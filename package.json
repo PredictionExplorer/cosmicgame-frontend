@@ -63,6 +63,7 @@
     "@types/react-dom": "19",
     "@uiw/codemirror-themes": "^4.19.16",
     "@uiw/react-codemirror": "^4.19.16",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/og": "^0.6.8",
     "@walletconnect/ethereum-provider": "^2.23.9",
     "axios": "^1.16.0",

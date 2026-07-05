@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 jest.mock('next/script', () => ({
   __esModule: true,
   default: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
@@ -17,6 +20,12 @@ jest.mock('../providers', () => ({
 }));
 
 jest.mock('../analytics', () => ({
+  Analytics: () => null,
+}));
+
+// Ships as untranspiled ESM; next/jest always ignores node_modules, so mock it
+// like wagmi/rainbowkit above.
+jest.mock('@vercel/analytics/next', () => ({
   Analytics: () => null,
 }));
 
@@ -150,4 +159,23 @@ describe('RootLayout viewport', () => {
 
 // RootLayout is an async Server Component (uses `headers()`); it cannot be rendered
 // reliably in jsdom like a sync client tree. Structure is covered by integration/e2e;
-// metadata and viewport are asserted above.
+// metadata and viewport are asserted above. The Vercel Analytics contract below is
+// therefore asserted statically against the layout source, following the same
+// approach as landing-shell-no-web3.test.ts.
+describe('RootLayout Vercel Analytics contract', () => {
+  const layoutSource = readFileSync(resolve(__dirname, '..', 'layout.tsx'), 'utf-8');
+
+  it('imports the Analytics component from @vercel/analytics/next', () => {
+    expect(layoutSource).toMatch(
+      /import\s*\{\s*Analytics\s+as\s+VercelAnalytics\s*\}\s*from\s*'@vercel\/analytics\/next'/,
+    );
+  });
+
+  it('renders <VercelAnalytics /> on both the landing and app host branches', () => {
+    const bodyMatch = layoutSource.match(/<body>([\s\S]*?)<\/body>/);
+    expect(bodyMatch).not.toBeNull();
+    // Rendered unconditionally inside <body> (outside the isLanding ternary),
+    // so both hosts report to Vercel Web Analytics.
+    expect(bodyMatch![1]).toContain('<VercelAnalytics />');
+  });
+});
