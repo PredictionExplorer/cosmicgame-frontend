@@ -275,7 +275,7 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
 
-    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );

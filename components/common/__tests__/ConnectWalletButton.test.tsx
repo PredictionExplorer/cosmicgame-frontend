@@ -1,5 +1,6 @@
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 
 import { render, screen } from '@/test-utils';
 
@@ -74,15 +75,28 @@ describe('ConnectWalletButton', () => {
     expect(tradeLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  it('links connected users to the Cosmic Signature marketplace', async () => {
+  it('links connected users to the Axiom Zero marketplace', async () => {
     renderWalletButton();
 
     const marketplaceLink = await screen.findByRole('link', {
-      name: 'Open Cosmic Signature marketplace',
+      name: 'Axiom Zero NFT marketplace',
     });
     expect(marketplaceLink).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
     expect(marketplaceLink).toHaveAttribute('target', '_blank');
     expect(marketplaceLink).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(marketplaceLink).toHaveTextContent('Axiom Zero Marketplace');
+  });
+
+  it('links connected users to Chaos Zero predictions', async () => {
+    renderWalletButton();
+
+    const predictionsLink = await screen.findByRole('link', {
+      name: 'Make predictions on Chaos Zero',
+    });
+    expect(predictionsLink).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
+    expect(predictionsLink).toHaveAttribute('target', '_blank');
+    expect(predictionsLink).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(predictionsLink).toHaveTextContent('Chaos Zero Predictions');
   });
 
   it('links connected users to the My NFTs page', async () => {

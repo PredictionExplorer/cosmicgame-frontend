@@ -237,9 +237,11 @@ describe('NavLink', () => {
 });
 
 describe('DrawerList', () => {
-  it('renders with a fixed width', () => {
+  it('fills the sheet and scrolls its own content', () => {
     const { container } = render(<DrawerList>Items</DrawerList>);
-    expect(container.firstChild).toHaveClass('w-[265px]');
+    expect(container.firstChild).toHaveClass('w-full');
+    expect(container.firstChild).toHaveClass('h-full');
+    expect(container.firstChild).toHaveClass('overflow-y-auto');
   });
 });
 

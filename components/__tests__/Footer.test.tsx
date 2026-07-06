@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 
 import Footer from '@/components/layout/Footer';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
@@ -94,11 +95,18 @@ describe('Footer', () => {
     expect(pg).toHaveAttribute('target', '_blank');
   });
 
-  it('renders the Cosmic Signature marketplace link', () => {
-    const marketplace = screen.getByRole('link', { name: 'NFT Marketplace' });
+  it('renders the Axiom Zero marketplace link', () => {
+    const marketplace = screen.getByRole('link', { name: 'Axiom Zero Marketplace' });
     expect(marketplace).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
     expect(marketplace).toHaveAttribute('target', '_blank');
     expect(marketplace).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('renders the Chaos Zero predictions link', () => {
+    const predictions = screen.getByRole('link', { name: 'Chaos Zero Predictions' });
+    expect(predictions).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
+    expect(predictions).toHaveAttribute('target', '_blank');
+    expect(predictions).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders the site map link', () => {

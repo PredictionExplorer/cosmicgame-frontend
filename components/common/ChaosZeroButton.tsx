@@ -1,48 +1,48 @@
 import type { AnchorHTMLAttributes } from 'react';
-import { Store } from 'lucide-react';
+import { TrendingUpDown } from 'lucide-react';
 
-import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-type NftMarketplaceButtonVariant = 'default' | 'secondary' | 'compact' | 'menu' | 'card';
+type ChaosZeroButtonVariant = 'default' | 'secondary' | 'compact' | 'menu' | 'card';
 
-interface NftMarketplaceButtonProps extends Omit<
+interface ChaosZeroButtonProps extends Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,
   'children' | 'href' | 'rel' | 'target'
 > {
-  variant?: NftMarketplaceButtonVariant;
+  variant?: ChaosZeroButtonVariant;
   label?: string;
 }
 
-const LABELS: Record<NftMarketplaceButtonVariant, string> = {
-  default: 'NFTs on Axiom Zero',
-  secondary: 'NFTs on Axiom Zero',
-  compact: 'Axiom Zero',
-  menu: 'Axiom Zero Marketplace',
-  card: 'Axiom Zero',
+const LABELS: Record<ChaosZeroButtonVariant, string> = {
+  default: 'Make Predictions on Chaos Zero',
+  secondary: 'Make Predictions on Chaos Zero',
+  compact: 'Chaos Zero',
+  menu: 'Chaos Zero Predictions',
+  card: 'Chaos Zero',
 };
 
-const buttonClasses: Record<Exclude<NftMarketplaceButtonVariant, 'menu'>, string> = {
+const buttonClasses: Record<Exclude<ChaosZeroButtonVariant, 'menu'>, string> = {
   default: 'h-11 px-5',
   secondary: 'h-11 px-5 border-primary/35 bg-primary/[0.06]',
   compact: 'h-9 rounded-full px-3.5 text-xs',
   card: 'h-8 rounded-md px-2.5 text-xs',
 };
 
-export function NftMarketplaceButton({
+export function ChaosZeroButton({
   variant = 'default',
   label,
   className,
-  'aria-label': ariaLabel = 'Axiom Zero NFT marketplace',
+  'aria-label': ariaLabel = 'Make predictions on Chaos Zero',
   ...props
-}: NftMarketplaceButtonProps) {
+}: ChaosZeroButtonProps) {
   const text = label ?? LABELS[variant];
 
   if (variant === 'menu') {
     return (
       <a
-        href={COSMIC_SIGNATURE_MARKETPLACE_URL}
+        href={CHAOS_ZERO_PREDICTIONS_URL}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={ariaLabel}
@@ -52,7 +52,7 @@ export function NftMarketplaceButton({
         )}
         {...props}
       >
-        <Store className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+        <TrendingUpDown className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
         {text}
       </a>
     );
@@ -68,14 +68,14 @@ export function NftMarketplaceButton({
       className={cn(buttonClasses[variant], className)}
     >
       <a
-        href={COSMIC_SIGNATURE_MARKETPLACE_URL}
+        href={CHAOS_ZERO_PREDICTIONS_URL}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={ariaLabel}
         {...props}
       >
         {text}
-        <Store className="h-4 w-4" aria-hidden />
+        <TrendingUpDown className="h-4 w-4" aria-hidden />
       </a>
     </Button>
   );

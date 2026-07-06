@@ -1,19 +1,27 @@
 'use client';
 
-import { useState, useEffect, useMemo, type FC } from 'react';
+import { useState, useEffect, useMemo, type FC, type ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, Menu } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Coins,
+  Gift,
+  History,
+  Layers,
+  LayoutDashboard,
+  Menu,
+  type LucideIcon,
+} from 'lucide-react';
 import { formatEther } from 'viem';
 
 import { cn } from '@/lib/utils';
-import getNAVs from '@/config/nav';
+import getNAVs, { type NavDescriptor } from '@/config/nav';
+import { ECOSYSTEM_DESTINATIONS } from '@/config/ecosystem';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
-import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
-import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
-import { AppBarWrapper, DrawerList } from '@/components/styled';
 import ListNavItem from '@/components/common/ListNavItem';
-import ListItemButton from '@/components/common/ListItemButton';
+import { EcosystemDock } from '@/components/layout/EcosystemDock';
+import { AppBarWrapper, DrawerList } from '@/components/styled';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useUserBalance, useUserInfo } from '@/hooks/useApiQuery';
@@ -31,6 +39,93 @@ interface Balance {
   CosmicSignature: number;
   RWLK: number;
 }
+
+/** Section label used throughout the mobile drawer. */
+const DrawerHeading: FC<{ children: ReactNode }> = ({ children }) => (
+  <p className="px-5 pb-1.5 pt-4 font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
+    {children}
+  </p>
+);
+
+/** Icon tile shared by drawer rows: falls back to a dot when no icon is set. */
+const DrawerIconTile: FC<{ icon?: LucideIcon; className?: string }> = ({
+  icon: Icon,
+  className,
+}) => (
+  <span
+    className={cn(
+      'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.04] text-white/55',
+      className,
+    )}
+    aria-hidden
+  >
+    {Icon ? <Icon className="h-4 w-4" /> : <span className="h-1.5 w-1.5 rounded-full bg-current" />}
+  </span>
+);
+
+const isExternalRoute = (route?: string) => !!route && /^https?:\/\//.test(route);
+
+/** One navigation row in the mobile drawer. */
+const DrawerNavRow: FC<{ item: NavDescriptor; onNavigate: () => void }> = ({
+  item,
+  onNavigate,
+}) => {
+  const rowClassName =
+    'flex items-center gap-3 px-5 py-2.5 text-sm text-white/75 no-underline transition-colors duration-[var(--duration-fast)] hover:bg-white/[0.04] hover:text-white';
+
+  const content = (
+    <>
+      <DrawerIconTile icon={item.icon} />
+      <span className="flex items-center gap-1.5">{item.title}</span>
+      {item.external ? (
+        <ArrowUpRight className="ml-auto h-3.5 w-3.5 shrink-0 text-white/30" aria-hidden />
+      ) : null}
+    </>
+  );
+
+  if (isExternalRoute(item.route)) {
+    return (
+      <a href={item.route} rel="noopener" className={rowClassName}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={item.route ?? '#'} className={rowClassName} onClick={onNavigate}>
+      {content}
+    </Link>
+  );
+};
+
+/** Featured drawer rows (e.g. Discover) render as a gradient card. */
+const DrawerFeaturedCard: FC<{ item: NavDescriptor }> = ({ item }) => {
+  const Icon = item.icon;
+  return (
+    <a
+      href={item.route}
+      rel="noopener"
+      className="group mx-4 mt-2 flex items-center gap-3 rounded-xl border border-white/[0.08] bg-[linear-gradient(120deg,rgb(var(--aurora-cyan-rgb)/0.07),rgb(var(--nebula-violet-rgb)/0.14))] px-3 py-3 no-underline transition-colors duration-[var(--duration-fast)] hover:border-[rgb(var(--aurora-cyan-rgb)/0.35)]"
+    >
+      <span
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-signature-gradient text-white"
+        aria-hidden
+      >
+        {Icon ? <Icon className="h-4 w-4" /> : null}
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="text-sm font-medium leading-tight text-white">{item.title}</span>
+        {item.description ? (
+          <span className="mt-0.5 text-xs leading-snug text-white/55">{item.description}</span>
+        ) : null}
+      </span>
+      <ArrowUpRight
+        className="ml-auto h-4 w-4 shrink-0 text-white/45 transition-colors group-hover:text-white"
+        aria-hidden
+      />
+    </a>
+  );
+};
 
 const Header: FC = () => {
   const [mobileView, setMobileView] = useState<boolean>(false);
@@ -92,8 +187,11 @@ const Header: FC = () => {
   }, []);
 
   const navs = getNAVs(status, account);
+  const standaloneNavs = navs.filter((nav) => !nav.children);
+  const groupedNavs = navs.filter((nav) => nav.children);
 
   const handleDrawerOpen = () => setDrawerOpen(true);
+  const closeDrawer = () => setDrawerOpen(false);
 
   const hasUnclaimedRewards = !!(
     account &&
@@ -103,84 +201,96 @@ const Header: FC = () => {
         (status?.claimableActionIds?.length ?? 0) > 0))
   );
 
-  const renderDesktop = () => (
-    <nav aria-label="Primary" className="flex items-center gap-6 lg:gap-8">
-      <Link
-        href="/"
-        aria-label="Cosmic Signature home"
-        className="flex items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[oklch(84.7%_0.149_213)]"
-      >
+  const brand = (
+    <Link
+      href="/"
+      aria-label="Cosmic Signature home"
+      className="group flex shrink-0 items-center gap-3 rounded-full no-underline"
+    >
+      <span className="relative flex h-10 w-10 items-center justify-center">
+        <span
+          aria-hidden
+          className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgb(var(--aurora-cyan-rgb)/0.35),transparent_70%)] opacity-0 blur-md transition-opacity duration-[var(--duration-base)] group-hover:opacity-100"
+        />
         <Image
           src="/images/logo2.svg"
           width={48}
           height={48}
           alt="Cosmic Signature"
           loading="eager"
-          className="h-10 w-auto max-h-10 object-contain"
+          className="relative h-10 w-auto max-h-10 object-contain"
         />
-      </Link>
+      </span>
+      <span className="hidden flex-col justify-center leading-none xl:flex">
+        <span className="font-display text-[15px] font-semibold tracking-[0.02em] text-white">
+          Cosmic Signature
+        </span>
+        <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+          On-chain art protocol
+        </span>
+      </span>
+    </Link>
+  );
 
-      {navs.map((nav, i) => (
-        <ListNavItem key={i} nav={nav} />
-      ))}
+  const renderDesktop = () => (
+    <nav aria-label="Primary" className="flex items-center gap-4 xl:gap-6">
+      {brand}
 
-      <a
-        href="https://cosmicsignature.com"
-        className="hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[oklch(84.7%_0.149_213)]/40 hover:bg-white/10 hover:text-white xl:inline-flex"
-        rel="noopener"
-        aria-label="Discover Cosmic Signature"
-      >
-        <span className="h-1.5 w-1.5 rounded-full bg-[oklch(84.7%_0.149_213)]" aria-hidden />
-        Discover
-        <ArrowUpRight className="h-3 w-3 opacity-70" aria-hidden />
-      </a>
+      <div className="flex items-center gap-0.5 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md">
+        {navs.map((nav, i) => (
+          <ListNavItem key={i} nav={nav} />
+        ))}
+      </div>
 
-      <UniswapTradeButton variant="compact" className="hidden lg:inline-flex" />
-      <NftMarketplaceButton variant="compact" className="hidden lg:inline-flex" />
-
-      <ConnectWalletButton
-        isMobileView={false}
-        loading={loading}
-        balance={balance}
-        stakedTokenCount={{
-          cst: anchoredCSTokens?.length,
-          rwalk: anchoredRWLKTokens?.length,
-        }}
-        hasUnclaimedRewards={hasUnclaimedRewards}
-      />
+      <div className="ml-auto flex items-center gap-3">
+        <EcosystemDock />
+        <ConnectWalletButton
+          isMobileView={false}
+          loading={loading}
+          balance={balance}
+          stakedTokenCount={{
+            cst: anchoredCSTokens?.length,
+            rwalk: anchoredRWLKTokens?.length,
+          }}
+          hasUnclaimedRewards={hasUnclaimedRewards}
+        />
+      </div>
     </nav>
   );
 
   const renderMobile = () => {
     return (
-      <nav className="flex items-center gap-2">
+      <nav className="flex items-center gap-2.5">
         <Button
           variant="ghost"
           size="icon"
           aria-label="menu"
           aria-haspopup="true"
           onClick={handleDrawerOpen}
-          className="mr-2"
+          className="h-10 w-10 shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03]"
         >
           {hasUnclaimedRewards ? (
             <span className="relative inline-flex">
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5" />
               <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-400" />
             </span>
           ) : (
-            <Menu className="h-6 w-6" />
+            <Menu className="h-5 w-5" />
           )}
         </Button>
 
-        <Link href="/">
+        <Link href="/" className="flex items-center gap-2.5 no-underline">
           <Image
             src="/images/logo2.svg"
             width={48}
             height={48}
             alt="logo"
             loading="eager"
-            className="h-10 w-auto max-h-10 object-contain"
+            className="h-9 w-auto max-h-9 object-contain"
           />
+          <span className="hidden font-display text-sm font-semibold tracking-[0.02em] text-white min-[480px]:inline">
+            Cosmic Signature
+          </span>
         </Link>
 
         <div className="ml-auto max-w-[12rem] overflow-hidden">
@@ -197,10 +307,33 @@ const Header: FC = () => {
         </div>
 
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <SheetContent side="left" className="w-[280px] p-0 sm:max-w-[280px]">
+          <SheetContent
+            side="left"
+            className="w-[320px] border-r border-white/[0.08] p-0 sm:max-w-[320px]"
+          >
             <SheetTitle className="sr-only">Navigation</SheetTitle>
             <DrawerList>
-              <div className="px-4 py-3">
+              {/* Brand */}
+              <div className="flex items-center gap-2.5 border-b border-white/[0.06] px-5 pb-3.5 pt-2">
+                <Image
+                  src="/images/logo2.svg"
+                  width={32}
+                  height={32}
+                  alt=""
+                  aria-hidden
+                  className="h-8 w-auto object-contain"
+                />
+                <span className="flex flex-col leading-none">
+                  <span className="font-display text-sm font-semibold tracking-[0.02em] text-white">
+                    Cosmic Signature
+                  </span>
+                  <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.3em] text-white/40">
+                    On-chain art protocol
+                  </span>
+                </span>
+              </div>
+
+              <div className="px-5 py-4">
                 <ConnectWalletButton
                   isMobileView
                   balance={balance}
@@ -212,79 +345,76 @@ const Header: FC = () => {
                 />
               </div>
 
-              <Separator />
+              <Separator className="bg-white/[0.06]" />
 
-              {/* Protocol */}
-              <p className="px-4 pt-4 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-                Protocol
-              </p>
-              <ListItemButton nav={{ title: 'Gallery', route: '/gallery' }} />
+              {/* Protocol: standalone destinations (Gallery, plus contextual items) */}
+              <DrawerHeading>Protocol</DrawerHeading>
+              {standaloneNavs.map((nav, i) => (
+                <DrawerNavRow key={i} item={nav} onNavigate={closeDrawer} />
+              ))}
 
-              <Separator className="my-2" />
+              {/* Grouped destinations (Explore, Help) */}
+              {groupedNavs.map((group, i) => (
+                <div key={i}>
+                  <Separator className="my-2 bg-white/[0.06]" />
+                  <DrawerHeading>{group.title}</DrawerHeading>
+                  {group.children
+                    ?.filter((child) => !child.featured)
+                    .map((child, j) => (
+                      <DrawerNavRow key={j} item={child} onNavigate={closeDrawer} />
+                    ))}
+                  {group.children
+                    ?.filter((child) => child.featured)
+                    .map((child, j) => (
+                      <DrawerFeaturedCard key={`featured-${j}`} item={child} />
+                    ))}
+                </div>
+              ))}
 
-              {/* Explore */}
-              <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-                Explore
-              </p>
-              <ListItemButton nav={{ title: 'Current Cycle', route: '/current-cycle' }} />
-              <ListItemButton nav={{ title: 'Allocation Recipients', route: '/allocation' }} />
-              <ListItemButton nav={{ title: 'Anchor Distributions', route: '/anchoring' }} />
-              <ListItemButton nav={{ title: 'Outreach Reserve', route: '/marketing' }} />
-              <ListItemButton nav={{ title: 'Statistics', route: '/statistics' }} />
-              <ListItemButton nav={{ title: 'Contracts', route: '/contracts' }} />
+              <Separator className="my-2 bg-white/[0.06]" />
 
-              <Separator className="my-2" />
-
-              {/* Help */}
-              <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-                Help
-              </p>
-              <ListItemButton nav={{ title: 'How It Works', route: '/how-it-works' }} />
-              <ListItemButton nav={{ title: 'FAQ', route: '/faq' }} />
-
-              <Separator className="my-2" />
-
-              {/* Cross-host link to the marketing site */}
-              <a
-                href="https://cosmicsignature.com"
-                rel="noopener"
-                aria-label="Discover Cosmic Signature"
-                className="mx-4 mt-2 inline-flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70 transition hover:border-[oklch(84.7%_0.149_213)]/40 hover:bg-white/10 hover:text-white"
-              >
-                <span className="flex items-center gap-2">
-                  <span
-                    className="h-1.5 w-1.5 rounded-full bg-[oklch(84.7%_0.149_213)]"
-                    aria-hidden
-                  />
-                  Discover
-                </span>
-                <ArrowUpRight className="h-4 w-4 opacity-70" aria-hidden />
-              </a>
-
-              <div className="px-4 pt-3">
-                <UniswapTradeButton
-                  variant="secondary"
-                  className="h-10 w-full justify-between rounded-lg px-3 text-sm"
-                />
-              </div>
-              <div className="px-4 pt-2">
-                <NftMarketplaceButton
-                  variant="secondary"
-                  className="h-10 w-full justify-between rounded-lg px-3 text-sm"
-                />
-              </div>
+              {/* Ecosystem: Uniswap, Axiom Zero, Chaos Zero */}
+              <DrawerHeading>Ecosystem</DrawerHeading>
+              {ECOSYSTEM_DESTINATIONS.map((destination) => {
+                const Icon = destination.icon;
+                return (
+                  <a
+                    key={destination.id}
+                    href={destination.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={destination.ariaLabel}
+                    className="flex items-center gap-3 px-5 py-2.5 no-underline transition-colors duration-[var(--duration-fast)] hover:bg-white/[0.04]"
+                  >
+                    <DrawerIconTile icon={Icon} />
+                    <span className="flex min-w-0 flex-col">
+                      <span className="text-sm leading-tight text-white/85">
+                        {destination.name}
+                      </span>
+                      <span className="mt-0.5 text-xs leading-tight text-white/45">
+                        {destination.product}
+                      </span>
+                    </span>
+                    <ArrowUpRight
+                      className="ml-auto h-3.5 w-3.5 shrink-0 text-white/30"
+                      aria-hidden
+                    />
+                  </a>
+                );
+              })}
 
               {account && (
                 <>
-                  <Separator className="my-2" />
+                  <Separator className="my-2 bg-white/[0.06]" />
 
                   {/* My Account */}
-                  <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-                    My Account
-                  </p>
-                  <ListItemButton nav={{ title: 'My Dashboard', route: '/my-statistics' }} />
-                  <ListItemButton
-                    nav={{
+                  <DrawerHeading>My Account</DrawerHeading>
+                  <DrawerNavRow
+                    item={{ title: 'My Dashboard', route: '/my-statistics', icon: LayoutDashboard }}
+                    onNavigate={closeDrawer}
+                  />
+                  <DrawerNavRow
+                    item={{
                       title: hasUnclaimedRewards ? (
                         <span className="flex items-center gap-2">
                           My Allocations
@@ -294,19 +424,32 @@ const Header: FC = () => {
                         'My Allocations'
                       ),
                       route: '/my-allocations',
+                      icon: Gift,
                     }}
+                    onNavigate={closeDrawer}
                   />
-                  <ListItemButton nav={{ title: 'My NFTs', route: '/my-tokens' }} />
-                  <ListItemButton nav={{ title: 'My Anchors', route: '/my-anchors' }} />
-                  <ListItemButton
-                    nav={{ title: 'Recipient History', route: '/recipient-history' }}
+                  <DrawerNavRow
+                    item={{ title: 'My NFTs', route: '/my-tokens', icon: Coins }}
+                    onNavigate={closeDrawer}
+                  />
+                  <DrawerNavRow
+                    item={{ title: 'My Anchors', route: '/my-anchors', icon: Layers }}
+                    onNavigate={closeDrawer}
+                  />
+                  <DrawerNavRow
+                    item={{
+                      title: 'Recipient History',
+                      route: '/recipient-history',
+                      icon: History,
+                    }}
+                    onNavigate={closeDrawer}
                   />
 
-                  <Separator className="my-2" />
+                  <Separator className="my-2 bg-white/[0.06]" />
 
                   {/* Balances */}
-                  <div className="px-4 py-2 space-y-1.5">
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                  <div className="space-y-1.5 px-5 py-2">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
                       Balances
                     </p>
                     {loading ? (
@@ -333,8 +476,8 @@ const Header: FC = () => {
                     )}
                   </div>
 
-                  <div className="px-4 py-2 space-y-1.5">
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                  <div className="space-y-1.5 px-5 py-2">
+                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
                       Anchored
                     </p>
                     <div className="flex justify-between text-xs">
@@ -348,6 +491,8 @@ const Header: FC = () => {
                   </div>
                 </>
               )}
+
+              <div className="pb-6" />
             </DrawerList>
           </SheetContent>
         </Sheet>

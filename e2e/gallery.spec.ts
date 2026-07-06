@@ -18,9 +18,7 @@ test.describe('Gallery page', () => {
   });
 
   test('links to the Cosmic Signature marketplace', async ({ page }) => {
-    const marketplaceLink = page
-      .getByRole('link', { name: 'Open Cosmic Signature marketplace' })
-      .first();
+    const marketplaceLink = page.getByRole('link', { name: 'Axiom Zero NFT marketplace' }).first();
     await ensureVisible(marketplaceLink);
     await expect(marketplaceLink).toBeVisible();
     await expect(marketplaceLink).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);

@@ -119,7 +119,12 @@ export function AppBarWrapper({
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-background/78 py-4 shadow-[0_16px_70px_-60px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-2xl print:static print:z-auto print:w-full',
+        // Base chrome: fixed glass bar with a soft aurora shadow.
+        'fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-background/80 py-4 shadow-[0_16px_70px_-60px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-2xl',
+        // Gradient hairlines: a faint stellar sheen on top, an aurora seam below.
+        'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/[0.14] before:to-transparent',
+        'after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-px after:h-px after:bg-gradient-to-r after:from-transparent after:via-[rgb(var(--aurora-cyan-rgb)/0.4)] after:to-transparent',
+        'print:static print:z-auto print:w-full print:before:hidden print:after:hidden',
         className,
       )}
       {...props}
@@ -142,7 +147,12 @@ export function FooterWrapper({
 }
 
 export function DrawerList({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('pt-4 w-[265px] h-full bg-background', className)} {...props} />;
+  return (
+    <div
+      className={cn('flex h-full w-full flex-col overflow-y-auto bg-background pt-2', className)}
+      {...props}
+    />
+  );
 }
 
 export function Wallet({

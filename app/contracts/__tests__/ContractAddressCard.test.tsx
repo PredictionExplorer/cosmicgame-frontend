@@ -105,7 +105,7 @@ describe('ContractAddressCard', () => {
       <ContractAddressCard {...defaultProps} name="Cosmic Signature NFT" showMarketplaceAction />,
     );
 
-    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );
@@ -115,7 +115,7 @@ describe('ContractAddressCard', () => {
     render(<ContractAddressCard {...defaultProps} />);
 
     expect(
-      screen.queryByRole('link', { name: 'Open Cosmic Signature marketplace' }),
+      screen.queryByRole('link', { name: 'Axiom Zero NFT marketplace' }),
     ).not.toBeInTheDocument();
   });
 

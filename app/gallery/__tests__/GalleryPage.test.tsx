@@ -116,7 +116,7 @@ describe('GalleryPage', () => {
     mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<GalleryPage />);
 
-    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );

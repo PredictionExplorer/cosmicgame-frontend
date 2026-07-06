@@ -177,11 +177,23 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     expect(description!).not.toMatch(/strategy bidding game/i);
   });
 
-  test('header has a cross-host Discover link to the marketing site', async ({ page }) => {
-    // On desktop viewports the "Discover" chip is visible. On mobile,
-    // it lives inside the drawer. Assert at least the anchor exists.
-    const links = page.locator('a[href="https://cosmicsignature.com"]');
-    const count = await links.count();
-    expect(count).toBeGreaterThan(0);
+  test('navigation hosts a cross-host Discover link to the marketing site', async ({ page }) => {
+    const isMobileViewport = await page.evaluate(() => window.innerWidth < 1024);
+
+    if (isMobileViewport) {
+      // On mobile the featured Discover card lives inside the drawer.
+      await page.getByRole('button', { name: 'menu' }).click();
+      const discover = page
+        .getByRole('dialog')
+        .locator('a[href="https://cosmicsignature.com"]')
+        .first();
+      await expect(discover).toBeVisible();
+    } else {
+      // On desktop it is the featured card at the bottom of the Help panel.
+      await page.getByRole('button', { name: /^Help$/ }).click();
+      const discover = page.locator('[role="menu"] a[href="https://cosmicsignature.com"]').first();
+      await expect(discover).toBeVisible();
+      await expect(discover).toContainText(/Discover/i);
+    }
   });
 });

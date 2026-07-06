@@ -113,7 +113,7 @@ describe('ContractAddressGrid', () => {
   it('shows the marketplace action only for the Cosmic Signature NFT contract', () => {
     render(<ContractAddressGrid {...defaultProps} />);
 
-    const links = screen.getAllByRole('link', { name: 'Open Cosmic Signature marketplace' });
+    const links = screen.getAllByRole('link', { name: 'Axiom Zero NFT marketplace' });
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
   });
