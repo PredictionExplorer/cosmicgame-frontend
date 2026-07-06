@@ -6,8 +6,8 @@ describe('linkifyMessage', () => {
   });
 
   it('returns a single text segment when there is no URL', () => {
-    expect(linkifyMessage('gm cosmos, good luck everyone')).toEqual([
-      { type: 'text', value: 'gm cosmos, good luck everyone' },
+    expect(linkifyMessage('gm cosmos, enjoy the cycle everyone')).toEqual([
+      { type: 'text', value: 'gm cosmos, enjoy the cycle everyone' },
     ]);
   });
 
