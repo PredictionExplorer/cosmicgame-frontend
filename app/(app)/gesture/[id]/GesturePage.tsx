@@ -14,6 +14,7 @@ import {
   detailPanelClass,
 } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { LinkifiedText } from '@/components/ui/linkified-text';
 import { PageShell } from '@/components/ui/page-shell';
 import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
 import NFTImage from '@/components/nft/NFTImage';
@@ -295,7 +296,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
             >
               <div className="px-4 py-4 sm:px-5">
                 <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                  {gestureInfo.Message || '\u2014'}
+                  {gestureInfo.Message ? <LinkifiedText text={gestureInfo.Message} /> : '\u2014'}
                 </p>
               </div>
             </SectionCard>

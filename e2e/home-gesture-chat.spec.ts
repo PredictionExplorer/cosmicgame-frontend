@@ -183,7 +183,7 @@ test.describe('home gesture chat', () => {
 
     await expect(chat).toBeVisible();
     await expect(chat.getByRole('heading', { name: 'Gesture Chat' })).toBeVisible();
-    await expect(chat.getByText('Cycle #7 messages from gestures.')).toBeVisible();
+    await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
     await expect(chat.getByText('Newest message from a gesture')).toBeVisible();
     await expect(chat.getByText('Older message from a gesture')).toBeVisible();
     await expect(chat.getByRole('link', { name: 'Open gesture position 103' })).toHaveAttribute(

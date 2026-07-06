@@ -329,6 +329,24 @@ describe('GestureForm', () => {
     expect(defaultProps.setMessage).toHaveBeenCalledWith('hello world');
   });
 
+  it('shows a live character counter for the message', () => {
+    const { rerender } = render(<GestureForm {...defaultProps} advancedExpanded />);
+    expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('0/280');
+
+    rerender(<GestureForm {...defaultProps} advancedExpanded message="hello" />);
+    expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('5/280');
+  });
+
+  it('highlights the character counter when the message nears the limit', () => {
+    const { rerender } = render(
+      <GestureForm {...defaultProps} advancedExpanded message={'a'.repeat(259)} />,
+    );
+    expect(screen.getByTestId('gesture-message-char-count')).not.toHaveClass('text-amber-300');
+
+    rerender(<GestureForm {...defaultProps} advancedExpanded message={'a'.repeat(260)} />);
+    expect(screen.getByTestId('gesture-message-char-count')).toHaveClass('text-amber-300');
+  });
+
   it('explains that gesture messages appear in chat and stay on-chain', async () => {
     const user = userEvent.setup();
     render(<GestureForm {...defaultProps} advancedExpanded />);

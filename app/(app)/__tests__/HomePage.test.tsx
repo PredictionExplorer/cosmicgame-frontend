@@ -281,8 +281,23 @@ jest.mock('../../../utils', () => ({
     return value < 10 ? `${value.toFixed(4)} ETH` : `${value.toFixed(2)} ETH`;
   },
   formatId: (id: number | string) => `#${id.toString().padStart(6, '0')}`,
+  formatTableAmount: (value: number | null | undefined) =>
+    value == null || !Number.isFinite(value) ? '\u2014' : String(value),
   getAssetsUrl: (path: string) => `https://assets.example.com/${path}`,
   getEnduranceChampions: () => [],
+  getGestureKindLabel: (gestureType: unknown) =>
+    gestureType === 2
+      ? 'a CST gesture'
+      : gestureType === 1
+        ? 'an ETH + RandomWalk gesture'
+        : 'an ETH gesture',
+  getRelativeTime: () => 'just now',
+  resolveGestureTypeCode: (record: { GestureType?: unknown; BidType?: unknown }) =>
+    typeof record.GestureType === 'number'
+      ? record.GestureType
+      : typeof record.BidType === 'number'
+        ? record.BidType
+        : undefined,
   shortenHex: (hex: string, length = 4) =>
     hex ? `${hex.substring(0, length + 2)}....${hex.substring(hex.length - length)}` : '',
 }));
@@ -705,6 +720,28 @@ describe('HomePage', () => {
     expect(within(chat).getByText('Newest current-cycle signal')).toBeInTheDocument();
     expect(within(chat).getByText('Older current-cycle signal')).toBeInTheDocument();
     expect(within(chat).queryByRole('link', { name: 'Open gesture 3' })).not.toBeInTheDocument();
+  });
+
+  it('expands the gesture form message options from the chat empty-state CTA', async () => {
+    const user = userEvent.setup();
+    const { scrollIntoView, restore } = mockScrollIntoView();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({ data: [] });
+
+    try {
+      render(<HomePage />);
+
+      const chat = screen.getByTestId('gesture-message-chat');
+      await user.click(within(chat).getByRole('button', { name: 'Make a Gesture' }));
+
+      expect(mockGestureForm.setAdvancedExpanded).toHaveBeenCalledWith(true);
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+    } finally {
+      restore();
+    }
   });
 
   it('keeps the gesture chat in the page when the current cycle has no messages', () => {

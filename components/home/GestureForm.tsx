@@ -66,6 +66,9 @@ const gestureOptions = [
   { value: 'CST', label: 'CST', desc: 'ERC-20' },
 ];
 
+const MESSAGE_MAX_LENGTH = protocolFacts.gestureMessageMaxLength;
+const MESSAGE_COUNTER_WARN_AT = MESSAGE_MAX_LENGTH - 20;
+
 function formatCompactCstDelta(value: number): string {
   return formatCstAmount(value)
     .replace(/(\.\d*?)0+$/, '$1')
@@ -365,12 +368,25 @@ export function GestureForm({
                 <textarea
                   placeholder="Leave a message with your gesture..."
                   value={message}
-                  maxLength={280}
+                  maxLength={MESSAGE_MAX_LENGTH}
                   rows={3}
                   disabled={previewMode}
                   className="w-full flex min-h-[72px] rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
                   onChange={(e) => setMessage(e.target.value)}
                 />
+                <div className="mt-1.5 flex justify-end">
+                  <span
+                    data-testid="gesture-message-char-count"
+                    className={cn(
+                      'text-xs tabular-nums',
+                      message.length >= MESSAGE_COUNTER_WARN_AT
+                        ? 'text-amber-300'
+                        : 'text-muted-foreground/60',
+                    )}
+                  >
+                    {message.length}/{MESSAGE_MAX_LENGTH}
+                  </span>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.

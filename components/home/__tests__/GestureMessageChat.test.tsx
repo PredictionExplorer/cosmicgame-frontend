@@ -4,7 +4,7 @@ import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import type { GestureInfo } from '@/services/api';
 
-import { render, screen, within, act, checkA11y } from '@/test-utils';
+import { render, screen, within, act, checkA11y, fireEvent } from '@/test-utils';
 
 import { GestureMessageChat } from '../GestureMessageChat';
 
@@ -52,7 +52,22 @@ describe('GestureMessageChat', () => {
     expect(screen.getByRole('heading', { name: 'Gesture Chat' })).toBeInTheDocument();
     expect(screen.getByText('First signal')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Open gesture 2' })).not.toBeInTheDocument();
-    expect(screen.getByText(/Cycle #7 messages from gestures/)).toBeInTheDocument();
+    expect(screen.getByText(/Cycle #7 · 1 message/)).toBeInTheDocument();
+  });
+
+  it('counts only visible messages in the header subtitle', () => {
+    render(
+      <GestureMessageChat
+        cycleNumber={9}
+        gestures={[
+          makeGesture({ EvtLogId: 1, Message: 'One' }),
+          makeGesture({ EvtLogId: 2, Message: 'Two' }),
+          makeGesture({ EvtLogId: 3, Message: '' }),
+        ]}
+      />,
+    );
+
+    expect(screen.getByText(/Cycle #9 · 2 messages/)).toBeInTheDocument();
   });
 
   it('shows newest messages first regardless of input order', () => {
@@ -83,10 +98,11 @@ describe('GestureMessageChat', () => {
     ).not.toHaveLength(0);
   });
 
-  it('renders the address, date, time, and message body', () => {
+  it('renders the address, relative time, and message body', async () => {
+    const user = userEvent.setup();
     const participant = '0x2222222222222222222222222222222222222222';
-    const timestamp = 1_700_001_234;
-    const [date, time] = convertTimestampToDateTime(timestamp, true).split(', ');
+    const timestamp = Math.floor(Date.now() / 1000) - 300;
+    const absolute = convertTimestampToDateTime(timestamp, true);
 
     render(
       <GestureMessageChat
@@ -109,9 +125,86 @@ describe('GestureMessageChat', () => {
     const positionBadge = screen.getByRole('link', { name: 'Open gesture position 3' });
     expect(positionBadge).toHaveAttribute('href', '/gesture/9');
     expect(positionBadge).toHaveTextContent('#3');
-    expect(screen.getByText(date!)).toBeInTheDocument();
-    expect(screen.getByText(time!)).toBeInTheDocument();
+
+    const time = screen.getByText('5 minutes ago');
+    expect(time).toHaveAttribute('dateTime', new Date(timestamp * 1000).toISOString());
+    await user.hover(time);
+    expect(await screen.findAllByText(absolute)).not.toHaveLength(0);
+
     expect(screen.getByText('A carefully timed gesture.')).toBeInTheDocument();
+  });
+
+  it('shows a gesture method badge with the gesture cost', () => {
+    render(
+      <GestureMessageChat
+        gestures={[
+          makeGesture({ EvtLogId: 1, GestureType: 0, GestureCostEth: 0.1, Message: 'eth' }),
+          makeGesture({ EvtLogId: 2, GestureType: 2, CstCost: 20, Message: 'cst' }),
+          makeGesture({ EvtLogId: 3, GestureType: 1, GestureCostEth: 0.05, Message: 'rwlk' }),
+        ]}
+      />,
+    );
+
+    const badges = screen.getAllByTestId('gesture-method-badge').map((badge) => badge.textContent);
+    expect(badges).toContain('0.1 ETH');
+    expect(badges).toContain('20 CST');
+    expect(badges).toContain('0.05 ETH + RWLK');
+  });
+
+  it('copies the participant address from a message', async () => {
+    const originalClipboard = navigator.clipboard;
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText },
+      writable: true,
+      configurable: true,
+    });
+    try {
+      const participant = '0x5555555555555555555555555555555555555555';
+      render(
+        <GestureMessageChat
+          gestures={[makeGesture({ BidderAddr: participant, Message: 'copy me' })]}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Copy address' }));
+
+      expect(writeText).toHaveBeenCalledWith(participant);
+      expect(await screen.findByRole('button', { name: 'Address copied' })).toBeInTheDocument();
+    } finally {
+      Object.defineProperty(navigator, 'clipboard', {
+        value: originalClipboard,
+        writable: true,
+        configurable: true,
+      });
+    }
+  });
+
+  it('linkifies message URLs behind a leave-site confirmation', async () => {
+    const openSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
+    try {
+      const user = userEvent.setup();
+      render(
+        <GestureMessageChat
+          gestures={[makeGesture({ Message: 'mint at https://example.com/mint now' })]}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'https://example.com/mint' }));
+
+      expect(await screen.findByRole('dialog')).toHaveTextContent('Leaving Cosmic Signature');
+      expect(openSpy).not.toHaveBeenCalled();
+
+      await user.click(screen.getByRole('button', { name: 'Open Link' }));
+
+      expect(openSpy).toHaveBeenCalledWith(
+        'https://example.com/mint',
+        '_blank',
+        'noopener,noreferrer',
+      );
+    } finally {
+      openSpy.mockRestore();
+    }
   });
 
   it('keeps long content as text and exposes the full wallet address', () => {
@@ -137,6 +230,19 @@ describe('GestureMessageChat', () => {
         'Messages attached to current-cycle gestures will appear here, newest first.',
       ),
     ).toBeInTheDocument();
+    expect(screen.getByText(/Current cycle · No messages yet/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Make a Gesture' })).not.toBeInTheDocument();
+  });
+
+  it('offers a Make a Gesture call to action in the empty state when wired', async () => {
+    const user = userEvent.setup();
+    const onJoinCta = jest.fn();
+
+    render(<GestureMessageChat gestures={[]} onJoinCta={onJoinCta} />);
+
+    await user.click(screen.getByRole('button', { name: 'Make a Gesture' }));
+
+    expect(onJoinCta).toHaveBeenCalledTimes(1);
   });
 
   it('exposes spacious desktop scroll and message layout classes', () => {

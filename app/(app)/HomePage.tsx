@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 
-import { formatSeconds, shortenHex } from '@/utils';
+import { formatSeconds, getGestureKindLabel, shortenHex } from '@/utils';
 
 import { reportError } from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
@@ -71,12 +71,6 @@ const sectionFade = {
 
 function renderInlineCountdown({ total }: CountdownRenderProps) {
   return <span className="font-mono tabular-nums">{formatSeconds(Math.ceil(total / 1000))}</span>;
-}
-
-function getGestureKindLabel(gestureType: unknown): string {
-  if (gestureType === 2) return 'a CST gesture';
-  if (gestureType === 1) return 'an ETH + RandomWalk gesture';
-  return 'an ETH gesture';
 }
 
 function formatRelativeGestureAge(timestamp: unknown, nowMs: number): string {
@@ -226,6 +220,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     setBidType,
     setMessage,
     setRwlkId,
+    setAdvancedExpanded,
   } = gestureForm;
   const cstDisplayNow =
     now > 0 && (!cstGestureData.updatedAtMs || now > cstGestureData.updatedAtMs) ? now : Date.now();
@@ -353,6 +348,12 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   const handlePrimaryCtaClick = useCallback(() => {
     scrollToGestureForm();
   }, [scrollToGestureForm]);
+
+  // Chat empty-state CTA: reveal the message field (Advanced) and bring the form into view.
+  const handleJoinChatCta = useCallback(() => {
+    setAdvancedExpanded(true);
+    scrollToGestureForm();
+  }, [scrollToGestureForm, setAdvancedExpanded]);
 
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
@@ -621,6 +622,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
               gestures={curGestureList}
               cycleNumber={round >= 0 ? round : undefined}
               pulseKey={gesturePulseKey}
+              onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
               className="min-h-[30rem] xl:sticky xl:top-24 xl:min-h-[38rem] 2xl:min-h-[42rem]"
             />
 
