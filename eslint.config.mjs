@@ -62,6 +62,10 @@ const config = [
     rules: {
       '@next/next/no-img-element': 'off',
       'jsx-a11y/alt-text': 'off',
+      // Tests render plain anchors on purpose (asChild wrappers, fixtures).
+      // With the (app)/(landing) route groups the rule's page detection
+      // misclassifies these fixture hrefs as app pages.
+      '@next/next/no-html-link-for-pages': 'off',
     },
   },
   prettierConfig,

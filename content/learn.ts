@@ -1,5 +1,8 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
 
 export interface LearnSection {
@@ -282,6 +285,40 @@ const baseLearnArticles: LearnArticle[] = [
       },
     ],
   },
+  {
+    slug: 'collecting-and-trading-cosmic-signature',
+    title: 'Collecting and Trading Cosmic Signature NFTs and CST | Cosmic Signature',
+    description:
+      'Where Cosmic Signature assets trade: the zero-fee Axiom Zero NFT marketplace, Uniswap CST swaps on Arbitrum, and the Chaos Zero prediction market for cycles.',
+    h1: 'Collecting and Trading Cosmic Signature',
+    updated: '2026-07-06',
+    schemaType: 'Article',
+    summary:
+      'Cosmic Signature NFTs trade on Axiom Zero, the zero-fee marketplace for fair-launch generative art on Arbitrum. CST trades on Uniswap, and Chaos Zero runs a prediction market on each Performance Cycle.',
+    sections: [
+      {
+        heading: 'Where The Assets Trade',
+        body: [
+          'Cosmic Signature NFTs are standard ERC-721 tokens on Arbitrum, and their primary marketplace is Axiom Zero. Axiom Zero is built for fair-launch generative art: it charges no platform fee, listings and sales settle directly on-chain in a single transaction, and sellers receive the full sale amount. The marketplace lists both Axiom Zero collections \u2014 Cosmic Signature and Random Walk \u2014 and reads every price it displays straight from verified marketplace contracts.',
+          'CST is a standard ERC-20 token and trades on Uniswap on Arbitrum. Because both assets follow open token standards, any Arbitrum marketplace or exchange that supports ERC-721 or ERC-20 can also handle them; always confirm contract addresses against the official contracts page before trading.',
+        ],
+      },
+      {
+        heading: 'The Chaos Zero Prediction Market',
+        body: [
+          'Chaos Zero is a prediction market built specifically for Cosmic Signature. Every Performance Cycle it opens a single question: will this cycle finalize with more gestures than the previous one? Positions are denominated in CST and are fully collateralized by construction \u2014 one CST always converts into one YES plus one NO token, and a matching pair always redeems for one CST.',
+          'Markets resolve from the public on-chain gesture count. The moment the count crosses the previous cycle\u2019s total, the outcome is certain, trading halts in the same block, and the market becomes withdraw-only. Chaos Zero has no owner, no admin keys, and no upgrade path.',
+        ],
+      },
+    ],
+    related: [
+      { label: 'Browse Cosmic Signature on Axiom Zero', href: COSMIC_SIGNATURE_MARKETPLACE_URL },
+      { label: 'Make predictions on Chaos Zero', href: CHAOS_ZERO_PREDICTIONS_URL },
+      { label: 'Swap ETH for CST on Uniswap', href: CST_UNISWAP_SWAP_URL },
+      { label: 'Verify contract addresses', href: appLink('/contracts') },
+      { label: 'Explore the NFT gallery', href: appLink('/gallery') },
+    ],
+  },
   // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
   {
     slug: 'not-a-lottery-not-an-investment',
@@ -452,6 +489,22 @@ const articleDepthSections: Record<string, LearnSection[]> = {
       body: [
         'Use the public-goods contribution pages for deposited amounts and the retrieval page for funds forwarded from the vault. Use the contracts page for addresses and the statistics page for aggregate context.',
         'The language should remain precise. Cosmic Signature can describe forwarding to public goods and Protocol Guild, but it should not imply tax treatment or special legal status beyond what the public records actually support.',
+      ],
+    },
+  ],
+  'collecting-and-trading-cosmic-signature': [
+    {
+      heading: 'Anchor Status And Collector Context',
+      body: [
+        'Anchoring gives Cosmic Signature and Random Walk NFTs a second market-relevant property besides the artwork itself. Every NFT can be anchored to the protocol exactly once, ever, and releasing an anchor permanently ends that eligibility. A never-anchored token therefore keeps its one-time anchoring option open for its next owner, which is why collectors often value that status.',
+        'Axiom Zero reads anchor status live from the anchoring contracts and labels every token as never anchored or anchored, and each collection can be filtered by that status. This keeps the marketplace description of a token consistent with the on-chain anchoring records that the app itself displays.',
+      ],
+    },
+    {
+      heading: 'How To Verify Venues And Addresses',
+      body: [
+        'Before trading, confirm the official contract addresses on the app-host contracts page and compare them with the collection or token pair you are viewing on a marketplace or exchange. Cosmic Signature links its ecosystem venues \u2014 Axiom Zero, Chaos Zero, and Uniswap \u2014 from the app header, footer, and site map so there is always an official navigation path to the correct destination.',
+        'The same caution applies to CST swaps and prediction positions: check that the token address matches the published CST contract, and remember that Chaos Zero positions resolve from public gesture counts recorded by the protocol, so every input to the market can be independently inspected on Arbitrum.',
       ],
     },
   ],

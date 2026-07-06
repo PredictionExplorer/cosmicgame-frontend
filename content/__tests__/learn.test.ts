@@ -47,6 +47,7 @@ describe('learnArticles', () => {
         'cst-token-and-cosmic-council',
         'anchoring-nfts',
         'protocol-guild-public-goods',
+        'collecting-and-trading-cosmic-signature',
         `not-a-${['lot', 'tery'].join('')}-not-an-${['invest', 'ment'].join('')}`,
       ]),
     );
@@ -71,5 +72,24 @@ describe('learn article contract accuracy', () => {
     const text = articleText('cst-token-and-cosmic-council');
     expect(text).toMatch(/burned/i);
     expect(text).toMatch(/delegat/i);
+  });
+
+  it('trading article names Axiom Zero, Uniswap, and Chaos Zero with correct roles', () => {
+    const text = articleText('collecting-and-trading-cosmic-signature');
+    expect(text).toMatch(/Axiom Zero/);
+    expect(text).toMatch(/no platform fee|zero-fee/i);
+    expect(text).toMatch(/Uniswap/);
+    expect(text).toMatch(/prediction market/i);
+    expect(text).toMatch(/more gestures than the previous one/i);
+    // Anchor facts must match the anchoring article: once-only, ever.
+    expect(text).toMatch(/anchored to the protocol exactly once, ever/i);
+  });
+
+  it('trading article links the ecosystem destinations from the shared config', () => {
+    const article = getLearnArticle('collecting-and-trading-cosmic-signature');
+    const hrefs = article!.related.map((link) => link.href);
+    expect(hrefs).toContain('https://www.axiomzero.market/cosmic-signature');
+    expect(hrefs).toContain('https://chaoszero.com');
+    expect(hrefs.some((href) => href.startsWith('https://app.uniswap.org/'))).toBe(true);
   });
 });

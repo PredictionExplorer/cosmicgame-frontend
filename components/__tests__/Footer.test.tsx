@@ -109,6 +109,21 @@ describe('Footer', () => {
     expect(predictions).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
+  it('renders the Uniswap CST trade link in the Ecosystem column', () => {
+    const uniswap = screen.getByRole('link', { name: 'Trade CST on Uniswap' });
+    expect(uniswap.getAttribute('href')).toMatch(/^https:\/\/app\.uniswap\.org\//);
+    expect(uniswap).toHaveAttribute('target', '_blank');
+    expect(uniswap).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('provides server-rendered crawl paths for the header dropdown destinations', () => {
+    // The header's Explore panel is a client-only dropdown, so these links
+    // must stay present in the footer for non-JS crawlers.
+    for (const href of ['/current-cycle', '/allocation', '/anchoring', '/marketing']) {
+      expect(document.querySelector(`a[href="${href}"]`)).not.toBeNull();
+    }
+  });
+
   it('renders the site map link', () => {
     const siteMapLink = screen.getByText('Site Map');
     expect(siteMapLink).toBeInTheDocument();

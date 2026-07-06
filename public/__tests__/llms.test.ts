@@ -3,6 +3,9 @@ import { join } from 'path';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
+
 const readPublicFile = (fileName: string) =>
   readFileSync(join(process.cwd(), 'public', fileName), 'utf8');
 
@@ -78,4 +81,28 @@ describe('LLM-facing protocol docs', () => {
     expect(content).toMatch(/5-week retrieval timeout/i);
     expect(content).toMatch(/anyone may retrieve unretrieved allocations for themselves/i);
   });
+
+  it.each(docs)('%s names Axiom Zero as the NFT marketplace', (_fileName, content) => {
+    expect(content).toContain('Axiom Zero');
+    expect(content).toContain(COSMIC_SIGNATURE_MARKETPLACE_URL);
+    expect(content).toMatch(/zero-fee/i);
+    // The marketplace section replaced the stale OpenSea-first framing.
+    expect(content).not.toMatch(/tradeable on OpenSea/i);
+  });
+
+  it.each(docs)('%s names Chaos Zero as the prediction market', (_fileName, content) => {
+    expect(content).toContain('Chaos Zero');
+    expect(content).toContain(CHAOS_ZERO_PREDICTIONS_URL);
+    expect(content).toMatch(/prediction market/i);
+    expect(content).toMatch(/more gestures than the previous one/i);
+  });
+
+  // lexicon-allow-start: this test enforces the ban list against the AI docs,
+  // so the banned vocabulary must literally appear in the test itself.
+  it.each(docs)('%s keeps ecosystem copy free of gambling vocabulary', (_fileName, content) => {
+    // The lexicon scanner does not cover .txt files, so enforce the most
+    // load-bearing bans here: Chaos Zero must be described via predictions.
+    expect(content).not.toMatch(/\b(bet|bets|betting|wager|wagers|odds|gambling)\b/i);
+  });
+  // lexicon-allow-end
 });

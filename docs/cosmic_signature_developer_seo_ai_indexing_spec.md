@@ -1,6 +1,6 @@
 # Cosmic Signature — SEO & AI Indexing: Status & Remaining Work
 
-**Last verified:** 2026-05-31 (code implementation + test audit)
+**Last verified:** 2026-07-06 (code implementation + test audit)
 **Scope:** Site-side changes only — code and hosting/CDN config. Excludes off-site promotion, Search Console / Bing Webmaster submission, social posting, paid links, and PR.
 
 This document started life as an implementation spec. **Most of it is now built and live.** It has been rewritten as a _living status doc_ so anyone improving SEO further can see, at a glance: what is done, what was proven by testing, and what is still open.
@@ -11,6 +11,16 @@ This document started life as an implementation spec. **Most of it is now built 
 - **🟡 Partial** — implemented but with a gap worth closing.
 - **❌ Open** — not done / needs work.
 - File references like [`utils/seo.ts`](../utils/seo.ts) point to the implementation.
+
+## 2026-07-06 implementation update
+
+The header-redesign follow-up and the static-rendering migration landed:
+
+- **P16 resolved — static rendering + ISR.** The root layout's `headers()` host branch was removed. The app now uses two root layouts in route groups — [`app/(app)/layout.tsx`](<../app/(app)/layout.tsx>) (dApp + Providers) and [`app/(landing)/layout.tsx`](<../app/(landing)/layout.tsx>) (LandingShell) — sharing [`app/root-document.tsx`](../app/root-document.tsx) and [`app/root-metadata.ts`](../app/root-metadata.ts). Host separation is enforced entirely by [`proxy.ts`](../proxy.ts). Result (verified in the build route table and by e2e cache-control assertions in [`e2e/seo-raw-html.spec.ts`](../e2e/seo-raw-html.spec.ts)): content pages (`/faq`, `/how-it-works`, `/terms`, `/about`, `/learn/*`, …) are statically prerendered; data pages (`/statistics*`, `/gallery`, `/allocation`, `/anchoring`, …) use ISR with `revalidate = 300`; dynamic-param data routes also revalidate every 300s. Server SEO summaries now resolve API failures to fallbacks so ISR builds cannot crash on a temporarily unreachable API.
+- **Global 404 with route groups:** a lowest-priority catch-all ([`app/(app)/[...notFound]/page.tsx`](<../app/(app)/[...notFound]/page.tsx>)) routes unknown URLs into the branded `not-found.tsx`, which is now a server component so the 404 HTML (copy + recovery links) is crawler-visible. Note: unknown paths on the landing host also render the (app) 404 chrome — acceptable for 404s (correct status + content) and the only cross-group compromise.
+- **Ecosystem entities (Axiom Zero, Chaos Zero):** `llms.txt` / `llms-full.txt` gained an Ecosystem section (tested in [`public/__tests__/llms.test.ts`](../public/__tests__/llms.test.ts)); the FAQ gained marketplace/prediction-market Q&As; a new learn article (`collecting-and-trading-cosmic-signature`) covers trading venues; the app footer, `/site-map`, and landing footer link all three destinations.
+- **Internal-link / crawl-path guarantees:** the header's dropdown panels are client-only, so [`app/(app)/__tests__/crawl-paths.test.tsx`](<../app/(app)/__tests__/crawl-paths.test.tsx>) enforces that every header-nav route and every XML-sitemap route keeps a server-rendered anchor in the footer or `/site-map` (which now mirrors the full sitemap, including statistics subpages and data routes).
+- **Structured data:** `WebPage` + `BreadcrumbList` added to `/how-it-works`, `/contracts`, `/code`, `/site-map`; a new `CollectionPage` builder covers `/gallery`. Per-page JSON-LD `@type`s, title/description uniqueness, sitemap URL health (every `<loc>` returns 200 and is not noindex), and `llms.txt` availability are asserted in the raw-HTML e2e suite.
 
 ## 2026-05-31 implementation update
 
@@ -103,7 +113,7 @@ All checks below were run with `curl` against the **raw HTML** (no JavaScript ex
 | P13 | AI files (`llms.txt`)             |   ✅   | `llms.txt` + `llms-full.txt` on both hosts. _(IndexNow & `.md` mirrors not done — optional, P23.)_                                                                                                                        |
 | P14 | Snippet / robots meta             |   ✅   | `index,follow,max-snippet:-1,max-image-preview:large`; no `noindex`/`nosnippet`/`X-Robots-Tag` on public pages.                                                                                                           |
 | P15 | Images / OG / video               |   ✅   | OG = real PNG 1200×630 + alt; hero `priority` + alt; gallery explanatory text + per-item alt. _(Per-page string `og:image` lacks width/height/alt — backlog #13.)_                                                        |
-| P16 | Performance / Core Web Vitals     |   🟡   | Real routes; web3 bundle excluded from landing. **`headers()` in root layout forces dynamic rendering for all pages — no static/CDN caching ([§4 Performance](#performance-and-core-web-vitals)).**                       |
+| P16 | Performance / Core Web Vitals     |   ✅   | Route-group root layouts removed the `headers()` host branch (2026-07-06): content pages prerender statically, data pages use ISR (`revalidate = 300`), and e2e asserts content routes are CDN-cacheable.                 |
 | P17 | HTTP status / 404                 |   ✅   | Real 404 verified live. Invalid non-numeric `/detail/[id]` values now call `notFound()`; missing API-token 404 responses also return the real not-found page.                                                             |
 | P18 | Trust / security content          |   🟡   | Pages present; non-investment language strong; risky words clean. **Audit-claim inconsistency; addresses API-gated; broken IPFS link — backlog #5, #7.**                                                                  |
 | P19 | Accessibility / semantic HTML     |   ✅   | `lang="en"`, header/nav/main/footer, skip link, one H1, keyboard accordions, decorative canvas `aria-hidden`.                                                                                                             |
@@ -185,7 +195,7 @@ Ordered by SEO/trust impact. Each item: **what → where → why → fix.**
 
 ### <a id="performance-and-core-web-vitals"></a>Performance and Core Web Vitals (P16)
 
-The root layout's `headers()` call (host detection) opts the **whole app into dynamic rendering** — confirmed live by `Cache-Control: private, no-cache, no-store` and by `/statistics`' `revalidate=300` having no effect. Content stays crawlable, but static pages (`/faq`, `/how-it-works`, `/learn/*`, `/about`) are recomputed per request instead of being statically generated and CDN-cached, which hurts TTFB/LCP and raises server cost. **Consider** host-segmented routing (route groups) that lets content pages be statically generated, or accept the trade-off deliberately.
+**✅ Resolved 2026-07-06.** The root layout's `headers()` call was eliminated by splitting the app into two route-group root layouts (`(app)` / `(landing)`); host separation lives exclusively in `proxy.ts`. Static pages (`/faq`, `/how-it-works`, `/learn/*`, `/about`, legal pages) are now prerendered at build time, data pages use ISR with `revalidate = 300` (the `/statistics` revalidate now actually works), and `e2e/seo-raw-html.spec.ts` fails if a content route regresses to `Cache-Control: private/no-store`. Remaining CDN-level cache verification (edge hit rates) is an off-box check.
 
 ### AI training bots (decision, not a bug)
 

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { FooterWrapper } from '@/components/styled';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { getClientBuildInfo, isVercelProductionDeploy } from '@/lib/buildInfo';
 
 const XIcon = (props: { className?: string }) => (
@@ -32,20 +33,35 @@ const DiscordIcon = (props: { className?: string }) => (
   </svg>
 );
 
+/**
+ * Footer navigation. Because the header's Explore/Help destinations live in
+ * client-only dropdown panels, this footer is the primary server-rendered
+ * crawl path for them — every internal route from the header nav must stay
+ * reachable here or on /site-map (enforced by app/__tests__/crawl-paths).
+ */
 const footerLinks: Record<string, { label: string; href: string; external?: boolean }[]> = {
   Protocol: [
     { label: 'Gallery', href: '/gallery' },
-    { label: 'Axiom Zero Marketplace', href: COSMIC_SIGNATURE_MARKETPLACE_URL, external: true },
-    { label: 'Chaos Zero Predictions', href: CHAOS_ZERO_PREDICTIONS_URL, external: true },
+    { label: 'Current Cycle', href: '/current-cycle' },
     { label: 'Statistics', href: '/statistics' },
     { label: 'Contracts', href: '/contracts' },
     { label: 'Source Code', href: '/code' },
   ],
+  Explore: [
+    { label: 'Allocation Recipients', href: '/allocation' },
+    { label: 'Anchor Distributions', href: '/anchoring' },
+    { label: 'Outreach Reserve', href: '/marketing' },
+    { label: 'How It Works', href: '/how-it-works' },
+    { label: 'FAQ', href: '/faq' },
+  ],
+  Ecosystem: [
+    { label: 'Axiom Zero Marketplace', href: COSMIC_SIGNATURE_MARKETPLACE_URL, external: true },
+    { label: 'Chaos Zero Predictions', href: CHAOS_ZERO_PREDICTIONS_URL, external: true },
+    { label: 'Trade CST on Uniswap', href: CST_UNISWAP_SWAP_URL, external: true },
+  ],
   Resources: [
     { label: 'About', href: 'https://cosmicsignature.com/about', external: true },
     { label: 'Learn', href: 'https://cosmicsignature.com/learn', external: true },
-    { label: 'How It Works', href: '/how-it-works' },
-    { label: 'FAQ', href: '/faq' },
     { label: 'Site Map', href: '/site-map' },
     {
       label: 'Protocol Guild',
@@ -77,8 +93,8 @@ const Footer = () => {
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[oklch(84.7%_0.149_213)]/40 to-transparent"
         />
         <div className="relative mx-auto w-full max-w-7xl px-4">
-          <div className="grid grid-cols-2 gap-8 py-14 md:grid-cols-4">
-            <div className="col-span-2 md:col-span-1">
+          <div className="grid grid-cols-2 gap-8 py-14 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="col-span-2 sm:col-span-3 lg:col-span-1">
               <Image
                 src="/images/logo2.svg"
                 width={180}

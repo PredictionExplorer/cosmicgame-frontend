@@ -131,13 +131,36 @@ Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreac
 - Art: Generative, based on three-body problem physics simulation
 - Storage: Seed stored on-chain; images reproducible via open-source Rust program
 - Supply: Limited by the increasing time-per-gesture mechanism
-- Tradeable on OpenSea and other Arbitrum NFT marketplaces
+- Trades on Axiom Zero (https://www.axiomzero.market/cosmic-signature), the zero-fee marketplace for Cosmic Signature, and on any other Arbitrum NFT marketplace that supports ERC-721
 
 ### RandomWalkNFT
 
 - Partner NFT project
 - Holders can attach an unused token to an ETH gesture for a 50% Gesture Cost reduction; each RandomWalkNFT can be used once for this discount
 - Can be anchored to the protocol for Anchored-NFT Stellar Selection eligibility
+- Also trades on Axiom Zero alongside Cosmic Signature NFTs
+
+## Ecosystem
+
+### Axiom Zero — NFT Marketplace
+
+- URL: https://www.axiomzero.market/cosmic-signature
+- Zero-fee NFT marketplace on Arbitrum for fair-launch generative art, including the Cosmic Signature and RandomWalk collections
+- Buying, selling, and listing settle directly on-chain in a single transaction; Axiom Zero never holds assets and adds no platform fee
+- Token pages read anchor status live from the anchoring contracts and label every NFT as never anchored or anchored — a never-anchored token keeps its one-time anchoring option open for the next owner, so collectors often value that status
+
+### Chaos Zero — Prediction Market
+
+- URL: https://chaoszero.com
+- Prediction market built specifically for Cosmic Signature, on Arbitrum One
+- Each Performance Cycle opens one question: will this cycle finalize with more gestures than the previous one?
+- Positions are denominated in CST and fully collateralized by construction — one CST always converts into one YES plus one NO token, and a matching pair always redeems for one CST
+- Markets resolve from the public on-chain gesture count; the moment the outcome becomes certain, trading halts and the market becomes withdraw-only
+- No owner, no admin keys, no upgrades
+
+### Uniswap — CST Trading
+
+- CST (ERC-20) trades on Uniswap on Arbitrum: https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0
 
 ## Technical Architecture
 
@@ -219,6 +242,12 @@ A: The images are generated from the three-body problem in physics, simulating t
 
 Q: Is the NFT supply limited?
 A: In practice, yes. The time added per gesture grows 1% with every finalized cycle, so cycles gradually lengthen and the pace of new NFT imprinting slows over time. There is no hard supply cap in the contract.
+
+Q: Where can I buy or sell Cosmic Signature NFTs?
+A: On Axiom Zero (https://www.axiomzero.market/cosmic-signature), the zero-fee NFT marketplace built for fair-launch generative art on Arbitrum. Cosmic Signature NFTs are standard ERC-721 assets, so any Arbitrum marketplace that supports the standard also works.
+
+Q: Is there a prediction market for Cosmic Signature?
+A: Yes. Chaos Zero (https://chaoszero.com) is a prediction market built specifically for Cosmic Signature. Every Performance Cycle it opens one question — will this cycle finalize with more gestures than the previous one? Positions are denominated in CST and fully collateralized, and markets resolve from the public on-chain gesture count.
 
 ### Arbitrum & Technical
 

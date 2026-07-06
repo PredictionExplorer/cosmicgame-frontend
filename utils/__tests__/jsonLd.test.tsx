@@ -1,5 +1,6 @@
 import {
   breadcrumbJsonLd,
+  collectionPageJsonLd,
   datasetJsonLd,
   organizationJsonLd,
   webPageJsonLd,
@@ -55,6 +56,25 @@ describe('JSON-LD builders', () => {
         '@type': 'Dataset',
         isAccessibleForFree: true,
         dateModified: '2026-05-31T00:00:00.000Z',
+      }),
+    );
+  });
+
+  it('builds CollectionPage JSON-LD linked to the site and art-protocol entities', () => {
+    expect(
+      collectionPageJsonLd({
+        name: 'Cosmic Signature Gallery',
+        description: 'Every imprinted Signature',
+        url: 'https://app.cosmicsignature.com/gallery',
+      }),
+    ).toEqual(
+      expect.objectContaining({
+        '@type': 'CollectionPage',
+        name: 'Cosmic Signature Gallery',
+        url: 'https://app.cosmicsignature.com/gallery',
+        isPartOf: { '@id': 'https://cosmicsignature.com/#website' },
+        about: { '@id': 'https://cosmicsignature.com/#art-protocol' },
+        publisher: { '@id': 'https://cosmicsignature.com/#organization' },
       }),
     );
   });

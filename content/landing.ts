@@ -23,6 +23,9 @@
 
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
 export const landingContent = {
@@ -353,6 +356,14 @@ export const landingContent = {
           { label: 'Documentation', href: `${APP_ORIGIN}/how-it-works` },
           { label: 'Contracts', href: `${APP_ORIGIN}/contracts` },
           { label: 'Source Code', href: `${APP_ORIGIN}/code` },
+        ],
+      },
+      {
+        heading: 'Ecosystem',
+        links: [
+          { label: 'Axiom Zero Marketplace', href: COSMIC_SIGNATURE_MARKETPLACE_URL },
+          { label: 'Chaos Zero Predictions', href: CHAOS_ZERO_PREDICTIONS_URL },
+          { label: 'Trade CST on Uniswap', href: CST_UNISWAP_SWAP_URL },
         ],
       },
       {

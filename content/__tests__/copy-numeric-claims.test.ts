@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-import { getAllItems } from '@/app/faq/data/faq-data';
+import { getAllItems } from '@/app/(app)/faq/data/faq-data';
 import { dappContent } from '@/content/dapp';
 import { landingContent } from '@/content/landing';
 import { learnArticles } from '@/content/learn';

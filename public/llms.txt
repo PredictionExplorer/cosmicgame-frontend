@@ -54,9 +54,15 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ## Tokens
 
-- **CST tokens**: ERC-20 coordination and utility tokens
-- **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics
+- **CST tokens**: ERC-20 coordination and utility tokens; trade on Uniswap on Arbitrum
+- **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics; trades on Axiom Zero, the zero-fee marketplace
 - **RandomWalkNFT**: Partner ERC-721 that can be attached to an ETH gesture for a one-time 50% ETH Gesture Cost reduction, or anchored for Anchored-NFT Stellar Selection eligibility
+
+## Ecosystem
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): The zero-fee NFT marketplace for Cosmic Signature and RandomWalk NFTs on Arbitrum. Trades settle directly on-chain, and every token page labels the NFT's anchor status (never anchored vs anchored) read live from the anchoring contracts.
+- [Chaos Zero](https://chaoszero.com): The prediction market built specifically for Cosmic Signature. Each Performance Cycle opens one question — will this cycle finalize with more gestures than the previous one? Positions are denominated in CST and fully collateralized by construction, with no owner or admin keys.
+- [Uniswap CST trading](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Swap ETH for CST on Arbitrum.
 
 ## Community
 

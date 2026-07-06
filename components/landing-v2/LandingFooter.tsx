@@ -24,7 +24,7 @@ export function LandingFooter() {
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">{footer.tagline}</p>
           </div>
 
-          <nav aria-label="Footer" className="grid gap-8 sm:grid-cols-3">
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             {footer.columns.map((col) => (
               <div key={col.heading}>
                 <h3 className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">

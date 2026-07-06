@@ -1,0 +1,29 @@
+import type { Metadata } from 'next';
+
+import { createMetadata } from '@/utils/seo';
+
+import UserStellarSelectionETHPage from './UserStellarSelectionETHPage';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ address: string }>;
+}): Promise<Metadata> {
+  const { address } = await params;
+  return createMetadata(
+    'Stellar Selection ETH | Cosmic Signature',
+    'All ETH allocations this participant received through Stellar Selection. Track random-selection allocations across completed cycles.',
+    undefined,
+    `/user/stellar-selection-eth/${address}`,
+    { index: false },
+  );
+}
+
+// Dynamic-param pages render on demand; revalidate keeps live protocol data
+// fresh instead of freezing the first render forever (see route-group refactor).
+export const revalidate = 300;
+
+export default async function Page({ params }: { params: Promise<{ address: string }> }) {
+  const { address } = await params;
+  return <UserStellarSelectionETHPage address={address} />;
+}

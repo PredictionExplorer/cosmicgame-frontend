@@ -93,6 +93,33 @@ export function webPageJsonLd({
   };
 }
 
+export function collectionPageJsonLd({
+  name,
+  description,
+  url,
+}: {
+  name: string;
+  description: string;
+  url: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name,
+    description,
+    url,
+    isPartOf: {
+      '@id': `${SITE_URL}/#website`,
+    },
+    about: {
+      '@id': `${SITE_URL}/#art-protocol`,
+    },
+    publisher: {
+      '@id': `${SITE_URL}/#organization`,
+    },
+  };
+}
+
 export function datasetJsonLd({
   name,
   description,
