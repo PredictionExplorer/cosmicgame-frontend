@@ -51,7 +51,7 @@ const timelineSteps = [
   {
     id: 'final-window',
     label: 'Final Window',
-    detail: 'The timer becomes the main event.',
+    detail: 'The clock nears zero. A new Gesture can still extend it.',
   },
   {
     id: 'finalization',
