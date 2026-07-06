@@ -76,18 +76,18 @@ All checks below were run with `curl` against the **raw HTML** (no JavaScript ex
 
 ### robots, sitemaps, redirects, status codes
 
-| Check                                               | Result                                                                                                                               |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `robots.txt` (both hosts)                           | ✅ Valid; correct per-host `Sitemap:` + `Host:`; AI/search bots enumerated and allowed; sensible `Disallow` per host                 |
-| `sitemap.xml` — landing                             | ✅ 13 URLs: `/`, `/about`, `/learn` + all 10 `/learn/*` articles                                                                     |
-| `sitemap.xml` — app                                 | ✅ App routes come from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts); wallet-personal routes such as `/recipient-history` are excluded  |
-| `llms.txt` (both hosts)                             | ✅ 200; includes the biology disambiguation line; `llms-full.txt` also present                                                       |
-| `http://…` → `https://…`                            | ✅ 308                                                                                                                               |
-| `https://www.cosmicsignature.com/` → apex           | 🟡 **307 (temporary)** — should be 301/308 permanent                                                                                 |
-| cross-host paths (e.g. landing `/faq` → app `/faq`) | ✅ 308                                                                                                                               |
-| unknown route (e.g. `/this-does-not-exist`)         | ✅ Real **404** + "Page Not Found" H1 (no soft-404)                                                                                  |
-| `X-Robots-Tag` on public pages                      | ✅ None present (good)                                                                                                               |
-| `Cache-Control` on app `/` and `/statistics`        | 🟡 `private, no-cache, no-store` — pages render per-request, not CDN-cached (see [§4 Performance](#performance-and-core-web-vitals)) |
+| Check                                               | Result                                                                                                                                  |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `robots.txt` (both hosts)                           | ✅ Valid; correct per-host `Sitemap:` + `Host:`; AI/search bots enumerated and allowed; sensible `Disallow` per host                    |
+| `sitemap.xml` — landing                             | ✅ 13 URLs: `/`, `/about`, `/learn` + all 10 `/learn/*` articles                                                                        |
+| `sitemap.xml` — app                                 | ✅ App routes come from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts); wallet-personal routes such as `/recipient-history` are excluded     |
+| `llms.txt` (both hosts)                             | ✅ 200; includes the biology disambiguation line; `llms-full.txt` also present                                                          |
+| `http://…` → `https://…`                            | ✅ 308                                                                                                                                  |
+| `https://www.cosmicsignature.com/` → apex           | ✅ **308 (permanent)** — fixed in Vercel domain config, verified 2026-07-06 (paths preserved, single hop); `www.app.` → `app.` also 308 |
+| cross-host paths (e.g. landing `/faq` → app `/faq`) | ✅ 308                                                                                                                                  |
+| unknown route (e.g. `/this-does-not-exist`)         | ✅ Real **404** + "Page Not Found" H1 (no soft-404)                                                                                     |
+| `X-Robots-Tag` on public pages                      | ✅ None present (good)                                                                                                                  |
+| `Cache-Control` on app `/` and `/statistics`        | 🟡 `private, no-cache, no-store` — pages render per-request, not CDN-cached (see [§4 Performance](#performance-and-core-web-vitals))    |
 
 > **Still to confirm off-box:** WAF/CDN behavior toward real crawler user-agents can only be verified from Vercel/CDN logs. See [§6](#6-off-box-verification-not-doable-from-the-repo).
 
@@ -97,7 +97,7 @@ All checks below were run with `curl` against the **raw HTML** (no JavaScript ex
 
 | #   | Area                              | Status | One-line summary                                                                                                                                                                                                          |
 | --- | --------------------------------- | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0  | Canonical URLs & redirects        |   ✅   | Absolute self-canonicals, trailing slash normalized, query stripped ([`utils/seo.ts`](../utils/seo.ts)); 308 host/protocol redirects. _(www→apex is 307 — backlog #8.)_                                                   |
+| P0  | Canonical URLs & redirects        |   ✅   | Absolute self-canonicals, trailing slash normalized, query stripped ([`utils/seo.ts`](../utils/seo.ts)); 308 host/protocol redirects. _(www→apex fixed to 308 in Vercel, verified 2026-07-06.)_                           |
 | P1  | Important pages server-rendered   |   ✅   | Public sitemap routes now have server-visible content. Data routes use [`app/PublicDataRouteSeoSummary.tsx`](../app/PublicDataRouteSeoSummary.tsx) before client hydration.                                               |
 | P2  | Homepage entity signal            |   ✅   | Brand-first H1 live; poetic line kept as subhead. _(Minor: 2 of 8 entity terms fall past first ~150 words; disambiguation line not on home/FAQ — backlog #10.)_                                                           |
 | P3  | FAQ crawlable Q&A                 |   ✅   | 58 Q&A / 6 categories, Radix `forceMount` keeps answers in DOM, `FAQPage` JSON-LD from same source ([`app/faq/`](../app/faq)).                                                                                            |
@@ -179,7 +179,7 @@ Ordered by SEO/trust impact. Each item: **what → where → why → fix.**
 - `/contracts` server summary now falls back to verified proxy/implementation addresses from [`content/protocol-facts.ts`](../content/protocol-facts.ts).
 - `/code` uses a valid IPFS gateway URL and links the GitHub organization.
 
-**8. `www → apex` redirect is 307 (temporary)** — make it 301/308 permanent (Vercel domain config) so canonical signals consolidate.
+**8. ✅ Done — `www → apex` redirect is now 308 (permanent)** — fixed in the Vercel domain config and verified live on 2026-07-06: `www.cosmicsignature.com/*` 308s to the apex with paths preserved in a single hop, and `www.app.cosmicsignature.com/*` 308s to `app.cosmicsignature.com/*` (previously that host never reached the app's host routing at all).
 
 ### Low / hygiene
 
@@ -258,15 +258,15 @@ for (const url of PUBLIC_URLS) {
 
 ### C. Redirects & status codes — Playwright `request`, `maxRedirects: 0`
 
-| Test                                      | Expect                                                |
-| ----------------------------------------- | ----------------------------------------------------- |
-| `http://cosmicsignature.com/`             | 308 → `https://cosmicsignature.com/`                  |
-| `http://app.cosmicsignature.com/`         | 308 → `https://app.cosmicsignature.com/`              |
-| `https://www.cosmicsignature.com/`        | **301 or 308** → apex (🔴 currently 307 — backlog #8) |
-| landing `/faq`, `/statistics`, `/terms`   | 308 → app host                                        |
-| app `/about`, `/learn/x`                  | 308 → landing host                                    |
-| `/this-route-does-not-exist` (both hosts) | **404**                                               |
-| `/detail/<nonexistent-id>`                | **404** (🔴 currently 200 — backlog #4)               |
+| Test                                      | Expect                                       |
+| ----------------------------------------- | -------------------------------------------- |
+| `http://cosmicsignature.com/`             | 308 → `https://cosmicsignature.com/`         |
+| `http://app.cosmicsignature.com/`         | 308 → `https://app.cosmicsignature.com/`     |
+| `https://www.cosmicsignature.com/`        | **308** → apex (✅ verified live 2026-07-06) |
+| landing `/faq`, `/statistics`, `/terms`   | 308 → app host                               |
+| app `/about`, `/learn/x`                  | 308 → landing host                           |
+| `/this-route-does-not-exist` (both hosts) | **404**                                      |
+| `/detail/<nonexistent-id>`                | **404** (🔴 currently 200 — backlog #4)      |
 
 ### D. robots.txt & sitemap integrity — Playwright `request`
 
@@ -305,7 +305,7 @@ Add Lighthouse CI with budgets (LCP < 2.5 s mobile, CLS < 0.1) on `/`, `/faq`, `
 These require dashboards/logs, not code:
 
 - **WAF/CDN crawler access:** in Vercel/CDN logs, confirm `Googlebot`, `Bingbot`, `OAI-SearchBot`, `ChatGPT-User`, `Claude-SearchBot`, `Claude-User`, `PerplexityBot`, `Perplexity-User` receive `200/301/308/404` — never `403/429/503`, JS-challenge, or CAPTCHA on public pages.
-- **`www → apex` redirect** is permanent (301/308) at the Vercel domain level (backlog #8).
+- ✅ **`www → apex` redirect** is permanent (308) at the Vercel domain level — verified live 2026-07-06 for both `www.cosmicsignature.com` and `www.app.cosmicsignature.com`.
 - **Search Console / Bing Webmaster:** submit both sitemaps; watch Coverage/Indexing reports (out of site-side scope but the natural next step).
 - **Crawler IP allowlists** (optional): OpenAI / Perplexity / Anthropic publish JSON IP ranges if you choose IP-based WAF verification.
 
