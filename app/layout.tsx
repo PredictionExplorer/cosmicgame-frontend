@@ -3,6 +3,7 @@ import { Suspense, type ReactNode } from 'react';
 import Script from 'next/script';
 import { headers } from 'next/headers';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import { LANDING_ORIGIN, isLandingHost } from '@/lib/hostRouting';
 import { clashDisplay, inter } from '@/lib/fonts';
@@ -140,6 +141,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <Analytics />
         </Suspense>
         <VercelAnalytics />
+        <SpeedInsights />
       </body>
     </html>
   );

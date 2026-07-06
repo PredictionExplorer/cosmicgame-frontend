@@ -23,10 +23,14 @@ jest.mock('../analytics', () => ({
   Analytics: () => null,
 }));
 
-// Ships as untranspiled ESM; next/jest always ignores node_modules, so mock it
-// like wagmi/rainbowkit above.
+// These ship as untranspiled ESM; next/jest always ignores node_modules, so
+// mock them like wagmi/rainbowkit above.
 jest.mock('@vercel/analytics/next', () => ({
   Analytics: () => null,
+}));
+
+jest.mock('@vercel/speed-insights/next', () => ({
+  SpeedInsights: () => null,
 }));
 
 jest.mock('../../utils/analytics', () => ({
@@ -159,11 +163,12 @@ describe('RootLayout viewport', () => {
 
 // RootLayout is an async Server Component (uses `headers()`); it cannot be rendered
 // reliably in jsdom like a sync client tree. Structure is covered by integration/e2e;
-// metadata and viewport are asserted above. The Vercel Analytics contract below is
-// therefore asserted statically against the layout source, following the same
-// approach as landing-shell-no-web3.test.ts.
+// metadata and viewport are asserted above. The Vercel Analytics / Speed Insights
+// contract below is therefore asserted statically against the layout source,
+// following the same approach as landing-shell-no-web3.test.ts.
 describe('RootLayout Vercel Analytics contract', () => {
   const layoutSource = readFileSync(resolve(__dirname, '..', 'layout.tsx'), 'utf-8');
+  const bodyMatch = layoutSource.match(/<body>([\s\S]*?)<\/body>/);
 
   it('imports the Analytics component from @vercel/analytics/next', () => {
     expect(layoutSource).toMatch(
@@ -171,11 +176,21 @@ describe('RootLayout Vercel Analytics contract', () => {
     );
   });
 
+  it('imports the SpeedInsights component from @vercel/speed-insights/next', () => {
+    expect(layoutSource).toMatch(
+      /import\s*\{\s*SpeedInsights\s*\}\s*from\s*'@vercel\/speed-insights\/next'/,
+    );
+  });
+
   it('renders <VercelAnalytics /> on both the landing and app host branches', () => {
-    const bodyMatch = layoutSource.match(/<body>([\s\S]*?)<\/body>/);
     expect(bodyMatch).not.toBeNull();
     // Rendered unconditionally inside <body> (outside the isLanding ternary),
     // so both hosts report to Vercel Web Analytics.
     expect(bodyMatch![1]).toContain('<VercelAnalytics />');
+  });
+
+  it('renders <SpeedInsights /> on both the landing and app host branches', () => {
+    expect(bodyMatch).not.toBeNull();
+    expect(bodyMatch![1]).toContain('<SpeedInsights />');
   });
 });

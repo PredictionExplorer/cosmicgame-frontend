@@ -65,6 +65,7 @@
     "@uiw/react-codemirror": "^4.19.16",
     "@vercel/analytics": "^2.0.1",
     "@vercel/og": "^0.6.8",
+    "@vercel/speed-insights": "^2.0.0",
     "@walletconnect/ethereum-provider": "^2.23.9",
     "axios": "^1.16.0",
     "class-variance-authority": "^0.7.1",
