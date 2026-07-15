@@ -47,7 +47,8 @@
       "notErc20": "The attached token must use an ERC-20 contract.",
       "insufficientAttachedToken": "Insufficient token balance to attach to this gesture.",
       "insufficientEth": "Your wallet does not have enough ETH for this gesture.",
-      "insufficientCst": "Your wallet does not have enough CST for this gesture."
+      "insufficientCst": "Your wallet does not have enough CST for this gesture.",
+      "cycleNotStarted": "The next cycle has not started yet. Gestures open in {duration}."
     },
     "transaction": {
       "failed": "Unable to submit the gesture. Check your wallet and network connection, refresh the current cost, and try again.",

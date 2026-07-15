@@ -47,6 +47,8 @@
     "cycleValue": "Cycle {round}",
     "gestureCost": "Gesture cost",
     "participationCst": "Participation CST",
+    "cstToOutbid": "To outbid participant",
+    "cstToThis": "To this participant",
     "attachedRandomWalk": "Random Walk NFT used for this ETH gesture",
     "paidWithCst": "Paid with CST (ERC-20)",
     "randomWalkId": "Random Walk NFT ID",
