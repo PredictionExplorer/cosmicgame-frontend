@@ -16,7 +16,10 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
-import { readCosmicGameWithFallback } from '@/utils/cosmicGameContractCompat';
+import {
+  isMissingFunctionReadError,
+  readCosmicGameWithFallback,
+} from '@/utils/cosmicGameContractCompat';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
@@ -91,6 +94,12 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   });
   const [cstDutchAuctionBeginningBidPriceMinLimit, setCstDutchAuctionBeginningBidPriceMinLimit] =
     useState(0);
+  /** V3-only parameters; stays null on V2 deployments (selectors absent), hiding the V3 cards. */
+  const [v3Config, setV3Config] = useState<{
+    lastBidderRewardPercent: number;
+    mainPrizeNumNfts: number;
+    lateBidDurationSeconds: number;
+  } | null>(null);
 
   const charityWalletContract = useContractNoSigner(charity, CHARITY_WALLET_ABI);
   const cosmicGameContract = useContractNoSigner(cosmicGame, COSMICGAME_ABI);
@@ -160,6 +169,34 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       const v = await cosmicGameContract.read.cstDutchAuctionBeginningBidPriceMinLimit?.();
       setCstDutchAuctionBeginningBidPriceMinLimit(Number(formatEther((v ?? 0n) as bigint)));
     }, 'cstDutchAuctionBeginningBidPriceMinLimit');
+
+    // V3-only getters: absent on V2, where the reads fail with unrecognized-selector
+    // errors — expected, so they are swallowed rather than reported.
+    void (async () => {
+      try {
+        const [percent, numNfts, lateBidDuration] = await Promise.all([
+          cosmicGameContract.read.lastBidderBidCstRewardAmountPercentage?.() as Promise<
+            bigint | undefined
+          >,
+          cosmicGameContract.read.mainPrizeNumCosmicSignatureNfts?.() as Promise<
+            bigint | undefined
+          >,
+          cosmicGameContract.read.getRoundLateBidDuration?.() as Promise<bigint | undefined>,
+        ]);
+        if (percent === undefined || numNfts === undefined) return;
+        setV3Config({
+          lastBidderRewardPercent: Number(percent),
+          mainPrizeNumNfts: Number(numNfts),
+          lateBidDurationSeconds: Number(lateBidDuration ?? 0n),
+        });
+      } catch (e) {
+        // On V2 the selectors are absent; behind the proxy this surfaces as a reasonless revert.
+        if (!isMissingFunctionReadError(e)) {
+          reportError(e, 'contracts read v3 config');
+        }
+        setV3Config(null);
+      }
+    })();
   }, [cosmicGameContract]);
 
   useEffect(() => {
@@ -303,6 +340,7 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             maxMessageLength={msgMaxLen}
             claimTimeout={data?.TimeoutClaimPrize ?? 0}
             initialIncrement={initialIncrement}
+            v3Config={v3Config}
             loading={loading}
           />
         </motion.section>
