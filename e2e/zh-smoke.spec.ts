@@ -71,18 +71,19 @@ test.describe('zh locale smoke', () => {
     await zhSwitcher.click();
     await page.getByRole('menuitem', { name: 'English' }).click();
 
-    await expect(page).toHaveURL(/\/faq$/);
-    // The cookie must flip back before asserting server-rendered state:
-    // switching to the default locale races the client cookie write against
-    // the RSC fetch, so settle on the cookie first, then verify via reload.
+    // NOTE: a bare /\/faq$/ regex would also match the OLD /zh/faq URL and
+    // let assertions run before the navigation lands — match exactly.
+    await page.waitForURL((url) => url.pathname === '/faq');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect
       .poll(async () => {
         const cookies = await context.cookies();
         return cookies.find((cookie) => cookie.name === 'NEXT_LOCALE')?.value;
       })
       .toBe('en');
+
+    // The preference must survive a full reload on the unprefixed URL.
     await page.reload();
-    await expect(page).toHaveURL(/\/faq$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 

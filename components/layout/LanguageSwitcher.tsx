@@ -16,9 +16,9 @@ import {
 
 /**
  * EN / 中文 selector (docs/i18n/README.md §2.4). Switching replaces the
- * current route under the target locale; the next-intl middleware persists
- * the choice in the NEXT_LOCALE cookie. Option labels are never translated —
- * each language is listed in itself.
+ * current route under the target locale; next-intl's router persists the
+ * choice in the NEXT_LOCALE cookie (attributes from `routing.localeCookie`).
+ * Option labels are never translated — each language is listed in itself.
  */
 export function LanguageSwitcher({ className }: { className?: string }) {
   const t = useTranslations('common');
@@ -30,8 +30,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
     if (next === locale) return;
     // Read query/hash at click time to avoid a useSearchParams() Suspense
     // boundary in every layout that mounts the switcher.
-    const suffix =
-      typeof window !== 'undefined' ? `${window.location.search}${window.location.hash}` : '';
+    const suffix = `${window.location.search}${window.location.hash}`;
     router.replace(`${pathname}${suffix}`, { locale: next });
   };
 

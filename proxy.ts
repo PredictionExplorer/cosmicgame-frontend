@@ -36,6 +36,29 @@ function isRedirect(response: NextResponse): boolean {
 }
 
 /**
+ * Makes the middleware READ-ONLY over the NEXT_LOCALE cookie.
+ *
+ * next-intl's middleware re-writes the cookie on every request whose URL
+ * locale differs from it — including App Router PREFETCHES. When a user
+ * switches zh -> en, prefetches of still-mounted `/zh/...` links respond
+ * with `Set-Cookie: NEXT_LOCALE=zh` and clobber the fresh choice, so the
+ * switch "doesn't stick". Next 16 strips the `Next-Router-Prefetch` header
+ * before middleware runs, so prefetches cannot be told apart server-side.
+ *
+ * Instead, the server never writes the cookie: next-intl's client router
+ * writes it on every explicit locale switch (see LanguageSwitcher), and the
+ * middleware keeps READING it to redirect unprefixed URLs to the preferred
+ * locale. Cookies set in middleware travel on `set-cookie` AND on
+ * `x-middleware-set-cookie` (re-applied by the server after a rewrite), so
+ * both are stripped.
+ */
+function withoutLocaleCookieWrites(res: NextResponse): NextResponse {
+  res.headers.delete('set-cookie');
+  res.headers.delete('x-middleware-set-cookie');
+  return res;
+}
+
+/**
  * Host routing composed with locale routing (docs/i18n/README.md §2.3).
  *
  * All host decisions run against the locale-STRIPPED public path so that
@@ -78,13 +101,13 @@ export default function middleware(req: NextRequest) {
       // the internal landing-site path never leaks into a Location header.
       const detection = intlMiddleware(req);
       if (detection && isRedirect(detection)) {
-        return detection;
+        return withoutLocaleCookieWrites(detection);
       }
       // No redirect needed: serve the landing by rewriting to the internal
       // route, keeping the locale segment, then let next-intl finish the
       // rewrite to `/[locale]/landing-site`.
       req.nextUrl.pathname = `${prefix}/landing-site`;
-      return intlMiddleware(req);
+      return withoutLocaleCookieWrites(intlMiddleware(req));
     }
 
     if (isAppOnlyPath(publicPath)) {
@@ -102,5 +125,5 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  return intlMiddleware(req);
+  return withoutLocaleCookieWrites(intlMiddleware(req));
 }

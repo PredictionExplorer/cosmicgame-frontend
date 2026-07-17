@@ -91,6 +91,14 @@ Implementation notes / deviations:
   Sprint 7.
 - **Locale detection** follows next-intl defaults: URL prefix → `NEXT_LOCALE` cookie →
   `Accept-Language` → `en`. Chinese-browser first-timers are auto-redirected to `/zh`.
+- **The middleware is read-only over `NEXT_LOCALE`** (`withoutLocaleCookieWrites` in
+  `proxy.ts`). next-intl's middleware normally rewrites the cookie on every request
+  whose URL locale differs from it — including App Router prefetches, which Next 16
+  strips the `Next-Router-Prefetch` header from before middleware runs. That let
+  prefetches of still-mounted `/zh/...` links clobber a fresh `en` choice, so switching
+  back to English "didn't stick". Now the cookie is written only client-side by
+  next-intl's router on an explicit switch (with `maxAge` 1 year from
+  `routing.localeCookie`), and the middleware only reads it for redirects.
 - **Cross-host locale carry-over:** the `NEXT_LOCALE` cookie is host-scoped, so the
   choice does not yet follow users between the landing and app hosts. Sprint 1 must
   build cross-host links (nav, footers, landing CTAs) with `localeHref()` so the URL
