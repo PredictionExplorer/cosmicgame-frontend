@@ -116,7 +116,7 @@ describe('GalleryPage', () => {
     mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<GalleryPage />);
 
-    expect(screen.getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );
@@ -155,7 +155,7 @@ describe('GalleryPage', () => {
   it('renders search input', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByLabelText('Search NFTs')).toBeInTheDocument();
+    expect(screen.getByLabelText('search.gallery.ariaLabel')).toBeInTheDocument();
   });
 
   it('renders filter chips', () => {
@@ -193,7 +193,7 @@ describe('GalleryPage', () => {
   it('filters by numeric search on enter', async () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    const input = screen.getByLabelText('Search NFTs');
+    const input = screen.getByLabelText('search.gallery.ariaLabel');
     fireEvent.change(input, { target: { value: '1' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     await waitFor(() => {

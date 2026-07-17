@@ -107,7 +107,7 @@ describe('MyTokens', () => {
     mockUseCSTTokensByUser.mockReturnValue({ data: [], isLoading: false, isError: false });
     render(<MyWallet />);
 
-    expect(screen.getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );

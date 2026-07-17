@@ -21,13 +21,13 @@ beforeEach(() => jest.clearAllMocks());
 describe('ETHSpentTable', () => {
   it('renders empty state when list is empty', () => {
     render(<ETHSpentTable list={[]} />);
-    expect(screen.getByText('No spenders yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.spenders')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<ETHSpentTable list={[createGesture()]} />);
-    expect(screen.getAllByText('User Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Spent Amount (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.userAddress').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.spentAmountEth').length).toBeGreaterThanOrEqual(1);
   });
 
   it('groups gestures by BidderAddr and sums amounts', () => {
@@ -54,7 +54,7 @@ describe('ETHSpentTable', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: '0x' + 'a'.repeat(40) });
     const list = [createGesture({ BidderAddr: '0x' + 'a'.repeat(40), EthPriceEth: 1.0 })];
     render(<ETHSpentTable list={list} />);
-    expect(screen.getByText('(You)')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.you')).toBeInTheDocument();
   });
 
   it('formats amount to 4 decimal places', () => {

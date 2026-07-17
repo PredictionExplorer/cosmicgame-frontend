@@ -2,16 +2,20 @@
 
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Check } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
 import { landingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
+import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 import { SectionHeading } from './SectionHeading';
 
 const { anchoring } = landingContent;
 
 export function Anchoring() {
+  const locale = useLocale();
+
   return (
     <section className="relative border-t border-white/10 bg-[#0D0521] py-28 sm:py-40">
       <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:px-12">
@@ -84,7 +88,7 @@ export function Anchoring() {
             ))}
           </ul>
           <Link
-            href={anchoring.cta.href}
+            href={localizeCrossHostHref(anchoring.cta.href, locale)}
             className="mt-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/10"
           >
             {anchoring.cta.label}

@@ -1,1 +1,29 @@
-{}
+{
+  "balances": {
+    "eth": "ETH",
+    "cst": "CST",
+    "cosmicNfts": "COSMIC NFT",
+    "rwlkNfts": "RWLK NFT",
+    "anchoredCst": "已锚定 Cosmic Signature NFT",
+    "anchoredRwlk": "已锚定 RWLK NFT"
+  },
+  "labels": {
+    "loading": "加载中…",
+    "balancesHeading": "余额",
+    "anchoredHeading": "已锚定",
+    "nftCount": "{count} 枚"
+  },
+  "account": {
+    "heading": "账户",
+    "myDashboard": "我的仪表盘",
+    "myRewards": "我的分配",
+    "myNfts": "我的 NFT",
+    "transferCst": "转账 CST",
+    "myAnchors": "我的锚定",
+    "winningHistory": "获配记录"
+  },
+  "accessibility": {
+    "copyAddress": "复制钱包地址",
+    "addressCopied": "已复制钱包地址"
+  }
+}

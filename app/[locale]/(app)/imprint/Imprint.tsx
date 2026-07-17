@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { formatEther, parseEther } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { Sparkles } from 'lucide-react';
@@ -21,10 +22,10 @@ import {
   isEthProviderError,
   reportError,
   getEthErrorMessage,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
 } from '@/utils/errors';
 
 const Imprint = () => {
+  const t = useTranslations('toasts');
   const [imprintCost, setImprintCost] = useState('0');
   const [nftIds, setNftIds] = useState<number[]>([]);
   const { account } = useActiveWeb3React();
@@ -44,7 +45,7 @@ const Imprint = () => {
         await publicClient?.waitForTransactionReceipt({ hash });
       } catch (err: unknown) {
         if (isUserRejection(err)) {
-          toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
+          toast.info(t('walletTransactionCancelled'));
           return;
         }
         reportError(err, 'imprint RWLK NFT');

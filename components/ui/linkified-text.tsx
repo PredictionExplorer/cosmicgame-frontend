@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Check, Copy, ExternalLink, ShieldAlert } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { linkifyMessage } from '@/utils/linkify';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ interface LinkifiedTextProps {
  * bypassed with middle/modified clicks.
  */
 export function LinkifiedText({ text }: LinkifiedTextProps) {
+  const t = useTranslations('common');
   const segments = useMemo(() => linkifyMessage(text), [text]);
   const [pendingUrl, setPendingUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -76,12 +78,9 @@ export function LinkifiedText({ text }: LinkifiedTextProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShieldAlert aria-hidden="true" className="h-5 w-5 shrink-0 text-amber-300" />
-              Leaving Cosmic Signature
+              {t('externalLink.title')}
             </DialogTitle>
-            <DialogDescription>
-              This link comes from a participant message stored on-chain. It has not been reviewed
-              or verified &mdash; check that the destination below is what you expect.
-            </DialogDescription>
+            <DialogDescription>{t('externalLink.description')}</DialogDescription>
           </DialogHeader>
           <div className="flex items-start gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] p-3">
             <p
@@ -93,7 +92,7 @@ export function LinkifiedText({ text }: LinkifiedTextProps) {
             <button
               type="button"
               onClick={handleCopy}
-              aria-label={copied ? 'Link copied' : 'Copy link'}
+              aria-label={copied ? t('externalLink.copied') : t('externalLink.copy')}
               className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/60 transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               {copied ? (
@@ -103,15 +102,13 @@ export function LinkifiedText({ text }: LinkifiedTextProps) {
               )}
             </button>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Never enter your wallet seed phrase or private keys on an external site.
-          </p>
+          <p className="text-xs text-muted-foreground">{t('externalLink.warning')}</p>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button onClick={handleOpen}>
-              Open Link <ExternalLink aria-hidden="true" className="h-4 w-4" />
+              {t('externalLink.open')} <ExternalLink aria-hidden="true" className="h-4 w-4" />
             </Button>
           </DialogFooter>
         </DialogContent>

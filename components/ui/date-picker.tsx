@@ -3,17 +3,20 @@
 import { useEffect, useMemo, useState, type FC } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { formatYyyymmddLabel, toYyyymmdd } from '@/utils/format';
 
-const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-function buildMonthGrid(month: Dayjs): Dayjs[] {
-  const start = month.startOf('month').startOf('week');
-  const end = month.endOf('month').endOf('week');
+function buildMonthGrid(month: Dayjs, weekStartsMonday: boolean): Dayjs[] {
+  const monthStart = month.startOf('month');
+  const monthEnd = month.endOf('month');
+  const startOffset = weekStartsMonday ? (monthStart.day() + 6) % 7 : monthStart.day();
+  const endWeekday = weekStartsMonday ? (monthEnd.day() + 6) % 7 : monthEnd.day();
+  const start = monthStart.subtract(startOffset, 'day');
+  const end = monthEnd.add(6 - endWeekday, 'day');
   const days: Dayjs[] = [];
   let cursor = start;
   while (cursor.isBefore(end, 'day') || cursor.isSame(end, 'day')) {
@@ -31,7 +34,20 @@ type CalendarPanelProps = {
 };
 
 function CalendarPanel({ viewMonth, onViewMonthChange, selected, onSelect }: CalendarPanelProps) {
-  const days = useMemo(() => buildMonthGrid(viewMonth), [viewMonth]);
+  const t = useTranslations('forms');
+  const locale = useLocale();
+  const weekStartsMonday = locale === 'zh';
+  const days = useMemo(
+    () => buildMonthGrid(viewMonth, weekStartsMonday),
+    [viewMonth, weekStartsMonday],
+  );
+  const weekdayKeys = weekStartsMonday
+    ? (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const)
+    : (['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const);
+  const monthLabel = new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    month: 'long',
+    year: 'numeric',
+  }).format(viewMonth.toDate());
 
   return (
     <div className="p-3" data-testid="date-picker-calendar">
@@ -41,30 +57,30 @@ function CalendarPanel({ viewMonth, onViewMonthChange, selected, onSelect }: Cal
           variant="ghost"
           size="icon"
           className="h-8 w-8"
-          aria-label="Previous month"
+          aria-label={t('datePicker.previousMonth')}
           onClick={() => onViewMonthChange(viewMonth.subtract(1, 'month'))}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="text-sm font-medium">{viewMonth.format('MMMM YYYY')}</span>
+        <span className="text-sm font-medium">{monthLabel}</span>
         <Button
           type="button"
           variant="ghost"
           size="icon"
           className="h-8 w-8"
-          aria-label="Next month"
+          aria-label={t('datePicker.nextMonth')}
           onClick={() => onViewMonthChange(viewMonth.add(1, 'month'))}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
       <div className="mb-1 grid grid-cols-7 gap-1">
-        {WEEKDAYS.map((day) => (
+        {weekdayKeys.map((day) => (
           <div
             key={day}
             className="flex h-8 w-8 items-center justify-center text-xs text-muted-foreground"
           >
-            {day}
+            {t(`datePicker.weekdays.${day}`)}
           </div>
         ))}
       </div>
@@ -107,6 +123,7 @@ export type DatePickerProps = {
 
 /** Date field with popover calendar for picking a day. */
 export const DatePicker: FC<DatePickerProps> = ({ id, label, value, onChange, className }) => {
+  const t = useTranslations('forms');
   const [open, setOpen] = useState(false);
   const selected = useMemo(() => (value ? dayjs(value) : null), [value]);
   const [viewMonth, setViewMonth] = useState(() =>
@@ -120,7 +137,7 @@ export const DatePicker: FC<DatePickerProps> = ({ id, label, value, onChange, cl
     }
   }, [open, value]);
 
-  const displayLabel = value ? formatYyyymmddLabel(toYyyymmdd(value)) : 'Pick a date';
+  const displayLabel = value ? formatYyyymmddLabel(toYyyymmdd(value)) : t('datePicker.pickDate');
 
   const handleSelect = (day: Dayjs) => {
     onChange(day.format('YYYY-MM-DD'));

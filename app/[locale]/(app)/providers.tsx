@@ -7,7 +7,7 @@ import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, type Locale as RainbowKitLocale } from '@rainbow-me/rainbowkit';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
 
@@ -147,6 +147,8 @@ const particleOptions: ISourceOptions = {
 const envValidation = getEnvValidation();
 
 function EnvErrorScreen({ missing }: { missing: string[] }) {
+  const t = useTranslations('errors');
+
   return (
     <div
       style={{
@@ -162,13 +164,9 @@ function EnvErrorScreen({ missing }: { missing: string[] }) {
       }}
     >
       <div style={{ maxWidth: 480 }}>
-        <h1 style={{ fontSize: '1.25rem', marginBottom: 16 }}>
-          Can&apos;t run because environment variables aren&apos;t set.
-        </h1>
-        <p style={{ marginBottom: 24, opacity: 0.9 }}>
-          We can&apos;t assume any defaults for networks or API URLs — that is prone to bugs.
-        </p>
-        <p style={{ marginBottom: 8, fontSize: '0.875rem' }}>Missing or invalid:</p>
+        <h1 style={{ fontSize: '1.25rem', marginBottom: 16 }}>{t('environment.title')}</h1>
+        <p style={{ marginBottom: 24, opacity: 0.9 }}>{t('environment.description')}</p>
+        <p style={{ marginBottom: 8, fontSize: '0.875rem' }}>{t('environment.missing')}</p>
         <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.875rem', opacity: 0.9 }}>
           {missing.map((name) => (
             <li key={name} style={{ marginBottom: 4 }}>
@@ -179,7 +177,7 @@ function EnvErrorScreen({ missing }: { missing: string[] }) {
           ))}
         </ul>
         <p style={{ marginTop: 24, fontSize: '0.8125rem', opacity: 0.7 }}>
-          Set them in your shell or in a .env file, then restart the dev server.
+          {t('environment.resolution')}
         </p>
       </div>
     </div>

@@ -1,0 +1,192 @@
+{
+  "page": {
+    "title": "网站地图",
+    "subtitle": "快速访问账户页面和公开协议数据。",
+    "home": "首页",
+    "jsonLdName": "Cosmic Signature 网站地图"
+  },
+  "sections": {
+    "personal": {
+      "title": "个人工具",
+      "description": "这些钱包专属页面供已连接钱包的参与者使用，不编入搜索索引，也不会出现在 XML 站点地图中。",
+      "navLabel": "个人工具"
+    },
+    "system": {
+      "title": "公开协议页面",
+      "description": "查看公开榜单、派发、统计、合约与帮助内容。",
+      "navLabel": "系统与帮助页面"
+    },
+    "data": {
+      "title": "协议数据页面",
+      "description": "XML 站点地图中的所有公开数据路由均汇总于此，便于浏览与抓取。",
+      "navLabel": "协议数据页面"
+    },
+    "ecosystem": {
+      "title": "生态",
+      "description": "外部产品包括 Axiom Zero NFT 市场、Chaos Zero 预测市场，以及 Uniswap 上的 CST 兑换服务。",
+      "navLabel": "生态产品"
+    }
+  },
+  "links": {
+    "myNfts": {
+      "label": "我的 NFT",
+      "description": "钱包专属的 NFT 页面，不编入索引。"
+    },
+    "myAllocations": {
+      "label": "我的未取回分配",
+      "description": "用于取回分配的钱包专属页面，不编入索引。"
+    },
+    "myAnchors": {
+      "label": "我的锚定",
+      "description": "钱包专属的锚定页面，不编入索引。"
+    },
+    "about": {
+      "label": "关于 Cosmic Signature",
+      "description": "了解项目主体与品牌信息。"
+    },
+    "learn": {
+      "label": "Cosmic Signature 学习中心",
+      "description": "提供便于读者阅读、便于 AI 和搜索系统抓取的内容。"
+    },
+    "whatIsCosmicSignature": {
+      "label": "什么是 Cosmic Signature？",
+      "description": "以通俗语言说明协议。"
+    },
+    "threeBodyArt": {
+      "label": "三体 NFT 艺术指南",
+      "description": "了解确定性物理如何生成签名 NFT。"
+    },
+    "gallery": {
+      "label": "Cosmic Signature 画廊",
+      "description": "确定性 NFT 艺术作品档案。"
+    },
+    "currentCycle": {
+      "label": "当前演绎周期",
+      "description": "查看实时周期状态与落笔信息。"
+    },
+    "howItWorks": {
+      "label": "运作原理",
+      "description": "逐步了解周期机制。"
+    },
+    "statistics": {
+      "label": "协议统计",
+      "description": "查看公开协议指标与数据来源。"
+    },
+    "contracts": {
+      "label": "Cosmic Signature 合约",
+      "description": "已验证的 Arbitrum 合约地址。"
+    },
+    "sourceCode": {
+      "label": "源代码",
+      "description": "渲染管线与源代码资源。"
+    },
+    "security": {
+      "label": "安全",
+      "description": "安全模型与验证资源。"
+    },
+    "audits": {
+      "label": "审计",
+      "description": "审计与形式化验证状态。"
+    },
+    "riskDisclosures": {
+      "label": "风险披露",
+      "description": "区块链风险与参与者须知。"
+    },
+    "faq": {
+      "label": "Cosmic Signature 常见问题",
+      "description": "协议机制的常见问答。"
+    },
+    "terms": {
+      "label": "服务条款",
+      "description": "使用应用与参与协议时适用的法律条款。"
+    },
+    "privacy": {
+      "label": "隐私政策",
+      "description": "钱包数据、分析与区块链透明度说明。"
+    },
+    "allocationRecipients": {
+      "label": "分配名录",
+      "description": "查看每个周期的储备去向。"
+    },
+    "anchorDistributions": {
+      "label": "锚定派发",
+      "description": "查看已锚定的 NFT 及其派发。"
+    },
+    "outreachReserve": {
+      "label": "推广储备",
+      "description": "社区推广 CST 动态。"
+    },
+    "imprint": {
+      "label": "铭刻",
+      "description": "新代币铭刻界面。"
+    },
+    "ethContributions": {
+      "label": "ETH 贡献",
+      "description": "ETH 贡献记录。"
+    },
+    "attachedNfts": {
+      "label": "已附加 NFT",
+      "description": "各周期中附加到落笔的 NFT。"
+    },
+    "finalizedAllocations": {
+      "label": "已收官周期的分配",
+      "description": "周期收官后的分配记录。"
+    },
+    "namedNfts": {
+      "label": "已命名 NFT",
+      "description": "由所有者命名的 NFT。"
+    },
+    "usedRwlkNfts": {
+      "label": "已使用的 Random Walk NFT",
+      "description": "已用于获得落笔价格折扣的 Random Walk NFT。"
+    },
+    "coordinationChanges": {
+      "label": "协调变更",
+      "description": "协议参数变更记录。"
+    },
+    "publicGoodsContributions": {
+      "label": "公共物品资助",
+      "description": "按周期记录公共物品分配。"
+    },
+    "voluntaryPublicGoods": {
+      "label": "自愿公共物品资助",
+      "description": "直接存入金库的自愿贡献。"
+    },
+    "publicGoodsRetrievals": {
+      "label": "公共物品取回",
+      "description": "从公共物品金库转拨的资金。"
+    },
+    "participationStats": {
+      "label": "统计：参与",
+      "description": "参与者与落笔分析。"
+    },
+    "tokenStats": {
+      "label": "统计：代币",
+      "description": "CST 与 NFT 供应量分析。"
+    },
+    "anchoringStats": {
+      "label": "统计：锚定",
+      "description": "锚定总量与历史记录。"
+    },
+    "activityStats": {
+      "label": "统计：活动",
+      "description": "周期活动与时间分析。"
+    },
+    "performanceStats": {
+      "label": "统计：表现",
+      "description": "周期记录与表现分析。"
+    },
+    "axiomZero": {
+      "label": "Axiom Zero 市场",
+      "description": "面向 Cosmic Signature 与 Random Walk 的零手续费 NFT 市场。"
+    },
+    "chaosZero": {
+      "label": "Chaos Zero 预测",
+      "description": "针对每个演绎周期的预测市场。"
+    },
+    "uniswap": {
+      "label": "在 Uniswap 上兑换 CST",
+      "description": "在 Arbitrum 上用 ETH 兑换 CST。"
+    }
+  }
+}

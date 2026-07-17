@@ -22,17 +22,17 @@ const createRecipient = (overrides = {}) => ({
 describe('AnchoringRecipientTable', () => {
   it('renders custom empty message when list is empty', () => {
     render(<AnchoringRecipientTable list={[]} />);
-    expect(
-      screen.getByText(/There were no anchored tokens at the time the cycle ended/),
-    ).toBeInTheDocument();
+    expect(screen.getByText('tables.anchoringRecipient.empty')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<AnchoringRecipientTable list={[createRecipient()]} />);
-    expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Anchor-holder').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Number of NFTs').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Distribution Amount (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.datetime').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.anchorHolder').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.numberOfNfts').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.columns.distributionAmountEth').length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('renders datetime as explorer link', () => {

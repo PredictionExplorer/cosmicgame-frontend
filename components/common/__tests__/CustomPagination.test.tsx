@@ -39,12 +39,12 @@ describe('CustomPagination', () => {
 
   it('shows "Go to page" input when page count >= 30', () => {
     render(<CustomPagination {...defaultProps} totalLength={300} perPage={10} />);
-    expect(screen.getByLabelText('go to page')).toBeInTheDocument();
+    expect(screen.getByLabelText('tables.pagination.goToPageAria')).toBeInTheDocument();
   });
 
   it('does not show "Go to page" input for small page counts', () => {
     render(<CustomPagination {...defaultProps} totalLength={50} perPage={10} />);
-    expect(screen.queryByLabelText('go to page')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('tables.pagination.goToPageAria')).not.toBeInTheDocument();
   });
 
   it('renders single page when totalLength <= perPage', () => {
@@ -56,7 +56,7 @@ describe('CustomPagination', () => {
   it('clamps page input to valid range', () => {
     render(<CustomPagination {...defaultProps} page={1} totalLength={300} perPage={10} />);
 
-    const input = screen.getByLabelText('go to page');
+    const input = screen.getByLabelText('tables.pagination.goToPageAria');
     fireEvent.change(input, { target: { value: '999' } });
 
     expect(defaultProps.setPage).toHaveBeenCalledWith(30);

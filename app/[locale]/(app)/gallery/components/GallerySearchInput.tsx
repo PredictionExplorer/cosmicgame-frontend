@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, type ChangeEvent, type KeyboardEvent } from 'react';
 import { Search, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 
@@ -22,6 +23,7 @@ export function GallerySearchInput({
   totalCount,
   className,
 }: GallerySearchInputProps) {
+  const t = useTranslations('search');
   const [local, setLocal] = useState(value);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -71,8 +73,8 @@ export function GallerySearchInput({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
         <input
           type="text"
-          placeholder="Search by token ID or name..."
-          aria-label="Search NFTs"
+          placeholder={t('gallery.placeholder')}
+          aria-label={t('gallery.ariaLabel')}
           value={local}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -82,7 +84,7 @@ export function GallerySearchInput({
           <button
             type="button"
             onClick={handleClear}
-            aria-label="Clear search"
+            aria-label={t('gallery.clear')}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
           >
             <X className="h-4 w-4" />
@@ -94,11 +96,11 @@ export function GallerySearchInput({
         onClick={handleSearchClick}
         className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
       >
-        Search
+        {t('gallery.submit')}
       </button>
       {isFiltered && (
         <span className="hidden sm:inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-          {resultCount.toLocaleString()} result{resultCount !== 1 ? 's' : ''}
+          {t('gallery.results', { count: resultCount })}
         </span>
       )}
     </div>

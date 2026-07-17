@@ -1,4 +1,7 @@
+'use client';
+
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 
@@ -13,12 +16,9 @@ interface SkipLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   children?: React.ReactNode;
 }
 
-export function SkipLink({
-  href = '#main',
-  className,
-  children = 'Skip to main content',
-  ...props
-}: SkipLinkProps) {
+export function SkipLink({ href = '#main', className, children, ...props }: SkipLinkProps) {
+  const t = useTranslations('common');
+
   return (
     <a
       href={href}
@@ -33,7 +33,7 @@ export function SkipLink({
       )}
       {...props}
     >
-      {children}
+      {children ?? t('accessibility.skipToMain')}
     </a>
   );
 }

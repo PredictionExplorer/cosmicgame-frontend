@@ -1,0 +1,15 @@
+{
+  "liveCycleCountdown": "实时演绎周期倒计时",
+  "countdown": {
+    "days": "天",
+    "hours": "小时",
+    "minutes": "分",
+    "seconds": "秒"
+  },
+  "countdownLong": {
+    "days": "天",
+    "hours": "小时",
+    "minutes": "分",
+    "seconds": "秒"
+  }
+}

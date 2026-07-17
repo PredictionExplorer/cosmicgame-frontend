@@ -11,10 +11,17 @@ import { routing, type AppLocale } from './routing';
 export const NAMESPACES = [
   'common',
   'errors',
+  'footer',
+  'formats',
+  'forms',
   'home',
   'meta',
+  'nav',
+  'search',
+  'siteMap',
   'statistics',
   'tables',
+  'tooltips',
   'toasts',
   'wallet',
 ] as const;

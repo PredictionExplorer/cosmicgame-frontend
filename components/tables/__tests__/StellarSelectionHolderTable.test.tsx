@@ -30,12 +30,12 @@ beforeEach(() => jest.clearAllMocks());
 describe('StellarSelectionHolderTable', () => {
   it('renders empty state when list is empty', () => {
     render(<StellarSelectionHolderTable list={[]} />);
-    expect(screen.getByText('No holders yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.holders')).toBeInTheDocument();
   });
 
   it('renders loading state before processing', () => {
     render(<StellarSelectionHolderTable list={[createGesture()]} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.loading')).toBeInTheDocument();
   });
 
   it('renders table headers when data is processed', () => {
@@ -46,9 +46,9 @@ describe('StellarSelectionHolderTable', () => {
         numRaffleNFTWinner={1}
       />,
     );
-    expect(screen.getAllByText('Holder').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.holder').length).toBeGreaterThanOrEqual(1);
     expect(
-      screen.getAllByText('Number of Stellar Selection Entries').length,
+      screen.getAllByText('tables.columns.numberOfStellarEntries').length,
     ).toBeGreaterThanOrEqual(1);
   });
 
@@ -70,7 +70,7 @@ describe('StellarSelectionHolderTable', () => {
     render(
       <StellarSelectionHolderTable list={list} numRaffleEthWinner={1} numRaffleNFTWinner={1} />,
     );
-    expect(screen.getByText('(You)')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.you')).toBeInTheDocument();
   });
 
   it('shows entry count per holder', () => {

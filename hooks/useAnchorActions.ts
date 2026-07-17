@@ -1,16 +1,12 @@
 import { useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { getConnectorClient } from '@wagmi/core';
 import { useConfig, useConnectorClient, usePublicClient, useWalletClient } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import {
-  isUserRejection,
-  reportError,
-  getEthErrorMessage,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
@@ -35,6 +31,7 @@ const ANCHORING_QUERY_KEYS = [
  * Handles contract calls, receipt waiting, query invalidation, and error reporting.
  */
 export function useAnchorActions() {
+  const t = useTranslations('toasts');
   const { stakingCst, stakingRwalk } = useContractAddresses();
   const { account } = useActiveWeb3React();
   const config = useConfig();
@@ -55,19 +52,17 @@ export function useAnchorActions() {
     (err: unknown) => {
       if (isUserRejection(err)) {
         setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });
         return;
       }
       reportError(err, 'anchor action error');
-      const msg = getEthErrorMessage(err);
-      if (msg !== 'An error occurred') {
-        setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
-      }
+      const msg = getEthErrorMessage(err, t('unexpectedError'));
+      setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
     },
-    [setNotification],
+    [setNotification, t],
   );
 
   const invalidateAnchoringQueries = useCallback(() => {

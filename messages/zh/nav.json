@@ -1,0 +1,110 @@
+{
+  "brand": {
+    "homeLabel": "Cosmic Signature 首页",
+    "tagline": "链上艺术协议"
+  },
+  "primaryLabel": "主导航",
+  "menuLabel": "打开菜单",
+  "drawerTitle": "导航",
+  "sections": {
+    "protocol": "协议",
+    "ecosystem": "生态",
+    "myAccount": "我的账户"
+  },
+  "links": {
+    "gallery": {
+      "label": "画廊",
+      "description": "浏览所有已铭刻的签名作品"
+    },
+    "explore": {
+      "label": "探索"
+    },
+    "currentCycle": {
+      "label": "当前周期",
+      "description": "查看正在塑造当前周期的实时落笔"
+    },
+    "allocationRecipients": {
+      "label": "分配名录",
+      "description": "查看每个周期的储备去向"
+    },
+    "anchorDistributions": {
+      "label": "锚定派发",
+      "description": "查看已锚定的 NFT 及其派发"
+    },
+    "outreachReserve": {
+      "label": "推广储备",
+      "description": "查看社区推广动态"
+    },
+    "statistics": {
+      "label": "统计",
+      "description": "查看协议全局指标与记录"
+    },
+    "contracts": {
+      "label": "合约",
+      "description": "查看已验证的地址与源代码"
+    },
+    "help": {
+      "label": "帮助"
+    },
+    "howItWorks": {
+      "label": "运作原理",
+      "description": "逐步了解周期机制"
+    },
+    "faq": {
+      "label": "常见问题",
+      "description": "查看常见问题解答"
+    },
+    "about": {
+      "label": "关于 Cosmic Signature",
+      "description": "了解协议背后的故事"
+    },
+    "learn": {
+      "label": "学习中心",
+      "description": "阅读指南与深度解读"
+    },
+    "discover": {
+      "label": "探索 Cosmic Signature",
+      "description": "了解艺术、故事与协议"
+    },
+    "myDashboard": "我的仪表盘",
+    "myAllocations": "我的分配",
+    "myNfts": "我的 NFT",
+    "myAnchors": "我的锚定",
+    "recipientHistory": "获配记录"
+  },
+  "ecosystem": {
+    "groupLabel": "Cosmic Signature 生态",
+    "uniswap": {
+      "name": "兑换 CST",
+      "product": "Uniswap",
+      "tagline": "在 Uniswap 上用 ETH 兑换 CST",
+      "ariaLabel": "在 Uniswap 上兑换 CST",
+      "defaultLabel": "在 Uniswap 上兑换 CST",
+      "shortLabel": "兑换 CST"
+    },
+    "axiomZero": {
+      "name": "Axiom Zero",
+      "product": "NFT 市场",
+      "tagline": "在零手续费市场收藏 Cosmic Signature NFT",
+      "ariaLabel": "Axiom Zero NFT 市场",
+      "defaultLabel": "Axiom Zero 上的 NFT",
+      "menuLabel": "Axiom Zero 市场",
+      "shortLabel": "Axiom Zero"
+    },
+    "chaosZero": {
+      "name": "Chaos Zero",
+      "product": "预测市场",
+      "tagline": "预测协议每个周期的结果",
+      "ariaLabel": "前往 Chaos Zero 参与预测",
+      "defaultLabel": "在 Chaos Zero 上参与预测",
+      "menuLabel": "Chaos Zero 预测",
+      "shortLabel": "Chaos Zero"
+    }
+  },
+  "maintenance": {
+    "pendingMessage": "当前周期的分配完成后，协议将进入维护模式。参数调整完成后会重新开放。",
+    "activeMessage": "协议正在维护。参数调整完成后即可继续落笔。",
+    "pendingLabel": "等待维护",
+    "activeLabel": "维护中"
+  }
+}

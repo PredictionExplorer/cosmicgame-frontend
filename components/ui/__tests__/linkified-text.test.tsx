@@ -38,7 +38,7 @@ describe('LinkifiedText', () => {
     await user.click(screen.getByRole('button', { name: 'https://example.com/claim' }));
 
     const dialog = await screen.findByRole('dialog');
-    expect(dialog).toHaveTextContent('Leaving Cosmic Signature');
+    expect(dialog).toHaveTextContent('common.externalLink.title');
     expect(screen.getByTestId('external-link-destination')).toHaveTextContent(
       'https://example.com/claim',
     );
@@ -50,7 +50,7 @@ describe('LinkifiedText', () => {
     render(<LinkifiedText text="https://example.com" />);
 
     await user.click(screen.getByRole('button', { name: 'https://example.com' }));
-    await user.click(await screen.findByRole('button', { name: 'Cancel' }));
+    await user.click(await screen.findByRole('button', { name: 'common.actions.cancel' }));
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(openSpy).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe('LinkifiedText', () => {
     render(<LinkifiedText text="www.example.com" />);
 
     await user.click(screen.getByRole('button', { name: 'www.example.com' }));
-    await user.click(await screen.findByRole('button', { name: 'Open Link' }));
+    await user.click(await screen.findByRole('button', { name: 'common.externalLink.open' }));
 
     expect(openSpy).toHaveBeenCalledWith(
       'https://www.example.com',
@@ -83,10 +83,12 @@ describe('LinkifiedText', () => {
       render(<LinkifiedText text="https://example.com" />);
 
       fireEvent.click(screen.getByRole('button', { name: 'https://example.com' }));
-      fireEvent.click(await screen.findByRole('button', { name: 'Copy link' }));
+      fireEvent.click(await screen.findByRole('button', { name: 'common.externalLink.copy' }));
 
       expect(writeText).toHaveBeenCalledWith('https://example.com');
-      expect(await screen.findByRole('button', { name: 'Link copied' })).toBeInTheDocument();
+      expect(
+        await screen.findByRole('button', { name: 'common.externalLink.copied' }),
+      ).toBeInTheDocument();
     } finally {
       Object.defineProperty(navigator, 'clipboard', {
         value: originalClipboard,

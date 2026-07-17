@@ -1,10 +1,11 @@
 'use client';
 
 import { Fragment } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import {
-  ECOSYSTEM_DESTINATIONS,
+  getEcosystemDestinations,
   type EcosystemAccent,
   type EcosystemDestination,
 } from '@/config/ecosystem';
@@ -61,16 +62,19 @@ function DockSegment({ destination }: { destination: EcosystemDestination }) {
  * prediction market) into one cohesive segmented control in the header.
  */
 export function EcosystemDock({ className }: { className?: string }) {
+  const t = useTranslations('nav');
+  const destinations = getEcosystemDestinations(t);
+
   return (
     <div
       role="group"
-      aria-label="Cosmic Signature ecosystem"
+      aria-label={t('ecosystem.groupLabel')}
       className={cn(
         'flex items-center rounded-full border border-white/[0.08] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md',
         className,
       )}
     >
-      {ECOSYSTEM_DESTINATIONS.map((destination, i) => (
+      {destinations.map((destination, i) => (
         <Fragment key={destination.id}>
           {i > 0 ? (
             <span className="mx-0.5 h-3.5 w-px shrink-0 bg-white/[0.08]" aria-hidden />

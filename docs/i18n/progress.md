@@ -27,7 +27,7 @@ states, `aria-label`s, form validation, SEO title/description, OG image text, JS
 | Sprint | Theme                                                                      | Units                        | Status      |
 | ------ | -------------------------------------------------------------------------- | ---------------------------- | ----------- |
 | 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**    |
-| 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | Not started |
+| 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**    |
 | 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | Not started |
 | 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | Not started |
 | 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | Not started |
@@ -117,30 +117,53 @@ look mostly-translated instead of mostly-English.
 
 | Namespace  | Contents (key sources)                                                                          | E   | T   | R   | Q   |
 | ---------- | ----------------------------------------------------------------------------------------------- | --- | --- | --- | --- |
-| `common`   | generic buttons/status/empty/loading (spread across `components/`)                              | ☐   | ☐   | ☐   | ☐   |
-| `nav`      | `config/nav.tsx` titles + descriptions, drawer, ecosystem (`config/ecosystem.ts`)               | ☐   | ☐   | ☐   | ☐   |
-| `footer`   | `components/layout/Footer.tsx` link groups + tagline                                            | ☐   | ☐   | ☐   | ☐   |
-| `wallet`   | connect/disconnect, RainbowKit locale (`zh-CN` built-in), network prompts, balances             | ☐   | ☐   | ☐   | ☐   |
-| `tables`   | shared headers/pagination/sorting/empty in `components/tables/` (26 files)                      | ☐   | ☐   | ☐   | ☐   |
-| `tooltips` | shared/global tooltips (`components/ui/info-tooltip.tsx` call sites in shared components)       | ☐   | ☐   | ☐   | ☐   |
-| `toasts`   | toast infrastructure + `utils/errors.ts` shared messages (page-specific texts land in Sprint 4) | ☐   | ☐   | ☐   | ☐   |
-| `errors`   | error boundaries, `error-state` components, API-failure copy                                    | ☐   | ☐   | ☐   | ☐   |
-| `forms`    | shared validation/input copy, date-picker labels (`components/ui/date-picker.tsx`)              | ☐   | ☐   | ☐   | ☐   |
-| `formats`  | duration/countdown unit labels (full locale formatting lands in Sprint 5)                       | ☐   | ☐   | ☐   | ☐   |
-| `meta`     | shared metadata fragments (site name pattern, OG defaults)                                      | ☐   | ☐   | ☐   | ☐   |
-| `search`   | header/gallery search placeholder + results copy                                                | ☐   | ☐   | ☐   | ☐   |
+| `common`   | generic buttons/status/empty/loading (spread across `components/`)                              | ✅  | ✅  | ✅  | ✅  |
+| `nav`      | `config/nav.tsx` titles + descriptions, drawer, ecosystem (`config/ecosystem.ts`)               | ✅  | ✅  | ✅  | ✅  |
+| `footer`   | `components/layout/Footer.tsx` link groups + tagline                                            | ✅  | ✅  | ✅  | ✅  |
+| `wallet`   | connect/disconnect, RainbowKit locale (`zh-CN` built-in), network prompts, balances             | ✅  | ✅  | ✅  | ✅  |
+| `tables`   | shared headers/pagination/sorting/empty in `components/tables/` (26 files)                      | ✅  | ✅  | ✅  | ✅  |
+| `tooltips` | shared/global tooltips (`components/ui/info-tooltip.tsx` call sites in shared components)       | ✅  | ✅  | ✅  | ✅  |
+| `toasts`   | toast infrastructure + `utils/errors.ts` shared messages (page-specific texts land in Sprint 4) | ✅  | ✅  | ✅  | ✅  |
+| `errors`   | error boundaries, `error-state` components, API-failure copy                                    | ✅  | ✅  | ✅  | ✅  |
+| `forms`    | shared validation/input copy, date-picker labels (`components/ui/date-picker.tsx`)              | ✅  | ✅  | ✅  | ✅  |
+| `formats`  | duration/countdown unit labels (full locale formatting lands in Sprint 5)                       | ✅  | ✅  | ✅  | ✅  |
+| `meta`     | shared metadata fragments (site name pattern, OG defaults)                                      | ✅  | ✅  | ✅  | ✅  |
+| `search`   | header/gallery search placeholder + results copy                                                | ✅  | ✅  | ✅  | ✅  |
 
 **Routes:**
 
 | Route                  | Sources                                                | E   | T   | R   | Q   |
 | ---------------------- | ------------------------------------------------------ | --- | --- | --- | --- |
-| `/[...notFound]` (404) | `(app)/[...notFound]/`                                 | ☐   | ☐   | ☐   | ☐   |
-| `/site-map`            | `(app)/site-map/SiteMapPage.tsx` (large label catalog) | ☐   | ☐   | ☐   | ☐   |
+| `/[...notFound]` (404) | `(app)/not-found.tsx`, `(app)/[...notFound]/`          | ✅  | ✅  | ✅  | ✅  |
+| `/site-map`            | `(app)/site-map/SiteMapPage.tsx` (large label catalog) | ✅  | ✅  | ✅  | ✅  |
 
 **Acceptance:** on any `/zh` page, header, footer, wallet flow, tables chrome, and error
 states are fully Chinese. Parity enforcement flips on for these namespaces. Glossary
-amendments from first contact with real UI are merged (glossary §6) — after this sprint
-the glossary is frozen except through the change process.
+amendments from first contact with real UI are merged (glossary §6). The glossary remains
+amendable through Sprint 2, then freezes through the change process.
+
+**Sprint 1 completed 2026-07-17.** Verification: type-check, lint, Jest (5,236 tests),
+production build (120 static pages), lexicon scan, full parity report, strict Sprint 1
+required-key gate, zh smoke (desktop + mobile), proxy routing, and rendered layout QA at
+320 / 768 / 1440 px with screenshots.
+
+Implementation notes / deviations:
+
+- Added and registered `nav`, `footer`, `tooltips`, `forms`, `formats`, `search`, and
+  route-owned `siteMap` catalogs. Sprint 1 owns 548 required zh keys; later-sprint
+  `home`, `statistics`, route metadata, and transaction-specific toast keys intentionally
+  continue to report English fallback.
+- `scripts/i18n-sprint1-required.json` makes completed keys fail CI without forcing mixed
+  namespaces (`common`, `meta`, `toasts`) to translate future-sprint entries early.
+- Every component-owned string in the 26 `components/tables/` files is localized; imported
+  statistics prose and locale-aware number/date formatting remain Sprint 5.
+- Cross-host user links now carry `/zh` explicitly; third-party links remain unchanged.
+  Shared root metadata and `/site-map` metadata/JSON-LD are locale-aware.
+- **R-stage exception requested by the project owner:** independent agent accuracy and
+  Chinese-only blind-fluency passes both returned PASS after corrections. This is recorded
+  as agent review, not native-human sign-off; Sprint 8's native reviewer launch gate remains.
+- No glossary amendments were needed. The documented freeze point is after Sprint 2, when
+  landing/Learn transcreation has exercised the terminology in long-form copy.
 
 ## Sprint 2 — Landing site + Learn hub
 
@@ -334,13 +357,15 @@ scan green; native reviewer sign-off; language switcher announced/visible. 上�
 
 ## Decisions log
 
-| Date       | Decision                                                                                                      |
-| ---------- | ------------------------------------------------------------------------------------------------------------- |
-| 2026-07-16 | Target Simplified Chinese (`zh`, zh-Hans) first; architecture N-locale ready                                  |
-| 2026-07-16 | URL strategy: locale prefix, `as-needed` — English URLs unchanged, Chinese under `/zh` on both hosts          |
-| 2026-07-16 | Library: next-intl; messages in `messages/{en,zh}/*.json`; long-form content as per-locale TS modules         |
-| 2026-07-16 | `content/dapp.ts` seeds the en catalogs, then is deleted                                                      |
-| 2026-07-16 | Register: 你 (never 您); core coinages per glossary §2 (落笔 / 演绎周期 / 收官 / 星选 / 锚定 / 取回 / 铭刻 …) |
+| Date       | Decision                                                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-16 | Target Simplified Chinese (`zh`, zh-Hans) first; architecture N-locale ready                                            |
+| 2026-07-16 | URL strategy: locale prefix, `as-needed` — English URLs unchanged, Chinese under `/zh` on both hosts                    |
+| 2026-07-16 | Library: next-intl; messages in `messages/{en,zh}/*.json`; long-form content as per-locale TS modules                   |
+| 2026-07-16 | `content/dapp.ts` seeds the en catalogs, then is deleted                                                                |
+| 2026-07-16 | Register: 你 (never 您); core coinages per glossary §2 (落笔 / 演绎周期 / 收官 / 星选 / 锚定 / 取回 / 铭刻 …)           |
+| 2026-07-17 | Sprint 1 R used owner-approved independent agent accuracy + blind-fluency passes; native launch review remains Sprint 8 |
+| 2026-07-17 | Glossary freeze reconciled to after Sprint 2, matching `glossary-zh.md`; Sprint 1 required no amendments                |
 
 ## Risk register
 

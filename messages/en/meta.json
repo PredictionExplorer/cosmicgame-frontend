@@ -1,4 +1,9 @@
 {
+  "shared": {
+    "defaultTitle": "Cosmic Signature",
+    "defaultOgTitle": "Cosmic Signature — Every Gesture Shapes the Signature.",
+    "defaultDescription": "A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors."
+  },
   "home": {
     "title": "Cosmic Signature · Procedural On-Chain Art Protocol",
     "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during a Performance Cycle; every gesture shapes the cycle's final Signature."
@@ -141,7 +146,7 @@
     "description": "RandomWalk NFTs already attached to ETH gestures for a 50% ETH Gesture Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount."
   },
   "siteMap": {
-    "title": "Site Map · Cosmic Signature",
+    "title": "Site Map | Cosmic Signature",
     "description": "Navigate every section of the Cosmic Signature protocol — gestures, NFT gallery, anchoring, statistics, allocations, and public-goods contributions."
   },
   "nftDonations": {

@@ -23,11 +23,10 @@ describe('AttachedNFTDistributionTable', () => {
     render(<AttachedNFTDistributionTable list={rows} />);
 
     expect(
-      screen.getAllByRole('button', { name: 'Explain column: Contract Address' }).length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getAllByRole('button', { name: 'Explain column: Number of NFTs' }).length,
-    ).toBeGreaterThanOrEqual(1);
+      screen.getAllByRole('button', {
+        name: /^tables\.tableHeaderHelp\.explainColumn/,
+      }).length,
+    ).toBeGreaterThanOrEqual(2);
   });
 
   it('opens attached NFT column help', async () => {
@@ -35,7 +34,9 @@ describe('AttachedNFTDistributionTable', () => {
     render(<AttachedNFTDistributionTable list={rows} />);
 
     await user.hover(
-      screen.getAllByRole('button', { name: 'Explain column: Contract Address' })[0]!,
+      screen.getAllByRole('button', {
+        name: /^tables\.tableHeaderHelp\.explainColumn/,
+      })[0]!,
     );
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent(

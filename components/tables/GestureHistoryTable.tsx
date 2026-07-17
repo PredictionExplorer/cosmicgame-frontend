@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Tr } from 'react-super-responsive-table';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
@@ -88,6 +89,7 @@ function formatGestureCostAmount(amount: number | undefined): string {
 }
 
 const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRowProps) => {
+  const t = useTranslations('tables');
   const router = useRouter();
   const publicClient = usePublicClient();
   const [symbol, setSymbol] = useState('');
@@ -128,7 +130,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
   const backgroundStyle =
     (gestureType !== undefined && gestureTypeStyles[gestureType]) || 'rgba(0,0,0,0.1)';
   const gestureTypeLabel =
-    (gestureType !== undefined && gestureTypeLabels[gestureType]) || 'Unknown';
+    (gestureType !== undefined && gestureTypeLabels[gestureType]) || t('status.unknown');
 
   const price =
     gestureType === 2
@@ -160,7 +162,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
         <span className="break-all">
           {gestureType === 1 && history.RWalkNFTId && (
             <>
-              {`Gesture was made using RandomWalk NFT (ID = ${history.RWalkNFTId})`}
+              {t('gestureHistory.randomWalkGesture', { id: history.RWalkNFTId })}
               <Image
                 src={getRWLKImageUrl(history.RWalkNFTId.toString().padStart(6, '0'))}
                 width={32}
@@ -173,16 +175,18 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
           )}
           {(!!history.NFTDonationTokenAddr || !!history.DonatedERC20TokenAddr) && (
             <>
-              {gestureType === 2 && 'Gesture was made using CST tokens'}
-              {gestureType === 0 && 'Gesture was made using ETH'}
+              {gestureType === 2 && t('gestureHistory.cstGesture')}
+              {gestureType === 0 && t('gestureHistory.ethGesture')}
               {!!history.NFTDonationTokenAddr &&
-                ` and a token (${shortenHex(
-                  history.NFTDonationTokenAddr,
-                  6,
-                )}) with ID ${history.NFTDonationTokenId} was attached`}
+                t('gestureHistory.nftAttached', {
+                  address: shortenHex(history.NFTDonationTokenAddr, 6),
+                  id: String(history.NFTDonationTokenId),
+                })}
               {!!history.DonatedERC20TokenAddr && (
                 <>
-                  {` and ${formatUnits(BigInt(history.DonatedERC20TokenAmount || '0'), decimals)}`}{' '}
+                  {t('gestureHistory.erc20AttachedPrefix', {
+                    amount: formatUnits(BigInt(history.DonatedERC20TokenAmount || '0'), decimals),
+                  })}{' '}
                   <a
                     href={getExplorerUrl('token', history.DonatedERC20TokenAddr)}
                     target="_blank"
@@ -191,7 +195,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
                   >
                     {symbol}
                   </a>
-                  {' was attached'}
+                  {t('gestureHistory.attachedSuffix')}
                 </>
               )}
             </>
@@ -221,6 +225,7 @@ const HistoryTable = ({
   showRound,
   nowSec,
 }: HistoryTableProps) => {
+  const t = useTranslations('tables');
   const { data: bannedBids } = useBannedGestures();
   const bannedList = bannedBids?.map((x: { bid_id: number }) => x.bid_id) ?? [];
 
@@ -241,14 +246,16 @@ const HistoryTable = ({
         </colgroup>
         <TablePrimaryHead>
           <Tr>
-            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Participant</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">Cost</TablePrimaryHeadCell>
-            {showRound && <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>}
-            <TablePrimaryHeadCell>Gesture Type</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="center">Gesture Duration</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Gesture Info</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.participant')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right">{t('columns.gestureCost')}</TablePrimaryHeadCell>
+            {showRound && <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>}
+            <TablePrimaryHeadCell>{t('columns.gestureType')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="center">
+              {t('columns.gestureDuration')}
+            </TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.gestureInfo')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.message')}</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <tbody>
@@ -276,6 +283,7 @@ const HistoryTable = ({
 };
 
 const GestureHistoryTable = ({ gestureHistory, showRound = true }: GestureHistoryTableProps) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [curPage, setCurrentPage] = useState(1);
   const nowSec = Math.floor(useNow(1000) / 1000);
@@ -299,7 +307,7 @@ const GestureHistoryTable = ({ gestureHistory, showRound = true }: GestureHistor
           />
         </>
       ) : (
-        <p>No gestures yet.</p>
+        <p>{t('empty.gestures')}</p>
       )}
     </div>
   );

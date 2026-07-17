@@ -1,4 +1,5 @@
 import {
+  APP_ORIGIN,
   APP_ONLY_PATH_PREFIXES,
   LANDING_ORIGIN,
   LANDING_ONLY_PATH_PREFIXES,
@@ -7,6 +8,8 @@ import {
   isLandingHost,
   isLandingOnlyPath,
   isLegacyWwwLandingHost,
+  localeHref,
+  localizeCrossHostHref,
   normalizeHost,
 } from '@/lib/hostRouting';
 
@@ -90,6 +93,40 @@ describe('hostRouting', () => {
       expect(isLegacyWwwLandingHost('www.cosmicsignature.com')).toBe(true);
       expect(isLegacyWwwLandingHost('cosmicsignature.com')).toBe(false);
       expect(isLegacyWwwLandingHost('app.cosmicsignature.com')).toBe(false);
+    });
+  });
+
+  describe('locale-aware absolute URLs', () => {
+    it('keeps English links unprefixed and prefixes Chinese links', () => {
+      expect(localeHref(APP_ORIGIN, '/gallery', 'en')).toBe(
+        'https://app.cosmicsignature.com/gallery',
+      );
+      expect(localeHref(APP_ORIGIN, '/gallery', 'zh')).toBe(
+        'https://app.cosmicsignature.com/zh/gallery',
+      );
+      expect(localeHref(LANDING_ORIGIN, '/', 'zh')).toBe('https://cosmicsignature.com/zh');
+    });
+
+    it('normalizes paths without a leading slash', () => {
+      expect(localeHref(LANDING_ORIGIN, 'learn', 'zh')).toBe(
+        'https://cosmicsignature.com/zh/learn',
+      );
+    });
+
+    it('localizes only Cosmic Signature absolute links and preserves URL suffixes', () => {
+      expect(
+        localizeCrossHostHref('https://app.cosmicsignature.com/gallery?q=orbit#results', 'zh'),
+      ).toBe('https://app.cosmicsignature.com/zh/gallery?q=orbit#results');
+      expect(localizeCrossHostHref('https://example.com/gallery', 'zh')).toBe(
+        'https://example.com/gallery',
+      );
+      expect(localizeCrossHostHref('/gallery', 'zh')).toBe('/gallery');
+    });
+
+    it('replaces an existing locale prefix instead of duplicating it', () => {
+      expect(localizeCrossHostHref('https://app.cosmicsignature.com/zh/gallery', 'en')).toBe(
+        'https://app.cosmicsignature.com/gallery',
+      );
     });
   });
 

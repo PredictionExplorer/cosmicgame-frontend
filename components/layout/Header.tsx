@@ -12,12 +12,14 @@ import {
   Menu,
   type LucideIcon,
 } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatEther } from 'viem';
 
 import { Link } from '@/i18n/navigation';
+import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import getNAVs, { type NavDescriptor } from '@/config/nav';
-import { ECOSYSTEM_DESTINATIONS } from '@/config/ecosystem';
+import { getEcosystemDestinations } from '@/config/ecosystem';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import ListNavItem from '@/components/common/ListNavItem';
 import { EcosystemDock } from '@/components/layout/EcosystemDock';
@@ -129,6 +131,9 @@ const DrawerFeaturedCard: FC<{ item: NavDescriptor }> = ({ item }) => {
 };
 
 const Header: FC = () => {
+  const t = useTranslations('nav');
+  const walletT = useTranslations('wallet');
+  const locale = useLocale() as AppLocale;
   const [mobileView, setMobileView] = useState<boolean>(false);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
@@ -187,7 +192,8 @@ const Header: FC = () => {
     };
   }, []);
 
-  const navs = getNAVs(status, account);
+  const navs = getNAVs(status, account, t, locale);
+  const ecosystemDestinations = getEcosystemDestinations(t);
   const standaloneNavs = navs.filter((nav) => !nav.children);
   const groupedNavs = navs.filter((nav) => nav.children);
 
@@ -205,7 +211,7 @@ const Header: FC = () => {
   const brand = (
     <Link
       href="/"
-      aria-label="Cosmic Signature home"
+      aria-label={t('brand.homeLabel')}
       className="group flex shrink-0 items-center gap-3 rounded-full no-underline"
     >
       <span className="relative flex h-10 w-10 items-center justify-center">
@@ -227,14 +233,14 @@ const Header: FC = () => {
           Cosmic Signature
         </span>
         <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-          On-chain art protocol
+          {t('brand.tagline')}
         </span>
       </span>
     </Link>
   );
 
   const renderDesktop = () => (
-    <nav aria-label="Primary" className="flex items-center gap-4 xl:gap-6">
+    <nav aria-label={t('primaryLabel')} className="flex items-center gap-4 xl:gap-6">
       {brand}
 
       <div className="flex items-center gap-0.5 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md">
@@ -266,7 +272,7 @@ const Header: FC = () => {
         <Button
           variant="ghost"
           size="icon"
-          aria-label="menu"
+          aria-label={t('menuLabel')}
           aria-haspopup="true"
           onClick={handleDrawerOpen}
           className="h-10 w-10 shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03]"
@@ -281,12 +287,17 @@ const Header: FC = () => {
           )}
         </Button>
 
-        <Link href="/" className="flex items-center gap-2.5 no-underline">
+        <Link
+          href="/"
+          aria-label={t('brand.homeLabel')}
+          className="flex items-center gap-2.5 no-underline"
+        >
           <Image
             src="/images/logo2.svg"
             width={48}
             height={48}
-            alt="logo"
+            alt=""
+            aria-hidden
             loading="eager"
             className="h-9 w-auto max-h-9 object-contain"
           />
@@ -313,7 +324,7 @@ const Header: FC = () => {
             side="left"
             className="w-[320px] border-r border-white/[0.08] p-0 sm:max-w-[320px]"
           >
-            <SheetTitle className="sr-only">Navigation</SheetTitle>
+            <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
             <DrawerList>
               {/* Brand */}
               <div className="flex items-center gap-2.5 border-b border-white/[0.06] px-5 pb-3.5 pt-2">
@@ -330,7 +341,7 @@ const Header: FC = () => {
                     Cosmic Signature
                   </span>
                   <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.3em] text-white/40">
-                    On-chain art protocol
+                    {t('brand.tagline')}
                   </span>
                 </span>
               </div>
@@ -354,7 +365,7 @@ const Header: FC = () => {
               <Separator className="bg-white/[0.06]" />
 
               {/* Protocol: standalone destinations (Gallery, plus contextual items) */}
-              <DrawerHeading>Protocol</DrawerHeading>
+              <DrawerHeading>{t('sections.protocol')}</DrawerHeading>
               {standaloneNavs.map((nav, i) => (
                 <DrawerNavRow key={i} item={nav} onNavigate={closeDrawer} />
               ))}
@@ -380,8 +391,8 @@ const Header: FC = () => {
               <Separator className="my-2 bg-white/[0.06]" />
 
               {/* Ecosystem: Uniswap, Axiom Zero, Chaos Zero */}
-              <DrawerHeading>Ecosystem</DrawerHeading>
-              {ECOSYSTEM_DESTINATIONS.map((destination) => {
+              <DrawerHeading>{t('sections.ecosystem')}</DrawerHeading>
+              {ecosystemDestinations.map((destination) => {
                 const Icon = destination.icon;
                 return (
                   <a
@@ -414,20 +425,24 @@ const Header: FC = () => {
                   <Separator className="my-2 bg-white/[0.06]" />
 
                   {/* My Account */}
-                  <DrawerHeading>My Account</DrawerHeading>
+                  <DrawerHeading>{t('sections.myAccount')}</DrawerHeading>
                   <DrawerNavRow
-                    item={{ title: 'My Dashboard', route: '/my-statistics', icon: LayoutDashboard }}
+                    item={{
+                      title: t('links.myDashboard'),
+                      route: '/my-statistics',
+                      icon: LayoutDashboard,
+                    }}
                     onNavigate={closeDrawer}
                   />
                   <DrawerNavRow
                     item={{
                       title: hasUnclaimedRewards ? (
                         <span className="flex items-center gap-2">
-                          My Allocations
+                          {t('links.myAllocations')}
                           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                         </span>
                       ) : (
-                        'My Allocations'
+                        t('links.myAllocations')
                       ),
                       route: '/my-allocations',
                       icon: Gift,
@@ -435,16 +450,16 @@ const Header: FC = () => {
                     onNavigate={closeDrawer}
                   />
                   <DrawerNavRow
-                    item={{ title: 'My NFTs', route: '/my-tokens', icon: Coins }}
+                    item={{ title: t('links.myNfts'), route: '/my-tokens', icon: Coins }}
                     onNavigate={closeDrawer}
                   />
                   <DrawerNavRow
-                    item={{ title: 'My Anchors', route: '/my-anchors', icon: Layers }}
+                    item={{ title: t('links.myAnchors'), route: '/my-anchors', icon: Layers }}
                     onNavigate={closeDrawer}
                   />
                   <DrawerNavRow
                     item={{
-                      title: 'Recipient History',
+                      title: t('links.recipientHistory'),
                       route: '/recipient-history',
                       icon: History,
                     }}
@@ -456,27 +471,37 @@ const Header: FC = () => {
                   {/* Balances */}
                   <div className="space-y-1.5 px-5 py-2">
                     <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
-                      Balances
+                      {walletT('labels.balancesHeading')}
                     </p>
                     {loading ? (
-                      <p className="text-xs text-primary">Loading...</p>
+                      <p className="text-xs text-primary">{walletT('labels.loading')}</p>
                     ) : (
                       <>
                         <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">ETH</span>
+                          <span className="text-muted-foreground">{walletT('balances.eth')}</span>
                           <span className="font-medium">{balance.ETH.toFixed(4)}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">CST</span>
+                          <span className="text-muted-foreground">{walletT('balances.cst')}</span>
                           <span className="font-medium">{balance.CosmicToken.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">COSMIC NFTs</span>
-                          <span className="font-medium">{balance.CosmicSignature}</span>
+                          <span className="text-muted-foreground">
+                            {walletT('balances.cosmicNfts')}
+                          </span>
+                          <span className="font-medium">
+                            {walletT('labels.nftCount', {
+                              count: balance.CosmicSignature,
+                            })}
+                          </span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">RWLK NFTs</span>
-                          <span className="font-medium">{balance.RWLK}</span>
+                          <span className="text-muted-foreground">
+                            {walletT('balances.rwlkNfts')}
+                          </span>
+                          <span className="font-medium">
+                            {walletT('labels.nftCount', { count: balance.RWLK })}
+                          </span>
                         </div>
                       </>
                     )}
@@ -484,15 +509,31 @@ const Header: FC = () => {
 
                   <div className="space-y-1.5 px-5 py-2">
                     <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
-                      Anchored
+                      {walletT('labels.anchoredHeading')}
                     </p>
                     <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">Cosmic Signature NFTs</span>
-                      <span className="font-medium text-primary">{anchoredCSTokens?.length}</span>
+                      <span className="text-muted-foreground">
+                        {walletT('balances.anchoredCst')}
+                      </span>
+                      <span className="font-medium text-primary">
+                        {anchoredCSTokens == null
+                          ? null
+                          : walletT('labels.nftCount', {
+                              count: anchoredCSTokens.length,
+                            })}
+                      </span>
                     </div>
                     <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">RWLK NFTs</span>
-                      <span className="font-medium text-primary">{anchoredRWLKTokens?.length}</span>
+                      <span className="text-muted-foreground">
+                        {walletT('balances.anchoredRwlk')}
+                      </span>
+                      <span className="font-medium text-primary">
+                        {anchoredRWLKTokens == null
+                          ? null
+                          : walletT('labels.nftCount', {
+                              count: anchoredRWLKTokens.length,
+                            })}
+                      </span>
                     </div>
                   </div>
                 </>
@@ -519,11 +560,11 @@ const Header: FC = () => {
             <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
               <p className="text-sm">
                 {systemMode === 1
-                  ? 'Maintenance mode activates after the current allocation finalizes. The protocol reopens once adjustments are complete.'
-                  : 'Protocol is in maintenance mode. Gestures will resume once parameter adjustments are complete.'}
+                  ? t('maintenance.pendingMessage')
+                  : t('maintenance.activeMessage')}
               </p>
               <span className="shrink-0 rounded-full bg-black/10 px-3 py-1 text-xs font-bold uppercase tracking-wider">
-                {systemMode === 1 ? 'Pending' : 'Maintenance'}
+                {systemMode === 1 ? t('maintenance.pendingLabel') : t('maintenance.activeLabel')}
               </span>
             </div>
           </div>

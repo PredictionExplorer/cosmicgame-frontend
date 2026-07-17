@@ -1,4 +1,7 @@
+import { getLocale } from 'next-intl/server';
+
 import { Link } from '@/i18n/navigation';
+import { localizeCrossHostHref } from '@/lib/hostRouting';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import {
   get_staked_cst_tokens,
@@ -425,6 +428,7 @@ function formatUpdatedAt(date: Date): string {
 
 export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRoute }) {
   const config = configs[route];
+  const locale = await getLocale();
   const updatedAt = new Date();
   // Resolve to an empty card list on transport failure so ISR builds never
   // crash on a temporarily unreachable API; the copy and internal links
@@ -467,7 +471,10 @@ export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRo
         <ul className="flex flex-wrap gap-3 text-sm">
           {config.links.map((link) => (
             <li key={link.href}>
-              <Link href={link.href} className="text-primary underline-offset-4 hover:underline">
+              <Link
+                href={localizeCrossHostHref(link.href, locale)}
+                className="text-primary underline-offset-4 hover:underline"
+              >
                 {link.label}
               </Link>
             </li>

@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { routing } from '@/i18n/routing';
 
 import { RootDocument } from '../../root-document';
-import { rootMetadata, rootViewport, openGraphLocale } from '../../root-metadata';
+import { createRootMetadata, rootViewport, openGraphLocale } from '../../root-metadata';
 
 import { LandingShell } from './landing-shell';
 
@@ -24,9 +24,16 @@ export const viewport = rootViewport;
 
 export async function generateMetadata({ params }: Pick<LayoutProps, 'params'>): Promise<Metadata> {
   const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations('meta');
+  const metadata = createRootMetadata({
+    defaultTitle: t('shared.defaultTitle'),
+    defaultOgTitle: t('shared.defaultOgTitle'),
+    defaultDescription: t('shared.defaultDescription'),
+  });
   return {
-    ...rootMetadata,
-    openGraph: { ...rootMetadata.openGraph, locale: openGraphLocale(locale) },
+    ...metadata,
+    openGraph: { ...metadata.openGraph, locale: openGraphLocale(locale) },
   };
 }
 

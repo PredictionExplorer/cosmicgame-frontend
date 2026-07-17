@@ -48,7 +48,7 @@ describe('StellarSelectionRecipientTable', () => {
         RaffleNFTWinners={[]}
       />,
     );
-    expect(screen.getByText('No recipients yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.recipients')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
@@ -58,9 +58,9 @@ describe('StellarSelectionRecipientTable', () => {
         RaffleNFTWinners={[]}
       />,
     );
-    expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Recipient').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Type').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.datetime').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.recipient').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.type').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows "ETH Deposit" type for entries with Amount', () => {
@@ -73,7 +73,9 @@ describe('StellarSelectionRecipientTable', () => {
         RaffleNFTWinners={[]}
       />,
     );
-    expect(screen.getAllByText('ETH Deposit').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.stellarSelection.ethDeposit').length).toBeGreaterThanOrEqual(
+      1,
+    );
   });
 
   it('shows "Cosmic Signature NFT Stellar Selection" for IsStaker && !IsRwalk', () => {
@@ -84,7 +86,7 @@ describe('StellarSelectionRecipientTable', () => {
       />,
     );
     expect(
-      screen.getAllByText('Cosmic Signature NFT Stellar Selection').length,
+      screen.getAllByText('tables.stellarSelection.signatureNftSelection').length,
     ).toBeGreaterThanOrEqual(1);
   });
 
@@ -96,7 +98,7 @@ describe('StellarSelectionRecipientTable', () => {
       />,
     );
     expect(
-      screen.getAllByText('Anchored-NFT Stellar Selection Cosmic Signature NFT').length,
+      screen.getAllByText('tables.stellarSelection.anchoredNft').length,
     ).toBeGreaterThanOrEqual(1);
   });
 

@@ -16,7 +16,11 @@ describe('TableHeaderHelp', () => {
     const user = userEvent.setup();
     render(<TableHeaderHelp desktop="Round" tooltip="Cycle or deployment context." />);
 
-    await user.hover(screen.getByRole('button', { name: 'Explain column: Round' }));
+    await user.hover(
+      screen.getByRole('button', {
+        name: /^tables\.tableHeaderHelp\.explainColumn/,
+      }),
+    );
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent('Cycle or deployment context.');
   });

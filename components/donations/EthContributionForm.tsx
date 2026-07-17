@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 import { parseEther } from 'viem';
 
@@ -9,7 +10,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { cn } from '@/lib/utils';
 import { asWriteFn } from '@/utils/contractWrite';
-import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
+import { isUserRejection, reportError } from '@/utils/errors';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,6 +49,7 @@ export function EthContributionForm({
   onSuccess,
   title = 'Make an ETH Contribution',
 }: EthContributionFormProps) {
+  const t = useTranslations('toasts');
   const [amount, setAmount] = useState('');
   const [metadataTitle, setMetadataTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -129,7 +131,7 @@ export function EthContributionForm({
     } catch (error: unknown) {
       if (isUserRejection(error)) {
         setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });

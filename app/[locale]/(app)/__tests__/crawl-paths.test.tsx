@@ -57,7 +57,7 @@ describe('crawl paths', () => {
   });
 
   it('every internal header-nav route has a server-rendered anchor', () => {
-    const routes = internalNavRoutes(getNAVs(null, null));
+    const routes = internalNavRoutes(getNAVs(null, null, (key) => key, 'en'));
     expect(routes.length).toBeGreaterThan(5);
     for (const route of routes) {
       if (!union.has(route)) {

@@ -88,7 +88,7 @@ describe('ContractAddressCard', () => {
       <ContractAddressCard {...defaultProps} name="Cosmic Signature CST Token" showTradeAction />,
     );
 
-    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' })).toHaveAttribute(
       'href',
       CST_UNISWAP_SWAP_URL,
     );
@@ -97,7 +97,9 @@ describe('ContractAddressCard', () => {
   it('does not render the Uniswap trade action by default', () => {
     render(<ContractAddressCard {...defaultProps} />);
 
-    expect(screen.queryByRole('link', { name: 'Trade CST on Uniswap' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders the marketplace action when requested', () => {
@@ -105,7 +107,7 @@ describe('ContractAddressCard', () => {
       <ContractAddressCard {...defaultProps} name="Cosmic Signature NFT" showMarketplaceAction />,
     );
 
-    expect(screen.getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );
@@ -115,7 +117,7 @@ describe('ContractAddressCard', () => {
     render(<ContractAddressCard {...defaultProps} />);
 
     expect(
-      screen.queryByRole('link', { name: 'Axiom Zero NFT marketplace' }),
+      screen.queryByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
     ).not.toBeInTheDocument();
   });
 

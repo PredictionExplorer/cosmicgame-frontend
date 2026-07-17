@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 
@@ -44,8 +45,14 @@ export function SkeletonText({
   lastLineWidth?: string;
   className?: string;
 }) {
+  const t = useTranslations('tables');
+
   return (
-    <div className={cn('space-y-2', className)} role="status" aria-label="Loading text">
+    <div
+      className={cn('space-y-2', className)}
+      role="status"
+      aria-label={t('skeleton.loadingText')}
+    >
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}
@@ -58,6 +65,8 @@ export function SkeletonText({
 }
 
 export function SkeletonStatCard({ className }: { className?: string }) {
+  const t = useTranslations('tables');
+
   return (
     <div
       className={cn(
@@ -65,7 +74,7 @@ export function SkeletonStatCard({ className }: { className?: string }) {
         className,
       )}
       role="status"
-      aria-label="Loading stat"
+      aria-label={t('skeleton.loadingStat')}
     >
       <div className="flex items-center justify-between">
         <Skeleton className="h-3 w-24" />
@@ -78,11 +87,13 @@ export function SkeletonStatCard({ className }: { className?: string }) {
 }
 
 export function SkeletonTableRow({ cols = 4, className }: { cols?: number; className?: string }) {
+  const t = useTranslations('tables');
+
   return (
     <div
       className={cn('flex items-center gap-4 border-b border-white/[0.04] px-4 py-3', className)}
       role="status"
-      aria-label="Loading row"
+      aria-label={t('skeleton.loadingRow')}
     >
       {Array.from({ length: cols }).map((_, i) => (
         <Skeleton key={i} className="h-3" style={{ width: `${100 / cols - 4}%`, flexShrink: 0 }} />
@@ -92,6 +103,8 @@ export function SkeletonTableRow({ cols = 4, className }: { cols?: number; class
 }
 
 export function SkeletonNFTCard({ className }: { className?: string }) {
+  const t = useTranslations('tables');
+
   return (
     <div
       className={cn(
@@ -99,7 +112,7 @@ export function SkeletonNFTCard({ className }: { className?: string }) {
         className,
       )}
       role="status"
-      aria-label="Loading NFT"
+      aria-label={t('skeleton.loadingNft')}
     >
       <Skeleton className="aspect-square w-full rounded-none" />
       <div className="space-y-2 p-4">

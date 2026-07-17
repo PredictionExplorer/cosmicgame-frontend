@@ -1,5 +1,6 @@
 import { useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -33,6 +34,7 @@ interface EthDonationRowProps {
 }
 
 const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
+  const t = useTranslations('tables');
   const router = useRouter();
 
   if (!row) {
@@ -64,7 +66,7 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
       </TablePrimaryCell>
       {showType && (
         <TablePrimaryCell align="center">
-          {row.RecordType ? 'Contribution with info' : 'Simple contribution'}
+          {row.RecordType ? t('ethContribution.withInfo') : t('ethContribution.simple')}
         </TablePrimaryCell>
       )}
       <TablePrimaryCell align="center">
@@ -91,11 +93,12 @@ interface EthDonationTableProps {
 }
 
 const EthDonationTable: FC<EthDonationTableProps> = ({ list, showType = true }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No contributions yet.</p>;
+    return <p>{t('empty.contributions')}</p>;
   }
 
   const startIndex = (page - 1) * perPage;
@@ -115,11 +118,11 @@ const EthDonationTable: FC<EthDonationTableProps> = ({ list, showType = true }) 
           </colgroup>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              {showType && <TablePrimaryHeadCell>Type</TablePrimaryHeadCell>}
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Contributor</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+              {showType && <TablePrimaryHeadCell>{t('columns.type')}</TablePrimaryHeadCell>}
+              <TablePrimaryHeadCell>{t('columns.round')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('columns.contributor')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">{t('columns.amountEth')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

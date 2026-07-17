@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   useConfig,
   useChainId,
@@ -21,7 +22,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
-import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
+import { isUserRejection, reportError } from '@/utils/errors';
 import {
   formatCustomContractError,
   getContractErrorMessage,
@@ -71,6 +72,7 @@ function getLiveCstPreviewRefreshMs(): number {
 }
 
 export function useGestureForm() {
+  const t = useTranslations('toasts');
   const contractAddrs = useContractAddresses();
   const config = useConfig();
   const chainId = useChainId();
@@ -599,13 +601,13 @@ export function useGestureForm() {
       return true;
     } catch (err) {
       if (isUserRejection(err)) {
-        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        notify('info', t('walletTransactionCancelled'));
       } else {
         notify('error', `Please switch to ${activeChain.name} in your wallet to make a gesture.`);
       }
       return false;
     }
-  }, [chainId, config, connectorClient, notify, switchChainAsync, walletClient]);
+  }, [chainId, config, connectorClient, notify, switchChainAsync, t, walletClient]);
 
   /**
    * Submit an ETH bid (with optional NFT/token donation).
@@ -701,7 +703,7 @@ export function useGestureForm() {
       return true;
     } catch (err: unknown) {
       if (isUserRejection(err)) {
-        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        notify('info', t('walletTransactionCancelled'));
         return false;
       }
       reportError(err, 'gesture-eth');
@@ -819,7 +821,7 @@ export function useGestureForm() {
       return true;
     } catch (err: unknown) {
       if (isUserRejection(err)) {
-        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        notify('info', t('walletTransactionCancelled'));
         return false;
       }
       reportError(err, 'gesture-cst');

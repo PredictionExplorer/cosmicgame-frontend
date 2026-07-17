@@ -3,13 +3,14 @@
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronDown } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
 import { landingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
-import { APP_ORIGIN } from '@/lib/hostRouting';
+import { APP_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { GradientText } from './GradientText';
@@ -25,6 +26,8 @@ const HeroCanvas = dynamic(
 const { hero } = landingContent;
 
 export function Hero() {
+  const locale = useLocale();
+
   return (
     <section className="relative isolate flex min-h-[100svh] w-full items-center overflow-hidden bg-deep-space">
       <div className="pointer-events-none absolute inset-0 z-0">
@@ -79,7 +82,7 @@ export function Hero() {
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
             <Link
-              href={hero.primaryCta.href}
+              href={localizeCrossHostHref(hero.primaryCta.href, locale)}
               className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-[#0D0521] transition hover:bg-[oklch(84.7%_0.149_213)] hover:text-[#0D0521] glow-aurora"
               rel="noopener"
             >
@@ -91,19 +94,19 @@ export function Hero() {
             </Link>
 
             <Link
-              href={hero.secondaryCta.href}
+              href={localizeCrossHostHref(hero.secondaryCta.href, locale)}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-4 text-base font-medium text-white backdrop-blur-md transition hover:bg-white/10"
             >
               {hero.secondaryCta.label}
             </Link>
             <Link
-              href={`${APP_ORIGIN}/statistics`}
+              href={localizeCrossHostHref(`${APP_ORIGIN}/statistics`, locale)}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-sm font-medium text-white/80 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
             >
               Protocol statistics
             </Link>
             <Link
-              href={`${APP_ORIGIN}/gallery`}
+              href={localizeCrossHostHref(`${APP_ORIGIN}/gallery`, locale)}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-sm font-medium text-white/80 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
             >
               NFT gallery

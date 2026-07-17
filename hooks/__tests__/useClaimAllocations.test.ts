@@ -6,6 +6,11 @@ import { act, renderHook, waitFor } from '@/test-utils';
 
 const mockSetNotification = jest.fn();
 const mockFetchStatusData = jest.fn();
+const mockTranslate = jest.fn((key: string) => `toasts.${key}`);
+
+jest.mock('next-intl', () => ({
+  useTranslations: () => mockTranslate,
+}));
 
 jest.mock('../../contexts/NotificationContext', () => ({
   useNotification: () => ({ setNotification: mockSetNotification }),
@@ -56,7 +61,6 @@ jest.mock('../../utils/errors', () => ({
   reportError: (...args: unknown[]) => mockReportError(...(args as [unknown, string])),
   getEthErrorMessage: (...args: unknown[]) =>
     mockGetEthErrorMessage(...(args as [unknown, string | undefined])),
-  WALLET_TRANSACTION_CANCELLED_MESSAGE: 'Transaction cancelled by user',
 }));
 
 const mockGetErrorMessage = jest.fn((msg: string) => msg);
@@ -198,7 +202,7 @@ describe('useClaimAllocations', () => {
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'info',
-          text: 'Transaction cancelled by user',
+          text: 'toasts.walletTransactionCancelled',
         }),
       );
       // Should NOT refresh data if the user cancelled.

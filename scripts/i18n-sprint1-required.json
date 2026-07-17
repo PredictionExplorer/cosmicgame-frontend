@@ -1,0 +1,17 @@
+{
+  "namespaces": {
+    "common": ["languageSwitcher.*", "accessibility.*", "status.*", "actions.*", "externalLink.*"],
+    "errors": ["*"],
+    "footer": ["*"],
+    "formats": ["*"],
+    "forms": ["*"],
+    "meta": ["shared.*", "siteMap.*"],
+    "nav": ["*"],
+    "search": ["*"],
+    "siteMap": ["*"],
+    "tables": ["*"],
+    "toasts": ["walletTransactionCancelled", "unexpectedError"],
+    "tooltips": ["*"],
+    "wallet": ["*"]
+  }
+}

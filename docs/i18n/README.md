@@ -255,7 +255,9 @@ action, Chinese renders in unstyled system fallback.
 1. **Catalog parity — `scripts/i18n-parity.ts`** (new): compares `messages/en/**` vs
    `messages/zh/**` key sets; reports missing/extra/empty keys per namespace. Runs in CI as
    a _report_ during rollout, flips to _failing_ per-namespace as sprints complete (the
-   sprint's acceptance criteria include "parity enforced for its namespaces").
+   sprint's acceptance criteria include "parity enforced for its namespaces"). Mixed
+   namespaces use a checked-in required-key manifest so later-sprint English extraction can
+   land without weakening already-shipped gates; Sprint 1 runs via `yarn i18n:sprint1`.
 2. **Chinese lexicon scan**: `scripts/lexicon-scan-core.ts` gains a zh banned-term list
    (from [glossary-zh.md §4](./glossary-zh.md)) applied to `messages/zh/**` and
    `content/**/zh.ts`. Same allow-pragma mechanism for FAQ denial copy.
@@ -309,6 +311,7 @@ yarn dev
 # dApp Chinese:    http://localhost:3000/zh
 # landing Chinese: http://cosmicsignature.local:3000/zh   (see lib/hostRouting.ts for /etc/hosts setup)
 yarn i18n:parity                       # translation coverage report (--strict [ns ...] to gate)
+yarn i18n:sprint1                      # hard-fail on the exact Sprint 1 key manifest
 yarn lexicon:scan                      # includes the zh banned-term phase
 npx playwright test e2e/zh-smoke.spec.ts e2e/proxy.spec.ts   # locale routing e2e
 ```

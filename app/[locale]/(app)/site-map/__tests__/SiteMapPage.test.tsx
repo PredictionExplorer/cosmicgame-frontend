@@ -7,57 +7,37 @@ import SiteMapPage, { appToolLinks, dataLinks, ecosystemLinks, systemLinks } fro
 describe('SiteMapPage', () => {
   it('renders the page heading', () => {
     render(<SiteMapPage />);
-    expect(screen.getByRole('heading', { level: 1, name: 'Site Map' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'siteMap.page.title' }),
+    ).toBeInTheDocument();
   });
 
   it('renders the per-user section heading', () => {
     render(<SiteMapPage />);
-    expect(screen.getByText('Personal App Tools')).toBeInTheDocument();
+    expect(screen.getByText('siteMap.sections.personal.title')).toBeInTheDocument();
   });
 
   it('renders all per-user links', () => {
     render(<SiteMapPage />);
-    const expectedLinks = [
-      { label: 'My NFTs', href: '/my-tokens' },
-      { label: 'My Unretrieved Allocations', href: '/my-allocations' },
-      { label: 'My Anchors', href: '/my-anchors' },
-    ];
-    for (const { label, href } of expectedLinks) {
-      const link = screen.getByRole('link', { name: new RegExp(label) });
+    for (const { id, href } of appToolLinks) {
+      const link = screen.getByRole('link', {
+        name: new RegExp(`siteMap\\.links\\.${id}\\.label`),
+      });
       expect(link).toHaveAttribute('href', href);
     }
   });
 
   it('renders the system section heading', () => {
     render(<SiteMapPage />);
-    expect(screen.getByText('Public Protocol Pages')).toBeInTheDocument();
+    expect(screen.getByText('siteMap.sections.system.title')).toBeInTheDocument();
   });
 
   it('renders all system links', () => {
     render(<SiteMapPage />);
-    const expectedLinks = [
-      { label: 'About Cosmic Signature', href: 'https://cosmicsignature.com/about' },
-      { label: 'Cosmic Signature Learn Hub', href: 'https://cosmicsignature.com/learn' },
-      {
-        label: 'What Is Cosmic Signature?',
-        href: 'https://cosmicsignature.com/learn/what-is-cosmic-signature',
-      },
-      {
-        label: 'Three-Body NFT Art Guide',
-        href: 'https://cosmicsignature.com/learn/three-body-nft-art',
-      },
-      { label: 'Cosmic Signature Gallery', href: '/gallery' },
-      { label: 'Current Performance Cycle', href: '/current-cycle' },
-      { label: 'Protocol Statistics', href: '/statistics' },
-      { label: 'Cosmic Signature Contracts', href: '/contracts' },
-      { label: 'Source Code', href: '/code' },
-      { label: 'Security', href: '/security' },
-      { label: 'Audits', href: '/audits' },
-      { label: 'Risk Disclosures', href: '/risk-disclosures' },
-      { label: 'Cosmic Signature FAQ', href: '/faq' },
-    ];
-    for (const { label, href } of expectedLinks) {
-      const link = screen.getByRole('link', { name: new RegExp(label) });
+    for (const { id, href } of systemLinks) {
+      const link = screen.getByRole('link', {
+        name: new RegExp(`siteMap\\.links\\.${id}\\.label`),
+      });
       expect(link).toHaveAttribute('href', href);
     }
   });
@@ -78,7 +58,7 @@ describe('SiteMapPage', () => {
 
   it('renders the protocol data section with every data route', () => {
     render(<SiteMapPage />);
-    expect(screen.getByText('Protocol Data Pages')).toBeInTheDocument();
+    expect(screen.getByText('siteMap.sections.data.title')).toBeInTheDocument();
     for (const { href } of dataLinks) {
       expect(document.querySelector(`a[href="${href}"]`)).not.toBeNull();
     }
@@ -86,17 +66,17 @@ describe('SiteMapPage', () => {
 
   it('renders the ecosystem section with external destinations', () => {
     render(<SiteMapPage />);
-    expect(screen.getByRole('link', { name: /Axiom Zero Marketplace/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /siteMap\.links\.axiomZero\.label/ })).toHaveAttribute(
       'href',
       'https://www.axiomzero.market/cosmic-signature',
     );
-    expect(screen.getByRole('link', { name: /Chaos Zero Predictions/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /siteMap\.links\.chaosZero\.label/ })).toHaveAttribute(
       'href',
       'https://chaoszero.com',
     );
-    expect(screen.getByRole('link', { name: /Trade CST on Uniswap/ }).getAttribute('href')).toMatch(
-      /^https:\/\/app\.uniswap\.org\//,
-    );
+    expect(
+      screen.getByRole('link', { name: /siteMap\.links\.uniswap\.label/ }).getAttribute('href'),
+    ).toMatch(/^https:\/\/app\.uniswap\.org\//);
   });
 
   it('covers every indexable XML-sitemap route with an HTML link', () => {

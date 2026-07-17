@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -72,11 +73,12 @@ const ContributionRow = ({ entry }: ContributionRowProps) => {
 };
 
 export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
+  const t = useTranslations('tables');
   const perPage = 10;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No contributions yet.</p>;
+    return <p>{t('empty.contributions')}</p>;
   }
 
   const currentData = list.slice((page - 1) * perPage, page * perPage);
@@ -87,10 +89,12 @@ export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Cycle Num</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Contributor Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Contribution amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('columns.cycleNumber')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('columns.contributorAddress')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                {t('columns.contributionAmountEth')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

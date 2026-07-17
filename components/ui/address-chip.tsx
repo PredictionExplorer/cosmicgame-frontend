@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { shortenHex } from '@/utils';
 
@@ -23,6 +24,7 @@ export function AddressChip({
   className,
   showCopy = true,
 }: AddressChipProps) {
+  const t = useTranslations('common');
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (e: React.MouseEvent) => {
@@ -53,7 +55,7 @@ export function AddressChip({
         <button
           onClick={handleCopy}
           className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
-          aria-label="Copy address"
+          aria-label={copied ? t('actions.copied') : t('actions.copyAddress')}
         >
           {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
         </button>

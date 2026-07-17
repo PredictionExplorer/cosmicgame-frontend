@@ -1,6 +1,7 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { usePublicClient } from 'wagmi';
 import { Tbody, Tr } from 'react-super-responsive-table';
@@ -22,12 +23,7 @@ import useAnchoringWalletCSTContract from '@/hooks/useAnchoringWalletCSTContract
 import { useNotification } from '@/contexts/NotificationContext';
 import { useApiData } from '@/contexts/ApiDataContext';
 import getErrorMessage from '@/utils/alert';
-import {
-  isUserRejection,
-  reportError,
-  getEthErrorMessage,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -68,6 +64,7 @@ const UncollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
 };
 
 export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string }) => {
+  const t = useTranslations('toasts');
   const { account } = useActiveWeb3React();
   const {
     apiData: status,
@@ -142,14 +139,12 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
         setNotification({
           visible: true,
           type: 'info',
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
         });
       } else {
         reportError(err, 'releasing Cosmic Signature NFT anchors');
-        const msg = getEthErrorMessage(err);
-        if (msg !== 'An error occurred') {
-          setNotification({ visible: true, type: 'error', text: getErrorMessage(msg) });
-        }
+        const msg = getEthErrorMessage(err, t('unexpectedError'));
+        setNotification({ visible: true, type: 'error', text: getErrorMessage(msg) });
       }
     } finally {
       setIsUnstaking(false);

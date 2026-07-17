@@ -91,12 +91,6 @@ const cases: Array<{
     expectedType: 'WebPage',
     expectedUrl: `${APP_ORIGIN}/code`,
   },
-  {
-    name: 'site-map',
-    page: <SiteMapRoutePage />,
-    expectedType: 'WebPage',
-    expectedUrl: `${APP_ORIGIN}/site-map`,
-  },
 ];
 
 describe.each(cases)('$name page JSON-LD', ({ page, expectedType, expectedUrl }) => {
@@ -119,5 +113,33 @@ describe.each(cases)('$name page JSON-LD', ({ page, expectedType, expectedUrl })
     const { getByTestId, unmount } = render(page);
     expect(getByTestId('page-body')).toBeInTheDocument();
     unmount();
+  });
+});
+
+describe('site-map page JSON-LD', () => {
+  async function renderSiteMap() {
+    const page = await SiteMapRoutePage({
+      params: Promise.resolve({ locale: 'en' }),
+    });
+    return { page, nodes: renderJsonLd(page) };
+  }
+
+  it('emits a WebPage pointing at its canonical URL', async () => {
+    const { nodes } = await renderSiteMap();
+    const pageNode = nodes.find((node) => node['@type'] === 'WebPage');
+    expect(pageNode?.url).toBe(`${APP_ORIGIN}/site-map`);
+  });
+
+  it('emits a BreadcrumbList that starts at the app home', async () => {
+    const { nodes } = await renderSiteMap();
+    const breadcrumb = nodes.find((node) => node['@type'] === 'BreadcrumbList');
+    expect(breadcrumb?.itemListElement?.[0]?.item).toBe(`${APP_ORIGIN}/`);
+    expect(breadcrumb?.itemListElement?.[1]?.item).toBe(`${APP_ORIGIN}/site-map`);
+  });
+
+  it('renders the page body alongside the structured data', async () => {
+    const { page } = await renderSiteMap();
+    const { getByTestId } = render(page);
+    expect(getByTestId('page-body')).toBeInTheDocument();
   });
 });

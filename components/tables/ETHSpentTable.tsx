@@ -1,5 +1,6 @@
 import { useEffect, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
@@ -29,6 +30,7 @@ interface ETHSpentRowProps {
 }
 
 const ETHSpentRow: FC<ETHSpentRowProps> = ({ row }) => {
+  const t = useTranslations('tables');
   const { account } = useActiveWeb3React();
 
   if (!row) {
@@ -42,7 +44,7 @@ const ETHSpentRow: FC<ETHSpentRowProps> = ({ row }) => {
       <TablePrimaryCell align="left">
         <AddressLink address={row.bidderAddr} url={`/user/${row.bidderAddr}`} />
         &nbsp;
-        {isCurrentUser && '(You)'}
+        {isCurrentUser && t('status.you')}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{(row.amount || 0).toFixed(4)} ETH</TablePrimaryCell>
     </TablePrimaryRow>
@@ -54,6 +56,7 @@ interface ETHSpentTableProps {
 }
 
 const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
   const [spenderList, setSpenderList] = useState<SpenderInfo[] | null>(null);
@@ -89,11 +92,11 @@ const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
   }, [list, account]);
 
   if (list.length === 0) {
-    return <p>No spenders yet.</p>;
+    return <p>{t('empty.spenders')}</p>;
   }
 
   if (spenderList === null) {
-    return <p className="text-lg font-semibold">Loading...</p>;
+    return <p className="text-lg font-semibold">{t('status.loading')}</p>;
   }
 
   const startIndex = (page - 1) * perPage;
@@ -110,8 +113,10 @@ const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
           </colgroup>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">User Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Spent Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.userAddress')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                {t('columns.spentAmountEth')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

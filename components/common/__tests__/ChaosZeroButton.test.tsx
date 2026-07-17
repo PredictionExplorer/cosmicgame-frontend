@@ -8,7 +8,7 @@ describe('ChaosZeroButton', () => {
   it('links to Chaos Zero with safe external attributes', () => {
     render(<ChaosZeroButton />);
 
-    const link = screen.getByRole('link', { name: 'Make predictions on Chaos Zero' });
+    const link = screen.getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' });
     expect(link).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -21,23 +21,23 @@ describe('ChaosZeroButton', () => {
   it('names the prediction market in the default label', () => {
     render(<ChaosZeroButton />);
 
-    expect(screen.getByRole('link', { name: 'Make predictions on Chaos Zero' })).toHaveTextContent(
-      'Make Predictions on Chaos Zero',
-    );
+    expect(
+      screen.getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' }),
+    ).toHaveTextContent('nav.ecosystem.chaosZero.defaultLabel');
   });
 
   it('supports compact visual copy while keeping the full accessible name', () => {
     render(<ChaosZeroButton variant="compact" />);
 
-    const link = screen.getByRole('link', { name: 'Make predictions on Chaos Zero' });
-    expect(link).toHaveTextContent('Chaos Zero');
+    const link = screen.getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' });
+    expect(link).toHaveTextContent('nav.ecosystem.chaosZero.shortLabel');
   });
 
   it('renders a lightweight menu variant for dropdown use', () => {
     render(<ChaosZeroButton variant="menu" />);
 
-    const link = screen.getByRole('link', { name: 'Make predictions on Chaos Zero' });
-    expect(link).toHaveTextContent('Chaos Zero Predictions');
+    const link = screen.getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' });
+    expect(link).toHaveTextContent('nav.ecosystem.chaosZero.menuLabel');
     expect(link).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
@@ -45,7 +45,7 @@ describe('ChaosZeroButton', () => {
   it('allows overriding the visible label without losing the link target', () => {
     render(<ChaosZeroButton variant="card" label="Predict this cycle" />);
 
-    const link = screen.getByRole('link', { name: 'Make predictions on Chaos Zero' });
+    const link = screen.getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' });
     expect(link).toHaveTextContent('Predict this cycle');
     expect(link).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
   });

@@ -127,7 +127,7 @@ describe('GestureForm', () => {
   it('CST selection links to trade CST on Uniswap', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" />);
 
-    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' })).toHaveAttribute(
       'href',
       CST_UNISWAP_SWAP_URL,
     );
@@ -136,7 +136,9 @@ describe('GestureForm', () => {
   it('does not show the Uniswap trade link for ETH selection', () => {
     render(<GestureForm {...defaultProps} gestureType="ETH" />);
 
-    expect(screen.queryByRole('link', { name: 'Trade CST on Uniswap' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows first-gesture ETH Calibration Window copy before all methods unlock', () => {

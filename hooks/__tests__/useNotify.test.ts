@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 
 import { useNotification } from '@/contexts/NotificationContext';
 import getErrorMessage from '@/utils/alert';
-import { isEthProviderError, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
+import { isEthProviderError, reportError } from '@/utils/errors';
 
 import { useNotify } from '../useNotify';
 
@@ -100,7 +100,7 @@ describe('useNotify', () => {
       expect(mockSetNotification).toHaveBeenCalledWith({
         visible: true,
         type: 'error',
-        text: 'Unexpected error. Please try again.',
+        text: 'toasts.unexpectedError',
       });
     });
 
@@ -114,7 +114,7 @@ describe('useNotify', () => {
       expect(mockSetNotification).toHaveBeenCalledWith({
         visible: true,
         type: 'info',
-        text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+        text: 'toasts.walletTransactionCancelled',
       });
       expect(mockReportError).not.toHaveBeenCalled();
     });

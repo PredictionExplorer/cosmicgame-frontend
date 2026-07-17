@@ -41,8 +41,8 @@ describe('DataTable', () => {
 
   it('renders a density toggle and switches density on click', () => {
     render(<DataTable ariaLabel="Test" data={rows} columns={columns} getRowKey={(r) => r.id} />);
-    const compact = screen.getByRole('button', { name: 'Compact row density' });
-    const comfortable = screen.getByRole('button', { name: 'Comfortable row density' });
+    const compact = screen.getByRole('button', { name: 'tables.density.compactAria' });
+    const comfortable = screen.getByRole('button', { name: 'tables.density.comfortableAria' });
     expect(comfortable).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(compact);
     expect(compact).toHaveAttribute('aria-pressed', 'true');
@@ -203,9 +203,11 @@ describe('DataTable', () => {
         skeletonRows={4}
       />,
     );
-    expect(screen.getByRole('status', { name: /loading rows/i })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'tables.skeleton.loadingRows' })).toBeInTheDocument();
     // SkeletonTableRow renders one wrapper per row
-    const rowWrappers = container.querySelectorAll('[role="status"][aria-label="Loading row"]');
+    const rowWrappers = container.querySelectorAll(
+      '[role="status"][aria-label="tables.skeleton.loadingRow"]',
+    );
     expect(rowWrappers.length).toBe(4);
   });
 

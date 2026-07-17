@@ -1,5 +1,8 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -31,29 +34,30 @@ const TONE: Record<Tone, { bg: string; fg: string }> = {
 };
 
 export function ErrorState({
-  title = 'Something went wrong',
+  title,
   message,
   icon,
   tone = 'destructive',
   onRetry,
-  retryLabel = 'Try again',
+  retryLabel,
   surface = false,
   className,
 }: ErrorStateProps) {
+  const t = useTranslations('errors');
   const palette = TONE[tone];
   const body = (
     <div className={cn('flex flex-col items-center justify-center py-16 text-center', className)}>
       <div className={cn('mb-4 rounded-full p-4', palette.bg)}>
         {icon ?? <AlertTriangle className={cn('h-8 w-8', palette.fg)} />}
       </div>
-      <h4 className="type-heading-3 text-foreground">{title}</h4>
+      <h4 className="type-heading-3 text-foreground">{title ?? t('state.title')}</h4>
       {message ? (
         <div className="mt-2 max-w-md type-body-sm text-muted-foreground">{message}</div>
       ) : null}
       {onRetry ? (
         <Button variant="outline" size="sm" onClick={onRetry} className="mt-6">
           <RefreshCw className="mr-2 h-3.5 w-3.5" aria-hidden />
-          {retryLabel}
+          {retryLabel ?? t('state.retry')}
         </Button>
       ) : null}
     </div>

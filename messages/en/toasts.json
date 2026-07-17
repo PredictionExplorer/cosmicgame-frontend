@@ -4,5 +4,7 @@
   "allocationRetrieved": "Allocation retrieved to your wallet.",
   "anchorSet": "NFT anchored to the protocol.",
   "anchorReleased": "Anchor released.",
-  "cycleFinalized": "Cycle finalized. Allocations distributed."
+  "cycleFinalized": "Cycle finalized. Allocations distributed.",
+  "walletTransactionCancelled": "Transaction not sent — you cancelled it in your wallet.",
+  "unexpectedError": "Unexpected error. Please try again."
 }

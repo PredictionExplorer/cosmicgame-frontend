@@ -8,8 +8,22 @@
     "anchoredRwlk": "Anchored RWLK NFTs"
   },
   "labels": {
-    "loading": "Loading…",
+    "loading": "Loading...",
     "balancesHeading": "Balances",
-    "anchoredHeading": "Anchored"
+    "anchoredHeading": "Anchored",
+    "nftCount": "{count}"
+  },
+  "account": {
+    "heading": "Account",
+    "myDashboard": "My Dashboard",
+    "myRewards": "My Rewards",
+    "myNfts": "My NFTs",
+    "transferCst": "Transfer CST",
+    "myAnchors": "My Anchors",
+    "winningHistory": "Winning History"
+  },
+  "accessibility": {
+    "copyAddress": "Copy wallet address",
+    "addressCopied": "Wallet address copied"
   }
 }

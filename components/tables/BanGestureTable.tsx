@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -56,6 +57,7 @@ const gestureTypeBg: Record<number, string> = {
 };
 
 const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) => {
+  const t = useTranslations('tables');
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
 
@@ -66,11 +68,11 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       setNotification({
         visible: true,
         type: 'success',
-        text: 'Gesture was banned successfully!',
+        text: t('banGesture.banned'),
       });
     } catch (e) {
       reportError(e, 'ban gesture');
-      const rawMsg = getEthErrorMessage(e, 'An error occurred');
+      const rawMsg = getEthErrorMessage(e, t('banGesture.error'));
       if (rawMsg) {
         const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ visible: true, text: msg, type: 'error' });
@@ -85,11 +87,11 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       setNotification({
         visible: true,
         type: 'success',
-        text: 'Gesture was unbanned successfully!',
+        text: t('banGesture.unbanned'),
       });
     } catch (e) {
       reportError(e, 'unban gesture');
-      const rawMsg = getEthErrorMessage(e, 'An error occurred');
+      const rawMsg = getEthErrorMessage(e, t('banGesture.error'));
       if (rawMsg) {
         const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ visible: true, text: msg, type: 'error' });
@@ -127,11 +129,7 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {history.GestureType === 2
-          ? 'CST'
-          : history.GestureType === 1
-            ? 'RWLK'
-            : 'ETH'}
+        {history.GestureType === 2 ? 'CST' : history.GestureType === 1 ? 'RWLK' : 'ETH'}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip>
@@ -146,11 +144,11 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       <TablePrimaryCell align="center">
         {isBanned ? (
           <Button variant="ghost" size="sm" onClick={handleUnban}>
-            Unban
+            {t('banGesture.unban')}
           </Button>
         ) : (
           <Button variant="ghost" size="sm" onClick={handleBan}>
-            Ban
+            {t('banGesture.ban')}
           </Button>
         )}
       </TablePrimaryCell>
@@ -159,6 +157,7 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
 };
 
 const HistoryTable = ({ gestureHistory, perPage, curPage }: HistoryTableProps) => {
+  const t = useTranslations('tables');
   const [bannedList, setBannedList] = useState<number[]>([]);
 
   const getBannedList = useCallback(async () => {
@@ -177,13 +176,13 @@ const HistoryTable = ({ gestureHistory, perPage, curPage }: HistoryTableProps) =
       <TablePrimary>
         <TablePrimaryHead>
           <Tr>
-            <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Participant</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Gesture Type</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.date')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('columns.participant')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('columns.gestureType')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.message')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>
-              <span className="sr-only">Actions</span>
+              <span className="sr-only">{t('columns.actions')}</span>
             </TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
@@ -203,6 +202,7 @@ const HistoryTable = ({ gestureHistory, perPage, curPage }: HistoryTableProps) =
 };
 
 const BanGestureTable = ({ gestureHistory }: BanGestureTableProps) => {
+  const t = useTranslations('tables');
   const perPage = 200;
   const [curPage, setCurrentPage] = useState(1);
 
@@ -219,7 +219,7 @@ const BanGestureTable = ({ gestureHistory }: BanGestureTableProps) => {
           />
         </>
       ) : (
-        <p>No gesture history yet.</p>
+        <p>{t('empty.gestureHistory')}</p>
       )}
     </div>
   );

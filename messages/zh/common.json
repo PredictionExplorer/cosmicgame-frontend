@@ -1,1 +1,32 @@
-{}
+{
+  "languageSwitcher": {
+    "label": "语言"
+  },
+  "accessibility": {
+    "skipToMain": "跳至主要内容",
+    "breadcrumb": "面包屑导航",
+    "footer": "页脚导航"
+  },
+  "status": {
+    "loading": "加载中",
+    "loadingEllipsis": "加载中…",
+    "loadingDots": "加载中…",
+    "noData": "暂无数据",
+    "nothingHere": "暂无内容"
+  },
+  "actions": {
+    "copyAddress": "复制地址",
+    "addressCopied": "已复制地址",
+    "copied": "已复制",
+    "cancel": "取消",
+    "close": "关闭"
+  },
+  "externalLink": {
+    "title": "即将离开 Cosmic Signature",
+    "description": "此链接来自参与者存储在链上的消息，未经审核或验证。请确认下方网址无误。",
+    "copy": "复制链接",
+    "copied": "已复制链接",
+    "warning": "切勿在外部网站输入钱包助记词或私钥。",
+    "open": "打开链接"
+  }
+}

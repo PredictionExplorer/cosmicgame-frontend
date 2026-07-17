@@ -16,15 +16,19 @@ const createRecipient = (overrides = {}) => ({
 describe('UniqueRecipientsTable', () => {
   it('renders empty state when list is empty', () => {
     render(<UniqueRecipientsTable list={[]} />);
-    expect(screen.getByText('No recipients yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.recipients')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<UniqueRecipientsTable list={[createRecipient()]} />);
-    expect(screen.getAllByText('Recipient Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Allocations Received').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Max Allocation (ETH)').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Allocations Sum (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.recipientAddress').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.allocationsReceived').length).toBeGreaterThanOrEqual(
+      1,
+    );
+    expect(screen.getAllByText('tables.columns.maxAllocationEth').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.allocationsSumEth').length).toBeGreaterThanOrEqual(
+      1,
+    );
   });
 
   it('renders recipient data', () => {

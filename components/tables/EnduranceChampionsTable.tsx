@@ -1,6 +1,7 @@
 import { useMemo, useState, type FC } from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatSeconds } from '@/utils';
@@ -29,6 +30,8 @@ interface ChampionRowProps {
 }
 
 const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row, isLive = false }) => {
+  const t = useTranslations('tables');
+
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -40,8 +43,8 @@ const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row, isLive = false }) =>
           <AddressLink address={row.participant} url={`/user/${row.participant}`} />
           {isLive && (
             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
-              Live
-              <InfoTooltip content="This participant is also the latest gesture maker, so this endurance window is still growing." />
+              {t('status.live')}
+              <InfoTooltip content={t('endurance.liveHelp')} />
             </span>
           )}
         </div>
@@ -79,6 +82,7 @@ function sameAddress(left: string | null | undefined, right: string | null | und
 }
 
 const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBidderAddress }) => {
+  const t = useTranslations('tables');
   const [sortField, setSortField] = useState<'championTime' | 'chronoWarrior'>('championTime');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState<number>(1);
@@ -109,11 +113,11 @@ const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBi
   }, [championList, sortField, sortDirection, page, perPage]);
 
   if (!championList) {
-    return <p>Loading...</p>;
+    return <p>{t('status.loading')}</p>;
   }
 
   if (championList.length === 0) {
-    return <p>No endurance champions yet.</p>;
+    return <p>{t('empty.enduranceChampions')}</p>;
   }
 
   return (
@@ -127,13 +131,13 @@ const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBi
           </colgroup>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">User Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.userAddress')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 <button
                   className="inline-flex items-center font-inherit cursor-pointer bg-transparent border-0 text-inherit"
                   onClick={() => handleSort('championTime')}
                 >
-                  Champion Time
+                  {t('endurance.championTime')}
                   <SortIcon
                     field="championTime"
                     sortField={sortField}
@@ -146,7 +150,7 @@ const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBi
                   className="inline-flex items-center font-inherit cursor-pointer bg-transparent border-0 text-inherit"
                   onClick={() => handleSort('chronoWarrior')}
                 >
-                  Chrono Warrior
+                  {t('endurance.chronoWarrior')}
                   <SortIcon
                     field="chronoWarrior"
                     sortField={sortField}

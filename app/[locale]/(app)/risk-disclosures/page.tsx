@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { Link } from '@/i18n/navigation';
+import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -12,7 +13,13 @@ export const metadata: Metadata = createMetadata(
   '/risk-disclosures',
 );
 
-export default function RiskDisclosuresPage() {
+export default async function RiskDisclosuresPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
   return (
     <main id="main" tabIndex={-1} className="mx-auto max-w-4xl px-6 py-16 lg:py-24">
       <JsonLd
@@ -60,7 +67,7 @@ export default function RiskDisclosuresPage() {
         <ul className="space-y-3">
           <li>
             <a
-              href="https://cosmicsignature.com/learn/not-a-lottery-not-an-investment"
+              href={localeHref(LANDING_ORIGIN, '/learn/not-a-lottery-not-an-investment', locale)}
               className="text-primary underline-offset-4 hover:underline"
             >
               Is Cosmic Signature a lottery, casino, or investment?

@@ -1,5 +1,8 @@
+'use client';
+
 import type { AnchorHTMLAttributes } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { cn } from '@/lib/utils';
@@ -15,12 +18,12 @@ interface UniswapTradeButtonProps extends Omit<
   label?: string;
 }
 
-const LABELS: Record<UniswapTradeButtonVariant, string> = {
-  default: 'Trade CST on Uniswap',
-  secondary: 'Trade CST on Uniswap',
-  compact: 'Trade CST',
-  menu: 'Trade CST on Uniswap',
-  card: 'Trade CST',
+const LABEL_KEYS: Record<UniswapTradeButtonVariant, string> = {
+  default: 'ecosystem.uniswap.defaultLabel',
+  secondary: 'ecosystem.uniswap.defaultLabel',
+  compact: 'ecosystem.uniswap.shortLabel',
+  menu: 'ecosystem.uniswap.defaultLabel',
+  card: 'ecosystem.uniswap.shortLabel',
 };
 
 const buttonClasses: Record<Exclude<UniswapTradeButtonVariant, 'menu'>, string> = {
@@ -34,10 +37,12 @@ export function UniswapTradeButton({
   variant = 'default',
   label,
   className,
-  'aria-label': ariaLabel = 'Trade CST on Uniswap',
+  'aria-label': ariaLabel,
   ...props
 }: UniswapTradeButtonProps) {
-  const text = label ?? LABELS[variant];
+  const t = useTranslations('nav');
+  const text = label ?? t(LABEL_KEYS[variant]);
+  const resolvedAriaLabel = ariaLabel ?? t('ecosystem.uniswap.ariaLabel');
 
   if (variant === 'menu') {
     return (
@@ -45,7 +50,7 @@ export function UniswapTradeButton({
         href={CST_UNISWAP_SWAP_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={ariaLabel}
+        aria-label={resolvedAriaLabel}
         className={cn(
           'flex w-full items-center gap-2.5 px-2 py-1.5 text-sm text-white no-underline transition-colors hover:text-primary',
           className,
@@ -71,7 +76,7 @@ export function UniswapTradeButton({
         href={CST_UNISWAP_SWAP_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={ariaLabel}
+        aria-label={resolvedAriaLabel}
         {...props}
       >
         {text}

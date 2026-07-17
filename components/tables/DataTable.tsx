@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Table, Thead, Tr, Th, Td } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
@@ -90,12 +91,13 @@ export function DataTable<T>({
   skeletonRows = 6,
   densityStorageKey = 'cs.datatable.density',
   initialSort,
-  emptyTitle = 'Nothing here yet',
+  emptyTitle,
   emptyDescription,
   emptyAction,
   className,
   ariaLabel,
 }: DataTableProps<T>) {
+  const t = useTranslations('tables');
   const [density, setDensity] = useDensityState(densityStorageKey);
   const [sort, setSort] = React.useState<{ id: string; direction: SortDirection } | null>(
     initialSort ?? null,
@@ -127,13 +129,17 @@ export function DataTable<T>({
       {error ? (
         <ErrorState message={error} onRetry={onRetry} />
       ) : loading ? (
-        <div aria-busy="true" role="status" aria-label="Loading rows">
+        <div aria-busy="true" role="status" aria-label={t('skeleton.loadingRows')}>
           {Array.from({ length: skeletonRows }).map((_, i) => (
             <SkeletonTableRow key={i} cols={columns.length} />
           ))}
         </div>
       ) : sortedData.length === 0 ? (
-        <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
+        <EmptyState
+          title={emptyTitle ?? t('empty.nothingHere')}
+          description={emptyDescription}
+          action={emptyAction}
+        />
       ) : (
         <div className="overflow-x-auto">
           <Table className="w-full min-w-[960px] border-collapse" aria-label={ariaLabel}>
@@ -259,11 +265,13 @@ function DensityToolbar({
   density: Density;
   onChange: (d: Density) => void;
 }) {
+  const t = useTranslations('tables');
+
   return (
     <div className="flex items-center justify-end border-b border-white/[0.06] px-2 py-1.5">
       <div
         role="group"
-        aria-label="Row density"
+        aria-label={t('density.groupLabel')}
         className="inline-flex rounded-md border border-white/[0.08] p-0.5"
       >
         {(['comfortable', 'compact'] as const).map((option) => (
@@ -273,7 +281,9 @@ function DensityToolbar({
                 type="button"
                 onClick={() => onChange(option)}
                 aria-pressed={density === option}
-                aria-label={`${option === 'comfortable' ? 'Comfortable' : 'Compact'} row density`}
+                aria-label={
+                  option === 'comfortable' ? t('density.comfortableAria') : t('density.compactAria')
+                }
                 className={cn(
                   'px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm transition-colors',
                   'duration-[var(--duration-fast)]',
@@ -282,14 +292,12 @@ function DensityToolbar({
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {option}
+                {option === 'comfortable' ? t('density.comfortable') : t('density.compact')}
               </button>
             </TooltipTrigger>
             <TooltipContent>
               <p className="max-w-[220px] text-xs leading-relaxed">
-                {option === 'comfortable'
-                  ? 'Use taller rows with more spacing for easier scanning.'
-                  : 'Use shorter rows to fit more allocation records on screen.'}
+                {option === 'comfortable' ? t('density.comfortableHelp') : t('density.compactHelp')}
               </p>
             </TooltipContent>
           </Tooltip>

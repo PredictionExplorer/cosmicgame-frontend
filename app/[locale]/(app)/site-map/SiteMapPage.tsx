@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronRight } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -9,99 +10,43 @@ import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { cn } from '@/lib/utils';
+import { localizeCrossHostHref } from '@/lib/hostRouting';
+
+interface SiteMapLinkDefinition {
+  id: string;
+  href: string;
+}
 
 export const appToolLinks = [
-  { href: '/my-tokens', label: 'My NFTs', description: 'Wallet-specific NFT view; noindexed.' },
-  {
-    href: '/my-allocations',
-    label: 'My Unretrieved Allocations',
-    description: 'Wallet-specific allocation retrieval view; noindexed.',
-  },
-  {
-    href: '/my-anchors',
-    label: 'My Anchors',
-    description: 'Wallet-specific anchoring view; noindexed.',
-  },
-];
+  { id: 'myNfts', href: '/my-tokens' },
+  { id: 'myAllocations', href: '/my-allocations' },
+  { id: 'myAnchors', href: '/my-anchors' },
+] as const satisfies readonly SiteMapLinkDefinition[];
 
 export const systemLinks = [
+  { id: 'about', href: 'https://cosmicsignature.com/about' },
+  { id: 'learn', href: 'https://cosmicsignature.com/learn' },
   {
-    href: 'https://cosmicsignature.com/about',
-    label: 'About Cosmic Signature',
-    description: 'Entity home and brand disambiguation.',
-  },
-  {
-    href: 'https://cosmicsignature.com/learn',
-    label: 'Cosmic Signature Learn Hub',
-    description: 'Crawlable explainers for AI and search systems.',
-  },
-  {
+    id: 'whatIsCosmicSignature',
     href: 'https://cosmicsignature.com/learn/what-is-cosmic-signature',
-    label: 'What Is Cosmic Signature?',
-    description: 'Plain-English definition of the protocol.',
   },
   {
+    id: 'threeBodyArt',
     href: 'https://cosmicsignature.com/learn/three-body-nft-art',
-    label: 'Three-Body NFT Art Guide',
-    description: 'How deterministic physics generates Signature NFTs.',
   },
-  {
-    href: '/gallery',
-    label: 'Cosmic Signature Gallery',
-    description: 'Deterministic NFT artwork archive.',
-  },
-  {
-    href: '/current-cycle',
-    label: 'Current Performance Cycle',
-    description: 'Live cycle state and gesture context.',
-  },
-  {
-    href: '/how-it-works',
-    label: 'How It Works',
-    description: 'The cycle mechanics, step by step.',
-  },
-  {
-    href: '/statistics',
-    label: 'Protocol Statistics',
-    description: 'Public protocol metrics and data sources.',
-  },
-  {
-    href: '/contracts',
-    label: 'Cosmic Signature Contracts',
-    description: 'Verified Arbitrum contract addresses.',
-  },
-  {
-    href: '/code',
-    label: 'Source Code',
-    description: 'Rendering pipeline and source-code resources.',
-  },
-  {
-    href: '/security',
-    label: 'Security',
-    description: 'Security model and verification resources.',
-  },
-  { href: '/audits', label: 'Audits', description: 'Audit and formal verification status.' },
-  {
-    href: '/risk-disclosures',
-    label: 'Risk Disclosures',
-    description: 'Blockchain risk and participant-clarity disclosures.',
-  },
-  {
-    href: '/faq',
-    label: 'Cosmic Signature FAQ',
-    description: 'Questions and answers about protocol mechanics.',
-  },
-  {
-    href: '/terms',
-    label: 'Terms of Service',
-    description: 'Legal terms for app use and participation.',
-  },
-  {
-    href: '/privacy',
-    label: 'Privacy Policy',
-    description: 'Wallet data, analytics, and blockchain transparency.',
-  },
-];
+  { id: 'gallery', href: '/gallery' },
+  { id: 'currentCycle', href: '/current-cycle' },
+  { id: 'howItWorks', href: '/how-it-works' },
+  { id: 'statistics', href: '/statistics' },
+  { id: 'contracts', href: '/contracts' },
+  { id: 'sourceCode', href: '/code' },
+  { id: 'security', href: '/security' },
+  { id: 'audits', href: '/audits' },
+  { id: 'riskDisclosures', href: '/risk-disclosures' },
+  { id: 'faq', href: '/faq' },
+  { id: 'terms', href: '/terms' },
+  { id: 'privacy', href: '/privacy' },
+] as const satisfies readonly SiteMapLinkDefinition[];
 
 /**
  * Public data routes. Together with `systemLinks`, this list keeps the HTML
@@ -109,116 +54,42 @@ export const systemLinks = [
  * app/__tests__/crawl-paths.test.tsx.
  */
 export const dataLinks = [
-  {
-    href: '/allocation',
-    label: 'Allocation Recipients',
-    description: 'Where each cycle\u2019s reserves went.',
-  },
-  {
-    href: '/anchoring',
-    label: 'Anchor Distributions',
-    description: 'Anchored NFTs and their distributions.',
-  },
-  {
-    href: '/marketing',
-    label: 'Outreach Reserve',
-    description: 'Community outreach CST activity.',
-  },
-  { href: '/imprint', label: 'Imprint', description: 'Imprint interface for new tokens.' },
-  {
-    href: '/eth-contribution',
-    label: 'ETH Contributions',
-    description: 'History of ETH contributions.',
-  },
-  {
-    href: '/attached-nfts',
-    label: 'Attached NFTs',
-    description: 'NFTs attached to gestures across cycles.',
-  },
-  {
-    href: '/allocation-finalized',
-    label: 'Finalized Allocations',
-    description: 'Record of finalized cycle allocations.',
-  },
-  { href: '/named-nfts', label: 'Named NFTs', description: 'NFTs given custom names.' },
-  {
-    href: '/used-rwlk-nfts',
-    label: 'Used RandomWalk NFTs',
-    description: 'RandomWalk NFTs already used for gesture discounts.',
-  },
-  {
-    href: '/coordination-changes',
-    label: 'Coordination Changes',
-    description: 'History of protocol parameter changes.',
-  },
-  {
-    href: '/public-goods-contributions-cg',
-    label: 'Public Goods Contributions',
-    description: 'Per-cycle Public Goods Allocation records.',
-  },
-  {
-    href: '/public-goods-contributions-voluntary',
-    label: 'Voluntary Public Goods Contributions',
-    description: 'Direct voluntary contributions to the vault.',
-  },
-  {
-    href: '/public-goods-retrievals',
-    label: 'Public Goods Retrievals',
-    description: 'Funds forwarded from the Public Goods Vault.',
-  },
-  {
-    href: '/statistics/participation',
-    label: 'Statistics: Participation',
-    description: 'Participant and gesture analytics.',
-  },
-  {
-    href: '/statistics/tokens',
-    label: 'Statistics: Tokens',
-    description: 'CST and NFT supply analytics.',
-  },
-  {
-    href: '/statistics/anchoring',
-    label: 'Statistics: Anchoring',
-    description: 'Anchoring totals and history.',
-  },
-  {
-    href: '/statistics/activity',
-    label: 'Statistics: Activity',
-    description: 'Cycle activity and timing analytics.',
-  },
-  {
-    href: '/statistics/performance',
-    label: 'Statistics: Performance',
-    description: 'Cycle records and performance analytics.',
-  },
-];
+  { id: 'allocationRecipients', href: '/allocation' },
+  { id: 'anchorDistributions', href: '/anchoring' },
+  { id: 'outreachReserve', href: '/marketing' },
+  { id: 'imprint', href: '/imprint' },
+  { id: 'ethContributions', href: '/eth-contribution' },
+  { id: 'attachedNfts', href: '/attached-nfts' },
+  { id: 'finalizedAllocations', href: '/allocation-finalized' },
+  { id: 'namedNfts', href: '/named-nfts' },
+  { id: 'usedRwlkNfts', href: '/used-rwlk-nfts' },
+  { id: 'coordinationChanges', href: '/coordination-changes' },
+  { id: 'publicGoodsContributions', href: '/public-goods-contributions-cg' },
+  { id: 'voluntaryPublicGoods', href: '/public-goods-contributions-voluntary' },
+  { id: 'publicGoodsRetrievals', href: '/public-goods-retrievals' },
+  { id: 'participationStats', href: '/statistics/participation' },
+  { id: 'tokenStats', href: '/statistics/tokens' },
+  { id: 'anchoringStats', href: '/statistics/anchoring' },
+  { id: 'activityStats', href: '/statistics/activity' },
+  { id: 'performanceStats', href: '/statistics/performance' },
+] as const satisfies readonly SiteMapLinkDefinition[];
 
 /** External product surfaces that orbit the protocol. */
 export const ecosystemLinks = [
-  {
-    href: COSMIC_SIGNATURE_MARKETPLACE_URL,
-    label: 'Axiom Zero Marketplace',
-    description: 'Zero-fee NFT marketplace for Cosmic Signature and Random Walk.',
-  },
-  {
-    href: CHAOS_ZERO_PREDICTIONS_URL,
-    label: 'Chaos Zero Predictions',
-    description: 'Prediction market on each Performance Cycle.',
-  },
-  {
-    href: CST_UNISWAP_SWAP_URL,
-    label: 'Trade CST on Uniswap',
-    description: 'Swap ETH for CST on Arbitrum.',
-  },
-];
+  { id: 'axiomZero', href: COSMIC_SIGNATURE_MARKETPLACE_URL },
+  { id: 'chaosZero', href: CHAOS_ZERO_PREDICTIONS_URL },
+  { id: 'uniswap', href: CST_UNISWAP_SWAP_URL },
+] as const satisfies readonly SiteMapLinkDefinition[];
 
 function SitemapLinkList({
   links,
   navLabel,
 }: {
-  links: readonly { href: string; label: string; description?: string }[];
+  links: readonly SiteMapLinkDefinition[];
   navLabel: string;
 }) {
+  const t = useTranslations('siteMap');
+  const locale = useLocale();
   const rowClassName = cn(
     'group flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm',
     'text-foreground/90 transition-colors',
@@ -228,7 +99,10 @@ function SitemapLinkList({
   return (
     <nav aria-label={navLabel} className="mt-5">
       <ul className="flex flex-col gap-0.5">
-        {links.map(({ href, label, description }) => {
+        {links.map(({ id, href }) => {
+          const localizedHref = localizeCrossHostHref(href, locale);
+          const label = t(`links.${id}.label`);
+          const description = t(`links.${id}.description`);
           const isExternal = /^https?:\/\//.test(href);
           const rowContent = (
             <>
@@ -247,13 +121,13 @@ function SitemapLinkList({
             </>
           );
           return (
-            <li key={href}>
+            <li key={id}>
               {isExternal ? (
-                <a href={href} rel="noopener" className={rowClassName}>
+                <a href={localizedHref} rel="noopener" className={rowClassName}>
                   {rowContent}
                 </a>
               ) : (
-                <Link href={href} className={rowClassName}>
+                <Link href={localizedHref} className={rowClassName}>
                   {rowContent}
                 </Link>
               )}
@@ -266,12 +140,14 @@ function SitemapLinkList({
 }
 
 const SiteMapPage = () => {
+  const t = useTranslations('siteMap');
+
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
-        title="Site Map"
-        subtitle="Quick links to account pages and public protocol data."
-        breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Site Map' }]}
+        title={t('page.title')}
+        subtitle={t('page.subtitle')}
+        breadcrumbs={[{ label: t('page.home'), href: '/' }, { label: t('page.title') }]}
         className="mb-10 max-w-3xl md:mx-auto md:text-center"
       />
 
@@ -284,13 +160,12 @@ const SiteMapPage = () => {
             id="sitemap-personal-heading"
             className="font-display text-lg font-semibold tracking-tight text-foreground"
           >
-            Personal App Tools
+            {t('sections.personal.title')}
           </h2>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            Wallet-specific pages are useful to connected participants but are noindexed and absent
-            from XML sitemaps.
+            {t('sections.personal.description')}
           </p>
-          <SitemapLinkList links={appToolLinks} navLabel="Personal app tools" />
+          <SitemapLinkList links={appToolLinks} navLabel={t('sections.personal.navLabel')} />
         </section>
 
         <section
@@ -301,12 +176,12 @@ const SiteMapPage = () => {
             id="sitemap-system-heading"
             className="font-display text-lg font-semibold tracking-tight text-foreground"
           >
-            Public Protocol Pages
+            {t('sections.system.title')}
           </h2>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            Public leaderboards, distributions, stats, contracts, and help.
+            {t('sections.system.description')}
           </p>
-          <SitemapLinkList links={systemLinks} navLabel="System and help pages" />
+          <SitemapLinkList links={systemLinks} navLabel={t('sections.system.navLabel')} />
         </section>
 
         <section
@@ -317,12 +192,12 @@ const SiteMapPage = () => {
             id="sitemap-data-heading"
             className="font-display text-lg font-semibold tracking-tight text-foreground"
           >
-            Protocol Data Pages
+            {t('sections.data.title')}
           </h2>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            Every public data route from the XML sitemap, in one crawlable list.
+            {t('sections.data.description')}
           </p>
-          <SitemapLinkList links={dataLinks} navLabel="Protocol data pages" />
+          <SitemapLinkList links={dataLinks} navLabel={t('sections.data.navLabel')} />
         </section>
 
         <section
@@ -333,13 +208,12 @@ const SiteMapPage = () => {
             id="sitemap-ecosystem-heading"
             className="font-display text-lg font-semibold tracking-tight text-foreground"
           >
-            Ecosystem
+            {t('sections.ecosystem.title')}
           </h2>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            External product surfaces: the Axiom Zero NFT marketplace, the Chaos Zero prediction
-            market, and Uniswap CST trading.
+            {t('sections.ecosystem.description')}
           </p>
-          <SitemapLinkList links={ecosystemLinks} navLabel="Ecosystem destinations" />
+          <SitemapLinkList links={ecosystemLinks} navLabel={t('sections.ecosystem.navLabel')} />
         </section>
       </div>
     </PageShell>

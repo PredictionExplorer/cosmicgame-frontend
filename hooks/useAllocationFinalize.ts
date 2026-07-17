@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { usePublicClient } from 'wagmi';
 import { zeroAddress } from 'viem';
 
@@ -7,7 +8,7 @@ import api from '@/services/api';
 import { isAxiosError } from '@/services/api/client';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
-import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
+import { isUserRejection, reportError } from '@/utils/errors';
 import { getContractErrorMessage, isEmptyContractReadError } from '@/utils/contractErrors';
 import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
@@ -24,6 +25,7 @@ interface UseAllocationFinalizeOptions {
 }
 
 export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOptions) {
+  const t = useTranslations('toasts');
   const router = useRouter();
   const publicClient = usePublicClient();
   const cosmicGameContract = useCosmicGameContract();
@@ -150,7 +152,7 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
       return true;
     } catch (err: unknown) {
       if (isUserRejection(err)) {
-        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        notify('info', t('walletTransactionCancelled'));
         return false;
       }
       reportError(err, 'finalize-cycle');

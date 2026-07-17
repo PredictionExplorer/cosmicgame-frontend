@@ -17,17 +17,17 @@ const createChampion = (overrides = {}) => ({
 describe('EnduranceChampionsTable', () => {
   it('renders loading state when championList is null', () => {
     render(<EnduranceChampionsTable championList={null} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.loading')).toBeInTheDocument();
   });
 
   it('renders empty state when championList is empty', () => {
     render(<EnduranceChampionsTable championList={[]} />);
-    expect(screen.getByText('No endurance champions yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.enduranceChampions')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<EnduranceChampionsTable championList={[createChampion()]} />);
-    expect(screen.getAllByText('User Address').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.userAddress').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders champion data with formatted times', () => {
@@ -63,7 +63,7 @@ describe('EnduranceChampionsTable', () => {
       createChampion({ participant: '0x' + '2'.repeat(40), championTime: 300 }),
     ];
     render(<EnduranceChampionsTable championList={list} />);
-    const sortButtons = screen.getAllByText('Champion Time');
+    const sortButtons = screen.getAllByText('tables.endurance.championTime');
     const headerButton = sortButtons.find((el) => el.tagName === 'BUTTON') ?? sortButtons[0]!;
     fireEvent.click(headerButton);
     const rows = screen.getAllByRole('row');
@@ -78,7 +78,7 @@ describe('EnduranceChampionsTable', () => {
       createChampion({ participant: '0x' + '2'.repeat(40), chronoWarrior: 100 }),
     ];
     render(<EnduranceChampionsTable championList={list} />);
-    const sortButtons = screen.getAllByText('Chrono Warrior');
+    const sortButtons = screen.getAllByText('tables.endurance.chronoWarrior');
     const headerButton = sortButtons.find((el) => el.tagName === 'BUTTON') ?? sortButtons[0]!;
     fireEvent.click(headerButton);
     const timeCells = screen.getAllByText(formatSeconds(500));
@@ -134,7 +134,7 @@ describe('EnduranceChampionsTable', () => {
       />,
     );
 
-    expect(screen.getByText('Live')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.live')).toBeInTheDocument();
   });
 
   it('matches the live row case-insensitively', () => {
@@ -146,12 +146,12 @@ describe('EnduranceChampionsTable', () => {
       />,
     );
 
-    expect(screen.getByText('Live')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.live')).toBeInTheDocument();
   });
 
   it('does not mark rows live without a latest participant address', () => {
     render(<EnduranceChampionsTable championList={[createChampion()]} />);
-    expect(screen.queryByText('Live')).not.toBeInTheDocument();
+    expect(screen.queryByText('tables.status.live')).not.toBeInTheDocument();
   });
 
   it('marks only the matching latest-participant row as live in a multi-row table', () => {
@@ -168,10 +168,10 @@ describe('EnduranceChampionsTable', () => {
       />,
     );
 
-    expect(screen.getAllByText('Live')).toHaveLength(1);
+    expect(screen.getAllByText('tables.status.live')).toHaveLength(1);
     const rows = screen.getAllByRole('row').filter((r) => r.querySelector('td'));
-    expect(rows[0]).toHaveTextContent('Live');
-    expect(rows[1]).not.toHaveTextContent('Live');
+    expect(rows[0]).toHaveTextContent('tables.status.live');
+    expect(rows[1]).not.toHaveTextContent('tables.status.live');
   });
 
   it('sort resets to desc when switching columns', () => {
@@ -182,13 +182,13 @@ describe('EnduranceChampionsTable', () => {
     render(<EnduranceChampionsTable championList={list} />);
 
     const championBtn =
-      screen.getAllByText('Champion Time').find((el) => el.tagName === 'BUTTON') ??
-      screen.getByText('Champion Time');
+      screen.getAllByText('tables.endurance.championTime').find((el) => el.tagName === 'BUTTON') ??
+      screen.getByText('tables.endurance.championTime');
     fireEvent.click(championBtn);
 
     const chronoBtn =
-      screen.getAllByText('Chrono Warrior').find((el) => el.tagName === 'BUTTON') ??
-      screen.getByText('Chrono Warrior');
+      screen.getAllByText('tables.endurance.chronoWarrior').find((el) => el.tagName === 'BUTTON') ??
+      screen.getByText('tables.endurance.chronoWarrior');
     fireEvent.click(chronoBtn);
 
     const rows = screen.getAllByRole('row');

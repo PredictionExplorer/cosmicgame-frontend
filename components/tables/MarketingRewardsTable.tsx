@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -37,11 +38,12 @@ const MarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
 };
 
 const MarketingRewardsTable = ({ list }: { list: MarketingReward[] }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No allocations yet.</p>;
+    return <p>{t('empty.allocations')}</p>;
   }
 
   const currentItems = list.slice((page - 1) * perPage, page * perPage);
@@ -52,8 +54,8 @@ const MarketingRewardsTable = ({ list }: { list: MarketingReward[] }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Amount (CST)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.amountCst')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

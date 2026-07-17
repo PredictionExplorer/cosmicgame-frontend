@@ -1,0 +1,40 @@
+{
+  "tagline": "A procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle’s final Signature.",
+  "sections": {
+    "protocol": "Protocol",
+    "explore": "Explore",
+    "ecosystem": "Ecosystem",
+    "resources": "Resources",
+    "community": "Community"
+  },
+  "links": {
+    "gallery": "Gallery",
+    "currentCycle": "Current Cycle",
+    "statistics": "Statistics",
+    "contracts": "Contracts",
+    "sourceCode": "Source Code",
+    "allocationRecipients": "Allocation Recipients",
+    "anchorDistributions": "Anchor Distributions",
+    "outreachReserve": "Outreach Reserve",
+    "howItWorks": "How It Works",
+    "faq": "FAQ",
+    "axiomZero": "Axiom Zero Marketplace",
+    "chaosZero": "Chaos Zero Predictions",
+    "uniswap": "Trade CST on Uniswap",
+    "about": "About",
+    "learn": "Learn",
+    "siteMap": "Site Map",
+    "protocolGuild": "Protocol Guild",
+    "twitter": "Twitter / X",
+    "discord": "Discord",
+    "discover": "Discover",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "social": {
+    "twitterLabel": "Twitter",
+    "discordLabel": "Discord"
+  },
+  "copyright": "© {year} Cosmic Signature. CC0 1.0 · Public domain.",
+  "colophon": "CC0 · Verified · Reproducible"
+}

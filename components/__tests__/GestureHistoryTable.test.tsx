@@ -11,7 +11,7 @@ import { render, screen, checkA11y } from '@/test-utils';
 describe('GestureHistoryTable', () => {
   test('with no records', () => {
     render(<GestureHistoryTable gestureHistory={[]} />);
-    expect(screen.getByText('No gestures yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.gestures')).toBeInTheDocument();
   });
 
   test('with mock data', () => {

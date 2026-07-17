@@ -19,22 +19,34 @@ const createAnchorHolder = (overrides = {}) => ({
 describe('UniqueAnchorHoldersRWLKTable', () => {
   it('renders empty state when list is empty', () => {
     render(<UniqueAnchorHoldersRWLKTable list={[]} />);
-    expect(screen.getByText('No anchor-holders yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.anchorHolders')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<UniqueAnchorHoldersRWLKTable list={[createAnchorHolder()]} />);
-    expect(screen.getAllByText('Anchor-holder Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Num Anchor Actions').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Num Release Actions').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Anchored Tokens').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Imprinted Tokens').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.anchorHolderAddress').length).toBeGreaterThanOrEqual(
+      1,
+    );
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.numAnchorActions').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.numReleaseActions').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.totalAnchoredTokens').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.totalImprintedTokens').length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('adds help triggers to RandomWalk anchor-holder headers', () => {
     render(<UniqueAnchorHoldersRWLKTable list={[createAnchorHolder()]} />);
     expect(
-      screen.getAllByRole('button', { name: /^Explain column:/ }).length,
+      screen.getAllByRole('button', {
+        name: /^tables\.tableHeaderHelp\.explainColumn/,
+      }).length,
     ).toBeGreaterThanOrEqual(5);
     expect(statisticsCopy.tables.totalAnchoredTokens).toMatch(/anchored-token/);
   });

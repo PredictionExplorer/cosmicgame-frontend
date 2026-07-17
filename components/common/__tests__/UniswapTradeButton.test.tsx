@@ -8,7 +8,7 @@ describe('UniswapTradeButton', () => {
   it('links to the CST swap on Uniswap for Arbitrum', () => {
     render(<UniswapTradeButton />);
 
-    const link = screen.getByRole('link', { name: 'Trade CST on Uniswap' });
+    const link = screen.getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' });
     expect(link).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -24,8 +24,8 @@ describe('UniswapTradeButton', () => {
   it('supports compact visual copy while keeping the full accessible name', () => {
     render(<UniswapTradeButton variant="compact" />);
 
-    const link = screen.getByRole('link', { name: 'Trade CST on Uniswap' });
-    expect(link).toHaveTextContent('Trade CST');
+    const link = screen.getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' });
+    expect(link).toHaveTextContent('nav.ecosystem.uniswap.shortLabel');
   });
 
   it('has no accessibility violations', async () => {

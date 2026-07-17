@@ -34,7 +34,7 @@ describe('VideoPlayerDialog', () => {
     const onClose = jest.fn();
     render(<VideoPlayerDialog open={true} videoPath="/video.mp4" onClose={onClose} />);
 
-    const closeButton = screen.getByRole('button', { name: 'Close' });
+    const closeButton = screen.getByRole('button', { name: 'common.actions.close' });
     await user.click(closeButton);
 
     expect(onClose).toHaveBeenCalledTimes(1);

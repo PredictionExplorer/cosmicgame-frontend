@@ -5,5 +5,32 @@
   },
   "languageSwitcher": {
     "label": "Language"
+  },
+  "accessibility": {
+    "skipToMain": "Skip to main content",
+    "breadcrumb": "Breadcrumb",
+    "footer": "Footer"
+  },
+  "status": {
+    "loading": "Loading",
+    "loadingEllipsis": "Loading…",
+    "loadingDots": "Loading...",
+    "noData": "No data available.",
+    "nothingHere": "Nothing here yet"
+  },
+  "actions": {
+    "copyAddress": "Copy address",
+    "addressCopied": "Address copied",
+    "copied": "Copied",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "externalLink": {
+    "title": "Leaving Cosmic Signature",
+    "description": "This link comes from a participant message stored on-chain. It has not been reviewed or verified — check that the destination below is what you expect.",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "warning": "Never enter your wallet seed phrase or private keys on an external site.",
+    "open": "Open Link"
   }
 }

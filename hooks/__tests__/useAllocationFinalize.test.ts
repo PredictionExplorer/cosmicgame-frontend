@@ -58,7 +58,6 @@ const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
 jest.mock('../../utils/errors', () => ({
   isUserRejection: jest.fn((_err: unknown) => false),
   reportError: jest.fn(),
-  WALLET_TRANSACTION_CANCELLED_MESSAGE: 'Transaction cancelled by user',
 }));
 
 jest.mock('../../utils/contractErrors', () => ({
@@ -284,7 +283,7 @@ describe('useAllocationFinalize', () => {
 
     expect(success).toBe(false);
     expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
-    expect(mockNotify).toHaveBeenCalledWith('info', 'Transaction cancelled by user');
+    expect(mockNotify).toHaveBeenCalledWith('info', 'toasts.walletTransactionCancelled');
   });
 
   it('shows the decoded contract error message when getContractErrorMessage returns one', async () => {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { convertTimestampToDateTime } from '@/utils';
@@ -31,6 +32,7 @@ interface SystemModesTableProps {
 }
 
 const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
+  const t = useTranslations('tables');
   const router = useRouter();
 
   if (!row) return <TablePrimaryRow />;
@@ -42,24 +44,25 @@ const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
   return (
     <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
       <TablePrimaryCell align="center">
-        {row.RoundNum ? row.RoundNum : 'Deployment'}
+        {row.RoundNum ? row.RoundNum : t('status.deployment')}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(row.TimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {prevRow ? convertTimestampToDateTime(prevRow.TimeStamp) : 'Currently Active'}
+        {prevRow ? convertTimestampToDateTime(prevRow.TimeStamp) : t('status.currentlyActive')}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
 export const SystemModesTable = ({ list }: SystemModesTableProps) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
 
   if (list.length === 0) {
-    return <p>No mode changes yet.</p>;
+    return <p>{t('empty.modeChanges')}</p>;
   }
 
   const paginatedList = list.slice((page - 1) * perPage, page * perPage);
@@ -76,13 +79,22 @@ export const SystemModesTable = ({ list }: SystemModesTableProps) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="center">
-                <TableHeaderHelp desktop="Round" tooltip={statisticsCopy.tables.systemRound} />
+                <TableHeaderHelp
+                  desktop={t('columns.round')}
+                  tooltip={statisticsCopy.tables.systemRound}
+                />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
-                <TableHeaderHelp desktop="Started" tooltip={statisticsCopy.tables.systemStarted} />
+                <TableHeaderHelp
+                  desktop={t('columns.started')}
+                  tooltip={statisticsCopy.tables.systemStarted}
+                />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
-                <TableHeaderHelp desktop="Ended" tooltip={statisticsCopy.tables.systemEnded} />
+                <TableHeaderHelp
+                  desktop={t('columns.ended')}
+                  tooltip={statisticsCopy.tables.systemEnded}
+                />
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

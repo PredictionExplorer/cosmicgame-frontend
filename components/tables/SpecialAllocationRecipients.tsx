@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { Coins, Crown, Lock, MessageSquare, Swords, User, Zap } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { convertTimestampToDateTime, formatSeconds } from '@/utils';
 
@@ -12,6 +13,7 @@ import type { GestureInfo } from '@/services/api/types';
 
 interface RoleCardConfig {
   key: 'latest' | 'endurance' | 'chrono' | 'lastcst';
+  testId: string;
   icon: ReactNode;
   title: string;
   tooltip: string;
@@ -33,13 +35,15 @@ interface SpecialAllocationRecipientsProps {
 }
 
 function StatusChip({ isLive, statusText }: { isLive: boolean; statusText?: string }) {
+  const t = useTranslations('tables');
+
   return isLive ? (
     <span
       data-testid="champion-live-chip"
       className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300"
     >
       <Zap className="h-3 w-3" />
-      {statusText ?? 'Live - growing'}
+      {statusText ?? t('specialAllocation.liveGrowing')}
     </span>
   ) : (
     <span
@@ -47,7 +51,7 @@ function StatusChip({ isLive, statusText }: { isLive: boolean; statusText?: stri
       className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
     >
       <Lock className="h-3 w-3" />
-      {statusText ?? 'Record standing'}
+      {statusText ?? t('specialAllocation.recordStanding')}
     </span>
   );
 }
@@ -75,6 +79,7 @@ function LoadingCard({ title, icon }: Pick<RoleCardConfig, 'title' | 'icon'>) {
 }
 
 function RoleCard({
+  testId,
   icon,
   title,
   tooltip,
@@ -91,7 +96,7 @@ function RoleCard({
   return (
     <div
       data-special-allocation-card
-      data-testid={`special-allocation-card-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+      data-testid={`special-allocation-card-${testId}`}
       className={cn(
         'rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.04] print:border print:border-border print:animate-none',
         accent === 'primary' &&
@@ -174,13 +179,15 @@ function LatestGestureProgress({
   latestGesture: ChampionsState['latestGesture'];
   hasEnduranceRecord: boolean;
 }) {
+  const t = useTranslations('tables');
+
   if (!hasEnduranceRecord) {
     return (
       <div
         data-testid="latest-participant-status"
         className="mt-3 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-3 py-2 text-xs text-emerald-300"
       >
-        First endurance record forming
+        {t('specialAllocation.firstRecordForming')}
       </div>
     );
   }
@@ -188,8 +195,12 @@ function LatestGestureProgress({
   const progress = Math.floor(latestGesture.progressToEnduranceChampion);
   const isComplete = latestGesture.isExtendingEnduranceRecord;
   const remainingCopy = latestGesture.isCurrentEnduranceChampion
-    ? `Needs ${formatSeconds(latestGesture.secondsUntilEnduranceChampion)} more to extend record`
-    : `Needs ${formatSeconds(latestGesture.secondsUntilEnduranceChampion)} more to become Endurance Champion`;
+    ? t('specialAllocation.needsToExtend', {
+        duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion),
+      })
+    : t('specialAllocation.needsToBecomeChampion', {
+        duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion),
+      });
 
   return (
     <div className="mt-3 rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2">
@@ -198,13 +209,13 @@ function LatestGestureProgress({
           data-testid="latest-participant-remaining"
           className={cn('text-xs', isComplete ? 'text-emerald-300' : 'text-muted-foreground')}
         >
-          {isComplete ? 'Extending Endurance Champion record' : remainingCopy}
+          {isComplete ? t('specialAllocation.extendingRecord') : remainingCopy}
         </span>
         <span className="font-mono text-xs tabular-nums text-primary">{progress}%</span>
       </div>
       <div
         role="progressbar"
-        aria-label="Progress toward Endurance Champion"
+        aria-label={t('specialAllocation.progressAria')}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={progress}
@@ -216,7 +227,10 @@ function LatestGestureProgress({
         />
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">
-        {formatSeconds(latestGesture.holdDuration)} of {formatSeconds(latestGesture.durationToBeat)}
+        {t('specialAllocation.progressAmounts', {
+          current: formatSeconds(latestGesture.holdDuration),
+          target: formatSeconds(latestGesture.durationToBeat),
+        })}
       </p>
     </div>
   );
@@ -246,13 +260,17 @@ function resolveGestureType(gesture: GestureInfo): number | undefined {
   return typeof backendGestureType === 'number' ? backendGestureType : undefined;
 }
 
-function formatGestureAmount(amount: number | undefined, unit: 'ETH' | 'CST'): string {
-  if (amount === undefined) return 'Unavailable';
+function formatGestureAmount(
+  amount: number | undefined,
+  unit: 'ETH' | 'CST',
+  unavailable: string,
+): string {
+  if (amount === undefined) return unavailable;
   return `${amount.toFixed(amount > 0 && amount < 1 ? 7 : 4)} ${unit}`;
 }
 
-function formatReceivedCstAmount(amount: number | undefined): string {
-  if (amount === undefined) return 'Unavailable';
+function formatReceivedCstAmount(amount: number | undefined, unavailable: string): string {
+  if (amount === undefined) return unavailable;
   return `${amount.toFixed(amount > 0 && amount < 1 ? 7 : 2)} CST`;
 }
 
@@ -277,13 +295,13 @@ function getParticipationCST(gesture: GestureInfo): number | undefined {
   );
 }
 
-function formatLatestGesturePayment(gesture: GestureInfo): string {
+function formatLatestGesturePayment(gesture: GestureInfo, unavailable: string): string {
   return resolveGestureType(gesture) === 2
-    ? formatGestureAmount(getCstGestureCost(gesture), 'CST')
-    : formatGestureAmount(getEthGestureCost(gesture), 'ETH');
+    ? formatGestureAmount(getCstGestureCost(gesture), 'CST', unavailable)
+    : formatGestureAmount(getEthGestureCost(gesture), 'ETH', unavailable);
 }
 
-function formatGestureMethod(gesture: GestureInfo): string {
+function formatGestureMethod(gesture: GestureInfo, unknown: string): string {
   switch (resolveGestureType(gesture)) {
     case 0:
       return 'ETH';
@@ -292,7 +310,7 @@ function formatGestureMethod(gesture: GestureInfo): string {
     case 2:
       return 'CST';
     default:
-      return 'Unknown';
+      return unknown;
   }
 }
 
@@ -300,15 +318,10 @@ function hasRandomWalkToken(gesture: GestureInfo): boolean {
   return typeof gesture.RWalkNFTId === 'number' && gesture.RWalkNFTId >= 0;
 }
 
-function formatRandomWalkStatus(gesture: GestureInfo): string {
-  if (hasRandomWalkToken(gesture)) return `Yes, token #${gesture.RWalkNFTId}`;
-  return resolveGestureType(gesture) === 1 ? 'Yes' : 'No';
-}
-
-function formatGestureTime(gesture: GestureInfo): string {
+function formatGestureTime(gesture: GestureInfo, unavailable: string): string {
   return typeof gesture.TimeStamp === 'number' && Number.isFinite(gesture.TimeStamp)
     ? convertTimestampToDateTime(gesture.TimeStamp, true)
-    : 'Unavailable';
+    : unavailable;
 }
 
 function getAttachedAssetLabels(gesture: GestureInfo): string[] {
@@ -318,9 +331,9 @@ function getAttachedAssetLabels(gesture: GestureInfo): string[] {
   ].filter(Boolean);
 }
 
-function formatAttachedAssets(gesture: GestureInfo): string {
+function formatAttachedAssets(gesture: GestureInfo, none: string): string {
   const assets = getAttachedAssetLabels(gesture);
-  if (assets.length === 0) return 'None';
+  if (assets.length === 0) return none;
   return assets.join(' + ');
 }
 
@@ -371,7 +384,15 @@ function LatestGestureDetails({
   latestGesture?: GestureInfo | null;
   latestAddress: string | null;
 }) {
+  const t = useTranslations('tables');
+
   if (!latestGesture || !sameAddress(latestGesture.BidderAddr, latestAddress)) return null;
+
+  const randomWalkStatus = hasRandomWalkToken(latestGesture)
+    ? t('specialAllocation.yesToken', { id: String(latestGesture.RWalkNFTId) })
+    : resolveGestureType(latestGesture) === 1
+      ? t('status.yes')
+      : t('status.no');
 
   return (
     <div
@@ -381,43 +402,52 @@ function LatestGestureDetails({
       <div className="mb-2 flex items-center gap-2">
         <div className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
         <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300">
-          Last Gesture
+          {t('specialAllocation.lastGesture')}
         </p>
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
         <DetailMetric
           testId="latest-participant-paid-amount"
-          label="Amount paid"
-          value={formatLatestGesturePayment(latestGesture)}
+          label={t('specialAllocation.amountPaid')}
+          value={formatLatestGesturePayment(latestGesture, t('status.unavailable'))}
           tone="emerald"
         />
-        <DetailMetric label="Method" value={formatGestureMethod(latestGesture)} />
+        <DetailMetric
+          label={t('specialAllocation.method')}
+          value={formatGestureMethod(latestGesture, t('status.unknown'))}
+        />
         <DetailMetric
           testId="latest-participant-random-walk"
-          label="Random Walk"
-          value={formatRandomWalkStatus(latestGesture)}
+          label={t('specialAllocation.randomWalk')}
+          value={randomWalkStatus}
         />
-        <DetailMetric label="Gesture time" value={formatGestureTime(latestGesture)} />
+        <DetailMetric
+          label={t('specialAllocation.gestureTime')}
+          value={formatGestureTime(latestGesture, t('status.unavailable'))}
+        />
         <DetailMetric
           testId="latest-participant-gesture-id"
-          label="Gesture Position"
+          label={t('specialAllocation.gesturePosition')}
           value={
             typeof latestGesture.BidPosition === 'number'
               ? `#${latestGesture.BidPosition}`
-              : 'Unavailable'
+              : t('status.unavailable')
           }
         />
         <DetailMetric
           testId="latest-participant-cst-received"
-          label="CST received"
-          value={formatReceivedCstAmount(getParticipationCST(latestGesture))}
+          label={t('specialAllocation.cstReceived')}
+          value={formatReceivedCstAmount(
+            getParticipationCST(latestGesture),
+            t('status.unavailable'),
+          )}
           tone="emerald"
         />
         {getAttachedAssetLabels(latestGesture).length > 0 && (
           <DetailMetric
             testId="latest-participant-attached-assets"
-            label="Attached assets"
-            value={formatAttachedAssets(latestGesture)}
+            label={t('specialAllocation.attachedAssets')}
+            value={formatAttachedAssets(latestGesture, t('status.none'))}
           />
         )}
       </div>
@@ -432,25 +462,28 @@ function ChronoWarriorDetails({
   chrono: ChampionsState['chrono'];
   challenge: ChampionsState['chronoChallenge'];
 }) {
+  const t = useTranslations('tables');
+
   if (!chrono.address) return null;
 
   const nextMetric = (() => {
     if (chrono.isLive) {
       return chrono.willStopGrowingIn !== undefined && chrono.willStopGrowingIn > 0
         ? {
-            label: 'May close in',
-            value: `${formatSeconds(chrono.willStopGrowingIn)} if the latest hold beats Endurance`,
+            label: t('specialAllocation.mayCloseIn'),
+            value: t('specialAllocation.mayCloseValue', {
+              duration: formatSeconds(chrono.willStopGrowingIn),
+            }),
           }
-        : { label: 'Status', value: 'Growing now' };
+        : { label: t('columns.status'), value: t('specialAllocation.growingNow') };
     }
     return {
-      label: 'Record status',
-      value: 'Standing Chrono-Warrior record',
+      label: t('specialAllocation.recordStatus'),
+      value: t('specialAllocation.standingChronoRecord'),
     };
   })();
 
   const showChallenge = challenge.hasDetails && !challenge.isLive;
-  const challengeVerb = challenge.isRecordHolder ? 'extend' : 'overtake';
 
   return (
     <div
@@ -460,13 +493,13 @@ function ChronoWarriorDetails({
       <div className="mb-2 flex items-center gap-2">
         <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(21,191,253,0.9)]" />
         <p className="text-[11px] font-medium uppercase tracking-wider text-primary/90">
-          Chrono Reign
+          {t('specialAllocation.chronoReign')}
         </p>
       </div>
       {chrono.isLive && chrono.currentSegmentDuration !== undefined && (
         <DetailMetric
           testId="chrono-current-segment"
-          label="Record-growing segment"
+          label={t('specialAllocation.recordGrowingSegment')}
           value={formatSeconds(chrono.currentSegmentDuration)}
           tone="primary"
         />
@@ -478,7 +511,7 @@ function ChronoWarriorDetails({
         tone={chrono.isLive ? 'emerald' : 'primary'}
       />
       <p className="text-[11px] leading-relaxed text-muted-foreground">
-        Chrono-Warrior is the standing record for continuous time as Endurance Champion.
+        {t('specialAllocation.chronoDescription')}
       </p>
       {showChallenge && (
         <div
@@ -486,7 +519,7 @@ function ChronoWarriorDetails({
           className="mt-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.045] p-3"
         >
           <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300">
-            Active Endurance Challenge
+            {t('specialAllocation.activeEnduranceChallenge')}
           </p>
           {challenge.address && (
             <a
@@ -499,24 +532,29 @@ function ChronoWarriorDetails({
           {challenge.duration !== undefined && (
             <DetailMetric
               testId="chrono-challenge-segment"
-              label="Challenge segment"
+              label={t('specialAllocation.challengeSegment')}
               value={formatSeconds(challenge.duration)}
               tone="emerald"
             />
           )}
           <DetailMetric
             testId="chrono-challenge-next-change"
-            label={challenge.isRecordHolder ? 'Can extend in' : 'Can overtake in'}
+            label={
+              challenge.isRecordHolder
+                ? t('specialAllocation.canExtendIn')
+                : t('specialAllocation.canOvertakeIn')
+            }
             value={
               challenge.startsGrowingIn !== undefined
                 ? formatSeconds(challenge.startsGrowingIn)
-                : `Waiting to ${challengeVerb} the Chrono record`
+                : challenge.isRecordHolder
+                  ? t('specialAllocation.waitingToExtend')
+                  : t('specialAllocation.waitingToOvertake')
             }
             tone="emerald"
           />
           <p className="text-[11px] leading-relaxed text-muted-foreground">
-            This countdown belongs to the current Endurance Champion, not necessarily the standing
-            Chrono-Warrior.
+            {t('specialAllocation.challengeDescription')}
           </p>
         </div>
       )}
@@ -534,53 +572,65 @@ function sameAddress(left: string | null | undefined, right: string | null | und
  * `hidden` on screen and `display:block` when printing so addresses reliably appear in the PDF.
  */
 function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsState }) {
+  const t = useTranslations('tables');
+
   return (
     <div
       className="hidden rounded-md border-2 border-foreground/40 bg-background p-4 text-sm text-foreground shadow-none [print-color-adjust:exact] print:block"
       data-special-allocation-leaders-print
     >
       <h3 className="mb-4 border-b border-foreground/30 pb-2 font-display text-base font-bold">
-        Special Allocation Leaders
+        {t('specialAllocation.heading')}
       </h3>
       <dl className="space-y-4">
         <div>
           <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
-            Latest Participant
+            {t('specialAllocation.latestParticipant')}
           </dt>
           <dd className="mt-1 break-all font-mono text-xs leading-relaxed">
             {state.latestGesture.address ?? '-'}
           </dd>
           {state.latestGesture.holdDuration > 0 && (
             <dd className="mt-1 text-xs">
-              Current hold: {formatSeconds(state.latestGesture.holdDuration)}
+              {t('specialAllocation.printCurrentHold', {
+                duration: formatSeconds(state.latestGesture.holdDuration),
+              })}
             </dd>
           )}
         </div>
         <div>
           <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
-            Endurance Champion
+            {t('specialAllocation.enduranceChampion')}
           </dt>
           <dd className="mt-1 break-all font-mono text-xs leading-relaxed">
             {state.endurance.address ?? '-'}
           </dd>
           {state.endurance.duration > 0 && (
-            <dd className="mt-1 text-xs">Window: {formatSeconds(state.endurance.duration)}</dd>
+            <dd className="mt-1 text-xs">
+              {t('specialAllocation.printWindow', {
+                duration: formatSeconds(state.endurance.duration),
+              })}
+            </dd>
           )}
         </div>
         <div>
           <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
-            Chrono Warrior
+            {t('specialAllocation.chronoWarriorPrint')}
           </dt>
           <dd className="mt-1 break-all font-mono text-xs leading-relaxed">
             {state.chrono.address ?? '-'}
           </dd>
           {state.chrono.duration > 0 && (
-            <dd className="mt-1 text-xs">Reign: {formatSeconds(state.chrono.duration)}</dd>
+            <dd className="mt-1 text-xs">
+              {t('specialAllocation.printReign', {
+                duration: formatSeconds(state.chrono.duration),
+              })}
+            </dd>
           )}
         </div>
         <div>
           <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
-            Final CST Gesture
+            {t('specialAllocation.finalCstGesture')}
           </dt>
           <dd className="mt-1 break-all font-mono text-xs leading-relaxed">
             {state.lastCst.address ?? '-'}
@@ -596,6 +646,7 @@ export const SpecialAllocationRecipients = ({
   latestMessage = null,
   latestGesture = null,
 }: SpecialAllocationRecipientsProps = {}) => {
+  const t = useTranslations('tables');
   const champions = useChampions();
   const isCurrentAccountLatest = sameAddress(currentAccount, champions.latestGesture.address);
   const cleanLatestMessage = latestMessage?.trim() ?? '';
@@ -603,19 +654,19 @@ export const SpecialAllocationRecipients = ({
   const cards: RoleCardConfig[] = [
     {
       key: 'latest',
+      testId: 'latest-participant',
       icon: <User className="h-5 w-5" />,
-      title: 'Latest Participant',
-      tooltip:
-        'The latest gesture maker is building an endurance window. They must hold the position longer than the current Endurance Champion window to take the lead.',
+      title: t('specialAllocation.latestParticipant'),
+      tooltip: t('specialAllocation.latestTooltip'),
       address: champions.latestGesture.address,
       duration: champions.latestGesture.address ? champions.latestGesture.holdDuration : undefined,
-      durationLabel: 'Current hold',
+      durationLabel: t('specialAllocation.currentHold'),
       isLive: champions.latestGesture.address ? true : undefined,
-      emptyText: 'No latest gesture yet',
+      emptyText: t('specialAllocation.noLatestGesture'),
       accent: champions.latestGesture.address ? 'emerald' : 'muted',
       badge: isCurrentAccountLatest ? (
         <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
-          You
+          {t('status.youBadge')}
         </span>
       ) : null,
       extra: champions.latestGesture.address ? (
@@ -634,34 +685,36 @@ export const SpecialAllocationRecipients = ({
     },
     {
       key: 'endurance',
+      testId: 'endurance-champion',
       icon: <Crown className="h-5 w-5" />,
-      title: 'Endurance Champion',
-      tooltip:
-        'The participant with the longest uninterrupted most-recent-gesture window. The timer only grows while that participant is still the latest gesture maker.',
+      title: t('specialAllocation.enduranceChampion'),
+      tooltip: t('specialAllocation.enduranceTooltip'),
       address: champions.endurance.address,
       duration: champions.endurance.duration,
-      durationLabel: 'Endurance window',
+      durationLabel: t('specialAllocation.enduranceWindow'),
       isLive: champions.endurance.isLive,
-      emptyText: 'No endurance record yet',
+      emptyText: t('specialAllocation.noEnduranceRecord'),
       accent: champions.endurance.isLive ? 'emerald' : 'muted',
       extra: champions.endurance.address ? (
         <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-          Longest single latest-participant window, not cumulative time.
+          {t('specialAllocation.enduranceNote')}
         </p>
       ) : null,
     },
     {
       key: 'chrono',
+      testId: 'chrono-warrior',
       icon: <Swords className="h-5 w-5" />,
-      title: 'Chrono-Warrior',
-      tooltip:
-        'The participant who held the Endurance Champion position for the longest continuous reign. Receives 8% of the Cycle Reserve, 1,000 CST, and a Cosmic Signature NFT.',
+      title: t('specialAllocation.chronoWarrior'),
+      tooltip: t('specialAllocation.chronoTooltip'),
       address: champions.chrono.address,
       duration: champions.chrono.duration,
-      durationLabel: 'Champion reign',
+      durationLabel: t('specialAllocation.championReign'),
       isLive: champions.chrono.isLive,
-      statusText: champions.chrono.statusText,
-      emptyText: 'No Chrono-Warrior record yet',
+      statusText: champions.chrono.isLive
+        ? t('specialAllocation.growingNow')
+        : t('specialAllocation.recordStanding'),
+      emptyText: t('specialAllocation.noChronoRecord'),
       accent: 'primary',
       extra: (
         <ChronoWarriorDetails chrono={champions.chrono} challenge={champions.chronoChallenge} />
@@ -669,16 +722,16 @@ export const SpecialAllocationRecipients = ({
     },
     {
       key: 'lastcst',
+      testId: 'final-cst-gesture',
       icon: <Coins className="h-5 w-5" />,
-      title: 'Final CST Gesture',
-      tooltip:
-        'The participant who made the last CST gesture of the cycle receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT.',
+      title: t('specialAllocation.finalCstGesture'),
+      tooltip: t('specialAllocation.finalCstTooltip'),
       address: champions.lastCst.address,
-      emptyText: 'Awaiting first CST gesture',
+      emptyText: t('specialAllocation.awaitingCstGesture'),
       accent: 'muted',
       extra: champions.lastCst.address ? (
         <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-          Only CST gestures update this role; ETH and Random Walk gestures do not.
+          {t('specialAllocation.finalCstNote')}
         </p>
       ) : null,
     },
@@ -694,17 +747,17 @@ export const SpecialAllocationRecipients = ({
       <section
         className="min-h-[2rem] space-y-4 print:min-h-0 print:hidden"
         data-special-allocation-leaders
-        aria-label="Special allocation leaders"
+        aria-label={t('specialAllocation.sectionAria')}
       >
         <div className="flex items-center gap-2">
           <h3
             data-testid="special-allocation-heading"
             className="font-display text-lg font-semibold tracking-tight text-foreground print:!text-foreground"
           >
-            Special Allocation Leaders
+            {t('specialAllocation.heading')}
           </h3>
           <span className="print:hidden">
-            <InfoTooltip content="These participants are currently in line to receive special allocations when the cycle finalizes. Positions can change with every new gesture." />
+            <InfoTooltip content={t('specialAllocation.headingHelp')} />
           </span>
         </div>
 

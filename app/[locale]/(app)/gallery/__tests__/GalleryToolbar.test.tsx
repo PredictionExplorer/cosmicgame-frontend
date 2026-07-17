@@ -19,7 +19,7 @@ beforeEach(() => jest.clearAllMocks());
 describe('GalleryToolbar', () => {
   it('renders search input', () => {
     render(<GalleryToolbar {...defaultProps} />);
-    expect(screen.getByLabelText('Search NFTs')).toBeInTheDocument();
+    expect(screen.getByLabelText('search.gallery.ariaLabel')).toBeInTheDocument();
   });
 
   it('renders filter chips', () => {
@@ -54,7 +54,7 @@ describe('GalleryToolbar', () => {
 
   it('calls onSearchSubmit on enter key', () => {
     render(<GalleryToolbar {...defaultProps} searchQuery="test" />);
-    const input = screen.getByLabelText('Search NFTs');
+    const input = screen.getByLabelText('search.gallery.ariaLabel');
     fireEvent.change(input, { target: { value: 'hello' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(defaultProps.onSearchSubmit).toHaveBeenCalled();

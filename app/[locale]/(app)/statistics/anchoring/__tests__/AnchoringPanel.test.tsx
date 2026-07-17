@@ -94,7 +94,9 @@ describe('AnchoringPanel', () => {
       refetch: jest.fn(),
     });
     render(<AnchoringPanel />);
-    expect(screen.getAllByRole('status', { name: 'Loading stat' }).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('status', { name: 'tables.skeleton.loadingStat' }).length,
+    ).toBeGreaterThan(0);
   });
 
   it('shows a section error with retry when anchor actions fail', async () => {

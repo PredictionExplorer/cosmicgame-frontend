@@ -42,8 +42,8 @@ describe('Footer', () => {
   });
 
   it('renders copyright and CC0 colophon', () => {
-    expect(screen.getByText(/\d{4} Cosmic Signature\. CC0 1\.0/)).toBeInTheDocument();
-    expect(screen.getByText(/CC0 · Verified · Reproducible/i)).toBeInTheDocument();
+    expect(screen.getByText(/footer\.copyright\(year=\d{4}\)/)).toBeInTheDocument();
+    expect(screen.getByText('footer.colophon')).toBeInTheDocument();
   });
 
   it('renders build commit and branch when not production deploy', () => {
@@ -53,19 +53,19 @@ describe('Footer', () => {
   });
 
   it('renders the terms link', () => {
-    const termsLink = screen.getByRole('link', { name: 'Terms' });
+    const termsLink = screen.getByRole('link', { name: 'footer.links.terms' });
     expect(termsLink).toBeInTheDocument();
     expect(termsLink).toHaveAttribute('href', '/terms');
   });
 
   it('renders the privacy link', () => {
-    const privacyLink = screen.getByRole('link', { name: 'Privacy' });
+    const privacyLink = screen.getByRole('link', { name: 'footer.links.privacy' });
     expect(privacyLink).toBeInTheDocument();
     expect(privacyLink).toHaveAttribute('href', '/privacy');
   });
 
   it('renders the twitter link pointing to the correct URL', () => {
-    const twitterLink = screen.getByLabelText('Twitter');
+    const twitterLink = screen.getByLabelText('footer.social.twitterLabel');
     expect(twitterLink).toBeInTheDocument();
     expect(twitterLink).toHaveAttribute('href', 'https://x.com/CosmicSignature');
     expect(twitterLink).toHaveAttribute('target', '_blank');
@@ -73,7 +73,7 @@ describe('Footer', () => {
   });
 
   it('renders the discord link pointing to the correct URL', () => {
-    const discordLink = screen.getByLabelText('Discord');
+    const discordLink = screen.getByLabelText('footer.social.discordLabel');
     expect(discordLink).toBeInTheDocument();
     expect(discordLink).toHaveAttribute('href', 'https://discord.gg/bGnPn96Qwt');
     expect(discordLink).toHaveAttribute('target', '_blank');
@@ -89,28 +89,28 @@ describe('Footer', () => {
   });
 
   it('renders the new Protocol Guild external link', () => {
-    const pg = screen.getByText('Protocol Guild');
+    const pg = screen.getByText('footer.links.protocolGuild');
     expect(pg).toBeInTheDocument();
     expect(pg).toHaveAttribute('href', 'https://protocol-guild.readthedocs.io');
     expect(pg).toHaveAttribute('target', '_blank');
   });
 
   it('renders the Axiom Zero marketplace link', () => {
-    const marketplace = screen.getByRole('link', { name: 'Axiom Zero Marketplace' });
+    const marketplace = screen.getByRole('link', { name: 'footer.links.axiomZero' });
     expect(marketplace).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
     expect(marketplace).toHaveAttribute('target', '_blank');
     expect(marketplace).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders the Chaos Zero predictions link', () => {
-    const predictions = screen.getByRole('link', { name: 'Chaos Zero Predictions' });
+    const predictions = screen.getByRole('link', { name: 'footer.links.chaosZero' });
     expect(predictions).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
     expect(predictions).toHaveAttribute('target', '_blank');
     expect(predictions).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders the Uniswap CST trade link in the Ecosystem column', () => {
-    const uniswap = screen.getByRole('link', { name: 'Trade CST on Uniswap' });
+    const uniswap = screen.getByRole('link', { name: 'footer.links.uniswap' });
     expect(uniswap.getAttribute('href')).toMatch(/^https:\/\/app\.uniswap\.org\//);
     expect(uniswap).toHaveAttribute('target', '_blank');
     expect(uniswap).toHaveAttribute('rel', 'noopener noreferrer');
@@ -125,7 +125,7 @@ describe('Footer', () => {
   });
 
   it('renders the site map link', () => {
-    const siteMapLink = screen.getByText('Site Map');
+    const siteMapLink = screen.getByText('footer.links.siteMap');
     expect(siteMapLink).toBeInTheDocument();
     expect(siteMapLink).toHaveAttribute('href', '/site-map');
   });

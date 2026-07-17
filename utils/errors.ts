@@ -24,13 +24,6 @@ export function isEthProviderError(err: unknown): err is EthProviderError {
 }
 
 /**
- * Shown when the user closes the wallet or rejects signing (EIP-1193 code 4001).
- * Prefer `type: 'info'` in notifications — this is not a failure.
- */
-export const WALLET_TRANSACTION_CANCELLED_MESSAGE =
-  'Transaction not sent — you cancelled it in your wallet.';
-
-/**
  * Returns `true` when the user dismissed the wallet or rejected signing (EIP-1193 4001).
  * Walks viem `cause` chains and `UserRejectedRequestError` — rejection is often nested.
  *

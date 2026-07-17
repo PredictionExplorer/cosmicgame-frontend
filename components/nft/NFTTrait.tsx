@@ -3,6 +3,7 @@
 import 'yet-another-react-lightbox/styles.css';
 
 import { useState, useMemo, useEffect, useCallback, type ChangeEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import Lightbox from 'yet-another-react-lightbox';
 import { usePublicClient } from 'wagmi';
 import { motion } from 'framer-motion';
@@ -35,12 +36,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import { useNotification } from '@/contexts/NotificationContext';
 import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
-import {
-  isUserRejection,
-  getEthErrorMessage,
-  reportError,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
 import {
   useDashboardInfo,
   useCSTInfo,
@@ -103,6 +99,7 @@ function getAllocationTypeConfig(recordType?: number) {
 
 /** Full detail page for a Cosmic Signature NFT, showing metadata, image/video, naming, transfer, and ownership history. */
 const NFTTrait = ({ tokenId }: NFTTraitProps) => {
+  const t = useTranslations('toasts');
   const [openDialog, setOpenDialog] = useState(false);
   const [openVideo, setOpenVideo] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
@@ -211,7 +208,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     } catch (err) {
       if (isUserRejection(err)) {
         setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });
@@ -244,7 +241,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         setNotification({
           visible: true,
           type: 'info',
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
         });
       } else {
         const msg = getEthErrorMessage(err, 'An error occurred while setting the token name.');
@@ -272,7 +269,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         setNotification({
           visible: true,
           type: 'info',
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
         });
       } else {
         const msg = getEthErrorMessage(err, 'An error occurred while clearing the token name.');

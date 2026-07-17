@@ -110,7 +110,7 @@ describe('HomeObservatoryHero', () => {
   it('links visitors to trade CST on Uniswap', () => {
     render(<HomeObservatoryHero {...liveProps} />);
 
-    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' })).toHaveAttribute(
       'href',
       CST_UNISWAP_SWAP_URL,
     );

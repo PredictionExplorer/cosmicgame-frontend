@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { usePublicClient } from 'wagmi';
 
-import {
-  isUserRejection,
-  reportError,
-  getEthErrorMessage,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useApiData } from '@/contexts/ApiDataContext';
@@ -40,6 +36,7 @@ interface ClaimingState {
  *      never human-readable display amounts.
  */
 export function useClaimAllocations(onSuccess?: () => void) {
+  const t = useTranslations('toasts');
   const { setNotification } = useNotification();
   const { fetchData: fetchStatusData } = useApiData();
   const stellarSelectionWalletContract = useStellarSelectionWalletContract();
@@ -67,7 +64,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
     (err: unknown, context: string) => {
       if (isUserRejection(err)) {
         setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });
@@ -78,7 +75,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
       const msg = getErrorMessage(rawMsg) || rawMsg;
       setNotification({ text: msg, type: 'error', visible: true });
     },
-    [setNotification],
+    [setNotification, t],
   );
 
   const notifyWalletNotConnected = useCallback(() => {

@@ -41,6 +41,12 @@ jobs:
       - name: i18n catalog parity report (informational during zh rollout)
         run: npm run i18n:parity
 
+      - name: Enforce Sprint 1 Chinese catalog coverage
+        run: npm run i18n:sprint1
+
+      - name: Enforce English and Chinese lexicon
+        run: npm run lexicon:scan
+
       - name: Type check
         run: npm run type-check
 

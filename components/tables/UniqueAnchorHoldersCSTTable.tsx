@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatTableAmount, shortenHex } from '@/utils';
@@ -20,47 +21,6 @@ import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { UniqueAnchorHolderCST } from '@/services/api/types';
 
 export type { UniqueAnchorHolderCST };
-
-const responsiveHeaders = [
-  {
-    desktop: 'Anchor-holder Address',
-    mobile: 'Holder',
-    align: 'left' as const,
-    tooltip: statisticsCopy.tables.anchorHolderAddress,
-  },
-  {
-    desktop: 'Num Anchor Actions',
-    mobile: 'Anchors',
-    tooltip: statisticsCopy.tables.numAnchorActions,
-  },
-  {
-    desktop: 'Num Release Actions',
-    mobile: 'Releases',
-    tooltip: statisticsCopy.tables.numReleaseActions,
-  },
-  {
-    desktop: 'Total Imprinted Tokens',
-    mobile: 'Imprinted',
-    tooltip: statisticsCopy.tables.totalImprintedTokens,
-  },
-  {
-    desktop: 'Total Anchored Tokens',
-    mobile: 'Anchored',
-    tooltip: statisticsCopy.tables.totalAnchoredTokens,
-  },
-  {
-    desktop: 'Total Distribution (ETH)',
-    mobile: 'Distributed',
-    align: 'right' as const,
-    tooltip: statisticsCopy.tables.totalDistributionEth,
-  },
-  {
-    desktop: 'Unretrieved Distribution (ETH)',
-    mobile: 'Unretrieved',
-    align: 'right' as const,
-    tooltip: statisticsCopy.tables.unretrievedDistributionEth,
-  },
-];
 
 const UniqueAnchorHoldersCSTRow = ({ row }: { row: UniqueAnchorHolderCST }) => {
   if (!row) {
@@ -100,11 +60,52 @@ const UniqueAnchorHoldersCSTRow = ({ row }: { row: UniqueAnchorHolderCST }) => {
 };
 
 export const UniqueAnchorHoldersCSTTable = ({ list }: { list: UniqueAnchorHolderCST[] }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
+  const responsiveHeaders = [
+    {
+      desktop: t('columns.anchorHolderAddress'),
+      mobile: t('columns.holder'),
+      align: 'left' as const,
+      tooltip: statisticsCopy.tables.anchorHolderAddress,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.numAnchorActions'),
+      mobile: t('uniqueAnchorHolders.anchors'),
+      tooltip: statisticsCopy.tables.numAnchorActions,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.numReleaseActions'),
+      mobile: t('uniqueAnchorHolders.releases'),
+      tooltip: statisticsCopy.tables.numReleaseActions,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.totalImprintedTokens'),
+      mobile: t('uniqueAnchorHolders.imprinted'),
+      tooltip: statisticsCopy.tables.totalImprintedTokens,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.totalAnchoredTokens'),
+      mobile: t('uniqueAnchorHolders.anchored'),
+      tooltip: statisticsCopy.tables.totalAnchoredTokens,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.totalDistributionEth'),
+      mobile: t('uniqueAnchorHolders.distributed'),
+      align: 'right' as const,
+      tooltip: statisticsCopy.tables.totalDistributionEth,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.unretrievedDistributionEth'),
+      mobile: t('uniqueAnchorHolders.unretrieved'),
+      align: 'right' as const,
+      tooltip: statisticsCopy.tables.unretrievedDistributionEth,
+    },
+  ];
 
   if (list.length === 0) {
-    return <p>No anchor-holders yet.</p>;
+    return <p>{t('empty.anchorHolders')}</p>;
   }
 
   return (

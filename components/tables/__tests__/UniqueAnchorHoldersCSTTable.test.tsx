@@ -22,24 +22,40 @@ const createAnchorHolder = (overrides = {}) => ({
 describe('UniqueAnchorHoldersCSTTable', () => {
   it('renders empty state when list is empty', () => {
     render(<UniqueAnchorHoldersCSTTable list={[]} />);
-    expect(screen.getByText('No anchor-holders yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.anchorHolders')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder()]} />);
-    expect(screen.getAllByText('Anchor-holder Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Num Anchor Actions').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Num Release Actions').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Imprinted Tokens').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Anchored Tokens').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Distribution (ETH)').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Unretrieved Distribution (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.anchorHolderAddress').length).toBeGreaterThanOrEqual(
+      1,
+    );
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.numAnchorActions').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.numReleaseActions').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.totalImprintedTokens').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.totalAnchoredTokens').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.totalDistributionEth').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('tables.uniqueAnchorHolders.unretrievedDistributionEth').length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('adds help triggers to anchor-holder table headers', () => {
     render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder()]} />);
     expect(
-      screen.getAllByRole('button', { name: /^Explain column:/ }).length,
+      screen.getAllByRole('button', {
+        name: /^tables\.tableHeaderHelp\.explainColumn/,
+      }).length,
     ).toBeGreaterThanOrEqual(7);
     expect(statisticsCopy.tables.totalImprintedTokens).toMatch(/imprinted/);
   });

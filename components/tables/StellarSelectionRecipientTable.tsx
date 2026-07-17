@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -30,6 +31,7 @@ type StellarSelectionRecipientEntry = (
 };
 
 const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry }) => {
+  const t = useTranslations('tables');
   const {
     TxHash = '',
     TimeStamp = 0,
@@ -92,12 +94,12 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
       </TablePrimaryCell>
       <TablePrimaryCell>
         {Amount
-          ? 'ETH Deposit'
+          ? t('stellarSelection.ethDeposit')
           : IsStaker && IsRwalk
-            ? 'Anchored-NFT Stellar Selection Cosmic Signature NFT'
+            ? t('stellarSelection.anchoredNft')
             : IsStaker && !IsRwalk
-              ? 'Cosmic Signature NFT Stellar Selection'
-              : 'Cosmic Signature NFT'}
+              ? t('stellarSelection.signatureNftSelection')
+              : t('stellarSelection.signatureNft')}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(cycleTimeoutTimesToRetrieveAllocations)}
@@ -123,6 +125,7 @@ const StellarSelectionRecipientTable = ({
   RaffleETHDeposits: StellarSelectionRecipientEntry[];
   RaffleNFTWinners: StellarSelectionRecipientEntry[];
 }) => {
+  const t = useTranslations('tables');
   const depositsExcludingLast = RaffleETHDeposits.slice(0, -1);
   const list = [...depositsExcludingLast, ...RaffleNFTWinners];
 
@@ -130,7 +133,7 @@ const StellarSelectionRecipientTable = ({
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No recipients yet.</p>;
+    return <p>{t('empty.recipients')}</p>;
   }
 
   return (
@@ -148,13 +151,15 @@ const StellarSelectionRecipientTable = ({
           </colgroup>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Recipient</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Cycle #</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Type</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Expiration Date</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.recipient')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">{t('columns.cycleHash')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.type')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                {t('columns.expirationDate')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">{t('columns.amount')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">{t('columns.tokenId')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

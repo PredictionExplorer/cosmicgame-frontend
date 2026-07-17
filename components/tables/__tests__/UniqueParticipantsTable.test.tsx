@@ -17,20 +17,24 @@ const createParticipant = (overrides = {}) => ({
 describe('UniqueParticipantsTable', () => {
   it('renders empty state when list is empty', () => {
     render(<UniqueParticipantsTable list={[]} />);
-    expect(screen.getByText('No participants yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.participants')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
-    expect(screen.getAllByText('Participant Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Number of Gestures').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Max Gesture (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.participantAddress').length).toBeGreaterThanOrEqual(
+      1,
+    );
+    expect(screen.getAllByText('tables.columns.numberOfGestures').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.maxGestureEth').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders header help triggers for confusing columns', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
     expect(
-      screen.getAllByRole('button', { name: /^Explain column:/ }).length,
+      screen.getAllByRole('button', {
+        name: /^tables\.tableHeaderHelp\.explainColumn/,
+      }).length,
     ).toBeGreaterThanOrEqual(3);
     expect(statisticsCopy.tables.numberOfGestures).toMatch(/gestures/);
   });

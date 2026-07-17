@@ -12,7 +12,7 @@ import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminE
 describe('AdminEventsTable', () => {
   test('with no records shows "No events yet."', () => {
     render(<AdminEventsTable list={[]} />);
-    expect(screen.getByText('No events yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.events')).toBeInTheDocument();
   });
 
   test('with mock data renders event rows', () => {
@@ -79,11 +79,11 @@ describe('AdminEventsTable', () => {
 
     // react-super-responsive-table duplicates header text in tdBefore divs,
     // so we use getAllByText and check the th elements
-    const eventHeaders = screen.getAllByText('Event');
+    const eventHeaders = screen.getAllByText('tables.columns.event');
     expect(eventHeaders.length).toBeGreaterThanOrEqual(1);
-    const datetimeHeaders = screen.getAllByText('Datetime');
+    const datetimeHeaders = screen.getAllByText('tables.columns.datetime');
     expect(datetimeHeaders.length).toBeGreaterThanOrEqual(1);
-    const newValueHeaders = screen.getAllByText('New Value');
+    const newValueHeaders = screen.getAllByText('tables.columns.newValue');
     expect(newValueHeaders.length).toBeGreaterThanOrEqual(1);
   });
 

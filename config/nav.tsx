@@ -15,6 +15,9 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
+import type { AppLocale } from '@/i18n/routing';
+import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+
 export interface NavDescriptor {
   title: string | ReactNode;
   route?: string;
@@ -35,90 +38,97 @@ interface ClaimStatus {
   UnretrievedAnchorDistribution?: number;
 }
 
-const getNAVs = (status: ClaimStatus | null, account: string | null) => {
+export type NavTranslator = (key: string) => string;
+
+const getNAVs = (
+  status: ClaimStatus | null,
+  account: string | null,
+  t: NavTranslator,
+  locale: AppLocale,
+) => {
   const NAVS: NavDescriptor[] = [
     {
-      title: 'Gallery',
+      title: t('links.gallery.label'),
       route: '/gallery',
-      description: 'Every Signature imprinted so far',
+      description: t('links.gallery.description'),
       icon: Images,
     },
     {
-      title: 'Explore',
+      title: t('links.explore.label'),
       route: '#',
       children: [
         {
-          title: 'Current Cycle',
+          title: t('links.currentCycle.label'),
           route: '/current-cycle',
-          description: 'Live gestures shaping the active cycle',
+          description: t('links.currentCycle.description'),
           icon: Orbit,
         },
         {
-          title: 'Allocation Recipients',
+          title: t('links.allocationRecipients.label'),
           route: '/allocation',
-          description: 'Where each cycle\u2019s reserves went',
+          description: t('links.allocationRecipients.description'),
           icon: Users,
         },
         {
-          title: 'Anchor Distributions',
+          title: t('links.anchorDistributions.label'),
           route: '/anchoring',
-          description: 'Anchored NFTs and their distributions',
+          description: t('links.anchorDistributions.description'),
           icon: Anchor,
         },
         {
-          title: 'Outreach Reserve',
+          title: t('links.outreachReserve.label'),
           route: '/marketing',
-          description: 'Community outreach activity',
+          description: t('links.outreachReserve.description'),
           icon: Megaphone,
         },
         {
-          title: 'Statistics',
+          title: t('links.statistics.label'),
           route: '/statistics',
-          description: 'Protocol-wide metrics and records',
+          description: t('links.statistics.description'),
           icon: ChartColumn,
         },
         {
-          title: 'Contracts',
+          title: t('links.contracts.label'),
           route: '/contracts',
-          description: 'Verified addresses and source code',
+          description: t('links.contracts.description'),
           icon: FileCode2,
         },
       ],
     },
     {
-      title: 'Help',
+      title: t('links.help.label'),
       route: '#',
       children: [
         {
-          title: 'How It Works',
+          title: t('links.howItWorks.label'),
           route: '/how-it-works',
-          description: 'The cycle mechanics, step by step',
+          description: t('links.howItWorks.description'),
           icon: Compass,
         },
         {
-          title: 'FAQ',
+          title: t('links.faq.label'),
           route: '/faq',
-          description: 'Answers to common questions',
+          description: t('links.faq.description'),
           icon: CircleHelp,
         },
         {
-          title: 'About Cosmic Signature',
-          route: 'https://cosmicsignature.com/about',
-          description: 'The story behind the protocol',
+          title: t('links.about.label'),
+          route: localeHref(LANDING_ORIGIN, '/about', locale),
+          description: t('links.about.description'),
           icon: ScrollText,
           external: true,
         },
         {
-          title: 'Learn Hub',
-          route: 'https://cosmicsignature.com/learn',
-          description: 'Guides and deep dives',
+          title: t('links.learn.label'),
+          route: localeHref(LANDING_ORIGIN, '/learn', locale),
+          description: t('links.learn.description'),
           icon: GraduationCap,
           external: true,
         },
         {
-          title: 'Discover Cosmic Signature',
-          route: 'https://cosmicsignature.com',
-          description: 'The art, the story, and the protocol',
+          title: t('links.discover.label'),
+          route: localeHref(LANDING_ORIGIN, '/', locale),
+          description: t('links.discover.description'),
           icon: Sparkles,
           external: true,
           featured: true,
@@ -135,7 +145,7 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
     NAVS.push({
       title: (
         <span className="relative inline-flex items-center gap-1.5">
-          My Allocations
+          {t('links.myAllocations')}
           <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
         </span>
       ),

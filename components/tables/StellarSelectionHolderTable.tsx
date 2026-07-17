@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import type { GestureInfo } from '@/services/api';
@@ -25,6 +26,7 @@ interface HolderRowProps {
 }
 
 const HolderRow = ({ holder }: HolderRowProps) => {
+  const t = useTranslations('tables');
   const { account } = useActiveWeb3React();
 
   if (!holder) {
@@ -38,7 +40,7 @@ const HolderRow = ({ holder }: HolderRowProps) => {
       <TablePrimaryCell align="left">
         <AddressLink address={holder?.userAddr ?? ''} url={`/user/${holder?.userAddr ?? ''}`} />
         &nbsp;
-        {isCurrentUser && '(You)'}
+        {isCurrentUser && t('status.you')}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{holder?.count ?? 0}</TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -62,6 +64,7 @@ const StellarSelectionHolderTable = ({
   numRaffleEthWinner,
   numRaffleNFTWinner,
 }: StellarSelectionHolderTableProps) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
   const [holderList, setHolderList] = useState<
@@ -117,13 +120,13 @@ const StellarSelectionHolderTable = ({
   }, [list, numRaffleEthWinner, numRaffleNFTWinner, account]);
 
   if (list.length === 0) {
-    return <p>No holders yet.</p>;
+    return <p>{t('empty.holders')}</p>;
   }
 
   return (
     <>
       {holderList === null ? (
-        <p className="text-lg font-semibold">Loading...</p>
+        <p className="text-lg font-semibold">{t('status.loading')}</p>
       ) : (
         <>
           <TablePrimaryContainer>
@@ -136,15 +139,15 @@ const StellarSelectionHolderTable = ({
               </colgroup>
               <TablePrimaryHead>
                 <Tr>
-                  <TablePrimaryHeadCell align="left">Holder</TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="left">{t('columns.holder')}</TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="center">
-                    Number of Stellar Selection Entries
+                    {t('columns.numberOfStellarEntries')}
                   </TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="center">
-                    Probability of Winning ETH
+                    {t('columns.ethSelectionProbability')}
                   </TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="center">
-                    Probability of Winning NFT
+                    {t('columns.nftSelectionProbability')}
                   </TablePrimaryHeadCell>
                 </Tr>
               </TablePrimaryHead>

@@ -119,7 +119,28 @@ jest.mock('next/navigation', () => ({
 jest.mock('next-intl', () => {
   const useTranslations = (namespace?: string) => {
     const prefix = namespace ? `${namespace}.` : '';
-    const t = (key: string) => `${prefix}${key}`;
+    const t = (key: string, values?: Record<string, unknown>) => {
+      if (namespace === 'tooltips') {
+        if (key === 'moreInformation') return `More information: ${String(values?.content ?? '')}`;
+        if (key === 'moreInformationAbout') {
+          return `More information about ${String(values?.label ?? '')}`;
+        }
+        if (key === 'explainColumn') return `Explain column: ${String(values?.column ?? '')}`;
+      }
+      if (namespace === 'common' && key === 'status.loadingDots') return 'Loading...';
+      if (namespace === 'errors' && key === 'state.title') return 'Something went wrong';
+      if (namespace === 'errors' && key === 'state.retry') return 'Try again';
+      if (namespace === 'wallet' && key === 'labels.nftCount') {
+        return String(values?.count ?? '');
+      }
+      const renderedValues = values
+        ? Object.entries(values)
+            .filter(([, value]) => typeof value !== 'function')
+            .map(([name, value]) => `${name}=${String(value)}`)
+            .join(',')
+        : '';
+      return `${prefix}${key}${renderedValues ? `(${renderedValues})` : ''}`;
+    };
     t.rich = (key: string) => `${prefix}${key}`;
     t.markup = (key: string) => `${prefix}${key}`;
     t.raw = (key: string) => `${prefix}${key}`;
@@ -151,7 +172,23 @@ jest.mock('next-intl/server', () => ({
   getTranslations: async (options?: string | { namespace?: string }) => {
     const namespace = typeof options === 'string' ? options : options?.namespace;
     const prefix = namespace ? `${namespace}.` : '';
-    return (key: string) => `${prefix}${key}`;
+    return (key: string, values?: Record<string, unknown>) => {
+      if (namespace === 'meta') {
+        const shared: Record<string, string> = {
+          'shared.defaultTitle': 'Cosmic Signature',
+          'shared.defaultOgTitle': 'Cosmic Signature — Every Gesture Shapes the Signature.',
+          'shared.defaultDescription':
+            'A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
+        };
+        if (shared[key]) return shared[key];
+      }
+      const renderedValues = values
+        ? Object.entries(values)
+            .map(([name, value]) => `${name}=${String(value)}`)
+            .join(',')
+        : '';
+      return `${prefix}${key}${renderedValues ? `(${renderedValues})` : ''}`;
+    };
   },
   getFormatter: async () => ({
     dateTime: (value: Date | number) => String(value),

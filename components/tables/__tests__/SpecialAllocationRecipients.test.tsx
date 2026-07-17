@@ -83,16 +83,16 @@ describe('SpecialAllocationRecipients', () => {
   it('renders section heading', () => {
     render(<SpecialAllocationRecipients />);
     expect(screen.getByTestId('special-allocation-heading')).toHaveTextContent(
-      'Special Allocation Leaders',
+      'tables.specialAllocation.heading',
     );
   });
 
   it('renders all four allocation category labels', () => {
     render(<SpecialAllocationRecipients />);
-    expect(screen.getByText('Latest Participant')).toBeInTheDocument();
-    expect(screen.getByText('Endurance Champion')).toBeInTheDocument();
-    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Final CST Gesture')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.latestParticipant')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.enduranceChampion')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.chronoWarrior')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.finalCstGesture')).toBeInTheDocument();
   });
 
   it('renders all recipient addresses as links', () => {
@@ -114,10 +114,10 @@ describe('SpecialAllocationRecipients', () => {
 
     const latestCard = screen.getByTestId('special-allocation-card-latest-participant');
     expect(latestCard).toHaveTextContent(enduranceAddress);
-    expect(latestCard).toHaveTextContent('You');
-    expect(latestCard).toHaveTextContent('Current hold');
+    expect(latestCard).toHaveTextContent('tables.status.youBadge');
+    expect(latestCard).toHaveTextContent('tables.specialAllocation.currentHold');
     expect(latestCard).toHaveTextContent('1h');
-    expect(latestCard).toHaveTextContent('Extending Endurance Champion record');
+    expect(latestCard).toHaveTextContent('tables.specialAllocation.extendingRecord');
     expect(screen.getByTestId('latest-participant-message')).toHaveTextContent('Signal received');
   });
 
@@ -125,16 +125,18 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients latestGesture={makeLatestGesture()} />);
 
     const details = screen.getByTestId('latest-participant-gesture-details');
-    expect(details).toHaveTextContent('Last Gesture');
+    expect(details).toHaveTextContent('tables.specialAllocation.lastGesture');
     expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('0.1234568 ETH');
-    expect(details).toHaveTextContent('Method');
+    expect(details).toHaveTextContent('tables.specialAllocation.method');
     expect(details).toHaveTextContent('ETH');
-    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent('No');
+    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent(
+      'tables.status.no',
+    );
     expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#7');
     expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('100.00 CST');
     expect(screen.queryByTestId('latest-participant-attached-assets')).not.toBeInTheDocument();
-    expect(details).not.toHaveTextContent('Attached assets');
-    expect(details).not.toHaveTextContent('None');
+    expect(details).not.toHaveTextContent('tables.specialAllocation.attachedAssets');
+    expect(details).not.toHaveTextContent('tables.status.none');
   });
 
   it('shows CST payment details for the latest participant gesture', () => {
@@ -151,7 +153,9 @@ describe('SpecialAllocationRecipients', () => {
     const details = screen.getByTestId('latest-participant-gesture-details');
     expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('25.5000 CST');
     expect(details).toHaveTextContent('CST');
-    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent('No');
+    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent(
+      'tables.status.no',
+    );
     expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('100.00 CST');
   });
 
@@ -194,7 +198,9 @@ describe('SpecialAllocationRecipients', () => {
       />,
     );
 
-    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('Unavailable');
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent(
+      'tables.status.unavailable',
+    );
   });
 
   it('shows Random Walk token involvement and attached assets for the latest participant gesture', () => {
@@ -216,11 +222,11 @@ describe('SpecialAllocationRecipients', () => {
     expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('0.0500000 ETH');
     expect(details).toHaveTextContent('Random Walk');
     expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent(
-      'Yes, token #123',
+      'tables.specialAllocation.yesToken',
     );
     expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('100.00 CST');
     expect(screen.getByTestId('latest-participant-attached-assets')).toHaveTextContent(
-      'Attached assets',
+      'tables.specialAllocation.attachedAssets',
     );
     expect(details).toHaveTextContent('NFT + ERC20');
   });
@@ -238,7 +244,7 @@ describe('SpecialAllocationRecipients', () => {
 
     const details = screen.getByTestId('latest-participant-gesture-details');
     expect(screen.queryByTestId('latest-participant-attached-assets')).not.toBeInTheDocument();
-    expect(details).not.toHaveTextContent('Attached assets');
+    expect(details).not.toHaveTextContent('tables.specialAllocation.attachedAssets');
   });
 
   it('does not show latest gesture details when the gesture belongs to another participant', () => {
@@ -279,11 +285,11 @@ describe('SpecialAllocationRecipients', () => {
     const latestCard = screen.getByTestId('special-allocation-card-latest-participant');
     expect(latestCard).toHaveTextContent(latestAddress);
     expect(screen.getByTestId('latest-participant-remaining')).toHaveTextContent(
-      'Needs 41s more to become Endurance Champion',
+      'tables.specialAllocation.needsToBecomeChampion',
     );
 
     const progress = screen.getByRole('progressbar', {
-      name: 'Progress toward Endurance Champion',
+      name: 'tables.specialAllocation.progressAria',
     });
     expect(progress).toHaveAttribute('aria-valuenow', '59');
     expect(progress).toHaveAttribute('aria-valuemax', '100');
@@ -311,14 +317,14 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     const enduranceCard = screen.getByTestId('special-allocation-card-endurance-champion');
-    expect(enduranceCard).not.toHaveTextContent('Live - growing');
-    expect(enduranceCard).toHaveTextContent('Record standing');
+    expect(enduranceCard).not.toHaveTextContent('tables.specialAllocation.liveGrowing');
+    expect(enduranceCard).toHaveTextContent('tables.specialAllocation.recordStanding');
 
     expect(screen.getByTestId('latest-participant-remaining')).toHaveTextContent(
-      'Needs 5m 1s more to extend record',
+      'tables.specialAllocation.needsToExtend',
     );
     expect(
-      screen.getByRole('progressbar', { name: 'Progress toward Endurance Champion' }),
+      screen.getByRole('progressbar', { name: 'tables.specialAllocation.progressAria' }),
     ).toHaveAttribute('aria-valuenow', '39');
   });
 
@@ -334,18 +340,20 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     expect(screen.getAllByTestId('champion-live-chip').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent('Record standing');
+    expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent(
+      'tables.specialAllocation.recordStanding',
+    );
   });
 
   it('renders distinct duration labels and formatted durations for both timed roles', () => {
     render(<SpecialAllocationRecipients />);
 
     const enduranceCard = screen.getByTestId('special-allocation-card-endurance-champion');
-    expect(enduranceCard).toHaveTextContent('Endurance window');
+    expect(enduranceCard).toHaveTextContent('tables.specialAllocation.enduranceWindow');
     expect(enduranceCard).toHaveTextContent('1h');
 
     const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
-    expect(chronoCard).toHaveTextContent('Champion reign');
+    expect(chronoCard).toHaveTextContent('tables.specialAllocation.championReign');
     expect(chronoCard).toHaveTextContent('30m');
   });
 
@@ -355,9 +363,9 @@ describe('SpecialAllocationRecipients', () => {
     const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
     expect(chronoCard).not.toHaveTextContent('Snapshot only');
     expect(chronoCard).not.toHaveTextContent('Source');
-    expect(chronoCard).toHaveTextContent('Standing Chrono-Warrior record');
-    expect(chronoCard).toHaveTextContent('Chrono Reign');
-    expect(chronoCard).not.toHaveTextContent('Live - growing');
+    expect(chronoCard).toHaveTextContent('tables.specialAllocation.standingChronoRecord');
+    expect(chronoCard).toHaveTextContent('tables.specialAllocation.chronoReign');
+    expect(chronoCard).not.toHaveTextContent('tables.specialAllocation.liveGrowing');
     expect(screen.queryByTestId('chrono-active-challenge')).not.toBeInTheDocument();
   });
 
@@ -388,13 +396,15 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
-    expect(chronoCard).toHaveTextContent('Growing now');
+    expect(chronoCard).toHaveTextContent('tables.specialAllocation.growingNow');
     expect(chronoCard).not.toHaveTextContent('Chain verified');
     expect(screen.getByTestId('chrono-current-segment')).toHaveTextContent('31m 40s');
     expect(screen.getByTestId('chrono-current-segment')).toHaveTextContent(
-      'Record-growing segment',
+      'tables.specialAllocation.recordGrowingSegment',
     );
-    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('May close in');
+    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent(
+      'tables.specialAllocation.mayCloseIn',
+    );
     expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('5m');
     expect(screen.queryByTestId('chrono-active-challenge')).not.toBeInTheDocument();
   });
@@ -423,17 +433,21 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     expect(screen.queryByTestId('chrono-source-status')).not.toBeInTheDocument();
-    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('Record status');
+    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent(
+      'tables.specialAllocation.recordStatus',
+    );
     expect(screen.getByTestId('chrono-next-change')).not.toHaveTextContent('Starts growing in');
     expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(
-      'Active Endurance Challenge',
+      'tables.specialAllocation.activeEnduranceChallenge',
     );
     expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(enduranceAddress);
     expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
-    expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('Can overtake in');
+    expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent(
+      'tables.specialAllocation.canOvertakeIn',
+    );
     expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('10m 1s');
     expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(
-      'not necessarily the standing Chrono-Warrior',
+      'tables.specialAllocation.challengeDescription',
     );
   });
 
@@ -459,7 +473,7 @@ describe('SpecialAllocationRecipients', () => {
     const { container } = render(<SpecialAllocationRecipients />);
 
     expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(
-      'Active Endurance Challenge',
+      'tables.specialAllocation.activeEnduranceChallenge',
     );
     await checkA11y(container);
   });
@@ -468,8 +482,8 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     const cstCard = screen.getByTestId('special-allocation-card-final-cst-gesture');
-    expect(cstCard).not.toHaveTextContent('Live - growing');
-    expect(cstCard).not.toHaveTextContent('Record standing');
+    expect(cstCard).not.toHaveTextContent('tables.specialAllocation.liveGrowing');
+    expect(cstCard).not.toHaveTextContent('tables.specialAllocation.recordStanding');
   });
 
   it('renders empty role copy when addresses are unavailable', () => {
@@ -500,10 +514,10 @@ describe('SpecialAllocationRecipients', () => {
 
     render(<SpecialAllocationRecipients />);
 
-    expect(screen.getByText('No latest gesture yet')).toBeInTheDocument();
-    expect(screen.getByText('No endurance record yet')).toBeInTheDocument();
-    expect(screen.getByText('No Chrono-Warrior record yet')).toBeInTheDocument();
-    expect(screen.getByText('Awaiting first CST gesture')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.noLatestGesture')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.noEnduranceRecord')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.noChronoRecord')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.awaitingCstGesture')).toBeInTheDocument();
   });
 
   it('shows first-record copy when latest participant exists before an endurance record', () => {
@@ -522,7 +536,7 @@ describe('SpecialAllocationRecipients', () => {
 
     render(<SpecialAllocationRecipients />);
 
-    expect(screen.getByText('First endurance record forming')).toBeInTheDocument();
+    expect(screen.getByText('tables.specialAllocation.firstRecordForming')).toBeInTheDocument();
   });
 
   it('renders loading cards when the champions query is loading', () => {

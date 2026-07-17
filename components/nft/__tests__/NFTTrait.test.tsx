@@ -185,7 +185,7 @@ describe('NFTTrait', () => {
     withNameHistory();
     render(<NFTTrait tokenId={5} />);
 
-    expect(screen.getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );

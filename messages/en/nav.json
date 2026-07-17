@@ -1,0 +1,110 @@
+{
+  "brand": {
+    "homeLabel": "Cosmic Signature home",
+    "tagline": "On-chain art protocol"
+  },
+  "primaryLabel": "Primary",
+  "menuLabel": "menu",
+  "drawerTitle": "Navigation",
+  "sections": {
+    "protocol": "Protocol",
+    "ecosystem": "Ecosystem",
+    "myAccount": "My Account"
+  },
+  "links": {
+    "gallery": {
+      "label": "Gallery",
+      "description": "Every Signature imprinted so far"
+    },
+    "explore": {
+      "label": "Explore"
+    },
+    "currentCycle": {
+      "label": "Current Cycle",
+      "description": "Live gestures shaping the active cycle"
+    },
+    "allocationRecipients": {
+      "label": "Allocation Recipients",
+      "description": "Where each cycle’s reserves went"
+    },
+    "anchorDistributions": {
+      "label": "Anchor Distributions",
+      "description": "Anchored NFTs and their distributions"
+    },
+    "outreachReserve": {
+      "label": "Outreach Reserve",
+      "description": "Community outreach activity"
+    },
+    "statistics": {
+      "label": "Statistics",
+      "description": "Protocol-wide metrics and records"
+    },
+    "contracts": {
+      "label": "Contracts",
+      "description": "Verified addresses and source code"
+    },
+    "help": {
+      "label": "Help"
+    },
+    "howItWorks": {
+      "label": "How It Works",
+      "description": "The cycle mechanics, step by step"
+    },
+    "faq": {
+      "label": "FAQ",
+      "description": "Answers to common questions"
+    },
+    "about": {
+      "label": "About Cosmic Signature",
+      "description": "The story behind the protocol"
+    },
+    "learn": {
+      "label": "Learn Hub",
+      "description": "Guides and deep dives"
+    },
+    "discover": {
+      "label": "Discover Cosmic Signature",
+      "description": "The art, the story, and the protocol"
+    },
+    "myDashboard": "My Dashboard",
+    "myAllocations": "My Allocations",
+    "myNfts": "My NFTs",
+    "myAnchors": "My Anchors",
+    "recipientHistory": "Recipient History"
+  },
+  "ecosystem": {
+    "groupLabel": "Cosmic Signature ecosystem",
+    "uniswap": {
+      "name": "Trade CST",
+      "product": "Uniswap",
+      "tagline": "Swap ETH for CST on Uniswap",
+      "ariaLabel": "Trade CST on Uniswap",
+      "defaultLabel": "Trade CST on Uniswap",
+      "shortLabel": "Trade CST"
+    },
+    "axiomZero": {
+      "name": "Axiom Zero",
+      "product": "NFT marketplace",
+      "tagline": "Collect Cosmic Signature NFTs on the zero-fee marketplace",
+      "ariaLabel": "Axiom Zero NFT marketplace",
+      "defaultLabel": "NFTs on Axiom Zero",
+      "menuLabel": "Axiom Zero Marketplace",
+      "shortLabel": "Axiom Zero"
+    },
+    "chaosZero": {
+      "name": "Chaos Zero",
+      "product": "Prediction market",
+      "tagline": "Make predictions on each cycle of the protocol",
+      "ariaLabel": "Make predictions on Chaos Zero",
+      "defaultLabel": "Make Predictions on Chaos Zero",
+      "menuLabel": "Chaos Zero Predictions",
+      "shortLabel": "Chaos Zero"
+    }
+  },
+  "maintenance": {
+    "pendingMessage": "Maintenance mode activates after the current allocation finalizes. The protocol reopens once adjustments are complete.",
+    "activeMessage": "Protocol is in maintenance mode. Gestures will resume once parameter adjustments are complete.",
+    "pendingLabel": "Pending",
+    "activeLabel": "Maintenance"
+  }
+}

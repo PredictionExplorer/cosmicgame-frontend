@@ -34,8 +34,9 @@ describe('ErrorBoundary', () => {
         <ThrowError shouldThrow />
       </ErrorBoundary>,
     );
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(screen.getByText('Test error')).toBeInTheDocument();
+    expect(screen.getByText('errors.boundary.title')).toBeInTheDocument();
+    expect(screen.getByText('errors.boundary.description')).toBeInTheDocument();
+    expect(screen.queryByText('Test error')).not.toBeInTheDocument();
   });
 
   it('displays a "Try Again" button on error', () => {
@@ -44,7 +45,7 @@ describe('ErrorBoundary', () => {
         <ThrowError shouldThrow />
       </ErrorBoundary>,
     );
-    expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'errors.boundary.retry' })).toBeInTheDocument();
   });
 
   it('resets error state when "Try Again" is clicked', () => {
@@ -54,7 +55,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    expect(screen.getByText('errors.boundary.title')).toBeInTheDocument();
 
     rerender(
       <ErrorBoundary>
@@ -62,9 +63,9 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'errors.boundary.retry' }));
     expect(screen.getByText('No error')).toBeInTheDocument();
-    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
+    expect(screen.queryByText('errors.boundary.title')).not.toBeInTheDocument();
   });
 
   it('renders custom fallback when provided', () => {
@@ -74,7 +75,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
     expect(screen.getByText('Custom fallback')).toBeInTheDocument();
-    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
+    expect(screen.queryByText('errors.boundary.title')).not.toBeInTheDocument();
   });
 
   it('shows a generic message when error has no message', () => {
@@ -87,7 +88,7 @@ describe('ErrorBoundary', () => {
         <ThrowEmpty />
       </ErrorBoundary>,
     );
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    expect(screen.getByText('errors.boundary.title')).toBeInTheDocument();
   });
 
   it('calls console.error via componentDidCatch', () => {

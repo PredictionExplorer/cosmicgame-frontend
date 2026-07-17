@@ -1,5 +1,8 @@
+'use client';
+
 import type { AnchorHTMLAttributes } from 'react';
 import { TrendingUpDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { cn } from '@/lib/utils';
@@ -15,12 +18,12 @@ interface ChaosZeroButtonProps extends Omit<
   label?: string;
 }
 
-const LABELS: Record<ChaosZeroButtonVariant, string> = {
-  default: 'Make Predictions on Chaos Zero',
-  secondary: 'Make Predictions on Chaos Zero',
-  compact: 'Chaos Zero',
-  menu: 'Chaos Zero Predictions',
-  card: 'Chaos Zero',
+const LABEL_KEYS: Record<ChaosZeroButtonVariant, string> = {
+  default: 'ecosystem.chaosZero.defaultLabel',
+  secondary: 'ecosystem.chaosZero.defaultLabel',
+  compact: 'ecosystem.chaosZero.shortLabel',
+  menu: 'ecosystem.chaosZero.menuLabel',
+  card: 'ecosystem.chaosZero.shortLabel',
 };
 
 const buttonClasses: Record<Exclude<ChaosZeroButtonVariant, 'menu'>, string> = {
@@ -34,10 +37,12 @@ export function ChaosZeroButton({
   variant = 'default',
   label,
   className,
-  'aria-label': ariaLabel = 'Make predictions on Chaos Zero',
+  'aria-label': ariaLabel,
   ...props
 }: ChaosZeroButtonProps) {
-  const text = label ?? LABELS[variant];
+  const t = useTranslations('nav');
+  const text = label ?? t(LABEL_KEYS[variant]);
+  const resolvedAriaLabel = ariaLabel ?? t('ecosystem.chaosZero.ariaLabel');
 
   if (variant === 'menu') {
     return (
@@ -45,7 +50,7 @@ export function ChaosZeroButton({
         href={CHAOS_ZERO_PREDICTIONS_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={ariaLabel}
+        aria-label={resolvedAriaLabel}
         className={cn(
           'flex w-full items-center gap-2.5 px-2 py-1.5 text-sm text-white no-underline transition-colors hover:text-primary',
           className,
@@ -71,7 +76,7 @@ export function ChaosZeroButton({
         href={CHAOS_ZERO_PREDICTIONS_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={ariaLabel}
+        aria-label={resolvedAriaLabel}
         {...props}
       >
         {text}

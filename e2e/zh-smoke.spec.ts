@@ -3,9 +3,8 @@ import { expect, test } from '@playwright/test';
 /**
  * Sprint 0 smoke coverage for the Chinese locale (docs/i18n/progress.md).
  *
- * At this stage /zh renders ENGLISH fallback copy — these tests assert the
- * i18n plumbing (routing, lang attribute, switcher, cookie persistence), not
- * translations. Translation assertions arrive with Sprints 1+.
+ * Sprint 1 translates global chrome and shared UI while later-sprint route
+ * bodies continue to use English fallback copy.
  *
  * Runs on localhost (neither configured host), which serves the dApp routes
  * without host redirects — same assumption as the other e2e suites.
@@ -23,6 +22,8 @@ test.describe('zh locale smoke', () => {
     await page.goto('/zh/gallery');
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
     await expect(page).toHaveURL(/\/zh\/gallery$/);
+    await expect(page.getByRole('textbox', { name: '搜索 NFT' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '搜索', exact: true })).toBeVisible();
   });
 
   test('/zh/faq renders under the locale prefix', async ({ page }) => {
@@ -35,6 +36,50 @@ test.describe('zh locale smoke', () => {
     // Footer links come from the shared chrome and must be locale-aware.
     const galleryLink = page.locator('footer a[href="/zh/gallery"]').first();
     await expect(galleryLink).toBeAttached();
+  });
+
+  test('global app chrome is Chinese and cross-host links carry /zh', async ({ page }) => {
+    await page.goto('/zh/faq');
+
+    await expect(page.locator('footer').getByText('服务条款', { exact: true })).toBeVisible();
+    await expect(page.locator('footer').getByText('隐私政策', { exact: true })).toBeVisible();
+
+    if ((page.viewportSize()?.width ?? 0) < 1024) {
+      await page.getByRole('button', { name: '打开菜单' }).click();
+      const drawer = page.getByRole('dialog');
+      await expect(drawer.getByText('画廊', { exact: true })).toBeVisible();
+      await expect(drawer.getByText('探索', { exact: true })).toBeVisible();
+      await expect(drawer.getByText('帮助', { exact: true })).toBeVisible();
+      await expect(drawer.getByRole('link', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
+        'href',
+        'https://cosmicsignature.com/zh/about',
+      );
+    } else {
+      const primary = page.getByRole('navigation', { name: '主导航' });
+      await expect(primary.getByText('画廊', { exact: true })).toBeVisible();
+      await expect(primary.getByText('探索', { exact: true })).toBeVisible();
+      await expect(primary.getByText('帮助', { exact: true })).toBeVisible();
+      await primary.getByRole('button', { name: '帮助' }).click();
+      await expect(page.getByRole('menuitem', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
+        'href',
+        'https://cosmicsignature.com/zh/about',
+      );
+    }
+  });
+
+  test('Sprint 1 routes render Chinese copy', async ({ page }) => {
+    await page.goto('/zh/site-map');
+    await expect(page.getByRole('heading', { level: 1, name: '网站地图' })).toBeVisible();
+    await expect(page).toHaveTitle('网站地图 · Cosmic Signature');
+    await expect(page.getByText('个人工具', { exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: /关于 Cosmic Signature/ })).toHaveAttribute(
+      'href',
+      'https://cosmicsignature.com/zh/about',
+    );
+
+    await page.goto('/zh/this-page-does-not-exist');
+    await expect(page.getByRole('heading', { level: 1, name: /404：找不到页面/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/zh');
   });
 
   test('language switcher round-trips en -> zh -> en and persists the cookie', async ({
@@ -66,7 +111,7 @@ test.describe('zh locale smoke', () => {
     await expect(page).toHaveURL(/\/zh\/faq$/);
 
     // Switch back to English.
-    const zhSwitcher = page.getByRole('button', { name: 'Language' }).last();
+    const zhSwitcher = page.getByRole('button', { name: '语言' }).last();
     await zhSwitcher.scrollIntoViewIfNeeded();
     await zhSwitcher.click();
     await page.getByRole('menuitem', { name: 'English' }).click();

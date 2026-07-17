@@ -46,17 +46,19 @@ const createAllocation = (overrides = {}) => ({
 describe('AllocationTable', () => {
   it('renders skeleton rows when loading', () => {
     render(<AllocationTable list={[]} loading={true} />);
-    expect(screen.getByRole('status', { name: /loading allocation cycles/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('status', { name: 'tables.allocation.loadingAria' }),
+    ).toBeInTheDocument();
   });
 
   it('renders empty state when not loading and list is empty', () => {
     render(<AllocationTable list={[]} loading={false} />);
-    expect(screen.getByText(/no recipients yet/i)).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.recipientCyclesTitle')).toBeInTheDocument();
   });
 
   it('renders compact two-line allocation row data', () => {
     render(<AllocationTable list={[createAllocation()]} loading={false} />);
-    expect(screen.getByText('Cycle 1')).toBeInTheDocument();
+    expect(screen.getByText('tables.allocation.cycle(cycle=1)')).toBeInTheDocument();
     expect(screen.getByText(convertTimestampToDateTime(1701346718))).toBeInTheDocument();
     expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
@@ -77,22 +79,25 @@ describe('AllocationTable', () => {
 
   it('cycle title links to the allocation detail page', () => {
     render(<AllocationTable list={[createAllocation({ RoundNum: 7 })]} loading={false} />);
-    expect(screen.getByRole('link', { name: 'Cycle 7' })).toHaveAttribute('href', '/allocation/7');
-  });
-
-  it('Explore button links to the cycle detail page', () => {
-    render(<AllocationTable list={[createAllocation({ RoundNum: 7 })]} loading={false} />);
-    expect(screen.getByRole('link', { name: 'Explore cycle 7' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'tables.allocation.cycle(cycle=7)' })).toHaveAttribute(
       'href',
       '/allocation/7',
     );
   });
 
+  it('Explore button links to the cycle detail page', () => {
+    render(<AllocationTable list={[createAllocation({ RoundNum: 7 })]} loading={false} />);
+    expect(
+      screen.getByRole('link', { name: 'tables.allocation.exploreAria(cycle=7)' }),
+    ).toHaveAttribute('href', '/allocation/7');
+  });
+
   it('renders only first page of results (perPage=10)', () => {
     const list = Array.from({ length: 12 }, (_, i) => createAllocation({ RoundNum: i + 1 }));
     render(<AllocationTable list={list} loading={false} />);
-    expect(screen.getByText('Cycle 10')).toBeInTheDocument();
-    expect(screen.queryByText('Cycle 11')).not.toBeInTheDocument();
+    const links = screen.getAllByRole('link');
+    expect(links.some((link) => link.getAttribute('href') === '/allocation/10')).toBe(true);
+    expect(links.some((link) => link.getAttribute('href') === '/allocation/11')).toBe(false);
   });
 
   it('has no accessibility violations', async () => {

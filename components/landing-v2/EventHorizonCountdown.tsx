@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight, Radio, Sparkles } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import api from '@/services/api';
 import { getCycleState, getDashboardActivationTime, type CyclePhase } from '@/lib/cycleState';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { getStableClientTargetTime } from '@/utils/time';
 import type { DashboardInfo } from '@/services/api';
 
@@ -22,7 +24,7 @@ type LandingCycleTimerSample = {
 };
 
 type TimeShard = {
-  label: 'Days' | 'Hours' | 'Min' | 'Sec';
+  label: string;
   value: number;
 };
 
@@ -52,17 +54,20 @@ function getShards(remainingMs: number): TimeShard[] {
   ];
 }
 
-function getShardsFromCountdown({
-  days,
-  hours,
-  minutes,
-  seconds,
-}: Pick<CountdownRenderProps, 'days' | 'hours' | 'minutes' | 'seconds'>): TimeShard[] {
+function getShardsFromCountdown(
+  {
+    days,
+    hours,
+    minutes,
+    seconds,
+  }: Pick<CountdownRenderProps, 'days' | 'hours' | 'minutes' | 'seconds'>,
+  labels: { days: string; hours: string; minutes: string; seconds: string },
+): TimeShard[] {
   return [
-    { label: 'Days', value: days },
-    { label: 'Hours', value: hours },
-    { label: 'Min', value: minutes },
-    { label: 'Sec', value: seconds },
+    { label: labels.days, value: days },
+    { label: labels.hours, value: hours },
+    { label: labels.minutes, value: minutes },
+    { label: labels.seconds, value: seconds },
   ];
 }
 
@@ -273,6 +278,8 @@ async function fetchLandingCycleTimerSample(): Promise<LandingCycleTimerSample> 
 }
 
 export function EventHorizonCountdown() {
+  const locale = useLocale();
+  const formatT = useTranslations('formats');
   const [sample, setSample] = useState<LandingCycleTimerSample | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [nowMs, setNowMs] = useState<number | null>(null);
@@ -334,9 +341,33 @@ export function EventHorizonCountdown() {
     snapshot.phase === 'final-minute';
   const isFinalMinutes = snapshot.phase === 'final-ten' || snapshot.phase === 'final-minute';
   const isReady = snapshot.phase === 'ready-to-finalize';
+  const longUnitLabels = {
+    days: formatT('countdownLong.days'),
+    hours: formatT('countdownLong.hours'),
+    minutes: formatT('countdownLong.minutes'),
+    seconds: formatT('countdownLong.seconds'),
+  };
+  const timerAriaLabel =
+    locale === 'zh'
+      ? snapshot.showCountdown
+        ? `${formatT('liveCycleCountdown')}：${snapshot.shards
+            .map(
+              (shard, index) =>
+                `${shard.value}${
+                  [
+                    longUnitLabels.days,
+                    longUnitLabels.hours,
+                    longUnitLabels.minutes,
+                    longUnitLabels.seconds,
+                  ][index] ?? ''
+                }`,
+            )
+            .join('，')}`
+        : formatT('liveCycleCountdown')
+      : snapshot.ariaLabel;
   const renderShardGrid = (props: CountdownRenderProps) => (
     <LandingShardGrid
-      shards={getShardsFromCountdown(props)}
+      shards={getShardsFromCountdown(props, longUnitLabels)}
       isFinalMinutes={isFinalMinutes}
       isUrgent={isUrgent}
       isOpeningSoon={isOpeningSoon}
@@ -346,7 +377,7 @@ export function EventHorizonCountdown() {
 
   return (
     <section
-      aria-label="Live Performance Cycle countdown"
+      aria-label={formatT('liveCycleCountdown')}
       className="relative w-full max-w-4xl"
       data-testid="event-horizon-countdown"
     >
@@ -412,7 +443,7 @@ export function EventHorizonCountdown() {
             </div>
           </div>
 
-          <div role="timer" aria-live="off" aria-label={snapshot.ariaLabel} className="relative">
+          <div role="timer" aria-live="off" aria-label={timerAriaLabel} className="relative">
             {snapshot.showCountdown ? (
               <SmoothCountdown date={snapshot.targetMs} renderer={renderShardGrid} />
             ) : (
@@ -431,7 +462,7 @@ export function EventHorizonCountdown() {
                       : 'Countdown synchronized to protocol time'}
               </span>
               <a
-                href="https://app.cosmicsignature.com"
+                href={localeHref(APP_ORIGIN, '/', locale)}
                 rel="noopener"
                 className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-white"
               >

@@ -43,17 +43,17 @@ describe('GalleryPagination', () => {
 
   it('renders Next button when not on last page', () => {
     render(<GalleryPagination {...defaultProps} />);
-    expect(screen.getByLabelText('Go to next page')).toBeInTheDocument();
+    expect(screen.getByLabelText('tables.pagination.nextAria')).toBeInTheDocument();
   });
 
   it('does not render Previous button on first page', () => {
     render(<GalleryPagination {...defaultProps} />);
-    expect(screen.queryByLabelText('Go to previous page')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('tables.pagination.previousAria')).not.toBeInTheDocument();
   });
 
   it('renders Previous button on page 2', () => {
     render(<GalleryPagination {...defaultProps} currentPage={2} />);
-    expect(screen.getByLabelText('Go to previous page')).toBeInTheDocument();
+    expect(screen.getByLabelText('tables.pagination.previousAria')).toBeInTheDocument();
   });
 
   it('returns null when totalItems is 0', () => {
@@ -65,7 +65,7 @@ describe('GalleryPagination', () => {
 
   it('does not render pagination links when totalPages is 1', () => {
     render(<GalleryPagination {...defaultProps} totalPages={1} totalItems={5} />);
-    expect(screen.queryByLabelText('Go to next page')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('tables.pagination.nextAria')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

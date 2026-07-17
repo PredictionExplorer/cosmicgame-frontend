@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
@@ -24,6 +25,8 @@ import type { AdminEventRow } from '@/services/api/types';
 export type { AdminEventRow };
 
 const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
+  const t = useTranslations('tables');
+
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -53,7 +56,7 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>
         {row.RecordType === 0 ? (
-          'Undefined'
+          t('status.undefined')
         ) : ADMIN_EVENTS[row.RecordType]?.type === 'timestamp' ? (
           convertTimestampToDateTime(row.IntegerValue)
         ) : ADMIN_EVENTS[row.RecordType]?.type === 'percentage' ? (
@@ -75,11 +78,12 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
 };
 
 export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
+  const t = useTranslations('tables');
   const perPage = 10;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-lg font-semibold">No events yet.</p>;
+    return <p className="text-lg font-semibold">{t('empty.events')}</p>;
   }
 
   return (
@@ -93,9 +97,9 @@ export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
           </colgroup>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Event</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">New Value</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.event')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.newValue')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

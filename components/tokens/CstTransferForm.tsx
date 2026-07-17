@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { writeContract } from '@wagmi/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Loader2, SendHorizontal } from 'lucide-react';
@@ -14,12 +15,7 @@ import { getExplorerUrl, shortenHex } from '@/utils';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';
-import {
-  getEthErrorMessage,
-  isUserRejection,
-  reportError,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -56,6 +52,7 @@ export function CstTransferForm({
   description = 'Send CST from your connected wallet to any address.',
   historyHref,
 }: CstTransferFormProps) {
+  const t = useTranslations('toasts');
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
   const [decimals, setDecimals] = useState(18);
@@ -220,7 +217,7 @@ export function CstTransferForm({
       toast.success('CST transfer confirmed.');
     } catch (err) {
       if (isUserRejection(err)) {
-        toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        toast.info(t('walletTransactionCancelled'));
         return;
       }
       reportError(err, 'Cosmic Signature CST transfer');

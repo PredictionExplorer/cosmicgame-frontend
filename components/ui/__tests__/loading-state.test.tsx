@@ -9,7 +9,7 @@ describe('LoadingState', () => {
     const { container } = render(<LoadingState />);
     // The visible title is a <p>, distinct from the Spinner's sr-only "Loading..."
     const title = container.querySelector('p.type-heading-3');
-    expect(title).toHaveTextContent(/^loading$/i);
+    expect(title).toHaveTextContent('common.status.loading');
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 

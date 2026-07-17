@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { reportError } from '@/utils/errors';
@@ -8,6 +9,11 @@ import { reportError } from '@/utils/errors';
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  messages: {
+    title: string;
+    description: string;
+    retry: string;
+  };
 }
 
 interface State {
@@ -15,7 +21,7 @@ interface State {
   error: Error | null;
 }
 
-export default class ErrorBoundary extends Component<Props, State> {
+export class ErrorBoundaryBase extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -39,12 +45,12 @@ export default class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="flex min-h-[200px] flex-col items-center justify-center p-8">
-          <h5 className="mb-2 text-xl font-semibold text-foreground">Something went wrong</h5>
-          <p className="mb-4 text-sm text-muted-foreground">
-            {this.state.error?.message || 'An unexpected error occurred.'}
-          </p>
+          <h5 className="mb-2 text-xl font-semibold text-foreground">
+            {this.props.messages.title}
+          </h5>
+          <p className="mb-4 text-sm text-muted-foreground">{this.props.messages.description}</p>
           <Button variant="outline" onClick={this.handleReset}>
-            Try Again
+            {this.props.messages.retry}
           </Button>
         </div>
       );
@@ -52,4 +58,20 @@ export default class ErrorBoundary extends Component<Props, State> {
 
     return this.props.children;
   }
+}
+
+export default function ErrorBoundary({ children, fallback }: Omit<Props, 'messages'>) {
+  const t = useTranslations('errors');
+  return (
+    <ErrorBoundaryBase
+      fallback={fallback}
+      messages={{
+        title: t('boundary.title'),
+        description: t('boundary.description'),
+        retry: t('boundary.retry'),
+      }}
+    >
+      {children}
+    </ErrorBoundaryBase>
+  );
 }

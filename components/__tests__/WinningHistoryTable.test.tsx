@@ -28,14 +28,14 @@ const createEntry = (overrides: Partial<WinningHistoryEntry> = {}): WinningHisto
 describe('RecipientHistoryTable', () => {
   it('renders "No history yet." when list is empty', () => {
     render(<RecipientHistoryTable winningHistory={[]} />);
-    expect(screen.getByText('No history yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.history')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<RecipientHistoryTable winningHistory={[createEntry()]} />);
-    const headers = screen.getAllByText('Record Type');
+    const headers = screen.getAllByText('tables.columns.recordType');
     expect(headers.length).toBeGreaterThanOrEqual(1);
-    const datetimeHeaders = screen.getAllByText('Datetime');
+    const datetimeHeaders = screen.getAllByText('tables.columns.datetime');
     expect(datetimeHeaders.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -47,13 +47,13 @@ describe('RecipientHistoryTable', () => {
 
   it('renders record type text for Main ETH Allocation', () => {
     render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 0 })]} />);
-    expect(screen.getByText('Main ETH Allocation')).toBeInTheDocument();
+    expect(screen.getByText('tables.recipientHistory.types.mainEth')).toBeInTheDocument();
   });
 
   it('renders record type text for Final CST Gesture CS NFT', () => {
     render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 3, TokenId: 1 })]} />);
-    expect(screen.getByText('Final CST Gesture CS NFT')).toBeInTheDocument();
-    expect(screen.getByText('N/A')).toBeInTheDocument();
+    expect(screen.getByText('tables.recipientHistory.types.finalCstNft')).toBeInTheDocument();
+    expect(screen.getByText('tables.recipientHistory.notApplicable')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/detail/1');
   });
 
@@ -63,7 +63,9 @@ describe('RecipientHistoryTable', () => {
         winningHistory={[createEntry({ RecordType: 10, AmountEth: 0.329286 })]}
       />,
     );
-    expect(screen.getByText('ETH Stellar Selection (for participants)')).toBeInTheDocument();
+    expect(
+      screen.getByText('tables.recipientHistory.types.participantStellarEth'),
+    ).toBeInTheDocument();
     expect(screen.getByText('0.3293 ETH')).toBeInTheDocument();
   });
 
@@ -105,13 +107,13 @@ describe('RecipientHistoryTable', () => {
   it('renders recipient address when showWinnerAddr is true', () => {
     const entry = createEntry();
     render(<RecipientHistoryTable winningHistory={[entry]} showWinnerAddr={true} />);
-    const recipientHeaders = screen.getAllByText('Recipient');
+    const recipientHeaders = screen.getAllByText('tables.columns.recipient');
     expect(recipientHeaders.length).toBeGreaterThanOrEqual(1);
   });
 
   it('hides recipient column when showWinnerAddr is false', () => {
     render(<RecipientHistoryTable winningHistory={[createEntry()]} showWinnerAddr={false} />);
-    expect(screen.queryByText('Recipient')).not.toBeInTheDocument();
+    expect(screen.queryByText('tables.columns.recipient')).not.toBeInTheDocument();
   });
 
   it('renders token ID link when TokenId >= 0', () => {

@@ -62,7 +62,7 @@ describe('SkeletonText', () => {
 describe('SkeletonStatCard', () => {
   it('exposes a single loading status wrapper', () => {
     render(<SkeletonStatCard />);
-    expect(screen.getByRole('status', { name: /loading stat/i })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'tables.skeleton.loadingStat' })).toBeInTheDocument();
   });
 });
 
@@ -77,6 +77,6 @@ describe('SkeletonTableRow', () => {
 describe('SkeletonNFTCard', () => {
   it('exposes a loading status', () => {
     render(<SkeletonNFTCard />);
-    expect(screen.getByRole('status', { name: /loading nft/i })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'tables.skeleton.loadingNft' })).toBeInTheDocument();
   });
 });

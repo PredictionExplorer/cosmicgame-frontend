@@ -101,6 +101,20 @@
     font-weight: 700;
   }
 
+  /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese
+     document, translated nav/table/status copy must keep natural CJK spacing. */
+  html[lang='zh'] [class*='tracking-'] {
+    letter-spacing: 0 !important;
+  }
+
+  /* Keep Latin identifiers monospaced while routing CJK glyphs through the
+     project font instead of an OS-dependent monospace fallback. */
+  html[lang='zh'] .font-mono {
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, var(--font-noto-sc), 'PingFang SC',
+      'Microsoft YaHei', monospace !important;
+  }
+
   button,
   a,
   [role='button'],

@@ -265,7 +265,7 @@ describe('CstTransferForm', () => {
     submitTransferForm();
 
     await waitFor(() =>
-      expect(toast.info).toHaveBeenCalledWith(expect.stringContaining('cancelled')),
+      expect(toast.info).toHaveBeenCalledWith('toasts.walletTransactionCancelled'),
     );
     expect(mockWaitForTransactionReceipt).not.toHaveBeenCalled();
   });

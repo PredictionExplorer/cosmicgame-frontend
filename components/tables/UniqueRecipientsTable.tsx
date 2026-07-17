@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { statisticsCopy } from '@/content/statistics-copy';
@@ -48,11 +49,12 @@ interface UniqueRecipientsTableProps {
 }
 
 export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No recipients yet.</p>;
+    return <p>{t('empty.recipients')}</p>;
   }
 
   return (
@@ -63,25 +65,25 @@ export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
             <Tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
-                  desktop="Recipient Address"
+                  desktop={t('columns.recipientAddress')}
                   tooltip={statisticsCopy.tables.recipientAddress}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
-                  desktop="Allocations Received"
+                  desktop={t('columns.allocationsReceived')}
                   tooltip={statisticsCopy.tables.allocationsReceived}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
-                  desktop="Max Allocation (ETH)"
+                  desktop={t('columns.maxAllocationEth')}
                   tooltip={statisticsCopy.tables.maxAllocationEth}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
-                  desktop="Allocations Sum (ETH)"
+                  desktop={t('columns.allocationsSumEth')}
                   tooltip={statisticsCopy.tables.allocationsSumEth}
                 />
               </TablePrimaryHeadCell>

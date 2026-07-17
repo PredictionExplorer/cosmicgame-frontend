@@ -1,14 +1,17 @@
 'use client';
 
 import Image from 'next/image';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import type { AppLocale } from '@/i18n/routing';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { FooterWrapper } from '@/components/styled';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { getClientBuildInfo, isVercelProductionDeploy } from '@/lib/buildInfo';
+import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
 const XIcon = (props: { className?: string }) => (
   <svg
@@ -40,44 +43,93 @@ const DiscordIcon = (props: { className?: string }) => (
  * crawl path for them — every internal route from the header nav must stay
  * reachable here or on /site-map (enforced by app/__tests__/crawl-paths).
  */
-const footerLinks: Record<string, { label: string; href: string; external?: boolean }[]> = {
-  Protocol: [
-    { label: 'Gallery', href: '/gallery' },
-    { label: 'Current Cycle', href: '/current-cycle' },
-    { label: 'Statistics', href: '/statistics' },
-    { label: 'Contracts', href: '/contracts' },
-    { label: 'Source Code', href: '/code' },
-  ],
-  Explore: [
-    { label: 'Allocation Recipients', href: '/allocation' },
-    { label: 'Anchor Distributions', href: '/anchoring' },
-    { label: 'Outreach Reserve', href: '/marketing' },
-    { label: 'How It Works', href: '/how-it-works' },
-    { label: 'FAQ', href: '/faq' },
-  ],
-  Ecosystem: [
-    { label: 'Axiom Zero Marketplace', href: COSMIC_SIGNATURE_MARKETPLACE_URL, external: true },
-    { label: 'Chaos Zero Predictions', href: CHAOS_ZERO_PREDICTIONS_URL, external: true },
-    { label: 'Trade CST on Uniswap', href: CST_UNISWAP_SWAP_URL, external: true },
-  ],
-  Resources: [
-    { label: 'About', href: 'https://cosmicsignature.com/about', external: true },
-    { label: 'Learn', href: 'https://cosmicsignature.com/learn', external: true },
-    { label: 'Site Map', href: '/site-map' },
+type FooterTranslator = (key: string) => string;
+
+interface FooterLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+interface FooterGroup {
+  title: string;
+  links: FooterLink[];
+}
+
+function getFooterLinks(t: FooterTranslator, locale: AppLocale): FooterGroup[] {
+  return [
     {
-      label: 'Protocol Guild',
-      href: 'https://protocol-guild.readthedocs.io',
-      external: true,
+      title: t('sections.protocol'),
+      links: [
+        { label: t('links.gallery'), href: '/gallery' },
+        { label: t('links.currentCycle'), href: '/current-cycle' },
+        { label: t('links.statistics'), href: '/statistics' },
+        { label: t('links.contracts'), href: '/contracts' },
+        { label: t('links.sourceCode'), href: '/code' },
+      ],
     },
-  ],
-  Community: [
-    { label: 'Twitter / X', href: 'https://x.com/CosmicSignature', external: true },
-    { label: 'Discord', href: 'https://discord.gg/bGnPn96Qwt', external: true },
-    { label: 'Discover', href: 'https://cosmicsignature.com', external: true },
-  ],
-};
+    {
+      title: t('sections.explore'),
+      links: [
+        { label: t('links.allocationRecipients'), href: '/allocation' },
+        { label: t('links.anchorDistributions'), href: '/anchoring' },
+        { label: t('links.outreachReserve'), href: '/marketing' },
+        { label: t('links.howItWorks'), href: '/how-it-works' },
+        { label: t('links.faq'), href: '/faq' },
+      ],
+    },
+    {
+      title: t('sections.ecosystem'),
+      links: [
+        {
+          label: t('links.axiomZero'),
+          href: COSMIC_SIGNATURE_MARKETPLACE_URL,
+          external: true,
+        },
+        { label: t('links.chaosZero'), href: CHAOS_ZERO_PREDICTIONS_URL, external: true },
+        { label: t('links.uniswap'), href: CST_UNISWAP_SWAP_URL, external: true },
+      ],
+    },
+    {
+      title: t('sections.resources'),
+      links: [
+        {
+          label: t('links.about'),
+          href: localeHref(LANDING_ORIGIN, '/about', locale),
+          external: true,
+        },
+        {
+          label: t('links.learn'),
+          href: localeHref(LANDING_ORIGIN, '/learn', locale),
+          external: true,
+        },
+        { label: t('links.siteMap'), href: '/site-map' },
+        {
+          label: t('links.protocolGuild'),
+          href: 'https://protocol-guild.readthedocs.io',
+          external: true,
+        },
+      ],
+    },
+    {
+      title: t('sections.community'),
+      links: [
+        { label: t('links.twitter'), href: 'https://x.com/CosmicSignature', external: true },
+        { label: t('links.discord'), href: 'https://discord.gg/bGnPn96Qwt', external: true },
+        {
+          label: t('links.discover'),
+          href: localeHref(LANDING_ORIGIN, '/', locale),
+          external: true,
+        },
+      ],
+    },
+  ];
+}
 
 const Footer = () => {
+  const t = useTranslations('footer');
+  const locale = useLocale() as AppLocale;
+  const footerLinks = getFooterLinks(t, locale);
   const build = getClientBuildInfo();
   const showBuild =
     build && (!isVercelProductionDeploy() || process.env.NEXT_PUBLIC_SHOW_BUILD_COMMIT === '1');
@@ -108,15 +160,14 @@ const Footer = () => {
                 className="mt-4 max-w-[260px] text-sm leading-relaxed text-white/60"
                 style={{ fontFamily: 'var(--font-inter, inherit)' }}
               >
-                A procedural on-chain art protocol on Arbitrum. Every gesture shapes the
-                cycle&apos;s final Signature.
+                {t('tagline')}
               </p>
               <div className="mt-5 flex items-center gap-2">
                 <a
                   href="https://x.com/CosmicSignature"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Twitter"
+                  aria-label={t('social.twitterLabel')}
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
                 >
                   <XIcon />
@@ -125,7 +176,7 @@ const Footer = () => {
                   href="https://discord.gg/bGnPn96Qwt"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Discord"
+                  aria-label={t('social.discordLabel')}
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
                 >
                   <DiscordIcon />
@@ -133,7 +184,7 @@ const Footer = () => {
               </div>
             </div>
 
-            {Object.entries(footerLinks).map(([title, links]) => (
+            {footerLinks.map(({ title, links }) => (
               <div key={title}>
                 <h4 className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
                   {title}
@@ -167,9 +218,7 @@ const Footer = () => {
 
           <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-xs sm:flex-row">
             <div className="flex flex-col items-center gap-1 sm:items-start">
-              <p className="text-white/50">
-                &copy; {new Date().getFullYear()} Cosmic Signature. CC0 1.0 · Public domain.
-              </p>
+              <p className="text-white/50">{t('copyright', { year: new Date().getFullYear() })}</p>
               {showBuild ? (
                 <p
                   data-testid="build-commit"
@@ -183,19 +232,19 @@ const Footer = () => {
             </div>
             <div className="flex items-center gap-6">
               <span className="font-mono uppercase tracking-[0.24em] text-white/40">
-                CC0 · Verified · Reproducible
+                {t('colophon')}
               </span>
               <Link
                 href="/terms"
                 className="text-white/60 no-underline transition hover:text-white"
               >
-                Terms
+                {t('links.terms')}
               </Link>
               <Link
                 href="/privacy"
                 className="text-white/60 no-underline transition hover:text-white"
               >
-                Privacy
+                {t('links.privacy')}
               </Link>
               <LanguageSwitcher />
             </div>

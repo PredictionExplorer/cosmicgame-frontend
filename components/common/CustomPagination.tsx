@@ -1,4 +1,5 @@
 import { useMemo, type ChangeEvent } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -49,6 +50,7 @@ export const CustomPagination = ({
   totalLength,
   perPage,
 }: CustomPaginationProps) => {
+  const t = useTranslations('tables');
   const pageCount = useMemo(
     () => Math.max(1, Math.ceil(totalLength / perPage)),
     [totalLength, perPage],
@@ -88,7 +90,7 @@ export const CustomPagination = ({
 
       {showGoToInput && (
         <div className="my-1 flex items-center sm:ml-8">
-          <span className="mr-2 text-sm">Go to page:</span>
+          <span className="mr-2 text-sm">{t('pagination.goToPage')}</span>
           <Input
             type="number"
             className="max-w-[100px]"
@@ -96,7 +98,7 @@ export const CustomPagination = ({
             onChange={handleInputChange}
             min={1}
             max={pageCount}
-            aria-label="go to page"
+            aria-label={t('pagination.goToPageAria')}
           />
         </div>
       )}

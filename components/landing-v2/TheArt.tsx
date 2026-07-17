@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useLocale } from 'next-intl';
 
 import { formatId, getAssetsUrl } from '@/utils';
 import { landingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { networkConfig } from '@/config/networks';
-import { APP_ORIGIN } from '@/lib/hostRouting';
+import { APP_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import NFTImage from '@/components/nft/NFTImage';
 
@@ -85,6 +86,7 @@ function GenerativeProcessVisual() {
 }
 
 export function TheArt() {
+  const locale = useLocale();
   const tokens = useLandingShowcaseTokens();
   const rotationIndex = useRotatingIndex({
     count: tokens.length,
@@ -118,7 +120,10 @@ export function TheArt() {
             {showcaseToken && showcaseImage && tokenLabel ? (
               <Link
                 key={showcaseToken.TokenId}
-                href={`${APP_ORIGIN}/detail/${showcaseToken.TokenId}`}
+                href={localizeCrossHostHref(
+                  `${APP_ORIGIN}/detail/${showcaseToken.TokenId}`,
+                  locale,
+                )}
                 className="group block h-full animate-in fade-in duration-700"
                 aria-label={`View Cosmic Signature ${tokenLabel}`}
               >

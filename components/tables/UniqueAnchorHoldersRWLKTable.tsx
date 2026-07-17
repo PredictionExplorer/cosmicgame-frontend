@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { statisticsCopy } from '@/content/statistics-copy';
@@ -18,35 +19,6 @@ import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { UniqueAnchorHolderRWLK } from '@/services/api/types';
 
 export type { UniqueAnchorHolderRWLK };
-
-const responsiveHeaders = [
-  {
-    desktop: 'Anchor-holder Address',
-    mobile: 'Holder',
-    align: 'left' as const,
-    tooltip: statisticsCopy.tables.anchorHolderAddress,
-  },
-  {
-    desktop: 'Num Anchor Actions',
-    mobile: 'Anchors',
-    tooltip: statisticsCopy.tables.numAnchorActions,
-  },
-  {
-    desktop: 'Num Release Actions',
-    mobile: 'Releases',
-    tooltip: statisticsCopy.tables.numReleaseActions,
-  },
-  {
-    desktop: 'Total Anchored Tokens',
-    mobile: 'Anchored',
-    tooltip: statisticsCopy.tables.totalAnchoredTokens,
-  },
-  {
-    desktop: 'Total Imprinted Tokens',
-    mobile: 'Imprinted',
-    tooltip: statisticsCopy.tables.totalImprintedTokens,
-  },
-];
 
 const UniqueAnchorHoldersRWLKRow = ({ row }: { row: UniqueAnchorHolderRWLK }) => {
   if (!row) {
@@ -75,11 +47,40 @@ const UniqueAnchorHoldersRWLKRow = ({ row }: { row: UniqueAnchorHolderRWLK }) =>
 };
 
 export const UniqueAnchorHoldersRWLKTable = ({ list }: { list: UniqueAnchorHolderRWLK[] }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
+  const responsiveHeaders = [
+    {
+      desktop: t('columns.anchorHolderAddress'),
+      mobile: t('columns.holder'),
+      align: 'left' as const,
+      tooltip: statisticsCopy.tables.anchorHolderAddress,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.numAnchorActions'),
+      mobile: t('uniqueAnchorHolders.anchors'),
+      tooltip: statisticsCopy.tables.numAnchorActions,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.numReleaseActions'),
+      mobile: t('uniqueAnchorHolders.releases'),
+      tooltip: statisticsCopy.tables.numReleaseActions,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.totalAnchoredTokens'),
+      mobile: t('uniqueAnchorHolders.anchored'),
+      tooltip: statisticsCopy.tables.totalAnchoredTokens,
+    },
+    {
+      desktop: t('uniqueAnchorHolders.totalImprintedTokens'),
+      mobile: t('uniqueAnchorHolders.imprinted'),
+      tooltip: statisticsCopy.tables.totalImprintedTokens,
+    },
+  ];
 
   if (list.length === 0) {
-    return <p>No anchor-holders yet.</p>;
+    return <p>{t('empty.anchorHolders')}</p>;
   }
 
   return (

@@ -1,6 +1,7 @@
 'use client';
 
 import { Info } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -24,10 +25,17 @@ export function InfoTooltip({
   ariaLabel,
   label,
 }: InfoTooltipProps) {
-  const defaultAriaLabel = content.length > 72 ? `${content.slice(0, 69).trimEnd()}...` : content;
+  const t = useTranslations('tooltips');
+  const locale = useLocale();
+  const defaultAriaLabel =
+    content.length > 72
+      ? `${content.slice(0, 69).trimEnd()}${locale === 'zh' ? '…' : '...'}`
+      : content;
   const resolvedAriaLabel =
     ariaLabel ??
-    (label ? `More information about ${label}` : `More information: ${defaultAriaLabel}`);
+    (label
+      ? t('moreInformationAbout', { label })
+      : t('moreInformation', { content: defaultAriaLabel }));
 
   return (
     <Tooltip>

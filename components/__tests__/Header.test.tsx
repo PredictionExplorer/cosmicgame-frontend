@@ -75,43 +75,43 @@ describe('Header (desktop)', () => {
     const logo = screen.getByAltText('Cosmic Signature');
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute('src', '/images/logo2.svg');
-    expect(screen.getByRole('link', { name: /cosmic signature home/i })).toHaveAttribute(
-      'href',
-      '/',
-    );
+    expect(screen.getByRole('link', { name: 'nav.brand.homeLabel' })).toHaveAttribute('href', '/');
   });
 
   it('renders the brand wordmark next to the logo', () => {
     render(<Header />);
-    const home = screen.getByRole('link', { name: /cosmic signature home/i });
+    const home = screen.getByRole('link', { name: 'nav.brand.homeLabel' });
     expect(within(home).getByText('Cosmic Signature')).toBeInTheDocument();
-    expect(within(home).getByText(/on-chain art protocol/i)).toBeInTheDocument();
+    expect(within(home).getByText('nav.brand.tagline')).toBeInTheDocument();
   });
 
   it('renders the primary navigation rail with lexicon-safe labels', () => {
     render(<Header />);
-    const primaryNav = screen.getByRole('navigation', { name: 'Primary' });
-    expect(within(primaryNav).getByText('Gallery')).toBeInTheDocument();
-    expect(within(primaryNav).getByText('Explore')).toBeInTheDocument();
-    expect(within(primaryNav).getByText('Help')).toBeInTheDocument();
+    const primaryNav = screen.getByRole('navigation', { name: 'nav.primaryLabel' });
+    expect(within(primaryNav).getByText('nav.links.gallery.label')).toBeInTheDocument();
+    expect(within(primaryNav).getByText('nav.links.explore.label')).toBeInTheDocument();
+    expect(within(primaryNav).getByText('nav.links.help.label')).toBeInTheDocument();
   });
 
   it('links Gallery directly to the gallery page', () => {
     render(<Header />);
-    expect(screen.getByRole('link', { name: 'Gallery' })).toHaveAttribute('href', '/gallery');
+    expect(screen.getByRole('link', { name: 'nav.links.gallery.label' })).toHaveAttribute(
+      'href',
+      '/gallery',
+    );
   });
 
   it('opens the Explore panel with icons and supporting copy', async () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: /explore/i }));
+    await user.click(screen.getByRole('button', { name: 'nav.links.explore.label' }));
 
     const menu = await screen.findByRole('menu');
-    expect(within(menu).getByText('Current Cycle')).toBeInTheDocument();
-    expect(within(menu).getByText('Live gestures shaping the active cycle')).toBeInTheDocument();
-    expect(within(menu).getByText('Statistics')).toBeInTheDocument();
-    expect(within(menu).getByText('Contracts')).toBeInTheDocument();
+    expect(within(menu).getByText('nav.links.currentCycle.label')).toBeInTheDocument();
+    expect(within(menu).getByText('nav.links.currentCycle.description')).toBeInTheDocument();
+    expect(within(menu).getByText('nav.links.statistics.label')).toBeInTheDocument();
+    expect(within(menu).getByText('nav.links.contracts.label')).toBeInTheDocument();
 
     const links = within(menu).getAllByRole('menuitem');
     expect(links.length).toBe(6);
@@ -121,63 +121,61 @@ describe('Header (desktop)', () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: /help/i }));
+    await user.click(screen.getByRole('button', { name: 'nav.links.help.label' }));
 
     const menu = await screen.findByRole('menu');
     const discover = within(menu).getByRole('menuitem', {
-      name: /discover cosmic signature/i,
+      name: /nav\.links\.discover\.label/i,
     });
     expect(discover).toHaveAttribute('href', 'https://cosmicsignature.com');
     expect(discover).toHaveAttribute('rel', 'noopener');
-    expect(within(menu).getByText('The art, the story, and the protocol')).toBeInTheDocument();
+    expect(within(menu).getByText('nav.links.discover.description')).toBeInTheDocument();
   });
 
   it('keeps internal and cross-host help links in the Help panel', async () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: /help/i }));
+    await user.click(screen.getByRole('button', { name: 'nav.links.help.label' }));
 
     const menu = await screen.findByRole('menu');
-    expect(within(menu).getByRole('menuitem', { name: /how it works/i })).toHaveAttribute(
+    expect(
+      within(menu).getByRole('menuitem', { name: /nav\.links\.howItWorks\.label/i }),
+    ).toHaveAttribute('href', '/how-it-works');
+    expect(within(menu).getByRole('menuitem', { name: /nav\.links\.faq\.label/i })).toHaveAttribute(
       'href',
-      '/how-it-works',
+      '/faq',
     );
-    expect(within(menu).getByRole('menuitem', { name: /faq/i })).toHaveAttribute('href', '/faq');
-    expect(within(menu).getByRole('menuitem', { name: /about cosmic signature/i })).toHaveAttribute(
-      'href',
-      'https://cosmicsignature.com/about',
-    );
-    expect(within(menu).getByRole('menuitem', { name: /learn hub/i })).toHaveAttribute(
-      'href',
-      'https://cosmicsignature.com/learn',
-    );
+    expect(
+      within(menu).getByRole('menuitem', { name: /nav\.links\.about\.label/i }),
+    ).toHaveAttribute('href', 'https://cosmicsignature.com/about');
+    expect(
+      within(menu).getByRole('menuitem', { name: /nav\.links\.learn\.label/i }),
+    ).toHaveAttribute('href', 'https://cosmicsignature.com/learn');
   });
 
   it('renders the ecosystem dock with all three destinations', () => {
     render(<Header />);
 
-    const dock = screen.getByRole('group', { name: 'Cosmic Signature ecosystem' });
-    expect(within(dock).getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
-      'href',
-      CST_UNISWAP_SWAP_URL,
-    );
-    expect(within(dock).getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
-      'href',
-      COSMIC_SIGNATURE_MARKETPLACE_URL,
-    );
+    const dock = screen.getByRole('group', { name: 'nav.ecosystem.groupLabel' });
     expect(
-      within(dock).getByRole('link', { name: 'Make predictions on Chaos Zero' }),
+      within(dock).getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' }),
+    ).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
+    expect(
+      within(dock).getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
+    ).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
+    expect(
+      within(dock).getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' }),
     ).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
   });
 
   it('names Axiom Zero and Chaos Zero visibly in the dock', () => {
     render(<Header />);
 
-    const dock = screen.getByRole('group', { name: 'Cosmic Signature ecosystem' });
-    expect(within(dock).getByText('Axiom Zero')).toBeInTheDocument();
-    expect(within(dock).getByText('Chaos Zero')).toBeInTheDocument();
-    expect(within(dock).getByText('Trade CST')).toBeInTheDocument();
+    const dock = screen.getByRole('group', { name: 'nav.ecosystem.groupLabel' });
+    expect(within(dock).getByText('nav.ecosystem.axiomZero.name')).toBeInTheDocument();
+    expect(within(dock).getByText('nav.ecosystem.chaosZero.name')).toBeInTheDocument();
+    expect(within(dock).getByText('nav.ecosystem.uniswap.name')).toBeInTheDocument();
   });
 
   it('does not render a maintenance banner when systemMode is 0', () => {
@@ -194,7 +192,7 @@ describe('Header (desktop)', () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: /help/i }));
+    await user.click(screen.getByRole('button', { name: 'nav.links.help.label' }));
     const menu = await screen.findByRole('menu');
 
     // Scoped to the panel: Radix aria-hides background content while open.
@@ -218,37 +216,37 @@ describe('Header (mobile)', () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: 'menu' }));
+    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
 
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByRole('link', { name: /gallery/i })).toHaveAttribute(
+    expect(
+      within(dialog).getByRole('link', { name: /nav\.links\.gallery\.label/i }),
+    ).toHaveAttribute('href', '/gallery');
+    expect(
+      within(dialog).getByRole('link', { name: /nav\.links\.currentCycle\.label/i }),
+    ).toHaveAttribute('href', '/current-cycle');
+    expect(within(dialog).getByRole('link', { name: /nav\.links\.faq\.label/i })).toHaveAttribute(
       'href',
-      '/gallery',
+      '/faq',
     );
-    expect(within(dialog).getByRole('link', { name: /current cycle/i })).toHaveAttribute(
-      'href',
-      '/current-cycle',
-    );
-    expect(within(dialog).getByRole('link', { name: /faq/i })).toHaveAttribute('href', '/faq');
   });
 
   it('renders the ecosystem section inside the drawer', async () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: 'menu' }));
+    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
 
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText('Ecosystem')).toBeInTheDocument();
-    expect(within(dialog).getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
-      'href',
-      CST_UNISWAP_SWAP_URL,
-    );
+    expect(within(dialog).getByText('nav.sections.ecosystem')).toBeInTheDocument();
     expect(
-      within(dialog).getByRole('link', { name: 'Axiom Zero NFT marketplace' }),
+      within(dialog).getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' }),
+    ).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
+    expect(
+      within(dialog).getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
     ).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
     expect(
-      within(dialog).getByRole('link', { name: 'Make predictions on Chaos Zero' }),
+      within(dialog).getByRole('link', { name: 'nav.ecosystem.chaosZero.ariaLabel' }),
     ).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
   });
 
@@ -256,10 +254,10 @@ describe('Header (mobile)', () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: 'menu' }));
+    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
 
     const dialog = await screen.findByRole('dialog');
-    const discover = within(dialog).getByRole('link', { name: /discover cosmic signature/i });
+    const discover = within(dialog).getByRole('link', { name: /nav\.links\.discover\.label/i });
     expect(discover).toHaveAttribute('href', 'https://cosmicsignature.com');
     expect(discover).toHaveAttribute('rel', 'noopener');
   });
@@ -268,13 +266,13 @@ describe('Header (mobile)', () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: 'menu' }));
+    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
 
     const dialog = await screen.findByRole('dialog');
     for (const name of [
-      'Trade CST on Uniswap',
-      'Axiom Zero NFT marketplace',
-      'Make predictions on Chaos Zero',
+      'nav.ecosystem.uniswap.ariaLabel',
+      'nav.ecosystem.axiomZero.ariaLabel',
+      'nav.ecosystem.chaosZero.ariaLabel',
     ]) {
       const link = within(dialog).getByRole('link', { name });
       expect(link).toHaveAttribute('target', '_blank');
@@ -286,7 +284,7 @@ describe('Header (mobile)', () => {
     const user = userEvent.setup();
     render(<Header />);
 
-    await user.click(screen.getByRole('button', { name: 'menu' }));
+    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
     const dialog = await screen.findByRole('dialog');
 
     // Scoped to the drawer: Radix aria-hides background content while open.

@@ -15,19 +15,25 @@ const createDonor = (overrides = {}) => ({
 describe('UniqueEthDonorsTable', () => {
   it('renders empty state when list is empty', () => {
     render(<UniqueEthDonorsTable list={[]} />);
-    expect(screen.getByText('No contributors yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.contributors')).toBeInTheDocument();
   });
 
   it('renders empty state when list is null/undefined', () => {
     render(<UniqueEthDonorsTable list={null as unknown as never[]} />);
-    expect(screen.getByText('No contributors yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.contributors')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<UniqueEthDonorsTable list={[createDonor()]} />);
-    expect(screen.getAllByText('Contributor Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Number of Contributions').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Contributed Amount (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.contributorAddress').length).toBeGreaterThanOrEqual(
+      1,
+    );
+    expect(
+      screen.getAllByText('tables.columns.numberOfContributions').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.totalContributedEth').length).toBeGreaterThanOrEqual(
+      1,
+    );
   });
 
   it('renders contributor data', () => {

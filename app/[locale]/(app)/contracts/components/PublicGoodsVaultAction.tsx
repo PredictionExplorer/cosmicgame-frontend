@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { writeContract } from '@wagmi/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Loader2, SendHorizontal, Vault } from 'lucide-react';
@@ -10,12 +11,7 @@ import { useConfig, usePublicClient } from 'wagmi';
 import { charityWalletAbi as CHARITY_WALLET_ABI } from '@/contracts/abis';
 import { formatEthValue, shortenHex } from '@/utils';
 
-import {
-  getEthErrorMessage,
-  isUserRejection,
-  reportError,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -38,6 +34,7 @@ export function PublicGoodsVaultAction({
   beneficiaryAddress,
   vaultBalanceEth,
 }: PublicGoodsVaultActionProps) {
+  const t = useTranslations('toasts');
   const [submitting, setSubmitting] = useState(false);
   const config = useConfig();
   const publicClient = usePublicClient({ chainId: activeChain.id });
@@ -80,7 +77,7 @@ export function PublicGoodsVaultAction({
       toast.success('Public-goods funds were forwarded to Protocol Guild.');
     } catch (err) {
       if (isUserRejection(err)) {
-        toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        toast.info(t('walletTransactionCancelled'));
         return;
       }
       reportError(err, 'forward public goods vault funds');

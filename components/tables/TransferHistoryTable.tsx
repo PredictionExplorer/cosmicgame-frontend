@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -24,6 +25,7 @@ function addrEq(a: string | undefined, b: string): boolean {
 }
 
 const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
+  const t = useTranslations('tables');
   const { stakingCst, stakingRwalk } = useContractAddresses();
   if (!record || record.FromAddr === ZERO_ADDRESS) {
     return null;
@@ -48,9 +50,9 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           <TooltipTrigger asChild>
             <Link href={`/user/${FromAddr}`} className="text-inherit font-mono">
               {addrEq(FromAddr, stakingCst)
-                ? 'Cosmic Signature NFT Anchoring Wallet'
+                ? t('transferHistory.signatureAnchoringWallet')
                 : addrEq(FromAddr, stakingRwalk)
-                  ? 'RandomWalk NFT Anchoring Wallet'
+                  ? t('transferHistory.randomWalkAnchoringWallet')
                   : shortenHex(FromAddr ?? '', 6)}
             </Link>
           </TooltipTrigger>
@@ -62,9 +64,9 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           <TooltipTrigger asChild>
             <Link href={`/user/${ToAddr}`} className="text-inherit font-mono">
               {addrEq(ToAddr, stakingCst)
-                ? 'Cosmic Signature NFT Anchoring Wallet'
+                ? t('transferHistory.signatureAnchoringWallet')
                 : addrEq(ToAddr, stakingRwalk)
-                  ? 'RandomWalk NFT Anchoring Wallet'
+                  ? t('transferHistory.randomWalkAnchoringWallet')
                   : shortenHex(ToAddr ?? '', 6)}
             </Link>
           </TooltipTrigger>
@@ -76,6 +78,7 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
 };
 
 export const TransferHistoryTable = ({ list }: { list: CSTTransferRecord[] }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
@@ -85,9 +88,11 @@ export const TransferHistoryTable = ({ list }: { list: CSTTransferRecord[] }) =>
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">From</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">To</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('columns.dateTimeCompact')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.from')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.to')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

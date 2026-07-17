@@ -29,12 +29,12 @@ const createDonation = (overrides = {}) => ({
 describe('EthDonationTable', () => {
   it('renders "No contributions yet." when list is empty', () => {
     render(<EthDonationTable list={[]} />);
-    expect(screen.getByText('No contributions yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.contributions')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<EthDonationTable list={[createDonation()]} />);
-    const headers = screen.getAllByText('Datetime');
+    const headers = screen.getAllByText('tables.columns.datetime');
     expect(headers.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -56,12 +56,12 @@ describe('EthDonationTable', () => {
 
   it('shows contribution type when showType is true', () => {
     render(<EthDonationTable list={[createDonation({ RecordType: 0 })]} showType={true} />);
-    expect(screen.getByText('Simple contribution')).toBeInTheDocument();
+    expect(screen.getByText('tables.ethContribution.simple')).toBeInTheDocument();
   });
 
   it('shows "Contribution with info" for RecordType > 0', () => {
     render(<EthDonationTable list={[createDonation({ RecordType: 1 })]} showType={true} />);
-    expect(screen.getByText('Contribution with info')).toBeInTheDocument();
+    expect(screen.getByText('tables.ethContribution.withInfo')).toBeInTheDocument();
   });
 
   it('sets rel="noopener noreferrer" on all target="_blank" links', () => {

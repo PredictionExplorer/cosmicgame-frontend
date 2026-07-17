@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -16,12 +17,14 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import type { NameHistoryRecord } from '@/services/api';
 
 const NameHistoryRow = ({ record }: { record: NameHistoryRecord }) => {
+  const t = useTranslations('tables');
+
   if (!record) {
     return <TablePrimaryRow />;
   }
 
   const txUrl = getExplorerUrl('tx', record.TxHash);
-  const displayName = record.TokenName || 'Token name was removed.';
+  const displayName = record.TokenName || t('nameHistory.removed');
 
   return (
     <TablePrimaryRow>
@@ -36,6 +39,7 @@ const NameHistoryRow = ({ record }: { record: NameHistoryRecord }) => {
 };
 
 const NameHistoryTable = ({ list }: { list: NameHistoryRecord[] }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
@@ -47,8 +51,10 @@ const NameHistoryTable = ({ list }: { list: NameHistoryRecord[] }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Token Name</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('columns.dateTimeCompact')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.tokenName')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

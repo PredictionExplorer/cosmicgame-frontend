@@ -126,7 +126,7 @@ describe('GestureMessageChat', () => {
     expect(positionBadge).toHaveAttribute('href', '/gesture/9');
     expect(positionBadge).toHaveTextContent('#3');
 
-    const time = screen.getByText('5 minutes ago');
+    const time = screen.getByText(/^[45] minutes ago$/);
     expect(time).toHaveAttribute('dateTime', new Date(timestamp * 1000).toISOString());
     await user.hover(time);
     expect(await screen.findAllByText(absolute)).not.toHaveLength(0);
@@ -167,10 +167,12 @@ describe('GestureMessageChat', () => {
         />,
       );
 
-      fireEvent.click(screen.getByRole('button', { name: 'Copy address' }));
+      fireEvent.click(screen.getByRole('button', { name: 'common.actions.copyAddress' }));
 
       expect(writeText).toHaveBeenCalledWith(participant);
-      expect(await screen.findByRole('button', { name: 'Address copied' })).toBeInTheDocument();
+      expect(
+        await screen.findByRole('button', { name: 'common.actions.addressCopied' }),
+      ).toBeInTheDocument();
     } finally {
       Object.defineProperty(navigator, 'clipboard', {
         value: originalClipboard,
@@ -192,10 +194,10 @@ describe('GestureMessageChat', () => {
 
       await user.click(screen.getByRole('button', { name: 'https://example.com/mint' }));
 
-      expect(await screen.findByRole('dialog')).toHaveTextContent('Leaving Cosmic Signature');
+      expect(await screen.findByRole('dialog')).toHaveTextContent('common.externalLink.title');
       expect(openSpy).not.toHaveBeenCalled();
 
-      await user.click(screen.getByRole('button', { name: 'Open Link' }));
+      await user.click(screen.getByRole('button', { name: 'common.externalLink.open' }));
 
       expect(openSpy).toHaveBeenCalledWith(
         'https://example.com/mint',

@@ -1,4 +1,27 @@
 import getNAVs, { type NavDescriptor } from '../nav';
+import navMessages from '../../messages/en/nav.json';
+
+function t(key: string): string {
+  const value = key
+    .split('.')
+    .reduce<unknown>(
+      (current, part) =>
+        typeof current === 'object' && current !== null
+          ? (current as Record<string, unknown>)[part]
+          : undefined,
+      navMessages,
+    );
+  if (typeof value !== 'string') throw new Error(`Missing test message: ${key}`);
+  return value;
+}
+
+function navs(
+  status: Parameters<typeof getNAVs>[0] = null,
+  account: string | null = null,
+  locale: 'en' | 'zh' = 'en',
+) {
+  return getNAVs(status, account, t, locale);
+}
 
 function flattenRoutes(items: NavDescriptor[]): string[] {
   return items.flatMap((item) => [
@@ -13,7 +36,7 @@ function flattenChildren(items: NavDescriptor[]): NavDescriptor[] {
 
 describe('getNAVs', () => {
   it('keeps CST transfer tools out of the main navigation', () => {
-    const routes = flattenRoutes(getNAVs(null, '0x1111111111111111111111111111111111111111'));
+    const routes = flattenRoutes(navs(null, '0x1111111111111111111111111111111111111111'));
 
     expect(routes).not.toContain('/transfer-cst');
     expect(routes).not.toContain('/transfer-cosmic-signature-nfts');
@@ -21,12 +44,12 @@ describe('getNAVs', () => {
   });
 
   it('exposes the three top-level groups in order', () => {
-    const titles = getNAVs(null, null).map((nav) => nav.title);
+    const titles = navs().map((nav) => nav.title);
     expect(titles).toEqual(['Gallery', 'Explore', 'Help']);
   });
 
   it('keeps all in-app destinations reachable', () => {
-    const routes = flattenRoutes(getNAVs(null, null));
+    const routes = flattenRoutes(navs());
 
     for (const route of [
       '/gallery',
@@ -44,7 +67,7 @@ describe('getNAVs', () => {
   });
 
   it('gives every panel child an icon and a description', () => {
-    for (const child of flattenChildren(getNAVs(null, null))) {
+    for (const child of flattenChildren(navs())) {
       expect(child.icon).toBeDefined();
       expect(typeof child.description).toBe('string');
       expect((child.description ?? '').length).toBeGreaterThan(0);
@@ -52,14 +75,14 @@ describe('getNAVs', () => {
   });
 
   it('flags every cross-host destination as external', () => {
-    for (const child of flattenChildren(getNAVs(null, null))) {
+    for (const child of flattenChildren(navs())) {
       const isCrossHost = /^https?:\/\//.test(child.route ?? '');
       expect(!!child.external).toBe(isCrossHost);
     }
   });
 
   it('features the Discover destination inside the Help group', () => {
-    const help = getNAVs(null, null).find((nav) => nav.title === 'Help');
+    const help = navs().find((nav) => nav.title === 'Help');
     const featured = help?.children?.filter((child) => child.featured) ?? [];
 
     expect(featured).toHaveLength(1);
@@ -68,14 +91,22 @@ describe('getNAVs', () => {
     expect(featured[0]!.external).toBe(true);
   });
 
+  it('carries Chinese locale prefixes to cross-host destinations', () => {
+    const help = navs(null, null, 'zh').find((nav) => nav.title === 'Help');
+    const routes = help?.children?.map((child) => child.route) ?? [];
+    expect(routes).toContain('https://cosmicsignature.com/zh/about');
+    expect(routes).toContain('https://cosmicsignature.com/zh/learn');
+    expect(routes).toContain('https://cosmicsignature.com/zh');
+  });
+
   it('adds My Allocations only when the account has something to collect', () => {
-    const routesWithout = flattenRoutes(getNAVs({ ETHRaffleToClaim: 0 }, '0x1'));
+    const routesWithout = flattenRoutes(navs({ ETHRaffleToClaim: 0 }, '0x1'));
     expect(routesWithout).not.toContain('/my-allocations');
 
-    const routesWith = flattenRoutes(getNAVs({ ETHRaffleToClaim: 1 }, '0x1'));
+    const routesWith = flattenRoutes(navs({ ETHRaffleToClaim: 1 }, '0x1'));
     expect(routesWith).toContain('/my-allocations');
 
-    const routesNoAccount = flattenRoutes(getNAVs({ ETHRaffleToClaim: 1 }, null));
+    const routesNoAccount = flattenRoutes(navs({ ETHRaffleToClaim: 1 }, null));
     expect(routesNoAccount).not.toContain('/my-allocations');
   });
 });

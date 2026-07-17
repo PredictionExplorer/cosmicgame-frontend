@@ -1,13 +1,18 @@
 import Image from 'next/image';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { landingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 const { footer } = landingContent;
 
 export function LandingFooter() {
+  const locale = useLocale();
+  const t = useTranslations('common');
+
   return (
     <footer className="relative overflow-hidden border-t border-white/10 bg-[#0A0418] pt-20 pb-12">
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-deep-space opacity-70" />
@@ -26,25 +31,31 @@ export function LandingFooter() {
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">{footer.tagline}</p>
           </div>
 
-          <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <nav
+            aria-label={t('accessibility.footer')}
+            className="grid grid-cols-2 gap-8 sm:grid-cols-4"
+          >
             {footer.columns.map((col) => (
               <div key={col.heading}>
                 <h3 className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
                   {col.heading}
                 </h3>
                 <ul className="mt-5 space-y-3">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        href={link.href}
-                        className="text-sm text-white/70 transition hover:text-white"
-                        rel={link.href.startsWith('http') ? 'noopener' : undefined}
-                        target={link.href.startsWith('http') ? '_blank' : undefined}
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
+                  {col.links.map((link) => {
+                    const href = localizeCrossHostHref(link.href, locale);
+                    return (
+                      <li key={link.label}>
+                        <Link
+                          href={href}
+                          className="text-sm text-white/70 transition hover:text-white"
+                          rel={link.href.startsWith('http') ? 'noopener' : undefined}
+                          target={link.href.startsWith('http') ? '_blank' : undefined}
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}

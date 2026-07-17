@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Check, Copy, Info, MessageCircle, Radio } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import {
   convertTimestampToDateTime,
@@ -71,6 +72,7 @@ function getMessageCountLabel(count: number): string {
 }
 
 function CopyAddressButton({ address }: { address: string }) {
+  const t = useTranslations('common');
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -83,7 +85,7 @@ function CopyAddressButton({ address }: { address: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      aria-label={copied ? 'Address copied' : 'Copy address'}
+      aria-label={copied ? t('actions.addressCopied') : t('actions.copyAddress')}
       className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       {copied ? (

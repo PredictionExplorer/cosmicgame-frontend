@@ -1,17 +1,14 @@
 import { useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { useNotification } from '@/contexts/NotificationContext';
 import getErrorMessage from '@/utils/alert';
-import {
-  isEthProviderError,
-  isUserRejection,
-  reportError,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { isEthProviderError, isUserRejection, reportError } from '@/utils/errors';
 
 type NotificationType = 'error' | 'warning' | 'success' | 'info';
 
 export function useNotify() {
+  const t = useTranslations('toasts');
   const { setNotification } = useNotification();
 
   const notify = useCallback(
@@ -22,22 +19,22 @@ export function useNotify() {
   const notifyErrorFromEthers = useCallback(
     (err: unknown) => {
       if (isUserRejection(err)) {
-        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        notify('info', t('walletTransactionCancelled'));
         return;
       }
       if (isEthProviderError(err) && err.data?.message) {
         reportError(err, 'ethers provider error');
         const msg = getErrorMessage(err.data.message);
-        notify('error', msg || 'Unexpected error. Please try again.');
+        notify('error', msg || t('unexpectedError'));
       } else if (err instanceof Error) {
         reportError(err, 'ethers provider error');
         notify('error', err.message);
       } else {
         reportError(err, 'ethers provider error');
-        notify('error', 'Unexpected error. Please try again.');
+        notify('error', t('unexpectedError'));
       }
     },
-    [notify],
+    [notify, t],
   );
 
   return { notify, notifyErrorFromEthers } as const;

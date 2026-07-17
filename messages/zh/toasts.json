@@ -1,1 +1,4 @@
-{}
+{
+  "walletTransactionCancelled": "交易未发送，已在钱包中取消。",
+  "unexpectedError": "发生意外错误，请重试。"
+}

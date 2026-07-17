@@ -158,3 +158,18 @@ export function localeHref(origin: string, path: string, locale: string): string
   const suffix = normalizedPath === '/' ? '' : normalizedPath;
   return `${origin}${prefix}${suffix}` || origin;
 }
+
+/**
+ * Adds the active locale to absolute links between Cosmic Signature's two
+ * hosts. Third-party and relative URLs pass through unchanged.
+ */
+export function localizeCrossHostHref(href: string, locale: string): string {
+  const origin = [APP_ORIGIN, LANDING_ORIGIN].find(
+    (candidate) => href === candidate || href.startsWith(`${candidate}/`),
+  );
+  if (!origin) return href;
+
+  const url = new URL(href);
+  const { publicPath } = splitLocalePrefix(url.pathname);
+  return `${localeHref(origin, publicPath, locale)}${url.search}${url.hash}`;
+}

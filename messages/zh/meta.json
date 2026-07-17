@@ -1,1 +1,11 @@
-{}
+{
+  "shared": {
+    "defaultTitle": "Cosmic Signature",
+    "defaultOgTitle": "Cosmic Signature · 每一笔，都在塑造签名",
+    "defaultDescription": "Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。每一笔，都在塑造签名。周期收官后，协议将储备分配至十余条轨道，包括支持 170 多位以太坊核心贡献者的 Protocol Guild。"
+  },
+  "siteMap": {
+    "title": "网站地图 · Cosmic Signature",
+    "description": "浏览 Cosmic Signature 协议的各个部分，包括落笔、NFT 画廊、锚定、统计、分配与公共物品资助。"
+  }
+}

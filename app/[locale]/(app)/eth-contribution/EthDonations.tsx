@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { parseEther } from 'viem';
 
 import { PageShell } from '@/components/ui/page-shell';
@@ -16,9 +17,10 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { asWriteFn } from '@/utils/contractWrite';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
-import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
+import { isUserRejection, reportError } from '@/utils/errors';
 
 const EthDonations = () => {
+  const t = useTranslations('toasts');
   const [donateAmount, setDonateAmount] = useState('');
   const [donateInformation, setDonationInformation] = useState('');
 
@@ -45,7 +47,7 @@ const EthDonations = () => {
     } catch (error: unknown) {
       if (isUserRejection(error)) {
         setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });
@@ -78,7 +80,7 @@ const EthDonations = () => {
     } catch (error: unknown) {
       if (isUserRejection(error)) {
         setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });

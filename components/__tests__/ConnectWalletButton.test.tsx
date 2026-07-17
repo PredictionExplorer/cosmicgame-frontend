@@ -112,7 +112,7 @@ describe('ConnectWalletButton', () => {
 
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
-    expect(screen.getByText('Balances')).toBeInTheDocument();
+    expect(screen.getByText('wallet.labels.balancesHeading')).toBeInTheDocument();
     expect(screen.getByText('2.5000')).toBeInTheDocument();
   });
 
@@ -135,7 +135,7 @@ describe('ConnectWalletButton', () => {
 
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('wallet.labels.loading')).toBeInTheDocument();
   });
 
   it('shows anchored token counts in dropdown', async () => {
@@ -157,7 +157,7 @@ describe('ConnectWalletButton', () => {
 
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
-    expect(screen.getByText('Cosmic Signature NFTs')).toBeInTheDocument();
+    expect(screen.getByText('wallet.balances.anchoredCst')).toBeInTheDocument();
     expect(screen.queryByText('CST NFTs')).not.toBeInTheDocument();
     expect(screen.getByText('7')).toBeInTheDocument();
   });
@@ -181,13 +181,16 @@ describe('ConnectWalletButton', () => {
 
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
-    expect(screen.getByText('My Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('My NFTs')).toBeInTheDocument();
+    expect(screen.getByText('wallet.account.myDashboard')).toBeInTheDocument();
+    expect(screen.getByText('wallet.account.myNfts')).toBeInTheDocument();
     expect(screen.queryByText('Transfer NFTs')).not.toBeInTheDocument();
 
-    const statLink = screen.getByText('My Dashboard').closest('a');
+    const statLink = screen.getByText('wallet.account.myDashboard').closest('a');
     expect(statLink).toHaveAttribute('href', '/my-statistics');
-    expect(screen.getByText('My NFTs').closest('a')).toHaveAttribute('href', '/my-tokens');
+    expect(screen.getByText('wallet.account.myNfts').closest('a')).toHaveAttribute(
+      'href',
+      '/my-tokens',
+    );
     expect(document.querySelector('a[href="/transfer-cosmic-signature-nfts"]')).toBeNull();
   });
 

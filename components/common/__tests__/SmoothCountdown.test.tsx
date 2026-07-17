@@ -60,4 +60,11 @@ describe('SmoothCountdown', () => {
 
     expect(screen.getByTestId('countdown-tenths')).toHaveTextContent('.9');
   });
+
+  it('supplies localized unit labels to the shared Counter', () => {
+    render(<SmoothCountdown date={90_000} />);
+
+    expect(screen.getByText('formats.countdown.minutes')).toBeInTheDocument();
+    expect(screen.getByText('formats.countdown.seconds')).toBeInTheDocument();
+  });
 });

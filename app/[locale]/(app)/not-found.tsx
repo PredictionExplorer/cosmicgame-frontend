@@ -1,35 +1,36 @@
 // Server component on purpose: the 404 page must arrive as crawler-visible
 // HTML (branded copy + recovery links), not hydrate client-side.
+import { getTranslations } from 'next-intl/server';
+
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
 
-const suggestedLinks = [
-  { href: '/', label: 'Home \u2014 Active Cycle' },
-  { href: '/gallery', label: 'NFT Gallery' },
-  { href: '/how-it-works', label: 'How It Works' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/statistics', label: 'Statistics' },
-  { href: '/anchoring', label: 'Anchor Distributions' },
-];
+export default async function NotFound() {
+  const t = await getTranslations('errors');
+  const suggestedLinks = [
+    { href: '/', label: t('notFound.links.home') },
+    { href: '/gallery', label: t('notFound.links.gallery') },
+    { href: '/how-it-works', label: t('notFound.links.howItWorks') },
+    { href: '/faq', label: t('notFound.links.faq') },
+    { href: '/statistics', label: t('notFound.links.statistics') },
+    { href: '/anchoring', label: t('notFound.links.anchoring') },
+  ];
 
-export default function NotFound() {
   return (
     <PageShell variant="form" backdrop="signature">
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <h1 className="text-2xl font-bold text-primary text-center">404 — Page Not Found</h1>
+        <h1 className="text-2xl font-bold text-primary text-center">{t('notFound.title')}</h1>
         <p className="text-sm text-muted-foreground text-center max-w-md">
-          The page you&apos;re looking for doesn&apos;t exist or may have been moved. Cosmic
-          Signature is a procedural on-chain art protocol on Arbitrum \u2014 explore the links below
-          to find what you need.
+          {t('notFound.description')}
         </p>
         <Button variant="outline" asChild>
-          <Link href="/">Return Home</Link>
+          <Link href="/">{t('notFound.returnHome')}</Link>
         </Button>
 
-        <nav aria-label="Suggested pages" className="mt-6 w-full max-w-sm">
+        <nav aria-label={t('notFound.suggestedPages')} className="mt-6 w-full max-w-sm">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60 mb-3 text-center">
-            Popular pages
+            {t('notFound.popularPages')}
           </p>
           <ul className="space-y-2">
             {suggestedLinks.map(({ href, label }) => (

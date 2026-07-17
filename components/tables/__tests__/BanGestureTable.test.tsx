@@ -55,7 +55,7 @@ describe('BanGestureTable', () => {
     await act(async () => {
       render(<BanGestureTable gestureHistory={[]} />);
     });
-    expect(screen.getByText('No gesture history yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.gestureHistory')).toBeInTheDocument();
   });
 
   it('renders gesture type ETH for GestureType 0', async () => {
@@ -83,7 +83,7 @@ describe('BanGestureTable', () => {
     await act(async () => {
       render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
     });
-    expect(screen.getAllByText('Ban').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.banGesture.ban').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders round number as link', async () => {
@@ -127,7 +127,7 @@ describe('BanGestureTable', () => {
     const user = userEvent.setup();
     render(<BanGestureTable gestureHistory={[createGestureHistory({ EvtLogId: 42 })]} />);
 
-    const banButton = await screen.findByRole('button', { name: 'Ban' });
+    const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
     await user.click(banButton);
 
     await waitFor(() => {
@@ -140,12 +140,12 @@ describe('BanGestureTable', () => {
     mockBanGesture.mockResolvedValueOnce(undefined);
     render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
 
-    const banButton = await screen.findByRole('button', { name: 'Ban' });
+    const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
     await user.click(banButton);
 
     await waitFor(() => {
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success', text: 'Gesture was banned successfully!' }),
+        expect.objectContaining({ type: 'success', text: 'tables.banGesture.banned' }),
       );
     });
   });
@@ -154,7 +154,9 @@ describe('BanGestureTable', () => {
     mockGetBannedGestures.mockResolvedValue([{ bid_id: 1 }]);
     render(<BanGestureTable gestureHistory={[createGestureHistory({ EvtLogId: 1 })]} />);
 
-    expect(await screen.findByRole('button', { name: 'Unban' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'tables.banGesture.unban' }),
+    ).toBeInTheDocument();
   });
 
   it('Unban click calls api.unban_gesture with EvtLogId', async () => {
@@ -162,7 +164,7 @@ describe('BanGestureTable', () => {
     mockGetBannedGestures.mockResolvedValue([{ bid_id: 1 }]);
     render(<BanGestureTable gestureHistory={[createGestureHistory({ EvtLogId: 1 })]} />);
 
-    const unbanButton = await screen.findByRole('button', { name: 'Unban' });
+    const unbanButton = await screen.findByRole('button', { name: 'tables.banGesture.unban' });
     await user.click(unbanButton);
 
     await waitFor(() => {
@@ -176,12 +178,12 @@ describe('BanGestureTable', () => {
     mockUnbanGesture.mockResolvedValueOnce(undefined);
     render(<BanGestureTable gestureHistory={[createGestureHistory({ EvtLogId: 1 })]} />);
 
-    const unbanButton = await screen.findByRole('button', { name: 'Unban' });
+    const unbanButton = await screen.findByRole('button', { name: 'tables.banGesture.unban' });
     await user.click(unbanButton);
 
     await waitFor(() => {
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success', text: 'Gesture was unbanned successfully!' }),
+        expect.objectContaining({ type: 'success', text: 'tables.banGesture.unbanned' }),
       );
     });
   });
@@ -193,7 +195,7 @@ describe('BanGestureTable', () => {
     getEthErrorMessage.mockReturnValueOnce('Server error details');
     render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
 
-    const banButton = await screen.findByRole('button', { name: 'Ban' });
+    const banButton = await screen.findByRole('button', { name: 'tables.banGesture.ban' });
     await user.click(banButton);
 
     await waitFor(() => {

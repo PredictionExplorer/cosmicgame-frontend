@@ -105,7 +105,9 @@ describe('ContractAddressGrid', () => {
   it('shows the Uniswap trade action only for the CST token contract', () => {
     render(<ContractAddressGrid {...defaultProps} />);
 
-    const links = screen.getAllByRole('link', { name: 'Trade CST on Uniswap' });
+    const links = screen.getAllByRole('link', {
+      name: 'nav.ecosystem.uniswap.ariaLabel',
+    });
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
   });
@@ -113,7 +115,9 @@ describe('ContractAddressGrid', () => {
   it('shows the marketplace action only for the Cosmic Signature NFT contract', () => {
     render(<ContractAddressGrid {...defaultProps} />);
 
-    const links = screen.getAllByRole('link', { name: 'Axiom Zero NFT marketplace' });
+    const links = screen.getAllByRole('link', {
+      name: 'nav.ecosystem.axiomZero.ariaLabel',
+    });
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
   });

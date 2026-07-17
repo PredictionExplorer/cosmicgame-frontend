@@ -6,14 +6,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface TimeUnit {
+  id: keyof CounterUnitLabels;
   value: number;
   label: string;
 }
 
-interface CounterProps extends CountdownRenderProps {
+export interface CounterUnitLabels {
+  days: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+}
+
+export interface LocalizedCountdownRenderProps extends CountdownRenderProps {
+  unitLabels?: CounterUnitLabels;
+}
+
+interface CounterProps extends LocalizedCountdownRenderProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   tone?: 'default' | 'impact';
 }
+
+const DEFAULT_UNIT_LABELS: CounterUnitLabels = {
+  days: 'DAYS',
+  hours: 'HRS',
+  minutes: 'MIN',
+  seconds: 'SEC',
+};
 
 const sizeClasses = {
   sm: { digit: 'text-xl', label: 'text-[10px]', pad: 'px-2.5 py-1', gap: 'gap-1.5' },
@@ -31,16 +50,22 @@ const sizeClasses = {
  * Pure function -- no hooks allowed here because react-countdown calls the
  * renderer as `renderer(props)` (plain function call), not `<Renderer />`.
  */
-function getTimeUnits(days: number, hours: number, minutes: number, seconds: number): TimeUnit[] {
+function getTimeUnits(
+  days: number,
+  hours: number,
+  minutes: number,
+  seconds: number,
+  labels: CounterUnitLabels,
+): TimeUnit[] {
   const units: TimeUnit[] = [
-    { value: days, label: 'DAYS' },
-    { value: hours, label: 'HRS' },
-    { value: minutes, label: 'MIN' },
-    { value: seconds, label: 'SEC' },
+    { id: 'days', value: days, label: labels.days },
+    { id: 'hours', value: hours, label: labels.hours },
+    { id: 'minutes', value: minutes, label: labels.minutes },
+    { id: 'seconds', value: seconds, label: labels.seconds },
   ];
   if (days === 0) {
-    const filtered = units.filter((u) => u.label !== 'DAYS');
-    if (hours === 0) return filtered.filter((u) => u.label !== 'HRS');
+    const filtered = units.filter((u) => u.id !== 'days');
+    if (hours === 0) return filtered.filter((u) => u.id !== 'hours');
     return filtered;
   }
   return units;
@@ -53,6 +78,7 @@ const Counter = ({
   seconds,
   milliseconds = 0,
   total,
+  unitLabels = DEFAULT_UNIT_LABELS,
   size = 'md',
   tone = 'default',
 }: CounterProps) => {
@@ -66,13 +92,13 @@ const Counter = ({
   const isCritical = totalSeconds < 300 && totalSeconds > 0;
   const isImpact = tone === 'impact' && !isUrgent && !isCritical;
   const s = sizeClasses[size];
-  const timeUnits = getTimeUnits(days, hours, minutes, seconds);
+  const timeUnits = getTimeUnits(days, hours, minutes, seconds, unitLabels);
   const isMonument = size === 'xl';
 
   return (
     <div className={cn('flex items-center justify-center', s.gap)}>
-      {timeUnits.map(({ value, label }, i) => (
-        <div key={label} className="flex items-center gap-inherit">
+      {timeUnits.map(({ id, value, label }, i) => (
+        <div key={id} className="flex items-center gap-inherit">
           <div className="flex flex-col items-center">
             <div
               className={cn(
@@ -118,7 +144,7 @@ const Counter = ({
                   }
                 >
                   {padZero(value)}
-                  {label === 'SEC' && showTenths && (
+                  {id === 'seconds' && showTenths && (
                     <span data-testid="countdown-tenths" className="text-[0.6em] opacity-80">
                       .{tenths}
                     </span>

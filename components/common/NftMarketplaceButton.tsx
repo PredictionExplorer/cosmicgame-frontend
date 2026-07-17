@@ -1,5 +1,8 @@
+'use client';
+
 import type { AnchorHTMLAttributes } from 'react';
 import { Store } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { cn } from '@/lib/utils';
@@ -15,12 +18,12 @@ interface NftMarketplaceButtonProps extends Omit<
   label?: string;
 }
 
-const LABELS: Record<NftMarketplaceButtonVariant, string> = {
-  default: 'NFTs on Axiom Zero',
-  secondary: 'NFTs on Axiom Zero',
-  compact: 'Axiom Zero',
-  menu: 'Axiom Zero Marketplace',
-  card: 'Axiom Zero',
+const LABEL_KEYS: Record<NftMarketplaceButtonVariant, string> = {
+  default: 'ecosystem.axiomZero.defaultLabel',
+  secondary: 'ecosystem.axiomZero.defaultLabel',
+  compact: 'ecosystem.axiomZero.shortLabel',
+  menu: 'ecosystem.axiomZero.menuLabel',
+  card: 'ecosystem.axiomZero.shortLabel',
 };
 
 const buttonClasses: Record<Exclude<NftMarketplaceButtonVariant, 'menu'>, string> = {
@@ -34,10 +37,12 @@ export function NftMarketplaceButton({
   variant = 'default',
   label,
   className,
-  'aria-label': ariaLabel = 'Axiom Zero NFT marketplace',
+  'aria-label': ariaLabel,
   ...props
 }: NftMarketplaceButtonProps) {
-  const text = label ?? LABELS[variant];
+  const t = useTranslations('nav');
+  const text = label ?? t(LABEL_KEYS[variant]);
+  const resolvedAriaLabel = ariaLabel ?? t('ecosystem.axiomZero.ariaLabel');
 
   if (variant === 'menu') {
     return (
@@ -45,7 +50,7 @@ export function NftMarketplaceButton({
         href={COSMIC_SIGNATURE_MARKETPLACE_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={ariaLabel}
+        aria-label={resolvedAriaLabel}
         className={cn(
           'flex w-full items-center gap-2.5 px-2 py-1.5 text-sm text-white no-underline transition-colors hover:text-primary',
           className,
@@ -71,7 +76,7 @@ export function NftMarketplaceButton({
         href={COSMIC_SIGNATURE_MARKETPLACE_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={ariaLabel}
+        aria-label={resolvedAriaLabel}
         {...props}
       >
         {text}

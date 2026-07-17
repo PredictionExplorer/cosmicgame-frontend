@@ -4,12 +4,12 @@ import { notFound } from 'next/navigation';
 import { learnArticles, getLearnArticle } from '@/content/learn';
 
 import { Link } from '@/i18n/navigation';
-import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 function sectionId(articleSlug: string, heading: string): string {
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function LearnArticlePage({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const article = getLearnArticle(slug);
   if (!article) notFound();
 
@@ -122,7 +122,10 @@ export default async function LearnArticlePage({ params }: PageProps) {
         <ul className="mt-4 space-y-3">
           {article.related.map((link) => (
             <li key={link.href}>
-              <a href={link.href} className="text-primary underline-offset-4 hover:underline">
+              <a
+                href={localizeCrossHostHref(link.href, locale)}
+                className="text-primary underline-offset-4 hover:underline"
+              >
                 {link.label}
               </a>
             </li>

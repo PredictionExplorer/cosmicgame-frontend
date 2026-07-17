@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Trophy, Ticket, Heart, Layers, Coins, AlertTriangle } from 'lucide-react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -24,50 +25,72 @@ export type { WinningHistoryEntry };
 export const STELLAR_SELECTION_RECORD_TYPES = new Set([10, 11, 12, 13, 14, 18]);
 
 /** Backend `cg_prize.ptype` / API `RecordType` — must match black-site prize history labels. */
-const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; text: string }> = {
-  0: { icon: <Ticket className="h-5 w-5" />, text: 'Main ETH Allocation' },
-  1: { icon: <Coins className="h-5 w-5" />, text: 'Main Signature Allocation CST' },
-  2: { icon: <Heart className="h-5 w-5" />, text: 'Main Signature Allocation CS NFT' },
-  3: { icon: <Ticket className="h-5 w-5" />, text: 'Final CST Gesture CS NFT' },
-  4: { icon: <Coins className="h-5 w-5" />, text: 'Final CST Gesture Recognition CST' },
-  5: { icon: <Trophy className="h-5 w-5" />, text: 'Endurance Champion CS NFT' },
-  6: { icon: <Coins className="h-5 w-5" />, text: 'Endurance Champion Recognition CST' },
-  7: { icon: <Trophy className="h-5 w-5" />, text: 'Chrono-Warrior ETH' },
-  8: { icon: <Coins className="h-5 w-5" />, text: 'Chrono-Warrior CST' },
-  9: { icon: <Ticket className="h-5 w-5" />, text: 'Chrono-Warrior CS NFT' },
-  10: { icon: <Trophy className="h-5 w-5" />, text: 'ETH Stellar Selection (for participants)' },
+const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; textKey: string }> = {
+  0: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.mainEth' },
+  1: { icon: <Coins className="h-5 w-5" />, textKey: 'recipientHistory.types.mainCst' },
+  2: { icon: <Heart className="h-5 w-5" />, textKey: 'recipientHistory.types.mainNft' },
+  3: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.finalCstNft' },
+  4: {
+    icon: <Coins className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.finalCstRecognition',
+  },
+  5: { icon: <Trophy className="h-5 w-5" />, textKey: 'recipientHistory.types.enduranceNft' },
+  6: {
+    icon: <Coins className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.enduranceRecognition',
+  },
+  7: { icon: <Trophy className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoEth' },
+  8: { icon: <Coins className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoCst' },
+  9: { icon: <Ticket className="h-5 w-5" />, textKey: 'recipientHistory.types.chronoNft' },
+  10: {
+    icon: <Trophy className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.participantStellarEth',
+  },
   11: {
     icon: <Coins className="h-5 w-5" />,
-    text: 'Recognition CST from Stellar Selection (for participants)',
+    textKey: 'recipientHistory.types.participantStellarCst',
   },
   12: {
     icon: <Layers className="h-5 w-5" />,
-    text: 'CS NFT Stellar Selection (for participants)',
+    textKey: 'recipientHistory.types.participantStellarNft',
   },
   13: {
     icon: <Coins className="h-5 w-5" />,
-    text: 'Recognition CST from Anchored-NFT Stellar Selection (for RandomWalk anchor-holders)',
+    textKey: 'recipientHistory.types.anchorStellarCst',
   },
   14: {
     icon: <Layers className="h-5 w-5" />,
-    text: 'CS NFT Stellar Selection (for RandomWalk anchor-holders)',
+    textKey: 'recipientHistory.types.anchorStellarNft',
   },
   15: {
     icon: <Ticket className="h-5 w-5" />,
-    text: 'Anchor Distribution ETH (for Cosmic Signature NFT anchor-holders)',
+    textKey: 'recipientHistory.types.anchorDistributionEth',
   },
-  16: { icon: <Heart className="h-5 w-5" />, text: 'Attached NFT (timeout retrieval)' },
-  17: { icon: <Coins className="h-5 w-5" />, text: 'Attached ERC-20 (timeout retrieval)' },
-  18: { icon: <Trophy className="h-5 w-5" />, text: 'ETH Stellar Selection (timeout retrieval)' },
+  16: {
+    icon: <Heart className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.attachedNftRetrieval',
+  },
+  17: {
+    icon: <Coins className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.attachedErc20Retrieval',
+  },
+  18: {
+    icon: <Trophy className="h-5 w-5" />,
+    textKey: 'recipientHistory.types.stellarEthRetrieval',
+  },
 };
 
 const ETH_RECORD_TYPES = new Set([0, 7, 10, 15, 18]);
 const CST_RECORD_TYPES = new Set([1, 4, 6, 8, 11, 13]);
 const NFT_RECORD_TYPES = new Set([2, 3, 5, 9, 12, 14, 16]);
 
-function formatAllocationAmount(recordType: number, amountEth: number | undefined): string {
+function formatAllocationAmount(
+  recordType: number,
+  amountEth: number | undefined,
+  notApplicable: string,
+): string {
   if (NFT_RECORD_TYPES.has(recordType)) {
-    return 'N/A';
+    return notApplicable;
   }
   if (ETH_RECORD_TYPES.has(recordType)) {
     return `${(amountEth ?? 0).toFixed(4)} ETH`;
@@ -92,19 +115,21 @@ const WinningHistoryRow = ({
   showWinnerAddr: boolean;
   showRoundColumn: boolean;
 }) => {
+  const t = useTranslations('tables');
   const { cosmicToken } = useContractAddresses();
   if (!history) return <TablePrimaryRow />;
 
   const recordType = RECORD_TYPE_MAP[history.RecordType] || {
     icon: null,
-    text: ' ',
+    textKey: null,
   };
 
   return (
     <TablePrimaryRow className={cn(!history.Claimed && showClaimedStatus && 'bg-white/[0.06]')}>
       <TablePrimaryCell>
         <div className="flex items-center">
-          {recordType.icon}&nbsp;<span>{recordType.text}</span>&nbsp;
+          {recordType.icon}&nbsp;
+          <span>{recordType.textKey ? t(recordType.textKey) : ' '}</span>&nbsp;
           {!history.Claimed && showClaimedStatus && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -112,7 +137,7 @@ const WinningHistoryRow = ({
                   <AlertTriangle className="h-4 w-4 text-destructive" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent>Unclaimed, go to Pending Winnings to claim.</TooltipContent>
+              <TooltipContent>{t('recipientHistory.unretrievedHelp')}</TooltipContent>
             </Tooltip>
           )}
         </div>
@@ -161,7 +186,11 @@ const WinningHistoryRow = ({
         </TablePrimaryCell>
       )}
       <TablePrimaryCell align="right">
-        {formatAllocationAmount(history.RecordType, history.AmountEth)}
+        {formatAllocationAmount(
+          history.RecordType,
+          history.AmountEth,
+          t('recipientHistory.notApplicable'),
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.RecordType === 1 ? (
@@ -232,6 +261,8 @@ function WinningHistorySubTable({
   showWinnerAddr: boolean;
   showRoundColumn: boolean;
 }) {
+  const t = useTranslations('tables');
+
   return (
     <TablePrimaryContainer>
       <TablePrimary>
@@ -247,14 +278,16 @@ function WinningHistorySubTable({
         </colgroup>
         <TablePrimaryHead>
           <Tr>
-            <TablePrimaryHeadCell align="left">Record Type</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            {showWinnerAddr && <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>}
-            {showRoundColumn && <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>}
-            <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Token Address</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">Position</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.recordType')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+            {showWinnerAddr && (
+              <TablePrimaryHeadCell>{t('columns.recipient')}</TablePrimaryHeadCell>
+            )}
+            {showRoundColumn && <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>}
+            <TablePrimaryHeadCell align="right">{t('columns.amount')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('columns.tokenAddress')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('columns.tokenId')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right">{t('columns.position')}</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <tbody>
@@ -288,10 +321,11 @@ export default function RecipientHistoryTable({
   showRoundColumn?: boolean;
   perPage?: number;
 }) {
+  const t = useTranslations('tables');
   const [currentPage, setCurrentPage] = useState(1);
 
   if (!winningHistory || winningHistory.length === 0) {
-    return <p>No history yet.</p>;
+    return <p>{t('empty.history')}</p>;
   }
 
   return (

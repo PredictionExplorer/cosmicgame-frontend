@@ -25,12 +25,24 @@ const DEFAULT_LOCALE = 'en';
 interface CliFlags {
   strict: boolean;
   strictNamespaces: readonly string[];
+  requiredManifest?: string;
 }
 
 function parseFlags(argv: readonly string[]): CliFlags {
   const strictIndex = argv.indexOf('--strict');
-  if (strictIndex === -1) return { strict: false, strictNamespaces: [] };
-  return { strict: true, strictNamespaces: argv.slice(strictIndex + 1) };
+  const requiredIndex = argv.indexOf('--required');
+  const requiredManifest = requiredIndex === -1 ? undefined : argv[requiredIndex + 1];
+  if (requiredIndex !== -1 && !requiredManifest) {
+    throw new Error('--required expects a manifest path');
+  }
+
+  const strictNamespaces =
+    strictIndex === -1 ? [] : argv.slice(strictIndex + 1).filter((arg) => !arg.startsWith('--'));
+  return {
+    strict: strictIndex !== -1,
+    strictNamespaces,
+    requiredManifest,
+  };
 }
 
 type Json = Record<string, unknown>;
@@ -68,6 +80,92 @@ function listNamespaces(locale: string): string[] {
   return readdirSync(join(MESSAGES_DIR, locale))
     .filter((file) => file.endsWith('.json'))
     .sort();
+}
+
+interface RequiredManifest {
+  namespaces: Record<string, string[]>;
+}
+
+function readRequiredManifest(filePath: string): RequiredManifest {
+  const parsed: unknown = JSON.parse(readFileSync(resolve(process.cwd(), filePath), 'utf8'));
+  if (
+    !isPlainObject(parsed) ||
+    !isPlainObject(parsed.namespaces) ||
+    !Object.values(parsed.namespaces).every(
+      (selectors) =>
+        Array.isArray(selectors) && selectors.every((selector) => typeof selector === 'string'),
+    )
+  ) {
+    throw new Error(`${filePath} must contain { "namespaces": { "name": ["key", "prefix.*"] } }`);
+  }
+  return parsed as unknown as RequiredManifest;
+}
+
+function expandRequiredKeys(
+  enKeys: Map<string, boolean>,
+  selectors: readonly string[],
+): Set<string> {
+  const required = new Set<string>();
+  for (const selector of selectors) {
+    if (selector === '*') {
+      for (const key of enKeys.keys()) required.add(key);
+      continue;
+    }
+    if (selector.endsWith('.*')) {
+      const prefix = selector.slice(0, -1);
+      const matches = [...enKeys.keys()].filter((key) => key.startsWith(prefix));
+      if (matches.length === 0) throw new Error(`Required selector ${selector} matches no en keys`);
+      for (const key of matches) required.add(key);
+      continue;
+    }
+    if (!enKeys.has(selector)) throw new Error(`Required en key does not exist: ${selector}`);
+    required.add(selector);
+  }
+  return required;
+}
+
+function checkRequiredManifest(filePath: string, localeNames: readonly string[]): number {
+  const manifest = readRequiredManifest(filePath);
+  let failures = 0;
+  console.log(`Sprint key gate — ${filePath}\n`);
+
+  for (const [namespace, selectors] of Object.entries(manifest.namespaces)) {
+    const namespaceFile = `${namespace}.json`;
+    if (!enNamespaces.includes(namespaceFile)) {
+      throw new Error(`Required namespace does not exist in en: ${namespace}`);
+    }
+    const enKeys = flattenKeys(readNamespace(DEFAULT_LOCALE, namespaceFile));
+    const required = expandRequiredKeys(enKeys, selectors);
+
+    for (const locale of localeNames) {
+      const localeFiles = new Set(listNamespaces(locale));
+      if (!localeFiles.has(namespaceFile)) {
+        console.error(`  ${locale}/${namespace}: missing catalog`);
+        failures += 1;
+        continue;
+      }
+      const localeKeys = flattenKeys(readNamespace(locale, namespaceFile));
+      const missing = [...required].filter(
+        (key) => !localeKeys.has(key) || localeKeys.get(key) === true,
+      );
+      const extra = selectors.includes('*')
+        ? [...localeKeys.keys()].filter((key) => !enKeys.has(key))
+        : [];
+      if (missing.length || extra.length) {
+        failures += 1;
+        console.error(
+          `  ${locale}/${namespace}: ${missing.length} missing/empty, ${extra.length} extra`,
+        );
+        for (const key of missing) console.error(`      · ${key}`);
+        for (const key of extra) console.error(`      · extra: ${key}`);
+      } else {
+        console.log(`  ${locale}/${namespace}: ${required.size} required keys present`);
+      }
+    }
+  }
+
+  console.log('');
+  return failures;
 }
 
 const flags = parseFlags(process.argv.slice(2));
@@ -138,8 +236,12 @@ for (const locale of locales) {
   }
 }
 
-if (flags.strict && strictFailures > 0) {
-  console.error(`❌  i18n parity failed for ${strictFailures} namespace(s)`);
+const requiredFailures = flags.requiredManifest
+  ? checkRequiredManifest(flags.requiredManifest, locales)
+  : 0;
+
+if ((flags.strict && strictFailures > 0) || requiredFailures > 0) {
+  console.error(`❌  i18n parity failed for ${strictFailures + requiredFailures} namespace(s)`);
   process.exit(1);
 }
 console.log('✅  i18n parity report complete');

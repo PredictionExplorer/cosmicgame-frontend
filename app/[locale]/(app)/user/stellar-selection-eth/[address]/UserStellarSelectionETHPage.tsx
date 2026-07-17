@@ -3,6 +3,7 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
 
@@ -15,12 +16,7 @@ import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWallet
 import { useNotification } from '@/contexts/NotificationContext';
 import { useStellarSelectionDepositsByUser } from '@/hooks/useApiQuery';
 import getErrorMessage from '@/utils/alert';
-import {
-  isUserRejection,
-  reportError,
-  getEthErrorMessage,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -115,6 +111,7 @@ const StellarSelectionAllocationsTable = ({ list }: { list: StellarSelectionETHD
 };
 
 const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string }) => {
+  const t = useTranslations('toasts');
   const { account } = useActiveWeb3React();
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
   const stellarSelectionWalletContract = useStellarSelectionWalletContract();
@@ -157,7 +154,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
     } catch (err: unknown) {
       if (isUserRejection(err)) {
         setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          text: t('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });

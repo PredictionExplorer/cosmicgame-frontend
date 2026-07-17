@@ -3,5 +3,37 @@
   "networkOffline": "No network. Reconnect to continue.",
   "walletNotConnected": "Connect a Web3 wallet to make a gesture.",
   "insufficientEth": "Not enough ETH in your wallet for this gesture.",
-  "cycleClosed": "This cycle has closed. The next Performance Cycle opens soon."
+  "cycleClosed": "This cycle has closed. The next Performance Cycle opens soon.",
+  "state": {
+    "title": "Something went wrong",
+    "retry": "Try again"
+  },
+  "boundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred.",
+    "retry": "Try Again"
+  },
+  "environment": {
+    "title": "Can't run because environment variables aren't set.",
+    "description": "We can't assume any defaults for networks or API URLs — that is prone to bugs.",
+    "missing": "Missing or invalid:",
+    "resolution": "Set them in your shell or in a .env file, then restart the dev server."
+  },
+  "apiFailure": "The service did not respond. Try again in a moment.",
+  "unexpected": "Unexpected error. Please try again.",
+  "notFound": {
+    "title": "404 — Page Not Found",
+    "description": "The page you’re looking for doesn’t exist or may have been moved. Cosmic Signature is a procedural on-chain art protocol on Arbitrum — explore the links below to find what you need.",
+    "returnHome": "Return Home",
+    "suggestedPages": "Suggested pages",
+    "popularPages": "Popular pages",
+    "links": {
+      "home": "Home — Active Cycle",
+      "gallery": "NFT Gallery",
+      "howItWorks": "How It Works",
+      "faq": "FAQ",
+      "statistics": "Statistics",
+      "anchoring": "Anchor Distributions"
+    }
+  }
 }

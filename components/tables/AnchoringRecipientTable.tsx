@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -53,16 +54,12 @@ const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
 };
 
 const AnchoringRecipientTable = ({ list }: { list: CSTAnchorDistribution[] }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return (
-      <p>
-        There were no anchored tokens at the time the cycle ended. The deposit amount was forwarded
-        to the Public Goods address.
-      </p>
-    );
+    return <p>{t('anchoringRecipient.empty')}</p>;
   }
 
   const displayedRecipients = list.slice((page - 1) * perPage, page * perPage);
@@ -73,10 +70,12 @@ const AnchoringRecipientTable = ({ list }: { list: CSTAnchorDistribution[] }) =>
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Anchor-holder</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Distribution Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.anchorHolder')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('columns.numberOfNfts')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                {t('columns.distributionAmountEth')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
@@ -38,6 +39,7 @@ function StatChip({
 }
 
 function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
+  const t = useTranslations('tables');
   const roundNum = allocation.RoundNum;
   const recipient = allocation.WinnerAddr ? shortenHex(allocation.WinnerAddr, 6) : '-';
   const stellarEth = (allocation.RoundStats?.TotalRaffleEthDepositsEth as number) || 0;
@@ -49,7 +51,7 @@ function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
         'border-b border-white/[0.06] px-4 py-3.5 last:border-b-0',
         'transition-colors hover:bg-white/[0.03]',
       )}
-      aria-label={`Cycle ${roundNum} allocation summary`}
+      aria-label={t('allocation.cycleAria', { cycle: roundNum })}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-1">
@@ -60,12 +62,12 @@ function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
                   href={`/allocation/${roundNum}`}
                   className="font-display text-base font-semibold text-foreground transition-colors hover:text-primary"
                 >
-                  Cycle {roundNum}
+                  {t('allocation.cycle', { cycle: roundNum })}
                 </Link>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-[240px] text-xs leading-relaxed">
-                  Open the detailed allocation breakdown for cycle #{roundNum}.
+                  {t('allocation.openDetails', { cycle: roundNum })}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -93,21 +95,24 @@ function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
                 </TooltipContent>
               ) : null}
             </Tooltip>
-            <InfoTooltip content="Signature Allocation amount and recipient wallet for this cycle." />
+            <InfoTooltip content={t('allocation.allocationHelp')} />
           </div>
         </div>
 
         <Tooltip>
           <TooltipTrigger asChild>
             <Button asChild variant="outline" size="sm" className="h-8 shrink-0 px-3 text-xs">
-              <Link href={`/allocation/${roundNum}`} aria-label={`Explore cycle ${roundNum}`}>
-                Explore
+              <Link
+                href={`/allocation/${roundNum}`}
+                aria-label={t('allocation.exploreAria', { cycle: roundNum })}
+              >
+                {t('allocation.explore')}
               </Link>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
             <p className="max-w-[240px] text-xs leading-relaxed">
-              View recipients, deposits, and allocation details for cycle #{roundNum}.
+              {t('allocation.exploreHelp', { cycle: roundNum })}
             </p>
           </TooltipContent>
         </Tooltip>
@@ -115,29 +120,29 @@ function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
 
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <StatChip
-          label="Gestures"
+          label={t('allocation.gestures')}
           value={allocation.RoundStats?.TotalBids ?? 0}
-          tooltip="Total gestures made during this cycle."
+          tooltip={t('allocation.gesturesHelp')}
         />
         <StatChip
-          label="NFTs"
+          label={t('allocation.nfts')}
           value={allocation.RoundStats?.TotalDonatedNFTs ?? 0}
-          tooltip="NFTs attached to gestures during this cycle."
+          tooltip={t('allocation.nftsHelp')}
         />
         <StatChip
-          label="Stellar"
+          label={t('allocation.stellar')}
           value={stellarEth.toFixed(4)}
-          tooltip="ETH allocated to the Stellar Selection pool."
+          tooltip={t('allocation.stellarHelp')}
         />
         <StatChip
-          label="Anchor"
+          label={t('allocation.anchor')}
           value={anchorEth.toFixed(4)}
-          tooltip="ETH allocated to Anchor Distributions."
+          tooltip={t('allocation.anchorHelp')}
         />
         <StatChip
-          label="Distributed"
+          label={t('allocation.distributed')}
           value={allocation.RoundStats?.TotalRaffleNFTs ?? 0}
-          tooltip="Cosmic Signature NFTs distributed via Stellar Selection."
+          tooltip={t('allocation.distributedHelp')}
         />
       </div>
     </article>
@@ -160,6 +165,7 @@ function AllocationRowSkeleton() {
 }
 
 export const AllocationTable = ({ list, loading }: { list: RoundInfo[]; loading: boolean }) => {
+  const t = useTranslations('tables');
   const [page, setPage] = useState(1);
 
   const paginatedList = useMemo(() => {
@@ -172,18 +178,18 @@ export const AllocationTable = ({ list, loading }: { list: RoundInfo[]; loading:
     <>
       <Surface variant="glass" radius="md" className="overflow-hidden">
         {loading ? (
-          <div aria-busy="true" role="status" aria-label="Loading allocation cycles">
+          <div aria-busy="true" role="status" aria-label={t('allocation.loadingAria')}>
             {Array.from({ length: 6 }).map((_, i) => (
               <AllocationRowSkeleton key={i} />
             ))}
           </div>
         ) : list.length === 0 ? (
           <EmptyState
-            title="No recipients yet"
-            description="No Performance Cycles have been finalized yet."
+            title={t('empty.recipientCyclesTitle')}
+            description={t('empty.recipientCyclesDescription')}
           />
         ) : (
-          <div role="list" aria-label="Allocation recipients by cycle">
+          <div role="list" aria-label={t('allocation.listAria')}>
             {paginatedList.map((allocation, index) => (
               <div key={allocation.RoundNum ?? `cycle-${index}`} role="listitem">
                 <AllocationCycleRow allocation={allocation} />

@@ -2,16 +2,20 @@
 
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
 import { landingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
+import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 import { SectionHeading } from './SectionHeading';
 
 const { publicGoods } = landingContent;
 
 export function PublicGoods() {
+  const locale = useLocale();
+
   return (
     <section className="relative overflow-hidden border-t border-white/10 bg-[#031810] py-28 sm:py-40">
       <div
@@ -82,7 +86,7 @@ export function PublicGoods() {
             </div>
 
             <Link
-              href={publicGoods.cta.href}
+              href={localizeCrossHostHref(publicGoods.cta.href, locale)}
               className="mt-8 inline-flex items-center gap-2 rounded-full border border-[oklch(77.1%_0.163_161)]/40 bg-[oklch(77.1%_0.163_161)]/10 px-6 py-3 text-sm font-medium text-[oklch(77.1%_0.163_161)] transition hover:bg-[oklch(77.1%_0.163_161)]/20"
               rel="noopener"
               target="_blank"

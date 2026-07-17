@@ -138,7 +138,6 @@ jest.mock('../../utils/errors', () => ({
   reportError: (...args: unknown[]) => mockReportError(...(args as [unknown, string])),
   getEthErrorMessage: (...args: unknown[]) =>
     mockGetEthErrorMessage(...(args as [unknown, string | undefined])),
-  WALLET_TRANSACTION_CANCELLED_MESSAGE: 'Transaction cancelled by user',
 }));
 
 const mockGetErrorMessage = jest.fn((msg: string) => msg);
@@ -305,7 +304,7 @@ describe('useAnchorActions', () => {
       });
 
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ text: 'Transaction cancelled by user', type: 'info' }),
+        expect.objectContaining({ text: 'toasts.walletTransactionCancelled', type: 'info' }),
       );
       expect(mockCstAnchor).not.toHaveBeenCalled();
     });
@@ -415,7 +414,7 @@ describe('useAnchorActions', () => {
       });
       expect(mockReportError).not.toHaveBeenCalled();
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'info', text: 'Transaction cancelled by user' }),
+        expect.objectContaining({ type: 'info', text: 'toasts.walletTransactionCancelled' }),
       );
     });
   });
@@ -473,7 +472,7 @@ describe('useAnchorActions', () => {
       mockIsUserRejection.mockReturnValueOnce(true);
       result.current.handleError(new Error('rejected'));
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'info', text: 'Transaction cancelled by user' }),
+        expect.objectContaining({ type: 'info', text: 'toasts.walletTransactionCancelled' }),
       );
       expect(mockReportError).not.toHaveBeenCalled();
     });
@@ -488,16 +487,19 @@ describe('useAnchorActions', () => {
       expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
 
-    it('stays silent when getEthErrorMessage returns the generic fallback', () => {
+    it('shows the localized generic fallback when no provider message exists', () => {
       mockIsUserRejection.mockReturnValueOnce(false);
-      mockGetEthErrorMessage.mockReturnValueOnce('An error occurred');
+      mockGetEthErrorMessage.mockReturnValueOnce('toasts.unexpectedError');
       const { result } = renderHook(() => useAnchorActions());
       result.current.handleError(new Error('unknown'));
-      // The hook treats 'An error occurred' as a "no actionable message" signal
-      // and skips the user-facing notification (it still reports to Sentry).
       expect(mockReportError).toHaveBeenCalled();
-      const errorCalls = mockSetNotification.mock.calls.filter(([arg]) => arg?.type === 'error');
-      expect(errorCalls).toHaveLength(0);
+      expect(mockGetEthErrorMessage).toHaveBeenCalledWith(
+        expect.any(Error),
+        'toasts.unexpectedError',
+      );
+      expect(mockSetNotification).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'error', text: 'toasts.unexpectedError' }),
+      );
     });
   });
 

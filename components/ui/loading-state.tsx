@@ -1,4 +1,7 @@
+'use client';
+
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Spinner } from '@/components/ui/spinner';
@@ -13,12 +16,13 @@ interface LoadingStateProps {
 }
 
 export function LoadingState({
-  title = 'Loading',
+  title,
   description,
   hint,
   size = 'md',
   className,
 }: LoadingStateProps) {
+  const t = useTranslations('common');
   const pad = size === 'sm' ? 'py-8' : size === 'lg' ? 'py-24' : 'py-16';
   return (
     <div
@@ -26,7 +30,7 @@ export function LoadingState({
       className={cn('flex flex-col items-center justify-center text-center', pad, className)}
     >
       <Spinner size={size} />
-      <p className="mt-4 type-heading-3 text-foreground">{title}</p>
+      <p className="mt-4 type-heading-3 text-foreground">{title ?? t('status.loading')}</p>
       {description ? (
         <p className="mt-1 max-w-sm type-body-sm text-muted-foreground">{description}</p>
       ) : null}

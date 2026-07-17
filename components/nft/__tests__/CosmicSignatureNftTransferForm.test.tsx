@@ -162,7 +162,7 @@ describe('CosmicSignatureNftTransferForm', () => {
   it('links sellers to the Cosmic Signature marketplace', () => {
     renderForm();
 
-    expect(screen.getByRole('link', { name: 'Axiom Zero NFT marketplace' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
       'href',
       COSMIC_SIGNATURE_MARKETPLACE_URL,
     );
@@ -442,7 +442,7 @@ describe('CosmicSignatureNftTransferForm', () => {
     submitForm();
 
     await waitFor(() =>
-      expect(toast.info).toHaveBeenCalledWith(expect.stringContaining('cancelled')),
+      expect(toast.info).toHaveBeenCalledWith('toasts.walletTransactionCancelled'),
     );
     expect(mockInvalidateQueries).not.toHaveBeenCalled();
   });

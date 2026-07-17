@@ -2,10 +2,11 @@
 
 import type { ReactNode } from 'react';
 import type { CountdownRenderProps } from 'react-countdown';
+import { useTranslations } from 'next-intl';
 
 import { useNow } from '@/hooks/useNow';
 
-import Counter from './Counter';
+import Counter, { type CounterUnitLabels, type LocalizedCountdownRenderProps } from './Counter';
 
 export interface CountdownParts {
   total: number;
@@ -20,7 +21,7 @@ export interface CountdownParts {
 interface SmoothCountdownProps {
   date: number;
   intervalMs?: number;
-  renderer?: (props: CountdownRenderProps) => ReactNode;
+  renderer?: (props: LocalizedCountdownRenderProps) => ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
@@ -65,9 +66,17 @@ export function SmoothCountdown({
   renderer,
   size = 'md',
 }: SmoothCountdownProps) {
+  const t = useTranslations('formats');
   const nowMs = useNow(intervalMs);
   const props = toCountdownRenderProps(getCountdownParts(date, nowMs));
+  const unitLabels: CounterUnitLabels = {
+    days: t('countdown.days'),
+    hours: t('countdown.hours'),
+    minutes: t('countdown.minutes'),
+    seconds: t('countdown.seconds'),
+  };
+  const localizedProps: LocalizedCountdownRenderProps = { ...props, unitLabels };
 
-  if (renderer) return <>{renderer(props)}</>;
-  return <Counter {...props} size={size} />;
+  if (renderer) return <>{renderer(localizedProps)}</>;
+  return <Counter {...localizedProps} size={size} />;
 }

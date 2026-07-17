@@ -24,40 +24,50 @@ export interface EcosystemDestination {
   icon: LucideIcon;
 }
 
+export interface EcosystemDestinationDefinition extends Pick<
+  EcosystemDestination,
+  'id' | 'href' | 'accent' | 'icon'
+> {
+  copyKey: 'uniswap' | 'axiomZero' | 'chaosZero';
+}
+
+type EcosystemTranslator = (key: string) => string;
+
 /**
  * The external product surfaces that orbit the Cosmic Signature app —
  * rendered as one cohesive "ecosystem" group in the header, the mobile
  * drawer, and the footer so the three destinations always read as a set.
  */
-export const ECOSYSTEM_DESTINATIONS: readonly EcosystemDestination[] = [
+export const ECOSYSTEM_DESTINATIONS: readonly EcosystemDestinationDefinition[] = [
   {
     id: 'uniswap-cst',
-    name: 'Trade CST',
-    product: 'Uniswap',
-    tagline: 'Swap ETH for CST on Uniswap',
+    copyKey: 'uniswap',
     href: CST_UNISWAP_SWAP_URL,
-    ariaLabel: 'Trade CST on Uniswap',
     accent: 'cyan',
     icon: ArrowLeftRight,
   },
   {
     id: 'axiom-zero',
-    name: 'Axiom Zero',
-    product: 'NFT marketplace',
-    tagline: 'Collect Cosmic Signature NFTs on the zero-fee marketplace',
+    copyKey: 'axiomZero',
     href: COSMIC_SIGNATURE_MARKETPLACE_URL,
-    ariaLabel: 'Axiom Zero NFT marketplace',
     accent: 'violet',
     icon: Store,
   },
   {
     id: 'chaos-zero',
-    name: 'Chaos Zero',
-    product: 'Prediction market',
-    tagline: 'Make predictions on each cycle of the protocol',
+    copyKey: 'chaosZero',
     href: CHAOS_ZERO_PREDICTIONS_URL,
-    ariaLabel: 'Make predictions on Chaos Zero',
     accent: 'gold',
     icon: TrendingUpDown,
   },
 ];
+
+export function getEcosystemDestinations(t: EcosystemTranslator): readonly EcosystemDestination[] {
+  return ECOSYSTEM_DESTINATIONS.map((destination) => ({
+    ...destination,
+    name: t(`ecosystem.${destination.copyKey}.name`),
+    product: t(`ecosystem.${destination.copyKey}.product`),
+    tagline: t(`ecosystem.${destination.copyKey}.tagline`),
+    ariaLabel: t(`ecosystem.${destination.copyKey}.ariaLabel`),
+  }));
+}

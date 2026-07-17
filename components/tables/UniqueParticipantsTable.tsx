@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { statisticsCopy } from '@/content/statistics-copy';
@@ -47,6 +48,7 @@ interface UniqueParticipantsTableProps {
 }
 
 export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
@@ -56,7 +58,7 @@ export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) 
   );
 
   if (list.length === 0) {
-    return <p>No participants yet.</p>;
+    return <p>{t('empty.participants')}</p>;
   }
 
   return (
@@ -67,19 +69,19 @@ export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) 
             <Tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
-                  desktop="Participant Address"
+                  desktop={t('columns.participantAddress')}
                   tooltip={statisticsCopy.tables.participantAddress}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 <TableHeaderHelp
-                  desktop="Number of Gestures"
+                  desktop={t('columns.numberOfGestures')}
                   tooltip={statisticsCopy.tables.numberOfGestures}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
-                  desktop="Max Gesture (ETH)"
+                  desktop={t('columns.maxGestureEth')}
                   tooltip={statisticsCopy.tables.maxGestureEth}
                 />
               </TablePrimaryHeadCell>

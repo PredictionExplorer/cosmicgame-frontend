@@ -9,8 +9,8 @@ import { render, screen, checkA11y } from '@/test-utils';
 describe('NameHistoryTable', () => {
   test('with no records', () => {
     render(<NameHistoryTable list={[]} />);
-    expect(screen.getByText('DateTime')).toBeInTheDocument();
-    expect(screen.getByText('Token Name')).toBeInTheDocument();
+    expect(screen.getByText('tables.columns.dateTimeCompact')).toBeInTheDocument();
+    expect(screen.getByText('tables.columns.tokenName')).toBeInTheDocument();
   });
 
   test('with mock data', async () => {
@@ -72,7 +72,7 @@ describe('NameHistoryTable', () => {
     expect(
       screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
     ).toBeInTheDocument();
-    expect(screen.getByText('Token name was removed.')).toBeInTheDocument();
+    expect(screen.getByText('tables.nameHistory.removed')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

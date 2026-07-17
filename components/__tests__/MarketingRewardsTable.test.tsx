@@ -22,12 +22,12 @@ const createReward = (overrides: Partial<MarketingReward> = {}): MarketingReward
 describe('MarketingRewardsTable', () => {
   it('renders "No allocations yet." when list is empty', () => {
     render(<MarketingRewardsTable list={[]} />);
-    expect(screen.getByText('No allocations yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.allocations')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<MarketingRewardsTable list={[createReward()]} />);
-    const headers = screen.getAllByText('Datetime');
+    const headers = screen.getAllByText('tables.columns.datetime');
     expect(headers.length).toBeGreaterThanOrEqual(1);
   });
 

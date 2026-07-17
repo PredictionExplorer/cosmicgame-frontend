@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { writeContract } from '@wagmi/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Loader2, SendHorizontal } from 'lucide-react';
@@ -17,12 +18,7 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { cn } from '@/lib/utils';
 import type { CSTTokenInfo } from '@/services/api';
-import {
-  getEthErrorMessage,
-  isUserRejection,
-  reportError,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { Button } from '@/components/ui/button';
@@ -92,6 +88,7 @@ export function CosmicSignatureNftTransferForm({
   description = 'Select one or more Cosmic Signature NFTs and send them to another wallet address.',
   historyHref,
 }: CosmicSignatureNftTransferFormProps) {
+  const t = useTranslations('toasts');
   const [recipient, setRecipient] = useState('');
   const [page, setPage] = useState(1);
   const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
@@ -289,7 +286,7 @@ export function CosmicSignatureNftTransferForm({
       );
 
       if (isUserRejection(err)) {
-        toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        toast.info(t('walletTransactionCancelled'));
       } else {
         reportError(err, 'Cosmic Signature NFT transfer');
         toast.error(

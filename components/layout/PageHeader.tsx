@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -42,6 +43,7 @@ export function PageHeader({
   gradientTitle = false,
   titleLevel = 1,
 }: PageHeaderProps) {
+  const t = useTranslations('common');
   const hasSidebar = Boolean(actions);
   const TitleTag = titleLevel === 2 ? 'h2' : 'h1';
   const titleGradientVariant =
@@ -78,7 +80,7 @@ export function PageHeader({
       />
       {breadcrumbs && breadcrumbs.length > 0 ? (
         <nav
-          aria-label="Breadcrumb"
+          aria-label={t('accessibility.breadcrumb')}
           className={cn(
             'mb-4 flex items-center gap-1 type-body-sm text-muted-foreground print:!text-foreground/80',
             align === 'center' && !hasSidebar && 'justify-center',

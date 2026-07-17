@@ -1,0 +1,40 @@
+{
+  "tagline": "Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。每一笔，都在塑造这一周期最终的签名。",
+  "sections": {
+    "protocol": "协议",
+    "explore": "探索",
+    "ecosystem": "生态",
+    "resources": "资源",
+    "community": "社区"
+  },
+  "links": {
+    "gallery": "画廊",
+    "currentCycle": "当前周期",
+    "statistics": "统计",
+    "contracts": "合约",
+    "sourceCode": "源代码",
+    "allocationRecipients": "分配名录",
+    "anchorDistributions": "锚定派发",
+    "outreachReserve": "推广储备",
+    "howItWorks": "运作原理",
+    "faq": "常见问题",
+    "axiomZero": "Axiom Zero 市场",
+    "chaosZero": "Chaos Zero 预测",
+    "uniswap": "在 Uniswap 上兑换 CST",
+    "about": "关于",
+    "learn": "学习中心",
+    "siteMap": "网站地图",
+    "protocolGuild": "Protocol Guild",
+    "twitter": "X（Twitter）",
+    "discord": "Discord",
+    "discover": "探索",
+    "terms": "服务条款",
+    "privacy": "隐私政策"
+  },
+  "social": {
+    "twitterLabel": "X（Twitter）",
+    "discordLabel": "Discord"
+  },
+  "copyright": "© {year} Cosmic Signature · CC0 1.0 · 公有领域",
+  "colophon": "CC0 · 已验证 · 可复现"
+}

@@ -62,14 +62,16 @@ describe('ConnectWalletButton', () => {
   it('links connected users to the CST transfer page', async () => {
     renderWalletButton();
 
-    const transferLink = await screen.findByText('Transfer CST');
+    const transferLink = await screen.findByText('wallet.account.transferCst');
     expect(transferLink.closest('a')).toHaveAttribute('href', '/transfer-cst');
   });
 
   it('links connected users to trade CST on Uniswap', async () => {
     renderWalletButton();
 
-    const tradeLink = await screen.findByRole('link', { name: 'Trade CST on Uniswap' });
+    const tradeLink = await screen.findByRole('link', {
+      name: 'nav.ecosystem.uniswap.ariaLabel',
+    });
     expect(tradeLink).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
     expect(tradeLink).toHaveAttribute('target', '_blank');
     expect(tradeLink).toHaveAttribute('rel', 'noopener noreferrer');
@@ -79,30 +81,30 @@ describe('ConnectWalletButton', () => {
     renderWalletButton();
 
     const marketplaceLink = await screen.findByRole('link', {
-      name: 'Axiom Zero NFT marketplace',
+      name: 'nav.ecosystem.axiomZero.ariaLabel',
     });
     expect(marketplaceLink).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
     expect(marketplaceLink).toHaveAttribute('target', '_blank');
     expect(marketplaceLink).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(marketplaceLink).toHaveTextContent('Axiom Zero Marketplace');
+    expect(marketplaceLink).toHaveTextContent('nav.ecosystem.axiomZero.menuLabel');
   });
 
   it('links connected users to Chaos Zero predictions', async () => {
     renderWalletButton();
 
     const predictionsLink = await screen.findByRole('link', {
-      name: 'Make predictions on Chaos Zero',
+      name: 'nav.ecosystem.chaosZero.ariaLabel',
     });
     expect(predictionsLink).toHaveAttribute('href', CHAOS_ZERO_PREDICTIONS_URL);
     expect(predictionsLink).toHaveAttribute('target', '_blank');
     expect(predictionsLink).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(predictionsLink).toHaveTextContent('Chaos Zero Predictions');
+    expect(predictionsLink).toHaveTextContent('nav.ecosystem.chaosZero.menuLabel');
   });
 
   it('links connected users to the My NFTs page', async () => {
     renderWalletButton();
 
-    const nftsLink = await screen.findByText('My NFTs');
+    const nftsLink = await screen.findByText('wallet.account.myNfts');
     expect(nftsLink.closest('a')).toHaveAttribute('href', '/my-tokens');
     expect(screen.queryByText('Transfer NFTs')).not.toBeInTheDocument();
     expect(document.querySelector('a[href="/transfer-cosmic-signature-nfts"]')).toBeNull();
@@ -111,7 +113,7 @@ describe('ConnectWalletButton', () => {
   it('does not expose the hidden marketing transfer URL in the wallet menu', async () => {
     renderWalletButton();
 
-    await screen.findByText('Transfer CST');
+    await screen.findByText('wallet.account.transferCst');
 
     expect(screen.queryByText('CST Outreach Transfer')).not.toBeInTheDocument();
     expect(document.querySelector('a[href="/internal/cst-outreach-transfer"]')).toBeNull();

@@ -27,32 +27,34 @@ beforeEach(() => jest.clearAllMocks());
 describe('SystemModesTable', () => {
   it('renders empty state when list is empty', () => {
     render(<SystemModesTable list={[]} />);
-    expect(screen.getByText('No mode changes yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.modeChanges')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<SystemModesTable list={[createEvent()]} />);
-    expect(screen.getAllByText('Round').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Started').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Ended').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.round').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.started').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.ended').length).toBeGreaterThanOrEqual(1);
   });
 
   it('adds help triggers to system event headers', () => {
     render(<SystemModesTable list={[createEvent()]} />);
     expect(
-      screen.getAllByRole('button', { name: /^Explain column:/ }).length,
+      screen.getAllByRole('button', {
+        name: /^tables\.tableHeaderHelp\.explainColumn/,
+      }).length,
     ).toBeGreaterThanOrEqual(3);
     expect(statisticsCopy.tables.systemEnded).toMatch(/replaced/);
   });
 
   it('shows "Deployment" for RoundNum 0', () => {
     render(<SystemModesTable list={[createEvent({ RoundNum: 0 })]} />);
-    expect(screen.getByText('Deployment')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.deployment')).toBeInTheDocument();
   });
 
   it('shows "Currently Active" for the first item (no prevRow)', () => {
     render(<SystemModesTable list={[createEvent()]} />);
-    expect(screen.getByText('Currently Active')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.currentlyActive')).toBeInTheDocument();
   });
 
   it('shows prevRow timestamp for non-first items', () => {
@@ -61,7 +63,7 @@ describe('SystemModesTable', () => {
       createEvent({ EvtLogId: 2, TimeStamp: 1701433118 }),
     ];
     render(<SystemModesTable list={list} />);
-    expect(screen.getByText('Currently Active')).toBeInTheDocument();
+    expect(screen.getByText('tables.status.currentlyActive')).toBeInTheDocument();
     expect(
       screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
     ).toBeGreaterThanOrEqual(1);

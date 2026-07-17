@@ -43,9 +43,9 @@ const createRecord = (overrides = {}) => ({
 describe('TransferHistoryTable', () => {
   it('renders table headers', () => {
     render(<TransferHistoryTable list={[createRecord()]} />);
-    expect(screen.getAllByText('DateTime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('From').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('To').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.dateTimeCompact').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.from').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('tables.columns.to').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders datetime as explorer link with rel attrs', () => {
@@ -71,12 +71,14 @@ describe('TransferHistoryTable', () => {
 
   it('shows Cosmic Signature NFT anchoring wallet label for CST anchoring address', () => {
     render(<TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_CST_LABEL })]} />);
-    expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
+    expect(screen.getByText('tables.transferHistory.signatureAnchoringWallet')).toBeInTheDocument();
   });
 
   it('shows RandomWalk NFT anchoring wallet label for RWLK anchoring address', () => {
     render(<TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_RWALK_LABEL })]} />);
-    expect(screen.getByText('RandomWalk NFT Anchoring Wallet')).toBeInTheDocument();
+    expect(
+      screen.getByText('tables.transferHistory.randomWalkAnchoringWallet'),
+    ).toBeInTheDocument();
   });
 
   it('shows shortened hex for regular addresses', () => {

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
+import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -12,7 +12,8 @@ export const metadata: Metadata = createMetadata(
   { canonicalHost: 'landing' },
 );
 
-export default function AboutPage() {
+export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const aboutJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'AboutPage',
@@ -73,13 +74,16 @@ export default function AboutPage() {
         <h2 className="text-xl font-semibold text-white">Official Resources</h2>
         <ul className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
           <li>
-            <a href={APP_ORIGIN} className="text-primary underline-offset-4 hover:underline">
+            <a
+              href={localeHref(APP_ORIGIN, '/', locale)}
+              className="text-primary underline-offset-4 hover:underline"
+            >
               Cosmic Signature app
             </a>
           </li>
           <li>
             <a
-              href={`${APP_ORIGIN}/contracts`}
+              href={localeHref(APP_ORIGIN, '/contracts', locale)}
               className="text-primary underline-offset-4 hover:underline"
             >
               Verified Arbitrum contracts
@@ -87,7 +91,7 @@ export default function AboutPage() {
           </li>
           <li>
             <a
-              href={`${APP_ORIGIN}/code`}
+              href={localeHref(APP_ORIGIN, '/code', locale)}
               className="text-primary underline-offset-4 hover:underline"
             >
               Source code resources
@@ -119,7 +123,7 @@ export default function AboutPage() {
           </li>
           <li>
             <a
-              href={`${APP_ORIGIN}/faq`}
+              href={localeHref(APP_ORIGIN, '/faq', locale)}
               className="text-primary underline-offset-4 hover:underline"
             >
               FAQ
@@ -127,7 +131,7 @@ export default function AboutPage() {
           </li>
           <li>
             <a
-              href={`${APP_ORIGIN}/terms`}
+              href={localeHref(APP_ORIGIN, '/terms', locale)}
               className="text-primary underline-offset-4 hover:underline"
             >
               Terms of Service
@@ -135,7 +139,7 @@ export default function AboutPage() {
           </li>
           <li>
             <a
-              href={`${APP_ORIGIN}/privacy`}
+              href={localeHref(APP_ORIGIN, '/privacy', locale)}
               className="text-primary underline-offset-4 hover:underline"
             >
               Privacy Policy
