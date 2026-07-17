@@ -1,0 +1,41 @@
+{
+  "sectionTitles": {
+    "gestureForm": "Make Your Gesture",
+    "gestureFormBody": "Select gesture method and participate in the active cycle.",
+    "allocations": "Cycle Allocations",
+    "viewCycle": "View Full Cycle Details"
+  },
+  "cta": {
+    "makeGesture": "Gesture now",
+    "finalize": "Finalize Cycle"
+  },
+  "liveBar": {
+    "cycleLabel": "Cycle",
+    "gesturesSuffix": "gesture",
+    "gesturesPluralSuffix": "gestures placed",
+    "previousCycleResults": "Previous Cycle results",
+    "parameters": "Parameters"
+  },
+  "gestureForm": {
+    "methodLabel": "Gesture Method",
+    "payWithEth": "Pay with Ether",
+    "payWithCst": "Pay with CST",
+    "attachedTokenLabel": "Attached token",
+    "attachedNftLabel": "Attached NFT",
+    "randomWalkLabel": "Attach a RandomWalk NFT",
+    "randomWalkHelp": "Attach a Random Walk NFT to an ETH gesture for a 50% Gesture-Cost discount (one-time use per NFT).",
+    "messageLabel": "Gesture message (optional)",
+    "submitEth": "Make Gesture — ETH",
+    "submitCst": "Make Gesture — CST"
+  },
+  "round": {
+    "currentCycleLabel": "Current Cycle",
+    "cycleOpensIn": "Cycle opens in",
+    "cycleFinalizationIn": "Performance closes in",
+    "totalGestures": "Total Gestures",
+    "nextEthGestureCost": "Next ETH Gesture Cost",
+    "nextCstGestureCost": "Next CST Gesture Cost",
+    "lastParticipant": "Last Participant",
+    "lastCstParticipant": "Last CST Participant"
+  }
+}

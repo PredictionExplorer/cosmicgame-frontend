@@ -1,0 +1,8 @@
+{
+  "gestureSubmitted": "Gesture submitted. Waiting for confirmation.",
+  "gestureConfirmed": "Gesture confirmed. The cycle continues.",
+  "allocationRetrieved": "Allocation retrieved to your wallet.",
+  "anchorSet": "NFT anchored to the protocol.",
+  "anchorReleased": "Anchor released.",
+  "cycleFinalized": "Cycle finalized. Allocations distributed."
+}

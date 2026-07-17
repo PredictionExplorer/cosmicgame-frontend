@@ -1,8 +1,7 @@
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 import { getAllItems } from '@/app/(app)/faq/data/faq-data';
-import { dappContent } from '@/content/dapp';
 import { landingContent } from '@/content/landing';
 import { learnArticles } from '@/content/learn';
 import { protocolFacts } from '@/content/protocol-facts';
@@ -27,6 +26,15 @@ interface CopySource {
 const readPublicFile = (fileName: string) =>
   readFileSync(join(process.cwd(), 'public', fileName), 'utf8');
 
+/** Concatenated message catalogs for a locale (messages/<locale>/*.json). */
+const readMessageCatalogs = (locale: string) => {
+  const dir = join(process.cwd(), 'messages', locale);
+  return readdirSync(dir)
+    .filter((fileName) => fileName.endsWith('.json'))
+    .map((fileName) => readFileSync(join(dir, fileName), 'utf8'))
+    .join('\n');
+};
+
 const sources: CopySource[] = [
   {
     name: 'faq-data',
@@ -36,7 +44,8 @@ const sources: CopySource[] = [
   },
   { name: 'landing', text: JSON.stringify(landingContent) },
   { name: 'learn', text: JSON.stringify(learnArticles) },
-  { name: 'dapp', text: JSON.stringify(dappContent) },
+  { name: 'messages-en', text: readMessageCatalogs('en') },
+  { name: 'messages-zh', text: readMessageCatalogs('zh') },
   { name: 'statistics-copy', text: JSON.stringify(statisticsCopy) },
   { name: 'llms.txt', text: readPublicFile('llms.txt') },
   { name: 'llms-full.txt', text: readPublicFile('llms-full.txt') },

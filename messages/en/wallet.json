@@ -1,0 +1,15 @@
+{
+  "balances": {
+    "eth": "ETH",
+    "cst": "CST",
+    "cosmicNfts": "COSMIC NFTs",
+    "rwlkNfts": "RWLK NFTs",
+    "anchoredCst": "Anchored Cosmic Signature NFTs",
+    "anchoredRwlk": "Anchored RWLK NFTs"
+  },
+  "labels": {
+    "loading": "Loading…",
+    "balancesHeading": "Balances",
+    "anchoredHeading": "Anchored"
+  }
+}

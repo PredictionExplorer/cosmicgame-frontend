@@ -1,0 +1,7 @@
+{
+  "generic": "Something went off the star map. Please try again.",
+  "networkOffline": "No network. Reconnect to continue.",
+  "walletNotConnected": "Connect a Web3 wallet to make a gesture.",
+  "insufficientEth": "Not enough ETH in your wallet for this gesture.",
+  "cycleClosed": "This cycle has closed. The next Performance Cycle opens soon."
+}

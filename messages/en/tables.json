@@ -1,0 +1,35 @@
+{
+  "empty": {
+    "gestures": "No gestures yet.",
+    "participants": "No participants yet.",
+    "recipients": "No recipients yet.",
+    "allocations": "No allocations yet.",
+    "anchorActions": "No anchor actions yet.",
+    "anchoredTokens": "No anchored tokens yet.",
+    "contributions": "No contributions yet.",
+    "publicGoods": "No public goods activity yet.",
+    "stellarSelection": "No Stellar Selection allocations yet.",
+    "attachedNfts": "No attached NFTs yet.",
+    "attachedTokens": "No attached tokens yet.",
+    "systemEvents": "No system events yet.",
+    "retrievals": "No retrievals yet.",
+    "generic": "No data available."
+  },
+  "loading": "Loading…",
+  "columns": {
+    "cycle": "Cycle",
+    "participant": "Participant",
+    "recipient": "Recipient",
+    "gestureCount": "Gestures",
+    "allocation": "Allocation",
+    "anchorActionId": "Anchor Action ID",
+    "dateTime": "Date & Time",
+    "amount": "Amount",
+    "tokenId": "Token ID",
+    "retrieved": "Retrieved",
+    "status": "Status",
+    "message": "Message",
+    "contributor": "Contributor",
+    "note": "Note"
+  }
+}

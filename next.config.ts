@@ -3,6 +3,7 @@ import { execSync } from 'node:child_process';
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 function resolveGitSha(): string {
   if (process.env.VERCEL_GIT_COMMIT_SHA?.trim()) return process.env.VERCEL_GIT_COMMIT_SHA.trim();
@@ -33,6 +34,9 @@ function resolveGitRef(): string {
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
+
+// Links i18n/request.ts to next-intl (docs/i18n/README.md §2).
+const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   env: {
@@ -140,7 +144,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(bundleAnalyzer(nextConfig), {
+export default withSentryConfig(bundleAnalyzer(withNextIntl(nextConfig)), {
   silent: true,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
