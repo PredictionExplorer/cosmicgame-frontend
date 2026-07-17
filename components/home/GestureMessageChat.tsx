@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 import { Check, Copy, Info, MessageCircle, Radio } from 'lucide-react';
 
 import {
@@ -12,6 +11,7 @@ import {
   shortenHex,
 } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';

@@ -1,13 +1,13 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState, type FC } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 import { statisticsCopy } from '@/content/statistics-copy';
 
+import { Link } from '@/i18n/navigation';
+import { useRouter } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,

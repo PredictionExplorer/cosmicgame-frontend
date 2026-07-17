@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 import { formatId, getAssetsUrl } from '@/utils';
 import { landingContent } from '@/content/landing';
 
+import { Link } from '@/i18n/navigation';
 import { networkConfig } from '@/config/networks';
 import { APP_ORIGIN } from '@/lib/hostRouting';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';

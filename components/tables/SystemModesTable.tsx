@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { convertTimestampToDateTime } from '@/utils';
 import { statisticsCopy } from '@/content/statistics-copy';
 
+import { useRouter } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,

@@ -1,12 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import Link from 'next/link';
 import { formatUnits } from 'viem';
 import { ExternalLink, Gift, ImageOff, Sparkles } from 'lucide-react';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import NFTImage from '@/components/nft/NFTImage';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Surface } from '@/components/ui/surface';

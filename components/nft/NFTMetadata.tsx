@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Calendar, Trophy, Award, User, Copy, Check } from 'lucide-react';
 
 import { getExplorerUrl, convertTimestampToDateTime, getRelativeTime } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { StatCard } from '@/components/ui/stat-card';
 import { AddressChip } from '@/components/ui/address-chip';
 import { InfoTooltip } from '@/components/ui/info-tooltip';

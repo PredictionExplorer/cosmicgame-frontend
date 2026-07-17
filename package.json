@@ -23,6 +23,7 @@
     "audit:high": "tsx scripts/audit-high.ts",
     "audit:protocol-facts": "tsx scripts/audit-protocol-facts.ts",
     "indexnow:submit": "tsx scripts/indexnow-submit.ts",
+    "i18n:parity": "tsx scripts/i18n-parity.ts",
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "prepare": "husky"
   },

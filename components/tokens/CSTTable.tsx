@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 
 import {
@@ -12,6 +11,7 @@ import {
   shortenHex,
 } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import NFTImage from '@/components/nft/NFTImage';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import {

@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Layers, Gavel, ArrowLeftRight, Ticket, ArrowRight } from 'lucide-react';
 
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 const fadeIn = {

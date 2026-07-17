@@ -1,7 +1,8 @@
 import { useState, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 
+import { useRouter, usePathname } from '@/i18n/navigation';
 import {
   Pagination,
   PaginationContent,

@@ -16,6 +16,10 @@ const config: Config = {
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': '<rootDir>/__mocks__/styleMock.ts',
     '\\.(jpg|jpeg|png|gif|webp|svg|wav|mp3)$': '<rootDir>/__mocks__/fileMock.ts',
+    // The SWC transform rewrites `@/` in import statements from tsconfig
+    // paths, but NOT inside jest.mock('...') specifiers (e.g. the global
+    // @/i18n/navigation mock in jest.setup.ts). This mapper covers those.
+    '^@/(.*)$': '<rootDir>/$1',
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(viem|wagmi|@wagmi|@rainbow-me|@tanstack|abitype|ox)/)',

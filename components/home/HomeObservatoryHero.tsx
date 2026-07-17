@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { ArrowRight, Fingerprint, HeartHandshake, Orbit, Radio, Sparkles } from 'lucide-react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 
 import { formatId, getAssetsUrl } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { GradientText } from '@/components/ui/gradient-text';

@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import Link from 'next/link';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime, getAssetsUrl, getThumbUrl, getRWLKImageUrl } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,

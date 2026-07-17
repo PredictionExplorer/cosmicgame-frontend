@@ -1,3 +1,5 @@
+import { routing } from '@/i18n/routing';
+
 const IS_DEV = process.env.NODE_ENV === 'development';
 
 const BASE_LANDING_HOSTS = ['cosmicsignature.com', 'www.cosmicsignature.com'];
@@ -121,4 +123,38 @@ export function isLandingOnlyPath(pathname: string): boolean {
   return LANDING_ONLY_PATH_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
+}
+
+/**
+ * Splits a configured locale prefix off a public pathname.
+ * `/zh/gallery` -> `{ locale: 'zh', publicPath: '/gallery' }`;
+ * `/gallery` -> `{ locale: undefined, publicPath: '/gallery' }`.
+ * Host-routing checks must always run against `publicPath`.
+ */
+export function splitLocalePrefix(pathname: string): {
+  locale?: (typeof routing.locales)[number];
+  publicPath: string;
+} {
+  for (const locale of routing.locales) {
+    if (pathname === `/${locale}`) {
+      return { locale, publicPath: '/' };
+    }
+    if (pathname.startsWith(`/${locale}/`)) {
+      return { locale, publicPath: pathname.slice(locale.length + 1) };
+    }
+  }
+  return { publicPath: pathname || '/' };
+}
+
+/**
+ * Builds a cross-host absolute URL that carries the locale prefix, e.g.
+ * `localeHref(APP_ORIGIN, '/anchoring', 'zh')` -> `https://app…/zh/anchoring`.
+ * Locale-aware in-host navigation should use `Link` from `@/i18n/navigation`
+ * instead; this helper exists for absolute URLs that cross hosts.
+ */
+export function localeHref(origin: string, path: string, locale: string): string {
+  const prefix = locale === routing.defaultLocale ? '' : `/${locale}`;
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const suffix = normalizedPath === '/' ? '' : normalizedPath;
+  return `${origin}${prefix}${suffix}` || origin;
 }

@@ -1,9 +1,9 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
+import { useRouter } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,

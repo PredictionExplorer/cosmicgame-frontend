@@ -1,7 +1,7 @@
 import { type ChangeEvent } from 'react';
-import Link from 'next/link';
 import { ArrowRight, Pen, Send } from 'lucide-react';
 
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InfoTooltip } from '@/components/ui/info-tooltip';

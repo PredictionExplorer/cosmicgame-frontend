@@ -1,11 +1,11 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,

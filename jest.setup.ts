@@ -112,3 +112,89 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
   useParams: () => ({}),
 }));
+
+// next-intl ships untranspiled ESM (like wagmi/rainbowkit above), so its
+// client hooks are mocked globally: components under test render with the
+// default locale and message KEYS as text (assert on keys, not copy).
+jest.mock('next-intl', () => {
+  const useTranslations = (namespace?: string) => {
+    const prefix = namespace ? `${namespace}.` : '';
+    const t = (key: string) => `${prefix}${key}`;
+    t.rich = (key: string) => `${prefix}${key}`;
+    t.markup = (key: string) => `${prefix}${key}`;
+    t.raw = (key: string) => `${prefix}${key}`;
+    t.has = () => true;
+    return t;
+  };
+  return {
+    useLocale: () => 'en',
+    useTranslations,
+    useMessages: () => ({}),
+    useNow: () => new Date(0),
+    useTimeZone: () => 'UTC',
+    useFormatter: () => ({
+      dateTime: (value: Date | number) => String(value),
+      number: (value: number) => String(value),
+      relativeTime: (value: Date | number) => String(value),
+      list: (value: Iterable<string>) => Array.from(value).join(', '),
+    }),
+    NextIntlClientProvider: ({ children }: { children?: unknown }) => children,
+    hasLocale: (locales: readonly string[], candidate: unknown) =>
+      typeof candidate === 'string' && locales.includes(candidate),
+  };
+});
+
+jest.mock('next-intl/server', () => ({
+  setRequestLocale: jest.fn(),
+  getLocale: async () => 'en',
+  getMessages: async () => ({}),
+  getTranslations: async (options?: string | { namespace?: string }) => {
+    const namespace = typeof options === 'string' ? options : options?.namespace;
+    const prefix = namespace ? `${namespace}.` : '';
+    return (key: string) => `${prefix}${key}`;
+  },
+  getFormatter: async () => ({
+    dateTime: (value: Date | number) => String(value),
+    number: (value: number) => String(value),
+  }),
+  getRequestConfig: (factory: unknown) => factory,
+}));
+
+// defineRouting is pure config; the identity keeps @/i18n/routing usable
+// (routing.locales, LOCALE_LABELS) without loading next-intl's ESM.
+jest.mock('next-intl/routing', () => ({
+  defineRouting: <T>(config: T) => config,
+}));
+
+// Mock the locale-aware navigation wrappers (@/i18n/navigation). Link renders
+// a plain anchor; the hooks DELEGATE to the next/navigation mock at call time,
+// so existing per-test `jest.mock('next/navigation', ...)` overrides (router
+// spies, pathname stubs) keep working unchanged for components that migrated
+// to the i18n wrappers.
+jest.mock('@/i18n/navigation', () => {
+  const React = require('react');
+  const hrefToString = (href: unknown): string => {
+    if (typeof href === 'string') return href;
+    if (href && typeof href === 'object') {
+      const obj = href as { pathname?: string; href?: string };
+      return obj.pathname ?? obj.href ?? '/';
+    }
+    return '/';
+  };
+  const nav = () => jest.requireMock('next/navigation');
+  const Link = React.forwardRef(function MockI18nLink(
+    props: { href: unknown; children?: unknown; locale?: string } & Record<string, unknown>,
+    ref: unknown,
+  ) {
+    const { href, children, locale: _locale, ...rest } = props;
+    return React.createElement('a', { href: hrefToString(href), ref, ...rest }, children);
+  });
+  return {
+    Link,
+    useRouter: () => nav().useRouter(),
+    usePathname: () => nav().usePathname(),
+    redirect: (href: unknown) => nav().redirect?.(hrefToString(href)),
+    permanentRedirect: (href: unknown) => nav().permanentRedirect?.(hrefToString(href)),
+    getPathname: (args: { href: unknown }) => hrefToString(args?.href),
+  };
+});

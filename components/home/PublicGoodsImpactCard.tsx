@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { ArrowUpRight, HeartHandshake, Vault } from 'lucide-react';
 
 import { landingContent } from '@/content/landing';
 import { formatEthValue } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import type { DashboardInfo } from '@/services/api';
 import { StatCard } from '@/components/ui/stat-card';
 import { cn } from '@/lib/utils';

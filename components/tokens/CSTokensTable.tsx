@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo, useRef, type MouseEvent } from 'react';
-import Link from 'next/link';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import {
   TablePrimary,

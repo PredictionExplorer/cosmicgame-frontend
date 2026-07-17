@@ -1,10 +1,10 @@
 'use client';
 
 import type { FC } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { ArrowUpRight, ChevronDown } from 'lucide-react';
 
+import { Link } from '@/i18n/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,

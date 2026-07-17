@@ -1,9 +1,9 @@
 import { useState, type FC } from 'react';
-import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,

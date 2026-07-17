@@ -5,6 +5,14 @@ import config from '@/next.config';
 
 jest.mock('@sentry/nextjs');
 
+// The real plugin resolves i18n/request.ts via createRequire(import.meta.url),
+// which jsdom cannot satisfy. The identity mock keeps the config chain
+// (withSentryConfig(bundleAnalyzer(withNextIntl(nextConfig)))) inspectable.
+jest.mock('next-intl/plugin', () => ({
+  __esModule: true,
+  default: () => (nextConfig: unknown) => nextConfig,
+}));
+
 describe('next.config', () => {
   it('enables React strict mode', () => {
     expect(config).toHaveProperty('reactStrictMode', true);

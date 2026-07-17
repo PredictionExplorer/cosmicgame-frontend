@@ -1,12 +1,13 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 
 import { landingContent } from '@/content/landing';
 
+import { Link } from '@/i18n/navigation';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
@@ -34,6 +35,10 @@ export function Hero() {
         className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-64 bg-gradient-to-t from-[#0D0521] via-[#0D0521]/60 to-transparent"
         aria-hidden
       />
+
+      <div className="absolute right-6 top-6 z-30">
+        <LanguageSwitcher />
+      </div>
 
       <div className="relative z-20 mx-auto w-full max-w-7xl px-6 pb-28 pt-24 sm:pb-32 md:pt-32 lg:px-12">
         <motion.div

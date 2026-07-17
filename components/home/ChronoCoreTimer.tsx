@@ -1,9 +1,9 @@
 'use client';
 
 import type { CountdownRenderProps } from 'react-countdown';
-import Link from 'next/link';
 import { ArrowRight, Clock3 } from 'lucide-react';
 
+import { Link } from '@/i18n/navigation';
 import Counter from '@/components/common/Counter';
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { InfoTooltip } from '@/components/ui/info-tooltip';

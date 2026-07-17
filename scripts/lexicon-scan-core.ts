@@ -166,6 +166,132 @@ export const DEFAULT_BANNED_STEMS: readonly string[] = [
 // lexicon-allow-end
 
 /**
+ * Simplified-Chinese banned terms (docs/i18n/glossary-zh.md §5). Mirrors the
+ * English list above: gambling/lottery/game/investment/staking/charity
+ * register is banned in Chinese copy; the coined cosmic terms carry the
+ * meaning instead (落笔, 星选, 锚定, 取回, 铭刻, …). As in English, the only
+ * sanctioned exception is FAQ/legal denial copy inside lexicon-allow pragmas.
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const ZH_BANNED_TERMS: readonly string[] = [
+  // bid / auction
+  '出价',
+  '竞价',
+  '叫价',
+  '投标',
+  '拍卖',
+  '竞拍',
+  '荷兰拍',
+  // prize / jackpot
+  '奖品',
+  '奖励',
+  '奖金',
+  '大奖',
+  '头奖',
+  '奖池',
+  '战利品',
+  // lottery / raffle / draw
+  '彩票',
+  '乐透',
+  '彩券',
+  '奖券',
+  '抽奖',
+  '抽签',
+  '摇号',
+  '开奖',
+  '刮刮乐',
+  // winner
+  '中奖',
+  '赢家',
+  '得主',
+  '获胜者',
+  '优胜者',
+  // gambling / bets / house
+  '赌博',
+  '赌场',
+  '赌注',
+  '博彩',
+  '下注',
+  '投注',
+  '押注',
+  '打赌',
+  '赔率',
+  '庄家',
+  '荷官',
+  // luck flavor
+  '抽中',
+  '碰运气',
+  '拼手气',
+  '幸运儿',
+  // game / play
+  '游戏',
+  '玩家',
+  '玩法',
+  '试玩',
+  '闯关',
+  // competition
+  '比赛',
+  '竞赛',
+  '竞争',
+  '竞技',
+  '锦标赛',
+  '争夺',
+  '对决',
+  // investment
+  '投资',
+  '理财',
+  '炒币',
+  '建仓',
+  // yield / profit / dividend
+  '收益',
+  '回报',
+  '年化',
+  '利息',
+  '分红',
+  '股息',
+  '盈利',
+  '利润',
+  // earn(ings) / income
+  '赚钱',
+  '赚取',
+  '躺赚',
+  '薅羊毛',
+  '被动收入',
+  // staking / mint / mining
+  '质押',
+  '铸造',
+  '铸币',
+  '挖矿',
+  // withdraw / claim
+  '提现',
+  '提款',
+  '领取',
+  '认领',
+  // giveaway / airdrop
+  '空投',
+  '赠品',
+  '白送',
+  '免费领',
+  // charity / donation
+  '慈善',
+  '捐赠',
+  '捐款',
+  '善款',
+  // DAO
+  '去中心化自治组织',
+  // round (cycle context) — 轮/轮次/回合 as standalone terms
+  '轮次',
+  '回合',
+  // ticket
+  '门票',
+  '入场券',
+  // tax
+  '免税',
+  '抵税',
+];
+// lexicon-allow-end
+
+/**
  * Builds a case-insensitive, word-boundary-aware regex from a list of
  * banned terms. Escapes regex metacharacters so "Dutch auction" matches
  * the literal phrase and "tax-deductible" matches the literal hyphen.
@@ -179,6 +305,19 @@ export function buildBannedPattern(banned: readonly string[]): RegExp {
   }
   const escaped = banned.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   return new RegExp(`\\b(${escaped.join('|')})\\b`, 'gi');
+}
+
+/**
+ * CJK variant of `buildBannedPattern`: `\b` word boundaries do not exist
+ * between CJK code points, so Chinese terms are matched as plain substrings.
+ * Case-insensitivity is irrelevant for CJK and omitted.
+ */
+export function buildZhBannedPattern(banned: readonly string[]): RegExp {
+  if (banned.length === 0) {
+    return /(?!)/g;
+  }
+  const escaped = banned.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return new RegExp(`(${escaped.join('|')})`, 'g');
 }
 
 /**

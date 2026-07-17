@@ -1,9 +1,9 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
-import Link from 'next/link';
 import { ArrowRight, Check, X } from 'lucide-react';
 
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Surface } from '@/components/ui/surface';
 import { getCycleState, type CyclePhase } from '@/lib/cycleState';

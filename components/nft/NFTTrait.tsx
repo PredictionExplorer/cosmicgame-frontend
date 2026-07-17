@@ -3,7 +3,6 @@
 import 'yet-another-react-lightbox/styles.css';
 
 import { useState, useMemo, useEffect, useCallback, type ChangeEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import Lightbox from 'yet-another-react-lightbox';
 import { usePublicClient } from 'wagmi';
 import { motion } from 'framer-motion';
@@ -11,6 +10,7 @@ import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown, Expand, Trophy } from 'l
 
 import { formatId, getAssetsUrl, getOriginUrl } from '@/utils';
 
+import { useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

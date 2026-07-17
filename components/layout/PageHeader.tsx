@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { GradientText } from '@/components/ui/gradient-text';
 

@@ -34,7 +34,9 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-family-display: var(--font-clash-display), 'ClashDisplay-Variable', sans-serif;
+  --font-family-display:
+    var(--font-clash-display), 'ClashDisplay-Variable', var(--font-noto-sc), 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
 }
 
 :root {
@@ -76,12 +78,27 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-inter), Inter, sans-serif;
+    font-family:
+      var(--font-inter), Inter, var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei', sans-serif;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+  }
+
+  /*
+   * Chinese locale typography (docs/i18n/README.md §5). The Latin display
+   * face (Clash Display) has no CJK glyphs, so zh headings fall through to
+   * Noto Sans SC. CJK must never inherit Latin display tracking, and the
+   * lighter display weights read too thin in CJK strokes.
+   */
+  html[lang='zh'] .type-display,
+  html[lang='zh'] h1,
+  html[lang='zh'] h2,
+  html[lang='zh'] h3 {
+    letter-spacing: 0;
+    font-weight: 700;
   }
 
   button,

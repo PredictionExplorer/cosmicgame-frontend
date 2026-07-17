@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 
+import { Link } from '@/i18n/navigation';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { FooterWrapper } from '@/components/styled';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
@@ -196,6 +197,7 @@ const Footer = () => {
               >
                 Privacy
               </Link>
+              <LanguageSwitcher />
             </div>
           </div>
         </div>

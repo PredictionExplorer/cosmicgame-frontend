@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import type { DashboardInfo } from '@/services/api';

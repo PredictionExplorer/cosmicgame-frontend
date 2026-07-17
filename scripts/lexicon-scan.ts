@@ -33,8 +33,10 @@ import { extname, join, relative, resolve } from 'node:path';
 import {
   DEFAULT_BANNED_STEMS,
   DEFAULT_BANNED_TERMS,
+  ZH_BANNED_TERMS,
   buildBannedPattern,
   buildIdentifierPattern,
+  buildZhBannedPattern,
   scanComments,
   scanContent,
   scanIdentifiers,
@@ -57,6 +59,7 @@ const SCAN_DIRS: readonly string[] = [
   'scripts',
   'e2e',
   'marketing',
+  'messages',
   'public',
   'pages',
 ];
@@ -66,9 +69,10 @@ const INCLUDE_EXTS: ReadonlySet<string> = new Set([
   '.tsx',
   '.js',
   '.jsx',
+  '.json',
+  '.mdx',
   '.mjs',
   '.cjs',
-  '.mdx',
   '.md',
 ]);
 const EXCLUDE_DIRS_BASE: ReadonlySet<string> = new Set(['__mocks__', 'node_modules', '.next']);
@@ -97,15 +101,26 @@ const EXCLUDE_DIRS: ReadonlySet<string> = new Set(
 
 const STRING_PATTERN = buildBannedPattern(DEFAULT_BANNED_TERMS);
 const IDENT_PATTERN = buildIdentifierPattern(DEFAULT_BANNED_STEMS);
+// Simplified-Chinese banned register (docs/i18n/glossary-zh.md §5). Runs on
+// every scanned file: zh copy lives in messages/zh/*.json today and in
+// content/**/zh.ts modules as translation sprints land.
+const ZH_PATTERN = buildZhBannedPattern(ZH_BANNED_TERMS);
 
 interface PhaseCounts {
   strings: number;
+  zhStrings: number;
   jsxText: number;
   identifiers: number;
   commentWarnings: number;
 }
 
-const counts: PhaseCounts = { strings: 0, jsxText: 0, identifiers: 0, commentWarnings: 0 };
+const counts: PhaseCounts = {
+  strings: 0,
+  zhStrings: 0,
+  jsxText: 0,
+  identifiers: 0,
+  commentWarnings: 0,
+};
 let failed = false;
 
 function isJsxFile(path: string): boolean {
@@ -129,6 +144,11 @@ function scanFile(absPath: string, relPath: string, content: string): void {
       counts.strings += 1;
       failed = true;
     }
+    for (const h of scanContent(content, ZH_PATTERN)) {
+      console.error(`\u274c  ${relPath}:${h.line}  banned zh term: "${h.term}" in ${h.literal}`);
+      counts.zhStrings += 1;
+      failed = true;
+    }
     if (flags.warnComments) {
       for (const h of scanComments(content, STRING_PATTERN)) {
         console.warn(
@@ -143,6 +163,12 @@ function scanFile(absPath: string, relPath: string, content: string): void {
   for (const h of scanContent(content, STRING_PATTERN)) {
     console.error(`\u274c  ${relPath}:${h.line}  banned term: "${h.term}" in ${h.literal}`);
     counts.strings += 1;
+    failed = true;
+  }
+
+  for (const h of scanContent(content, ZH_PATTERN)) {
+    console.error(`\u274c  ${relPath}:${h.line}  banned zh term: "${h.term}" in ${h.literal}`);
+    counts.zhStrings += 1;
     failed = true;
   }
 
@@ -213,9 +239,11 @@ for (const dir of SCAN_DIRS) walk(dir);
 
 if (failed) {
   console.error(
-    `\n\u274c  lexicon scan failed \u2014 strings:${counts.strings} jsx:${counts.jsxText} identifiers:${counts.identifiers}`,
+    `\n\u274c  lexicon scan failed \u2014 strings:${counts.strings} zh:${counts.zhStrings} jsx:${counts.jsxText} identifiers:${counts.identifiers}`,
   );
-  console.error('   Replace banned terms per marketing/cosmic-lexicon.md');
+  console.error(
+    '   Replace banned terms per marketing/cosmic-lexicon.md (zh: docs/i18n/glossary-zh.md)',
+  );
   process.exit(1);
 }
 

@@ -1,7 +1,6 @@
-import Link from 'next/link';
-
 import { formatId, getAssetsUrl, getThumbUrl } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { NFTSkeleton } from '@/components/styled';
 
 import NFTImage from './NFTImage';

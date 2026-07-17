@@ -1,7 +1,8 @@
-import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
 import { formatId } from '@/utils';
+
+import { Link } from '@/i18n/navigation';
 
 interface NFTBreadcrumbProps {
   tokenId: number;

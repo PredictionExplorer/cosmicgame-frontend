@@ -6,7 +6,7 @@
  * Field names such as NumBidsCST, TotalRaffleEthDeposits, NumActiveStakers,
  * NumDonatedNFTs mirror the Go server's response keys. Renaming them breaks
  * deserialization. Translate banned vocabulary at render time via
- * content/dapp.ts lookups, not here.
+ * messages/<locale> catalog lookups, not here.
  *
  * The entire file is wrapped in a single `lexicon-allow` block: the field
  * names inside these interfaces are a sealed contract with the backend and

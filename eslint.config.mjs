@@ -35,7 +35,7 @@ const config = [
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           pathGroups: [
             {
-              pattern: '@/{components,hooks,lib,utils,contexts,services,config}/**',
+              pattern: '@/{components,hooks,lib,utils,contexts,services,config,i18n}/**',
               group: 'internal',
               position: 'after',
             },
@@ -55,6 +55,34 @@ const config = [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      // Locale-aware navigation: plain next/link and the locale-sensitive
+      // next/navigation hooks drop the /zh prefix. Use the wrappers from
+      // @/i18n/navigation instead (docs/i18n/README.md §2.2).
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'next/link',
+              message: "Import { Link } from '@/i18n/navigation' to preserve the locale prefix.",
+            },
+            {
+              name: 'next/navigation',
+              importNames: ['useRouter', 'usePathname', 'redirect', 'permanentRedirect'],
+              message:
+                "Import locale-aware navigation from '@/i18n/navigation' (useSearchParams and notFound stay on next/navigation).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The i18n wrappers themselves and analytics (GA must report the real,
+    // locale-prefixed URL) are the sanctioned users of the native APIs.
+    files: ['i18n/**', 'app/analytics.tsx'],
+    rules: {
+      'no-restricted-imports': 'off',
     },
   },
   {

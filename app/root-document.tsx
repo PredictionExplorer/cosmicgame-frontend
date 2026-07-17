@@ -3,7 +3,7 @@ import Script from 'next/script';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
-import { clashDisplay, inter } from '@/lib/fonts';
+import { clashDisplay, inter, notoSansSC } from '@/lib/fonts';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 
 import { Analytics } from './analytics';
@@ -12,26 +12,30 @@ import '@/styles/global.css';
 
 /**
  * Shared `<html>`/`<body>` document rendered by BOTH root layouts —
- * `app/(app)/layout.tsx` and `app/(landing)/layout.tsx`.
+ * `app/[locale]/(app)/layout.tsx` and `app/[locale]/(landing)/layout.tsx`.
  *
  * Neither layout reads request state (no `headers()` / `cookies()`), which is
  * what allows content routes to be statically generated and CDN-cached. Host
- * separation is enforced entirely at the edge by proxy.ts, so the layouts can
- * be resolved from the URL path alone.
+ * separation is enforced entirely at the edge by proxy.ts, and the locale
+ * arrives as a route param, so the layouts can be resolved from the URL path
+ * alone.
  */
 export function RootDocument({
   children,
   headExtras,
+  locale = 'en',
 }: {
   children: ReactNode;
   /** Host-specific head content (e.g. JSON-LD blocks). */
   headExtras?: ReactNode;
+  /** BCP 47 language tag from the [locale] segment ('en' | 'zh'). */
+  locale?: string;
 }) {
   return (
     <html
-      lang="en"
+      lang={locale}
       data-scroll-behavior="smooth"
-      className={`${clashDisplay.variable} ${inter.variable}`}
+      className={`${clashDisplay.variable} ${inter.variable} ${notoSansSC.variable}`}
     >
       <head>
         {headExtras}

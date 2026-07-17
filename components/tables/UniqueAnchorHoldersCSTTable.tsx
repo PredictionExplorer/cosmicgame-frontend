@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatTableAmount, shortenHex } from '@/utils';
 import { statisticsCopy } from '@/content/statistics-copy';
 
+import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,

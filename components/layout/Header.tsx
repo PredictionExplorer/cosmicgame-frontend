@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, type FC, type ReactNode } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import {
   ArrowUpRight,
   Coins,
@@ -15,12 +14,14 @@ import {
 } from 'lucide-react';
 import { formatEther } from 'viem';
 
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import getNAVs, { type NavDescriptor } from '@/config/nav';
 import { ECOSYSTEM_DESTINATIONS } from '@/config/ecosystem';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import ListNavItem from '@/components/common/ListNavItem';
 import { EcosystemDock } from '@/components/layout/EcosystemDock';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { AppBarWrapper, DrawerList } from '@/components/styled';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useActiveWeb3React } from '@/hooks/web3';
@@ -244,6 +245,7 @@ const Header: FC = () => {
 
       <div className="ml-auto flex items-center gap-3">
         <EcosystemDock />
+        <LanguageSwitcher />
         <ConnectWalletButton
           isMobileView={false}
           loading={loading}
@@ -343,6 +345,10 @@ const Header: FC = () => {
                     rwalk: anchoredRWLKTokens?.length,
                   }}
                 />
+              </div>
+
+              <div className="px-5 pb-3">
+                <LanguageSwitcher className="w-full justify-center" />
               </div>
 
               <Separator className="bg-white/[0.06]" />

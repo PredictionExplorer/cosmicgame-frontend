@@ -2,10 +2,10 @@
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { useMemo, useState, type FC, type FocusEvent, type MouseEvent } from 'react';
-import Link from 'next/link';
 
 import { formatUnixTsLabel, shortenHex } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { useTopBidderActivePeriods, useBidTimeBounds } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import type { BidderActivePeriod, TopBidderInfo } from '@/services/api/types';

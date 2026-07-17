@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { writeContract } from '@wagmi/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Loader2, SendHorizontal } from 'lucide-react';
@@ -12,6 +11,7 @@ import { useConfig, usePublicClient } from 'wagmi';
 import { cosmicSignatureAbi } from '@/contracts/abis';
 import { getExplorerUrl, shortenHex } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';

@@ -1,7 +1,9 @@
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { landingContent } from '@/content/landing';
+
+import { Link } from '@/i18n/navigation';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 
 const { footer } = landingContent;
 
@@ -51,7 +53,10 @@ export function LandingFooter() {
 
         <div className="mt-16 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-8 text-xs text-white/50 sm:flex-row sm:items-center">
           <p>&copy; {new Date().getFullYear()} Cosmic Signature. Public domain.</p>
-          <p className="font-mono uppercase tracking-[0.24em]">{footer.colophon}</p>
+          <div className="flex items-center gap-4">
+            <p className="font-mono uppercase tracking-[0.24em]">{footer.colophon}</p>
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
     </footer>

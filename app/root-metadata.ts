@@ -10,9 +10,14 @@ const defaultOgTitle = 'Cosmic Signature \u2014 Every Gesture Shapes the Signatu
 const defaultDescription =
   'A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.';
 
+/** Maps a routing locale to the OpenGraph `og:locale` value. */
+export function openGraphLocale(locale: string): string {
+  return locale === 'zh' ? 'zh_CN' : 'en_US';
+}
+
 /**
  * Site-wide metadata defaults shared by both root layouts
- * (`app/(app)/layout.tsx` and `app/(landing)/layout.tsx`).
+ * (`app/[locale]/(app)/layout.tsx` and `app/[locale]/(landing)/layout.tsx`).
  *
  * `openGraph.images` and `twitter.images` are intentionally not set here.
  * Next.js auto-populates them from the file-system convention

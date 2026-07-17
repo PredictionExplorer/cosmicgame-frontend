@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { Tr, Tbody } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Copy, Check } from 'lucide-react';
 
 import { shortenHex } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
 interface AddressChipProps {

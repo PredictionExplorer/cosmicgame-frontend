@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePublicClient } from 'wagmi';
-import { useRouter } from 'next/navigation';
 import { zeroAddress } from 'viem';
 
+import { useRouter } from '@/i18n/navigation';
 import api from '@/services/api';
 import { isAxiosError } from '@/services/api/client';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';

@@ -1,10 +1,10 @@
 import { useState, type FC } from 'react';
-import { useRouter } from 'next/navigation';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
+import { useRouter } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,

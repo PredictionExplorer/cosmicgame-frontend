@@ -1,10 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
 import { landingContent } from '@/content/landing';
+
+import { Link } from '@/i18n/navigation';
 
 import { SectionHeading } from './SectionHeading';
 

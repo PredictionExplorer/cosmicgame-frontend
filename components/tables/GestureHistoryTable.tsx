@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Tr } from 'react-super-responsive-table';
 import { usePublicClient } from 'wagmi';
@@ -15,6 +14,7 @@ import {
 } from '@/utils';
 import ERC20_ABI from '@/contracts/CosmicToken.json';
 
+import { useRouter } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,

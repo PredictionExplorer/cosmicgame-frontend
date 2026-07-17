@@ -180,28 +180,37 @@ type OgModule = {
 };
 
 const STATIC_OG_MODULES: ReadonlyArray<readonly [string, () => Promise<unknown>]> = [
-  ['app/opengraph-image', () => import('@/app/(app)/opengraph-image')],
-  ['app/(landing)/opengraph-image', () => import('@/app/(landing)/opengraph-image')],
-  ['app/faq/opengraph-image', () => import('@/app/(app)/faq/opengraph-image')],
-  ['app/how-it-works/opengraph-image', () => import('@/app/(app)/how-it-works/opengraph-image')],
-  ['app/gallery/opengraph-image', () => import('@/app/(app)/gallery/opengraph-image')],
-  ['app/anchoring/opengraph-image', () => import('@/app/(app)/anchoring/opengraph-image')],
-  ['app/current-cycle/opengraph-image', () => import('@/app/(app)/current-cycle/opengraph-image')],
+  ['app/opengraph-image', () => import('@/app/[locale]/(app)/opengraph-image')],
+  ['app/(landing)/opengraph-image', () => import('@/app/[locale]/(landing)/opengraph-image')],
+  ['app/faq/opengraph-image', () => import('@/app/[locale]/(app)/faq/opengraph-image')],
+  [
+    'app/how-it-works/opengraph-image',
+    () => import('@/app/[locale]/(app)/how-it-works/opengraph-image'),
+  ],
+  ['app/gallery/opengraph-image', () => import('@/app/[locale]/(app)/gallery/opengraph-image')],
+  ['app/anchoring/opengraph-image', () => import('@/app/[locale]/(app)/anchoring/opengraph-image')],
+  [
+    'app/current-cycle/opengraph-image',
+    () => import('@/app/[locale]/(app)/current-cycle/opengraph-image'),
+  ],
   [
     'app/landing-site/opengraph-image',
-    () => import('@/app/(landing)/landing-site/opengraph-image'),
+    () => import('@/app/[locale]/(landing)/landing-site/opengraph-image'),
   ],
 ];
 
 const DYNAMIC_OG_MODULES: ReadonlyArray<readonly [string, () => Promise<unknown>]> = [
   [
     'app/allocation/[id]/opengraph-image',
-    () => import('@/app/(app)/allocation/[id]/opengraph-image'),
+    () => import('@/app/[locale]/(app)/allocation/[id]/opengraph-image'),
   ],
-  ['app/gesture/[id]/opengraph-image', () => import('@/app/(app)/gesture/[id]/opengraph-image')],
+  [
+    'app/gesture/[id]/opengraph-image',
+    () => import('@/app/[locale]/(app)/gesture/[id]/opengraph-image'),
+  ],
   [
     'app/user/[address]/opengraph-image',
-    () => import('@/app/(app)/user/[address]/opengraph-image'),
+    () => import('@/app/[locale]/(app)/user/[address]/opengraph-image'),
   ],
 ];
 
@@ -234,7 +243,7 @@ describe('static-tier opengraph-image module shape', () => {
 
 describe('static-tier opengraph-image content', () => {
   it('app/opengraph-image renders the brand-line headline', async () => {
-    const mod = (await import('@/app/(app)/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/opengraph-image')) as OgModule;
     mod.default();
     const props = lastCardProps();
     expect(props.eyebrow).toBe('Cosmic Signature');
@@ -243,7 +252,7 @@ describe('static-tier opengraph-image content', () => {
   });
 
   it('faq card uses the FAQ eyebrow', async () => {
-    const mod = (await import('@/app/(app)/faq/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/faq/opengraph-image')) as OgModule;
     mod.default();
     const props = lastCardProps();
     expect(props.eyebrow).toBe('FAQ');
@@ -251,7 +260,7 @@ describe('static-tier opengraph-image content', () => {
   });
 
   it('how-it-works card uses the four-stage subhead and three short chips', async () => {
-    const mod = (await import('@/app/(app)/how-it-works/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/how-it-works/opengraph-image')) as OgModule;
     mod.default();
     const props = lastCardProps();
     expect(props.eyebrow).toBe('How It Works');
@@ -261,7 +270,7 @@ describe('static-tier opengraph-image content', () => {
   });
 
   it('gallery card mentions three-body trajectories', async () => {
-    const mod = (await import('@/app/(app)/gallery/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/gallery/opengraph-image')) as OgModule;
     mod.default();
     const props = lastCardProps();
     expect(props.eyebrow).toBe('Gallery');
@@ -269,7 +278,7 @@ describe('static-tier opengraph-image content', () => {
   });
 
   it('anchoring card surfaces the per-cycle share message', async () => {
-    const mod = (await import('@/app/(app)/anchoring/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/anchoring/opengraph-image')) as OgModule;
     mod.default();
     const props = lastCardProps();
     expect(props.eyebrow).toBe('Anchoring');
@@ -277,7 +286,7 @@ describe('static-tier opengraph-image content', () => {
   });
 
   it('current-cycle card frames the live cycle', async () => {
-    const mod = (await import('@/app/(app)/current-cycle/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/current-cycle/opengraph-image')) as OgModule;
     mod.default();
     const props = lastCardProps();
     expect(props.eyebrow).toBe('Current Cycle');
@@ -285,8 +294,9 @@ describe('static-tier opengraph-image content', () => {
   });
 
   it('landing-site card matches the site-wide default exactly', async () => {
-    const root = (await import('@/app/(app)/opengraph-image')) as OgModule;
-    const landing = (await import('@/app/(landing)/landing-site/opengraph-image')) as OgModule;
+    const root = (await import('@/app/[locale]/(app)/opengraph-image')) as OgModule;
+    const landing =
+      (await import('@/app/[locale]/(landing)/landing-site/opengraph-image')) as OgModule;
 
     root.default();
     const rootProps = lastCardProps();
@@ -335,14 +345,14 @@ describe('allocation/[id] dynamic OG card', () => {
   ];
 
   it.each(cases)('id=%j -> eyebrow=%j', async (id, expected) => {
-    const mod = (await import('@/app/(app)/allocation/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/allocation/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id }) });
     expect(lastCardProps().eyebrow).toBe(expected);
     expect(lastCardProps().title).toMatch(/allocation distribution/i);
   });
 
   it('preserves the size constant on every render', async () => {
-    const mod = (await import('@/app/(app)/allocation/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/allocation/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id: '7' }) });
     expect(lastCardSize()).toEqual(COSMIC_OG_SIZE);
   });
@@ -377,7 +387,7 @@ describe('gesture/[id] dynamic OG card', () => {
   it('labels the resolved gesture position from the API', async () => {
     const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 410 } } });
 
-    const mod = (await import('@/app/(app)/gesture/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id: '23514' }) });
 
     expect(fetchMock).toHaveBeenCalledWith(
@@ -390,14 +400,14 @@ describe('gesture/[id] dynamic OG card', () => {
 
   it('treats position 0 as a valid position', async () => {
     stubApi({ ok: true, body: { BidInfo: { BidPosition: 0 } } });
-    const mod = (await import('@/app/(app)/gesture/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id: '7' }) });
     expect(lastCardProps().eyebrow).toBe('Gesture Position #0');
   });
 
   it('trims and parses the route id before requesting', async () => {
     const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 9 } } });
-    const mod = (await import('@/app/(app)/gesture/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id: '  3  ' }) });
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/info/3'), expect.anything());
     expect(lastCardProps().eyebrow).toBe('Gesture Position #9');
@@ -408,7 +418,7 @@ describe('gesture/[id] dynamic OG card', () => {
     'falls back to "Gesture" for invalid id %j without calling the API',
     async (id) => {
       const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 1 } } });
-      const mod = (await import('@/app/(app)/gesture/[id]/opengraph-image')) as OgModule;
+      const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
       await mod.default({ params: Promise.resolve({ id }) });
       expect(fetchMock).not.toHaveBeenCalled();
       expect(lastCardProps().eyebrow).toBe('Gesture');
@@ -417,14 +427,14 @@ describe('gesture/[id] dynamic OG card', () => {
 
   it('falls back to "Gesture" on a non-OK API response', async () => {
     stubApi({ ok: false, body: {} });
-    const mod = (await import('@/app/(app)/gesture/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id: '12' }) });
     expect(lastCardProps().eyebrow).toBe('Gesture');
   });
 
   it('falls back to "Gesture" when the position is absent from the response', async () => {
     stubApi({ ok: true, body: { BidInfo: {} } });
-    const mod = (await import('@/app/(app)/gesture/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id: '12' }) });
     expect(lastCardProps().eyebrow).toBe('Gesture');
   });
@@ -434,7 +444,7 @@ describe('gesture/[id] dynamic OG card', () => {
     global.fetch = jest.fn(async () => {
       throw new Error('network down');
     }) as unknown as typeof fetch;
-    const mod = (await import('@/app/(app)/gesture/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id: '12' }) });
     expect(lastCardProps().eyebrow).toBe('Gesture');
   });
@@ -443,7 +453,7 @@ describe('gesture/[id] dynamic OG card', () => {
     delete process.env.NEXT_PUBLIC_API_URL;
     const fetchMock = jest.fn();
     global.fetch = fetchMock as unknown as typeof fetch;
-    const mod = (await import('@/app/(app)/gesture/[id]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ id: '12' }) });
     expect(fetchMock).not.toHaveBeenCalled();
     expect(lastCardProps().eyebrow).toBe('Gesture');
@@ -471,13 +481,13 @@ describe('user/[address] dynamic OG card', () => {
   ];
 
   it.each(cases)('address=%j -> title=%j', async (address, expectedTitle) => {
-    const mod = (await import('@/app/(app)/user/[address]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ address }) });
     expect(lastCardProps().title).toBe(expectedTitle);
   });
 
   it('always uses the "Participant" eyebrow regardless of the address', async () => {
-    const mod = (await import('@/app/(app)/user/[address]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ address: VALID_ADDR }) });
     expect(lastCardProps().eyebrow).toBe('Participant');
 
@@ -486,7 +496,7 @@ describe('user/[address] dynamic OG card', () => {
   });
 
   it('truncated addresses use a Unicode horizontal ellipsis rather than three dots', async () => {
-    const mod = (await import('@/app/(app)/user/[address]/opengraph-image')) as OgModule;
+    const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
     await mod.default({ params: Promise.resolve({ address: VALID_ADDR }) });
     const title = lastCardProps().title;
     expect(title).toContain('\u2026');

@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo, useState, type ReactNode } from 'react';
-import Link from 'next/link';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
