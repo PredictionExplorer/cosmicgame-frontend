@@ -308,8 +308,9 @@ flowchart LR
 yarn dev
 # dApp Chinese:    http://localhost:3000/zh
 # landing Chinese: http://cosmicsignature.local:3000/zh   (see lib/hostRouting.ts for /etc/hosts setup)
-yarn tsx scripts/i18n-parity.ts        # translation coverage report
-yarn lexicon:scan                      # includes zh banned terms once wired
+yarn i18n:parity                       # translation coverage report (--strict [ns ...] to gate)
+yarn lexicon:scan                      # includes the zh banned-term phase
+npx playwright test e2e/zh-smoke.spec.ts e2e/proxy.spec.ts   # locale routing e2e
 ```
 
 To test locale detection: clear the `NEXT_LOCALE` cookie and set the browser's language to

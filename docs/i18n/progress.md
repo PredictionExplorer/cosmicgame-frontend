@@ -26,7 +26,7 @@ states, `aria-label`s, form validation, SEO title/description, OG image text, JS
 
 | Sprint | Theme                                                                      | Units                        | Status      |
 | ------ | -------------------------------------------------------------------------- | ---------------------------- | ----------- |
-| 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | Not started |
+| 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**    |
 | 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | Not started |
 | 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | Not started |
 | 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | Not started |
@@ -49,25 +49,56 @@ Chinese exists at `/zh` (rendering English fallback text) but is not yet linked 
 
 | #    | Task                                                                                                                                                                                         | Done |
 | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
-| 0.1  | Install `next-intl`; add `i18n/routing.ts` (`locales: ['en','zh']`, `defaultLocale: 'en'`, `localePrefix: 'as-needed'`), `i18n/request.ts` with en-fallback deep merge, `i18n/navigation.ts` | ☐    |
-| 0.2  | Wrap `next.config.ts` with `createNextIntlPlugin()` (compose with Sentry + analyzer)                                                                                                         | ☐    |
-| 0.3  | Move `app/(app)` and `app/(landing)` under `app/[locale]/`; `api/` stays outside; fix relative imports                                                                                       | ☐    |
-| 0.4  | Locale layouts: validate `hasLocale`, `setRequestLocale`, `generateStaticParams`, `NextIntlClientProvider`; `RootDocument` takes `locale` and sets `<html lang>`                             | ☐    |
-| 0.5  | Compose `proxy.ts` with next-intl middleware; host checks run on locale-stripped path; `/zh` → `/zh/landing-site` rewrite; redirects preserve prefix (README §2.3)                           | ☐    |
-| 0.6  | Codemod `next/link` + `next/navigation` imports to `i18n/navigation.ts` wrappers; add `localeHref()` for cross-host absolute URLs                                                            | ☐    |
-| 0.7  | Seed `messages/en/*.json` namespaces from `content/dapp.ts`, then delete `content/dapp.ts`; create empty-object `messages/zh/*.json`                                                         | ☐    |
-| 0.8  | Language switcher component (English / 中文) in app header + mobile drawer, landing header, both footers; `NEXT_LOCALE` cookie persistence                                                   | ☐    |
-| 0.9  | Fonts: add Noto Sans SC per README §5, `html[lang="zh"]` heading overrides                                                                                                                   | ☐    |
-| 0.10 | SEO plumbing: `createMetadata` emits hreflang alternates + `og:locale`; sitemap alternates; fix hardcoded `en_US`                                                                            | ☐    |
-| 0.11 | `scripts/i18n-parity.ts` + CI report job                                                                                                                                                     | ☐    |
-| 0.12 | zh banned-term list wired into lexicon scanner for `messages/zh/**` and `content/**/zh*` (from glossary §5)                                                                                  | ☐    |
-| 0.13 | E2E: zh smoke spec (`/zh` home/gallery/learn/faq render, switcher round-trip, cookie, host redirects with prefix); extend host-routing specs                                                 | ☐    |
-| 0.14 | Docs: update README.md §9 commands if they changed during implementation                                                                                                                     | ☐    |
+| 0.1  | Install `next-intl`; add `i18n/routing.ts` (`locales: ['en','zh']`, `defaultLocale: 'en'`, `localePrefix: 'as-needed'`), `i18n/request.ts` with en-fallback deep merge, `i18n/navigation.ts` | ✅   |
+| 0.2  | Wrap `next.config.ts` with `createNextIntlPlugin()` (compose with Sentry + analyzer)                                                                                                         | ✅   |
+| 0.3  | Move `app/(app)` and `app/(landing)` under `app/[locale]/`; `api/` stays outside; fix relative imports                                                                                       | ✅   |
+| 0.4  | Locale layouts: validate `hasLocale`, `setRequestLocale`, `generateStaticParams`, `NextIntlClientProvider`; `RootDocument` takes `locale` and sets `<html lang>`                             | ✅   |
+| 0.5  | Compose `proxy.ts` with next-intl middleware; host checks run on locale-stripped path; `/zh` → `/zh/landing-site` rewrite; redirects preserve prefix (README §2.3)                           | ✅   |
+| 0.6  | Codemod `next/link` + `next/navigation` imports to `i18n/navigation.ts` wrappers; add `localeHref()` for cross-host absolute URLs                                                            | ✅   |
+| 0.7  | Seed `messages/en/*.json` namespaces from `content/dapp.ts`, then delete `content/dapp.ts`; create empty-object `messages/zh/*.json`                                                         | ✅   |
+| 0.8  | Language switcher component (English / 中文) in app header + mobile drawer, landing header, both footers; `NEXT_LOCALE` cookie persistence                                                   | ✅   |
+| 0.9  | Fonts: add Noto Sans SC per README §5, `html[lang="zh"]` heading overrides                                                                                                                   | ✅   |
+| 0.10 | SEO plumbing: `createMetadata` emits hreflang alternates + `og:locale`; sitemap alternates; fix hardcoded `en_US`                                                                            | ✅   |
+| 0.11 | `scripts/i18n-parity.ts` + CI report job                                                                                                                                                     | ✅   |
+| 0.12 | zh banned-term list wired into lexicon scanner for `messages/zh/**` and `content/**/zh*` (from glossary §5)                                                                                  | ✅   |
+| 0.13 | E2E: zh smoke spec (`/zh` home/gallery/learn/faq render, switcher round-trip, cookie, host redirects with prefix); extend host-routing specs                                                 | ✅   |
+| 0.14 | Docs: update README.md §9 commands if they changed during implementation                                                                                                                     | ✅   |
 
 **Acceptance:** English site is behaviorally identical at every existing URL (full e2e
 suite green, no URL changes, static rendering preserved — verify build output). `/zh/...`
 renders every route with English fallback. Switcher works both directions on both hosts.
 Parity report runs in CI.
+
+**Sprint 0 completed 2026-07-16.** Verification: type-check, lint, jest (5,209 tests),
+`yarn build` (all 62 routes SSG'd for both `/en/*` and `/zh/*`, ISR timings preserved),
+lexicon scan (en + zh phases), parity report (262 en keys), and the e2e routing subset
+(proxy incl. `/zh` cases, zh-smoke, smoke, navigation, landing, static-pages).
+
+Implementation notes / deviations:
+
+- **0.6:** ~95 files codemodded. Jest gained global mocks for `@/i18n/navigation`
+  (delegating to the existing `next/navigation` mocks) and `next-intl` (hooks echo
+  message keys), so component tests keep working without providers.
+- **0.7:** 8 namespaces seeded (262 keys): `common`, `errors`, `home`, `meta`,
+  `statistics`, `tables`, `toasts`, `wallet`. Registered in `i18n/request.ts`
+  `NAMESPACES` — new namespaces must be added there and in every locale.
+- **0.8:** the landing has no header bar, so the switcher floats top-right in the hero.
+  Bonus: RainbowKit wallet modal follows the locale (`zh-CN`).
+- **0.10 (progressive activation):** `createMetadata` only emits hreflang + locale
+  canonical when a page passes `locale`. Untranslated pages must not pass it — their
+  `/zh` variant is an English duplicate and keeps canonicalizing to the English URL.
+  Activate per page as translations ship (Sprints 2–7); sitemap alternates follow in
+  Sprint 7.
+- **Locale detection** follows next-intl defaults: URL prefix → `NEXT_LOCALE` cookie →
+  `Accept-Language` → `en`. Chinese-browser first-timers are auto-redirected to `/zh`.
+- **Cross-host locale carry-over:** the `NEXT_LOCALE` cookie is host-scoped, so the
+  choice does not yet follow users between the landing and app hosts. Sprint 1 must
+  build cross-host links (nav, footers, landing CTAs) with `localeHref()` so the URL
+  prefix carries the locale across.
+- **Denial copy must never live in JSON catalogs** (JSON has no comment pragmas for
+  `lexicon-allow`) — it belongs in per-locale TS content modules.
+- The dApp home (`/[locale]`) renders dynamically because it reads `headers()` —
+  pre-existing behavior, unrelated to i18n.
 
 ## Sprint 1 — Global chrome
 

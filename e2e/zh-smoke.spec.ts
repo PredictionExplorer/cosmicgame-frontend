@@ -72,6 +72,17 @@ test.describe('zh locale smoke', () => {
     await page.getByRole('menuitem', { name: 'English' }).click();
 
     await expect(page).toHaveURL(/\/faq$/);
+    // The cookie must flip back before asserting server-rendered state:
+    // switching to the default locale races the client cookie write against
+    // the RSC fetch, so settle on the cookie first, then verify via reload.
+    await expect
+      .poll(async () => {
+        const cookies = await context.cookies();
+        return cookies.find((cookie) => cookie.name === 'NEXT_LOCALE')?.value;
+      })
+      .toBe('en');
+    await page.reload();
+    await expect(page).toHaveURL(/\/faq$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   });
 
