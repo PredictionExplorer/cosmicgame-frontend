@@ -29,6 +29,54 @@ function assertNoBannedTerms(text: unknown) {
 }
 
 describe('JSON-LD generators', () => {
+  it('accepts localized copy, URLs, and language metadata', () => {
+    const website = websiteJsonLd({
+      description: '中文协议说明',
+      inLanguage: 'zh-Hans',
+      url: 'https://cosmicsignature.com/zh',
+      searchUrlTemplate: 'https://app.cosmicsignature.com/zh/gallery?search={search_term_string}',
+    });
+    const organization = organizationJsonLd({
+      description: '中文组织说明',
+      inLanguage: 'zh-Hans',
+      url: 'https://cosmicsignature.com/zh',
+    });
+    const artwork = artProtocolJsonLd({
+      description: '中文艺术说明',
+      inLanguage: 'zh-Hans',
+      genre: '生成艺术',
+      keywords: ['链上艺术', '三体问题'],
+    });
+    const faq = faqPageJsonLd([{ question: '这是什么？', answer: '链上艺术协议。' }], 'zh-Hans');
+    const breadcrumbs = breadcrumbJsonLd(
+      [{ name: '学习', path: '/learn' }],
+      'https://cosmicsignature.com/zh',
+      'zh-Hans',
+    );
+
+    expect(website).toEqual(
+      expect.objectContaining({
+        description: '中文协议说明',
+        inLanguage: 'zh-Hans',
+        url: 'https://cosmicsignature.com/zh',
+      }),
+    );
+    expect(website.potentialAction.target.urlTemplate).toContain('/zh/gallery');
+    expect(organization).toEqual(
+      expect.objectContaining({ description: '中文组织说明', inLanguage: 'zh-Hans' }),
+    );
+    expect(artwork).toEqual(
+      expect.objectContaining({
+        description: '中文艺术说明',
+        genre: '生成艺术',
+        inLanguage: 'zh-Hans',
+      }),
+    );
+    expect(faq.inLanguage).toBe('zh-Hans');
+    expect(breadcrumbs.inLanguage).toBe('zh-Hans');
+    expect(breadcrumbs.itemListElement[0]!.item).toBe('https://cosmicsignature.com/zh/learn');
+  });
+
   describe('websiteJsonLd', () => {
     const result = websiteJsonLd();
 

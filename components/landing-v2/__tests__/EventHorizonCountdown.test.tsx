@@ -52,12 +52,11 @@ describe('getLandingCycleTimerSnapshot', () => {
     expect(snapshot.finalizationTargetMs).toBe(sampledAtMs + 7_200_000);
     expect(snapshot.showCountdown).toBe(true);
     expect(snapshot.shards).toEqual([
-      { label: 'Days', value: 0 },
-      { label: 'Hours', value: 2 },
-      { label: 'Min', value: 0 },
-      { label: 'Sec', value: 0 },
+      { unit: 'days', value: 0 },
+      { unit: 'hours', value: 2 },
+      { unit: 'minutes', value: 0 },
+      { unit: 'seconds', value: 0 },
     ]);
-    expect(snapshot.title).toBe('Cycle #12 finalizes in');
     expect(snapshot.gestureCount).toBe(34);
   });
 
@@ -99,7 +98,6 @@ describe('getLandingCycleTimerSnapshot', () => {
     expect(snapshot.targetMs).toBe(activationTime * 1000);
     expect(snapshot.finalizationTargetMs).toBe(sampledAtMs + 7_200_000);
     expect(snapshot.showCountdown).toBe(true);
-    expect(snapshot.title).toBe('Cycle #12 opens soon');
   });
 
   it('shows ready-to-finalize when the backend target has passed', () => {
@@ -109,7 +107,6 @@ describe('getLandingCycleTimerSnapshot', () => {
     });
 
     expect(snapshot.phase).toBe('ready-to-finalize');
-    expect(snapshot.title).toBe('Cycle #12 is ready to finalize');
   });
 
   it('shows a waiting state before the first Gesture starts the horizon', () => {
@@ -127,14 +124,12 @@ describe('getLandingCycleTimerSnapshot', () => {
     expect(snapshot.phase).toBe('waiting-first-gesture');
     expect(snapshot.remainingMs).toBe(0);
     expect(snapshot.showCountdown).toBe(false);
-    expect(snapshot.title).toBe('Cycle #12 is waiting for its first Gesture');
   });
 
   it('uses a loading snapshot before live data arrives', () => {
     const snapshot = getLandingCycleTimerSnapshot({ sample: null, nowMs: sampledAtMs });
 
     expect(snapshot.phase).toBe('loading');
-    expect(snapshot.title).toBe('Synchronizing the cycle horizon');
   });
 });
 
@@ -157,13 +152,17 @@ describe('<EventHorizonCountdown />', () => {
 
     expect(screen.getByTestId('event-horizon-countdown')).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Cycle #21 finalizes in' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', {
+          name: /landing\.timer\.phases\.approach\.title/,
+        }),
+      ).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('timer')).toHaveAccessibleName(/Cycle #21 finalizes in/i);
-    expect(screen.getByText('55 Gestures')).toBeInTheDocument();
-    expect(screen.getByText('Same clock as the app')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Open live cycle/i })).toHaveAttribute(
+    expect(screen.getByRole('timer')).toHaveAccessibleName(/landing\.timer\.countdownAria/);
+    expect(screen.getByText(/landing\.timer\.gestureCount\(count=55\)/)).toBeInTheDocument();
+    expect(screen.getByText('landing.timer.sameClock')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /landing\.timer\.openLiveCycle/i })).toHaveAttribute(
       'href',
       'https://app.cosmicsignature.com',
     );
@@ -176,10 +175,10 @@ describe('<EventHorizonCountdown />', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: 'Live cycle clock unavailable' }),
+        screen.getByRole('heading', { name: 'landing.timer.phases.unavailable.title' }),
       ).toBeInTheDocument();
     });
-    expect(screen.getByText(/could not reach the protocol clock/i)).toBeInTheDocument();
+    expect(screen.getByText('landing.timer.phases.unavailable.body')).toBeInTheDocument();
   });
 
   it('renders waiting state without a ticking countdown', async () => {
@@ -196,10 +195,12 @@ describe('<EventHorizonCountdown />', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: 'Cycle #21 is waiting for its first Gesture' }),
+        screen.getByRole('heading', {
+          name: /landing\.timer\.phases\.waitingFirstGesture\.title/,
+        }),
       ).toBeInTheDocument();
     });
-    expect(screen.getByText('Awaiting first Gesture')).toBeInTheDocument();
-    expect(screen.queryByText('Countdown synchronized to protocol time')).not.toBeInTheDocument();
+    expect(screen.getByText('landing.timer.staticClock.waitingFirstGesture')).toBeInTheDocument();
+    expect(screen.queryByText('landing.timer.status.synchronized')).not.toBeInTheDocument();
   });
 });

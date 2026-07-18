@@ -14,7 +14,7 @@ import { expect, request, test } from '@playwright/test';
  * automatically, so we can assert on 3xx status + Location headers.
  */
 
-const BASE = 'http://localhost:3000';
+const BASE = `http://localhost:${process.env.PLAYWRIGHT_PORT ?? 3000}`;
 
 /**
  * The proxy middleware bakes the redirect target into the build via
@@ -198,6 +198,7 @@ test.describe('proxy middleware', () => {
       expect(res.status()).toBe(200);
       const body = await res.text();
       expect(body).toContain('lang="zh"');
+      expect(body).toContain('程序化链上艺术');
       await ctx.dispose();
     });
 

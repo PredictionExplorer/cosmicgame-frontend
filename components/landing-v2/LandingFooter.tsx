@@ -1,15 +1,13 @@
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
 
-const { footer } = landingContent;
-
-export function LandingFooter() {
+export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) {
   const locale = useLocale();
   const t = useTranslations('common');
 
@@ -20,12 +18,12 @@ export function LandingFooter() {
         <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr] lg:gap-16">
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
-              <Image src="/images/logo.svg" alt="Cosmic Signature" width={36} height={36} />
+              <Image src="/images/logo.svg" alt={footer.logoAlt} width={36} height={36} />
               <span
                 className="text-xl font-semibold text-white"
                 style={{ fontFamily: 'var(--font-family-display)' }}
               >
-                Cosmic Signature
+                {footer.brandName}
               </span>
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">{footer.tagline}</p>
@@ -63,7 +61,7 @@ export function LandingFooter() {
         </div>
 
         <div className="mt-16 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-8 text-xs text-white/50 sm:flex-row sm:items-center">
-          <p>&copy; {new Date().getFullYear()} Cosmic Signature. Public domain.</p>
+          <p>{footer.copyright.replace('{year}', String(new Date().getFullYear()))}</p>
           <div className="flex items-center gap-4">
             <p className="font-mono uppercase tracking-[0.24em]">{footer.colophon}</p>
             <LanguageSwitcher />

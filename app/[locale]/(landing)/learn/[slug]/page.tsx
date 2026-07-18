@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { setRequestLocale } from 'next-intl/server';
 
-import { learnArticles, getLearnArticle } from '@/content/learn';
+import { getLearnArticle, getLearnContent, getLearnSlugs } from '@/content/learn';
 
 import { Link } from '@/i18n/navigation';
-import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
+import { LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -12,42 +13,58 @@ interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-function sectionId(articleSlug: string, heading: string): string {
-  return `${articleSlug}-${heading.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+function sectionId(articleSlug: string, index: number): string {
+  return `${articleSlug}-section-${index + 1}`;
+}
+
+function displayUpdatedDate(value: string, locale: string): string {
+  if (locale !== 'zh') return value;
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${value}T00:00:00Z`));
 }
 
 export function generateStaticParams() {
-  return learnArticles.map((article) => ({ slug: article.slug }));
+  return getLearnSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const article = getLearnArticle(slug);
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+  const article = getLearnArticle(slug, locale);
   if (!article) return {};
 
   return createMetadata(article.title, article.description, undefined, `/learn/${article.slug}`, {
     canonicalHost: 'landing',
+    locale,
   });
 }
 
 export default async function LearnArticlePage({ params }: PageProps) {
   const { locale, slug } = await params;
-  const article = getLearnArticle(slug);
+  setRequestLocale(locale);
+  const article = getLearnArticle(slug, locale);
   if (!article) notFound();
+  const { articleUi } = getLearnContent(locale);
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
 
-  const url = `${LANDING_ORIGIN}/learn/${article.slug}`;
+  const url = localeHref(LANDING_ORIGIN, `/learn/${article.slug}`, locale);
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': article.schemaType,
     headline: article.h1,
     description: article.description,
     url,
+    inLanguage,
     datePublished: article.updated,
     dateModified: article.updated,
     author: {
       '@type': 'Organization',
       name: 'Cosmic Signature',
-      url: `${LANDING_ORIGIN}/`,
+      url: localeHref(LANDING_ORIGIN, '/', locale),
     },
     publisher: {
       '@id': `${LANDING_ORIGIN}/#organization`,
@@ -61,46 +78,47 @@ export default async function LearnArticlePage({ params }: PageProps) {
         data={[
           breadcrumbJsonLd(
             [
-              { name: 'Cosmic Signature', path: '/' },
-              { name: 'Learn', path: '/learn' },
+              { name: articleUi.breadcrumbs.homeLabel, path: '/' },
+              { name: articleUi.breadcrumbs.learnLabel, path: '/learn' },
               { name: article.h1, path: `/learn/${article.slug}` },
             ],
-            LANDING_ORIGIN,
+            localeHref(LANDING_ORIGIN, '/', locale),
+            inLanguage,
           ),
           articleJsonLd,
         ]}
       />
-      <nav aria-label="Breadcrumb" className="mb-8 text-sm text-white/60">
+      <nav aria-label={articleUi.breadcrumbs.ariaLabel} className="mb-8 text-sm text-white/60">
         <Link href="/" className="hover:text-white">
-          Cosmic Signature
+          {articleUi.breadcrumbs.homeLabel}
         </Link>
         <span className="mx-2">/</span>
         <Link href="/learn" className="hover:text-white">
-          Learn
+          {articleUi.breadcrumbs.learnLabel}
         </Link>
       </nav>
 
       <article>
         <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">
-          Cosmic Signature Learn
+          {articleUi.eyebrow}
         </p>
         <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
           {article.h1}
         </h1>
         <p className="mt-6 text-lg leading-8 text-white/78">{article.summary}</p>
         <p className="mt-4 text-sm text-white/50">
-          Last updated: <time dateTime={article.updated}>{article.updated}</time> · Published by
-          Cosmic Signature
+          {articleUi.lastUpdatedLabel}
+          {locale === 'zh' ? null : ' '}
+          <time dateTime={article.updated}>
+            {displayUpdatedDate(article.updated, locale)}
+          </time> · {articleUi.publisherLabel}
         </p>
 
         <div className="mt-12 space-y-10">
-          {article.sections.map((section) => (
-            <section
-              key={section.heading}
-              aria-labelledby={sectionId(article.slug, section.heading)}
-            >
+          {article.sections.map((section, sectionIndex) => (
+            <section key={section.heading} aria-labelledby={sectionId(article.slug, sectionIndex)}>
               <h2
-                id={sectionId(article.slug, section.heading)}
+                id={sectionId(article.slug, sectionIndex)}
                 className="text-2xl font-semibold tracking-tight text-white"
               >
                 {section.heading}
@@ -118,7 +136,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
       </article>
 
       <aside className="mt-14 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-        <h2 className="text-lg font-semibold text-white">Related Cosmic Signature resources</h2>
+        <h2 className="text-lg font-semibold text-white">{articleUi.relatedResourcesHeading}</h2>
         <ul className="mt-4 space-y-3">
           {article.related.map((link) => (
             <li key={link.href}>

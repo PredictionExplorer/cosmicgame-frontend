@@ -1,0 +1,67 @@
+{
+  "timer": {
+    "cycle": {
+      "current": "当前周期",
+      "numbered": "第 {number} 个周期",
+      "generic": "演绎周期"
+    },
+    "phases": {
+      "loading": {
+        "title": "正在同步周期倒计时",
+        "body": "正在读取协议时间，请稍候。"
+      },
+      "openingSoon": {
+        "title": "{cycle}即将开启",
+        "body": "下一周期即将开启。倒计时归零后即可落笔。"
+      },
+      "waitingFirstGesture": {
+        "title": "{cycle}正等待第一笔",
+        "body": "落下第一笔后，收官倒计时便会启动，下一幅签名作品也将由此成形。"
+      },
+      "approach": {
+        "title": "{cycle}距收官还有",
+        "body": "周期正在进行。每一笔都在塑造签名，也可能延长收官倒计时。"
+      },
+      "finalHour": {
+        "title": "{cycle}进入最后一小时",
+        "body": "每一笔都可能推迟收官，并为正在成形的签名再添一笔。"
+      },
+      "nearHorizon": {
+        "title": "{cycle}即将收官",
+        "body": "收官倒计时即将归零。接下来的片刻将决定最终形态。"
+      },
+      "ready": {
+        "title": "{cycle}已可收官",
+        "body": "收官倒计时已经归零，协议已可将本周期铭刻为最终签名。"
+      },
+      "unavailable": {
+        "title": "无法读取实时周期时钟",
+        "body": "当前页面暂时无法连接协议时钟。请打开应用查看最新周期状态。"
+      },
+      "live": {
+        "title": "{cycle}距收官还有",
+        "body": "此处显示的倒计时与应用内同步。每一笔都在塑造签名，也可能推迟收官。"
+      }
+    },
+    "staticClock": {
+      "waitingFirstGesture": "等待第一笔",
+      "ready": "00:00",
+      "unavailable": "时钟暂不可用",
+      "syncing": "同步中"
+    },
+    "liveClock": "实时周期时钟",
+    "gestureCount": "{count} 次落笔",
+    "sameClock": "与应用内时钟同步",
+    "status": {
+      "ready": "已可收官",
+      "openingSoon": "周期开启倒计时",
+      "waitingFirstGesture": "周期已开启，等待第一笔",
+      "synchronized": "倒计时已与协议时间同步"
+    },
+    "openLiveCycle": "查看实时周期",
+    "eventHorizon": "事件地平线",
+    "countdownAria": "{label}：{duration}",
+    "durationPart": "{value}{unit}",
+    "durationSeparator": "，"
+  }
+}

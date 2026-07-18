@@ -18,14 +18,31 @@ export interface BreadcrumbSegment {
   path: string;
 }
 
-export function websiteJsonLd() {
+interface LocalizedSiteJsonLdOptions {
+  description?: string;
+  inLanguage?: string;
+  url?: string;
+}
+
+interface WebsiteJsonLdOptions extends LocalizedSiteJsonLdOptions {
+  searchUrlTemplate?: string;
+}
+
+interface ArtProtocolJsonLdOptions extends LocalizedSiteJsonLdOptions {
+  creditText?: string;
+  genre?: string;
+  keywords?: readonly string[];
+}
+
+export function websiteJsonLd(options: WebsiteJsonLdOptions = {}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${SITE_URL}/#website`,
     name: SITE_NAME,
-    url: `${SITE_URL}/`,
-    description: PROTOCOL_DESCRIPTION,
+    url: options.url ?? `${SITE_URL}/`,
+    description: options.description ?? PROTOCOL_DESCRIPTION,
+    ...(options.inLanguage ? { inLanguage: options.inLanguage } : {}),
     publisher: {
       '@id': `${SITE_URL}/#organization`,
     },
@@ -33,27 +50,28 @@ export function websiteJsonLd() {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${APP_URL}/gallery?search={search_term_string}`,
+        urlTemplate: options.searchUrlTemplate ?? `${APP_URL}/gallery?search={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
   };
 }
 
-export function organizationJsonLd() {
+export function organizationJsonLd(options: LocalizedSiteJsonLdOptions = {}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     '@id': `${SITE_URL}/#organization`,
     name: SITE_NAME,
-    url: `${SITE_URL}/`,
+    url: options.url ?? `${SITE_URL}/`,
     logo: SITE_LOGO_URL,
     sameAs: [
       'https://x.com/CosmicSignature',
       'https://discord.gg/bGnPn96Qwt',
       'https://github.com/PredictionExplorer',
     ],
-    description: PROTOCOL_DESCRIPTION,
+    description: options.description ?? PROTOCOL_DESCRIPTION,
+    ...(options.inLanguage ? { inLanguage: options.inLanguage } : {}),
   };
 }
 
@@ -76,10 +94,12 @@ export function webPageJsonLd({
   name,
   description,
   url,
+  inLanguage,
 }: {
   name: string;
   description: string;
   url: string;
+  inLanguage?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -87,6 +107,7 @@ export function webPageJsonLd({
     name,
     description,
     url,
+    ...(inLanguage ? { inLanguage } : {}),
     publisher: {
       '@id': `${SITE_URL}/#organization`,
     },
@@ -148,19 +169,19 @@ export function datasetJsonLd({
   };
 }
 
-export function artProtocolJsonLd() {
+export function artProtocolJsonLd(options: ArtProtocolJsonLdOptions = {}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     '@id': `${SITE_URL}/#art-protocol`,
     name: SITE_NAME,
-    url: `${SITE_URL}/`,
+    url: options.url ?? `${SITE_URL}/`,
     image: SITE_LOGO_URL,
     license: 'https://creativecommons.org/publicdomain/zero/1.0/',
-    creditText: 'Cosmic Signature Protocol',
-    description: PROTOCOL_DESCRIPTION,
-    genre: 'Generative Art',
-    keywords: [
+    creditText: options.creditText ?? 'Cosmic Signature Protocol',
+    description: options.description ?? PROTOCOL_DESCRIPTION,
+    genre: options.genre ?? 'Generative Art',
+    keywords: options.keywords ?? [
       'procedural art',
       'on-chain art',
       'three-body problem',
@@ -170,13 +191,15 @@ export function artProtocolJsonLd() {
       'Arbitrum',
       'Ethereum',
     ],
+    ...(options.inLanguage ? { inLanguage: options.inLanguage } : {}),
   };
 }
 
-export function faqPageJsonLd(items: FAQItem[]) {
+export function faqPageJsonLd(items: FAQItem[], inLanguage?: string) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    ...(inLanguage ? { inLanguage } : {}),
     mainEntity: items.map((item) => ({
       '@type': 'Question',
       name: item.question,
@@ -188,11 +211,16 @@ export function faqPageJsonLd(items: FAQItem[]) {
   };
 }
 
-export function breadcrumbJsonLd(segments: BreadcrumbSegment[], baseUrl: string = APP_URL) {
+export function breadcrumbJsonLd(
+  segments: BreadcrumbSegment[],
+  baseUrl: string = APP_URL,
+  inLanguage?: string,
+) {
   const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
+    ...(inLanguage ? { inLanguage } : {}),
     itemListElement: segments.map((segment, index) => ({
       '@type': 'ListItem',
       position: index + 1,

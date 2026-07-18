@@ -2,13 +2,11 @@
 
 import { motion } from 'framer-motion';
 
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { SectionHeading } from './SectionHeading';
 
-const { council } = landingContent;
-
-export function CosmicCouncil() {
+export function CosmicCouncil({ council }: { council: LandingContent['council'] }) {
   return (
     <section className="relative border-t border-white/10 bg-[#0D0521] py-28 sm:py-40">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">

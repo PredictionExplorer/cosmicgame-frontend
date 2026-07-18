@@ -4,16 +4,14 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight, Check } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 import { SectionHeading } from './SectionHeading';
 
-const { anchoring } = landingContent;
-
-export function Anchoring() {
+export function Anchoring({ anchoring }: { anchoring: LandingContent['anchoring'] }) {
   const locale = useLocale();
 
   return (

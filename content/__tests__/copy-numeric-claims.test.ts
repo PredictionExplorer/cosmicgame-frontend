@@ -2,8 +2,8 @@ import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 import { getAllItems } from '@/app/[locale]/(app)/faq/data/faq-data';
-import { landingContent } from '@/content/landing';
-import { learnArticles } from '@/content/learn';
+import { landingContentEn, landingContentZh } from '@/content/landing';
+import { learnContentEn, learnContentZh } from '@/content/learn';
 import { protocolFacts } from '@/content/protocol-facts';
 import { statisticsCopy } from '@/content/statistics-copy';
 
@@ -42,8 +42,10 @@ const sources: CopySource[] = [
       .map((item) => `${item.question} ${item.answer}`)
       .join('\n'),
   },
-  { name: 'landing', text: JSON.stringify(landingContent) },
-  { name: 'learn', text: JSON.stringify(learnArticles) },
+  { name: 'landing-en', text: JSON.stringify(landingContentEn) },
+  { name: 'landing-zh', text: JSON.stringify(landingContentZh) },
+  { name: 'learn-en', text: JSON.stringify(learnContentEn.articles) },
+  { name: 'learn-zh', text: JSON.stringify(learnContentZh.articles) },
   { name: 'messages-en', text: readMessageCatalogs('en') },
   { name: 'messages-zh', text: readMessageCatalogs('zh') },
   { name: 'statistics-copy', text: JSON.stringify(statisticsCopy) },

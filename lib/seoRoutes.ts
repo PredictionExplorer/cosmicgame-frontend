@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-import { learnArticles } from '@/content/learn';
+import { learnContentEn } from '@/content/learn';
 
 export type SeoHost = 'app' | 'landing';
 export type SeoRouteKind = 'content' | 'data' | 'tool' | 'personal' | 'admin' | 'dynamic';
@@ -58,7 +58,7 @@ const landingStaticRoutes: SeoRoute[] = [
   },
 ];
 
-const learnRoutes: SeoRoute[] = learnArticles.map((article) => ({
+const learnRoutes: SeoRoute[] = learnContentEn.articles.map((article) => ({
   path: `/learn/${article.slug}`,
   host: 'landing',
   kind: 'content',

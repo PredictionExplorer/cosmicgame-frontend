@@ -12,10 +12,8 @@ _raffle_ became **Stellar Selection**, _staking_ became **Anchoring**. The Chine
 carry an **art-performance register**, never a gambling / gaming / investment register.
 Do not translate the underlying banned concept — translate the coined term.
 
-> Status: recommendations below were drafted for engineering + translation kickoff.
-> The native-fluency reviewer of Sprint 1 may amend any decision **by editing this file**
-> (and updating all existing usages in the same PR). After Sprint 2 the glossary is frozen
-> except through the change process in §6.
+> Status: **frozen after Sprint 2 (2026-07-18)**. Amendments now require the change process
+> in §6 and must update all existing usages in the same PR.
 
 ---
 
@@ -88,6 +86,10 @@ Finalize button. Never 最终确定 (translationese) or 结算 (settlement — f
 | Cycle Finalization Time   | 周期收官时间 |
 | Open-Finalization Window  | 公开收官窗口 |
 | When the cycle finalizes… | 周期收官时…… |
+
+`周期收官时间` is the full mechanic name used in definitions and labels. In running
+Chinese that describes the clock starting, extending, or reaching zero, use the natural
+short form `收官倒计时` (for example, `首笔落笔会启动收官倒计时`).
 
 ### Calibration Window（原 Dutch auction）→ 校准窗口
 

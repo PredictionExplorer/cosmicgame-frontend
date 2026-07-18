@@ -1,26 +1,3 @@
-/**
- * Single source of truth for every string rendered on the Cosmic Signature
- * landing page at cosmicsignature.com. Every landing component imports from
- * this file so regulatory/legal review is a single-file read.
- *
- * Vocabulary rules (see /marketing/cosmic-lexicon.md for canonical guide):
- * - "bid" is banned. Use "Gesture" or "Make a Gesture".
- * - "allocation" is banned. Use "Allocation" or "Signature Allocation".
- * - "stellarSelection" is banned. Use "Stellar Selection".
- * - "recipient" is banned. Use "Recipient".
- * - "Dutch auction" is banned. Use "Calibration Window".
- * - "anchoring / anchor / anchorHolder" are banned. Use "Anchoring / Anchor / Anchor-holder".
- * - "yield / rewards / passive" are banned. Use "Anchor Distribution".
- * - "charity / donation" are banned. Use "Public Goods Contribution".
- * - "DAO" is banned. Use "Cosmic Council" or "Protocol Coordination".
- * - "withdraw / claim" are replaced with "Retrieve".
- *
- * All public-copy banned words are also banned here per the lexicon's
- * 2026-04-23 revision: "game", "play", "player", "compete", "competition",
- * "contest", "tournament", "draw", "sweepstakes", "giveaway", "earn",
- * "earnings", "income".
- */
-
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
@@ -28,11 +5,13 @@ import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
-export const landingContent = {
+import type { LandingContent } from './types';
+
+export const landingContentEn = {
   meta: {
     title: 'Cosmic Signature: Procedural On-Chain Art Protocol on Arbitrum',
     description:
-      'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle\u2019s final Signature, and the protocol redistributes its reserves across everyone who shaped the outcome \u2014 including the infrastructure Ethereum itself depends on.',
+      'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle’s final Signature, and the protocol redistributes its reserves across everyone who shaped the outcome — including the infrastructure Ethereum itself depends on.',
     keywords: [
       'Cosmic Signature',
       'procedural art protocol',
@@ -48,12 +27,19 @@ export const landingContent = {
   },
 
   hero: {
-    eyebrow: 'Procedural on-chain art protocol \u00b7 Arbitrum',
+    eyebrow: 'Procedural on-chain art protocol · Arbitrum',
     headline: 'Cosmic Signature: Procedural On-Chain Art on Arbitrum',
+    headlineLead: 'Cosmic Signature: Procedural On-Chain Art on',
+    headlineAccent: 'Arbitrum',
     subhead:
-      'Every Gesture Shapes the Signature. Make a gesture during a Performance Cycle, and every gesture shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including the infrastructure Ethereum itself depends on.',
+      'Every Gesture Shapes the Signature. Make a gesture during a Performance Cycle, and every gesture shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including the infrastructure Ethereum itself depends on.',
+    biologyDisclaimer:
+      'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
     primaryCta: { label: 'Open the App', href: APP_ORIGIN },
     secondaryCta: { label: 'Explore the Cycle', href: '#cycle' },
+    statisticsCta: { label: 'Protocol statistics', href: `${APP_ORIGIN}/statistics` },
+    galleryCta: { label: 'NFT gallery', href: `${APP_ORIGIN}/gallery` },
+    scrollAriaLabel: 'Scroll to The Cycle section',
     marqueeChips: [
       'Verified Contracts',
       'CC0',
@@ -89,7 +75,7 @@ export const landingContent = {
       {
         number: '04',
         title: 'Allocations',
-        body: 'The protocol distributes the Cycle Reserve across more than ten allocation tracks. About half of the ETH reserve rolls into the next cycle\u2019s Compounding Reserve.',
+        body: 'The protocol distributes the Cycle Reserve across more than ten allocation tracks. About half of the ETH reserve rolls into the next cycle’s Compounding Reserve.',
       },
     ],
   },
@@ -98,12 +84,25 @@ export const landingContent = {
     eyebrow: 'The Art',
     heading: 'The Three Body Problem, rendered on-chain.',
     description:
-      'Every Cosmic Signature NFT visualizes three celestial bodies orbiting under Newtonian gravity. Three bodies produce fundamentally chaotic trajectories. No AI. No training data. Just deterministic physics. Same seed \u2192 identical output, pixel for pixel.',
+      'Every Cosmic Signature NFT visualizes three celestial bodies orbiting under Newtonian gravity. Three bodies produce fundamentally chaotic trajectories. No AI. No training data. Just deterministic physics. Same seed → identical output, pixel for pixel.',
+    loading: {
+      label: 'Live archive syncing',
+      description:
+        'Real generated NFTs appear here as soon as indexed token metadata is available.',
+    },
+    showcase: {
+      liveLabel: 'Live Signature',
+      signalLabel: 'Signal',
+      awaitingMetadataLabel: 'Awaiting metadata',
+      viewAriaLabel: 'View Cosmic Signature {tokenLabel}',
+      artworkAlt: 'Cosmic Signature artwork {tokenLabel}',
+    },
+    stageLabel: 'Stage',
     stages: [
       {
         number: '01',
         title: 'Seed',
-        body: 'A 32-byte hash is derived from on-chain data \u2014 block information and ArbSys precompiles \u2014 then fed into a SHA3-256 RNG.',
+        body: 'A 32-byte hash is derived from on-chain data — block information and ArbSys precompiles — then fed into a SHA3-256 RNG.',
       },
       {
         number: '02',
@@ -113,7 +112,7 @@ export const landingContent = {
       {
         number: '03',
         title: 'Selection',
-        body: 'A Borda rank aggregation (chaos \u00d7 equilateralness) selects the most visually interesting orbit from the candidate pool.',
+        body: 'A Borda rank aggregation (chaos × equilateralness) selects the most visually interesting orbit from the candidate pool.',
       },
       {
         number: '04',
@@ -123,7 +122,7 @@ export const landingContent = {
       {
         number: '05',
         title: 'Color',
-        body: 'Colors are mixed in the OKLab perceptual space with 120\u00b0 hue separation per body, modulated by drift and a sine wave.',
+        body: 'Colors are mixed in the OKLab perceptual space with 120° hue separation per body, modulated by drift and a sine wave.',
       },
       {
         number: '06',
@@ -149,6 +148,7 @@ export const landingContent = {
     heading: 'More than ten ways the protocol distributes the Cycle Reserve.',
     description:
       'When a cycle finalizes, the protocol distributes its ETH and CST reserves across allocation tracks that recognize endurance, timing, dedication, and participation. About half of the ETH reserve compounds into the next cycle.',
+    cardLabel: 'Allocation',
     items: [
       {
         percent: '25%',
@@ -188,7 +188,7 @@ export const landingContent = {
       },
       {
         percent: '10 NFTs',
-        title: 'NFT Stellar Selection \u2014 Participants',
+        title: 'NFT Stellar Selection — Participants',
         body: `Ten randomly selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and one Cosmic Signature NFT.`,
         tone: 'default',
       },
@@ -216,10 +216,10 @@ export const landingContent = {
   anchoring: {
     eyebrow: 'Anchoring',
     heading: 'Anchor Cosmic Signature NFTs to the protocol.',
-    body: `Anchored Cosmic Signature NFTs receive a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution each cycle, paid out when the anchor is released. Release the anchor whenever you like \u2014 but each NFT can be anchored only once, so releasing permanently ends that NFT\u2019s anchoring eligibility. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection, where selected anchor-holders receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT (no ETH).`,
+    body: `Anchored Cosmic Signature NFTs receive a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution each cycle, paid out when the anchor is released. Release the anchor whenever you like — but each NFT can be anchored only once, so releasing permanently ends that NFT’s anchoring eligibility. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection, where selected anchor-holders receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT (no ETH).`,
     bullets: [
       'Per-cycle ETH accrual, retrieved at anchor release',
-      'Release anchors at any time \u2014 each NFT anchors only once',
+      'Release anchors at any time — each NFT anchors only once',
       'Random Walk anchors enter the Stellar Selection',
       'No fixed term and no penalties; releasing is permanent per NFT',
     ],
@@ -228,14 +228,23 @@ export const landingContent = {
 
   publicGoods: {
     eyebrow: 'Public Goods',
-    heading: '7% of every cycle funds Ethereum\u2019s core contributors.',
-    body: 'Every Performance Cycle forwards 7% of its ETH reserve to Protocol Guild \u2014 the collective funding mechanism for 170+ Ethereum core contributors. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.',
-    // lexicon-allow-start — explicit legal disclaimer language prescribed by
-    // the Cosmic Lexicon Section C.7. "Charitable" appears here deliberately
-    // to *deny* any charitable-tax-treatment framing, not to invoke one.
+    heading: '7% of every cycle funds Ethereum’s core contributors.',
+    body: 'Every Performance Cycle forwards 7% of its ETH reserve to Protocol Guild — the collective funding mechanism for 170+ Ethereum core contributors. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.',
+    disclaimerHeading: 'Disclaimer',
+    // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
       'This is a forwarding of ETH to a public-goods address (currently Protocol Guild). It is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
     // lexicon-allow-end
+    card: {
+      label: 'Cycle Allocation',
+      percentage: '7%',
+      description: 'of every Performance Cycle is forwarded to Protocol Guild.',
+      tableRows: [
+        { label: 'Protocol Guild contributors', value: '170+' },
+        { label: 'Enforcement', value: 'on-chain' },
+        { label: 'Recipient', value: 'pg.eth' },
+      ],
+    },
     cta: { label: 'Learn about Protocol Guild', href: 'https://protocol-guild.readthedocs.io' },
   },
 
@@ -262,7 +271,7 @@ export const landingContent = {
   verifiability: {
     eyebrow: 'Verifiability',
     heading: 'Open, verified, reproducible.',
-    body: 'Anyone can verify a Signature by regenerating it from its seed. Contract verification, static analysis notes, and audit status are published through the app as reports become available. The whole repository is CC0 \u2014 no rights reserved, fork and remix encouraged.',
+    body: 'Anyone can verify a Signature by regenerating it from its seed. Contract verification, static analysis notes, and audit status are published through the app as reports become available. The whole repository is CC0 — no rights reserved, fork and remix encouraged.',
     pillars: [
       {
         title: 'CC0 1.0',
@@ -274,20 +283,16 @@ export const landingContent = {
       },
       {
         title: 'Reproducible Art',
-        body: 'SHA-256 hashes of generated frames asserted in continuous integration. Same seed \u2192 identical output.',
+        body: 'SHA-256 hashes of generated frames asserted in continuous integration. Same seed → identical output.',
       },
     ],
   },
 
-  // lexicon-allow-start: FAQ denial copy intentionally cites the categories it disclaims (lottery, investment, gambling) per cosmic-lexicon.md D.5. This is the one place these words must appear in order to disclaim them.
   faq: {
     eyebrow: 'Clarifications',
     heading: 'Questions worth answering plainly.',
     items: [
-      // lexicon-allow-start — mandatory FAQ denial language. Lexicon C banned
-      // list explicitly allows invoking "lottery, casino, gambling, house,
-      // dealer, bet" in a denial FAQ so that search crawlers and compliance
-      // reviewers can see the denial verbatim. Cosmic terms carry the rest.
+      // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.
       {
         question: 'Is this a lottery, casino, or gambling product?',
         answer:
@@ -297,7 +302,7 @@ export const landingContent = {
       {
         question: 'What do I actually do as a participant?',
         answer:
-          'You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle\u2019s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least 100 CST.',
+          'You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle’s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least 100 CST.',
       },
       {
         question: 'Why does the Participation CST amount change?',
@@ -310,24 +315,20 @@ export const landingContent = {
       {
         question: 'Where do the ETH allocations come from?',
         answer:
-          'From the Cycle Reserve, which grows as participants make gestures. When a cycle finalizes, about half rolls forward into the next cycle\u2019s Compounding Reserve; the remainder is distributed across allocation tracks (Signature Allocation, Chrono-Warrior, Anchor Distribution, Stellar Selection, Public Goods) per on-chain parameters.',
+          'From the Cycle Reserve, which grows as participants make gestures. When a cycle finalizes, about half rolls forward into the next cycle’s Compounding Reserve; the remainder is distributed across allocation tracks (Signature Allocation, Chrono-Warrior, Anchor Distribution, Stellar Selection, Public Goods) per on-chain parameters.',
       },
-      // lexicon-allow-start — mandatory investment/securities denial FAQ.
-      // Per lexicon guidance, "investment / profit / dividend" appear in a
-      // denial context so that crawlers and reviewers see the explicit denial.
+      // lexicon-allow-start: explicit investment and securities denial.
       {
         question: 'Is any of this an investment?',
         answer:
           'No. CST tokens express participation and coordination weight within the protocol, not equity, profit share, dividend, or investment contract. No team wallet receives ETH from participant gestures. Cosmic Signature makes no representation about token price or future behavior and does not solicit participation as an investment.',
       },
       // lexicon-allow-end
-      // lexicon-allow-start — mandatory public-goods / tax-sense denial FAQ,
-      // verbatim from cosmic-lexicon.md Section C.7. "Charitable" denies a
-      // charitable-tax-treatment framing, not invokes one.
+      // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: 'What exactly is Public Goods?',
         answer:
-          'Seven percent of each cycle\u2019s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
+          'Seven percent of each cycle’s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
       },
       // lexicon-allow-end
       {
@@ -338,13 +339,14 @@ export const landingContent = {
       {
         question: 'Can I fork this?',
         answer:
-          'Yes. The entire repository is licensed CC0 1.0 \u2014 no rights reserved. Contracts, shaders, renderers, marketing site, and documentation are all in the public domain.',
+          'Yes. The entire repository is licensed CC0 1.0 — no rights reserved. Contracts, shaders, renderers, marketing site, and documentation are all in the public domain.',
       },
     ],
   },
 
-  // lexicon-allow-end
   footer: {
+    brandName: 'Cosmic Signature',
+    logoAlt: 'Cosmic Signature',
     tagline: 'A procedural on-chain art protocol on Arbitrum.',
     columns: [
       {
@@ -384,8 +386,14 @@ export const landingContent = {
         ],
       },
     ],
-    colophon: 'CC0 1.0 \u00b7 Publicly verifiable \u00b7 Reproducible art',
+    copyright: '© {year} Cosmic Signature. Public domain.',
+    colophon: 'CC0 1.0 · Publicly verifiable · Reproducible art',
   },
-} as const;
 
-export type LandingContent = typeof landingContent;
+  notFound: {
+    code: '404',
+    heading: 'Off the star map.',
+    description: 'This coordinate has drifted outside the protocol. Return to the Signature.',
+    cta: { label: 'Back to the Signature', href: '/' },
+  },
+} as const satisfies LandingContent;

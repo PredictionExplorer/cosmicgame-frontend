@@ -3,15 +3,17 @@
 import { motion } from 'framer-motion';
 import { FileCheck, ShieldCheck, Sparkles } from 'lucide-react';
 
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { SectionHeading } from './SectionHeading';
 
-const { verifiability } = landingContent;
-
 const ICONS = [FileCheck, ShieldCheck, Sparkles];
 
-export function Verifiability() {
+export function Verifiability({
+  verifiability,
+}: {
+  verifiability: LandingContent['verifiability'];
+}) {
   return (
     <section className="relative border-t border-white/10 bg-[#0A0418] py-28 sm:py-40">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">

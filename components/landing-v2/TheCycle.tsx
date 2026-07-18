@@ -3,13 +3,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { SectionHeading } from './SectionHeading';
 
-const { cycle } = landingContent;
-
-export function TheCycle() {
+export function TheCycle({ cycle }: { cycle: LandingContent['cycle'] }) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,

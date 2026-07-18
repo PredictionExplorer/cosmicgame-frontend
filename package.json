@@ -25,6 +25,7 @@
     "indexnow:submit": "tsx scripts/indexnow-submit.ts",
     "i18n:parity": "tsx scripts/i18n-parity.ts",
     "i18n:sprint1": "tsx scripts/i18n-parity.ts --required scripts/i18n-sprint1-required.json",
+    "i18n:sprint2": "tsx scripts/i18n-parity.ts --required scripts/i18n-sprint2-required.json",
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "prepare": "husky"
   },

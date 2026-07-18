@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 
 import { formatId, getAssetsUrl } from '@/utils';
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { networkConfig } from '@/config/networks';
@@ -15,7 +15,6 @@ import NFTImage from '@/components/nft/NFTImage';
 
 import { SectionHeading } from './SectionHeading';
 
-const { art } = landingContent;
 const SHOWCASE_LIMIT = 36;
 const ROTATION_MS = 18_000;
 
@@ -64,7 +63,7 @@ function useLandingShowcaseTokens() {
   return tokens;
 }
 
-function GenerativeProcessVisual() {
+function GenerativeProcessVisual({ loading }: { loading: LandingContent['art']['loading'] }) {
   return (
     <div className="relative flex h-full min-h-[24rem] items-center justify-center overflow-hidden">
       <div className="absolute h-64 w-64 rounded-full border border-white/10" />
@@ -75,17 +74,15 @@ function GenerativeProcessVisual() {
       <div className="absolute h-px w-56 -rotate-[32deg] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
       <div className="relative z-[1] max-w-xs px-6 text-center">
         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">
-          Live archive syncing
+          {loading.label}
         </p>
-        <p className="mt-3 text-sm leading-relaxed text-white/70">
-          Real generated NFTs appear here as soon as indexed token metadata is available.
-        </p>
+        <p className="mt-3 text-sm leading-relaxed text-white/70">{loading.description}</p>
       </div>
     </div>
   );
 }
 
-export function TheArt() {
+export function TheArt({ art }: { art: LandingContent['art'] }) {
   const locale = useLocale();
   const tokens = useLandingShowcaseTokens();
   const rotationIndex = useRotatingIndex({
@@ -125,18 +122,18 @@ export function TheArt() {
                   locale,
                 )}
                 className="group block h-full animate-in fade-in duration-700"
-                aria-label={`View Cosmic Signature ${tokenLabel}`}
+                aria-label={art.showcase.viewAriaLabel.replace('{tokenLabel}', tokenLabel)}
               >
                 <NFTImage
                   src={showcaseImage}
-                  alt={`Cosmic Signature artwork ${tokenLabel}`}
+                  alt={art.showcase.artworkAlt.replace('{tokenLabel}', tokenLabel)}
                   terminalFallbackSrc={null}
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="h-full aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.025]"
                 />
               </Link>
             ) : (
-              <GenerativeProcessVisual />
+              <GenerativeProcessVisual loading={art.loading} />
             )}
             <div
               className="pointer-events-none absolute inset-0"
@@ -148,9 +145,11 @@ export function TheArt() {
             />
             <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between rounded-xl border border-white/10 bg-black/50 px-4 py-3 text-xs backdrop-blur">
               <span className="font-mono uppercase tracking-[0.2em] text-white/60">
-                {tokenLabel ? 'Live Signature' : 'Signal'}
+                {tokenLabel ? art.showcase.liveLabel : art.showcase.signalLabel}
               </span>
-              <span className="font-mono text-white/90">{tokenLabel ?? 'Awaiting metadata'}</span>
+              <span className="font-mono text-white/90">
+                {tokenLabel ?? art.showcase.awaitingMetadataLabel}
+              </span>
             </div>
           </div>
 
@@ -170,7 +169,7 @@ export function TheArt() {
                 <div>
                   <div className="flex items-baseline gap-3">
                     <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
-                      Stage {stage.number}
+                      {art.stageLabel} {stage.number}
                     </span>
                   </div>
                   <h3

@@ -2,11 +2,9 @@
 
 import { motion } from 'framer-motion';
 
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { SectionHeading } from './SectionHeading';
-
-const { tracks } = landingContent;
 
 type Tone = 'primary' | 'aurora' | 'rose' | 'impact' | 'nebula' | 'solar' | 'default';
 
@@ -30,7 +28,7 @@ const TONE_TEXT: Record<Tone, string> = {
   default: 'text-white',
 };
 
-export function AllocationTracks() {
+export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] }) {
   return (
     <section id="tracks" className="relative border-t border-white/10 bg-[#0A0418] py-28 sm:py-40">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
@@ -75,7 +73,7 @@ export function AllocationTracks() {
 
                 <div className="relative">
                   <p className={`font-mono text-[10px] uppercase tracking-[0.24em] text-white/50`}>
-                    Allocation
+                    {tracks.cardLabel}
                   </p>
                   <p
                     className={`mt-3 text-4xl font-semibold tracking-tight sm:text-5xl ${TONE_TEXT[tone]}`}

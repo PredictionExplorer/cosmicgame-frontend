@@ -151,7 +151,7 @@ per namespace, identical key structure across locales:
 
 ```
 common.json     nav.json        footer.json     wallet.json
-home.json       currentCycle.json  gallery.json  detail.json
+home.json       landing.json    currentCycle.json  gallery.json  detail.json
 gesture.json    anchoring.json  allocation.json myPages.json
 statistics.json tables.json     tooltips.json   toasts.json
 errors.json     forms.json      meta.json       howItWorks.json

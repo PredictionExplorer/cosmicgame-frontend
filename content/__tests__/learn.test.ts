@@ -1,6 +1,36 @@
-import { getLearnArticle, learnArticles } from '@/content/learn';
+import {
+  getLearnArticle as getLocalizedLearnArticle,
+  getLearnContent,
+  getLearnSlugs,
+  learnContentEn,
+  learnContentZh,
+} from '@/content/learn';
+
+const learnArticles = learnContentEn.articles;
+const getLearnArticle = (slug: string) => getLocalizedLearnArticle(slug, 'en');
 
 describe('learnArticles', () => {
+  it('keeps locale-invariant routing and complete Chinese articles', () => {
+    expect(getLearnSlugs()).toEqual(learnArticles.map((article) => article.slug));
+    expect(learnContentZh.articles.map((article) => article.slug)).toEqual(getLearnSlugs());
+    expect(getLearnContent('zh-Hans').hub.h1).toBe(learnContentZh.hub.h1);
+
+    for (const article of learnContentZh.articles) {
+      expect(article.h1).toMatch(/[\u3400-\u9fff]/);
+      expect(article.summary).toMatch(/[\u3400-\u9fff]/);
+      expect(article.sections.length).toBeGreaterThanOrEqual(3);
+      // Chinese has no whitespace-delimited words and is materially denser
+      // than English, so use a CJK-aware character floor instead.
+      expect(article.sections.flatMap((section) => section.body).join('').length).toBeGreaterThan(
+        400,
+      );
+      const english = getLearnArticle(article.slug);
+      expect(article.related.map((link) => link.href)).toEqual(
+        english?.related.map((link) => link.href),
+      );
+    }
+  });
+
   it('has unique slugs, titles, descriptions, and h1s', () => {
     const slugs = new Set(learnArticles.map((article) => article.slug));
     const titles = new Set(learnArticles.map((article) => article.title));

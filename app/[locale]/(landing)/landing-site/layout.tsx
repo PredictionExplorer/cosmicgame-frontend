@@ -1,44 +1,43 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { setRequestLocale } from 'next-intl/server';
 
-import { landingContent } from '@/content/landing';
+import { getLandingContent } from '@/content/landing';
 
-import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, artProtocolJsonLd, organizationJsonLd, websiteJsonLd } from '@/utils/jsonLd';
+import { createMetadata } from '@/utils/seo';
 
-const { meta } = landingContent;
+interface LayoutProps {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}
 
-export const metadata: Metadata = {
-  metadataBase: new URL(LANDING_ORIGIN),
-  title: { default: meta.title, template: '%s \u00b7 Cosmic Signature' },
-  description: meta.description,
-  keywords: [...meta.keywords],
-  alternates: { canonical: LANDING_ORIGIN },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-snippet': -1,
-      'max-image-preview': 'large',
-      'max-video-preview': -1,
+export async function generateMetadata({ params }: Pick<LayoutProps, 'params'>): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const { meta } = getLandingContent(locale);
+  const metadata = createMetadata(meta.title, meta.description, undefined, '/', {
+    canonicalHost: 'landing',
+    locale,
+  });
+
+  return {
+    ...metadata,
+    metadataBase: new URL(LANDING_ORIGIN),
+    title: { default: meta.title, template: '%s \u00b7 Cosmic Signature' },
+    keywords: [...meta.keywords],
+    openGraph: {
+      ...metadata.openGraph,
+      type: 'website',
+      siteName: 'Cosmic Signature',
     },
-  },
-  openGraph: {
-    type: 'website',
-    siteName: 'Cosmic Signature',
-    title: meta.title,
-    description: meta.description,
-    locale: 'en_US',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@CosmicSignature',
-    title: meta.title,
-    description: meta.description,
-  },
-};
+    twitter: {
+      ...metadata.twitter,
+      site: '@CosmicSignature',
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -54,10 +53,36 @@ export const viewport: Viewport = {
  * boundaries. This nested layout only adds landing-specific chrome:
  * JSON-LD blocks and the page background container.
  */
-export default function LandingLayout({ children }: { children: ReactNode }) {
+export default async function LandingLayout({ children, params }: LayoutProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const { meta } = getLandingContent(locale);
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
+
   return (
     <>
-      <JsonLd data={[websiteJsonLd(), organizationJsonLd(), artProtocolJsonLd()]} />
+      <JsonLd
+        data={[
+          websiteJsonLd({
+            description: meta.description,
+            inLanguage,
+            url: landingUrl,
+            searchUrlTemplate: `${localeHref(APP_ORIGIN, '/gallery', locale)}?search={search_term_string}`,
+          }),
+          organizationJsonLd({
+            description: meta.description,
+            inLanguage,
+            url: landingUrl,
+          }),
+          artProtocolJsonLd({
+            description: meta.description,
+            inLanguage,
+            keywords: meta.keywords,
+            url: landingUrl,
+          }),
+        ]}
+      />
       <div className="relative min-h-screen overflow-x-clip bg-deep-space text-stellar-white antialiased">
         {children}
       </div>

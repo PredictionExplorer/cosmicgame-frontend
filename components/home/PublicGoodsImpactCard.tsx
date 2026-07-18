@@ -2,7 +2,7 @@
 
 import { ArrowUpRight, HeartHandshake, Vault } from 'lucide-react';
 
-import { landingContent } from '@/content/landing';
+import { landingContentEn } from '@/content/landing';
 import { formatEthValue } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
@@ -136,7 +136,7 @@ export function PublicGoodsImpactCard({
       </div>
 
       <p className="relative mt-6 border-t border-white/10 pt-4 text-xs leading-relaxed text-white/45">
-        {landingContent.publicGoods.disclaimer}
+        {landingContentEn.publicGoods.disclaimer}
       </p>
     </section>
   );

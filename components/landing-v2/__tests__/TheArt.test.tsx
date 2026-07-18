@@ -1,5 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 
+import { landingContentEn } from '@/content/landing';
+
 import { TheArt } from '@/components/landing-v2/TheArt';
 
 jest.mock('framer-motion', () => {
@@ -55,7 +57,7 @@ describe('<TheArt />', () => {
   it('renders a real generated NFT with its token number and app detail link', async () => {
     mockTokenFetch([{ TokenId: 42, Seed: 'abc123' }]);
 
-    render(<TheArt />);
+    render(<TheArt art={landingContentEn.art} />);
 
     expect(await screen.findByText('#000042')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'View Cosmic Signature #000042' })).toHaveAttribute(
@@ -71,7 +73,7 @@ describe('<TheArt />', () => {
   it('shows a neutral non-NFT visual when no real token metadata is available', async () => {
     mockTokenFetch([]);
 
-    render(<TheArt />);
+    render(<TheArt art={landingContentEn.art} />);
 
     await waitFor(() => expect(global.fetch).toHaveBeenCalled());
     expect(screen.getByText('Awaiting metadata')).toBeInTheDocument();
@@ -87,7 +89,7 @@ describe('<TheArt />', () => {
       { TokenId: 2, Seed: 'bbb' },
     ]);
 
-    render(<TheArt />);
+    render(<TheArt art={landingContentEn.art} />);
 
     expect(await screen.findByText('#000001')).toBeInTheDocument();
 

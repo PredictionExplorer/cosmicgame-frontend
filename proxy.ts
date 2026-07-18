@@ -20,7 +20,7 @@ export const config = {
      * Run on all paths except Next assets and public files. The negative
      * lookahead exclusions here are the standard Vercel recipe.
      */
-    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|manifest.webmanifest|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map)$).*)',
+    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|llms(?:-full)?\\.txt|manifest.webmanifest|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map)$).*)',
   ],
 };
 
@@ -103,11 +103,13 @@ export default function middleware(req: NextRequest) {
       if (detection && isRedirect(detection)) {
         return withoutLocaleCookieWrites(detection);
       }
-      // No redirect needed: serve the landing by rewriting to the internal
-      // route, keeping the locale segment, then let next-intl finish the
-      // rewrite to `/[locale]/landing-site`.
-      req.nextUrl.pathname = `${prefix}/landing-site`;
-      return withoutLocaleCookieWrites(intlMiddleware(req));
+      // No redirect needed: rewrite directly to the locale-segmented internal
+      // route. Running next-intl a second time here can retain the original
+      // root router state and render `/[locale]` while advertising
+      // `/landing-site` metadata.
+      const internalUrl = req.nextUrl.clone();
+      internalUrl.pathname = `/${locale ?? routing.defaultLocale}/landing-site`;
+      return NextResponse.rewrite(internalUrl);
     }
 
     if (isAppOnlyPath(publicPath)) {

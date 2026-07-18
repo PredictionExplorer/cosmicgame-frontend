@@ -118,6 +118,23 @@ describe('createMetadata', () => {
     });
   });
 
+  it('emits locale canonicals, hreflang alternates, and Open Graph locale', () => {
+    const result = createMetadata('标题', '说明', undefined, '/learn', {
+      canonicalHost: 'landing',
+      locale: 'zh',
+    });
+
+    expect(result.alternates).toEqual({
+      canonical: 'https://cosmicsignature.com/zh/learn',
+      languages: {
+        en: 'https://cosmicsignature.com/learn',
+        zh: 'https://cosmicsignature.com/zh/learn',
+        'x-default': 'https://cosmicsignature.com/learn',
+      },
+    });
+    expect(result.openGraph).toEqual(expect.objectContaining({ locale: 'zh_CN' }));
+  });
+
   it('strips query strings from canonical paths', () => {
     const result = createMetadata('T', 'D', undefined, '/gallery?page=1&sort=newest');
 

@@ -85,6 +85,10 @@ export function createMetadata(
     twitter.images = [imageUrl];
   }
 
+  if (options.locale !== undefined) {
+    openGraph.locale = options.locale === 'zh' ? 'zh_CN' : 'en_US';
+  }
+
   const index = options.index ?? true;
   const metadata: Metadata = {
     title,

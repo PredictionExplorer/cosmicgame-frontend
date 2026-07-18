@@ -27,6 +27,30 @@ const publicPages: PublicPage[] = [
     jsonLd: ['Article', 'BreadcrumbList'],
   },
   {
+    path: '/zh',
+    host: LANDING_HOST,
+    h1: 'Cosmic Signature：程序化链上艺术',
+    jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
+  },
+  {
+    path: '/zh/about',
+    host: LANDING_HOST,
+    h1: '关于 Cosmic Signature',
+    jsonLd: ['AboutPage'],
+  },
+  {
+    path: '/zh/learn',
+    host: LANDING_HOST,
+    h1: '了解 Cosmic Signature',
+    jsonLd: ['BreadcrumbList'],
+  },
+  {
+    path: '/zh/learn/what-is-cosmic-signature',
+    host: LANDING_HOST,
+    h1: '什么是 Cosmic Signature？',
+    jsonLd: ['Article', 'BreadcrumbList'],
+  },
+  {
     path: '/',
     host: APP_HOST,
     h1: /Shape the next Cosmic Signature|Next Cycle Opens Soon|Cycle #\d+ Is Open|The Final Window Is Open|Cycle Ready to Finalize/,
@@ -137,6 +161,34 @@ test.describe('raw HTML SEO', () => {
       }
     });
   }
+
+  test('Sprint 2 Chinese pages emit localized canonicals, hreflang, and structured data', async ({
+    request,
+  }) => {
+    const pages = [
+      { path: '/zh', canonical: 'https://cosmicsignature.com/zh' },
+      { path: '/zh/about', canonical: 'https://cosmicsignature.com/zh/about' },
+      { path: '/zh/learn', canonical: 'https://cosmicsignature.com/zh/learn' },
+      {
+        path: '/zh/learn/what-is-cosmic-signature',
+        canonical: 'https://cosmicsignature.com/zh/learn/what-is-cosmic-signature',
+      },
+    ];
+
+    for (const page of pages) {
+      const response = await request.get(page.path, { headers: hostHeaders(LANDING_HOST) });
+      expect(response.status()).toBe(200);
+      const html = await response.text();
+
+      expect(html).toMatch(/<html[^>]+lang="zh"/);
+      expect(extractTitle(html)).toMatch(/[\u3400-\u9fff]/);
+      expect(extractDescription(html)).toMatch(/[\u3400-\u9fff]/);
+      expect(html).toContain(`rel="canonical" href="${page.canonical}"`);
+      expect(html).toMatch(/hreflang="en"/i);
+      expect(html).toMatch(/hreflang="zh"/i);
+      expect(html).toContain('"inLanguage":"zh-Hans"');
+    }
+  });
 
   test('public pages have unique titles and meta descriptions', async ({ request }) => {
     const titles = new Map<string, string>();

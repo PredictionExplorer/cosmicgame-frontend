@@ -28,7 +28,7 @@ states, `aria-label`s, form validation, SEO title/description, OG image text, JS
 | ------ | -------------------------------------------------------------------------- | ---------------------------- | ----------- |
 | 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**    |
 | 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**    |
-| 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | Not started |
+| 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | **Done**    |
 | 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | Not started |
 | 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | Not started |
 | 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | Not started |
@@ -172,31 +172,55 @@ The public face; highest transcreation bar (style guide §2 landing register). C
 
 | Route           | Sources                                                                                                                                        | E   | T   | R   | Q   |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --- | --- | --- | --- |
-| `/` (landing)   | `(landing)/landing-site/`, `content/landing/` (hero, cycle, art, tracks, anchoring, public goods, council, verifiability, landing FAQ, footer) | ☐   | ☐   | ☐   | ☐   |
-| `/about`        | `(landing)/about/page.tsx`                                                                                                                     | ☐   | ☐   | ☐   | ☐   |
-| `/learn` (hub)  | `(landing)/learn/`, `content/learn/` hub copy                                                                                                  | ☐   | ☐   | ☐   | ☐   |
-| `/learn/[slug]` | `content/learn/` articles — tracked per article below                                                                                          | ☐   | ☐   | ☐   | ☐   |
+| `/` (landing)   | `(landing)/landing-site/`, `content/landing/` (hero, cycle, art, tracks, anchoring, public goods, council, verifiability, landing FAQ, footer) | ✅  | ✅  | ✅  | ✅  |
+| `/about`        | `(landing)/about/page.tsx`                                                                                                                     | ✅  | ✅  | ✅  | ✅  |
+| `/learn` (hub)  | `(landing)/learn/`, `content/learn/` hub copy                                                                                                  | ✅  | ✅  | ✅  | ✅  |
+| `/learn/[slug]` | `content/learn/` articles — tracked per article below                                                                                          | ✅  | ✅  | ✅  | ✅  |
 
 Per-article tracking (all four stages apply to each):
 
 | Article slug                              | E   | T   | R   | Q   |
 | ----------------------------------------- | --- | --- | --- | --- |
-| `what-is-cosmic-signature`                | ☐   | ☐   | ☐   | ☐   |
-| `how-the-performance-cycle-works`         | ☐   | ☐   | ☐   | ☐   |
-| `how-gestures-work`                       | ☐   | ☐   | ☐   | ☐   |
-| `three-body-nft-art`                      | ☐   | ☐   | ☐   | ☐   |
-| `cosmic-signature-on-arbitrum`            | ☐   | ☐   | ☐   | ☐   |
-| `contracts-security-verification`         | ☐   | ☐   | ☐   | ☐   |
-| `cst-token-and-cosmic-council`            | ☐   | ☐   | ☐   | ☐   |
-| `anchoring-nfts`                          | ☐   | ☐   | ☐   | ☐   |
-| `protocol-guild-public-goods`             | ☐   | ☐   | ☐   | ☐   |
-| `collecting-and-trading-cosmic-signature` | ☐   | ☐   | ☐   | ☐   |
-| `not-a-lottery-not-an-investment`         | ☐   | ☐   | ☐   | ☐   |
+| `what-is-cosmic-signature`                | ✅  | ✅  | ✅  | ✅  |
+| `how-the-performance-cycle-works`         | ✅  | ✅  | ✅  | ✅  |
+| `how-gestures-work`                       | ✅  | ✅  | ✅  | ✅  |
+| `three-body-nft-art`                      | ✅  | ✅  | ✅  | ✅  |
+| `cosmic-signature-on-arbitrum`            | ✅  | ✅  | ✅  | ✅  |
+| `contracts-security-verification`         | ✅  | ✅  | ✅  | ✅  |
+| `cst-token-and-cosmic-council`            | ✅  | ✅  | ✅  | ✅  |
+| `anchoring-nfts`                          | ✅  | ✅  | ✅  | ✅  |
+| `protocol-guild-public-goods`             | ✅  | ✅  | ✅  | ✅  |
+| `collecting-and-trading-cosmic-signature` | ✅  | ✅  | ✅  | ✅  |
+| `not-a-lottery-not-an-investment`         | ✅  | ✅  | ✅  | ✅  |
 
 **Acceptance:** `cosmicsignature.com/zh` is 100% Chinese including metadata and landing
 FAQ JSON-LD; denial copy (landing FAQ + `not-a-lottery-not-an-investment`) reviewed
 against glossary §5 with allow-pragmas in place; fluency pass done by a reviewer reading
 only Chinese.
+
+**Sprint 2 completed 2026-07-18.** Verification: type-check, lint, Jest (5,253 tests),
+production build, English/Chinese lexicon scan, Sprint 1 + Sprint 2 required-key gates,
+and 64 rendered routing/landing/SEO Playwright checks. Chinese layout QA covered 320 /
+768 / 1440 px on the landing page, About, Learn hub, and a representative article.
+
+Implementation notes / deviations:
+
+- `content/landing.ts` and `content/learn.ts` became typed `en.ts` / `zh.ts` modules with
+  locale accessors; About received the same structure. Server pages select one locale and
+  pass serializable section props to client components, so both content models do not enter
+  the landing client bundle.
+- Dynamic landing-clock copy lives in the strict `landing` message namespace (37 required
+  keys). All four routes now emit localized canonicals, hreflang, Open Graph locale, and
+  route-owned JSON-LD; CJK Open Graph image rendering remains the scheduled Sprint 7 item.
+- Landing denial copy and the denial Learn article use narrowly scoped `lexicon-allow`
+  pragmas. Independent agent bilingual-accuracy and Chinese-only blind-fluency passes both
+  returned PASS after corrections. The project owner waived human review for this sprint;
+  R records agent review and does not claim human sign-off.
+- The glossary now permits `收官倒计时` as the natural running-copy form of
+  `周期收官时间`. With long-form transcreation complete, the glossary is now frozen except
+  through its §6 change process.
+- QA exposed and fixed a locale-root rewrite bug that served the dApp at the landing host's
+  `/zh`; proxy tests now assert Chinese landing copy, not only `lang=\"zh\"`.
 
 ## Sprint 3 — Core dApp
 
@@ -366,6 +390,8 @@ scan green; native reviewer sign-off; language switcher announced/visible. 上�
 | 2026-07-16 | Register: 你 (never 您); core coinages per glossary §2 (落笔 / 演绎周期 / 收官 / 星选 / 锚定 / 取回 / 铭刻 …)           |
 | 2026-07-17 | Sprint 1 R used owner-approved independent agent accuracy + blind-fluency passes; native launch review remains Sprint 8 |
 | 2026-07-17 | Glossary freeze reconciled to after Sprint 2, matching `glossary-zh.md`; Sprint 1 required no amendments                |
+| 2026-07-18 | Sprint 2 R used owner-approved agent accuracy + Chinese-only fluency passes; human review was waived for this sprint    |
+| 2026-07-18 | `收官倒计时` approved for running clock copy; post-Sprint-2 glossary freeze is now active                               |
 
 ## Risk register
 

@@ -24,8 +24,12 @@ type LandingCycleTimerSample = {
 };
 
 type TimeShard = {
-  label: string;
+  unit: 'days' | 'hours' | 'minutes' | 'seconds';
   value: number;
+};
+
+type DisplayTimeShard = TimeShard & {
+  label: string;
 };
 
 type LandingCycleTimerSnapshot = {
@@ -37,9 +41,6 @@ type LandingCycleTimerSnapshot = {
   shards: TimeShard[];
   cycleNumber: number | null;
   gestureCount: number;
-  title: string;
-  body: string;
-  ariaLabel: string;
 };
 
 const pad = (n: number) => String(Math.max(0, n)).padStart(2, '0');
@@ -47,10 +48,10 @@ const pad = (n: number) => String(Math.max(0, n)).padStart(2, '0');
 function getShards(remainingMs: number): TimeShard[] {
   const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000));
   return [
-    { label: 'Days', value: Math.floor(totalSeconds / 86_400) },
-    { label: 'Hours', value: Math.floor((totalSeconds % 86_400) / 3_600) },
-    { label: 'Min', value: Math.floor((totalSeconds % 3_600) / 60) },
-    { label: 'Sec', value: totalSeconds % 60 },
+    { unit: 'days', value: Math.floor(totalSeconds / 86_400) },
+    { unit: 'hours', value: Math.floor((totalSeconds % 86_400) / 3_600) },
+    { unit: 'minutes', value: Math.floor((totalSeconds % 3_600) / 60) },
+    { unit: 'seconds', value: totalSeconds % 60 },
   ];
 }
 
@@ -62,82 +63,21 @@ function getShardsFromCountdown(
     seconds,
   }: Pick<CountdownRenderProps, 'days' | 'hours' | 'minutes' | 'seconds'>,
   labels: { days: string; hours: string; minutes: string; seconds: string },
-): TimeShard[] {
+): DisplayTimeShard[] {
   return [
-    { label: labels.days, value: days },
-    { label: labels.hours, value: hours },
-    { label: labels.minutes, value: minutes },
-    { label: labels.seconds, value: seconds },
+    { unit: 'days', label: labels.days, value: days },
+    { unit: 'hours', label: labels.hours, value: hours },
+    { unit: 'minutes', label: labels.minutes, value: minutes },
+    { unit: 'seconds', label: labels.seconds, value: seconds },
   ];
 }
 
-function copyForPhase(phase: TimerPhase, cycleNumber: number | null) {
-  const cycleLabel = cycleNumber == null ? 'the current cycle' : `Cycle #${cycleNumber}`;
-
-  switch (phase) {
-    case 'loading':
-      return {
-        title: 'Synchronizing the cycle horizon',
-        body: 'Reading the live protocol clock before the countdown appears.',
-      };
-    case 'opening-soon':
-      return {
-        title: `${cycleLabel} opens soon`,
-        body: 'The next cycle is preparing to open. When this countdown reaches zero, Gestures become available.',
-      };
-    case 'waiting-first-gesture':
-      return {
-        title: `${cycleLabel} is waiting for its first Gesture`,
-        body: 'The first Gesture ignites the Cycle Finalization Time and starts shaping the next Signature.',
-      };
-    case 'approach':
-      return {
-        title: `${cycleLabel} finalizes in`,
-        body: 'The cycle is live. Each Gesture shapes the Signature and can extend the finalization clock.',
-      };
-    case 'final-hour':
-      return {
-        title: `${cycleLabel} is entering the final hour`,
-        body: 'Every new Gesture can extend the horizon and leave one more trace on the evolving Signature.',
-      };
-    case 'final-ten':
-    case 'final-minute':
-      return {
-        title: `${cycleLabel} is near the horizon`,
-        body: 'The Cycle Finalization Time is almost here. The next moments decide the final shape.',
-      };
-    case 'ready-to-finalize':
-      return {
-        title: `${cycleLabel} is ready to finalize`,
-        body: 'The horizon has closed. The protocol is ready to transform the cycle into a final Signature.',
-      };
-    case 'unavailable':
-      return {
-        title: 'Live cycle clock unavailable',
-        body: 'The landing page could not reach the protocol clock. Open the app for the latest cycle state.',
-      };
-    case 'live':
-    default:
-      return {
-        title: `${cycleLabel} finalizes in`,
-        body: 'This is the same live Cycle Finalization Time shown in the app. Each Gesture shapes the Signature and can extend the horizon.',
-      };
-  }
-}
-
-function landingStaticTextForPhase(phase: TimerPhase): string {
-  if (phase === 'waiting-first-gesture') return 'Awaiting first Gesture';
-  if (phase === 'ready-to-finalize') return '00:00';
-  if (phase === 'unavailable') return 'Clock unavailable';
-  return 'Syncing';
-}
-
-function LandingStaticClock({ phase }: { phase: TimerPhase }) {
+function LandingStaticClock({ text }: { text: string }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-black/20 px-4 py-8 text-center shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] backdrop-blur-md">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
       <p className="font-display text-3xl font-semibold tracking-tight text-[rgb(var(--impact-green-rgb))] sm:text-4xl">
-        {landingStaticTextForPhase(phase)}
+        {text}
       </p>
     </div>
   );
@@ -150,7 +90,7 @@ function LandingShardGrid({
   isOpeningSoon,
   isWaitingForFirstGesture,
 }: {
-  shards: TimeShard[];
+  shards: DisplayTimeShard[];
   isFinalMinutes: boolean;
   isUrgent: boolean;
   isOpeningSoon: boolean;
@@ -195,7 +135,6 @@ export function getLandingCycleTimerSnapshot({
   nowMs: number;
 }): LandingCycleTimerSnapshot {
   if (!sample) {
-    const copy = copyForPhase('loading', null);
     return {
       phase: 'loading',
       targetMs: 0,
@@ -205,8 +144,6 @@ export function getLandingCycleTimerSnapshot({
       shards: getShards(0),
       cycleNumber: null,
       gestureCount: 0,
-      ariaLabel: copy.title,
-      ...copy,
     };
   }
 
@@ -241,7 +178,6 @@ export function getLandingCycleTimerSnapshot({
   const remainingMs = showCountdown ? Math.max(0, targetMs - nowMs) : 0;
   const phase = state.phase;
   const cycleNumber = sample.dashboard?.CurRoundNum ?? null;
-  const copy = copyForPhase(phase, cycleNumber);
 
   return {
     phase,
@@ -252,12 +188,6 @@ export function getLandingCycleTimerSnapshot({
     shards: getShards(remainingMs),
     cycleNumber,
     gestureCount: sample.dashboard?.CurNumBids ?? 0,
-    ariaLabel: showCountdown
-      ? `${copy.title}: ${getShards(remainingMs)
-          .map((shard) => `${shard.value} ${shard.label}`)
-          .join(', ')}`
-      : copy.title,
-    ...copy,
   };
 }
 
@@ -280,6 +210,7 @@ async function fetchLandingCycleTimerSample(): Promise<LandingCycleTimerSample> 
 export function EventHorizonCountdown() {
   const locale = useLocale();
   const formatT = useTranslations('formats');
+  const timerT = useTranslations('landing.timer');
   const [sample, setSample] = useState<LandingCycleTimerSample | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [nowMs, setNowMs] = useState<number | null>(null);
@@ -316,7 +247,6 @@ export function EventHorizonCountdown() {
 
   const snapshot = useMemo(() => {
     if (loadFailed && !sample) {
-      const copy = copyForPhase('unavailable', null);
       return {
         phase: 'unavailable' as const,
         targetMs: 0,
@@ -326,8 +256,6 @@ export function EventHorizonCountdown() {
         shards: getShards(0),
         cycleNumber: null,
         gestureCount: 0,
-        ariaLabel: copy.title,
-        ...copy,
       };
     }
     return getLandingCycleTimerSnapshot({ sample, nowMs: nowMs ?? sample?.sampledAtMs ?? 0 });
@@ -341,30 +269,95 @@ export function EventHorizonCountdown() {
     snapshot.phase === 'final-minute';
   const isFinalMinutes = snapshot.phase === 'final-ten' || snapshot.phase === 'final-minute';
   const isReady = snapshot.phase === 'ready-to-finalize';
+  const cycleLabel =
+    snapshot.cycleNumber == null
+      ? timerT('cycle.current')
+      : timerT('cycle.numbered', { number: snapshot.cycleNumber });
+  const phaseCopy = (() => {
+    switch (snapshot.phase) {
+      case 'loading':
+        return {
+          title: timerT('phases.loading.title'),
+          body: timerT('phases.loading.body'),
+        };
+      case 'opening-soon':
+        return {
+          title: timerT('phases.openingSoon.title', { cycle: cycleLabel }),
+          body: timerT('phases.openingSoon.body'),
+        };
+      case 'waiting-first-gesture':
+        return {
+          title: timerT('phases.waitingFirstGesture.title', { cycle: cycleLabel }),
+          body: timerT('phases.waitingFirstGesture.body'),
+        };
+      case 'approach':
+        return {
+          title: timerT('phases.approach.title', { cycle: cycleLabel }),
+          body: timerT('phases.approach.body'),
+        };
+      case 'final-hour':
+        return {
+          title: timerT('phases.finalHour.title', { cycle: cycleLabel }),
+          body: timerT('phases.finalHour.body'),
+        };
+      case 'final-ten':
+      case 'final-minute':
+        return {
+          title: timerT('phases.nearHorizon.title', { cycle: cycleLabel }),
+          body: timerT('phases.nearHorizon.body'),
+        };
+      case 'ready-to-finalize':
+        return {
+          title: timerT('phases.ready.title', { cycle: cycleLabel }),
+          body: timerT('phases.ready.body'),
+        };
+      case 'unavailable':
+        return {
+          title: timerT('phases.unavailable.title'),
+          body: timerT('phases.unavailable.body'),
+        };
+      case 'live':
+      default:
+        return {
+          title: timerT('phases.live.title', { cycle: cycleLabel }),
+          body: timerT('phases.live.body'),
+        };
+    }
+  })();
+  const staticClockText =
+    snapshot.phase === 'waiting-first-gesture'
+      ? timerT('staticClock.waitingFirstGesture')
+      : snapshot.phase === 'ready-to-finalize'
+        ? timerT('staticClock.ready')
+        : snapshot.phase === 'unavailable'
+          ? timerT('staticClock.unavailable')
+          : timerT('staticClock.syncing');
+  const statusText = isReady
+    ? timerT('status.ready')
+    : isOpeningSoon
+      ? timerT('status.openingSoon')
+      : isWaitingForFirstGesture
+        ? timerT('status.waitingFirstGesture')
+        : timerT('status.synchronized');
   const longUnitLabels = {
     days: formatT('countdownLong.days'),
     hours: formatT('countdownLong.hours'),
     minutes: formatT('countdownLong.minutes'),
     seconds: formatT('countdownLong.seconds'),
   };
-  const timerAriaLabel =
-    locale === 'zh'
-      ? snapshot.showCountdown
-        ? `${formatT('liveCycleCountdown')}：${snapshot.shards
-            .map(
-              (shard, index) =>
-                `${shard.value}${
-                  [
-                    longUnitLabels.days,
-                    longUnitLabels.hours,
-                    longUnitLabels.minutes,
-                    longUnitLabels.seconds,
-                  ][index] ?? ''
-                }`,
-            )
-            .join('，')}`
-        : formatT('liveCycleCountdown')
-      : snapshot.ariaLabel;
+  const timerAriaLabel = snapshot.showCountdown
+    ? timerT('countdownAria', {
+        label: phaseCopy.title,
+        duration: snapshot.shards
+          .map((shard) =>
+            timerT('durationPart', {
+              value: shard.value,
+              unit: longUnitLabels[shard.unit],
+            }),
+          )
+          .join(timerT('durationSeparator')),
+      })
+    : phaseCopy.title;
   const renderShardGrid = (props: CountdownRenderProps) => (
     <LandingShardGrid
       shards={getShardsFromCountdown(props, longUnitLabels)}
@@ -416,29 +409,29 @@ export function EventHorizonCountdown() {
                         : 'bg-primary animate-live-dot',
                 ].join(' ')}
               />
-              Live cycle clock
+              {timerT('liveClock')}
             </div>
 
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.22em] text-white/50">
                 {snapshot.cycleNumber == null
-                  ? 'Performance Cycle'
-                  : `Cycle #${snapshot.cycleNumber}`}
+                  ? timerT('cycle.generic')
+                  : timerT('cycle.numbered', { number: snapshot.cycleNumber })}
               </p>
               <h2 className="mt-2 max-w-xl text-balance font-display text-2xl font-semibold leading-tight text-white sm:text-3xl">
-                {snapshot.title}
+                {phaseCopy.title}
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">
-                {snapshot.body}
+                {phaseCopy.body}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/55">
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                {snapshot.gestureCount} Gesture{snapshot.gestureCount === 1 ? '' : 's'}
+                {timerT('gestureCount', { count: snapshot.gestureCount })}
               </span>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                Same clock as the app
+                {timerT('sameClock')}
               </span>
             </div>
           </div>
@@ -447,26 +440,20 @@ export function EventHorizonCountdown() {
             {snapshot.showCountdown ? (
               <SmoothCountdown date={snapshot.targetMs} renderer={renderShardGrid} />
             ) : (
-              <LandingStaticClock phase={snapshot.phase} />
+              <LandingStaticClock text={staticClockText} />
             )}
 
             <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.045] p-3 text-sm text-white/70 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
               <span className="inline-flex items-center gap-2">
                 <Radio className="h-4 w-4 text-primary" aria-hidden />
-                {isReady
-                  ? 'Ready to finalize'
-                  : isOpeningSoon
-                    ? 'Countdown to cycle opening'
-                    : isWaitingForFirstGesture
-                      ? 'Open and waiting for the first Gesture'
-                      : 'Countdown synchronized to protocol time'}
+                {statusText}
               </span>
               <a
                 href={localeHref(APP_ORIGIN, '/', locale)}
                 rel="noopener"
                 className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-white"
               >
-                Open live cycle
+                {timerT('openLiveCycle')}
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </a>
             </div>
@@ -475,7 +462,7 @@ export function EventHorizonCountdown() {
 
         <div className="pointer-events-none absolute bottom-4 right-5 hidden items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/35 sm:flex">
           <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden />
-          Event horizon
+          {timerT('eventHorizon')}
         </div>
       </div>
     </section>

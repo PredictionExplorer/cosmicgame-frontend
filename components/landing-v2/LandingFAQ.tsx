@@ -1,6 +1,8 @@
 'use client';
 
-import { landingContent } from '@/content/landing';
+import { useLocale } from 'next-intl';
+
+import type { LandingContent } from '@/content/landing';
 
 import {
   Accordion,
@@ -12,9 +14,8 @@ import { JsonLd, faqPageJsonLd } from '@/utils/jsonLd';
 
 import { SectionHeading } from './SectionHeading';
 
-const { faq } = landingContent;
-
-export function LandingFAQ() {
+export function LandingFAQ({ faq }: { faq: LandingContent['faq'] }) {
+  const locale = useLocale();
   const faqItems = faq.items.map((item) => ({
     question: item.question,
     answer: item.answer,
@@ -22,7 +23,7 @@ export function LandingFAQ() {
 
   return (
     <section id="faq" className="relative border-t border-white/10 bg-[#0D0521] py-28 sm:py-40">
-      <JsonLd data={faqPageJsonLd(faqItems)} />
+      <JsonLd data={faqPageJsonLd(faqItems, locale === 'zh' ? 'zh-Hans' : 'en')} />
       <div className="mx-auto max-w-4xl px-6 lg:px-12">
         <SectionHeading
           eyebrow={faq.eyebrow}

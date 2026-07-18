@@ -1,45 +1,54 @@
 import type { Metadata } from 'next';
+import { setRequestLocale } from 'next-intl/server';
 
-import { learnArticles } from '@/content/learn';
+import { getLearnContent } from '@/content/learn';
 
 import { Link } from '@/i18n/navigation';
-import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
-export const metadata: Metadata = createMetadata(
-  'Learn Cosmic Signature | On-Chain Art, Performance Cycles, and Arbitrum',
-  'Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications.',
-  undefined,
-  '/learn',
-  { canonicalHost: 'landing' },
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export default function LearnIndexPage() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const { hub } = getLearnContent(locale);
+
+  return createMetadata(hub.meta.title, hub.meta.description, undefined, '/learn', {
+    canonicalHost: 'landing',
+    locale,
+  });
+}
+
+export default async function LearnIndexPage({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const { hub, articles } = getLearnContent(locale);
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+
   return (
     <main id="main" tabIndex={-1} className="relative mx-auto max-w-6xl px-6 py-24 lg:py-32">
       <JsonLd
         data={breadcrumbJsonLd(
           [
-            { name: 'Cosmic Signature', path: '/' },
-            { name: 'Learn', path: '/learn' },
+            { name: hub.breadcrumbs.homeLabel, path: '/' },
+            { name: hub.breadcrumbs.learnLabel, path: '/learn' },
           ],
-          LANDING_ORIGIN,
+          localeHref(LANDING_ORIGIN, '/', locale),
+          inLanguage,
         )}
       />
-      <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">
-        Cosmic Signature Learn
-      </p>
+      <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">{hub.eyebrow}</p>
       <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-        Learn Cosmic Signature
+        {hub.h1}
       </h1>
-      <p className="mt-6 max-w-3xl text-lg leading-8 text-white/78">
-        Clear, crawlable guides to Cosmic Signature: the procedural on-chain art protocol on
-        Arbitrum where gestures shape deterministic three-body NFT art during Performance Cycles.
-      </p>
+      <p className="mt-6 max-w-3xl text-lg leading-8 text-white/78">{hub.intro}</p>
 
       <div className="mt-12 grid gap-5 md:grid-cols-2">
-        {learnArticles.map((article) => (
+        {articles.map((article) => (
           <Link
             key={article.slug}
             href={`/learn/${article.slug}`}

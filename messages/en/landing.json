@@ -1,0 +1,67 @@
+{
+  "timer": {
+    "cycle": {
+      "current": "the current cycle",
+      "numbered": "Cycle #{number}",
+      "generic": "Performance Cycle"
+    },
+    "phases": {
+      "loading": {
+        "title": "Synchronizing the cycle horizon",
+        "body": "Reading the live protocol clock before the countdown appears."
+      },
+      "openingSoon": {
+        "title": "{cycle} opens soon",
+        "body": "The next cycle is preparing to open. When this countdown reaches zero, Gestures become available."
+      },
+      "waitingFirstGesture": {
+        "title": "{cycle} is waiting for its first Gesture",
+        "body": "The first Gesture ignites the Cycle Finalization Time and starts shaping the next Signature."
+      },
+      "approach": {
+        "title": "{cycle} finalizes in",
+        "body": "The cycle is live. Each Gesture shapes the Signature and can extend the finalization clock."
+      },
+      "finalHour": {
+        "title": "{cycle} is entering the final hour",
+        "body": "Every new Gesture can extend the horizon and leave one more trace on the evolving Signature."
+      },
+      "nearHorizon": {
+        "title": "{cycle} is near the horizon",
+        "body": "The Cycle Finalization Time is almost here. The next moments decide the final shape."
+      },
+      "ready": {
+        "title": "{cycle} is ready to finalize",
+        "body": "The horizon has closed. The protocol is ready to transform the cycle into a final Signature."
+      },
+      "unavailable": {
+        "title": "Live cycle clock unavailable",
+        "body": "The landing page could not reach the protocol clock. Open the app for the latest cycle state."
+      },
+      "live": {
+        "title": "{cycle} finalizes in",
+        "body": "This is the same live Cycle Finalization Time shown in the app. Each Gesture shapes the Signature and can extend the horizon."
+      }
+    },
+    "staticClock": {
+      "waitingFirstGesture": "Awaiting first Gesture",
+      "ready": "00:00",
+      "unavailable": "Clock unavailable",
+      "syncing": "Syncing"
+    },
+    "liveClock": "Live cycle clock",
+    "gestureCount": "{count, plural, one {# Gesture} other {# Gestures}}",
+    "sameClock": "Same clock as the app",
+    "status": {
+      "ready": "Ready to finalize",
+      "openingSoon": "Countdown to cycle opening",
+      "waitingFirstGesture": "Open and waiting for the first Gesture",
+      "synchronized": "Countdown synchronized to protocol time"
+    },
+    "openLiveCycle": "Open live cycle",
+    "eventHorizon": "Event horizon",
+    "countdownAria": "{label}: {duration}",
+    "durationPart": "{value} {unit}",
+    "durationSeparator": ", "
+  }
+}

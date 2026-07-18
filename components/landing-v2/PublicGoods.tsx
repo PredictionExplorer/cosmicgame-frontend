@@ -4,16 +4,14 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 import { SectionHeading } from './SectionHeading';
 
-const { publicGoods } = landingContent;
-
-export function PublicGoods() {
+export function PublicGoods({ publicGoods }: { publicGoods: LandingContent['publicGoods'] }) {
   const locale = useLocale();
 
   return (
@@ -57,32 +55,24 @@ export function PublicGoods() {
           >
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[oklch(77.1%_0.163_161)]">
-                Cycle Allocation
+                {publicGoods.card.label}
               </p>
               <p
                 className="mt-4 text-7xl font-semibold text-gradient-aurora sm:text-8xl"
                 style={{ fontFamily: 'var(--font-family-display)' }}
               >
-                7%
+                {publicGoods.card.percentage}
               </p>
-              <p className="mt-4 text-lg text-white/80">
-                of every Performance Cycle is forwarded to Protocol Guild.
-              </p>
+              <p className="mt-4 text-lg text-white/80">{publicGoods.card.description}</p>
             </div>
 
             <div className="relative mt-8 space-y-3 border-t border-white/10 pt-6 text-sm text-white/70">
-              <div className="flex items-center justify-between">
-                <span>Protocol Guild contributors</span>
-                <span className="font-mono text-white/90">170+</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Enforcement</span>
-                <span className="font-mono text-white/90">on-chain</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Recipient</span>
-                <span className="font-mono text-white/90">pg.eth</span>
-              </div>
+              {publicGoods.card.tableRows.map((row) => (
+                <div key={row.label} className="flex items-center justify-between">
+                  <span>{row.label}</span>
+                  <span className="font-mono text-white/90">{row.value}</span>
+                </div>
+              ))}
             </div>
 
             <Link
@@ -99,7 +89,7 @@ export function PublicGoods() {
 
         <div className="relative mt-16 rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm text-white/60 backdrop-blur sm:p-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">
-            Disclaimer
+            {publicGoods.disclaimerHeading}
           </p>
           <p className="mt-2 leading-relaxed">{publicGoods.disclaimer}</p>
         </div>

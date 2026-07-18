@@ -1,4 +1,6 @@
-import { landingContent } from '@/content/landing';
+import { getLandingContent, landingContentEn, landingContentZh } from '@/content/landing';
+
+const landingContent = landingContentEn;
 
 /**
  * Structural and regulatory invariants for the landing copy. Paired with
@@ -7,6 +9,17 @@ import { landingContent } from '@/content/landing';
  * any structural change (missing sections, missing CTAs) fails CI.
  */
 describe('landing content shape', () => {
+  it('selects complete locale models without changing structural invariants', () => {
+    expect(getLandingContent('en')).toBe(landingContentEn);
+    expect(getLandingContent('zh-CN')).toBe(landingContentZh);
+    expect(landingContentZh.cycle.stages).toHaveLength(landingContentEn.cycle.stages.length);
+    expect(landingContentZh.art.stages).toHaveLength(landingContentEn.art.stages.length);
+    expect(landingContentZh.tracks.items).toHaveLength(landingContentEn.tracks.items.length);
+    expect(landingContentZh.faq.items).toHaveLength(landingContentEn.faq.items.length);
+    expect(landingContentZh.footer.columns).toHaveLength(landingContentEn.footer.columns.length);
+    expect(JSON.stringify(landingContentZh)).toMatch(/[\u3400-\u9fff]/);
+  });
+
   it('exposes all required top-level sections', () => {
     expect(landingContent).toMatchObject({
       meta: expect.any(Object),

@@ -4,6 +4,8 @@ if (process.env.FORCE_COLOR && process.env.NO_COLOR) {
   delete process.env.NO_COLOR;
 }
 
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 3000);
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -15,7 +17,7 @@ export default defineConfig({
   },
   reporter: [['html', { open: 'never' }], ['list']],
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: `http://localhost:${port}`,
     trace: 'on-first-retry',
     video: 'on-first-retry',
     screenshot: 'only-on-failure',
@@ -34,8 +36,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'PLAYWRIGHT=1 npm run build && PLAYWRIGHT=1 npm run start -- -p 3000',
-    port: 3000,
+    command: `PLAYWRIGHT=1 npm run build && PLAYWRIGHT=1 npm run start -- -p ${port}`,
+    port,
     reuseExistingServer: false,
     timeout: 120_000,
   },

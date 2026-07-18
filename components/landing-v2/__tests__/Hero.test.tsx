@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
+import { landingContentEn } from '@/content/landing';
+
 import { Hero } from '@/components/landing-v2/Hero';
 
 // HeroCanvas uses dynamic() + ssr:false, which renders a loading state on
@@ -19,7 +21,7 @@ jest.mock('../EventHorizonCountdown', () => ({
 
 describe('<Hero />', () => {
   it('renders the lexicon-safe headline', () => {
-    render(<Hero />);
+    render(<Hero hero={landingContentEn.hero} />);
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toHaveTextContent(/Cosmic Signature/i);
     expect(heading).toHaveTextContent(/Procedural On-Chain Art/i);
@@ -27,32 +29,32 @@ describe('<Hero />', () => {
   });
 
   it('renders the primary CTA linking to the app subdomain', () => {
-    render(<Hero />);
+    render(<Hero hero={landingContentEn.hero} />);
     const primaryCta = screen.getByRole('link', { name: /open the app/i });
     expect(primaryCta).toHaveAttribute('href', 'https://app.cosmicsignature.com');
     expect(primaryCta).toHaveAttribute('rel', 'noopener');
   });
 
   it('renders the secondary CTA anchoring to the cycle section', () => {
-    render(<Hero />);
+    render(<Hero hero={landingContentEn.hero} />);
     const secondaryCta = screen.getByRole('link', { name: /explore the cycle/i });
     expect(secondaryCta).toHaveAttribute('href', '#cycle');
   });
 
   it('renders the live Event Horizon countdown inside the hero', () => {
-    render(<Hero />);
+    render(<Hero hero={landingContentEn.hero} />);
     expect(screen.getByTestId('event-horizon-countdown')).toBeInTheDocument();
     expect(screen.getByLabelText('Live Performance Cycle countdown')).toBeInTheDocument();
   });
 
   it('renders the scroll-to-cycle chevron with an accessible label', () => {
-    render(<Hero />);
+    render(<Hero hero={landingContentEn.hero} />);
     const chevron = screen.getByRole('link', { name: /scroll to the cycle section/i });
     expect(chevron).toHaveAttribute('href', '#cycle');
   });
 
   it('renders the marquee credibility chips', () => {
-    render(<Hero />);
+    render(<Hero hero={landingContentEn.hero} />);
     expect(screen.getByText('CC0')).toBeInTheDocument();
     expect(screen.getByText('Verified Contracts')).toBeInTheDocument();
     expect(screen.getByText('7% to Protocol Guild')).toBeInTheDocument();
@@ -61,13 +63,13 @@ describe('<Hero />', () => {
   it('avoids unsupported audit claims in the marquee chips', () => {
     // Audit/formal-verification status is published on /audits; the hero
     // must not assert it as a blanket fact.
-    render(<Hero />);
+    render(<Hero hero={landingContentEn.hero} />);
     expect(screen.queryByText('Formally Verified')).not.toBeInTheDocument();
     expect(screen.queryByText('Audited Contracts')).not.toBeInTheDocument();
   });
 
   it('contains no banned lexicon terms in the rendered DOM', () => {
-    const { container } = render(<Hero />);
+    const { container } = render(<Hero hero={landingContentEn.hero} />);
     const text = container.textContent ?? '';
     expect(text).not.toMatch(/\bbid(?:ding|der|s)?\b/i);
     expect(text).not.toMatch(/\bprize(?:s|d)?\b/i);
@@ -76,7 +78,7 @@ describe('<Hero />', () => {
   });
 
   it('renders the hero canvas mount point (dynamic import)', () => {
-    render(<Hero />);
+    render(<Hero hero={landingContentEn.hero} />);
     expect(screen.getByTestId('hero-canvas-stub')).toBeInTheDocument();
   });
 });

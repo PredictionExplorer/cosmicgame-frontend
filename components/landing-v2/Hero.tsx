@@ -5,12 +5,12 @@ import { motion } from 'framer-motion';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
-import { landingContent } from '@/content/landing';
+import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
-import { APP_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
+import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { GradientText } from './GradientText';
@@ -23,9 +23,7 @@ const HeroCanvas = dynamic(
   },
 );
 
-const { hero } = landingContent;
-
-export function Hero() {
+export function Hero({ hero }: { hero: LandingContent['hero'] }) {
   const locale = useLocale();
 
   return (
@@ -59,16 +57,15 @@ export function Hero() {
             className="mt-8 text-balance text-5xl font-semibold leading-[0.98] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-[92px]"
             style={{ fontFamily: 'var(--font-family-display)' }}
           >
-            Cosmic Signature: Procedural On-Chain Art on{' '}
-            <GradientText variant="signature">Arbitrum</GradientText>
+            {hero.headlineLead}{' '}
+            <GradientText variant="signature">{hero.headlineAccent}</GradientText>
           </h1>
 
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl">
             {hero.subhead}
           </p>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/55">
-            Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
-            mutational signatures in biology. It is an on-chain art protocol and app.
+            {hero.biologyDisclaimer}
           </p>
 
           <motion.div
@@ -100,16 +97,16 @@ export function Hero() {
               {hero.secondaryCta.label}
             </Link>
             <Link
-              href={localizeCrossHostHref(`${APP_ORIGIN}/statistics`, locale)}
+              href={localizeCrossHostHref(hero.statisticsCta.href, locale)}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-sm font-medium text-white/80 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
             >
-              Protocol statistics
+              {hero.statisticsCta.label}
             </Link>
             <Link
-              href={localizeCrossHostHref(`${APP_ORIGIN}/gallery`, locale)}
+              href={localizeCrossHostHref(hero.galleryCta.href, locale)}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-sm font-medium text-white/80 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
             >
-              NFT gallery
+              {hero.galleryCta.label}
             </Link>
           </div>
         </motion.div>
@@ -137,7 +134,7 @@ export function Hero() {
 
       <motion.a
         href="#cycle"
-        aria-label="Scroll to The Cycle section"
+        aria-label={hero.scrollAriaLabel}
         className="absolute bottom-8 left-1/2 z-30 -translate-x-1/2 text-white/50 transition hover:text-white"
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}

@@ -5,22 +5,7 @@ import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
 
-export interface LearnSection {
-  heading: string;
-  body: string[];
-}
-
-export interface LearnArticle {
-  slug: string;
-  title: string;
-  description: string;
-  h1: string;
-  updated: string;
-  summary: string;
-  schemaType: 'Article' | 'TechArticle';
-  sections: LearnSection[];
-  related: { label: string; href: string }[];
-}
+import type { LearnArticle, LearnContent, LearnSection } from './types';
 
 const appLink = (path: string) => `${APP_ORIGIN}${path}`;
 
@@ -347,7 +332,7 @@ const baseLearnArticles: LearnArticle[] = [
   // lexicon-allow-end
 ];
 
-const articleDepthSections: Record<string, LearnSection[]> = {
+const articleDepthSections: Record<string, readonly LearnSection[]> = {
   'what-is-cosmic-signature': [
     {
       heading: 'What Makes The Protocol Distinct',
@@ -558,15 +543,39 @@ const answerabilitySections: LearnSection[] = [
   },
 ];
 
-export const learnArticles: LearnArticle[] = baseLearnArticles.map((article) => ({
-  ...article,
-  sections: [
-    ...article.sections,
-    ...(articleDepthSections[article.slug] ?? []),
-    ...answerabilitySections,
-  ],
-}));
-
-export function getLearnArticle(slug: string): LearnArticle | undefined {
-  return learnArticles.find((article) => article.slug === slug);
-}
+export const learnContentEn = {
+  hub: {
+    meta: {
+      title: 'Learn Cosmic Signature | On-Chain Art, Performance Cycles, and Arbitrum',
+      description:
+        'Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications.',
+    },
+    eyebrow: 'Cosmic Signature Learn',
+    h1: 'Learn Cosmic Signature',
+    intro:
+      'Clear, crawlable guides to Cosmic Signature: the procedural on-chain art protocol on Arbitrum where gestures shape deterministic three-body NFT art during Performance Cycles.',
+    breadcrumbs: {
+      homeLabel: 'Cosmic Signature',
+      learnLabel: 'Learn',
+    },
+  },
+  articleUi: {
+    eyebrow: 'Cosmic Signature Learn',
+    breadcrumbs: {
+      ariaLabel: 'Breadcrumb',
+      homeLabel: 'Cosmic Signature',
+      learnLabel: 'Learn',
+    },
+    lastUpdatedLabel: 'Last updated:',
+    publisherLabel: 'Published by Cosmic Signature',
+    relatedResourcesHeading: 'Related Cosmic Signature resources',
+  },
+  articles: baseLearnArticles.map((article) => ({
+    ...article,
+    sections: [
+      ...article.sections,
+      ...(articleDepthSections[article.slug] ?? []),
+      ...answerabilitySections,
+    ],
+  })),
+} satisfies LearnContent;

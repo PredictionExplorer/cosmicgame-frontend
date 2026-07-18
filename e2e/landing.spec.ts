@@ -13,6 +13,8 @@ import { expect, test, type Page } from '@playwright/test';
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
 const APP_ORIGIN_PATTERN =
   /^https:\/\/app\.cosmicsignature\.com$|^http:\/\/app\.cosmicsignature\.local:3000$/;
+const APP_ZH_ORIGIN_PATTERN =
+  /^https:\/\/app\.cosmicsignature\.com\/zh$|^http:\/\/app\.cosmicsignature\.local:3000\/zh$/;
 const MOCK_NOW_SECONDS = 1_700_000_000;
 const MOCK_CYCLE_FINALIZATION_SECONDS = MOCK_NOW_SECONDS + 7_265;
 const CURRENT_TIME_ROUTE = '**/api/cosmicgame/time/current';
@@ -176,6 +178,77 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     const contents = await scripts.allInnerTexts();
     const hasFAQ = contents.some((c) => c.includes('"@type":"FAQPage"'));
     expect(hasFAQ).toBe(true);
+  });
+
+  test('renders the complete Chinese landing page and localized FAQ JSON-LD', async ({ page }) => {
+    await page.goto('/zh', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('程序化链上艺术');
+    await expect(page.getByRole('link', { name: '打开应用' }).first()).toHaveAttribute(
+      'href',
+      APP_ZH_ORIGIN_PATTERN,
+    );
+
+    const timer = page.getByLabel('实时演绎周期倒计时');
+    await expect(timer.getByText('实时周期时钟')).toBeVisible({ timeout: 10_000 });
+    await expect(timer.getByRole('heading', { name: /第 42 个周期距收官还有/ })).toBeVisible();
+    await expect(timer.getByText('128 次落笔')).toBeVisible();
+    await expect(timer.getByText('与应用内时钟同步')).toBeVisible();
+    await expect(timer.getByRole('link', { name: '查看实时周期' })).toHaveAttribute(
+      'href',
+      APP_ZH_ORIGIN_PATTERN,
+    );
+
+    await expect(page.getByText('参与者实际要做什么？')).toBeVisible();
+    const scripts = await page.locator('script[type="application/ld+json"]').allInnerTexts();
+    const faq = scripts.find((content) => content.includes('"@type":"FAQPage"'));
+    expect(faq).toContain('"inLanguage":"zh-Hans"');
+    expect(faq).toContain('参与者实际要做什么？');
+  });
+
+  test('keeps Chinese landing copy within the viewport at release breakpoints', async ({
+    page,
+  }, testInfo) => {
+    for (const viewport of [
+      { name: 'mobile-320', width: 320, height: 800 },
+      { name: 'tablet-768', width: 768, height: 1024 },
+      { name: 'desktop-1440', width: 1440, height: 1000 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/zh', { waitUntil: 'domcontentloaded' });
+      await expect(page.getByRole('heading', { level: 1 })).toContainText('程序化链上艺术');
+      await expect
+        .poll(() =>
+          page.evaluate(
+            () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+          ),
+        )
+        .toBe(true);
+      await testInfo.attach(`zh-landing-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+
+      for (const route of [
+        { path: '/zh/about', heading: '关于 Cosmic Signature' },
+        { path: '/zh/learn', heading: '了解 Cosmic Signature' },
+        {
+          path: '/zh/learn/what-is-cosmic-signature',
+          heading: '什么是 Cosmic Signature？',
+        },
+      ]) {
+        await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+        await expect(page.getByRole('heading', { level: 1, name: route.heading })).toBeVisible();
+        await expect
+          .poll(() =>
+            page.evaluate(
+              () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+            ),
+          )
+          .toBe(true);
+      }
+    }
   });
 
   test('contains no banned lexicon terms in rendered HTML', async ({ page }) => {
