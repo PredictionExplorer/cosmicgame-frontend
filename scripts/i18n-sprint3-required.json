@@ -1,0 +1,11 @@
+{
+  "namespaces": {
+    "home": ["*"],
+    "currentCycle": ["*"],
+    "gallery": ["*"],
+    "detail": ["*"],
+    "gesture": ["*"],
+    "common": ["breadcrumbs.*"],
+    "meta": ["home.*", "gallery.*", "currentCycleFull.*", "tokenDetail.*", "gestureDetail.*"]
+  }
+}

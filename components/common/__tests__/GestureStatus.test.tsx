@@ -75,7 +75,7 @@ describe('GestureStatus', () => {
         data={{ ...activeData, TsRoundStart: 0, CurRoundNum: 0 } as never}
       />,
     );
-    expect(screen.getByText('Open the Cycle')).toBeInTheDocument();
+    expect(screen.getByText('home.status.openCycle.title')).toBeInTheDocument();
   });
 
   it('shows cycle opened message for first gesture in existing cycle', () => {
@@ -85,8 +85,8 @@ describe('GestureStatus', () => {
         data={{ ...activeData, TsRoundStart: 0, CurRoundNum: 5 } as never}
       />,
     );
-    expect(screen.getByText('Cycle 5')).toBeInTheDocument();
-    expect(screen.getByText(/Calibration Window/)).toBeInTheDocument();
+    expect(screen.getByText('home.status.openCycle.cycleNumber(cycle=5)')).toBeInTheDocument();
+    expect(screen.getByText('home.status.openCycle.body')).toBeInTheDocument();
   });
 
   it('displays Signature Allocation and gesture cost info', () => {
@@ -121,7 +121,7 @@ describe('GestureStatus', () => {
       />,
     );
 
-    expect(screen.getByText('FREE')).toBeInTheDocument();
+    expect(screen.getByText('home.status.metrics.free')).toBeInTheDocument();
   });
 
   it('shows compact CST Calibration Window progress from merged contract data', () => {
@@ -142,11 +142,13 @@ describe('GestureStatus', () => {
       />,
     );
 
-    expect(screen.getByText('CST Window')).toBeInTheDocument();
+    expect(screen.getByText('home.status.metrics.cstWindow')).toBeInTheDocument();
     expect(screen.getByText('50%')).toBeInTheDocument();
-    expect(screen.getByText('Duration 1h 30m')).toBeInTheDocument();
+    // formatSeconds emits a trailing separator space, preserved inside the
+    // mocked message values: "duration=1h 30m ".
+    expect(screen.getByText('home.status.metrics.duration(duration=1h 30m )')).toBeInTheDocument();
     expect(
-      screen.getByRole('progressbar', { name: 'CST Calibration Window progress' }),
+      screen.getByRole('progressbar', { name: 'home.status.metrics.cstWindowProgressAria' }),
     ).toHaveAttribute('aria-valuenow', '50');
   });
 
@@ -167,7 +169,7 @@ describe('GestureStatus', () => {
 
     expect(screen.getByText('0.1%')).toBeInTheDocument();
     expect(
-      screen.getByRole('progressbar', { name: 'CST Calibration Window progress' }),
+      screen.getByRole('progressbar', { name: 'home.status.metrics.cstWindowProgressAria' }),
     ).toHaveAttribute('aria-valuenow', '0.1');
   });
 
@@ -197,10 +199,10 @@ describe('GestureStatus', () => {
       />,
     );
 
-    expect(screen.queryByText('Cycle finalizes in')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.status.finalizesIn')).not.toBeInTheDocument();
     expect(mockCountdownProps).toHaveLength(0);
-    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
-    expect(screen.getByText('ETH Gesture')).toBeInTheDocument();
+    expect(screen.getByText('home.status.metrics.signatureAllocation')).toBeInTheDocument();
+    expect(screen.getByText('home.status.metrics.ethGesture')).toBeInTheDocument();
   });
 
   it('shows cycle standing copy without restricted chance wording', () => {
@@ -218,7 +220,7 @@ describe('GestureStatus', () => {
       />,
     );
 
-    expect(screen.getByText('Your Cycle Standing')).toBeInTheDocument();
+    expect(screen.getByText('home.status.standing.title')).toBeInTheDocument();
     expect(screen.queryByText('Your Chances')).not.toBeInTheDocument();
   });
 
@@ -238,9 +240,9 @@ describe('GestureStatus', () => {
       />,
     );
 
-    expect(screen.getByText(/You made the most recent gesture/)).toHaveTextContent(
-      'Signature Allocation (10.5000 ETH, 1,000 CST, 1 Cosmic Signature NFT, plus all 3 attached NFTs shown below).',
-    );
+    expect(
+      screen.getByText('home.status.standing.leader.withNft(amount=10.5000,nftCount=3)'),
+    ).toBeInTheDocument();
   });
 
   it('includes attached ERC20 tokens in the latest gesture maker Signature Allocation copy', () => {
@@ -259,9 +261,9 @@ describe('GestureStatus', () => {
       />,
     );
 
-    expect(screen.getByText(/You made the most recent gesture/)).toHaveTextContent(
-      'Signature Allocation (10.5000 ETH, 1,000 CST, 1 Cosmic Signature NFT, plus all 2 attached ERC20 token deposits shown below).',
-    );
+    expect(
+      screen.getByText('home.status.standing.leader.withErc20(amount=10.5000,erc20Count=2)'),
+    ).toBeInTheDocument();
   });
 
   it('combines attached NFTs and ERC20 tokens in the latest gesture maker copy', () => {
@@ -281,9 +283,11 @@ describe('GestureStatus', () => {
       />,
     );
 
-    expect(screen.getByText(/You made the most recent gesture/)).toHaveTextContent(
-      'Signature Allocation (10.5000 ETH, 1,000 CST, 1 Cosmic Signature NFT, plus all 3 attached NFTs and the attached ERC20 token deposit shown below).',
-    );
+    expect(
+      screen.getByText(
+        'home.status.standing.leader.withBoth(amount=10.5000,nftCount=3,erc20Count=1)',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('omits attached NFT copy when no attached NFTs are available', () => {
@@ -301,15 +305,11 @@ describe('GestureStatus', () => {
       />,
     );
 
-    expect(screen.getByText(/You made the most recent gesture/)).toHaveTextContent(
-      'Signature Allocation (10.5000 ETH, 1,000 CST, 1 Cosmic Signature NFT).',
-    );
-    expect(screen.getByText(/You made the most recent gesture/)).not.toHaveTextContent(
-      'attached NFT',
-    );
-    expect(screen.getByText(/You made the most recent gesture/)).not.toHaveTextContent(
-      'attached ERC20',
-    );
+    expect(
+      screen.getByText('home.status.standing.leader.base(amount=10.5000)'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/nftCount=/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/erc20Count=/)).not.toBeInTheDocument();
   });
 
   it('includes attached ERC20 tokens in the Signature Allocation tooltip copy', async () => {
@@ -327,9 +327,7 @@ describe('GestureStatus', () => {
     await user.hover(screen.getAllByRole('button', { name: /^More information/ })[1]!);
 
     expect(
-      await screen.findAllByText(
-        'The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and the attached ERC20 token deposit.',
-      ),
+      await screen.findAllByText('home.status.metrics.signatureTooltip.withErc20(erc20Count=1)'),
     ).not.toHaveLength(0);
   });
 
@@ -342,8 +340,8 @@ describe('GestureStatus', () => {
         ethGestureInfo={{ ETHPrice: 0.01 }}
       />,
     );
-    expect(screen.getByText('Cycle Ready to Finalize')).toBeInTheDocument();
-    expect(screen.getByText('The finalization clock reached zero.')).toBeInTheDocument();
+    expect(screen.getByText('home.status.readyToFinalize')).toBeInTheDocument();
+    expect(screen.getByText('home.status.clockReachedZero')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

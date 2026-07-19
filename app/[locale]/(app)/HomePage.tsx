@@ -8,8 +8,9 @@ import type { CountdownRenderProps } from 'react-countdown';
 import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds, getGestureKindLabel, shortenHex } from '@/utils';
+import { formatSeconds, shortenHex } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { reportError } from '@/utils/errors';
@@ -69,20 +70,24 @@ const sectionFade = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
-function renderInlineCountdown({ total }: CountdownRenderProps) {
-  return <span className="font-mono tabular-nums">{formatSeconds(Math.ceil(total / 1000))}</span>;
+type HomeTranslator = ReturnType<typeof useTranslations>;
+
+function formatRelativeGestureAge(timestamp: unknown, nowMs: number, t: HomeTranslator): string {
+  const numericTimestamp = Number(timestamp);
+  if (!Number.isFinite(numericTimestamp) || numericTimestamp <= 0) return t('ticker.age.justNow');
+  const elapsedSeconds = Math.max(0, Math.floor((nowMs - numericTimestamp * 1000) / 1000));
+  if (elapsedSeconds < 60) return t('ticker.age.seconds', { count: String(elapsedSeconds) });
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+  if (elapsedMinutes < 60) return t('ticker.age.minutes', { count: String(elapsedMinutes) });
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) return t('ticker.age.hours', { count: String(elapsedHours) });
+  return t('ticker.age.days', { count: String(Math.floor(elapsedHours / 24)) });
 }
 
-function formatRelativeGestureAge(timestamp: unknown, nowMs: number): string {
-  const numericTimestamp = Number(timestamp);
-  if (!Number.isFinite(numericTimestamp) || numericTimestamp <= 0) return 'just now';
-  const elapsedSeconds = Math.max(0, Math.floor((nowMs - numericTimestamp * 1000) / 1000));
-  if (elapsedSeconds < 60) return `${elapsedSeconds}s ago`;
-  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
-  if (elapsedMinutes < 60) return `${elapsedMinutes}m ago`;
-  const elapsedHours = Math.floor(elapsedMinutes / 60);
-  if (elapsedHours < 24) return `${elapsedHours}h ago`;
-  return `${Math.floor(elapsedHours / 24)}d ago`;
+function getGestureKindSelectValue(gestureType: unknown): 'eth' | 'randomWalk' | 'cst' {
+  if (gestureType === 2) return 'cst';
+  if (gestureType === 1) return 'randomWalk';
+  return 'eth';
 }
 
 function LatestGestureTicker({
@@ -92,6 +97,7 @@ function LatestGestureTicker({
   gesture: GestureInfo | null;
   pulseKey: number;
 }) {
+  const t = useTranslations('home');
   const nowMs = useNow(15_000);
   const isPulsing = useLivePulse(pulseKey);
 
@@ -103,7 +109,7 @@ function LatestGestureTicker({
       className={`mt-4 flex items-center justify-between gap-3 rounded-2xl border border-primary/15 bg-primary/[0.055] px-4 py-3 text-sm transition-colors hover:border-primary/35 hover:bg-primary/[0.08] ${
         isPulsing ? 'animate-live-flash' : ''
       }`}
-      aria-label={`Open latest gesture ${gesture.EvtLogId}`}
+      aria-label={t('ticker.openLatestAria', { id: String(gesture.EvtLogId) })}
     >
       <span className="flex min-w-0 items-center gap-3">
         <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-primary/20">
@@ -114,10 +120,13 @@ function LatestGestureTicker({
         </span>
         <span className="min-w-0">
           <span className="block truncate font-medium text-foreground">
-            {shortenHex(gesture.BidderAddr, 6)} made {getGestureKindLabel(gesture.GestureType)}
+            {t('ticker.gestureLine', {
+              address: shortenHex(gesture.BidderAddr, 6),
+              kind: getGestureKindSelectValue(gesture.GestureType),
+            })}
           </span>
           <span className="mt-0.5 block text-xs text-muted-foreground">
-            {formatRelativeGestureAge(gesture.TimeStamp, nowMs)}
+            {formatRelativeGestureAge(gesture.TimeStamp, nowMs, t)}
           </span>
         </span>
       </span>
@@ -132,11 +141,17 @@ interface HomePageProps {
 }
 
 const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomePageProps) => {
+  const t = useTranslations('home');
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
   const { notify } = useNotify();
   const uxScenario = useUxScenarioSnapshot();
+
+  const renderInlineCountdown = ({ total }: CountdownRenderProps) => (
+    <span className="font-mono tabular-nums">{formatSeconds(Math.ceil(total / 1000), locale)}</span>
+  );
 
   const [hostname, setHostname] = useState<string | null>(initialHostname);
 
@@ -317,18 +332,19 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
 
   const getGestureLabel = () => {
     const adj = (ethGestureInfo?.ETHPrice ?? 0) * (1 + gestureCostPlus / 100);
-    const fmt = (v: number, t: number) => (v > t ? v.toFixed(2) : v.toFixed(5));
-    if (gestureType === 'ETH') return `Gesture with ETH (${fmt(adj, 0.1)} ETH)`;
+    const fmt = (v: number, threshold: number) => (v > threshold ? v.toFixed(2) : v.toFixed(5));
+    if (gestureType === 'ETH') return t('form.submit.eth', { cost: fmt(adj, 0.1) });
     if (gestureType === 'RandomWalk' && rwlkId !== -1)
-      return `Gesture with ETH + RandomWalk token ${rwlkId} (${fmt(adj * 0.5, 0.2)} ETH)`;
+      return t('form.submit.randomWalkWithToken', {
+        tokenId: String(rwlkId),
+        cost: fmt(adj * 0.5, 0.2),
+      });
     if (gestureType === 'CST') {
-      const costLabel = liveCstGestureData.isFree
-        ? 'FREE GESTURE'
-        : `${liveCstGestureData.CSTPrice.toFixed(2)} CST`;
-      return `Gesture with CST (${costLabel})`;
+      if (liveCstGestureData.isFree) return t('form.submit.cstFree');
+      return t('form.submit.cst', { cost: liveCstGestureData.CSTPrice.toFixed(2) });
     }
-    if (gestureType === 'RandomWalk') return 'Gesture with ETH + RandomWalk';
-    return `Gesture with ${gestureType}`;
+    if (gestureType === 'RandomWalk') return t('form.submit.randomWalk');
+    return t('form.submit.generic', { method: gestureType });
   };
 
   const cycleState = getCycleState({ data, loading, allocationTime, activationTime, now });
@@ -467,17 +483,15 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
               >
                 <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
                   <h2 className="font-display text-xl font-bold tracking-tight mb-1">
-                    Make Your Gesture
+                    {t('form.title')}
                   </h2>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Choose a gesture method and participate in the active cycle.
-                  </p>
+                  <p className="text-sm text-muted-foreground mb-6">{t('form.subtitle')}</p>
 
                   {loading ? (
                     <div
                       className="space-y-5"
                       role="status"
-                      aria-label="Loading gesture form"
+                      aria-label={t('form.loadingAria')}
                       data-testid="gesture-form-skeleton"
                     >
                       {/* Plain Skeletons only: nesting SkeletonText would add a second role="status". */}
@@ -514,7 +528,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                           >
                             {isGesturing ? (
                               <span className="flex items-center gap-2">
-                                <Spinner size="sm" /> Processing...
+                                <Spinner size="sm" /> {t('form.processing')}
                               </span>
                             ) : (
                               <>
@@ -525,8 +539,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                         )}
                         {account && !canGesture && cycleTimerEnded === false && (
                           <p className="text-sm text-muted-foreground">
-                            You made the final gesture for this cycle. When the timer ends, use
-                            Finalize Cycle below.
+                            {t('form.finalGestureMade')}
                           </p>
                         )}
                         {canClaim && (
@@ -541,15 +554,15 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                             >
                               {isClaiming ? (
                                 <span className="flex items-center gap-2">
-                                  <Spinner size="sm" /> Processing...
+                                  <Spinner size="sm" /> {t('form.processing')}
                                 </span>
                               ) : (
                                 <>
-                                  Finalize Cycle
+                                  {t('form.finalize')}
                                   <span className="flex items-center">
                                     {claimWait > now && data?.LastBidderAddr !== account && (
                                       <>
-                                        &nbsp;available in &nbsp;
+                                        &nbsp;{t('form.finalizeAvailableIn')} &nbsp;
                                         <SmoothCountdown
                                           date={claimWait}
                                           renderer={renderInlineCountdown}
@@ -565,8 +578,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                             </Button>
                             {data?.LastBidderAddr !== account && claimWait > now && (
                               <p className="text-sm italic text-right text-primary">
-                                Please wait for the participant who made the Final Gesture to
-                                finalize the cycle.
+                                {t('form.finalizeWaitNote')}
                               </p>
                             )}
                           </>
@@ -583,11 +595,10 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                       />
                       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
                         <h3 className="font-display text-lg font-semibold tracking-tight">
-                          Connect to submit your gesture
+                          {t('form.connect.title')}
                         </h3>
                         <p className="mt-2 text-sm text-muted-foreground">
-                          Review the live gesture methods and costs above, then connect MetaMask or
-                          another wallet to submit on Arbitrum.
+                          {t('form.connect.body')}
                         </p>
                         <div className="mt-4">
                           <ConnectWalletButton
@@ -643,10 +654,10 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                 <span className="pointer-events-none absolute -bottom-14 left-8 h-28 w-28 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
                 <span className="relative min-w-0">
                   <span className="block text-sm font-semibold text-white">
-                    View Full Cycle Details
+                    {t('cycleDetails.title')}
                   </span>
                   <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                    Gesture history, leaderboards, contributions, and allocation distribution
+                    {t('cycleDetails.subtitle')}
                   </span>
                 </span>
                 <ArrowRight className="relative h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
@@ -697,7 +708,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
             className="h-12 w-full rounded-full shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)]"
           >
             <Link href="#make-gesture">
-              {account ? 'Make a Gesture' : 'Preview Gesture Options'}
+              {account ? t('mobileCta.makeGesture') : t('mobileCta.preview')}
             </Link>
           </Button>
         </div>

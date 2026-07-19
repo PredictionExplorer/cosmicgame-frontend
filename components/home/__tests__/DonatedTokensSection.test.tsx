@@ -52,7 +52,7 @@ const defaultProps = {
 describe('DonatedTokensSection', () => {
   it('renders SectionDivider heading', () => {
     render(<DonatedTokensSection {...defaultProps} />);
-    expect(screen.getByText('Attached Tokens')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.attachedTokens.title')).toBeInTheDocument();
   });
 
   it('renders InfoTooltip for attached tokens', () => {
@@ -63,13 +63,13 @@ describe('DonatedTokensSection', () => {
 
   it('renders both tab labels', () => {
     render(<DonatedTokensSection {...defaultProps} />);
-    expect(screen.getByText('ERC721 Tokens')).toBeInTheDocument();
-    expect(screen.getByText('ERC20 Tokens')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.attachedTokens.erc721Tab')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.attachedTokens.erc20Tab')).toBeInTheDocument();
   });
 
   it('shows empty state for ERC721 when no NFTs', () => {
     render(<DonatedTokensSection {...defaultProps} donatedTokensTab={0} />);
-    expect(screen.getByText('No ERC721 tokens were attached this cycle.')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.attachedTokens.erc721Empty')).toBeInTheDocument();
   });
 
   it('renders NFT grid when NFTs are provided', () => {
@@ -90,7 +90,9 @@ describe('DonatedTokensSection', () => {
 
   it('uses correct tab value prop', () => {
     const { container } = render(<DonatedTokensSection {...defaultProps} donatedTokensTab={1} />);
-    expect(container.querySelector('[data-state="active"]')).toHaveTextContent('ERC20 Tokens');
+    expect(container.querySelector('[data-state="active"]')).toHaveTextContent(
+      'currentCycle.attachedTokens.erc20Tab',
+    );
   });
 
   it('renders AttachedERC20Table in second tab', () => {
@@ -117,7 +119,7 @@ describe('DonatedTokensSection', () => {
     const user = userEvent.setup();
     render(<DonatedTokensSection {...defaultProps} donatedTokensTab={0} />);
 
-    await user.click(screen.getByText('ERC20 Tokens'));
+    await user.click(screen.getByText('currentCycle.attachedTokens.erc20Tab'));
 
     expect(defaultProps.onTabChange).toHaveBeenCalled();
     const callArgs = defaultProps.onTabChange.mock.calls[0];
@@ -131,7 +133,7 @@ describe('DonatedTokensSection', () => {
       <DonatedTokensSection {...defaultProps} donatedTokensTab={1} onTabChange={onTabChange} />,
     );
 
-    await user.click(screen.getByText('ERC721 Tokens'));
+    await user.click(screen.getByText('currentCycle.attachedTokens.erc721Tab'));
 
     expect(onTabChange).toHaveBeenCalled();
     const callArgs = onTabChange.mock.calls[0];

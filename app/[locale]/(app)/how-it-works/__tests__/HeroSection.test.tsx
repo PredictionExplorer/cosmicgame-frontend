@@ -1,3 +1,5 @@
+import { howItWorksContentEn } from '@/content/how-it-works';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { HeroSection } from '../components/HeroSection';
@@ -43,46 +45,49 @@ jest.mock('next/link', () => ({
   ),
 }));
 
+const hero = howItWorksContentEn.hero;
+
 describe('HeroSection', () => {
   it('renders the main heading', () => {
-    render(<HeroSection />);
+    render(<HeroSection hero={hero} />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'How Cosmic Signature Works',
     );
   });
 
   it('renders the tagline', () => {
-    render(<HeroSection />);
+    render(<HeroSection hero={hero} />);
+    expect(screen.getByText(hero.paragraph)).toBeInTheDocument();
     expect(
       screen.getByText(/Participants make gestures during a Performance Cycle/),
     ).toBeInTheDocument();
   });
 
   it('renders the protocol badge', () => {
-    render(<HeroSection />);
+    render(<HeroSection hero={hero} />);
     expect(screen.getByText('Procedural On-Chain Art Protocol')).toBeInTheDocument();
   });
 
   it('renders Open the Protocol link pointing to homepage', () => {
-    render(<HeroSection />);
+    render(<HeroSection hero={hero} />);
     const link = screen.getByRole('link', { name: 'Open the Protocol' });
     expect(link).toHaveAttribute('href', '/');
   });
 
   it('renders Learn More link pointing to game overview section', () => {
-    render(<HeroSection />);
+    render(<HeroSection hero={hero} />);
     const link = screen.getByRole('link', { name: 'Learn More' });
     expect(link).toHaveAttribute('href', '#protocol-overview');
   });
 
   it('has the correct aria-labelledby on the section', () => {
-    const { container } = render(<HeroSection />);
+    const { container } = render(<HeroSection hero={hero} />);
     const section = container.querySelector('section');
     expect(section).toHaveAttribute('aria-labelledby', 'hero-heading');
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<HeroSection />);
+    const { container } = render(<HeroSection hero={hero} />);
     await checkA11y(container);
   });
 });

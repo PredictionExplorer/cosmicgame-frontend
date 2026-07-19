@@ -74,24 +74,24 @@ function getAllocationTypeConfig(recordType?: number) {
   switch (recordType) {
     case 1:
       return {
-        label: 'Stellar Selection Recipient',
+        labelKey: 'badges.stellarSelectionRecipient',
         className: 'bg-accent/20 text-accent border-accent/30',
-      };
+      } as const;
     case 2:
       return {
-        label: 'Anchor Recipient',
+        labelKey: 'badges.anchorRecipient',
         className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-      };
+      } as const;
     case 3:
       return {
-        label: 'Cycle Recipient',
+        labelKey: 'badges.cycleRecipient',
         className: 'bg-primary/20 text-primary border-primary/30',
-      };
+      } as const;
     case 4:
       return {
-        label: 'Endurance Champion',
+        labelKey: 'badges.enduranceChampion',
         className: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-      };
+      } as const;
     default:
       return null;
   }
@@ -99,7 +99,9 @@ function getAllocationTypeConfig(recordType?: number) {
 
 /** Full detail page for a Cosmic Signature NFT, showing metadata, image/video, naming, transfer, and ownership history. */
 const NFTTrait = ({ tokenId }: NFTTraitProps) => {
-  const t = useTranslations('toasts');
+  const t = useTranslations('detail');
+  const tCommon = useTranslations('common');
+  const tToasts = useTranslations('toasts');
   const [openDialog, setOpenDialog] = useState(false);
   const [openVideo, setOpenVideo] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
@@ -208,7 +210,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     } catch (err) {
       if (isUserRejection(err)) {
         setNotification({
-          text: t('walletTransactionCancelled'),
+          text: tToasts('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });
@@ -241,7 +243,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         setNotification({
           visible: true,
           type: 'info',
-          text: t('walletTransactionCancelled'),
+          text: tToasts('walletTransactionCancelled'),
         });
       } else {
         const msg = getEthErrorMessage(err, 'An error occurred while setting the token name.');
@@ -269,7 +271,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         setNotification({
           visible: true,
           type: 'info',
-          text: t('walletTransactionCancelled'),
+          text: tToasts('walletTransactionCancelled'),
         });
       } else {
         const msg = getEthErrorMessage(err, 'An error occurred while clearing the token name.');
@@ -334,7 +336,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
               onClick={() => setImageOpen(true)}
               data-testid="nft-image-container"
             >
-              <NFTImage src={image} terminalFallbackSrc={null} />
+              <NFTImage src={image} terminalFallbackSrc={null} alt={t('image.defaultAlt')} />
               <div className="absolute top-3 left-3">
                 <Badge className="bg-black/50 backdrop-blur-sm text-white border-white/20 text-xs font-mono">
                   {formatId(tokenId)}
@@ -350,7 +352,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
               <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="text-xs">
-                    Share
+                    {t('share.trigger')}
                     {menuOpen ? (
                       <ChevronUp className="ml-1 h-3.5 w-3.5" />
                     ) : (
@@ -365,7 +367,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                       setMenuOpen(false);
                     }}
                   >
-                    Copy Video Link
+                    {t('share.copyVideoLink')}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
@@ -373,7 +375,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                       setMenuOpen(false);
                     }}
                   >
-                    Copy Image Link
+                    {t('share.copyImageLink')}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => {
@@ -381,12 +383,12 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                       setMenuOpen(false);
                     }}
                   >
-                    Copy Page Link
+                    {t('share.copyPageLink')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <NftMarketplaceButton variant="card" label="Buy or sell NFTs" />
+              <NftMarketplaceButton variant="card" label={t('actions.buyOrSellNfts')} />
 
               <div className="flex gap-2 ml-auto">
                 <Button
@@ -394,7 +396,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                   size="sm"
                   onClick={handlePrev}
                   disabled={!canGoPrev}
-                  aria-label="Previous token"
+                  aria-label={t('navigation.previousToken')}
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
@@ -403,7 +405,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                   size="sm"
                   onClick={handleNext}
                   disabled={!canGoNext}
-                  aria-label="Next token"
+                  aria-label={t('navigation.nextToken')}
                 >
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -420,7 +422,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
               </h1>
             ) : (
               <h1 className="text-3xl md:text-4xl font-bold font-display tracking-tight text-muted-foreground/50">
-                Unnamed Token
+                {t('hero.unnamedToken')}
               </h1>
             )}
 
@@ -432,12 +434,12 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
 
               {allocationConfig && (
                 <Badge className={`border text-xs ${allocationConfig.className}`}>
-                  {allocationConfig.label}
+                  {t(allocationConfig.labelKey)}
                   <InfoTooltip
                     content={
                       nft?.RecordType === 3
-                        ? `Received as the Cycle Recipient in Cycle #${nft?.RoundNum}`
-                        : `Received as a ${allocationConfig.label}`
+                        ? t('badges.receivedAsCycleRecipient', { round: String(nft?.RoundNum) })
+                        : t('badges.receivedAs', { label: t(allocationConfig.labelKey) })
                     }
                     iconClassName="h-3 w-3 ml-1"
                   />
@@ -446,17 +448,17 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
 
               {anchoringEligible ? (
                 <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs">
-                  Eligible for Anchoring
+                  {t('badges.eligibleForAnchoring')}
                   <InfoTooltip
-                    content="This Cosmic Signature NFT has never been anchored and can receive ETH Anchor Distributions when anchored."
+                    content={t('badges.eligibleForAnchoringTooltip')}
                     iconClassName="h-3 w-3 ml-1"
                   />
                 </Badge>
               ) : (
                 <Badge className="bg-red-500/15 text-red-400 border border-red-500/30 text-xs">
-                  Already Anchored
+                  {t('badges.alreadyAnchored')}
                   <InfoTooltip
-                    content="This token has already been anchored and cannot be anchored again."
+                    content={t('badges.alreadyAnchoredTooltip')}
                     iconClassName="h-3 w-3 ml-1"
                   />
                 </Badge>
@@ -473,7 +475,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                   className="text-xs"
                 >
                   <Trophy className="h-3.5 w-3.5 mr-1.5" />
-                  View Cycle #{nft.RoundNum} Details
+                  {t('actions.viewCycleDetails', { round: nft.RoundNum })}
                 </Button>
               </div>
             )}
@@ -541,7 +543,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="print-motion-visible mt-12"
         >
-          <SectionDivider title="Name History" className="mb-6" />
+          <SectionDivider title={t('sections.nameHistory')} className="mb-6" />
           <NameHistoryTable list={nameHistory} />
         </motion.section>
       )}
@@ -555,7 +557,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           transition={{ duration: 0.5, delay: 0.55 }}
           className="print-motion-visible mt-12"
         >
-          <SectionDivider title="Ownership History" className="mb-6" />
+          <SectionDivider title={t('sections.ownershipHistory')} className="mb-6" />
           <TransferHistoryTable list={transferHistory} />
         </motion.section>
       )}
@@ -577,16 +579,13 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       <Dialog open={openDialog} onOpenChange={(open) => !open && handleCloseDialog()}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Transfer</DialogTitle>
-            <DialogDescription>
-              The destination account doesn&apos;t appear to have any transaction history. Are you
-              sure you want to send the token to this address? Please double-check it.
-            </DialogDescription>
+            <DialogTitle>{t('transferDialog.title')}</DialogTitle>
+            <DialogDescription>{t('transferDialog.description')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={handleTransfer}>Yes, Transfer</Button>
+            <Button onClick={handleTransfer}>{t('transferDialog.confirm')}</Button>
             <Button variant="outline" onClick={handleCloseDialog}>
-              Cancel
+              {tCommon('actions.cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>

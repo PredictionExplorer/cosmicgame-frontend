@@ -3,38 +3,10 @@
 import { motion } from 'framer-motion';
 import { Gavel, Timer, Trophy } from 'lucide-react';
 
+import type { HowItWorksContent } from '@/content/how-it-works';
+
 import { GradientText } from '@/components/styled';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-
-const cards = [
-  {
-    number: '01',
-    title: 'Gesture',
-    description:
-      'Make a gesture with ETH or CST (ERC-20). Each gesture extends the Cycle Finalization Time, records a Stellar Selection entry, and shapes the evolving Signature.',
-    tooltip:
-      'Gestures can be made with ETH or CST tokens (ERC-20). Attaching a Random Walk NFT to an ETH gesture grants a one-time 50% ETH Gesture Cost reduction.',
-    Icon: Gavel,
-  },
-  {
-    number: '02',
-    title: 'Endure',
-    description:
-      'The cycle runs until the Cycle Finalization Time expires. Each new gesture adds the current time increment to the stored finalization time.',
-    tooltip:
-      'The time increment starts around one hour and grows gradually across cycles. CST Gesture Cost uses a dynamic Calibration Window that ETH and CST gestures move in opposite directions.',
-    Icon: Timer,
-  },
-  {
-    number: '03',
-    title: 'Receive',
-    description:
-      'Participate in allocations when the cycle finalizes \u2014 Signature Allocation, Stellar Selections, Anchor Distributions, and more.',
-    tooltip:
-      'The participant who made the Final Gesture receives 25% of the Cycle Reserve, 1,000 CST, and a Cosmic Signature NFT. Stellar Selection recipients, anchor-holders, and other participants also receive allocations.',
-    Icon: Trophy,
-  },
-] as const;
 
 const containerVariants = {
   hidden: {},
@@ -46,7 +18,13 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
-export function GameOverview() {
+export function GameOverview({ overview }: { overview: HowItWorksContent['overview'] }) {
+  const cards = [
+    { Icon: Gavel, ...overview.cards[0] },
+    { Icon: Timer, ...overview.cards[1] },
+    { Icon: Trophy, ...overview.cards[2] },
+  ];
+
   return (
     <section id="protocol-overview" aria-labelledby="protocol-overview-heading" className="py-16">
       <div className="mb-10 text-center">
@@ -54,11 +32,9 @@ export function GameOverview() {
           id="protocol-overview-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          How It Works
+          {overview.heading}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Three steps to participate and shape the Cycle Reserve
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{overview.subhead}</p>
       </div>
 
       <motion.div

@@ -45,8 +45,8 @@ describe('NFTMetadata', () => {
 
   it('renders round stat card with link', () => {
     render(<NFTMetadata nft={fullNft} />);
-    expect(screen.getByText('Round #42')).toBeInTheDocument();
-    const link = screen.getByText('Round #42').closest('a');
+    expect(screen.getByText('detail.metadata.roundNumber(round=42)')).toBeInTheDocument();
+    const link = screen.getByText('detail.metadata.roundNumber(round=42)').closest('a');
     expect(link).toHaveAttribute('href', '/allocation/42');
   });
 
@@ -71,7 +71,7 @@ describe('NFTMetadata', () => {
 
   it('renders dash for imprinted when no TimeStamp', () => {
     render(<NFTMetadata nft={{ ...fullNft, TimeStamp: undefined }} />);
-    expect(screen.getByText('Imprinted').closest('[class]')).toBeInTheDocument();
+    expect(screen.getByText('detail.metadata.imprinted').closest('[class]')).toBeInTheDocument();
   });
 
   it('handles null nft gracefully', () => {

@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 import { ArrowRight, Check, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
@@ -33,36 +34,12 @@ const getExplainerDismissedSnapshot = (): boolean =>
 const getExplainerDismissedServerSnapshot = (): boolean => true;
 
 const timelineSteps = [
-  {
-    id: 'opening-soon',
-    label: 'Opening Soon',
-    detail: 'The next cycle is scheduled and waiting to open.',
-  },
-  {
-    id: 'first-gesture',
-    label: 'First Gesture',
-    detail: 'The first Gesture starts the finalization clock.',
-  },
-  {
-    id: 'open',
-    label: 'Open Cycle',
-    detail: 'Gestures shape the Signature and extend time.',
-  },
-  {
-    id: 'final-window',
-    label: 'Final Window',
-    detail: 'The clock nears zero. A new Gesture can still extend it.',
-  },
-  {
-    id: 'finalization',
-    label: 'Finalization',
-    detail: 'The Final Gesture participant can close the cycle.',
-  },
-  {
-    id: 'allocation',
-    label: 'Allocation',
-    detail: 'The reserve distributes across protocol tracks.',
-  },
+  { id: 'opening-soon', messageKey: 'openingSoon' },
+  { id: 'first-gesture', messageKey: 'firstGesture' },
+  { id: 'open', messageKey: 'open' },
+  { id: 'final-window', messageKey: 'finalWindow' },
+  { id: 'finalization', messageKey: 'finalization' },
+  { id: 'allocation', messageKey: 'allocation' },
 ] as const;
 
 function phaseToTimelineId(phase: CyclePhase): (typeof timelineSteps)[number]['id'] {
@@ -85,6 +62,7 @@ export function CyclePhaseGuide({
   activationTime,
   now,
 }: CyclePhaseGuideProps) {
+  const t = useTranslations('home');
   const phase = getCycleState({ data, loading, allocationTime, activationTime, now }).phase;
   const activeStepId = phaseToTimelineId(phase);
   const activeIndex = timelineSteps.findIndex((step) => step.id === activeStepId);
@@ -105,14 +83,14 @@ export function CyclePhaseGuide({
       <Surface variant="glass-bordered" radius="xl" padding="none" className="p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-eyebrow text-muted-foreground">Cycle phase</p>
+            <p className="type-eyebrow text-muted-foreground">{t('phaseGuide.eyebrow')}</p>
             <h2 id="cycle-phase-guide-title" className="mt-2 font-display text-xl font-bold">
-              Where this Performance Cycle is now
+              {t('phaseGuide.title')}
             </h2>
           </div>
           <Button asChild variant="secondary" size="sm">
             <Link href="/how-it-works">
-              How it works
+              {t('phaseGuide.howItWorks')}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -120,7 +98,7 @@ export function CyclePhaseGuide({
 
         <ol
           className="mt-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6"
-          aria-label="Performance Cycle phases"
+          aria-label={t('phaseGuide.timelineAria')}
         >
           {timelineSteps.map((step, index) => {
             const isActive = step.id === activeStepId;
@@ -151,10 +129,18 @@ export function CyclePhaseGuide({
                   >
                     {isComplete ? <Check className="h-3 w-3" /> : index + 1}
                   </span>
-                  {isActive ? 'Now' : isComplete ? 'Passed' : 'Next'}
+                  {isActive
+                    ? t('phaseGuide.stepState.now')
+                    : isComplete
+                      ? t('phaseGuide.stepState.passed')
+                      : t('phaseGuide.stepState.next')}
                 </span>
-                <h3 className="mt-3 text-sm font-semibold">{step.label}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{step.detail}</p>
+                <h3 className="mt-3 text-sm font-semibold">
+                  {t(`phaseGuide.steps.${step.messageKey}.label`)}
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                  {t(`phaseGuide.steps.${step.messageKey}.detail`)}
+                </p>
               </li>
             );
           })}
@@ -165,29 +151,26 @@ export function CyclePhaseGuide({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="font-display text-base font-semibold">
-                  New here? Read the cycle in 30 seconds.
+                  {t('phaseGuide.explainer.title')}
                 </h3>
                 <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                  Wait for the cycle to open, make a Gesture once Gestures are available, and watch
-                  the finalization clock. Each Gesture helps shape the final Signature, can extend
-                  time, and updates who is in line for allocations. When time expires, the cycle
-                  finalizes and the reserve distributes on-chain.
+                  {t('phaseGuide.explainer.body')}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-3 text-sm">
                   <Link className="text-primary underline-offset-4 hover:underline" href="/faq">
-                    Read the FAQ
+                    {t('phaseGuide.explainer.faqLink')}
                   </Link>
                   <Link
                     className="text-primary underline-offset-4 hover:underline"
                     href="/how-it-works"
                   >
-                    See the full walkthrough
+                    {t('phaseGuide.explainer.walkthroughLink')}
                   </Link>
                 </div>
               </div>
               <button
                 type="button"
-                aria-label="Dismiss cycle explainer"
+                aria-label={t('phaseGuide.explainer.dismissAria')}
                 onClick={dismissExplainer}
                 className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >

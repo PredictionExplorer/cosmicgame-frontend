@@ -70,8 +70,8 @@ beforeEach(() => {
 describe('GestureForm', () => {
   it('renders gesture type selector with ETH option', () => {
     render(<GestureForm {...defaultProps} />);
-    expect(screen.getByText('ETH')).toBeInTheDocument();
-    expect(screen.getByText('Gesture Method')).toBeInTheDocument();
+    expect(screen.getByText('home.form.method.eth.label')).toBeInTheDocument();
+    expect(screen.getByText('home.form.methodLabel')).toBeInTheDocument();
   });
 
   it('hides RandomWalk/CST when LastBidderAddr is zeroAddress', () => {
@@ -85,42 +85,44 @@ describe('GestureForm', () => {
         }
       />,
     );
-    expect(screen.getByText('ETH')).toBeInTheDocument();
-    expect(screen.queryByText('ETH + RWLK')).not.toBeInTheDocument();
-    expect(screen.queryByText('ERC-20')).not.toBeInTheDocument();
+    expect(screen.getByText('home.form.method.eth.label')).toBeInTheDocument();
+    expect(screen.queryByText('home.form.method.randomWalk.label')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.form.method.cst.desc')).not.toBeInTheDocument();
   });
 
   it('shows RandomWalk/CST when LastBidderAddr is not zero', () => {
     render(<GestureForm {...defaultProps} />);
-    expect(screen.getByText('ETH + RWLK')).toBeInTheDocument();
-    expect(screen.getByText('ERC-20')).toBeInTheDocument();
+    expect(screen.getByText('home.form.method.randomWalk.label')).toBeInTheDocument();
+    expect(screen.getByText('home.form.method.cst.desc')).toBeInTheDocument();
   });
 
   it('ETH selection renders correctly', () => {
     render(<GestureForm {...defaultProps} gestureType="ETH" />);
-    expect(screen.getByText('ETH')).toBeInTheDocument();
+    expect(screen.getByText('home.form.method.eth.label')).toBeInTheDocument();
     expect(screen.queryByTestId('rwlk-grid')).not.toBeInTheDocument();
-    expect(screen.getByText('CST Reward Preview')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.previewTitle')).toBeInTheDocument();
     expect(screen.queryByText(/Protection 1:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Protection 2:/)).not.toBeInTheDocument();
   });
 
   it('RandomWalk selection shows NFT gallery', () => {
     render(<GestureForm {...defaultProps} gestureType="RandomWalk" />);
-    expect(screen.getByText('Your Random Walk NFTs')).toBeInTheDocument();
+    expect(screen.getByText('home.form.rwlk.title')).toBeInTheDocument();
     expect(screen.getByTestId('rwlk-grid')).toHaveTextContent('3 NFTs');
-    expect(screen.getByText('CST Reward Preview')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.previewTitle')).toBeInTheDocument();
     expect(screen.queryByText(/Protection 1:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Protection 2:/)).not.toBeInTheDocument();
   });
 
   it('CST selection shows Calibration Window info', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" />);
-    expect(screen.getByRole('region', { name: 'CST Calibration Window' })).toBeInTheDocument();
-    expect(screen.getByText('Dynamic Duration')).toBeInTheDocument();
-    expect(screen.getByText('50% complete')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'home.calibration.cstTitle' })).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.dynamicDuration')).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.percentComplete(percent=50%)')).toBeInTheDocument();
     expect(
-      screen.getByRole('progressbar', { name: 'CST Calibration Window progress' }),
+      screen.getByRole('progressbar', {
+        name: 'home.calibration.progressAria(title=home.calibration.cstTitle)',
+      }),
     ).toHaveAttribute('aria-valuenow', '50');
   });
 
@@ -155,23 +157,21 @@ describe('GestureForm', () => {
     );
 
     expect(
-      screen.getByRole('region', { name: 'First Gesture Calibration Window' }),
+      screen.getByRole('region', { name: 'home.calibration.firstGestureTitle' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('The first ETH gesture cost descends while this opening window progresses.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.firstGestureSubtitle')).toBeInTheDocument();
   });
 
   it('CST selection shows reward preview and minimum accepted amount', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" />);
-    expect(screen.getByText('CST Gesture Economics')).toBeInTheDocument();
-    expect(screen.getByText('100 CST')).toBeInTheDocument();
-    expect(screen.getByText('1.5 CST')).toBeInTheDocument();
-    expect(screen.getByText('+98.5 CST')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.economicsTitle')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=100)')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=1.5)')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=+98.5)')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.netPositive')).toBeInTheDocument();
     expect(
-      screen.getByText('The CST reward exceeds the CST cost if this lands.'),
+      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=99))'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
     expect(screen.queryByText(/Protection 1:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Protection 2:/)).not.toBeInTheDocument();
   });
@@ -180,13 +180,10 @@ describe('GestureForm', () => {
     const user = userEvent.setup();
     render(<GestureForm {...defaultProps} gestureType="CST" />);
 
-    await user.hover(screen.getByRole('button', { name: 'What Min accepted CST means' }));
+    await user.hover(screen.getByRole('button', { name: 'home.form.reward.minAcceptedAria' }));
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'The minimum Participation CST reward your transaction will accept.',
-    );
-    expect(screen.getByRole('tooltip')).toHaveTextContent(
-      'If the contract would imprint less by confirmation, the gesture reverts instead of accepting a lower reward.',
+      'home.form.reward.minAcceptedTooltip',
     );
   });
 
@@ -206,10 +203,8 @@ describe('GestureForm', () => {
       />,
     );
 
-    expect(screen.getByText('-0.5 CST')).toBeInTheDocument();
-    expect(
-      screen.getByText('Most CST gestures spend more CST than they receive.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=-0.5)')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.netNegative')).toBeInTheDocument();
   });
 
   it('shows positive net CST when the CST reward is greater than the cost', () => {
@@ -228,10 +223,8 @@ describe('GestureForm', () => {
       />,
     );
 
-    expect(screen.getByText('+3.75 CST')).toBeInTheDocument();
-    expect(
-      screen.getByText('The CST reward exceeds the CST cost if this lands.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=+3.75)')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.netPositive')).toBeInTheDocument();
   });
 
   it('treats free CST gestures as zero cost when calculating net CST', () => {
@@ -250,15 +243,17 @@ describe('GestureForm', () => {
       />,
     );
 
-    expect(screen.getByText('0 CST')).toBeInTheDocument();
-    expect(screen.getByText('+2 CST')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=0)')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=+2)')).toBeInTheDocument();
   });
 
   it('shows a loading state while the live CST reward preview is refreshing', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" isCstRewardLoading />);
     expect(screen.getAllByText('Loading...')).toHaveLength(2);
-    expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
-    expect(screen.queryByText(/reward exceeds/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=99))'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('home.form.reward.netPositive')).not.toBeInTheDocument();
   });
 
   it('shows a placeholder when the live CST reward preview is unavailable', () => {
@@ -271,17 +266,21 @@ describe('GestureForm', () => {
       />,
     );
 
-    expect(screen.getAllByText('-- CST')).toHaveLength(2);
-    expect(screen.getByText('Min accepted: -- CST')).toBeInTheDocument();
-    expect(screen.queryByText(/reward exceeds/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/spend more CST/)).not.toBeInTheDocument();
+    expect(screen.getAllByText('home.form.reward.cstAmount(amount=--)')).toHaveLength(2);
+    expect(
+      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=--))'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('home.form.reward.netPositive')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.form.reward.netNegative')).not.toBeInTheDocument();
   });
 
   it('updates displayed CST reward preview values when live props change', () => {
     const { rerender } = render(<GestureForm {...defaultProps} gestureType="CST" />);
 
-    expect(screen.getByText('100 CST')).toBeInTheDocument();
-    expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=100)')).toBeInTheDocument();
+    expect(
+      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=99))'),
+    ).toBeInTheDocument();
 
     rerender(
       <GestureForm
@@ -292,10 +291,14 @@ describe('GestureForm', () => {
       />,
     );
 
-    expect(screen.getByText('125 CST')).toBeInTheDocument();
-    expect(screen.getByText('+123.5 CST')).toBeInTheDocument();
-    expect(screen.getByText('Min accepted: 123.75 CST')).toBeInTheDocument();
-    expect(screen.queryByText('100 CST')).not.toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=125)')).toBeInTheDocument();
+    expect(screen.getByText('home.form.reward.cstAmount(amount=+123.5)')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=123.75))',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('home.form.reward.cstAmount(amount=100)')).not.toBeInTheDocument();
   });
 
   it('hides gesture protections before the first gesture unlocks all methods', () => {
@@ -309,7 +312,7 @@ describe('GestureForm', () => {
         }
       />,
     );
-    expect(screen.queryByText('CST Reward Preview')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.form.reward.previewTitle')).not.toBeInTheDocument();
   });
 
   it('CST preview shows zero minimum when accepting any reward', () => {
@@ -321,12 +324,14 @@ describe('GestureForm', () => {
         gestureCstRewardAmountMin={0}
       />,
     );
-    expect(screen.getByText('Min accepted: any reward, including 0 CST')).toBeInTheDocument();
+    expect(
+      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.minAcceptedAny)'),
+    ).toBeInTheDocument();
   });
 
   it('Message textarea accepts input', () => {
     render(<GestureForm {...defaultProps} advancedExpanded />);
-    const textarea = screen.getByPlaceholderText('Leave a message with your gesture...');
+    const textarea = screen.getByPlaceholderText('home.form.advanced.messagePlaceholder');
     fireEvent.change(textarea, { target: { value: 'hello world' } });
     expect(defaultProps.setMessage).toHaveBeenCalledWith('hello world');
   });
@@ -353,45 +358,44 @@ describe('GestureForm', () => {
     const user = userEvent.setup();
     render(<GestureForm {...defaultProps} advancedExpanded />);
 
-    await user.hover(screen.getByRole('button', { name: 'How gesture messages work' }));
+    await user.hover(screen.getByRole('button', { name: 'home.form.advanced.messageTooltipAria' }));
 
-    expect(await screen.findAllByText(/appear in Gesture Chat/)).not.toHaveLength(0);
-    expect(screen.getAllByText(/blockchain permanently/).length).toBeGreaterThan(0);
+    expect(await screen.findAllByText('home.form.advanced.messageTooltip')).not.toHaveLength(0);
   });
 
   it('Advanced options accordion toggles', () => {
     const { rerender } = render(<GestureForm {...defaultProps} advancedExpanded={false} />);
-    expect(screen.getByText('Advanced')).toBeInTheDocument();
-    expect(screen.queryByText('Message')).not.toBeInTheDocument();
-    expect(screen.queryByText(/Attach tokens or NFTs to your gesture/)).not.toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.title')).toBeInTheDocument();
+    expect(screen.queryByText('home.form.advanced.messageLabel')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.form.advanced.attachIntro')).not.toBeInTheDocument();
 
     rerender(<GestureForm {...defaultProps} advancedExpanded={true} />);
-    expect(screen.getByText('Message')).toBeInTheDocument();
-    expect(screen.getByText(/Attach tokens or NFTs to your gesture/)).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.messageLabel')).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.attachIntro')).toBeInTheDocument();
   });
 
   it('NFT contribution form renders with advancedExpanded=true, contributionType=NFT', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} contributionType="NFT" />);
-    expect(screen.getByText('NFT Contract Address')).toBeInTheDocument();
-    expect(screen.getByText('Token ID')).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.nftContractLabel')).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.nftIdLabel')).toBeInTheDocument();
   });
 
   it('Token contribution form renders with advancedExpanded=true, contributionType=Token', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} contributionType="Token" />);
-    expect(screen.getByText('Contract Address')).toBeInTheDocument();
-    expect(screen.getByText('Amount')).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.tokenContractLabel')).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.tokenAmountLabel')).toBeInTheDocument();
   });
 
   it('gesture cost collision prevention section shows for non-CST gesture types', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="ETH" />);
-    expect(screen.getByText('Collision Prevention')).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.collision.title')).toBeInTheDocument();
   });
 
   it('clicking RandomWalk radio calls setBidType and resets rwlkId', async () => {
     const user = userEvent.setup();
     render(<GestureForm {...defaultProps} gestureType="ETH" />);
 
-    await user.click(screen.getByText('ETH + RWLK'));
+    await user.click(screen.getByText('home.form.method.randomWalk.label'));
 
     expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
     expect(defaultProps.setBidType).toHaveBeenCalledWith('RandomWalk');
@@ -401,7 +405,7 @@ describe('GestureForm', () => {
     const user = userEvent.setup();
     render(<GestureForm {...defaultProps} gestureType="ETH" />);
 
-    await user.click(screen.getByText('CST'));
+    await user.click(screen.getByText('home.form.method.cst.label'));
 
     expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
     expect(defaultProps.setBidType).toHaveBeenCalledWith('CST');
@@ -411,7 +415,7 @@ describe('GestureForm', () => {
     const user = userEvent.setup();
     render(<GestureForm {...defaultProps} advancedExpanded={true} contributionType="NFT" />);
 
-    await user.click(screen.getByText('Attach Token'));
+    await user.click(screen.getByText('home.form.advanced.attachToken'));
 
     expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
     expect(defaultProps.setContributionType).toHaveBeenCalledWith('Token');
@@ -426,7 +430,7 @@ describe('GestureForm', () => {
 
   it('NFT number input calls setNftId', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} contributionType="NFT" />);
-    const input = screen.getByPlaceholderText('Token ID');
+    const input = screen.getByPlaceholderText('home.form.advanced.nftIdPlaceholder');
     fireEvent.change(input, { target: { value: '42' } });
     expect(defaultProps.setNftId).toHaveBeenCalledWith('42');
   });
@@ -469,7 +473,9 @@ describe('GestureForm', () => {
       />,
     );
     const expectedPrice = (0.01 * (1 + 10 / 100) * 1).toFixed(6);
-    expect(screen.getByText(`≈ ${expectedPrice} ETH`)).toBeInTheDocument();
+    expect(
+      screen.getByText(`home.form.advanced.collision.approxCost(amount=${expectedPrice})`),
+    ).toBeInTheDocument();
   });
 
   it('computed gesture cost applies 50% discount for ETH + RandomWalk', () => {
@@ -482,18 +488,20 @@ describe('GestureForm', () => {
       />,
     );
     const expectedPrice = (0.01 * 1 * 0.5).toFixed(6);
-    expect(screen.getByText(`≈ ${expectedPrice} ETH`)).toBeInTheDocument();
+    expect(
+      screen.getByText(`home.form.advanced.collision.approxCost(amount=${expectedPrice})`),
+    ).toBeInTheDocument();
   });
 
   it('hides gesture cost collision prevention for CST gesture type', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="CST" />);
-    expect(screen.queryByText('Collision Prevention')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.form.advanced.collision.title')).not.toBeInTheDocument();
   });
 
   it('shows minimum CST reward protection control for every unlocked gesture type', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="ETH" />);
-    expect(screen.getByText('Minimum CST Reward Protection')).toBeInTheDocument();
-    expect(screen.getByText(/square-root formula based on elapsed time/)).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeInTheDocument();
+    expect(screen.getByText('home.form.advanced.minCstProtection.body')).toBeInTheDocument();
   });
 
   it('updates CST reward tolerance from advanced options', () => {
@@ -505,12 +513,16 @@ describe('GestureForm', () => {
 
   it('allows users to accept any CST reward including zero', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="CST" />);
-    const checkbox = screen.getByRole('checkbox', { name: 'Accept any CST reward' });
+    const checkbox = screen.getByRole('checkbox', {
+      name: 'home.form.advanced.minCstProtection.acceptAnyAria',
+    });
 
     fireEvent.click(checkbox);
 
     expect(defaultProps.setAcceptAnyCstReward).toHaveBeenCalledWith(true);
-    expect(screen.getByText(/minimum accepted CST reward of 0/)).toBeInTheDocument();
+    expect(
+      screen.getByText('home.form.advanced.minCstProtection.acceptAnyBody'),
+    ).toBeInTheDocument();
   });
 
   it('disables CST tolerance input when accepting any CST reward', () => {
@@ -540,49 +552,52 @@ describe('GestureForm', () => {
         }}
       />,
     );
+    expect(screen.getByText('home.calibration.cstEndedMessage')).toBeInTheDocument();
     expect(
-      screen.getByText('Calibration Window ended \u2014 you can gesture for free.'),
+      screen.getByText(
+        'home.form.reward.durationMismatch(contractDuration=43200s,apiDuration=3600s)',
+      ),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Using on-chain duration/)).toBeInTheDocument();
     expect(
-      screen.queryByRole('progressbar', { name: 'CST Calibration Window progress' }),
+      screen.queryByRole('progressbar', {
+        name: 'home.calibration.progressAria(title=home.calibration.cstTitle)',
+      }),
     ).not.toBeInTheDocument();
   });
 
   it('marks the selected gesture method with aria-pressed', () => {
     render(<GestureForm {...defaultProps} gestureType="ETH" />);
 
-    expect(screen.getByRole('button', { name: /ETH Pay with Ether/ })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    expect(screen.getByRole('button', { name: /ETH \+ RWLK 50% discount/ })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
+    expect(
+      screen.getByRole('button', {
+        name: 'home.form.method.eth.label home.form.method.eth.desc',
+      }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(
+      screen.getByRole('button', {
+        name: 'home.form.method.randomWalk.label home.form.method.randomWalk.desc',
+      }),
+    ).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('labels the RandomWalk discount tooltip trigger', () => {
     render(<GestureForm {...defaultProps} gestureType="RandomWalk" />);
 
-    expect(
-      screen.getByRole('button', { name: 'About RandomWalk gesture discounts' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'home.form.rwlk.tooltipAria' })).toBeInTheDocument();
   });
 
   describe('preview mode (disconnected wallet)', () => {
     it('shows the connect explainer banner', () => {
       render(<GestureForm {...defaultProps} previewMode />);
 
-      expect(screen.getByText(/Preview the live gesture options here/)).toBeInTheDocument();
-      expect(screen.getByText(/Connect a wallet/)).toBeInTheDocument();
+      expect(screen.getByText('home.form.preview')).toBeInTheDocument();
     });
 
     it('keeps the gesture method picker interactive for exploration', async () => {
       const user = userEvent.setup();
       render(<GestureForm {...defaultProps} previewMode gestureType="ETH" />);
 
-      await user.click(screen.getByText('ETH + RWLK'));
+      await user.click(screen.getByText('home.form.method.randomWalk.label'));
 
       expect(defaultProps.setBidType).toHaveBeenCalledWith('RandomWalk');
     });
@@ -590,28 +605,28 @@ describe('GestureForm', () => {
     it('disables the message textarea', () => {
       render(<GestureForm {...defaultProps} previewMode advancedExpanded />);
 
-      expect(screen.getByPlaceholderText('Leave a message with your gesture...')).toBeDisabled();
+      expect(screen.getByPlaceholderText('home.form.advanced.messagePlaceholder')).toBeDisabled();
     });
 
     it('disables the advanced options accordion trigger', () => {
       render(<GestureForm {...defaultProps} previewMode />);
 
-      expect(screen.getByRole('button', { name: /Advanced/ })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /home\.form\.advanced\.title/ })).toBeDisabled();
     });
 
     it('disables attachment inputs when advanced options are expanded', () => {
       render(<GestureForm {...defaultProps} previewMode advancedExpanded contributionType="NFT" />);
 
       expect(screen.getByPlaceholderText('0x...')).toBeDisabled();
-      expect(screen.getByPlaceholderText('Token ID')).toBeDisabled();
+      expect(screen.getByPlaceholderText('home.form.advanced.nftIdPlaceholder')).toBeDisabled();
     });
 
     it('does not show the preview banner for connected users', () => {
       render(<GestureForm {...defaultProps} advancedExpanded />);
 
-      expect(screen.queryByText(/Preview the live gesture options here/)).not.toBeInTheDocument();
+      expect(screen.queryByText('home.form.preview')).not.toBeInTheDocument();
       expect(
-        screen.getByPlaceholderText('Leave a message with your gesture...'),
+        screen.getByPlaceholderText('home.form.advanced.messagePlaceholder'),
       ).not.toBeDisabled();
     });
 

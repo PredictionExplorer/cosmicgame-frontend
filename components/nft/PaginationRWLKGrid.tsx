@@ -1,5 +1,6 @@
 import { useState, useEffect, type FC, type ChangeEvent } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -37,6 +38,7 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
   selectedToken = -1,
   setSelectedToken = null,
 }) => {
+  const t = useTranslations('home');
   const [filteredData, setFilteredData] = useState<number[]>([]);
   const [itemsPerPage] = useState<number>(6);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -68,12 +70,17 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
       {/* Search Input */}
       <div className="relative mb-4">
         <Input
-          placeholder="Enter NFT ID"
+          placeholder={t('rwlkGrid.searchPlaceholder')}
           className="pr-10"
           onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchId(e.target.value)}
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-          <Image src="/images/search.svg" width={19} height={19} alt="search icon" />
+          <Image
+            src="/images/search.svg"
+            width={19}
+            height={19}
+            alt={t('rwlkGrid.searchIconAlt')}
+          />
         </div>
       </div>
 
@@ -128,7 +135,7 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
 
       {/* Empty State */}
       {!loading && data.length === 0 && (
-        <p className="text-base text-center text-foreground">Nothing Found!</p>
+        <p className="text-base text-center text-foreground">{t('rwlkGrid.empty')}</p>
       )}
     </div>
   );

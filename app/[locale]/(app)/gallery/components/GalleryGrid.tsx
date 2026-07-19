@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -31,6 +32,7 @@ export function GalleryGrid({
   onPageChange,
   onPerPageChange,
 }: GalleryGridProps) {
+  const t = useTranslations('gallery');
   const totalPages = Math.ceil(totalItems / perPage);
 
   if (loading) {
@@ -38,12 +40,7 @@ export function GalleryGrid({
   }
 
   if (items.length === 0) {
-    return (
-      <EmptyState
-        title="No NFTs found"
-        description="Try adjusting your search or filters to find what you're looking for."
-      />
-    );
+    return <EmptyState title={t('empty.title')} description={t('empty.description')} />;
   }
 
   return (

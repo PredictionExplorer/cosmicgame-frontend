@@ -17,21 +17,21 @@ describe('NFTBreadcrumb', () => {
 
   it('renders Home link', () => {
     render(<NFTBreadcrumb tokenId={42} />);
-    const homeLink = screen.getByText('Home');
+    const homeLink = screen.getByText('common.breadcrumbs.home');
     expect(homeLink).toBeInTheDocument();
     expect(homeLink.closest('a')).toHaveAttribute('href', '/');
   });
 
   it('renders Gallery link', () => {
     render(<NFTBreadcrumb tokenId={42} />);
-    const galleryLink = screen.getByText('Gallery');
+    const galleryLink = screen.getByText('common.breadcrumbs.gallery');
     expect(galleryLink).toBeInTheDocument();
     expect(galleryLink.closest('a')).toHaveAttribute('href', '/gallery');
   });
 
   it('shows formatted token ID when no name is provided', () => {
     render(<NFTBreadcrumb tokenId={42} />);
-    expect(screen.getByText('Token #000042')).toBeInTheDocument();
+    expect(screen.getByText('detail.breadcrumb.tokenFallback(id=#000042)')).toBeInTheDocument();
   });
 
   it('shows token name when provided', () => {
@@ -41,7 +41,7 @@ describe('NFTBreadcrumb', () => {
 
   it('has aria-label for navigation', () => {
     render(<NFTBreadcrumb tokenId={0} />);
-    expect(screen.getByLabelText('Breadcrumb')).toBeInTheDocument();
+    expect(screen.getByLabelText('common.accessibility.breadcrumb')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

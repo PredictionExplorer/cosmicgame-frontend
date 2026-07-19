@@ -10,10 +10,14 @@ import { routing, type AppLocale } from './routing';
  */
 export const NAMESPACES = [
   'common',
+  'currentCycle',
+  'detail',
   'errors',
   'footer',
   'formats',
   'forms',
+  'gallery',
+  'gesture',
   'home',
   'landing',
   'meta',

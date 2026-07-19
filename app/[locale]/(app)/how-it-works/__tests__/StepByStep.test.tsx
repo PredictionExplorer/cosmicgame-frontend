@@ -1,3 +1,5 @@
+import { howItWorksContentEn } from '@/content/how-it-works';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -41,36 +43,41 @@ jest.mock('framer-motion', () => {
 const renderWithTooltip = (ui: React.ReactElement) =>
   render(<TooltipProvider>{ui}</TooltipProvider>);
 
+const stepByStep = howItWorksContentEn.stepByStep;
+
 describe('StepByStep', () => {
   it('renders the section heading', () => {
-    renderWithTooltip(<StepByStep />);
+    renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
     expect(screen.getByRole('heading', { name: 'Getting Started' })).toBeInTheDocument();
   });
 
   it('renders all three step titles', () => {
-    renderWithTooltip(<StepByStep />);
+    renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
     expect(screen.getByText('Connect Your Wallet')).toBeInTheDocument();
     expect(screen.getByText('Check the Gesture Cost')).toBeInTheDocument();
     expect(screen.getByText('Make Your Gesture')).toBeInTheDocument();
   });
 
   it('renders step labels with correct numbering', () => {
-    renderWithTooltip(<StepByStep />);
+    renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
     expect(screen.getByText('STEP 01')).toBeInTheDocument();
     expect(screen.getByText('STEP 02')).toBeInTheDocument();
     expect(screen.getByText('STEP 03')).toBeInTheDocument();
   });
 
-  it('renders key bullet points for each step', () => {
-    renderWithTooltip(<StepByStep />);
+  it('renders every highlight bullet from the content module', () => {
+    renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
+    for (const step of stepByStep.steps) {
+      for (const highlight of step.highlights) {
+        expect(screen.getByText(highlight)).toBeInTheDocument();
+      }
+    }
     expect(screen.getByText(/Connect Wallet/)).toBeInTheDocument();
-    expect(screen.getByText(/Arbitrum blockchain/)).toBeInTheDocument();
-    expect(screen.getByText(/Review the Cycle Finalization Time/)).toBeInTheDocument();
     expect(screen.getByText(/Click "Gesture Now"/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = renderWithTooltip(<StepByStep />);
+    const { container } = renderWithTooltip(<StepByStep stepByStep={stepByStep} />);
     await checkA11y(container);
   });
 });

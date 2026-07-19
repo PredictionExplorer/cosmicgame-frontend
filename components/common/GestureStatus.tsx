@@ -4,6 +4,7 @@ import { useMemo, type ReactNode } from 'react';
 import { zeroAddress } from 'viem';
 import { Trophy, Coins, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { convertTimestampToDateTime, formatSeconds } from '@/utils';
 
@@ -146,41 +147,28 @@ function GestureMetricCard({
   );
 }
 
-function formatAttachedAssetPart(
-  count: number,
-  singularLabel: string,
-  pluralLabel: string,
-  includeAllForPlural = true,
-) {
-  if (count === 0) return '';
-  if (count === 1) return `the attached ${singularLabel}`;
-  return `${includeAllForPlural ? 'all ' : ''}${count} attached ${pluralLabel}`;
+type AttachedAssetVariant = 'base' | 'withNft' | 'withErc20' | 'withBoth';
+
+/**
+ * Selects the ICU message variant for copy that enumerates the attached
+ * assets included in the Signature Allocation (none / NFTs / ERC20 / both).
+ */
+function getAttachedAssetVariant(nftCount: number, erc20Count: number): AttachedAssetVariant {
+  if (nftCount > 0 && erc20Count > 0) return 'withBoth';
+  if (nftCount > 0) return 'withNft';
+  if (erc20Count > 0) return 'withErc20';
+  return 'base';
 }
 
-function joinAssetParts(parts: string[]) {
-  if (parts.length === 0) return '';
-  if (parts.length === 1) return parts[0];
-  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
-}
-
-function formatAttachedAssetStatusCopy(nftCount: number, erc20Count: number) {
-  const parts = [
-    formatAttachedAssetPart(nftCount, 'NFT', 'NFTs'),
-    formatAttachedAssetPart(erc20Count, 'ERC20 token deposit', 'ERC20 token deposits'),
-  ].filter(Boolean);
-
-  if (parts.length === 0) return '';
-  return `, plus ${joinAssetParts(parts)} shown below`;
-}
-
-function formatAttachedAssetTooltipCopy(nftCount: number, erc20Count: number) {
-  const parts = [
-    formatAttachedAssetPart(nftCount, 'NFT', 'NFTs'),
-    formatAttachedAssetPart(erc20Count, 'ERC20 token deposit', 'ERC20 token deposits'),
-  ].filter(Boolean);
-
-  if (parts.length === 0) return '';
-  return `, and ${joinAssetParts(parts)}`;
+function getAttachedAssetValues(
+  variant: AttachedAssetVariant,
+  nftCount: number,
+  erc20Count: number,
+): Record<string, number> {
+  if (variant === 'withBoth') return { nftCount, erc20Count };
+  if (variant === 'withNft') return { nftCount };
+  if (variant === 'withErc20') return { erc20Count };
+  return {};
 }
 
 export const GestureStatus = ({
@@ -195,6 +183,8 @@ export const GestureStatus = ({
   attachedNFTCount = 0,
   attachedERC20Count = 0,
 }: GestureStatusProps) => {
+  const t = useTranslations('home');
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { data: userInfoRaw } = useUserInfo(account);
 
@@ -223,11 +213,9 @@ export const GestureStatus = ({
     };
   }, [account, data, userInfoRaw, curGestureList]);
 
-  const attachedAssetAllocationCopy = formatAttachedAssetStatusCopy(
-    attachedNFTCount,
-    attachedERC20Count,
-  );
-  const attachedAssetTooltipCopy = formatAttachedAssetTooltipCopy(
+  const attachedAssetVariant = getAttachedAssetVariant(attachedNFTCount, attachedERC20Count);
+  const attachedAssetValues = getAttachedAssetValues(
+    attachedAssetVariant,
     attachedNFTCount,
     attachedERC20Count,
   );
@@ -250,7 +238,10 @@ export const GestureStatus = ({
           )}
         >
           <p className="text-sm text-muted-foreground">
-            Cycle {data.CurRoundNum} opens at {convertTimestampToDateTime(activationTime, true)}
+            {t('status.opensAt', {
+              cycle: String(data.CurRoundNum),
+              dateTime: convertTimestampToDateTime(activationTime, true, locale),
+            })}
           </p>
           <div className="mt-4">
             <SmoothCountdown date={activationTime * 1000} renderer={Counter} />
@@ -269,11 +260,8 @@ export const GestureStatus = ({
                 className="gradient-border-card gradient-border-card-accent rounded-2xl bg-gradient-to-b from-primary/[0.06] to-transparent p-6 text-center"
               >
                 <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
-                  Cycle finalizes in
-                  <InfoTooltip
-                    content="When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer."
-                    className="ml-1.5"
-                  />
+                  {t('status.finalizesIn')}
+                  <InfoTooltip content={t('status.finalizesInTooltip')} className="ml-1.5" />
                 </p>
                 <SmoothCountdown date={allocationTime} renderer={Counter} />
               </motion.div>
@@ -285,9 +273,9 @@ export const GestureStatus = ({
               >
                 <Zap className="mx-auto h-8 w-8 text-primary mb-2" />
                 <h5 className="font-display text-xl font-bold text-primary">
-                  Cycle Ready to Finalize
+                  {t('status.readyToFinalize')}
                 </h5>
-                <p className="mt-1 text-sm text-primary/80">The finalization clock reached zero.</p>
+                <p className="mt-1 text-sm text-primary/80">{t('status.clockReachedZero')}</p>
               </motion.div>
             ))}
 
@@ -301,11 +289,14 @@ export const GestureStatus = ({
               className="h-full"
             >
               <GestureMetricCard
-                label="Signature Allocation"
+                label={t('status.metrics.signatureAllocation')}
                 value={`${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`}
                 icon={<Trophy className="h-5 w-5" />}
                 tone="signature"
-                tooltip={`The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT${attachedAssetTooltipCopy}.`}
+                tooltip={t(
+                  `status.metrics.signatureTooltip.${attachedAssetVariant}`,
+                  attachedAssetValues,
+                )}
               />
             </motion.div>
 
@@ -319,11 +310,11 @@ export const GestureStatus = ({
                   className="h-full"
                 >
                   <GestureMetricCard
-                    label="ETH Gesture"
+                    label={t('status.metrics.ethGesture')}
                     value={`${(ethGestureInfo?.ETHPrice ?? 0).toFixed(5)} ETH`}
                     icon={<Coins className="h-4 w-4" />}
                     tone="eth"
-                    tooltip="Current cost to make a gesture with ETH"
+                    tooltip={t('status.metrics.ethGestureTooltip')}
                   />
                 </motion.div>
                 <motion.div
@@ -334,11 +325,11 @@ export const GestureStatus = ({
                   className="h-full"
                 >
                   <GestureMetricCard
-                    label="ETH + RandomWalk Gesture"
+                    label={t('status.metrics.randomWalkGesture')}
                     value={`${((ethGestureInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH`}
                     icon={<TrendingUp className="h-4 w-4" />}
                     tone="randomwalk"
-                    tooltip="50% ETH Gesture Cost reduction when attaching a RandomWalk NFT to an ETH gesture"
+                    tooltip={t('status.metrics.randomWalkGestureTooltip')}
                   />
                 </motion.div>
                 <motion.div
@@ -349,23 +340,25 @@ export const GestureStatus = ({
                   className="h-full"
                 >
                   <GestureMetricCard
-                    label="CST Gesture"
+                    label={t('status.metrics.cstGesture')}
                     value={
                       cstGestureData.isFree
-                        ? 'FREE'
+                        ? t('status.metrics.free')
                         : `${formatCstAmount(cstGestureData.CSTPrice)} CST`
                     }
                     detail={
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between gap-3 text-[11px]">
-                          <span className="text-muted-foreground">CST Window</span>
+                          <span className="text-muted-foreground">
+                            {t('status.metrics.cstWindow')}
+                          </span>
                           <span className="font-mono tabular-nums text-[rgb(var(--impact-green-rgb))]">
                             {formatCstProgressPercent(cstAuctionProgress.percentComplete)}
                           </span>
                         </div>
                         <div
                           role="progressbar"
-                          aria-label="CST Calibration Window progress"
+                          aria-label={t('status.metrics.cstWindowProgressAria')}
                           aria-valuemin={0}
                           aria-valuemax={100}
                           aria-valuenow={cstProgressValue}
@@ -377,13 +370,15 @@ export const GestureStatus = ({
                           />
                         </div>
                         <p className="text-[11px] text-muted-foreground">
-                          Duration {formatSeconds(cstAuctionProgress.auctionDuration)}
+                          {t('status.metrics.duration', {
+                            duration: formatSeconds(cstAuctionProgress.auctionDuration, locale),
+                          })}
                         </p>
                       </div>
                     }
                     icon={<Zap className="h-4 w-4" />}
                     tone="cst"
-                    tooltip="Gesture with CST. Cost descends through the live Calibration Window, which CST gestures lengthen and ETH gestures shorten."
+                    tooltip={t('status.metrics.cstGestureTooltip')}
                   />
                 </motion.div>
               </>
@@ -402,26 +397,24 @@ export const GestureStatus = ({
               <div className="flex items-center gap-1.5">
                 <TrendingUp className="h-4 w-4 text-primary/70" />
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Your Cycle Standing
+                  {t('status.standing.title')}
                 </p>
-                <InfoTooltip content="Shows your current Final Gesture standing and Stellar Selection frequency based on your gestures this cycle." />
+                <InfoTooltip content={t('status.standing.tooltip')} />
               </div>
               {data.LastBidderAddr === account ? (
                 <p className="text-sm font-medium text-emerald-400">
-                  You made the most recent gesture. If no one else gestures, you receive the
-                  Signature Allocation ({(data.PrizeAmountEth ?? 0).toFixed(4)} ETH, 1,000 CST, 1
-                  Cosmic Signature NFT{attachedAssetAllocationCopy}).
+                  {t(`status.standing.leader.${attachedAssetVariant}`, {
+                    amount: (data.PrizeAmountEth ?? 0).toFixed(4),
+                    ...attachedAssetValues,
+                  })}
                 </p>
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  You are not the most recent participant &mdash; gesture again to take the lead, or
-                  remain eligible for Stellar Selection.
-                </p>
+                <p className="text-sm text-muted-foreground">{t('status.standing.notLeader')}</p>
               )}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">ETH Stellar Selection</span>
+                    <span className="text-muted-foreground">{t('status.standing.ethStellar')}</span>
                     <span className="font-medium text-primary">
                       {selectionFrequency.stellarEth.toFixed(1)}%
                     </span>
@@ -437,7 +430,7 @@ export const GestureStatus = ({
                 </div>
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">NFT Stellar Selection</span>
+                    <span className="text-muted-foreground">{t('status.standing.nftStellar')}</span>
                     <span className="font-medium text-accent">
                       {selectionFrequency.nft.toFixed(1)}%
                     </span>
@@ -462,13 +455,13 @@ export const GestureStatus = ({
           className="gradient-border-card rounded-2xl bg-primary/[0.04] p-8 text-center"
         >
           {data && data.CurRoundNum > 0 ? (
-            <h4 className="font-display text-2xl font-bold">Cycle {data.CurRoundNum}</h4>
+            <h4 className="font-display text-2xl font-bold">
+              {t('status.openCycle.cycleNumber', { cycle: String(data.CurRoundNum) })}
+            </h4>
           ) : (
-            <h4 className="font-display text-2xl font-bold">Open the Cycle</h4>
+            <h4 className="font-display text-2xl font-bold">{t('status.openCycle.title')}</h4>
           )}
-          <p className="mt-2 text-sm text-muted-foreground">
-            The Calibration Window for the first ETH gesture is open. Make your gesture.
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{t('status.openCycle.body')}</p>
         </motion.div>
       )}
     </div>

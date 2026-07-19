@@ -17,7 +17,7 @@ describe('DetailPage', () => {
 
   it('shows error message for negative tokenId', () => {
     render(<DetailPage tokenId={-1} />);
-    expect(screen.getByText('Invalid Token Id')).toBeInTheDocument();
+    expect(screen.getByText('detail.invalid.title')).toBeInTheDocument();
   });
 
   it('does not render NFTTrait for negative tokenId', () => {

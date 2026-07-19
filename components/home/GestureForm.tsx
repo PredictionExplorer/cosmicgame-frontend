@@ -1,5 +1,6 @@
 import { zeroAddress } from 'viem';
 import { Settings2, Info } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
@@ -61,10 +62,10 @@ interface GestureFormProps {
 }
 
 const gestureOptions = [
-  { value: 'ETH', label: 'ETH', desc: 'Pay with Ether' },
-  { value: 'RandomWalk', label: 'ETH + RWLK', desc: '50% discount' },
-  { value: 'CST', label: 'CST', desc: 'ERC-20' },
-];
+  { value: 'ETH', messageKey: 'eth' },
+  { value: 'RandomWalk', messageKey: 'randomWalk' },
+  { value: 'CST', messageKey: 'cst' },
+] as const;
 
 const MESSAGE_MAX_LENGTH = protocolFacts.gestureMessageMaxLength;
 const MESSAGE_COUNTER_WARN_AT = MESSAGE_MAX_LENGTH - 20;
@@ -110,6 +111,9 @@ export function GestureForm({
   setAcceptAnyCstReward,
   previewMode = false,
 }: GestureFormProps) {
+  const t = useTranslations('home');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
   const showAll = data?.LastBidderAddr !== zeroAddress;
   const visibleOptions = showAll ? gestureOptions : gestureOptions.filter((o) => o.value === 'ETH');
   const currentCstGestureCost = cstGestureData.isFree ? 0 : cstGestureData.CSTPrice;
@@ -119,27 +123,30 @@ export function GestureForm({
     hasCstReward && hasCstCost ? gestureCstRewardAmount - currentCstGestureCost : null;
   const netCstLabel =
     netCstAmount == null
-      ? '-- CST'
-      : `${netCstAmount > 0 ? '+' : netCstAmount < 0 ? '-' : ''}${formatCompactCstDelta(
-          Math.abs(netCstAmount),
-        )} CST`;
-  const rewardPreviewTitle = gestureType === 'CST' ? 'CST Gesture Economics' : 'CST Reward Preview';
+      ? t('form.reward.cstAmount', { amount: '--' })
+      : t('form.reward.cstAmount', {
+          amount: `${netCstAmount > 0 ? '+' : netCstAmount < 0 ? '-' : ''}${formatCompactCstDelta(
+            Math.abs(netCstAmount),
+          )}`,
+        });
+  const rewardPreviewTitle =
+    gestureType === 'CST' ? t('form.reward.economicsTitle') : t('form.reward.previewTitle');
   const rewardPreviewDescription =
     gestureType === 'CST'
-      ? 'Net CST is the Participation CST reward minus the current CST gesture cost.'
-      : 'Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.';
+      ? t('form.reward.economicsDescription')
+      : t('form.reward.previewDescription');
   const minAcceptedCstLabel = acceptAnyCstReward
-    ? 'any reward, including 0 CST'
-    : `${formatCstAmount(gestureCstRewardAmountMin)} CST`;
+    ? t('form.reward.minAcceptedAny')
+    : t('form.reward.cstAmount', { amount: formatCstAmount(gestureCstRewardAmountMin) });
   const minAcceptedCstTooltip = acceptAnyCstReward
-    ? 'Accept any CST reward sends a minimum accepted reward of 0, so the gesture can land with any dynamic CST reward, including none.'
-    : 'The minimum Participation CST reward your transaction will accept. It is the current preview minus your Minimum CST Reward Protection tolerance. If the contract would imprint less by confirmation, the gesture reverts instead of accepting a lower reward.';
+    ? t('form.reward.minAcceptedTooltipAny')
+    : t('form.reward.minAcceptedTooltip');
 
   return (
     <div className="mt-8 space-y-5">
       <div>
         <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3 block">
-          Gesture Method
+          {t('form.methodLabel')}
         </Label>
         <div className="flex gap-2">
           {visibleOptions.map((opt) => (
@@ -158,8 +165,12 @@ export function GestureForm({
                   : 'border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:bg-white/[0.04] hover:text-white',
               )}
             >
-              <span className="block text-sm font-medium">{opt.label}</span>
-              <span className="block text-[10px] mt-0.5 opacity-60">{opt.desc}</span>
+              <span className="block text-sm font-medium">
+                {t(`form.method.${opt.messageKey}.label`)}
+              </span>
+              <span className="block text-[10px] mt-0.5 opacity-60">
+                {t(`form.method.${opt.messageKey}.desc`)}
+              </span>
             </button>
           ))}
         </div>
@@ -169,30 +180,27 @@ export function GestureForm({
         <AuctionInfo
           secondsElapsed={ethGestureInfo?.SecondsElapsed ?? 0}
           auctionDuration={ethGestureInfo?.AuctionDuration ?? 0}
-          title="First Gesture Calibration Window"
-          subtitle="The first ETH gesture cost descends while this opening window progresses."
+          title={t('calibration.firstGestureTitle')}
+          subtitle={t('calibration.firstGestureSubtitle')}
         />
       )}
 
       {gestureType === 'RandomWalk' && (
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
           <div className="flex items-center gap-2 mb-2">
-            <h6 className="text-sm font-semibold">Your Random Walk NFTs</h6>
+            <h6 className="text-sm font-semibold">{t('form.rwlk.title')}</h6>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  aria-label="About RandomWalk gesture discounts"
+                  aria-label={t('form.rwlk.tooltipAria')}
                   className="inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   <Info className="h-3.5 w-3.5" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className="max-w-[240px]">
-                  Attach a RandomWalk NFT to an ETH gesture to receive a 50% Gesture Cost reduction.
-                  Each NFT can only be used once.
-                </p>
+                <p className="max-w-[240px]">{t('form.rwlk.tooltip')}</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -210,14 +218,19 @@ export function GestureForm({
           <AuctionInfo
             secondsElapsed={cstGestureData.SecondsElapsed}
             auctionDuration={cstGestureData.AuctionDuration}
-            title="CST Calibration Window"
-            subtitle={`CST cost descends through this dynamic window. ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`}
-            endedMessage="Calibration Window ended — you can gesture for free."
+            title={t('calibration.cstTitle')}
+            subtitle={t('calibration.cstSubtitle', {
+              decreasePercent: String(
+                protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+              ),
+              increasePercent: String(
+                protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+              ),
+            })}
+            endedMessage={t('calibration.cstEndedMessage')}
           />
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/15 bg-primary/[0.045] p-4">
-            <p className="max-w-md text-sm text-muted-foreground">
-              Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.
-            </p>
+            <p className="max-w-md text-sm text-muted-foreground">{t('form.cstTrade')}</p>
             <UniswapTradeButton variant="compact" />
           </div>
         </div>
@@ -237,25 +250,29 @@ export function GestureForm({
                 <div className="grid min-w-[13rem] grid-cols-2 gap-2 text-left sm:min-w-[19rem] sm:grid-cols-3">
                   <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2">
                     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                      Reward
+                      {t('form.reward.rewardLabel')}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-emerald-300">
                       {isCstRewardLoading
-                        ? 'Loading...'
-                        : `${formatCstAmount(gestureCstRewardAmount)} CST`}
+                        ? tCommon('status.loadingDots')
+                        : t('form.reward.cstAmount', {
+                            amount: formatCstAmount(gestureCstRewardAmount),
+                          })}
                     </p>
                   </div>
                   <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2">
                     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                      Cost
+                      {t('form.reward.costLabel')}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-foreground">
-                      {formatCstAmount(currentCstGestureCost)} CST
+                      {t('form.reward.cstAmount', {
+                        amount: formatCstAmount(currentCstGestureCost),
+                      })}
                     </p>
                   </div>
                   <div className="col-span-2 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2 sm:col-span-1">
                     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                      Net CST
+                      {t('form.reward.netLabel')}
                     </p>
                     <p
                       className={cn(
@@ -267,22 +284,24 @@ export function GestureForm({
                             : 'text-muted-foreground',
                       )}
                     >
-                      {isCstRewardLoading ? 'Loading...' : netCstLabel}
+                      {isCstRewardLoading ? tCommon('status.loadingDots') : netCstLabel}
                     </p>
                   </div>
                 </div>
               ) : (
                 <p className="text-base font-semibold text-emerald-300">
                   {isCstRewardLoading
-                    ? 'Loading...'
-                    : `${formatCstAmount(gestureCstRewardAmount)} CST`}
+                    ? tCommon('status.loadingDots')
+                    : t('form.reward.cstAmount', {
+                        amount: formatCstAmount(gestureCstRewardAmount),
+                      })}
                 </p>
               )}
               <p className="mt-1 flex items-center justify-end gap-1 text-xs text-muted-foreground">
-                <span>Min accepted: {minAcceptedCstLabel}</span>
+                <span>{t('form.reward.minAccepted', { value: minAcceptedCstLabel })}</span>
                 <InfoTooltip
                   content={minAcceptedCstTooltip}
-                  ariaLabel="What Min accepted CST means"
+                  ariaLabel={t('form.reward.minAcceptedAria')}
                   maxWidth={320}
                   side="top"
                   className="text-muted-foreground/60"
@@ -295,9 +314,7 @@ export function GestureForm({
                     netCstAmount > 0 ? 'text-emerald-300' : 'text-muted-foreground',
                   )}
                 >
-                  {netCstAmount > 0
-                    ? 'The CST reward exceeds the CST cost if this lands.'
-                    : 'Most CST gestures spend more CST than they receive.'}
+                  {netCstAmount > 0 ? t('form.reward.netPositive') : t('form.reward.netNegative')}
                 </p>
               )}
             </div>
@@ -307,8 +324,10 @@ export function GestureForm({
             cstGestureData.apiAuctionDuration != null &&
             cstGestureData.apiAuctionDuration !== cstGestureData.AuctionDuration && (
               <p className="mt-3 text-xs text-amber-200/90">
-                Using on-chain duration ({formatSeconds(cstGestureData.AuctionDuration)}) because
-                the API reported {formatSeconds(cstGestureData.apiAuctionDuration)}.
+                {t('form.reward.durationMismatch', {
+                  contractDuration: formatSeconds(cstGestureData.AuctionDuration, locale),
+                  apiDuration: formatSeconds(cstGestureData.apiAuctionDuration, locale),
+                })}
               </p>
             )}
         </div>
@@ -316,8 +335,7 @@ export function GestureForm({
 
       {previewMode && (
         <div className="rounded-xl border border-primary/20 bg-primary/[0.06] p-4 text-sm leading-relaxed text-muted-foreground">
-          Preview the live gesture options here. Connect a wallet to write your message, attach
-          assets, and submit the gesture on Arbitrum.
+          {t('form.preview')}
         </div>
       )}
 
@@ -334,7 +352,7 @@ export function GestureForm({
           >
             <span className="flex items-center gap-2">
               <Settings2 className="h-4 w-4" />
-              Advanced
+              {t('form.advanced.title')}
             </span>
           </AccordionTrigger>
           <AccordionContent>
@@ -342,31 +360,30 @@ export function GestureForm({
               <div>
                 <div className="mb-2 flex items-center gap-2">
                   <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Message{' '}
+                    {t('form.advanced.messageLabel')}{' '}
                     <span className="normal-case tracking-normal opacity-50">
-                      (optional, 280 chars)
+                      {t('form.advanced.messageOptionalHint', {
+                        maxLength: String(MESSAGE_MAX_LENGTH),
+                      })}
                     </span>
                   </Label>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
                         type="button"
-                        aria-label="How gesture messages work"
+                        aria-label={t('form.advanced.messageTooltipAria')}
                         className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       >
                         <Info className="h-3.5 w-3.5" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="max-w-[260px]">
-                        Leave a message to appear in Gesture Chat. Your message is recorded on-chain
-                        with your gesture and remains on the blockchain permanently.
-                      </p>
+                      <p className="max-w-[260px]">{t('form.advanced.messageTooltip')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </div>
                 <textarea
-                  placeholder="Leave a message with your gesture..."
+                  placeholder={t('form.advanced.messagePlaceholder')}
                   value={message}
                   maxLength={MESSAGE_MAX_LENGTH}
                   rows={3}
@@ -388,40 +405,35 @@ export function GestureForm({
                   </span>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.
-              </p>
+              <p className="text-xs text-muted-foreground">{t('form.advanced.attachIntro')}</p>
               {showAll && (
                 <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Minimum CST Reward Protection
+                    {t('form.advanced.minCstProtection.title')}
                   </p>
                   <p className="text-xs leading-relaxed text-muted-foreground">
-                    Participation CST uses a square-root formula based on elapsed time. This setting
-                    protects you if another gesture lands first and lowers the amount before your
-                    transaction confirms.
+                    {t('form.advanced.minCstProtection.body')}
                   </p>
                   <label className="flex items-start gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] p-3 text-sm">
                     <Checkbox
                       checked={acceptAnyCstReward}
                       disabled={previewMode || !setAcceptAnyCstReward}
                       onChange={(e) => setAcceptAnyCstReward?.(e.currentTarget.checked)}
-                      aria-label="Accept any CST reward"
+                      aria-label={t('form.advanced.minCstProtection.acceptAnyAria')}
                     />
                     <span>
                       <span className="block font-medium text-foreground">
-                        Accept any CST reward, including 0
+                        {t('form.advanced.minCstProtection.acceptAnyTitle')}
                       </span>
                       <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                        Sends a minimum accepted CST reward of 0. Use this when you prefer the
-                        gesture to land even if the dynamic CST amount changes before confirmation.
+                        {t('form.advanced.minCstProtection.acceptAnyBody')}
                       </span>
                     </span>
                   </label>
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
-                        Allow reward to move down by
+                        {t('form.advanced.minCstProtection.toleranceLabel')}
                       </span>
                       <div className="relative w-[4.75rem] shrink-0">
                         <CustomTextField
@@ -443,13 +455,13 @@ export function GestureForm({
                       </div>
                     </div>
                     <span className="text-sm font-mono text-muted-foreground tabular-nums min-w-0">
-                      min {formatCstAmount(gestureCstRewardAmountMin)} CST
+                      {t('form.advanced.minCstProtection.minAmount', {
+                        amount: formatCstAmount(gestureCstRewardAmountMin),
+                      })}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    If the contract would imprint less CST than this minimum by the time your
-                    transaction lands, the gesture should revert instead of accepting a lower
-                    dynamic CST amount.
+                    {t('form.advanced.minCstProtection.revertNote')}
                   </p>
                 </div>
               )}
@@ -463,18 +475,18 @@ export function GestureForm({
               >
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <RadioGroupItem value="NFT" />
-                  <span className="text-sm">Attach NFT</span>
+                  <span className="text-sm">{t('form.advanced.attachNft')}</span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <RadioGroupItem value="Token" />
-                  <span className="text-sm">Attach Token</span>
+                  <span className="text-sm">{t('form.advanced.attachToken')}</span>
                 </label>
               </RadioGroup>
               {contributionType === 'Token' && (
                 <div className="space-y-3">
                   <div className="min-w-0">
                     <Label className="text-xs text-muted-foreground mb-1 block">
-                      Contract Address
+                      {t('form.advanced.tokenContractLabel')}
                     </Label>
                     <Input
                       placeholder="0x..."
@@ -487,7 +499,9 @@ export function GestureForm({
                     />
                   </div>
                   <div className="w-full max-w-[11rem]">
-                    <Label className="text-xs text-muted-foreground mb-1 block">Amount</Label>
+                    <Label className="text-xs text-muted-foreground mb-1 block">
+                      {t('form.advanced.tokenAmountLabel')}
+                    </Label>
                     <Input
                       placeholder="0.0"
                       type="number"
@@ -503,7 +517,7 @@ export function GestureForm({
                 <div className="space-y-3">
                   <div className="min-w-0">
                     <Label className="text-xs text-muted-foreground mb-1 block">
-                      NFT Contract Address
+                      {t('form.advanced.nftContractLabel')}
                     </Label>
                     <Input
                       placeholder="0x..."
@@ -516,9 +530,11 @@ export function GestureForm({
                     />
                   </div>
                   <div className="w-full max-w-[7.5rem]">
-                    <Label className="text-xs text-muted-foreground mb-1 block">Token ID</Label>
+                    <Label className="text-xs text-muted-foreground mb-1 block">
+                      {t('form.advanced.nftIdLabel')}
+                    </Label>
                     <Input
-                      placeholder="Token ID"
+                      placeholder={t('form.advanced.nftIdPlaceholder')}
                       type="number"
                       min={0}
                       value={nftId}
@@ -532,12 +548,12 @@ export function GestureForm({
               {gestureType !== 'CST' && (
                 <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Collision Prevention
+                    {t('form.advanced.collision.title')}
                   </p>
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
-                        Raise by
+                        {t('form.advanced.collision.raiseBy')}
                       </span>
                       <div className="relative w-[4.25rem] shrink-0">
                         <CustomTextField
@@ -559,18 +575,17 @@ export function GestureForm({
                       </div>
                     </div>
                     <span className="text-sm font-mono text-muted-foreground tabular-nums min-w-0">
-                      ≈{' '}
-                      {(
-                        (ethGestureInfo?.ETHPrice ?? 0) *
-                        (1 + gestureCostPlus / 100) *
-                        (gestureType === 'RandomWalk' ? 0.5 : 1)
-                      ).toFixed(6)}{' '}
-                      ETH
+                      {t('form.advanced.collision.approxCost', {
+                        amount: (
+                          (ethGestureInfo?.ETHPrice ?? 0) *
+                          (1 + gestureCostPlus / 100) *
+                          (gestureType === 'RandomWalk' ? 0.5 : 1)
+                        ).toFixed(6),
+                      })}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Bumps Gesture Cost by {gestureCostPlus}% to avoid collision when two gestures
-                    land in the same block. Does not permanently raise the cost.
+                    {t('form.advanced.collision.note', { percent: String(gestureCostPlus) })}
                   </p>
                 </div>
               )}

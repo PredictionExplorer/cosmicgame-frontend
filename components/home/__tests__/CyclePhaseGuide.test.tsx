@@ -43,11 +43,13 @@ function renderGuide({
   );
 }
 
-function getStep(label: string) {
-  const timeline = screen.getByRole('list', { name: 'Performance Cycle phases' });
-  const heading = within(timeline).getByRole('heading', { name: label });
+function getStep(labelKey: string) {
+  const timeline = screen.getByRole('list', { name: 'home.phaseGuide.timelineAria' });
+  const heading = within(timeline).getByRole('heading', {
+    name: `home.phaseGuide.steps.${labelKey}.label`,
+  });
   const step = heading.closest('li');
-  if (!step) throw new Error(`step "${label}" must render inside a list item`);
+  if (!step) throw new Error(`step "${labelKey}" must render inside a list item`);
   return step;
 }
 
@@ -59,20 +61,18 @@ describe('CyclePhaseGuide', () => {
   it('renders all five cycle phases with a heading and how-it-works link', () => {
     renderGuide();
 
-    expect(
-      screen.getByRole('heading', { name: 'Where this Performance Cycle is now' }),
-    ).toBeInTheDocument();
-    for (const label of [
-      'Opening Soon',
-      'First Gesture',
-      'Open Cycle',
-      'Final Window',
-      'Finalization',
-      'Allocation',
+    expect(screen.getByRole('heading', { name: 'home.phaseGuide.title' })).toBeInTheDocument();
+    for (const labelKey of [
+      'openingSoon',
+      'firstGesture',
+      'open',
+      'finalWindow',
+      'finalization',
+      'allocation',
     ]) {
-      expect(getStep(label)).toBeInTheDocument();
+      expect(getStep(labelKey)).toBeInTheDocument();
     }
-    expect(screen.getByRole('link', { name: /How it works/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /home\.phaseGuide\.howItWorks/ })).toHaveAttribute(
       'href',
       '/how-it-works',
     );
@@ -81,30 +81,30 @@ describe('CyclePhaseGuide', () => {
   it('marks Open Cycle as the current step during a stable cycle', () => {
     renderGuide();
 
-    expect(getStep('Open Cycle')).toHaveAttribute('aria-current', 'step');
-    expect(getStep('First Gesture')).not.toHaveAttribute('aria-current');
-    expect(getStep('First Gesture')).toHaveTextContent('Passed');
-    expect(getStep('Final Window')).toHaveTextContent('Next');
+    expect(getStep('open')).toHaveAttribute('aria-current', 'step');
+    expect(getStep('firstGesture')).not.toHaveAttribute('aria-current');
+    expect(getStep('firstGesture')).toHaveTextContent('home.phaseGuide.stepState.passed');
+    expect(getStep('finalWindow')).toHaveTextContent('home.phaseGuide.stepState.next');
   });
 
   it('marks Opening Soon before the next cycle opens', () => {
     renderGuide({ activationTime: NOW_MS / 1000 + 3_600 });
 
-    expect(getStep('Opening Soon')).toHaveAttribute('aria-current', 'step');
-    expect(getStep('First Gesture')).toHaveTextContent('Next');
+    expect(getStep('openingSoon')).toHaveAttribute('aria-current', 'step');
+    expect(getStep('firstGesture')).toHaveTextContent('home.phaseGuide.stepState.next');
   });
 
   it('marks the Final Window step in the closing hour', () => {
     renderGuide({ allocationTime: NOW_MS + 30 * 60_000 });
 
-    expect(getStep('Final Window')).toHaveAttribute('aria-current', 'step');
+    expect(getStep('finalWindow')).toHaveAttribute('aria-current', 'step');
   });
 
   it('marks Finalization once the cycle timer expires', () => {
     renderGuide({ allocationTime: NOW_MS - 1_000 });
 
-    expect(getStep('Finalization')).toHaveAttribute('aria-current', 'step');
-    expect(getStep('Open Cycle')).toHaveTextContent('Passed');
+    expect(getStep('finalization')).toHaveAttribute('aria-current', 'step');
+    expect(getStep('open')).toHaveTextContent('home.phaseGuide.stepState.passed');
   });
 
   it('marks First Gesture before the first gesture of a cycle', () => {
@@ -112,27 +112,29 @@ describe('CyclePhaseGuide', () => {
       data: makeData({ LastBidderAddr: '0x0000000000000000000000000000000000000000' }),
     });
 
-    expect(getStep('First Gesture')).toHaveAttribute('aria-current', 'step');
+    expect(getStep('firstGesture')).toHaveAttribute('aria-current', 'step');
   });
 
   it('shows the first-visit explainer with FAQ and walkthrough links', () => {
     renderGuide();
 
-    expect(screen.getByText('New here? Read the cycle in 30 seconds.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Read the FAQ' })).toHaveAttribute('href', '/faq');
-    expect(screen.getByRole('link', { name: 'See the full walkthrough' })).toHaveAttribute(
+    expect(screen.getByText('home.phaseGuide.explainer.title')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'home.phaseGuide.explainer.faqLink' })).toHaveAttribute(
       'href',
-      '/how-it-works',
+      '/faq',
     );
+    expect(
+      screen.getByRole('link', { name: 'home.phaseGuide.explainer.walkthroughLink' }),
+    ).toHaveAttribute('href', '/how-it-works');
   });
 
   it('dismisses the explainer and persists the choice in localStorage', async () => {
     const user = userEvent.setup();
     renderGuide();
 
-    await user.click(screen.getByRole('button', { name: 'Dismiss cycle explainer' }));
+    await user.click(screen.getByRole('button', { name: 'home.phaseGuide.explainer.dismissAria' }));
 
-    expect(screen.queryByText('New here? Read the cycle in 30 seconds.')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.phaseGuide.explainer.title')).not.toBeInTheDocument();
     expect(window.localStorage.getItem('cosmic-cycle-explainer-dismissed')).toBe('1');
   });
 
@@ -140,10 +142,8 @@ describe('CyclePhaseGuide', () => {
     window.localStorage.setItem('cosmic-cycle-explainer-dismissed', '1');
     renderGuide();
 
-    expect(screen.queryByText('New here? Read the cycle in 30 seconds.')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Where this Performance Cycle is now' }),
-    ).toBeInTheDocument();
+    expect(screen.queryByText('home.phaseGuide.explainer.title')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'home.phaseGuide.title' })).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

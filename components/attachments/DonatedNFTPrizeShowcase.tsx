@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { formatUnits } from 'viem';
 import { ExternalLink, Gift, ImageOff, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -57,20 +58,49 @@ export function AttachedNFTAllocationShowcase({
   className,
   variant = 'default',
 }: AttachedNFTAllocationShowcaseProps) {
+  const t = useTranslations('currentCycle');
+
   if (nfts.length === 0 && erc20Tokens.length === 0) return null;
 
-  const cycleLabel = cycleNumber ?? nfts[0]?.RoundNum ?? erc20Tokens[0]?.RoundNum ?? 'current';
+  const cycleLabel =
+    cycleNumber ?? nfts[0]?.RoundNum ?? erc20Tokens[0]?.RoundNum ?? t('showcase.cycleFallback');
   const previewNfts = nfts.slice(0, MAX_NFT_PREVIEW);
   const previewErc20Tokens = erc20Tokens.slice(0, MAX_ERC20_PREVIEW);
   const totalPreviewCount = previewNfts.length + previewErc20Tokens.length;
   const totalAssetCount = nfts.length + erc20Tokens.length;
-  const allocationSummary = formatAllocationSummary(nfts.length, erc20Tokens.length);
-  const receiptCopy = formatReceiptCopy(nfts.length, erc20Tokens.length);
-  const previewCopy = formatPreviewCopy(totalPreviewCount, totalAssetCount);
-  const remainderCopy = formatRemainderCopy(
-    nfts.length - previewNfts.length,
-    erc20Tokens.length - previewErc20Tokens.length,
-  );
+  const allocationSummary =
+    nfts.length > 0 && erc20Tokens.length > 0
+      ? t('showcase.bonusReceipt.mixed', { nftCount: nfts.length, erc20Count: erc20Tokens.length })
+      : nfts.length > 0
+        ? t('showcase.bonusReceipt.nftOnly', { nftCount: nfts.length })
+        : t('showcase.bonusReceipt.erc20Only', { erc20Count: erc20Tokens.length });
+  const receiptDescription =
+    nfts.length > 0 && erc20Tokens.length > 0
+      ? t('showcase.description.mixed', {
+          nftCount: nfts.length,
+          erc20Count: erc20Tokens.length,
+          cycle: cycleLabel,
+        })
+      : nfts.length > 0
+        ? t('showcase.description.nftOnly', { nftCount: nfts.length, cycle: cycleLabel })
+        : t('showcase.description.erc20Only', {
+            erc20Count: erc20Tokens.length,
+            cycle: cycleLabel,
+          });
+  const previewCopy =
+    totalPreviewCount >= totalAssetCount
+      ? t('showcase.summary.previewAll')
+      : t('showcase.summary.previewCount', { visible: totalPreviewCount, total: totalAssetCount });
+  const hiddenNftCount = nfts.length - previewNfts.length;
+  const hiddenErc20Count = erc20Tokens.length - previewErc20Tokens.length;
+  const remainderCopy =
+    hiddenNftCount > 0 && hiddenErc20Count > 0
+      ? t('showcase.remainder.mixed', { nftCount: hiddenNftCount, erc20Count: hiddenErc20Count })
+      : hiddenNftCount > 0
+        ? t('showcase.remainder.nftOnly', { nftCount: hiddenNftCount })
+        : hiddenErc20Count > 0
+          ? t('showcase.remainder.erc20Only', { erc20Count: hiddenErc20Count })
+          : '';
 
   return (
     <section
@@ -89,7 +119,7 @@ export function AttachedNFTAllocationShowcase({
             <div className="max-w-3xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.22)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[rgb(var(--solar-gold-rgb))]">
                 <Sparkles className="h-3.5 w-3.5" />
-                Included in Signature Allocation
+                {t('showcase.badge')}
               </div>
               <h2
                 id="attached-nft-allocation-title"
@@ -98,12 +128,10 @@ export function AttachedNFTAllocationShowcase({
                   variant === 'default' && 'sm:text-3xl',
                 )}
               >
-                Bonus assets attached to this cycle
+                {t('showcase.heading')}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                A compact receipt for the community-attached assets that travel with the Signature
-                Allocation. The Final Gesture participant receives {receiptCopy} when Cycle #
-                {cycleLabel} finalizes.
+                {receiptDescription}
               </p>
             </div>
 
@@ -111,7 +139,7 @@ export function AttachedNFTAllocationShowcase({
               <Gift className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Bonus Receipt
+                  {t('showcase.bonusReceipt.label')}
                 </p>
                 <p className="text-sm font-bold text-white">{allocationSummary}</p>
               </div>
@@ -124,10 +152,19 @@ export function AttachedNFTAllocationShowcase({
               variant === 'default' ? 'lg:grid-cols-4' : 'xl:grid-cols-2 2xl:grid-cols-4',
             )}
           >
-            <SummaryChip label="Assets included" value={String(totalAssetCount)} />
-            <SummaryChip label="Cycle" value={`#${cycleLabel}`} />
-            <SummaryChip label="Preview" value={previewCopy} />
-            <SummaryChip label="Recipient rule" value="Final Gesture" />
+            <SummaryChip
+              label={t('showcase.summary.assetsIncluded')}
+              value={String(totalAssetCount)}
+            />
+            <SummaryChip
+              label={t('showcase.summary.cycle')}
+              value={t('showcase.summary.cycleValue', { cycle: cycleLabel })}
+            />
+            <SummaryChip label={t('showcase.summary.preview')} value={previewCopy} />
+            <SummaryChip
+              label={t('showcase.summary.recipientRule')}
+              value={t('showcase.summary.recipientRuleValue')}
+            />
           </div>
 
           <div
@@ -171,51 +208,6 @@ export function AttachedNFTAllocationShowcase({
   );
 }
 
-function plural(count: number, singular: string, pluralLabel = `${singular}s`) {
-  return count === 1 ? singular : pluralLabel;
-}
-
-function formatAllocationSummary(nftCount: number, erc20Count: number) {
-  const parts: string[] = [];
-  if (nftCount > 0) parts.push(`${nftCount} ERC-721 ${plural(nftCount, 'token')}`);
-  if (erc20Count > 0) {
-    parts.push(`${erc20Count} ERC-20 ${plural(erc20Count, 'deposit')}`);
-  }
-  return parts.join(' + ');
-}
-
-function formatReceiptCopy(nftCount: number, erc20Count: number) {
-  const parts: string[] = [];
-
-  if (nftCount === 1) parts.push('the attached NFT');
-  if (nftCount > 1) parts.push(`all ${nftCount} attached NFTs`);
-  if (erc20Count === 1) parts.push('the attached ERC-20 token deposit');
-  if (erc20Count > 1) parts.push(`all ${erc20Count} attached ERC-20 token deposits`);
-
-  if (parts.length === 1) return parts[0];
-  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
-}
-
-function formatPreviewCopy(visibleCount: number, totalCount: number) {
-  if (visibleCount >= totalCount) return 'All visible';
-  return `${visibleCount} of ${totalCount}`;
-}
-
-function formatRemainderCopy(hiddenNftCount: number, hiddenErc20Count: number) {
-  const parts: string[] = [];
-  if (hiddenNftCount > 0) {
-    parts.push(`${hiddenNftCount} more attached NFT${hiddenNftCount === 1 ? '' : 's'}`);
-  }
-  if (hiddenErc20Count > 0) {
-    parts.push(
-      `${hiddenErc20Count} more attached ERC-20 token deposit${hiddenErc20Count === 1 ? '' : 's'}`,
-    );
-  }
-  if (parts.length === 0) return '';
-  const joined = parts.length === 1 ? parts[0] : `${parts[0]} and ${parts[1]}`;
-  return `Showing the featured receipt preview. Plus ${joined} in the full cycle details.`;
-}
-
 function formatDisplayDecimal(value: string) {
   const [whole, fraction] = value.split('.');
   if (!fraction) return whole;
@@ -229,7 +221,7 @@ function formatFiniteAmount(amount: number) {
   return formatDisplayDecimal(amount.toFixed(precision));
 }
 
-function getAttachedErc20Amount(token: DonatedERC20Token, decimals: number) {
+function getAttachedErc20Amount(token: DonatedERC20Token, decimals: number, unknownLabel: string) {
   if (typeof token.AmountDonatedEth === 'number' && Number.isFinite(token.AmountDonatedEth)) {
     return formatFiniteAmount(token.AmountDonatedEth);
   }
@@ -247,10 +239,10 @@ function getAttachedErc20Amount(token: DonatedERC20Token, decimals: number) {
     try {
       return formatDisplayDecimal(formatUnits(BigInt(rawAmount), decimals));
     } catch {
-      return 'Unknown amount';
+      return unknownLabel;
     }
   }
-  return 'Unknown amount';
+  return unknownLabel;
 }
 
 function SummaryChip({ label, value }: { label: string; value: string }) {
@@ -321,9 +313,16 @@ function AttachedNFTAllocationCard({
   featured: boolean;
   variant: AttachedNFTAllocationShowcaseProps['variant'];
 }) {
+  const t = useTranslations('currentCycle');
   const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI);
   const tokenId = getAttachedNftTokenId(nft);
   const primaryLink = resolveAttachedNftLink({ nft, metadata });
+  const primaryLabel =
+    primaryLink.kind === 'project'
+      ? t('showcase.nftCard.links.project')
+      : primaryLink.kind === 'opensea'
+        ? t('showcase.nftCard.links.opensea')
+        : t('showcase.nftCard.links.explorer');
   const explorerLink = resolveAttachedNftExplorerLink(nft);
   const openSeaUrl = buildOpenSeaAssetUrl(nft.TokenAddr, tokenId);
   const { data: estimate } = useNFTCollectionEstimate({
@@ -332,9 +331,16 @@ function AttachedNFTAllocationCard({
     enabled: featured,
   });
 
-  const title = metadata?.name ?? (tokenId ? `NFT #${tokenId}` : 'Attached NFT');
-  const subtitle = metadata?.collection_name ?? metadata?.platform ?? 'Community-attached ERC-721';
-  const imageAlt = metadata?.name ? `Attached NFT ${metadata.name}` : 'Attached NFT allocation';
+  const title =
+    metadata?.name ??
+    (tokenId
+      ? t('showcase.nftCard.fallbackTitle', { id: tokenId })
+      : t('showcase.nftCard.fallbackTitleUnknown'));
+  const subtitle =
+    metadata?.collection_name ?? metadata?.platform ?? t('showcase.nftCard.fallbackSubtitle');
+  const imageAlt = metadata?.name
+    ? t('showcase.nftCard.imageAlt', { name: metadata.name })
+    : t('showcase.nftCard.imageAltFallback');
   const mediaClassName = cn(
     'group/media mx-auto flex aspect-[4/3] max-h-[420px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-black/25 p-2',
     assetTones.nft.media,
@@ -350,7 +356,7 @@ function AttachedNFTAllocationCard({
               target="_blank"
               rel="noopener noreferrer"
               className={mediaClassName}
-              aria-label={`${primaryLink.label}: ${title}`}
+              aria-label={t('showcase.nftCard.mediaAria', { label: primaryLabel, title })}
               data-testid="nft-allocation-media"
             >
               <NFTImage
@@ -377,11 +383,14 @@ function AttachedNFTAllocationCard({
         <div className="flex min-w-0 flex-col justify-between gap-4">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <AssetTypeBadge tone="nft">ERC-721</AssetTypeBadge>
+              <AssetTypeBadge tone="nft">{t('showcase.nftCard.badge')}</AssetTypeBadge>
               {estimate ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.25)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--solar-gold-rgb))]">
-                  Floor ~{estimate.floorPriceEth.toFixed(3)} {estimate.currency}
-                  <InfoTooltip content="Collection floor estimate, not an appraisal of this specific token." />
+                  {t('showcase.nftCard.floorEstimate', {
+                    price: estimate.floorPriceEth.toFixed(3),
+                    currency: estimate.currency,
+                  })}
+                  <InfoTooltip content={t('showcase.nftCard.floorTooltip')} />
                 </span>
               ) : null}
             </div>
@@ -394,7 +403,7 @@ function AttachedNFTAllocationCard({
             {isError ? (
               <p className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground">
                 <ImageOff className="h-3.5 w-3.5" />
-                Metadata unavailable. The attached NFT is still part of this cycle allocation.
+                {t('showcase.nftCard.metadataUnavailable')}
               </p>
             ) : metadata?.description && featured ? (
               <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
@@ -405,16 +414,23 @@ function AttachedNFTAllocationCard({
 
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <AssetFact label="Token ID" value={tokenId ? `#${tokenId}` : 'Unknown'} />
               <AssetFact
-                label="Attached by"
+                label={t('showcase.facts.tokenId')}
+                value={
+                  tokenId
+                    ? t('showcase.facts.tokenIdValue', { id: tokenId })
+                    : t('showcase.facts.unknown')
+                }
+              />
+              <AssetFact
+                label={t('showcase.facts.attachedBy')}
                 value={
                   nft.DonorAddr ? (
                     <Link href={`/user/${nft.DonorAddr}`} className="hover:text-primary">
                       {shortenHex(nft.DonorAddr, 5)}
                     </Link>
                   ) : (
-                    'Unknown'
+                    t('showcase.facts.unknown')
                   )
                 }
               />
@@ -422,12 +438,14 @@ function AttachedNFTAllocationCard({
 
             <div className="flex flex-wrap gap-2">
               {primaryLink.href ? (
-                <AssetAction href={primaryLink.href} label={primaryLink.label} primary />
+                <AssetAction href={primaryLink.href} label={primaryLabel} primary />
               ) : null}
               {openSeaUrl && primaryLink.href !== openSeaUrl ? (
-                <AssetAction href={openSeaUrl} label="OpenSea" />
+                <AssetAction href={openSeaUrl} label={t('showcase.nftCard.openSea')} />
               ) : null}
-              {explorerLink.href ? <AssetAction href={explorerLink.href} label="Explorer" /> : null}
+              {explorerLink.href ? (
+                <AssetAction href={explorerLink.href} label={t('showcase.nftCard.explorer')} />
+              ) : null}
             </div>
           </div>
         </div>
@@ -445,12 +463,17 @@ function AttachedERC20AllocationCard({
   featured: boolean;
   variant: AttachedNFTAllocationShowcaseProps['variant'];
 }) {
+  const t = useTranslations('currentCycle');
   const { data: metadata } = useAttachedErc20Metadata(token.TokenAddr);
-  const symbol = metadata?.symbol || 'ERC20';
-  const amount = getAttachedErc20Amount(token, metadata?.decimals ?? 18);
-  const tokenName = metadata?.name || 'Attached ERC20 token';
+  const symbol = metadata?.symbol || t('showcase.erc20Card.symbolFallback');
+  const amount = getAttachedErc20Amount(
+    token,
+    metadata?.decimals ?? 18,
+    t('showcase.erc20Card.unknownAmount'),
+  );
+  const tokenName = metadata?.name || t('showcase.erc20Card.nameFallback');
   const explorerHref = token.TokenAddr ? getExplorerUrl('token', token.TokenAddr) : '';
-  const logoSource = metadata?.logoSource ?? 'curated token metadata';
+  const logoSource = metadata?.logoSource ?? t('showcase.erc20Card.logoSourceFallback');
 
   return (
     <AssetCardShell tone="erc20" featured={featured} variant={variant}>
@@ -474,11 +497,11 @@ function AttachedERC20AllocationCard({
                 tone="erc20"
                 tooltip={
                   metadata?.logoURI
-                    ? `Logo from ${logoSource}; verify the token address before assigning value.`
-                    : 'This ERC-20 token deposit is attached to the cycle and goes to the Signature Allocation recipient when finalized.'
+                    ? t('showcase.erc20Card.badgeTooltipLogo', { source: logoSource })
+                    : t('showcase.erc20Card.badgeTooltipDefault')
                 }
               >
-                ERC-20 deposit
+                {t('showcase.erc20Card.badge')}
               </AssetTypeBadge>
             </div>
 
@@ -498,7 +521,7 @@ function AttachedERC20AllocationCard({
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2 text-xs">
               <AssetFact
-                label="Token"
+                label={t('showcase.facts.token')}
                 value={
                   explorerHref ? (
                     <a
@@ -510,19 +533,19 @@ function AttachedERC20AllocationCard({
                       {shortenHex(token.TokenAddr, 5)}
                     </a>
                   ) : (
-                    'Unknown'
+                    t('showcase.facts.unknown')
                   )
                 }
               />
               <AssetFact
-                label="Attached by"
+                label={t('showcase.facts.attachedBy')}
                 value={
                   token.DonorAddr ? (
                     <Link href={`/user/${token.DonorAddr}`} className="hover:text-primary">
                       {shortenHex(token.DonorAddr, 5)}
                     </Link>
                   ) : (
-                    'Unknown'
+                    t('showcase.facts.unknown')
                   )
                 }
               />
@@ -530,7 +553,11 @@ function AttachedERC20AllocationCard({
 
             <div className="flex flex-wrap gap-2">
               {explorerHref ? (
-                <AssetAction href={explorerHref} label={`View ${symbol} token`} primary />
+                <AssetAction
+                  href={explorerHref}
+                  label={t('showcase.erc20Card.viewToken', { symbol })}
+                  primary
+                />
               ) : null}
             </div>
           </div>

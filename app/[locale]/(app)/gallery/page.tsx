@@ -1,39 +1,56 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { APP_ORIGIN } from '@/lib/hostRouting';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, collectionPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 import GalleryPage from './GalleryPage';
 import { GallerySeoSummary } from './GallerySeoSummary';
 
-const description =
-  'Explore Cosmic Signature NFT artwork generated from deterministic three-body physics, on-chain seeds, spectral rendering, and Performance Cycle data.';
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export const metadata: Metadata = createMetadata(
-  'Cosmic Signature Gallery | Deterministic Three-Body NFT Art',
-  description,
-  undefined,
-  '/gallery',
-);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(t('gallery.title'), t('gallery.description'), undefined, '/gallery', {
+    locale,
+  });
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const [t, meta, common] = await Promise.all([
+    getTranslations('gallery'),
+    getTranslations('meta'),
+    getTranslations('common'),
+  ]);
+
   return (
     <>
       <JsonLd
         data={[
           collectionPageJsonLd({
-            name: 'Cosmic Signature Gallery',
-            description,
-            url: `${APP_ORIGIN}/gallery`,
+            name: t('jsonLd.name'),
+            // Single source of truth: the CollectionPage description is the
+            // meta description, so it is read from the meta namespace instead
+            // of being duplicated into gallery.json.
+            description: meta('gallery.description'),
+            url: localeHref(APP_ORIGIN, '/gallery', locale),
           }),
-          breadcrumbJsonLd([
-            { name: 'Home', path: '/' },
-            { name: 'Gallery', path: '/gallery' },
-          ]),
+          breadcrumbJsonLd(
+            [
+              { name: common('breadcrumbs.home'), path: '/' },
+              { name: common('breadcrumbs.gallery'), path: '/gallery' },
+            ],
+            localeHref(APP_ORIGIN, '/', locale),
+          ),
         ]}
       />
       <GallerySeoSummary />

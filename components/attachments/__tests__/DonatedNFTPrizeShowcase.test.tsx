@@ -73,12 +73,18 @@ function createErc20(overrides: Partial<DonatedERC20Token> = {}): DonatedERC20To
 }
 
 function expectSingleRecipientRuleSummary() {
-  expect(screen.getAllByText('Recipient rule')).toHaveLength(1);
-  expect(screen.getAllByText('Final Gesture')).toHaveLength(1);
+  expect(screen.getAllByText('currentCycle.showcase.summary.recipientRule')).toHaveLength(1);
+  expect(screen.getAllByText('currentCycle.showcase.summary.recipientRuleValue')).toHaveLength(1);
 
-  const recipientRuleChip = screen.getByText('Recipient rule').closest('div');
+  const recipientRuleChip = screen
+    .getByText('currentCycle.showcase.summary.recipientRule')
+    .closest('div');
   expect(recipientRuleChip).not.toBeNull();
-  expect(within(recipientRuleChip as HTMLElement).getByText('Final Gesture')).toBeInTheDocument();
+  expect(
+    within(recipientRuleChip as HTMLElement).getByText(
+      'currentCycle.showcase.summary.recipientRuleValue',
+    ),
+  ).toBeInTheDocument();
 }
 
 beforeEach(() => {
@@ -117,15 +123,13 @@ describe('AttachedNFTAllocationShowcase', () => {
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
     expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-variant', 'default');
-    expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.heading')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        /Final Gesture participant receives the attached NFT when Cycle #42 finalizes/i,
-      ),
+      screen.getByText('currentCycle.showcase.description.nftOnly(nftCount=1,cycle=42)'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Included in Signature Allocation')).toBeInTheDocument();
-    expect(screen.getByText('Bonus Receipt')).toBeInTheDocument();
-    expect(screen.getByText('All visible')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.badge')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.bonusReceipt.label')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.summary.previewAll')).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
 
@@ -144,8 +148,10 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(showcase).toHaveAttribute('data-variant', 'rail');
     expect(showcase).toHaveClass('my-0', 'rail-assets');
     expect(showcase).not.toHaveClass('my-8');
-    expect(screen.getByText('2 ERC-721 tokens + 1 ERC-20 deposit')).toBeInTheDocument();
-    expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.showcase.bonusReceipt.mixed(nftCount=2,erc20Count=1)'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.heading')).toBeInTheDocument();
     expect(screen.getAllByTestId('nft-allocation-media')).toHaveLength(2);
     expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1250.5 GLXY');
     expectSingleRecipientRuleSummary();
@@ -159,13 +165,13 @@ describe('AttachedNFTAllocationShowcase', () => {
       />,
     );
 
-    expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.heading')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        /Final Gesture participant receives all 2 attached NFTs when Cycle #42 finalizes/i,
-      ),
+      screen.getByText('currentCycle.showcase.description.nftOnly(nftCount=2,cycle=42)'),
     ).toBeInTheDocument();
-    expect(screen.getByText('2 ERC-721 tokens')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.showcase.bonusReceipt.nftOnly(nftCount=2)'),
+    ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
 
@@ -174,14 +180,14 @@ describe('AttachedNFTAllocationShowcase', () => {
       <AttachedNFTAllocationShowcase nfts={[]} erc20Tokens={[createErc20()]} cycleNumber={42} />,
     );
 
-    expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.heading')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        /Final Gesture participant receives the attached ERC-20 token deposit when Cycle #42 finalizes/i,
-      ),
+      screen.getByText('currentCycle.showcase.description.erc20Only(erc20Count=1,cycle=42)'),
     ).toBeInTheDocument();
-    expect(screen.getByText('1 ERC-20 deposit')).toBeInTheDocument();
-    expect(screen.getByText('ERC-20 deposit')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.showcase.bonusReceipt.erc20Only(erc20Count=1)'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.erc20Card.badge')).toBeInTheDocument();
     const amount = screen.getByTestId('erc20-attached-amount');
     expect(amount).toHaveTextContent('1250.5 GLXY');
     expect(amount.className).toContain('shadow-[0_0_70px_-34px');
@@ -189,14 +195,12 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('Galaxy Credits')).toBeInTheDocument();
     expect(screen.queryByText('Pending finalization')).not.toBeInTheDocument();
     expect(screen.queryByText('Retrieved')).not.toBeInTheDocument();
-    expect(screen.getByAltText('GLXY token logo')).toHaveAttribute(
-      'src',
-      'https://cdn.example/glxy.png',
-    );
-    expect(screen.getByRole('link', { name: /View GLXY token/i })).toHaveAttribute(
-      'href',
-      expect.stringContaining(ERC20_CONTRACT),
-    );
+    expect(
+      screen.getByAltText('currentCycle.showcase.erc20Card.logoAlt(token=GLXY)'),
+    ).toHaveAttribute('src', 'https://cdn.example/glxy.png');
+    expect(
+      screen.getByRole('link', { name: 'currentCycle.showcase.erc20Card.viewToken(symbol=GLXY)' }),
+    ).toHaveAttribute('href', expect.stringContaining(ERC20_CONTRACT));
     expectSingleRecipientRuleSummary();
   });
 
@@ -210,11 +214,11 @@ describe('AttachedNFTAllocationShowcase', () => {
     );
 
     expect(
-      screen.getByText(
-        /Final Gesture participant receives all 2 attached NFTs and all 2 attached ERC-20 token deposits when Cycle #42 finalizes/i,
-      ),
+      screen.getByText('currentCycle.showcase.description.mixed(nftCount=2,erc20Count=2,cycle=42)'),
     ).toBeInTheDocument();
-    expect(screen.getByText('2 ERC-721 tokens + 2 ERC-20 deposits')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.showcase.bonusReceipt.mixed(nftCount=2,erc20Count=2)'),
+    ).toBeInTheDocument();
     const amounts = screen.getAllByTestId('erc20-attached-amount');
     expect(amounts).toHaveLength(2);
     expect(amounts[0]).toHaveTextContent('1250.5 GLXY');
@@ -249,43 +253,40 @@ describe('AttachedNFTAllocationShowcase', () => {
     );
 
     expect(
-      screen.getByText(
-        /Final Gesture participant receives the attached NFT and the attached ERC-20 token deposit when Cycle #42 finalizes/i,
-      ),
+      screen.getByText('currentCycle.showcase.description.mixed(nftCount=1,erc20Count=1,cycle=42)'),
     ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
     expect(screen.queryByTestId('recipient-receives-badge')).not.toBeInTheDocument();
     expect(screen.queryByText('Recipient receives')).not.toBeInTheDocument();
     expect(screen.queryByText('Recipient')).not.toBeInTheDocument();
-    expect(screen.getByText('Token ID')).toBeInTheDocument();
-    expect(screen.getByText('Token')).toBeInTheDocument();
-    expect(screen.getAllByText('Attached by')).toHaveLength(2);
+    expect(screen.getByText('currentCycle.showcase.facts.tokenId')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.facts.token')).toBeInTheDocument();
+    expect(screen.getAllByText('currentCycle.showcase.facts.attachedBy')).toHaveLength(2);
   });
 
   it('displays metadata image, title, collection, token id, contributor, and actions', () => {
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
-    expect(screen.getByAltText('Attached NFT Chromie Squiggle #123')).toHaveAttribute(
-      'src',
-      'https://cdn.example/nft.png',
-    );
+    expect(
+      screen.getByAltText('currentCycle.showcase.nftCard.imageAlt(name=Chromie Squiggle #123)'),
+    ).toHaveAttribute('src', 'https://cdn.example/nft.png');
     expect(screen.getByText('Chromie Squiggle #123')).toBeInTheDocument();
     expect(screen.getByText('Chromie Squiggle')).toBeInTheDocument();
-    expect(screen.getByText('#123')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.showcase.facts.tokenIdValue(id=123)'),
+    ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
     expect(
       screen
-        .getAllByRole('link', { name: /View NFT/i })
+        .getAllByRole('link', { name: /showcase\.nftCard\.links\.project/ })
         .some((link) => link.getAttribute('href') === 'https://project.example/nft/123'),
     ).toBe(true);
-    expect(screen.getByRole('link', { name: /OpenSea/i })).toHaveAttribute(
-      'href',
-      buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId),
-    );
-    expect(screen.getByRole('link', { name: /Explorer/i })).toHaveAttribute(
-      'href',
-      expect.stringContaining(CONTRACT),
-    );
+    expect(
+      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.openSea' }),
+    ).toHaveAttribute('href', buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId));
+    expect(
+      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
+    ).toHaveAttribute('href', expect.stringContaining(CONTRACT));
     expect(screen.getByRole('link', { name: /0xabcd/i })).toHaveAttribute(
       'href',
       `/user/${CONTRIBUTOR}`,
@@ -326,7 +327,7 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     expect(
       screen
-        .getAllByRole('link', { name: /View on OpenSea/i })
+        .getAllByRole('link', { name: /showcase\.nftCard\.links\.opensea/ })
         .some(
           (link) =>
             link.getAttribute('href') ===
@@ -340,17 +341,19 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
-    expect(screen.getByAltText('Attached NFT allocation')).toHaveAttribute(
+    expect(screen.getByAltText('currentCycle.showcase.nftCard.imageAltFallback')).toHaveAttribute(
       'src',
       '/images/qmark.png',
     );
-    expect(screen.getByText('NFT #123')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        'Metadata unavailable. The attached NFT is still part of this cycle allocation.',
-      ),
+      screen.getByText('currentCycle.showcase.nftCard.fallbackTitle(id=123)'),
     ).toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: /View on OpenSea/i }).length).toBeGreaterThan(0);
+    expect(
+      screen.getByText('currentCycle.showcase.nftCard.metadataUnavailable'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('link', { name: /showcase\.nftCard\.links\.opensea/ }).length,
+    ).toBeGreaterThan(0);
   });
 
   it('handles missing token id without hiding the card', () => {
@@ -361,9 +364,13 @@ describe('AttachedNFTAllocationShowcase', () => {
       />,
     );
 
-    expect(screen.getByText('Unknown')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /OpenSea/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Explorer/i })).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.showcase.facts.unknown')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'currentCycle.showcase.nftCard.openSea' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'currentCycle.showcase.nftCard.explorer' }),
+    ).toBeInTheDocument();
   });
 
   it('shows floor estimate only when available and labels it as approximate', () => {
@@ -379,7 +386,9 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
-    expect(screen.getByText(/Floor ~0.420 ETH/)).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.showcase.nftCard.floorEstimate(price=0.420,currency=ETH)'),
+    ).toBeInTheDocument();
   });
 
   it('limits the preview to four NFTs and links users to full details copy', () => {
@@ -391,11 +400,11 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     expect(screen.getAllByTestId('nft-image')).toHaveLength(4);
     expect(
-      screen.getByText(
-        'Showing the featured receipt preview. Plus 2 more attached NFTs in the full cycle details.',
-      ),
+      screen.getByText('currentCycle.showcase.remainder.nftOnly(nftCount=2)'),
     ).toBeInTheDocument();
-    expect(screen.getByText('4 of 6')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.showcase.summary.previewCount(visible=4,total=6)'),
+    ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
 
@@ -406,13 +415,15 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     render(<AttachedNFTAllocationShowcase nfts={[]} erc20Tokens={tokens} cycleNumber={42} />);
 
-    expect(screen.getAllByAltText('GLXY token logo')).toHaveLength(4);
     expect(
-      screen.getByText(
-        'Showing the featured receipt preview. Plus 2 more attached ERC-20 token deposits in the full cycle details.',
-      ),
+      screen.getAllByAltText('currentCycle.showcase.erc20Card.logoAlt(token=GLXY)'),
+    ).toHaveLength(4);
+    expect(
+      screen.getByText('currentCycle.showcase.remainder.erc20Only(erc20Count=2)'),
     ).toBeInTheDocument();
-    expect(screen.getByText('4 of 6')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.showcase.summary.previewCount(visible=4,total=6)'),
+    ).toBeInTheDocument();
     expectSingleRecipientRuleSummary();
   });
 
@@ -429,7 +440,9 @@ describe('AttachedNFTAllocationShowcase', () => {
       <AttachedNFTAllocationShowcase nfts={[]} erc20Tokens={[createErc20()]} cycleNumber={42} />,
     );
 
-    expect(screen.queryByAltText('GLXY token logo')).not.toBeInTheDocument();
+    expect(
+      screen.queryByAltText('currentCycle.showcase.erc20Card.logoAlt(token=GLXY)'),
+    ).not.toBeInTheDocument();
     expect(screen.getAllByText('GLXY').length).toBeGreaterThan(0);
   });
 

@@ -1,0 +1,179 @@
+{
+  "error": {
+    "title": "未能加载周期数据",
+    "message": "请刷新页面重试。"
+  },
+  "nav": {
+    "backToHome": "返回首页"
+  },
+  "status": {
+    "notStarted": "尚未开始"
+  },
+  "hero": {
+    "title": "第 {n} 个周期",
+    "subtitle": "开启于 {date} · 已落笔 {count} 次",
+    "status": {
+      "openingSoon": "即将开启",
+      "awaitingFirstGesture": "等待第一笔",
+      "readyToFinalize": "已可收官",
+      "live": "进行中"
+    },
+    "cta": {
+      "viewHomeClock": "查看首页时钟",
+      "finalizeCycle": "收官",
+      "makeFirstGesture": "落下第一笔",
+      "makeGesture": "落笔"
+    },
+    "countdown": {
+      "opensIn": "周期开启倒计时",
+      "opensAt": "第 {n} 个周期将于 {date} 开启",
+      "finalizesIn": "周期收官倒计时",
+      "finalizesTooltip": "倒计时归零后，写下收官之笔的参与者即可收官，并取回签名分配。每一次新落笔都会延长倒计时。",
+      "readyTitle": "周期已可收官",
+      "readyMessage": "收官倒计时已归零。"
+    }
+  },
+  "stats": {
+    "totalGestures": {
+      "label": "落笔总次数",
+      "tooltip": "本周期的落笔总次数。每一笔也同时计入一次星选资格。"
+    },
+    "cycleReserve": {
+      "label": "周期储备",
+      "tooltip": "签名分配中的 ETH 部分，由写下收官之笔的参与者取回。获配者还将获得 1,000 CST 与一枚 Cosmic Signature NFT。"
+    },
+    "stellarSelectionPool": {
+      "label": "星选池",
+      "tooltip": "周期收官时，这部分 ETH 将由程序化随机选出的 {count} 位参与者均分。"
+    },
+    "publicGoods": {
+      "label": "公共物品",
+      "tooltip": "每个周期，周期储备的 {percent}% 会转拨给 Protocol Guild。"
+    },
+    "contributedEth": {
+      "label": "ETH 贡献",
+      "tooltip": "本周期来自社区的直接 ETH 贡献。"
+    },
+    "attachedNfts": {
+      "label": "已附加 NFT",
+      "tooltip": "本周期社区随落笔附加的 NFT。"
+    }
+  },
+  "sections": {
+    "allocationTracks": {
+      "title": "分配轨道",
+      "tooltip": "周期储备如何沿各条分配轨道发放：签名分配、时之勇士、星选、公共物品、锚定派发与滚动储备。"
+    },
+    "stellarSelectionEntries": {
+      "title": "星选资格",
+      "tooltip": "每一笔都计入一次星选资格；落笔越多，获得 ETH 或 Cosmic Signature NFT 分配的入选频次越高。"
+    },
+    "topEthSpenders": {
+      "title": "ETH 支出排行",
+      "tooltip": "参与者地址，按本周期落笔支出的 ETH 总额排序。"
+    },
+    "enduranceChampions": {
+      "title": "坚守冠军",
+      "tooltip": "按参与者保持最新落笔者位置的时长排序。单次连续时长最长者将获得一次表彰 CST 铭刻（1,000 CST），并获配一枚 Cosmic Signature NFT。"
+    },
+    "gestureHistory": {
+      "title": "第 {n} 个周期落笔历史",
+      "tooltip": "按时间顺序记录本周期的每一次落笔，最新的排在最前。"
+    },
+    "ethContributions": {
+      "title": "ETH 贡献",
+      "tooltip": "本周期社区成员的直接 ETH 贡献。"
+    },
+    "cycleRules": {
+      "title": "周期规则",
+      "tooltip": "本周期的关键规则与分配机制。"
+    }
+  },
+  "rules": {
+    "howItWorks": "运作原理",
+    "participation": "落笔时，你可能铭刻<em>动态的参与 CST</em>，具体数量取决于距上一笔经过的时间，并按其平方根计算。",
+    "calibration": "ETH 落笔会使 CST 校准窗口缩短约 {decreasePercent}%；CST 落笔则使其延长约 {increasePercent}%。",
+    "stellarSelection": "每一笔都计入一次星选资格。周期收官时，周期储备的 {rafflePercent}% 将由程序化随机选出的 {ethEntries} 位 ETH 星选获配者均分；另有 {nftEntries} 位星选获配者与 {anchorHolders} 位 Random Walk NFT 锚定者，各获配一枚 Cosmic Signature NFT。",
+    "publicGoods": "每个周期，Protocol Guild 都会收到周期储备的 {percent}%（至少 {amount} ETH）。"
+  },
+  "footer": {
+    "contractBalance": "合约余额",
+    "cycleDuration": "周期时长",
+    "uniqueParticipants": "独立参与者"
+  },
+  "attachedTokens": {
+    "title": "已附加代币",
+    "tooltip": "社区随落笔附加的 NFT 与 ERC-20 代币，用于充实周期储备。",
+    "erc721Tab": "ERC-721 代币",
+    "erc20Tab": "ERC-20 代币",
+    "erc721Empty": "本周期暂无已附加的 ERC-721 代币。"
+  },
+  "showcase": {
+    "badge": "计入签名分配",
+    "heading": "本周期的附加资产",
+    "cycleFallback": "当前",
+    "description": {
+      "nftOnly": "这份简明清单记录了随签名分配一同交付的社区附加资产：本周期（#{cycle}）收官后，写下收官之笔的参与者将一并获得 {nftCount} 枚已附加 NFT。",
+      "erc20Only": "这份简明清单记录了随签名分配一同交付的社区附加资产：本周期（#{cycle}）收官后，写下收官之笔的参与者将一并获得 {erc20Count} 笔已附加的 ERC-20 代币存入。",
+      "mixed": "这份简明清单记录了随签名分配一同交付的社区附加资产：本周期（#{cycle}）收官后，写下收官之笔的参与者将一并获得 {nftCount} 枚已附加 NFT 与 {erc20Count} 笔 ERC-20 代币存入。"
+    },
+    "bonusReceipt": {
+      "label": "附加资产清单",
+      "nftOnly": "{nftCount} 枚 ERC-721 代币",
+      "erc20Only": "{erc20Count} 笔 ERC-20 存入",
+      "mixed": "{nftCount} 枚 ERC-721 代币 + {erc20Count} 笔 ERC-20 存入"
+    },
+    "summary": {
+      "assetsIncluded": "包含资产",
+      "cycle": "周期",
+      "cycleValue": "#{cycle}",
+      "preview": "预览",
+      "previewAll": "全部可见",
+      "previewCount": "{visible} / {total}",
+      "recipientRule": "获配规则",
+      "recipientRuleValue": "收官之笔"
+    },
+    "remainder": {
+      "nftOnly": "此处仅展示精选清单预览，完整周期明细中还有 {nftCount} 枚已附加 NFT。",
+      "erc20Only": "此处仅展示精选清单预览，完整周期明细中还有 {erc20Count} 笔已附加的 ERC-20 代币存入。",
+      "mixed": "此处仅展示精选清单预览，完整周期明细中还有 {nftCount} 枚已附加 NFT 与 {erc20Count} 笔 ERC-20 代币存入。"
+    },
+    "nftCard": {
+      "badge": "ERC-721",
+      "fallbackTitle": "NFT #{id}",
+      "fallbackTitleUnknown": "已附加 NFT",
+      "fallbackSubtitle": "社区附加的 ERC-721",
+      "imageAlt": "已附加 NFT {name}",
+      "imageAltFallback": "已附加 NFT 分配",
+      "mediaAria": "{label}：{title}",
+      "floorEstimate": "地板价约 {price} {currency}",
+      "floorTooltip": "此为系列地板价估计，并非对这枚代币的估值。",
+      "metadataUnavailable": "元数据暂不可用。这枚已附加 NFT 仍计入本周期分配。",
+      "openSea": "OpenSea",
+      "explorer": "区块浏览器",
+      "links": {
+        "project": "查看 NFT",
+        "opensea": "在 OpenSea 上查看",
+        "explorer": "查看合约"
+      }
+    },
+    "erc20Card": {
+      "badge": "ERC-20 存入",
+      "badgeTooltipLogo": "代币图标来源：{source}。判断其价值前，请先核对代币地址。",
+      "badgeTooltipDefault": "这笔 ERC-20 代币存入已附加至本周期，收官后将交付给签名分配获配者。",
+      "symbolFallback": "ERC20",
+      "nameFallback": "已附加 ERC-20 代币",
+      "logoSourceFallback": "精选代币元数据",
+      "unknownAmount": "数量未知",
+      "viewToken": "查看 {symbol} 代币",
+      "logoAlt": "{token} 代币图标"
+    },
+    "facts": {
+      "tokenId": "代币 ID",
+      "tokenIdValue": "#{id}",
+      "token": "代币",
+      "attachedBy": "附加者",
+      "unknown": "未知"
+    }
+  }
+}

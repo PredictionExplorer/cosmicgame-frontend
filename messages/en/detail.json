@@ -1,0 +1,90 @@
+{
+  "invalid": {
+    "title": "Invalid Token Id"
+  },
+  "jsonLd": {
+    "productName": "Cosmic Signature NFT #{id}",
+    "productDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics.",
+    "breadcrumbToken": "Token #{id}"
+  },
+  "breadcrumb": {
+    "tokenFallback": "Token {id}"
+  },
+  "hero": {
+    "unnamedToken": "Unnamed Token"
+  },
+  "badges": {
+    "stellarSelectionRecipient": "Stellar Selection Recipient",
+    "anchorRecipient": "Anchor Recipient",
+    "cycleRecipient": "Cycle Recipient",
+    "enduranceChampion": "Endurance Champion",
+    "receivedAsCycleRecipient": "Received as the Cycle Recipient in Cycle #{round}",
+    "receivedAs": "Received as a {label}",
+    "eligibleForAnchoring": "Eligible for Anchoring",
+    "eligibleForAnchoringTooltip": "This Cosmic Signature NFT has never been anchored and can receive ETH Anchor Distributions when anchored.",
+    "alreadyAnchored": "Already Anchored",
+    "alreadyAnchoredTooltip": "This token has already been anchored and cannot be anchored again."
+  },
+  "share": {
+    "trigger": "Share",
+    "copyVideoLink": "Copy Video Link",
+    "copyImageLink": "Copy Image Link",
+    "copyPageLink": "Copy Page Link"
+  },
+  "actions": {
+    "buyOrSellNfts": "Buy or sell NFTs",
+    "viewCycleDetails": "View Cycle #{round} Details"
+  },
+  "navigation": {
+    "previousToken": "Previous token",
+    "nextToken": "Next token"
+  },
+  "sections": {
+    "nameHistory": "Name History",
+    "ownershipHistory": "Ownership History"
+  },
+  "transferDialog": {
+    "title": "Confirm Transfer",
+    "description": "The destination account doesn't appear to have any transaction history. Are you sure you want to send the token to this address? Please double-check it.",
+    "confirm": "Yes, Transfer"
+  },
+  "ownerActions": {
+    "title": "Manage Your Token",
+    "titleTooltip": "As the current owner, you can transfer this token to another address or set a custom name for it.",
+    "transferHeading": "Transfer",
+    "transferTooltip": "Send this token to another Ethereum address. Double-check the address before confirming — transfers are irreversible.",
+    "recipientPlaceholder": "Recipient address (0x...)",
+    "transferButton": "Transfer",
+    "nameHeading": "Name Token",
+    "renameHeading": "Rename Token",
+    "nameTooltip": "Give your token a custom name (max 32 bytes). Named tokens appear on the Named NFTs page.",
+    "namePlaceholder": "Enter token name",
+    "setName": "Set Name",
+    "changeName": "Change Name",
+    "clearName": "Clear",
+    "namedTokensCount": "There are {count} tokens with a name.",
+    "viewAllNamedTokens": "View all named tokens"
+  },
+  "metadata": {
+    "imprinted": "Imprinted",
+    "imprintedTooltip": "When this token was imprinted on-chain. Click to view the transaction.",
+    "cycle": "Cycle",
+    "cycleTooltip": "The Performance Cycle in which this token was allocated. Click to view cycle details.",
+    "recipient": "Recipient",
+    "recipientTooltip": "The address that originally received this token during the Performance Cycle.",
+    "owner": "Owner",
+    "ownerTooltip": "The current holder of this token. May differ from the recipient if the token was transferred.",
+    "roundNumber": "Round #{round}",
+    "seed": "Seed",
+    "seedTooltip": "The unique random seed used to generate this token's artwork and traits.",
+    "copySeed": "Copy seed"
+  },
+  "video": {
+    "watchAnimation": "Watch Animation",
+    "watchAnimationTooltip": "Each Cosmic Signature NFT has a unique generative animation derived from its seed. Click to watch."
+  },
+  "image": {
+    "defaultAlt": "NFT",
+    "artworkUnavailable": "Artwork unavailable"
+  }
+}

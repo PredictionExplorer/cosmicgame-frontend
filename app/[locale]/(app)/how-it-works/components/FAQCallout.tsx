@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { HelpCircle, ArrowRight } from 'lucide-react';
 
+import type { HowItWorksContent } from '@/content/how-it-works';
+
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 
@@ -11,7 +13,7 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
-export function FAQCallout() {
+export function FAQCallout({ faqCallout }: { faqCallout: HowItWorksContent['faqCallout'] }) {
   return (
     <motion.section
       aria-labelledby="faq-callout-heading"
@@ -32,18 +34,15 @@ export function FAQCallout() {
           id="faq-callout-heading"
           className="mt-4 font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          Have Questions?
+          {faqCallout.heading}
         </h2>
 
-        <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-          Read the FAQ for detailed answers on cycle mechanics, allocation tracks, tokens, and
-          everything else about Cosmic Signature.
-        </p>
+        <p className="mx-auto mt-3 max-w-md text-muted-foreground">{faqCallout.body}</p>
 
         <div className="mt-6">
           <Button asChild size="lg">
-            <Link href="/faq" className="inline-flex items-center gap-2">
-              Browse FAQ
+            <Link href={faqCallout.cta.href} className="inline-flex items-center gap-2">
+              {faqCallout.cta.label}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>

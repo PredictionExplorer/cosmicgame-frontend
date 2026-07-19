@@ -1,5 +1,6 @@
 import { type ChangeEvent } from 'react';
 import { ArrowRight, Pen, Send } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
@@ -36,14 +37,16 @@ export function NFTOwnerActions({
   onSetName,
   onClearName,
 }: NFTOwnerActionsProps) {
+  const t = useTranslations('detail');
+
   return (
     <div
       className="gradient-border-card rounded-xl bg-white/[0.02] p-6"
       data-testid="owner-actions"
     >
       <div className="flex items-center gap-2 mb-6">
-        <h3 className="text-lg font-semibold text-foreground">Manage Your Token</h3>
-        <InfoTooltip content="As the current owner, you can transfer this token to another address or set a custom name for it." />
+        <h3 className="text-lg font-semibold text-foreground">{t('ownerActions.title')}</h3>
+        <InfoTooltip content={t('ownerActions.titleTooltip')} />
       </div>
 
       {/* Transfer section */}
@@ -51,19 +54,19 @@ export function NFTOwnerActions({
         <div className="flex items-center gap-2 mb-3">
           <Send className="h-4 w-4 text-primary/70" />
           <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-            Transfer
+            {t('ownerActions.transferHeading')}
           </h4>
-          <InfoTooltip content="Send this token to another Ethereum address. Double-check the address before confirming — transfers are irreversible." />
+          <InfoTooltip content={t('ownerActions.transferTooltip')} />
         </div>
         <div className="flex gap-2">
           <Input
-            placeholder="Recipient address (0x...)"
+            placeholder={t('ownerActions.recipientPlaceholder')}
             className="flex-1 font-mono text-sm"
             value={address}
             onChange={(e) => onAddressChange(e.target.value)}
           />
           <Button variant="secondary" onClick={onTransfer} disabled={disabled}>
-            Transfer
+            {t('ownerActions.transferButton')}
             <ArrowRight className="ml-1.5 h-4 w-4" />
           </Button>
         </div>
@@ -76,13 +79,13 @@ export function NFTOwnerActions({
         <div className="flex items-center gap-2 mb-3">
           <Pen className="h-4 w-4 text-primary/70" />
           <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-            {nftTokenName ? 'Rename Token' : 'Name Token'}
+            {nftTokenName ? t('ownerActions.renameHeading') : t('ownerActions.nameHeading')}
           </h4>
-          <InfoTooltip content="Give your token a custom name (max 32 bytes). Named tokens appear on the Named NFTs page." />
+          <InfoTooltip content={t('ownerActions.nameTooltip')} />
         </div>
         <div className="flex gap-2">
           <Input
-            placeholder="Enter token name"
+            placeholder={t('ownerActions.namePlaceholder')}
             value={tokenName}
             className="flex-1"
             maxLength={32}
@@ -94,18 +97,18 @@ export function NFTOwnerActions({
             className="whitespace-nowrap"
             disabled={!tokenName}
           >
-            {nftTokenName === '' ? 'Set Name' : 'Change Name'}
+            {nftTokenName === '' ? t('ownerActions.setName') : t('ownerActions.changeName')}
           </Button>
           {nameHistoryCount > 0 && currentName && (
             <Button variant="outline" onClick={onClearName} className="whitespace-nowrap">
-              Clear
+              {t('ownerActions.clearName')}
             </Button>
           )}
         </div>
         <p className="text-xs text-muted-foreground mt-3">
-          There are {totalNamedTokens} tokens with a name.{' '}
+          {t('ownerActions.namedTokensCount', { count: totalNamedTokens })}{' '}
           <Link href="/named-nfts" className="text-primary hover:underline">
-            View all named tokens
+            {t('ownerActions.viewAllNamedTokens')}
           </Link>
         </p>
       </div>

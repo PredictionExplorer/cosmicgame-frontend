@@ -19,10 +19,16 @@ export const formatId = (id: number | string): string => {
   return `#${id.toString().padStart(6, '0')}`;
 };
 
-/** Converts Unix timestamp to locale-style date string (e.g., "Jan 01, 12:34"). */
+/**
+ * Converts Unix timestamp to a locale-style date string.
+ * `en` output is byte-identical to the historical format ("Jan 01, 12:34");
+ * `zh` renders "1月1日 12:34" (docs/i18n/README.md §4). Site-wide locale
+ * formatting lands in Sprint 5; only translated pages pass `locale` for now.
+ */
 export const convertTimestampToDateTime = (
   timestamp: number,
   showSecond: boolean = false,
+  locale: string = 'en',
 ): string => {
   const month_names = [
     'Jan',
@@ -40,12 +46,18 @@ export const convertTimestampToDateTime = (
   ];
 
   const date_ob = new Date(timestamp * 1000); // Convert to Date object
-  const month = month_names[date_ob.getMonth()];
-  const date = ('0' + date_ob.getDate()).slice(-2);
   const hours = ('0' + date_ob.getHours()).slice(-2);
   const minutes = ('0' + date_ob.getMinutes()).slice(-2);
   const seconds = ('0' + date_ob.getSeconds()).slice(-2);
-  let result = `${month} ${date}, ${hours}:${minutes}`;
+
+  let result: string;
+  if (locale === 'zh') {
+    result = `${date_ob.getMonth() + 1}月${date_ob.getDate()}日 ${hours}:${minutes}`;
+  } else {
+    const month = month_names[date_ob.getMonth()];
+    const date = ('0' + date_ob.getDate()).slice(-2);
+    result = `${month} ${date}, ${hours}:${minutes}`;
+  }
 
   if (showSecond) {
     result += `:${seconds}`;
@@ -54,8 +66,12 @@ export const convertTimestampToDateTime = (
   return result;
 };
 
-/** Converts seconds into a human-readable duration string (e.g., "1d 2h 30m 45s"). */
-export const formatSeconds = (seconds: number): string => {
+/**
+ * Converts seconds into a human-readable duration string.
+ * `en`: "1d 2h 30m 45s" (unchanged); `zh`: "1天2小时30分45秒"
+ * (docs/i18n/style-guide-zh.md §5 compact duration form).
+ */
+export const formatSeconds = (seconds: number, locale: string = 'en'): string => {
   if (seconds < 0) return ' ';
 
   let minutes = Math.floor(seconds / 60);
@@ -65,13 +81,18 @@ export const formatSeconds = (seconds: number): string => {
   let days = Math.floor(hours / 24);
   hours = hours % 24;
 
-  let str = '';
-  if (days) str += `${days}d `;
-  if (hours || (str && (minutes || seconds))) str += `${hours}h `;
-  if (minutes || (str && seconds)) str += `${minutes}m `;
-  if (seconds) str += `${seconds}s`;
+  const units =
+    locale === 'zh'
+      ? { d: '天', h: '小时', m: '分', s: '秒', sep: '' }
+      : { d: 'd', h: 'h', m: 'm', s: 's', sep: ' ' };
 
-  return str || '0s';
+  let str = '';
+  if (days) str += `${days}${units.d}${units.sep}`;
+  if (hours || (str && (minutes || seconds))) str += `${hours}${units.h}${units.sep}`;
+  if (minutes || (str && seconds)) str += `${minutes}${units.m}${units.sep}`;
+  if (seconds) str += `${seconds}${units.s}`;
+
+  return str || `0${units.s}`;
 };
 /**
  * Calculates the difference between the current time and a given timestamp.

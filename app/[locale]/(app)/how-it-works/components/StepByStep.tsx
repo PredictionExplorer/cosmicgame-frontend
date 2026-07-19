@@ -3,48 +3,10 @@
 import { motion } from 'framer-motion';
 import { Wallet, Search, MousePointerClick } from 'lucide-react';
 
+import type { HowItWorksContent } from '@/content/how-it-works';
+
 import { GradientText } from '@/components/styled';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-
-const steps = [
-  {
-    Icon: Wallet,
-    title: 'Connect Your Wallet',
-    highlights: [
-      'Click the "Connect Wallet" button at the top of the page.',
-      'Use a wallet that supports the Arbitrum blockchain, such as MetaMask.',
-      'Switch your network to Arbitrum when prompted, then approve permissions.',
-      'Your wallet address will appear in the header once connected.',
-    ],
-    tooltip:
-      'Arbitrum is a Layer 2 blockchain on Ethereum with lower gas fees and faster transactions.',
-  },
-  {
-    Icon: Search,
-    title: 'Check the Gesture Cost',
-    highlights: [
-      'Review the Cycle Finalization Time — every gesture adds the current time increment to the stored finalization time.',
-      'Check the current Gesture Cost in ETH or CST before committing.',
-      'Review the live Participation CST preview; the amount changes with time since the previous gesture.',
-      'Note the Signature Allocation amount to see the potential ETH distribution.',
-      'Ensure your wallet holds the Gesture Cost plus a small amount for gas fees.',
-    ],
-    tooltip:
-      'Gas fees on Arbitrum are typically a few cents \u2014 much cheaper than Ethereum mainnet.',
-  },
-  {
-    Icon: MousePointerClick,
-    title: 'Make Your Gesture',
-    highlights: [
-      'Choose ETH, optionally attach a Random Walk NFT for a 50% ETH Gesture Cost reduction, or make a CST (ERC-20) gesture.',
-      'Click "Gesture Now" and confirm the transaction in your wallet.',
-      'Your gesture extends the Cycle Finalization Time and updates the ETH/CST cost state.',
-      'Every gesture records a Stellar Selection entry and may imprint dynamic Participation CST automatically.',
-    ],
-    tooltip:
-      'Each Random Walk NFT can be used once for the 50% ETH Gesture Cost reduction - choose your moment wisely.',
-  },
-] as const;
 
 const containerVariants = {
   hidden: {},
@@ -56,7 +18,13 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
-export function StepByStep() {
+export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['stepByStep'] }) {
+  const steps = [
+    { Icon: Wallet, ...stepByStep.steps[0] },
+    { Icon: Search, ...stepByStep.steps[1] },
+    { Icon: MousePointerClick, ...stepByStep.steps[2] },
+  ];
+
   return (
     <section aria-labelledby="steps-heading" className="py-16">
       <div className="mb-10 text-center">
@@ -64,11 +32,9 @@ export function StepByStep() {
           id="steps-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          Getting Started
+          {stepByStep.heading}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          From wallet connection to your first gesture in three steps.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{stepByStep.subhead}</p>
       </div>
 
       <motion.div
@@ -92,7 +58,7 @@ export function StepByStep() {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <GradientText className="text-xs font-bold tracking-widest">
-                    STEP {String(i + 1).padStart(2, '0')}
+                    {stepByStep.stepLabel} {String(i + 1).padStart(2, '0')}
                   </GradientText>
                 </div>
                 <div className="mt-1 flex items-center gap-2">

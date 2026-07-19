@@ -213,7 +213,7 @@ describe('NFTTrait', () => {
     withNft();
     mockUseNameHistory.mockReturnValue({ data: [], isLoading: false, refetch: jest.fn() });
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('Unnamed Token')).toBeInTheDocument();
+    expect(screen.getByText('detail.hero.unnamedToken')).toBeInTheDocument();
   });
 
   it('renders token badges', () => {
@@ -227,21 +227,21 @@ describe('NFTTrait', () => {
     withDashboard();
     withNft({ Staked: false, WasUnstaked: false });
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('Eligible for Anchoring')).toBeInTheDocument();
+    expect(screen.getByText('detail.badges.eligibleForAnchoring')).toBeInTheDocument();
   });
 
   it('renders already anchored badge when anchored', () => {
     withDashboard();
     withNft({ Staked: true });
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('Already Anchored')).toBeInTheDocument();
+    expect(screen.getByText('detail.badges.alreadyAnchored')).toBeInTheDocument();
   });
 
   it('renders allocation type badge for Round Recipient', () => {
     withDashboard();
     withNft({ RecordType: 3 });
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('Cycle Recipient')).toBeInTheDocument();
+    expect(screen.getByText('detail.badges.cycleRecipient')).toBeInTheDocument();
   });
 
   it('renders NFT image', () => {

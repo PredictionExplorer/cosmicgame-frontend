@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getAssetsUrl, logoImgUrl } from '@/utils';
 
@@ -12,6 +13,10 @@ import DetailPage from './DetailPage';
 
 /** Avoid serving og:image / JSON-LD from an older build or data cache when CDN hosts change per network. */
 export const dynamic = 'force-dynamic';
+
+interface PageProps {
+  params: Promise<{ locale: string; id: string }>;
+}
 
 function parseTokenId(id: string): number | null {
   if (!/^\d+$/.test(id)) return null;
@@ -34,39 +39,41 @@ async function loadTokenInfo(tokenId: number): Promise<CSTTokenInfo | null | und
   }
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
-  const { id } = await params;
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale, id } = await params;
   const tokenId = parseTokenId(id);
 
   if (tokenId === null) {
     notFound();
   }
 
-  const title = `Cosmic Signature NFT #${id} | Cosmic Signature`;
-  const description = `Attributes and ownership history of Cosmic Signature NFT #${id} - a deterministic three-body NFT rendered spectrally on Arbitrum.`;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  const title = t('tokenDetail.titleFor', { id });
+  const description = t('tokenDetail.descriptionFor', { id });
 
   const tokenInfo = await loadTokenInfo(tokenId);
   if (tokenInfo === null) {
     notFound();
   }
 
-  return createMetadata(title, description, tokenImageUrl(tokenInfo?.Seed), '/detail/' + id);
+  return createMetadata(title, description, tokenImageUrl(tokenInfo?.Seed), '/detail/' + id, {
+    locale,
+  });
 }
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function Page({ params }: PageProps) {
+  const { locale, id } = await params;
   const tokenId = parseTokenId(id);
 
   if (tokenId === null) {
     notFound();
   }
 
-  const name = `Cosmic Signature NFT #${id}`;
-  const description = `Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics.`;
+  setRequestLocale(locale);
+  const [t, tCommon] = await Promise.all([getTranslations('detail'), getTranslations('common')]);
+
+  const name = t('jsonLd.productName', { id });
+  const description = t('jsonLd.productDescription');
   const tokenInfo = await loadTokenInfo(tokenId);
 
   if (tokenInfo === null) {
@@ -80,9 +87,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <JsonLd data={nftProductJsonLd({ tokenId, name, description, imageUrl })} />
       <JsonLd
         data={breadcrumbJsonLd([
-          { name: 'Home', path: '/' },
-          { name: 'Gallery', path: '/gallery' },
-          { name: `Token #${id}`, path: `/detail/${id}` },
+          { name: tCommon('breadcrumbs.home'), path: '/' },
+          { name: tCommon('breadcrumbs.gallery'), path: '/gallery' },
+          { name: t('jsonLd.breadcrumbToken', { id }), path: `/detail/${id}` },
         ])}
       />
       <DetailPage tokenId={tokenId} />

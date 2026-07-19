@@ -1,8 +1,9 @@
 'use client';
 
 import { ArrowUpRight, HeartHandshake, Vault } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { landingContentEn } from '@/content/landing';
+import { getLandingContent } from '@/content/landing';
 import { formatEthValue } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
@@ -26,6 +27,8 @@ export function PublicGoodsImpactCard({
   variant = 'default',
   className,
 }: PublicGoodsImpactCardProps) {
+  const t = useTranslations('home');
+  const locale = useLocale();
   const percentage = toNumber(data?.CharityPercentage);
 
   if (!data || percentage <= 0) {
@@ -68,7 +71,7 @@ export function PublicGoodsImpactCard({
       >
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[rgb(var(--impact-green-rgb))]">
-            Public Goods
+            {t('publicGoods.eyebrow')}
           </p>
           <h2
             id="public-goods-impact-heading"
@@ -77,11 +80,11 @@ export function PublicGoodsImpactCard({
               variant === 'rail' ? 'text-2xl' : 'text-2xl sm:text-3xl',
             )}
           >
-            Funding Ethereum&apos;s core contributors.
+            {t('publicGoods.heading')}
           </h2>
           <div className="mt-6">
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-              This cycle
+              {t('publicGoods.thisCycle')}
             </p>
             <p
               className={cn(
@@ -93,14 +96,15 @@ export function PublicGoodsImpactCard({
             </p>
           </div>
           <p className="mt-5 max-w-2xl text-sm leading-relaxed text-white/75">
-            {percentage.toFixed(percentage % 1 === 0 ? 0 : 2)}% of every Performance Cycle is
-            forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.
+            {t('publicGoods.body', {
+              percent: percentage.toFixed(percentage % 1 === 0 ? 0 : 2),
+            })}
           </p>
           <Link
             href="/public-goods-contributions-cg"
             className="mt-6 inline-flex items-center gap-2 rounded-full border border-[oklch(77.1%_0.163_161)]/40 bg-[rgb(var(--impact-green-rgb)/0.10)] px-5 py-2.5 text-sm font-medium text-[rgb(var(--impact-green-rgb))] transition hover:bg-[rgb(var(--impact-green-rgb)/0.18)]"
           >
-            View public-goods contributions
+            {t('publicGoods.cta')}
             <ArrowUpRight className="h-4 w-4" aria-hidden />
           </Link>
         </div>
@@ -112,31 +116,35 @@ export function PublicGoodsImpactCard({
           )}
         >
           <StatCard
-            label="Lifetime Contributed"
+            label={t('publicGoods.stats.lifetime')}
             value={formatEthValue(lifetimeContributedEth)}
             icon={<HeartHandshake className="h-4 w-4" />}
             accent="impact"
-            tooltip="Automatic protocol forwards plus voluntary public-goods contributions."
+            tooltip={t('publicGoods.stats.lifetimeTooltip')}
           />
           <StatCard
-            label="In Vault Now"
+            label={t('publicGoods.stats.vault')}
             value={formatEthValue(vaultBalanceEth)}
             icon={<Vault className="h-4 w-4" />}
             accent="impact"
-            tooltip="ETH currently held in the Public Goods Vault before retrieval."
+            tooltip={t('publicGoods.stats.vaultTooltip')}
           />
           <StatCard
-            label="Already Retrieved"
+            label={t('publicGoods.stats.retrieved')}
             value={formatEthValue(retrievedEth)}
             icon={<ArrowUpRight className="h-4 w-4" />}
             accent="impact"
-            tooltip="Total ETH retrieved from the Public Goods Vault for beneficiaries."
+            tooltip={t('publicGoods.stats.retrievedTooltip')}
           />
         </div>
       </div>
 
+      {/* Legal denial copy stays in the per-locale landing content modules
+          (content/landing/{en,zh}.ts): the message catalogs cannot carry
+          lexicon-allow pragmas, and the zh disclaimer there is already
+          reviewed legal copy. */}
       <p className="relative mt-6 border-t border-white/10 pt-4 text-xs leading-relaxed text-white/45">
-        {landingContentEn.publicGoods.disclaimer}
+        {getLandingContent(locale).publicGoods.disclaimer}
       </p>
     </section>
   );

@@ -3,50 +3,9 @@
 import { motion } from 'framer-motion';
 import { Coins, Ticket, ImageIcon, Trophy } from 'lucide-react';
 
-import { protocolFacts } from '@/content/protocol-facts';
+import type { HowItWorksContent } from '@/content/how-it-works';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-
-const rewards = [
-  {
-    Icon: Coins,
-    title: 'Dynamic Participation CST',
-    description:
-      'Each gesture may imprint CST based on how long it has been since the previous gesture.',
-    tooltip: `Participation CST uses a square-root formula: ${protocolFacts.dynamicCstRewardFormula}. Rapid gestures can receive 0 CST; longer quiet periods create larger imprints.`,
-    accent: 'from-cyan-400/20 to-blue-500/20',
-    iconColor: 'text-cyan-400',
-  },
-  {
-    Icon: Ticket,
-    title: 'Stellar Selection Entry',
-    description: 'Each gesture records an entry in Stellar Selection for end-of-cycle allocations.',
-    tooltip:
-      'When the cycle finalizes, entries are randomly selected: three participants share 4% of the Cycle Reserve in ETH.',
-    accent: 'from-purple-400/20 to-pink-500/20',
-    iconColor: 'text-purple-400',
-  },
-  {
-    Icon: ImageIcon,
-    title: 'Cosmic Signature NFT Selection',
-    description:
-      'Ten participants receive 1,000 CST and a unique Cosmic Signature NFT via Stellar Selection each cycle.',
-    tooltip:
-      'Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT each cycle.',
-    accent: 'from-amber-400/20 to-orange-500/20',
-    iconColor: 'text-amber-400',
-  },
-  {
-    Icon: Trophy,
-    title: 'Signature Allocation',
-    description:
-      'The participant who made the Final Gesture may retrieve 25% of the Cycle Reserve in ETH, 1,000 CST, and a Cosmic Signature NFT.',
-    tooltip:
-      'The Cycle Reserve grows from all gestures. The participant who made the Final Gesture retrieves the Signature Allocation via the protocol contract.',
-    accent: 'from-emerald-400/20 to-teal-500/20',
-    iconColor: 'text-emerald-400',
-  },
-] as const;
 
 const containerVariants = {
   hidden: {},
@@ -58,7 +17,38 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' as const } },
 };
 
-export function RewardBreakdown() {
+export function RewardBreakdown({
+  rewardBreakdown,
+}: {
+  rewardBreakdown: HowItWorksContent['rewardBreakdown'];
+}) {
+  const rewards = [
+    {
+      Icon: Coins,
+      accent: 'from-cyan-400/20 to-blue-500/20',
+      iconColor: 'text-cyan-400',
+      ...rewardBreakdown.items[0],
+    },
+    {
+      Icon: Ticket,
+      accent: 'from-purple-400/20 to-pink-500/20',
+      iconColor: 'text-purple-400',
+      ...rewardBreakdown.items[1],
+    },
+    {
+      Icon: ImageIcon,
+      accent: 'from-amber-400/20 to-orange-500/20',
+      iconColor: 'text-amber-400',
+      ...rewardBreakdown.items[2],
+    },
+    {
+      Icon: Trophy,
+      accent: 'from-emerald-400/20 to-teal-500/20',
+      iconColor: 'text-emerald-400',
+      ...rewardBreakdown.items[3],
+    },
+  ];
+
   return (
     <section aria-labelledby="rewards-heading" className="py-16">
       <div className="mb-10 text-center">
@@ -66,11 +56,9 @@ export function RewardBreakdown() {
           id="rewards-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          What Every Gesture Imprints
+          {rewardBreakdown.heading}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Participation imprints multiple allocation tracks per cycle.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{rewardBreakdown.subhead}</p>
       </div>
 
       <motion.div

@@ -19,24 +19,24 @@ const mockData = {
 describe('Allocation Breakdown', () => {
   it('renders section heading', () => {
     render(<Prize data={mockData} />);
-    expect(screen.getByText('Allocation Breakdown')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.title')).toBeInTheDocument();
   });
 
   it('renders Signature Allocation link', () => {
     render(<Prize data={mockData} />);
-    const main = screen.getByText('Signature Allocation');
+    const main = screen.getByText('home.allocation.cards.signature.name');
     expect(main.closest('a')).toHaveAttribute('href', '/faq#main-allocation');
   });
 
   it('renders Chrono-Warrior Allocation link', () => {
     render(<Prize data={mockData} />);
-    const chrono = screen.getByText('Chrono-Warrior Allocation');
+    const chrono = screen.getByText('home.allocation.cards.chronoWarrior.name');
     expect(chrono.closest('a')).toHaveAttribute('href', '/faq#chrono-warrior');
   });
 
   it('renders Endurance Champion link', () => {
     render(<Prize data={mockData} />);
-    const endurance = screen.getByText('Endurance Champion');
+    const endurance = screen.getByText('home.allocation.cards.endurance.name');
     expect(endurance.closest('a')).toHaveAttribute('href', '/faq#endurance-champion');
   });
 
@@ -59,51 +59,55 @@ describe('Allocation Breakdown', () => {
 
   it('displays allocation amounts from data', () => {
     render(<Prize data={mockData} />);
-    expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
-    expect(screen.getByText('0.7500 ETH')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.amounts.eth(amount=1.5000)')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.amounts.eth(amount=0.7500)')).toBeInTheDocument();
   });
 
   it('renders Public Goods with current-cycle amount and Protocol Guild label', () => {
     render(<Prize data={mockData} />);
-    const publicGoods = screen.getByText('Public Goods');
+    const publicGoods = screen.getByText('home.allocation.cards.publicGoods.name');
     expect(publicGoods.closest('a')).toHaveAttribute('href', '/faq');
-    expect(screen.getByText('0.7000 ETH')).toBeInTheDocument();
-    expect(screen.getByText('Protocol Guild')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.amounts.eth(amount=0.7000)')).toBeInTheDocument();
+    expect(
+      screen.getByText('home.allocation.cards.publicGoods.recipientLabel'),
+    ).toBeInTheDocument();
   });
 
   it('displays Stellar Selection recipient counts', () => {
     render(<Prize data={mockData} />);
-    expect(screen.getByText('5 recipients')).toBeInTheDocument();
-    expect(screen.getByText('3 recipients')).toBeInTheDocument();
-    expect(screen.getByText('2 recipients')).toBeInTheDocument();
-    expect(screen.getAllByText('1 recipient')).toHaveLength(4);
-    expect(screen.getByText('Proportional · all anchor-holders')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.recipientCount(count=5)')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.recipientCount(count=3)')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.recipientCount(count=2)')).toBeInTheDocument();
+    expect(screen.getAllByText('home.allocation.recipientCount(count=1)')).toHaveLength(4);
+    expect(
+      screen.getByText('home.allocation.cards.cosmicAnchor.recipientLabel'),
+    ).toBeInTheDocument();
   });
 
   it('calculates Chrono-Warrior ETH correctly', () => {
     render(<Prize data={mockData} />);
     const expected = ((10 * 5) / 100).toFixed(4);
-    expect(screen.getByText(`${expected} ETH`)).toBeInTheDocument();
+    expect(screen.getByText(`home.allocation.amounts.eth(amount=${expected})`)).toBeInTheDocument();
   });
 
   it('shows fixed Recognition CST amount for Endurance Champion and Final CST Gesture', () => {
     render(<Prize data={mockData} />);
-    const cstAmounts = screen.getAllByText('1,000 CST');
+    const cstAmounts = screen.getAllByText('home.allocation.amounts.fixedCst');
     expect(cstAmounts.length).toBe(4);
-    expect(screen.getAllByText('1,000 CST each')).toHaveLength(2);
+    expect(screen.getAllByText('home.allocation.amounts.fixedCstEach')).toHaveLength(2);
   });
 
   it('shows Chrono-Warrior ETH, CST, and NFT pieces', () => {
     render(<Prize data={mockData} />);
-    expect(screen.getByText('Chrono-Warrior Allocation')).toBeInTheDocument();
-    expect(screen.getByText('0.5000 ETH')).toBeInTheDocument();
-    expect(screen.getAllByText('1,000 CST')).toHaveLength(4);
-    expect(screen.getAllByText('1 Cosmic Signature NFT')).toHaveLength(4);
+    expect(screen.getByText('home.allocation.cards.chronoWarrior.name')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.amounts.eth(amount=0.5000)')).toBeInTheDocument();
+    expect(screen.getAllByText('home.allocation.amounts.fixedCst')).toHaveLength(4);
+    expect(screen.getAllByText('home.allocation.amounts.nft')).toHaveLength(4);
   });
 
   it('renders with null data without crashing', () => {
     render(<Prize data={null} />);
-    expect(screen.getByText('Allocation Breakdown')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.title')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

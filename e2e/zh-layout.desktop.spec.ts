@@ -78,3 +78,46 @@ test.describe('Sprint 1 Chinese layout QA', () => {
     });
   }
 });
+
+test.describe('Sprint 3 Chinese layout QA', () => {
+  for (const viewport of VIEWPORTS) {
+    test(`${viewport.name} keeps core dApp Chinese pages readable`, async ({ page }, testInfo) => {
+      await page.setViewportSize(viewport);
+
+      await page.goto('/zh');
+      await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+      await expect(page.getByText('落笔方式').first()).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-home-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+
+      await page.goto('/zh/current-cycle');
+      await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-current-cycle-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+
+      await page.goto('/zh/gallery');
+      // Visible gallery heading is an h2 (the h1 is the English SeoSummary until Sprint 7).
+      await expect(page.getByRole('heading', { name: 'NFT 画廊' })).toBeVisible();
+      await expect(page.getByText('铭刻总数', { exact: true }).first()).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-gallery-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+
+      await page.goto('/zh/how-it-works');
+      await expect(page.getByRole('heading', { level: 1, name: /运作原理/ })).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-how-it-works-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+    });
+  }
+});

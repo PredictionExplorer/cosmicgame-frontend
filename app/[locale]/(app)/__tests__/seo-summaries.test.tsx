@@ -143,14 +143,14 @@ describe('server-visible SEO summaries', () => {
       />,
     );
 
-    expect(screen.getByRole('region', { name: 'Shape the next Cosmic Signature' })).toHaveAttribute(
+    expect(screen.getByRole('region', { name: 'home.hero.phase.live.headline' })).toHaveAttribute(
       'aria-labelledby',
       'home-observatory-title',
     );
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Shape the next Cosmic Signature' }),
+      screen.getByRole('heading', { level: 1, name: 'home.hero.phase.live.headline' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /make a gesture/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /home\.hero\.phase\.live\.cta/ })).toHaveAttribute(
       'href',
       '#make-gesture',
     );

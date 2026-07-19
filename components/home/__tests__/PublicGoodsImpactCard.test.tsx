@@ -28,7 +28,7 @@ describe('PublicGoodsImpactCard', () => {
   it('renders the current-cycle public-goods ETH amount', () => {
     render(<PublicGoodsImpactCard data={dashboardData} />);
     expect(screen.getByText('8.6415 ETH')).toBeInTheDocument();
-    expect(screen.getByText(/7% of every Performance Cycle/)).toBeInTheDocument();
+    expect(screen.getByText('home.publicGoods.body(percent=7)')).toBeInTheDocument();
   });
 
   it('uses the full-width default layout by default', () => {
@@ -48,10 +48,8 @@ describe('PublicGoodsImpactCard', () => {
     expect(card).toHaveAttribute('data-variant', 'rail');
     expect(card).toHaveClass('p-5', 'sm:p-6', 'rail-companion-card');
     expect(card).not.toHaveClass('mt-10');
-    expect(
-      screen.getByRole('heading', { name: "Funding Ethereum's core contributors." }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /View public-goods contributions/ })).toHaveAttribute(
+    expect(screen.getByRole('heading', { name: 'home.publicGoods.heading' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /home\.publicGoods\.cta/ })).toHaveAttribute(
       'href',
       '/public-goods-contributions-cg',
     );
@@ -59,19 +57,26 @@ describe('PublicGoodsImpactCard', () => {
 
   it('renders supporting public-goods totals', () => {
     render(<PublicGoodsImpactCard data={dashboardData} />);
-    expect(screen.getByText('Lifetime Contributed')).toBeInTheDocument();
+    expect(screen.getByText('home.publicGoods.stats.lifetime')).toBeInTheDocument();
     expect(screen.getByText('11.23 ETH')).toBeInTheDocument();
-    expect(screen.getByText('In Vault Now')).toBeInTheDocument();
+    expect(screen.getByText('home.publicGoods.stats.vault')).toBeInTheDocument();
     expect(screen.getByText('0.5000 ETH')).toBeInTheDocument();
-    expect(screen.getByText('Already Retrieved')).toBeInTheDocument();
+    expect(screen.getByText('home.publicGoods.stats.retrieved')).toBeInTheDocument();
     expect(screen.getByText('2.5000 ETH')).toBeInTheDocument();
   });
 
   it('links to protocol public-goods contributions', () => {
     render(<PublicGoodsImpactCard data={dashboardData} />);
-    expect(screen.getByRole('link', { name: /View public-goods contributions/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /home\.publicGoods\.cta/ })).toHaveAttribute(
       'href',
       '/public-goods-contributions-cg',
+    );
+  });
+
+  it('keeps the English legal disclaimer from the landing content module', () => {
+    render(<PublicGoodsImpactCard data={dashboardData} />);
+    expect(screen.getByText(/not a charitable contribution in the U\.S\. tax sense/)).toHaveClass(
+      'text-white/45',
     );
   });
 

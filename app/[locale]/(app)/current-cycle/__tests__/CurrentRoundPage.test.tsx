@@ -134,43 +134,45 @@ describe('CurrentRoundPage', () => {
   it('renders error state on API failure', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false, isError: true });
     render(<CurrentRoundPage />);
-    expect(screen.getByText('Failed to load cycle data')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.error.title')).toBeInTheDocument();
   });
 
   it('renders error state when data is null', () => {
     mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false, isError: false });
     render(<CurrentRoundPage />);
-    expect(screen.getByText('Failed to load cycle data')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.error.title')).toBeInTheDocument();
   });
 
   it('renders round number in heading', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByText('Cycle #42')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.hero.title(n=42)')).toBeInTheDocument();
   });
 
   it('renders LIVE badge', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByTestId('live-badge')).toHaveTextContent('Live');
+    expect(screen.getByTestId('live-badge')).toHaveTextContent('currentCycle.hero.status.live');
   });
 
   it('renders gesture count in subtitle', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByText(/137 gestures made/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/currentCycle\.hero\.subtitle\(date=.+,count=137\)/),
+    ).toBeInTheDocument();
   });
 
   it('renders all 6 stat cards with correct values', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('Total Gestures')).toBeInTheDocument();
-    expect(screen.getByText('Cycle Reserve')).toBeInTheDocument();
-    expect(screen.getByText('Stellar Selection Pool')).toBeInTheDocument();
-    expect(screen.getByText('Public Goods')).toBeInTheDocument();
-    expect(screen.getByText('Contributed ETH')).toBeInTheDocument();
-    expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.stats.totalGestures.label')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.stats.cycleReserve.label')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.stats.stellarSelectionPool.label')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.stats.publicGoods.label')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.stats.contributedEth.label')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.stats.attachedNfts.label')).toBeInTheDocument();
   });
 
   it('displays formatted allocation pool value', () => {
@@ -200,14 +202,16 @@ describe('CurrentRoundPage', () => {
     });
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('Opening soon')).toBeInTheDocument();
-    expect(screen.getByText('Cycle opens in')).toBeInTheDocument();
-    expect(screen.getByText(/Cycle 42 opens at/)).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.hero.status.openingSoon')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.hero.countdown.opensIn')).toBeInTheDocument();
+    expect(
+      screen.getByText(/currentCycle\.hero\.countdown\.opensAt\(n=42,date=.+\)/),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('countdown')).toBeInTheDocument();
     expect(mockCountdownProps).toEqual(
       expect.arrayContaining([expect.objectContaining({ date: activationSec * 1000 })]),
     );
-    expect(screen.queryByText('Cycle finalizes in')).not.toBeInTheDocument();
+    expect(screen.queryByText('currentCycle.hero.countdown.finalizesIn')).not.toBeInTheDocument();
   });
 
   it('renders countdown timer when allocation time is in the future', () => {
@@ -220,7 +224,7 @@ describe('CurrentRoundPage', () => {
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('Cycle finalizes in')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.hero.countdown.finalizesIn')).toBeInTheDocument();
     expect(screen.getByTestId('countdown')).toBeInTheDocument();
     expect(mockCountdownProps).toEqual(
       expect.arrayContaining([expect.objectContaining({ date: futureTimeMs })]),
@@ -237,8 +241,8 @@ describe('CurrentRoundPage', () => {
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('Cycle Ready to Finalize')).toBeInTheDocument();
-    expect(screen.getByText('The finalization clock reached zero.')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.hero.countdown.readyTitle')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.hero.countdown.readyMessage')).toBeInTheDocument();
   });
 
   it('does not show countdown or exhausted state when no last participant', () => {
@@ -250,8 +254,8 @@ describe('CurrentRoundPage', () => {
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     render(<CurrentRoundPage />);
 
-    expect(screen.queryByText('Cycle finalizes in')).not.toBeInTheDocument();
-    expect(screen.queryByText('Cycle Ready to Finalize')).not.toBeInTheDocument();
+    expect(screen.queryByText('currentCycle.hero.countdown.finalizesIn')).not.toBeInTheDocument();
+    expect(screen.queryByText('currentCycle.hero.countdown.readyTitle')).not.toBeInTheDocument();
   });
 
   it('does not render duplicate standalone latest participant card', () => {
@@ -293,7 +297,7 @@ describe('CurrentRoundPage', () => {
   it('renders "Make a Gesture" CTA link', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    const cta = screen.getByRole('link', { name: /Make a Gesture/ });
+    const cta = screen.getByRole('link', { name: /currentCycle\.hero\.cta\.makeGesture/ });
     expect(cta).toBeInTheDocument();
     expect(cta).toHaveAttribute('href', '/');
   });
@@ -301,7 +305,7 @@ describe('CurrentRoundPage', () => {
   it('renders "Back to Home" navigation link', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    const link = screen.getByRole('link', { name: /Back to Home/ });
+    const link = screen.getByRole('link', { name: /currentCycle\.nav\.backToHome/ });
     expect(link).toHaveAttribute('href', '/');
   });
 
@@ -377,7 +381,7 @@ describe('CurrentRoundPage', () => {
   it('renders singular gesture text for 1 gesture', () => {
     setupLoaded({ CurNumBids: 1 });
     render(<CurrentRoundPage />);
-    expect(screen.getByText(/1 gesture made/)).toBeInTheDocument();
+    expect(screen.getByText(/currentCycle\.hero\.subtitle\(date=.+,count=1\)/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

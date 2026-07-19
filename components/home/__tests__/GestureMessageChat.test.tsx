@@ -49,10 +49,12 @@ describe('GestureMessageChat', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Gesture Chat' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'home.chat.title' })).toBeInTheDocument();
     expect(screen.getByText('First signal')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Open gesture 2' })).not.toBeInTheDocument();
-    expect(screen.getByText(/Cycle #7 · 1 message/)).toBeInTheDocument();
+    expect(
+      screen.getByText('home.chat.cycleNumber(number=7) · home.chat.messageCount(count=1)'),
+    ).toBeInTheDocument();
   });
 
   it('counts only visible messages in the header subtitle', () => {
@@ -67,7 +69,9 @@ describe('GestureMessageChat', () => {
       />,
     );
 
-    expect(screen.getByText(/Cycle #9 · 2 messages/)).toBeInTheDocument();
+    expect(
+      screen.getByText('home.chat.cycleNumber(number=9) · home.chat.messageCount(count=2)'),
+    ).toBeInTheDocument();
   });
 
   it('shows newest messages first regardless of input order', () => {
@@ -91,11 +95,9 @@ describe('GestureMessageChat', () => {
     const user = userEvent.setup();
     render(<GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} />);
 
-    await user.hover(screen.getByRole('button', { name: 'How to join Gesture Chat' }));
+    await user.hover(screen.getByRole('button', { name: 'home.chat.joinTooltipAria' }));
 
-    expect(
-      await screen.findAllByText(/Make a gesture and leave an optional message/),
-    ).not.toHaveLength(0);
+    expect(await screen.findAllByText('home.chat.joinTooltip')).not.toHaveLength(0);
   });
 
   it('renders the address, relative time, and message body', async () => {
@@ -122,7 +124,9 @@ describe('GestureMessageChat', () => {
       'href',
       `/user/${participant}`,
     );
-    const positionBadge = screen.getByRole('link', { name: 'Open gesture position 3' });
+    const positionBadge = screen.getByRole('link', {
+      name: 'home.chat.openPositionAria(position=3)',
+    });
     expect(positionBadge).toHaveAttribute('href', '/gesture/9');
     expect(positionBadge).toHaveTextContent('#3');
 
@@ -146,9 +150,9 @@ describe('GestureMessageChat', () => {
     );
 
     const badges = screen.getAllByTestId('gesture-method-badge').map((badge) => badge.textContent);
-    expect(badges).toContain('0.1 ETH');
-    expect(badges).toContain('20 CST');
-    expect(badges).toContain('0.05 ETH + RWLK');
+    expect(badges).toContain('home.chat.badge.eth(amount=0.1)');
+    expect(badges).toContain('home.chat.badge.cst(amount=20)');
+    expect(badges).toContain('home.chat.badge.ethRwlk(amount=0.05)');
   });
 
   it('copies the participant address from a message', async () => {
@@ -226,14 +230,12 @@ describe('GestureMessageChat', () => {
   it('shows an empty state when the current cycle has no messages', () => {
     render(<GestureMessageChat gestures={[makeGesture({ Message: '' })]} />);
 
-    expect(screen.getByText('No gesture messages yet')).toBeInTheDocument();
+    expect(screen.getByText('home.chat.empty.title')).toBeInTheDocument();
+    expect(screen.getByText('home.chat.empty.description')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        'Messages attached to current-cycle gestures will appear here, newest first.',
-      ),
+      screen.getByText('home.chat.currentCycle · home.chat.messageCount(count=0)'),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Current cycle · No messages yet/)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Make a Gesture' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'home.chat.empty.cta' })).not.toBeInTheDocument();
   });
 
   it('offers a Make a Gesture call to action in the empty state when wired', async () => {
@@ -242,7 +244,7 @@ describe('GestureMessageChat', () => {
 
     render(<GestureMessageChat gestures={[]} onJoinCta={onJoinCta} />);
 
-    await user.click(screen.getByRole('button', { name: 'Make a Gesture' }));
+    await user.click(screen.getByRole('button', { name: 'home.chat.empty.cta' }));
 
     expect(onJoinCta).toHaveBeenCalledTimes(1);
   });
@@ -263,7 +265,9 @@ describe('GestureMessageChat', () => {
       'xl:max-h-[calc(100vh-14rem)]',
       '2xl:max-h-[calc(100vh-15rem)]',
     );
-    expect(screen.getByLabelText(`Gesture message from ${participant}`)).toHaveClass('2xl:p-5');
+    expect(screen.getByLabelText(`home.chat.messageAria(address=${participant})`)).toHaveClass(
+      '2xl:p-5',
+    );
   });
 
   it('excludes messages for banned gestures', () => {

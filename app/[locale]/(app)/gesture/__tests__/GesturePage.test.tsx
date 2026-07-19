@@ -54,7 +54,7 @@ describe('GesturePage', () => {
   it('shows error for negative gesture id', () => {
     mockUseGestureInfo.mockReturnValue({ data: null, isLoading: false });
     render(<GesturePage gestureId={-1} />);
-    expect(screen.getByText('Invalid Gesture Id')).toBeInTheDocument();
+    expect(screen.getByText('gesture.invalid.title')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -66,13 +66,15 @@ describe('GesturePage', () => {
   it('shows "no gesture information" when data is null', () => {
     mockUseGestureInfo.mockReturnValue({ data: null, isLoading: false });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('No gesture information found.')).toBeInTheDocument();
+    expect(screen.getByText('gesture.empty.title')).toBeInTheDocument();
   });
 
   it('renders gesture details heading', () => {
     mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByRole('heading', { name: 'Gesture details', level: 1 })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'gesture.header.title', level: 1 }),
+    ).toBeInTheDocument();
   });
 
   it('shows the gesture position (bid_position) instead of the event-log id', () => {
@@ -81,8 +83,12 @@ describe('GesturePage', () => {
       isLoading: false,
     });
     render(<GesturePage gestureId={23514} />);
-    expect(screen.getAllByText('Gesture Position #7').length).toBeGreaterThanOrEqual(1);
-    expect(screen.queryByText('Gesture #23514')).not.toBeInTheDocument();
+    expect(
+      screen.getAllByText('gesture.header.positionLabel(position=7)').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.queryByText('gesture.header.positionLabel(position=23514)'),
+    ).not.toBeInTheDocument();
   });
 
   it('renders participant address', () => {
@@ -94,7 +100,10 @@ describe('GesturePage', () => {
   it('renders round number', () => {
     mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByRole('link', { name: /Cycle 5/i })).toHaveAttribute('href', '/allocation/5');
+    expect(screen.getByRole('link', { name: 'gesture.rows.cycleValue(round=5)' })).toHaveAttribute(
+      'href',
+      '/allocation/5',
+    );
   });
 
   it('renders ETH gesture cost for GestureType !== 2', () => {
@@ -130,9 +139,9 @@ describe('GesturePage', () => {
 
     render(<GesturePage gestureId={18482} />);
 
-    const costSection = screen.getByRole('region', { name: 'Cost and Participation CST' });
+    const costSection = screen.getByRole('region', { name: 'gesture.sections.cost.title' });
     expect(within(costSection).getByText('411.5278 CST')).toBeInTheDocument();
-    expect(within(costSection).getByText('Participation CST')).toBeInTheDocument();
+    expect(within(costSection).getByText('gesture.rows.participationCst')).toBeInTheDocument();
     expect(within(costSection).getByText('100.00 CST')).toBeInTheDocument();
     expect(within(costSection).queryByText('0.00 CST')).not.toBeInTheDocument();
   });
@@ -155,7 +164,7 @@ describe('GesturePage', () => {
 
     render(<GesturePage gestureId={18482} />);
 
-    const costSection = screen.getByRole('region', { name: 'Cost and Participation CST' });
+    const costSection = screen.getByRole('region', { name: 'gesture.sections.cost.title' });
     expect(within(costSection).getAllByText('—')).toHaveLength(2);
   });
 
@@ -168,8 +177,8 @@ describe('GesturePage', () => {
   it('shows "No" for ETH + RandomWalk attachment when RWalkNFTId < 0', () => {
     mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('Attached RandomWalk NFT to ETH gesture:')).toBeInTheDocument();
-    const noTexts = screen.getAllByText('No');
+    expect(screen.getByText('gesture.rows.attachedRandomWalk')).toBeInTheDocument();
+    const noTexts = screen.getAllByText('gesture.values.no');
     expect(noTexts.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -179,7 +188,7 @@ describe('GesturePage', () => {
       isLoading: false,
     });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('RandomWalkNFT ID:')).toBeInTheDocument();
+    expect(screen.getByText('gesture.rows.randomWalkId')).toBeInTheDocument();
     const matches = screen.getAllByText('42');
     expect(matches.length).toBeGreaterThanOrEqual(1);
   });
@@ -194,7 +203,7 @@ describe('GesturePage', () => {
       isLoading: false,
     });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('Attached ERC-20 Token Address:')).toBeInTheDocument();
+    expect(screen.getByText('gesture.rows.erc20Address')).toBeInTheDocument();
     expect(screen.getByText('0xToken')).toBeInTheDocument();
   });
 

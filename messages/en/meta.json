@@ -5,16 +5,13 @@
     "defaultDescription": "A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors."
   },
   "home": {
-    "title": "Cosmic Signature · Procedural On-Chain Art Protocol",
-    "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during a Performance Cycle; every gesture shapes the cycle's final Signature."
+    "title": "Cosmic Signature",
+    "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the Cycle Reserve distributes across allocation tracks — including Protocol Guild.",
+    "descriptionWithReserve": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the {reserve} Cycle Reserve distributes across allocation tracks — including Protocol Guild."
   },
   "gallery": {
-    "title": "Gallery · Cosmic Signature",
-    "description": "Explore every Cosmic Signature NFT — deterministic three-body orbits rendered spectrally on Arbitrum."
-  },
-  "currentCycle": {
-    "title": "Current Cycle · Cosmic Signature",
-    "description": "Live status of the active Performance Cycle: Gesture Cost, Cycle Finalization Time, and recent gestures."
+    "title": "Cosmic Signature Gallery | Deterministic Three-Body NFT Art",
+    "description": "Explore Cosmic Signature NFT artwork generated from deterministic three-body physics, on-chain seeds, spectral rendering, and Performance Cycle data."
   },
   "allocations": {
     "title": "Allocation Recipients · Cosmic Signature",
@@ -31,10 +28,6 @@
   "faq": {
     "title": "Clarifications · Cosmic Signature",
     "description": "Questions worth answering plainly about Cosmic Signature — what the protocol is, how gestures work, and what it is not."
-  },
-  "howItWorks": {
-    "title": "How It Works · Cosmic Signature",
-    "description": "Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window to final allocation distribution."
   },
   "myAllocations": {
     "title": "My Allocations · Cosmic Signature",
@@ -57,9 +50,12 @@
     "description": "Privacy practices for visitors to the Cosmic Signature protocol."
   },
   "tokenDetail": {
-    "titleFor": "Cosmic Signature NFT #{id} · Cosmic Signature",
-    "descriptionFor": "Attributes and ownership history of Cosmic Signature NFT #{id} - a deterministic three-body NFT rendered spectrally on Arbitrum.",
-    "fallbackDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body physics."
+    "titleFor": "Cosmic Signature NFT #{id} | Cosmic Signature",
+    "descriptionFor": "Attributes and ownership history of Cosmic Signature NFT #{id} - a deterministic three-body NFT rendered spectrally on Arbitrum."
+  },
+  "gestureDetail": {
+    "title": "Gesture Information | Cosmic Signature",
+    "description": "View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol."
   },
   "coordinationChanges": {
     "title": "Coordination Changes · Cosmic Signature",
@@ -78,7 +74,7 @@
     "description": "Protocol administration events and coordination parameter changes for a specific Cosmic Signature cycle."
   },
   "currentCycleFull": {
-    "title": "Current Cycle · Cosmic Signature",
+    "title": "Current Performance Cycle | Cosmic Signature",
     "description": "Full details for the active Performance Cycle: gesture history, leaderboards, attached contributions, and allocation distribution."
   },
   "allocationInfo": {

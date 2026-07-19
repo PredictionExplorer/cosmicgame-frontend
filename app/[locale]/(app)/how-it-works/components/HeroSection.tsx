@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 
+import type { HowItWorksContent } from '@/content/how-it-works';
+
 import { Link } from '@/i18n/navigation';
 import { GradientText } from '@/components/styled';
 import { Button } from '@/components/ui/button';
@@ -12,7 +14,7 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
 };
 
-export function HeroSection() {
+export function HeroSection({ hero }: { hero: HowItWorksContent['hero'] }) {
   return (
     <motion.section
       aria-labelledby="hero-heading"
@@ -45,7 +47,7 @@ export function HeroSection() {
         className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary"
       >
         <Sparkles className="h-3.5 w-3.5" />
-        Procedural On-Chain Art Protocol
+        {hero.badge}
       </motion.div>
 
       <motion.h1
@@ -53,9 +55,9 @@ export function HeroSection() {
         variants={fadeUp}
         className="relative mx-auto max-w-5xl font-display text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl"
       >
-        How Cosmic Signature{' '}
+        {hero.headingLead}{' '}
         <GradientText as="span" className="font-display">
-          Works
+          {hero.headingAccent}
         </GradientText>
       </motion.h1>
 
@@ -63,10 +65,7 @@ export function HeroSection() {
         variants={fadeUp}
         className="relative mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground"
       >
-        Gesture. Endure. Shape the Signature. Participants make gestures during a Performance Cycle.
-        When the Cycle Finalization Time expires, the cycle can be finalized and allocations
-        distribute across more than ten tracks &mdash; including the Signature Allocation, Anchor
-        Distributions, and Protocol Guild.
+        {hero.paragraph}
       </motion.p>
 
       <motion.div
@@ -74,10 +73,10 @@ export function HeroSection() {
         className="relative mt-9 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center"
       >
         <Button asChild size="lg">
-          <Link href="/">Open the Protocol</Link>
+          <Link href={hero.primaryCta.href}>{hero.primaryCta.label}</Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <a href="#protocol-overview">Learn More</a>
+          <a href={hero.secondaryCta.href}>{hero.secondaryCta.label}</a>
         </Button>
       </motion.div>
     </motion.section>

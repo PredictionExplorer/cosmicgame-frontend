@@ -1,0 +1,90 @@
+{
+  "jsonLd": {
+    "name": "Cosmic Signature Gallery"
+  },
+  "page": {
+    "eyebrowImprinted": "Collection · {count} NFTs Imprinted",
+    "eyebrowLive": "Collection · Live",
+    "title": "NFT Gallery",
+    "subtitle": "Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
+  },
+  "intro": {
+    "badge": "Generative archive",
+    "description": "Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed via three-body-problem physics simulations. In a typical cycle, 24 new NFTs are imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT Stellar Selection NFTs for RandomWalk NFT anchor-holders."
+  },
+  "featured": {
+    "viewAria": "View Cosmic Signature {id}",
+    "alt": "Cosmic Signature artwork {id}",
+    "emptyHint": "Real collection artwork appears here when indexed NFTs are available.",
+    "badgeImprint": "Featured imprint",
+    "badgeArchive": "Archive",
+    "awaitingMetadata": "Awaiting metadata"
+  },
+  "hero": {
+    "totalImprinted": {
+      "label": "Total Imprinted",
+      "tooltip": "The total number of COSMIC NFTs imprinted across all cycles"
+    },
+    "currentlyAnchored": {
+      "label": "Currently Anchored",
+      "tooltip": "NFTs anchored to the protocol, receiving distributions for their owners"
+    },
+    "namedNfts": {
+      "label": "Named NFTs",
+      "tooltip": "NFTs that have been given a unique custom name by their owner"
+    },
+    "cycles": {
+      "label": "Cycles",
+      "tooltip": "The number of unique cycles that have produced NFTs"
+    }
+  },
+  "card": {
+    "alt": "Cosmic Signature {id}",
+    "unnamed": "Unnamed",
+    "tooltips": {
+      "round": "Imprinted in cycle {round}",
+      "anchored": "Currently anchored and receiving Anchor Distributions",
+      "customName": "This NFT has a custom name",
+      "identifier": "Unique sequential identifier for this COSMIC NFT",
+      "mintedOn": "Imprinted on {date}"
+    }
+  },
+  "filters": {
+    "ariaLabel": "Filter NFTs",
+    "all": {
+      "label": "All",
+      "tooltip": "Show all NFTs in the collection"
+    },
+    "anchored": {
+      "label": "Anchored",
+      "tooltip": "NFTs currently anchored and receiving Anchor Distributions"
+    },
+    "named": {
+      "label": "Named",
+      "tooltip": "NFTs given a custom name by their owner"
+    }
+  },
+  "sort": {
+    "ariaLabel": "Sort order",
+    "tooltip": "Change the order NFTs are displayed",
+    "newest": "Newest First",
+    "oldest": "Oldest First",
+    "cycleDesc": "Cycle (High → Low)",
+    "cycleAsc": "Cycle (Low → High)"
+  },
+  "view": {
+    "ariaLabel": "View mode",
+    "grid": "Grid view",
+    "list": "List view"
+  },
+  "pagination": {
+    "showing": "Showing <value>{start}</value> - <value>{end}</value> of <value>{total}</value> NFTs",
+    "perPage": "Per page",
+    "perPageAria": "Items per page",
+    "perPageTooltip": "Number of NFTs displayed per page"
+  },
+  "empty": {
+    "title": "No NFTs found",
+    "description": "Try adjusting your search or filters to find what you're looking for."
+  }
+}

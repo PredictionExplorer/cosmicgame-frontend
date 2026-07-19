@@ -26,7 +26,7 @@ describe('NFTVideo', () => {
 
   it('renders "Watch Animation" heading', () => {
     render(<NFTVideo {...defaultProps} />);
-    expect(screen.getByText('Watch Animation')).toBeInTheDocument();
+    expect(screen.getByText('detail.video.watchAnimation')).toBeInTheDocument();
   });
 
   it('renders the thumbnail image', () => {

@@ -1,5 +1,7 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
+
 import {
   Pagination,
   PaginationContent,
@@ -49,20 +51,24 @@ export function GalleryPagination({
   onPageChange,
   onPerPageChange,
 }: GalleryPaginationProps) {
+  const t = useTranslations('gallery');
+  const locale = useLocale();
+
   if (totalItems === 0) return null;
 
+  const numberLocale = locale === 'zh' ? 'zh-CN' : 'en-US';
   const startItem = (currentPage - 1) * perPage + 1;
   const endItem = Math.min(currentPage * perPage, totalItems);
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-10">
       <p className="text-xs text-muted-foreground order-2 sm:order-1">
-        Showing <span className="font-medium text-foreground">{startItem.toLocaleString()}</span>
-        {' - '}
-        <span className="font-medium text-foreground">{endItem.toLocaleString()}</span>
-        {' of '}
-        <span className="font-medium text-foreground">{totalItems.toLocaleString()}</span>
-        {' NFTs'}
+        {t.rich('pagination.showing', {
+          start: startItem.toLocaleString(numberLocale),
+          end: endItem.toLocaleString(numberLocale),
+          total: totalItems.toLocaleString(numberLocale),
+          value: (chunks) => <span className="font-medium text-foreground">{chunks}</span>,
+        })}
       </p>
 
       {totalPages > 1 && (
@@ -103,11 +109,11 @@ export function GalleryPagination({
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="order-3 flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Per page</span>
+            <span className="text-xs text-muted-foreground">{t('pagination.perPage')}</span>
             <Select value={String(perPage)} onValueChange={(v) => onPerPageChange(Number(v))}>
               <SelectTrigger
                 className="w-[70px] h-8 text-xs border-white/[0.06] bg-white/[0.03]"
-                aria-label="Items per page"
+                aria-label={t('pagination.perPageAria')}
               >
                 <SelectValue />
               </SelectTrigger>
@@ -122,7 +128,7 @@ export function GalleryPagination({
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom">
-          <p>Number of NFTs displayed per page</p>
+          <p>{t('pagination.perPageTooltip')}</p>
         </TooltipContent>
       </Tooltip>
     </div>

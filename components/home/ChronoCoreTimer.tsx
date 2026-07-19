@@ -2,6 +2,7 @@
 
 import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight, Clock3 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import Counter from '@/components/common/Counter';
@@ -26,17 +27,16 @@ interface ChronoCoreTimerProps {
 }
 
 interface PhaseView {
-  eyebrow: string;
-  label: string;
-  status: string;
-  tooltip: string;
+  /** Message key segment under `home.chrono.phase.*`. */
+  messageKey: string;
+  /** Whether this phase renders a static display text instead of a countdown. */
+  hasDisplayText: boolean;
   toneClass: string;
   haloClass: string;
   glowClass: string;
   pulseClass: string;
   clockTextClass: string;
   iconClass: string;
-  displayText?: string;
 }
 
 export function getChronoCorePhase({
@@ -53,12 +53,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
   switch (phase) {
     case 'loading':
       return {
-        eyebrow: 'Cycle clock syncing',
-        label: 'Syncing',
-        status: 'Reading the live cycle timer.',
-        tooltip:
-          'The app is synchronizing with protocol time before showing the current cycle state.',
-        displayText: 'Syncing',
+        messageKey: 'loading',
+        hasDisplayText: true,
         toneClass: 'border-white/[0.10] bg-white/[0.03]',
         haloClass: 'border-white/10 bg-white/[0.02]',
         glowClass: 'shadow-[0_0_80px_rgb(var(--aurora-cyan-rgb)/0.16)]',
@@ -68,12 +64,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       };
     case 'unavailable':
       return {
-        eyebrow: 'Cycle clock unavailable',
-        label: 'Clock unavailable',
-        status: 'Live timer temporarily unavailable.',
-        tooltip:
-          'The live cycle clock could not be reached. Open cycle details for the latest indexed state.',
-        displayText: 'Syncing',
+        messageKey: 'unavailable',
+        hasDisplayText: true,
         toneClass: 'border-white/[0.10] bg-white/[0.025]',
         haloClass: 'border-white/10 bg-white/[0.015]',
         glowClass: 'shadow-[0_0_60px_rgb(255_255_255/0.08)]',
@@ -83,11 +75,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       };
     case 'opening-soon':
       return {
-        eyebrow: 'Next cycle opens in',
-        label: 'Opening soon',
-        status: 'Waiting for the next cycle. Gestures open when this countdown reaches zero.',
-        tooltip:
-          'This clock counts down to cycle opening. Once it reaches zero, the first Gesture can start the finalization clock.',
+        messageKey: 'openingSoon',
+        hasDisplayText: false,
         toneClass:
           'border-emerald-300/35 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.13))]',
         haloClass: 'border-emerald-300/35 bg-emerald-400/[0.055]',
@@ -99,12 +88,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       };
     case 'waiting-first-gesture':
       return {
-        eyebrow: 'Cycle is open',
-        label: 'Awaiting first Gesture',
-        status: 'Cycle is open. The first Gesture starts the finalization clock.',
-        tooltip:
-          'No finalization countdown is running yet. The first Gesture starts the cycle timer and begins shaping this Signature.',
-        displayText: 'Awaiting first Gesture',
+        messageKey: 'waitingFirstGesture',
+        hasDisplayText: true,
         toneClass:
           'border-emerald-300/30 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.13),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.12))]',
         haloClass: 'border-emerald-300/30 bg-emerald-400/[0.045]',
@@ -116,11 +101,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       };
     case 'approach':
       return {
-        eyebrow: 'Cycle finalizes in',
-        label: 'Under 12 hours',
-        status: 'Cycle is live. Each Gesture can extend the finalization clock.',
-        tooltip:
-          'This is the Cycle Finalization Time. When it reaches zero, the Final Gesture participant may finalize the cycle.',
+        messageKey: 'approach',
+        hasDisplayText: false,
         toneClass:
           'border-primary/35 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.14))]',
         haloClass: 'border-primary/30 bg-primary/[0.045]',
@@ -131,11 +113,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       };
     case 'final-hour':
       return {
-        eyebrow: 'Final hour',
-        label: 'Final hour',
-        status: 'Less than one hour remains before this cycle can finalize.',
-        tooltip:
-          'The finalization clock is under one hour. New Gestures can still extend the Cycle Finalization Time.',
+        messageKey: 'finalHour',
+        hasDisplayText: false,
         toneClass:
           'border-[rgb(var(--solar-gold-rgb)/0.42)] bg-[linear-gradient(135deg,rgb(var(--solar-gold-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.13))]',
         haloClass: 'border-[rgb(var(--solar-gold-rgb)/0.36)] bg-[rgb(var(--solar-gold-rgb)/0.045)]',
@@ -146,11 +125,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       };
     case 'final-ten':
       return {
-        eyebrow: 'Final 10 minutes',
-        label: 'Final 10 minutes',
-        status: 'Final minutes. Every Gesture can still change the ending.',
-        tooltip:
-          'The cycle is inside the final ten minutes. The clock is urgent, but a new Gesture can still extend it.',
+        messageKey: 'finalTen',
+        hasDisplayText: false,
         toneClass:
           'border-[rgb(var(--chrono-rose-rgb)/0.46)] bg-[linear-gradient(135deg,rgb(var(--chrono-rose-rgb)/0.18),rgb(var(--cosmic-indigo-rgb)/0.36),rgb(var(--nebula-violet-rgb)/0.18))]',
         haloClass:
@@ -162,11 +138,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       };
     case 'final-minute':
       return {
-        eyebrow: 'Final minute',
-        label: 'Final minute',
-        status: 'Final minute. Tenths are live.',
-        tooltip:
-          'The finalization clock is in its last minute. If it reaches zero, the cycle becomes ready to finalize.',
+        messageKey: 'finalMinute',
+        hasDisplayText: false,
         toneClass:
           'border-red-400/55 bg-[linear-gradient(135deg,rgb(var(--chrono-rose-rgb)/0.24),rgb(127_29_29/0.32),rgb(var(--nebula-violet-rgb)/0.20))]',
         haloClass: 'border-red-400/45 bg-red-500/[0.055]',
@@ -177,12 +150,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       };
     case 'ready-to-finalize':
       return {
-        eyebrow: 'Cycle ready to finalize',
-        label: 'Ready',
-        status: 'Finalization is ready. A new Gesture can still extend the cycle.',
-        tooltip:
-          'The Cycle Finalization Time reached zero. The Final Gesture participant may finalize; after the exclusivity window, anyone may finalize and receives the Signature Allocation. Gestures remain possible until finalization executes.',
-        displayText: '00:00',
+        messageKey: 'readyToFinalize',
+        hasDisplayText: true,
         toneClass:
           'border-emerald-400/35 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.11))]',
         haloClass: 'border-emerald-300/35 bg-emerald-400/[0.045]',
@@ -194,11 +163,8 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
     case 'live':
     default:
       return {
-        eyebrow: 'Cycle finalizes in',
-        label: 'Cycle is live',
-        status: 'Cycle is live. Each Gesture can extend the finalization clock.',
-        tooltip:
-          'This is the Cycle Finalization Time. When it reaches zero, the Final Gesture participant may finalize the cycle.',
+        messageKey: 'live',
+        hasDisplayText: false,
         toneClass:
           'border-primary/25 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.12),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.13))]',
         haloClass: 'border-primary/25 bg-primary/[0.035]',
@@ -219,9 +185,17 @@ export function ChronoCoreTimer({
   canOpenGesturePanel,
   onPrimaryCtaClick,
 }: ChronoCoreTimerProps) {
+  const t = useTranslations('home');
   const cycleState = getCycleState({ data, loading, allocationTime, activationTime, now });
   const phase = cycleState.phase;
   const view = viewForPhase(phase);
+  const eyebrow = t(`chrono.phase.${view.messageKey}.eyebrow`);
+  const label = t(`chrono.phase.${view.messageKey}.label`);
+  const status = t(`chrono.phase.${view.messageKey}.status`);
+  const tooltip = t(`chrono.phase.${view.messageKey}.tooltip`);
+  const displayText = view.hasDisplayText
+    ? t(`chrono.phase.${view.messageKey}.display`)
+    : undefined;
   const targetMs = cycleState.isOpeningSoon
     ? (cycleState.activationTime ?? activationTime) * 1000
     : allocationTime;
@@ -233,16 +207,16 @@ export function ChronoCoreTimer({
   );
   const primaryHref = canOpenGesturePanel ? '#make-gesture' : '/current-cycle';
   const primaryLabel = isReady
-    ? 'Finalize Cycle'
+    ? t('chrono.cta.finalize')
     : phase === 'waiting-first-gesture' && canOpenGesturePanel
-      ? 'Make the first Gesture'
+      ? t('chrono.cta.makeFirstGesture')
       : canOpenGesturePanel
-        ? 'Make a Gesture'
-        : 'View Cycle';
+        ? t('chrono.cta.makeGesture')
+        : t('chrono.cta.viewCycle');
 
   return (
     <section
-      aria-label="Cycle Finalization Time"
+      aria-label={t('chrono.sectionAria')}
       className="print-motion-visible relative z-[1] mb-8"
       data-testid="chrono-core-timer"
       data-phase={phase}
@@ -266,8 +240,8 @@ export function ChronoCoreTimer({
         <div className="relative mx-auto max-w-5xl px-4 py-7 text-center sm:px-8 sm:py-10">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.045] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
             <Clock3 className={cn('h-3.5 w-3.5', view.iconClass)} aria-hidden />
-            {view.eyebrow}
-            <InfoTooltip content={view.tooltip} className="ml-0" />
+            {eyebrow}
+            <InfoTooltip content={tooltip} className="ml-0" />
           </div>
 
           <div className="relative mx-auto max-w-4xl">
@@ -278,7 +252,7 @@ export function ChronoCoreTimer({
               )}
               role="timer"
               aria-live="off"
-              aria-label={`${view.label}. ${view.status}`}
+              aria-label={t('chrono.timerAria', { label, status })}
             >
               {showCountdown ? (
                 <SmoothCountdown date={targetMs} renderer={renderMonumentCounter} />
@@ -290,7 +264,7 @@ export function ChronoCoreTimer({
                       view.clockTextClass,
                     )}
                   >
-                    {view.displayText}
+                    {displayText}
                   </p>
                 </div>
               )}
@@ -311,7 +285,7 @@ export function ChronoCoreTimer({
                   : undefined,
               )}
             >
-              {view.status}
+              {status}
             </span>
             {onPrimaryCtaClick && primaryHref === '#make-gesture' ? (
               <button

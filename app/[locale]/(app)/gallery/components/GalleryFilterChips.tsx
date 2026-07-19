@@ -1,6 +1,7 @@
 'use client';
 
 import { Layers, Lock, Tag } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,20 +13,31 @@ interface GalleryFilterChipsProps {
   onChange: (filter: FilterKey) => void;
 }
 
-const filters: { key: FilterKey; label: string; icon: typeof Layers; tooltip: string }[] = [
-  { key: 'all', label: 'All', icon: Layers, tooltip: 'Show all NFTs in the collection' },
+const filters: { key: FilterKey; labelKey: string; icon: typeof Layers; tooltipKey: string }[] = [
+  { key: 'all', labelKey: 'filters.all.label', icon: Layers, tooltipKey: 'filters.all.tooltip' },
   {
     key: 'staked',
-    label: 'Anchored',
+    labelKey: 'filters.anchored.label',
     icon: Lock,
-    tooltip: 'NFTs currently anchored and receiving Anchor Distributions',
+    tooltipKey: 'filters.anchored.tooltip',
   },
-  { key: 'named', label: 'Named', icon: Tag, tooltip: 'NFTs given a custom name by their owner' },
+  {
+    key: 'named',
+    labelKey: 'filters.named.label',
+    icon: Tag,
+    tooltipKey: 'filters.named.tooltip',
+  },
 ];
 
 export function GalleryFilterChips({ value, onChange }: GalleryFilterChipsProps) {
+  const t = useTranslations('gallery');
+
   return (
-    <div className="flex items-center gap-1.5" role="radiogroup" aria-label="Filter NFTs">
+    <div
+      className="flex items-center gap-1.5"
+      role="radiogroup"
+      aria-label={t('filters.ariaLabel')}
+    >
       {filters.map((f) => {
         const Icon = f.icon;
         const isActive = value === f.key;
@@ -45,11 +57,11 @@ export function GalleryFilterChips({ value, onChange }: GalleryFilterChipsProps)
                 )}
               >
                 <Icon className="h-3 w-3" />
-                {f.label}
+                {t(f.labelKey)}
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <p>{f.tooltip}</p>
+              <p>{t(f.tooltipKey)}</p>
             </TooltipContent>
           </Tooltip>
         );

@@ -1,3 +1,5 @@
+import { howItWorksContentEn } from '@/content/how-it-works';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import HowToPlayPage from '../HowToPlayPage';
@@ -45,50 +47,50 @@ jest.mock('next/link', () => ({
 
 describe('HowToPlayPage', () => {
   it('renders the hero section', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'How Cosmic Signature Works',
     );
   });
 
   it('renders the game overview section', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     expect(screen.getByText('How It Works')).toBeInTheDocument();
   });
 
   it('renders the reward breakdown section', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     expect(screen.getByText('What Every Gesture Imprints')).toBeInTheDocument();
   });
 
   it('renders the game cycle section', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     expect(screen.getByText('Lifecycle of a Performance Cycle')).toBeInTheDocument();
   });
 
   it('renders the step-by-step section', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     expect(screen.getByText('Getting Started')).toBeInTheDocument();
   });
 
   it('renders the pro tips section', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     expect(screen.getByText('Pro Tips & Strategy')).toBeInTheDocument();
   });
 
   it('renders the FAQ callout section', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     expect(screen.getByText('Have Questions?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Browse FAQ/i })).toHaveAttribute('href', '/faq');
   });
 
   it('renders the CTA section', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     expect(screen.getByText('Ready to Make Your First Gesture?')).toBeInTheDocument();
   });
 
   it('has correct heading hierarchy with all section headings', () => {
-    render(<HowToPlayPage />);
+    render(<HowToPlayPage content={howItWorksContentEn} />);
     const h1 = screen.getByRole('heading', { level: 1 });
     expect(h1).toBeInTheDocument();
 
@@ -97,13 +99,13 @@ describe('HowToPlayPage', () => {
   });
 
   it('renders section dividers between sections', () => {
-    const { container } = render(<HowToPlayPage />);
+    const { container } = render(<HowToPlayPage content={howItWorksContentEn} />);
     const dividers = container.querySelectorAll('[class*="bg-gradient-to-r"]');
     expect(dividers.length).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<HowToPlayPage />);
+    const { container } = render(<HowToPlayPage content={howItWorksContentEn} />);
     await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

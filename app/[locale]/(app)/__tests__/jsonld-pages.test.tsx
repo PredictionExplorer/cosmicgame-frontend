@@ -61,56 +61,61 @@ function renderJsonLd(ui: React.ReactElement): JsonLdNode[] {
   return nodes;
 }
 
+/**
+ * Locale-aware pages (Sprint 3) export async components that take `params`;
+ * pre-i18n pages still render synchronously. Each case provides a factory so
+ * both shapes share the assertions.
+ */
 const cases: Array<{
   name: string;
-  page: React.ReactElement;
+  renderPage: () => Promise<React.ReactElement> | React.ReactElement;
   expectedType: string;
   expectedUrl: string;
 }> = [
   {
     name: 'how-it-works',
-    page: <HowItWorksPage />,
+    renderPage: () => HowItWorksPage({ params: Promise.resolve({ locale: 'en' }) }),
     expectedType: 'WebPage',
     expectedUrl: `${APP_ORIGIN}/how-it-works`,
   },
   {
     name: 'gallery',
-    page: <GalleryPage />,
+    renderPage: () => GalleryPage({ params: Promise.resolve({ locale: 'en' }) }),
     expectedType: 'CollectionPage',
     expectedUrl: `${APP_ORIGIN}/gallery`,
   },
   {
     name: 'contracts',
-    page: <ContractsPage />,
+    renderPage: () => <ContractsPage />,
     expectedType: 'WebPage',
     expectedUrl: `${APP_ORIGIN}/contracts`,
   },
   {
     name: 'code',
-    page: <CodePage />,
+    renderPage: () => <CodePage />,
     expectedType: 'WebPage',
     expectedUrl: `${APP_ORIGIN}/code`,
   },
 ];
 
-describe.each(cases)('$name page JSON-LD', ({ page, expectedType, expectedUrl }) => {
-  it(`emits ${expectedType} pointing at its canonical URL`, () => {
-    const nodes = renderJsonLd(page);
+describe.each(cases)('$name page JSON-LD', ({ renderPage, expectedType, expectedUrl }) => {
+  it(`emits ${expectedType} pointing at its canonical URL`, async () => {
+    const nodes = renderJsonLd(await renderPage());
     const pageNode = nodes.find((node) => node['@type'] === expectedType);
     expect(pageNode).toBeDefined();
     expect(pageNode!.url).toBe(expectedUrl);
   });
 
-  it('emits a BreadcrumbList that starts at the app home', () => {
-    const nodes = renderJsonLd(page);
+  it('emits a BreadcrumbList that starts at the app home', async () => {
+    const nodes = renderJsonLd(await renderPage());
     const breadcrumb = nodes.find((node) => node['@type'] === 'BreadcrumbList');
     expect(breadcrumb).toBeDefined();
     expect(breadcrumb!.itemListElement?.[0]?.item).toBe(`${APP_ORIGIN}/`);
     expect(breadcrumb!.itemListElement?.[1]?.item).toBe(expectedUrl);
   });
 
-  it('renders the page body alongside the structured data', () => {
-    const { getByTestId, unmount } = render(page);
+  it('renders the page body alongside the structured data', async () => {
+    const { getByTestId, unmount } = render(await renderPage());
     expect(getByTestId('page-body')).toBeInTheDocument();
     unmount();
   });

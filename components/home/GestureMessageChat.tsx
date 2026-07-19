@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Check, Copy, Info, MessageCircle, Radio } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import {
   convertTimestampToDateTime,
@@ -38,8 +38,8 @@ interface GestureChatMessage {
   message: string;
 }
 
-function formatGestureMessageTimestamp(timestamp: number) {
-  const display = convertTimestampToDateTime(timestamp, true);
+function formatGestureMessageTimestamp(timestamp: number, locale: string) {
+  const display = convertTimestampToDateTime(timestamp, true, locale);
   const [date = display, time = ''] = display.split(', ');
 
   return {
@@ -50,25 +50,34 @@ function formatGestureMessageTimestamp(timestamp: number) {
   };
 }
 
-/** Compact method badge text: cost + unit when known (e.g. "0.1 ETH + RWLK"), else just the method. */
-function getGestureMethodBadgeLabel(gesture: GestureInfo): string {
+/**
+ * Compact method badge descriptor: cost + unit message when known
+ * (e.g. "0.1 ETH + RWLK"), else just the method fallback message.
+ */
+function getGestureMethodBadge(gesture: GestureInfo): {
+  messageKey: 'eth' | 'ethFallback' | 'ethRwlk' | 'rwlkFallback' | 'cst' | 'cstFallback';
+  amount?: string;
+} {
   const typeCode = resolveGestureTypeCode(gesture);
   if (typeCode === 2) {
     const cost =
       typeof gesture.CstCost === 'number' && gesture.CstCost >= 0 ? gesture.CstCost : null;
-    return cost != null ? `${formatTableAmount(cost)} CST` : 'CST';
+    return cost != null
+      ? { messageKey: 'cst', amount: formatTableAmount(cost) }
+      : { messageKey: 'cstFallback' };
   }
   const cost =
     typeof gesture.GestureCostEth === 'number' && gesture.GestureCostEth >= 0
       ? gesture.GestureCostEth
       : null;
-  const base = cost != null ? `${formatTableAmount(cost)} ETH` : 'ETH';
-  return typeCode === 1 ? `${base} + RWLK` : base;
-}
-
-function getMessageCountLabel(count: number): string {
-  if (count === 0) return 'No messages yet';
-  return count === 1 ? '1 message' : `${count} messages`;
+  if (typeCode === 1) {
+    return cost != null
+      ? { messageKey: 'ethRwlk', amount: formatTableAmount(cost) }
+      : { messageKey: 'rwlkFallback' };
+  }
+  return cost != null
+    ? { messageKey: 'eth', amount: formatTableAmount(cost) }
+    : { messageKey: 'ethFallback' };
 }
 
 function CopyAddressButton({ address }: { address: string }) {
@@ -121,6 +130,8 @@ export function GestureMessageChat({
   pulseKey = 0,
   onJoinCta,
 }: GestureMessageChatProps) {
+  const t = useTranslations('home');
+  const locale = useLocale();
   const { data: bannedGestures } = useBannedGestures();
   const bannedGestureIds = useMemo(
     () => new Set((bannedGestures ?? []).map((gesture) => gesture.bid_id)),
@@ -155,37 +166,36 @@ export function GestureMessageChat({
                     <span className="absolute inline-flex h-full w-full animate-live-dot rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300" />
                   </span>
-                  Live Feed
+                  {t('chat.liveFeed')}
                 </div>
                 <div className="flex items-center gap-2">
                   <h2
                     id="gesture-message-chat-title"
                     className="font-display text-xl font-bold tracking-tight"
                   >
-                    Gesture Chat
+                    {t('chat.title')}
                   </h2>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
                         type="button"
-                        aria-label="How to join Gesture Chat"
+                        aria-label={t('chat.joinTooltipAria')}
                         className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       >
                         <Info className="h-3.5 w-3.5" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="max-w-[240px]">
-                        Want to join the chat? Make a gesture and leave an optional message.
-                        Messages attached to gestures appear here.
-                      </p>
+                      <p className="max-w-[240px]">{t('chat.joinTooltip')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {cycleNumber != null ? `Cycle #${cycleNumber}` : 'Current cycle'}
+                  {cycleNumber != null
+                    ? t('chat.cycleNumber', { number: String(cycleNumber) })
+                    : t('chat.currentCycle')}
                   {' \u00b7 '}
-                  {getMessageCountLabel(messages.length)}
+                  {t('chat.messageCount', { count: messages.length })}
                 </p>
               </div>
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/12 text-primary">
@@ -201,20 +211,21 @@ export function GestureMessageChat({
             {messages.length > 0 ? (
               <ol className="space-y-3" aria-live="polite">
                 {messages.map(({ gesture, message }, index) => {
-                  const timestamp = formatGestureMessageTimestamp(gesture.TimeStamp);
+                  const timestamp = formatGestureMessageTimestamp(gesture.TimeStamp, locale);
                   const relativeLabel =
                     nowMs > 0
-                      ? getRelativeTime(gesture.TimeStamp, Math.floor(nowMs / 1000))
+                      ? getRelativeTime(gesture.TimeStamp, Math.floor(nowMs / 1000), locale)
                       : timestamp.absolute;
                   const isNewest = index === 0;
                   const gestureId = Number.isFinite(gesture.EvtLogId) ? gesture.EvtLogId : null;
                   const gesturePosition =
                     typeof gesture.BidPosition === 'number' ? gesture.BidPosition : null;
-                  const messageKey =
+                  const listItemKey =
                     gestureId ?? `${gesture.BidderAddr}-${gesture.TimeStamp}-${index}`;
+                  const badge = getGestureMethodBadge(gesture);
 
                   return (
-                    <li key={messageKey}>
+                    <li key={listItemKey}>
                       <article
                         className={cn(
                           'rounded-2xl border p-4 transition-colors 2xl:p-5',
@@ -222,7 +233,7 @@ export function GestureMessageChat({
                             ? 'border-primary/25 bg-primary/[0.075] shadow-[0_18px_70px_-54px_rgb(var(--aurora-cyan-rgb)/0.9)]'
                             : 'border-white/[0.06] bg-white/[0.03]',
                         )}
-                        aria-label={`Gesture message from ${gesture.BidderAddr}`}
+                        aria-label={t('chat.messageAria', { address: gesture.BidderAddr })}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex min-w-0 items-center gap-1">
@@ -245,13 +256,17 @@ export function GestureMessageChat({
                               data-testid="gesture-method-badge"
                               className="inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.035] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
                             >
-                              {getGestureMethodBadgeLabel(gesture)}
+                              {badge.amount != null
+                                ? t(`chat.badge.${badge.messageKey}`, { amount: badge.amount })
+                                : t(`chat.badge.${badge.messageKey}`)}
                             </span>
                             {gestureId != null ? (
                               <Link
                                 href={`/gesture/${gestureId}`}
                                 className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.035] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary"
-                                aria-label={`Open gesture position ${gesturePosition ?? gestureId}`}
+                                aria-label={t('chat.openPositionAria', {
+                                  position: String(gesturePosition ?? gestureId),
+                                })}
                               >
                                 <Radio className="h-3 w-3" />#{gesturePosition ?? gestureId}
                               </Link>
@@ -282,12 +297,12 @@ export function GestureMessageChat({
             ) : (
               <EmptyState
                 icon={<MessageCircle className="h-8 w-8 text-muted-foreground/50" />}
-                title="No gesture messages yet"
-                description="Messages attached to current-cycle gestures will appear here, newest first."
+                title={t('chat.empty.title')}
+                description={t('chat.empty.description')}
                 action={
                   onJoinCta ? (
                     <Button variant="secondary" size="sm" onClick={onJoinCta}>
-                      Make a Gesture
+                      {t('chat.empty.cta')}
                     </Button>
                   ) : undefined
                 }

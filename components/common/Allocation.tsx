@@ -13,6 +13,7 @@ import {
   Sprout,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -39,7 +40,7 @@ interface AllocationCardData {
   name: string;
   tooltip: string;
   amounts: string[];
-  recipients?: string;
+  recipientCount?: number;
   recipientLabel?: string;
   faqLink?: string;
   featured?: boolean;
@@ -56,19 +57,20 @@ const cardVariants = {
 };
 
 const Allocation: FC<AllocationProps> = ({ data }) => {
+  const t = useTranslations('home');
+
   const allocations: AllocationCardData[] = [
     {
       icon: <Trophy className="h-5 w-5" />,
-      name: 'Signature Allocation',
-      tooltip:
-        'The participant who made the Final Gesture when the countdown reaches zero may retrieve this allocation: ETH, 1,000 CST, a Cosmic Signature NFT, and attached tokens.',
+      name: t('allocation.cards.signature.name'),
+      tooltip: t('allocation.cards.signature.tooltip'),
       amounts: [
-        `${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`,
-        '1,000 CST',
-        '1 Cosmic Signature NFT',
-        'Attached tokens (if any)',
+        t('allocation.amounts.eth', { amount: (data?.PrizeAmountEth ?? 0).toFixed(4) }),
+        t('allocation.amounts.fixedCst'),
+        t('allocation.amounts.nft'),
+        t('allocation.amounts.attachedTokens'),
       ],
-      recipients: '1',
+      recipientCount: 1,
       // lexicon-allow-start — FAQ hash anchor preserves legacy URL fragment
       faqLink: '/faq#main-allocation',
       // lexicon-allow-end
@@ -76,85 +78,97 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
     },
     {
       icon: <Sprout className="h-5 w-5" />,
-      name: 'Public Goods',
-      tooltip: `${data?.CharityPercentage ?? 0}% of every Cycle Reserve is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.`,
+      name: t('allocation.cards.publicGoods.name'),
+      tooltip: t('allocation.cards.publicGoods.tooltip', {
+        percent: String(data?.CharityPercentage ?? 0),
+      }),
       amounts: [
-        `${(((data?.CosmicGameBalanceEth ?? 0) * (data?.CharityPercentage ?? 0)) / 100).toFixed(4)} ETH`,
+        t('allocation.amounts.eth', {
+          amount: (
+            ((data?.CosmicGameBalanceEth ?? 0) * (data?.CharityPercentage ?? 0)) /
+            100
+          ).toFixed(4),
+        }),
       ],
-      recipientLabel: 'Protocol Guild',
+      recipientLabel: t('allocation.cards.publicGoods.recipientLabel'),
       faqLink: '/faq',
       impact: true,
     },
     {
       icon: <Shuffle className="h-5 w-5" />,
-      name: 'ETH Stellar Selection',
-      tooltip:
-        'Participants are selected at random from the cycle entries to share an allocation of ETH.',
+      name: t('allocation.cards.ethStellar.name'),
+      tooltip: t('allocation.cards.ethStellar.tooltip'),
       amounts: [
-        `${((data?.RaffleAmountEth ?? 0) / (data?.NumRaffleEthWinnersBidding ?? 1)).toFixed(4)} ETH each`,
+        t('allocation.amounts.ethEach', {
+          amount: ((data?.RaffleAmountEth ?? 0) / (data?.NumRaffleEthWinnersBidding ?? 1)).toFixed(
+            4,
+          ),
+        }),
       ],
-      recipients: `${data?.NumRaffleEthWinnersBidding}`,
+      recipientCount: data?.NumRaffleEthWinnersBidding ?? 0,
     },
     {
       icon: <ImageIcon className="h-5 w-5" />,
-      name: 'NFT Stellar Selection',
-      tooltip:
-        'Participants are selected at random from the cycle entries to receive Recognition CST and Cosmic Signature NFTs.',
-      amounts: ['1,000 CST each', '1 Cosmic Signature NFT each'],
-      recipients: `${data?.NumRaffleNFTWinnersBidding}`,
+      name: t('allocation.cards.nftStellar.name'),
+      tooltip: t('allocation.cards.nftStellar.tooltip'),
+      amounts: [t('allocation.amounts.fixedCstEach'), t('allocation.amounts.nftEach')],
+      recipientCount: data?.NumRaffleNFTWinnersBidding ?? 0,
     },
     {
       icon: <Layers className="h-5 w-5" />,
-      name: 'RandomWalk Anchor-holder',
-      tooltip:
-        'Anchor-holders of RandomWalk NFTs may receive Recognition CST and Cosmic Signature NFTs.',
-      amounts: ['1,000 CST each', '1 Cosmic Signature NFT each'],
-      recipients: `${data?.NumRaffleNFTWinnersStakingRWalk}`,
+      name: t('allocation.cards.randomWalkAnchor.name'),
+      tooltip: t('allocation.cards.randomWalkAnchor.tooltip'),
+      amounts: [t('allocation.amounts.fixedCstEach'), t('allocation.amounts.nftEach')],
+      recipientCount: data?.NumRaffleNFTWinnersStakingRWalk ?? 0,
     },
     {
       icon: <Users className="h-5 w-5" />,
-      name: 'Cosmic Signature Anchor',
-      tooltip: 'Anchor-holders of Cosmic Signature NFTs share the per-cycle Anchor Distribution.',
-      amounts: [`${(data?.StakingAmountEth ?? 0).toFixed(4)} ETH`],
-      recipientLabel: 'Proportional · all anchor-holders',
+      name: t('allocation.cards.cosmicAnchor.name'),
+      tooltip: t('allocation.cards.cosmicAnchor.tooltip'),
+      amounts: [t('allocation.amounts.eth', { amount: (data?.StakingAmountEth ?? 0).toFixed(4) })],
+      recipientLabel: t('allocation.cards.cosmicAnchor.recipientLabel'),
     },
     {
       icon: <Swords className="h-5 w-5" />,
-      name: 'Chrono-Warrior Allocation',
-      tooltip:
-        'The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve and a Cosmic Signature NFT.',
+      name: t('allocation.cards.chronoWarrior.name'),
+      tooltip: t('allocation.cards.chronoWarrior.tooltip'),
       amounts: [
-        `${(((data?.CosmicGameBalanceEth ?? 0) * (data?.ChronoWarriorPercentage ?? 0)) / 100).toFixed(4)} ETH`,
-        '1,000 CST',
-        '1 Cosmic Signature NFT',
+        t('allocation.amounts.eth', {
+          amount: (
+            ((data?.CosmicGameBalanceEth ?? 0) * (data?.ChronoWarriorPercentage ?? 0)) /
+            100
+          ).toFixed(4),
+        }),
+        t('allocation.amounts.fixedCst'),
+        t('allocation.amounts.nft'),
       ],
-      recipients: '1',
+      recipientCount: 1,
       faqLink: '/faq#chrono-warrior',
     },
     {
       icon: <Crown className="h-5 w-5" />,
-      name: 'Endurance Champion',
-      tooltip:
-        'The participant who remained the most recent gesture maker for the longest consecutive interval. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT.',
-      amounts: ['1,000 CST', '1 Cosmic Signature NFT'],
-      recipients: '1',
+      name: t('allocation.cards.endurance.name'),
+      tooltip: t('allocation.cards.endurance.tooltip'),
+      amounts: [t('allocation.amounts.fixedCst'), t('allocation.amounts.nft')],
+      recipientCount: 1,
       faqLink: '/faq#endurance-champion',
     },
     {
       icon: <Coins className="h-5 w-5" />,
-      name: 'Final CST Gesture',
-      tooltip:
-        'The participant who made the last CST gesture of the cycle receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT.',
-      amounts: ['1,000 CST', '1 Cosmic Signature NFT'],
-      recipients: '1',
+      name: t('allocation.cards.finalCst.name'),
+      tooltip: t('allocation.cards.finalCst.tooltip'),
+      amounts: [t('allocation.amounts.fixedCst'), t('allocation.amounts.nft')],
+      recipientCount: 1,
     },
   ];
 
   return (
     <div className="mt-12">
       <div className="flex items-center gap-2 mb-6">
-        <h3 className="font-display text-lg font-semibold tracking-tight">Allocation Breakdown</h3>
-        <InfoTooltip content="Allocations distributed when the cycle finalizes across more than ten tracks." />
+        <h3 className="font-display text-lg font-semibold tracking-tight">
+          {t('allocation.title')}
+        </h3>
+        <InfoTooltip content={t('allocation.titleTooltip')} />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {allocations.map((allocation, i) => (
@@ -229,7 +243,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                 <div className="mt-2.5 flex items-center gap-1.5">
                   <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                     {allocation.recipientLabel ??
-                      `${allocation.recipients} recipient${allocation.recipients === '1' ? '' : 's'}`}
+                      t('allocation.recipientCount', { count: allocation.recipientCount ?? 0 })}
                   </span>
                 </div>
               </div>

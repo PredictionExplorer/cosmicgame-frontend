@@ -3,6 +3,7 @@
 import { useMemo, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { formatId, getAssetsUrl } from '@/utils';
 
@@ -30,6 +31,7 @@ function isNumeric(value: string) {
 }
 
 const GalleryPage = () => {
+  const t = useTranslations('gallery');
   const { data: nfts, isLoading } = useCSTList();
 
   const router = useRouter();
@@ -197,13 +199,15 @@ const GalleryPage = () => {
         align="left"
         eyebrow={
           <SectionEyebrow tone="aurora" pulse>
-            Collection · {stats.total > 0 ? `${stats.total} NFTs Imprinted` : 'Live'}
+            {stats.total > 0
+              ? t('page.eyebrowImprinted', { count: stats.total })
+              : t('page.eyebrowLive')}
           </SectionEyebrow>
         }
-        title="NFT Gallery"
+        title={t('page.title')}
         titleLevel={2}
         gradientTitle="signature"
-        subtitle="Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
+        subtitle={t('page.subtitle')}
         actions={<NftMarketplaceButton variant="secondary" />}
       />
 
@@ -216,25 +220,20 @@ const GalleryPage = () => {
         <div className="relative z-[1] max-w-3xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-white/70">
             <Sparkles className="h-3.5 w-3.5 text-[rgb(var(--aurora-cyan-rgb))]" />
-            Generative archive
+            {t('intro.badge')}
           </div>
-          <p className="type-body-md text-muted-foreground">
-            Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain
-            seed via three-body-problem physics simulations. In a typical cycle, 24 new NFTs are
-            imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT
-            Stellar Selection NFTs for RandomWalk NFT anchor-holders.
-          </p>
+          <p className="type-body-md text-muted-foreground">{t('intro.description')}</p>
         </div>
         <div className="relative min-h-[220px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.10] bg-black/30">
           {featuredNft && featuredImage ? (
             <Link
               href={`/detail/${featuredNft.TokenId}`}
               className="group block h-full min-h-[220px]"
-              aria-label={`View Cosmic Signature ${formatId(featuredNft.TokenId)}`}
+              aria-label={t('featured.viewAria', { id: formatId(featuredNft.TokenId) })}
             >
               <NFTImage
                 src={featuredImage}
-                alt={`Cosmic Signature artwork ${formatId(featuredNft.TokenId)}`}
+                alt={t('featured.alt', { id: formatId(featuredNft.TokenId) })}
                 terminalFallbackSrc={null}
                 sizes="(max-width: 1024px) 100vw, 360px"
                 className="h-full min-h-[220px] object-cover opacity-90 saturate-125 transition-transform duration-700 group-hover:scale-[1.025]"
@@ -245,7 +244,7 @@ const GalleryPage = () => {
               <div className="absolute h-40 w-40 rounded-full border border-primary/20" />
               <div className="absolute h-px w-56 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
               <div className="relative z-[1] max-w-[14rem] px-4 text-center text-xs leading-relaxed text-muted-foreground">
-                Real collection artwork appears here when indexed NFTs are available.
+                {t('featured.emptyHint')}
               </div>
             </div>
           )}
@@ -255,9 +254,11 @@ const GalleryPage = () => {
           />
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-lg border border-white/10 bg-black/45 px-3 py-2 text-xs text-white/70 backdrop-blur">
             <span className="font-mono uppercase tracking-[0.2em]">
-              {featuredNft ? 'Featured imprint' : 'Archive'}
+              {featuredNft ? t('featured.badgeImprint') : t('featured.badgeArchive')}
             </span>
-            <span>{featuredNft ? formatId(featuredNft.TokenId) : 'Awaiting metadata'}</span>
+            <span>
+              {featuredNft ? formatId(featuredNft.TokenId) : t('featured.awaitingMetadata')}
+            </span>
           </div>
         </div>
       </Surface>

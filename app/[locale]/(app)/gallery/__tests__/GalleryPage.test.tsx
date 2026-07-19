@@ -106,10 +106,8 @@ describe('GalleryPage', () => {
   it('renders the page title and subtitle', () => {
     mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByText('NFT Gallery')).toBeInTheDocument();
-    expect(
-      screen.getByText(/Explore the complete Cosmic Signature NFT collection imprinted/),
-    ).toBeInTheDocument();
+    expect(screen.getByText('gallery.page.title')).toBeInTheDocument();
+    expect(screen.getByText('gallery.page.subtitle')).toBeInTheDocument();
   });
 
   it('links to the Cosmic Signature marketplace', () => {
@@ -132,10 +130,10 @@ describe('GalleryPage', () => {
   it('renders hero stats with correct counts', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByText('Total Imprinted')).toBeInTheDocument();
-    expect(screen.getByText('Currently Anchored')).toBeInTheDocument();
-    expect(screen.getByText('Named NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Cycles')).toBeInTheDocument();
+    expect(screen.getByText('gallery.hero.totalImprinted.label')).toBeInTheDocument();
+    expect(screen.getByText('gallery.hero.currentlyAnchored.label')).toBeInTheDocument();
+    expect(screen.getByText('gallery.hero.namedNfts.label')).toBeInTheDocument();
+    expect(screen.getByText('gallery.hero.cycles.label')).toBeInTheDocument();
   });
 
   it('renders NFT cards when data is loaded', () => {
@@ -149,7 +147,7 @@ describe('GalleryPage', () => {
   it('shows empty state when no data', () => {
     mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByText('No NFTs found')).toBeInTheDocument();
+    expect(screen.getByText('gallery.empty.title')).toBeInTheDocument();
   });
 
   it('renders search input', () => {
@@ -161,15 +159,17 @@ describe('GalleryPage', () => {
   it('renders filter chips', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByRole('radio', { name: /All/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Anchored/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Named/i })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'gallery.filters.all.label' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('radio', { name: 'gallery.filters.anchored.label' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'gallery.filters.named.label' })).toBeInTheDocument();
   });
 
   it('filters NFTs when Anchored chip is clicked', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    fireEvent.click(screen.getByRole('radio', { name: /Anchored/i }));
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.anchored.label' }));
     expect(screen.getAllByText('#000003').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('#000002')).toBeInTheDocument();
     expect(screen.queryByText('#000001')).not.toBeInTheDocument();
@@ -178,7 +178,7 @@ describe('GalleryPage', () => {
   it('filters NFTs when Named chip is clicked', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    fireEvent.click(screen.getByRole('radio', { name: /Named/i }));
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.named.label' }));
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Gamma')).toBeInTheDocument();
   });
@@ -186,8 +186,8 @@ describe('GalleryPage', () => {
   it('renders view mode toggle', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByRole('radio', { name: 'Grid view' })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: 'List view' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'gallery.view.grid' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'gallery.view.list' })).toBeInTheDocument();
   });
 
   it('filters by numeric search on enter', async () => {
@@ -210,6 +210,6 @@ describe('GalleryPage', () => {
   it('handles null data gracefully', () => {
     mockUseCSTList.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByText('No NFTs found')).toBeInTheDocument();
+    expect(screen.getByText('gallery.empty.title')).toBeInTheDocument();
   });
 });

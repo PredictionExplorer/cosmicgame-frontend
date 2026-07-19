@@ -10,24 +10,27 @@ describe('TokenLogo', () => {
       <TokenLogo logoURI="https://cdn.example/logo.png" symbol="GLXY" name="Galaxy Credits" />,
     );
 
-    expect(screen.getByAltText('GLXY token logo')).toHaveAttribute(
-      'src',
-      'https://cdn.example/logo.png',
-    );
+    expect(
+      screen.getByAltText('currentCycle.showcase.erc20Card.logoAlt(token=GLXY)'),
+    ).toHaveAttribute('src', 'https://cdn.example/logo.png');
   });
 
   it('falls back to generated initials when the logo is missing', () => {
     render(<TokenLogo symbol="GLXY" name="Galaxy Credits" />);
 
-    expect(screen.queryByAltText('GLXY token logo')).not.toBeInTheDocument();
+    expect(
+      screen.queryByAltText('currentCycle.showcase.erc20Card.logoAlt(token=GLXY)'),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('GLXY')).toBeInTheDocument();
   });
 
   it('falls back when the logo image fails to load', () => {
     render(<TokenLogo logoURI="https://cdn.example/missing.png" symbol="GLXY" />);
 
-    fireEvent.error(screen.getByAltText('GLXY token logo'));
-    expect(screen.queryByAltText('GLXY token logo')).not.toBeInTheDocument();
+    fireEvent.error(screen.getByAltText('currentCycle.showcase.erc20Card.logoAlt(token=GLXY)'));
+    expect(
+      screen.queryByAltText('currentCycle.showcase.erc20Card.logoAlt(token=GLXY)'),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('GLXY')).toBeInTheDocument();
   });
 

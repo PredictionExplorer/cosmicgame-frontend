@@ -132,8 +132,8 @@ describe('RoundInfoSection', () => {
 
   it('renders collapsible Cycle Rules section', () => {
     render(<RoundInfoSection {...defaultProps} />);
-    expect(screen.getByText('How it works')).toBeInTheDocument();
-    expect(screen.getByText('Cycle Rules')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.rules.howItWorks')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.sections.cycleRules.title')).toBeInTheDocument();
   });
 
   it('hides rules content when collapsed (default state)', () => {
@@ -144,9 +144,9 @@ describe('RoundInfoSection', () => {
   it('renders round summary footer strip', () => {
     render(<RoundInfoSection {...defaultProps} />);
     expect(screen.getByTestId('round-summary-footer')).toBeInTheDocument();
-    expect(screen.getByText('Contract Balance')).toBeInTheDocument();
-    expect(screen.getByText('Cycle Duration')).toBeInTheDocument();
-    expect(screen.getByText('Unique Participants')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.footer.contractBalance')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.footer.cycleDuration')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.footer.uniqueParticipants')).toBeInTheDocument();
   });
 
   it('displays formatted contract balance in footer', () => {
@@ -174,13 +174,17 @@ describe('RoundInfoSection', () => {
     };
     render(<RoundInfoSection {...propsWithDonations} />);
 
-    expect(screen.getByText('Allocation Tracks')).toBeInTheDocument();
-    expect(screen.getByText('Stellar Selection Entries')).toBeInTheDocument();
-    expect(screen.getByText('Top ETH Spenders')).toBeInTheDocument();
-    expect(screen.getByText('Endurance Champions')).toBeInTheDocument();
-    expect(screen.getByText(/Gesture History/)).toBeInTheDocument();
-    expect(screen.getByText('ETH Contributions')).toBeInTheDocument();
-    expect(screen.getByText('Cycle Rules')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.sections.allocationTracks.title')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.sections.stellarSelectionEntries.title'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.sections.topEthSpenders.title')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.sections.enduranceChampions.title')).toBeInTheDocument();
+    expect(
+      screen.getByText('currentCycle.sections.gestureHistory.title(n=10)'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.sections.ethContributions.title')).toBeInTheDocument();
+    expect(screen.getByText('currentCycle.sections.cycleRules.title')).toBeInTheDocument();
   });
 
   it('renders sections in correct order (gesture history before contributions)', () => {

@@ -77,7 +77,9 @@ describe('NFTImage', () => {
 
     fireEvent.error(img);
 
-    expect(screen.getByRole('img', { name: 'Real NFT' })).toHaveTextContent('Artwork unavailable');
+    expect(screen.getByRole('img', { name: 'Real NFT' })).toHaveTextContent(
+      'detail.image.artworkUnavailable',
+    );
   });
 
   test('defaults to lazy loading for below-the-fold use', () => {

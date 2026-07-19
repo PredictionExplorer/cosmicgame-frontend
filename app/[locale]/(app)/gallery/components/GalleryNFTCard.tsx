@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Lock, Tag } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { formatId, getAssetsUrl, getThumbUrl, convertTimestampToDateTime } from '@/utils';
 
@@ -27,19 +28,25 @@ interface GalleryNFTCardProps {
   variant: ViewMode;
 }
 
-function formatImprintAge(timestamp: number): string {
+/**
+ * Compact relative imprint age. `en` keeps the historical byte-identical
+ * forms ("just now", "5m ago"); `zh` follows the style guide's relative
+ * forms with a space between digit and CJK ("刚刚", "5 分钟前").
+ */
+function formatImprintAge(timestamp: number, locale: string): string {
+  const zh = locale === 'zh';
   const seconds = Math.floor(Date.now() / 1000) - timestamp;
-  if (seconds < 60) return 'just now';
+  if (seconds < 60) return zh ? '刚刚' : 'just now';
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return zh ? `${minutes} 分钟前` : `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return zh ? `${hours} 小时前` : `${hours}h ago`;
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) return zh ? `${days} 天前` : `${days}d ago`;
   const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo ago`;
+  if (months < 12) return zh ? `${months} 个月前` : `${months}mo ago`;
   const years = Math.floor(days / 365);
-  return `${years}y ago`;
+  return zh ? `${years} 年前` : `${years}y ago`;
 }
 
 export function GalleryNFTCard({ nft, index, variant }: GalleryNFTCardProps) {
@@ -63,6 +70,9 @@ interface CardInnerProps {
 }
 
 function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
+  const t = useTranslations('gallery');
+  const locale = useLocale();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -76,7 +86,7 @@ function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
             <NFTImage
               src={getThumbUrl(seed, 'card')}
               fallbackSrc={fullImage}
-              alt={`Cosmic Signature ${formatId(nft.TokenId)}`}
+              alt={t('card.alt', { id: formatId(nft.TokenId) })}
             />
           </div>
           {nft.RoundNum !== undefined && nft.RoundNum !== null && (
@@ -87,7 +97,7 @@ function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
                 </span>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>Minted in game round {nft.RoundNum}</p>
+                <p>{t('card.tooltips.round', { round: nft.RoundNum })}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -100,7 +110,7 @@ function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="left">
-                  <p>Currently anchored and receiving Anchor Distributions</p>
+                  <p>{t('card.tooltips.anchored')}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -112,7 +122,7 @@ function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="left">
-                  <p>This NFT has a custom name</p>
+                  <p>{t('card.tooltips.customName')}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -127,18 +137,22 @@ function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Unique sequential identifier for this COSMIC NFT</p>
+                <p>{t('card.tooltips.identifier')}</p>
               </TooltipContent>
             </Tooltip>
             {nft.MintTimeStamp && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="text-[10px] text-muted-foreground/60 cursor-help">
-                    {formatImprintAge(nft.MintTimeStamp)}
+                    {formatImprintAge(nft.MintTimeStamp, locale)}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Minted on {convertTimestampToDateTime(nft.MintTimeStamp)}</p>
+                  <p>
+                    {t('card.tooltips.mintedOn', {
+                      date: convertTimestampToDateTime(nft.MintTimeStamp, false, locale),
+                    })}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -151,6 +165,9 @@ function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
 }
 
 function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
+  const t = useTranslations('gallery');
+  const locale = useLocale();
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -168,7 +185,7 @@ function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
           <NFTImage
             src={getThumbUrl(seed, 'micro')}
             fallbackSrc={fullImage}
-            alt={`Cosmic Signature ${formatId(nft.TokenId)}`}
+            alt={t('card.alt', { id: formatId(nft.TokenId) })}
             className="h-full w-full object-cover"
           />
         </div>
@@ -180,13 +197,13 @@ function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
               </span>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <p>Unique sequential identifier for this COSMIC NFT</p>
+              <p>{t('card.tooltips.identifier')}</p>
             </TooltipContent>
           </Tooltip>
           {hasName ? (
             <span className="text-sm font-medium text-white truncate">{nft.TokenName}</span>
           ) : (
-            <span className="text-sm text-muted-foreground/50 italic">Unnamed</span>
+            <span className="text-sm text-muted-foreground/50 italic">{t('card.unnamed')}</span>
           )}
           <div className="hidden sm:flex items-center gap-1.5 ml-auto shrink-0">
             {nft.RoundNum !== undefined && nft.RoundNum !== null && (
@@ -197,7 +214,7 @@ function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Minted in game round {nft.RoundNum}</p>
+                  <p>{t('card.tooltips.round', { round: nft.RoundNum })}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -209,7 +226,7 @@ function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="left">
-                  <p>Currently anchored and receiving Anchor Distributions</p>
+                  <p>{t('card.tooltips.anchored')}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -221,7 +238,7 @@ function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="left">
-                  <p>This NFT has a custom name</p>
+                  <p>{t('card.tooltips.customName')}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -230,11 +247,15 @@ function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="hidden md:block text-[10px] text-muted-foreground/60 shrink-0 cursor-help">
-                  {formatImprintAge(nft.MintTimeStamp)}
+                  {formatImprintAge(nft.MintTimeStamp, locale)}
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Minted on {convertTimestampToDateTime(nft.MintTimeStamp)}</p>
+                <p>
+                  {t('card.tooltips.mintedOn', {
+                    date: convertTimestampToDateTime(nft.MintTimeStamp, false, locale),
+                  })}
+                </p>
               </TooltipContent>
             </Tooltip>
           )}

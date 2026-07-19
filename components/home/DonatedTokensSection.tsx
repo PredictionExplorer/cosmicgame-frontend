@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import AttachedNFT from '@/components/attachments/AttachedNFT';
@@ -28,6 +30,7 @@ export function DonatedTokensSection({
   setCurPage,
   perPage,
 }: DonatedTokensSectionProps) {
+  const t = useTranslations('currentCycle');
   const gridLayout =
     donatedNFTs.length > 16
       ? 'grid-cols-2 sm:grid-cols-4 md:grid-cols-6'
@@ -38,8 +41,8 @@ export function DonatedTokensSection({
   return (
     <div>
       <div className="flex items-center gap-2 mb-6">
-        <SectionDivider title="Attached Tokens" className="flex-1" />
-        <InfoTooltip content="NFTs and ERC-20 tokens attached to gestures by the community to enrich the cycle's Cycle Reserve." />
+        <SectionDivider title={t('attachedTokens.title')} className="flex-1" />
+        <InfoTooltip content={t('attachedTokens.tooltip')} />
       </div>
       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(271,98%,60%)]/40">
         <Tabs
@@ -49,10 +52,10 @@ export function DonatedTokensSection({
           <div className="border-b border-white/[0.06]">
             <TabsList className="w-full">
               <TabsTrigger value="0" className="flex-1">
-                ERC721 Tokens
+                {t('attachedTokens.erc721Tab')}
               </TabsTrigger>
               <TabsTrigger value="1" className="flex-1">
-                ERC20 Tokens
+                {t('attachedTokens.erc20Tab')}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -74,9 +77,7 @@ export function DonatedTokensSection({
                 />
               </>
             ) : (
-              <p className="text-muted-foreground text-sm">
-                No ERC721 tokens were attached this cycle.
-              </p>
+              <p className="text-muted-foreground text-sm">{t('attachedTokens.erc721Empty')}</p>
             )}
           </TabsContent>
           <TabsContent value="1" className="p-6">

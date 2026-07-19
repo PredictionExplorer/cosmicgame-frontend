@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Calendar, Trophy, Award, User, Copy, Check } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, convertTimestampToDateTime, getRelativeTime } from '@/utils';
 
@@ -26,6 +27,7 @@ export interface NFTMetadataProps {
 }
 
 function SeedBlock({ seed }: { seed?: string | number }) {
+  const t = useTranslations('detail');
   const [copied, setCopied] = useState(false);
   const seedStr = String(seed ?? '');
 
@@ -42,9 +44,9 @@ function SeedBlock({ seed }: { seed?: string | number }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-1">
           <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            Seed
+            {t('metadata.seed')}
           </span>
-          <InfoTooltip content="The unique random seed used to generate this token's artwork and traits." />
+          <InfoTooltip content={t('metadata.seedTooltip')} />
         </div>
         <p
           className="font-mono text-sm text-foreground break-all leading-relaxed"
@@ -56,7 +58,7 @@ function SeedBlock({ seed }: { seed?: string | number }) {
       <button
         onClick={handleCopy}
         className="shrink-0 rounded-md p-2 text-muted-foreground/50 hover:text-primary hover:bg-white/[0.04] transition-colors"
-        aria-label="Copy seed"
+        aria-label={t('metadata.copySeed')}
         data-testid="copy-seed-button"
       >
         {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
@@ -66,8 +68,14 @@ function SeedBlock({ seed }: { seed?: string | number }) {
 }
 
 export function NFTMetadata({ nft }: NFTMetadataProps) {
-  const imprintedRelative = nft?.TimeStamp ? getRelativeTime(nft.TimeStamp) : undefined;
-  const imprintedAbsolute = nft?.TimeStamp ? convertTimestampToDateTime(nft.TimeStamp) : undefined;
+  const t = useTranslations('detail');
+  const locale = useLocale();
+  const imprintedRelative = nft?.TimeStamp
+    ? getRelativeTime(nft.TimeStamp, undefined, locale)
+    : undefined;
+  const imprintedAbsolute = nft?.TimeStamp
+    ? convertTimestampToDateTime(nft.TimeStamp, false, locale)
+    : undefined;
   const imprintedDisplay =
     imprintedRelative && imprintedAbsolute
       ? `${imprintedRelative} (${imprintedAbsolute})`
@@ -79,7 +87,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
         href={`/allocation/${nft.RoundNum}`}
         className="text-inherit transition-colors no-underline print:!text-foreground hover:text-primary"
       >
-        Round #{nft.RoundNum}
+        {t('metadata.roundNumber', { round: nft.RoundNum })}
       </Link>
     ) : (
       '—'
@@ -93,7 +101,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
     <div data-testid="nft-metadata">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label="Imprinted"
+          label={t('metadata.imprinted')}
           value={
             nft?.TimeStamp ? (
               <a
@@ -109,25 +117,25 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
             )
           }
           icon={<Calendar className="h-4 w-4" />}
-          tooltip="When this token was imprinted on-chain. Click to view the transaction."
+          tooltip={t('metadata.imprintedTooltip')}
         />
         <StatCard
-          label="Cycle"
+          label={t('metadata.cycle')}
           value={roundDisplay}
           icon={<Trophy className="h-4 w-4" />}
-          tooltip="The Performance Cycle in which this token was allocated. Click to view cycle details."
+          tooltip={t('metadata.cycleTooltip')}
         />
         <StatCard
-          label="Recipient"
+          label={t('metadata.recipient')}
           value={recipientDisplay}
           icon={<Award className="h-4 w-4" />}
-          tooltip="The address that originally received this token during the Performance Cycle."
+          tooltip={t('metadata.recipientTooltip')}
         />
         <StatCard
-          label="Owner"
+          label={t('metadata.owner')}
           value={ownerDisplay}
           icon={<User className="h-4 w-4" />}
-          tooltip="The current holder of this token. May differ from the recipient if the token was transferred."
+          tooltip={t('metadata.ownerTooltip')}
         />
       </div>
 

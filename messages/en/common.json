@@ -11,6 +11,10 @@
     "breadcrumb": "Breadcrumb",
     "footer": "Footer"
   },
+  "breadcrumbs": {
+    "home": "Home",
+    "gallery": "Gallery"
+  },
   "status": {
     "loading": "Loading",
     "loadingEllipsis": "Loading…",

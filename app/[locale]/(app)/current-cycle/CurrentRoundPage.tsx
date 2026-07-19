@@ -15,6 +15,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { getEnduranceChampions, formatEthValue, convertTimestampToDateTime } from '@/utils';
 
@@ -55,6 +56,8 @@ const sectionFade = {
 };
 
 const CurrentRoundPage = () => {
+  const t = useTranslations('currentCycle');
+  const locale = useLocale();
   const { data: dashboardData, isLoading, isError } = useDashboardInfo();
   const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
   const round = dashboardData?.CurRoundNum ?? -1;
@@ -105,8 +108,8 @@ const CurrentRoundPage = () => {
     return (
       <PageShell variant="data" backdrop="signature">
         <ErrorState
-          title="Failed to load cycle data"
-          message="Please refresh the page to try again."
+          title={t('error.title')}
+          message={t('error.message')}
           onRetry={() => window.location.reload()}
         />
       </PageShell>
@@ -114,8 +117,8 @@ const CurrentRoundPage = () => {
   }
 
   const roundStarted = data.TsRoundStart
-    ? convertTimestampToDateTime(data.TsRoundStart)
-    : 'Not started';
+    ? convertTimestampToDateTime(data.TsRoundStart, false, locale)
+    : t('status.notStarted');
 
   const hasStarted = data.TsRoundStart !== 0;
   const hasLastParticipant = data.LastBidderAddr !== zeroAddress;
@@ -123,19 +126,19 @@ const CurrentRoundPage = () => {
   const isCountdownActive = hasLastParticipant && allocationTime > nowMs;
   const isGesturesExhausted = hasLastParticipant && allocationTime > 0 && allocationTime <= nowMs;
   const statusBadgeLabel = isPreActivation
-    ? 'Opening soon'
+    ? t('hero.status.openingSoon')
     : !hasLastParticipant
-      ? 'Awaiting first Gesture'
+      ? t('hero.status.awaitingFirstGesture')
       : isGesturesExhausted
-        ? 'Ready to finalize'
-        : 'Live';
+        ? t('hero.status.readyToFinalize')
+        : t('hero.status.live');
   const primaryCtaLabel = isPreActivation
-    ? 'View Home Clock'
+    ? t('hero.cta.viewHomeClock')
     : isGesturesExhausted
-      ? 'Finalize Cycle'
+      ? t('hero.cta.finalizeCycle')
       : !hasLastParticipant
-        ? 'Make the first Gesture'
-        : 'Make a Gesture';
+        ? t('hero.cta.makeFirstGesture')
+        : t('hero.cta.makeGesture');
 
   const charityAmount =
     (Number(data.CosmicGameBalanceEth) || 0) * ((data.CharityPercentage ?? 0) / 100);
@@ -148,7 +151,7 @@ const CurrentRoundPage = () => {
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-white transition-colors mb-6"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to Home
+        {t('nav.backToHome')}
       </Link>
 
       {/* ===== HERO SECTION ===== */}
@@ -171,11 +174,10 @@ const CurrentRoundPage = () => {
             </div>
             <div>
               <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                Cycle #{data.CurRoundNum}
+                {t('hero.title', { n: data.CurRoundNum })}
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Opened {roundStarted} &bull; {data.CurNumBids} gesture
-                {data.CurNumBids !== 1 ? 's' : ''} made
+                {t('hero.subtitle', { date: roundStarted, count: data.CurNumBids })}
               </p>
             </div>
           </div>
@@ -202,10 +204,13 @@ const CurrentRoundPage = () => {
         {isPreActivation && (
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
-              Cycle opens in
+              {t('hero.countdown.opensIn')}
             </p>
             <p className="text-sm text-muted-foreground mb-4">
-              Cycle {data.CurRoundNum} opens at {convertTimestampToDateTime(activationTime, true)}
+              {t('hero.countdown.opensAt', {
+                n: data.CurRoundNum,
+                date: convertTimestampToDateTime(activationTime, true, locale),
+              })}
             </p>
             <SmoothCountdown date={activationTime * 1000} renderer={Counter} />
           </div>
@@ -215,11 +220,8 @@ const CurrentRoundPage = () => {
         {!isPreActivation && hasStarted && isCountdownActive && (
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
-              Cycle finalizes in
-              <InfoTooltip
-                content="When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation. Each new gesture extends the timer."
-                className="ml-1.5"
-              />
+              {t('hero.countdown.finalizesIn')}
+              <InfoTooltip content={t('hero.countdown.finalizesTooltip')} className="ml-1.5" />
             </p>
             <SmoothCountdown date={allocationTime} renderer={Counter} />
           </div>
@@ -228,8 +230,10 @@ const CurrentRoundPage = () => {
         {!isPreActivation && hasStarted && isGesturesExhausted && (
           <div className="text-center rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
             <Zap className="mx-auto h-7 w-7 text-primary mb-2" />
-            <p className="font-display text-lg font-bold text-primary">Cycle Ready to Finalize</p>
-            <p className="mt-1 text-sm text-primary/80">The finalization clock reached zero.</p>
+            <p className="font-display text-lg font-bold text-primary">
+              {t('hero.countdown.readyTitle')}
+            </p>
+            <p className="mt-1 text-sm text-primary/80">{t('hero.countdown.readyMessage')}</p>
           </div>
         )}
 
@@ -268,41 +272,43 @@ const CurrentRoundPage = () => {
         className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-12"
       >
         <StatCard
-          label="Total Gestures"
+          label={t('stats.totalGestures.label')}
           value={data.CurNumBids}
           icon={<Hash className="h-4 w-4" />}
-          tooltip="Total gestures made in this cycle. Each gesture is also a Stellar Selection entry."
+          tooltip={t('stats.totalGestures.tooltip')}
         />
         <StatCard
-          label="Cycle Reserve"
+          label={t('stats.cycleReserve.label')}
           value={formatEthValue(data.PrizeAmountEth ?? 0)}
           icon={<Trophy className="h-4 w-4" />}
-          tooltip="ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture. The recipient also receives 1,000 CST and a Cosmic Signature NFT."
+          tooltip={t('stats.cycleReserve.tooltip')}
           gradient
         />
         <StatCard
-          label="Stellar Selection Pool"
+          label={t('stats.stellarSelectionPool.label')}
           value={formatEthValue(data.RaffleAmountEth ?? 0)}
           icon={<Shuffle className="h-4 w-4" />}
-          tooltip={`ETH split across ${data.NumRaffleEthWinnersBidding ?? 0} randomly selected participants when the cycle finalizes.`}
+          tooltip={t('stats.stellarSelectionPool.tooltip', {
+            count: data.NumRaffleEthWinnersBidding ?? 0,
+          })}
         />
         <StatCard
-          label="Public Goods"
+          label={t('stats.publicGoods.label')}
           value={formatEthValue(charityAmount)}
           icon={<Heart className="h-4 w-4" />}
-          tooltip={`${data.CharityPercentage ?? 0}% of the Cycle Reserve is forwarded to Protocol Guild each cycle.`}
+          tooltip={t('stats.publicGoods.tooltip', { percent: data.CharityPercentage ?? 0 })}
         />
         <StatCard
-          label="Contributed ETH"
+          label={t('stats.contributedEth.label')}
           value={formatEthValue(data.CurRoundStats?.TotalDonatedAmountEth ?? 0)}
           icon={<Coins className="h-4 w-4" />}
-          tooltip="Direct ETH contributions from the community this cycle."
+          tooltip={t('stats.contributedEth.tooltip')}
         />
         <StatCard
-          label="Attached NFTs"
+          label={t('stats.attachedNfts.label')}
           value={data.CurRoundStats?.TotalDonatedNFTs ?? 0}
           icon={<ImageIcon className="h-4 w-4" />}
-          tooltip="NFTs attached to gestures by the community this cycle."
+          tooltip={t('stats.attachedNfts.tooltip')}
         />
       </motion.div>
 

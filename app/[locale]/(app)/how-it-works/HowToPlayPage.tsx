@@ -1,5 +1,7 @@
 'use client';
 
+import type { HowItWorksContent } from '@/content/how-it-works';
+
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionDivider } from '@/components/ui/section-divider';
 
@@ -12,24 +14,24 @@ import { ProTips } from './components/ProTips';
 import { FAQCallout } from './components/FAQCallout';
 import { CallToAction } from './components/CallToAction';
 
-const HowToPlayPage = () => {
+const HowToPlayPage = ({ content }: { content: HowItWorksContent }) => {
   return (
     <PageShell variant="marketing" backdrop="signature">
-      <HeroSection />
+      <HeroSection hero={content.hero} />
       <SectionDivider />
-      <GameOverview />
+      <GameOverview overview={content.overview} />
       <SectionDivider />
-      <RewardBreakdown />
+      <RewardBreakdown rewardBreakdown={content.rewardBreakdown} />
       <SectionDivider />
-      <GameCycle />
+      <GameCycle gameCycle={content.gameCycle} />
       <SectionDivider />
-      <StepByStep />
+      <StepByStep stepByStep={content.stepByStep} />
       <SectionDivider />
-      <ProTips />
+      <ProTips proTips={content.proTips} />
       <SectionDivider />
-      <FAQCallout />
+      <FAQCallout faqCallout={content.faqCallout} />
       <SectionDivider />
-      <CallToAction />
+      <CallToAction callToAction={content.callToAction} />
     </PageShell>
   );
 };

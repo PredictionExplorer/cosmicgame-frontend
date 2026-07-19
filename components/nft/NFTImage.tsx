@@ -1,5 +1,6 @@
 import { type CSSProperties, useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 
@@ -40,6 +41,8 @@ const NFTImage = ({
   src,
   fallbackSrc,
   terminalFallbackSrc = FALLBACK_SRC,
+  // English default keeps server-safety for any future server-tree usage;
+  // translated call sites pass a localized alt (e.g. detail.image.defaultAlt).
   alt = 'NFT',
   style,
   className,
@@ -47,6 +50,7 @@ const NFTImage = ({
   loading,
   sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px',
 }: NFTImageProps) => {
+  const t = useTranslations('detail');
   // Resolution chain: primary src, optional fallback, then the configured terminal fallback.
   const chain = [src, fallbackSrc, terminalFallbackSrc ?? undefined].filter(
     (s): s is string => typeof s === 'string' && s.length > 0,
@@ -82,7 +86,7 @@ const NFTImage = ({
         )}
         style={style}
       >
-        Artwork unavailable
+        {t('image.artworkUnavailable')}
       </div>
     );
   }

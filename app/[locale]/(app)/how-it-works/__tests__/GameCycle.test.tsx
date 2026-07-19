@@ -1,3 +1,5 @@
+import { howItWorksContentEn } from '@/content/how-it-works';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -41,16 +43,18 @@ jest.mock('framer-motion', () => {
 const renderWithTooltip = (ui: React.ReactElement) =>
   render(<TooltipProvider>{ui}</TooltipProvider>);
 
+const gameCycle = howItWorksContentEn.gameCycle;
+
 describe('GameCycle', () => {
   it('renders the section heading', () => {
-    renderWithTooltip(<GameCycle />);
+    renderWithTooltip(<GameCycle gameCycle={gameCycle} />);
     expect(
       screen.getByRole('heading', { name: 'Lifecycle of a Performance Cycle' }),
     ).toBeInTheDocument();
   });
 
   it('renders all six phase labels in order', () => {
-    renderWithTooltip(<GameCycle />);
+    renderWithTooltip(<GameCycle gameCycle={gameCycle} />);
     expect(screen.getByText('Cycle Opens')).toBeInTheDocument();
     expect(screen.getByText('Participants Gesture')).toBeInTheDocument();
     expect(screen.getByText('Cycle Finalization Time Expires')).toBeInTheDocument();
@@ -60,7 +64,7 @@ describe('GameCycle', () => {
   });
 
   it('renders phase numbers 01 through 06', () => {
-    renderWithTooltip(<GameCycle />);
+    renderWithTooltip(<GameCycle gameCycle={gameCycle} />);
     expect(screen.getByText('01')).toBeInTheDocument();
     expect(screen.getByText('02')).toBeInTheDocument();
     expect(screen.getByText('03')).toBeInTheDocument();
@@ -69,28 +73,26 @@ describe('GameCycle', () => {
     expect(screen.getByText('06')).toBeInTheDocument();
   });
 
-  it('renders phase descriptions', () => {
-    renderWithTooltip(<GameCycle />);
+  it('renders every phase description from the content module', () => {
+    renderWithTooltip(<GameCycle gameCycle={gameCycle} />);
+    for (const phase of gameCycle.phases) {
+      expect(screen.getByText(phase.description)).toBeInTheDocument();
+    }
     expect(screen.getByText(/first ETH Calibration Window opens/)).toBeInTheDocument();
-    expect(screen.getByText(/Participation CST is dynamic/)).toBeInTheDocument();
-    expect(
-      screen.getByText(/countdown reaches zero, the participant who made the Final Gesture/),
-    ).toBeInTheDocument();
     expect(screen.getByText(/25% of the Cycle Reserve/)).toBeInTheDocument();
     expect(screen.getByText(/Three ETH Stellar Selection recipients/)).toBeInTheDocument();
-    expect(screen.getByText(/Cycle Reserve rolls forward/)).toBeInTheDocument();
   });
 
   it('does not claim that gestures stop when the countdown expires', () => {
     // Contract behavior: gestures stay open until finalization executes, and a
     // late gesture takes over the Final Gesture position.
-    renderWithTooltip(<GameCycle />);
+    renderWithTooltip(<GameCycle gameCycle={gameCycle} />);
     expect(screen.queryByText(/the cycle closes/)).not.toBeInTheDocument();
     expect(screen.queryByText(/No more gestures/)).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = renderWithTooltip(<GameCycle />);
+    const { container } = renderWithTooltip(<GameCycle gameCycle={gameCycle} />);
     await checkA11y(container);
   });
 });

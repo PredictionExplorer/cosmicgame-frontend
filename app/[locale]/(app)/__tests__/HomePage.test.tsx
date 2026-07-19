@@ -253,6 +253,7 @@ jest.mock('../../../../components/tables/SpecialAllocationRecipients', () => ({
 }));
 
 jest.mock('../../../../utils', () => ({
+  formatSeconds: (seconds: number) => `${seconds}s`,
   convertTimestampToDateTime: (timestamp: number, showSecond: boolean = false): string => {
     const monthNames = [
       'Jan',
@@ -418,7 +419,7 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const chronoCore = screen.getByTestId('chrono-core-timer');
-    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
+    const observatory = screen.getByRole('region', { name: 'home.hero.console.ariaLabel' });
     expect(chronoCore).toHaveAttribute('data-phase', 'live');
     expect(observatory.compareDocumentPosition(chronoCore)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
@@ -432,11 +433,9 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const chronoCore = screen.getByTestId('chrono-core-timer');
-    const phaseGuide = screen.getByRole('heading', {
-      name: 'Where this Performance Cycle is now',
-    });
+    const phaseGuide = screen.getByRole('heading', { name: 'home.phaseGuide.title' });
     expect(chronoCore.compareDocumentPosition(phaseGuide)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(screen.getByRole('list', { name: 'Performance Cycle phases' })).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'home.phaseGuide.timelineAria' })).toBeInTheDocument();
   });
 
   it('renders a premium observatory hero with live cycle data and protocol story', () => {
@@ -448,15 +447,17 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Shape the next Cosmic Signature' }),
+      screen.getByRole('heading', { level: 1, name: 'home.hero.phase.live.headline' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Live on Arbitrum')).toBeInTheDocument();
-    expect(screen.getByText('Gestures shape the art')).toBeInTheDocument();
-    expect(screen.getByText('CST records participation')).toBeInTheDocument();
-    expect(screen.getByText('Allocations fund public goods')).toBeInTheDocument();
+    expect(screen.getByText('home.hero.phase.live.badge')).toBeInTheDocument();
+    expect(screen.getByText('home.hero.story.gestures.title')).toBeInTheDocument();
+    expect(screen.getByText('home.hero.story.cst.title')).toBeInTheDocument();
+    expect(screen.getByText('home.hero.story.publicGoods.title')).toBeInTheDocument();
 
-    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
-    expect(within(observatory).getByRole('heading', { name: 'Cycle #7' })).toBeInTheDocument();
+    const observatory = screen.getByRole('region', { name: 'home.hero.console.ariaLabel' });
+    expect(
+      within(observatory).getByRole('heading', { name: 'home.hero.cycleNumber(number=7)' }),
+    ).toBeInTheDocument();
     expect(within(observatory).getByText('42')).toBeInTheDocument();
     expect(within(observatory).getByText('2.7500 ETH')).toBeInTheDocument();
     expect(within(observatory).getByText('7%')).toBeInTheDocument();
@@ -471,13 +472,12 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(screen.getByRole('link', { name: /View Cosmic Signature #/ })).toHaveAttribute(
-      'href',
-      expect.stringMatching(/^\/detail\/\d+$/),
-    );
+    expect(
+      screen.getByRole('link', { name: /home\.hero\.console\.viewSignatureAria/ }),
+    ).toHaveAttribute('href', expect.stringMatching(/^\/detail\/\d+$/));
     expect(screen.getByTestId('nft-image')).toHaveAttribute(
       'alt',
-      expect.stringMatching(/^Cosmic Signature artwork #\d{6}$/),
+      expect.stringMatching(/^home\.hero\.console\.artworkAlt\(id=#\d{6}\)$/),
     );
   });
 
@@ -492,7 +492,9 @@ describe('HomePage', () => {
     try {
       render(<HomePage />);
 
-      const buttons = screen.getAllByRole('button', { name: /Make a Gesture/ });
+      const buttons = screen.getAllByRole('button', {
+        name: /home\.hero\.phase\.live\.cta|home\.chrono\.cta\.makeGesture/,
+      });
       expect(buttons.length).toBeGreaterThanOrEqual(1);
       await user.click(buttons[0]!);
 
@@ -523,7 +525,9 @@ describe('HomePage', () => {
       render(<HomePage />);
 
       const chronoCore = screen.getByTestId('chrono-core-timer');
-      await user.click(within(chronoCore).getByRole('button', { name: /Finalize Cycle/ }));
+      await user.click(
+        within(chronoCore).getByRole('button', { name: 'home.chrono.cta.finalize' }),
+      );
 
       expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
       expect(mockAllocationFinalize.onFinalize).not.toHaveBeenCalled();
@@ -546,9 +550,11 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
     expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute('data-phase', 'opening-soon');
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Next Cycle Opens Soon' }),
+      screen.getByRole('heading', { level: 1, name: 'home.hero.phase.openingSoon.headline' }),
     ).toBeInTheDocument();
-    const links = screen.getAllByRole('link', { name: /View Cycle Details|View Cycle/ });
+    const links = screen.getAllByRole('link', {
+      name: /home\.hero\.viewCycleDetails|home\.chrono\.cta\.viewCycle/,
+    });
     expect(links.length).toBeGreaterThanOrEqual(1);
     for (const link of links) {
       expect(link).toHaveAttribute('href', '/current-cycle');
@@ -558,7 +564,7 @@ describe('HomePage', () => {
   it('shows gesture form skeletons instead of a blocking overlay while loading', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<HomePage />);
-    expect(screen.getByRole('status', { name: 'Loading gesture form' })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'home.form.loadingAria' })).toBeInTheDocument();
     expect(screen.getByTestId('gesture-form-skeleton')).toBeInTheDocument();
   });
 
@@ -644,9 +650,7 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(
-      screen.getByRole('button', { name: /Gesture with CST \(FREE GESTURE\)/ }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'home.form.submit.cstFree' })).toBeInTheDocument();
   });
 
   it('keeps merged CST data wired while rendering the disconnected preview path', () => {
@@ -735,7 +739,7 @@ describe('HomePage', () => {
       render(<HomePage />);
 
       const chat = screen.getByTestId('gesture-message-chat');
-      await user.click(within(chat).getByRole('button', { name: 'Make a Gesture' }));
+      await user.click(within(chat).getByRole('button', { name: 'home.chat.empty.cta' }));
 
       expect(mockGestureForm.setAdvancedExpanded).toHaveBeenCalledWith(true);
       expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
@@ -754,7 +758,7 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const chat = screen.getByTestId('gesture-message-chat');
-    expect(within(chat).getByText('No gesture messages yet')).toBeInTheDocument();
+    expect(within(chat).getByText('home.chat.empty.title')).toBeInTheDocument();
   });
 
   it('places the gesture chat after the primary current-cycle content in the responsive layout', () => {
@@ -768,7 +772,7 @@ describe('HomePage', () => {
     const status = screen.getByTestId('gesture-status');
     const leaders = screen.getByTestId('special-allocation-recipients');
     const form = screen.getByTestId('gesture-form');
-    const allocationHeading = screen.getByText('Allocation Breakdown');
+    const allocationHeading = screen.getByText('home.allocation.title');
     const chat = screen.getByTestId('gesture-message-chat');
     const layout = screen.getByTestId('home-current-cycle-layout');
     const primaryColumn = screen.getByTestId('home-primary-column');
@@ -878,7 +882,7 @@ describe('HomePage', () => {
     expect(showcase).toHaveAttribute('data-count', '2');
     expect(showcase).toHaveAttribute('data-erc20-count', '0');
     expect(showcase).toHaveAttribute('data-cycle', '7');
-    expect(screen.getByText('Allocation Breakdown').compareDocumentPosition(showcase)).toBe(
+    expect(screen.getByText('home.allocation.title').compareDocumentPosition(showcase)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
   });
@@ -943,7 +947,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText('Allocation Breakdown')).toBeInTheDocument();
+    expect(screen.getByText('home.allocation.title')).toBeInTheDocument();
   });
 
   it('renders Public Goods impact card when dashboard data is loaded', () => {
@@ -952,7 +956,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText("Funding Ethereum's core contributors.")).toBeInTheDocument();
+    expect(screen.getByText('home.publicGoods.heading')).toBeInTheDocument();
     expect(screen.getAllByText('0.7000 ETH').length).toBeGreaterThan(0);
   });
 
@@ -962,7 +966,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText('View Full Cycle Details')).toBeInTheDocument();
+    expect(screen.getByText('home.cycleDetails.title')).toBeInTheDocument();
   });
 
   it('shows link to previous cycle allocations when cycle > 1', () => {
@@ -971,7 +975,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Cycle 4 allocations/)).toBeInTheDocument();
+    expect(screen.getByText('home.hero.console.previousAllocations(number=4)')).toBeInTheDocument();
   });
 
   it('does not show previous cycle link when cycle is 1', () => {
@@ -980,7 +984,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.queryByText(/Cycle \d+ allocations/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/home\.hero\.console\.previousAllocations/)).not.toBeInTheDocument();
   });
 
   it('does not render GestureForm when still loading', () => {
@@ -998,7 +1002,7 @@ describe('HomePage', () => {
     render(<HomePage />);
     expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
     expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-preview', 'true');
-    expect(screen.getByText('Connect to submit your gesture')).toBeInTheDocument();
+    expect(screen.getByText('home.form.connect.title')).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
   });
 
@@ -1018,7 +1022,7 @@ describe('HomePage', () => {
 
     expect(screen.queryByTestId('connect-to-gesture')).not.toBeInTheDocument();
     expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-preview', 'false');
-    expect(screen.getByRole('button', { name: /Gesture with ETH/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /home\.form\.submit\.eth/ })).toBeEnabled();
   });
 
   it('shows a sticky mobile gesture CTA labelled for the wallet state', () => {
@@ -1029,17 +1033,19 @@ describe('HomePage', () => {
 
     const { rerender } = render(<HomePage />);
     // Hero + chrono timer use scroll-only buttons; sticky mobile CTA remains a link.
-    expect(screen.getAllByRole('button', { name: 'Make a Gesture' }).length).toBeGreaterThanOrEqual(
-      1,
-    );
-    expect(screen.getByRole('link', { name: 'Make a Gesture' })).toHaveAttribute(
+    expect(
+      screen.getAllByRole('button', {
+        name: /home\.hero\.phase\.live\.cta|home\.chrono\.cta\.makeGesture/,
+      }).length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('link', { name: 'home.mobileCta.makeGesture' })).toHaveAttribute(
       'href',
       '#make-gesture',
     );
 
     mockAccount = null;
     rerender(<HomePage />);
-    expect(screen.getByRole('link', { name: 'Preview Gesture Options' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'home.mobileCta.preview' })).toHaveAttribute(
       'href',
       '#make-gesture',
     );
@@ -1067,10 +1073,12 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    const ticker = screen.getByRole('link', { name: 'Open latest gesture 42' });
+    const ticker = screen.getByRole('link', { name: 'home.ticker.openLatestAria(id=42)' });
     expect(ticker).toHaveAttribute('href', '/gesture/42');
-    expect(ticker).toHaveTextContent(/made an ETH gesture/);
-    expect(ticker).toHaveTextContent(/2m ago/);
+    expect(ticker).toHaveTextContent(
+      'home.ticker.gestureLine(address=0x111111....111111,kind=eth)',
+    );
+    expect(ticker).toHaveTextContent('home.ticker.age.minutes(count=2)');
   });
 
   it('labels CST and RandomWalk gestures in the ticker', () => {
@@ -1093,9 +1101,9 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(screen.getByRole('link', { name: 'Open latest gesture 43' })).toHaveTextContent(
-      /made a CST gesture/,
-    );
+    expect(
+      screen.getByRole('link', { name: 'home.ticker.openLatestAria(id=43)' }),
+    ).toHaveTextContent(/kind=cst/);
   });
 
   it('pulses live surfaces when a cosmic:gesture-placed event arrives', async () => {
@@ -1120,7 +1128,7 @@ describe('HomePage', () => {
 
       render(<HomePage />);
 
-      const ticker = screen.getByRole('link', { name: 'Open latest gesture 44' });
+      const ticker = screen.getByRole('link', { name: 'home.ticker.openLatestAria(id=44)' });
       expect(ticker).not.toHaveClass('animate-live-flash');
 
       act(() => {
@@ -1147,7 +1155,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    await user.click(screen.getByRole('button', { name: /Gesture with ETH/ }));
+    await user.click(screen.getByRole('button', { name: /home\.form\.submit\.eth/ }));
 
     expect(mockSetQueryData).toHaveBeenCalledWith(['dashboardInfo'], expect.any(Function));
     const updater = mockSetQueryData.mock.calls[0]![1] as (
@@ -1210,7 +1218,7 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     const buttons = screen.getAllByRole('button');
-    const gestureButton = buttons.find((b) => b.textContent?.includes('Gesture'));
+    const gestureButton = buttons.find((b) => b.textContent?.includes('home.form.submit'));
     expect(gestureButton).toBeDefined();
   });
 
@@ -1222,7 +1230,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    await user.click(screen.getByRole('button', { name: /Gesture with ETH \(0\.01020 ETH\)/ }));
+    await user.click(screen.getByRole('button', { name: 'home.form.submit.eth(cost=0.01020)' }));
 
     expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
     expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
@@ -1239,7 +1247,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    await user.click(screen.getByRole('button', { name: /Gesture with CST \(1\.00 CST\)/ }));
+    await user.click(screen.getByRole('button', { name: 'home.form.submit.cst(cost=1.00)' }));
 
     expect(mockGestureForm.onGestureWithCST).toHaveBeenCalledTimes(1);
     expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
@@ -1255,7 +1263,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    const gestureButton = screen.getByRole('button', { name: 'Gesture with ETH + RandomWalk' });
+    const gestureButton = screen.getByRole('button', { name: 'home.form.submit.randomWalk' });
 
     expect(gestureButton).toBeDisabled();
     await user.click(gestureButton);
@@ -1268,7 +1276,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    const finalizeButton = screen.queryByText(/Finalize Cycle/);
+    const finalizeButton = screen.queryByText(/home\.form\.finalize/);
     expect(finalizeButton || screen.queryByTestId('gesture-status')).toBeTruthy();
   });
 
@@ -1284,7 +1292,9 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    const finalizeButtons = screen.getAllByRole('button', { name: /Finalize Cycle/ });
+    const finalizeButtons = screen.getAllByRole('button', {
+      name: /home\.form\.finalize|home\.chrono\.cta\.finalize/,
+    });
     await user.click(finalizeButtons[finalizeButtons.length - 1]!);
 
     expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1);
@@ -1296,15 +1306,16 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Cycle 9 allocations/)).toBeInTheDocument();
-    const link = screen.getByRole('link', { name: /Cycle 9 allocations/ });
+    const link = screen.getByRole('link', {
+      name: /home\.hero\.console\.previousAllocations\(number=9\)/,
+    });
     expect(link).toHaveAttribute('href', '/allocation/9');
   });
 
   it('renders loading skeletons and hides GestureForm when loading', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<HomePage />);
-    expect(screen.getByRole('status', { name: 'Loading gesture form' })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'home.form.loadingAria' })).toBeInTheDocument();
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
   });
 

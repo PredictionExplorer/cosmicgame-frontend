@@ -1,3 +1,5 @@
+import { howItWorksContentEn } from '@/content/how-it-works';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { FAQCallout } from '../components/FAQCallout';
@@ -44,31 +46,34 @@ jest.mock('next/link', () => ({
   ),
 }));
 
+const faqCallout = howItWorksContentEn.faqCallout;
+
 describe('FAQCallout', () => {
   it('renders the heading', () => {
-    render(<FAQCallout />);
+    render(<FAQCallout faqCallout={faqCallout} />);
     expect(screen.getByRole('heading', { name: /Have Questions\?/i })).toBeInTheDocument();
   });
 
   it('renders description text', () => {
-    render(<FAQCallout />);
+    render(<FAQCallout faqCallout={faqCallout} />);
+    expect(screen.getByText(faqCallout.body)).toBeInTheDocument();
     expect(screen.getByText(/Read the FAQ/i)).toBeInTheDocument();
   });
 
   it('renders a link to the FAQ page', () => {
-    render(<FAQCallout />);
+    render(<FAQCallout faqCallout={faqCallout} />);
     const link = screen.getByRole('link', { name: /Browse FAQ/i });
     expect(link).toHaveAttribute('href', '/faq');
   });
 
   it('has the correct aria-labelledby', () => {
-    render(<FAQCallout />);
+    render(<FAQCallout faqCallout={faqCallout} />);
     const section = screen.getByRole('heading', { name: /Have Questions\?/i }).closest('section');
     expect(section).toHaveAttribute('aria-labelledby', 'faq-callout-heading');
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<FAQCallout />);
+    const { container } = render(<FAQCallout faqCallout={faqCallout} />);
     await checkA11y(container);
   });
 });

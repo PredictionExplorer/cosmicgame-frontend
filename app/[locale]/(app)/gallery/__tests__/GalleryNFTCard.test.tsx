@@ -105,7 +105,7 @@ describe('GalleryNFTCard (grid)', () => {
 
   it('renders image with alt text', () => {
     render(<GalleryNFTCard nft={fullNFT} index={0} variant="grid" />);
-    const img = screen.getByAltText('Cosmic Signature #000042');
+    const img = screen.getByAltText('gallery.card.alt(id=#000042)');
     expect(img).toBeInTheDocument();
   });
 
@@ -128,7 +128,7 @@ describe('GalleryNFTCard (list)', () => {
 
   it('shows Unnamed for empty name in list mode', () => {
     render(<GalleryNFTCard nft={unnamedNFT} index={0} variant="list" />);
-    expect(screen.getByText('Unnamed')).toBeInTheDocument();
+    expect(screen.getByText('gallery.card.unnamed')).toBeInTheDocument();
   });
 
   it('links to detail page in list mode', () => {

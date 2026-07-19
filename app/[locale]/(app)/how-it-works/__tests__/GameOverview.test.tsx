@@ -1,3 +1,5 @@
+import { howItWorksContentEn } from '@/content/how-it-works';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -41,42 +43,44 @@ jest.mock('framer-motion', () => {
 const renderWithTooltip = (ui: React.ReactElement) =>
   render(<TooltipProvider>{ui}</TooltipProvider>);
 
+const overview = howItWorksContentEn.overview;
+
 describe('GameOverview', () => {
   it('renders the section heading', () => {
-    renderWithTooltip(<GameOverview />);
+    renderWithTooltip(<GameOverview overview={overview} />);
     expect(screen.getByRole('heading', { name: 'How It Works' })).toBeInTheDocument();
+    expect(screen.getByText(overview.subhead)).toBeInTheDocument();
   });
 
   it('renders all three card titles', () => {
-    renderWithTooltip(<GameOverview />);
+    renderWithTooltip(<GameOverview overview={overview} />);
     expect(screen.getByText('Gesture')).toBeInTheDocument();
     expect(screen.getByText('Endure')).toBeInTheDocument();
     expect(screen.getByText('Receive')).toBeInTheDocument();
   });
 
   it('renders step numbers', () => {
-    renderWithTooltip(<GameOverview />);
+    renderWithTooltip(<GameOverview overview={overview} />);
     expect(screen.getByText('01')).toBeInTheDocument();
     expect(screen.getByText('02')).toBeInTheDocument();
     expect(screen.getByText('03')).toBeInTheDocument();
   });
 
-  it('renders card descriptions', () => {
-    renderWithTooltip(<GameOverview />);
+  it('renders every card description from the content module', () => {
+    renderWithTooltip(<GameOverview overview={overview} />);
+    for (const card of overview.cards) {
+      expect(screen.getByText(card.description)).toBeInTheDocument();
+    }
     expect(screen.getByText(/Make a gesture with ETH or CST/)).toBeInTheDocument();
-    expect(screen.getByText(/Cycle Finalization Time expires/)).toBeInTheDocument();
-    expect(
-      screen.getByText(/Participate in allocations when the cycle finalizes/),
-    ).toBeInTheDocument();
   });
 
   it('has the correct section id for anchor linking', () => {
-    const { container } = renderWithTooltip(<GameOverview />);
+    const { container } = renderWithTooltip(<GameOverview overview={overview} />);
     expect(container.querySelector('#protocol-overview')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = renderWithTooltip(<GameOverview />);
+    const { container } = renderWithTooltip(<GameOverview overview={overview} />);
     await checkA11y(container);
   });
 });

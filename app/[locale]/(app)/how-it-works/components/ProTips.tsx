@@ -3,56 +3,9 @@
 import { motion } from 'framer-motion';
 import { Shield, TrendingDown, ImageIcon, Ticket, Clock, Zap } from 'lucide-react';
 
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import type { HowItWorksContent } from '@/content/how-it-works';
 
-const tips = [
-  {
-    Icon: TrendingDown,
-    title: 'Watch Both Calibration Windows',
-    description:
-      'ETH and CST Gesture Costs follow separate live windows, and each gesture changes the CST window.',
-    tooltip:
-      'ETH gestures slightly shorten the CST Calibration Window; CST gestures slightly lengthen it. The live app panels show the current cost path.',
-  },
-  {
-    Icon: ImageIcon,
-    title: 'Attach a Random Walk NFT',
-    description: 'Holding a Random Walk NFT grants a one-time 50% ETH Gesture Cost reduction.',
-    tooltip:
-      'Each Random Walk NFT can be used once for the cost reduction. Save it for a higher-cost gesture to maximize the effect.',
-  },
-  {
-    Icon: Ticket,
-    title: 'Stack Stellar Selection Entries',
-    description:
-      'Each gesture records one Stellar Selection entry. More gestures means higher Selection frequency.',
-    tooltip:
-      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT.',
-  },
-  {
-    Icon: Shield,
-    title: 'Use a Burner Wallet',
-    description:
-      'The smart contracts are publicly source-verified on-chain, but using a dedicated wallet for participation adds an extra layer of safety.',
-    tooltip:
-      'A burner wallet isolates your protocol activity from your main holdings for additional security. Audit and verification status is published on the Audits page.',
-  },
-  {
-    Icon: Clock,
-    title: 'Watch the Finalization Time',
-    description:
-      'Each gesture adds the current time increment to the stored Cycle Finalization Time.',
-    tooltip:
-      'Gesturing near the deadline positions you closest to the Final Gesture, but another participant can still gesture after you until the cycle is finalized.',
-  },
-  {
-    Icon: Zap,
-    title: 'Gesture with CST',
-    description: 'Use CST as an alternative gesture currency through the CST Calibration Window.',
-    tooltip:
-      'A CST gesture records a Stellar Selection entry, extends the timer, may imprint dynamic Participation CST, and lengthens the CST Calibration Window by about 0.4%.',
-  },
-] as const;
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const containerVariants = {
   hidden: {},
@@ -64,7 +17,16 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
 };
 
-export function ProTips() {
+export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) {
+  const tips = [
+    { Icon: TrendingDown, ...proTips.tips[0] },
+    { Icon: ImageIcon, ...proTips.tips[1] },
+    { Icon: Ticket, ...proTips.tips[2] },
+    { Icon: Shield, ...proTips.tips[3] },
+    { Icon: Clock, ...proTips.tips[4] },
+    { Icon: Zap, ...proTips.tips[5] },
+  ];
+
   return (
     <section aria-labelledby="tips-heading" className="py-16">
       <div className="mb-10 text-center">
@@ -72,11 +34,9 @@ export function ProTips() {
           id="tips-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          Pro Tips &amp; Strategy
+          {proTips.heading}
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Practical guidance for maximizing participation across allocation tracks.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{proTips.subhead}</p>
       </div>
 
       <motion.div

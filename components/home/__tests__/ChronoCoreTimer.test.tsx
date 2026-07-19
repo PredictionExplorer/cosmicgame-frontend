@@ -87,14 +87,12 @@ describe('<ChronoCoreTimer />', () => {
 
     const timer = screen.getByTestId('chrono-core-timer');
     expect(timer).toHaveAttribute('data-phase', 'live');
-    expect(screen.getByText('Cycle finalizes in')).toBeInTheDocument();
-    expect(
-      screen.getByText('Cycle is live. Each Gesture can extend the finalization clock.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('home.chrono.phase.live.eyebrow')).toBeInTheDocument();
+    expect(screen.getByText('home.chrono.phase.live.status')).toBeInTheDocument();
     expect(screen.queryByText('Protocol clock locked')).not.toBeInTheDocument();
     expect(screen.queryByText('Chrono Core')).not.toBeInTheDocument();
     expect(screen.queryByText('2.5000 ETH')).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Make a Gesture/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'home.chrono.cta.makeGesture' })).toHaveAttribute(
       'href',
       '#make-gesture',
     );
@@ -120,9 +118,9 @@ describe('<ChronoCoreTimer />', () => {
 
     const timer = screen.getByTestId('chrono-core-timer');
     expect(timer).toHaveAttribute('data-phase', 'final-minute');
-    expect(screen.getByText('Final minute. Tenths are live.')).toBeInTheDocument();
+    expect(screen.getByText('home.chrono.phase.finalMinute.status')).toBeInTheDocument();
     expect(screen.getByRole('timer')).toHaveAccessibleName(
-      'Final minute. Final minute. Tenths are live.',
+      'home.chrono.timerAria(label=home.chrono.phase.finalMinute.label,status=home.chrono.phase.finalMinute.status)',
     );
   });
 
@@ -138,15 +136,10 @@ describe('<ChronoCoreTimer />', () => {
 
     const timer = screen.getByTestId('chrono-core-timer');
     expect(timer).toHaveAttribute('data-phase', 'opening-soon');
-    expect(screen.getByText('Next cycle opens in')).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'Waiting for the next cycle. Gestures open when this countdown reaches zero.',
-      ),
-    ).toBeInTheDocument();
-    expect(screen.queryByText('Time left in this cycle')).not.toBeInTheDocument();
+    expect(screen.getByText('home.chrono.phase.openingSoon.eyebrow')).toBeInTheDocument();
+    expect(screen.getByText('home.chrono.phase.openingSoon.status')).toBeInTheDocument();
     expect(screen.getByTestId('chrono-status')).toHaveClass('font-semibold', 'text-foreground');
-    expect(screen.getByRole('link', { name: /View Cycle/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'home.chrono.cta.viewCycle' })).toHaveAttribute(
       'href',
       '/current-cycle',
     );
@@ -169,11 +162,9 @@ describe('<ChronoCoreTimer />', () => {
       'data-phase',
       'ready-to-finalize',
     );
-    expect(screen.getByText('00:00')).toBeInTheDocument();
-    expect(
-      screen.getByText('Finalization is ready. A new Gesture can still extend the cycle.'),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Finalize Cycle/ })).toHaveAttribute(
+    expect(screen.getByText('home.chrono.phase.readyToFinalize.display')).toBeInTheDocument();
+    expect(screen.getByText('home.chrono.phase.readyToFinalize.status')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'home.chrono.cta.finalize' })).toHaveAttribute(
       'href',
       '#make-gesture',
     );
@@ -191,9 +182,9 @@ describe('<ChronoCoreTimer />', () => {
       'data-phase',
       'waiting-first-gesture',
     );
-    expect(screen.getByText('Awaiting first Gesture')).toBeInTheDocument();
+    expect(screen.getByText('home.chrono.phase.waitingFirstGesture.display')).toBeInTheDocument();
     expect(screen.getByTestId('chrono-status')).toHaveClass('font-semibold', 'text-foreground');
-    expect(screen.getByRole('link', { name: /Make the first Gesture/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'home.chrono.cta.makeFirstGesture' })).toHaveAttribute(
       'href',
       '#make-gesture',
     );

@@ -12,12 +12,14 @@ describe('AuctionInfo', () => {
   it('renders a prominent dynamic duration and active progress details', () => {
     render(<AuctionInfo secondsElapsed={1350} auctionDuration={5400} />);
 
-    expect(screen.getByRole('region', { name: 'Calibration Window' })).toBeInTheDocument();
-    expect(screen.getByText('Dynamic Duration')).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'home.calibration.defaultTitle' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.dynamicDuration')).toBeInTheDocument();
     expect(screen.getAllByText('5400s')).toHaveLength(2);
     expect(screen.getByText('1350s')).toBeInTheDocument();
     expect(screen.getByText('4050s')).toBeInTheDocument();
-    expect(screen.getByText('25% complete')).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.percentComplete(percent=25%)')).toBeInTheDocument();
   });
 
   it('renders an accessible progressbar with clamped values', () => {
@@ -26,7 +28,7 @@ describe('AuctionInfo', () => {
     );
 
     const progress = screen.getByRole('progressbar', {
-      name: 'CST Calibration Window progress',
+      name: 'home.calibration.progressAria(title=CST Calibration Window)',
     });
     expect(progress).toHaveAttribute('aria-valuemin', '0');
     expect(progress).toHaveAttribute('aria-valuemax', '100');
@@ -39,14 +41,14 @@ describe('AuctionInfo', () => {
       <AuctionInfo secondsElapsed={43} auctionDuration={43200} title="CST Calibration Window" />,
     );
 
-    expect(screen.getByText('0.1% complete')).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.percentComplete(percent=0.1%)')).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0.1');
   });
 
   it('shows ended message when elapsed is greater than duration', () => {
     render(<AuctionInfo secondsElapsed={6000} auctionDuration={5400} />);
 
-    expect(screen.getByText('Calibration Window closed.')).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.defaultEndedMessage')).toBeInTheDocument();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText('0s')).toBeInTheDocument();
   });
@@ -54,16 +56,16 @@ describe('AuctionInfo', () => {
   it('keeps the dynamic window active when elapsed equals duration', () => {
     render(<AuctionInfo secondsElapsed={5400} auctionDuration={5400} />);
 
-    expect(screen.getByText('100% complete')).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.percentComplete(percent=100%)')).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
     expect(screen.getAllByText('5400s')).toHaveLength(3);
-    expect(screen.queryByText('Calibration Window closed.')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.calibration.defaultEndedMessage')).not.toBeInTheDocument();
   });
 
   it('handles zero values gracefully', () => {
     render(<AuctionInfo secondsElapsed={0} auctionDuration={0} />);
 
-    expect(screen.getByText('0% complete')).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.percentComplete(percent=0%)')).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
     expect(screen.getAllByText('0s')).toHaveLength(4);
     expect(screen.queryByText('NaN')).not.toBeInTheDocument();
@@ -81,7 +83,7 @@ describe('AuctionInfo', () => {
     expect(
       screen.getByText('Calibration Window closed, you can gesture for free.'),
     ).toBeInTheDocument();
-    expect(screen.queryByText('Calibration Window closed.')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.calibration.defaultEndedMessage')).not.toBeInTheDocument();
   });
 
   it('supports custom labels for CST-specific display copy', () => {
@@ -98,7 +100,7 @@ describe('AuctionInfo', () => {
     expect(
       screen.getByText('The CST gesture cost descends through this dynamic contract window.'),
     ).toBeInTheDocument();
-    expect(screen.getByText('50% complete')).toBeInTheDocument();
+    expect(screen.getByText('home.calibration.percentComplete(percent=50%)')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

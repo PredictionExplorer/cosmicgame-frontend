@@ -98,20 +98,18 @@ describe('GalleryGrid', () => {
 
   it('shows empty state when no items', () => {
     render(<GalleryGrid {...defaultProps} items={[]} totalItems={0} />);
-    expect(screen.getByText('No NFTs found')).toBeInTheDocument();
+    expect(screen.getByText('gallery.empty.title')).toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('shows pagination info', () => {
     render(<GalleryGrid {...defaultProps} />);
-    const showingText = screen.getByText(/Showing/);
-    expect(showingText).toBeInTheDocument();
-    expect(showingText.textContent).toContain('3');
+    expect(screen.getByText('gallery.pagination.showing')).toBeInTheDocument();
   });
 
   it('renders per-page selector', () => {
     render(<GalleryGrid {...defaultProps} />);
-    expect(screen.getByText('Per page')).toBeInTheDocument();
+    expect(screen.getByText('gallery.pagination.perPage')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 
+import type { HowItWorksContent } from '@/content/how-it-works';
+
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 
@@ -17,7 +19,11 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
-export function CallToAction() {
+export function CallToAction({
+  callToAction,
+}: {
+  callToAction: HowItWorksContent['callToAction'];
+}) {
   return (
     <motion.section
       aria-labelledby="cta-heading"
@@ -31,38 +37,35 @@ export function CallToAction() {
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent" />
 
         <h2 id="cta-heading" className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          Ready to Make Your First Gesture?
+          {callToAction.heading}
         </h2>
 
-        <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-          Join the active Performance Cycle. Connect your wallet and make your first gesture to
-          start imprinting CST and shaping the cycle\u2019s Signature.
-        </p>
+        <p className="mx-auto mt-3 max-w-lg text-muted-foreground">{callToAction.body}</p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Button asChild size="lg">
-            <Link href="/">Open the Protocol</Link>
+            <Link href={callToAction.primaryCta.href}>{callToAction.primaryCta.label}</Link>
           </Button>
         </div>
 
         <div className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground">
           <a
-            href="https://discord.com/channels/1258032742084509779/1258691600951935056"
+            href={callToAction.discordCta.href}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 transition-colors hover:text-primary"
           >
             <MessageCircle className="h-4 w-4" />
-            Discord
+            {callToAction.discordCta.label}
           </a>
           <a
-            href="https://x.com/CosmicSignature"
+            href={callToAction.twitterCta.href}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 transition-colors hover:text-primary"
           >
             <XIcon className="h-4 w-4" />
-            Twitter / X
+            {callToAction.twitterCta.label}
           </a>
         </div>
       </div>

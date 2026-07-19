@@ -3,6 +3,7 @@
 import { type SyntheticEvent, type ComponentProps, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Wallet, Clock, Users } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 import { formatEthValue, formatSeconds, type EnduranceChampion } from '@/utils';
@@ -63,6 +64,9 @@ export function RoundInfoSection({
   setCurPage,
   perPage,
 }: RoundInfoSectionProps) {
+  const t = useTranslations('currentCycle');
+  const locale = useLocale();
+
   const uniqueParticipants = useMemo(() => {
     const addrs = new Set(curGestureList.map((b) => b.BidderAddr));
     return addrs.size;
@@ -73,8 +77,8 @@ export function RoundInfoSection({
   const roundDuration = useMemo(() => {
     if (!data?.TsRoundStart) return '';
     const elapsed = Math.floor(nowMs / 1000) - data.TsRoundStart;
-    return elapsed > 0 ? formatSeconds(elapsed) : '';
-  }, [data, nowMs]);
+    return elapsed > 0 ? formatSeconds(elapsed, locale) : '';
+  }, [data, nowMs, locale]);
 
   return (
     <div className="space-y-16">
@@ -86,8 +90,8 @@ export function RoundInfoSection({
       {/* 2. Fund Distribution */}
       <motion.div custom={1} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title="Allocation Tracks" className="flex-1" />
-          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
+          <SectionDivider title={t('sections.allocationTracks.title')} className="flex-1" />
+          <InfoTooltip content={t('sections.allocationTracks.tooltip')} />
         </div>
         <FundDistribution data={data ?? undefined} />
       </motion.div>
@@ -95,8 +99,8 @@ export function RoundInfoSection({
       {/* 3. Stellar Selection Entries */}
       <motion.div custom={2} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title="Stellar Selection Entries" className="flex-1" />
-          <InfoTooltip content="Each gesture records one Stellar Selection entry. More gestures = higher Selection frequency for ETH or Cosmic Signature NFT allocations." />
+          <SectionDivider title={t('sections.stellarSelectionEntries.title')} className="flex-1" />
+          <InfoTooltip content={t('sections.stellarSelectionEntries.tooltip')} />
         </div>
         <StellarSelectionHolderTable
           list={curGestureList}
@@ -108,8 +112,8 @@ export function RoundInfoSection({
       {/* 4. Top ETH Spenders */}
       <motion.div custom={3} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title="Top ETH Spenders" className="flex-1" />
-          <InfoTooltip content="Participant addresses ranked by total ETH spent on gestures this cycle." />
+          <SectionDivider title={t('sections.topEthSpenders.title')} className="flex-1" />
+          <InfoTooltip content={t('sections.topEthSpenders.tooltip')} />
         </div>
         <ETHSpentTable list={curGestureList as ComponentProps<typeof ETHSpentTable>['list']} />
       </motion.div>
@@ -117,8 +121,8 @@ export function RoundInfoSection({
       {/* 5. Endurance Champions */}
       <motion.div custom={4} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title="Endurance Champions" className="flex-1" />
-          <InfoTooltip content="Participants ranked by how long they remained the most-recent gesture maker. The one with the longest consecutive interval receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT." />
+          <SectionDivider title={t('sections.enduranceChampions.title')} className="flex-1" />
+          <InfoTooltip content={t('sections.enduranceChampions.tooltip')} />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(45,93%,52%)]/40">
           <EnduranceChampionsTable
@@ -132,10 +136,10 @@ export function RoundInfoSection({
       <motion.div custom={5} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
           <SectionDivider
-            title={`Gesture History \u2014 Cycle ${data?.CurRoundNum ?? ''}`}
+            title={t('sections.gestureHistory.title', { n: data?.CurRoundNum ?? '' })}
             className="flex-1"
           />
-          <InfoTooltip content="Chronological record of every gesture made in this cycle, newest first." />
+          <InfoTooltip content={t('sections.gestureHistory.tooltip')} />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(196,98%,54%)]/40">
           <GestureHistory gestureHistory={curGestureList} showRound={false} />
@@ -146,8 +150,8 @@ export function RoundInfoSection({
       {ethDonations.length > 0 && (
         <motion.div custom={6} variants={sectionFade} initial="hidden" animate="visible">
           <div className="flex items-center gap-2 mb-6">
-            <SectionDivider title="ETH Contributions" className="flex-1" />
-            <InfoTooltip content="Direct ETH contributions made by community members during this cycle." />
+            <SectionDivider title={t('sections.ethContributions.title')} className="flex-1" />
+            <InfoTooltip content={t('sections.ethContributions.tooltip')} />
           </div>
           <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(205,100%,71%)]/40">
             <EthDonationTable list={ethDonations} showType={false} />
@@ -171,8 +175,8 @@ export function RoundInfoSection({
       {/* 9. Cycle Rules (collapsible) */}
       <motion.div custom={8} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-4">
-          <SectionDivider title="Cycle Rules" className="flex-1" />
-          <InfoTooltip content="Key rules and allocation mechanics for this cycle." />
+          <SectionDivider title={t('sections.cycleRules.title')} className="flex-1" />
+          <InfoTooltip content={t('sections.cycleRules.tooltip')} />
         </div>
         <div className="gradient-border-card rounded-xl bg-white/[0.02]">
           <Accordion type="single" collapsible>
@@ -180,38 +184,42 @@ export function RoundInfoSection({
               <AccordionTrigger className="px-5 py-4 hover:no-underline">
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4 text-primary/60" />
-                  <span className="text-sm font-medium text-muted-foreground">How it works</span>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {t('rules.howItWorks')}
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-5 pb-5">
                 <div className="text-sm text-muted-foreground space-y-3">
                   <p>
-                    When you gesture, you may imprint{' '}
-                    <span className="text-white font-medium">dynamic Participation CST</span>. The
-                    amount uses a square-root formula based on how long it has been since the
-                    previous gesture.
+                    {t.rich('rules.participation', {
+                      em: (chunks) => <span className="text-white font-medium">{chunks}</span>,
+                    })}
                   </p>
                   <p>
-                    ETH gestures shorten the CST Calibration Window by about{' '}
-                    {protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures
-                    lengthen it by about{' '}
-                    {protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.
+                    {t('rules.calibration', {
+                      decreasePercent:
+                        protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+                      increasePercent:
+                        protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+                    })}
                   </p>
                   <p>
-                    Each gesture records one Stellar Selection entry.{' '}
-                    {data?.NumRaffleEthWinnersBidding} entries receive {data?.RafflePercentage}% of
-                    the Cycle Reserve. {data?.NumRaffleNFTWinnersBidding} additional Selection
-                    recipients and {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT
-                    anchor-holders receive a Cosmic Signature NFT.
+                    {t('rules.stellarSelection', {
+                      ethEntries: data?.NumRaffleEthWinnersBidding ?? '',
+                      rafflePercent: data?.RafflePercentage ?? '',
+                      nftEntries: data?.NumRaffleNFTWinnersBidding ?? '',
+                      anchorHolders: data?.NumRaffleNFTWinnersStakingRWalk ?? '',
+                    })}
                   </p>
                   <p>
-                    Protocol Guild receives {data?.CharityPercentage ?? 0}% of the Cycle Reserve (at
-                    least{' '}
-                    {(
-                      (Number(data?.CosmicGameBalanceEth) || 0) *
-                      ((data?.CharityPercentage ?? 0) / 100)
-                    ).toFixed(4)}{' '}
-                    ETH) each cycle.
+                    {t('rules.publicGoods', {
+                      percent: data?.CharityPercentage ?? 0,
+                      amount: (
+                        (Number(data?.CosmicGameBalanceEth) || 0) *
+                        ((data?.CharityPercentage ?? 0) / 100)
+                      ).toFixed(4),
+                    })}
                   </p>
                 </div>
               </AccordionContent>
@@ -233,7 +241,7 @@ export function RoundInfoSection({
               </div>
               <div>
                 <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Contract Balance
+                  {t('footer.contractBalance')}
                 </p>
                 <p className="text-sm font-bold text-white">
                   {formatEthValue(Number(data?.CosmicGameBalanceEth) || 0)}
@@ -246,9 +254,11 @@ export function RoundInfoSection({
               </div>
               <div>
                 <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Cycle Duration
+                  {t('footer.cycleDuration')}
                 </p>
-                <p className="text-sm font-bold text-white">{roundDuration || 'Not started'}</p>
+                <p className="text-sm font-bold text-white">
+                  {roundDuration || t('status.notStarted')}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -257,7 +267,7 @@ export function RoundInfoSection({
               </div>
               <div>
                 <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Unique Participants
+                  {t('footer.uniqueParticipants')}
                 </p>
                 <p className="text-sm font-bold text-white">{uniqueParticipants}</p>
               </div>

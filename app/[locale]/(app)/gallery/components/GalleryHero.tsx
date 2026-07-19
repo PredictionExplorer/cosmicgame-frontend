@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Gem, Lock, Tag, Trophy } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -46,42 +47,44 @@ function useAnimatedCounter(target: number, duration = 1200) {
 
 const statCards: {
   key: keyof GalleryStats;
-  label: string;
+  labelKey: string;
   icon: typeof Gem;
-  tooltip: string;
+  tooltipKey: string;
   gradient: string;
 }[] = [
   {
     key: 'total',
-    label: 'Total Imprinted',
+    labelKey: 'hero.totalImprinted.label',
     icon: Gem,
-    tooltip: 'The total number of COSMIC NFTs imprinted across all cycles',
+    tooltipKey: 'hero.totalImprinted.tooltip',
     gradient: 'from-[#06AEEC] to-[#35C9FF]',
   },
   {
     key: 'staked',
-    label: 'Currently Anchored',
+    labelKey: 'hero.currentlyAnchored.label',
     icon: Lock,
-    tooltip: 'NFTs anchored to the protocol, receiving distributions for their owners',
+    tooltipKey: 'hero.currentlyAnchored.tooltip',
     gradient: 'from-[#9C37FD] to-[#C77DFF]',
   },
   {
     key: 'named',
-    label: 'Named NFTs',
+    labelKey: 'hero.namedNfts.label',
     icon: Tag,
-    tooltip: 'NFTs that have been given a unique custom name by their owner',
+    tooltipKey: 'hero.namedNfts.tooltip',
     gradient: 'from-[#06AEEC] to-[#9C37FD]',
   },
   {
     key: 'rounds',
-    label: 'Cycles',
+    labelKey: 'hero.cycles.label',
     icon: Trophy,
-    tooltip: 'The number of unique cycles that have produced NFTs',
+    tooltipKey: 'hero.cycles.tooltip',
     gradient: 'from-[#35C9FF] to-[#9C37FD]',
   },
 ];
 
 export function GalleryHero({ stats, loading }: GalleryHeroProps) {
+  const t = useTranslations('gallery');
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-10">
       {statCards.map((card, index) => (
@@ -93,9 +96,9 @@ export function GalleryHero({ stats, loading }: GalleryHeroProps) {
         >
           <StatCard
             value={stats[card.key]}
-            label={card.label}
+            label={t(card.labelKey)}
             icon={card.icon}
-            tooltip={card.tooltip}
+            tooltip={t(card.tooltipKey)}
             gradient={card.gradient}
             loading={loading}
           />
@@ -115,6 +118,7 @@ interface StatCardProps {
 }
 
 function StatCard({ value, label, icon: Icon, tooltip, gradient, loading }: StatCardProps) {
+  const locale = useLocale();
   const animatedValue = useAnimatedCounter(loading ? 0 : value);
 
   return (
@@ -134,7 +138,7 @@ function StatCard({ value, label, icon: Icon, tooltip, gradient, loading }: Stat
                 <div className="h-8 w-16 rounded bg-white/[0.06] animate-pulse" />
               ) : (
                 <p className="text-2xl md:text-3xl font-display font-bold tracking-tight">
-                  {animatedValue.toLocaleString()}
+                  {animatedValue.toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US')}
                 </p>
               )}
             </div>

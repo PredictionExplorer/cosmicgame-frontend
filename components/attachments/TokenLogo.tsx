@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Coins } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 
@@ -28,9 +29,10 @@ function TokenFallback({ symbol }: { symbol?: string }) {
 }
 
 export function TokenLogo({ logoURI, symbol, name, className }: TokenLogoProps) {
+  const t = useTranslations('currentCycle');
   const [failed, setFailed] = useState(false);
   const resolvedLogoURI = logoURI && !failed ? logoURI : null;
-  const label = `${symbol || name || 'ERC20'} token logo`;
+  const label = t('showcase.erc20Card.logoAlt', { token: symbol || name || 'ERC20' });
 
   return (
     <div

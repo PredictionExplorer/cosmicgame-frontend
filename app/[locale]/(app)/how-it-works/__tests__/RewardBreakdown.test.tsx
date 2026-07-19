@@ -1,3 +1,5 @@
+import { howItWorksContentEn } from '@/content/how-it-works';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -41,26 +43,29 @@ jest.mock('framer-motion', () => {
 const renderWithTooltip = (ui: React.ReactElement) =>
   render(<TooltipProvider>{ui}</TooltipProvider>);
 
+const rewardBreakdown = howItWorksContentEn.rewardBreakdown;
+
 describe('RewardBreakdown', () => {
   it('renders the section heading', () => {
-    renderWithTooltip(<RewardBreakdown />);
+    renderWithTooltip(<RewardBreakdown rewardBreakdown={rewardBreakdown} />);
     expect(
       screen.getByRole('heading', { name: 'What Every Gesture Imprints' }),
     ).toBeInTheDocument();
   });
 
   it('renders all four reward titles', () => {
-    renderWithTooltip(<RewardBreakdown />);
+    renderWithTooltip(<RewardBreakdown rewardBreakdown={rewardBreakdown} />);
     expect(screen.getByText('Dynamic Participation CST')).toBeInTheDocument();
     expect(screen.getByText('Stellar Selection Entry')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature NFT Selection')).toBeInTheDocument();
     expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
   });
 
-  it('renders reward descriptions', () => {
-    renderWithTooltip(<RewardBreakdown />);
-    expect(screen.getByText(/may imprint CST based on how long/)).toBeInTheDocument();
-    expect(screen.getByText(/records an entry in Stellar Selection/)).toBeInTheDocument();
+  it('renders every reward description from the content module', () => {
+    renderWithTooltip(<RewardBreakdown rewardBreakdown={rewardBreakdown} />);
+    for (const item of rewardBreakdown.items) {
+      expect(screen.getByText(item.description)).toBeInTheDocument();
+    }
     expect(
       screen.getByText(/receive 1,000 CST and a unique Cosmic Signature NFT/),
     ).toBeInTheDocument();
@@ -68,7 +73,7 @@ describe('RewardBreakdown', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = renderWithTooltip(<RewardBreakdown />);
+    const { container } = renderWithTooltip(<RewardBreakdown rewardBreakdown={rewardBreakdown} />);
     await checkA11y(container);
   });
 });

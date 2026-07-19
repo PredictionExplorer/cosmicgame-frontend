@@ -7,14 +7,10 @@ import '@testing-library/jest-dom';
 describe('LatestNFTs', () => {
   test('with no records shows a helpful empty state', () => {
     render(<LatestNFTs />);
-    expect(screen.getByRole('heading', { name: 'Latest NFTs' })).toBeInTheDocument();
-    expect(
-      screen.getByText('No Cosmic Signature NFTs have been imprinted yet.'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/gallery will fill as Performance Cycles finalize/),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Open the gallery' })).toHaveAttribute(
+    expect(screen.getByRole('heading', { name: 'home.latestNfts.title' })).toBeInTheDocument();
+    expect(screen.getByText('home.latestNfts.empty.title')).toBeInTheDocument();
+    expect(screen.getByText('home.latestNfts.empty.body')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'home.latestNfts.empty.cta' })).toHaveAttribute(
       'href',
       '/gallery',
     );

@@ -32,12 +32,12 @@ describe('PaginationRWLKGrid', () => {
 
   it('renders empty state when no data', () => {
     render(<PaginationRWLKGrid loading={false} data={[]} />);
-    expect(screen.getByText('Nothing Found!')).toBeInTheDocument();
+    expect(screen.getByText('home.rwlkGrid.empty')).toBeInTheDocument();
   });
 
   it('renders search input', () => {
     render(<PaginationRWLKGrid loading={false} data={[]} />);
-    expect(screen.getByPlaceholderText('Enter NFT ID')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder')).toBeInTheDocument();
   });
 
   it('renders RWLK NFT cards when data is provided', () => {
@@ -100,7 +100,7 @@ describe('PaginationRWLKGrid', () => {
   it('search input filters displayed items', () => {
     render(<PaginationRWLKGrid loading={false} data={[10, 20, 30]} />);
 
-    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID'), {
+    fireEvent.change(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder'), {
       target: { value: '20' },
     });
 
@@ -115,7 +115,7 @@ describe('PaginationRWLKGrid', () => {
 
     expect(screen.getAllByTestId('rwlk-card')).toHaveLength(6);
 
-    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID'), {
+    fireEvent.change(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder'), {
       target: { value: '3' },
     });
 
@@ -140,12 +140,12 @@ describe('PaginationRWLKGrid', () => {
   it('clearing search restores all items', () => {
     render(<PaginationRWLKGrid loading={false} data={[10, 20, 30]} />);
 
-    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID'), {
+    fireEvent.change(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder'), {
       target: { value: '20' },
     });
     expect(screen.getAllByTestId('rwlk-card')).toHaveLength(1);
 
-    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID'), {
+    fireEvent.change(screen.getByPlaceholderText('home.rwlkGrid.searchPlaceholder'), {
       target: { value: '' },
     });
     expect(screen.getAllByTestId('rwlk-card')).toHaveLength(3);

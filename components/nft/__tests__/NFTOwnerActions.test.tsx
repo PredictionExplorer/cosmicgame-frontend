@@ -34,70 +34,84 @@ describe('NFTOwnerActions', () => {
 
   it('renders "Manage Your Token" heading', () => {
     render(<NFTOwnerActions {...defaultProps} />);
-    expect(screen.getByText('Manage Your Token')).toBeInTheDocument();
+    expect(screen.getByText('detail.ownerActions.title')).toBeInTheDocument();
   });
 
   it('renders transfer section with Transfer button', () => {
     render(<NFTOwnerActions {...defaultProps} />);
-    expect(screen.getByRole('button', { name: 'Transfer' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'detail.ownerActions.transferButton' }),
+    ).toBeInTheDocument();
   });
 
   it('disables Transfer button when disabled prop is true', () => {
     render(<NFTOwnerActions {...defaultProps} disabled={true} />);
-    expect(screen.getByRole('button', { name: 'Transfer' })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'detail.ownerActions.transferButton' }),
+    ).toBeDisabled();
   });
 
   it('enables Transfer button when disabled prop is false', () => {
     render(<NFTOwnerActions {...defaultProps} disabled={false} />);
-    expect(screen.getByRole('button', { name: 'Transfer' })).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'detail.ownerActions.transferButton' }),
+    ).not.toBeDisabled();
   });
 
   it('calls onTransfer when Transfer is clicked', () => {
     render(<NFTOwnerActions {...defaultProps} disabled={false} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Transfer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'detail.ownerActions.transferButton' }));
     expect(defaultProps.onTransfer).toHaveBeenCalledTimes(1);
   });
 
   it('renders "Set Name" when nftTokenName is empty', () => {
     render(<NFTOwnerActions {...defaultProps} nftTokenName="" />);
-    expect(screen.getByRole('button', { name: /Set Name/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'detail.ownerActions.setName' })).toBeInTheDocument();
   });
 
   it('renders "Change Name" when nftTokenName is present', () => {
     render(<NFTOwnerActions {...defaultProps} nftTokenName="MyToken" />);
-    expect(screen.getByRole('button', { name: /Change Name/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'detail.ownerActions.changeName' }),
+    ).toBeInTheDocument();
   });
 
   it('disables Set Name button when tokenName is empty', () => {
     render(<NFTOwnerActions {...defaultProps} tokenName="" />);
-    expect(screen.getByRole('button', { name: /Set Name/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'detail.ownerActions.setName' })).toBeDisabled();
   });
 
   it('enables Set Name button when tokenName is provided', () => {
     render(<NFTOwnerActions {...defaultProps} tokenName="NewName" />);
-    expect(screen.getByRole('button', { name: /Set Name/i })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: 'detail.ownerActions.setName' })).not.toBeDisabled();
   });
 
   it('renders Clear button when name history exists and currentName is set', () => {
     render(<NFTOwnerActions {...defaultProps} nameHistoryCount={2} currentName="OldName" />);
-    expect(screen.getByRole('button', { name: /Clear/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'detail.ownerActions.clearName' }),
+    ).toBeInTheDocument();
   });
 
   it('does not render Clear button when nameHistoryCount is 0', () => {
     render(<NFTOwnerActions {...defaultProps} nameHistoryCount={0} currentName="" />);
-    expect(screen.queryByRole('button', { name: /Clear/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'detail.ownerActions.clearName' }),
+    ).not.toBeInTheDocument();
   });
 
   it('calls onClearName when Clear is clicked', () => {
     render(<NFTOwnerActions {...defaultProps} nameHistoryCount={1} currentName="Name" />);
-    fireEvent.click(screen.getByRole('button', { name: /Clear/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'detail.ownerActions.clearName' }));
     expect(defaultProps.onClearName).toHaveBeenCalledTimes(1);
   });
 
   it('shows total named tokens count with link', () => {
     render(<NFTOwnerActions {...defaultProps} totalNamedTokens={42} />);
-    expect(screen.getByText(/42 tokens/)).toBeInTheDocument();
-    expect(screen.getByText('View all named tokens').closest('a')).toHaveAttribute(
+    expect(
+      screen.getByText(/detail\.ownerActions\.namedTokensCount\(count=42\)/),
+    ).toBeInTheDocument();
+    expect(screen.getByText('detail.ownerActions.viewAllNamedTokens').closest('a')).toHaveAttribute(
       'href',
       '/named-nfts',
     );
@@ -105,7 +119,7 @@ describe('NFTOwnerActions', () => {
 
   it('calls onAddressChange when typing in the address field', () => {
     render(<NFTOwnerActions {...defaultProps} />);
-    const addressInput = screen.getByPlaceholderText(/Recipient address/);
+    const addressInput = screen.getByPlaceholderText('detail.ownerActions.recipientPlaceholder');
     fireEvent.change(addressInput, { target: { value: '0xABC' } });
     expect(defaultProps.onAddressChange).toHaveBeenCalledWith('0xABC');
   });

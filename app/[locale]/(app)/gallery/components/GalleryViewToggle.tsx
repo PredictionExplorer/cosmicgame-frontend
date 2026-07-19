@@ -1,6 +1,7 @@
 'use client';
 
 import { LayoutGrid, List } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,17 +13,19 @@ interface GalleryViewToggleProps {
   onChange: (mode: ViewMode) => void;
 }
 
-const modes: { value: ViewMode; icon: typeof LayoutGrid; label: string }[] = [
-  { value: 'grid', icon: LayoutGrid, label: 'Grid view' },
-  { value: 'list', icon: List, label: 'List view' },
+const modes: { value: ViewMode; icon: typeof LayoutGrid; labelKey: string }[] = [
+  { value: 'grid', icon: LayoutGrid, labelKey: 'view.grid' },
+  { value: 'list', icon: List, labelKey: 'view.list' },
 ];
 
 export function GalleryViewToggle({ value, onChange }: GalleryViewToggleProps) {
+  const t = useTranslations('gallery');
+
   return (
     <div
       className="flex items-center rounded-lg border border-white/[0.06] bg-white/[0.02] p-0.5"
       role="radiogroup"
-      aria-label="View mode"
+      aria-label={t('view.ariaLabel')}
     >
       {modes.map((mode) => {
         const Icon = mode.icon;
@@ -34,7 +37,7 @@ export function GalleryViewToggle({ value, onChange }: GalleryViewToggleProps) {
                 type="button"
                 role="radio"
                 aria-checked={isActive}
-                aria-label={mode.label}
+                aria-label={t(mode.labelKey)}
                 onClick={() => onChange(mode.value)}
                 className={cn(
                   'rounded-md p-1.5 transition-all duration-200',
@@ -47,7 +50,7 @@ export function GalleryViewToggle({ value, onChange }: GalleryViewToggleProps) {
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <p>{mode.label}</p>
+              <p>{t(mode.labelKey)}</p>
             </TooltipContent>
           </Tooltip>
         );

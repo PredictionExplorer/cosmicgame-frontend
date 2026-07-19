@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowDownUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import {
   Select,
@@ -18,14 +19,16 @@ interface GallerySortSelectProps {
   onChange: (sort: SortKey) => void;
 }
 
-const sortOptions: { value: SortKey; label: string }[] = [
-  { value: 'newest', label: 'Newest First' },
-  { value: 'oldest', label: 'Oldest First' },
-  { value: 'cycle-desc', label: 'Cycle (High → Low)' },
-  { value: 'cycle-asc', label: 'Cycle (Low → High)' },
+const sortOptions: { value: SortKey; labelKey: string }[] = [
+  { value: 'newest', labelKey: 'sort.newest' },
+  { value: 'oldest', labelKey: 'sort.oldest' },
+  { value: 'cycle-desc', labelKey: 'sort.cycleDesc' },
+  { value: 'cycle-asc', labelKey: 'sort.cycleAsc' },
 ];
 
 export function GallerySortSelect({ value, onChange }: GallerySortSelectProps) {
+  const t = useTranslations('gallery');
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -34,14 +37,14 @@ export function GallerySortSelect({ value, onChange }: GallerySortSelectProps) {
           <Select value={value} onValueChange={(v) => onChange(v as SortKey)}>
             <SelectTrigger
               className="w-[170px] h-9 text-xs border-white/[0.06] bg-white/[0.03]"
-              aria-label="Sort order"
+              aria-label={t('sort.ariaLabel')}
             >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {sortOptions.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {t(opt.labelKey)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -49,7 +52,7 @@ export function GallerySortSelect({ value, onChange }: GallerySortSelectProps) {
         </div>
       </TooltipTrigger>
       <TooltipContent side="bottom">
-        <p>Change the order NFTs are displayed</p>
+        <p>{t('sort.tooltip')}</p>
       </TooltipContent>
     </Tooltip>
   );

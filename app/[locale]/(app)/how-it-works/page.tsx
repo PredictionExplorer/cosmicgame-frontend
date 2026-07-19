@@ -1,38 +1,55 @@
 import type { Metadata } from 'next';
+import { setRequestLocale } from 'next-intl/server';
 
-import { APP_ORIGIN } from '@/lib/hostRouting';
+import { getHowItWorksContent } from '@/content/how-it-works';
+
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 import HowToPlayPage from './HowToPlayPage';
 
-const description =
-  'Learn how a Cosmic Signature Performance Cycle unfolds \u2014 from the Calibration Window through Gestures to final allocation distribution.';
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export const metadata: Metadata = createMetadata(
-  'How Cosmic Signature Works | Performance Cycles, Gestures, and NFTs',
-  description,
-  undefined,
-  '/how-it-works',
-);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const { metadata } = getHowItWorksContent(locale);
 
-export default function Page() {
+  return createMetadata(metadata.title, metadata.description, undefined, metadata.path, {
+    locale,
+  });
+}
+
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const content = getHowItWorksContent(locale);
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+
   return (
     <>
       <JsonLd
         data={[
           webPageJsonLd({
-            name: 'How Cosmic Signature Works',
-            description,
-            url: `${APP_ORIGIN}/how-it-works`,
+            name: content.jsonLd.name,
+            description: content.jsonLd.description,
+            url: localeHref(APP_ORIGIN, content.metadata.path, locale),
+            inLanguage,
           }),
-          breadcrumbJsonLd([
-            { name: 'Home', path: '/' },
-            { name: 'How It Works', path: '/how-it-works' },
-          ]),
+          breadcrumbJsonLd(
+            [
+              { name: content.breadcrumbs.homeLabel, path: '/' },
+              { name: content.breadcrumbs.pageLabel, path: content.metadata.path },
+            ],
+            localeHref(APP_ORIGIN, '/', locale),
+            inLanguage,
+          ),
         ]}
       />
-      <HowToPlayPage />
+      <HowToPlayPage content={content} />
     </>
   );
 }

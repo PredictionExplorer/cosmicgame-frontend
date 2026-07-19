@@ -12,22 +12,22 @@ beforeEach(() => jest.clearAllMocks());
 describe('GallerySortSelect', () => {
   it('renders the sort trigger', () => {
     render(<GallerySortSelect {...defaultProps} />);
-    expect(screen.getByRole('combobox', { name: 'Sort order' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'gallery.sort.ariaLabel' })).toBeInTheDocument();
   });
 
   it('displays the current value label', () => {
     render(<GallerySortSelect {...defaultProps} />);
-    expect(screen.getByText('Newest First')).toBeInTheDocument();
+    expect(screen.getByText('gallery.sort.newest')).toBeInTheDocument();
   });
 
   it('displays oldest first when selected', () => {
     render(<GallerySortSelect {...defaultProps} value="oldest" />);
-    expect(screen.getByText('Oldest First')).toBeInTheDocument();
+    expect(screen.getByText('gallery.sort.oldest')).toBeInTheDocument();
   });
 
   it('displays cycle desc when selected', () => {
     render(<GallerySortSelect {...defaultProps} value="cycle-desc" />);
-    expect(screen.getByText(/Cycle.*High/)).toBeInTheDocument();
+    expect(screen.getByText('gallery.sort.cycleDesc')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

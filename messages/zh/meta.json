@@ -4,6 +4,27 @@
     "defaultOgTitle": "Cosmic Signature · 每一笔，都在塑造签名",
     "defaultDescription": "Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。每一笔，都在塑造签名。周期收官后，协议将储备分配至十余条轨道，包括支持 170 多位以太坊核心贡献者的 Protocol Guild。"
   },
+  "home": {
+    "title": "Cosmic Signature",
+    "description": "Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。在演绎周期中落笔；周期收官后，周期储备将沿各条分配轨道发放，其中一条通向 Protocol Guild。",
+    "descriptionWithReserve": "Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。在演绎周期中落笔；周期收官后，{reserve} 的周期储备将沿各条分配轨道发放，其中一条通向 Protocol Guild。"
+  },
+  "gallery": {
+    "title": "Cosmic Signature 画廊 · 确定性三体 NFT 艺术",
+    "description": "浏览 Cosmic Signature NFT 作品：由确定性三体物理、链上种子与光谱渲染生成，并融入演绎周期数据。"
+  },
+  "tokenDetail": {
+    "titleFor": "Cosmic Signature NFT #{id} · Cosmic Signature",
+    "descriptionFor": "Cosmic Signature NFT #{id} 的属性与流转记录。这枚确定性三体 NFT 在 Arbitrum 上经光谱渲染生成。"
+  },
+  "gestureDetail": {
+    "title": "落笔详情 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 协议中单次落笔的详细信息：时间戳、参与者地址、落笔价格与所属周期。"
+  },
+  "currentCycleFull": {
+    "title": "当前演绎周期 · Cosmic Signature",
+    "description": "当前演绎周期的完整详情：落笔历史、排行榜、已附加贡献与各轨道分配。"
+  },
   "siteMap": {
     "title": "网站地图 · Cosmic Signature",
     "description": "浏览 Cosmic Signature 协议的各个部分，包括落笔、NFT 画廊、锚定、统计、分配与公共物品资助。"

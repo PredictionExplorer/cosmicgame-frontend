@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import axios from 'axios';
 import { headers } from 'next/headers';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { cosmicGameBaseUrl } from '@/services/api';
 import { get_dashboard_info } from '@/services/api/rounds';
@@ -9,20 +10,32 @@ import { createMetadata } from '@/utils/seo';
 
 import HomePage from './HomePage';
 
-export async function generateMetadata(): Promise<Metadata> {
-  let reserveStr = '';
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+
+  let reserve: number | null = null;
   try {
     const { data } = await axios.get(cosmicGameBaseUrl + 'statistics/dashboard');
-    const reserve = data?.PrizeAmountEth ?? 0;
-    reserveStr = `${reserve.toFixed(4)} ETH `;
+    reserve = data?.PrizeAmountEth ?? 0;
   } catch {
     // fallback
   }
-  const description = `Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the ${reserveStr}Cycle Reserve distributes across allocation tracks — including Protocol Guild.`;
-  return createMetadata('Cosmic Signature', description, undefined, '/');
+  const description =
+    reserve != null
+      ? t('home.descriptionWithReserve', { reserve: `${reserve.toFixed(4)} ETH` })
+      : t('home.description');
+  return createMetadata(t('home.title'), description, undefined, '/', { locale });
 }
 
-export default async function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const [initialDashboardData, requestHeaders] = await Promise.all([
     get_dashboard_info().catch(() => null),
     headers(),

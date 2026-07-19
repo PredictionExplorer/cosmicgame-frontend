@@ -1,3 +1,5 @@
+import { howItWorksContentEn } from '@/content/how-it-works';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -41,14 +43,16 @@ jest.mock('framer-motion', () => {
 const renderWithTooltip = (ui: React.ReactElement) =>
   render(<TooltipProvider>{ui}</TooltipProvider>);
 
+const proTips = howItWorksContentEn.proTips;
+
 describe('ProTips', () => {
   it('renders the section heading', () => {
-    renderWithTooltip(<ProTips />);
+    renderWithTooltip(<ProTips proTips={proTips} />);
     expect(screen.getByText('Pro Tips & Strategy')).toBeInTheDocument();
   });
 
   it('renders all six tip titles', () => {
-    renderWithTooltip(<ProTips />);
+    renderWithTooltip(<ProTips proTips={proTips} />);
     expect(screen.getByText('Watch Both Calibration Windows')).toBeInTheDocument();
     expect(screen.getByText('Attach a Random Walk NFT')).toBeInTheDocument();
     expect(screen.getByText('Stack Stellar Selection Entries')).toBeInTheDocument();
@@ -57,22 +61,19 @@ describe('ProTips', () => {
     expect(screen.getByText('Gesture with CST')).toBeInTheDocument();
   });
 
-  it('renders tip descriptions', () => {
-    renderWithTooltip(<ProTips />);
-    expect(
-      screen.getByText(/ETH and CST Gesture Costs follow separate live windows/),
-    ).toBeInTheDocument();
+  it('renders every tip description from the content module', () => {
+    renderWithTooltip(<ProTips proTips={proTips} />);
+    for (const tip of proTips.tips) {
+      expect(screen.getByText(tip.description)).toBeInTheDocument();
+    }
     expect(screen.getByText(/one-time 50% ETH Gesture Cost reduction/)).toBeInTheDocument();
-    expect(screen.getByText(/higher Selection frequency/)).toBeInTheDocument();
     expect(
       screen.getByText(/smart contracts are publicly source-verified on-chain/),
     ).toBeInTheDocument();
-    expect(screen.getByText(/adds the current time increment/)).toBeInTheDocument();
-    expect(screen.getByText(/Use CST as an alternative gesture currency/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = renderWithTooltip(<ProTips />);
+    const { container } = renderWithTooltip(<ProTips proTips={proTips} />);
     await checkA11y(container);
   });
 });

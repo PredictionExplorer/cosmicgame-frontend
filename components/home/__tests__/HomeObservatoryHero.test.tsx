@@ -35,9 +35,9 @@ describe('HomeObservatoryHero', () => {
     render(<HomeObservatoryHero {...liveProps} />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Shape the next Cosmic Signature' }),
+      screen.getByRole('heading', { level: 1, name: 'home.hero.phase.live.headline' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Shape the next Cosmic Signature' })).toHaveAttribute(
+    expect(screen.getByRole('region', { name: 'home.hero.phase.live.headline' })).toHaveAttribute(
       'aria-labelledby',
       'home-observatory-title',
     );
@@ -46,8 +46,10 @@ describe('HomeObservatoryHero', () => {
   it('shows live cycle stats in the observatory console', () => {
     render(<HomeObservatoryHero {...liveProps} />);
 
-    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
-    expect(within(observatory).getByRole('heading', { name: 'Cycle #7' })).toBeInTheDocument();
+    const observatory = screen.getByRole('region', { name: 'home.hero.console.ariaLabel' });
+    expect(
+      within(observatory).getByRole('heading', { name: 'home.hero.cycleNumber(number=7)' }),
+    ).toBeInTheDocument();
     expect(within(observatory).getByText('42')).toBeInTheDocument();
     expect(within(observatory).getByText('2.7500 ETH')).toBeInTheDocument();
     expect(within(observatory).getByText('7%')).toBeInTheDocument();
@@ -56,23 +58,27 @@ describe('HomeObservatoryHero', () => {
   it('links real artwork to its token detail page and shows the token number', () => {
     render(<HomeObservatoryHero {...liveProps} />);
 
-    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
+    const observatory = screen.getByRole('region', { name: 'home.hero.console.ariaLabel' });
     expect(
-      within(observatory).getByRole('link', { name: 'View Cosmic Signature #000012' }),
+      within(observatory).getByRole('link', {
+        name: 'home.hero.console.viewSignatureAria(id=#000012)',
+      }),
     ).toHaveAttribute('href', '/detail/12');
-    expect(within(observatory).getByText('Signature #000012')).toBeInTheDocument();
     expect(
-      within(observatory).getByAltText('Cosmic Signature artwork #000012'),
+      within(observatory).getByText('home.hero.console.signatureBadge(id=#000012)'),
+    ).toBeInTheDocument();
+    expect(
+      within(observatory).getByAltText('home.hero.console.artworkAlt(id=#000012)'),
     ).toBeInTheDocument();
   });
 
   it('shows a neutral state instead of sample art when no real token is available', () => {
     render(<HomeObservatoryHero {...liveProps} bannerToken={null} />);
 
-    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
-    expect(within(observatory).getByText('Awaiting generated Signature')).toBeInTheDocument();
+    const observatory = screen.getByRole('region', { name: 'home.hero.console.ariaLabel' });
+    expect(within(observatory).getByText('home.hero.artUnavailable.eyebrow')).toBeInTheDocument();
     expect(
-      within(observatory).queryByRole('link', { name: /View Cosmic Signature #/ }),
+      within(observatory).queryByRole('link', { name: /home\.hero\.console\.viewSignatureAria/ }),
     ).not.toBeInTheDocument();
   });
 
@@ -83,7 +89,7 @@ describe('HomeObservatoryHero', () => {
         <HomeObservatoryHero {...liveProps} data={makeData({ CurNumBids: 100 })} />,
       );
 
-      const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
+      const observatory = screen.getByRole('region', { name: 'home.hero.console.ariaLabel' });
       expect(within(observatory).getByText('100')).toBeInTheDocument();
 
       rerender(<HomeObservatoryHero {...liveProps} data={makeData({ CurNumBids: 160 })} />);
@@ -101,7 +107,7 @@ describe('HomeObservatoryHero', () => {
   it('points the primary CTA at the gesture panel when the cycle is open', () => {
     render(<HomeObservatoryHero {...liveProps} />);
 
-    expect(screen.getByRole('link', { name: /Make a Gesture/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /home\.hero\.phase\.live\.cta/ })).toHaveAttribute(
       'href',
       '#make-gesture',
     );
@@ -127,14 +133,17 @@ describe('HomeObservatoryHero', () => {
     );
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Next Cycle Opens Soon' }),
+      screen.getByRole('heading', { level: 1, name: 'home.hero.phase.openingSoon.headline' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Opening soon')).toBeInTheDocument();
-    expect(screen.getByText(/is preparing to open/)).toHaveClass(
-      'font-medium',
-      'text-foreground/90',
-    );
-    for (const link of screen.getAllByRole('link', { name: /View Cycle Details/ })) {
+    expect(screen.getByText('home.hero.phase.openingSoon.badge')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'home.hero.phase.openingSoon.body(cycleLabel=home.hero.cycleNumber(number=7))',
+      ),
+    ).toHaveClass('font-medium', 'text-foreground/90');
+    const cycleDetailLinks = screen.getAllByRole('link', { name: 'home.hero.viewCycleDetails' });
+    expect(cycleDetailLinks.length).toBeGreaterThanOrEqual(2);
+    for (const link of cycleDetailLinks) {
       expect(link).toHaveAttribute('href', '/current-cycle');
     }
   });
@@ -142,21 +151,24 @@ describe('HomeObservatoryHero', () => {
   it('shows first-Gesture copy when the cycle is open but no Gesture has started the clock', () => {
     render(<HomeObservatoryHero {...liveProps} phase="waiting-first-gesture" />);
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Cycle #7 Is Open' })).toBeInTheDocument();
-    expect(screen.getByText('Open for first Gesture')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Make the first Gesture/ })).toHaveAttribute(
-      'href',
-      '#make-gesture',
-    );
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'home.hero.phase.waitingFirstGesture.headline(cycleLabel=home.hero.cycleNumber(number=7))',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('home.hero.phase.waitingFirstGesture.badge')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /home\.hero\.phase\.waitingFirstGesture\.cta/ }),
+    ).toHaveAttribute('href', '#make-gesture');
   });
 
   it('links to the previous cycle allocations when one exists', () => {
     render(<HomeObservatoryHero {...liveProps} data={makeData({ CurRoundNum: 5 })} />);
 
-    expect(screen.getByRole('link', { name: /Cycle 4 allocations/ })).toHaveAttribute(
-      'href',
-      '/allocation/4',
-    );
+    expect(
+      screen.getByRole('link', { name: /home\.hero\.console\.previousAllocations\(number=4\)/ }),
+    ).toHaveAttribute('href', '/allocation/4');
   });
 
   it('has no accessibility violations', async () => {

@@ -29,7 +29,7 @@ states, `aria-label`s, form validation, SEO title/description, OG image text, JS
 | 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**    |
 | 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**    |
 | 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | **Done**    |
-| 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | Not started |
+| 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | **Done**    |
 | 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | Not started |
 | 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | Not started |
 | 6      | FAQ, legal & trust pages                                                   | 10 routes                    | Not started |
@@ -231,16 +231,78 @@ mechanics. Heavy inline-JSX extraction (~99 strings in how-it-works alone;
 
 | Route            | Sources                                                            | E   | T   | R   | Q   |
 | ---------------- | ------------------------------------------------------------------ | --- | --- | --- | --- |
-| `/` (app home)   | `(app)/page.tsx`, `components/home/`                               | ☐   | ☐   | ☐   | ☐   |
-| `/current-cycle` | `(app)/current-cycle/`                                             | ☐   | ☐   | ☐   | ☐   |
-| `/gallery`       | `(app)/gallery/`, `GalleryNFTCard.tsx`                             | ☐   | ☐   | ☐   | ☐   |
-| `/detail/[id]`   | `(app)/detail/[id]/`, `components/nft/`, `components/detail-page/` | ☐   | ☐   | ☐   | ☐   |
-| `/gesture/[id]`  | `(app)/gesture/[id]/`                                              | ☐   | ☐   | ☐   | ☐   |
-| `/how-it-works`  | `(app)/how-it-works/components/` (incl. `StepByStep.tsx`)          | ☐   | ☐   | ☐   | ☐   |
+| `/` (app home)   | `(app)/page.tsx`, `components/home/`                               | ✅  | ✅  | ✅  | ✅  |
+| `/current-cycle` | `(app)/current-cycle/`                                             | ✅  | ✅  | ✅  | ✅  |
+| `/gallery`       | `(app)/gallery/`, `GalleryNFTCard.tsx`                             | ✅  | ✅  | ✅  | ✅  |
+| `/detail/[id]`   | `(app)/detail/[id]/`, `components/nft/`, `components/detail-page/` | ✅  | ✅  | ✅  | ✅  |
+| `/gesture/[id]`  | `(app)/gesture/[id]/`                                              | ✅  | ✅  | ✅  | ✅  |
+| `/how-it-works`  | `(app)/how-it-works/components/` (incl. `StepByStep.tsx`)          | ✅  | ✅  | ✅  | ✅  |
 
 **Acceptance:** a Chinese-speaking first-time user can land on `app…/zh`, read how the
 protocol works, watch the live cycle, and browse the gallery entirely in Chinese —
 including every tooltip and countdown on those pages.
+
+**Sprint 3 completed 2026-07-18.** Verification: type-check, lint, Jest (5,267 tests),
+production build (all routes SSG'd for `/en/*` and `/zh/*`, ISR timings preserved),
+English + Chinese lexicon scans, ICU compile check over all 2,540 catalog messages,
+en↔zh placeholder-parity check, Sprint 1 + 2 + 3 required-key gates, and the full
+Playwright e2e suite (desktop + mobile) including the new `zh-sprint3` spec and
+Sprint 3 layout QA at 320 / 768 / 1440 px with screenshots.
+
+Implementation notes / deviations:
+
+- New namespaces `currentCycle`, `detail`, `gallery`, `gesture` (registered in
+  `i18n/request.ts`); `home.json` was **rewritten** — the Sprint 0 seed keys were
+  consumed by nothing and had drifted from the live UI, so live copy won (322 keys).
+  Sprint 3 owns 638 required zh keys via `scripts/i18n-sprint3-required.json`
+  (`yarn i18n:sprint3`, enforced in CI).
+- `/how-it-works` became a per-locale content module `content/how-it-works/`
+  (README §3.2) rather than a JSON catalog — its ~99 strings are structured
+  section arrays. Six additional protocol numbers now interpolate from
+  `protocol-facts.ts` (25%, 4%, 50%, 1,000 CST, 48-hour, 0.4%); a JSX bug that
+  rendered a literal `\u2019` in CallToAction was fixed in passing.
+- `meta.json` was reconciled to the live page metadata (live copy wins; the seed
+  wording had drifted): `gestureDetail` added, `tokenDetail`/`gallery`/
+  `currentCycleFull`/`home` aligned, and the unused `howItWorks` + short
+  `currentCycle` seeds deleted (the content module owns how-it-works metadata).
+  The home description interpolates the live reserve via `{reserve}`.
+- Locale-aware formatting, Sprint 3 surfaces only: `convertTimestampToDateTime`,
+  `formatSeconds`, and `getRelativeTime` accept a `locale` argument (default
+  `'en'` is byte-identical; zh renders 1月1日 12:34 / 1天2小时30分45秒 /
+  3 小时前). Only Sprint 3 call sites pass it; the site-wide sweep stays Sprint 5.
+- **English copy fix forced by the lexicon gate:** the gallery card tooltips
+  "Minted in game round {n}" / "Minted on {date}" contained banned vocabulary
+  that had survived only because the strings predated scanner coverage; they are
+  now "Imprinted in cycle {round}" / "Imprinted on {date}". No test or e2e spec
+  referenced the old copy.
+- `PublicGoodsImpactCard`'s legal disclaimer stays in `content/landing/` (selected
+  by locale) instead of moving into `home.json`: it contains denial vocabulary
+  that requires a `lexicon-allow` pragma, which JSON cannot carry.
+- Intentionally still English (later sprints): transaction toast/submit feedback
+  (`hooks/useGestureForm.ts`, NFT name/transfer toasts in `NFTTrait`) — Sprint 4's
+  sweep; `*SeoSummary.tsx` crawler content and OG images — Sprint 7;
+  `attachedNftLinks.ts` helper labels for the `/attached-nfts` consumer — Sprint 5
+  (the Sprint 3 showcase translates them by link kind).
+- e2e: new `zh-sprint3.spec.ts` covers all six routes incl. tooltip content; it
+  uses a zh-aware tooltip locator because InfoTooltip aria-labels are translated
+  ("更多信息…"), which the shared English-prefix helper cannot match.
+  `zh-layout.desktop.spec.ts` gained a Sprint 3 section (home, current-cycle,
+  gallery, how-it-works at three viewports with screenshots).
+- **R-stage per the owner-approved Sprints 1–2 precedent** (approved with the
+  Sprint 3 plan): an independent agent bilingual-accuracy pass (2 corrections:
+  a terminology drift, a strengthened outage-state claim) and a Chinese-only
+  blind-fluency pass (15 polish edits) both returned PASS after corrections.
+  Recorded as agent review; the native-human launch gate remains Sprint 8.
+- Glossary amendment proposals recorded for the §6 process (glossary unchanged):
+  add 流转记录 (Ownership History) + 命名记录 (Name History), pin 星选池
+  (Stellar Selection Pool), and consider 落笔留言板 (Gesture Chat).
+- **Pre-existing e2e flakes surfaced during verification (not Sprint 3 regressions;
+  reproduced identically on pre-sprint HEAD `d0362cc` in a clean worktree):**
+  `home-gesture-chat.spec.ts` fails when the live protocol cycle is between
+  cycles — the server renders the real "opening soon" state while the test
+  mocks a live cycle, and the settled DOM can briefly carry both trees — and
+  `a11y.spec.ts` "skip link jumps to #main" fails on Mobile Chrome. Both are
+  live-cycle-state/emulation dependent and pass when the cycle is active.
 
 ## Sprint 4 — Transactions & holdings
 
@@ -392,6 +454,9 @@ scan green; native reviewer sign-off; language switcher announced/visible. 上�
 | 2026-07-17 | Glossary freeze reconciled to after Sprint 2, matching `glossary-zh.md`; Sprint 1 required no amendments                |
 | 2026-07-18 | Sprint 2 R used owner-approved agent accuracy + Chinese-only fluency passes; human review was waived for this sprint    |
 | 2026-07-18 | `收官倒计时` approved for running clock copy; post-Sprint-2 glossary freeze is now active                               |
+| 2026-07-18 | Sprint 3 R used the same owner-approved agent review flow (approved with the Sprint 3 plan); native gate stays Sprint 8 |
+| 2026-07-18 | Gallery card tooltips reworded off banned vocabulary ("Minted in game round" → "Imprinted in cycle") — lexicon gate     |
+| 2026-07-18 | Glossary §6 proposals queued: 流转记录 / 命名记录 / 星选池 / 落笔留言板 (glossary itself unchanged, frozen)             |
 
 ## Risk register
 

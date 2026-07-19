@@ -24,31 +24,33 @@ describe('GalleryToolbar', () => {
 
   it('renders filter chips', () => {
     render(<GalleryToolbar {...defaultProps} />);
-    expect(screen.getByRole('radio', { name: /All/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Anchored/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Named/i })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'gallery.filters.all.label' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('radio', { name: 'gallery.filters.anchored.label' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'gallery.filters.named.label' })).toBeInTheDocument();
   });
 
   it('renders sort control', () => {
     render(<GalleryToolbar {...defaultProps} />);
-    expect(screen.getByRole('combobox', { name: 'Sort order' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'gallery.sort.ariaLabel' })).toBeInTheDocument();
   });
 
   it('renders view mode toggle', () => {
     render(<GalleryToolbar {...defaultProps} />);
-    expect(screen.getByRole('radio', { name: 'Grid view' })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: 'List view' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'gallery.view.grid' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'gallery.view.list' })).toBeInTheDocument();
   });
 
   it('calls onFilterChange when chip is clicked', () => {
     render(<GalleryToolbar {...defaultProps} />);
-    fireEvent.click(screen.getByRole('radio', { name: /Anchored/i }));
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.filters.anchored.label' }));
     expect(defaultProps.onFilterChange).toHaveBeenCalledWith('staked');
   });
 
   it('calls onViewModeChange when toggle is clicked', () => {
     render(<GalleryToolbar {...defaultProps} />);
-    fireEvent.click(screen.getByRole('radio', { name: 'List view' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'gallery.view.list' }));
     expect(defaultProps.onViewModeChange).toHaveBeenCalledWith('list');
   });
 

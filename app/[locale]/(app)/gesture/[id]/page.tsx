@@ -1,21 +1,23 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
 import GesturePage from './GesturePage';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
-  const { id } = await params;
+interface PageProps {
+  params: Promise<{ locale: string; id: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
   return createMetadata(
-    'Gesture Information | Cosmic Signature',
-    'View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol.',
+    t('gestureDetail.title'),
+    t('gestureDetail.description'),
     undefined,
     `/gesture/${id}`,
-    { index: false },
+    { index: false, locale },
   );
 }
 
@@ -23,7 +25,8 @@ export async function generateMetadata({
 // fresh instead of freezing the first render forever (see route-group refactor).
 export const revalidate = 300;
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function Page({ params }: PageProps) {
+  const { locale, id } = await params;
+  setRequestLocale(locale);
   return <GesturePage gestureId={parseInt(id, 10)} />;
 }

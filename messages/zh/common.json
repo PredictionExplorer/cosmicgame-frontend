@@ -7,6 +7,10 @@
     "breadcrumb": "面包屑导航",
     "footer": "页脚导航"
   },
+  "breadcrumbs": {
+    "home": "首页",
+    "gallery": "画廊"
+  },
   "status": {
     "loading": "加载中",
     "loadingEllipsis": "加载中…",
