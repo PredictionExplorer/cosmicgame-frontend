@@ -1,3 +1,5 @@
+import zhMeta from '@/messages/zh/meta.json';
+
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
 import { render } from '@/test-utils';
@@ -15,8 +17,8 @@ describe('localized site-map route', () => {
       params: Promise.resolve({ locale: 'zh' }),
     });
 
-    expect(metadata.title).toBe('meta.siteMap.title');
-    expect(metadata.description).toBe('meta.siteMap.description');
+    expect(metadata.title).toBe(zhMeta.siteMap.title);
+    expect(metadata.description).toBe(zhMeta.siteMap.description);
     expect(metadata.alternates).toEqual({
       canonical: `${APP_ORIGIN}/zh/site-map`,
       languages: {

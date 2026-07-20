@@ -1,6 +1,7 @@
 import {
   artProtocolJsonLd,
   breadcrumbJsonLd,
+  collectionPageJsonLd,
   faqPageJsonLd,
   nftProductJsonLd,
   organizationJsonLd,
@@ -34,11 +35,9 @@ describe('JSON-LD generators', () => {
       description: '中文协议说明',
       inLanguage: 'zh-Hans',
       url: 'https://cosmicsignature.com/zh',
-      searchUrlTemplate: 'https://app.cosmicsignature.com/zh/gallery?search={search_term_string}',
     });
     const organization = organizationJsonLd({
       description: '中文组织说明',
-      inLanguage: 'zh-Hans',
       url: 'https://cosmicsignature.com/zh',
     });
     const artwork = artProtocolJsonLd({
@@ -47,11 +46,30 @@ describe('JSON-LD generators', () => {
       genre: '生成艺术',
       keywords: ['链上艺术', '三体问题'],
     });
+    const webApplication = webApplicationJsonLd({
+      browserRequirements: '需要 Web3 钱包',
+      description: '中文应用说明',
+      inLanguage: 'zh-Hans',
+      url: 'https://app.cosmicsignature.com/zh',
+    });
+    const collection = collectionPageJsonLd({
+      name: 'Cosmic Signature 画廊',
+      description: '中文系列说明',
+      inLanguage: 'zh-Hans',
+      url: 'https://app.cosmicsignature.com/zh/gallery',
+    });
+    const product = nftProductJsonLd({
+      tokenId: 7,
+      name: 'Cosmic Signature NFT #7',
+      description: '中文作品说明',
+      imageUrl: 'https://example.com/7.png',
+      url: 'https://app.cosmicsignature.com/zh/detail/7',
+      category: '数字藏品',
+    });
     const faq = faqPageJsonLd([{ question: '这是什么？', answer: '链上艺术协议。' }], 'zh-Hans');
     const breadcrumbs = breadcrumbJsonLd(
       [{ name: '学习', path: '/learn' }],
       'https://cosmicsignature.com/zh',
-      'zh-Hans',
     );
 
     expect(website).toEqual(
@@ -61,10 +79,8 @@ describe('JSON-LD generators', () => {
         url: 'https://cosmicsignature.com/zh',
       }),
     );
-    expect(website.potentialAction.target.urlTemplate).toContain('/zh/gallery');
-    expect(organization).toEqual(
-      expect.objectContaining({ description: '中文组织说明', inLanguage: 'zh-Hans' }),
-    );
+    expect(organization).toEqual(expect.objectContaining({ description: '中文组织说明' }));
+    expect(organization).not.toHaveProperty('inLanguage');
     expect(artwork).toEqual(
       expect.objectContaining({
         description: '中文艺术说明',
@@ -72,8 +88,30 @@ describe('JSON-LD generators', () => {
         inLanguage: 'zh-Hans',
       }),
     );
+    expect(webApplication).toEqual(
+      expect.objectContaining({
+        browserRequirements: '需要 Web3 钱包',
+        description: '中文应用说明',
+        inLanguage: 'zh-Hans',
+        url: 'https://app.cosmicsignature.com/zh',
+      }),
+    );
+    expect(collection).toEqual(
+      expect.objectContaining({
+        name: 'Cosmic Signature 画廊',
+        inLanguage: 'zh-Hans',
+        url: 'https://app.cosmicsignature.com/zh/gallery',
+      }),
+    );
+    expect(product).toEqual(
+      expect.objectContaining({
+        category: '数字藏品',
+        url: 'https://app.cosmicsignature.com/zh/detail/7',
+      }),
+    );
+    expect(product).not.toHaveProperty('inLanguage');
     expect(faq.inLanguage).toBe('zh-Hans');
-    expect(breadcrumbs.inLanguage).toBe('zh-Hans');
+    expect(breadcrumbs).not.toHaveProperty('inLanguage');
     expect(breadcrumbs.itemListElement[0]!.item).toBe('https://cosmicsignature.com/zh/learn');
   });
 
@@ -91,10 +129,8 @@ describe('JSON-LD generators', () => {
       expect(result['@id']).toBe('https://cosmicsignature.com/#website');
     });
 
-    it('includes a SearchAction', () => {
-      expect(result.potentialAction).toBeDefined();
-      expect(result.potentialAction['@type']).toBe('SearchAction');
-      expect(result.potentialAction['query-input']).toContain('search_term_string');
+    it('does not advertise a nonfunctional SearchAction', () => {
+      expect(result).not.toHaveProperty('potentialAction');
     });
 
     it('has lexicon-safe description', () => {

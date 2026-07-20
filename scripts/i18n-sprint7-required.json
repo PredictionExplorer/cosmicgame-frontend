@@ -1,0 +1,11 @@
+{
+  "namespaces": {
+    "admin": ["*"],
+    "coordination": ["*"],
+    "ethContribution": ["*"],
+    "marketing": ["*"],
+    "publicGoods": ["*"],
+    "meta": ["*"],
+    "seo": ["*"]
+  }
+}

@@ -86,8 +86,8 @@ describe('generateMetadata', () => {
 
     const metadata = await generateMetadata(pageProps);
 
-    expect(metadata.title).toBe('meta.home.title');
-    expect(metadata.description).toBe('meta.home.descriptionWithReserve(reserve=0.6250 ETH)');
+    expect(metadata.title).toBe('Cosmic Signature');
+    expect(metadata.description).toContain('0.6250 ETH Cycle Reserve');
     expect(metadata.openGraph).toEqual(expect.objectContaining({ locale: 'en_US' }));
   });
 
@@ -96,7 +96,7 @@ describe('generateMetadata', () => {
 
     const metadata = await generateMetadata(pageProps);
 
-    expect(metadata.description).toBe('meta.home.descriptionWithReserve(reserve=0.0000 ETH)');
+    expect(metadata.description).toContain('0.0000 ETH Cycle Reserve');
   });
 
   it('falls back to the reserve-free description when the dashboard fetch fails', async () => {
@@ -104,7 +104,7 @@ describe('generateMetadata', () => {
 
     const metadata = await generateMetadata(pageProps);
 
-    expect(metadata.description).toBe('meta.home.description');
+    expect(metadata.description).toContain('procedural on-chain art protocol on Arbitrum');
     expect(metadata.alternates).toEqual({
       canonical: 'https://app.cosmicsignature.com',
       languages: {

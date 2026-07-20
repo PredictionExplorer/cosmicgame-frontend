@@ -1,5 +1,5 @@
 import { Lock, Unlock, Coins, Gift, Layers } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
@@ -48,6 +48,7 @@ export function UserAnchoringSection({
   rwlkImprints,
 }: UserAnchoringSectionProps) {
   const t = useTranslations('myPages');
+  const locale = useLocale();
   const totalAnchorActions = cstAnchorActions.filter((a) => a.ActionType !== 1).length;
   const totalReleaseActions = cstAnchorActions.filter((a) => a.ActionType === 1).length;
   const totalRewardEth = cstAnchorDistributions.reduce(
@@ -108,19 +109,19 @@ export function UserAnchoringSection({
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
                 <StatCard
                   label={t('statistics.anchoring.stats.anchorActions.label')}
-                  value={totalAnchorActions.toLocaleString()}
+                  value={totalAnchorActions.toLocaleString(locale)}
                   icon={<Lock className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.anchorActions.cosmicSignatureTooltip')}
                 />
                 <StatCard
                   label={t('statistics.anchoring.stats.releaseActions.label')}
-                  value={totalReleaseActions.toLocaleString()}
+                  value={totalReleaseActions.toLocaleString(locale)}
                   icon={<Unlock className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.releaseActions.cosmicSignatureTooltip')}
                 />
                 <StatCard
                   label={t('statistics.anchoring.stats.nftsWithDistributions.label')}
-                  value={cstAnchorDistributions.length.toLocaleString()}
+                  value={cstAnchorDistributions.length.toLocaleString(locale)}
                   icon={<Layers className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.nftsWithDistributions.tooltip')}
                 />
@@ -189,26 +190,26 @@ export function UserAnchoringSection({
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
                 <StatCard
                   label={t('statistics.anchoring.stats.anchorActions.label')}
-                  value={(rwlkStats?.TotalNumStakeActions ?? 0).toLocaleString()}
+                  value={(rwlkStats?.TotalNumStakeActions ?? 0).toLocaleString(locale)}
                   icon={<Lock className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.anchorActions.randomWalkTooltip')}
                 />
                 <StatCard
                   label={t('statistics.anchoring.stats.releaseActions.label')}
-                  value={(rwlkStats?.TotalNumUnstakeActions ?? 0).toLocaleString()}
+                  value={(rwlkStats?.TotalNumUnstakeActions ?? 0).toLocaleString(locale)}
                   icon={<Unlock className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.releaseActions.randomWalkTooltip')}
                 />
                 <StatCard
                   label={t('statistics.anchoring.stats.nftsAnchored.label')}
-                  value={(rwlkStats?.TotalTokensStaked ?? 0).toLocaleString()}
+                  value={(rwlkStats?.TotalTokensStaked ?? 0).toLocaleString(locale)}
                   icon={<Layers className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.nftsAnchored.tooltip')}
                   featured
                 />
                 <StatCard
                   label={t('statistics.anchoring.stats.nftsImprinted.label')}
-                  value={(rwlkStats?.TotalTokensMinted ?? 0).toLocaleString()}
+                  value={(rwlkStats?.TotalTokensMinted ?? 0).toLocaleString(locale)}
                   icon={<Gift className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.nftsImprinted.tooltip')}
                 />

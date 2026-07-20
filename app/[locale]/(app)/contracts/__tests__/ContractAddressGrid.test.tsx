@@ -30,30 +30,35 @@ Object.assign(navigator, {
 
 const contracts: ContractEntry[] = [
   {
+    id: 'protocol',
     name: 'Cosmic Game',
     address: '0xAAA',
     description: 'Main game',
     category: 'core',
   },
   {
+    id: 'nft',
     name: 'Cosmic Signature NFT',
     address: '0xBBB',
     description: 'NFT collection',
     category: 'core',
   },
   {
+    id: 'cst',
     name: 'Cosmic Signature CST Token',
     address: '0xCST',
     description: 'CST token',
     category: 'core',
   },
   {
+    id: 'publicGoods',
     name: 'Public Goods Vault',
     address: '0xCCC',
     description: 'Public Goods',
     category: 'wallet',
   },
   {
+    id: 'cosmicAnchor',
     name: 'Cosmic Signature NFT Anchoring Wallet',
     address: '0xDDD',
     description: 'Cosmic Signature NFT Anchoring',
@@ -95,6 +100,31 @@ describe('ContractAddressGrid', () => {
     render(<ContractAddressGrid {...defaultProps} searchTerm="0xDDD" />);
     expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
     expect(screen.queryByText('Cosmic Game')).not.toBeInTheDocument();
+  });
+
+  it('normalizes search independently of a Turkish/Azeri host locale', () => {
+    const originalToLocaleLowerCase = String.prototype.toLocaleLowerCase;
+    const localeLowerCase = jest
+      .spyOn(String.prototype, 'toLocaleLowerCase')
+      .mockImplementation(function mockTurkishLowerCase(
+        this: string,
+        locales?: Intl.LocalesArgument,
+      ) {
+        if (locales === undefined) {
+          return String(this).replaceAll('I', 'ı').toLowerCase();
+        }
+        return originalToLocaleLowerCase.call(String(this), locales);
+      });
+
+    try {
+      render(<ContractAddressGrid {...defaultProps} searchTerm="SIGNATURE" />);
+
+      expect(screen.getByText('Cosmic Signature NFT')).toBeInTheDocument();
+      expect(screen.getByText('Cosmic Signature CST Token')).toBeInTheDocument();
+      expect(localeLowerCase).toHaveBeenCalledWith('en-US');
+    } finally {
+      localeLowerCase.mockRestore();
+    }
   });
 
   it('shows empty state when search has no results', () => {

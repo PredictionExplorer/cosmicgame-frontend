@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { LayoutGrid } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { type FAQCategory } from '@/content/faq';
 
 import { cn } from '@/lib/utils';
 
-import { type FAQCategory } from '../data/faq-data';
+import { FAQ_ICONS } from './faqIcons';
 
 interface CategoryNavProps {
-  categories: FAQCategory[];
+  categories: readonly FAQCategory[];
   activeCategory: string | null;
   onCategoryClick: (categoryId: string | null) => void;
   className?: string;
@@ -20,6 +23,7 @@ export function CategoryNav({
   onCategoryClick,
   className,
 }: CategoryNavProps) {
+  const t = useTranslations('faq');
   const navRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
 
@@ -55,7 +59,7 @@ export function CategoryNav({
   return (
     <div ref={navRef} className={cn('sticky top-[72px] z-30', className)}>
       <nav
-        aria-label="FAQ categories"
+        aria-label={t('navigation.ariaLabel')}
         className={cn(
           'mx-auto -mx-4 overflow-x-auto px-4 py-3 transition-all duration-300 scrollbar-none',
           isSticky && 'border-b border-white/[0.06] bg-background/90 backdrop-blur-xl',
@@ -72,10 +76,10 @@ export function CategoryNav({
             )}
           >
             <LayoutGrid className="h-3.5 w-3.5" />
-            All
+            {t('navigation.all')}
           </button>
           {categories.map((cat) => {
-            const Icon = cat.icon;
+            const Icon = FAQ_ICONS[cat.icon];
             return (
               <button
                 key={cat.id}

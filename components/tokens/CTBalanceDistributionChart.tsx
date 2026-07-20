@@ -1,5 +1,6 @@
 import { useMemo, type FC } from 'react';
 import { BarChart, Bar, XAxis, YAxis, LabelList, ResponsiveContainer, Cell } from 'recharts';
+import { useTranslations } from 'next-intl';
 
 import { shortenHex } from '@/utils';
 
@@ -60,6 +61,7 @@ const formatLabel: import('recharts/types/component/Label').LabelFormatter = (va
  * Remaining holders are aggregated into an "Others" bucket.
  */
 export const CTBalanceDistributionChart: FC<CTBalanceDistributionChartProps> = ({ list }) => {
+  const t = useTranslations('statistics');
   const { marketing } = useContractAddresses();
   const { processed: data, max } = useProcessedBalances(list, DISPLAY_LIMIT);
 
@@ -67,16 +69,14 @@ export const CTBalanceDistributionChart: FC<CTBalanceDistributionChartProps> = (
     () =>
       data.map((entry) => ({
         category:
-          marketing &&
-          entry.OwnerAddr &&
-          entry.OwnerAddr.toLowerCase() === marketing.toLowerCase()
-            ? 'Marketing Wallet'
+          marketing && entry.OwnerAddr && entry.OwnerAddr.toLowerCase() === marketing.toLowerCase()
+            ? t('charts.balance.outreachWallet')
             : entry.OwnerAddr === 'Others'
-              ? 'Others'
+              ? t('charts.balance.others')
               : shortenHex(entry.OwnerAddr, 6),
         value: entry.BalanceFloat,
       })),
-    [data, marketing],
+    [data, marketing, t],
   );
 
   if (chartData.length === 0) return null;

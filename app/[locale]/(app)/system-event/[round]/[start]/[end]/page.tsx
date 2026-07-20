@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -7,15 +8,16 @@ import SystemEventPage from './SystemEventPage';
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ round: string; start: string; end: string }>;
+  params: Promise<{ locale: string; round: string; start: string; end: string }>;
 }): Promise<Metadata> {
-  const { round, start, end } = await params;
+  const { locale, round, start, end } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
   return createMetadata(
-    'System Events | Cosmic Signature',
-    'Protocol administration events and coordination parameter changes for a specific Cosmic Signature cycle.',
+    t('systemEvent.title'),
+    t('systemEvent.description'),
     undefined,
     `/system-event/${round}/${start}/${end}`,
-    { index: false },
+    { index: false, locale },
   );
 }
 
@@ -26,8 +28,9 @@ export const revalidate = 300;
 export default async function Page({
   params,
 }: {
-  params: Promise<{ round: string; start: string; end: string }>;
+  params: Promise<{ locale: string; round: string; start: string; end: string }>;
 }) {
-  const { round, start, end } = await params;
+  const { locale, round, start, end } = await params;
+  setRequestLocale(locale);
   return <SystemEventPage round={Number(round)} start={Number(start)} end={Number(end)} />;
 }

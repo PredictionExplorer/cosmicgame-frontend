@@ -1,9 +1,12 @@
 import userEvent from '@testing-library/user-event';
 
+import { faqContentEn } from '@/content/faq';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { CategoryNav } from '../components/CategoryNav';
-import { faqCategories } from '../data/faq-data';
+
+const faqCategories = faqContentEn.categories;
 
 describe('CategoryNav', () => {
   const onCategoryClick = jest.fn();

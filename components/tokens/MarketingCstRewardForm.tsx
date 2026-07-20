@@ -15,6 +15,7 @@ import { getExplorerUrl, shortenHex } from '@/utils';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { Link } from '@/i18n/navigation';
 import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,7 @@ export function MarketingCstRewardForm({
   historyHref,
 }: MarketingCstRewardFormProps) {
   const t = useTranslations('toasts');
+  const tMarketing = useTranslations('marketing');
   const locale = useLocale();
   const decimalsReadWarning = t('transfer.marketingCst.decimalsWarning');
   const balanceReadFailed = t('transfer.marketingCst.balanceReadFailed');
@@ -257,24 +259,25 @@ export function MarketingCstRewardForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pay CST Reward</CardTitle>
-        <CardDescription>
-          Calls the outreach reserve contract&apos;s `payReward` function. The connected wallet must
-          be the current treasurer.
-        </CardDescription>
+        <CardTitle>{tMarketing('transferForm.title')}</CardTitle>
+        <CardDescription>{tMarketing('transferForm.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-6 grid gap-3 rounded-lg border border-white/[0.06] bg-white/[0.025] p-4 text-sm sm:grid-cols-2">
           <div>
             <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Outreach reserve
+              {tMarketing('transferForm.reserveLabel')}
             </p>
             <p className="mt-1 font-mono text-foreground">
-              {normalizedMarketingWallet ? shortenHex(normalizedMarketingWallet, 6) : 'Unavailable'}
+              {normalizedMarketingWallet
+                ? shortenHex(normalizedMarketingWallet, 6)
+                : tMarketing('transferForm.unavailable')}
             </p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Available CST</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              {tMarketing('transferForm.availableLabel')}
+            </p>
             <p className="mt-1 font-semibold text-foreground">
               {balanceLoading
                 ? t('transfer.marketingCst.loading')
@@ -282,15 +285,23 @@ export function MarketingCstRewardForm({
             </p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Owner</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              {tMarketing('transferForm.ownerLabel')}
+            </p>
             <p className="mt-1 font-mono text-foreground">
-              {normalizedOwner ? shortenHex(normalizedOwner, 6) : 'Unavailable'}
+              {normalizedOwner
+                ? shortenHex(normalizedOwner, 6)
+                : tMarketing('transferForm.unavailable')}
             </p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Treasurer</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              {tMarketing('transferForm.treasurerLabel')}
+            </p>
             <p className="mt-1 font-mono text-foreground">
-              {normalizedTreasurer ? shortenHex(normalizedTreasurer, 6) : 'Unavailable'}
+              {normalizedTreasurer
+                ? shortenHex(normalizedTreasurer, 6)
+                : tMarketing('transferForm.unavailable')}
             </p>
           </div>
         </div>
@@ -299,7 +310,9 @@ export function MarketingCstRewardForm({
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="marketing-cst-recipient">Recipient address</Label>
+            <Label htmlFor="marketing-cst-recipient">
+              {tMarketing('transferForm.recipientLabel')}
+            </Label>
             <Input
               id="marketing-cst-recipient"
               value={recipient}
@@ -311,7 +324,7 @@ export function MarketingCstRewardForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="marketing-cst-amount">Amount</Label>
+            <Label htmlFor="marketing-cst-amount">{tMarketing('transferForm.amountLabel')}</Label>
             <Input
               id="marketing-cst-amount"
               value={amount}
@@ -338,12 +351,12 @@ export function MarketingCstRewardForm({
             </Button>
 
             {historyHref ? (
-              <a
+              <Link
                 href={historyHref}
                 className="text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
-                View outreach reserve transfers
-              </a>
+                {tMarketing('transferForm.historyLink')}
+              </Link>
             ) : null}
           </div>
         </form>

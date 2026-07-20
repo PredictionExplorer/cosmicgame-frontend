@@ -51,7 +51,7 @@ export const howItWorksContentEn = {
         title: 'Receive',
         description:
           'Participate in allocations when the cycle finalizes — Signature Allocation, Stellar Selections, Anchor Distributions, and more.',
-        tooltip: `The participant who made the Final Gesture receives ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, and a Cosmic Signature NFT. Stellar Selection recipients, anchor-holders, and other participants also receive allocations.`,
+        tooltip: `The participant who made the Final Gesture receives ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT. Stellar Selection recipients, anchor-holders, and other participants also receive allocations.`,
       },
     ],
   },
@@ -73,12 +73,12 @@ export const howItWorksContentEn = {
       },
       {
         title: 'Cosmic Signature NFT Selection',
-        description: `Ten participants receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a unique Cosmic Signature NFT via Stellar Selection each cycle.`,
-        tooltip: `Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT each cycle.`,
+        description: `Ten participants receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a unique Cosmic Signature NFT via Stellar Selection each cycle.`,
+        tooltip: `Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT each cycle.`,
       },
       {
         title: 'Signature Allocation',
-        description: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, and a Cosmic Signature NFT.`,
+        description: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
         tooltip:
           'The Cycle Reserve grows from all gestures. The participant who made the Final Gesture retrieves the Signature Allocation via the protocol contract.',
       },
@@ -108,13 +108,13 @@ export const howItWorksContentEn = {
       },
       {
         label: 'Cycle Finalizes',
-        description: `The participant who made the Final Gesture retrieves the Signature Allocation: ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, and a Cosmic Signature NFT.`,
+        description: `The participant who made the Final Gesture retrieves the Signature Allocation: ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
         tooltip:
           'The Signature Allocation retrieval happens via the protocol contract. The CST and Cosmic Signature NFT are imprinted automatically.',
       },
       {
         label: 'Stellar Selections',
-        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT.`,
+        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
         tooltip:
           'Entries are recorded per gesture. More gestures means higher Selection frequency. Random Walk NFT anchor-holders have a separate Stellar Selection.',
       },
@@ -188,7 +188,7 @@ export const howItWorksContentEn = {
         title: 'Stack Stellar Selection Entries',
         description:
           'Each gesture records one Stellar Selection entry. More gestures means higher Selection frequency.',
-        tooltip: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT.`,
+        tooltip: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
       },
       {
         title: 'Use a Burner Wallet',

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { Link } from '@/i18n/navigation';
 import { usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -13,11 +15,12 @@ import { ALL_STATISTICS_SECTIONS, STATISTICS_HUB } from './statistics-sections';
  */
 export function StatisticsSubNav() {
   const pathname = usePathname();
+  const t = useTranslations('statistics');
 
   return (
     <div className="sticky top-[72px] z-30 -mx-4 mb-8 px-4">
       <nav
-        aria-label="Statistics sections"
+        aria-label={t('navigation.ariaLabel')}
         className="border-b border-white/[0.06] bg-background/85 py-3 backdrop-blur-xl"
       >
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
@@ -40,7 +43,7 @@ export function StatisticsSubNav() {
                 )}
               >
                 <Icon className="h-3.5 w-3.5" aria-hidden />
-                {section.label}
+                {t(`navigation.${section.messageKey}.label`)}
               </Link>
             );
           })}

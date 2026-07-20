@@ -1,0 +1,74 @@
+{
+  "page": {
+    "eyebrow": "管理 · 受限",
+    "title": "管理",
+    "subtitle": "管理落笔记录与系统设置",
+    "gestureList": "落笔列表",
+    "loading": "加载中…"
+  },
+  "settings": {
+    "title": "管理方法",
+    "subtitle": "以只读方式查看控制面板中的合约地址与参数。",
+    "breadcrumbs": {
+      "home": "首页",
+      "admin": "管理",
+      "settings": "设置"
+    },
+    "loading": "加载中…",
+    "contractTitle": "Cosmic Signature 合约",
+    "contractDescription": "控制面板 API 提供的合约地址与链上参数。",
+    "placeholders": {
+      "address": "在此输入地址",
+      "number": "在此输入数值"
+    },
+    "actions": {
+      "setAddress": "设置地址",
+      "set": "设置"
+    },
+    "fields": {
+      "cosmicSignatureNft": "Cosmic Signature NFT（ERC-721）合约地址",
+      "cstToken": "Cosmic Signature CST 代币（ERC-20）合约地址",
+      "publicGoodsVault": "公共物品金库合约地址",
+      "randomWalkNft": "Random Walk NFT 合约地址",
+      "stellarSelectionWallet": "星选钱包合约地址",
+      "anchoringWallet": "锚定钱包合约地址",
+      "outreachWallet": "推广钱包合约地址",
+      "businessLogic": "业务逻辑合约地址",
+      "ethStellarRecipients": "每个周期的 ETH 星选获配者人数",
+      "nftStellarRecipients": "每个周期的 NFT 星选获配者人数",
+      "nftHolderRecipients": "每个周期的 NFT 持有者获配人数",
+      "signatureAllocationPercentage": "签名分配比例",
+      "publicGoodsPercentage": "公共物品比例",
+      "stellarSelectionPercentage": "星选比例",
+      "anchorDistributionPercentage": "锚定派发比例",
+      "timeIncrease": "时间增量",
+      "allocationTimeout": "取回签名分配的超时时间",
+      "priceIncrease": "价格增幅",
+      "nanosecondsExtra": "额外纳秒数",
+      "initialAllocationSeconds": "距签名分配的初始秒数",
+      "initialGestureCostFraction": "初始落笔价格比例",
+      "activationTime": "启用时间",
+      "gestureRatio": "ETH 与 CST 落笔比率",
+      "calibrationWindowLength": "周期开启时 CST 校准窗口时长",
+      "switchMode": "切换模式"
+    },
+    "modes": {
+      "runtime": "运行模式",
+      "maintenance": "维护模式"
+    }
+  },
+  "outreachTransfer": {
+    "title": "CST 推广转账",
+    "subtitle": "仅限通过此网址访问的转账工具，供已配置的推广储备钱包签名者使用。",
+    "roleReadError": "未能读取推广储备的所有者与财务执行人。",
+    "walletRequiredTitle": "未连接钱包",
+    "walletRequiredDescription": "请连接推广储备现任财务执行人的钱包，再拨付 CST 分配。",
+    "walletUnavailableTitle": "推广钱包暂不可用",
+    "walletUnavailableDescription": "控制面板尚未提供推广钱包地址。",
+    "rolesLoadingTitle": "正在加载推广储备角色",
+    "rolesLoadingDescription": "正在从合约读取 MarketingWallet 的所有者与财务执行人。",
+    "rolesErrorTitle": "未能读取推广储备角色",
+    "restrictedTitle": "访问受限",
+    "restrictedDescription": "请连接推广储备现任财务执行人（{treasurer}）的钱包，才能使用此转账工具。所有者：{owner}。"
+  }
+}

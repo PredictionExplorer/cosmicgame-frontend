@@ -11,5 +11,12 @@
     "hours": "Hours",
     "minutes": "Min",
     "seconds": "Sec"
+  },
+  "durationCompact": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "left": "left"
   }
 }

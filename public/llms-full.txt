@@ -267,3 +267,107 @@ A: No team wallet receives ETH from participant gestures. All reserves flow thro
 
 Q: What happens if the team disappears?
 A: The protocol is self-sustaining. Since NFT seeds are stored on-chain, anyone can regenerate the images using the open-source Rust program.
+
+## 中文完整说明
+
+### 关于 Cosmic Signature
+
+Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议，将链上参与、生成艺术与公共物品支持结合在同一套公开机制中。每个演绎周期里，参与者以 ETH 或 CST 落笔；每一笔都会延长收官倒计时、计入星选资格，并继续塑造周期最终的签名作品。
+
+NFT 作品源自物理学中的三体问题：开放源代码的 Rust 程序读取链上种子，模拟三个天体的运动并描绘轨迹。相同种子会生成完全一致的图像和视频，因此作品可由任何人复现。
+
+Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。
+
+### 中文网站结构
+
+#### 介绍与学习
+
+- **中文主页**：https://cosmicsignature.com/zh
+- **关于**：https://cosmicsignature.com/zh/about
+- **学习中心**：https://cosmicsignature.com/zh/learn
+- **什么是 Cosmic Signature**：https://cosmicsignature.com/zh/learn/what-is-cosmic-signature
+- **三体 NFT 艺术**：https://cosmicsignature.com/zh/learn/three-body-nft-art
+- **公共物品机制**：https://cosmicsignature.com/zh/learn/protocol-guild-public-goods
+
+#### 应用与公开数据
+
+- **应用主页**：https://app.cosmicsignature.com/zh
+- **当前演绎周期**：https://app.cosmicsignature.com/zh/current-cycle
+- **画廊**：https://app.cosmicsignature.com/zh/gallery
+- **运作原理**：https://app.cosmicsignature.com/zh/how-it-works
+- **常见问题**：https://app.cosmicsignature.com/zh/faq
+- **分配名录**：https://app.cosmicsignature.com/zh/allocation
+- **锚定**：https://app.cosmicsignature.com/zh/anchoring
+- **统计**：https://app.cosmicsignature.com/zh/statistics
+- **直接 ETH 贡献**：https://app.cosmicsignature.com/zh/eth-contribution
+- **公共物品资助**：https://app.cosmicsignature.com/zh/public-goods-contributions-cg
+- **合约**：https://app.cosmicsignature.com/zh/contracts
+- **源代码**：https://app.cosmicsignature.com/zh/code
+- **安全**：https://app.cosmicsignature.com/zh/security
+- **审计**：https://app.cosmicsignature.com/zh/audits
+- **风险披露**：https://app.cosmicsignature.com/zh/risk-disclosures
+
+### 演绎周期与落笔
+
+1. 新周期先开启 ETH 校准窗口；CST 校准窗口从 12 小时基准出发，之后随链上参与变化。
+2. 每次落笔都会按当前时间增量延长收官倒计时。该增量最初为 1 小时，每有一个周期收官便增长 1%。
+3. 落笔可使用 ETH 或 CST；每个周期的第一笔必须使用 ETH。CST 落笔价格会在当前校准窗口内逐步回落，落笔所用 CST 随后销毁。
+4. CST 落笔会使 CST 校准窗口延长约 0.4%，ETH 落笔会使其缩短约 0.398%。
+5. 写下收官之笔的参与者在倒计时归零后拥有 48 小时专属收官窗口。在真正执行收官前仍可继续落笔；专属窗口结束后，任何人均可收官，实际收官者获得签名分配。
+6. 每次落笔都会计入一次星选资格，并可能按距上一笔经过的时间铭刻动态参与 CST。计算采用平方根公式；连续快速落笔可能铭刻 0 CST，间隔越长，铭刻量越大但增长逐渐放缓。
+7. 未使用的 RandomWalk NFT 可附加至一笔 ETH 落笔，使该笔 ETH 落笔价格降低 50%；每枚 RandomWalk NFT 只能使用一次。
+
+### 每周期分配
+
+- **25%**：签名分配，由实际完成收官的参与者获得
+- **8%**：时之勇士 ETH 分配
+- **4%**：由 3 个 ETH 星选资格共享
+- **6%**：Cosmic Signature NFT 锚定派发
+- **7%**：公共物品分配，当前转拨至 Protocol Guild
+- **约 50%**：作为滚动储备进入下一周期
+- **3,000 CST**：铭刻至推广储备，供生态贡献者分配
+
+绝大多数周期会铭刻 24 枚 Cosmic Signature NFT，并为每枚 NFT 分配配套 1,000 CST：签名分配 1 枚、最后一笔 CST 获配者 1 枚、坚守冠军 1 枚、时之勇士 1 枚、参与者 NFT 星选 10 枚、锚定 NFT 星选 10 枚。与 3,000 CST 推广储备合计，典型固定周期末及推广 CST 铭刻为 27,000 CST；按落笔动态计算的参与 CST 另计。
+
+### 锚定与取回
+
+- 已锚定的 Cosmic Signature NFT 按锚定数量平均分享每周期 6% 的 ETH 锚定派发；累计 ETH 在解锚时支付
+- 已锚定的 RandomWalk NFT 仅获得锚定 NFT 星选资格，不参与 ETH 锚定派发
+- 每枚 Cosmic Signature NFT 或 RandomWalk NFT 一生只能锚定一次；解锚会永久结束该 NFT 的锚定资格
+- 若周期收官时没有 Cosmic Signature NFT 处于锚定状态，该周期的 6% 会留在周期储备中
+- 次级 ETH、ERC-20 与 ERC-721 分配保存在分配钱包中；5 周取回期限结束后，任何人都可为自己取回仍未取回的分配
+
+### 代币与生态
+
+- **CST**：ERC-20 协调与实用代币，可用于 CST 校准窗口内的落笔，并参与宇宙议会协调信号
+- **Cosmic Signature NFT**：ERC-721 三体生成艺术，种子存于链上，可通过开放源代码的 Rust 程序复现
+- **RandomWalk NFT**：可用于一次性 ETH 落笔价格减免，也可锚定以获得锚定 NFT 星选资格
+- **Axiom Zero**（https://www.axiomzero.market/cosmic-signature）：Arbitrum 上不收平台费的 NFT 市场；交易直接在链上结算
+- **Chaos Zero**（https://chaoszero.com）：面向 Cosmic Signature 的预测市场；每周期判断收官时的落笔数是否高于上一周期，结果取自公开链上数据
+- **Uniswap**：https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0
+
+### 协调与信任
+
+- 核心协议参数只能在下一周期尚未启用时调整；周期启用时点、周期间隔及部分外围配置有各自限制
+- 协议合约采用 UUPS 升级方式，但只能在周期间调整；当前实现可在链上逐字节验证
+- 所有参与者 ETH 都依照公开合约规则在协议内流转，没有团队钱包直接接收落笔 ETH
+- 审计与形式化验证状态发布于 https://app.cosmicsignature.com/zh/audits
+- 长期目标是将所有权移交宇宙议会，并最终彻底放弃所有权；届时参数与实现均不再可改
+- 即使团队停止维护，链上种子与开放源代码仍允许任何人复现 NFT 作品
+
+### 中文常见问题
+
+**问：没有 NFT 可以参与吗？**
+答：可以。任何人都可直接落笔，不需要先持有 NFT；RandomWalk NFT 只是可选的一次性价格减免工具。
+
+**问：签名分配包含什么？**
+答：包括周期储备的 25%、1,000 CST、1 枚独一无二的 Cosmic Signature NFT，以及其他项目随落笔附加的代币。
+
+**问：星选如何运作？**
+答：每一笔都会计入一个星选资格。周期收官时，3 个 ETH 星选资格共享周期储备的 4%；另有 10 个参与者 NFT 星选结果与 10 个锚定 NFT 星选结果，每个结果对应 1,000 CST 与 1 枚 Cosmic Signature NFT。
+
+**问：NFT 作品如何生成？**
+答：合约保存种子，开放源代码的 Rust 程序以该种子运行三体物理模拟并进行光谱渲染；相同种子始终生成相同像素。
+
+**问：哪里可以查看已部署合约与验证信息？**
+答：合约地址见 https://app.cosmicsignature.com/zh/contracts ，安全说明见 https://app.cosmicsignature.com/zh/security ，审计状态见 https://app.cosmicsignature.com/zh/audits 。

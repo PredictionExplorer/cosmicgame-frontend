@@ -1,0 +1,74 @@
+{
+  "page": {
+    "eyebrow": "Admin · Restricted",
+    "title": "Admin",
+    "subtitle": "Manage gestures and system administration",
+    "gestureList": "Gesture List",
+    "loading": "Loading..."
+  },
+  "settings": {
+    "title": "Administrative methods",
+    "subtitle": "Read-only view of dashboard contract addresses and parameters.",
+    "breadcrumbs": {
+      "home": "Home",
+      "admin": "Admin",
+      "settings": "Settings"
+    },
+    "loading": "Loading...",
+    "contractTitle": "Cosmic Signature Contract",
+    "contractDescription": "Contract addresses and on-chain parameters from the dashboard API.",
+    "placeholders": {
+      "address": "Enter address here",
+      "number": "Enter number here"
+    },
+    "actions": {
+      "setAddress": "Set Address",
+      "set": "Set"
+    },
+    "fields": {
+      "cosmicSignatureNft": "Cosmic Signature NFT (ERC-721) contract address",
+      "cstToken": "Cosmic Signature CST Token (ERC-20) contract address",
+      "publicGoodsVault": "Public Goods Vault contract address",
+      "randomWalkNft": "RandomWalk NFT contract address",
+      "stellarSelectionWallet": "Stellar Selection wallet contract address",
+      "anchoringWallet": "Anchoring wallet contract address",
+      "outreachWallet": "Outreach wallet contract address",
+      "businessLogic": "Business logic contract address",
+      "ethStellarRecipients": "Number of ETH Stellar Selection recipients per cycle",
+      "nftStellarRecipients": "Number of NFT Stellar Selection recipients per cycle",
+      "nftHolderRecipients": "Number of NFT holder recipients per cycle",
+      "signatureAllocationPercentage": "Signature Allocation percentage",
+      "publicGoodsPercentage": "Public Goods percentage",
+      "stellarSelectionPercentage": "Stellar Selection percentage",
+      "anchorDistributionPercentage": "Anchor Distribution percentage",
+      "timeIncrease": "Time increase",
+      "allocationTimeout": "Timeout to retrieve Signature Allocation",
+      "priceIncrease": "Price increase",
+      "nanosecondsExtra": "Nano seconds extra",
+      "initialAllocationSeconds": "Initial seconds until Signature Allocation",
+      "initialGestureCostFraction": "Initial Gesture Cost fraction",
+      "activationTime": "Activation time",
+      "gestureRatio": "ETH to CST Gesture ratio",
+      "calibrationWindowLength": "Cycle start CST Calibration Window length",
+      "switchMode": "Switch mode"
+    },
+    "modes": {
+      "runtime": "Runtime Mode",
+      "maintenance": "Maintenance Mode"
+    }
+  },
+  "outreachTransfer": {
+    "title": "CST Outreach Transfer",
+    "subtitle": "URL-only transfer tool for the configured outreach reserve wallet signer.",
+    "roleReadError": "Unable to read the outreach reserve owner and treasurer.",
+    "walletRequiredTitle": "Wallet not connected",
+    "walletRequiredDescription": "Connect the current outreach reserve treasurer wallet to pay CST rewards.",
+    "walletUnavailableTitle": "Marketing wallet unavailable",
+    "walletUnavailableDescription": "The dashboard has not provided a marketing wallet address yet.",
+    "rolesLoadingTitle": "Loading outreach reserve roles",
+    "rolesLoadingDescription": "Reading the MarketingWallet owner and treasurer from the contract.",
+    "rolesErrorTitle": "Unable to read outreach reserve roles",
+    "restrictedTitle": "Access restricted",
+    "restrictedDescription": "Connect the current outreach reserve treasurer ({treasurer}) to use this URL-only transfer tool. Owner: {owner}."
+  }
+}

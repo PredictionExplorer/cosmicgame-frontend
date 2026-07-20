@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import { getExplorerUrl, shortenHex } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -26,6 +27,7 @@ function addrEq(a: string | undefined, b: string): boolean {
 
 const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const { stakingCst, stakingRwalk } = useContractAddresses();
   if (!record || record.FromAddr === ZERO_ADDRESS) {
     return null;
@@ -42,7 +44,7 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(TimeStamp)}
+          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell>

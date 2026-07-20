@@ -1,3 +1,5 @@
+import { execFileSync } from 'node:child_process';
+
 import {
   formatSeconds,
   calculateTimeDiff,
@@ -9,6 +11,10 @@ import {
   supplyHistoryBootstrapRange,
   supplyHistoryDateBounds,
   formatYyyymmddLabel,
+  formatUnixTsLabel,
+  convertTimestampToDateTime,
+  convertTimestampToServerDateTime,
+  formatGroupedNumber,
 } from '../format';
 
 describe('formatTableAmount', () => {
@@ -33,6 +39,7 @@ describe('formatTableAmount', () => {
 
   it('adds thousands separators for large values', () => {
     expect(formatTableAmount(12096.254179)).toBe('12,096.254179');
+    expect(formatTableAmount(12096.254179, 'zh')).toBe('12,096.254179');
   });
 
   it('renders non-finite input as an em dash', () => {
@@ -53,6 +60,7 @@ describe('formatSeconds edge cases', () => {
 
   it('returns full breakdown for days+hours+minutes+seconds', () => {
     expect(formatSeconds(90061)).toBe('1d 1h 1m 1s');
+    expect(formatSeconds(90061, 'zh')).toBe('1天1小时1分1秒');
   });
 
   it('truncates fractional seconds', () => {
@@ -96,6 +104,7 @@ describe('calculateTimeDiff', () => {
   it('returns multi-day difference with hours', () => {
     const threeDaysAgo = 1_700_000_000 - 3 * 86400 - 7200;
     expect(calculateTimeDiff(threeDaysAgo)).toBe('3d 2h ');
+    expect(calculateTimeDiff(threeDaysAgo, 'zh')).toBe('3天2小时');
   });
 });
 
@@ -143,6 +152,55 @@ describe('YYYYMMDD date helpers', () => {
 
   it('formats YYYYMMDD label', () => {
     expect(formatYyyymmddLabel('20260506')).toBe('May 6, 2026');
+    expect(formatYyyymmddLabel('20260506', 'zh')).toBe('2026/5/6');
+  });
+
+  it('formats Unix chart labels in English and Chinese without changing UTC semantics', () => {
+    const timestamp = Date.UTC(2026, 0, 1, 12, 34) / 1000;
+    expect(formatUnixTsLabel(timestamp, true)).toBe('Jan 1, 2026 12:34 UTC');
+    expect(formatUnixTsLabel(timestamp, true, 'zh')).toBe('2026年1月1日 12:34（UTC）');
+  });
+
+  it('preserves historical browser-local output in English and Chinese', () => {
+    const timestamp = new Date(2026, 0, 1, 12, 34, 56).getTime() / 1000;
+    expect(convertTimestampToDateTime(timestamp, true)).toBe('Jan 01, 12:34:56');
+    expect(convertTimestampToDateTime(timestamp, true, 'zh')).toBe('1月1日 12:34:56');
+  });
+
+  it('uses an explicit deterministic UTC value for server snapshots', () => {
+    const timestamp = Date.UTC(2026, 0, 1, 12, 34, 56) / 1000;
+    expect(convertTimestampToDateTime(timestamp, true, 'en', 'utc')).toBe('Jan 01, 12:34:56');
+    expect(convertTimestampToServerDateTime(timestamp, true, 'zh')).toBe('1月1日 12:34:56');
+  });
+
+  it('keeps local semantics in a non-UTC timezone across a date boundary', () => {
+    const script = `
+      import('./utils/format.ts').then((format) => {
+        const api = format.default ?? format;
+        const timestamp = Date.UTC(2026, 0, 1, 0, 30, 45) / 1000;
+        process.stdout.write(JSON.stringify([
+          api.convertTimestampToDateTime(timestamp, true),
+          api.convertTimestampToDateTime(timestamp, true, 'zh'),
+          api.convertTimestampToServerDateTime(timestamp, true),
+        ]));
+      });
+    `;
+    const output = execFileSync(process.execPath, ['--import', 'tsx', '--eval', script], {
+      cwd: process.cwd(),
+      env: { ...process.env, TZ: 'America/Los_Angeles' },
+      encoding: 'utf8',
+    });
+
+    expect(JSON.parse(output)).toEqual([
+      'Dec 31, 16:30:45',
+      '12月31日 16:30:45',
+      'Jan 01, 00:30:45',
+    ]);
+  });
+
+  it('uses Western grouping in both locales', () => {
+    expect(formatGroupedNumber(1_000_000)).toBe('1,000,000');
+    expect(formatGroupedNumber(1_000_000, 'zh')).toBe('1,000,000');
   });
 
   it('returns bootstrap range from epoch to today', () => {

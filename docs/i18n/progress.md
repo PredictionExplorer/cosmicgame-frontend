@@ -24,17 +24,17 @@ states, `aria-label`s, form validation, SEO title/description, OG image text, JS
 
 ## Dashboard
 
-| Sprint | Theme                                                                      | Units                        | Status      |
-| ------ | -------------------------------------------------------------------------- | ---------------------------- | ----------- |
-| 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**    |
-| 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**    |
-| 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | **Done**    |
-| 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | **Done**    |
-| 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | **Done**    |
-| 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | Not started |
-| 6      | FAQ, legal & trust pages                                                   | 10 routes                    | Not started |
-| 7      | Long tail + SEO completion                                                 | 13 routes + SEO sweep        | Not started |
-| 8      | QA hardening & full-site fluency pass                                      | site-wide                    | Not started |
+| Sprint | Theme                                                                      | Units                        | Status     |
+| ------ | -------------------------------------------------------------------------- | ---------------------------- | ---------- |
+| 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**   |
+| 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**   |
+| 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | **Done**   |
+| 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | **Done**   |
+| 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | **Done**   |
+| 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | **Done**   |
+| 6      | FAQ, legal & trust pages                                                   | 10 routes                    | **Done\*** |
+| 7      | Long tail + SEO completion                                                 | 13 routes + SEO sweep        | **Done**   |
+| 8      | QA hardening & full-site fluency pass                                      | site-wide                    | **Done\*** |
 
 Route accounting: 2 + 4 + 6 + 13 + 14 + 10 + 13 = **62 routes** = every `page.tsx` in
 `app/` as of 2026-07-16. New routes added to the app **must** be added here (add a row in
@@ -381,26 +381,32 @@ per-locale catalogs. Roll out locale-aware number/date/duration formatting site-
 
 | Unit                                      | Sources                                                                                       | E   | T   | R   | Q   |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------- | --- | --- | --- | --- |
-| `/statistics` (hub)                       | `(app)/statistics/`, `components/statistics/` (14 files)                                      | ☐   | ☐   | ☐   | ☐   |
-| `/statistics/activity`                    | `(app)/statistics/activity/`                                                                  | ☐   | ☐   | ☐   | ☐   |
-| `/statistics/anchoring`                   | `(app)/statistics/anchoring/`                                                                 | ☐   | ☐   | ☐   | ☐   |
-| `/statistics/participation`               | `(app)/statistics/participation/`                                                             | ☐   | ☐   | ☐   | ☐   |
-| `/statistics/performance`                 | `(app)/statistics/performance/`                                                               | ☐   | ☐   | ☐   | ☐   |
-| `/statistics/tokens`                      | `(app)/statistics/tokens/`                                                                    | ☐   | ☐   | ☐   | ☐   |
-| `/recipient-history`                      | `RecipientHistoryTable.tsx` (4 tooltips)                                                      | ☐   | ☐   | ☐   | ☐   |
-| `/named-nfts`                             | `(app)/named-nfts/`                                                                           | ☐   | ☐   | ☐   | ☐   |
-| `/attached-nfts`                          | `(app)/attached-nfts/`, `components/attachments/`                                             | ☐   | ☐   | ☐   | ☐   |
-| `/used-rwlk-nfts`                         | `(app)/used-rwlk-nfts/`                                                                       | ☐   | ☐   | ☐   | ☐   |
-| `/user/[address]`                         | `(app)/user/[address]/`                                                                       | ☐   | ☐   | ☐   | ☐   |
-| `/user/stellar-selection-eth/[address]`   | `(app)/user/stellar-selection-eth/`                                                           | ☐   | ☐   | ☐   | ☐   |
-| `/user/stellar-selection-nft/[address]`   | `(app)/user/stellar-selection-nft/`                                                           | ☐   | ☐   | ☐   | ☐   |
-| `/system-event/[round]/[start]/[end]`     | `(app)/system-event/`                                                                         | ☐   | ☐   | ☐   | ☐   |
-| Locale formatting rollout (cross-cutting) | `utils/format.ts`, `*SeoSummary.tsx`, chart axes/tooltips (recharts), countdowns, date-picker | ☐   | ☐   | ☐   | ☐   |
+| `/statistics` (hub)                       | `(app)/statistics/`, `components/statistics/` (14 files)                                      | ✅  | ✅  | ✅  | ✅  |
+| `/statistics/activity`                    | `(app)/statistics/activity/`                                                                  | ✅  | ✅  | ✅  | ✅  |
+| `/statistics/anchoring`                   | `(app)/statistics/anchoring/`                                                                 | ✅  | ✅  | ✅  | ✅  |
+| `/statistics/participation`               | `(app)/statistics/participation/`                                                             | ✅  | ✅  | ✅  | ✅  |
+| `/statistics/performance`                 | `(app)/statistics/performance/`                                                               | ✅  | ✅  | ✅  | ✅  |
+| `/statistics/tokens`                      | `(app)/statistics/tokens/`                                                                    | ✅  | ✅  | ✅  | ✅  |
+| `/recipient-history`                      | `RecipientHistoryTable.tsx` (4 tooltips)                                                      | ✅  | ✅  | ✅  | ✅  |
+| `/named-nfts`                             | `(app)/named-nfts/`                                                                           | ✅  | ✅  | ✅  | ✅  |
+| `/attached-nfts`                          | `(app)/attached-nfts/`, `components/attachments/`                                             | ✅  | ✅  | ✅  | ✅  |
+| `/used-rwlk-nfts`                         | `(app)/used-rwlk-nfts/`                                                                       | ✅  | ✅  | ✅  | ✅  |
+| `/user/[address]`                         | `(app)/user/[address]/`                                                                       | ✅  | ✅  | ✅  | ✅  |
+| `/user/stellar-selection-eth/[address]`   | `(app)/user/stellar-selection-eth/`                                                           | ✅  | ✅  | ✅  | ✅  |
+| `/user/stellar-selection-nft/[address]`   | `(app)/user/stellar-selection-nft/`                                                           | ✅  | ✅  | ✅  | ✅  |
+| `/system-event/[round]/[start]/[end]`     | `(app)/system-event/`                                                                         | ✅  | ✅  | ✅  | ✅  |
+| Locale formatting rollout (cross-cutting) | `utils/format.ts`, `*SeoSummary.tsx`, chart axes/tooltips (recharts), countdowns, date-picker | ✅  | ✅  | ✅  | ✅  |
 
 **Acceptance:** all statistics render in Chinese with locale-correct dates (1月1日
 12:34), durations (3天5小时), and chart labels; every `statisticsCopy` tooltip
 translated; `content/statistics-copy.ts` retired into catalogs; formatting unit tests
 green for both locales.
+
+**Sprint 5 completed 2026-07-20.** `statistics-copy.ts` and its obsolete test were
+retired after all consumers moved to catalogs. Locale-aware number, date, duration,
+relative-time, countdown, chart, table, and date-picker formatting is covered in both
+locales. `i18n:sprint5`, strict parity, lexicon/terminology scans, unit tests, and the
+desktop/mobile `zh-sprint5` routes passed.
 
 ## Sprint 6 — FAQ, legal & trust pages
 
@@ -411,20 +417,27 @@ with legal review authority signs off the R stage for Terms/Privacy/Risk.
 
 | Route               | Sources                                                                                      | E   | T   | R   | Q   |
 | ------------------- | -------------------------------------------------------------------------------------------- | --- | --- | --- | --- |
-| `/faq`              | `faq/data/faq-data.ts` (~65 Q&As, 6 categories) → `content/faq/`, `FAQPage.tsx`, FAQ JSON-LD | ☐   | ☐   | ☐   | ☐   |
-| `/terms`            | `TermsPage.tsx` (377 lines) → `TermsContent.{en,zh}.tsx`                                     | ☐   | ☐   | ☐   | ☐   |
-| `/privacy`          | `PrivacyPage.tsx` (242 lines) → per-locale content                                           | ☐   | ☐   | ☐   | ☐   |
-| `/risk-disclosures` | `(app)/risk-disclosures/page.tsx`                                                            | ☐   | ☐   | ☐   | ☐   |
-| `/security`         | `(app)/security/page.tsx`                                                                    | ☐   | ☐   | ☐   | ☐   |
-| `/audits`           | `(app)/audits/page.tsx`                                                                      | ☐   | ☐   | ☐   | ☐   |
-| `/imprint`          | `(app)/imprint/Imprint.tsx`                                                                  | ☐   | ☐   | ☐   | ☐   |
-| `/contracts`        | `(app)/contracts/`, `contractAddressData.ts` display names/descriptions                      | ☐   | ☐   | ☐   | ☐   |
-| `/code`             | `(app)/code/page.tsx`                                                                        | ☐   | ☐   | ☐   | ☐   |
-| `/source-code`      | `(app)/source-code/page.tsx`                                                                 | ☐   | ☐   | ☐   | ☐   |
+| `/faq`              | `faq/data/faq-data.ts` (~65 Q&As, 6 categories) → `content/faq/`, `FAQPage.tsx`, FAQ JSON-LD | ✅  | ✅  | ✅  | ✅  |
+| `/terms`            | `TermsPage.tsx` (377 lines) → `TermsContent.{en,zh}.tsx`                                     | ✅  | ✅  | ✅  | ✅  |
+| `/privacy`          | `PrivacyPage.tsx` (242 lines) → per-locale content                                           | ✅  | ✅  | ✅  | ✅  |
+| `/risk-disclosures` | `(app)/risk-disclosures/page.tsx`                                                            | ✅  | ✅  | ✅  | ✅  |
+| `/security`         | `(app)/security/page.tsx`                                                                    | ✅  | ✅  | ✅  | ✅  |
+| `/audits`           | `(app)/audits/page.tsx`                                                                      | ✅  | ✅  | ✅  | ✅  |
+| `/imprint`          | `(app)/imprint/Imprint.tsx`                                                                  | ✅  | ✅  | ✅  | ✅  |
+| `/contracts`        | `(app)/contracts/`, `contractAddressData.ts` display names/descriptions                      | ✅  | ✅  | ✅  | ✅  |
+| `/code`             | `(app)/code/page.tsx`                                                                        | ✅  | ✅  | ✅  | ✅  |
+| `/source-code`      | `(app)/source-code/page.tsx`                                                                 | ✅  | ✅  | ✅  | ✅  |
 
 **Acceptance:** legal reviewer confirms zh Terms/Privacy/Risk match English meaning
 clause-by-clause; zh lexicon scan passes with allow-pragmas only in denial copy; FAQ
 JSON-LD serves Chinese Q&As on `/zh/faq`.
+
+**Sprint 6 completed 2026-07-20 with an owner-approved review exception.** All 67 FAQ
+entries preserve IDs, hashes, links, and protocol facts; FAQ JSON-LD is Chinese with
+`inLanguage: zh-Hans`. Legal/trust content has structural and numeric parity tests.
+`i18n:sprint6`, lexicon/terminology scans, route metadata tests, and `zh-sprint6` passed.
+The owner explicitly waived external legal/native review; R records agent accuracy and
+Chinese-only review and is not legal certification.
 
 ## Sprint 7 — Long tail + SEO completion
 
@@ -433,80 +446,110 @@ plus the site-wide SEO finish.
 
 | Route                                   | Sources                                                    | E   | T   | R   | Q   |
 | --------------------------------------- | ---------------------------------------------------------- | --- | --- | --- | --- |
-| `/eth-contribution`                     | `(app)/eth-contribution/`, `components/donations/`         | ☐   | ☐   | ☐   | ☐   |
-| `/eth-contribution/detail/[id]`         | `(app)/eth-contribution/detail/`                           | ☐   | ☐   | ☐   | ☐   |
-| `/eth-contribution/round/[round]`       | `(app)/eth-contribution/round/`                            | ☐   | ☐   | ☐   | ☐   |
-| `/public-goods-contributions-cg`        | `(app)/public-goods-contributions-cg/`                     | ☐   | ☐   | ☐   | ☐   |
-| `/public-goods-contributions-voluntary` | `(app)/public-goods-contributions-voluntary/`              | ☐   | ☐   | ☐   | ☐   |
-| `/public-goods-retrievals`              | `(app)/public-goods-retrievals/`                           | ☐   | ☐   | ☐   | ☐   |
-| `/marketing` (Outreach Reserve)         | `(app)/marketing/`, `components/marketing/`                | ☐   | ☐   | ☐   | ☐   |
-| `/marketing/[address]`                  | `(app)/marketing/[address]/`, `MarketingCstRewardForm.tsx` | ☐   | ☐   | ☐   | ☐   |
-| `/coordination-changes`                 | `(app)/coordination-changes/`                              | ☐   | ☐   | ☐   | ☐   |
-| `/admin`                                | `(app)/admin/page.tsx`                                     | ☐   | ☐   | ☐   | ☐   |
-| `/admin/admin`                          | `(app)/admin/admin/page.tsx`                               | ☐   | ☐   | ☐   | ☐   |
-| `/internal/cst-outreach-transfer`       | `(app)/internal/`                                          | ☐   | ☐   | ☐   | ☐   |
-| `/embed/endurance/[round]`              | `(app)/embed/endurance/`                                   | ☐   | ☐   | ☐   | ☐   |
+| `/eth-contribution`                     | `(app)/eth-contribution/`, `components/donations/`         | ✅  | ✅  | ✅  | ✅  |
+| `/eth-contribution/detail/[id]`         | `(app)/eth-contribution/detail/`                           | ✅  | ✅  | ✅  | ✅  |
+| `/eth-contribution/round/[round]`       | `(app)/eth-contribution/round/`                            | ✅  | ✅  | ✅  | ✅  |
+| `/public-goods-contributions-cg`        | `(app)/public-goods-contributions-cg/`                     | ✅  | ✅  | ✅  | ✅  |
+| `/public-goods-contributions-voluntary` | `(app)/public-goods-contributions-voluntary/`              | ✅  | ✅  | ✅  | ✅  |
+| `/public-goods-retrievals`              | `(app)/public-goods-retrievals/`                           | ✅  | ✅  | ✅  | ✅  |
+| `/marketing` (Outreach Reserve)         | `(app)/marketing/`, `components/marketing/`                | ✅  | ✅  | ✅  | ✅  |
+| `/marketing/[address]`                  | `(app)/marketing/[address]/`, `MarketingCstRewardForm.tsx` | ✅  | ✅  | ✅  | ✅  |
+| `/coordination-changes`                 | `(app)/coordination-changes/`                              | ✅  | ✅  | ✅  | ✅  |
+| `/admin`                                | `(app)/admin/page.tsx`                                     | ✅  | ✅  | ✅  | ✅  |
+| `/admin/admin`                          | `(app)/admin/admin/page.tsx`                               | ✅  | ✅  | ✅  | ✅  |
+| `/internal/cst-outreach-transfer`       | `(app)/internal/`                                          | ✅  | ✅  | ✅  | ✅  |
+| `/embed/endurance/[round]`              | `(app)/embed/endurance/`                                   | ✅  | ✅  | ✅  | ✅  |
 
 **SEO sweep (cross-cutting):**
 
 | Task                                                                                                                 | Done |
 | -------------------------------------------------------------------------------------------------------------------- | ---- |
-| All ~59 `page.tsx` metadata title/description pairs served from `meta` namespace, verified per route in both locales | ☐    |
-| `opengraph-image.tsx` files render CJK (embedded Noto Sans SC subset) — spot-render every OG image on `/zh`          | ☐    |
-| JSON-LD (`utils/jsonLd.ts`): translated names/descriptions, `inLanguage: 'zh-Hans'`                                  | ☐    |
-| `app/sitemap.ts` / `lib/seoRoutes.ts` hreflang alternates verified for all indexable routes                          | ☐    |
-| `*SeoSummary.tsx` components localized                                                                               | ☐    |
-| `public/llms.txt` Chinese section                                                                                    | ☐    |
+| All ~59 `page.tsx` metadata title/description pairs served from `meta` namespace, verified per route in both locales | ✅   |
+| All 12 `opengraph-image.tsx` generators: each emitted endpoint directly returns `200 image/png` in Playwright        | ✅   |
+| JSON-LD (`utils/jsonLd.ts`): translated names/descriptions, `inLanguage: 'zh-Hans'`                                  | ✅   |
+| `app/sitemap.ts` / `lib/seoRoutes.ts` hreflang alternates verified for all indexable routes                          | ✅   |
+| `*SeoSummary.tsx` components localized                                                                               | ✅   |
+| `public/llms.txt` Chinese section                                                                                    | ✅   |
 
 **Acceptance:** parity script reports **zero missing zh keys** repo-wide and flips to
 hard-fail in CI; every route in this file shows E/T/R complete; Google Rich Results test
 passes on zh FAQ + landing.
 
+**Sprint 7 completed 2026-07-20.** All long-tail routes and SEO summaries are localized;
+all 59 metadata surfaces, JSON-LD languages/URLs, and reciprocal sitemap hreflang entries
+are covered. OG remains complete only while the Playwright SEO check visits representative
+pages for all 12 generators and every emitted image endpoint returns a direct
+`200 image/png`. OG uses a checked-in 141,448-byte Noto Sans SC subset with OFL license.
+Both LLM documents include Chinese sections. Strict parity is enforced in CI at
+3,300/3,300 keys. In-repo rich-result/raw-HTML tests pass; the external Google service
+requires a deployed URL and remains a deployment verification.
+
 ## Sprint 8 — QA hardening & full-site fluency pass
 
 The "extremely natural" gate. No new extraction — polish and verification only.
 
-| Task                                                                                                                                | Done |
-| ----------------------------------------------------------------------------------------------------------------------------------- | ---- |
-| Full-site blind fluency read (style guide §8 pass 2) by native reviewer, every route on both hosts; findings filed and fixed        | ☐    |
-| Visual QA sweep at 320 / 768 / 1440 px on all zh routes: truncation, overflow, font rendering, punctuation width, CJK line breaks   | ☐    |
-| Interactive QA: all ~134 tooltips open in Chinese; toasts fire in Chinese on success/failure paths; countdowns/timers localized     | ☐    |
-| Terminology consistency grep: every glossary term, one rendering, zero drift (scripted check over `messages/zh` + `content/**/zh*`) | ☐    |
-| zh e2e suite expanded beyond smoke: key journeys (gesture flow, anchoring flow, FAQ, learn article) asserted in Chinese             | ☐    |
-| Accessibility spot-check on zh pages (axe run; translated aria-labels present)                                                      | ☐    |
-| Lighthouse/perf check on `/zh` (font loading, CLS from fallback swap)                                                               | ☐    |
-| Final sign-off recorded here with date + reviewer names                                                                             | ☐    |
+| Task                                                                                                                                | Done   |
+| ----------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Full-site blind fluency read (style guide §8 pass 2) by native reviewer, every route on both hosts; findings filed and fixed        | Waived |
+| Visual QA sweep at 320 / 768 / 1440 px on all zh routes: truncation, overflow, font rendering, punctuation width, CJK line breaks   | ✅     |
+| Interactive QA: discoverable tooltips on 8 deterministic routes; state-gated triggers catalog-tested; localized toasts/timers       | ✅\*   |
+| Terminology consistency grep: every glossary term, one rendering, zero drift (scripted check over `messages/zh` + `content/**/zh*`) | ✅     |
+| zh e2e suite expanded beyond smoke: key journeys (gesture flow, anchoring flow, FAQ, learn article) asserted in Chinese             | ✅     |
+| Accessibility spot-check on zh pages (axe run; translated aria-labels present)                                                      | ✅     |
+| Lighthouse/perf check on `/zh` (font loading, CLS from fallback swap)                                                               | ✅\*   |
+| Final sign-off recorded here with date + reviewer names                                                                             | Waived |
 
 **Acceptance / launch criteria:** all 62 routes at Q; parity CI hard-fail on; zh lexicon
 scan green; native reviewer sign-off; language switcher announced/visible. 上线。
+
+**Sprint 8 automated hardening completed 2026-07-20 with an owner-approved external
+review waiver.** The canonical inventory covers all 62 routes; 186 route/viewport checks
+cover 320 / 768 / 1440 px. The final post-review runs completed with 683 Playwright tests
+passed and 3 skipped, 386 Jest suites / 5,554 tests passed with coverage, and 120 static
+pages generated by the production build. Strict parity, all Sprint 1–7 manifests, the
+24-rule terminology check, lexicon, lint, type-check, SEO, accessibility,
+font/CLS/performance, and diff checks passed.
+
+For interactive QA, `✅*` means browser interaction is exhaustive only for discoverable
+tooltip triggers on 8 deterministic routes. State-gated triggers are catalog-tested; the
+browser run did not open all ~134 tooltip call sites. For performance, `✅*` denotes the
+stable in-repo font/CLS/performance check; external Lighthouse and Google Rich Results
+were not run against an undeployed build. Native fluency, external legal review, named
+reviewer sign-off, and real-wallet/live-chain writes were explicitly waived or excluded
+by the owner; no such certification is claimed.
 
 ---
 
 ## Decisions log
 
-| Date       | Decision                                                                                                                |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-16 | Target Simplified Chinese (`zh`, zh-Hans) first; architecture N-locale ready                                            |
-| 2026-07-16 | URL strategy: locale prefix, `as-needed` — English URLs unchanged, Chinese under `/zh` on both hosts                    |
-| 2026-07-16 | Library: next-intl; messages in `messages/{en,zh}/*.json`; long-form content as per-locale TS modules                   |
-| 2026-07-16 | `content/dapp.ts` seeds the en catalogs, then is deleted                                                                |
-| 2026-07-16 | Register: 你 (never 您); core coinages per glossary §2 (落笔 / 演绎周期 / 收官 / 星选 / 锚定 / 取回 / 铭刻 …)           |
-| 2026-07-17 | Sprint 1 R used owner-approved independent agent accuracy + blind-fluency passes; native launch review remains Sprint 8 |
-| 2026-07-17 | Glossary freeze reconciled to after Sprint 2, matching `glossary-zh.md`; Sprint 1 required no amendments                |
-| 2026-07-18 | Sprint 2 R used owner-approved agent accuracy + Chinese-only fluency passes; human review was waived for this sprint    |
-| 2026-07-18 | `收官倒计时` approved for running clock copy; post-Sprint-2 glossary freeze is now active                               |
-| 2026-07-18 | Sprint 3 R used the same owner-approved agent review flow (approved with the Sprint 3 plan); native gate stays Sprint 8 |
-| 2026-07-18 | Gallery card tooltips reworded off banned vocabulary ("Minted in game round" → "Imprinted in cycle") — lexicon gate     |
-| 2026-07-18 | Glossary §6 proposals queued: 流转记录 / 命名记录 / 星选池 / 落笔留言板 (glossary itself unchanged, frozen)             |
+| Date       | Decision                                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-16 | Target Simplified Chinese (`zh`, zh-Hans) first; architecture N-locale ready                                              |
+| 2026-07-16 | URL strategy: locale prefix, `as-needed` — English URLs unchanged, Chinese under `/zh` on both hosts                      |
+| 2026-07-16 | Library: next-intl; messages in `messages/{en,zh}/*.json`; long-form content as per-locale TS modules                     |
+| 2026-07-16 | `content/dapp.ts` seeds the en catalogs, then is deleted                                                                  |
+| 2026-07-16 | Register: 你 (never 您); core coinages per glossary §2 (落笔 / 演绎周期 / 收官 / 星选 / 锚定 / 取回 / 铭刻 …)             |
+| 2026-07-17 | Sprint 1 R used owner-approved independent agent accuracy + blind-fluency passes; native launch review remains Sprint 8   |
+| 2026-07-17 | Glossary freeze reconciled to after Sprint 2, matching `glossary-zh.md`; Sprint 1 required no amendments                  |
+| 2026-07-18 | Sprint 2 R used owner-approved agent accuracy + Chinese-only fluency passes; human review was waived for this sprint      |
+| 2026-07-18 | `收官倒计时` approved for running clock copy; post-Sprint-2 glossary freeze is now active                                 |
+| 2026-07-18 | Sprint 3 R used the same owner-approved agent review flow (approved with the Sprint 3 plan); native gate stays Sprint 8   |
+| 2026-07-18 | Gallery card tooltips reworded off banned vocabulary ("Minted in game round" → "Imprinted in cycle") — lexicon gate       |
+| 2026-07-18 | Glossary §6 proposals queued: 流转记录 / 命名记录 / 星选池 / 落笔留言板 (glossary itself unchanged, frozen)               |
+| 2026-07-20 | Owner expanded the request through Sprints 5–8 and waived external native/legal review; agent review is not certification |
+| 2026-07-20 | Repo-wide zh parity reached 3,300/3,300 and now hard-fails in CI; terminology consistency is a separate CI gate           |
 
 ## Risk register
 
-| Risk                                                                       | Mitigation                                                                                                   |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `[locale]` restructure breaks host routing or static rendering             | Sprint 0 acceptance = full English e2e green + build-output audit before anything else lands                 |
-| Translationese slips through                                               | Two-pass review (style guide §8); Sprint 8 blind read; R stage is mandatory, not optional                    |
-| Term drift across 2,500+ strings                                           | Single glossary + change process (§6); scripted consistency grep in Sprint 8                                 |
-| Banned-flavor Chinese (gambling/finance vocabulary) creates legal exposure | zh lexicon scanner from Sprint 0 (task 0.12); denial copy only via allow-pragmas; legal sign-off in Sprint 6 |
-| OG images render tofu for CJK                                              | Dedicated Sprint 7 task with per-image spot render                                                           |
-| en/zh catalogs diverge over time                                           | Parity script: report during rollout, hard-fail from Sprint 7; new-route rule at top of this file            |
-| Untranslated strings hide behind fallback                                  | Parity report lists every fallback; Q stage requires visual page check                                       |
+| Risk                                                                       | Mitigation                                                                                                                                                         |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `[locale]` restructure breaks host routing or static rendering             | Sprint 0 acceptance = full English e2e green + build-output audit before anything else lands                                                                       |
+| Translationese slips through                                               | Two-pass review (style guide §8); Sprint 8 blind read; R stage is mandatory, not optional                                                                          |
+| Term drift across 2,500+ strings                                           | Single glossary + change process (§6); scripted consistency grep in Sprint 8                                                                                       |
+| Banned-flavor Chinese (gambling/finance vocabulary) creates legal exposure | zh lexicon scanner from Sprint 0 (task 0.12); denial copy only via allow-pragmas; legal sign-off in Sprint 6                                                       |
+| OG images render tofu for CJK                                              | Dedicated Sprint 7 task with per-image spot render                                                                                                                 |
+| en/zh catalogs diverge over time                                           | Parity script: report during rollout, hard-fail from Sprint 7; new-route rule at top of this file                                                                  |
+| Untranslated strings hide behind fallback                                  | Parity report lists every fallback; Q stage requires visual page check                                                                                             |
+| Terms governing-law/jurisdiction language remains generic                  | Chain/custody copy is reconciled in both locales; counsel must resolve jurisdiction before any future certified release                                            |
+| External native/legal review was waived for this rollout                   | Waiver is explicit in Sprint 6/8 notes; no reviewer names or legal/native certification are claimed                                                                |
+| Third-party material is accidentally swept into the project CC0 dedication | Root `LICENSE` scopes CC0 to project-owned material; `THIRD_PARTY_NOTICES.md` preserves dependency/asset terms and links the bundled Noto subset to its OFL notice |

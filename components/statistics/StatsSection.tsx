@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
 import { ErrorState } from '@/components/ui/error-state';
@@ -57,7 +58,7 @@ export function StatsSection({
   isError = false,
   onRetry,
   isEmpty = false,
-  emptyTitle = 'No data yet',
+  emptyTitle,
   emptyDescription,
   emptyIcon,
   skeleton,
@@ -65,14 +66,21 @@ export function StatsSection({
   className,
   children,
 }: StatsSectionProps) {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   let body: ReactNode = children;
   if (isLoading) {
     body = skeleton ?? <DefaultSkeleton />;
   } else if (isError) {
     body = (
       <ErrorState
-        title={errorTitle ?? `Failed to load ${title.toLowerCase()}`}
-        message="The statistics service did not respond. Try again in a moment."
+        title={
+          errorTitle ??
+          t('shared.sectionLoadErrorTitle', {
+            title: locale === 'zh' ? title : title.toLowerCase(),
+          })
+        }
+        message={t('shared.serviceError')}
         onRetry={onRetry}
         className="py-10"
       />
@@ -80,7 +88,7 @@ export function StatsSection({
   } else if (isEmpty) {
     body = (
       <EmptyState
-        title={emptyTitle}
+        title={emptyTitle ?? t('shared.noDataTitle')}
         description={emptyDescription}
         icon={emptyIcon}
         className="py-10"

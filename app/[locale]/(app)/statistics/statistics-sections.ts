@@ -9,22 +9,15 @@ export interface StatisticsSectionDef {
   /** Route segment under /statistics ('' = hub). */
   slug: string;
   href: string;
-  /** Short label used in the sub-navigation and explore cards. */
-  label: string;
-  /** Page heading (h1) for the section page. */
-  title: string;
-  /** Intro sentence rendered server-side and reused as the meta description. */
-  description: string;
+  /** Message key under statistics.navigation. */
+  messageKey: 'overview' | 'participation' | 'tokens' | 'anchoring' | 'activity' | 'performance';
   icon: LucideIcon;
 }
 
 export const STATISTICS_HUB: StatisticsSectionDef = {
   slug: '',
   href: '/statistics',
-  label: 'Overview',
-  title: 'Cosmic Signature Protocol Statistics',
-  description:
-    'Historical data and overall metrics for the Cosmic Signature protocol on Arbitrum, with detailed sections for participation, tokens, anchoring, activity, and performance.',
+  messageKey: 'overview',
   icon: LayoutGrid,
 };
 
@@ -32,46 +25,31 @@ export const STATISTICS_SECTIONS: StatisticsSectionDef[] = [
   {
     slug: 'participation',
     href: '/statistics/participation',
-    label: 'Participation',
-    title: 'Participation Statistics',
-    description:
-      'Unique participants, allocation recipients, and ETH contributors indexed across all Cosmic Signature Performance Cycles.',
+    messageKey: 'participation',
     icon: Users,
   },
   {
     slug: 'tokens',
     href: '/statistics/tokens',
-    label: 'Tokens',
-    title: 'Token Distribution Statistics',
-    description:
-      'Cosmic Signature NFT ownership, CST (ERC-20) balance distribution, total supply history, and assets attached to gestures.',
+    messageKey: 'tokens',
     icon: Coins,
   },
   {
     slug: 'anchoring',
     href: '/statistics/anchoring',
-    label: 'Anchoring',
-    title: 'Anchoring Statistics',
-    description:
-      'Anchor and release actions, currently anchored tokens, and unique anchor-holders for Cosmic Signature and RandomWalk NFTs.',
+    messageKey: 'anchoring',
     icon: Anchor,
   },
   {
     slug: 'activity',
     href: '/statistics/activity',
-    label: 'Activity',
-    title: 'Gesture Activity Statistics',
-    description:
-      'Gesture frequency over time, activity spikes, participant active periods, gesture-type mix, cycle timelines, and cycle activations.',
+    messageKey: 'activity',
     icon: Activity,
   },
   {
     slug: 'performance',
     href: '/statistics/performance',
-    label: 'Performance',
-    title: 'Participant Performance Statistics',
-    description:
-      'Participant performance leaderboard and claimable allocation outcomes for every Cosmic Signature Performance Cycle.',
+    messageKey: 'performance',
     icon: Trophy,
   },
 ];

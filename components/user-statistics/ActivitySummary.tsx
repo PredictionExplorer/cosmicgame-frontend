@@ -1,7 +1,7 @@
 'use client';
 
 import { Gavel, Ticket, Layers } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
@@ -69,6 +69,7 @@ export function ActivitySummary({
   className,
 }: ActivitySummaryProps) {
   const t = useTranslations('myPages');
+  const locale = useLocale();
   const rwlk = userInfo.StakingStatisticsRWalk;
   const totalAnchorActions =
     (rwlk?.TotalNumStakeActions ?? 0) + (rwlk?.TotalNumUnstakeActions ?? 0);
@@ -92,7 +93,7 @@ export function ActivitySummary({
             stats={[
               {
                 label: t('statistics.activity.gesturesMade.label'),
-                value: userInfo.NumBids.toLocaleString(),
+                value: userInfo.NumBids.toLocaleString(locale),
                 tooltip: t('statistics.activity.gesturesMade.tooltip'),
               },
               {
@@ -109,12 +110,12 @@ export function ActivitySummary({
             stats={[
               {
                 label: t('statistics.activity.ethSelections.label'),
-                value: (userInfo.NumRaffleEthWinnings ?? 0).toLocaleString(),
+                value: (userInfo.NumRaffleEthWinnings ?? 0).toLocaleString(locale),
                 tooltip: t('statistics.activity.ethSelections.tooltip'),
               },
               {
                 label: t('statistics.activity.nftsReceived.label'),
-                value: (userInfo.RaffleNFTsCount ?? 0).toLocaleString(),
+                value: (userInfo.RaffleNFTsCount ?? 0).toLocaleString(locale),
                 tooltip: t('statistics.activity.nftsReceived.tooltip'),
               },
             ]}
@@ -126,7 +127,7 @@ export function ActivitySummary({
             stats={[
               {
                 label: t('statistics.activity.anchorActions.label'),
-                value: totalAnchorActions.toLocaleString(),
+                value: totalAnchorActions.toLocaleString(locale),
                 tooltip: t('statistics.activity.anchorActions.tooltip'),
               },
               {

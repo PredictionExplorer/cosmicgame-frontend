@@ -1,0 +1,28 @@
+{
+  "page": {
+    "title": "铭刻 Random Walk NFT",
+    "subtitle": "拥有 Random Walk NFT，可将一笔 ETH 落笔的价格降低 50%",
+    "description": "RandomWalk NFT 是独特的数字藏品，可在 Cosmic Signature 协议中带来策略优势。将一枚 RandomWalk NFT 附加至 ETH 落笔，即可使 ETH 落笔价格降低 50%，在周期后段尤其显著。每枚 RandomWalk NFT 只能使用一次，请审慎选择时机。这种落笔附加与锚定 RandomWalk NFT 以取得锚定 NFT 星选资格是两项独立机制。",
+    "currentCost": "当前铭刻价格",
+    "submit": "铭刻",
+    "myNfts": "我的 Random Walk NFT"
+  },
+  "seo": {
+    "eyebrow": "RandomWalk NFT 铭刻 · Arbitrum",
+    "heading": "铭刻 RandomWalk NFT",
+    "description": "铭刻用于参与 Cosmic Signature 的 RandomWalk NFT。每枚尚未使用的 RandomWalk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。",
+    "source": "Cosmic Signature 公共协议配置 API",
+    "lastUpdated": "更新时间：{date}。数据来源：{source}。下方交互式内容会载入实时应用数据；此摘要直接写入初始 HTML，便于搜索引擎与 AI 抓取。",
+    "relatedAria": "RandomWalk NFT 铭刻相关页面",
+    "cards": {
+      "cycle": "当前演绎周期",
+      "cost": "当前 ETH 落笔价格",
+      "discount": "RandomWalk 减免"
+    },
+    "links": {
+      "cycle": "打开当前演绎周期",
+      "learn": "了解落笔机制",
+      "used": "查看已使用的 RandomWalk NFT"
+    }
+  }
+}

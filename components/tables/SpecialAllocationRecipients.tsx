@@ -2,12 +2,14 @@
 
 import type { ReactNode } from 'react';
 import { Coins, Crown, Lock, MessageSquare, Swords, User, Zap } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { convertTimestampToDateTime, formatSeconds } from '@/utils';
+import { formatSeconds } from '@/utils';
 
+import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useChampions, type ChampionsState } from '@/hooks/useChampions';
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api/types';
 
@@ -93,6 +95,7 @@ function RoleCard({
   extra,
   badge,
 }: RoleCardConfig) {
+  const locale = useLocale();
   return (
     <div
       data-special-allocation-card
@@ -140,12 +143,12 @@ function RoleCard({
           </div>
 
           {address ? (
-            <a
+            <Link
               href={`/user/${address}`}
               className="mt-2 block break-all font-mono text-sm text-foreground print:!text-foreground transition-colors hover:text-primary"
             >
               {address}
-            </a>
+            </Link>
           ) : (
             <p className="mt-2 text-sm text-muted-foreground/60 italic">{emptyText}</p>
           )}
@@ -161,7 +164,7 @@ function RoleCard({
                   isLive ? 'text-emerald-300' : 'text-foreground',
                 )}
               >
-                {formatSeconds(duration)}
+                {formatSeconds(duration, locale)}
               </p>
             </div>
           )}
@@ -180,6 +183,7 @@ function LatestGestureProgress({
   hasEnduranceRecord: boolean;
 }) {
   const t = useTranslations('tables');
+  const locale = useLocale();
 
   if (!hasEnduranceRecord) {
     return (
@@ -196,10 +200,10 @@ function LatestGestureProgress({
   const isComplete = latestGesture.isExtendingEnduranceRecord;
   const remainingCopy = latestGesture.isCurrentEnduranceChampion
     ? t('specialAllocation.needsToExtend', {
-        duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion),
+        duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion, locale),
       })
     : t('specialAllocation.needsToBecomeChampion', {
-        duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion),
+        duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion, locale),
       });
 
   return (
@@ -228,8 +232,8 @@ function LatestGestureProgress({
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">
         {t('specialAllocation.progressAmounts', {
-          current: formatSeconds(latestGesture.holdDuration),
-          target: formatSeconds(latestGesture.durationToBeat),
+          current: formatSeconds(latestGesture.holdDuration, locale),
+          target: formatSeconds(latestGesture.durationToBeat, locale),
         })}
       </p>
     </div>
@@ -318,12 +322,6 @@ function hasRandomWalkToken(gesture: GestureInfo): boolean {
   return typeof gesture.RWalkNFTId === 'number' && gesture.RWalkNFTId >= 0;
 }
 
-function formatGestureTime(gesture: GestureInfo, unavailable: string): string {
-  return typeof gesture.TimeStamp === 'number' && Number.isFinite(gesture.TimeStamp)
-    ? convertTimestampToDateTime(gesture.TimeStamp, true)
-    : unavailable;
-}
-
 function getAttachedAssetLabels(gesture: GestureInfo): string[] {
   return [
     gesture.NFTDonationTokenAddr && gesture.NFTDonationTokenId !== -1 ? 'NFT' : '',
@@ -385,6 +383,14 @@ function LatestGestureDetails({
   latestAddress: string | null;
 }) {
   const t = useTranslations('tables');
+  const locale = useLocale();
+  const hasGestureTime =
+    typeof latestGesture?.TimeStamp === 'number' && Number.isFinite(latestGesture.TimeStamp);
+  const gestureTimestamp =
+    typeof latestGesture?.TimeStamp === 'number' && Number.isFinite(latestGesture.TimeStamp)
+      ? latestGesture.TimeStamp
+      : 0;
+  const gestureTime = useHydrationSafeDateTime(gestureTimestamp, true, locale);
 
   if (!latestGesture || !sameAddress(latestGesture.BidderAddr, latestAddress)) return null;
 
@@ -423,7 +429,7 @@ function LatestGestureDetails({
         />
         <DetailMetric
           label={t('specialAllocation.gestureTime')}
-          value={formatGestureTime(latestGesture, t('status.unavailable'))}
+          value={hasGestureTime ? gestureTime : t('status.unavailable')}
         />
         <DetailMetric
           testId="latest-participant-gesture-id"
@@ -463,6 +469,7 @@ function ChronoWarriorDetails({
   challenge: ChampionsState['chronoChallenge'];
 }) {
   const t = useTranslations('tables');
+  const locale = useLocale();
 
   if (!chrono.address) return null;
 
@@ -472,7 +479,7 @@ function ChronoWarriorDetails({
         ? {
             label: t('specialAllocation.mayCloseIn'),
             value: t('specialAllocation.mayCloseValue', {
-              duration: formatSeconds(chrono.willStopGrowingIn),
+              duration: formatSeconds(chrono.willStopGrowingIn, locale),
             }),
           }
         : { label: t('columns.status'), value: t('specialAllocation.growingNow') };
@@ -500,7 +507,7 @@ function ChronoWarriorDetails({
         <DetailMetric
           testId="chrono-current-segment"
           label={t('specialAllocation.recordGrowingSegment')}
-          value={formatSeconds(chrono.currentSegmentDuration)}
+          value={formatSeconds(chrono.currentSegmentDuration, locale)}
           tone="primary"
         />
       )}
@@ -522,18 +529,18 @@ function ChronoWarriorDetails({
             {t('specialAllocation.activeEnduranceChallenge')}
           </p>
           {challenge.address && (
-            <a
+            <Link
               href={`/user/${challenge.address}`}
               className="mt-2 block break-all font-mono text-xs text-foreground transition-colors hover:text-primary"
             >
               {challenge.address}
-            </a>
+            </Link>
           )}
           {challenge.duration !== undefined && (
             <DetailMetric
               testId="chrono-challenge-segment"
               label={t('specialAllocation.challengeSegment')}
-              value={formatSeconds(challenge.duration)}
+              value={formatSeconds(challenge.duration, locale)}
               tone="emerald"
             />
           )}
@@ -546,7 +553,7 @@ function ChronoWarriorDetails({
             }
             value={
               challenge.startsGrowingIn !== undefined
-                ? formatSeconds(challenge.startsGrowingIn)
+                ? formatSeconds(challenge.startsGrowingIn, locale)
                 : challenge.isRecordHolder
                   ? t('specialAllocation.waitingToExtend')
                   : t('specialAllocation.waitingToOvertake')
@@ -573,6 +580,7 @@ function sameAddress(left: string | null | undefined, right: string | null | und
  */
 function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsState }) {
   const t = useTranslations('tables');
+  const locale = useLocale();
 
   return (
     <div
@@ -593,7 +601,7 @@ function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsStat
           {state.latestGesture.holdDuration > 0 && (
             <dd className="mt-1 text-xs">
               {t('specialAllocation.printCurrentHold', {
-                duration: formatSeconds(state.latestGesture.holdDuration),
+                duration: formatSeconds(state.latestGesture.holdDuration, locale),
               })}
             </dd>
           )}
@@ -608,7 +616,7 @@ function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsStat
           {state.endurance.duration > 0 && (
             <dd className="mt-1 text-xs">
               {t('specialAllocation.printWindow', {
-                duration: formatSeconds(state.endurance.duration),
+                duration: formatSeconds(state.endurance.duration, locale),
               })}
             </dd>
           )}
@@ -623,7 +631,7 @@ function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsStat
           {state.chrono.duration > 0 && (
             <dd className="mt-1 text-xs">
               {t('specialAllocation.printReign', {
-                duration: formatSeconds(state.chrono.duration),
+                duration: formatSeconds(state.chrono.duration, locale),
               })}
             </dd>
           )}

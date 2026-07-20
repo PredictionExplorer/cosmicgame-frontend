@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -6,16 +7,29 @@ import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import NamedNFTsPage from './NamedNFTsPage';
 
-export const metadata: Metadata = createMetadata(
-  'Named Cosmic Signature NFTs | Cosmic Signature',
-  'Browse Cosmic Signature NFTs that have been given custom names by their owners. Each named NFT carries a unique identity within the collection.',
-  undefined,
-  '/named-nfts',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('namedNfts.title'),
+    t('namedNfts.description'),
+    undefined,
+    '/named-nfts',
+    {
+      locale,
+    },
+  );
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <>
       <PublicDataRouteSeoSummary route="named-nfts" />

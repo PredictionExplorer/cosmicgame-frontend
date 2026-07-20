@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getAboutContent } from '@/content/about';
 
@@ -15,8 +15,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   setRequestLocale(locale);
   const { metadata } = getAboutContent(locale);
+  const t = await getTranslations({ locale, namespace: 'meta' });
 
-  return createMetadata(metadata.title, metadata.description, undefined, metadata.path, {
+  return createMetadata(t('about.title'), t('about.description'), undefined, metadata.path, {
     canonicalHost: 'landing',
     locale,
   });
@@ -50,7 +51,6 @@ export default async function AboutPage({ params }: PageProps) {
               { name: content.breadcrumbLabel, path: content.metadata.path },
             ],
             localeHref(LANDING_ORIGIN, '/', locale),
-            inLanguage,
           ),
           aboutJsonLd,
         ]}

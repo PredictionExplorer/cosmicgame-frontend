@@ -4,8 +4,7 @@ import { useState, type FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { convertTimestampToDateTime } from '@/utils';
-
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link } from '@/i18n/navigation';
 import {
   TablePrimary,
@@ -35,7 +34,7 @@ const GlobalAnchoredTokensRow: FC<GlobalAnchoredTokensRowProps> = ({ row, IsRWLK
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(row.StakeTimeStamp, false, locale)}
+        <HydrationSafeDateTime timestamp={row.StakeTimeStamp} locale={locale} />
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">

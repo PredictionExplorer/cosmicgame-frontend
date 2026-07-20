@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { Wallet, Coins, Trophy, Gem, Gavel, TrendingUp } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
@@ -31,6 +31,7 @@ export function HeroStats({
   className,
 }: HeroStatsProps) {
   const t = useTranslations('myPages');
+  const locale = useLocale();
   const totalEthWon = useMemo(
     () => (userInfo.SumRaffleEthWinnings ?? 0) + (userInfo.SumRaffleEthWithdrawal ?? 0),
     [userInfo.SumRaffleEthWinnings, userInfo.SumRaffleEthWithdrawal],
@@ -61,7 +62,7 @@ export function HeroStats({
       },
       {
         label: t('statistics.hero.signatureAllocations.label'),
-        value: userInfo.NumPrizes.toLocaleString(),
+        value: userInfo.NumPrizes.toLocaleString(locale),
         tooltip: t('statistics.hero.signatureAllocations.tooltip'),
         icon: <Trophy className="h-4 w-4" />,
       },
@@ -73,7 +74,7 @@ export function HeroStats({
       },
       {
         label: t('statistics.hero.gestures.label'),
-        value: userInfo.NumBids.toLocaleString(),
+        value: userInfo.NumBids.toLocaleString(locale),
         tooltip: t('statistics.hero.gestures.tooltip'),
         icon: <Gavel className="h-4 w-4" />,
       },
@@ -84,7 +85,16 @@ export function HeroStats({
         icon: <TrendingUp className="h-4 w-4" />,
       },
     ],
-    [balanceETH, balanceCST, userInfo.NumPrizes, userInfo.NumBids, totalEthWon, bestProbability, t],
+    [
+      balanceETH,
+      balanceCST,
+      userInfo.NumPrizes,
+      userInfo.NumBids,
+      totalEthWon,
+      bestProbability,
+      locale,
+      t,
+    ],
   );
 
   if (loading) {

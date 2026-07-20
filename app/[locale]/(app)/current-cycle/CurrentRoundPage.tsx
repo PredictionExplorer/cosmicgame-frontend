@@ -17,7 +17,7 @@ import {
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getEnduranceChampions, formatEthValue, convertTimestampToDateTime } from '@/utils';
+import { getEnduranceChampions, formatEthValue } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { PageShell } from '@/components/ui/page-shell';
@@ -29,6 +29,7 @@ import { Button } from '@/components/ui/button';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import { RoundInfoSection } from '@/components/home/RoundInfoSection';
 import Counter from '@/components/common/Counter';
+import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import type { AttachedNFT as DonatedNFTType } from '@/services/api/types';
@@ -83,6 +84,8 @@ const CurrentRoundPage = () => {
   }, [currentTimeRaw, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
   const { allocationTime, activationTime } = useAllocationFinalize({ data, offset });
+  const roundStartedDate = useHydrationSafeDateTime(data?.TsRoundStart ?? 0, false, locale);
+  const activationDate = useHydrationSafeDateTime(activationTime, true, locale);
 
   const championList = useMemo(() => {
     if (!bidListData) return null;
@@ -116,9 +119,7 @@ const CurrentRoundPage = () => {
     );
   }
 
-  const roundStarted = data.TsRoundStart
-    ? convertTimestampToDateTime(data.TsRoundStart, false, locale)
-    : t('status.notStarted');
+  const roundStarted = data.TsRoundStart ? roundStartedDate : t('status.notStarted');
 
   const hasStarted = data.TsRoundStart !== 0;
   const hasLastParticipant = data.LastBidderAddr !== zeroAddress;
@@ -209,7 +210,7 @@ const CurrentRoundPage = () => {
             <p className="text-sm text-muted-foreground mb-4">
               {t('hero.countdown.opensAt', {
                 n: data.CurRoundNum,
-                date: convertTimestampToDateTime(activationTime, true, locale),
+                date: activationDate,
               })}
             </p>
             <SmoothCountdown date={activationTime * 1000} renderer={Counter} />

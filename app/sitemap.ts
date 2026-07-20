@@ -1,19 +1,36 @@
 import { headers } from 'next/headers';
 import type { MetadataRoute } from 'next';
 
-import { APP_ORIGIN, LANDING_ORIGIN, isAppHost, normalizeHost } from '@/lib/hostRouting';
-import { appSitemapRoutes, landingSitemapRoutes, routeUrl, type SeoRoute } from '@/lib/seoRoutes';
+import { routing } from '@/i18n/routing';
+import {
+  APP_ORIGIN,
+  LANDING_ORIGIN,
+  isAppHost,
+  localeHref,
+  normalizeHost,
+} from '@/lib/hostRouting';
+import {
+  appSitemapRoutes,
+  landingSitemapRoutes,
+  routeLanguageAlternates,
+  type SeoRoute,
+} from '@/lib/seoRoutes';
 
 const LANDING_URL = LANDING_ORIGIN;
 const APP_URL = APP_ORIGIN;
 
 function renderSitemap(baseUrl: string, routes: SeoRoute[]): MetadataRoute.Sitemap {
-  return routes.map(({ path, priority, changeFrequency, lastModified }) => ({
-    url: routeUrl(baseUrl, path),
-    lastModified: new Date(lastModified),
-    ...(changeFrequency ? { changeFrequency } : {}),
-    ...(priority !== undefined ? { priority } : {}),
-  }));
+  return routes.flatMap(({ path, priority, changeFrequency, lastModified }) =>
+    routing.locales.map((locale) => ({
+      url: localeHref(baseUrl, path || '/', locale),
+      lastModified: new Date(lastModified),
+      alternates: {
+        languages: routeLanguageAlternates(baseUrl, path),
+      },
+      ...(changeFrequency ? { changeFrequency } : {}),
+      ...(priority !== undefined ? { priority } : {}),
+    })),
+  );
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

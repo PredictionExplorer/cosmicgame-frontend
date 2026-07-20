@@ -118,6 +118,24 @@ describe('landing content contract accuracy', () => {
     expect(landingContent.hero.marqueeChips).not.toContain('Formally Verified');
     expect(landingContent.hero.marqueeChips).toContain('Verified Contracts');
   });
+
+  it('scopes CC0 claims to project-owned materials with third-party exceptions', () => {
+    const english = JSON.stringify({
+      verifiability: landingContentEn.verifiability,
+      forkAnswer: landingContentEn.faq.items.find((item) => item.question === 'Can I fork this?'),
+    });
+    const chinese = JSON.stringify({
+      verifiability: landingContentZh.verifiability,
+      forkAnswer: landingContentZh.faq.items.find((item) => item.question.includes('自由复用')),
+    });
+
+    expect(english).toMatch(/Project-owned materials/);
+    expect(english).toMatch(/third-party dependencies/);
+    expect(english).not.toMatch(/whole repository|entire repository|Every contract/i);
+    expect(chinese).toMatch(/项目自有材料/);
+    expect(chinese).toMatch(/第三方依赖/);
+    expect(chinese).not.toMatch(/整个代码仓库|所有合约/);
+  });
 });
 
 describe('landing content lexicon (outside allow-list)', () => {

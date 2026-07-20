@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ShieldAlert, SendHorizontal } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { usePublicClient } from 'wagmi';
 
 import { marketingWalletAbi } from '@/contracts/abis';
@@ -17,6 +18,8 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 export default function CstOutreachTransferPage() {
+  const t = useTranslations('admin');
+  const roleReadError = t('outreachTransfer.roleReadError');
   const { account, active } = useActiveWeb3React();
   const publicClient = usePublicClient({ chainId: activeChain.id });
   const contractAddrs = useContractAddresses();
@@ -61,7 +64,7 @@ export default function CstOutreachTransferPage() {
         if (!cancelled) {
           setOwnerAddress(null);
           setTreasurerAddress(null);
-          setRolesError('Unable to read the outreach reserve owner and treasurer.');
+          setRolesError(roleReadError);
         }
       } finally {
         if (!cancelled) setRolesLoading(false);
@@ -73,7 +76,7 @@ export default function CstOutreachTransferPage() {
     return () => {
       cancelled = true;
     };
-  }, [marketingWallet, publicClient]);
+  }, [marketingWallet, publicClient, roleReadError]);
 
   const isTreasurer = useMemo(() => {
     return (
@@ -86,8 +89,8 @@ export default function CstOutreachTransferPage() {
     <PageShell variant="data" backdrop="signature">
       <div className="mx-auto max-w-3xl">
         <PageHeader
-          title="CST Outreach Transfer"
-          subtitle="URL-only transfer tool for the configured outreach reserve wallet signer."
+          title={t('outreachTransfer.title')}
+          subtitle={t('outreachTransfer.subtitle')}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
         />
@@ -95,35 +98,35 @@ export default function CstOutreachTransferPage() {
         {!active || !account ? (
           <EmptyState
             icon={<SendHorizontal className="h-8 w-8 text-muted-foreground/50" />}
-            title="Wallet not connected"
-            description="Connect the current outreach reserve treasurer wallet to pay CST rewards."
+            title={t('outreachTransfer.walletRequiredTitle')}
+            description={t('outreachTransfer.walletRequiredDescription')}
           />
         ) : !marketingWallet ? (
           <EmptyState
             icon={<ShieldAlert className="h-8 w-8 text-muted-foreground/50" />}
-            title="Marketing wallet unavailable"
-            description="The dashboard has not provided a marketing wallet address yet."
+            title={t('outreachTransfer.walletUnavailableTitle')}
+            description={t('outreachTransfer.walletUnavailableDescription')}
           />
         ) : rolesLoading ? (
           <EmptyState
             icon={<ShieldAlert className="h-8 w-8 text-muted-foreground/50" />}
-            title="Loading outreach reserve roles"
-            description="Reading the MarketingWallet owner and treasurer from the contract."
+            title={t('outreachTransfer.rolesLoadingTitle')}
+            description={t('outreachTransfer.rolesLoadingDescription')}
           />
         ) : rolesError ? (
           <EmptyState
             icon={<ShieldAlert className="h-8 w-8 text-muted-foreground/50" />}
-            title="Unable to read outreach reserve roles"
+            title={t('outreachTransfer.rolesErrorTitle')}
             description={rolesError}
           />
         ) : !isTreasurer ? (
           <EmptyState
             icon={<ShieldAlert className="h-8 w-8 text-muted-foreground/50" />}
-            title="Access restricted"
-            description={`Connect the current outreach reserve treasurer (${shortenHex(
-              treasurerAddress ?? '',
-              6,
-            )}) to use this URL-only transfer tool. Owner: ${shortenHex(ownerAddress ?? '', 6)}.`}
+            title={t('outreachTransfer.restrictedTitle')}
+            description={t('outreachTransfer.restrictedDescription', {
+              treasurer: shortenHex(treasurerAddress ?? '', 6),
+              owner: shortenHex(ownerAddress ?? '', 6),
+            })}
           />
         ) : (
           <MarketingCstRewardForm

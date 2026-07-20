@@ -46,6 +46,9 @@ jest.mock('../site-map/SiteMapPage', () => ({
 
 interface JsonLdNode {
   '@type'?: string;
+  name?: string;
+  description?: string;
+  inLanguage?: string;
   url?: string;
   itemListElement?: Array<{ item?: string }>;
 }
@@ -68,31 +71,31 @@ function renderJsonLd(ui: React.ReactElement): JsonLdNode[] {
  */
 const cases: Array<{
   name: string;
-  renderPage: () => Promise<React.ReactElement> | React.ReactElement;
+  renderPage: (locale?: string) => Promise<React.ReactElement> | React.ReactElement;
   expectedType: string;
   expectedUrl: string;
 }> = [
   {
     name: 'how-it-works',
-    renderPage: () => HowItWorksPage({ params: Promise.resolve({ locale: 'en' }) }),
+    renderPage: (locale = 'en') => HowItWorksPage({ params: Promise.resolve({ locale }) }),
     expectedType: 'WebPage',
     expectedUrl: `${APP_ORIGIN}/how-it-works`,
   },
   {
     name: 'gallery',
-    renderPage: () => GalleryPage({ params: Promise.resolve({ locale: 'en' }) }),
+    renderPage: (locale = 'en') => GalleryPage({ params: Promise.resolve({ locale }) }),
     expectedType: 'CollectionPage',
     expectedUrl: `${APP_ORIGIN}/gallery`,
   },
   {
     name: 'contracts',
-    renderPage: () => <ContractsPage />,
+    renderPage: (locale = 'en') => ContractsPage({ params: Promise.resolve({ locale }) }),
     expectedType: 'WebPage',
     expectedUrl: `${APP_ORIGIN}/contracts`,
   },
   {
     name: 'code',
-    renderPage: () => <CodePage />,
+    renderPage: (locale = 'en') => CodePage({ params: Promise.resolve({ locale }) }),
     expectedType: 'WebPage',
     expectedUrl: `${APP_ORIGIN}/code`,
   },
@@ -119,12 +122,30 @@ describe.each(cases)('$name page JSON-LD', ({ renderPage, expectedType, expected
     expect(getByTestId('page-body')).toBeInTheDocument();
     unmount();
   });
+
+  it('emits Chinese copy, language, and locale-correct URLs', async () => {
+    const nodes = renderJsonLd(await renderPage('zh'));
+    const pageNode = nodes.find((node) => node['@type'] === expectedType);
+    const breadcrumb = nodes.find((node) => node['@type'] === 'BreadcrumbList');
+    const zhUrl = expectedUrl.replace(APP_ORIGIN, `${APP_ORIGIN}/zh`);
+
+    expect(pageNode).toEqual(
+      expect.objectContaining({
+        inLanguage: 'zh-Hans',
+        url: zhUrl,
+      }),
+    );
+    expect(`${pageNode?.name ?? ''}${pageNode?.description ?? ''}`).toMatch(/[\u3400-\u9fff]/);
+    expect(breadcrumb).not.toHaveProperty('inLanguage');
+    expect(breadcrumb?.itemListElement?.[0]?.item).toBe(`${APP_ORIGIN}/zh/`);
+    expect(breadcrumb?.itemListElement?.at(-1)?.item).toBe(zhUrl);
+  });
 });
 
 describe('site-map page JSON-LD', () => {
-  async function renderSiteMap() {
+  async function renderSiteMap(locale = 'en') {
     const page = await SiteMapRoutePage({
-      params: Promise.resolve({ locale: 'en' }),
+      params: Promise.resolve({ locale }),
     });
     return { page, nodes: renderJsonLd(page) };
   }
@@ -146,5 +167,20 @@ describe('site-map page JSON-LD', () => {
     const { page } = await renderSiteMap();
     const { getByTestId } = render(page);
     expect(getByTestId('page-body')).toBeInTheDocument();
+  });
+
+  it('localizes the site-map schema for Chinese', async () => {
+    const { nodes } = await renderSiteMap('zh');
+    const pageNode = nodes.find((node) => node['@type'] === 'WebPage');
+    const breadcrumb = nodes.find((node) => node['@type'] === 'BreadcrumbList');
+    expect(pageNode).toEqual(
+      expect.objectContaining({
+        inLanguage: 'zh-Hans',
+        url: `${APP_ORIGIN}/zh/site-map`,
+      }),
+    );
+    expect(`${pageNode?.name ?? ''}${pageNode?.description ?? ''}`).toMatch(/[\u3400-\u9fff]/);
+    expect(breadcrumb).not.toHaveProperty('inLanguage');
+    expect(breadcrumb?.itemListElement?.[1]?.item).toBe(`${APP_ORIGIN}/zh/site-map`);
   });
 });

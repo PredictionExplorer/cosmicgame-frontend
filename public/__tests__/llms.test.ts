@@ -105,4 +105,22 @@ describe('LLM-facing protocol docs', () => {
     expect(content).not.toMatch(/\b(bet|bets|betting|wager|wagers|odds|gambling)\b/i);
   });
   // lexicon-allow-end
+
+  it.each(docs)('%s includes useful Simplified Chinese protocol guidance', (_fileName, content) => {
+    expect(content).toMatch(/^## 中文/m);
+    expect(content).toContain('程序化链上艺术协议');
+    expect(content).toContain('48 小时');
+    expect(content).toContain(`${protocolFacts.typicalNftsPerCycle} 枚 Cosmic Signature NFT`);
+    expect(content).toContain('每枚 RandomWalk NFT 只能');
+    expect(content).toContain('COSMIC 癌症突变数据库');
+  });
+
+  it.each(docs)('%s links canonical Chinese landing and app routes', (_fileName, content) => {
+    expect(content).toContain('https://cosmicsignature.com/zh');
+    expect(content).toContain('https://cosmicsignature.com/zh/learn');
+    expect(content).toContain('https://app.cosmicsignature.com/zh');
+    expect(content).toContain('https://app.cosmicsignature.com/zh/security');
+    expect(content).toContain('https://app.cosmicsignature.com/zh/audits');
+    expect(content).toContain('https://app.cosmicsignature.com/zh/risk-disclosures');
+  });
 });

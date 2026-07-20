@@ -2,6 +2,7 @@
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { useMemo, useState, type FC, type FocusEvent, type MouseEvent } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { formatUnixTsLabel, shortenHex } from '@/utils';
 
@@ -44,6 +45,8 @@ type BidderActivePeriodsTimelineProps = {
 export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> = ({
   enabled = true,
 }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const { data: bounds } = useBidTimeBounds(enabled);
   const nowSec = Math.floor(useNow(60_000) / 1000);
 
@@ -79,9 +82,9 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
     const count = 6;
     return Array.from({ length: count }, (_, i) => {
       const ts = initTs + Math.floor((range * i) / (count - 1));
-      return { ts, label: formatUnixTsLabel(ts, false) };
+      return { ts, label: formatUnixTsLabel(ts, false, locale) };
     });
-  }, [initTs, range]);
+  }, [initTs, range, locale]);
 
   const handleBarEnter = (period: BidderActivePeriod, e: MouseEvent<SVGRectElement>) => {
     const rect = e.currentTarget.ownerSVGElement?.getBoundingClientRect();
@@ -106,16 +109,17 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
   };
 
   const periodLabel = (period: BidderActivePeriod) =>
-    `${shortenHex(period.BidderAddr, 6)}: ${period.NumBids} gestures from ${formatUnixTsLabel(
-      period.PeriodStart,
-      true,
-    )} to ${formatUnixTsLabel(period.PeriodEnd, true)}`;
+    t('charts.activePeriods.ariaLabel', {
+      address: shortenHex(period.BidderAddr, 6),
+      count: period.NumBids,
+      start: formatUnixTsLabel(period.PeriodStart, true, locale),
+      end: formatUnixTsLabel(period.PeriodEnd, true, locale),
+    });
 
   return (
     <div className="space-y-3" data-testid="bidder-active-periods-timeline">
       <p className="text-xs text-muted-foreground">
-        Active periods for top {TOP_N} participants (≥2 gestures with ≤6h gap between consecutive
-        gestures). Each bar is one burst.
+        {t('charts.activePeriods.description', { count: TOP_N })}
       </p>
 
       {isLoading ? (
@@ -124,13 +128,13 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
         </div>
       ) : isError ? (
         <ErrorState
-          title="Failed to load active periods"
-          message="Could not fetch top participant activity timeline."
+          title={t('charts.activePeriods.loadErrorTitle')}
+          message={t('charts.activePeriods.loadErrorMessage')}
           onRetry={() => refetch()}
         />
       ) : rows.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          No active gesture periods found for top participants.
+          {t('charts.activePeriods.empty')}
         </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-white/[0.06] bg-black/20">
@@ -139,7 +143,9 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
               className="grid border-b border-white/[0.06] text-[10px] text-muted-foreground"
               style={{ gridTemplateColumns: `${LABEL_WIDTH}px 1fr` }}
             >
-              <div className="px-3 py-2 font-medium uppercase tracking-wider">Participant</div>
+              <div className="px-3 py-2 font-medium uppercase tracking-wider">
+                {t('charts.activePeriods.participant')}
+              </div>
               <div className="relative px-2 py-2">
                 <div className="flex justify-between">
                   {axisTicks.map((tick) => (
@@ -224,14 +230,16 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
               >
                 <p className="font-medium text-white">{shortenHex(hover.period.BidderAddr, 6)}</p>
                 <p className="text-muted-foreground">
-                  {formatUnixTsLabel(hover.period.PeriodStart, true)}
+                  {formatUnixTsLabel(hover.period.PeriodStart, true, locale)}
                 </p>
                 <p className="text-muted-foreground">
-                  → {formatUnixTsLabel(hover.period.PeriodEnd, true)}
+                  → {formatUnixTsLabel(hover.period.PeriodEnd, true, locale)}
                 </p>
                 <p className="text-muted-foreground">
-                  {hover.period.NumBids} gestures · {Math.round(hover.period.DurationSecs / 60)} min
-                  span
+                  {t('charts.activePeriods.tooltipSummary', {
+                    count: hover.period.NumBids,
+                    minutes: Math.round(hover.period.DurationSecs / 60),
+                  })}
                 </p>
               </div>
             ) : null}

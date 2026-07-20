@@ -1,3 +1,5 @@
+import statisticsMessages from '@/messages/en/statistics.json';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { StatisticsSubNav } from '../StatisticsSubNav';
@@ -23,10 +25,11 @@ describe('StatisticsSubNav', () => {
     const links = nav.querySelectorAll('a');
     expect(links).toHaveLength(ALL_STATISTICS_SECTIONS.length);
     for (const section of ALL_STATISTICS_SECTIONS) {
-      expect(screen.getByRole('link', { name: section.label })).toHaveAttribute(
-        'href',
-        section.href,
-      );
+      expect(
+        screen.getByRole('link', {
+          name: statisticsMessages.navigation[section.messageKey].label,
+        }),
+      ).toHaveAttribute('href', section.href);
     }
   });
 

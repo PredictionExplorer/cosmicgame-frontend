@@ -32,6 +32,38 @@ describe('sitemap (host-aware)', () => {
       const entries = await sitemap();
       expect(entries[0]!.url).toBe('https://cosmicsignature.com');
     });
+
+    it('adds English, Chinese, and x-default alternates on the landing host', async () => {
+      const entries = await sitemap();
+      const learn = entries.find((entry) => entry.url === 'https://cosmicsignature.com/learn');
+      expect(learn?.alternates?.languages).toEqual({
+        en: 'https://cosmicsignature.com/learn',
+        zh: 'https://cosmicsignature.com/zh/learn',
+        'x-default': 'https://cosmicsignature.com/learn',
+      });
+
+      for (const entry of entries) {
+        expect(entry.alternates?.languages?.zh).toMatch(
+          /^https:\/\/cosmicsignature\.com\/zh(?:\/|$)/,
+        );
+      }
+    });
+
+    it('emits reciprocal English and Chinese loc entries on the landing host', async () => {
+      const entries = await sitemap();
+      const urls = new Set(entries.map((entry) => entry.url));
+
+      expect(urls).toContain('https://cosmicsignature.com/zh');
+      expect(urls).toContain('https://cosmicsignature.com/zh/about');
+      expect(urls).toContain('https://cosmicsignature.com/zh/learn');
+
+      for (const entry of entries) {
+        const languages = entry.alternates?.languages;
+        expect(urls).toContain(languages?.en);
+        expect(urls).toContain(languages?.zh);
+        expect(languages?.['x-default']).toBe(languages?.en);
+      }
+    });
   });
 
   describe('on app host', () => {
@@ -52,6 +84,41 @@ describe('sitemap (host-aware)', () => {
         expect(entry).toHaveProperty('lastModified');
         expect(entry).toHaveProperty('changeFrequency');
         expect(entry).toHaveProperty('priority');
+        expect(entry.alternates?.languages).toEqual(
+          expect.objectContaining({
+            en: expect.stringMatching(/^https:\/\/app\.cosmicsignature\.com/),
+            zh: expect.stringMatching(/^https:\/\/app\.cosmicsignature\.com\/zh(?:\/|$)/),
+            'x-default': expect.stringMatching(/^https:\/\/app\.cosmicsignature\.com/),
+          }),
+        );
+      }
+    });
+
+    it('uses locale-correct alternates for app routes', async () => {
+      const entries = await sitemap();
+      const gallery = entries.find(
+        (entry) => entry.url === 'https://app.cosmicsignature.com/gallery',
+      );
+      expect(gallery?.alternates?.languages).toEqual({
+        en: 'https://app.cosmicsignature.com/gallery',
+        zh: 'https://app.cosmicsignature.com/zh/gallery',
+        'x-default': 'https://app.cosmicsignature.com/gallery',
+      });
+    });
+
+    it('emits reciprocal English and Chinese loc entries on the app host', async () => {
+      const entries = await sitemap();
+      const urls = new Set(entries.map((entry) => entry.url));
+
+      expect(urls).toContain('https://app.cosmicsignature.com/zh');
+      expect(urls).toContain('https://app.cosmicsignature.com/zh/gallery');
+      expect(urls).toContain('https://app.cosmicsignature.com/zh/statistics');
+
+      for (const entry of entries) {
+        const languages = entry.alternates?.languages;
+        expect(urls).toContain(languages?.en);
+        expect(urls).toContain(languages?.zh);
+        expect(languages?.['x-default']).toBe(languages?.en);
       }
     });
 
@@ -184,7 +251,7 @@ describe('sitemap (host-aware)', () => {
     it('uses route policy dates instead of request time for lastModified', async () => {
       const entries = await sitemap();
       for (const entry of entries) {
-        expect((entry.lastModified as Date).toISOString()).toBe('2026-05-31T00:00:00.000Z');
+        expect((entry.lastModified as Date).toISOString()).toBe('2026-07-20T00:00:00.000Z');
       }
     });
   });

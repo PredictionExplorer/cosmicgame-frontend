@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -6,16 +7,27 @@ import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import UsedRwlkNftsPage from './UsedRwlkNftsPage';
 
-export const metadata: Metadata = createMetadata(
-  'Used RandomWalk NFTs | Cosmic Signature',
-  'RandomWalk NFTs already attached to ETH gestures for a 50% Gesture-Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount.',
-  undefined,
-  '/used-rwlk-nfts',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('usedRwlkNfts.title'),
+    t('usedRwlkNfts.description'),
+    undefined,
+    '/used-rwlk-nfts',
+    { locale },
+  );
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <>
       <PublicDataRouteSeoSummary route="used-rwlk-nfts" />

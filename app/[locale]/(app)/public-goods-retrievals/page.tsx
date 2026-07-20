@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -6,16 +7,28 @@ import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import CharityWithdrawals from './CharityWithdrawals';
 
-export const metadata: Metadata = createMetadata(
-  'Public Goods Retrievals | Cosmic Signature',
-  'Retrievals from the Public Goods Vault. Each cycle, a share of the Cycle Reserve is forwarded to a beneficiary address selected by the Cosmic Council.',
-  undefined,
-  '/public-goods-retrievals',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('publicGoodsRetrievals.title'),
+    t('publicGoodsRetrievals.description'),
+    undefined,
+    '/public-goods-retrievals',
+    { locale },
+  );
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <PublicDataRouteSeoSummary route="public-goods-retrievals" />

@@ -1,25 +1,31 @@
-import { statisticsCopy } from '@/content/statistics-copy';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 import { Link } from '@/i18n/navigation';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { get_dashboard_info } from '@/services/api/rounds';
 
-const numberFormatter = new Intl.NumberFormat('en-US');
-const ethFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 4,
-});
-
-function formatNumber(value: unknown): string {
+function formatNumber(value: unknown, locale: string, unavailable: string): string {
   const numeric = Number(value);
-  return Number.isFinite(numeric) ? numberFormatter.format(numeric) : 'Unavailable';
+  return Number.isFinite(numeric)
+    ? new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US').format(numeric)
+    : unavailable;
 }
 
-function formatEth(value: unknown): string {
+function formatEth(value: unknown, locale: string, unavailable: string): string {
   const numeric = Number(value);
-  return Number.isFinite(numeric) ? `${ethFormatter.format(numeric)} ETH` : 'Unavailable';
+  return Number.isFinite(numeric)
+    ? `${new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+        maximumFractionDigits: 4,
+      }).format(numeric)} ETH`
+    : unavailable;
 }
 
-function formatUpdatedAt(date: Date): string {
+function formatUpdatedAt(date: Date, locale: string): string {
+  if (locale === 'zh') {
+    return `${date.getUTCFullYear()}年${date.getUTCMonth() + 1}月${date.getUTCDate()}日 ${String(
+      date.getUTCHours(),
+    ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}（UTC）`;
+  }
   return date.toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
 }
 
@@ -44,6 +50,8 @@ function SummaryMetric({ label, value, tooltip, description }: SummaryMetricProp
 }
 
 export async function StatisticsSeoSummary() {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: 'statistics' });
   const updatedAt = new Date();
   // Resolve to null on transport failure so ISR builds never crash on a
   // temporarily unreachable API; the summary falls back to static copy.
@@ -56,75 +64,66 @@ export async function StatisticsSeoSummary() {
       aria-labelledby="statistics-heading"
       className="mb-12 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
     >
-      <p className="type-eyebrow text-muted-foreground">Protocol statistics · Arbitrum</p>
+      <p className="type-eyebrow text-muted-foreground">{t('hub.seo.eyebrow')}</p>
       <h1 id="statistics-heading" className="mt-4 type-display-md text-foreground">
-        Cosmic Signature Protocol Statistics
+        {t('hub.seo.heading')}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
-        This page tracks public Cosmic Signature protocol activity on Arbitrum, including
-        Performance Cycle status, gestures, Cosmic Signature NFTs, CST, anchoring, reserves, and
-        allocation data. The interactive tables below hydrate with live app data, while this summary
-        is available in the initial HTML for search engines and AI crawlers.
+        {t('hub.seo.description')}
       </p>
       <p className="mt-3 type-body-sm text-muted-foreground">
-        Last updated: {formatUpdatedAt(updatedAt)}
-        {!hasLiveData
-          ? '. Live data is temporarily unavailable; this page is showing explanatory protocol context.'
-          : ''}
+        {t('hub.seo.lastUpdated', { date: formatUpdatedAt(updatedAt, locale) })}
+        {!hasLiveData ? t('hub.seo.unavailableSuffix') : ''}
       </p>
 
       <dl className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryMetric
-          label={statisticsCopy.metrics.activePerformanceCycle.label}
-          value={formatNumber(data?.CurRoundNum)}
-          tooltip={statisticsCopy.metrics.activePerformanceCycle.tooltip}
-          description={statisticsCopy.metrics.activePerformanceCycle.seoDescription}
+          label={t('metrics.activePerformanceCycle.label')}
+          value={formatNumber(data?.CurRoundNum, locale, t('hub.seo.unavailable'))}
+          tooltip={t('metrics.activePerformanceCycle.tooltip')}
+          description={t('metrics.activePerformanceCycle.seoDescription')}
         />
         <SummaryMetric
-          label={statisticsCopy.metrics.activeCycleGestures.label}
-          value={formatNumber(data?.CurNumBids)}
-          tooltip={statisticsCopy.metrics.activeCycleGestures.tooltip}
-          description={statisticsCopy.metrics.activeCycleGestures.seoDescription}
+          label={t('metrics.activeCycleGestures.label')}
+          value={formatNumber(data?.CurNumBids, locale, t('hub.seo.unavailable'))}
+          tooltip={t('metrics.activeCycleGestures.tooltip')}
+          description={t('metrics.activeCycleGestures.seoDescription')}
         />
         <SummaryMetric
-          label={statisticsCopy.metrics.contractBalance.seoLabel}
-          value={formatEth(data?.CosmicGameBalanceEth)}
-          tooltip={statisticsCopy.metrics.contractBalance.tooltip}
-          description={statisticsCopy.metrics.contractBalance.seoDescription}
+          label={t('metrics.contractBalance.seoLabel')}
+          value={formatEth(data?.CosmicGameBalanceEth, locale, t('hub.seo.unavailable'))}
+          tooltip={t('metrics.contractBalance.tooltip')}
+          description={t('metrics.contractBalance.seoDescription')}
         />
         <SummaryMetric
-          label={statisticsCopy.metrics.cosmicSignatureNftsImprinted.label}
-          value={formatNumber(mainStats?.NumCSTokenMints)}
-          tooltip={statisticsCopy.metrics.cosmicSignatureNftsImprinted.tooltip}
-          description={statisticsCopy.metrics.cosmicSignatureNftsImprinted.seoDescription}
+          label={t('metrics.cosmicSignatureNftsImprinted.label')}
+          value={formatNumber(mainStats?.NumCSTokenMints, locale, t('hub.seo.unavailable'))}
+          tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
+          description={t('metrics.cosmicSignatureNftsImprinted.seoDescription')}
         />
       </dl>
 
-      <p className="mt-6 type-body-sm text-muted-foreground">
-        Data comes from the public Cosmic Signature API, which indexes Arbitrum smart contract
-        activity for the protocol. For protocol mechanics and verification details, use the
-        crawlable links below.
-      </p>
-      <nav aria-label="Statistics related pages" className="mt-5">
+      <p className="mt-6 type-body-sm text-muted-foreground">{t('hub.seo.dataSource')}</p>
+      <nav aria-label={t('hub.seo.relatedPagesAria')} className="mt-5">
         <ul className="flex flex-wrap gap-3 text-sm">
           <li>
             <Link href="/current-cycle" className="text-primary underline-offset-4 hover:underline">
-              View the current Performance Cycle
+              {t('hub.seo.links.currentCycle')}
             </Link>
           </li>
           <li>
             <Link href="/how-it-works" className="text-primary underline-offset-4 hover:underline">
-              Learn how Cosmic Signature works
+              {t('hub.seo.links.howItWorks')}
             </Link>
           </li>
           <li>
             <Link href="/contracts" className="text-primary underline-offset-4 hover:underline">
-              Review verified Arbitrum contracts
+              {t('hub.seo.links.contracts')}
             </Link>
           </li>
           <li>
             <Link href="/faq" className="text-primary underline-offset-4 hover:underline">
-              Read the Cosmic Signature FAQ
+              {t('hub.seo.links.faq')}
             </Link>
           </li>
         </ul>

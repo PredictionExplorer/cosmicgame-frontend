@@ -8,6 +8,11 @@ export interface RootMetadataCopy {
   defaultDescription: string;
 }
 
+export interface RootMetadataOptions {
+  origin: string;
+  canonical: string;
+}
+
 // Default OG/Twitter title is intentionally punchier than the document
 // title — most embed cards crop after ~70 chars and we want the
 // brand-line tagline visible in Discord/Slack/X previews.
@@ -29,13 +34,16 @@ export function openGraphLocale(locale: string): string {
  *
  * `openGraph.images` and `twitter.images` are intentionally not set here.
  * Next.js auto-populates them from the file-system convention
- * (`opengraph-image.tsx` in each route group), which produces a real PNG via
+ * (the nearest `opengraph-image.tsx` in the route tree), which produces a real PNG via
  * `next/og`. SVG og:image is rejected by Discord, Slack, X, Facebook, and
  * LinkedIn, which is why the previous `logoImgUrl` (an SVG) failed to preview.
  */
-export function createRootMetadata(copy: RootMetadataCopy): Metadata {
+export function createRootMetadata(
+  copy: RootMetadataCopy,
+  { origin, canonical }: RootMetadataOptions,
+): Metadata {
   return {
-    metadataBase: new URL(LANDING_ORIGIN),
+    metadataBase: new URL(origin),
     title: { default: copy.defaultTitle, template: '%s' },
     description: copy.defaultDescription,
     icons: {
@@ -48,7 +56,7 @@ export function createRootMetadata(copy: RootMetadataCopy): Metadata {
       google: 'ZUw5gzqw7CFIEZgCJ2pLy-MhDe7Fdotpc31fS75v3dE',
     },
     alternates: {
-      canonical: LANDING_ORIGIN,
+      canonical,
     },
     robots: {
       index: true,
@@ -96,7 +104,10 @@ export function createRootMetadata(copy: RootMetadataCopy): Metadata {
   };
 }
 
-export const rootMetadata: Metadata = createRootMetadata(englishRootMetadataCopy);
+export const rootMetadata: Metadata = createRootMetadata(englishRootMetadataCopy, {
+  origin: LANDING_ORIGIN,
+  canonical: LANDING_ORIGIN,
+});
 
 export const rootViewport: Viewport = {
   width: 'device-width',

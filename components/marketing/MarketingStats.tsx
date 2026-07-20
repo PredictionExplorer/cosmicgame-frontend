@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Info } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -46,6 +47,8 @@ function useCountUp(target: number, inView: boolean, decimals = 0) {
 }
 
 function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCardProps) {
+  const locale = useLocale();
+  const t = useTranslations('marketing');
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
   const displayed = useCountUp(value, inView, decimals);
@@ -67,7 +70,7 @@ function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCard
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label={`Info about ${label}`}
+              aria-label={t('stats.infoAria', { label })}
               className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
             >
               <Info className="h-3.5 w-3.5" />
@@ -78,9 +81,9 @@ function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCard
       </div>
       <p
         className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl"
-        aria-label={`${label}: ${value}${suffix}`}
+        aria-label={t('stats.valueAria', { label, value, suffix })}
       >
-        {displayed.toLocaleString()}
+        {displayed.toLocaleString(locale)}
         {suffix && <span className="ml-1 text-xl text-muted-foreground">{suffix}</span>}
       </p>
     </motion.div>
@@ -98,28 +101,30 @@ export function MarketingStats({
   activeMarketers,
   rewardTransactions,
 }: MarketingStatsProps) {
+  const t = useTranslations('marketing');
+
   return (
     <section aria-labelledby="stats-heading" className="py-16">
       <h2 id="stats-heading" className="sr-only">
-        Outreach Program Statistics
+        {t('stats.heading')}
       </h2>
       <div className="grid gap-6 sm:grid-cols-3">
         <StatCard
-          label="Total Allocations"
+          label={t('stats.totalAllocations.label')}
           value={totalRewardsEth}
           suffix="CST"
           decimals={2}
-          tooltip="Total CST tokens forwarded to all outreach contributors since launch"
+          tooltip={t('stats.totalAllocations.tooltip')}
         />
         <StatCard
-          label="Active Outreach Contributors"
+          label={t('stats.activeContributors.label')}
           value={activeMarketers}
-          tooltip="Number of unique wallet addresses that have received outreach allocations"
+          tooltip={t('stats.activeContributors.tooltip')}
         />
         <StatCard
-          label="Allocation Transactions"
+          label={t('stats.transactions.label')}
           value={rewardTransactions}
-          tooltip="Total number of individual allocation payouts processed"
+          tooltip={t('stats.transactions.tooltip')}
         />
       </div>
     </section>

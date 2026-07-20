@@ -4,8 +4,7 @@ import { setRequestLocale } from 'next-intl/server';
 
 import { getLandingContent } from '@/content/landing';
 
-import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, artProtocolJsonLd, organizationJsonLd, websiteJsonLd } from '@/utils/jsonLd';
+import { LANDING_ORIGIN } from '@/lib/hostRouting';
 import { createMetadata } from '@/utils/seo';
 
 interface LayoutProps {
@@ -51,41 +50,16 @@ export const viewport: Viewport = {
  * The root layout (app/layout.tsx) already renders <LandingShell> on the
  * marketing host, which provides React Cookies + Toaster + error
  * boundaries. This nested layout only adds landing-specific chrome:
- * JSON-LD blocks and the page background container.
+ * the page background container. Landing-wide JSON-LD lives in the shared
+ * route-group layout so `/about` and `/learn/*` receive the same entities.
  */
 export default async function LandingLayout({ children, params }: LayoutProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { meta } = getLandingContent(locale);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
-  const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
 
   return (
-    <>
-      <JsonLd
-        data={[
-          websiteJsonLd({
-            description: meta.description,
-            inLanguage,
-            url: landingUrl,
-            searchUrlTemplate: `${localeHref(APP_ORIGIN, '/gallery', locale)}?search={search_term_string}`,
-          }),
-          organizationJsonLd({
-            description: meta.description,
-            inLanguage,
-            url: landingUrl,
-          }),
-          artProtocolJsonLd({
-            description: meta.description,
-            inLanguage,
-            keywords: meta.keywords,
-            url: landingUrl,
-          }),
-        ]}
-      />
-      <div className="relative min-h-screen overflow-x-clip bg-deep-space text-stellar-white antialiased">
-        {children}
-      </div>
-    </>
+    <div className="relative min-h-screen overflow-x-clip bg-deep-space text-stellar-white antialiased">
+      {children}
+    </div>
   );
 }

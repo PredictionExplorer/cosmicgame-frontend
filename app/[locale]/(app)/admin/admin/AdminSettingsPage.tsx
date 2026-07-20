@@ -1,6 +1,7 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,27 +19,38 @@ import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 
 function AdminFieldRow({ label, children }: { label: string; children: ReactNode }) {
+  const labelId = useId();
+
   return (
     <div className="grid grid-cols-1 gap-3 border-b border-white/[0.06] px-4 py-4 last:border-b-0 sm:grid-cols-[minmax(0,280px)_1fr] sm:items-center sm:px-5">
-      <span className="text-sm font-medium text-foreground">{label}</span>
-      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">{children}</div>
+      <span id={labelId} className="text-sm font-medium text-foreground">
+        {label}
+      </span>
+      <div
+        role="group"
+        aria-labelledby={labelId}
+        className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center"
+      >
+        {children}
+      </div>
     </div>
   );
 }
 
 const AdminSettingsPage = () => {
+  const t = useTranslations('admin');
   const { data, isLoading } = useDashboardInfo();
 
   return (
     <PageShell variant="data" className="max-sm:pb-16">
       <div className="mx-auto max-w-4xl">
         <PageHeader
-          title="Administrative methods"
-          subtitle="Read-only view of dashboard contract addresses and parameters."
+          title={t('settings.title')}
+          subtitle={t('settings.subtitle')}
           breadcrumbs={[
-            { label: 'Home', href: '/' },
-            { label: 'Admin', href: '/admin' },
-            { label: 'Settings' },
+            { label: t('settings.breadcrumbs.home'), href: '/' },
+            { label: t('settings.breadcrumbs.admin'), href: '/admin' },
+            { label: t('settings.breadcrumbs.settings') },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
@@ -46,271 +58,297 @@ const AdminSettingsPage = () => {
 
         {isLoading || !data ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+            <p className="text-sm font-medium text-muted-foreground" role="status">
+              {t('settings.loading')}
+            </p>
           </div>
         ) : (
           <SectionCard
             sectionId="admin-cosmic-contract"
-            title="Cosmic Signature Contract"
-            description="Contract addresses and on-chain parameters from the dashboard API."
+            title={t('settings.contractTitle')}
+            description={t('settings.contractDescription')}
           >
             <div>
-              <AdminFieldRow label="Cosmic Signature NFT (ERC-721) contract address">
+              <AdminFieldRow label={t('settings.fields.cosmicSignatureNft')}>
                 <Input
-                  placeholder="Enter address here"
+                  placeholder={t('settings.placeholders.address')}
                   className="flex-1 font-mono text-sm"
                   value={String(data?.ContractAddrs?.CosmicSignatureAddr ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set Address
+                  {t('settings.actions.setAddress')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Cosmic Signature CST Token (ERC-20) contract address">
+              <AdminFieldRow label={t('settings.fields.cstToken')}>
                 <Input
-                  placeholder="Enter address here"
+                  placeholder={t('settings.placeholders.address')}
                   className="flex-1 font-mono text-sm"
                   value={String(data?.ContractAddrs?.CosmicTokenAddr ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set Address
+                  {t('settings.actions.setAddress')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Public Goods Vault contract address">
+              <AdminFieldRow label={t('settings.fields.publicGoodsVault')}>
                 <Input
-                  placeholder="Enter address here"
+                  placeholder={t('settings.placeholders.address')}
                   className="flex-1 font-mono text-sm"
                   value={String(data?.ContractAddrs?.CharityWalletAddr ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set Address
+                  {t('settings.actions.setAddress')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="RandomWalk NFT contract address">
+              <AdminFieldRow label={t('settings.fields.randomWalkNft')}>
                 <Input
-                  placeholder="Enter address here"
+                  placeholder={t('settings.placeholders.address')}
                   className="flex-1 font-mono text-sm"
                   value={String(data?.ContractAddrs?.RandomWalkAddr ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set Address
+                  {t('settings.actions.setAddress')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Stellar Selection wallet contract address">
+              <AdminFieldRow label={t('settings.fields.stellarSelectionWallet')}>
                 <Input
-                  placeholder="Enter address here"
+                  placeholder={t('settings.placeholders.address')}
                   className="flex-1 font-mono text-sm"
                   value={String(data?.ContractAddrs?.RaffleWalletAddr ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set Address
+                  {t('settings.actions.setAddress')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Anchoring wallet contract address">
+              <AdminFieldRow label={t('settings.fields.anchoringWallet')}>
                 <Input
-                  placeholder="Enter address here"
+                  placeholder={t('settings.placeholders.address')}
                   className="flex-1 font-mono text-sm"
                   value={String(data?.ContractAddrs?.StakingWalletAddr ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set Address
+                  {t('settings.actions.setAddress')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Outreach wallet contract address">
+              <AdminFieldRow label={t('settings.fields.outreachWallet')}>
                 <Input
-                  placeholder="Enter address here"
+                  placeholder={t('settings.placeholders.address')}
                   className="flex-1 font-mono text-sm"
                   value={String(data?.ContractAddrs?.MarketingWalletAddr ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set Address
+                  {t('settings.actions.setAddress')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Business logic contract address">
+              <AdminFieldRow label={t('settings.fields.businessLogic')}>
                 <Input
-                  placeholder="Enter address here"
+                  placeholder={t('settings.placeholders.address')}
                   className="flex-1 font-mono text-sm"
                   value={String(data?.ContractAddrs?.BusinessLogicAddr ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set Address
+                  {t('settings.actions.setAddress')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Number of ETH Stellar Selection recipients per cycle">
+              <AdminFieldRow label={t('settings.fields.ethStellarRecipients')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.NumRaffleEthWinners ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Number of NFT Stellar Selection recipients per cycle">
+              <AdminFieldRow label={t('settings.fields.nftStellarRecipients')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.NumRaffleNFTWinners ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Number of NFT holder recipients per cycle">
+              <AdminFieldRow label={t('settings.fields.nftHolderRecipients')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.NumHolderNFTWinners ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Signature Allocation percentage">
+              <AdminFieldRow label={t('settings.fields.signatureAllocationPercentage')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.PrizePercentage ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Public Goods percentage">
+              <AdminFieldRow label={t('settings.fields.publicGoodsPercentage')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.CharityPercentage ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Stellar Selection percentage">
+              <AdminFieldRow label={t('settings.fields.stellarSelectionPercentage')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.RafflePercentage ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Anchor Distribution percentage">
+              <AdminFieldRow label={t('settings.fields.anchorDistributionPercentage')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.StakingPercentage ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Time increase">
+              <AdminFieldRow label={t('settings.fields.timeIncrease')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.TimeIncrease ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Timeout to retrieve Signature Allocation">
-                <Input type="number" placeholder="Enter number here" className="flex-1" />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label="Price increase">
+              <AdminFieldRow label={t('settings.fields.allocationTimeout')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
+                  className="flex-1"
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  {t('settings.actions.set')}
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label={t('settings.fields.priceIncrease')}>
+                <Input
+                  type="number"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.PriceIncrease ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Nano seconds extra">
+              <AdminFieldRow label={t('settings.fields.nanosecondsExtra')}>
                 <Input
                   type="number"
-                  placeholder="Enter number here"
+                  placeholder={t('settings.placeholders.number')}
                   className="flex-1"
                   value={String(data?.NanosecondsExtra ?? '')}
                   readOnly
                 />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Initial seconds until Signature Allocation">
-                <Input type="number" placeholder="Enter number here" className="flex-1" />
+              <AdminFieldRow label={t('settings.fields.initialAllocationSeconds')}>
+                <Input
+                  type="number"
+                  placeholder={t('settings.placeholders.number')}
+                  className="flex-1"
+                />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Initial Gesture Cost fraction">
-                <Input type="number" placeholder="Enter number here" className="flex-1" />
+              <AdminFieldRow label={t('settings.fields.initialGestureCostFraction')}>
+                <Input
+                  type="number"
+                  placeholder={t('settings.placeholders.number')}
+                  className="flex-1"
+                />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Activation time">
-                <Input type="number" placeholder="Enter number here" className="flex-1" />
+              <AdminFieldRow label={t('settings.fields.activationTime')}>
+                <Input
+                  type="number"
+                  placeholder={t('settings.placeholders.number')}
+                  className="flex-1"
+                />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="ETH to CST Gesture ratio">
-                <Input type="number" placeholder="Enter number here" className="flex-1" />
+              <AdminFieldRow label={t('settings.fields.gestureRatio')}>
+                <Input
+                  type="number"
+                  placeholder={t('settings.placeholders.number')}
+                  className="flex-1"
+                />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Cycle start CST Calibration Window length">
-                <Input type="number" placeholder="Enter number here" className="flex-1" />
+              <AdminFieldRow label={t('settings.fields.calibrationWindowLength')}>
+                <Input
+                  type="number"
+                  placeholder={t('settings.placeholders.number')}
+                  className="flex-1"
+                />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Switch mode">
+              <AdminFieldRow label={t('settings.fields.switchMode')}>
                 <Select defaultValue="runtime">
                   <SelectTrigger className="w-full flex-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="runtime">Runtime Mode</SelectItem>
-                    <SelectItem value="maintenance">Maintenance Mode</SelectItem>
+                    <SelectItem value="runtime">{t('settings.modes.runtime')}</SelectItem>
+                    <SelectItem value="maintenance">{t('settings.modes.maintenance')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  Set
+                  {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>
             </div>

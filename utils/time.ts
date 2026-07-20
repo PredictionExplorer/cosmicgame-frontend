@@ -9,12 +9,12 @@ const YEAR = 31536000; // 365 days
  * `en` returns e.g. "2 months ago", "1 year ago", "just now" (unchanged);
  * `zh` returns "2 个月前", "1 年前", "刚刚" (CJK–Latin spacing per
  * docs/i18n/style-guide-zh.md §4). Chinese has no plural inflection, so both
- * counts share one form. Site-wide locale formatting lands in Sprint 5.
+ * counts share one form.
  */
 export function getRelativeTime(timestamp: number, nowSeconds?: number, locale = 'en'): string {
   const now = nowSeconds ?? Math.floor(Date.now() / 1000);
   const diff = now - timestamp;
-  const zh = locale === 'zh';
+  const zh = locale.toLowerCase().startsWith('zh');
 
   if (diff < MINUTE) return zh ? '刚刚' : 'just now';
   if (diff < HOUR) {

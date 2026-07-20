@@ -1,17 +1,28 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
 import WinningHistory from './WinningHistory';
 
-export const metadata: Metadata = createMetadata(
-  'My Allocation History | Cosmic Signature',
-  'View your complete allocation history in Cosmic Signature, including Signature Allocations, ETH Stellar Selection distributions, Cosmic Signature NFTs, and Anchor Distributions.',
-  undefined,
-  '/recipient-history',
-  { index: false },
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export default function Page() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('recipientHistory.title'),
+    t('recipientHistory.description'),
+    undefined,
+    '/recipient-history',
+    { index: false, locale },
+  );
+}
+
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return <WinningHistory />;
 }

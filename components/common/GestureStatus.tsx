@@ -6,8 +6,9 @@ import { Trophy, Coins, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { convertTimestampToDateTime, formatSeconds } from '@/utils';
+import { formatSeconds } from '@/utils';
 
+import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
@@ -185,6 +186,7 @@ export const GestureStatus = ({
 }: GestureStatusProps) => {
   const t = useTranslations('home');
   const locale = useLocale();
+  const activationDateTime = useHydrationSafeDateTime(activationTime, true, locale);
   const { account } = useActiveWeb3React();
   const { data: userInfoRaw } = useUserInfo(account);
 
@@ -240,7 +242,7 @@ export const GestureStatus = ({
           <p className="text-sm text-muted-foreground">
             {t('status.opensAt', {
               cycle: String(data.CurRoundNum),
-              dateTime: convertTimestampToDateTime(activationTime, true, locale),
+              dateTime: activationDateTime,
             })}
           </p>
           <div className="mt-4">

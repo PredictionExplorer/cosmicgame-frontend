@@ -1,5 +1,7 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
+
 import AttachedNFTTable, { type NFTRecord } from '@/components/attachments/AttachedNFTTable';
 import { useDonationsNFTList } from '@/hooks/useApiQuery';
 import { Spinner } from '@/components/ui/spinner';
@@ -8,6 +10,8 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 const NFTDonationsPage = () => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const { data: nftDonations = null } = useDonationsNFTList();
 
   return (
@@ -15,17 +19,19 @@ const NFTDonationsPage = () => {
       <PageHeader
         align="left"
         eyebrow={
-          <SectionEyebrow tone="impact">Attached NFTs · {nftDonations?.length ?? 0}</SectionEyebrow>
+          <SectionEyebrow tone="impact">
+            {t('attachedNfts.eyebrow', {
+              count: (nftDonations?.length ?? 0).toLocaleString(locale),
+            })}
+          </SectionEyebrow>
         }
-        title="Attached NFT Contributions"
+        title={t('attachedNfts.title')}
         titleLevel={2}
         gradientTitle="signature"
-        subtitle="NFTs attached to gestures by community members across cycles"
+        subtitle={t('attachedNfts.subtitle')}
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Community members can attach their NFTs (ERC-721) to gestures using the advanced options.
-        Attached NFTs forward to the participant who receives the Signature Allocation when the
-        cycle finalizes, enriching the distribution beyond ETH.
+        {t('attachedNfts.description')}
       </p>
 
       {nftDonations === null ? (

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -18,6 +19,7 @@ import type { NameHistoryRecord } from '@/services/api';
 
 const NameHistoryRow = ({ record }: { record: NameHistoryRecord }) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
 
   if (!record) {
     return <TablePrimaryRow />;
@@ -30,7 +32,7 @@ const NameHistoryRow = ({ record }: { record: NameHistoryRecord }) => {
     <TablePrimaryRow>
       <TablePrimaryCell>
         <a href={txUrl} className="text-inherit" target="_blank" rel="noopener noreferrer">
-          {convertTimestampToDateTime(record.TimeStamp)}
+          <HydrationSafeDateTime timestamp={record.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell>{displayName}</TablePrimaryCell>

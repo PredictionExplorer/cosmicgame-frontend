@@ -4,8 +4,10 @@ import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import { getExplorerUrl, shortenHex } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
@@ -134,7 +136,10 @@ const WinningHistoryRow = ({
           {!history.Claimed && showClaimedStatus && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <button className="inline-flex items-center justify-center h-6 w-6 rounded-full hover:bg-white/10">
+                <button
+                  aria-label={t('recipientHistory.unretrievedAria')}
+                  className="inline-flex items-center justify-center h-6 w-6 rounded-full hover:bg-white/10"
+                >
                   <AlertTriangle className="h-4 w-4 text-destructive" />
                 </button>
               </TooltipTrigger>
@@ -150,7 +155,7 @@ const WinningHistoryRow = ({
           rel="noopener noreferrer"
           className="text-inherit"
         >
-          {convertTimestampToDateTime(history.TimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={history.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       {showWinnerAddr && (
@@ -158,14 +163,14 @@ const WinningHistoryRow = ({
           {history.WinnerAddr ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <a
+                <Link
                   href={`/user/${history.WinnerAddr}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono text-inherit"
                 >
                   {shortenHex(history.WinnerAddr, 6)}
-                </a>
+                </Link>
               </TooltipTrigger>
               <TooltipContent>{history.WinnerAddr}</TooltipContent>
             </Tooltip>
@@ -176,14 +181,14 @@ const WinningHistoryRow = ({
       )}
       {showRoundColumn && (
         <TablePrimaryCell align="center">
-          <a
+          <Link
             href={`/allocation/${history.RoundNum}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-inherit"
           >
             {history.RoundNum}
-          </a>
+          </Link>
         </TablePrimaryCell>
       )}
       <TablePrimaryCell align="right">
@@ -228,14 +233,14 @@ const WinningHistoryRow = ({
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {(history.TokenId ?? -1) >= 0 ? (
-          <a
+          <Link
             href={`/detail/${history.TokenId}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-inherit"
           >
             {history.TokenId}
-          </a>
+          </Link>
         ) : (
           ' '
         )}

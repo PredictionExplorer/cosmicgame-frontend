@@ -1,9 +1,12 @@
+import { getLocale, getTranslations } from 'next-intl/server';
+
 import { Link } from '@/i18n/navigation';
 import { get_dashboard_info } from '@/services/api/rounds';
 
-const numberFormatter = new Intl.NumberFormat('en-US');
-
 export async function GallerySeoSummary() {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  const numberFormatter = new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US');
   // Resolve to null on transport failure so ISR builds never crash on a
   // temporarily unreachable API; the card then renders "Unavailable".
   const data = await get_dashboard_info().catch(() => null);
@@ -14,50 +17,52 @@ export async function GallerySeoSummary() {
       aria-labelledby="gallery-seo-heading"
       className="mb-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
     >
-      <p className="type-eyebrow text-muted-foreground">Deterministic NFT art · Arbitrum</p>
+      <p className="type-eyebrow text-muted-foreground">{t('gallerySummary.eyebrow')}</p>
       <h1 id="gallery-seo-heading" className="mt-4 type-display-md text-foreground">
-        Cosmic Signature Gallery
+        {t('gallerySummary.heading')}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
-        Explore Cosmic Signature NFT artwork generated from deterministic three-body physics,
-        on-chain seeds, spectral rendering, and Performance Cycle data. Each Signature is
-        reproducible from protocol records and represents a specific cycle context.
+        {t('gallerySummary.description')}
       </p>
       <dl className="mt-6 grid gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
           <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Imprinted NFTs
+            {t('gallerySummary.cards.imprinted')}
           </dt>
           <dd className="mt-2 text-2xl font-semibold">
             {typeof count === 'number' && Number.isFinite(count)
               ? numberFormatter.format(count)
-              : 'Unavailable'}
+              : t('gallerySummary.unavailable')}
           </dd>
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Art Process</dt>
-          <dd className="mt-2 text-lg font-semibold">Three-body simulation</dd>
+          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            {t('gallerySummary.cards.process')}
+          </dt>
+          <dd className="mt-2 text-lg font-semibold">{t('gallerySummary.cards.processValue')}</dd>
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">License</dt>
-          <dd className="mt-2 text-lg font-semibold">CC0-aligned</dd>
+          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            {t('gallerySummary.cards.license')}
+          </dt>
+          <dd className="mt-2 text-lg font-semibold">{t('gallerySummary.cards.licenseValue')}</dd>
         </div>
       </dl>
-      <nav aria-label="Gallery related pages" className="mt-6">
+      <nav aria-label={t('gallerySummary.relatedAria')} className="mt-6">
         <ul className="flex flex-wrap gap-3 text-sm">
           <li>
             <Link href="/how-it-works" className="text-primary underline-offset-4 hover:underline">
-              Learn how Cosmic Signature works
+              {t('gallerySummary.links.learn')}
             </Link>
           </li>
           <li>
             <Link href="/code" className="text-primary underline-offset-4 hover:underline">
-              Review the rendering source code
+              {t('gallerySummary.links.code')}
             </Link>
           </li>
           <li>
             <Link href="/statistics" className="text-primary underline-offset-4 hover:underline">
-              View protocol statistics
+              {t('gallerySummary.links.statistics')}
             </Link>
           </li>
         </ul>

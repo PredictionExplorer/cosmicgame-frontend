@@ -4,9 +4,13 @@ import { useState } from 'react';
 import { Calendar, Trophy, Award, User, Copy, Check } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, convertTimestampToDateTime, getRelativeTime } from '@/utils';
+import { getExplorerUrl, getRelativeTime } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import {
+  useHydrationSafeDateTime,
+  useHydrationSafeNowSeconds,
+} from '@/components/common/HydrationSafeDateTime';
 import { StatCard } from '@/components/ui/stat-card';
 import { AddressChip } from '@/components/ui/address-chip';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -70,12 +74,13 @@ function SeedBlock({ seed }: { seed?: string | number }) {
 export function NFTMetadata({ nft }: NFTMetadataProps) {
   const t = useTranslations('detail');
   const locale = useLocale();
+  const timestamp = nft?.TimeStamp ?? 0;
+  const absoluteDate = useHydrationSafeDateTime(timestamp, false, locale);
+  const nowSeconds = useHydrationSafeNowSeconds(timestamp);
   const imprintedRelative = nft?.TimeStamp
-    ? getRelativeTime(nft.TimeStamp, undefined, locale)
+    ? getRelativeTime(nft.TimeStamp, nowSeconds, locale)
     : undefined;
-  const imprintedAbsolute = nft?.TimeStamp
-    ? convertTimestampToDateTime(nft.TimeStamp, false, locale)
-    : undefined;
+  const imprintedAbsolute = nft?.TimeStamp ? absoluteDate : undefined;
   const imprintedDisplay =
     imprintedRelative && imprintedAbsolute
       ? `${imprintedRelative} (${imprintedAbsolute})`

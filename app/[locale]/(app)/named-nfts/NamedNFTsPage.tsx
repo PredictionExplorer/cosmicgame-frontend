@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { Tr, Tbody } from 'react-super-responsive-table';
-
-import { convertTimestampToDateTime } from '@/utils';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -25,6 +25,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
+  const locale = useLocale();
   if (!nft) {
     return <TablePrimaryRow />;
   }
@@ -32,7 +33,7 @@ const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(nft.MintTimeStamp ?? nft.TimeStamp)}
+        <HydrationSafeDateTime timestamp={nft.MintTimeStamp ?? nft.TimeStamp} locale={locale} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link href={`/detail/${nft.TokenId}`} className="text-inherit text-[inherit]">
@@ -45,14 +46,15 @@ const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
 };
 
 const NamedNFTsTable = ({ list }: { list: CSTTokenInfo[] }) => {
+  const t = useTranslations('tables');
   return (
     <TablePrimaryContainer>
       <TablePrimary>
         <TablePrimaryHead>
           <Tr>
-            <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Token Name</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.dateTimeCompact')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('statisticsColumns.namedNftTokenId')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.tokenName')}</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <Tbody>
@@ -66,6 +68,8 @@ const NamedNFTsTable = ({ list }: { list: CSTTokenInfo[] }) => {
 };
 
 const NamedNFTsPage = () => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const [curPage, setCurPage] = useState(1);
   const perPage = 5;
   const { data: list = [], isLoading: loading } = useNamedNFTs();
@@ -74,16 +78,18 @@ const NamedNFTsPage = () => {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         align="left"
-        eyebrow={<SectionEyebrow tone="aurora">Named NFTs · {list.length}</SectionEyebrow>}
-        title="Named Cosmic Signature NFTs"
+        eyebrow={
+          <SectionEyebrow tone="aurora">
+            {t('namedNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
+          </SectionEyebrow>
+        }
+        title={t('namedNfts.title')}
         titleLevel={2}
         gradientTitle="signature"
-        subtitle="Browse Cosmic Signature NFTs that have been given custom names"
+        subtitle={t('namedNfts.subtitle')}
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Cosmic Signature NFT owners can give their NFTs custom names, creating a unique identity
-        within the collection. Named NFTs stand out in the gallery and carry the personal touch of
-        their owners.
+        {t('namedNfts.description')}
       </p>
 
       <div className="mt-12">
@@ -103,8 +109,8 @@ const NamedNFTsPage = () => {
           </>
         ) : (
           <EmptyState
-            title="No named NFTs"
-            description="No Cosmic Signature NFTs have been named yet."
+            title={t('namedNfts.emptyTitle')}
+            description={t('namedNfts.emptyDescription')}
           />
         )}
       </div>

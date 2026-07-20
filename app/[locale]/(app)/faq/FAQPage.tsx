@@ -1,11 +1,19 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
+
+import {
+  faqContentEn,
+  findFaqItemByHash,
+  findFaqItemById,
+  getTotalFaqQuestionCount,
+  type FAQContent,
+} from '@/content/faq';
 
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionDivider } from '@/components/ui/section-divider';
 
-import { faqCategories, findItemByHash, getTotalQuestionCount } from './data/faq-data';
 import { HeroSection } from './components/HeroSection';
 import { PopularQuestions } from './components/PopularQuestions';
 import { CategoryNav } from './components/CategoryNav';
@@ -21,20 +29,25 @@ function useDebounce(value: string, delay: number): string {
   return debounced;
 }
 
-const FAQPage = () => {
+interface FAQPageProps {
+  content?: FAQContent;
+}
+
+const FAQPage = ({ content = faqContentEn }: FAQPageProps) => {
+  const t = useTranslations('faq');
   const [searchInput, setSearchInput] = useState('');
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const categoryRefs = useRef<Map<string, HTMLElement>>(new Map());
-  const hasHandledHash = useRef(false);
 
   const debouncedSearch = useDebounce(searchInput, 200);
-  const totalCount = getTotalQuestionCount();
+  const totalCount = getTotalFaqQuestionCount(content);
+  const { categories } = content;
 
   const filteredCategories = useMemo(() => {
-    if (!debouncedSearch.trim()) return faqCategories;
+    if (!debouncedSearch.trim()) return categories;
     const q = debouncedSearch.toLowerCase();
-    return faqCategories
+    return categories
       .map((cat) => ({
         ...cat,
         items: cat.items.filter(
@@ -43,7 +56,7 @@ const FAQPage = () => {
         ),
       }))
       .filter((cat) => cat.items.length > 0);
-  }, [debouncedSearch]);
+  }, [categories, debouncedSearch]);
 
   const resultCount = useMemo(
     () => filteredCategories.reduce((sum, cat) => sum + cat.items.length, 0),
@@ -51,27 +64,34 @@ const FAQPage = () => {
   );
 
   useEffect(() => {
-    if (hasHandledHash.current) return;
-    if (typeof window === 'undefined' || !window.location.hash) return;
-    hasHandledHash.current = true;
+    if (typeof window === 'undefined') return;
 
-    const result = findItemByHash(window.location.hash);
-    if (!result) return;
+    const openHashTarget = () => {
+      if (!window.location.hash) return;
+      const result = findFaqItemByHash(content, window.location.hash);
+      if (!result) return;
 
-    requestAnimationFrame(() => {
-      setExpandedItems([result.item.id]);
-      setActiveCategory(result.category.id);
+      requestAnimationFrame(() => {
+        setExpandedItems((current) =>
+          current.includes(result.item.id) ? current : [...current, result.item.id],
+        );
+        setActiveCategory(result.category.id);
 
-      setTimeout(() => {
-        const anchor = result.item.hashAnchor || result.item.id;
-        const el = document.getElementById(anchor);
-        if (el) {
-          const y = el.getBoundingClientRect().top + window.scrollY - 140;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      }, 100);
-    });
-  }, []);
+        setTimeout(() => {
+          const anchor = result.item.hashAnchor ?? result.item.id;
+          const el = document.getElementById(anchor);
+          if (el) {
+            const y = el.getBoundingClientRect().top + window.scrollY - 140;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+          }
+        }, 100);
+      });
+    };
+
+    openHashTarget();
+    window.addEventListener('hashchange', openHashTarget);
+    return () => window.removeEventListener('hashchange', openHashTarget);
+  }, [content]);
 
   useEffect(() => {
     const refs = categoryRefs.current;
@@ -97,38 +117,47 @@ const FAQPage = () => {
     return () => observer.disconnect();
   }, [debouncedSearch]);
 
-  const handleItemToggle = useCallback((categoryId: string, itemId: string) => {
+  const handleItemToggle = useCallback((_categoryId: string, itemId: string) => {
     setExpandedItems((prev) =>
       prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId],
     );
   }, []);
 
-  const handleExpandAll = useCallback((categoryId: string) => {
-    const cat = faqCategories.find((c) => c.id === categoryId);
-    if (!cat) return;
+  const handleExpandAll = useCallback(
+    (categoryId: string) => {
+      const cat = categories.find((c) => c.id === categoryId);
+      if (!cat) return;
 
-    setExpandedItems((prev) => {
-      const catItemIds = cat.items.map((item) => item.id);
-      const allExpanded = catItemIds.every((id) => prev.includes(id));
-      if (allExpanded) {
-        return prev.filter((id) => !catItemIds.includes(id));
-      }
-      return [...new Set([...prev, ...catItemIds])];
-    });
-  }, []);
+      setExpandedItems((prev) => {
+        const catItemIds = cat.items.map((item) => item.id);
+        const allExpanded = catItemIds.every((id) => prev.includes(id));
+        if (allExpanded) {
+          return prev.filter((id) => !catItemIds.includes(id));
+        }
+        return [...new Set([...prev, ...catItemIds])];
+      });
+    },
+    [categories],
+  );
 
-  const handlePopularClick = useCallback((itemId: string, categoryId: string) => {
-    setExpandedItems((prev) => (prev.includes(itemId) ? prev : [...prev, itemId]));
-    setActiveCategory(categoryId);
+  const handlePopularClick = useCallback(
+    (itemId: string, categoryId: string) => {
+      const resolved = findFaqItemById(content, itemId);
+      const anchor = resolved?.item.hashAnchor ?? itemId;
 
-    requestAnimationFrame(() => {
-      const el = document.getElementById(itemId);
-      if (el) {
-        const y = el.getBoundingClientRect().top + window.scrollY - 140;
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }
-    });
-  }, []);
+      setExpandedItems((prev) => (prev.includes(itemId) ? prev : [...prev, itemId]));
+      setActiveCategory(categoryId);
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById(anchor);
+        if (el) {
+          const y = el.getBoundingClientRect().top + window.scrollY - 140;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      });
+    },
+    [content],
+  );
 
   const setCategoryRef = useCallback(
     (categoryId: string) => (el: HTMLElement | null) => {
@@ -150,13 +179,13 @@ const FAQPage = () => {
         onSearchChange={setSearchInput}
         resultCount={resultCount}
         totalCount={totalCount}
-        categoryCount={faqCategories.length}
+        categoryCount={categories.length}
       />
 
       {!isSearching && (
         <>
           <SectionDivider />
-          <PopularQuestions onQuestionClick={handlePopularClick} />
+          <PopularQuestions content={content} onQuestionClick={handlePopularClick} />
         </>
       )}
 
@@ -164,7 +193,7 @@ const FAQPage = () => {
 
       {!isSearching && (
         <CategoryNav
-          categories={faqCategories}
+          categories={categories}
           activeCategory={activeCategory}
           onCategoryClick={setActiveCategory}
         />
@@ -185,14 +214,14 @@ const FAQPage = () => {
 
         {isSearching && filteredCategories.length === 0 && (
           <div className="py-16 text-center">
-            <p className="text-lg font-medium text-muted-foreground">No questions found</p>
+            <p className="text-lg font-medium text-muted-foreground">{t('empty.heading')}</p>
             <p className="mt-2 text-sm text-muted-foreground/60">
-              Try a different search term or{' '}
+              {t('empty.descriptionPrefix')}{' '}
               <button
                 onClick={() => setSearchInput('')}
                 className="text-primary underline-offset-2 hover:underline"
               >
-                clear the search
+                {t('empty.clearAction')}
               </button>
             </p>
           </div>

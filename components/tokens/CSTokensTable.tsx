@@ -3,8 +3,9 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import {
@@ -74,7 +75,7 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(TimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
 

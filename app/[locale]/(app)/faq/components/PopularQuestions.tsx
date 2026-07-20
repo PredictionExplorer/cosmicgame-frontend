@@ -2,18 +2,23 @@
 
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import {
+  faqContentEn,
+  type FAQCategory,
+  type FAQContent,
+  type FAQItem,
+  findFaqItemById,
+} from '@/content/faq';
 
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
-import {
-  popularQuestionIds,
-  faqCategories,
-  type FAQItem,
-  type FAQCategory,
-} from '../data/faq-data';
+import { FAQ_ICONS } from './faqIcons';
 
 interface PopularQuestionsProps {
+  content?: FAQContent;
   onQuestionClick: (itemId: string, categoryId: string) => void;
   className?: string;
 }
@@ -23,18 +28,11 @@ interface ResolvedPopular {
   category: FAQCategory;
 }
 
-function resolvePopular(): ResolvedPopular[] {
-  const results: ResolvedPopular[] = [];
-  for (const id of popularQuestionIds) {
-    for (const cat of faqCategories) {
-      const item = cat.items.find((q) => q.id === id);
-      if (item) {
-        results.push({ item, category: cat });
-        break;
-      }
-    }
-  }
-  return results;
+function resolvePopular(content: FAQContent): ResolvedPopular[] {
+  return content.popularQuestionIds.flatMap((id) => {
+    const resolved = findFaqItemById(content, id);
+    return resolved ? [resolved] : [];
+  });
 }
 
 const container = {
@@ -50,8 +48,13 @@ const cardVariant = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
 };
 
-export function PopularQuestions({ onQuestionClick, className }: PopularQuestionsProps) {
-  const items = resolvePopular();
+export function PopularQuestions({
+  content = faqContentEn,
+  onQuestionClick,
+  className,
+}: PopularQuestionsProps) {
+  const t = useTranslations('faq');
+  const items = resolvePopular(content);
 
   return (
     <section aria-labelledby="popular-heading" className={cn('py-8', className)}>
@@ -61,9 +64,9 @@ export function PopularQuestions({ onQuestionClick, className }: PopularQuestion
           id="popular-heading"
           className="text-sm font-medium uppercase tracking-wider text-muted-foreground"
         >
-          Popular Questions
+          {t('popular.heading')}
         </h2>
-        <InfoTooltip content="These are the most commonly asked questions by new participants." />
+        <InfoTooltip content={t('popular.tooltip')} />
       </div>
 
       <motion.div
@@ -74,7 +77,7 @@ export function PopularQuestions({ onQuestionClick, className }: PopularQuestion
         className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
       >
         {items.map(({ item, category }) => {
-          const Icon = category.icon;
+          const Icon = FAQ_ICONS[category.icon];
           return (
             <motion.button
               key={item.id}

@@ -2,6 +2,7 @@
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { memo, useMemo, useState, type FC } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   AreaChart,
   Area,
@@ -31,22 +32,28 @@ const CST_COLOR = '#15bffd';
 
 const DAY_SECS = 86400;
 
-type IntervalOption = { label: string; secs: number };
+type IntervalOption = {
+  labelKey: 'oneHour' | 'sixHours' | 'twelveHours' | 'oneDay';
+  secs: number;
+};
 const INTERVAL_OPTIONS: IntervalOption[] = [
-  { label: '1h', secs: 3600 },
-  { label: '6h', secs: 21600 },
-  { label: '12h', secs: 43200 },
-  { label: '1d', secs: 86400 },
+  { labelKey: 'oneHour', secs: 3600 },
+  { labelKey: 'sixHours', secs: 21600 },
+  { labelKey: 'twelveHours', secs: 43200 },
+  { labelKey: 'oneDay', secs: 86400 },
 ];
 
 // Recharts Area "type" controls how control points are connected. Linear is the
 // default per spec; "step" holds each value flat across the window, "monotone"
 // draws a smooth curve.
-type InterpolationOption = { label: string; type: 'linear' | 'step' | 'monotone' };
+type InterpolationOption = {
+  labelKey: 'linear' | 'step' | 'smooth';
+  type: 'linear' | 'step' | 'monotone';
+};
 const INTERPOLATION_OPTIONS: InterpolationOption[] = [
-  { label: 'Linear', type: 'linear' },
-  { label: 'Step', type: 'step' },
-  { label: 'Smooth', type: 'monotone' },
+  { labelKey: 'linear', type: 'linear' },
+  { labelKey: 'step', type: 'step' },
+  { labelKey: 'smooth', type: 'monotone' },
 ];
 
 type ChartPoint = {
@@ -61,10 +68,14 @@ type ChartPoint = {
   totalBids: number;
 };
 
-function toChartPoints(records: BidTypeRatioBucket[], withTime: boolean): ChartPoint[] {
+function toChartPoints(
+  records: BidTypeRatioBucket[],
+  withTime: boolean,
+  locale: string,
+): ChartPoint[] {
   return records.map((r) => ({
     bucketTs: r.BucketTs,
-    label: formatUnixTsLabel(r.BucketTs, withTime),
+    label: formatUnixTsLabel(r.BucketTs, withTime, locale),
     ethPct: r.EthPct ?? 0,
     rwalkPct: r.RwalkPct ?? 0,
     cstPct: r.CstPct ?? 0,
@@ -81,6 +92,7 @@ type RatioTooltipProps = {
 };
 
 function RatioTooltip({ active, payload }: RatioTooltipProps) {
+  const t = useTranslations('statistics');
   if (!active || !payload?.length) return null;
   const point = payload[0]?.payload;
   if (!point) return null;
@@ -110,7 +122,7 @@ function RatioTooltip({ active, payload }: RatioTooltipProps) {
           </div>
         ))}
         <div className="mt-1 flex justify-between gap-4 border-t border-white/10 pt-1">
-          <dt>Total gestures</dt>
+          <dt>{t('charts.typeRatio.totalGestures')}</dt>
           <dd className="text-white">{point.totalBids}</dd>
         </div>
       </dl>
@@ -132,13 +144,15 @@ const RatioAreaChart = memo(function RatioAreaChart({
   interpolation: InterpolationOption['type'];
   withTime: boolean;
 }) {
+  const locale = useLocale();
+
   return (
     <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
       <AreaChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
         <XAxis
           dataKey="bucketTs"
-          tickFormatter={(ts) => formatUnixTsLabel(Number(ts), withTime)}
+          tickFormatter={(ts) => formatUnixTsLabel(Number(ts), withTime, locale)}
           tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
           interval="preserveStartEnd"
           minTickGap={withTime ? 48 : 24}
@@ -204,6 +218,8 @@ type BidTypeRatioChartProps = {
  * per-interval (windowed); windows with no gestures dip to baseline.
  */
 export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, enabled = true }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const [intervalSecs, setIntervalSecs] = useState<number>(21600); // 6h
   const [interpolation, setInterpolation] = useState<InterpolationOption['type']>('monotone'); // Smooth
 
@@ -230,31 +246,34 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
   );
 
   const withTime = intervalSecs < DAY_SECS;
-  const chartData = useMemo(() => toChartPoints(data ?? [], withTime), [data, withTime]);
+  const chartData = useMemo(
+    () => toChartPoints(data ?? [], withTime, locale),
+    [data, withTime, locale],
+  );
 
   return (
     <div className="space-y-4" data-testid="bid-type-ratio-chart">
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">
-            Sample every
+            {t('charts.typeRatio.sampleEvery')}
           </span>
           {INTERVAL_OPTIONS.map((opt) => (
             <Button
-              key={opt.label}
+              key={opt.labelKey}
               type="button"
               size="sm"
               variant={intervalSecs === opt.secs ? 'default' : 'outline'}
               aria-pressed={intervalSecs === opt.secs}
               onClick={() => setIntervalSecs(opt.secs)}
             >
-              {opt.label}
+              {t(`charts.typeRatio.intervals.${opt.labelKey}`)}
             </Button>
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">
-            Interpolation
+            {t('charts.typeRatio.interpolation')}
           </span>
           {INTERPOLATION_OPTIONS.map((opt) => (
             <Button
@@ -265,7 +284,7 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
               aria-pressed={interpolation === opt.type}
               onClick={() => setInterpolation(opt.type)}
             >
-              {opt.label}
+              {t(`charts.typeRatio.${opt.labelKey}`)}
             </Button>
           ))}
         </div>
@@ -273,7 +292,7 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
 
       {!hasRound ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          The current round hasn&apos;t started yet.
+          {t('charts.typeRatio.notStarted')}
         </p>
       ) : isLoading ? (
         <div className="flex justify-center py-16">
@@ -281,22 +300,19 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
         </div>
       ) : isError ? (
         <ErrorState
-          title="Failed to load gesture-type distribution"
-          message="Could not fetch the gesture-type composition for the current round."
+          title={t('charts.typeRatio.loadErrorTitle')}
+          message={t('charts.typeRatio.loadErrorMessage')}
           onRetry={() => refetch()}
         />
       ) : chartData.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          No gesture activity in the current round yet.
+          {t('charts.typeRatio.empty')}
         </p>
       ) : (
         <RatioAreaChart data={chartData} interpolation={interpolation} withTime={withTime} />
       )}
 
-      <p className="text-xs text-muted-foreground">
-        Each sample is the gesture-type mix within that window (per-interval, not cumulative).
-        Windows with no gestures show 0% for all types.
-      </p>
+      <p className="text-xs text-muted-foreground">{t('charts.typeRatio.description')}</p>
     </div>
   );
 };

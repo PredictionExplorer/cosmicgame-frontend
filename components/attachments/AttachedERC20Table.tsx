@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import { getExplorerUrl, shortenHex } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -50,7 +51,7 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(token.TimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={token.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
 
@@ -248,7 +249,7 @@ function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
             return (
               <tr key={`${token.EvtLogId}-${token.TxHash}-${token.TokenAddr}`}>
                 <td className="border border-foreground/15 p-2">
-                  {convertTimestampToDateTime(token.TimeStamp, false, locale)}
+                  <HydrationSafeDateTime timestamp={token.TimeStamp} locale={locale} />
                 </td>
                 <td className="border border-foreground/15 p-2 text-center">{token.RoundNum}</td>
                 <td className="border border-foreground/15 p-2 font-mono break-all">

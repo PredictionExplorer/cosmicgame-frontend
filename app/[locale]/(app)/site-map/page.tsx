@@ -14,7 +14,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations('meta');
+  const t = await getTranslations({ locale, namespace: 'meta' });
   return createMetadata(t('siteMap.title'), t('siteMap.description'), undefined, '/site-map', {
     locale,
   });
@@ -23,8 +23,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [meta, t] = await Promise.all([getTranslations('meta'), getTranslations('siteMap')]);
+  const [meta, t] = await Promise.all([
+    getTranslations({ locale, namespace: 'meta' }),
+    getTranslations({ locale, namespace: 'siteMap' }),
+  ]);
   const description = meta('siteMap.description');
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
 
   return (
     <>
@@ -34,6 +38,7 @@ export default async function Page({ params }: PageProps) {
             name: t('page.jsonLdName'),
             description,
             url: localeHref(APP_ORIGIN, '/site-map', locale),
+            inLanguage,
           }),
           breadcrumbJsonLd(
             [

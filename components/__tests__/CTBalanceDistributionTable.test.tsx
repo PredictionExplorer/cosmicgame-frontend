@@ -6,7 +6,7 @@ import '@testing-library/jest-dom';
 describe('CTBalanceDistributionTable', () => {
   test('with no records', () => {
     render(<CTBalanceDistributionTable list={[]} />);
-    expect(screen.getByText('No tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.tokens')).toBeInTheDocument();
   });
 
   test('with mock data', () => {

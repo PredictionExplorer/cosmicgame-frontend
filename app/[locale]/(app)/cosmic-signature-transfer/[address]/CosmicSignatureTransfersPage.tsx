@@ -7,9 +7,10 @@ import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, convertTimestampToDateTime, getWalletKind } from '@/utils';
+import { getExplorerUrl, getWalletKind } from '@/utils';
 
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import {
@@ -54,7 +55,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(row.TimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
 

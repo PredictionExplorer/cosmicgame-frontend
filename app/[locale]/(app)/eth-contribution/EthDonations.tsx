@@ -22,7 +22,8 @@ import { isUserRejection, reportError } from '@/utils/errors';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 
 const EthDonations = () => {
-  const t = useTranslations('toasts');
+  const t = useTranslations('ethContribution');
+  const tToast = useTranslations('toasts');
   const [donateAmount, setDonateAmount] = useState('');
   const [donateInformation, setDonationInformation] = useState('');
   const [submitting, setSubmitting] = useState<'plain' | 'withInfo' | null>(null);
@@ -37,7 +38,7 @@ const EthDonations = () => {
   const handleDonate = async () => {
     if (!account) {
       setNotification({
-        text: t('contribution.connectWallet'),
+        text: tToast('contribution.connectWallet'),
         type: 'error',
         visible: true,
       });
@@ -45,7 +46,7 @@ const EthDonations = () => {
     }
     if (!cosmicGameContract) {
       setNotification({
-        text: t('contribution.contractUnavailable'),
+        text: tToast('contribution.contractUnavailable'),
         type: 'error',
         visible: true,
       });
@@ -60,7 +61,7 @@ const EthDonations = () => {
       assertSuccessfulTransactionReceipt(receipt);
 
       setNotification({
-        text: t('contribution.submitted', { amount: donateAmount }),
+        text: tToast('contribution.submitted', { amount: donateAmount }),
         type: 'success',
         visible: true,
       });
@@ -70,14 +71,14 @@ const EthDonations = () => {
     } catch (error: unknown) {
       if (isUserRejection(error)) {
         setNotification({
-          text: t('walletTransactionCancelled'),
+          text: tToast('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });
       } else {
         reportError(error, 'Contribution error');
         setNotification({
-          text: t('contribution.failed'),
+          text: tToast('contribution.failed'),
           type: 'error',
           visible: true,
         });
@@ -90,7 +91,7 @@ const EthDonations = () => {
   const handleDonateWithInfo = async () => {
     if (!account) {
       setNotification({
-        text: t('contribution.connectWallet'),
+        text: tToast('contribution.connectWallet'),
         type: 'error',
         visible: true,
       });
@@ -98,7 +99,7 @@ const EthDonations = () => {
     }
     if (!cosmicGameContract) {
       setNotification({
-        text: t('contribution.contractUnavailable'),
+        text: tToast('contribution.contractUnavailable'),
         type: 'error',
         visible: true,
       });
@@ -116,7 +117,7 @@ const EthDonations = () => {
       assertSuccessfulTransactionReceipt(receipt);
 
       setNotification({
-        text: t('contribution.submittedWithInfo', { amount: donateAmount }),
+        text: tToast('contribution.submittedWithInfo', { amount: donateAmount }),
         type: 'success',
         visible: true,
       });
@@ -127,14 +128,14 @@ const EthDonations = () => {
     } catch (error: unknown) {
       if (isUserRejection(error)) {
         setNotification({
-          text: t('walletTransactionCancelled'),
+          text: tToast('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });
       } else {
         reportError(error, 'Contribution with info error');
         setNotification({
-          text: t('contribution.failedWithInfo'),
+          text: tToast('contribution.failedWithInfo'),
           type: 'error',
           visible: true,
         });
@@ -146,27 +147,26 @@ const EthDonations = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        title="ETH Contributions"
-        titleLevel={2}
-        subtitle="Contribute ETH directly to the Cosmic Signature Public Goods Vault"
-      />
+      <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Contribute ETH directly to the Cosmic Signature Public Goods Vault to support beneficiaries
-        selected through Cosmic Council coordination. You can include an optional title, message,
-        and URL with your contribution. Top contributors for each cycle may be featured on the home
-        page.
+        {t('page.description')}
       </p>
 
       {!!account && (
         <div className="mb-12 rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 space-y-4">
           <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Make a Contribution
+            {t('page.formTitle')}
           </h3>
           <div>
-            <Label className="text-xs text-muted-foreground mb-1.5 block">Amount (ETH)</Label>
+            <Label
+              htmlFor="eth-contribution-page-amount"
+              className="text-xs text-muted-foreground mb-1.5 block"
+            >
+              {t('page.amountLabel')}
+            </Label>
             <div className="flex items-center gap-2">
               <Input
+                id="eth-contribution-page-amount"
                 placeholder="0.0"
                 type="number"
                 value={donateAmount}
@@ -177,14 +177,19 @@ const EthDonations = () => {
             </div>
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground mb-1.5 block">
-              Information <span className="opacity-50">(optional, JSON)</span>
+            <Label
+              htmlFor="eth-contribution-page-information"
+              className="text-xs text-muted-foreground mb-1.5 block"
+            >
+              {t('page.informationLabel')}{' '}
+              <span className="opacity-50">{t('page.optionalJson')}</span>
             </Label>
             <textarea
+              id="eth-contribution-page-information"
               value={donateInformation}
               rows={3}
               className="flex w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
-              placeholder='{"name": "Your Name", "message": "..."}'
+              placeholder={t('page.informationPlaceholder')}
               onChange={(e) => setDonationInformation(e.target.value)}
             />
           </div>
@@ -193,20 +198,22 @@ const EthDonations = () => {
               disabled={!donateAmount || donateAmount === '0' || submitting !== null}
               onClick={handleDonate}
             >
-              {submitting === 'plain' ? t('contribution.submitting') : 'Contribute'}
+              {submitting === 'plain' ? tToast('contribution.submitting') : t('page.contribute')}
             </Button>
             <Button
               variant="outline"
               disabled={!donateAmount || donateAmount === '0' || submitting !== null}
               onClick={handleDonateWithInfo}
             >
-              {submitting === 'withInfo' ? t('contribution.submitting') : 'Contribute with Info'}
+              {submitting === 'withInfo'
+                ? tToast('contribution.submitting')
+                : t('page.contributeWithInfo')}
             </Button>
           </div>
         </div>
       )}
 
-      <SectionDivider title="Contribution History" className="mb-6" />
+      <SectionDivider title={t('page.historyTitle')} className="mb-6" />
       {isLoading || charityDonations === null ? (
         <div className="flex justify-center py-8">
           <Spinner />

@@ -56,16 +56,22 @@ beforeAll(async () => {
 });
 
 describe('Root layout metadata (shared by both route groups)', () => {
-  it('both root layouts produce the same site-wide metadata defaults', () => {
-    expect(landingMetadata).toEqual(metadata);
+  it('shares copy defaults while keeping host-specific origins', () => {
+    expect(landingMetadata.title).toEqual(metadata.title);
+    expect(landingMetadata.description).toBe(metadata.description);
+    expect(landingMetadata.keywords).toEqual(metadata.keywords);
     expect(landingViewport).toBe(viewport);
+    expect(metadata.metadataBase).toEqual(new URL('https://app.cosmicsignature.com'));
+    expect(landingMetadata.metadataBase).toEqual(new URL('https://cosmicsignature.com'));
   });
 
-  it('localizes og:locale per the [locale] segment', async () => {
+  it('localizes og:locale and each root canonical per the [locale] segment', async () => {
     const zh = await generateMetadata(paramsFor('zh'));
     expect((zh.openGraph as { locale?: string }).locale).toBe('zh_CN');
+    expect(zh.alternates?.canonical).toBe('https://app.cosmicsignature.com/zh');
     const zhLanding = await landingGenerateMetadata(paramsFor('zh'));
     expect((zhLanding.openGraph as { locale?: string }).locale).toBe('zh_CN');
+    expect(zhLanding.alternates?.canonical).toBe('https://cosmicsignature.com/zh');
   });
 
   it('exports metadata with correct default title', () => {
@@ -78,8 +84,8 @@ describe('Root layout metadata (shared by both route groups)', () => {
     expect(metadata.description).not.toMatch(/strategy bidding game/i);
   });
 
-  it('exports metadata with metadataBase', () => {
-    expect(metadata.metadataBase).toEqual(new URL('https://cosmicsignature.com'));
+  it('exports metadata with the app metadataBase', () => {
+    expect(metadata.metadataBase).toEqual(new URL('https://app.cosmicsignature.com'));
   });
 
   it('exports metadata with openGraph', () => {
@@ -161,8 +167,11 @@ describe('Root layout metadata (shared by both route groups)', () => {
     );
   });
 
-  it('sets the canonical URL to the marketing host (not the app subdomain)', () => {
+  it('sets host-correct English root canonicals', () => {
     expect(metadata.alternates).toEqual(
+      expect.objectContaining({ canonical: 'https://app.cosmicsignature.com' }),
+    );
+    expect(landingMetadata.alternates).toEqual(
       expect.objectContaining({ canonical: 'https://cosmicsignature.com' }),
     );
   });

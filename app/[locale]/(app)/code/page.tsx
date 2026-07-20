@@ -1,36 +1,54 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { APP_ORIGIN } from '@/lib/hostRouting';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 import { CodeSeoSummary } from './CodeSeoSummary';
 import CodeViewer from './CodeViewer';
 
-const description =
-  'Explore the Cosmic Signature source code, rendering pipeline, contract repository, verification workflow, and CC0 public-domain license.';
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export const metadata: Metadata = createMetadata(
-  'Cosmic Signature Source Code | CC0 On-Chain Art Protocol',
-  description,
-  undefined,
-  '/code',
-);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(t('code.title'), t('code.description'), undefined, '/code', { locale });
+}
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const [meta, code] = await Promise.all([
+    getTranslations({ locale, namespace: 'meta' }),
+    getTranslations({ locale, namespace: 'code' }),
+  ]);
+  const description = meta('code.description');
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const pageUrl = localeHref(APP_ORIGIN, '/code', locale);
+
   return (
     <>
       <JsonLd
         data={[
           webPageJsonLd({
-            name: 'Cosmic Signature Source Code',
+            name: code('seo.heading'),
             description,
-            url: `${APP_ORIGIN}/code`,
+            url: pageUrl,
+            inLanguage,
           }),
-          breadcrumbJsonLd([
-            { name: 'Home', path: '/' },
-            { name: 'Source Code', path: '/code' },
-          ]),
+          breadcrumbJsonLd(
+            [
+              {
+                name: locale === 'zh' ? '首页' : 'Home',
+                path: '/',
+              },
+              { name: locale === 'zh' ? '源代码' : 'Source Code', path: '/code' },
+            ],
+            localeHref(APP_ORIGIN, '/', locale),
+          ),
         ]}
       />
       <CodeSeoSummary />

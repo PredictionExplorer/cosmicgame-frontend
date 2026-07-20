@@ -14,6 +14,7 @@
     "contributors": "No contributors yet.",
     "publicGoods": "No public goods activity yet.",
     "stellarSelection": "No Stellar Selection allocations yet.",
+    "tokens": "No tokens yet.",
     "holders": "No holders yet.",
     "spenders": "No spenders yet.",
     "enduranceChampions": "No endurance champions yet.",
@@ -233,6 +234,7 @@
   "recipientHistory": {
     "notApplicable": "N/A",
     "unretrievedHelp": "Unclaimed, go to Pending Winnings to claim.",
+    "unretrievedAria": "Unretrieved allocation information",
     "types": {
       "mainEth": "Main ETH Allocation",
       "mainCst": "Main Signature Allocation CST",
@@ -336,5 +338,42 @@
     "distributed": "Distributed",
     "unretrievedDistributionEth": "Unretrieved Distribution (ETH)",
     "unretrieved": "Unretrieved"
+  },
+  "statisticsColumns": {
+    "ownerAddress": "Owner Address",
+    "numberOfTokensOwned": "Number of Tokens Owned",
+    "cstBalance": "Balance (CST)",
+    "contractAddress": "Contract Address",
+    "numberOfNfts": "Number of NFTs",
+    "namedNftTokenId": "Token Id",
+    "isRandomWalk": "Is RandomWalk",
+    "isAnchorHolder": "Is Anchor-holder"
+  },
+  "statisticsTooltips": {
+    "participantAddress": "Wallet address that made at least one indexed gesture.",
+    "numberOfGestures": "Total indexed gestures made by this wallet.",
+    "maxGestureEth": "Largest single ETH-denominated gesture recorded for this wallet.",
+    "recipientAddress": "Wallet address that received one or more indexed protocol allocations.",
+    "allocationsReceived": "Number of indexed allocations received by this wallet.",
+    "maxAllocationEth": "Largest ETH allocation indexed for this recipient.",
+    "allocationsSumEth": "Total ETH allocations indexed for this recipient.",
+    "contributorAddress": "Wallet address that contributed ETH to the protocol.",
+    "numberOfContributions": "Number of indexed ETH contribution transactions from this wallet.",
+    "totalContributedEth": "Total ETH contributed by this wallet.",
+    "ownerAddress": "Wallet address currently holding the token balance shown in this row.",
+    "numberOfTokensOwned": "Number of Cosmic Signature NFT ERC-721 tokens held by this wallet.",
+    "cstBalance": "Current CST ERC-20 balance for this wallet.",
+    "anchorHolderAddress": "Wallet address that anchored or released tokens.",
+    "numAnchorActions": "Number of indexed anchor transactions made by this wallet.",
+    "numReleaseActions": "Number of indexed release transactions made by this wallet.",
+    "totalImprintedTokens": "Total tokens imprinted for this anchor-holder through the relevant anchoring or allocation flow.",
+    "totalAnchoredTokens": "Current or cumulative anchored-token count reported for this wallet.",
+    "totalDistributionEth": "Total ETH Anchor Distribution indexed for this wallet.",
+    "unretrievedDistributionEth": "ETH Anchor Distribution still available for this wallet to retrieve.",
+    "systemRound": "Cycle or deployment context for this system event.",
+    "systemStarted": "Timestamp when this system event became active.",
+    "systemEnded": "Timestamp when the next system event replaced this one.",
+    "attachedNftContractAddress": "ERC-721 contract address for tokens attached to gestures.",
+    "attachedNftCount": "Number of NFTs from this contract that have been attached to gestures."
   }
 }

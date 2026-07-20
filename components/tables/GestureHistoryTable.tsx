@@ -6,16 +6,11 @@ import { formatUnits } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import {
-  shortenHex,
-  convertTimestampToDateTime,
-  formatSeconds,
-  getRWLKImageUrl,
-  getExplorerUrl,
-} from '@/utils';
+import { shortenHex, formatSeconds, getRWLKImageUrl, getExplorerUrl } from '@/utils';
 import ERC20_ABI from '@/contracts/CosmicToken.json';
 
 import { useRouter } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
@@ -145,7 +140,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
       onClick={handleRowClick}
     >
       <TablePrimaryCell className="whitespace-nowrap">
-        {convertTimestampToDateTime(history.TimeStamp, true, locale)}
+        <HydrationSafeDateTime timestamp={history.TimeStamp} showSecond locale={locale} />
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip>

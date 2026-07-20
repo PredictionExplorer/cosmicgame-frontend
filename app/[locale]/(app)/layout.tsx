@@ -5,6 +5,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { routing } from '@/i18n/routing';
+import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
 
 import { RootDocument } from '../../root-document';
@@ -31,11 +32,17 @@ export async function generateMetadata({ params }: Pick<LayoutProps, 'params'>):
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('meta');
-  const metadata = createRootMetadata({
-    defaultTitle: t('shared.defaultTitle'),
-    defaultOgTitle: t('shared.defaultOgTitle'),
-    defaultDescription: t('shared.defaultDescription'),
-  });
+  const metadata = createRootMetadata(
+    {
+      defaultTitle: t('shared.defaultTitle'),
+      defaultOgTitle: t('shared.defaultOgTitle'),
+      defaultDescription: t('shared.defaultDescription'),
+    },
+    {
+      origin: APP_ORIGIN,
+      canonical: localeHref(APP_ORIGIN, '/', locale),
+    },
+  );
   return {
     ...metadata,
     openGraph: { ...metadata.openGraph, locale: openGraphLocale(locale) },
@@ -61,11 +68,36 @@ export default async function AppRootLayout({ children, params }: LayoutProps) {
     notFound();
   }
   setRequestLocale(locale);
+  const seo = await getTranslations({ locale, namespace: 'seo' });
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
+  const appUrl = localeHref(APP_ORIGIN, '/', locale);
+  const protocolDescription = seo('jsonLd.app.protocolDescription');
 
   return (
     <RootDocument
       locale={locale}
-      headExtras={<JsonLd data={[websiteJsonLd(), organizationJsonLd(), webApplicationJsonLd()]} />}
+      headExtras={
+        <JsonLd
+          data={[
+            websiteJsonLd({
+              description: protocolDescription,
+              inLanguage,
+              url: landingUrl,
+            }),
+            organizationJsonLd({
+              description: protocolDescription,
+              url: landingUrl,
+            }),
+            webApplicationJsonLd({
+              browserRequirements: seo('jsonLd.app.browserRequirements'),
+              description: seo('jsonLd.app.webApplicationDescription'),
+              inLanguage,
+              url: appUrl,
+            }),
+          ]}
+        />
+      }
     >
       <NextIntlClientProvider>
         <Providers showAppChrome>{children}</Providers>

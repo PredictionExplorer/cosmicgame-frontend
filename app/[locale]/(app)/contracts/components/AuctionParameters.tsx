@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Copy, Check, ExternalLink, Gavel, Timer } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
@@ -86,6 +87,7 @@ function CharityRow({
   percentage?: number;
   explorerUrl: string;
 }) {
+  const t = useTranslations('contracts');
   const [copied, setCopied] = useState(false);
   const { copy } = useClipboard();
 
@@ -101,8 +103,10 @@ function CharityRow({
     <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium text-foreground">Public Goods Address</span>
-          <InfoTooltip content="The on-chain address currently receiving the Public Goods Allocation from the Public Goods Vault contract" />
+          <span className="text-sm font-medium text-foreground">
+            {t('parameters.publicGoodsAddress')}
+          </span>
+          <InfoTooltip content={t('parameters.publicGoodsAddressTooltip')} />
         </div>
         <div className="flex items-center gap-2">
           {percentage != null && (
@@ -111,7 +115,7 @@ function CharityRow({
           <button
             onClick={handleCopy}
             className="rounded-md p-1.5 text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-muted-foreground"
-            aria-label="Copy Public Goods address"
+            aria-label={t('parameters.copyPublicGoodsAria')}
           >
             {copied ? (
               <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -124,7 +128,7 @@ function CharityRow({
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-md p-1.5 text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-muted-foreground"
-            aria-label="View Public Goods address on block explorer"
+            aria-label={t('parameters.viewPublicGoodsAria')}
           >
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
@@ -151,13 +155,12 @@ export function AuctionParameters({
   raffleNftWinnersStaking,
   loading = false,
 }: AuctionParametersProps) {
+  const locale = useLocale();
+  const t = useTranslations('contracts');
   if (loading) {
     return (
       <div>
-        <SectionDivider
-          title="Calibration Window & Stellar Selection Parameters"
-          className="mb-4"
-        />
+        <SectionDivider title={t('parameters.title')} className="mb-4" />
         <div className="grid gap-3 sm:grid-cols-2">
           <Skeleton className="h-40 rounded-xl" />
           <Skeleton className="h-40 rounded-xl" />
@@ -173,7 +176,7 @@ export function AuctionParameters({
 
   return (
     <div>
-      <SectionDivider title="Calibration Window & Stellar Selection Parameters" className="mb-4" />
+      <SectionDivider title={t('parameters.title')} className="mb-4" />
 
       <motion.div
         className="grid gap-3 sm:grid-cols-2"
@@ -183,24 +186,26 @@ export function AuctionParameters({
       >
         <motion.div variants={fadeUp}>
           <AuctionCard
-            title="CST Calibration Window"
+            title={t('parameters.cstTitle')}
             icon={<Gavel className="h-4 w-4" />}
             items={[
               {
-                label: 'Duration',
-                value: formatSeconds(cstDurations.AuctionDuration),
-                tooltip: `Live stored duration of the CST Calibration Window. CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%; ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
+                label: t('parameters.duration'),
+                value: formatSeconds(cstDurations.AuctionDuration, locale),
+                tooltip: t('parameters.cstDurationTooltip', {
+                  increase: protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+                  decrease: protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+                }),
               },
               {
-                label: 'Elapsed Duration',
-                value: formatSeconds(cstDurations.ElapsedDuration),
-                tooltip: 'Time already elapsed in the current CST Calibration Window',
+                label: t('parameters.elapsed'),
+                value: formatSeconds(cstDurations.ElapsedDuration, locale),
+                tooltip: t('parameters.cstElapsedTooltip'),
               },
               {
-                label: 'Calibration Ceiling',
+                label: t('parameters.ceiling'),
                 value: `${cstBeginningBidPrice} CST`,
-                tooltip:
-                  'Starting Gesture Cost of the CST Calibration Window currently displayed. The cost descends linearly across the live stored duration.',
+                tooltip: t('parameters.cstCeilingTooltip'),
               },
             ]}
           />
@@ -208,19 +213,18 @@ export function AuctionParameters({
 
         <motion.div variants={fadeUp}>
           <AuctionCard
-            title="ETH Calibration Window"
+            title={t('parameters.ethTitle')}
             icon={<Timer className="h-4 w-4" />}
             items={[
               {
-                label: 'Duration',
-                value: formatSeconds(ethDurations.AuctionDuration),
-                tooltip:
-                  'Total duration of the ETH Calibration Window where Gesture Cost descends over time',
+                label: t('parameters.duration'),
+                value: formatSeconds(ethDurations.AuctionDuration, locale),
+                tooltip: t('parameters.ethDurationTooltip'),
               },
               {
-                label: 'Elapsed Duration',
-                value: formatSeconds(ethDurations.ElapsedDuration),
-                tooltip: 'Time already elapsed in the current ETH Calibration Window',
+                label: t('parameters.elapsed'),
+                value: formatSeconds(ethDurations.ElapsedDuration, locale),
+                tooltip: t('parameters.ethElapsedTooltip'),
               },
             ]}
           />
@@ -241,19 +245,19 @@ export function AuctionParameters({
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <StatCard
-          label="ETH Stellar Selection Recipients"
+          label={t('parameters.selection.ethLabel')}
           value={raffleEthWinners ?? '--'}
-          tooltip="Number of participants randomly selected to receive ETH allocations each cycle"
+          tooltip={t('parameters.selection.ethTooltip')}
         />
         <StatCard
-          label="NFT Stellar Selection (Participants)"
+          label={t('parameters.selection.nftLabel')}
           value={raffleNftWinnersBidding ?? '--'}
-          tooltip="Number of participants randomly selected to receive Cosmic Signature NFTs each cycle"
+          tooltip={t('parameters.selection.nftTooltip')}
         />
         <StatCard
-          label="NFT Stellar Selection (Anchored RWLK)"
+          label={t('parameters.selection.anchorLabel')}
           value={raffleNftWinnersStaking ?? '--'}
-          tooltip="Number of RandomWalk NFT anchor-holders randomly selected to receive Cosmic Signature NFTs each cycle"
+          tooltip={t('parameters.selection.anchorTooltip')}
         />
       </div>
     </div>

@@ -2,16 +2,12 @@
 
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import {
-  formatSeconds,
-  formatEthValue,
-  getExplorerUrl,
-  shortenHex,
-  convertTimestampToDateTime,
-} from '@/utils';
+import { formatSeconds, formatEthValue, getExplorerUrl, shortenHex } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -42,12 +38,6 @@ import type {
 
 const PER_PAGE = 10;
 
-const ASSET_LABEL: Record<ClaimUnclaimedItem['AssetType'], string> = {
-  ETH: 'ETH',
-  ERC721: 'Attached NFT',
-  ERC20: 'Attached ERC-20',
-};
-
 /** Delegates to the shared address shortener so truncation is consistent app-wide. */
 const shortAddr = (a: string) => shortenHex(a);
 
@@ -62,6 +52,7 @@ const CountBadge = ({ n, label }: { n: number; label: string }) => {
 };
 
 const ItemDetail = ({ item }: { item: ClaimUnclaimedItem }) => {
+  const locale = useLocale();
   if (item.AssetType === 'ETH') {
     return <span>{formatEthValue(item.AmountEth)}</span>;
   }
@@ -74,7 +65,7 @@ const ItemDetail = ({ item }: { item: ClaimUnclaimedItem }) => {
   }
   return (
     <span className="text-muted-foreground">
-      {item.AmountEth.toLocaleString()} ·{' '}
+      {item.AmountEth.toLocaleString(locale)} ·{' '}
       <span className="font-mono">{shortAddr(item.TokenAddr)}</span>
     </span>
   );
@@ -88,61 +79,82 @@ const UnclaimedDialog = ({
   cycle: RoundClaimSummary | null;
   nowSec: number;
   onClose: () => void;
-}) => (
-  <Dialog open={!!cycle} onOpenChange={(open) => !open && onClose()}>
-    <DialogContent className="max-w-xl">
-      {cycle && (
-        <>
-          <DialogHeader>
-            <DialogTitle>Unclaimed assets — Cycle {cycle.RoundNum}</DialogTitle>
-            <DialogDescription>
-              {cycle.Expired
-                ? 'The claim window has closed — these assets can now be swept by anyone.'
-                : `Claim window closes in ${formatSeconds(
-                    Math.max(0, cycle.ClaimWindowTimeout - nowSec),
-                  )}.`}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-[60vh] overflow-auto">
-            <TablePrimaryContainer>
-              <TablePrimary>
-                <TablePrimaryHead>
-                  <Tr>
-                    <TablePrimaryHeadCell align="left">Asset</TablePrimaryHeadCell>
-                    <TablePrimaryHeadCell align="left">Recipient</TablePrimaryHeadCell>
-                    <TablePrimaryHeadCell align="right">Detail</TablePrimaryHeadCell>
-                  </Tr>
-                </TablePrimaryHead>
-                <tbody>
-                  {cycle.UnclaimedItems.map((item, idx) => (
-                    <TablePrimaryRow
-                      key={`${item.AssetType}-${item.TokenAddr ?? ''}-${item.TokenId ?? ''}-${item.RecipientAddr ?? idx}`}
-                    >
-                      <TablePrimaryCell>{ASSET_LABEL[item.AssetType]}</TablePrimaryCell>
-                      <TablePrimaryCell>
-                        {item.RecipientAddr ? (
-                          <AddressLink
-                            address={item.RecipientAddr}
-                            url={`/user/${item.RecipientAddr}`}
-                          />
-                        ) : (
-                          '—'
-                        )}
-                      </TablePrimaryCell>
-                      <TablePrimaryCell align="right">
-                        <ItemDetail item={item} />
-                      </TablePrimaryCell>
-                    </TablePrimaryRow>
-                  ))}
-                </tbody>
-              </TablePrimary>
-            </TablePrimaryContainer>
-          </div>
-        </>
-      )}
-    </DialogContent>
-  </Dialog>
-);
+}) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
+  const assetLabel: Record<ClaimUnclaimedItem['AssetType'], string> = {
+    ETH: t('performance.claims.assets.eth'),
+    ERC721: t('performance.claims.assets.nft'),
+    ERC20: t('performance.claims.assets.erc20'),
+  };
+
+  return (
+    <Dialog open={!!cycle} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-xl">
+        {cycle && (
+          <>
+            <DialogHeader>
+              <DialogTitle>
+                {t('performance.claims.dialog.unclaimedTitle', { cycle: cycle.RoundNum })}
+              </DialogTitle>
+              <DialogDescription>
+                {cycle.Expired
+                  ? t('performance.claims.dialog.expired')
+                  : t('performance.claims.dialog.closesIn', {
+                      duration: formatSeconds(
+                        Math.max(0, cycle.ClaimWindowTimeout - nowSec),
+                        locale,
+                      ),
+                    })}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="max-h-[60vh] overflow-auto">
+              <TablePrimaryContainer>
+                <TablePrimary>
+                  <TablePrimaryHead>
+                    <Tr>
+                      <TablePrimaryHeadCell align="left">
+                        {t('performance.claims.dialog.asset')}
+                      </TablePrimaryHeadCell>
+                      <TablePrimaryHeadCell align="left">
+                        {t('performance.claims.dialog.recipient')}
+                      </TablePrimaryHeadCell>
+                      <TablePrimaryHeadCell align="right">
+                        {t('performance.claims.dialog.detail')}
+                      </TablePrimaryHeadCell>
+                    </Tr>
+                  </TablePrimaryHead>
+                  <tbody>
+                    {cycle.UnclaimedItems.map((item, idx) => (
+                      <TablePrimaryRow
+                        key={`${item.AssetType}-${item.TokenAddr ?? ''}-${item.TokenId ?? ''}-${item.RecipientAddr ?? idx}`}
+                      >
+                        <TablePrimaryCell>{assetLabel[item.AssetType]}</TablePrimaryCell>
+                        <TablePrimaryCell>
+                          {item.RecipientAddr ? (
+                            <AddressLink
+                              address={item.RecipientAddr}
+                              url={`/user/${item.RecipientAddr}`}
+                            />
+                          ) : (
+                            '—'
+                          )}
+                        </TablePrimaryCell>
+                        <TablePrimaryCell align="right">
+                          <ItemDetail item={item} />
+                        </TablePrimaryCell>
+                      </TablePrimaryRow>
+                    ))}
+                  </tbody>
+                </TablePrimary>
+              </TablePrimaryContainer>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 const TxLink = ({ hash }: { hash: string }) =>
   hash ? (
@@ -159,11 +171,13 @@ const TxLink = ({ hash }: { hash: string }) =>
   );
 
 const TxnAssetDetail = ({ txn }: { txn: ClaimTxn }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   if (txn.AssetType === 'ETH') return <span>{formatEthValue(txn.AmountEth)}</span>;
   if (txn.AssetType === 'ERC721')
     return (
       <span>
-        Attached NFT{' '}
+        {t('performance.claims.assets.nft')}{' '}
         <a
           href={getExplorerUrl('address', txn.TokenAddr)}
           target="_blank"
@@ -177,7 +191,7 @@ const TxnAssetDetail = ({ txn }: { txn: ClaimTxn }) => {
     );
   return (
     <span>
-      {txn.AmountEth.toLocaleString()}{' '}
+      {txn.AmountEth.toLocaleString(locale)}{' '}
       <a
         href={getExplorerUrl('address', txn.TokenAddr)}
         target="_blank"
@@ -192,6 +206,8 @@ const TxnAssetDetail = ({ txn }: { txn: ClaimTxn }) => {
 
 /** Explore dialog: the claim transactions (with latency) + tokens attached this cycle. */
 const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: () => void }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const { data, isLoading } = useClaimDetailByRound(round);
   const claims: ClaimTxn[] = data?.ClaimTransactions ?? [];
   const attached: AttachedToken[] = data?.AttachedTokens ?? [];
@@ -200,11 +216,10 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
     <Dialog open={round != null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[883px]">
         <DialogHeader>
-          <DialogTitle>Explore Cycle {round}</DialogTitle>
-          <DialogDescription>
-            Claim transactions with how long each recipient took, and the tokens attached this
-            cycle.
-          </DialogDescription>
+          <DialogTitle>
+            {t('performance.claims.dialog.exploreTitle', { cycle: round ?? 0 })}
+          </DialogTitle>
+          <DialogDescription>{t('performance.claims.dialog.exploreDescription')}</DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
@@ -214,19 +229,33 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
         ) : (
           <div className="max-h-[65vh] space-y-6 overflow-auto">
             <div>
-              <h4 className="mb-2 text-sm font-semibold text-white">Claim transactions</h4>
+              <h4 className="mb-2 text-sm font-semibold text-white">
+                {t('performance.claims.dialog.claimTransactions')}
+              </h4>
               {claims.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No claims recorded for this cycle.</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('performance.claims.dialog.noClaims')}
+                </p>
               ) : (
                 <TablePrimaryContainer>
                   <TablePrimary>
                     <TablePrimaryHead>
                       <Tr>
-                        <TablePrimaryHeadCell align="left">Asset</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="left">Recipient</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="right">Claimed After</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="left">When</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="right">Transaction</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">
+                          {t('performance.claims.dialog.asset')}
+                        </TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">
+                          {t('performance.claims.dialog.recipient')}
+                        </TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="right">
+                          {t('performance.claims.dialog.claimedAfter')}
+                        </TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">
+                          {t('performance.claims.dialog.when')}
+                        </TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="right">
+                          {t('performance.claims.dialog.transaction')}
+                        </TablePrimaryHeadCell>
                       </Tr>
                     </TablePrimaryHead>
                     <tbody>
@@ -244,15 +273,17 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                               txn.BeneficiaryAddr.toLowerCase() !==
                                 txn.RecipientAddr.toLowerCase() && (
                                 <span className="block text-xs text-red-400">
-                                  swept by {shortAddr(txn.BeneficiaryAddr)}
+                                  {t('performance.claims.dialog.sweptBy', {
+                                    address: shortAddr(txn.BeneficiaryAddr),
+                                  })}
                                 </span>
                               )}
                           </TablePrimaryCell>
                           <TablePrimaryCell align="right">
-                            {formatSeconds(Math.max(0, txn.ClaimedAfterSecs))}
+                            {formatSeconds(Math.max(0, txn.ClaimedAfterSecs), locale)}
                           </TablePrimaryCell>
                           <TablePrimaryCell>
-                            {convertTimestampToDateTime(txn.ClaimTs)}
+                            <HydrationSafeDateTime timestamp={txn.ClaimTs} locale={locale} />
                           </TablePrimaryCell>
                           <TablePrimaryCell align="right">
                             <TxLink hash={txn.TxHash} />
@@ -266,26 +297,42 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
             </div>
 
             <div>
-              <h4 className="mb-2 text-sm font-semibold text-white">Attached tokens</h4>
+              <h4 className="mb-2 text-sm font-semibold text-white">
+                {t('performance.claims.dialog.attachedTokens')}
+              </h4>
               {attached.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No tokens attached this cycle.</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('performance.claims.dialog.noAttached')}
+                </p>
               ) : (
                 <TablePrimaryContainer>
                   <TablePrimary>
                     <TablePrimaryHead>
                       <Tr>
-                        <TablePrimaryHeadCell align="left">Asset</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="left">Token</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="right">Detail</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="left">Attached By</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="right">Transaction</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">
+                          {t('performance.claims.dialog.asset')}
+                        </TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">
+                          {t('performance.claims.dialog.token')}
+                        </TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="right">
+                          {t('performance.claims.dialog.detail')}
+                        </TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">
+                          {t('performance.claims.dialog.attachedBy')}
+                        </TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="right">
+                          {t('performance.claims.dialog.transaction')}
+                        </TablePrimaryHeadCell>
                       </Tr>
                     </TablePrimaryHead>
                     <tbody>
                       {attached.map((tok, idx) => (
                         <TablePrimaryRow key={tok.TxHash ? `${tok.TxHash}-${idx}` : idx}>
                           <TablePrimaryCell>
-                            {tok.AssetType === 'ERC721' ? 'Attached NFT' : 'Attached ERC-20'}
+                            {tok.AssetType === 'ERC721'
+                              ? t('performance.claims.assets.nft')
+                              : t('performance.claims.assets.erc20')}
                           </TablePrimaryCell>
                           <TablePrimaryCell>
                             <a
@@ -300,7 +347,7 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                           <TablePrimaryCell align="right">
                             {tok.AssetType === 'ERC721'
                               ? `#${tok.TokenId}`
-                              : tok.AmountEth.toLocaleString()}
+                              : tok.AmountEth.toLocaleString(locale)}
                           </TablePrimaryCell>
                           <TablePrimaryCell>
                             <AddressLink
@@ -369,6 +416,8 @@ const Row = ({
   onOpen: (c: RoundClaimSummary) => void;
   onExplore: (round: number) => void;
 }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   if (!cycle) return <TablePrimaryRow />;
 
   const hasUnclaimed = cycle.TotalUnclaimed > 0;
@@ -389,9 +438,11 @@ const Row = ({
             type="button"
             onClick={() => onOpen(cycle)}
             className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:border-primary/60 hover:bg-primary/15"
-            title="View unclaimed assets"
+            title={t('performance.claims.viewUnclaimed')}
           >
-            {cycle.TotalUnclaimed} unclaimed
+            {t('performance.claims.unclaimedCount', {
+              count: cycle.TotalUnclaimed.toLocaleString(locale),
+            })}
             {cycle.EthUnclaimedEth > 0 && (
               <span className="text-muted-foreground">
                 · {formatEthValue(cycle.EthUnclaimedEth)}
@@ -399,7 +450,7 @@ const Row = ({
             )}
           </button>
         ) : (
-          <span className="text-muted-foreground">All claimed</span>
+          <span className="text-muted-foreground">{t('performance.claims.allClaimed')}</span>
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
@@ -407,7 +458,7 @@ const Row = ({
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {cycle.AvgClaimPeriodSecs > 0 ? (
-          formatSeconds(cycle.AvgClaimPeriodSecs)
+          formatSeconds(cycle.AvgClaimPeriodSecs, locale)
         ) : (
           <span className="text-muted-foreground">—</span>
         )}
@@ -418,7 +469,7 @@ const Row = ({
           onClick={() => onExplore(cycle.RoundNum)}
           className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white transition-colors hover:border-white/30 hover:bg-white/[0.08]"
         >
-          Explore
+          {t('performance.claims.explore')}
         </button>
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -426,6 +477,7 @@ const Row = ({
 };
 
 export const ClaimsByRoundSection = () => {
+  const t = useTranslations('statistics');
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<RoundClaimSummary | null>(null);
   const [exploreRound, setExploreRound] = useState<number | null>(null);
@@ -439,10 +491,7 @@ export const ClaimsByRoundSection = () => {
   return (
     <div className="space-y-4">
       <p className="text-sm leading-6 text-muted-foreground">
-        Claimable assets awarded each cycle — secondary ETH allocations, attached NFTs, and attached
-        ERC-20s that recipients withdraw themselves. Directly-paid assets (main ETH, imprinted CST
-        and NFTs) are excluded, since they aren&apos;t claimed. Recipients normally claim right
-        away; anything left past the claim window can be swept by anyone.
+        {t('performance.claims.description')}
       </p>
 
       {isLoading ? (
@@ -451,25 +500,37 @@ export const ClaimsByRoundSection = () => {
         </div>
       ) : isError ? (
         <ErrorState
-          title="Failed to load allocation claims"
-          message="The statistics service did not respond. Try again in a moment."
+          title={t('performance.claims.loadErrorTitle')}
+          message={t('performance.claims.loadErrorMessage')}
           onRetry={() => refetch()}
           className="py-10"
         />
       ) : list.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">No claimable assets awarded yet.</p>
+        <p className="py-8 text-center text-muted-foreground">{t('performance.claims.empty')}</p>
       ) : (
         <>
           <TablePrimaryContainer>
             <TablePrimary>
               <TablePrimaryHead>
                 <Tr>
-                  <TablePrimaryHeadCell align="center">Cycle</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="left">Awarded (claimable)</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Unclaimed</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Claimed %</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Avg Claim Time</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Details</TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="center">
+                    {t('performance.claims.columns.cycle')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="left">
+                    {t('performance.claims.columns.awarded')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.claims.columns.unclaimed')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.claims.columns.claimedPercent')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.claims.columns.averageTime')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.claims.columns.details')}
+                  </TablePrimaryHeadCell>
                 </Tr>
               </TablePrimaryHead>
               <tbody>

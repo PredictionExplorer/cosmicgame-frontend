@@ -1,23 +1,59 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import Imprint from './Imprint';
 
-export const metadata: Metadata = createMetadata(
-  'Imprint RandomWalk NFT | Cosmic Signature',
-  'Imprint a RandomWalk NFT on Cosmic Signature. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% Gesture-Cost discount.',
-  undefined,
-  '/imprint',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(t('mint.title'), t('mint.description'), undefined, '/imprint', { locale });
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const [meta, imprint] = await Promise.all([
+    getTranslations({ locale, namespace: 'meta' }),
+    getTranslations({ locale, namespace: 'imprint' }),
+  ]);
+  const description = meta('mint.description');
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const pageUrl = localeHref(APP_ORIGIN, '/imprint', locale);
+
   return (
     <>
+      <JsonLd
+        data={[
+          webPageJsonLd({
+            name: imprint('seo.heading'),
+            description,
+            url: pageUrl,
+            inLanguage,
+          }),
+          breadcrumbJsonLd(
+            [
+              {
+                name: locale === 'zh' ? '首页' : 'Home',
+                path: '/',
+              },
+              { name: locale === 'zh' ? '铭刻' : 'Imprint', path: '/imprint' },
+            ],
+            localeHref(APP_ORIGIN, '/', locale),
+          ),
+        ]}
+      />
       <PublicDataRouteSeoSummary route="imprint" />
       <Imprint />
     </>

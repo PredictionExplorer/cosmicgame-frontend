@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getLearnContent } from '@/content/learn';
 
@@ -15,9 +15,9 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { hub } = getLearnContent(locale);
+  const t = await getTranslations({ locale, namespace: 'meta' });
 
-  return createMetadata(hub.meta.title, hub.meta.description, undefined, '/learn', {
+  return createMetadata(t('learn.title'), t('learn.description'), undefined, '/learn', {
     canonicalHost: 'landing',
     locale,
   });
@@ -27,7 +27,6 @@ export default async function LearnIndexPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const { hub, articles } = getLearnContent(locale);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
 
   return (
     <main id="main" tabIndex={-1} className="relative mx-auto max-w-6xl px-6 py-24 lg:py-32">
@@ -38,7 +37,6 @@ export default async function LearnIndexPage({ params }: PageProps) {
             { name: hub.breadcrumbs.learnLabel, path: '/learn' },
           ],
           localeHref(LANDING_ORIGIN, '/', locale),
-          inLanguage,
         )}
       />
       <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">{hub.eyebrow}</p>

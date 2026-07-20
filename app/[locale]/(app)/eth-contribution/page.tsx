@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -6,16 +7,28 @@ import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import EthDonations from './EthDonations';
 
-export const metadata: Metadata = createMetadata(
-  'Direct ETH Contributions | Cosmic Signature',
-  'Contribute ETH directly to the Cosmic Signature Public Goods Vault and view the complete contribution history. Support public goods while taking part in the protocol.',
-  undefined,
-  '/eth-contribution',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('ethContribution.title'),
+    t('ethContribution.description'),
+    undefined,
+    '/eth-contribution',
+    { locale },
+  );
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <PublicDataRouteSeoSummary route="eth-contribution" />

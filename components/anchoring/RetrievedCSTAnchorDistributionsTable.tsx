@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { convertTimestampToDateTime } from '@/utils';
-
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -34,7 +33,7 @@ const CollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(DepositTimeStamp, false, locale)}
+        <HydrationSafeDateTime timestamp={DepositTimeStamp} locale={locale} />
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>

@@ -1,8 +1,7 @@
 'use client';
 
 import { Coins, Gift, Layers, TrendingUp, Users } from 'lucide-react';
-
-import { statisticsCopy } from '@/content/statistics-copy';
+import { useTranslations } from 'next-intl';
 
 import {
   useCSTDistribution,
@@ -21,6 +20,7 @@ import { CSTTotalSupplyHistorySection } from '@/components/tokens/CSTTotalSupply
 
 /** Token distribution tables, CST supply history, and attached assets. */
 const TokensPanel = () => {
+  const t = useTranslations('statistics');
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo(undefined, {
     poll: false,
   });
@@ -35,25 +35,25 @@ const TokensPanel = () => {
     <div data-testid="tokens-panel">
       <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
         <StatCard
-          label={statisticsCopy.metrics.cosmicSignatureNftHolders.label}
+          label={t('metrics.cosmicSignatureNftHolders.label')}
           value={cstDistribution.length}
           icon={<Users className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.cosmicSignatureNftHolders.tooltip}
+          tooltip={t('metrics.cosmicSignatureNftHolders.tooltip')}
           loading={cstDistributionQuery.isLoading}
           featured
         />
         <StatCard
-          label={statisticsCopy.metrics.cstErc20Holders.label}
+          label={t('metrics.cstErc20Holders.label')}
           value={ctBalanceDistribution.length}
           icon={<Coins className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.cstErc20Holders.tooltip}
+          tooltip={t('metrics.cstErc20Holders.tooltip')}
           loading={ctBalanceQuery.isLoading}
         />
         <StatCard
-          label={statisticsCopy.metrics.attachedNfts.label}
+          label={t('metrics.attachedNfts.label')}
           value={Number(dashboardData?.NumDonatedNFTs ?? 0)}
           icon={<Gift className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.attachedNfts.tooltip}
+          tooltip={t('metrics.attachedNfts.tooltip')}
           loading={dashboardLoading}
           featured
         />
@@ -61,29 +61,29 @@ const TokensPanel = () => {
 
       <div className="space-y-8">
         <StatsSection
-          title="Cosmic Signature NFT (ERC-721)"
-          tooltip={statisticsCopy.sections.cosmicSignatureTokenDistribution}
+          title={t('tokens.sections.nftDistribution')}
+          tooltip={t('sectionTooltips.cosmicSignatureTokenDistribution')}
           icon={<Layers className="h-3.5 w-3.5" />}
           isLoading={cstDistributionQuery.isLoading}
           isError={cstDistributionQuery.isError}
           onRetry={() => cstDistributionQuery.refetch()}
           isEmpty={cstDistribution.length === 0}
-          emptyTitle="No Cosmic Signature NFTs imprinted yet"
-          emptyDescription="Owner distribution appears here once NFTs are imprinted."
+          emptyTitle={t('tokens.empty.nftTitle')}
+          emptyDescription={t('tokens.empty.nftDescription')}
         >
           <CSTokenDistributionTable list={cstDistribution} />
         </StatsSection>
 
         <StatsSection
-          title="CST (ERC-20) Balance Distribution"
-          tooltip={statisticsCopy.sections.cstBalanceDistribution}
+          title={t('tokens.sections.cstDistribution')}
+          tooltip={t('sectionTooltips.cstBalanceDistribution')}
           icon={<Coins className="h-3.5 w-3.5" />}
           isLoading={ctBalanceQuery.isLoading}
           isError={ctBalanceQuery.isError}
           onRetry={() => ctBalanceQuery.refetch()}
           isEmpty={ctBalanceDistribution.length === 0}
-          emptyTitle="No CST balances yet"
-          emptyDescription="Wallet balance distribution appears here once CST is in circulation."
+          emptyTitle={t('tokens.empty.cstTitle')}
+          emptyDescription={t('tokens.empty.cstDescription')}
         >
           <CTBalanceDistributionChart list={ctBalanceDistribution} />
           <div className="mt-4">
@@ -92,22 +92,22 @@ const TokensPanel = () => {
         </StatsSection>
 
         <StatsSection
-          title="CST Total Supply"
-          tooltip={statisticsCopy.sections.cstTotalSupply}
+          title={t('tokens.sections.totalSupply')}
+          tooltip={t('sectionTooltips.cstTotalSupply')}
           icon={<TrendingUp className="h-3.5 w-3.5" />}
         >
           <CSTTotalSupplyHistorySection />
         </StatsSection>
 
         <StatsSection
-          title="Attached Token Distribution"
-          tooltip={statisticsCopy.sections.attachedTokenDistribution}
+          title={t('tokens.sections.attachedDistribution')}
+          tooltip={t('sectionTooltips.attachedTokenDistribution')}
           icon={<Gift className="h-3.5 w-3.5" />}
           defaultOpen={false}
           lazy
           isLoading={dashboardLoading}
           isEmpty={(dashboardData?.MainStats.DonatedTokenDistribution ?? []).length === 0}
-          emptyTitle="No attached ERC-721 contracts yet"
+          emptyTitle={t('tokens.empty.contractsTitle')}
         >
           <AttachedNFTDistributionTable
             list={dashboardData?.MainStats.DonatedTokenDistribution ?? []}

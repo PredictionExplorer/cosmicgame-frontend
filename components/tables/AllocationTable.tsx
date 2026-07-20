@@ -3,8 +3,9 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { shortenHex } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link } from '@/i18n/navigation';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Button } from '@/components/ui/button';
@@ -73,7 +74,7 @@ function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
               </TooltipContent>
             </Tooltip>
             <span className="text-xs text-muted-foreground">
-              {convertTimestampToDateTime(allocation.TimeStamp, false, locale)}
+              <HydrationSafeDateTime timestamp={allocation.TimeStamp} locale={locale} />
             </span>
           </div>
 

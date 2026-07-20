@@ -3,8 +3,6 @@ import { Tr } from 'react-super-responsive-table';
 import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { statisticsCopy } from '@/content/statistics-copy';
-
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -55,27 +53,27 @@ export const UniqueAnchorHoldersRWLKTable = ({ list }: { list: UniqueAnchorHolde
       desktop: t('columns.anchorHolderAddress'),
       mobile: t('columns.holder'),
       align: 'left' as const,
-      tooltip: statisticsCopy.tables.anchorHolderAddress,
+      tooltip: t('statisticsTooltips.anchorHolderAddress'),
     },
     {
       desktop: t('uniqueAnchorHolders.numAnchorActions'),
       mobile: t('uniqueAnchorHolders.anchors'),
-      tooltip: statisticsCopy.tables.numAnchorActions,
+      tooltip: t('statisticsTooltips.numAnchorActions'),
     },
     {
       desktop: t('uniqueAnchorHolders.numReleaseActions'),
       mobile: t('uniqueAnchorHolders.releases'),
-      tooltip: statisticsCopy.tables.numReleaseActions,
+      tooltip: t('statisticsTooltips.numReleaseActions'),
     },
     {
       desktop: t('uniqueAnchorHolders.totalAnchoredTokens'),
       mobile: t('uniqueAnchorHolders.anchored'),
-      tooltip: statisticsCopy.tables.totalAnchoredTokens,
+      tooltip: t('statisticsTooltips.totalAnchoredTokens'),
     },
     {
       desktop: t('uniqueAnchorHolders.totalImprintedTokens'),
       mobile: t('uniqueAnchorHolders.imprinted'),
-      tooltip: statisticsCopy.tables.totalImprintedTokens,
+      tooltip: t('statisticsTooltips.totalImprintedTokens'),
     },
   ];
 

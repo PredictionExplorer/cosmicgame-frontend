@@ -3,8 +3,9 @@ import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import { getExplorerUrl, shortenHex } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -34,7 +35,7 @@ const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(recipient.TimeStamp ?? 0, false, locale)}
+          <HydrationSafeDateTime timestamp={recipient.TimeStamp ?? 0} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="left">

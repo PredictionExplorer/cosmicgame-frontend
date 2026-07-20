@@ -6,8 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { usePublicClient } from 'wagmi';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { convertTimestampToDateTime } from '@/utils';
-
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -54,7 +53,7 @@ const UncollectedRewardsRow = ({ row, locale }: { row: CSTAnchorDistribution; lo
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(DepositTimeStamp, false, locale)}
+        <HydrationSafeDateTime timestamp={DepositTimeStamp} locale={locale} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
       <TablePrimaryCell align="center">{`${YourTokensStaked} / ${NumStakedNFTs}`}</TablePrimaryCell>

@@ -79,3 +79,42 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 ## Optional
 
 - [Full documentation](https://cosmicsignature.com/llms-full.txt)
+
+## 中文概览
+
+Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议。参与者在演绎周期中落笔；每一笔都会影响周期最终的签名作品。周期收官后，协议按公开规则将周期储备发往十余条分配轨道，其中包括支持以太坊核心贡献者的 Protocol Guild。
+
+Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。
+
+### 中文关键页面
+
+- [中文主页](https://cosmicsignature.com/zh)：协议与链上艺术概览
+- [关于](https://cosmicsignature.com/zh/about)：协议主体、官方链接与名称辨析
+- [学习中心](https://cosmicsignature.com/zh/learn)：演绎周期、三体艺术、锚定与公共物品说明
+- [中文应用](https://app.cosmicsignature.com/zh)：当前周期与落笔界面
+- [画廊](https://app.cosmicsignature.com/zh/gallery)：浏览已铭刻的 Cosmic Signature NFT
+- [运作原理](https://app.cosmicsignature.com/zh/how-it-works)：完整协议机制
+- [常见问题](https://app.cosmicsignature.com/zh/faq)：按主题整理的中文解答
+- [统计](https://app.cosmicsignature.com/zh/statistics)：公开协议数据
+- [锚定](https://app.cosmicsignature.com/zh/anchoring)：锚定规则与派发记录
+- [合约](https://app.cosmicsignature.com/zh/contracts)：已部署合约地址
+- [安全](https://app.cosmicsignature.com/zh/security)：验证资源与参与安全说明
+- [审计](https://app.cosmicsignature.com/zh/audits)：审计状态与形式化验证背景
+- [风险披露](https://app.cosmicsignature.com/zh/risk-disclosures)：区块链、钱包与协议参与风险
+
+### 协议要点
+
+- 每个周期以 ETH 与 CST 校准窗口机制开启；CST 窗口从 12 小时基准出发，并随链上参与变化
+- 每次落笔都会按当前时间增量延长收官倒计时；该增量从 1 小时起步，每有一个周期收官便增长 1%
+- 写下收官之笔的参与者拥有 48 小时专属收官窗口；之后任何人均可收官，实际收官者获得签名分配
+- 每周期储备的 25% 进入签名分配，8% 发往时之勇士，4% 由 3 个 ETH 星选资格共享，6% 用于锚定派发，7% 发往 Protocol Guild，约 50% 滚入下一周期
+- 绝大多数周期会铭刻 24 枚 Cosmic Signature NFT，并配套 24,000 CST；连同 3,000 CST 推广储备，典型固定铭刻总量为 27,000 CST，另有按落笔动态计算的参与 CST
+- 每枚 Cosmic Signature NFT 或 RandomWalk NFT 一生只能锚定一次；解锚后不再具备锚定资格
+- 未使用的 RandomWalk NFT 可附加至一笔 ETH 落笔，使该笔 ETH 落笔价格降低 50%；每枚 RandomWalk NFT 只能用于这项减免一次
+- 次级 ETH 与已附加资产设有 5 周取回期限；期限结束后，任何人都可为自己取回仍未取回的分配
+
+### 生态
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature)：Arbitrum 上不收平台费的 NFT 市场
+- [Chaos Zero](https://chaoszero.com)：面向 Cosmic Signature 周期的预测市场；每周期的问题是本周期收官时的落笔数是否高于上一周期
+- [Uniswap CST 兑换](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)：在 Arbitrum 上兑换 CST

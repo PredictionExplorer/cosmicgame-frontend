@@ -3,6 +3,9 @@
 import { forwardRef, Fragment, useCallback, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronsUpDown, Link2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { type FAQCategory as FAQCategoryType, type FAQItem } from '@/content/faq';
 
 import {
   Accordion,
@@ -12,53 +15,63 @@ import {
 } from '@/components/ui/accordion';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
-import { type FAQCategory as FAQCategoryType, type FAQItem } from '../data/faq-data';
+import { FAQ_ICONS } from './faqIcons';
 
-const tooltipTerms: Record<string, string> = {
-  'Endurance Champion':
-    'A special title given to the participant who held the most-recent-gesture position for the longest uninterrupted interval within a Performance Cycle.',
-  'Chrono Warrior':
-    'An even rarer title \u2014 the participant who held the Endurance Champion position for the longest consecutive interval.',
-  'Chrono-Warrior':
-    'An even rarer title \u2014 the participant who held the Endurance Champion position for the longest consecutive interval.',
-  'Calibration Window':
-    'A price-discovery window where Gesture Cost starts high and descends over time from the Calibration Ceiling toward the Calibration Floor. The longer you wait, the lower the cost.',
-  'Cosmic Council':
-    'The on-chain coordination body where CST holders submit Coordination Proposals and express Support or Opposition \u2014 for example, selecting the Public Goods Beneficiary that receives each cycle\u2019s public-goods allocation.',
-  CST: 'CST tokens \u2014 the ERC-20 tokens imprinted with every gesture. Used on the Cosmic Council and as alternative gesture currency.',
-  'ERC-20': 'A widely used Ethereum token standard for fungible (interchangeable) tokens.',
-  'ERC-721':
-    'The Ethereum token standard for non-fungible tokens (NFTs) \u2014 each token is unique.',
-  'Layer 2':
-    "A secondary protocol built on top of Ethereum that processes transactions faster and cheaper while inheriting Ethereum's security.",
-  rollup:
-    'A Layer 2 technique that bundles ("rolls up") many transactions into one, dramatically reducing costs while keeping Ethereum-level security.',
-  RandomWalkNFT:
-    'A sister NFT collection. Attaching one to an ETH gesture grants a one-time 50% ETH Gesture Cost reduction.',
-  'renounceOwnership()':
-    "A smart contract function that permanently gives up the team's ability to change protocol parameters \u2014 making the rules immutable.",
-};
+const TOOLTIP_KEYS = [
+  'enduranceChampion',
+  'chronoWarrior',
+  'calibrationWindow',
+  'cosmicCouncil',
+  'cst',
+  'erc20',
+  'erc721',
+  'layer2',
+  'rollup',
+  'randomWalkNft',
+  'renounceOwnership',
+] as const;
 
-function enrichWithTooltips(text: string): React.ReactNode[] {
-  const sortedTerms = Object.keys(tooltipTerms).sort((a, b) => b.length - a.length);
+interface TooltipTerm {
+  term: string;
+  content: string;
+}
+
+function normalizeForMatch(value: string): string {
+  return value.normalize('NFKC').toLowerCase();
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export function enrichWithTooltips(
+  text: string,
+  tooltipTerms: readonly TooltipTerm[],
+): React.ReactNode[] {
+  const sortedTerms = tooltipTerms
+    .filter(({ term }) => term.length > 0)
+    .sort((a, b) => b.term.length - a.term.length);
+  if (sortedTerms.length === 0) return [text];
+
   const pattern = new RegExp(
-    `(${sortedTerms.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`,
-    'g',
+    `(${sortedTerms.map(({ term }) => escapeRegExp(term)).join('|')})`,
+    'giu',
   );
-
   const parts = text.split(pattern);
+  const termsByNormalizedValue = new Map(
+    sortedTerms.map((entry) => [normalizeForMatch(entry.term), entry] as const),
+  );
   const seen = new Set<string>();
 
   return parts.map((part, i) => {
-    const normalizedKey = Object.keys(tooltipTerms).find(
-      (k) => k.toLowerCase() === part.toLowerCase(),
-    );
-    if (normalizedKey && tooltipTerms[normalizedKey] && !seen.has(normalizedKey.toLowerCase())) {
-      seen.add(normalizedKey.toLowerCase());
+    const normalizedPart = normalizeForMatch(part);
+    const matchedTerm = termsByNormalizedValue.get(normalizedPart);
+    if (matchedTerm && !seen.has(normalizedPart)) {
+      seen.add(normalizedPart);
       return (
         <Fragment key={i}>
           <span className="font-medium text-foreground">{part}</span>
-          <InfoTooltip content={tooltipTerms[normalizedKey]} side="top" maxWidth={280} />
+          <InfoTooltip content={matchedTerm.content} side="top" maxWidth={280} />
         </Fragment>
       );
     }
@@ -68,10 +81,11 @@ function enrichWithTooltips(text: string): React.ReactNode[] {
 
 function highlightSearch(text: string, query: string): React.ReactNode {
   if (!query.trim()) return text;
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const regex = new RegExp(`(${escapeRegExp(query)})`, 'giu');
+  const normalizedQuery = normalizeForMatch(query);
   const parts = text.split(regex);
   return parts.map((part, i) =>
-    regex.test(part) ? (
+    normalizeForMatch(part) === normalizedQuery ? (
       <mark key={i} className="rounded-sm bg-primary/25 px-0.5 text-foreground">
         {part}
       </mark>
@@ -99,15 +113,26 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
     { category, searchQuery, expandedItems, onItemToggle, onExpandAll },
     ref,
   ) {
+    const t = useTranslations('faq');
     const [copiedId, setCopiedId] = useState<string | null>(null);
-    const Icon = category.icon;
+    const Icon = FAQ_ICONS[category.icon];
     const allExpanded = category.items.every((item) => expandedItems.includes(item.id));
+    const tooltipTerms = useMemo(
+      () =>
+        TOOLTIP_KEYS.map((key) => ({
+          term: t(`tooltips.${key}.term`),
+          content: t(`tooltips.${key}.content`),
+        })),
+      [t],
+    );
 
     const filteredItems = useMemo(() => {
       if (!searchQuery.trim()) return category.items;
-      const q = searchQuery.toLowerCase();
+      const q = normalizeForMatch(searchQuery);
       return category.items.filter(
-        (item) => item.question.toLowerCase().includes(q) || item.answer.toLowerCase().includes(q),
+        (item) =>
+          normalizeForMatch(item.question).includes(q) ||
+          normalizeForMatch(item.answer).includes(q),
       );
     }, [category.items, searchQuery]);
 
@@ -155,10 +180,10 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
           <button
             onClick={() => onExpandAll(category.id)}
             className="hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground sm:inline-flex"
-            aria-label={allExpanded ? 'Collapse all questions' : 'Expand all questions'}
+            aria-label={allExpanded ? t('category.collapseAllAria') : t('category.expandAllAria')}
           >
             <ChevronsUpDown className="h-3.5 w-3.5" />
-            {allExpanded ? 'Collapse All' : 'Expand All'}
+            {allExpanded ? t('category.collapseAll') : t('category.expandAll')}
           </button>
         </div>
 
@@ -192,7 +217,7 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {searchQuery
                     ? highlightSearch(item.answer, searchQuery)
-                    : enrichWithTooltips(item.answer)}
+                    : enrichWithTooltips(item.answer, tooltipTerms)}
                 </p>
                 <button
                   onClick={(e) => {
@@ -200,10 +225,10 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                     copyLink(item);
                   }}
                   className="mt-3 inline-flex items-center gap-1.5 text-xs text-muted-foreground/50 transition-colors hover:text-primary"
-                  aria-label="Copy link to this question"
+                  aria-label={t('category.copyLinkAria')}
                 >
                   <Link2 className="h-3 w-3" />
-                  {copiedId === item.id ? 'Copied!' : 'Copy link'}
+                  {copiedId === item.id ? t('category.copied') : t('category.copyLink')}
                 </button>
               </AccordionContent>
             </AccordionItem>

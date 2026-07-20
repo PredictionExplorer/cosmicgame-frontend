@@ -38,8 +38,8 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: i18n catalog parity report (informational during zh rollout)
-        run: npm run i18n:parity
+      - name: Enforce complete i18n catalog parity
+        run: npm run i18n:strict
 
       - name: Enforce Sprint 1 Chinese catalog coverage
         run: npm run i18n:sprint1
@@ -52,6 +52,18 @@ jobs:
 
       - name: Enforce Sprint 4 Chinese catalog coverage
         run: npm run i18n:sprint4
+
+      - name: Enforce Sprint 5 Chinese catalog coverage
+        run: npm run i18n:sprint5
+
+      - name: Enforce Sprint 6 Chinese catalog coverage
+        run: npm run i18n:sprint6
+
+      - name: Enforce Sprint 7 Chinese catalog coverage
+        run: npm run i18n:sprint7
+
+      - name: Enforce canonical Chinese terminology
+        run: npm run terminology:check
 
       - name: Enforce English and Chinese lexicon
         run: npm run lexicon:scan

@@ -5,9 +5,10 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tr, Tbody } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   DefinitionList,
   DetailRow,
@@ -80,7 +81,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
         </TablePrimaryCell>
 
         <TablePrimaryCell align="left">
-          {convertTimestampToDateTime(DepositTimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={DepositTimeStamp} locale={locale} />
         </TablePrimaryCell>
 
         <TablePrimaryCell align="center">
@@ -114,7 +115,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {convertTimestampToDateTime(Stake.TimeStamp, false, locale)}
+                      <HydrationSafeDateTime timestamp={Stake.TimeStamp} locale={locale} />
                     </a>
                   </DetailRow>
                   <DetailRow label={t('distributionsByToken.details.anchoredNfts')}>
@@ -138,7 +139,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {convertTimestampToDateTime(Unstake.TimeStamp, false, locale)}
+                        <HydrationSafeDateTime timestamp={Unstake.TimeStamp} locale={locale} />
                       </a>
                     </DetailRow>
                     <DetailRow label={t('distributionsByToken.details.anchoredNfts')}>

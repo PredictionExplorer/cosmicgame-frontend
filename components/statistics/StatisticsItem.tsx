@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
@@ -32,11 +33,19 @@ export const CountdownRenderer = ({
   minutes: number;
   seconds: number;
 }) => {
+  const t = useTranslations('formats');
+  const locale = useLocale();
+  const separator = locale === 'zh' ? '' : ' ';
   let result = '';
-  if (days) result += `${days}d `;
-  if (hours || result) result += `${hours}h `;
-  if (minutes || result) result += `${minutes}m `;
-  if (seconds || result) result += `${seconds}s`;
-  if (result !== '') result += ' left';
+  if (days) result += `${days}${t('durationCompact.days')}${separator}`;
+  if (hours || result) result += `${hours}${t('durationCompact.hours')}${separator}`;
+  if (minutes || result) result += `${minutes}${t('durationCompact.minutes')}${separator}`;
+  if (seconds || result) result += `${seconds}${t('durationCompact.seconds')}`;
+  if (result !== '') {
+    result =
+      locale === 'zh'
+        ? `${t('durationCompact.left')}${result}`
+        : `${result} ${t('durationCompact.left')}`;
+  }
   return result !== '' ? <p className="text-primary font-medium">{result}</p> : null;
 };

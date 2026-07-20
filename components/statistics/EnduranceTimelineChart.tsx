@@ -13,14 +13,15 @@ import {
   Legend,
 } from 'recharts';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds, shortenHex } from '@/utils';
 
+import { Link } from '@/i18n/navigation';
 import {
   getEnduranceGantt,
   getEnduranceTimeline,
   type EnduranceGantt,
-  type EnduranceStint,
   type EnduranceTimeline,
   type EnduranceTimelinePoint,
 } from '@/utils/endurance';
@@ -40,15 +41,16 @@ const TICK_COUNT = 6;
 const LANE_SCROLL_THRESHOLD = 14;
 
 /** Compact "hours into round" label, e.g. "45m", "1.5h", "2d". */
-function formatHoursTick(hours: number): string {
+function formatHoursTick(hours: number, locale: string = 'en'): string {
+  const zh = locale === 'zh';
   if (hours >= 24) {
     const d = hours / 24;
-    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}d`;
+    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${zh ? '天' : 'd'}`;
   }
   if (hours >= 1) {
-    return `${Number.isInteger(hours) ? hours.toFixed(0) : hours.toFixed(1)}h`;
+    return `${Number.isInteger(hours) ? hours.toFixed(0) : hours.toFixed(1)}${zh ? '小时' : 'h'}`;
   }
-  return `${Math.round(hours * 60)}m`;
+  return `${Math.round(hours * 60)}${zh ? '分' : 'm'}`;
 }
 
 const pct = (v: number): string => `${Math.max(0, Math.min(100, v * 100))}%`;
@@ -92,31 +94,21 @@ function RoleBadge({
   );
 }
 
-function stintTitle(stint: EnduranceStint, address: string): string {
-  const from = formatHoursTick(stint.startHours);
-  const to = formatHoursTick(stint.startHours + stint.durationHours);
-  const role = stint.isEnduranceChampion
-    ? ' (Endurance Champion)'
-    : stint.isRecord
-      ? ' (new record)'
-      : '';
-  return `${shortenHex(address, 6)} • held ${formatSeconds(stint.durationSeconds)} • ${from} → ${to} into round${role}`;
-}
-
 const LINE_CHART_HEIGHT = 360;
 
 /** Compact duration for the line chart's Y-axis ticks, e.g. "45m", "1.5h", "2d". */
-function formatDurationTick(secs: number): string {
+function formatDurationTick(secs: number, locale: string = 'en'): string {
+  const zh = locale === 'zh';
   if (secs <= 0) return '0';
   if (secs >= 86400) {
     const d = secs / 86400;
-    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}d`;
+    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${zh ? '天' : 'd'}`;
   }
   if (secs >= 3600) {
     const h = secs / 3600;
-    return `${Number.isInteger(h) ? h.toFixed(0) : h.toFixed(1)}h`;
+    return `${Number.isInteger(h) ? h.toFixed(0) : h.toFixed(1)}${zh ? '小时' : 'h'}`;
   }
-  return `${Math.round(secs / 60)}m`;
+  return `${Math.round(secs / 60)}${zh ? '分' : 'm'}`;
 }
 
 type TimelineTooltipProps = {
@@ -125,20 +117,28 @@ type TimelineTooltipProps = {
 };
 
 function TimelineTooltip({ active, payload }: TimelineTooltipProps) {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   if (!active || !payload?.length) return null;
   const point = payload[0]?.payload;
   if (!point) return null;
 
   const rows = [
-    { color: LEAD_COLOR, name: 'Current lead window', value: point.lead },
-    { color: ENDURANCE_COLOR, name: 'Endurance record', value: point.enduranceRecord },
-    { color: CHRONO_COLOR, name: 'Chrono-warrior record', value: point.chronoRecord },
+    { color: LEAD_COLOR, name: t('charts.endurance.currentLeadWindow'), value: point.lead },
+    {
+      color: ENDURANCE_COLOR,
+      name: t('charts.endurance.enduranceRecord'),
+      value: point.enduranceRecord,
+    },
+    { color: CHRONO_COLOR, name: t('charts.endurance.chronoRecord'), value: point.chronoRecord },
   ];
 
   return (
     <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
       <p className="mb-2 font-medium text-white">
-        {formatHoursTick(point.hoursIntoRound)} into round
+        {t('charts.endurance.intoCycle', {
+          duration: formatHoursTick(point.hoursIntoRound, locale),
+        })}
       </p>
       <dl className="space-y-1 text-muted-foreground">
         {rows.map((row) => (
@@ -150,11 +150,11 @@ function TimelineTooltip({ active, payload }: TimelineTooltipProps) {
               />
               {row.name}
             </dt>
-            <dd className="text-white">{formatSeconds(row.value) || '0s'}</dd>
+            <dd className="text-white">{formatSeconds(row.value, locale)}</dd>
           </div>
         ))}
         <div className="mt-1 flex justify-between gap-4 border-t border-white/10 pt-1">
-          <dt>Lead held by</dt>
+          <dt>{t('charts.endurance.leadHeldBy')}</dt>
           <dd className="font-mono text-white">{shortenHex(point.leader, 4)}</dd>
         </div>
       </dl>
@@ -172,6 +172,9 @@ const EnduranceLineView = memo(function EnduranceLineView({
 }: {
   points: EnduranceTimelinePoint[];
 }) {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
+
   return (
     <ResponsiveContainer width="100%" height={LINE_CHART_HEIGHT}>
       <ComposedChart data={points} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
@@ -180,12 +183,12 @@ const EnduranceLineView = memo(function EnduranceLineView({
           dataKey="hoursIntoRound"
           type="number"
           domain={[0, 'dataMax']}
-          tickFormatter={(h) => formatHoursTick(Number(h))}
+          tickFormatter={(h) => formatHoursTick(Number(h), locale)}
           tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
           interval="preserveStartEnd"
           minTickGap={32}
           label={{
-            value: 'Time into round',
+            value: t('charts.endurance.timeIntoCycle'),
             position: 'insideBottom',
             offset: -4,
             fill: 'rgba(255,255,255,0.45)',
@@ -193,7 +196,7 @@ const EnduranceLineView = memo(function EnduranceLineView({
           }}
         />
         <YAxis
-          tickFormatter={(v) => formatDurationTick(Number(v))}
+          tickFormatter={(v) => formatDurationTick(Number(v), locale)}
           tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
           width={48}
         />
@@ -207,7 +210,7 @@ const EnduranceLineView = memo(function EnduranceLineView({
         <Area
           type="linear"
           dataKey="lead"
-          name="Current lead window"
+          name={t('charts.endurance.currentLeadWindow')}
           stroke={LEAD_COLOR}
           fill={LEAD_COLOR}
           fillOpacity={0.18}
@@ -218,7 +221,7 @@ const EnduranceLineView = memo(function EnduranceLineView({
         <Line
           type="stepAfter"
           dataKey="enduranceRecord"
-          name="Endurance champion record"
+          name={t('charts.endurance.enduranceChampionRecord')}
           stroke={ENDURANCE_COLOR}
           strokeWidth={2}
           dot={false}
@@ -227,7 +230,7 @@ const EnduranceLineView = memo(function EnduranceLineView({
         <Line
           type="stepAfter"
           dataKey="chronoRecord"
-          name="Chrono-warrior record"
+          name={t('charts.endurance.chronoRecord')}
           stroke={CHRONO_COLOR}
           strokeWidth={2}
           dot={false}
@@ -244,6 +247,8 @@ const EnduranceLineView = memo(function EnduranceLineView({
  * DOM (no SVG/canvas) it never repaints/flashes on the page's periodic re-renders.
  */
 const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: EnduranceGantt }) {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const durHours = gantt.roundDurationSeconds / 3600;
   const manyLanes = gantt.lanes.length > LANE_SCROLL_THRESHOLD;
   const ticks = Array.from({ length: TICK_COUNT + 1 }, (_, i) => i);
@@ -251,15 +256,15 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        <LegendDot color={ENDURANCE_COLOR} label="Endurance champion (longest single hold)" />
-        <LegendDot color={CHRONO_COLOR} label="Chrono-warrior (longest reign)" />
-        <LegendDot color={LEAD_COLOR} label="Lead held" />
+        <LegendDot color={ENDURANCE_COLOR} label={t('charts.endurance.legendEndurance')} />
+        <LegendDot color={CHRONO_COLOR} label={t('charts.endurance.legendChrono')} />
+        <LegendDot color={LEAD_COLOR} label={t('charts.endurance.legendLead')} />
         <span className="inline-flex items-center gap-1.5">
           <span
             className="inline-block h-2.5 w-2.5 rounded-sm"
             style={{ boxShadow: `inset 0 0 0 1.5px ${RECORD_COLOR}` }}
           />
-          New record set
+          {t('charts.endurance.legendNewRecord')}
         </span>
       </div>
 
@@ -280,7 +285,7 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                 className="absolute top-0 text-[10px] text-muted-foreground"
                 style={{ left: pct(i / TICK_COUNT), transform }}
               >
-                {formatHoursTick((durHours * i) / TICK_COUNT)}
+                {formatHoursTick((durHours * i) / TICK_COUNT, locale)}
               </span>
             );
           })}
@@ -296,13 +301,16 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                   {shortenHex(lane.address, 4)}
                 </span>
                 {lane.isEnduranceChampion ? (
-                  <RoleBadge color={ENDURANCE_COLOR} label="Endurance Champion">
-                    EC
+                  <RoleBadge
+                    color={ENDURANCE_COLOR}
+                    label={t('charts.endurance.enduranceChampion')}
+                  >
+                    {t('charts.endurance.enduranceChampionAbbr')}
                   </RoleBadge>
                 ) : null}
                 {lane.isChronoWarrior ? (
-                  <RoleBadge color={CHRONO_COLOR} label="Chrono-Warrior">
-                    CW
+                  <RoleBadge color={CHRONO_COLOR} label={t('charts.endurance.chronoWarrior')}>
+                    {t('charts.endurance.chronoWarriorAbbr')}
                   </RoleBadge>
                 ) : null}
               </div>
@@ -322,12 +330,32 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                   return (
                     <div
                       key={i}
-                      title={stintTitle(stint, lane.address)}
+                      title={t('charts.endurance.stintAria', {
+                        address: shortenHex(lane.address, 6),
+                        duration: formatSeconds(stint.durationSeconds, locale),
+                        from: formatHoursTick(stint.startHours, locale),
+                        to: formatHoursTick(stint.startHours + stint.durationHours, locale),
+                        role: stint.isEnduranceChampion
+                          ? t('charts.endurance.roleEndurance')
+                          : stint.isRecord
+                            ? t('charts.endurance.roleNewRecord')
+                            : '',
+                      })}
                       // Focusable so keyboard and screen-reader users can step
                       // through stints; `title` alone is hover-only.
                       tabIndex={0}
                       role="img"
-                      aria-label={stintTitle(stint, lane.address)}
+                      aria-label={t('charts.endurance.stintAria', {
+                        address: shortenHex(lane.address, 6),
+                        duration: formatSeconds(stint.durationSeconds, locale),
+                        from: formatHoursTick(stint.startHours, locale),
+                        to: formatHoursTick(stint.startHours + stint.durationHours, locale),
+                        role: stint.isEnduranceChampion
+                          ? t('charts.endurance.roleEndurance')
+                          : stint.isRecord
+                            ? t('charts.endurance.roleNewRecord')
+                            : '',
+                      })}
                       className="absolute top-0.5 bottom-0.5 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white"
                       style={{
                         left: pct(stint.startHours / durHours),
@@ -346,13 +374,7 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Each bar is a lead stint — an address holding the lead from one gesture until the next
-        gesture arrives. Bar width is how long they held the lead. Amber-outlined bars set a new
-        endurance record at the time; the violet bar is the single longest hold of all (Endurance
-        Champion); the rose lane held the title longest overall (Chrono-Warrior). Hover a bar for
-        details.
-      </p>
+      <p className="text-xs text-muted-foreground">{t('charts.endurance.description')}</p>
     </div>
   );
 });
@@ -368,6 +390,8 @@ type EnduranceTimelineChartProps = {
  * gesture list.
  */
 const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const hasRound = round >= 0;
   const { data: gestures, isLoading, isError, refetch } = useGestureListByCycle(round, 'asc');
 
@@ -393,7 +417,9 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
 
   if (!hasRound) {
     return (
-      <p className="py-8 text-center text-sm text-muted-foreground">Select a round to inspect.</p>
+      <p className="py-8 text-center text-sm text-muted-foreground">
+        {t('charts.endurance.selectCycle')}
+      </p>
     );
   }
   if (isLoading) {
@@ -406,8 +432,8 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
   if (isError) {
     return (
       <ErrorState
-        title="Failed to load endurance timeline"
-        message="Could not fetch the gesture history for this round."
+        title={t('charts.endurance.loadErrorTitle')}
+        message={t('charts.endurance.loadErrorMessage')}
         onRetry={() => refetch()}
       />
     );
@@ -415,7 +441,7 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
   if (gantt.lanes.length === 0) {
     return (
       <p className="py-8 text-center text-sm text-muted-foreground">
-        No lead activity in this round yet.
+        {t('charts.endurance.empty')}
       </p>
     );
   }
@@ -424,29 +450,23 @@ const EnduranceTimelineChart: FC<EnduranceTimelineChartProps> = ({ round, isLive
     <div className="space-y-3" data-testid="endurance-timeline-chart">
       <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
         <span className="text-muted-foreground">
-          Endurance champion:{' '}
-          <span className="font-mono text-white">
-            {shortenHex(gantt.enduranceChampionAddress, 4)}
-          </span>{' '}
-          held{' '}
-          <span className="font-medium text-white">
-            {formatSeconds(gantt.enduranceChampionStintSeconds) || '0s'}
-          </span>
+          {t('charts.endurance.championSummary', {
+            address: shortenHex(gantt.enduranceChampionAddress, 4),
+            duration: formatSeconds(gantt.enduranceChampionStintSeconds, locale),
+          })}
         </span>
         <span className="text-muted-foreground">
-          Chrono-warrior:{' '}
-          <span className="font-mono text-white">{shortenHex(gantt.chronoWarriorAddress, 4)}</span>{' '}
-          reigned{' '}
-          <span className="font-medium text-white">
-            {formatSeconds(gantt.chronoWarriorSeconds) || '0s'}
-          </span>
+          {t('charts.endurance.chronoSummary', {
+            address: shortenHex(gantt.chronoWarriorAddress, 4),
+            duration: formatSeconds(gantt.chronoWarriorSeconds, locale),
+          })}
         </span>
       </div>
 
       <Tabs defaultValue="gantt" className="w-full">
         <TabsList>
-          <TabsTrigger value="gantt">Gantt</TabsTrigger>
-          <TabsTrigger value="lines">Line chart</TabsTrigger>
+          <TabsTrigger value="gantt">{t('charts.endurance.gantt')}</TabsTrigger>
+          <TabsTrigger value="lines">{t('charts.endurance.lineChart')}</TabsTrigger>
         </TabsList>
         <TabsContent value="gantt" className="mt-4">
           <EnduranceGanttView gantt={gantt} />
@@ -471,6 +491,7 @@ type EnduranceTimelineSectionProps = {
 export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
   currentRoundNum,
 }) => {
+  const t = useTranslations('statistics');
   const maxRound = Math.max(0, currentRoundNum);
   // `null` means "follow the live round": the selection is derived from
   // currentRoundNum until the user explicitly navigates, so a new live round
@@ -487,13 +508,15 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-xs uppercase tracking-wider text-muted-foreground">Round</span>
+        <span className="text-xs uppercase tracking-wider text-muted-foreground">
+          {t('charts.endurance.cycle')}
+        </span>
         <div className="flex items-center gap-1">
           <Button
             type="button"
             size="icon"
             variant="outline"
-            aria-label="Previous round"
+            aria-label={t('charts.endurance.previousCycleAria')}
             disabled={selectedRound <= 0}
             onClick={() => setSelectedRound(selectedRound - 1)}
           >
@@ -504,7 +527,7 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
             min={0}
             max={maxRound}
             value={selectedRound}
-            aria-label="Round number"
+            aria-label={t('charts.endurance.cycleNumberAria')}
             onChange={(e) => {
               const next = Number(e.target.value);
               if (Number.isFinite(next)) {
@@ -517,7 +540,7 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
             type="button"
             size="icon"
             variant="outline"
-            aria-label="Next round"
+            aria-label={t('charts.endurance.nextCycleAria')}
             disabled={selectedRound >= maxRound}
             onClick={() => setSelectedRound(selectedRound + 1)}
           >
@@ -526,23 +549,23 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
         </div>
         {isLive ? (
           <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            Live round
+            {t('charts.endurance.liveCycle')}
           </span>
         ) : (
           <Button type="button" size="sm" variant="ghost" onClick={() => setPinnedRound(null)}>
-            Jump to live
+            {t('charts.endurance.jumpLive')}
           </Button>
         )}
-        <a
+        <Link
           href={`/embed/endurance/${selectedRound}`}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Open chart in a new window"
-          title="Open in new window"
+          aria-label={t('charts.endurance.openWindowAria')}
+          title={t('charts.endurance.openWindowTitle')}
           className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-white"
         >
           <ExternalLink className="h-4 w-4" />
-        </a>
+        </Link>
       </div>
 
       <EnduranceTimelineChart round={selectedRound} isLive={isLive} />

@@ -1,0 +1,91 @@
+{
+  "loadingAria": "正在加载推广分配",
+  "hero": {
+    "title": "通过<highlight>推广 Cosmic Signature</highlight> 获得 CST 分配",
+    "description": "参与 Cosmic Signature 推广；每项经核验的推广行动，都可获得 CST 分配。",
+    "learnHow": "了解参与方式"
+  },
+  "stats": {
+    "heading": "推广计划统计",
+    "infoAria": "查看“{label}”说明",
+    "valueAria": "{label}：{value} {suffix}",
+    "totalAllocations": {
+      "label": "累计分配",
+      "tooltip": "自推广计划启动以来，向所有推广贡献者发放的 CST 总量。"
+    },
+    "activeContributors": {
+      "label": "推广贡献者",
+      "tooltip": "收到过推广分配的独立钱包地址数。"
+    },
+    "transactions": {
+      "label": "分配交易",
+      "tooltip": "已处理的推广分配交易总数。"
+    }
+  },
+  "howItWorks": {
+    "title": "参与方式",
+    "infoAria": "查看参与方式说明",
+    "tooltip": "通过 3 个步骤参与 Cosmic Signature 推广并获得分配。",
+    "stepInfoAria": "查看“{title}”说明",
+    "steps": {
+      "promote": {
+        "title": "开展推广",
+        "description": "在社交平台、博客和社区中介绍 Cosmic Signature。",
+        "tooltip": "可创作内容、分享推荐链接、撰写博客文章或制作视频，参与 Cosmic Signature 推广。"
+      },
+      "verify": {
+        "title": "接受核验",
+        "description": "团队会审阅并核验推广行动。",
+        "tooltip": "推广团队会综合评估传播范围、内容质量与真实性，再确认相应分配。"
+      },
+      "receive": {
+        "title": "获得 CST",
+        "description": "CST 分配会直接发放至钱包。",
+        "tooltip": "核验完成后，CST 将通过链上交易发送至钱包地址；分配额会参考推广行动的实际影响。"
+      }
+    }
+  },
+  "leaderboard": {
+    "title": "推广贡献榜",
+    "infoAria": "查看推广贡献榜说明",
+    "tooltip": "按推广活动累计获配的 CST 排名。",
+    "empty": "暂无推广贡献者。",
+    "rewardCountOne": "{count} 笔分配",
+    "rewardCountOther": "{count} 笔分配"
+  },
+  "history": {
+    "title": "推广分配记录",
+    "infoAria": "查看推广分配记录说明",
+    "tooltip": "按时间顺序列出全部推广分配交易。",
+    "showingOne": "共 <strong>{count}</strong> 笔分配",
+    "showingOther": "共 <strong>{count}</strong> 笔分配",
+    "emptyTitle": "暂无推广分配",
+    "emptyDescription": "推广行动通过核验并完成拨付后，记录会显示在这里。"
+  },
+  "cta": {
+    "title": "准备参与推广？",
+    "description": "加入推广计划，向更多人介绍 Cosmic Signature，并根据经核验的推广行动获得 CST 分配。",
+    "contact": "联系推广团队",
+    "contactTooltip": "联系团队，了解推广机会与分配规则。",
+    "infoAria": "查看联系推广团队的说明",
+    "infoTooltip": "团队会协助准备推广材料，并说明不同推广行动对应的分配档位。"
+  },
+  "address": {
+    "invalid": "以太坊地址无效",
+    "heading": "此参与者的推广分配",
+    "loading": "加载中…",
+    "outreachWallet": "推广钱包"
+  },
+  "transferForm": {
+    "title": "拨付推广 CST",
+    "description": "调用推广储备合约的 `payReward` 函数；当前连接的钱包必须属于现任财务执行人。",
+    "reserveLabel": "推广储备",
+    "availableLabel": "可用 CST",
+    "ownerLabel": "所有者",
+    "treasurerLabel": "财务执行人",
+    "unavailable": "暂不可用",
+    "recipientLabel": "接收地址",
+    "amountLabel": "数量",
+    "historyLink": "查看推广储备转账记录"
+  }
+}

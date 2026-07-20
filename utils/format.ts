@@ -2,6 +2,10 @@ import { formatUnits } from 'viem';
 
 type BigNumberish = bigint | string | number;
 
+/** Maps app locale codes to stable Intl locales. */
+export const toIntlLocale = (locale: string = 'en'): string =>
+  locale.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US';
+
 /** Shortens a hex string (e.g., address) for display. */
 export function shortenHex(hex: string, length = 4): string {
   if (hex) {
@@ -19,16 +23,22 @@ export const formatId = (id: number | string): string => {
   return `#${id.toString().padStart(6, '0')}`;
 };
 
+export type TimestampTimeZone = 'local' | 'utc';
+
 /**
  * Converts Unix timestamp to a locale-style date string.
  * `en` output is byte-identical to the historical format ("Jan 01, 12:34");
- * `zh` renders "1月1日 12:34" (docs/i18n/README.md §4). Site-wide locale
- * formatting lands in Sprint 5; only translated pages pass `locale` for now.
+ * `zh` renders "1月1日 12:34" (docs/i18n/README.md §4).
+ *
+ * Browser-local time is the historical/default behavior. Pass `utc` only for
+ * deterministic server snapshots; hydration-safe UI should use
+ * `HydrationSafeDateTime` or `useHydrationSafeDateTime`.
  */
 export const convertTimestampToDateTime = (
   timestamp: number,
   showSecond: boolean = false,
   locale: string = 'en',
+  timeZone: TimestampTimeZone = 'local',
 ): string => {
   const month_names = [
     'Jan',
@@ -45,18 +55,23 @@ export const convertTimestampToDateTime = (
     'Dec',
   ];
 
-  const date_ob = new Date(timestamp * 1000); // Convert to Date object
-  const hours = ('0' + date_ob.getHours()).slice(-2);
-  const minutes = ('0' + date_ob.getMinutes()).slice(-2);
-  const seconds = ('0' + date_ob.getSeconds()).slice(-2);
+  const date_ob = new Date(timestamp * 1000);
+  const month = timeZone === 'utc' ? date_ob.getUTCMonth() : date_ob.getMonth();
+  const day = timeZone === 'utc' ? date_ob.getUTCDate() : date_ob.getDate();
+  const hour = timeZone === 'utc' ? date_ob.getUTCHours() : date_ob.getHours();
+  const minute = timeZone === 'utc' ? date_ob.getUTCMinutes() : date_ob.getMinutes();
+  const second = timeZone === 'utc' ? date_ob.getUTCSeconds() : date_ob.getSeconds();
+  const hours = ('0' + hour).slice(-2);
+  const minutes = ('0' + minute).slice(-2);
+  const seconds = ('0' + second).slice(-2);
 
   let result: string;
-  if (locale === 'zh') {
-    result = `${date_ob.getMonth() + 1}月${date_ob.getDate()}日 ${hours}:${minutes}`;
+  if (toIntlLocale(locale) === 'zh-CN') {
+    result = `${month + 1}月${day}日 ${hours}:${minutes}`;
   } else {
-    const month = month_names[date_ob.getMonth()];
-    const date = ('0' + date_ob.getDate()).slice(-2);
-    result = `${month} ${date}, ${hours}:${minutes}`;
+    const monthName = month_names[month];
+    const date = ('0' + day).slice(-2);
+    result = `${monthName} ${date}, ${hours}:${minutes}`;
   }
 
   if (showSecond) {
@@ -65,6 +80,13 @@ export const convertTimestampToDateTime = (
 
   return result;
 };
+
+/** Deterministic value used for SSR and the first hydration render. */
+export const convertTimestampToServerDateTime = (
+  timestamp: number,
+  showSecond: boolean = false,
+  locale: string = 'en',
+): string => convertTimestampToDateTime(timestamp, showSecond, locale, 'utc');
 
 /**
  * Converts seconds into a human-readable duration string.
@@ -82,7 +104,7 @@ export const formatSeconds = (seconds: number, locale: string = 'en'): string =>
   hours = hours % 24;
 
   const units =
-    locale === 'zh'
+    toIntlLocale(locale) === 'zh-CN'
       ? { d: '天', h: '小时', m: '分', s: '秒', sep: '' }
       : { d: 'd', h: 'h', m: 'm', s: 's', sep: ' ' };
 
@@ -98,9 +120,9 @@ export const formatSeconds = (seconds: number, locale: string = 'en'): string =>
  * Calculates the difference between the current time and a given timestamp.
  * Returns the time difference in a human-readable format (e.g., "1d 2h 30m 45s").
  */
-export const calculateTimeDiff = (timestamp: number): string => {
+export const calculateTimeDiff = (timestamp: number, locale: string = 'en'): string => {
   const seconds = Math.floor(Date.now() / 1000) - timestamp;
-  return seconds < 0 ? '' : formatSeconds(seconds);
+  return seconds < 0 ? '' : formatSeconds(seconds, locale);
 };
 
 /** Formats ETH for display: 4 decimals when < 10, else 2. */
@@ -109,23 +131,31 @@ export const formatEthValue = (value: number): string => {
   return value < 10 ? `${value.toFixed(4)} ETH` : `${value.toFixed(2)} ETH`;
 };
 
-const compactAmountFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 6,
-});
-
 /**
  * Formats a numeric table amount without the misleading `0.000000` wall that
  * fixed-precision output produces: zero renders as "0", dust renders as
  * "<0.0001", and everything else gets up to 6 decimals with trailing zeros
  * trimmed. Unit-free — append " ETH"/" CST" at the call site if needed.
  */
-export const formatTableAmount = (value: number | null | undefined): string => {
+export const formatTableAmount = (
+  value: number | null | undefined,
+  locale: string = 'en',
+): string => {
   if (value == null || !Number.isFinite(value)) return '—';
   if (value === 0) return '0';
   const magnitude = Math.abs(value);
   if (magnitude < 0.0001) return value > 0 ? '<0.0001' : '>-0.0001';
-  return compactAmountFormatter.format(value);
+  return new Intl.NumberFormat(toIntlLocale(locale), {
+    maximumFractionDigits: 6,
+  }).format(value);
 };
+
+/** Locale-aware grouped number; Chinese data displays keep Western grouping. */
+export const formatGroupedNumber = (
+  value: number,
+  locale: string = 'en',
+  options?: Intl.NumberFormatOptions,
+): string => new Intl.NumberFormat(toIntlLocale(locale), options).format(value);
 
 /** Formats CST for display: 4 decimals when < 10, else 2. */
 export const formatCSTValue = (value: number): string => {
@@ -160,11 +190,14 @@ const MONTH_LABELS = [
 ];
 
 /** Formats YYYYMMDD for chart axis / tooltip labels. */
-export function formatYyyymmddLabel(yyyymmdd: string): string {
+export function formatYyyymmddLabel(yyyymmdd: string, locale: string = 'en'): string {
   if (yyyymmdd.length !== 8) return yyyymmdd;
   const year = Number(yyyymmdd.slice(0, 4));
   const month = Number(yyyymmdd.slice(4, 6)) - 1;
   const day = Number(yyyymmdd.slice(6, 8));
+  if (toIntlLocale(locale) === 'zh-CN') {
+    return `${year}/${month + 1}/${day}`;
+  }
   const monthName = MONTH_LABELS[month] ?? '';
   return `${monthName} ${day}, ${year}`;
 }
@@ -185,11 +218,20 @@ export function yyyymmddTodayUtc(): string {
 }
 
 /** Formats a Unix timestamp (seconds) for chart axis / tooltip labels. */
-export function formatUnixTsLabel(ts: number, withTime = false): string {
+export function formatUnixTsLabel(ts: number, withTime = false, locale: string = 'en'): string {
   const d = new Date(ts * 1000);
-  const month = MONTH_LABELS[d.getUTCMonth()] ?? '';
   const day = d.getUTCDate();
+  const monthIndex = d.getUTCMonth();
   const year = d.getUTCFullYear();
+  if (toIntlLocale(locale) === 'zh-CN') {
+    if (!withTime) {
+      return `${year}/${monthIndex + 1}/${day}`;
+    }
+    const hh = String(d.getUTCHours()).padStart(2, '0');
+    const mm = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${year}年${monthIndex + 1}月${day}日 ${hh}:${mm}（UTC）`;
+  }
+  const month = MONTH_LABELS[monthIndex] ?? '';
   if (!withTime) {
     return `${month} ${day}, ${year}`;
   }

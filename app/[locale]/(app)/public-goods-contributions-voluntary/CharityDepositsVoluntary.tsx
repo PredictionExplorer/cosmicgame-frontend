@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import {
@@ -9,22 +11,19 @@ import {
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 
 const CharityDepositsVoluntary = () => {
+  const t = useTranslations('publicGoods');
   const { data: voluntaryDeposits = [], isLoading: loading } = useCharityVoluntary();
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        title="Voluntary Public-Goods Contributions"
-        titleLevel={2}
-        subtitle="Community members' voluntary contributions to the Public Goods Vault"
-      />
+      <PageHeader title={t('voluntary.title')} titleLevel={2} subtitle={t('voluntary.subtitle')} />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Beyond automatic protocol forwards, community members can make voluntary contributions to
-        the Public Goods Vault. These contributions reflect the Cosmic Signature community&apos;s
-        commitment to supporting public-goods initiatives through on-chain coordination.
+        {t('voluntary.description')}
       </p>
       {loading ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <p className="text-lg font-semibold" role="status">
+          {t('loading')}
+        </p>
       ) : (
         <CharityDepositTable list={voluntaryDeposits as PublicGoodsContributionEntry[]} />
       )}

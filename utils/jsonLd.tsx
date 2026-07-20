@@ -24,8 +24,9 @@ interface LocalizedSiteJsonLdOptions {
   url?: string;
 }
 
-interface WebsiteJsonLdOptions extends LocalizedSiteJsonLdOptions {
-  searchUrlTemplate?: string;
+interface OrganizationJsonLdOptions {
+  description?: string;
+  url?: string;
 }
 
 interface ArtProtocolJsonLdOptions extends LocalizedSiteJsonLdOptions {
@@ -34,7 +35,7 @@ interface ArtProtocolJsonLdOptions extends LocalizedSiteJsonLdOptions {
   keywords?: readonly string[];
 }
 
-export function websiteJsonLd(options: WebsiteJsonLdOptions = {}) {
+export function websiteJsonLd(options: LocalizedSiteJsonLdOptions = {}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -46,18 +47,10 @@ export function websiteJsonLd(options: WebsiteJsonLdOptions = {}) {
     publisher: {
       '@id': `${SITE_URL}/#organization`,
     },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: options.searchUrlTemplate ?? `${APP_URL}/gallery?search={search_term_string}`,
-      },
-      'query-input': 'required name=search_term_string',
-    },
   };
 }
 
-export function organizationJsonLd(options: LocalizedSiteJsonLdOptions = {}) {
+export function organizationJsonLd(options: OrganizationJsonLdOptions = {}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -71,22 +64,28 @@ export function organizationJsonLd(options: LocalizedSiteJsonLdOptions = {}) {
       'https://github.com/PredictionExplorer',
     ],
     description: options.description ?? PROTOCOL_DESCRIPTION,
-    ...(options.inLanguage ? { inLanguage: options.inLanguage } : {}),
   };
 }
 
-export function webApplicationJsonLd() {
+interface WebApplicationJsonLdOptions extends LocalizedSiteJsonLdOptions {
+  browserRequirements?: string;
+}
+
+export function webApplicationJsonLd(options: WebApplicationJsonLdOptions = {}) {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     '@id': `${APP_URL}/#webapp`,
     name: SITE_NAME,
-    url: `${APP_URL}/`,
+    url: options.url ?? `${APP_URL}/`,
     applicationCategory: 'EntertainmentApplication',
     operatingSystem: 'Any',
-    browserRequirements: 'Requires a Web3-compatible browser or wallet extension',
+    browserRequirements:
+      options.browserRequirements ?? 'Requires a Web3-compatible browser or wallet extension',
     description:
+      options.description ??
       'A procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; the protocol distributes allocations across more than ten tracks when the cycle finalizes.',
+    ...(options.inLanguage ? { inLanguage: options.inLanguage } : {}),
   };
 }
 
@@ -118,10 +117,12 @@ export function collectionPageJsonLd({
   name,
   description,
   url,
+  inLanguage,
 }: {
   name: string;
   description: string;
   url: string;
+  inLanguage?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -129,6 +130,7 @@ export function collectionPageJsonLd({
     name,
     description,
     url,
+    ...(inLanguage ? { inLanguage } : {}),
     isPartOf: {
       '@id': `${SITE_URL}/#website`,
     },
@@ -146,11 +148,13 @@ export function datasetJsonLd({
   description,
   url,
   dateModified,
+  inLanguage,
 }: {
   name: string;
   description: string;
   url: string;
   dateModified: string;
+  inLanguage?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -159,6 +163,7 @@ export function datasetJsonLd({
     description,
     url,
     dateModified,
+    ...(inLanguage ? { inLanguage } : {}),
     creator: {
       '@id': `${SITE_URL}/#organization`,
     },
@@ -211,16 +216,11 @@ export function faqPageJsonLd(items: FAQItem[], inLanguage?: string) {
   };
 }
 
-export function breadcrumbJsonLd(
-  segments: BreadcrumbSegment[],
-  baseUrl: string = APP_URL,
-  inLanguage?: string,
-) {
+export function breadcrumbJsonLd(segments: BreadcrumbSegment[], baseUrl: string = APP_URL) {
   const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    ...(inLanguage ? { inLanguage } : {}),
     itemListElement: segments.map((segment, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -235,11 +235,15 @@ export function nftProductJsonLd({
   name,
   description,
   imageUrl,
+  url,
+  category,
 }: {
   tokenId: number;
   name: string;
   description: string;
   imageUrl: string;
+  url?: string;
+  category?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -247,12 +251,12 @@ export function nftProductJsonLd({
     name,
     description,
     image: imageUrl,
-    url: `${APP_URL}/detail/${tokenId}`,
+    url: url ?? `${APP_URL}/detail/${tokenId}`,
     brand: {
       '@type': 'Organization',
       name: SITE_NAME,
     },
-    category: 'Digital Collectible',
+    category: category ?? 'Digital Collectible',
   };
 }
 

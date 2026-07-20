@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getAssetsUrl, logoImgUrl } from '@/utils';
 
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { axios, getAPIUrl, isAxiosError } from '@/services/api/client';
 import type { CSTTokenInfo } from '@/services/api/types';
 import { createMetadata } from '@/utils/seo';
@@ -70,10 +71,15 @@ export default async function Page({ params }: PageProps) {
   }
 
   setRequestLocale(locale);
-  const [t, tCommon] = await Promise.all([getTranslations('detail'), getTranslations('common')]);
+  const [t, tCommon, seo] = await Promise.all([
+    getTranslations({ locale, namespace: 'detail' }),
+    getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'seo' }),
+  ]);
 
   const name = t('jsonLd.productName', { id });
   const description = t('jsonLd.productDescription');
+  const pageUrl = localeHref(APP_ORIGIN, `/detail/${id}`, locale);
   const tokenInfo = await loadTokenInfo(tokenId);
 
   if (tokenInfo === null) {
@@ -84,13 +90,25 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <>
-      <JsonLd data={nftProductJsonLd({ tokenId, name, description, imageUrl })} />
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: tCommon('breadcrumbs.home'), path: '/' },
-          { name: tCommon('breadcrumbs.gallery'), path: '/gallery' },
-          { name: t('jsonLd.breadcrumbToken', { id }), path: `/detail/${id}` },
-        ])}
+        data={nftProductJsonLd({
+          tokenId,
+          name,
+          description,
+          imageUrl,
+          url: pageUrl,
+          category: seo('jsonLd.product.category'),
+        })}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd(
+          [
+            { name: tCommon('breadcrumbs.home'), path: '/' },
+            { name: tCommon('breadcrumbs.gallery'), path: '/gallery' },
+            { name: t('jsonLd.breadcrumbToken', { id }), path: `/detail/${id}` },
+          ],
+          localeHref(APP_ORIGIN, '/', locale),
+        )}
       />
       <DetailPage tokenId={tokenId} />
     </>

@@ -1,0 +1,94 @@
+{
+  "hero": {
+    "badge": "知识库",
+    "titlePrefix": "Cosmic Signature",
+    "titleHighlight": "常见问题",
+    "subtitle": "从初次参与到深入理解周期机制，这里汇集了关于 Cosmic Signature 的常见疑问。",
+    "answerCount": "{count}+ 条解答",
+    "answerCountTooltip": "全面解答 Cosmic Signature 各方面的常见问题。",
+    "categoryCount": "{count} 个分类",
+    "alwaysUpdated": "持续更新"
+  },
+  "search": {
+    "placeholder": "搜索问题……",
+    "ariaLabel": "搜索常见问题",
+    "clear": "清除",
+    "clearAria": "清除搜索内容",
+    "noResults": "未找到相关问题，请尝试其他关键词。",
+    "resultCount": "共 {totalCount} 个问题，当前显示 {resultCount} 个"
+  },
+  "navigation": {
+    "ariaLabel": "常见问题分类",
+    "all": "全部"
+  },
+  "category": {
+    "expandAll": "全部展开",
+    "collapseAll": "全部收起",
+    "expandAllAria": "展开本分类的所有问题",
+    "collapseAllAria": "收起本分类的所有问题",
+    "copyLink": "复制链接",
+    "copied": "已复制",
+    "copyLinkAria": "复制此问题的链接"
+  },
+  "popular": {
+    "heading": "热门问题",
+    "tooltip": "新参与者最常提出的问题。"
+  },
+  "empty": {
+    "heading": "未找到相关问题",
+    "descriptionPrefix": "请尝试其他关键词，或",
+    "clearAction": "清除搜索"
+  },
+  "contact": {
+    "heading": "还有其他问题？",
+    "description": "没有找到想了解的内容？社区成员很乐意提供帮助。通过以下任一渠道联系我们，我们会尽快回复。",
+    "x": "Twitter / X",
+    "discord": "Discord"
+  },
+  "tooltips": {
+    "enduranceChampion": {
+      "term": "坚守冠军",
+      "content": "一个演绎周期内，连续保持“最近一笔落笔者”身份时间最长的参与者。"
+    },
+    "chronoWarrior": {
+      "term": "时之勇士",
+      "content": "连续保持坚守冠军身份时间最长的参与者。"
+    },
+    "calibrationWindow": {
+      "term": "校准窗口",
+      "content": "用于发现落笔价格的时段。价格从校准上限开始，随时间向校准下限下降；等待越久，价格越低。"
+    },
+    "cosmicCouncil": {
+      "term": "宇宙议会",
+      "content": "链上协议协调机构。CST 持有者可提交协调提案并表达支持或反对，例如决定每个周期公共物品分配的受益方。"
+    },
+    "cst": {
+      "term": "CST",
+      "content": "每笔落笔都可能铭刻的 ERC-20 代币，可用于宇宙议会协调，也可替代 ETH 落笔。"
+    },
+    "erc20": {
+      "term": "ERC-20",
+      "content": "以太坊广泛采用的同质化代币标准，同一合约中的代币可以互换。"
+    },
+    "erc721": {
+      "term": "ERC-721",
+      "content": "以太坊的非同质化代币（NFT）标准，每枚代币都独一无二。"
+    },
+    "layer2": {
+      "term": "Layer 2",
+      "content": "构建在以太坊之上的扩展协议，可更快、更低成本地处理交易，同时继承以太坊的安全性。"
+    },
+    "rollup": {
+      "term": "汇总网络",
+      "content": "把多笔交易汇总处理并将数据发布回以太坊的 Layer 2 技术，可显著降低成本并保留以太坊级别的安全性。"
+    },
+    "randomWalkNft": {
+      "term": "Random Walk NFT",
+      "content": "与 Cosmic Signature 相关联的 NFT 系列。将一枚附加至 ETH 落笔，可一次性降低 50% 的 ETH 落笔价格。"
+    },
+    "renounceOwnership": {
+      "term": "放弃所有权",
+      "content": "不可逆的智能合约操作，会永久撤销团队更改协议参数的能力。"
+    }
+  }
+}

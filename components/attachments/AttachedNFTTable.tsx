@@ -2,9 +2,10 @@ import { useState, type FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import { getExplorerUrl, shortenHex } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -64,7 +65,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(nft.TimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={nft.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
 
@@ -266,7 +267,7 @@ function AttachedNFTPrintFallback({ list }: { list: NFTRecord[] }) {
           {list.map((nft) => (
             <tr key={String(nft.RecordId)}>
               <td className="border border-foreground/15 p-2">
-                {convertTimestampToDateTime(nft.TimeStamp, false, locale)}
+                <HydrationSafeDateTime timestamp={nft.TimeStamp} locale={locale} />
               </td>
               <td className="border border-foreground/15 p-2 font-mono break-all">
                 {nft.DonorAddr}

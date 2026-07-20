@@ -14,9 +14,9 @@
  *   - No Tailwind / no external CSS — only inline `style` props.
  *   - Every parent element with multiple children must declare
  *     `display: 'flex'` (Satori errors otherwise).
- *   - Font loading is intentionally skipped: Satori's Helvetica fallback
- *     is consistent across deploys and avoids the ~200 ms of edge-time
- *     font fetching.
+ *   - English keeps Satori's Helvetica fallback for visual parity. Chinese
+ *     cards receive a checked-in Noto Sans SC subset from the shared image
+ *     factory so every CJK glyph renders without a network request.
  *
  * Visual language matches the landing-site `Hero` and the runtime
  * `ReducedMotionFallback` background — deep-space gradient with
@@ -36,6 +36,10 @@ export type CosmicOgCardProps = {
   chips?: readonly string[];
   /** Bottom-right text. Defaults to the canonical domain. */
   footerEnd?: string;
+  /** Embedded font family used for CJK rendering. English leaves this unset. */
+  fontFamily?: string;
+  /** Removes Latin-only casing and tracking treatments from Chinese copy. */
+  cjk?: boolean;
 };
 
 const DEFAULT_CHIPS = ['CC0', 'Verified On-Chain', '7% Protocol Guild'] as const;
@@ -65,6 +69,8 @@ export function CosmicOgCard({
   subhead,
   chips = DEFAULT_CHIPS,
   footerEnd = 'cosmicsignature.com',
+  fontFamily,
+  cjk = false,
 }: CosmicOgCardProps): ReactElement {
   return (
     <div
@@ -77,7 +83,7 @@ export function CosmicOgCard({
         padding: '80px',
         background: DEEP_SPACE_BACKGROUND,
         color: '#F0EDFF',
-        fontFamily: 'Helvetica, Arial, sans-serif',
+        fontFamily: fontFamily ?? 'Helvetica, Arial, sans-serif',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -94,8 +100,8 @@ export function CosmicOgCard({
           style={{
             display: 'flex',
             fontSize: 20,
-            textTransform: 'uppercase',
-            letterSpacing: '0.3em',
+            textTransform: cjk ? 'none' : 'uppercase',
+            letterSpacing: cjk ? '0.08em' : '0.3em',
             opacity: 0.85,
           }}
         >
@@ -110,7 +116,7 @@ export function CosmicOgCard({
             fontSize: 84,
             fontWeight: 700,
             lineHeight: 1.02,
-            letterSpacing: '-0.02em',
+            letterSpacing: cjk ? '0' : '-0.02em',
             maxWidth: '1040px',
           }}
         >
@@ -138,8 +144,8 @@ export function CosmicOgCard({
           justifyContent: 'space-between',
           fontSize: 18,
           opacity: 0.65,
-          textTransform: 'uppercase',
-          letterSpacing: '0.22em',
+          textTransform: cjk ? 'none' : 'uppercase',
+          letterSpacing: cjk ? '0.08em' : '0.22em',
         }}
       >
         <div style={{ display: 'flex', gap: '32px' }}>

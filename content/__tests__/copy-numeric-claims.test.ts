@@ -1,11 +1,10 @@
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
-import { getAllItems } from '@/app/[locale]/(app)/faq/data/faq-data';
+import { faqContentEn, faqContentZh, getAllFaqItems } from '@/content/faq';
 import { landingContentEn, landingContentZh } from '@/content/landing';
 import { learnContentEn, learnContentZh } from '@/content/learn';
 import { protocolFacts } from '@/content/protocol-facts';
-import { statisticsCopy } from '@/content/statistics-copy';
 
 /**
  * Cross-copy numeric drift guard.
@@ -37,8 +36,14 @@ const readMessageCatalogs = (locale: string) => {
 
 const sources: CopySource[] = [
   {
-    name: 'faq-data',
-    text: getAllItems()
+    name: 'faq-en',
+    text: getAllFaqItems(faqContentEn)
+      .map((item) => `${item.question} ${item.answer}`)
+      .join('\n'),
+  },
+  {
+    name: 'faq-zh',
+    text: getAllFaqItems(faqContentZh)
       .map((item) => `${item.question} ${item.answer}`)
       .join('\n'),
   },
@@ -48,12 +53,13 @@ const sources: CopySource[] = [
   { name: 'learn-zh', text: JSON.stringify(learnContentZh.articles) },
   { name: 'messages-en', text: readMessageCatalogs('en') },
   { name: 'messages-zh', text: readMessageCatalogs('zh') },
-  { name: 'statistics-copy', text: JSON.stringify(statisticsCopy) },
   { name: 'llms.txt', text: readPublicFile('llms.txt') },
   { name: 'llms-full.txt', text: readPublicFile('llms-full.txt') },
 ];
 
 const allowedPercents = new Set<number>([
+  // Chart prose uses the neutral zero boundary ("no activity shows 0%").
+  0,
   protocolFacts.mainEthPercentage,
   protocolFacts.chronoWarriorEthPercentage,
   protocolFacts.stellarSelectionEthPercentage,

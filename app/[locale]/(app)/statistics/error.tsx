@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { ErrorState } from '@/components/ui/error-state';
 import { reportError } from '@/utils/errors';
@@ -13,14 +14,16 @@ export default function StatisticsError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations('statistics');
+
   useEffect(() => {
     reportError(error, 'statistics-route');
   }, [error]);
 
   return (
     <ErrorState
-      title="Statistics failed to load"
-      message="Something went wrong while rendering this statistics page. Try again, or come back in a moment."
+      title={t('routeError.title')}
+      message={t('routeError.message')}
       onRetry={reset}
       surface
     />

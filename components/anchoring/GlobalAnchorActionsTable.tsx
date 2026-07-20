@@ -4,8 +4,9 @@ import { useState, type FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { shortenHex } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link } from '@/i18n/navigation';
 import { useRouter } from '@/i18n/navigation';
 import {
@@ -51,7 +52,7 @@ const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }
   return (
     <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(row.TimeStamp, false, locale)}
+        <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">

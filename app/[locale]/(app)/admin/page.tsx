@@ -1,17 +1,25 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
 import AdminPage from './AdminPage';
 
-export const metadata: Metadata = createMetadata(
-  'Admin | Cosmic Signature',
-  'Administrative controls for the Cosmic Signature protocol. Manage protocol parameters, contract settings, and system configuration.',
-  undefined,
-  '/admin',
-  { index: false },
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export default function Page() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(t('admin.title'), t('admin.description'), undefined, '/admin', {
+    index: false,
+    locale,
+  });
+}
+
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return <AdminPage />;
 }

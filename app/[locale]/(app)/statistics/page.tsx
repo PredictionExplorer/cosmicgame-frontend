@@ -1,38 +1,54 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { APP_ORIGIN } from '@/lib/hostRouting';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, datasetJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 import { StatisticsSeoSummary } from './StatisticsSeoSummary';
 import StatisticsHubPanel from './StatisticsHubPanel';
 
-export const metadata: Metadata = createMetadata(
-  'Cosmic Signature Statistics | Performance Cycle, Gestures, NFTs, and CST',
-  'View Cosmic Signature protocol statistics on Arbitrum, including Performance Cycle status, gestures, NFT activity, CST, anchoring, reserves, and allocation data.',
-  undefined,
-  '/statistics',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('statistics.title'),
+    t('statistics.description'),
+    undefined,
+    '/statistics',
+    { locale },
+  );
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'statistics' });
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const url = localeHref(APP_ORIGIN, '/statistics', locale);
+
   return (
     <>
       <JsonLd
         data={[
           webPageJsonLd({
-            name: 'Cosmic Signature Protocol Statistics',
-            description:
-              'Public Cosmic Signature protocol statistics on Arbitrum, including Performance Cycle status, gestures, NFTs, CST, anchoring, reserves, and allocation data.',
-            url: `${APP_ORIGIN}/statistics`,
+            name: t('hub.jsonLd.webPageName'),
+            description: t('hub.jsonLd.webPageDescription'),
+            url,
+            inLanguage,
           }),
           datasetJsonLd({
-            name: 'Cosmic Signature Protocol Statistics Snapshot',
-            description:
-              'A crawlable summary of public Cosmic Signature protocol activity indexed from Arbitrum smart contracts and the Cosmic Signature API.',
-            url: `${APP_ORIGIN}/statistics`,
+            name: t('hub.jsonLd.datasetName'),
+            description: t('hub.jsonLd.datasetDescription'),
+            url,
             dateModified: new Date().toISOString(),
+            inLanguage,
           }),
         ]}
       />

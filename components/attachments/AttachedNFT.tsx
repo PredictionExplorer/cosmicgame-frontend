@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import { StyledCard } from '@/components/styled';
 import NFTImage from '@/components/nft/NFTImage';
 import type { AttachedNFT as AttachedNFTRecord } from '@/services/api/types';
@@ -17,18 +19,30 @@ interface DonatedNFTProps {
 }
 
 const DonatedNFT = ({ nft }: DonatedNFTProps) => {
+  const t = useTranslations('statistics');
   const { data: tokenURI } = useAttachedNftMetadata(nft.NFTTokenURI);
-  const link = resolveAttachedNftLink({ nft, metadata: tokenURI });
+  const labels = {
+    viewNft: t('attachedNftLinks.viewNft'),
+    viewOpenSea: t('attachedNftLinks.viewOpenSea'),
+    viewContract: t('attachedNftLinks.viewContract'),
+    detailsUnavailable: t('attachedNftLinks.detailsUnavailable'),
+    contractUnavailable: t('attachedNftLinks.contractUnavailable'),
+  };
+  const link = resolveAttachedNftLink({ nft, metadata: tokenURI, labels });
   const tokenId = getAttachedNftTokenId(nft);
   const label = tokenURI?.name
-    ? `View attached NFT ${tokenURI.name}`
+    ? t('attachedNftCard.viewNamed', { name: tokenURI.name })
     : tokenId
-      ? `View attached NFT ${tokenId}`
+      ? t('attachedNftCard.viewId', { id: tokenId })
       : link.label;
   const image = (
     <NFTImage
       src={tokenURI?.image}
-      alt={tokenURI?.name ? `Attached NFT ${tokenURI.name}` : 'Attached NFT'}
+      alt={
+        tokenURI?.name
+          ? t('attachedNftCard.imageAltNamed', { name: tokenURI.name })
+          : t('attachedNftCard.imageAlt')
+      }
     />
   );
 
@@ -58,7 +72,7 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
           data-testid="NFTTokenId"
           title={tokenId ? `#${tokenId}` : undefined}
         >
-          {tokenId ? `#${tokenId}` : 'Unknown token'}
+          {tokenId ? `#${tokenId}` : t('attachedNftCard.unknownToken')}
         </span>
         <span
           className={cn(
@@ -66,7 +80,7 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
             !link.href && 'bg-white/[0.05] text-muted-foreground',
           )}
         >
-          Attached
+          {t('attachedNftCard.attached')}
         </span>
       </div>
     </StyledCard>

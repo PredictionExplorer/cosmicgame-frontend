@@ -1,10 +1,9 @@
-import { ImageResponse } from 'next/og';
-
-import { COSMIC_OG_SIZE, CosmicOgCard } from '@/lib/og/CosmicOgCard';
+import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
+import { formatOgEyebrow, getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
+import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
 
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
-export const alt = 'Cosmic Signature \u2014 Gesture';
 
 /**
  * The route param is the event-log id, not the gesture position. Unlike the
@@ -32,20 +31,19 @@ async function fetchGesturePosition(rawId: string): Promise<number | null> {
   }
 }
 
-function gesturePositionLabel(position: number | null): string {
-  return position !== null ? `Gesture Position #${position}` : 'Gesture';
+interface ImageProps {
+  params: Promise<{ locale: string; id: string }>;
 }
 
-export default async function Image({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const eyebrow = gesturePositionLabel(await fetchGesturePosition(id));
+export async function generateImageMetadata({ params }: ImageProps) {
+  const { locale } = await params;
+  return getOgImageMetadata(locale, 'gesture');
+}
 
-  return new ImageResponse(
-    <CosmicOgCard
-      eyebrow={eyebrow}
-      title="An imprint on the Signature."
-      subhead="Each gesture extends the Cycle Finalization Time, imprints Participation CST, and shapes the cycle\u2019s evolving Signature."
-    />,
-    size,
-  );
+export default async function Image({ params }: ImageProps) {
+  const { locale, id } = await params;
+  const copy = getOgCopy(locale, 'gesture');
+  const eyebrow = formatOgEyebrow(copy, await fetchGesturePosition(id));
+
+  return createCosmicOgImage(locale, { ...copy, eyebrow });
 }

@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
 import { shortenHex } from '@/utils';
-import { statisticsCopy } from '@/content/statistics-copy';
 
 import { UniqueAnchorHoldersCSTTable } from '@/components/tables/UniqueAnchorHoldersCSTTable';
 
@@ -50,14 +50,17 @@ describe('UniqueAnchorHoldersCSTTable', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 
-  it('adds help triggers to anchor-holder table headers', () => {
+  it('adds localized help to anchor-holder table headers', async () => {
+    const user = userEvent.setup();
     render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder()]} />);
-    expect(
-      screen.getAllByRole('button', {
-        name: /^tables\.tableHeaderHelp\.explainColumn/,
-      }).length,
-    ).toBeGreaterThanOrEqual(7);
-    expect(statisticsCopy.tables.totalImprintedTokens).toMatch(/imprinted/);
+    const triggers = screen.getAllByRole('button', {
+      name: /^tables\.tableHeaderHelp\.explainColumn/,
+    });
+    expect(triggers.length).toBeGreaterThanOrEqual(7);
+    await user.hover(triggers[3]!);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'tables.statisticsTooltips.totalImprintedTokens',
+    );
   });
 
   it('renders anchor-holder data', () => {

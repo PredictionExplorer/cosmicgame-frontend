@@ -47,11 +47,14 @@ function hasValidUrl(value: string) {
 
 export function EthContributionForm({
   className,
-  description = 'Contributions are recorded for the active cycle by the contract.',
+  description,
   onSuccess,
-  title = 'Make an ETH Contribution',
+  title,
 }: EthContributionFormProps) {
-  const t = useTranslations('toasts');
+  const t = useTranslations('ethContribution');
+  const tToast = useTranslations('toasts');
+  const resolvedDescription = description ?? t('form.defaultDescription');
+  const resolvedTitle = title ?? t('form.defaultTitle');
   const [amount, setAmount] = useState('');
   const [metadataTitle, setMetadataTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -72,7 +75,7 @@ export function EthContributionForm({
   const handleSubmit = async () => {
     if (!account) {
       setNotification({
-        text: t('contribution.connectWallet'),
+        text: tToast('contribution.connectWallet'),
         type: 'error',
         visible: true,
       });
@@ -81,7 +84,7 @@ export function EthContributionForm({
 
     if (!amountIsValid) {
       setNotification({
-        text: t('contribution.invalidAmount'),
+        text: tToast('contribution.invalidAmount'),
         type: 'error',
         visible: true,
       });
@@ -90,7 +93,7 @@ export function EthContributionForm({
 
     if (!urlIsValid) {
       setNotification({
-        text: t('contribution.invalidUrl'),
+        text: tToast('contribution.invalidUrl'),
         type: 'error',
         visible: true,
       });
@@ -99,7 +102,7 @@ export function EthContributionForm({
 
     if (!cosmicGameContract) {
       setNotification({
-        text: t('contribution.contractUnavailable'),
+        text: tToast('contribution.contractUnavailable'),
         type: 'error',
         visible: true,
       });
@@ -125,9 +128,12 @@ export function EthContributionForm({
       assertSuccessfulTransactionReceipt(receipt);
 
       setNotification({
-        text: t(hasMetadata ? 'contribution.formSubmittedWithInfo' : 'contribution.formSubmitted', {
-          amount: amount.trim(),
-        }),
+        text: tToast(
+          hasMetadata ? 'contribution.formSubmittedWithInfo' : 'contribution.formSubmitted',
+          {
+            amount: amount.trim(),
+          },
+        ),
         type: 'success',
         visible: true,
       });
@@ -139,14 +145,14 @@ export function EthContributionForm({
     } catch (error: unknown) {
       if (isUserRejection(error)) {
         setNotification({
-          text: t('walletTransactionCancelled'),
+          text: tToast('walletTransactionCancelled'),
           type: 'info',
           visible: true,
         });
       } else {
         reportError(error, 'ETH contribution error');
         setNotification({
-          text: t('contribution.formFailed'),
+          text: tToast('contribution.formFailed'),
           type: 'error',
           visible: true,
         });
@@ -160,14 +166,16 @@ export function EthContributionForm({
     <Surface variant="solar" radius="xl" padding="lg" className={cn('mb-12 space-y-5', className)}>
       <div className="space-y-2">
         <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-          {title}
+          {resolvedTitle}
         </h3>
-        <p className="type-body-sm text-muted-foreground">{description}</p>
+        <p className="type-body-sm text-muted-foreground">{resolvedDescription}</p>
       </div>
 
       {!account ? (
         <div className="flex flex-col gap-3 rounded-lg border border-white/[0.08] bg-black/20 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">{t('contribution.connectWalletInline')}</p>
+          <p className="text-sm text-muted-foreground">
+            {tToast('contribution.connectWalletInline')}
+          </p>
           <div className="sm:shrink-0">
             <RainbowConnectButton />
           </div>
@@ -180,7 +188,7 @@ export function EthContributionForm({
             htmlFor="eth-contribution-amount"
             className="mb-1.5 block text-xs text-muted-foreground"
           >
-            Amount (ETH)
+            {t('form.amountLabel')}
           </Label>
           <div className="flex items-center gap-2">
             <Input
@@ -194,7 +202,9 @@ export function EthContributionForm({
             <span className="text-sm text-muted-foreground">ETH</span>
           </div>
           {amount.length > 0 && !amountIsValid ? (
-            <p className="mt-1.5 text-xs text-destructive">{t('contribution.invalidAmount')}</p>
+            <p className="mt-1.5 text-xs text-destructive">
+              {tToast('contribution.invalidAmount')}
+            </p>
           ) : null}
         </div>
 
@@ -204,11 +214,11 @@ export function EthContributionForm({
               htmlFor="eth-contribution-title"
               className="mb-1.5 block text-xs text-muted-foreground"
             >
-              Title <span className="opacity-50">(optional)</span>
+              {t('form.titleLabel')} <span className="opacity-50">{t('form.optional')}</span>
             </Label>
             <Input
               id="eth-contribution-title"
-              placeholder="Contribution title"
+              placeholder={t('form.titlePlaceholder')}
               value={metadataTitle}
               onChange={(event) => setMetadataTitle(event.target.value)}
             />
@@ -218,7 +228,7 @@ export function EthContributionForm({
               htmlFor="eth-contribution-url"
               className="mb-1.5 block text-xs text-muted-foreground"
             >
-              URL <span className="opacity-50">(optional)</span>
+              {t('form.urlLabel')} <span className="opacity-50">{t('form.optional')}</span>
             </Label>
             <Input
               id="eth-contribution-url"
@@ -229,7 +239,7 @@ export function EthContributionForm({
             />
             {!urlIsValid ? (
               <p className="mt-1.5 text-xs text-destructive">
-                {t('contribution.invalidUrlInline')}
+                {tToast('contribution.invalidUrlInline')}
               </p>
             ) : null}
           </div>
@@ -241,14 +251,14 @@ export function EthContributionForm({
           htmlFor="eth-contribution-message"
           className="mb-1.5 block text-xs text-muted-foreground"
         >
-          Message <span className="opacity-50">(optional)</span>
+          {t('form.messageLabel')} <span className="opacity-50">{t('form.optional')}</span>
         </Label>
         <textarea
           id="eth-contribution-message"
           value={message}
           rows={3}
           className="flex w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm transition-colors ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="Leave an optional note with your contribution"
+          placeholder={t('form.messagePlaceholder')}
           onChange={(event) => setMessage(event.target.value)}
         />
       </div>
@@ -256,14 +266,12 @@ export function EthContributionForm({
       <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center">
         <Button disabled={!canSubmit} onClick={handleSubmit}>
           {isSubmitting
-            ? t('contribution.submitting')
+            ? tToast('contribution.submitting')
             : hasMetadata
-              ? 'Contribute with Message'
-              : 'Contribute ETH'}
+              ? t('form.contributeWithMessage')
+              : t('form.contributeEth')}
         </Button>
-        <p className="text-xs text-muted-foreground">
-          Optional fields are stored as structured JSON for contribution detail pages.
-        </p>
+        <p className="text-xs text-muted-foreground">{t('form.structuredHelp')}</p>
       </div>
     </Surface>
   );

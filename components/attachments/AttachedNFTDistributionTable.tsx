@@ -2,8 +2,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useMemo, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
-
-import { statisticsCopy } from '@/content/statistics-copy';
+import { useTranslations } from 'next-intl';
 
 import {
   TablePrimary,
@@ -28,6 +27,7 @@ interface NFTDistributionTableProps {
 }
 
 const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) => {
+  const t = useTranslations('tables');
   const [page, setPage] = useState(1);
 
   const paginatedData = useMemo(
@@ -36,7 +36,7 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
   );
 
   if (list.length === 0) {
-    return <p>No attached tokens yet.</p>;
+    return <p>{t('empty.attachedTokens')}</p>;
   }
 
   return (
@@ -47,14 +47,14 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
             <Tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
-                  desktop="Contract Address"
-                  tooltip={statisticsCopy.tables.attachedNftContractAddress}
+                  desktop={t('statisticsColumns.contractAddress')}
+                  tooltip={t('statisticsTooltips.attachedNftContractAddress')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
-                  desktop="Number of NFTs"
-                  tooltip={statisticsCopy.tables.attachedNftCount}
+                  desktop={t('statisticsColumns.numberOfNfts')}
+                  tooltip={t('statisticsTooltips.attachedNftCount')}
                 />
               </TablePrimaryHeadCell>
             </Tr>

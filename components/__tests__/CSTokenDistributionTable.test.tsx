@@ -6,7 +6,7 @@ import '@testing-library/jest-dom';
 describe('CSTokenDistributionTable', () => {
   test('with no records', () => {
     render(<CSTokenDistributionTable list={[]} />);
-    expect(screen.getByText('No tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.tokens')).toBeInTheDocument();
   });
 
   test('with mock data', () => {

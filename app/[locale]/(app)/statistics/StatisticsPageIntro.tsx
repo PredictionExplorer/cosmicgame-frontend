@@ -6,15 +6,17 @@ import { SectionEyebrow } from '@/components/ui/section-eyebrow';
  * hydrates client-side.
  */
 export function StatisticsPageIntro({
+  eyebrow,
   title,
   description,
 }: {
+  eyebrow: string;
   title: string;
   description: string;
 }) {
   return (
     <header className="mb-10">
-      <SectionEyebrow tone="aurora">Protocol Statistics · Arbitrum</SectionEyebrow>
+      <SectionEyebrow tone="aurora">{eyebrow}</SectionEyebrow>
       <h1 className="mt-4 type-display-md text-foreground">{title}</h1>
       <p className="mt-3 max-w-3xl type-body-lg text-muted-foreground">{description}</p>
     </header>

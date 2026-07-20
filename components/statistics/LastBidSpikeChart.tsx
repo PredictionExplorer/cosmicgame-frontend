@@ -13,8 +13,9 @@ import {
   ReferenceArea,
 } from 'recharts';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { formatUnixTsLabel } from '@/utils';
+import { formatGroupedNumber, formatUnixTsLabel } from '@/utils';
 
 import { useBiddingActivity, useBidFrequency, useBidTimeBounds } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
@@ -46,10 +47,10 @@ function spikeViewRange(spike: BidSpike): { initTs: number; finTs: number } {
   return { initTs, finTs };
 }
 
-function toChartPoints(records: BidFrequencyBucket[]): ChartPoint[] {
+function toChartPoints(records: BidFrequencyBucket[], locale: string): ChartPoint[] {
   return records.map((r) => ({
     bucketTs: r.BucketTs,
-    label: formatUnixTsLabel(r.BucketTs, true),
+    label: formatUnixTsLabel(r.BucketTs, true, locale),
     numBids: r.NumBids ?? 0,
   }));
 }
@@ -60,6 +61,7 @@ type SpikeTooltipProps = {
 };
 
 function SpikeTooltip({ active, payload }: SpikeTooltipProps) {
+  const t = useTranslations('statistics');
   if (!active || !payload?.length) return null;
   const point = payload[0]?.payload;
   if (!point) return null;
@@ -68,7 +70,7 @@ function SpikeTooltip({ active, payload }: SpikeTooltipProps) {
     <div className="rounded-lg border border-white/10 bg-background/95 px-3 py-2 text-sm shadow-lg">
       <p className="mb-1 font-medium text-white">{point.label}</p>
       <p className="text-muted-foreground">
-        Gestures: <span className="text-white">{point.numBids}</span>
+        {t('charts.spikes.gestures', { count: point.numBids })}
       </p>
     </div>
   );
@@ -80,6 +82,8 @@ type LastBidSpikeChartProps = {
 
 /** Hourly frequency chart focused on gesture spikes, with navigation between detected spikes. */
 export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const { data: bounds } = useBidTimeBounds(enabled);
   const nowSec = Math.floor(useNow(60_000) / 1000);
 
@@ -105,10 +109,7 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
 
   const selectedSpike = selectedIndex !== null ? spikes[selectedIndex] : undefined;
 
-  const viewRange = useMemo(
-    () => (selectedSpike ? spikeViewRange(selectedSpike) : null),
-    [selectedSpike],
-  );
+  const viewRange = selectedSpike ? spikeViewRange(selectedSpike) : null;
 
   const {
     data: windowFrequency,
@@ -122,10 +123,15 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
     enabled && viewRange !== null,
   );
 
-  const chartData = useMemo(() => toChartPoints(windowFrequency ?? []), [windowFrequency]);
+  const chartData = useMemo(
+    () => toChartPoints(windowFrequency ?? [], locale),
+    [windowFrequency, locale],
+  );
 
-  const spikeLabelStart = selectedSpike ? formatUnixTsLabel(selectedSpike.StartTs, true) : '';
-  const spikeLabelEnd = selectedSpike ? formatUnixTsLabel(selectedSpike.EndTs, true) : '';
+  const spikeLabelStart = selectedSpike
+    ? formatUnixTsLabel(selectedSpike.StartTs, true, locale)
+    : '';
+  const spikeLabelEnd = selectedSpike ? formatUnixTsLabel(selectedSpike.EndTs, true, locale) : '';
 
   const goPrev = () => {
     if (selectedIndex === null || selectedIndex <= 0) return;
@@ -149,14 +155,14 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
-              Spikes ({spikes.length})
+              {t('charts.spikes.count', { count: formatGroupedNumber(spikes.length, locale) })}
             </span>
             {/* Selection is by array position — the backend `Index` field is not
                 guaranteed to match the array order, and mixing the two broke
                 prev/next navigation. Scrolls horizontally when many spikes exist. */}
             <div
               role="group"
-              aria-label="Detected gesture spikes"
+              aria-label={t('charts.spikes.groupAria')}
               className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none"
             >
               {spikes.map((spike, arrayIndex) => (
@@ -182,7 +188,7 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
               variant="outline"
               onClick={goPrev}
               disabled={selectedIndex === null || selectedIndex <= 0}
-              aria-label="Previous spike"
+              aria-label={t('charts.spikes.previousAria')}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -192,14 +198,17 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
               variant="outline"
               onClick={goNext}
               disabled={selectedIndex === null || selectedIndex >= spikes.length - 1}
-              aria-label="Next spike"
+              aria-label={t('charts.spikes.nextAria')}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
             {selectedSpike ? (
               <p className="text-xs text-muted-foreground">
-                Peak {selectedSpike.PeakNumBids} gestures/hr · {selectedSpike.TotalBids} total in
-                spike · {formatUnixTsLabel(selectedSpike.PeakTs, true)}
+                {t('charts.spikes.summary', {
+                  peak: formatGroupedNumber(selectedSpike.PeakNumBids, locale),
+                  total: formatGroupedNumber(selectedSpike.TotalBids, locale),
+                  date: formatUnixTsLabel(selectedSpike.PeakTs, true, locale),
+                })}
               </p>
             ) : null}
           </div>
@@ -212,28 +221,30 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
         </div>
       ) : chartError ? (
         <ErrorState
-          title="Failed to load gesture spikes"
-          message="Could not fetch spike detection data."
+          title={t('charts.spikes.loadErrorTitle')}
+          message={t('charts.spikes.loadErrorMessage')}
           onRetry={() => {
             void refetch();
             void refetchWindow();
           }}
         />
       ) : spikes.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted-foreground">
-          No gesture spikes detected in indexed history.
-        </p>
+        <p className="py-8 text-center text-sm text-muted-foreground">{t('charts.spikes.empty')}</p>
       ) : showEmptyRecent ? (
         <div className="rounded-lg border border-dashed border-white/10 py-12 text-center">
-          <p className="text-sm text-muted-foreground">No spikes recently.</p>
+          <p className="text-sm text-muted-foreground">{t('charts.spikes.noneRecent')}</p>
           <p className="mt-2 text-xs text-muted-foreground/80">
-            Select a spike index above to scroll into the past and inspect earlier activity bursts.
+            {t('charts.spikes.selectEarlier')}
           </p>
         </div>
       ) : selectedSpike && chartData.length > 0 ? (
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            Viewing spike #{selectedIndex! + 1}: {spikeLabelStart} → {spikeLabelEnd}
+            {t('charts.spikes.viewing', {
+              index: selectedIndex! + 1,
+              start: spikeLabelStart,
+              end: spikeLabelEnd,
+            })}
           </p>
           <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
             <BarChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
@@ -242,7 +253,7 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
                 dataKey="bucketTs"
                 type="number"
                 domain={['dataMin', 'dataMax']}
-                tickFormatter={(ts) => formatUnixTsLabel(Number(ts), true)}
+                tickFormatter={(ts) => formatUnixTsLabel(Number(ts), true, locale)}
                 tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 10 }}
                 interval="preserveStartEnd"
                 minTickGap={40}
@@ -267,14 +278,11 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
               />
             </BarChart>
           </ResponsiveContainer>
-          <p className="text-xs text-muted-foreground">
-            Gestures in the first hour after each cycle opens are excluded — opening activity is
-            unusually concentrated and would otherwise skew this chart.
-          </p>
+          <p className="text-xs text-muted-foreground">{t('charts.frequency.openingExcluded')}</p>
         </div>
       ) : (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          No hourly buckets for the selected spike window.
+          {t('charts.spikes.emptyWindow')}
         </p>
       )}
     </div>

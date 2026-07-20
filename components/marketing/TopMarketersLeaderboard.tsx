@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Info } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { AddressLink } from '@/components/common/AddressLink';
@@ -46,6 +47,7 @@ export interface TopMarketersLeaderboardProps {
 }
 
 export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProps) {
+  const t = useTranslations('marketing');
   const topMarketers = useMemo(() => aggregateMarketers(rewards).slice(0, 5), [rewards]);
 
   return (
@@ -56,27 +58,25 @@ export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProp
           id="leaderboard-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          Top Marketers
+          {t('leaderboard.title')}
         </h2>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label="Info about top marketers"
+              aria-label={t('leaderboard.infoAria')}
               className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
             >
               <Info className="h-4 w-4" />
             </button>
           </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            Rankings based on total CST earned from marketing activities
-          </TooltipContent>
+          <TooltipContent className="max-w-xs">{t('leaderboard.tooltip')}</TooltipContent>
         </Tooltip>
       </div>
 
       {topMarketers.length === 0 ? (
         <p className="text-center text-muted-foreground" role="status">
-          No marketers yet.
+          {t('leaderboard.empty')}
         </p>
       ) : (
         <motion.div
@@ -120,7 +120,12 @@ export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProp
                   <span className="text-sm text-muted-foreground">CST</span>
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {marketer.rewardCount} reward{marketer.rewardCount !== 1 ? 's' : ''}
+                  {t(
+                    marketer.rewardCount === 1
+                      ? 'leaderboard.rewardCountOne'
+                      : 'leaderboard.rewardCountOther',
+                    { count: marketer.rewardCount },
+                  )}
                 </p>
               </div>
             </motion.div>

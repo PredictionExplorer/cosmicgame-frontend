@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -7,15 +8,16 @@ import UserStellarSelectionNFTPage from './UserStellarSelectionNFTPage';
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ address: string }>;
+  params: Promise<{ locale: string; address: string }>;
 }): Promise<Metadata> {
-  const { address } = await params;
+  const { locale, address } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
   return createMetadata(
-    'Stellar Selection NFTs | Cosmic Signature',
-    'All Cosmic Signature NFTs allocated to this participant through Stellar Selection. Browse NFTs received via on-chain random selection.',
+    t('userStellarSelectionNft.title'),
+    t('userStellarSelectionNft.description'),
     undefined,
     `/user/stellar-selection-nft/${address}`,
-    { index: false },
+    { index: false, locale },
   );
 }
 
@@ -23,7 +25,12 @@ export async function generateMetadata({
 // fresh instead of freezing the first render forever (see route-group refactor).
 export const revalidate = 300;
 
-export default async function Page({ params }: { params: Promise<{ address: string }> }) {
-  const { address } = await params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string; address: string }>;
+}) {
+  const { locale, address } = await params;
+  setRequestLocale(locale);
   return <UserStellarSelectionNFTPage address={address} />;
 }

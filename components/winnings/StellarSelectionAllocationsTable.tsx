@@ -3,9 +3,10 @@ import { Tr, Tbody } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
+import { getExplorerUrl, formatSeconds, shortenHex } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
@@ -29,6 +30,33 @@ export interface StellarSelectionAllocation {
   Claimed: boolean;
 }
 
+function ExpirationDateTime({
+  timestamp,
+  nowSec,
+  empty,
+}: {
+  timestamp: number;
+  nowSec: number;
+  empty: string;
+}) {
+  const t = useTranslations('myPages');
+  const locale = useLocale();
+  if (timestamp <= 0) return empty;
+
+  return (
+    <HydrationSafeDateTime timestamp={timestamp} locale={locale}>
+      {(date) =>
+        timestamp < nowSec
+          ? t('stellarSelectionAllocations.expired', { date })
+          : t('stellarSelectionAllocations.remaining', {
+              date,
+              remaining: formatSeconds(timestamp - nowSec, locale),
+            })
+      }
+    </HydrationSafeDateTime>
+  );
+}
+
 /** A single row displaying one stellarSelection ETH winning. */
 function StellarSelectionAllocationRow({
   winning,
@@ -44,18 +72,6 @@ function StellarSelectionAllocationRow({
 
   if (!winning) return <TablePrimaryRow />;
 
-  const isExpired = roundTimeout > 0 && roundTimeout < nowSec;
-  const expirationLabel = roundTimeout
-    ? isExpired
-      ? t('stellarSelectionAllocations.expired', {
-          date: convertTimestampToDateTime(roundTimeout, false, locale),
-        })
-      : t('stellarSelectionAllocations.remaining', {
-          date: convertTimestampToDateTime(roundTimeout, false, locale),
-          remaining: formatSeconds(roundTimeout - nowSec, locale),
-        })
-    : ' ';
-
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
@@ -65,7 +81,7 @@ function StellarSelectionAllocationRow({
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(TimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -88,7 +104,9 @@ function StellarSelectionAllocationRow({
           <TooltipContent>{WinnerAddr}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{expirationLabel}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <ExpirationDateTime timestamp={roundTimeout} nowSec={nowSec} empty=" " />
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">{Amount.toFixed(7)}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         {Claimed ? t('shared.yes') : t('shared.no')}
@@ -146,29 +164,19 @@ function StellarSelectionAllocationsPrintFallback({
         <tbody>
           {list.map((w) => {
             const rt = roundTimeouts[w.RoundNum] ?? 0;
-            const isExpired = rt > 0 && rt < nowSec;
-            const expirationLabel =
-              rt > 0
-                ? isExpired
-                  ? t('stellarSelectionAllocations.expired', {
-                      date: convertTimestampToDateTime(rt, false, locale),
-                    })
-                  : t('stellarSelectionAllocations.remaining', {
-                      date: convertTimestampToDateTime(rt, false, locale),
-                      remaining: formatSeconds(rt - nowSec, locale),
-                    })
-                : '—';
 
             return (
               <tr key={w.EvtLogId}>
                 <td className="border border-foreground/15 p-2">
-                  {convertTimestampToDateTime(w.TimeStamp, false, locale)}
+                  <HydrationSafeDateTime timestamp={w.TimeStamp} locale={locale} />
                 </td>
                 <td className="border border-foreground/15 p-2 text-center">{w.RoundNum}</td>
                 <td className="border border-foreground/15 p-2 font-mono">
                   {shortenHex(w.WinnerAddr, 6)}
                 </td>
-                <td className="border border-foreground/15 p-2 text-center">{expirationLabel}</td>
+                <td className="border border-foreground/15 p-2 text-center">
+                  <ExpirationDateTime timestamp={rt} nowSec={nowSec} empty="—" />
+                </td>
                 <td className="border border-foreground/15 p-2 text-center">
                   {w.Amount.toFixed(7)}
                 </td>

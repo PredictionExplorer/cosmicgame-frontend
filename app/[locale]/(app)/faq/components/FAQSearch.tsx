@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 
@@ -14,6 +15,7 @@ interface FAQSearchProps {
 }
 
 export function FAQSearch({ value, onChange, resultCount, totalCount, className }: FAQSearchProps) {
+  const t = useTranslations('faq');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -39,8 +41,8 @@ export function FAQSearch({ value, onChange, resultCount, totalCount, className 
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Search questions..."
-          aria-label="Search frequently asked questions"
+          placeholder={t('search.placeholder')}
+          aria-label={t('search.ariaLabel')}
           className="h-12 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] pl-11 pr-24 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all duration-200 focus:border-primary/40 focus:bg-white/[0.05] focus:outline-none focus:ring-2 focus:ring-primary/20 backdrop-blur-sm"
         />
 
@@ -48,11 +50,11 @@ export function FAQSearch({ value, onChange, resultCount, totalCount, className 
           {isFiltering ? (
             <button
               onClick={() => onChange('')}
-              aria-label="Clear search"
+              aria-label={t('search.clearAria')}
               className="flex h-7 items-center rounded-md px-2 text-xs text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
             >
               <X className="mr-1 h-3 w-3" />
-              Clear
+              {t('search.clear')}
             </button>
           ) : (
             <kbd className="pointer-events-none hidden h-6 select-none items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.04] px-2 font-mono text-[10px] text-muted-foreground/50 sm:inline-flex">
@@ -65,8 +67,8 @@ export function FAQSearch({ value, onChange, resultCount, totalCount, className 
       {isFiltering && resultCount !== undefined && totalCount !== undefined && (
         <p className="mt-2 text-center text-xs text-muted-foreground/70" aria-live="polite">
           {resultCount === 0
-            ? 'No questions found. Try a different search term.'
-            : `Showing ${resultCount} of ${totalCount} questions`}
+            ? t('search.noResults')
+            : t('search.resultCount', { resultCount, totalCount })}
         </p>
       )}
     </div>

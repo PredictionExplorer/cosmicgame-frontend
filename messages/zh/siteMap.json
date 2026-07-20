@@ -8,7 +8,7 @@
   "sections": {
     "personal": {
       "title": "个人工具",
-      "description": "这些钱包专属页面供已连接钱包的参与者使用，不编入搜索索引，也不会出现在 XML 站点地图中。",
+      "description": "这些钱包专属页面供已连接钱包的参与者使用，不编入搜索索引，也不会出现在 XML 网站地图中。",
       "navLabel": "个人工具"
     },
     "system": {
@@ -18,7 +18,7 @@
     },
     "data": {
       "title": "协议数据页面",
-      "description": "XML 站点地图中的所有公开数据路由均汇总于此，便于浏览与抓取。",
+      "description": "XML 网站地图中的所有公开数据路由均汇总于此，便于浏览与抓取。",
       "navLabel": "协议数据页面"
     },
     "ecosystem": {

@@ -11,5 +11,12 @@
     "hours": "小时",
     "minutes": "分",
     "seconds": "秒"
+  },
+  "durationCompact": {
+    "days": "天",
+    "hours": "小时",
+    "minutes": "分",
+    "seconds": "秒",
+    "left": "剩余"
   }
 }

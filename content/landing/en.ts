@@ -165,7 +165,7 @@ export const landingContentEn = {
       {
         percent: '8%',
         title: 'Chrono-Warrior Allocation',
-        body: `To the participant who held the Endurance Champion position for the longest consecutive interval. Includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST and one Cosmic Signature NFT.`,
+        body: `To the participant who held the Endurance Champion position for the longest consecutive interval. Includes ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
         tone: 'rose',
       },
       {
@@ -189,13 +189,13 @@ export const landingContentEn = {
       {
         percent: '10 NFTs',
         title: 'NFT Stellar Selection — Participants',
-        body: `Ten randomly selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and one Cosmic Signature NFT.`,
+        body: `Ten randomly selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
         tone: 'default',
       },
       {
         percent: '10 NFTs',
         title: 'Anchored-NFT Stellar Selection',
-        body: `Ten randomly selected Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and one Cosmic Signature NFT.`,
+        body: `Ten randomly selected Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
         tone: 'default',
       },
       {
@@ -216,7 +216,7 @@ export const landingContentEn = {
   anchoring: {
     eyebrow: 'Anchoring',
     heading: 'Anchor Cosmic Signature NFTs to the protocol.',
-    body: `Anchored Cosmic Signature NFTs receive a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution each cycle, paid out when the anchor is released. Release the anchor whenever you like — but each NFT can be anchored only once, so releasing permanently ends that NFT’s anchoring eligibility. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection, where selected anchor-holders receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT (no ETH).`,
+    body: `Anchored Cosmic Signature NFTs receive a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution each cycle, paid out when the anchor is released. Release the anchor whenever you like — but each NFT can be anchored only once, so releasing permanently ends that NFT’s anchoring eligibility. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection, where selected anchor-holders receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT (no ETH).`,
     bullets: [
       'Per-cycle ETH accrual, retrieved at anchor release',
       'Release anchors at any time — each NFT anchors only once',
@@ -271,11 +271,11 @@ export const landingContentEn = {
   verifiability: {
     eyebrow: 'Verifiability',
     heading: 'Open, verified, reproducible.',
-    body: 'Anyone can verify a Signature by regenerating it from its seed. Contract verification, static analysis notes, and audit status are published through the app as reports become available. The whole repository is CC0 — no rights reserved, fork and remix encouraged.',
+    body: 'Anyone can verify a Signature by regenerating it from its seed. Contract verification, static analysis notes, and audit status are published through the app as reports become available. Project-owned materials in this repository are dedicated under CC0 1.0; third-party dependencies, fonts, and assets retain their own licenses.',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: 'Every contract, every shader, every rendering pipeline. No rights reserved. Public domain.',
+        body: 'Project-owned contracts, shaders, and rendering pipelines. No rights reserved. Third-party materials are excluded.',
       },
       {
         title: 'Verification Status',
@@ -339,7 +339,7 @@ export const landingContentEn = {
       {
         question: 'Can I fork this?',
         answer:
-          'Yes. The entire repository is licensed CC0 1.0 — no rights reserved. Contracts, shaders, renderers, marketing site, and documentation are all in the public domain.',
+          'Yes. Project-owned contracts, shaders, renderers, marketing pages, and documentation are dedicated under CC0 1.0 — no rights reserved. Third-party dependencies, fonts, and assets remain under their own licenses; see THIRD_PARTY_NOTICES.md.',
       },
     ],
   },
@@ -386,7 +386,7 @@ export const landingContentEn = {
         ],
       },
     ],
-    copyright: '© {year} Cosmic Signature. Public domain.',
+    copyright: '© {year} Cosmic Signature. Project-owned materials: CC0 1.0.',
     colophon: 'CC0 1.0 · Publicly verifiable · Reproducible art',
   },
 

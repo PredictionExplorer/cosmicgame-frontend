@@ -97,7 +97,7 @@
   html[lang='zh'] h1,
   html[lang='zh'] h2,
   html[lang='zh'] h3 {
-    letter-spacing: 0;
+    letter-spacing: 0 !important;
     font-weight: 700;
   }
 

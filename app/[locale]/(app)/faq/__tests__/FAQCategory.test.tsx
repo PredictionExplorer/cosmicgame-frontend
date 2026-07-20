@@ -1,16 +1,16 @@
 import userEvent from '@testing-library/user-event';
-import { Rocket } from 'lucide-react';
+
+import type { FAQCategory } from '@/content/faq';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
-import type { FAQCategory } from '../data/faq-data';
-import { FAQCategorySection } from '../components/FAQCategory';
+import { FAQCategorySection, enrichWithTooltips } from '../components/FAQCategory';
 
 const mockCategory: FAQCategory = {
   id: 'test-cat',
   title: 'Test Category',
   description: 'Test description',
-  icon: Rocket,
+  icon: 'rocket',
   items: [
     {
       id: 'q1',
@@ -189,6 +189,19 @@ describe('FAQCategorySection', () => {
     renderFAQCategory({ searchQuery: '', expandedItems: ['q1'] });
 
     expect(screen.getAllByRole('button', { name: /^More information/ }).length).toBeGreaterThan(0);
+  });
+
+  it('matches normalized Chinese terms and enriches only their first occurrence', () => {
+    render(
+      <p>
+        {enrichWithTooltips('坚守冠军由坚守冠军规则确定。', [
+          { term: '坚守冠军', content: '连续保持最近落笔者身份时间最长的参与者。' },
+        ])}
+      </p>,
+    );
+
+    expect(document.body).toHaveTextContent('坚守冠军由坚守冠军规则确定。');
+    expect(screen.getAllByRole('button', { name: /^More information/ })).toHaveLength(1);
   });
 
   it('sets correct id attribute for deep linking', () => {

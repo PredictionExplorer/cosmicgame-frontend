@@ -1,5 +1,7 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
+
 import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
 import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
@@ -10,6 +12,8 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/layout/PageHeader';
 
 function WinningHistory() {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { data, isLoading: loading, error: queryError } = useClaimHistoryByUser(account);
   const winningHistory = data ?? null;
@@ -19,17 +23,15 @@ function WinningHistory() {
     return (
       <PageShell variant="data" backdrop="signature">
         <PageHeader
-          title="My Allocation History"
-          subtitle="View your past allocation retrievals and distributions"
+          title={t('recipientHistory.pageTitle')}
+          subtitle={t('recipientHistory.subtitle')}
         />
         <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-          Track your complete allocation history across all Cosmic Signature Performance Cycles.
-          This includes Signature Allocation retrievals, ETH Stellar Selection distributions, Cosmic
-          Signature NFT allocations, and Anchor Distributions.
+          {t('recipientHistory.disconnectedDescription')}
         </p>
         <EmptyState
-          title="Wallet not connected"
-          description="Please connect your wallet to see your allocation history."
+          title={t('recipientHistory.walletTitle')}
+          description={t('recipientHistory.walletDescription')}
         />
       </PageShell>
     );
@@ -38,13 +40,11 @@ function WinningHistory() {
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
-        title="History of My Allocations"
-        subtitle="View your past allocation retrievals and distributions"
+        title={t('recipientHistory.connectedTitle')}
+        subtitle={t('recipientHistory.subtitle')}
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Track your complete allocation history across all Cosmic Signature Performance Cycles. This
-        includes Signature Allocation retrievals, Stellar Selection ETH allocations, Cosmic
-        Signature NFT allocations, and Anchor Distributions.
+        {t('recipientHistory.connectedDescription')}
       </p>
 
       {loading ? (
@@ -52,11 +52,14 @@ function WinningHistory() {
           <Spinner />
         </div>
       ) : error ? (
-        <ErrorState title="Failed to load allocation history" message={error} />
+        <ErrorState
+          title={t('recipientHistory.loadError')}
+          message={locale === 'zh' ? t('recipientHistory.loadErrorDescription') : error}
+        />
       ) : !winningHistory || winningHistory.length === 0 ? (
         <EmptyState
-          title="No allocations yet"
-          description="You currently have no recorded allocations."
+          title={t('recipientHistory.emptyTitle')}
+          description={t('recipientHistory.emptyDescription')}
         />
       ) : (
         <RecipientHistoryTable

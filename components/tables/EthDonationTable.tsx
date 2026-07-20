@@ -1,11 +1,12 @@
 import { useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
-import { useRouter } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { Link, useRouter } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -35,6 +36,7 @@ interface EthDonationRowProps {
 
 const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const router = useRouter();
 
   if (!row) {
@@ -61,7 +63,7 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(row.TimeStamp)}
+          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       {showType && (
@@ -70,14 +72,14 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
         </TablePrimaryCell>
       )}
       <TablePrimaryCell align="center">
-        <a
+        <Link
           className="text-inherit"
           href={`/allocation/${row.RoundNum}`}
           target="_blank"
           rel="noopener noreferrer"
         >
           {row.RoundNum}
-        </a>
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <AddressLink address={row.DonorAddr} url={`/user/${row.DonorAddr}`} />

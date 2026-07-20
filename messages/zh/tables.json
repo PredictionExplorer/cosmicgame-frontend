@@ -14,6 +14,7 @@
     "contributors": "暂无贡献者。",
     "publicGoods": "暂无公共物品活动。",
     "stellarSelection": "暂无星选分配。",
+    "tokens": "暂无代币。",
     "holders": "暂无持有者。",
     "spenders": "暂无 ETH 支出记录。",
     "enduranceChampions": "暂无坚守冠军。",
@@ -233,6 +234,7 @@
   "recipientHistory": {
     "notApplicable": "不适用",
     "unretrievedHelp": "尚未取回，请前往“待取回分配”页面操作。",
+    "unretrievedAria": "未取回分配说明",
     "types": {
       "mainEth": "主要 ETH 分配",
       "mainCst": "主要签名分配 CST",
@@ -336,5 +338,42 @@
     "distributed": "已派发",
     "unretrievedDistributionEth": "未取回锚定派发（ETH）",
     "unretrieved": "未取回"
+  },
+  "statisticsColumns": {
+    "ownerAddress": "持有者地址",
+    "numberOfTokensOwned": "持有代币数",
+    "cstBalance": "余额（CST）",
+    "contractAddress": "合约地址",
+    "numberOfNfts": "NFT 数量",
+    "namedNftTokenId": "代币 ID",
+    "isRandomWalk": "来自 Random Walk",
+    "isAnchorHolder": "锚定者"
+  },
+  "statisticsTooltips": {
+    "participantAddress": "至少完成过一笔已索引落笔的钱包地址。",
+    "numberOfGestures": "此钱包完成的已索引落笔总次数。",
+    "maxGestureEth": "此钱包记录中金额最高的一笔 ETH 落笔。",
+    "recipientAddress": "收到过一次或多次协议已索引分配的钱包地址。",
+    "allocationsReceived": "此钱包收到的已索引分配次数。",
+    "maxAllocationEth": "此获配者记录中金额最高的一笔 ETH 分配。",
+    "allocationsSumEth": "此获配者的已索引 ETH 分配总额。",
+    "contributorAddress": "曾向协议贡献 ETH 的钱包地址。",
+    "numberOfContributions": "此钱包发起的已索引 ETH 贡献交易数。",
+    "totalContributedEth": "此钱包贡献的 ETH 总额。",
+    "ownerAddress": "当前持有本行所示代币余额的钱包地址。",
+    "numberOfTokensOwned": "此钱包持有的 Cosmic Signature NFT（ERC-721）数量。",
+    "cstBalance": "此钱包当前的 CST（ERC-20）余额。",
+    "anchorHolderAddress": "曾锚定或解锚代币的钱包地址。",
+    "numAnchorActions": "此钱包发起的已索引锚定交易数。",
+    "numReleaseActions": "此钱包发起的已索引解锚交易数。",
+    "totalImprintedTokens": "通过相关锚定或分配流程为此锚定者铭刻的代币总数。",
+    "totalAnchoredTokens": "统计 API 为此钱包报告的当前或累计锚定代币数。",
+    "totalDistributionEth": "为此钱包索引的 ETH 锚定派发总额。",
+    "unretrievedDistributionEth": "此钱包仍可取回的 ETH 锚定派发。",
+    "systemRound": "此系统事件所属的周期或部署阶段。",
+    "systemStarted": "此系统事件开始生效的时间。",
+    "systemEnded": "下一系统事件取代此事件的时间。",
+    "attachedNftContractAddress": "随落笔附加的代币所属 ERC-721 合约地址。",
+    "attachedNftCount": "此合约中已随落笔附加的 NFT 数量。"
   }
 }

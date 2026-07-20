@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -7,15 +8,16 @@ import MarketingRewardsPage from './MarketingRewardsPage';
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ address: string }>;
+  params: Promise<{ locale: string; address: string }>;
 }): Promise<Metadata> {
-  const { address } = await params;
+  const { locale, address } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
   return createMetadata(
-    'Outreach Allocations | Cosmic Signature',
-    'Outreach allocation history and CST allocations for a Cosmic Signature ecosystem contributor. Review referral activity and contributions.',
+    t('outreachAddress.title'),
+    t('outreachAddress.description'),
     undefined,
     `/marketing/${address}`,
-    { index: false },
+    { index: false, locale },
   );
 }
 
@@ -23,7 +25,12 @@ export async function generateMetadata({
 // fresh instead of freezing the first render forever (see route-group refactor).
 export const revalidate = 300;
 
-export default async function Page({ params }: { params: Promise<{ address: string }> }) {
-  const { address } = await params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string; address: string }>;
+}) {
+  const { locale, address } = await params;
+  setRequestLocale(locale);
   return <MarketingRewardsPage address={address} />;
 }

@@ -111,15 +111,54 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/',
   useSearchParams: () => new URLSearchParams(),
   useParams: () => ({}),
+  notFound: () => {
+    throw new Error('NEXT_NOT_FOUND');
+  },
 }));
 
 // next-intl ships untranspiled ESM (like wagmi/rainbowkit above), so its
 // client hooks are mocked globally: components under test render with the
 // default locale and message KEYS as text (assert on keys, not copy).
 jest.mock('next-intl', () => {
+  const React = require('react');
+  const statisticsMessages = require('./messages/en/statistics.json') as Record<string, unknown>;
+  const formatsMessages = require('./messages/en/formats.json') as Record<string, unknown>;
+  const catalogMessages: Record<string, Record<string, unknown>> = {
+    admin: require('./messages/en/admin.json') as Record<string, unknown>,
+    code: require('./messages/en/code.json') as Record<string, unknown>,
+    contracts: require('./messages/en/contracts.json') as Record<string, unknown>,
+    coordination: require('./messages/en/coordination.json') as Record<string, unknown>,
+    ethContribution: require('./messages/en/ethContribution.json') as Record<string, unknown>,
+    faq: require('./messages/en/faq.json') as Record<string, unknown>,
+    imprint: require('./messages/en/imprint.json') as Record<string, unknown>,
+    legal: require('./messages/en/legal.json') as Record<string, unknown>,
+    marketing: require('./messages/en/marketing.json') as Record<string, unknown>,
+    publicGoods: require('./messages/en/publicGoods.json') as Record<string, unknown>,
+    seo: require('./messages/en/seo.json') as Record<string, unknown>,
+    statistics: statisticsMessages,
+  };
+  const resolveMessage = (messages: Record<string, unknown>, key: string): unknown =>
+    key
+      .split('.')
+      .reduce<unknown>(
+        (value, part) =>
+          value && typeof value === 'object' ? (value as Record<string, unknown>)[part] : undefined,
+        messages,
+      );
+  const interpolate = (message: string, values?: Record<string, unknown>) =>
+    message.replace(/\{(\w+)\}/g, (_match, name: string) => String(values?.[name] ?? `{${name}}`));
+
   const useTranslations = (namespace?: string) => {
     const prefix = namespace ? `${namespace}.` : '';
     const t = (key: string, values?: Record<string, unknown>) => {
+      if (namespace && catalogMessages[namespace]) {
+        const message = resolveMessage(catalogMessages[namespace], key);
+        if (typeof message === 'string') return interpolate(message, values);
+      }
+      if (namespace === 'formats' && key.startsWith('durationCompact.')) {
+        const message = resolveMessage(formatsMessages, key);
+        if (typeof message === 'string') return interpolate(message, values);
+      }
       if (namespace === 'tooltips') {
         if (key === 'moreInformation') return `More information: ${String(values?.content ?? '')}`;
         if (key === 'moreInformationAbout') {
@@ -141,7 +180,29 @@ jest.mock('next-intl', () => {
         : '';
       return `${prefix}${key}${renderedValues ? `(${renderedValues})` : ''}`;
     };
-    t.rich = (key: string) => `${prefix}${key}`;
+    t.rich = (key: string, values?: Record<string, unknown>) => {
+      if (namespace && catalogMessages[namespace]) {
+        const message = resolveMessage(catalogMessages[namespace], key);
+        if (typeof message === 'string') {
+          const strongMatch = message.match(/^(.*)<strong>\{(\w+)\}<\/strong>(.*)$/);
+          if (strongMatch && typeof values?.strong === 'function') {
+            const before = strongMatch[1] ?? '';
+            const valueName = strongMatch[2] ?? '';
+            const after = strongMatch[3] ?? '';
+            const renderStrong = values.strong as (chunks: string) => unknown;
+            return React.createElement(
+              React.Fragment,
+              null,
+              interpolate(before, values),
+              renderStrong(String(values?.[valueName] ?? `{${valueName}}`)),
+              interpolate(after, values),
+            );
+          }
+          return interpolate(message, values).replace(/<\/?\w+>/g, '');
+        }
+      }
+      return `${prefix}${key}`;
+    };
     t.markup = (key: string) => `${prefix}${key}`;
     t.raw = (key: string) => `${prefix}${key}`;
     t.has = () => true;
@@ -167,12 +228,71 @@ jest.mock('next-intl', () => {
 
 jest.mock('next-intl/server', () => ({
   setRequestLocale: jest.fn(),
-  getLocale: async () => 'en',
+  getLocale: jest.fn(async () => 'en'),
   getMessages: async () => ({}),
-  getTranslations: async (options?: string | { namespace?: string }) => {
+  getTranslations: async (options?: string | { locale?: string; namespace?: string }) => {
     const namespace = typeof options === 'string' ? options : options?.namespace;
+    const locale = typeof options === 'object' && options.locale === 'zh' ? 'zh' : 'en';
     const prefix = namespace ? `${namespace}.` : '';
+    const namespaceMessagesByLocale: Record<string, Record<string, Record<string, unknown>>> = {
+      en: {
+        admin: require('./messages/en/admin.json') as Record<string, unknown>,
+        code: require('./messages/en/code.json') as Record<string, unknown>,
+        common: require('./messages/en/common.json') as Record<string, unknown>,
+        contracts: require('./messages/en/contracts.json') as Record<string, unknown>,
+        coordination: require('./messages/en/coordination.json') as Record<string, unknown>,
+        detail: require('./messages/en/detail.json') as Record<string, unknown>,
+        ethContribution: require('./messages/en/ethContribution.json') as Record<string, unknown>,
+        faq: require('./messages/en/faq.json') as Record<string, unknown>,
+        imprint: require('./messages/en/imprint.json') as Record<string, unknown>,
+        legal: require('./messages/en/legal.json') as Record<string, unknown>,
+        marketing: require('./messages/en/marketing.json') as Record<string, unknown>,
+        meta: require('./messages/en/meta.json') as Record<string, unknown>,
+        publicGoods: require('./messages/en/publicGoods.json') as Record<string, unknown>,
+        seo: require('./messages/en/seo.json') as Record<string, unknown>,
+        siteMap: require('./messages/en/siteMap.json') as Record<string, unknown>,
+        statistics: require('./messages/en/statistics.json') as Record<string, unknown>,
+      },
+      zh: {
+        admin: require('./messages/zh/admin.json') as Record<string, unknown>,
+        code: require('./messages/zh/code.json') as Record<string, unknown>,
+        common: require('./messages/zh/common.json') as Record<string, unknown>,
+        contracts: require('./messages/zh/contracts.json') as Record<string, unknown>,
+        coordination: require('./messages/zh/coordination.json') as Record<string, unknown>,
+        detail: require('./messages/zh/detail.json') as Record<string, unknown>,
+        ethContribution: require('./messages/zh/ethContribution.json') as Record<string, unknown>,
+        faq: require('./messages/zh/faq.json') as Record<string, unknown>,
+        imprint: require('./messages/zh/imprint.json') as Record<string, unknown>,
+        legal: require('./messages/zh/legal.json') as Record<string, unknown>,
+        marketing: require('./messages/zh/marketing.json') as Record<string, unknown>,
+        meta: require('./messages/zh/meta.json') as Record<string, unknown>,
+        publicGoods: require('./messages/zh/publicGoods.json') as Record<string, unknown>,
+        seo: require('./messages/zh/seo.json') as Record<string, unknown>,
+        siteMap: require('./messages/zh/siteMap.json') as Record<string, unknown>,
+        statistics: require('./messages/zh/statistics.json') as Record<string, unknown>,
+      },
+    };
+    const namespaceMessages = namespaceMessagesByLocale[locale]!;
+    const statisticsMessages = namespaceMessages.statistics!;
+    const resolveMessage = (key: string): unknown =>
+      key
+        .split('.')
+        .reduce<unknown>(
+          (value, part) =>
+            value && typeof value === 'object'
+              ? (value as Record<string, unknown>)[part]
+              : undefined,
+          (namespace && namespaceMessages[namespace]) || statisticsMessages,
+        );
     return (key: string, values?: Record<string, unknown>) => {
+      if (namespace && namespaceMessages[namespace]) {
+        const message = resolveMessage(key);
+        if (typeof message === 'string') {
+          return message.replace(/\{(\w+)\}/g, (_match, name: string) =>
+            String(values?.[name] ?? `{${name}}`),
+          );
+        }
+      }
       if (namespace === 'meta') {
         const shared: Record<string, string> = {
           'shared.defaultTitle': 'Cosmic Signature',

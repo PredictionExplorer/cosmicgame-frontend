@@ -2,9 +2,9 @@
 
 import type { ReactNode } from 'react';
 import { ArrowRight, Coins, Hash, Heart, Layers, Lock, Trophy, Wallet } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { formatCSTValue, formatEthValue } from '@/utils';
-import { statisticsCopy } from '@/content/statistics-copy';
+import { formatCSTValue, formatEthValue, formatGroupedNumber } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
@@ -38,6 +38,7 @@ interface ExploreCardProps {
 }
 
 function ExploreCard({ section, headline, headlineLabel }: ExploreCardProps) {
+  const t = useTranslations('statistics');
   const Icon = section.icon;
   return (
     <Surface asChild variant="glass-bordered" radius="lg" padding="none" interactive>
@@ -51,7 +52,9 @@ function ExploreCard({ section, headline, headlineLabel }: ExploreCardProps) {
               >
                 <Icon className="h-4 w-4" />
               </span>
-              <h3 className="text-base font-semibold text-white">{section.label}</h3>
+              <h3 className="text-base font-semibold text-white">
+                {t(`navigation.${section.messageKey}.label`)}
+              </h3>
             </div>
             <ArrowRight
               aria-hidden
@@ -59,7 +62,7 @@ function ExploreCard({ section, headline, headlineLabel }: ExploreCardProps) {
             />
           </div>
           <p className="mt-3 flex-1 text-sm leading-6 text-muted-foreground">
-            {section.description}
+            {t(`navigation.${section.messageKey}.description`)}
           </p>
           <p className="mt-4 text-sm">
             <span className="text-xl font-semibold text-foreground">{headline}</span>{' '}
@@ -73,6 +76,8 @@ function ExploreCard({ section, headline, headlineLabel }: ExploreCardProps) {
 
 /** Statistics hub: headline metrics, protocol economy groups, and links into the section pages. */
 const StatisticsHubPanel = () => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const { data: dashboardData, isLoading: dashboardLoading, isError, refetch } = useDashboardInfo();
   const { data: ctStatisticsData } = useCTStatistics();
 
@@ -96,8 +101,8 @@ const StatisticsHubPanel = () => {
   if (isError || !dashboardData) {
     return (
       <ErrorState
-        title="Failed to load statistics"
-        message="The statistics service did not respond. Try again in a moment."
+        title={t('hub.loadErrorTitle')}
+        message={t('hub.loadErrorMessage')}
         onRetry={() => refetch()}
         surface
       />
@@ -112,24 +117,24 @@ const StatisticsHubPanel = () => {
 
   const exploreHeadlines: Record<string, { headline: ReactNode; headlineLabel: string }> = {
     participation: {
-      headline: data.MainStats.NumUniqueBidders.toLocaleString(),
-      headlineLabel: 'unique participants',
+      headline: formatGroupedNumber(data.MainStats.NumUniqueBidders, locale),
+      headlineLabel: t('hub.headlines.uniqueParticipants'),
     },
     tokens: {
-      headline: data.MainStats.NumCSTokenMints.toLocaleString(),
-      headlineLabel: 'NFTs imprinted',
+      headline: formatGroupedNumber(data.MainStats.NumCSTokenMints, locale),
+      headlineLabel: t('hub.headlines.nftsImprinted'),
     },
     anchoring: {
-      headline: totalAnchored.toLocaleString(),
-      headlineLabel: 'NFTs anchored',
+      headline: formatGroupedNumber(totalAnchored, locale),
+      headlineLabel: t('hub.headlines.nftsAnchored'),
     },
     activity: {
-      headline: Number(data.CurNumBids ?? 0).toLocaleString(),
-      headlineLabel: 'gestures this cycle',
+      headline: formatGroupedNumber(Number(data.CurNumBids ?? 0), locale),
+      headlineLabel: t('hub.headlines.gesturesThisCycle'),
     },
     performance: {
-      headline: totalAllocationsDistributed.toLocaleString(),
-      headlineLabel: 'allocations distributed',
+      headline: formatGroupedNumber(totalAllocationsDistributed, locale),
+      headlineLabel: t('hub.headlines.allocationsDistributed'),
     },
   };
 
@@ -138,35 +143,35 @@ const StatisticsHubPanel = () => {
       {/* Headline metrics */}
       <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
         <StatCard
-          label={statisticsCopy.metrics.totalCycles.label}
+          label={t('metrics.totalCycles.label')}
           value={data.CurRoundNum}
           icon={<Hash className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.totalCycles.tooltip}
+          tooltip={t('metrics.totalCycles.tooltip')}
         />
         <StatCard
-          label={statisticsCopy.metrics.allocationsDistributed.label}
+          label={t('metrics.allocationsDistributed.label')}
           value={totalAllocationsDistributed}
           icon={<Trophy className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.allocationsDistributed.tooltip}
+          tooltip={t('metrics.allocationsDistributed.tooltip')}
         />
         <StatCard
-          label={statisticsCopy.metrics.cosmicSignatureNftsImprinted.shortLabel}
+          label={t('metrics.cosmicSignatureNftsImprinted.shortLabel')}
           value={data.MainStats.NumCSTokenMints}
           icon={<Layers className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.cosmicSignatureNftsImprinted.tooltip}
+          tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
         />
         <StatCard
-          label={statisticsCopy.metrics.contractBalance.label}
+          label={t('metrics.contractBalance.label')}
           value={formatEthValue(data.CosmicGameBalanceEth ?? 0)}
           icon={<Wallet className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.contractBalance.tooltip}
+          tooltip={t('metrics.contractBalance.tooltip')}
           gradient
         />
       </div>
 
       {/* Section explore cards */}
-      <SectionDivider title="Explore Statistics" className="mb-6" />
-      <nav aria-label="Statistics section pages" className="mb-12">
+      <SectionDivider title={t('hub.exploreTitle')} className="mb-6" />
+      <nav aria-label={t('hub.exploreAria')} className="mb-12">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {STATISTICS_SECTIONS.map((section) => (
             <ExploreCard
@@ -191,10 +196,8 @@ const StatisticsHubPanel = () => {
         <Link href="/current-cycle" className="group">
           <div className="flex items-center justify-between gap-4 p-5">
             <div>
-              <p className="text-base font-semibold text-white">Looking for current cycle data?</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                View gesture history, leaderboards, and live cycle details
-              </p>
+              <p className="text-base font-semibold text-white">{t('hub.currentCycleTitle')}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t('hub.currentCycleSubtitle')}</p>
             </div>
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[rgb(var(--aurora-cyan-rgb)/0.25)] bg-[rgb(var(--aurora-cyan-rgb)/0.10)]">
               <ArrowRight
@@ -211,139 +214,149 @@ const StatisticsHubPanel = () => {
       </Surface>
 
       {/* Protocol economy */}
-      <SectionDivider title="Protocol Economy" className="mb-6" />
+      <SectionDivider title={t('hub.protocolEconomyTitle')} className="mb-6" />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatisticsGroup
-          title="Allocation Economy"
+          title={t('groups.allocationEconomy.label')}
           icon={<Trophy className="h-4 w-4" />}
           accentColor="blue"
-          tooltip={statisticsCopy.groups.allocationEconomy}
+          tooltip={t('groups.allocationEconomy.tooltip')}
         >
           <StatisticsItem
-            title={statisticsCopy.metrics.numAllocationsDistributed.label}
+            title={t('metrics.numAllocationsDistributed.label')}
             value={
               <Link href="/allocation" className="text-inherit">
                 {totalAllocationsDistributed}
               </Link>
             }
-            tooltip={statisticsCopy.metrics.numAllocationsDistributed.tooltip}
+            tooltip={t('metrics.numAllocationsDistributed.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.totalSignatureAllocationsDistributed.label}
+            title={t('metrics.totalSignatureAllocationsDistributed.label')}
             value={formatEthValue(Number(data.TotalPrizesPaidAmountEth) || 0)}
-            tooltip={statisticsCopy.metrics.totalSignatureAllocationsDistributed.tooltip}
+            tooltip={t('metrics.totalSignatureAllocationsDistributed.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.stellarSelectionEthDeposited.label}
+            title={t('metrics.stellarSelectionEthDeposited.label')}
             value={formatEthValue(data.MainStats.TotalRaffleEthDeposits)}
-            tooltip={statisticsCopy.metrics.stellarSelectionEthDeposited.tooltip}
+            tooltip={t('metrics.stellarSelectionEthDeposited.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.stellarSelectionEthRetrieved.label}
+            title={t('metrics.stellarSelectionEthRetrieved.label')}
             value={formatEthValue(data.MainStats.TotalRaffleEthWithdrawn)}
-            tooltip={statisticsCopy.metrics.stellarSelectionEthRetrieved.tooltip}
+            tooltip={t('metrics.stellarSelectionEthRetrieved.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.ethInGesturesCurrentCycle.label}
+            title={t('metrics.ethInGesturesCurrentCycle.label')}
             value={formatEthValue(data.CurRoundStats?.TotalEthInBidsEth ?? 0)}
-            tooltip={statisticsCopy.metrics.ethInGesturesCurrentCycle.tooltip}
+            tooltip={t('metrics.ethInGesturesCurrentCycle.tooltip')}
           />
           {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
-            <p className="mt-2 text-sm text-primary">{`${data.MainStats.NumWinnersWithPendingRaffleWithdrawal} recipients have yet to retrieve funds totaling ${formatEthValue(data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn)}`}</p>
+            <p className="mt-2 text-sm text-primary">
+              {t('hub.pendingStellarRetrievals', {
+                count: formatGroupedNumber(
+                  data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0,
+                  locale,
+                ),
+                amount: formatEthValue(
+                  data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn,
+                ),
+              })}
+            </p>
           )}
         </StatisticsGroup>
 
         <StatisticsGroup
-          title="Token Economy"
+          title={t('groups.tokenEconomy.label')}
           icon={<Coins className="h-4 w-4" />}
           accentColor="purple"
-          tooltip={statisticsCopy.groups.tokenEconomy}
+          tooltip={t('groups.tokenEconomy.tooltip')}
         >
           <StatisticsItem
-            title={statisticsCopy.metrics.totalSupplyErc20.label}
+            title={t('metrics.totalSupplyErc20.label')}
             value={formatCSTValue(ctStatisticsData?.TotalSupplyEth ?? 0)}
-            tooltip={statisticsCopy.metrics.totalSupplyErc20.tooltip}
+            tooltip={t('metrics.totalSupplyErc20.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.cosmicSignatureNftsImprinted.shortLabel}
+            title={t('metrics.cosmicSignatureNftsImprinted.shortLabel')}
             value={
               <Link href="/gallery" className="text-inherit">
                 {data.MainStats.NumCSTokenMints}
               </Link>
             }
-            tooltip={statisticsCopy.metrics.cosmicSignatureNftsImprinted.tooltip}
+            tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.totalCstConsumed.label}
+            title={t('metrics.totalCstConsumed.label')}
             value={formatCSTValue(data.MainStats.TotalCSTConsumedEth)}
-            tooltip={statisticsCopy.metrics.totalCstConsumed.tooltip}
+            tooltip={t('metrics.totalCstConsumed.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.cstConsumedCurrentCycle.label}
+            title={t('metrics.cstConsumedCurrentCycle.label')}
             value={formatCSTValue(data.CurRoundStats?.TotalCstInBidsEth ?? 0)}
-            tooltip={statisticsCopy.metrics.cstConsumedCurrentCycle.tooltip}
+            tooltip={t('metrics.cstConsumedCurrentCycle.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.cstGestures.label}
+            title={t('metrics.cstGestures.label')}
             value={data.MainStats.NumBidsCST}
-            tooltip={statisticsCopy.metrics.cstGestures.tooltip}
+            tooltip={t('metrics.cstGestures.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.outreachReserve.label}
+            title={t('metrics.outreachReserve.label')}
             value={formatCSTValue(data.MainStats.TotalMktRewardsEth)}
-            tooltip={statisticsCopy.metrics.outreachReserve.tooltip}
+            tooltip={t('metrics.outreachReserve.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.outreachTransactions.label}
+            title={t('metrics.outreachTransactions.label')}
             value={
               <Link className="text-inherit" href="/marketing">
                 {data.MainStats.NumMktRewards}
               </Link>
             }
-            tooltip={statisticsCopy.metrics.outreachTransactions.tooltip}
+            tooltip={t('metrics.outreachTransactions.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.randomWalkNftsUsed.label}
+            title={t('metrics.randomWalkNftsUsed.label')}
             value={
               <Link className="text-inherit" href="/used-rwlk-nfts">
                 {data.NumRwalkTokensUsed as ReactNode}
               </Link>
             }
-            tooltip={statisticsCopy.metrics.randomWalkNftsUsed.tooltip}
+            tooltip={t('metrics.randomWalkNftsUsed.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.namedTokens.label}
+            title={t('metrics.namedTokens.label')}
             value={
               <Link className="text-inherit" href="/named-nfts">
                 {data.MainStats.TotalNamedTokens}
               </Link>
             }
-            tooltip={statisticsCopy.metrics.namedTokens.tooltip}
+            tooltip={t('metrics.namedTokens.tooltip')}
           />
         </StatisticsGroup>
 
         <StatisticsGroup
-          title="Public Goods & Contributions"
+          title={t('groups.publicGoods.label')}
           icon={<Heart className="h-4 w-4" />}
           accentColor="emerald"
-          tooltip={statisticsCopy.groups.publicGoods}
+          tooltip={t('groups.publicGoods.tooltip')}
         >
           <StatisticsItem
-            title={statisticsCopy.metrics.publicGoodsBalance.label}
+            title={t('metrics.publicGoodsBalance.label')}
             value={formatEthValue(Number(data.CharityBalanceEth) || 0)}
-            tooltip={statisticsCopy.metrics.publicGoodsBalance.tooltip}
+            tooltip={t('metrics.publicGoodsBalance.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.attachedNfts.label}
+            title={t('metrics.attachedNfts.label')}
             value={
               <Link className="text-inherit" href="/attached-nfts">
                 {data.NumDonatedNFTs as ReactNode}
               </Link>
             }
-            tooltip={statisticsCopy.metrics.attachedNfts.tooltip}
+            tooltip={t('metrics.attachedNfts.tooltip')}
           />
           <StatisticsItem
-            title={statisticsCopy.metrics.totalContributedEth.label}
+            title={t('metrics.totalContributedEth.label')}
             value={
               <Link
                 className="text-inherit"
@@ -354,63 +367,66 @@ const StatisticsHubPanel = () => {
                 {formatEthValue(data.MainStats.TotalEthDonatedAmountEth ?? 0)}
               </Link>
             }
-            tooltip={statisticsCopy.metrics.totalContributedEth.tooltip}
+            tooltip={t('metrics.totalContributedEth.tooltip')}
           />
           {(data.MainStats.NumCosmicGameDonations ?? 0) > 0 && (
             <>
               <StatisticsItem
-                title={statisticsCopy.metrics.protocolContributions.label}
+                title={t('metrics.protocolContributions.label')}
                 value={
                   <Link className="text-inherit" href="/public-goods-contributions-cg">
                     {data.MainStats.NumCosmicGameDonations}
                   </Link>
                 }
-                tooltip={statisticsCopy.metrics.protocolContributions.tooltip}
+                tooltip={t('metrics.protocolContributions.tooltip')}
               />
               <StatisticsItem
-                title={statisticsCopy.metrics.protocolContributionsSum.label}
+                title={t('metrics.protocolContributionsSum.label')}
                 value={
                   <Link className="text-inherit" href="/public-goods-contributions-cg">
                     {formatEthValue(data.MainStats.SumCosmicGameDonationsEth ?? 0)}
                   </Link>
                 }
-                tooltip={statisticsCopy.metrics.protocolContributionsSum.tooltip}
+                tooltip={t('metrics.protocolContributionsSum.tooltip')}
               />
             </>
           )}
           {(Number(data.SumVoluntaryDonationsEth) || 0) > 0 && (
             <StatisticsItem
-              title={statisticsCopy.metrics.voluntaryContributions.label}
+              title={t('metrics.voluntaryContributions.label')}
               value={
                 <Link className="text-inherit" href="/public-goods-contributions-voluntary">
-                  {`${data.NumVoluntaryDonations} totaling ${formatEthValue(Number(data.SumVoluntaryDonationsEth) || 0)}`}
+                  {t('hub.voluntaryContributionSummary', {
+                    count: formatGroupedNumber(Number(data.NumVoluntaryDonations) || 0, locale),
+                    amount: formatEthValue(Number(data.SumVoluntaryDonationsEth) || 0),
+                  })}
                 </Link>
               }
-              tooltip={statisticsCopy.metrics.voluntaryContributions.tooltip}
+              tooltip={t('metrics.voluntaryContributions.tooltip')}
             />
           )}
           {(data.MainStats.NumWithdrawals ?? 0) > 0 && (
             <StatisticsItem
-              title={statisticsCopy.metrics.publicGoodsRetrievals.label}
+              title={t('metrics.publicGoodsRetrievals.label')}
               value={
                 <Link className="text-inherit" href="/public-goods-retrievals">
                   {data.MainStats.NumWithdrawals}
                 </Link>
               }
-              tooltip={statisticsCopy.metrics.publicGoodsRetrievals.tooltip}
+              tooltip={t('metrics.publicGoodsRetrievals.tooltip')}
             />
           )}
           <StatisticsItem
-            title={statisticsCopy.metrics.totalPublicGoodsRetrieved.label}
+            title={t('metrics.totalPublicGoodsRetrieved.label')}
             value={formatEthValue(data.MainStats.SumWithdrawals ?? 0)}
-            tooltip={statisticsCopy.metrics.totalPublicGoodsRetrieved.tooltip}
+            tooltip={t('metrics.totalPublicGoodsRetrieved.tooltip')}
           />
         </StatisticsGroup>
       </div>
 
       {/* Anchoring snapshot */}
       <div className="mt-12">
-        <SectionDivider title="Anchoring at a Glance" className="mb-6" />
+        <SectionDivider title={t('hub.anchoringGlanceTitle')} className="mb-6" />
         <Surface
           variant="gradient-border-accent"
           radius="xl"
@@ -419,17 +435,20 @@ const StatisticsHubPanel = () => {
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-              {(cstAnchorStats.TotalTokensStaked ?? 0).toLocaleString()} Cosmic Signature NFTs and{' '}
-              {(rwlkAnchorStats.TotalTokensStaked ?? 0).toLocaleString()} RandomWalk NFTs are
-              currently anchored. See anchor actions, anchored tokens, and unique anchor-holders on
-              the anchoring statistics page.
+              {t('hub.anchoringGlanceDescription', {
+                cosmicCount: formatGroupedNumber(cstAnchorStats.TotalTokensStaked ?? 0, locale),
+                randomWalkCount: formatGroupedNumber(
+                  rwlkAnchorStats.TotalTokensStaked ?? 0,
+                  locale,
+                ),
+              })}
             </p>
             <Link
               href="/statistics/anchoring"
               className="group inline-flex items-center gap-2 self-start whitespace-nowrap rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary no-underline transition-colors hover:border-primary/45 hover:bg-primary/15 lg:self-auto"
             >
               <Lock className="h-4 w-4" aria-hidden />
-              Anchoring statistics
+              {t('hub.anchoringGlanceLink')}
               <ArrowRight
                 aria-hidden
                 className="h-4 w-4 transition-transform group-hover:translate-x-0.5"

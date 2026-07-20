@@ -314,16 +314,24 @@ function AttachedNFTAllocationCard({
   variant: AttachedNFTAllocationShowcaseProps['variant'];
 }) {
   const t = useTranslations('currentCycle');
+  const tStatistics = useTranslations('statistics');
   const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI);
   const tokenId = getAttachedNftTokenId(nft);
-  const primaryLink = resolveAttachedNftLink({ nft, metadata });
+  const linkLabels = {
+    viewNft: tStatistics('attachedNftLinks.viewNft'),
+    viewOpenSea: tStatistics('attachedNftLinks.viewOpenSea'),
+    viewContract: tStatistics('attachedNftLinks.viewContract'),
+    detailsUnavailable: tStatistics('attachedNftLinks.detailsUnavailable'),
+    contractUnavailable: tStatistics('attachedNftLinks.contractUnavailable'),
+  };
+  const primaryLink = resolveAttachedNftLink({ nft, metadata, labels: linkLabels });
   const primaryLabel =
     primaryLink.kind === 'project'
       ? t('showcase.nftCard.links.project')
       : primaryLink.kind === 'opensea'
         ? t('showcase.nftCard.links.opensea')
         : t('showcase.nftCard.links.explorer');
-  const explorerLink = resolveAttachedNftExplorerLink(nft);
+  const explorerLink = resolveAttachedNftExplorerLink(nft, linkLabels);
   const openSeaUrl = buildOpenSeaAssetUrl(nft.TokenAddr, tokenId);
   const { data: estimate } = useNFTCollectionEstimate({
     tokenAddr: nft.TokenAddr,

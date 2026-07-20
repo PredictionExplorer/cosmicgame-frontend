@@ -1,11 +1,17 @@
 import { appSitemapRoutes, dynamicNoindexRoutePrefixes, noindexAppRoutes } from '@/lib/seoRoutes';
 import { createMetadata } from '@/utils/seo';
 
-import { metadata as cstOutreachTransferMetadata } from '../internal/cst-outreach-transfer/page';
-import { metadata as recipientHistoryMetadata } from '../recipient-history/page';
+import { generateMetadata as generateEmbedEnduranceMetadata } from '../embed/endurance/[round]/page';
+import { generateMetadata as generateCstOutreachTransferMetadata } from '../internal/cst-outreach-transfer/page';
+import { generateMetadata as generateRecipientHistoryMetadata } from '../recipient-history/page';
 import { generateMetadata as generateTransferCstMetadata } from '../transfer-cst/page';
 
 jest.mock('../internal/cst-outreach-transfer/CstOutreachTransferPage', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock('../embed/endurance/[round]/EmbedEnduranceChart', () => ({
   __esModule: true,
   default: () => null,
 }));
@@ -87,7 +93,11 @@ describe('SEO route policy', () => {
   });
 
   it('marks wallet-personal routes as noindex', async () => {
-    expectNoIndex(recipientHistoryMetadata);
+    expectNoIndex(
+      await generateRecipientHistoryMetadata({
+        params: Promise.resolve({ locale: 'en' }),
+      }),
+    );
     expectNoIndex(
       await generateTransferCstMetadata({
         params: Promise.resolve({ locale: 'en' }),
@@ -95,8 +105,12 @@ describe('SEO route policy', () => {
     );
   });
 
-  it('marks the URL-only CST outreach transfer route as noindex and out of sitemap', () => {
-    expectNoIndex(cstOutreachTransferMetadata);
+  it('marks the URL-only CST outreach transfer route as noindex and out of sitemap', async () => {
+    expectNoIndex(
+      await generateCstOutreachTransferMetadata({
+        params: Promise.resolve({ locale: 'en' }),
+      }),
+    );
     expect(noindexAppRoutes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -117,9 +131,31 @@ describe('SEO route policy', () => {
     }
   });
 
-  it('tracks dynamic noindex route prefixes for policy coverage', () => {
+  it('tracks every dynamic noindex route prefix, including endurance embeds', () => {
     expect(dynamicNoindexRoutePrefixes).toEqual(
-      expect.arrayContaining(['/gesture/', '/user/', '/system-event/', '/marketing/']),
+      expect.arrayContaining([
+        '/embed/endurance/',
+        '/gesture/',
+        '/user/',
+        '/system-event/',
+        '/marketing/',
+      ]),
     );
+  });
+
+  it('keeps standalone endurance embeds noindex,nofollow with a self canonical', async () => {
+    const metadata = await generateEmbedEnduranceMetadata({
+      params: Promise.resolve({ locale: 'zh', round: '42' }),
+    });
+
+    expect(metadata.robots).toEqual({
+      index: false,
+      follow: false,
+      googleBot: { index: false, follow: false },
+    });
+    expect(metadata.alternates?.canonical).toBe(
+      'https://app.cosmicsignature.com/zh/embed/endurance/42',
+    );
+    expect(appSitemapRoutes.map((route) => route.path)).not.toContain('/embed/endurance/42');
   });
 });

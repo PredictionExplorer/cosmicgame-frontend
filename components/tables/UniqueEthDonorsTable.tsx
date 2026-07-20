@@ -3,8 +3,6 @@ import { Tr } from 'react-super-responsive-table';
 import { useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { statisticsCopy } from '@/content/statistics-copy';
-
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -54,19 +52,19 @@ export const UniqueEthDonorsTable = ({ list }: { list: UniqueEthDonor[] }) => {
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('columns.contributorAddress')}
-                  tooltip={statisticsCopy.tables.contributorAddress}
+                  tooltip={t('statisticsTooltips.contributorAddress')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
                 <TableHeaderHelp
                   desktop={t('columns.numberOfContributions')}
-                  tooltip={statisticsCopy.tables.numberOfContributions}
+                  tooltip={t('statisticsTooltips.numberOfContributions')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
                   desktop={t('columns.totalContributedEth')}
-                  tooltip={statisticsCopy.tables.totalContributedEth}
+                  tooltip={t('statisticsTooltips.totalContributedEth')}
                 />
               </TablePrimaryHeadCell>
             </Tr>

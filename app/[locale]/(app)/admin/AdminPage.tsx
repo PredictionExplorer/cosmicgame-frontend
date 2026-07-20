@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
@@ -9,6 +10,7 @@ import { useGestureList } from '@/hooks/useApiQuery';
 import BanGestureTable from '@/components/tables/BanGestureTable';
 
 const AdminPage = () => {
+  const t = useTranslations('admin');
   const { data: bidListRaw, isLoading } = useGestureList();
 
   const gestureList = useMemo(
@@ -22,18 +24,18 @@ const AdminPage = () => {
         align="left"
         eyebrow={
           <SectionEyebrow tone="rose" pulse>
-            Admin · Restricted
+            {t('page.eyebrow')}
           </SectionEyebrow>
         }
-        title="Admin"
+        title={t('page.title')}
         gradientTitle="signature"
-        subtitle="Manage gestures and system administration"
+        subtitle={t('page.subtitle')}
       />
       <div>
-        <h2 className="text-xl font-semibold mb-4">Gesture List</h2>
+        <h2 className="text-xl font-semibold mb-4">{t('page.gestureList')}</h2>
         {isLoading || gestureList === null ? (
           <p className="text-lg font-semibold" role="status">
-            Loading...
+            {t('page.loading')}
           </p>
         ) : (
           <BanGestureTable gestureHistory={gestureList} />

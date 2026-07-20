@@ -34,11 +34,16 @@ import { Toaster } from 'sonner';
 
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { usePathname } from '@/i18n/navigation';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
 export function LandingShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const showUtilitySwitcher = pathname !== '/' && pathname !== '/landing-site';
+
   useEffect(() => {
     installGlobalErrorHandlers();
   }, []);
@@ -48,6 +53,11 @@ export function LandingShell({ children }: { children: ReactNode }) {
       <CookiesProvider>
         <TooltipProvider delayDuration={200} skipDelayDuration={300}>
           <SkipLink />
+          {showUtilitySwitcher ? (
+            <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-6">
+              <LanguageSwitcher />
+            </div>
+          ) : null}
           <ErrorBoundary>{children}</ErrorBoundary>
           <Toaster
             position="top-right"

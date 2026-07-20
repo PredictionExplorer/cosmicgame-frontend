@@ -2,8 +2,7 @@
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { BarChart3, Flame, Users } from 'lucide-react';
-
-import { statisticsCopy } from '@/content/statistics-copy';
+import { useTranslations } from 'next-intl';
 
 import { SectionDivider } from '@/components/ui/section-divider';
 import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
@@ -13,14 +12,16 @@ import { BidderActivePeriodsTimeline } from '@/components/statistics/BidderActiv
 
 /** Bidding analytics charts for the statistics page. */
 export function BiddingActivitySection() {
+  const t = useTranslations('statistics');
+
   return (
     <div className="mt-10">
-      <SectionDivider title="Gesture Activity" className="mb-6" />
+      <SectionDivider title={t('activity.heading')} className="mb-6" />
 
       <div className="space-y-4">
         <CollapsibleSection
-          title="Gesture Frequency Over Time"
-          tooltip={statisticsCopy.sections.gestureFrequency}
+          title={t('activity.sections.frequency')}
+          tooltip={t('sectionTooltips.gestureFrequency')}
           icon={<BarChart3 className="h-3.5 w-3.5" />}
           defaultOpen
         >
@@ -28,8 +29,8 @@ export function BiddingActivitySection() {
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="Gesture Spikes"
-          tooltip={statisticsCopy.sections.gestureSpikes}
+          title={t('activity.sections.spikes')}
+          tooltip={t('sectionTooltips.gestureSpikes')}
           icon={<Flame className="h-3.5 w-3.5" />}
           defaultOpen
         >
@@ -37,8 +38,8 @@ export function BiddingActivitySection() {
         </CollapsibleSection>
 
         <CollapsibleSection
-          title="Top 20 Participant Active Periods"
-          tooltip={statisticsCopy.sections.participantActivePeriods}
+          title={t('activity.sections.activePeriods')}
+          tooltip={t('sectionTooltips.participantActivePeriods')}
           icon={<Users className="h-3.5 w-3.5" />}
           defaultOpen
         >

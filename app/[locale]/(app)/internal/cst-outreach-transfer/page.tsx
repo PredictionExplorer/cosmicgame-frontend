@@ -1,17 +1,28 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
 import CstOutreachTransferPage from './CstOutreachTransferPage';
 
-export const metadata: Metadata = createMetadata(
-  'CST Outreach Transfer | Cosmic Signature',
-  'Restricted CST transfer tool for the configured outreach reserve wallet signer.',
-  undefined,
-  '/internal/cst-outreach-transfer',
-  { index: false },
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export default function Page() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('internalCstOutreachTransfer.title'),
+    t('internalCstOutreachTransfer.description'),
+    undefined,
+    '/internal/cst-outreach-transfer',
+    { index: false, locale },
+  );
+}
+
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return <CstOutreachTransferPage />;
 }

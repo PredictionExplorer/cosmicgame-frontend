@@ -4,7 +4,11 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { getLandingContent } from '@/content/landing';
+
 import { routing } from '@/i18n/routing';
+import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { JsonLd, artProtocolJsonLd, organizationJsonLd, websiteJsonLd } from '@/utils/jsonLd';
 
 import { RootDocument } from '../../root-document';
 import { createRootMetadata, rootViewport, openGraphLocale } from '../../root-metadata';
@@ -26,11 +30,17 @@ export async function generateMetadata({ params }: Pick<LayoutProps, 'params'>):
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('meta');
-  const metadata = createRootMetadata({
-    defaultTitle: t('shared.defaultTitle'),
-    defaultOgTitle: t('shared.defaultOgTitle'),
-    defaultDescription: t('shared.defaultDescription'),
-  });
+  const metadata = createRootMetadata(
+    {
+      defaultTitle: t('shared.defaultTitle'),
+      defaultOgTitle: t('shared.defaultOgTitle'),
+      defaultDescription: t('shared.defaultDescription'),
+    },
+    {
+      origin: LANDING_ORIGIN,
+      canonical: localeHref(LANDING_ORIGIN, '/', locale),
+    },
+  );
   return {
     ...metadata,
     openGraph: { ...metadata.openGraph, locale: openGraphLocale(locale) },
@@ -53,9 +63,38 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
     notFound();
   }
   setRequestLocale(locale);
+  const { meta } = getLandingContent(locale);
+  const seo = await getTranslations({ locale, namespace: 'seo' });
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
 
   return (
-    <RootDocument locale={locale}>
+    <RootDocument
+      locale={locale}
+      headExtras={
+        <JsonLd
+          data={[
+            websiteJsonLd({
+              description: meta.description,
+              inLanguage,
+              url: landingUrl,
+            }),
+            organizationJsonLd({
+              description: meta.description,
+              url: landingUrl,
+            }),
+            artProtocolJsonLd({
+              creditText: seo('jsonLd.artProtocol.creditText'),
+              description: meta.description,
+              genre: seo('jsonLd.artProtocol.genre'),
+              inLanguage,
+              keywords: meta.keywords,
+              url: landingUrl,
+            }),
+          ]}
+        />
+      }
+    >
       <NextIntlClientProvider>
         <LandingShell>{children}</LandingShell>
       </NextIntlClientProvider>

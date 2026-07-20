@@ -2,8 +2,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useMemo, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
-
-import { statisticsCopy } from '@/content/statistics-copy';
+import { useTranslations } from 'next-intl';
 
 import {
   TablePrimary,
@@ -50,6 +49,7 @@ export const CSTokenDistributionTable: FC<CSTokenDistributionTableProps> = ({
   list,
   perPage = 5,
 }) => {
+  const t = useTranslations('tables');
   const [page, setPage] = useState(1);
 
   const paginatedData = useMemo(
@@ -57,7 +57,7 @@ export const CSTokenDistributionTable: FC<CSTokenDistributionTableProps> = ({
     [list, page, perPage],
   );
 
-  if (list.length === 0) return <p>No tokens yet.</p>;
+  if (list.length === 0) return <p>{t('empty.tokens')}</p>;
 
   return (
     <>
@@ -67,14 +67,14 @@ export const CSTokenDistributionTable: FC<CSTokenDistributionTableProps> = ({
             <Tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
-                  desktop="Owner Address"
-                  tooltip={statisticsCopy.tables.ownerAddress}
+                  desktop={t('statisticsColumns.ownerAddress')}
+                  tooltip={t('statisticsTooltips.ownerAddress')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
-                  desktop="Number of Tokens Owned"
-                  tooltip={statisticsCopy.tables.numberOfTokensOwned}
+                  desktop={t('statisticsColumns.numberOfTokensOwned')}
+                  tooltip={t('statisticsTooltips.numberOfTokensOwned')}
                 />
               </TablePrimaryHeadCell>
             </Tr>

@@ -4,15 +4,10 @@ import { useMemo, useState } from 'react';
 import { Check, Copy, Info, MessageCircle, Radio } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import {
-  convertTimestampToDateTime,
-  formatTableAmount,
-  getRelativeTime,
-  resolveGestureTypeCode,
-  shortenHex,
-} from '@/utils';
+import { formatTableAmount, getRelativeTime, resolveGestureTypeCode, shortenHex } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';
@@ -38,8 +33,7 @@ interface GestureChatMessage {
   message: string;
 }
 
-function formatGestureMessageTimestamp(timestamp: number, locale: string) {
-  const display = convertTimestampToDateTime(timestamp, true, locale);
+function formatGestureMessageTimestamp(timestamp: number, display: string) {
   const [date = display, time = ''] = display.split(', ');
 
   return {
@@ -50,11 +44,40 @@ function formatGestureMessageTimestamp(timestamp: number, locale: string) {
   };
 }
 
+function GestureMessageTimestamp({
+  timestamp,
+  locale,
+  nowMs,
+}: {
+  timestamp: number;
+  locale: string;
+  nowMs: number;
+}) {
+  const display = useHydrationSafeDateTime(timestamp, true, locale);
+  const formatted = formatGestureMessageTimestamp(timestamp, display);
+  const relativeLabel =
+    nowMs > 0 ? getRelativeTime(timestamp, Math.floor(nowMs / 1000), locale) : formatted.absolute;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <time dateTime={formatted.iso} className="mt-2 block w-fit text-xs text-muted-foreground">
+          {relativeLabel}
+        </time>
+      </TooltipTrigger>
+      <TooltipContent>{formatted.absolute}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 /**
  * Compact method badge descriptor: cost + unit message when known
  * (e.g. "0.1 ETH + RWLK"), else just the method fallback message.
  */
-function getGestureMethodBadge(gesture: GestureInfo): {
+function getGestureMethodBadge(
+  gesture: GestureInfo,
+  locale: string,
+): {
   messageKey: 'eth' | 'ethFallback' | 'ethRwlk' | 'rwlkFallback' | 'cst' | 'cstFallback';
   amount?: string;
 } {
@@ -63,7 +86,7 @@ function getGestureMethodBadge(gesture: GestureInfo): {
     const cost =
       typeof gesture.CstCost === 'number' && gesture.CstCost >= 0 ? gesture.CstCost : null;
     return cost != null
-      ? { messageKey: 'cst', amount: formatTableAmount(cost) }
+      ? { messageKey: 'cst', amount: formatTableAmount(cost, locale) }
       : { messageKey: 'cstFallback' };
   }
   const cost =
@@ -72,11 +95,11 @@ function getGestureMethodBadge(gesture: GestureInfo): {
       : null;
   if (typeCode === 1) {
     return cost != null
-      ? { messageKey: 'ethRwlk', amount: formatTableAmount(cost) }
+      ? { messageKey: 'ethRwlk', amount: formatTableAmount(cost, locale) }
       : { messageKey: 'rwlkFallback' };
   }
   return cost != null
-    ? { messageKey: 'eth', amount: formatTableAmount(cost) }
+    ? { messageKey: 'eth', amount: formatTableAmount(cost, locale) }
     : { messageKey: 'ethFallback' };
 }
 
@@ -211,18 +234,13 @@ export function GestureMessageChat({
             {messages.length > 0 ? (
               <ol className="space-y-3" aria-live="polite">
                 {messages.map(({ gesture, message }, index) => {
-                  const timestamp = formatGestureMessageTimestamp(gesture.TimeStamp, locale);
-                  const relativeLabel =
-                    nowMs > 0
-                      ? getRelativeTime(gesture.TimeStamp, Math.floor(nowMs / 1000), locale)
-                      : timestamp.absolute;
                   const isNewest = index === 0;
                   const gestureId = Number.isFinite(gesture.EvtLogId) ? gesture.EvtLogId : null;
                   const gesturePosition =
                     typeof gesture.BidPosition === 'number' ? gesture.BidPosition : null;
                   const listItemKey =
                     gestureId ?? `${gesture.BidderAddr}-${gesture.TimeStamp}-${index}`;
-                  const badge = getGestureMethodBadge(gesture);
+                  const badge = getGestureMethodBadge(gesture, locale);
 
                   return (
                     <li key={listItemKey}>
@@ -274,17 +292,11 @@ export function GestureMessageChat({
                           </div>
                         </div>
 
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <time
-                              dateTime={timestamp.iso}
-                              className="mt-2 block w-fit text-xs text-muted-foreground"
-                            >
-                              {relativeLabel}
-                            </time>
-                          </TooltipTrigger>
-                          <TooltipContent>{timestamp.absolute}</TooltipContent>
-                        </Tooltip>
+                        <GestureMessageTimestamp
+                          timestamp={gesture.TimeStamp}
+                          locale={locale}
+                          nowMs={nowMs}
+                        />
 
                         <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/95">
                           <LinkifiedText text={message} />

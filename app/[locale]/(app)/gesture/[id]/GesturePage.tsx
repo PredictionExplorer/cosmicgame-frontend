@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   DefinitionList,
   DetailRow,
@@ -151,7 +152,7 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {convertTimestampToDateTime(gestureInfo.TimeStamp, false, locale)}
+                    <HydrationSafeDateTime timestamp={gestureInfo.TimeStamp} locale={locale} />
                   </a>
                   <span className="mt-1 block text-xs text-muted-foreground">
                     {t('rows.datetimeHelp')}

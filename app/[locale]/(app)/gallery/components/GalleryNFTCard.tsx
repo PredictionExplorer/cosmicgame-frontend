@@ -4,9 +4,13 @@ import { motion } from 'framer-motion';
 import { Lock, Tag } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatId, getAssetsUrl, getThumbUrl, convertTimestampToDateTime } from '@/utils';
+import { formatId, getAssetsUrl, getThumbUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import {
+  useHydrationSafeDateTime,
+  useHydrationSafeNowSeconds,
+} from '@/components/common/HydrationSafeDateTime';
 import { cn } from '@/lib/utils';
 import NFTImage from '@/components/nft/NFTImage';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -33,9 +37,9 @@ interface GalleryNFTCardProps {
  * forms ("just now", "5m ago"); `zh` follows the style guide's relative
  * forms with a space between digit and CJK ("刚刚", "5 分钟前").
  */
-function formatImprintAge(timestamp: number, locale: string): string {
+function formatImprintAge(timestamp: number, locale: string, nowSeconds: number): string {
   const zh = locale === 'zh';
-  const seconds = Math.floor(Date.now() / 1000) - timestamp;
+  const seconds = nowSeconds - timestamp;
   if (seconds < 60) return zh ? '刚刚' : 'just now';
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return zh ? `${minutes} 分钟前` : `${minutes}m ago`;
@@ -72,6 +76,8 @@ interface CardInnerProps {
 function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
   const t = useTranslations('gallery');
   const locale = useLocale();
+  const imprintedDate = useHydrationSafeDateTime(nft.MintTimeStamp ?? 0, false, locale);
+  const nowSeconds = useHydrationSafeNowSeconds(nft.MintTimeStamp ?? 0);
 
   return (
     <motion.div
@@ -144,13 +150,13 @@ function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="text-[10px] text-muted-foreground/60 cursor-help">
-                    {formatImprintAge(nft.MintTimeStamp, locale)}
+                    {formatImprintAge(nft.MintTimeStamp, locale, nowSeconds)}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
                   <p>
                     {t('card.tooltips.mintedOn', {
-                      date: convertTimestampToDateTime(nft.MintTimeStamp, false, locale),
+                      date: imprintedDate,
                     })}
                   </p>
                 </TooltipContent>
@@ -167,6 +173,8 @@ function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
 function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
   const t = useTranslations('gallery');
   const locale = useLocale();
+  const imprintedDate = useHydrationSafeDateTime(nft.MintTimeStamp ?? 0, false, locale);
+  const nowSeconds = useHydrationSafeNowSeconds(nft.MintTimeStamp ?? 0);
 
   return (
     <motion.div
@@ -247,13 +255,13 @@ function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="hidden md:block text-[10px] text-muted-foreground/60 shrink-0 cursor-help">
-                  {formatImprintAge(nft.MintTimeStamp, locale)}
+                  {formatImprintAge(nft.MintTimeStamp, locale, nowSeconds)}
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 <p>
                   {t('card.tooltips.mintedOn', {
-                    date: convertTimestampToDateTime(nft.MintTimeStamp, false, locale),
+                    date: imprintedDate,
                   })}
                 </p>
               </TooltipContent>

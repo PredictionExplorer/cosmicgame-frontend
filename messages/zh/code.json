@@ -1,0 +1,22 @@
+{
+  "viewer": {
+    "title": "代码查看器",
+    "subtitle": "查看将种子转换为图像的生成代码",
+    "description": "以下代码会把智能合约生成的种子转换为图像。你也可以在 IPFS 上查看：",
+    "github": "公开的 GitHub 组织位于 <link>github.com/PredictionExplorer</link>。"
+  },
+  "seo": {
+    "eyebrow": "源代码 · 确定性艺术",
+    "heading": "Cosmic Signature 源代码",
+    "description": "Cosmic Signature 公开确定性艺术流水线的源代码资源；这套流水线将链上种子转换为三体 NFT 艺术。下方客户端查看器支持交互，本段服务端渲染摘要则让抓取工具无需等待 JavaScript 即可读取核心事实。",
+    "excerpt": "种子 -> SHA3-256 随机流 -> 三体模拟 -> 光谱渲染器 -> Cosmic Signature NFT 图像",
+    "relatedAria": "源代码相关页面",
+    "links": {
+      "ipfs": "打开已发布的 IPFS 源代码制品",
+      "github": "打开 GitHub 组织",
+      "contracts": "查看已验证合约",
+      "security": "阅读安全说明",
+      "gallery": "浏览生成的 NFT 艺术"
+    }
+  }
+}

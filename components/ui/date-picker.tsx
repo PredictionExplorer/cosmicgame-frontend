@@ -124,6 +124,7 @@ export type DatePickerProps = {
 /** Date field with popover calendar for picking a day. */
 export const DatePicker: FC<DatePickerProps> = ({ id, label, value, onChange, className }) => {
   const t = useTranslations('forms');
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const selected = useMemo(() => (value ? dayjs(value) : null), [value]);
   const [viewMonth, setViewMonth] = useState(() =>
@@ -137,7 +138,9 @@ export const DatePicker: FC<DatePickerProps> = ({ id, label, value, onChange, cl
     }
   }, [open, value]);
 
-  const displayLabel = value ? formatYyyymmddLabel(toYyyymmdd(value)) : t('datePicker.pickDate');
+  const displayLabel = value
+    ? formatYyyymmddLabel(toYyyymmdd(value), locale)
+    : t('datePicker.pickDate');
 
   const handleSelect = (day: Dayjs) => {
     onChange(day.format('YYYY-MM-DD'));

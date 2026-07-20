@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatTableAmount, shortenHex } from '@/utils';
-import { statisticsCopy } from '@/content/statistics-copy';
 
 import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -22,7 +21,13 @@ import type { UniqueAnchorHolderCST } from '@/services/api/types';
 
 export type { UniqueAnchorHolderCST };
 
-const UniqueAnchorHoldersCSTRow = ({ row }: { row: UniqueAnchorHolderCST }) => {
+const UniqueAnchorHoldersCSTRow = ({
+  row,
+  locale,
+}: {
+  row: UniqueAnchorHolderCST;
+  locale: string;
+}) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -53,14 +58,17 @@ const UniqueAnchorHoldersCSTRow = ({ row }: { row: UniqueAnchorHolderCST }) => {
       <TablePrimaryCell align="center">{NumUnstakeActions}</TablePrimaryCell>
       <TablePrimaryCell align="center">{TotalTokensMinted}</TablePrimaryCell>
       <TablePrimaryCell align="center">{TotalTokensStaked}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{formatTableAmount(TotalRewardEth)}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{formatTableAmount(UnclaimedRewardEth)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{formatTableAmount(TotalRewardEth, locale)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {formatTableAmount(UnclaimedRewardEth, locale)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
 export const UniqueAnchorHoldersCSTTable = ({ list }: { list: UniqueAnchorHolderCST[] }) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const perPage = 5;
   const [page, setPage] = useState(1);
   const responsiveHeaders = [
@@ -68,39 +76,39 @@ export const UniqueAnchorHoldersCSTTable = ({ list }: { list: UniqueAnchorHolder
       desktop: t('columns.anchorHolderAddress'),
       mobile: t('columns.holder'),
       align: 'left' as const,
-      tooltip: statisticsCopy.tables.anchorHolderAddress,
+      tooltip: t('statisticsTooltips.anchorHolderAddress'),
     },
     {
       desktop: t('uniqueAnchorHolders.numAnchorActions'),
       mobile: t('uniqueAnchorHolders.anchors'),
-      tooltip: statisticsCopy.tables.numAnchorActions,
+      tooltip: t('statisticsTooltips.numAnchorActions'),
     },
     {
       desktop: t('uniqueAnchorHolders.numReleaseActions'),
       mobile: t('uniqueAnchorHolders.releases'),
-      tooltip: statisticsCopy.tables.numReleaseActions,
+      tooltip: t('statisticsTooltips.numReleaseActions'),
     },
     {
       desktop: t('uniqueAnchorHolders.totalImprintedTokens'),
       mobile: t('uniqueAnchorHolders.imprinted'),
-      tooltip: statisticsCopy.tables.totalImprintedTokens,
+      tooltip: t('statisticsTooltips.totalImprintedTokens'),
     },
     {
       desktop: t('uniqueAnchorHolders.totalAnchoredTokens'),
       mobile: t('uniqueAnchorHolders.anchored'),
-      tooltip: statisticsCopy.tables.totalAnchoredTokens,
+      tooltip: t('statisticsTooltips.totalAnchoredTokens'),
     },
     {
       desktop: t('uniqueAnchorHolders.totalDistributionEth'),
       mobile: t('uniqueAnchorHolders.distributed'),
       align: 'right' as const,
-      tooltip: statisticsCopy.tables.totalDistributionEth,
+      tooltip: t('statisticsTooltips.totalDistributionEth'),
     },
     {
       desktop: t('uniqueAnchorHolders.unretrievedDistributionEth'),
       mobile: t('uniqueAnchorHolders.unretrieved'),
       align: 'right' as const,
-      tooltip: statisticsCopy.tables.unretrievedDistributionEth,
+      tooltip: t('statisticsTooltips.unretrievedDistributionEth'),
     },
   ];
 
@@ -127,7 +135,7 @@ export const UniqueAnchorHoldersCSTTable = ({ list }: { list: UniqueAnchorHolder
           </TablePrimaryHead>
           <tbody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <UniqueAnchorHoldersCSTRow row={row} key={row.StakerAid} />
+              <UniqueAnchorHoldersCSTRow row={row} locale={locale} key={row.StakerAid} />
             ))}
           </tbody>
         </TablePrimary>

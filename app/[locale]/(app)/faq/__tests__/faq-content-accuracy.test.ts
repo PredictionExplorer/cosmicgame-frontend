@@ -1,6 +1,9 @@
 import { protocolFacts } from '@/content/protocol-facts';
+import { faqContentEn, findFaqItemById, getAllFaqItems } from '@/content/faq';
 
-import { faqCategories, findItemById, getAllItems } from '../data/faq-data';
+const faqCategories = faqContentEn.categories;
+const getAllItems = () => getAllFaqItems(faqContentEn);
+const findItemById = (id: string) => findFaqItemById(faqContentEn, id);
 
 /**
  * Contract-accuracy regression guard for FAQ copy.

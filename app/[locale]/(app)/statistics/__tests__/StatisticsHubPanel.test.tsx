@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import statisticsMessages from '@/messages/en/statistics.json';
+
 import { render, screen, within, checkA11y } from '@/test-utils';
 
 import StatisticsHubPanel from '../StatisticsHubPanel';
@@ -54,7 +56,11 @@ describe('StatisticsHubPanel', () => {
     const nav = screen.getByRole('navigation', { name: 'Statistics section pages' });
     for (const section of STATISTICS_SECTIONS) {
       expect(nav.querySelector(`a[href="${section.href}"]`)).toBeInTheDocument();
-      expect(within(nav).getByRole('heading', { name: section.label })).toBeInTheDocument();
+      expect(
+        within(nav).getByRole('heading', {
+          name: statisticsMessages.navigation[section.messageKey].label,
+        }),
+      ).toBeInTheDocument();
     }
   });
 

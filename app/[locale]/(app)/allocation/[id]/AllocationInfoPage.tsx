@@ -25,15 +25,10 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
 
-import {
-  getExplorerUrl,
-  convertTimestampToDateTime,
-  formatEthValue,
-  shortenHex,
-  getEnduranceChampions,
-} from '@/utils';
+import { getExplorerUrl, formatEthValue, shortenHex, getEnduranceChampions } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { cn } from '@/lib/utils';
 import { PageShell } from '@/components/ui/page-shell';
 import {
@@ -652,13 +647,9 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
 
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span>
-                      {t('details.hero.finalized', {
-                        dateTime: convertTimestampToDateTime(
-                          allocationInfo.TimeStamp,
-                          false,
-                          locale,
-                        ),
-                      })}
+                      <HydrationSafeDateTime timestamp={allocationInfo.TimeStamp} locale={locale}>
+                        {(dateTime) => t('details.hero.finalized', { dateTime })}
+                      </HydrationSafeDateTime>
                     </span>
                     <span className="text-white/10">|</span>
                     <a

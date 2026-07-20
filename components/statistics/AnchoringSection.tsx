@@ -1,6 +1,7 @@
 'use client';
 
-import { statisticsCopy } from '@/content/statistics-copy';
+import { useTranslations } from 'next-intl';
+
 import { formatEthValue } from '@/utils';
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -88,6 +89,8 @@ export function AnchoringSection({
   uniqueCSTAnchorHolders,
   uniqueRWLKAnchorHolders,
 }: AnchoringSectionProps) {
+  const t = useTranslations('statistics');
+
   return (
     <Tabs defaultValue="cst" className="mt-8">
       <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 p-1 sm:inline-flex sm:w-auto sm:flex-nowrap">
@@ -95,77 +98,77 @@ export function AnchoringSection({
           value="cst"
           className="min-w-0 flex-1 whitespace-normal px-2 py-2 text-center text-sm font-semibold leading-tight sm:flex-none sm:whitespace-nowrap sm:px-3 sm:py-1.5 sm:text-lg"
         >
-          Cosmic Signature NFT
+          {t('anchoringPage.tabs.cosmicSignature')}
         </TabsTrigger>
         <TabsTrigger
           value="rwlk"
           className="min-w-0 flex-1 whitespace-normal px-2 py-2 text-center text-sm font-semibold leading-tight sm:flex-none sm:whitespace-nowrap sm:px-3 sm:py-1.5 sm:text-lg"
         >
-          RandomWalk NFT
+          {t('anchoringPage.tabs.randomWalk')}
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="cst" className="space-y-6 pt-4">
         <StatisticsGroup
-          title="Cosmic Signature NFT Anchoring Overview"
+          title={t('anchoringPage.groups.cosmicSignature')}
           accentColor="blue"
-          tooltip={statisticsCopy.anchoring.cstGroup}
+          tooltip={t('anchoringTooltips.cstGroup')}
         >
           <StatisticsItem
-            title="Number of Active Anchor-holders"
+            title={t('anchoringPage.stats.activeHolders')}
             value={cstStats.NumActiveStakers}
-            tooltip={statisticsCopy.anchoring.cstActiveAnchorHolders}
+            tooltip={t('anchoringTooltips.cstActiveAnchorHolders')}
           />
           <StatisticsItem
-            title="Number of Anchor-Distribution Deposits"
+            title={t('anchoringPage.stats.distributionDeposits')}
             value={cstStats.NumDeposits ?? '—'}
-            tooltip={statisticsCopy.anchoring.cstAnchorDistributionDeposits}
+            tooltip={t('anchoringTooltips.cstAnchorDistributionDeposits')}
           />
           <StatisticsItem
-            title="Total Anchor Distributions"
+            title={t('anchoringPage.stats.totalDistributions')}
             value={formatEthValue(cstStats.TotalRewardEth ?? 0)}
-            tooltip={statisticsCopy.anchoring.cstTotalAnchorDistributions}
+            tooltip={t('anchoringTooltips.cstTotalAnchorDistributions')}
           />
           <StatisticsItem
-            title="Total Tokens Imprinted"
+            title={t('anchoringPage.stats.tokensImprinted')}
             value={cstStats.TotalTokensMinted ?? '—'}
-            tooltip={statisticsCopy.anchoring.cstTotalTokensImprinted}
+            tooltip={t('anchoringTooltips.cstTotalTokensImprinted')}
           />
           <StatisticsItem
-            title="Total Tokens Anchored"
+            title={t('anchoringPage.stats.tokensAnchored')}
             value={cstStats.TotalTokensStaked}
-            tooltip={statisticsCopy.anchoring.cstTotalTokensAnchored}
+            tooltip={t('anchoringTooltips.cstTotalTokensAnchored')}
           />
           <StatisticsItem
-            title="Unretrieved Anchor Distributions"
+            title={t('anchoringPage.stats.unretrievedDistributions')}
             value={formatEthValue(cstStats.UnclaimedRewardEth ?? 0)}
-            tooltip={statisticsCopy.anchoring.cstUnretrievedAnchorDistributions}
+            tooltip={t('anchoringTooltips.cstUnretrievedAnchorDistributions')}
           />
         </StatisticsGroup>
 
         <AnchoringTableSection
-          title="Anchor / Release Actions"
-          tooltip={statisticsCopy.sections.anchorReleaseActions}
+          title={t('anchoringPage.tables.actions')}
+          tooltip={t('sectionTooltips.anchorReleaseActions')}
           state={cstAnchorActions}
-          emptyTitle="No anchor actions yet"
+          emptyTitle={t('anchoringPage.empty.actions')}
         >
           <GlobalAnchorActionsTable list={cstAnchorActions.data ?? []} IsRWLK={false} />
         </AnchoringTableSection>
 
         <AnchoringTableSection
-          title="Anchored Tokens"
-          tooltip={statisticsCopy.sections.anchoredTokens}
+          title={t('anchoringPage.tables.anchoredTokens')}
+          tooltip={t('sectionTooltips.anchoredTokens')}
           state={anchoredCSTokens}
-          emptyTitle="No tokens currently anchored"
+          emptyTitle={t('anchoringPage.empty.tokens')}
         >
           <GlobalAnchoredTokensTable list={anchoredCSTokens.data ?? []} IsRWLK={false} />
         </AnchoringTableSection>
 
         <AnchoringTableSection
-          title="Unique Anchor-holders"
-          tooltip={statisticsCopy.sections.uniqueAnchorHolders}
+          title={t('anchoringPage.tables.uniqueHolders')}
+          tooltip={t('sectionTooltips.uniqueAnchorHolders')}
           state={uniqueCSTAnchorHolders}
-          emptyTitle="No anchor-holders yet"
+          emptyTitle={t('anchoringPage.empty.holders')}
         >
           <UniqueAnchorHoldersCSTTable list={uniqueCSTAnchorHolders.data ?? []} />
         </AnchoringTableSection>
@@ -173,50 +176,50 @@ export function AnchoringSection({
 
       <TabsContent value="rwlk" className="space-y-6 pt-4">
         <StatisticsGroup
-          title="RWLK Anchoring Overview"
+          title={t('anchoringPage.groups.randomWalk')}
           accentColor="purple"
-          tooltip={statisticsCopy.anchoring.rwlkGroup}
+          tooltip={t('anchoringTooltips.rwlkGroup')}
         >
           <StatisticsItem
-            title="Number of Active Anchor-holders"
+            title={t('anchoringPage.stats.activeHolders')}
             value={rwlkStats.NumActiveStakers}
-            tooltip={statisticsCopy.anchoring.rwlkActiveAnchorHolders}
+            tooltip={t('anchoringTooltips.rwlkActiveAnchorHolders')}
           />
           <StatisticsItem
-            title="Total Tokens Imprinted"
+            title={t('anchoringPage.stats.tokensImprinted')}
             value={rwlkStats.TotalTokensMinted ?? '—'}
-            tooltip={statisticsCopy.anchoring.rwlkTotalTokensImprinted}
+            tooltip={t('anchoringTooltips.rwlkTotalTokensImprinted')}
           />
           <StatisticsItem
-            title="Total Tokens Anchored"
+            title={t('anchoringPage.stats.tokensAnchored')}
             value={rwlkStats.TotalTokensStaked}
-            tooltip={statisticsCopy.anchoring.rwlkTotalTokensAnchored}
+            tooltip={t('anchoringTooltips.rwlkTotalTokensAnchored')}
           />
         </StatisticsGroup>
 
         <AnchoringTableSection
-          title="Anchor / Release Actions"
-          tooltip={statisticsCopy.sections.anchorReleaseActions}
+          title={t('anchoringPage.tables.actions')}
+          tooltip={t('sectionTooltips.anchorReleaseActions')}
           state={rwlkAnchorActions}
-          emptyTitle="No anchor actions yet"
+          emptyTitle={t('anchoringPage.empty.actions')}
         >
           <GlobalAnchorActionsTable list={rwlkAnchorActions.data ?? []} IsRWLK={true} />
         </AnchoringTableSection>
 
         <AnchoringTableSection
-          title="Anchored Tokens"
-          tooltip={statisticsCopy.sections.anchoredTokens}
+          title={t('anchoringPage.tables.anchoredTokens')}
+          tooltip={t('sectionTooltips.anchoredTokens')}
           state={anchoredRWLKTokens}
-          emptyTitle="No tokens currently anchored"
+          emptyTitle={t('anchoringPage.empty.tokens')}
         >
           <GlobalAnchoredTokensTable list={anchoredRWLKTokens.data ?? []} IsRWLK={true} />
         </AnchoringTableSection>
 
         <AnchoringTableSection
-          title="Unique Anchor-holders"
-          tooltip={statisticsCopy.sections.uniqueAnchorHolders}
+          title={t('anchoringPage.tables.uniqueHolders')}
+          tooltip={t('sectionTooltips.uniqueAnchorHolders')}
           state={uniqueRWLKAnchorHolders}
-          emptyTitle="No anchor-holders yet"
+          emptyTitle={t('anchoringPage.empty.holders')}
         >
           <UniqueAnchorHoldersRWLKTable list={uniqueRWLKAnchorHolders.data ?? []} />
         </AnchoringTableSection>

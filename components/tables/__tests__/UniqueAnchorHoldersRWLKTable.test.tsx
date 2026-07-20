@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
-
-import { statisticsCopy } from '@/content/statistics-copy';
+import userEvent from '@testing-library/user-event';
 
 import { UniqueAnchorHoldersRWLKTable } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
 
@@ -41,14 +40,17 @@ describe('UniqueAnchorHoldersRWLKTable', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 
-  it('adds help triggers to RandomWalk anchor-holder headers', () => {
+  it('adds localized help to RandomWalk anchor-holder headers', async () => {
+    const user = userEvent.setup();
     render(<UniqueAnchorHoldersRWLKTable list={[createAnchorHolder()]} />);
-    expect(
-      screen.getAllByRole('button', {
-        name: /^tables\.tableHeaderHelp\.explainColumn/,
-      }).length,
-    ).toBeGreaterThanOrEqual(5);
-    expect(statisticsCopy.tables.totalAnchoredTokens).toMatch(/anchored-token/);
+    const triggers = screen.getAllByRole('button', {
+      name: /^tables\.tableHeaderHelp\.explainColumn/,
+    });
+    expect(triggers.length).toBeGreaterThanOrEqual(5);
+    await user.hover(triggers[3]!);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'tables.statisticsTooltips.totalAnchoredTokens',
+    );
   });
 
   it('renders anchor-holder data', () => {

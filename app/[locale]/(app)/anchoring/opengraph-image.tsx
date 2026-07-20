@@ -1,19 +1,20 @@
-import { ImageResponse } from 'next/og';
-
-import { COSMIC_OG_SIZE, CosmicOgCard } from '@/lib/og/CosmicOgCard';
+import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
+import { getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
+import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
 
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
-export const alt = 'Cosmic Signature \u2014 Anchoring';
 
-export default function Image() {
-  return new ImageResponse(
-    <CosmicOgCard
-      eyebrow="Anchoring"
-      title="Anchor a Signature. Receive a share each cycle."
-      subhead="Anchored Cosmic Signature NFTs receive a proportional share of the per-cycle Anchor Distribution. Release any time."
-      chips={['No Lockup', 'Per-Cycle ETH', 'Stellar Selection']}
-    />,
-    size,
-  );
+interface ImageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateImageMetadata({ params }: ImageProps) {
+  const { locale } = await params;
+  return getOgImageMetadata(locale, 'anchoring');
+}
+
+export default async function Image({ params }: ImageProps) {
+  const { locale } = await params;
+  return createCosmicOgImage(locale, getOgCopy(locale, 'anchoring'));
 }

@@ -166,7 +166,7 @@ export const landingContentZh = {
       {
         percent: '8%',
         title: '时之勇士分配',
-        body: `单次连续保持领先时间最长的参与者获配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString()} CST 与 1 枚 Cosmic Signature NFT。`,
+        body: `单次连续保持领先时间最长的参与者获配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
         tone: 'rose',
       },
       {
@@ -190,13 +190,13 @@ export const landingContentZh = {
       {
         percent: '10 枚 NFT',
         title: '参与者 NFT 星选',
-        body: `程序化随机选出 10 位参与者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString()} CST 与 1 枚 Cosmic Signature NFT。`,
+        body: `程序化随机选出 10 位参与者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
         tone: 'default',
       },
       {
         percent: '10 枚 NFT',
         title: '锚定 NFT 星选',
-        body: `程序化随机选出 10 位 Random Walk NFT 锚定者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString()} CST 与 1 枚 Cosmic Signature NFT。`,
+        body: `程序化随机选出 10 位 Random Walk NFT 锚定者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
         tone: 'default',
       },
       {
@@ -217,7 +217,7 @@ export const landingContentZh = {
   anchoring: {
     eyebrow: '锚定',
     heading: '将 Cosmic Signature NFT 锚定至协议。',
-    body: `每个周期，${protocolFacts.anchorDistributionPercentage}% 的 ETH 周期储备会用于锚定派发。已锚定的 Cosmic Signature NFT 会按比例累积相应份额，解锚时即可取回。每枚 NFT 仅可锚定一次，但可随时解锚；一旦解锚，便永久失去再次锚定的资格。已锚定的 Random Walk NFT 可获得锚定 NFT 星选资格；入选锚定者将获配 ${protocolFacts.specialAllocationCst.toLocaleString()} CST 与 1 枚 Cosmic Signature NFT（不含 ETH）。`,
+    body: `每个周期，${protocolFacts.anchorDistributionPercentage}% 的 ETH 周期储备会用于锚定派发。已锚定的 Cosmic Signature NFT 会按比例累积相应份额，解锚时即可取回。每枚 NFT 仅可锚定一次，但可随时解锚；一旦解锚，便永久失去再次锚定的资格。已锚定的 Random Walk NFT 可获得锚定 NFT 星选资格；入选锚定者将获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT（不含 ETH）。`,
     bullets: [
       '每个周期累积 ETH 锚定派发，解锚时取回',
       '可随时解锚；每枚 NFT 仅可锚定一次',
@@ -272,11 +272,11 @@ export const landingContentZh = {
   verifiability: {
     eyebrow: '可验证性',
     heading: '开放、已验证、可复现。',
-    body: '任何人都能从种子重新生成签名作品，独立完成验证。合约验证、静态分析说明和审计状态会随报告一同发布在应用中。整个代码仓库采用 CC0，不保留任何权利；欢迎自由复用、修改和再创作。',
+    body: '任何人都能从种子重新生成签名作品，独立完成验证。合约验证、静态分析说明和审计状态会随报告一同发布在应用中。本仓库中的项目自有材料采用 CC0 1.0；第三方依赖、字体与素材仍适用各自的许可证。',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: '所有合约、着色器和渲染管线均采用 CC0 1.0，归入公有领域。',
+        body: '项目自有的合约、着色器与渲染管线采用 CC0 1.0，不保留任何权利；第三方材料不在此范围内。',
       },
       {
         title: '验证状态',
@@ -341,7 +341,7 @@ export const landingContentZh = {
       {
         question: '我可以自由复用或改编吗？',
         answer:
-          '可以。整个代码仓库采用 CC0 1.0——不保留任何权利。合约、着色器、渲染器、营销网站与文档均已进入公有领域。',
+          '可以。项目自有的合约、着色器、渲染器、营销页面与文档均采用 CC0 1.0，不保留任何权利。第三方依赖、字体与素材仍适用各自的许可证；详见 THIRD_PARTY_NOTICES.md。',
       },
     ],
   },
@@ -388,7 +388,7 @@ export const landingContentZh = {
         ],
       },
     ],
-    copyright: '© {year} Cosmic Signature。公有领域。',
+    copyright: '© {year} Cosmic Signature。项目自有材料采用 CC0 1.0。',
     colophon: 'CC0 1.0 · 公开可验证 · 可复现艺术',
   },
 

@@ -6,3 +6,4 @@ export * from './wallet';
 export * from './endurance';
 export * from './metadata';
 export * from './time';
+export * from './routeParams';

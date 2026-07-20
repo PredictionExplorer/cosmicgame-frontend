@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -35,7 +36,7 @@ const AnchorDistributionImprintsRow = ({ row }: { row: AnchorDistributionImprint
           rel="noopener noreferrer"
           className="text-inherit"
         >
-          {convertTimestampToDateTime(row.TimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
 

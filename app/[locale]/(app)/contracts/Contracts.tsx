@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { formatEther } from 'viem';
 
 import {
@@ -25,7 +26,7 @@ import { FundDistribution } from './components/FundDistribution';
 import { GameConfiguration } from './components/GameConfiguration';
 import { ContractAddressGrid } from './components/ContractAddressGrid';
 import { AuctionParameters } from './components/AuctionParameters';
-import { buildContracts } from './contractAddressData';
+import { buildContracts, CONTRACT_ENTRY_IDS, type ContractEntryCopy } from './contractAddressData';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 24 },
@@ -56,6 +57,7 @@ function getLiveCstPreviewRefreshMs(): number {
 }
 
 const Contracts = () => {
+  const t = useTranslations('contracts');
   const { data, isLoading: loading } = useDashboardInfo();
   const { charity, cosmicGame } = useContractAddresses();
 
@@ -222,20 +224,29 @@ const Contracts = () => {
     fetchData();
   }, [charityWalletContract]);
 
-  const contracts = buildContracts(data?.ContractAddrs);
+  const contractCopy = Object.fromEntries(
+    CONTRACT_ENTRY_IDS.map((id) => [
+      id,
+      {
+        name: t(`entries.${id}.name`),
+        description: t(`entries.${id}.description`),
+      },
+    ]),
+  ) as ContractEntryCopy;
+  const contracts = buildContracts(data?.ContractAddrs, contractCopy);
 
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         eyebrow={
           <SectionEyebrow tone="aurora" pulse>
-            Verified Contracts · Arbitrum
+            {t('page.eyebrow')}
           </SectionEyebrow>
         }
-        title="Contract Addresses"
+        title={t('page.title')}
         titleLevel={2}
         gradientTitle="aurora"
-        subtitle="On-chain addresses, configuration, source links, and verification context for the Cosmic Signature protocol."
+        subtitle={t('page.subtitle')}
       >
         <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
       </PageHeader>
@@ -245,7 +256,7 @@ const Contracts = () => {
           variants={sectionFade}
           initial="hidden"
           animate="visible"
-          aria-label="Allocation Tracks"
+          aria-label={t('page.allocationAria')}
         >
           <FundDistribution
             prizePercentage={data?.PrizePercentage}
@@ -262,7 +273,7 @@ const Contracts = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.15 }}
-          aria-label="Protocol Configuration"
+          aria-label={t('page.configurationAria')}
         >
           <GameConfiguration
             priceIncrease={priceIncrease}
@@ -281,9 +292,9 @@ const Contracts = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.3 }}
-          aria-label="Contract Addresses"
+          aria-label={t('page.addressesAria')}
         >
-          <SectionDivider title="Contract Addresses" className="mb-4" />
+          <SectionDivider title={t('page.addressesTitle')} className="mb-4" />
           <ContractAddressGrid
             contracts={contracts}
             explorerUrl={networkConfig.explorerUrl}
@@ -297,7 +308,7 @@ const Contracts = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.45 }}
-          aria-label="Calibration Window and Stellar Selection Parameters"
+          aria-label={t('page.parametersAria')}
         >
           <AuctionParameters
             cstDurations={cstDutchAuctionDurations}

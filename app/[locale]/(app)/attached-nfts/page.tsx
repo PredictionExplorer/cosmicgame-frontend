@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -6,16 +7,27 @@ import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import NFTDonationsPage from './NFTDonationsPage';
 
-export const metadata: Metadata = createMetadata(
-  'Attached NFT Contributions | Cosmic Signature',
-  'Browse the history of NFTs attached to gestures by community members. Attached NFTs forward to the participant who receives the Signature Allocation each cycle.',
-  undefined,
-  '/attached-nfts',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('nftDonations.title'),
+    t('nftDonations.description'),
+    undefined,
+    '/attached-nfts',
+    { locale },
+  );
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <>
       <PublicDataRouteSeoSummary route="attached-nfts" />

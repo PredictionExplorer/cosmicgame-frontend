@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { statisticsCopy } from '@/content/statistics-copy';
 import { formatTableAmount } from '@/utils';
 
 import {
@@ -23,9 +22,10 @@ export type { Recipient };
 
 interface UniqueRecipientsRowProps {
   recipient?: Recipient;
+  locale: string;
 }
 
-const UniqueRecipientsRow = ({ recipient }: UniqueRecipientsRowProps) => {
+const UniqueRecipientsRow = ({ recipient, locale }: UniqueRecipientsRowProps) => {
   if (!recipient) {
     return <TablePrimaryRow />;
   }
@@ -37,9 +37,11 @@ const UniqueRecipientsRow = ({ recipient }: UniqueRecipientsRowProps) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="right">{recipient.AllocationsCount}</TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {formatTableAmount(recipient.MaxWinAmountEth)}
+        {formatTableAmount(recipient.MaxWinAmountEth, locale)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{formatTableAmount(recipient.PrizesSum)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {formatTableAmount(recipient.PrizesSum, locale)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -50,6 +52,7 @@ interface UniqueRecipientsTableProps {
 
 export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const perPage = 5;
   const [page, setPage] = useState(1);
 
@@ -66,32 +69,36 @@ export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('columns.recipientAddress')}
-                  tooltip={statisticsCopy.tables.recipientAddress}
+                  tooltip={t('statisticsTooltips.recipientAddress')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
                   desktop={t('columns.allocationsReceived')}
-                  tooltip={statisticsCopy.tables.allocationsReceived}
+                  tooltip={t('statisticsTooltips.allocationsReceived')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
                   desktop={t('columns.maxAllocationEth')}
-                  tooltip={statisticsCopy.tables.maxAllocationEth}
+                  tooltip={t('statisticsTooltips.maxAllocationEth')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
                   desktop={t('columns.allocationsSumEth')}
-                  tooltip={statisticsCopy.tables.allocationsSumEth}
+                  tooltip={t('statisticsTooltips.allocationsSumEth')}
                 />
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>
             {list.slice((page - 1) * perPage, page * perPage).map((recipient) => (
-              <UniqueRecipientsRow recipient={recipient} key={recipient.WinnerAid} />
+              <UniqueRecipientsRow
+                recipient={recipient}
+                locale={locale}
+                key={recipient.WinnerAid}
+              />
             ))}
           </tbody>
         </TablePrimary>

@@ -1,9 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { statisticsCopy } from '@/content/statistics-copy';
 import { formatTableAmount } from '@/utils';
 
 import {
@@ -23,9 +22,10 @@ export type { Participant };
 
 interface UniqueParticipantsRowProps {
   bidder?: Participant;
+  locale: string;
 }
 
-const UniqueParticipantsRow = ({ bidder }: UniqueParticipantsRowProps) => {
+const UniqueParticipantsRow = ({ bidder, locale }: UniqueParticipantsRowProps) => {
   if (!bidder) {
     return <TablePrimaryRow />;
   }
@@ -38,7 +38,9 @@ const UniqueParticipantsRow = ({ bidder }: UniqueParticipantsRowProps) => {
         <AddressLink address={BidderAddr} url={`/user/${BidderAddr}`} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{NumBids}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{formatTableAmount(MaxBidAmountEth)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {formatTableAmount(MaxBidAmountEth, locale)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -49,6 +51,7 @@ interface UniqueParticipantsTableProps {
 
 export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const perPage = 5;
   const [page, setPage] = useState(1);
 
@@ -70,26 +73,26 @@ export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) 
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('columns.participantAddress')}
-                  tooltip={statisticsCopy.tables.participantAddress}
+                  tooltip={t('statisticsTooltips.participantAddress')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 <TableHeaderHelp
                   desktop={t('columns.numberOfGestures')}
-                  tooltip={statisticsCopy.tables.numberOfGestures}
+                  tooltip={t('statisticsTooltips.numberOfGestures')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
                   desktop={t('columns.maxGestureEth')}
-                  tooltip={statisticsCopy.tables.maxGestureEth}
+                  tooltip={t('statisticsTooltips.maxGestureEth')}
                 />
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>
             {paginatedList.map((bidder) => (
-              <UniqueParticipantsRow bidder={bidder} key={bidder.BidderAid} />
+              <UniqueParticipantsRow bidder={bidder} locale={locale} key={bidder.BidderAid} />
             ))}
           </tbody>
         </TablePrimary>

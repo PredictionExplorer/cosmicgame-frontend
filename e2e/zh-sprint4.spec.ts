@@ -66,7 +66,11 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
   });
 
   test('/zh/allocation/[id] renders localized cycle details and metadata', async ({ page }) => {
-    await openZhRoute(page, `/zh/allocation/${SPRINT4_MOCK_CYCLE}`, '分配详情 · Cosmic Signature');
+    await openZhRoute(
+      page,
+      `/zh/allocation/${SPRINT4_MOCK_CYCLE}`,
+      `第 ${SPRINT4_MOCK_CYCLE} 个周期分配详情 · Cosmic Signature`,
+    );
     await expect(
       page.getByRole('heading', { level: 1, name: `第 ${SPRINT4_MOCK_CYCLE} 个周期` }),
     ).toBeVisible();
@@ -202,7 +206,11 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
   });
 
   test('shows an end-user-visible Chinese Sonner toast', async ({ page }) => {
-    await openZhRoute(page, `/zh/allocation/${SPRINT4_MOCK_CYCLE}`, '分配详情 · Cosmic Signature');
+    await openZhRoute(
+      page,
+      `/zh/allocation/${SPRINT4_MOCK_CYCLE}`,
+      `第 ${SPRINT4_MOCK_CYCLE} 个周期分配详情 · Cosmic Signature`,
+    );
     await page.getByRole('button', { name: '分享周期摘要' }).click();
     await expect(
       page.locator('[data-sonner-toast]').filter({ hasText: '周期摘要已复制到剪贴板' }),

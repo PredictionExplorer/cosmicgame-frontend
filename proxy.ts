@@ -81,6 +81,15 @@ export default function middleware(req: NextRequest) {
     return NextResponse.redirect(`${LANDING_ORIGIN}${prefix}${suffix}${search}`, 308);
   }
 
+  // Next's generated metadata URLs retain the physical `/[locale]/` segment,
+  // including `/en/` under the public `as-needed` locale policy. Sending these
+  // through next-intl would redirect English images to an unprefixed path, and
+  // the hidden landing-site image would be canonicalized to `/`. Serve the
+  // generated endpoint at the exact URL emitted in og:image instead.
+  if (locale !== undefined && /\/opengraph-image(?:[-/]|$)/.test(publicPath)) {
+    return NextResponse.next();
+  }
+
   // `/landing-site` is an INTERNAL route — the landing lives publicly only at
   // cosmicsignature.com/ (and /zh). Any direct external request is either
   // canonicalized (on the marketing host) or 404'd (anywhere else) so search

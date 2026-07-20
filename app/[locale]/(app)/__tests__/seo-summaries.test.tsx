@@ -1,11 +1,15 @@
+import { getLocale } from 'next-intl/server';
+
 import { protocolFacts } from '@/content/protocol-facts';
-import { statisticsCopy } from '@/content/statistics-copy';
+import statisticsMessages from '@/messages/en/statistics.json';
+import zhSeoMessages from '@/messages/zh/seo.json';
 
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 
 import { render, screen } from '@/test-utils';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
+import { CodeSeoSummary } from '../code/CodeSeoSummary';
 import { ContractsSeoSummary } from '../contracts/ContractsSeoSummary';
 import { CurrentCycleSeoSummary } from '../current-cycle/CurrentCycleSeoSummary';
 import { GallerySeoSummary } from '../gallery/GallerySeoSummary';
@@ -62,6 +66,7 @@ jest.mock('../../../../services/api/tokens', () => ({
 // lexicon-allow-end
 
 const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
+const mockGetLocale = getLocale as jest.MockedFunction<typeof getLocale>;
 const mockGetRoundList = get_round_list as jest.MockedFunction<typeof get_round_list>;
 const mockGetClaimHistory = get_claim_history as jest.MockedFunction<typeof get_claim_history>;
 const mockMarketingRewards = get_marketing_rewards as jest.MockedFunction<
@@ -109,6 +114,7 @@ const dashboard = {
 
 describe('server-visible SEO summaries', () => {
   beforeEach(() => {
+    mockGetLocale.mockResolvedValue('en');
     mockGetRoundList.mockResolvedValue([]);
     mockGetClaimHistory.mockResolvedValue([]);
     mockGetDashboardInfo.mockResolvedValue(
@@ -161,32 +167,33 @@ describe('server-visible SEO summaries', () => {
     render(await StatisticsSeoSummary());
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Cosmic Signature Protocol Statistics' }),
+      screen.getByRole('heading', { level: 1, name: statisticsMessages.hub.seo.heading }),
     ).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /verified Arbitrum contracts/i })).toHaveAttribute(
-      'href',
-      '/contracts',
-    );
     expect(
-      screen.getByText(statisticsCopy.metrics.cosmicSignatureNftsImprinted.label),
+      screen.getByRole('link', { name: statisticsMessages.hub.seo.links.contracts }),
+    ).toHaveAttribute('href', '/contracts');
+    expect(
+      screen.getByText(statisticsMessages.metrics.cosmicSignatureNftsImprinted.label),
     ).toBeInTheDocument();
     for (const metric of [
-      statisticsCopy.metrics.activePerformanceCycle,
-      statisticsCopy.metrics.activeCycleGestures,
-      statisticsCopy.metrics.contractBalance,
-      statisticsCopy.metrics.cosmicSignatureNftsImprinted,
-    ]) {
-      expect(screen.getByText(metric.seoDescription)).toBeInTheDocument();
+      'activePerformanceCycle',
+      'activeCycleGestures',
+      'contractBalance',
+      'cosmicSignatureNftsImprinted',
+    ] as const) {
+      expect(
+        screen.getByText(statisticsMessages.metrics[metric].seoDescription),
+      ).toBeInTheDocument();
     }
     expect(
       screen.getByRole('button', {
-        name: `More information about ${statisticsCopy.metrics.activePerformanceCycle.label}`,
+        name: `More information about ${statisticsMessages.metrics.activePerformanceCycle.label}`,
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', {
-        name: `More information about ${statisticsCopy.metrics.cosmicSignatureNftsImprinted.label}`,
+        name: `More information about ${statisticsMessages.metrics.cosmicSignatureNftsImprinted.label}`,
       }),
     ).toBeInTheDocument();
   });
@@ -260,5 +267,63 @@ describe('server-visible SEO summaries', () => {
         name: 'More information about Total Signature Allocation ETH',
       }),
     ).toBeInTheDocument();
+  });
+
+  it('renders every shared data-route surface in Chinese without English fallback copy', async () => {
+    mockGetLocale.mockResolvedValue('zh');
+    render(await PublicDataRouteSeoSummary({ route: 'allocation' }));
+
+    const copy = zhSeoMessages.publicData.routes.allocation;
+    expect(screen.getByRole('heading', { level: 1, name: copy.heading })).toBeInTheDocument();
+    expect(screen.getByText(copy.cards.totalEth.label)).toBeInTheDocument();
+    expect(copy.cards.totalEth.tooltip).toMatch(/[\u3400-\u9fff]/);
+    expect(
+      screen.getByRole('button', {
+        name: `More information about ${copy.cards.totalEth.label}`,
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: copy.links.statistics })).toHaveAttribute(
+      'href',
+      '/statistics',
+    );
+    expect(screen.getByText(/最后更新：/)).toBeInTheDocument();
+    expect(screen.queryByText(/initial HTML for search engines/i)).not.toBeInTheDocument();
+  });
+
+  it('renders all dedicated SEO summaries with Chinese headings and links', async () => {
+    mockGetLocale.mockResolvedValue('zh');
+
+    const gallery = render(await GallerySeoSummary());
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: zhSeoMessages.gallerySummary.heading,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: zhSeoMessages.gallerySummary.links.code }),
+    ).toHaveAttribute('href', '/code');
+    gallery.unmount();
+
+    const currentCycle = render(await CurrentCycleSeoSummary());
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: zhSeoMessages.currentCycleSummary.heading,
+      }),
+    ).toBeInTheDocument();
+    currentCycle.unmount();
+
+    const statistics = render(await StatisticsSeoSummary());
+    expect(screen.getByRole('heading', { level: 1, name: /协议统计/ })).toBeInTheDocument();
+    statistics.unmount();
+
+    const contracts = render(await ContractsSeoSummary());
+    expect(screen.getByRole('heading', { level: 1, name: /合约/ })).toBeInTheDocument();
+    contracts.unmount();
+
+    const code = render(await CodeSeoSummary());
+    expect(screen.getByRole('heading', { level: 1, name: /源代码/ })).toBeInTheDocument();
+    code.unmount();
   });
 });

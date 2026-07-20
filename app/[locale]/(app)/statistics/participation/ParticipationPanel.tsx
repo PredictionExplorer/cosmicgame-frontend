@@ -2,8 +2,7 @@
 
 import { useMemo } from 'react';
 import { Award, Gift, TrendingUp, Users } from 'lucide-react';
-
-import { statisticsCopy } from '@/content/statistics-copy';
+import { useTranslations } from 'next-intl';
 
 import {
   useDashboardInfo,
@@ -25,6 +24,7 @@ import {
 
 /** Community participation tables: unique participants, recipients, and ETH contributors. */
 const ParticipationPanel = () => {
+  const t = useTranslations('statistics');
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo(undefined, {
     poll: false,
   });
@@ -47,74 +47,74 @@ const ParticipationPanel = () => {
     <div data-testid="participation-panel">
       <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
         <StatCard
-          label={statisticsCopy.metrics.uniqueParticipants.label}
+          label={t('metrics.uniqueParticipants.label')}
           value={mainStats?.NumUniqueBidders ?? '—'}
           icon={<Users className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.uniqueParticipants.tooltip}
+          tooltip={t('metrics.uniqueParticipants.tooltip')}
           loading={dashboardLoading}
         />
         <StatCard
-          label={statisticsCopy.metrics.uniqueRecipients.label}
+          label={t('metrics.uniqueRecipients.label')}
           value={mainStats?.NumUniqueWinners ?? '—'}
           icon={<Award className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.uniqueRecipients.tooltip}
+          tooltip={t('metrics.uniqueRecipients.tooltip')}
           loading={dashboardLoading}
         />
         <StatCard
-          label={statisticsCopy.metrics.uniqueEthContributors.label}
+          label={t('metrics.uniqueEthContributors.label')}
           value={mainStats?.NumUniqueDonors ?? '—'}
           icon={<Gift className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.uniqueEthContributors.tooltip}
+          tooltip={t('metrics.uniqueEthContributors.tooltip')}
           loading={dashboardLoading}
         />
         <StatCard
-          label={statisticsCopy.metrics.uniqueAnchorHolders.label}
+          label={t('metrics.uniqueAnchorHolders.label')}
           value={mainStats ? mainStats.NumUniqueStakersCST + mainStats.NumUniqueStakersRWalk : '—'}
           icon={<TrendingUp className="h-4 w-4" />}
-          tooltip={statisticsCopy.metrics.uniqueAnchorHolders.tooltip}
+          tooltip={t('metrics.uniqueAnchorHolders.tooltip')}
           loading={dashboardLoading}
         />
       </div>
 
       <div className="space-y-8">
         <StatsSection
-          title="Unique Participants"
-          tooltip={statisticsCopy.sections.uniqueParticipants}
+          title={t('participation.sections.participants')}
+          tooltip={t('sectionTooltips.uniqueParticipants')}
           icon={<Users className="h-3.5 w-3.5" />}
           isLoading={participantsQuery.isLoading}
           isError={participantsQuery.isError}
           onRetry={() => participantsQuery.refetch()}
           isEmpty={uniqueParticipants.length === 0}
-          emptyTitle="No participants yet"
-          emptyDescription="Wallets appear here after their first indexed gesture."
+          emptyTitle={t('participation.empty.participantsTitle')}
+          emptyDescription={t('participation.empty.participantsDescription')}
         >
           <UniqueParticipantsTable list={uniqueParticipants} />
         </StatsSection>
 
         <StatsSection
-          title="Unique Recipients"
-          tooltip={statisticsCopy.sections.uniqueRecipients}
+          title={t('participation.sections.recipients')}
+          tooltip={t('sectionTooltips.uniqueRecipients')}
           icon={<Award className="h-3.5 w-3.5" />}
           isLoading={recipientsQuery.isLoading}
           isError={recipientsQuery.isError}
           onRetry={() => recipientsQuery.refetch()}
           isEmpty={uniqueRecipients.length === 0}
-          emptyTitle="No recipients yet"
-          emptyDescription="Wallets appear here after receiving their first indexed allocation."
+          emptyTitle={t('participation.empty.recipientsTitle')}
+          emptyDescription={t('participation.empty.recipientsDescription')}
         >
           <UniqueRecipientsTable list={uniqueRecipients} />
         </StatsSection>
 
         <StatsSection
-          title="Unique ETH Contributors"
-          tooltip={statisticsCopy.sections.uniqueEthContributors}
+          title={t('participation.sections.contributors')}
+          tooltip={t('sectionTooltips.uniqueEthContributors')}
           icon={<Gift className="h-3.5 w-3.5" />}
           isLoading={donorsQuery.isLoading}
           isError={donorsQuery.isError}
           onRetry={() => donorsQuery.refetch()}
           isEmpty={uniqueDonors.length === 0}
-          emptyTitle="No ETH contributions yet"
-          emptyDescription="Wallets appear here after their first indexed ETH contribution."
+          emptyTitle={t('participation.empty.contributorsTitle')}
+          emptyDescription={t('participation.empty.contributorsDescription')}
         >
           <UniqueEthDonorsTable list={uniqueDonors} />
         </StatsSection>

@@ -1,18 +1,20 @@
-import { ImageResponse } from 'next/og';
-
-import { COSMIC_OG_SIZE, CosmicOgCard } from '@/lib/og/CosmicOgCard';
+import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
+import { getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
+import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
 
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
-export const alt = 'Cosmic Signature \u2014 Every Gesture Shapes the Signature.';
 
-export default function Image() {
-  return new ImageResponse(
-    <CosmicOgCard
-      eyebrow="Cosmic Signature"
-      title="Every Gesture Shapes the Signature."
-      subhead="A procedural on-chain art protocol on Arbitrum."
-    />,
-    size,
-  );
+interface ImageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateImageMetadata({ params }: ImageProps) {
+  const { locale } = await params;
+  return getOgImageMetadata(locale, 'default');
+}
+
+export default async function Image({ params }: ImageProps) {
+  const { locale } = await params;
+  return createCosmicOgImage(locale, getOgCopy(locale, 'default'));
 }

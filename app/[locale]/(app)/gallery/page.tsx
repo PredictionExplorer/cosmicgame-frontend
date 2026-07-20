@@ -27,10 +27,11 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const [t, meta, common] = await Promise.all([
-    getTranslations('gallery'),
-    getTranslations('meta'),
-    getTranslations('common'),
+    getTranslations({ locale, namespace: 'gallery' }),
+    getTranslations({ locale, namespace: 'meta' }),
+    getTranslations({ locale, namespace: 'common' }),
   ]);
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
 
   return (
     <>
@@ -43,6 +44,7 @@ export default async function Page({ params }: PageProps) {
             // of being duplicated into gallery.json.
             description: meta('gallery.description'),
             url: localeHref(APP_ORIGIN, '/gallery', locale),
+            inLanguage,
           }),
           breadcrumbJsonLd(
             [

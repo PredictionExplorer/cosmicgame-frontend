@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
@@ -12,30 +14,33 @@ interface EthDonationByRoundPageProps {
 }
 
 const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
+  const t = useTranslations('ethContribution');
   const { data: donationInfo = [], isLoading: loading } = useDonationsBothByRound(round);
 
-  if (round < 0) {
+  if (!Number.isInteger(round) || round < 0) {
     return (
       <PageShell variant="data" backdrop="signature">
         <div className={cn(detailPanelClass, 'mx-auto max-w-lg p-8 text-center')}>
-          <p className="font-display text-lg font-semibold text-foreground">Invalid Cycle Number</p>
+          <p className="font-display text-lg font-semibold text-foreground">
+            {t('cycle.invalidNumber')}
+          </p>
         </div>
       </PageShell>
     );
   }
 
-  const title = `Direct (ETH) Contributions for Cycle ${round}`;
+  const title = t('cycle.title', { cycle: round });
 
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
           title={title}
-          subtitle="All direct ETH contributions recorded for this cycle."
+          subtitle={t('cycle.subtitle')}
           breadcrumbs={[
-            { label: 'Home', href: '/' },
-            { label: 'ETH contributions', href: '/eth-contribution' },
-            { label: `Cycle ${round}` },
+            { label: t('cycle.breadcrumbHome'), href: '/' },
+            { label: t('cycle.breadcrumbContributions'), href: '/eth-contribution' },
+            { label: t('cycle.breadcrumbCycle', { cycle: round }) },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
@@ -43,7 +48,7 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
 
         {loading ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+            <p className="text-sm font-medium text-muted-foreground">{t('cycle.loading')}</p>
           </div>
         ) : (
           <div className={cn(detailPanelClass, 'overflow-x-auto p-2 sm:p-4')}>

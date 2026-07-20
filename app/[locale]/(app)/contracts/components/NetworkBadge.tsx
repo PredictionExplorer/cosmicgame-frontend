@@ -1,4 +1,5 @@
 import { Globe } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
 
@@ -8,6 +9,8 @@ interface NetworkBadgeProps {
 }
 
 export function NetworkBadge({ chainName, chainId }: NetworkBadgeProps) {
+  const t = useTranslations('contracts');
+
   return (
     <Badge
       variant="outline"
@@ -15,7 +18,7 @@ export function NetworkBadge({ chainName, chainId }: NetworkBadgeProps) {
     >
       <Globe className="h-3.5 w-3.5 text-primary" />
       <span className="font-medium">{chainName}</span>
-      <span className="text-muted-foreground">Chain {chainId}</span>
+      <span className="text-muted-foreground">{t('network.chain', { chainId })}</span>
     </Badge>
   );
 }

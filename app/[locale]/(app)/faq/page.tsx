@@ -1,30 +1,48 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { getAllFaqItems, getFaqContent } from '@/content/faq';
+
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { createMetadata } from '@/utils/seo';
 import { JsonLd, faqPageJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 
-import { getAllItems } from './data/faq-data';
 import FAQPage from './FAQPage';
 
-export const metadata: Metadata = createMetadata(
-  'Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol',
-  'Answers to common questions about Cosmic Signature, Performance Cycles, gestures, CST, three-body NFT art, Arbitrum, anchoring, contracts, and protocol security.',
-  undefined,
-  '/faq',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export default function Page() {
-  const allItems = getAllItems();
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(t('faq.title'), t('faq.description'), undefined, '/faq', { locale });
+}
+
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const content = getFaqContent(locale);
+  const allItems = getAllFaqItems(content);
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const [common, faq] = await Promise.all([
+    getTranslations({ locale, namespace: 'common' }),
+    getTranslations({ locale, namespace: 'faq' }),
+  ]);
+
   return (
     <>
-      <JsonLd data={faqPageJsonLd(allItems)} />
+      <JsonLd data={faqPageJsonLd(allItems, inLanguage)} />
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: 'Home', path: '/' },
-          { name: 'FAQ', path: '/faq' },
-        ])}
+        data={breadcrumbJsonLd(
+          [
+            { name: common('breadcrumbs.home'), path: '/' },
+            { name: faq('hero.titleHighlight'), path: '/faq' },
+          ],
+          localeHref(APP_ORIGIN, '/', locale),
+        )}
       />
-      <FAQPage />
+      <FAQPage content={content} />
     </>
   );
 }

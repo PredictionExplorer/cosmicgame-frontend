@@ -137,6 +137,12 @@ describe('getRelativeTime', () => {
     expect(getRelativeTime(NOW - 31536000 * 3, NOW)).toBe('3 years ago');
   });
 
+  it('renders natural Chinese relative units without plural inflection', () => {
+    expect(getRelativeTime(NOW - 30, NOW, 'zh')).toBe('刚刚');
+    expect(getRelativeTime(NOW - 7200, NOW, 'zh')).toBe('2 小时前');
+    expect(getRelativeTime(NOW - 86400 * 3, NOW, 'zh')).toBe('3 天前');
+  });
+
   it('uses Date.now when nowSeconds is not provided', () => {
     jest.spyOn(Date, 'now').mockReturnValue(NOW * 1000);
     expect(getRelativeTime(NOW - 120)).toBe('2 minutes ago');

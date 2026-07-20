@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { TrendingUp, Clock, Coins, MessageSquare, Timer, Zap } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
@@ -41,10 +42,12 @@ export function GameConfiguration({
   initialIncrement,
   loading = false,
 }: GameConfigurationProps) {
+  const locale = useLocale();
+  const t = useTranslations('contracts');
   if (loading) {
     return (
       <div>
-        <SectionDivider title="Protocol Configuration" className="mb-4" />
+        <SectionDivider title={t('configuration.title')} className="mb-4" />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <StatCardSkeleton key={i} />
@@ -56,50 +59,50 @@ export function GameConfiguration({
 
   const cards = [
     {
-      label: 'ETH Gesture-Cost Step-Up',
+      label: t('configuration.cards.ethStep.label'),
       value: `${priceIncrease}%`,
       icon: <TrendingUp className="h-4 w-4" />,
-      tooltip:
-        'ETH gesture cost uses this step-up parameter. CST gesture cost follows the live CST Calibration Window.',
+      tooltip: t('configuration.cards.ethStep.tooltip'),
       featured: true,
     },
     {
-      label: 'Time Increment',
-      value: timeIncrement > 0 ? formatSeconds(timeIncrement) : '--',
+      label: t('configuration.cards.timeIncrement.label'),
+      value: timeIncrement > 0 ? formatSeconds(timeIncrement, locale) : '--',
       icon: <Clock className="h-4 w-4" />,
-      tooltip: `Each gesture adds this much time to the Cycle Finalization Time. The increment grows by ${timeIncrease}% with each cycle.`,
+      tooltip: t('configuration.cards.timeIncrement.tooltip', { percent: timeIncrease }),
       featured: true,
     },
     {
-      label: 'Current Participation CST Preview',
+      label: t('configuration.cards.cstPreview.label'),
       value: `${formatCstAmount(cstRewardPerBid)} CST`,
       icon: <Coins className="h-4 w-4" />,
-      tooltip: `Estimated Participation CST if a gesture lands now. The amount is dynamic and uses ${protocolFacts.dynamicCstRewardFormula}.`,
+      tooltip: t('configuration.cards.cstPreview.tooltip', {
+        formula: protocolFacts.dynamicCstRewardFormula,
+      }),
     },
     {
-      label: 'Finalization Timeout',
-      value: claimTimeout > 0 ? formatSeconds(claimTimeout) : '--',
+      label: t('configuration.cards.finalization.label'),
+      value: claimTimeout > 0 ? formatSeconds(claimTimeout, locale) : '--',
       icon: <Timer className="h-4 w-4" />,
-      tooltip:
-        'Time the Final Gesture participant has to finalize the cycle before the Open-Finalization Window opens to anyone',
+      tooltip: t('configuration.cards.finalization.tooltip'),
     },
     {
-      label: 'Initial Time Increment',
-      value: initialIncrement > 0 ? formatSeconds(initialIncrement) : '--',
+      label: t('configuration.cards.initial.label'),
+      value: initialIncrement > 0 ? formatSeconds(initialIncrement, locale) : '--',
       icon: <Zap className="h-4 w-4" />,
-      tooltip: 'The initial Cycle Finalization Time added when the first gesture is made',
+      tooltip: t('configuration.cards.initial.tooltip'),
     },
     {
-      label: 'Max Message Length',
+      label: t('configuration.cards.message.label'),
       value: maxMessageLength > 0 ? maxMessageLength : '--',
       icon: <MessageSquare className="h-4 w-4" />,
-      tooltip: 'Maximum character length allowed in gesture messages',
+      tooltip: t('configuration.cards.message.tooltip'),
     },
   ];
 
   return (
     <div>
-      <SectionDivider title="Protocol Configuration" className="mb-4" />
+      <SectionDivider title={t('configuration.title')} className="mb-4" />
       <motion.div
         className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
         variants={stagger}

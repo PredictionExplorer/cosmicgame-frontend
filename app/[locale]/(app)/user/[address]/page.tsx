@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getAddress, isAddress } from 'viem';
 import axios from 'axios';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { cosmicGameBaseUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
@@ -10,9 +11,10 @@ import UserPage from './UserPage';
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ address: string }>;
+  params: Promise<{ locale: string; address: string }>;
 }): Promise<Metadata> {
-  const { address: rawAddress } = await params;
+  const { locale, address: rawAddress } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
   let address = rawAddress;
 
   if (isAddress(address.toLowerCase())) {
@@ -20,27 +22,35 @@ export async function generateMetadata({
     try {
       const { data } = await axios.get(`${cosmicGameBaseUrl}user/info/${address}`);
       if (!data || !data.Gestures?.length) {
-        address = 'Invalid Address';
+        address = t('userProfile.invalidAddress');
       }
     } catch {
-      address = 'Invalid Address';
+      address = t('userProfile.invalidAddress');
     }
   } else {
-    address = 'Invalid Address';
+    address = t('userProfile.invalidAddress');
   }
 
-  const title = `Information for User ${address} | Cosmic Signature`;
-  const description = `Information for User ${address}`;
+  const title = t('userProfile.title', { address });
+  const description = t('userProfile.description', { address });
 
-  return createMetadata(title, description, undefined, '/user/' + rawAddress, { index: false });
+  return createMetadata(title, description, undefined, '/user/' + rawAddress, {
+    index: false,
+    locale,
+  });
 }
 
 // Dynamic-param pages render on demand; revalidate keeps live protocol data
 // fresh instead of freezing the first render forever (see route-group refactor).
 export const revalidate = 300;
 
-export default async function Page({ params }: { params: Promise<{ address: string }> }) {
-  const { address: rawAddress } = await params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string; address: string }>;
+}) {
+  const { locale, address: rawAddress } = await params;
+  setRequestLocale(locale);
   let address = rawAddress;
 
   if (isAddress(address.toLowerCase())) {

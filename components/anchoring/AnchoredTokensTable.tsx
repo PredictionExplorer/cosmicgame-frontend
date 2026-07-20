@@ -3,9 +3,10 @@ import { ChevronDown, Loader2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { convertTimestampToDateTime, getAssetsUrl, getThumbUrl, getRWLKImageUrl } from '@/utils';
+import { getAssetsUrl, getThumbUrl, getRWLKImageUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -173,7 +174,7 @@ const AnchoredTokenRow = ({
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(anchorTimeStamp, false, locale)}
+        <HydrationSafeDateTime timestamp={anchorTimeStamp} locale={locale} />
       </TablePrimaryCell>
 
       {!isRandomWalk && (

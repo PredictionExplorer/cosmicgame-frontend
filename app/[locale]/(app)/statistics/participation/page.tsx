@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { APP_ORIGIN } from '@/lib/hostRouting';
+import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
@@ -11,32 +12,52 @@ import ParticipationPanel from './ParticipationPanel';
 
 const section = STATISTICS_SECTIONS.find((s) => s.slug === 'participation')!;
 
-export const metadata: Metadata = createMetadata(
-  'Participation Statistics | Cosmic Signature',
-  section.description,
-  undefined,
-  section.href,
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('statisticsParticipation.title'),
+    t('statisticsParticipation.description'),
+    undefined,
+    section.href,
+    { locale },
+  );
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'statistics' });
+  const title = t(`navigation.${section.messageKey}.title`);
+  const description = t(`navigation.${section.messageKey}.description`);
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+
   return (
     <>
       <JsonLd
         data={[
           webPageJsonLd({
-            name: section.title,
-            description: section.description,
-            url: `${APP_ORIGIN}${section.href}`,
+            name: title,
+            description,
+            url: localeHref(APP_ORIGIN, section.href, locale),
+            inLanguage,
           }),
-          breadcrumbJsonLd([
-            { name: 'Statistics', path: '/statistics' },
-            { name: section.label, path: section.href },
-          ]),
+          breadcrumbJsonLd(
+            [
+              { name: t('breadcrumbs.statistics'), path: '/statistics' },
+              { name: t(`navigation.${section.messageKey}.label`), path: section.href },
+            ],
+            localeHref(APP_ORIGIN, '/', locale),
+          ),
         ]}
       />
-      <StatisticsPageIntro title={section.title} description={section.description} />
+      <StatisticsPageIntro eyebrow={t('intro.eyebrow')} title={title} description={description} />
       <ParticipationPanel />
     </>
   );

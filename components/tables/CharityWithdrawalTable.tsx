@@ -1,10 +1,11 @@
 import { useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -24,6 +25,7 @@ interface WithdrawalRowProps {
 }
 
 const WithdrawalRow: FC<WithdrawalRowProps> = ({ retrieval }) => {
+  const locale = useLocale();
   if (!retrieval) {
     return <TablePrimaryRow />;
   }
@@ -37,7 +39,7 @@ const WithdrawalRow: FC<WithdrawalRowProps> = ({ retrieval }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(retrieval.TimeStamp)}
+          <HydrationSafeDateTime timestamp={retrieval.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">

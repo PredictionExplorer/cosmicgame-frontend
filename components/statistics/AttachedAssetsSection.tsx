@@ -2,8 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Gift, ImageOff } from 'lucide-react';
-
-import { statisticsCopy } from '@/content/statistics-copy';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { useDonationsERC20ByRound, useDonationsNFTList } from '@/hooks/useApiQuery';
@@ -39,6 +38,7 @@ export interface AttachedAssetsSectionProps {
  * render back-to-back on the statistics page.
  */
 export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSectionProps) {
+  const t = useTranslations('statistics');
   const nftQuery = useDonationsNFTList();
   const erc20Query = useDonationsERC20ByRound(currentRoundNum);
 
@@ -68,13 +68,13 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
   const scopeToggle = (
     <div
       role="group"
-      aria-label="Attached NFT scope"
+      aria-label={t('attachedAssets.scopeAria')}
       className="mb-4 inline-flex items-center gap-1 rounded-lg bg-white/[0.04] p-1"
     >
       {(
         [
-          { value: 'all', label: 'All cycles' },
-          { value: 'current', label: 'Current cycle' },
+          { value: 'all', label: t('attachedAssets.scopeAll') },
+          { value: 'current', label: t('attachedAssets.scopeCurrent') },
         ] as const
       ).map((option) => (
         <button
@@ -97,18 +97,18 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
 
   return (
     <StatsSection
-      title="Attached Assets"
-      tooltip={statisticsCopy.sections.attachedAssets}
+      title={t('tokens.sections.attachedAssets')}
+      tooltip={t('sectionTooltips.attachedAssets')}
       icon={<Gift className="h-3.5 w-3.5" />}
       defaultOpen
     >
       <Tabs defaultValue="nfts">
         <TabsList className="w-full sm:w-auto">
           <TabsTrigger value="nfts" className="flex-1 sm:flex-none">
-            NFTs (ERC-721)
+            {t('attachedAssets.nftTab')}
           </TabsTrigger>
           <TabsTrigger value="erc20" className="flex-1 sm:flex-none">
-            Tokens (ERC-20)
+            {t('attachedAssets.erc20Tab')}
           </TabsTrigger>
         </TabsList>
 
@@ -122,8 +122,8 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
             </div>
           ) : nftQuery.isError ? (
             <ErrorState
-              title="Failed to load attached NFTs"
-              message="The statistics service did not respond. Try again in a moment."
+              title={t('attachedAssets.nftLoadError')}
+              message={t('attachedAssets.serviceError')}
               onRetry={() => nftQuery.refetch()}
               className="py-10"
             />
@@ -132,13 +132,13 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
               icon={<ImageOff className="h-8 w-8 text-muted-foreground/50" />}
               title={
                 nftScope === 'current'
-                  ? 'No NFTs attached this cycle'
-                  : 'No NFTs have been attached yet'
+                  ? t('attachedAssets.emptyCurrentTitle')
+                  : t('attachedAssets.emptyAllTitle')
               }
               description={
                 nftScope === 'current'
-                  ? 'NFTs attached to gestures during the current Performance Cycle will appear here.'
-                  : 'Attached NFTs from all cycles will appear here.'
+                  ? t('attachedAssets.emptyCurrentDescription')
+                  : t('attachedAssets.emptyAllDescription')
               }
               className="py-10"
             />
@@ -161,7 +161,7 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
 
         <TabsContent value="erc20" className="pt-4">
           <p className="mb-4 text-xs text-muted-foreground">
-            ERC-20 tokens attached to gestures during the current Performance Cycle.
+            {t('attachedAssets.erc20Description')}
           </p>
           {erc20Query.isLoading ? (
             <div>
@@ -171,8 +171,8 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
             </div>
           ) : erc20Query.isError ? (
             <ErrorState
-              title="Failed to load attached ERC-20 tokens"
-              message="The statistics service did not respond. Try again in a moment."
+              title={t('attachedAssets.erc20LoadError')}
+              message={t('attachedAssets.serviceError')}
               onRetry={() => erc20Query.refetch()}
               className="py-10"
             />

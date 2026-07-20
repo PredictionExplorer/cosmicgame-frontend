@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { History, Info } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import {
   GlobalMarketingRewardsTable,
@@ -14,6 +15,8 @@ export interface RewardsHistorySectionProps {
 }
 
 export function RewardsHistorySection({ rewards }: RewardsHistorySectionProps) {
+  const t = useTranslations('marketing');
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -29,38 +32,36 @@ export function RewardsHistorySection({ rewards }: RewardsHistorySectionProps) {
           id="history-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          Reward History
+          {t('history.title')}
         </h2>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label="Info about reward history"
+              aria-label={t('history.infoAria')}
               className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
             >
               <Info className="h-4 w-4" />
             </button>
           </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            Complete chronological log of all marketing reward distributions
-          </TooltipContent>
+          <TooltipContent className="max-w-xs">{t('history.tooltip')}</TooltipContent>
         </Tooltip>
       </div>
 
       {rewards.length > 0 && (
         <p className="mb-4 text-center text-sm text-muted-foreground">
-          Showing <span className="font-semibold text-foreground">{rewards.length}</span> reward
-          {rewards.length !== 1 ? 's' : ''}
+          {t.rich(rewards.length === 1 ? 'history.showingOne' : 'history.showingOther', {
+            count: rewards.length,
+            strong: (chunks) => <span className="font-semibold text-foreground">{chunks}</span>,
+          })}
         </p>
       )}
 
       {rewards.length === 0 ? (
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-8 py-16 text-center">
           <History className="mx-auto mb-4 h-10 w-10 text-muted-foreground/40" />
-          <p className="text-lg font-medium text-muted-foreground">No rewards distributed yet</p>
-          <p className="mt-1 text-sm text-muted-foreground/60">
-            Rewards will appear here once marketing activities are verified and paid out.
-          </p>
+          <p className="text-lg font-medium text-muted-foreground">{t('history.emptyTitle')}</p>
+          <p className="mt-1 text-sm text-muted-foreground/60">{t('history.emptyDescription')}</p>
         </div>
       ) : (
         <GlobalMarketingRewardsTable list={rewards} />

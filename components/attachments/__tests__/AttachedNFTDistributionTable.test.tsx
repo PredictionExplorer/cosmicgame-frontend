@@ -1,7 +1,5 @@
 import userEvent from '@testing-library/user-event';
 
-import { statisticsCopy } from '@/content/statistics-copy';
-
 import { render, screen, checkA11y } from '@/test-utils';
 
 import AttachedNFTDistributionTable from '../AttachedNFTDistributionTable';
@@ -16,7 +14,7 @@ const rows = [
 describe('AttachedNFTDistributionTable', () => {
   it('renders empty state', () => {
     render(<AttachedNFTDistributionTable list={[]} />);
-    expect(screen.getByText('No attached tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.attachedTokens')).toBeInTheDocument();
   });
 
   it('renders column help triggers', () => {
@@ -40,7 +38,7 @@ describe('AttachedNFTDistributionTable', () => {
     );
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      statisticsCopy.tables.attachedNftContractAddress,
+      'tables.statisticsTooltips.attachedNftContractAddress',
     );
   });
 

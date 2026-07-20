@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import { getExplorerUrl, shortenHex } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -32,6 +33,7 @@ type StellarSelectionRecipientEntry = (
 
 const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry }) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const {
     TxHash = '',
     TimeStamp = 0,
@@ -74,7 +76,7 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(TimeStamp)}
+          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell>
@@ -102,7 +104,7 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
               : t('stellarSelection.signatureNft')}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(cycleTimeoutTimesToRetrieveAllocations)}
+        <HydrationSafeDateTime timestamp={cycleTimeoutTimesToRetrieveAllocations} locale={locale} />
       </TablePrimaryCell>
       <TablePrimaryCell align="right">{Amount ? `${Amount.toFixed(4)} ETH` : ' '}</TablePrimaryCell>
       <TablePrimaryCell align="center">

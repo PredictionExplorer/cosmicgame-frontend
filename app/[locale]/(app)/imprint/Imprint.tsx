@@ -21,7 +21,8 @@ import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 
 const Imprint = () => {
-  const t = useTranslations('toasts');
+  const t = useTranslations('imprint');
+  const toastT = useTranslations('toasts');
   const locale = useLocale();
   const [imprintCost, setImprintCost] = useState('0');
   const [nftIds, setNftIds] = useState<number[]>([]);
@@ -32,7 +33,7 @@ const Imprint = () => {
 
   const handleImprint = async () => {
     if (!nftContract) {
-      toast.error(t('imprint.contractUnavailable'));
+      toast.error(toastT('imprint.contractUnavailable'));
       return;
     }
     setIsSubmitting(true);
@@ -46,14 +47,14 @@ const Imprint = () => {
       });
       const receipt = await publicClient?.waitForTransactionReceipt({ hash });
       assertSuccessfulTransactionReceipt(receipt);
-      toast.success(t('imprint.confirmed'));
+      toast.success(toastT('imprint.confirmed'));
     } catch (err: unknown) {
       if (isUserRejection(err)) {
-        toast.info(t('walletTransactionCancelled'));
+        toast.info(toastT('walletTransactionCancelled'));
         return;
       }
       reportError(err, 'imprint RWLK NFT');
-      toast.error(getEthErrorMessage(err, t('imprint.failed'), { locale }));
+      toast.error(getEthErrorMessage(err, toastT('imprint.failed'), { locale }));
     } finally {
       setIsSubmitting(false);
     }
@@ -90,19 +91,10 @@ const Imprint = () => {
 
   return (
     <PageShell variant="form">
-      <PageHeader
-        title="Imprint Random Walk NFT"
-        titleLevel={2}
-        subtitle="Own a Random Walk NFT and receive a 50% reduction in ETH Gesture Cost"
-      />
+      <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
 
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        RandomWalk NFTs are unique digital collectibles that grant holders a strategic advantage in
-        the Cosmic Signature protocol. By attaching a RandomWalk NFT to an ETH gesture, you receive
-        a 50% reduction in ETH Gesture Cost - a significant edge late in the cycle. Each RandomWalk
-        NFT can be used once for this discount, so choose your moment wisely for maximum impact.
-        This gesture attachment is separate from anchoring RandomWalk NFTs for Anchored-NFT Stellar
-        Selection eligibility.
+        {t('page.description')}
       </p>
 
       <div className="flex flex-col items-center">
@@ -113,16 +105,16 @@ const Imprint = () => {
           <p className="text-3xl font-bold font-display">
             {imprintCost} <span className="text-primary">ETH</span>
           </p>
-          <p className="text-sm text-muted-foreground mt-2">Current imprint cost</p>
+          <p className="text-sm text-muted-foreground mt-2">{t('page.currentCost')}</p>
           <Button size="lg" onClick={handleImprint} className="w-full mt-6" disabled={isSubmitting}>
-            {isSubmitting ? t('imprint.imprinting') : 'Imprint Now'}
+            {isSubmitting ? toastT('imprint.imprinting') : t('page.submit')}
           </Button>
         </div>
       </div>
 
       {nftIds.length > 0 && (
         <div className="mt-16">
-          <SectionDivider title="My Random Walk NFTs" className="mb-6" />
+          <SectionDivider title={t('page.myNfts')} className="mb-6" />
           <div className="flex flex-wrap gap-2">
             {nftIds.map((tokenId) => (
               <Link

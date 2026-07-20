@@ -3,10 +3,12 @@
 import { useMemo, useState } from 'react';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { useStellarSelectionNFTAllocationsByUser } from '@/hooks/useApiQuery';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { PageShell } from '@/components/ui/page-shell';
@@ -32,6 +34,8 @@ interface StellarSelectionNFTAllocation {
 }
 
 function NFTWinningsRow({ row }: { row: StellarSelectionNFTAllocation }) {
+  const t = useTranslations('tables');
+  const locale = useLocale();
   if (!row) return <TablePrimaryRow />;
 
   const { TxHash, TimeStamp, RoundNum, IsRWalk, IsStaker, TokenId } = row;
@@ -45,7 +49,7 @@ function NFTWinningsRow({ row }: { row: StellarSelectionNFTAllocation }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(TimeStamp)}
+          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
 
@@ -60,8 +64,12 @@ function NFTWinningsRow({ row }: { row: StellarSelectionNFTAllocation }) {
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{IsRWalk ? 'Yes' : 'No'}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{IsStaker ? 'Yes' : 'No'}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {IsRWalk ? t('status.yes') : t('status.no')}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {IsStaker ? t('status.yes') : t('status.no')}
+      </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
         <Link href={`/detail/${TokenId}`} className="font-mono text-inherit">
@@ -73,11 +81,13 @@ function NFTWinningsRow({ row }: { row: StellarSelectionNFTAllocation }) {
 }
 
 function NFTWinningsTable({ list }: { list: StellarSelectionNFTAllocation[] }) {
+  const t = useTranslations('tables');
+  const tStatistics = useTranslations('statistics');
   const PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   if (!list.length) {
-    return <p>No NFT allocations yet.</p>;
+    return <p>{tStatistics('stellarSelectionNft.empty')}</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -90,11 +100,11 @@ function NFTWinningsTable({ list }: { list: StellarSelectionNFTAllocation[] }) {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Is RandomWalk</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Is Anchor-holder</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('statisticsColumns.isRandomWalk')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('statisticsColumns.isAnchorHolder')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('columns.tokenId')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>
@@ -116,6 +126,7 @@ function NFTWinningsTable({ list }: { list: StellarSelectionNFTAllocation[] }) {
 }
 
 function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string }) {
+  const t = useTranslations('statistics');
   const validatedAddress =
     rawAddress && isAddress(rawAddress.toLowerCase())
       ? getAddress(rawAddress.toLowerCase())
@@ -140,7 +151,7 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
   if (invalidAddress) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <p className="text-lg font-semibold">Invalid Address</p>
+        <p className="text-lg font-semibold">{t('stellarSelectionNft.invalidAddress')}</p>
       </PageShell>
     );
   }
@@ -148,17 +159,19 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
   return (
     <PageShell variant="data" backdrop="signature">
       <div className="mb-8">
-        <span className="mr-4 text-lg font-semibold text-primary">User</span>
+        <span className="mr-4 text-lg font-semibold text-primary">
+          {t('stellarSelectionNft.user')}
+        </span>
         <span className="font-mono text-lg font-semibold">{validatedAddress}</span>
       </div>
 
       <div className="mt-8">
         <h4 className="mb-4 text-lg font-semibold leading-none">
-          Stellar Selection NFTs allocated to this participant
+          {t('stellarSelectionNft.heading')}
         </h4>
 
         {stellarSelectionNfts.loading ? (
-          <p className="text-lg font-semibold">Loading...</p>
+          <p className="text-lg font-semibold">{t('stellarSelectionNft.loading')}</p>
         ) : (
           <NFTWinningsTable list={stellarSelectionNfts.data} />
         )}

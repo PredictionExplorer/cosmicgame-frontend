@@ -3,6 +3,7 @@
 import { type ReactNode } from 'react';
 import { Trophy, Shuffle, Heart, Layers, Swords, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -51,6 +52,7 @@ const fillVariants = {
 };
 
 export function FundDistribution({ data }: { data?: DistData }) {
+  const t = useTranslations('contracts');
   const allocation = clamp(data?.PrizePercentage);
   const stellarSelection = clamp(data?.RafflePercentage);
   const charity = clamp(data?.CharityPercentage);
@@ -62,60 +64,56 @@ export function FundDistribution({ data }: { data?: DistData }) {
 
   const categories: FundCategory[] = [
     {
-      label: 'Signature Allocation',
+      label: t('funds.segments.signature.label'),
       value: allocation,
       eth: (allocation * balance) / 100,
       icon: <Trophy className="h-4 w-4" />,
-      tooltip:
-        'ETH retrieved by the participant who made the Final Gesture; they also receive 1,000 CST and a Cosmic Signature NFT.',
+      tooltip: t('funds.segments.signature.tooltip'),
       color: 'text-[hsl(196,98%,54%)]',
       gradient: 'from-[hsl(196,98%,54%)] to-[hsl(196,98%,40%)]',
     },
     {
-      label: 'Stellar Selection',
+      label: t('funds.segments.stellar.label'),
       value: stellarSelection,
       eth: (stellarSelection * balance) / 100,
       icon: <Shuffle className="h-4 w-4" />,
-      tooltip:
-        'ETH split across participants randomly selected from cycle entries at finalization.',
+      tooltip: t('funds.segments.stellar.tooltip'),
       color: 'text-[hsl(271,98%,60%)]',
       gradient: 'from-[hsl(271,98%,60%)] to-[hsl(271,98%,45%)]',
     },
     {
-      label: 'Public Goods',
+      label: t('funds.segments.publicGoods.label'),
       value: charity,
       eth: (charity * balance) / 100,
       icon: <Heart className="h-4 w-4" />,
-      tooltip: 'Forwarded to Protocol Guild each cycle as the Public Goods Allocation.',
+      tooltip: t('funds.segments.publicGoods.tooltip'),
       color: 'text-[hsl(205,100%,71%)]',
       gradient: 'from-[hsl(205,100%,71%)] to-[hsl(205,100%,55%)]',
     },
     {
-      label: 'Anchor Distribution',
+      label: t('funds.segments.anchor.label'),
       value: anchoring,
       eth: (anchoring * balance) / 100,
       icon: <Layers className="h-4 w-4" />,
-      tooltip:
-        'Distributed to Cosmic Signature NFT anchor-holders proportional to their anchored count.',
+      tooltip: t('funds.segments.anchor.tooltip'),
       color: 'text-[hsl(45,93%,52%)]',
       gradient: 'from-[hsl(45,93%,52%)] to-[hsl(45,93%,38%)]',
     },
     {
-      label: 'Chrono-Warrior',
+      label: t('funds.segments.chrono.label'),
       value: chrono,
       eth: (chrono * balance) / 100,
       icon: <Swords className="h-4 w-4" />,
-      tooltip:
-        'ETH awarded to the Chrono-Warrior, who also receives 1,000 CST and a Cosmic Signature NFT.',
+      tooltip: t('funds.segments.chrono.tooltip'),
       color: 'text-[hsl(0,62%,50%)]',
       gradient: 'from-[hsl(0,62%,50%)] to-[hsl(0,62%,38%)]',
     },
     {
-      label: 'Next cycle',
+      label: t('funds.segments.next.label'),
       value: remainder,
       eth: (remainder * balance) / 100,
       icon: <RotateCcw className="h-4 w-4" />,
-      tooltip: 'Remaining funds that roll forward into the next cycle as the Compounding Reserve.',
+      tooltip: t('funds.segments.next.tooltip'),
       color: 'text-muted-foreground',
       gradient: 'from-white/30 to-white/15',
     },

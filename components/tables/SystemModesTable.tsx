@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { convertTimestampToDateTime } from '@/utils';
-import { statisticsCopy } from '@/content/statistics-copy';
-
 import { useRouter } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -33,6 +31,7 @@ interface SystemModesTableProps {
 
 const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const router = useRouter();
 
   if (!row) return <TablePrimaryRow />;
@@ -47,10 +46,14 @@ const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
         {row.RoundNum ? row.RoundNum : t('status.deployment')}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(row.TimeStamp)}
+        <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {prevRow ? convertTimestampToDateTime(prevRow.TimeStamp) : t('status.currentlyActive')}
+        {prevRow ? (
+          <HydrationSafeDateTime timestamp={prevRow.TimeStamp} locale={locale} />
+        ) : (
+          t('status.currentlyActive')
+        )}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -81,19 +84,19 @@ export const SystemModesTable = ({ list }: SystemModesTableProps) => {
               <TablePrimaryHeadCell align="center">
                 <TableHeaderHelp
                   desktop={t('columns.round')}
-                  tooltip={statisticsCopy.tables.systemRound}
+                  tooltip={t('statisticsTooltips.systemRound')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 <TableHeaderHelp
                   desktop={t('columns.started')}
-                  tooltip={statisticsCopy.tables.systemStarted}
+                  tooltip={t('statisticsTooltips.systemStarted')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 <TableHeaderHelp
                   desktop={t('columns.ended')}
-                  tooltip={statisticsCopy.tables.systemEnded}
+                  tooltip={t('statisticsTooltips.systemEnded')}
                 />
               </TablePrimaryHeadCell>
             </Tr>

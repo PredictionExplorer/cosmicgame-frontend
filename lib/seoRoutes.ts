@@ -2,6 +2,9 @@ import type { MetadataRoute } from 'next';
 
 import { learnContentEn } from '@/content/learn';
 
+import { routing } from '@/i18n/routing';
+import { localeHref } from '@/lib/hostRouting';
+
 export type SeoHost = 'app' | 'landing';
 export type SeoRouteKind = 'content' | 'data' | 'tool' | 'personal' | 'admin' | 'dynamic';
 
@@ -19,8 +22,8 @@ export interface SeoRoute {
   priority?: number;
 }
 
-const CONTENT_LAST_MODIFIED = '2026-05-31';
-const DYNAMIC_LAST_MODIFIED = '2026-05-31';
+const CONTENT_LAST_MODIFIED = '2026-07-20';
+const DYNAMIC_LAST_MODIFIED = '2026-07-20';
 
 const landingStaticRoutes: SeoRoute[] = [
   {
@@ -65,7 +68,7 @@ const learnRoutes: SeoRoute[] = learnContentEn.articles.map((article) => ({
   index: true,
   includeInSitemap: true,
   hasServerVisibleContent: true,
-  lastModified: article.updated,
+  lastModified: CONTENT_LAST_MODIFIED,
   changeFrequency: 'monthly',
   priority: 0.7,
 }));
@@ -142,6 +145,7 @@ export const dynamicNoindexRoutePrefixes = [
   '/cosmic-signature-transfer/',
   '/cosmic-token-transfer/',
   '/distributions-by-token/',
+  '/embed/endurance/',
   '/eth-contribution/detail/',
   '/eth-contribution/round/',
   '/gesture/',
@@ -163,4 +167,14 @@ export const appSitemapRoutes = appSeoRoutes.filter(
 
 export function routeUrl(baseUrl: string, path: string): string {
   return `${baseUrl}${path}`;
+}
+
+export function routeLanguageAlternates(baseUrl: string, path: string): Record<string, string> {
+  const normalizedPath = path || '/';
+  return {
+    ...Object.fromEntries(
+      routing.locales.map((locale) => [locale, localeHref(baseUrl, normalizedPath, locale)]),
+    ),
+    'x-default': localeHref(baseUrl, normalizedPath, routing.defaultLocale),
+  };
 }

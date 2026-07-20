@@ -172,16 +172,20 @@ describe('COSMIC_OG_SIZE', () => {
 // ---------------------------------------------------------------------------
 
 type OgModule = {
-  runtime: string;
   contentType: string;
   size: { width: number; height: number };
-  alt: string;
+  generateImageMetadata: (args: {
+    params: Promise<{ locale: string; id?: string; address?: string }>;
+  }) => Promise<Array<{ alt: string }>>;
   default: (...args: unknown[]) => unknown;
 };
 
 const STATIC_OG_MODULES: ReadonlyArray<readonly [string, () => Promise<unknown>]> = [
   ['app/opengraph-image', () => import('@/app/[locale]/(app)/opengraph-image')],
-  ['app/(landing)/opengraph-image', () => import('@/app/[locale]/(landing)/opengraph-image')],
+  [
+    'app/landing-site/opengraph-image',
+    () => import('@/app/[locale]/(landing)/landing-site/opengraph-image'),
+  ],
   ['app/faq/opengraph-image', () => import('@/app/[locale]/(app)/faq/opengraph-image')],
   [
     'app/how-it-works/opengraph-image',
@@ -193,10 +197,8 @@ const STATIC_OG_MODULES: ReadonlyArray<readonly [string, () => Promise<unknown>]
     'app/current-cycle/opengraph-image',
     () => import('@/app/[locale]/(app)/current-cycle/opengraph-image'),
   ],
-  [
-    'app/landing-site/opengraph-image',
-    () => import('@/app/[locale]/(landing)/landing-site/opengraph-image'),
-  ],
+  ['app/about/opengraph-image', () => import('@/app/[locale]/(landing)/about/opengraph-image')],
+  ['app/learn/opengraph-image', () => import('@/app/[locale]/(landing)/learn/opengraph-image')],
 ];
 
 const DYNAMIC_OG_MODULES: ReadonlyArray<readonly [string, () => Promise<unknown>]> = [
@@ -219,8 +221,11 @@ describe('static-tier opengraph-image module shape', () => {
     const mod = (await load()) as OgModule;
     expect(mod.contentType).toBe('image/png');
     expect(mod.size).toEqual(COSMIC_OG_SIZE);
-    expect(typeof mod.alt).toBe('string');
-    expect(mod.alt.length).toBeGreaterThan(0);
+    const [metadata] = await mod.generateImageMetadata({
+      params: Promise.resolve({ locale: 'en' }),
+    });
+    expect(typeof metadata?.alt).toBe('string');
+    expect(metadata?.alt.length).toBeGreaterThan(0);
     expect(typeof mod.default).toBe('function');
   });
 
@@ -228,7 +233,7 @@ describe('static-tier opengraph-image module shape', () => {
     '%s default() invokes ImageResponse with CosmicOgCard',
     async (_label, load) => {
       const mod = (await load()) as OgModule;
-      mod.default();
+      await mod.default({ params: Promise.resolve({ locale: 'en' }) });
       expect(mockImageResponseCalls).toHaveLength(1);
       expect(lastCardSize()).toEqual(COSMIC_OG_SIZE);
       expect(lastCardProps().title.length).toBeGreaterThan(0);
@@ -237,14 +242,17 @@ describe('static-tier opengraph-image module shape', () => {
 
   it.each(STATIC_OG_MODULES)('%s alt text mentions the brand', async (_label, load) => {
     const mod = (await load()) as OgModule;
-    expect(mod.alt).toMatch(/Cosmic Signature/);
+    const [metadata] = await mod.generateImageMetadata({
+      params: Promise.resolve({ locale: 'en' }),
+    });
+    expect(metadata?.alt).toMatch(/Cosmic Signature/);
   });
 });
 
 describe('static-tier opengraph-image content', () => {
   it('app/opengraph-image renders the brand-line headline', async () => {
     const mod = (await import('@/app/[locale]/(app)/opengraph-image')) as OgModule;
-    mod.default();
+    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
     const props = lastCardProps();
     expect(props.eyebrow).toBe('Cosmic Signature');
     expect(props.title).toBe('Every Gesture Shapes the Signature.');
@@ -253,7 +261,7 @@ describe('static-tier opengraph-image content', () => {
 
   it('faq card uses the FAQ eyebrow', async () => {
     const mod = (await import('@/app/[locale]/(app)/faq/opengraph-image')) as OgModule;
-    mod.default();
+    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
     const props = lastCardProps();
     expect(props.eyebrow).toBe('FAQ');
     expect(props.title).toMatch(/answering plainly/i);
@@ -261,7 +269,7 @@ describe('static-tier opengraph-image content', () => {
 
   it('how-it-works card uses the four-stage subhead and three short chips', async () => {
     const mod = (await import('@/app/[locale]/(app)/how-it-works/opengraph-image')) as OgModule;
-    mod.default();
+    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
     const props = lastCardProps();
     expect(props.eyebrow).toBe('How It Works');
     expect(props.title).toMatch(/four stages/i);
@@ -271,7 +279,7 @@ describe('static-tier opengraph-image content', () => {
 
   it('gallery card mentions three-body trajectories', async () => {
     const mod = (await import('@/app/[locale]/(app)/gallery/opengraph-image')) as OgModule;
-    mod.default();
+    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
     const props = lastCardProps();
     expect(props.eyebrow).toBe('Gallery');
     expect(props.title).toMatch(/three-body trajectories/i);
@@ -279,7 +287,7 @@ describe('static-tier opengraph-image content', () => {
 
   it('anchoring card surfaces the per-cycle share message', async () => {
     const mod = (await import('@/app/[locale]/(app)/anchoring/opengraph-image')) as OgModule;
-    mod.default();
+    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
     const props = lastCardProps();
     expect(props.eyebrow).toBe('Anchoring');
     expect(props.title).toMatch(/each cycle/i);
@@ -287,28 +295,32 @@ describe('static-tier opengraph-image content', () => {
 
   it('current-cycle card frames the live cycle', async () => {
     const mod = (await import('@/app/[locale]/(app)/current-cycle/opengraph-image')) as OgModule;
-    mod.default();
+    await mod.default({ params: Promise.resolve({ locale: 'en' }) });
     const props = lastCardProps();
     expect(props.eyebrow).toBe('Current Cycle');
     expect(props.title).toMatch(/Performance Cycle/);
   });
 
-  it('landing-site card matches the site-wide default exactly', async () => {
-    const root = (await import('@/app/[locale]/(app)/opengraph-image')) as OgModule;
-    const landing =
+  it('about card matches the landing-site card exactly', async () => {
+    const root =
       (await import('@/app/[locale]/(landing)/landing-site/opengraph-image')) as OgModule;
+    const about = (await import('@/app/[locale]/(landing)/about/opengraph-image')) as OgModule;
 
-    root.default();
+    await root.default({ params: Promise.resolve({ locale: 'en' }) });
     const rootProps = lastCardProps();
 
-    landing.default();
-    const landingProps = lastCardProps();
+    await about.default({ params: Promise.resolve({ locale: 'en' }) });
+    const aboutProps = lastCardProps();
 
-    // The marketing host shares the canonical card; if these diverge,
-    // a refactor probably forgot to delete one of them.
-    expect(landingProps.eyebrow).toBe(rootProps.eyebrow);
-    expect(landingProps.title).toBe(rootProps.title);
-    expect(landingProps.subhead).toBe(rootProps.subhead);
+    expect(aboutProps.eyebrow).toBe(rootProps.eyebrow);
+    expect(aboutProps.title).toBe(rootProps.title);
+    expect(aboutProps.subhead).toBe(rootProps.subhead);
+  });
+
+  it('learn card uses the localized landing visual', async () => {
+    const mod = (await import('@/app/[locale]/(landing)/learn/opengraph-image')) as OgModule;
+    await mod.default({ params: Promise.resolve({ locale: 'zh' }) });
+    expect(lastCardProps().title).toMatch(/[\u3400-\u9fff]/);
   });
 });
 
@@ -321,8 +333,11 @@ describe('dynamic-tier opengraph-image module shape', () => {
     const mod = (await load()) as OgModule;
     expect(mod.contentType).toBe('image/png');
     expect(mod.size).toEqual(COSMIC_OG_SIZE);
-    expect(typeof mod.alt).toBe('string');
-    expect(mod.alt).toMatch(/Cosmic Signature/);
+    const [metadata] = await mod.generateImageMetadata({
+      params: Promise.resolve({ locale: 'en' }),
+    });
+    expect(typeof metadata?.alt).toBe('string');
+    expect(metadata?.alt).toMatch(/Cosmic Signature/);
     expect(typeof mod.default).toBe('function');
   });
 });
@@ -334,9 +349,11 @@ describe('allocation/[id] dynamic OG card', () => {
     ['1', 'Cycle #1'],
     ['42', 'Cycle #42'],
     ['999999', 'Cycle #999999'],
-    ['  42  ', 'Cycle #42'], // parseInt accepts leading whitespace
-    ['12abc', 'Cycle #12'], // parseInt stops at first non-digit
-    ['12.9', 'Cycle #12'], // parseInt truncates
+    ['  42  ', 'Allocation'],
+    ['12abc', 'Allocation'],
+    ['12.9', 'Allocation'],
+    ['042', 'Allocation'],
+    [String(Number.MAX_SAFE_INTEGER + 1), 'Allocation'],
     ['-1', 'Allocation'], // negative falls back to generic eyebrow
     ['abc', 'Allocation'],
     ['', 'Allocation'],
@@ -346,14 +363,14 @@ describe('allocation/[id] dynamic OG card', () => {
 
   it.each(cases)('id=%j -> eyebrow=%j', async (id, expected) => {
     const mod = (await import('@/app/[locale]/(app)/allocation/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id }) });
     expect(lastCardProps().eyebrow).toBe(expected);
     expect(lastCardProps().title).toMatch(/allocation distribution/i);
   });
 
   it('preserves the size constant on every render', async () => {
     const mod = (await import('@/app/[locale]/(app)/allocation/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id: '7' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id: '7' }) });
     expect(lastCardSize()).toEqual(COSMIC_OG_SIZE);
   });
 });
@@ -388,7 +405,7 @@ describe('gesture/[id] dynamic OG card', () => {
     const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 410 } } });
 
     const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id: '23514' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id: '23514' }) });
 
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/info/23514'),
@@ -401,14 +418,14 @@ describe('gesture/[id] dynamic OG card', () => {
   it('treats position 0 as a valid position', async () => {
     stubApi({ ok: true, body: { BidInfo: { BidPosition: 0 } } });
     const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id: '7' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id: '7' }) });
     expect(lastCardProps().eyebrow).toBe('Gesture Position #0');
   });
 
   it('trims and parses the route id before requesting', async () => {
     const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 9 } } });
     const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id: '  3  ' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id: '  3  ' }) });
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/info/3'), expect.anything());
     expect(lastCardProps().eyebrow).toBe('Gesture Position #9');
   });
@@ -419,7 +436,7 @@ describe('gesture/[id] dynamic OG card', () => {
     async (id) => {
       const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 1 } } });
       const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-      await mod.default({ params: Promise.resolve({ id }) });
+      await mod.default({ params: Promise.resolve({ locale: 'en', id }) });
       expect(fetchMock).not.toHaveBeenCalled();
       expect(lastCardProps().eyebrow).toBe('Gesture');
     },
@@ -428,14 +445,14 @@ describe('gesture/[id] dynamic OG card', () => {
   it('falls back to "Gesture" on a non-OK API response', async () => {
     stubApi({ ok: false, body: {} });
     const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id: '12' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id: '12' }) });
     expect(lastCardProps().eyebrow).toBe('Gesture');
   });
 
   it('falls back to "Gesture" when the position is absent from the response', async () => {
     stubApi({ ok: true, body: { BidInfo: {} } });
     const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id: '12' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id: '12' }) });
     expect(lastCardProps().eyebrow).toBe('Gesture');
   });
 
@@ -445,7 +462,7 @@ describe('gesture/[id] dynamic OG card', () => {
       throw new Error('network down');
     }) as unknown as typeof fetch;
     const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id: '12' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id: '12' }) });
     expect(lastCardProps().eyebrow).toBe('Gesture');
   });
 
@@ -454,7 +471,7 @@ describe('gesture/[id] dynamic OG card', () => {
     const fetchMock = jest.fn();
     global.fetch = fetchMock as unknown as typeof fetch;
     const mod = (await import('@/app/[locale]/(app)/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id: '12' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', id: '12' }) });
     expect(fetchMock).not.toHaveBeenCalled();
     expect(lastCardProps().eyebrow).toBe('Gesture');
   });
@@ -463,14 +480,14 @@ describe('gesture/[id] dynamic OG card', () => {
 describe('user/[address] dynamic OG card', () => {
   // Format: [address, expected title]
   const VALID_ADDR = '0x1234567890abcdef1234567890abcdef12345678';
-  const expectedTruncated = '0x1234\u20265678';
+  const expectedTruncated = '0x1234 5678';
 
   const cases: ReadonlyArray<readonly [string, string]> = [
     [VALID_ADDR, expectedTruncated],
     [VALID_ADDR.toUpperCase(), expectedTruncated], // mixed case is normalized
     [`  ${VALID_ADDR}  `, expectedTruncated], // surrounding whitespace trimmed
-    // First 6 chars of the lowercased input + horizontal ellipsis + last 4.
-    ['0xABCDEF1234567890ABCDEF1234567890ABCDEF12', '0xabcd\u2026ef12'],
+    // The normal-space separator is guaranteed to exist in the embedded subset.
+    ['0xABCDEF1234567890ABCDEF1234567890ABCDEF12', '0xabcd ef12'],
     ['0x1234', 'Participant'], // wrong length
     [VALID_ADDR.slice(2), 'Participant'], // missing 0x prefix
     [`0x${'Z'.repeat(40)}`, 'Participant'], // invalid hex chars
@@ -482,25 +499,23 @@ describe('user/[address] dynamic OG card', () => {
 
   it.each(cases)('address=%j -> title=%j', async (address, expectedTitle) => {
     const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ address }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', address }) });
     expect(lastCardProps().title).toBe(expectedTitle);
   });
 
   it('always uses the "Participant" eyebrow regardless of the address', async () => {
     const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ address: VALID_ADDR }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', address: VALID_ADDR }) });
     expect(lastCardProps().eyebrow).toBe('Participant');
 
-    await mod.default({ params: Promise.resolve({ address: 'garbage' }) });
+    await mod.default({ params: Promise.resolve({ locale: 'en', address: 'garbage' }) });
     expect(lastCardProps().eyebrow).toBe('Participant');
   });
 
-  it('truncated addresses use a Unicode horizontal ellipsis rather than three dots', async () => {
+  it('uses the exact subset-safe normal-space participant title', async () => {
     const mod = (await import('@/app/[locale]/(app)/user/[address]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ address: VALID_ADDR }) });
-    const title = lastCardProps().title;
-    expect(title).toContain('\u2026');
-    expect(title).not.toContain('...');
+    await mod.default({ params: Promise.resolve({ locale: 'en', address: VALID_ADDR }) });
+    expect(lastCardProps().title).toBe('0x1234 5678');
   });
 });
 
@@ -528,13 +543,17 @@ describe('cross-cutting OG invariants', () => {
     const types = new Set<unknown>();
     for (const [, load] of STATIC_OG_MODULES) {
       const mod = (await load()) as OgModule;
-      mod.default();
+      await mod.default({ params: Promise.resolve({ locale: 'en' }) });
       types.add(lastCardProps().title);
     }
     for (const [, load] of DYNAMIC_OG_MODULES) {
       const mod = (await load()) as OgModule;
       await mod.default({
-        params: Promise.resolve({ id: '1', address: '0x' + 'a'.repeat(40) }),
+        params: Promise.resolve({
+          locale: 'en',
+          id: '1',
+          address: '0x' + 'a'.repeat(40),
+        }),
       });
       types.add(lastCardProps().title);
     }

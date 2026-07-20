@@ -1,34 +1,24 @@
-import { ImageResponse } from 'next/og';
-
-import { COSMIC_OG_SIZE, CosmicOgCard } from '@/lib/og/CosmicOgCard';
+import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
+import { formatOgEyebrow, getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
+import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
+import { parseCanonicalNonNegativeSafeInteger } from '@/utils/routeParams';
 
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
-export const alt = 'Cosmic Signature \u2014 Allocation Distribution';
 
-/**
- * Sanitize the route param to a printable cycle number. We intentionally
- * do not call the API here — the OG card is generated on the edge and
- * Discord/X cache aggressively, so live data has limited cosmetic value
- * and adds failure modes.
- */
-function parseCycleLabel(raw: string): string {
-  const n = Number.parseInt(raw, 10);
-  if (Number.isFinite(n) && n >= 0) return `Cycle #${n}`;
-  return 'Allocation';
+interface ImageProps {
+  params: Promise<{ locale: string; id: string }>;
 }
 
-export default async function Image({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const eyebrow = parseCycleLabel(id);
+export async function generateImageMetadata({ params }: ImageProps) {
+  const { locale } = await params;
+  return getOgImageMetadata(locale, 'allocation');
+}
 
-  return new ImageResponse(
-    <CosmicOgCard
-      eyebrow={eyebrow}
-      title="Allocation Distribution"
-      subhead="How the Cycle Reserve was distributed across more than ten allocation tracks."
-      chips={['Signature', 'Chrono-Warrior', 'Anchor']}
-    />,
-    size,
-  );
+export default async function Image({ params }: ImageProps) {
+  const { locale, id } = await params;
+  const copy = getOgCopy(locale, 'allocation');
+  const eyebrow = formatOgEyebrow(copy, parseCanonicalNonNegativeSafeInteger(id));
+
+  return createCosmicOgImage(locale, { ...copy, eyebrow });
 }

@@ -2,10 +2,13 @@
 
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 
 export function MarketingHero() {
+  const t = useTranslations('marketing');
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 30 }}
@@ -24,20 +27,24 @@ export function MarketingHero() {
       />
 
       <h2 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-        Earn Rewards by{' '}
-        <span className="bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent">
-          Spreading the Word
-        </span>
+        {t.rich('hero.title', {
+          legacy: (chunks) => <>{chunks}</>,
+          highlight: (chunks) => (
+            <span className="bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent">
+              {chunks}
+            </span>
+          ),
+        })}
       </h2>
 
       <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-        Promote Cosmic Signature and receive CST distributions for every verified outreach activity.
+        {t('hero.description')}
       </p>
 
       <div className="mt-10">
         <Button asChild size="lg" className="group">
           <a href="#how-it-works">
-            Learn How
+            {t('hero.learnHow')}
             <ArrowDown className="ml-1 h-4 w-4 transition-transform group-hover:translate-y-0.5" />
           </a>
         </Button>

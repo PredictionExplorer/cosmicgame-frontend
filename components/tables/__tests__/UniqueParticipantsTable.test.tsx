@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
-
-import { statisticsCopy } from '@/content/statistics-copy';
+import userEvent from '@testing-library/user-event';
 
 import { UniqueParticipantsTable } from '@/components/tables/UniqueParticipantsTable';
 
@@ -29,14 +28,17 @@ describe('UniqueParticipantsTable', () => {
     expect(screen.getAllByText('tables.columns.maxGestureEth').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders header help triggers for confusing columns', () => {
+  it('renders localized header help for confusing columns', async () => {
+    const user = userEvent.setup();
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
-    expect(
-      screen.getAllByRole('button', {
-        name: /^tables\.tableHeaderHelp\.explainColumn/,
-      }).length,
-    ).toBeGreaterThanOrEqual(3);
-    expect(statisticsCopy.tables.numberOfGestures).toMatch(/gestures/);
+    const triggers = screen.getAllByRole('button', {
+      name: /^tables\.tableHeaderHelp\.explainColumn/,
+    });
+    expect(triggers.length).toBeGreaterThanOrEqual(3);
+    await user.hover(triggers[1]!);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'tables.statisticsTooltips.numberOfGestures',
+    );
   });
 
   it('renders participant data', () => {

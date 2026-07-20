@@ -3,8 +3,9 @@
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { useMemo, useState, type FC } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { formatUnixTsLabel } from '@/utils';
+import { formatGroupedNumber, formatUnixTsLabel } from '@/utils';
 
 import { useBidFrequency, useBidTimeBounds } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
@@ -28,10 +29,14 @@ type ChartPoint = {
   uniqueBidders: number;
 };
 
-function toChartPoints(records: BidFrequencyBucket[], withTime: boolean): ChartPoint[] {
+function toChartPoints(
+  records: BidFrequencyBucket[],
+  withTime: boolean,
+  locale: string,
+): ChartPoint[] {
   return records.map((r) => ({
     bucketTs: r.BucketTs,
-    label: formatUnixTsLabel(r.BucketTs, withTime),
+    label: formatUnixTsLabel(r.BucketTs, withTime, locale),
     numBids: r.NumBids ?? 0,
     uniqueBidders: r.UniqueBidders ?? 0,
   }));
@@ -43,6 +48,8 @@ type FrequencyTooltipProps = {
 };
 
 function FrequencyTooltip({ active, payload }: FrequencyTooltipProps) {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   if (!active || !payload?.length) return null;
   const point = payload[0]?.payload;
   if (!point) return null;
@@ -52,12 +59,12 @@ function FrequencyTooltip({ active, payload }: FrequencyTooltipProps) {
       <p className="mb-2 font-medium text-white">{point.label}</p>
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex justify-between gap-4">
-          <dt>Gestures</dt>
-          <dd className="text-white">{point.numBids}</dd>
+          <dt>{t('charts.frequency.gestures')}</dt>
+          <dd className="text-white">{formatGroupedNumber(point.numBids, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Unique participants</dt>
-          <dd className="text-white">{point.uniqueBidders}</dd>
+          <dt>{t('charts.frequency.uniqueParticipants')}</dt>
+          <dd className="text-white">{formatGroupedNumber(point.uniqueBidders, locale)}</dd>
         </div>
       </dl>
     </div>
@@ -70,6 +77,8 @@ type BidFrequencyChartProps = {
 
 /** Bar chart of gesture frequency over time (daily or hourly buckets). */
 export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const [interval, setInterval] = useState<IntervalOption>('day');
   const { data: bounds } = useBidTimeBounds(enabled);
   const nowSec = Math.floor(useNow(60_000) / 1000);
@@ -92,12 +101,17 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
     enabled,
   );
 
-  const chartData = useMemo(() => toChartPoints(data ?? [], interval === 'hour'), [data, interval]);
+  const chartData = useMemo(
+    () => toChartPoints(data ?? [], interval === 'hour', locale),
+    [data, interval, locale],
+  );
 
   return (
     <div className="space-y-4" data-testid="bid-frequency-chart">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs uppercase tracking-wider text-muted-foreground">Bucket</span>
+        <span className="text-xs uppercase tracking-wider text-muted-foreground">
+          {t('charts.frequency.bucket')}
+        </span>
         <Button
           type="button"
           size="sm"
@@ -105,7 +119,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
           aria-pressed={interval === 'day'}
           onClick={() => setInterval('day')}
         >
-          Daily
+          {t('charts.frequency.daily')}
         </Button>
         <Button
           type="button"
@@ -114,7 +128,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
           aria-pressed={interval === 'hour'}
           onClick={() => setInterval('hour')}
         >
-          Hourly
+          {t('charts.frequency.hourly')}
         </Button>
       </div>
 
@@ -124,13 +138,13 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
         </div>
       ) : isError ? (
         <ErrorState
-          title="Failed to load gesture frequency"
-          message="Could not fetch gesture frequency for the selected range."
+          title={t('charts.frequency.loadErrorTitle')}
+          message={t('charts.frequency.loadErrorMessage')}
           onRetry={() => refetch()}
         />
       ) : chartData.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          No gesture activity in this time range.
+          {t('charts.frequency.empty')}
         </p>
       ) : (
         <>
@@ -139,7 +153,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
               <XAxis
                 dataKey="bucketTs"
-                tickFormatter={(ts) => formatUnixTsLabel(Number(ts), interval === 'hour')}
+                tickFormatter={(ts) => formatUnixTsLabel(Number(ts), interval === 'hour', locale)}
                 tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
                 interval="preserveStartEnd"
                 minTickGap={interval === 'hour' ? 48 : 24}
@@ -158,10 +172,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
               />
             </BarChart>
           </ResponsiveContainer>
-          <p className="text-xs text-muted-foreground">
-            Gestures in the first hour after each cycle opens are excluded — opening activity is
-            unusually concentrated and would otherwise skew this chart.
-          </p>
+          <p className="text-xs text-muted-foreground">{t('charts.frequency.openingExcluded')}</p>
         </>
       )}
     </div>

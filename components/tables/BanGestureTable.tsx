@@ -3,8 +3,9 @@ import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +21,7 @@ import { AddressLink } from '@/components/common/AddressLink';
 import api from '@/services/api';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useNotification } from '@/contexts/NotificationContext';
+import { Link } from '@/i18n/navigation';
 import getErrorMessage from '@/utils/alert';
 import { reportError, getEthErrorMessage } from '@/utils/errors';
 import { cn } from '@/lib/utils';
@@ -114,21 +116,21 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(history.TimeStamp)}
+          <HydrationSafeDateTime timestamp={history.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <AddressLink address={history.BidderAddr} url={`/user/${history.BidderAddr}`} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <a
+        <Link
           className="text-inherit"
           href={`/allocation/${history.RoundNum}`}
           target="_blank"
           rel="noopener noreferrer"
         >
           {history.RoundNum}
-        </a>
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.GestureType === 2 ? 'CST' : history.GestureType === 1 ? 'RWLK' : 'ETH'}

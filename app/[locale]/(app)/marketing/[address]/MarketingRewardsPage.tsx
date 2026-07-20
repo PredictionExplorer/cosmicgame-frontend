@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
 
 import { Link } from '@/i18n/navigation';
@@ -14,15 +15,9 @@ interface MarketingRewardsPageProps {
 }
 
 const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps) => {
-  let address = rawAddress;
-
-  if (isAddress(address.toLowerCase())) {
-    address = getAddress(address.toLowerCase());
-  } else {
-    address = 'Invalid Address';
-  }
-
-  const invalidAddress = address === 'Invalid Address';
+  const t = useTranslations('marketing');
+  const invalidAddress = !isAddress(rawAddress.toLowerCase());
+  const address = invalidAddress ? rawAddress : getAddress(rawAddress.toLowerCase());
   const { data: marketingRewards = [], isLoading: loading } = useMarketingRewardsByUser(
     invalidAddress ? undefined : address,
   );
@@ -30,13 +25,11 @@ const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps
   return (
     <PageShell variant="marketing" backdrop="signature">
       {invalidAddress ? (
-        <p className="text-lg font-semibold">Invalid Ethereum Address</p>
+        <p className="text-lg font-semibold">{t('address.invalid')}</p>
       ) : (
         <>
           <div className="mb-8">
-            <span className="text-lg font-semibold text-primary mr-2">
-              Marketing Rewards for User
-            </span>
+            <span className="text-lg font-semibold text-primary mr-2">{t('address.heading')}</span>
             <span className="text-lg font-semibold font-mono break-all">
               <Link
                 href={`/user/${address}`}
@@ -47,7 +40,9 @@ const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps
             </span>
           </div>
           {loading ? (
-            <p className="text-lg font-semibold">Loading...</p>
+            <p className="text-lg font-semibold" role="status">
+              {t('address.loading')}
+            </p>
           ) : (
             <MarketingRewardsTable list={(marketingRewards ?? []) as MarketingReward[]} />
           )}

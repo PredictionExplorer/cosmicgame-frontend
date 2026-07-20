@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,6 +49,8 @@ export function FundDistribution({
   charityPercentage,
   loading = false,
 }: FundDistributionProps) {
+  const t = useTranslations('contracts');
+
   if (loading) {
     return (
       <Card>
@@ -68,37 +71,34 @@ export function FundDistribution({
 
   const segments: FundSegment[] = [
     {
-      label: 'Signature Allocation',
+      label: t('funds.segments.signature.label'),
       value: prizePercentage ?? 0,
       color: SEGMENT_COLORS.allocation,
-      tooltip:
-        'ETH percentage retrieved by the participant who made the Final Gesture; they also receive 1,000 CST and a Cosmic Signature NFT',
+      tooltip: t('funds.segments.signature.tooltip'),
     },
     {
-      label: 'Chrono-Warrior',
+      label: t('funds.segments.chrono.label'),
       value: chronoWarriorPercentage ?? 0,
       color: SEGMENT_COLORS.chrono,
-      tooltip:
-        'ETH allocation to the Chrono-Warrior, who also receives 1,000 CST and a Cosmic Signature NFT',
+      tooltip: t('funds.segments.chrono.tooltip'),
     },
     {
-      label: 'Stellar Selection',
+      label: t('funds.segments.stellar.label'),
       value: stellarSelectionPercentage ?? 0,
       color: SEGMENT_COLORS.stellarSelection,
-      tooltip: 'Portion distributed to randomly selected participants when the cycle finalizes',
+      tooltip: t('funds.segments.stellar.tooltip'),
     },
     {
-      label: 'Anchor Distribution',
+      label: t('funds.segments.anchor.label'),
       value: stakingPercentage ?? 0,
       color: SEGMENT_COLORS.anchoring,
-      tooltip:
-        'ETH Anchor Distributions to Cosmic Signature NFT anchor-holders, proportional to anchored NFT count',
+      tooltip: t('funds.segments.anchor.tooltip'),
     },
     {
-      label: 'Public Goods',
+      label: t('funds.segments.publicGoods.label'),
       value: charityPercentage ?? 0,
       color: SEGMENT_COLORS.charity,
-      tooltip: 'Forwarded to the Public Goods Beneficiary (Protocol Guild) each cycle',
+      tooltip: t('funds.segments.publicGoods.tooltip'),
     },
   ];
 
@@ -108,15 +108,15 @@ export function FundDistribution({
     <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-lg font-semibold">Allocation Tracks</CardTitle>
-          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
+          <CardTitle className="text-lg font-semibold">{t('funds.title')}</CardTitle>
+          <InfoTooltip content={t('funds.description')} />
         </div>
       </CardHeader>
       <CardContent>
         <div
           className="flex h-10 w-full overflow-hidden rounded-full bg-white/[0.06]"
           role="img"
-          aria-label="Allocation tracks bar chart"
+          aria-label={t('funds.chartAria')}
         >
           {segments.map((segment, i) => {
             if (segment.value <= 0) return null;

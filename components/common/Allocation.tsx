@@ -15,6 +15,7 @@ import {
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
@@ -209,14 +210,14 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                     )}
                   >
                     {allocation.faqLink ? (
-                      <a
+                      <Link
                         href={allocation.faqLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hover:text-primary transition-colors"
                       >
                         {allocation.name}
-                      </a>
+                      </Link>
                     ) : (
                       allocation.name
                     )}

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import {
@@ -9,22 +11,19 @@ import {
 import { useCharityCGDeposits } from '@/hooks/useApiQuery';
 
 const CharityCGDeposits = () => {
+  const t = useTranslations('publicGoods');
   const { data: charityCGDeposits = [], isLoading: loading } = useCharityCGDeposits();
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        title="Protocol Public-Goods Contributions"
-        titleLevel={2}
-        subtitle="Automatic forwards from the Cosmic Signature protocol to the Public Goods Vault"
-      />
+      <PageHeader title={t('protocol.title')} titleLevel={2} subtitle={t('protocol.subtitle')} />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Each cycle, a percentage of the Cycle Reserve is automatically forwarded to the Public Goods
-        Vault. The Cosmic Council coordinates which public-goods beneficiaries receive these funds,
-        creating a direct link between participation and ecosystem impact.
+        {t('protocol.description')}
       </p>
       {loading ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <p className="text-lg font-semibold" role="status">
+          {t('loading')}
+        </p>
       ) : (
         <CharityDepositTable list={charityCGDeposits as PublicGoodsContributionEntry[]} />
       )}

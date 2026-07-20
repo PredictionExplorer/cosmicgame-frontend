@@ -178,12 +178,12 @@ test.describe('home gesture chat', () => {
   test('shows current-cycle gesture messages newest first', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    const chat = page.getByTestId('gesture-message-chat');
+    const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
+    await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
     await chat.scrollIntoViewIfNeeded();
 
     await expect(chat).toBeVisible();
     await expect(chat.getByRole('heading', { name: 'Gesture Chat' })).toBeVisible();
-    await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
     await expect(chat.getByText('Newest message from a gesture')).toBeVisible();
     await expect(chat.getByText('Older message from a gesture')).toBeVisible();
     await expect(chat.getByRole('link', { name: 'Open gesture position 103' })).toHaveAttribute(
@@ -199,10 +199,11 @@ test.describe('home gesture chat', () => {
   test('positions the chat appropriately for the current viewport', async ({ page }, testInfo) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    const chat = page.getByTestId('gesture-message-chat');
-    const primaryColumn = page.getByTestId('home-primary-column');
-    const cycleDetails = page.getByTestId('cycle-details-link-card');
-    const publicGoods = page.getByTestId('public-goods-impact-card');
+    const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
+    const primaryColumn = page.locator('[data-testid="home-primary-column"]:visible').first();
+    const cycleDetails = page.locator('[data-testid="cycle-details-link-card"]:visible').first();
+    const publicGoods = page.locator('[data-testid="public-goods-impact-card"]:visible').first();
+    await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
     await expect(chat).toBeVisible();
     await expect(cycleDetails).toBeVisible();
     await expect(publicGoods).toBeVisible();

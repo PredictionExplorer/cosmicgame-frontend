@@ -2,36 +2,10 @@
 
 import { motion } from 'framer-motion';
 import { Megaphone, ShieldCheck, Coins, Info } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { GradientText } from '@/components/styled';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-
-const steps = [
-  {
-    number: '01',
-    title: 'Promote',
-    description: 'Share Cosmic Signature across social media, blogs, and communities.',
-    tooltip:
-      'Create content, share referral links, write blog posts, or produce videos about Cosmic Signature to qualify.',
-    Icon: Megaphone,
-  },
-  {
-    number: '02',
-    title: 'Get Verified',
-    description: 'Our team reviews and verifies your promotional activity.',
-    tooltip:
-      'The marketing team evaluates reach, quality, and authenticity of your promotional efforts before approving rewards.',
-    Icon: ShieldCheck,
-  },
-  {
-    number: '03',
-    title: 'Receive CST',
-    description: 'Receive CST token allocations directly to your wallet.',
-    tooltip:
-      'Once verified, CST tokens are sent on-chain to your wallet address. Allocations scale with the impact of your outreach.',
-    Icon: Coins,
-  },
-] as const;
 
 const containerVariants = {
   hidden: {},
@@ -46,6 +20,31 @@ const itemVariants = {
 };
 
 export function HowItWorks() {
+  const t = useTranslations('marketing');
+  const steps = [
+    {
+      number: '01',
+      title: t('howItWorks.steps.promote.title'),
+      description: t('howItWorks.steps.promote.description'),
+      tooltip: t('howItWorks.steps.promote.tooltip'),
+      Icon: Megaphone,
+    },
+    {
+      number: '02',
+      title: t('howItWorks.steps.verify.title'),
+      description: t('howItWorks.steps.verify.description'),
+      tooltip: t('howItWorks.steps.verify.tooltip'),
+      Icon: ShieldCheck,
+    },
+    {
+      number: '03',
+      title: t('howItWorks.steps.receive.title'),
+      description: t('howItWorks.steps.receive.description'),
+      tooltip: t('howItWorks.steps.receive.tooltip'),
+      Icon: Coins,
+    },
+  ] as const;
+
   return (
     <section id="how-it-works" aria-labelledby="how-it-works-heading" className="py-16">
       <div className="mb-12 flex items-center justify-center gap-2">
@@ -53,21 +52,19 @@ export function HowItWorks() {
           id="how-it-works-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          How It Works
+          {t('howItWorks.title')}
         </h2>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label="Info about how it works"
+              aria-label={t('howItWorks.infoAria')}
               className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
             >
               <Info className="h-4 w-4" />
             </button>
           </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            Three simple steps to start receiving outreach distributions with Cosmic Signature
-          </TooltipContent>
+          <TooltipContent className="max-w-xs">{t('howItWorks.tooltip')}</TooltipContent>
         </Tooltip>
       </div>
 
@@ -101,7 +98,7 @@ export function HowItWorks() {
                 <TooltipTrigger asChild>
                   <button
                     type="button"
-                    aria-label={`More info about ${step.title}`}
+                    aria-label={t('howItWorks.stepInfoAria', { title: step.title })}
                     className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
                   >
                     <Info className="h-3.5 w-3.5" />

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { Coins, Users, Layers, TrendingUp, ArrowRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
@@ -29,6 +29,7 @@ import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 
 const AnchoringPage = () => {
   const t = useTranslations('anchoring');
+  const locale = useLocale();
   const {
     data: cosmicSignatureRewards,
     isLoading: isLoadingCST,
@@ -51,8 +52,9 @@ const AnchoringPage = () => {
       formatDistributionPerAnchoredNftEth(
         dashboardData?.StakingAmountEth,
         dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
+        locale,
       ),
-    [dashboardData],
+    [dashboardData, locale],
   );
 
   const heroStats = useMemo(
@@ -69,7 +71,7 @@ const AnchoringPage = () => {
         label: t('overview.stats.cosmicSignatureAnchored.label'),
         value: (
           dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked ?? 0
-        ).toLocaleString(),
+        ).toLocaleString(locale),
         tooltip: t('overview.stats.cosmicSignatureAnchored.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
@@ -77,7 +79,7 @@ const AnchoringPage = () => {
         label: t('overview.stats.randomWalkAnchored.label'),
         value: (
           dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0
-        ).toLocaleString(),
+        ).toLocaleString(locale),
         tooltip: t('overview.stats.randomWalkAnchored.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
@@ -91,12 +93,12 @@ const AnchoringPage = () => {
       },
       {
         label: t('overview.stats.uniqueHolders.label'),
-        value: (uniqueStakers?.length ?? 0).toLocaleString(),
+        value: (uniqueStakers?.length ?? 0).toLocaleString(locale),
         tooltip: t('overview.stats.uniqueHolders.tooltip'),
         icon: <Users className="h-4 w-4" />,
       },
     ],
-    [dashboardData, distributionPerNft, t, uniqueStakers],
+    [dashboardData, distributionPerNft, locale, t, uniqueStakers],
   );
 
   if (hasError) {

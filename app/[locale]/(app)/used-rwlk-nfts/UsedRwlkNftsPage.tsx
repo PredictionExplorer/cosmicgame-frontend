@@ -4,10 +4,12 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
@@ -32,6 +34,7 @@ interface UsedRwlkNftRecord {
 }
 
 const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
+  const locale = useLocale();
   if (!nft) {
     return <TablePrimaryRow />;
   }
@@ -45,7 +48,7 @@ const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(nft.TimeStamp)}
+          <HydrationSafeDateTime timestamp={nft.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
 
@@ -67,15 +70,16 @@ const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
 };
 
 const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
+  const t = useTranslations('tables');
   return (
     <TablePrimaryContainer>
       <TablePrimary>
         <TablePrimaryHead>
           <Tr>
-            <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Participant Address</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">{t('columns.dateTimeCompact')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('columns.participantAddress')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>{t('statisticsColumns.namedNftTokenId')}</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <tbody>
@@ -89,6 +93,8 @@ const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
 };
 
 const UsedRwlkNftsPage = () => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const perPage = 5;
   const [curPage, setCurPage] = useState(1);
   const { data: list = [], isLoading: loading } = useUsedRWLKNFTs();
@@ -97,21 +103,23 @@ const UsedRwlkNftsPage = () => {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         align="left"
-        eyebrow={<SectionEyebrow tone="nebula">Used RWLK · {list.length}</SectionEyebrow>}
-        title="Used Random Walk NFTs"
+        eyebrow={
+          <SectionEyebrow tone="nebula">
+            {t('usedRwlkNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
+          </SectionEyebrow>
+        }
+        title={t('usedRwlkNfts.title')}
         titleLevel={2}
         gradientTitle="signature"
-        subtitle="Random Walk NFTs attached to ETH gestures for the one-time 50% Gesture Cost reduction"
+        subtitle={t('usedRwlkNfts.subtitle')}
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        RandomWalk NFT holders can attach an unused NFT to an ETH gesture for a 50% Gesture Cost
-        reduction in Cosmic Signature. Once used, a RandomWalk NFT is recorded here. Each NFT can
-        only be used once for this discount, making the timing of its use a strategic decision.
+        {t('usedRwlkNfts.description')}
       </p>
 
       <div className="mt-12">
         {loading ? (
-          <p className="text-lg font-semibold">Loading...</p>
+          <p className="text-lg font-semibold">{t('usedRwlkNfts.loading')}</p>
         ) : list.length > 0 ? (
           <>
             <UsedRwlkNftsTable
@@ -125,7 +133,7 @@ const UsedRwlkNftsPage = () => {
             />
           </>
         ) : (
-          <p className="text-lg font-semibold">No NFTs yet.</p>
+          <p className="text-lg font-semibold">{t('usedRwlkNfts.empty')}</p>
         )}
       </div>
     </PageShell>

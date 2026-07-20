@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -20,6 +21,7 @@ import type { MarketingReward } from '@/services/api/types';
 export type { MarketingReward };
 
 const GlobalMarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
+  const locale = useLocale();
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -33,7 +35,7 @@ const GlobalMarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(row.TimeStamp)}
+          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">

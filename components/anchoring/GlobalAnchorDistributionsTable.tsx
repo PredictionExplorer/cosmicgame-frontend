@@ -5,8 +5,9 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link } from '@/i18n/navigation';
 import {
   TablePrimary,
@@ -52,7 +53,7 @@ const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) =
             rel="noopener noreferrer"
             className="text-inherit"
           >
-            {convertTimestampToDateTime(row.TimeStamp ?? 0, false, locale)}
+            <HydrationSafeDateTime timestamp={row.TimeStamp ?? 0} locale={locale} />
           </a>
         </TablePrimaryCell>
 

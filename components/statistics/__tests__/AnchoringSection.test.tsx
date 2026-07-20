@@ -1,5 +1,3 @@
-import { statisticsCopy } from '@/content/statistics-copy';
-
 import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
 import {
@@ -201,23 +199,34 @@ describe('AnchoringSection', () => {
 
   it('explains imprinted-token anchoring counters', () => {
     render(<AnchoringSection {...defaultProps} />);
-    expect(screen.getByText(statisticsCopy.anchoring.cstTotalTokensImprinted)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Indexed Cosmic Signature NFT imprint count associated with Cosmic Signature NFT anchoring records.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('explains anchoring overview groups', () => {
     render(<AnchoringSection {...defaultProps} />);
-    expect(screen.getByText(statisticsCopy.anchoring.cstGroup)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Cosmic Signature NFT anchoring shares ETH Anchor Distributions among currently anchored Cosmic Signature NFTs.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('explains anchoring drill-down collapsibles', () => {
     render(<AnchoringSection {...defaultProps} />);
     expect(
-      screen.getAllByText(statisticsCopy.sections.anchorReleaseActions).length,
+      screen.getAllByText('Chronological anchor and release actions for the selected NFT type.')
+        .length,
     ).toBeGreaterThan(0);
-    expect(screen.getAllByText(statisticsCopy.sections.anchoredTokens).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(statisticsCopy.sections.uniqueAnchorHolders).length).toBeGreaterThan(
-      0,
-    );
+    expect(
+      screen.getAllByText('Tokens currently anchored in the selected anchoring wallet.').length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText('Wallets that have anchored or released the selected NFT type.').length,
+    ).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {

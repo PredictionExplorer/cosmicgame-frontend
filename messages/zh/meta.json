@@ -46,8 +46,8 @@
     "description": "查看指定 Cosmic Signature NFT 的锚定派发明细，包括各周期 ETH 派发记录、取回状态与累计锚定派发额。"
   },
   "allocationInfo": {
-    "title": "分配详情 · Cosmic Signature",
-    "description": "查看单个演绎周期的获配者、签名分配、星选结果及已附加 NFT 流向。"
+    "titleFor": "第 {id} 个周期分配详情 · Cosmic Signature",
+    "descriptionFor": "查看第 {id} 个 Cosmic Signature 演绎周期的获配者、签名分配、星选结果及已附加 NFT 流向。"
   },
   "anchorAction": {
     "title": "锚定操作详情 · Cosmic Signature",
@@ -80,5 +80,216 @@
   "siteMap": {
     "title": "网站地图 · Cosmic Signature",
     "description": "浏览 Cosmic Signature 协议的各个部分，包括落笔、NFT 画廊、锚定、统计、分配与公共物品资助。"
+  },
+  "statistics": {
+    "title": "Cosmic Signature 统计 · 演绎周期、落笔、NFT 与 CST",
+    "description": "查看 Cosmic Signature 在 Arbitrum 上的协议统计，包括演绎周期状态、落笔、NFT 活动、CST、锚定、储备与分配数据。"
+  },
+  "statisticsParticipation": {
+    "title": "参与统计 · Cosmic Signature",
+    "description": "汇总 Cosmic Signature 所有演绎周期中的独立参与者、获配者与 ETH 贡献者。"
+  },
+  "statisticsTokens": {
+    "title": "代币分布统计 · Cosmic Signature",
+    "description": "查看 Cosmic Signature NFT 持有情况、CST（ERC-20）余额分布、总供应量历史，以及随落笔附加的资产。"
+  },
+  "statisticsAnchoring": {
+    "title": "锚定统计 · Cosmic Signature",
+    "description": "查看 Cosmic Signature NFT 与 Random Walk NFT 的锚定和解锚操作、当前已锚定代币及独立锚定者。"
+  },
+  "statisticsActivity": {
+    "title": "落笔活动统计 · Cosmic Signature",
+    "description": "查看落笔频次、活动峰值、参与者活跃时段、落笔类型占比、周期时间线与周期启用记录。"
+  },
+  "statisticsPerformance": {
+    "title": "参与者表现统计 · Cosmic Signature",
+    "description": "查看参与者表现榜，以及 Cosmic Signature 各演绎周期中可取回资产的处理情况。"
+  },
+  "recipientHistory": {
+    "title": "我的分配历史 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 中的完整分配历史，包括签名分配、ETH 星选分配、Cosmic Signature NFT 与锚定派发。"
+  },
+  "namedNfts": {
+    "title": "已命名 Cosmic Signature NFT · Cosmic Signature",
+    "description": "浏览由持有者自定义名称的 Cosmic Signature NFT。每枚已命名 NFT 都在系列中拥有独特身份。"
+  },
+  "nftDonations": {
+    "title": "已附加 NFT 贡献 · Cosmic Signature",
+    "description": "浏览社区成员随落笔附加的 NFT。每个周期中，这些 NFT 会转给签名分配获配者。"
+  },
+  "usedRwlkNfts": {
+    "title": "已使用的 Random Walk NFT · Cosmic Signature",
+    "description": "查看已随 ETH 落笔附加、并用于一次性降低 50% 落笔价格的 Random Walk NFT。每枚 NFT 仅可使用一次。"
+  },
+  "userProfile": {
+    "title": "参与者 {address} 的信息 · Cosmic Signature",
+    "description": "查看参与者 {address} 的 Cosmic Signature 统计与活动。",
+    "invalidAddress": "无效地址"
+  },
+  "userStellarSelectionEth": {
+    "title": "星选 ETH · Cosmic Signature",
+    "description": "查看此参与者通过星选获配的全部 ETH，以及各已完成周期中的分配记录。"
+  },
+  "userStellarSelectionNft": {
+    "title": "星选 NFT · Cosmic Signature",
+    "description": "查看此参与者通过星选获配的全部 Cosmic Signature NFT。"
+  },
+  "systemEvent": {
+    "title": "系统事件 · Cosmic Signature",
+    "description": "查看指定 Cosmic Signature 周期的协议管理事件与协调参数变更。"
+  },
+  "faq": {
+    "title": "Cosmic Signature 常见问题 · Arbitrum 链上艺术协议",
+    "description": "解答 Cosmic Signature、演绎周期、落笔、CST、三体 NFT 艺术、Arbitrum、锚定、合约与协议安全等常见问题。"
+  },
+  "contracts": {
+    "title": "Cosmic Signature 合约 · 已验证的 Arbitrum 智能合约",
+    "description": "查看 Cosmic Signature 智能合约地址、验证状态、审计、形式化验证说明与 Arbitrum 部署详情。"
+  },
+  "terms": {
+    "title": "服务条款 · Cosmic Signature",
+    "description": "Cosmic Signature 程序化链上艺术协议的使用条款。"
+  },
+  "privacy": {
+    "title": "隐私 · Cosmic Signature",
+    "description": "Cosmic Signature 协议面向访问者的隐私实践。"
+  },
+  "pageTerms": {
+    "title": "服务条款 · Cosmic Signature",
+    "description": "Cosmic Signature 服务条款，涵盖参与资格、协议机制、分配、风险、禁止行为及其他法律条款。"
+  },
+  "pagePrivacy": {
+    "title": "隐私政策 · Cosmic Signature",
+    "description": "Cosmic Signature 隐私政策，说明钱包数据、交易、安全与区块链透明性相关的信息处理方式。"
+  },
+  "security": {
+    "title": "Cosmic Signature 安全 · 协议验证与参与安全",
+    "description": "了解 Cosmic Signature 的安全措施、Arbitrum 合约验证、运行控制与参与者安全说明。"
+  },
+  "audits": {
+    "title": "Cosmic Signature 审计 · 验证与合约审查",
+    "description": "查看 Cosmic Signature 审计状态、形式化验证背景、智能合约审查说明与源代码验证资源。"
+  },
+  "code": {
+    "title": "Cosmic Signature 源代码 · CC0 链上艺术协议",
+    "description": "浏览 Cosmic Signature 源代码、渲染流水线、合约仓库、验证流程与 CC0 公有领域许可。"
+  },
+  "mint": {
+    "title": "铭刻 RandomWalk NFT · Cosmic Signature",
+    "description": "在 Cosmic Signature 铭刻 RandomWalk NFT。每枚尚未使用的 RandomWalk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。"
+  },
+  "coordinationChanges": {
+    "title": "协调变更 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 协议参数的完整调整记录，包括落笔价格、周期时间、锚定派发设置及其他协调变更。"
+  },
+  "publicGoodsCgContributions": {
+    "title": "协议公共物品资助 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 协议自动转拨给公共物品受益方的资金。每个周期，固定比例的周期储备都会用于支持公共物品。"
+  },
+  "publicGoodsRetrievals": {
+    "title": "公共物品取回 · Cosmic Signature",
+    "description": "查看公共物品金库的取回记录。每个周期，部分周期储备会转拨给由宇宙议会协调选定的公共物品受益方。"
+  },
+  "publicGoodsVoluntary": {
+    "title": "自愿公共物品资助 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 社区自愿转入公共物品金库的资金，以及由宇宙议会协调选定的公共物品受益方。"
+  },
+  "outreach": {
+    "title": "推广分配 · Cosmic Signature",
+    "description": "参与 Cosmic Signature 推广并获得 CST 分配。查看推广贡献榜、分配记录与参与方式。"
+  },
+  "outreachAddress": {
+    "title": "推广分配 · Cosmic Signature",
+    "description": "查看指定 Cosmic Signature 推广贡献者的推广记录与 CST 分配。"
+  },
+  "ethContribution": {
+    "title": "直接 ETH 贡献 · Cosmic Signature",
+    "description": "直接向 Cosmic Signature 公共物品金库贡献 ETH，并查看完整贡献记录。"
+  },
+  "ethContributionDetail": {
+    "title": "直接 ETH 贡献详情 · Cosmic Signature",
+    "description": "查看指定 ETH 贡献的贡献者地址、金额、所属周期与可选留言。"
+  },
+  "ethContributionByCycle": {
+    "title": "按周期查看直接 ETH 贡献 · Cosmic Signature",
+    "description": "按演绎周期查看向 Cosmic Signature 协议直接贡献的 ETH。"
+  },
+  "admin": {
+    "title": "管理 · Cosmic Signature",
+    "description": "Cosmic Signature 协议管理工具，用于查看协议参数、合约设置与系统配置。"
+  },
+  "adminSettings": {
+    "title": "管理设置 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 的管理设置与合约配置。"
+  },
+  "internalCstOutreachTransfer": {
+    "title": "CST 推广转账 · Cosmic Signature",
+    "description": "仅供已配置推广储备钱包签名者使用的受限 CST 转账工具。"
+  },
+  "embedEndurance": {
+    "title": "坚守与时之勇士时间线",
+    "description": "查看 Cosmic Signature 指定演绎周期的坚守冠军与时之勇士时间线。"
+  },
+  "about": {
+    "title": "关于 Cosmic Signature · Arbitrum 链上艺术",
+    "description": "Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议，将演绎周期中的落笔化为确定性的三体 NFT 艺术。"
+  },
+  "learn": {
+    "title": "了解 Cosmic Signature · 链上艺术、演绎周期与 Arbitrum",
+    "description": "了解 Cosmic Signature 的运作原理：演绎周期、落笔、CST、三体 NFT 艺术、Arbitrum 合约、锚定、公共物品与风险释疑。"
+  },
+  "howItWorks": {
+    "title": "Cosmic Signature 运作原理 · 演绎周期、落笔与 NFT",
+    "description": "了解 Cosmic Signature 演绎周期如何展开：从校准窗口到一次次落笔，再到收官后的分配发放。"
+  },
+  "riskDisclosures": {
+    "title": "Cosmic Signature 风险披露 · 不是\u6295资产品",
+    "description": "阅读 Cosmic Signature 风险披露，了解区块链参与、钱包交互、NFT、CST、分配及非\u6295资属性说明。"
+  },
+  "learnArticles": {
+    "what-is-cosmic-signature": {
+      "title": "什么是 Cosmic Signature？ · Cosmic Signature",
+      "description": "Cosmic Signature 是运行于 Arbitrum 的程序化链上艺术协议；参与者在演绎周期中落笔，共同塑造确定性的三体 NFT 作品。"
+    },
+    "how-the-performance-cycle-works": {
+      "title": "Cosmic Signature 演绎周期如何运作 · Cosmic Signature",
+      "description": "了解 Cosmic Signature 的演绎周期如何在 Arbitrum 上展开，包括校准窗口、落笔、收官和分配轨道。"
+    },
+    "how-gestures-work": {
+      "title": "Cosmic Signature 的落笔如何运作 · Cosmic Signature",
+      "description": "了解 ETH 落笔、CST 落笔、落笔价格与参与 CST，以及每一笔如何塑造 Cosmic Signature 演绎周期。"
+    },
+    "three-body-nft-art": {
+      "title": "Cosmic Signature 如何生成三体 NFT 艺术 · Cosmic Signature",
+      "description": "从技术层面了解 Cosmic Signature 如何以链上种子与三体物理生成确定性的 NFT 作品。"
+    },
+    "cosmic-signature-on-arbitrum": {
+      "title": "运行于 Arbitrum 的 Cosmic Signature · Cosmic Signature",
+      "description": "了解 Cosmic Signature 为何运行于 Arbitrum，以及协议如何借助以太坊 Layer 2 基础设施承载链上艺术。"
+    },
+    "contracts-security-verification": {
+      "title": "Cosmic Signature 合约、安全与验证 · Cosmic Signature",
+      "description": "查阅 Cosmic Signature 智能合约、源代码、验证信息，以及这套 Arbitrum 协议的安全背景。"
+    },
+    "cst-token-and-cosmic-council": {
+      "title": "CST 与宇宙议会 · Cosmic Signature",
+      "description": "了解 CST 代币与落笔、协议协调和宇宙议会之间的关系。"
+    },
+    "anchoring-nfts": {
+      "title": "锚定 Cosmic Signature NFT · Cosmic Signature",
+      "description": "了解 Cosmic Signature NFT 的锚定机制、ETH 锚定派发，以及 Random Walk NFT 的参与资格。"
+    },
+    "protocol-guild-public-goods": {
+      "title": "Cosmic Signature 与以太坊公共物品 · Cosmic Signature",
+      "description": "了解 Cosmic Signature 如何将公共物品分配转拨至 Protocol Guild，为以太坊核心贡献者提供资助。"
+    },
+    "collecting-and-trading-cosmic-signature": {
+      "title": "收藏与交易 Cosmic Signature NFT 和 CST · Cosmic Signature",
+      "description": "了解 Cosmic Signature 资产可在哪里交易：Axiom Zero NFT 市场不收平台费，可在 Arbitrum 上通过 Uniswap 兑换 CST，Chaos Zero 则提供周期预测市场。"
+    },
+    "not-a-\u006cottery-not-an-\u0069nvestment": {
+      "title": "Cosmic Signature 是彩\u7968、赌\u573a或投\u8d44产品吗？ · Cosmic Signature",
+      "description": "Cosmic Signature 是程序化链上艺术协议，不是彩\u7968、赌\u573a、赌\u535a产品或投\u8d44产品。"
+    }
   }
 }

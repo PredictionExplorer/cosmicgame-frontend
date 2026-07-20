@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -7,15 +8,16 @@ import EthDonationDetailPage from './EthDonationDetailPage';
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
   return createMetadata(
-    'Direct ETH Contribution Detail | Cosmic Signature',
-    'Details of a specific ETH contribution to the Cosmic Signature Public Goods Vault \u2014 contributor address, amount, cycle, and optional note.',
+    t('ethContributionDetail.title'),
+    t('ethContributionDetail.description'),
     undefined,
     `/eth-contribution/detail/${id}`,
-    { index: false },
+    { index: false, locale },
   );
 }
 
@@ -23,7 +25,12 @@ export async function generateMetadata({
 // fresh instead of freezing the first render forever (see route-group refactor).
 export const revalidate = 300;
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}) {
+  const { locale, id } = await params;
+  setRequestLocale(locale);
   return <EthDonationDetailPage id={Number(id)} />;
 }

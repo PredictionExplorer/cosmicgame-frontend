@@ -8,9 +8,10 @@ import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
 import { usePublicClient } from 'wagmi';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useApiData } from '@/contexts/ApiDataContext';
 import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
@@ -41,6 +42,7 @@ interface StellarSelectionETHDeposit {
 }
 
 const StellarSelectionAllocationsRow = ({ deposit }: { deposit: StellarSelectionETHDeposit }) => {
+  const locale = useLocale();
   if (!deposit) return <TablePrimaryRow />;
 
   const { TxHash, TimeStamp, RoundNum, Amount } = deposit;
@@ -53,7 +55,7 @@ const StellarSelectionAllocationsRow = ({ deposit }: { deposit: StellarSelection
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(TimeStamp)}
+          <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -72,11 +74,13 @@ const StellarSelectionAllocationsRow = ({ deposit }: { deposit: StellarSelection
 };
 
 const StellarSelectionAllocationsTable = ({ list }: { list: StellarSelectionETHDeposit[] }) => {
+  const t = useTranslations('tables');
+  const tStatistics = useTranslations('statistics');
   const PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No Stellar Selection ETH yet.</p>;
+    return <p>{tStatistics('stellarSelectionEth.empty')}</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -89,9 +93,9 @@ const StellarSelectionAllocationsTable = ({ list }: { list: StellarSelectionETHD
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('columns.date')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">{t('columns.amountEth')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>
@@ -114,6 +118,7 @@ const StellarSelectionAllocationsTable = ({ list }: { list: StellarSelectionETHD
 
 const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string }) => {
   const t = useTranslations('toasts');
+  const tStatistics = useTranslations('statistics');
   const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
@@ -190,7 +195,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
   if (invalidAddress) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <p className="text-lg font-semibold">Invalid Address</p>
+        <p className="text-lg font-semibold">{tStatistics('stellarSelectionEth.invalidAddress')}</p>
       </PageShell>
     );
   }
@@ -198,23 +203,29 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
   return (
     <PageShell variant="data" backdrop="signature">
       <div className="mb-8">
-        <span className="mr-4 text-lg font-semibold text-primary">User</span>
+        <span className="mr-4 text-lg font-semibold text-primary">
+          {tStatistics('stellarSelectionEth.user')}
+        </span>
         <span className="font-mono text-lg font-semibold">{validatedAddress}</span>
       </div>
 
       <div className="mt-8">
         <div className="mb-4 flex items-center justify-between">
           <h4 className="text-lg font-semibold leading-none">
-            Stellar Selection ETH allocated to this participant
+            {tStatistics('stellarSelectionEth.heading')}
           </h4>
 
           {status?.ETHRaffleToClaim > 0 && account === validatedAddress && (
             <div className="flex items-center gap-4">
               <span className="mr-4">
-                Your retrievable allocations are {status.ETHRaffleToClaim.toFixed(6)} ETH
+                {tStatistics('stellarSelectionEth.retrievable', {
+                  amount: status.ETHRaffleToClaim.toFixed(6),
+                })}
               </span>
               <Button onClick={handleAllETHClaim} disabled={isClaiming}>
-                {isClaiming ? t('claim.retrieving') : 'Retrieve All'}
+                {isClaiming
+                  ? t('claim.retrieving')
+                  : tStatistics('stellarSelectionEth.retrieveAll')}
               </Button>
             </div>
           )}

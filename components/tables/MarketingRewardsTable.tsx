@@ -3,8 +3,9 @@ import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -31,7 +32,7 @@ const MarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
     <TablePrimaryRow>
       <TablePrimaryCell>
         <a className="text-inherit" href={transactionUrl} target="_blank" rel="noopener noreferrer">
-          {convertTimestampToDateTime(row.TimeStamp, false, locale)}
+          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell>{row.AmountEth.toFixed(2)}</TablePrimaryCell>

@@ -3,6 +3,7 @@
 // lexicon-allow-start: component name and backend field names preserve existing API/chart contract
 
 import { useMemo, type FC } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   LineChart,
   Line,
@@ -64,6 +65,7 @@ type SupplyByBidTooltipProps = {
 };
 
 function SupplyByBidTooltip({ active, payload }: SupplyByBidTooltipProps) {
+  const t = useTranslations('statistics');
   if (!active || !payload?.length) return null;
   const point = payload[0]?.payload as ChartPoint | undefined;
   if (!point) return null;
@@ -71,32 +73,32 @@ function SupplyByBidTooltip({ active, payload }: SupplyByBidTooltipProps) {
   return (
     <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
       <p className="mb-2 font-medium text-white">
-        Gesture {point.bidNum}
+        {t('charts.supply.gesture', { number: point.bidNum })}
         {point.dateTime ? ` · ${point.dateTime}` : ''}
       </p>
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex justify-between gap-4">
-          <dt>Total supply</dt>
+          <dt>{t('charts.supply.totalSupply')}</dt>
           <dd className="text-white">{formatCSTValue(point.totalSupplyEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Mint</dt>
+          <dt>{t('charts.supply.imprint')}</dt>
           <dd className="text-white">{formatCSTValue(point.mintAmountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Burn</dt>
+          <dt>{t('charts.supply.consume')}</dt>
           <dd className="text-white">{formatCSTValue(point.burnAmountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Net</dt>
+          <dt>{t('charts.supply.net')}</dt>
           <dd className="text-white">{formatCSTValue(point.amountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Gesture type</dt>
+          <dt>{t('charts.supply.gestureType')}</dt>
           <dd className="text-white">{point.bidTypeLabel}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Gesture info id</dt>
+          <dt>{t('charts.supply.gestureInfoId')}</dt>
           <dd className="text-white">{point.bidInfoId}</dd>
         </div>
       </dl>
@@ -112,6 +114,7 @@ type CSTTotalSupplyHistoryByBidChartProps = {
 export const CSTTotalSupplyHistoryByBidChart: FC<CSTTotalSupplyHistoryByBidChartProps> = ({
   enabled = true,
 }) => {
+  const t = useTranslations('statistics');
   const { data, isLoading, isError, refetch } = useCTTotalSupplyHistoryByBid(enabled);
 
   const chartData = useMemo(() => toBidChartPoints(data ?? []), [data]);
@@ -125,12 +128,14 @@ export const CSTTotalSupplyHistoryByBidChart: FC<CSTTotalSupplyHistoryByBidChart
         </div>
       ) : isError ? (
         <ErrorState
-          title="Failed to load supply history"
-          message="Could not fetch CST total supply by gesture."
+          title={t('charts.supply.loadErrorTitle')}
+          message={t('charts.supply.loadGestureError')}
           onRetry={() => refetch()}
         />
       ) : chartData.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted-foreground">No supply history by gesture.</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          {t('charts.supply.emptyGesture')}
+        </p>
       ) : (
         <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>

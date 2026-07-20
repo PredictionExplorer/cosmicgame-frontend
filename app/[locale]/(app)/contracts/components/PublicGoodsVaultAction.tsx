@@ -35,7 +35,8 @@ export function PublicGoodsVaultAction({
   beneficiaryAddress,
   vaultBalanceEth,
 }: PublicGoodsVaultActionProps) {
-  const t = useTranslations('toasts');
+  const t = useTranslations('contracts');
+  const toastT = useTranslations('toasts');
   const locale = useLocale();
   const [submitting, setSubmitting] = useState(false);
   const config = useConfig();
@@ -49,19 +50,19 @@ export function PublicGoodsVaultAction({
   const hasFunds = displayBalance > 0;
   const disabled = submitting || !hasFunds;
   const buttonLabel = submitting
-    ? t('contribution.publicGoodsVault.forwarding')
+    ? toastT('contribution.publicGoodsVault.forwarding')
     : hasFunds
-      ? t('contribution.publicGoodsVault.forward')
-      : t('contribution.publicGoodsVault.nothing');
+      ? toastT('contribution.publicGoodsVault.forward')
+      : toastT('contribution.publicGoodsVault.nothing');
 
   const handleForward = async () => {
     if (!hasFunds) {
-      toast.info(t('contribution.publicGoodsVault.none'));
+      toast.info(toastT('contribution.publicGoodsVault.none'));
       return;
     }
 
     if (!active || !account) {
-      toast.error(t('contribution.publicGoodsVault.connectWallet'));
+      toast.error(toastT('contribution.publicGoodsVault.connectWallet'));
       return;
     }
 
@@ -77,14 +78,16 @@ export function PublicGoodsVaultAction({
       const receipt = await publicClient?.waitForTransactionReceipt({ hash });
       assertSuccessfulTransactionReceipt(receipt);
       await queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] });
-      toast.success(t('contribution.publicGoodsVault.forwarded'));
+      toast.success(toastT('contribution.publicGoodsVault.forwarded'));
     } catch (err) {
       if (isUserRejection(err)) {
-        toast.info(t('walletTransactionCancelled'));
+        toast.info(toastT('walletTransactionCancelled'));
         return;
       }
       reportError(err, 'forward public goods vault funds');
-      toast.error(getEthErrorMessage(err, t('contribution.publicGoodsVault.failed'), { locale }));
+      toast.error(
+        getEthErrorMessage(err, toastT('contribution.publicGoodsVault.failed'), { locale }),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -97,28 +100,25 @@ export function PublicGoodsVaultAction({
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white/[0.06] text-primary/60">
             <Vault className="h-4 w-4" />
           </div>
-          <CardTitle className="text-base font-semibold">Public Goods Vault Action</CardTitle>
-          <InfoTooltip content="Calls the Public Goods Vault send() function to forward the vault's ETH balance to the configured Protocol Guild beneficiary." />
+          <CardTitle className="text-base font-semibold">{t('vault.title')}</CardTitle>
+          <InfoTooltip content={t('vault.tooltip')} />
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              <span className="text-muted-foreground">In vault now</span>
+              <span className="text-muted-foreground">{t('vault.balance')}</span>
               <span className="font-mono font-semibold text-foreground">
                 {formatEthValue(displayBalance)}
               </span>
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Forward available public-goods funds from the vault to Protocol Guild
-              {beneficiaryAddress ? (
-                <>
-                  {' '}
-                  (<span className="font-mono">{shortenHex(beneficiaryAddress, 6)}</span>)
-                </>
-              ) : null}
-              .
+              {beneficiaryAddress
+                ? t('vault.descriptionWithBeneficiary', {
+                    address: shortenHex(beneficiaryAddress, 6),
+                  })
+                : t('vault.description')}
             </p>
           </div>
 
@@ -126,7 +126,7 @@ export function PublicGoodsVaultAction({
             type="button"
             onClick={handleForward}
             disabled={disabled}
-            aria-label="Forward Public Goods Vault balance to Protocol Guild"
+            aria-label={t('vault.aria')}
             className="w-full md:w-auto"
           >
             {submitting ? (

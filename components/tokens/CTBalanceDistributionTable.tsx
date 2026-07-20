@@ -2,8 +2,8 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { memo, useMemo, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { statisticsCopy } from '@/content/statistics-copy';
 import { formatTableAmount } from '@/utils';
 
 import {
@@ -24,19 +24,23 @@ export interface BalanceRow {
   BalanceFloat: number;
 }
 
-const CTBalanceDistributionRow: FC<{ row?: BalanceRow }> = memo(({ row }) => {
-  if (!row) return <TablePrimaryRow />;
+const CTBalanceDistributionRow: FC<{ row?: BalanceRow; locale: string }> = memo(
+  ({ row, locale }) => {
+    if (!row) return <TablePrimaryRow />;
 
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell>
-        <AddressLink address={row.OwnerAddr} url={`/user/${row.OwnerAddr}`} />
-      </TablePrimaryCell>
+    return (
+      <TablePrimaryRow>
+        <TablePrimaryCell>
+          <AddressLink address={row.OwnerAddr} url={`/user/${row.OwnerAddr}`} />
+        </TablePrimaryCell>
 
-      <TablePrimaryCell align="right">{formatTableAmount(row.BalanceFloat)}</TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-});
+        <TablePrimaryCell align="right">
+          {formatTableAmount(row.BalanceFloat, locale)}
+        </TablePrimaryCell>
+      </TablePrimaryRow>
+    );
+  },
+);
 CTBalanceDistributionRow.displayName = 'CTBalanceDistributionRow';
 
 interface TableProps {
@@ -44,6 +48,8 @@ interface TableProps {
 }
 
 export const CTBalanceDistributionTable: FC<TableProps> = ({ list }) => {
+  const t = useTranslations('tables');
+  const locale = useLocale();
   const PER_PAGE = 5;
   const [page, setPage] = useState(1);
 
@@ -52,7 +58,7 @@ export const CTBalanceDistributionTable: FC<TableProps> = ({ list }) => {
     [list, page],
   );
 
-  if (list.length === 0) return <p>No tokens yet.</p>;
+  if (list.length === 0) return <p>{t('empty.tokens')}</p>;
 
   return (
     <>
@@ -62,14 +68,14 @@ export const CTBalanceDistributionTable: FC<TableProps> = ({ list }) => {
             <Tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
-                  desktop="Owner Address"
-                  tooltip={statisticsCopy.tables.ownerAddress}
+                  desktop={t('statisticsColumns.ownerAddress')}
+                  tooltip={t('statisticsTooltips.ownerAddress')}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 <TableHeaderHelp
-                  desktop="Balance (CST)"
-                  tooltip={statisticsCopy.tables.cstBalance}
+                  desktop={t('statisticsColumns.cstBalance')}
+                  tooltip={t('statisticsTooltips.cstBalance')}
                 />
               </TablePrimaryHeadCell>
             </Tr>
@@ -77,7 +83,7 @@ export const CTBalanceDistributionTable: FC<TableProps> = ({ list }) => {
 
           <tbody>
             {currentRows.map((row) => (
-              <CTBalanceDistributionRow key={row.OwnerAid} row={row} />
+              <CTBalanceDistributionRow key={row.OwnerAid} row={row} locale={locale} />
             ))}
           </tbody>
         </TablePrimary>

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 import { SectionDivider } from '@/components/ui/section-divider';
 
@@ -17,12 +18,6 @@ interface ContractAddressGridProps {
   searchTerm: string;
   onSearchChange: (term: string) => void;
 }
-
-const CATEGORY_LABELS: Record<ContractEntry['category'], string> = {
-  core: 'Core Contracts',
-  wallet: 'Wallet Contracts',
-  anchoring: 'Anchoring Contracts',
-};
 
 const CATEGORY_ORDER: ContractEntry['category'][] = ['core', 'wallet', 'anchoring'];
 
@@ -42,18 +37,19 @@ export function ContractAddressGrid({
   searchTerm,
   onSearchChange,
 }: ContractAddressGridProps) {
-  const lowerSearch = searchTerm.toLowerCase();
+  const t = useTranslations('contracts');
+  const lowerSearch = searchTerm.toLocaleLowerCase('en-US');
   const filtered = searchTerm
     ? contracts.filter(
         (c) =>
-          c.name.toLowerCase().includes(lowerSearch) ||
-          c.address.toLowerCase().includes(lowerSearch),
+          c.name.toLocaleLowerCase('en-US').includes(lowerSearch) ||
+          c.address.toLocaleLowerCase('en-US').includes(lowerSearch),
       )
     : contracts;
 
   const grouped = CATEGORY_ORDER.map((cat) => ({
     category: cat,
-    label: CATEGORY_LABELS[cat],
+    label: t(`categories.${cat}`),
     items: filtered.filter((c) => c.category === cat),
   })).filter((g) => g.items.length > 0);
 
@@ -63,7 +59,7 @@ export function ContractAddressGrid({
 
       {grouped.length === 0 && (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          No contracts match &ldquo;{searchTerm}&rdquo;
+          {t('search.empty', { searchTerm })}
         </p>
       )}
 
@@ -83,8 +79,8 @@ export function ContractAddressGrid({
                   address={contract.address}
                   description={contract.description}
                   explorerUrl={explorerUrl}
-                  showTradeAction={contract.name === 'Cosmic Signature CST Token'}
-                  showMarketplaceAction={contract.name === 'Cosmic Signature NFT'}
+                  showTradeAction={contract.id === 'cst'}
+                  showMarketplaceAction={contract.id === 'nft'}
                 />
               </motion.div>
             ))}

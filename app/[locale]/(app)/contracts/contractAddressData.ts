@@ -3,13 +3,83 @@ import { protocolFacts } from '@/content/protocol-facts';
 import type { ContractAddresses } from '@/services/api/types';
 
 export type ContractCategory = 'core' | 'wallet' | 'anchoring';
+export const CONTRACT_ENTRY_IDS = [
+  'protocol',
+  'implementation',
+  'cst',
+  'nft',
+  'randomWalk',
+  'council',
+  'publicGoods',
+  'outreach',
+  'allocations',
+  'cosmicAnchor',
+  'rwalkAnchor',
+] as const;
+export type ContractEntryId = (typeof CONTRACT_ENTRY_IDS)[number];
 
 export interface ContractEntry {
+  id: ContractEntryId;
   name: string;
   address: string;
   description: string;
   category: ContractCategory;
 }
+
+export type ContractEntryCopy = Record<
+  ContractEntryId,
+  Pick<ContractEntry, 'name' | 'description'>
+>;
+
+export const CONTRACT_ENTRY_COPY_EN: ContractEntryCopy = {
+  protocol: {
+    name: 'Cosmic Signature Protocol',
+    description:
+      'The main protocol proxy contract that manages cycles, gestures, and allocation distribution',
+  },
+  implementation: {
+    name: 'Implementation Contract',
+    description: 'The current implementation behind the Cosmic Signature Protocol proxy contract',
+  },
+  cst: {
+    name: 'Cosmic Signature CST Token',
+    description:
+      'ERC-20 token (CST) imprinted with every gesture and used to express Coordination Weight on the Cosmic Council',
+  },
+  nft: {
+    name: 'Cosmic Signature NFT',
+    description: 'ERC-721 NFT collection imprinted as allocations to cycle recipients',
+  },
+  randomWalk: {
+    name: 'RandomWalk',
+    description:
+      'RandomWalk NFT collection that can be attached to ETH gestures for a one-time discount or anchored for Anchored-NFT Stellar Selection eligibility',
+  },
+  council: {
+    name: 'Cosmic Council',
+    description: 'On-chain Protocol Coordination contract for Coordination Proposals',
+  },
+  publicGoods: {
+    name: 'Public Goods Vault',
+    description: "Receives the Public Goods Allocation from each cycle's Cycle Reserve",
+  },
+  outreach: {
+    name: 'Outreach Reserve',
+    description: 'Funds allocated for outreach distributions and ecosystem contributors',
+  },
+  allocations: {
+    name: 'Allocations Wallet',
+    description: 'Escrow contract holding allocations awaiting retrieval',
+  },
+  cosmicAnchor: {
+    name: 'Cosmic Signature NFT Anchoring Wallet',
+    description: 'Anchoring contract for Cosmic Signature NFTs',
+  },
+  rwalkAnchor: {
+    name: 'RWLK Anchoring Wallet',
+    description: 'Anchoring contract for RandomWalk NFTs',
+  },
+};
 
 export const CONTRACT_LABELS: Record<string, string> = {
   CosmicGameAddr: 'Cosmic Signature Protocol',
@@ -46,76 +116,76 @@ export function getDisplayContractAddresses(
   };
 }
 
-export function buildContracts(apiAddrs: ContractAddresses | undefined | null): ContractEntry[] {
+export function buildContracts(
+  apiAddrs: ContractAddresses | undefined | null,
+  copy: ContractEntryCopy = CONTRACT_ENTRY_COPY_EN,
+): ContractEntry[] {
   const addrs = getDisplayContractAddresses(apiAddrs);
   const contracts: ContractEntry[] = [
     {
-      name: 'Cosmic Signature Protocol',
+      id: 'protocol',
+      ...copy.protocol,
       address: addrs.CosmicGameAddr ?? '',
-      description:
-        'The main protocol proxy contract that manages cycles, gestures, and allocation distribution',
       category: 'core',
     },
     {
-      name: 'Implementation Contract',
+      id: 'implementation',
+      ...copy.implementation,
       address: addrs.ImplementationAddr ?? '',
-      description: 'The current implementation behind the Cosmic Signature Protocol proxy contract',
       category: 'core',
     },
     {
-      name: 'Cosmic Signature CST Token',
+      id: 'cst',
+      ...copy.cst,
       address: addrs.CosmicTokenAddr ?? '',
-      description:
-        'ERC-20 token (CST) imprinted with every gesture and used to express Coordination Weight on the Cosmic Council',
       category: 'core',
     },
     {
-      name: 'Cosmic Signature NFT',
+      id: 'nft',
+      ...copy.nft,
       address: addrs.CosmicSignatureAddr ?? '',
-      description: 'ERC-721 NFT collection imprinted as allocations to cycle recipients',
       category: 'core',
     },
     {
-      name: 'RandomWalk',
+      id: 'randomWalk',
+      ...copy.randomWalk,
       address: addrs.RandomWalkAddr ?? '',
-      description:
-        'RandomWalk NFT collection that can be attached to ETH gestures for a one-time discount or anchored for Anchored-NFT Stellar Selection eligibility',
       category: 'core',
     },
     {
-      name: 'Cosmic Council',
+      id: 'council',
+      ...copy.council,
       address: addrs.CosmicDaoAddr ?? '',
-      description: 'On-chain Protocol Coordination contract for Coordination Proposals',
       category: 'core',
     },
     {
-      name: 'Public Goods Vault',
+      id: 'publicGoods',
+      ...copy.publicGoods,
       address: addrs.CharityWalletAddr ?? '',
-      description: "Receives the Public Goods Allocation from each cycle's Cycle Reserve",
       category: 'wallet',
     },
     {
-      name: 'Outreach Reserve',
+      id: 'outreach',
+      ...copy.outreach,
       address: addrs.MarketingWalletAddr ?? '',
-      description: 'Funds allocated for outreach distributions and ecosystem contributors',
       category: 'wallet',
     },
     {
-      name: 'Allocations Wallet',
+      id: 'allocations',
+      ...copy.allocations,
       address: addrs.PrizesWalletAddr ?? '',
-      description: 'Escrow contract holding allocations awaiting retrieval',
       category: 'wallet',
     },
     {
-      name: 'Cosmic Signature NFT Anchoring Wallet',
+      id: 'cosmicAnchor',
+      ...copy.cosmicAnchor,
       address: addrs.StakingWalletCSTAddr ?? '',
-      description: 'Anchoring contract for Cosmic Signature NFTs',
       category: 'anchoring',
     },
     {
-      name: 'RWLK Anchoring Wallet',
+      id: 'rwalkAnchor',
+      ...copy.rwalkAnchor,
       address: addrs.StakingWalletRWalkAddr ?? '',
-      description: 'Anchoring contract for RandomWalk NFTs',
       category: 'anchoring',
     },
   ];
@@ -123,12 +193,15 @@ export function buildContracts(apiAddrs: ContractAddresses | undefined | null): 
   return contracts.filter((c) => c.address);
 }
 
-export function getSeoContractAddressEntries(apiAddrs: ContractAddresses | undefined | null) {
+export function getSeoContractAddressEntries(
+  apiAddrs: ContractAddresses | undefined | null,
+  labels: Record<string, string> = CONTRACT_LABELS,
+) {
   return Object.entries(getDisplayContractAddresses(apiAddrs))
     .filter((entry): entry is [string, string] => isAddress(entry[1]))
     .map(([key, address]) => ({
       key,
-      label: CONTRACT_LABELS[key] ?? key,
+      label: labels[key] ?? key,
       address,
     }));
 }

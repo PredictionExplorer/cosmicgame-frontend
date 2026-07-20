@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
@@ -20,12 +21,12 @@ import { useRoiLeaderboard } from '@/hooks/useApiQuery';
 import type { RoiLeaderboardEntry, RoiLeaderboardSort } from '@/services/api/types';
 
 // lexicon-allow-start: sort ids below are the sealed backend query-param contract
-const SORT_TABS: { id: RoiLeaderboardSort; label: string }[] = [
-  { id: 'net_pl', label: 'Highest Net ETH' },
-  { id: 'roi', label: 'Highest Net %' },
-  { id: 'winrate', label: 'Best Allocation Rate' },
-  { id: 'spent', label: 'Biggest Spender' },
-  { id: 'nfts', label: 'Most NFTs' },
+const SORT_TABS: { id: RoiLeaderboardSort; labelKey: string }[] = [
+  { id: 'net_pl', labelKey: 'netEth' },
+  { id: 'roi', labelKey: 'netPercent' },
+  { id: 'winrate', labelKey: 'allocationRate' },
+  { id: 'spent', labelKey: 'spender' },
+  { id: 'nfts', labelKey: 'nfts' },
 ];
 // lexicon-allow-end
 
@@ -67,10 +68,18 @@ const NetCell = ({ value }: { value: number }) => {
   return <span className={`font-semibold ${tone}`}>{fmtSignedEth(value)}</span>;
 };
 
-const NetPctCell = ({ entry }: { entry: RoiLeaderboardEntry }) => {
+const NetPctCell = ({
+  entry,
+  cstOnlyTooltip,
+  noEthReceivedTooltip,
+}: {
+  entry: RoiLeaderboardEntry;
+  cstOnlyTooltip: string;
+  noEthReceivedTooltip: string;
+}) => {
   if (isCstOnly(entry)) {
     return (
-      <span className="text-muted-foreground" title="No ETH spent (CST-only participant)">
+      <span className="text-muted-foreground" title={cstOnlyTooltip}>
         —
       </span>
     );
@@ -80,10 +89,7 @@ const NetPctCell = ({ entry }: { entry: RoiLeaderboardEntry }) => {
   // participants while cycles run. Mute it instead of painting the table red.
   if (pct <= -100 && entry.EthWonEth <= 0) {
     return (
-      <span
-        className="tabular-nums text-muted-foreground"
-        title="No ETH received back yet — this participant has not received an ETH allocation so far"
-      >
+      <span className="tabular-nums text-muted-foreground" title={noEthReceivedTooltip}>
         −100%
       </span>
     );
@@ -114,7 +120,21 @@ const AllocationBadges = ({ entry }: { entry: RoiLeaderboardEntry }) => {
   );
 };
 
-const Row = ({ entry, rank }: { entry?: RoiLeaderboardEntry; rank?: number }) => {
+const Row = ({
+  entry,
+  rank,
+  cstOnlyLabel,
+  cstOnlyTooltip,
+  noEthReceivedTooltip,
+  locale,
+}: {
+  entry?: RoiLeaderboardEntry;
+  rank?: number;
+  cstOnlyLabel: string;
+  cstOnlyTooltip: string;
+  noEthReceivedTooltip: string;
+  locale: string;
+}) => {
   if (!entry) {
     return <TablePrimaryRow />;
   }
@@ -124,7 +144,9 @@ const Row = ({ entry, rank }: { entry?: RoiLeaderboardEntry; rank?: number }) =>
       <TablePrimaryCell>
         <AddressLink address={entry.BidderAddr} url={`/user/${entry.BidderAddr}`} />
         {isCstOnly(entry) && (
-          <span className="ml-2 align-middle text-[11px] text-muted-foreground">(CST-only)</span>
+          <span className="ml-2 align-middle text-[11px] text-muted-foreground">
+            {cstOnlyLabel}
+          </span>
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
@@ -133,7 +155,7 @@ const Row = ({ entry, rank }: { entry?: RoiLeaderboardEntry; rank?: number }) =>
           ({entry.RoundsWon}/{entry.RoundsParticipated})
         </span>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{entry.NumBids}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{entry.NumBids.toLocaleString(locale)}</TablePrimaryCell>
       <TablePrimaryCell align="right">
         {fmtEth(entry.TotalEthSpentEth)}
         {entry.TotalCstSpentEth > 0 && (
@@ -147,7 +169,11 @@ const Row = ({ entry, rank }: { entry?: RoiLeaderboardEntry; rank?: number }) =>
         <NetCell value={entry.NetPlEth} />
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        <NetPctCell entry={entry} />
+        <NetPctCell
+          entry={entry}
+          cstOnlyTooltip={cstOnlyTooltip}
+          noEthReceivedTooltip={noEthReceivedTooltip}
+        />
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         <AllocationBadges entry={entry} />
@@ -157,6 +183,8 @@ const Row = ({ entry, rank }: { entry?: RoiLeaderboardEntry; rank?: number }) =>
 };
 
 export const RoiLeaderboardSection = () => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const [sort, setSort] = useState<RoiLeaderboardSort>('net_pl');
   const [minBids, setMinBids] = useState(5);
   const [page, setPage] = useState(1);
@@ -176,22 +204,23 @@ export const RoiLeaderboardSection = () => {
   return (
     <div className="space-y-4">
       <p className="text-sm leading-6 text-muted-foreground">
-        Net ETH and return per participant, across all cycles. Figures are{' '}
-        <span className="text-white">ETH-only</span> — ETH received from allocations minus ETH spent
-        on gestures; CST and NFT allocations are shown as context. Participants who only used CST
-        show no ETH return.
+        {t.rich('performance.leaderboard.description', {
+          em: (chunks) => <span className="text-white">{chunks}</span>,
+        })}
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-2">
           {SORT_TABS.map((tab) => (
             <Pill key={tab.id} active={sort === tab.id} onClick={() => onSort(tab.id)}>
-              {tab.label}
+              {t(`performance.leaderboard.sort.${tab.labelKey}`)}
             </Pill>
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Min gestures</span>
+          <span className="text-xs text-muted-foreground">
+            {t('performance.leaderboard.minimumGestures')}
+          </span>
           {MIN_GESTURES_OPTIONS.map((opt) => (
             <Pill key={opt} active={minBids === opt} onClick={() => onMinGestures(opt)}>
               ≥{opt}
@@ -206,14 +235,14 @@ export const RoiLeaderboardSection = () => {
         </div>
       ) : isError ? (
         <ErrorState
-          title="Failed to load the performance leaderboard"
-          message="The statistics service did not respond. Try again in a moment."
+          title={t('performance.leaderboard.loadErrorTitle')}
+          message={t('performance.leaderboard.loadErrorMessage')}
           onRetry={() => refetch()}
           className="py-10"
         />
       ) : list.length === 0 ? (
         <p className="py-8 text-center text-muted-foreground">
-          No participants match this filter yet.
+          {t('performance.leaderboard.empty')}
         </p>
       ) : (
         <>
@@ -222,19 +251,43 @@ export const RoiLeaderboardSection = () => {
               <TablePrimaryHead>
                 <Tr>
                   <TablePrimaryHeadCell align="center">#</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="left">Participant</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Allocation Rate</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Gestures</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Spent (ETH)</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Received (ETH)</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Net (ETH)</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Net %</TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">Allocations</TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="left">
+                    {t('performance.leaderboard.columns.participant')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.leaderboard.columns.allocationRate')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.leaderboard.columns.gestures')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.leaderboard.columns.spent')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.leaderboard.columns.received')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.leaderboard.columns.net')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.leaderboard.columns.netPercent')}
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">
+                    {t('performance.leaderboard.columns.allocations')}
+                  </TablePrimaryHeadCell>
                 </Tr>
               </TablePrimaryHead>
               <tbody>
                 {list.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((entry, idx) => (
-                  <Row key={entry.BidderAid} entry={entry} rank={(page - 1) * PER_PAGE + idx + 1} />
+                  <Row
+                    key={entry.BidderAid}
+                    entry={entry}
+                    rank={(page - 1) * PER_PAGE + idx + 1}
+                    cstOnlyLabel={t('performance.leaderboard.cstOnly')}
+                    cstOnlyTooltip={t('performance.leaderboard.cstOnlyTooltip')}
+                    noEthReceivedTooltip={t('performance.leaderboard.noEthReceivedTooltip')}
+                    locale={locale}
+                  />
                 ))}
               </tbody>
             </TablePrimary>

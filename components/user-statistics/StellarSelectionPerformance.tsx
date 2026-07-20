@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -108,6 +108,7 @@ export function StellarSelectionPerformance({
   className,
 }: StellarSelectionPerformanceProps) {
   const t = useTranslations('myPages');
+  const locale = useLocale();
   const showProbabilities = useMemo(() => {
     const roundActive = !((data?.CurRoundNum ?? 0) > 0 && data?.TsRoundStart === 0);
     return roundActive && stellarSelectionETHProbability >= 0;
@@ -156,23 +157,23 @@ export function StellarSelectionPerformance({
         />
         <StellarSelectionStat
           label={t('statistics.stellarSelection.unretrievedNfts.label')}
-          value={(userInfo.UnclaimedNFTs ?? 0).toLocaleString()}
+          value={(userInfo.UnclaimedNFTs ?? 0).toLocaleString(locale)}
           tooltip={t('statistics.stellarSelection.unretrievedNfts.tooltip')}
         />
         <StellarSelectionStat
           label={t('statistics.stellarSelection.stellarSelectionNfts.label')}
-          value={(userInfo.RaffleNFTsCount ?? 0).toLocaleString()}
+          value={(userInfo.RaffleNFTsCount ?? 0).toLocaleString(locale)}
           tooltip={t('statistics.stellarSelection.stellarSelectionNfts.tooltip')}
           href={userInfo.Address ? `/user/stellar-selection-nft/${userInfo.Address}` : undefined}
         />
         <StellarSelectionStat
           label={t('statistics.stellarSelection.allocationNfts.label')}
-          value={(userInfo.RewardNFTsCount ?? 0).toLocaleString()}
+          value={(userInfo.RewardNFTsCount ?? 0).toLocaleString(locale)}
           tooltip={t('statistics.stellarSelection.allocationNfts.tooltip')}
         />
         <StellarSelectionStat
           label={t('statistics.stellarSelection.cosmicSignatureNfts.label')}
-          value={(userInfo.TotalCSTokensWon ?? 0).toLocaleString()}
+          value={(userInfo.TotalCSTokensWon ?? 0).toLocaleString(locale)}
           tooltip={t('statistics.stellarSelection.cosmicSignatureNfts.tooltip')}
         />
       </div>

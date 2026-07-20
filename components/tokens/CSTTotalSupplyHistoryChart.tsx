@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type FC } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   LineChart,
   Line,
@@ -40,10 +41,13 @@ type ChartPoint = {
   numBids: number;
 };
 
-export function toChartPoints(records: CTTotalSupplyHistoryByDateRecord[]): ChartPoint[] {
+export function toChartPoints(
+  records: CTTotalSupplyHistoryByDateRecord[],
+  locale: string = 'en',
+): ChartPoint[] {
   return records.map((r) => ({
     dateKey: r.Date,
-    label: formatYyyymmddLabel(r.Date),
+    label: formatYyyymmddLabel(r.Date, locale),
     totalSupplyEth: r.TotalSupplyEth ?? 0,
     mintAmountEth: r.MintAmountEth ?? 0,
     burnAmountEth: r.BurnAmountEth ?? 0,
@@ -58,6 +62,8 @@ type SupplyTooltipProps = {
 };
 
 function SupplyTooltip({ active, payload }: SupplyTooltipProps) {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   if (!active || !payload?.length) return null;
   const point = payload[0]?.payload as ChartPoint | undefined;
   if (!point) return null;
@@ -67,24 +73,26 @@ function SupplyTooltip({ active, payload }: SupplyTooltipProps) {
       <p className="mb-2 font-medium text-white">{point.label}</p>
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex justify-between gap-4">
-          <dt>Total supply</dt>
+          <dt>{t('charts.supply.totalSupply')}</dt>
           <dd className="text-white">{formatCSTValue(point.totalSupplyEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Mint</dt>
+          <dt>{t('charts.supply.imprint')}</dt>
           <dd className="text-white">{formatCSTValue(point.mintAmountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Burn</dt>
+          <dt>{t('charts.supply.consume')}</dt>
           <dd className="text-white">{formatCSTValue(point.burnAmountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Net</dt>
+          <dt>{t('charts.supply.net')}</dt>
           <dd className="text-white">{formatCSTValue(point.amountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Num gestures</dt>
-          <dd className="text-white">{point.numBids}</dd>
+          <dt>{t('charts.supply.numGestures')}</dt>
+          <dd className="text-white">
+            {new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US').format(point.numBids)}
+          </dd>
         </div>
       </dl>
     </div>
@@ -99,6 +107,8 @@ type CSTTotalSupplyHistoryChartProps = {
 export const CSTTotalSupplyHistoryChart: FC<CSTTotalSupplyHistoryChartProps> = ({
   enabled = true,
 }) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const bootstrap = useMemo(() => supplyHistoryBootstrapRange(), []);
   const [draftFrom, setDraftFrom] = useState(() => fromYyyymmdd(bootstrap.from));
   const [draftTo, setDraftTo] = useState(() => fromYyyymmdd(bootstrap.to));
@@ -113,7 +123,7 @@ export const CSTTotalSupplyHistoryChart: FC<CSTTotalSupplyHistoryChartProps> = (
     enabled,
   );
 
-  const chartData = useMemo(() => toChartPoints(data ?? []), [data]);
+  const chartData = useMemo(() => toChartPoints(data ?? [], locale), [data, locale]);
 
   useEffect(() => {
     if (!data?.length || rangeInitialized.current) return;
@@ -131,7 +141,7 @@ export const CSTTotalSupplyHistoryChart: FC<CSTTotalSupplyHistoryChartProps> = (
     const from = toYyyymmdd(draftFrom);
     const to = toYyyymmdd(draftTo);
     if (from > to) {
-      setRangeError('Start date must be on or before end date.');
+      setRangeError(t('charts.supply.invalidRange'));
       return;
     }
     setRangeError(null);
@@ -150,13 +160,18 @@ export const CSTTotalSupplyHistoryChart: FC<CSTTotalSupplyHistoryChartProps> = (
       >
         <DatePicker
           id="supply-history-from"
-          label="From"
+          label={t('charts.supply.from')}
           value={draftFrom}
           onChange={setDraftFrom}
         />
-        <DatePicker id="supply-history-to" label="To" value={draftTo} onChange={setDraftTo} />
+        <DatePicker
+          id="supply-history-to"
+          label={t('charts.supply.to')}
+          value={draftTo}
+          onChange={setDraftTo}
+        />
         <Button type="submit" variant="default">
-          Update chart
+          {t('charts.supply.update')}
         </Button>
       </form>
 
@@ -168,13 +183,13 @@ export const CSTTotalSupplyHistoryChart: FC<CSTTotalSupplyHistoryChartProps> = (
         </div>
       ) : isError ? (
         <ErrorState
-          title="Failed to load supply history"
-          message="Could not fetch CST total supply for the selected range."
+          title={t('charts.supply.loadErrorTitle')}
+          message={t('charts.supply.loadDateError')}
           onRetry={() => refetch()}
         />
       ) : chartData.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          No supply history for this date range.
+          {t('charts.supply.emptyDate')}
         </p>
       ) : (
         <ResponsiveContainer width="100%" height={CHART_HEIGHT}>

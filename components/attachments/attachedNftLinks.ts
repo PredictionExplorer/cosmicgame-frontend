@@ -15,6 +15,22 @@ export interface AttachedNftResolvedLink {
   label: string;
 }
 
+export interface AttachedNftLinkLabels {
+  viewNft: string;
+  viewOpenSea: string;
+  viewContract: string;
+  detailsUnavailable: string;
+  contractUnavailable: string;
+}
+
+const DEFAULT_LABELS: AttachedNftLinkLabels = {
+  viewNft: 'View NFT',
+  viewOpenSea: 'View on OpenSea',
+  viewContract: 'View contract',
+  detailsUnavailable: 'NFT details unavailable',
+  contractUnavailable: 'Contract unavailable',
+};
+
 export function getAttachedNftTokenId(
   nft: Partial<Pick<AttachedNFT, 'NFTTokenId' | 'TokenId'>>,
 ): string | null {
@@ -57,40 +73,43 @@ export function resolveAttachedNftLink({
   nft,
   metadata,
   chainId = networkConfig.chainId,
+  labels = DEFAULT_LABELS,
 }: {
   nft: Partial<Pick<AttachedNFT, 'TokenAddr' | 'NFTTokenId' | 'TokenId'>>;
   metadata?: AttachedNftLinkMetadata | null;
   chainId?: number;
+  labels?: AttachedNftLinkLabels;
 }): AttachedNftResolvedLink {
   const projectUrl = normalizeHttpUrl(metadata?.external_url);
   if (projectUrl) {
-    return { kind: 'project', href: projectUrl, label: 'View NFT' };
+    return { kind: 'project', href: projectUrl, label: labels.viewNft };
   }
 
   const tokenId = getAttachedNftTokenId(nft);
   const openSeaUrl = buildOpenSeaAssetUrl(nft.TokenAddr, tokenId, chainId);
   if (openSeaUrl) {
-    return { kind: 'opensea', href: openSeaUrl, label: 'View on OpenSea' };
+    return { kind: 'opensea', href: openSeaUrl, label: labels.viewOpenSea };
   }
 
   if (nft.TokenAddr) {
     return {
       kind: 'explorer',
       href: getExplorerUrl('address', nft.TokenAddr),
-      label: 'View contract',
+      label: labels.viewContract,
     };
   }
 
-  return { kind: 'none', href: null, label: 'NFT details unavailable' };
+  return { kind: 'none', href: null, label: labels.detailsUnavailable };
 }
 
 export function resolveAttachedNftExplorerLink(
   nft: Partial<Pick<AttachedNFT, 'TokenAddr'>>,
+  labels: AttachedNftLinkLabels = DEFAULT_LABELS,
 ): AttachedNftResolvedLink {
-  if (!nft.TokenAddr) return { kind: 'none', href: null, label: 'Contract unavailable' };
+  if (!nft.TokenAddr) return { kind: 'none', href: null, label: labels.contractUnavailable };
   return {
     kind: 'explorer',
     href: getExplorerUrl('address', nft.TokenAddr),
-    label: 'View contract',
+    label: labels.viewContract,
   };
 }

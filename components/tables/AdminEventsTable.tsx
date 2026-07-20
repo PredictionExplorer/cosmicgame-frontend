@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds } from '@/utils';
+import { getExplorerUrl, formatSeconds } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
@@ -26,22 +27,39 @@ export type { AdminEventRow };
 
 const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
   const t = useTranslations('tables');
+  const tCoordination = useTranslations('coordination');
+  const tStatistics = useTranslations('statistics');
+  const locale = useLocale();
 
   if (!row) {
     return <TablePrimaryRow />;
   }
+  const event = ADMIN_EVENTS[row.RecordType];
+  const eventName = event?.messageKey
+    ? tCoordination(`events.${event.messageKey}`)
+    : t('status.unknown');
 
   return (
     <TablePrimaryRow className={cn(row.TransferType > 0 && 'bg-white/[0.06]')}>
       <TablePrimaryCell>
-        {ADMIN_EVENTS[row.RecordType]?.name}
+        {eventName}
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="ml-2 inline-flex align-middle">
+            <button
+              type="button"
+              aria-label={tStatistics('systemEvent.explainEvent', {
+                event: eventName,
+              })}
+              className="ml-2 inline-flex align-middle"
+            >
               <AlertCircle className="h-4 w-4" />
-            </span>
+            </button>
           </TooltipTrigger>
-          <TooltipContent>{ADMIN_EVENTS[row.RecordType]?.description}</TooltipContent>
+          <TooltipContent>
+            {event?.messageKey
+              ? tStatistics(`systemEvent.adminEvents.${event.messageKey}`)
+              : event?.description}
+          </TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell>
@@ -51,21 +69,21 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(row.TimeStamp)}
+          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell>
         {row.RecordType === 0 ? (
           t('status.undefined')
-        ) : ADMIN_EVENTS[row.RecordType]?.type === 'timestamp' ? (
-          convertTimestampToDateTime(row.IntegerValue)
-        ) : ADMIN_EVENTS[row.RecordType]?.type === 'percentage' ? (
+        ) : event?.type === 'timestamp' ? (
+          <HydrationSafeDateTime timestamp={row.IntegerValue} locale={locale} />
+        ) : event?.type === 'percentage' ? (
           `${row.IntegerValue}%`
-        ) : ADMIN_EVENTS[row.RecordType]?.type === 'number' ? (
+        ) : event?.type === 'number' ? (
           row.IntegerValue
-        ) : ADMIN_EVENTS[row.RecordType]?.type === 'time' ? (
-          formatSeconds(row.IntegerValue)
-        ) : ADMIN_EVENTS[row.RecordType]?.type === 'address' ? (
+        ) : event?.type === 'time' ? (
+          formatSeconds(row.IntegerValue, locale)
+        ) : event?.type === 'address' ? (
           <span className="font-mono">{row.AddressValue}</span>
         ) : (
           <a href={row.StringValue} target="_blank" rel="noopener noreferrer">

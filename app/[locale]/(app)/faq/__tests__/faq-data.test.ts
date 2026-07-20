@@ -1,11 +1,18 @@
 import {
-  faqCategories,
-  popularQuestionIds,
-  getAllItems,
-  getTotalQuestionCount,
-  findItemById,
-  findItemByHash,
-} from '../data/faq-data';
+  faqContentEn,
+  findFaqItemByHash,
+  findFaqItemById,
+  getAllFaqItems,
+  getTotalFaqQuestionCount,
+  type FAQCategory,
+} from '@/content/faq';
+
+const faqCategories: readonly FAQCategory[] = faqContentEn.categories;
+const popularQuestionIds = faqContentEn.popularQuestionIds;
+const getAllItems = () => getAllFaqItems(faqContentEn);
+const getTotalQuestionCount = () => getTotalFaqQuestionCount(faqContentEn);
+const findItemById = (id: string) => findFaqItemById(faqContentEn, id);
+const findItemByHash = (hash: string) => findFaqItemByHash(faqContentEn, hash);
 
 const EXPECTED_CATEGORY_IDS = [
   'getting-started',

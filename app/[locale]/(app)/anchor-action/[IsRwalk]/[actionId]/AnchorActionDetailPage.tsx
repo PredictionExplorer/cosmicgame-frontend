@@ -2,9 +2,10 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, getAssetsUrl, getRWLKImageUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl, getAssetsUrl, getRWLKImageUrl } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   DefinitionList,
   DetailRow,
@@ -152,7 +153,7 @@ function AnchorActionBody({
                 rel="noopener noreferrer"
                 className={detailLinkClass}
               >
-                {convertTimestampToDateTime(anchor.TimeStamp, false, locale)}
+                <HydrationSafeDateTime timestamp={anchor.TimeStamp} locale={locale} />
               </a>
             </DetailRow>
             <DetailRow label={t('anchorActionDetail.anchor.tokenCount')}>
@@ -175,7 +176,7 @@ function AnchorActionBody({
                   rel="noopener noreferrer"
                   className={detailLinkClass}
                 >
-                  {convertTimestampToDateTime(release.TimeStamp, false, locale)}
+                  <HydrationSafeDateTime timestamp={release.TimeStamp} locale={locale} />
                 </a>
               </DetailRow>
               <DetailRow label={t('anchorActionDetail.release.tokenCount')}>

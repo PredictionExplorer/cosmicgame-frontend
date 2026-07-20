@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import CharityWithdrawalTable, {
@@ -8,22 +10,23 @@ import CharityWithdrawalTable, {
 import { useCharityWithdrawals } from '@/hooks/useApiQuery';
 
 const CharityWithdrawals = () => {
+  const t = useTranslations('publicGoods');
   const { data: charityWithdrawals = [], isLoading: loading } = useCharityWithdrawals();
 
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
-        title="Public Goods Retrievals"
+        title={t('retrievals.title')}
         titleLevel={2}
-        subtitle="Funds retrieved from the Public Goods Vault"
+        subtitle={t('retrievals.subtitle')}
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        This page tracks all retrievals from the Cosmic Signature Public Goods Vault. Each retrieval
-        represents public-goods funds being forwarded to beneficiaries selected through Cosmic
-        Council coordination.
+        {t('retrievals.description')}
       </p>
       {loading ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <p className="text-lg font-semibold" role="status">
+          {t('loading')}
+        </p>
       ) : (
         <CharityWithdrawalTable list={charityWithdrawals as CharityWithdrawal[]} />
       )}

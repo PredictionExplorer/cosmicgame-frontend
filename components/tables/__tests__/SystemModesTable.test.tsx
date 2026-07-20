@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { convertTimestampToDateTime } from '@/utils';
-import { statisticsCopy } from '@/content/statistics-copy';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
@@ -37,14 +37,17 @@ describe('SystemModesTable', () => {
     expect(screen.getAllByText('tables.columns.ended').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('adds help triggers to system event headers', () => {
+  it('adds localized help to system event headers', async () => {
+    const user = userEvent.setup();
     render(<SystemModesTable list={[createEvent()]} />);
-    expect(
-      screen.getAllByRole('button', {
-        name: /^tables\.tableHeaderHelp\.explainColumn/,
-      }).length,
-    ).toBeGreaterThanOrEqual(3);
-    expect(statisticsCopy.tables.systemEnded).toMatch(/replaced/);
+    const triggers = screen.getAllByRole('button', {
+      name: /^tables\.tableHeaderHelp\.explainColumn/,
+    });
+    expect(triggers.length).toBeGreaterThanOrEqual(3);
+    await user.hover(triggers[2]!);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'tables.statisticsTooltips.systemEnded',
+    );
   });
 
   it('shows "Deployment" for RoundNum 0', () => {

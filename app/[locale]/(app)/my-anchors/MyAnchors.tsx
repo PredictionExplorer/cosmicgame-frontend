@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { Layers, TrendingUp, Gift } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
@@ -30,6 +30,7 @@ import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 
 const MyAnchors = () => {
   const t = useTranslations('myPages');
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { anchor, release, handleError, rwalkContract } = useAnchorActions();
 
@@ -50,8 +51,9 @@ const MyAnchors = () => {
       formatDistributionPerAnchoredNftEth(
         dashboardData?.StakingAmountEth,
         dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
+        locale,
       ),
-    [dashboardData],
+    [dashboardData, locale],
   );
 
   const loading =
@@ -74,13 +76,13 @@ const MyAnchors = () => {
     () => [
       {
         label: t('anchors.stats.cosmicSignature.label'),
-        value: anchoredCSTokens.length.toLocaleString(),
+        value: anchoredCSTokens.length.toLocaleString(locale),
         tooltip: t('anchors.stats.cosmicSignature.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
       {
         label: t('anchors.stats.randomWalk.label'),
-        value: anchoredRWLKTokens.length.toLocaleString(),
+        value: anchoredRWLKTokens.length.toLocaleString(locale),
         tooltip: t('anchors.stats.randomWalk.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
@@ -106,7 +108,7 @@ const MyAnchors = () => {
         icon: <TrendingUp className="h-4 w-4" />,
       },
     ],
-    [anchoredCSTokens, anchoredRWLKTokens, unclaimedRewardEth, distributionPerCST, t],
+    [anchoredCSTokens, anchoredRWLKTokens, unclaimedRewardEth, distributionPerCST, locale, t],
   );
 
   useEffect(() => {

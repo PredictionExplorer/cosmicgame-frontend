@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -17,6 +18,8 @@ interface SystemEventPageProps {
 }
 
 const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
+  const t = useTranslations('statistics');
+  const locale = useLocale();
   const { data: eventsRaw, isLoading: loading, error } = useSystemEvents(start, end);
   const events = eventsRaw ?? [];
 
@@ -28,19 +31,27 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
 
   const title =
     round > 0
-      ? `System Configuration Made Before Cycle ${round}`
-      : 'System Configuration Made Before Deployment';
+      ? t('systemEvent.titleBeforeCycle', { cycle: round })
+      : t('systemEvent.titleBeforeDeployment');
 
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-6xl">
         <PageHeader
           title={title}
-          subtitle={`Event log range ${start}–${end}`}
+          subtitle={t('systemEvent.range', { start, end })}
           breadcrumbs={[
-            { label: 'Home', href: '/' },
-            { label: 'Coordination changes', href: '/coordination-changes' },
-            { label: round > 0 ? `Before cycle ${round}` : 'Deployment' },
+            { label: t('systemEvent.breadcrumbs.home'), href: '/' },
+            {
+              label: t('systemEvent.breadcrumbs.coordination'),
+              href: '/coordination-changes',
+            },
+            {
+              label:
+                round > 0
+                  ? t('systemEvent.breadcrumbs.beforeCycle', { cycle: round })
+                  : t('systemEvent.breadcrumbs.deployment'),
+            },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
@@ -48,12 +59,14 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
 
         {loading ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+            <p className="text-sm font-medium text-muted-foreground">{t('systemEvent.loading')}</p>
           </div>
         ) : error ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
             <p className="text-lg font-semibold text-destructive">
-              {error.message || 'Failed to load system events'}
+              {locale === 'zh'
+                ? t('systemEvent.loadError')
+                : error.message || t('systemEvent.loadError')}
             </p>
           </div>
         ) : (

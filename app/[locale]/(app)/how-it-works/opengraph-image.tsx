@@ -1,19 +1,20 @@
-import { ImageResponse } from 'next/og';
-
-import { COSMIC_OG_SIZE, CosmicOgCard } from '@/lib/og/CosmicOgCard';
+import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
+import { getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
+import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
 
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
-export const alt = 'Cosmic Signature \u2014 How It Works';
 
-export default function Image() {
-  return new ImageResponse(
-    <CosmicOgCard
-      eyebrow="How It Works"
-      title="From Calibration to Allocation, in four stages."
-      subhead="Open the cycle. Make a gesture. Finalize. The protocol distributes the reserve."
-      chips={['Calibration', 'Gestures', 'Allocations']}
-    />,
-    size,
-  );
+interface ImageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateImageMetadata({ params }: ImageProps) {
+  const { locale } = await params;
+  return getOgImageMetadata(locale, 'howItWorks');
+}
+
+export default async function Image({ params }: ImageProps) {
+  const { locale } = await params;
+  return createCosmicOgImage(locale, getOgCopy(locale, 'howItWorks'));
 }

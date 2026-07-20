@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { HelpCircle, BookOpen, Layers } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { GradientText } from '@/components/styled';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -32,6 +33,8 @@ export function HeroSection({
   totalCount,
   categoryCount,
 }: HeroSectionProps) {
+  const t = useTranslations('faq');
+
   return (
     <section
       aria-labelledby="faq-hero-heading"
@@ -61,7 +64,7 @@ export function HeroSection({
         className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.06] px-4 py-1.5 text-xs font-medium text-primary"
       >
         <HelpCircle className="h-3.5 w-3.5" />
-        Knowledge Base
+        {t('hero.badge')}
       </motion.div>
 
       <motion.h1
@@ -72,7 +75,7 @@ export function HeroSection({
         animate="visible"
         className="relative font-display text-3xl font-bold tracking-tight md:text-5xl"
       >
-        Cosmic Signature <GradientText>FAQ</GradientText>
+        {t('hero.titlePrefix')} <GradientText>{t('hero.titleHighlight')}</GradientText>
       </motion.h1>
 
       <motion.p
@@ -82,8 +85,7 @@ export function HeroSection({
         animate="visible"
         className="relative mx-auto mt-4 max-w-lg text-base text-muted-foreground"
       >
-        Everything you need to know about Cosmic Signature — from getting started to advanced game
-        mechanics.
+        {t('hero.subtitle')}
       </motion.p>
 
       <motion.div
@@ -112,20 +114,20 @@ export function HeroSection({
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
             <HelpCircle className="h-3.5 w-3.5 text-primary" />
           </div>
-          <span>{totalCount}+ Answers</span>
-          <InfoTooltip content="Comprehensive answers covering every aspect of Cosmic Signature." />
+          <span>{t('hero.answerCount', { count: totalCount })}</span>
+          <InfoTooltip content={t('hero.answerCountTooltip')} />
         </div>
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/10">
             <Layers className="h-3.5 w-3.5 text-accent" />
           </div>
-          <span>{categoryCount} Categories</span>
+          <span>{t('hero.categoryCount', { count: categoryCount })}</span>
         </div>
         <div className="hidden items-center gap-2 sm:flex">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
             <BookOpen className="h-3.5 w-3.5 text-primary" />
           </div>
-          <span>Always Updated</span>
+          <span>{t('hero.alwaysUpdated')}</span>
         </div>
       </motion.div>
     </section>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
@@ -15,6 +16,7 @@ import { RewardsHistorySection } from '@/components/marketing/RewardsHistorySect
 import { MarketingCTA } from '@/components/marketing/MarketingCTA';
 
 const MarketingRewards = () => {
+  const t = useTranslations('marketing');
   const { data: marketingRewards = [], isLoading: rewardsLoading } = useMarketingRewards();
   const { data: dashboard, isLoading: dashboardLoading } = useDashboardInfo();
 
@@ -33,11 +35,7 @@ const MarketingRewards = () => {
   if (loading) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <div
-          className="flex justify-center py-32"
-          role="status"
-          aria-label="Loading marketing rewards"
-        >
+        <div className="flex justify-center py-32" role="status" aria-label={t('loadingAria')}>
           <Spinner />
         </div>
       </PageShell>

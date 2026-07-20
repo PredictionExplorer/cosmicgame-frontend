@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl } from '@/utils';
 
+import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { Link } from '@/i18n/navigation';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -34,6 +36,7 @@ interface CharityDepositTableProps {
 }
 
 const ContributionRow = ({ entry }: ContributionRowProps) => {
+  const locale = useLocale();
   if (!entry) {
     return <TablePrimaryRow />;
   }
@@ -47,21 +50,21 @@ const ContributionRow = ({ entry }: ContributionRowProps) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(entry.TimeStamp)}
+          <HydrationSafeDateTime timestamp={entry.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {entry.RoundNum < 0 ? (
           ' '
         ) : (
-          <a
+          <Link
             className="text-inherit"
             href={`/allocation/${entry.RoundNum}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             {entry.RoundNum}
-          </a>
+          </Link>
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">

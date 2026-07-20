@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+
+import { parseCanonicalNonNegativeSafeInteger } from '@/utils';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -10,13 +13,16 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale, id } = await params;
+  const cycleId = parseCanonicalNonNegativeSafeInteger(id);
+  if (cycleId === null) notFound();
+
   const t = await getTranslations({ locale, namespace: 'meta' });
   return createMetadata(
-    t('allocationInfo.title'),
-    t('allocationInfo.description'),
+    t('allocationInfo.titleFor', { id: cycleId }),
+    t('allocationInfo.descriptionFor', { id: cycleId }),
     undefined,
-    undefined,
+    `/allocation/${id}`,
     { locale },
   );
 }
@@ -27,6 +33,9 @@ export const revalidate = 300;
 
 export default async function Page({ params }: PageProps) {
   const { locale, id } = await params;
+  const cycleId = parseCanonicalNonNegativeSafeInteger(id);
+  if (cycleId === null) notFound();
+
   setRequestLocale(locale);
-  return <AllocationInfoPage roundNum={parseInt(id, 10)} />;
+  return <AllocationInfoPage roundNum={cycleId} />;
 }
