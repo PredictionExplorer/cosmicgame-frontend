@@ -3,9 +3,10 @@
 import 'yet-another-react-lightbox/styles.css';
 
 import { useState, useMemo, useEffect, useCallback, type ChangeEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Lightbox from 'yet-another-react-lightbox';
 import { usePublicClient } from 'wagmi';
+import { isAddress } from 'viem';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown, Expand, Trophy } from 'lucide-react';
 
@@ -37,6 +38,7 @@ import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import { useNotification } from '@/contexts/NotificationContext';
 import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
 import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
+import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 import {
   useDashboardInfo,
   useCSTInfo,
@@ -102,6 +104,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const t = useTranslations('detail');
   const tCommon = useTranslations('common');
   const tToasts = useTranslations('toasts');
+  const locale = useLocale();
   const [openDialog, setOpenDialog] = useState(false);
   const [openVideo, setOpenVideo] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
@@ -172,6 +175,14 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   }, [canGoPrev, canGoNext, handlePrev, handleNext]);
 
   const handleClickTransfer = async () => {
+    if (!isAddress(address)) {
+      setNotification({
+        text: tToasts('transfer.common.invalidRecipient'),
+        type: 'error',
+        visible: true,
+      });
+      return;
+    }
     const { ethereum } = window as Window & {
       ethereum?: { request: (args: { method: string; params: unknown[] }) => Promise<unknown> };
     };
@@ -202,11 +213,26 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const handleTransfer = async () => {
     handleCloseDialog();
     if (!nftContract || !account) return;
+    if (!isAddress(address)) {
+      setNotification({
+        text: tToasts('transfer.common.invalidRecipient'),
+        type: 'error',
+        visible: true,
+      });
+      return;
+    }
     try {
       const hash = await nftContract.write.transferFrom?.([account, address, tokenId]);
-      if (hash) await publicClient?.waitForTransactionReceipt({ hash });
+      assertTransactionHash(hash);
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
       await Promise.all([refetchCSTInfo(), refetchTransferHistory()]);
       setAddress('');
+      setNotification({
+        text: tToasts('transfer.nft.detailTransferConfirmed'),
+        type: 'success',
+        visible: true,
+      });
     } catch (err) {
       if (isUserRejection(err)) {
         setNotification({
@@ -215,8 +241,9 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           visible: true,
         });
       } else {
+        reportError(err, 'transfer Cosmic Signature NFT');
         setNotification({
-          text: 'Please input a valid address for the token receiver!',
+          text: getEthErrorMessage(err, tToasts('transfer.nft.failed'), { locale }),
           type: 'error',
           visible: true,
         });
@@ -228,13 +255,15 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     if (!nftContract) return;
     try {
       const hash = await nftContract.write.setNftName?.([tokenId, tokenName]);
-      if (hash) await publicClient?.waitForTransactionReceipt({ hash });
+      assertTransactionHash(hash);
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
       setTimeout(async () => {
         await Promise.all([refetchCSTInfo(), refetchNameHistory()]);
       }, 3000);
       setTokenName('');
       setNotification({
-        text: 'The token name has been changed successfully!',
+        text: tToasts('transfer.nft.nameSet'),
         type: 'success',
         visible: true,
       });
@@ -246,7 +275,8 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           text: tToasts('walletTransactionCancelled'),
         });
       } else {
-        const msg = getEthErrorMessage(err, 'An error occurred while setting the token name.');
+        reportError(err, 'set Cosmic Signature NFT name');
+        const msg = getEthErrorMessage(err, tToasts('transfer.nft.nameSetFailed'), { locale });
         setNotification({ visible: true, type: 'error', text: msg });
       }
     }
@@ -256,13 +286,15 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     if (!nftContract) return;
     try {
       const hash = await nftContract.write.setNftName?.([tokenId, '']);
-      if (hash) await publicClient?.waitForTransactionReceipt({ hash });
+      assertTransactionHash(hash);
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
       setTimeout(async () => {
         await Promise.all([refetchCSTInfo(), refetchNameHistory()]);
       }, 3000);
       setTokenName('');
       setNotification({
-        text: 'The token name has been cleared successfully!',
+        text: tToasts('transfer.nft.nameCleared'),
         type: 'success',
         visible: true,
       });
@@ -274,7 +306,8 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           text: tToasts('walletTransactionCancelled'),
         });
       } else {
-        const msg = getEthErrorMessage(err, 'An error occurred while clearing the token name.');
+        reportError(err, 'clear Cosmic Signature NFT name');
+        const msg = getEthErrorMessage(err, tToasts('transfer.nft.nameClearFailed'), { locale });
         setNotification({ visible: true, type: 'error', text: msg });
       }
     }

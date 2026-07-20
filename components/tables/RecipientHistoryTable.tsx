@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Trophy, Ticket, Heart, Layers, Coins, AlertTriangle } from 'lucide-react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -116,6 +116,7 @@ const WinningHistoryRow = ({
   showRoundColumn: boolean;
 }) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const { cosmicToken } = useContractAddresses();
   if (!history) return <TablePrimaryRow />;
 
@@ -149,7 +150,7 @@ const WinningHistoryRow = ({
           rel="noopener noreferrer"
           className="text-inherit"
         >
-          {convertTimestampToDateTime(history.TimeStamp)}
+          {convertTimestampToDateTime(history.TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
       {showWinnerAddr && (

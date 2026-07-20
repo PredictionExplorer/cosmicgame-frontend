@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import type { AnchoredTokenInfo, AnchorAction, AnchorDistributionImprint } from '@/services/api';
 import AnchorActionsTable from '@/components/anchoring/AnchorActionsTable';
 import { AnchoredTokensTable } from '@/components/anchoring/AnchoredTokensTable';
@@ -39,12 +41,14 @@ export function RWLKAnchoringPanel({
   handleUnstake,
   handleUnstakeMany,
 }: RWLKAnchoringPanelProps) {
+  const t = useTranslations('anchoring');
+
   return (
     <>
       <div>
         <SectionHeader
-          title="Anchored Tokens"
-          tooltip="RandomWalk NFTs you currently have anchored. Each anchored RandomWalk NFT is eligible for on-chain random selection in Anchored-NFT Stellar Selection."
+          title={t('panels.shared.anchoredTokens')}
+          tooltip={t('panels.randomWalk.anchoredTooltip')}
         />
         <AnchoredTokensTable
           list={anchoredTokens}
@@ -60,8 +64,8 @@ export function RWLKAnchoringPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Available for Anchoring"
-          tooltip="RandomWalk NFTs in your wallet that can be anchored for Anchored-NFT Stellar Selection eligibility, not ETH Anchor Distributions."
+          title={t('panels.shared.available')}
+          tooltip={t('panels.randomWalk.availableTooltip')}
         />
         <RWLKNFTTable
           list={userTokens}
@@ -77,16 +81,16 @@ export function RWLKAnchoringPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Anchored-NFT Stellar Selection"
-          tooltip="Cosmic Signature NFTs and paired CST imprinted when this wallet wins Anchored-NFT Stellar Selection through the on-chain random selection mechanism."
+          title={t('panels.randomWalk.selection')}
+          tooltip={t('panels.randomWalk.selectionTooltip')}
         />
         <RwalkAnchorDistributionImprintsTable list={rwlkImprints} />
       </div>
 
       <div className="mt-12">
         <SectionHeader
-          title="Anchor / Release History"
-          tooltip="A chronological record of all your anchor and release transactions."
+          title={t('panels.shared.history')}
+          tooltip={t('panels.shared.historyTooltip')}
         />
         <AnchorActionsTable list={stakingActions} IsRwalk={true} />
       </div>

@@ -124,6 +124,18 @@ describe('getEthErrorMessage', () => {
     expect(getEthErrorMessage({}, 'Custom fallback')).toBe('Custom fallback');
   });
 
+  it('hides arbitrary provider diagnostics behind the fallback for Chinese UI', () => {
+    const err = { data: { message: 'execution reverted: arbitrary English diagnostic' } };
+    expect(getEthErrorMessage(err, '交易未能完成。', { locale: 'zh' })).toBe('交易未能完成。');
+  });
+
+  it('preserves detailed provider diagnostics for English UI', () => {
+    const err = { data: { message: 'execution reverted: useful detail' } };
+    expect(getEthErrorMessage(err, 'Transaction failed.', { locale: 'en' })).toBe(
+      'execution reverted: useful detail',
+    );
+  });
+
   it('returns fallback for null', () => {
     expect(getEthErrorMessage(null)).toBe('An error occurred');
   });

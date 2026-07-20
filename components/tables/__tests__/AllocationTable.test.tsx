@@ -6,6 +6,18 @@ import { AllocationTable } from '@/components/tables/AllocationTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 const createAllocation = (overrides = {}) => ({
   RoundNum: 1,
   WinnerAddr: '0x1234567890abcdef1234567890abcdef12345678',
@@ -43,6 +55,8 @@ const createAllocation = (overrides = {}) => ({
   ...overrides,
 });
 
+beforeEach(() => jest.clearAllMocks());
+
 describe('AllocationTable', () => {
   it('renders skeleton rows when loading', () => {
     render(<AllocationTable list={[]} loading={true} />);
@@ -60,6 +74,7 @@ describe('AllocationTable', () => {
     render(<AllocationTable list={[createAllocation()]} loading={false} />);
     expect(screen.getByText('tables.allocation.cycle(cycle=1)')).toBeInTheDocument();
     expect(screen.getByText(convertTimestampToDateTime(1701346718))).toBeInTheDocument();
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
     expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('2.5000')).toBeInTheDocument();

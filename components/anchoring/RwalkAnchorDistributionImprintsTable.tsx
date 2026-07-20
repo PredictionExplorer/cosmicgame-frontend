@@ -1,6 +1,7 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -19,6 +20,8 @@ import { AddressLink } from '@/components/common/AddressLink';
 import type { AnchorDistributionImprint } from '@/services/api';
 
 const AnchorDistributionImprintsRow = ({ row }: { row: AnchorDistributionImprint }) => {
+  const locale = useLocale();
+
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -32,7 +35,7 @@ const AnchorDistributionImprintsRow = ({ row }: { row: AnchorDistributionImprint
           rel="noopener noreferrer"
           className="text-inherit"
         >
-          {convertTimestampToDateTime(row.TimeStamp)}
+          {convertTimestampToDateTime(row.TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
 
@@ -60,11 +63,12 @@ export const RwalkAnchorDistributionImprintsTable = ({
 }: {
   list: AnchorDistributionImprint[];
 }) => {
+  const t = useTranslations('anchoring');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No allocations yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.allocations')}</p>;
   }
 
   const startIndex = (page - 1) * perPage;
@@ -77,10 +81,18 @@ export const RwalkAnchorDistributionImprintsTable = ({
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('tables.randomWalkImprints.columns.datetime')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.randomWalkImprints.columns.recipient')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.randomWalkImprints.columns.cycle')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.randomWalkImprints.columns.tokenId')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

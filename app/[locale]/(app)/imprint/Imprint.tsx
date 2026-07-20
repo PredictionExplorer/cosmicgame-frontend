@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatEther, parseEther } from 'viem';
 import { usePublicClient } from 'wagmi';
 import { Sparkles } from 'lucide-react';
@@ -17,42 +17,45 @@ import { SectionDivider } from '@/components/ui/section-divider';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { asWriteFn } from '@/utils/contractWrite';
-import {
-  isUserRejection,
-  isEthProviderError,
-  reportError,
-  getEthErrorMessage,
-} from '@/utils/errors';
+import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 
 const Imprint = () => {
   const t = useTranslations('toasts');
+  const locale = useLocale();
   const [imprintCost, setImprintCost] = useState('0');
   const [nftIds, setNftIds] = useState<number[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { account } = useActiveWeb3React();
   const publicClient = usePublicClient();
   const nftContract = useRWLKNFTContract();
 
   const handleImprint = async () => {
-    if (nftContract) {
-      try {
-        const abiImprintCost = (await nftContract.read.getMintPrice?.()) as bigint; // lexicon-allow-abi
-        const newPrice = parseFloat(formatEther(abiImprintCost)) * 1.01;
+    if (!nftContract) {
+      toast.error(t('imprint.contractUnavailable'));
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const abiImprintCost = (await nftContract.read.getMintPrice?.()) as bigint; // lexicon-allow-abi
+      const newPrice = parseFloat(formatEther(abiImprintCost)) * 1.01;
 
-        const hash = await asWriteFn(nftContract.write.mint)({
-          // lexicon-allow-abi
-          value: parseEther(newPrice.toFixed(6)),
-        });
-        await publicClient?.waitForTransactionReceipt({ hash });
-      } catch (err: unknown) {
-        if (isUserRejection(err)) {
-          toast.info(t('walletTransactionCancelled'));
-          return;
-        }
-        reportError(err, 'imprint RWLK NFT');
-        if (isEthProviderError(err)) {
-          alert(getEthErrorMessage(err, 'Imprint failed'));
-        }
+      const hash = await asWriteFn(nftContract.write.mint)({
+        // lexicon-allow-abi
+        value: parseEther(newPrice.toFixed(6)),
+      });
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
+      toast.success(t('imprint.confirmed'));
+    } catch (err: unknown) {
+      if (isUserRejection(err)) {
+        toast.info(t('walletTransactionCancelled'));
+        return;
       }
+      reportError(err, 'imprint RWLK NFT');
+      toast.error(getEthErrorMessage(err, t('imprint.failed'), { locale }));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -111,8 +114,8 @@ const Imprint = () => {
             {imprintCost} <span className="text-primary">ETH</span>
           </p>
           <p className="text-sm text-muted-foreground mt-2">Current imprint cost</p>
-          <Button size="lg" onClick={handleImprint} className="w-full mt-6">
-            Imprint Now
+          <Button size="lg" onClick={handleImprint} className="w-full mt-6" disabled={isSubmitting}>
+            {isSubmitting ? t('imprint.imprinting') : 'Imprint Now'}
           </Button>
         </div>
       </div>

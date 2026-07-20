@@ -5,8 +5,9 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { useState } from 'react';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
+import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, convertTimestampToDateTime, isWalletAddress } from '@/utils';
+import { getExplorerUrl, convertTimestampToDateTime, getWalletKind } from '@/utils';
 
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -33,10 +34,16 @@ interface TransferRow extends CSTTransferRecord {
 }
 
 const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
+  const t = useTranslations('myPages');
+  const locale = useLocale();
   const contractAddrs = useContractAddresses();
   if (!row) {
     return <TablePrimaryRow />;
   }
+  const fromAddress = row.FromAddr ?? '';
+  const toAddress = row.ToAddr ?? '';
+  const fromWalletKind = getWalletKind(fromAddress, contractAddrs);
+  const toWalletKind = getWalletKind(toAddress, contractAddrs);
 
   return (
     <TablePrimaryRow className={(row.TransferType ?? 0) > 0 ? 'bg-white/[0.06]' : ''}>
@@ -47,47 +54,47 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(row.TimeStamp)}
+          {convertTimestampToDateTime(row.TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {isWalletAddress(row.FromAddr ?? '', contractAddrs) !== '' ? (
+        {fromWalletKind ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <a
                 className="text-inherit text-[length:inherit] font-mono"
-                href={`/user/${row.FromAddr}`}
+                href={`/user/${fromAddress}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {isWalletAddress(row.FromAddr ?? '', contractAddrs)}
+                {t(`transferHistory.walletLabels.${fromWalletKind}`)}
               </a>
             </TooltipTrigger>
-            <TooltipContent>{row.FromAddr ?? ''}</TooltipContent>
+            <TooltipContent>{fromAddress}</TooltipContent>
           </Tooltip>
         ) : (
-          <AddressLink address={row.FromAddr ?? ''} url={`/user/${row.FromAddr}`} />
+          <AddressLink address={fromAddress} url={`/user/${fromAddress}`} />
         )}
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {isWalletAddress(row.ToAddr ?? '', contractAddrs) !== '' ? (
+        {toWalletKind ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <a
                 className="text-inherit text-[length:inherit] font-mono"
-                href={`/user/${row.ToAddr}`}
+                href={`/user/${toAddress}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {isWalletAddress(row.ToAddr ?? '', contractAddrs)}
+                {t(`transferHistory.walletLabels.${toWalletKind}`)}
               </a>
             </TooltipTrigger>
-            <TooltipContent>{row.ToAddr ?? ''}</TooltipContent>
+            <TooltipContent>{toAddress}</TooltipContent>
           </Tooltip>
         ) : (
-          <AddressLink address={row.ToAddr ?? ''} url={`/user/${row.ToAddr}`} />
+          <AddressLink address={toAddress} url={`/user/${toAddress}`} />
         )}
       </TablePrimaryCell>
 
@@ -106,13 +113,14 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
 };
 
 const CosmicSignatureTransfersTable = ({ list }: { list: TransferRow[] }) => {
+  const t = useTranslations('myPages');
   const perPage = 10;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
     return (
       <div className="p-10 text-center text-sm font-medium text-muted-foreground">
-        No transfers yet.
+        {t('transferHistory.nft.empty')}
       </div>
     );
   }
@@ -125,10 +133,10 @@ const CosmicSignatureTransfersTable = ({ list }: { list: TransferRow[] }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>From</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>To</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('shared.datetime')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('shared.from')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('shared.to')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('shared.tokenId')}</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>
@@ -145,13 +153,8 @@ const CosmicSignatureTransfersTable = ({ list }: { list: TransferRow[] }) => {
 };
 
 const CosmicSignatureTransfersPage = ({ address: rawAddress }: { address: string }) => {
-  let address = rawAddress;
-
-  if (isAddress(address.toLowerCase())) {
-    address = getAddress(address.toLowerCase());
-  } else {
-    address = 'Invalid Address';
-  }
+  const t = useTranslations('myPages');
+  const address = isAddress(rawAddress.toLowerCase()) ? getAddress(rawAddress.toLowerCase()) : null;
 
   const { data: cosmicSignatureTransfers = [], isLoading: loading } = useCSTTransfers(address);
 
@@ -159,22 +162,31 @@ const CosmicSignatureTransfersPage = ({ address: rawAddress }: { address: string
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
-          title="Cosmic Signature Transfers"
-          subtitle={address !== 'Invalid Address' ? address : undefined}
+          title={t('transferHistory.nft.title')}
+          subtitle={address ?? undefined}
           breadcrumbs={[
-            { label: 'Home', href: '/' },
-            ...(address !== 'Invalid Address'
-              ? ([{ label: 'User', href: `/user/${address}` }] as const)
-              : []),
-            { label: 'NFT transfers' },
+            { label: t('shared.home'), href: '/' },
+            ...(address ? ([{ label: t('shared.user'), href: `/user/${address}` }] as const) : []),
+            { label: t('transferHistory.breadcrumbs.nft') },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
         />
 
-        {loading ? (
+        {!address ? (
+          <div className={cn(detailPanelClass, 'p-10 text-center')} role="alert">
+            <p className="font-semibold text-foreground">
+              {t('transferHistory.nft.invalidAddress.title')}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t('transferHistory.nft.invalidAddress.description')}
+            </p>
+          </div>
+        ) : loading ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('transferHistory.loading')}
+            </p>
           </div>
         ) : (
           <div className={cn(detailPanelClass, 'overflow-x-auto p-2 sm:p-4')}>

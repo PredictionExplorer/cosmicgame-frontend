@@ -53,7 +53,7 @@ jest.mock('../../services/api', () => ({
   },
 }));
 
-const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
+const mockGetContractErrorDescriptor = jest.fn().mockReturnValue(null);
 
 jest.mock('../../utils/errors', () => ({
   isUserRejection: jest.fn((_err: unknown) => false),
@@ -61,7 +61,8 @@ jest.mock('../../utils/errors', () => ({
 }));
 
 jest.mock('../../utils/contractErrors', () => ({
-  getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
+  getContractErrorDescriptor: (...args: unknown[]) => mockGetContractErrorDescriptor(...args),
+  isEmptyContractReadError: jest.fn(() => false),
 }));
 
 import { useAllocationFinalize } from '../useAllocationFinalize';
@@ -83,7 +84,7 @@ beforeEach(() => {
   mockEstimateGas.mockResolvedValue(BigInt(500000));
   mockReadRoundNum.mockReset();
   mockReadRoundNum.mockResolvedValueOnce(BigInt(5)).mockResolvedValueOnce(BigInt(6));
-  mockGetContractErrorMessage.mockReturnValue(null);
+  mockGetContractErrorDescriptor.mockReturnValue(null);
   mockUsePublicClient.mockReturnValue({ waitForTransactionReceipt: mockWaitForReceipt });
   mockWaitForReceipt.mockResolvedValue({ status: 'success' });
   mockUseAllocationTime.mockReturnValue({ data: 1000 } as ReturnType<typeof useAllocationTime>);
@@ -267,7 +268,7 @@ describe('useAllocationFinalize', () => {
 
     expect(success).toBe(false);
     expect(mockReportError).toHaveBeenCalledWith(claimError, 'finalize-cycle');
-    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(claimError);
+    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(claimError, 'toasts.finalize.failed');
   });
 
   it('onFinalize user rejection: silently returns false with info toast', async () => {
@@ -286,12 +287,13 @@ describe('useAllocationFinalize', () => {
     expect(mockNotify).toHaveBeenCalledWith('info', 'toasts.walletTransactionCancelled');
   });
 
-  it('shows the decoded contract error message when getContractErrorMessage returns one', async () => {
+  it('selects the localized key for a decoded contract error', async () => {
     const err = new Error('MainPrizeEarlyClaim revert');
     mockFinalizeCycle.mockRejectedValueOnce(err);
-    mockGetContractErrorMessage.mockReturnValueOnce(
-      'Not enough time has elapsed to retrieve the Signature Allocation.',
-    );
+    mockGetContractErrorDescriptor.mockReturnValueOnce({
+      key: 'finalize.contractErrors.mainPrizeEarlyClaim',
+      errorName: 'MainPrizeEarlyClaim',
+    });
 
     const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
 
@@ -301,7 +303,7 @@ describe('useAllocationFinalize', () => {
 
     expect(mockNotify).toHaveBeenCalledWith(
       'error',
-      'Not enough time has elapsed to retrieve the Signature Allocation.',
+      'toasts.finalize.contractErrors.mainPrizeEarlyClaim',
     );
     expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
   });
@@ -319,6 +321,24 @@ describe('useAllocationFinalize', () => {
 
     expect(success).toBe(false);
     expect(mockReportError).toHaveBeenCalledWith(rxErr, 'finalize-cycle');
+    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(rxErr, 'toasts.finalize.failed');
+  });
+
+  it('treats a reverted receipt status as a localized finalize failure', async () => {
+    mockWaitForReceipt.mockResolvedValueOnce({ status: 'reverted' });
+    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onFinalize();
+    });
+
+    expect(success).toBe(false);
+    expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'finalize-cycle');
+    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(
+      expect.any(Error),
+      'toasts.finalize.failed',
+    );
   });
 
   it('onFinalize with no contract: notifies error, returns false, never calls write', async () => {
@@ -332,10 +352,7 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(success).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith(
-      'error',
-      'Please connect your wallet and ensure you are on the correct network.',
-    );
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.wallet.connectCorrectNetwork');
     expect(mockFinalizeCycle).not.toHaveBeenCalled();
   });
 
@@ -352,10 +369,7 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(success).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith(
-      'error',
-      'Network unavailable — please reconnect your wallet.',
-    );
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.network.unavailable');
     expect(mockFinalizeCycle).not.toHaveBeenCalled();
   });
 
@@ -375,7 +389,7 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(success).toBe(true); // still true — tx succeeded
-    expect(mockNotify).toHaveBeenCalledWith('warning', expect.stringContaining('did not advance'));
+    expect(mockNotify).toHaveBeenCalledWith('warning', 'toasts.finalize.roundDidNotAdvance');
     expect(mockApi.create).not.toHaveBeenCalled();
     expect(mockPush).not.toHaveBeenCalled();
   });
@@ -390,7 +404,7 @@ describe('useAllocationFinalize', () => {
       await result.current.onFinalize();
     });
 
-    expect(mockNotify).toHaveBeenCalledWith('warning', expect.stringContaining('did not advance'));
+    expect(mockNotify).toHaveBeenCalledWith('warning', 'toasts.finalize.roundDidNotAdvance');
   });
 
   // ─────────────────────────────────────────────
@@ -410,10 +424,7 @@ describe('useAllocationFinalize', () => {
 
     expect(success).toBe(true);
     expect(mockReportError).toHaveBeenCalledWith(apiErr, 'post-claim-api');
-    expect(mockNotify).toHaveBeenCalledWith(
-      'warning',
-      expect.stringContaining('Token metadata may still be updating'),
-    );
+    expect(mockNotify).toHaveBeenCalledWith('warning', 'toasts.finalize.metadataUpdating');
     expect(mockPush).toHaveBeenCalled();
   });
 

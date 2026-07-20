@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -27,6 +28,8 @@ interface TokenRowProps {
 }
 
 const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
+  const t = useTranslations('tables');
+  const locale = useLocale();
   if (!token) return <TablePrimaryRow />;
 
   const donatedEth =
@@ -47,7 +50,7 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(token.TimeStamp)}
+          {convertTimestampToDateTime(token.TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
 
@@ -102,7 +105,9 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
         )}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{token.Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {token.Claimed ? t('attachedAssets.status.yes') : t('attachedAssets.status.no')}
+      </TablePrimaryCell>
 
       {handleClaim && (
         <TablePrimaryCell>
@@ -113,7 +118,7 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
               }
               data-testid="Claim Button"
             >
-              Claim
+              {t('attachedAssets.actions.claim')}
             </Button>
           )}
         </TablePrimaryCell>
@@ -128,11 +133,12 @@ interface DonatedERC20TableProps {
 }
 
 const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
 
   if (!list || list.length === 0) {
-    return <p>No attached ERC20 tokens yet.</p>;
+    return <p>{t('attachedAssets.erc20.empty')}</p>;
   }
 
   const pageSlice = list.slice((page - 1) * perPage, page * perPage);
@@ -144,16 +150,30 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
           <TablePrimary>
             <TablePrimaryHead>
               <Tr>
-                <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Cycle #</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Attached Amount</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Retrieved Amount</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Retrieved</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">
+                  {t('attachedAssets.erc20.columns.datetime')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('attachedAssets.erc20.columns.cycle')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">
+                  {t('attachedAssets.erc20.columns.tokenAddress')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('attachedAssets.erc20.columns.attachedAmount')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('attachedAssets.erc20.columns.retrievedAmount')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('attachedAssets.erc20.columns.recipient')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('attachedAssets.erc20.columns.retrieved')}
+                </TablePrimaryHeadCell>
                 {handleClaim && (
                   <TablePrimaryHeadCell>
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">{t('attachedAssets.aria.actions')}</span>
                   </TablePrimaryHeadCell>
                 )}
               </Tr>
@@ -180,6 +200,9 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
 
 /** Plain table for Save as PDF (Skia often drops responsive-table output). */
 function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
+  const t = useTranslations('tables');
+  const locale = useLocale();
+
   return (
     <div
       aria-hidden="true"
@@ -190,25 +213,25 @@ function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
         <thead>
           <tr>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
-              Datetime
+              {t('attachedAssets.erc20.columns.datetime')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Cycle #
+              {t('attachedAssets.erc20.columns.cycle')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
-              Token Address
+              {t('attachedAssets.erc20.columns.tokenAddress')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Attached Amount
+              {t('attachedAssets.erc20.columns.attachedAmount')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Retrieved Amount
+              {t('attachedAssets.erc20.columns.retrievedAmount')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
-              Recipient
+              {t('attachedAssets.erc20.columns.recipient')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Retrieved
+              {t('attachedAssets.erc20.columns.retrieved')}
             </th>
           </tr>
         </thead>
@@ -225,7 +248,7 @@ function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
             return (
               <tr key={`${token.EvtLogId}-${token.TxHash}-${token.TokenAddr}`}>
                 <td className="border border-foreground/15 p-2">
-                  {convertTimestampToDateTime(token.TimeStamp)}
+                  {convertTimestampToDateTime(token.TimeStamp, false, locale)}
                 </td>
                 <td className="border border-foreground/15 p-2 text-center">{token.RoundNum}</td>
                 <td className="border border-foreground/15 p-2 font-mono break-all">
@@ -241,7 +264,7 @@ function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
                   {token.WinnerAddr || '—'}
                 </td>
                 <td className="border border-foreground/15 p-2 text-center">
-                  {token.Claimed ? 'Yes' : 'No'}
+                  {token.Claimed ? t('attachedAssets.status.yes') : t('attachedAssets.status.no')}
                 </td>
               </tr>
             );

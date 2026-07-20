@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { writeContract } from '@wagmi/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Loader2, SendHorizontal } from 'lucide-react';
@@ -16,6 +16,7 @@ import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -53,6 +54,9 @@ export function MarketingCstRewardForm({
   historyHref,
 }: MarketingCstRewardFormProps) {
   const t = useTranslations('toasts');
+  const locale = useLocale();
+  const decimalsReadWarning = t('transfer.marketingCst.decimalsWarning');
+  const balanceReadFailed = t('transfer.marketingCst.balanceReadFailed');
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
   const [decimals, setDecimals] = useState(18);
@@ -98,7 +102,7 @@ export function MarketingCstRewardForm({
           );
         } catch (err) {
           reportError(err, 'MarketingWallet CST decimals read');
-          toast.warning('Unable to read CST decimals; assuming 18 decimal places.');
+          toast.warning(decimalsReadWarning);
         }
 
         const balance = (await publicClient.readContract({
@@ -116,7 +120,7 @@ export function MarketingCstRewardForm({
         reportError(err, 'MarketingWallet CST balance read');
         if (!cancelled) {
           setBalanceWei(null);
-          setBalanceError('Unable to read the outreach reserve CST balance. Please try again.');
+          setBalanceError(balanceReadFailed);
         }
       } finally {
         if (!cancelled) setBalanceLoading(false);
@@ -128,39 +132,45 @@ export function MarketingCstRewardForm({
     return () => {
       cancelled = true;
     };
-  }, [contractAddrs.cosmicToken, normalizedMarketingWallet, publicClient]);
+  }, [
+    balanceReadFailed,
+    contractAddrs.cosmicToken,
+    decimalsReadWarning,
+    normalizedMarketingWallet,
+    publicClient,
+  ]);
 
   const validateReward = (): ValidReward | null => {
     if (!contractAddrs.cosmicToken) {
-      toast.error('CST token address is not available yet.');
+      toast.error(t('transfer.marketingCst.tokenUnavailable'));
       return null;
     }
     if (!active || !account) {
-      toast.error('Connect your wallet before paying a CST reward.');
+      toast.error(t('transfer.marketingCst.walletRequired'));
       return null;
     }
     if (!normalizedMarketingWallet) {
-      toast.error('Outreach reserve wallet is not available.');
+      toast.error(t('transfer.marketingCst.reserveUnavailable'));
       return null;
     }
     if (!normalizedTreasurer) {
-      toast.error('Marketing wallet treasurer is not available.');
+      toast.error(t('transfer.marketingCst.treasurerUnavailable'));
       return null;
     }
     if (account.toLowerCase() !== normalizedTreasurer.toLowerCase()) {
-      toast.error('Connect the current marketing wallet treasurer before paying CST rewards.');
+      toast.error(t('transfer.marketingCst.treasurerRequired'));
       return null;
     }
 
     const normalizedRecipient = normalizeAddress(recipient);
     if (!normalizedRecipient || normalizedRecipient.toLowerCase() === zeroAddress) {
-      toast.error('Enter a valid recipient address.');
+      toast.error(t('transfer.common.invalidRecipient'));
       return null;
     }
 
     const amountText = amount.trim();
     if (!/^\d+(\.\d+)?$/.test(amountText)) {
-      toast.error('Enter a valid CST amount.');
+      toast.error(t('transfer.common.invalidAmount'));
       return null;
     }
 
@@ -168,20 +178,20 @@ export function MarketingCstRewardForm({
     try {
       amountWei = parseUnits(amountText, decimals);
     } catch {
-      toast.error('Enter a CST amount with a valid number of decimals.');
+      toast.error(t('transfer.common.invalidDecimals'));
       return null;
     }
 
     if (amountWei <= 0n) {
-      toast.error('Enter an amount greater than zero.');
+      toast.error(t('transfer.common.amountPositive'));
       return null;
     }
     if (balanceWei == null) {
-      toast.error('Outreach reserve CST balance is still loading. Please try again in a moment.');
+      toast.error(t('transfer.marketingCst.balanceLoading'));
       return null;
     }
     if (amountWei > balanceWei) {
-      toast.error('Insufficient outreach reserve CST balance.');
+      toast.error(t('transfer.marketingCst.insufficientBalance'));
       return null;
     }
 
@@ -205,7 +215,8 @@ export function MarketingCstRewardForm({
         chainId: activeChain.id,
       });
 
-      await publicClient?.waitForTransactionReceipt({ hash });
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
       setTxHash(hash);
       setRecipient('');
       setAmount('');
@@ -220,14 +231,14 @@ export function MarketingCstRewardForm({
         queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] }),
       ]);
 
-      toast.success('Marketing CST reward confirmed.');
+      toast.success(t('transfer.marketingCst.confirmed'));
     } catch (err) {
       if (isUserRejection(err)) {
         toast.info(t('walletTransactionCancelled'));
         return;
       }
       reportError(err, 'MarketingWallet payReward');
-      toast.error(getEthErrorMessage(err, 'Unable to pay CST reward. Please try again.'));
+      toast.error(getEthErrorMessage(err, t('transfer.marketingCst.failed'), { locale }));
     } finally {
       setSubmitting(false);
     }
@@ -265,7 +276,9 @@ export function MarketingCstRewardForm({
           <div>
             <p className="text-xs uppercase tracking-wider text-muted-foreground">Available CST</p>
             <p className="mt-1 font-semibold text-foreground">
-              {balanceLoading ? 'Loading...' : `${formatCstUnits(balanceWei, decimals)} CST`}
+              {balanceLoading
+                ? t('transfer.marketingCst.loading')
+                : `${formatCstUnits(balanceWei, decimals)} CST`}
             </p>
           </div>
           <div>
@@ -311,13 +324,17 @@ export function MarketingCstRewardForm({
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button type="submit" disabled={submitDisabled} aria-label="Pay CST reward">
+            <Button
+              type="submit"
+              disabled={submitDisabled}
+              aria-label={t('transfer.marketingCst.pay')}
+            >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
               ) : (
                 <SendHorizontal className="h-4 w-4" aria-hidden />
               )}
-              {submitting ? 'Paying...' : 'Pay CST Reward'}
+              {submitting ? t('transfer.marketingCst.paying') : t('transfer.marketingCst.pay')}
             </Button>
 
             {historyHref ? (
@@ -333,14 +350,14 @@ export function MarketingCstRewardForm({
 
         {txHash ? (
           <div className="mt-5 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] p-4 text-sm">
-            <p className="font-medium text-emerald-200">Marketing CST reward confirmed.</p>
+            <p className="font-medium text-emerald-200">{t('transfer.marketingCst.confirmed')}</p>
             <a
               href={getExplorerUrl('tx', txHash)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
             >
-              View transaction
+              {t('transfer.marketingCst.viewTransaction')}
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
             </a>
           </div>

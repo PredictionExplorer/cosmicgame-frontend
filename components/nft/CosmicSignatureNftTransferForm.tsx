@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { writeContract } from '@wagmi/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Loader2, SendHorizontal } from 'lucide-react';
@@ -19,6 +19,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { cn } from '@/lib/utils';
 import type { CSTTokenInfo } from '@/services/api';
 import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,8 @@ interface TransferProgress {
   failedTokenId: number | null;
 }
 
+type DisabledReason = 'anchored' | 'ownerChanged';
+
 interface EthereumProvider {
   request: (args: { method: string; params: unknown[] }) => Promise<unknown>;
 }
@@ -74,10 +77,13 @@ function isTokenTransferable(token: CSTTokenInfo, sourceAddress: string | null):
   return isSameAddress(token.CurOwnerAddr, sourceAddress);
 }
 
-function getDisabledReason(token: CSTTokenInfo, sourceAddress: string | null): string | null {
-  if (token.Staked) return 'Anchored - release before transfer';
+function getDisabledReason(
+  token: CSTTokenInfo,
+  sourceAddress: string | null,
+): DisabledReason | null {
+  if (token.Staked) return 'anchored';
   if (sourceAddress && token.CurOwnerAddr && !isSameAddress(token.CurOwnerAddr, sourceAddress)) {
-    return 'Owner changed - refresh before transfer';
+    return 'ownerChanged';
   }
   return null;
 }
@@ -85,10 +91,13 @@ function getDisabledReason(token: CSTTokenInfo, sourceAddress: string | null): s
 export function CosmicSignatureNftTransferForm({
   sourceAddress,
   tokens,
-  description = 'Select one or more Cosmic Signature NFTs and send them to another wallet address.',
+  description,
   historyHref,
 }: CosmicSignatureNftTransferFormProps) {
-  const t = useTranslations('toasts');
+  const t = useTranslations('myPages');
+  const tToast = useTranslations('toasts');
+  const locale = useLocale();
+  const resolvedDescription = description ?? t('nftTransfer.defaultDescription');
   const [recipient, setRecipient] = useState('');
   const [page, setPage] = useState(1);
   const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
@@ -156,34 +165,34 @@ export function CosmicSignatureNftTransferForm({
 
   const validateTransfer = (): ValidTransfer | null => {
     if (!contractAddrs.cosmicSignature) {
-      toast.error('Cosmic Signature NFT contract address is not available yet.');
+      toast.error(tToast('transfer.nft.contractUnavailable'));
       return null;
     }
     if (!active || !account) {
-      toast.error('Connect your wallet before sending NFTs.');
+      toast.error(tToast('transfer.nft.walletRequired'));
       return null;
     }
     if (!normalizedSource) {
-      toast.error('Source wallet is not available.');
+      toast.error(tToast('transfer.common.sourceUnavailable'));
       return null;
     }
     if (!isSameAddress(account, normalizedSource)) {
-      toast.error('Connect the source wallet before sending NFTs from it.');
+      toast.error(tToast('transfer.nft.sourceWalletRequired'));
       return null;
     }
 
     const normalizedRecipient = normalizeAddress(recipient);
     if (!normalizedRecipient || normalizedRecipient.toLowerCase() === zeroAddress) {
-      toast.error('Enter a valid recipient address.');
+      toast.error(tToast('transfer.common.invalidRecipient'));
       return null;
     }
     if (isSameAddress(normalizedRecipient, normalizedSource)) {
-      toast.error('Enter a recipient address different from your connected wallet.');
+      toast.error(tToast('transfer.nft.recipientMustDiffer'));
       return null;
     }
 
     if (selectedTransferableIds.length === 0) {
-      toast.error('Select at least one transferable NFT.');
+      toast.error(tToast('transfer.nft.selectOne'));
       return null;
     }
 
@@ -257,7 +266,8 @@ export function CosmicSignatureNftTransferForm({
           chainId: activeChain.id,
         });
 
-        await publicClient?.waitForTransactionReceipt({ hash });
+        const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+        assertSuccessfulTransactionReceipt(receipt);
         transferredIds.push(tokenId);
         confirmedHashes.push(hash);
         setProgress({
@@ -270,11 +280,7 @@ export function CosmicSignatureNftTransferForm({
 
       setSelectedTokenIds([]);
       setRecipient('');
-      toast.success(
-        validTransfer.tokenIds.length === 1
-          ? 'NFT transfer confirmed.'
-          : `${validTransfer.tokenIds.length} NFT transfers confirmed.`,
-      );
+      toast.success(tToast('transfer.nft.confirmed', { count: validTransfer.tokenIds.length }));
     } catch (err) {
       setProgress((current) =>
         current
@@ -286,15 +292,16 @@ export function CosmicSignatureNftTransferForm({
       );
 
       if (isUserRejection(err)) {
-        toast.info(t('walletTransactionCancelled'));
+        toast.info(tToast('walletTransactionCancelled'));
       } else {
         reportError(err, 'Cosmic Signature NFT transfer');
         toast.error(
           getEthErrorMessage(
             err,
             currentTokenId == null
-              ? 'Unable to send selected NFTs. Please try again.'
-              : `Unable to transfer NFT #${currentTokenId}. Please try again.`,
+              ? tToast('transfer.nft.failed')
+              : tToast('transfer.nft.failedToken', { tokenId: currentTokenId }),
+            { locale },
           ),
         );
       }
@@ -344,38 +351,39 @@ export function CosmicSignatureNftTransferForm({
     <>
       <Card>
         <CardHeader>
-          <CardDescription>{description}</CardDescription>
+          <CardDescription>{resolvedDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/15 bg-primary/[0.045] p-4 text-sm">
-            <p className="max-w-md text-muted-foreground">
-              Looking to sell instead of sending directly? Use the marketplace to list or acquire
-              Cosmic Signature NFTs.
-            </p>
-            <NftMarketplaceButton variant="compact" label="Buy or sell NFTs" />
+            <p className="max-w-md text-muted-foreground">{t('nftTransfer.marketplacePrompt')}</p>
+            <NftMarketplaceButton variant="compact" label={t('nftTransfer.marketplace')} />
           </div>
           <div className="mb-6 grid gap-3 rounded-lg border border-white/[0.06] bg-white/[0.025] p-4 text-sm sm:grid-cols-3">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                Source wallet
+                {t('nftTransfer.sourceWallet')}
               </p>
               <p className="mt-1 font-mono text-foreground">
-                {normalizedSource ? shortenHex(normalizedSource, 6) : 'Unavailable'}
+                {normalizedSource ? shortenHex(normalizedSource, 6) : t('shared.unavailable')}
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">Owned NFTs</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                {t('nftTransfer.ownedNfts')}
+              </p>
               <p className="mt-1 font-semibold text-foreground">{tokens.length}</p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">Selected</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                {t('nftTransfer.selected')}
+              </p>
               <p className="mt-1 font-semibold text-foreground">{selectedTransferableIds.length}</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="nft-recipient">Recipient address</Label>
+              <Label htmlFor="nft-recipient">{t('nftTransfer.recipientAddress')}</Label>
               <Input
                 id="nft-recipient"
                 value={recipient}
@@ -388,16 +396,18 @@ export function CosmicSignatureNftTransferForm({
 
             {tokens.length === 0 ? (
               <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-5 text-sm text-muted-foreground">
-                You do not have any Cosmic Signature NFTs in this wallet.
+                {t('nftTransfer.empty')}
               </div>
             ) : (
               <div className="space-y-4" data-testid="nft-transfer-picker">
                 <div className="flex flex-col gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-sm text-muted-foreground">
-                    <p className="font-medium text-foreground">Choose NFTs to transfer</p>
+                    <p className="font-medium text-foreground">{t('nftTransfer.pickerTitle')}</p>
                     <p>
-                      {selectedTransferableIds.length} selected of {transferableTokenIds.length}{' '}
-                      transferable NFTs.
+                      {t('nftTransfer.pickerSummary', {
+                        selected: selectedTransferableIds.length,
+                        total: transferableTokenIds.length,
+                      })}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -408,7 +418,7 @@ export function CosmicSignatureNftTransferForm({
                       disabled={submitting || transferableTokenIds.length === 0}
                       onClick={handleSelectAll}
                     >
-                      Select all transferable
+                      {t('nftTransfer.selectAll')}
                     </Button>
                     <Button
                       type="button"
@@ -417,7 +427,7 @@ export function CosmicSignatureNftTransferForm({
                       disabled={submitting || pageItems.length === 0}
                       onClick={handleSelectCurrentPage}
                     >
-                      Select current page
+                      {t('nftTransfer.selectPage')}
                     </Button>
                     <Button
                       type="button"
@@ -426,14 +436,20 @@ export function CosmicSignatureNftTransferForm({
                       disabled={submitting || selectedTransferableIds.length === 0}
                       onClick={handleSelectNone}
                     >
-                      Clear selection
+                      {t('nftTransfer.clear')}
                     </Button>
                   </div>
                 </div>
 
-                <div className="space-y-3" aria-label="Cosmic Signature NFTs">
+                <div className="space-y-3" aria-label={t('nftTransfer.listAria')}>
                   {pageItems.map((token) => {
                     const disabledReason = getDisabledReason(token, normalizedSource);
+                    const disabledReasonLabel =
+                      disabledReason === 'anchored'
+                        ? t('nftTransfer.statusLabels.anchored')
+                        : disabledReason === 'ownerChanged'
+                          ? t('nftTransfer.statusLabels.ownerChanged')
+                          : null;
                     const transferable = disabledReason == null;
                     const selected = isSelected(token.TokenId);
 
@@ -457,18 +473,18 @@ export function CosmicSignatureNftTransferForm({
                           <Checkbox
                             checked={selected}
                             disabled={!transferable || submitting}
-                            aria-label={`Select NFT #${token.TokenId}`}
+                            aria-label={t('nftTransfer.selectAria', { id: token.TokenId })}
                             className="h-4 w-4"
                             onChange={() => handleSelectToggle(token)}
                           />
                           <span className="font-medium text-foreground sm:hidden">
-                            NFT #{token.TokenId}
+                            {t('nftTransfer.nftLabel', { id: token.TokenId })}
                           </span>
                         </div>
 
                         <div>
                           <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
-                            Token ID
+                            {t('nftTransfer.tokenId')}
                           </p>
                           <Link
                             href={`/detail/${token.TokenId}`}
@@ -483,16 +499,16 @@ export function CosmicSignatureNftTransferForm({
 
                         <div>
                           <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                            Custom name
+                            {t('nftTransfer.customName')}
                           </p>
                           <p className="mt-1 text-foreground">
-                            {token.TokenName ? token.TokenName : 'No custom name'}
+                            {token.TokenName ? token.TokenName : t('nftTransfer.noCustomName')}
                           </p>
                         </div>
 
                         <div>
                           <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                            Generation cycle
+                            {t('nftTransfer.generationCycle')}
                           </p>
                           {token.RoundNum != null ? (
                             <Link
@@ -502,18 +518,18 @@ export function CosmicSignatureNftTransferForm({
                               className="mt-1 inline-flex text-foreground underline-offset-4 hover:underline"
                               onClick={(event) => event.stopPropagation()}
                             >
-                              Cycle {token.RoundNum}
+                              {t('nftTransfer.cycle', { cycle: token.RoundNum })}
                             </Link>
                           ) : (
                             <span className="mt-1 inline-flex text-muted-foreground">
-                              Cycle data not available
+                              {t('nftTransfer.cycleUnavailable')}
                             </span>
                           )}
                         </div>
 
                         <div>
                           <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
-                            Status
+                            {t('nftTransfer.status')}
                           </p>
                           <span
                             className={cn(
@@ -525,7 +541,10 @@ export function CosmicSignatureNftTransferForm({
                                   : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200',
                             )}
                           >
-                            {disabledReason ?? (selected ? 'Selected' : 'Transferable')}
+                            {disabledReasonLabel ??
+                              (selected
+                                ? t('nftTransfer.statusLabels.selected')
+                                : t('nftTransfer.statusLabels.transferable'))}
                           </span>
                         </div>
                       </div>
@@ -554,12 +573,15 @@ export function CosmicSignatureNftTransferForm({
               >
                 <p className="font-medium text-foreground">
                   {progress.failedTokenId == null
-                    ? `Transferred ${progress.completed} of ${progress.total} NFTs`
-                    : `Transfer stopped at NFT #${progress.failedTokenId}`}
+                    ? t('nftTransfer.progress.transferred', {
+                        completed: progress.completed,
+                        total: progress.total,
+                      })
+                    : t('nftTransfer.progress.stopped', { id: progress.failedTokenId })}
                 </p>
                 {progress.currentTokenId != null && progress.failedTokenId == null ? (
                   <p className="mt-1 text-muted-foreground">
-                    Current NFT: #{progress.currentTokenId}
+                    {t('nftTransfer.progress.current', { id: progress.currentTokenId })}
                   </p>
                 ) : null}
               </div>
@@ -569,8 +591,8 @@ export function CosmicSignatureNftTransferForm({
               <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] p-4 text-sm">
                 <p className="font-medium text-emerald-200">
                   {txHashes.length === 1
-                    ? 'Latest transfer confirmed.'
-                    : `${txHashes.length} transfers confirmed.`}
+                    ? t('nftTransfer.confirmation.latest')
+                    : t('nftTransfer.confirmation.multiple', { count: txHashes.length })}
                 </p>
                 <a
                   href={getExplorerUrl('tx', txHashes[txHashes.length - 1]!)}
@@ -578,20 +600,24 @@ export function CosmicSignatureNftTransferForm({
                   rel="noopener noreferrer"
                   className="mt-2 inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
                 >
-                  View latest transaction
+                  {t('nftTransfer.confirmation.viewLatest')}
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
                 </a>
               </div>
             ) : null}
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <Button type="submit" disabled={submitDisabled} aria-label="Send selected NFTs">
+              <Button
+                type="submit"
+                disabled={submitDisabled}
+                aria-label={t('nftTransfer.sendAria')}
+              >
                 {submitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                 ) : (
                   <SendHorizontal className="h-4 w-4" aria-hidden />
                 )}
-                {submitting ? 'Sending...' : 'Send Selected NFTs'}
+                {submitting ? t('nftTransfer.sending') : t('nftTransfer.send')}
               </Button>
 
               {historyHref ? (
@@ -599,7 +625,7 @@ export function CosmicSignatureNftTransferForm({
                   href={historyHref}
                   className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                 >
-                  View NFT transfer history
+                  {t('nftTransfer.viewHistory')}
                 </a>
               ) : null}
             </div>
@@ -610,17 +636,14 @@ export function CosmicSignatureNftTransferForm({
       <Dialog open={warningOpen} onOpenChange={setWarningOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Recipient has no transaction history</DialogTitle>
-            <DialogDescription>
-              This address appears to have no transactions yet. Double-check the recipient before
-              sending; NFT transfers cannot be undone.
-            </DialogDescription>
+            <DialogTitle>{t('nftTransfer.warning.title')}</DialogTitle>
+            <DialogDescription>{t('nftTransfer.warning.description')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setWarningOpen(false)}>
-              Cancel
+              {t('nftTransfer.warning.cancel')}
             </Button>
-            <Button onClick={handleConfirmNewRecipient}>Continue transfer</Button>
+            <Button onClick={handleConfirmNewRecipient}>{t('nftTransfer.warning.continue')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

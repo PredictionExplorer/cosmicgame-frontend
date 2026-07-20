@@ -14,12 +14,12 @@
     "description": "Explore Cosmic Signature NFT artwork generated from deterministic three-body physics, on-chain seeds, spectral rendering, and Performance Cycle data."
   },
   "allocations": {
-    "title": "Allocation Recipients · Cosmic Signature",
-    "description": "Recipients of Signature Allocations, Chrono-Warrior Allocations, Anchor Distributions, and Stellar Selections by cycle."
+    "title": "Allocation Recipients | Cosmic Signature",
+    "description": "View the complete history of Cosmic Signature allocation recipients, cycle statistics, and ETH distributions across all finalized Performance Cycles."
   },
   "anchoring": {
-    "title": "Anchor Distributions · Cosmic Signature",
-    "description": "Anchor Cosmic Signature NFTs to the protocol to receive per-cycle ETH Anchor Distributions, or anchor Random Walk NFTs for Anchored-NFT Stellar Selection eligibility."
+    "title": "Anchoring | Cosmic Signature",
+    "description": "Anchor your Cosmic Signature NFTs to the protocol to receive per-cycle ETH Anchor Distributions. View global anchoring statistics and how the mechanism works on Arbitrum."
   },
   "statistics": {
     "title": "Statistics · Cosmic Signature",
@@ -30,12 +30,12 @@
     "description": "Questions worth answering plainly about Cosmic Signature — what the protocol is, how gestures work, and what it is not."
   },
   "myAllocations": {
-    "title": "My Allocations · Cosmic Signature",
-    "description": "Your allocation retrievals, anchor distributions, and Stellar Selection entries."
+    "title": "My Allocations | Cosmic Signature",
+    "description": "View and retrieve your pending ETH allocations, Stellar Selection distributions, Anchor Distributions, and attached assets from the Cosmic Signature protocol."
   },
   "myAnchors": {
-    "title": "My Anchors · Cosmic Signature",
-    "description": "Your anchored Cosmic Signature NFTs, ETH Anchor Distributions, Random Walk NFT anchors, and Anchored-NFT Stellar Selection history."
+    "title": "My Anchors | Cosmic Signature",
+    "description": "Manage your anchored Cosmic Signature and Random Walk NFTs. View ETH Anchor Distributions for Cosmic Signature NFTs and Anchored-NFT Stellar Selection history for Random Walk NFTs."
   },
   "contracts": {
     "title": "Contracts · Cosmic Signature",
@@ -62,8 +62,8 @@
     "description": "Complete history of protocol parameter adjustments in Cosmic Signature — gesture cost step-ups, cycle time additions, anchor distribution settings, and other coordination updates."
   },
   "distributionsByToken": {
-    "title": "Distributions By Token · Cosmic Signature",
-    "description": "Anchor Distribution details for a specific Cosmic Signature NFT — per-cycle ETH distribution history, retrieval status, and cumulative allocations."
+    "title": "Distributions By Token | Cosmic Signature",
+    "description": "Anchor Distribution details for a specific Cosmic Signature NFT — per-cycle ETH distribution history, retrieval status, and cumulative Anchor Distributions."
   },
   "mint": {
     "title": "Imprint RandomWalk NFT · Cosmic Signature",
@@ -78,11 +78,11 @@
     "description": "Full details for the active Performance Cycle: gesture history, leaderboards, attached contributions, and allocation distribution."
   },
   "allocationInfo": {
-    "title": "Allocation Information · Cosmic Signature",
+    "title": "Allocation Information | Cosmic Signature",
     "description": "Detailed allocation information for a Cosmic Signature cycle — recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations."
   },
   "anchorAction": {
-    "title": "Anchor Action Detail · Cosmic Signature",
+    "title": "Anchor Action Detail | Cosmic Signature",
     "description": "Details of a specific anchor action in Cosmic Signature — token type, anchored amounts, and distribution retrieval status."
   },
   "pageTerms": {
@@ -110,7 +110,7 @@
     "description": "Voluntary contributions to the Public Goods Vault from the Cosmic Signature community. Contributions support the configured Public Goods Beneficiary — currently Protocol Guild."
   },
   "allocationRetrieved": {
-    "title": "Retrieved Allocations · Cosmic Signature",
+    "title": "Retrieved Allocations | Cosmic Signature",
     "description": "Details of retrieved allocations from the Cosmic Signature protocol, including ETH receipts, Cosmic Signature NFT allocations, and Stellar Selection allocations."
   },
   "outreach": {
@@ -134,8 +134,24 @@
     "description": "Direct ETH contributions to the Cosmic Signature protocol broken down by Performance Cycle."
   },
   "myStatistics": {
-    "title": "My Statistics · Cosmic Signature",
-    "description": "Track your performance in Cosmic Signature — gesture history, anchor status, anchor distributions, and cycle participation."
+    "title": "My Statistics | Cosmic Signature",
+    "description": "Track your performance with Cosmic Signature's My Statistics page. View detailed gesture history, anchor status, distributions, and more. Stay informed and optimize your participation in our on-chain protocol."
+  },
+  "myTokens": {
+    "title": "My NFTs | Cosmic Signature",
+    "description": "View and manage the Cosmic Signature NFTs in your connected wallet, including optional transfers to another address."
+  },
+  "transferCst": {
+    "title": "Transfer CST | Cosmic Signature",
+    "description": "Send your Cosmic Signature CST tokens to another wallet address."
+  },
+  "cosmicSignatureTransfers": {
+    "title": "Cosmic Signature NFT Transfer History | Cosmic Signature",
+    "description": "Cosmic Signature NFT Transfer History"
+  },
+  "cosmicTokenTransfers": {
+    "title": "Cosmic Signature CST Token Transfer History | Cosmic Signature",
+    "description": "Cosmic Signature CST Token Transfer History"
   },
   "usedRwlkNfts": {
     "title": "Used RandomWalk NFTs · Cosmic Signature",

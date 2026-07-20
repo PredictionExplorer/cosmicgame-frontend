@@ -13,6 +13,22 @@
     "title": "Cosmic Signature 画廊 · 确定性三体 NFT 艺术",
     "description": "浏览 Cosmic Signature NFT 作品：由确定性三体物理、链上种子与光谱渲染生成，并融入演绎周期数据。"
   },
+  "allocations": {
+    "title": "分配名录 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 所有已收官演绎周期的获配记录、周期统计与 ETH 发放情况。"
+  },
+  "anchoring": {
+    "title": "锚定 · Cosmic Signature",
+    "description": "将 Cosmic Signature NFT 锚定至协议，即可在每个周期获得 ETH 锚定派发。查看全局锚定统计，以及该机制在 Arbitrum 上的运作原理。"
+  },
+  "myAllocations": {
+    "title": "我的分配 · Cosmic Signature",
+    "description": "查看并取回 Cosmic Signature 协议中待取回的 ETH 分配、星选分配、锚定派发与已附加资产。"
+  },
+  "myAnchors": {
+    "title": "我的锚定 · Cosmic Signature",
+    "description": "管理已锚定的 Cosmic Signature NFT 与 Random Walk NFT，查看 ETH 锚定派发和锚定 NFT 星选记录。"
+  },
   "tokenDetail": {
     "titleFor": "Cosmic Signature NFT #{id} · Cosmic Signature",
     "descriptionFor": "Cosmic Signature NFT #{id} 的属性与流转记录。这枚确定性三体 NFT 在 Arbitrum 上经光谱渲染生成。"
@@ -24,6 +40,42 @@
   "currentCycleFull": {
     "title": "当前演绎周期 · Cosmic Signature",
     "description": "当前演绎周期的完整详情：落笔历史、排行榜、已附加贡献与各轨道分配。"
+  },
+  "distributionsByToken": {
+    "title": "按代币查看锚定派发 · Cosmic Signature",
+    "description": "查看指定 Cosmic Signature NFT 的锚定派发明细，包括各周期 ETH 派发记录、取回状态与累计锚定派发额。"
+  },
+  "allocationInfo": {
+    "title": "分配详情 · Cosmic Signature",
+    "description": "查看单个演绎周期的获配者、签名分配、星选结果及已附加 NFT 流向。"
+  },
+  "anchorAction": {
+    "title": "锚定操作详情 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 单次锚定操作的代币类型、锚定数量与锚定派发的取回状态。"
+  },
+  "allocationRetrieved": {
+    "title": "已取回分配 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 已取回分配的详情，包括收到的 ETH、Cosmic Signature NFT 分配与星选分配。"
+  },
+  "myStatistics": {
+    "title": "我的统计 · Cosmic Signature",
+    "description": "查看 Cosmic Signature 中的落笔记录、获配记录、锚定状态、代币持有情况与可取回资产。"
+  },
+  "myTokens": {
+    "title": "我的 NFT · Cosmic Signature",
+    "description": "查看并管理已连接钱包中的 Cosmic Signature NFT，也可选择转移至其他地址。"
+  },
+  "transferCst": {
+    "title": "转账 CST · Cosmic Signature",
+    "description": "将 Cosmic Signature CST 代币转账至其他钱包地址。"
+  },
+  "cosmicSignatureTransfers": {
+    "title": "Cosmic Signature NFT 转移记录 · Cosmic Signature",
+    "description": "查看指定钱包的 Cosmic Signature NFT 转移记录，包括转出方、接收方、代币 ID 与时间。"
+  },
+  "cosmicTokenTransfers": {
+    "title": "Cosmic Signature CST 转账记录 · Cosmic Signature",
+    "description": "查看指定钱包的 CST 转账记录，包括转出方、接收方、数量与时间。"
   },
   "siteMap": {
     "title": "网站地图 · Cosmic Signature",

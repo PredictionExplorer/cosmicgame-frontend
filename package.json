@@ -27,6 +27,7 @@
     "i18n:sprint1": "tsx scripts/i18n-parity.ts --required scripts/i18n-sprint1-required.json",
     "i18n:sprint2": "tsx scripts/i18n-parity.ts --required scripts/i18n-sprint2-required.json",
     "i18n:sprint3": "tsx scripts/i18n-parity.ts --required scripts/i18n-sprint3-required.json",
+    "i18n:sprint4": "tsx scripts/i18n-parity.ts --required scripts/i18n-sprint4-required.json",
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "prepare": "husky"
   },

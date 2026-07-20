@@ -4,6 +4,18 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 import { GlobalAnchoredTokensTable } from '../GlobalAnchoredTokensTable';
 
 const createRow = (overrides = {}) => ({
@@ -16,15 +28,22 @@ const createRow = (overrides = {}) => ({
   ...overrides,
 });
 
+beforeEach(() => jest.clearAllMocks());
+
 describe('GlobalAnchoredTokensTable', () => {
   it('renders empty state message', () => {
     render(<GlobalAnchoredTokensTable list={[]} IsRWLK={false} />);
-    expect(screen.getByText('No tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.tokens')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<GlobalAnchoredTokensTable list={[createRow()]} IsRWLK={false} />);
-    for (const header of ['Anchor Datetime', 'Action ID', 'Token ID', 'Anchor-holder Address']) {
+    for (const header of [
+      'anchoring.tables.globalAnchoredTokens.headers.anchorDatetime.desktop',
+      'anchoring.tables.globalAnchoredTokens.headers.actionId.desktop',
+      'anchoring.tables.globalAnchoredTokens.headers.tokenId.desktop',
+      'anchoring.tables.globalAnchoredTokens.headers.holderAddress.desktop',
+    ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });
@@ -34,6 +53,7 @@ describe('GlobalAnchoredTokensTable', () => {
     expect(
       screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
     ).toBeGreaterThanOrEqual(1);
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
     expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(1);
   });
 

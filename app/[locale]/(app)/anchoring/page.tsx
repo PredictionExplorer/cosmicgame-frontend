@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
@@ -6,16 +7,24 @@ import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
 import AnchoringPage from './AnchoringPage';
 
-export const metadata: Metadata = createMetadata(
-  'Anchoring | Cosmic Signature',
-  'Anchor your Cosmic Signature NFTs to the protocol to receive per-cycle ETH Anchor Distributions. View global anchoring statistics and how the mechanism works on Arbitrum.',
-  undefined,
-  '/anchoring',
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(t('anchoring.title'), t('anchoring.description'), undefined, '/anchoring', {
+    locale,
+  });
+}
 
 export const revalidate = 300;
 
-export default function Page() {
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <PublicDataRouteSeoSummary route="anchoring" />

@@ -91,16 +91,16 @@ async function renderReadyForm(sourceAddress = SOURCE) {
 }
 
 function fillTransferForm(amount = '12.5', recipient = RECIPIENT) {
-  fireEvent.change(screen.getByLabelText('Recipient address'), {
+  fireEvent.change(screen.getByLabelText('myPages.transferCst.form.recipientAddress'), {
     target: { value: recipient },
   });
-  fireEvent.change(screen.getByLabelText('Amount'), {
+  fireEvent.change(screen.getByLabelText('myPages.transferCst.form.amount'), {
     target: { value: amount },
   });
 }
 
 function submitTransferForm() {
-  const button = screen.getByRole('button', { name: /send cst/i });
+  const button = screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' });
   const form = button.closest('form');
   expect(form).not.toBeNull();
   fireEvent.submit(form!);
@@ -124,10 +124,9 @@ describe('CstTransferForm', () => {
     expect(screen.getByText('Test source')).toBeInTheDocument();
     expect(screen.getByText('0x111111....111111')).toBeInTheDocument();
     expect(screen.getByText('100.00 CST')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /view cst transfer history/i })).toHaveAttribute(
-      'href',
-      `/cosmic-token-transfer/${SOURCE}`,
-    );
+    expect(
+      screen.getByRole('link', { name: 'myPages.transferCst.form.viewHistory' }),
+    ).toHaveAttribute('href', `/cosmic-token-transfer/${SOURCE}`);
   });
 
   it('rejects an invalid recipient before writing', async () => {
@@ -136,7 +135,7 @@ describe('CstTransferForm', () => {
 
     submitTransferForm();
 
-    expect(toast.error).toHaveBeenCalledWith('Enter a valid recipient address.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidRecipient');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -146,7 +145,7 @@ describe('CstTransferForm', () => {
 
     submitTransferForm();
 
-    expect(toast.error).toHaveBeenCalledWith('Enter an amount greater than zero.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.amountPositive');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -156,7 +155,7 @@ describe('CstTransferForm', () => {
 
     submitTransferForm();
 
-    expect(toast.error).toHaveBeenCalledWith('Enter a valid CST amount.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidAmount');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -166,7 +165,7 @@ describe('CstTransferForm', () => {
 
     submitTransferForm();
 
-    expect(toast.error).toHaveBeenCalledWith('Insufficient CST balance.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.cst.insufficientBalance');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -174,7 +173,9 @@ describe('CstTransferForm', () => {
     mockContractAddresses = { ...TEST_APP_CONTRACT_ADDRESSES, cosmicToken: '' };
     renderWithQuery(<CstTransferForm sourceAddress={SOURCE} />);
 
-    expect(screen.getByRole('button', { name: /send cst/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' }),
+    ).toBeDisabled();
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -185,9 +186,7 @@ describe('CstTransferForm', () => {
 
     submitTransferForm();
 
-    expect(toast.error).toHaveBeenCalledWith(
-      'Connect the source wallet before sending CST from it.',
-    );
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.cst.sourceWalletRequired');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -202,7 +201,9 @@ describe('CstTransferForm', () => {
     fillTransferForm('1.5');
     submitTransferForm();
 
-    await waitFor(() => expect(toast.warning).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(toast.warning).toHaveBeenCalledWith('toasts.transfer.cst.decimalsWarning'),
+    );
     await waitFor(() => expect(mockWriteContract).toHaveBeenCalled());
     expect(mockReportError).toHaveBeenCalledWith(
       expect.any(Error),
@@ -220,9 +221,11 @@ describe('CstTransferForm', () => {
     renderWithQuery(<CstTransferForm sourceAddress={SOURCE} />);
 
     expect(
-      await screen.findByText('Unable to read this wallet CST balance. Please try again.'),
+      await screen.findByText('myPages.transferCst.form.balanceReadError'),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /send cst/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' }),
+    ).toBeDisabled();
   });
 
   it('calls standard ERC-20 transfer, waits for receipt, and invalidates related queries', async () => {
@@ -244,17 +247,18 @@ describe('CstTransferForm', () => {
     );
     expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: TX_HASH });
 
-    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('CST transfer confirmed.'));
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith('toasts.transfer.cst.confirmed'),
+    );
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['userBalance', SOURCE] });
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['userBalance', RECIPIENT] });
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctTransfers', SOURCE] });
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctTransfers', RECIPIENT] });
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctBalancesDistribution'] });
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
-    expect(screen.getByRole('link', { name: /view transaction/i })).toHaveAttribute(
-      'href',
-      expect.stringContaining(TX_HASH),
-    );
+    expect(
+      screen.getByRole('link', { name: 'myPages.transferCst.form.viewTransaction' }),
+    ).toHaveAttribute('href', expect.stringContaining(TX_HASH));
   });
 
   it('shows an informational toast when the wallet rejects the transaction', async () => {
@@ -278,9 +282,22 @@ describe('CstTransferForm', () => {
 
     submitTransferForm();
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith('Unable to send CST. Please try again.'),
-    );
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('toasts.transfer.cst.failed'));
     expect(mockReportError).toHaveBeenCalledWith(err, 'Cosmic Signature CST transfer');
+  });
+
+  it('reports a reverted receipt and shows the localized CST fallback', async () => {
+    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
+    await renderReadyForm();
+    fillTransferForm('1');
+
+    submitTransferForm();
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('toasts.transfer.cst.failed'));
+    expect(mockReportError).toHaveBeenCalledWith(
+      expect.any(Error),
+      'Cosmic Signature CST transfer',
+    );
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });

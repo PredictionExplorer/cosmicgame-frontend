@@ -1,6 +1,6 @@
 import type { AppContractAddresses } from '@/config/networks';
 
-import { isWalletAddress } from '../wallet';
+import { getWalletKind, isWalletAddress } from '../wallet';
 
 const SAMPLE_WALLETS: AppContractAddresses = {
   randomWalkNft: '',
@@ -15,6 +15,23 @@ const SAMPLE_WALLETS: AppContractAddresses = {
   marketing: '0xaa00000000000000000000000000000000000005',
   implementation: '',
 };
+
+describe('getWalletKind', () => {
+  it.each([
+    ['cosmicSignatureAnchoring', SAMPLE_WALLETS.stakingCst],
+    ['randomWalkAnchoring', SAMPLE_WALLETS.stakingRwalk],
+    ['outreach', SAMPLE_WALLETS.marketing],
+    ['stellarSelection', SAMPLE_WALLETS.prizesWallet],
+    ['publicGoods', SAMPLE_WALLETS.charity],
+  ] as const)('returns the stable %s kind', (expectedKind, address) => {
+    expect(getWalletKind(address, SAMPLE_WALLETS)).toBe(expectedKind);
+  });
+
+  it('returns null for unknown and empty addresses', () => {
+    expect(getWalletKind('0x0000000000000000000000000000000000000000', SAMPLE_WALLETS)).toBeNull();
+    expect(getWalletKind('', SAMPLE_WALLETS)).toBeNull();
+  });
+});
 
 describe('isWalletAddress', () => {
   it('returns Cosmic Signature NFT anchoring label for the CST anchoring address', () => {

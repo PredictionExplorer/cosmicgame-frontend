@@ -9,6 +9,7 @@ const mockFetchStatusData = jest.fn();
 const mockTranslate = jest.fn((key: string) => `toasts.${key}`);
 
 jest.mock('next-intl', () => ({
+  useLocale: () => 'en',
   useTranslations: () => mockTranslate,
 }));
 
@@ -77,6 +78,9 @@ import { useClaimAllocations } from '../useClaimAllocations';
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockUsePublicClient.mockReturnValue({
+    waitForTransactionReceipt: mockWaitForTransactionReceipt,
+  });
   mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
   mockWriteWithdrawEverything.mockResolvedValue('0xtx1' as const);
   mockWriteClaimDonatedNft.mockResolvedValue('0xtx2' as const);
@@ -150,6 +154,11 @@ describe('useClaimAllocations', () => {
         await result.current.retrieveAllStellarSelectionETH([1]);
       });
       expect(mockFetchStatusData).toHaveBeenCalledTimes(1);
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.claim.stellarEthSuccess',
+        type: 'success',
+        visible: true,
+      });
     });
 
     it('calls onSuccess callback after success', async () => {
@@ -171,7 +180,7 @@ describe('useClaimAllocations', () => {
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'error',
-          text: expect.stringContaining('Please connect your wallet'),
+          text: 'toasts.claim.walletNotConnected',
         }),
       );
     });
@@ -191,7 +200,7 @@ describe('useClaimAllocations', () => {
     });
 
     it('shows cancelled notification when user rejects the tx', async () => {
-      const rejection = new Error('user rejected');
+      const rejection = { code: 4001, message: 'user rejected' };
       mockWriteWithdrawEverything.mockRejectedValueOnce(rejection);
       mockIsUserRejection.mockReturnValueOnce(true);
 
@@ -224,6 +233,26 @@ describe('useClaimAllocations', () => {
       expect(result.current.isClaiming.raffleETH).toBe(false);
     });
 
+    it('reports a reverted receipt with the localized claim fallback', async () => {
+      mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
+      const { result } = renderHook(() => useClaimAllocations());
+
+      await act(async () => {
+        await result.current.retrieveAllStellarSelectionETH([1]);
+      });
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(Error),
+        'retrieve all Stellar Selection ETH',
+      );
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.claim.failed',
+        type: 'error',
+        visible: true,
+      });
+      expect(mockFetchStatusData).not.toHaveBeenCalled();
+    });
+
     it('handles empty round list gracefully', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
@@ -232,13 +261,19 @@ describe('useClaimAllocations', () => {
       expect(mockWriteWithdrawEverything).toHaveBeenCalledWith([[], [], []]);
     });
 
-    it('does not call waitForTransactionReceipt when write returns undefined', async () => {
+    it('treats a missing transaction hash as a localized claim failure', async () => {
       mockWriteWithdrawEverything.mockResolvedValueOnce(undefined as never);
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
         await result.current.retrieveAllStellarSelectionETH([1]);
       });
       expect(mockWaitForTransactionReceipt).not.toHaveBeenCalled();
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.claim.failed',
+        type: 'error',
+        visible: true,
+      });
+      expect(mockFetchStatusData).not.toHaveBeenCalled();
     });
   });
 
@@ -258,6 +293,12 @@ describe('useClaimAllocations', () => {
       });
       expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx2' });
       expect(mockFetchStatusData).toHaveBeenCalled();
+      expect(mockTranslate).toHaveBeenCalledWith('claim.nftSuccess');
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.claim.nftSuccess',
+        type: 'success',
+        visible: true,
+      });
     });
 
     it('tracks the token id in claimingDonatedNFTs during the call', async () => {
@@ -574,13 +615,18 @@ describe('useClaimAllocations', () => {
   });
 
   describe('publicClient edge cases', () => {
-    it('still succeeds when publicClient is undefined (hydration edge)', async () => {
+    it('shows a localized failure when publicClient is unavailable', async () => {
       mockUsePublicClient.mockReturnValue(undefined as never);
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
         await result.current.retrieveAllStellarSelectionETH([1]);
       });
-      expect(mockFetchStatusData).toHaveBeenCalled();
+      expect(mockFetchStatusData).not.toHaveBeenCalled();
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.claim.failed',
+        type: 'error',
+        visible: true,
+      });
     });
   });
 

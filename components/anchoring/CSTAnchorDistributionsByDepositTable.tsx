@@ -1,6 +1,7 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -32,6 +33,9 @@ export interface CSTAnchorDistributionByDeposit {
 }
 
 const CSTAnchorDistributionsByDepositRow = ({ row }: { row: CSTAnchorDistributionByDeposit }) => {
+  const t = useTranslations('anchoring');
+  const locale = useLocale();
+
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -45,7 +49,7 @@ const CSTAnchorDistributionsByDepositRow = ({ row }: { row: CSTAnchorDistributio
           rel="noopener noreferrer"
           className="text-inherit"
         >
-          {convertTimestampToDateTime(row.TimeStamp)}
+          {convertTimestampToDateTime(row.TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
 
@@ -59,7 +63,9 @@ const CSTAnchorDistributionsByDepositRow = ({ row }: { row: CSTAnchorDistributio
       <TablePrimaryCell align="center">{row.DepositAmountEth.toFixed(4)}</TablePrimaryCell>
       <TablePrimaryCell align="center">{row.ClaimedAmountEth.toFixed(4)}</TablePrimaryCell>
       <TablePrimaryCell align="center">{row.YourClaimableAmountEth.toFixed(4)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.FullyClaimed ? 'Yes' : 'No'}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.FullyClaimed ? t('common.yes') : t('common.no')}
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
       <TablePrimaryCell align="center">{row.NumTokensCollected}</TablePrimaryCell>
       <TablePrimaryCell align="center">{row.YourTokensStaked}</TablePrimaryCell>
@@ -72,11 +78,12 @@ export const CSTAnchorDistributionsByDepositTable = ({
 }: {
   list: CSTAnchorDistributionByDeposit[];
 }) => {
+  const t = useTranslations('anchoring');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No distributions yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
   }
 
   const startIndex = (page - 1) * perPage;
@@ -89,16 +96,36 @@ export const CSTAnchorDistributionsByDepositTable = ({
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit Cycle</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Deposit Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Retrieved Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Your Retrievable Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Fully Retrieved?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Anchored NFTs</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Retrieved Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Your Anchored Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('tables.distributionsByDeposit.columns.depositDatetime')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.depositCycle')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.depositId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.totalDepositAmount')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.totalRetrievedAmount')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.yourRetrievableAmount')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.fullyRetrieved')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.totalAnchoredNfts')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.totalRetrievedTokens')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.distributionsByDeposit.columns.yourAnchoredTokens')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

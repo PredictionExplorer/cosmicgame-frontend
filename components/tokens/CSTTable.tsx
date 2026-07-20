@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
+import { useLocale, useTranslations } from 'next-intl';
 
 import {
   getExplorerUrl,
@@ -28,6 +29,8 @@ import type { CSTTokenInfo } from '@/services/api';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 function CSTRow({ nft }: { nft: CSTTokenInfo }) {
+  const t = useTranslations('myPages');
+  const locale = useLocale();
   const seed = nft?.Seed ?? '';
   const thumbURL = getThumbUrl(seed, 'micro');
   const fullURL = getAssetsUrl(`cosmicsignature/0x${seed}.png`);
@@ -51,7 +54,7 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(nft.TimeStamp)}
+          {convertTimestampToDateTime(nft.TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
 
@@ -80,23 +83,27 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{nft.Staked ? 'Yes' : 'No'}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {nft.Staked ? t('shared.yes') : t('shared.no')}
+      </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{nft.WasUnstaked ? 'Yes' : 'No'}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {nft.WasUnstaked ? t('shared.yes') : t('shared.no')}
+      </TablePrimaryCell>
 
       <TablePrimaryCell align="right">
         {nft.RecordType === 1 ? (
-          'Cosmic Signature NFT Stellar Selection'
+          t('tokens.table.types.stellarSelection')
         ) : nft.RecordType === 2 ? (
-          'Anchored-NFT Stellar Selection (RandomWalk anchor-holder)'
+          t('tokens.table.types.anchoredNftSelection')
         ) : nft.RecordType === 3 ? (
           <Link href={`/allocation/${nft.RoundNum}`} className="text-inherit">
-            Signature Allocation Recipient (#{nft.RoundNum})
+            {t('tokens.table.types.signatureAllocation', { cycle: nft.RoundNum ?? '' })}
           </Link>
         ) : nft.RecordType === 4 ? (
-          'Endurance Champion'
+          t('tokens.table.types.enduranceChampion')
         ) : nft.RecordType === 5 ? (
-          'Last CST Participant'
+          t('tokens.table.types.lastCstParticipant')
         ) : (
           ''
         )}
@@ -106,11 +113,12 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
 }
 
 export function CSTTable({ list }: { list: CSTTokenInfo[] }) {
+  const t = useTranslations('myPages');
   const [currentPage, setCurrentPage] = useState(1);
   const PER_PAGE = 5;
 
   if (list.length === 0) {
-    return <p>No tokens yet.</p>;
+    return <p>{t('tokens.table.empty')}</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -135,16 +143,18 @@ export function CSTTable({ list }: { list: CSTTokenInfo[] }) {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell>
-                <span className="sr-only">Details</span>
+                <span className="sr-only">{t('tokens.table.details')}</span>
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Recipient Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Currently Anchored?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Anchored Once?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Allocation Type</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">{t('tokens.table.datetime')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('tokens.table.tokenId')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('tokens.table.tokenName')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('tokens.table.cycle')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('tokens.table.recipientAddress')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('tokens.table.currentlyAnchored')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('tokens.table.anchoredOnce')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                {t('tokens.table.allocationType')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

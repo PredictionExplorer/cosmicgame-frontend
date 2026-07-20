@@ -37,17 +37,17 @@ beforeEach(() => jest.clearAllMocks());
 describe('CSTokensTable', () => {
   it('renders empty state when list is empty', () => {
     render(<CSTokensTable {...defaultProps} />);
-    expect(screen.getByText('No available tokens.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.tables.availableTokens.empty')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<CSTokensTable {...defaultProps} list={[createToken()]} />);
     for (const header of [
-      'Imprint Datetime',
-      'Token ID',
-      'Token Name',
-      'Cycle',
-      'Recipient Address',
+      'anchoring.tables.availableTokens.columns.imprintDatetime',
+      'anchoring.tables.availableTokens.columns.tokenId',
+      'anchoring.tables.availableTokens.columns.tokenName',
+      'anchoring.tables.availableTokens.columns.cycle',
+      'anchoring.tables.availableTokens.columns.recipientAddress',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
@@ -70,13 +70,15 @@ describe('CSTokensTable', () => {
   it('renders Anchor button for tokens that are not anchored', () => {
     const token = createToken({ Staked: false });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
-    expect(screen.getByText('Anchor')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.tables.availableTokens.actions.anchor')).toBeInTheDocument();
   });
 
   it('does not render Anchor button for anchored tokens', () => {
     const token = createToken({ Staked: true });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
-    expect(screen.queryByText('Anchor')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.tables.availableTokens.actions.anchor'),
+    ).not.toBeInTheDocument();
   });
 
   it('paginates with perPage=5', () => {
@@ -104,7 +106,7 @@ describe('CSTokensTable', () => {
     const token = createToken({ TokenId: 42, Staked: false });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
 
-    await user.click(screen.getByText('Anchor'));
+    await user.click(screen.getByText('anchoring.tables.availableTokens.actions.anchor'));
 
     await waitFor(() => {
       expect(defaultProps.handleStake).toHaveBeenCalledWith(42, false);
@@ -124,7 +126,9 @@ describe('CSTokensTable', () => {
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
 
-    expect(screen.getByText('Anchor Many')).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.tables.availableTokens.actions.anchorMany'),
+    ).toBeInTheDocument();
   });
 
   it('Anchor Many calls handleStakeMany with selected IDs and isRwlk=false flags', async () => {
@@ -139,7 +143,7 @@ describe('CSTokensTable', () => {
     const cell2 = screen.getAllByText('20').find((el) => el.closest('td'));
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
-    await user.click(screen.getByText('Anchor Many'));
+    await user.click(screen.getByText('anchoring.tables.availableTokens.actions.anchorMany'));
 
     await waitFor(() => {
       expect(defaultProps.handleStakeMany).toHaveBeenCalledWith(
@@ -157,7 +161,7 @@ describe('CSTokensTable', () => {
     ];
     render(<CSTokensTable {...defaultProps} list={list} />);
 
-    const anchorButtons = screen.getAllByText('Anchor');
+    const anchorButtons = screen.getAllByText('anchoring.tables.availableTokens.actions.anchor');
     await user.click(anchorButtons[0]!);
 
     await waitFor(() => {
@@ -170,7 +174,9 @@ describe('CSTokensTable', () => {
     const list2 = [createToken({ TokenId: 2, EvtLogId: 2 })];
     const { rerender } = render(<CSTokensTable {...defaultProps} list={list1} />);
     rerender(<CSTokensTable {...defaultProps} list={list2} />);
-    expect(screen.queryByText('Anchor Many')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.tables.availableTokens.actions.anchorMany'),
+    ).not.toBeInTheDocument();
   });
 
   it('Token ID links to detail page', () => {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { Layers, TrendingUp, Gift } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
@@ -28,6 +29,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 
 const MyAnchors = () => {
+  const t = useTranslations('myPages');
   const { account } = useActiveWeb3React();
   const { anchor, release, handleError, rwalkContract } = useAnchorActions();
 
@@ -71,38 +73,40 @@ const MyAnchors = () => {
   const heroStats: AnchoringStatItem[] = useMemo(
     () => [
       {
-        label: 'Your Anchored Cosmic Signature NFTs',
+        label: t('anchors.stats.cosmicSignature.label'),
         value: anchoredCSTokens.length.toLocaleString(),
-        tooltip:
-          'Number of Cosmic Signature NFTs you currently have anchored. Anchoring more Cosmic Signature NFTs increases your share of ETH Anchor Distributions.',
+        tooltip: t('anchors.stats.cosmicSignature.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'Your Anchored Random Walk NFTs',
+        label: t('anchors.stats.randomWalk.label'),
         value: anchoredRWLKTokens.length.toLocaleString(),
-        tooltip:
-          'Number of Random Walk NFTs you currently have anchored. Each anchored Random Walk NFT is eligible for Anchored-NFT Stellar Selection.',
+        tooltip: t('anchors.stats.randomWalk.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'Unretrieved Distributions',
+        label: t('anchors.stats.unretrieved.label'),
         value: unclaimedRewardEth > 0 ? `${unclaimedRewardEth.toFixed(4)} ETH` : '0 ETH',
-        tooltip:
-          'ETH Anchor Distributions allocated to your anchored Cosmic Signature NFTs but not yet retrieved. Releasing a Cosmic Signature NFT anchor automatically retrieves its accumulated distributions.',
+        tooltip: t('anchors.stats.unretrieved.tooltip'),
         icon: <Gift className="h-4 w-4" />,
         featured: true,
         gradient: true,
       },
       {
-        label: 'Distribution per Cosmic Signature NFT',
+        label: t('anchors.stats.distributionPerNft.label'),
         value: distributionPerCST.value,
-        tooltip:
-          'Current ETH Anchor Distribution per anchored Cosmic Signature NFT, calculated as the total anchoring pool (on-chain) divided by the indexed number of anchored Cosmic Signature NFTs.' +
-          distributionPerCST.tooltipSuffix,
+        tooltip: [
+          t('anchors.stats.distributionPerNft.tooltip'),
+          distributionPerCST.tooltipSuffix
+            ? t('anchors.stats.distributionPerNft.indexUnavailableSuffix')
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
         icon: <TrendingUp className="h-4 w-4" />,
       },
     ],
-    [anchoredCSTokens, anchoredRWLKTokens, unclaimedRewardEth, distributionPerCST],
+    [anchoredCSTokens, anchoredRWLKTokens, unclaimedRewardEth, distributionPerCST, t],
   );
 
   useEffect(() => {
@@ -131,18 +135,18 @@ const MyAnchors = () => {
         align="left"
         eyebrow={
           <SectionEyebrow tone="aurora" pulse>
-            Personal · Anchors
+            {t('anchors.eyebrow')}
           </SectionEyebrow>
         }
-        title="My Anchors"
+        title={t('anchors.title')}
         gradientTitle="signature"
-        subtitle="Manage your anchored NFTs and view Cosmic Signature NFT distributions"
+        subtitle={t('anchors.subtitle')}
       />
 
       {!account ? (
         <EmptyState
-          title="Wallet not connected"
-          description="Please connect your wallet to manage your anchors."
+          title={t('shared.walletNotConnected')}
+          description={t('anchors.walletDescription')}
         />
       ) : loading ? (
         <div data-testid="my-anchors-skeleton">
@@ -168,7 +172,7 @@ const MyAnchors = () => {
                     <Layers className="h-5 w-5" />
                   </span>
                   <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
-                    Cosmic Signature Anchoring
+                    {t('anchors.tabs.cosmicSignature')}
                   </span>
                 </div>
               </TabsTrigger>
@@ -178,7 +182,7 @@ const MyAnchors = () => {
                     <Layers className="h-5 w-5" />
                   </span>
                   <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
-                    Random Walk Anchoring
+                    {t('anchors.tabs.randomWalk')}
                   </span>
                 </div>
               </TabsTrigger>

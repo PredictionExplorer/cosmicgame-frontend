@@ -1,6 +1,7 @@
 'use client';
 
 import { SendHorizontal } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
@@ -20,6 +21,7 @@ import { useCSTTokensByUser } from '@/hooks/useApiQuery';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 function MyWallet() {
+  const t = useTranslations('myPages');
   const { account, active } = useActiveWeb3React();
   const {
     data: tokensRaw,
@@ -27,32 +29,34 @@ function MyWallet() {
     isError: hasError,
   } = useCSTTokensByUser(active && account ? account : undefined);
   const tokens = tokensRaw ?? [];
-  const error = hasError ? 'Failed to load Cosmic Signature NFTs.' : null;
 
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
-        title="My NFTs"
-        subtitle="Cosmic Signature NFTs in your connected wallet"
-        actions={<NftMarketplaceButton variant="secondary" label="Buy or sell NFTs" />}
+        title={t('tokens.page.title')}
+        subtitle={t('tokens.page.subtitle')}
+        actions={<NftMarketplaceButton variant="secondary" label={t('tokens.page.marketplace')} />}
       />
 
       {!active || !account ? (
         <EmptyState
           icon={<SendHorizontal className="h-8 w-8 text-muted-foreground/50" />}
-          title="Wallet not connected"
-          description="Please connect your wallet to view and manage your NFTs."
+          title={t('shared.walletNotConnected')}
+          description={t('tokens.page.walletDescription')}
         />
       ) : loading ? (
         <div className="flex justify-center py-8">
           <Spinner />
         </div>
-      ) : error ? (
-        <ErrorState title="Failed to load tokens" message={error} />
+      ) : hasError ? (
+        <ErrorState
+          title={t('tokens.page.loadErrorTitle')}
+          message={t('tokens.page.loadErrorMessage')}
+        />
       ) : (
         <div className="mt-12 space-y-8">
           <section>
-            <h2 className="mb-4 text-lg font-semibold">Cosmic Signature NFTs I Own</h2>
+            <h2 className="mb-4 text-lg font-semibold">{t('tokens.page.ownedTitle')}</h2>
             <CSTTable list={tokens} />
           </section>
 
@@ -64,9 +68,11 @@ function MyWallet() {
             <AccordionItem value="transfer-nfts" className="border-0">
               <AccordionTrigger className="text-left hover:no-underline">
                 <span>
-                  <span className="block text-sm font-semibold text-foreground">Transfer NFTs</span>
+                  <span className="block text-sm font-semibold text-foreground">
+                    {t('tokens.page.transferTitle')}
+                  </span>
                   <span className="mt-1 block text-xs font-normal text-muted-foreground">
-                    Optional: send selected Cosmic Signature NFTs to another wallet.
+                    {t('tokens.page.transferSubtitle')}
                   </span>
                 </span>
               </AccordionTrigger>
@@ -74,7 +80,7 @@ function MyWallet() {
                 <CosmicSignatureNftTransferForm
                   sourceAddress={account}
                   tokens={tokens}
-                  description="Select NFTs from this wallet only when you are ready to send them to another address."
+                  description={t('tokens.page.transferDescription')}
                   historyHref={`/cosmic-signature-transfer/${account}`}
                 />
               </AccordionContent>

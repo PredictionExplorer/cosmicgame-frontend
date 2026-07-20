@@ -7,12 +7,26 @@ import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable
 
 import { checkA11y, render, screen } from '@/test-utils';
 
+const mockFormatSeconds = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    formatSeconds: (seconds: number, locale?: string) => {
+      mockFormatSeconds(seconds, locale);
+      return actual.formatSeconds(seconds, locale);
+    },
+  };
+});
+
 const createChampion = (overrides = {}) => ({
   participant: '0x1234567890abcdef1234567890abcdef12345678',
   championTime: 3600,
   chronoWarrior: 1800,
   ...overrides,
 });
+
+beforeEach(() => jest.clearAllMocks());
 
 describe('EnduranceChampionsTable', () => {
   it('renders loading state when championList is null', () => {
@@ -38,6 +52,8 @@ describe('EnduranceChampionsTable', () => {
     );
     expect(screen.getAllByText(/1h/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/30m/).length).toBeGreaterThanOrEqual(1);
+    expect(mockFormatSeconds).toHaveBeenCalledWith(3600, 'en');
+    expect(mockFormatSeconds).toHaveBeenCalledWith(1800, 'en');
   });
 
   it('renders 0 chrono warrior time as formatted seconds', () => {

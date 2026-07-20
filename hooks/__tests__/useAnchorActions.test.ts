@@ -261,7 +261,7 @@ describe('useAnchorActions', () => {
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'success',
-          text: expect.stringContaining('anchored token 42'),
+          text: 'toasts.anchor.anchored(count=1)',
         }),
       );
     });
@@ -277,7 +277,7 @@ describe('useAnchorActions', () => {
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'error',
-          text: expect.stringContaining('connect your wallet'),
+          text: 'toasts.wallet.connectCorrectNetwork',
         }),
       );
     });
@@ -349,7 +349,7 @@ describe('useAnchorActions', () => {
 
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
-          text: expect.stringContaining('selected tokens were anchored'),
+          text: 'toasts.anchor.anchored(count=3)',
         }),
       );
     });
@@ -406,7 +406,7 @@ describe('useAnchorActions', () => {
     });
 
     it('handles user rejection cleanly without reporting an error', async () => {
-      mockCstRelease.mockRejectedValueOnce(new Error('user rejected'));
+      mockCstRelease.mockRejectedValueOnce({ code: 4001, message: 'user rejected' });
       mockIsUserRejection.mockReturnValueOnce(true);
       const { result } = renderHook(() => useAnchorActions());
       await act(async () => {
@@ -437,7 +437,7 @@ describe('useAnchorActions', () => {
       await flushDeferredAnchoringEffects();
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
-          text: expect.stringContaining('selected tokens were unanchored'),
+          text: 'toasts.anchor.released(count=2)',
         }),
       );
     });
@@ -489,22 +489,40 @@ describe('useAnchorActions', () => {
 
     it('shows the localized generic fallback when no provider message exists', () => {
       mockIsUserRejection.mockReturnValueOnce(false);
-      mockGetEthErrorMessage.mockReturnValueOnce('toasts.unexpectedError');
+      mockGetEthErrorMessage.mockReturnValueOnce('toasts.anchor.failed');
       const { result } = renderHook(() => useAnchorActions());
       result.current.handleError(new Error('unknown'));
       expect(mockReportError).toHaveBeenCalled();
       expect(mockGetEthErrorMessage).toHaveBeenCalledWith(
         expect.any(Error),
-        'toasts.unexpectedError',
+        'toasts.anchor.failed',
+        { locale: 'en' },
       );
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'error', text: 'toasts.unexpectedError' }),
+        expect.objectContaining({ type: 'error', text: 'toasts.anchor.failed' }),
       );
     });
   });
 
   describe('transaction receipt waiting', () => {
-    it('does not emit a success notification if the tx hash is undefined', async () => {
+    it('reports a reverted receipt and shows the localized anchor fallback', async () => {
+      mockIsApprovedForAll.mockResolvedValueOnce(true);
+      mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
+      const { result } = renderHook(() => useAnchorActions());
+
+      await act(async () => {
+        await result.current.anchor(42, false);
+      });
+
+      expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'anchor action error');
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.anchor.failed',
+        type: 'error',
+        visible: true,
+      });
+    });
+
+    it('shows the localized failure if the tx hash is undefined', async () => {
       mockIsApprovedForAll.mockResolvedValueOnce(true);
       mockCstAnchor.mockResolvedValueOnce(undefined as never);
       const { result } = renderHook(() => useAnchorActions());
@@ -512,12 +530,16 @@ describe('useAnchorActions', () => {
         await result.current.anchor(42, false);
       });
       await flushDeferredAnchoringEffects();
-      // No receipt => no user-facing "anchored successfully" notification,
-      // but queries still get invalidated so the UI re-queries state.
       const successCalls = mockSetNotification.mock.calls.filter(
         ([arg]) => arg?.type === 'success',
       );
       expect(successCalls).toHaveLength(0);
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.anchor.failed',
+        type: 'error',
+        visible: true,
+      });
+      expect(mockInvalidateQueries).not.toHaveBeenCalled();
     });
   });
 });

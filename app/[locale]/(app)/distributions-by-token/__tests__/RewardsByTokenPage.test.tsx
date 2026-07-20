@@ -1,6 +1,18 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen } from '@/test-utils';
 
 import RewardsByTokenPage from '../[address]/[tokenId]/RewardsByTokenPage';
+
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
 
 const mockUseAnchorDistributionsByUserByTokenDetails = jest.fn().mockReturnValue({
   data: undefined,
@@ -23,7 +35,7 @@ describe('RewardsByTokenPage', () => {
       error: null,
     });
     render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.loading')).toBeInTheDocument();
   });
 
   it('renders rewards table with data', () => {
@@ -51,7 +63,9 @@ describe('RewardsByTokenPage', () => {
       error: null,
     });
     render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
-    expect(screen.getByText('Anchor Distribution Details for Token 42')).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.distributionsByToken.title(tokenId=42)'),
+    ).toBeInTheDocument();
   });
 
   it('passes correct arguments to the hook', () => {
@@ -64,6 +78,39 @@ describe('RewardsByTokenPage', () => {
     expect(mockUseAnchorDistributionsByUserByTokenDetails).toHaveBeenCalledWith('0xABC', 7);
   });
 
+  it('passes the locale to all three timestamp formats', () => {
+    mockUseAnchorDistributionsByUserByTokenDetails.mockReturnValue({
+      data: {
+        0: {
+          DepositTimeStamp: 1000,
+          RoundNum: 1,
+          DepositId: 100,
+          DepositIndex: 0,
+          Claimed: true,
+          RewardEth: 0.5,
+          Stake: { TxHash: '0xstake', TimeStamp: 2000, NumStakedNFTs: 3 },
+          Unstake: {
+            EvtLogId: 1,
+            TxHash: '0xunstake',
+            TimeStamp: 3000,
+            NumStakedNFTs: 3,
+            MaxUnpaidDepositIndex: 0,
+            RewardAmountEth: 0.5,
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
+    fireEvent.click(screen.getByRole('button', { name: 'anchoring.common.aria.expandRow' }));
+
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1000, false, 'en');
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(2000, false, 'en');
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(3000, false, 'en');
+  });
+
   it('handles empty response', () => {
     mockUseAnchorDistributionsByUserByTokenDetails.mockReturnValue({
       data: {},
@@ -71,7 +118,9 @@ describe('RewardsByTokenPage', () => {
       error: null,
     });
     render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
-    expect(screen.getByText('Anchor Distribution Details for Token 42')).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.distributionsByToken.title(tokenId=42)'),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

@@ -1,17 +1,28 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
 import MyAnchors from './MyAnchors';
 
-export const metadata: Metadata = createMetadata(
-  'My Anchors | Cosmic Signature',
-  'Manage your anchored Cosmic Signature and Random Walk NFTs. View ETH Anchor Distributions for Cosmic Signature NFTs and Anchored-NFT Stellar Selection history for Random Walk NFTs.',
-  undefined,
-  '/my-anchors',
-  { index: false },
-);
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
 
-export default function Page() {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return createMetadata(
+    t('myAnchors.title'),
+    t('myAnchors.description'),
+    undefined,
+    '/my-anchors',
+    { index: false, locale },
+  );
+}
+
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return <MyAnchors />;
 }

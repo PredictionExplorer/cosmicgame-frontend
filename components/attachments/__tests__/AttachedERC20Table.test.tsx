@@ -25,20 +25,20 @@ const createToken = (overrides = {}) => ({
 describe('DonatedERC20Table', () => {
   it('renders empty state when list is empty', () => {
     render(<DonatedERC20Table list={[]} handleClaim={null} />);
-    expect(screen.getByText('No attached ERC20 tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.attachedAssets.erc20.empty')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
     const table = screen.getAllByRole('table')[0]!;
     for (const header of [
-      'Datetime',
-      'Cycle #',
-      'Token Address',
-      'Attached Amount',
-      'Retrieved Amount',
-      'Recipient',
-      'Retrieved',
+      'tables.attachedAssets.erc20.columns.datetime',
+      'tables.attachedAssets.erc20.columns.cycle',
+      'tables.attachedAssets.erc20.columns.tokenAddress',
+      'tables.attachedAssets.erc20.columns.attachedAmount',
+      'tables.attachedAssets.erc20.columns.retrievedAmount',
+      'tables.attachedAssets.erc20.columns.recipient',
+      'tables.attachedAssets.erc20.columns.retrieved',
     ]) {
       expect(within(table).getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
@@ -50,12 +50,14 @@ describe('DonatedERC20Table', () => {
     expect(within(table).getAllByText('1').length).toBeGreaterThanOrEqual(1);
     expect(within(table).getByText('5.25')).toBeInTheDocument();
     expect(within(table).getByText('1.50')).toBeInTheDocument();
-    expect(within(table).getByText('No')).toBeInTheDocument();
+    expect(within(table).getByText('tables.attachedAssets.status.no')).toBeInTheDocument();
   });
 
   it('shows Yes for claimed tokens', () => {
     render(<DonatedERC20Table list={[createToken({ Claimed: true })]} handleClaim={null} />);
-    expect(within(screen.getAllByRole('table')[0]!).getByText('Yes')).toBeInTheDocument();
+    expect(
+      within(screen.getAllByRole('table')[0]!).getByText('tables.attachedAssets.status.yes'),
+    ).toBeInTheDocument();
   });
 
   it('does not render Claim when handleClaim is null', () => {
@@ -65,7 +67,9 @@ describe('DonatedERC20Table', () => {
 
   it('renders Claim when handleClaim is set and token is not claimed', () => {
     render(<DonatedERC20Table list={[createToken()]} handleClaim={jest.fn()} />);
-    expect(screen.getByTestId('Claim Button')).toBeInTheDocument();
+    expect(screen.getByTestId('Claim Button')).toHaveTextContent(
+      'tables.attachedAssets.actions.claim',
+    );
   });
 
   it('passes the raw claim amount, not the display amount, to handleClaim', () => {

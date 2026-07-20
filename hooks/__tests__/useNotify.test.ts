@@ -100,8 +100,45 @@ describe('useNotify', () => {
       expect(mockSetNotification).toHaveBeenCalledWith({
         visible: true,
         type: 'error',
-        text: 'toasts.unexpectedError',
+        text: 'toasts.generic.rpcFailure',
       });
+    });
+
+    it('uses an action-specific localized fallback when provided', () => {
+      const error = 42;
+      const { result } = renderHook(() => useNotify());
+
+      act(() => {
+        result.current.notifyErrorFromEthers(error, 'toasts.transfer.cst.failed');
+      });
+
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        type: 'error',
+        text: 'toasts.transfer.cst.failed',
+      });
+      expect(mockReportError).toHaveBeenCalledWith(error, 'ethers provider error');
+    });
+
+    it('does not expose raw provider diagnostics in Chinese UI', () => {
+      const nextIntl = jest.requireMock('next-intl') as { useLocale: () => string };
+      const localeSpy = jest.spyOn(nextIntl, 'useLocale').mockReturnValue('zh');
+      mockIsEthProviderError.mockReturnValue(true);
+      const providerError = { data: { message: 'execution reverted: English diagnostic' } };
+
+      const { result } = renderHook(() => useNotify());
+      act(() => {
+        result.current.notifyErrorFromEthers(providerError, 'toasts.transfer.cst.failed');
+      });
+
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        type: 'error',
+        text: 'toasts.transfer.cst.failed',
+      });
+      expect(mockGetErrorMessage).not.toHaveBeenCalled();
+      expect(mockReportError).toHaveBeenCalledWith(providerError, 'ethers provider error');
+      localeSpy.mockRestore();
     });
 
     it('shows info when user rejected the transaction (EIP-1193 4001)', () => {

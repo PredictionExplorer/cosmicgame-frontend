@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
+
 import { render, screen, within, act, checkA11y } from '@/test-utils';
 
 import HomePage from '../HomePage';
@@ -309,6 +311,8 @@ jest.mock('../../../../utils/errors', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
+  resetUxScenarioForTest();
+  window.history.pushState({}, '', '/');
   mockAccount = '0xUser';
   Object.assign(mockGestureForm, {
     gestureType: 'ETH',
@@ -1236,6 +1240,24 @@ describe('HomePage', () => {
     expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
     expect(mockGestureForm.setMessage).toHaveBeenCalledWith('');
+  });
+
+  it('uses the localized toast key for a simulated gesture', async () => {
+    const user = userEvent.setup();
+    window.history.pushState({}, '', '/?uxScenario=live-mid-cycle');
+    resetUxScenarioForTest();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    render(<HomePage />);
+
+    const gestureButton = document.getElementById('gesture-submit');
+    expect(gestureButton).toBeInstanceOf(HTMLButtonElement);
+    await user.click(gestureButton!);
+
+    expect(mockNotify).toHaveBeenCalledWith('success', 'toasts.gesture.simulated(seconds=25)');
+    expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
   });
 
   it('submits a CST gesture through the CST interaction path', async () => {

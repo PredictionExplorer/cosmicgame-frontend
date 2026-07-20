@@ -30,7 +30,7 @@ states, `aria-label`s, form validation, SEO title/description, OG image text, JS
 | 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**    |
 | 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | **Done**    |
 | 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | **Done**    |
-| 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | Not started |
+| 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | **Done**    |
 | 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | Not started |
 | 6      | FAQ, legal & trust pages                                                   | 10 routes                    | Not started |
 | 7      | Long tail + SEO completion                                                 | 13 routes + SEO sweep        | Not started |
@@ -313,24 +313,65 @@ transfer forms). Transaction copy must be unambiguous — errors follow style gu
 
 | Route                                         | Sources                                                                          | E   | T   | R   | Q   |
 | --------------------------------------------- | -------------------------------------------------------------------------------- | --- | --- | --- | --- |
-| `/allocation`                                 | `(app)/allocation/`, `components/tables/AllocationTable.tsx` (5 tooltips)        | ☐   | ☐   | ☐   | ☐   |
-| `/allocation/[id]`                            | `AllocationInfoPage.tsx` (11 tooltips — densest file)                            | ☐   | ☐   | ☐   | ☐   |
-| `/allocation-finalized`                       | `(app)/allocation-finalized/`, `useAllocationFinalize.ts`                        | ☐   | ☐   | ☐   | ☐   |
-| `/anchoring`                                  | `(app)/anchoring/`, `components/anchoring/` (15 files), `useAnchorActions.ts`    | ☐   | ☐   | ☐   | ☐   |
-| `/anchor-action/[IsRwalk]/[actionId]`         | `(app)/anchor-action/`                                                           | ☐   | ☐   | ☐   | ☐   |
-| `/my-allocations`                             | `(app)/my-allocations/`, `components/winnings/`                                  | ☐   | ☐   | ☐   | ☐   |
-| `/my-anchors`                                 | `(app)/my-anchors/`                                                              | ☐   | ☐   | ☐   | ☐   |
-| `/my-statistics`                              | `(app)/my-statistics/`, `components/user-statistics/`                            | ☐   | ☐   | ☐   | ☐   |
-| `/my-tokens`                                  | `(app)/my-tokens/`, `components/tokens/`                                         | ☐   | ☐   | ☐   | ☐   |
-| `/transfer-cst`                               | `(app)/transfer-cst/`, `CstTransferForm.tsx`                                     | ☐   | ☐   | ☐   | ☐   |
-| `/cosmic-signature-transfer/[address]`        | `(app)/cosmic-signature-transfer/`                                               | ☐   | ☐   | ☐   | ☐   |
-| `/cosmic-token-transfer/[address]`            | `(app)/cosmic-token-transfer/`                                                   | ☐   | ☐   | ☐   | ☐   |
-| `/distributions-by-token/[address]/[tokenId]` | `(app)/distributions-by-token/`                                                  | ☐   | ☐   | ☐   | ☐   |
-| Toast/error sweep (cross-cutting)             | `hooks/`, `components/tokens/`, `utils/errors.ts` → `toasts`/`errors` namespaces | ☐   | ☐   | ☐   | ☐   |
+| `/allocation`                                 | `(app)/allocation/`, `components/tables/AllocationTable.tsx` (5 tooltips)        | ✅  | ✅  | ✅  | ✅  |
+| `/allocation/[id]`                            | `AllocationInfoPage.tsx` (11 tooltips — densest file)                            | ✅  | ✅  | ✅  | ✅  |
+| `/allocation-finalized`                       | `(app)/allocation-finalized/`, `useAllocationFinalize.ts`                        | ✅  | ✅  | ✅  | ✅  |
+| `/anchoring`                                  | `(app)/anchoring/`, `components/anchoring/` (15 files), `useAnchorActions.ts`    | ✅  | ✅  | ✅  | ✅  |
+| `/anchor-action/[IsRwalk]/[actionId]`         | `(app)/anchor-action/`                                                           | ✅  | ✅  | ✅  | ✅  |
+| `/my-allocations`                             | `(app)/my-allocations/`, `components/winnings/`                                  | ✅  | ✅  | ✅  | ✅  |
+| `/my-anchors`                                 | `(app)/my-anchors/`                                                              | ✅  | ✅  | ✅  | ✅  |
+| `/my-statistics`                              | `(app)/my-statistics/`, `components/user-statistics/`                            | ✅  | ✅  | ✅  | ✅  |
+| `/my-tokens`                                  | `(app)/my-tokens/`, `components/tokens/`                                         | ✅  | ✅  | ✅  | ✅  |
+| `/transfer-cst`                               | `(app)/transfer-cst/`, `CstTransferForm.tsx`                                     | ✅  | ✅  | ✅  | ✅  |
+| `/cosmic-signature-transfer/[address]`        | `(app)/cosmic-signature-transfer/`                                               | ✅  | ✅  | ✅  | ✅  |
+| `/cosmic-token-transfer/[address]`            | `(app)/cosmic-token-transfer/`                                                   | ✅  | ✅  | ✅  | ✅  |
+| `/distributions-by-token/[address]/[tokenId]` | `(app)/distributions-by-token/`                                                  | ✅  | ✅  | ✅  | ✅  |
+| Toast/error sweep (cross-cutting)             | `hooks/`, `components/tokens/`, `utils/errors.ts` → `toasts`/`errors` namespaces | ✅  | ✅  | ✅  | ✅  |
 
 **Acceptance:** every transaction flow (gesture, anchor, release, retrieve, transfer,
 finalize) runs end-to-end in Chinese — every confirmation, pending, success, and failure
 message. Wallet-rejection and RPC-failure paths explicitly QA'd in Chinese.
+
+**Sprint 4 completed 2026-07-19.** Verification: lint, type-check, Jest coverage
+(5,345 tests), production build (120 static pages; `/en/*` and `/zh/*` output preserved),
+English + Chinese lexicon scans, Sprint 1–4 required-key gates, en↔zh placeholder/tag
+parity, targeted Playwright coverage for every Sprint 4 route on desktop + mobile,
+allocation/anchoring tooltips, a rendered Chinese Sonner toast, and layout QA at
+320 / 768 / 1440 px with screenshots.
+
+Implementation notes / deviations:
+
+- Added and registered `allocation` (152 keys), `anchoring` (205), and `myPages`
+  (266) catalogs. The expanded `toasts` namespace has 129 translated keys. Sprint 4
+  owns 802 required zh keys across those catalogs plus its `tables` and `meta` keys
+  via `scripts/i18n-sprint4-required.json` (`yarn i18n:sprint4`, enforced in CI).
+- All 13 route metadata surfaces now use locale-aware `generateMetadata`; crawler-only
+  `PublicDataRouteSeoSummary`, JSON-LD/OG-image completion, and the broader SEO sweep
+  remain Sprint 7.
+- Transaction feedback was extracted from 17 production owners. Wallet cancellation
+  is consistently informational; known contract reverts use locale-independent
+  descriptors; arbitrary provider diagnostics are logged but replaced by actionable
+  Chinese RPC/receipt fallbacks on `/zh`. Code-4001 rejection and RPC/receipt failures
+  are covered deterministically in hook/form tests. A real-wallet signing matrix stays
+  in Sprint 8 because the production public-client balance read cannot be stably driven
+  through the injected Playwright provider.
+- Locale-aware dates/durations were wired through every Sprint 4 route dependency
+  touched by the 13-route surface. The site-wide mechanical formatting sweep remains
+  Sprint 5.
+- `e2e/zh-sprint4.spec.ts` covers all 13 routes with deterministic API fixtures,
+  localized metadata, representative tooltips, and rendered toast output.
+  `zh-layout.desktop.spec.ts` covers representative allocation, anchoring, holdings,
+  and transfer pages at all three release widths.
+- **R-stage per the owner-approved Sprints 1–3 precedent:** an independent bilingual
+  accuracy review and a Chinese-only blind-fluency review both returned PASS after
+  mechanics, terminology, and transaction-copy corrections. Recorded as agent review;
+  the native-human launch gate remains Sprint 8.
+- Full Playwright regression run: 530 passed, 3 skipped. It exposed one stale English
+  allocation-tooltip assertion, which was corrected and then passed on desktop +
+  mobile with the full Sprint 4/layout subset (47/47). The only remaining full-suite
+  failures were the already documented live-cycle `home-gesture-chat` race; the known
+  Mobile Chrome skip-link case passed on retry. Production builds also continue to log
+  the pre-existing live `stakedTokensCST` schema warning without failing.
 
 ## Sprint 5 — Statistics & data tables + locale formatting
 

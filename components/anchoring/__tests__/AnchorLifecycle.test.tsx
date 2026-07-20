@@ -7,21 +7,26 @@ import { checkA11y, render, screen } from '@/test-utils';
 describe('AnchorLifecycle', () => {
   it('renders the four-step lifecycle as an ordered list', () => {
     render(<AnchorLifecycle current="anchor" />);
-    const list = screen.getByRole('list', { name: /anchor lifecycle/i });
+    const list = screen.getByRole('list', { name: 'anchoring.lifecycle.ariaLabel' });
     expect(list).toBeInTheDocument();
     expect(list.querySelectorAll('[role="listitem"], li').length).toBeGreaterThanOrEqual(4);
   });
 
   it('renders every stage label', () => {
     render(<AnchorLifecycle current="anchor" />);
-    for (const label of ['Anchor', 'Active', 'Retrievable', 'Retrieved']) {
+    for (const label of [
+      'anchoring.lifecycle.stages.anchor.label',
+      'anchoring.lifecycle.stages.active.label',
+      'anchoring.lifecycle.stages.retrievable.label',
+      'anchoring.lifecycle.stages.retrieved.label',
+    ]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
   });
 
   it('marks the current stage with aria-current', () => {
     render(<AnchorLifecycle current="active" />);
-    const active = screen.getByText('Active').closest('li');
+    const active = screen.getByText('anchoring.lifecycle.stages.active.label').closest('li');
     expect(active).toHaveAttribute('aria-current', 'step');
   });
 

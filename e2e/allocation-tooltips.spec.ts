@@ -36,7 +36,7 @@ const ALLOCATION_DETAIL_TOOLTIPS = [
   },
   {
     label: 'Anchor Distribution',
-    expected: /distributed across Cosmic Signature NFTs anchored to the protocol/,
+    expected: /distributed in proportion to each wallet's number of anchored Cosmic Signature NFTs/,
   },
   {
     label: 'Stellar Selection Pool',

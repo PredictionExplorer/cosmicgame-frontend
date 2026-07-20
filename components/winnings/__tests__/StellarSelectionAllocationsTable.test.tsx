@@ -69,11 +69,11 @@ async function renderAndFlush(list: StellarSelectionAllocation[]) {
 describe('StellarSelectionAllocationsTable', () => {
   it('renders table headers', async () => {
     await renderAndFlush([]);
-    expect(screen.getByText('Datetime')).toBeInTheDocument();
-    expect(screen.getByText('Cycle')).toBeInTheDocument();
-    expect(screen.getByText('Recipient')).toBeInTheDocument();
-    expect(screen.getByText('Amount (ETH)')).toBeInTheDocument();
-    expect(screen.getByText('Retrieved')).toBeInTheDocument();
+    expect(screen.getByText('myPages.stellarSelectionAllocations.datetime')).toBeInTheDocument();
+    expect(screen.getByText('myPages.stellarSelectionAllocations.cycle')).toBeInTheDocument();
+    expect(screen.getByText('myPages.stellarSelectionAllocations.recipient')).toBeInTheDocument();
+    expect(screen.getByText('myPages.stellarSelectionAllocations.amount')).toBeInTheDocument();
+    expect(screen.getByText('myPages.stellarSelectionAllocations.retrieved')).toBeInTheDocument();
   });
 
   it('renders a winning row with correct data', async () => {
@@ -82,12 +82,14 @@ describe('StellarSelectionAllocationsTable', () => {
     expect(interactive.getByText('date-1700000000')).toBeInTheDocument();
     expect(interactive.getByText('42')).toBeInTheDocument();
     expect(interactive.getByText('1.2345678')).toBeInTheDocument();
-    expect(interactive.getByText('No')).toBeInTheDocument();
+    expect(interactive.getByText('myPages.shared.no')).toBeInTheDocument();
   });
 
   it('shows "Yes" for claimed winnings', async () => {
     await renderAndFlush([{ ...winning, Claimed: true }]);
-    expect(within(screen.getByTestId('table-primary')).getByText('Yes')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('table-primary')).getByText('myPages.shared.yes'),
+    ).toBeInTheDocument();
   });
 
   it('renders multiple rows', async () => {

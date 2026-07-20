@@ -39,35 +39,35 @@ const defaultProps: RWLKAnchoringPanelProps = {
 describe('RWLKAnchoringPanel', () => {
   it('renders all four section headers', () => {
     render(<RWLKAnchoringPanel {...defaultProps} />);
-    expect(screen.getByText('Anchored Tokens')).toBeInTheDocument();
-    expect(screen.getByText('Available for Anchoring')).toBeInTheDocument();
-    expect(screen.getByText('Anchored-NFT Stellar Selection')).toBeInTheDocument();
-    expect(screen.getByText('Anchor / Release History')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.panels.shared.anchoredTokens')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.panels.shared.available')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.panels.randomWalk.selection')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.panels.shared.history')).toBeInTheDocument();
     expect(screen.queryByText('Anchor Allocation Tokens')).not.toBeInTheDocument();
   });
 
   it('renders Anchored Tokens section first', () => {
     render(<RWLKAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[0]).toHaveTextContent('Anchored Tokens');
+    expect(headings[0]).toHaveTextContent('anchoring.panels.shared.anchoredTokens');
   });
 
   it('renders Available for Anchoring section second', () => {
     render(<RWLKAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[1]).toHaveTextContent('Available for Anchoring');
+    expect(headings[1]).toHaveTextContent('anchoring.panels.shared.available');
   });
 
   it('renders Anchored-NFT Stellar Selection section third', () => {
     render(<RWLKAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[2]).toHaveTextContent('Anchored-NFT Stellar Selection');
+    expect(headings[2]).toHaveTextContent('anchoring.panels.randomWalk.selection');
   });
 
   it('renders Anchor / Release History section last', () => {
     render(<RWLKAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[3]).toHaveTextContent('Anchor / Release History');
+    expect(headings[3]).toHaveTextContent('anchoring.panels.shared.history');
   });
 
   it('passes account to RWLKNFTTable as ownerAddress', () => {

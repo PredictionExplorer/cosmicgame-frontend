@@ -19,11 +19,16 @@ jest.mock('../attachments/useAttachedNftMetadata', () => ({
 describe('AttachedNFTTable', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseAttachedNftMetadata.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+    });
   });
 
   test('with no records', () => {
     render(<AttachedNFTTable list={[]} claimingTokens={[]} />);
-    expect(screen.getByText('No attached NFTs yet.')).toBeInTheDocument();
+    expect(screen.getByText('tables.attachedAssets.nft.empty')).toBeInTheDocument();
   });
 
   test('with mock data', async () => {
@@ -56,6 +61,16 @@ describe('AttachedNFTTable', () => {
     ];
     render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
     const interactive = within(screen.getAllByRole('table')[0]!);
+    for (const header of [
+      'tables.attachedAssets.nft.columns.datetime',
+      'tables.attachedAssets.nft.columns.contributorAddress',
+      'tables.attachedAssets.nft.columns.round',
+      'tables.attachedAssets.nft.columns.tokenAddress',
+      'tables.attachedAssets.nft.columns.tokenId',
+      'tables.attachedAssets.nft.columns.tokenImage',
+    ]) {
+      expect(interactive.getAllByText(header).length).toBeGreaterThanOrEqual(1);
+    }
     expect(
       interactive.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
     ).toBeInTheDocument();
@@ -65,12 +80,39 @@ describe('AttachedNFTTable', () => {
     expect(interactive.getByText(String(mockData[0]!.NFTTokenId))).toBeInTheDocument();
 
     await waitFor(() => {
-      const src = screen.getByAltText('NFT').getAttribute('src') ?? '';
+      const src =
+        screen
+          .getByAltText('tables.attachedAssets.nft.imageAlt(id=13000081)')
+          .getAttribute('src') ?? '';
       const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
       expect(decoded).toEqual(mockImageUrl);
     });
 
-    expect(screen.getByTestId('Claim Button').textContent).toEqual('Claim');
+    expect(screen.getByTestId('Claim Button')).toHaveTextContent(
+      'tables.attachedAssets.actions.claim',
+    );
+  });
+
+  test('renders the localized unavailable-image state', () => {
+    render(
+      <AttachedNFTTable
+        list={[
+          {
+            RecordId: '1',
+            TxHash: '0xabc',
+            TimeStamp: 1700000000,
+            DonorAddr: '0x1111111111111111111111111111111111111111',
+            RoundNum: 1,
+            TokenAddr: '0x2222222222222222222222222222222222222222',
+            NFTTokenId: 7,
+            Index: 0,
+          },
+        ]}
+        claimingTokens={[]}
+      />,
+    );
+
+    expect(screen.getByText('tables.attachedAssets.nft.imageUnavailable')).toBeInTheDocument();
   });
 
   test('external links have rel="noopener noreferrer"', async () => {
@@ -202,7 +244,9 @@ describe('AttachedNFTTable', () => {
 
     render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[17]} />);
     expect(screen.getByTestId('Claim Button')).toBeDisabled();
-    expect(screen.getByTestId('Claim Button')).toHaveTextContent('Claiming...');
+    expect(screen.getByTestId('Claim Button')).toHaveTextContent(
+      'tables.attachedAssets.actions.claiming',
+    );
   });
 
   it('has no accessibility violations', async () => {

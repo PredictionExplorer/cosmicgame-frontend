@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { getConnectorClient } from '@wagmi/core';
 import { useConfig, useConnectorClient, usePublicClient, useWalletClient } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,6 +10,7 @@ import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors
 import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
+import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 
 import { useActiveWeb3React } from './web3';
 import useAnchoringWalletCSTContract from './useAnchoringWalletCSTContract';
@@ -32,6 +33,7 @@ const ANCHORING_QUERY_KEYS = [
  */
 export function useAnchorActions() {
   const t = useTranslations('toasts');
+  const locale = useLocale();
   const { stakingCst, stakingRwalk } = useContractAddresses();
   const { account } = useActiveWeb3React();
   const config = useConfig();
@@ -59,10 +61,10 @@ export function useAnchorActions() {
         return;
       }
       reportError(err, 'anchor action error');
-      const msg = getEthErrorMessage(err, t('unexpectedError'));
-      setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
+      const msg = getEthErrorMessage(err, t('anchor.failed'), { locale });
+      setNotification({ text: getErrorMessage(msg) || msg, type: 'error', visible: true });
     },
-    [setNotification, t],
+    [locale, setNotification, t],
   );
 
   const invalidateAnchoringQueries = useCallback(() => {
@@ -92,7 +94,9 @@ export function useAnchorActions() {
       const isApprovedForAll = await nftContract.read.isApprovedForAll?.([account, walletAddress]);
       if (!isApprovedForAll) {
         const hash = await nftContract.write.setApprovalForAll?.([walletAddress, true]);
-        if (hash) await publicClient?.waitForTransactionReceipt({ hash });
+        assertTransactionHash(hash);
+        const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+        assertSuccessfulTransactionReceipt(receipt);
       }
     },
     [account, publicClient],
@@ -108,7 +112,7 @@ export function useAnchorActions() {
         if (!nftContract || !anchoringContract) {
           setNotification({
             visible: true,
-            text: 'Please connect your wallet and ensure you are on the correct network.',
+            text: t('wallet.connectCorrectNetwork'),
             type: 'error',
           });
           return;
@@ -117,7 +121,7 @@ export function useAnchorActions() {
         if (!account) {
           setNotification({
             visible: true,
-            text: 'Please connect your wallet and ensure you are on the correct network.',
+            text: t('wallet.connectCorrectNetwork'),
             type: 'error',
           });
           return;
@@ -126,7 +130,7 @@ export function useAnchorActions() {
         if (!(await ensureSignerReady())) {
           setNotification({
             visible: true,
-            text: 'Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again.',
+            text: t('anchor.walletNotReady'),
             type: 'error',
           });
           return;
@@ -138,7 +142,9 @@ export function useAnchorActions() {
           ? await anchoringContract.write.stakeMany?.([tokenIds])
           : await anchoringContract.write.stake?.([tokenIds]);
 
-        const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
+        assertTransactionHash(hash);
+        const res = await publicClient?.waitForTransactionReceipt({ hash });
+        assertSuccessfulTransactionReceipt(res);
 
         setTimeout(() => {
           invalidateAnchoringQueries();
@@ -146,9 +152,9 @@ export function useAnchorActions() {
             setNotification({
               visible: true,
               type: 'success',
-              text: Array.isArray(tokenIds)
-                ? 'The selected tokens were anchored successfully!'
-                : `You have successfully anchored token ${tokenIds}!`,
+              text: t('anchor.anchored', {
+                count: Array.isArray(tokenIds) ? tokenIds.length : 1,
+              }),
             });
           }
         }, 2000);
@@ -173,6 +179,7 @@ export function useAnchorActions() {
       handleError,
       stakingCst,
       stakingRwalk,
+      t,
     ],
   );
 
@@ -184,7 +191,7 @@ export function useAnchorActions() {
         if (!anchoringContract) {
           setNotification({
             visible: true,
-            text: 'Please connect your wallet and ensure you are on the correct network.',
+            text: t('wallet.connectCorrectNetwork'),
             type: 'error',
           });
           return;
@@ -193,7 +200,7 @@ export function useAnchorActions() {
         if (!account) {
           setNotification({
             visible: true,
-            text: 'Please connect your wallet and ensure you are on the correct network.',
+            text: t('wallet.connectCorrectNetwork'),
             type: 'error',
           });
           return;
@@ -202,7 +209,7 @@ export function useAnchorActions() {
         if (!(await ensureSignerReady())) {
           setNotification({
             visible: true,
-            text: 'Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again.',
+            text: t('anchor.walletNotReady'),
             type: 'error',
           });
           return;
@@ -212,7 +219,9 @@ export function useAnchorActions() {
           ? await anchoringContract.write.unstakeMany?.([actionIds])
           : await anchoringContract.write.unstake?.([actionIds]);
 
-        const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
+        assertTransactionHash(hash);
+        const res = await publicClient?.waitForTransactionReceipt({ hash });
+        assertSuccessfulTransactionReceipt(res);
 
         setTimeout(() => {
           invalidateAnchoringQueries();
@@ -220,9 +229,9 @@ export function useAnchorActions() {
             setNotification({
               visible: true,
               type: 'success',
-              text: Array.isArray(actionIds)
-                ? 'The selected tokens were unanchored successfully!'
-                : 'You have successfully unanchored token!',
+              text: t('anchor.released', {
+                count: Array.isArray(actionIds) ? actionIds.length : 1,
+              }),
             });
           }
         }, 2000);
@@ -242,6 +251,7 @@ export function useAnchorActions() {
       setNotification,
       invalidateAnchoringQueries,
       handleError,
+      t,
     ],
   );
 

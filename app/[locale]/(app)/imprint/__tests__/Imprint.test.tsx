@@ -1,4 +1,5 @@
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 
 import { checkA11y, render, screen, waitFor } from '@/test-utils';
 
@@ -45,7 +46,9 @@ jest.mock('../../../../../utils', () => ({
 const mockReportError = jest.fn<void, [unknown, string]>();
 const mockIsUserRejection = jest.fn<boolean, [unknown]>(() => false);
 const mockIsEthProviderError = jest.fn<boolean, [unknown]>(() => false);
-const mockGetEthErrorMessage = jest.fn<string, [unknown, string?]>(() => 'Imprint failed');
+const mockGetEthErrorMessage = jest.fn<string, [unknown, string?]>(
+  (_error, fallback) => fallback ?? 'Imprint failed',
+);
 
 jest.mock('../../../../../utils/errors', () => ({
   isUserRejection: (err: unknown) => mockIsUserRejection(err),
@@ -56,6 +59,14 @@ jest.mock('../../../../../utils/errors', () => ({
 
 jest.mock('../../../../../utils/contractWrite', () => ({
   asWriteFn: (fn: (...a: unknown[]) => unknown) => fn,
+}));
+
+jest.mock('sonner', () => ({
+  toast: {
+    error: jest.fn(),
+    info: jest.fn(),
+    success: jest.fn(),
+  },
 }));
 
 beforeEach(() => jest.clearAllMocks());
@@ -140,11 +151,12 @@ describe('Mint', () => {
     await waitFor(() => {
       expect(mockWaitForTxReceipt).toHaveBeenCalledWith({ hash: '0xTxHash' });
     });
+    expect(toast.success).toHaveBeenCalledWith('toasts.imprint.confirmed');
   });
 
   it('does not call reportError on user rejection', async () => {
     const user = userEvent.setup();
-    const rejectionErr = new Error('User rejected');
+    const rejectionErr = { code: 4001, message: 'User rejected' };
     mockImprint.mockRejectedValueOnce(rejectionErr);
     mockIsUserRejection.mockReturnValueOnce(true);
     render(<Imprint />);
@@ -155,6 +167,7 @@ describe('Mint', () => {
       expect(mockIsUserRejection).toHaveBeenCalledWith(rejectionErr);
     });
     expect(mockReportError).not.toHaveBeenCalled();
+    expect(toast.info).toHaveBeenCalledWith('toasts.walletTransactionCancelled');
   });
 
   it('calls reportError on non-user-rejection error', async () => {
@@ -170,24 +183,52 @@ describe('Mint', () => {
     await waitFor(() => {
       expect(mockReportError).toHaveBeenCalledWith(imprintErr, 'imprint RWLK NFT');
     });
+    expect(toast.error).toHaveBeenCalledWith('toasts.imprint.failed');
   });
 
-  it('alerts with error message when isEthProviderError is true', async () => {
+  it('shows the locale-safe toast fallback for provider errors', async () => {
     const user = userEvent.setup();
     const providerErr = new Error('Provider error');
     mockImprint.mockRejectedValueOnce(providerErr);
     mockIsUserRejection.mockReturnValueOnce(false);
     mockIsEthProviderError.mockReturnValueOnce(true);
-    mockGetEthErrorMessage.mockReturnValueOnce('Insufficient funds');
-    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+    mockGetEthErrorMessage.mockReturnValueOnce('toasts.imprint.failed');
     render(<Imprint />);
 
     await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Insufficient funds');
+      expect(toast.error).toHaveBeenCalledWith('toasts.imprint.failed');
     });
-    alertSpy.mockRestore();
+  });
+
+  it('treats a reverted receipt as an error instead of success', async () => {
+    const user = userEvent.setup();
+    mockImprint.mockResolvedValueOnce('0xTxHash');
+    mockWaitForTxReceipt.mockResolvedValueOnce({ status: 'reverted' });
+    render(<Imprint />);
+
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('toasts.imprint.failed'));
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it('shows the localized pending label while imprinting', async () => {
+    const user = userEvent.setup();
+    let resolveImprint!: (hash: string) => void;
+    mockImprint.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveImprint = resolve;
+      }),
+    );
+    render(<Imprint />);
+
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
+    expect(await screen.findByText('toasts.imprint.imprinting')).toBeInTheDocument();
+
+    resolveImprint('0xTxHash');
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('toasts.imprint.confirmed'));
   });
 
   it('renders NFT links sorted descending', async () => {

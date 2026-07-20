@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -106,6 +107,7 @@ export function StellarSelectionPerformance({
   data,
   className,
 }: StellarSelectionPerformanceProps) {
+  const t = useTranslations('myPages');
   const showProbabilities = useMemo(() => {
     const roundActive = !((data?.CurRoundNum ?? 0) > 0 && data?.TsRoundStart === 0);
     return roundActive && stellarSelectionETHProbability >= 0;
@@ -125,53 +127,53 @@ export function StellarSelectionPerformance({
       {showProbabilities && (
         <div className="space-y-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
           <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Current Cycle Selection Frequency
+            {t('statistics.stellarSelection.currentFrequency')}
           </h4>
           <ProbabilityBar
-            label="ETH Stellar Selection"
+            label={t('statistics.stellarSelection.ethProbability.label')}
             probability={stellarSelectionETHProbability}
-            tooltip="Your selection frequency for an ETH Stellar Selection allocation this cycle, based on your share of total gestures and the number of ETH Stellar Selection recipients chosen."
+            tooltip={t('statistics.stellarSelection.ethProbability.tooltip')}
           />
           <ProbabilityBar
-            label="NFT Stellar Selection"
+            label={t('statistics.stellarSelection.nftProbability.label')}
             probability={stellarSelectionNFTProbability}
-            tooltip="Your selection frequency for a Cosmic Signature NFT Stellar Selection imprint this cycle, based on your share of total gestures."
+            tooltip={t('statistics.stellarSelection.nftProbability.tooltip')}
           />
         </div>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <StellarSelectionStat
-          label="Total Stellar Selection ETH"
+          label={t('statistics.stellarSelection.totalEth.label')}
           value={`${totalStellarSelectionEth.toFixed(4)} ETH`}
-          tooltip="Combined ETH from Stellar Selection allocations and retrievals across all cycles."
+          tooltip={t('statistics.stellarSelection.totalEth.tooltip')}
           href={userInfo.Address ? `/user/stellar-selection-eth/${userInfo.Address}` : undefined}
         />
         <StellarSelectionStat
-          label="ETH Retrieved"
+          label={t('statistics.stellarSelection.ethRetrieved.label')}
           value={`${(userInfo.SumRaffleEthWithdrawal ?? 0).toFixed(4)} ETH`}
-          tooltip="ETH already retrieved from Stellar Selection allocations to your wallet."
+          tooltip={t('statistics.stellarSelection.ethRetrieved.tooltip')}
         />
         <StellarSelectionStat
-          label="Unretrieved NFTs"
+          label={t('statistics.stellarSelection.unretrievedNfts.label')}
           value={(userInfo.UnclaimedNFTs ?? 0).toLocaleString()}
-          tooltip="Attached NFTs allocated to you but not yet retrieved."
+          tooltip={t('statistics.stellarSelection.unretrievedNfts.tooltip')}
         />
         <StellarSelectionStat
-          label="Stellar Selection NFTs"
+          label={t('statistics.stellarSelection.stellarSelectionNfts.label')}
           value={(userInfo.RaffleNFTsCount ?? 0).toLocaleString()}
-          tooltip="Cosmic Signature NFTs imprinted through Stellar Selection."
+          tooltip={t('statistics.stellarSelection.stellarSelectionNfts.tooltip')}
           href={userInfo.Address ? `/user/stellar-selection-nft/${userInfo.Address}` : undefined}
         />
         <StellarSelectionStat
-          label="Allocation NFTs"
+          label={t('statistics.stellarSelection.allocationNfts.label')}
           value={(userInfo.RewardNFTsCount ?? 0).toLocaleString()}
-          tooltip="Total Cosmic Signature NFTs received as allocations (all imprint types combined)."
+          tooltip={t('statistics.stellarSelection.allocationNfts.tooltip')}
         />
         <StellarSelectionStat
-          label="Cosmic Signature NFTs Received"
+          label={t('statistics.stellarSelection.cosmicSignatureNfts.label')}
           value={(userInfo.TotalCSTokensWon ?? 0).toLocaleString()}
-          tooltip="Total Cosmic Signature NFTs received across all cycles."
+          tooltip={t('statistics.stellarSelection.cosmicSignatureNfts.tooltip')}
         />
       </div>
     </motion.div>

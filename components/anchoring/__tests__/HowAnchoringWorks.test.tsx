@@ -5,68 +5,71 @@ import { HowAnchoringWorks } from '../HowAnchoringWorks';
 describe('HowAnchoringWorks', () => {
   it('renders the section title', () => {
     render(<HowAnchoringWorks />);
-    expect(screen.getByText('How Anchoring Works')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.howItWorks.title')).toBeInTheDocument();
   });
 
   it('renders the introductory description', () => {
     render(<HowAnchoringWorks />);
-    expect(
-      screen.getByText('New to anchoring? Expand any section below to learn more.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('anchoring.howItWorks.intro')).toBeInTheDocument();
   });
 
   it('renders all accordion trigger labels', () => {
     render(<HowAnchoringWorks />);
-    expect(screen.getByText('What is Anchoring?')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature NFT Anchoring')).toBeInTheDocument();
-    expect(screen.getByText('RandomWalk (RWLK) Anchoring')).toBeInTheDocument();
-    expect(screen.getByText('How are distributions calculated?')).toBeInTheDocument();
-    expect(screen.getByText('Can I re-anchor an NFT after releasing it?')).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.howItWorks.items.whatIsAnchoring.question'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.howItWorks.items.cosmicSignature.question'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('anchoring.howItWorks.items.randomWalk.question')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.howItWorks.items.calculation.question')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.howItWorks.items.anchorOnce.question')).toBeInTheDocument();
   });
 
   it('explains the once-only anchoring rule (usedNfts) when expanded', () => {
     render(<HowAnchoringWorks />);
-    fireEvent.click(screen.getByText('What is Anchoring?'));
-    expect(screen.getByText(/anchored only once, ever/)).toBeVisible();
+    fireEvent.click(screen.getByText('anchoring.howItWorks.items.whatIsAnchoring.question'));
+    expect(screen.getByText('anchoring.howItWorks.items.whatIsAnchoring.answer')).toBeVisible();
   });
 
   it('explains that releasing is permanent per NFT', () => {
     render(<HowAnchoringWorks />);
-    fireEvent.click(screen.getByText('Can I re-anchor an NFT after releasing it?'));
-    expect(screen.getByText(/permanently ends that NFT/)).toBeVisible();
+    fireEvent.click(screen.getByText('anchoring.howItWorks.items.anchorOnce.question'));
+    expect(screen.getByText('anchoring.howItWorks.items.anchorOnce.answer')).toBeVisible();
   });
 
   it('explains payout-at-release and the zero-anchor rollover for CS NFT anchoring', () => {
     render(<HowAnchoringWorks />);
-    fireEvent.click(screen.getByText('Cosmic Signature NFT Anchoring'));
-    expect(screen.getByText(/paid out when you release an anchor/)).toBeVisible();
-    expect(screen.getByText(/stays in the Cycle Reserve/)).toBeVisible();
+    fireEvent.click(screen.getByText('anchoring.howItWorks.items.cosmicSignature.question'));
+    expect(screen.getByText('anchoring.howItWorks.items.cosmicSignature.answer')).toBeVisible();
   });
 
   it('states that RandomWalk anchors receive no ETH', () => {
     render(<HowAnchoringWorks />);
-    fireEvent.click(screen.getByText('RandomWalk (RWLK) Anchoring'));
-    expect(screen.getByText(/RandomWalk anchors receive no ETH/)).toBeVisible();
+    fireEvent.click(screen.getByText('anchoring.howItWorks.items.randomWalk.question'));
+    expect(screen.getByText('anchoring.howItWorks.items.randomWalk.answer')).toBeVisible();
   });
 
   it('does not show content before expanding', () => {
     render(<HowAnchoringWorks />);
-    expect(screen.queryByText(/Anchoring lets you dedicate NFTs/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.howItWorks.items.whatIsAnchoring.answer'),
+    ).not.toBeInTheDocument();
   });
 
   it('shows content after clicking a trigger', () => {
     render(<HowAnchoringWorks />);
-    fireEvent.click(screen.getByText('What is Anchoring?'));
-    expect(screen.getByText(/Anchoring lets you dedicate NFTs/)).toBeVisible();
+    fireEvent.click(screen.getByText('anchoring.howItWorks.items.whatIsAnchoring.question'));
+    expect(screen.getByText('anchoring.howItWorks.items.whatIsAnchoring.answer')).toBeVisible();
   });
 
   it('collapses previously open item when another is clicked', () => {
     render(<HowAnchoringWorks />);
-    fireEvent.click(screen.getByText('What is Anchoring?'));
-    expect(screen.getByText(/Anchoring lets you dedicate NFTs/)).toBeVisible();
+    fireEvent.click(screen.getByText('anchoring.howItWorks.items.whatIsAnchoring.question'));
+    expect(screen.getByText('anchoring.howItWorks.items.whatIsAnchoring.answer')).toBeVisible();
 
-    fireEvent.click(screen.getByText('Cosmic Signature NFT Anchoring'));
-    expect(screen.getByText(/Anchor your Cosmic Signature NFTs/)).toBeVisible();
+    fireEvent.click(screen.getByText('anchoring.howItWorks.items.cosmicSignature.question'));
+    expect(screen.getByText('anchoring.howItWorks.items.cosmicSignature.answer')).toBeVisible();
   });
 
   it('applies custom className', () => {
@@ -81,7 +84,7 @@ describe('HowAnchoringWorks', () => {
 
   it('has no accessibility violations with expanded item', async () => {
     const { container } = render(<HowAnchoringWorks />);
-    fireEvent.click(screen.getByText('What is Anchoring?'));
+    fireEvent.click(screen.getByText('anchoring.howItWorks.items.whatIsAnchoring.question'));
     await checkA11y(container);
   });
 });

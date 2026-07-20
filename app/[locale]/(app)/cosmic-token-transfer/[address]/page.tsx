@@ -1,21 +1,23 @@
 import type { Metadata } from 'next';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
 
 import CosmicTokenTransfersPage from './CosmicTokenTransfersPage';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ address: string }>;
-}): Promise<Metadata> {
-  const { address } = await params;
+interface PageProps {
+  params: Promise<{ locale: string; address: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale, address } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
   return createMetadata(
-    'Cosmic Signature CST Token Transfer History | Cosmic Signature',
-    'Cosmic Signature CST Token Transfer History',
+    t('cosmicTokenTransfers.title'),
+    t('cosmicTokenTransfers.description'),
     undefined,
     `/cosmic-token-transfer/${address}`,
-    { index: false },
+    { index: false, locale },
   );
 }
 
@@ -23,7 +25,8 @@ export async function generateMetadata({
 // fresh instead of freezing the first render forever (see route-group refactor).
 export const revalidate = 300;
 
-export default async function Page({ params }: { params: Promise<{ address: string }> }) {
-  const { address } = await params;
+export default async function Page({ params }: PageProps) {
+  const { locale, address } = await params;
+  setRequestLocale(locale);
   return <CosmicTokenTransfersPage address={address} />;
 }

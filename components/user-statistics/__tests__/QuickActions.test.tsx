@@ -34,40 +34,48 @@ describe('QuickActions', () => {
 
   it('renders all 4 action links', () => {
     render(<QuickActions address={address} />);
-    expect(screen.getByText('Anchor NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Make a Gesture')).toBeInTheDocument();
-    expect(screen.getByText('View Transfers')).toBeInTheDocument();
-    expect(screen.getByText('Stellar Selection History')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.quickActions.anchor.label')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.quickActions.gesture.label')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.quickActions.transfers.label')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.quickActions.stellarSelection.label'),
+    ).toBeInTheDocument();
   });
 
   it('renders action descriptions', () => {
     render(<QuickActions address={address} />);
     expect(
-      screen.getByText(
-        'Anchor Cosmic Signature NFTs for ETH distributions or Random Walk NFTs for Stellar Selection',
-      ),
+      screen.getByText('myPages.statistics.quickActions.anchor.description'),
     ).toBeInTheDocument();
     expect(
       screen.queryByText('Receive Anchor Distributions by anchoring your tokens'),
     ).not.toBeInTheDocument();
-    expect(screen.getByText('Take part in the active cycle')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.quickActions.gesture.description'),
+    ).toBeInTheDocument();
   });
 
   it('links to correct anchoring page', () => {
     render(<QuickActions address={address} />);
-    const anchorLink = screen.getByText('Anchor NFTs').closest('a');
+    const anchorLink = screen
+      .getByText('myPages.statistics.quickActions.anchor.label')
+      .closest('a');
     expect(anchorLink).toHaveAttribute('href', '/my-anchors');
   });
 
   it('links to correct transfer page with address', () => {
     render(<QuickActions address={address} />);
-    const transferLink = screen.getByText('View Transfers').closest('a');
+    const transferLink = screen
+      .getByText('myPages.statistics.quickActions.transfers.label')
+      .closest('a');
     expect(transferLink).toHaveAttribute('href', `/cosmic-signature-transfer/${address}`);
   });
 
   it('links to correct stellar-selection history page with address', () => {
     render(<QuickActions address={address} />);
-    const stellarSelectionLink = screen.getByText('Stellar Selection History').closest('a');
+    const stellarSelectionLink = screen
+      .getByText('myPages.statistics.quickActions.stellarSelection.label')
+      .closest('a');
     expect(stellarSelectionLink).toHaveAttribute('href', `/user/stellar-selection-eth/${address}`);
   });
 

@@ -1,6 +1,7 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime } from '@/utils';
@@ -18,6 +19,8 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import type { CSTAnchorDistribution } from '@/services/api';
 
 const CollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
+  const locale = useLocale();
+
   if (!row) return null;
 
   const {
@@ -30,7 +33,9 @@ const CollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>{convertTimestampToDateTime(DepositTimeStamp)}</TablePrimaryCell>
+      <TablePrimaryCell>
+        {convertTimestampToDateTime(DepositTimeStamp, false, locale)}
+      </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
 
@@ -52,11 +57,12 @@ export const RetrievedCSTAnchorDistributionsTable = ({
 }: {
   list: CSTAnchorDistribution[];
 }) => {
+  const t = useTranslations('anchoring');
   const [currentPage, setCurrentPage] = useState(1);
   const PER_PAGE = 5;
 
   if (!list || list.length === 0) {
-    return <p className="text-muted-foreground">No distributions yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -77,11 +83,21 @@ export const RetrievedCSTAnchorDistributionsTable = ({
 
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit Amount (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Collected Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('tables.retrievedDistributions.columns.depositDatetime')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.retrievedDistributions.columns.depositId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.retrievedDistributions.columns.cycle')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.retrievedDistributions.columns.depositAmountEth')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.retrievedDistributions.columns.retrievedAmountEth')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

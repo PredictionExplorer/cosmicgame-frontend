@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 import { parseEther } from 'viem';
+import { usePublicClient } from 'wagmi';
 
 import { useNotification } from '@/contexts/NotificationContext';
 import { useActiveWeb3React } from '@/hooks/web3';
@@ -11,6 +12,7 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { cn } from '@/lib/utils';
 import { asWriteFn } from '@/utils/contractWrite';
 import { isUserRejection, reportError } from '@/utils/errors';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,6 +60,7 @@ export function EthContributionForm({
 
   const { account } = useActiveWeb3React();
   const cosmicGameContract = useCosmicGameContract();
+  const publicClient = usePublicClient();
   const { setNotification } = useNotification();
 
   const amountIsValid = useMemo(() => hasValidAmount(amount), [amount]);
@@ -69,7 +72,7 @@ export function EthContributionForm({
   const handleSubmit = async () => {
     if (!account) {
       setNotification({
-        text: 'Please connect your wallet to contribute ETH.',
+        text: t('contribution.connectWallet'),
         type: 'error',
         visible: true,
       });
@@ -78,7 +81,7 @@ export function EthContributionForm({
 
     if (!amountIsValid) {
       setNotification({
-        text: 'Enter an ETH amount greater than 0.',
+        text: t('contribution.invalidAmount'),
         type: 'error',
         visible: true,
       });
@@ -87,7 +90,7 @@ export function EthContributionForm({
 
     if (!urlIsValid) {
       setNotification({
-        text: 'Enter a valid URL beginning with http:// or https://.',
+        text: t('contribution.invalidUrl'),
         type: 'error',
         visible: true,
       });
@@ -96,7 +99,7 @@ export function EthContributionForm({
 
     if (!cosmicGameContract) {
       setNotification({
-        text: 'Please connect your wallet and ensure you are on the correct network.',
+        text: t('contribution.contractUnavailable'),
         type: 'error',
         visible: true,
       });
@@ -106,6 +109,7 @@ export function EthContributionForm({
     setIsSubmitting(true);
     try {
       const value = parseEther(amount.trim());
+      let hash: `0x${string}`;
 
       if (hasMetadata) {
         const payload = JSON.stringify({
@@ -113,13 +117,17 @@ export function EthContributionForm({
           message: message.trim(),
           url: url.trim(),
         });
-        await asWriteFn(cosmicGameContract.write.donateEthWithInfo)([payload], { value });
+        hash = await asWriteFn(cosmicGameContract.write.donateEthWithInfo)([payload], { value });
       } else {
-        await asWriteFn(cosmicGameContract.write.donateEth)([], { value });
+        hash = await asWriteFn(cosmicGameContract.write.donateEth)([], { value });
       }
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
 
       setNotification({
-        text: `${amount.trim()} ETH contribution submitted successfully.`,
+        text: t(hasMetadata ? 'contribution.formSubmittedWithInfo' : 'contribution.formSubmitted', {
+          amount: amount.trim(),
+        }),
         type: 'success',
         visible: true,
       });
@@ -138,7 +146,7 @@ export function EthContributionForm({
       } else {
         reportError(error, 'ETH contribution error');
         setNotification({
-          text: 'ETH contribution failed, please check your input and try again.',
+          text: t('contribution.formFailed'),
           type: 'error',
           visible: true,
         });
@@ -159,7 +167,7 @@ export function EthContributionForm({
 
       {!account ? (
         <div className="flex flex-col gap-3 rounded-lg border border-white/[0.08] bg-black/20 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted-foreground">Connect your wallet to contribute ETH.</p>
+          <p className="text-sm text-muted-foreground">{t('contribution.connectWalletInline')}</p>
           <div className="sm:shrink-0">
             <RainbowConnectButton />
           </div>
@@ -186,7 +194,7 @@ export function EthContributionForm({
             <span className="text-sm text-muted-foreground">ETH</span>
           </div>
           {amount.length > 0 && !amountIsValid ? (
-            <p className="mt-1.5 text-xs text-destructive">Enter an amount greater than 0.</p>
+            <p className="mt-1.5 text-xs text-destructive">{t('contribution.invalidAmount')}</p>
           ) : null}
         </div>
 
@@ -220,7 +228,9 @@ export function EthContributionForm({
               aria-invalid={!urlIsValid}
             />
             {!urlIsValid ? (
-              <p className="mt-1.5 text-xs text-destructive">Use an http:// or https:// URL.</p>
+              <p className="mt-1.5 text-xs text-destructive">
+                {t('contribution.invalidUrlInline')}
+              </p>
             ) : null}
           </div>
         </div>
@@ -246,7 +256,7 @@ export function EthContributionForm({
       <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center">
         <Button disabled={!canSubmit} onClick={handleSubmit}>
           {isSubmitting
-            ? 'Submitting...'
+            ? t('contribution.submitting')
             : hasMetadata
               ? 'Contribute with Message'
               : 'Contribute ETH'}

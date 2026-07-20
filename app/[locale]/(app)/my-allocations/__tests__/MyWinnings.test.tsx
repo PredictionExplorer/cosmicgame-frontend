@@ -127,10 +127,8 @@ describe('MyWinnings', () => {
   it('prompts login when no account is connected', () => {
     mockAccount = null;
     render(<MyWinnings />);
-    expect(screen.getByText('Wallet not connected')).toBeInTheDocument();
-    expect(
-      screen.getByText('Connect your wallet to view and retrieve your allocations.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('myPages.shared.walletNotConnected')).toBeInTheDocument();
+    expect(screen.getByText('myPages.allocations.walletDescription')).toBeInTheDocument();
   });
 
   it('shows error state when queries fail', () => {
@@ -141,7 +139,7 @@ describe('MyWinnings', () => {
       refetch: mockRefetchNFTs,
     });
     render(<MyWinnings />);
-    expect(screen.getByText('Failed to load')).toBeInTheDocument();
+    expect(screen.getByText('myPages.allocations.loadErrorTitle')).toBeInTheDocument();
   });
 
   it('shows loading for stellar-selection section', () => {
@@ -176,7 +174,7 @@ describe('MyWinnings', () => {
       refetch: mockRefetchStellarSelection,
     });
     render(<MyWinnings />);
-    expect(screen.getByText('No ETH allocations yet')).toBeInTheDocument();
+    expect(screen.getByText('myPages.allocations.empty.ethTitle')).toBeInTheDocument();
   });
 
   it('renders page heading and sections with data', () => {
@@ -204,9 +202,9 @@ describe('MyWinnings', () => {
     });
     render(<MyWinnings />);
 
-    expect(screen.getByText('My Allocations')).toBeInTheDocument();
-    expect(screen.getByText('Retrievable ETH Allocations')).toBeInTheDocument();
-    expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
+    expect(screen.getByText('myPages.allocations.title')).toBeInTheDocument();
+    expect(screen.getByText('myPages.allocations.sections.eth')).toBeInTheDocument();
+    expect(screen.getByText('myPages.allocations.sections.nfts')).toBeInTheDocument();
     expect(screen.getByTestId('attached-nft-table')).toHaveTextContent('nfts: 1');
     expect(screen.getByTestId('uncollected-rewards')).toBeInTheDocument();
   });
@@ -240,7 +238,7 @@ describe('MyWinnings', () => {
     });
 
     render(<MyWinnings />);
-    fireEvent.click(screen.getByText('Retrieve All'));
+    fireEvent.click(screen.getByText('myPages.allocations.retrieveAll'));
     expect(mockClaimAllDonatedNFTs).toHaveBeenCalledWith([7, 12]);
   });
 
@@ -278,7 +276,7 @@ describe('MyWinnings', () => {
     });
 
     render(<MyWinnings />);
-    fireEvent.click(screen.getByText('Retrieve All'));
+    fireEvent.click(screen.getByText('myPages.allocations.retrieveAll'));
     expect(mockClaimAllDonatedERC20).toHaveBeenCalledWith([
       {
         roundNum: 0,

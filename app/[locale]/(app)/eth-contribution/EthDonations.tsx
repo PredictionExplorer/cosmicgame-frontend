@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { parseEther } from 'viem';
+import { usePublicClient } from 'wagmi';
 
 import { PageShell } from '@/components/ui/page-shell';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -18,26 +19,48 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { asWriteFn } from '@/utils/contractWrite';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { isUserRejection, reportError } from '@/utils/errors';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 
 const EthDonations = () => {
   const t = useTranslations('toasts');
   const [donateAmount, setDonateAmount] = useState('');
   const [donateInformation, setDonationInformation] = useState('');
+  const [submitting, setSubmitting] = useState<'plain' | 'withInfo' | null>(null);
 
   const { setNotification } = useNotification();
   const { account } = useActiveWeb3React();
   const cosmicGameContract = useCosmicGameContract();
+  const publicClient = usePublicClient();
   const { data: donationsRaw, isLoading, refetch: refetchDonations } = useDonationsBoth();
   const charityDonations = (donationsRaw as EthDonation[] | undefined) ?? null;
 
   const handleDonate = async () => {
+    if (!account) {
+      setNotification({
+        text: t('contribution.connectWallet'),
+        type: 'error',
+        visible: true,
+      });
+      return;
+    }
+    if (!cosmicGameContract) {
+      setNotification({
+        text: t('contribution.contractUnavailable'),
+        type: 'error',
+        visible: true,
+      });
+      return;
+    }
+    setSubmitting('plain');
     try {
-      await asWriteFn(cosmicGameContract!.write.donateEth)([], {
+      const hash = await asWriteFn(cosmicGameContract.write.donateEth)([], {
         value: parseEther(donateAmount),
       });
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
 
       setNotification({
-        text: `${donateAmount} ETH was contributed successfully!`,
+        text: t('contribution.submitted', { amount: donateAmount }),
         type: 'success',
         visible: true,
       });
@@ -54,22 +77,46 @@ const EthDonations = () => {
       } else {
         reportError(error, 'Contribution error');
         setNotification({
-          text: 'Contribution failed, please try again.',
+          text: t('contribution.failed'),
           type: 'error',
           visible: true,
         });
       }
+    } finally {
+      setSubmitting(null);
     }
   };
 
   const handleDonateWithInfo = async () => {
-    try {
-      await asWriteFn(cosmicGameContract!.write.donateEthWithInfo)([donateInformation], {
-        value: parseEther(donateAmount),
+    if (!account) {
+      setNotification({
+        text: t('contribution.connectWallet'),
+        type: 'error',
+        visible: true,
       });
+      return;
+    }
+    if (!cosmicGameContract) {
+      setNotification({
+        text: t('contribution.contractUnavailable'),
+        type: 'error',
+        visible: true,
+      });
+      return;
+    }
+    setSubmitting('withInfo');
+    try {
+      const hash = await asWriteFn(cosmicGameContract.write.donateEthWithInfo)(
+        [donateInformation],
+        {
+          value: parseEther(donateAmount),
+        },
+      );
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
 
       setNotification({
-        text: `${donateAmount} ETH with information was contributed successfully!`,
+        text: t('contribution.submittedWithInfo', { amount: donateAmount }),
         type: 'success',
         visible: true,
       });
@@ -87,11 +134,13 @@ const EthDonations = () => {
       } else {
         reportError(error, 'Contribution with info error');
         setNotification({
-          text: 'Contribution with information failed, please check your input.',
+          text: t('contribution.failedWithInfo'),
           type: 'error',
           visible: true,
         });
       }
+    } finally {
+      setSubmitting(null);
     }
   };
 
@@ -140,15 +189,18 @@ const EthDonations = () => {
             />
           </div>
           <div className="flex gap-2 pt-2">
-            <Button disabled={!donateAmount || donateAmount === '0'} onClick={handleDonate}>
-              Contribute
+            <Button
+              disabled={!donateAmount || donateAmount === '0' || submitting !== null}
+              onClick={handleDonate}
+            >
+              {submitting === 'plain' ? t('contribution.submitting') : 'Contribute'}
             </Button>
             <Button
               variant="outline"
-              disabled={!donateAmount || donateAmount === '0'}
+              disabled={!donateAmount || donateAmount === '0' || submitting !== null}
               onClick={handleDonateWithInfo}
             >
-              Contribute with Info
+              {submitting === 'withInfo' ? t('contribution.submitting') : 'Contribute with Info'}
             </Button>
           </div>
         </div>

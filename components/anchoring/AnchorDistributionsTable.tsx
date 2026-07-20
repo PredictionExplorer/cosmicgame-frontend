@@ -1,6 +1,7 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { useRouter } from '@/i18n/navigation';
@@ -47,11 +48,12 @@ export const AnchorDistributionsTable = ({
   list: AnchorDistribution[];
   address: string;
 }) => {
+  const t = useTranslations('anchoring');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (!list || list.length === 0) {
-    return <p className="text-muted-foreground">No distributions yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
   }
 
   const startIndex = (page - 1) * perPage;
@@ -64,9 +66,15 @@ export const AnchorDistributionsTable = ({
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Retrieved Distributions (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Distributions to Retrieve (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.tokenDistributions.columns.tokenId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.tokenDistributions.columns.retrievedEth')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.tokenDistributions.columns.retrievableEth')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

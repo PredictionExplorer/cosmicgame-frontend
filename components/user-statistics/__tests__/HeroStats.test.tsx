@@ -25,12 +25,16 @@ const baseProps: HeroStatsProps = {
 describe('HeroStats', () => {
   it('renders all 6 stat cards', () => {
     render(<HeroStats {...baseProps} />);
-    expect(screen.getByText('ETH Balance')).toBeInTheDocument();
-    expect(screen.getByText('CST Balance')).toBeInTheDocument();
-    expect(screen.getByText('Signature Allocations Received')).toBeInTheDocument();
-    expect(screen.getByText('Total ETH Received')).toBeInTheDocument();
-    expect(screen.getByText('Gestures Made')).toBeInTheDocument();
-    expect(screen.getByText('Selection Frequency')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.hero.ethBalance.label')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.hero.cstBalance.label')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.hero.signatureAllocations.label'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.hero.totalEth.label')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.hero.gestures.label')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.hero.selectionFrequency.label'),
+    ).toBeInTheDocument();
   });
 
   it('displays ETH balance value', () => {
@@ -72,7 +76,7 @@ describe('HeroStats', () => {
   it('renders skeleton loading state', () => {
     render(<HeroStats {...baseProps} loading={true} />);
     expect(screen.getByTestId('hero-stats-skeleton')).toBeInTheDocument();
-    expect(screen.queryByText('ETH Balance')).not.toBeInTheDocument();
+    expect(screen.queryByText('myPages.statistics.hero.ethBalance.label')).not.toBeInTheDocument();
   });
 
   it('renders the hero-stats container', () => {

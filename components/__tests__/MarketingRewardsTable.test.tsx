@@ -7,6 +7,18 @@ import type { MarketingReward } from '@/services/api/types';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 const createReward = (overrides: Partial<MarketingReward> = {}): MarketingReward => ({
   EvtLogId: 1,
   BlockNum: 100000,
@@ -18,6 +30,8 @@ const createReward = (overrides: Partial<MarketingReward> = {}): MarketingReward
   AmountEth: 25.5,
   ...overrides,
 });
+
+beforeEach(() => jest.clearAllMocks());
 
 describe('MarketingRewardsTable', () => {
   it('renders "No allocations yet." when list is empty', () => {
@@ -35,6 +49,7 @@ describe('MarketingRewardsTable', () => {
     const reward = createReward();
     render(<MarketingRewardsTable list={[reward]} />);
     expect(screen.getByText(convertTimestampToDateTime(reward.TimeStamp))).toBeInTheDocument();
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(reward.TimeStamp, false, 'en');
   });
 
   it('renders amount', () => {

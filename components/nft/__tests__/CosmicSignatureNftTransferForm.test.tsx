@@ -103,7 +103,7 @@ function renderForm(tokens: CSTTokenInfo[] = [createToken()]) {
 }
 
 function fillRecipient(value = RECIPIENT) {
-  fireEvent.change(screen.getByLabelText('Recipient address'), {
+  fireEvent.change(screen.getByLabelText('myPages.nftTransfer.recipientAddress'), {
     target: { value },
   });
 }
@@ -119,7 +119,7 @@ function selectToken(nameOrId: string | RegExp) {
 }
 
 function submitForm() {
-  const button = screen.getByRole('button', { name: /send selected nfts/i });
+  const button = screen.getByRole('button', { name: 'myPages.nftTransfer.sendAria' });
   const form = button.closest('form');
   expect(form).not.toBeNull();
   fireEvent.submit(form!);
@@ -150,10 +150,12 @@ describe('CosmicSignatureNftTransferForm', () => {
     expect(screen.getAllByText('0x111111....111111')).toHaveLength(1);
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
-    expect(screen.getAllByLabelText(/select nft #/i)).toHaveLength(2);
+    expect(screen.getAllByLabelText(/myPages\.nftTransfer\.selectAria/)).toHaveLength(2);
     expect(screen.queryByLabelText('Select Cosmic Signature NFTs')).not.toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: /select all transferable/i })).toHaveLength(1);
-    expect(screen.getByRole('link', { name: /view nft transfer history/i })).toHaveAttribute(
+    expect(screen.getAllByRole('button', { name: 'myPages.nftTransfer.selectAll' })).toHaveLength(
+      1,
+    );
+    expect(screen.getByRole('link', { name: 'myPages.nftTransfer.viewHistory' })).toHaveAttribute(
       'href',
       `/cosmic-signature-transfer/${SOURCE}`,
     );
@@ -174,10 +176,12 @@ describe('CosmicSignatureNftTransferForm', () => {
       createToken({ TokenId: 2, TokenName: '', RoundNum: undefined, EvtLogId: 2 }),
     ]);
 
-    expect(screen.getAllByText('Custom name')).toHaveLength(2);
-    expect(screen.getAllByText('Generation cycle')).toHaveLength(2);
-    expect(getTokenRow('Alpha')).toHaveTextContent('Cycle 42');
-    expect(getTokenRow('No custom name')).toHaveTextContent('Cycle data not available');
+    expect(screen.getAllByText('myPages.nftTransfer.customName')).toHaveLength(2);
+    expect(screen.getAllByText('myPages.nftTransfer.generationCycle')).toHaveLength(2);
+    expect(getTokenRow('Alpha')).toHaveTextContent('myPages.nftTransfer.cycle(cycle=42)');
+    expect(getTokenRow('myPages.nftTransfer.noCustomName')).toHaveTextContent(
+      'myPages.nftTransfer.cycleUnavailable',
+    );
     expect(screen.queryByText('Unnamed')).not.toBeInTheDocument();
     expect(screen.queryByText('Unknown')).not.toBeInTheDocument();
   });
@@ -186,9 +190,11 @@ describe('CosmicSignatureNftTransferForm', () => {
     renderForm([createToken({ TokenId: 1, TokenName: 'Deployment NFT', RoundNum: 0 })]);
 
     const row = getTokenRow('Deployment NFT');
-    expect(row).toHaveTextContent('Cycle 0');
-    expect(screen.getByRole('link', { name: 'Cycle 0' })).toHaveAttribute('href', '/allocation/0');
-    expect(screen.queryByText('Cycle data not available')).not.toBeInTheDocument();
+    expect(row).toHaveTextContent('myPages.nftTransfer.cycle(cycle=0)');
+    expect(
+      screen.getByRole('link', { name: 'myPages.nftTransfer.cycle(cycle=0)' }),
+    ).toHaveAttribute('href', '/allocation/0');
+    expect(screen.queryByText('myPages.nftTransfer.cycleUnavailable')).not.toBeInTheDocument();
   });
 
   it('does not repeat owner addresses inside NFT rows', () => {
@@ -214,7 +220,7 @@ describe('CosmicSignatureNftTransferForm', () => {
     const user = userEvent.setup();
     renderForm();
 
-    const input = screen.getByLabelText('Recipient address');
+    const input = screen.getByLabelText('myPages.nftTransfer.recipientAddress');
     await user.type(input, RECIPIENT);
 
     expect(input).toHaveValue(RECIPIENT);
@@ -229,30 +235,38 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     await user.click(getTokenRow('Alpha'));
 
-    expect(screen.getByLabelText('Select NFT #1')).toBeChecked();
-    expect(screen.getByText('1 selected of 2 transferable NFTs.')).toBeInTheDocument();
-    expect(getTokenRow('Alpha')).toHaveTextContent('Selected');
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).toBeChecked();
+    expect(
+      screen.getByText('myPages.nftTransfer.pickerSummary(selected=1,total=2)'),
+    ).toBeInTheDocument();
+    expect(getTokenRow('Alpha')).toHaveTextContent('myPages.nftTransfer.statusLabels.selected');
 
     await user.click(getTokenRow('Alpha'));
 
-    expect(screen.getByLabelText('Select NFT #1')).not.toBeChecked();
-    expect(screen.getByText('0 selected of 2 transferable NFTs.')).toBeInTheDocument();
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).not.toBeChecked();
+    expect(
+      screen.getByText('myPages.nftTransfer.pickerSummary(selected=0,total=2)'),
+    ).toBeInTheDocument();
   });
 
   it('selects and unselects NFTs from the checkbox without double toggling', async () => {
     const user = userEvent.setup();
     renderForm();
 
-    const checkbox = screen.getByLabelText('Select NFT #1');
+    const checkbox = screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)');
     await user.click(checkbox);
 
     expect(checkbox).toBeChecked();
-    expect(screen.getByText('1 selected of 1 transferable NFTs.')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.nftTransfer.pickerSummary(selected=1,total=1)'),
+    ).toBeInTheDocument();
 
     await user.click(checkbox);
 
     expect(checkbox).not.toBeChecked();
-    expect(screen.getByText('0 selected of 1 transferable NFTs.')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.nftTransfer.pickerSummary(selected=0,total=1)'),
+    ).toBeInTheDocument();
   });
 
   it('bulk-selects only transferable NFTs and clears selection', async () => {
@@ -268,17 +282,21 @@ describe('CosmicSignatureNftTransferForm', () => {
       }),
     ]);
 
-    await user.click(screen.getByRole('button', { name: /select all transferable/i }));
+    await user.click(screen.getByRole('button', { name: 'myPages.nftTransfer.selectAll' }));
 
-    expect(screen.getByLabelText('Select NFT #1')).toBeChecked();
-    expect(screen.getByLabelText('Select NFT #2')).not.toBeChecked();
-    expect(screen.getByLabelText('Select NFT #3')).not.toBeChecked();
-    expect(screen.getByText('1 selected of 1 transferable NFTs.')).toBeInTheDocument();
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).toBeChecked();
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=2)')).not.toBeChecked();
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=3)')).not.toBeChecked();
+    expect(
+      screen.getByText('myPages.nftTransfer.pickerSummary(selected=1,total=1)'),
+    ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /clear selection/i }));
+    await user.click(screen.getByRole('button', { name: 'myPages.nftTransfer.clear' }));
 
-    expect(screen.getByLabelText('Select NFT #1')).not.toBeChecked();
-    expect(screen.getByText('0 selected of 1 transferable NFTs.')).toBeInTheDocument();
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).not.toBeChecked();
+    expect(
+      screen.getByText('myPages.nftTransfer.pickerSummary(selected=0,total=1)'),
+    ).toBeInTheDocument();
   });
 
   it('keeps picker controls usable when NFTs include owner metadata', async () => {
@@ -288,13 +306,13 @@ describe('CosmicSignatureNftTransferForm', () => {
       createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
     ]);
 
-    await user.type(screen.getByLabelText('Recipient address'), RECIPIENT);
-    await user.click(screen.getByRole('button', { name: /select current page/i }));
+    await user.type(screen.getByLabelText('myPages.nftTransfer.recipientAddress'), RECIPIENT);
+    await user.click(screen.getByRole('button', { name: 'myPages.nftTransfer.selectPage' }));
 
-    expect(screen.getByLabelText('Recipient address')).toHaveValue(RECIPIENT);
-    expect(screen.getByLabelText('Select NFT #1')).toBeChecked();
-    expect(screen.getByLabelText('Select NFT #2')).toBeChecked();
-    expect(screen.getByRole('button', { name: /send selected nfts/i })).toBeEnabled();
+    expect(screen.getByLabelText('myPages.nftTransfer.recipientAddress')).toHaveValue(RECIPIENT);
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).toBeChecked();
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=2)')).toBeChecked();
+    expect(screen.getByRole('button', { name: 'myPages.nftTransfer.sendAria' })).toBeEnabled();
   });
 
   it('shows anchored NFTs but keeps them unselectable', () => {
@@ -304,8 +322,8 @@ describe('CosmicSignatureNftTransferForm', () => {
     ]);
 
     selectToken('Anchored');
-    expect(screen.getByText('Anchored - release before transfer')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /send selected nfts/i })).toBeDisabled();
+    expect(screen.getByText('myPages.nftTransfer.statusLabels.anchored')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'myPages.nftTransfer.sendAria' })).toBeDisabled();
   });
 
   it('keeps stale-owner NFTs unselectable', async () => {
@@ -320,9 +338,9 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     await user.click(getTokenRow('Stale owner'));
 
-    expect(screen.getByText('Owner changed - refresh before transfer')).toBeInTheDocument();
-    expect(screen.getByLabelText('Select NFT #1')).not.toBeChecked();
-    expect(screen.getByRole('button', { name: /send selected nfts/i })).toBeDisabled();
+    expect(screen.getByText('myPages.nftTransfer.statusLabels.ownerChanged')).toBeInTheDocument();
+    expect(screen.getByLabelText('myPages.nftTransfer.selectAria(id=1)')).not.toBeChecked();
+    expect(screen.getByRole('button', { name: 'myPages.nftTransfer.sendAria' })).toBeDisabled();
   });
 
   it('rejects an invalid recipient before writing', () => {
@@ -332,7 +350,7 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     submitForm();
 
-    expect(toast.error).toHaveBeenCalledWith('Enter a valid recipient address.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidRecipient');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -343,9 +361,7 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     submitForm();
 
-    expect(toast.error).toHaveBeenCalledWith(
-      'Enter a recipient address different from your connected wallet.',
-    );
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.nft.recipientMustDiffer');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -357,9 +373,7 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     submitForm();
 
-    expect(toast.error).toHaveBeenCalledWith(
-      'Connect the source wallet before sending NFTs from it.',
-    );
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.nft.sourceWalletRequired');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -397,7 +411,9 @@ describe('CosmicSignatureNftTransferForm', () => {
     expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: TX_HASH_1 });
     expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: TX_HASH_2 });
 
-    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('2 NFT transfers confirmed.'));
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith('toasts.transfer.nft.confirmed(count=2)'),
+    );
     expect(mockInvalidateQueries).toHaveBeenCalledWith({
       queryKey: ['cstTokensByUser', SOURCE],
     });
@@ -424,11 +440,13 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     submitForm();
 
-    await waitFor(() => expect(screen.getByText('Transfer stopped at NFT #2')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('myPages.nftTransfer.progress.stopped(id=2)')).toBeInTheDocument(),
+    );
     expect(mockWriteContract).toHaveBeenCalledTimes(2);
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstInfo', 1] });
     expect(mockInvalidateQueries).not.toHaveBeenCalledWith({ queryKey: ['cstInfo', 2] });
-    expect(toast.error).toHaveBeenCalledWith('Unable to transfer NFT #2. Please try again.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.nft.failedToken(tokenId=2)');
   });
 
   it('shows an informational toast when the wallet rejects the first transaction', async () => {
@@ -447,6 +465,24 @@ describe('CosmicSignatureNftTransferForm', () => {
     expect(mockInvalidateQueries).not.toHaveBeenCalled();
   });
 
+  it('stops on a reverted receipt and shows the localized token failure', async () => {
+    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
+    renderForm();
+    selectToken('Alpha');
+    fillRecipient();
+
+    submitForm();
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('toasts.transfer.nft.failedToken(tokenId=1)'),
+    );
+    expect(mockReportError).toHaveBeenCalledWith(
+      expect.any(Error),
+      'Cosmic Signature NFT transfer',
+    );
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
   it('asks for confirmation before transferring to an address with no transaction history', async () => {
     mockEthereumRequest.mockResolvedValue('0x0');
 
@@ -456,10 +492,10 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     submitForm();
 
-    expect(await screen.findByText('Recipient has no transaction history')).toBeInTheDocument();
+    expect(await screen.findByText('myPages.nftTransfer.warning.title')).toBeInTheDocument();
     expect(mockWriteContract).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue transfer/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'myPages.nftTransfer.warning.continue' }));
 
     await waitFor(() => expect(mockWriteContract).toHaveBeenCalledTimes(1));
   });

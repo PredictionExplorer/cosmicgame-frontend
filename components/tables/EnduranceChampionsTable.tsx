@@ -1,7 +1,7 @@
 import { useMemo, useState, type FC } from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatSeconds } from '@/utils';
@@ -31,6 +31,7 @@ interface ChampionRowProps {
 
 const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row, isLive = false }) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
 
   if (!row) {
     return <TablePrimaryRow />;
@@ -49,8 +50,10 @@ const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row, isLive = false }) =>
           )}
         </div>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{formatSeconds(row.championTime)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{formatSeconds(row.chronoWarrior || 0)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{formatSeconds(row.championTime, locale)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {formatSeconds(row.chronoWarrior || 0, locale)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };

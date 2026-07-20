@@ -5,6 +5,7 @@ import { formatEther } from 'viem';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { UserCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useClaimAllocations } from '@/hooks/useClaimAllocations';
@@ -86,6 +87,7 @@ function LoadingSkeleton() {
 
 /** Comprehensive user profile view with bidding stats, winning history, anchoring actions, token holdings, and stellarSelection claims. */
 const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
+  const t = useTranslations('myPages');
   const { account } = useActiveWeb3React();
   const { fetchData: fetchStakedTokens } = useAnchoredToken();
   const queryClient = useQueryClient();
@@ -237,19 +239,19 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   if (address === 'Invalid Address') {
     return (
       <MainWrapper>
-        <h1 className="text-xl font-medium">Invalid Address</h1>
+        <h1 className="text-xl font-medium">{t('statistics.page.invalidAddress')}</h1>
       </MainWrapper>
     );
   }
 
   return (
-    <MainWrapper aria-label={isOwnProfile ? 'My Statistics' : 'User Statistics'}>
+    <MainWrapper
+      aria-label={isOwnProfile ? t('statistics.page.ariaOwn') : t('statistics.page.ariaUser')}
+    >
       <PageHeader
-        title={isOwnProfile ? 'My Statistics' : 'User Profile'}
+        title={isOwnProfile ? t('statistics.page.ownTitle') : t('statistics.page.userTitle')}
         subtitle={
-          isOwnProfile
-            ? 'Your complete performance dashboard and activity history'
-            : 'Viewing another participant\u2019s statistics and activity'
+          isOwnProfile ? t('statistics.page.ownSubtitle') : t('statistics.page.userSubtitle')
         }
       >
         {address && !isOwnProfile && (
@@ -266,9 +268,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           <div className="mb-4 rounded-full bg-white/[0.04] p-4">
             <UserCircle className="h-8 w-8 text-muted-foreground/50" />
           </div>
-          <h2 className="text-lg font-semibold">No activity yet</h2>
+          <h2 className="text-lg font-semibold">{t('statistics.page.emptyTitle')}</h2>
           <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-            This account hasn&apos;t participated in any rounds yet. Place a bid to get started!
+            {t('statistics.page.emptyDescription')}
           </p>
         </div>
       ) : (
@@ -291,7 +293,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <SectionDivider title="Gesture History" />
+            <SectionDivider title={t('statistics.page.sections.gestureHistory')} />
             <div className="mt-6">
               <GestureHistoryTable gestureHistory={gestureHistory} />
             </div>
@@ -304,7 +306,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <SectionDivider title="Recipient History" />
+            <SectionDivider title={t('statistics.page.sections.recipientHistory')} />
             <div className="mt-6">
               <RecipientHistoryTable
                 winningHistory={claimHistory ?? []}
@@ -321,7 +323,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <SectionDivider title="Anchoring" />
+            <SectionDivider title={t('statistics.page.sections.anchoring')} />
             <div className="mt-6">
               <UserAnchoringSection
                 address={address!}
@@ -343,7 +345,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <SectionDivider title="Token Holdings" />
+            <SectionDivider title={t('statistics.page.sections.tokenHoldings')} />
             <div className="mt-6">
               <CSTTable list={cstList} />
             </div>
@@ -357,7 +359,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
               whileInView="visible"
               viewport={{ once: true, amount: 0.1 }}
             >
-              <SectionDivider title="Outreach Allocations" />
+              <SectionDivider title={t('statistics.page.sections.outreachAllocations')} />
               <div className="mt-6">
                 <MarketingRewardsTable list={marketingRewards} />
               </div>
@@ -371,7 +373,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <SectionDivider title="Claimable Assets" />
+            <SectionDivider title={t('statistics.page.sections.claimableAssets')} />
             <div className="mt-6 space-y-10">
               <DonatedAssetsSection
                 unclaimedNFTs={unclaimedDonatedNFTsList}

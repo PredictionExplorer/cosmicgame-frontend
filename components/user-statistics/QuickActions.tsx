@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Layers, Gavel, ArrowLeftRight, Ticket, ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -22,43 +23,39 @@ interface ActionItem {
   icon: React.ReactNode;
 }
 
-function buildActions(address: string): ActionItem[] {
-  return [
-    {
-      label: 'Anchor NFTs',
-      description:
-        'Anchor Cosmic Signature NFTs for ETH distributions or Random Walk NFTs for Stellar Selection',
-      href: '/my-anchors',
-      icon: <Layers className="h-4 w-4" />,
-    },
-    {
-      label: 'Make a Gesture',
-      description: 'Take part in the active cycle',
-      href: '/',
-      icon: <Gavel className="h-4 w-4" />,
-    },
-    {
-      label: 'View Transfers',
-      description: 'ERC721 and ERC20 transfer history',
-      href: `/cosmic-signature-transfer/${address}`,
-      icon: <ArrowLeftRight className="h-4 w-4" />,
-    },
-    {
-      label: 'Stellar Selection History',
-      description: 'Your Stellar Selection allocations and ETH deposits',
-      href: `/user/stellar-selection-eth/${address}`,
-      icon: <Ticket className="h-4 w-4" />,
-    },
-  ];
-}
-
 export interface QuickActionsProps {
   address: string;
   className?: string;
 }
 
 export function QuickActions({ address, className }: QuickActionsProps) {
-  const actions = buildActions(address);
+  const t = useTranslations('myPages');
+  const actions: ActionItem[] = [
+    {
+      label: t('statistics.quickActions.anchor.label'),
+      description: t('statistics.quickActions.anchor.description'),
+      href: '/my-anchors',
+      icon: <Layers className="h-4 w-4" />,
+    },
+    {
+      label: t('statistics.quickActions.gesture.label'),
+      description: t('statistics.quickActions.gesture.description'),
+      href: '/',
+      icon: <Gavel className="h-4 w-4" />,
+    },
+    {
+      label: t('statistics.quickActions.transfers.label'),
+      description: t('statistics.quickActions.transfers.description'),
+      href: `/cosmic-signature-transfer/${address}`,
+      icon: <ArrowLeftRight className="h-4 w-4" />,
+    },
+    {
+      label: t('statistics.quickActions.stellarSelection.label'),
+      description: t('statistics.quickActions.stellarSelection.description'),
+      href: `/user/stellar-selection-eth/${address}`,
+      icon: <Ticket className="h-4 w-4" />,
+    },
+  ];
 
   return (
     <motion.div

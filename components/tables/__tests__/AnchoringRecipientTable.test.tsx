@@ -4,6 +4,18 @@ import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 // eslint-disable-next-line import/order
 import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable';
 
@@ -18,6 +30,8 @@ const createRecipient = (overrides = {}) => ({
   StakerAmountEth: 0.5,
   ...overrides,
 });
+
+beforeEach(() => jest.clearAllMocks());
 
 describe('AnchoringRecipientTable', () => {
   it('renders custom empty message when list is empty', () => {
@@ -41,6 +55,7 @@ describe('AnchoringRecipientTable', () => {
     const datetime = screen.getByText(convertTimestampToDateTime(recipient.TimeStamp));
     expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(recipient.TimeStamp, false, 'en');
   });
 
   it('renders shortened anchorHolder address with link', () => {

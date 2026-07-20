@@ -3,7 +3,7 @@ import { createMetadata } from '@/utils/seo';
 
 import { metadata as cstOutreachTransferMetadata } from '../internal/cst-outreach-transfer/page';
 import { metadata as recipientHistoryMetadata } from '../recipient-history/page';
-import { metadata as transferCstMetadata } from '../transfer-cst/page';
+import { generateMetadata as generateTransferCstMetadata } from '../transfer-cst/page';
 
 jest.mock('../internal/cst-outreach-transfer/CstOutreachTransferPage', () => ({
   __esModule: true,
@@ -86,9 +86,13 @@ describe('SEO route policy', () => {
     }
   });
 
-  it('marks wallet-personal routes as noindex', () => {
+  it('marks wallet-personal routes as noindex', async () => {
     expectNoIndex(recipientHistoryMetadata);
-    expectNoIndex(transferCstMetadata);
+    expectNoIndex(
+      await generateTransferCstMetadata({
+        params: Promise.resolve({ locale: 'en' }),
+      }),
+    );
   });
 
   it('marks the URL-only CST outreach transfer route as noindex and out of sitemap', () => {

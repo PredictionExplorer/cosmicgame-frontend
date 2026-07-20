@@ -52,8 +52,12 @@ describe('StellarSelectionPerformance', () => {
 
   it('renders probability bars when cycle is active', () => {
     render(<StellarSelectionPerformance {...baseProps} />);
-    expect(screen.getByText('ETH Stellar Selection')).toBeInTheDocument();
-    expect(screen.getByText('NFT Stellar Selection')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.stellarSelection.ethProbability.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.stellarSelection.nftProbability.label'),
+    ).toBeInTheDocument();
     expect(screen.getByText('35.00%')).toBeInTheDocument();
     expect(screen.getByText('15.00%')).toBeInTheDocument();
   });
@@ -66,8 +70,12 @@ describe('StellarSelectionPerformance', () => {
         stellarSelectionNFTProbability={-1}
       />,
     );
-    expect(screen.queryByText('ETH Stellar Selection')).not.toBeInTheDocument();
-    expect(screen.queryByText('NFT Stellar Selection')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('myPages.statistics.stellarSelection.ethProbability.label'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('myPages.statistics.stellarSelection.nftProbability.label'),
+    ).not.toBeInTheDocument();
   });
 
   it('hides probability bars when cycle is not active', () => {
@@ -77,17 +85,31 @@ describe('StellarSelectionPerformance', () => {
         data={{ CurRoundNum: 5, TsRoundStart: 0 } as StellarSelectionPerformanceProps['data']}
       />,
     );
-    expect(screen.queryByText('Current Cycle Selection Frequency')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('myPages.statistics.stellarSelection.currentFrequency'),
+    ).not.toBeInTheDocument();
   });
 
   it('renders Stellar Selection stat cards', () => {
     render(<StellarSelectionPerformance {...baseProps} />);
-    expect(screen.getByText('Total Stellar Selection ETH')).toBeInTheDocument();
-    expect(screen.getByText('ETH Retrieved')).toBeInTheDocument();
-    expect(screen.getByText('Unretrieved NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Stellar Selection NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Allocation NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature NFTs Received')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.stellarSelection.totalEth.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.stellarSelection.ethRetrieved.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.stellarSelection.unretrievedNfts.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.stellarSelection.stellarSelectionNfts.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.stellarSelection.allocationNfts.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.stellarSelection.cosmicSignatureNfts.label'),
+    ).toBeInTheDocument();
   });
 
   it('displays correct total Stellar Selection ETH', () => {
@@ -102,13 +124,17 @@ describe('StellarSelectionPerformance', () => {
 
   it('links to Stellar Selection ETH page', () => {
     render(<StellarSelectionPerformance {...baseProps} />);
-    const link = screen.getByText('Total Stellar Selection ETH').closest('a');
+    const link = screen
+      .getByText('myPages.statistics.stellarSelection.totalEth.label')
+      .closest('a');
     expect(link).toHaveAttribute('href', '/user/stellar-selection-eth/0xUser123');
   });
 
   it('links to Stellar Selection NFT page', () => {
     render(<StellarSelectionPerformance {...baseProps} />);
-    const link = screen.getByText('Stellar Selection NFTs').closest('a');
+    const link = screen
+      .getByText('myPages.statistics.stellarSelection.stellarSelectionNfts.label')
+      .closest('a');
     expect(link).toHaveAttribute('href', '/user/stellar-selection-nft/0xUser123');
   });
 

@@ -41,17 +41,20 @@ jest.mock('../../hooks/web3', () => ({
 /*  Wagmi – extracted so individual tests can override behaviour     */
 /* ────────────────────────────────────────────────────────────────── */
 
-const mockWaitForTransactionReceipt = jest.fn().mockResolvedValue({});
+const mockWaitForTransactionReceipt = jest.fn().mockResolvedValue({ status: 'success' });
 const mockGetCode = jest.fn().mockResolvedValue('0x1234');
 const mockGetBalance = jest.fn().mockResolvedValue(BigInt(10e18));
 const mockReadContract = jest.fn().mockResolvedValue(true);
 const mockEstimateContractGas = jest.fn().mockResolvedValue(BigInt(500_000));
 const mockWriteContract = jest.fn().mockResolvedValue('0xhash');
+const mockSwitchChainAsync = jest.fn().mockResolvedValue(undefined);
+const mockWalletGetChainId = jest.fn().mockResolvedValue(421614);
+const mockGetSignerChainId = jest.fn().mockResolvedValue(421614);
 
 jest.mock('wagmi', () => ({
   useConfig: jest.fn(() => ({})),
   useChainId: jest.fn(() => 421614),
-  useSwitchChain: jest.fn(() => ({ switchChainAsync: jest.fn().mockResolvedValue(undefined) })),
+  useSwitchChain: jest.fn(() => ({ switchChainAsync: mockSwitchChainAsync })),
   useConnectorClient: jest.fn(() => ({ data: undefined })),
   usePublicClient: jest.fn(() => ({
     waitForTransactionReceipt: mockWaitForTransactionReceipt,
@@ -65,9 +68,13 @@ jest.mock('wagmi', () => ({
       writeContract: mockWriteContract,
       account: { address: '0xUser' as `0x${string}` },
       /** Must match jest `activeChain.id` for `NEXT_PUBLIC_NETWORK` in jest.setup (sepolia → 421614). */
-      getChainId: jest.fn().mockResolvedValue(421614),
+      getChainId: mockWalletGetChainId,
     },
   })),
+}));
+
+jest.mock('viem/actions', () => ({
+  getChainId: (...args: unknown[]) => mockGetSignerChainId(...args),
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -220,7 +227,7 @@ jest.mock('../../contracts/abis', () => ({
 
 const mockIsUserRejection = jest.fn().mockReturnValue(false);
 const mockReportError = jest.fn();
-const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
+const mockGetContractErrorDescriptor = jest.fn().mockReturnValue(null);
 const mockIsContractRevertError = jest.fn().mockReturnValue(false);
 const mockFormatCustomContractError = jest.fn().mockReturnValue(null);
 
@@ -230,7 +237,7 @@ jest.mock('../../utils/errors', () => ({
 }));
 
 jest.mock('../../utils/contractErrors', () => ({
-  getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
+  getContractErrorDescriptor: (...args: unknown[]) => mockGetContractErrorDescriptor(...args),
   isContractRevertError: (...args: unknown[]) => mockIsContractRevertError(...args),
   formatCustomContractError: (...args: unknown[]) => mockFormatCustomContractError(...args),
 }));
@@ -275,10 +282,13 @@ beforeEach(() => {
     return true;
   });
   mockWriteContract.mockResolvedValue('0xhash');
-  mockWaitForTransactionReceipt.mockResolvedValue({});
+  mockSwitchChainAsync.mockResolvedValue(undefined);
+  mockWalletGetChainId.mockResolvedValue(421614);
+  mockGetSignerChainId.mockResolvedValue(421614);
+  mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
   mockIsUserRejection.mockReturnValue(false);
   mockIsContractRevertError.mockReturnValue(false);
-  mockGetContractErrorMessage.mockReturnValue(null);
+  mockGetContractErrorDescriptor.mockReturnValue(null);
   mockFormatCustomContractError.mockReturnValue(null);
   mockEstimateContractGas.mockResolvedValue(BigInt(500_000));
   mockUseCosmicGameContract.mockReturnValue(mockContractObj);
@@ -617,6 +627,7 @@ describe('useGestureForm', () => {
       expect.objectContaining({ functionName: 'bidWithEth' }),
     );
     expect(mockWaitForTransactionReceipt).toHaveBeenCalled();
+    expect(mockNotify).toHaveBeenCalledWith('success', 'toasts.gesture.confirmed');
     expect(result.current.isGesturing).toBe(false);
   });
 
@@ -768,7 +779,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith('error', expect.stringContaining('Insufficient ETH'));
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.gesture.validation.insufficientEth');
     expect(mockWagmiWriteContract).not.toHaveBeenCalled();
   });
 
@@ -785,7 +796,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith('error', expect.stringContaining('Insufficient CST'));
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.gesture.validation.insufficientCst');
     expect(mockGestureWithCst).not.toHaveBeenCalled();
   });
 
@@ -800,10 +811,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith(
-      'error',
-      expect.stringContaining('connect your wallet'),
-    );
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.wallet.connectCorrectNetwork');
   });
 
   it('onGesture silently ignores user rejection', async () => {
@@ -819,6 +827,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(success).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith('info', 'toasts.walletTransactionCancelled');
     expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
     expect(result.current.isGesturing).toBe(false);
   });
@@ -851,16 +860,30 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(ok).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith('error', 'Please connect your wallet.');
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.wallet.connect');
     expect(mockWagmiWriteContract).not.toHaveBeenCalled();
     // Restore
     useWeb3.useActiveWeb3React.mockReturnValue({ account: '0xUser', chainId: 1, active: true });
   });
 
+  it('uses a generic localized app-network message when switching fails', async () => {
+    mockGetSignerChainId.mockResolvedValueOnce(1);
+    mockSwitchChainAsync.mockRejectedValueOnce(new Error('switch failed'));
+
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    const ok = await result.current.onGesture();
+
+    expect(ok).toBe(false);
+    expect(mockSwitchChainAsync).toHaveBeenCalledWith({ chainId: 421614 });
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.network.switchForGesture');
+  });
+
   it('onGesture reports error with context "gesture-eth" and falls back to notifyErrorFromEthers', async () => {
     const rpcErr = new Error('rpc timeout');
     mockWagmiWriteContract.mockRejectedValueOnce(rpcErr);
-    mockGetContractErrorMessage.mockReturnValue(null);
+    mockGetContractErrorDescriptor.mockReturnValue(null);
     mockIsUserRejection.mockReturnValue(false);
 
     const { result } = renderHook(() => useGestureForm());
@@ -870,15 +893,19 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(mockReportError).toHaveBeenCalledWith(rpcErr, 'gesture-eth');
-    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(rpcErr);
+    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(
+      rpcErr,
+      'toasts.gesture.transaction.failed',
+    );
   });
 
-  it('onGesture decodes contract error via getContractErrorMessage when revert hits', async () => {
+  it('onGesture selects the localized descriptor key for a known contract revert', async () => {
     const revertErr = new Error('execution reverted');
     mockWagmiWriteContract.mockRejectedValueOnce(revertErr);
-    mockGetContractErrorMessage.mockReturnValueOnce(
-      'The current Gesture Cost is greater than the amount you transferred.',
-    );
+    mockGetContractErrorDescriptor.mockReturnValueOnce({
+      key: 'gesture.contractErrors.insufficientReceivedBidAmount',
+      errorName: 'InsufficientReceivedBidAmount',
+    });
     mockIsUserRejection.mockReturnValue(false);
 
     const { result } = renderHook(() => useGestureForm());
@@ -891,17 +918,16 @@ describe('useGestureForm', () => {
     expect(ok).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith(
       'error',
-      'The current Gesture Cost is greater than the amount you transferred.',
+      'toasts.gesture.contractErrors.insufficientReceivedBidAmount',
     );
     expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
-    // Restore
-    mockGetContractErrorMessage.mockReturnValue(null);
+    mockGetContractErrorDescriptor.mockReturnValue(null);
   });
 
   it('onGestureWithCST reports error with context "gesture-cst"', async () => {
     const cstErr = new Error('cst revert');
     mockWagmiWriteContract.mockRejectedValueOnce(cstErr);
-    mockGetContractErrorMessage.mockReturnValue(null);
+    mockGetContractErrorDescriptor.mockReturnValue(null);
     mockIsUserRejection.mockReturnValue(false);
 
     const { result } = renderHook(() => useGestureForm());
@@ -916,7 +942,7 @@ describe('useGestureForm', () => {
   it('explains CST protection reverts when no specific contract message is decoded', async () => {
     const cstErr = new Error('execution reverted');
     mockWagmiWriteContract.mockRejectedValueOnce(cstErr);
-    mockGetContractErrorMessage.mockReturnValue(null);
+    mockGetContractErrorDescriptor.mockReturnValue(null);
     mockIsContractRevertError.mockReturnValue(true);
 
     const { result } = renderHook(() => useGestureForm());
@@ -925,14 +951,7 @@ describe('useGestureForm', () => {
     await result.current.onGestureWithCST();
     await flushAsyncWork();
 
-    expect(mockNotify).toHaveBeenCalledWith(
-      'error',
-      expect.stringContaining('minimum CST reward protection'),
-    );
-    expect(mockNotify).toHaveBeenCalledWith(
-      'error',
-      expect.stringContaining('Accept any CST reward'),
-    );
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.gesture.transaction.cstReverted');
     expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
   });
 
@@ -944,6 +963,23 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xhash' });
+  });
+
+  it('treats a reverted receipt as a localized transaction failure', async () => {
+    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
+    const { result } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    const ok = await result.current.onGesture();
+    await flushAsyncWork();
+
+    expect(ok).toBe(false);
+    expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'gesture-eth');
+    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(
+      expect.any(Error),
+      'toasts.gesture.transaction.failed',
+    );
+    expect(mockNotify).not.toHaveBeenCalledWith('success', 'toasts.gesture.confirmed');
   });
 
   it('onGesture aborts if ensureNftOwnership reports wrong owner', async () => {
@@ -966,7 +1002,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(ok).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith('error', "You aren't the owner of the token!");
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.gesture.validation.notNftOwner');
     mockReadContract.mockResolvedValue(true);
   });
 
@@ -989,10 +1025,7 @@ describe('useGestureForm', () => {
     await flushAsyncWork();
 
     expect(ok).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith(
-      'error',
-      'The attached NFT contract is not an ERC721 token contract.',
-    );
+    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.gesture.validation.notErc721');
     mockReadContract.mockResolvedValue(true);
   });
 });

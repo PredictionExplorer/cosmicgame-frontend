@@ -9,8 +9,9 @@ import { isAxiosError } from '@/services/api/client';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
 import { isUserRejection, reportError } from '@/utils/errors';
-import { getContractErrorMessage, isEmptyContractReadError } from '@/utils/contractErrors';
+import { getContractErrorDescriptor, isEmptyContractReadError } from '@/utils/contractErrors';
 import { asWriteFn } from '@/utils/contractWrite';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { useNotify } from '@/hooks/useNotify';
 import { useAllocationTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
 import { getStableClientTargetTime } from '@/utils/time';
@@ -86,11 +87,11 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
   const onFinalize = async (): Promise<boolean> => {
     if (inFlightRef.current) return false;
     if (!cosmicGameContract) {
-      notify('error', 'Please connect your wallet and ensure you are on the correct network.');
+      notify('error', t('wallet.connectCorrectNetwork'));
       return false;
     }
     if (!publicClient) {
-      notify('error', 'Network unavailable — please reconnect your wallet.');
+      notify('error', t('network.unavailable'));
       return false;
     }
 
@@ -112,14 +113,12 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
       }
 
       const hash = await asWriteFn(cosmicGameContract.write.claimMainPrize)({ gas: gasLimit });
-      await publicClient.waitForTransactionReceipt({ hash });
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
 
       const roundAfter = (await cosmicGameContract.read.roundNum?.()) as bigint;
       if (roundAfter <= roundBefore) {
-        notify(
-          'warning',
-          'Claim transaction succeeded but the cycle did not advance. Please refresh the page.',
-        );
+        notify('warning', t('finalize.roundDidNotAdvance'));
         return true;
       }
 
@@ -137,10 +136,7 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
         const missingIndexer = isAxiosError(apiErr) && apiErr.response?.status === 404;
         if (!missingIndexer) {
           reportError(apiErr, 'post-claim-api');
-          notify(
-            'warning',
-            'Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.',
-          );
+          notify('warning', t('finalize.metadataUpdating'));
         }
       }
 
@@ -156,11 +152,11 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
         return false;
       }
       reportError(err, 'finalize-cycle');
-      const msg = getContractErrorMessage(err);
-      if (msg) {
-        notify('error', msg);
+      const descriptor = getContractErrorDescriptor(err);
+      if (descriptor) {
+        notify('error', t(descriptor.key, descriptor.values));
       } else {
-        notifyErrorFromEthers(err);
+        notifyErrorFromEthers(err, t('finalize.failed'));
       }
       return false;
     } finally {

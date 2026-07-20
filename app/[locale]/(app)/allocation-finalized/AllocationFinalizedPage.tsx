@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Fireworks, { FireworksHandlers } from '@fireworks-js/react';
 import { usePublicClient } from 'wagmi';
+import { useTranslations } from 'next-intl';
 
 import { useRouter } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
@@ -26,6 +27,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 const ACTIVATION_POLL_MS = 4000;
 
 const AllocationFinalizedPage = () => {
+  const t = useTranslations('allocation');
   const searchParams = useSearchParams();
   const router = useRouter();
   const publicClient = usePublicClient();
@@ -85,7 +87,10 @@ const AllocationFinalizedPage = () => {
     setFinishFireworks(true);
   };
 
-  const breadcrumbsBase = [{ label: 'Home', href: '/' }, { label: 'Allocation finalized' }];
+  const breadcrumbsBase = [
+    { label: t('finalized.home'), href: '/' },
+    { label: t('finalized.title') },
+  ];
 
   return (
     <MainWrapper className="max-sm:pb-16">
@@ -109,8 +114,8 @@ const AllocationFinalizedPage = () => {
         {!cycleIsValid ? (
           <>
             <PageHeader
-              title="Allocation finalized"
-              subtitle="This page needs a valid cycle number in the URL."
+              title={t('finalized.title')}
+              subtitle={t('finalized.invalid.subtitle')}
               breadcrumbs={breadcrumbsBase}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
@@ -118,47 +123,59 @@ const AllocationFinalizedPage = () => {
             />
             <div className={cn(detailPanelClass, 'p-10 text-center')}>
               <p className="font-medium text-foreground">
-                Missing or invalid <span className="font-mono">cycle</span> query parameter.
+                {t.rich('finalized.invalid.missingParameter', {
+                  code: (chunks) => <span className="font-mono">{chunks}</span>,
+                })}
               </p>
               <p className="mt-3 text-sm text-muted-foreground">
-                Open{' '}
-                <Link href="/my-allocations" className={detailLinkClass}>
-                  My Allocations
-                </Link>{' '}
-                to review completed cycles.
+                {t.rich('finalized.invalid.guidance', {
+                  allocations: (chunks) => (
+                    <Link href="/my-allocations" className={detailLinkClass}>
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </p>
             </div>
           </>
         ) : loading ? (
           <>
             <PageHeader
-              title="Allocation finalized"
-              subtitle={`Loading cycle ${roundNum}…`}
+              title={t('finalized.title')}
+              subtitle={t('finalized.loading.subtitle', { cycle: roundNum })}
               breadcrumbs={breadcrumbsBase}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
               titleLevel={2}
             />
             <div className={cn(detailPanelClass, 'p-10 text-center')}>
-              <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t('finalized.loading.status')}
+              </p>
             </div>
           </>
         ) : !allocationInfo ? (
           <>
             <PageHeader
               title={
-                isClaimSuccess ? 'You successfully completed this cycle' : 'Allocation finalized'
+                isClaimSuccess
+                  ? t('finalized.pending.successTitle')
+                  : t('finalized.pending.defaultTitle')
               }
-              subtitle={isClaimSuccess ? `Cycle ${roundNum} was finalized on-chain.` : undefined}
+              subtitle={
+                isClaimSuccess
+                  ? t('finalized.pending.successSubtitle', { cycle: roundNum })
+                  : undefined
+              }
               breadcrumbs={
                 isClaimSuccess
                   ? [
-                      { label: 'Home', href: '/' },
+                      { label: t('finalized.home'), href: '/' },
                       {
-                        label: `Cycle ${roundNum}`,
+                        label: t('finalized.pending.cycleBreadcrumb', { cycle: roundNum }),
                         href: `/allocation/${roundNum}`,
                       },
-                      { label: 'Finalized' },
+                      { label: t('finalized.pending.finalizedBreadcrumb') },
                     ]
                   : breadcrumbsBase
               }
@@ -170,36 +187,40 @@ const AllocationFinalizedPage = () => {
               {isClaimSuccess ? (
                 <>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Allocation breakdown (Signature Allocation distribution, prizes, and attached
-                    tokens) is on the allocation details page for this cycle.
+                    {t('finalized.pending.breakdown')}
                   </p>
                   <Link
                     href={`/allocation/${roundNum}`}
                     className={cn(detailLinkClass, 'inline-block text-base font-medium')}
                   >
-                    View cycle {roundNum} allocation details
+                    {t('finalized.pending.viewDetails', { cycle: roundNum })}
                   </Link>
                   <p className="text-sm text-muted-foreground">
-                    You can also review everything under{' '}
-                    <Link href="/my-allocations" className={detailLinkClass}>
-                      My Allocations
-                    </Link>
-                    .
+                    {t.rich('finalized.pending.review', {
+                      allocations: (chunks) => (
+                        <Link href="/my-allocations" className={detailLinkClass}>
+                          {chunks}
+                        </Link>
+                      ),
+                    })}
                   </p>
                 </>
               ) : (
-                <p className="font-medium text-foreground">No allocation information.</p>
+                <p className="font-medium text-foreground">{t('finalized.pending.empty')}</p>
               )}
             </div>
           </>
         ) : (
           <>
             <PageHeader
-              title={`Congratulations! Cycle ${allocationInfo.RoundNum} Signature Allocation received.`}
+              title={t('finalized.result.title', { cycle: allocationInfo.RoundNum })}
               breadcrumbs={[
-                { label: 'Home', href: '/' },
-                { label: 'Allocation', href: `/allocation/${allocationInfo.RoundNum}` },
-                { label: 'Retrieved' },
+                { label: t('finalized.home'), href: '/' },
+                {
+                  label: t('finalized.result.allocationBreadcrumb'),
+                  href: `/allocation/${allocationInfo.RoundNum}`,
+                },
+                { label: t('finalized.result.retrievedBreadcrumb') },
               ]}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
@@ -208,16 +229,16 @@ const AllocationFinalizedPage = () => {
 
             <SectionCard
               sectionId="allocation-claimed-rewards"
-              title={`Cycle ${allocationInfo.RoundNum} allocations`}
-              description="Summary of the Signature Allocation components for this cycle."
+              title={t('finalized.result.sectionTitle', { cycle: allocationInfo.RoundNum })}
+              description={t('finalized.result.sectionDescription')}
             >
               <DefinitionList>
-                <DetailRow label="ETH allocation">
+                <DetailRow label={t('finalized.result.ethAllocation')}>
                   <span className="font-mono tabular-nums">
                     {allocationInfo.AmountEth.toFixed(6)} ETH
                   </span>
                 </DetailRow>
-                <DetailRow label="Cosmic Signature NFT ID">
+                <DetailRow label={t('finalized.result.nftId')}>
                   <Link
                     href={`/detail/${allocationInfo.TokenId}`}
                     className={cn(detailLinkClass, 'font-mono tabular-nums')}
@@ -226,10 +247,11 @@ const AllocationFinalizedPage = () => {
                   </Link>
                 </DetailRow>
                 {!!(allocationInfo.RoundStats.TotalDonatedNFTs as number) ? (
-                  <DetailRow label="Attached tokens (ERC721)">
+                  <DetailRow label={t('finalized.result.attachedTokensLabel')}>
                     <span>
-                      {allocationInfo.RoundStats.TotalDonatedNFTs as ReactNode} attached tokens
-                      (ERC721)
+                      {t('finalized.result.attachedTokens', {
+                        count: allocationInfo.RoundStats.TotalDonatedNFTs as number,
+                      })}
                     </span>
                   </DetailRow>
                 ) : null}
@@ -238,20 +260,22 @@ const AllocationFinalizedPage = () => {
 
             <SectionCard
               sectionId="allocation-claimed-next"
-              title="Next steps"
-              description="Stellar Selection and anchoring may produce separate allocations."
+              title={t('finalized.next.title')}
+              description={t('finalized.next.description')}
             >
               <div className="px-4 py-4 text-sm leading-relaxed text-muted-foreground sm:px-5">
-                There could also be additional allocations from Stellar Selection. To view your
-                allocations, go to{' '}
-                <Link href="/my-allocations" className={detailLinkClass}>
-                  My Allocations
-                </Link>{' '}
-                page. For Anchor Distributions, visit{' '}
-                <Link href="/my-anchors" className={detailLinkClass}>
-                  My Anchors
-                </Link>{' '}
-                page.
+                {t.rich('finalized.next.body', {
+                  allocations: (chunks) => (
+                    <Link href="/my-allocations" className={detailLinkClass}>
+                      {chunks}
+                    </Link>
+                  ),
+                  anchors: (chunks) => (
+                    <Link href="/my-anchors" className={detailLinkClass}>
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </div>
             </SectionCard>
           </>

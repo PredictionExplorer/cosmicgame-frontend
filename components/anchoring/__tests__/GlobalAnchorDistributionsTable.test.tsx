@@ -4,6 +4,18 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 jest.mock('../../../hooks/useApiQuery', () => ({
   useCSTAnchorDistributionsByCycle: () => ({ data: [] }),
 }));
@@ -23,21 +35,23 @@ const createRow = (overrides = {}) => ({
   ...overrides,
 });
 
+beforeEach(() => jest.clearAllMocks());
+
 describe('GlobalAnchorDistributionsTable', () => {
   it('renders empty state message', () => {
     render(<GlobalAnchorDistributionsTable list={[]} />);
-    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.distributions')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<GlobalAnchorDistributionsTable list={[createRow()]} />);
     for (const header of [
-      'Deposit Datetime',
-      'Cycle',
-      'Total Anchored Tokens',
-      'Total Deposited (ETH)',
-      'Fully Retrieved?',
-      'Pending to Retrieve (ETH)',
+      'anchoring.tables.globalDistributions.columns.depositDatetime',
+      'anchoring.tables.globalDistributions.columns.cycle',
+      'anchoring.tables.globalDistributions.columns.totalAnchoredTokens',
+      'anchoring.tables.globalDistributions.columns.totalDepositedEth',
+      'anchoring.tables.globalDistributions.columns.fullyRetrieved',
+      'anchoring.tables.globalDistributions.columns.pendingEth',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
@@ -48,6 +62,7 @@ describe('GlobalAnchorDistributionsTable', () => {
     expect(
       screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
     ).toBeGreaterThanOrEqual(1);
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
     expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
   });
@@ -64,7 +79,7 @@ describe('GlobalAnchorDistributionsTable', () => {
 
   it('displays FullyClaimed status', () => {
     render(<GlobalAnchorDistributionsTable list={[createRow({ FullyClaimed: true })]} />);
-    expect(screen.getAllByText('Yes').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('anchoring.common.yes').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders round link', () => {

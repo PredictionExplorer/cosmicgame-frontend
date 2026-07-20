@@ -50,24 +50,32 @@ describe('AnchorActionDetailPage', () => {
     mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
     mockUseCSTAnchorActionInfo.mockReturnValue(noData);
     render(<AnchorActionDetailPage IsRwalk={1} actionId={5} />);
-    expect(screen.getByText('Anchor Action for RandomWalk NFT')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'anchoring.anchorActionDetail.subtitle(token=anchoring.anchorActionDetail.token.labels.randomWalk)',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('renders CST heading when IsRwalk=0', () => {
     mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
     mockUseCSTAnchorActionInfo.mockReturnValue(noData);
     render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('Anchor Action for Cosmic Signature NFT')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'anchoring.anchorActionDetail.subtitle(token=anchoring.anchorActionDetail.token.labels.cosmicSignature)',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
     mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
     mockUseCSTAnchorActionInfo.mockReturnValue({ data: null, isLoading: true, error: null });
     render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.loading')).toBeInTheDocument();
   });
 
-  it('shows error state', () => {
+  it('shows a translated fallback instead of the raw backend error', () => {
     mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
     mockUseCSTAnchorActionInfo.mockReturnValue({
       data: null,
@@ -75,14 +83,15 @@ describe('AnchorActionDetailPage', () => {
       error: { message: 'Fetch failed' },
     });
     render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('Fetch failed')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.anchorActionDetail.error')).toBeInTheDocument();
+    expect(screen.queryByText('Fetch failed')).not.toBeInTheDocument();
   });
 
   it('shows "no data" when actionInfo is null', () => {
     mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
     mockUseCSTAnchorActionInfo.mockReturnValue(noData);
     render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('No data found for this anchor action.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.anchorActionDetail.empty')).toBeInTheDocument();
   });
 
   it('renders anchor info when data is available (CST)', () => {
@@ -93,7 +102,7 @@ describe('AnchorActionDetailPage', () => {
       error: null,
     });
     render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('Anchor')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.anchorActionDetail.anchor.title')).toBeInTheDocument();
     expect(screen.getByText('0xStaker')).toBeInTheDocument();
   });
 

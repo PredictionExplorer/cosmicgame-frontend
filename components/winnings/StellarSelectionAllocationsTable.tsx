@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Tr, Tbody } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
 
@@ -36,12 +37,24 @@ function StellarSelectionAllocationRow({
   winning: StellarSelectionAllocation;
   roundTimeout: number;
 }) {
+  const t = useTranslations('myPages');
+  const locale = useLocale();
   const { TxHash, TimeStamp, RoundNum, Amount, WinnerAddr, Claimed } = winning;
   const nowSec = Math.ceil(useNow(1000) / 1000);
 
   if (!winning) return <TablePrimaryRow />;
 
   const isExpired = roundTimeout > 0 && roundTimeout < nowSec;
+  const expirationLabel = roundTimeout
+    ? isExpired
+      ? t('stellarSelectionAllocations.expired', {
+          date: convertTimestampToDateTime(roundTimeout, false, locale),
+        })
+      : t('stellarSelectionAllocations.remaining', {
+          date: convertTimestampToDateTime(roundTimeout, false, locale),
+          remaining: formatSeconds(roundTimeout - nowSec, locale),
+        })
+    : ' ';
 
   return (
     <TablePrimaryRow>
@@ -52,7 +65,7 @@ function StellarSelectionAllocationRow({
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(TimeStamp)}
+          {convertTimestampToDateTime(TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -75,18 +88,11 @@ function StellarSelectionAllocationRow({
           <TooltipContent>{WinnerAddr}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {roundTimeout ? (
-          <>
-            {convertTimestampToDateTime(roundTimeout)}{' '}
-            {isExpired ? '(Expired)' : `(${formatSeconds(roundTimeout - nowSec)})`}
-          </>
-        ) : (
-          ' '
-        )}
-      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{expirationLabel}</TablePrimaryCell>
       <TablePrimaryCell align="center">{Amount.toFixed(7)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {Claimed ? t('shared.yes') : t('shared.no')}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 }
@@ -103,6 +109,8 @@ function StellarSelectionAllocationsPrintFallback({
   list: StellarSelectionAllocation[];
   roundTimeouts: Record<number, number>;
 }) {
+  const t = useTranslations('myPages');
+  const locale = useLocale();
   const [nowSec] = useState(() => Math.ceil(Date.now() / 1000));
   if (list.length === 0) return null;
 
@@ -116,22 +124,22 @@ function StellarSelectionAllocationsPrintFallback({
         <thead>
           <tr>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
-              Datetime
+              {t('stellarSelectionAllocations.datetime')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Cycle
+              {t('stellarSelectionAllocations.cycle')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Recipient
+              {t('stellarSelectionAllocations.recipient')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Expiration Date
+              {t('stellarSelectionAllocations.expirationDate')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Amount (ETH)
+              {t('stellarSelectionAllocations.amount')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Retrieved
+              {t('stellarSelectionAllocations.retrieved')}
             </th>
           </tr>
         </thead>
@@ -141,15 +149,20 @@ function StellarSelectionAllocationsPrintFallback({
             const isExpired = rt > 0 && rt < nowSec;
             const expirationLabel =
               rt > 0
-                ? `${convertTimestampToDateTime(rt)}${
-                    isExpired ? ' (Expired)' : ` (${formatSeconds(rt - nowSec)})`
-                  }`
+                ? isExpired
+                  ? t('stellarSelectionAllocations.expired', {
+                      date: convertTimestampToDateTime(rt, false, locale),
+                    })
+                  : t('stellarSelectionAllocations.remaining', {
+                      date: convertTimestampToDateTime(rt, false, locale),
+                      remaining: formatSeconds(rt - nowSec, locale),
+                    })
                 : '—';
 
             return (
               <tr key={w.EvtLogId}>
                 <td className="border border-foreground/15 p-2">
-                  {convertTimestampToDateTime(w.TimeStamp)}
+                  {convertTimestampToDateTime(w.TimeStamp, false, locale)}
                 </td>
                 <td className="border border-foreground/15 p-2 text-center">{w.RoundNum}</td>
                 <td className="border border-foreground/15 p-2 font-mono">
@@ -160,7 +173,7 @@ function StellarSelectionAllocationsPrintFallback({
                   {w.Amount.toFixed(7)}
                 </td>
                 <td className="border border-foreground/15 p-2 text-center">
-                  {w.Claimed ? 'Yes' : 'No'}
+                  {w.Claimed ? t('shared.yes') : t('shared.no')}
                 </td>
               </tr>
             );
@@ -173,6 +186,7 @@ function StellarSelectionAllocationsPrintFallback({
 
 /** Table of stellarSelection ETH winnings with expiration countdown. */
 export function StellarSelectionAllocationsTable({ list }: { list: StellarSelectionAllocation[] }) {
+  const t = useTranslations('myPages');
   const stellarSelectionWalletContract = useStellarSelectionWalletContract();
   const [roundTimeouts, setRoundTimeouts] = useState<Record<number, number>>({});
 
@@ -208,12 +222,24 @@ export function StellarSelectionAllocationsTable({ list }: { list: StellarSelect
           <TablePrimary>
             <TablePrimaryHead>
               <Tr>
-                <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Amount (ETH)</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Retrieved</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">
+                  {t('stellarSelectionAllocations.datetime')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('stellarSelectionAllocations.cycle')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('stellarSelectionAllocations.recipient')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('stellarSelectionAllocations.expirationDate')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('stellarSelectionAllocations.amount')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('stellarSelectionAllocations.retrieved')}
+                </TablePrimaryHeadCell>
               </Tr>
             </TablePrimaryHead>
             <Tbody>

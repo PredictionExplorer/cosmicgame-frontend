@@ -42,7 +42,7 @@ describe('TransferCstPage', () => {
 
     render(<TransferCstPage />);
 
-    expect(screen.getByText('Wallet not connected')).toBeInTheDocument();
+    expect(screen.getByText('myPages.shared.walletNotConnected')).toBeInTheDocument();
     expect(screen.queryByTestId('cst-transfer-form')).not.toBeInTheDocument();
   });
 

@@ -57,12 +57,32 @@ const CUSTOM_ERROR_MESSAGES: Record<string, string> = {
   NoBidsPlacedInCurrentRound: 'No gestures have been made in the current cycle yet.',
 };
 
+const CUSTOM_ERROR_TRANSLATION_KEYS: Record<string, string> = {
+  InsufficientReceivedBidAmount: 'gesture.contractErrors.insufficientReceivedBidAmount',
+  UsedRandomWalkNft: 'gesture.contractErrors.usedRandomWalkNft',
+  CallerIsNotNftOwner: 'gesture.contractErrors.callerIsNotNftOwner',
+  RoundIsInactive: 'gesture.contractErrors.roundIsInactive',
+  TooLongBidMessage: 'gesture.contractErrors.tooLongBidMessage',
+  WrongBidType: 'gesture.contractErrors.wrongBidType',
+  FundTransferFailed: 'gesture.contractErrors.fundTransferFailed',
+  MainPrizeEarlyClaim: 'finalize.contractErrors.mainPrizeEarlyClaim',
+  MainPrizeClaimDenied: 'finalize.contractErrors.mainPrizeClaimDenied',
+  NoBidsPlacedInCurrentRound: 'finalize.contractErrors.noGestures',
+};
+
 type GestureCurrency = 'ETH' | 'CST';
 
-interface ContractErrorOptions {
+export interface ContractErrorOptions {
   gestureCurrency?: GestureCurrency;
   displayedPrice?: number;
   displayedPriceWei?: bigint | null;
+}
+
+export interface ContractErrorDescriptor {
+  /** Key relative to the `toasts` namespace. */
+  key: string;
+  values?: Record<string, string | number>;
+  errorName: string;
 }
 
 /**
@@ -75,10 +95,14 @@ function extractContractErrorName(err: unknown): string | null {
   const walkable = err as Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => Error };
 
   if (typeof walkable.walk === 'function') {
-    const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
-    if (inner && 'data' in inner) {
-      const data = (inner as Error & { data?: { errorName?: string; args?: unknown[] } }).data;
-      if (data?.errorName) return data.errorName;
+    try {
+      const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
+      if (inner && 'data' in inner) {
+        const data = (inner as Error & { data?: { errorName?: string; args?: unknown[] } }).data;
+        if (data?.errorName) return data.errorName;
+      }
+    } catch {
+      /* Fall through to the explicit cause chain. */
     }
   }
 
@@ -87,6 +111,89 @@ function extractContractErrorName(err: unknown): string | null {
   }
 
   return null;
+}
+
+function normalizeContractErrorOptions(
+  optionsOrDisplayedEthPrice?: number | ContractErrorOptions,
+): ContractErrorOptions {
+  return typeof optionsOrDisplayedEthPrice === 'number'
+    ? { gestureCurrency: 'ETH', displayedPrice: optionsOrDisplayedEthPrice }
+    : (optionsOrDisplayedEthPrice ?? {});
+}
+
+function getPriceChangeDescriptor(
+  err: unknown,
+  errorName: string,
+  options: ContractErrorOptions,
+): ContractErrorDescriptor | null {
+  if (
+    errorName !== 'InsufficientReceivedBidAmount' ||
+    (options.displayedPrice === undefined && options.displayedPriceWei == null)
+  ) {
+    return null;
+  }
+
+  const walkable = err as Error & { walk?: (fn: (e: Error) => boolean) => Error };
+  if (typeof walkable.walk !== 'function') return null;
+
+  let inner: Error | null = null;
+  try {
+    inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
+  } catch {
+    return null;
+  }
+  if (!inner || !('data' in inner)) return null;
+
+  const data = (inner as Error & { data?: { args?: readonly unknown[] } }).data;
+  const requiredWei = data?.args?.[1];
+  if (typeof requiredWei !== 'bigint') return null;
+
+  const displayedPrice =
+    options.displayedPrice ??
+    (options.displayedPriceWei != null ? parseFloat(formatEther(options.displayedPriceWei)) : 0);
+  const requiredAmount = parseFloat(formatEther(requiredWei));
+  const delta = requiredAmount - displayedPrice;
+  if (delta <= 0) return null;
+
+  if ((options.gestureCurrency ?? 'ETH') === 'CST') {
+    return {
+      key: 'gesture.contractErrors.cstCostChanged',
+      values: {
+        required: requiredAmount.toFixed(6),
+        maximum: displayedPrice.toFixed(6),
+      },
+      errorName,
+    };
+  }
+
+  return {
+    key: 'gesture.contractErrors.ethCostChanged',
+    values: {
+      increase: delta.toFixed(6),
+      required: requiredAmount.toFixed(6),
+    },
+    errorName,
+  };
+}
+
+/**
+ * Returns a locale-independent descriptor for a known contract custom error.
+ * Consumers can pass the descriptor to `useTranslations('toasts')` without
+ * ever exposing raw revert diagnostics in localized UI.
+ */
+export function getContractErrorDescriptor(
+  err: unknown,
+  optionsOrDisplayedEthPrice?: number | ContractErrorOptions,
+): ContractErrorDescriptor | null {
+  const errorName = extractContractErrorName(err);
+  if (!errorName) return null;
+
+  const options = normalizeContractErrorOptions(optionsOrDisplayedEthPrice);
+  const priceChange = getPriceChangeDescriptor(err, errorName, options);
+  if (priceChange) return priceChange;
+
+  const key = CUSTOM_ERROR_TRANSLATION_KEYS[errorName];
+  return key ? { key, errorName } : null;
 }
 
 /**
@@ -103,47 +210,20 @@ export function getContractErrorMessage(
   err: unknown,
   optionsOrDisplayedEthPrice?: number | ContractErrorOptions,
 ): string | null {
-  const errorName = extractContractErrorName(err);
-  if (!errorName) return null;
-  const options: ContractErrorOptions =
-    typeof optionsOrDisplayedEthPrice === 'number'
-      ? { gestureCurrency: 'ETH', displayedPrice: optionsOrDisplayedEthPrice }
-      : (optionsOrDisplayedEthPrice ?? {});
-  const gestureCurrency = options.gestureCurrency ?? 'ETH';
+  const descriptor = getContractErrorDescriptor(err, optionsOrDisplayedEthPrice);
+  if (!descriptor) return null;
 
-  if (
-    errorName === 'InsufficientReceivedBidAmount' &&
-    (options.displayedPrice !== undefined || options.displayedPriceWei != null)
-  ) {
-    const walkable = err as Error & { walk?: (fn: (e: Error) => boolean) => Error };
-    if (typeof walkable.walk === 'function') {
-      const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
-      if (inner && 'data' in inner) {
-        const data = (inner as Error & { data?: { args?: readonly unknown[] } }).data;
-        const requiredWei = data?.args?.[1];
-        if (typeof requiredWei === 'bigint') {
-          const displayedPrice =
-            options.displayedPrice ??
-            (options.displayedPriceWei != null
-              ? parseFloat(formatEther(options.displayedPriceWei))
-              : 0);
-          const requiredAmount = parseFloat(formatEther(requiredWei));
-          const delta = requiredAmount - displayedPrice;
-          if (delta > 0) {
-            if (gestureCurrency === 'CST') {
-              return (
-                `CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. ` +
-                `The contract required ${requiredAmount.toFixed(6)} CST, above your ${displayedPrice.toFixed(6)} CST maximum. Refresh and try again.`
-              );
-            }
-            return `Gesture Cost rose by ${delta.toFixed(6)} ETH while your transaction was in transit. The new required cost is ${requiredAmount.toFixed(6)} ETH. Please try again.`;
-          }
-        }
-      }
-    }
+  if (descriptor.key === 'gesture.contractErrors.cstCostChanged') {
+    return (
+      `CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. ` +
+      `The contract required ${descriptor.values?.required} CST, above your ${descriptor.values?.maximum} CST maximum. Refresh and try again.`
+    );
+  }
+  if (descriptor.key === 'gesture.contractErrors.ethCostChanged') {
+    return `Gesture Cost rose by ${descriptor.values?.increase} ETH while your transaction was in transit. The new required cost is ${descriptor.values?.required} ETH. Please try again.`;
   }
 
-  return CUSTOM_ERROR_MESSAGES[errorName] ?? null;
+  return CUSTOM_ERROR_MESSAGES[descriptor.errorName] ?? null;
 }
 
 /**

@@ -1,10 +1,10 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState, type FC } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
-import { statisticsCopy } from '@/content/statistics-copy';
 
 import { Link } from '@/i18n/navigation';
 import { useRouter } from '@/i18n/navigation';
@@ -19,31 +19,6 @@ import {
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
-
-const responsiveHeaders = [
-  {
-    desktop: 'Anchor Datetime',
-    mobile: 'Datetime',
-    align: 'left' as const,
-    tooltip: 'Timestamp when the anchor or release action was indexed.',
-  },
-  {
-    desktop: 'Action Type',
-    mobile: 'Type',
-    tooltip: 'Whether this row anchored or released NFTs.',
-  },
-  {
-    desktop: 'Token ID',
-    mobile: 'Token',
-    tooltip: 'Token involved in the anchor or release action.',
-  },
-  {
-    desktop: 'Anchor-holder Address',
-    mobile: 'Holder',
-    tooltip: statisticsCopy.tables.anchorHolderAddress,
-  },
-  { desktop: 'Number of NFTs', mobile: 'NFTs', tooltip: 'Anchored NFT count after this action.' },
-];
 
 interface RowData {
   EvtLogId: string | number;
@@ -61,6 +36,8 @@ interface GlobalAnchorActionsRowProps {
 }
 
 const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }) => {
+  const t = useTranslations('anchoring');
+  const locale = useLocale();
   const router = useRouter();
 
   if (!row) {
@@ -73,10 +50,12 @@ const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }
 
   return (
     <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
-      <TablePrimaryCell>{convertTimestampToDateTime(row.TimeStamp)}</TablePrimaryCell>
+      <TablePrimaryCell>
+        {convertTimestampToDateTime(row.TimeStamp, false, locale)}
+      </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {row.ActionType === 0 ? 'Anchor' : 'Release'}
+        {row.ActionType === 0 ? t('common.anchor') : t('common.release')}
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
@@ -118,11 +97,40 @@ interface GlobalAnchorActionsTableProps {
 }
 
 export const GlobalAnchorActionsTable: FC<GlobalAnchorActionsTableProps> = ({ list, IsRWLK }) => {
+  const t = useTranslations('anchoring');
   const perPage = 5;
   const [page, setPage] = useState(1);
+  const responsiveHeaders = [
+    {
+      desktop: t('tables.globalAnchorActions.headers.anchorDatetime.desktop'),
+      mobile: t('tables.globalAnchorActions.headers.anchorDatetime.mobile'),
+      align: 'left' as const,
+      tooltip: t('tables.globalAnchorActions.headers.anchorDatetime.tooltip'),
+    },
+    {
+      desktop: t('tables.globalAnchorActions.headers.actionType.desktop'),
+      mobile: t('tables.globalAnchorActions.headers.actionType.mobile'),
+      tooltip: t('tables.globalAnchorActions.headers.actionType.tooltip'),
+    },
+    {
+      desktop: t('tables.globalAnchorActions.headers.tokenId.desktop'),
+      mobile: t('tables.globalAnchorActions.headers.tokenId.mobile'),
+      tooltip: t('tables.globalAnchorActions.headers.tokenId.tooltip'),
+    },
+    {
+      desktop: t('tables.globalAnchorActions.headers.holderAddress.desktop'),
+      mobile: t('tables.globalAnchorActions.headers.holderAddress.mobile'),
+      tooltip: t('tables.globalAnchorActions.headers.holderAddress.tooltip'),
+    },
+    {
+      desktop: t('tables.globalAnchorActions.headers.nftCount.desktop'),
+      mobile: t('tables.globalAnchorActions.headers.nftCount.mobile'),
+      tooltip: t('tables.globalAnchorActions.headers.nftCount.tooltip'),
+    },
+  ];
 
   if (!list || list.length === 0) {
-    return <p className="text-muted-foreground">No actions yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.actions')}</p>;
   }
 
   const startIndex = (page - 1) * perPage;

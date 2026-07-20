@@ -106,7 +106,9 @@ function fillRewardForm(amount = '12.5', recipient = RECIPIENT) {
 }
 
 function submitRewardForm() {
-  const button = screen.getByRole('button', { name: /pay cst reward/i });
+  const button = screen.getByRole('button', {
+    name: 'toasts.transfer.marketingCst.pay',
+  });
   const form = button.closest('form');
   expect(form).not.toBeNull();
   fireEvent.submit(form!);
@@ -131,27 +133,44 @@ describe('MarketingCstRewardForm', () => {
     expect(screen.getByText('3000.00 CST')).toBeInTheDocument();
     expect(screen.getByText('0x111111....111111')).toBeInTheDocument();
     expect(screen.getByText('0x222222....222222')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'toasts.transfer.marketingCst.pay' }),
+    ).toHaveTextContent('toasts.transfer.marketingCst.pay');
     expect(screen.getByRole('link', { name: /view outreach reserve transfers/i })).toHaveAttribute(
       'href',
       `/cosmic-token-transfer/${TEST_MARKETING_WALLET}`,
     );
   });
 
+  it('shows the localized balance loading state', async () => {
+    mockReadContract.mockReturnValue(new Promise(() => {}));
+
+    renderWithQuery(
+      <MarketingCstRewardForm
+        marketingWalletAddress={TEST_MARKETING_WALLET}
+        ownerAddress={OWNER}
+        treasurerAddress={TREASURER}
+      />,
+    );
+
+    expect(await screen.findByText('toasts.transfer.marketingCst.loading')).toBeInTheDocument();
+  });
+
   it('rejects invalid recipient, invalid amount, and over-balance amount before writing', async () => {
     await renderReadyForm();
     fillRewardForm('1', 'not-an-address');
     submitRewardForm();
-    expect(toast.error).toHaveBeenCalledWith('Enter a valid recipient address.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidRecipient');
 
     jest.clearAllMocks();
     fillRewardForm('abc');
     submitRewardForm();
-    expect(toast.error).toHaveBeenCalledWith('Enter a valid CST amount.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidAmount');
 
     jest.clearAllMocks();
     fillRewardForm('3000.01');
     submitRewardForm();
-    expect(toast.error).toHaveBeenCalledWith('Insufficient outreach reserve CST balance.');
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.marketingCst.insufficientBalance');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -162,16 +181,14 @@ describe('MarketingCstRewardForm', () => {
 
     submitRewardForm();
 
-    expect(toast.error).toHaveBeenCalledWith(
-      'Connect the current marketing wallet treasurer before paying CST rewards.',
-    );
+    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.marketingCst.treasurerRequired');
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
   it('disables submit when the treasurer address is unavailable', async () => {
     await renderReadyForm({ treasurerAddress: null });
 
-    expect(screen.getByRole('button', { name: /pay cst reward/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'toasts.transfer.marketingCst.pay' })).toBeDisabled();
     expect(mockWriteContract).not.toHaveBeenCalled();
   });
 
@@ -186,7 +203,9 @@ describe('MarketingCstRewardForm', () => {
     fillRewardForm('1.5');
     submitRewardForm();
 
-    await waitFor(() => expect(toast.warning).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(toast.warning).toHaveBeenCalledWith('toasts.transfer.marketingCst.decimalsWarning'),
+    );
     await waitFor(() => expect(mockWriteContract).toHaveBeenCalled());
     expect(mockReportError).toHaveBeenCalledWith(
       expect.any(Error),
@@ -210,9 +229,9 @@ describe('MarketingCstRewardForm', () => {
     );
 
     expect(
-      await screen.findByText('Unable to read the outreach reserve CST balance. Please try again.'),
+      await screen.findByText('toasts.transfer.marketingCst.balanceReadFailed'),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /pay cst reward/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'toasts.transfer.marketingCst.pay' })).toBeDisabled();
   });
 
   it('calls MarketingWallet payReward, waits for receipt, and invalidates related queries', async () => {
@@ -239,7 +258,7 @@ describe('MarketingCstRewardForm', () => {
     expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: TX_HASH });
 
     await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith('Marketing CST reward confirmed.'),
+      expect(toast.success).toHaveBeenCalledWith('toasts.transfer.marketingCst.confirmed'),
     );
     expect(mockInvalidateQueries).toHaveBeenCalledWith({
       queryKey: ['userBalance', TEST_MARKETING_WALLET],
@@ -251,10 +270,10 @@ describe('MarketingCstRewardForm', () => {
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctTransfers', RECIPIENT] });
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctBalancesDistribution'] });
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
-    expect(screen.getByRole('link', { name: /view transaction/i })).toHaveAttribute(
-      'href',
-      expect.stringContaining(TX_HASH),
-    );
+    expect(screen.getByText('toasts.transfer.marketingCst.confirmed')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'toasts.transfer.marketingCst.viewTransaction' }),
+    ).toHaveAttribute('href', expect.stringContaining(TX_HASH));
   });
 
   it('shows an informational toast when the wallet rejects the reward transaction', async () => {
@@ -279,8 +298,41 @@ describe('MarketingCstRewardForm', () => {
     submitRewardForm();
 
     await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith('Unable to pay CST reward. Please try again.'),
+      expect(toast.error).toHaveBeenCalledWith('toasts.transfer.marketingCst.failed'),
     );
     expect(mockReportError).toHaveBeenCalledWith(err, 'MarketingWallet payReward');
+  });
+
+  it('reports a reverted receipt and shows the localized reward fallback', async () => {
+    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
+    await renderReadyForm();
+    fillRewardForm('1');
+
+    submitRewardForm();
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('toasts.transfer.marketingCst.failed'),
+    );
+    expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'MarketingWallet payReward');
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it('shows the localized pending label while the reward transaction is awaiting approval', async () => {
+    let resolveWrite!: (hash: string) => void;
+    mockWriteContract.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveWrite = resolve;
+      }),
+    );
+    await renderReadyForm();
+    fillRewardForm('1');
+
+    submitRewardForm();
+    expect(await screen.findByText('toasts.transfer.marketingCst.paying')).toBeInTheDocument();
+
+    resolveWrite(TX_HASH);
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith('toasts.transfer.marketingCst.confirmed'),
+    );
   });
 });

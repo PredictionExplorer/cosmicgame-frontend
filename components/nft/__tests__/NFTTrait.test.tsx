@@ -1,6 +1,6 @@
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 
-import { render, screen, fireEvent, checkA11y } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y, waitFor } from '@/test-utils';
 
 import NFTTrait from '../NFTTrait';
 
@@ -63,8 +63,9 @@ jest.mock('../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: '0xOwner' }),
 }));
 
+const mockWaitForTransactionReceipt = jest.fn();
 jest.mock('wagmi', () => ({
-  usePublicClient: () => ({ waitForTransactionReceipt: jest.fn() }),
+  usePublicClient: () => ({ waitForTransactionReceipt: mockWaitForTransactionReceipt }),
 }));
 
 const mockRouterPush = jest.fn();
@@ -72,17 +73,29 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockRouterPush }),
 }));
 
+const mockTransferFrom = jest.fn();
+const mockSetNftName = jest.fn();
 jest.mock('../../../hooks/useCosmicSignatureContract', () => ({
   __esModule: true,
   default: () => ({
     read: { totalSupply: jest.fn().mockResolvedValue(BigInt(100)) },
-    write: { transferFrom: jest.fn(), setNftName: jest.fn() },
+    write: { transferFrom: mockTransferFrom, setNftName: mockSetNftName },
   }),
 }));
 
+const mockSetNotification = jest.fn();
 jest.mock('../../../contexts/NotificationContext', () => ({
-  useNotification: () => ({ setNotification: jest.fn() }),
+  useNotification: () => ({ setNotification: mockSetNotification }),
 }));
+
+const mockReportError = jest.fn();
+jest.mock('../../../utils/errors', () => {
+  const actual = jest.requireActual('../../../utils/errors');
+  return {
+    ...actual,
+    reportError: (...args: unknown[]) => mockReportError(...args),
+  };
+});
 
 jest.mock('../../../hooks/useClipboard', () => ({
   useClipboard: () => ({ copy: jest.fn() }),
@@ -107,7 +120,30 @@ jest.mock('../NFTMetadata', () => ({
   NFTMetadata: () => <div data-testid="nft-metadata" />,
 }));
 jest.mock('../NFTOwnerActions', () => ({
-  NFTOwnerActions: () => <div data-testid="owner-actions" />,
+  NFTOwnerActions: (props: {
+    onAddressChange: (value: string) => void;
+    onTransfer: () => void;
+    onSetName: () => void;
+    onClearName: () => void;
+  }) => (
+    <div data-testid="owner-actions">
+      <button
+        type="button"
+        onClick={() => props.onAddressChange('0x1111111111111111111111111111111111111111')}
+      >
+        Set recipient
+      </button>
+      <button type="button" onClick={props.onTransfer}>
+        Transfer test NFT
+      </button>
+      <button type="button" onClick={props.onSetName}>
+        Set test name
+      </button>
+      <button type="button" onClick={props.onClearName}>
+        Clear test name
+      </button>
+    </div>
+  ),
 }));
 jest.mock('../../../components/tables/NameHistoryTable', () => ({
   __esModule: true,
@@ -128,6 +164,13 @@ jest.mock('yet-another-react-lightbox', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockRouterPush.mockClear();
+  mockTransferFrom.mockResolvedValue('0xtransfer');
+  mockSetNftName.mockResolvedValue('0xname');
+  mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
+  Object.defineProperty(window, 'ethereum', {
+    configurable: true,
+    value: { request: jest.fn().mockResolvedValue('0x1') },
+  });
 });
 
 const baseNft = {
@@ -313,6 +356,108 @@ describe('NFTTrait', () => {
       fireEvent.keyDown(input, { key: 'ArrowLeft' });
       expect(mockRouterPush).not.toHaveBeenCalled();
     }
+  });
+
+  it('shows a localized success notification after a confirmed NFT transfer', async () => {
+    withDashboard();
+    withNft();
+    withNameHistory();
+    render(<NFTTrait tokenId={5} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.transfer.nft.detailTransferConfirmed',
+        type: 'success',
+        visible: true,
+      }),
+    );
+    expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtransfer' });
+  });
+
+  it('treats wallet rejection code 4001 as informational', async () => {
+    mockTransferFrom.mockRejectedValueOnce({ code: 4001 });
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={5} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.walletTransactionCancelled',
+        type: 'info',
+        visible: true,
+      }),
+    );
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('reports transfer RPC failures with a localized fallback', async () => {
+    const error = new Error('RPC failed');
+    mockTransferFrom.mockRejectedValueOnce(error);
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={5} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.transfer.nft.failed',
+        type: 'error',
+        visible: true,
+      }),
+    );
+    expect(mockReportError).toHaveBeenCalledWith(error, 'transfer Cosmic Signature NFT');
+  });
+
+  it('does not report a reverted transfer receipt as success', async () => {
+    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={5} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.transfer.nft.failed',
+        type: 'error',
+        visible: true,
+      }),
+    );
+    expect(mockSetNotification).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'success' }),
+    );
+  });
+
+  it('localizes token naming success and failure notifications', async () => {
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={5} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Set test name' }));
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.transfer.nft.nameSet',
+        type: 'success',
+        visible: true,
+      }),
+    );
+
+    const error = new Error('clear failed');
+    mockSetNftName.mockRejectedValueOnce(error);
+    fireEvent.click(screen.getByRole('button', { name: 'Clear test name' }));
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        text: 'toasts.transfer.nft.nameClearFailed',
+        type: 'error',
+        visible: true,
+      }),
+    );
+    expect(mockReportError).toHaveBeenCalledWith(error, 'clear Cosmic Signature NFT name');
   });
 
   it('has no accessibility violations', async () => {

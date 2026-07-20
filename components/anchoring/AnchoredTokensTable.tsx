@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { ChevronDown, Loader2 } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime, getAssetsUrl, getThumbUrl, getRWLKImageUrl } from '@/utils';
@@ -95,6 +96,8 @@ const AnchoredTokenRow = ({
   onRowClick,
   onReleaseSingle,
 }: AnchoredTokenRowProps) => {
+  const t = useTranslations('anchoring');
+  const locale = useLocale();
   const [processing, setProcessing] = useState(false);
   const anchorActionId = isRandomWalk
     ? (row as RandomWalkRow).StakeActionId
@@ -170,7 +173,7 @@ const AnchoredTokenRow = ({
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(anchorTimeStamp)}
+        {convertTimestampToDateTime(anchorTimeStamp, false, locale)}
       </TablePrimaryCell>
 
       {!isRandomWalk && (
@@ -196,10 +199,10 @@ const AnchoredTokenRow = ({
           {processing ? (
             <span className="flex items-center gap-1">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Releasing...
+              {t('common.releasing')}
             </span>
           ) : (
-            'Release'
+            t('common.release')
           )}
         </Button>
       </TablePrimaryCell>
@@ -220,6 +223,7 @@ export const AnchoredTokensTable = ({
   handleUnstakeMany,
   IsRwalk,
 }: AnchoredTokensTableProps) => {
+  const t = useTranslations('anchoring');
   const { account } = useActiveWeb3React();
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
@@ -318,7 +322,7 @@ export const AnchoredTokensTable = ({
   };
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No tokens yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.tokens')}</p>;
   }
 
   return (
@@ -351,25 +355,37 @@ export const AnchoredTokensTable = ({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start">
                     <DropdownMenuItem className="min-w-[166px]" onClick={onSelectAllClick}>
-                      Select All
+                      {t('tables.anchoredTokens.selection.all')}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="min-w-[166px]" onClick={onSelectCurPgClick}>
-                      Select Current Page
+                      {t('tables.anchoredTokens.selection.currentPage')}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="min-w-[166px]" onClick={onSelectNoneClick}>
-                      Select None
+                      {t('tables.anchoredTokens.selection.none')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TablePrimaryHeadCell>
 
-              <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Anchor Action ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Anchor Datetime</TablePrimaryHeadCell>
-              {!IsRwalk && <TablePrimaryHeadCell>Accumulated Distributions</TablePrimaryHeadCell>}
               <TablePrimaryHeadCell>
-                <span className="sr-only">Actions</span>
+                {t('tables.anchoredTokens.columns.image')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.anchoredTokens.columns.tokenId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.anchoredTokens.columns.actionId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.anchoredTokens.columns.datetime')}
+              </TablePrimaryHeadCell>
+              {!IsRwalk && (
+                <TablePrimaryHeadCell>
+                  {t('tables.anchoredTokens.columns.accumulatedDistributions')}
+                </TablePrimaryHeadCell>
+              )}
+              <TablePrimaryHeadCell>
+                <span className="sr-only">{t('common.aria.actions')}</span>
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
@@ -408,10 +424,10 @@ export const AnchoredTokensTable = ({
             {processing ? (
               <span className="flex items-center gap-1">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                Releasing...
+                {t('common.releasing')}
               </span>
             ) : (
-              'Release Many'
+              t('common.actions.releaseMany')
             )}
           </Button>
         </div>

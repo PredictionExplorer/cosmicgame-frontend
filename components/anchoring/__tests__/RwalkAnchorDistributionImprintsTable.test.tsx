@@ -4,6 +4,18 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 import { RwalkAnchorDistributionImprintsTable } from '../RwalkAnchorDistributionImprintsTable';
 
 const createRow = (overrides = {}) => ({
@@ -16,15 +28,22 @@ const createRow = (overrides = {}) => ({
   ...overrides,
 });
 
+beforeEach(() => jest.clearAllMocks());
+
 describe('RwalkAnchorDistributionImprintsTable', () => {
   it('renders empty state message', () => {
     render(<RwalkAnchorDistributionImprintsTable list={[]} />);
-    expect(screen.getByText('No allocations yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.allocations')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<RwalkAnchorDistributionImprintsTable list={[createRow()]} />);
-    for (const header of ['Datetime', 'Recipient', 'Cycle', 'Token ID']) {
+    for (const header of [
+      'anchoring.tables.randomWalkImprints.columns.datetime',
+      'anchoring.tables.randomWalkImprints.columns.recipient',
+      'anchoring.tables.randomWalkImprints.columns.cycle',
+      'anchoring.tables.randomWalkImprints.columns.tokenId',
+    ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });
@@ -34,6 +53,7 @@ describe('RwalkAnchorDistributionImprintsTable', () => {
     expect(
       screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
     ).toBeGreaterThanOrEqual(1);
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
     expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('42').length).toBeGreaterThanOrEqual(1);
   });

@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import type { CSTTokenInfo, AnchoredTokenInfo, AnchorAction, RewardsByToken } from '@/services/api';
 import AnchorActionsTable from '@/components/anchoring/AnchorActionsTable';
 import { AnchorDistributionsTable } from '@/components/anchoring/AnchorDistributionsTable';
@@ -39,12 +41,14 @@ export function CSTAnchoringPanel({
   handleUnstake,
   handleUnstakeMany,
 }: CSTAnchoringPanelProps) {
+  const t = useTranslations('anchoring');
+
   return (
     <>
       <div>
         <SectionHeader
-          title="Anchored Tokens"
-          tooltip="Cosmic Signature NFTs you currently have anchored. You receive ETH Anchor Distributions proportional to how many Cosmic Signature NFTs you anchor."
+          title={t('panels.shared.anchoredTokens')}
+          tooltip={t('panels.cosmicSignature.anchoredTooltip')}
         />
         <AnchoredTokensTable
           list={anchoredTokens}
@@ -60,8 +64,8 @@ export function CSTAnchoringPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Available for Anchoring"
-          tooltip="Cosmic Signature NFTs in your wallet that can be anchored to start receiving ETH Anchor Distributions."
+          title={t('panels.shared.available')}
+          tooltip={t('panels.cosmicSignature.availableTooltip')}
         />
         <CSTokensTable
           list={userTokens}
@@ -76,16 +80,16 @@ export function CSTAnchoringPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Anchor Distributions"
-          tooltip="ETH Anchor Distributions allocated to each anchored Cosmic Signature NFT. Unretrieved distributions can be collected by releasing the anchor."
+          title={t('panels.cosmicSignature.distributions')}
+          tooltip={t('panels.cosmicSignature.distributionsTooltip')}
         />
         <AnchorDistributionsTable list={anchorDistributions} address={account} />
       </div>
 
       <div className="mt-12">
         <SectionHeader
-          title="Anchor / Release History"
-          tooltip="A chronological record of all your anchor and release transactions."
+          title={t('panels.shared.history')}
+          tooltip={t('panels.shared.historyTooltip')}
         />
         <AnchorActionsTable list={stakingActions} IsRwalk={false} />
       </div>

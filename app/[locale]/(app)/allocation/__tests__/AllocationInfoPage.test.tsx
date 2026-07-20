@@ -148,8 +148,8 @@ describe('AllocationInfoPage', () => {
   describe('error and loading states', () => {
     it('shows invalid round message for negative roundNum', () => {
       render(<AllocationInfoPage roundNum={-1} />);
-      expect(screen.getByText('Invalid Cycle Number')).toBeInTheDocument();
-      expect(screen.getByText(/Back to Allocation Recipients/i)).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.invalid.title')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.invalid.back')).toBeInTheDocument();
     });
 
     it('shows skeleton loading state', () => {
@@ -186,33 +186,33 @@ describe('AllocationInfoPage', () => {
     it('shows not found when allocationInfo is null after loading', () => {
       mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false });
       render(<AllocationInfoPage roundNum={1} />);
-      expect(screen.getByText('Allocation Data Not Found')).toBeInTheDocument();
-      expect(screen.getByText(/Back to Allocation Recipients/i)).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.notFound.title')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.notFound.back')).toBeInTheDocument();
     });
 
     it('not found message includes the round number', () => {
       mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false });
       render(<AllocationInfoPage roundNum={99} />);
-      expect(screen.getByText(/Cycle #99/i)).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.notFound.help(cycle=99)')).toBeInTheDocument();
     });
   });
 
   describe('hero banner', () => {
     it('renders round number as heading', () => {
       renderWithData(4);
-      expect(screen.getByText('Cycle #4')).toBeInTheDocument();
+      expect(screen.getByText('allocation.formats.cycleHash(cycle=4)')).toBeInTheDocument();
     });
 
     it('renders breadcrumbs with Allocation Recipients link', () => {
       renderWithData(1);
-      const breadcrumbLink = screen.getByText('Allocation Recipients');
+      const breadcrumbLink = screen.getByText('allocation.details.breadcrumbs.recipients');
       expect(breadcrumbLink).toBeInTheDocument();
       expect(breadcrumbLink.closest('a')).toHaveAttribute('href', '/allocation');
     });
 
     it('renders current round in breadcrumbs', () => {
       renderWithData(3);
-      expect(screen.getByText('Cycle 3')).toBeInTheDocument();
+      expect(screen.getByText('allocation.formats.cycle(cycle=3)')).toBeInTheDocument();
     });
 
     it('displays large hero allocation amount', () => {
@@ -223,30 +223,34 @@ describe('AllocationInfoPage', () => {
 
     it('displays recipient address in hero section', () => {
       renderWithData(1);
-      const heroSection = screen.getByLabelText('Cycle Hero');
+      const heroSection = screen.getByLabelText('allocation.details.hero.aria');
       expect(within(heroSection).getByText(/0xWinn/)).toBeInTheDocument();
     });
 
     it('renders NFT token link in hero', () => {
       renderWithData(1);
-      const heroSection = screen.getByLabelText('Cycle Hero');
-      expect(within(heroSection).getByText('Cosmic Signature #42')).toBeInTheDocument();
+      const heroSection = screen.getByLabelText('allocation.details.hero.aria');
+      expect(
+        within(heroSection).getByText('allocation.formats.cosmicSignatureToken(token=42)'),
+      ).toBeInTheDocument();
     });
 
     it('renders finalized timestamp', () => {
       renderWithData(1);
-      expect(screen.getByText(/Finalized/i)).toBeInTheDocument();
+      expect(screen.getByText(/allocation\.details\.hero\.finalized/)).toBeInTheDocument();
     });
 
     it('renders explorer transaction link', () => {
       renderWithData(1);
-      expect(screen.getByText('View transaction')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.hero.viewTransaction')).toBeInTheDocument();
     });
 
     it('does not show NFT link when tokenId is 0', () => {
       renderWithData(1, { TokenId: 0 });
-      const heroSection = screen.getByLabelText('Cycle Hero');
-      expect(within(heroSection).queryByText(/Cosmic Signature #/)).not.toBeInTheDocument();
+      const heroSection = screen.getByLabelText('allocation.details.hero.aria');
+      expect(
+        within(heroSection).queryByText(/allocation\.formats\.cosmicSignatureToken/),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -261,7 +265,9 @@ describe('AllocationInfoPage', () => {
       renderWithData(1);
       await user.click(screen.getByTestId('share-round-button'));
       await waitFor(() => {
-        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('Cycle #1'));
+        expect(mockCopy).toHaveBeenCalledWith(
+          expect.stringContaining('allocation.details.share.summary(cycle=1'),
+        );
       });
     });
 
@@ -270,7 +276,7 @@ describe('AllocationInfoPage', () => {
       renderWithData(1);
       await user.click(screen.getByTestId('share-round-button'));
       await waitFor(() => {
-        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('1.5000 ETH'));
+        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('amount=1.5000'));
       });
     });
 
@@ -279,7 +285,7 @@ describe('AllocationInfoPage', () => {
       renderWithData(1);
       await user.click(screen.getByTestId('share-round-button'));
       await waitFor(() => {
-        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('Recipient:'));
+        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('recipient='));
       });
     });
 
@@ -289,7 +295,7 @@ describe('AllocationInfoPage', () => {
       renderWithData(1);
       await user.click(screen.getByTestId('share-round-button'));
       await waitFor(() => {
-        expect(toast.success).toHaveBeenCalledWith('Cycle summary copied to clipboard');
+        expect(toast.success).toHaveBeenCalledWith('allocation.details.share.success');
       });
     });
   });
@@ -299,14 +305,18 @@ describe('AllocationInfoPage', () => {
       renderWithData(1);
       const nav = screen.getByTestId('round-navigation');
       expect(nav).toBeInTheDocument();
-      expect(screen.getByLabelText('Previous cycle')).toBeInTheDocument();
-      expect(screen.getByLabelText('Next cycle')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('allocation.details.navigation.previousAria'),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.navigation.nextAria')).toBeInTheDocument();
     });
 
     it('hides previous button for round 0', () => {
       renderWithData(0);
-      expect(screen.queryByLabelText('Previous cycle')).not.toBeInTheDocument();
-      expect(screen.getByLabelText('Next cycle')).toBeInTheDocument();
+      expect(
+        screen.queryByLabelText('allocation.details.navigation.previousAria'),
+      ).not.toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.navigation.nextAria')).toBeInTheDocument();
     });
 
     it('hides next button when at max round', () => {
@@ -315,19 +325,23 @@ describe('AllocationInfoPage', () => {
         isLoading: false,
       });
       renderWithData(1);
-      expect(screen.getByLabelText('Previous cycle')).toBeInTheDocument();
-      expect(screen.queryByLabelText('Next cycle')).not.toBeInTheDocument();
+      expect(
+        screen.getByLabelText('allocation.details.navigation.previousAria'),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByLabelText('allocation.details.navigation.nextAria'),
+      ).not.toBeInTheDocument();
     });
 
     it('previous link points to correct round', () => {
       renderWithData(2);
-      const prev = screen.getByLabelText('Previous cycle');
+      const prev = screen.getByLabelText('allocation.details.navigation.previousAria');
       expect(prev).toHaveAttribute('href', '/allocation/1');
     });
 
     it('next link points to correct round', () => {
       renderWithData(1);
-      const next = screen.getByLabelText('Next cycle');
+      const next = screen.getByLabelText('allocation.details.navigation.nextAria');
       expect(next).toHaveAttribute('href', '/allocation/2');
     });
   });
@@ -335,7 +349,7 @@ describe('AllocationInfoPage', () => {
   describe('round recipients section', () => {
     it('renders section heading', () => {
       renderWithData(1);
-      expect(screen.getByText('Cycle Recipients')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.recipientSection.title')).toBeInTheDocument();
     });
 
     it('renders all four recipient cards', () => {
@@ -372,22 +386,22 @@ describe('AllocationInfoPage', () => {
 
     it('shows token links for NFT rewards', () => {
       renderWithData(1);
-      expect(screen.getByText('Token #42')).toBeInTheDocument();
-      expect(screen.getByText('Token #15')).toBeInTheDocument();
-      expect(screen.getByText('Token #10')).toBeInTheDocument();
-      expect(screen.getByText('Token #11')).toBeInTheDocument();
+      expect(screen.getByText('allocation.formats.token(token=42)')).toBeInTheDocument();
+      expect(screen.getByText('allocation.formats.token(token=15)')).toBeInTheDocument();
+      expect(screen.getByText('allocation.formats.token(token=10)')).toBeInTheDocument();
+      expect(screen.getByText('allocation.formats.token(token=11)')).toBeInTheDocument();
     });
 
     it('shows "None" when a recipient address is empty', () => {
       renderWithData(1, { EnduranceWinnerAddr: '' });
       const card = screen.getByTestId('recipient-card-endurance-champion');
-      expect(within(card).getByText('None')).toBeInTheDocument();
+      expect(within(card).getByText('allocation.details.recipientCard.none')).toBeInTheDocument();
     });
 
     it('does not show token link when tokenId is 0', () => {
       renderWithData(1, { ChronoWarriorNftTokenId: 0 });
       const card = screen.getByTestId('recipient-card-chrono-warrior');
-      expect(within(card).queryByText(/Token #/)).not.toBeInTheDocument();
+      expect(within(card).queryByText(/allocation\.formats\.token/)).not.toBeInTheDocument();
     });
   });
 
@@ -408,10 +422,18 @@ describe('AllocationInfoPage', () => {
     it('displays distribution labels', () => {
       renderWithData(1);
       const bar = screen.getByTestId('allocation-distribution-bar');
-      expect(within(bar).getByText('Signature Allocation')).toBeInTheDocument();
-      expect(within(bar).getByText('Public Goods')).toBeInTheDocument();
-      expect(within(bar).getByText('Anchor Distribution')).toBeInTheDocument();
-      expect(within(bar).getByText('Stellar Selection')).toBeInTheDocument();
+      expect(
+        within(bar).getByText('allocation.details.distribution.segments.signature.label'),
+      ).toBeInTheDocument();
+      expect(
+        within(bar).getByText('allocation.details.distribution.segments.publicGoods.label'),
+      ).toBeInTheDocument();
+      expect(
+        within(bar).getByText('allocation.details.distribution.segments.anchor.label'),
+      ).toBeInTheDocument();
+      expect(
+        within(bar).getByText('allocation.details.distribution.segments.stellar.label'),
+      ).toBeInTheDocument();
     });
 
     it('displays percentage values', () => {
@@ -423,30 +445,36 @@ describe('AllocationInfoPage', () => {
 
     it('renders section heading with tooltip', () => {
       renderWithData(1);
-      expect(screen.getByText('Allocation Distribution')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.distribution.title')).toBeInTheDocument();
     });
   });
 
   describe('round statistics', () => {
     it('renders section heading', () => {
       renderWithData(1);
-      expect(screen.getByText('Cycle Statistics')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.statistics.title')).toBeInTheDocument();
     });
 
     it('renders all 9 stat cards', () => {
       renderWithData(1);
-      const statsSection = screen.getByLabelText('Cycle Statistics');
+      const statsSection = screen.getByLabelText('allocation.details.statistics.aria');
       // Labeled "Signature Allocation ETH" because the stat shows the Final
       // Gesture recipient's ETH, not the whole Cycle Reserve.
-      expect(within(statsSection).getByText('Signature Allocation ETH')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Public Goods')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Anchor Distribution')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Stellar Selection Pool')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Total Gestures')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Attached NFTs')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Anchored Tokens')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Unique Anchor-holders')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Total Contributed')).toBeInTheDocument();
+      for (const card of [
+        'signatureEth',
+        'publicGoods',
+        'anchor',
+        'stellar',
+        'gestures',
+        'attachedNfts',
+        'anchoredTokens',
+        'uniqueAnchorHolders',
+        'totalContributed',
+      ]) {
+        expect(
+          within(statsSection).getByText(`allocation.details.statistics.cards.${card}.label`),
+        ).toBeInTheDocument();
+      }
     });
 
     it('displays correct gesture count', () => {
@@ -466,7 +494,7 @@ describe('AllocationInfoPage', () => {
 
     it('displays unique anchorHolders count', () => {
       renderWithData(1);
-      const statsSection = screen.getByLabelText('Cycle Statistics');
+      const statsSection = screen.getByLabelText('allocation.details.statistics.aria');
       expect(within(statsSection).getByText('0')).toBeInTheDocument();
     });
 
@@ -477,7 +505,7 @@ describe('AllocationInfoPage', () => {
 
     it('displays anchor deposit amount', () => {
       renderWithData(1);
-      const statsSection = screen.getByLabelText('Cycle Statistics');
+      const statsSection = screen.getByLabelText('allocation.details.statistics.aria');
       expect(within(statsSection).getByText('0.5000 ETH')).toBeInTheDocument();
     });
   });
@@ -485,18 +513,28 @@ describe('AllocationInfoPage', () => {
   describe('section divider', () => {
     it('renders detailed data section divider', () => {
       renderWithData(1);
-      expect(screen.getByText('Detailed Data')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.data.divider')).toBeInTheDocument();
     });
   });
 
   describe('tabbed data sections', () => {
     it('renders all tab triggers', () => {
       renderWithData(1);
-      expect(screen.getByRole('tab', { name: /Gesture History/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /Endurance Champions/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /Stellar Selection/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /Anchor Distributions/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /Contributions/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.gestures/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.endurance/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.stellar/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.anchoring/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.contributions/i }),
+      ).toBeInTheDocument();
     });
 
     it('shows gesture history table by default', () => {
@@ -507,7 +545,9 @@ describe('AllocationInfoPage', () => {
     it('switches to endurance champions tab', async () => {
       const user = userEvent.setup();
       renderWithData(1);
-      await user.click(screen.getByRole('tab', { name: /Endurance Champions/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.endurance/i }),
+      );
       await waitFor(() => {
         expect(screen.getByTestId('endurance-champions-table')).toBeInTheDocument();
       });
@@ -533,7 +573,9 @@ describe('AllocationInfoPage', () => {
           },
         ],
       });
-      await user.click(screen.getByRole('tab', { name: /Stellar Selection/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.stellar/i }),
+      );
       await waitFor(() => {
         expect(screen.getByTestId('stellar-selection-ledger-table')).toHaveTextContent(
           'records: 1',
@@ -544,11 +586,11 @@ describe('AllocationInfoPage', () => {
     it('switches to anchor distributions tab and shows empty state', async () => {
       const user = userEvent.setup();
       renderWithData(1);
-      await user.click(screen.getByRole('tab', { name: /Anchor Distributions/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.anchoring/i }),
+      );
       await waitFor(() => {
-        expect(
-          screen.getByText('No Anchor Distributions distributed in this cycle.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('allocation.details.data.empty.anchoring')).toBeInTheDocument();
       });
     });
 
@@ -563,7 +605,9 @@ describe('AllocationInfoPage', () => {
         isLoading: false,
       });
       renderWithData(1);
-      await user.click(screen.getByRole('tab', { name: /Contributions/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.contributions/i }),
+      );
       await waitFor(() => {
         expect(screen.getByTestId('attached-nft-table')).toBeInTheDocument();
         expect(screen.getByTestId('attached-erc20-table')).toBeInTheDocument();
@@ -573,11 +617,12 @@ describe('AllocationInfoPage', () => {
     it('shows attached NFT and ERC20 headings in contributions tab', async () => {
       const user = userEvent.setup();
       renderWithData(1);
-      await user.click(screen.getByRole('tab', { name: /Contributions/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.contributions/i }),
+      );
       await waitFor(() => {
-        const headings = screen.getAllByText('Attached NFTs');
-        expect(headings.length).toBeGreaterThanOrEqual(1);
-        expect(screen.getByText('Attached ERC-20 Tokens')).toBeInTheDocument();
+        expect(screen.getByText('allocation.details.data.contributions.nfts')).toBeInTheDocument();
+        expect(screen.getByText('allocation.details.data.contributions.erc20')).toBeInTheDocument();
       });
     });
   });
@@ -587,7 +632,7 @@ describe('AllocationInfoPage', () => {
       mockUseRoundInfo.mockReturnValue({ data: baseAllocationInfo, isLoading: false });
       mockUseGestureListByCycle.mockReturnValue({ data: [], isLoading: false });
       render(<AllocationInfoPage roundNum={1} />);
-      expect(screen.getByText('No gestures were made in this cycle.')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.data.empty.gestures')).toBeInTheDocument();
     });
 
     it('shows empty state for stellar selection when no stellar allocation records', async () => {
@@ -608,11 +653,11 @@ describe('AllocationInfoPage', () => {
       });
       mockUseGestureListByCycle.mockReturnValue({ data: [], isLoading: false });
       render(<AllocationInfoPage roundNum={1} />);
-      await user.click(screen.getByRole('tab', { name: /Stellar Selection/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.stellar/i }),
+      );
       await waitFor(() => {
-        expect(
-          screen.getByText('No Stellar Selection recipients for this cycle.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('allocation.details.data.empty.stellar')).toBeInTheDocument();
       });
     });
 
@@ -621,11 +666,11 @@ describe('AllocationInfoPage', () => {
       mockUseRoundInfo.mockReturnValue({ data: baseAllocationInfo, isLoading: false });
       mockUseGestureListByCycle.mockReturnValue({ data: [], isLoading: false });
       render(<AllocationInfoPage roundNum={1} />);
-      await user.click(screen.getByRole('tab', { name: /Endurance Champions/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.endurance/i }),
+      );
       await waitFor(() => {
-        expect(
-          screen.getByText('No Endurance Champion data available for this cycle.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('allocation.details.data.empty.endurance')).toBeInTheDocument();
       });
     });
 
@@ -634,11 +679,11 @@ describe('AllocationInfoPage', () => {
       mockUseRoundInfo.mockReturnValue({ data: baseAllocationInfo, isLoading: false });
       mockUseGestureListByCycle.mockReturnValue({ data: [], isLoading: false });
       render(<AllocationInfoPage roundNum={1} />);
-      await user.click(screen.getByRole('tab', { name: /Anchor Distributions/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.anchoring/i }),
+      );
       await waitFor(() => {
-        expect(
-          screen.getByText('No Anchor Distributions distributed in this cycle.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('allocation.details.data.empty.anchoring')).toBeInTheDocument();
       });
     });
 
@@ -647,14 +692,12 @@ describe('AllocationInfoPage', () => {
       mockUseRoundInfo.mockReturnValue({ data: baseAllocationInfo, isLoading: false });
       mockUseGestureListByCycle.mockReturnValue({ data: [], isLoading: false });
       render(<AllocationInfoPage roundNum={1} />);
-      await user.click(screen.getByRole('tab', { name: /Contributions/i }));
+      await user.click(
+        screen.getByRole('tab', { name: /allocation\.details\.data\.tabs\.contributions/i }),
+      );
       await waitFor(() => {
-        expect(
-          screen.getByText('No NFTs were attached to gestures in this cycle.'),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByText('No ERC-20 tokens were attached to gestures in this cycle.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('allocation.details.data.empty.nfts')).toBeInTheDocument();
+        expect(screen.getByText('allocation.details.data.empty.erc20')).toBeInTheDocument();
       });
     });
   });
@@ -663,7 +706,7 @@ describe('AllocationInfoPage', () => {
     it('copies address to clipboard on copy button click', async () => {
       const user = userEvent.setup();
       renderWithData(1);
-      const copyButtons = screen.getAllByLabelText(/Copy address/i);
+      const copyButtons = screen.getAllByLabelText(/allocation\.details\.copy\.addressAria/i);
       expect(copyButtons.length).toBeGreaterThan(0);
       await user.click(copyButtons[0]!);
       await waitFor(() => {
@@ -675,16 +718,16 @@ describe('AllocationInfoPage', () => {
       const { toast } = jest.requireMock('sonner');
       const user = userEvent.setup();
       renderWithData(1);
-      const copyButtons = screen.getAllByLabelText(/Copy address/i);
+      const copyButtons = screen.getAllByLabelText(/allocation\.details\.copy\.addressAria/i);
       await user.click(copyButtons[0]!);
       await waitFor(() => {
-        expect(toast.success).toHaveBeenCalledWith('Address copied to clipboard');
+        expect(toast.success).toHaveBeenCalledWith('allocation.details.copy.addressSuccess');
       });
     });
 
     it('renders copy buttons for all recipient addresses', () => {
       renderWithData(1);
-      const copyButtons = screen.getAllByLabelText(/Copy address/i);
+      const copyButtons = screen.getAllByLabelText(/allocation\.details\.copy\.addressAria/i);
       expect(copyButtons.length).toBeGreaterThanOrEqual(4);
     });
   });
@@ -692,7 +735,9 @@ describe('AllocationInfoPage', () => {
   describe('tab badges', () => {
     it('shows gesture count badge on gesture history tab', () => {
       renderWithData(1);
-      const gesturesTab = screen.getByRole('tab', { name: /Gesture History/i });
+      const gesturesTab = screen.getByRole('tab', {
+        name: /allocation\.details\.data\.tabs\.gestures/i,
+      });
       expect(gesturesTab).toHaveTextContent('1');
     });
 
@@ -704,7 +749,9 @@ describe('AllocationInfoPage', () => {
           { RecordType: 0, WinnerAddr: '0x3', RoundNum: 1 },
         ],
       });
-      const stellarSelectionTab = screen.getByRole('tab', { name: /Stellar Selection/i });
+      const stellarSelectionTab = screen.getByRole('tab', {
+        name: /allocation\.details\.data\.tabs\.stellar/i,
+      });
       expect(stellarSelectionTab).toHaveTextContent('2');
     });
 
@@ -718,7 +765,9 @@ describe('AllocationInfoPage', () => {
         isLoading: false,
       });
       renderWithData(1);
-      const donationsTab = screen.getByRole('tab', { name: /Contributions/i });
+      const donationsTab = screen.getByRole('tab', {
+        name: /allocation\.details\.data\.tabs\.contributions/i,
+      });
       expect(donationsTab).toHaveTextContent('3');
     });
   });
@@ -769,12 +818,12 @@ describe('AllocationInfoPage', () => {
 
     it('sections have aria labels', () => {
       renderWithData(1);
-      expect(screen.getByLabelText('Cycle Hero')).toBeInTheDocument();
-      expect(screen.getByLabelText('Cycle Recipients')).toBeInTheDocument();
-      expect(screen.getByLabelText('Allocation Distribution')).toBeInTheDocument();
-      expect(screen.getByLabelText('Cycle Statistics')).toBeInTheDocument();
-      expect(screen.getByLabelText('All Allocations for This Cycle')).toBeInTheDocument();
-      expect(screen.getByLabelText('Cycle Data')).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.hero.aria')).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.recipientSection.aria')).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.distribution.aria')).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.statistics.aria')).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.ledger.aria')).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.data.aria')).toBeInTheDocument();
     });
 
     it('renders the per-cycle allocation ledger when AllPrizes is populated', () => {
@@ -802,7 +851,7 @@ describe('AllocationInfoPage', () => {
         isLoading: false,
       });
       render(<AllocationInfoPage roundNum={1} />);
-      expect(screen.getByText('All Allocations for This Cycle')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.ledger.title')).toBeInTheDocument();
       expect(screen.getByTestId('cycle-allocation-ledger-table')).toHaveTextContent('records: 2');
       expect(screen.getByTestId('cycle-allocation-ledger-table')).toHaveTextContent(
         'showRoundColumn: false',
@@ -811,23 +860,25 @@ describe('AllocationInfoPage', () => {
 
     it('shows empty message when AllPrizes is empty', () => {
       renderWithData(1);
-      expect(screen.getByText('No allocation records yet.')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.ledger.empty')).toBeInTheDocument();
     });
 
     it('share button has accessible label', () => {
       renderWithData(1);
-      expect(screen.getByLabelText('Share cycle summary')).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.hero.shareAria')).toBeInTheDocument();
     });
 
     it('navigation links have accessible labels', () => {
       renderWithData(1);
-      expect(screen.getByLabelText('Previous cycle')).toBeInTheDocument();
-      expect(screen.getByLabelText('Next cycle')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('allocation.details.navigation.previousAria'),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText('allocation.details.navigation.nextAria')).toBeInTheDocument();
     });
 
     it('copy buttons have accessible labels', () => {
       renderWithData(1);
-      const copyButtons = screen.getAllByLabelText(/Copy address/i);
+      const copyButtons = screen.getAllByLabelText(/allocation\.details\.copy\.addressAria/i);
       copyButtons.forEach((button) => {
         expect(button).toHaveAttribute('aria-label');
       });

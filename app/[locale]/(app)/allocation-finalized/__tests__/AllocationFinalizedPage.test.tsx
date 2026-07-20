@@ -58,14 +58,14 @@ describe('AllocationFinalizedPage', () => {
   it('shows loading state while fetching', () => {
     mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: true, error: null });
     render(<AllocationFinalizedPage />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-    expect(screen.getByText('Loading cycle 5…')).toBeInTheDocument();
+    expect(screen.getByText('allocation.finalized.loading.status')).toBeInTheDocument();
+    expect(screen.getByText('allocation.finalized.loading.subtitle(cycle=5)')).toBeInTheDocument();
   });
 
   it('shows no allocation info message when data is null and not a success redirect', () => {
     mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<AllocationFinalizedPage />);
-    expect(screen.getByText('No allocation information.')).toBeInTheDocument();
+    expect(screen.getByText('allocation.finalized.pending.empty')).toBeInTheDocument();
   });
 
   it('shows success follow-up when message=success and API has no row', () => {
@@ -73,9 +73,11 @@ describe('AllocationFinalizedPage', () => {
     mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<AllocationFinalizedPage />);
     expect(
-      screen.getByRole('heading', { name: /You successfully completed this cycle/i }),
+      screen.getByRole('heading', { name: 'allocation.finalized.pending.successTitle' }),
     ).toBeInTheDocument();
-    const link = screen.getByRole('link', { name: /View cycle 0 allocation details/i });
+    const link = screen.getByRole('link', {
+      name: 'allocation.finalized.pending.viewDetails(cycle=0)',
+    });
     expect(link).toHaveAttribute('href', '/allocation/0');
     expect(screen.getByTestId('fireworks')).toBeInTheDocument();
   });
@@ -92,9 +94,7 @@ describe('AllocationFinalizedPage', () => {
       error: null,
     });
     render(<AllocationFinalizedPage />);
-    expect(
-      screen.getByText('Congratulations! Cycle 5 Signature Allocation received.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('allocation.finalized.result.title(cycle=5)')).toBeInTheDocument();
     expect(screen.getByText('1.234567 ETH')).toBeInTheDocument();
   });
 
@@ -123,7 +123,9 @@ describe('AllocationFinalizedPage', () => {
       error: null,
     });
     render(<AllocationFinalizedPage />);
-    expect(screen.getByText(/7 attached tokens/)).toBeInTheDocument();
+    expect(
+      screen.getByText('allocation.finalized.result.attachedTokens(count=7)'),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

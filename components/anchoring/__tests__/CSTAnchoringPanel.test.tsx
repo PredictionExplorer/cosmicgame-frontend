@@ -39,34 +39,34 @@ const defaultProps: CSTAnchoringPanelProps = {
 describe('CSTAnchoringPanel', () => {
   it('renders all four section headers', () => {
     render(<CSTAnchoringPanel {...defaultProps} />);
-    expect(screen.getByText('Anchored Tokens')).toBeInTheDocument();
-    expect(screen.getByText('Available for Anchoring')).toBeInTheDocument();
-    expect(screen.getByText('Anchor Distributions')).toBeInTheDocument();
-    expect(screen.getByText('Anchor / Release History')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.panels.shared.anchoredTokens')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.panels.shared.available')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.panels.cosmicSignature.distributions')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.panels.shared.history')).toBeInTheDocument();
   });
 
   it('renders Anchored Tokens section first', () => {
     render(<CSTAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[0]).toHaveTextContent('Anchored Tokens');
+    expect(headings[0]).toHaveTextContent('anchoring.panels.shared.anchoredTokens');
   });
 
   it('renders Available for Anchoring section second', () => {
     render(<CSTAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[1]).toHaveTextContent('Available for Anchoring');
+    expect(headings[1]).toHaveTextContent('anchoring.panels.shared.available');
   });
 
   it('renders Anchor Distributions section third', () => {
     render(<CSTAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[2]).toHaveTextContent('Anchor Distributions');
+    expect(headings[2]).toHaveTextContent('anchoring.panels.cosmicSignature.distributions');
   });
 
   it('renders Anchor / Release History section last', () => {
     render(<CSTAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[3]).toHaveTextContent('Anchor / Release History');
+    expect(headings[3]).toHaveTextContent('anchoring.panels.shared.history');
   });
 
   it('passes account to AnchorDistributionsTable', () => {

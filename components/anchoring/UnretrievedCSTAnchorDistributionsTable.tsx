@@ -1,7 +1,7 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { usePublicClient } from 'wagmi';
 import { Tbody, Tr } from 'react-super-responsive-table';
@@ -35,8 +35,9 @@ import {
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { CSTAnchorDistribution } from '@/services/api';
+import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 
-const UncollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
+const UncollectedRewardsRow = ({ row, locale }: { row: CSTAnchorDistribution; locale: string }) => {
   if (!row) return <TablePrimaryRow />;
 
   const {
@@ -52,7 +53,9 @@ const UncollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>{convertTimestampToDateTime(DepositTimeStamp)}</TablePrimaryCell>
+      <TablePrimaryCell>
+        {convertTimestampToDateTime(DepositTimeStamp, false, locale)}
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
       <TablePrimaryCell align="center">{`${YourTokensStaked} / ${NumStakedNFTs}`}</TablePrimaryCell>
       <TablePrimaryCell align="center">{NumUnclaimedTokens}</TablePrimaryCell>
@@ -64,7 +67,9 @@ const UncollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
 };
 
 export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string }) => {
-  const t = useTranslations('toasts');
+  const t = useTranslations('anchoring');
+  const toastT = useTranslations('toasts');
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
   const {
     apiData: status,
@@ -117,15 +122,23 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
     handleClose();
     setIsUnstaking(true);
     try {
-      const hash = await cstAnchoringContract!.write.unstakeMany?.([cstWithRewards]);
-      const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
-      if (res) {
+      if (!cstAnchoringContract) {
         setNotification({
           visible: true,
-          text: 'The selected anchors were released successfully!',
-          type: 'success',
+          text: toastT('wallet.connectCorrectNetwork'),
+          type: 'error',
         });
+        return;
       }
+      const hash = await cstAnchoringContract.write.unstakeMany?.([cstWithRewards]);
+      assertTransactionHash(hash);
+      const res = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(res);
+      setNotification({
+        visible: true,
+        text: toastT('anchor.releasedWithDistributions', { count: cstWithRewards.length }),
+        type: 'success',
+      });
       setTimeout(() => {
         if (isOwnAccount) {
           refetchApiData();
@@ -139,12 +152,16 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
         setNotification({
           visible: true,
           type: 'info',
-          text: t('walletTransactionCancelled'),
+          text: toastT('walletTransactionCancelled'),
         });
       } else {
         reportError(err, 'releasing Cosmic Signature NFT anchors');
-        const msg = getEthErrorMessage(err, t('unexpectedError'));
-        setNotification({ visible: true, type: 'error', text: getErrorMessage(msg) });
+        const msg = getEthErrorMessage(err, toastT('anchor.failed'), { locale });
+        setNotification({
+          visible: true,
+          type: 'error',
+          text: getErrorMessage(msg) || msg,
+        });
       }
     } finally {
       setIsUnstaking(false);
@@ -164,11 +181,11 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
   const list = isOwnAccount ? contextRewards : localList;
 
   if (list === null) {
-    return <p className="text-muted-foreground">Loading...</p>;
+    return <p className="text-muted-foreground">{t('common.loading')}</p>;
   }
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No distributions yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
   }
 
   const currentPageData = list.slice(startIndex, endIndex);
@@ -189,19 +206,33 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
 
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Anchored Tokens (You / Total)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Unretrieved Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit Amount (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Distribution Amount (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Unretrieved Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('tables.unretrievedDistributions.columns.depositDatetime')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.unretrievedDistributions.columns.depositId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.unretrievedDistributions.columns.anchoredTokens')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.unretrievedDistributions.columns.unretrievedTokens')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.unretrievedDistributions.columns.depositAmountEth')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.unretrievedDistributions.columns.distributionAmountEth')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.unretrievedDistributions.columns.unretrievedAmountEth')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 
           <Tbody>
             {currentPageData.map((row) => (
-              <UncollectedRewardsRow key={row.EvtLogId} row={row} />
+              <UncollectedRewardsRow key={row.EvtLogId} row={row} locale={locale} />
             ))}
           </Tbody>
         </TablePrimary>
@@ -210,17 +241,18 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
       {isOwnAccount && (status?.UnretrievedAnchorDistribution ?? 0) > 0 && (
         <div className="flex justify-end items-center mt-4">
           <p className="mr-4">
-            Your retrievable distributions are{' '}
-            {`${(status?.UnretrievedAnchorDistribution ?? 0).toFixed(6)} ETH`}
+            {t('tables.unretrievedDistributions.summary', {
+              amount: (status?.UnretrievedAnchorDistribution ?? 0).toFixed(6),
+            })}
           </p>
           <Button onClick={handleOpen} disabled={isUnstaking}>
             {isUnstaking ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Processing...
+                {t('common.processing')}
               </span>
             ) : (
-              'Release & Retrieve All'
+              t('tables.unretrievedDistributions.releaseAll')
             )}
           </Button>
         </div>
@@ -236,31 +268,34 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Release Tokens &amp; Retrieve Distributions</DialogTitle>
+            <DialogTitle>{t('tables.unretrievedDistributions.dialog.title')}</DialogTitle>
             <DialogDescription>
-              This will <strong>release all your anchored Cosmic Signature NFTs</strong> and forward{' '}
-              <strong>{(status?.UnretrievedAnchorDistribution ?? 0).toFixed(6)} ETH</strong> in
-              accumulated distributions to your wallet.
+              {t.rich('tables.unretrievedDistributions.dialog.description', {
+                amount: (status?.UnretrievedAnchorDistribution ?? 0).toFixed(6),
+                strong: (chunks) => <strong>{chunks}</strong>,
+                amountStrong: (chunks) => <strong>{chunks}</strong>,
+              })}
             </DialogDescription>
           </DialogHeader>
           <Alert variant="warning">
             <AlertDescription>
-              <strong>Permanent action:</strong> Once released, these Cosmic Signature NFTs cannot
-              be anchored again. Only proceed if you want to exit anchoring entirely.
+              {t.rich('tables.unretrievedDistributions.dialog.warning', {
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
             </AlertDescription>
           </Alert>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={handleClose}>
-              Cancel
+              {t('common.actions.cancel')}
             </Button>
             <Button variant="destructive" onClick={releaseAllCST} disabled={isUnstaking}>
               {isUnstaking ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Processing...
+                  {t('common.processing')}
                 </span>
               ) : (
-                'Release & Retrieve'
+                t('tables.unretrievedDistributions.dialog.confirm')
               )}
             </Button>
           </DialogFooter>

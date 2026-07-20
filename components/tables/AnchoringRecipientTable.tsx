@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -19,6 +19,8 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import type { CSTAnchorDistribution } from '@/services/api';
 
 const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
+  const locale = useLocale();
+
   if (!recipient) {
     return <TablePrimaryRow />;
   }
@@ -32,7 +34,7 @@ const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(recipient.TimeStamp ?? 0)}
+          {convertTimestampToDateTime(recipient.TimeStamp ?? 0, false, locale)}
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="left">

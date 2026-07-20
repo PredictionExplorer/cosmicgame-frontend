@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePublicClient } from 'wagmi';
 
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
@@ -7,6 +7,7 @@ import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { toDonatedErc20ClaimAmountBigInt } from '@/utils/donatedErc20';
+import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 
 import useStellarSelectionWalletContract from './useStellarSelectionWalletContract';
 
@@ -37,6 +38,7 @@ interface ClaimingState {
  */
 export function useClaimAllocations(onSuccess?: () => void) {
   const t = useTranslations('toasts');
+  const locale = useLocale();
   const { setNotification } = useNotification();
   const { fetchData: fetchStatusData } = useApiData();
   const stellarSelectionWalletContract = useStellarSelectionWalletContract();
@@ -71,20 +73,20 @@ export function useClaimAllocations(onSuccess?: () => void) {
         return;
       }
       reportError(err, context);
-      const rawMsg = getEthErrorMessage(err, 'An error occurred');
+      const rawMsg = getEthErrorMessage(err, t('claim.failed'), { locale });
       const msg = getErrorMessage(rawMsg) || rawMsg;
       setNotification({ text: msg, type: 'error', visible: true });
     },
-    [setNotification, t],
+    [locale, setNotification, t],
   );
 
   const notifyWalletNotConnected = useCallback(() => {
     setNotification({
-      text: 'Please connect your wallet and ensure you are on the correct network.',
+      text: t('claim.walletNotConnected'),
       type: 'error',
       visible: true,
     });
-  }, [setNotification]);
+  }, [setNotification, t]);
 
   const refreshAfterClaim = useCallback(() => {
     if (!mountedRef.current) return;
@@ -95,16 +97,15 @@ export function useClaimAllocations(onSuccess?: () => void) {
   /**
    * Awaits the transaction receipt so that consumer UI only transitions out
    * of its loading state once the tx has actually been included in a block.
-   * If `publicClient` is unavailable (should not happen in practice but can
-   * during hydration), we fall back to treating the tx-hash resolution as
-   * enough — any follow-up error surfaces via the query refetch.
+   * A missing hash/client is handled as a transaction failure; treating either
+   * as success could falsely tell the user that assets were retrieved.
    */
   const awaitTx = useCallback(
     async (maybeHash: `0x${string}` | undefined) => {
-      if (!maybeHash) return;
-      if (publicClient) {
-        await publicClient.waitForTransactionReceipt({ hash: maybeHash });
-      }
+      assertTransactionHash(maybeHash);
+      if (!publicClient) throw new Error('Public client is unavailable.');
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: maybeHash });
+      assertSuccessfulTransactionReceipt(receipt);
     },
     [publicClient],
   );
@@ -123,6 +124,11 @@ export function useClaimAllocations(onSuccess?: () => void) {
           [],
         ]);
         await awaitTx(hash);
+        setNotification({
+          text: t('claim.stellarEthSuccess'),
+          type: 'success',
+          visible: true,
+        });
         refreshAfterClaim();
       } catch (err) {
         handleTxError(err, 'retrieve all Stellar Selection ETH');
@@ -136,6 +142,8 @@ export function useClaimAllocations(onSuccess?: () => void) {
       stellarSelectionWalletContract,
       notifyWalletNotConnected,
       awaitTx,
+      setNotification,
+      t,
       refreshAfterClaim,
       handleTxError,
     ],
@@ -151,6 +159,11 @@ export function useClaimAllocations(onSuccess?: () => void) {
       try {
         const hash = await stellarSelectionWalletContract.write.claimDonatedNft?.([tokenID]);
         await awaitTx(hash);
+        setNotification({
+          text: t('claim.nftSuccess'),
+          type: 'success',
+          visible: true,
+        });
         refreshAfterClaim();
       } catch (err) {
         handleTxError(err, 'retrieve attached NFT');
@@ -164,6 +177,8 @@ export function useClaimAllocations(onSuccess?: () => void) {
       stellarSelectionWalletContract,
       notifyWalletNotConnected,
       awaitTx,
+      setNotification,
+      t,
       refreshAfterClaim,
       handleTxError,
     ],
@@ -179,6 +194,11 @@ export function useClaimAllocations(onSuccess?: () => void) {
       try {
         const hash = await stellarSelectionWalletContract.write.claimManyDonatedNfts?.([indexList]);
         await awaitTx(hash);
+        setNotification({
+          text: t('claim.nftsSuccess', { count: indexList.length }),
+          type: 'success',
+          visible: true,
+        });
         refreshAfterClaim();
       } catch (err) {
         handleTxError(err, 'retrieve all attached NFTs');
@@ -192,6 +212,8 @@ export function useClaimAllocations(onSuccess?: () => void) {
       stellarSelectionWalletContract,
       notifyWalletNotConnected,
       awaitTx,
+      setNotification,
+      t,
       refreshAfterClaim,
       handleTxError,
     ],
@@ -211,6 +233,11 @@ export function useClaimAllocations(onSuccess?: () => void) {
           toDonatedErc20ClaimAmountBigInt(amount),
         ]);
         await awaitTx(hash);
+        setNotification({
+          text: t('claim.tokenSuccess'),
+          type: 'success',
+          visible: true,
+        });
         refreshAfterClaim();
       } catch (err) {
         handleTxError(err, 'retrieve attached ERC20 token');
@@ -224,6 +251,8 @@ export function useClaimAllocations(onSuccess?: () => void) {
       stellarSelectionWalletContract,
       notifyWalletNotConnected,
       awaitTx,
+      setNotification,
+      t,
       refreshAfterClaim,
       handleTxError,
     ],
@@ -251,6 +280,11 @@ export function useClaimAllocations(onSuccess?: () => void) {
           rawTokens,
         ]);
         await awaitTx(hash);
+        setNotification({
+          text: t('claim.tokensSuccess', { count: rawTokens.length }),
+          type: 'success',
+          visible: true,
+        });
         refreshAfterClaim();
       } catch (err) {
         handleTxError(err, 'retrieve all attached ERC20 tokens');
@@ -264,6 +298,8 @@ export function useClaimAllocations(onSuccess?: () => void) {
       stellarSelectionWalletContract,
       notifyWalletNotConnected,
       awaitTx,
+      setNotification,
+      t,
       refreshAfterClaim,
       handleTxError,
     ],

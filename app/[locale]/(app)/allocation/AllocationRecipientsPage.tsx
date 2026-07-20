@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Trophy, Gavel, Layers, Users } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
@@ -14,59 +15,61 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { AllocationTable } from '@/components/tables/AllocationTable';
 import { useRoundList } from '@/hooks/useApiQuery';
 
-const allocationTracks = [
-  {
-    label: 'Signature',
-    value: `${protocolFacts.mainEthPercentage}%`,
-    width: `${protocolFacts.mainEthPercentage}%`,
-    color: 'bg-[rgb(var(--aurora-cyan-rgb))]',
-    tooltip:
-      'The Signature Allocation is the main ETH allocation, retrieved by the participant who made the Final Gesture.',
-  },
-  {
-    label: 'Chrono',
-    value: `${protocolFacts.chronoWarriorEthPercentage}%`,
-    width: `${protocolFacts.chronoWarriorEthPercentage}%`,
-    color: 'bg-[rgb(var(--nebula-violet-rgb))]',
-    tooltip:
-      'The Chrono-Warrior allocation rewards the participant whose gesture carried the cycle through the most time.',
-  },
-  {
-    label: 'Stellar ETH',
-    value: `${protocolFacts.stellarSelectionEthPercentage}%`,
-    width: `${protocolFacts.stellarSelectionEthPercentage}%`,
-    color: 'bg-[rgb(var(--solar-gold-rgb))]',
-    tooltip:
-      'ETH set aside for Stellar Selection recipients. Each gesture creates selection frequency for these participant allocations.',
-  },
-  {
-    label: 'Anchor',
-    value: `${protocolFacts.anchorDistributionPercentage}%`,
-    width: `${protocolFacts.anchorDistributionPercentage}%`,
-    color: 'bg-[rgb(var(--impact-green-rgb))]',
-    tooltip:
-      'ETH distributed to wallets with Cosmic Signature NFTs anchored to the protocol. RandomWalk NFT anchors receive Anchored-NFT Stellar Selection eligibility instead, not ETH.',
-  },
-  {
-    label: 'Public Goods',
-    value: `${protocolFacts.publicGoodsPercentage}%`,
-    width: `${protocolFacts.publicGoodsPercentage}%`,
-    color: 'bg-[rgb(var(--chrono-rose-rgb))]',
-    tooltip:
-      'ETH forwarded from the cycle to the selected Public Goods Beneficiary, currently Protocol Guild.',
-  },
-  {
-    label: 'Next cycle',
-    value: `~${protocolFacts.compoundingReservePercentage}%`,
-    width: `${protocolFacts.compoundingReservePercentage}%`,
-    color: 'bg-white/40',
-    tooltip:
-      'The remaining Cycle Reserve compounds into the next Performance Cycle after the finalized allocations are made.',
-  },
-] as const;
-
 const AllocationRecipientsPage = () => {
+  const t = useTranslations('allocation');
+  const locale = useLocale();
   const { data: rawPrizeClaims = [], isLoading: loading } = useRoundList();
+
+  const allocationTracks = [
+    {
+      id: 'signature',
+      label: t('recipients.reserveSplit.tracks.signature.label'),
+      value: `${protocolFacts.mainEthPercentage}%`,
+      width: `${protocolFacts.mainEthPercentage}%`,
+      color: 'bg-[rgb(var(--aurora-cyan-rgb))]',
+      tooltip: t('recipients.reserveSplit.tracks.signature.tooltip'),
+    },
+    {
+      id: 'chrono',
+      label: t('recipients.reserveSplit.tracks.chrono.label'),
+      value: `${protocolFacts.chronoWarriorEthPercentage}%`,
+      width: `${protocolFacts.chronoWarriorEthPercentage}%`,
+      color: 'bg-[rgb(var(--nebula-violet-rgb))]',
+      tooltip: t('recipients.reserveSplit.tracks.chrono.tooltip'),
+    },
+    {
+      id: 'stellar',
+      label: t('recipients.reserveSplit.tracks.stellar.label'),
+      value: `${protocolFacts.stellarSelectionEthPercentage}%`,
+      width: `${protocolFacts.stellarSelectionEthPercentage}%`,
+      color: 'bg-[rgb(var(--solar-gold-rgb))]',
+      tooltip: t('recipients.reserveSplit.tracks.stellar.tooltip'),
+    },
+    {
+      id: 'anchor',
+      label: t('recipients.reserveSplit.tracks.anchor.label'),
+      value: `${protocolFacts.anchorDistributionPercentage}%`,
+      width: `${protocolFacts.anchorDistributionPercentage}%`,
+      color: 'bg-[rgb(var(--impact-green-rgb))]',
+      tooltip: t('recipients.reserveSplit.tracks.anchor.tooltip'),
+    },
+    {
+      id: 'public-goods',
+      label: t('recipients.reserveSplit.tracks.publicGoods.label'),
+      value: `${protocolFacts.publicGoodsPercentage}%`,
+      width: `${protocolFacts.publicGoodsPercentage}%`,
+      color: 'bg-[rgb(var(--chrono-rose-rgb))]',
+      tooltip: t('recipients.reserveSplit.tracks.publicGoods.tooltip'),
+    },
+    {
+      id: 'next-cycle',
+      label: t('recipients.reserveSplit.tracks.nextCycle.label'),
+      value: `~${protocolFacts.compoundingReservePercentage}%`,
+      width: `${protocolFacts.compoundingReservePercentage}%`,
+      color: 'bg-white/40',
+      tooltip: t('recipients.reserveSplit.tracks.nextCycle.tooltip'),
+    },
+  ] as const;
 
   const allocationFinalizations = useMemo(
     () => [...rawPrizeClaims].sort((a, b) => b.TimeStamp - a.TimeStamp),
@@ -93,19 +96,19 @@ const AllocationRecipientsPage = () => {
         align="left"
         eyebrow={
           <SectionEyebrow tone="aurora" pulse>
-            Allocation · Performance Cycles
+            {t('recipients.header.eyebrow')}
           </SectionEyebrow>
         }
-        title="Allocation Recipients"
+        title={t('recipients.header.title')}
         titleLevel={2}
         gradientTitle="signature"
-        subtitle="Browse the complete history of allocation recipients, cycle statistics, and allocation distributions across all finalized Performance Cycles."
+        subtitle={t('recipients.header.subtitle')}
         meta={
           <span className="inline-flex items-center gap-1.5 type-body-sm text-muted-foreground">
-            <span>Finalized round records only</span>
+            <span>{t('recipients.header.scope')}</span>
             <InfoTooltip
-              content="This page summarizes finalized Performance Cycles from the round API. Pending cycles and unrelated allocation retrieval records are not included in these totals."
-              label="Finalized round records only"
+              content={t('recipients.header.scopeTooltip')}
+              label={t('recipients.header.scope')}
             />
           </span>
         }
@@ -118,24 +121,20 @@ const AllocationRecipientsPage = () => {
         className="mb-10 grid gap-6 lg:grid-cols-[1fr_360px] lg:items-center"
       >
         <p className="type-body-md text-muted-foreground">
-          When a Performance Cycle finalizes, the participant who made the Final Gesture retrieves
-          the Signature Allocation &mdash; {protocolFacts.mainEthPercentage}% of the Cycle Reserve,
-          1,000 CST, and a unique Cosmic Signature NFT. Additional allocations flow through
-          Chrono-Warrior, Stellar Selection, Anchor Distributions, Public Goods, and the Compounding
-          Cycle Reserve.
+          {t('recipients.intro', { percentage: protocolFacts.mainEthPercentage })}
         </p>
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <p className="type-eyebrow text-white/65">Cycle Reserve Split</p>
+            <p className="type-eyebrow text-white/65">{t('recipients.reserveSplit.label')}</p>
             <InfoTooltip
-              content="Percentages show how a finalized cycle's ETH reserve is allocated across protocol tracks."
-              label="Cycle Reserve Split"
+              content={t('recipients.reserveSplit.tooltip')}
+              label={t('recipients.reserveSplit.label')}
               iconClassName="h-3 w-3"
               className="text-white/45 hover:text-white/80"
             />
           </div>
-          {allocationTracks.map(({ label, value, width, color, tooltip }) => (
-            <div key={label} className="grid grid-cols-[112px_1fr_48px] items-center gap-3">
+          {allocationTracks.map(({ id, label, value, width, color, tooltip }) => (
+            <div key={id} className="grid grid-cols-[112px_1fr_48px] items-center gap-3">
               <span className="flex items-center gap-1.5 type-mono-sm text-white/55">
                 <span>{label}</span>
                 <InfoTooltip
@@ -168,35 +167,35 @@ const AllocationRecipientsPage = () => {
         <div data-testid="summary-stats" className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard
             data-testid="summary-stat-total-cycles"
-            label="Total Cycles"
+            label={t('recipients.stats.totalCycles.label')}
             value={summaryStats.totalRounds}
             icon={<Layers className="h-4 w-4" />}
             accent="aurora"
-            tooltip="The total number of finalized Performance Cycles so far."
+            tooltip={t('recipients.stats.totalCycles.tooltip')}
           />
           <StatCard
             data-testid="summary-stat-total-eth-distributed"
-            label="Total ETH Distributed"
+            label={t('recipients.stats.totalEth.label')}
             value={`${summaryStats.totalEth.toFixed(2)} ETH`}
             icon={<Trophy className="h-4 w-4" />}
             accent="solar"
-            tooltip="The combined ETH distributed as Signature Allocations across all cycles."
+            tooltip={t('recipients.stats.totalEth.tooltip')}
           />
           <StatCard
             data-testid="summary-stat-total-gestures"
-            label="Total Gestures"
-            value={summaryStats.totalGestures.toLocaleString()}
+            label={t('recipients.stats.totalGestures.label')}
+            value={summaryStats.totalGestures.toLocaleString(locale)}
             icon={<Gavel className="h-4 w-4" />}
             accent="nebula"
-            tooltip="The cumulative number of gestures made across all finalized cycles."
+            tooltip={t('recipients.stats.totalGestures.tooltip')}
           />
           <StatCard
             data-testid="summary-stat-unique-recipients"
-            label="Unique Recipients"
+            label={t('recipients.stats.uniqueRecipients.label')}
             value={summaryStats.uniqueRecipients}
             icon={<Users className="h-4 w-4" />}
             accent="impact"
-            tooltip="The number of distinct wallet addresses that have retrieved a Signature Allocation."
+            tooltip={t('recipients.stats.uniqueRecipients.tooltip')}
           />
         </div>
       ) : null}

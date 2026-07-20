@@ -3,6 +3,18 @@ import { fireEvent } from '@testing-library/react';
 
 import { act, render, screen, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 jest.mock('../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: '0xUser123' }),
 }));
@@ -64,7 +76,7 @@ describe('AnchoredTokensTable', () => {
         />,
       );
     });
-    expect(screen.getByText('No tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.tokens')).toBeInTheDocument();
   });
 
   it('renders table headers for RWLK', async () => {
@@ -78,7 +90,12 @@ describe('AnchoredTokensTable', () => {
         />,
       );
     });
-    for (const header of ['Token Image', 'Token ID', 'Anchor Action ID', 'Anchor Datetime']) {
+    for (const header of [
+      'anchoring.tables.anchoredTokens.columns.image',
+      'anchoring.tables.anchoredTokens.columns.tokenId',
+      'anchoring.tables.anchoredTokens.columns.actionId',
+      'anchoring.tables.anchoredTokens.columns.datetime',
+    ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });
@@ -94,7 +111,10 @@ describe('AnchoredTokensTable', () => {
         />,
       );
     });
-    expect(screen.getAllByText('Accumulated Distributions').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('anchoring.tables.anchoredTokens.columns.accumulatedDistributions')
+        .length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('does not show Accumulated Distributions header for RWLK', async () => {
@@ -108,7 +128,9 @@ describe('AnchoredTokensTable', () => {
         />,
       );
     });
-    expect(screen.queryByText('Accumulated Distributions')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.tables.anchoredTokens.columns.accumulatedDistributions'),
+    ).not.toBeInTheDocument();
   });
 
   it('renders RWLK row data', async () => {
@@ -124,6 +146,7 @@ describe('AnchoredTokensTable', () => {
     });
     expect(screen.getAllByText('55').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('7').length).toBeGreaterThanOrEqual(1);
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
   });
 
   it('renders CST row data', async () => {
@@ -152,7 +175,7 @@ describe('AnchoredTokensTable', () => {
         />,
       );
     });
-    expect(screen.getAllByText('Release').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('anchoring.common.release').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders only first page of results (perPage=5)', async () => {
@@ -189,7 +212,7 @@ describe('AnchoredTokensTable', () => {
       );
     });
     await act(async () => {
-      fireEvent.click(screen.getAllByText('Release')[0]!);
+      fireEvent.click(screen.getAllByText('anchoring.common.release')[0]!);
     });
     expect(mockRelease).toHaveBeenCalledWith(42, true);
   });
@@ -248,7 +271,7 @@ describe('AnchoredTokensTable', () => {
     const cell2 = screen.getAllByText('43').find((el) => el.closest('td'));
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
-    expect(screen.getByText('Release Many')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.actions.releaseMany')).toBeInTheDocument();
   });
 
   it('Unstake Many calls handleUnstakeMany with selected action IDs', async () => {
@@ -270,7 +293,7 @@ describe('AnchoredTokensTable', () => {
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
     await act(async () => {
-      fireEvent.click(screen.getByText('Release Many'));
+      fireEvent.click(screen.getByText('anchoring.common.actions.releaseMany'));
     });
     expect(mockReleaseMany).toHaveBeenCalledWith(expect.arrayContaining([10, 20]), true);
   });
@@ -287,9 +310,9 @@ describe('AnchoredTokensTable', () => {
       );
     });
     await act(async () => {
-      fireEvent.click(screen.getAllByText('Release')[0]!);
+      fireEvent.click(screen.getAllByText('anchoring.common.release')[0]!);
     });
-    expect(screen.queryByText('Release Many')).not.toBeInTheDocument();
+    expect(screen.queryByText('anchoring.common.actions.releaseMany')).not.toBeInTheDocument();
   });
 
   it('resets selection when list prop changes', async () => {
@@ -316,7 +339,7 @@ describe('AnchoredTokensTable', () => {
         />,
       );
     });
-    expect(screen.queryByText('Release Many')).not.toBeInTheDocument();
+    expect(screen.queryByText('anchoring.common.actions.releaseMany')).not.toBeInTheDocument();
   });
 
   it('passes isRwlk=false for CST release', async () => {
@@ -331,7 +354,7 @@ describe('AnchoredTokensTable', () => {
       );
     });
     await act(async () => {
-      fireEvent.click(screen.getAllByText('Release')[0]!);
+      fireEvent.click(screen.getAllByText('anchoring.common.release')[0]!);
     });
     expect(mockRelease).toHaveBeenCalledWith(10, false);
   });

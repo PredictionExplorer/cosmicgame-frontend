@@ -62,10 +62,8 @@ describe('MyTokens', () => {
     mockAccount = null;
     mockActive = false;
     render(<MyWallet />);
-    expect(screen.getByText('Wallet not connected')).toBeInTheDocument();
-    expect(
-      screen.getByText('Please connect your wallet to view and manage your NFTs.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('myPages.shared.walletNotConnected')).toBeInTheDocument();
+    expect(screen.getByText('myPages.tokens.page.walletDescription')).toBeInTheDocument();
     expect(mockUseCSTTokensByUser).toHaveBeenCalledWith(undefined);
   });
 
@@ -78,7 +76,7 @@ describe('MyTokens', () => {
   it('shows error state', () => {
     mockUseCSTTokensByUser.mockReturnValue({ data: undefined, isLoading: false, isError: true });
     render(<MyWallet />);
-    expect(screen.getByText('Failed to load Cosmic Signature NFTs.')).toBeInTheDocument();
+    expect(screen.getByText('myPages.tokens.page.loadErrorMessage')).toBeInTheDocument();
   });
 
   it('renders token table with data', () => {
@@ -99,8 +97,8 @@ describe('MyTokens', () => {
   it('renders page title', () => {
     mockUseCSTTokensByUser.mockReturnValue({ data: [], isLoading: false, isError: false });
     render(<MyWallet />);
-    expect(screen.getByText('My NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature NFTs I Own')).toBeInTheDocument();
+    expect(screen.getByText('myPages.tokens.page.title')).toBeInTheDocument();
+    expect(screen.getByText('myPages.tokens.page.ownedTitle')).toBeInTheDocument();
   });
 
   it('links to the Cosmic Signature marketplace from the page header', () => {
@@ -129,13 +127,13 @@ describe('MyTokens', () => {
     expect(screen.getByTestId('cst-table')).toHaveTextContent('tokens: 2');
     expect(screen.queryByTestId('nft-transfer-form')).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /transfer nfts/i }));
+    await user.click(screen.getByText('myPages.tokens.page.transferTitle'));
 
     const form = screen.getByTestId('nft-transfer-form');
     expect(form).toHaveAttribute('data-source', '0xUser');
     expect(form).toHaveAttribute('data-count', '2');
     expect(form).toHaveAttribute('data-history', '/cosmic-signature-transfer/0xUser');
-    expect(form).toHaveTextContent('Select NFTs from this wallet only when you are ready');
+    expect(form).toHaveTextContent('myPages.tokens.page.transferDescription');
   });
 
   it('has no accessibility violations', async () => {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -58,6 +58,8 @@ const gestureTypeBg: Record<number, string> = {
 
 const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) => {
   const t = useTranslations('tables');
+  const tToast = useTranslations('toasts');
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
 
@@ -68,11 +70,11 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       setNotification({
         visible: true,
         type: 'success',
-        text: t('banGesture.banned'),
+        text: tToast('admin.gestureBan.banned'),
       });
     } catch (e) {
       reportError(e, 'ban gesture');
-      const rawMsg = getEthErrorMessage(e, t('banGesture.error'));
+      const rawMsg = getEthErrorMessage(e, tToast('admin.gestureBan.failed'), { locale });
       if (rawMsg) {
         const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ visible: true, text: msg, type: 'error' });
@@ -87,11 +89,11 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       setNotification({
         visible: true,
         type: 'success',
-        text: t('banGesture.unbanned'),
+        text: tToast('admin.gestureBan.unbanned'),
       });
     } catch (e) {
       reportError(e, 'unban gesture');
-      const rawMsg = getEthErrorMessage(e, t('banGesture.error'));
+      const rawMsg = getEthErrorMessage(e, tToast('admin.gestureBan.failed'), { locale });
       if (rawMsg) {
         const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ visible: true, text: msg, type: 'error' });

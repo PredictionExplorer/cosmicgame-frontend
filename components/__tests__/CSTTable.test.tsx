@@ -14,7 +14,7 @@ import { CSTTable } from '@/components/tokens/CSTTable';
 describe('CSTTable', () => {
   test('with no records shows "No tokens yet."', () => {
     render(<CSTTable list={[]} />);
-    expect(screen.getByText('No tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('myPages.tokens.table.empty')).toBeInTheDocument();
   });
 
   test('with mock data renders token rows', () => {
@@ -71,8 +71,8 @@ describe('CSTTable', () => {
     render(<CSTTable list={mockData} />);
 
     // Staked = false => "No", WasUnstaked = true => "Yes"
-    const noElements = screen.getAllByText('No');
-    const yesElements = screen.getAllByText('Yes');
+    const noElements = screen.getAllByText('myPages.shared.no');
+    const yesElements = screen.getAllByText('myPages.shared.yes');
     expect(noElements.length).toBeGreaterThanOrEqual(1);
     expect(yesElements.length).toBeGreaterThanOrEqual(1);
   });
@@ -99,7 +99,7 @@ describe('CSTTable', () => {
 
     render(<CSTTable list={mockData} />);
 
-    expect(screen.getByText('Cosmic Signature NFT Stellar Selection')).toBeInTheDocument();
+    expect(screen.getByText('myPages.tokens.table.types.stellarSelection')).toBeInTheDocument();
   });
 
   test('renders table headers', () => {
@@ -126,10 +126,14 @@ describe('CSTTable', () => {
 
     // react-super-responsive-table duplicates header text in tdBefore divs,
     // so we use getAllByText and check at least one match exists
-    expect(screen.getAllByText('Token ID').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Token Name').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Cycle').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Recipient Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Allocation Type').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('myPages.tokens.table.tokenId').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('myPages.tokens.table.tokenName').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('myPages.tokens.table.cycle').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('myPages.tokens.table.recipientAddress').length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('myPages.tokens.table.allocationType').length,
+    ).toBeGreaterThanOrEqual(1);
   });
 });

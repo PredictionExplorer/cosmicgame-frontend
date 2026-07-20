@@ -31,25 +31,27 @@ describe('ActivitySummary', () => {
 
   it('renders activity overview heading', () => {
     render(<ActivitySummary {...baseProps} />);
-    expect(screen.getByText('Activity Overview')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.activity.title')).toBeInTheDocument();
   });
 
   it('renders gesturing stats', () => {
     render(<ActivitySummary {...baseProps} />);
-    expect(screen.getByText('Gestures Made')).toBeInTheDocument();
-    expect(screen.getByText('Max Gesture')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.activity.gesturesMade.label')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.activity.maxGesture.label')).toBeInTheDocument();
   });
 
   it('renders stellar-selection stats', () => {
     render(<ActivitySummary {...baseProps} />);
-    expect(screen.getByText('ETH Stellar Selections Participated')).toBeInTheDocument();
-    expect(screen.getByText('NFTs Received')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.activity.ethSelections.label')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.activity.nftsReceived.label')).toBeInTheDocument();
   });
 
   it('renders anchoring stats', () => {
     render(<ActivitySummary {...baseProps} />);
-    expect(screen.getByText('Anchor Actions')).toBeInTheDocument();
-    expect(screen.getByText('Distributions Received')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.activity.anchorActions.label')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.activity.distributionsReceived.label'),
+    ).toBeInTheDocument();
   });
 
   it('displays correct gesture count', () => {
@@ -59,7 +61,7 @@ describe('ActivitySummary', () => {
 
   it('displays combined anchor actions count', () => {
     render(<ActivitySummary {...baseProps} />);
-    const anchorLabel = screen.getByText('Anchor Actions');
+    const anchorLabel = screen.getByText('myPages.statistics.activity.anchorActions.label');
     const anchorRow = anchorLabel.closest('div')!.parentElement!;
     expect(anchorRow).toHaveTextContent('5');
   });

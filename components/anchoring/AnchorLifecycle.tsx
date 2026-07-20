@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Anchor, Check, Hourglass, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Surface } from '@/components/ui/surface';
@@ -22,34 +23,24 @@ type IconComponent = React.ComponentType<{ className?: string; 'aria-hidden'?: b
 
 interface StageDef {
   id: AnchorStage;
-  label: string;
-  description: string;
   icon: IconComponent;
 }
 
 const STAGES: readonly StageDef[] = [
   {
     id: 'anchor',
-    label: 'Anchor',
-    description: 'NFT deposited into the protocol',
     icon: Anchor,
   },
   {
     id: 'active',
-    label: 'Active',
-    description: 'Receiving per-cycle distributions',
     icon: Hourglass,
   },
   {
     id: 'retrievable',
-    label: 'Retrievable',
-    description: 'Available to retrieve',
     icon: Package,
   },
   {
     id: 'retrieved',
-    label: 'Retrieved',
-    description: 'Returned to your wallet',
     icon: Check,
   },
 ];
@@ -66,6 +57,7 @@ interface AnchorLifecycleProps {
 }
 
 export function AnchorLifecycle({ current, timestamps, className }: AnchorLifecycleProps) {
+  const t = useTranslations('anchoring');
   const variants = useMotionVariants(fadeRise);
   const activeIdx = stageIndex(current);
 
@@ -73,7 +65,7 @@ export function AnchorLifecycle({ current, timestamps, className }: AnchorLifecy
     <Surface variant="glass" radius="md" padding="lg" className={className}>
       <ol
         role="list"
-        aria-label="Anchor lifecycle"
+        aria-label={t('lifecycle.ariaLabel')}
         className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-0"
       >
         <div className="absolute left-4 top-4 hidden h-0.5 w-[calc(100%-2rem)] bg-white/[0.06] sm:block" />
@@ -118,9 +110,11 @@ export function AnchorLifecycle({ current, timestamps, className }: AnchorLifecy
                     reached ? 'text-foreground' : 'text-muted-foreground/70',
                   )}
                 >
-                  {stage.label}
+                  {t(`lifecycle.stages.${stage.id}.label`)}
                 </p>
-                <p className="type-body-sm text-muted-foreground">{stage.description}</p>
+                <p className="type-body-sm text-muted-foreground">
+                  {t(`lifecycle.stages.${stage.id}.description`)}
+                </p>
                 {ts ? <p className="mt-0.5 type-mono-sm text-muted-foreground/60">{ts}</p> : null}
               </div>
             </motion.li>

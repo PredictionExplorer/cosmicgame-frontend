@@ -1,10 +1,10 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState, type FC } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime } from '@/utils';
-import { statisticsCopy } from '@/content/statistics-copy';
 
 import { Link } from '@/i18n/navigation';
 import {
@@ -20,35 +20,23 @@ import { AddressLink } from '@/components/common/AddressLink';
 import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { AnchoredTokenInfo } from '@/services/api';
 
-const responsiveHeaders = [
-  {
-    desktop: 'Anchor Datetime',
-    mobile: 'Datetime',
-    align: 'left' as const,
-    tooltip: 'Timestamp when the token was anchored.',
-  },
-  { desktop: 'Action ID', mobile: 'Action', tooltip: 'Anchor action record linked to this token.' },
-  { desktop: 'Token ID', mobile: 'Token', tooltip: 'Anchored token identifier.' },
-  {
-    desktop: 'Anchor-holder Address',
-    mobile: 'Holder',
-    tooltip: statisticsCopy.tables.anchorHolderAddress,
-  },
-];
-
 interface GlobalAnchoredTokensRowProps {
   row: AnchoredTokenInfo;
   IsRWLK: boolean;
 }
 
 const GlobalAnchoredTokensRow: FC<GlobalAnchoredTokensRowProps> = ({ row, IsRWLK }) => {
+  const locale = useLocale();
+
   if (!row) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>{convertTimestampToDateTime(row.StakeTimeStamp)}</TablePrimaryCell>
+      <TablePrimaryCell>
+        {convertTimestampToDateTime(row.StakeTimeStamp, false, locale)}
+      </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
         <Link
@@ -87,11 +75,35 @@ interface GlobalAnchoredTokensTableProps {
 }
 
 export const GlobalAnchoredTokensTable: FC<GlobalAnchoredTokensTableProps> = ({ list, IsRWLK }) => {
+  const t = useTranslations('anchoring');
   const perPage = 5;
   const [page, setPage] = useState(1);
+  const responsiveHeaders = [
+    {
+      desktop: t('tables.globalAnchoredTokens.headers.anchorDatetime.desktop'),
+      mobile: t('tables.globalAnchoredTokens.headers.anchorDatetime.mobile'),
+      align: 'left' as const,
+      tooltip: t('tables.globalAnchoredTokens.headers.anchorDatetime.tooltip'),
+    },
+    {
+      desktop: t('tables.globalAnchoredTokens.headers.actionId.desktop'),
+      mobile: t('tables.globalAnchoredTokens.headers.actionId.mobile'),
+      tooltip: t('tables.globalAnchoredTokens.headers.actionId.tooltip'),
+    },
+    {
+      desktop: t('tables.globalAnchoredTokens.headers.tokenId.desktop'),
+      mobile: t('tables.globalAnchoredTokens.headers.tokenId.mobile'),
+      tooltip: t('tables.globalAnchoredTokens.headers.tokenId.tooltip'),
+    },
+    {
+      desktop: t('tables.globalAnchoredTokens.headers.holderAddress.desktop'),
+      mobile: t('tables.globalAnchoredTokens.headers.holderAddress.mobile'),
+      tooltip: t('tables.globalAnchoredTokens.headers.holderAddress.tooltip'),
+    },
+  ];
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No tokens yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.tokens')}</p>;
   }
 
   const startIndex = (page - 1) * perPage;

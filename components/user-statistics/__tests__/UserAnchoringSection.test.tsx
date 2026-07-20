@@ -62,16 +62,26 @@ describe('UserAnchoringSection', () => {
 
   it('renders tab triggers', () => {
     render(<UserAnchoringSection {...defaultProps} />);
-    expect(screen.getByText('Cosmic Signature Anchoring')).toBeInTheDocument();
-    expect(screen.getByText('Random Walk Anchoring')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.anchoring.tabs.cosmicSignature'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.anchoring.tabs.randomWalk')).toBeInTheDocument();
   });
 
   it('renders CST stat cards with correct values', () => {
     render(<UserAnchoringSection {...defaultProps} />);
-    expect(screen.getByText('Anchor Actions')).toBeInTheDocument();
-    expect(screen.getByText('Release Actions')).toBeInTheDocument();
-    expect(screen.getByText('Total Distributions')).toBeInTheDocument();
-    expect(screen.getByText('Unretrieved Distributions')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.anchoring.stats.anchorActions.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.anchoring.stats.releaseActions.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.anchoring.stats.totalDistributions.label'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.anchoring.stats.unretrievedDistributions.label'),
+    ).toBeInTheDocument();
   });
 
   it('renders anchoring tables', () => {
@@ -84,7 +94,9 @@ describe('UserAnchoringSection', () => {
     render(
       <UserAnchoringSection {...defaultProps} cstAnchorActions={[]} cstAnchorDistributions={[]} />,
     );
-    expect(screen.getByText('No anchoring activity yet')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.anchoring.empty.cosmicSignatureTitle'),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

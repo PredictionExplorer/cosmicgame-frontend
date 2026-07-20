@@ -17,12 +17,15 @@ beforeEach(() => jest.clearAllMocks());
 describe('RWLKNFTTable', () => {
   it('renders empty state when list is empty', () => {
     render(<RWLKNFTTable {...defaultProps} />);
-    expect(screen.getByText('No available tokens.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.tables.availableTokens.empty')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<RWLKNFTTable {...defaultProps} list={[1]} />);
-    for (const header of ['Owner Address', 'Token ID']) {
+    for (const header of [
+      'anchoring.tables.availableTokens.columns.ownerAddress',
+      'anchoring.tables.availableTokens.columns.tokenId',
+    ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });
@@ -34,10 +37,11 @@ describe('RWLKNFTTable', () => {
     expect(screen.getAllByText('30').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders Stake button for each row', () => {
+  it('renders Anchor button for each row', () => {
     render(<RWLKNFTTable {...defaultProps} list={[1, 2]} />);
-    const anchorButtons = screen.getAllByText('Stake');
+    const anchorButtons = screen.getAllByText('anchoring.tables.availableTokens.actions.anchor');
     expect(anchorButtons.length).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByText(/Stake/)).not.toBeInTheDocument();
   });
 
   it('paginates with 5 items per page', () => {
@@ -60,21 +64,23 @@ describe('RWLKNFTTable', () => {
     const cell = screen.getAllByText('10').find((el) => el.closest('td'));
     fireEvent.click(cell!.closest('tr')!);
 
-    expect(screen.queryByText('Stake Many')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.tables.availableTokens.actions.anchorMany'),
+    ).not.toBeInTheDocument();
   });
 
-  it('Stake button calls handleStake with tokenId and isRwlk=true', async () => {
+  it('Anchor button calls handleStake with tokenId and isRwlk=true', async () => {
     const user = userEvent.setup();
     render(<RWLKNFTTable {...defaultProps} list={[42]} />);
 
-    await user.click(screen.getByText('Stake'));
+    await user.click(screen.getByText('anchoring.tables.availableTokens.actions.anchor'));
 
     await waitFor(() => {
       expect(defaultProps.handleStake).toHaveBeenCalledWith(42, true);
     });
   });
 
-  it('shows Stake Many when multiple rows selected', () => {
+  it('shows Anchor Many when multiple rows selected', () => {
     render(<RWLKNFTTable {...defaultProps} list={[1, 2, 3]} />);
 
     const cell1 = screen.getAllByText('1').find((el) => el.closest('td'));
@@ -82,10 +88,12 @@ describe('RWLKNFTTable', () => {
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
 
-    expect(screen.getByText('Stake Many')).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.tables.availableTokens.actions.anchorMany'),
+    ).toBeInTheDocument();
   });
 
-  it('Stake Many calls handleStakeMany with selected IDs and isRwlk flags', async () => {
+  it('Anchor Many calls handleStakeMany with selected IDs and isRwlk flags', async () => {
     const user = userEvent.setup();
     render(<RWLKNFTTable {...defaultProps} list={[10, 20, 30]} />);
 
@@ -93,7 +101,7 @@ describe('RWLKNFTTable', () => {
     const cell2 = screen.getAllByText('20').find((el) => el.closest('td'));
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
-    await user.click(screen.getByText('Stake Many'));
+    await user.click(screen.getByText('anchoring.tables.availableTokens.actions.anchorMany'));
 
     await waitFor(() => {
       expect(defaultProps.handleStakeMany).toHaveBeenCalledWith(
@@ -103,23 +111,29 @@ describe('RWLKNFTTable', () => {
     });
   });
 
-  it('deselecting row hides Stake Many when only one remains', () => {
+  it('deselecting row hides Anchor Many when only one remains', () => {
     render(<RWLKNFTTable {...defaultProps} list={[1, 2, 3]} />);
 
     const cell1 = screen.getAllByText('1').find((el) => el.closest('td'));
     const cell2 = screen.getAllByText('2').find((el) => el.closest('td'));
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
-    expect(screen.getByText('Stake Many')).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.tables.availableTokens.actions.anchorMany'),
+    ).toBeInTheDocument();
 
     fireEvent.click(cell2!.closest('tr')!);
-    expect(screen.queryByText('Stake Many')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.tables.availableTokens.actions.anchorMany'),
+    ).not.toBeInTheDocument();
   });
 
   it('resets selection when list changes', () => {
     const { rerender } = render(<RWLKNFTTable {...defaultProps} list={[1, 2]} />);
     rerender(<RWLKNFTTable {...defaultProps} list={[3, 4]} />);
-    expect(screen.queryByText('Stake Many')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.tables.availableTokens.actions.anchorMany'),
+    ).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { mockSprint4Api } from './zh-sprint4-helpers';
+
 const VIEWPORTS = [
   { name: 'mobile-320', width: 320, height: 800 },
   { name: 'tablet-768', width: 768, height: 1024 },
@@ -115,6 +117,66 @@ test.describe('Sprint 3 Chinese layout QA', () => {
       await expect(page.getByRole('heading', { level: 1, name: /运作原理/ })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-how-it-works-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+    });
+  }
+});
+
+test.describe('Sprint 4 Chinese layout QA', () => {
+  for (const viewport of VIEWPORTS) {
+    test(`${viewport.name} keeps transaction and holdings pages readable`, async ({
+      page,
+    }, testInfo) => {
+      await mockSprint4Api(page);
+      await page.setViewportSize(viewport);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+
+      await page.goto('/zh/allocation');
+      await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+      await expect(page.getByText('分配名录', { exact: true }).first()).toBeVisible();
+      await expect(page.getByText('周期储备分配', { exact: true })).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-allocation-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+
+      await page.goto('/zh/anchoring');
+      await expect(page.getByText('锚定派发', { exact: true }).first()).toBeVisible();
+      await expect(page.getByRole('heading', { name: '锚定运作原理' })).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-anchoring-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+
+      await page.goto('/zh/my-allocations');
+      await expect(page.getByText('我的分配', { exact: true }).first()).toBeVisible();
+      await expect(page.getByText('连接钱包后即可查看并取回分配。', { exact: true })).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-my-allocations-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+
+      await page.goto('/zh/my-anchors');
+      await expect(page.getByText('我的锚定', { exact: true }).first()).toBeVisible();
+      await expect(page.getByText('连接钱包后即可管理锚定。', { exact: true })).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-my-anchors-${viewport.name}`, {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+
+      await page.goto('/zh/transfer-cst');
+      await expect(page.getByRole('heading', { level: 1, name: '转账 CST' })).toBeVisible();
+      await expect(
+        page.getByText('连接钱包后即可从余额中转账 CST。', { exact: true }),
+      ).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+      await testInfo.attach(`zh-transfer-cst-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),
         contentType: 'image/png',
       });

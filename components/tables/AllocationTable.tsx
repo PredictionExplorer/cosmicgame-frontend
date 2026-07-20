@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, type ReactNode } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
@@ -40,6 +40,7 @@ function StatChip({
 
 function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const roundNum = allocation.RoundNum;
   const recipient = allocation.WinnerAddr ? shortenHex(allocation.WinnerAddr, 6) : '-';
   const stellarEth = (allocation.RoundStats?.TotalRaffleEthDepositsEth as number) || 0;
@@ -72,7 +73,7 @@ function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
               </TooltipContent>
             </Tooltip>
             <span className="text-xs text-muted-foreground">
-              {convertTimestampToDateTime(allocation.TimeStamp)}
+              {convertTimestampToDateTime(allocation.TimeStamp, false, locale)}
             </span>
           </div>
 

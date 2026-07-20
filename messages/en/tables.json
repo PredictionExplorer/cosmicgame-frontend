@@ -27,6 +27,45 @@
     "generic": "No data available.",
     "nothingHere": "Nothing here yet"
   },
+  "attachedAssets": {
+    "actions": {
+      "claim": "Claim",
+      "claiming": "Claiming..."
+    },
+    "status": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "aria": {
+      "actions": "Actions"
+    },
+    "nft": {
+      "empty": "No attached NFTs yet.",
+      "imageAlt": "NFT #{id}",
+      "imageUnavailable": "Image not available",
+      "columns": {
+        "datetime": "Datetime",
+        "contributorAddress": "Contributor Address",
+        "round": "Round #",
+        "tokenAddress": "Token Address",
+        "tokenId": "Token ID",
+        "tokenImage": "Token Image",
+        "tokenUri": "Token URI"
+      }
+    },
+    "erc20": {
+      "empty": "No attached ERC20 tokens yet.",
+      "columns": {
+        "datetime": "Datetime",
+        "cycle": "Cycle #",
+        "tokenAddress": "Token Address",
+        "attachedAmount": "Attached Amount",
+        "retrievedAmount": "Retrieved Amount",
+        "recipient": "Recipient",
+        "retrieved": "Retrieved"
+      }
+    }
+  },
   "loading": "Loading…",
   "status": {
     "loading": "Loading...",
@@ -181,6 +220,7 @@
   },
   "gestureHistory": {
     "randomWalkGesture": "Gesture was made using RandomWalk NFT (ID = {id})",
+    "randomWalkImageAlt": "RWLK NFT",
     "cstGesture": "Gesture was made using CST tokens",
     "ethGesture": "Gesture was made using ETH",
     "nftAttached": " and a token ({address}) with ID {id} was attached",

@@ -4,6 +4,18 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 import { RetrievedCSTAnchorDistributionsTable } from '../RetrievedCSTAnchorDistributionsTable';
 
 const createRow = (overrides = {}) => ({
@@ -17,25 +29,27 @@ const createRow = (overrides = {}) => ({
   ...overrides,
 });
 
+beforeEach(() => jest.clearAllMocks());
+
 describe('RetrievedCSTAnchorDistributionsTable', () => {
   it('renders empty state message', () => {
     render(<RetrievedCSTAnchorDistributionsTable list={[]} />);
-    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.distributions')).toBeInTheDocument();
   });
 
   it('renders empty state for null list', () => {
     render(<RetrievedCSTAnchorDistributionsTable list={null as unknown as never[]} />);
-    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.distributions')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<RetrievedCSTAnchorDistributionsTable list={[createRow()]} />);
     for (const header of [
-      'Deposit Datetime',
-      'Deposit ID',
-      'Round',
-      'Deposit Amount (ETH)',
-      'Collected Amount (ETH)',
+      'anchoring.tables.retrievedDistributions.columns.depositDatetime',
+      'anchoring.tables.retrievedDistributions.columns.depositId',
+      'anchoring.tables.retrievedDistributions.columns.cycle',
+      'anchoring.tables.retrievedDistributions.columns.depositAmountEth',
+      'anchoring.tables.retrievedDistributions.columns.retrievedAmountEth',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
@@ -46,6 +60,7 @@ describe('RetrievedCSTAnchorDistributionsTable', () => {
     expect(
       screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
     ).toBeGreaterThanOrEqual(1);
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
     expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(1);
   });

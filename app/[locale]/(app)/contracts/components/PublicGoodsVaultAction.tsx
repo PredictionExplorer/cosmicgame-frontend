@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { writeContract } from '@wagmi/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Loader2, SendHorizontal, Vault } from 'lucide-react';
@@ -12,6 +12,7 @@ import { charityWalletAbi as CHARITY_WALLET_ABI } from '@/contracts/abis';
 import { formatEthValue, shortenHex } from '@/utils';
 
 import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -35,6 +36,7 @@ export function PublicGoodsVaultAction({
   vaultBalanceEth,
 }: PublicGoodsVaultActionProps) {
   const t = useTranslations('toasts');
+  const locale = useLocale();
   const [submitting, setSubmitting] = useState(false);
   const config = useConfig();
   const publicClient = usePublicClient({ chainId: activeChain.id });
@@ -47,19 +49,19 @@ export function PublicGoodsVaultAction({
   const hasFunds = displayBalance > 0;
   const disabled = submitting || !hasFunds;
   const buttonLabel = submitting
-    ? 'Forwarding...'
+    ? t('contribution.publicGoodsVault.forwarding')
     : hasFunds
-      ? 'Forward to Protocol Guild'
-      : 'Nothing to Forward';
+      ? t('contribution.publicGoodsVault.forward')
+      : t('contribution.publicGoodsVault.nothing');
 
   const handleForward = async () => {
     if (!hasFunds) {
-      toast.info('No public-goods funds are waiting in the vault.');
+      toast.info(t('contribution.publicGoodsVault.none'));
       return;
     }
 
     if (!active || !account) {
-      toast.error('Connect your wallet to forward Public Goods Vault funds.');
+      toast.error(t('contribution.publicGoodsVault.connectWallet'));
       return;
     }
 
@@ -72,16 +74,17 @@ export function PublicGoodsVaultAction({
         args: [],
       });
 
-      await publicClient?.waitForTransactionReceipt({ hash });
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
       await queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] });
-      toast.success('Public-goods funds were forwarded to Protocol Guild.');
+      toast.success(t('contribution.publicGoodsVault.forwarded'));
     } catch (err) {
       if (isUserRejection(err)) {
         toast.info(t('walletTransactionCancelled'));
         return;
       }
       reportError(err, 'forward public goods vault funds');
-      toast.error(getEthErrorMessage(err, 'Unable to forward Public Goods Vault funds.'));
+      toast.error(getEthErrorMessage(err, t('contribution.publicGoodsVault.failed'), { locale }));
     } finally {
       setSubmitting(false);
     }

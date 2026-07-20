@@ -181,7 +181,7 @@ const baseUserInfo = {
 describe('UserStatisticsView', () => {
   it('shows invalid address empty state', () => {
     render(<UserStatisticsView address="Invalid Address" isOwnProfile={false} />);
-    expect(screen.getByText('Invalid Address')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.invalidAddress')).toBeInTheDocument();
   });
 
   it('shows skeleton loading state', () => {
@@ -194,7 +194,7 @@ describe('UserStatisticsView', () => {
     mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
     mockUseUserInfo.mockReturnValue({ data: null, isLoading: false });
     render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
-    expect(screen.getByText('No activity yet')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.emptyTitle')).toBeInTheDocument();
   });
 
   it('renders user stats and tables with full data', () => {
@@ -220,25 +220,29 @@ describe('UserStatisticsView', () => {
     mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
     mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
     render(<UserStatisticsView address="0xUser" isOwnProfile={true} />);
-    expect(screen.getByText('My Statistics')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.ownTitle')).toBeInTheDocument();
   });
 
   it('shows "User Profile" heading for other profile', () => {
     mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
     mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
     render(<UserStatisticsView address="0xOther" isOwnProfile={false} />);
-    expect(screen.getByText('User Profile')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.userTitle')).toBeInTheDocument();
   });
 
   it('renders section dividers', () => {
     mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
     mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
     render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
-    expect(screen.getByText('Gesture History')).toBeInTheDocument();
-    expect(screen.getByText('Recipient History')).toBeInTheDocument();
-    expect(screen.getByText('Anchoring')).toBeInTheDocument();
-    expect(screen.getByText('Token Holdings')).toBeInTheDocument();
-    expect(screen.getByText('Claimable Assets')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.sections.gestureHistory')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.page.sections.recipientHistory'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.sections.anchoring')).toBeInTheDocument();
+    expect(screen.getByText('myPages.statistics.page.sections.tokenHoldings')).toBeInTheDocument();
+    expect(
+      screen.getByText('myPages.statistics.page.sections.claimableAssets'),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

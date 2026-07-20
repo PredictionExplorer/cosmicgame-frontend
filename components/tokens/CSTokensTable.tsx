@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useRef, type MouseEvent } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -36,6 +37,8 @@ interface CSTokenRowProps {
 }
 
 const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTokenRowProps) => {
+  const t = useTranslations('anchoring');
+  const locale = useLocale();
   const [processing, setProcessing] = useState(false);
   if (!row) return null;
 
@@ -71,7 +74,7 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(TimeStamp)}
+          {convertTimestampToDateTime(TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
 
@@ -109,10 +112,10 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
             {processing ? (
               <span className="flex items-center gap-1">
                 <Spinner size="sm" />
-                Anchoring...
+                {t('tables.availableTokens.actions.anchoring')}
               </span>
             ) : (
-              'Anchor'
+              t('tables.availableTokens.actions.anchor')
             )}
           </Button>
         )}
@@ -128,6 +131,7 @@ interface CSTokensTableProps {
 }
 
 export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTableProps) => {
+  const t = useTranslations('anchoring');
   const perPage = 5;
   const [page, setPage] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -195,7 +199,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
   };
 
   if (list.length === 0) {
-    return <p>No available tokens.</p>;
+    return <p>{t('tables.availableTokens.empty')}</p>;
   }
 
   return (
@@ -232,22 +236,36 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
                     </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="min-w-[166px]">
-                    <DropdownMenuItem onSelect={handleSelectAll}>Select All</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleSelectCurrentPage}>
-                      Select Current Page
+                    <DropdownMenuItem onSelect={handleSelectAll}>
+                      {t('tables.availableTokens.selection.all')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleSelectNone}>Select None</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSelectCurrentPage}>
+                      {t('tables.availableTokens.selection.currentPage')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSelectNone}>
+                      {t('tables.availableTokens.selection.none')}
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TablePrimaryHeadCell>
 
-              <TablePrimaryHeadCell align="left">Imprint Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Recipient Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('tables.availableTokens.columns.imprintDatetime')}
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
-                <span className="sr-only">Actions</span>
+                {t('tables.availableTokens.columns.tokenId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.availableTokens.columns.tokenName')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.availableTokens.columns.cycle')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.availableTokens.columns.recipientAddress')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                <span className="sr-only">{t('tables.availableTokens.aria.actions')}</span>
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
@@ -272,10 +290,10 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
             {processing ? (
               <span className="flex items-center gap-1">
                 <Spinner size="sm" />
-                Anchoring...
+                {t('tables.availableTokens.actions.anchoring')}
               </span>
             ) : (
-              'Anchor Many'
+              t('tables.availableTokens.actions.anchorMany')
             )}
           </Button>
         </div>

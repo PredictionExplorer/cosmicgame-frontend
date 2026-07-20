@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Coins, Users, Layers, TrendingUp, ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
@@ -27,6 +28,7 @@ import { formatEthValue } from '@/utils/format';
 import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 
 const AnchoringPage = () => {
+  const t = useTranslations('anchoring');
   const {
     data: cosmicSignatureRewards,
     isLoading: isLoadingCST,
@@ -42,7 +44,7 @@ const AnchoringPage = () => {
 
   const loading = isLoadingCST || isLoadingRWLK;
   const statsLoading = isLoadingDashboard || isLoadingStakers;
-  const error = cstError?.message || rwlkError?.message || null;
+  const hasError = Boolean(cstError || rwlkError);
 
   const distributionPerNft = useMemo(
     () =>
@@ -56,54 +58,51 @@ const AnchoringPage = () => {
   const heroStats = useMemo(
     () => [
       {
-        label: 'Anchor Distribution Pool',
+        label: t('overview.stats.pool.label'),
         value: formatEthValue(dashboardData?.StakingAmountEth ?? 0),
-        tooltip:
-          'Total ETH currently allocated to the Anchor Distribution pool, distributed proportionally to Cosmic Signature NFT anchor-holders each cycle.',
+        tooltip: t('overview.stats.pool.tooltip'),
         icon: <Coins className="h-4 w-4" />,
         featured: true,
         gradient: true,
       },
       {
-        label: 'Cosmic Signature NFTs Anchored',
+        label: t('overview.stats.cosmicSignatureAnchored.label'),
         value: (
           dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked ?? 0
         ).toLocaleString(),
-        tooltip:
-          'Total number of Cosmic Signature NFTs currently anchored to the protocol across all anchor-holders.',
+        tooltip: t('overview.stats.cosmicSignatureAnchored.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'RWLK NFTs Anchored',
+        label: t('overview.stats.randomWalkAnchored.label'),
         value: (
           dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0
         ).toLocaleString(),
-        tooltip:
-          'Total number of RandomWalk NFTs currently anchored. Anchored RandomWalk NFTs are eligible for Anchored-NFT Stellar Selection via on-chain random selection.',
+        tooltip: t('overview.stats.randomWalkAnchored.tooltip'),
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'Distribution per NFT',
+        label: t('overview.stats.distributionPerNft.label'),
         value: distributionPerNft.value,
-        tooltip:
-          'Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.' +
-          distributionPerNft.tooltipSuffix,
+        tooltip: distributionPerNft.tooltipSuffix
+          ? t('overview.stats.distributionPerNft.tooltipUnavailable')
+          : t('overview.stats.distributionPerNft.tooltip'),
         icon: <TrendingUp className="h-4 w-4" />,
       },
       {
-        label: 'Unique Anchor-holders',
+        label: t('overview.stats.uniqueHolders.label'),
         value: (uniqueStakers?.length ?? 0).toLocaleString(),
-        tooltip: 'Number of distinct wallet addresses that have anchored Cosmic Signature NFTs.',
+        tooltip: t('overview.stats.uniqueHolders.tooltip'),
         icon: <Users className="h-4 w-4" />,
       },
     ],
-    [dashboardData, distributionPerNft, uniqueStakers],
+    [dashboardData, distributionPerNft, t, uniqueStakers],
   );
 
-  if (error) {
+  if (hasError) {
     return (
       <PageShell variant="data">
-        <ErrorState title="Error loading anchoring data" message={error} />
+        <ErrorState title={t('overview.errorTitle')} message={t('overview.errorMessage')} />
       </PageShell>
     );
   }
@@ -114,13 +113,13 @@ const AnchoringPage = () => {
         align="left"
         eyebrow={
           <SectionEyebrow tone="aurora" pulse>
-            Anchor Distributions · Live
+            {t('overview.eyebrow')}
           </SectionEyebrow>
         }
-        title="Anchor Distributions"
+        title={t('overview.title')}
         titleLevel={2}
         gradientTitle="signature"
-        subtitle="Overview of global anchoring activity and distribution history"
+        subtitle={t('overview.subtitle')}
       />
 
       <Surface
@@ -130,9 +129,9 @@ const AnchoringPage = () => {
         className="mb-8 grid gap-6 lg:grid-cols-[1fr_340px] lg:items-center"
       >
         <p className="type-body-md text-muted-foreground">
-          Anchor your Cosmic Signature NFTs to share {protocolFacts.anchorDistributionPercentage}%
-          of each cycle&apos;s Cycle Reserve through ETH Anchor Distributions. Anchor RandomWalk
-          NFTs to enter the Anchored-NFT Stellar Selection.
+          {t('overview.intro.description', {
+            percentage: protocolFacts.anchorDistributionPercentage,
+          })}
         </p>
         <div className="relative min-h-[160px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.08] bg-black/20">
           <div
@@ -145,7 +144,9 @@ const AnchoringPage = () => {
           />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="rounded-full bg-[rgb(var(--impact-green-rgb)/0.14)] px-4 py-2 text-sm font-semibold text-[rgb(var(--impact-green-rgb))]">
-              {protocolFacts.anchorDistributionPercentage}% anchor flow
+              {t('overview.intro.flow', {
+                percentage: protocolFacts.anchorDistributionPercentage,
+              })}
             </div>
           </div>
         </div>
@@ -160,17 +161,14 @@ const AnchoringPage = () => {
         className="group mb-10 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/[0.04] p-5 transition-all hover:border-primary/40 hover:bg-primary/[0.08] no-underline"
       >
         <div>
-          <p className="text-base font-semibold text-foreground">Start Anchoring</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Anchor your Cosmic Signature NFTs to receive a share of each cycle&apos;s Anchor
-            Distribution pool.
-          </p>
+          <p className="text-base font-semibold text-foreground">{t('overview.cta.title')}</p>
+          <p className="text-sm text-muted-foreground mt-1">{t('overview.cta.description')}</p>
         </div>
         <ArrowRight className="h-5 w-5 text-primary opacity-60 transition-transform group-hover:translate-x-1 group-hover:opacity-100" />
       </Link>
 
       <div>
-        <SectionDivider title="Cosmic Signature NFT" />
+        <SectionDivider title={t('overview.sections.cosmicSignature')} />
         {loading ? (
           <div className="space-y-3 py-4">
             <Skeleton className="h-10 w-full" />
@@ -183,7 +181,7 @@ const AnchoringPage = () => {
       </div>
 
       <div>
-        <SectionDivider title="RandomWalk NFT" />
+        <SectionDivider title={t('overview.sections.randomWalk')} />
         {loading ? (
           <div className="space-y-3 py-4">
             <Skeleton className="h-10 w-full" />

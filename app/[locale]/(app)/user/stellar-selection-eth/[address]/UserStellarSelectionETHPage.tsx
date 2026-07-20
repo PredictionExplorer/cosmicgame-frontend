@@ -3,9 +3,10 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
+import { usePublicClient } from 'wagmi';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
@@ -29,6 +30,7 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import { Button } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 
 interface StellarSelectionETHDeposit {
   EvtLogId: number;
@@ -112,9 +114,11 @@ const StellarSelectionAllocationsTable = ({ list }: { list: StellarSelectionETHD
 
 const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string }) => {
   const t = useTranslations('toasts');
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
   const stellarSelectionWalletContract = useStellarSelectionWalletContract();
+  const publicClient = usePublicClient();
   const { setNotification } = useNotification();
 
   const validatedAddress =
@@ -142,10 +146,25 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
   );
 
   const handleAllETHClaim = async () => {
-    if (!stellarSelectionWalletContract) return;
+    if (!stellarSelectionWalletContract) {
+      setNotification({
+        text: t('claim.walletNotConnected'),
+        type: 'error',
+        visible: true,
+      });
+      return;
+    }
     setIsClaiming(true);
     try {
-      await stellarSelectionWalletContract.write.withdrawEth?.();
+      const hash = await stellarSelectionWalletContract.write.withdrawEth?.();
+      if (!hash) throw new Error('Stellar Selection ETH retrieval returned no transaction hash.');
+      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
+      setNotification({
+        text: t('claim.stellarEthSuccess'),
+        type: 'success',
+        visible: true,
+      });
       setTimeout(() => {
         fetchStatusData();
         refetchDeposits();
@@ -160,7 +179,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
         });
       } else {
         reportError(err, 'retrieve stellar selection ETH');
-        const rawMsg = getEthErrorMessage(err, 'An error occurred');
+        const rawMsg = getEthErrorMessage(err, t('claim.failed'), { locale });
         const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ text: msg, type: 'error', visible: true });
       }
@@ -195,7 +214,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
                 Your retrievable allocations are {status.ETHRaffleToClaim.toFixed(6)} ETH
               </span>
               <Button onClick={handleAllETHClaim} disabled={isClaiming}>
-                Retrieve All
+                {isClaiming ? t('claim.retrieving') : 'Retrieve All'}
               </Button>
             </div>
           )}

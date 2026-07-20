@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Wallet, Coins, Trophy, Gem, Gavel, TrendingUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
@@ -29,6 +30,7 @@ export function HeroStats({
   loading = false,
   className,
 }: HeroStatsProps) {
+  const t = useTranslations('myPages');
   const totalEthWon = useMemo(
     () => (userInfo.SumRaffleEthWinnings ?? 0) + (userInfo.SumRaffleEthWithdrawal ?? 0),
     [userInfo.SumRaffleEthWinnings, userInfo.SumRaffleEthWithdrawal],
@@ -43,50 +45,46 @@ export function HeroStats({
   const stats = useMemo(
     () => [
       {
-        label: 'ETH Balance',
+        label: t('statistics.hero.ethBalance.label'),
         value: `${balanceETH.toFixed(4)} ETH`,
-        tooltip: 'Your current ETH balance in this wallet.',
+        tooltip: t('statistics.hero.ethBalance.tooltip'),
         icon: <Wallet className="h-4 w-4" />,
         featured: true,
         gradient: true,
       },
       {
-        label: 'CST Balance',
+        label: t('statistics.hero.cstBalance.label'),
         value: `${balanceCST.toFixed(2)} CST`,
-        tooltip:
-          'Your CST token (ERC-20) balance from gestures, Recognition CST allocations, and transfers.',
+        tooltip: t('statistics.hero.cstBalance.tooltip'),
         icon: <Coins className="h-4 w-4" />,
         featured: true,
       },
       {
-        label: 'Signature Allocations Received',
+        label: t('statistics.hero.signatureAllocations.label'),
         value: userInfo.NumPrizes.toLocaleString(),
-        tooltip:
-          'Number of times you retrieved the Signature Allocation by making the Final Gesture before the Cycle Finalization Time expired.',
+        tooltip: t('statistics.hero.signatureAllocations.tooltip'),
         icon: <Trophy className="h-4 w-4" />,
       },
       {
-        label: 'Total ETH Received',
+        label: t('statistics.hero.totalEth.label'),
         value: formatEthValue(totalEthWon),
-        tooltip:
-          'Combined ETH retrieved from Stellar Selection allocations and other distributions across all cycles you participated in.',
+        tooltip: t('statistics.hero.totalEth.tooltip'),
         icon: <Gem className="h-4 w-4" />,
       },
       {
-        label: 'Gestures Made',
+        label: t('statistics.hero.gestures.label'),
         value: userInfo.NumBids.toLocaleString(),
-        tooltip: 'Total number of gestures you have made across all Performance Cycles.',
+        tooltip: t('statistics.hero.gestures.tooltip'),
         icon: <Gavel className="h-4 w-4" />,
       },
       {
-        label: 'Selection Frequency',
+        label: t('statistics.hero.selectionFrequency.label'),
         value: bestProbability >= 0 ? `${(bestProbability * 100).toFixed(2)}%` : '--',
-        tooltip:
-          'Your best Stellar Selection frequency in the current cycle, calculated from your gesture count relative to total gestures and the number of selected recipients.',
+        tooltip: t('statistics.hero.selectionFrequency.tooltip'),
         icon: <TrendingUp className="h-4 w-4" />,
       },
     ],
-    [balanceETH, balanceCST, userInfo.NumPrizes, userInfo.NumBids, totalEthWon, bestProbability],
+    [balanceETH, balanceCST, userInfo.NumPrizes, userInfo.NumBids, totalEthWon, bestProbability, t],
   );
 
   if (loading) {

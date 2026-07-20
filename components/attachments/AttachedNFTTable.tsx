@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -46,6 +47,8 @@ interface DonatedNFTTableProps {
 }
 
 const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
+  const t = useTranslations('tables');
+  const locale = useLocale();
   const { data: tokenURI } = useAttachedNftMetadata(nft.NFTTokenURI);
 
   if (!nft) return <TablePrimaryRow />;
@@ -61,7 +64,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(nft.TimeStamp)}
+          {convertTimestampToDateTime(nft.TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
 
@@ -126,10 +129,17 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
       <TablePrimaryCell className="w-[130px]">
         {tokenURI?.image ? (
           <a href={tokenURI.external_url} target="_blank" rel="noopener noreferrer">
-            <NFTImage src={tokenURI.image} />
+            <NFTImage
+              src={tokenURI.image}
+              alt={t('attachedAssets.nft.imageAlt', {
+                id: String(nft.NFTTokenId ?? nft.TokenId ?? ''),
+              })}
+            />
           </a>
         ) : (
-          <span className="text-sm text-muted-foreground">Image not available</span>
+          <span className="text-sm text-muted-foreground">
+            {t('attachedAssets.nft.imageUnavailable')}
+          </span>
         )}
       </TablePrimaryCell>
 
@@ -141,7 +151,9 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
               disabled={isClaiming}
               data-testid="Claim Button"
             >
-              {isClaiming ? 'Claiming...' : 'Claim'}
+              {isClaiming
+                ? t('attachedAssets.actions.claiming')
+                : t('attachedAssets.actions.claim')}
             </Button>
           )}
         </TablePrimaryCell>
@@ -151,11 +163,12 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
 };
 
 const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claimingTokens }) => {
+  const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
 
   if (!list || list.length === 0) {
-    return <p>No attached NFTs yet.</p>;
+    return <p>{t('attachedAssets.nft.empty')}</p>;
   }
 
   const pageSlice = list.slice((page - 1) * perPage, page * perPage);
@@ -167,15 +180,25 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
           <TablePrimary>
             <TablePrimaryHead>
               <Tr>
-                <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="left">Contributor Address</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Round #</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">
+                  {t('attachedAssets.nft.columns.datetime')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">
+                  {t('attachedAssets.nft.columns.contributorAddress')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>{t('attachedAssets.nft.columns.round')}</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">
+                  {t('attachedAssets.nft.columns.tokenAddress')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('attachedAssets.nft.columns.tokenId')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('attachedAssets.nft.columns.tokenImage')}
+                </TablePrimaryHeadCell>
                 {handleClaim && (
                   <TablePrimaryHeadCell>
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">{t('attachedAssets.aria.actions')}</span>
                   </TablePrimaryHeadCell>
                 )}
               </Tr>
@@ -207,6 +230,9 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
 
 /** Plain table for Save as PDF (Skia often drops responsive-table output). */
 function AttachedNFTPrintFallback({ list }: { list: NFTRecord[] }) {
+  const t = useTranslations('tables');
+  const locale = useLocale();
+
   return (
     <div
       aria-hidden="true"
@@ -217,22 +243,22 @@ function AttachedNFTPrintFallback({ list }: { list: NFTRecord[] }) {
         <thead>
           <tr>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
-              Datetime
+              {t('attachedAssets.nft.columns.datetime')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
-              Contributor Address
+              {t('attachedAssets.nft.columns.contributorAddress')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Round #
+              {t('attachedAssets.nft.columns.round')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
-              Token Address
+              {t('attachedAssets.nft.columns.tokenAddress')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
-              Token ID
+              {t('attachedAssets.nft.columns.tokenId')}
             </th>
             <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
-              Token URI
+              {t('attachedAssets.nft.columns.tokenUri')}
             </th>
           </tr>
         </thead>
@@ -240,7 +266,7 @@ function AttachedNFTPrintFallback({ list }: { list: NFTRecord[] }) {
           {list.map((nft) => (
             <tr key={String(nft.RecordId)}>
               <td className="border border-foreground/15 p-2">
-                {convertTimestampToDateTime(nft.TimeStamp)}
+                {convertTimestampToDateTime(nft.TimeStamp, false, locale)}
               </td>
               <td className="border border-foreground/15 p-2 font-mono break-all">
                 {nft.DonorAddr}

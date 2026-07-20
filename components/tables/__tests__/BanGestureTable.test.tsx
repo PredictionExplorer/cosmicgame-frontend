@@ -145,7 +145,10 @@ describe('BanGestureTable', () => {
 
     await waitFor(() => {
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success', text: 'tables.banGesture.banned' }),
+        expect.objectContaining({
+          type: 'success',
+          text: 'toasts.admin.gestureBan.banned',
+        }),
       );
     });
   });
@@ -183,7 +186,10 @@ describe('BanGestureTable', () => {
 
     await waitFor(() => {
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success', text: 'tables.banGesture.unbanned' }),
+        expect.objectContaining({
+          type: 'success',
+          text: 'toasts.admin.gestureBan.unbanned',
+        }),
       );
     });
   });
@@ -199,8 +205,32 @@ describe('BanGestureTable', () => {
     await user.click(banButton);
 
     await waitFor(() => {
-      expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        text: 'Server error details',
+        type: 'error',
+      });
     });
+  });
+
+  it('selects the localized admin fallback when no technical detail is shown', async () => {
+    const user = userEvent.setup();
+    const error = new Error('Server error');
+    mockBanGesture.mockRejectedValueOnce(error);
+    const { getEthErrorMessage, reportError } = jest.requireMock('../../../utils/errors');
+    getEthErrorMessage.mockImplementationOnce((_err: unknown, fallback: string) => fallback);
+    render(<BanGestureTable gestureHistory={[createGestureHistory()]} />);
+
+    await user.click(await screen.findByRole('button', { name: 'tables.banGesture.ban' }));
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        text: 'toasts.admin.gestureBan.failed',
+        type: 'error',
+      }),
+    );
+    expect(reportError).toHaveBeenCalledWith(error, 'ban gesture');
   });
 
   it('has no accessibility violations', async () => {

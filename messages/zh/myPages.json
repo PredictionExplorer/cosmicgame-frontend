@@ -1,0 +1,424 @@
+{
+  "shared": {
+    "home": "首页",
+    "user": "用户",
+    "walletNotConnected": "未连接钱包",
+    "loading": "加载中…",
+    "unavailable": "暂不可用",
+    "yes": "是",
+    "no": "否",
+    "datetime": "日期时间",
+    "from": "转出方",
+    "to": "接收方",
+    "tokenId": "代币 ID",
+    "cycle": "周期",
+    "recipient": "获配者"
+  },
+  "allocations": {
+    "eyebrow": "个人 · 分配",
+    "title": "我的分配",
+    "subtitle": "查看并取回所有未取回分配",
+    "walletDescription": "连接钱包后即可查看并取回分配。",
+    "loadErrorTitle": "未能加载分配",
+    "loadErrorMessage": "未能加载待取回分配数据，请稍后重试。",
+    "sections": {
+      "eth": "可取回的 ETH 分配",
+      "anchors": "Cosmic Signature NFT 锚定派发",
+      "nfts": "已附加 NFT",
+      "erc20": "已附加 ERC-20 代币"
+    },
+    "empty": {
+      "ethTitle": "暂无 ETH 分配",
+      "ethDescription": "落笔后即可参与 ETH 星选，获配结果由协议在链上确定。",
+      "nftTitle": "暂无已附加 NFT",
+      "nftDescription": "周期内随落笔附加的 NFT 会显示在这里。",
+      "erc20Title": "暂无已附加代币",
+      "erc20Description": "周期内随落笔附加的 ERC-20 代币会显示在这里。"
+    },
+    "retrievable": "可取回：",
+    "retrieving": "取回中…",
+    "retrieveAll": "全部取回",
+    "viewHistory": "查看分配记录"
+  },
+  "anchors": {
+    "eyebrow": "个人 · 锚定",
+    "title": "我的锚定",
+    "subtitle": "管理已锚定 NFT，查看 ETH 锚定派发",
+    "walletDescription": "连接钱包后即可管理锚定。",
+    "tabs": {
+      "cosmicSignature": "Cosmic Signature NFT 锚定",
+      "randomWalk": "Random Walk NFT 锚定"
+    },
+    "stats": {
+      "cosmicSignature": {
+        "label": "已锚定的 Cosmic Signature NFT",
+        "tooltip": "当前已锚定的 Cosmic Signature NFT 数量。锚定数量越多，分得的 ETH 锚定派发比例越高。"
+      },
+      "randomWalk": {
+        "label": "已锚定的 Random Walk NFT",
+        "tooltip": "当前已锚定的 Random Walk NFT 数量。每枚已锚定的 Random Walk NFT 均可参与锚定 NFT 星选。"
+      },
+      "unretrieved": {
+        "label": "未取回派发",
+        "tooltip": "已分配至 Cosmic Signature NFT 但尚未取回的 ETH 锚定派发。解锚时，累积派发会自动取回。"
+      },
+      "distributionPerNft": {
+        "label": "每枚 Cosmic Signature NFT 派发额",
+        "tooltip": "当前每枚已锚定 Cosmic Signature NFT 的 ETH 锚定派发额，按链上锚定池总额除以已索引的锚定 NFT 数量计算。",
+        "indexUnavailableSuffix": "锚定数量数据尚未同步，因此暂无法计算每枚 NFT 的派发额。请稍后再试。"
+      }
+    }
+  },
+  "statistics": {
+    "page": {
+      "invalidAddress": "地址无效",
+      "ariaOwn": "我的统计",
+      "ariaUser": "参与者统计",
+      "ownTitle": "我的统计",
+      "userTitle": "参与者统计",
+      "ownSubtitle": "完整查看表现数据与活动记录",
+      "userSubtitle": "查看其他参与者的统计与活动",
+      "emptyTitle": "暂无活动",
+      "emptyDescription": "此账户尚未参与任何周期。落笔即可开始。",
+      "sections": {
+        "gestureHistory": "落笔历史",
+        "recipientHistory": "获配记录",
+        "anchoring": "锚定",
+        "tokenHoldings": "代币持有情况",
+        "outreachAllocations": "推广分配",
+        "claimableAssets": "可取回资产"
+      }
+    },
+    "hero": {
+      "ethBalance": {
+        "label": "ETH 余额",
+        "tooltip": "此钱包当前的 ETH 余额。"
+      },
+      "cstBalance": {
+        "label": "CST 余额",
+        "tooltip": "此钱包通过落笔、表彰 CST 铭刻和转账获得的 CST（ERC-20）余额。"
+      },
+      "signatureAllocations": {
+        "label": "已获签名分配",
+        "tooltip": "在周期收官倒计时结束前写下收官之笔，并取回签名分配的次数。"
+      },
+      "totalEth": {
+        "label": "星选 ETH 总额",
+        "tooltip": "所有周期中通过星选获配的 ETH 总额，包括已取回与未取回部分。"
+      },
+      "gestures": {
+        "label": "落笔次数",
+        "tooltip": "所有演绎周期中的落笔总次数。"
+      },
+      "selectionFrequency": {
+        "label": "入选频次",
+        "tooltip": "当前周期 ETH 星选与 NFT 星选中较高的入选频次，按落笔次数占比和对应的获配者数量计算。"
+      }
+    },
+    "activity": {
+      "title": "活动概览",
+      "groups": {
+        "gestures": "落笔",
+        "stellarSelections": "星选",
+        "anchoring": "锚定"
+      },
+      "gesturesMade": {
+        "label": "落笔次数",
+        "tooltip": "所有周期中的落笔总次数。"
+      },
+      "maxGesture": {
+        "label": "最高落笔",
+        "tooltip": "历来单笔金额最高的一次落笔。"
+      },
+      "ethSelections": {
+        "label": "ETH 星选获配次数",
+        "tooltip": "获得 ETH 星选分配的次数。"
+      },
+      "nftsReceived": {
+        "label": "收到的 NFT",
+        "tooltip": "通过星选铭刻获得的 Cosmic Signature NFT。"
+      },
+      "anchorActions": {
+        "label": "锚定操作",
+        "tooltip": "Random Walk NFT 的锚定与解锚操作总数。"
+      },
+      "distributionsReceived": {
+        "label": "锚定派发总额",
+        "tooltip": "锚定 Cosmic Signature NFT 获得的 ETH 锚定派发总额，包括已取回与未取回部分。"
+      }
+    },
+    "quickActions": {
+      "anchor": {
+        "label": "锚定 NFT",
+        "description": "锚定 Cosmic Signature NFT 可获得 ETH 锚定派发；锚定 Random Walk NFT 可参与锚定 NFT 星选"
+      },
+      "gesture": {
+        "label": "落笔",
+        "description": "参与当前周期"
+      },
+      "transfers": {
+        "label": "查看 NFT 转移记录",
+        "description": "Cosmic Signature NFT 转移记录"
+      },
+      "stellarSelection": {
+        "label": "星选记录",
+        "description": "星选分配与 ETH 存入记录"
+      }
+    },
+    "stellarSelection": {
+      "currentFrequency": "当前周期入选频次",
+      "ethProbability": {
+        "label": "ETH 星选",
+        "tooltip": "当前周期在 ETH 星选中的入选频次，按落笔次数占比和 ETH 星选获配者数量计算。"
+      },
+      "nftProbability": {
+        "label": "NFT 星选",
+        "tooltip": "当前周期在 Cosmic Signature NFT 星选中的入选频次，按落笔次数占比计算。"
+      },
+      "totalEth": {
+        "label": "星选 ETH 总额",
+        "tooltip": "所有周期中通过星选获配的 ETH 总额，包括已取回与未取回部分。"
+      },
+      "ethRetrieved": {
+        "label": "已取回 ETH",
+        "tooltip": "已从星选分配取回至钱包的 ETH。"
+      },
+      "unretrievedNfts": {
+        "label": "未取回 NFT",
+        "tooltip": "这些已附加 NFT 已随签名分配获配，但尚未取回。"
+      },
+      "stellarSelectionNfts": {
+        "label": "星选 NFT",
+        "tooltip": "通过星选铭刻的 Cosmic Signature NFT。"
+      },
+      "allocationNfts": {
+        "label": "分配 NFT",
+        "tooltip": "通过各类铭刻分配获得的 Cosmic Signature NFT 总数。"
+      },
+      "cosmicSignatureNfts": {
+        "label": "收到的 Cosmic Signature NFT",
+        "tooltip": "所有周期中收到的 Cosmic Signature NFT 总数。"
+      }
+    },
+    "anchoring": {
+      "tabs": {
+        "cosmicSignature": "Cosmic Signature NFT 锚定",
+        "randomWalk": "Random Walk NFT 锚定"
+      },
+      "empty": {
+        "cosmicSignatureTitle": "暂无锚定活动",
+        "cosmicSignatureDescription": "锚定 Cosmic Signature NFT，即可在每个周期获得 ETH 锚定派发。",
+        "randomWalkTitle": "暂无 Random Walk NFT 锚定",
+        "randomWalkDescription": "锚定 Random Walk NFT，即可参与锚定 NFT 星选。"
+      },
+      "stats": {
+        "anchorActions": {
+          "label": "锚定操作",
+          "cosmicSignatureTooltip": "锚定 Cosmic Signature NFT 的次数。",
+          "randomWalkTooltip": "锚定 Random Walk NFT 的次数。"
+        },
+        "releaseActions": {
+          "label": "解锚操作",
+          "cosmicSignatureTooltip": "解锚 Cosmic Signature NFT 的次数。",
+          "randomWalkTooltip": "解锚 Random Walk NFT 的次数。"
+        },
+        "nftsWithDistributions": {
+          "label": "已有派发的 NFT",
+          "tooltip": "已累积锚定派发的 Cosmic Signature NFT 数量。"
+        },
+        "totalDistributions": {
+          "label": "锚定派发总额",
+          "tooltip": "锚定获得的 ETH 锚定派发总额，包括已取回与未取回部分。"
+        },
+        "unretrievedDistributions": {
+          "label": "未取回派发",
+          "tooltip": "已分配但尚未取回至钱包的锚定派发。"
+        },
+        "nftsAnchored": {
+          "label": "已锚定 NFT",
+          "tooltip": "当前已锚定的 Random Walk NFT 总数。"
+        },
+        "nftsImprinted": {
+          "label": "已铭刻 NFT",
+          "tooltip": "通过锚定 NFT 星选获得的 Cosmic Signature NFT。"
+        }
+      },
+      "sections": {
+        "actions": "锚定与解锚操作",
+        "distributionsByToken": "按代币查看锚定派发",
+        "distributionsByDeposit": "按存入查看锚定派发",
+        "retrievedDistributions": "已取回锚定派发",
+        "unretrievedDistributions": "未取回锚定派发",
+        "anchoredNftSelection": "锚定 NFT 星选"
+      }
+    },
+    "donatedAssets": {
+      "nfts": {
+        "title": "收到的已附加 NFT",
+        "tooltip": "其他参与者随落笔附加的 NFT 会作为签名分配的一部分归于此账户。尚未取回的 NFT 可取回至钱包。",
+        "unclaimed": "{count} 枚未取回",
+        "claimAll": "全部取回 NFT",
+        "emptyTitle": "暂无已附加 NFT",
+        "emptyDescription": "尚未通过签名分配获配任何已附加 NFT。"
+      },
+      "erc20": {
+        "title": "已附加 ERC-20 代币",
+        "tooltip": "其他参与者附加的 ERC-20 代币。未取回的代币可取回至钱包。",
+        "unclaimed": "{count} 笔未取回",
+        "claimAll": "全部取回代币",
+        "emptyTitle": "暂无已附加代币",
+        "emptyDescription": "尚未收到任何已附加 ERC-20 代币。"
+      }
+    }
+  },
+  "tokens": {
+    "page": {
+      "title": "我的 NFT",
+      "subtitle": "已连接钱包中的 Cosmic Signature NFT",
+      "marketplace": "买卖 NFT",
+      "walletDescription": "连接钱包后即可查看并管理 NFT。",
+      "loadErrorTitle": "未能加载代币",
+      "loadErrorMessage": "未能加载 Cosmic Signature NFT。",
+      "ownedTitle": "持有的 Cosmic Signature NFT",
+      "transferTitle": "转移 NFT",
+      "transferSubtitle": "可选：将选中的 Cosmic Signature NFT 发送至其他钱包。",
+      "transferDescription": "仅在准备好将 NFT 发送至其他地址后，再从此钱包中选择要转移的 NFT。"
+    },
+    "table": {
+      "empty": "暂无代币。",
+      "details": "详情",
+      "datetime": "日期时间",
+      "tokenId": "代币 ID",
+      "tokenName": "代币名称",
+      "cycle": "周期",
+      "recipientAddress": "获配者地址",
+      "currentlyAnchored": "当前已锚定",
+      "anchoredOnce": "曾锚定",
+      "allocationType": "分配类型",
+      "types": {
+        "stellarSelection": "Cosmic Signature NFT 星选",
+        "anchoredNftSelection": "锚定 NFT 星选（Random Walk NFT 锚定者）",
+        "signatureAllocation": "签名分配获配者（第 {cycle} 个周期）",
+        "enduranceChampion": "坚守冠军",
+        "lastCstParticipant": "CST 收官之笔获配者"
+      }
+    }
+  },
+  "transferCst": {
+    "page": {
+      "title": "转账 CST",
+      "subtitle": "将 Cosmic Signature CST 代币发送至其他地址。",
+      "walletDescription": "连接钱包后即可从余额中转账 CST。",
+      "sourceLabel": "已连接钱包",
+      "description": "从已连接钱包转账 CST。交易由钱包签名，并直接发送至 CST 代币合约。"
+    },
+    "form": {
+      "title": "转账 CST",
+      "sourceWallet": "来源钱包",
+      "defaultDescription": "从已连接钱包将 CST 发送至任意地址。",
+      "available": "可用 CST",
+      "balanceReadError": "未能读取此钱包的 CST 余额，请重试。",
+      "decimalsReadWarning": "未能读取 CST 小数位数，将按 18 位处理。",
+      "recipientAddress": "接收地址",
+      "amount": "数量",
+      "sendAria": "发送 CST",
+      "sending": "发送中…",
+      "send": "发送 CST",
+      "viewHistory": "查看 CST 转账记录",
+      "confirmed": "转账已确认。",
+      "viewTransaction": "查看交易"
+    }
+  },
+  "nftTransfer": {
+    "defaultDescription": "选择一枚或多枚 Cosmic Signature NFT，并发送至其他钱包地址。",
+    "marketplacePrompt": "想买卖 NFT？可前往市场；如需直接转移，请在下方继续。",
+    "marketplace": "买卖 NFT",
+    "sourceWallet": "来源钱包",
+    "ownedNfts": "持有的 NFT",
+    "selected": "已选择",
+    "recipientAddress": "接收地址",
+    "empty": "此钱包中没有 Cosmic Signature NFT。",
+    "pickerTitle": "选择要转移的 NFT",
+    "pickerSummary": "可转移 {total} 枚，已选择 {selected} 枚。",
+    "selectAll": "选择全部可转移项",
+    "selectPage": "选择当前页",
+    "clear": "清除选择",
+    "listAria": "Cosmic Signature NFT",
+    "selectAria": "选择 NFT #{id}",
+    "nftLabel": "NFT #{id}",
+    "tokenId": "代币 ID",
+    "customName": "专属名称",
+    "noCustomName": "无专属名称",
+    "generationCycle": "生成周期",
+    "cycle": "第 {cycle} 个周期",
+    "cycleUnavailable": "暂无周期数据",
+    "status": "状态",
+    "statusLabels": {
+      "anchored": "已锚定，请先解锚再转移",
+      "ownerChanged": "持有者已变更，请刷新后再转移",
+      "selected": "已选择",
+      "transferable": "可转移"
+    },
+    "progress": {
+      "transferred": "已转移 {completed} 枚，共 {total} 枚",
+      "stopped": "NFT #{id} 未能转移，操作已停止。",
+      "current": "当前 NFT：#{id}"
+    },
+    "confirmation": {
+      "latest": "最新一笔转移已确认。",
+      "multiple": "{count} 笔转移已确认。",
+      "viewLatest": "查看最新交易"
+    },
+    "sendAria": "发送已选 NFT",
+    "sending": "发送中…",
+    "send": "发送已选 NFT",
+    "viewHistory": "查看 NFT 转移记录",
+    "warning": {
+      "title": "接收地址无交易记录",
+      "description": "暂未查到该地址的交易记录。发送前请再次核对；NFT 转移无法撤销。",
+      "cancel": "取消",
+      "continue": "继续转移"
+    }
+  },
+  "transferHistory": {
+    "loading": "加载中…",
+    "walletLabels": {
+      "cosmicSignatureAnchoring": "Cosmic Signature NFT 锚定钱包",
+      "randomWalkAnchoring": "Random Walk NFT 锚定钱包",
+      "outreach": "推广钱包",
+      "stellarSelection": "星选钱包",
+      "publicGoods": "公共物品金库"
+    },
+    "breadcrumbs": {
+      "nft": "NFT 转移",
+      "cst": "CST 转账"
+    },
+    "nft": {
+      "title": "Cosmic Signature NFT 转移记录",
+      "empty": "暂无 NFT 转移记录。",
+      "invalidAddress": {
+        "title": "地址无效",
+        "description": "请输入有效的钱包地址以查看 NFT 转移记录。"
+      }
+    },
+    "cst": {
+      "title": "Cosmic Signature CST 转账记录",
+      "empty": "暂无 CST 转账记录。",
+      "invalidAddress": {
+        "title": "地址无效",
+        "description": "请输入有效的钱包地址以查看 CST 转账记录。"
+      },
+      "value": "数量（CST）"
+    }
+  },
+  "stellarSelectionAllocations": {
+    "datetime": "日期时间",
+    "cycle": "周期",
+    "recipient": "获配者",
+    "expirationDate": "到期时间",
+    "amount": "金额（ETH）",
+    "retrieved": "已取回",
+    "expired": "{date}（已过期）",
+    "remaining": "{date}（剩余 {remaining}）"
+  }
+}

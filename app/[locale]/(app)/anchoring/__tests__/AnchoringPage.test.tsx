@@ -83,7 +83,7 @@ describe('AnchoringPage', () => {
   it('renders the heading', () => {
     setupDefaults();
     render(<AnchoringPage />);
-    expect(screen.getByText('Anchor Distributions')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.overview.title')).toBeInTheDocument();
   });
 
   it('renders the stats dashboard', () => {
@@ -95,19 +95,21 @@ describe('AnchoringPage', () => {
   it('displays stat values from dashboard data', () => {
     setupDefaults();
     render(<AnchoringPage />);
-    expect(screen.getByTestId('stat-Anchor Distribution Pool')).toHaveTextContent(
-      'Anchor Distribution Pool',
+    expect(screen.getByTestId('stat-anchoring.overview.stats.pool.label')).toHaveTextContent(
+      'anchoring.overview.stats.pool.label',
     );
-    expect(screen.getByTestId('stat-Cosmic Signature NFTs Anchored')).toHaveTextContent(
-      'Cosmic Signature NFTs Anchored',
-    );
-    expect(screen.getByTestId('stat-RWLK NFTs Anchored')).toHaveTextContent('RWLK NFTs Anchored');
-    expect(screen.getByTestId('stat-Distribution per NFT')).toHaveTextContent(
-      'Distribution per NFT',
-    );
-    expect(screen.getByTestId('stat-Unique Anchor-holders')).toHaveTextContent(
-      'Unique Anchor-holders',
-    );
+    expect(
+      screen.getByTestId('stat-anchoring.overview.stats.cosmicSignatureAnchored.label'),
+    ).toHaveTextContent('anchoring.overview.stats.cosmicSignatureAnchored.label');
+    expect(
+      screen.getByTestId('stat-anchoring.overview.stats.randomWalkAnchored.label'),
+    ).toHaveTextContent('anchoring.overview.stats.randomWalkAnchored.label');
+    expect(
+      screen.getByTestId('stat-anchoring.overview.stats.distributionPerNft.label'),
+    ).toHaveTextContent('anchoring.overview.stats.distributionPerNft.label');
+    expect(
+      screen.getByTestId('stat-anchoring.overview.stats.uniqueHolders.label'),
+    ).toHaveTextContent('anchoring.overview.stats.uniqueHolders.label');
   });
 
   it('shows stats loading state when dashboard is loading', () => {
@@ -132,7 +134,7 @@ describe('AnchoringPage', () => {
   it('renders the Start Anchoring CTA link', () => {
     setupDefaults();
     render(<AnchoringPage />);
-    const link = screen.getByRole('link', { name: /start anchoring/i });
+    const link = screen.getByRole('link', { name: /anchoring\.overview\.cta\.title/i });
     expect(link).toHaveAttribute('href', '/my-anchors');
   });
 
@@ -149,7 +151,7 @@ describe('AnchoringPage', () => {
     expect(screen.queryByTestId('cst-table')).not.toBeInTheDocument();
   });
 
-  it('shows error state for CST error', () => {
+  it('shows a translated fallback instead of the raw CST error', () => {
     mockUseCSTAnchorDistributions.mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -159,11 +161,12 @@ describe('AnchoringPage', () => {
     mockUseDashboardInfo.mockReturnValue(mockDashboard);
     mockUseUniqueCSTAnchorHolders.mockReturnValue(mockAnchorHolders);
     render(<AnchoringPage />);
-    expect(screen.getByText('Error loading anchoring data')).toBeInTheDocument();
-    expect(screen.getByText('CST fetch failed')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.overview.errorTitle')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.overview.errorMessage')).toBeInTheDocument();
+    expect(screen.queryByText('CST fetch failed')).not.toBeInTheDocument();
   });
 
-  it('shows error state for RWLK error', () => {
+  it('shows a translated fallback instead of the raw RWLK error', () => {
     mockUseCSTAnchorDistributions.mockReturnValue(noError);
     mockUseGlobalRWLKAnchorImprints.mockReturnValue({
       data: undefined,
@@ -173,8 +176,9 @@ describe('AnchoringPage', () => {
     mockUseDashboardInfo.mockReturnValue(mockDashboard);
     mockUseUniqueCSTAnchorHolders.mockReturnValue(mockAnchorHolders);
     render(<AnchoringPage />);
-    expect(screen.getByText('Error loading anchoring data')).toBeInTheDocument();
-    expect(screen.getByText('RWLK fetch failed')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.overview.errorTitle')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.overview.errorMessage')).toBeInTheDocument();
+    expect(screen.queryByText('RWLK fetch failed')).not.toBeInTheDocument();
   });
 
   it('renders both tables when loaded', () => {
@@ -198,8 +202,8 @@ describe('AnchoringPage', () => {
   it('renders section headings', () => {
     setupDefaults();
     render(<AnchoringPage />);
-    expect(screen.getByText('Cosmic Signature NFT')).toBeInTheDocument();
-    expect(screen.getByText('RandomWalk NFT')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.overview.sections.cosmicSignature')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.overview.sections.randomWalk')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

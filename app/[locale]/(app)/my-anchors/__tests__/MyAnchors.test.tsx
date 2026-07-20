@@ -116,9 +116,7 @@ describe('MyAnchors', () => {
     await act(async () => {
       render(<MyAnchors />);
     });
-    expect(
-      screen.getByText('Please connect your wallet to manage your anchors.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('myPages.anchors.walletDescription')).toBeInTheDocument();
   });
 
   it('shows skeleton loading state', async () => {
@@ -142,7 +140,7 @@ describe('MyAnchors', () => {
     render(<MyAnchors />);
     await waitFor(() => {});
 
-    expect(screen.getByText('My Anchors')).toBeInTheDocument();
+    expect(screen.getByText('myPages.anchors.title')).toBeInTheDocument();
     expect(screen.getByTestId('anchoring-hero-stats')).toBeInTheDocument();
     expect(screen.getByTestId('anchor-distributions-table')).toBeInTheDocument();
     expect(screen.getByTestId('anchor-actions-table')).toBeInTheDocument();
@@ -161,10 +159,14 @@ describe('MyAnchors', () => {
     });
     render(<MyAnchors />);
     await waitFor(() => {});
-    expect(screen.getByTestId('stat-Your Anchored Cosmic Signature NFTs')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-Your Anchored Random Walk NFTs')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-Unretrieved Distributions')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-Distribution per Cosmic Signature NFT')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('stat-myPages.anchors.stats.cosmicSignature.label'),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('stat-myPages.anchors.stats.randomWalk.label')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-myPages.anchors.stats.unretrieved.label')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('stat-myPages.anchors.stats.distributionPerNft.label'),
+    ).toBeInTheDocument();
     expect(screen.queryByTestId('stat-Your Anchored CST')).not.toBeInTheDocument();
     expect(screen.queryByTestId('stat-Distribution per CST')).not.toBeInTheDocument();
   });
@@ -182,9 +184,9 @@ describe('MyAnchors', () => {
     });
     render(<MyAnchors />);
     await waitFor(() => {});
-    expect(screen.getByTestId('stat-Distribution per Cosmic Signature NFT')).toHaveTextContent(
-      '0.225795 ETH',
-    );
+    expect(
+      screen.getByTestId('stat-myPages.anchors.stats.distributionPerNft.label'),
+    ).toHaveTextContent('0.225795 ETH');
   });
 
   it('renders page title', async () => {
@@ -193,7 +195,7 @@ describe('MyAnchors', () => {
     await act(async () => {
       render(<MyAnchors />);
     });
-    expect(screen.getByText('My Anchors')).toBeInTheDocument();
+    expect(screen.getByText('myPages.anchors.title')).toBeInTheDocument();
   });
 
   it('does not render hero stats when wallet is not connected', async () => {

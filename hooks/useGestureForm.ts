@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   useConfig,
   useChainId,
@@ -25,9 +25,10 @@ import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
 import { isUserRejection, reportError } from '@/utils/errors';
 import {
   formatCustomContractError,
-  getContractErrorMessage,
+  getContractErrorDescriptor,
   isContractRevertError,
 } from '@/utils/contractErrors';
+import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import {
   type CosmicGameGestureFunctionName,
   pickGestureWriteAbi,
@@ -73,6 +74,7 @@ function getLiveCstPreviewRefreshMs(): number {
 
 export function useGestureForm() {
   const t = useTranslations('toasts');
+  const locale = useLocale();
   const contractAddrs = useContractAddresses();
   const config = useConfig();
   const chainId = useChainId();
@@ -285,7 +287,9 @@ export function useGestureForm() {
 
   const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
     const hash = await hashPromise;
-    await publicClient!.waitForTransactionReceipt({ hash });
+    const receipt = await publicClient!.waitForTransactionReceipt({ hash });
+    assertSuccessfulTransactionReceipt(receipt);
+    notify('success', t('gesture.confirmed'));
   };
 
   const isContractAddress = async (address: string) => {
@@ -320,7 +324,7 @@ export function useGestureForm() {
         args: [BigInt(tokenId)],
       })) as string;
       if (owner?.toLowerCase() !== account?.toLowerCase()) {
-        notify('error', "You aren't the owner of the token!");
+        notify('error', t('gesture.validation.notNftOwner'));
         return false;
       }
       return true;
@@ -348,7 +352,8 @@ export function useGestureForm() {
         chainId: activeChain.id,
         ...feeParams,
       });
-      await publicClient!.waitForTransactionReceipt({ hash });
+      const receipt = await publicClient!.waitForTransactionReceipt({ hash });
+      assertSuccessfulTransactionReceipt(receipt);
     }
   };
 
@@ -378,7 +383,8 @@ export function useGestureForm() {
       chainId: activeChain.id,
       ...feeParams,
     });
-    await publicClient!.waitForTransactionReceipt({ hash });
+    const receipt = await publicClient!.waitForTransactionReceipt({ hash });
+    assertSuccessfulTransactionReceipt(receipt);
   };
 
   const getErc20Decimals = async (tokenAddress: string) => {
@@ -390,7 +396,7 @@ export function useGestureForm() {
       })) as number;
     } catch {
       console.warn('decimals() not found, assuming 18.');
-      notify('warning', "Token doesn't implement decimals(); assuming 18 decimal places.");
+      notify('warning', t('gesture.validation.tokenDecimalsWarning'));
       return 18;
     }
   };
@@ -432,11 +438,11 @@ export function useGestureForm() {
       throw new Error('Missing attached NFT address or tokenId.');
     }
     if (!(await isContractAddress(nftAddress))) {
-      notify('error', 'The address provided is not a valid contract address!');
+      notify('error', t('gesture.validation.invalidContractAddress'));
       return false;
     }
     if (!(await isERC721(nftAddress))) {
-      notify('error', 'The attached NFT contract is not an ERC721 token contract.');
+      notify('error', t('gesture.validation.notErc721'));
       return false;
     }
     if (!(await ensureNftOwnership(nftAddress, tokenId))) return false;
@@ -449,7 +455,7 @@ export function useGestureForm() {
       throw new Error('Missing attached token address or amount.');
     }
     if (!(await isContractAddress(tokenAddress))) {
-      notify('error', 'The address provided is not a valid contract address!');
+      notify('error', t('gesture.validation.invalidContractAddress'));
       return { ok: false as const };
     }
 
@@ -461,7 +467,7 @@ export function useGestureForm() {
       });
       if (!ts) throw new Error('Not an ERC20');
     } catch {
-      notify('error', 'The attached token contract is not an ERC20 token contract.');
+      notify('error', t('gesture.validation.notErc20'));
       return { ok: false as const };
     }
 
@@ -475,7 +481,7 @@ export function useGestureForm() {
     })) as bigint;
 
     if (bal < amountWei) {
-      notify('error', 'Insufficient token balance to attach to this gesture.');
+      notify('error', t('gesture.validation.insufficientAttachedToken'));
       return { ok: false as const };
     }
     await ensureErc20Allowance(tokenAddress, contractAddrs.prizesWallet, amountWei);
@@ -581,7 +587,7 @@ export function useGestureForm() {
       }
     }
     if (!signer) {
-      notify('error', 'Your wallet is not ready. Reconnect and try again.');
+      notify('error', t('wallet.notReady'));
       return false;
     }
 
@@ -603,7 +609,7 @@ export function useGestureForm() {
       if (isUserRejection(err)) {
         notify('info', t('walletTransactionCancelled'));
       } else {
-        notify('error', `Please switch to ${activeChain.name} in your wallet to make a gesture.`);
+        notify('error', t('network.switchForGesture'));
       }
       return false;
     }
@@ -617,21 +623,21 @@ export function useGestureForm() {
     setIsBidding(true);
     try {
       if (!account) {
-        notify('error', 'Please connect your wallet.');
+        notify('error', t('wallet.connect'));
         return false;
       }
       if (!(await switchToActiveChainIfNeeded())) {
         return false;
       }
       if (!cosmicGameContract) {
-        notify('error', 'Please connect your wallet and ensure you are on the correct network.');
+        notify('error', t('wallet.connectCorrectNetwork'));
         return false;
       }
 
       const ethGestureCost = await getNextEthGestureCostWithModifiers();
 
       if (!(await hasEthBalance(ethGestureCost))) {
-        notify('error', "Insufficient ETH balance! There isn't enough ETH in your wallet.");
+        notify('error', t('gesture.validation.insufficientEth'));
         return false;
       }
 
@@ -707,13 +713,16 @@ export function useGestureForm() {
         return false;
       }
       reportError(err, 'gesture-eth');
-      const detailed = formatCustomContractError(err);
-      const msg = getContractErrorMessage(err, ethGestureInfo?.ETHPrice);
-      const combined = [msg, detailed].filter(Boolean).join('\n\n');
+      const descriptor = getContractErrorDescriptor(err, ethGestureInfo?.ETHPrice);
+      const localizedMessage = descriptor ? t(descriptor.key, descriptor.values) : null;
+      const detailed = locale.toLowerCase().startsWith('zh')
+        ? null
+        : formatCustomContractError(err);
+      const combined = [localizedMessage, detailed].filter(Boolean).join('\n\n');
       if (combined) {
         notify('error', combined);
       } else {
-        notifyErrorFromEthers(err);
+        notifyErrorFromEthers(err, t('gesture.transaction.failed'));
       }
       return false;
     } finally {
@@ -730,7 +739,7 @@ export function useGestureForm() {
     let submittedCstPriceMaxLimit: bigint | null = null;
     try {
       if (!account) {
-        notify('error', 'Please connect your wallet.');
+        notify('error', t('wallet.connect'));
         return false;
       }
       if (!(await switchToActiveChainIfNeeded())) {
@@ -745,11 +754,11 @@ export function useGestureForm() {
           ((await getConnectorClient(config)) as unknown as typeof signerClient) ?? undefined;
       }
       if (!signerClient) {
-        notify('error', 'Wallet is still connecting. Please try again in a moment.');
+        notify('error', t('wallet.stillConnecting'));
         return false;
       }
       if (!cosmicGameContract) {
-        notify('error', 'Please connect your wallet and ensure you are on the correct network.');
+        notify('error', t('wallet.connectCorrectNetwork'));
         return false;
       }
       const signerAddress =
@@ -763,10 +772,7 @@ export function useGestureForm() {
 
       if (priceMaxLimit > 0n) {
         if (!(await hasCstBalance(priceMaxLimit))) {
-          notify(
-            'error',
-            "Insufficient CST balance! There isn't enough CST (ERC-20) in your wallet.",
-          );
+          notify('error', t('gesture.validation.insufficientCst'));
           return false;
         }
         // No ERC-20 approval needed: the game burns the bidder's CST directly via the
@@ -825,20 +831,20 @@ export function useGestureForm() {
         return false;
       }
       reportError(err, 'gesture-cst');
-      const detailed = formatCustomContractError(err);
-      const msg = getContractErrorMessage(err, {
+      const descriptor = getContractErrorDescriptor(err, {
         gestureCurrency: 'CST',
         displayedPriceWei: submittedCstPriceMaxLimit,
       });
-      if (msg || detailed) {
-        notify('error', [msg, detailed].filter(Boolean).join('\n\n'));
+      const localizedMessage = descriptor ? t(descriptor.key, descriptor.values) : null;
+      const detailed = locale.toLowerCase().startsWith('zh')
+        ? null
+        : formatCustomContractError(err);
+      if (localizedMessage || detailed) {
+        notify('error', [localizedMessage, detailed].filter(Boolean).join('\n\n'));
       } else if (isContractRevertError(err)) {
-        notify(
-          'error',
-          'The CST gesture reverted. Another gesture may have landed first, causing your max CST cost or minimum CST reward protection to fail. Refresh the preview and try again, or choose "Accept any CST reward" if you are comfortable receiving 0 CST.',
-        );
+        notify('error', t('gesture.transaction.cstReverted'));
       } else {
-        notifyErrorFromEthers(err);
+        notifyErrorFromEthers(err, t('gesture.transaction.failed'));
       }
       return false;
     } finally {

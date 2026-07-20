@@ -9,6 +9,8 @@ import { routing, type AppLocale } from './routing';
  * scripts/i18n-parity.ts, reports drift) and list it here.
  */
 export const NAMESPACES = [
+  'allocation',
+  'anchoring',
   'common',
   'currentCycle',
   'detail',
@@ -21,6 +23,7 @@ export const NAMESPACES = [
   'home',
   'landing',
   'meta',
+  'myPages',
   'nav',
   'search',
   'siteMap',

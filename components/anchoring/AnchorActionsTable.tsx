@@ -1,6 +1,7 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime } from '@/utils';
@@ -19,6 +20,8 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import type { AnchorAction } from '@/services/api';
 
 const AnchorActionsRow = ({ row, IsRwalk }: { row: AnchorAction; IsRwalk: boolean }) => {
+  const t = useTranslations('anchoring');
+  const locale = useLocale();
   const router = useRouter();
 
   if (!row) {
@@ -31,10 +34,12 @@ const AnchorActionsRow = ({ row, IsRwalk }: { row: AnchorAction; IsRwalk: boolea
 
   return (
     <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
-      <TablePrimaryCell>{convertTimestampToDateTime(row.TimeStamp)}</TablePrimaryCell>
+      <TablePrimaryCell>
+        {convertTimestampToDateTime(row.TimeStamp, false, locale)}
+      </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {row.ActionType === 1 ? 'Release' : 'Anchor'}
+        {row.ActionType === 1 ? t('common.release') : t('common.anchor')}
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
@@ -55,11 +60,12 @@ const AnchorActionsRow = ({ row, IsRwalk }: { row: AnchorAction; IsRwalk: boolea
 };
 
 const AnchorActionsTable = ({ list, IsRwalk }: { list: AnchorAction[]; IsRwalk: boolean }) => {
+  const t = useTranslations('anchoring');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No actions yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.actions')}</p>;
   }
 
   const startIndex = (page - 1) * perPage;
@@ -79,10 +85,16 @@ const AnchorActionsTable = ({ list, IsRwalk }: { list: AnchorAction[]; IsRwalk: 
 
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Action Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('tables.anchorActions.columns.datetime')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>{t('tables.anchorActions.columns.type')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.anchorActions.columns.tokenId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.anchorActions.columns.nftCount')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

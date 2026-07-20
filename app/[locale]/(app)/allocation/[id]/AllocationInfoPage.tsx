@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useLocale, useTranslations } from 'next-intl';
 
 import {
   getExplorerUrl,
@@ -92,13 +93,14 @@ function CopyableAddress({
   href?: string;
   className?: string;
 }) {
+  const t = useTranslations('allocation');
   const { copy } = useClipboard();
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     await copy(address);
-    toast.success('Address copied to clipboard');
+    toast.success(t('details.copy.addressSuccess'));
   };
 
   const display = shortenHex(address, 6);
@@ -118,7 +120,7 @@ function CopyableAddress({
       <button
         onClick={handleCopy}
         className="shrink-0 p-0.5 rounded opacity-0 group-hover/addr:opacity-100 hover:text-primary transition-all"
-        aria-label={`Copy address ${address}`}
+        aria-label={t('details.copy.addressAria', { address })}
       >
         <Copy className="h-3 w-3" />
       </button>
@@ -166,6 +168,7 @@ function LoadingSkeleton() {
 }
 
 function RoundNavigation({ roundNum, maxRound }: { roundNum: number; maxRound: number }) {
+  const t = useTranslations('allocation');
   const hasPrev = roundNum > 0;
   const hasNext = roundNum < maxRound;
 
@@ -175,10 +178,10 @@ function RoundNavigation({ roundNum, maxRound }: { roundNum: number; maxRound: n
         <Link
           href={`/allocation/${roundNum - 1}`}
           className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all"
-          aria-label="Previous cycle"
+          aria-label={t('details.navigation.previousAria')}
         >
           <ChevronLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Cycle {roundNum - 1}</span>
+          <span className="hidden sm:inline">{t('formats.cycle', { cycle: roundNum - 1 })}</span>
         </Link>
       ) : (
         <span />
@@ -187,9 +190,9 @@ function RoundNavigation({ roundNum, maxRound }: { roundNum: number; maxRound: n
         <Link
           href={`/allocation/${roundNum + 1}`}
           className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all"
-          aria-label="Next cycle"
+          aria-label={t('details.navigation.nextAria')}
         >
-          <span className="hidden sm:inline">Cycle {roundNum + 1}</span>
+          <span className="hidden sm:inline">{t('formats.cycle', { cycle: roundNum + 1 })}</span>
           <ChevronRight className="h-4 w-4" />
         </Link>
       ) : (
@@ -207,6 +210,7 @@ function RecipientCard({
   rewards,
   tokenId,
   tokenLabel,
+  testId,
   featured,
 }: {
   icon: React.ReactNode;
@@ -216,8 +220,11 @@ function RecipientCard({
   rewards: { label: string; value: string }[];
   tokenId?: number;
   tokenLabel?: string;
+  testId: string;
   featured?: boolean;
 }) {
+  const t = useTranslations('allocation');
+
   return (
     <motion.div
       variants={cardFade}
@@ -227,7 +234,7 @@ function RecipientCard({
           ? 'gradient-border-card gradient-border-card-accent bg-white/[0.04] hover:bg-white/[0.06]'
           : 'gradient-border-card bg-white/[0.02] hover:bg-white/[0.04]',
       )}
-      data-testid={`recipient-card-${title.toLowerCase().replace(/\s+/g, '-')}`}
+      data-testid={`recipient-card-${testId}`}
     >
       <div className="flex items-center gap-2.5 mb-4">
         <div
@@ -256,13 +263,15 @@ function RecipientCard({
       <div className="space-y-3">
         <div>
           <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
-            Recipient
+            {t('details.recipientCard.recipient')}
           </span>
           <div className="mt-0.5">
             {address ? (
               <CopyableAddress address={address} href={`/user/${address}`} />
             ) : (
-              <span className="text-sm text-muted-foreground/50 italic">None</span>
+              <span className="text-sm text-muted-foreground/50 italic">
+                {t('details.recipientCard.none')}
+              </span>
             )}
           </div>
         </div>
@@ -290,13 +299,13 @@ function RecipientCard({
         {tokenId !== undefined && tokenId > 0 && (
           <div>
             <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
-              {tokenLabel ?? 'NFT Token'}
+              {tokenLabel ?? t('details.recipientCard.nftToken')}
             </span>
             <Link
               href={`/detail/${tokenId}`}
               className="mt-0.5 block text-sm text-primary hover:underline"
             >
-              Token #{tokenId}
+              {t('formats.token', { token: tokenId })}
             </Link>
           </div>
         )}
@@ -306,6 +315,7 @@ function RecipientCard({
 }
 
 interface DistributionSegment {
+  id: string;
   label: string;
   value: number;
   color: string;
@@ -334,7 +344,7 @@ function AllocationDistributionBar({ segments }: { segments: DistributionSegment
                 <div
                   className={cn('relative transition-all duration-300', seg.color)}
                   style={{ width: `${pct}%` }}
-                  data-testid={`distribution-segment-${seg.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  data-testid={`distribution-segment-${seg.id}`}
                 />
               </TooltipTrigger>
               <TooltipContent>
@@ -375,6 +385,8 @@ interface AllocationInfoPageProps {
 }
 
 const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
+  const t = useTranslations('allocation');
+  const locale = useLocale();
   const { data: allocationInfo, isLoading: loadingRound } = useRoundInfo(roundNum);
   const { data: gestureHistory = [], isLoading: loadingGestures } = useGestureListByCycle(
     roundNum,
@@ -421,29 +433,29 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
 
   const handleShareRound = async () => {
     if (!allocationInfo) return;
-    const summary = [
-      `Cycle #${roundNum} \u2014 Cosmic Signature`,
-      `Signature Allocation: ${allocationInfo.AmountEth.toFixed(4)} ETH`,
-      `Recipient: ${shortenHex(allocationInfo.WinnerAddr, 6)}`,
-      `Gestures: ${allocationInfo.RoundStats.TotalBids}`,
-      `${typeof window !== 'undefined' ? window.location.href : ''}`,
-    ].join('\n');
+    const summary = t('details.share.summary', {
+      cycle: roundNum,
+      amount: allocationInfo.AmountEth.toFixed(4),
+      recipient: shortenHex(allocationInfo.WinnerAddr, 6),
+      gestures: allocationInfo.RoundStats.TotalBids,
+      url: typeof window !== 'undefined' ? window.location.href : '',
+    });
     await copy(summary);
-    toast.success('Cycle summary copied to clipboard');
+    toast.success(t('details.share.success'));
   };
 
   if (roundNum < 0) {
     return (
       <PageShell variant="data" backdrop="signature">
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h2 className="text-2xl font-bold mb-2">Invalid Cycle Number</h2>
-          <p className="text-muted-foreground mb-6">The cycle number must be a positive integer.</p>
+          <h2 className="text-2xl font-bold mb-2">{t('details.invalid.title')}</h2>
+          <p className="text-muted-foreground mb-6">{t('details.invalid.help')}</p>
           <Link
             href="/allocation"
             className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
           >
             <ChevronLeft className="h-4 w-4" />
-            Back to Allocation Recipients
+            {t('details.invalid.back')}
           </Link>
         </div>
       </PageShell>
@@ -458,16 +470,16 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     return (
       <PageShell variant="data" backdrop="signature">
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h2 className="text-2xl font-bold mb-2">Allocation Data Not Found</h2>
+          <h2 className="text-2xl font-bold mb-2">{t('details.notFound.title')}</h2>
           <p className="text-muted-foreground mb-6">
-            No data available for Cycle #{roundNum}. The cycle may not have finalized yet.
+            {t('details.notFound.help', { cycle: roundNum })}
           </p>
           <Link
             href="/allocation"
             className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
           >
             <ChevronLeft className="h-4 w-4" />
-            Back to Allocation Recipients
+            {t('details.notFound.back')}
           </Link>
         </div>
       </PageShell>
@@ -476,89 +488,97 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
 
   const distributionSegments: DistributionSegment[] = [
     {
-      label: 'Signature Allocation',
+      id: 'signature-allocation',
+      label: t('details.distribution.segments.signature.label'),
       value: allocationInfo.AmountEth,
       color: 'bg-[#15BFFD]',
-      tooltip: `${allocationInfo.AmountEth.toFixed(4)} ETH retrieved by the participant who made the Final Gesture.`,
+      tooltip: t('details.distribution.segments.signature.tooltip', {
+        amount: allocationInfo.AmountEth.toFixed(4),
+      }),
     },
     {
-      label: 'Public Goods',
+      id: 'public-goods',
+      label: t('details.distribution.segments.publicGoods.label'),
       value: allocationInfo.CharityAmountETH,
       color: 'bg-emerald-500',
-      tooltip: `${allocationInfo.CharityAmountETH.toFixed(4)} ETH forwarded to the Public Goods Beneficiary (Protocol Guild).`,
+      tooltip: t('details.distribution.segments.publicGoods.tooltip', {
+        amount: allocationInfo.CharityAmountETH.toFixed(4),
+      }),
     },
     {
-      label: 'Anchor Distribution',
+      id: 'anchor-distribution',
+      label: t('details.distribution.segments.anchor.label'),
       value: allocationInfo.StakingDepositAmountEth,
       color: 'bg-[#9C37FD]',
-      tooltip: `${allocationInfo.StakingDepositAmountEth.toFixed(4)} ETH distributed across Cosmic Signature NFTs anchored to the protocol.`,
+      tooltip: t('details.distribution.segments.anchor.tooltip', {
+        amount: allocationInfo.StakingDepositAmountEth.toFixed(4),
+      }),
     },
     {
-      label: 'Stellar Selection',
+      id: 'stellar-selection',
+      label: t('details.distribution.segments.stellar.label'),
       value: allocationInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0,
       color: 'bg-[#5B8DEF]',
-      tooltip: `${(allocationInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH allocated to the Stellar Selection pool.`,
+      tooltip: t('details.distribution.segments.stellar.tooltip', {
+        amount: (allocationInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4),
+      }),
     },
   ];
 
   const stats = [
     {
       icon: <Trophy className="h-3.5 w-3.5" />,
-      label: 'Signature Allocation ETH',
+      label: t('details.statistics.cards.signatureEth.label'),
       value: `${allocationInfo.AmountEth.toFixed(4)} ETH`,
-      tooltip:
-        'The ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture of this cycle.',
+      tooltip: t('details.statistics.cards.signatureEth.tooltip'),
     },
     {
       icon: <Heart className="h-3.5 w-3.5" />,
-      label: 'Public Goods',
+      label: t('details.statistics.cards.publicGoods.label'),
       value: `${allocationInfo.CharityAmountETH.toFixed(4)} ETH`,
-      tooltip:
-        'The amount forwarded to the Public Goods Beneficiary (Protocol Guild) from this cycle.',
+      tooltip: t('details.statistics.cards.publicGoods.tooltip'),
     },
     {
       icon: <Landmark className="h-3.5 w-3.5" />,
-      label: 'Anchor Distribution',
+      label: t('details.statistics.cards.anchor.label'),
       value: `${allocationInfo.StakingDepositAmountEth.toFixed(4)} ETH`,
-      tooltip:
-        'Total ETH distributed to participants who anchored Cosmic Signature NFTs for this cycle.',
+      tooltip: t('details.statistics.cards.anchor.tooltip'),
     },
     {
       icon: <BarChart3 className="h-3.5 w-3.5" />,
-      label: 'Stellar Selection Pool',
+      label: t('details.statistics.cards.stellar.label'),
       value: `${(allocationInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH`,
-      tooltip: 'Total ETH allocated to the Stellar Selection pool across the cycle.',
+      tooltip: t('details.statistics.cards.stellar.tooltip'),
     },
     {
       icon: <Gavel className="h-3.5 w-3.5" />,
-      label: 'Total Gestures',
+      label: t('details.statistics.cards.gestures.label'),
       value: allocationInfo.RoundStats.TotalBids,
-      tooltip: 'The total number of gestures made during this cycle.',
+      tooltip: t('details.statistics.cards.gestures.tooltip'),
     },
     {
       icon: <Gift className="h-3.5 w-3.5" />,
-      label: 'Attached NFTs',
+      label: t('details.statistics.cards.attachedNfts.label'),
       value: allocationInfo.RoundStats.TotalDonatedNFTs ?? 0,
-      tooltip: 'Number of NFTs attached to gestures by participants during this cycle.',
+      tooltip: t('details.statistics.cards.attachedNfts.tooltip'),
     },
     {
       icon: <Layers className="h-3.5 w-3.5" />,
-      label: 'Anchored Tokens',
+      label: t('details.statistics.cards.anchoredTokens.label'),
       value: allocationInfo.StakingNumStakedTokens,
-      tooltip: 'Number of NFT tokens anchored to the protocol for this cycle.',
+      tooltip: t('details.statistics.cards.anchoredTokens.tooltip'),
     },
     {
       icon: <Users className="h-3.5 w-3.5" />,
-      label: 'Unique Anchor-holders',
+      label: t('details.statistics.cards.uniqueAnchorHolders.label'),
       value: anchorDistributions.length,
-      tooltip: 'How many unique addresses had tokens anchored during this cycle.',
+      tooltip: t('details.statistics.cards.uniqueAnchorHolders.tooltip'),
     },
     {
       icon: <Sparkles className="h-3.5 w-3.5" />,
-      label: 'Total Contributed',
+      label: t('details.statistics.cards.totalContributed.label'),
       value: formatEthValue(allocationInfo.RoundStats.TotalDonatedAmountEth ?? 0),
-      tooltip:
-        'Combined value of all ERC-20 token contributions attached to gestures during this cycle.',
+      tooltip: t('details.statistics.cards.totalContributed.tooltip'),
     },
   ];
 
@@ -569,10 +589,10 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
       {/* Breadcrumbs */}
       <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
         <Link href="/allocation" className="hover:text-primary transition-colors">
-          Allocation Recipients
+          {t('details.breadcrumbs.recipients')}
         </Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <span className="text-foreground">Cycle {roundNum}</span>
+        <span className="text-foreground">{t('formats.cycle', { cycle: roundNum })}</span>
       </nav>
 
       {/* Hero Banner */}
@@ -581,7 +601,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="Cycle Hero"
+        aria-label={t('details.hero.aria')}
       >
         <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.04] via-white/[0.02] to-transparent p-6 md:p-10">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.04] via-transparent to-accent/[0.04] pointer-events-none" />
@@ -590,7 +610,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
               <div className="space-y-4 min-w-0 flex-1">
                 <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-white">
-                  Cycle #{roundNum}
+                  {t('formats.cycleHash', { cycle: roundNum })}
                 </h1>
 
                 <div className="flex items-baseline gap-2 flex-wrap">
@@ -601,16 +621,13 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                   >
                     {allocationInfo.AmountEth.toFixed(4)} ETH
                   </p>
-                  <InfoTooltip
-                    content="Total ETH retrieved by the participant who made the Final Gesture when the countdown reached zero."
-                    iconClassName="h-4 w-4"
-                  />
+                  <InfoTooltip content={t('details.hero.amountTooltip')} iconClassName="h-4 w-4" />
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
-                      Recipient
+                      {t('details.hero.recipient')}
                     </span>
                     <CopyableAddress
                       address={allocationInfo.WinnerAddr}
@@ -621,20 +638,28 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                   {allocationInfo.TokenId > 0 && (
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
-                        NFT
+                        {t('details.hero.nft')}
                       </span>
                       <Link
                         href={`/detail/${allocationInfo.TokenId}`}
                         className="text-sm text-primary hover:underline"
                       >
-                        Cosmic Signature #{allocationInfo.TokenId}
+                        {t('formats.cosmicSignatureToken', { token: allocationInfo.TokenId })}
                       </Link>
-                      <InfoTooltip content="View this Cosmic Signature NFT in the gallery." />
+                      <InfoTooltip content={t('details.hero.nftTooltip')} />
                     </div>
                   )}
 
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>Finalized {convertTimestampToDateTime(allocationInfo.TimeStamp)}</span>
+                    <span>
+                      {t('details.hero.finalized', {
+                        dateTime: convertTimestampToDateTime(
+                          allocationInfo.TimeStamp,
+                          false,
+                          locale,
+                        ),
+                      })}
+                    </span>
                     <span className="text-white/10">|</span>
                     <a
                       href={getExplorerUrl('tx', allocationInfo.TxHash)}
@@ -642,7 +667,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 hover:text-primary transition-colors"
                     >
-                      View transaction <ExternalLink className="h-3 w-3" />
+                      {t('details.hero.viewTransaction')} <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>
                 </div>
@@ -652,11 +677,11 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                 <button
                   onClick={handleShareRound}
                   className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all"
-                  aria-label="Share cycle summary"
+                  aria-label={t('details.hero.shareAria')}
                   data-testid="share-round-button"
                 >
                   <Share2 className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Share</span>
+                  <span className="hidden sm:inline">{t('details.hero.share')}</span>
                 </button>
                 <RoundNavigation roundNum={roundNum} maxRound={maxRound} />
               </div>
@@ -671,11 +696,13 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="Cycle Recipients"
+        aria-label={t('details.recipientSection.aria')}
       >
         <div className="flex items-center gap-2 mb-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Cycle Recipients</h2>
-          <InfoTooltip content="All allocation recipients for this cycle. The Signature Allocation goes to the participant who made the Final Gesture; special roles receive additional allocations." />
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            {t('details.recipientSection.title')}
+          </h2>
+          <InfoTooltip content={t('details.recipientSection.tooltip')} />
         </div>
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
@@ -685,65 +712,72 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         >
           <RecipientCard
             icon={<Trophy className="h-5 w-5" />}
-            title="Signature Allocation"
-            tooltip="The participant who made the Final Gesture when the countdown reached zero. Retrieves the Signature Allocation in ETH, 1,000 CST, and a Cosmic Signature NFT."
+            title={t('details.recipientSection.cards.signature.title')}
+            tooltip={t('details.recipientSection.cards.signature.tooltip')}
             address={allocationInfo.WinnerAddr}
             rewards={[
-              { label: 'ETH Allocation', value: `${allocationInfo.AmountEth.toFixed(4)} ETH` },
               {
-                label: 'Recognition CST',
+                label: t('details.recipientSection.labels.ethAllocation'),
+                value: `${allocationInfo.AmountEth.toFixed(4)} ETH`,
+              },
+              {
+                label: t('details.recipientSection.labels.recognitionCst'),
                 value: `${(allocationInfo.CSTAmountEth ?? 0).toFixed(4)} CST`,
               },
             ]}
             tokenId={allocationInfo.TokenId}
-            tokenLabel="Cosmic Signature NFT"
+            tokenLabel={t('details.recipientSection.labels.cosmicSignatureNft')}
+            testId="signature-allocation"
             featured
           />
           <RecipientCard
             icon={<Swords className="h-5 w-5" />}
-            title="Chrono-Warrior"
-            tooltip="The participant who held the Endurance Champion position for the longest consecutive interval. Retrieves ETH, Recognition CST, and a Cosmic Signature NFT."
+            title={t('details.recipientSection.cards.chrono.title')}
+            tooltip={t('details.recipientSection.cards.chrono.tooltip')}
             address={allocationInfo.ChronoWarriorAddr}
             rewards={[
               {
-                label: 'ETH Allocation',
+                label: t('details.recipientSection.labels.ethAllocation'),
                 value: `${allocationInfo.ChronoWarriorAmountEth.toFixed(4)} ETH`,
               },
               {
-                label: 'Recognition CST',
+                label: t('details.recipientSection.labels.recognitionCst'),
                 value: `${(allocationInfo.ChronoWarriorCstAmountEth ?? 0).toFixed(4)} CST`,
               },
             ]}
             tokenId={allocationInfo.ChronoWarriorNftTokenId}
-            tokenLabel="Cosmic Signature NFT"
+            tokenLabel={t('details.recipientSection.labels.cosmicSignatureNft')}
+            testId="chrono-warrior"
           />
           <RecipientCard
             icon={<Crown className="h-5 w-5" />}
-            title="Endurance Champion"
-            tooltip="The participant who held the most-recent-gesture position for the longest uninterrupted interval. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+            title={t('details.recipientSection.cards.endurance.title')}
+            tooltip={t('details.recipientSection.cards.endurance.tooltip')}
             address={allocationInfo.EnduranceWinnerAddr}
             rewards={[
               {
-                label: 'Recognition CST',
+                label: t('details.recipientSection.labels.recognitionCst'),
                 value: `${(allocationInfo.EnduranceERC20AmountEth ?? 0).toFixed(4)} CST`,
               },
             ]}
             tokenId={allocationInfo.EnduranceERC721TokenId}
-            tokenLabel="Cosmic Signature NFT"
+            tokenLabel={t('details.recipientSection.labels.cosmicSignatureNft')}
+            testId="endurance-champion"
           />
           <RecipientCard
             icon={<Coins className="h-5 w-5" />}
-            title="Final CST Gesture"
-            tooltip="The participant who made the last CST gesture of the cycle. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+            title={t('details.recipientSection.cards.finalCst.title')}
+            tooltip={t('details.recipientSection.cards.finalCst.tooltip')}
             address={allocationInfo.LastCstBidderAddr}
             rewards={[
               {
-                label: 'Recognition CST',
+                label: t('details.recipientSection.labels.recognitionCst'),
                 value: `${(allocationInfo.LastCstBidderERC20AmountEth ?? 0).toFixed(4)} CST`,
               },
             ]}
             tokenId={allocationInfo.LastCstBidderERC721TokenId}
-            tokenLabel="Cosmic Signature NFT"
+            tokenLabel={t('details.recipientSection.labels.cosmicSignatureNft')}
+            testId="final-cst-gesture"
           />
         </motion.div>
       </motion.section>
@@ -754,13 +788,13 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="Allocation Distribution"
+        aria-label={t('details.distribution.aria')}
       >
         <div className="flex items-center gap-2 mb-5">
           <h2 className="font-display text-lg font-semibold tracking-tight">
-            Allocation Distribution
+            {t('details.distribution.title')}
           </h2>
-          <InfoTooltip content="Visual breakdown of how the cycle's Cycle Reserve was distributed across allocation tracks." />
+          <InfoTooltip content={t('details.distribution.tooltip')} />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
           <AllocationDistributionBar segments={distributionSegments} />
@@ -773,11 +807,13 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="Cycle Statistics"
+        aria-label={t('details.statistics.aria')}
       >
         <div className="flex items-center gap-2 mb-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Cycle Statistics</h2>
-          <InfoTooltip content="Key metrics summarizing this cycle's activity and allocation distribution." />
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            {t('details.statistics.title')}
+          </h2>
+          <InfoTooltip content={t('details.statistics.tooltip')} />
         </div>
         <motion.div
           className="grid grid-cols-2 sm:grid-cols-3 gap-3"
@@ -806,13 +842,13 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="All Allocations for This Cycle"
+        aria-label={t('details.ledger.aria')}
       >
         <div className="flex items-center gap-2 mb-5">
           <h2 className="font-display text-lg font-semibold tracking-tight">
-            All Allocations for This Cycle
+            {t('details.ledger.title')}
           </h2>
-          <InfoTooltip content="Complete ledger of every allocation record for this cycle — Signature Allocation, Chrono-Warrior, Endurance Champion, Stellar Selection, Anchor Distributions, and related NFT/CST distributions." />
+          <InfoTooltip content={t('details.ledger.tooltip')} />
           {cycleAllocationLedger.length > 0 ? (
             <span className="ml-1 rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
               {cycleAllocationLedger.length}
@@ -826,40 +862,40 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             perPage={10}
           />
         ) : (
-          <p className="text-sm text-muted-foreground">No allocation records yet.</p>
+          <p className="text-sm text-muted-foreground">{t('details.ledger.empty')}</p>
         )}
       </motion.section>
 
       {/* Section Divider */}
-      <SectionDivider title="Detailed Data" className="mb-10" />
+      <SectionDivider title={t('details.data.divider')} className="mb-10" />
 
       {/* Tabbed Data Sections */}
       <motion.section
         initial="hidden"
         animate="visible"
         variants={sectionFade}
-        aria-label="Cycle Data"
+        aria-label={t('details.data.aria')}
       >
         <Tabs defaultValue="gestures" className="w-full">
           <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-white/[0.03] p-1.5 rounded-xl">
             <TabsTrigger value="gestures" className="flex-1 min-w-[100px]">
-              Gesture History
+              {t('details.data.tabs.gestures')}
               <TabBadge count={gestureHistory.length} />
             </TabsTrigger>
             <TabsTrigger value="endurance" className="flex-1 min-w-[100px]">
-              Endurance Champions
+              {t('details.data.tabs.endurance')}
               <TabBadge count={championList.length} />
             </TabsTrigger>
             <TabsTrigger value="stellar-selection" className="flex-1 min-w-[100px]">
-              Stellar Selection
+              {t('details.data.tabs.stellar')}
               <TabBadge count={stellarSelectionLedger.length} />
             </TabsTrigger>
             <TabsTrigger value="anchoring" className="flex-1 min-w-[100px]">
-              Anchor Distributions
+              {t('details.data.tabs.anchoring')}
               <TabBadge count={anchorDistributions.length} />
             </TabsTrigger>
             <TabsTrigger value="contributions" className="flex-1 min-w-[100px]">
-              Contributions
+              {t('details.data.tabs.contributions')}
               <TabBadge count={donationsCount} />
             </TabsTrigger>
           </TabsList>
@@ -868,7 +904,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             {gestureHistory.length > 0 ? (
               <GestureHistoryTable gestureHistory={gestureHistory} />
             ) : (
-              <EmptyState title="No gestures were made in this cycle." />
+              <EmptyState title={t('details.data.empty.gestures')} />
             )}
           </TabsContent>
 
@@ -876,7 +912,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             {championList.length > 0 ? (
               <EnduranceChampionsTable championList={championList} />
             ) : (
-              <EmptyState title="No Endurance Champion data available for this cycle." />
+              <EmptyState title={t('details.data.empty.endurance')} />
             )}
           </TabsContent>
 
@@ -888,7 +924,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                 perPage={10}
               />
             ) : (
-              <EmptyState title="No Stellar Selection recipients for this cycle." />
+              <EmptyState title={t('details.data.empty.stellar')} />
             )}
           </TabsContent>
 
@@ -896,7 +932,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             {anchorDistributions.length > 0 ? (
               <AnchoringRecipientTable list={anchorDistributions} />
             ) : (
-              <EmptyState title="No Anchor Distributions distributed in this cycle." />
+              <EmptyState title={t('details.data.empty.anchoring')} />
             )}
           </TabsContent>
 
@@ -905,8 +941,8 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-semibold">Attached NFTs</h3>
-                  <InfoTooltip content="NFTs attached to gestures during this cycle, forwarded to the participant who made the Final Gesture." />
+                  <h3 className="text-sm font-semibold">{t('details.data.contributions.nfts')}</h3>
+                  <InfoTooltip content={t('details.data.contributions.nftsTooltip')} />
                 </div>
                 {nftDonations.length > 0 ? (
                   <AttachedNFTTable
@@ -915,19 +951,19 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                     claimingTokens={[]}
                   />
                 ) : (
-                  <EmptyState title="No NFTs were attached to gestures in this cycle." />
+                  <EmptyState title={t('details.data.empty.nfts')} />
                 )}
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <Coins className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-semibold">Attached ERC-20 Tokens</h3>
-                  <InfoTooltip content="ERC-20 tokens attached to gestures by participants, forwarded to the Signature Allocation recipient." />
+                  <h3 className="text-sm font-semibold">{t('details.data.contributions.erc20')}</h3>
+                  <InfoTooltip content={t('details.data.contributions.erc20Tooltip')} />
                 </div>
                 {donatedERC20Tokens.length > 0 ? (
                   <AttachedERC20Table list={donatedERC20Tokens} handleClaim={null} />
                 ) : (
-                  <EmptyState title="No ERC-20 tokens were attached to gestures in this cycle." />
+                  <EmptyState title={t('details.data.empty.erc20')} />
                 )}
               </div>
             </div>

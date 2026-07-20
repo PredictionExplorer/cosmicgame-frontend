@@ -142,6 +142,7 @@ interface HomePageProps {
 
 const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomePageProps) => {
   const t = useTranslations('home');
+  const tToast = useTranslations('toasts');
   const locale = useLocale();
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
@@ -288,10 +289,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
       if (nextScenario) {
         setMessage('');
         setGesturePulseKey((value) => value + 1);
-        notify(
-          'success',
-          `Simulated gesture placed. Timer extended by ${nextScenario.extensionSeconds}s.`,
-        );
+        notify('success', tToast('gesture.simulated', { seconds: nextScenario.extensionSeconds }));
       }
       return;
     }
@@ -308,6 +306,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     onGestureWithCST,
     optimisticallyRecordGesture,
     setMessage,
+    tToast,
     uxScenario,
     withPostTxRefresh,
   ]);

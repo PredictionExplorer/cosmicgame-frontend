@@ -70,7 +70,7 @@ const files: FileEntry[] = UTIL_FILES.map((name) => {
 const EXPECTED_COUNTS: Record<string, number> = {
   'alert.ts': 1,
   'analytics.ts': 3,
-  'contractErrors.ts': 4,
+  'contractErrors.ts': 5,
   'contractWrite.ts': 1,
   'endurance.ts': 3,
   'errors.ts': 4,
@@ -78,7 +78,7 @@ const EXPECTED_COUNTS: Record<string, number> = {
   'metadata.ts': 1,
   'seo.ts': 1,
   'urls.ts': 7,
-  'wallet.ts': 1,
+  'wallet.ts': 2,
 };
 
 describe('Utils JSDoc coverage', () => {
@@ -102,9 +102,9 @@ describe('Utils JSDoc coverage', () => {
   });
 
   describe('no function is missing from the inventory', () => {
-    it('total exported functions/constants across all util files is 43', () => {
+    it('total exported functions/constants across all util files is 45', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(43);
+      expect(total).toBe(45);
     });
   });
 

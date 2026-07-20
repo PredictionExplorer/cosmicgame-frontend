@@ -18,6 +18,17 @@ export interface EthProviderError {
   data?: { message?: string };
 }
 
+export interface EthErrorMessageOptions {
+  /**
+   * The active UI locale. Provider diagnostics are intentionally hidden from
+   * Chinese UI because wallets and RPC nodes commonly return arbitrary English
+   * strings. The original error should still be passed to `reportError`.
+   */
+  locale?: string;
+  /** Explicitly override whether the provider's raw message may be displayed. */
+  preserveProviderMessage?: boolean;
+}
+
 /** Type-guard for wallet/provider errors that carry a `.data` bag. */
 export function isEthProviderError(err: unknown): err is EthProviderError {
   return typeof err === 'object' && err !== null && 'data' in err;
@@ -93,11 +104,22 @@ export function isUserRejection(err: unknown): boolean {
 }
 
 /**
- * Extracts a user-friendly message from an Ethereum provider error,
- * falling back to a default when none is available.
+ * Extracts a user-friendly message from an Ethereum provider error.
+ *
+ * Existing callers remain byte-for-byte compatible: without options, a
+ * provider message is returned when present. Locale-aware transaction callers
+ * should pass `{locale}` so Chinese UI receives the translated fallback while
+ * the raw diagnostic remains available to logging and error reporting.
  */
-export function getEthErrorMessage(err: unknown, fallback = 'An error occurred'): string {
-  if (isEthProviderError(err) && err.data?.message) {
+export function getEthErrorMessage(
+  err: unknown,
+  fallback = 'An error occurred',
+  options: EthErrorMessageOptions = {},
+): string {
+  const preserveProviderMessage =
+    options.preserveProviderMessage ?? !options.locale?.toLowerCase().startsWith('zh');
+
+  if (preserveProviderMessage && isEthProviderError(err) && err.data?.message) {
     return err.data.message;
   }
   return fallback;

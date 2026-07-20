@@ -2,6 +2,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -21,6 +22,8 @@ import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable
 import type { CSTAnchorDistribution } from '@/services/api';
 
 const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) => {
+  const t = useTranslations('anchoring');
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
 
   const { data: list = [] } = useCSTAnchorDistributionsByCycle(row?.RoundNum);
@@ -34,7 +37,7 @@ const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) =
       <TablePrimaryRow className="border-b-0">
         <TablePrimaryCell className="p-0">
           <button
-            aria-label="expand row"
+            aria-label={t('common.aria.expandRow')}
             className="inline-flex items-center justify-center rounded-full p-1 hover:bg-white/10 transition-colors"
             onClick={() => setOpen(!open)}
           >
@@ -49,7 +52,7 @@ const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) =
             rel="noopener noreferrer"
             className="text-inherit"
           >
-            {convertTimestampToDateTime(row.TimeStamp ?? 0)}
+            {convertTimestampToDateTime(row.TimeStamp ?? 0, false, locale)}
           </a>
         </TablePrimaryCell>
 
@@ -65,7 +68,9 @@ const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) =
           {(row.TotalDepositAmountEth ?? 0).toFixed(6)}
         </TablePrimaryCell>
 
-        <TablePrimaryCell align="center">{row.FullyClaimed ? 'Yes' : 'No'}</TablePrimaryCell>
+        <TablePrimaryCell align="center">
+          {row.FullyClaimed ? t('common.yes') : t('common.no')}
+        </TablePrimaryCell>
 
         <TablePrimaryCell align="right">
           {(row.PendingToCollectEth ?? 0).toFixed(6)}
@@ -77,7 +82,7 @@ const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) =
           {open && (
             <div className="m-2 mb-8">
               <h3 className="text-base font-medium mb-2">
-                ETH Anchor Distributions for Cycle {row.RoundNum}
+                {t('tables.globalDistributions.cycleDetails', { cycle: row.RoundNum })}
               </h3>
               <AnchoringRecipientTable list={list} />
             </div>
@@ -89,11 +94,12 @@ const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) =
 };
 
 export const GlobalAnchorDistributionsTable = ({ list }: { list: CSTAnchorDistribution[] }) => {
+  const t = useTranslations('anchoring');
   const perPage = 5;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No distributions yet.</p>;
+    return <p className="text-muted-foreground">{t('common.empty.distributions')}</p>;
   }
 
   const displayedRows = list.slice((page - 1) * perPage, page * perPage);
@@ -105,12 +111,24 @@ export const GlobalAnchorDistributionsTable = ({ list }: { list: CSTAnchorDistri
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell className="p-0" />
-              <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Anchored Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Deposited (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Fully Retrieved?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Pending to Retrieve (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('tables.globalDistributions.columns.depositDatetime')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.globalDistributions.columns.cycle')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.globalDistributions.columns.totalAnchoredTokens')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.globalDistributions.columns.totalDepositedEth')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                {t('tables.globalDistributions.columns.fullyRetrieved')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                {t('tables.globalDistributions.columns.pendingEth')}
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

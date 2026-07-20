@@ -24,20 +24,20 @@ beforeEach(() => jest.clearAllMocks());
 describe('AnchorDistributionsTable', () => {
   it('renders empty state message', () => {
     render(<AnchorDistributionsTable list={[]} address={ADDRESS} />);
-    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.distributions')).toBeInTheDocument();
   });
 
   it('renders empty state for null list', () => {
     render(<AnchorDistributionsTable list={null as unknown as never[]} address={ADDRESS} />);
-    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.distributions')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<AnchorDistributionsTable list={[createRow()]} address={ADDRESS} />);
     for (const header of [
-      'Token ID',
-      'Retrieved Distributions (ETH)',
-      'Distributions to Retrieve (ETH)',
+      'anchoring.tables.tokenDistributions.columns.tokenId',
+      'anchoring.tables.tokenDistributions.columns.retrievedEth',
+      'anchoring.tables.tokenDistributions.columns.retrievableEth',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }

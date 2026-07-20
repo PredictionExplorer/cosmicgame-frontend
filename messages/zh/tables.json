@@ -27,6 +27,45 @@
     "generic": "暂无数据。",
     "nothingHere": "暂无内容"
   },
+  "attachedAssets": {
+    "actions": {
+      "claim": "取回",
+      "claiming": "取回中…"
+    },
+    "status": {
+      "yes": "是",
+      "no": "否"
+    },
+    "aria": {
+      "actions": "操作"
+    },
+    "nft": {
+      "empty": "暂无已附加 NFT。",
+      "imageAlt": "NFT #{id}",
+      "imageUnavailable": "暂无图像",
+      "columns": {
+        "datetime": "日期时间",
+        "contributorAddress": "附加者地址",
+        "round": "周期编号",
+        "tokenAddress": "代币地址",
+        "tokenId": "代币 ID",
+        "tokenImage": "代币图像",
+        "tokenUri": "代币 URI"
+      }
+    },
+    "erc20": {
+      "empty": "暂无已附加 ERC-20 代币。",
+      "columns": {
+        "datetime": "日期时间",
+        "cycle": "周期编号",
+        "tokenAddress": "代币地址",
+        "attachedAmount": "附加数量",
+        "retrievedAmount": "已取回数量",
+        "recipient": "获配者",
+        "retrieved": "已取回"
+      }
+    }
+  },
   "loading": "加载中…",
   "status": {
     "loading": "加载中…",
@@ -181,6 +220,7 @@
   },
   "gestureHistory": {
     "randomWalkGesture": "使用 Random Walk NFT 落笔（ID：{id}）",
+    "randomWalkImageAlt": "Random Walk NFT",
     "cstGesture": "使用 CST 代币落笔",
     "ethGesture": "使用 ETH 落笔",
     "nftAttached": "，并附加了代币（{address}），ID 为 {id}",

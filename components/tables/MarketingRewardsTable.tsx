@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -19,6 +19,8 @@ import type { MarketingReward } from '@/services/api/types';
 export type { MarketingReward };
 
 const MarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
+  const locale = useLocale();
+
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -29,7 +31,7 @@ const MarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
     <TablePrimaryRow>
       <TablePrimaryCell>
         <a className="text-inherit" href={transactionUrl} target="_blank" rel="noopener noreferrer">
-          {convertTimestampToDateTime(row.TimeStamp)}
+          {convertTimestampToDateTime(row.TimeStamp, false, locale)}
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell>{row.AmountEth.toFixed(2)}</TablePrimaryCell>

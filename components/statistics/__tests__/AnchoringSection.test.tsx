@@ -139,16 +139,22 @@ describe('AnchoringSection', () => {
     render(
       <AnchoringSection {...defaultProps} cstAnchorActions={dataState([createAnchorAction()])} />,
     );
-    expect(screen.getAllByText('Anchor Datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Anchor').length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('anchoring.tables.globalAnchorActions.headers.anchorDatetime.desktop')
+        .length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText('anchoring.tables.globalAnchorActions.headers.anchorDatetime.mobile')
+        .length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('anchoring.common.anchor').length).toBeGreaterThanOrEqual(1);
   });
 
   it('navigates from a CST anchor-action row', () => {
     render(
       <AnchoringSection {...defaultProps} cstAnchorActions={dataState([createAnchorAction()])} />,
     );
-    const row = screen.getAllByText('Anchor')[0]!.closest('tr');
+    const row = screen.getAllByText('anchoring.common.anchor')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/10');
   });

@@ -1,4 +1,5 @@
 import { Gift, Coins } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +52,7 @@ export function DonatedAssetsSection({
   onClaimERC20,
   onClaimAllERC20,
 }: DonatedAssetsSectionProps) {
+  const t = useTranslations('myPages');
   const allNFTs = [...unclaimedNFTs, ...claimedNFTs];
   const unclaimedERC20Count = donatedERC20.filter((x) => !x.Claimed).length;
 
@@ -60,18 +62,20 @@ export function DonatedAssetsSection({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Attached NFTs Received
+              {t('statistics.donatedAssets.nfts.title')}
             </p>
-            <InfoTooltip content="NFTs attached by other participants that were allocated to you through Stellar Selection. Unretrieved NFTs can be retrieved to your wallet." />
+            <InfoTooltip content={t('statistics.donatedAssets.nfts.tooltip')} />
             {unclaimedNFTs.length > 0 && (
               <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                {unclaimedNFTs.length} unclaimed
+                {t('statistics.donatedAssets.nfts.unclaimed', {
+                  count: unclaimedNFTs.length,
+                })}
               </Badge>
             )}
           </div>
           {unclaimedNFTs.length > 0 && canClaim && (
             <Button onClick={onClaimAllNFTs} disabled={isClaiming} size="sm">
-              Claim All NFTs
+              {t('statistics.donatedAssets.nfts.claimAll')}
             </Button>
           )}
         </div>
@@ -80,8 +84,8 @@ export function DonatedAssetsSection({
         ) : allNFTs.length === 0 ? (
           <EmptyState
             icon={<Gift className="h-8 w-8 text-muted-foreground/50" />}
-            title="No attached NFTs"
-            description="You haven't received any attached NFTs through Stellar Selection yet."
+            title={t('statistics.donatedAssets.nfts.emptyTitle')}
+            description={t('statistics.donatedAssets.nfts.emptyDescription')}
           />
         ) : (
           <AttachedNFTTable
@@ -96,18 +100,20 @@ export function DonatedAssetsSection({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Attached ERC20 Tokens
+              {t('statistics.donatedAssets.erc20.title')}
             </p>
-            <InfoTooltip content="ERC20 tokens attached by other participants. Unretrieved tokens can be retrieved to your wallet." />
+            <InfoTooltip content={t('statistics.donatedAssets.erc20.tooltip')} />
             {unclaimedERC20Count > 0 && (
               <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                {unclaimedERC20Count} unclaimed
+                {t('statistics.donatedAssets.erc20.unclaimed', {
+                  count: unclaimedERC20Count,
+                })}
               </Badge>
             )}
           </div>
           {unclaimedERC20Count > 0 && canClaim && (
             <Button onClick={onClaimAllERC20} size="sm">
-              Claim All Tokens
+              {t('statistics.donatedAssets.erc20.claimAll')}
             </Button>
           )}
         </div>
@@ -116,8 +122,8 @@ export function DonatedAssetsSection({
         ) : donatedERC20.length === 0 ? (
           <EmptyState
             icon={<Coins className="h-8 w-8 text-muted-foreground/50" />}
-            title="No attached tokens"
-            description="You haven't received any attached ERC20 tokens yet."
+            title={t('statistics.donatedAssets.erc20.emptyTitle')}
+            description={t('statistics.donatedAssets.erc20.emptyDescription')}
           />
         ) : (
           <AttachedERC20Table

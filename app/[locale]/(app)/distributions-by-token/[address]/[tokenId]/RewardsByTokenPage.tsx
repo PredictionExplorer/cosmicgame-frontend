@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Tr, Tbody } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
@@ -56,6 +57,8 @@ interface RewardsRowData {
 }
 
 function RewardsDetailRow({ row }: { row: RewardsRowData }) {
+  const t = useTranslations('anchoring');
+  const locale = useLocale();
   const [open, setOpen] = useState<boolean>(false);
 
   if (!row) return <TablePrimaryRow />;
@@ -70,14 +73,14 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
             variant="ghost"
             size="icon"
             onClick={() => setOpen((prev) => !prev)}
-            aria-label="expand row"
+            aria-label={t('common.aria.expandRow')}
           >
             {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </TablePrimaryCell>
 
         <TablePrimaryCell align="left">
-          {convertTimestampToDateTime(DepositTimeStamp)}
+          {convertTimestampToDateTime(DepositTimeStamp, false, locale)}
         </TablePrimaryCell>
 
         <TablePrimaryCell align="center">
@@ -87,7 +90,9 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
         </TablePrimaryCell>
 
         <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
-        <TablePrimaryCell align="center">{Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
+        <TablePrimaryCell align="center">
+          {Claimed ? t('common.yes') : t('common.no')}
+        </TablePrimaryCell>
         <TablePrimaryCell align="right">{RewardEth.toFixed(6)}</TablePrimaryCell>
       </TablePrimaryRow>
 
@@ -97,20 +102,22 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
             <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
               <div className={cn(detailPanelClass, 'mb-0')}>
                 <div className="border-b border-white/[0.06] px-4 py-3">
-                  <h3 className="font-display text-sm font-semibold text-foreground">Anchor</h3>
+                  <h3 className="font-display text-sm font-semibold text-foreground">
+                    {t('distributionsByToken.details.anchorTitle')}
+                  </h3>
                 </div>
                 <DefinitionList>
-                  <DetailRow label="Anchored datetime">
+                  <DetailRow label={t('distributionsByToken.details.anchoredDatetime')}>
                     <a
                       className={detailLinkClass}
                       href={getExplorerUrl('tx', Stake.TxHash)}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {convertTimestampToDateTime(Stake.TimeStamp)}
+                      {convertTimestampToDateTime(Stake.TimeStamp, false, locale)}
                     </a>
                   </DetailRow>
-                  <DetailRow label="Number of anchored NFTs">
+                  <DetailRow label={t('distributionsByToken.details.anchoredNfts')}>
                     <span className="font-mono tabular-nums">{Stake.NumStakedNFTs}</span>
                   </DetailRow>
                 </DefinitionList>
@@ -120,24 +127,24 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                 <div className={cn(detailPanelClass, 'mb-0')}>
                   <div className="border-b border-white/[0.06] px-4 py-3">
                     <h3 className="font-display text-sm font-semibold text-foreground">
-                      Release Anchor
+                      {t('distributionsByToken.details.releaseTitle')}
                     </h3>
                   </div>
                   <DefinitionList>
-                    <DetailRow label="Released datetime">
+                    <DetailRow label={t('distributionsByToken.details.releasedDatetime')}>
                       <a
                         className={detailLinkClass}
                         href={getExplorerUrl('tx', Unstake.TxHash)}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {convertTimestampToDateTime(Unstake.TimeStamp)}
+                        {convertTimestampToDateTime(Unstake.TimeStamp, false, locale)}
                       </a>
                     </DetailRow>
-                    <DetailRow label="Number of anchored NFTs">
+                    <DetailRow label={t('distributionsByToken.details.anchoredNfts')}>
                       <span className="font-mono tabular-nums">{Unstake.NumStakedNFTs}</span>
                     </DetailRow>
-                    <DetailRow label="Distribution">
+                    <DetailRow label={t('distributionsByToken.details.distribution')}>
                       <span className="font-mono tabular-nums">
                         {Unstake.RewardAmountEth.toFixed(6)} ETH
                       </span>
@@ -156,6 +163,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
 }
 
 function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
+  const t = useTranslations('anchoring');
   const PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -169,13 +177,23 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
             <TablePrimaryHead>
               <Tr>
                 <TablePrimaryHeadCell>
-                  <span className="sr-only">Details</span>
+                  <span className="sr-only">{t('distributionsByToken.columns.details')}</span>
                 </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Is Retrieved?</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="right">Distribution (ETH)</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">
+                  {t('distributionsByToken.columns.depositDatetime')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('distributionsByToken.columns.cycle')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('distributionsByToken.columns.depositId')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>
+                  {t('distributionsByToken.columns.retrieved')}
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="right">
+                  {t('distributionsByToken.columns.distributionEth')}
+                </TablePrimaryHeadCell>
               </Tr>
             </TablePrimaryHead>
             <Tbody>
@@ -202,6 +220,7 @@ function SectionCardTableShell({ children }: { children: React.ReactNode }) {
 }
 
 function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: number }) {
+  const t = useTranslations('anchoring');
   const { data: rawResponse, isLoading: loading } = useAnchorDistributionsByUserByTokenDetails(
     address,
     tokenId,
@@ -213,18 +232,18 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
       .map((key) => (rawResponse as Record<string, unknown>)[key]) as RewardsRowData[];
   }, [rawResponse]);
 
-  const pageTitle = `Anchor Distribution Details for Token ${tokenId}`;
+  const pageTitle = t('distributionsByToken.title', { tokenId });
 
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
           title={pageTitle}
-          subtitle={`Distributions for ${address}`}
+          subtitle={t('distributionsByToken.subtitle', { address })}
           breadcrumbs={[
-            { label: 'Home', href: '/' },
-            { label: 'User', href: `/user/${address}` },
-            { label: `Token #${tokenId}` },
+            { label: t('distributionsByToken.breadcrumbs.home'), href: '/' },
+            { label: t('distributionsByToken.breadcrumbs.user'), href: `/user/${address}` },
+            { label: t('distributionsByToken.breadcrumbs.token', { tokenId }) },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
@@ -232,7 +251,7 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
 
         {loading ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+            <p className="text-sm font-medium text-muted-foreground">{t('common.loading')}</p>
           </div>
         ) : (
           <RewardsDetailTable list={rewardsData} />

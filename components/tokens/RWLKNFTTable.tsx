@@ -2,6 +2,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { useEffect, useState, useMemo, useRef, type MouseEvent } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Tr } from 'react-super-responsive-table';
 
 import { cn } from '@/lib/utils';
@@ -35,6 +36,7 @@ interface RWLKRowProps {
 }
 
 const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }: RWLKRowProps) => {
+  const t = useTranslations('anchoring');
   const handleRowClick = () => onSelectToggle(tokenId);
 
   const handleAnchorClick = (e: MouseEvent) => {
@@ -61,7 +63,7 @@ const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }:
 
       <TablePrimaryCell align="center">
         <Button size="sm" onClick={handleAnchorClick}>
-          Stake
+          {t('tables.availableTokens.actions.anchor')}
         </Button>
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -81,6 +83,7 @@ export const RWLKNFTTable = ({
   handleStake,
   handleStakeMany,
 }: RWLKNFTTableProps) => {
+  const t = useTranslations('anchoring');
   const [currentPage, setCurrentPage] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
@@ -136,7 +139,7 @@ export const RWLKNFTTable = ({
   };
 
   if (list.length === 0) {
-    return <p>No available tokens.</p>;
+    return <p>{t('tables.availableTokens.empty')}</p>;
   }
 
   return (
@@ -170,18 +173,26 @@ export const RWLKNFTTable = ({
                     </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="min-w-[166px]">
-                    <DropdownMenuItem onSelect={handleSelectAll}>Select All</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleSelectCurrentPage}>
-                      Select Current Page
+                    <DropdownMenuItem onSelect={handleSelectAll}>
+                      {t('tables.availableTokens.selection.all')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleSelectNone}>Select None</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSelectCurrentPage}>
+                      {t('tables.availableTokens.selection.currentPage')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSelectNone}>
+                      {t('tables.availableTokens.selection.none')}
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Owner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                {t('tables.availableTokens.columns.ownerAddress')}
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
-                <span className="sr-only">Actions</span>
+                {t('tables.availableTokens.columns.tokenId')}
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                <span className="sr-only">{t('tables.availableTokens.aria.actions')}</span>
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
@@ -204,7 +215,7 @@ export const RWLKNFTTable = ({
       {selectedTokenIds.length > 1 && (
         <div className="flex justify-end mt-4">
           <Button variant="text" onClick={handleManyAnchor}>
-            Stake Many
+            {t('tables.availableTokens.actions.anchorMany')}
           </Button>
         </div>
       )}

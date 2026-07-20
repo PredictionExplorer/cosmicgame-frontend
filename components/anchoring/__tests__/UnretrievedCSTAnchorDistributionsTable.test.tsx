@@ -5,10 +5,27 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { act, render, screen, waitFor, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 const mockSetNotification = jest.fn();
 const mockFetchData = jest.fn();
 const mockReleaseMany = jest.fn();
 const mockWaitForTxReceipt = jest.fn().mockResolvedValue({ status: 'success' });
+const mockIsUserRejection = jest.fn<boolean, [unknown]>(() => false);
+const mockReportError = jest.fn<void, [unknown, string?]>();
+const mockGetEthErrorMessage = jest.fn<string, [unknown, string?, { locale?: string }?]>(
+  (_error: unknown, fallback?: string) => fallback ?? 'An error occurred',
+);
 const mockAccount = { current: null as string | null };
 
 jest.mock('../../../hooks/web3', () => ({
@@ -48,9 +65,10 @@ jest.mock('wagmi', () => ({
 }));
 
 jest.mock('../../../utils/errors', () => ({
-  isUserRejection: jest.fn(() => false),
-  reportError: jest.fn(),
-  getEthErrorMessage: jest.fn(() => 'An error occurred'),
+  isUserRejection: (error: unknown) => mockIsUserRejection(error),
+  reportError: (error: unknown, context?: string) => mockReportError(error, context),
+  getEthErrorMessage: (error: unknown, fallback?: string, options?: { locale?: string }) =>
+    mockGetEthErrorMessage(error, fallback, options),
 }));
 
 jest.mock('../../../utils/alert', () => ({
@@ -80,7 +98,33 @@ beforeEach(() => {
   mockAccount.current = null;
   mockContextRewards.current = null;
   mockUnretrievedAnchorDistribution.current = 0;
+  mockWaitForTxReceipt.mockResolvedValue({ status: 'success' });
+  mockIsUserRejection.mockReturnValue(false);
+  mockGetEthErrorMessage.mockImplementation((_error, fallback) => fallback ?? 'An error occurred');
 });
+
+async function renderAndConfirmRelease() {
+  const user = userEvent.setup();
+  mockAccount.current = '0xOwner';
+  mockUnretrievedAnchorDistribution.current = 1;
+  mockContextRewards.current = [createRow()];
+  mockApi.get_staking_cst_by_user_by_deposit_rewards.mockResolvedValue([
+    { Actions: [{ Claimed: false, Stake: { ActionId: 99 } }] },
+  ]);
+  await act(async () => {
+    render(<UnretrievedCSTAnchorDistributionsTable user="0xOwner" />);
+  });
+  await user.click(
+    screen.getByRole('button', {
+      name: 'anchoring.tables.unretrievedDistributions.releaseAll',
+    }),
+  );
+  await user.click(
+    await screen.findByRole('button', {
+      name: 'anchoring.tables.unretrievedDistributions.dialog.confirm',
+    }),
+  );
+}
 
 describe('UnretrievedCSTAnchorDistributionsTable', () => {
   it('renders loading state when list is null (non-own account)', async () => {
@@ -88,26 +132,26 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
     await act(async () => {
       render(<UnretrievedCSTAnchorDistributionsTable user="0xOtherUser" />);
     });
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.loading')).toBeInTheDocument();
   });
 
   it('renders empty state when list is empty', async () => {
     mockApi.get_staking_cst_rewards_to_claim_by_user.mockResolvedValue([]);
     render(<UnretrievedCSTAnchorDistributionsTable user="0xOtherUser" />);
-    expect(await screen.findByText('No distributions yet.')).toBeInTheDocument();
+    expect(await screen.findByText('anchoring.common.empty.distributions')).toBeInTheDocument();
   });
 
   it('renders table headers', async () => {
     mockApi.get_staking_cst_rewards_to_claim_by_user.mockResolvedValue([createRow()]);
     render(<UnretrievedCSTAnchorDistributionsTable user="0xOtherUser" />);
     for (const header of [
-      'Deposit Datetime',
-      'Deposit ID',
-      'Anchored Tokens (You / Total)',
-      'Unretrieved Tokens',
-      'Deposit Amount (ETH)',
-      'Distribution Amount (ETH)',
-      'Unretrieved Amount (ETH)',
+      'anchoring.tables.unretrievedDistributions.columns.depositDatetime',
+      'anchoring.tables.unretrievedDistributions.columns.depositId',
+      'anchoring.tables.unretrievedDistributions.columns.anchoredTokens',
+      'anchoring.tables.unretrievedDistributions.columns.unretrievedTokens',
+      'anchoring.tables.unretrievedDistributions.columns.depositAmountEth',
+      'anchoring.tables.unretrievedDistributions.columns.distributionAmountEth',
+      'anchoring.tables.unretrievedDistributions.columns.unretrievedAmountEth',
     ]) {
       expect((await screen.findAllByText(header)).length).toBeGreaterThanOrEqual(1);
     }
@@ -119,6 +163,7 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
     expect(
       (await screen.findAllByText(convertTimestampToDateTime(1701346718))).length,
     ).toBeGreaterThanOrEqual(1);
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
     expect((await screen.findAllByText('5')).length).toBeGreaterThanOrEqual(1);
     expect((await screen.findAllByText('2 / 10')).length).toBeGreaterThanOrEqual(1);
     expect((await screen.findAllByText('3')).length).toBeGreaterThanOrEqual(1);
@@ -148,7 +193,9 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
     mockApi.get_staking_cst_rewards_to_claim_by_user.mockResolvedValue([createRow()]);
     render(<UnretrievedCSTAnchorDistributionsTable user="0xOtherUser" />);
     await screen.findByText('5');
-    expect(screen.queryByText('Release & Retrieve All')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.tables.unretrievedDistributions.releaseAll'),
+    ).not.toBeInTheDocument();
   });
 
   it('calls API to fetch uncollected rewards on mount', async () => {
@@ -166,7 +213,11 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
       render(<UnretrievedCSTAnchorDistributionsTable user="0xOwner" />);
     });
 
-    expect(screen.getByRole('button', { name: 'Release & Retrieve All' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'anchoring.tables.unretrievedDistributions.releaseAll',
+      }),
+    ).toBeInTheDocument();
   });
 
   it('own account uses context rewards without API fetch', async () => {
@@ -187,7 +238,9 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
       render(<UnretrievedCSTAnchorDistributionsTable user="0xOwner" />);
     });
 
-    expect(screen.getByText(/2\.345000 ETH/)).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.tables.unretrievedDistributions.summary(amount=2.345000)'),
+    ).toBeInTheDocument();
   });
 
   it('Unstake & Claim All opens confirmation dialog', async () => {
@@ -199,11 +252,23 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
       render(<UnretrievedCSTAnchorDistributionsTable user="0xOwner" />);
     });
 
-    await user.click(screen.getByRole('button', { name: 'Release & Retrieve All' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: 'anchoring.tables.unretrievedDistributions.releaseAll',
+      }),
+    );
 
-    expect(screen.getByText('Release Tokens & Retrieve Distributions')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Release & Retrieve' })).toBeInTheDocument();
+    expect(
+      screen.getByText('anchoring.tables.unretrievedDistributions.dialog.title'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'anchoring.common.actions.cancel' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'anchoring.tables.unretrievedDistributions.dialog.confirm',
+      }),
+    ).toBeInTheDocument();
   });
 
   it('Cancel button closes dialog without unstaking', async () => {
@@ -215,8 +280,12 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
       render(<UnretrievedCSTAnchorDistributionsTable user="0xOwner" />);
     });
 
-    await user.click(screen.getByRole('button', { name: 'Release & Retrieve All' }));
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: 'anchoring.tables.unretrievedDistributions.releaseAll',
+      }),
+    );
+    await user.click(screen.getByRole('button', { name: 'anchoring.common.actions.cancel' }));
 
     expect(mockReleaseMany).not.toHaveBeenCalled();
   });
@@ -234,17 +303,84 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
       render(<UnretrievedCSTAnchorDistributionsTable user="0xOwner" />);
     });
 
-    await user.click(screen.getByRole('button', { name: 'Release & Retrieve All' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: 'anchoring.tables.unretrievedDistributions.releaseAll',
+      }),
+    );
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Release & Retrieve' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', {
+          name: 'anchoring.tables.unretrievedDistributions.dialog.confirm',
+        }),
+      ).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole('button', { name: 'Release & Retrieve' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: 'anchoring.tables.unretrievedDistributions.dialog.confirm',
+      }),
+    );
 
     await waitFor(() => {
       expect(mockReleaseMany).toHaveBeenCalled();
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        text: 'toasts.anchor.releasedWithDistributions(count=1)',
+        type: 'success',
+      });
     });
+  });
+
+  it('shows informational cancellation for wallet rejection code 4001', async () => {
+    mockReleaseMany.mockRejectedValueOnce({ code: 4001 });
+    mockIsUserRejection.mockReturnValueOnce(true);
+
+    await renderAndConfirmRelease();
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        type: 'info',
+        text: 'toasts.walletTransactionCancelled',
+      }),
+    );
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('reports RPC failures with the localized anchor fallback', async () => {
+    const error = new Error('RPC unavailable');
+    mockReleaseMany.mockRejectedValueOnce(error);
+
+    await renderAndConfirmRelease();
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        type: 'error',
+        text: 'toasts.anchor.failed',
+      }),
+    );
+    expect(mockReportError).toHaveBeenCalledWith(error, 'releasing Cosmic Signature NFT anchors');
+  });
+
+  it('treats a reverted receipt as an error instead of success', async () => {
+    mockReleaseMany.mockResolvedValueOnce('0xTxHash');
+    mockWaitForTxReceipt.mockResolvedValueOnce({ status: 'reverted' });
+
+    await renderAndConfirmRelease();
+
+    await waitFor(() =>
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        type: 'error',
+        text: 'toasts.anchor.failed',
+      }),
+    );
+    expect(mockSetNotification).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'success' }),
+    );
   });
 
   it('hides Unstake button when UnretrievedAnchorDistribution is 0', async () => {
@@ -255,7 +391,9 @@ describe('UnretrievedCSTAnchorDistributionsTable', () => {
       render(<UnretrievedCSTAnchorDistributionsTable user="0xOwner" />);
     });
 
-    expect(screen.queryByText('Release & Retrieve All')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('anchoring.tables.unretrievedDistributions.releaseAll'),
+    ).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

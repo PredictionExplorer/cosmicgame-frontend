@@ -1,5 +1,7 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
+
 import { getExplorerUrl, getAssetsUrl, getRWLKImageUrl, convertTimestampToDateTime } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
@@ -19,27 +21,30 @@ import { useRWLKAnchorActionInfo, useCSTAnchorActionInfo } from '@/hooks/useApiQ
 import { cn } from '@/lib/utils';
 
 function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actionId: number }) {
+  const t = useTranslations('anchoring');
   const isRwalk = Boolean(IsRwalk);
 
   const rwlkQuery = useRWLKAnchorActionInfo(isRwalk ? actionId : null);
   const cstQuery = useCSTAnchorActionInfo(!isRwalk ? actionId : null);
   const activeQuery = isRwalk ? rwlkQuery : cstQuery;
   const { data: actionInfo = null, isLoading: loading } = activeQuery;
-  const error = activeQuery.error?.message ?? null;
+  const hasError = Boolean(activeQuery.error);
 
-  const headingToken = isRwalk ? 'RandomWalk' : 'Cosmic Signature';
-  const subtitleText = `Anchor Action for ${headingToken} NFT`;
+  const headingToken = isRwalk
+    ? t('anchorActionDetail.token.labels.randomWalk')
+    : t('anchorActionDetail.token.labels.cosmicSignature');
+  const subtitleText = t('anchorActionDetail.subtitle', { token: headingToken });
 
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
-          title="Anchor action"
+          title={t('anchorActionDetail.title')}
           subtitle={subtitleText}
           breadcrumbs={[
-            { label: 'Home', href: '/' },
-            { label: 'My Anchors', href: '/my-anchors' },
-            { label: `Action #${actionId}` },
+            { label: t('anchorActionDetail.breadcrumbs.home'), href: '/' },
+            { label: t('anchorActionDetail.breadcrumbs.myAnchors'), href: '/my-anchors' },
+            { label: t('anchorActionDetail.breadcrumbs.action', { id: actionId }) },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
@@ -47,11 +52,11 @@ function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; action
 
         {loading ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+            <p className="text-sm font-medium text-muted-foreground">{t('common.loading')}</p>
           </div>
-        ) : error ? (
+        ) : hasError ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-destructive font-medium">{error}</p>
+            <p className="text-destructive font-medium">{t('anchorActionDetail.error')}</p>
           </div>
         ) : actionInfo?.Stake ? (
           <AnchorActionBody
@@ -62,7 +67,7 @@ function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; action
           />
         ) : (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="font-medium text-foreground">No data found for this anchor action.</p>
+            <p className="font-medium text-foreground">{t('anchorActionDetail.empty')}</p>
           </div>
         )}
       </div>
@@ -81,6 +86,8 @@ function AnchorActionBody({
   anchor: AnchorAction;
   release: AnchorAction | null;
 }) {
+  const t = useTranslations('anchoring');
+  const locale = useLocale();
   const { TokenId, Seed, StakerAddr } = anchor;
 
   const tokenImageURL = isRwalk
@@ -95,11 +102,11 @@ function AnchorActionBody({
     <div className="grid gap-8 lg:grid-cols-2">
       <SectionCard
         sectionId="anchor-action-token"
-        title="Token"
+        title={t('anchorActionDetail.token.title')}
         description={
           isRwalk
-            ? 'Random Walk NFT used in this action.'
-            : 'Cosmic Signature NFT used in this action.'
+            ? t('anchorActionDetail.token.randomWalkDescription')
+            : t('anchorActionDetail.token.cosmicSignatureDescription')
         }
       >
         <div className="px-4 pb-4 pt-2 sm:px-5">
@@ -112,10 +119,10 @@ function AnchorActionBody({
           </div>
         </div>
         <DefinitionList>
-          <DetailRow label="Action ID">
+          <DetailRow label={t('anchorActionDetail.token.actionId')}>
             <span className="font-mono tabular-nums">{actionId}</span>
           </DetailRow>
-          <DetailRow label="Anchor-holder address">
+          <DetailRow label={t('anchorActionDetail.token.holderAddress')}>
             <Link
               href={`/user/${StakerAddr}`}
               className={cn(detailLinkClass, 'font-mono text-[13px] break-all')}
@@ -123,7 +130,7 @@ function AnchorActionBody({
               {StakerAddr}
             </Link>
           </DetailRow>
-          <DetailRow label="Token ID">
+          <DetailRow label={t('anchorActionDetail.token.tokenId')}>
             <Link href={tokenDetailHref} className={detailLinkClass}>
               {TokenId}
             </Link>
@@ -134,21 +141,21 @@ function AnchorActionBody({
       <div className="space-y-8">
         <SectionCard
           sectionId="anchoring-action-anchor"
-          title="Anchor"
-          description="When tokens were anchored to the protocol."
+          title={t('anchorActionDetail.anchor.title')}
+          description={t('anchorActionDetail.anchor.description')}
         >
           <DefinitionList>
-            <DetailRow label="Anchored datetime">
+            <DetailRow label={t('anchorActionDetail.anchor.datetime')}>
               <a
                 href={getExplorerUrl('tx', anchor.TxHash)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={detailLinkClass}
               >
-                {convertTimestampToDateTime(anchor.TimeStamp)}
+                {convertTimestampToDateTime(anchor.TimeStamp, false, locale)}
               </a>
             </DetailRow>
-            <DetailRow label="Number of anchored tokens">
+            <DetailRow label={t('anchorActionDetail.anchor.tokenCount')}>
               <span className="font-mono tabular-nums">{anchor.NumStakedNFTs}</span>
             </DetailRow>
           </DefinitionList>
@@ -157,21 +164,21 @@ function AnchorActionBody({
         {release && release.EvtLogId && release.EvtLogId !== 0 ? (
           <SectionCard
             sectionId="anchoring-action-release"
-            title="Release"
-            description="When the anchor was released."
+            title={t('anchorActionDetail.release.title')}
+            description={t('anchorActionDetail.release.description')}
           >
             <DefinitionList>
-              <DetailRow label="Released datetime">
+              <DetailRow label={t('anchorActionDetail.release.datetime')}>
                 <a
                   href={getExplorerUrl('tx', release.TxHash)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={detailLinkClass}
                 >
-                  {convertTimestampToDateTime(release.TimeStamp)}
+                  {convertTimestampToDateTime(release.TimeStamp, false, locale)}
                 </a>
               </DetailRow>
-              <DetailRow label="Number of anchored tokens">
+              <DetailRow label={t('anchorActionDetail.release.tokenCount')}>
                 <span className="font-mono tabular-nums">{release.NumStakedNFTs}</span>
               </DetailRow>
             </DefinitionList>

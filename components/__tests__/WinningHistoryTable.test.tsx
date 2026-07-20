@@ -7,6 +7,18 @@ import type { WinningHistoryEntry } from '@/services/api/types';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 const createEntry = (overrides: Partial<WinningHistoryEntry> = {}): WinningHistoryEntry => ({
   EvtLogId: 1,
   BlockNum: 100000,
@@ -24,6 +36,8 @@ const createEntry = (overrides: Partial<WinningHistoryEntry> = {}): WinningHisto
   Claimed: true,
   ...overrides,
 });
+
+beforeEach(() => jest.clearAllMocks());
 
 describe('RecipientHistoryTable', () => {
   it('renders "No history yet." when list is empty', () => {
@@ -43,6 +57,7 @@ describe('RecipientHistoryTable', () => {
     const entry = createEntry();
     render(<RecipientHistoryTable winningHistory={[entry]} />);
     expect(screen.getByText(convertTimestampToDateTime(entry.TimeStamp))).toBeInTheDocument();
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(entry.TimeStamp, false, 'en');
   });
 
   it('renders record type text for Main ETH Allocation', () => {

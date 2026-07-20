@@ -1,4 +1,175 @@
 {
+  "gestureSubmitted": "落笔已提交，正在等待确认。",
+  "gestureConfirmed": "落笔已确认，周期继续推进。",
+  "allocationRetrieved": "分配已取回至钱包。",
+  "anchorSet": "NFT 已锚定至协议。",
+  "anchorReleased": "NFT 已解锚。",
+  "cycleFinalized": "周期已收官，分配已完成。",
   "walletTransactionCancelled": "交易未发送，已在钱包中取消。",
-  "unexpectedError": "发生意外错误，请重试。"
+  "unexpectedError": "操作未能完成，请重试。",
+  "generic": {
+    "unexpectedError": "操作未能完成，请重试。",
+    "rpcFailure": "交易未能完成。请检查钱包与网络连接后重试。",
+    "receiptFailure": "交易已发送但未能确认。请先在钱包或区块浏览器中查看状态，再决定是否重试。",
+    "transactionFailed": "交易失败，请重试。"
+  },
+  "wallet": {
+    "connect": "请先连接钱包。",
+    "connectCorrectNetwork": "请连接钱包并切换至应用所用网络。",
+    "notReady": "钱包尚未就绪，请重新连接后重试。",
+    "stillConnecting": "钱包仍在连接中，请稍后重试。"
+  },
+  "network": {
+    "unavailable": "网络暂不可用，请重新连接钱包。",
+    "switchForGesture": "请先将钱包切换至应用所用网络，再落笔。",
+    "wrongChain": "钱包尚未连接完成，或当前网络与应用不一致。请切换至应用所用网络后重试。"
+  },
+  "gesture": {
+    "simulated": "模拟落笔已完成，计时延长 {seconds} 秒。",
+    "confirmed": "落笔已确认，周期继续推进。",
+    "validation": {
+      "notNftOwner": "当前钱包并未持有这枚 NFT。",
+      "tokenDecimalsWarning": "此代币未实现 decimals()；将按 18 位小数处理。",
+      "invalidContractAddress": "请输入有效的合约地址。",
+      "notErc721": "所选合约不符合 ERC-721 标准。",
+      "notErc20": "所选合约不符合 ERC-20 标准。",
+      "insufficientAttachedToken": "钱包中的代币余额不足，无法附加至本次落笔。",
+      "insufficientEth": "钱包中的 ETH 余额不足。",
+      "insufficientCst": "钱包中的 CST（ERC-20）余额不足。"
+    },
+    "transaction": {
+      "failed": "未能提交落笔。请检查钱包与网络连接，刷新当前落笔价格后重试。",
+      "cstReverted": "CST 落笔未完成，落笔价格或铭刻量已发生变化。请刷新预览后重试；如可接受 0 CST 铭刻量，也可选择“接受任意 CST 铭刻量”。"
+    },
+    "contractErrors": {
+      "insufficientReceivedBidAmount": "当前落笔价格高于转入金额。",
+      "usedRandomWalkNft": "这枚 Random Walk NFT 已用于落笔。",
+      "callerIsNotNftOwner": "当前钱包并未持有这枚 NFT。",
+      "roundIsInactive": "当前周期尚未开始或已经结束。",
+      "tooLongBidMessage": "落笔留言过长。",
+      "wrongBidType": "所选落笔类型不正确。",
+      "fundTransferFailed": "资金转移失败。",
+      "ethCostChanged": "ETH 落笔价格已变为 {required} ETH，比提交时高 {increase} ETH。请重试。",
+      "cstCostChanged": "交易处理期间，CST 落笔价格已变化。当前需 {required} CST，超过设置的 {maximum} CST 落笔价格上限。请刷新后重试。"
+    }
+  },
+  "anchor": {
+    "walletNotReady": "钱包尚未连接完成，或当前网络与应用不一致。请切换至应用所用网络后重试。",
+    "anchored": "{count} 枚 NFT 已锚定至协议。",
+    "released": "已完成 {count} 项解锚操作。",
+    "releasedWithDistributions": "已完成 {count} 项解锚操作，累积的 ETH 锚定派发已取回至钱包。",
+    "failed": "锚定交易未能完成。请检查钱包与网络连接后重试。"
+  },
+  "allocation": {
+    "retrieved": "分配已取回至钱包。"
+  },
+  "finalize": {
+    "roundDidNotAdvance": "取回交易已成功，但周期尚未推进。请刷新页面。",
+    "metadataUpdating": "周期已在链上收官，代币元数据可能仍在更新。请前往“我的分配”查看，或稍后刷新。",
+    "failed": "未能完成周期收官。请检查钱包与网络连接后重试。",
+    "contractErrors": {
+      "mainPrizeEarlyClaim": "尚未到达可取回签名分配的时间。",
+      "mainPrizeClaimDenied": "只有写下收官之笔的参与者可以取回签名分配。",
+      "noGestures": "当前周期内尚无落笔。"
+    }
+  },
+  "claim": {
+    "walletNotConnected": "请连接钱包，并确认已切换至正确的网络。",
+    "failed": "未能取回分配。请检查钱包与网络连接后重试。",
+    "stellarEthSuccess": "星选 ETH 已取回至钱包。",
+    "nftSuccess": "已附加 NFT 已取回至钱包。",
+    "nftsSuccess": "已将 {count} 枚已附加 NFT 取回至钱包。",
+    "tokenSuccess": "已附加 ERC-20 代币已取回至钱包。",
+    "tokensSuccess": "已将 {count} 笔已附加 ERC-20 代币取回至钱包。",
+    "retrieving": "取回中…"
+  },
+  "transfer": {
+    "common": {
+      "sourceUnavailable": "转出钱包暂不可用。",
+      "invalidRecipient": "请输入有效的接收地址。",
+      "invalidAmount": "请输入有效的 CST 数量。",
+      "invalidDecimals": "CST 数量的小数位数无效。",
+      "amountPositive": "请输入大于 0 的数量。"
+    },
+    "cst": {
+      "tokenUnavailable": "CST 代币地址暂不可用。",
+      "walletRequired": "请先连接钱包，再发送 CST。",
+      "sourceWalletRequired": "请连接转出钱包，再从该钱包发送 CST。",
+      "balanceLoading": "CST 余额仍在加载，请稍后重试。",
+      "insufficientBalance": "CST 余额不足。",
+      "decimalsWarning": "未能读取 CST 小数位数；将按 18 位小数处理。",
+      "confirmed": "CST 转账已确认。",
+      "failed": "未能发送 CST。请检查钱包与网络连接后重试。"
+    },
+    "nft": {
+      "contractUnavailable": "Cosmic Signature NFT 合约地址暂不可用。",
+      "walletRequired": "请先连接钱包，再发送 NFT。",
+      "sourceWalletRequired": "请连接转出钱包，再从该钱包发送 NFT。",
+      "recipientMustDiffer": "接收地址不能与当前连接的钱包地址相同。",
+      "selectOne": "请至少选择一枚可转移的 NFT。",
+      "confirmed": "{count} 笔 NFT 转移已确认。",
+      "detailTransferConfirmed": "NFT 转移已确认。",
+      "failed": "未能发送所选 NFT。请检查钱包与网络连接后重试。",
+      "failedToken": "未能转移 NFT #{tokenId}。请检查钱包与网络连接后重试。",
+      "nameSet": "代币名称已成功更改。",
+      "nameCleared": "代币名称已成功清除。",
+      "nameSetFailed": "未能更改代币名称，请重试。",
+      "nameClearFailed": "未能清除代币名称，请重试。"
+    },
+    "marketingCst": {
+      "tokenUnavailable": "CST 代币地址暂不可用。",
+      "walletRequired": "请先连接钱包，再拨付推广 CST。",
+      "reserveUnavailable": "推广储备钱包暂不可用。",
+      "treasurerUnavailable": "推广钱包财务执行人地址暂不可用。",
+      "treasurerRequired": "请连接当前推广钱包财务执行人的钱包，再拨付推广 CST。",
+      "balanceLoading": "推广储备的 CST 余额仍在加载，请稍后重试。",
+      "insufficientBalance": "推广储备的 CST 余额不足。",
+      "decimalsWarning": "未能读取 CST 小数位数；将按 18 位小数处理。",
+      "balanceReadFailed": "未能读取推广储备的 CST 余额，请重试。",
+      "confirmed": "推广 CST 拨付已确认。",
+      "failed": "未能拨付推广 CST。请检查钱包与网络连接后重试。",
+      "loading": "加载中…",
+      "pay": "拨付推广 CST",
+      "paying": "发放中…",
+      "viewTransaction": "查看交易"
+    }
+  },
+  "contribution": {
+    "connectWallet": "请先连接钱包，再贡献 ETH。",
+    "connectWalletInline": "连接钱包后即可贡献 ETH。",
+    "invalidAmount": "请输入大于 0 的 ETH 数量。",
+    "invalidUrl": "请输入以 http:// 或 https:// 开头的有效网址。",
+    "invalidUrlInline": "请使用 http:// 或 https:// 网址。",
+    "contractUnavailable": "请连接钱包，并确认已切换至正确的网络。",
+    "formSubmitted": "{amount} ETH 贡献已确认。",
+    "formSubmittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
+    "submitted": "{amount} ETH 贡献已确认。",
+    "submittedWithInfo": "附带信息的 {amount} ETH 贡献已确认。",
+    "formFailed": "ETH 贡献失败。请检查输入、钱包与网络连接后重试。",
+    "failed": "ETH 贡献失败。请检查钱包与网络连接后重试。",
+    "failedWithInfo": "附带信息的 ETH 贡献失败。请检查输入、钱包与网络连接后重试。",
+    "submitting": "提交中…",
+    "publicGoodsVault": {
+      "none": "公共物品金库中暂无待转拨资金。",
+      "connectWallet": "请连接钱包，再将公共物品金库资金转拨给 Protocol Guild。",
+      "forwarded": "公共物品资金已转拨给 Protocol Guild。",
+      "failed": "未能将公共物品金库资金转拨给 Protocol Guild。请检查钱包与网络连接后重试。",
+      "forwarding": "转拨中…",
+      "forward": "转拨给 Protocol Guild",
+      "nothing": "暂无可转拨资金"
+    }
+  },
+  "imprint": {
+    "contractUnavailable": "Random Walk NFT 合约暂不可用。请连接钱包并切换至正确网络后重试。",
+    "confirmed": "Random Walk NFT 铭刻已确认。",
+    "failed": "未能铭刻 Random Walk NFT。请检查钱包与网络连接后重试。",
+    "imprinting": "铭刻中…"
+  },
+  "admin": {
+    "gestureBan": {
+      "banned": "落笔已成功屏蔽。",
+      "unbanned": "落笔已取消屏蔽。",
+      "failed": "未能更新落笔审核状态，请重试。"
+    }
+  }
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { Gavel, Ticket, Layers } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
@@ -67,6 +68,7 @@ export function ActivitySummary({
   totalAnchorDistributionEth = 0,
   className,
 }: ActivitySummaryProps) {
+  const t = useTranslations('myPages');
   const rwlk = userInfo.StakingStatisticsRWalk;
   const totalAnchorActions =
     (rwlk?.TotalNumStakeActions ?? 0) + (rwlk?.TotalNumUnstakeActions ?? 0);
@@ -81,56 +83,56 @@ export function ActivitySummary({
         )}
       >
         <h3 className="activity-overview-heading mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground print:!text-foreground/80">
-          Activity Overview
+          {t('statistics.activity.title')}
         </h3>
         <div className="activity-overview-grid grid grid-cols-1 gap-6 sm:grid-cols-3 sm:divide-x sm:divide-white/[0.06] print:!block print:space-y-5 print:!divide-none">
           <StatGroup
             icon={<Gavel className="h-3.5 w-3.5" />}
-            title="Gestures"
+            title={t('statistics.activity.groups.gestures')}
             stats={[
               {
-                label: 'Gestures Made',
+                label: t('statistics.activity.gesturesMade.label'),
                 value: userInfo.NumBids.toLocaleString(),
-                tooltip: 'Total gestures across all cycles.',
+                tooltip: t('statistics.activity.gesturesMade.tooltip'),
               },
               {
-                label: 'Max Gesture',
+                label: t('statistics.activity.maxGesture.label'),
                 value: formatEthValue(userInfo.MaxBidAmount ?? 0),
-                tooltip: 'The highest single gesture you have ever made.',
+                tooltip: t('statistics.activity.maxGesture.tooltip'),
               },
             ]}
           />
           <StatGroup
             icon={<Ticket className="h-3.5 w-3.5" />}
-            title="Stellar Selections"
+            title={t('statistics.activity.groups.stellarSelections')}
             className="sm:pl-6"
             stats={[
               {
-                label: 'ETH Stellar Selections Participated',
+                label: t('statistics.activity.ethSelections.label'),
                 value: (userInfo.NumRaffleEthWinnings ?? 0).toLocaleString(),
-                tooltip: 'Number of ETH Stellar Selection allocations you have taken part in.',
+                tooltip: t('statistics.activity.ethSelections.tooltip'),
               },
               {
-                label: 'NFTs Received',
+                label: t('statistics.activity.nftsReceived.label'),
                 value: (userInfo.RaffleNFTsCount ?? 0).toLocaleString(),
-                tooltip: 'Cosmic Signature NFTs received through Stellar Selection imprints.',
+                tooltip: t('statistics.activity.nftsReceived.tooltip'),
               },
             ]}
           />
           <StatGroup
             icon={<Layers className="h-3.5 w-3.5" />}
-            title="Anchoring"
+            title={t('statistics.activity.groups.anchoring')}
             className="sm:pl-6"
             stats={[
               {
-                label: 'Anchor Actions',
+                label: t('statistics.activity.anchorActions.label'),
                 value: totalAnchorActions.toLocaleString(),
-                tooltip: 'Combined anchor and release actions for RandomWalk NFTs.',
+                tooltip: t('statistics.activity.anchorActions.tooltip'),
               },
               {
-                label: 'Distributions Received',
+                label: t('statistics.activity.distributionsReceived.label'),
                 value: formatEthValue(totalAnchorDistributionEth),
-                tooltip: 'Total ETH received from anchoring Cosmic Signature NFTs.',
+                tooltip: t('statistics.activity.distributionsReceived.tooltip'),
               },
             ]}
           />

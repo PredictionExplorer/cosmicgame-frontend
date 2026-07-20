@@ -37,15 +37,13 @@ describe('AllocationRecipientsPage', () => {
   it('renders the heading', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<AllocationRecipientsPage />);
-    expect(screen.getByText('Allocation Recipients')).toBeInTheDocument();
+    expect(screen.getByText('allocation.recipients.header.title')).toBeInTheDocument();
   });
 
   it('renders the enhanced subtitle', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<AllocationRecipientsPage />);
-    expect(
-      screen.getByText(/Browse the complete history of allocation recipients/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/allocation\.recipients\.header\.subtitle/i)).toBeInTheDocument();
   });
 
   it('renders page-scope and reserve-split tooltips', () => {
@@ -53,10 +51,14 @@ describe('AllocationRecipientsPage', () => {
     render(<AllocationRecipientsPage />);
 
     expect(
-      screen.getByRole('button', { name: 'More information about Finalized round records only' }),
+      screen.getByRole('button', {
+        name: 'More information about allocation.recipients.header.scope',
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'More information about Cycle Reserve Split' }),
+      screen.getByRole('button', {
+        name: 'More information about allocation.recipients.reserveSplit.label',
+      }),
     ).toBeInTheDocument();
   });
 
@@ -104,16 +106,11 @@ describe('AllocationRecipientsPage', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<AllocationRecipientsPage />);
 
-    for (const label of [
-      'Signature',
-      'Chrono',
-      'Stellar ETH',
-      'Anchor',
-      'Public Goods',
-      'Next cycle',
-    ]) {
+    for (const track of ['signature', 'chrono', 'stellar', 'anchor', 'publicGoods', 'nextCycle']) {
       expect(
-        screen.getByRole('button', { name: `More information about ${label}` }),
+        screen.getByRole('button', {
+          name: `More information about allocation.recipients.reserveSplit.tracks.${track}.label`,
+        }),
       ).toBeInTheDocument();
     }
   });

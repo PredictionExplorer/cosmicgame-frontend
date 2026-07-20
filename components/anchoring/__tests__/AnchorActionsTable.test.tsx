@@ -5,6 +5,18 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
+const mockConvertTimestampToDateTime = jest.fn();
+jest.mock('@/utils', () => {
+  const actual = jest.requireActual<typeof import('@/utils')>('@/utils');
+  return {
+    ...actual,
+    convertTimestampToDateTime: (timestamp: number, showSecond?: boolean, locale?: string) => {
+      mockConvertTimestampToDateTime(timestamp, showSecond, locale);
+      return actual.convertTimestampToDateTime(timestamp, showSecond, locale);
+    },
+  };
+});
+
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, prefetch: jest.fn() }),
@@ -33,12 +45,17 @@ beforeEach(() => jest.clearAllMocks());
 describe('AnchorActionsTable', () => {
   it('renders empty state message', () => {
     render(<AnchorActionsTable list={[]} IsRwalk={false} />);
-    expect(screen.getByText('No actions yet.')).toBeInTheDocument();
+    expect(screen.getByText('anchoring.common.empty.actions')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<AnchorActionsTable list={[createRow()]} IsRwalk={false} />);
-    for (const header of ['Action Datetime', 'Action Type', 'Token ID', 'Number of NFTs']) {
+    for (const header of [
+      'anchoring.tables.anchorActions.columns.datetime',
+      'anchoring.tables.anchorActions.columns.type',
+      'anchoring.tables.anchorActions.columns.tokenId',
+      'anchoring.tables.anchorActions.columns.nftCount',
+    ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });
@@ -48,14 +65,15 @@ describe('AnchorActionsTable', () => {
     expect(
       screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
     ).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Anchor').length).toBeGreaterThanOrEqual(1);
+    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, false, 'en');
+    expect(screen.getAllByText('anchoring.common.anchor').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('42').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
   });
 
   it('displays Unstake for ActionType 1', () => {
     render(<AnchorActionsTable list={[createRow({ ActionType: 1 })]} IsRwalk={false} />);
-    expect(screen.getAllByText('Release').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('anchoring.common.release').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders only first page of results (perPage=5)', () => {
@@ -69,14 +87,14 @@ describe('AnchorActionsTable', () => {
 
   it('navigates to anchor action on row click (CST)', () => {
     render(<AnchorActionsTable list={[createRow({ ActionId: 7 })]} IsRwalk={false} />);
-    const row = screen.getAllByText('Anchor')[0]!.closest('tr');
+    const row = screen.getAllByText('anchoring.common.anchor')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/7');
   });
 
   it('navigates with IsRwalk=1 flag on row click', () => {
     render(<AnchorActionsTable list={[createRow({ ActionId: 3 })]} IsRwalk={true} />);
-    const row = screen.getAllByText('Anchor')[0]!.closest('tr');
+    const row = screen.getAllByText('anchoring.common.anchor')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/anchor-action/1/3');
   });

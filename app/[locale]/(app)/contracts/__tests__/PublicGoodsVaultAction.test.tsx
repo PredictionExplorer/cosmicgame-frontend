@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import { fireEvent, renderWithQuery, screen, waitFor } from '@/test-utils';
 
 import { PublicGoodsVaultAction } from '../components/PublicGoodsVaultAction';
@@ -5,6 +7,7 @@ import { PublicGoodsVaultAction } from '../components/PublicGoodsVaultAction';
 const mockWriteContract = jest.fn();
 const mockWaitForTransactionReceipt = jest.fn();
 const mockUseActiveWeb3React = jest.fn();
+const mockReportError = jest.fn();
 
 jest.mock('@wagmi/core', () => ({
   writeContract: (...args: unknown[]) => mockWriteContract(...args),
@@ -20,6 +23,14 @@ jest.mock('wagmi', () => ({
 jest.mock('../../../../../hooks/web3', () => ({
   useActiveWeb3React: () => mockUseActiveWeb3React(),
 }));
+
+jest.mock('../../../../../utils/errors', () => {
+  const actual = jest.requireActual('../../../../../utils/errors');
+  return {
+    ...actual,
+    reportError: (...args: unknown[]) => mockReportError(...args),
+  };
+});
 
 jest.mock('sonner', () => ({
   toast: {
@@ -61,7 +72,7 @@ describe('PublicGoodsVaultAction', () => {
     renderWithQuery(<PublicGoodsVaultAction {...defaultProps} vaultBalanceEth={0} />);
 
     expect(screen.getByRole('button', { name: /forward public goods vault/i })).toBeDisabled();
-    expect(screen.getByText('Nothing to Forward')).toBeInTheDocument();
+    expect(screen.getByText('toasts.contribution.publicGoodsVault.nothing')).toBeInTheDocument();
   });
 
   it('calls the no-argument send overload and waits for confirmation', async () => {
@@ -80,5 +91,63 @@ describe('PublicGoodsVaultAction', () => {
       );
     });
     expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xhash' });
+    expect(toast.success).toHaveBeenCalledWith('toasts.contribution.publicGoodsVault.forwarded');
+  });
+
+  it('shows informational cancellation for wallet rejection code 4001', async () => {
+    mockWriteContract.mockRejectedValueOnce({ code: 4001 });
+    renderWithQuery(<PublicGoodsVaultAction {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /forward public goods vault/i }));
+
+    await waitFor(() =>
+      expect(toast.info).toHaveBeenCalledWith('toasts.walletTransactionCancelled'),
+    );
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('reports RPC failures with the localized vault fallback', async () => {
+    const error = new Error('RPC unavailable');
+    mockWriteContract.mockRejectedValueOnce(error);
+    renderWithQuery(<PublicGoodsVaultAction {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /forward public goods vault/i }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('toasts.contribution.publicGoodsVault.failed'),
+    );
+    expect(mockReportError).toHaveBeenCalledWith(error, 'forward public goods vault funds');
+  });
+
+  it('treats a reverted receipt as an error instead of success', async () => {
+    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
+    renderWithQuery(<PublicGoodsVaultAction {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /forward public goods vault/i }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('toasts.contribution.publicGoodsVault.failed'),
+    );
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it('shows the localized pending label while forwarding funds', async () => {
+    let resolveWrite!: (hash: string) => void;
+    mockWriteContract.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveWrite = resolve;
+      }),
+    );
+    renderWithQuery(<PublicGoodsVaultAction {...defaultProps} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /forward public goods vault/i }));
+    expect(
+      await screen.findByText('toasts.contribution.publicGoodsVault.forwarding'),
+    ).toBeInTheDocument();
+
+    resolveWrite('0xhash');
+    await waitFor(() =>
+      expect(toast.success).toHaveBeenCalledWith('toasts.contribution.publicGoodsVault.forwarded'),
+    );
   });
 });

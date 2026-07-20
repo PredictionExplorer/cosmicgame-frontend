@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Tr } from 'react-super-responsive-table';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
@@ -90,6 +90,7 @@ function formatGestureCostAmount(amount: number | undefined): string {
 
 const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRowProps) => {
   const t = useTranslations('tables');
+  const locale = useLocale();
   const router = useRouter();
   const publicClient = usePublicClient();
   const [symbol, setSymbol] = useState('');
@@ -144,7 +145,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
       onClick={handleRowClick}
     >
       <TablePrimaryCell className="whitespace-nowrap">
-        {convertTimestampToDateTime(history.TimeStamp, true)}
+        {convertTimestampToDateTime(history.TimeStamp, true, locale)}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip>
@@ -157,7 +158,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
       <TablePrimaryCell align="right">{price}</TablePrimaryCell>
       {showRound && <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>}
       <TablePrimaryCell align="center">{gestureTypeLabel}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{formatSeconds(gestureDuration)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{formatSeconds(gestureDuration, locale)}</TablePrimaryCell>
       <TablePrimaryCell>
         <span className="break-all">
           {gestureType === 1 && history.RWalkNFTId && (
@@ -168,7 +169,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
                 width={32}
                 height={32}
                 className="align-middle inline"
-                alt="RWLK NFT"
+                alt={t('gestureHistory.randomWalkImageAlt')}
                 unoptimized
               />
             </>
