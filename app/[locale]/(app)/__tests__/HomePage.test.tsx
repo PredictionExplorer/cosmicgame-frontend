@@ -100,10 +100,11 @@ jest.mock('../../../../hooks/useAllocationFinalize', () => ({
 
 /* ── useAllocationNotification ───────────────────────────────────────── */
 
+const mockRequestNotificationPermission = jest.fn();
 jest.mock('../../../../hooks/useAllocationNotification', () => ({
   useAllocationNotification: () => ({
     playAudio: jest.fn(),
-    requestNotificationPermission: jest.fn(),
+    requestNotificationPermission: mockRequestNotificationPermission,
   }),
 }));
 
@@ -1236,6 +1237,7 @@ describe('HomePage', () => {
     render(<HomePage />);
     await user.click(screen.getByRole('button', { name: 'home.form.submit.eth(cost=0.01020)' }));
 
+    expect(mockRequestNotificationPermission).toHaveBeenCalledTimes(1);
     expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
     expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });

@@ -35,13 +35,14 @@ export const inter = localFont({
  * Clash Display and Inter carry no CJK glyphs, so Chinese text falls through
  * to this face. Google serves Noto Sans SC as ~100 small `unicode-range`
  * slices; browsers only fetch the ranges a page actually uses, so English
- * pages download nothing. `preload: false` keeps it out of the critical path.
+ * pages download nothing. `preload: false` keeps it out of the critical path,
+ * while `display: optional` avoids a late full-page CJK metric swap on slow links.
  */
 export const notoSansSC = Noto_Sans_SC({
-  weight: ['400', '500', '700'],
+  weight: 'variable',
   subsets: ['latin'],
   variable: '--font-noto-sc',
-  display: 'swap',
+  display: 'optional',
   preload: false,
   fallback: ['PingFang SC', 'Microsoft YaHei', 'system-ui', 'sans-serif'],
 });

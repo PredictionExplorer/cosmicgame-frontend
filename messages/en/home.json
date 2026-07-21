@@ -82,6 +82,10 @@
       "previousAllocations": "Cycle {number} allocations"
     }
   },
+  "notifications": {
+    "finalizationSoonTitle": "Gesture now — the cycle can finalize soon",
+    "finalizationSoonBody": "The Cycle Finalization Time expires in 5 minutes. Make a Gesture now to extend the cycle and take part in the final allocations."
+  },
   "chrono": {
     "sectionAria": "Cycle Finalization Time",
     "timerAria": "{label}. {status}",

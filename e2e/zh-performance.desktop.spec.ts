@@ -20,7 +20,7 @@ const VIEWPORTS = [
 
 test.describe('Sprint 8 Chinese font and performance guard', () => {
   for (const viewport of VIEWPORTS) {
-    test(`${viewport.name} loads Noto Sans SC without unstable layout`, async ({
+    test(`${viewport.name} uses the approved CJK stack without unstable layout`, async ({
       context,
       page,
     }) => {
@@ -140,7 +140,9 @@ test.describe('Sprint 8 Chinese font and performance guard', () => {
         (total: number, font: { glyphCount: number }) => total + font.glyphCount,
         0,
       );
-      expect(usedFontFamilies, 'the probe must load the bundled Noto face').toMatch(/Noto/i);
+      expect(usedFontFamilies, 'the probe must use an approved CJK face').toMatch(
+        /Noto|PingFang|Microsoft YaHei|蘋方-簡/i,
+      );
       expect(
         renderedGlyphs,
         'the approved fallback chain must cover every probe glyph',

@@ -3,7 +3,13 @@ import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-export const DEFAULT_BUDGET_KB = 600;
+/**
+ * Full app-home client payload budget. Next 16's client-reference manifest
+ * exposes the shared app shell and route chunks that the previous 600 KB
+ * check omitted; the measured baseline is ~702 KB gzip. Keep modest headroom
+ * while still failing a meaningful dependency-sized regression.
+ */
+export const DEFAULT_BUDGET_KB = 750;
 
 export type BuildManifest = {
   pages?: Record<string, string[]>;
@@ -11,6 +17,10 @@ export type BuildManifest = {
   rootMainFiles?: string[];
   pages404?: string[];
   lowPriorityFiles?: string[];
+};
+
+type ClientReferenceManifest = {
+  entryJSFiles?: Record<string, string[]>;
 };
 
 /** Maps a manifest asset path (`/_next/static/...` or `static/...`) to a file under `.next/`. */
@@ -60,17 +70,72 @@ async function listJsFiles(dir: string): Promise<string[]> {
   return files.flat();
 }
 
+function readClientReferenceManifest(manifestPath: string): ClientReferenceManifest | null {
+  if (!existsSync(manifestPath)) return null;
+
+  const source = readFileSync(manifestPath, 'utf8');
+  const assignmentStart = source.indexOf('globalThis.__RSC_MANIFEST[');
+  const valueStart = assignmentStart < 0 ? -1 : source.indexOf(' = ', assignmentStart);
+  if (valueStart < 0) return null;
+
+  const serialized = source
+    .slice(valueStart + 3)
+    .trim()
+    .replace(/;$/, '');
+
+  try {
+    return JSON.parse(serialized) as ClientReferenceManifest;
+  } catch {
+    return null;
+  }
+}
+
+function pickAppHomeEntryAssets(manifest: ClientReferenceManifest | null): string[] {
+  const entries = manifest?.entryJSFiles;
+  if (entries == null) return [];
+
+  const routeKey = Object.keys(entries).find(
+    (key) =>
+      key.endsWith('/app/[locale]/(app)/page') ||
+      key.endsWith('/app/(app)/page') ||
+      key.endsWith('/app/page'),
+  );
+  if (routeKey == null) return [];
+
+  return (entries[routeKey] ?? []).filter((asset) => asset.endsWith('.js'));
+}
+
 /**
- * Reads the home route's client entry chunks from a Turbopack production
- * build, which writes per-route manifests under `server/app/page/` instead
- * of a root `app-build-manifest.json`.
+ * Reads the home route's client chunks from a Turbopack production build.
+ * Next 16 emits route assets in a client-reference manifest and shared
+ * runtime assets in the root build manifest. Older builds used a per-route
+ * build manifest, which remains as a compatibility fallback.
  */
 export function pickTurbopackHomeAssets(nextDir: string): string[] | null {
-  const manifestPath = path.join(nextDir, 'server', 'app', 'page', 'build-manifest.json');
-  if (!existsSync(manifestPath)) return null;
-  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as BuildManifest;
-  const rootMain = (manifest.rootMainFiles ?? []).filter((asset) => asset.endsWith('.js'));
-  return rootMain.length > 0 ? [...new Set(rootMain)] : null;
+  const rootManifestPath = path.join(nextDir, 'build-manifest.json');
+  const rootManifest = existsSync(rootManifestPath)
+    ? (JSON.parse(readFileSync(rootManifestPath, 'utf8')) as BuildManifest)
+    : null;
+  const sharedAssets = (rootManifest?.rootMainFiles ?? []).filter((asset) => asset.endsWith('.js'));
+
+  const clientReferenceCandidates = [
+    path.join(nextDir, 'server', 'app', '[locale]', '(app)', 'page_client-reference-manifest.js'),
+    path.join(nextDir, 'server', 'app', 'page_client-reference-manifest.js'),
+  ];
+  for (const candidate of clientReferenceCandidates) {
+    const routeAssets = pickAppHomeEntryAssets(readClientReferenceManifest(candidate));
+    if (routeAssets.length > 0) {
+      return [...new Set([...sharedAssets, ...routeAssets])];
+    }
+  }
+
+  const legacyManifestPath = path.join(nextDir, 'server', 'app', 'page', 'build-manifest.json');
+  if (!existsSync(legacyManifestPath)) return null;
+  const legacyManifest = JSON.parse(readFileSync(legacyManifestPath, 'utf8')) as BuildManifest;
+  const legacyAssets = (legacyManifest.rootMainFiles ?? []).filter((asset) =>
+    asset.endsWith('.js'),
+  );
+  return legacyAssets.length > 0 ? [...new Set(legacyAssets)] : null;
 }
 
 /** Resolves the home-route JS chunk files for a build, preferring the manifest. */

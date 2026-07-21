@@ -10,6 +10,8 @@ jest.mock('../../utils/errors', () => ({
 
 const mockReportError = reportError as jest.Mock;
 const mockPlay = jest.fn().mockResolvedValue(undefined);
+const WARNING_TITLE = 'Localized finalization warning';
+const WARNING_BODY = 'Localized finalization warning body';
 
 global.Audio = jest.fn(() => ({ play: mockPlay })) as unknown as typeof Audio;
 
@@ -78,7 +80,7 @@ describe('useAllocationNotification', () => {
   });
 
   describe('requestNotificationPermission', () => {
-    it('calls Notification.requestPermission when not granted', () => {
+    it('calls Notification.requestPermission only once when not granted', () => {
       setupNotificationMock('default');
 
       const { result } = renderHook(() =>
@@ -87,9 +89,10 @@ describe('useAllocationNotification', () => {
 
       act(() => {
         result.current.requestNotificationPermission();
+        result.current.requestNotificationPermission();
       });
 
-      expect(Notification.requestPermission).toHaveBeenCalled();
+      expect(Notification.requestPermission).toHaveBeenCalledTimes(1);
     });
 
     it('does nothing when already granted', () => {
@@ -164,25 +167,34 @@ describe('useAllocationNotification', () => {
       const mockNotification = setupNotificationMock('granted');
       const allocationTime = Date.now() + 3 * 60 * 1000;
 
-      renderHook(() => useAllocationNotification({ allocationTime }));
+      renderHook(() =>
+        useAllocationNotification({
+          allocationTime,
+          notificationTitle: WARNING_TITLE,
+          notificationBody: WARNING_BODY,
+        }),
+      );
 
       act(() => {
         jest.advanceTimersByTime(1000);
       });
 
-      expect(mockNotification).toHaveBeenCalledWith(
-        'Gesture now \u2014 the cycle can finalize soon',
-        {
-          body: 'The Cycle Finalization Time expires in 5 minutes. Make a gesture now to extend the cycle and take part in the final allocations.',
-        },
-      );
+      expect(mockNotification).toHaveBeenCalledWith(WARNING_TITLE, {
+        body: WARNING_BODY,
+      });
     });
 
     it('does not fire notification when outside the 5-minute window', () => {
       const mockNotification = setupNotificationMock('granted');
       const allocationTime = Date.now() + 10 * 60 * 1000;
 
-      renderHook(() => useAllocationNotification({ allocationTime }));
+      renderHook(() =>
+        useAllocationNotification({
+          allocationTime,
+          notificationTitle: WARNING_TITLE,
+          notificationBody: WARNING_BODY,
+        }),
+      );
 
       act(() => {
         jest.advanceTimersByTime(1000);
@@ -195,7 +207,13 @@ describe('useAllocationNotification', () => {
       setupNotificationMock('granted');
       const allocationTime = Date.now() + 3 * 60 * 1000;
 
-      renderHook(() => useAllocationNotification({ allocationTime }));
+      renderHook(() =>
+        useAllocationNotification({
+          allocationTime,
+          notificationTitle: WARNING_TITLE,
+          notificationBody: WARNING_BODY,
+        }),
+      );
 
       act(() => {
         jest.advanceTimersByTime(1000);
@@ -214,7 +232,13 @@ describe('useAllocationNotification', () => {
       const mockNotification = setupNotificationMock('granted');
       const allocationTime = Date.now() - 1000;
 
-      renderHook(() => useAllocationNotification({ allocationTime }));
+      renderHook(() =>
+        useAllocationNotification({
+          allocationTime,
+          notificationTitle: WARNING_TITLE,
+          notificationBody: WARNING_BODY,
+        }),
+      );
 
       act(() => {
         jest.advanceTimersByTime(3000);

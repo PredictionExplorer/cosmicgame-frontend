@@ -4,6 +4,8 @@ import { reportError } from '@/utils/errors';
 
 interface UseAllocationNotificationOptions {
   allocationTime: number;
+  notificationTitle?: string;
+  notificationBody?: string;
 }
 
 const NOTIFICATION_SRC = '/audio/notification.wav';
@@ -71,14 +73,35 @@ async function unlockPlayback(notificationSoundRef: MutableRefObject<HTMLAudioEl
   }
 }
 
-export function useAllocationNotification({ allocationTime }: UseAllocationNotificationOptions) {
+export function useAllocationNotification({
+  allocationTime,
+  notificationTitle,
+  notificationBody,
+}: UseAllocationNotificationOptions) {
   const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
   const unlockOnceRef = useRef(false);
+  const permissionRequestedRef = useRef(false);
 
   const primeAllocationSoundOnUserGesture = useCallback(async () => {
     if (unlockOnceRef.current) return;
     unlockOnceRef.current = true;
     await unlockPlayback(notificationSoundRef);
+  }, []);
+
+  const requestNotificationPermission = useCallback(() => {
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    // Only prompt in the default state. Calling requestPermission when denied
+    // spams the console ("permission has been blocked…") and has no effect.
+    if (Notification.permission !== 'default') return;
+    if (permissionRequestedRef.current) return;
+    permissionRequestedRef.current = true;
+    void Notification.requestPermission()
+      .then(() => {
+        /* granted / denied / dismissed — browser owns the outcome */
+      })
+      .catch(() => {
+        /* ignore: secure contexts / policy / user gesture requirements */
+      });
   }, []);
 
   const playAudio = useCallback(async () => {
@@ -108,20 +131,6 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
     };
   }, [primeAllocationSoundOnUserGesture]);
 
-  const requestNotificationPermission = useCallback(() => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    // Only prompt in the default state. Calling requestPermission when denied
-    // spams the console ("permission has been blocked…") and has no effect.
-    if (Notification.permission !== 'default') return;
-    void Notification.requestPermission()
-      .then(() => {
-        /* granted / denied / dismissed — browser owns the outcome */
-      })
-      .catch(() => {
-        /* ignore: secure contexts / policy / user gesture requirements */
-      });
-  }, []);
-
   const sendNotification = useCallback((title: string, options: NotificationOptions) => {
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, options);
@@ -129,11 +138,12 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
   }, []);
 
   useEffect(() => {
+    if (!notificationTitle || !notificationBody) return;
     const interval = setInterval(() => {
       const now = Date.now();
       if (allocationTime && now >= allocationTime - 5 * 60 * 1000 && now <= allocationTime) {
-        sendNotification('Gesture now \u2014 the cycle can finalize soon', {
-          body: 'The Cycle Finalization Time expires in 5 minutes. Make a gesture now to extend the cycle and take part in the final allocations.',
+        sendNotification(notificationTitle, {
+          body: notificationBody,
         });
         clearInterval(interval);
       }
@@ -144,7 +154,7 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
     return () => {
       clearInterval(interval);
     };
-  }, [allocationTime, sendNotification]);
+  }, [allocationTime, notificationBody, notificationTitle, sendNotification]);
 
   return { playAudio, requestNotificationPermission, sendNotification } as const;
 }

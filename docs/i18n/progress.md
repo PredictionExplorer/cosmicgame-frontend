@@ -24,17 +24,17 @@ states, `aria-label`s, form validation, SEO title/description, OG image text, JS
 
 ## Dashboard
 
-| Sprint | Theme                                                                      | Units                        | Status     |
-| ------ | -------------------------------------------------------------------------- | ---------------------------- | ---------- |
-| 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**   |
-| 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**   |
-| 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | **Done**   |
-| 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | **Done**   |
-| 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | **Done**   |
-| 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | **Done**   |
-| 6      | FAQ, legal & trust pages                                                   | 10 routes                    | **Done\*** |
-| 7      | Long tail + SEO completion                                                 | 13 routes + SEO sweep        | **Done**   |
-| 8      | QA hardening & full-site fluency pass                                      | site-wide                    | **Done\*** |
+| Sprint | Theme                                                                      | Units                        | Status             |
+| ------ | -------------------------------------------------------------------------- | ---------------------------- | ------------------ |
+| 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**           |
+| 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**           |
+| 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | **Done**           |
+| 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | **Done**           |
+| 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | **Done**           |
+| 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | **Done**           |
+| 6      | FAQ, legal & trust pages                                                   | 10 routes                    | **Done\***         |
+| 7      | Long tail + SEO completion                                                 | 13 routes + SEO sweep        | **Done**           |
+| 8      | QA hardening & full-site fluency pass                                      | site-wide                    | **Deploy pending** |
 
 Route accounting: 2 + 4 + 6 + 13 + 14 + 10 + 13 = **62 routes** = every `page.tsx` in
 `app/` as of 2026-07-16. New routes added to the app **must** be added here (add a row in
@@ -481,63 +481,95 @@ are covered. OG remains complete only while the Playwright SEO check visits repr
 pages for all 12 generators and every emitted image endpoint returns a direct
 `200 image/png`. OG uses a checked-in 141,448-byte Noto Sans SC subset with OFL license.
 Both LLM documents include Chinese sections. Strict parity is enforced in CI at
-3,300/3,300 keys. In-repo rich-result/raw-HTML tests pass; the external Google service
+3,302/3,302 keys. In-repo rich-result/raw-HTML tests pass; the external Google service
 requires a deployed URL and remains a deployment verification.
 
 ## Sprint 8 — QA hardening & full-site fluency pass
 
 The "extremely natural" gate. No new extraction — polish and verification only.
 
-| Task                                                                                                                                | Done   |
-| ----------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Full-site blind fluency read (style guide §8 pass 2) by native reviewer, every route on both hosts; findings filed and fixed        | Waived |
-| Visual QA sweep at 320 / 768 / 1440 px on all zh routes: truncation, overflow, font rendering, punctuation width, CJK line breaks   | ✅     |
-| Interactive QA: discoverable tooltips on 8 deterministic routes; state-gated triggers catalog-tested; localized toasts/timers       | ✅\*   |
-| Terminology consistency grep: every glossary term, one rendering, zero drift (scripted check over `messages/zh` + `content/**/zh*`) | ✅     |
-| zh e2e suite expanded beyond smoke: key journeys (gesture flow, anchoring flow, FAQ, learn article) asserted in Chinese             | ✅     |
-| Accessibility spot-check on zh pages (axe run; translated aria-labels present)                                                      | ✅     |
-| Lighthouse/perf check on `/zh` (font loading, CLS from fallback swap)                                                               | ✅\*   |
-| Final sign-off recorded here with date + reviewer names                                                                             | Waived |
+| Task                                                                                                                                | Done                            |
+| ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| Full-site blind fluency read (style guide §8 pass 2) by native reviewer, every route on both hosts; findings filed and fixed        | Waived                          |
+| Visual QA sweep at 320 / 768 / 1440 px on all zh routes: truncation, overflow, font rendering, punctuation width, CJK line breaks   | ✅                              |
+| Interactive QA: discoverable tooltips on 8 deterministic routes; state-gated triggers catalog-tested; localized toasts/timers       | ✅\*                            |
+| Terminology consistency grep: every glossary term, one rendering, zero drift (scripted check over `messages/zh` + `content/**/zh*`) | ✅                              |
+| zh e2e suite expanded beyond smoke: key journeys (gesture flow, anchoring flow, FAQ, learn article) asserted in Chinese             | ✅                              |
+| Accessibility spot-check on zh pages (axe run; translated aria-labels present)                                                      | ✅                              |
+| Lighthouse/perf check on `/zh` (font loading, CLS from fallback swap)                                                               | Local measured / deploy pending |
+| Final sign-off recorded here with date + reviewer names                                                                             | Waived                          |
 
 **Acceptance / launch criteria:** all 62 routes at Q; parity CI hard-fail on; zh lexicon
 scan green; native reviewer sign-off; language switcher announced/visible. 上线。
 
 **Sprint 8 automated hardening completed 2026-07-20 with an owner-approved external
 review waiver.** The canonical inventory covers all 62 routes; 186 route/viewport checks
-cover 320 / 768 / 1440 px. The final post-review runs completed with 683 Playwright tests
-passed and 3 skipped, 386 Jest suites / 5,554 tests passed with coverage, and 120 static
+cover 320 / 768 / 1440 px. The final re-verification completed with 685 Playwright tests
+passed and 3 skipped, 386 Jest suites / 5,556 tests passed with coverage, and 120 static
 pages generated by the production build. Strict parity, all Sprint 1–7 manifests, the
 24-rule terminology check, lexicon, lint, type-check, SEO, accessibility,
 font/CLS/performance, and diff checks passed.
 
 For interactive QA, `✅*` means browser interaction is exhaustive only for discoverable
 tooltip triggers on 8 deterministic routes. State-gated triggers are catalog-tested; the
-browser run did not open all ~134 tooltip call sites. For performance, `✅*` denotes the
-stable in-repo font/CLS/performance check; external Lighthouse and Google Rich Results
-were not run against an undeployed build. Native fluency, external legal review, named
-reviewer sign-off, and real-wallet/live-chain writes were explicitly waived or excluded
-by the owner; no such certification is claimed.
+browser run did not open all ~134 tooltip call sites. Performance has stable in-repo
+font/CLS coverage and a local Lighthouse baseline; external Lighthouse and Google Rich
+Results were not run against an undeployed build. Native fluency, external legal review,
+named reviewer sign-off, and real-wallet/live-chain writes were explicitly waived or
+excluded by the owner; no such certification is claimed.
+
+### Production-readiness re-verification — 2026-07-20
+
+The owner retained the native-fluency and legal-review waivers but raised the release bar
+to include deployed SEO/performance checks and non-mutating wallet validation.
+Localization and release-build verification is green: strict parity remains 3,302/3,302;
+every Sprint 1–7 manifest, terminology, and lexicon gate passes; 386 Jest suites / 5,556
+tests pass with coverage; the 120-page production build succeeds; protocol facts match
+live chain values; and the full app-home client payload is 702.3 KB gzip against the
+enforced 750 KB budget.
+
+The bundle gate now reads Next 16's client-reference manifest, counts the full initial app
+shell plus home-route chunks, and runs in CI. The previous 600 KB check was absent from CI
+and could no longer read the current build output, so no working budget was enforced. Noto
+Sans SC now uses one variable-weight set instead of duplicating every Unicode slice for
+three static weights; `font-display: optional` keeps the approved system CJK fallback on
+slow links instead of swapping metrics late. Two consecutive throttled local app runs held
+CLS at 0.002 and scored 46 and 60 for performance; accessibility / best practices / SEO
+were 98 / 96 / 92. The landing page scored 62 / 100 / 96 / 100 with zero CLS. These are
+diagnostic baselines, not deployed release scores. Notification permission now waits for
+a gesture submission, and its five-minute warning is localized in both catalogs. Chinese wallet
+QA opens the `zh-CN` RainbowKit chooser and connects through an injected EIP-1193 test
+provider without signing or submitting a transaction.
+
+**Deployment is the remaining blocker.** At verification time,
+`https://cosmicsignature.com/zh` and `https://app.cosmicsignature.com/zh` both returned
+HTTP 404, `https://cosmicsignature.com/sitemap.xml` returned HTTP 500, and the deployed
+`llms.txt` did not contain the Chinese section from this branch. External Lighthouse,
+Google Rich Results, and an actual browser-wallet check cannot produce valid Chinese-site
+evidence until this branch is deployed. Sprint 8 therefore remains **Deploy pending**;
+repository automation is not represented as production sign-off.
 
 ---
 
 ## Decisions log
 
-| Date       | Decision                                                                                                                  |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-16 | Target Simplified Chinese (`zh`, zh-Hans) first; architecture N-locale ready                                              |
-| 2026-07-16 | URL strategy: locale prefix, `as-needed` — English URLs unchanged, Chinese under `/zh` on both hosts                      |
-| 2026-07-16 | Library: next-intl; messages in `messages/{en,zh}/*.json`; long-form content as per-locale TS modules                     |
-| 2026-07-16 | `content/dapp.ts` seeds the en catalogs, then is deleted                                                                  |
-| 2026-07-16 | Register: 你 (never 您); core coinages per glossary §2 (落笔 / 演绎周期 / 收官 / 星选 / 锚定 / 取回 / 铭刻 …)             |
-| 2026-07-17 | Sprint 1 R used owner-approved independent agent accuracy + blind-fluency passes; native launch review remains Sprint 8   |
-| 2026-07-17 | Glossary freeze reconciled to after Sprint 2, matching `glossary-zh.md`; Sprint 1 required no amendments                  |
-| 2026-07-18 | Sprint 2 R used owner-approved agent accuracy + Chinese-only fluency passes; human review was waived for this sprint      |
-| 2026-07-18 | `收官倒计时` approved for running clock copy; post-Sprint-2 glossary freeze is now active                                 |
-| 2026-07-18 | Sprint 3 R used the same owner-approved agent review flow (approved with the Sprint 3 plan); native gate stays Sprint 8   |
-| 2026-07-18 | Gallery card tooltips reworded off banned vocabulary ("Minted in game round" → "Imprinted in cycle") — lexicon gate       |
-| 2026-07-18 | Glossary §6 proposals queued: 流转记录 / 命名记录 / 星选池 / 落笔留言板 (glossary itself unchanged, frozen)               |
-| 2026-07-20 | Owner expanded the request through Sprints 5–8 and waived external native/legal review; agent review is not certification |
-| 2026-07-20 | Repo-wide zh parity reached 3,300/3,300 and now hard-fails in CI; terminology consistency is a separate CI gate           |
+| Date       | Decision                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-07-16 | Target Simplified Chinese (`zh`, zh-Hans) first; architecture N-locale ready                                                         |
+| 2026-07-16 | URL strategy: locale prefix, `as-needed` — English URLs unchanged, Chinese under `/zh` on both hosts                                 |
+| 2026-07-16 | Library: next-intl; messages in `messages/{en,zh}/*.json`; long-form content as per-locale TS modules                                |
+| 2026-07-16 | `content/dapp.ts` seeds the en catalogs, then is deleted                                                                             |
+| 2026-07-16 | Register: 你 (never 您); core coinages per glossary §2 (落笔 / 演绎周期 / 收官 / 星选 / 锚定 / 取回 / 铭刻 …)                        |
+| 2026-07-17 | Sprint 1 R used owner-approved independent agent accuracy + blind-fluency passes; native launch review remains Sprint 8              |
+| 2026-07-17 | Glossary freeze reconciled to after Sprint 2, matching `glossary-zh.md`; Sprint 1 required no amendments                             |
+| 2026-07-18 | Sprint 2 R used owner-approved agent accuracy + Chinese-only fluency passes; human review was waived for this sprint                 |
+| 2026-07-18 | `收官倒计时` approved for running clock copy; post-Sprint-2 glossary freeze is now active                                            |
+| 2026-07-18 | Sprint 3 R used the same owner-approved agent review flow (approved with the Sprint 3 plan); native gate stays Sprint 8              |
+| 2026-07-18 | Gallery card tooltips reworded off banned vocabulary ("Minted in game round" → "Imprinted in cycle") — lexicon gate                  |
+| 2026-07-18 | Glossary §6 proposals queued: 流转记录 / 命名记录 / 星选池 / 落笔留言板 (glossary itself unchanged, frozen)                          |
+| 2026-07-20 | Owner expanded the request through Sprints 5–8 and waived external native/legal review; agent review is not certification            |
+| 2026-07-20 | Repo-wide zh parity reached 3,302/3,302 and now hard-fails in CI; terminology consistency is a separate CI gate                      |
+| 2026-07-20 | Owner retained native/legal waivers but requires deployed SEO/performance and non-mutating wallet validation for production sign-off |
 
 ## Risk register
 

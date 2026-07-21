@@ -71,6 +71,40 @@ describe('bundle budget core', () => {
       expect(pickTurbopackHomeAssets(tempDir)).toBeNull();
     });
 
+    it('combines Next 16 shared and app-home client chunks', () => {
+      writeFileSync(
+        path.join(tempDir, 'build-manifest.json'),
+        JSON.stringify({
+          pages: { '/_app': [] },
+          rootMainFiles: ['static/chunks/runtime.js', 'static/chunks/shared.js'],
+        }),
+      );
+      const routeDir = path.join(tempDir, 'server', 'app', '[locale]', '(app)');
+      mkdirSync(routeDir, { recursive: true });
+      writeFileSync(
+        path.join(routeDir, 'page_client-reference-manifest.js'),
+        [
+          'globalThis.__RSC_MANIFEST = globalThis.__RSC_MANIFEST || {};',
+          `globalThis.__RSC_MANIFEST["/[locale]/(app)/page"] = ${JSON.stringify({
+            entryJSFiles: {
+              '[project]/app/[locale]/(app)/layout': ['static/chunks/shared.js'],
+              '[project]/app/[locale]/(app)/page': [
+                'static/chunks/shared.js',
+                'static/chunks/home.js',
+                'static/chunks/home.css',
+              ],
+            },
+          })};`,
+        ].join('\n'),
+      );
+
+      expect(pickTurbopackHomeAssets(tempDir)).toEqual([
+        'static/chunks/runtime.js',
+        'static/chunks/shared.js',
+        'static/chunks/home.js',
+      ]);
+    });
+
     it('reads rootMainFiles from the per-route build manifest', () => {
       const routeDir = path.join(tempDir, 'server', 'app', 'page');
       mkdirSync(routeDir, { recursive: true });
@@ -145,7 +179,7 @@ describe('bundle budget core', () => {
       expect(result.fileCount).toBe(1);
       expect(result.gzipKb).toBeGreaterThan(0);
       expect(result.gzipKb).toBeCloseTo(computeGzipKb([chunk]), 5);
-      expect(result.summary).toMatch(/App home JS gzip: .* \(budget 600 KB\)/);
+      expect(result.summary).toMatch(/App home JS gzip: .* \(budget 750 KB\)/);
     });
 
     it('fails when the gzip size exceeds the budget', () => {
@@ -175,8 +209,8 @@ describe('bundle budget core', () => {
     });
   });
 
-  it('keeps the default budget at 600 KB gzip', () => {
-    expect(DEFAULT_BUDGET_KB).toBe(600);
+  it('keeps the full app-home budget at 750 KB gzip', () => {
+    expect(DEFAULT_BUDGET_KB).toBe(750);
   });
 
   describe('directory fallback', () => {

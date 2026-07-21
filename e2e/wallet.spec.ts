@@ -112,6 +112,28 @@ test.describe('Wallet connection state (disconnected)', () => {
     expect(pageErrors.join('\n')).not.toContain('Cannot find module');
   });
 
+  test('Chinese wallet chooser connects through the non-mutating injected flow', async ({
+    page,
+  }) => {
+    await installMockMetaMask(page);
+    await page.goto('/zh', { waitUntil: 'networkidle' });
+
+    const connectBtn = page.getByRole('button', { name: /连接钱包/ }).first();
+    await expect(connectBtn).toBeVisible();
+    await connectBtn.click();
+
+    const dialog = page.getByRole('dialog').first();
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+    await expect(dialog).toContainText(/连接钱包|选择钱包/);
+    await dialog.getByRole('button', { name: /^MetaMask$/i }).click();
+
+    await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+    await expect(page.getByText(/0x1234\.{4}5678/).first()).toBeVisible({ timeout: 10_000 });
+    await expect
+      .poll(() => page.evaluate(() => window.__mockEthereumRequests ?? []))
+      .toContain('eth_requestAccounts');
+  });
+
   test('home page shows a connect prompt in the gesture area before wallet connection', async ({
     page,
   }) => {

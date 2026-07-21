@@ -219,11 +219,13 @@ existing unit tests plus new zh cases.
 Clash Display (display headings) and Inter (body) contain **no CJK glyphs**. Without
 action, Chinese renders in unstyled system fallback.
 
-- Add **Noto Sans SC** via `next/font/google` (weights 400/500/700, variable
-  `--font-noto-sc`, `display: 'swap'`). Google Fonts serves it as ~100 small
+- Add **Noto Sans SC** via `next/font/google` (one variable-weight set,
+  `--font-noto-sc`, `display: 'optional'`). Google Fonts serves it as ~100 small
   `unicode-range` slices, so browsers only download the glyph ranges a page actually uses —
-  English pages fetch nothing. It is therefore appended to the global font stacks
-  unconditionally (after Inter / after Clash Display).
+  English pages fetch nothing. `optional` prevents a late CJK metric swap on slow links;
+  the approved system CJK stack remains visible when Noto misses the short load window.
+  Noto is appended to the global font stacks unconditionally (after Inter / after Clash
+  Display).
 - Chinese headings render in Noto Sans SC via fallback (Clash Display has no CJK). Add an
   `html[lang="zh"]` rule bumping display-heading weight to 700 and tightening
   letter-spacing to `0` (CJK must never be letter-spaced like the Latin display face).
@@ -310,10 +312,12 @@ flowchart LR
 yarn dev
 # dApp Chinese:    http://localhost:3000/zh
 # landing Chinese: http://cosmicsignature.local:3000/zh   (see lib/hostRouting.ts for /etc/hosts setup)
-yarn i18n:parity                       # translation coverage report (--strict [ns ...] to gate)
-yarn i18n:sprint1                      # hard-fail on the exact Sprint 1 key manifest
-yarn lexicon:scan                      # includes the zh banned-term phase
-npx playwright test e2e/zh-smoke.spec.ts e2e/proxy.spec.ts   # locale routing e2e
+yarn i18n:strict                       # hard-fail on any en/zh catalog drift
+yarn i18n:sprint1 && yarn i18n:sprint2 && yarn i18n:sprint3
+yarn i18n:sprint4 && yarn i18n:sprint5 && yarn i18n:sprint6 && yarn i18n:sprint7
+yarn terminology:check && yarn lexicon:scan
+yarn test:e2e:zh                       # Chinese routes, QA journeys, a11y, routing, wallet
+yarn build && yarn bundle:budget       # production output and full app-home JS budget
 ```
 
 To test locale detection: clear the `NEXT_LOCALE` cookie and set the browser's language to

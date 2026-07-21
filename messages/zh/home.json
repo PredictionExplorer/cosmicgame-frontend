@@ -82,6 +82,10 @@
       "previousAllocations": "第 {number} 个周期的分配"
     }
   },
+  "notifications": {
+    "finalizationSoonTitle": "现在落笔——收官在即",
+    "finalizationSoonBody": "收官倒计时将在 5 分钟后归零。现在落笔即可延长周期，并参与最终分配。"
+  },
   "chrono": {
     "sectionAria": "周期收官时间",
     "timerAria": "{label}。{status}",

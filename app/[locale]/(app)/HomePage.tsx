@@ -207,6 +207,8 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   const allocationFinalize = useAllocationFinalize({ data, offset });
   const { playAudio, requestNotificationPermission } = useAllocationNotification({
     allocationTime: allocationFinalize.allocationTime,
+    notificationTitle: t('notifications.finalizationSoonTitle'),
+    notificationBody: t('notifications.finalizationSoonBody'),
   });
 
   const prevGestureCountRef = useRef<number>(0);
@@ -280,6 +282,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   }, [account, queryClient]);
 
   const handleGesture = useCallback(async () => {
+    requestNotificationPermission();
     if (uxScenario) {
       const nextScenario = simulateUxScenarioGesture({
         bidder: account ?? UX_SCENARIO_DEMO_ACCOUNT,
@@ -305,6 +308,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     onGesture,
     onGestureWithCST,
     optimisticallyRecordGesture,
+    requestNotificationPermission,
     setMessage,
     tToast,
     uxScenario,
@@ -315,13 +319,12 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   }, [onFinalize, withPostTxRefresh]);
 
   useEffect(() => {
-    requestNotificationPermission();
     if (searchParams?.get('randomwalk')) {
       setRwlkId(Number(searchParams.get('tokenId')));
       setBidType('RandomWalk');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, requestNotificationPermission]);
+  }, [searchParams]);
 
   useEffect(() => {
     const handleGesturePlaced = () => setGesturePulseKey((value) => value + 1);

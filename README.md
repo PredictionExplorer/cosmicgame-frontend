@@ -56,23 +56,24 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 
 ## Scripts
 
-| Script                    | Description                                             |
-| ------------------------- | ------------------------------------------------------- |
-| `yarn dev`                | Start development server                                |
-| `yarn build`              | Create production build                                 |
-| `yarn start`              | Run production server                                   |
-| `yarn lint`               | Run ESLint (zero warnings allowed)                      |
-| `yarn type-check`         | Run the TypeScript compiler without emitting            |
-| `yarn test`               | Run unit tests (Jest)                                   |
-| `yarn test:coverage`      | Run unit tests with coverage report                     |
-| `yarn test:seo`           | Run the SEO test subset (unit + raw-HTML e2e)           |
-| `yarn test:e2e`           | Run end-to-end tests (Playwright)                       |
-| `yarn test:e2e:ui`        | Run E2E tests with Playwright UI                        |
-| `yarn test:e2e:headed`    | Run E2E tests in headed browser                         |
-| `yarn analyze`            | Production build with bundle analyzer                   |
-| `yarn bundle:budget`      | Check app-home JS gzip size against budget (post-build) |
-| `yarn contracts:generate` | Regenerate typed ABIs from `contracts/*.json`           |
-| `yarn lexicon:scan`       | Enforce domain terminology in UI copy                   |
+| Script                    | Description                                                             |
+| ------------------------- | ----------------------------------------------------------------------- |
+| `yarn dev`                | Start development server                                                |
+| `yarn build`              | Create production build                                                 |
+| `yarn start`              | Run production server                                                   |
+| `yarn lint`               | Run ESLint (zero warnings allowed)                                      |
+| `yarn type-check`         | Run the TypeScript compiler without emitting                            |
+| `yarn test`               | Run unit tests (Jest)                                                   |
+| `yarn test:coverage`      | Run unit tests with coverage report                                     |
+| `yarn test:seo`           | Run the SEO test subset (unit + raw-HTML e2e)                           |
+| `yarn test:e2e`           | Run end-to-end tests (Playwright)                                       |
+| `yarn test:e2e:zh`        | Run the Chinese rollout, routing, accessibility, and wallet E2E subset  |
+| `yarn test:e2e:ui`        | Run E2E tests with Playwright UI                                        |
+| `yarn test:e2e:headed`    | Run E2E tests in headed browser                                         |
+| `yarn analyze`            | Production build with bundle analyzer                                   |
+| `yarn bundle:budget`      | Check full app-home initial JS gzip payload against budget (post-build) |
+| `yarn contracts:generate` | Regenerate typed ABIs from `contracts/*.json`                           |
+| `yarn lexicon:scan`       | Enforce domain terminology in UI copy                                   |
 
 ## Environment Variables
 
