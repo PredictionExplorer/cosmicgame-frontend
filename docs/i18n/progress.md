@@ -525,7 +525,7 @@ to include deployed SEO/performance checks and non-mutating wallet validation.
 Localization and release-build verification is green: strict parity remains 3,302/3,302;
 every Sprint 1–7 manifest, terminology, and lexicon gate passes; 386 Jest suites / 5,556
 tests pass with coverage; the 120-page production build succeeds; protocol facts match
-live chain values; and the full app-home client payload is 702.3 KB gzip against the
+live chain values; and the full app-home client payload is 703.4 KB gzip against the
 enforced 750 KB budget.
 
 The bundle gate now reads Next 16's client-reference manifest, counts the full initial app

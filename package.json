@@ -78,7 +78,7 @@
     "@vercel/og": "^0.6.8",
     "@vercel/speed-insights": "^2.0.0",
     "@walletconnect/ethereum-provider": "^2.23.9",
-    "axios": "^1.16.0",
+    "axios": "^1.18.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "codemirror": "^6.0.0",
@@ -138,7 +138,7 @@
   },
   "resolutions": {
     "@noble/hashes": "^1.8.0",
-    "axios": "^1.16.0",
+    "axios": "^1.18.1",
     "defu": "^6.1.5",
     "flatted": "^3.4.2",
     "follow-redirects": "^1.16.0",
@@ -161,7 +161,7 @@
   },
   "overrides": {
     "@noble/hashes": "^1.8.0",
-    "axios": "^1.16.0",
+    "axios": "^1.18.1",
     "defu": "^6.1.5",
     "flatted": "^3.4.2",
     "follow-redirects": "^1.16.0",
