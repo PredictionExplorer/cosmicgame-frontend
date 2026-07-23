@@ -8,7 +8,7 @@ import type { PrivacyCopy } from '@/content/legal/PrivacyContent';
 import { termsCopyEn } from '@/content/legal/TermsContent.en';
 import { termsCopyZh } from '@/content/legal/TermsContent.zh';
 import type { TrustPageCopy } from '@/content/legal/TrustPageContent';
-import { protocolFacts } from '@/content/protocol-facts';
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 
 function termsStructure(copy: typeof termsCopyEn | typeof termsCopyZh) {
   return {
@@ -65,12 +65,17 @@ describe('localized legal content', () => {
 
   it('preserves Terms protocol facts and legal dates', () => {
     const chineseTerms = JSON.stringify(termsCopyZh);
-    expect(chineseTerms).toContain(
-      String(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture),
-    );
-    expect(chineseTerms).toContain(
-      String(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture),
-    );
+    if (isV3Mechanics) {
+      // V3 Terms describe the 2x-restart calibration window instead of the drift percentages.
+      expect(chineseTerms).toContain('两倍');
+    } else {
+      expect(chineseTerms).toContain(
+        String(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture),
+      );
+      expect(chineseTerms).toContain(
+        String(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture),
+      );
+    }
     expect(chineseTerms).toContain(String(protocolFacts.finalGestureExclusivityHours));
     expect(chineseTerms).toContain(String(protocolFacts.secondaryRetrievalTimeoutWeeks));
     expect(termsCopyZh.lastUpdated).toContain('2026年7月20日');

@@ -113,8 +113,13 @@ const allowedCstAmounts = new Set<number>([
   protocolFacts.cstCalibrationCeilingMinCst,
   protocolFacts.cstCalibrationFloorCst,
   protocolFacts.councilProposalThresholdCst,
-  // Worked examples of the dynamic Participation CST formula.
+  // Worked examples of the dynamic Participation CST formula (V2 sqrt and V3 linear).
   ...protocolFacts.dynamicCstRewardExamples.map((example) => Number(example.cst)),
+  ...protocolFacts.v3.dynamicCstRewardExamples.map((example) =>
+    Number(example.cst.replace(/,/g, '')),
+  ),
+  // V3 linear accrual rate ("about 1 CST per minute at launch").
+  protocolFacts.v3.dynamicCstRewardPerMinuteAtLaunch,
 ]);
 
 // English groups thousands with commas; Ukrainian (and Intl for uk-UA) with a
