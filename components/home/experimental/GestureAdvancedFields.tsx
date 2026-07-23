@@ -3,7 +3,7 @@
 import { Settings2, Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { protocolFacts } from '@/content/protocol-facts';
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 
 import { formatCstAmount } from '@/utils/cstGesture';
 import { cn } from '@/lib/utils';
@@ -152,7 +152,11 @@ export function GestureAdvancedFields({
             {t('form.advanced.minCstProtection.title')}
           </p>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            {t('form.advanced.minCstProtection.body')}
+            {t(
+              isV3Mechanics
+                ? 'form.advanced.minCstProtection.bodyV3'
+                : 'form.advanced.minCstProtection.body',
+            )}
           </p>
           <label className="flex items-start gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] p-3 text-sm">
             <Checkbox
