@@ -7,7 +7,7 @@
     "amountLabel": "金额（ETH）",
     "informationLabel": "附加信息",
     "optionalJson": "（可选，JSON）",
-    "informationPlaceholder": "{\"name\": \"你的名称\", \"message\": \"留言\"}",
+    "informationPlaceholder": "'{'\"name\": \"你的名称\", \"message\": \"留言\"'}'",
     "contribute": "贡献",
     "contributeWithInfo": "附带信息并贡献",
     "historyTitle": "贡献记录"

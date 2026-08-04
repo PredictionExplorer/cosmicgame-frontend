@@ -3,7 +3,7 @@ import { getAddress, isAddress } from 'viem';
 import axios from 'axios';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { cosmicGameBaseUrl } from '@/services/api';
+import { getAPIUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
 
 import UserPage from './UserPage';
@@ -20,7 +20,7 @@ export async function generateMetadata({
   if (isAddress(address.toLowerCase())) {
     address = getAddress(address.toLowerCase());
     try {
-      const { data } = await axios.get(`${cosmicGameBaseUrl}user/info/${address}`);
+      const { data } = await axios.get(getAPIUrl(`user/info/${address}`));
       if (!data || !data.Gestures?.length) {
         address = t('userProfile.invalidAddress');
       }

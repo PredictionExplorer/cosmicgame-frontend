@@ -28,6 +28,11 @@ process.env.NEXT_PUBLIC_NETWORK = 'sepolia';
 process.env.NEXT_PUBLIC_API_URL = 'http://test-api.example/api/cosmicgame/';
 process.env.NEXT_PUBLIC_RPC_URL = 'http://127.0.0.1:8545';
 process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID = 'test-walletconnect-project-id';
+// The plural rotation lists take precedence over the singular vars
+// (lib/serverRotation.ts), so shell-exported values would silently change
+// which base URL the suite resolves. Strip them for the same hermeticity.
+delete process.env.NEXT_PUBLIC_API_URLS;
+delete process.env.NEXT_PUBLIC_RPC_URLS;
 
 // Build stamp (mirrors next.config `env`); Preview/local show footer line in tests.
 process.env.NEXT_PUBLIC_BUILD_COMMIT =

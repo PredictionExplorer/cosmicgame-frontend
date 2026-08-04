@@ -30,6 +30,7 @@ import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
+import { getApiBase, getRpcUrl } from '@/lib/serverRotation';
 
 // Wallet UI stylesheet — kept scoped to Providers (the app-only tree) so
 // the landing host never ships it.
@@ -249,6 +250,13 @@ export function Providers({
         `  NFT CDN: ${networkConfig.nftApiUrl}` +
         buildLines,
     );
+  }, []);
+
+  useEffect(() => {
+    // Announce the rotation picks at startup ("[serverRotation] using RPC/API
+    // = ..."); later changes (hour flip, failover) are logged by pickServer.
+    getRpcUrl();
+    getApiBase();
   }, []);
 
   useEffect(() => {

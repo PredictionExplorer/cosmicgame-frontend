@@ -1,6 +1,7 @@
 import axios, { isAxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 
 import { networkConfig } from '@/config/networks';
+import { apiBaseUrls, getApiBase, markServerDown, rebaseUrl } from '@/lib/serverRotation';
 import { reportError } from '@/utils/errors';
 
 import type { RoundInfo } from './types';
@@ -8,11 +9,11 @@ import type { RoundInfo } from './types';
 /** True when the failed request was aimed at our Cosmic Game or main NFT API (not arbitrary third-party URLs). */
 function isConfiguredBackendRequest(cfg: InternalAxiosRequestConfig | undefined): boolean {
   if (!cfg) return false;
-  const built = (cfg.url ?? '').trim();
-  const base = (cfg.baseURL ?? '').replace(/\/$/, '');
-  const full = base ? `${base}/${built.replace(/^\//, '')}` : built;
-  const target = (full || built).toLowerCase();
+  const target = requestFullUrl(cfg).toLowerCase();
 
+  for (const base of apiBaseUrls) {
+    if (target.startsWith(base.toLowerCase())) return true;
+  }
   const cosmic = (networkConfig.apiUrl || '').replace(/\/$/, '').toLowerCase();
   if (cosmic && target.startsWith(cosmic)) return true;
   if (target.includes('/api/cosmicgame')) return true;
@@ -21,6 +22,28 @@ function isConfiguredBackendRequest(cfg: InternalAxiosRequestConfig | undefined)
   if (main && target.startsWith(main)) return true;
 
   return false;
+}
+
+/** Reassembles the full request URL from an axios config (baseURL + url). */
+function requestFullUrl(cfg: InternalAxiosRequestConfig): string {
+  const built = (cfg.url ?? '').trim();
+  const base = (cfg.baseURL ?? '').replace(/\/$/, '');
+  return base ? `${base}/${built.replace(/^\//, '')}` : built;
+}
+
+/** Marker preventing more than one rotation retry per logical request. */
+interface RotationRetryConfig extends InternalAxiosRequestConfig {
+  __rotationRetried?: boolean;
+}
+
+/**
+ * True for failures that indicate the *server* is unhealthy (unreachable, or
+ * responding 5xx) rather than a request-level problem like a 404.
+ */
+function isServerFailure(error: unknown): boolean {
+  if (!isAxiosError(error)) return false;
+  if (!error.response) return true; // network error / timeout / DNS
+  return error.response.status >= 500;
 }
 
 axios.interceptors.response.use(
@@ -36,13 +59,10 @@ axios.interceptors.response.use(
       isConfiguredBackendRequest(error.config)
     ) {
       const cfg = error.config;
-      const built = cfg?.url ?? '';
-      const fullUrl = cfg?.baseURL
-        ? `${cfg.baseURL.replace(/\/$/, '')}/${(cfg.url ?? '').replace(/^\//, '')}`
-        : built;
+      const fullUrl = cfg ? requestFullUrl(cfg) : '';
       console.error(
         '[Cosmic API] Network error (no response). Request URL:',
-        fullUrl || built || '(unknown)',
+        fullUrl || '(unknown)',
       );
       console.error(
         'Check: (1) Go websrv is running, (2) NEXT_PUBLIC_API_URL ends with /api/cosmicgame — e.g. http://127.0.0.1:8099/api/cosmicgame',
@@ -50,6 +70,32 @@ axios.interceptors.response.use(
       console.error(
         'If the page is HTTPS and the API is HTTP, use same-origin proxy: set NEXT_PUBLIC_API_URL to this app origin + /api/cosmicgame and COSMICGAME_API_UPSTREAM in .env.local (see .env.example).',
       );
+    }
+
+    // Server rotation failover: when a configured API server is unreachable
+    // (or 5xx), mark it down and replay the request once against the next
+    // healthy server in the list. GETs dominate this API; the single retry is
+    // also acceptable for the few POSTs since the failed server never
+    // processed the request (no response / 5xx from a dead upstream).
+    if (isAxiosError(error) && isServerFailure(error) && apiBaseUrls.length > 1) {
+      const cfg = error.config as RotationRetryConfig | undefined;
+      if (cfg && !cfg.__rotationRetried) {
+        const fullUrl = requestFullUrl(cfg);
+        const failedBase = apiBaseUrls.find(
+          (base) => fullUrl === base || fullUrl.startsWith(`${base}/`),
+        );
+        if (failedBase) {
+          markServerDown(failedBase);
+          const retryUrl = rebaseUrl(fullUrl, apiBaseUrls);
+          if (retryUrl) {
+            cfg.__rotationRetried = true;
+            cfg.baseURL = undefined;
+            cfg.url = retryUrl;
+            console.warn('[Cosmic API] retrying against next server:', retryUrl);
+            return axios(cfg);
+          }
+        }
+      }
     }
     return Promise.reject(error);
   },
@@ -60,12 +106,15 @@ axios.interceptors.response.use(
 axios.defaults.timeout = 15_000;
 
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  const b = (process.env.NEXT_PUBLIC_API_URL || '').trim();
-  if (b && !b.includes('cosmicgame')) {
-    console.warn(
-      '[Cosmic API] NEXT_PUBLIC_API_URL should include the path /api/cosmicgame (see .env.example). Got:',
-      b,
-    );
+  const configured =
+    apiBaseUrls.length > 0 ? apiBaseUrls : [(process.env.NEXT_PUBLIC_API_URL || '').trim()];
+  for (const b of configured) {
+    if (b && !b.includes('cosmicgame')) {
+      console.warn(
+        '[Cosmic API] API URLs should include the path /api/cosmicgame (see .env.example). Got:',
+        b,
+      );
+    }
   }
 }
 
@@ -73,18 +122,26 @@ export { axios, isAxiosError };
 
 /** Base URL for the main NFT/token API. */
 export const baseUrl = networkConfig.nftApiUrl;
-/** Base URL for the Cosmic Game statistics API. */
+/**
+ * Base URL for the Cosmic Game statistics API (first configured server, raw
+ * env form). Prefer {@link getAPIUrl}, which follows the hourly server
+ * rotation.
+ */
 export const cosmicGameBaseUrl = networkConfig.apiUrl;
 
 /**
- * Builds a full URL to the Cosmic Game API. Joins `NEXT_PUBLIC_API_URL` and `url` with exactly one
- * `/` (so `.../api/cosmicgame` + `bid/...` does not become `.../api/cosmicgamebid/...`).
+ * Builds a full URL to the Cosmic Game API against the currently selected
+ * server (hourly round-robin with failover — see lib/serverRotation). Joins
+ * base and `url` with exactly one `/` (so `.../api/cosmicgame` + `bid/...`
+ * does not become `.../api/cosmicgamebid/...`).
  */
 export const getAPIUrl = (url: string) => {
   if (url === '') {
+    // Historical contract: empty path returns the primary base in raw env form.
     return cosmicGameBaseUrl;
   }
-  const base = (cosmicGameBaseUrl || '').replace(/\/+$/, '');
+  const rotated = getApiBase();
+  const base = (rotated || cosmicGameBaseUrl || '').replace(/\/+$/, '');
   const path = (url || '').replace(/^\/+/, '');
   if (!base) return `/${path}`;
   return `${base}/${path}`;

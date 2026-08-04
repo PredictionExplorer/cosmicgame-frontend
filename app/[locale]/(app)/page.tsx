@@ -4,7 +4,7 @@ import axios from 'axios';
 import { headers } from 'next/headers';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { cosmicGameBaseUrl } from '@/services/api';
+import { getAPIUrl } from '@/services/api';
 import { get_dashboard_info } from '@/services/api/rounds';
 import { createMetadata } from '@/utils/seo';
 
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   let reserve: number | null = null;
   try {
-    const { data } = await axios.get(cosmicGameBaseUrl + 'statistics/dashboard');
+    const { data } = await axios.get(getAPIUrl('statistics/dashboard'));
     reserve = data?.PrizeAmountEth ?? 0;
   } catch {
     // fallback

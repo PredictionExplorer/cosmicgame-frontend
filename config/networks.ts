@@ -22,20 +22,31 @@ export interface EnvValidation {
   missing: string[];
 }
 
+/** First entry of a comma-separated env list, or '' when unset/empty. */
+const firstOfList = (raw: string | undefined): string =>
+  (raw ?? '')
+    .split(',')
+    .map((u) => u.trim())
+    .filter(Boolean)[0] ?? '';
+
 /** Returns validation result. Call before using networkConfig. */
 export function getEnvValidation(): EnvValidation {
   const missing: string[] = [];
   const network = process.env.NEXT_PUBLIC_NETWORK?.trim();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
-  const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL?.trim();
+  // The plural list variables (server rotation, see lib/serverRotation)
+  // satisfy the singular requirement.
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL?.trim() || firstOfList(process.env.NEXT_PUBLIC_API_URLS);
+  const rpcUrl =
+    process.env.NEXT_PUBLIC_RPC_URL?.trim() || firstOfList(process.env.NEXT_PUBLIC_RPC_URLS);
   const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
 
   if (!network) missing.push('NEXT_PUBLIC_NETWORK');
   else if (network !== 'local' && network !== 'sepolia' && network !== 'mainnet') {
     missing.push('NEXT_PUBLIC_NETWORK (must be: local, sepolia, or mainnet)');
   }
-  if (!apiUrl) missing.push('NEXT_PUBLIC_API_URL');
-  if (!rpcUrl) missing.push('NEXT_PUBLIC_RPC_URL');
+  if (!apiUrl) missing.push('NEXT_PUBLIC_API_URL (or NEXT_PUBLIC_API_URLS)');
+  if (!rpcUrl) missing.push('NEXT_PUBLIC_RPC_URL (or NEXT_PUBLIC_RPC_URLS)');
   if (!walletConnectProjectId) missing.push('NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID');
 
   return {
@@ -93,11 +104,15 @@ const resolvedNetworkName: NetworkName =
 
 const defaults = networkDefaults[resolvedNetworkName] ?? networkDefaults.sepolia;
 
-/** API and RPC URLs come only from env; no defaults. */
+/**
+ * API and RPC URLs come only from env; no defaults. With the plural list
+ * variables set, these hold the first server; rotation-aware call sites go
+ * through lib/serverRotation instead.
+ */
 export const networkConfig: NetworkConfig = {
   ...defaults,
-  apiUrl: process.env.NEXT_PUBLIC_API_URL?.trim() ?? '',
-  rpcUrl: process.env.NEXT_PUBLIC_RPC_URL?.trim() ?? '',
+  apiUrl: process.env.NEXT_PUBLIC_API_URL?.trim() || firstOfList(process.env.NEXT_PUBLIC_API_URLS),
+  rpcUrl: process.env.NEXT_PUBLIC_RPC_URL?.trim() || firstOfList(process.env.NEXT_PUBLIC_RPC_URLS),
   explorerUrl: process.env.NEXT_PUBLIC_EXPLORER_URL?.trim() || defaults.explorerUrl,
 };
 

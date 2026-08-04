@@ -7,7 +7,7 @@
     "amountLabel": "Amount (ETH)",
     "informationLabel": "Information",
     "optionalJson": "(optional, JSON)",
-    "informationPlaceholder": "{\"name\": \"Your Name\", \"message\": \"...\"}",
+    "informationPlaceholder": "'{'\"name\": \"Your Name\", \"message\": \"...\"'}'",
     "contribute": "Contribute",
     "contributeWithInfo": "Contribute with Info",
     "historyTitle": "Contribution History"

@@ -59,8 +59,8 @@ describe('network environment validation', () => {
       valid: false,
       missing: [
         'NEXT_PUBLIC_NETWORK',
-        'NEXT_PUBLIC_API_URL',
-        'NEXT_PUBLIC_RPC_URL',
+        'NEXT_PUBLIC_API_URL (or NEXT_PUBLIC_API_URLS)',
+        'NEXT_PUBLIC_RPC_URL (or NEXT_PUBLIC_RPC_URLS)',
         'NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID',
       ],
     });
