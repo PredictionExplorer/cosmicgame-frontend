@@ -60,6 +60,16 @@ is not attacker-controlled in the deployed dapp.
   attacker-controlled values and rendering the result as HTML. The app does not
   call those methods.
 
+### GHSA-5p4m-2wfm-xmqj
+
+- package: `js-yaml`
+- severity: high
+- scope: transitive development tooling (eslint, commitlint, babel-jest)
+- reason: The quadratic CPU consumption requires parsing attacker-controlled
+  YAML with `!!omap` tags. This package is only reached through local lint and
+  test tooling that parses repository-controlled config files; no fixed 3.x/4.x
+  release exists (CVE-2026-59870 fix is not backported).
+
 ### GHSA-3ppc-4f35-3m26
 
 - package: `minimatch`
