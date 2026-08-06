@@ -1,5 +1,3 @@
-import { networkConfig } from '@/config/networks';
-
 import {
   getExplorerUrl,
   getProxiedUrl,
@@ -35,7 +33,8 @@ describe('getOriginUrl', () => {
 });
 
 describe('getAssetsUrl', () => {
-  const nftBase = networkConfig.nftApiUrl.replace(/\/+$/, '');
+  // Media follows the rotated API origin (jest.setup.ts NEXT_PUBLIC_API_URL).
+  const nftBase = 'http://test-api.example';
 
   it('constructs direct URL with the NFT image server base', () => {
     const result = getAssetsUrl('cosmicsignature/logo.png');
@@ -44,7 +43,8 @@ describe('getAssetsUrl', () => {
 });
 
 describe('getThumbUrl', () => {
-  const nftBase = networkConfig.nftApiUrl.replace(/\/+$/, '');
+  // Media follows the rotated API origin (jest.setup.ts NEXT_PUBLIC_API_URL).
+  const nftBase = 'http://test-api.example';
 
   it('builds the card thumbnail path inside the per-seed package dir', () => {
     const result = getThumbUrl('abc123', 'card');
@@ -63,7 +63,8 @@ describe('getThumbUrl', () => {
 });
 
 describe('getRWLKImageUrl', () => {
-  const nftBase = networkConfig.nftApiUrl.replace(/\/+$/, '');
+  // Media follows the rotated API origin (jest.setup.ts NEXT_PUBLIC_API_URL).
+  const nftBase = 'http://test-api.example';
 
   it('constructs direct URL with default variant', () => {
     const result = getRWLKImageUrl('12345');

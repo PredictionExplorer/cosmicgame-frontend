@@ -1,7 +1,13 @@
 import axios, { isAxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 
 import { networkConfig } from '@/config/networks';
-import { apiBaseUrls, getApiBase, markServerDown, rebaseUrl } from '@/lib/serverRotation';
+import {
+  apiBaseUrls,
+  getApiBase,
+  getApiOrigin,
+  markServerDown,
+  rebaseUrl,
+} from '@/lib/serverRotation';
 import { reportError } from '@/utils/errors';
 
 import type { RoundInfo } from './types';
@@ -167,12 +173,16 @@ export const pagedPath = (page?: ApiPageWindow): string => {
   return `${offset}/${limit}`;
 };
 
-/** Builds a direct URL targeting the main NFT/token API. */
+/**
+ * Builds a direct URL targeting the main NFT/token API. Served by the same
+ * rotated servers as the Cosmic Game API, so the current rotation pick is
+ * preferred; `nftApiUrl` is only the no-rotation fallback.
+ */
 export const getMainAPIUrl = (url: string) => {
   if (url === '') {
     return baseUrl;
   }
-  const base = (baseUrl || '').replace(/\/+$/, '');
+  const base = (getApiOrigin() || baseUrl || '').replace(/\/+$/, '');
   const path = (url || '').replace(/^\/+/, '');
   if (!base) return `/${path}`;
   return `${base}/${path}`;

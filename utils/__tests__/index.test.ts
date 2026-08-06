@@ -1,4 +1,3 @@
-import { networkConfig } from '@/config/networks';
 import {
   shortenHex,
   parseBalance,
@@ -188,7 +187,8 @@ describe('getExplorerUrl', () => {
 });
 
 describe('getAssetsUrl', () => {
-  const nftBase = networkConfig.nftApiUrl.replace(/\/+$/, '');
+  // Media follows the rotated API origin (jest.setup.ts NEXT_PUBLIC_API_URL).
+  const nftBase = 'http://test-api.example';
 
   it('builds direct URL with correct base path', () => {
     const result = getAssetsUrl('cosmicsignature/logo.png');
@@ -202,7 +202,8 @@ describe('getAssetsUrl', () => {
 });
 
 describe('getRWLKImageUrl', () => {
-  const nftBase = networkConfig.nftApiUrl.replace(/\/+$/, '');
+  // Media follows the rotated API origin (jest.setup.ts NEXT_PUBLIC_API_URL).
+  const nftBase = 'http://test-api.example';
 
   it('builds direct URL with default variant', () => {
     const result = getRWLKImageUrl('token_123');

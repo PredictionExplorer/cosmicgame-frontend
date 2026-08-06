@@ -35,6 +35,47 @@ const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
+interface RemoteImagePattern {
+  protocol: 'http' | 'https';
+  hostname: string;
+  port: string;
+  pathname: string;
+  search: string;
+}
+
+/**
+ * One next/image remote pattern per configured API origin. NFT media is
+ * served by the same rotated API servers (see lib/serverRotation.ts and
+ * utils/urls.ts), so any host in NEXT_PUBLIC_API_URLS / NEXT_PUBLIC_API_URL
+ * may appear as an image src depending on the hourly rotation.
+ */
+function apiOriginRemotePatterns(): RemoteImagePattern[] {
+  const raw = [process.env.NEXT_PUBLIC_API_URLS, process.env.NEXT_PUBLIC_API_URL]
+    .filter(Boolean)
+    .join(',');
+  const patterns: RemoteImagePattern[] = [];
+  const seen = new Set<string>();
+  for (const entry of raw.split(',')) {
+    const trimmed = entry.trim();
+    if (!trimmed) continue;
+    try {
+      const url = new URL(trimmed);
+      if (seen.has(url.origin)) continue;
+      seen.add(url.origin);
+      patterns.push({
+        protocol: url.protocol === 'https:' ? 'https' : 'http',
+        hostname: url.hostname,
+        port: url.port,
+        pathname: '/**',
+        search: '',
+      });
+    } catch {
+      // Malformed origins surface at runtime through the fetch layer.
+    }
+  }
+  return patterns;
+}
+
 // Links i18n/request.ts to next-intl (docs/i18n/README.md §2).
 const withNextIntl = createNextIntlPlugin();
 
@@ -93,6 +134,10 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
+      // Rotated API origins (the media servers actually used by the app).
+      ...apiOriginRemotePatterns(),
+      // Legacy media host: kept for URLs stored in metadata / third-party
+      // caches. Frontend code no longer builds URLs against it.
       {
         protocol: 'https',
         hostname: 'nfts.cosmicsignature.com',

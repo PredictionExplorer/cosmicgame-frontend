@@ -30,7 +30,7 @@ import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
-import { getApiBase, getRpcUrl } from '@/lib/serverRotation';
+import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 
 // Wallet UI stylesheet — kept scoped to Providers (the app-only tree) so
 // the landing host never ships it.
@@ -247,7 +247,7 @@ export function Providers({
         `  Chain ID: ${networkConfig.chainId}\n` +
         `  RPC URL: ${rpcDisplay}\n` +
         `  API URL: ${networkConfig.apiUrl}\n` +
-        `  NFT CDN: ${networkConfig.nftApiUrl}` +
+        `  NFT media: ${getApiOrigin() || networkConfig.nftApiUrl} (follows API rotation)` +
         buildLines,
     );
   }, []);

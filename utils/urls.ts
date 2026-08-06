@@ -1,11 +1,18 @@
 import { networkConfig } from '@/config/networks';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { getApiOrigin } from '@/lib/serverRotation';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 
-/** NFT CDN origin (no path); from `networkConfig.nftApiUrl` per environment. */
+/**
+ * NFT media origin (no path). The rotated API servers serve the media too
+ * (`/images/...`), so media follows the same hourly rotation and failover as
+ * API calls instead of pinning a dedicated single-server media host.
+ * Falls back to the per-environment `nftApiUrl` when no API base is
+ * configured.
+ */
 function nftCdnOrigin(): string {
-  return (networkConfig.nftApiUrl || 'https://nfts.cosmicsignature.com/').replace(/\/+$/, '');
+  return getApiOrigin() || (networkConfig.nftApiUrl || '').replace(/\/+$/, '');
 }
 
 /** Returns a block-explorer URL for a tx hash, address, or token. */

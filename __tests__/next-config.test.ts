@@ -26,10 +26,16 @@ describe('next.config', () => {
     });
   });
 
-  it('configures NFT image remote patterns for all CDN hosts', () => {
+  it('configures NFT image remote patterns for rotated API origins and legacy CDN hosts', () => {
     const patterns = (config as NextConfig).images?.remotePatterns;
     expect(patterns).toEqual(
       expect.arrayContaining([
+        // Derived from jest.setup.ts NEXT_PUBLIC_API_URL: media is served by
+        // the rotated API servers (utils/urls.ts nftCdnOrigin).
+        expect.objectContaining({
+          protocol: 'http',
+          hostname: 'test-api.example',
+        }),
         expect.objectContaining({
           protocol: 'https',
           hostname: 'nfts.cosmicsignature.com',
@@ -44,7 +50,7 @@ describe('next.config', () => {
         }),
       ]),
     );
-    expect(patterns).toHaveLength(3);
+    expect(patterns).toHaveLength(4);
   });
 
   it('enables turbopack', () => {

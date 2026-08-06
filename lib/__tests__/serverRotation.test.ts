@@ -2,6 +2,7 @@ import {
   FAILURE_COOLDOWN_MS,
   ROTATION_PERIOD_MS,
   __resetServerRotation,
+  getApiOrigin,
   markServerDown,
   parseUrlList,
   pickServer,
@@ -112,5 +113,13 @@ describe('rebaseUrl', () => {
     const t0 = slotStart(2);
     // Nothing marked down: the pick equals the URL's own base.
     expect(rebaseUrl(`${A}/statistics`, [A], t0)).toBeNull();
+  });
+});
+
+describe('getApiOrigin', () => {
+  it('returns the origin of the rotated API base (media is served there too)', () => {
+    // jest.setup.ts sets NEXT_PUBLIC_API_URL=http://test-api.example/api/cosmicgame/,
+    // so the module-level rotation list resolves to that single server.
+    expect(getApiOrigin()).toBe('http://test-api.example');
   });
 });

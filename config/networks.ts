@@ -91,7 +91,11 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     chainHex: '0xa4b1',
     chainName: 'Arbitrum One',
     explorerUrl: 'https://arbiscan.io',
-    nftApiUrl: 'https://nfts.cosmicsignature.com/',
+    // Fallback only: media normally follows the rotated API origin (see
+    // utils/urls.ts). a1 serves the same /images and /metadata content as the
+    // legacy nfts.cosmicsignature.com host, which stays reserved for on-chain
+    // tokenURI / third-party marketplaces.
+    nftApiUrl: 'https://a1.cosmicsignature.com/',
     infuraKey,
   },
 };

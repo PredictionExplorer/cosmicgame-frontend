@@ -107,6 +107,23 @@ export function markServerDown(url: string, now: number = Date.now()): void {
 /** The API base to use right now (hourly rotation + failover). */
 export const getApiBase = (): string => pickServer(apiBaseUrls, Date.now(), 'API');
 
+/**
+ * Origin (`scheme://host[:port]`) of the API server picked for this hour.
+ * The rotated API servers also serve the NFT media (`/images/...`,
+ * `/metadata/...`), so media URLs built from this origin follow the same
+ * rotation and failover as API calls. Empty when no API base is configured
+ * or the configured base is not an absolute URL.
+ */
+export const getApiOrigin = (): string => {
+  const base = getApiBase();
+  if (!base) return '';
+  try {
+    return new URL(base).origin;
+  } catch {
+    return '';
+  }
+};
+
 /** The RPC endpoint to use right now (hourly rotation + failover). */
 export const getRpcUrl = (): string => pickServer(rpcUrls, Date.now(), 'RPC');
 

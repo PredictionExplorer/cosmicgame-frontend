@@ -577,19 +577,23 @@ describe('client helper functions', () => {
   });
 
   describe('getMainAPIUrl', () => {
-    it('returns direct URL with main base + path', () => {
+    // The main API is served by the rotated servers; the base is the origin
+    // of jest.setup.ts NEXT_PUBLIC_API_URL, not the legacy nftApiUrl host.
+    const rotatedOrigin = 'http://test-api.example';
+
+    it('returns direct URL against the rotated API origin', () => {
       const result = getMainAPIUrl('get_banned_bids');
 
-      expect(result).toBe(baseUrl + 'get_banned_bids');
+      expect(result).toBe(`${rotatedOrigin}/get_banned_bids`);
     });
 
     it('passes path through without encoding', () => {
       const result = getMainAPIUrl('action?id=42&type=ban');
 
-      expect(result).toBe(baseUrl + 'action?id=42&type=ban');
+      expect(result).toBe(`${rotatedOrigin}/action?id=42&type=ban`);
     });
 
-    it('handles empty path', () => {
+    it('handles empty path (historical contract: raw nftApiUrl base)', () => {
       const result = getMainAPIUrl('');
 
       expect(result).toBe(baseUrl);
@@ -597,9 +601,8 @@ describe('client helper functions', () => {
 
     it('joins base and leading-slash paths with exactly one slash', () => {
       const result = getMainAPIUrl('/get_banned_bids');
-      const expectedBase = baseUrl.replace(/\/+$/, '');
 
-      expect(result).toBe(`${expectedBase}/get_banned_bids`);
+      expect(result).toBe(`${rotatedOrigin}/get_banned_bids`);
     });
   });
 
