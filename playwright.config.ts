@@ -34,11 +34,22 @@ export default defineConfig({
       testIgnore: ['**/*.desktop.spec.ts'],
       use: { ...devices['Pixel 5'] },
     },
+    {
+      // Mobile Safari is the single biggest source of iOS-only layout bugs
+      // (viewport units, sticky headers, flex min-width defaults), none of
+      // which Chromium reproduces.
+      name: 'Mobile Safari',
+      testIgnore: ['**/*.desktop.spec.ts'],
+      use: { ...devices['iPhone 13'] },
+    },
   ],
   webServer: {
     command: `PLAYWRIGHT=1 npm run build && PLAYWRIGHT=1 npm run start -- -p ${port}`,
     port,
-    reuseExistingServer: false,
-    timeout: 120_000,
+    // CI always builds from scratch. Locally, `PLAYWRIGHT_REUSE_SERVER=1`
+    // attaches to an already-running production server so an audit sweep
+    // doesn't pay for a full rebuild on every iteration.
+    reuseExistingServer: !process.env.CI && !!process.env.PLAYWRIGHT_REUSE_SERVER,
+    timeout: 300_000,
   },
 });
