@@ -1,12 +1,11 @@
 import { useState, useMemo } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatTableAmount } from '@/utils';
 
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -26,6 +25,8 @@ interface UniqueParticipantsRowProps {
 }
 
 const UniqueParticipantsRow = ({ bidder, locale }: UniqueParticipantsRowProps) => {
+  const t = useTranslations('tables');
+
   if (!bidder) {
     return <TablePrimaryRow />;
   }
@@ -34,11 +35,13 @@ const UniqueParticipantsRow = ({ bidder, locale }: UniqueParticipantsRowProps) =
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.participantAddress')}>
         <AddressLink address={BidderAddr} url={`/user/${BidderAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{NumBids}</TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('columns.numberOfGestures')} align="center">
+        {NumBids}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.maxGestureEth')} align="right">
         {formatTableAmount(MaxBidAmountEth, locale)}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -69,7 +72,7 @@ export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) 
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('columns.participantAddress')}
@@ -88,13 +91,13 @@ export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) 
                   tooltip={t('statisticsTooltips.maxGestureEth')}
                 />
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {paginatedList.map((bidder) => (
               <UniqueParticipantsRow bidder={bidder} locale={locale} key={bidder.BidderAid} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

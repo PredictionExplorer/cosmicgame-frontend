@@ -1,12 +1,11 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
+import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -22,21 +21,39 @@ interface AnchorDistribution extends RewardsByToken {
 }
 
 const AnchorDistributionsRow = ({ row, address }: { row: AnchorDistribution; address: string }) => {
+  const t = useTranslations('anchoring');
   const router = useRouter();
 
   if (!row) {
     return <TablePrimaryRow />;
   }
 
+  const distributionsHref = `/distributions-by-token/${address}/${row.TokenId}`;
+
   const handleRowClick = () => {
-    router.push(`/distributions-by-token/${address}/${row.TokenId}`);
+    router.push(distributionsHref);
   };
 
   return (
-    <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
-      <TablePrimaryCell align="center">{row.TokenId}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{(row.RewardCollectedEth ?? 0).toFixed(6)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{(row.RewardToCollectEth ?? 0).toFixed(6)}</TablePrimaryCell>
+    <TablePrimaryRow onActivate={handleRowClick}>
+      <TablePrimaryCell label={t('tables.tokenDistributions.columns.tokenId')} align="center">
+        <Link
+          href={distributionsHref}
+          className={TABLE_ROW_LINK_CLASS}
+          aria-label={t('distributionsByToken.title', { tokenId: row.TokenId })}
+        >
+          {row.TokenId}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.tokenDistributions.columns.retrievedEth')} align="center">
+        {(row.RewardCollectedEth ?? 0).toFixed(6)}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.tokenDistributions.columns.retrievableEth')}
+        align="center"
+      >
+        {(row.RewardToCollectEth ?? 0).toFixed(6)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -65,7 +82,7 @@ export const AnchorDistributionsTable = ({
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell>
                 {t('tables.tokenDistributions.columns.tokenId')}
               </TablePrimaryHeadCell>
@@ -75,14 +92,14 @@ export const AnchorDistributionsTable = ({
               <TablePrimaryHeadCell>
                 {t('tables.tokenDistributions.columns.retrievableEth')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <Tbody>
+          <TablePrimaryBody>
             {currentData.map((row) => (
               <AnchorDistributionsRow key={row.TokenId} row={row} address={address} />
             ))}
-          </Tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

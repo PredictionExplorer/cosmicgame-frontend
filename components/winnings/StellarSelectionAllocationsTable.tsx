@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Tr, Tbody } from 'react-super-responsive-table';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, formatSeconds, shortenHex } from '@/utils';
@@ -10,6 +8,7 @@ import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -28,6 +27,11 @@ export interface StellarSelectionAllocation {
   Amount: number;
   WinnerAddr: string;
   Claimed: boolean;
+}
+
+/** The indexer can omit an allocation amount; a missing one must not crash the row. */
+function formatAllocationEth(amount: number | undefined): string {
+  return typeof amount === 'number' && Number.isFinite(amount) ? amount.toFixed(7) : '—';
 }
 
 function ExpirationDateTime({
@@ -74,7 +78,7 @@ function StellarSelectionAllocationRow({
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('stellarSelectionAllocations.datetime')}>
         <a
           className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', TxHash)}
@@ -84,7 +88,7 @@ function StellarSelectionAllocationRow({
           <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('stellarSelectionAllocations.cycle')} align="center">
         <Link
           href={`/allocation/${RoundNum}`}
           className="text-inherit text-[inherit]"
@@ -94,21 +98,23 @@ function StellarSelectionAllocationRow({
           {RoundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('stellarSelectionAllocations.recipient')} align="center">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/user/${WinnerAddr}`} className="text-inherit text-[inherit]">
+            <Link href={`/user/${WinnerAddr}`} className="text-inherit text-[inherit] break-all">
               {shortenHex(WinnerAddr, 6)}
             </Link>
           </TooltipTrigger>
           <TooltipContent>{WinnerAddr}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('stellarSelectionAllocations.expirationDate')} align="center">
         <ExpirationDateTime timestamp={roundTimeout} nowSec={nowSec} empty=" " />
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{Amount.toFixed(7)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('stellarSelectionAllocations.amount')} align="center">
+        {formatAllocationEth(Amount)}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('stellarSelectionAllocations.retrieved')} align="center">
         {Claimed ? t('shared.yes') : t('shared.no')}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -116,7 +122,7 @@ function StellarSelectionAllocationRow({
 }
 
 /**
- * Chrome’s Skia PDF pipeline often drops `react-super-responsive-table` output even when the
+ * Chrome’s Skia PDF pipeline often drops the responsive table's output even when the
  * on-screen layout looks fine. Plain HTML + `hidden print:block` mirrors
  * {@link SpecialAllocationRecipients}’s print fallback.
  */
@@ -178,7 +184,7 @@ function StellarSelectionAllocationsPrintFallback({
                   <ExpirationDateTime timestamp={rt} nowSec={nowSec} empty="—" />
                 </td>
                 <td className="border border-foreground/15 p-2 text-center">
-                  {w.Amount.toFixed(7)}
+                  {formatAllocationEth(w.Amount)}
                 </td>
                 <td className="border border-foreground/15 p-2 text-center">
                   {w.Claimed ? t('shared.yes') : t('shared.no')}
@@ -229,7 +235,7 @@ export function StellarSelectionAllocationsTable({ list }: { list: StellarSelect
         <TablePrimaryContainer>
           <TablePrimary>
             <TablePrimaryHead>
-              <Tr>
+              <tr>
                 <TablePrimaryHeadCell align="left">
                   {t('stellarSelectionAllocations.datetime')}
                 </TablePrimaryHeadCell>
@@ -248,9 +254,9 @@ export function StellarSelectionAllocationsTable({ list }: { list: StellarSelect
                 <TablePrimaryHeadCell>
                   {t('stellarSelectionAllocations.retrieved')}
                 </TablePrimaryHeadCell>
-              </Tr>
+              </tr>
             </TablePrimaryHead>
-            <Tbody>
+            <TablePrimaryBody>
               {list.map((winning) => (
                 <StellarSelectionAllocationRow
                   key={winning.EvtLogId}
@@ -258,7 +264,7 @@ export function StellarSelectionAllocationsTable({ list }: { list: StellarSelect
                   roundTimeout={roundTimeouts[winning.RoundNum] ?? 0}
                 />
               ))}
-            </Tbody>
+            </TablePrimaryBody>
           </TablePrimary>
         </TablePrimaryContainer>
       </div>

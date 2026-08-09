@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl } from '@/utils';
 
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -20,6 +19,7 @@ import type { MarketingReward } from '@/services/api/types';
 export type { MarketingReward };
 
 const MarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
+  const t = useTranslations('tables');
   const locale = useLocale();
 
   if (!row) {
@@ -30,12 +30,12 @@ const MarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a className="text-inherit" href={transactionUrl} target="_blank" rel="noopener noreferrer">
           <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell>{row.AmountEth.toFixed(2)}</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.amountCst')}>{row.AmountEth.toFixed(2)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -56,16 +56,16 @@ const MarketingRewardsTable = ({ list }: { list: MarketingReward[] }) => {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('columns.amountCst')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {currentItems.map((row) => (
               <MarketingRewardsRow key={row.EvtLogId} row={row} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

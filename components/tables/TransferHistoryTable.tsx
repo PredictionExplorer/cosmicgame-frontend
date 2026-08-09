@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -10,6 +8,7 @@ import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -37,7 +36,7 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.dateTimeCompact')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
@@ -47,10 +46,10 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.from')}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/user/${FromAddr}`} className="text-inherit font-mono">
+            <Link href={`/user/${FromAddr}`} className="text-inherit font-mono break-all">
               {addrEq(FromAddr, stakingCst)
                 ? t('transferHistory.signatureAnchoringWallet')
                 : addrEq(FromAddr, stakingRwalk)
@@ -61,10 +60,10 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           <TooltipContent>{FromAddr}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.to')}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/user/${ToAddr}`} className="text-inherit font-mono">
+            <Link href={`/user/${ToAddr}`} className="text-inherit font-mono break-all">
               {addrEq(ToAddr, stakingCst)
                 ? t('transferHistory.signatureAnchoringWallet')
                 : addrEq(ToAddr, stakingRwalk)
@@ -89,19 +88,19 @@ export const TransferHistoryTable = ({ list }: { list: CSTTransferRecord[] }) =>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 {t('columns.dateTimeCompact')}
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('columns.from')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('columns.to')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice((page - 1) * perPage, page * perPage).map((record) => (
               <TransferHistoryRow record={record} key={record.EvtLogId} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

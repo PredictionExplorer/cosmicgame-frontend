@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -19,6 +18,8 @@ import type { UniqueAnchorHolderRWLK } from '@/services/api/types';
 export type { UniqueAnchorHolderRWLK };
 
 const UniqueAnchorHoldersRWLKRow = ({ row }: { row: UniqueAnchorHolderRWLK }) => {
+  const t = useTranslations('tables');
+
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -33,13 +34,21 @@ const UniqueAnchorHoldersRWLKRow = ({ row }: { row: UniqueAnchorHolderRWLK }) =>
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.holder')}>
         <AddressLink address={StakerAddr} url={`/user/${StakerAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{NumStakeActions}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{NumUnstakeActions}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{TotalTokensStaked}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{TotalTokensMinted}</TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.anchors')} align="center">
+        {NumStakeActions}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.releases')} align="center">
+        {NumUnstakeActions}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.anchored')} align="center">
+        {TotalTokensStaked}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.imprinted')} align="center">
+        {TotalTokensMinted}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -86,7 +95,7 @@ export const UniqueAnchorHoldersRWLKTable = ({ list }: { list: UniqueAnchorHolde
       <TablePrimaryContainer>
         <TablePrimary className="sm:min-w-[720px] xl:min-w-0">
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               {responsiveHeaders.map((header) => (
                 <TablePrimaryHeadCell key={header.desktop} align={header.align}>
                   <TableHeaderHelp
@@ -96,13 +105,13 @@ export const UniqueAnchorHoldersRWLKTable = ({ list }: { list: UniqueAnchorHolde
                   />
                 </TablePrimaryHeadCell>
               ))}
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <UniqueAnchorHoldersRWLKRow row={row} key={row.StakerAid} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

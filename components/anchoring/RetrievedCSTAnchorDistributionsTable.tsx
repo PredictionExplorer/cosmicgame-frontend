@@ -1,13 +1,11 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -18,6 +16,7 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import type { CSTAnchorDistribution } from '@/services/api';
 
 const CollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
+  const t = useTranslations('anchoring');
   const locale = useLocale();
 
   if (!row) return null;
@@ -32,21 +31,33 @@ const CollectedRewardsRow = ({ row }: { row: CSTAnchorDistribution }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.retrievedDistributions.columns.depositDatetime')}>
         <HydrationSafeDateTime timestamp={DepositTimeStamp} locale={locale} />
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.retrievedDistributions.columns.depositId')} align="center">
+        {DepositId}
+      </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.retrievedDistributions.columns.cycle')} align="center">
         <Link href={`/allocation/${RoundNum}`} className="text-inherit">
           {RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{(TotalDepositAmountEth ?? 0).toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.retrievedDistributions.columns.depositAmountEth')}
+        align="center"
+      >
+        {(TotalDepositAmountEth ?? 0).toFixed(6)}
+      </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{(YourCollectedAmountEth ?? 0).toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.retrievedDistributions.columns.retrievedAmountEth')}
+        align="center"
+      >
+        {(YourCollectedAmountEth ?? 0).toFixed(6)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -72,16 +83,8 @@ export const RetrievedCSTAnchorDistributionsTable = ({
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="20%" />
-            <col width="20%" />
-            <col width="20%" />
-            <col width="20%" />
-            <col width="20%" />
-          </colgroup>
-
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 {t('tables.retrievedDistributions.columns.depositDatetime')}
               </TablePrimaryHeadCell>
@@ -97,14 +100,14 @@ export const RetrievedCSTAnchorDistributionsTable = ({
               <TablePrimaryHeadCell>
                 {t('tables.retrievedDistributions.columns.retrievedAmountEth')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <Tbody>
+          <TablePrimaryBody>
             {currentData.map((row) => (
               <CollectedRewardsRow key={row.EvtLogId} row={row} />
             ))}
-          </Tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

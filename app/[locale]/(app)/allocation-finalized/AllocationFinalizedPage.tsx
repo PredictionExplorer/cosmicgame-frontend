@@ -21,8 +21,6 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { useRoundInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 /** Poll interval while waiting for the next round to become active (chain activation time). */
 const ACTIVATION_POLL_MS = 4000;
 

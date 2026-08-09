@@ -6,8 +6,6 @@ import type { CSTTokenInfo } from '@/services/api';
 
 import { render, screen } from '@/test-utils';
 
-jest.mock('react-super-responsive-table/dist/SuperResponsiveTableStyle.css', () => ({}));
-
 // eslint-disable-next-line import/order
 import { CSTTable } from '@/components/tokens/CSTTable';
 
@@ -124,8 +122,8 @@ describe('CSTTable', () => {
 
     render(<CSTTable list={mockData} />);
 
-    // react-super-responsive-table duplicates header text in tdBefore divs,
-    // so we use getAllByText and check at least one match exists
+    // The mobile card layout repeats the column name via CSS, not extra DOM,
+    // but a label string can still appear in more than one place.
     expect(screen.getAllByText('myPages.tokens.table.tokenId').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('myPages.tokens.table.tokenName').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('myPages.tokens.table.cycle').length).toBeGreaterThanOrEqual(1);

@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo, useRef, type MouseEvent } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl } from '@/utils';
 
@@ -10,6 +9,7 @@ import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -17,7 +17,6 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import type { CSTTokenInfo } from '@/services/api';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Spinner } from '@/components/ui/spinner';
@@ -39,6 +38,7 @@ interface CSTokenRowProps {
 
 const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTokenRowProps) => {
   const t = useTranslations('anchoring');
+  const tableT = useTranslations('tables');
   const locale = useLocale();
   const [processing, setProcessing] = useState(false);
   if (!row) return null;
@@ -64,11 +64,11 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
       onClick={handleRowClick}
       className={cn('cursor-pointer', isItemSelected && 'bg-white/5')}
     >
-      <TablePrimaryCell className="!px-3 !py-2">
+      <TablePrimaryCell className="!px-3 !py-2" label={tableT('columns.selected')}>
         <Checkbox checked={isItemSelected} readOnly className="h-4 w-4" />
       </TablePrimaryCell>
 
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.availableTokens.columns.imprintDatetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
@@ -79,7 +79,7 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.availableTokens.columns.tokenId')} align="center">
         <Link
           href={`/detail/${TokenId}`}
           className="text-inherit"
@@ -90,9 +90,11 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{TokenName || ' '}</TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.availableTokens.columns.tokenName')} align="center">
+        {TokenName || ' '}
+      </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.availableTokens.columns.cycle')} align="center">
         <Link
           href={`/allocation/${RoundNum}`}
           className="text-inherit"
@@ -103,11 +105,15 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell
+        label={t('tables.availableTokens.columns.recipientAddress')}
+        align="center"
+        priority="secondary"
+      >
         <AddressLink address={String(WinnerAddr ?? '')} url={`/user/${WinnerAddr ?? ''}`} />
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.availableTokens.aria.actions')} align="center">
         {!Staked && (
           <Button size="sm" disabled={processing} onClick={handleAnchorClick}>
             {processing ? (
@@ -207,18 +213,8 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="3%" />
-            <col width="25%" />
-            <col width="10%" />
-            <col width="15%" />
-            <col width="10%" />
-            <col width="25%" />
-            <col width="12%" />
-          </colgroup>
-
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left" className="!px-3 !py-2">
                 <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                   <DropdownMenuTrigger asChild>
@@ -262,16 +258,16 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
               <TablePrimaryHeadCell>
                 {t('tables.availableTokens.columns.cycle')}
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
+              <TablePrimaryHeadCell priority="secondary">
                 {t('tables.availableTokens.columns.recipientAddress')}
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
                 <span className="sr-only">{t('tables.availableTokens.aria.actions')}</span>
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <tbody>
+          <TablePrimaryBody>
             {pageItems.map((row) => (
               <CSTokenRow
                 key={row.EvtLogId}
@@ -281,7 +277,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
                 onStakeSingle={handleAnchorSingle}
               />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

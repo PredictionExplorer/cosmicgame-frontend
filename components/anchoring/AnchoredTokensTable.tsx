@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { getAssetsUrl, getThumbUrl, getRWLKImageUrl } from '@/utils';
 
@@ -9,13 +8,13 @@ import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import api from '@/services/api';
 import { reportError } from '@/utils/errors';
@@ -98,6 +97,7 @@ const AnchoredTokenRow = ({
   onReleaseSingle,
 }: AnchoredTokenRowProps) => {
   const t = useTranslations('anchoring');
+  const tableT = useTranslations('tables');
   const locale = useLocale();
   const [processing, setProcessing] = useState(false);
   const anchorActionId = isRandomWalk
@@ -142,16 +142,16 @@ const AnchoredTokenRow = ({
       className={cn('cursor-pointer', isItemSelected && 'bg-white/[0.08]')}
       onClick={() => onRowClick(anchorActionId)}
     >
-      <TablePrimaryCell className="p-2">
+      <TablePrimaryCell className="p-2" label={tableT('columns.selected')}>
         <Checkbox checked={isItemSelected} readOnly />
       </TablePrimaryCell>
 
-      <TablePrimaryCell className="w-[120px]">
+      <TablePrimaryCell label={t('tables.anchoredTokens.columns.image')}>
         <NFTImage src={tokenImageURL} fallbackSrc={tokenImageFallback} />
         <span className="text-xs mt-2 block">{tokenName}</span>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.anchoredTokens.columns.tokenId')} align="center">
         <a
           href={isRandomWalk ? `https://randomwalknft.com/detail/${tokenId}` : `/detail/${tokenId}`}
           className="text-inherit"
@@ -162,7 +162,7 @@ const AnchoredTokenRow = ({
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.anchoredTokens.columns.actionId')} align="center">
         <Link
           href={`/anchor-action/${isRandomWalk ? 1 : 0}/${anchorActionId}`}
           className="text-inherit"
@@ -173,15 +173,20 @@ const AnchoredTokenRow = ({
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.anchoredTokens.columns.datetime')} align="center">
         <HydrationSafeDateTime timestamp={anchorTimeStamp} locale={locale} />
       </TablePrimaryCell>
 
       {!isRandomWalk && (
-        <TablePrimaryCell align="center">{accumulatedRewards.toFixed(4)}</TablePrimaryCell>
+        <TablePrimaryCell
+          label={t('tables.anchoredTokens.columns.accumulatedDistributions')}
+          align="center"
+        >
+          {accumulatedRewards.toFixed(4)}
+        </TablePrimaryCell>
       )}
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('common.aria.actions')} align="center">
         <Button
           size="sm"
           variant="ghost"
@@ -330,18 +335,8 @@ export const AnchoredTokensTable = ({
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="5%" />
-            <col width="15%" />
-            <col width="20%" />
-            <col width="15%" />
-            <col width="15%" />
-            {!IsRwalk && <col width="15%" />}
-            <col width="15%" />
-          </colgroup>
-
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell className="p-2" align="left">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -368,7 +363,7 @@ export const AnchoredTokensTable = ({
                 </DropdownMenu>
               </TablePrimaryHeadCell>
 
-              <TablePrimaryHeadCell>
+              <TablePrimaryHeadCell className="w-[120px]">
                 {t('tables.anchoredTokens.columns.image')}
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
@@ -388,10 +383,10 @@ export const AnchoredTokensTable = ({
               <TablePrimaryHeadCell>
                 <span className="sr-only">{t('common.aria.actions')}</span>
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <Tbody>
+          <TablePrimaryBody>
             {sortedList.slice((page - 1) * perPage, page * perPage).map((row) => {
               const anchorActionId = IsRwalk
                 ? (row as RandomWalkRow).StakeActionId
@@ -415,7 +410,7 @@ export const AnchoredTokensTable = ({
                 />
               );
             })}
-          </Tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

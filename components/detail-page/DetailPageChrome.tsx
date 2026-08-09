@@ -29,7 +29,10 @@ export function SectionCard({
   return (
     <section className={cn(detailPanelClass, 'mb-8', className)} aria-labelledby={sectionId}>
       <div className="border-b border-white/[0.06] px-5 py-4">
-        <h2 id={sectionId} className="font-display text-lg font-semibold tracking-tight text-foreground">
+        <h2
+          id={sectionId}
+          className="font-display text-lg font-semibold tracking-tight text-foreground"
+        >
           {title}
         </h2>
         {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}

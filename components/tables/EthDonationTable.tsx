@@ -1,14 +1,14 @@
 import { useState, type FC } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl } from '@/utils';
 
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { Link, useRouter } from '@/i18n/navigation';
+import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -43,35 +43,51 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
     return <TablePrimaryRow />;
   }
 
+  // `clickable` is exactly "this record has a detail page": rows of type 0 are
+  // bare transfers with nothing to show, and pages that hide the type column
+  // only ever list records that do have one.
   const clickable = row.RecordType > 0 || !showType;
+  const detailHref = `/eth-contribution/detail/${row.CGRecordId}`;
 
   const handleRowClick = () => {
-    if (clickable) {
-      router.push(`/eth-contribution/detail/${row.CGRecordId}`);
-    }
+    router.push(detailHref);
   };
 
   return (
-    <TablePrimaryRow
-      className={clickable ? 'cursor-pointer' : undefined}
-      onClick={clickable ? handleRowClick : undefined}
-    >
-      <TablePrimaryCell>
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', row.TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
-        </a>
+    <TablePrimaryRow onActivate={clickable ? handleRowClick : undefined}>
+      <TablePrimaryCell label={t('columns.datetime')}>
+        {/*
+         * The datetime is the row's keyboard entry point, so it has to lead
+         * where a row click leads. Nesting it inside the explorer link instead
+         * would recreate the `nested-interactive` violation this replaced; the
+         * detail page carries the same explorer link on its own datetime, so
+         * the transaction stays one click away.
+         */}
+        {clickable ? (
+          <Link
+            href={detailHref}
+            className={TABLE_ROW_LINK_CLASS}
+            aria-label={t('ethContribution.viewContribution', { id: row.CGRecordId })}
+          >
+            <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
+          </Link>
+        ) : (
+          <a
+            className="text-inherit"
+            href={getExplorerUrl('tx', row.TxHash)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
+          </a>
+        )}
       </TablePrimaryCell>
       {showType && (
-        <TablePrimaryCell align="center">
+        <TablePrimaryCell label={t('columns.type')} align="center">
           {row.RecordType ? t('ethContribution.withInfo') : t('ethContribution.simple')}
         </TablePrimaryCell>
       )}
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.round')} align="center">
         <Link
           className="text-inherit"
           href={`/allocation/${row.RoundNum}`}
@@ -81,10 +97,12 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
           {row.RoundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.contributor')} align="center">
         <AddressLink address={row.DonorAddr} url={`/user/${row.DonorAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{row.AmountEth.toFixed(2)}</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.amountEth')} align="right">
+        {row.AmountEth.toFixed(2)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -111,27 +129,20 @@ const EthDonationTable: FC<EthDonationTableProps> = ({ list, showType = true }) 
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="20%" />
-            {showType && <col width="20%" />}
-            <col width="20%" />
-            <col width="20%" />
-            <col width="20%" />
-          </colgroup>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               {showType && <TablePrimaryHeadCell>{t('columns.type')}</TablePrimaryHeadCell>}
               <TablePrimaryHeadCell>{t('columns.round')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.contributor')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">{t('columns.amountEth')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {visibleRows.map((row) => (
               <EthDonationRow key={row.EvtLogId} row={row} showType={showType} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

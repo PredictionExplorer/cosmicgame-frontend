@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -19,17 +18,27 @@ import type { UniqueEthDonor } from '@/services/api/types';
 export type { UniqueEthDonor };
 
 const UniqueEthDonorsRow = ({ row }: { row: UniqueEthDonor }) => {
+  const t = useTranslations('tables');
+
   if (!row) {
     return <TablePrimaryRow />;
   }
 
+  const totalDonated = row.TotalDonatedEth;
+
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.contributorAddress')}>
         <AddressLink address={row.DonorAddr} url={`/user/${row.DonorAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.CountDonations}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{row.TotalDonatedEth.toFixed(2)}</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.numberOfContributions')} align="center">
+        {row.CountDonations}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.totalContributedEth')} align="right">
+        {typeof totalDonated === 'number' && Number.isFinite(totalDonated)
+          ? totalDonated.toFixed(2)
+          : '—'}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -48,7 +57,7 @@ export const UniqueEthDonorsTable = ({ list }: { list: UniqueEthDonor[] }) => {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('columns.contributorAddress')}
@@ -67,13 +76,13 @@ export const UniqueEthDonorsTable = ({ list }: { list: UniqueEthDonor[] }) => {
                   tooltip={t('statisticsTooltips.totalContributedEth')}
                 />
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice((page - 1) * perPage, page * perPage).map((donor) => (
               <UniqueEthDonorsRow row={donor} key={donor.DonorAid} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

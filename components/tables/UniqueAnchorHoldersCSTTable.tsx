@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatTableAmount, shortenHex } from '@/utils';
 
@@ -9,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -28,6 +27,8 @@ const UniqueAnchorHoldersCSTRow = ({
   row: UniqueAnchorHolderCST;
   locale: string;
 }) => {
+  const t = useTranslations('tables');
+
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -44,22 +45,32 @@ const UniqueAnchorHoldersCSTRow = ({
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.holder')}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/user/${StakerAddr}`} className="text-inherit font-mono">
+            <Link href={`/user/${StakerAddr}`} className="text-inherit font-mono break-all">
               {shortenHex(StakerAddr, 6)}
             </Link>
           </TooltipTrigger>
           <TooltipContent>{StakerAddr}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{NumStakeActions}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{NumUnstakeActions}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{TotalTokensMinted}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{TotalTokensStaked}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{formatTableAmount(TotalRewardEth, locale)}</TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('uniqueAnchorHolders.anchors')} align="center">
+        {NumStakeActions}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.releases')} align="center">
+        {NumUnstakeActions}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.imprinted')} align="center">
+        {TotalTokensMinted}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.anchored')} align="center">
+        {TotalTokensStaked}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.distributed')} align="right">
+        {formatTableAmount(TotalRewardEth, locale)}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('uniqueAnchorHolders.unretrieved')} align="right">
         {formatTableAmount(UnclaimedRewardEth, locale)}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -121,7 +132,7 @@ export const UniqueAnchorHoldersCSTTable = ({ list }: { list: UniqueAnchorHolder
       <TablePrimaryContainer>
         <TablePrimary className="sm:min-w-[860px] xl:min-w-0">
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               {responsiveHeaders.map((header) => (
                 <TablePrimaryHeadCell key={header.desktop} align={header.align}>
                   <TableHeaderHelp
@@ -131,13 +142,13 @@ export const UniqueAnchorHoldersCSTTable = ({ list }: { list: UniqueAnchorHolder
                   />
                 </TablePrimaryHeadCell>
               ))}
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <UniqueAnchorHoldersCSTRow row={row} locale={locale} key={row.StakerAid} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

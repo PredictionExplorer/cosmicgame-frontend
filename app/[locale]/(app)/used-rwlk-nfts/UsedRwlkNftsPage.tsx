@@ -1,9 +1,6 @@
 'use client';
 
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl } from '@/utils';
@@ -15,6 +12,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -34,6 +32,7 @@ interface UsedRwlkNftRecord {
 }
 
 const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
+  const t = useTranslations('tables');
   const locale = useLocale();
   if (!nft) {
     return <TablePrimaryRow />;
@@ -41,7 +40,7 @@ const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.dateTimeCompact')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', nft.TxHash)}
@@ -52,19 +51,21 @@ const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
-        <Link href={`/user/${nft.BidderAddr}`} className="font-mono text-inherit">
+      <TablePrimaryCell label={t('columns.participantAddress')} align="center">
+        <Link href={`/user/${nft.BidderAddr}`} className="font-mono break-all text-inherit">
           {nft.BidderAddr}
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.cycle')} align="center">
         <Link href={`/allocation/${nft.RoundNum}`} className="text-inherit">
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{nft.RWalkTokenId}</TablePrimaryCell>
+      <TablePrimaryCell label={t('statisticsColumns.namedNftTokenId')} align="center">
+        {nft.RWalkTokenId}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -75,18 +76,18 @@ const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
     <TablePrimaryContainer>
       <TablePrimary>
         <TablePrimaryHead>
-          <Tr>
+          <tr>
             <TablePrimaryHeadCell align="left">{t('columns.dateTimeCompact')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>{t('columns.participantAddress')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>{t('statisticsColumns.namedNftTokenId')}</TablePrimaryHeadCell>
-          </Tr>
+          </tr>
         </TablePrimaryHead>
-        <tbody>
+        <TablePrimaryBody>
           {list.map((nft, i: number) => (
             <UsedRwlkNftRow key={i} nft={nft} />
           ))}
-        </tbody>
+        </TablePrimaryBody>
       </TablePrimary>
     </TablePrimaryContainer>
   );

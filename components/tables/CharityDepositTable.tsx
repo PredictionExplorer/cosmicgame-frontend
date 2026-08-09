@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl } from '@/utils';
 
@@ -9,6 +7,7 @@ import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime
 import { Link } from '@/i18n/navigation';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -36,6 +35,7 @@ interface CharityDepositTableProps {
 }
 
 const ContributionRow = ({ entry }: ContributionRowProps) => {
+  const t = useTranslations('tables');
   const locale = useLocale();
   if (!entry) {
     return <TablePrimaryRow />;
@@ -43,7 +43,7 @@ const ContributionRow = ({ entry }: ContributionRowProps) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', entry.TxHash)}
@@ -53,7 +53,7 @@ const ContributionRow = ({ entry }: ContributionRowProps) => {
           <HydrationSafeDateTime timestamp={entry.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.cycleNumber')} align="center">
         {entry.RoundNum < 0 ? (
           ' '
         ) : (
@@ -67,10 +67,12 @@ const ContributionRow = ({ entry }: ContributionRowProps) => {
           </Link>
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.contributorAddress')} align="center">
         <AddressLink address={entry.DonorAddr} url={`/user/${entry.DonorAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{entry.AmountEth.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.contributionAmountEth')} align="right">
+        {entry.AmountEth.toFixed(6)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -91,20 +93,20 @@ export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.cycleNumber')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.contributorAddress')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 {t('columns.contributionAmountEth')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {currentData.map((entry) => (
               <ContributionRow entry={entry} key={entry.EvtLogId} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

@@ -3,14 +3,22 @@
 import * as React from 'react';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Table, Thead, Tr, Th, Td } from 'react-super-responsive-table';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { cn } from '@/lib/utils';
+import { Link } from '@/i18n/navigation';
+import {
+  TablePrimary,
+  TablePrimaryBody,
+  TablePrimaryCell,
+  TablePrimaryHead,
+  TablePrimaryHeadCell,
+  TablePrimaryRow,
+} from '@/components/styled';
 import { Surface } from '@/components/ui/surface';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
 import { SkeletonTableRow } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -19,8 +27,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
  *
  * Replaces hand-rolled tables that reimplement the same sort / density /
  * empty state / loading skeleton every time. Pass a `columns` schema and
- * `data`; the table handles sorting, row hover, density toggle, and
- * responsive mobile pivoting via react-super-responsive-table.
+ * `data`; the table handles sorting, row hover, density toggle, and the
+ * mobile card layout provided by `components/ui/responsive-table`.
  *
  * Not a drop-in for every existing table — complex tables (nested rows,
  * multi-level headers, ad-hoc cell rendering) keep their current shape.
@@ -34,6 +42,11 @@ export interface DataTableColumn<T> {
   id: string;
   /** Column header label. */
   header: React.ReactNode;
+  /**
+   * Plain-text column name shown beside each value in the mobile card layout.
+   * Only needed when `header` is a ReactNode; a string `header` is used as-is.
+   */
+  label?: string;
   /** Accessor for sortable/searchable value. Use `render` for display. */
   accessor?: (row: T) => string | number | null | undefined;
   /** Custom cell renderer. Falls back to `accessor`. */
@@ -42,7 +55,7 @@ export interface DataTableColumn<T> {
   align?: 'left' | 'center' | 'right';
   /** CSS width (e.g. `'120px'`, `'10%'`). */
   width?: string;
-  /** Hide below `sm` breakpoint. */
+  /** Drop the column from the mobile card layout. */
   hideOnMobile?: boolean;
   /** Help-text tooltip rendered next to the header label. */
   tooltip?: string;
@@ -59,8 +72,25 @@ interface DataTableProps<T> {
   columns: DataTableColumn<T>[];
   /** Stable key per row. Defaults to array index (not ideal — pass a key). */
   getRowKey?: (row: T, index: number) => string | number;
-  /** Callback when a row is clicked. */
+  /**
+   * Pointer-only convenience: fires when anywhere in the row is clicked,
+   * except on a nested link or button. The row carries no interactive role,
+   * so whenever this navigates, pass `getRowHref` too — otherwise keyboard
+   * and screen-reader users have no way to reach the destination.
+   */
   onRowClick?: (row: T, index: number) => void;
+  /**
+   * Destination the row leads to. Wraps the FIRST column's content in a real
+   * link, which is what gives keyboard and assistive-tech users the same
+   * destination `onRowClick` gives pointer users (and supports open-in-new-tab).
+   */
+  getRowHref?: (row: T, index: number) => string;
+  /**
+   * Accessible name for the `getRowHref` link. Worth setting when the first
+   * cell alone is ambiguous out of context (a bare date, an index); without it
+   * the link is named by the cell's own content.
+   */
+  getRowLabel?: (row: T, index: number) => string;
   loading?: boolean;
   error?: string | null;
   onRetry?: () => void;
@@ -85,6 +115,8 @@ export function DataTable<T>({
   columns,
   getRowKey,
   onRowClick,
+  getRowHref,
+  getRowLabel,
   loading = false,
   error = null,
   onRetry,
@@ -142,17 +174,19 @@ export function DataTable<T>({
         />
       ) : (
         <div className="overflow-x-auto">
-          <Table className="w-full min-w-[960px] border-collapse" aria-label={ariaLabel}>
-            <Thead className="bg-white/[0.04] sticky top-0 z-[1]">
-              <Tr>
+          <TablePrimary aria-label={ariaLabel}>
+            <TablePrimaryHead>
+              <tr>
                 {columns.map((col) => {
                   const isSorted = sort?.id === col.id;
                   const direction = isSorted ? sort.direction : null;
                   const Icon =
                     direction === 'asc' ? ArrowUp : direction === 'desc' ? ArrowDown : ArrowUpDown;
                   return (
-                    <Th
+                    <TablePrimaryHeadCell
                       key={col.id}
+                      align={col.align}
+                      priority={col.hideOnMobile ? 'secondary' : 'primary'}
                       style={col.width ? { width: col.width } : undefined}
                       aria-sort={
                         !col.sortable
@@ -163,13 +197,7 @@ export function DataTable<T>({
                               ? 'descending'
                               : 'none'
                       }
-                      className={cn(
-                        'border-b border-white/[0.06] px-4 py-3 type-eyebrow text-muted-foreground font-medium',
-                        col.hideOnMobile && 'max-sm:hidden',
-                        col.align === 'center' && 'text-center',
-                        col.align === 'right' && 'text-right',
-                        col.headerClassName,
-                      )}
+                      className={col.headerClassName}
                     >
                       {col.sortable ? (
                         <span className="inline-flex items-center gap-1">
@@ -197,61 +225,51 @@ export function DataTable<T>({
                           ) : null}
                         </span>
                       )}
-                    </Th>
+                    </TablePrimaryHeadCell>
                   );
                 })}
-              </Tr>
-            </Thead>
-            <tbody>
+              </tr>
+            </TablePrimaryHead>
+            <TablePrimaryBody>
               {sortedData.map((row, rowIdx) => {
                 const key = getRowKey ? getRowKey(row, rowIdx) : rowIdx;
                 const handleClick = onRowClick ? () => onRowClick(row, rowIdx) : undefined;
-                const handleKeyDown = handleClick
-                  ? (e: React.KeyboardEvent<HTMLTableRowElement>) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleClick();
-                      }
-                    }
-                  : undefined;
+                const rowHref = getRowHref?.(row, rowIdx);
                 return (
-                  <Tr
-                    key={key}
-                    tabIndex={handleClick ? 0 : undefined}
-                    role={handleClick ? 'button' : undefined}
-                    onClick={handleClick}
-                    onKeyDown={handleKeyDown}
-                    className={cn(
-                      'border-0 border-b border-white/[0.03] transition-colors',
-                      'duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
-                      handleClick && 'cursor-pointer hover:bg-white/[0.04]',
-                    )}
-                  >
-                    {columns.map((col) => (
-                      <Td
-                        key={col.id}
-                        className={cn(
-                          'px-4 text-muted-foreground leading-[1.43]',
-                          rowPadding,
-                          cellText,
-                          col.hideOnMobile && 'max-sm:hidden',
-                          col.align === 'center' && 'text-center',
-                          col.align === 'right' && 'text-right',
-                          col.cellClassName,
-                        )}
-                      >
-                        {col.render
-                          ? col.render(row, rowIdx)
-                          : col.accessor
-                            ? String(col.accessor(row) ?? '')
-                            : null}
-                      </Td>
-                    ))}
-                  </Tr>
+                  <TablePrimaryRow key={key} onActivate={handleClick}>
+                    {columns.map((col, colIdx) => {
+                      const content = col.render
+                        ? col.render(row, rowIdx)
+                        : col.accessor
+                          ? String(col.accessor(row) ?? '')
+                          : null;
+                      return (
+                        <TablePrimaryCell
+                          key={col.id}
+                          label={columnLabel(col)}
+                          align={col.align}
+                          priority={col.hideOnMobile ? 'secondary' : 'primary'}
+                          className={cn(rowPadding, cellText, col.cellClassName)}
+                        >
+                          {colIdx === 0 && rowHref ? (
+                            <Link
+                              href={rowHref}
+                              className={TABLE_ROW_LINK_CLASS}
+                              aria-label={getRowLabel?.(row, rowIdx)}
+                            >
+                              {content}
+                            </Link>
+                          ) : (
+                            content
+                          )}
+                        </TablePrimaryCell>
+                      );
+                    })}
+                  </TablePrimaryRow>
                 );
               })}
-            </tbody>
-          </Table>
+            </TablePrimaryBody>
+          </TablePrimary>
         </div>
       )}
     </Surface>
@@ -358,6 +376,16 @@ function useDensityState(storageKey: string | null): [Density, (d: Density) => v
   );
 
   return [density, setDensity];
+}
+
+/**
+ * Text the mobile card layout shows beside a cell's value. A ReactNode header
+ * cannot be reused verbatim, so such columns should set `label`; the id is only
+ * a last resort so a card never renders an unlabelled row.
+ */
+function columnLabel<T>(col: DataTableColumn<T>): string {
+  if (col.label) return col.label;
+  return typeof col.header === 'string' ? col.header : col.id;
 }
 
 function compareValues(a: unknown, b: unknown): number {

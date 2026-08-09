@@ -12,8 +12,11 @@ import { AmbientBackdrop, type AmbientBackdropProps } from '@/components/ui/ambi
  * and provides the `#main` skip-link target.
  */
 
+// `overflow-x-clip` contains the decorative backdrops without creating a
+// scroll container, so content that overflows vertically is still reachable
+// and horizontal bleed is cut rather than silently hidden in both axes.
 const shellVariants = cva(
-  'relative z-[1] mx-auto w-full overflow-hidden print:overflow-visible leading-normal min-h-[calc(100vh-100px)]',
+  'relative z-[1] mx-auto w-full overflow-x-clip print:overflow-visible leading-normal min-h-[calc(100vh-100px)]',
   {
     variants: {
       variant: {

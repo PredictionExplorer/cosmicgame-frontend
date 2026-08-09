@@ -1,16 +1,14 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useState, type FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { shortenHex } from '@/utils';
 
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { Link } from '@/i18n/navigation';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
+import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -45,21 +43,35 @@ const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }
     return <TablePrimaryRow />;
   }
 
+  const actionHref = `/anchor-action/${IsRWLK ? 1 : 0}/${row.ActionId}`;
+
   const handleRowClick = () => {
-    router.push(`/anchor-action/${IsRWLK ? 1 : 0}/${row.ActionId}`);
+    router.push(actionHref);
   };
 
   return (
-    <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
-      <TablePrimaryCell>
-        <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
+    <TablePrimaryRow onActivate={handleRowClick}>
+      <TablePrimaryCell label={t('tables.globalAnchorActions.headers.anchorDatetime.mobile')}>
+        <Link
+          href={actionHref}
+          className={TABLE_ROW_LINK_CLASS}
+          aria-label={t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
+        >
+          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
+        </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell
+        label={t('tables.globalAnchorActions.headers.actionType.mobile')}
+        align="center"
+      >
         {row.ActionType === 0 ? t('common.anchor') : t('common.release')}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell
+        label={t('tables.globalAnchorActions.headers.tokenId.mobile')}
+        align="center"
+      >
         {IsRWLK ? (
           <a href={`https://randomwalknft.com/detail/${row.TokenId}`} className="text-inherit">
             {row.TokenId}
@@ -71,7 +83,10 @@ const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }
         )}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell
+        label={t('tables.globalAnchorActions.headers.holderAddress.mobile')}
+        align="center"
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
@@ -87,7 +102,12 @@ const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.globalAnchorActions.headers.nftCount.mobile')}
+        align="center"
+      >
+        {row.NumStakedNFTs}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -142,16 +162,8 @@ export const GlobalAnchorActionsTable: FC<GlobalAnchorActionsTableProps> = ({ li
     <>
       <TablePrimaryContainer>
         <TablePrimary className="sm:min-w-[720px] lg:min-w-0">
-          <colgroup>
-            <col width="25%" />
-            <col width="15%" />
-            <col width="15%" />
-            <col width="25%" />
-            <col width="15%" />
-          </colgroup>
-
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               {responsiveHeaders.map((header) => (
                 <TablePrimaryHeadCell key={header.desktop} align={header.align}>
                   <TableHeaderHelp
@@ -161,14 +173,14 @@ export const GlobalAnchorActionsTable: FC<GlobalAnchorActionsTableProps> = ({ li
                   />
                 </TablePrimaryHeadCell>
               ))}
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <Tbody>
+          <TablePrimaryBody>
             {visibleRows.map((row) => (
               <GlobalAnchorActionsRow key={row.EvtLogId} row={row} IsRWLK={IsRWLK} />
             ))}
-          </Tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

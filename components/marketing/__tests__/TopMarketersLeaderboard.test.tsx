@@ -5,7 +5,6 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import { TopMarketersLeaderboard } from '../TopMarketersLeaderboard';
 
-
 const renderWithTooltip = (ui: React.ReactElement) =>
   render(<TooltipProvider>{ui}</TooltipProvider>);
 

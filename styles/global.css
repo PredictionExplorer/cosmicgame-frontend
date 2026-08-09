@@ -37,6 +37,14 @@
   --font-family-display:
     var(--font-clash-display), 'ClashDisplay-Variable', var(--font-noto-sc), 'PingFang SC',
     'Microsoft YaHei', sans-serif;
+
+  /*
+   * Tailwind v4 only generates `xs:` / `max-xs:` variants for a breakpoint it
+   * knows about. Several components already used `max-xs:` to go full width on
+   * small phones; without this the rules were never emitted and a 360px-wide
+   * search field overflowed a 320px viewport.
+   */
+  --breakpoint-xs: 30rem;
 }
 
 :root {
@@ -161,43 +169,98 @@
   display: none;
 }
 
-@media screen and (max-width: 40em) {
-  .responsiveTable tbody tr {
-    border: 1px solid rgba(255, 255, 255, 0.06) !important;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    padding: 0 !important;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.02);
+/*
+ * Horizontal pill scrollers (FAQ categories, statistics sub-nav) rely on this
+ * to hide the scrollbar. It was referenced but never defined, so those rows
+ * showed a scrollbar on every touch device.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
-  .responsiveTable td.pivoted {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: clamp(6.25rem, 32vw, 7.5rem) !important;
-    padding-right: 10px !important;
-    font-weight: 400;
-    font-size: 13px;
-    width: 100%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/*
+ * Mobile card layout for `.cs-table` (see components/ui/responsive-table.tsx).
+ *
+ * Each cell becomes a label/value grid row. The label comes from the cell's own
+ * `data-label`, so it cannot drift from the column it belongs to, and no extra
+ * DOM node is needed. `minmax(0, 1fr)` on the value column is what lets long
+ * addresses and messages wrap instead of pushing the card wider than the screen.
+ */
+@media screen and (max-width: 39.99em) {
+  .cs-table,
+  .cs-table thead,
+  .cs-table tbody,
+  .cs-table tr,
+  .cs-table td {
+    display: block;
+  }
+
+  /* Headers stay in the accessibility tree; each cell repeats them visually. */
+  .cs-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .cs-table tbody tr {
+    margin-bottom: 0.75rem;
+    border: 1px solid rgb(255 255 255 / 0.08);
+    border-radius: 0.75rem;
+    background: rgb(255 255 255 / 0.02);
+    overflow: hidden;
+  }
+
+  .cs-table tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .cs-table tbody td {
+    display: grid;
+    grid-template-columns: minmax(4.5rem, 34%) minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid rgb(255 255 255 / 0.04);
+    /* Long hashes and addresses must break rather than widen the card. */
     overflow-wrap: anywhere;
     word-break: break-word;
+    /* Safety net: a stray `whitespace-nowrap` utility must not reintroduce
+       horizontal overflow in a card. */
+    white-space: normal;
   }
-  .responsiveTable td .tdBefore {
-    top: 0;
-    left: 0 !important;
-    bottom: 0;
-    width: clamp(5.5rem, 30vw, 6.75rem) !important;
-    background-color: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.5);
-    font-weight: 500 !important;
-    font-size: 10px;
-    line-height: 1.25;
-    text-transform: uppercase;
+
+  .cs-table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .cs-table tbody td::before {
+    content: attr(data-label);
+    color: rgb(255 255 255 / 0.5);
+    font-size: 0.625rem;
+    font-weight: 500;
+    line-height: 1.6;
     letter-spacing: 0.05em;
-    padding: 10px 8px;
-    display: flex;
-    align-items: flex-start;
+    text-align: left;
+    text-transform: uppercase;
     overflow-wrap: anywhere;
+  }
+
+  /* A labelled blank row is noise; drop cells with nothing to show. */
+  .cs-table td[data-empty='true'] {
+    display: none;
+  }
+
+  /* Columns explicitly marked redundant on a phone. */
+  .cs-table td[data-priority='secondary'],
+  .cs-table th[data-priority='secondary'] {
+    display: none;
   }
 }
 
@@ -504,53 +567,57 @@
   }
 
   /*
-   * react-super-responsive-table: `@media screen and (max-width: 40em)` can still match
-   * Chrome’s print/PDF layout pass when the page width is narrow, which turns thead into
-   * `position: absolute; top: -9999px` and breaks table geometry — tables often render empty.
-   * Force normal table layout and readable ink on paper/PDF.
+   * Chrome's print/PDF pass can match the narrow media query and collapse the
+   * card layout into an unreadable single column. Force real table geometry
+   * and drop the repeated per-cell labels on paper.
    */
-  .responsiveTable {
+  .cs-table {
     display: table !important;
     width: 100% !important;
     border-collapse: collapse !important;
   }
 
-  .responsiveTable thead {
+  .cs-table thead {
+    position: static !important;
     display: table-header-group !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    clip-path: none !important;
   }
 
-  .responsiveTable tbody {
+  .cs-table tbody {
     display: table-row-group !important;
   }
 
-  .responsiveTable thead tr,
-  .responsiveTable tbody tr {
+  .cs-table thead tr,
+  .cs-table tbody tr {
     display: table-row !important;
-    position: static !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
   }
 
-  .responsiveTable th,
-  .responsiveTable td {
+  .cs-table th,
+  .cs-table td {
     display: table-cell !important;
-    position: static !important;
+    padding: 0.5rem 0.75rem !important;
     color: hsl(var(--foreground)) !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  .responsiveTable td.pivoted {
-    padding-left: 1rem !important;
-    text-align: inherit !important;
+  .cs-table td::before {
+    content: none !important;
   }
 
-  .responsiveTable td .tdBefore {
-    display: none !important;
+  /* Nothing is hidden on paper — width is no longer a constraint. */
+  .cs-table td[data-empty='true'],
+  .cs-table td[data-priority='secondary'],
+  .cs-table th[data-priority='secondary'] {
+    display: table-cell !important;
   }
 
-  .responsiveTable a {
+  .cs-table a {
     color: hsl(var(--foreground)) !important;
     text-decoration: underline !important;
   }

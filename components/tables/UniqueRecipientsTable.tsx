@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatTableAmount } from '@/utils';
 
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -26,20 +25,24 @@ interface UniqueRecipientsRowProps {
 }
 
 const UniqueRecipientsRow = ({ recipient, locale }: UniqueRecipientsRowProps) => {
+  const t = useTranslations('tables');
+
   if (!recipient) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.recipientAddress')}>
         <AddressLink address={recipient.WinnerAddr} url={`/user/${recipient.WinnerAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{recipient.AllocationsCount}</TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('columns.allocationsReceived')} align="right">
+        {recipient.AllocationsCount}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.maxAllocationEth')} align="right">
         {formatTableAmount(recipient.MaxWinAmountEth, locale)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('columns.allocationsSumEth')} align="right">
         {formatTableAmount(recipient.PrizesSum, locale)}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -65,7 +68,7 @@ export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('columns.recipientAddress')}
@@ -90,9 +93,9 @@ export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
                   tooltip={t('statisticsTooltips.allocationsSumEth')}
                 />
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice((page - 1) * perPage, page * perPage).map((recipient) => (
               <UniqueRecipientsRow
                 recipient={recipient}
@@ -100,7 +103,7 @@ export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
                 key={recipient.WinnerAid}
               />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

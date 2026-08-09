@@ -1,8 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Trophy, Ticket, Heart, Layers, Coins, AlertTriangle } from 'lucide-react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -13,6 +11,7 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import {
   TablePrimaryContainer,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
@@ -129,10 +128,11 @@ const WinningHistoryRow = ({
 
   return (
     <TablePrimaryRow className={cn(!history.Claimed && showClaimedStatus && 'bg-white/[0.06]')}>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.recordType')}>
         <div className="flex items-center">
           {recordType.icon}&nbsp;
-          <span>{recordType.textKey ? t(recordType.textKey) : ' '}</span>&nbsp;
+          <span className="break-words">{recordType.textKey ? t(recordType.textKey) : ' '}</span>
+          &nbsp;
           {!history.Claimed && showClaimedStatus && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -148,7 +148,7 @@ const WinningHistoryRow = ({
           )}
         </div>
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a
           href={getExplorerUrl('tx', history.TxHash)}
           target="_blank"
@@ -159,7 +159,7 @@ const WinningHistoryRow = ({
         </a>
       </TablePrimaryCell>
       {showWinnerAddr && (
-        <TablePrimaryCell align="center">
+        <TablePrimaryCell label={t('columns.recipient')} align="center">
           {history.WinnerAddr ? (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -167,7 +167,7 @@ const WinningHistoryRow = ({
                   href={`/user/${history.WinnerAddr}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono text-inherit"
+                  className="font-mono text-inherit break-all"
                 >
                   {shortenHex(history.WinnerAddr, 6)}
                 </Link>
@@ -180,7 +180,7 @@ const WinningHistoryRow = ({
         </TablePrimaryCell>
       )}
       {showRoundColumn && (
-        <TablePrimaryCell align="center">
+        <TablePrimaryCell label={t('columns.cycle')} align="center">
           <Link
             href={`/allocation/${history.RoundNum}`}
             target="_blank"
@@ -191,14 +191,14 @@ const WinningHistoryRow = ({
           </Link>
         </TablePrimaryCell>
       )}
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('columns.amount')} align="right">
         {formatAllocationAmount(
           history.RecordType,
           history.AmountEth,
           t('recipientHistory.notApplicable'),
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.tokenAddress')} align="center">
         {history.RecordType === 1 ? (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -206,7 +206,7 @@ const WinningHistoryRow = ({
                 href={getExplorerUrl('address', cosmicToken)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-inherit"
+                className="text-inherit break-all"
               >
                 {shortenHex(cosmicToken, 6)}
               </a>
@@ -220,7 +220,7 @@ const WinningHistoryRow = ({
                 href={getExplorerUrl('address', history.TokenAddress)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-inherit"
+                className="text-inherit break-all"
               >
                 {shortenHex(history.TokenAddress, 6)}
               </a>
@@ -231,7 +231,7 @@ const WinningHistoryRow = ({
           ' '
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.tokenId')} align="center">
         {(history.TokenId ?? -1) >= 0 ? (
           <Link
             href={`/detail/${history.TokenId}`}
@@ -245,7 +245,8 @@ const WinningHistoryRow = ({
           ' '
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      {/* An ordering index within the cycle; the card layout drops it to stay scannable. */}
+      <TablePrimaryCell label={t('columns.position')} align="right" priority="secondary">
         {(history.WinnerIndex ?? -1) >= 0 ? history.WinnerIndex : ' '}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -272,18 +273,8 @@ function WinningHistorySubTable({
   return (
     <TablePrimaryContainer>
       <TablePrimary>
-        <colgroup>
-          <col width="20%" />
-          <col width="14%" />
-          {showWinnerAddr && <col width="17%" />}
-          {showRoundColumn && <col width="7%" />}
-          <col width="11%" />
-          <col width="17%" />
-          <col width="8%" />
-          <col width="7%" />
-        </colgroup>
         <TablePrimaryHead>
-          <Tr>
+          <tr>
             <TablePrimaryHeadCell align="left">{t('columns.recordType')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
             {showWinnerAddr && (
@@ -293,10 +284,12 @@ function WinningHistorySubTable({
             <TablePrimaryHeadCell align="right">{t('columns.amount')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>{t('columns.tokenAddress')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>{t('columns.tokenId')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">{t('columns.position')}</TablePrimaryHeadCell>
-          </Tr>
+            <TablePrimaryHeadCell align="right" priority="secondary">
+              {t('columns.position')}
+            </TablePrimaryHeadCell>
+          </tr>
         </TablePrimaryHead>
-        <tbody>
+        <TablePrimaryBody>
           {winningHistory
             .slice((curPage - 1) * perPage, curPage * perPage)
             .map((history, index) => (
@@ -308,7 +301,7 @@ function WinningHistorySubTable({
                 showRoundColumn={showRoundColumn}
               />
             ))}
-        </tbody>
+        </TablePrimaryBody>
       </TablePrimary>
     </TablePrimaryContainer>
   );

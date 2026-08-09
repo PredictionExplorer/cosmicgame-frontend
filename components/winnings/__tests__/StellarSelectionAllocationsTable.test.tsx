@@ -11,6 +11,7 @@ jest.mock('../../styled', () => ({
   ),
   TablePrimaryContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   TablePrimaryHead: ({ children }: { children: React.ReactNode }) => <thead>{children}</thead>,
+  TablePrimaryBody: ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>,
   TablePrimaryHeadCell: ({ children }: { children: React.ReactNode; align?: string }) => (
     <th>{children}</th>
   ),
@@ -28,13 +29,6 @@ jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
     },
   }),
 }));
-
-jest.mock('react-super-responsive-table', () => ({
-  Tr: ({ children }: { children: React.ReactNode }) => <tr>{children}</tr>,
-  Tbody: ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>,
-}));
-
-jest.mock('react-super-responsive-table/dist/SuperResponsiveTableStyle.css', () => ({}));
 
 jest.mock('next/link', () => ({
   __esModule: true,

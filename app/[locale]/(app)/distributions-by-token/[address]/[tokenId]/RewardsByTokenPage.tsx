@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tr, Tbody } from 'react-super-responsive-table';
 
 import { getExplorerUrl } from '@/utils';
 
@@ -21,13 +20,13 @@ import { Button } from '@/components/ui/button';
 import { useAnchorDistributionsByUserByTokenDetails } from '@/hooks/useApiQuery';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { cn } from '@/lib/utils';
 
@@ -69,7 +68,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
   return (
     <>
       <TablePrimaryRow className="border-b-0">
-        <TablePrimaryCell>
+        <TablePrimaryCell label={t('distributionsByToken.columns.details')}>
           <Button
             variant="ghost"
             size="icon"
@@ -80,26 +79,34 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
           </Button>
         </TablePrimaryCell>
 
-        <TablePrimaryCell align="left">
+        <TablePrimaryCell label={t('distributionsByToken.columns.depositDatetime')} align="left">
           <HydrationSafeDateTime timestamp={DepositTimeStamp} locale={locale} />
         </TablePrimaryCell>
 
-        <TablePrimaryCell align="center">
+        <TablePrimaryCell label={t('distributionsByToken.columns.cycle')} align="center">
           <Link href={`/allocation/${RoundNum}`} className="text-inherit text-[inherit]">
             {RoundNum}
           </Link>
         </TablePrimaryCell>
 
-        <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
-        <TablePrimaryCell align="center">
+        <TablePrimaryCell label={t('distributionsByToken.columns.depositId')} align="center">
+          {DepositId}
+        </TablePrimaryCell>
+        <TablePrimaryCell label={t('distributionsByToken.columns.retrieved')} align="center">
           {Claimed ? t('common.yes') : t('common.no')}
         </TablePrimaryCell>
-        <TablePrimaryCell align="right">{RewardEth.toFixed(6)}</TablePrimaryCell>
+        <TablePrimaryCell label={t('distributionsByToken.columns.distributionEth')} align="right">
+          {RewardEth.toFixed(6)}
+        </TablePrimaryCell>
       </TablePrimaryRow>
 
       {open && (
         <TablePrimaryRow className="border-t-0">
-          <TablePrimaryCell className="!py-0" colSpan={6}>
+          <TablePrimaryCell
+            className="!py-0"
+            colSpan={6}
+            label={t('distributionsByToken.columns.details')}
+          >
             <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
               <div className={cn(detailPanelClass, 'mb-0')}>
                 <div className="border-b border-white/[0.06] px-4 py-3">
@@ -176,7 +183,7 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
         <TablePrimaryContainer>
           <TablePrimary>
             <TablePrimaryHead>
-              <Tr>
+              <tr>
                 <TablePrimaryHeadCell>
                   <span className="sr-only">{t('distributionsByToken.columns.details')}</span>
                 </TablePrimaryHeadCell>
@@ -195,13 +202,13 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
                 <TablePrimaryHeadCell align="right">
                   {t('distributionsByToken.columns.distributionEth')}
                 </TablePrimaryHeadCell>
-              </Tr>
+              </tr>
             </TablePrimaryHead>
-            <Tbody>
+            <TablePrimaryBody>
               {paginatedData.map((row) => (
                 <RewardsDetailRow key={row.DepositId} row={row} />
               ))}
-            </Tbody>
+            </TablePrimaryBody>
           </TablePrimary>
         </TablePrimaryContainer>
       </SectionCardTableShell>
@@ -217,7 +224,7 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
 }
 
 function SectionCardTableShell({ children }: { children: React.ReactNode }) {
-  return <div className={cn(detailPanelClass, 'mb-8 overflow-x-auto')}>{children}</div>;
+  return <div className={cn(detailPanelClass, 'mb-8')}>{children}</div>;
 }
 
 function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: number }) {

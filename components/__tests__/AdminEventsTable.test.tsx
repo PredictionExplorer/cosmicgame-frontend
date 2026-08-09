@@ -4,8 +4,6 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
-jest.mock('react-super-responsive-table/dist/SuperResponsiveTableStyle.css', () => ({}));
-
 // eslint-disable-next-line import/order
 import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
 
@@ -77,8 +75,8 @@ describe('AdminEventsTable', () => {
 
     render(<AdminEventsTable list={mockData} />);
 
-    // react-super-responsive-table duplicates header text in tdBefore divs,
-    // so we use getAllByText and check the th elements
+    // A label string can appear both as a column header and as a cell's
+    // mobile `data-label`, so match on the th elements specifically.
     const eventHeaders = screen.getAllByText('tables.columns.event');
     expect(eventHeaders.length).toBeGreaterThanOrEqual(1);
     const datetimeHeaders = screen.getAllByText('tables.columns.datetime');

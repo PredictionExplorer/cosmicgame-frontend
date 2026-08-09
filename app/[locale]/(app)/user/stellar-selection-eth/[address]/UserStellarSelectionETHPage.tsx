@@ -1,11 +1,8 @@
 'use client';
 
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
-import { Tr } from 'react-super-responsive-table';
 import { usePublicClient } from 'wagmi';
 
 import { getExplorerUrl } from '@/utils';
@@ -21,6 +18,7 @@ import getErrorMessage from '@/utils/alert';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -42,13 +40,14 @@ interface StellarSelectionETHDeposit {
 }
 
 const StellarSelectionAllocationsRow = ({ deposit }: { deposit: StellarSelectionETHDeposit }) => {
+  const t = useTranslations('tables');
   const locale = useLocale();
   if (!deposit) return <TablePrimaryRow />;
 
   const { TxHash, TimeStamp, RoundNum, Amount } = deposit;
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.date')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
@@ -58,7 +57,7 @@ const StellarSelectionAllocationsRow = ({ deposit }: { deposit: StellarSelection
           <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.cycle')} align="center">
         <Link
           href={`/allocation/${RoundNum}`}
           className="text-inherit"
@@ -68,7 +67,9 @@ const StellarSelectionAllocationsRow = ({ deposit }: { deposit: StellarSelection
           {RoundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{Amount.toFixed(4)}</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.amountEth')} align="right">
+        {Amount.toFixed(4)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -92,17 +93,17 @@ const StellarSelectionAllocationsTable = ({ list }: { list: StellarSelectionETHD
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.date')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">{t('columns.amountEth')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {currentPageItems.map((deposit) => (
               <StellarSelectionAllocationsRow key={deposit.EvtLogId} deposit={deposit} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

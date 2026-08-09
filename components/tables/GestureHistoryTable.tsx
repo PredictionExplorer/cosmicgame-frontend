@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Tr } from 'react-super-responsive-table';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { shortenHex, formatSeconds, getRWLKImageUrl, getExplorerUrl } from '@/utils';
 import ERC20_ABI from '@/contracts/CosmicToken.json';
 
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
@@ -91,30 +91,33 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
   const [symbol, setSymbol] = useState('');
   const [decimals, setDecimals] = useState(18);
 
-  useEffect(() => {
-    const getSymbol = async () => {
-      if (!publicClient) return;
-      const tokenAddr = history.DonatedERC20TokenAddr! as `0x${string}`;
-      const [sym, dec] = await Promise.all([
-        publicClient.readContract({
-          address: tokenAddr,
-          abi: ERC20_ABI,
-          functionName: 'symbol',
-        }),
-        publicClient.readContract({
-          address: tokenAddr,
-          abi: ERC20_ABI,
-          functionName: 'decimals',
-        }),
-      ]);
-      setSymbol(sym as string);
-      setDecimals(Number(dec));
-    };
+  const tokenAddr = history.DonatedERC20TokenAddr;
 
-    if (!!history.DonatedERC20TokenAddr && publicClient) {
-      getSymbol();
-    }
-  }, [history.DonatedERC20TokenAddr, publicClient]);
+  useEffect(() => {
+    if (!tokenAddr || !publicClient) return;
+
+    let cancelled = false;
+    const read = { address: tokenAddr as `0x${string}`, abi: ERC20_ABI } as const;
+
+    Promise.all([
+      publicClient.readContract({ ...read, functionName: 'symbol' }),
+      publicClient.readContract({ ...read, functionName: 'decimals' }),
+    ])
+      .then(([sym, dec]) => {
+        if (cancelled) return;
+        setSymbol(String(sym));
+        const parsed = Number(dec);
+        setDecimals(Number.isFinite(parsed) ? parsed : 18);
+      })
+      .catch(() => {
+        // A missing or non-standard ERC-20 leaves the amount unlabelled rather
+        // than breaking the row.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tokenAddr, publicClient]);
 
   const handleRowClick = () => {
     router.push(`/gesture/${history.EvtLogId}`);
@@ -134,28 +137,40 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
       : `${formatGestureCostAmount(history.EthPriceEth)} ETH`;
 
   return (
-    <TablePrimaryRow
-      className="cursor-pointer"
-      style={{ background: backgroundStyle }}
-      onClick={handleRowClick}
-    >
-      <TablePrimaryCell className="whitespace-nowrap">
-        <HydrationSafeDateTime timestamp={history.TimeStamp} showSecond locale={locale} />
+    <TablePrimaryRow style={{ background: backgroundStyle }} onActivate={handleRowClick}>
+      <TablePrimaryCell label={t('columns.datetime')}>
+        <Link
+          href={`/gesture/${history.EvtLogId}`}
+          className={TABLE_ROW_LINK_CLASS}
+          aria-label={t('gestureHistory.viewGesture', { id: history.EvtLogId })}
+        >
+          <HydrationSafeDateTime timestamp={history.TimeStamp} showSecond locale={locale} />
+        </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.participant')}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="font-mono">{shortenHex(history.BidderAddr, 6)}</span>
+            <span className="font-mono break-all">{shortenHex(history.BidderAddr, 6)}</span>
           </TooltipTrigger>
           <TooltipContent>{history.BidderAddr}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{price}</TablePrimaryCell>
-      {showRound && <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>}
-      <TablePrimaryCell align="center">{gestureTypeLabel}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{formatSeconds(gestureDuration, locale)}</TablePrimaryCell>
-      <TablePrimaryCell>
-        <span className="break-all">
+      <TablePrimaryCell label={t('columns.gestureCost')} align="right">
+        {price}
+      </TablePrimaryCell>
+      {showRound && (
+        <TablePrimaryCell label={t('columns.cycle')} align="center">
+          {history.RoundNum}
+        </TablePrimaryCell>
+      )}
+      <TablePrimaryCell label={t('columns.gestureType')} align="center">
+        {gestureTypeLabel}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.gestureDuration')} align="center">
+        {formatSeconds(gestureDuration, locale)}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.gestureInfo')}>
+        <span className="break-words">
           {gestureType === 1 && history.RWalkNFTId && (
             <>
               {t('gestureHistory.randomWalkGesture', { id: history.RWalkNFTId })}
@@ -198,17 +213,24 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
           )}{' '}
         </span>
       </TablePrimaryCell>
-      <TablePrimaryCell>
-        {!isBanned && history.Message && (
+      <TablePrimaryCell label={t('columns.message')}>
+        {!isBanned && history.Message ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="max-w-[180px] overflow-hidden whitespace-nowrap inline-block text-ellipsis leading-none">
+              {/*
+               * On a phone the message wraps in full: the desktop ellipsis hid
+               * it behind a hover tooltip that touch users can never open,
+               * because tapping the row navigates to the gesture instead.
+               */}
+              <span className="block break-words sm:max-w-[18rem] sm:truncate">
                 {history.Message}
               </span>
             </TooltipTrigger>
-            <TooltipContent>{history.Message}</TooltipContent>
+            <TooltipContent className="max-w-[min(20rem,90vw)] break-words">
+              {history.Message}
+            </TooltipContent>
           </Tooltip>
-        )}{' '}
+        ) : null}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -228,33 +250,25 @@ const HistoryTable = ({
   const displayedGestures = gestureHistory.slice((curPage - 1) * perPage, curPage * perPage);
 
   return (
-    <TablePrimaryContainer>
+    <TablePrimaryContainer label={t('gestureHistory.tableLabel')}>
       <TablePrimary>
-        <colgroup>
-          <col width="10%" />
-          <col width="15%" />
-          <col width="14%" />
-          {showRound && <col width="8%" />}
-          <col width="9%" />
-          <col width="15%" />
-          <col width="15%" />
-          <col width="20%" />
-        </colgroup>
         <TablePrimaryHead>
-          <Tr>
+          <tr>
             <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">{t('columns.participant')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="right">{t('columns.gestureCost')}</TablePrimaryHeadCell>
-            {showRound && <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>}
-            <TablePrimaryHeadCell>{t('columns.gestureType')}</TablePrimaryHeadCell>
+            {showRound && (
+              <TablePrimaryHeadCell align="center">{t('columns.cycle')}</TablePrimaryHeadCell>
+            )}
+            <TablePrimaryHeadCell align="center">{t('columns.gestureType')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="center">
               {t('columns.gestureDuration')}
             </TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">{t('columns.gestureInfo')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">{t('columns.message')}</TablePrimaryHeadCell>
-          </Tr>
+          </tr>
         </TablePrimaryHead>
-        <tbody>
+        <TablePrimaryBody>
           {displayedGestures.map((history, index) => {
             const gestureDuration =
               (curPage - 1) * perPage + index === 0
@@ -272,7 +286,7 @@ const HistoryTable = ({
               />
             );
           })}
-        </tbody>
+        </TablePrimaryBody>
       </TablePrimary>
     </TablePrimaryContainer>
   );

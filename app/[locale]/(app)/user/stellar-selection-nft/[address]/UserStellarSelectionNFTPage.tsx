@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { getAddress, isAddress } from 'viem';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl } from '@/utils';
@@ -14,14 +13,13 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import { PageShell } from '@/components/ui/page-shell';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 interface StellarSelectionNFTAllocation {
   EvtLogId: number;
@@ -42,7 +40,7 @@ function NFTWinningsRow({ row }: { row: StellarSelectionNFTAllocation }) {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
@@ -53,7 +51,7 @@ function NFTWinningsRow({ row }: { row: StellarSelectionNFTAllocation }) {
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.cycle')} align="center">
         <Link
           href={`/allocation/${RoundNum}`}
           className="font-mono text-inherit"
@@ -64,14 +62,14 @@ function NFTWinningsRow({ row }: { row: StellarSelectionNFTAllocation }) {
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('statisticsColumns.isRandomWalk')} align="center">
         {IsRWalk ? t('status.yes') : t('status.no')}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('statisticsColumns.isAnchorHolder')} align="center">
         {IsStaker ? t('status.yes') : t('status.no')}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.tokenId')} align="center">
         <Link href={`/detail/${TokenId}`} className="font-mono text-inherit">
           {TokenId}
         </Link>
@@ -99,19 +97,19 @@ function NFTWinningsTable({ list }: { list: StellarSelectionNFTAllocation[] }) {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('statisticsColumns.isRandomWalk')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('statisticsColumns.isAnchorHolder')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.tokenId')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {currentItems.map((row) => (
               <NFTWinningsRow key={row.EvtLogId} row={row} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

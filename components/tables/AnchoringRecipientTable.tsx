@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -10,6 +8,7 @@ import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
@@ -20,6 +19,7 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import type { CSTAnchorDistribution } from '@/services/api';
 
 const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
+  const t = useTranslations('tables');
   const locale = useLocale();
 
   if (!recipient) {
@@ -28,7 +28,7 @@ const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', recipient.TxHash ?? '')}
@@ -38,7 +38,7 @@ const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
           <HydrationSafeDateTime timestamp={recipient.TimeStamp ?? 0} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell align="left">
+      <TablePrimaryCell label={t('columns.anchorHolder')} align="left">
         <Tooltip>
           <TooltipTrigger asChild>
             <Link href={`/user/${recipient.StakerAddr}`} className="text-inherit font-mono">
@@ -48,8 +48,10 @@ const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
           <TooltipContent>{recipient.StakerAddr}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{recipient.StakerNumStakedNFTs}</TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('columns.numberOfNfts')} align="center">
+        {recipient.StakerNumStakedNFTs}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.distributionAmountEth')} align="right">
         {(recipient.StakerAmountEth ?? 0).toFixed(4)}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -72,20 +74,20 @@ const AnchoringRecipientTable = ({ list }: { list: CSTAnchorDistribution[] }) =>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('columns.anchorHolder')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.numberOfNfts')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 {t('columns.distributionAmountEth')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {displayedRecipients.map((recipient) => (
               <RecipientRow key={recipient.StakerAddr} recipient={recipient} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

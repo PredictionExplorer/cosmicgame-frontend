@@ -1,14 +1,12 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useCallback, useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { usePublicClient } from 'wagmi';
-import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -37,6 +35,8 @@ import type { CSTAnchorDistribution } from '@/services/api';
 import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 
 const UncollectedRewardsRow = ({ row, locale }: { row: CSTAnchorDistribution; locale: string }) => {
+  const t = useTranslations('anchoring');
+
   if (!row) return <TablePrimaryRow />;
 
   const {
@@ -52,15 +52,43 @@ const UncollectedRewardsRow = ({ row, locale }: { row: CSTAnchorDistribution; lo
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.unretrievedDistributions.columns.depositDatetime')}>
         <HydrationSafeDateTime timestamp={DepositTimeStamp} locale={locale} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{`${YourTokensStaked} / ${NumStakedNFTs}`}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{NumUnclaimedTokens}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{(DepositAmountEth ?? 0).toFixed(6)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{(YourRewardAmountEth ?? 0).toFixed(6)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{(PendingToClaimEth ?? 0).toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.unretrievedDistributions.columns.depositId')}
+        align="center"
+      >
+        {DepositId}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.unretrievedDistributions.columns.anchoredTokens')}
+        align="center"
+      >{`${YourTokensStaked} / ${NumStakedNFTs}`}</TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.unretrievedDistributions.columns.unretrievedTokens')}
+        align="center"
+      >
+        {NumUnclaimedTokens}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.unretrievedDistributions.columns.depositAmountEth')}
+        align="center"
+      >
+        {(DepositAmountEth ?? 0).toFixed(6)}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.unretrievedDistributions.columns.distributionAmountEth')}
+        align="center"
+      >
+        {(YourRewardAmountEth ?? 0).toFixed(6)}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.unretrievedDistributions.columns.unretrievedAmountEth')}
+        align="center"
+      >
+        {(PendingToClaimEth ?? 0).toFixed(6)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -193,18 +221,8 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="15%" />
-            <col width="10%" />
-            <col width="15%" />
-            <col width="15%" />
-            <col width="15%" />
-            <col width="15%" />
-            <col width="25%" />
-          </colgroup>
-
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 {t('tables.unretrievedDistributions.columns.depositDatetime')}
               </TablePrimaryHeadCell>
@@ -226,14 +244,14 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
               <TablePrimaryHeadCell>
                 {t('tables.unretrievedDistributions.columns.unretrievedAmountEth')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <Tbody>
+          <TablePrimaryBody>
             {currentPageData.map((row) => (
               <UncollectedRewardsRow key={row.EvtLogId} row={row} locale={locale} />
             ))}
-          </Tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

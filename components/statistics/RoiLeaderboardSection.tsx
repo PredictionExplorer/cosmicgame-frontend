@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -135,13 +134,18 @@ const Row = ({
   noEthReceivedTooltip: string;
   locale: string;
 }) => {
+  const t = useTranslations('statistics');
+  const tTables = useTranslations('tables');
+
   if (!entry) {
     return <TablePrimaryRow />;
   }
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell align="center">{rank}</TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={tTables('columns.position')} align="center">
+        {rank}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('performance.leaderboard.columns.participant')}>
         <AddressLink address={entry.BidderAddr} url={`/user/${entry.BidderAddr}`} />
         {isCstOnly(entry) && (
           <span className="ml-2 align-middle text-[11px] text-muted-foreground">
@@ -149,14 +153,25 @@ const Row = ({
           </span>
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('performance.leaderboard.columns.allocationRate')} align="right">
         {Math.round(entry.WinRate * 100)}%
         <span className="ml-1 text-xs text-muted-foreground">
           ({entry.RoundsWon}/{entry.RoundsParticipated})
         </span>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{entry.NumBids.toLocaleString(locale)}</TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      {/*
+       * Gesture volume is already implied by the allocation-rate fraction next
+       * to it, and it is the one column no sort tab orders by — so the card
+       * layout drops it rather than spend a row on it.
+       */}
+      <TablePrimaryCell
+        label={t('performance.leaderboard.columns.gestures')}
+        align="right"
+        priority="secondary"
+      >
+        {entry.NumBids.toLocaleString(locale)}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('performance.leaderboard.columns.spent')} align="right">
         {fmtEth(entry.TotalEthSpentEth)}
         {entry.TotalCstSpentEth > 0 && (
           <span className="block text-xs text-muted-foreground">
@@ -164,18 +179,25 @@ const Row = ({
           </span>
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{fmtEth(entry.EthWonEth)}</TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      {/* Recoverable from Spent + Net, both of which stay on the card. */}
+      <TablePrimaryCell
+        label={t('performance.leaderboard.columns.received')}
+        align="right"
+        priority="secondary"
+      >
+        {fmtEth(entry.EthWonEth)}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('performance.leaderboard.columns.net')} align="right">
         <NetCell value={entry.NetPlEth} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('performance.leaderboard.columns.netPercent')} align="right">
         <NetPctCell
           entry={entry}
           cstOnlyTooltip={cstOnlyTooltip}
           noEthReceivedTooltip={noEthReceivedTooltip}
         />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('performance.leaderboard.columns.allocations')} align="right">
         <AllocationBadges entry={entry} />
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -249,7 +271,7 @@ export const RoiLeaderboardSection = () => {
           <TablePrimaryContainer>
             <TablePrimary>
               <TablePrimaryHead>
-                <Tr>
+                <tr>
                   <TablePrimaryHeadCell align="center">#</TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="left">
                     {t('performance.leaderboard.columns.participant')}
@@ -257,13 +279,13 @@ export const RoiLeaderboardSection = () => {
                   <TablePrimaryHeadCell align="right">
                     {t('performance.leaderboard.columns.allocationRate')}
                   </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">
+                  <TablePrimaryHeadCell align="right" priority="secondary">
                     {t('performance.leaderboard.columns.gestures')}
                   </TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="right">
                     {t('performance.leaderboard.columns.spent')}
                   </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">
+                  <TablePrimaryHeadCell align="right" priority="secondary">
                     {t('performance.leaderboard.columns.received')}
                   </TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="right">
@@ -275,9 +297,9 @@ export const RoiLeaderboardSection = () => {
                   <TablePrimaryHeadCell align="right">
                     {t('performance.leaderboard.columns.allocations')}
                   </TablePrimaryHeadCell>
-                </Tr>
+                </tr>
               </TablePrimaryHead>
-              <tbody>
+              <TablePrimaryBody>
                 {list.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((entry, idx) => (
                   <Row
                     key={entry.BidderAid}
@@ -289,7 +311,7 @@ export const RoiLeaderboardSection = () => {
                     locale={locale}
                   />
                 ))}
-              </tbody>
+              </TablePrimaryBody>
             </TablePrimary>
           </TablePrimaryContainer>
           <CustomPagination

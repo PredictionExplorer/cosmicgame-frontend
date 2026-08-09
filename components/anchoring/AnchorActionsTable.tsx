@@ -1,14 +1,12 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { useRouter } from '@/i18n/navigation';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -27,21 +25,29 @@ const AnchorActionsRow = ({ row, IsRwalk }: { row: AnchorAction; IsRwalk: boolea
     return <TablePrimaryRow />;
   }
 
+  const actionHref = `/anchor-action/${IsRwalk ? 1 : 0}/${row.ActionId}`;
+
   const handleRowClick = () => {
-    router.push(`/anchor-action/${IsRwalk ? 1 : 0}/${row.ActionId}`);
+    router.push(actionHref);
   };
 
   return (
-    <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
-      <TablePrimaryCell>
-        <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
+    <TablePrimaryRow onActivate={handleRowClick}>
+      <TablePrimaryCell label={t('tables.anchorActions.columns.datetime')}>
+        <Link
+          href={actionHref}
+          className={TABLE_ROW_LINK_CLASS}
+          aria-label={t('anchorActionDetail.breadcrumbs.action', { id: row.ActionId })}
+        >
+          <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
+        </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.anchorActions.columns.type')} align="center">
         {row.ActionType === 1 ? t('common.release') : t('common.anchor')}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.anchorActions.columns.tokenId')} align="center">
         {IsRwalk ? (
           <a href={`https://randomwalknft.com/detail/${row.TokenId}`} className="text-inherit">
             {row.TokenId}
@@ -53,7 +59,9 @@ const AnchorActionsRow = ({ row, IsRwalk }: { row: AnchorAction; IsRwalk: boolea
         )}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.anchorActions.columns.nftCount')} align="center">
+        {row.NumStakedNFTs}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -75,15 +83,8 @@ const AnchorActionsTable = ({ list, IsRwalk }: { list: AnchorAction[]; IsRwalk: 
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="25%" />
-            <col width="25%" />
-            <col width="25%" />
-            <col width="25%" />
-          </colgroup>
-
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 {t('tables.anchorActions.columns.datetime')}
               </TablePrimaryHeadCell>
@@ -94,14 +95,14 @@ const AnchorActionsTable = ({ list, IsRwalk }: { list: AnchorAction[]; IsRwalk: 
               <TablePrimaryHeadCell>
                 {t('tables.anchorActions.columns.nftCount')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <Tbody>
+          <TablePrimaryBody>
             {currentData.map((row) => (
               <AnchorActionsRow key={row.EvtLogId} row={row} IsRwalk={IsRwalk} />
             ))}
-          </Tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

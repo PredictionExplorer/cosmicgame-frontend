@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tr } from 'react-super-responsive-table';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, formatSeconds } from '@/utils';
 
@@ -12,6 +10,7 @@ import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -41,7 +40,7 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
 
   return (
     <TablePrimaryRow className={cn(row.TransferType > 0 && 'bg-white/[0.06]')}>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.event')}>
         {eventName}
         <Tooltip>
           <TooltipTrigger asChild>
@@ -62,7 +61,7 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
           </TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', row.TxHash)}
@@ -72,7 +71,7 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
           <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.newValue')}>
         {row.RecordType === 0 ? (
           t('status.undefined')
         ) : event?.type === 'timestamp' ? (
@@ -84,9 +83,9 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
         ) : event?.type === 'time' ? (
           formatSeconds(row.IntegerValue, locale)
         ) : event?.type === 'address' ? (
-          <span className="font-mono">{row.AddressValue}</span>
+          <span className="font-mono break-all">{row.AddressValue}</span>
         ) : (
-          <a href={row.StringValue} target="_blank" rel="noopener noreferrer">
+          <a className="break-all" href={row.StringValue} target="_blank" rel="noopener noreferrer">
             {row.StringValue}
           </a>
         )}
@@ -108,23 +107,18 @@ export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup className="max-sm:hidden">
-            <col width="40%" />
-            <col width="15%" />
-            <col width="45%" />
-          </colgroup>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.event')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('columns.newValue')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <AdminEventsRow row={row} key={row.EvtLogId} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

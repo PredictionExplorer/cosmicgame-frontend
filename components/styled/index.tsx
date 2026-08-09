@@ -1,7 +1,15 @@
-import React, { type ComponentPropsWithoutRef } from 'react';
-import { Table, Thead, Tr, Th, Td } from 'react-super-responsive-table';
+import React from 'react';
 
 import { cn } from '@/lib/utils';
+import {
+  ResponsiveTable,
+  ResponsiveTableBody,
+  ResponsiveTableCell,
+  ResponsiveTableContainer,
+  ResponsiveTableHead,
+  ResponsiveTableHeadCell,
+  ResponsiveTableRow,
+} from '@/components/ui/responsive-table';
 
 export function StyledLink({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return <a className={cn('text-white underline', className)} {...props} />;
@@ -20,49 +28,29 @@ export function StyledCard({
   );
 }
 
-export function TablePrimaryContainer({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn(
-        'relative overflow-x-auto overflow-y-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.014)_48%,rgb(var(--nebula-violet-rgb)/0.05))] shadow-[0_20px_90px_-70px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-px before:bg-gradient-to-r before:from-transparent before:via-[rgb(var(--aurora-cyan-rgb)/0.55)] before:to-transparent print:overflow-visible print:shadow-none print:backdrop-blur-none',
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+/**
+ * Table primitives.
+ *
+ * These are thin aliases over `components/ui/responsive-table`, which replaced
+ * `react-super-responsive-table`. The important difference for callers is that
+ * `TablePrimaryCell` now requires a `label`: it is what the mobile card layout
+ * shows beside the value, and making it explicit is what stops a cell from
+ * inheriting the wrong column's label.
+ */
+export const TablePrimaryContainer = ResponsiveTableContainer;
+export const TablePrimary = ResponsiveTable;
+export const TablePrimaryHead = ResponsiveTableHead;
+export const TablePrimaryBody = ResponsiveTableBody;
+export const TablePrimaryHeadCell = ResponsiveTableHeadCell;
+export const TablePrimaryCell = ResponsiveTableCell;
+export const TablePrimaryRow = ResponsiveTableRow;
 
-export function TablePrimary({ className, ...props }: ComponentPropsWithoutRef<typeof Table>) {
-  return <Table className={cn('border-collapse w-full', className)} {...props} />;
-}
-
-export function TablePrimaryHead({ className, ...props }: ComponentPropsWithoutRef<typeof Thead>) {
-  return (
-    <Thead
-      className={cn(
-        'sticky top-0 z-[1] bg-[linear-gradient(90deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.10))] backdrop-blur-md print:static print:backdrop-blur-none print:[background-image:none] print:bg-transparent',
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-export function TablePrimaryHeadCell({ className, ...props }: ComponentPropsWithoutRef<typeof Th>) {
-  return (
-    <Th
-      className={cn(
-        'text-muted-foreground font-medium text-xs uppercase tracking-wider leading-[1.43] border-b border-white/[0.08] px-4 py-3 max-sm:text-[10px] print:!text-foreground',
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
+/**
+ * Renders a long column name on desktop and a short one on mobile.
+ *
+ * Only useful in the header now — mobile card labels come from each cell's
+ * `label` prop, which should already be the short form.
+ */
 export function TableResponsiveHeaderLabel({
   desktop,
   mobile,
@@ -75,30 +63,6 @@ export function TableResponsiveHeaderLabel({
       <span className="sm:hidden">{mobile}</span>
       <span className="hidden sm:inline">{desktop}</span>
     </>
-  );
-}
-
-export function TablePrimaryCell({ className, ...props }: ComponentPropsWithoutRef<typeof Td>) {
-  return (
-    <Td
-      className={cn(
-        'font-normal text-muted-foreground leading-[1.43] border-b border-white/[0.03] px-4 py-3.5 text-sm max-sm:text-xs print:!text-foreground',
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-export function TablePrimaryRow({ className, ...props }: ComponentPropsWithoutRef<typeof Tr>) {
-  return (
-    <Tr
-      className={cn(
-        'border-0 transition-colors hover:bg-white/[0.055] even:bg-white/[0.018]',
-        className,
-      )}
-      {...props}
-    />
   );
 }
 
@@ -200,7 +164,7 @@ export function MainWrapper({ className, id, ...props }: React.HTMLAttributes<HT
       id={id ?? 'main'}
       tabIndex={-1}
       className={cn(
-        'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-hidden leading-normal min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
+        'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-x-clip leading-normal min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
         className,
       )}
       {...props}
@@ -286,7 +250,7 @@ export function SearchField({ className, ...props }: React.InputHTMLAttributes<H
   return (
     <input
       className={cn(
-        'mr-2 w-[360px] flex h-10 rounded-md border border-input bg-background px-3 py-2 text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 max-xs:mr-0 max-xs:mb-4 max-xs:w-full',
+        'mr-2 w-full max-w-[360px] flex h-11 rounded-md border border-input bg-background px-3 py-2 text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 max-xs:mr-0 max-xs:mb-4 max-xs:max-w-none',
         className,
       )}
       {...props}
@@ -301,7 +265,7 @@ export function SearchButton({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-md text-sm font-medium px-4 py-2 bg-gradient-to-r from-[#06AEEC] to-[#9C37FD] text-white hover:opacity-90 max-xs:w-full',
+        'inline-flex h-11 shrink-0 items-center justify-center rounded-md text-sm font-medium px-4 py-2 bg-gradient-to-r from-[#06AEEC] to-[#9C37FD] text-white hover:opacity-90 max-xs:w-full',
         className,
       )}
       {...props}

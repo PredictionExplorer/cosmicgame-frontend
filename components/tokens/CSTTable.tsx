@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, getAssetsUrl, getThumbUrl, shortenHex } from '@/utils';
@@ -12,6 +11,7 @@ import NFTImage from '@/components/nft/NFTImage';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -20,8 +20,6 @@ import {
 } from '@/components/styled';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CSTTokenInfo } from '@/services/api';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 function CSTRow({ nft }: { nft: CSTTokenInfo }) {
   const t = useTranslations('myPages');
@@ -36,13 +34,13 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell className="w-[120px]">
+      <TablePrimaryCell label={t('tokens.table.details')}>
         <Link href={`/detail/${nft.TokenId}`} className="text-inherit">
           <NFTImage src={thumbURL} fallbackSrc={fullURL} />
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('tokens.table.datetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', nft.TxHash)}
@@ -53,24 +51,30 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tokens.table.tokenId')} align="center">
         <Link href={`/detail/${nft.TokenId}`} className="text-inherit">
           {nft.TokenId}
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{nft.TokenName || ' '}</TablePrimaryCell>
+      <TablePrimaryCell label={t('tokens.table.tokenName')} align="center">
+        {nft.TokenName || ' '}
+      </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tokens.table.cycle')} align="center">
         <Link href={`/allocation/${nft.RoundNum}`} className="text-inherit">
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell
+        label={t('tokens.table.recipientAddress')}
+        align="center"
+        priority="secondary"
+      >
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/user/${nft.WinnerAddr}`} className="text-inherit font-mono">
+            <Link href={`/user/${nft.WinnerAddr}`} className="text-inherit font-mono break-all">
               {shortenHex(nft.WinnerAddr ?? '', 6)}
             </Link>
           </TooltipTrigger>
@@ -78,15 +82,15 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tokens.table.currentlyAnchored')} align="center">
         {nft.Staked ? t('shared.yes') : t('shared.no')}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tokens.table.anchoredOnce')} align="center" priority="secondary">
         {nft.WasUnstaked ? t('shared.yes') : t('shared.no')}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('tokens.table.allocationType')} align="right">
         {nft.RecordType === 1 ? (
           t('tokens.table.types.stellarSelection')
         ) : nft.RecordType === 2 ? (
@@ -124,39 +128,32 @@ export function CSTTable({ list }: { list: CSTTokenInfo[] }) {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="10%" />
-            <col width="15%" />
-            <col width="9%" />
-            <col width="10%" />
-            <col width="8%" />
-            <col width="16%" />
-            <col width="8%" />
-            <col width="8%" />
-            <col width="16%" />
-          </colgroup>
           <TablePrimaryHead>
-            <Tr>
-              <TablePrimaryHeadCell>
+            <tr>
+              <TablePrimaryHeadCell className="w-[120px]">
                 <span className="sr-only">{t('tokens.table.details')}</span>
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('tokens.table.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('tokens.table.tokenId')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('tokens.table.tokenName')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('tokens.table.cycle')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('tokens.table.recipientAddress')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell priority="secondary">
+                {t('tokens.table.recipientAddress')}
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('tokens.table.currentlyAnchored')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>{t('tokens.table.anchoredOnce')}</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell priority="secondary">
+                {t('tokens.table.anchoredOnce')}
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 {t('tokens.table.allocationType')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {currentItems.map((nft) => (
               <CSTRow key={nft.EvtLogId} nft={nft} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

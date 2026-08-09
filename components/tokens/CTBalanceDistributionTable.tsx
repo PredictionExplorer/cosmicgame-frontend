@@ -1,13 +1,11 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { memo, useMemo, useState, type FC } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatTableAmount } from '@/utils';
 
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -26,15 +24,17 @@ export interface BalanceRow {
 
 const CTBalanceDistributionRow: FC<{ row?: BalanceRow; locale: string }> = memo(
   ({ row, locale }) => {
+    const t = useTranslations('tables');
+
     if (!row) return <TablePrimaryRow />;
 
     return (
       <TablePrimaryRow>
-        <TablePrimaryCell>
+        <TablePrimaryCell label={t('statisticsColumns.ownerAddress')}>
           <AddressLink address={row.OwnerAddr} url={`/user/${row.OwnerAddr}`} />
         </TablePrimaryCell>
 
-        <TablePrimaryCell align="right">
+        <TablePrimaryCell label={t('statisticsColumns.cstBalance')} align="right">
           {formatTableAmount(row.BalanceFloat, locale)}
         </TablePrimaryCell>
       </TablePrimaryRow>
@@ -65,7 +65,7 @@ export const CTBalanceDistributionTable: FC<TableProps> = ({ list }) => {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('statisticsColumns.ownerAddress')}
@@ -78,14 +78,14 @@ export const CTBalanceDistributionTable: FC<TableProps> = ({ list }) => {
                   tooltip={t('statisticsTooltips.cstBalance')}
                 />
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <tbody>
+          <TablePrimaryBody>
             {currentRows.map((row) => (
               <CTBalanceDistributionRow key={row.OwnerAid} row={row} locale={locale} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

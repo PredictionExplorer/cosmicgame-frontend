@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl } from '@/utils';
 
@@ -10,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Button } from '@/components/ui/button';
 import {
   TablePrimaryContainer,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
@@ -109,7 +108,7 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
 
   return (
     <TablePrimaryRow className={cn(gestureTypeBg[history.GestureType] || 'bg-black/10')}>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.date')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', history.TxHash)}
@@ -119,10 +118,10 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
           <HydrationSafeDateTime timestamp={history.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.participant')} align="center">
         <AddressLink address={history.BidderAddr} url={`/user/${history.BidderAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.cycle')} align="center">
         <Link
           className="text-inherit"
           href={`/allocation/${history.RoundNum}`}
@@ -132,20 +131,24 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
           {history.RoundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.gestureType')} align="center">
         {history.GestureType === 2 ? 'CST' : history.GestureType === 1 ? 'RWLK' : 'ETH'}
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.message')}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="max-w-[180px] overflow-hidden whitespace-nowrap inline-block text-ellipsis leading-none">
+            {/*
+             * The desktop ellipsis hid the message behind a hover tooltip that
+             * touch users cannot open, so on a phone it wraps in full instead.
+             */}
+            <span className="block break-words sm:max-w-[18rem] sm:truncate">
               {history.Message}
             </span>
           </TooltipTrigger>
           <TooltipContent>{history.Message || ''}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.actions')} align="center">
         {isBanned ? (
           <Button variant="ghost" size="sm" onClick={handleUnban}>
             {t('banGesture.unban')}
@@ -179,7 +182,7 @@ const HistoryTable = ({ gestureHistory, perPage, curPage }: HistoryTableProps) =
     <TablePrimaryContainer>
       <TablePrimary>
         <TablePrimaryHead>
-          <Tr>
+          <tr>
             <TablePrimaryHeadCell align="left">{t('columns.date')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>{t('columns.participant')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>{t('columns.cycle')}</TablePrimaryHeadCell>
@@ -188,9 +191,9 @@ const HistoryTable = ({ gestureHistory, perPage, curPage }: HistoryTableProps) =
             <TablePrimaryHeadCell>
               <span className="sr-only">{t('columns.actions')}</span>
             </TablePrimaryHeadCell>
-          </Tr>
+          </tr>
         </TablePrimaryHead>
-        <tbody>
+        <TablePrimaryBody>
           {displayedGestures.map((history) => (
             <HistoryRow
               key={history.EvtLogId}
@@ -199,7 +202,7 @@ const HistoryTable = ({ gestureHistory, perPage, curPage }: HistoryTableProps) =
               updateBannedList={getBannedList}
             />
           ))}
-        </tbody>
+        </TablePrimaryBody>
       </TablePrimary>
     </TablePrimaryContainer>
   );

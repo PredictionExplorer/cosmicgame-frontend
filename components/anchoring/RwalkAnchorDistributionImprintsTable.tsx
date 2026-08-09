@@ -1,8 +1,5 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl } from '@/utils';
 
@@ -10,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -21,6 +19,7 @@ import { AddressLink } from '@/components/common/AddressLink';
 import type { AnchorDistributionImprint } from '@/services/api';
 
 const AnchorDistributionImprintsRow = ({ row }: { row: AnchorDistributionImprint }) => {
+  const t = useTranslations('anchoring');
   const locale = useLocale();
 
   if (!row) {
@@ -29,7 +28,7 @@ const AnchorDistributionImprintsRow = ({ row }: { row: AnchorDistributionImprint
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.randomWalkImprints.columns.datetime')}>
         <a
           href={getExplorerUrl('tx', row.TxHash)}
           target="_blank"
@@ -40,17 +39,17 @@ const AnchorDistributionImprintsRow = ({ row }: { row: AnchorDistributionImprint
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.randomWalkImprints.columns.recipient')} align="center">
         <AddressLink address={row.WinnerAddr} url={`/user/${row.WinnerAddr}`} />
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.randomWalkImprints.columns.cycle')} align="center">
         <Link href={`/allocation/${row.RoundNum}`} className="text-inherit">
           {row.RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.randomWalkImprints.columns.tokenId')} align="center">
         <Link href={`/detail/${row.TokenId}`} className="text-inherit">
           {row.TokenId}
         </Link>
@@ -81,7 +80,7 @@ export const RwalkAnchorDistributionImprintsTable = ({
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 {t('tables.randomWalkImprints.columns.datetime')}
               </TablePrimaryHeadCell>
@@ -94,14 +93,14 @@ export const RwalkAnchorDistributionImprintsTable = ({
               <TablePrimaryHeadCell>
                 {t('tables.randomWalkImprints.columns.tokenId')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <Tbody>
+          <TablePrimaryBody>
             {currentData.map((row) => (
               <AnchorDistributionImprintsRow key={row.EvtLogId} row={row} />
             ))}
-          </Tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

@@ -1,10 +1,7 @@
 'use client';
 
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useState } from 'react';
 import { getAddress, isAddress } from 'viem';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, getWalletKind } from '@/utils';
@@ -15,6 +12,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -48,7 +46,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
 
   return (
     <TablePrimaryRow className={(row.TransferType ?? 0) > 0 ? 'bg-white/[0.06]' : ''}>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('shared.datetime')}>
         <a
           className="text-inherit text-[length:inherit]"
           href={getExplorerUrl('tx', row.TxHash)}
@@ -59,7 +57,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('shared.from')} align="center">
         {fromWalletKind ? (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -79,7 +77,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
         )}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('shared.to')} align="center">
         {toWalletKind ? (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -99,7 +97,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
         )}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('shared.tokenId')} align="center">
         <a
           className="text-inherit text-[length:inherit]"
           href={`/detail/${row.TokenId}`}
@@ -133,18 +131,18 @@ const CosmicSignatureTransfersTable = ({ list }: { list: TransferRow[] }) => {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('shared.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('shared.from')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('shared.to')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('shared.tokenId')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {currentPageList.map((row) => (
               <CosmicSignatureTransferRow key={row.EvtLogId} row={row} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

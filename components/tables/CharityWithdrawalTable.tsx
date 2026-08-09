@@ -1,13 +1,12 @@
 import { useState, type FC } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl } from '@/utils';
 
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -25,6 +24,7 @@ interface WithdrawalRowProps {
 }
 
 const WithdrawalRow: FC<WithdrawalRowProps> = ({ retrieval }) => {
+  const t = useTranslations('tables');
   const locale = useLocale();
   if (!retrieval) {
     return <TablePrimaryRow />;
@@ -32,7 +32,7 @@ const WithdrawalRow: FC<WithdrawalRowProps> = ({ retrieval }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', retrieval.TxHash)}
@@ -42,13 +42,15 @@ const WithdrawalRow: FC<WithdrawalRowProps> = ({ retrieval }) => {
           <HydrationSafeDateTime timestamp={retrieval.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.destinationAddress')} align="center">
         <AddressLink
           address={retrieval.DestinationAddr}
           url={`/user/${retrieval.DestinationAddr}`}
         />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{retrieval.AmountEth.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.retrievalAmountEth')} align="right">
+        {retrieval.AmountEth.toFixed(6)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -74,19 +76,19 @@ const CharityWithdrawalTable: FC<CharityWithdrawalTableProps> = ({ list }) => {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.destinationAddress')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 {t('columns.retrievalAmountEth')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice(startIndex, endIndex).map((retrieval) => (
               <WithdrawalRow retrieval={retrieval} key={retrieval.EvtLogId} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination

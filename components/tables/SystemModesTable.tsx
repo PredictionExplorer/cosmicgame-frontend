@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -36,19 +36,31 @@ const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
 
   if (!row) return <TablePrimaryRow />;
 
+  const eventHref = `/system-event/${row.RoundNum}/${row.EvtLogId}/${row.NextEvtLogId}`;
+
   const handleRowClick = () => {
-    router.push(`/system-event/${row.RoundNum}/${row.EvtLogId}/${row.NextEvtLogId}`);
+    router.push(eventHref);
   };
 
+  const scope = row.RoundNum
+    ? t('allocation.cycle', { cycle: row.RoundNum })
+    : t('status.deployment');
+
   return (
-    <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
-      <TablePrimaryCell align="center">
-        {row.RoundNum ? row.RoundNum : t('status.deployment')}
+    <TablePrimaryRow onActivate={handleRowClick}>
+      <TablePrimaryCell label={t('columns.round')} align="center">
+        <Link
+          href={eventHref}
+          className={TABLE_ROW_LINK_CLASS}
+          aria-label={t('systemModes.viewEvent', { scope })}
+        >
+          {row.RoundNum ? row.RoundNum : t('status.deployment')}
+        </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.started')} align="center">
         <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.ended')} align="center">
         {prevRow ? (
           <HydrationSafeDateTime timestamp={prevRow.TimeStamp} locale={locale} />
         ) : (
@@ -74,13 +86,8 @@ export const SystemModesTable = ({ list }: SystemModesTableProps) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="25%" />
-            <col width="33%" />
-            <col width="33%" />
-          </colgroup>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="center">
                 <TableHeaderHelp
                   desktop={t('columns.round')}
@@ -99,16 +106,16 @@ export const SystemModesTable = ({ list }: SystemModesTableProps) => {
                   tooltip={t('statisticsTooltips.systemEnded')}
                 />
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {paginatedList.map((row, i) => {
               const globalIndex = (page - 1) * perPage + i;
               const prevRow = globalIndex > 0 ? (list[globalIndex - 1] ?? null) : null;
 
               return <SystemModesRow key={row.EvtLogId} row={row} prevRow={prevRow} />;
             })}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Tr, Tbody } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -16,7 +16,6 @@ import {
 } from '@/components/styled';
 import { useNamedNFTs } from '@/hooks/useApiQuery';
 import type { CSTTokenInfo } from '@/services/api';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -25,6 +24,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
+  const t = useTranslations('tables');
   const locale = useLocale();
   if (!nft) {
     return <TablePrimaryRow />;
@@ -32,15 +32,15 @@ const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.dateTimeCompact')}>
         <HydrationSafeDateTime timestamp={nft.MintTimeStamp ?? nft.TimeStamp} locale={locale} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('statisticsColumns.namedNftTokenId')} align="center">
         <Link href={`/detail/${nft.TokenId}`} className="text-inherit text-[inherit]">
           {nft.TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>{nft.TokenName ?? ''}</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.tokenName')}>{nft.TokenName ?? ''}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -51,17 +51,17 @@ const NamedNFTsTable = ({ list }: { list: CSTTokenInfo[] }) => {
     <TablePrimaryContainer>
       <TablePrimary>
         <TablePrimaryHead>
-          <Tr>
+          <tr>
             <TablePrimaryHeadCell align="left">{t('columns.dateTimeCompact')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>{t('statisticsColumns.namedNftTokenId')}</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">{t('columns.tokenName')}</TablePrimaryHeadCell>
-          </Tr>
+          </tr>
         </TablePrimaryHead>
-        <Tbody>
+        <TablePrimaryBody>
           {list.map((nft, i: number) => (
             <NamedNFTRow key={i} nft={nft} />
           ))}
-        </Tbody>
+        </TablePrimaryBody>
       </TablePrimary>
     </TablePrimaryContainer>
   );

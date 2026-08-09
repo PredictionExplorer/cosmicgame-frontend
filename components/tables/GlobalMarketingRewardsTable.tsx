@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl } from '@/utils';
 
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -21,6 +20,7 @@ import type { MarketingReward } from '@/services/api/types';
 export type { MarketingReward };
 
 const GlobalMarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
+  const t = useTranslations('tables');
   const locale = useLocale();
   if (!row) {
     return <TablePrimaryRow />;
@@ -28,7 +28,7 @@ const GlobalMarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', row.TxHash)}
@@ -38,10 +38,12 @@ const GlobalMarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
           <HydrationSafeDateTime timestamp={row.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.outreachContributor')} align="center">
         <AddressLink address={row.MarketerAddr} url={`/marketing/${row.MarketerAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{row.AmountEth.toFixed(2)} CST</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.amount')} align="right">
+        {row.AmountEth.toFixed(2)} CST
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -60,17 +62,17 @@ export const GlobalMarketingRewardsTable = ({ list }: { list: MarketingReward[] 
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>{t('columns.outreachContributor')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">{t('columns.amount')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <GlobalMarketingRewardsRow row={row} key={row.EvtLogId} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

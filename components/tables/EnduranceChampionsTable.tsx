@@ -1,13 +1,12 @@
 import { useMemo, useState, type FC } from 'react';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatSeconds } from '@/utils';
 
 import {
   TablePrimaryContainer,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
@@ -39,7 +38,7 @@ const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row, isLive = false }) =>
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell align="left">
+      <TablePrimaryCell label={t('columns.userAddress')} align="left">
         <div className="flex flex-wrap items-center gap-2">
           <AddressLink address={row.participant} url={`/user/${row.participant}`} />
           {isLive && (
@@ -50,8 +49,10 @@ const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row, isLive = false }) =>
           )}
         </div>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{formatSeconds(row.championTime, locale)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('endurance.championTime')} align="center">
+        {formatSeconds(row.championTime, locale)}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('endurance.chronoWarrior')} align="center">
         {formatSeconds(row.chronoWarrior || 0, locale)}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -127,13 +128,8 @@ const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBi
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="50%" />
-            <col width="25%" />
-            <col width="25%" />
-          </colgroup>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.userAddress')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 <button
@@ -161,9 +157,9 @@ const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBi
                   />
                 </button>
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {paginatedList.map((row, index) => (
               <EnduranceChampionsRow
                 key={`${row.participant}-${index}-${page}`}
@@ -171,7 +167,7 @@ const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBi
                 isLive={sameAddress(row.participant, lastBidderAddress)}
               />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       {championList.length > perPage && (

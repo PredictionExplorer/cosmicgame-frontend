@@ -1,13 +1,11 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useEffect, useState, useMemo, useRef, type MouseEvent } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Tr } from 'react-super-responsive-table';
 
 import { cn } from '@/lib/utils';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -37,6 +35,7 @@ interface RWLKRowProps {
 
 const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }: RWLKRowProps) => {
   const t = useTranslations('anchoring');
+  const tableT = useTranslations('tables');
   const handleRowClick = () => onSelectToggle(tokenId);
 
   const handleAnchorClick = (e: MouseEvent) => {
@@ -51,17 +50,19 @@ const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }:
       onClick={handleRowClick}
       className={cn('cursor-pointer', isSelected && 'bg-white/5')}
     >
-      <TablePrimaryCell className="!px-3 !py-2">
+      <TablePrimaryCell className="!px-3 !py-2" label={tableT('columns.selected')}>
         <Checkbox checked={isSelected} readOnly className="h-4 w-4" />
       </TablePrimaryCell>
 
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.availableTokens.columns.ownerAddress')}>
         <AddressLink address={ownerAddress} url={`/user/${ownerAddress}`} />
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{tokenId}</TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.availableTokens.columns.tokenId')} align="center">
+        {tokenId}
+      </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.availableTokens.aria.actions')} align="center">
         <Button size="sm" onClick={handleAnchorClick}>
           {t('tables.availableTokens.actions.anchor')}
         </Button>
@@ -146,15 +147,8 @@ export const RWLKNFTTable = ({
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="5%" />
-            <col width="50%" />
-            <col width="25%" />
-            <col width="20%" />
-          </colgroup>
-
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left" className="!px-3 !py-2">
                 <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                   <DropdownMenuTrigger asChild>
@@ -194,10 +188,10 @@ export const RWLKNFTTable = ({
               <TablePrimaryHeadCell>
                 <span className="sr-only">{t('tables.availableTokens.aria.actions')}</span>
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <tbody>
+          <TablePrimaryBody>
             {currentPageData.map((tokenId) => (
               <RWLKRow
                 key={tokenId}
@@ -208,7 +202,7 @@ export const RWLKNFTTable = ({
                 onStake={handleSingleAnchor}
               />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

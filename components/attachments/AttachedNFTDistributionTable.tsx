@@ -1,11 +1,9 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useMemo, useState, type FC } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useTranslations } from 'next-intl';
 
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -44,7 +42,7 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('statisticsColumns.contractAddress')}
@@ -57,9 +55,9 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
                   tooltip={t('statisticsTooltips.attachedNftCount')}
                 />
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {paginatedData.map((row, index) => {
               const rowKey = `attached-nft-${(page - 1) * PER_PAGE + index}`;
               if (!row) {
@@ -67,14 +65,16 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
               }
               return (
                 <TablePrimaryRow key={rowKey}>
-                  <TablePrimaryCell>
-                    <span className="font-mono">{row.TokenAddr}</span>
+                  <TablePrimaryCell label={t('statisticsColumns.contractAddress')}>
+                    <span className="font-mono break-all">{row.TokenAddr}</span>
                   </TablePrimaryCell>
-                  <TablePrimaryCell align="right">{row.NumDonations}</TablePrimaryCell>
+                  <TablePrimaryCell label={t('statisticsColumns.numberOfNfts')} align="right">
+                    {row.NumDonations}
+                  </TablePrimaryCell>
                 </TablePrimaryRow>
               );
             })}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

@@ -1,11 +1,9 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useMemo, useState, type FC } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useTranslations } from 'next-intl';
 
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -27,15 +25,19 @@ interface CSTokenDistributionRowProps {
 }
 
 const CSTokenDistributionRow: FC<CSTokenDistributionRowProps> = ({ row }) => {
+  const t = useTranslations('tables');
+
   if (!row) return <TablePrimaryRow />;
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('statisticsColumns.ownerAddress')}>
         <AddressLink address={row.OwnerAddr} url={`/user/${row.OwnerAddr}`} />
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="right">{row.NumTokens}</TablePrimaryCell>
+      <TablePrimaryCell label={t('statisticsColumns.numberOfTokensOwned')} align="right">
+        {row.NumTokens}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -64,7 +66,7 @@ export const CSTokenDistributionTable: FC<CSTokenDistributionTableProps> = ({
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 <TableHeaderHelp
                   desktop={t('statisticsColumns.ownerAddress')}
@@ -77,14 +79,14 @@ export const CSTokenDistributionTable: FC<CSTokenDistributionTableProps> = ({
                   tooltip={t('statisticsTooltips.numberOfTokensOwned')}
                 />
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <tbody>
+          <TablePrimaryBody>
             {paginatedData.map((row) => (
               <CSTokenDistributionRow row={row} key={row.OwnerAid} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

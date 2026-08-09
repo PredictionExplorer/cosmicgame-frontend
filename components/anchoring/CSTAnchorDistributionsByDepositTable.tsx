@@ -1,8 +1,5 @@
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl } from '@/utils';
 
@@ -10,6 +7,7 @@ import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime
 import { Link } from '@/i18n/navigation';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -43,7 +41,7 @@ const CSTAnchorDistributionsByDepositRow = ({ row }: { row: CSTAnchorDistributio
 
   return (
     <TablePrimaryRow className="border-b-0">
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('tables.distributionsByDeposit.columns.depositDatetime')}>
         <a
           href={getExplorerUrl('tx', row.TxHash)}
           target="_blank"
@@ -54,22 +52,63 @@ const CSTAnchorDistributionsByDepositRow = ({ row }: { row: CSTAnchorDistributio
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell
+        label={t('tables.distributionsByDeposit.columns.depositCycle')}
+        align="center"
+      >
         <Link href={`/allocation/${row.DepositRoundNum}`} className="text-inherit">
           {row.DepositRoundNum}
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{row.DepositId}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.DepositAmountEth.toFixed(4)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.ClaimedAmountEth.toFixed(4)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.YourClaimableAmountEth.toFixed(4)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('tables.distributionsByDeposit.columns.depositId')} align="center">
+        {row.DepositId}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.distributionsByDeposit.columns.totalDepositAmount')}
+        align="center"
+      >
+        {row.DepositAmountEth.toFixed(4)}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.distributionsByDeposit.columns.totalRetrievedAmount')}
+        align="center"
+        priority="secondary"
+      >
+        {row.ClaimedAmountEth.toFixed(4)}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.distributionsByDeposit.columns.yourRetrievableAmount')}
+        align="center"
+      >
+        {row.YourClaimableAmountEth.toFixed(4)}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.distributionsByDeposit.columns.fullyRetrieved')}
+        align="center"
+      >
         {row.FullyClaimed ? t('common.yes') : t('common.no')}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.NumTokensCollected}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.YourTokensStaked}</TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.distributionsByDeposit.columns.totalAnchoredNfts')}
+        align="center"
+        priority="secondary"
+      >
+        {row.NumStakedNFTs}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.distributionsByDeposit.columns.totalRetrievedTokens')}
+        align="center"
+        priority="secondary"
+      >
+        {row.NumTokensCollected}
+      </TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('tables.distributionsByDeposit.columns.yourAnchoredTokens')}
+        align="center"
+      >
+        {row.YourTokensStaked}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -96,7 +135,7 @@ export const CSTAnchorDistributionsByDepositTable = ({
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 {t('tables.distributionsByDeposit.columns.depositDatetime')}
               </TablePrimaryHeadCell>
@@ -109,7 +148,7 @@ export const CSTAnchorDistributionsByDepositTable = ({
               <TablePrimaryHeadCell>
                 {t('tables.distributionsByDeposit.columns.totalDepositAmount')}
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
+              <TablePrimaryHeadCell priority="secondary">
                 {t('tables.distributionsByDeposit.columns.totalRetrievedAmount')}
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
@@ -118,23 +157,23 @@ export const CSTAnchorDistributionsByDepositTable = ({
               <TablePrimaryHeadCell>
                 {t('tables.distributionsByDeposit.columns.fullyRetrieved')}
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
+              <TablePrimaryHeadCell priority="secondary">
                 {t('tables.distributionsByDeposit.columns.totalAnchoredNfts')}
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>
+              <TablePrimaryHeadCell priority="secondary">
                 {t('tables.distributionsByDeposit.columns.totalRetrievedTokens')}
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
                 {t('tables.distributionsByDeposit.columns.yourAnchoredTokens')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
 
-          <Tbody>
+          <TablePrimaryBody>
             {currentData.map((row) => (
               <CSTAnchorDistributionsByDepositRow row={row} key={row.EvtLogId} />
             ))}
-          </Tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
 

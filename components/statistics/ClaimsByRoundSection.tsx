@@ -1,15 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { formatSeconds, formatEthValue, getExplorerUrl, shortenHex } from '@/utils';
 
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -59,14 +58,14 @@ const ItemDetail = ({ item }: { item: ClaimUnclaimedItem }) => {
   if (item.AssetType === 'ERC721') {
     return (
       <span className="text-muted-foreground">
-        <span className="font-mono">{shortAddr(item.TokenAddr)}</span> #{item.TokenId}
+        <span className="font-mono break-all">{shortAddr(item.TokenAddr)}</span> #{item.TokenId}
       </span>
     );
   }
   return (
     <span className="text-muted-foreground">
       {item.AmountEth.toLocaleString(locale)} ·{' '}
-      <span className="font-mono">{shortAddr(item.TokenAddr)}</span>
+      <span className="font-mono break-all">{shortAddr(item.TokenAddr)}</span>
     </span>
   );
 };
@@ -112,7 +111,7 @@ const UnclaimedDialog = ({
               <TablePrimaryContainer>
                 <TablePrimary>
                   <TablePrimaryHead>
-                    <Tr>
+                    <tr>
                       <TablePrimaryHeadCell align="left">
                         {t('performance.claims.dialog.asset')}
                       </TablePrimaryHeadCell>
@@ -122,15 +121,17 @@ const UnclaimedDialog = ({
                       <TablePrimaryHeadCell align="right">
                         {t('performance.claims.dialog.detail')}
                       </TablePrimaryHeadCell>
-                    </Tr>
+                    </tr>
                   </TablePrimaryHead>
-                  <tbody>
+                  <TablePrimaryBody>
                     {cycle.UnclaimedItems.map((item, idx) => (
                       <TablePrimaryRow
                         key={`${item.AssetType}-${item.TokenAddr ?? ''}-${item.TokenId ?? ''}-${item.RecipientAddr ?? idx}`}
                       >
-                        <TablePrimaryCell>{assetLabel[item.AssetType]}</TablePrimaryCell>
-                        <TablePrimaryCell>
+                        <TablePrimaryCell label={t('performance.claims.dialog.asset')}>
+                          {assetLabel[item.AssetType]}
+                        </TablePrimaryCell>
+                        <TablePrimaryCell label={t('performance.claims.dialog.recipient')}>
                           {item.RecipientAddr ? (
                             <AddressLink
                               address={item.RecipientAddr}
@@ -140,12 +141,15 @@ const UnclaimedDialog = ({
                             '—'
                           )}
                         </TablePrimaryCell>
-                        <TablePrimaryCell align="right">
+                        <TablePrimaryCell
+                          label={t('performance.claims.dialog.detail')}
+                          align="right"
+                        >
                           <ItemDetail item={item} />
                         </TablePrimaryCell>
                       </TablePrimaryRow>
                     ))}
-                  </tbody>
+                  </TablePrimaryBody>
                 </TablePrimary>
               </TablePrimaryContainer>
             </div>
@@ -162,7 +166,7 @@ const TxLink = ({ hash }: { hash: string }) =>
       href={getExplorerUrl('tx', hash)}
       target="_blank"
       rel="noopener noreferrer"
-      className="font-mono text-primary hover:underline"
+      className="font-mono break-all text-primary hover:underline"
     >
       {shortenHex(hash)}
     </a>
@@ -182,7 +186,7 @@ const TxnAssetDetail = ({ txn }: { txn: ClaimTxn }) => {
           href={getExplorerUrl('address', txn.TokenAddr)}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-mono text-primary hover:underline"
+          className="font-mono break-all text-primary hover:underline"
         >
           {shortAddr(txn.TokenAddr)}
         </a>{' '}
@@ -196,7 +200,7 @@ const TxnAssetDetail = ({ txn }: { txn: ClaimTxn }) => {
         href={getExplorerUrl('address', txn.TokenAddr)}
         target="_blank"
         rel="noopener noreferrer"
-        className="font-mono text-primary hover:underline"
+        className="font-mono break-all text-primary hover:underline"
       >
         {shortAddr(txn.TokenAddr)}
       </a>
@@ -240,7 +244,7 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                 <TablePrimaryContainer>
                   <TablePrimary>
                     <TablePrimaryHead>
-                      <Tr>
+                      <tr>
                         <TablePrimaryHeadCell align="left">
                           {t('performance.claims.dialog.asset')}
                         </TablePrimaryHeadCell>
@@ -256,15 +260,15 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                         <TablePrimaryHeadCell align="right">
                           {t('performance.claims.dialog.transaction')}
                         </TablePrimaryHeadCell>
-                      </Tr>
+                      </tr>
                     </TablePrimaryHead>
-                    <tbody>
+                    <TablePrimaryBody>
                       {claims.map((txn, idx) => (
                         <TablePrimaryRow key={txn.TxHash ? `${txn.TxHash}-${idx}` : idx}>
-                          <TablePrimaryCell>
+                          <TablePrimaryCell label={t('performance.claims.dialog.asset')}>
                             <TxnAssetDetail txn={txn} />
                           </TablePrimaryCell>
-                          <TablePrimaryCell>
+                          <TablePrimaryCell label={t('performance.claims.dialog.recipient')}>
                             <AddressLink
                               address={txn.RecipientAddr}
                               url={`/user/${txn.RecipientAddr}`}
@@ -272,25 +276,31 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                             {txn.BeneficiaryAddr &&
                               txn.BeneficiaryAddr.toLowerCase() !==
                                 txn.RecipientAddr.toLowerCase() && (
-                                <span className="block text-xs text-red-400">
+                                <span className="block break-words text-xs text-red-400">
                                   {t('performance.claims.dialog.sweptBy', {
                                     address: shortAddr(txn.BeneficiaryAddr),
                                   })}
                                 </span>
                               )}
                           </TablePrimaryCell>
-                          <TablePrimaryCell align="right">
+                          <TablePrimaryCell
+                            label={t('performance.claims.dialog.claimedAfter')}
+                            align="right"
+                          >
                             {formatSeconds(Math.max(0, txn.ClaimedAfterSecs), locale)}
                           </TablePrimaryCell>
-                          <TablePrimaryCell>
+                          <TablePrimaryCell label={t('performance.claims.dialog.when')}>
                             <HydrationSafeDateTime timestamp={txn.ClaimTs} locale={locale} />
                           </TablePrimaryCell>
-                          <TablePrimaryCell align="right">
+                          <TablePrimaryCell
+                            label={t('performance.claims.dialog.transaction')}
+                            align="right"
+                          >
                             <TxLink hash={txn.TxHash} />
                           </TablePrimaryCell>
                         </TablePrimaryRow>
                       ))}
-                    </tbody>
+                    </TablePrimaryBody>
                   </TablePrimary>
                 </TablePrimaryContainer>
               )}
@@ -308,7 +318,7 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                 <TablePrimaryContainer>
                   <TablePrimary>
                     <TablePrimaryHead>
-                      <Tr>
+                      <tr>
                         <TablePrimaryHeadCell align="left">
                           {t('performance.claims.dialog.asset')}
                         </TablePrimaryHeadCell>
@@ -324,43 +334,49 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                         <TablePrimaryHeadCell align="right">
                           {t('performance.claims.dialog.transaction')}
                         </TablePrimaryHeadCell>
-                      </Tr>
+                      </tr>
                     </TablePrimaryHead>
-                    <tbody>
+                    <TablePrimaryBody>
                       {attached.map((tok, idx) => (
                         <TablePrimaryRow key={tok.TxHash ? `${tok.TxHash}-${idx}` : idx}>
-                          <TablePrimaryCell>
+                          <TablePrimaryCell label={t('performance.claims.dialog.asset')}>
                             {tok.AssetType === 'ERC721'
                               ? t('performance.claims.assets.nft')
                               : t('performance.claims.assets.erc20')}
                           </TablePrimaryCell>
-                          <TablePrimaryCell>
+                          <TablePrimaryCell label={t('performance.claims.dialog.token')}>
                             <a
                               href={getExplorerUrl('address', tok.TokenAddr)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="font-mono text-primary hover:underline"
+                              className="font-mono break-all text-primary hover:underline"
                             >
                               {shortAddr(tok.TokenAddr)}
                             </a>
                           </TablePrimaryCell>
-                          <TablePrimaryCell align="right">
+                          <TablePrimaryCell
+                            label={t('performance.claims.dialog.detail')}
+                            align="right"
+                          >
                             {tok.AssetType === 'ERC721'
                               ? `#${tok.TokenId}`
                               : tok.AmountEth.toLocaleString(locale)}
                           </TablePrimaryCell>
-                          <TablePrimaryCell>
+                          <TablePrimaryCell label={t('performance.claims.dialog.attachedBy')}>
                             <AddressLink
                               address={tok.ContributorAddr}
                               url={`/user/${tok.ContributorAddr}`}
                             />
                           </TablePrimaryCell>
-                          <TablePrimaryCell align="right">
+                          <TablePrimaryCell
+                            label={t('performance.claims.dialog.transaction')}
+                            align="right"
+                          >
                             <TxLink hash={tok.TxHash} />
                           </TablePrimaryCell>
                         </TablePrimaryRow>
                       ))}
-                    </tbody>
+                    </TablePrimaryBody>
                   </TablePrimary>
                 </TablePrimaryContainer>
               )}
@@ -424,15 +440,17 @@ const Row = ({
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell align="center">{cycle.RoundNum}</TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('performance.claims.columns.cycle')} align="center">
+        {cycle.RoundNum}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('performance.claims.columns.awarded')}>
         <span className="inline-flex flex-wrap items-center gap-1.5">
           <CountBadge n={cycle.EthAwarded} label="ETH" />
           <CountBadge n={cycle.NftAwarded} label="NFT" />
           <CountBadge n={cycle.Erc20Awarded} label="ERC-20" />
         </span>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('performance.claims.columns.unclaimed')} align="right">
         {hasUnclaimed ? (
           <button
             type="button"
@@ -453,17 +471,17 @@ const Row = ({
           <span className="text-muted-foreground">{t('performance.claims.allClaimed')}</span>
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('performance.claims.columns.claimedPercent')} align="right">
         <ClaimedPctCell cycle={cycle} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('performance.claims.columns.averageTime')} align="right">
         {cycle.AvgClaimPeriodSecs > 0 ? (
           formatSeconds(cycle.AvgClaimPeriodSecs, locale)
         ) : (
           <span className="text-muted-foreground">—</span>
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell label={t('performance.claims.columns.details')} align="right">
         <button
           type="button"
           onClick={() => onExplore(cycle.RoundNum)}
@@ -512,7 +530,7 @@ export const ClaimsByRoundSection = () => {
           <TablePrimaryContainer>
             <TablePrimary>
               <TablePrimaryHead>
-                <Tr>
+                <tr>
                   <TablePrimaryHeadCell align="center">
                     {t('performance.claims.columns.cycle')}
                   </TablePrimaryHeadCell>
@@ -531,9 +549,9 @@ export const ClaimsByRoundSection = () => {
                   <TablePrimaryHeadCell align="right">
                     {t('performance.claims.columns.details')}
                   </TablePrimaryHeadCell>
-                </Tr>
+                </tr>
               </TablePrimaryHead>
-              <tbody>
+              <TablePrimaryBody>
                 {list.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((cycle) => (
                   <Row
                     key={cycle.RoundNum}
@@ -542,7 +560,7 @@ export const ClaimsByRoundSection = () => {
                     onExplore={setExploreRound}
                   />
                 ))}
-              </tbody>
+              </TablePrimaryBody>
             </TablePrimary>
           </TablePrimaryContainer>
           <CustomPagination

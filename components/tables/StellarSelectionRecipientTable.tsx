@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -10,6 +8,7 @@ import { Link } from '@/i18n/navigation';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
@@ -52,14 +51,21 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
     const contract = stellarSelectionWalletContract;
     if (!contract) return;
 
+    let cancelled = false;
+
     const fetchCycleTimeoutTimesToRetrieveAllocations = async () => {
       const cycleTimeoutTimesToRetrieveAllocations =
         await (contract.read.roundTimeoutTimesToWithdrawPrizes?.([BigInt(RoundNum)]) ??
           Promise.resolve(0n));
+      if (cancelled) return;
       setRoundTimeoutTimesToWithdrawPrizes(Number(cycleTimeoutTimesToRetrieveAllocations ?? 0));
     };
 
     void fetchCycleTimeoutTimesToRetrieveAllocations();
+
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stellarSelectionWalletContract]);
 
@@ -69,7 +75,7 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.datetime')}>
         <a
           className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
@@ -79,22 +85,22 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
           <HydrationSafeDateTime timestamp={TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.recipient')}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/user/${WinnerAddr}`} className="text-inherit font-mono">
+            <Link href={`/user/${WinnerAddr}`} className="text-inherit font-mono break-all">
               {shortenHex(WinnerAddr, 6)}
             </Link>
           </TooltipTrigger>
           <TooltipContent>{WinnerAddr}</TooltipContent>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.cycleHash')} align="center">
         <Link href={`/allocation/${RoundNum}`} className="text-inherit">
           {RoundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.type')}>
         {Amount
           ? t('stellarSelection.ethDeposit')
           : IsStaker && IsRwalk
@@ -103,11 +109,13 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
               ? t('stellarSelection.signatureNftSelection')
               : t('stellarSelection.signatureNft')}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.expirationDate')} align="center">
         <HydrationSafeDateTime timestamp={cycleTimeoutTimesToRetrieveAllocations} locale={locale} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{Amount ? `${Amount.toFixed(4)} ETH` : ' '}</TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.amount')} align="right">
+        {Amount ? `${Amount.toFixed(4)} ETH` : ' '}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.tokenId')} align="center">
         {TokenId ? (
           <Link href={`/detail/${TokenId}`} className="text-inherit">
             {TokenId}
@@ -142,17 +150,8 @@ const StellarSelectionRecipientTable = ({
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="12%" />
-            <col width="15%" />
-            <col width="9%" />
-            <col width="16%" />
-            <col width="15%" />
-            <col width="13%" />
-            <col width="10%" />
-          </colgroup>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('columns.recipient')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">{t('columns.cycleHash')}</TablePrimaryHeadCell>
@@ -162,16 +161,16 @@ const StellarSelectionRecipientTable = ({
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">{t('columns.amount')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">{t('columns.tokenId')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {list.slice((page - 1) * perPage, page * perPage).map((recipient) => (
               <RecipientRow
                 key={recipient.Tx?.EvtLogId ?? recipient.EvtLogId}
                 recipient={recipient}
               />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

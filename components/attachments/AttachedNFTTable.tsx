@@ -1,6 +1,5 @@
 import { useState, type FC } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -8,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -17,7 +17,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NFTImage from '@/components/nft/NFTImage';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 
@@ -58,7 +57,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('attachedAssets.nft.columns.datetime')}>
         <a
           className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', nft.TxHash)}
@@ -69,12 +68,15 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('attachedAssets.nft.columns.contributorAddress')}
+        priority="secondary"
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Link
               href={`/user/${nft.DonorAddr}`}
-              className="text-inherit text-[inherit] font-mono"
+              className="text-inherit text-[inherit] font-mono break-all"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -85,7 +87,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('attachedAssets.nft.columns.round')} align="center">
         <Link
           href={`/allocation/${nft.RoundNum}`}
           className="text-inherit text-[inherit]"
@@ -96,12 +98,12 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('attachedAssets.nft.columns.tokenAddress')}>
         <Tooltip>
           <TooltipTrigger asChild>
             <a
               href={getExplorerUrl('address', nft.TokenAddr)}
-              className="text-inherit text-[inherit] font-mono"
+              className="text-inherit text-[inherit] font-mono break-all"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -112,7 +114,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('attachedAssets.nft.columns.tokenId')} align="center">
         {tokenURI?.external_url ? (
           <a
             href={tokenURI.external_url}
@@ -127,7 +129,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         )}
       </TablePrimaryCell>
 
-      <TablePrimaryCell className="w-[130px]">
+      <TablePrimaryCell label={t('attachedAssets.nft.columns.tokenImage')}>
         {tokenURI?.image ? (
           <a href={tokenURI.external_url} target="_blank" rel="noopener noreferrer">
             <NFTImage
@@ -145,7 +147,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
       </TablePrimaryCell>
 
       {handleClaim && (
-        <TablePrimaryCell>
+        <TablePrimaryCell label={t('attachedAssets.aria.actions')}>
           {!nft.WinnerAddr && (
             <Button
               onClick={() => handleClaim(nft.Index)}
@@ -180,11 +182,11 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
         <TablePrimaryContainer>
           <TablePrimary>
             <TablePrimaryHead>
-              <Tr>
+              <tr>
                 <TablePrimaryHeadCell align="left">
                   {t('attachedAssets.nft.columns.datetime')}
                 </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="left">
+                <TablePrimaryHeadCell align="left" priority="secondary">
                   {t('attachedAssets.nft.columns.contributorAddress')}
                 </TablePrimaryHeadCell>
                 <TablePrimaryHeadCell>{t('attachedAssets.nft.columns.round')}</TablePrimaryHeadCell>
@@ -194,7 +196,7 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
                 <TablePrimaryHeadCell>
                   {t('attachedAssets.nft.columns.tokenId')}
                 </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
+                <TablePrimaryHeadCell className="w-[130px]">
                   {t('attachedAssets.nft.columns.tokenImage')}
                 </TablePrimaryHeadCell>
                 {handleClaim && (
@@ -202,9 +204,9 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
                     <span className="sr-only">{t('attachedAssets.aria.actions')}</span>
                   </TablePrimaryHeadCell>
                 )}
-              </Tr>
+              </tr>
             </TablePrimaryHead>
-            <tbody>
+            <TablePrimaryBody>
               {pageSlice.map((nft, i) => (
                 <NFTRow
                   key={page * perPage + i}
@@ -213,7 +215,7 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
                   claimingTokens={claimingTokens}
                 />
               ))}
-            </tbody>
+            </TablePrimaryBody>
           </TablePrimary>
         </TablePrimaryContainer>
 

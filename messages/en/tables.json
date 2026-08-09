@@ -145,7 +145,8 @@
     "expirationDate": "Expiration Date",
     "started": "Started",
     "ended": "Ended",
-    "actions": "Actions"
+    "actions": "Actions",
+    "selected": "Selected"
   },
   "pagination": {
     "label": "pagination",
@@ -212,7 +213,8 @@
   },
   "ethContribution": {
     "withInfo": "Contribution with info",
-    "simple": "Simple contribution"
+    "simple": "Simple contribution",
+    "viewContribution": "View contribution {id}"
   },
   "endurance": {
     "liveHelp": "This participant is also the latest gesture maker, so this endurance window is still growing.",
@@ -226,7 +228,9 @@
     "ethGesture": "Gesture was made using ETH",
     "nftAttached": " and a token ({address}) with ID {id} was attached",
     "erc20AttachedPrefix": " and {amount}",
-    "attachedSuffix": " was attached"
+    "attachedSuffix": " was attached",
+    "tableLabel": "Gesture history",
+    "viewGesture": "View gesture {id}"
   },
   "nameHistory": {
     "removed": "Token name was removed."
@@ -320,6 +324,9 @@
     "anchoredNft": "Anchored-NFT Stellar Selection Cosmic Signature NFT",
     "signatureNftSelection": "Cosmic Signature NFT Stellar Selection",
     "signatureNft": "Cosmic Signature NFT"
+  },
+  "systemModes": {
+    "viewEvent": "View system event for {scope}"
   },
   "transferHistory": {
     "signatureAnchoringWallet": "Cosmic Signature NFT Anchoring Wallet",

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -8,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -16,7 +16,6 @@ import {
 } from '@/components/styled';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { DonatedERC20Token } from '@/services/api/types';
 import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
@@ -44,7 +43,7 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('attachedAssets.erc20.columns.datetime')}>
         <a
           className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', token.TxHash)}
@@ -55,7 +54,7 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
         </a>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('attachedAssets.erc20.columns.cycle')} align="center">
         <Link
           href={`/allocation/${token.RoundNum}`}
           className="text-inherit text-[inherit]"
@@ -66,12 +65,12 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('attachedAssets.erc20.columns.tokenAddress')}>
         <Tooltip>
           <TooltipTrigger asChild>
             <a
               href={getExplorerUrl('address', token.TokenAddr)}
-              className="text-inherit text-[inherit] font-mono"
+              className="text-inherit text-[inherit] font-mono break-all"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -82,17 +81,25 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{donatedEth.toFixed(2)}</TablePrimaryCell>
+      <TablePrimaryCell label={t('attachedAssets.erc20.columns.attachedAmount')} align="center">
+        {donatedEth.toFixed(2)}
+      </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{claimedEth.toFixed(2)}</TablePrimaryCell>
+      <TablePrimaryCell
+        label={t('attachedAssets.erc20.columns.retrievedAmount')}
+        align="center"
+        priority="secondary"
+      >
+        {claimedEth.toFixed(2)}
+      </TablePrimaryCell>
 
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('attachedAssets.erc20.columns.recipient')} priority="secondary">
         {token.WinnerAddr ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
                 href={`/user/${token.WinnerAddr}`}
-                className="text-inherit text-[inherit] font-mono"
+                className="text-inherit text-[inherit] font-mono break-all"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -106,12 +113,12 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
         )}
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('attachedAssets.erc20.columns.retrieved')} align="center">
         {token.Claimed ? t('attachedAssets.status.yes') : t('attachedAssets.status.no')}
       </TablePrimaryCell>
 
       {handleClaim && (
-        <TablePrimaryCell>
+        <TablePrimaryCell label={t('attachedAssets.aria.actions')}>
           {!token.Claimed && (
             <Button
               onClick={() =>
@@ -150,7 +157,7 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
         <TablePrimaryContainer>
           <TablePrimary>
             <TablePrimaryHead>
-              <Tr>
+              <tr>
                 <TablePrimaryHeadCell align="left">
                   {t('attachedAssets.erc20.columns.datetime')}
                 </TablePrimaryHeadCell>
@@ -163,10 +170,10 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
                 <TablePrimaryHeadCell>
                   {t('attachedAssets.erc20.columns.attachedAmount')}
                 </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
+                <TablePrimaryHeadCell priority="secondary">
                   {t('attachedAssets.erc20.columns.retrievedAmount')}
                 </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>
+                <TablePrimaryHeadCell priority="secondary">
                   {t('attachedAssets.erc20.columns.recipient')}
                 </TablePrimaryHeadCell>
                 <TablePrimaryHeadCell>
@@ -177,13 +184,13 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
                     <span className="sr-only">{t('attachedAssets.aria.actions')}</span>
                   </TablePrimaryHeadCell>
                 )}
-              </Tr>
+              </tr>
             </TablePrimaryHead>
-            <tbody>
+            <TablePrimaryBody>
               {pageSlice.map((token, i) => (
                 <TokenRow key={page * perPage + i} token={token} handleClaim={handleClaim} />
               ))}
-            </tbody>
+            </TablePrimaryBody>
           </TablePrimary>
         </TablePrimaryContainer>
 

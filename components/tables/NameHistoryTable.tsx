@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useLocale, useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl } from '@/utils';
 
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import {
   TablePrimary,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
@@ -30,17 +29,19 @@ const NameHistoryRow = ({ record }: { record: NameHistoryRecord }) => {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.dateTimeCompact')}>
         <a href={txUrl} className="text-inherit" target="_blank" rel="noopener noreferrer">
           <HydrationSafeDateTime timestamp={record.TimeStamp} locale={locale} />
         </a>
       </TablePrimaryCell>
-      <TablePrimaryCell>{displayName}</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.tokenName')}>{displayName}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-const NameHistoryTable = ({ list }: { list: NameHistoryRecord[] }) => {
+// `list` is defaulted because the name history can be absent from the token
+// payload; without it a missing field would throw while slicing the page.
+const NameHistoryTable = ({ list = [] }: { list?: NameHistoryRecord[] }) => {
   const t = useTranslations('tables');
   const perPage = 5;
   const [page, setPage] = useState(1);
@@ -52,18 +53,18 @@ const NameHistoryTable = ({ list }: { list: NameHistoryRecord[] }) => {
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">
                 {t('columns.dateTimeCompact')}
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">{t('columns.tokenName')}</TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {currentItems.map((record) => (
               <NameHistoryRow key={record.EvtLogId} record={record} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

@@ -145,7 +145,8 @@
     "expirationDate": "到期时间",
     "started": "开始时间",
     "ended": "结束时间",
-    "actions": "操作"
+    "actions": "操作",
+    "selected": "已选择"
   },
   "pagination": {
     "label": "分页导航",
@@ -212,7 +213,8 @@
   },
   "ethContribution": {
     "withInfo": "附带信息的贡献",
-    "simple": "普通贡献"
+    "simple": "普通贡献",
+    "viewContribution": "查看贡献 {id}"
   },
   "endurance": {
     "liveHelp": "这位参与者也是最新落笔者，因此坚守时段仍在增长。",
@@ -226,7 +228,9 @@
     "ethGesture": "使用 ETH 落笔",
     "nftAttached": "，并附加了代币（{address}），ID 为 {id}",
     "erc20AttachedPrefix": "，并附加了 {amount}",
-    "attachedSuffix": " 代币"
+    "attachedSuffix": " 代币",
+    "tableLabel": "落笔历史",
+    "viewGesture": "查看落笔 {id}"
   },
   "nameHistory": {
     "removed": "代币名称已移除。"
@@ -320,6 +324,9 @@
     "anchoredNft": "通过锚定 NFT 星选获配的 Cosmic Signature NFT",
     "signatureNftSelection": "Cosmic Signature NFT 星选",
     "signatureNft": "Cosmic Signature NFT"
+  },
+  "systemModes": {
+    "viewEvent": "查看{scope}的系统事件"
   },
   "transferHistory": {
     "signatureAnchoringWallet": "Cosmic Signature NFT 锚定钱包",

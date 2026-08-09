@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import type { GestureInfo } from '@/services/api';
 import {
   TablePrimaryContainer,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
@@ -37,16 +36,18 @@ const HolderRow = ({ holder }: HolderRowProps) => {
 
   return (
     <TablePrimaryRow className={isCurrentUser ? 'bg-white/[0.06]' : undefined}>
-      <TablePrimaryCell align="left">
+      <TablePrimaryCell label={t('columns.holder')} align="left">
         <AddressLink address={holder?.userAddr ?? ''} url={`/user/${holder?.userAddr ?? ''}`} />
         &nbsp;
         {isCurrentUser && t('status.you')}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{holder?.count ?? 0}</TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.numberOfStellarEntries')} align="center">
+        {holder?.count ?? 0}
+      </TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.ethSelectionProbability')} align="center">
         {((holder?.ethProbability ?? 0) * 100).toFixed(2)}%
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell label={t('columns.nftSelectionProbability')} align="center">
         {((holder?.NFTProbability ?? 0) * 100).toFixed(2)}%
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -131,14 +132,8 @@ const StellarSelectionHolderTable = ({
         <>
           <TablePrimaryContainer>
             <TablePrimary>
-              <colgroup>
-                <col width="40%" />
-                <col width="20%" />
-                <col width="20%" />
-                <col width="20%" />
-              </colgroup>
               <TablePrimaryHead>
-                <Tr>
+                <tr>
                   <TablePrimaryHeadCell align="left">{t('columns.holder')}</TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="center">
                     {t('columns.numberOfStellarEntries')}
@@ -149,13 +144,13 @@ const StellarSelectionHolderTable = ({
                   <TablePrimaryHeadCell align="center">
                     {t('columns.nftSelectionProbability')}
                   </TablePrimaryHeadCell>
-                </Tr>
+                </tr>
               </TablePrimaryHead>
-              <tbody>
+              <TablePrimaryBody>
                 {holderList.slice((page - 1) * perPage, page * perPage).map((holder) => (
                   <HolderRow key={holder.userAddr} holder={holder} />
                 ))}
-              </tbody>
+              </TablePrimaryBody>
             </TablePrimary>
           </TablePrimaryContainer>
           <CustomPagination

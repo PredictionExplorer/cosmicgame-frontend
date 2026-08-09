@@ -1,10 +1,9 @@
 import { useEffect, useState, type FC } from 'react';
-import { Tr } from 'react-super-responsive-table';
 import { useTranslations } from 'next-intl';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
   TablePrimaryContainer,
+  TablePrimaryBody,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
@@ -41,12 +40,14 @@ const ETHSpentRow: FC<ETHSpentRowProps> = ({ row }) => {
 
   return (
     <TablePrimaryRow className={isCurrentUser ? 'bg-white/[0.06]' : undefined}>
-      <TablePrimaryCell align="left">
+      <TablePrimaryCell label={t('columns.userAddress')} align="left">
         <AddressLink address={row.bidderAddr} url={`/user/${row.bidderAddr}`} />
         &nbsp;
         {isCurrentUser && t('status.you')}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{(row.amount || 0).toFixed(4)} ETH</TablePrimaryCell>
+      <TablePrimaryCell label={t('columns.spentAmountEth')} align="center">
+        {(row.amount || 0).toFixed(4)} ETH
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -107,23 +108,19 @@ const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          <colgroup>
-            <col width="50%" />
-            <col width="50%" />
-          </colgroup>
           <TablePrimaryHead>
-            <Tr>
+            <tr>
               <TablePrimaryHeadCell align="left">{t('columns.userAddress')}</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 {t('columns.spentAmountEth')}
               </TablePrimaryHeadCell>
-            </Tr>
+            </tr>
           </TablePrimaryHead>
-          <tbody>
+          <TablePrimaryBody>
             {visibleRows.map((row) => (
               <ETHSpentRow key={row.bidderAddr} row={row} />
             ))}
-          </tbody>
+          </TablePrimaryBody>
         </TablePrimary>
       </TablePrimaryContainer>
       <CustomPagination
