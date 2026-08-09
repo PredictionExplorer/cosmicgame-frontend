@@ -108,15 +108,37 @@ test.describe('/statistics tooltips', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
 
     if (testInfo.project.name !== 'Desktop Chrome') {
-      const firstParticipantRow = page
+      // The card layout hides the header row, so there is no header tooltip to
+      // open on a phone. What has to hold instead is that each value still
+      // carries its column name: the header text stays in `thead` for assistive
+      // tech, and every cell repeats it from `data-label` via CSS `::before`.
+      const participantsTable = page
         .getByRole('table')
         .filter({ hasText: 'Participant Address' })
-        .first()
-        .locator('tbody tr')
         .first();
+      await expect(participantsTable.locator('thead th').first()).toContainText(
+        'Participant Address',
+      );
+
+      const firstParticipantRow = participantsTable.locator('tbody tr').first();
       await firstParticipantRow.scrollIntoViewIfNeeded();
-      await expect(firstParticipantRow).toContainText('Participant Address');
-      await expect(firstParticipantRow).toContainText('Number of Gestures');
+      await expect(firstParticipantRow.locator('td').first()).toHaveAttribute(
+        'data-label',
+        'Participant Address',
+      );
+      await expect(firstParticipantRow.locator('td').nth(1)).toHaveAttribute(
+        'data-label',
+        'Number of Gestures',
+      );
+
+      const renderedLabels = await firstParticipantRow
+        .locator('td')
+        .evaluateAll((cells) =>
+          cells.map((cell) => getComputedStyle(cell, '::before').content.replace(/^"|"$/g, '')),
+        );
+      expect(renderedLabels).toEqual(
+        expect.arrayContaining(['Participant Address', 'Number of Gestures']),
+      );
       return;
     }
 

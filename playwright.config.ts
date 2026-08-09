@@ -37,9 +37,14 @@ export default defineConfig({
     {
       // Mobile Safari is the single biggest source of iOS-only layout bugs
       // (viewport units, sticky headers, flex min-width defaults), none of
-      // which Chromium reproduces.
+      // which Chromium reproduces — so it runs the layout audits.
+      //
+      // Scoped to those deliberately. The interaction suites are built around
+      // hover tooltips and Tab-to-link focus, neither of which behaves the
+      // same under WebKit, so running them here reports on the engine rather
+      // than on the app.
       name: 'Mobile Safari',
-      testIgnore: ['**/*.desktop.spec.ts'],
+      testMatch: ['**/mobile-overflow.mobile.spec.ts', '**/mobile-tap-targets.mobile.spec.ts'],
       use: { ...devices['iPhone 13'] },
     },
   ],

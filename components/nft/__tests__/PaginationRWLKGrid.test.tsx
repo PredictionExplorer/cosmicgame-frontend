@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen, fireEvent, checkA11y } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y, within } from '@/test-utils';
 
 jest.mock(
   'next/image',
@@ -130,8 +130,13 @@ describe('PaginationRWLKGrid', () => {
 
     expect(screen.getAllByTestId('rwlk-card')).toHaveLength(6);
 
+    // Query by role rather than tag: paging controls are buttons, since they
+    // change state instead of navigating.
     const nav = screen.getByRole('navigation');
-    const page2 = nav.querySelector('a:not([aria-current])');
+    const [page2] = within(nav)
+      .getAllByRole('button')
+      .filter((control) => control.getAttribute('aria-current') !== 'page');
+    expect(page2).toBeDefined();
     fireEvent.click(page2!);
 
     expect(screen.getAllByTestId('rwlk-card')).toHaveLength(3);

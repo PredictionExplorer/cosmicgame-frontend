@@ -36,7 +36,10 @@ const config: Config = {
     '!**/node_modules/**',
   ],
   coverageThreshold: {
-    global: { branches: 69, functions: 74, lines: 80, statements: 79 },
+    // Kept a couple of points under the measured numbers (branches 76.4,
+    // functions 80.1, lines 85.5, statements 84.0) so an unrelated change
+    // cannot fail CI on rounding alone.
+    global: { branches: 75, functions: 78, lines: 84, statements: 82 },
   },
 };
 

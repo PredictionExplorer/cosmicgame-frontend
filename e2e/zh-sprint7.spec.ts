@@ -3,6 +3,94 @@ import { expect, test, type Page } from '@playwright/test';
 import { mockZhQualityApi } from './zh-quality-mocks';
 
 const ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
+const MOCK_TIMESTAMP = 1710000000;
+
+/**
+ * The Go API always sends the full transaction envelope, and `flattenTx` hoists
+ * every field of it. Omitting `BlockNum` / `TxId` produced records that strict
+ * validation rightly rejects, which left the pages under test on their loading
+ * state instead of rendering rows.
+ */
+function mockTransaction(evtLogId: number, hashFill: string) {
+  return {
+    EvtLogId: evtLogId,
+    BlockNum: 100000 + evtLogId,
+    TxId: evtLogId,
+    TxHash: `0x${hashFill.repeat(64)}`,
+    TimeStamp: MOCK_TIMESTAMP,
+    DateTime: new Date(MOCK_TIMESTAMP * 1000).toISOString(),
+  };
+}
+
+const contractAddresses = {
+  CosmicSignatureAddr: '0x1111111111111111111111111111111111111111',
+  CosmicTokenAddr: '0x2222222222222222222222222222222222222222',
+  CharityWalletAddr: '0x3333333333333333333333333333333333333333',
+  RandomWalkAddr: '0x4444444444444444444444444444444444444444',
+  RaffleWalletAddr: '0x5555555555555555555555555555555555555555',
+  StakingWalletAddr: '0x6666666666666666666666666666666666666666',
+  MarketingWalletAddr: '0x7777777777777777777777777777777777777777',
+  BusinessLogicAddr: '0x8888888888888888888888888888888888888888',
+  CosmicGameAddr: '0x9999999999999999999999999999999999999999',
+  CosmicDaoAddr: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  PrizesWalletAddr: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+  StakingWalletCSTAddr: '0xcccccccccccccccccccccccccccccccccccccccc',
+  StakingWalletRWalkAddr: '0xdddddddddddddddddddddddddddddddddddddddd',
+  ImplementationAddr: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+};
+
+const dashboard = {
+  CurRoundNum: 8,
+  CurNumBids: 7,
+  CurPrizeAmountEth: 2.5,
+  CurBidPriceEth: 0.1,
+  PrizeClaimTs: MOCK_TIMESTAMP + 3600,
+  TsRoundStart: MOCK_TIMESTAMP - 3600,
+  LastBidderAddr: ADDRESS,
+  GestureCostEth: 0.1,
+  StakingAmountEth: 3,
+  MainStats: {
+    NumCSTokenMints: 24,
+    NumBidsCST: 5,
+    NumUniqueBidders: 4,
+    NumUniqueWinners: 3,
+    NumUniqueDonors: 2,
+    NumUniqueStakersCST: 1,
+    NumUniqueStakersRWalk: 1,
+    TotalRaffleEthDeposits: 4,
+    TotalRaffleEthWithdrawn: 3,
+    TotalCSTConsumedEth: 100,
+    TotalNamedTokens: 1,
+    TotalMktRewardsEth: 125,
+    NumMktRewards: 4,
+    StakeStatisticsCST: {
+      NumActiveStakers: 1,
+      NumDeposits: 1,
+      TotalTokensStaked: 2,
+      TotalRewardEth: 3,
+      UnclaimedRewardEth: 0,
+    },
+    StakeStatisticsRWalk: {
+      NumActiveStakers: 1,
+      TotalTokensStaked: 1,
+      TotalTokensMinted: 1,
+    },
+  },
+  ContractAddrs: contractAddresses,
+  NumRaffleEthWinners: 5,
+  NumRaffleNFTWinners: 3,
+  NumHolderNFTWinners: 2,
+  NumRaffleEthWinnersBidding: 2,
+  NumRaffleNFTWinnersBidding: 1,
+  NumRaffleNFTWinnersStakingRWalk: 1,
+  PrizePercentage: 25,
+  CharityPercentage: 7,
+  RafflePercentage: 15,
+  StakingPercentage: 20,
+  TimeIncrease: 300,
+  PriceIncrease: 10,
+  NanosecondsExtra: 5000000,
+};
 
 // lexicon-allow-start: mocked backend URL paths mirror the sealed API contract
 async function mockSprint7Api(page: Page): Promise<void> {
@@ -10,35 +98,7 @@ async function mockSprint7Api(page: Page): Promise<void> {
     const path = new URL(route.request().url()).pathname;
 
     if (path.endsWith('/statistics/dashboard')) {
-      await route.fulfill({
-        json: {
-          CurRoundNum: 8,
-          MainStats: {
-            TotalMktRewardsEth: 125,
-            NumMktRewards: 4,
-          },
-          ContractAddrs: {
-            CosmicSignatureAddr: '0x1111111111111111111111111111111111111111',
-            CosmicTokenAddr: '0x2222222222222222222222222222222222222222',
-            CharityWalletAddr: '0x3333333333333333333333333333333333333333',
-            RandomWalkAddr: '0x4444444444444444444444444444444444444444',
-            RaffleWalletAddr: '0x5555555555555555555555555555555555555555',
-            StakingWalletAddr: '0x6666666666666666666666666666666666666666',
-            MarketingWalletAddr: '0x7777777777777777777777777777777777777777',
-            BusinessLogicAddr: '0x8888888888888888888888888888888888888888',
-          },
-          NumRaffleEthWinners: 5,
-          NumRaffleNFTWinners: 3,
-          NumHolderNFTWinners: 2,
-          PrizePercentage: 25,
-          CharityPercentage: 7,
-          RafflePercentage: 15,
-          StakingPercentage: 20,
-          TimeIncrease: 300,
-          PriceIncrease: 10,
-          NanosecondsExtra: 5000000,
-        },
-      });
+      await route.fulfill({ json: dashboard });
       return;
     }
 
@@ -51,11 +111,7 @@ async function mockSprint7Api(page: Page): Promise<void> {
             RoundNum: 7,
             AmountEth: 1.25,
             DataJson: JSON.stringify({ title: 'Protocol work', message: 'Keep building' }),
-            Tx: {
-              EvtLogId: 7,
-              TxHash: `0x${'a'.repeat(64)}`,
-              TimeStamp: 1710000000,
-            },
+            Tx: mockTransaction(7, 'a'),
           },
         },
       });
@@ -113,11 +169,7 @@ async function mockSprint7Api(page: Page): Promise<void> {
               IntegerValue: 7,
               AddressValue: '',
               StringValue: '',
-              Tx: {
-                EvtLogId: 3,
-                TxHash: `0x${'b'.repeat(64)}`,
-                TimeStamp: 1710000000,
-              },
+              Tx: mockTransaction(3, 'b'),
             },
           ],
         },
@@ -157,13 +209,11 @@ async function mockSprint7Api(page: Page): Promise<void> {
             {
               BidderAddr: ADDRESS,
               RoundNum: 7,
-              GestureType: 0,
+              BidType: 0,
+              EthPriceEth: 0.05,
+              CstPriceEth: -1,
               Message: 'Review locale link',
-              Tx: {
-                EvtLogId: 9,
-                TxHash: `0x${'c'.repeat(64)}`,
-                TimeStamp: 1710000000,
-              },
+              Tx: mockTransaction(9, 'c'),
             },
           ],
         },

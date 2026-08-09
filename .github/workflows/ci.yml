@@ -118,13 +118,16 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
+      # WebKit backs the Mobile Safari project, which runs the mobile layout
+      # audits. iOS Safari is where most mobile-only layout bugs actually
+      # appear, and Chromium does not reproduce them.
       - name: Install Playwright
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Install Playwright deps only
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright install-deps chromium webkit
 
       - name: Build and start server
         run: |

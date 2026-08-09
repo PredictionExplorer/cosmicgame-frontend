@@ -34,10 +34,19 @@ PaginationItem.displayName = 'PaginationItem';
 type PaginationLinkProps = {
   isActive?: boolean;
 } & Pick<ButtonProps, 'size'> &
-  React.ComponentProps<'a'>;
+  Omit<React.ComponentProps<'button'>, 'type'>;
 
+/**
+ * Renders a `<button>`, not an `<a>`.
+ *
+ * Paging here changes component state rather than navigating, and the previous
+ * `<a>` had no `href` — so it was not focusable and exposed no control role.
+ * Every paged table in the app shares this component, which made all of them
+ * mouse-only.
+ */
 const PaginationLink = ({ className, isActive, size = 'icon', ...props }: PaginationLinkProps) => (
-  <a
+  <button
+    type="button"
     aria-current={isActive ? 'page' : undefined}
     className={cn(
       buttonVariants({

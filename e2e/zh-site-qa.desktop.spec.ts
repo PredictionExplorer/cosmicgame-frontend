@@ -172,18 +172,35 @@ async function expectChineseTypography(page: Page, route: ZhRouteInventoryEntry)
   }
 }
 
-async function expectNoUnexpectedEnglishHeadings(
-  page: Page,
-  route: ZhRouteInventoryEntry,
-): Promise<void> {
-  const headings = await page.locator('h1, h2, h3').evaluateAll((elements) =>
+function readVisibleHeadings(page: Page): Promise<string> {
+  return page.locator('h1, h2, h3').evaluateAll((elements) =>
     elements
       .filter((element) => (element as HTMLElement).offsetParent !== null)
       .map((element) => (element.textContent ?? '').trim().replace(/\s+/g, ' '))
       .filter(Boolean)
       .join('\n'),
   );
+}
 
+async function expectNoUnexpectedEnglishHeadings(
+  page: Page,
+  route: ZhRouteInventoryEntry,
+): Promise<void> {
+  // A route whose page suspends (the statistics pages await live data behind
+  // `loading.tsx`) arrives as a streamed payload that React parks in a hidden
+  // staging div and only moves into the layout on the next frame. `body`
+  // already carries the text at that point, so the checks around this one pass
+  // while every heading still computes as `display: none`. Poll rather than
+  // sample once — everything after this reads the settled DOM.
+  if (!route.allowNoHeading) {
+    await expect
+      .poll(() => readVisibleHeadings(page), {
+        message: `no visible headings rendered on ${route.id}`,
+      })
+      .not.toBe('');
+  }
+
+  const headings = await readVisibleHeadings(page);
   if (!headings && route.allowNoHeading) return;
   expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
   expect(headings, `Chinese heading missing on ${route.id}`).toMatch(CJK);
