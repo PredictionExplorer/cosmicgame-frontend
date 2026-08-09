@@ -48,7 +48,10 @@ export function ResponsiveTableContainer({
       {...(label ? { role: 'region', 'aria-label': label } : {})}
       tabIndex={0}
       className={cn(
-        'relative overflow-x-auto rounded-xl border border-white/[0.06] bg-white/[0.02]',
+        // `overflow-y-auto` is declared rather than left implicit: a lone
+        // `overflow-x-auto` already forces the other axis to `auto` per spec,
+        // so stating it keeps the behaviour visible to the next reader.
+        'relative overflow-x-auto overflow-y-auto rounded-xl border border-white/[0.06] bg-white/[0.02]',
         'bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.014)_48%,rgb(var(--nebula-violet-rgb)/0.05))]',
         'shadow-[0_20px_90px_-70px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm',
         'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-px',
@@ -84,7 +87,12 @@ export function ResponsiveTableHead({
     <thead
       data-testid="thead"
       className={cn(
-        'sticky top-0 z-[1] backdrop-blur-md',
+        // Not sticky. A `sticky top-0` here used to look like it pinned the
+        // header row, but the container scrolls horizontally, and per spec that
+        // forces the other axis to `auto` — so this stuck to a container that
+        // has no height constraint and therefore never scrolls vertically. It
+        // pinned nothing and only created a stacking context.
+        'backdrop-blur-md',
         'bg-[linear-gradient(90deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.10))]',
         'print:static print:bg-transparent print:backdrop-blur-none print:[background-image:none]',
         className,

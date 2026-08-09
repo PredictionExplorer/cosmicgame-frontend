@@ -236,7 +236,10 @@ export function GestureMessageChat({
 
           <div
             data-testid="gesture-message-chat-scroll"
-            className="relative z-[1] flex-1 overflow-y-auto p-4 lg:max-h-[calc(100vh-13rem)] xl:p-5 xl:max-h-[calc(100vh-14rem)] 2xl:max-h-[calc(100vh-15rem)]"
+            // Below xl the message list owns its own scrolling. From xl the
+            // whole rail is pinned and scrollable, so capping this too would
+            // nest a second scroll area inside the first.
+            className="relative z-[1] flex-1 overflow-y-auto p-4 lg:max-h-[calc(100vh-13rem)] xl:max-h-none xl:overflow-y-visible xl:p-5"
           >
             {messages.length > 0 ? (
               <ol className="space-y-3" aria-live="polite">

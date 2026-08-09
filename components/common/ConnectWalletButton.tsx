@@ -85,7 +85,9 @@ const ConnectWalletButton = ({
           )}
           <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="z-[10003] w-[280px]" align="end">
+        {/* Sits in the chrome layer with the header it drops out of; the
+            previous z-[10003] was outside any scale and beat the skip link. */}
+        <DropdownMenuContent className="z-50 w-[280px]" align="end">
           {/* Address header */}
           <div className="flex items-center justify-between px-3 py-2">
             <span className="text-xs font-mono text-muted-foreground">

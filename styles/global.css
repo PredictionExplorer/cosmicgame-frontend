@@ -47,6 +47,40 @@
   --breakpoint-xs: 30rem;
 }
 
+/*
+ * Chrome geometry.
+ *
+ * The header used to have no declared height — it was padding plus whatever
+ * its contents measured — while five different places hard-coded what they
+ * guessed that height to be: sticky offsets of 96px, 80px and 72px, and a
+ * maintenance banner at 88px/96px, for one bar that actually rendered at ~73px.
+ * The header is now exactly `--header-height` tall and everything that needs to
+ * sit below it derives from this one value.
+ */
+:root {
+  --header-height: 4.5rem; /* 72px */
+  /* Breathing room between the header and anything pinned beneath it. */
+  --sticky-offset: calc(var(--header-height) + 0.75rem);
+}
+
+/*
+ * Layer scale.
+ *
+ * Stacking only compares within a shared context, so these are a shared
+ * vocabulary rather than a guarantee. Values that sat outside any scale
+ * (`z-[10003]`, an inline `zIndex: 10000`) are the ones that caused trouble.
+ */
+@theme inline {
+  --z-backdrop: -10; /* ambient gradients, particles */
+  --z-base: 1; /* page shell and ordinary card content */
+  --z-raised: 10; /* pinned rails and toolbars */
+  --z-sticky-nav: 30; /* sticky sub-navigation bars */
+  --z-banner: 40; /* maintenance banner, floating CTAs */
+  --z-chrome: 50; /* site header, dialogs, popovers */
+  --z-celebration: 60; /* full-screen effects over chrome */
+  --z-skip-link: 100; /* must beat everything when focused */
+}
+
 :root {
   --background: 235 68% 10%;
   --foreground: 0 0% 100%;

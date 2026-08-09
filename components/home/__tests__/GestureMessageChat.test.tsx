@@ -260,11 +260,13 @@ describe('GestureMessageChat', () => {
       />,
     );
 
-    expect(screen.getByTestId('gesture-message-chat-scroll')).toHaveClass(
-      'xl:p-5',
-      'xl:max-h-[calc(100vh-14rem)]',
-      '2xl:max-h-[calc(100vh-15rem)]',
-    );
+    const scroll = screen.getByTestId('gesture-message-chat-scroll');
+    expect(scroll).toHaveClass('xl:p-5');
+    // Below xl the message list scrolls itself. From xl the surrounding rail is
+    // pinned and scrollable, so capping the list here would nest a second
+    // scroll area inside the first.
+    expect(scroll).toHaveClass('lg:max-h-[calc(100vh-13rem)]');
+    expect(scroll).toHaveClass('xl:max-h-none', 'xl:overflow-y-visible');
     expect(screen.getByLabelText(`home.chat.messageAria(address=${participant})`)).toHaveClass(
       '2xl:p-5',
     );

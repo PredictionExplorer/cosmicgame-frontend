@@ -55,6 +55,15 @@ describe('AppBarWrapper', () => {
     expect(container.firstChild).toHaveClass('fixed');
   });
 
+  it('declares its height from the shared token', () => {
+    // Sticky sub-navs, the maintenance banner and the pinned home rail all
+    // offset themselves from --header-height. When the header derived its own
+    // height from its contents instead, five places hard-coded five different
+    // guesses at it (96px, 88px, 80px, 72px) and none of them matched.
+    const { container } = render(<AppBarWrapper>nav</AppBarWrapper>);
+    expect(container.firstChild).toHaveClass('h-[var(--header-height)]');
+  });
+
   it('has z-50 class', () => {
     const { container } = render(<AppBarWrapper>nav</AppBarWrapper>);
     expect(container.firstChild).toHaveClass('z-50');

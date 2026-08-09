@@ -291,7 +291,7 @@ const GalleryPage = () => {
         variant="glass-bordered"
         radius="md"
         padding="md"
-        className="sticky top-20 z-10 mb-6 backdrop-blur-md"
+        className="sticky top-[var(--sticky-offset)] z-30 mb-6 backdrop-blur-md"
       >
         <GalleryToolbar
           searchQuery={searchQuery}

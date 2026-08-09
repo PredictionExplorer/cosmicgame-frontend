@@ -791,7 +791,15 @@ describe('HomePage', () => {
     expect(primaryColumn).toContainElement(form);
     expect(primaryColumn).toContainElement(allocationHeading);
     expect(chatColumn).toContainElement(chat);
-    expect(chat).toHaveClass('xl:sticky', 'xl:top-24', 'xl:min-h-[38rem]', '2xl:min-h-[42rem]');
+    expect(chat).toHaveClass('xl:min-h-[38rem]', '2xl:min-h-[42rem]');
+
+    // The whole rail pins, not just the chat. Pinning the chat alone let the
+    // cards below it scroll up through it, because those cards are exactly the
+    // container height that lets a sticky element travel.
+    expect(chatColumn).toHaveClass('xl:sticky', 'xl:top-[var(--sticky-offset)]');
+    expect(chat).not.toHaveClass('xl:sticky');
+    // A rail taller than the viewport has to stay reachable.
+    expect(chatColumn).toHaveClass('xl:overflow-y-auto');
   });
 
   it('uses a wider home shell and keeps desktop companion actions in the chat rail', () => {

@@ -104,7 +104,8 @@ const AllocationFinalizedPage = () => {
               width: '100%',
               height: '100%',
               position: 'fixed',
-              zIndex: 10000,
+              // Celebration layer: above the header, below a focused skip link.
+              zIndex: 60,
             }}
             onClick={handleFireworksClick}
           />

@@ -18,7 +18,7 @@ export function StatisticsSubNav() {
   const t = useTranslations('statistics');
 
   return (
-    <div className="sticky top-[72px] z-30 -mx-4 mb-8 px-4">
+    <div className="sticky top-[var(--sticky-offset)] z-30 -mx-4 mb-8 px-4">
       <nav
         aria-label={t('navigation.ariaLabel')}
         className="border-b border-white/[0.06] bg-background/85 py-3 backdrop-blur-xl"

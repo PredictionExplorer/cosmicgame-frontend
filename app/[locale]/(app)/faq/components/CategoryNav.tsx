@@ -58,7 +58,7 @@ export function CategoryNav({
   };
 
   return (
-    <div ref={navRef} className={cn('sticky top-[72px] z-30', className)}>
+    <div ref={navRef} className={cn('sticky top-[var(--sticky-offset)] z-30', className)}>
       <nav
         aria-label={t('navigation.ariaLabel')}
         className={cn(

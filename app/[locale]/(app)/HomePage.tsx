@@ -654,13 +654,26 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
             )}
           </div>
 
-          <div data-testid="home-chat-column" className="min-w-0 space-y-6">
+          {/*
+            The rail pins as one unit. Pinning only the chat looked right until
+            you scrolled: a sticky element travels for exactly as long as there
+            is container height beneath it, and here that height was the three
+            cards below — so they slid up through the chat, which is glass and
+            let them show straight through. Sticking the whole rail means there
+            is nothing left to scroll past it. `max-h` plus `overflow-y-auto`
+            keeps a rail taller than the viewport reachable rather than pinning
+            its lower half permanently off screen.
+          */}
+          <div
+            data-testid="home-chat-column"
+            className="min-w-0 space-y-6 xl:sticky xl:top-[var(--sticky-offset)] xl:z-10 xl:max-h-[calc(100vh-var(--sticky-offset)-1.5rem)] xl:overflow-y-auto xl:overscroll-contain xl:pr-1"
+          >
             <GestureMessageChat
               gestures={curGestureList}
               cycleNumber={round >= 0 ? round : undefined}
               pulseKey={gesturePulseKey}
               onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
-              className="min-h-[30rem] xl:sticky xl:top-24 xl:min-h-[38rem] 2xl:min-h-[42rem]"
+              className="min-h-[30rem] xl:min-h-[38rem] 2xl:min-h-[42rem]"
             />
 
             {/* ===== FULL ROUND DETAILS LINK ===== */}
