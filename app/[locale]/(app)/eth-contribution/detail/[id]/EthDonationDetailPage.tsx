@@ -19,6 +19,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
+import { formatFixed } from '@/utils/format';
 
 interface EthDonationDetailPageProps {
   id: number;
@@ -170,7 +171,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
             </DetailRow>
             <DetailRow label={t('detail.amountLabel')}>
               <span className="font-mono tabular-nums">
-                {donationInfo.AmountEth.toFixed(2)} ETH
+                {formatFixed(donationInfo.AmountEth, 2)} ETH
               </span>
             </DetailRow>
           </DefinitionList>

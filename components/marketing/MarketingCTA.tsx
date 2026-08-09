@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 
 export function MarketingCTA() {
   const t = useTranslations('marketing');
@@ -40,7 +42,11 @@ export function MarketingCTA() {
             <button
               type="button"
               aria-label={t('cta.infoAria')}
-              className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+              data-touch-target="extended"
+              className={cn(
+                'text-muted-foreground/60 hover:text-muted-foreground transition-colors',
+                TOUCH_TARGET_EXTENDED_CLASS,
+              )}
             >
               <Info className="h-4 w-4" />
             </button>

@@ -1,10 +1,21 @@
 /**
  * Zod schemas for Cosmic Signature backend wire format.
  *
- * Phase 2 ships these in WARN-ONLY mode: `safeValidate` returns the original
- * value unchanged whether the schema matches or not, but reports a Sentry
- * breadcrumb on mismatch so we get telemetry before flipping to hard-throw
- * mode (planned after one week of clean telemetry).
+ * Two validation styles, chosen explicitly at every call site — there is no
+ * global mode flag:
+ *
+ *   validate / validateList        strict. A mismatch throws, so the calling
+ *                                  read rejects and React Query reports
+ *                                  `isError`. Used on the payloads the UI
+ *                                  cannot render wrong: dashboard, cycles,
+ *                                  gestures, user info, claim/allocation data,
+ *                                  anchored-token lists.
+ *
+ *   safeValidate /                 warn-only. Reports the mismatch to Sentry
+ *   safeValidateListSample         and passes the raw value through. Used for
+ *                                  analytics/statistics payloads where one bad
+ *                                  row should not blank a whole page, and for
+ *                                  schemas that have not yet earned telemetry.
  *
  * Why Zod and not TypeScript alone: the Go API can ship a breaking payload
  * change (renamed field, type widening) that the UI silently destructures as
@@ -14,7 +25,8 @@
  * the ergonomic handle; these schemas are the runtime guardrail.
  *
  * IMPORTANT: field names mirror the Go server response keys and must not be
- * renamed here (same contract as services/api/types.ts).
+ * renamed here (same contract as services/api/types.ts). Schemas are `.loose()`
+ * so new backend fields pass through untouched.
  */
 
 // lexicon-allow-start: backend wire-format field names mirror the Go server
@@ -28,7 +40,9 @@ import { reportError } from '@/utils/errors';
  * ------------------------------------------------------------------------- */
 
 const AddressSchema = z.string();
-const NumberLike = z.union([z.number(), z.string().transform((s) => Number(s))]);
+/** Numeric wire field the Go server sometimes serializes as a decimal string. */
+const NumberOrNumericString = z.union([z.number(), z.string()]);
+const IdSchema = z.union([z.string(), z.number()]);
 
 export const TxInfoSchema = z
   .object({
@@ -124,7 +138,11 @@ export type DashboardInfoParsed = z.infer<typeof DashboardInfoSchema>;
 
 const RoundStatsSchema = z
   .object({
-    TotalBids: z.number(),
+    /**
+     * Absent for a cycle the backend has no stats row for yet — `flattenRoundInfo`
+     * substitutes `{}` in that case, so this cannot be required.
+     */
+    TotalBids: z.number().optional(),
     TotalDonatedAmountEth: z.number().optional(),
     TotalDonatedNFTs: z.number().optional(),
     TotalRaffleEthDepositsEth: z.number().optional(),
@@ -134,7 +152,7 @@ const RoundStatsSchema = z
   })
   .loose();
 
-const StellarSelectionNFTRecipientSchema = z
+export const StellarSelectionNFTRecipientSchema = z
   .object({
     EvtLogId: z.number().optional(),
     TxHash: z.string().optional(),
@@ -148,7 +166,7 @@ const StellarSelectionNFTRecipientSchema = z
   .loose();
 
 /** Backend round detail sometimes omits tx fields or nests them under `Tx` (see flattenTxArray). */
-const StellarSelectionETHDepositSchema = z
+export const StellarSelectionETHDepositSchema = z
   .object({
     EvtLogId: z.number().optional(),
     TxHash: z.string().optional(),
@@ -166,7 +184,8 @@ const AllocationEntrySchema = z
     RoundNum: z.number().optional(),
     WinnerAddr: AddressSchema.optional(),
     TokenId: z.number().optional(),
-    Amount: NumberLike.optional(),
+    /** Wei amounts arrive as decimal strings on some allocation records. */
+    Amount: NumberOrNumericString.optional(),
   })
   .loose();
 
@@ -176,9 +195,15 @@ export const RoundInfoSchema = z
     WinnerAddr: AddressSchema,
     AmountEth: z.number(),
     TokenId: z.number(),
-    TxHash: z.string(),
-    TimeStamp: z.number(),
-    DateTime: z.string(),
+    /**
+     * Claim-transaction fields, hoisted by `flattenRoundInfo` from
+     * `ClaimPrizeTx.Tx`. A cycle that has not been finalized has no claim
+     * transaction, so these are absent for the in-flight cycle that
+     * `rounds/list` and `rounds/info/{n}` both return.
+     */
+    TxHash: z.string().optional(),
+    TimeStamp: z.number().optional(),
+    DateTime: z.string().optional(),
     RoundStats: RoundStatsSchema,
     RaffleNFTWinners: z.array(StellarSelectionNFTRecipientSchema),
     StakingNFTWinners: z.array(StellarSelectionNFTRecipientSchema),
@@ -212,7 +237,12 @@ export const GestureInfoSchema = z
     RoundNum: z.number(),
     BidderAddr: AddressSchema,
     GestureType: z.number(),
-    GestureCostEth: z.number(),
+    /**
+     * ETH cost of the gesture, mapped by `normalizeGestureRecord` from
+     * `EthPriceEth`. A CST gesture reports a negative sentinel ETH price, so
+     * the normalizer leaves this unset — absent means "not paid in ETH".
+     */
+    GestureCostEth: z.number().optional(),
     Message: z.string().optional(),
   })
   .loose();
@@ -264,12 +294,98 @@ export const SpecialRecipientsSchema = z
 export type SpecialRecipientsParsed = z.infer<typeof SpecialRecipientsSchema>;
 
 /* ------------------------------------------------------------------------- *
+ *  Claim / allocation data
+ * ------------------------------------------------------------------------- */
+
+const AssetTypeSchema = z.enum(['ETH', 'ERC721', 'ERC20']);
+
+const ClaimUnclaimedItemSchema = z
+  .object({
+    AssetType: AssetTypeSchema,
+    RecipientAddr: AddressSchema,
+    AmountEth: z.number(),
+    TokenAddr: AddressSchema,
+    TokenId: z.number(),
+  })
+  .loose();
+
+export const RoundClaimSummarySchema = z
+  .object({
+    RoundNum: z.number(),
+    ClaimWindowTimeout: z.number(),
+    AwardedTs: z.number(),
+    Expired: z.boolean(),
+    EthAwarded: z.number(),
+    EthUnclaimed: z.number(),
+    EthUnclaimedEth: z.number(),
+    NftAwarded: z.number(),
+    NftUnclaimed: z.number(),
+    Erc20Awarded: z.number(),
+    Erc20Unclaimed: z.number(),
+    TotalAwarded: z.number(),
+    TotalUnclaimed: z.number(),
+    AvgClaimPeriodSecs: z.number(),
+    /** Omitted (rather than empty) when a cycle has nothing left to claim. */
+    UnclaimedItems: z.array(ClaimUnclaimedItemSchema).nullish(),
+  })
+  .loose();
+
+const ClaimTxnSchema = z
+  .object({
+    AssetType: AssetTypeSchema,
+    RecipientAddr: AddressSchema,
+    BeneficiaryAddr: AddressSchema,
+    AmountEth: z.number(),
+    TokenAddr: AddressSchema,
+    TokenId: z.number(),
+    ClaimedAfterSecs: z.number(),
+    ClaimTs: z.number(),
+    TxHash: z.string(),
+  })
+  .loose();
+
+const AttachedTokenSchema = z
+  .object({
+    AssetType: z.enum(['ERC721', 'ERC20']),
+    ContributorAddr: AddressSchema,
+    TokenAddr: AddressSchema,
+    TokenId: z.number(),
+    AmountEth: z.number(),
+    Ts: z.number(),
+    TxHash: z.string(),
+  })
+  .loose();
+
+export const RoundClaimDetailSchema = z
+  .object({
+    RoundNum: z.number(),
+    ClaimTransactions: z.array(ClaimTxnSchema),
+    AttachedTokens: z.array(AttachedTokenSchema),
+  })
+  .loose();
+
+/** One row of a wallet's allocation-claim history (`prizes/history/*`). */
+export const WinningHistoryEntrySchema = z
+  .object({
+    EvtLogId: z.number(),
+    TxHash: z.string(),
+    TimeStamp: z.number(),
+    RoundNum: z.number(),
+    RecordType: z.number(),
+    WinnerAddr: AddressSchema.optional(),
+    AmountEth: z.number().optional(),
+    TokenId: z.number().optional(),
+    Claimed: z.boolean().optional(),
+  })
+  .loose();
+
+/* ------------------------------------------------------------------------- *
  *  Statistics list endpoints
  * ------------------------------------------------------------------------- */
 
 export const ParticipantSchema = z
   .object({
-    BidderAid: z.union([z.string(), z.number()]),
+    BidderAid: IdSchema,
     BidderAddr: AddressSchema,
     NumBids: z.number(),
     MaxBidAmountEth: z.number(),
@@ -278,7 +394,7 @@ export const ParticipantSchema = z
 
 export const RecipientSchema = z
   .object({
-    WinnerAid: z.union([z.string(), z.number()]),
+    WinnerAid: IdSchema,
     WinnerAddr: AddressSchema,
     AllocationsCount: z.number().optional(),
     MaxWinAmountEth: z.number(),
@@ -288,7 +404,7 @@ export const RecipientSchema = z
 
 export const UniqueEthDonorSchema = z
   .object({
-    DonorAid: z.union([z.string(), z.number()]),
+    DonorAid: IdSchema,
     DonorAddr: AddressSchema,
     CountDonations: z.number(),
     TotalDonatedEth: z.number(),
@@ -298,7 +414,7 @@ export const UniqueEthDonorSchema = z
 export const TokenDistributionSchema = z
   .object({
     OwnerAddr: AddressSchema,
-    OwnerAid: z.union([z.string(), z.number()]),
+    OwnerAid: IdSchema,
     NumTokens: z.number(),
   })
   .loose();
@@ -306,7 +422,7 @@ export const TokenDistributionSchema = z
 export const CTBalanceDistributionSchema = z
   .object({
     OwnerAddr: AddressSchema,
-    OwnerAid: z.union([z.string(), z.number()]),
+    OwnerAid: IdSchema,
     BalanceFloat: z.number(),
   })
   .loose();
@@ -330,7 +446,11 @@ export const AnchorActionSchema = z
   })
   .loose();
 
-export const AnchoredTokenInfoSchema = z
+/**
+ * Anchored RandomWalk token row (`staking/randomwalk/staked_tokens/*`): the
+ * token id and the anchoring action are flat on the row.
+ */
+export const AnchoredTokenRWalkSchema = z
   .object({
     StakeActionId: z.number(),
     StakedTokenId: z.number(),
@@ -338,17 +458,42 @@ export const AnchoredTokenInfoSchema = z
   })
   .loose();
 
+/**
+ * Anchored Cosmic Signature token row (`staking/cst/staked_tokens/*`).
+ *
+ * The CST payload nests the token under `TokenInfo` and carries no flat
+ * `StakedTokenId` — which is why the shared schema used for both endpoints
+ * reported `0.StakedTokenId: expected number, received undefined` on every
+ * poll. The consumers already read `TokenInfo.TokenId` for CST rows
+ * (GlobalAnchoredTokensTable, AnchoredTokensTable), so `TokenInfo` is the
+ * required part here and the flat RandomWalk fields are optional.
+ */
+export const AnchoredTokenCSTSchema = z
+  .object({
+    StakeTimeStamp: z.number(),
+    TokenInfo: z
+      .object({
+        TokenId: z.number(),
+        Seed: NumberOrNumericString.optional(),
+        StakeActionId: z.number().optional(),
+      })
+      .loose(),
+    StakeActionId: z.number().optional(),
+    StakedTokenId: z.number().optional(),
+  })
+  .loose();
+
 export const SystemModeChangeEventSchema = z
   .object({
     RoundNum: z.number(),
-    EvtLogId: z.union([z.string(), z.number()]),
+    EvtLogId: IdSchema,
     TimeStamp: z.number(),
   })
   .loose();
 
 export const UniqueAnchorHolderCSTSchema = z
   .object({
-    StakerAid: z.union([z.string(), z.number()]),
+    StakerAid: IdSchema,
     StakerAddr: AddressSchema,
     NumStakeActions: z.number(),
     NumUnstakeActions: z.number(),
@@ -361,7 +506,7 @@ export const UniqueAnchorHolderCSTSchema = z
 
 export const UniqueAnchorHolderRWLKSchema = z
   .object({
-    StakerAid: z.union([z.string(), z.number()]),
+    StakerAid: IdSchema,
     StakerAddr: AddressSchema,
     NumStakeActions: z.number(),
     NumUnstakeActions: z.number(),
@@ -379,10 +524,175 @@ export const AttachedNFTRecordSchema = z
   })
   .loose();
 
+/* ------------------------------------------------------------------------- *
+ *  Donations — ETH / charity
+ * ------------------------------------------------------------------------- */
+
 /**
- * Warn-mode validation for statistics list payloads: checks a sample of rows
- * (full scans of 10k+ row lists would be wasted work) and reports the first
- * mismatch to Sentry with the endpoint name.
+ * ETH contribution record (`donations/eth/*`, `donations/charity/*`). Tx fields
+ * are hoisted by `flattenTx`; simple list rows omit `RoundNum` when the
+ * contribution was not tied to a cycle.
+ */
+export const ETHDonationSchema = z
+  .object({
+    EvtLogId: z.number(),
+    TxHash: z.string(),
+    TimeStamp: z.number(),
+    DateTime: z.string().optional(),
+    RoundNum: z.number().optional(),
+    DonorAddr: AddressSchema.optional(),
+    AmountEth: z.number(),
+    RecordType: z.number().optional(),
+  })
+  .loose();
+
+/** Charity retrieval record (`donations/charity/withdrawals`). */
+export const CharityWithdrawalSchema = z
+  .object({
+    EvtLogId: IdSchema,
+    TxHash: z.string(),
+    TimeStamp: z.number(),
+    DestinationAddr: AddressSchema,
+    AmountEth: z.number(),
+  })
+  .loose();
+
+/* ------------------------------------------------------------------------- *
+ *  Marketing
+ * ------------------------------------------------------------------------- */
+
+/** Marketing reward record (`marketing/rewards/*`), tx fields hoisted by `flattenTx`. */
+export const MarketingRewardSchema = z
+  .object({
+    EvtLogId: z.number(),
+    TxHash: z.string(),
+    TimeStamp: z.number(),
+    DateTime: z.string().optional(),
+    MarketerAddr: AddressSchema,
+    AmountEth: z.number(),
+  })
+  .loose();
+
+/* ------------------------------------------------------------------------- *
+ *  Gesture analytics (bidding-stats)
+ * ------------------------------------------------------------------------- */
+
+export const BidFrequencyBucketSchema = z
+  .object({
+    BucketTs: z.number(),
+    NumBids: z.number(),
+    UniqueBidders: z.number(),
+  })
+  .loose();
+
+export const BidTypeRatioBucketSchema = z
+  .object({
+    BucketTs: z.number(),
+    EthBids: z.number(),
+    RwalkBids: z.number(),
+    CstBids: z.number(),
+    TotalBids: z.number(),
+    EthPct: z.number(),
+    RwalkPct: z.number(),
+    CstPct: z.number(),
+  })
+  .loose();
+
+export const BidSpikeSchema = z
+  .object({
+    Index: z.number(),
+    StartTs: z.number(),
+    EndTs: z.number(),
+    PeakTs: z.number(),
+    PeakNumBids: z.number(),
+    TotalBids: z.number(),
+    BucketCount: z.number(),
+  })
+  .loose();
+
+export const BidTimeBoundsSchema = z
+  .object({
+    MinTs: z.number(),
+    MaxTs: z.number(),
+  })
+  .loose();
+
+export const BiddingActivityResponseSchema = z
+  .object({
+    InitTs: z.number(),
+    FinTs: z.number(),
+    Interval: z.number(),
+    FrequencyHistory: z.array(BidFrequencyBucketSchema),
+    Spikes: z.array(BidSpikeSchema),
+    RecentSpikeIndex: z.number(),
+    RecentWindowSecs: z.number(),
+  })
+  .loose();
+
+export const TopBidderInfoSchema = z
+  .object({
+    BidderAid: z.number(),
+    BidderAddr: AddressSchema,
+    NumBids: z.number(),
+  })
+  .loose();
+
+export const BidderActivePeriodSchema = z
+  .object({
+    BidderAid: z.number(),
+    BidderAddr: AddressSchema,
+    PeriodStart: z.number(),
+    PeriodEnd: z.number(),
+    NumBids: z.number(),
+    DurationSecs: z.number(),
+  })
+  .loose();
+
+export const TopBidderActivePeriodsResponseSchema = z
+  .object({
+    InitTs: z.number(),
+    FinTs: z.number(),
+    TopN: z.number(),
+    GapHours: z.number(),
+    MinBids: z.number(),
+    TopBidders: z.array(TopBidderInfoSchema),
+    ActivePeriods: z.array(BidderActivePeriodSchema),
+  })
+  .loose();
+
+/* ------------------------------------------------------------------------- *
+ *  Validation helpers
+ * ------------------------------------------------------------------------- */
+
+/** Builds the `schemaMismatch:<name> — <path>: <message>` summary for a failed parse. */
+function describeMismatch(error: z.ZodError, name: string): string {
+  const issues = error.issues
+    .slice(0, 3)
+    .map((issue) => `${issue.path.join('.') || '<root>'}: ${issue.message}`)
+    .join('; ');
+  return `schemaMismatch:${name} — ${issues}`;
+}
+
+/**
+ * Warn-only validation. Returns the parsed value on a match and the raw value
+ * on a mismatch, after reporting `schemaMismatch:<name>` to Sentry.
+ *
+ * Use for non-critical payloads (statistics, analytics, history lists) and for
+ * schemas that have not yet earned telemetry. Prefer {@link validate} anywhere
+ * a wrong payload would corrupt what the user sees.
+ */
+export function safeValidate<T>(schema: z.ZodType<T>, value: unknown, name: string): unknown {
+  const result = schema.safeParse(value);
+  if (result.success) return result.data;
+
+  reportError(new Error(describeMismatch(result.error, name)), `schema:${name}`);
+  return value;
+}
+
+/**
+ * Warn-only validation for a list payload: checks the first `sampleSize` rows
+ * (a full scan of a 10k+ row analytics list is wasted work when nothing acts
+ * on the result) and reports the first mismatch with the endpoint name.
  */
 export function safeValidateListSample<T>(
   schema: z.ZodType<T>,
@@ -391,59 +701,34 @@ export function safeValidateListSample<T>(
   sampleSize = 5,
 ): unknown {
   if (!Array.isArray(rows) || rows.length === 0) return rows;
-  const sample = rows.slice(0, sampleSize);
-  safeValidate(z.array(schema), sample, name);
+  safeValidate(z.array(schema), rows.slice(0, sampleSize), name);
   return rows;
 }
 
-/* ------------------------------------------------------------------------- *
- *  Validation helpers
- * ------------------------------------------------------------------------- */
-
-type Mode = 'warn' | 'throw';
-
-// Default mode is warn-only. Switch to 'throw' after a week of clean
-// Sentry telemetry — see services/api/client.ts for the flag.
-let currentMode: Mode = 'warn';
-
-export function setValidationMode(mode: Mode): void {
-  currentMode = mode;
-}
-
-export function getValidationMode(): Mode {
-  return currentMode;
+/**
+ * Strict validation: throws `schemaMismatch:<name> — <path>: <message>` when
+ * the payload does not match, so the read rejects and React Query surfaces
+ * `isError` instead of handing a half-empty object to the UI.
+ */
+export function validate<T>(schema: z.ZodType<T>, value: unknown, name: string): T {
+  const result = schema.safeParse(value);
+  if (result.success) return result.data;
+  throw new Error(describeMismatch(result.error, name));
 }
 
 /**
- * Parse `value` against `schema` and report on mismatch.
+ * Strict validation for a critical list payload — every row is checked, not a
+ * sample, so a corrupt row 500 fails the read the same way row 1 would.
  *
- * In 'warn' mode (default): always returns `value` unchanged; logs the
- * first 3 Zod issues to Sentry with a `schemaMismatch:<name>` tag so we
- * can triage without breaking the UI.
- *
- * In 'throw' mode: throws on mismatch. Suitable once telemetry has shown
- * the backend and schemas are aligned.
+ * `null` / `undefined` count as an empty list: Go marshals a nil slice as
+ * `null`, so a missing key legitimately means "no rows". Any other non-array
+ * value is a contract break and throws.
  */
-export function safeValidate<T>(schema: z.ZodType<T>, value: unknown, name: string): unknown {
-  const result = schema.safeParse(value);
-  if (result.success) return result.data;
-
-  const issues = result.error.issues.slice(0, 3).map((i) => ({
-    path: i.path.join('.') || '<root>',
-    message: i.message,
-    code: i.code,
-  }));
-
-  const summary = `schemaMismatch:${name} — ${issues
-    .map((i) => `${i.path}: ${i.message}`)
-    .join('; ')}`;
-
-  if (currentMode === 'throw') {
-    throw new Error(summary);
+export function validateList<T>(schema: z.ZodType<T>, rows: unknown, name: string): T[] {
+  if (rows == null) return [];
+  if (!Array.isArray(rows)) {
+    throw new Error(`schemaMismatch:${name} — <root>: expected array, received ${typeof rows}`);
   }
-
-  // warn-only: log once to Sentry and pass the raw value through.
-  reportError(new Error(summary), `schema:${name}`);
-  return value;
+  return validate(z.array(schema), rows, name);
 }
 // lexicon-allow-end

@@ -19,7 +19,11 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
+      // `min-h-11` rather than a taller `h-*` below `sm`: the trigger is often a
+      // flex item, and along a flex container's main axis `flex-basis` replaces
+      // `height` entirely, which is how `h-10` was resolving to 38px inside the
+      // admin form's `flex-col sm:flex-row` rows.
+      'flex h-10 min-h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 [&>span]:line-clamp-1',
       className,
     )}
     {...props}

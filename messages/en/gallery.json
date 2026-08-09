@@ -1,4 +1,8 @@
 {
+  "error": {
+    "title": "Unable to load the imprint archive",
+    "message": "The Cosmic Signature collection could not be read. Try again to load the archive."
+  },
   "jsonLd": {
     "name": "Cosmic Signature Gallery"
   },

@@ -4,6 +4,9 @@ import { AxiosError } from 'axios';
 
 import {
   axios as clientAxios,
+  apiCallEmptyOn404,
+  apiCallRequired,
+  apiGet,
   flattenTx,
   flattenTxArray,
   normalizeGestureRecord,
@@ -210,6 +213,153 @@ describe('apiCall', () => {
       throw makeAxios400();
     }, []);
     expect(mockReportError).not.toHaveBeenCalled();
+  });
+});
+
+describe('apiCallRequired', () => {
+  it('returns fn() result on success', async () => {
+    expect(await apiCallRequired(async () => [1, 2, 3])).toEqual([1, 2, 3]);
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['400', makeAxios400],
+    ['403', makeAxios403],
+    ['404', makeAxios404],
+    ['500', makeAxios500],
+  ])('propagates a %s instead of a fallback, and reports it', async (_label, makeError) => {
+    const original = makeError();
+    await expect(
+      apiCallRequired(async () => {
+        throw original;
+      }),
+    ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith(original, 'apiCallRequired');
+  });
+
+  it('propagates a network error with no response', async () => {
+    await expect(
+      apiCallRequired(async () => {
+        throw makeAxiosNoResponse();
+      }),
+    ).rejects.toThrow('Network response was not OK');
+  });
+
+  it('keeps a schema mismatch message intact so the field path survives', async () => {
+    const mismatch = new Error('schemaMismatch:DashboardInfo — CurRoundNum: expected number');
+    await expect(
+      apiCallRequired(async () => {
+        throw mismatch;
+      }),
+    ).rejects.toThrow('schemaMismatch:DashboardInfo — CurRoundNum: expected number');
+    expect(mockReportError).toHaveBeenCalledWith(mismatch, 'apiCallRequired');
+  });
+
+  it('normalizes a non-Error throwable', async () => {
+    await expect(
+      apiCallRequired(async () => {
+        throw 'string error';
+      }),
+    ).rejects.toThrow('Network response was not OK');
+  });
+});
+
+describe('apiCallEmptyOn404', () => {
+  it('returns fn() result on success', async () => {
+    expect(await apiCallEmptyOn404(async () => ['ok'], [])).toEqual(['ok']);
+  });
+
+  it('returns the fallback on 404, which means the route or record is absent', async () => {
+    const result = await apiCallEmptyOn404(async () => {
+      throw makeAxios404();
+    }, [] as number[]);
+    expect(result).toEqual([]);
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('returns a null fallback on 404', async () => {
+    const result = await apiCallEmptyOn404(async (): Promise<string | null> => {
+      throw makeAxios404();
+    }, null);
+    expect(result).toBeNull();
+  });
+
+  it.each([
+    ['400', makeAxios400],
+    ['403', makeAxios403],
+    ['500', makeAxios500],
+  ])('propagates a %s rather than treating it as empty', async (_label, makeError) => {
+    const original = makeError();
+    await expect(
+      apiCallEmptyOn404(async () => {
+        throw original;
+      }, []),
+    ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith(original, 'apiCallEmptyOn404');
+  });
+
+  it('propagates a schema mismatch with its message', async () => {
+    await expect(
+      apiCallEmptyOn404(async () => {
+        throw new Error(
+          'schemaMismatch:RoundClaimSummary[byRound] — 0.EthAwarded: expected number',
+        );
+      }, []),
+    ).rejects.toThrow(/schemaMismatch:RoundClaimSummary/);
+  });
+});
+
+describe('apiGet', () => {
+  const adapter = jest.fn();
+
+  beforeEach(() => {
+    adapter.mockReset();
+    adapter.mockImplementation(async (config: unknown) => ({
+      data: { ok: true },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    }));
+  });
+
+  it('attaches the caller abort signal to the request', async () => {
+    const controller = new AbortController();
+
+    const response = await apiGet(
+      '/api/cosmicgame/test',
+      { signal: controller.signal },
+      {
+        adapter,
+      },
+    );
+
+    expect(response.data).toEqual({ ok: true });
+    expect(adapter.mock.calls[0]?.[0]).toMatchObject({ signal: controller.signal });
+  });
+
+  it('merges the signal with an existing request config', async () => {
+    const controller = new AbortController();
+
+    await apiGet(
+      '/api/cosmicgame/test',
+      { signal: controller.signal },
+      {
+        adapter,
+        params: { limit: 5 },
+      },
+    );
+
+    expect(adapter.mock.calls[0]?.[0]).toMatchObject({
+      signal: controller.signal,
+      params: { limit: 5 },
+    });
+  });
+
+  it('sends no signal when the caller passes no options', async () => {
+    await apiGet('/api/cosmicgame/test', undefined, { adapter });
+
+    expect(adapter.mock.calls[0]?.[0]?.signal).toBeUndefined();
   });
 });
 

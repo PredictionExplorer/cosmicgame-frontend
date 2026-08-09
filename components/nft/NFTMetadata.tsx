@@ -7,6 +7,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { getExplorerUrl, getRelativeTime } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 import {
   useHydrationSafeDateTime,
   useHydrationSafeNowSeconds,
@@ -61,7 +63,10 @@ function SeedBlock({ seed }: { seed?: string | number }) {
       </div>
       <button
         onClick={handleCopy}
-        className="shrink-0 rounded-md p-2 text-muted-foreground/50 hover:text-primary hover:bg-white/[0.04] transition-colors"
+        className={cn(
+          'shrink-0 rounded-md p-2 text-muted-foreground/50 hover:text-primary hover:bg-white/[0.04] transition-colors',
+          TOUCH_TARGET_ICON_CLASS,
+        )}
         aria-label={t('metadata.copySeed')}
         data-testid="copy-seed-button"
       >

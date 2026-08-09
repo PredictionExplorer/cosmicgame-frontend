@@ -15,6 +15,7 @@ import type { DashboardInfo, GestureInfo } from '@/services/api';
 import { useUserInfo } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
+import { formatFixed } from '@/utils/format';
 import {
   formatCstAmount,
   formatCstProgressPercent,
@@ -418,7 +419,7 @@ export const GestureStatus = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">{t('status.standing.ethStellar')}</span>
                     <span className="font-medium text-primary">
-                      {selectionFrequency.stellarEth.toFixed(1)}%
+                      {formatFixed(selectionFrequency.stellarEth, 1)}%
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
@@ -434,7 +435,7 @@ export const GestureStatus = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">{t('status.standing.nftStellar')}</span>
                     <span className="font-medium text-accent">
-                      {selectionFrequency.nft.toFixed(1)}%
+                      {formatFixed(selectionFrequency.nft, 1)}%
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">

@@ -13,6 +13,11 @@ type Tone = 'destructive' | 'warning' | 'neutral';
 interface ErrorStateProps {
   title?: string;
   message?: ReactNode;
+  /**
+   * Heading level for the title. Defaults to 4; pass 3 when the state sits
+   * directly under a page `h2` so the document keeps a valid heading order.
+   */
+  headingLevel?: 3 | 4;
   /** Lucide icon override. Defaults to AlertTriangle. */
   icon?: ReactNode;
   tone?: Tone;
@@ -36,6 +41,7 @@ const TONE: Record<Tone, { bg: string; fg: string }> = {
 export function ErrorState({
   title,
   message,
+  headingLevel = 4,
   icon,
   tone = 'destructive',
   onRetry,
@@ -45,12 +51,13 @@ export function ErrorState({
 }: ErrorStateProps) {
   const t = useTranslations('errors');
   const palette = TONE[tone];
+  const Heading = headingLevel === 3 ? 'h3' : 'h4';
   const body = (
     <div className={cn('flex flex-col items-center justify-center py-16 text-center', className)}>
       <div className={cn('mb-4 rounded-full p-4', palette.bg)}>
         {icon ?? <AlertTriangle className={cn('h-8 w-8', palette.fg)} />}
       </div>
-      <h4 className="type-heading-3 text-foreground">{title ?? t('state.title')}</h4>
+      <Heading className="type-heading-3 text-foreground">{title ?? t('state.title')}</Heading>
       {message ? (
         <div className="mt-2 max-w-md type-body-sm text-muted-foreground">{message}</div>
       ) : null}

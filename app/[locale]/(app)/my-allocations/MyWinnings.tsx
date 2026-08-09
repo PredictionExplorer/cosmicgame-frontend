@@ -30,6 +30,7 @@ import {
   type StellarSelectionAllocation,
 } from '@/components/winnings/StellarSelectionAllocationsTable';
 import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
+import { formatFixed } from '@/utils/format';
 
 interface UnclaimedDonatedNFT {
   Index: number;
@@ -205,7 +206,7 @@ export default function MyWinnings() {
                   <p className="text-sm text-muted-foreground">
                     {t('allocations.retrievable')}{' '}
                     <span className="text-white font-medium">
-                      {status.ETHRaffleToClaim.toFixed(6)} ETH
+                      {formatFixed(status.ETHRaffleToClaim, 6)} ETH
                     </span>
                   </p>
                   <Button onClick={handleAllETHClaim} disabled={isClaiming.raffleETH} size="sm">

@@ -23,6 +23,7 @@ import NFTImage from '@/components/nft/NFTImage';
 import { useGestureInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api';
+import { formatFixed } from '@/utils/format';
 
 interface NFTTokenURI {
   image?: string;
@@ -44,7 +45,7 @@ function formatAmount(
 ): string {
   if (amount === undefined) return '—';
   const precision = amount > 0 && amount < 1 ? decimals.fractional : decimals.standard;
-  return `${amount.toFixed(precision)} ${unit}`;
+  return `${formatFixed(amount, precision)} ${unit}`;
 }
 
 function getCstGestureCost(gestureInfo: GestureInfo): number | undefined {

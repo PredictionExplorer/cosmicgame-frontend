@@ -212,4 +212,49 @@ describe('GalleryPage', () => {
     render(<GalleryPage />);
     expect(screen.getByText('gallery.empty.title')).toBeInTheDocument();
   });
+
+  describe('when the archive read fails', () => {
+    it('shows an error state instead of an empty collection', () => {
+      mockUseCSTList.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch: jest.fn(),
+      });
+
+      render(<GalleryPage />);
+
+      expect(screen.getByText('gallery.error.title')).toBeInTheDocument();
+      expect(screen.getByText('gallery.error.message')).toBeInTheDocument();
+      expect(screen.queryByText('gallery.empty.title')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('search.gallery.ariaLabel')).not.toBeInTheDocument();
+    });
+
+    it('refetches the collection when the retry action is used', () => {
+      const refetch = jest.fn();
+      mockUseCSTList.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch,
+      });
+
+      render(<GalleryPage />);
+      fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
+
+      expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('has no accessibility violations in the error state', async () => {
+      mockUseCSTList.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch: jest.fn(),
+      });
+
+      const { container } = render(<GalleryPage />);
+      await checkA11y(container);
+    });
+  });
 });

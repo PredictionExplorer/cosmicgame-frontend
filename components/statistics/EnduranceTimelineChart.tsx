@@ -27,6 +27,8 @@ import {
 } from '@/utils/endurance';
 import { useGestureListByCycle, useRoundInfo, useCurrentTime } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
@@ -534,7 +536,10 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
                 setSelectedRound(Math.floor(next));
               }
             }}
-            className="w-20 rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-center text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className={cn(
+              'w-20 rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-center text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              TOUCH_TARGET_HEIGHT_CLASS,
+            )}
           />
           <Button
             type="button"
@@ -562,7 +567,10 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
           rel="noopener noreferrer"
           aria-label={t('charts.endurance.openWindowAria')}
           title={t('charts.endurance.openWindowTitle')}
-          className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-white"
+          className={cn(
+            'ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-white',
+            TOUCH_TARGET_ICON_CLASS,
+          )}
         >
           <ExternalLink className="h-4 w-4" />
         </Link>

@@ -18,6 +18,7 @@ import { useNotify } from '@/hooks/useNotify';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Button } from '@/components/ui/button';
+import { ErrorState } from '@/components/ui/error-state';
 import { Spinner } from '@/components/ui/spinner';
 import { PageShell } from '@/components/ui/page-shell';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -59,6 +60,7 @@ import {
 import { RootLandingPage } from '@/components/landing/RootLandingPage';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 import { deriveLiveCstGestureData } from '@/utils/cstGesture';
+import { formatFixed } from '@/utils/format';
 
 const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
   ssr: false,
@@ -162,8 +164,12 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     setHostname(window.location.hostname);
   }, []);
 
-  const { data: dashboardData, isLoading: dashboardLoading } =
-    useDashboardInfo(initialDashboardData);
+  const {
+    data: dashboardData,
+    isLoading: dashboardLoading,
+    isError: dashboardFailed,
+    refetch: refetchDashboard,
+  } = useDashboardInfo(initialDashboardData);
   const { data: currentTimeData, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
 
   const round = dashboardData?.CurRoundNum ?? -1;
@@ -345,7 +351,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
       });
     if (gestureType === 'CST') {
       if (liveCstGestureData.isFree) return t('form.submit.cstFree');
-      return t('form.submit.cst', { cost: liveCstGestureData.CSTPrice.toFixed(2) });
+      return t('form.submit.cst', { cost: formatFixed(liveCstGestureData.CSTPrice, 2) });
     }
     if (gestureType === 'RandomWalk') return t('form.submit.randomWalk');
     return t('form.submit.generic', { method: gestureType });
@@ -387,6 +393,22 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Spinner size="lg" />
       </div>
+    );
+  }
+
+  // Without the dashboard read there is no cycle number, countdown, or
+  // allocation pool — rendering the page would show an idle cycle that does
+  // not exist, so say the read failed and offer a retry instead.
+  if (dashboardFailed && !dashboardData) {
+    return (
+      <PageShell variant="data" backdrop="signature">
+        <ErrorState
+          title={t('error.title')}
+          message={t('error.message')}
+          onRetry={() => void refetchDashboard()}
+          surface
+        />
+      </PageShell>
     );
   }
 

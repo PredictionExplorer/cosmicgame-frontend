@@ -41,6 +41,8 @@ import {
   useDonationsERC20ByRound,
   useCurrentTime,
 } from '@/hooks/useApiQuery';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useNow } from '@/hooks/useNow';
 
@@ -149,7 +151,10 @@ const CurrentRoundPage = () => {
       {/* Back navigation */}
       <Link
         href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-white transition-colors mb-6"
+        className={cn(
+          'inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-white transition-colors mb-6',
+          TOUCH_TARGET_TEXT_LINK_CLASS,
+        )}
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         {t('nav.backToHome')}

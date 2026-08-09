@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 import { parseBalance } from '@/utils';
 
+import { formatFixed } from '@/utils/format';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
@@ -61,13 +62,25 @@ const Imprint = () => {
   };
 
   useEffect(() => {
+    if (!nftContract) return;
+    let cancelled = false;
     const getData = async () => {
-      const abiImprintCost = (await nftContract!.read.getMintPrice?.()) as bigint; // lexicon-allow-abi
-      setImprintCost((parseFloat(parseBalance(abiImprintCost)) * 1.01 + 0.008).toFixed(4));
+      try {
+        const abiImprintCost = (await nftContract.read.getMintPrice?.()) as bigint; // lexicon-allow-abi
+        if (cancelled) return;
+        // `parseBalance` yields a sentinel for unreadable values, so parse the
+        // base cost before deriving the displayed total.
+        const baseCost = parseFloat(parseBalance(abiImprintCost));
+        setImprintCost(formatFixed(baseCost * 1.01 + 0.008, 4, '0'));
+      } catch (err) {
+        if (cancelled) return;
+        reportError(err, 'read RWLK imprint cost');
+      }
     };
-    if (nftContract) {
-      getData();
-    }
+    void getData();
+    return () => {
+      cancelled = true;
+    };
   }, [nftContract]);
 
   useEffect(() => {

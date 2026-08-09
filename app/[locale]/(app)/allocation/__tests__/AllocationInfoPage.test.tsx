@@ -195,6 +195,37 @@ describe('AllocationInfoPage', () => {
       render(<AllocationInfoPage roundNum={99} />);
       expect(screen.getByText('allocation.details.notFound.help(cycle=99)')).toBeInTheDocument();
     });
+
+    it('distinguishes a failed read from a cycle with no data', () => {
+      mockUseRoundInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch: jest.fn(),
+      });
+
+      render(<AllocationInfoPage roundNum={4} />);
+
+      expect(screen.getByText('allocation.details.error.title')).toBeInTheDocument();
+      expect(screen.getByText('allocation.details.error.message(cycle=4)')).toBeInTheDocument();
+      expect(screen.queryByText('allocation.details.notFound.title')).not.toBeInTheDocument();
+    });
+
+    it('refetches the cycle when the retry action is used', async () => {
+      const user = userEvent.setup();
+      const refetch = jest.fn();
+      mockUseRoundInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch,
+      });
+
+      render(<AllocationInfoPage roundNum={4} />);
+      await user.click(screen.getByRole('button', { name: /Try again/ }));
+
+      expect(refetch).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('hero banner', () => {

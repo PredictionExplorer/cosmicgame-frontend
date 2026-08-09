@@ -4,6 +4,7 @@ import { useId, useState, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 export interface CollapsibleSectionProps {
@@ -59,7 +60,10 @@ export function CollapsibleSection({
           onClick={handleToggle}
           aria-expanded={open}
           aria-controls={panelId}
-          className="flex min-w-0 flex-1 items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className={cn(
+            'flex min-w-0 flex-1 items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            TOUCH_TARGET_HEIGHT_CLASS,
+          )}
         >
           <div className="flex min-w-0 items-start gap-2.5">
             {icon && (

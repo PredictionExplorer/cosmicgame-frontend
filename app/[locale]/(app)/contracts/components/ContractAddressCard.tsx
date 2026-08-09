@@ -5,6 +5,7 @@ import { Copy, Check, ExternalLink } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 import { useClipboard } from '@/hooks/useClipboard';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
@@ -56,7 +57,10 @@ export function ContractAddressCard({
         <div className="flex items-center gap-1">
           <button
             onClick={handleCopy}
-            className="rounded-md p-1.5 text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-muted-foreground"
+            className={cn(
+              'rounded-md p-1.5 text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-muted-foreground',
+              TOUCH_TARGET_ICON_CLASS,
+            )}
             aria-label={t('addressCard.copyAria', { name })}
           >
             {copied ? (
@@ -69,7 +73,10 @@ export function ContractAddressCard({
             href={explorerHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-md p-1.5 text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-muted-foreground"
+            className={cn(
+              'rounded-md p-1.5 text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-muted-foreground',
+              TOUCH_TARGET_ICON_CLASS,
+            )}
             aria-label={t('addressCard.explorerAria', { name })}
           >
             <ExternalLink className="h-3.5 w-3.5" />

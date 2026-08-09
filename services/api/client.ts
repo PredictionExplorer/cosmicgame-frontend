@@ -1,4 +1,47 @@
-import axios, { isAxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+/**
+ * Axios instance, URL builders, payload normalizers, and the read policies the
+ * endpoint modules wrap every request in.
+ *
+ * Read policies — a failed read either surfaces or resolves to a fallback, and
+ * which one it does is a per-endpoint decision made at the call site:
+ *
+ *   apiCallRequired     Nothing is swallowed. The reads a page is built around,
+ *                       where a fallback would be a lie:
+ *                         statistics/dashboard
+ *                         rounds/list, rounds/info/{n}
+ *                         bid/list/all, bid/list/by_round/…
+ *                         bid/current_special_winners
+ *                         user/info/{addr}
+ *                         cst/list/all
+ *                         prizes/history/global, prizes/history/by_user/…
+ *                         staking/cst/staked_tokens/{all,by_user/…}
+ *                         staking/randomwalk/staked_tokens/{all,by_user/…}
+ *                       plus the unclaimed-asset reads, where an empty list
+ *                       would wrongly tell a wallet it has nothing to collect:
+ *                         staking/cst/rewards/to_claim/by_user/…
+ *                         prizes/eth/unclaimed/by_user/…
+ *                         donations/nft/unclaimed/by_user/…
+ *
+ *   apiCallEmptyOn404   404 means "nothing yet"; everything else rejects.
+ *                       Analytics routes that ship ahead of the Go server:
+ *                         statistics/leaderboard/roi
+ *                         statistics/claims/by_round
+ *                         statistics/claims/detail/{round}
+ *                       and single-record lookups where 404 means the record
+ *                       does not exist:
+ *                         bid/info/{id}
+ *
+ *   apiCall             Lenient: 400/403/404 resolve to the fallback. The long
+ *                       tail of secondary tables, badges, and admin-gated
+ *                       routes (get_banned_bids answers 403 to ordinary
+ *                       clients) where an empty result is a truthful answer.
+ */
+import axios, {
+  isAxiosError,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 
 import { networkConfig } from '@/config/networks';
 import {
@@ -157,6 +200,40 @@ export const getAPIUrl = (url: string) => {
 export interface ApiPageWindow {
   offset?: number;
   limit?: number;
+}
+
+/** Per-request options every read endpoint accepts. */
+export interface ApiRequestOptions {
+  /**
+   * Abort signal for the request. The React Query hooks forward the signal
+   * their `queryFn` receives, so navigating away (or a superseded refetch)
+   * cancels the in-flight HTTP request instead of letting it settle unused.
+   */
+  signal?: AbortSignal;
+}
+
+/**
+ * Options a paged list read accepts: the pagination window plus the abort
+ * signal, in one object so callers never have to pass a positional
+ * placeholder to reach the signal.
+ */
+export type ApiListRequestOptions = ApiPageWindow & ApiRequestOptions;
+
+/**
+ * Issues a GET against the shared axios instance, attaching the caller's abort
+ * signal when there is one.
+ *
+ * The config argument is omitted entirely when there is nothing to send, so the
+ * request shape stays `axios.get(url)` for callers that pass no options.
+ */
+export function apiGet(
+  url: string,
+  opts?: ApiRequestOptions,
+  config?: AxiosRequestConfig,
+): Promise<AxiosResponse> {
+  const merged: AxiosRequestConfig = { ...config };
+  if (opts?.signal) merged.signal = opts.signal;
+  return Object.keys(merged).length > 0 ? axios.get(url, merged) : axios.get(url);
 }
 
 /**
@@ -395,17 +472,59 @@ export function assertApiEnvelope(response: AxiosResponse): void {
   }
 }
 
-/** Wraps an API call with response-envelope checking and standard error handling. */
+/**
+ * Normalizes a failed read into the error React Query surfaces.
+ *
+ * Transport failures collapse to one message (the status is already on the
+ * Sentry report); schema mismatches and backend envelope errors keep their own
+ * message, which is the part that says *which field* broke.
+ */
+function toReadError(err: unknown): Error {
+  if (!isAxiosError(err) && err instanceof Error) return err;
+  return new Error('Network response was not OK');
+}
+
+/**
+ * Optional read: 400/403/404 resolve to `fallback`; see the read-policy table
+ * at the top of this file.
+ */
 export async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   try {
     return await fn();
   } catch (err: unknown) {
     const status = isAxiosError(err) ? err.response?.status : undefined;
-    // 400/403: client not allowed or bad request. 404: missing resource or
-    // endpoint not deployed — common for optional list reads; use fallback.
     if (status === 400 || status === 403 || status === 404) return fallback;
     reportError(err, 'apiCall');
     throw new Error('Network response was not OK');
+  }
+}
+
+/**
+ * Required read: nothing is swallowed. Every failure — including 400/403/404 —
+ * rejects, so React Query reports `isError` and the page can show an error
+ * state instead of rendering as though the data were empty.
+ */
+export async function apiCallRequired<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err: unknown) {
+    reportError(err, 'apiCallRequired');
+    throw toReadError(err);
+  }
+}
+
+/**
+ * Read where a 404 genuinely means "nothing yet" — the route is absent on an
+ * older server build, or the record does not exist. A 404 resolves to
+ * `fallback`; 400, 403, 5xx, network, and schema failures all reject.
+ */
+export async function apiCallEmptyOn404<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await fn();
+  } catch (err: unknown) {
+    if (isAxiosError(err) && err.response?.status === 404) return fallback;
+    reportError(err, 'apiCallEmptyOn404');
+    throw toReadError(err);
   }
 }
 

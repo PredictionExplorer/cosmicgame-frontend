@@ -91,6 +91,10 @@
       "help": "No data available for Cycle #{cycle}. The cycle may not have finalized yet.",
       "back": "Back to Allocation Recipients"
     },
+    "error": {
+      "title": "Couldn't load this cycle",
+      "message": "Cycle #{cycle} data failed to load. Try again, or go back to the recipients list."
+    },
     "breadcrumbs": {
       "recipients": "Allocation Recipients"
     },

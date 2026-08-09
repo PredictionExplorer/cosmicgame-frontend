@@ -7,6 +7,8 @@ import type { HowItWorksContent } from '@/content/how-it-works';
 
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
@@ -53,7 +55,10 @@ export function CallToAction({
             href={callToAction.discordCta.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 transition-colors hover:text-primary"
+            className={cn(
+              'inline-flex items-center gap-2 transition-colors hover:text-primary',
+              TOUCH_TARGET_TEXT_LINK_CLASS,
+            )}
           >
             <MessageCircle className="h-4 w-4" />
             {callToAction.discordCta.label}
@@ -62,7 +67,10 @@ export function CallToAction({
             href={callToAction.twitterCta.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 transition-colors hover:text-primary"
+            className={cn(
+              'inline-flex items-center gap-2 transition-colors hover:text-primary',
+              TOUCH_TARGET_TEXT_LINK_CLASS,
+            )}
           >
             <XIcon className="h-4 w-4" />
             {callToAction.twitterCta.label}

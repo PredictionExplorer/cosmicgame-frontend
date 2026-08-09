@@ -29,6 +29,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { cn } from '@/lib/utils';
+import { formatFixed } from '@/utils/format';
 
 interface AnchorInfo {
   TxHash: string;
@@ -96,7 +97,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
           {Claimed ? t('common.yes') : t('common.no')}
         </TablePrimaryCell>
         <TablePrimaryCell label={t('distributionsByToken.columns.distributionEth')} align="right">
-          {RewardEth.toFixed(6)}
+          {formatFixed(RewardEth, 6)}
         </TablePrimaryCell>
       </TablePrimaryRow>
 
@@ -154,7 +155,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                     </DetailRow>
                     <DetailRow label={t('distributionsByToken.details.distribution')}>
                       <span className="font-mono tabular-nums">
-                        {Unstake.RewardAmountEth.toFixed(6)} ETH
+                        {formatFixed(Unstake.RewardAmountEth, 6)} ETH
                       </span>
                     </DetailRow>
                   </DefinitionList>

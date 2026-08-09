@@ -121,6 +121,30 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
         return false;
       }
 
+      /**
+       * How far the element's rendered text lines fall outside its own content
+       * box, in pixels.
+       *
+       * `scrollWidth` is the obvious measure but it counts absolutely
+       * positioned descendants, including decorative glows and the invisible
+       * pseudo-element halos that give small icon buttons a 44px tap target.
+       * Those inflate it by a few pixels while clipping nothing, which is
+       * indistinguishable from a real bug at this level. A `Range` over the
+       * element's contents returns the actual line boxes and ignores
+       * out-of-flow content, so it answers the question we care about: is any
+       * text outside the box?
+       */
+      function textSpill(el: Element, contentLeft: number, contentRight: number): number {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        let spill = 0;
+        for (const line of Array.from(range.getClientRects())) {
+          if (line.width === 0) continue;
+          spill = Math.max(spill, line.right - contentRight, contentLeft - line.left);
+        }
+        return spill;
+      }
+
       const violations: {
         type: 'overflowing' | 'clipped' | 'truncated';
         selector: string;
@@ -146,7 +170,9 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
 
         // 1. The element's own text does not fit inside it.
         if (!scrollable && el.clientWidth >= MIN_MEASURABLE_PX) {
-          const overflowBy = el.scrollWidth - el.clientWidth;
+          const ownLeft = rect.left + el.clientLeft;
+          const ownRight = ownLeft + el.clientWidth;
+          const overflowBy = textSpill(el, ownLeft, ownRight);
           if (overflowBy > tolerance) {
             violations.push({
               type: style.textOverflow === 'ellipsis' ? 'truncated' : 'overflowing',
@@ -243,6 +269,49 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
         return false;
       }
 
+      /**
+       * The area of the control a finger can actually reach.
+       *
+       * `overflow: hidden`/`clip` clips hit-testing, not just painting, so a
+       * control inside a clipped box is unreachable however large its own
+       * border box is. The mobile card layout relies on exactly that: it keeps
+       * each table's `thead` in the DOM for the accessibility tree and clips it
+       * to a 1px box, and a sortable column header holds a real `<button>`.
+       * Measuring that button's own rect reported a 118x17 tap target for a
+       * control that paints nothing and swallows no taps.
+       *
+       * Scroll containers are deliberately not treated as clipping: their
+       * content is reachable, just not on screen yet.
+       */
+      function visibleRect(el: Element): { width: number; height: number } {
+        const rect = el.getBoundingClientRect();
+        let top = rect.top;
+        let right = rect.right;
+        let bottom = rect.bottom;
+        let left = rect.left;
+
+        for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+          const style = window.getComputedStyle(parent);
+          const clipsX = style.overflowX === 'hidden' || style.overflowX === 'clip';
+          const clipsY = style.overflowY === 'hidden' || style.overflowY === 'clip';
+          if (!clipsX && !clipsY) continue;
+
+          const parentRect = parent.getBoundingClientRect();
+          if (clipsX) {
+            const contentLeft = parentRect.left + parent.clientLeft;
+            left = Math.max(left, contentLeft);
+            right = Math.min(right, contentLeft + parent.clientWidth);
+          }
+          if (clipsY) {
+            const contentTop = parentRect.top + parent.clientTop;
+            top = Math.max(top, contentTop);
+            bottom = Math.min(bottom, contentTop + parent.clientHeight);
+          }
+        }
+
+        return { width: Math.max(0, right - left), height: Math.max(0, bottom - top) };
+      }
+
       function describe(el: Element): string {
         const label =
           el.getAttribute('aria-label') ?? (el.textContent ?? '').trim().slice(0, 40) ?? '';
@@ -267,6 +336,9 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
         if (rect.width === 0 || rect.height === 0) continue;
         // Visually-hidden controls (skip links until focused) are not touch targets.
         if (rect.width <= 1 || rect.height <= 1) continue;
+        // Nor are controls an ancestor clips away entirely.
+        const visible = visibleRect(el);
+        if (visible.width <= 1 || visible.height <= 1) continue;
 
         const required = isTextLink(el) ? minTextLinkSize : minSize;
         if (
@@ -316,11 +388,25 @@ export function formatTapTargetViolations(
 /**
  * Waits for layout to settle: fonts drive text metrics and images drive row
  * heights, so measuring before both land produces flaky results.
+ *
+ * Waiting for `load` and then for the main thread to go idle is not belt and
+ * braces. The header picks its layout from `window.innerWidth` inside an
+ * effect, so the server-rendered markup is the *desktop* nav on every route and
+ * React only swaps in the mobile nav once it has hydrated. Sampling before that
+ * measured the desktop nav pills — controls a phone never ends up showing —
+ * and which routes caught it changed from run to run.
  */
 export async function waitForStableLayout(page: Page): Promise<void> {
-  await page.waitForLoadState('domcontentloaded');
+  await page.waitForLoadState('load');
   await page.evaluate(async () => {
     if (document.fonts?.ready) await document.fonts.ready;
+    await new Promise<void>((resolve) => {
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(() => resolve(), { timeout: 2000 });
+      } else {
+        requestAnimationFrame(() => resolve());
+      }
+    });
   });
   await page.waitForTimeout(300);
 }

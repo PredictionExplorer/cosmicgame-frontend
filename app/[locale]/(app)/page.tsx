@@ -7,6 +7,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAPIUrl } from '@/services/api';
 import { get_dashboard_info } from '@/services/api/rounds';
 import { createMetadata } from '@/utils/seo';
+import { formatFixed } from '@/utils/format';
 
 import HomePage from './HomePage';
 
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   const description =
     reserve != null
-      ? t('home.descriptionWithReserve', { reserve: `${reserve.toFixed(4)} ETH` })
+      ? t('home.descriptionWithReserve', { reserve: `${formatFixed(reserve, 4)} ETH` })
       : t('home.description');
   return createMetadata(t('home.title'), description, undefined, '/', { locale });
 }

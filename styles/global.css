@@ -262,6 +262,18 @@
     overflow-wrap: anywhere;
   }
 
+  /*
+   * A cell's direct children are grid items, so they blockify and their box
+   * collapses onto the cell's 12px line box — about 17px, under the 24px WCAG
+   * 2.5.8 target for a text link. The value column always spans far more than
+   * 24px, so raising the line box alone turns the whole line into the target;
+   * `min-height` covers links whose content is an icon rather than text.
+   */
+  .cs-table tbody td > a {
+    min-height: 1.5rem;
+    line-height: 1.5rem;
+  }
+
   /* A labelled blank row is noise; drop cells with nothing to show. */
   .cs-table td[data-empty='true'] {
     display: none;

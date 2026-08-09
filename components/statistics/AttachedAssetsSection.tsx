@@ -5,6 +5,7 @@ import { Gift, ImageOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
 import { useDonationsERC20ByRound, useDonationsNFTList } from '@/hooks/useApiQuery';
 import type { AttachedNFT as AttachedNFTRecord, DonatedERC20Token } from '@/services/api/types';
 import AttachedNFTCard from '@/components/attachments/AttachedNFT';
@@ -84,6 +85,7 @@ export function AttachedAssetsSection({ currentRoundNum }: AttachedAssetsSection
           onClick={() => setScope(option.value)}
           className={cn(
             'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+            TOUCH_TARGET_HEIGHT_CLASS,
             nftScope === option.value
               ? 'bg-primary/15 text-primary'
               : 'text-muted-foreground hover:text-foreground',

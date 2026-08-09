@@ -109,6 +109,7 @@
       "selectOne": "Select at least one transferable NFT.",
       "confirmed": "{count, plural, one {NFT transfer confirmed.} other {# NFT transfers confirmed.}}",
       "detailTransferConfirmed": "NFT transfer confirmed.",
+      "recipientCheckFailed": "Could not check the recipient address. Check your wallet and network connection, then try again.",
       "failed": "Unable to send selected NFTs. Please try again.",
       "failedToken": "Unable to transfer NFT #{tokenId}. Please try again.",
       "nameSet": "The token name has been changed successfully!",

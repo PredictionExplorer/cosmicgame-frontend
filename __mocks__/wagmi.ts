@@ -6,11 +6,12 @@
 import type { ReactNode } from 'react';
 
 module.exports = {
-  useAccount: () => ({ address: undefined, isConnected: false }),
+  useAccount: () => ({ address: undefined, isConnected: false, chainId: undefined }),
   useChainId: () => 421614,
   useConfig: () => ({}),
   useConnectorClient: () => ({ data: undefined }),
   usePublicClient: () => undefined,
   useWalletClient: () => ({ data: undefined }),
+  useSwitchChain: () => ({ switchChainAsync: async () => undefined }),
   WagmiProvider: ({ children }: { children: ReactNode }) => children,
 };

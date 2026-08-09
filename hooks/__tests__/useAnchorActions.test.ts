@@ -35,11 +35,22 @@ jest.mock('@wagmi/core', () => ({
   getConnectorClient: jest.fn().mockResolvedValue(undefined),
 }));
 
+const mockSwitchChainAsync = jest.fn().mockResolvedValue(undefined);
+
 jest.mock('wagmi', () => ({
   usePublicClient: () => mockUsePublicClient(),
   useWalletClient: () => ({ data: {} }),
   useConnectorClient: () => ({ data: undefined }),
   useConfig: () => ({}),
+  useAccount: () => ({ address: mockAccount, isConnected: true, chainId: 421614 }),
+  useSwitchChain: () => ({ switchChainAsync: mockSwitchChainAsync }),
+}));
+
+// The chain guard reads the wallet client's real chain before every write;
+// default it to the app chain so existing cases exercise the happy path.
+const mockGetChainId = jest.fn<Promise<number>, [unknown]>();
+jest.mock('viem/actions', () => ({
+  getChainId: (...args: unknown[]) => mockGetChainId(args[0]),
 }));
 
 // Contract write methods on the NFT, CST anchoring wallet, and RWLK anchoring wallet.
@@ -155,6 +166,8 @@ import { useAnchorActions } from '../useAnchorActions';
 beforeEach(() => {
   jest.clearAllMocks();
   jest.useFakeTimers();
+  mockGetChainId.mockResolvedValue(421614);
+  mockSwitchChainAsync.mockResolvedValue(undefined);
   mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
   mockIsApprovedForAll.mockResolvedValue(false);
   mockSetApprovalForAll.mockResolvedValue('0xapproveHash');
@@ -439,6 +452,95 @@ describe('useAnchorActions', () => {
         expect.objectContaining({
           text: 'toasts.anchor.released(count=2)',
         }),
+      );
+    });
+  });
+
+  describe('chain guard', () => {
+    it('blocks the anchor write when the wallet will not move to the app chain', async () => {
+      mockGetChainId.mockResolvedValueOnce(1);
+      mockSwitchChainAsync.mockRejectedValueOnce(new Error('switch refused'));
+      mockIsApprovedForAll.mockResolvedValueOnce(true);
+      const { result } = renderHook(() => useAnchorActions());
+
+      await act(async () => {
+        await result.current.anchor(42, false);
+      });
+
+      expect(mockCstAnchor).not.toHaveBeenCalled();
+      expect(mockSetApprovalForAll).not.toHaveBeenCalled();
+    });
+
+    it('blocks the release write on the same mismatch', async () => {
+      mockGetChainId.mockResolvedValueOnce(1);
+      mockSwitchChainAsync.mockRejectedValueOnce(new Error('switch refused'));
+      const { result } = renderHook(() => useAnchorActions());
+
+      await act(async () => {
+        await result.current.release(7, false);
+      });
+
+      expect(mockCstRelease).not.toHaveBeenCalled();
+    });
+
+    it('proceeds once the wallet accepts the switch', async () => {
+      mockGetChainId.mockResolvedValueOnce(1);
+      mockIsApprovedForAll.mockResolvedValueOnce(true);
+      const { result } = renderHook(() => useAnchorActions());
+
+      await act(async () => {
+        await result.current.anchor(42, false);
+      });
+
+      expect(mockSwitchChainAsync).toHaveBeenCalledWith({ chainId: 421614 });
+      expect(mockCstAnchor).toHaveBeenCalledWith([42]);
+    });
+  });
+
+  describe('deferred refresh cleanup', () => {
+    it('cancels the pending anchor refresh when the caller unmounts first', async () => {
+      mockIsApprovedForAll.mockResolvedValueOnce(true);
+      const { result, unmount } = renderHook(() => useAnchorActions());
+
+      await act(async () => {
+        await result.current.anchor(42, false);
+      });
+      expect(mockInvalidateQueries).not.toHaveBeenCalled();
+
+      unmount();
+      await flushDeferredAnchoringEffects();
+
+      expect(mockInvalidateQueries).not.toHaveBeenCalled();
+      expect(mockFetchAnchoredTokens).not.toHaveBeenCalled();
+      expect(mockSetNotification).not.toHaveBeenCalled();
+    });
+
+    it('cancels the pending release refresh when the caller unmounts first', async () => {
+      const { result, unmount } = renderHook(() => useAnchorActions());
+
+      await act(async () => {
+        await result.current.release(7, false);
+      });
+
+      unmount();
+      await flushDeferredAnchoringEffects();
+
+      expect(mockInvalidateQueries).not.toHaveBeenCalled();
+      expect(mockSetNotification).not.toHaveBeenCalled();
+    });
+
+    it('still fires the refresh when the caller stays mounted', async () => {
+      mockIsApprovedForAll.mockResolvedValueOnce(true);
+      const { result } = renderHook(() => useAnchorActions());
+
+      await act(async () => {
+        await result.current.anchor(42, false);
+      });
+      await flushDeferredAnchoringEffects();
+
+      expect(mockInvalidateQueries).toHaveBeenCalled();
+      expect(mockSetNotification).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'success' }),
       );
     });
   });

@@ -20,6 +20,7 @@ import { MainWrapper } from '@/components/styled';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { useRoundInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
+import { formatFixed } from '@/utils/format';
 
 /** Poll interval while waiting for the next round to become active (chain activation time). */
 const ACTIVATION_POLL_MS = 4000;
@@ -233,7 +234,7 @@ const AllocationFinalizedPage = () => {
               <DefinitionList>
                 <DetailRow label={t('finalized.result.ethAllocation')}>
                   <span className="font-mono tabular-nums">
-                    {allocationInfo.AmountEth.toFixed(6)} ETH
+                    {formatFixed(allocationInfo.AmountEth, 6)} ETH
                   </span>
                 </DetailRow>
                 <DetailRow label={t('finalized.result.nftId')}>

@@ -1,4 +1,8 @@
 {
+  "error": {
+    "title": "Live cycle data unavailable",
+    "message": "We couldn't reach the protocol data service, so the current cycle can't be shown. Try again in a moment."
+  },
   "hero": {
     "cycleFallback": "The cycle",
     "cycleNumber": "Cycle #{number}",

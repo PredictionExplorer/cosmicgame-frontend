@@ -4,7 +4,9 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  // `max-w-full` + wrapping keeps a long label such as "Eligible for Anchoring"
+  // inside its row on a phone instead of a few pixels past the edge.
+  'inline-flex max-w-full items-center rounded-full border px-2.5 py-0.5 text-center text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 [overflow-wrap:anywhere]',
   {
     variants: {
       variant: {

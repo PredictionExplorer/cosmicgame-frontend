@@ -66,14 +66,39 @@ describe('tokens API', () => {
       expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/cst.*list.*all/));
     });
 
-    it('returns empty array on 400', async () => {
+    it('propagates a 400 instead of resolving to an empty gallery', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_cst_list()).toEqual([]);
+      await expect(get_cst_list()).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('Network Error'));
-      await expect(get_cst_list()).rejects.toThrow('Network response was not OK');
+      await expect(get_cst_list()).rejects.toThrow('Network Error');
+    });
+
+    it('forwards an abort signal to axios', async () => {
+      const controller = new AbortController();
+      mockedAxios.get.mockResolvedValue({ data: { CosmicSignatureTokenList: [] } });
+
+      await get_cst_list({ signal: controller.signal });
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.any(String), {
+        signal: controller.signal,
+      });
+    });
+
+    it('keeps the pagination window and the signal in one options object', async () => {
+      const controller = new AbortController();
+      mockedAxios.get.mockResolvedValue({ data: { CosmicSignatureTokenList: [] } });
+
+      await get_cst_list({ offset: 20, limit: 10, signal: controller.signal });
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        expect.stringMatching(/cst\/list\/all\/20\/10$/),
+        {
+          signal: controller.signal,
+        },
+      );
     });
   });
 

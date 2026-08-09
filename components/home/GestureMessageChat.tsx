@@ -17,6 +17,7 @@ import { useBannedGestures } from '@/hooks/useApiQuery';
 import { useLivePulse } from '@/hooks/useLivePulse';
 import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import type { GestureInfo } from '@/services/api';
 
 interface GestureMessageChatProps {
@@ -118,7 +119,10 @@ function CopyAddressButton({ address }: { address: string }) {
       type="button"
       onClick={handleCopy}
       aria-label={copied ? t('actions.addressCopied') : t('actions.copyAddress')}
-      className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className={cn(
+        'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        TOUCH_TARGET_ICON_CLASS,
+      )}
     >
       {copied ? (
         <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -203,7 +207,10 @@ export function GestureMessageChat({
                       <button
                         type="button"
                         aria-label={t('chat.joinTooltipAria')}
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        className={cn(
+                          'inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                          TOUCH_TARGET_ICON_CLASS,
+                        )}
                       >
                         <Info className="h-3.5 w-3.5" />
                       </button>
@@ -253,13 +260,23 @@ export function GestureMessageChat({
                         )}
                         aria-label={t('chat.messageAria', { address: gesture.BidderAddr })}
                       >
-                        <div className="flex items-start justify-between gap-3">
+                        {/*
+                          Stacked on phones: the badge cluster is `shrink-0`
+                          while the address is `min-w-0` over `font-mono`
+                          (`overflow-wrap: anywhere`), so on one row the badges
+                          took their full width and squeezed the address to a
+                          single character column ~5px wide and 360px tall.
+                        */}
+                        <div className="flex items-start justify-between gap-3 max-sm:flex-col max-sm:items-start max-sm:gap-2">
                           <div className="flex min-w-0 items-center gap-1">
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Link
                                   href={`/user/${gesture.BidderAddr}`}
-                                  className="min-w-0 font-mono text-sm font-semibold text-white underline-offset-4 hover:text-primary hover:underline"
+                                  className={cn(
+                                    'min-w-0 font-mono text-sm font-semibold text-white underline-offset-4 hover:text-primary hover:underline',
+                                    TOUCH_TARGET_TEXT_LINK_CLASS,
+                                  )}
                                   title={gesture.BidderAddr}
                                 >
                                   {shortenHex(gesture.BidderAddr, 6)}

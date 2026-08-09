@@ -8,6 +8,7 @@ import { shortenHex } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 
 interface AddressChipProps {
   address: string;
@@ -47,14 +48,19 @@ export function AddressChip({
     >
       <Link
         href={resolvedHref}
-        className="text-muted-foreground transition-colors no-underline print:!text-foreground hover:text-primary"
+        // The chip's 12px type gives the link a 16px box; `min-h-6` lifts it to
+        // the 24px WCAG 2.5.8 target on phones without changing the type scale.
+        className="text-muted-foreground transition-colors no-underline print:!text-foreground hover:text-primary max-sm:flex max-sm:min-h-6 max-sm:items-center"
       >
         {display}
       </Link>
       {showCopy && (
         <button
           onClick={handleCopy}
-          className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+          className={cn(
+            'text-muted-foreground/40 hover:text-muted-foreground transition-colors',
+            TOUCH_TARGET_ICON_CLASS,
+          )}
           aria-label={copied ? t('actions.copied') : t('actions.copyAddress')}
         >
           {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}

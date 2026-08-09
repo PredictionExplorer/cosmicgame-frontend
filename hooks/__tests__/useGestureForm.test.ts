@@ -54,6 +54,7 @@ const mockGetSignerChainId = jest.fn().mockResolvedValue(421614);
 jest.mock('wagmi', () => ({
   useConfig: jest.fn(() => ({})),
   useChainId: jest.fn(() => 421614),
+  useAccount: jest.fn(() => ({ address: '0xUser', isConnected: true, chainId: 421614 })),
   useSwitchChain: jest.fn(() => ({ switchChainAsync: mockSwitchChainAsync })),
   useConnectorClient: jest.fn(() => ({ data: undefined })),
   usePublicClient: jest.fn(() => ({
@@ -611,6 +612,62 @@ describe('useGestureForm', () => {
 
     // Wallet owns [1,2,3]; token 2 is already used → available [1,3] reversed → [3,1]
     expect(result.current.rwlknftIds).toEqual([3, 1]);
+  });
+
+  it('ignores a walletOfOwner read that resolves after unmount', async () => {
+    let resolveTokens!: (tokens: bigint[]) => void;
+    mockRWLKContract.read.walletOfOwner.mockReturnValueOnce(
+      new Promise<bigint[]>((resolve) => {
+        resolveTokens = resolve;
+      }),
+    );
+
+    const { result, unmount } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+    expect(result.current.rwlknftIds).toEqual([]);
+
+    unmount();
+
+    await act(async () => {
+      resolveTokens([BigInt(7), BigInt(8)]);
+      await flushAsyncWork();
+    });
+
+    // Nothing to assert on state after unmount; the contract is that the late
+    // resolution neither throws nor reports, which jest.setup would surface as
+    // a failing console.error.
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('does not report a walletOfOwner rejection that lands after unmount', async () => {
+    let rejectTokens!: (err: Error) => void;
+    mockRWLKContract.read.walletOfOwner.mockReturnValueOnce(
+      new Promise<bigint[]>((_resolve, reject) => {
+        rejectTokens = reject;
+      }),
+    );
+
+    const { unmount } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    unmount();
+
+    await act(async () => {
+      rejectTokens(new Error('wallet disconnected'));
+      await flushAsyncWork();
+    });
+
+    expect(mockReportError).not.toHaveBeenCalledWith(expect.anything(), 'getRwlkNFTIds');
+  });
+
+  it('still reports a walletOfOwner rejection while mounted', async () => {
+    const readError = new Error('rpc down');
+    mockRWLKContract.read.walletOfOwner.mockRejectedValueOnce(readError);
+
+    renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    expect(mockReportError).toHaveBeenCalledWith(readError, 'getRwlkNFTIds');
   });
 
   it('onGesture succeeds with ETH gesture and returns true', async () => {

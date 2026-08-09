@@ -1,13 +1,21 @@
 import {
-  axios,
+  apiGet,
   getAPIUrl,
   apiCall,
+  apiCallRequired,
   flattenTx,
   flattenTxArray,
   pagedPath,
-  type ApiPageWindow,
+  type ApiListRequestOptions,
+  type ApiRequestOptions,
 } from './client';
-import { AnchorActionSchema, AnchoredTokenInfoSchema, safeValidateListSample } from './schemas';
+import {
+  AnchorActionSchema,
+  AnchoredTokenCSTSchema,
+  AnchoredTokenRWalkSchema,
+  safeValidateListSample,
+  validateList,
+} from './schemas';
 import type {
   ActionIdWithClaimInfo,
   CSTAnchorDistribution,
@@ -20,45 +28,66 @@ import type {
 
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
-/** Fetches unclaimed Cosmic Signature NFT anchoring rewards (ETH deposits) for a wallet address. */
+/**
+ * Fetches unclaimed Cosmic Signature NFT anchoring rewards (ETH deposits) for a wallet address.
+ * Required read: an empty list is what "nothing to collect" looks like, so it must not double as
+ * the failure result.
+ */
 export function get_staking_cst_rewards_to_claim_by_user(
   address: string,
+  opts?: ApiRequestOptions,
 ): Promise<CSTAnchorDistribution[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/to_claim/by_user/${address}`));
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(
+      getAPIUrl(`staking/cst/rewards/to_claim/by_user/${address}`),
+      opts,
+    );
     return flattenTxArray<CSTAnchorDistribution>(data.UnclaimedEthDeposits);
-  }, []);
+  });
 }
 
 /** Fetches already-collected Cosmic Signature NFT anchoring rewards for a wallet address (optionally paged). */
 export function get_staking_cst_rewards_collected_by_user(
   address: string,
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/${pagedPath(page)}`),
+    const { data } = await apiGet(
+      getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/${pagedPath(opts)}`),
+      opts,
     );
     return flattenTxArray<CSTAnchorDistribution>(data.CollectedStakingCSTRewards);
   }, []);
 }
 
-/** Fetches Cosmic Signature NFTs currently anchored by a wallet address. */
-export function get_staked_cst_tokens_by_user(address: string): Promise<AnchoredTokenInfo[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/cst/staked_tokens/by_user/${address}`));
-    return data.StakedTokensCST as AnchoredTokenInfo[];
-  }, []);
+/**
+ * Fetches Cosmic Signature NFTs currently anchored by a wallet address. Required read, strictly
+ * validated — this list drives which tokens a holder can release.
+ */
+export function get_staked_cst_tokens_by_user(
+  address: string,
+  opts?: ApiRequestOptions,
+): Promise<AnchoredTokenInfo[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl(`staking/cst/staked_tokens/by_user/${address}`), opts);
+    return validateList(
+      AnchoredTokenCSTSchema,
+      data.StakedTokensCST,
+      'stakedTokensCST[byUser]',
+    ) as AnchoredTokenInfo[];
+  });
 }
 
 /** Fetches anchoring action IDs with claim status for a user's deposit. */
 export function get_cst_action_ids_by_deposit_id(
   user_addr: string,
   deposit_id: number,
+  opts?: ApiRequestOptions,
 ): Promise<ActionIdWithClaimInfo[] | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(
+    const { data } = await apiGet(
       getAPIUrl(`staking/cst/rewards/action_ids_by_deposit/${user_addr}/${deposit_id}`),
+      opts,
     );
     return data.ActionIdsWithClaimInfo as ActionIdWithClaimInfo[];
   }, null);
@@ -67,20 +96,21 @@ export function get_cst_action_ids_by_deposit_id(
 /** Fetches Cosmic Signature NFT anchor/release actions performed by a wallet address (optionally paged). */
 export function get_staking_cst_actions_by_user(
   address: string,
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<AnchorAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`staking/cst/actions/by_user/${address}/${pagedPath(page)}`),
+    const { data } = await apiGet(
+      getAPIUrl(`staking/cst/actions/by_user/${address}/${pagedPath(opts)}`),
+      opts,
     );
     return flattenTxArray<AnchorAction>(data.StakingCSTActions);
   }, []);
 }
 
 /** Fetches Cosmic Signature NFT anchor/release actions globally (optionally paged). */
-export function get_staking_cst_actions(page?: ApiPageWindow): Promise<AnchorAction[]> {
+export function get_staking_cst_actions(opts?: ApiListRequestOptions): Promise<AnchorAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/cst/actions/global/${pagedPath(page)}`));
+    const { data } = await apiGet(getAPIUrl(`staking/cst/actions/global/${pagedPath(opts)}`), opts);
     return safeValidateListSample(
       AnchorActionSchema,
       flattenTxArray<AnchorAction>(data.StakingCSTActions),
@@ -92,9 +122,10 @@ export function get_staking_cst_actions(page?: ApiPageWindow): Promise<AnchorAct
 /** Fetches combined anchor + release record details for a Cosmic Signature NFT anchoring action. */
 export function get_staking_cst_actions_info(
   actionId: number,
+  opts?: ApiRequestOptions,
 ): Promise<CombinedAnchorRecordInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/cst/actions/info/${actionId}`));
+    const { data } = await apiGet(getAPIUrl(`staking/cst/actions/info/${actionId}`), opts);
     const info = data.CombinedAnchorRecordInfo;
     if (!info) return null;
     return {
@@ -106,17 +137,22 @@ export function get_staking_cst_actions_info(
 }
 
 /** Fetches all Cosmic Signature NFT anchoring rewards globally. */
-export function get_staking_cst_rewards(): Promise<CSTAnchorDistribution[]> {
+export function get_staking_cst_rewards(
+  opts?: ApiRequestOptions,
+): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/cst/rewards/global'));
+    const { data } = await apiGet(getAPIUrl('staking/cst/rewards/global'), opts);
     return flattenTxArray<CSTAnchorDistribution>(data.StakingCSTRewards);
   }, []);
 }
 
 /** Fetches Cosmic Signature NFT anchoring rewards distributed in a specific round. */
-export function get_staking_cst_rewards_by_round(round: number): Promise<CSTAnchorDistribution[]> {
+export function get_staking_cst_rewards_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_round/${round}`));
+    const { data } = await apiGet(getAPIUrl(`staking/cst/rewards/by_round/${round}`), opts);
     return flattenTxArray<CSTAnchorDistribution>(data.Rewards);
   }, []);
 }
@@ -124,30 +160,40 @@ export function get_staking_cst_rewards_by_round(round: number): Promise<CSTAnch
 /** Fetches Cosmic Signature NFT anchoring reward-paid records for a wallet address. */
 export function get_staking_cst_reward_paid_records_by_user(
   address: string,
+  opts?: ApiRequestOptions,
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/paid/by_user/${address}`));
+    const { data } = await apiGet(getAPIUrl(`staking/cst/rewards/paid/by_user/${address}`), opts);
     return flattenTxArray<CSTAnchorDistribution>(data.RewardPaidRecords);
   }, []);
 }
 
-/** Fetches all currently anchored Cosmic Signature NFTs globally. */
-export function get_staked_cst_tokens(): Promise<AnchoredTokenInfo[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/cst/staked_tokens/all'));
-    return safeValidateListSample(
-      AnchoredTokenInfoSchema,
+/**
+ * Fetches all currently anchored Cosmic Signature NFTs globally.
+ *
+ * Strictly validated against the CST row shape: the token id lives under
+ * `TokenInfo.TokenId`, not in a flat `StakedTokenId`.
+ */
+export function get_staked_cst_tokens(opts?: ApiRequestOptions): Promise<AnchoredTokenInfo[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl('staking/cst/staked_tokens/all'), opts);
+    return validateList(
+      AnchoredTokenCSTSchema,
       data.StakedTokensCST,
       'stakedTokensCST',
     ) as AnchoredTokenInfo[];
-  }, []);
+  });
 }
 
 /** Fetches a per-token summary of anchoring rewards for a wallet address. */
-export function get_staking_rewards_by_user(address: string): Promise<RewardsByToken[]> {
+export function get_staking_rewards_by_user(
+  address: string,
+  opts?: ApiRequestOptions,
+): Promise<RewardsByToken[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
+    const { data } = await apiGet(
       getAPIUrl(`staking/cst/rewards/by_user/by_token/summary/${address}`),
+      opts,
     );
     return data.RewardsByToken as RewardsByToken[];
   }, []);
@@ -157,10 +203,12 @@ export function get_staking_rewards_by_user(address: string): Promise<RewardsByT
 export function get_staking_rewards_by_user_by_token_details(
   address: string,
   tokenId: number,
+  opts?: ApiRequestOptions,
 ): Promise<Record<string, unknown> | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(
+    const { data } = await apiGet(
       getAPIUrl(`staking/cst/rewards/by_user/by_token/details/${address}/${tokenId}`),
+      opts,
     );
     const details = data.RewardsByTokenDetails;
     if (!details || typeof details !== 'object') return details;
@@ -204,10 +252,12 @@ export function get_staking_rewards_by_user_by_token_details(
 /** Fetches Cosmic Signature NFT anchoring rewards grouped by deposit for a wallet address. */
 export function get_staking_cst_by_user_by_deposit_rewards(
   address: string,
+  opts?: ApiRequestOptions,
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
+    const { data } = await apiGet(
       getAPIUrl(`staking/cst/rewards/by_user/by_deposit/${address}`),
+      opts,
     );
     return flattenTxArray<CSTAnchorDistribution>(data.RewardsByDeposit);
   }, []);
@@ -216,9 +266,10 @@ export function get_staking_cst_by_user_by_deposit_rewards(
 /** Fetches combined anchor + release record details for a RandomWalk anchoring action. */
 export function get_staking_rwalk_actions_info(
   actionId: number,
+  opts?: ApiRequestOptions,
 ): Promise<CombinedAnchorRecordInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/randomwalk/actions/info/${actionId}`));
+    const { data } = await apiGet(getAPIUrl(`staking/randomwalk/actions/info/${actionId}`), opts);
     const info = data.CombinedRWalkStakingRecordInfo;
     if (!info) return null;
     return {
@@ -230,10 +281,11 @@ export function get_staking_rwalk_actions_info(
 }
 
 /** Fetches RandomWalk anchor/release actions globally (optionally paged). */
-export function get_staking_rwalk_actions(page?: ApiPageWindow): Promise<AnchorAction[]> {
+export function get_staking_rwalk_actions(opts?: ApiListRequestOptions): Promise<AnchorAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`staking/randomwalk/actions/global/${pagedPath(page)}`),
+    const { data } = await apiGet(
+      getAPIUrl(`staking/randomwalk/actions/global/${pagedPath(opts)}`),
+      opts,
     );
     return safeValidateListSample(
       AnchorActionSchema,
@@ -246,11 +298,12 @@ export function get_staking_rwalk_actions(page?: ApiPageWindow): Promise<AnchorA
 /** Fetches RandomWalk anchor/release actions performed by a wallet address (optionally paged). */
 export function get_staking_rwalk_actions_by_user(
   address: string,
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<AnchorAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`staking/randomwalk/actions/by_user/${address}/${pagedPath(page)}`),
+    const { data } = await apiGet(
+      getAPIUrl(`staking/randomwalk/actions/by_user/${address}/${pagedPath(opts)}`),
+      opts,
     );
     return flattenTxArray<AnchorAction>(data.UserStakingActionsRWalk);
   }, []);
@@ -258,11 +311,12 @@ export function get_staking_rwalk_actions_by_user(
 
 /** Fetches RandomWalk anchoring reward mint records globally (optionally paged). */
 export function get_staking_rwalk_mints_global(
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<AnchorDistributionImprint[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`staking/randomwalk/mints/global/${pagedPath(page)}`),
+    const { data } = await apiGet(
+      getAPIUrl(`staking/randomwalk/mints/global/${pagedPath(opts)}`),
+      opts,
     );
     return flattenTxArray<AnchorDistributionImprint>(data.StakingRWalkRewardsMints);
   }, []);
@@ -271,33 +325,48 @@ export function get_staking_rwalk_mints_global(
 /** Fetches RandomWalk anchoring reward mint records for a wallet address. */
 export function get_staking_rwalk_mints_by_user(
   address: string,
+  opts?: ApiRequestOptions,
 ): Promise<AnchorDistributionImprint[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/randomwalk/mints/by_user/${address}`));
+    const { data } = await apiGet(getAPIUrl(`staking/randomwalk/mints/by_user/${address}`), opts);
     return flattenTxArray<AnchorDistributionImprint>(data.RWalkStakingRewardMints);
   }, []);
 }
 
-/** Fetches all currently staked RandomWalk NFTs globally. */
-export function get_staked_rwalk_tokens(): Promise<AnchoredTokenInfo[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/randomwalk/staked_tokens/all'));
-    return safeValidateListSample(
-      AnchoredTokenInfoSchema,
+/**
+ * Fetches all currently staked RandomWalk NFTs globally. Strictly validated against the
+ * RandomWalk row shape (flat `StakedTokenId` / `StakeActionId`).
+ */
+export function get_staked_rwalk_tokens(opts?: ApiRequestOptions): Promise<AnchoredTokenInfo[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl('staking/randomwalk/staked_tokens/all'), opts);
+    return validateList(
+      AnchoredTokenRWalkSchema,
       data.StakedTokensRWalk,
       'stakedTokensRWalk',
     ) as AnchoredTokenInfo[];
-  }, []);
+  });
 }
 
-/** Fetches RandomWalk NFTs currently staked by a wallet address. */
-export function get_staked_rwalk_tokens_by_user(address: string): Promise<AnchoredTokenInfo[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(
+/**
+ * Fetches RandomWalk NFTs currently staked by a wallet address. Required read, strictly
+ * validated — this list drives which tokens a holder can release.
+ */
+export function get_staked_rwalk_tokens_by_user(
+  address: string,
+  opts?: ApiRequestOptions,
+): Promise<AnchoredTokenInfo[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(
       getAPIUrl(`staking/randomwalk/staked_tokens/by_user/${address}`),
+      opts,
     );
-    return data.StakedTokensRWalk as AnchoredTokenInfo[];
-  }, []);
+    return validateList(
+      AnchoredTokenRWalkSchema,
+      data.StakedTokensRWalk,
+      'stakedTokensRWalk[byUser]',
+    ) as AnchoredTokenInfo[];
+  });
 }
 
 // lexicon-allow-end

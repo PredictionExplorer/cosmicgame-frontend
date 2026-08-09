@@ -22,6 +22,7 @@ import type { BidTypeRatioBucket } from '@/services/api/types';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
+import { formatFixed } from '@/utils/format';
 
 const CHART_HEIGHT = 340;
 
@@ -117,7 +118,7 @@ function RatioTooltip({ active, payload }: RatioTooltipProps) {
               {row.name}
             </dt>
             <dd className="text-white">
-              {row.pct.toFixed(2)}% <span className="text-muted-foreground">({row.bids})</span>
+              {formatFixed(row.pct, 2)}% <span className="text-muted-foreground">({row.bids})</span>
             </dd>
           </div>
         ))}
@@ -266,6 +267,9 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
               variant={intervalSecs === opt.secs ? 'default' : 'outline'}
               aria-pressed={intervalSecs === opt.secs}
               onClick={() => setIntervalSecs(opt.secs)}
+              // "1h"/"6h"/"1d" reach 44px tall but only ~41px wide. The row
+              // wraps, so a width floor costs a neighbour nothing.
+              className="max-sm:min-w-11"
             >
               {t(`charts.typeRatio.intervals.${opt.labelKey}`)}
             </Button>

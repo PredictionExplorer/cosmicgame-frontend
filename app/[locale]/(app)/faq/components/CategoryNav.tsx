@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { type FAQCategory } from '@/content/faq';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
 
 import { FAQ_ICONS } from './faqIcons';
 
@@ -70,6 +71,7 @@ export function CategoryNav({
             onClick={() => scrollToCategory(null)}
             className={cn(
               'inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200',
+              TOUCH_TARGET_HEIGHT_CLASS,
               activeCategory === null
                 ? 'bg-primary/15 text-primary shadow-sm shadow-primary/10'
                 : 'text-muted-foreground hover:bg-white/[0.04] hover:text-foreground',
@@ -86,6 +88,7 @@ export function CategoryNav({
                 onClick={() => scrollToCategory(cat.id)}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap',
+                  TOUCH_TARGET_HEIGHT_CLASS,
                   activeCategory === cat.id
                     ? 'bg-primary/15 text-primary shadow-sm shadow-primary/10'
                     : 'text-muted-foreground hover:bg-white/[0.04] hover:text-foreground',

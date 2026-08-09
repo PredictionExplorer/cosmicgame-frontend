@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { ErrorState } from '@/components/ui/error-state';
-import { reportError } from '@/utils/errors';
+import { RouteError } from '@/components/layout/RouteError';
 
 /** Route-level error boundary for the statistics section pages. */
 export default function StatisticsError({
@@ -16,16 +14,13 @@ export default function StatisticsError({
 }) {
   const t = useTranslations('statistics');
 
-  useEffect(() => {
-    reportError(error, 'statistics-route');
-  }, [error]);
-
   return (
-    <ErrorState
+    <RouteError
+      error={error}
+      reset={reset}
+      context="statistics-route"
       title={t('routeError.title')}
       message={t('routeError.message')}
-      onRetry={reset}
-      surface
     />
   );
 }

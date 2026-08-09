@@ -6,21 +6,31 @@
  * obvious in the diff, not hidden behind a helper.
  */
 
+// lexicon-allow-start: schema fixtures mirror the backend-sealed API surface
+
 import {
+  AnchoredTokenCSTSchema,
+  AnchoredTokenRWalkSchema,
+  BidTypeRatioBucketSchema,
+  CharityWithdrawalSchema,
   DashboardInfoSchema,
+  ETHDonationSchema,
   GestureInfoSchema,
+  MarketingRewardSchema,
+  RoundClaimDetailSchema,
+  RoundClaimSummarySchema,
   RoundInfoSchema,
   SpecialRecipientsSchema,
+  StellarSelectionETHDepositSchema,
+  TopBidderActivePeriodsResponseSchema,
   UserBalanceSchema,
   UserInfoSchema,
-  getValidationMode,
   safeValidate,
-  setValidationMode,
+  safeValidateListSample,
+  validate,
+  validateList,
 } from '@/services/api/schemas';
 import { normalizeDashboardWire } from '@/services/api/rounds';
-
-// Reset validation mode between cases since it's module-level state.
-afterEach(() => setValidationMode('warn'));
 
 describe('DashboardInfoSchema', () => {
   const sample = {
@@ -201,37 +211,52 @@ describe('RoundInfoSchema', () => {
     };
     expect(() => RoundInfoSchema.parse(nested)).not.toThrow();
   });
+
+  it('accepts an unfinalized cycle, which has no claim transaction or stats row', () => {
+    const inFlight = { ...sample, RoundStats: {} };
+    delete (inFlight as { TxHash?: unknown }).TxHash;
+    delete (inFlight as { TimeStamp?: unknown }).TimeStamp;
+    delete (inFlight as { DateTime?: unknown }).DateTime;
+
+    expect(() => RoundInfoSchema.parse(inFlight)).not.toThrow();
+  });
+
+  it('keeps a string allocation amount as a string instead of coercing it', () => {
+    const parsed = RoundInfoSchema.parse({
+      ...sample,
+      AllPrizes: [{ RoundNum: 5, Amount: '1500000000000000000' }],
+    });
+
+    expect(parsed.AllPrizes[0]?.Amount).toBe('1500000000000000000');
+  });
 });
 
 describe('GestureInfoSchema', () => {
+  const sample = {
+    EvtLogId: 1,
+    BlockNum: 100,
+    TxId: 5,
+    TxHash: '0xh',
+    TimeStamp: 1_700_000_000,
+    RoundNum: 17,
+    BidderAddr: '0xbidder',
+    GestureType: 0,
+    GestureCostEth: 0.001,
+  };
+
   it('accepts a realistic payload', () => {
-    const sample = {
-      EvtLogId: 1,
-      BlockNum: 100,
-      TxId: 5,
-      TxHash: '0xh',
-      TimeStamp: 1_700_000_000,
-      RoundNum: 17,
-      BidderAddr: '0xbidder',
-      GestureType: 0,
-      GestureCostEth: 0.001,
-    };
     expect(() => GestureInfoSchema.parse(sample)).not.toThrow();
   });
 
+  it('accepts a CST gesture, which has no ETH cost', () => {
+    const cst = { ...sample, GestureType: 2 };
+    delete (cst as { GestureCostEth?: unknown }).GestureCostEth;
+
+    expect(() => GestureInfoSchema.parse(cst)).not.toThrow();
+  });
+
   it('rejects a wrong type on GestureType', () => {
-    const bad = {
-      EvtLogId: 1,
-      BlockNum: 100,
-      TxId: 5,
-      TxHash: '0xh',
-      TimeStamp: 1_700_000_000,
-      RoundNum: 17,
-      BidderAddr: '0xbidder',
-      GestureType: 'nope',
-      GestureCostEth: 0.001,
-    };
-    expect(() => GestureInfoSchema.parse(bad)).toThrow();
+    expect(() => GestureInfoSchema.parse({ ...sample, GestureType: 'nope' })).toThrow();
   });
 });
 
@@ -293,29 +318,201 @@ describe('SpecialRecipientsSchema', () => {
       SpecialRecipientsSchema.parse({ ...livePayload, ChronoWarriorDuration: '1551' }),
     ).toThrow();
   });
+});
 
-  it('safeValidate preserves bad payloads in warn mode', () => {
-    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      const bad = { ...livePayload, LastBidderLastBidTime: 'bad' };
-      expect(safeValidate(SpecialRecipientsSchema, bad, 'SpecialRecipients')).toBe(bad);
-      expect(spy).toHaveBeenCalledWith(
-        expect.stringContaining('[schema:SpecialRecipients]'),
-        expect.any(Error),
-      );
-    } finally {
-      spy.mockRestore();
-    }
+describe('anchored-token schemas', () => {
+  /** The CST endpoint nests the token and sends no flat `StakedTokenId`. */
+  const cstRow = {
+    StakeActionId: 10,
+    StakeTimeStamp: 1701346718,
+    UserAddr: '0xholder',
+    TokenInfo: { TokenId: 99, Seed: 'abc123', StakeActionId: 10 },
+  };
+
+  it('accepts the CST row shape that the shared schema used to reject', () => {
+    expect(() => AnchoredTokenCSTSchema.parse(cstRow)).not.toThrow();
+  });
+
+  it('requires the nested TokenInfo the CST tables read', () => {
+    const withoutTokenInfo = { ...cstRow };
+    delete (withoutTokenInfo as { TokenInfo?: unknown }).TokenInfo;
+
+    expect(() => AnchoredTokenCSTSchema.parse(withoutTokenInfo)).toThrow();
+  });
+
+  it('accepts a numeric CST seed as well as a hex string', () => {
+    expect(() =>
+      AnchoredTokenCSTSchema.parse({ ...cstRow, TokenInfo: { TokenId: 1, Seed: 42 } }),
+    ).not.toThrow();
+  });
+
+  it('requires the flat token id on RandomWalk rows', () => {
+    expect(() =>
+      AnchoredTokenRWalkSchema.parse({
+        StakeActionId: 7,
+        StakedTokenId: 42,
+        StakeTimeStamp: 1701346718,
+      }),
+    ).not.toThrow();
+    expect(() =>
+      AnchoredTokenRWalkSchema.parse({ StakeActionId: 7, StakeTimeStamp: 1701346718 }),
+    ).toThrow();
   });
 });
 
-describe('safeValidate (warn-only default)', () => {
-  it('returns the original value when the schema matches', () => {
+describe('claim / allocation schemas', () => {
+  const summary = {
+    RoundNum: 4,
+    ClaimWindowTimeout: 1_800_000_000,
+    AwardedTs: 1_700_000_000,
+    Expired: false,
+    EthAwarded: 3,
+    EthUnclaimed: 1,
+    EthUnclaimedEth: 0.25,
+    NftAwarded: 2,
+    NftUnclaimed: 1,
+    Erc20Awarded: 1,
+    Erc20Unclaimed: 0,
+    TotalAwarded: 6,
+    TotalUnclaimed: 2,
+    AvgClaimPeriodSecs: 3600,
+    UnclaimedItems: [
+      {
+        AssetType: 'ETH',
+        RecipientAddr: '0xrecipient',
+        AmountEth: 0.25,
+        TokenAddr: '',
+        TokenId: -1,
+      },
+    ],
+  };
+
+  it('accepts a per-cycle claim summary', () => {
+    expect(() => RoundClaimSummarySchema.parse(summary)).not.toThrow();
+  });
+
+  it('accepts a summary with no unclaimed items key', () => {
+    const withoutItems = { ...summary };
+    delete (withoutItems as { UnclaimedItems?: unknown }).UnclaimedItems;
+
+    expect(() => RoundClaimSummarySchema.parse(withoutItems)).not.toThrow();
+  });
+
+  it('rejects an unknown asset type', () => {
+    expect(() =>
+      RoundClaimSummarySchema.parse({
+        ...summary,
+        UnclaimedItems: [{ ...summary.UnclaimedItems[0], AssetType: 'DOGE' }],
+      }),
+    ).toThrow();
+  });
+
+  it('accepts a claim drill-down with empty collections', () => {
+    expect(() =>
+      RoundClaimDetailSchema.parse({ RoundNum: 4, ClaimTransactions: [], AttachedTokens: [] }),
+    ).not.toThrow();
+  });
+});
+
+describe('newly covered modules', () => {
+  it('accepts a marketing reward row', () => {
+    expect(() =>
+      MarketingRewardSchema.parse({
+        EvtLogId: 1,
+        TxHash: '0xh',
+        TimeStamp: 1_700_000_000,
+        MarketerAddr: '0xmarketer',
+        AmountEth: 0.5,
+      }),
+    ).not.toThrow();
+  });
+
+  it('rejects a marketing reward whose amount is a string', () => {
+    expect(() =>
+      MarketingRewardSchema.parse({
+        EvtLogId: 1,
+        TxHash: '0xh',
+        TimeStamp: 1_700_000_000,
+        MarketerAddr: '0xmarketer',
+        AmountEth: '0.5',
+      }),
+    ).toThrow();
+  });
+
+  it('accepts an ETH contribution row with and without a cycle', () => {
+    const row = {
+      EvtLogId: 2,
+      TxHash: '0xh',
+      TimeStamp: 1_700_000_000,
+      DonorAddr: '0xdonor',
+      AmountEth: 1,
+    };
+    expect(() => ETHDonationSchema.parse(row)).not.toThrow();
+    expect(() => ETHDonationSchema.parse({ ...row, RoundNum: 3 })).not.toThrow();
+  });
+
+  it('accepts a charity retrieval row with a string event id', () => {
+    expect(() =>
+      CharityWithdrawalSchema.parse({
+        EvtLogId: '18',
+        TxHash: '0xh',
+        TimeStamp: 1_700_000_000,
+        DestinationAddr: '0xcharity',
+        AmountEth: 2,
+      }),
+    ).not.toThrow();
+  });
+
+  it('accepts a stellar-selection deposit row with only the fields the API sends', () => {
+    expect(() => StellarSelectionETHDepositSchema.parse({ Amount: 0.5 })).not.toThrow();
+  });
+
+  it('accepts a gesture-type ratio bucket', () => {
+    expect(() =>
+      BidTypeRatioBucketSchema.parse({
+        BucketTs: 1_700_000_000,
+        EthBids: 3,
+        RwalkBids: 1,
+        CstBids: 2,
+        TotalBids: 6,
+        EthPct: 50,
+        RwalkPct: 16.7,
+        CstPct: 33.3,
+      }),
+    ).not.toThrow();
+  });
+
+  it('accepts a top-participant active-periods response', () => {
+    expect(() =>
+      TopBidderActivePeriodsResponseSchema.parse({
+        InitTs: 1,
+        FinTs: 2,
+        TopN: 3,
+        GapHours: 6,
+        MinBids: 2,
+        TopBidders: [{ BidderAid: 1, BidderAddr: '0xa', NumBids: 5 }],
+        ActivePeriods: [
+          {
+            BidderAid: 1,
+            BidderAddr: '0xa',
+            PeriodStart: 1,
+            PeriodEnd: 2,
+            NumBids: 5,
+            DurationSecs: 1,
+          },
+        ],
+      }),
+    ).not.toThrow();
+  });
+});
+
+describe('safeValidate (warn-only)', () => {
+  it('returns the parsed value when the schema matches', () => {
     const value = { NumBids: 1, NumPrizes: 1 };
     expect(safeValidate(UserInfoSchema, value, 'UserInfo')).toEqual(value);
   });
 
-  it('returns the original value on mismatch in warn mode (no throw)', () => {
+  it('returns the original value on mismatch and reports it', () => {
     // reportError fires console.error — silence it here so the jest.setup
     // guard doesn't fail the test on the expected telemetry call.
     const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -332,15 +529,90 @@ describe('safeValidate (warn-only default)', () => {
     }
   });
 
-  it('throws on mismatch in throw mode', () => {
-    setValidationMode('throw');
-    const bad = { NumBids: 'not-a-number' };
-    expect(() => safeValidate(UserInfoSchema, bad, 'UserInfo')).toThrow(/schemaMismatch:UserInfo/);
-  });
-
-  it('getValidationMode reflects the set mode', () => {
-    expect(getValidationMode()).toBe('warn');
-    setValidationMode('throw');
-    expect(getValidationMode()).toBe('throw');
+  it('reports the field path of the first mismatch', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      safeValidate(UserInfoSchema, { NumBids: 1 }, 'UserInfo');
+      const reported = spy.mock.calls[0]?.[1] as Error;
+      expect(reported.message).toMatch(/schemaMismatch:UserInfo — NumPrizes:/);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
+
+describe('safeValidateListSample (warn-only)', () => {
+  it('only inspects the sampled rows', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const rows = [
+        ...Array.from({ length: 5 }, () => ({ NumBids: 1, NumPrizes: 1 })),
+        { NumBids: 'bad' },
+      ];
+      expect(safeValidateListSample(UserInfoSchema, rows, 'UserInfoList')).toBe(rows);
+      expect(spy).not.toHaveBeenCalled();
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('passes non-array and empty input straight through', () => {
+    expect(safeValidateListSample(UserInfoSchema, null, 'UserInfoList')).toBeNull();
+    expect(safeValidateListSample(UserInfoSchema, [], 'UserInfoList')).toEqual([]);
+  });
+});
+
+describe('validate (strict)', () => {
+  it('returns the parsed value when the schema matches', () => {
+    expect(validate(UserInfoSchema, { NumBids: 1, NumPrizes: 2 }, 'UserInfo')).toEqual({
+      NumBids: 1,
+      NumPrizes: 2,
+    });
+  });
+
+  it('throws with the endpoint name and field path on mismatch', () => {
+    expect(() => validate(UserInfoSchema, { NumBids: 'not-a-number' }, 'UserInfo')).toThrow(
+      /schemaMismatch:UserInfo — NumBids: /,
+    );
+  });
+
+  it('does not report to Sentry — the failed read does that once', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      expect(() => validate(UserInfoSchema, {}, 'UserInfo')).toThrow();
+      expect(spy).not.toHaveBeenCalled();
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});
+
+describe('validateList (strict)', () => {
+  const rows = (count: number) =>
+    Array.from({ length: count }, () => ({ NumBids: 1, NumPrizes: 1 }));
+
+  it('returns the parsed rows when every row matches', () => {
+    expect(validateList(UserInfoSchema, rows(3), 'UserInfoList')).toHaveLength(3);
+  });
+
+  it('checks past the sampled window that warn-mode validation stops at', () => {
+    const corrupt = [...rows(20), { NumBids: 1 }];
+
+    expect(() => validateList(UserInfoSchema, corrupt, 'UserInfoList')).toThrow(
+      /schemaMismatch:UserInfoList — 20\.NumPrizes/,
+    );
+  });
+
+  it('treats a nil slice (null) as an empty list', () => {
+    expect(validateList(UserInfoSchema, null, 'UserInfoList')).toEqual([]);
+    expect(validateList(UserInfoSchema, undefined, 'UserInfoList')).toEqual([]);
+  });
+
+  it('throws when the payload is not a list at all', () => {
+    expect(() => validateList(UserInfoSchema, { NumBids: 1 }, 'UserInfoList')).toThrow(
+      /schemaMismatch:UserInfoList — <root>: expected array, received object/,
+    );
+  });
+});
+
+// lexicon-allow-end

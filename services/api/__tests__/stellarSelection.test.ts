@@ -115,16 +115,26 @@ describe('stellarSelection API', () => {
       );
     });
 
-    it('returns empty array on 400', async () => {
+    it('propagates a 400 rather than reporting nothing to collect', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_unclaimed_raffle_deposits_by_user('0xghi')).toEqual([]);
+      await expect(get_unclaimed_raffle_deposits_by_user('0xghi')).rejects.toThrow(
+        'Network response was not OK',
+      );
+    });
+
+    it('rejects a deposit row with a non-numeric amount', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { UnclaimedDeposits: [{ Amount: '0.5', RoundNum: 3 }] },
+      });
+
+      await expect(get_unclaimed_raffle_deposits_by_user('0xghi')).rejects.toThrow(
+        /schemaMismatch:unclaimedRaffleDepositsByUser — 0\.Amount/,
+      );
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_unclaimed_raffle_deposits_by_user('0xghi')).rejects.toThrow(
-        'Network response was not OK',
-      );
+      await expect(get_unclaimed_raffle_deposits_by_user('0xghi')).rejects.toThrow('fail');
     });
   });
 

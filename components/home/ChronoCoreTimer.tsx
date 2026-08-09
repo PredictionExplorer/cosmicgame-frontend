@@ -10,6 +10,7 @@ import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Surface } from '@/components/ui/surface';
 import { getCycleState, type CyclePhase } from '@/lib/cycleState';
+import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 
@@ -238,7 +239,7 @@ export function ChronoCoreTimer({
         <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
 
         <div className="relative mx-auto max-w-5xl px-4 py-7 text-center sm:px-8 sm:py-10">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.045] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+          <div className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.045] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.24em]">
             <Clock3 className={cn('h-3.5 w-3.5', view.iconClass)} aria-hidden />
             {eyebrow}
             <InfoTooltip content={tooltip} className="ml-0" />
@@ -291,7 +292,10 @@ export function ChronoCoreTimer({
               <button
                 type="button"
                 onClick={onPrimaryCtaClick}
-                className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-foreground"
+                className={cn(
+                  'inline-flex items-center gap-2 font-semibold text-primary transition hover:text-foreground',
+                  TOUCH_TARGET_HEIGHT_CLASS,
+                )}
               >
                 {primaryLabel}
                 <ArrowRight className="h-4 w-4" aria-hidden />
@@ -299,7 +303,10 @@ export function ChronoCoreTimer({
             ) : (
               <Link
                 href={primaryHref}
-                className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-foreground"
+                className={cn(
+                  'inline-flex items-center gap-2 font-semibold text-primary transition hover:text-foreground',
+                  TOUCH_TARGET_TEXT_LINK_CLASS,
+                )}
               >
                 {primaryLabel}
                 <ArrowRight className="h-4 w-4" aria-hidden />

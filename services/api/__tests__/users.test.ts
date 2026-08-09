@@ -86,14 +86,22 @@ describe('users API', () => {
       expect(result?.Gestures[0]).toHaveProperty('TxHash', '0xabc');
     });
 
-    it('returns null on 400 response', async () => {
+    it('rejects a UserInfo block with non-numeric totals', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { Addr: '0x1234', UserInfo: { NumBids: 'many', NumPrizes: 1 } },
+      });
+
+      await expect(get_user_info('0x1234')).rejects.toThrow(/schemaMismatch:UserInfo — NumBids/);
+    });
+
+    it('propagates a 400 instead of resolving to null', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_user_info('0x1234')).toBeNull();
+      await expect(get_user_info('0x1234')).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('Network Error'));
-      await expect(get_user_info('0x1234')).rejects.toThrow('Network response was not OK');
+      await expect(get_user_info('0x1234')).rejects.toThrow('Network Error');
     });
   });
 

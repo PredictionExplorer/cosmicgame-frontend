@@ -18,6 +18,7 @@ import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 
 import { shortenHex } from '@/utils';
 
+import { formatFixed } from '@/utils/format';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -193,11 +194,11 @@ const ConnectWalletButton = ({
               <>
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">{t('balances.eth')}</span>
-                  <span className="font-medium">{balance.ETH.toFixed(4)}</span>
+                  <span className="font-medium">{formatFixed(balance.ETH, 4)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">{t('balances.cst')}</span>
-                  <span className="font-medium">{balance.CosmicToken.toFixed(2)}</span>
+                  <span className="font-medium">{formatFixed(balance.CosmicToken, 2)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">{t('balances.cosmicNfts')}</span>

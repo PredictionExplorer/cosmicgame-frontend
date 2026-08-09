@@ -4,6 +4,7 @@ import { LayoutGrid, List } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export type ViewMode = 'grid' | 'list';
@@ -41,6 +42,7 @@ export function GalleryViewToggle({ value, onChange }: GalleryViewToggleProps) {
                 onClick={() => onChange(mode.value)}
                 className={cn(
                   'rounded-md p-1.5 transition-all duration-200',
+                  TOUCH_TARGET_ICON_CLASS,
                   isActive
                     ? 'bg-primary/20 text-primary shadow-sm'
                     : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]',

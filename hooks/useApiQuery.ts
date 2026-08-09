@@ -113,7 +113,7 @@ export function useDashboardInfo(
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<DashboardInfo | null>({
     queryKey: ['dashboardInfo'],
-    queryFn: () => api.get_dashboard_info(),
+    queryFn: ({ signal }) => api.get_dashboard_info({ signal }),
     enabled: !scenario,
     refetchInterval: poll ? 12_000 : false,
     refetchIntervalInBackground: false,
@@ -129,7 +129,7 @@ export function useDashboardInfo(
 export function useRoundList() {
   return useQuery<RoundInfo[]>({
     queryKey: ['roundList'],
-    queryFn: () => api.get_round_list(),
+    queryFn: ({ signal }) => api.get_round_list({ signal }),
     staleTime: 30_000,
     refetchInterval: 60_000,
     refetchIntervalInBackground: false,
@@ -139,7 +139,7 @@ export function useRoundList() {
 export function useRoundInfo(roundNum: number) {
   return useQuery<RoundInfo | null>({
     queryKey: ['roundInfo', roundNum],
-    queryFn: () => api.get_round_info(roundNum),
+    queryFn: ({ signal }) => api.get_round_info(roundNum, { signal }),
     /** Backend serves `rounds/info/0`; the previous `> 0` guard broke first-cycle finalize UX. */
     enabled: Number.isFinite(roundNum) && roundNum >= 0,
     staleTime: 30_000,
@@ -150,7 +150,7 @@ export function useAllocationTime() {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<number>({
     queryKey: ['allocationTime'],
-    queryFn: () => api.get_prize_time(),
+    queryFn: ({ signal }) => api.get_prize_time({ signal }),
     enabled: !scenario,
     staleTime: 5_000,
     refetchInterval: 10_000,
@@ -163,7 +163,7 @@ export function useAllocationTime() {
 export function useClaimHistory() {
   return useQuery<TxInfo[]>({
     queryKey: ['claimHistory'],
-    queryFn: () => api.get_claim_history(),
+    queryFn: ({ signal }) => api.get_claim_history({ signal }),
     staleTime: 30_000,
   });
 }
@@ -171,7 +171,7 @@ export function useClaimHistory() {
 export function useClaimHistoryByUser(address: string | null | undefined) {
   return useQuery<WinningHistoryEntry[] | null>({
     queryKey: ['claimHistoryByUser', address],
-    queryFn: () => api.get_claim_history_by_user(address!),
+    queryFn: ({ signal }) => api.get_claim_history_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -180,7 +180,7 @@ export function useClaimHistoryByUser(address: string | null | undefined) {
 export function useGestureList() {
   return useQuery<GestureInfo[]>({
     queryKey: ['gestureList'],
-    queryFn: () => api.get_bid_list(),
+    queryFn: ({ signal }) => api.get_bid_list({ signal }),
     staleTime: 10_000,
     refetchInterval: 15_000,
     refetchIntervalInBackground: false,
@@ -191,7 +191,7 @@ export function useGestureList() {
 export function useGestureInfo(evtLogId: number) {
   return useQuery<GestureInfo | null>({
     queryKey: ['gestureInfo', evtLogId],
-    queryFn: () => api.get_bid_info(evtLogId),
+    queryFn: ({ signal }) => api.get_bid_info(evtLogId, { signal }),
     enabled: evtLogId > 0,
     staleTime: 60_000,
   });
@@ -201,7 +201,7 @@ export function useGestureListByCycle(round: number, sortDir: string = 'desc') {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<GestureInfo[]>({
     queryKey: ['bidListByRound', round, sortDir],
-    queryFn: () => api.get_bid_list_by_round(round, sortDir),
+    queryFn: ({ signal }) => api.get_bid_list_by_round(round, sortDir, { signal }),
     enabled: !scenario && round >= 0,
     staleTime: 15_000,
     refetchInterval: 10_000,
@@ -215,7 +215,7 @@ export function useCurrentSpecialRecipients() {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<SpecialRecipients | null>({
     queryKey: ['currentSpecialWinners'],
-    queryFn: () => api.get_current_special_winners(),
+    queryFn: ({ signal }) => api.get_current_special_winners({ signal }),
     enabled: !scenario,
     staleTime: 15_000,
     refetchInterval: 30_000,
@@ -228,7 +228,7 @@ export function useCurrentSpecialRecipients() {
 export function useAllocationDepositsList() {
   return useQuery<TxInfo[]>({
     queryKey: ['prizeDepositsList'],
-    queryFn: () => api.get_prize_deposits_list(),
+    queryFn: ({ signal }) => api.get_prize_deposits_list({ signal }),
     staleTime: 30_000,
   });
 }
@@ -236,7 +236,7 @@ export function useAllocationDepositsList() {
 export function useAllocationDepositsByCycle(round: number) {
   return useQuery<TxInfo[]>({
     queryKey: ['prizeDepositsByRound', round],
-    queryFn: () => api.get_prize_deposits_by_round(round),
+    queryFn: ({ signal }) => api.get_prize_deposits_by_round(round, { signal }),
     enabled: round >= 0,
     staleTime: 30_000,
   });
@@ -245,7 +245,7 @@ export function useAllocationDepositsByCycle(round: number) {
 export function useBannedGestures() {
   return useQuery<BannedGesture[]>({
     queryKey: ['bannedBids'],
-    queryFn: () => api.get_banned_bids(),
+    queryFn: ({ signal }) => api.get_banned_bids({ signal }),
     staleTime: 30_000,
   });
 }
@@ -254,7 +254,7 @@ export function useGestureEthCost() {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<GestureEthCostInfo | null>({
     queryKey: ['bidEthPrice'],
-    queryFn: () => api.get_bid_eth_price(),
+    queryFn: ({ signal }) => api.get_bid_eth_price({ signal }),
     enabled: !scenario,
     staleTime: 10_000,
     refetchInterval: 15_000,
@@ -267,7 +267,7 @@ export function useGestureEthCost() {
 export function useTimeUntilAllocation() {
   return useQuery<number>({
     queryKey: ['timeUntilPrize'],
-    queryFn: () => api.get_time_until_prize(),
+    queryFn: ({ signal }) => api.get_time_until_prize({ signal }),
     staleTime: 5_000,
     refetchInterval: 10_000,
     refetchIntervalInBackground: false,
@@ -282,7 +282,7 @@ export function useTimeUntilAllocation() {
 export function useCSTList() {
   return useQuery<CSTTokenInfo[]>({
     queryKey: ['cstList'],
-    queryFn: () => api.get_cst_list(),
+    queryFn: ({ signal }) => api.get_cst_list({ signal }),
     staleTime: 30_000,
   });
 }
@@ -290,7 +290,7 @@ export function useCSTList() {
 export function useCSTTokensByUser(address: string | null | undefined) {
   return useQuery<CSTTokenInfo[]>({
     queryKey: ['cstTokensByUser', address],
-    queryFn: () => api.get_cst_tokens_by_user(address!),
+    queryFn: ({ signal }) => api.get_cst_tokens_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -299,7 +299,7 @@ export function useCSTTokensByUser(address: string | null | undefined) {
 export function useCSTInfo(tokenId: number | null | undefined) {
   return useQuery<CSTTokenInfo | null>({
     queryKey: ['cstInfo', tokenId],
-    queryFn: () => api.get_cst_info(tokenId!),
+    queryFn: ({ signal }) => api.get_cst_info(tokenId!, { signal }),
     enabled: tokenId != null && tokenId >= 0,
     staleTime: 60_000,
   });
@@ -308,7 +308,7 @@ export function useCSTInfo(tokenId: number | null | undefined) {
 export function useNameHistory(tokenId: number | null | undefined) {
   return useQuery<NameHistoryRecord[]>({
     queryKey: ['nameHistory', tokenId],
-    queryFn: () => api.get_name_history(tokenId!),
+    queryFn: ({ signal }) => api.get_name_history(tokenId!, { signal }),
     enabled: tokenId != null && tokenId >= 0,
     staleTime: 30_000,
   });
@@ -317,7 +317,7 @@ export function useNameHistory(tokenId: number | null | undefined) {
 export function useTokenByName(name: string | null | undefined) {
   return useQuery<CSTTokenInfo[]>({
     queryKey: ['tokenByName', name],
-    queryFn: () => api.get_token_by_name(name!),
+    queryFn: ({ signal }) => api.get_token_by_name(name!, { signal }),
     enabled: !!name,
     staleTime: 30_000,
   });
@@ -326,7 +326,7 @@ export function useTokenByName(name: string | null | undefined) {
 export function useNamedNFTs() {
   return useQuery<CSTTokenInfo[]>({
     queryKey: ['namedNFTs'],
-    queryFn: () => api.get_named_nfts(),
+    queryFn: ({ signal }) => api.get_named_nfts({ signal }),
     staleTime: 30_000,
   });
 }
@@ -334,7 +334,7 @@ export function useNamedNFTs() {
 export function useCSTTransfers(address: string | null | undefined) {
   return useQuery<CSTTransferRecord[]>({
     queryKey: ['cstTransfers', address],
-    queryFn: () => api.get_cst_transfers(address!),
+    queryFn: ({ signal }) => api.get_cst_transfers(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -343,7 +343,7 @@ export function useCSTTransfers(address: string | null | undefined) {
 export function useCSTDistribution() {
   return useQuery<TokenDistribution[]>({
     queryKey: ['cstDistribution'],
-    queryFn: () => api.get_cst_distribution(),
+    queryFn: ({ signal }) => api.get_cst_distribution({ signal }),
     staleTime: 60_000,
   });
 }
@@ -351,7 +351,7 @@ export function useCSTDistribution() {
 export function useCTBalancesDistribution() {
   return useQuery<CTBalanceDistribution[]>({
     queryKey: ['ctBalancesDistribution'],
-    queryFn: () => api.get_ct_balances_distribution(),
+    queryFn: ({ signal }) => api.get_ct_balances_distribution({ signal }),
     staleTime: 60_000,
   });
 }
@@ -359,7 +359,7 @@ export function useCTBalancesDistribution() {
 export function useCTStatistics() {
   return useQuery<CTStatistics | null>({
     queryKey: ['ctStatistics'],
-    queryFn: () => api.get_ct_statistics(),
+    queryFn: ({ signal }) => api.get_ct_statistics({ signal }),
     staleTime: 60_000,
   });
 }
@@ -367,7 +367,7 @@ export function useCTStatistics() {
 export function useCTTotalSupplyHistoryByDate(fromDate: string, toDate: string, enabled = true) {
   return useQuery<CTTotalSupplyHistoryByDateRecord[]>({
     queryKey: ['ctTotalSupplyHistoryByDate', fromDate, toDate],
-    queryFn: () => api.get_ct_total_supply_history_by_date(fromDate, toDate),
+    queryFn: ({ signal }) => api.get_ct_total_supply_history_by_date(fromDate, toDate, { signal }),
     enabled: enabled && Boolean(fromDate) && Boolean(toDate),
     staleTime: 60_000,
   });
@@ -377,7 +377,7 @@ export function useCTTotalSupplyHistoryByDate(fromDate: string, toDate: string, 
 export function useCTTotalSupplyHistoryByBid(enabled = true) {
   return useQuery<CTTotalSupplyHistoryByBidRecord[]>({
     queryKey: ['ctTotalSupplyHistoryByBid'],
-    queryFn: () => api.get_ct_total_supply_history_by_bid(),
+    queryFn: ({ signal }) => api.get_ct_total_supply_history_by_bid({ signal }),
     enabled,
     staleTime: 60_000,
   });
@@ -388,7 +388,7 @@ export function useCTTotalSupplyHistoryByBid(enabled = true) {
 export function useBidTimeBounds(enabled = true) {
   return useQuery<BidTimeBounds>({
     queryKey: ['bidTimeBounds'],
-    queryFn: () => api.get_bid_time_bounds(),
+    queryFn: ({ signal }) => api.get_bid_time_bounds({ signal }),
     enabled,
     staleTime: 300_000,
   });
@@ -402,7 +402,7 @@ export function useBiddingActivity(
 ) {
   return useQuery<BiddingActivityResponse>({
     queryKey: ['biddingActivity', initTs, finTs, intervalSecs],
-    queryFn: () => api.get_bidding_activity(initTs, finTs, intervalSecs),
+    queryFn: ({ signal }) => api.get_bidding_activity(initTs, finTs, intervalSecs, { signal }),
     enabled: enabled && initTs > 0 && finTs > initTs && intervalSecs > 0,
     staleTime: 60_000,
   });
@@ -416,7 +416,7 @@ export function useBidFrequency(
 ) {
   return useQuery<BidFrequencyBucket[]>({
     queryKey: ['bidFrequency', initTs, finTs, intervalSecs],
-    queryFn: () => api.get_bid_frequency(initTs, finTs, intervalSecs),
+    queryFn: ({ signal }) => api.get_bid_frequency(initTs, finTs, intervalSecs, { signal }),
     enabled: enabled && initTs > 0 && finTs > initTs && intervalSecs > 0,
     staleTime: 60_000,
   });
@@ -430,7 +430,7 @@ export function useBidTypeRatio(
 ) {
   return useQuery<BidTypeRatioBucket[]>({
     queryKey: ['bidTypeRatio', fromTs, toTs, intervalSecs],
-    queryFn: () => api.get_bid_type_ratio(fromTs, toTs, intervalSecs),
+    queryFn: ({ signal }) => api.get_bid_type_ratio(fromTs, toTs, intervalSecs, { signal }),
     enabled: enabled && fromTs > 0 && toTs > fromTs && intervalSecs > 0,
     staleTime: 60_000,
   });
@@ -444,7 +444,7 @@ export function useTopBidderActivePeriods(
 ) {
   return useQuery<TopBidderActivePeriodsResponse>({
     queryKey: ['topBidderActivePeriods', topN, initTs, finTs],
-    queryFn: () => api.get_top_bidder_active_periods(topN, initTs, finTs),
+    queryFn: ({ signal }) => api.get_top_bidder_active_periods(topN, initTs, finTs, { signal }),
     enabled: enabled && initTs > 0 && finTs > initTs && topN > 0,
     staleTime: 60_000,
   });
@@ -454,7 +454,7 @@ export function useTopBidderActivePeriods(
 export function useCTTransfers(address: string | null | undefined) {
   return useQuery<TxInfo[]>({
     queryKey: ['ctTransfers', address],
-    queryFn: () => api.get_ct_transfers(address!),
+    queryFn: ({ signal }) => api.get_ct_transfers(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -463,7 +463,7 @@ export function useCTTransfers(address: string | null | undefined) {
 export function useCTOwnershipTransfers(tokenId: number | null | undefined) {
   return useQuery<CSTTransferRecord[]>({
     queryKey: ['ctOwnershipTransfers', tokenId],
-    queryFn: () => api.get_ct_ownership_transfers(tokenId!),
+    queryFn: ({ signal }) => api.get_ct_ownership_transfers(tokenId!, { signal }),
     enabled: tokenId != null && tokenId >= 0,
     staleTime: 30_000,
   });
@@ -473,7 +473,7 @@ export function useCTPrice() {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<CTPriceInfo | null>({
     queryKey: ['ctPrice'],
-    queryFn: () => api.get_ct_price(),
+    queryFn: ({ signal }) => api.get_ct_price({ signal }),
     enabled: !scenario,
     staleTime: 10_000,
     refetchInterval: 15_000,
@@ -486,7 +486,7 @@ export function useCTPrice() {
 export function useTokenInfo(tokenId: number | string | null | undefined) {
   return useQuery<TokenImprintInfo | null>({
     queryKey: ['tokenInfo', tokenId],
-    queryFn: () => api.get_info(tokenId!),
+    queryFn: ({ signal }) => api.get_info(tokenId!, { signal }),
     enabled: tokenId != null,
     staleTime: 60_000,
   });
@@ -495,7 +495,7 @@ export function useTokenInfo(tokenId: number | string | null | undefined) {
 export function useUsedRWLKNFTs() {
   return useQuery<UsedRWLKNFT[]>({
     queryKey: ['usedRWLKNFTs'],
-    queryFn: () => api.get_used_rwlk_nfts(),
+    queryFn: ({ signal }) => api.get_used_rwlk_nfts({ signal }),
     staleTime: 30_000,
   });
 }
@@ -507,7 +507,7 @@ export function useUsedRWLKNFTs() {
 export function useCSTAnchorDistributionsToRetrieveByUser(address: string | null | undefined) {
   return useQuery<CSTAnchorDistribution[]>({
     queryKey: ['stakingCSTRewardsToClaim', address],
-    queryFn: () => api.get_staking_cst_rewards_to_claim_by_user(address!),
+    queryFn: ({ signal }) => api.get_staking_cst_rewards_to_claim_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 15_000,
     refetchInterval: 30_000,
@@ -518,7 +518,7 @@ export function useCSTAnchorDistributionsToRetrieveByUser(address: string | null
 export function useCSTAnchorDistributionsRetrievedByUser(address: string | null | undefined) {
   return useQuery<CSTAnchorDistribution[]>({
     queryKey: ['stakingCSTRewardsCollected', address],
-    queryFn: () => api.get_staking_cst_rewards_collected_by_user(address!),
+    queryFn: ({ signal }) => api.get_staking_cst_rewards_collected_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -527,7 +527,7 @@ export function useCSTAnchorDistributionsRetrievedByUser(address: string | null 
 export function useAnchoredCSTokensByUser(address: string | null | undefined) {
   return useQuery<AnchoredTokenInfo[]>({
     queryKey: ['stakedCSTTokens', address],
-    queryFn: () => api.get_staked_cst_tokens_by_user(address!),
+    queryFn: ({ signal }) => api.get_staked_cst_tokens_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 15_000,
     refetchInterval: 30_000,
@@ -541,7 +541,7 @@ export function useCSTActionIdsByDepositId(
 ) {
   return useQuery<ActionIdWithClaimInfo[] | null>({
     queryKey: ['cstActionIdsByDeposit', address, depositId],
-    queryFn: () => api.get_cst_action_ids_by_deposit_id(address!, depositId!),
+    queryFn: ({ signal }) => api.get_cst_action_ids_by_deposit_id(address!, depositId!, { signal }),
     enabled: !!address && depositId != null,
     staleTime: 30_000,
   });
@@ -550,7 +550,7 @@ export function useCSTActionIdsByDepositId(
 export function useCSTAnchorActionsByUser(address: string | null | undefined) {
   return useQuery<AnchorAction[]>({
     queryKey: ['stakingCSTActionsByUser', address],
-    queryFn: () => api.get_staking_cst_actions_by_user(address!),
+    queryFn: ({ signal }) => api.get_staking_cst_actions_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -559,7 +559,7 @@ export function useCSTAnchorActionsByUser(address: string | null | undefined) {
 export function useCSTAnchorActions() {
   return useQuery<AnchorAction[]>({
     queryKey: ['cstAnchorActions'],
-    queryFn: () => api.get_staking_cst_actions(),
+    queryFn: ({ signal }) => api.get_staking_cst_actions({ signal }),
     staleTime: 30_000,
   });
 }
@@ -567,7 +567,7 @@ export function useCSTAnchorActions() {
 export function useCSTAnchorActionInfo(actionId: number | null | undefined) {
   return useQuery<CombinedAnchorRecordInfo | null>({
     queryKey: ['stakingCSTActionsInfo', actionId],
-    queryFn: () => api.get_staking_cst_actions_info(actionId!),
+    queryFn: ({ signal }) => api.get_staking_cst_actions_info(actionId!, { signal }),
     enabled: actionId != null && actionId >= 0,
     staleTime: 30_000,
   });
@@ -576,7 +576,7 @@ export function useCSTAnchorActionInfo(actionId: number | null | undefined) {
 export function useCSTAnchorDistributions() {
   return useQuery<CSTAnchorDistribution[]>({
     queryKey: ['stakingCSTRewards'],
-    queryFn: () => api.get_staking_cst_rewards(),
+    queryFn: ({ signal }) => api.get_staking_cst_rewards({ signal }),
     staleTime: 30_000,
   });
 }
@@ -584,7 +584,7 @@ export function useCSTAnchorDistributions() {
 export function useCSTAnchorDistributionsByCycle(round: number | null | undefined) {
   return useQuery<CSTAnchorDistribution[]>({
     queryKey: ['stakingCSTRewardsByRound', round],
-    queryFn: () => api.get_staking_cst_rewards_by_round(round!),
+    queryFn: ({ signal }) => api.get_staking_cst_rewards_by_round(round!, { signal }),
     enabled: round != null && round >= 0,
     staleTime: 30_000,
   });
@@ -593,7 +593,7 @@ export function useCSTAnchorDistributionsByCycle(round: number | null | undefine
 export function useCSTAnchorDistributionPaidRecordsByUser(address: string | null | undefined) {
   return useQuery<CSTAnchorDistribution[]>({
     queryKey: ['stakingCSTRewardPaidRecords', address],
-    queryFn: () => api.get_staking_cst_reward_paid_records_by_user(address!),
+    queryFn: ({ signal }) => api.get_staking_cst_reward_paid_records_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -602,7 +602,7 @@ export function useCSTAnchorDistributionPaidRecordsByUser(address: string | null
 export function useGlobalAnchoredCSTokens() {
   return useQuery<AnchoredTokenInfo[]>({
     queryKey: ['stakedCSTTokensGlobal'],
-    queryFn: () => api.get_staked_cst_tokens(),
+    queryFn: ({ signal }) => api.get_staked_cst_tokens({ signal }),
     staleTime: 30_000,
   });
 }
@@ -610,7 +610,7 @@ export function useGlobalAnchoredCSTokens() {
 export function useAnchorDistributionsByUser(address: string | null | undefined) {
   return useQuery<RewardsByToken[]>({
     queryKey: ['stakingRewardsByUser', address],
-    queryFn: () => api.get_staking_rewards_by_user(address!),
+    queryFn: ({ signal }) => api.get_staking_rewards_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -622,7 +622,8 @@ export function useAnchorDistributionsByUserByTokenDetails(
 ) {
   return useQuery<Record<string, unknown> | null>({
     queryKey: ['stakingRewardsByUserByToken', address, tokenId],
-    queryFn: () => api.get_staking_rewards_by_user_by_token_details(address!, tokenId!),
+    queryFn: ({ signal }) =>
+      api.get_staking_rewards_by_user_by_token_details(address!, tokenId!, { signal }),
     enabled: !!address && tokenId != null,
     staleTime: 30_000,
   });
@@ -631,7 +632,7 @@ export function useAnchorDistributionsByUserByTokenDetails(
 export function useCSTAnchorDistributionsByUserByDeposit(address: string | null | undefined) {
   return useQuery<CSTAnchorDistribution[]>({
     queryKey: ['stakingCSTByUserByDeposit', address],
-    queryFn: () => api.get_staking_cst_by_user_by_deposit_rewards(address!),
+    queryFn: ({ signal }) => api.get_staking_cst_by_user_by_deposit_rewards(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -644,7 +645,7 @@ export function useCSTAnchorDistributionsByUserByDeposit(address: string | null 
 export function useRWLKAnchorActionInfo(actionId: number | null | undefined) {
   return useQuery<CombinedAnchorRecordInfo | null>({
     queryKey: ['stakingRWLKActionsInfo', actionId],
-    queryFn: () => api.get_staking_rwalk_actions_info(actionId!),
+    queryFn: ({ signal }) => api.get_staking_rwalk_actions_info(actionId!, { signal }),
     enabled: actionId != null && actionId >= 0,
     staleTime: 30_000,
   });
@@ -653,7 +654,7 @@ export function useRWLKAnchorActionInfo(actionId: number | null | undefined) {
 export function useRWLKAnchorActions() {
   return useQuery<AnchorAction[]>({
     queryKey: ['rwlkAnchorActions'],
-    queryFn: () => api.get_staking_rwalk_actions(),
+    queryFn: ({ signal }) => api.get_staking_rwalk_actions({ signal }),
     staleTime: 30_000,
   });
 }
@@ -661,7 +662,7 @@ export function useRWLKAnchorActions() {
 export function useRWLKAnchorActionsByUser(address: string | null | undefined) {
   return useQuery<AnchorAction[]>({
     queryKey: ['stakingRWLKActionsByUser', address],
-    queryFn: () => api.get_staking_rwalk_actions_by_user(address!),
+    queryFn: ({ signal }) => api.get_staking_rwalk_actions_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -670,7 +671,7 @@ export function useRWLKAnchorActionsByUser(address: string | null | undefined) {
 export function useGlobalRWLKAnchorImprints() {
   return useQuery<AnchorDistributionImprint[]>({
     queryKey: ['stakingRWLKMintsGlobal'],
-    queryFn: () => api.get_staking_rwalk_mints_global(),
+    queryFn: ({ signal }) => api.get_staking_rwalk_mints_global({ signal }),
     staleTime: 30_000,
   });
 }
@@ -678,7 +679,7 @@ export function useGlobalRWLKAnchorImprints() {
 export function useRWLKAnchorImprintsByUser(address: string | null | undefined) {
   return useQuery<AnchorDistributionImprint[]>({
     queryKey: ['stakingRWLKMintsByUser', address],
-    queryFn: () => api.get_staking_rwalk_mints_by_user(address!),
+    queryFn: ({ signal }) => api.get_staking_rwalk_mints_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -687,7 +688,7 @@ export function useRWLKAnchorImprintsByUser(address: string | null | undefined) 
 export function useGlobalAnchoredRWLKTokens() {
   return useQuery<AnchoredTokenInfo[]>({
     queryKey: ['stakedRWLKTokensGlobal'],
-    queryFn: () => api.get_staked_rwalk_tokens(),
+    queryFn: ({ signal }) => api.get_staked_rwalk_tokens({ signal }),
     staleTime: 30_000,
   });
 }
@@ -695,7 +696,7 @@ export function useGlobalAnchoredRWLKTokens() {
 export function useAnchoredRWLKTokensByUser(address: string | null | undefined) {
   return useQuery<AnchoredTokenInfo[]>({
     queryKey: ['anchoredRWLKTokens', address],
-    queryFn: () => api.get_staked_rwalk_tokens_by_user(address!),
+    queryFn: ({ signal }) => api.get_staked_rwalk_tokens_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 15_000,
     refetchInterval: 30_000,
@@ -710,7 +711,7 @@ export function useAnchoredRWLKTokensByUser(address: string | null | undefined) 
 export function useDonationsCGSimpleList() {
   return useQuery<ETHDonation[]>({
     queryKey: ['donationsCGSimpleList'],
-    queryFn: () => api.get_donations_cg_simple_list(),
+    queryFn: ({ signal }) => api.get_donations_cg_simple_list({ signal }),
     staleTime: 30_000,
   });
 }
@@ -718,7 +719,7 @@ export function useDonationsCGSimpleList() {
 export function useDonationsCGSimpleByRound(round: number) {
   return useQuery<ETHDonation[]>({
     queryKey: ['donationsCGSimpleByRound', round],
-    queryFn: () => api.get_donations_cg_simple_by_round(round),
+    queryFn: ({ signal }) => api.get_donations_cg_simple_by_round(round, { signal }),
     enabled: round >= 0,
     staleTime: 30_000,
   });
@@ -727,7 +728,7 @@ export function useDonationsCGSimpleByRound(round: number) {
 export function useDonationsCGWithInfoList() {
   return useQuery<ETHDonation[]>({
     queryKey: ['donationsCGWithInfoList'],
-    queryFn: () => api.get_donations_cg_with_info_list(),
+    queryFn: ({ signal }) => api.get_donations_cg_with_info_list({ signal }),
     staleTime: 30_000,
   });
 }
@@ -735,7 +736,7 @@ export function useDonationsCGWithInfoList() {
 export function useDonationsCGWithInfoByRound(round: number) {
   return useQuery<ETHDonation[]>({
     queryKey: ['donationsCGWithInfoByRound', round],
-    queryFn: () => api.get_donations_cg_with_info_by_round(round),
+    queryFn: ({ signal }) => api.get_donations_cg_with_info_by_round(round, { signal }),
     enabled: round >= 0,
     staleTime: 30_000,
   });
@@ -744,7 +745,7 @@ export function useDonationsCGWithInfoByRound(round: number) {
 export function useDonationsWithInfoById(id: number | null | undefined) {
   return useQuery<ETHDonation | null>({
     queryKey: ['donationsWithInfoById', id],
-    queryFn: () => api.get_donations_with_info_by_id(id!),
+    queryFn: ({ signal }) => api.get_donations_with_info_by_id(id!, { signal }),
     enabled: id != null && id >= 0,
     staleTime: 60_000,
   });
@@ -753,7 +754,7 @@ export function useDonationsWithInfoById(id: number | null | undefined) {
 export function useDonationsEthByUser(address: string | null | undefined) {
   return useQuery<ETHDonation[]>({
     queryKey: ['donationsEthByUser', address],
-    queryFn: () => api.get_donations_eth_by_user(address!),
+    queryFn: ({ signal }) => api.get_donations_eth_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -762,7 +763,7 @@ export function useDonationsEthByUser(address: string | null | undefined) {
 export function useDonationsBothByRound(round: number) {
   return useQuery<ETHDonation[]>({
     queryKey: ['donationsBothByRound', round],
-    queryFn: () => api.get_donations_both_by_round(round),
+    queryFn: ({ signal }) => api.get_donations_both_by_round(round, { signal }),
     enabled: round >= 0,
     staleTime: 30_000,
   });
@@ -771,7 +772,7 @@ export function useDonationsBothByRound(round: number) {
 export function useDonationsBoth() {
   return useQuery<ETHDonation[]>({
     queryKey: ['donationsBoth'],
-    queryFn: () => api.get_donations_both(),
+    queryFn: ({ signal }) => api.get_donations_both({ signal }),
     staleTime: 30_000,
   });
 }
@@ -783,7 +784,7 @@ export function useDonationsBoth() {
 export function useCharityDonationsDeposits() {
   return useQuery<ETHDonation[]>({
     queryKey: ['charityDonationsDeposits'],
-    queryFn: () => api.get_charity_donations_deposits(),
+    queryFn: ({ signal }) => api.get_charity_donations_deposits({ signal }),
     staleTime: 60_000,
   });
 }
@@ -791,7 +792,7 @@ export function useCharityDonationsDeposits() {
 export function useCharityCGDeposits() {
   return useQuery<ETHDonation[]>({
     queryKey: ['charityCGDeposits'],
-    queryFn: () => api.get_charity_cg_deposits(),
+    queryFn: ({ signal }) => api.get_charity_cg_deposits({ signal }),
     staleTime: 60_000,
   });
 }
@@ -799,7 +800,7 @@ export function useCharityCGDeposits() {
 export function useCharityVoluntary() {
   return useQuery<ETHDonation[]>({
     queryKey: ['charityVoluntary'],
-    queryFn: () => api.get_charity_voluntary(),
+    queryFn: ({ signal }) => api.get_charity_voluntary({ signal }),
     staleTime: 60_000,
   });
 }
@@ -807,7 +808,7 @@ export function useCharityVoluntary() {
 export function useCharityWithdrawals() {
   return useQuery<CharityWithdrawal[]>({
     queryKey: ['charityWithdrawals'],
-    queryFn: () => api.get_charity_withdrawals(),
+    queryFn: ({ signal }) => api.get_charity_withdrawals({ signal }),
     staleTime: 60_000,
   });
 }
@@ -819,7 +820,7 @@ export function useCharityWithdrawals() {
 export function useDonationsNFTList() {
   return useQuery<AttachedNFT[]>({
     queryKey: ['donationsNFTList'],
-    queryFn: () => api.get_donations_nft_list(),
+    queryFn: ({ signal }) => api.get_donations_nft_list({ signal }),
     staleTime: 30_000,
   });
 }
@@ -827,7 +828,7 @@ export function useDonationsNFTList() {
 export function useDonatedNFTInfo(recordId: number | null | undefined) {
   return useQuery<AttachedNFT | null>({
     queryKey: ['donatedNFTInfo', recordId],
-    queryFn: () => api.get_donated_nft_info(recordId!),
+    queryFn: ({ signal }) => api.get_donated_nft_info(recordId!, { signal }),
     enabled: recordId != null && recordId >= 0,
     staleTime: 60_000,
   });
@@ -836,7 +837,7 @@ export function useDonatedNFTInfo(recordId: number | null | undefined) {
 export function useDonatedNFTClaimsAll() {
   return useQuery<AttachedNFT[]>({
     queryKey: ['donatedNFTClaimsAll'],
-    queryFn: () => api.get_donated_nft_claims_all(),
+    queryFn: ({ signal }) => api.get_donated_nft_claims_all({ signal }),
     staleTime: 30_000,
   });
 }
@@ -844,7 +845,7 @@ export function useDonatedNFTClaimsAll() {
 export function useClaimedDonatedNFTByUser(address: string | null | undefined) {
   return useQuery<AttachedNFT[]>({
     queryKey: ['claimedDonatedNFTByUser', address],
-    queryFn: () => api.get_claimed_donated_nft_by_user(address!),
+    queryFn: ({ signal }) => api.get_claimed_donated_nft_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -853,7 +854,7 @@ export function useClaimedDonatedNFTByUser(address: string | null | undefined) {
 export function useNFTDonationStats() {
   return useQuery<NFTDonationStatsEntry[]>({
     queryKey: ['nftDonationStats'],
-    queryFn: () => api.get_nft_donation_stats(),
+    queryFn: ({ signal }) => api.get_nft_donation_stats({ signal }),
     staleTime: 60_000,
   });
 }
@@ -862,7 +863,7 @@ export function useDonationsNFTByRound(round: number) {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<AttachedNFT[]>({
     queryKey: ['donationsNFTByRound', round],
-    queryFn: () => api.get_donations_nft_by_round(round),
+    queryFn: ({ signal }) => api.get_donations_nft_by_round(round, { signal }),
     enabled: !scenario && round >= 0,
     staleTime: 30_000,
     refetchOnWindowFocus: true,
@@ -873,7 +874,7 @@ export function useDonationsNFTByRound(round: number) {
 export function useDonationsNFTUnclaimedByRound(round: number) {
   return useQuery<AttachedNFT[]>({
     queryKey: ['donationsNFTUnclaimedByRound', round],
-    queryFn: () => api.get_donations_nft_unclaimed_by_round(round),
+    queryFn: ({ signal }) => api.get_donations_nft_unclaimed_by_round(round, { signal }),
     enabled: round >= 0,
     staleTime: 30_000,
   });
@@ -882,7 +883,7 @@ export function useDonationsNFTUnclaimedByRound(round: number) {
 export function useUnclaimedDonatedNFTByUser(address: string | null | undefined) {
   return useQuery<AttachedNFT[]>({
     queryKey: ['unclaimedDonatedNFTByUser', address],
-    queryFn: () => api.get_unclaimed_donated_nft_by_user(address!),
+    queryFn: ({ signal }) => api.get_unclaimed_donated_nft_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -896,7 +897,7 @@ export function useDonationsERC20ByRound(round: number) {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<DonatedERC20Token[]>({
     queryKey: ['donationsERC20ByRound', round],
-    queryFn: () => api.get_donations_erc20_by_round(round),
+    queryFn: ({ signal }) => api.get_donations_erc20_by_round(round, { signal }),
     enabled: !scenario && round >= 0,
     staleTime: 30_000,
     refetchOnWindowFocus: true,
@@ -907,7 +908,7 @@ export function useDonationsERC20ByRound(round: number) {
 export function useDonationsERC20ByUser(address: string | null | undefined) {
   return useQuery<DonatedERC20Token[]>({
     queryKey: ['donationsERC20ByUser', address],
-    queryFn: () => api.get_donations_erc20_by_user(address!),
+    queryFn: ({ signal }) => api.get_donations_erc20_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -920,7 +921,7 @@ export function useDonationsERC20ByUser(address: string | null | undefined) {
 export function useUserInfo(address: string | null | undefined) {
   return useQuery<UserInfoWithLists | null>({
     queryKey: ['userInfo', address],
-    queryFn: () => api.get_user_info(address!),
+    queryFn: ({ signal }) => api.get_user_info(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
     refetchInterval: 30_000,
@@ -931,7 +932,7 @@ export function useUserInfo(address: string | null | undefined) {
 export function useUserBalance(address: string | null | undefined) {
   return useQuery<UserBalance | null>({
     queryKey: ['userBalance', address],
-    queryFn: () => api.get_user_balance(address!),
+    queryFn: ({ signal }) => api.get_user_balance(address!, { signal }),
     enabled: !!address,
     staleTime: 15_000,
     refetchInterval: 30_000,
@@ -942,7 +943,7 @@ export function useUserBalance(address: string | null | undefined) {
 export function useNotifyRedBox(address: string | null | undefined) {
   return useQuery<NotifyRedBoxResult | null>({
     queryKey: ['notifyRedBox', address],
-    queryFn: () => api.notify_red_box(address!),
+    queryFn: ({ signal }) => api.notify_red_box(address!, { signal }),
     enabled: !!address,
     staleTime: 15_000,
     refetchInterval: 30_000,
@@ -953,7 +954,7 @@ export function useNotifyRedBox(address: string | null | undefined) {
 export function useUniqueParticipants() {
   return useQuery<Participant[]>({
     queryKey: ['uniqueParticipants'],
-    queryFn: () => api.get_unique_bidders(),
+    queryFn: ({ signal }) => api.get_unique_bidders({ signal }),
     staleTime: 60_000,
   });
 }
@@ -961,7 +962,7 @@ export function useUniqueParticipants() {
 export function useUniqueRecipients() {
   return useQuery<Recipient[]>({
     queryKey: ['uniqueRecipients'],
-    queryFn: () => api.get_unique_winners(),
+    queryFn: ({ signal }) => api.get_unique_winners({ signal }),
     staleTime: 60_000,
   });
 }
@@ -969,7 +970,7 @@ export function useUniqueRecipients() {
 export function useUniqueDonors() {
   return useQuery<UniqueEthDonor[]>({
     queryKey: ['uniqueDonors'],
-    queryFn: () => api.get_unique_donors(),
+    queryFn: ({ signal }) => api.get_unique_donors({ signal }),
     staleTime: 60_000,
   });
 }
@@ -977,7 +978,7 @@ export function useUniqueDonors() {
 export function useRoiLeaderboard(sort: RoiLeaderboardSort = 'net_pl', minBids = 5) {
   return useQuery<RoiLeaderboardEntry[]>({
     queryKey: ['roiLeaderboard', sort, minBids],
-    queryFn: () => api.get_roi_leaderboard(sort, minBids),
+    queryFn: ({ signal }) => api.get_roi_leaderboard(sort, minBids, { signal }),
     staleTime: 60_000,
   });
 }
@@ -985,7 +986,7 @@ export function useRoiLeaderboard(sort: RoiLeaderboardSort = 'net_pl', minBids =
 export function useClaimsByRound() {
   return useQuery<RoundClaimSummary[]>({
     queryKey: ['claimsByRound'],
-    queryFn: () => api.get_claims_by_round(),
+    queryFn: ({ signal }) => api.get_claims_by_round({ signal }),
     staleTime: 60_000,
   });
 }
@@ -993,7 +994,7 @@ export function useClaimsByRound() {
 export function useClaimDetailByRound(round: number | null) {
   return useQuery<RoundClaimDetail | null>({
     queryKey: ['claimDetailByRound', round],
-    queryFn: () => api.get_claim_detail_by_round(round!),
+    queryFn: ({ signal }) => api.get_claim_detail_by_round(round!, { signal }),
     enabled: round != null && round >= 0,
     staleTime: 60_000,
   });
@@ -1002,7 +1003,7 @@ export function useClaimDetailByRound(round: number | null) {
 export function useUniqueCSTAnchorHolders() {
   return useQuery<UniqueAnchorHolderCST[]>({
     queryKey: ['uniqueCSTAnchorHolders'],
-    queryFn: () => api.get_unique_cst_stakers(),
+    queryFn: ({ signal }) => api.get_unique_cst_stakers({ signal }),
     staleTime: 60_000,
   });
 }
@@ -1010,7 +1011,7 @@ export function useUniqueCSTAnchorHolders() {
 export function useUniqueRWLKAnchorHolders() {
   return useQuery<UniqueAnchorHolderRWLK[]>({
     queryKey: ['uniqueRWLKAnchorHolders'],
-    queryFn: () => api.get_unique_rwalk_stakers(),
+    queryFn: ({ signal }) => api.get_unique_rwalk_stakers({ signal }),
     staleTime: 60_000,
   });
 }
@@ -1018,7 +1019,7 @@ export function useUniqueRWLKAnchorHolders() {
 export function useUniqueBothAnchorHolders() {
   return useQuery<UniqueAnchorHolderRWLK[]>({
     queryKey: ['uniqueBothStakers'],
-    queryFn: () => api.get_unique_both_stakers(),
+    queryFn: ({ signal }) => api.get_unique_both_stakers({ signal }),
     staleTime: 60_000,
   });
 }
@@ -1030,7 +1031,7 @@ export function useUniqueBothAnchorHolders() {
 export function useStellarSelectionDepositsByUser(address: string | null | undefined) {
   return useQuery<StellarSelectionETHDeposit[]>({
     queryKey: ['raffleDepositsByUser', address],
-    queryFn: () => api.get_raffle_deposits_by_user(address!),
+    queryFn: ({ signal }) => api.get_raffle_deposits_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -1039,7 +1040,7 @@ export function useStellarSelectionDepositsByUser(address: string | null | undef
 export function useChronoWarriorDepositsByUser(address: string | null | undefined) {
   return useQuery<StellarSelectionETHDeposit[]>({
     queryKey: ['chronoWarriorDepositsByUser', address],
-    queryFn: () => api.get_chrono_warrior_deposits_by_user(address!),
+    queryFn: ({ signal }) => api.get_chrono_warrior_deposits_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -1048,7 +1049,7 @@ export function useChronoWarriorDepositsByUser(address: string | null | undefine
 export function useUnretrievedStellarSelectionDepositsByUser(address: string | null | undefined) {
   return useQuery<StellarSelectionETHDeposit[]>({
     queryKey: ['unclaimedRaffleDepositsByUser', address],
-    queryFn: () => api.get_unclaimed_raffle_deposits_by_user(address!),
+    queryFn: ({ signal }) => api.get_unclaimed_raffle_deposits_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 15_000,
     refetchInterval: 30_000,
@@ -1059,7 +1060,7 @@ export function useUnretrievedStellarSelectionDepositsByUser(address: string | n
 export function useStellarSelectionNFTRecipientsList() {
   return useQuery<StellarSelectionNFTRecipient[]>({
     queryKey: ['raffleNFTWinnersList'],
-    queryFn: () => api.get_raffle_nft_winners_list(),
+    queryFn: ({ signal }) => api.get_raffle_nft_winners_list({ signal }),
     staleTime: 30_000,
   });
 }
@@ -1067,7 +1068,7 @@ export function useStellarSelectionNFTRecipientsList() {
 export function useStellarSelectionNFTRecipientsByCycle(round: number) {
   return useQuery<StellarSelectionNFTRecipient[]>({
     queryKey: ['raffleNFTWinnersByRound', round],
-    queryFn: () => api.get_raffle_nft_winners_by_round(round),
+    queryFn: ({ signal }) => api.get_raffle_nft_winners_by_round(round, { signal }),
     enabled: round >= 0,
     staleTime: 30_000,
   });
@@ -1076,7 +1077,7 @@ export function useStellarSelectionNFTRecipientsByCycle(round: number) {
 export function useStellarSelectionNFTAllocationsByUser(address: string | null | undefined) {
   return useQuery<StellarSelectionNFTRecipient[]>({
     queryKey: ['raffleNFTWinningsByUser', address],
-    queryFn: () => api.get_raffle_nft_winnings_by_user(address!),
+    queryFn: ({ signal }) => api.get_raffle_nft_winnings_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -1089,7 +1090,7 @@ export function useStellarSelectionNFTAllocationsByUser(address: string | null |
 export function useMarketingRewards() {
   return useQuery<MarketingReward[]>({
     queryKey: ['marketingRewards'],
-    queryFn: () => api.get_marketing_rewards(),
+    queryFn: ({ signal }) => api.get_marketing_rewards({ signal }),
     staleTime: 30_000,
   });
 }
@@ -1097,7 +1098,7 @@ export function useMarketingRewards() {
 export function useMarketingRewardsByUser(address: string | null | undefined) {
   return useQuery<MarketingReward[]>({
     queryKey: ['marketingRewardsByUser', address],
-    queryFn: () => api.get_marketing_rewards_by_user(address!),
+    queryFn: ({ signal }) => api.get_marketing_rewards_by_user(address!, { signal }),
     enabled: !!address,
     staleTime: 30_000,
   });
@@ -1111,7 +1112,7 @@ export function useCurrentTime() {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<number>({
     queryKey: ['currentTime'],
-    queryFn: () => api.get_current_time(),
+    queryFn: ({ signal }) => api.get_current_time({ signal }),
     enabled: !scenario,
     staleTime: 5_000,
     refetchInterval: 12_000,
@@ -1124,7 +1125,7 @@ export function useCurrentTime() {
 export function useSystemModelist() {
   return useQuery<SystemModeChangeEvent[]>({
     queryKey: ['systemModelist'],
-    queryFn: () => api.get_system_modelist(),
+    queryFn: ({ signal }) => api.get_system_modelist({ signal }),
     staleTime: 60_000,
   });
 }
@@ -1132,7 +1133,7 @@ export function useSystemModelist() {
 export function useSystemEvents(start: number, end: number) {
   return useQuery<AdminEventRow[]>({
     queryKey: ['systemEvents', start, end],
-    queryFn: () => api.get_system_events(start, end),
+    queryFn: ({ signal }) => api.get_system_events(start, end, { signal }),
     enabled: start >= 0 && end >= start,
     staleTime: 60_000,
   });

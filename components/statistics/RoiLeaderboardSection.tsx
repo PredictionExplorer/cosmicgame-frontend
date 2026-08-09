@@ -17,6 +17,8 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 import { useRoiLeaderboard } from '@/hooks/useApiQuery';
+import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
+import { formatFixed } from '@/utils/format';
 import type { RoiLeaderboardEntry, RoiLeaderboardSort } from '@/services/api/types';
 
 // lexicon-allow-start: sort ids below are the sealed backend query-param contract
@@ -35,8 +37,8 @@ const PER_PAGE = 10;
 /** Whether this participant paid no ETH (CST-only) — ETH-only return is undefined for them. */
 const isCstOnly = (e: RoiLeaderboardEntry) => e.TotalEthSpentEth <= 0;
 
-const fmtEth = (n: number) => n.toFixed(4);
-const fmtSignedEth = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(4)}`;
+const fmtEth = (n: number) => formatFixed(n, 4);
+const fmtSignedEth = (n: number) => `${n >= 0 ? '+' : ''}${formatFixed(n, 4)}`;
 
 const Pill = ({
   active,
@@ -51,7 +53,7 @@ const Pill = ({
     type="button"
     aria-pressed={active}
     onClick={onClick}
-    className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+    className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors ${TOUCH_TARGET_ICON_CLASS} ${
       active
         ? 'border-primary/50 bg-primary/15 text-primary'
         : 'border-white/10 bg-white/[0.03] text-muted-foreground hover:border-white/20 hover:text-white'
@@ -95,7 +97,9 @@ const NetPctCell = ({
   }
   const tone = pct > 0 ? 'text-emerald-400' : pct < 0 ? 'text-red-400' : 'text-muted-foreground';
   return (
-    <span className={`font-semibold ${tone}`}>{`${pct >= 0 ? '+' : ''}${pct.toFixed(0)}%`}</span>
+    <span
+      className={`font-semibold ${tone}`}
+    >{`${pct >= 0 ? '+' : ''}${formatFixed(pct, 0)}%`}</span>
   );
 };
 
@@ -175,7 +179,7 @@ const Row = ({
         {fmtEth(entry.TotalEthSpentEth)}
         {entry.TotalCstSpentEth > 0 && (
           <span className="block text-xs text-muted-foreground">
-            {entry.TotalCstSpentEth.toFixed(0)} CST
+            {formatFixed(entry.TotalCstSpentEth, 0)} CST
           </span>
         )}
       </TablePrimaryCell>

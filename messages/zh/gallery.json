@@ -1,4 +1,8 @@
 {
+  "error": {
+    "title": "无法加载铭刻档案",
+    "message": "未能读取 Cosmic Signature 藏品列表。请重试以加载档案。"
+  },
   "jsonLd": {
     "name": "Cosmic Signature 画廊"
   },

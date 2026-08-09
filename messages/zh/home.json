@@ -1,4 +1,8 @@
 {
+  "error": {
+    "title": "暂时无法获取当前周期数据",
+    "message": "无法连接协议数据服务，因此无法显示当前周期。请稍后重试。"
+  },
   "hero": {
     "cycleFallback": "演绎周期",
     "cycleNumber": "第 {number} 个周期",

@@ -5,6 +5,7 @@ import { Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 
 interface GallerySearchInputProps {
   value: string;
@@ -78,14 +79,20 @@ export function GallerySearchInput({
           value={local}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          className="w-full h-10 rounded-lg border border-white/[0.06] bg-white/[0.03] pl-9 pr-9 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+          className={cn(
+            'w-full h-10 rounded-lg border border-white/[0.06] bg-white/[0.03] pl-9 pr-9 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors',
+            TOUCH_TARGET_HEIGHT_CLASS,
+          )}
         />
         {local && (
           <button
             type="button"
             onClick={handleClear}
             aria-label={t('gallery.clear')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
+            className={cn(
+              'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors',
+              TOUCH_TARGET_ICON_CLASS,
+            )}
           >
             <X className="h-4 w-4" />
           </button>
@@ -94,7 +101,10 @@ export function GallerySearchInput({
       <button
         type="button"
         onClick={handleSearchClick}
-        className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+        className={cn(
+          'h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity',
+          TOUCH_TARGET_HEIGHT_CLASS,
+        )}
       >
         {t('gallery.submit')}
       </button>

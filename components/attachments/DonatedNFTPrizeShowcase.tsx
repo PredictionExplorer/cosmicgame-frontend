@@ -13,6 +13,7 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Surface } from '@/components/ui/surface';
 import { cn } from '@/lib/utils';
 import type { AttachedNFT, DonatedERC20Token } from '@/services/api/types';
+import { formatFixed } from '@/utils/format';
 
 import {
   buildOpenSeaAssetUrl,
@@ -395,7 +396,7 @@ function AttachedNFTAllocationCard({
               {estimate ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.25)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--solar-gold-rgb))]">
                   {t('showcase.nftCard.floorEstimate', {
-                    price: estimate.floorPriceEth.toFixed(3),
+                    price: formatFixed(estimate.floorPriceEth, 3),
                     currency: estimate.currency,
                   })}
                   <InfoTooltip content={t('showcase.nftCard.floorTooltip')} />

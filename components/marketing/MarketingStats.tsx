@@ -6,6 +6,8 @@ import { Info } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 
 interface StatCardProps {
   label: string;
@@ -71,7 +73,11 @@ function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCard
             <button
               type="button"
               aria-label={t('stats.infoAria', { label })}
-              className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+              data-touch-target="extended"
+              className={cn(
+                'text-muted-foreground/60 hover:text-muted-foreground transition-colors',
+                TOUCH_TARGET_EXTENDED_CLASS,
+              )}
             >
               <Info className="h-3.5 w-3.5" />
             </button>

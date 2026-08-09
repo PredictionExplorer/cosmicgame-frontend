@@ -4,6 +4,8 @@ import { useTranslations } from 'next-intl';
 import { formatId } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 
 interface NFTBreadcrumbProps {
   tokenId: number;
@@ -23,14 +25,20 @@ export function NFTBreadcrumb({ tokenId, tokenName }: NFTBreadcrumbProps) {
     >
       <Link
         href="/"
-        className="text-muted-foreground hover:text-primary transition-colors no-underline"
+        className={cn(
+          'text-muted-foreground hover:text-primary transition-colors no-underline',
+          TOUCH_TARGET_TEXT_LINK_CLASS,
+        )}
       >
         {tCommon('breadcrumbs.home')}
       </Link>
       <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40" />
       <Link
         href="/gallery"
-        className="text-muted-foreground hover:text-primary transition-colors no-underline"
+        className={cn(
+          'text-muted-foreground hover:text-primary transition-colors no-underline',
+          TOUCH_TARGET_TEXT_LINK_CLASS,
+        )}
       >
         {tCommon('breadcrumbs.gallery')}
       </Link>

@@ -53,6 +53,20 @@ const make400 = () =>
 
 const TX = { EvtLogId: 1, BlockNum: 10, TxId: 1, TxHash: '0xh', TimeStamp: 100, DateTime: '' };
 
+/**
+ * Anchored CST row as the Go server sends it: the token lives under `TokenInfo`
+ * and there is no flat `StakedTokenId` (only RandomWalk rows carry one).
+ */
+const CST_ROW = {
+  StakeActionId: 10,
+  StakeTimeStamp: 1701346718,
+  UserAddr: '0xholder',
+  TokenInfo: { TokenId: 99, Seed: 'abc123', StakeActionId: 10 },
+};
+
+/** Anchored RandomWalk row: token id and action id are flat on the row. */
+const RWALK_ROW = { StakeActionId: 7, StakedTokenId: 42, StakeTimeStamp: 1701346718 };
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -71,16 +85,16 @@ describe('anchoring API', () => {
       );
     });
 
-    it('returns empty array on 400', async () => {
+    it('propagates a 400 rather than reporting nothing to collect', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_staking_cst_rewards_to_claim_by_user('0xabc')).toEqual([]);
+      await expect(get_staking_cst_rewards_to_claim_by_user('0xabc')).rejects.toThrow(
+        'Network response was not OK',
+      );
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_staking_cst_rewards_to_claim_by_user('0xabc')).rejects.toThrow(
-        'Network response was not OK',
-      );
+      await expect(get_staking_cst_rewards_to_claim_by_user('0xabc')).rejects.toThrow('fail');
     });
   });
 
@@ -110,8 +124,8 @@ describe('anchoring API', () => {
   });
 
   describe('get_staked_cst_tokens_by_user', () => {
-    it('returns raw data on success', async () => {
-      const tokens = [{ TokenId: 1, IsStaked: true }];
+    it('accepts the nested CST row shape (token id under TokenInfo)', async () => {
+      const tokens = [CST_ROW];
       mockedAxios.get.mockResolvedValue({ data: { StakedTokensCST: tokens } });
       const result = await get_staked_cst_tokens_by_user('0xabc');
       expect(result).toEqual(tokens);
@@ -120,16 +134,23 @@ describe('anchoring API', () => {
       );
     });
 
-    it('returns empty array on 400', async () => {
+    it('rejects a row whose TokenInfo is missing', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { StakedTokensCST: [{ StakeTimeStamp: 100 }] } });
+      await expect(get_staked_cst_tokens_by_user('0xabc')).rejects.toThrow(
+        /schemaMismatch:stakedTokensCST\[byUser\]/,
+      );
+    });
+
+    it('propagates a 400 rather than reporting no anchored tokens', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_staked_cst_tokens_by_user('0xabc')).toEqual([]);
+      await expect(get_staked_cst_tokens_by_user('0xabc')).rejects.toThrow(
+        'Network response was not OK',
+      );
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_staked_cst_tokens_by_user('0xabc')).rejects.toThrow(
-        'Network response was not OK',
-      );
+      await expect(get_staked_cst_tokens_by_user('0xabc')).rejects.toThrow('fail');
     });
   });
 
@@ -300,8 +321,8 @@ describe('anchoring API', () => {
   });
 
   describe('get_staked_cst_tokens', () => {
-    it('returns raw token data on success', async () => {
-      const tokens = [{ TokenId: 1 }];
+    it('returns the global CST rows on success', async () => {
+      const tokens = [CST_ROW, { ...CST_ROW, StakeActionId: 11 }];
       mockedAxios.get.mockResolvedValue({ data: { StakedTokensCST: tokens } });
       const result = await get_staked_cst_tokens();
       expect(result).toEqual(tokens);
@@ -310,14 +331,28 @@ describe('anchoring API', () => {
       );
     });
 
-    it('returns empty array on 400', async () => {
-      mockedAxios.get.mockRejectedValue(make400());
+    it('treats a null list as empty rather than a mismatch', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { StakedTokensCST: null } });
       expect(await get_staked_cst_tokens()).toEqual([]);
+    });
+
+    it('reports the row index of a corrupt row beyond the first five', async () => {
+      const rows = [
+        ...Array.from({ length: 6 }, (_, i) => ({ ...CST_ROW, StakeActionId: i })),
+        { ...CST_ROW, TokenInfo: { TokenId: 'not-a-number' } },
+      ];
+      mockedAxios.get.mockResolvedValue({ data: { StakedTokensCST: rows } });
+      await expect(get_staked_cst_tokens()).rejects.toThrow(/6\.TokenInfo\.TokenId/);
+    });
+
+    it('propagates a 400 instead of returning an empty list', async () => {
+      mockedAxios.get.mockRejectedValue(make400());
+      await expect(get_staked_cst_tokens()).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_staked_cst_tokens()).rejects.toThrow('Network response was not OK');
+      await expect(get_staked_cst_tokens()).rejects.toThrow('fail');
     });
   });
 
@@ -524,8 +559,8 @@ describe('anchoring API', () => {
   });
 
   describe('get_staked_rwalk_tokens', () => {
-    it('returns raw token data on success', async () => {
-      const tokens = [{ TokenId: 10 }];
+    it('returns the flat RandomWalk rows on success', async () => {
+      const tokens = [RWALK_ROW];
       mockedAxios.get.mockResolvedValue({ data: { StakedTokensRWalk: tokens } });
       const result = await get_staked_rwalk_tokens();
       expect(result).toEqual(tokens);
@@ -534,20 +569,29 @@ describe('anchoring API', () => {
       );
     });
 
-    it('returns empty array on 400', async () => {
+    it('rejects a RandomWalk row without a flat token id', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { StakedTokensRWalk: [{ StakeActionId: 7, StakeTimeStamp: 1 }] },
+      });
+      await expect(get_staked_rwalk_tokens()).rejects.toThrow(
+        /schemaMismatch:stakedTokensRWalk .*StakedTokenId/,
+      );
+    });
+
+    it('propagates a 400 instead of returning an empty list', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_staked_rwalk_tokens()).toEqual([]);
+      await expect(get_staked_rwalk_tokens()).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_staked_rwalk_tokens()).rejects.toThrow('Network response was not OK');
+      await expect(get_staked_rwalk_tokens()).rejects.toThrow('fail');
     });
   });
 
   describe('get_staked_rwalk_tokens_by_user', () => {
-    it('returns raw token data on success', async () => {
-      const tokens = [{ TokenId: 11 }];
+    it('returns the flat RandomWalk rows on success', async () => {
+      const tokens = [{ ...RWALK_ROW, StakedTokenId: 11 }];
       mockedAxios.get.mockResolvedValue({ data: { StakedTokensRWalk: tokens } });
       const result = await get_staked_rwalk_tokens_by_user('0xabc');
       expect(result).toEqual(tokens);
@@ -556,16 +600,16 @@ describe('anchoring API', () => {
       );
     });
 
-    it('returns empty array on 400', async () => {
+    it('propagates a 400 rather than reporting no anchored tokens', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_staked_rwalk_tokens_by_user('0xabc')).toEqual([]);
+      await expect(get_staked_rwalk_tokens_by_user('0xabc')).rejects.toThrow(
+        'Network response was not OK',
+      );
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_staked_rwalk_tokens_by_user('0xabc')).rejects.toThrow(
-        'Network response was not OK',
-      );
+      await expect(get_staked_rwalk_tokens_by_user('0xabc')).rejects.toThrow('fail');
     });
   });
 });

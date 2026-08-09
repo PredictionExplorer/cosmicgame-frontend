@@ -24,11 +24,21 @@ const buttonVariants = cva(
       // Every size reaches the 44px touch target below `sm` and keeps its
       // original desktop density above it, so pointer UIs stay compact
       // without asking a thumb to hit a 36px button.
+      //
+      // `min-h-11` carries the guarantee that `h-11` cannot: a button is often
+      // a flex item, and along a flex container's main axis `flex-basis`
+      // supersedes `height`, so only min sizing survives the flex algorithm.
+      //
+      // There is deliberately no matching `min-w-11`. A width floor on every
+      // button starves its siblings in a tight row — it pushed the language
+      // switcher's own label 6px out of its box — and only a handful of
+      // buttons with two-character labels are narrower than 44px. Those set
+      // `max-sm:min-w-11` at the call site instead.
       size: {
-        default: 'h-11 px-4 py-2 sm:h-10',
-        sm: 'h-11 rounded-md px-3 sm:h-9',
-        lg: 'h-11 rounded-md px-8',
-        icon: 'h-11 w-11 sm:h-10 sm:w-10',
+        default: 'h-11 min-h-11 px-4 py-2 sm:h-10 sm:min-h-0',
+        sm: 'h-11 min-h-11 rounded-md px-3 sm:h-9 sm:min-h-0',
+        lg: 'h-11 min-h-11 rounded-md px-8 sm:min-h-0',
+        icon: 'h-11 w-11 min-h-11 min-w-11 sm:h-10 sm:w-10 sm:min-h-0 sm:min-w-0',
       },
     },
     defaultVariants: {

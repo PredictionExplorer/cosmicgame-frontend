@@ -2,6 +2,13 @@ import { formatUnits } from 'viem';
 
 type BigNumberish = bigint | string | number;
 
+/**
+ * Rendered wherever a numeric value cannot be shown (missing API field, NaN,
+ * unparseable wei). Formatters return this instead of throwing or printing
+ * `NaN`, so a single bad record never takes down the surrounding render.
+ */
+export const UNAVAILABLE_VALUE = '—';
+
 /** Maps app locale codes to stable Intl locales. */
 export const toIntlLocale = (locale: string = 'en'): string =>
   locale.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US';
@@ -14,9 +21,51 @@ export function shortenHex(hex: string, length = 4): string {
   return '';
 }
 
-/** Parses wei/smallest-unit balance to a fixed-decimal string. */
-export const parseBalance = (value: BigNumberish, decimals = 18, decimalsToDisplay = 4): string =>
-  parseFloat(formatUnits(BigInt(value), decimals)).toFixed(decimalsToDisplay);
+/**
+ * Parses wei/smallest-unit balance to a fixed-decimal string.
+ *
+ * Total by construction: `BigInt()` throws on fractional numbers and
+ * non-numeric strings, and `toFixed` throws on out-of-range precision, so
+ * anything unparseable renders `UNAVAILABLE_VALUE` rather than escaping as an
+ * uncaught RangeError/SyntaxError mid-render.
+ */
+export const parseBalance = (value: BigNumberish, decimals = 18, decimalsToDisplay = 4): string => {
+  try {
+    const parsed = parseFloat(formatUnits(BigInt(value), decimals));
+    if (!Number.isFinite(parsed)) return UNAVAILABLE_VALUE;
+    return parsed.toFixed(decimalsToDisplay);
+  } catch {
+    return UNAVAILABLE_VALUE;
+  }
+};
+
+/**
+ * `toFixed` that cannot throw. Finite input is byte-identical to
+ * `value.toFixed(digits)`; null/undefined/NaN/Infinity render `fallback`.
+ * Use at display sites where the value comes from an API field that the
+ * schema types as required but the backend can still omit.
+ */
+export const formatFixed = (
+  value: number | null | undefined,
+  digits: number,
+  fallback: string = UNAVAILABLE_VALUE,
+): string =>
+  typeof value === 'number' && Number.isFinite(value) ? value.toFixed(digits) : fallback;
+
+/**
+ * Converts a wei amount to an ETH `number` without the precision loss of
+ * `Number(wei) / 1e18`, which rounds the integer to a double *before*
+ * dividing and so goes wrong above 2^53 wei (~0.009 ETH). Formatting the
+ * exact decimal string first means only one rounding step, at the end.
+ */
+export const weiToEthNumber = (value: BigNumberish, fallback = 0): number => {
+  try {
+    const eth = Number(formatUnits(BigInt(value), 18));
+    return Number.isFinite(eth) ? eth : fallback;
+  } catch {
+    return fallback;
+  }
+};
 
 /** Pads numeric ID with leading zeros for display (e.g., #000123). */
 export const formatId = (id: number | string): string => {
@@ -125,9 +174,13 @@ export const calculateTimeDiff = (timestamp: number, locale: string = 'en'): str
   return seconds < 0 ? '' : formatSeconds(seconds, locale);
 };
 
-/** Formats ETH for display: 4 decimals when < 10, else 2. */
-export const formatEthValue = (value: number): string => {
-  if (!value) return '0 ETH';
+/**
+ * Formats ETH for display: 4 decimals when < 10, else 2.
+ * Guards on finiteness rather than truthiness so a legitimate negative (a
+ * net-loss ROI figure, say) renders its real value instead of "0 ETH".
+ */
+export const formatEthValue = (value: number | null | undefined): string => {
+  if (value == null || !Number.isFinite(value) || value === 0) return '0 ETH';
   return value < 10 ? `${value.toFixed(4)} ETH` : `${value.toFixed(2)} ETH`;
 };
 
@@ -141,7 +194,7 @@ export const formatTableAmount = (
   value: number | null | undefined,
   locale: string = 'en',
 ): string => {
-  if (value == null || !Number.isFinite(value)) return '—';
+  if (value == null || !Number.isFinite(value)) return UNAVAILABLE_VALUE;
   if (value === 0) return '0';
   const magnitude = Math.abs(value);
   if (magnitude < 0.0001) return value > 0 ? '<0.0001' : '>-0.0001';
@@ -157,9 +210,12 @@ export const formatGroupedNumber = (
   options?: Intl.NumberFormatOptions,
 ): string => new Intl.NumberFormat(toIntlLocale(locale), options).format(value);
 
-/** Formats CST for display: 4 decimals when < 10, else 2. */
-export const formatCSTValue = (value: number): string => {
-  if (!value) return '0 CST';
+/**
+ * Formats CST for display: 4 decimals when < 10, else 2.
+ * Finiteness guard (not truthiness) so negatives survive — see `formatEthValue`.
+ */
+export const formatCSTValue = (value: number | null | undefined): string => {
+  if (value == null || !Number.isFinite(value) || value === 0) return '0 CST';
   return value < 10 ? `${value.toFixed(4)} CST` : `${value.toFixed(2)} CST`;
 };
 

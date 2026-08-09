@@ -7,6 +7,7 @@ import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 
 const Sheet = SheetPrimitive.Root;
 
@@ -68,7 +69,12 @@ const SheetContent = React.forwardRef<
     <SheetOverlay />
     <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
       {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+      <SheetPrimitive.Close
+        className={cn(
+          'absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary',
+          TOUCH_TARGET_ICON_CLASS,
+        )}
+      >
         <X className="h-4 w-4" />
         <SheetCloseLabel />
       </SheetPrimitive.Close>

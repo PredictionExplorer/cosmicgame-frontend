@@ -15,6 +15,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { formatFixed } from '@/utils/format';
 
 export interface CSTAnchorDistributionByDeposit {
   EvtLogId: number;
@@ -68,20 +69,20 @@ const CSTAnchorDistributionsByDepositRow = ({ row }: { row: CSTAnchorDistributio
         label={t('tables.distributionsByDeposit.columns.totalDepositAmount')}
         align="center"
       >
-        {row.DepositAmountEth.toFixed(4)}
+        {formatFixed(row.DepositAmountEth, 4)}
       </TablePrimaryCell>
       <TablePrimaryCell
         label={t('tables.distributionsByDeposit.columns.totalRetrievedAmount')}
         align="center"
         priority="secondary"
       >
-        {row.ClaimedAmountEth.toFixed(4)}
+        {formatFixed(row.ClaimedAmountEth, 4)}
       </TablePrimaryCell>
       <TablePrimaryCell
         label={t('tables.distributionsByDeposit.columns.yourRetrievableAmount')}
         align="center"
       >
-        {row.YourClaimableAmountEth.toFixed(4)}
+        {formatFixed(row.YourClaimableAmountEth, 4)}
       </TablePrimaryCell>
       <TablePrimaryCell
         label={t('tables.distributionsByDeposit.columns.fullyRetrieved')}

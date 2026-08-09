@@ -1343,6 +1343,66 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
   });
 
+  describe('when the dashboard read fails', () => {
+    it('shows an error state instead of rendering an idle cycle', () => {
+      mockUseDashboardInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch: jest.fn(),
+      });
+
+      render(<HomePage />);
+
+      expect(screen.getByText('home.error.title')).toBeInTheDocument();
+      expect(screen.getByText('home.error.message')).toBeInTheDocument();
+      expect(screen.queryByTestId('chrono-core-timer')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
+    });
+
+    it('refetches the dashboard when the retry action is used', async () => {
+      const user = userEvent.setup();
+      const refetch = jest.fn();
+      mockUseDashboardInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch,
+      });
+
+      render(<HomePage />);
+      await user.click(screen.getByRole('button', { name: /Try again/ }));
+
+      expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the last good cycle data on screen when a refetch fails', () => {
+      mockUseDashboardInfo.mockReturnValue({
+        data: makeDashboardData({ CurRoundNum: 7 }),
+        isLoading: false,
+        isError: true,
+        refetch: jest.fn(),
+      });
+
+      render(<HomePage />);
+
+      expect(screen.queryByText('home.error.title')).not.toBeInTheDocument();
+      expect(screen.getByTestId('chrono-core-timer')).toBeInTheDocument();
+    });
+
+    it('has no accessibility violations in the error state', async () => {
+      mockUseDashboardInfo.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+        refetch: jest.fn(),
+      });
+
+      const { container } = render(<HomePage />);
+      await checkA11y(container);
+    });
+  });
+
   it('has no accessibility violations', async () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),

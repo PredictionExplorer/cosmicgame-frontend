@@ -233,7 +233,7 @@ export function HomeObservatoryHero({
             <m.div variants={staggerVariants} className="flex min-w-0 flex-col justify-center">
               <m.div
                 variants={itemVariants}
-                className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+                className="mb-5 inline-flex w-fit max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.22em]"
               >
                 <span className="relative flex h-2 w-2">
                   <span

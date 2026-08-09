@@ -11,6 +11,7 @@ import { useRouter, usePathname } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
+import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { Surface } from '@/components/ui/surface';
@@ -32,7 +33,7 @@ function isNumeric(value: string) {
 
 const GalleryPage = () => {
   const t = useTranslations('gallery');
-  const { data: nfts, isLoading } = useCSTList();
+  const { data: nfts, isLoading, isError, refetch } = useCSTList();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -193,23 +194,44 @@ const GalleryPage = () => {
     [updateUrl],
   );
 
+  const pageHeader = (
+    <PageHeader
+      align="left"
+      eyebrow={
+        <SectionEyebrow tone="aurora" pulse>
+          {stats.total > 0
+            ? t('page.eyebrowImprinted', { count: stats.total })
+            : t('page.eyebrowLive')}
+        </SectionEyebrow>
+      }
+      title={t('page.title')}
+      titleLevel={2}
+      gradientTitle="signature"
+      subtitle={t('page.subtitle')}
+      actions={<NftMarketplaceButton variant="secondary" />}
+    />
+  );
+
+  // An empty grid would read as "no Signatures exist yet", which is a very
+  // different statement from "the archive could not be read".
+  if (isError) {
+    return (
+      <PageShell variant="data" backdrop="signature">
+        {pageHeader}
+        <ErrorState
+          title={t('error.title')}
+          message={t('error.message')}
+          headingLevel={3}
+          onRetry={() => void refetch()}
+          surface
+        />
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        align="left"
-        eyebrow={
-          <SectionEyebrow tone="aurora" pulse>
-            {stats.total > 0
-              ? t('page.eyebrowImprinted', { count: stats.total })
-              : t('page.eyebrowLive')}
-          </SectionEyebrow>
-        }
-        title={t('page.title')}
-        titleLevel={2}
-        gradientTitle="signature"
-        subtitle={t('page.subtitle')}
-        actions={<NftMarketplaceButton variant="secondary" />}
-      />
+      {pageHeader}
 
       <Surface
         variant="nebula"

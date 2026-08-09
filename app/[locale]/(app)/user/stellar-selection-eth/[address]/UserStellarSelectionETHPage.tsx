@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
+import { formatFixed } from '@/utils/format';
 
 interface StellarSelectionETHDeposit {
   EvtLogId: number;
@@ -68,7 +69,7 @@ const StellarSelectionAllocationsRow = ({ deposit }: { deposit: StellarSelection
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell label={t('columns.amountEth')} align="right">
-        {Amount.toFixed(4)}
+        {formatFixed(Amount, 4)}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -220,7 +221,7 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
             <div className="flex items-center gap-4">
               <span className="mr-4">
                 {tStatistics('stellarSelectionEth.retrievable', {
-                  amount: status.ETHRaffleToClaim.toFixed(6),
+                  amount: formatFixed(status.ETHRaffleToClaim, 6),
                 })}
               </span>
               <Button onClick={handleAllETHClaim} disabled={isClaiming}>

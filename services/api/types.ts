@@ -445,6 +445,12 @@ export interface AnchorAction extends TxInfo {
 
 export interface AnchoredTokenInfo {
   StakeActionId: number;
+  /**
+   * Present only on RandomWalk rows. The CST endpoints nest the token under
+   * `TokenInfo` instead, and the CST tables read `TokenInfo.TokenId` — see
+   * `AnchoredTokenCSTSchema` / `AnchoredTokenRWalkSchema` in schemas.ts, which
+   * model the two shapes separately.
+   */
   StakedTokenId: number;
   TokenInfo?: {
     TokenId: number;

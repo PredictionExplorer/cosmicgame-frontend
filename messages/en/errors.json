@@ -13,6 +13,24 @@
     "description": "An unexpected error occurred.",
     "retry": "Try Again"
   },
+  "route": {
+    "message": "Something went wrong while rendering this page. Try again, or come back in a moment.",
+    "titles": {
+      "app": "This page failed to load",
+      "allocation": "Allocation details failed to load",
+      "anchoring": "Anchor distributions failed to load",
+      "gallery": "The gallery failed to load",
+      "myAllocations": "Your allocations failed to load",
+      "myAnchors": "Your anchors failed to load",
+      "myTokens": "Your tokens failed to load",
+      "myStatistics": "Your statistics failed to load"
+    }
+  },
+  "global": {
+    "title": "The app hit an unexpected error",
+    "message": "Something went wrong outside the page content. Reloading usually clears it.",
+    "retry": "Reload"
+  },
   "environment": {
     "title": "Can't run because environment variables aren't set.",
     "description": "We can't assume any defaults for networks or API URLs — that is prone to bugs.",

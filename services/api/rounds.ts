@@ -1,22 +1,31 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
+import { weiToEthNumber } from '@/utils/format';
+
 import {
-  axios,
+  apiGet,
   getAPIUrl,
   apiCall,
+  apiCallEmptyOn404,
+  apiCallRequired,
   apiPost,
+  axios,
   flattenTxArray,
   flattenGesture,
   flattenGestureArray,
   flattenRoundInfo,
   pagedPath,
-  type ApiPageWindow,
+  type ApiListRequestOptions,
+  type ApiRequestOptions,
 } from './client';
 import {
   DashboardInfoSchema,
+  GestureInfoSchema,
   RoundInfoSchema,
   SpecialRecipientsSchema,
-  safeValidate,
+  WinningHistoryEntrySchema,
+  validate,
+  validateList,
 } from './schemas';
 import type {
   DashboardInfo,
@@ -54,94 +63,112 @@ function tokenRewardWeiStringToGestureCostEth(tokenReward: unknown): number {
   if (typeof tokenReward !== 'string' || tokenReward === '' || tokenReward === 'error') {
     return 0;
   }
+  // Keep the value in wei through `formatUnits`: `Number(wei) / 1e18` rounds
+  // the integer to a double first and loses precision past 2^53.
   try {
-    const wei = BigInt(tokenReward);
-    return Number(wei) / 1e18;
+    return weiToEthNumber(BigInt(tokenReward));
   } catch {
     const n = Number(tokenReward);
     return Number.isFinite(n) ? n / 1e18 : 0;
   }
 }
 
-/** Fetches the global dashboard statistics (current round, allocation pool, bid count, etc.). */
-export function get_dashboard_info(): Promise<DashboardInfo | null> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/dashboard'));
+/**
+ * Fetches the global dashboard statistics (current round, allocation pool, bid count, etc.).
+ * Required read, strictly validated: every live surface derives cycle state from it, so a
+ * missing or malformed payload must reach the UI as an error, not as an idle cycle.
+ */
+export function get_dashboard_info(opts?: ApiRequestOptions): Promise<DashboardInfo | null> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl('statistics/dashboard'), opts);
     const normalized = normalizeDashboardWire(data as Record<string, unknown>);
-    return safeValidate(DashboardInfoSchema, normalized, 'DashboardInfo') as DashboardInfo;
-  }, null);
+    return validate(DashboardInfoSchema, normalized, 'DashboardInfo') as DashboardInfo;
+  });
 }
 
 /** Fetches rounds with flattened allocation, charity, and anchoring fields (optionally paged). */
-export function get_round_list(page?: ApiPageWindow): Promise<RoundInfo[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`rounds/list/${pagedPath(page)}`));
+export function get_round_list(opts?: ApiListRequestOptions): Promise<RoundInfo[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl(`rounds/list/${pagedPath(opts)}`), opts);
     const rounds = (data.Rounds || [])
       .map(flattenRoundInfo)
       .filter((r: RoundInfo | null): r is RoundInfo => r !== null);
-    // Spot-check the first round against the schema (warn-only) — cheap
-    // signal that the backend shape is still the one we think it is.
-    if (rounds.length > 0) {
-      safeValidate(RoundInfoSchema, rounds[0], 'RoundInfo[list]');
-    }
+    // Checked for its throw, not its return value: the flattened rounds are
+    // already the shape the UI consumes.
+    validateList(RoundInfoSchema, rounds, 'RoundInfo[list]');
     return rounds;
-  }, []);
+  });
 }
 
 /** Fetches detailed info for a single round, clamping negative values to 0. */
-export function get_round_info(roundNum: number): Promise<RoundInfo | null> {
+export function get_round_info(
+  roundNum: number,
+  opts?: ApiRequestOptions,
+): Promise<RoundInfo | null> {
   const id = roundNum < 0 ? 0 : roundNum;
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`rounds/info/${id}`));
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl(`rounds/info/${id}`), opts);
     const round = flattenRoundInfo(data.RoundInfo);
-    if (round) safeValidate(RoundInfoSchema, round, 'RoundInfo[detail]');
+    if (round) validate(RoundInfoSchema, round, 'RoundInfo[detail]');
     return round;
-  }, null);
+  });
 }
 
 /** Fetches the allocation-claim timestamp for the current round. */
-export function get_prize_time(): Promise<number> {
+export function get_prize_time(opts?: ApiRequestOptions): Promise<number> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('rounds/current/time'));
+    const { data } = await apiGet(getAPIUrl('rounds/current/time'), opts);
     return data.CurRoundPrizeTime;
   }, 0);
 }
 
 /** Fetches the global allocation-claim history with flattened transaction fields (optionally paged). */
-export function get_claim_history(page?: ApiPageWindow): Promise<TxInfo[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`prizes/history/global/${pagedPath(page)}`));
+export function get_claim_history(opts?: ApiListRequestOptions): Promise<TxInfo[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl(`prizes/history/global/${pagedPath(opts)}`), opts);
     return flattenTxArray<TxInfo>(data.GlobalPrizeHistory);
-  }, []);
+  });
 }
 
 /** Fetches allocation-claim history for a specific wallet address (optionally paged). */
 export function get_claim_history_by_user(
   address: string,
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<WinningHistoryEntry[] | null> {
-  return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`prizes/history/by_user/${address}/${pagedPath(page)}`),
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(
+      getAPIUrl(`prizes/history/by_user/${address}/${pagedPath(opts)}`),
+      opts,
     );
     // Backend uses `USerPrizeHistory` (typo); accept the corrected key as well.
-    return flattenTxArray<WinningHistoryEntry>(data.UserPrizeHistory ?? data.USerPrizeHistory);
-  }, null);
+    const history = flattenTxArray<WinningHistoryEntry>(
+      data.UserPrizeHistory ?? data.USerPrizeHistory,
+    );
+    validateList(WinningHistoryEntrySchema, history, 'WinningHistory[byUser]');
+    return history;
+  });
 }
 
 /** Fetches gestures across all rounds with flattened transaction fields (optionally paged). */
-export function get_bid_list(page?: ApiPageWindow): Promise<GestureInfo[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`bid/list/all/${pagedPath(page)}`));
-    return flattenGestureArray<GestureInfo>(data.Gestures ?? data.Bids);
-  }, []);
+export function get_bid_list(opts?: ApiListRequestOptions): Promise<GestureInfo[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl(`bid/list/all/${pagedPath(opts)}`), opts);
+    const gestures = flattenGestureArray<GestureInfo>(data.Gestures ?? data.Bids);
+    validateList(GestureInfoSchema, gestures, 'GestureInfo[list]');
+    return gestures;
+  });
 }
 
-/** Fetches a single bid by its event-log ID. */
-export function get_bid_info(evtLogID: number): Promise<GestureInfo | null> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`bid/info/${evtLogID}`));
-    return flattenGesture<GestureInfo>(data.GestureInfo ?? data.BidInfo);
+/** Fetches a single bid by its event-log ID; a 404 means no such gesture. */
+export function get_bid_info(
+  evtLogID: number,
+  opts?: ApiRequestOptions,
+): Promise<GestureInfo | null> {
+  return apiCallEmptyOn404(async () => {
+    const { data } = await apiGet(getAPIUrl(`bid/info/${evtLogID}`), opts);
+    const gesture = flattenGesture<GestureInfo>(data.GestureInfo ?? data.BidInfo);
+    if (gesture) validate(GestureInfoSchema, gesture, 'GestureInfo[detail]');
+    return gesture;
   }, null);
 }
 
@@ -149,49 +176,60 @@ export function get_bid_info(evtLogID: number): Promise<GestureInfo | null> {
 export function get_bid_list_by_round(
   round: number,
   sortDir: string,
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<GestureInfo[]> {
-  return apiCall(async () => {
+  return apiCallRequired(async () => {
     const dir = sortDir === 'asc' ? 0 : 1;
-    const { data } = await axios.get(
-      getAPIUrl(`bid/list/by_round/${round}/${dir}/${pagedPath(page)}`),
+    const { data } = await apiGet(
+      getAPIUrl(`bid/list/by_round/${round}/${dir}/${pagedPath(opts)}`),
+      opts,
     );
-    return flattenGestureArray<GestureInfo>(data.BidsByRound);
-  }, []);
+    const gestures = flattenGestureArray<GestureInfo>(data.BidsByRound);
+    validateList(GestureInfoSchema, gestures, 'GestureInfo[byRound]');
+    return gestures;
+  });
 }
 
 /** Fetches the current round's special-allocation recipients (endurance champion, last CST bidder, chrono warrior). */
-export function get_current_special_winners(): Promise<SpecialRecipients | null> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('bid/current_special_winners'));
-    return safeValidate(
+export function get_current_special_winners(
+  opts?: ApiRequestOptions,
+): Promise<SpecialRecipients | null> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl('bid/current_special_winners'), opts);
+    return validate(
       SpecialRecipientsSchema,
       data,
       'SpecialRecipients[current]',
     ) as SpecialRecipients;
-  }, null);
+  });
 }
 
 /** Fetches stellarSelection ETH deposits across all rounds (optionally paged). */
-export function get_prize_deposits_list(page?: ApiPageWindow): Promise<TxInfo[]> {
+export function get_prize_deposits_list(opts?: ApiListRequestOptions): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`raffle/deposits/list/${pagedPath(page)}`));
+    const { data } = await apiGet(getAPIUrl(`raffle/deposits/list/${pagedPath(opts)}`), opts);
     return flattenTxArray<TxInfo>(data.RaffleDeposits);
   }, []);
 }
 
 /** Fetches stellarSelection ETH deposits for a specific round. */
-export function get_prize_deposits_by_round(round: number): Promise<TxInfo[]> {
+export function get_prize_deposits_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`raffle/deposits/by_round/${round}`));
+    const { data } = await apiGet(getAPIUrl(`raffle/deposits/by_round/${round}`), opts);
     return flattenTxArray<TxInfo>(data.RaffleDeposits);
   }, []);
 }
 
-/** Fetches the list of administratively banned gestures (Cosmic Game / Go API). */
-export function get_banned_bids(): Promise<BannedGesture[]> {
+/**
+ * Fetches the list of administratively banned gestures (Cosmic Game / Go API).
+ * Optional read: the route is admin-gated and answers 403 to ordinary clients.
+ */
+export function get_banned_bids(opts?: ApiRequestOptions): Promise<BannedGesture[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('get_banned_bids'));
+    const { data } = await apiGet(getAPIUrl('get_banned_bids'), opts);
     return data as BannedGesture[];
   }, []);
 }
@@ -216,17 +254,17 @@ export function unban_gesture(bid_id: number) {
 }
 
 /** Fetches the current bid price in ETH and related pricing info. */
-export function get_bid_eth_price(): Promise<GestureEthCostInfo | null> {
+export function get_bid_eth_price(opts?: ApiRequestOptions): Promise<GestureEthCostInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`bid/eth_price`));
+    const { data } = await apiGet(getAPIUrl(`bid/eth_price`), opts);
     return data as GestureEthCostInfo;
   }, null);
 }
 
 /** Fetches the number of seconds remaining until the next allocation can be claimed. */
-export function get_time_until_prize(): Promise<number> {
+export function get_time_until_prize(opts?: ApiRequestOptions): Promise<number> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('time/until_prize'));
+    const { data } = await apiGet(getAPIUrl('time/until_prize'), opts);
     return data.TimeUntilPrize;
   }, 0);
 }

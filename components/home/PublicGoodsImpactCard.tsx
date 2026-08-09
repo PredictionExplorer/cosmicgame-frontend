@@ -10,6 +10,7 @@ import { Link } from '@/i18n/navigation';
 import type { DashboardInfo } from '@/services/api';
 import { StatCard } from '@/components/ui/stat-card';
 import { cn } from '@/lib/utils';
+import { formatFixed } from '@/utils/format';
 
 interface PublicGoodsImpactCardProps {
   data: DashboardInfo | null;
@@ -92,12 +93,12 @@ export function PublicGoodsImpactCard({
                 variant === 'rail' ? 'text-5xl' : 'text-5xl sm:text-6xl',
               )}
             >
-              {currentCycleEth.toFixed(4)} ETH
+              {formatFixed(currentCycleEth, 4)} ETH
             </p>
           </div>
           <p className="mt-5 max-w-2xl text-sm leading-relaxed text-white/75">
             {t('publicGoods.body', {
-              percent: percentage.toFixed(percentage % 1 === 0 ? 0 : 2),
+              percent: formatFixed(percentage, percentage % 1 === 0 ? 0 : 2),
             })}
           </p>
           <Link

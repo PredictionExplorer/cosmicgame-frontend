@@ -2,7 +2,7 @@
 
 import 'yet-another-react-lightbox/styles.css';
 
-import { useState, useMemo, useEffect, useCallback, type ChangeEvent } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, type ChangeEvent } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import Lightbox from 'yet-another-react-lightbox';
 import { usePublicClient } from 'wagmi';
@@ -34,6 +34,7 @@ import { SectionDivider } from '@/components/ui/section-divider';
 import NameHistoryTable from '@/components/tables/NameHistoryTable';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { useRequireChain } from '@/hooks/useRequireChain';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import { useNotification } from '@/contexts/NotificationContext';
 import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
@@ -71,6 +72,9 @@ const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
+
+/** Naming writes land before the indexer catches up, so the refetch is deferred. */
+const NAME_REFETCH_DELAY_MS = 3000;
 
 function getAllocationTypeConfig(recordType?: number) {
   switch (recordType) {
@@ -146,7 +150,28 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const { account } = useActiveWeb3React();
   const publicClient = usePublicClient();
   const { setNotification } = useNotification();
+  const { ensureCorrectChain } = useRequireChain();
   const { copy } = useClipboard();
+
+  const nameRefetchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
+
+  useEffect(
+    () => () => {
+      for (const timerId of nameRefetchTimers.current) clearTimeout(timerId);
+      nameRefetchTimers.current.clear();
+    },
+    [],
+  );
+
+  /** Schedules the deferred refetch, cancelling it if the page unmounts first. */
+  const scheduleNameRefetch = useCallback((task: () => void) => {
+    const timers = nameRefetchTimers.current;
+    const timerId = setTimeout(() => {
+      timers.delete(timerId);
+      task();
+    }, NAME_REFETCH_DELAY_MS);
+    timers.add(timerId);
+  }, []);
 
   const isOwner = account != null && account === nft?.CurOwnerAddr;
   const totalImprints = dashboard?.MainStats?.NumCSTokenMints ?? 0;
@@ -186,7 +211,14 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     const { ethereum } = window as Window & {
       ethereum?: { request: (args: { method: string; params: unknown[] }) => Promise<unknown> };
     };
-    if (!ethereum) return;
+    if (!ethereum) {
+      setNotification({
+        text: tToasts('wallet.notReady'),
+        type: 'error',
+        visible: true,
+      });
+      return;
+    }
     try {
       const txCount = await ethereum.request({
         method: 'eth_getTransactionCount',
@@ -199,6 +231,11 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       }
     } catch (err) {
       reportError(err, 'check transfer destination');
+      setNotification({
+        text: tToasts('transfer.nft.recipientCheckFailed'),
+        type: 'error',
+        visible: true,
+      });
     }
   };
 
@@ -221,6 +258,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       });
       return;
     }
+    if (!(await ensureCorrectChain())) return;
     try {
       const hash = await nftContract.write.transferFrom?.([account, address, tokenId]);
       assertTransactionHash(hash);
@@ -253,14 +291,15 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
 
   const handleSetTokenName = async () => {
     if (!nftContract) return;
+    if (!(await ensureCorrectChain())) return;
     try {
       const hash = await nftContract.write.setNftName?.([tokenId, tokenName]);
       assertTransactionHash(hash);
       const receipt = await publicClient?.waitForTransactionReceipt({ hash });
       assertSuccessfulTransactionReceipt(receipt);
-      setTimeout(async () => {
-        await Promise.all([refetchCSTInfo(), refetchNameHistory()]);
-      }, 3000);
+      scheduleNameRefetch(() => {
+        void Promise.all([refetchCSTInfo(), refetchNameHistory()]);
+      });
       setTokenName('');
       setNotification({
         text: tToasts('transfer.nft.nameSet'),
@@ -284,14 +323,15 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
 
   const handleClearName = async () => {
     if (!nftContract) return;
+    if (!(await ensureCorrectChain())) return;
     try {
       const hash = await nftContract.write.setNftName?.([tokenId, '']);
       assertTransactionHash(hash);
       const receipt = await publicClient?.waitForTransactionReceipt({ hash });
       assertSuccessfulTransactionReceipt(receipt);
-      setTimeout(async () => {
-        await Promise.all([refetchCSTInfo(), refetchNameHistory()]);
-      }, 3000);
+      scheduleNameRefetch(() => {
+        void Promise.all([refetchCSTInfo(), refetchNameHistory()]);
+      });
       setTokenName('');
       setNotification({
         text: tToasts('transfer.nft.nameCleared'),
@@ -381,7 +421,11 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
             </div>
 
             {/* Actions bar below image */}
-            <div className="mt-4 flex items-center gap-3">
+            {/* Wraps on phones: share, marketplace and the prev/next pair do
+                not fit one 320px row once each control reaches its 44px touch
+                target, and without wrapping the marketplace label spills out
+                of its own button. */}
+            <div className="mt-4 flex items-center gap-3 max-sm:flex-wrap">
               <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="text-xs">
@@ -430,6 +474,8 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                   onClick={handlePrev}
                   disabled={!canGoPrev}
                   aria-label={t('navigation.previousToken')}
+                  // Icon-only, so `px-3` alone leaves it ~42px wide.
+                  className="max-sm:min-w-11"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
@@ -439,6 +485,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                   onClick={handleNext}
                   disabled={!canGoNext}
                   aria-label={t('navigation.nextToken')}
+                  className="max-sm:min-w-11"
                 >
                   <ArrowRight className="h-4 w-4" />
                 </Button>

@@ -8,6 +8,7 @@ import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Surface } from '@/components/ui/surface';
 import { getCycleState, type CyclePhase } from '@/lib/cycleState';
+import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 
@@ -157,11 +158,20 @@ export function CyclePhaseGuide({
                   {t('phaseGuide.explainer.body')}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-3 text-sm">
-                  <Link className="text-primary underline-offset-4 hover:underline" href="/faq">
+                  <Link
+                    className={cn(
+                      'text-primary underline-offset-4 hover:underline',
+                      TOUCH_TARGET_TEXT_LINK_CLASS,
+                    )}
+                    href="/faq"
+                  >
                     {t('phaseGuide.explainer.faqLink')}
                   </Link>
                   <Link
-                    className="text-primary underline-offset-4 hover:underline"
+                    className={cn(
+                      'text-primary underline-offset-4 hover:underline',
+                      TOUCH_TARGET_TEXT_LINK_CLASS,
+                    )}
                     href="/how-it-works"
                   >
                     {t('phaseGuide.explainer.walkthroughLink')}
@@ -172,7 +182,10 @@ export function CyclePhaseGuide({
                 type="button"
                 aria-label={t('phaseGuide.explainer.dismissAria')}
                 onClick={dismissExplainer}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className={cn(
+                  'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                  TOUCH_TARGET_ICON_CLASS,
+                )}
               >
                 <X className="h-4 w-4" />
               </button>

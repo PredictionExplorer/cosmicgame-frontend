@@ -326,6 +326,76 @@ describe('Contracts', () => {
     });
   });
 
+  it('renders the divisor-derived percentages from contract reads', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseContractNoSigner.mockReturnValue({
+      read: {
+        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
+        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(50n),
+        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
+        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
+        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
+        getBidCstRewardAmount: jest.fn().mockResolvedValue(100000000000000000000n),
+        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
+        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
+        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
+        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
+      },
+    });
+
+    render(<Contracts />);
+
+    await waitFor(() => expect(screen.getByText('2%')).toBeInTheDocument());
+  });
+
+  it('never shows Infinity% when the contract returns a zero divisor', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseContractNoSigner.mockReturnValue({
+      read: {
+        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
+        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(0n),
+        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(0n),
+        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
+        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
+        getBidCstRewardAmount: jest.fn().mockResolvedValue(100000000000000000000n),
+        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
+        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
+        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
+        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
+      },
+    });
+
+    render(<Contracts />);
+
+    await waitFor(() => expect(screen.getByText('0%')).toBeInTheDocument());
+    expect(screen.queryByText('Infinity%')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Infinity/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
+  });
+
+  it('leaves the percentages alone when the divisor read is unusable', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseContractNoSigner.mockReturnValue({
+      read: {
+        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
+        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue('not-a-number'),
+        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue('not-a-number'),
+        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
+        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
+        getBidCstRewardAmount: jest.fn().mockResolvedValue(100000000000000000000n),
+        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
+        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
+        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
+        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
+      },
+    });
+
+    render(<Contracts />);
+
+    await waitFor(() => expect(screen.getByText('0%')).toBeInTheDocument());
+    expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
+  });
+
   it('refreshes the participation CST preview live', async () => {
     const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
     liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;

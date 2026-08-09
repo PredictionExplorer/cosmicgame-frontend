@@ -91,6 +91,10 @@
       "help": "暂无第 {cycle} 个周期的数据。该周期可能尚未收官。",
       "back": "返回分配名录"
     },
+    "error": {
+      "title": "无法加载该周期",
+      "message": "第 {cycle} 个周期的数据加载失败。请重试，或返回名录。"
+    },
     "breadcrumbs": {
       "recipients": "分配名录"
     },

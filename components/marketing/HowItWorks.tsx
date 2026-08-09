@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl';
 
 import { GradientText } from '@/components/styled';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 
 const containerVariants = {
   hidden: {},
@@ -59,7 +61,11 @@ export function HowItWorks() {
             <button
               type="button"
               aria-label={t('howItWorks.infoAria')}
-              className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+              data-touch-target="extended"
+              className={cn(
+                'text-muted-foreground/60 hover:text-muted-foreground transition-colors',
+                TOUCH_TARGET_EXTENDED_CLASS,
+              )}
             >
               <Info className="h-4 w-4" />
             </button>
@@ -99,7 +105,11 @@ export function HowItWorks() {
                   <button
                     type="button"
                     aria-label={t('howItWorks.stepInfoAria', { title: step.title })}
-                    className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                    data-touch-target="extended"
+                    className={cn(
+                      'text-muted-foreground/60 hover:text-muted-foreground transition-colors',
+                      TOUCH_TARGET_EXTENDED_CLASS,
+                    )}
                   >
                     <Info className="h-3.5 w-3.5" />
                   </button>

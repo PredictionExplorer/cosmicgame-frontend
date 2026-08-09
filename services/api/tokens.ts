@@ -1,13 +1,16 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
 import {
+  apiGet,
   axios,
   getAPIUrl,
   apiCall,
+  apiCallRequired,
   flattenTx,
   flattenTxArray,
   pagedPath,
-  type ApiPageWindow,
+  type ApiListRequestOptions,
+  type ApiRequestOptions,
 } from './client';
 import {
   CTBalanceDistributionSchema,
@@ -31,53 +34,69 @@ import type {
   TokenImprintInfo,
 } from './types';
 
-/** Fetches Cosmic Signature NFTs with flattened transaction fields (optionally paged). */
-export function get_cst_list(page?: ApiPageWindow): Promise<CSTTokenInfo[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/list/all/${pagedPath(page)}`));
+/**
+ * Fetches Cosmic Signature NFTs with flattened transaction fields (optionally paged).
+ * Required read: the gallery is built entirely from this list, so a failure has to
+ * surface as an error rather than an empty collection.
+ */
+export function get_cst_list(opts?: ApiListRequestOptions): Promise<CSTTokenInfo[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl(`cst/list/all/${pagedPath(opts)}`), opts);
     return flattenTxArray<CSTTokenInfo>(data.CosmicSignatureTokenList);
-  }, []);
+  });
 }
 
 /** Fetches Cosmic Signature NFTs owned by a specific wallet address (optionally paged). */
 export function get_cst_tokens_by_user(
   address: string,
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/list/by_user/${address}/${pagedPath(page)}`));
+    const { data } = await apiGet(
+      getAPIUrl(`cst/list/by_user/${address}/${pagedPath(opts)}`),
+      opts,
+    );
     return flattenTxArray<CSTTokenInfo>(data.UserTokens);
   }, []);
 }
 
 /** Fetches detailed info for a single Cosmic Signature NFT by its ID. */
-export function get_cst_info(tokenId: number): Promise<CSTTokenInfo | null> {
+export function get_cst_info(
+  tokenId: number,
+  opts?: ApiRequestOptions,
+): Promise<CSTTokenInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/info/${tokenId}`));
+    const { data } = await apiGet(getAPIUrl(`cst/info/${tokenId}`), opts);
     return flattenTx(data.TokenInfo) as CSTTokenInfo | null;
   }, null);
 }
 
 /** Fetches the naming history for a Cosmic Signature NFT. */
-export function get_name_history(token_id: number): Promise<NameHistoryRecord[]> {
+export function get_name_history(
+  token_id: number,
+  opts?: ApiRequestOptions,
+): Promise<NameHistoryRecord[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/names/history/${token_id}`));
+    const { data } = await apiGet(getAPIUrl(`cst/names/history/${token_id}`), opts);
     return flattenTxArray<NameHistoryRecord>(data.TokenNameHistory);
   }, []);
 }
 
 /** Searches Cosmic Signature NFTs by name, returning all matches. */
-export function get_token_by_name(token_name: string): Promise<CSTTokenInfo[]> {
+export function get_token_by_name(
+  token_name: string,
+  opts?: ApiRequestOptions,
+): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/names/search/${token_name}`));
+    const { data } = await apiGet(getAPIUrl(`cst/names/search/${token_name}`), opts);
     return flattenTxArray<CSTTokenInfo>(data.TokenNameSearchResults);
   }, []);
 }
 
 /** Fetches only Cosmic Signature NFTs that have been given a custom name. */
-export function get_named_nfts(): Promise<CSTTokenInfo[]> {
+export function get_named_nfts(opts?: ApiRequestOptions): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('cst/names/named_only'));
+    const { data } = await apiGet(getAPIUrl('cst/names/named_only'), opts);
     return flattenTxArray<CSTTokenInfo>(data.NamedTokens);
   }, []);
 }
@@ -85,20 +104,21 @@ export function get_named_nfts(): Promise<CSTTokenInfo[]> {
 /** Fetches Cosmic Signature NFT transfer history for a wallet address (optionally paged). */
 export function get_cst_transfers(
   address: string,
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<CSTTransferRecord[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`cst/transfers/by_user/${address}/${pagedPath(page)}`),
+    const { data } = await apiGet(
+      getAPIUrl(`cst/transfers/by_user/${address}/${pagedPath(opts)}`),
+      opts,
     );
     return flattenTxArray<CSTTransferRecord>(data.CosmicSignatureTransfers);
   }, []);
 }
 
 /** Fetches the distribution of Cosmic Signature NFT ownership across wallets. */
-export function get_cst_distribution(): Promise<TokenDistribution[]> {
+export function get_cst_distribution(opts?: ApiRequestOptions): Promise<TokenDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('cst/distribution'));
+    const { data } = await apiGet(getAPIUrl('cst/distribution'), opts);
     return safeValidateListSample(
       TokenDistributionSchema,
       data.CosmicSignatureTokenDistribution,
@@ -108,9 +128,11 @@ export function get_cst_distribution(): Promise<TokenDistribution[]> {
 }
 
 /** Fetches the CST (ERC-20) balance distribution across wallets. */
-export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]> {
+export function get_ct_balances_distribution(
+  opts?: ApiRequestOptions,
+): Promise<CTBalanceDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('ct/balances'));
+    const { data } = await apiGet(getAPIUrl('ct/balances'), opts);
     return safeValidateListSample(
       CTBalanceDistributionSchema,
       data.CosmicTokenBalances,
@@ -120,9 +142,9 @@ export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]>
 }
 
 /** Fetches aggregated CST (ERC-20) token statistics including total supply. */
-export function get_ct_statistics(): Promise<CTStatistics | null> {
+export function get_ct_statistics(opts?: ApiRequestOptions): Promise<CTStatistics | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('ct/statistics'));
+    const { data } = await apiGet(getAPIUrl('ct/statistics'), opts);
     if (data.Statistics == null) return null;
     return safeValidate(CTStatisticsSchema, data.Statistics, 'ctStatistics') as CTStatistics;
   }, null);
@@ -132,28 +154,33 @@ export function get_ct_statistics(): Promise<CTStatistics | null> {
 export function get_ct_total_supply_history_by_date(
   fromDate: string,
   toDate: string,
+  opts?: ApiRequestOptions,
 ): Promise<CTTotalSupplyHistoryByDateRecord[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
+    const { data } = await apiGet(
       getAPIUrl(`ct/total_supply_history_by_date/${fromDate}/${toDate}`),
+      opts,
     );
     return (data.TotalSupplyHistory ?? []) as CTTotalSupplyHistoryByDateRecord[];
   }, []);
 }
 
 /** Fetches per-bid CST total supply history (running cumulative supply after each bid). */
-export function get_ct_total_supply_history_by_bid(): Promise<CTTotalSupplyHistoryByBidRecord[]> {
+export function get_ct_total_supply_history_by_bid(
+  opts?: ApiRequestOptions,
+): Promise<CTTotalSupplyHistoryByBidRecord[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('ct/total_supply_history_by_bid'));
+    const { data } = await apiGet(getAPIUrl('ct/total_supply_history_by_bid'), opts);
     return flattenTxArray<CTTotalSupplyHistoryByBidRecord>(data.TotalSupplyHistory);
   }, []);
 }
 
 /** Fetches CST (ERC-20) transfer history for a wallet address (optionally paged). */
-export function get_ct_transfers(address: string, page?: ApiPageWindow): Promise<TxInfo[]> {
+export function get_ct_transfers(address: string, opts?: ApiListRequestOptions): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`ct/transfers/by_user/${address}/${pagedPath(page)}`),
+    const { data } = await apiGet(
+      getAPIUrl(`ct/transfers/by_user/${address}/${pagedPath(opts)}`),
+      opts,
     );
     return flattenTxArray<TxInfo>(data.CosmicTokenTransfers);
   }, []);
@@ -162,18 +189,21 @@ export function get_ct_transfers(address: string, page?: ApiPageWindow): Promise
 /** Fetches the ownership-transfer history for a single Cosmic Signature NFT (optionally paged). */
 export function get_ct_ownership_transfers(
   token_id: number,
-  page?: ApiPageWindow,
+  opts?: ApiListRequestOptions,
 ): Promise<CSTTransferRecord[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/transfers/all/${token_id}/${pagedPath(page)}`));
+    const { data } = await apiGet(
+      getAPIUrl(`cst/transfers/all/${token_id}/${pagedPath(opts)}`),
+      opts,
+    );
     return flattenTxArray<CSTTransferRecord>(data.TokenTransfers);
   }, []);
 }
 
 /** Fetches the current CST token price info (CST bid price). */
-export function get_ct_price(): Promise<CTPriceInfo | null> {
+export function get_ct_price(opts?: ApiRequestOptions): Promise<CTPriceInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('bid/cst_price'));
+    const { data } = await apiGet(getAPIUrl('bid/cst_price'), opts);
     return data as CTPriceInfo;
   }, null);
 }
@@ -183,17 +213,20 @@ export function get_ct_price(): Promise<CTPriceInfo | null> {
  * calls: `GET {NEXT_PUBLIC_API_URL}/randomwalk/tokens/info/:id` → the Go server serves this at
  * `/api/cosmicgame/randomwalk/tokens/info/:id` (and also `/api/randomwalk/tokens/info/:id`).
  */
-export function get_info(token_id: number | string): Promise<TokenImprintInfo | null> {
+export function get_info(
+  token_id: number | string,
+  opts?: ApiRequestOptions,
+): Promise<TokenImprintInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`randomwalk/tokens/info/${token_id}`));
+    const { data } = await apiGet(getAPIUrl(`randomwalk/tokens/info/${token_id}`), opts);
     return data.TokenInfo as TokenImprintInfo | null;
   }, null);
 }
 
 /** Fetches RandomWalk NFTs that have been used for discounted gestures. */
-export function get_used_rwlk_nfts(): Promise<UsedRWLKNFT[]> {
+export function get_used_rwlk_nfts(opts?: ApiRequestOptions): Promise<UsedRWLKNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('bid/used_randomwalk_nfts'));
+    const { data } = await apiGet(getAPIUrl('bid/used_randomwalk_nfts'), opts);
     return data.UsedRwalkNFTs;
   }, []);
 }

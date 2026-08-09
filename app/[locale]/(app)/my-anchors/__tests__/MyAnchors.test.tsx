@@ -28,6 +28,8 @@ jest.mock('wagmi', () => ({
   useWalletClient: () => ({ data: undefined }),
   useConnectorClient: () => ({ data: undefined }),
   useConfig: () => ({}),
+  useAccount: () => ({ address: '0xUser', isConnected: true, chainId: 421614 }),
+  useSwitchChain: () => ({ switchChainAsync: jest.fn() }),
 }));
 
 jest.mock('@wagmi/core', () => ({

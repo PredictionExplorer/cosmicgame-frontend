@@ -1,16 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import {
-  useConfig,
-  useChainId,
-  usePublicClient,
-  useWalletClient,
-  useConnectorClient,
-  useSwitchChain,
-} from 'wagmi';
+import { useConfig, usePublicClient, useWalletClient, useConnectorClient } from 'wagmi';
 import { getConnectorClient, writeContract } from '@wagmi/core';
-import { formatEther, isAddress, maxUint256, parseEther, parseUnits, type Client } from 'viem';
-import { getChainId } from 'viem/actions';
+import { formatEther, isAddress, maxUint256, parseEther, parseUnits } from 'viem';
 
 import { randomWalkNftAbi as NFT_ABI, cosmicTokenAbi as ERC20_ABI } from '@/contracts/abis';
 import { cosmicGameAbi } from '@/contracts/abis';
@@ -36,6 +28,7 @@ import {
   withGestureArgsV1ThenV2,
 } from '@/utils/cosmicGameContractCompat';
 import { useNotify } from '@/hooks/useNotify';
+import { useRequireChain } from '@/hooks/useRequireChain';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@/utils/cstGesture';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
@@ -77,8 +70,6 @@ export function useGestureForm() {
   const locale = useLocale();
   const contractAddrs = useContractAddresses();
   const config = useConfig();
-  const chainId = useChainId();
-  const { switchChainAsync } = useSwitchChain();
   const { account } = useActiveWeb3React();
   const publicClient = usePublicClient({ chainId: activeChain.id });
   const { data: connectorClient } = useConnectorClient({ chainId: activeChain.id });
@@ -87,6 +78,9 @@ export function useGestureForm() {
   const cosmicGameContract = useCosmicGameContract();
   const nftRWLKContract = useRWLKNFTContract();
   const { notify, notifyErrorFromEthers } = useNotify();
+  const { ensureCorrectChain } = useRequireChain({
+    switchFailedMessage: t('network.switchForGesture'),
+  });
   const uxScenario = useUxScenarioSnapshot();
 
   const { data: ctPriceData } = useCTPrice();
@@ -569,53 +563,6 @@ export function useGestureForm() {
     );
 
   /**
-   * Wagmi's `useChainId()` can disagree with MetaMask (e.g. hooks say Hardhat while the wallet
-   * stays on Arbitrum Sepolia). Use the wallet client's chain before sending to avoid viem
-   * `ChainMismatchError` at `writeContract` time.
-   */
-  const switchToActiveChainIfNeeded = useCallback(async (): Promise<boolean> => {
-    let signer = connectorClient ?? walletClient;
-    if (!signer) {
-      try {
-        // Do NOT pin `chainId` here: wagmi would require the connector to ALREADY be on
-        // `activeChain.id` and throws `ConnectorChainMismatchError` otherwise (MetaMask
-        // frequently disagrees with wagmi's chain state). We need the client on the
-        // wallet's *current* chain precisely so we can detect the mismatch and switch below.
-        signer = ((await getConnectorClient(config)) as unknown as typeof signer) ?? undefined;
-      } catch {
-        signer = undefined;
-      }
-    }
-    if (!signer) {
-      notify('error', t('wallet.notReady'));
-      return false;
-    }
-
-    let walletChainId: number;
-    try {
-      walletChainId = await getChainId(signer as Client);
-    } catch {
-      walletChainId = chainId ?? activeChain.id;
-    }
-
-    if (walletChainId === activeChain.id) {
-      return true;
-    }
-
-    try {
-      await switchChainAsync({ chainId: activeChain.id });
-      return true;
-    } catch (err) {
-      if (isUserRejection(err)) {
-        notify('info', t('walletTransactionCancelled'));
-      } else {
-        notify('error', t('network.switchForGesture'));
-      }
-      return false;
-    }
-  }, [chainId, config, connectorClient, notify, switchChainAsync, t, walletClient]);
-
-  /**
    * Submit an ETH bid (with optional NFT/token donation).
    * Returns `true` on success so the caller can trigger a post-tx refresh.
    */
@@ -626,7 +573,7 @@ export function useGestureForm() {
         notify('error', t('wallet.connect'));
         return false;
       }
-      if (!(await switchToActiveChainIfNeeded())) {
+      if (!(await ensureCorrectChain())) {
         return false;
       }
       if (!cosmicGameContract) {
@@ -742,12 +689,12 @@ export function useGestureForm() {
         notify('error', t('wallet.connect'));
         return false;
       }
-      if (!(await switchToActiveChainIfNeeded())) {
+      if (!(await ensureCorrectChain())) {
         return false;
       }
       let signerClient = client;
       if (!signerClient) {
-        // Unpinned: the chain was already aligned by switchToActiveChainIfNeeded(), and
+        // Unpinned: the chain was already aligned by ensureCorrectChain(), and
         // MetaMask's connector chain can lag right after a switch. Pinning `chainId` here
         // would throw `ConnectorChainMismatchError`. We only need the account address.
         signerClient =
@@ -855,15 +802,23 @@ export function useGestureForm() {
   useEffect(() => {
     if (!nftRWLKContract || !account || !usedRWLKData) return;
     const gesturedRWLKIds = usedRWLKData.map((x) => x.RWalkTokenId);
+    let cancelled = false;
     (nftRWLKContract.read.walletOfOwner?.([account]) as Promise<readonly bigint[]>)
       .then((tokens) => {
+        if (cancelled) return;
         const nftIds = tokens
           .map((t) => Number(t))
           .filter((t: number) => !gesturedRWLKIds.includes(t))
           .reverse();
         setRwlknftIds(nftIds);
       })
-      .catch((e) => reportError(e, 'getRwlkNFTIds'));
+      .catch((e) => {
+        if (cancelled) return;
+        reportError(e, 'getRwlkNFTIds');
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [nftRWLKContract, account, usedRWLKData]);
 
   const updateCstRewardTolerancePercent = useCallback((value: number) => {

@@ -9,8 +9,17 @@ import {
   type GestureTimingPoint,
 } from '@/utils/biddingAnalytics';
 
-import { axios, getAPIUrl, isAxiosError } from './client';
+import { apiGet, getAPIUrl, isAxiosError, type ApiRequestOptions } from './client';
 import { get_bid_list } from './rounds';
+import {
+  BidFrequencyBucketSchema,
+  BidTimeBoundsSchema,
+  BidTypeRatioBucketSchema,
+  BiddingActivityResponseSchema,
+  TopBidderActivePeriodsResponseSchema,
+  safeValidate,
+  safeValidateListSample,
+} from './schemas';
 import type {
   BidFrequencyBucket,
   BidTypeRatioBucket,
@@ -25,14 +34,23 @@ let cachedBiddersPromise: ReturnType<typeof get_unique_bidders> | null = null;
 
 function loadGestures() {
   if (!cachedGesturesPromise) {
-    cachedGesturesPromise = get_bid_list();
+    // Drop a rejected promise from the cache: the gesture list is a required
+    // read now, and caching the rejection would keep every analytics chart
+    // broken for the rest of the session.
+    cachedGesturesPromise = get_bid_list().catch((err: unknown) => {
+      cachedGesturesPromise = null;
+      throw err;
+    });
   }
   return cachedGesturesPromise;
 }
 
 function loadBidders() {
   if (!cachedBiddersPromise) {
-    cachedBiddersPromise = get_unique_bidders();
+    cachedBiddersPromise = get_unique_bidders().catch((err: unknown) => {
+      cachedBiddersPromise = null;
+      throw err;
+    });
   }
   return cachedBiddersPromise;
 }
@@ -53,20 +71,26 @@ export async function get_bidding_activity(
   initTs: number,
   finTs: number,
   intervalSecs: number,
+  opts?: ApiRequestOptions,
 ): Promise<BiddingActivityResponse> {
   try {
-    const { data } = await axios.get(
+    const { data } = await apiGet(
       getAPIUrl(`statistics/bidding/activity/${initTs}/${finTs}/${intervalSecs}`),
+      opts,
     );
-    return {
-      InitTs: data.InitTs ?? initTs,
-      FinTs: data.FinTs ?? finTs,
-      Interval: data.Interval ?? intervalSecs,
-      FrequencyHistory: data.FrequencyHistory ?? [],
-      Spikes: data.Spikes ?? [],
-      RecentSpikeIndex: data.RecentSpikeIndex ?? -1,
-      RecentWindowSecs: data.RecentWindowSecs ?? 0,
-    };
+    return safeValidate(
+      BiddingActivityResponseSchema,
+      {
+        InitTs: data.InitTs ?? initTs,
+        FinTs: data.FinTs ?? finTs,
+        Interval: data.Interval ?? intervalSecs,
+        FrequencyHistory: data.FrequencyHistory ?? [],
+        Spikes: data.Spikes ?? [],
+        RecentSpikeIndex: data.RecentSpikeIndex ?? -1,
+        RecentWindowSecs: data.RecentWindowSecs ?? 0,
+      },
+      'biddingActivity',
+    ) as BiddingActivityResponse;
   } catch (err) {
     if (!isMissingEndpoint(err)) throw err;
     const gestures = filterForAnalytics(await loadGestures());
@@ -79,12 +103,18 @@ export async function get_bid_frequency(
   initTs: number,
   finTs: number,
   intervalSecs: number,
+  opts?: ApiRequestOptions,
 ): Promise<BidFrequencyBucket[]> {
   try {
-    const { data } = await axios.get(
+    const { data } = await apiGet(
       getAPIUrl(`statistics/bidding/frequency/${initTs}/${finTs}/${intervalSecs}`),
+      opts,
     );
-    return data.FrequencyHistory ?? [];
+    return safeValidateListSample(
+      BidFrequencyBucketSchema,
+      data.FrequencyHistory ?? [],
+      'bidFrequency',
+    ) as BidFrequencyBucket[];
   } catch (err) {
     if (!isMissingEndpoint(err)) throw err;
     const gestures = filterForAnalytics(await loadGestures());
@@ -93,13 +123,14 @@ export async function get_bid_frequency(
 }
 
 /** Fetches earliest and latest bid timestamps in the indexed history. */
-export async function get_bid_time_bounds(): Promise<BidTimeBounds> {
+export async function get_bid_time_bounds(opts?: ApiRequestOptions): Promise<BidTimeBounds> {
   try {
-    const { data } = await axios.get(getAPIUrl('statistics/bidding/time_bounds'));
-    return {
-      MinTs: data.MinTs ?? 0,
-      MaxTs: data.MaxTs ?? 0,
-    };
+    const { data } = await apiGet(getAPIUrl('statistics/bidding/time_bounds'), opts);
+    return safeValidate(
+      BidTimeBoundsSchema,
+      { MinTs: data.MinTs ?? 0, MaxTs: data.MaxTs ?? 0 },
+      'bidTimeBounds',
+    ) as BidTimeBounds;
   } catch (err) {
     if (!isMissingEndpoint(err)) throw err;
     const gestures = await loadGestures();
@@ -111,16 +142,37 @@ export async function get_bid_time_bounds(): Promise<BidTimeBounds> {
  * Fetches the per-interval bid-type composition (ETH / RandomWalk / CST) over a
  * time range. Each bucket carries raw counts plus windowed percentages summing
  * to ~100%. Windows with no bids report zeros (a dip to baseline, not a gap).
+ *
+ * There is no client-side reconstruction for this series, so a server without
+ * the route yields an empty series; every other failure propagates.
  */
 export async function get_bid_type_ratio(
   fromTs: number,
   toTs: number,
   intervalSecs: number,
+  opts?: ApiRequestOptions,
 ): Promise<BidTypeRatioBucket[]> {
-  const { data } = await axios.get(getAPIUrl('bid/bid_type_ratio'), {
-    params: { from_ts: fromTs, to_ts: toTs, interval_secs: intervalSecs },
-  });
-  return data.RatioHistory ?? [];
+  try {
+    const { data } = await apiGet(getAPIUrl('bid/bid_type_ratio'), opts, {
+      params: { from_ts: fromTs, to_ts: toTs, interval_secs: intervalSecs },
+    });
+    return safeValidateListSample(
+      BidTypeRatioBucketSchema,
+      data.RatioHistory ?? [],
+      'bidTypeRatio',
+    ) as BidTypeRatioBucket[];
+  } catch (err) {
+    if (!isMissingEndpoint(err)) throw err;
+    return [];
+  }
+}
+
+/** Grouping options for {@link get_top_bidder_active_periods}. */
+export interface TopBidderActivePeriodsOptions extends ApiRequestOptions {
+  /** Idle gap (hours) that ends an active period. */
+  gapHours?: number;
+  /** Minimum gestures for a period to count. */
+  minBids?: number;
 }
 
 /** Fetches active bidding periods for the top N bidders. */
@@ -128,23 +180,29 @@ export async function get_top_bidder_active_periods(
   topN: number,
   initTs: number,
   finTs: number,
-  gapHours = 6,
-  minBids = 2,
+  opts?: TopBidderActivePeriodsOptions,
 ): Promise<TopBidderActivePeriodsResponse> {
+  const gapHours = opts?.gapHours ?? 6;
+  const minBids = opts?.minBids ?? 2;
   try {
-    const { data } = await axios.get(
+    const { data } = await apiGet(
       getAPIUrl(`statistics/bidding/top_active_periods/${topN}/${initTs}/${finTs}`),
+      opts,
       { params: { gap_hours: gapHours, min_bids: minBids } },
     );
-    return {
-      InitTs: data.InitTs ?? initTs,
-      FinTs: data.FinTs ?? finTs,
-      TopN: data.TopN ?? topN,
-      GapHours: data.GapHours ?? gapHours,
-      MinBids: data.MinBids ?? minBids,
-      TopBidders: data.TopBidders ?? [],
-      ActivePeriods: data.ActivePeriods ?? [],
-    };
+    return safeValidate(
+      TopBidderActivePeriodsResponseSchema,
+      {
+        InitTs: data.InitTs ?? initTs,
+        FinTs: data.FinTs ?? finTs,
+        TopN: data.TopN ?? topN,
+        GapHours: data.GapHours ?? gapHours,
+        MinBids: data.MinBids ?? minBids,
+        TopBidders: data.TopBidders ?? [],
+        ActivePeriods: data.ActivePeriods ?? [],
+      },
+      'topBidderActivePeriods',
+    ) as TopBidderActivePeriodsResponse;
   } catch (err) {
     if (!isMissingEndpoint(err)) throw err;
     const [gestures, bidders] = await Promise.all([loadGestures(), loadBidders()]);

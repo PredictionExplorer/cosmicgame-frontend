@@ -109,6 +109,7 @@
       "selectOne": "请至少选择一枚可转移的 NFT。",
       "confirmed": "{count} 笔 NFT 转移已确认。",
       "detailTransferConfirmed": "NFT 转移已确认。",
+      "recipientCheckFailed": "未能校验接收地址。请检查钱包与网络连接后重试。",
       "failed": "未能发送所选 NFT。请检查钱包与网络连接后重试。",
       "failedToken": "未能转移 NFT #{tokenId}。请检查钱包与网络连接后重试。",
       "nameSet": "代币名称已成功更改。",

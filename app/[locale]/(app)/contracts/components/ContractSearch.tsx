@@ -4,6 +4,7 @@ import { Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 
 interface ContractSearchProps {
   value: string;
@@ -22,13 +23,19 @@ export function ContractSearch({ value, onChange, className }: ContractSearchPro
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t('search.placeholder')}
-        className="flex h-10 w-full rounded-lg border border-white/[0.06] bg-white/[0.03] pl-9 pr-9 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/30 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-colors"
+        className={cn(
+          'flex h-10 w-full rounded-lg border border-white/[0.06] bg-white/[0.03] pl-9 pr-9 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/30 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-colors',
+          TOUCH_TARGET_HEIGHT_CLASS,
+        )}
         aria-label={t('search.ariaLabel')}
       />
       {value && (
         <button
           onClick={() => onChange('')}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+          className={cn(
+            'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-muted-foreground transition-colors',
+            TOUCH_TARGET_ICON_CLASS,
+          )}
           aria-label={t('search.clearAria')}
         >
           <X className="h-4 w-4" />

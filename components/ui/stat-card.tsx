@@ -4,6 +4,7 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatFixed } from '@/utils/format';
 
 type Accent = 'aurora' | 'nebula' | 'solar' | 'impact' | 'neutral';
 
@@ -138,7 +139,7 @@ function StatTrend({ delta, label, invertSentiment = false }: StatCardTrend) {
   const isFlat = delta === 0;
   const isGood = isFlat ? null : invertSentiment ? !isUp : isUp;
   const Arrow = isUp ? ArrowUpRight : ArrowDownRight;
-  const pct = `${isUp ? '+' : ''}${delta.toFixed(1)}%`;
+  const pct = `${isUp ? '+' : ''}${formatFixed(delta, 1)}%`;
   return (
     <div className="mt-2.5 flex items-center gap-2 type-body-sm">
       <span

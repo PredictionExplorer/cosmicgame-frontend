@@ -32,6 +32,7 @@ import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
 import { useSystemMode } from '@/contexts/SystemModeContext';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { HEADER_POLL_INTERVAL_MS } from '@/config/constants';
+import { formatFixed } from '@/utils/format';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
@@ -479,11 +480,11 @@ const Header: FC = () => {
                       <>
                         <div className="flex justify-between text-xs">
                           <span className="text-muted-foreground">{walletT('balances.eth')}</span>
-                          <span className="font-medium">{balance.ETH.toFixed(4)}</span>
+                          <span className="font-medium">{formatFixed(balance.ETH, 4)}</span>
                         </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-muted-foreground">{walletT('balances.cst')}</span>
-                          <span className="font-medium">{balance.CosmicToken.toFixed(2)}</span>
+                          <span className="font-medium">{formatFixed(balance.CosmicToken, 2)}</span>
                         </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-muted-foreground">

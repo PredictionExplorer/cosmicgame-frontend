@@ -1,6 +1,6 @@
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 
-import { render, screen, fireEvent, checkA11y, waitFor } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y, waitFor, act } from '@/test-utils';
 
 import NFTTrait from '../NFTTrait';
 
@@ -66,6 +66,18 @@ jest.mock('../../../hooks/web3', () => ({
 const mockWaitForTransactionReceipt = jest.fn();
 jest.mock('wagmi', () => ({
   usePublicClient: () => ({ waitForTransactionReceipt: mockWaitForTransactionReceipt }),
+}));
+
+const mockEnsureCorrectChain = jest.fn<Promise<boolean>, []>();
+jest.mock('../../../hooks/useRequireChain', () => ({
+  useRequireChain: () => ({
+    requiredChainId: 421614,
+    connectedChainId: 421614,
+    isWrongChain: false,
+    isConnected: true,
+    switchToRequiredChain: jest.fn(),
+    ensureCorrectChain: mockEnsureCorrectChain,
+  }),
 }));
 
 const mockRouterPush = jest.fn();
@@ -163,6 +175,7 @@ jest.mock('yet-another-react-lightbox', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockEnsureCorrectChain.mockResolvedValue(true);
   mockRouterPush.mockClear();
   mockTransferFrom.mockResolvedValue('0xtransfer');
   mockSetNftName.mockResolvedValue('0xname');
@@ -464,5 +477,157 @@ describe('NFTTrait', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     const { container } = render(<NFTTrait tokenId={5} />);
     await checkA11y(container);
+  });
+
+  describe('transaction failure feedback', () => {
+    it('tells the user when no injected wallet is available to check the recipient', async () => {
+      Object.defineProperty(window, 'ethereum', { configurable: true, value: undefined });
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
+
+      await waitFor(() =>
+        expect(mockSetNotification).toHaveBeenCalledWith({
+          text: 'toasts.wallet.notReady',
+          type: 'error',
+          visible: true,
+        }),
+      );
+      expect(mockTransferFrom).not.toHaveBeenCalled();
+    });
+
+    it('reports and surfaces a failed recipient pre-check instead of doing nothing', async () => {
+      const checkError = new Error('eth_getTransactionCount failed');
+      Object.defineProperty(window, 'ethereum', {
+        configurable: true,
+        value: { request: jest.fn().mockRejectedValue(checkError) },
+      });
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
+
+      await waitFor(() =>
+        expect(mockSetNotification).toHaveBeenCalledWith({
+          text: 'toasts.transfer.nft.recipientCheckFailed',
+          type: 'error',
+          visible: true,
+        }),
+      );
+      expect(mockReportError).toHaveBeenCalledWith(checkError, 'check transfer destination');
+    });
+  });
+
+  describe('chain guard', () => {
+    it('blocks the transfer write when the wallet is on the wrong chain', async () => {
+      mockEnsureCorrectChain.mockResolvedValue(false);
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
+
+      await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalled());
+      expect(mockTransferFrom).not.toHaveBeenCalled();
+    });
+
+    it('blocks the naming writes on the same mismatch', async () => {
+      mockEnsureCorrectChain.mockResolvedValue(false);
+      withDashboard();
+      withNft();
+      render(<NFTTrait tokenId={5} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Set test name' }));
+      await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalled());
+      expect(mockSetNftName).not.toHaveBeenCalled();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Clear test name' }));
+      await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(2));
+      expect(mockSetNftName).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('deferred name refetch cleanup', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('does not refetch after the page unmounts before the delay elapses', async () => {
+      const refetchCSTInfo = jest.fn();
+      const refetchNameHistory = jest.fn();
+      withDashboard();
+      mockUseCSTInfo.mockReturnValue({
+        data: baseNft,
+        isLoading: false,
+        refetch: refetchCSTInfo,
+      });
+      mockUseNameHistory.mockReturnValue({
+        data: [{ TokenName: 'MyToken' }],
+        isLoading: false,
+        refetch: refetchNameHistory,
+      });
+
+      const { unmount } = render(<NFTTrait tokenId={5} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Set test name' }));
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      unmount();
+
+      await act(async () => {
+        jest.advanceTimersByTime(5000);
+        await Promise.resolve();
+      });
+
+      expect(refetchCSTInfo).not.toHaveBeenCalled();
+      expect(refetchNameHistory).not.toHaveBeenCalled();
+    });
+
+    it('still refetches after the delay while the page stays mounted', async () => {
+      const refetchCSTInfo = jest.fn();
+      const refetchNameHistory = jest.fn();
+      withDashboard();
+      mockUseCSTInfo.mockReturnValue({
+        data: baseNft,
+        isLoading: false,
+        refetch: refetchCSTInfo,
+      });
+      mockUseNameHistory.mockReturnValue({
+        data: [{ TokenName: 'MyToken' }],
+        isLoading: false,
+        refetch: refetchNameHistory,
+      });
+
+      render(<NFTTrait tokenId={5} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Set test name' }));
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      await act(async () => {
+        jest.advanceTimersByTime(5000);
+        await Promise.resolve();
+      });
+
+      expect(refetchCSTInfo).toHaveBeenCalled();
+      expect(refetchNameHistory).toHaveBeenCalled();
+    });
   });
 });

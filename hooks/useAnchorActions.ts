@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { getConnectorClient } from '@wagmi/core';
 import { useConfig, useConnectorClient, usePublicClient, useWalletClient } from 'wagmi';
@@ -13,10 +13,14 @@ import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
 import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 
 import { useActiveWeb3React } from './web3';
+import { useRequireChain } from './useRequireChain';
 import useAnchoringWalletCSTContract from './useAnchoringWalletCSTContract';
 import useAnchoringWalletRWLKContract from './useAnchoringWalletRWLKContract';
 import useCosmicSignatureContract from './useCosmicSignatureContract';
 import useRWLKNFTContract from './useRWLKNFTContract';
+
+/** The indexer needs a beat after the receipt before the new state is queryable. */
+const INDEXER_SETTLE_MS = 2000;
 
 const ANCHORING_QUERY_KEYS = [
   'dashboardInfo',
@@ -44,6 +48,7 @@ export function useAnchorActions() {
   const { setNotification } = useNotification();
   const queryClient = useQueryClient();
   const { fetchData: fetchStakedTokens } = useAnchoredToken();
+  const { ensureCorrectChain } = useRequireChain();
 
   const cosmicSignatureContract = useCosmicSignatureContract();
   const rwalkContract = useRWLKNFTContract();
@@ -73,6 +78,30 @@ export function useAnchorActions() {
     }
     fetchStakedTokens();
   }, [queryClient, fetchStakedTokens]);
+
+  const pendingTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
+
+  useEffect(
+    () => () => {
+      for (const timerId of pendingTimers.current) clearTimeout(timerId);
+      pendingTimers.current.clear();
+    },
+    [],
+  );
+
+  /**
+   * Defers the post-receipt refresh, keeping the handle so an unmount between
+   * the receipt and the timeout cancels it instead of invalidating queries and
+   * notifying against a tree that is already gone.
+   */
+  const deferUntilIndexed = useCallback((task: () => void) => {
+    const timers = pendingTimers.current;
+    const timerId = setTimeout(() => {
+      timers.delete(timerId);
+      task();
+    }, INDEXER_SETTLE_MS);
+    timers.add(timerId);
+  }, []);
 
   /** Same pattern as `useGestureForm`: hooks scoped to `activeChain`, then imperative fallback. */
   const ensureSignerReady = useCallback(async () => {
@@ -136,6 +165,8 @@ export function useAnchorActions() {
           return;
         }
 
+        if (!(await ensureCorrectChain())) return;
+
         await approveIfNeeded(nftContract, walletAddress);
 
         const hash = Array.isArray(tokenIds)
@@ -146,7 +177,7 @@ export function useAnchorActions() {
         const res = await publicClient?.waitForTransactionReceipt({ hash });
         assertSuccessfulTransactionReceipt(res);
 
-        setTimeout(() => {
+        deferUntilIndexed(() => {
           invalidateAnchoringQueries();
           if (res) {
             setNotification({
@@ -157,7 +188,7 @@ export function useAnchorActions() {
               }),
             });
           }
-        }, 2000);
+        });
 
         return res;
       } catch (err) {
@@ -168,6 +199,7 @@ export function useAnchorActions() {
     [
       account,
       ensureSignerReady,
+      ensureCorrectChain,
       approveIfNeeded,
       cosmicSignatureContract,
       rwalkContract,
@@ -175,6 +207,7 @@ export function useAnchorActions() {
       rwlkAnchoringContract,
       publicClient,
       setNotification,
+      deferUntilIndexed,
       invalidateAnchoringQueries,
       handleError,
       stakingCst,
@@ -215,6 +248,8 @@ export function useAnchorActions() {
           return;
         }
 
+        if (!(await ensureCorrectChain())) return;
+
         const hash = Array.isArray(actionIds)
           ? await anchoringContract.write.unstakeMany?.([actionIds])
           : await anchoringContract.write.unstake?.([actionIds]);
@@ -223,7 +258,7 @@ export function useAnchorActions() {
         const res = await publicClient?.waitForTransactionReceipt({ hash });
         assertSuccessfulTransactionReceipt(res);
 
-        setTimeout(() => {
+        deferUntilIndexed(() => {
           invalidateAnchoringQueries();
           if (res) {
             setNotification({
@@ -234,7 +269,7 @@ export function useAnchorActions() {
               }),
             });
           }
-        }, 2000);
+        });
 
         return res;
       } catch (err) {
@@ -245,10 +280,12 @@ export function useAnchorActions() {
     [
       account,
       ensureSignerReady,
+      ensureCorrectChain,
       cstAnchoringContract,
       rwlkAnchoringContract,
       publicClient,
       setNotification,
+      deferUntilIndexed,
       invalidateAnchoringQueries,
       handleError,
       t,

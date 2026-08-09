@@ -27,9 +27,11 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { getExplorerUrl, formatEthValue, shortenHex, getEnduranceChampions } from '@/utils';
 
+import { formatFixed } from '@/utils/format';
 import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { PageShell } from '@/components/ui/page-shell';
 import {
   useRoundInfo,
@@ -44,6 +46,7 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/ui/stat-card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -105,7 +108,10 @@ function CopyableAddress({
       {href ? (
         <Link
           href={href}
-          className="font-mono text-sm text-white hover:text-primary transition-colors truncate"
+          className={cn(
+            'font-mono text-sm text-white hover:text-primary transition-colors truncate',
+            TOUCH_TARGET_TEXT_LINK_CLASS,
+          )}
         >
           {display}
         </Link>
@@ -114,7 +120,13 @@ function CopyableAddress({
       )}
       <button
         onClick={handleCopy}
-        className="shrink-0 p-0.5 rounded opacity-0 group-hover/addr:opacity-100 hover:text-primary transition-all"
+        // Revealing this on hover leaves it permanently invisible — but still
+        // hit-testable — on a touch device, so below `sm` it is always shown
+        // and sized as a real target instead.
+        className={cn(
+          'shrink-0 p-0.5 rounded opacity-0 group-hover/addr:opacity-100 hover:text-primary transition-all max-sm:opacity-100',
+          TOUCH_TARGET_ICON_CLASS,
+        )}
         aria-label={t('details.copy.addressAria', { address })}
       >
         <Copy className="h-3 w-3" />
@@ -298,7 +310,10 @@ function RecipientCard({
             </span>
             <Link
               href={`/detail/${tokenId}`}
-              className="mt-0.5 block text-sm text-primary hover:underline"
+              className={cn(
+                'mt-0.5 block text-sm text-primary hover:underline',
+                TOUCH_TARGET_TEXT_LINK_CLASS,
+              )}
             >
               {t('formats.token', { token: tokenId })}
             </Link>
@@ -382,7 +397,12 @@ interface AllocationInfoPageProps {
 const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
   const t = useTranslations('allocation');
   const locale = useLocale();
-  const { data: allocationInfo, isLoading: loadingRound } = useRoundInfo(roundNum);
+  const {
+    data: allocationInfo,
+    isLoading: loadingRound,
+    isError: roundFailed,
+    refetch: refetchRound,
+  } = useRoundInfo(roundNum);
   const { data: gestureHistory = [], isLoading: loadingGestures } = useGestureListByCycle(
     roundNum,
     'desc',
@@ -430,7 +450,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     if (!allocationInfo) return;
     const summary = t('details.share.summary', {
       cycle: roundNum,
-      amount: allocationInfo.AmountEth.toFixed(4),
+      amount: formatFixed(allocationInfo.AmountEth, 4),
       recipient: shortenHex(allocationInfo.WinnerAddr, 6),
       gestures: allocationInfo.RoundStats.TotalBids,
       url: typeof window !== 'undefined' ? window.location.href : '',
@@ -461,6 +481,21 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     return <LoadingSkeleton />;
   }
 
+  // A failed read is not the same as a cycle that has no data yet: keep the
+  // "not found" copy for the latter and say so plainly for the former.
+  if (roundFailed) {
+    return (
+      <PageShell variant="data" backdrop="signature">
+        <ErrorState
+          title={t('details.error.title')}
+          message={t('details.error.message', { cycle: roundNum })}
+          onRetry={() => void refetchRound()}
+          surface
+        />
+      </PageShell>
+    );
+  }
+
   if (!allocationInfo) {
     return (
       <PageShell variant="data" backdrop="signature">
@@ -488,7 +523,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
       value: allocationInfo.AmountEth,
       color: 'bg-[#15BFFD]',
       tooltip: t('details.distribution.segments.signature.tooltip', {
-        amount: allocationInfo.AmountEth.toFixed(4),
+        amount: formatFixed(allocationInfo.AmountEth, 4),
       }),
     },
     {
@@ -497,7 +532,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
       value: allocationInfo.CharityAmountETH,
       color: 'bg-emerald-500',
       tooltip: t('details.distribution.segments.publicGoods.tooltip', {
-        amount: allocationInfo.CharityAmountETH.toFixed(4),
+        amount: formatFixed(allocationInfo.CharityAmountETH, 4),
       }),
     },
     {
@@ -506,7 +541,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
       value: allocationInfo.StakingDepositAmountEth,
       color: 'bg-[#9C37FD]',
       tooltip: t('details.distribution.segments.anchor.tooltip', {
-        amount: allocationInfo.StakingDepositAmountEth.toFixed(4),
+        amount: formatFixed(allocationInfo.StakingDepositAmountEth, 4),
       }),
     },
     {
@@ -524,19 +559,19 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     {
       icon: <Trophy className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.signatureEth.label'),
-      value: `${allocationInfo.AmountEth.toFixed(4)} ETH`,
+      value: `${formatFixed(allocationInfo.AmountEth, 4)} ETH`,
       tooltip: t('details.statistics.cards.signatureEth.tooltip'),
     },
     {
       icon: <Heart className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.publicGoods.label'),
-      value: `${allocationInfo.CharityAmountETH.toFixed(4)} ETH`,
+      value: `${formatFixed(allocationInfo.CharityAmountETH, 4)} ETH`,
       tooltip: t('details.statistics.cards.publicGoods.tooltip'),
     },
     {
       icon: <Landmark className="h-3.5 w-3.5" />,
       label: t('details.statistics.cards.anchor.label'),
-      value: `${allocationInfo.StakingDepositAmountEth.toFixed(4)} ETH`,
+      value: `${formatFixed(allocationInfo.StakingDepositAmountEth, 4)} ETH`,
       tooltip: t('details.statistics.cards.anchor.tooltip'),
     },
     {
@@ -583,7 +618,10 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     <PageShell variant="data" backdrop="signature">
       {/* Breadcrumbs */}
       <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <Link href="/allocation" className="hover:text-primary transition-colors">
+        <Link
+          href="/allocation"
+          className={cn('hover:text-primary transition-colors', TOUCH_TARGET_TEXT_LINK_CLASS)}
+        >
           {t('details.breadcrumbs.recipients')}
         </Link>
         <ChevronRight className="h-3.5 w-3.5" />
@@ -614,7 +652,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                     style={{ textShadow: '0 0 40px rgba(21, 191, 253, 0.2)' }}
                     data-testid="hero-allocation-amount"
                   >
-                    {allocationInfo.AmountEth.toFixed(4)} ETH
+                    {formatFixed(allocationInfo.AmountEth, 4)} ETH
                   </p>
                   <InfoTooltip content={t('details.hero.amountTooltip')} iconClassName="h-4 w-4" />
                 </div>
@@ -637,7 +675,10 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
                       </span>
                       <Link
                         href={`/detail/${allocationInfo.TokenId}`}
-                        className="text-sm text-primary hover:underline"
+                        className={cn(
+                          'text-sm text-primary hover:underline',
+                          TOUCH_TARGET_TEXT_LINK_CLASS,
+                        )}
                       >
                         {t('formats.cosmicSignatureToken', { token: allocationInfo.TokenId })}
                       </Link>
@@ -667,7 +708,10 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
               <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <button
                   onClick={handleShareRound}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all"
+                  className={cn(
+                    'inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all',
+                    TOUCH_TARGET_ICON_CLASS,
+                  )}
                   aria-label={t('details.hero.shareAria')}
                   data-testid="share-round-button"
                 >
@@ -709,7 +753,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             rewards={[
               {
                 label: t('details.recipientSection.labels.ethAllocation'),
-                value: `${allocationInfo.AmountEth.toFixed(4)} ETH`,
+                value: `${formatFixed(allocationInfo.AmountEth, 4)} ETH`,
               },
               {
                 label: t('details.recipientSection.labels.recognitionCst'),
@@ -729,7 +773,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             rewards={[
               {
                 label: t('details.recipientSection.labels.ethAllocation'),
-                value: `${allocationInfo.ChronoWarriorAmountEth.toFixed(4)} ETH`,
+                value: `${formatFixed(allocationInfo.ChronoWarriorAmountEth, 4)} ETH`,
               },
               {
                 label: t('details.recipientSection.labels.recognitionCst'),

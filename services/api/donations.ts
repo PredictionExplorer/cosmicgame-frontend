@@ -1,17 +1,25 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
 import {
-  axios,
+  apiGet,
   getAPIUrl,
   apiCall,
+  apiCallRequired,
   flattenTx,
   flattenTxArray,
   normalizeFieldNames,
   normalizeFieldNamesArray,
   pagedPath,
-  type ApiPageWindow,
+  type ApiListRequestOptions,
+  type ApiRequestOptions,
 } from './client';
-import { AttachedNFTRecordSchema, safeValidateListSample } from './schemas';
+import {
+  AttachedNFTRecordSchema,
+  CharityWithdrawalSchema,
+  ETHDonationSchema,
+  safeValidate,
+  safeValidateListSample,
+} from './schemas';
 import type {
   CharityWithdrawal,
   ETHDonation,
@@ -66,105 +74,171 @@ function mapErc20DonationRowForTable(row: DonatedERC20Token): DonatedERC20Token 
 }
 
 /** Fetches direct Cosmic Game ETH donations without extra info (optionally paged). */
-export function get_donations_cg_simple_list(page?: ApiPageWindow): Promise<ETHDonation[]> {
+export function get_donations_cg_simple_list(opts?: ApiListRequestOptions): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/eth/simple/list/${pagedPath(page)}`));
-    return flattenTxArray<ETHDonation>(data.DirectCGDonations);
+    const { data } = await apiGet(getAPIUrl(`donations/eth/simple/list/${pagedPath(opts)}`), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.DirectCGDonations),
+      'donationsCGSimpleList',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches direct Cosmic Game ETH donations for a specific round (simple records). */
-export function get_donations_cg_simple_by_round(round: number): Promise<ETHDonation[]> {
+export function get_donations_cg_simple_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/eth/simple/by_round/${round}`));
-    return flattenTxArray<ETHDonation>(data.DirectCGDonations);
+    const { data } = await apiGet(getAPIUrl(`donations/eth/simple/by_round/${round}`), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.DirectCGDonations),
+      'donationsCGSimpleByRound',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches direct Cosmic Game ETH donations with extended donor/round info (optionally paged). */
-export function get_donations_cg_with_info_list(page?: ApiPageWindow): Promise<ETHDonation[]> {
+export function get_donations_cg_with_info_list(
+  opts?: ApiListRequestOptions,
+): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/eth/with_info/list/${pagedPath(page)}`));
-    return flattenTxArray<ETHDonation>(data.DirectCGDonations);
+    const { data } = await apiGet(
+      getAPIUrl(`donations/eth/with_info/list/${pagedPath(opts)}`),
+      opts,
+    );
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.DirectCGDonations),
+      'donationsCGWithInfoList',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches direct Cosmic Game ETH donations with extended info for a specific round. */
-export function get_donations_cg_with_info_by_round(round: number): Promise<ETHDonation[]> {
+export function get_donations_cg_with_info_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/eth/with_info/by_round/${round}`));
-    return flattenTxArray<ETHDonation>(data.DirectCGDonations);
+    const { data } = await apiGet(getAPIUrl(`donations/eth/with_info/by_round/${round}`), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.DirectCGDonations),
+      'donationsCGWithInfoByRound',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches a single ETH donation with extended info by its record ID. */
-export function get_donations_with_info_by_id(id: number): Promise<ETHDonation | null> {
+export function get_donations_with_info_by_id(
+  id: number,
+  opts?: ApiRequestOptions,
+): Promise<ETHDonation | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/eth/with_info/info/${id}`));
-    return flattenTx(data.ETHDonation) as ETHDonation | null;
+    const { data } = await apiGet(getAPIUrl(`donations/eth/with_info/info/${id}`), opts);
+    const donation = flattenTx(data.ETHDonation) as ETHDonation | null;
+    if (donation == null) return donation;
+    return safeValidate(ETHDonationSchema, donation, 'donationWithInfo') as ETHDonation;
   }, null);
 }
 
 /** Fetches combined ETH donation records made by a specific wallet address. */
-export function get_donations_eth_by_user(address: string): Promise<ETHDonation[]> {
+export function get_donations_eth_by_user(
+  address: string,
+  opts?: ApiRequestOptions,
+): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/eth/by_user/${address}`));
-    return flattenTxArray<ETHDonation>(data.CombinedDonationRecords);
+    const { data } = await apiGet(getAPIUrl(`donations/eth/by_user/${address}`), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.CombinedDonationRecords),
+      'donationsEthByUser',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches combined (direct + voluntary) Cosmic Game donations for a specific round. */
-export function get_donations_both_by_round(round: number): Promise<ETHDonation[]> {
+export function get_donations_both_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/eth/both/by_round/${round}`));
-    return flattenTxArray<ETHDonation>(data.CosmicGameDonations);
+    const { data } = await apiGet(getAPIUrl(`donations/eth/both/by_round/${round}`), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.CosmicGameDonations),
+      'donationsBothByRound',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches all combined (direct + voluntary) Cosmic Game donations. */
-export function get_donations_both(): Promise<ETHDonation[]> {
+export function get_donations_both(opts?: ApiRequestOptions): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/eth/both/all'));
-    return flattenTxArray<ETHDonation>(data.CosmicGameDonations);
+    const { data } = await apiGet(getAPIUrl('donations/eth/both/all'), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.CosmicGameDonations),
+      'donationsBoth',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches charity donation deposits from allocation-pool distributions. */
-export function get_charity_donations_deposits(): Promise<ETHDonation[]> {
+export function get_charity_donations_deposits(opts?: ApiRequestOptions): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/charity/deposits'));
-    return flattenTxArray<ETHDonation>(data.CharityDonations);
+    const { data } = await apiGet(getAPIUrl('donations/charity/deposits'), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.CharityDonations),
+      'charityDeposits',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches Cosmic Game charity deposits (automatic per-round charity share). */
-export function get_charity_cg_deposits(): Promise<ETHDonation[]> {
+export function get_charity_cg_deposits(opts?: ApiRequestOptions): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/charity/cg_deposits'));
-    return flattenTxArray<ETHDonation>(data.CharityDonations);
+    const { data } = await apiGet(getAPIUrl('donations/charity/cg_deposits'), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.CharityDonations),
+      'charityCGDeposits',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches voluntary charity donations made by users. */
-export function get_charity_voluntary(): Promise<ETHDonation[]> {
+export function get_charity_voluntary(opts?: ApiRequestOptions): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/charity/voluntary'));
-    return flattenTxArray<ETHDonation>(data.CharityDonations);
+    const { data } = await apiGet(getAPIUrl('donations/charity/voluntary'), opts);
+    return safeValidateListSample(
+      ETHDonationSchema,
+      flattenTxArray<ETHDonation>(data.CharityDonations),
+      'charityVoluntary',
+    ) as ETHDonation[];
   }, []);
 }
 
 /** Fetches charity withdrawal records (funds sent to the charity address). */
-export function get_charity_withdrawals(): Promise<CharityWithdrawal[]> {
+export function get_charity_withdrawals(opts?: ApiRequestOptions): Promise<CharityWithdrawal[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/charity/withdrawals'));
-    return flattenTxArray<CharityWithdrawal>(data.CharityWithdrawals);
+    const { data } = await apiGet(getAPIUrl('donations/charity/withdrawals'), opts);
+    return safeValidateListSample(
+      CharityWithdrawalSchema,
+      flattenTxArray<CharityWithdrawal>(data.CharityWithdrawals),
+      'charityWithdrawals',
+    ) as CharityWithdrawal[];
   }, []);
 }
 
 /** Fetches donated NFTs with normalized field names (optionally paged). */
-export function get_donations_nft_list(page?: ApiPageWindow): Promise<AttachedNFT[]> {
+export function get_donations_nft_list(opts?: ApiListRequestOptions): Promise<AttachedNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/nft/list/${pagedPath(page)}`));
+    const { data } = await apiGet(getAPIUrl(`donations/nft/list/${pagedPath(opts)}`), opts);
     return safeValidateListSample(
       AttachedNFTRecordSchema,
       normalizeFieldNamesArray(flattenTxArray<AttachedNFT>(data.NFTDonations)),
@@ -174,43 +248,53 @@ export function get_donations_nft_list(page?: ApiPageWindow): Promise<AttachedNF
 }
 
 /** Fetches detailed info for a single donated NFT by its record ID. */
-export function get_donated_nft_info(record_id: number): Promise<AttachedNFT | null> {
+export function get_donated_nft_info(
+  record_id: number,
+  opts?: ApiRequestOptions,
+): Promise<AttachedNFT | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/nft/info/${record_id}`));
+    const { data } = await apiGet(getAPIUrl(`donations/nft/info/${record_id}`), opts);
     return normalizeFieldNames(flattenTx(data.NFTDonation)) as AttachedNFT | null;
   }, null);
 }
 
 /** Fetches donated NFT claim records globally (optionally paged; historical cap 100k). */
-export function get_donated_nft_claims_all(page?: ApiPageWindow): Promise<AttachedNFT[]> {
+export function get_donated_nft_claims_all(opts?: ApiListRequestOptions): Promise<AttachedNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`donations/nft/claims/${pagedPath({ limit: 100_000, ...page })}`),
+    const { data } = await apiGet(
+      getAPIUrl(`donations/nft/claims/${pagedPath({ limit: 100_000, ...opts })}`),
+      opts,
     );
     return flattenTxArray<AttachedNFT>(data.DonatedNFTClaims);
   }, []);
 }
 
 /** Fetches donated NFTs that have been claimed by a specific wallet address. */
-export function get_claimed_donated_nft_by_user(address: string): Promise<AttachedNFT[]> {
+export function get_claimed_donated_nft_by_user(
+  address: string,
+  opts?: ApiRequestOptions,
+): Promise<AttachedNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/nft/claims/by_user/${address}`));
+    const { data } = await apiGet(getAPIUrl(`donations/nft/claims/by_user/${address}`), opts);
     return flattenTxArray<AttachedNFT>(data.DonatedNFTClaims);
   }, []);
 }
 
 /** Fetches aggregate NFT donation statistics. */
-export function get_nft_donation_stats(): Promise<NFTDonationStatsEntry[]> {
+export function get_nft_donation_stats(opts?: ApiRequestOptions): Promise<NFTDonationStatsEntry[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/nft/statistics'));
+    const { data } = await apiGet(getAPIUrl('donations/nft/statistics'), opts);
     return data.NFTDonationStats as NFTDonationStatsEntry[];
   }, []);
 }
 
 /** Fetches donated NFTs for a specific round with normalized field names. */
-export function get_donations_nft_by_round(round: number): Promise<AttachedNFT[]> {
+export function get_donations_nft_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<AttachedNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/nft/by_round/${round}`));
+    const { data } = await apiGet(getAPIUrl(`donations/nft/by_round/${round}`), opts);
     return normalizeFieldNamesArray(
       flattenTxArray<AttachedNFT>(data.NFTDonations),
     ) as AttachedNFT[];
@@ -218,29 +302,41 @@ export function get_donations_nft_by_round(round: number): Promise<AttachedNFT[]
 }
 
 /** Fetches unclaimed donated NFTs for a specific round. */
-export function get_donations_nft_unclaimed_by_round(round: number): Promise<AttachedNFT[]> {
+export function get_donations_nft_unclaimed_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<AttachedNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/nft/unclaimed/by_round/${round}`));
+    const { data } = await apiGet(getAPIUrl(`donations/nft/unclaimed/by_round/${round}`), opts);
     return normalizeFieldNamesArray(
       flattenTxArray<AttachedNFT>(data.NFTDonations),
     ) as AttachedNFT[];
   }, []);
 }
 
-/** Fetches unclaimed donated NFTs available for a specific wallet address. */
-export function get_unclaimed_donated_nft_by_user(address: string): Promise<AttachedNFT[]> {
-  return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/nft/unclaimed/by_user/${address}`));
+/**
+ * Fetches unclaimed donated NFTs available for a specific wallet address. Required read: an
+ * empty list is how the UI says "nothing to collect", so a failed read must not look like one.
+ */
+export function get_unclaimed_donated_nft_by_user(
+  address: string,
+  opts?: ApiRequestOptions,
+): Promise<AttachedNFT[]> {
+  return apiCallRequired(async () => {
+    const { data } = await apiGet(getAPIUrl(`donations/nft/unclaimed/by_user/${address}`), opts);
     return normalizeFieldNamesArray(
       flattenTxArray<AttachedNFT>(data.UnclaimedDonatedNFTs),
     ) as AttachedNFT[];
-  }, []);
+  });
 }
 
 /** Fetches ERC-20 token donations for a round (includes rows before main-prize claim; optional winner when claim exists). */
-export function get_donations_erc20_by_round(round: number): Promise<DonatedERC20Token[]> {
+export function get_donations_erc20_by_round(
+  round: number,
+  opts?: ApiRequestOptions,
+): Promise<DonatedERC20Token[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/erc20/by_round/all/${round}`));
+    const { data } = await apiGet(getAPIUrl(`donations/erc20/by_round/all/${round}`), opts);
     const rows = normalizeFieldNamesArray(
       flattenTxArray<DonatedERC20Token>(data.DonationsERC20ByRoundAll),
     ) as DonatedERC20Token[];
@@ -249,9 +345,12 @@ export function get_donations_erc20_by_round(round: number): Promise<DonatedERC2
 }
 
 /** Fetches ERC-20 token donations won by a specific wallet address. */
-export function get_donations_erc20_by_user(address: string): Promise<DonatedERC20Token[]> {
+export function get_donations_erc20_by_user(
+  address: string,
+  opts?: ApiRequestOptions,
+): Promise<DonatedERC20Token[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/erc20/by_user/${address}`));
+    const { data } = await apiGet(getAPIUrl(`donations/erc20/by_user/${address}`), opts);
     const rows = normalizeFieldNamesArray(
       flattenTxArray<DonatedERC20Token>(data.DonatedPrizesERC20ByWinner),
     ) as DonatedERC20Token[];

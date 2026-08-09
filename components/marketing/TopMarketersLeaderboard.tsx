@@ -6,9 +6,11 @@ import { Trophy, Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { AddressLink } from '@/components/common/AddressLink';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { MarketingReward } from '@/services/api/types';
+import { formatFixed } from '@/utils/format';
 
 interface AggregatedMarketer {
   address: string;
@@ -65,7 +67,11 @@ export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProp
             <button
               type="button"
               aria-label={t('leaderboard.infoAria')}
-              className="text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+              data-touch-target="extended"
+              className={cn(
+                'text-muted-foreground/60 hover:text-muted-foreground transition-colors',
+                TOUCH_TARGET_EXTENDED_CLASS,
+              )}
             >
               <Info className="h-4 w-4" />
             </button>
@@ -116,7 +122,7 @@ export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProp
 
               <div className="text-right">
                 <p className="font-display text-lg font-bold">
-                  {marketer.totalEarned.toFixed(2)}{' '}
+                  {formatFixed(marketer.totalEarned, 2)}{' '}
                   <span className="text-sm text-muted-foreground">CST</span>
                 </p>
                 <p className="text-xs text-muted-foreground">

@@ -49,7 +49,12 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
               aria-label={tStatistics('systemEvent.explainEvent', {
                 event: eventName,
               })}
-              className="ml-2 inline-flex align-middle"
+              // The icon trails the event name inside a table cell, so it
+              // cannot grow to 44px without stretching the mobile card row.
+              // A transparent pseudo-element carries the hit area instead
+              // (see components/ui/info-tooltip.tsx).
+              data-touch-target="extended"
+              className="relative ml-2 inline-flex align-middle after:absolute after:left-1/2 after:top-1/2 after:h-11 after:w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] sm:after:hidden"
             >
               <AlertCircle className="h-4 w-4" />
             </button>

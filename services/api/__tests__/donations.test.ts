@@ -479,16 +479,16 @@ describe('donations API', () => {
       );
     });
 
-    it('returns empty array on 400', async () => {
+    it('propagates a 400 rather than reporting nothing to collect', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_unclaimed_donated_nft_by_user('0xaddr')).toEqual([]);
+      await expect(get_unclaimed_donated_nft_by_user('0xaddr')).rejects.toThrow(
+        'Network response was not OK',
+      );
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_unclaimed_donated_nft_by_user('0xaddr')).rejects.toThrow(
-        'Network response was not OK',
-      );
+      await expect(get_unclaimed_donated_nft_by_user('0xaddr')).rejects.toThrow('fail');
     });
 
     it('preserves donation index and NFT identity fields', async () => {

@@ -50,6 +50,12 @@ const make403 = () =>
     isAxiosError: true,
   });
 
+const make404 = () =>
+  Object.assign(new Error('Not Found'), {
+    response: { status: 404 },
+    isAxiosError: true,
+  });
+
 const mockTx = (id: number) => ({
   EvtLogId: id,
   Tx: {
@@ -62,6 +68,51 @@ const mockTx = (id: number) => ({
   },
 });
 
+/** Wire-shaped gesture record: what the strict `GestureInfoSchema` has to accept. */
+const mockGesture = (id: number, overrides: Record<string, unknown> = {}) => ({
+  ...mockTx(id),
+  RoundNum: 7,
+  BidderAddr: '0xbidder',
+  BidType: 0,
+  EthPriceEth: 0.01,
+  ...overrides,
+});
+
+/** Allocation-claim row: `WinningHistoryEntrySchema` requires the cycle and record type. */
+const mockClaim = (id: number) => ({ ...mockTx(id), RoundNum: 3, RecordType: 0 });
+
+/** Dashboard payload with every field the strict schema requires. */
+const mockDashboard = (overrides: Record<string, unknown> = {}) => ({
+  CurNumBids: 42,
+  CurPrizeAmountEth: 1.23,
+  CurRoundNum: 17,
+  PrizeClaimTs: 1_700_000_000,
+  TsRoundStart: 1_699_000_000,
+  LastBidderAddr: '0xabc',
+  GestureCostEth: 0.001,
+  StakingAmountEth: 0.5,
+  NumRaffleNFTWinnersBidding: 3,
+  NumRaffleNFTWinnersStakingRWalk: 2,
+  MainStats: {
+    NumCSTokenMints: 1000,
+    TotalRaffleEthDeposits: 10,
+    TotalCSTConsumedEth: 5,
+    TotalMktRewardsEth: 1,
+    NumMktRewards: 8,
+    TotalRaffleEthWithdrawn: 7,
+    NumBidsCST: 200,
+    NumUniqueBidders: 50,
+    NumUniqueWinners: 20,
+    NumUniqueDonors: 10,
+    TotalNamedTokens: 30,
+    NumUniqueStakersCST: 40,
+    NumUniqueStakersRWalk: 25,
+    StakeStatisticsCST: { NumActiveStakers: 40, TotalTokensStaked: 400 },
+    StakeStatisticsRWalk: { NumActiveStakers: 25, TotalTokensStaked: 300 },
+  },
+  ...overrides,
+});
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -69,25 +120,50 @@ beforeEach(() => {
 describe('rounds API', () => {
   describe('get_dashboard_info', () => {
     it('returns data on successful response', async () => {
-      const mockData = { TotalRounds: 10, ActiveRound: 5 };
+      const mockData = mockDashboard();
       mockedAxios.get.mockResolvedValue({ data: mockData });
 
       const result = await get_dashboard_info();
 
-      // `normalizeDashboardWire` always sets `GestureCostEth` (from `TokenReward` or 0).
-      expect(result).toEqual({ ...mockData, GestureCostEth: 0 });
+      expect(result).toEqual(mockData);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/statistics.*dashboard/));
     });
 
-    it('returns null on 400 response', async () => {
+    it('rejects a payload missing a required field instead of passing it through', async () => {
+      const bad = mockDashboard();
+      delete (bad as { CurRoundNum?: unknown }).CurRoundNum;
+      mockedAxios.get.mockResolvedValue({ data: bad });
+
+      await expect(get_dashboard_info()).rejects.toThrow(
+        /schemaMismatch:DashboardInfo — CurRoundNum/,
+      );
+    });
+
+    it('propagates a 400 instead of resolving to null', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_dashboard_info()).toBeNull();
+      await expect(get_dashboard_info()).rejects.toThrow('Network response was not OK');
+    });
+
+    it('propagates a 404 instead of resolving to null', async () => {
+      mockedAxios.get.mockRejectedValue(make404());
+      await expect(get_dashboard_info()).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('Network Error'));
-      await expect(get_dashboard_info()).rejects.toThrow('Network response was not OK');
+      await expect(get_dashboard_info()).rejects.toThrow('Network Error');
+    });
+
+    it('forwards an abort signal to axios', async () => {
+      const controller = new AbortController();
+      mockedAxios.get.mockResolvedValue({ data: mockDashboard() });
+
+      await get_dashboard_info({ signal: controller.signal });
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.any(String), {
+        signal: controller.signal,
+      });
     });
   });
 
@@ -129,20 +205,20 @@ describe('rounds API', () => {
       );
     });
 
-    it('returns empty array on 400 response', async () => {
+    it('propagates a 400 instead of resolving to an empty list', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_round_list()).toEqual([]);
+      await expect(get_round_list()).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('Network Error'));
-      await expect(get_round_list()).rejects.toThrow('Network response was not OK');
+      await expect(get_round_list()).rejects.toThrow('Network Error');
     });
   });
 
   describe('get_bid_list', () => {
     it('returns array of gestures on successful response', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { Gestures: [mockTx(1)] } });
+      mockedAxios.get.mockResolvedValue({ data: { Gestures: [mockGesture(1)] } });
 
       const result = await get_bid_list();
 
@@ -152,19 +228,40 @@ describe('rounds API', () => {
       expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*list/));
     });
 
+    it('accepts CST gestures, which carry no ETH cost', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { Gestures: [mockGesture(2, { BidType: 2, EthPriceEth: -1, CstPriceEth: 411.5 })] },
+      });
+
+      const result = await get_bid_list();
+
+      expect(result[0]?.GestureType).toBe(2);
+      expect(result[0]?.GestureCostEth).toBeUndefined();
+    });
+
     it('returns empty array when Gestures is missing', async () => {
       mockedAxios.get.mockResolvedValue({ data: {} });
       expect(await get_bid_list()).toEqual([]);
     });
 
-    it('returns empty array on 400 response', async () => {
+    it('rejects a corrupt gesture anywhere in the list, not just in the first rows', async () => {
+      const gestures = [
+        ...Array.from({ length: 8 }, (_, i) => mockGesture(i + 1)),
+        mockGesture(9, { BidderAddr: 42 }),
+      ];
+      mockedAxios.get.mockResolvedValue({ data: { Gestures: gestures } });
+
+      await expect(get_bid_list()).rejects.toThrow(/schemaMismatch:GestureInfo\[list\] — 8\./);
+    });
+
+    it('propagates a 400 instead of resolving to an empty list', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_bid_list()).toEqual([]);
+      await expect(get_bid_list()).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('Network Error'));
-      await expect(get_bid_list()).rejects.toThrow('Network response was not OK');
+      await expect(get_bid_list()).rejects.toThrow('Network Error');
     });
   });
 
@@ -226,14 +323,35 @@ describe('rounds API', () => {
       expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/rounds.*info.*0/));
     });
 
-    it('returns null on 400 response', async () => {
+    it('accepts an unfinalized cycle, which has no claim transaction', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { RoundInfo: { RoundNum: 8, ClaimPrizeTx: null, RoundStats: {} } },
+      });
+
+      const result = await get_round_info(8);
+
+      expect(result).toHaveProperty('RoundNum', 8);
+      expect(result?.TxHash).toBeUndefined();
+    });
+
+    it('rejects a cycle whose allocation amount is not a number', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { RoundInfo: { RoundNum: 8, MainPrize: { EthAmountEth: '1.5' } } },
+      });
+
+      await expect(get_round_info(8)).rejects.toThrow(
+        /schemaMismatch:RoundInfo\[detail\] — AmountEth/,
+      );
+    });
+
+    it('propagates a 400 instead of resolving to null', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_round_info(1)).toBeNull();
+      await expect(get_round_info(1)).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_round_info(1)).rejects.toThrow('Network response was not OK');
+      await expect(get_round_info(1)).rejects.toThrow('fail');
     });
   });
 
@@ -279,14 +397,14 @@ describe('rounds API', () => {
       expect(await get_claim_history()).toEqual([]);
     });
 
-    it('returns empty array on 400 response', async () => {
+    it('propagates a 400 instead of resolving to an empty list', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_claim_history()).toEqual([]);
+      await expect(get_claim_history()).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_claim_history()).rejects.toThrow('Network response was not OK');
+      await expect(get_claim_history()).rejects.toThrow('fail');
     });
   });
 
@@ -295,7 +413,7 @@ describe('rounds API', () => {
 
     it('returns flattened history for the given address', async () => {
       mockedAxios.get.mockResolvedValue({
-        data: { USerPrizeHistory: [mockTx(3)] },
+        data: { USerPrizeHistory: [mockClaim(3)] },
       });
 
       const result = await get_claim_history_by_user(addr);
@@ -312,20 +430,20 @@ describe('rounds API', () => {
       expect(await get_claim_history_by_user(addr)).toEqual([]);
     });
 
-    it('returns null on 400 response', async () => {
+    it('propagates a 400 instead of resolving to null', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_claim_history_by_user(addr)).toBeNull();
+      await expect(get_claim_history_by_user(addr)).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_claim_history_by_user(addr)).rejects.toThrow('Network response was not OK');
+      await expect(get_claim_history_by_user(addr)).rejects.toThrow('fail');
     });
   });
 
   describe('get_bid_info', () => {
     it('returns flattened bid on success', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { GestureInfo: mockTx(7) } });
+      mockedAxios.get.mockResolvedValue({ data: { GestureInfo: mockGesture(7) } });
 
       const result = await get_bid_info(7);
 
@@ -370,14 +488,19 @@ describe('rounds API', () => {
       expect(await get_bid_info(99)).toBeNull();
     });
 
-    it('returns null on 400 response', async () => {
-      mockedAxios.get.mockRejectedValue(make400());
+    it('returns null on 404, which means no such gesture', async () => {
+      mockedAxios.get.mockRejectedValue(make404());
       expect(await get_bid_info(1)).toBeNull();
+    });
+
+    it('propagates a 400 instead of resolving to null', async () => {
+      mockedAxios.get.mockRejectedValue(make400());
+      await expect(get_bid_info(1)).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_bid_info(1)).rejects.toThrow('Network response was not OK');
+      await expect(get_bid_info(1)).rejects.toThrow('fail');
     });
   });
 
@@ -416,7 +539,7 @@ describe('rounds API', () => {
     });
 
     it('maps "asc" sort direction to 0', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { BidsByRound: [mockTx(1)] } });
+      mockedAxios.get.mockResolvedValue({ data: { BidsByRound: [mockGesture(1)] } });
 
       const result = await get_bid_list_by_round(5, 'asc');
 
@@ -456,14 +579,14 @@ describe('rounds API', () => {
       );
     });
 
-    it('returns empty array on 400 response', async () => {
+    it('propagates a 400 instead of resolving to an empty list', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_bid_list_by_round(1, 'asc')).toEqual([]);
+      await expect(get_bid_list_by_round(1, 'asc')).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_bid_list_by_round(1, 'asc')).rejects.toThrow('Network response was not OK');
+      await expect(get_bid_list_by_round(1, 'asc')).rejects.toThrow('fail');
     });
   });
 
@@ -490,14 +613,14 @@ describe('rounds API', () => {
       );
     });
 
-    it('returns null on 400 response', async () => {
+    it('propagates a 400 instead of resolving to null', async () => {
       mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_current_special_winners()).toBeNull();
+      await expect(get_current_special_winners()).rejects.toThrow('Network response was not OK');
     });
 
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_current_special_winners()).rejects.toThrow('Network response was not OK');
+      await expect(get_current_special_winners()).rejects.toThrow('fail');
     });
   });
 

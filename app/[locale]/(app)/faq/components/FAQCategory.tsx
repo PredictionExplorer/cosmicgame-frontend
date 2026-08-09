@@ -217,7 +217,7 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                 {/* Several answers embed contract identifiers such as
                     `mainPrizeTimeIncrementInMicroSeconds`, which are wider than
                     a phone screen on their own. */}
-                <p className="break-words text-sm leading-relaxed text-muted-foreground">
+                <p className="text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">
                   {searchQuery
                     ? highlightSearch(item.answer, searchQuery)
                     : enrichWithTooltips(item.answer, tooltipTerms)}
@@ -227,7 +227,10 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                     e.stopPropagation();
                     copyLink(item);
                   }}
-                  className="-mx-2 mt-1 inline-flex min-h-11 items-center gap-1.5 px-2 text-xs text-muted-foreground/50 transition-colors hover:text-primary sm:mx-0 sm:mt-3 sm:min-h-0 sm:px-0"
+                  // Height alone was under the touch target, so this grows
+                  // vertically only. Widening it with a negative margin would
+                  // push it outside the accordion's `overflow-hidden` box.
+                  className="mt-1 inline-flex min-h-11 items-center gap-1.5 text-xs text-muted-foreground/50 transition-colors hover:text-primary sm:mt-3 sm:min-h-0"
                   aria-label={t('category.copyLinkAria')}
                 >
                   <Link2 className="h-3 w-3" />

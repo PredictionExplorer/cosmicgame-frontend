@@ -47,6 +47,17 @@ function shouldScheduleLiveCstPreviewTimer(): boolean {
   return !isJest || testGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ === true;
 }
 
+/**
+ * Turns a contract divisor into the percentage the UI shows. A zero or
+ * unreadable divisor would produce `Infinity`/`NaN` and render as
+ * "Infinity%", so those return null and the caller keeps the previous value.
+ */
+function percentFromDivisor(divisor: unknown): number | null {
+  const value = Number(divisor ?? 1);
+  if (!Number.isFinite(value) || value === 0) return null;
+  return 100 / value;
+}
+
 function getLiveCstPreviewRefreshMs(): number {
   const testInterval = (globalThis as LiveCstPreviewTestGlobals)
     .__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__;
@@ -101,12 +112,14 @@ const Contracts = () => {
 
     safeCall(async () => {
       const v = await cosmicGameContract.read.ethBidPriceIncreaseDivisor?.();
-      setPriceIncrease(100 / Number(v ?? 1));
+      const percent = percentFromDivisor(v);
+      if (percent !== null) setPriceIncrease(percent);
     }, 'ethBidPriceIncreaseDivisor');
 
     safeCall(async () => {
       const v = await cosmicGameContract.read.mainPrizeTimeIncrementIncreaseDivisor?.();
-      setTimeIncrease(100 / Number(v ?? 1));
+      const percent = percentFromDivisor(v);
+      if (percent !== null) setTimeIncrease(percent);
     }, 'mainPrizeTimeIncrementIncreaseDivisor');
 
     safeCall(async () => {

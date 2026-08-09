@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
+import { formatFixed } from '@/utils/format';
 import { cn } from '@/lib/utils';
 import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
 
@@ -47,7 +48,7 @@ export function HeroStats({
     () => [
       {
         label: t('statistics.hero.ethBalance.label'),
-        value: `${balanceETH.toFixed(4)} ETH`,
+        value: `${formatFixed(balanceETH, 4)} ETH`,
         tooltip: t('statistics.hero.ethBalance.tooltip'),
         icon: <Wallet className="h-4 w-4" />,
         featured: true,
@@ -55,7 +56,7 @@ export function HeroStats({
       },
       {
         label: t('statistics.hero.cstBalance.label'),
-        value: `${balanceCST.toFixed(2)} CST`,
+        value: `${formatFixed(balanceCST, 2)} CST`,
         tooltip: t('statistics.hero.cstBalance.tooltip'),
         icon: <Coins className="h-4 w-4" />,
         featured: true,
