@@ -132,6 +132,16 @@
   summary {
     touch-action: manipulation;
   }
+
+  /*
+   * Monospace in this app is always an address, hash, token id or IPFS URI —
+   * 40+ characters with no natural break opportunity, which is wider than a
+   * phone screen. `anywhere` (rather than `break-word`) also lowers the
+   * min-content width, so flex and grid children can actually shrink.
+   */
+  .font-mono {
+    overflow-wrap: anywhere;
+  }
 }
 
 @property --radius {

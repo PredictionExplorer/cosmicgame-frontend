@@ -240,6 +240,6 @@ export function ResponsiveTableRow({ className, onActivate, onClick, ...props }:
  * screen-reader users the destination that `onActivate` gives pointer users.
  */
 export const TABLE_ROW_LINK_CLASS = cn(
-  'rounded-sm text-inherit underline-offset-4 hover:underline',
+  'inline-block rounded-sm leading-6 text-inherit underline-offset-4 hover:underline',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
 );

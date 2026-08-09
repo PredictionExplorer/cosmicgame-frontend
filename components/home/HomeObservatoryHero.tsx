@@ -382,30 +382,30 @@ export function HomeObservatoryHero({
                   <ObservatoryArtworkUnavailable />
                 )}
 
-                <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="mt-4 grid grid-cols-2 gap-2 min-[400px]:grid-cols-3">
                   <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    <p className="break-words text-[10px] uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.18em]">
                       {t('hero.console.stats.gestures')}
                     </p>
-                    <p className="mt-1 text-lg font-bold tabular-nums">
+                    <p className="mt-1 break-words text-lg font-bold tabular-nums">
                       {Math.round(animatedGestureCount).toLocaleString(
                         locale === 'zh' ? 'zh-CN' : 'en-US',
                       )}
                     </p>
                   </div>
                   <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    <p className="break-words text-[10px] uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.18em]">
                       {t('hero.console.stats.signature')}
                     </p>
-                    <p className="mt-1 text-sm font-bold tabular-nums">
+                    <p className="mt-1 break-words text-sm font-bold tabular-nums">
                       {formatEth(animatedSignatureAllocation)}
                     </p>
                   </div>
                   <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    <p className="break-words text-[10px] uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.18em]">
                       {t('hero.console.stats.publicGoods')}
                     </p>
-                    <p className="mt-1 text-sm font-bold tabular-nums">
+                    <p className="mt-1 break-words text-sm font-bold tabular-nums">
                       {publicGoodsPercentage > 0
                         ? `${publicGoodsPercentage}%`
                         : t('hero.console.stats.publicGoodsFallback')}

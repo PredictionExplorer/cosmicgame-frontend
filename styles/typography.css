@@ -6,6 +6,10 @@
  *
  * The display + heading tiers use the ClashDisplay variable font
  * (loaded via next/font in lib/fonts.ts → --font-family-display).
+ *
+ * Every tier sets `overflow-wrap: break-word`. Display sizes start at 36px, so
+ * a single long word — a token name, an untranslated identifier — is wider
+ * than a 320px screen and would otherwise escape its container.
  */
 
 @utility type-display-xl {
@@ -15,6 +19,7 @@
   font-weight: 600;
   letter-spacing: -0.03em;
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 @utility type-display-lg {
@@ -24,6 +29,7 @@
   font-weight: 600;
   letter-spacing: -0.025em;
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 @utility type-display-md {
@@ -33,6 +39,7 @@
   font-weight: 600;
   letter-spacing: -0.02em;
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 @utility type-display-sm {
@@ -42,6 +49,7 @@
   font-weight: 600;
   letter-spacing: -0.015em;
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 @utility type-heading-1 {
@@ -50,6 +58,7 @@
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.01em;
+  overflow-wrap: break-word;
 }
 
 @utility type-heading-2 {
@@ -58,6 +67,7 @@
   line-height: 1.25;
   font-weight: 700;
   letter-spacing: -0.005em;
+  overflow-wrap: break-word;
 }
 
 @utility type-heading-3 {
@@ -65,24 +75,28 @@
   line-height: 1.3;
   font-weight: 600;
   letter-spacing: -0.005em;
+  overflow-wrap: break-word;
 }
 
 @utility type-body-lg {
   font-size: 1.125rem; /* 18px */
   line-height: 1.6;
   font-weight: 400;
+  overflow-wrap: break-word;
 }
 
 @utility type-body-md {
   font-size: 1rem; /* 16px */
   line-height: 1.55;
   font-weight: 400;
+  overflow-wrap: break-word;
 }
 
 @utility type-body-sm {
   font-size: 0.875rem; /* 14px */
   line-height: 1.5;
   font-weight: 400;
+  overflow-wrap: break-word;
 }
 
 @utility type-mono-md {
@@ -91,6 +105,8 @@
   line-height: 1.5;
   font-weight: 500;
   font-feature-settings: 'tnum' 1;
+  /* Hashes and addresses have no break opportunities of their own. */
+  overflow-wrap: anywhere;
 }
 
 @utility type-mono-sm {
@@ -99,6 +115,8 @@
   line-height: 1.4;
   font-weight: 500;
   font-feature-settings: 'tnum' 1;
+  /* Hashes and addresses have no break opportunities of their own. */
+  overflow-wrap: anywhere;
 }
 
 @utility type-eyebrow {
@@ -107,4 +125,13 @@
   font-weight: 500;
   letter-spacing: 0.28em;
   text-transform: uppercase;
+
+  /*
+   * 0.28em of tracking adds roughly half again to the width of an uppercase
+   * label. In a two-column stat grid on a 320px screen that is enough for
+   * "Stellar Selection Pool" to overrun its card, so ease off on phones.
+   */
+  @media (width < 40rem) {
+    letter-spacing: 0.12em;
+  }
 }

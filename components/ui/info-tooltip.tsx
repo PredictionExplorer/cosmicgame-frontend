@@ -43,8 +43,15 @@ export function InfoTooltip({
         <button
           type="button"
           aria-label={resolvedAriaLabel}
+          // The icon sits inline beside a label, so it cannot grow to 44px
+          // without pushing that row taller. Instead a transparent
+          // pseudo-element extends the hit area to 44px around the icon,
+          // leaving layout untouched. `data-touch-target` tells the mobile
+          // audit to verify the real hit area rather than the icon's box.
+          data-touch-target="extended"
           className={cn(
-            'inline-flex cursor-help appearance-none items-center border-0 bg-transparent p-0 align-middle text-muted-foreground/50 transition-colors hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            'relative inline-flex cursor-help appearance-none items-center border-0 bg-transparent p-0 align-middle text-muted-foreground/50 transition-colors hover:text-primary/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            "after:absolute after:left-1/2 after:top-1/2 after:h-11 after:w-11 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] sm:after:hidden",
             className,
           )}
         >

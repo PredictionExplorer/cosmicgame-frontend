@@ -168,7 +168,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('social.twitterLabel')}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 sm:h-9 sm:w-9 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
                 >
                   <XIcon />
                 </a>
@@ -177,7 +177,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('social.discordLabel')}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 sm:h-9 sm:w-9 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
                 >
                   <DiscordIcon />
                 </a>
@@ -230,19 +230,19 @@ const Footer = () => {
                 </p>
               ) : null}
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               <span className="font-mono uppercase tracking-[0.24em] text-white/40">
                 {t('colophon')}
               </span>
               <Link
                 href="/terms"
-                className="text-white/60 no-underline transition hover:text-white"
+                className="inline-flex min-h-6 items-center text-white/60 no-underline transition hover:text-white"
               >
                 {t('links.terms')}
               </Link>
               <Link
                 href="/privacy"
-                className="text-white/60 no-underline transition hover:text-white"
+                className="inline-flex min-h-6 items-center text-white/60 no-underline transition hover:text-white"
               >
                 {t('links.privacy')}
               </Link>

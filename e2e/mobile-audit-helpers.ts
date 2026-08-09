@@ -21,8 +21,17 @@ const OVERFLOW_TOLERANCE_PX = 1;
  */
 const MIN_MEASURABLE_PX = 8;
 
-/** WCAG 2.5.5 (AAA) target size. WCAG 2.5.8 (AA) allows 24px with spacing. */
+/**
+ * Target sizes.
+ *
+ * Controls with an explicit affordance — buttons, inputs, tabs, icon-only
+ * links — are held to WCAG 2.5.5 (AAA), because they are what a thumb aims at.
+ * Text links are held to WCAG 2.5.8 (AA); sizing them to 44px would mean
+ * padding out breadcrumbs and footer link lists, which the spec explicitly
+ * does not ask for.
+ */
 export const MIN_TAP_TARGET_PX = 44;
+export const MIN_TEXT_LINK_TARGET_PX = 24;
 
 export const MOBILE_AUDIT_VIEWPORTS = [
   { name: 'iphone-se', width: 320, height: 568 },
@@ -31,12 +40,16 @@ export const MOBILE_AUDIT_VIEWPORTS = [
 ] as const;
 
 export interface OverflowViolation {
-  /** `overflowing` = content wider than its own box. `truncated` = clipped with an ellipsis. */
-  type: 'overflowing' | 'truncated';
+  /**
+   * - `overflowing` — the element's own text does not fit its box.
+   * - `clipped` — the text fits its box, but an ancestor with `overflow: hidden`
+   *   cuts it off, so part of it is invisible.
+   * - `truncated` — deliberately cut with an ellipsis. Reported separately
+   *   because on mobile it usually means content is unreachable.
+   */
+  type: 'overflowing' | 'clipped' | 'truncated';
   selector: string;
-  scrollWidth: number;
-  clientWidth: number;
-  overflowX: string;
+  overflowBy: number;
   text: string;
 }
 
@@ -93,21 +106,30 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
         return parts.join(' > ');
       }
 
-      function hasText(el: Element): boolean {
-        return (el.textContent ?? '').trim().length > 0;
+      /**
+       * Only elements that own a text node are measured. Checking containers
+       * instead would flag every decorative blur that is positioned to bleed
+       * and then deliberately clipped by an `overflow-hidden` parent, which
+       * buries the handful of places where readable content is actually lost.
+       */
+      function ownsText(el: Element): boolean {
+        for (const node of Array.from(el.childNodes)) {
+          if (node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== '') {
+            return true;
+          }
+        }
+        return false;
       }
 
-      interface Measured {
-        type: 'overflowing' | 'truncated';
-        scrollWidth: number;
-        clientWidth: number;
-        overflowX: string;
+      const violations: {
+        type: 'overflowing' | 'clipped' | 'truncated';
+        selector: string;
+        overflowBy: number;
         text: string;
-      }
-
-      const candidates: { el: Element; violation: Measured }[] = [];
+      }[] = [];
 
       for (const el of Array.from(document.querySelectorAll('*'))) {
+        if (!ownsText(el)) continue;
         if (el.closest('[data-overflow-audit="ignore"]')) continue;
 
         const style = window.getComputedStyle(el);
@@ -115,44 +137,50 @@ export async function collectOverflowViolations(page: Page): Promise<OverflowVio
           continue;
         }
 
-        // Decorative, non-interactive layers (ambient backdrops, glow orbs) are
-        // positioned to bleed on purpose and never hold readable content.
-        if (
-          style.pointerEvents === 'none' &&
-          (style.position === 'fixed' || style.position === 'absolute')
-        ) {
-          continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.width < MIN_MEASURABLE_PX || rect.height < 1) continue;
+
+        const text = (el.textContent ?? '').trim().slice(0, 80);
+        const overflowX = style.overflowX;
+        const scrollable = overflowX === 'auto' || overflowX === 'scroll';
+
+        // 1. The element's own text does not fit inside it.
+        if (!scrollable && el.clientWidth >= MIN_MEASURABLE_PX) {
+          const overflowBy = el.scrollWidth - el.clientWidth;
+          if (overflowBy > tolerance) {
+            violations.push({
+              type: style.textOverflow === 'ellipsis' ? 'truncated' : 'overflowing',
+              selector: describe(el),
+              overflowBy,
+              text,
+            });
+            continue;
+          }
         }
 
-        const overflowX = style.overflowX;
-        // Intentional scroll containers are how wide content is *supposed* to work.
-        if (overflowX === 'auto' || overflowX === 'scroll') continue;
+        // 2. The text fits its own box but an ancestor cuts it off.
+        for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+          const parentStyle = window.getComputedStyle(parent);
+          const parentOverflow = parentStyle.overflowX;
+          if (parentOverflow === 'visible') continue;
+          // Reaching a scroll container means the content is reachable.
+          if (parentOverflow === 'auto' || parentOverflow === 'scroll') break;
+          // Screen-reader-only wrappers (including the table header row the
+          // mobile card layout hides) clip themselves to a 1px box by design.
+          if (parent.clientWidth < MIN_MEASURABLE_PX) break;
 
-        const clientWidth = el.clientWidth;
-        // Visually-hidden helpers (`.sr-only`) are deliberately clipped to a
-        // 1px box; they are read aloud, never laid out.
-        if (clientWidth < MIN_MEASURABLE_PX) continue;
-        if (el.scrollWidth <= clientWidth + tolerance) continue;
-        if (!hasText(el)) continue;
-
-        candidates.push({
-          el,
-          violation: {
-            type: style.textOverflow === 'ellipsis' ? 'truncated' : 'overflowing',
-            scrollWidth: el.scrollWidth,
-            clientWidth,
-            overflowX,
-            text: (el.textContent ?? '').trim().slice(0, 80),
-          },
-        });
+          const parentRect = parent.getBoundingClientRect();
+          const contentLeft = parentRect.left + parent.clientLeft;
+          const contentRight = contentLeft + parent.clientWidth;
+          const spill = Math.max(rect.right - contentRight, contentLeft - rect.left);
+          if (spill > tolerance) {
+            violations.push({ type: 'clipped', selector: describe(el), overflowBy: spill, text });
+          }
+          break;
+        }
       }
 
-      // Report only the innermost culprits. Otherwise a single wide table also
-      // flags every wrapper above it and buries the real cause.
-      const elements = candidates.map((c) => c.el);
-      return candidates
-        .filter(({ el }) => !elements.some((other) => other !== el && el.contains(other)))
-        .map(({ el, violation }) => ({ ...violation, selector: describe(el) }));
+      return violations;
     },
     { tolerance: OVERFLOW_TOLERANCE_PX, MIN_MEASURABLE_PX },
   );
@@ -174,7 +202,7 @@ export async function getPageOverflow(
  */
 export async function collectTapTargetViolations(page: Page): Promise<TapTargetViolation[]> {
   return page.evaluate(
-    ({ minSize }) => {
+    ({ minSize, minTextLinkSize }) => {
       const SELECTOR = [
         'a[href]',
         'button',
@@ -187,6 +215,33 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
         '[role="switch"]',
         '[role="menuitem"]',
       ].join(',');
+
+      /** A link whose content is text, rather than an icon-only control. */
+      function isTextLink(el: Element): boolean {
+        if (el.tagName !== 'A') return false;
+        return (el.textContent ?? '').trim().length > 0;
+      }
+
+      /**
+       * Controls too small to grow without disturbing the layout around them
+       * extend their hit area with a pseudo-element and declare
+       * `data-touch-target="extended"`. Measure that pseudo-element rather
+       * than take the attribute on trust — the first attempt at this in the
+       * codebase produced no box at all, and only measuring caught it.
+       *
+       * `elementFromPoint` would be a stronger check but only works inside the
+       * viewport, and most controls on a page are below the fold.
+       */
+      function hasWorkingExtendedHitArea(el: Element, required: number): boolean {
+        for (const pseudo of ['::after', '::before']) {
+          const style = window.getComputedStyle(el, pseudo);
+          if (style.content === 'none' || style.position !== 'absolute') continue;
+          const width = Number.parseFloat(style.width);
+          const height = Number.parseFloat(style.height);
+          if (width + 0.5 >= required && height + 0.5 >= required) return true;
+        }
+        return false;
+      }
 
       function describe(el: Element): string {
         const label =
@@ -213,7 +268,14 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
         // Visually-hidden controls (skip links until focused) are not touch targets.
         if (rect.width <= 1 || rect.height <= 1) continue;
 
-        if (rect.width + 0.5 < minSize || rect.height + 0.5 < minSize) {
+        const required = isTextLink(el) ? minTextLinkSize : minSize;
+        if (
+          el.getAttribute('data-touch-target') === 'extended' &&
+          hasWorkingExtendedHitArea(el, required)
+        ) {
+          continue;
+        }
+        if (rect.width + 0.5 < required || rect.height + 0.5 < required) {
           violations.push({
             selector: describe(el),
             width: Math.round(rect.width * 10) / 10,
@@ -225,7 +287,7 @@ export async function collectTapTargetViolations(page: Page): Promise<TapTargetV
 
       return violations;
     },
-    { minSize: MIN_TAP_TARGET_PX },
+    { minSize: MIN_TAP_TARGET_PX, minTextLinkSize: MIN_TEXT_LINK_TARGET_PX },
   );
 }
 
@@ -236,8 +298,7 @@ export function formatOverflowViolations(
   if (violations.length === 0) return '';
   const lines = violations.map(
     (v) =>
-      `  [${v.type}] ${v.selector}\n` +
-      `      scrollWidth=${v.scrollWidth} clientWidth=${v.clientWidth} overflow-x=${v.overflowX}\n` +
+      `  [${v.type}] overflows by ${Math.round(v.overflowBy)}px — ${v.selector}\n` +
       `      text: ${JSON.stringify(v.text)}`,
   );
   return `${violations.length} overflow violation(s) on ${route}:\n${lines.join('\n')}`;

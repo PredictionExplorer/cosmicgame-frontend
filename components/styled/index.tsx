@@ -12,7 +12,9 @@ import {
 } from '@/components/ui/responsive-table';
 
 export function StyledLink({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return <a className={cn('text-white underline', className)} {...props} />;
+  // These frequently wrap IPFS URIs and contract addresses, which have no
+  // natural break opportunity and otherwise run off a narrow screen.
+  return <a className={cn('break-words text-white underline', className)} {...props} />;
 }
 
 export function StyledCard({
@@ -250,7 +252,7 @@ export function SearchField({ className, ...props }: React.InputHTMLAttributes<H
   return (
     <input
       className={cn(
-        'mr-2 w-full max-w-[360px] flex h-11 rounded-md border border-input bg-background px-3 py-2 text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 max-xs:mr-0 max-xs:mb-4 max-xs:max-w-none',
+        'mr-2 w-full max-w-[360px] flex h-11 rounded-md border border-input bg-background px-3 py-2 text-base sm:text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 max-xs:mr-0 max-xs:mb-4 max-xs:max-w-none',
         className,
       )}
       {...props}
@@ -341,7 +343,7 @@ export function CustomTextField({
   return (
     <input
       className={cn(
-        'flex h-10 w-full rounded-md border border-input bg-background px-4 py-3 text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'flex h-11 sm:h-10 w-full rounded-md border border-input bg-background px-4 py-3 text-base sm:text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         className,
       )}
       {...props}

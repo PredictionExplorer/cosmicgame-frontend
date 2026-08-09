@@ -214,7 +214,10 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                 {searchQuery ? highlightSearch(item.question, searchQuery) : item.question}
               </AccordionTrigger>
               <AccordionContent forceMount className="pb-5">
-                <p className="text-sm leading-relaxed text-muted-foreground">
+                {/* Several answers embed contract identifiers such as
+                    `mainPrizeTimeIncrementInMicroSeconds`, which are wider than
+                    a phone screen on their own. */}
+                <p className="break-words text-sm leading-relaxed text-muted-foreground">
                   {searchQuery
                     ? highlightSearch(item.answer, searchQuery)
                     : enrichWithTooltips(item.answer, tooltipTerms)}
@@ -224,7 +227,7 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
                     e.stopPropagation();
                     copyLink(item);
                   }}
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs text-muted-foreground/50 transition-colors hover:text-primary"
+                  className="-mx-2 mt-1 inline-flex min-h-11 items-center gap-1.5 px-2 text-xs text-muted-foreground/50 transition-colors hover:text-primary sm:mx-0 sm:mt-3 sm:min-h-0 sm:px-0"
                   aria-label={t('category.copyLinkAria')}
                 >
                   <Link2 className="h-3 w-3" />

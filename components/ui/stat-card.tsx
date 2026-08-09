@@ -91,14 +91,19 @@ export function StatCard({
       )}
     >
       <div className="relative z-[1] flex items-start justify-between gap-2">
-        <div className="flex items-center gap-1.5">
-          <p className="type-eyebrow text-muted-foreground print:!text-foreground/80">{label}</p>
+        {/* `min-w-0` on both levels: flex items default to `min-width: auto`,
+            which stops a long label from ever wrapping and pushes the card
+            wider than its grid column on narrow screens. */}
+        <div className="flex min-w-0 items-center gap-1.5">
+          <p className="type-eyebrow min-w-0 break-words text-muted-foreground print:!text-foreground/80">
+            {label}
+          </p>
           {tooltip ? <InfoTooltip content={tooltip} label={label} /> : null}
         </div>
         {icon ? (
           <div
             className={cn(
-              'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
+              'flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors',
               'duration-[var(--duration-fast)]',
               featured ? 'bg-primary/15 text-primary' : palette.icon,
             )}
@@ -112,7 +117,7 @@ export function StatCard({
       ) : (
         <div
           className={cn(
-            'stat-card-value relative z-[1] mt-3 text-xl font-bold tracking-tight tabular-nums text-foreground',
+            'stat-card-value relative z-[1] mt-3 break-words text-xl font-bold tracking-tight tabular-nums text-foreground',
             'print:!text-foreground print:!shadow-none print:[-webkit-text-fill-color:hsl(var(--foreground))]',
             gradient &&
               'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent print:!bg-none print:!bg-clip-border',

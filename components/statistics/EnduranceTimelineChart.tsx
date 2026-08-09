@@ -296,8 +296,8 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
         <div className="space-y-1.5">
           {gantt.lanes.map((lane) => (
             <div key={lane.address} className="flex items-center gap-3">
-              <div className="flex w-36 shrink-0 items-center gap-1.5 overflow-hidden">
-                <span className="truncate font-mono text-xs text-white" title={lane.address}>
+              <div className="flex w-24 shrink-0 items-center gap-1.5 overflow-hidden sm:w-36">
+                <span className="font-mono text-xs text-white sm:truncate" title={lane.address}>
                   {shortenHex(lane.address, 4)}
                 </span>
                 {lane.isEnduranceChampion ? (

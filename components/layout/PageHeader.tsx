@@ -82,7 +82,7 @@ export function PageHeader({
         <nav
           aria-label={t('accessibility.breadcrumb')}
           className={cn(
-            'mb-4 flex items-center gap-1 type-body-sm text-muted-foreground print:!text-foreground/80',
+            'mb-4 flex flex-wrap items-center gap-1 type-body-sm text-muted-foreground print:!text-foreground/80',
             align === 'center' && !hasSidebar && 'justify-center',
           )}
         >
@@ -90,7 +90,10 @@ export function PageHeader({
             <span key={i} className="flex items-center gap-1">
               {i > 0 ? <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40" /> : null}
               {crumb.href ? (
-                <Link href={crumb.href} className="transition-colors hover:text-primary">
+                <Link
+                  href={crumb.href}
+                  className="inline-flex min-h-6 items-center transition-colors hover:text-primary"
+                >
                   {crumb.label}
                 </Link>
               ) : (
@@ -105,11 +108,11 @@ export function PageHeader({
           hasSidebar && 'flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between',
         )}
       >
-        <div>
+        <div className="min-w-0">
           {eyebrow ? (
             <div
               className={cn(
-                'mb-4 type-eyebrow text-muted-foreground',
+                'mb-4 type-eyebrow break-words text-muted-foreground',
                 align === 'center' && !hasSidebar && 'flex justify-center',
               )}
             >

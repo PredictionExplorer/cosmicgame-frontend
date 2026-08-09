@@ -241,7 +241,9 @@ const ConnectWalletButton = ({
   }
 
   return (
-    <div className="ml-auto">
+    // RainbowKit styles its own button and gives us no size prop, so the
+    // 44px touch target has to be enforced from the outside.
+    <div className="ml-auto [&_button]:min-h-11 sm:[&_button]:min-h-0">
       <RainbowConnectButton />
     </div>
   );

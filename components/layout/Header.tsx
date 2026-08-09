@@ -275,7 +275,7 @@ const Header: FC = () => {
           aria-label={t('menuLabel')}
           aria-haspopup="true"
           onClick={handleDrawerOpen}
-          className="h-10 w-10 shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03]"
+          className="h-11 w-11 shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03] sm:h-10 sm:w-10"
         >
           {hasUnclaimedRewards ? (
             <span className="relative inline-flex">

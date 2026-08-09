@@ -119,7 +119,9 @@ function LatestGestureTicker({
           )}
         </span>
         <span className="min-w-0">
-          <span className="block truncate font-medium text-foreground">
+          {/* Wraps to two lines on a phone rather than truncating: the address
+              is the useful part and the ellipsis cut it off entirely. */}
+          <span className="block break-words font-medium text-foreground sm:truncate">
             {t('ticker.gestureLine', {
               address: shortenHex(gesture.BidderAddr, 6),
               kind: getGestureKindSelectValue(gesture.GestureType),
