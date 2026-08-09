@@ -18,7 +18,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 ## Prerequisites
 
 - Node.js 20+ (see `.nvmrc`)
-- Yarn
+- npm 10+ (bundled with Node)
 - A Web3 wallet (e.g. MetaMask) for blockchain features
 
 ## Getting Started
@@ -28,7 +28,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
    ```bash
    git clone <repo-url>
    cd cosmicgame-frontend
-   yarn install
+   npm ci
    ```
 
 2. **Configure environment:**
@@ -42,7 +42,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 3. **Start development server:**
 
    ```bash
-   yarn dev
+   npm run dev
    ```
 
    Open [http://localhost:3000](http://localhost:3000).
@@ -50,30 +50,30 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 4. **Production build:**
 
    ```bash
-   yarn build
-   yarn start
+   npm run build
+   npm run start
    ```
 
 ## Scripts
 
-| Script                    | Description                                                             |
-| ------------------------- | ----------------------------------------------------------------------- |
-| `yarn dev`                | Start development server                                                |
-| `yarn build`              | Create production build                                                 |
-| `yarn start`              | Run production server                                                   |
-| `yarn lint`               | Run ESLint (zero warnings allowed)                                      |
-| `yarn type-check`         | Run the TypeScript compiler without emitting                            |
-| `yarn test`               | Run unit tests (Jest)                                                   |
-| `yarn test:coverage`      | Run unit tests with coverage report                                     |
-| `yarn test:seo`           | Run the SEO test subset (unit + raw-HTML e2e)                           |
-| `yarn test:e2e`           | Run end-to-end tests (Playwright)                                       |
-| `yarn test:e2e:zh`        | Run the Chinese rollout, routing, accessibility, and wallet E2E subset  |
-| `yarn test:e2e:ui`        | Run E2E tests with Playwright UI                                        |
-| `yarn test:e2e:headed`    | Run E2E tests in headed browser                                         |
-| `yarn analyze`            | Production build with bundle analyzer                                   |
-| `yarn bundle:budget`      | Check full app-home initial JS gzip payload against budget (post-build) |
-| `yarn contracts:generate` | Regenerate typed ABIs from `contracts/*.json`                           |
-| `yarn lexicon:scan`       | Enforce domain terminology in UI copy                                   |
+| Script                       | Description                                                             |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `npm run dev`                | Start development server                                                |
+| `npm run build`              | Create production build                                                 |
+| `npm run start`              | Run production server                                                   |
+| `npm run lint`               | Run ESLint (zero warnings allowed)                                      |
+| `npm run type-check`         | Run the TypeScript compiler without emitting                            |
+| `npm run test`               | Run unit tests (Jest)                                                   |
+| `npm run test:coverage`      | Run unit tests with coverage report                                     |
+| `npm run test:seo`           | Run the SEO test subset (unit + raw-HTML e2e)                           |
+| `npm run test:e2e`           | Run end-to-end tests (Playwright)                                       |
+| `npm run test:e2e:zh`        | Run the Chinese rollout, routing, accessibility, and wallet E2E subset  |
+| `npm run test:e2e:ui`        | Run E2E tests with Playwright UI                                        |
+| `npm run test:e2e:headed`    | Run E2E tests in headed browser                                         |
+| `npm run analyze`            | Production build with bundle analyzer                                   |
+| `npm run bundle:budget`      | Check full app-home initial JS gzip payload against budget (post-build) |
+| `npm run contracts:generate` | Regenerate typed ABIs from `contracts/*.json`                           |
+| `npm run lexicon:scan`       | Enforce domain terminology in UI copy                                   |
 
 ## Environment Variables
 
@@ -120,7 +120,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 ## Architecture
 
 - **Data fetching:** All backend reads go through React Query hooks in `hooks/useApiQuery.ts` (caching, polling, focus refetch). The HTTP layer in `services/api/` uses Axios with an envelope-validating interceptor; list endpoints accept an optional `ApiPageWindow` for server-side pagination (`pagedPath` in `services/api/client.ts`).
-- **Contracts:** ABIs are generated into `contracts/generated.ts` via `yarn contracts:generate` (wagmi CLI). `contracts/abis.ts` re-exports them widened to viem's `Abi` for existing call sites; import from `contracts/generated` for fully literal types.
+- **Contracts:** ABIs are generated into `contracts/generated.ts` via `npm run contracts:generate` (wagmi CLI). `contracts/abis.ts` re-exports them widened to viem's `Abi` for existing call sites; import from `contracts/generated` for fully literal types.
 - **Live updates:** `hooks/useLiveGameDataRefresh.ts` watches the on-chain `BidPlaced` event, invalidates live queries, and dispatches a `cosmic:gesture-placed` window event that drives UI pulses (gesture chat, latest-gesture ticker).
 - **Gesture Message Chat:** The home-page chat panel is current-cycle scoped and reuses `useGestureListByCycle(round, 'desc')`; see `docs/gesture-message-chat.md`.
 - **Error handling:** Errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
@@ -142,7 +142,7 @@ Contract addresses come from the backend dashboard API at runtime (`contexts/Con
 ### Linting
 
 ```bash
-yarn lint
+npm run lint
 ```
 
 ESLint uses the modern flat config format (`eslint.config.mjs`) with `eslint-config-next/core-web-vitals`, strict TypeScript rules, and import ordering. The repo enforces zero warnings.
@@ -162,7 +162,7 @@ Common types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `ci`.
 Unit tests use Jest with React Testing Library. E2E tests use Playwright against Desktop Chrome and Mobile Chrome viewports.
 
 ```bash
-yarn test              # unit tests
-yarn test:coverage     # unit tests with coverage
-yarn test:e2e          # end-to-end tests
+npm run test              # unit tests
+npm run test:coverage     # unit tests with coverage
+npm run test:e2e          # end-to-end tests
 ```

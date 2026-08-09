@@ -71,8 +71,8 @@ E2E coverage lives in `e2e/home-gesture-chat.spec.ts` and mocks current-cycle AP
 ## Validation Commands
 
 ```bash
-YARN_IGNORE_ENGINES=1 yarn test components/home/__tests__/GestureMessageChat.test.tsx components/home/__tests__/PublicGoodsImpactCard.test.tsx components/attachments/__tests__/DonatedNFTPrizeShowcase.test.tsx "app/(app)/__tests__/HomePage.test.tsx" utils/__tests__/linkify.test.ts components/ui/__tests__/linkified-text.test.tsx --runInBand
-YARN_IGNORE_ENGINES=1 yarn test:e2e e2e/home-gesture-chat.spec.ts
-yarn lint
-yarn type-check
+npm run test -- components/home/__tests__/GestureMessageChat.test.tsx components/home/__tests__/PublicGoodsImpactCard.test.tsx components/attachments/__tests__/DonatedNFTPrizeShowcase.test.tsx "app/(app)/__tests__/HomePage.test.tsx" utils/__tests__/linkify.test.ts components/ui/__tests__/linkified-text.test.tsx --runInBand
+npm run test:e2e -- e2e/home-gesture-chat.spec.ts
+npm run lint
+npm run type-check
 ```

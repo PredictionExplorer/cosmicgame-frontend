@@ -13,11 +13,26 @@ is not attacker-controlled in the deployed dapp.
   checked-in npm script requires them.
 - Accepted advisories must include an id, package, severity, scope, and reason.
 - Accepted advisories should be revisited when the owning top-level package
-  releases a compatible patch.
+  releases a compatible patch. An entry claiming no fix exists is a claim about
+  a moment in time, so re-check it rather than trusting it: the `js-yaml`
+  advisory below was accepted on the grounds that no patched 3.x or 4.x release
+  existed, and both `3.15.1` and `4.3.1` were published afterwards. Prefer
+  removing an entry over keeping it.
+- Prefer a patched version over an override, and an override over an
+  acceptance. The `js-yaml` and `esbuild` advisories were both cleared by
+  moving within ranges the consuming packages already declared, so neither
+  needed a pin.
+- The project installs with npm only. `resolutions` is a yarn field that npm
+  ignores, so pins belong in `overrides`.
 - CI runs the audit in non-blocking mode so new advisories are visible without
   blocking unrelated hotfixes.
 
 ## Accepted Dependency Advisories
+
+Entries are retained for history even once an advisory leaves the tree.
+`npm run audit:high` reports the live set and flags accepted entries that no
+longer apply, so use its output rather than the length of this list to judge
+current exposure.
 
 ### GHSA-vpq2-c234-7xj6
 
@@ -59,16 +74,6 @@ is not attacker-controlled in the deployed dapp.
 - reason: The XSS requires calling HTML-emitting `Address6` methods with
   attacker-controlled values and rendering the result as HTML. The app does not
   call those methods.
-
-### GHSA-5p4m-2wfm-xmqj
-
-- package: `js-yaml`
-- severity: high
-- scope: transitive development tooling (eslint, commitlint, babel-jest)
-- reason: The quadratic CPU consumption requires parsing attacker-controlled
-  YAML with `!!omap` tags. This package is only reached through local lint and
-  test tooling that parses repository-controlled config files; no fixed 3.x/4.x
-  release exists (CVE-2026-59870 fix is not backported).
 
 ### GHSA-3ppc-4f35-3m26
 

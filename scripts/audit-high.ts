@@ -22,8 +22,10 @@ interface NpmAuditReport {
 
 const repoRoot = process.cwd();
 const acceptedDoc = readFileSync(path.join(repoRoot, 'docs/SECURITY.md'), 'utf8');
-const acceptedIds = new Set(
-  Array.from(acceptedDoc.matchAll(/^### (GHSA-[a-z0-9-]+)$/gim), (match) => match[1]),
+const acceptedIds = new Set<string>(
+  Array.from(acceptedDoc.matchAll(/^### (GHSA-[a-z0-9-]+)$/gim), (match) => match[1]).filter(
+    (id): id is string => id !== undefined,
+  ),
 );
 
 function advisoryId(url: string): string | null {
@@ -100,6 +102,30 @@ if (unacceptedHighs.length > 0) {
   process.exit(1);
 }
 
+/**
+ * Accepted advisories that no longer appear in the tree.
+ *
+ * Reported but not fatal. An acceptance records that no fix was available at
+ * the time, which stops being true the moment upstream ships one — the js-yaml
+ * entry sat here as "no fixed 3.x/4.x release exists" for a while after both
+ * 3.15.1 and 4.3.1 were published, and a high advisory stayed in the tree
+ * because nobody re-checked. Surfacing the gap is what makes the policy's
+ * "revisit when a patch lands" line actually happen.
+ */
+const staleAcceptances = Array.from(acceptedIds).filter((id) => !advisories.has(id));
+
 process.stdout.write(
   `Dependency audit passed: 0 production advisories; ${advisories.size} dev/tooling advisories found, all high/critical advisories are documented.\n`,
 );
+
+if (staleAcceptances.length > 0) {
+  // Summarised rather than listed in full: a wall of ids on every CI run gets
+  // skimmed past, which is how the js-yaml entry went stale in the first place.
+  const shown = staleAcceptances.slice(0, 5);
+  const remainder = staleAcceptances.length - shown.length;
+  process.stdout.write(
+    `\n${staleAcceptances.length} accepted advisor${staleAcceptances.length === 1 ? 'y' : 'ies'} in docs/SECURITY.md no longer appear in the dependency tree.\n` +
+      `Confirm each is fixed rather than merely absent, then remove the entry: ${shown.join(', ')}` +
+      `${remainder > 0 ? ` and ${remainder} more` : ''}.\n`,
+  );
+}
