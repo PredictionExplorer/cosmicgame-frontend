@@ -178,27 +178,31 @@ export function GestureMessageChat({
       variant="glass-bordered"
       radius="xl"
       padding="none"
-      className={cn('print:break-inside-avoid', isPulsing && 'animate-live-flash', className)}
+      className={cn(
+        'min-w-0 print:h-auto print:overflow-visible print:break-inside-avoid',
+        isPulsing && 'animate-live-flash',
+        className,
+      )}
     >
       <aside aria-labelledby="gesture-message-chat-title" data-testid="gesture-message-chat">
         <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
         <div className="pointer-events-none absolute -left-12 bottom-0 h-36 w-36 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
 
         <div className="relative z-[1] flex h-full min-h-0 flex-col">
-          <div className="border-b border-white/[0.07] p-5 xl:p-6">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="border-b border-white/[0.07] p-4 sm:p-5 xl:p-4">
+            <div className="flex items-start justify-between gap-2.5">
+              <div className="min-w-0">
+                <div className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-live-dot rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300" />
                   </span>
                   {t('chat.liveFeed')}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
                   <h2
                     id="gesture-message-chat-title"
-                    className="font-display text-xl font-bold tracking-tight"
+                    className="font-display text-lg font-bold tracking-tight sm:text-xl xl:text-lg"
                   >
                     {t('chat.title')}
                   </h2>
@@ -220,7 +224,7 @@ export function GestureMessageChat({
                     </TooltipContent>
                   </Tooltip>
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   {cycleNumber != null
                     ? t('chat.cycleNumber', { number: String(cycleNumber) })
                     : t('chat.currentCycle')}
@@ -228,7 +232,7 @@ export function GestureMessageChat({
                   {t('chat.messageCount', { count: messages.length })}
                 </p>
               </div>
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/12 text-primary">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/12 text-primary max-sm:hidden">
                 <MessageCircle className="h-5 w-5" />
               </div>
             </div>
@@ -236,13 +240,15 @@ export function GestureMessageChat({
 
           <div
             data-testid="gesture-message-chat-scroll"
-            // Below xl the message list owns its own scrolling. From xl the
-            // whole rail is pinned and scrollable, so capping this too would
-            // nest a second scroll area inside the first.
-            className="relative z-[1] flex-1 overflow-y-auto p-4 lg:max-h-[calc(100vh-13rem)] xl:max-h-none xl:overflow-y-visible xl:p-5"
+            role="region"
+            aria-labelledby="gesture-message-chat-title"
+            tabIndex={0}
+            // Phones stay in the document flow. Tablet-sized feeds and the
+            // deliberately capped desktop panel scroll here instead.
+            className="relative z-[1] min-h-0 flex-1 overflow-y-visible p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60 sm:p-4 lg:max-h-[calc(100vh-13rem)] lg:overflow-y-auto xl:max-h-none xl:overflow-y-auto xl:p-4 xl:[scrollbar-gutter:stable] print:max-h-none print:overflow-visible print:[scrollbar-gutter:auto]"
           >
             {messages.length > 0 ? (
-              <ol className="space-y-3" aria-live="polite">
+              <ol className="space-y-2.5 sm:space-y-3 xl:space-y-2.5" aria-live="polite">
                 {messages.map(({ gesture, message }, index) => {
                   const isNewest = index === 0;
                   const gestureId = Number.isFinite(gesture.EvtLogId) ? gesture.EvtLogId : null;
@@ -256,7 +262,7 @@ export function GestureMessageChat({
                     <li key={listItemKey}>
                       <article
                         className={cn(
-                          'rounded-2xl border p-4 transition-colors 2xl:p-5',
+                          'rounded-xl border p-3 transition-colors sm:rounded-2xl sm:p-4 xl:p-3.5 2xl:p-4',
                           isNewest
                             ? 'border-primary/25 bg-primary/[0.075] shadow-[0_18px_70px_-54px_rgb(var(--aurora-cyan-rgb)/0.9)]'
                             : 'border-white/[0.06] bg-white/[0.03]',
@@ -270,8 +276,14 @@ export function GestureMessageChat({
                           took their full width and squeezed the address to a
                           single character column ~5px wide and 360px tall.
                         */}
-                        <div className="flex items-start justify-between gap-3 max-sm:flex-col max-sm:items-start max-sm:gap-2">
-                          <div className="flex min-w-0 items-center gap-1">
+                        <div
+                          data-testid="gesture-message-meta"
+                          className="flex items-start justify-between gap-3 max-sm:flex-col max-sm:items-start max-sm:gap-2"
+                        >
+                          <div
+                            data-testid="gesture-message-participant"
+                            className="flex min-w-0 items-center gap-1"
+                          >
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Link
@@ -289,7 +301,10 @@ export function GestureMessageChat({
                             </Tooltip>
                             <CopyAddressButton address={gesture.BidderAddr} />
                           </div>
-                          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+                          <div
+                            data-testid="gesture-message-badges"
+                            className="flex shrink-0 flex-wrap items-center justify-end gap-1.5 max-sm:justify-start"
+                          >
                             <span
                               data-testid="gesture-method-badge"
                               className="inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.035] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground"
@@ -318,7 +333,7 @@ export function GestureMessageChat({
                           nowMs={nowMs}
                         />
 
-                        <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/95">
+                        <p className="mt-2.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/95">
                           <LinkifiedText text={message} />
                         </p>
                       </article>
@@ -338,7 +353,7 @@ export function GestureMessageChat({
                     </Button>
                   ) : undefined
                 }
-                className="min-h-[20rem] py-10"
+                className="min-h-[14rem] py-8 sm:min-h-[16rem] xl:h-full xl:min-h-0 xl:py-6"
               />
             )}
           </div>

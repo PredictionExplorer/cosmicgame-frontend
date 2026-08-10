@@ -43,10 +43,10 @@ The panel uses `useBannedGestures()` and hides messages whose `EvtLogId` is pres
 The home page keeps the timer and hero full width. Below the hero, the page switches to a responsive two-column layout that expands beyond the default data-page width on large screens:
 
 - Main content: status, special allocation leaders, gesture form, and allocation breakdown.
-- Right rail: `GestureMessageChat`, sticky on desktop with internal scrolling, plus a companion stack below it: full-cycle details, public-goods impact, and attached asset receipt when assets exist.
+- Right rail: `GestureMessageChat`, sticky on desktop with a compact viewport-aware height and an internally scrolling message body, plus a companion stack below it: full-cycle details, public-goods impact, and attached asset receipt when assets exist.
 - Large screens use a wider rail (`28rem-36rem` at `xl`, `34rem-42rem` at `2xl`) so the feed and companion cards fill the available right-side space instead of feeling like a narrow sidebar.
 
-On tablet and mobile, the grid stacks so the chat remains part of the document flow and does not cover gesture controls.
+On phones, the grid stacks and the feed expands naturally with the page instead of creating a nested vertical scroller. Compact padding, stacked participant metadata, safe text wrapping, and 44px touch targets keep the panel usable down to 320px. Tablet-sized feeds may scroll internally when they exceed the available viewport height.
 
 ## Test Coverage
 
@@ -59,6 +59,7 @@ Component coverage lives in `components/home/__tests__/GestureMessageChat.test.t
 - copy-address behavior;
 - long text safety;
 - empty state (with and without the CTA);
+- responsive scroll ownership, compact spacing, phone stacking, and touch-target classes;
 - banned-message exclusion;
 - accessibility via `checkA11y`.
 
@@ -66,7 +67,7 @@ URL segmentation coverage lives in `utils/__tests__/linkify.test.ts`, and the co
 
 Home-page integration coverage lives in `app/(app)/__tests__/HomePage.test.tsx` and verifies the panel receives the current-cycle gesture feed, the primary gesture flow remains in the main column, optional companion cards render in the right rail only when data exists, and the chat empty-state CTA expands the gesture form's Advanced options.
 
-E2E coverage lives in `e2e/home-gesture-chat.spec.ts` and mocks current-cycle API responses to verify the panel renders the expected messages, docks on the desktop right rail, keeps companion cards aligned under the chat, stays wider than the old rail, and does not overlap the primary column.
+E2E coverage lives in `e2e/home-gesture-chat.spec.ts` and mocks current-cycle API responses to verify the panel renders the expected messages, caps and scrolls a long desktop feed, expands a long phone feed without nested scrolling, keeps companion cards aligned under the chat, and does not overlap the primary column. The mobile overflow and tap-target audits exercise the home feed at 320px, 375px, and 414px in Chromium and WebKit.
 
 ## Validation Commands
 

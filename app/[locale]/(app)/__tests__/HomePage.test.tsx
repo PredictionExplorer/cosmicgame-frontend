@@ -791,7 +791,12 @@ describe('HomePage', () => {
     expect(primaryColumn).toContainElement(form);
     expect(primaryColumn).toContainElement(allocationHeading);
     expect(chatColumn).toContainElement(chat);
-    expect(chat).toHaveClass('xl:min-h-[38rem]', '2xl:min-h-[42rem]');
+    expect(chat).toHaveClass(
+      'xl:h-[clamp(30rem,68vh,34rem)]',
+      '2xl:h-[clamp(32rem,64vh,36rem)]',
+      'print:h-auto',
+    );
+    expect(chat).not.toHaveClass('min-h-[30rem]', 'xl:min-h-[38rem]', '2xl:min-h-[42rem]');
 
     // The whole rail pins, not just the chat. Pinning the chat alone let the
     // cards below it scroll up through it, because those cards are exactly the
@@ -800,6 +805,13 @@ describe('HomePage', () => {
     expect(chat).not.toHaveClass('xl:sticky');
     // A rail taller than the viewport has to stay reachable.
     expect(chatColumn).toHaveClass('xl:overflow-y-auto');
+    // Print must expand both scroll owners so messages and companion cards are not clipped.
+    expect(chatColumn).toHaveClass(
+      'print:static',
+      'print:max-h-none',
+      'print:overflow-visible',
+      'print:pr-0',
+    );
   });
 
   it('uses a wider home shell and keeps desktop companion actions in the chat rail', () => {

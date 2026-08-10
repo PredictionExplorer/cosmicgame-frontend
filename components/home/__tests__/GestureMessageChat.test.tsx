@@ -230,8 +230,15 @@ describe('GestureMessageChat', () => {
   it('shows an empty state when the current cycle has no messages', () => {
     render(<GestureMessageChat gestures={[makeGesture({ Message: '' })]} />);
 
-    expect(screen.getByText('home.chat.empty.title')).toBeInTheDocument();
+    const title = screen.getByText('home.chat.empty.title');
+    expect(title).toBeInTheDocument();
     expect(screen.getByText('home.chat.empty.description')).toBeInTheDocument();
+    expect(title.parentElement).toHaveClass(
+      'min-h-[14rem]',
+      'sm:min-h-[16rem]',
+      'xl:h-full',
+      'xl:min-h-0',
+    );
     expect(
       screen.getByText('home.chat.currentCycle · home.chat.messageCount(count=0)'),
     ).toBeInTheDocument();
@@ -249,7 +256,7 @@ describe('GestureMessageChat', () => {
     expect(onJoinCta).toHaveBeenCalledTimes(1);
   });
 
-  it('exposes spacious desktop scroll and message layout classes', () => {
+  it('uses compact responsive layout and an accessible desktop scroller', () => {
     const participant = '0x4444444444444444444444444444444444444444';
 
     render(
@@ -261,14 +268,43 @@ describe('GestureMessageChat', () => {
     );
 
     const scroll = screen.getByTestId('gesture-message-chat-scroll');
-    expect(scroll).toHaveClass('xl:p-5');
-    // Below xl the message list scrolls itself. From xl the surrounding rail is
-    // pinned and scrollable, so capping the list here would nest a second
-    // scroll area inside the first.
-    expect(scroll).toHaveClass('lg:max-h-[calc(100vh-13rem)]');
-    expect(scroll).toHaveClass('xl:max-h-none', 'xl:overflow-y-visible');
+    expect(
+      screen.getByRole('region', {
+        name: 'home.chat.title',
+      }),
+    ).toBe(scroll);
+    expect(scroll).toHaveAttribute('tabIndex', '0');
+    expect(scroll).toHaveClass(
+      'min-h-0',
+      'overflow-y-visible',
+      'lg:max-h-[calc(100vh-13rem)]',
+      'lg:overflow-y-auto',
+      'xl:max-h-none',
+      'xl:overflow-y-auto',
+      'xl:p-4',
+      'print:max-h-none',
+      'print:overflow-visible',
+    );
+
+    expect(screen.getByTestId('gesture-message-meta')).toHaveClass(
+      'max-sm:flex-col',
+      'max-sm:items-start',
+    );
+    expect(screen.getByTestId('gesture-message-badges')).toHaveClass('max-sm:justify-start');
+
     expect(screen.getByLabelText(`home.chat.messageAria(address=${participant})`)).toHaveClass(
-      '2xl:p-5',
+      'p-3',
+      'sm:p-4',
+      'xl:p-3.5',
+      '2xl:p-4',
+    );
+    expect(screen.getByRole('button', { name: 'common.actions.copyAddress' })).toHaveClass(
+      'max-sm:min-h-11',
+      'max-sm:min-w-11',
+    );
+    expect(screen.getByTestId('gesture-message-chat')).toHaveClass(
+      'print:h-auto',
+      'print:overflow-visible',
     );
   });
 

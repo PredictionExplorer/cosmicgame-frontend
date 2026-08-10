@@ -96,7 +96,23 @@ const gestures = [
   },
 ];
 
-async function mockHomeGestureChatApi(page: Page) {
+const longGestureFeed = Array.from({ length: 12 }, (_, index) => {
+  const sequence = index + 1;
+  return {
+    ...gestures[0]!,
+    BidderAddr: `0x${sequence.toString(16).padStart(40, '0')}`,
+    Message: `Scrollable message ${sequence}: ${'cosmic signal '.repeat(8).trim()}`,
+    Tx: {
+      ...gestures[0]!.Tx,
+      EvtLogId: 200 + sequence,
+      TxId: 200 + sequence,
+      TxHash: `0x${200 + sequence}`,
+      TimeStamp: MOCK_NOW_SECONDS - sequence * 60,
+    },
+  };
+});
+
+async function mockHomeGestureChatApi(page: Page, gestureFeed = gestures) {
   await page.route('**/api/cosmicgame/**', async (route) => {
     const url = new URL(route.request().url());
     const path = url.pathname;
@@ -118,7 +134,7 @@ async function mockHomeGestureChatApi(page: Page) {
 
     // lexicon-allow-start: backend route paths are sealed API contracts.
     if (path.includes(`/bid/list/by_round/${CYCLE_NUMBER}/1/`)) {
-      await route.fulfill({ json: { BidsByRound: gestures } });
+      await route.fulfill({ json: { BidsByRound: gestureFeed } });
       return;
     }
 
@@ -196,6 +212,50 @@ test.describe('home gesture chat', () => {
     await expect(firstMessage).toContainText('Newest message from a gesture');
   });
 
+  test('handles a long feed without making phone scrolling feel nested', async ({
+    page,
+  }, testInfo) => {
+    await page.unroute('**/api/cosmicgame/**');
+    await mockHomeGestureChatApi(page, longGestureFeed);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
+    const scroll = chat.getByTestId('gesture-message-chat-scroll');
+    const cycleDetails = page.locator('[data-testid="cycle-details-link-card"]:visible').first();
+    await expect(chat.getByText('Cycle #7 · 12 messages')).toBeVisible();
+
+    const viewport = page.viewportSize();
+    const chatBox = await chat.boundingBox();
+    const metrics = await scroll.evaluate((element) => ({
+      clientHeight: element.clientHeight,
+      scrollHeight: element.scrollHeight,
+      overflowY: window.getComputedStyle(element).overflowY,
+    }));
+    expect(viewport).not.toBeNull();
+    expect(chatBox).not.toBeNull();
+
+    if (testInfo.project.name === 'Desktop Chrome') {
+      expect(chatBox!.height).toBeLessThanOrEqual(viewport!.height * 0.75);
+      expect(metrics.overflowY).toBe('auto');
+      expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight + 20);
+
+      await scroll.evaluate((element) => {
+        element.scrollTop = element.scrollHeight;
+      });
+      expect(await scroll.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+      await expect(chat.getByText(/Scrollable message 12:/)).toBeVisible();
+      return;
+    }
+
+    expect(metrics.overflowY).toBe('visible');
+    expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.clientHeight + 1);
+    expect(chatBox!.height).toBeGreaterThan(viewport!.height);
+
+    const cycleDetailsBox = await cycleDetails.boundingBox();
+    expect(cycleDetailsBox).not.toBeNull();
+    expect(cycleDetailsBox!.y).toBeGreaterThan(chatBox!.y + chatBox!.height);
+  });
+
   test('positions the chat appropriately for the current viewport', async ({ page }, testInfo) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
@@ -224,6 +284,15 @@ test.describe('home gesture chat', () => {
       expect(box!.x).toBeGreaterThanOrEqual(0);
       expect(cycleDetailsBox!.y).toBeGreaterThan(box!.y + box!.height);
       expect(publicGoodsBox!.y).toBeGreaterThan(cycleDetailsBox!.y + cycleDetailsBox!.height);
+
+      const participantBox = await chat
+        .getByTestId('gesture-message-participant')
+        .first()
+        .boundingBox();
+      const badgesBox = await chat.getByTestId('gesture-message-badges').first().boundingBox();
+      expect(participantBox).not.toBeNull();
+      expect(badgesBox).not.toBeNull();
+      expect(badgesBox!.y).toBeGreaterThanOrEqual(participantBox!.y + participantBox!.height - 1);
       return;
     }
 

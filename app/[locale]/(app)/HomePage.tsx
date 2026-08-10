@@ -666,14 +666,14 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
           */}
           <div
             data-testid="home-chat-column"
-            className="min-w-0 space-y-6 xl:sticky xl:top-[var(--sticky-offset)] xl:z-10 xl:max-h-[calc(100vh-var(--sticky-offset)-1.5rem)] xl:overflow-y-auto xl:overscroll-contain xl:pr-1"
+            className="min-w-0 space-y-6 xl:sticky xl:top-[var(--sticky-offset)] xl:z-10 xl:max-h-[calc(100vh-var(--sticky-offset)-1.5rem)] xl:overflow-y-auto xl:overscroll-contain xl:pr-1 print:static print:max-h-none print:overflow-visible print:pr-0"
           >
             <GestureMessageChat
               gestures={curGestureList}
               cycleNumber={round >= 0 ? round : undefined}
               pulseKey={gesturePulseKey}
               onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
-              className="min-h-[30rem] xl:min-h-[38rem] 2xl:min-h-[42rem]"
+              className="xl:h-[clamp(30rem,68vh,34rem)] 2xl:h-[clamp(32rem,64vh,36rem)] print:h-auto"
             />
 
             {/* ===== FULL ROUND DETAILS LINK ===== */}
