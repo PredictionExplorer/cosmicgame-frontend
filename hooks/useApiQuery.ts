@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 import { useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 
 import api from '@/services/api';
-import { getLiveDataPollIntervalMs, getRemainingMsToPrizeTime } from '@/lib/pollingCadence';
+import { getLiveDataPollIntervalMs, getRemainingMsToAllocationTime } from '@/lib/pollingCadence';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 import type {
   ActionIdWithClaimInfo,
@@ -110,7 +110,7 @@ function useLivePollInterval(baseMs: number): () => number {
   return useCallback(
     () =>
       getLiveDataPollIntervalMs(
-        getRemainingMsToPrizeTime(queryClient.getQueryData(['allocationTime'])),
+        getRemainingMsToAllocationTime(queryClient.getQueryData(['allocationTime'])),
         baseMs,
       ),
     [baseMs, queryClient],

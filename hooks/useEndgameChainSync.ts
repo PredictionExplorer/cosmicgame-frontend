@@ -144,7 +144,7 @@ export function useEndgameChainSync({
           return;
         }
 
-        const previousPrizeTime = queryClient.getQueryData<number>(['allocationTime']);
+        const previousAllocationTime = queryClient.getQueryData<number>(['allocationTime']);
         queryClient.setQueryData(['allocationTime'], sample.mainPrizeTimeSec);
         queryClient.setQueryData(['currentTime'], sample.blockTimestampSec);
         queryClient.setQueryData<DashboardInfo | null>(['dashboardInfo'], (current) => {
@@ -153,7 +153,10 @@ export function useEndgameChainSync({
           return { ...current, LastBidderAddr: sample.lastBidderAddress };
         });
 
-        if (typeof previousPrizeTime === 'number' && sample.mainPrizeTimeSec > previousPrizeTime) {
+        if (
+          typeof previousAllocationTime === 'number' &&
+          sample.mainPrizeTimeSec > previousAllocationTime
+        ) {
           // A new Gesture extended the cycle; pull the full bid data.
           void queryClient.invalidateQueries({ queryKey: ['bidListByRound'] });
           void queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] });

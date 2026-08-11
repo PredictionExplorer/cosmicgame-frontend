@@ -43,17 +43,19 @@ export function getLiveDataPollIntervalMs(
 }
 
 /**
- * Milliseconds until a prize time expressed in epoch seconds, or `null` when
- * the value is absent/invalid. Local clock skew of a few seconds is fine here;
- * this only selects a polling cadence, not the displayed countdown.
+ * Milliseconds until an allocation time expressed in epoch seconds, or `null`
+ * when the value is absent/invalid. Local clock skew of a few seconds is fine
+ * here; this only selects a polling cadence, not the displayed countdown.
  */
-export function getRemainingMsToPrizeTime(
-  prizeTimeSec: unknown,
+export function getRemainingMsToAllocationTime(
+  allocationTimeSec: unknown,
   nowMs: number = Date.now(),
 ): number | null {
   const sec =
-    typeof prizeTimeSec === 'number' && Number.isFinite(prizeTimeSec) && prizeTimeSec > 0
-      ? prizeTimeSec
+    typeof allocationTimeSec === 'number' &&
+    Number.isFinite(allocationTimeSec) &&
+    allocationTimeSec > 0
+      ? allocationTimeSec
       : null;
   return sec == null ? null : sec * 1000 - nowMs;
 }

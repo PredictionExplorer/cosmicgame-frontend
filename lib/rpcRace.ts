@@ -112,14 +112,14 @@ function parseSample(items: JsonRpcResponseItem[], ids: BatchIds): EndgameChainS
   const block = pick(items, ids.latestBlock) as { timestamp?: string } | null;
   const timestampHex = block?.timestamp;
   if (typeof timestampHex !== 'string') throw new Error('latest block missing timestamp');
-  const lastBidder = decodeFunctionResult({
+  const latestParticipant = decodeFunctionResult({
     abi: cosmicGameAbi,
     functionName: 'lastBidderAddress',
     data: pick(items, ids.lastBidderAddress) as `0x${string}`,
   });
   return {
     mainPrizeTimeSec: decodeUintCall('mainPrizeTime', pick(items, ids.mainPrizeTime)),
-    lastBidderAddress: String(lastBidder),
+    lastBidderAddress: String(latestParticipant),
     roundNum: decodeUintCall('roundNum', pick(items, ids.roundNum)),
     blockTimestampSec: Number(BigInt(timestampHex)),
     sampledAtMs: Date.now(),

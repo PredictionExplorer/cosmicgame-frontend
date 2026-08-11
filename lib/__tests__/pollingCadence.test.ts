@@ -2,7 +2,7 @@ import {
   FINAL_SPRINT_INTERVAL_MS,
   PAST_DEADLINE_FAST_WINDOW_MS,
   getLiveDataPollIntervalMs,
-  getRemainingMsToPrizeTime,
+  getRemainingMsToAllocationTime,
 } from '../pollingCadence';
 
 describe('getLiveDataPollIntervalMs', () => {
@@ -37,19 +37,19 @@ describe('getLiveDataPollIntervalMs', () => {
   });
 });
 
-describe('getRemainingMsToPrizeTime', () => {
+describe('getRemainingMsToAllocationTime', () => {
   const NOW = 1_700_000_000_000;
 
-  it('converts an epoch-seconds prize time to remaining milliseconds', () => {
-    expect(getRemainingMsToPrizeTime(NOW / 1000 + 90, NOW)).toBe(90_000);
-    expect(getRemainingMsToPrizeTime(NOW / 1000 - 5, NOW)).toBe(-5_000);
+  it('converts an epoch-seconds allocation time to remaining milliseconds', () => {
+    expect(getRemainingMsToAllocationTime(NOW / 1000 + 90, NOW)).toBe(90_000);
+    expect(getRemainingMsToAllocationTime(NOW / 1000 - 5, NOW)).toBe(-5_000);
   });
 
   it('returns null for absent or invalid values', () => {
-    expect(getRemainingMsToPrizeTime(undefined, NOW)).toBeNull();
-    expect(getRemainingMsToPrizeTime(null, NOW)).toBeNull();
-    expect(getRemainingMsToPrizeTime(0, NOW)).toBeNull();
-    expect(getRemainingMsToPrizeTime('123', NOW)).toBeNull();
-    expect(getRemainingMsToPrizeTime(Number.NaN, NOW)).toBeNull();
+    expect(getRemainingMsToAllocationTime(undefined, NOW)).toBeNull();
+    expect(getRemainingMsToAllocationTime(null, NOW)).toBeNull();
+    expect(getRemainingMsToAllocationTime(0, NOW)).toBeNull();
+    expect(getRemainingMsToAllocationTime('123', NOW)).toBeNull();
+    expect(getRemainingMsToAllocationTime(Number.NaN, NOW)).toBeNull();
   });
 });
