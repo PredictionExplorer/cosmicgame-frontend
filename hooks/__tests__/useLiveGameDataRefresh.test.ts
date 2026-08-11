@@ -71,12 +71,41 @@ describe('useLiveGameDataRefresh', () => {
       expect.objectContaining({
         address: '0xabc',
         eventName: 'BidPlaced',
+        onError: expect.any(Function),
       }),
     );
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
 
     unmount();
-    expect(unwatch).toHaveBeenCalledTimes(1);
+    // Both the BidPlaced and MainPrizeClaimed watchers are torn down.
+    expect(unwatch).toHaveBeenCalledTimes(2);
+  });
+
+  it('watches MainPrizeClaimed and refreshes claim-affected queries', () => {
+    const watchContractEvent = jest.fn(({ onLogs }) => {
+      onLogs([]);
+      return jest.fn();
+    });
+    const invalidateQueries = jest.fn().mockResolvedValue(undefined);
+    const onCycleFinalized = jest.fn();
+    window.addEventListener('cosmic:cycle-finalized', onCycleFinalized);
+
+    mockUsePublicClient.mockReturnValue({ watchContractEvent } as never);
+    mockUseQueryClient.mockReturnValue({ invalidateQueries } as never);
+
+    renderHook(() => useLiveGameDataRefresh());
+
+    expect(watchContractEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        address: '0xabc',
+        eventName: 'MainPrizeClaimed',
+        onError: expect.any(Function),
+      }),
+    );
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['claimHistory'] });
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['roundList'] });
+    expect(onCycleFinalized).toHaveBeenCalledTimes(1);
+    window.removeEventListener('cosmic:cycle-finalized', onCycleFinalized);
   });
 
   it('dispatches a cosmic:gesture-placed window event when a gesture lands', () => {

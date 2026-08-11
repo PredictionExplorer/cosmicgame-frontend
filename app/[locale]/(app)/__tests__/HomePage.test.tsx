@@ -98,6 +98,18 @@ jest.mock('../../../../hooks/useAllocationFinalize', () => ({
   useAllocationFinalize: () => mockAllocationFinalize,
 }));
 
+/* ── useEndgameChainSync ─────────────────────────────────────────── */
+
+const mockUseEndgameChainSync = jest.fn(() => ({
+  isConfirmationPending: false,
+  isClaimedOnChain: false,
+  lastSample: null,
+}));
+
+jest.mock('../../../../hooks/useEndgameChainSync', () => ({
+  useEndgameChainSync: (...args: unknown[]) => (mockUseEndgameChainSync as jest.Mock)(...args),
+}));
+
 /* ── useAllocationNotification ───────────────────────────────────────── */
 
 const mockRequestNotificationPermission = jest.fn();
@@ -315,6 +327,11 @@ beforeEach(() => {
   resetUxScenarioForTest();
   window.history.pushState({}, '', '/');
   mockAccount = '0xUser';
+  mockUseEndgameChainSync.mockReturnValue({
+    isConfirmationPending: false,
+    isClaimedOnChain: false,
+    lastSample: null,
+  });
   Object.assign(mockGestureForm, {
     gestureType: 'ETH',
     contributionType: 'NFT',
@@ -541,6 +558,28 @@ describe('HomePage', () => {
     } finally {
       restore();
     }
+  });
+
+  it('holds the timer in the confirming phase until the zero-cross is verified on-chain', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: mockAccount }),
+      isLoading: false,
+    });
+    mockAllocationFinalize.allocationTime = Date.now() - 60 * 60_000;
+    mockUseEndgameChainSync.mockReturnValue({
+      isConfirmationPending: true,
+      isClaimedOnChain: false,
+      lastSample: null,
+    });
+
+    render(<HomePage />);
+
+    expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute('data-phase', 'confirming');
+    // The finalize CTA must not appear while the ready state is unverified: a
+    // last-second gesture may still have extended the cycle on-chain.
+    expect(
+      screen.queryByRole('button', { name: 'home.chrono.cta.finalize' }),
+    ).not.toBeInTheDocument();
   });
 
   it('links the hero primary action to cycle details before gestures are open', () => {

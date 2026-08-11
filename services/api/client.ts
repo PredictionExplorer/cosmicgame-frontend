@@ -86,11 +86,32 @@ interface RotationRetryConfig extends InternalAxiosRequestConfig {
 }
 
 /**
+ * True when the request was canceled through its abort signal rather than
+ * failing. The React Query hooks forward their abort signal, so unmounts and
+ * superseded refetches cancel in-flight reads routinely (in dev, StrictMode's
+ * double-mount cancels the entire first volley on every page load). axios
+ * models cancellation as an AxiosError with no `response`, so any "is this a
+ * failure?" check must ask this first.
+ */
+function isCancellation(error: unknown): boolean {
+  // `__CANCEL__` is the marker axios stamps on CanceledError; this is exactly
+  // what `axios.isCancel` checks, tested directly so the helper also works
+  // under test doubles that stub the axios module.
+  if ((error as { __CANCEL__?: boolean } | null | undefined)?.__CANCEL__) return true;
+  return isAxiosError(error) && error.code === 'ERR_CANCELED';
+}
+
+/**
  * True for failures that indicate the *server* is unhealthy (unreachable, or
  * responding 5xx) rather than a request-level problem like a 404.
+ *
+ * Exported for tests.
  */
-function isServerFailure(error: unknown): boolean {
+export function isServerFailure(error: unknown): boolean {
   if (!isAxiosError(error)) return false;
+  // A canceled request says nothing about server health; treating it as one
+  // marks healthy servers down for the whole failure cooldown.
+  if (isCancellation(error)) return false;
   if (!error.response) return true; // network error / timeout / DNS
   return error.response.status >= 500;
 }
@@ -105,6 +126,7 @@ axios.interceptors.response.use(
       process.env.NODE_ENV === 'development' &&
       isAxiosError(error) &&
       !error.response &&
+      !isCancellation(error) &&
       isConfiguredBackendRequest(error.config)
     ) {
       const cfg = error.config;
@@ -134,7 +156,10 @@ axios.interceptors.response.use(
           (base) => fullUrl === base || fullUrl.startsWith(`${base}/`),
         );
         if (failedBase) {
-          markServerDown(failedBase);
+          const reason = error.response
+            ? `HTTP ${error.response.status}`
+            : (error.code ?? 'no response');
+          markServerDown(failedBase, Date.now(), `${reason} on ${fullUrl}`);
           const retryUrl = rebaseUrl(fullUrl, apiBaseUrls);
           if (retryUrl) {
             cfg.__rotationRetried = true;
@@ -492,6 +517,10 @@ export async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T> 
   try {
     return await fn();
   } catch (err: unknown) {
+    // Cancellation is not a failure: rethrow untouched (React Query discards
+    // aborted fetches) and never report it — reporting turns every navigation
+    // into console noise and a Sentry event.
+    if (isCancellation(err)) throw err;
     const status = isAxiosError(err) ? err.response?.status : undefined;
     if (status === 400 || status === 403 || status === 404) return fallback;
     reportError(err, 'apiCall');
@@ -508,6 +537,7 @@ export async function apiCallRequired<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn();
   } catch (err: unknown) {
+    if (isCancellation(err)) throw err;
     reportError(err, 'apiCallRequired');
     throw toReadError(err);
   }
@@ -522,6 +552,7 @@ export async function apiCallEmptyOn404<T>(fn: () => Promise<T>, fallback: T): P
   try {
     return await fn();
   } catch (err: unknown) {
+    if (isCancellation(err)) throw err;
     if (isAxiosError(err) && err.response?.status === 404) return fallback;
     reportError(err, 'apiCallEmptyOn404');
     throw toReadError(err);
@@ -533,6 +564,7 @@ export async function apiPost<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn();
   } catch (err: unknown) {
+    if (isCancellation(err)) throw err;
     reportError(err, 'apiPost');
     throw new Error('Network response was not OK');
   }

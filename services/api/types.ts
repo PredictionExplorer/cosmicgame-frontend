@@ -737,7 +737,8 @@ export interface UniqueAnchorHolderCST {
   StakerAddr: string;
   NumStakeActions: number;
   NumUnstakeActions: number;
-  TotalTokensMinted: number;
+  /** Absent in the live CST endpoint response (CST anchoring does not mint). */
+  TotalTokensMinted?: number;
   TotalTokensStaked: number;
   TotalRewardEth: number;
   UnclaimedRewardEth: number;

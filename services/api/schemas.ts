@@ -497,7 +497,10 @@ export const UniqueAnchorHolderCSTSchema = z
     StakerAddr: AddressSchema,
     NumStakeActions: z.number(),
     NumUnstakeActions: z.number(),
-    TotalTokensMinted: z.number(),
+    // The live CST endpoint omits this field (CST anchoring pays ETH rewards,
+    // it does not mint); the RWLK variant does return it. The table defaults
+    // absent values to 0.
+    TotalTokensMinted: z.number().optional(),
     TotalTokensStaked: z.number(),
     TotalRewardEth: z.number(),
     UnclaimedRewardEth: z.number(),

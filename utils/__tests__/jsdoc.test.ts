@@ -73,7 +73,7 @@ const EXPECTED_COUNTS: Record<string, number> = {
   'contractErrors.ts': 5,
   'contractWrite.ts': 1,
   'endurance.ts': 3,
-  'errors.ts': 4,
+  'errors.ts': 6,
   'format.ts': 23,
   'metadata.ts': 1,
   'seo.ts': 1,
@@ -102,9 +102,9 @@ describe('Utils JSDoc coverage', () => {
   });
 
   describe('no function is missing from the inventory', () => {
-    it('total exported functions/constants across all util files is 51', () => {
+    it('total exported functions/constants across all util files is 53', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(51);
+      expect(total).toBe(53);
     });
   });
 

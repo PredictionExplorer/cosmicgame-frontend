@@ -19,6 +19,12 @@
         "body": "Make the first Gesture to start the finalization clock and begin shaping this cycle's Signature.",
         "cta": "Make the first Gesture"
       },
+      "confirming": {
+        "badge": "Verifying on-chain",
+        "headline": "Confirming the Final Moment",
+        "body": "The clock reached zero. Checking the chain for a last-second Gesture before the cycle can finalize.",
+        "cta": "View Cycle Details"
+      },
       "readyToFinalize": {
         "badge": "Ready to finalize",
         "headline": "Cycle Ready to Finalize",
@@ -144,6 +150,13 @@
         "label": "Final minute",
         "status": "Final minute. Tenths are live.",
         "tooltip": "The finalization clock is in its last minute. If it reaches zero, the cycle becomes ready to finalize."
+      },
+      "confirming": {
+        "eyebrow": "Verifying on-chain",
+        "label": "Confirming",
+        "status": "The clock reached zero. Confirming on-chain that no last-second Gesture extended the cycle.",
+        "tooltip": "The countdown reached zero on this device. Before showing the cycle as ready to finalize, the app verifies directly against the blockchain that the deadline truly passed - a Gesture in the final seconds can still have extended it.",
+        "display": "00:00"
       },
       "readyToFinalize": {
         "eyebrow": "Cycle ready to finalize",

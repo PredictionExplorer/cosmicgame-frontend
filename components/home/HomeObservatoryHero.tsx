@@ -65,6 +65,14 @@ function getHeroPhaseView(phase: CyclePhase) {
         badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot',
         bodyClass: 'text-foreground/90 font-medium sm:text-xl',
       };
+    case 'confirming':
+      return {
+        messageKey: 'confirming',
+        headlineUsesCycleLabel: false,
+        bodyUsesCycleLabel: false,
+        badgeDotClass: 'bg-primary animate-pulse-glow',
+        bodyClass: 'text-foreground/90 font-medium sm:text-xl',
+      };
     case 'ready-to-finalize':
       return {
         messageKey: 'readyToFinalize',

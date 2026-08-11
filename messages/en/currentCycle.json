@@ -30,7 +30,9 @@
       "finalizesIn": "Cycle finalizes in",
       "finalizesTooltip": "When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation. Each new gesture extends the timer.",
       "readyTitle": "Cycle Ready to Finalize",
-      "readyMessage": "The finalization clock reached zero."
+      "readyMessage": "The finalization clock reached zero.",
+      "confirmingTitle": "Confirming the Final Moment",
+      "confirmingMessage": "The clock reached zero. Checking the chain for a last-second Gesture before the cycle can finalize."
     }
   },
   "stats": {

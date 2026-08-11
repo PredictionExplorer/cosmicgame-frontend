@@ -18,6 +18,8 @@ interface CyclePhaseGuideProps {
   allocationTime: number;
   activationTime: number;
   now: number;
+  /** See useEndgameChainSync; omit for legacy local-clock behavior. */
+  finalizationConfirmed?: boolean;
 }
 
 const explainerStorageKey = 'cosmic-cycle-explainer-dismissed';
@@ -48,7 +50,7 @@ function phaseToTimelineId(phase: CyclePhase): (typeof timelineSteps)[number]['i
     return 'opening-soon';
   }
   if (phase === 'waiting-first-gesture') return 'first-gesture';
-  if (phase === 'ready-to-finalize') return 'finalization';
+  if (phase === 'ready-to-finalize' || phase === 'confirming') return 'finalization';
   if (phase === 'final-hour' || phase === 'final-ten' || phase === 'final-minute') {
     return 'final-window';
   }
@@ -62,9 +64,17 @@ export function CyclePhaseGuide({
   allocationTime,
   activationTime,
   now,
+  finalizationConfirmed,
 }: CyclePhaseGuideProps) {
   const t = useTranslations('home');
-  const phase = getCycleState({ data, loading, allocationTime, activationTime, now }).phase;
+  const phase = getCycleState({
+    data,
+    loading,
+    allocationTime,
+    activationTime,
+    now,
+    finalizationConfirmed,
+  }).phase;
   const activeStepId = phaseToTimelineId(phase);
   const activeIndex = timelineSteps.findIndex((step) => step.id === activeStepId);
   const explainerDismissed = useSyncExternalStore(

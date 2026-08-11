@@ -79,6 +79,10 @@ export function pickServer(urls: string[], now: number = Date.now(), label?: str
   return picked;
 }
 
+/** list-key -> last time the all-down condition was logged. */
+const lastAllDownLogAt = new Map<string, number>();
+const ALL_DOWN_LOG_INTERVAL_MS = 30_000;
+
 function pickServerInternal(urls: string[], now: number): string {
   if (urls.length === 0) return '';
   const start = hourlySlot(urls.length, now);
@@ -86,21 +90,32 @@ function pickServerInternal(urls: string[], now: number): string {
     const candidate = urls[(start + i) % urls.length] ?? '';
     if (candidate && (downUntil.get(candidate) ?? 0) <= now) return candidate;
   }
-  console.error(
-    '[serverRotation] all servers are marked down, using hourly pick anyway:',
-    urls.join(', '),
-  );
+  // pickServer runs on every API/media URL build, so an un-throttled log here
+  // floods the console for the whole cooldown window.
+  const listKey = urls.join(',');
+  if (now - (lastAllDownLogAt.get(listKey) ?? 0) >= ALL_DOWN_LOG_INTERVAL_MS) {
+    lastAllDownLogAt.set(listKey, now);
+    console.error(
+      '[serverRotation] all servers are marked down, using hourly pick anyway:',
+      urls.join(', '),
+    );
+  }
   return urls[start] ?? '';
 }
 
-/** Marks a server as failed so the rotation skips it for the cooldown window. */
-export function markServerDown(url: string, now: number = Date.now()): void {
+/**
+ * Marks a server as failed so the rotation skips it for the cooldown window.
+ * Pass `reason` (error code, status, failing URL) so the console shows *why*
+ * a server was marked down, not just that it happened.
+ */
+export function markServerDown(url: string, now: number = Date.now(), reason?: string): void {
   const base = url.replace(/\/+$/, '');
   if (!base) return;
   downUntil.set(base, now + FAILURE_COOLDOWN_MS);
   console.warn(
     `[serverRotation] marking server down for ${Math.round(FAILURE_COOLDOWN_MS / 1000)}s:`,
     base,
+    reason ? `(${reason})` : '',
   );
 }
 

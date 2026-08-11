@@ -107,6 +107,7 @@ import {
 
 jest.mock('@tanstack/react-query', () => ({
   useQuery: jest.fn(() => ({ data: undefined, isLoading: false, error: null })),
+  useQueryClient: jest.fn(() => ({ getQueryData: jest.fn(() => undefined) })),
   QueryClient: class QueryClient {},
   QueryClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }));

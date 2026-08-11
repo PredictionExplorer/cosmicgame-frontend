@@ -12,6 +12,7 @@ export type CyclePhase =
   | 'final-hour'
   | 'final-ten'
   | 'final-minute'
+  | 'confirming'
   | 'ready-to-finalize';
 
 export interface CycleStateInput {
@@ -20,6 +21,14 @@ export interface CycleStateInput {
   allocationTime: number;
   activationTime?: number | null;
   now: number;
+  /**
+   * On-chain verification of the zero-cross (see useEndgameChainSync). While
+   * `false`, the local countdown has reached zero but fresh chain state has
+   * not yet confirmed the deadline passed, so the phase is 'confirming'
+   * instead of 'ready-to-finalize'. Omit (undefined) to keep the legacy
+   * behavior of flipping to ready purely on the local clock.
+   */
+  finalizationConfirmed?: boolean;
 }
 
 export interface CycleState {
@@ -30,6 +39,7 @@ export interface CycleState {
   isWaitingForFirstGesture: boolean;
   isFinalizationCountdownActive: boolean;
   isGestureOpen: boolean;
+  isConfirmingFinalization: boolean;
   isReadyToFinalize: boolean;
 }
 
@@ -54,6 +64,7 @@ export function getCycleState({
   allocationTime,
   activationTime,
   now,
+  finalizationConfirmed,
 }: CycleStateInput): CycleState {
   const explicitActivationTime = getFinitePositiveSeconds(activationTime);
   const dashboardActivationTime = getDashboardActivationTime(data);
@@ -71,7 +82,8 @@ export function getCycleState({
     phase = 'waiting-first-gesture';
   } else {
     const remainingMs = allocationTime - now;
-    if (remainingMs <= 0) phase = 'ready-to-finalize';
+    if (remainingMs <= 0)
+      phase = finalizationConfirmed === false ? 'confirming' : 'ready-to-finalize';
     else if (remainingMs <= 60_000) phase = 'final-minute';
     else if (remainingMs <= 10 * 60_000) phase = 'final-ten';
     else if (remainingMs <= 60 * 60_000) phase = 'final-hour';
@@ -94,6 +106,7 @@ export function getCycleState({
     isWaitingForFirstGesture: phase === 'waiting-first-gesture',
     isFinalizationCountdownActive,
     isGestureOpen: phase === 'waiting-first-gesture' || isFinalizationCountdownActive,
+    isConfirmingFinalization: phase === 'confirming',
     isReadyToFinalize: phase === 'ready-to-finalize',
   };
 }

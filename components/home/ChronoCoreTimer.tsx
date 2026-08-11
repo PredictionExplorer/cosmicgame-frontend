@@ -25,6 +25,12 @@ interface ChronoCoreTimerProps {
   canOpenGesturePanel: boolean;
   /** When set, primary CTA submits a gesture (or finalize) instead of only scrolling. */
   onPrimaryCtaClick?: () => void;
+  /**
+   * On-chain verification of the zero-cross (see useEndgameChainSync). While
+   * `false`, the timer shows a "verifying on-chain" state instead of flipping
+   * straight to "ready to finalize". Omit for the legacy local-clock behavior.
+   */
+  finalizationConfirmed?: boolean;
 }
 
 interface PhaseView {
@@ -149,6 +155,18 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
         clockTextClass: 'text-red-300',
         iconClass: 'text-red-300',
       };
+    case 'confirming':
+      return {
+        messageKey: 'confirming',
+        hasDisplayText: true,
+        toneClass:
+          'border-primary/40 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.18),rgb(var(--cosmic-indigo-rgb)/0.36),rgb(var(--nebula-violet-rgb)/0.16))]',
+        haloClass: 'border-primary/35 bg-primary/[0.05]',
+        glowClass: 'shadow-[0_0_120px_rgb(var(--aurora-cyan-rgb)/0.30)]',
+        pulseClass: 'animate-pulse-glow',
+        clockTextClass: 'text-primary',
+        iconClass: 'text-primary',
+      };
     case 'ready-to-finalize':
       return {
         messageKey: 'readyToFinalize',
@@ -185,9 +203,17 @@ export function ChronoCoreTimer({
   now,
   canOpenGesturePanel,
   onPrimaryCtaClick,
+  finalizationConfirmed,
 }: ChronoCoreTimerProps) {
   const t = useTranslations('home');
-  const cycleState = getCycleState({ data, loading, allocationTime, activationTime, now });
+  const cycleState = getCycleState({
+    data,
+    loading,
+    allocationTime,
+    activationTime,
+    now,
+    finalizationConfirmed,
+  });
   const phase = cycleState.phase;
   const view = viewForPhase(phase);
   const eyebrow = t(`chrono.phase.${view.messageKey}.eyebrow`);

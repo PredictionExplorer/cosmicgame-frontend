@@ -35,6 +35,7 @@ import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedN
 import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
+import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useLivePulse } from '@/hooks/useLivePulse';
@@ -263,6 +264,12 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     onFinalize,
   } = allocationFinalize;
 
+  // Final-minute synchronizer: 1s direct-chain reads (racing both RPC nodes,
+  // ETL/backend bypassed) that keep the countdown target, last bidder, and
+  // claim state within ~1-2s of on-chain reality around the zero-cross.
+  const endgame = useEndgameChainSync({ targetMs: allocationTime });
+  const finalizationConfirmed = !endgame.isConfirmationPending;
+
   const withPostTxRefresh = useCallback(
     (retryMs = 1500, activationMs = 3000) => {
       void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'refresh live data'));
@@ -357,12 +364,24 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     return t('form.submit.generic', { method: gestureType });
   };
 
-  const cycleState = getCycleState({ data, loading, allocationTime, activationTime, now });
+  const cycleState = getCycleState({
+    data,
+    loading,
+    allocationTime,
+    activationTime,
+    now,
+    finalizationConfirmed,
+  });
   const canGesture = allocationTime > now || data?.LastBidderAddr !== account;
-  const canClaim = !(allocationTime > now || data?.LastBidderAddr === zeroAddress || loading);
+  // The claim CTA additionally waits for the on-chain zero-cross confirmation
+  // so a last-second gesture can't leave users clicking into a revert.
+  const canClaim =
+    !(allocationTime > now || data?.LastBidderAddr === zeroAddress || loading) &&
+    finalizationConfirmed;
   const claimWait = allocationTime + timeoutFinalize * 1000;
-  const isRoundActive = cycleState.isGestureOpen || cycleState.isReadyToFinalize;
-  const cycleTimerEnded = cycleState.isReadyToFinalize;
+  const isRoundActive =
+    cycleState.isGestureOpen || cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
+  const cycleTimerEnded = cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
 
   const scrollToGestureForm = useCallback(() => {
     const el = document.getElementById('make-gesture');
@@ -452,6 +471,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
           now={now}
           canOpenGesturePanel={!loading && isRoundActive}
           onPrimaryCtaClick={handlePrimaryCtaClick}
+          finalizationConfirmed={finalizationConfirmed}
         />
 
         <CyclePhaseGuide
@@ -460,6 +480,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
           allocationTime={allocationTime}
           activationTime={activationTime}
           now={now}
+          finalizationConfirmed={finalizationConfirmed}
         />
 
         <div

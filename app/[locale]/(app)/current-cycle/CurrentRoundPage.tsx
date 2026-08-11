@@ -44,6 +44,7 @@ import {
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
+import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useNow } from '@/hooks/useNow';
 
 type EthDonation = import('@/components/tables/EthDonationTable').EthDonation;
@@ -86,6 +87,10 @@ const CurrentRoundPage = () => {
   }, [currentTimeRaw, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
   const { allocationTime, activationTime } = useAllocationFinalize({ data, offset });
+  // Final-minute synchronizer: 1s direct-chain reads around the zero-cross so
+  // the page doesn't declare the cycle finished on a stale countdown target.
+  const endgame = useEndgameChainSync({ targetMs: allocationTime });
+  const finalizationConfirmed = !endgame.isConfirmationPending;
   const roundStartedDate = useHydrationSafeDateTime(data?.TsRoundStart ?? 0, false, locale);
   const activationDate = useHydrationSafeDateTime(activationTime, true, locale);
 
@@ -127,7 +132,11 @@ const CurrentRoundPage = () => {
   const hasLastParticipant = data.LastBidderAddr !== zeroAddress;
   const isPreActivation = activationTime > nowMs / 1000;
   const isCountdownActive = hasLastParticipant && allocationTime > nowMs;
-  const isGesturesExhausted = hasLastParticipant && allocationTime > 0 && allocationTime <= nowMs;
+  const isPastDeadline = hasLastParticipant && allocationTime > 0 && allocationTime <= nowMs;
+  // Only declare the cycle finished once the zero-cross is confirmed on-chain;
+  // a last-second gesture may still have extended the deadline.
+  const isConfirmingFinalization = isPastDeadline && !finalizationConfirmed;
+  const isGesturesExhausted = isPastDeadline && finalizationConfirmed;
   const statusBadgeLabel = isPreActivation
     ? t('hero.status.openingSoon')
     : !hasLastParticipant
@@ -230,6 +239,16 @@ const CurrentRoundPage = () => {
               <InfoTooltip content={t('hero.countdown.finalizesTooltip')} className="ml-1.5" />
             </p>
             <SmoothCountdown date={allocationTime} renderer={Counter} />
+          </div>
+        )}
+
+        {!isPreActivation && hasStarted && isConfirmingFinalization && (
+          <div className="text-center rounded-xl bg-primary/[0.06] p-5">
+            <Spinner size="sm" className="mx-auto mb-2" />
+            <p className="font-display text-lg font-bold text-primary">
+              {t('hero.countdown.confirmingTitle')}
+            </p>
+            <p className="mt-1 text-sm text-primary/80">{t('hero.countdown.confirmingMessage')}</p>
           </div>
         )}
 

@@ -30,7 +30,9 @@
       "finalizesIn": "周期收官倒计时",
       "finalizesTooltip": "倒计时归零后，写下收官之笔的参与者即可收官，并取回签名分配。每一次新落笔都会延长倒计时。",
       "readyTitle": "周期已可收官",
-      "readyMessage": "收官倒计时已归零。"
+      "readyMessage": "收官倒计时已归零。",
+      "confirmingTitle": "正在确认收官时刻",
+      "confirmingMessage": "倒计时已归零。正在链上核验最后一刻是否有新落笔延长周期。"
     }
   },
   "stats": {

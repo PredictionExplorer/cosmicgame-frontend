@@ -101,6 +101,42 @@ describe('getCycleState', () => {
     expect(state.isGestureOpen).toBe(true);
   });
 
+  it('keeps legacy instant-ready behavior when finalizationConfirmed is omitted', () => {
+    const state = getCycleState({ ...baseInput, allocationTime: NOW - 1 });
+    expect(state.phase).toBe('ready-to-finalize');
+    expect(state.isConfirmingFinalization).toBe(false);
+  });
+
+  it('holds in confirming while the zero-cross is unverified on-chain', () => {
+    const state = getCycleState({
+      ...baseInput,
+      allocationTime: NOW - 1,
+      finalizationConfirmed: false,
+    });
+    expect(state.phase).toBe('confirming');
+    expect(state.isConfirmingFinalization).toBe(true);
+    expect(state.isReadyToFinalize).toBe(false);
+  });
+
+  it('shows ready-to-finalize once the zero-cross is confirmed on-chain', () => {
+    const state = getCycleState({
+      ...baseInput,
+      allocationTime: NOW - 1,
+      finalizationConfirmed: true,
+    });
+    expect(state.phase).toBe('ready-to-finalize');
+    expect(state.isReadyToFinalize).toBe(true);
+  });
+
+  it('ignores finalizationConfirmed while the countdown is still running', () => {
+    const state = getCycleState({
+      ...baseInput,
+      allocationTime: NOW + 60_000,
+      finalizationConfirmed: false,
+    });
+    expect(state.phase).toBe('final-minute');
+  });
+
   it('marks only countdown phases as finalization countdown active', () => {
     expect(getCycleState(baseInput).isFinalizationCountdownActive).toBe(true);
     expect(

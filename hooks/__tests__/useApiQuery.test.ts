@@ -99,6 +99,7 @@ import {
 
 jest.mock('@tanstack/react-query', () => ({
   useQuery: jest.fn(() => ({ data: undefined, isLoading: false, error: null })),
+  useQueryClient: jest.fn(() => ({ getQueryData: jest.fn(() => undefined) })),
   QueryClient: class QueryClient {},
   QueryClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -125,6 +126,14 @@ function getOptions() {
   return mockUseQuery.mock.calls[0][0];
 }
 
+/**
+ * Live cycle queries use an adaptive refetch interval (lib/pollingCadence):
+ * a function that returns the base cadence when no prize time is cached.
+ */
+function resolveRefetchInterval(value: unknown): unknown {
+  return typeof value === 'function' ? value() : value;
+}
+
 // ---------------------------------------------------------------------------
 // Rounds & Bidding
 // ---------------------------------------------------------------------------
@@ -144,7 +153,7 @@ describe('useApiQuery hooks', () => {
       renderHook(() => useDashboardInfo());
 
       const options = mockUseQuery.mock.calls[0][0];
-      expect(options.refetchInterval).toBe(12_000);
+      expect(resolveRefetchInterval(options.refetchInterval)).toBe(12_000);
       expect(options.refetchIntervalInBackground).toBe(false);
       expect(options.staleTime).toBe(5_000);
     });
@@ -189,7 +198,7 @@ describe('useApiQuery hooks', () => {
       renderHook(() => useDashboardInfo(undefined, {}));
 
       const options = getOptions();
-      expect(options.refetchInterval).toBe(12_000);
+      expect(resolveRefetchInterval(options.refetchInterval)).toBe(12_000);
       expect(options.refetchOnWindowFocus).toBe(true);
     });
   });
@@ -274,7 +283,7 @@ describe('useApiQuery hooks', () => {
 
       const options = getOptions();
       expect(options.staleTime).toBe(5_000);
-      expect(options.refetchInterval).toBe(10_000);
+      expect(resolveRefetchInterval(options.refetchInterval)).toBe(10_000);
       expect(options.refetchIntervalInBackground).toBe(false);
     });
   });
@@ -385,7 +394,7 @@ describe('useApiQuery hooks', () => {
 
       const options = getOptions();
       expect(options.staleTime).toBe(15_000);
-      expect(options.refetchInterval).toBe(10_000);
+      expect(resolveRefetchInterval(options.refetchInterval)).toBe(10_000);
       expect(options.refetchIntervalInBackground).toBe(false);
       expect(options.refetchOnWindowFocus).toBe(true);
     });
@@ -1837,7 +1846,7 @@ describe('useApiQuery hooks', () => {
 
       const options = mockUseQuery.mock.calls[0][0];
       expect(options.staleTime).toBe(5_000);
-      expect(options.refetchInterval).toBe(12_000);
+      expect(resolveRefetchInterval(options.refetchInterval)).toBe(12_000);
     });
   });
 

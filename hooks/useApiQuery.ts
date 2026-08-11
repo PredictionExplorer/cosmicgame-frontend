@@ -2,9 +2,11 @@
  * React Query hooks that wrap the API layer. Each hook maps to a backend endpoint
  * with appropriate stale times and refetch intervals for the Cosmic Signature app.
  */
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 
 import api from '@/services/api';
+import { getLiveDataPollIntervalMs, getRemainingMsToPrizeTime } from '@/lib/pollingCadence';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 import type {
   ActionIdWithClaimInfo,
@@ -97,6 +99,24 @@ function withUxScenarioData<T>(
   } as UseQueryResult<T, Error>;
 }
 
+/**
+ * Adaptive refetch interval for live cycle queries: the base cadence far from
+ * the finalization deadline, ramping to ~2s inside the final window (see
+ * lib/pollingCadence). Reads the cached prize time so every live query speeds
+ * up together as the countdown approaches zero.
+ */
+function useLivePollInterval(baseMs: number): () => number {
+  const queryClient = useQueryClient();
+  return useCallback(
+    () =>
+      getLiveDataPollIntervalMs(
+        getRemainingMsToPrizeTime(queryClient.getQueryData(['allocationTime'])),
+        baseMs,
+      ),
+    [baseMs, queryClient],
+  );
+}
+
 export interface DashboardInfoOptions {
   /**
    * Live pages (home, current cycle, statistics hub) poll every 12s. Pages
@@ -111,11 +131,12 @@ export function useDashboardInfo(
   { poll = true }: DashboardInfoOptions = {},
 ) {
   const scenario = useUxScenarioSnapshot();
+  const liveInterval = useLivePollInterval(12_000);
   const query = useQuery<DashboardInfo | null>({
     queryKey: ['dashboardInfo'],
     queryFn: ({ signal }) => api.get_dashboard_info({ signal }),
     enabled: !scenario,
-    refetchInterval: poll ? 12_000 : false,
+    refetchInterval: poll ? liveInterval : false,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: poll,
     staleTime: poll ? 5_000 : 60_000,
@@ -148,12 +169,13 @@ export function useRoundInfo(roundNum: number) {
 
 export function useAllocationTime() {
   const scenario = useUxScenarioSnapshot();
+  const liveInterval = useLivePollInterval(10_000);
   const query = useQuery<number>({
     queryKey: ['allocationTime'],
     queryFn: ({ signal }) => api.get_prize_time({ signal }),
     enabled: !scenario,
     staleTime: 5_000,
-    refetchInterval: 10_000,
+    refetchInterval: liveInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
@@ -199,12 +221,13 @@ export function useGestureInfo(evtLogId: number) {
 
 export function useGestureListByCycle(round: number, sortDir: string = 'desc') {
   const scenario = useUxScenarioSnapshot();
+  const liveInterval = useLivePollInterval(10_000);
   const query = useQuery<GestureInfo[]>({
     queryKey: ['bidListByRound', round, sortDir],
     queryFn: ({ signal }) => api.get_bid_list_by_round(round, sortDir, { signal }),
     enabled: !scenario && round >= 0,
     staleTime: 15_000,
-    refetchInterval: 10_000,
+    refetchInterval: liveInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
@@ -1110,12 +1133,13 @@ export function useMarketingRewardsByUser(address: string | null | undefined) {
 
 export function useCurrentTime() {
   const scenario = useUxScenarioSnapshot();
+  const liveInterval = useLivePollInterval(12_000);
   const query = useQuery<number>({
     queryKey: ['currentTime'],
     queryFn: ({ signal }) => api.get_current_time({ signal }),
     enabled: !scenario,
     staleTime: 5_000,
-    refetchInterval: 12_000,
+    refetchInterval: liveInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });

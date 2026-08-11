@@ -2,9 +2,11 @@ import * as Sentry from '@sentry/nextjs';
 
 import {
   isEthProviderError,
+  isTransientNetworkError,
   isUserRejection,
   getEthErrorMessage,
   reportError,
+  reportErrorThrottled,
 } from '@/utils/errors';
 import { isContractRevertError, isEmptyContractReadError } from '@/utils/contractErrors';
 
@@ -188,6 +190,93 @@ describe('isEmptyContractReadError', () => {
 
   it('returns false for unrelated errors', () => {
     expect(isEmptyContractReadError(new Error('contract reverted'))).toBe(false);
+  });
+});
+
+describe('isTransientNetworkError', () => {
+  it('recognizes a viem HttpRequestError by name', () => {
+    const err = new Error('HTTP request failed.');
+    err.name = 'HttpRequestError';
+    expect(isTransientNetworkError(err)).toBe(true);
+  });
+
+  it('recognizes fetch failures by message', () => {
+    expect(isTransientNetworkError(new TypeError('Failed to fetch'))).toBe(true);
+    expect(isTransientNetworkError(new TypeError('Load failed'))).toBe(true);
+    expect(isTransientNetworkError(new Error('fetch failed'))).toBe(true);
+  });
+
+  it('recognizes connection and timeout failures', () => {
+    expect(isTransientNetworkError(new Error('connect ECONNREFUSED 127.0.0.1:3000'))).toBe(true);
+    expect(isTransientNetworkError(new Error('The request timed out.'))).toBe(true);
+  });
+
+  it('walks nested cause chains (viem ContractFunctionExecutionError shape)', () => {
+    const inner = new Error('HTTP request failed.');
+    inner.name = 'HttpRequestError';
+    const middle = new Error('Raw call arguments failed');
+    (middle as Error & { cause?: unknown }).cause = inner;
+    const outer = new Error('The contract function "getNextCstBidPrice" reverted.');
+    (outer as Error & { cause?: unknown }).cause = middle;
+    expect(isTransientNetworkError(outer)).toBe(true);
+  });
+
+  it('checks the viem details field', () => {
+    const err = new Error('something went wrong');
+    (err as Error & { details?: string }).details = 'Failed to fetch';
+    expect(isTransientNetworkError(err)).toBe(true);
+  });
+
+  it('returns false for application-level errors', () => {
+    expect(isTransientNetworkError(new Error('execution reverted'))).toBe(false);
+    expect(isTransientNetworkError(new Error('schemaMismatch:DashboardInfo'))).toBe(false);
+    expect(isTransientNetworkError(null)).toBe(false);
+    expect(isTransientNetworkError(undefined)).toBe(false);
+    expect(isTransientNetworkError('Failed to fetch')).toBe(false);
+  });
+});
+
+describe('reportErrorThrottled', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('reports the first error and suppresses repeats within the interval', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    let now = 1_000_000;
+    jest.spyOn(Date, 'now').mockImplementation(() => now);
+    const err = new Error('boom');
+
+    reportErrorThrottled(err, 'throttle-test-a');
+    now += 1_000;
+    reportErrorThrottled(err, 'throttle-test-a');
+
+    expect(mockedSentry.captureException).toHaveBeenCalledTimes(1);
+    expect(consoleSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports again after the interval elapses', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    let now = 2_000_000;
+    jest.spyOn(Date, 'now').mockImplementation(() => now);
+    const err = new Error('boom');
+
+    reportErrorThrottled(err, 'throttle-test-b', 60_000);
+    now += 60_001;
+    reportErrorThrottled(err, 'throttle-test-b', 60_000);
+
+    expect(mockedSentry.captureException).toHaveBeenCalledTimes(2);
+  });
+
+  it('throttles per context key independently', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(Date, 'now').mockImplementation(() => 3_000_000);
+    const err = new Error('boom');
+
+    reportErrorThrottled(err, 'throttle-test-c');
+    reportErrorThrottled(err, 'throttle-test-d');
+
+    expect(mockedSentry.captureException).toHaveBeenCalledTimes(2);
   });
 });
 

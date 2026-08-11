@@ -14,7 +14,12 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
-import { isUserRejection, reportError } from '@/utils/errors';
+import {
+  isTransientNetworkError,
+  isUserRejection,
+  reportError,
+  reportErrorThrottled,
+} from '@/utils/errors';
 import {
   formatCustomContractError,
   getContractErrorDescriptor,
@@ -174,6 +179,19 @@ export function useGestureForm() {
     let inFlight = false;
     let timeoutId: number | null = null;
 
+    // The preview refresh polls continuously, so a transport failure (dev
+    // server restart, network blip, machine waking from sleep) would emit one
+    // console dump + Sentry event per read per retry. Those failures recover
+    // on the next poll; report them at most once per throttle window and keep
+    // the last known preview values instead of blanking the form.
+    const reportPreviewError = (error: unknown, context: string) => {
+      if (isTransientNetworkError(error)) {
+        reportErrorThrottled(error, context);
+      } else {
+        reportError(error, context);
+      }
+    };
+
     const refreshLiveCstPreview = async (showLoading = false) => {
       if (cancelled || inFlight) return;
       inFlight = true;
@@ -210,7 +228,7 @@ export function useGestureForm() {
                   });
                 })
                 .catch((e) => {
-                  if (!cancelled) reportError(e, 'getCstDutchAuctionDurations');
+                  if (!cancelled) reportPreviewError(e, 'getCstDutchAuctionDurations');
                 })
             : Promise.resolve(),
           canReadPrice
@@ -223,8 +241,8 @@ export function useGestureForm() {
                 })
                 .catch((e) => {
                   if (!cancelled) {
-                    setContractCstPriceWei(null);
-                    reportError(e, 'getNextCstBidPrice');
+                    if (!isTransientNetworkError(e)) setContractCstPriceWei(null);
+                    reportPreviewError(e, 'getNextCstBidPrice');
                   }
                 })
             : Promise.resolve(),
@@ -242,8 +260,8 @@ export function useGestureForm() {
                 })
                 .catch((e) => {
                   if (!cancelled) {
-                    setGestureCstRewardAmountWei(null);
-                    reportError(e, 'getBidCstRewardAmount');
+                    if (!isTransientNetworkError(e)) setGestureCstRewardAmountWei(null);
+                    reportPreviewError(e, 'getBidCstRewardAmount');
                   }
                 })
             : Promise.resolve(),

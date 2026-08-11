@@ -1,12 +1,13 @@
 // lexicon-allow-start: service test fixtures mirror the backend-sealed API surface
 
-import { AxiosError } from 'axios';
+import { AxiosError, CanceledError } from 'axios';
 
 import {
   axios as clientAxios,
   apiCallEmptyOn404,
   apiCallRequired,
   apiGet,
+  isServerFailure,
   flattenTx,
   flattenTxArray,
   normalizeGestureRecord,
@@ -421,6 +422,70 @@ describe('pagedPath', () => {
   it('clamps negative and fractional windows to sane values', () => {
     expect(pagedPath({ offset: -5, limit: -10 })).toBe('0/1');
     expect(pagedPath({ offset: 1.9, limit: 10.7 })).toBe('1/10');
+  });
+});
+
+describe('isServerFailure', () => {
+  it('treats a network error (no response) as a server failure', () => {
+    const err = new AxiosError('Network Error', 'ERR_NETWORK');
+    expect(isServerFailure(err)).toBe(true);
+  });
+
+  it('treats a 5xx response as a server failure', () => {
+    const err = new AxiosError('Server Error', 'ERR_BAD_RESPONSE', undefined, undefined, {
+      status: 502,
+      statusText: 'Bad Gateway',
+      headers: {},
+      config: {} as never,
+      data: {},
+    });
+    expect(isServerFailure(err)).toBe(true);
+  });
+
+  it('does not treat request-level errors (4xx) as server failures', () => {
+    expect(isServerFailure(makeAxios400())).toBe(false);
+    expect(isServerFailure(makeAxios403())).toBe(false);
+  });
+
+  it('does not treat a canceled request as a server failure', () => {
+    // React Query forwards abort signals, so unmounts and superseded
+    // refetches cancel in-flight reads constantly. Those cancellations look
+    // like AxiosErrors with no response and must not mark servers down —
+    // that misread cascades into "all servers are marked down".
+    expect(isServerFailure(new CanceledError('canceled'))).toBe(false);
+  });
+
+  it('does not treat non-axios errors as server failures', () => {
+    expect(isServerFailure(new Error('boom'))).toBe(false);
+    expect(isServerFailure(undefined)).toBe(false);
+  });
+});
+
+describe('cancellation pass-through in read/write wrappers', () => {
+  // Cancellations flow constantly through these wrappers (React Query aborts
+  // superseded refetches and unmounted queries). They must be rethrown
+  // untouched and never reported — reporting turns every navigation into a
+  // Sentry event.
+  const canceled = new CanceledError('canceled');
+
+  it('apiCall rethrows the original CanceledError without reporting', async () => {
+    await expect(apiCall(() => Promise.reject(canceled), 'fallback')).rejects.toBe(canceled);
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('apiCallRequired rethrows the original CanceledError without reporting', async () => {
+    await expect(apiCallRequired(() => Promise.reject(canceled))).rejects.toBe(canceled);
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('apiCallEmptyOn404 rethrows the original CanceledError without reporting', async () => {
+    await expect(apiCallEmptyOn404(() => Promise.reject(canceled), null)).rejects.toBe(canceled);
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('apiPost rethrows the original CanceledError without reporting', async () => {
+    await expect(apiPost(() => Promise.reject(canceled))).rejects.toBe(canceled);
+    expect(mockReportError).not.toHaveBeenCalled();
   });
 });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight, Radio, Sparkles } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -9,6 +9,7 @@ import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import api from '@/services/api';
 import { getCycleState, getDashboardActivationTime, type CyclePhase } from '@/lib/cycleState';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { getLiveDataPollIntervalMs } from '@/lib/pollingCadence';
 import { getStableClientTargetTime } from '@/utils/time';
 import type { DashboardInfo } from '@/services/api';
 
@@ -214,14 +215,17 @@ export function EventHorizonCountdown() {
   const [sample, setSample] = useState<LandingCycleTimerSample | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const [nowMs, setNowMs] = useState<number | null>(null);
+  const sampleRef = useRef<LandingCycleTimerSample | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    let pollId: number | undefined;
 
     const refresh = async () => {
       try {
         const nextSample = await fetchLandingCycleTimerSample();
         if (!cancelled) {
+          sampleRef.current = nextSample;
           setSample(nextSample);
           setLoadFailed(false);
           setNowMs(Date.now());
@@ -234,13 +238,30 @@ export function EventHorizonCountdown() {
       }
     };
 
-    void refresh();
-    const pollId = window.setInterval(refresh, POLL_INTERVAL_MS);
+    // Adaptive cadence: the base 12s poll ramps up near the finalization
+    // deadline so the landing timer doesn't sit on a stale target while a
+    // last-second gesture extends the cycle (see lib/pollingCadence).
+    const nextDelayMs = () => {
+      const snapshot = getLandingCycleTimerSnapshot({
+        sample: sampleRef.current,
+        nowMs: Date.now(),
+      });
+      const remainingMs =
+        snapshot.finalizationTargetMs > 0 ? snapshot.finalizationTargetMs - Date.now() : null;
+      return getLiveDataPollIntervalMs(remainingMs, POLL_INTERVAL_MS);
+    };
+
+    const loop = async () => {
+      await refresh();
+      if (!cancelled) pollId = window.setTimeout(loop, nextDelayMs());
+    };
+
+    void loop();
     const tickId = window.setInterval(() => setNowMs(Date.now()), 1000);
 
     return () => {
       cancelled = true;
-      window.clearInterval(pollId);
+      if (pollId !== undefined) window.clearTimeout(pollId);
       window.clearInterval(tickId);
     };
   }, []);

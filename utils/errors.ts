@@ -126,6 +126,67 @@ export function getEthErrorMessage(
 }
 
 /**
+ * True when the error is a transport-level failure reaching an RPC or API
+ * endpoint — fetch failed, connection refused/reset, request timed out —
+ * rather than an application-level error. Walks viem-style `cause` chains via
+ * duck-typing (no viem import; see module doc). Periodic background reads use
+ * this to avoid flooding the console and Sentry while a server restarts or
+ * the network blips: such failures resolve themselves on the next poll.
+ */
+export function isTransientNetworkError(err: unknown): boolean {
+  const seen = new WeakSet<object>();
+
+  function walk(e: unknown): boolean {
+    if (e == null || typeof e !== 'object') return false;
+    if (seen.has(e as object)) return false;
+    seen.add(e as object);
+
+    const o = e as { name?: unknown; message?: unknown; details?: unknown; cause?: unknown };
+    const name = typeof o.name === 'string' ? o.name : '';
+    if (name === 'HttpRequestError' || name === 'TimeoutError') return true;
+
+    const text = [o.message, o.details]
+      .filter((v): v is string => typeof v === 'string')
+      .join(' ')
+      .toLowerCase();
+    if (
+      text.includes('failed to fetch') || // Chrome fetch TypeError
+      text.includes('fetch failed') || // Node/undici
+      text.includes('load failed') || // Safari fetch TypeError
+      text.includes('network request failed') ||
+      text.includes('http request failed') || // viem HttpRequestError
+      text.includes('timed out') ||
+      text.includes('econnrefused') ||
+      text.includes('econnreset')
+    ) {
+      return true;
+    }
+
+    return walk(o.cause);
+  }
+
+  return walk(err);
+}
+
+const lastReportAtByContext = new Map<string, number>();
+
+/**
+ * Like `reportError`, but reports at most once per `intervalMs` for a given
+ * context key. For failures inside polling/retry loops, where every retry
+ * would otherwise emit a console dump and a Sentry event.
+ */
+export function reportErrorThrottled(
+  error: unknown,
+  context: string,
+  intervalMs = 5 * 60_000,
+): void {
+  const now = Date.now();
+  if (now - (lastReportAtByContext.get(context) ?? 0) < intervalMs) return;
+  lastReportAtByContext.set(context, now);
+  reportError(error, context);
+}
+
+/**
  * Reports an error to Sentry (if configured) and logs it to the console.
  * Use this instead of bare `console.error` throughout the codebase.
  */

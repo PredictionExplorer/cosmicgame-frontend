@@ -12,6 +12,11 @@ const mockUseAllocationFinalize = jest.fn().mockReturnValue({
   allocationTime: 0,
   activationTime: 0,
 });
+const mockUseEndgameChainSync = jest.fn().mockReturnValue({
+  isConfirmationPending: false,
+  isClaimedOnChain: false,
+  lastSample: null,
+});
 const mockCountdownProps: Array<Record<string, unknown>> = [];
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
@@ -25,6 +30,10 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
 
 jest.mock('../../../../../hooks/useAllocationFinalize', () => ({
   useAllocationFinalize: (...args: unknown[]) => mockUseAllocationFinalize(...args),
+}));
+
+jest.mock('../../../../../hooks/useEndgameChainSync', () => ({
+  useEndgameChainSync: (...args: unknown[]) => mockUseEndgameChainSync(...args),
 }));
 
 jest.mock('../../../../../components/common/SmoothCountdown', () => ({
@@ -91,6 +100,11 @@ beforeEach(() => {
   mockUseAllocationFinalize.mockReturnValue({
     allocationTime: 0,
     activationTime: 0,
+  });
+  mockUseEndgameChainSync.mockReturnValue({
+    isConfirmationPending: false,
+    isClaimedOnChain: false,
+    lastSample: null,
   });
   mockCountdownProps.length = 0;
 });
@@ -243,6 +257,25 @@ describe('CurrentRoundPage', () => {
 
     expect(screen.getByText('currentCycle.hero.countdown.readyTitle')).toBeInTheDocument();
     expect(screen.getByText('currentCycle.hero.countdown.readyMessage')).toBeInTheDocument();
+  });
+
+  it('holds in the confirming state while the zero-cross awaits on-chain verification', () => {
+    const pastTimeMs = (NOW_SEC - 60) * 1000;
+    setupLoaded();
+    mockUseAllocationFinalize.mockReturnValue({
+      allocationTime: pastTimeMs,
+      activationTime: NOW_SEC - 3600,
+    });
+    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
+    mockUseEndgameChainSync.mockReturnValue({
+      isConfirmationPending: true,
+      isClaimedOnChain: false,
+      lastSample: null,
+    });
+    render(<CurrentRoundPage />);
+
+    expect(screen.getByText('currentCycle.hero.countdown.confirmingTitle')).toBeInTheDocument();
+    expect(screen.queryByText('currentCycle.hero.countdown.readyTitle')).not.toBeInTheDocument();
   });
 
   it('does not show countdown or exhausted state when no last participant', () => {
