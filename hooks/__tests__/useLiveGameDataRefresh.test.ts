@@ -1,8 +1,16 @@
 import { renderHook } from '@testing-library/react';
 import { useQueryClient } from '@tanstack/react-query';
-import { usePublicClient } from 'wagmi';
 
 import {
+  startCosmicEventPolling,
+  WATCHED_COSMIC_EVENTS,
+  type CosmicChainEvent,
+} from '@/lib/chainEvents';
+
+import {
+  ETL_ECHO_DELAY_MS,
+  EVENT_QUERY_ROUTES,
+  EVENT_WINDOW_EVENTS,
   invalidateLiveGameQueries,
   LIVE_GAME_QUERY_KEYS,
   useLiveGameDataRefresh,
@@ -13,19 +21,26 @@ jest.mock('@tanstack/react-query', () => ({
   useQueryClient: jest.fn(),
 }));
 
-jest.mock('wagmi', () => ({
-  usePublicClient: jest.fn(),
-}));
-
 jest.mock('../../contexts/ContractAddressesContext', () => ({
   useContractAddresses: jest.fn(),
 }));
 
+jest.mock('@/lib/chainEvents', () => ({
+  ...jest.requireActual('@/lib/chainEvents'),
+  startCosmicEventPolling: jest.fn(),
+}));
+
 const mockUseQueryClient = useQueryClient as jest.MockedFunction<typeof useQueryClient>;
-const mockUsePublicClient = usePublicClient as jest.MockedFunction<typeof usePublicClient>;
 const mockUseContractAddresses = useContractAddresses as jest.MockedFunction<
   typeof useContractAddresses
 >;
+const mockStartPolling = startCosmicEventPolling as jest.MockedFunction<
+  typeof startCosmicEventPolling
+>;
+
+function event(eventName: CosmicChainEvent['eventName']): CosmicChainEvent {
+  return { eventName, blockNumber: 100, logIndex: 0, transactionHash: '0xdead' };
+}
 
 describe('invalidateLiveGameQueries', () => {
   it('invalidates every live game query key', async () => {
@@ -38,101 +53,150 @@ describe('invalidateLiveGameQueries', () => {
     expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(LIVE_GAME_QUERY_KEYS.length);
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['bidListByRound'] });
-    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: ['donationsNFTByRound'],
-    });
-    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: ['donationsERC20ByRound'],
-    });
+  });
+});
+
+describe('EVENT_QUERY_ROUTES', () => {
+  it('routes every watched event to at least one query key', () => {
+    for (const name of WATCHED_COSMIC_EVENTS) {
+      expect(EVENT_QUERY_ROUTES[name].length).toBeGreaterThan(0);
+    }
+  });
+
+  it('refreshes claim- and round-scoped queries on MainPrizeClaimed', () => {
+    const keys = EVENT_QUERY_ROUTES.MainPrizeClaimed.map((key) => JSON.stringify(key));
+    expect(keys).toContain(JSON.stringify(['claimHistory']));
+    expect(keys).toContain(JSON.stringify(['roundList']));
+    expect(keys).toContain(JSON.stringify(['allocationTime']));
+  });
+
+  it('refreshes contribution queries on both EthDonated event variants', () => {
+    for (const name of ['EthDonated', 'EthDonatedWithInfo'] as const) {
+      const keys = EVENT_QUERY_ROUTES[name].map((key) => JSON.stringify(key));
+      expect(keys).toContain(JSON.stringify(['donationsCGSimpleList']));
+      expect(keys).toContain(JSON.stringify(['dashboardInfo']));
+    }
   });
 });
 
 describe('useLiveGameDataRefresh', () => {
+  let invalidateQueries: jest.Mock;
+  let emitEvents: (events: CosmicChainEvent[]) => void;
+  let stopPolling: jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseQueryClient.mockReturnValue({ invalidateQueries: jest.fn() } as never);
+    jest.useFakeTimers();
+    invalidateQueries = jest.fn().mockResolvedValue(undefined);
+    stopPolling = jest.fn();
+    mockUseQueryClient.mockReturnValue({ invalidateQueries } as never);
     mockUseContractAddresses.mockReturnValue({ cosmicGame: '0xabc' } as never);
+    mockStartPolling.mockImplementation(({ onEvents }) => {
+      emitEvents = onEvents;
+      return stopPolling;
+    });
   });
 
-  it('watches BidPlaced and invalidates live game queries when logs arrive', () => {
-    const unwatch = jest.fn();
-    const watchContractEvent = jest.fn(({ onLogs }) => {
-      onLogs([]);
-      return unwatch;
-    });
-    const invalidateQueries = jest.fn().mockResolvedValue(undefined);
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
-    mockUsePublicClient.mockReturnValue({ watchContractEvent } as never);
-    mockUseQueryClient.mockReturnValue({ invalidateQueries } as never);
-
+  it('starts polling for the contract and stops on unmount', () => {
     const { unmount } = renderHook(() => useLiveGameDataRefresh());
 
-    expect(watchContractEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        address: '0xabc',
-        eventName: 'BidPlaced',
-        onError: expect.any(Function),
-      }),
+    expect(mockStartPolling).toHaveBeenCalledWith(
+      expect.objectContaining({ contractAddress: '0xabc' }),
     );
-    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
 
     unmount();
-    // Both the BidPlaced and MainPrizeClaimed watchers are torn down.
-    expect(unwatch).toHaveBeenCalledTimes(2);
+    expect(stopPolling).toHaveBeenCalledTimes(1);
   });
 
-  it('watches MainPrizeClaimed and refreshes claim-affected queries', () => {
-    const watchContractEvent = jest.fn(({ onLogs }) => {
-      onLogs([]);
-      return jest.fn();
-    });
-    const invalidateQueries = jest.fn().mockResolvedValue(undefined);
-    const onCycleFinalized = jest.fn();
-    window.addEventListener('cosmic:cycle-finalized', onCycleFinalized);
-
-    mockUsePublicClient.mockReturnValue({ watchContractEvent } as never);
-    mockUseQueryClient.mockReturnValue({ invalidateQueries } as never);
-
-    renderHook(() => useLiveGameDataRefresh());
-
-    expect(watchContractEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        address: '0xabc',
-        eventName: 'MainPrizeClaimed',
-        onError: expect.any(Function),
-      }),
-    );
-    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['claimHistory'] });
-    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['roundList'] });
-    expect(onCycleFinalized).toHaveBeenCalledTimes(1);
-    window.removeEventListener('cosmic:cycle-finalized', onCycleFinalized);
-  });
-
-  it('dispatches a cosmic:gesture-placed window event when a gesture lands', () => {
+  it('invalidates live queries and dispatches the gesture window event on BidPlaced', () => {
     const onGesturePlaced = jest.fn();
     window.addEventListener('cosmic:gesture-placed', onGesturePlaced);
 
-    const watchContractEvent = jest.fn(({ onLogs }) => {
-      onLogs([]);
-      return jest.fn();
-    });
-    mockUsePublicClient.mockReturnValue({ watchContractEvent } as never);
-    mockUseQueryClient.mockReturnValue({
-      invalidateQueries: jest.fn().mockResolvedValue(undefined),
-    } as never);
-
     renderHook(() => useLiveGameDataRefresh());
+    emitEvents([event('BidPlaced')]);
 
     expect(onGesturePlaced).toHaveBeenCalledTimes(1);
+    expect(invalidateQueries).toHaveBeenCalledTimes(LIVE_GAME_QUERY_KEYS.length);
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['allocationTime'] });
+
+    // ETL echo: the same keys are invalidated again after the delay.
+    jest.advanceTimersByTime(ETL_ECHO_DELAY_MS);
+    expect(invalidateQueries).toHaveBeenCalledTimes(LIVE_GAME_QUERY_KEYS.length * 2);
+
     window.removeEventListener('cosmic:gesture-placed', onGesturePlaced);
   });
 
-  it('no-ops without a public client or contract address', () => {
-    mockUsePublicClient.mockReturnValue(undefined as never);
+  it('dispatches cosmic:cycle-finalized and refreshes claim queries on MainPrizeClaimed', () => {
+    const onCycleFinalized = jest.fn();
+    window.addEventListener('cosmic:cycle-finalized', onCycleFinalized);
+
+    renderHook(() => useLiveGameDataRefresh());
+    emitEvents([event('MainPrizeClaimed')]);
+
+    expect(onCycleFinalized).toHaveBeenCalledTimes(1);
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['claimHistory'] });
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['roundList'] });
+
+    window.removeEventListener('cosmic:cycle-finalized', onCycleFinalized);
+  });
+
+  it('refreshes contribution queries without any window event on EthDonated', () => {
+    const listeners = Object.values(EVENT_WINDOW_EVENTS).map((name) => {
+      const listener = jest.fn();
+      window.addEventListener(name, listener);
+      return { name, listener };
+    });
+
+    renderHook(() => useLiveGameDataRefresh());
+    emitEvents([event('EthDonated')]);
+
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['donationsCGSimpleList'] });
+    expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['donationsBothByRound'] });
+    for (const { name, listener } of listeners) {
+      expect(listener).not.toHaveBeenCalled();
+      window.removeEventListener(name, listener);
+    }
+  });
+
+  it('coalesces query keys and window events across a batch of events', () => {
+    const onGesturePlaced = jest.fn();
+    window.addEventListener('cosmic:gesture-placed', onGesturePlaced);
+
+    renderHook(() => useLiveGameDataRefresh());
+    emitEvents([event('BidPlaced'), event('FirstBidPlacedInRound'), event('MainPrizeClaimed')]);
+
+    // Both gesture events share one window event, dispatched once.
+    expect(onGesturePlaced).toHaveBeenCalledTimes(1);
+
+    // dashboardInfo appears in all three routes but is invalidated once.
+    const dashboardCalls = invalidateQueries.mock.calls.filter(
+      ([arg]) => JSON.stringify(arg.queryKey) === JSON.stringify(['dashboardInfo']),
+    );
+    expect(dashboardCalls).toHaveLength(1);
+
+    window.removeEventListener('cosmic:gesture-placed', onGesturePlaced);
+  });
+
+  it('clears pending echo timers on unmount', () => {
+    const { unmount } = renderHook(() => useLiveGameDataRefresh());
+    emitEvents([event('BidPlaced')]);
+    const immediateCount = invalidateQueries.mock.calls.length;
+
+    unmount();
+    jest.advanceTimersByTime(ETL_ECHO_DELAY_MS * 2);
+
+    expect(invalidateQueries).toHaveBeenCalledTimes(immediateCount);
+  });
+
+  it('does not poll without a contract address', () => {
     mockUseContractAddresses.mockReturnValue({ cosmicGame: '' } as never);
 
     renderHook(() => useLiveGameDataRefresh());
 
-    expect(mockUseQueryClient().invalidateQueries).not.toHaveBeenCalled();
+    expect(mockStartPolling).not.toHaveBeenCalled();
   });
 });

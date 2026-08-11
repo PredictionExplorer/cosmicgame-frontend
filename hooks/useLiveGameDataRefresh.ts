@@ -2,13 +2,13 @@
 
 import { useEffect } from 'react';
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { usePublicClient } from 'wagmi';
 
-import { cosmicGameAbi } from '@/contracts/abis';
-
-import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import { reportError } from '@/utils/errors';
+import {
+  startCosmicEventPolling,
+  type CosmicChainEvent,
+  type WatchedCosmicEventName,
+} from '@/lib/chainEvents';
 
 export const LIVE_GAME_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['dashboardInfo'],
@@ -25,6 +25,45 @@ export const LIVE_GAME_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['ctPrice'],
 ];
 
+/** Queries showing ETH donation data (list pages, per-round tabs, totals). */
+const ETH_DONATION_QUERY_KEYS: readonly (readonly unknown[])[] = [
+  ['dashboardInfo'],
+  ['donationsCGSimpleList'],
+  ['donationsCGSimpleByRound'],
+  ['donationsCGWithInfoList'],
+  ['donationsCGWithInfoByRound'],
+  ['donationsWithInfoById'],
+  ['donationsEthByUser'],
+  ['donationsBoth'],
+  ['donationsBothByRound'],
+];
+
+/**
+ * Which query caches each watched CosmicGame event refreshes. Keys are
+ * matched as prefixes, so e.g. `['roundInfo']` covers every per-round entry.
+ */
+export const EVENT_QUERY_ROUTES: Record<WatchedCosmicEventName, readonly (readonly unknown[])[]> = {
+  BidPlaced: LIVE_GAME_QUERY_KEYS,
+  FirstBidPlacedInRound: [...LIVE_GAME_QUERY_KEYS, ['roundList'], ['roundInfo']],
+  MainPrizeClaimed: [...LIVE_GAME_QUERY_KEYS, ['claimHistory'], ['roundList'], ['roundInfo']],
+  EthDonated: ETH_DONATION_QUERY_KEYS,
+  EthDonatedWithInfo: ETH_DONATION_QUERY_KEYS,
+};
+
+/** DOM events broadcast so non-query consumers can react immediately. */
+export const EVENT_WINDOW_EVENTS: Partial<Record<WatchedCosmicEventName, string>> = {
+  BidPlaced: 'cosmic:gesture-placed',
+  FirstBidPlacedInRound: 'cosmic:gesture-placed',
+  MainPrizeClaimed: 'cosmic:cycle-finalized',
+};
+
+/**
+ * The backend ETL indexes a new block shortly after the node sees it, so the
+ * immediate invalidation can still fetch pre-event API data. Each affected
+ * query is therefore invalidated a second time after this delay.
+ */
+export const ETL_ECHO_DELAY_MS = 2_000;
+
 export function invalidateLiveGameQueries(queryClient: QueryClient): Promise<unknown[]> {
   return Promise.all(
     LIVE_GAME_QUERY_KEYS.map((queryKey) =>
@@ -36,67 +75,58 @@ export function invalidateLiveGameQueries(queryClient: QueryClient): Promise<unk
 }
 
 /**
- * Watcher failures repeat on every poll cycle (~4s) while an RPC node is
- * unreachable; report each label at most once per window to keep Sentry
- * signal without flooding it.
- */
-const WATCH_ERROR_REPORT_INTERVAL_MS = 5 * 60_000;
-const lastWatchErrorReportAtMs = new Map<string, number>();
-
-function reportWatchError(error: unknown, label: string): void {
-  const now = Date.now();
-  if (now - (lastWatchErrorReportAtMs.get(label) ?? 0) < WATCH_ERROR_REPORT_INTERVAL_MS) return;
-  lastWatchErrorReportAtMs.set(label, now);
-  reportError(error, label);
-}
-
-/**
- * Keeps active-cycle UI synchronized for passive viewers: refreshes live data
- * the moment a new gesture lands on-chain and the moment a cycle is finalized
- * (`MainPrizeClaimed`), instead of waiting for the next scheduled poll.
+ * Site-wide event-driven refresh: polls both RPC nodes for the watched
+ * CosmicGame events (see lib/chainEvents) and, when one lands on-chain,
+ * broadcasts the matching window event and invalidates the affected query
+ * caches — once immediately and once after `ETL_ECHO_DELAY_MS`, so viewers
+ * see fresh data even though the backend ETL indexes the block slightly
+ * after the node does.
  */
 export function useLiveGameDataRefresh() {
   const queryClient = useQueryClient();
-  const publicClient = usePublicClient({ chainId: activeChain.id });
   const { cosmicGame } = useContractAddresses();
 
   useEffect(() => {
-    if (!publicClient || !cosmicGame) return undefined;
+    if (!cosmicGame) return undefined;
 
-    const address = cosmicGame as `0x${string}`;
-    const unwatchers: (() => void)[] = [];
-    try {
-      unwatchers.push(
-        publicClient.watchContractEvent({
-          address,
-          abi: cosmicGameAbi,
-          eventName: 'BidPlaced',
-          onLogs: () => {
-            window.dispatchEvent(new CustomEvent('cosmic:gesture-placed'));
-            void invalidateLiveGameQueries(queryClient);
-          },
-          onError: (error) => reportWatchError(error, 'watch BidPlaced'),
-        }),
-      );
-      unwatchers.push(
-        publicClient.watchContractEvent({
-          address,
-          abi: cosmicGameAbi,
-          eventName: 'MainPrizeClaimed',
-          onLogs: () => {
-            window.dispatchEvent(new CustomEvent('cosmic:cycle-finalized'));
-            void invalidateLiveGameQueries(queryClient);
-            void queryClient.invalidateQueries({ queryKey: ['claimHistory'] });
-            void queryClient.invalidateQueries({ queryKey: ['roundList'] });
-          },
-          onError: (error) => reportWatchError(error, 'watch MainPrizeClaimed'),
-        }),
-      );
-    } catch (error) {
-      reportError(error, 'watch cosmic game events');
-    }
-    return () => {
-      for (const unwatch of unwatchers) unwatch();
+    const echoTimers = new Set<ReturnType<typeof setTimeout>>();
+
+    const handleEvents = (events: CosmicChainEvent[]): void => {
+      const keysByHash = new Map<string, readonly unknown[]>();
+      const windowEventNames = new Set<string>();
+      for (const event of events) {
+        for (const queryKey of EVENT_QUERY_ROUTES[event.eventName]) {
+          keysByHash.set(JSON.stringify(queryKey), queryKey);
+        }
+        const windowEventName = EVENT_WINDOW_EVENTS[event.eventName];
+        if (windowEventName) windowEventNames.add(windowEventName);
+      }
+
+      for (const name of windowEventNames) {
+        window.dispatchEvent(new CustomEvent(name));
+      }
+
+      const invalidateAll = (): void => {
+        for (const queryKey of keysByHash.values()) {
+          void queryClient.invalidateQueries({ queryKey });
+        }
+      };
+      invalidateAll();
+      const timer = setTimeout(() => {
+        echoTimers.delete(timer);
+        invalidateAll();
+      }, ETL_ECHO_DELAY_MS);
+      echoTimers.add(timer);
     };
-  }, [cosmicGame, publicClient, queryClient]);
+
+    const stop = startCosmicEventPolling({
+      contractAddress: cosmicGame,
+      onEvents: handleEvents,
+    });
+
+    return () => {
+      stop();
+      for (const timer of echoTimers) clearTimeout(timer);
+    };
+  }, [cosmicGame, queryClient]);
 }

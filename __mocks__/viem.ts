@@ -15,6 +15,11 @@ module.exports = {
   parseUnits: (val: string, decimals: number) =>
     BigInt(Math.round(Number(val) * Math.pow(10, decimals))),
   isAddress: (addr: string) => /^0x[0-9a-fA-F]{40}$/.test(addr),
+  // Real implementation (pure hashing, no heavy deps): tests that derive
+  // event topics must produce the same selectors as production code.
+  toEventSelector: (event: unknown) =>
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('viem/utils') as { toEventSelector: (e: unknown) => string }).toEventSelector(event),
   getAddress: (addr: string) => addr,
   zeroAddress: '0x0000000000000000000000000000000000000000',
   maxUint256: BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
