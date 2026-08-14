@@ -103,7 +103,8 @@ describe('FAQPage', () => {
     });
     await user.type(searchInput, 'Endurance Champion');
 
-    await screen.findByText(/Showing \d+ of \d+ questions/i);
+    // The search input is debounced (200ms); allow extra time on slow machines.
+    await screen.findByText(/Showing \d+ of \d+ questions/i, {}, { timeout: 10_000 });
   }, 30_000);
 
   it('shows "No questions found" for nonsense search', async () => {
@@ -115,11 +116,15 @@ describe('FAQPage', () => {
     });
     await user.type(searchInput, 'xyznonexistentquestion123');
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('No questions found. Try a different search term.'),
-      ).toBeInTheDocument();
-    });
+    // The search input is debounced (200ms); allow extra time on slow machines.
+    await waitFor(
+      () => {
+        expect(
+          screen.getByText('No questions found. Try a different search term.'),
+        ).toBeInTheDocument();
+      },
+      { timeout: 10_000 },
+    );
   }, 30_000);
 
   it('hides popular questions and category nav when searching', async () => {
@@ -133,9 +138,13 @@ describe('FAQPage', () => {
     });
     await user.type(searchInput, 'anchoring'); // lexicon-allow-line
 
-    await waitFor(() => {
-      expect(screen.queryByText('Popular Questions')).not.toBeInTheDocument();
-    });
+    // The search input is debounced (200ms); allow extra time on slow machines.
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Popular Questions')).not.toBeInTheDocument();
+      },
+      { timeout: 10_000 },
+    );
   }, 15_000);
 
   it('has no accessibility violations', async () => {

@@ -12,7 +12,6 @@ import {
   get_staking_cst_actions_info,
   get_staking_cst_rewards,
   get_staking_cst_rewards_by_round,
-  get_staking_cst_reward_paid_records_by_user,
   get_staked_cst_tokens,
   get_staking_rewards_by_user,
   get_staking_rewards_by_user_by_token_details,
@@ -293,28 +292,6 @@ describe('anchoring API', () => {
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
       await expect(get_staking_cst_rewards_by_round(3)).rejects.toThrow(
-        'Network response was not OK',
-      );
-    });
-  });
-
-  describe('get_staking_cst_reward_paid_records_by_user', () => {
-    it('calls correct endpoint', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { RewardPaidRecords: [] } });
-      await get_staking_cst_reward_paid_records_by_user('0xabc');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/staking.*cst.*rewards.*paid.*by_user.*0xabc/),
-      );
-    });
-
-    it('returns empty array on 400', async () => {
-      mockedAxios.get.mockRejectedValue(make400());
-      expect(await get_staking_cst_reward_paid_records_by_user('0xabc')).toEqual([]);
-    });
-
-    it('throws on network error', async () => {
-      mockedAxios.get.mockRejectedValue(new Error('fail'));
-      await expect(get_staking_cst_reward_paid_records_by_user('0xabc')).rejects.toThrow(
         'Network response was not OK',
       );
     });

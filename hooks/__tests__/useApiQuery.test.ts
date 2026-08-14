@@ -41,7 +41,6 @@ import {
   useCSTAnchorActionInfo,
   useCSTAnchorDistributions,
   useCSTAnchorDistributionsByCycle,
-  useCSTAnchorDistributionPaidRecordsByUser,
   useGlobalAnchoredCSTokens,
   useAnchorDistributionsByUser,
   useAnchorDistributionsByUserByTokenDetails,
@@ -952,21 +951,6 @@ describe('useApiQuery hooks', () => {
     it('is enabled for round = 0', () => {
       renderHook(() => useCSTAnchorDistributionsByCycle(0));
       expect(getOptions().enabled).toBe(true);
-    });
-  });
-
-  describe('useCSTAnchorDistributionPaidRecordsByUser', () => {
-    it('includes address in the query key', () => {
-      renderHook(() => useCSTAnchorDistributionPaidRecordsByUser('0xeee'));
-
-      expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['stakingCSTRewardPaidRecords', '0xeee'] }),
-      );
-    });
-
-    it('is disabled when address is null', () => {
-      renderHook(() => useCSTAnchorDistributionPaidRecordsByUser(null));
-      expect(getOptions().enabled).toBe(false);
     });
   });
 

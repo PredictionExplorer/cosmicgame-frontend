@@ -88,7 +88,6 @@ const USE_API_QUERY_EXPORTS = [
   'useCSTAnchorActionInfo',
   'useCSTAnchorDistributions',
   'useCSTAnchorDistributionsByCycle',
-  'useCSTAnchorDistributionPaidRecordsByUser',
   'useGlobalAnchoredCSTokens',
   'useAnchorDistributionsByUser',
   'useAnchorDistributionsByUserByTokenDetails',

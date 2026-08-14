@@ -613,15 +613,6 @@ export function useCSTAnchorDistributionsByCycle(round: number | null | undefine
   });
 }
 
-export function useCSTAnchorDistributionPaidRecordsByUser(address: string | null | undefined) {
-  return useQuery<CSTAnchorDistribution[]>({
-    queryKey: ['stakingCSTRewardPaidRecords', address],
-    queryFn: ({ signal }) => api.get_staking_cst_reward_paid_records_by_user(address!, { signal }),
-    enabled: !!address,
-    staleTime: 30_000,
-  });
-}
-
 export function useGlobalAnchoredCSTokens() {
   return useQuery<AnchoredTokenInfo[]>({
     queryKey: ['stakedCSTTokensGlobal'],

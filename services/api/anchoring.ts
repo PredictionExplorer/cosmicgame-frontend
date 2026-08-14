@@ -157,17 +157,6 @@ export function get_staking_cst_rewards_by_round(
   }, []);
 }
 
-/** Fetches Cosmic Signature NFT anchoring reward-paid records for a wallet address. */
-export function get_staking_cst_reward_paid_records_by_user(
-  address: string,
-  opts?: ApiRequestOptions,
-): Promise<CSTAnchorDistribution[]> {
-  return apiCall(async () => {
-    const { data } = await apiGet(getAPIUrl(`staking/cst/rewards/paid/by_user/${address}`), opts);
-    return flattenTxArray<CSTAnchorDistribution>(data.RewardPaidRecords);
-  }, []);
-}
-
 /**
  * Fetches all currently anchored Cosmic Signature NFTs globally.
  *

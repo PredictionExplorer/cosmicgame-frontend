@@ -49,7 +49,6 @@ import {
   useCSTAnchorActionInfo,
   useCSTAnchorDistributions,
   useCSTAnchorDistributionsByCycle,
-  useCSTAnchorDistributionPaidRecordsByUser,
   useGlobalAnchoredCSTokens,
   useAnchorDistributionsByUser,
   useAnchorDistributionsByUserByTokenDetails,
@@ -175,10 +174,6 @@ describe('useApiQuery hook generics — every hook passes a type to useQuery<T>'
     ['useCSTAnchorActionInfo', () => useCSTAnchorActionInfo(1)],
     ['useCSTAnchorDistributions', () => useCSTAnchorDistributions()],
     ['useCSTAnchorDistributionsByCycle', () => useCSTAnchorDistributionsByCycle(1)],
-    [
-      'useCSTAnchorDistributionPaidRecordsByUser',
-      () => useCSTAnchorDistributionPaidRecordsByUser('0x'),
-    ],
     ['useGlobalAnchoredCSTokens', () => useGlobalAnchoredCSTokens()],
     ['useAnchorDistributionsByUser', () => useAnchorDistributionsByUser('0x')],
     [
@@ -246,8 +241,8 @@ describe('useApiQuery hook generics — every hook passes a type to useQuery<T>'
     ['useSystemEvents', () => useSystemEvents(0, 100)],
   ];
 
-  it('covers all 95 hooks', () => {
-    expect(HOOKS_WITH_GENERICS.length).toBe(95);
+  it('covers all 94 hooks', () => {
+    expect(HOOKS_WITH_GENERICS.length).toBe(94);
   });
 
   it.each(HOOKS_WITH_GENERICS)('%s calls useQuery with a queryFn', (name, hook) => {
