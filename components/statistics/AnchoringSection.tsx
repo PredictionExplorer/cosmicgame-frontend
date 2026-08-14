@@ -31,7 +31,6 @@ export interface AnchoringSectionProps {
     NumActiveStakers: number;
     NumDeposits?: number;
     TotalRewardEth?: number;
-    TotalTokensMinted?: number;
     TotalTokensStaked: number;
     UnclaimedRewardEth?: number;
   };
@@ -128,11 +127,6 @@ export function AnchoringSection({
             title={t('anchoringPage.stats.totalDistributions')}
             value={formatEthValue(cstStats.TotalRewardEth ?? 0)}
             tooltip={t('anchoringTooltips.cstTotalAnchorDistributions')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.tokensImprinted')}
-            value={cstStats.TotalTokensMinted ?? '—'}
-            tooltip={t('anchoringTooltips.cstTotalTokensImprinted')}
           />
           <StatisticsItem
             title={t('anchoringPage.stats.tokensAnchored')}

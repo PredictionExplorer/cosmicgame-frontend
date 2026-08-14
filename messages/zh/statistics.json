@@ -263,7 +263,6 @@
     "cstActiveAnchorHolders": "当前至少锚定一枚 Cosmic Signature NFT 的钱包。",
     "cstAnchorDistributionDeposits": "Cosmic Signature NFT 锚定派发池的累计存入事件数。",
     "cstTotalAnchorDistributions": "向 Cosmic Signature NFT 锚定者派发的 ETH 总额。",
-    "cstTotalTokensImprinted": "与 Cosmic Signature NFT 锚定记录关联的已索引 Cosmic Signature NFT 铭刻数量。",
     "cstTotalTokensAnchored": "协议中当前已锚定的 Cosmic Signature NFT 数量。",
     "cstUnretrievedAnchorDistributions": "已分配但尚未由 Cosmic Signature NFT 锚定者取回的锚定派发。",
     "rwlkActiveAnchorHolders": "当前至少锚定一枚 Random Walk NFT 的钱包。",

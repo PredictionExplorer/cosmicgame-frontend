@@ -263,7 +263,6 @@
     "cstActiveAnchorHolders": "Wallets currently anchoring at least one Cosmic Signature NFT.",
     "cstAnchorDistributionDeposits": "Total deposit events into the Cosmic Signature NFT Anchor Distribution pool.",
     "cstTotalAnchorDistributions": "Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders.",
-    "cstTotalTokensImprinted": "Indexed Cosmic Signature NFT imprint count associated with Cosmic Signature NFT anchoring records.",
     "cstTotalTokensAnchored": "Number of Cosmic Signature NFTs currently anchored in the protocol.",
     "cstUnretrievedAnchorDistributions": "Anchor Distributions allocated but not yet retrieved by Cosmic Signature NFT anchor-holders.",
     "rwlkActiveAnchorHolders": "Wallets currently anchoring at least one RandomWalk NFT.",

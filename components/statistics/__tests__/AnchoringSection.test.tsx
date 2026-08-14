@@ -1,3 +1,5 @@
+import userEvent from '@testing-library/user-event';
+
 import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
 import {
@@ -82,7 +84,6 @@ const defaultProps: AnchoringSectionProps = {
     NumActiveStakers: 10,
     NumDeposits: 5,
     TotalRewardEth: 1.5,
-    TotalTokensMinted: 100,
     TotalTokensStaked: 50,
     UnclaimedRewardEth: 0.3,
   },
@@ -197,11 +198,13 @@ describe('AnchoringSection', () => {
     expect(tooltips.length).toBeGreaterThan(0);
   });
 
-  it('explains imprinted-token anchoring counters', () => {
+  it('explains imprinted-token anchoring counters', async () => {
+    const user = userEvent.setup();
     render(<AnchoringSection {...defaultProps} />);
+    await user.click(screen.getByRole('tab', { name: 'RandomWalk NFT' }));
     expect(
       screen.getByText(
-        'Indexed Cosmic Signature NFT imprint count associated with Cosmic Signature NFT anchoring records.',
+        'Total Cosmic Signature NFTs and paired CST imprinted for RandomWalk NFT anchor-holders through Anchored-NFT Stellar Selection.',
       ),
     ).toBeInTheDocument();
   });
