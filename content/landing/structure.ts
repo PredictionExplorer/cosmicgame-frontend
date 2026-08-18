@@ -1,4 +1,4 @@
-import { protocolFacts } from '@/content/protocol-facts';
+import { ethDistributionFacts } from '@/content/protocol-facts';
 
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
@@ -119,7 +119,7 @@ export const LANDING_STRUCTURE = {
     ctaHref: `${APP_ORIGIN}/anchoring`,
   },
   publicGoods: {
-    cardPercentage: `${protocolFacts.publicGoodsPercentage}%`,
+    cardPercentage: `${ethDistributionFacts.publicGoodsPercentage}%`,
     cardTableRows: [
       { id: 'contributors', value: '170+' },
       { id: 'enforcement' },
