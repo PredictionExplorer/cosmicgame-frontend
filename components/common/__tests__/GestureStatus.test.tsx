@@ -1,8 +1,13 @@
 import userEvent from '@testing-library/user-event';
 
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import { GestureStatus } from '../GestureStatus';
+
+// Signature Allocation NFT count baked into the copy (V3: 3, V2: 1).
+const cscNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
 
 const mockCountdownProps: Array<Record<string, unknown>> = [];
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
@@ -257,7 +262,9 @@ describe('GestureStatus', () => {
     );
 
     expect(
-      screen.getByText('home.status.standing.leader.withNft(amount=10.5000,nftCount=3)'),
+      screen.getByText(
+        `home.status.standing.leader.withNft(amount=10.5000,cscNftCount=${cscNftCount},nftCount=3)`,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -277,7 +284,9 @@ describe('GestureStatus', () => {
     );
 
     expect(
-      screen.getByText('home.status.standing.leader.withErc20(amount=10.5000,erc20Count=2)'),
+      screen.getByText(
+        `home.status.standing.leader.withErc20(amount=10.5000,cscNftCount=${cscNftCount},erc20Count=2)`,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -299,7 +308,7 @@ describe('GestureStatus', () => {
 
     expect(
       screen.getByText(
-        'home.status.standing.leader.withBoth(amount=10.5000,nftCount=3,erc20Count=1)',
+        `home.status.standing.leader.withBoth(amount=10.5000,cscNftCount=${cscNftCount},nftCount=3,erc20Count=1)`,
       ),
     ).toBeInTheDocument();
   });
@@ -319,7 +328,9 @@ describe('GestureStatus', () => {
     );
 
     expect(
-      screen.getByText('home.status.standing.leader.base(amount=10.5000)'),
+      screen.getByText(
+        `home.status.standing.leader.base(amount=10.5000,cscNftCount=${cscNftCount})`,
+      ),
     ).toBeInTheDocument();
     expect(screen.queryByText(/nftCount=/)).not.toBeInTheDocument();
     expect(screen.queryByText(/erc20Count=/)).not.toBeInTheDocument();
@@ -340,7 +351,9 @@ describe('GestureStatus', () => {
     await user.hover(screen.getAllByRole('button', { name: /^More information/ })[1]!);
 
     expect(
-      await screen.findAllByText('home.status.metrics.signatureTooltip.withErc20(erc20Count=1)'),
+      await screen.findAllByText(
+        `home.status.metrics.signatureTooltip.withErc20(cscNftCount=${cscNftCount},erc20Count=1)`,
+      ),
     ).not.toHaveLength(0);
   });
 
