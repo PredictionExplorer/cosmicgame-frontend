@@ -2,6 +2,7 @@ import {
   cstRewardFacts,
   ethDistributionFacts,
   isV3Mechanics,
+  nftAllocationFacts,
   protocolFacts,
 } from '@/content/protocol-facts';
 
@@ -59,7 +60,7 @@ export const faqTextEn = {
     items: {
       'what-is-the-main-allocation': {
         question: 'What is the Signature Allocation?',
-        answer: `The Signature Allocation is received by the participant who made the Final Gesture of a cycle. It includes one Cosmic Signature NFT, a Recognition CST imprint of 1,000 CST, and ${ethDistributionFacts.mainEthPercentage}% of the Cycle Reserve in ETH, plus any tokens or NFTs attached to participant gestures during the cycle.`,
+        answer: `The Signature Allocation is received by the participant who made the Final Gesture of a cycle. It includes ${nftAllocationFacts.mainPrizeNftPhrase.en}, a Recognition CST imprint of 1,000 CST, and ${ethDistributionFacts.mainEthPercentage}% of the Cycle Reserve in ETH, plus any tokens or NFTs attached to participant gestures during the cycle.`,
       },
       'what-rewards-per-bid': {
         question: 'What do I receive for each gesture?',
@@ -87,7 +88,7 @@ export const faqTextEn = {
       },
       'how-many-nfts-minted': {
         question: 'How many Cosmic Signature NFTs are imprinted each cycle?',
-        answer: `In the vast majority of cycles, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ${protocolFacts.nftStellarSelectionRecipients} for NFT Stellar Selection recipients, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection. Each of those ${protocolFacts.typicalNftsPerCycle} NFT allocations also includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST. If a cycle has no CST gestures or no anchored Random Walk NFTs, those specific imprints are skipped for that cycle.`,
+        answer: `In the vast majority of cycles, ${nftAllocationFacts.typicalNftsPerCycle} Cosmic Signature NFTs are imprinted: ${nftAllocationFacts.mainPrizeNftsWord.en} for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ${protocolFacts.nftStellarSelectionRecipients} for NFT Stellar Selection recipients, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection. Each of those ${nftAllocationFacts.nftBearingAllocations} NFT allocations also includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST. If a cycle has no CST gestures or no anchored Random Walk NFTs, those specific imprints are skipped for that cycle.`,
       },
       'what-happens-to-remaining-eth': {
         question: 'What happens to the remaining ETH in the Cycle Reserve?',
