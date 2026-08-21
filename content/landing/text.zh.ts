@@ -1,4 +1,9 @@
-import { ethDistributionFacts, isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+import {
+  ethDistributionFacts,
+  isV3Mechanics,
+  nftAllocationFacts,
+  protocolFacts,
+} from '@/content/protocol-facts';
 
 import type { LandingText } from './structure';
 
@@ -151,7 +156,7 @@ export const landingTextZh = {
     items: {
       'signature-allocation': {
         title: '签名分配',
-        body: '写下收官之笔的参与者获配。其中包括 1,000 CST 与 1 枚 Cosmic Signature NFT。',
+        body: `写下收官之笔的参与者获配。其中包括 1,000 CST 与 ${nftAllocationFacts.mainPrizeNftPhrase.zh}。`,
       },
       'compounding-reserve': {
         percent: '约 50%',
