@@ -1,4 +1,9 @@
-import { ethDistributionFacts, isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+import {
+  ethDistributionFacts,
+  isV3Mechanics,
+  nftAllocationFacts,
+  protocolFacts,
+} from '@/content/protocol-facts';
 
 import type { LandingText } from './structure';
 
@@ -149,7 +154,7 @@ export const landingTextEn = {
     items: {
       'signature-allocation': {
         title: 'Signature Allocation',
-        body: 'To the participant who made the Final Gesture. Includes 1,000 CST and one Cosmic Signature NFT.',
+        body: `To the participant who made the Final Gesture. Includes 1,000 CST and ${nftAllocationFacts.mainPrizeNftPhrase.en}.`,
       },
       'compounding-reserve': {
         percent: '~50%',

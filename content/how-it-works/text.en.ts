@@ -2,6 +2,7 @@ import {
   cstRewardFacts,
   ethDistributionFacts,
   isV3Mechanics,
+  nftAllocationFacts,
   protocolFacts,
 } from '@/content/protocol-facts';
 
@@ -53,7 +54,7 @@ export const howItWorksTextEn = {
         title: 'Receive',
         description:
           'Participate in allocations when the cycle finalizes — Signature Allocation, Stellar Selections, Anchor Distributions, and more.',
-        tooltip: `The participant who made the Final Gesture receives ${ethDistributionFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT. Stellar Selection recipients, anchor-holders, and other participants also receive allocations.`,
+        tooltip: `The participant who made the Final Gesture receives ${ethDistributionFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and ${nftAllocationFacts.mainPrizeNftPhrase.en}. Stellar Selection recipients, anchor-holders, and other participants also receive allocations.`,
       },
     ],
   },
@@ -80,7 +81,7 @@ export const howItWorksTextEn = {
       },
       {
         title: 'Signature Allocation',
-        description: `The participant who made the Final Gesture may retrieve ${ethDistributionFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
+        description: `The participant who made the Final Gesture may retrieve ${ethDistributionFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and ${nftAllocationFacts.mainPrizeNftPhrase.en}.`,
         tooltip:
           'The Cycle Reserve grows from all gestures. The participant who made the Final Gesture retrieves the Signature Allocation via the protocol contract.',
       },
@@ -113,9 +114,9 @@ export const howItWorksTextEn = {
       },
       {
         label: 'Cycle Finalizes',
-        description: `The participant who made the Final Gesture retrieves the Signature Allocation: ${ethDistributionFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
+        description: `The participant who made the Final Gesture retrieves the Signature Allocation: ${ethDistributionFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and ${nftAllocationFacts.mainPrizeNftPhrase.en}.`,
         tooltip:
-          'The Signature Allocation retrieval happens via the protocol contract. The CST and Cosmic Signature NFT are imprinted automatically.',
+          'The Signature Allocation retrieval happens via the protocol contract. The CST and Cosmic Signature NFT allocations are imprinted automatically.',
       },
       {
         label: 'Stellar Selections',
