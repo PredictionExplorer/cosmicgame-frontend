@@ -1,4 +1,9 @@
-import { ethDistributionFacts, isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+import {
+  ethDistributionFacts,
+  isV3Mechanics,
+  nftAllocationFacts,
+  protocolFacts,
+} from '@/content/protocol-facts';
 
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
@@ -156,7 +161,7 @@ export const landingContentZh = {
       {
         percent: '25%',
         title: '签名分配',
-        body: '写下收官之笔的参与者获配。其中包括 1,000 CST 与 1 枚 Cosmic Signature NFT。',
+        body: `写下收官之笔的参与者获配。其中包括 1,000 CST 与 ${nftAllocationFacts.mainPrizeNftPhrase.zh}。`,
         tone: 'primary',
       },
       {
