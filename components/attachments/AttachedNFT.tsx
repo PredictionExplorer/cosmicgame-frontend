@@ -20,7 +20,10 @@ interface DonatedNFTProps {
 
 const DonatedNFT = ({ nft }: DonatedNFTProps) => {
   const t = useTranslations('statistics');
-  const { data: tokenURI } = useAttachedNftMetadata(nft.NFTTokenURI);
+  const { data: tokenURI } = useAttachedNftMetadata(nft.NFTTokenURI, {
+    tokenAddr: nft.TokenAddr,
+    tokenId: nft.NFTTokenId ?? nft.TokenId,
+  });
   const labels = {
     viewNft: t('attachedNftLinks.viewNft'),
     viewOpenSea: t('attachedNftLinks.viewOpenSea'),
@@ -38,6 +41,7 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
   const image = (
     <NFTImage
       src={tokenURI?.image}
+      fallbackSrc={tokenURI?.imageFallback}
       alt={
         tokenURI?.name
           ? t('attachedNftCard.imageAltNamed', { name: tokenURI.name })

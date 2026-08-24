@@ -316,7 +316,10 @@ function AttachedNFTAllocationCard({
 }) {
   const t = useTranslations('currentCycle');
   const tStatistics = useTranslations('statistics');
-  const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI);
+  const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI, {
+    tokenAddr: nft.TokenAddr,
+    tokenId: getAttachedNftTokenId(nft),
+  });
   const tokenId = getAttachedNftTokenId(nft);
   const linkLabels = {
     viewNft: tStatistics('attachedNftLinks.viewNft'),
@@ -370,6 +373,7 @@ function AttachedNFTAllocationCard({
             >
               <NFTImage
                 src={metadata?.image}
+                fallbackSrc={metadata?.imageFallback}
                 alt={imageAlt}
                 priority={featured}
                 sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px"
@@ -380,6 +384,7 @@ function AttachedNFTAllocationCard({
             <div className={mediaClassName} data-testid="nft-allocation-media">
               <NFTImage
                 src={metadata?.image}
+                fallbackSrc={metadata?.imageFallback}
                 alt={imageAlt}
                 priority={featured}
                 sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px"

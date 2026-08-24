@@ -16,8 +16,9 @@ import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 const PER_PAGE = 5;
 
 export interface NFTDistributionRowData {
-  TokenAddr: string;
-  NumDonations: number;
+  /** Field names follow the backend dashboard's MainStats.DonatedTokenDistribution rows. */
+  ContractAddr: string;
+  NumDonatedTokens: number;
 }
 
 interface NFTDistributionTableProps {
@@ -66,10 +67,10 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
               return (
                 <TablePrimaryRow key={rowKey}>
                   <TablePrimaryCell label={t('statisticsColumns.contractAddress')}>
-                    <span className="font-mono break-all">{row.TokenAddr}</span>
+                    <span className="font-mono break-all">{row.ContractAddr}</span>
                   </TablePrimaryCell>
                   <TablePrimaryCell label={t('statisticsColumns.numberOfNfts')} align="right">
-                    {row.NumDonations}
+                    {row.NumDonatedTokens}
                   </TablePrimaryCell>
                 </TablePrimaryRow>
               );

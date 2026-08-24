@@ -75,8 +75,8 @@ export interface MainStats {
 }
 
 export interface DonatedTokenDistributionEntry {
-  TokenAddr: string;
-  NumDonations: number;
+  ContractAddr: string;
+  NumDonatedTokens: number;
   [key: string]: unknown;
 }
 

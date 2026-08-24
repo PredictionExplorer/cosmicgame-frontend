@@ -6,8 +6,8 @@ import AttachedNFTDistributionTable from '../AttachedNFTDistributionTable';
 
 const rows = [
   {
-    TokenAddr: '0x1234567890abcdef1234567890abcdef12345678',
-    NumDonations: 3,
+    ContractAddr: '0x1234567890abcdef1234567890abcdef12345678',
+    NumDonatedTokens: 3,
   },
 ];
 

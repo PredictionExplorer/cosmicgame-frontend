@@ -49,7 +49,10 @@ interface DonatedNFTTableProps {
 const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
   const t = useTranslations('tables');
   const locale = useLocale();
-  const { data: tokenURI } = useAttachedNftMetadata(nft.NFTTokenURI);
+  const { data: tokenURI } = useAttachedNftMetadata(nft.NFTTokenURI, {
+    tokenAddr: nft.TokenAddr,
+    tokenId: nft.NFTTokenId ?? nft.TokenId,
+  });
 
   if (!nft) return <TablePrimaryRow />;
 
@@ -134,6 +137,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
           <a href={tokenURI.external_url} target="_blank" rel="noopener noreferrer">
             <NFTImage
               src={tokenURI.image}
+              fallbackSrc={tokenURI.imageFallback}
               alt={t('attachedAssets.nft.imageAlt', {
                 id: String(nft.NFTTokenId ?? nft.TokenId ?? ''),
               })}
