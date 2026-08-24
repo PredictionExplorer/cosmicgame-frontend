@@ -1,8 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
 
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
+
 import type { DashboardInfo } from '../../../services/api';
 import api from '../../../services/api';
 import { EventHorizonCountdown, getLandingCycleTimerSnapshot } from '../EventHorizonCountdown';
+
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => <img {...props} />,
+}));
 
 jest.mock('../../../services/api', () => ({
   __esModule: true,
@@ -165,6 +172,15 @@ describe('<EventHorizonCountdown />', () => {
     expect(screen.getByRole('link', { name: /landing\.timer\.openLiveCycle/i })).toHaveAttribute(
       'href',
       'https://app.cosmicsignature.com',
+    );
+
+    const poolLink = screen.getByRole('link', { name: 'landing.timer.viewCstPool' });
+    expect(poolLink).toHaveAttribute('href', CST_GECKOTERMINAL_POOL_URL);
+    expect(poolLink).toHaveAttribute('target', '_blank');
+    expect(poolLink).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(poolLink.querySelector('img')).toHaveAttribute(
+      'src',
+      '/images/brands/geckoterminal-symbol.svg',
     );
   });
 

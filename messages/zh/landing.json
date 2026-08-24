@@ -59,6 +59,7 @@
       "synchronized": "倒计时已与协议时间同步"
     },
     "openLiveCycle": "查看实时周期",
+    "viewCstPool": "GeckoTerminal 上的 CST 池",
     "eventHorizon": "事件地平线",
     "countdownAria": "{label}：{duration}",
     "durationPart": "{value}{unit}",

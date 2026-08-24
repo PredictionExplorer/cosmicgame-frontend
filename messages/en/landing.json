@@ -59,6 +59,7 @@
       "synchronized": "Countdown synchronized to protocol time"
     },
     "openLiveCycle": "Open live cycle",
+    "viewCstPool": "CST pool on GeckoTerminal",
     "eventHorizon": "Event horizon",
     "countdownAria": "{label}: {duration}",
     "durationPart": "{value} {unit}",

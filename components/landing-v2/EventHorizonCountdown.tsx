@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CountdownRenderProps } from 'react-countdown';
-import { ArrowRight, Radio, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, ArrowUpRight, Radio, Sparkles } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import api from '@/services/api';
 import { getCycleState, getDashboardActivationTime, type CyclePhase } from '@/lib/cycleState';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
@@ -469,14 +471,32 @@ export function EventHorizonCountdown() {
                 <Radio className="h-4 w-4 text-primary" aria-hidden />
                 {statusText}
               </span>
-              <a
-                href={localeHref(APP_ORIGIN, '/', locale)}
-                rel="noopener"
-                className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-white"
-              >
-                {timerT('openLiveCycle')}
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </a>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:justify-end">
+                <a
+                  href={localeHref(APP_ORIGIN, '/', locale)}
+                  rel="noopener"
+                  className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-white"
+                >
+                  {timerT('openLiveCycle')}
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </a>
+                <a
+                  href={CST_GECKOTERMINAL_POOL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 font-medium text-white/65 transition hover:text-white"
+                >
+                  <Image
+                    src="/images/brands/geckoterminal-symbol.svg"
+                    width={16}
+                    height={16}
+                    alt=""
+                    aria-hidden
+                  />
+                  {timerT('viewCstPool')}
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                </a>
+              </div>
             </div>
           </div>
         </div>
