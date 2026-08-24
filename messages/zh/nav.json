@@ -82,6 +82,10 @@
       "defaultLabel": "在 Uniswap 上兑换 CST",
       "shortLabel": "兑换 CST"
     },
+    "geckoTerminal": {
+      "ariaLabel": "在 GeckoTerminal 查看 CST 流动性池",
+      "shortLabel": "查看 CST 池"
+    },
     "axiomZero": {
       "name": "Axiom Zero",
       "product": "NFT 市场",

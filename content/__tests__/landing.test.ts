@@ -1,5 +1,7 @@
 import { getLandingContent, landingContentEn, landingContentZh } from '@/content/landing';
 
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
+
 const landingContent = landingContentEn;
 
 /**
@@ -68,7 +70,7 @@ describe('landing content shape', () => {
     expect(landingContent.footer.columns).toHaveLength(4);
   });
 
-  it('footer ecosystem column links Axiom Zero, Chaos Zero, and Uniswap', () => {
+  it('footer ecosystem column links Axiom Zero, Chaos Zero, Uniswap, and GeckoTerminal', () => {
     const ecosystem = landingContent.footer.columns.find(
       (column) => column.heading === 'Ecosystem',
     );
@@ -77,6 +79,7 @@ describe('landing content shape', () => {
     expect(hrefs).toContain('https://www.axiomzero.market/cosmic-signature');
     expect(hrefs).toContain('https://chaoszero.com');
     expect(hrefs.some((href) => href.startsWith('https://app.uniswap.org/'))).toBe(true);
+    expect(hrefs).toContain(CST_GECKOTERMINAL_POOL_URL);
   });
 });
 

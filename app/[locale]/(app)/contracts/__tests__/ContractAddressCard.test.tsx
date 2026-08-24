@@ -1,3 +1,4 @@
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
@@ -99,6 +100,24 @@ describe('ContractAddressCard', () => {
 
     expect(
       screen.queryByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the GeckoTerminal pool action when requested', () => {
+    render(
+      <ContractAddressCard {...defaultProps} name="Cosmic Signature CST Token" showPoolAction />,
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'nav.ecosystem.geckoTerminal.ariaLabel' }),
+    ).toHaveAttribute('href', CST_GECKOTERMINAL_POOL_URL);
+  });
+
+  it('does not render the GeckoTerminal pool action by default', () => {
+    render(<ContractAddressCard {...defaultProps} />);
+
+    expect(
+      screen.queryByRole('link', { name: 'nav.ecosystem.geckoTerminal.ariaLabel' }),
     ).not.toBeInTheDocument();
   });
 

@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 
 import Footer from '@/components/layout/Footer';
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 
@@ -114,6 +115,13 @@ describe('Footer', () => {
     expect(uniswap.getAttribute('href')).toMatch(/^https:\/\/app\.uniswap\.org\//);
     expect(uniswap).toHaveAttribute('target', '_blank');
     expect(uniswap).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('renders the GeckoTerminal CST pool link in the Ecosystem column', () => {
+    const geckoTerminal = screen.getByRole('link', { name: 'footer.links.geckoTerminal' });
+    expect(geckoTerminal).toHaveAttribute('href', CST_GECKOTERMINAL_POOL_URL);
+    expect(geckoTerminal).toHaveAttribute('target', '_blank');
+    expect(geckoTerminal).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('provides server-rendered crawl paths for the header dropdown destinations', () => {

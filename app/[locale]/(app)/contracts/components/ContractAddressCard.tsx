@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
 import { useClipboard } from '@/hooks/useClipboard';
+import { GeckoTerminalPoolButton } from '@/components/common/GeckoTerminalPoolButton';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -17,6 +18,7 @@ interface ContractAddressCardProps {
   description: string;
   explorerUrl: string;
   showTradeAction?: boolean;
+  showPoolAction?: boolean;
   showMarketplaceAction?: boolean;
   className?: string;
 }
@@ -27,6 +29,7 @@ export function ContractAddressCard({
   description,
   explorerUrl,
   showTradeAction = false,
+  showPoolAction = false,
   showMarketplaceAction = false,
   className,
 }: ContractAddressCardProps) {
@@ -86,9 +89,10 @@ export function ContractAddressCard({
       <p className="mt-2 break-all font-mono text-xs text-muted-foreground leading-relaxed">
         {address}
       </p>
-      {showTradeAction || showMarketplaceAction ? (
+      {showTradeAction || showPoolAction || showMarketplaceAction ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {showTradeAction ? <UniswapTradeButton variant="card" /> : null}
+          {showPoolAction ? <GeckoTerminalPoolButton /> : null}
           {showMarketplaceAction ? <NftMarketplaceButton variant="card" /> : null}
         </div>
       ) : null}

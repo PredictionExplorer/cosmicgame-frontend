@@ -107,5 +107,7 @@ describe('localized legal content', () => {
       '[assets/fonts/OFL-NotoSansCJK.txt](assets/fonts/OFL-NotoSansCJK.txt)',
     );
     expect(notices).toContain('SIL Open Font License 1.1');
+    expect(notices).toContain('public/images/brands/geckoterminal-symbol.svg');
+    expect(notices).toContain('https://brand.coingecko.com/resources/brand-kit');
   });
 });

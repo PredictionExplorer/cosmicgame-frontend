@@ -1,5 +1,6 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
@@ -366,6 +367,7 @@ export const landingContentEn = {
           { label: 'Axiom Zero Marketplace', href: COSMIC_SIGNATURE_MARKETPLACE_URL },
           { label: 'Chaos Zero Predictions', href: CHAOS_ZERO_PREDICTIONS_URL },
           { label: 'Trade CST on Uniswap', href: CST_UNISWAP_SWAP_URL },
+          { label: 'View CST pool on GeckoTerminal', href: CST_GECKOTERMINAL_POOL_URL },
         ],
       },
       {

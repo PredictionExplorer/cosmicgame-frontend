@@ -1,3 +1,4 @@
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
@@ -140,6 +141,16 @@ describe('ContractAddressGrid', () => {
     });
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
+  });
+
+  it('shows the GeckoTerminal pool action only for the CST token contract', () => {
+    render(<ContractAddressGrid {...defaultProps} />);
+
+    const links = screen.getAllByRole('link', {
+      name: 'nav.ecosystem.geckoTerminal.ariaLabel',
+    });
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAttribute('href', CST_GECKOTERMINAL_POOL_URL);
   });
 
   it('shows the marketplace action only for the Cosmic Signature NFT contract', () => {

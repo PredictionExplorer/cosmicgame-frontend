@@ -82,6 +82,10 @@
       "defaultLabel": "Trade CST on Uniswap",
       "shortLabel": "Trade CST"
     },
+    "geckoTerminal": {
+      "ariaLabel": "View the CST pool on GeckoTerminal",
+      "shortLabel": "View CST pool"
+    },
     "axiomZero": {
       "name": "Axiom Zero",
       "product": "NFT marketplace",

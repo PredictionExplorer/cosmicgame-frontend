@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import type { AppLocale } from '@/i18n/routing';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { FooterWrapper } from '@/components/styled';
+import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
@@ -88,6 +89,11 @@ function getFooterLinks(t: FooterTranslator, locale: AppLocale): FooterGroup[] {
         },
         { label: t('links.chaosZero'), href: CHAOS_ZERO_PREDICTIONS_URL, external: true },
         { label: t('links.uniswap'), href: CST_UNISWAP_SWAP_URL, external: true },
+        {
+          label: t('links.geckoTerminal'),
+          href: CST_GECKOTERMINAL_POOL_URL,
+          external: true,
+        },
       ],
     },
     {

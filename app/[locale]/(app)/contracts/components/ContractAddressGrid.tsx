@@ -80,6 +80,7 @@ export function ContractAddressGrid({
                   description={contract.description}
                   explorerUrl={explorerUrl}
                   showTradeAction={contract.id === 'cst'}
+                  showPoolAction={contract.id === 'cst'}
                   showMarketplaceAction={contract.id === 'nft'}
                 />
               </motion.div>
