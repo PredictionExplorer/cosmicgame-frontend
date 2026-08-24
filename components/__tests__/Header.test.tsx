@@ -13,6 +13,9 @@ jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
 jest.mock('viem');
 
+let mockAccount: string | null = null;
+const mockAddCst = jest.fn();
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
@@ -21,7 +24,21 @@ jest.mock('next/image', () => ({
 }));
 
 jest.mock('../../hooks/web3', () => ({
-  useActiveWeb3React: () => ({ account: null, chainId: 421614, active: false }),
+  useActiveWeb3React: () => ({
+    account: mockAccount,
+    chainId: 421614,
+    active: mockAccount !== null,
+  }),
+}));
+
+jest.mock('../../hooks/useMetaMaskWatchAsset', () => ({
+  useMetaMaskWatchAsset: () => ({
+    isMetaMaskConnected: mockAccount !== null,
+    isAddingCst: false,
+    isAddingNft: false,
+    addCst: mockAddCst,
+    addCosmicSignatureNft: jest.fn(),
+  }),
 }));
 
 jest.mock('../../contexts/ApiDataContext', () => ({
@@ -66,6 +83,7 @@ const setViewportWidth = (value: number) => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockAccount = null;
   setViewportWidth(1200);
 });
 
@@ -229,6 +247,20 @@ describe('Header (mobile)', () => {
       'href',
       '/faq',
     );
+  });
+
+  it('lets connected MetaMask users add CST from the drawer', async () => {
+    const user = userEvent.setup();
+    mockAccount = '0x1234567890abcdef1234567890abcdef12345678';
+    render(<Header />);
+
+    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
+
+    const dialog = await screen.findByRole('dialog');
+    await user.click(
+      within(dialog).getByRole('button', { name: 'wallet.account.addCstToMetaMask' }),
+    );
+    expect(mockAddCst).toHaveBeenCalledTimes(1);
   });
 
   it('renders the ecosystem section inside the drawer', async () => {

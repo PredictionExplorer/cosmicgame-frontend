@@ -19,6 +19,18 @@
     "notReady": "Your wallet is not ready. Reconnect and try again.",
     "stillConnecting": "Wallet is still connecting. Please try again in a moment."
   },
+  "watchAsset": {
+    "metaMaskRequired": "Connect MetaMask to add this asset.",
+    "providerUnavailable": "MetaMask is not ready. Reconnect it and try again.",
+    "cstUnavailable": "The CST token address is not available yet.",
+    "nftUnavailable": "The Cosmic Signature NFT contract address is not available yet.",
+    "cstAdded": "CST was added to MetaMask.",
+    "nftAdded": "This Cosmic Signature NFT was added to MetaMask.",
+    "notAdded": "The asset was not added to MetaMask.",
+    "cancelled": "The MetaMask request was cancelled.",
+    "cstFailed": "MetaMask could not add CST. Please try again.",
+    "nftFailed": "MetaMask could not add this NFT. NFT import is experimental and requires the MetaMask browser extension."
+  },
   "network": {
     "unavailable": "Network unavailable — please reconnect your wallet.",
     "switchForGesture": "Switch your wallet to the app network before making a gesture.",

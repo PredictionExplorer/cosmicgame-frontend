@@ -11,6 +11,16 @@ jest.mock('../../hooks/web3', () => ({
   useActiveWeb3React: () => mockUseActiveWeb3React(),
 }));
 
+jest.mock('../../hooks/useMetaMaskWatchAsset', () => ({
+  useMetaMaskWatchAsset: () => ({
+    isMetaMaskConnected: false,
+    isAddingCst: false,
+    isAddingNft: false,
+    addCst: jest.fn(),
+    addCosmicSignatureNft: jest.fn(),
+  }),
+}));
+
 // eslint-disable-next-line import/order
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 

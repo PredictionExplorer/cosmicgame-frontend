@@ -17,8 +17,11 @@ const defaultProps: NFTOwnerActionsProps = {
   currentName: '',
   totalNamedTokens: 42,
   disabled: true,
+  showMetaMaskAction: false,
+  addingToMetaMask: false,
   onAddressChange: jest.fn(),
   onTokenNameChange: jest.fn(),
+  onAddToMetaMask: jest.fn(),
   onTransfer: jest.fn(),
   onSetName: jest.fn(),
   onClearName: jest.fn(),
@@ -35,6 +38,31 @@ describe('NFTOwnerActions', () => {
   it('renders "Manage Your Token" heading', () => {
     render(<NFTOwnerActions {...defaultProps} />);
     expect(screen.getByText('detail.ownerActions.title')).toBeInTheDocument();
+  });
+
+  it('shows the MetaMask action only when it is available', () => {
+    const { rerender } = render(<NFTOwnerActions {...defaultProps} />);
+    expect(
+      screen.queryByRole('button', { name: 'detail.ownerActions.addToMetaMask' }),
+    ).not.toBeInTheDocument();
+
+    rerender(<NFTOwnerActions {...defaultProps} showMetaMaskAction />);
+    expect(
+      screen.getByRole('button', { name: 'detail.ownerActions.addToMetaMask' }),
+    ).toBeInTheDocument();
+  });
+
+  it('requests that MetaMask display the NFT', () => {
+    render(<NFTOwnerActions {...defaultProps} showMetaMaskAction />);
+    fireEvent.click(screen.getByRole('button', { name: 'detail.ownerActions.addToMetaMask' }));
+    expect(defaultProps.onAddToMetaMask).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables the MetaMask action while its request is pending', () => {
+    render(<NFTOwnerActions {...defaultProps} showMetaMaskAction addingToMetaMask />);
+    expect(
+      screen.getByRole('button', { name: 'detail.ownerActions.addingToMetaMask' }),
+    ).toBeDisabled();
   });
 
   it('renders transfer section with Transfer button', () => {

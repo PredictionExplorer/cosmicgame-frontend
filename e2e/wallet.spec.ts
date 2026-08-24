@@ -1,5 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
 
+import { mockZhQualityApi } from './zh-quality-mocks';
+
+const MOCK_CST_ADDRESS = '0x6666666666666666666666666666666666666666';
+
 async function openMobileMenuIfNeeded(page: Page) {
   const menuButton = page.locator('role=button[name="menu"]');
   if (await menuButton.isVisible()) {
@@ -27,19 +31,16 @@ async function openWalletModal(page: Page) {
 
 async function installMockMetaMask(page: Page) {
   await page.addInitScript(() => {
-    const mockWindow = window as Window & { __mockEthereumRequests?: string[] };
+    const mockWindow = window as Window & {
+      __mockEthereumRequests?: string[];
+      __mockWatchAssetRequests?: unknown[];
+    };
     const listeners: Record<string, Array<(...args: unknown[]) => void>> = {};
     const provider = {
       isMetaMask: true as const,
       selectedAddress: null as string | null,
       chainId: '0xa4b1',
-      request: async ({
-        method,
-        params,
-      }: {
-        method: string;
-        params?: Array<{ chainId?: string }>;
-      }) => {
+      request: async ({ method, params }: { method: string; params?: unknown }) => {
         mockWindow.__mockEthereumRequests = [...(mockWindow.__mockEthereumRequests ?? []), method];
         if (method === 'eth_accounts') {
           return provider.selectedAddress ? [provider.selectedAddress] : [];
@@ -50,10 +51,18 @@ async function installMockMetaMask(page: Page) {
         }
         if (method === 'eth_chainId') return provider.chainId;
         if (method === 'wallet_switchEthereumChain') {
-          provider.chainId = params?.[0]?.chainId ?? provider.chainId;
+          const chainParams = params as Array<{ chainId?: string }> | undefined;
+          provider.chainId = chainParams?.[0]?.chainId ?? provider.chainId;
           return null;
         }
         if (method === 'wallet_addEthereumChain') return null;
+        if (method === 'wallet_watchAsset') {
+          mockWindow.__mockWatchAssetRequests = [
+            ...(mockWindow.__mockWatchAssetRequests ?? []),
+            params,
+          ];
+          return true;
+        }
         if (method === 'net_version') return '42161';
         return null;
       },
@@ -72,6 +81,7 @@ async function installMockMetaMask(page: Page) {
 declare global {
   interface Window {
     __mockEthereumRequests?: string[];
+    __mockWatchAssetRequests?: unknown[];
   }
 }
 
@@ -110,6 +120,35 @@ test.describe('Wallet connection state (disconnected)', () => {
       .toContain('eth_requestAccounts');
     expect(pageErrors.join('\n')).not.toContain('@metamask/sdk');
     expect(pageErrors.join('\n')).not.toContain('Cannot find module');
+  });
+
+  test('connected users can add CST to MetaMask with the expected metadata', async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== 'Desktop Chrome', 'Desktop wallet menu payload coverage');
+    await mockZhQualityApi(page);
+    await installMockMetaMask(page);
+
+    const dialog = await openWalletModal(page);
+    await dialog.getByRole('button', { name: /^MetaMask$/i }).click();
+
+    const walletTrigger = page.getByRole('button', { name: /0x1234/i }).first();
+    await expect(walletTrigger).toBeVisible({ timeout: 10_000 });
+    await walletTrigger.click();
+    await page.getByRole('menuitem', { name: 'Add CST to MetaMask' }).click();
+
+    const image = new URL('/images/logo2.svg', page.url()).href;
+    await expect
+      .poll(() => page.evaluate(() => window.__mockWatchAssetRequests?.[0]))
+      .toEqual({
+        type: 'ERC20',
+        options: {
+          address: MOCK_CST_ADDRESS,
+          symbol: 'CST',
+          decimals: 18,
+          image,
+        },
+      });
   });
 
   test('Chinese wallet chooser connects through the non-mutating injected flow', async ({

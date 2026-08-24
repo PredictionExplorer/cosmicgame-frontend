@@ -47,6 +47,7 @@ import {
   useCTOwnershipTransfers,
 } from '@/hooks/useApiQuery';
 import { useClipboard } from '@/hooks/useClipboard';
+import { useMetaMaskWatchAsset } from '@/hooks/useMetaMaskWatchAsset';
 import { GradientText } from '@/components/styled';
 import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
@@ -152,6 +153,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const { setNotification } = useNotification();
   const { ensureCorrectChain } = useRequireChain();
   const { copy } = useClipboard();
+  const { isMetaMaskConnected, isAddingNft, addCosmicSignatureNft } = useMetaMaskWatchAsset();
 
   const nameRefetchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
 
@@ -605,8 +607,11 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
             currentName={nameHistory[0]?.TokenName ?? ''}
             totalNamedTokens={dashboard?.MainStats.TotalNamedTokens ?? 0}
             disabled={!address || address === account}
+            showMetaMaskAction={isMetaMaskConnected}
+            addingToMetaMask={isAddingNft}
             onAddressChange={setAddress}
             onTokenNameChange={handleChangeName}
+            onAddToMetaMask={() => void addCosmicSignatureNft(tokenId)}
             onTransfer={handleClickTransfer}
             onSetName={handleSetTokenName}
             onClearName={handleClearName}

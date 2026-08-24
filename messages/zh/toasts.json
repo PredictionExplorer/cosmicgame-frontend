@@ -19,6 +19,18 @@
     "notReady": "钱包尚未就绪，请重新连接后重试。",
     "stillConnecting": "钱包仍在连接中，请稍后重试。"
   },
+  "watchAsset": {
+    "metaMaskRequired": "请连接 MetaMask 后再添加此资产。",
+    "providerUnavailable": "MetaMask 尚未就绪，请重新连接后重试。",
+    "cstUnavailable": "CST 代币地址暂不可用。",
+    "nftUnavailable": "Cosmic Signature NFT 合约地址暂不可用。",
+    "cstAdded": "CST 已添加至 MetaMask。",
+    "nftAdded": "这枚 Cosmic Signature NFT 已添加至 MetaMask。",
+    "notAdded": "此资产未添加至 MetaMask。",
+    "cancelled": "已取消 MetaMask 请求。",
+    "cstFailed": "MetaMask 未能添加 CST，请重试。",
+    "nftFailed": "MetaMask 未能添加这枚 NFT。NFT 导入仍为实验性功能，仅支持 MetaMask 浏览器扩展。"
+  },
   "network": {
     "unavailable": "网络暂不可用，请重新连接钱包。",
     "switchForGesture": "请先将钱包切换至应用所用网络，再落笔。",

@@ -50,7 +50,11 @@
   },
   "ownerActions": {
     "title": "管理这枚代币",
-    "titleTooltip": "作为当前持有者，你可以将这枚代币转移至其他地址，或为它设置专属名称。",
+    "titleTooltip": "作为当前持有者，你可以在 MetaMask 中显示、转移或命名这枚代币。",
+    "metaMaskHeading": "在 MetaMask 中显示",
+    "metaMaskTooltip": "请求 MetaMask 浏览器扩展显示这枚 NFT。NFT 导入仍为实验性功能，MetaMask 移动端暂不支持。",
+    "addToMetaMask": "将 NFT 添加至 MetaMask",
+    "addingToMetaMask": "正在添加 NFT…",
     "transferHeading": "转移",
     "transferTooltip": "将代币发送至其他以太坊地址。转移不可撤销，确认前请仔细核对地址。",
     "recipientPlaceholder": "接收地址（0x…）",

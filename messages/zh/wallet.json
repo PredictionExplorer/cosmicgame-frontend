@@ -19,6 +19,8 @@
     "myRewards": "我的分配",
     "myNfts": "我的 NFT",
     "transferCst": "转账 CST",
+    "addCstToMetaMask": "将 CST 添加至 MetaMask",
+    "addingCstToMetaMask": "正在添加 CST…",
     "myAnchors": "我的锚定",
     "winningHistory": "获配记录"
   },

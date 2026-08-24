@@ -125,6 +125,16 @@ jest.mock('../../../../hooks/useNotify', () => ({
   useNotify: () => ({ notify: mockNotify, notifyErrorFromEthers: jest.fn() }),
 }));
 
+jest.mock('../../../../hooks/useMetaMaskWatchAsset', () => ({
+  useMetaMaskWatchAsset: () => ({
+    isMetaMaskConnected: false,
+    isAddingCst: false,
+    isAddingNft: false,
+    addCst: jest.fn(),
+    addCosmicSignatureNft: jest.fn(),
+  }),
+}));
+
 /* ── wagmi / web3 ───────────────────────────────────────────────── */
 
 let mockAccount: string | null = '0xUser';

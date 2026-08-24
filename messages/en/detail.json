@@ -50,7 +50,11 @@
   },
   "ownerActions": {
     "title": "Manage Your Token",
-    "titleTooltip": "As the current owner, you can transfer this token to another address or set a custom name for it.",
+    "titleTooltip": "As the current owner, you can display this token in MetaMask, transfer it, or set a custom name.",
+    "metaMaskHeading": "Display in MetaMask",
+    "metaMaskTooltip": "Prompt the MetaMask browser extension to display this NFT. NFT import is experimental and is not available in MetaMask Mobile.",
+    "addToMetaMask": "Add NFT to MetaMask",
+    "addingToMetaMask": "Adding NFT to MetaMask...",
     "transferHeading": "Transfer",
     "transferTooltip": "Send this token to another Ethereum address. Double-check the address before confirming — transfers are irreversible.",
     "recipientPlaceholder": "Recipient address (0x...)",

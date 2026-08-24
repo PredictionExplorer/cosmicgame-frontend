@@ -26,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { AddCstToMetaMaskButton } from '@/components/common/AddCstToMetaMaskButton';
 import { ChaosZeroButton } from '@/components/common/ChaosZeroButton';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
@@ -160,6 +161,7 @@ const ConnectWalletButton = ({
             <DropdownMenuItem className="cursor-pointer p-0">
               <UniswapTradeButton variant="menu" />
             </DropdownMenuItem>
+            <AddCstToMetaMaskButton />
             <DropdownMenuItem className="cursor-pointer p-0">
               <ChaosZeroButton variant="menu" />
             </DropdownMenuItem>

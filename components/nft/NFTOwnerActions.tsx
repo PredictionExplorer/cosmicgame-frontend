@@ -1,5 +1,5 @@
 import { type ChangeEvent } from 'react';
-import { ArrowRight, Pen, Send } from 'lucide-react';
+import { ArrowRight, CirclePlus, Pen, Send, WalletCards } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
@@ -16,8 +16,11 @@ export interface NFTOwnerActionsProps {
   currentName: string;
   totalNamedTokens: number;
   disabled: boolean;
+  showMetaMaskAction: boolean;
+  addingToMetaMask: boolean;
   onAddressChange: (value: string) => void;
   onTokenNameChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onAddToMetaMask: () => void;
   onTransfer: () => void;
   onSetName: () => void;
   onClearName: () => void;
@@ -31,8 +34,11 @@ export function NFTOwnerActions({
   currentName,
   totalNamedTokens,
   disabled,
+  showMetaMaskAction,
+  addingToMetaMask,
   onAddressChange,
   onTokenNameChange,
+  onAddToMetaMask,
   onTransfer,
   onSetName,
   onClearName,
@@ -48,6 +54,28 @@ export function NFTOwnerActions({
         <h3 className="text-lg font-semibold text-foreground">{t('ownerActions.title')}</h3>
         <InfoTooltip content={t('ownerActions.titleTooltip')} />
       </div>
+
+      {showMetaMaskAction && (
+        <>
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <WalletCards className="h-4 w-4 text-primary/70" aria-hidden />
+              <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                {t('ownerActions.metaMaskHeading')}
+              </h4>
+              <InfoTooltip content={t('ownerActions.metaMaskTooltip')} />
+            </div>
+            <Button variant="secondary" onClick={onAddToMetaMask} disabled={addingToMetaMask}>
+              {addingToMetaMask
+                ? t('ownerActions.addingToMetaMask')
+                : t('ownerActions.addToMetaMask')}
+              <CirclePlus className="ml-1.5 h-4 w-4" aria-hidden />
+            </Button>
+          </div>
+
+          <SectionDivider className="my-6" />
+        </>
+      )}
 
       {/* Transfer section */}
       <div>

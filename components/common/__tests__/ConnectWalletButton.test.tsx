@@ -2,17 +2,28 @@ import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 
-import { render, screen } from '@/test-utils';
+import { fireEvent, render, screen } from '@/test-utils';
 
 import ConnectWalletButton from '../ConnectWalletButton';
 
 const ACCOUNT = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
 
 let mockAccount: string | null = ACCOUNT;
+const mockAddCst = jest.fn();
 
 jest.mock('../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({
     account: mockAccount,
+  }),
+}));
+
+jest.mock('../../../hooks/useMetaMaskWatchAsset', () => ({
+  useMetaMaskWatchAsset: () => ({
+    isMetaMaskConnected: true,
+    isAddingCst: false,
+    isAddingNft: false,
+    addCst: mockAddCst,
+    addCosmicSignatureNft: jest.fn(),
   }),
 }));
 
@@ -64,6 +75,14 @@ describe('ConnectWalletButton', () => {
 
     const transferLink = await screen.findByText('wallet.account.transferCst');
     expect(transferLink.closest('a')).toHaveAttribute('href', '/transfer-cst');
+  });
+
+  it('lets connected MetaMask users add CST to their wallet', () => {
+    renderWalletButton();
+
+    fireEvent.click(screen.getByRole('button', { name: 'wallet.account.addCstToMetaMask' }));
+
+    expect(mockAddCst).toHaveBeenCalledTimes(1);
   });
 
   it('links connected users to trade CST on Uniswap', async () => {

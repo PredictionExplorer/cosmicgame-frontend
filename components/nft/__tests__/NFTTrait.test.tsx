@@ -113,6 +113,16 @@ jest.mock('../../../hooks/useClipboard', () => ({
   useClipboard: () => ({ copy: jest.fn() }),
 }));
 
+jest.mock('../../../hooks/useMetaMaskWatchAsset', () => ({
+  useMetaMaskWatchAsset: () => ({
+    isMetaMaskConnected: false,
+    isAddingCst: false,
+    isAddingNft: false,
+    addCst: jest.fn(),
+    addCosmicSignatureNft: jest.fn(),
+  }),
+}));
+
 jest.mock('next/link', () => ({
   __esModule: true,
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (

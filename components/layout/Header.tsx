@@ -20,6 +20,7 @@ import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import getNAVs, { type NavDescriptor } from '@/config/nav';
 import { getEcosystemDestinations } from '@/config/ecosystem';
+import { AddCstToMetaMaskButton } from '@/components/common/AddCstToMetaMaskButton';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import ListNavItem from '@/components/common/ListNavItem';
 import { EcosystemDock } from '@/components/layout/EcosystemDock';
@@ -507,6 +508,8 @@ const Header: FC = () => {
                       </>
                     )}
                   </div>
+
+                  <AddCstToMetaMaskButton variant="drawer" />
 
                   <div className="space-y-1.5 px-5 py-2">
                     <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
