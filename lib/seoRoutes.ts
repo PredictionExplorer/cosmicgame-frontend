@@ -59,6 +59,17 @@ const landingStaticRoutes: SeoRoute[] = [
     changeFrequency: 'weekly',
     priority: 0.8,
   },
+  {
+    path: '/white-paper',
+    host: 'landing',
+    kind: 'content',
+    index: true,
+    includeInSitemap: true,
+    hasServerVisibleContent: true,
+    lastModified: '2026-08-24',
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  },
 ];
 
 const learnRoutes: SeoRoute[] = learnContentEn.articles.map((article) => ({

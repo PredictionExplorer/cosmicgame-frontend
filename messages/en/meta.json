@@ -238,6 +238,10 @@
     "title": "Learn Cosmic Signature | On-Chain Art, Performance Cycles, and Arbitrum",
     "description": "Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications."
   },
+  "whitePaper": {
+    "title": "Cosmic Signature White Paper | A Procedural On-Chain Art Protocol",
+    "description": "The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization."
+  },
   "howItWorks": {
     "title": "How Cosmic Signature Works | Performance Cycles, Gestures, and NFTs",
     "description": "Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution."

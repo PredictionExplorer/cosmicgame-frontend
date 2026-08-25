@@ -238,6 +238,10 @@
     "title": "了解 Cosmic Signature · 链上艺术、演绎周期与 Arbitrum",
     "description": "了解 Cosmic Signature 的运作原理：演绎周期、落笔、CST、三体 NFT 艺术、Arbitrum 合约、锚定、公共物品与风险释疑。"
   },
+  "whitePaper": {
+    "title": "Cosmic Signature 白皮书 · 程序化链上艺术协议",
+    "description": "阅读 Cosmic Signature 白皮书：演绎周期、落笔、分配轨道、确定性三体 NFT 艺术、CST、锚定、宇宙议会、协议升级与全面去中心化路线。"
+  },
   "howItWorks": {
     "title": "Cosmic Signature 运作原理 · 演绎周期、落笔与 NFT",
     "description": "了解 Cosmic Signature 演绎周期如何展开：从校准窗口到一次次落笔，再到收官后的分配发放。"

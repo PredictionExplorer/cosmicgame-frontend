@@ -12,6 +12,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 - [Marketing Home](https://cosmicsignature.com/): Overview of Cosmic Signature as a procedural on-chain art protocol
 - [About](https://cosmicsignature.com/about): Entity home for Cosmic Signature
+- [White Paper](https://cosmicsignature.com/white-paper): The reference description of the protocol, with a downloadable PDF (v1.0, August 2026)
 - [What is Cosmic Signature?](https://cosmicsignature.com/learn/what-is-cosmic-signature): Plain-English overview
 - [Three-Body NFT Art](https://cosmicsignature.com/learn/three-body-nft-art): Technical explanation of deterministic art generation
 - [App](https://app.cosmicsignature.com/): Live gesture interface and active cycle status
@@ -90,6 +91,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 
 - [中文主页](https://cosmicsignature.com/zh)：协议与链上艺术概览
 - [关于](https://cosmicsignature.com/zh/about)：协议主体、官方链接与名称辨析
+- [白皮书](https://cosmicsignature.com/white-paper)：协议机制与设计的完整说明（英文，附 PDF）
 - [学习中心](https://cosmicsignature.com/zh/learn)：演绎周期、三体艺术、锚定与公共物品说明
 - [中文应用](https://app.cosmicsignature.com/zh)：当前周期与落笔界面
 - [画廊](https://app.cosmicsignature.com/zh/gallery)：浏览已铭刻的 Cosmic Signature NFT

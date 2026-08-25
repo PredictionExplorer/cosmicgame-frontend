@@ -5,6 +5,7 @@ import {
   CircleHelp,
   Compass,
   FileCode2,
+  FileText,
   GraduationCap,
   Images,
   Megaphone,
@@ -123,6 +124,13 @@ const getNAVs = (
           route: localeHref(LANDING_ORIGIN, '/learn', locale),
           description: t('links.learn.description'),
           icon: GraduationCap,
+          external: true,
+        },
+        {
+          title: t('links.whitePaper.label'),
+          route: localeHref(LANDING_ORIGIN, '/white-paper', locale),
+          description: t('links.whitePaper.description'),
+          icon: FileText,
           external: true,
         },
         {

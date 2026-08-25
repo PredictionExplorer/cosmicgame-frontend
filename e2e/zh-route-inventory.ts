@@ -103,6 +103,17 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     cluster: 'landing',
     expectedText: '什么是 Cosmic Signature？',
   },
+  {
+    id: 'white-paper',
+    pageFile: '(landing)/white-paper/page.tsx',
+    publicPath: '/white-paper',
+    fixturePath: '/white-paper',
+    host: 'landing',
+    cluster: 'landing',
+    // The paper body is English-only for v1.0; the zh variant renders a
+    // Chinese language notice alongside localized metadata.
+    expectedText: '白皮书目前提供英文版',
+  },
 
   // Sprint 3 — core dApp journey.
   {

@@ -109,6 +109,11 @@ function getFooterLinks(t: FooterTranslator, locale: AppLocale): FooterGroup[] {
           href: localeHref(LANDING_ORIGIN, '/learn', locale),
           external: true,
         },
+        {
+          label: t('links.whitePaper'),
+          href: localeHref(LANDING_ORIGIN, '/white-paper', locale),
+          external: true,
+        },
         { label: t('links.audits'), href: '/audits' },
         { label: t('links.siteMap'), href: '/site-map' },
         {

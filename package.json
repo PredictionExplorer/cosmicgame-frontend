@@ -35,6 +35,7 @@
     "i18n:sprint7": "tsx scripts/i18n-parity.ts --required scripts/i18n-sprint7-required.json",
     "terminology:check": "tsx scripts/terminology-consistency.ts",
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
+    "white-paper:pdf": "tsx scripts/generate-white-paper-pdf.ts",
     "prepare": "husky"
   },
   "dependencies": {

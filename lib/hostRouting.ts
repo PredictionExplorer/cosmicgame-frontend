@@ -109,7 +109,7 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/user',
 ];
 
-export const LANDING_ONLY_PATH_PREFIXES: readonly string[] = ['/about', '/learn'];
+export const LANDING_ONLY_PATH_PREFIXES: readonly string[] = ['/about', '/learn', '/white-paper'];
 
 export function isAppOnlyPath(pathname: string): boolean {
   if (!pathname || pathname === '/') return false;
