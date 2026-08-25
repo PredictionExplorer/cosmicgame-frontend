@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 import { parseEther } from 'viem';
 import { usePublicClient } from 'wagmi';
 
 import { useNotification } from '@/contexts/NotificationContext';
+import { useWalletUi } from '@/contexts/WalletUiContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { cn } from '@/lib/utils';
@@ -53,6 +53,7 @@ export function EthContributionForm({
 }: EthContributionFormProps) {
   const t = useTranslations('ethContribution');
   const tToast = useTranslations('toasts');
+  const tWallet = useTranslations('wallet');
   const resolvedDescription = description ?? t('form.defaultDescription');
   const resolvedTitle = title ?? t('form.defaultTitle');
   const [amount, setAmount] = useState('');
@@ -62,6 +63,7 @@ export function EthContributionForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { account } = useActiveWeb3React();
+  const { requestConnectModal, warmConnectModal } = useWalletUi();
   const cosmicGameContract = useCosmicGameContract();
   const publicClient = usePublicClient();
   const { setNotification } = useNotification();
@@ -177,7 +179,14 @@ export function EthContributionForm({
             {tToast('contribution.connectWalletInline')}
           </p>
           <div className="sm:shrink-0">
-            <RainbowConnectButton />
+            <Button
+              onClick={requestConnectModal}
+              onPointerEnter={warmConnectModal}
+              onFocus={warmConnectModal}
+              data-testid="connect-wallet-button"
+            >
+              {tWallet('connect.button')}
+            </Button>
           </div>
         </div>
       ) : null}

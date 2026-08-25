@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
@@ -29,9 +30,11 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   return (
-    <>
-      <PublicDataRouteSeoSummary route="attached-nfts" />
-      <NFTDonationsPage />
-    </>
+    <PageMessages namespaces={['detail', 'statistics', 'tables']}>
+      <>
+        <PublicDataRouteSeoSummary route="attached-nfts" />
+        <NFTDonationsPage />
+      </>
+    </PageMessages>
   );
 }

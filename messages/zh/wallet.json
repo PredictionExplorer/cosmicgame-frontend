@@ -1,4 +1,7 @@
 {
+  "connect": {
+    "button": "连接钱包"
+  },
   "balances": {
     "eth": "ETH",
     "cst": "CST",

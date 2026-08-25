@@ -10,6 +10,7 @@ import type { LandingContent } from '@/content/landing';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
+import { useCanRenderHeroCanvas } from '@/components/three/hero-canvas-gate';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
@@ -23,13 +24,25 @@ const HeroCanvas = dynamic(
   },
 );
 
+/**
+ * Renders the WebGL canvas only when the gate passes. Rendering (not just
+ * hiding) is what matters: mounting the dynamic component is what triggers
+ * the three.js chunk download, so phones and reduced-motion visitors must
+ * never mount it.
+ */
+function HeroBackdrop() {
+  const canRenderCanvas = useCanRenderHeroCanvas();
+  if (!canRenderCanvas) return <ReducedMotionFallback />;
+  return <HeroCanvas />;
+}
+
 export function Hero({ hero }: { hero: LandingContent['hero'] }) {
   const locale = useLocale();
 
   return (
     <section className="relative isolate flex min-h-[100svh] w-full items-center overflow-hidden bg-deep-space">
       <div className="pointer-events-none absolute inset-0 z-0">
-        <HeroCanvas />
+        <HeroBackdrop />
       </div>
 
       <div
@@ -42,9 +55,13 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
       </div>
 
       <div className="relative z-20 mx-auto w-full max-w-7xl px-6 pb-28 pt-24 sm:pb-32 md:pt-32 lg:px-12">
+        {/* Transform-only entrance (no opacity ramp): the headline and subhead
+            are the page's LCP candidates and must be visible in the server
+            HTML — an opacity-0 initial state would delay LCP until the whole
+            bundle hydrates. */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ y: 24 }}
+          animate={{ y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-4xl"
         >
@@ -69,8 +86,8 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
           </p>
 
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 16 }}
+            animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="mt-10"
           >

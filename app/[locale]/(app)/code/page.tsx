@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { CodeSeoSummary } from './CodeSeoSummary';
 import CodeViewer from './CodeViewer';
@@ -30,29 +31,31 @@ export default async function Page({ params }: PageProps) {
   const pageUrl = localeHref(APP_ORIGIN, '/code', locale);
 
   return (
-    <>
-      <JsonLd
-        data={[
-          webPageJsonLd({
-            name: code('seo.heading'),
-            description,
-            url: pageUrl,
-            inLanguage,
-          }),
-          breadcrumbJsonLd(
-            [
-              {
-                name: locale === 'zh' ? '首页' : 'Home',
-                path: '/',
-              },
-              { name: locale === 'zh' ? '源代码' : 'Source Code', path: '/code' },
-            ],
-            localeHref(APP_ORIGIN, '/', locale),
-          ),
-        ]}
-      />
-      <CodeSeoSummary />
-      <CodeViewer />
-    </>
+    <PageMessages namespaces={['code']}>
+      <>
+        <JsonLd
+          data={[
+            webPageJsonLd({
+              name: code('seo.heading'),
+              description,
+              url: pageUrl,
+              inLanguage,
+            }),
+            breadcrumbJsonLd(
+              [
+                {
+                  name: locale === 'zh' ? '首页' : 'Home',
+                  path: '/',
+                },
+                { name: locale === 'zh' ? '源代码' : 'Source Code', path: '/code' },
+              ],
+              localeHref(APP_ORIGIN, '/', locale),
+            ),
+          ]}
+        />
+        <CodeSeoSummary />
+        <CodeViewer />
+      </>
+    </PageMessages>
   );
 }

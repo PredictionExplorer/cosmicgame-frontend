@@ -143,6 +143,10 @@ export function useDashboardInfo(
     // A failed server-side fetch arrives as `null`; normalize it to undefined
     // so the query still starts in a loading state and fetches immediately.
     initialData: initialData ?? undefined,
+    // The seed comes from an ISR page that may be up to its revalidation
+    // window stale; dating it to epoch 0 makes React Query refresh it right
+    // after hydration while the seeded HTML keeps the first paint complete.
+    initialDataUpdatedAt: initialData ? 0 : undefined,
   });
   return withUxScenarioData(query, scenario?.dashboard ?? undefined, scenario?.createdAtMs);
 }
@@ -319,12 +323,15 @@ export function useCSTTokensByUser(address: string | null | undefined) {
   });
 }
 
-export function useCSTInfo(tokenId: number | null | undefined) {
+export function useCSTInfo(tokenId: number | null | undefined, initialData?: CSTTokenInfo | null) {
   return useQuery<CSTTokenInfo | null>({
     queryKey: ['cstInfo', tokenId],
     queryFn: ({ signal }) => api.get_cst_info(tokenId!, { signal }),
     enabled: tokenId != null && tokenId >= 0,
     staleTime: 60_000,
+    // Server-rendered seed (e.g. the home hero artwork): keeps the first
+    // client render identical to the SSR HTML without an immediate refetch.
+    initialData: initialData ?? undefined,
   });
 }
 

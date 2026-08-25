@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -5,15 +6,23 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAssetsUrl, logoImgUrl } from '@/utils';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { axios, getAPIUrl, isAxiosError } from '@/services/api/client';
+import { getAPIUrl } from '@/services/api/client';
 import type { CSTTokenInfo } from '@/services/api/types';
 import { createMetadata } from '@/utils/seo';
 import { JsonLd, nftProductJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import DetailPage from './DetailPage';
 
-/** Avoid serving og:image / JSON-LD from an older build or data cache when CDN hosts change per network. */
-export const dynamic = 'force-dynamic';
+/**
+ * ISR (was force-dynamic): token metadata is immutable once imprinted, so a
+ * bounded staleness window is safe and turns every repeat visit into a CDN
+ * hit instead of a serverless render. The original force-dynamic guarded
+ * against og:image URLs surviving from an older build when CDN hosts change
+ * per network — deploys purge the ISR cache, and in-between the 5-minute
+ * window bounds any host-rotation staleness.
+ */
+export const revalidate = 300;
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
@@ -30,15 +39,27 @@ function tokenImageUrl(seed: string | number | undefined): string {
   return getAssetsUrl(`cosmicsignature/0x${seed}.png`);
 }
 
-async function loadTokenInfo(tokenId: number): Promise<CSTTokenInfo | null | undefined> {
+/**
+ * `fetch` (not axios) so the read lands in the Next.js Data Cache, and
+ * React `cache()` so generateMetadata and the page body share one request
+ * per render instead of the two this page used to make.
+ * Returns null for a confirmed missing token (404), undefined on transport
+ * errors — callers 404 the page only on the former.
+ */
+const loadTokenInfo = cache(async (tokenId: number): Promise<CSTTokenInfo | null | undefined> => {
   try {
-    const { data } = await axios.get(getAPIUrl(`cst/info/${tokenId}`));
-    return (data.TokenInfo ?? null) as CSTTokenInfo | null;
-  } catch (error) {
-    if (isAxiosError(error) && error.response?.status === 404) return null;
+    const response = await fetch(getAPIUrl(`cst/info/${tokenId}`), {
+      headers: { Accept: 'application/json' },
+      next: { revalidate: 300 },
+    });
+    if (response.status === 404) return null;
+    if (!response.ok) return undefined;
+    const data = (await response.json()) as { TokenInfo?: CSTTokenInfo | null };
+    return data.TokenInfo ?? null;
+  } catch {
     return undefined;
   }
-}
+});
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, id } = await params;
@@ -89,28 +110,30 @@ export default async function Page({ params }: PageProps) {
   const imageUrl = tokenImageUrl(tokenInfo?.Seed);
 
   return (
-    <>
-      <JsonLd
-        data={nftProductJsonLd({
-          tokenId,
-          name,
-          description,
-          imageUrl,
-          url: pageUrl,
-          category: seo('jsonLd.product.category'),
-        })}
-      />
-      <JsonLd
-        data={breadcrumbJsonLd(
-          [
-            { name: tCommon('breadcrumbs.home'), path: '/' },
-            { name: tCommon('breadcrumbs.gallery'), path: '/gallery' },
-            { name: t('jsonLd.breadcrumbToken', { id }), path: `/detail/${id}` },
-          ],
-          localeHref(APP_ORIGIN, '/', locale),
-        )}
-      />
-      <DetailPage tokenId={tokenId} />
-    </>
+    <PageMessages namespaces={['detail', 'tables']}>
+      <>
+        <JsonLd
+          data={nftProductJsonLd({
+            tokenId,
+            name,
+            description,
+            imageUrl,
+            url: pageUrl,
+            category: seo('jsonLd.product.category'),
+          })}
+        />
+        <JsonLd
+          data={breadcrumbJsonLd(
+            [
+              { name: tCommon('breadcrumbs.home'), path: '/' },
+              { name: tCommon('breadcrumbs.gallery'), path: '/gallery' },
+              { name: t('jsonLd.breadcrumbToken', { id }), path: `/detail/${id}` },
+            ],
+            localeHref(APP_ORIGIN, '/', locale),
+          )}
+        />
+        <DetailPage tokenId={tokenId} />
+      </>
+    </PageMessages>
   );
 }

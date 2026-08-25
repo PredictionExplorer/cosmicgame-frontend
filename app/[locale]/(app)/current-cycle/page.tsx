@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { CurrentCycleSeoSummary } from './CurrentCycleSeoSummary';
 import CurrentRoundPage from './CurrentRoundPage';
@@ -29,9 +30,21 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <>
-      <CurrentCycleSeoSummary />
-      <CurrentRoundPage />
-    </>
+    <PageMessages
+      namespaces={[
+        'contracts',
+        'currentCycle',
+        'detail',
+        'home',
+        'marketing',
+        'statistics',
+        'tables',
+      ]}
+    >
+      <>
+        <CurrentCycleSeoSummary />
+        <CurrentRoundPage />
+      </>
+    </PageMessages>
   );
 }

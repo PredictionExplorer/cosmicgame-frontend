@@ -2,10 +2,11 @@ import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { APP_CHROME_NAMESPACES, pickMessages } from '@/lib/i18n/clientMessages';
 import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
 
 import { RootDocument } from '../../root-document';
@@ -73,6 +74,11 @@ export default async function AppRootLayout({ children, params }: LayoutProps) {
   const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
   const appUrl = localeHref(APP_ORIGIN, '/', locale);
   const protocolDescription = seo('jsonLd.app.protocolDescription');
+  // Chrome-scoped: only the namespaces the persistent shell (header, footer,
+  // toasts, ...) needs are serialized here. Each page adds its own set via
+  // <PageMessages>; without scoping the full ~300 KB catalog shipped in
+  // every HTML document.
+  const chromeMessages = pickMessages(await getMessages({ locale }), APP_CHROME_NAMESPACES);
 
   return (
     <RootDocument
@@ -99,7 +105,7 @@ export default async function AppRootLayout({ children, params }: LayoutProps) {
         />
       }
     >
-      <NextIntlClientProvider>
+      <NextIntlClientProvider messages={chromeMessages}>
         <Providers showAppChrome>{children}</Providers>
       </NextIntlClientProvider>
     </RootDocument>

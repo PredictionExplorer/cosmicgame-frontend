@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { axe } from 'jest-axe';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { WalletUiProvider } from '@/contexts/WalletUiContext';
 
 export function createTestQueryClient() {
   return new QueryClient({
@@ -17,14 +18,20 @@ export function createTestQueryClient() {
 }
 
 function AllProviders({ children }: { children: ReactNode }) {
-  return <TooltipProvider delayDuration={0}>{children}</TooltipProvider>;
+  return (
+    <TooltipProvider delayDuration={0}>
+      <WalletUiProvider>{children}</WalletUiProvider>
+    </TooltipProvider>
+  );
 }
 
 function QueryWrapper({ children }: { children: ReactNode }) {
   const client = createTestQueryClient();
   return (
     <TooltipProvider delayDuration={0}>
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      <QueryClientProvider client={client}>
+        <WalletUiProvider>{children}</WalletUiProvider>
+      </QueryClientProvider>
     </TooltipProvider>
   );
 }

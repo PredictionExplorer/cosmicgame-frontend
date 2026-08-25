@@ -5,11 +5,21 @@ import { gzipSync } from 'node:zlib';
 
 /**
  * Full app-home client payload budget. Next 16's client-reference manifest
- * exposes the shared app shell and route chunks that the previous 600 KB
- * check omitted; the measured baseline is ~702 KB gzip. Keep modest headroom
- * while still failing a meaningful dependency-sized regression.
+ * exposes the shared app shell and route chunks that older checks omitted.
+ *
+ * Measured baseline after the RES-100 work: ~610 KB gzip (was ~709 KB before
+ * the wallet stack moved behind a connect-intent dynamic import). The budget
+ * keeps ~30 KB of headroom — enough for ordinary feature work, small enough
+ * that re-adding an eager wallet SDK or a chart library fails CI.
  */
-export const DEFAULT_BUDGET_KB = 750;
+export const DEFAULT_BUDGET_KB = 640;
+
+/**
+ * Landing-home client payload budget. The landing must stay lean: it ships
+ * no wallet stack and its three.js hero is a desktop-only dynamic chunk that
+ * this manifest-based measurement intentionally excludes.
+ */
+export const DEFAULT_LANDING_BUDGET_KB = 320;
 
 export type BuildManifest = {
   pages?: Record<string, string[]>;
@@ -90,15 +100,15 @@ function readClientReferenceManifest(manifestPath: string): ClientReferenceManif
   }
 }
 
-function pickAppHomeEntryAssets(manifest: ClientReferenceManifest | null): string[] {
+function pickRouteEntryAssets(
+  manifest: ClientReferenceManifest | null,
+  routeKeySuffixes: readonly string[],
+): string[] {
   const entries = manifest?.entryJSFiles;
   if (entries == null) return [];
 
-  const routeKey = Object.keys(entries).find(
-    (key) =>
-      key.endsWith('/app/[locale]/(app)/page') ||
-      key.endsWith('/app/(app)/page') ||
-      key.endsWith('/app/page'),
+  const routeKey = Object.keys(entries).find((key) =>
+    routeKeySuffixes.some((suffix) => key.endsWith(suffix)),
   );
   if (routeKey == null) return [];
 
@@ -106,24 +116,27 @@ function pickAppHomeEntryAssets(manifest: ClientReferenceManifest | null): strin
 }
 
 /**
- * Reads the home route's client chunks from a Turbopack production build.
+ * Reads a route's client chunks from a Turbopack production build.
  * Next 16 emits route assets in a client-reference manifest and shared
  * runtime assets in the root build manifest. Older builds used a per-route
  * build manifest, which remains as a compatibility fallback.
  */
-export function pickTurbopackHomeAssets(nextDir: string): string[] | null {
+export function pickTurbopackRouteAssets(
+  nextDir: string,
+  clientReferenceManifests: readonly string[],
+  routeKeySuffixes: readonly string[],
+): string[] | null {
   const rootManifestPath = path.join(nextDir, 'build-manifest.json');
   const rootManifest = existsSync(rootManifestPath)
     ? (JSON.parse(readFileSync(rootManifestPath, 'utf8')) as BuildManifest)
     : null;
   const sharedAssets = (rootManifest?.rootMainFiles ?? []).filter((asset) => asset.endsWith('.js'));
 
-  const clientReferenceCandidates = [
-    path.join(nextDir, 'server', 'app', '[locale]', '(app)', 'page_client-reference-manifest.js'),
-    path.join(nextDir, 'server', 'app', 'page_client-reference-manifest.js'),
-  ];
-  for (const candidate of clientReferenceCandidates) {
-    const routeAssets = pickAppHomeEntryAssets(readClientReferenceManifest(candidate));
+  for (const candidate of clientReferenceManifests) {
+    const routeAssets = pickRouteEntryAssets(
+      readClientReferenceManifest(path.join(nextDir, candidate)),
+      routeKeySuffixes,
+    );
     if (routeAssets.length > 0) {
       return [...new Set([...sharedAssets, ...routeAssets])];
     }
@@ -138,9 +151,18 @@ export function pickTurbopackHomeAssets(nextDir: string): string[] | null {
   return legacyAssets.length > 0 ? [...new Set(legacyAssets)] : null;
 }
 
-/** Resolves the home-route JS chunk files for a build, preferring the manifest. */
+/** Resolves the app-home JS chunk files for a build, preferring the manifest. */
 export async function getHomeJsFiles(nextDir: string): Promise<string[]> {
-  const assets = pickHomeAssets(readManifest(nextDir)) ?? pickTurbopackHomeAssets(nextDir);
+  const assets =
+    pickHomeAssets(readManifest(nextDir)) ??
+    pickTurbopackRouteAssets(
+      nextDir,
+      [
+        path.join('server', 'app', '[locale]', '(app)', 'page_client-reference-manifest.js'),
+        path.join('server', 'app', 'page_client-reference-manifest.js'),
+      ],
+      ['/app/[locale]/(app)/page', '/app/(app)/page', '/app/page'],
+    );
   if (assets != null) {
     return assets.map((asset) => resolveNextAsset(nextDir, asset));
   }
@@ -151,6 +173,30 @@ export async function getHomeJsFiles(nextDir: string): Promise<string[]> {
   }
 
   throw new Error('Could not find Next.js build manifests. Run `yarn build` before this check.');
+}
+
+/** Resolves the landing-home JS chunk files for a build. */
+export function getLandingJsFiles(nextDir: string): string[] {
+  const assets = pickTurbopackRouteAssets(
+    nextDir,
+    [
+      path.join(
+        'server',
+        'app',
+        '[locale]',
+        '(landing)',
+        'landing-site',
+        'page_client-reference-manifest.js',
+      ),
+    ],
+    ['/app/[locale]/(landing)/landing-site/page'],
+  );
+  if (assets == null) {
+    throw new Error(
+      'Could not find the landing-site client-reference manifest. Run a build first.',
+    );
+  }
+  return assets.map((asset) => resolveNextAsset(nextDir, asset));
 }
 
 /** Sums the gzip-compressed size of the given files, in kilobytes. */
@@ -168,7 +214,11 @@ export interface BudgetResult {
 }
 
 /** Computes gzip size for the chunks and compares it to the budget. */
-export function evaluateBudget(files: string[], budgetKb: number): BudgetResult {
+export function evaluateBudget(
+  files: string[],
+  budgetKb: number,
+  label = 'App home',
+): BudgetResult {
   const existing = files.filter(existsSync);
   if (existing.length === 0) {
     throw new Error('No home-page JavaScript chunks found. Run `yarn build` before this check.');
@@ -180,7 +230,7 @@ export function evaluateBudget(files: string[], budgetKb: number): BudgetResult 
     fileCount: existing.length,
     withinBudget: gzipKb <= budgetKb,
     summary:
-      `App home JS gzip: ${gzipKb.toFixed(1)} KB across ${existing.length} chunks ` +
+      `${label} JS gzip: ${gzipKb.toFixed(1)} KB across ${existing.length} chunks ` +
       `(budget ${budgetKb.toFixed(0)} KB)`,
   };
 }

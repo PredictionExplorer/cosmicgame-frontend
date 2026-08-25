@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { parseCanonicalNonNegativeSafeInteger } from '@/utils';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import AllocationInfoPage from './AllocationInfoPage';
 
@@ -37,5 +38,9 @@ export default async function Page({ params }: PageProps) {
   if (cycleId === null) notFound();
 
   setRequestLocale(locale);
-  return <AllocationInfoPage roundNum={cycleId} />;
+  return (
+    <PageMessages namespaces={['allocation', 'detail', 'marketing', 'tables']}>
+      <AllocationInfoPage roundNum={cycleId} />
+    </PageMessages>
+  );
 }

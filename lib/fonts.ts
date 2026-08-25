@@ -1,5 +1,5 @@
 import localFont from 'next/font/local';
-import { Noto_Sans_SC } from 'next/font/google';
+import { Inter, Noto_Sans_SC } from 'next/font/google';
 
 export const clashDisplay = localFont({
   src: [
@@ -15,14 +15,18 @@ export const clashDisplay = localFont({
   fallback: ['system-ui', 'Arial', 'sans-serif'],
 });
 
-export const inter = localFont({
-  src: [
-    {
-      path: '../public/fonts/Inter/fonts/InterVariable.woff2',
-      weight: '100 900',
-      style: 'normal',
-    },
-  ],
+/**
+ * Body face, served through next/font/google: files are downloaded at BUILD
+ * time and self-hosted (no runtime Google requests), and — the reason for
+ * this setup — automatically subsetted per unicode range. The previous
+ * self-hosted full-range variable file carried every script Inter supports
+ * at 352 KB and was preloaded on every page, competing with the LCP
+ * resources on mobile; the latin subsets total ~50 KB. Chinese text never
+ * renders in Inter (it falls through to Noto Sans SC below), so nothing is
+ * lost.
+ */
+export const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
   variable: '--font-inter',
   display: 'swap',
   preload: true,

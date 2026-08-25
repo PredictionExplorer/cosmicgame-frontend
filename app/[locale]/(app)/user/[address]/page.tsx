@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getAPIUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import UserPage from './UserPage';
 
@@ -59,5 +60,9 @@ export default async function Page({
     address = 'Invalid Address';
   }
 
-  return <UserPage address={address} />;
+  return (
+    <PageMessages namespaces={['anchoring', 'detail', 'marketing', 'myPages', 'tables']}>
+      <UserPage address={address} />
+    </PageMessages>
+  );
 }

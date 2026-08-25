@@ -37,25 +37,36 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
   const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
   const { data: claimHistoryRaw } = useClaimHistory();
 
-  const [allocationTime, setAllocationTime] = useState(() =>
-    getStableClientTargetTime({
+  const [allocationTime, setAllocationTime] = useState(() => {
+    const stableTargetMs = getStableClientTargetTime({
       targetServerTimeSec: prizeTimeRaw,
       currentServerTimeSec: currentTimeRaw,
       currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
-    }),
-  );
+    });
+    if (stableTargetMs > 0) return stableTargetMs;
+    // Server-seeded fallback: the dashboard snapshot already carries the
+    // finalization timestamp the dedicated queries will re-fetch. Using it
+    // for the first render keeps the server-rendered phase correct (live /
+    // approach instead of a spurious ready-to-finalize) so the home page's
+    // sections do not mount/unmount — and shift layout — after hydration.
+    const seededSeconds = data?.PrizeClaimTs;
+    return typeof seededSeconds === 'number' && seededSeconds > 0 ? seededSeconds * 1000 : 0;
+  });
 
   useEffect(() => {
     const updateId = window.setTimeout(() => {
-      setAllocationTime((previousTargetMs) =>
-        getStableClientTargetTime({
+      setAllocationTime((previousTargetMs) => {
+        const nextTargetMs = getStableClientTargetTime({
           targetServerTimeSec: prizeTimeRaw,
           currentServerTimeSec: currentTimeRaw,
           currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
           previousTargetMs,
           correctionToleranceMs: 1500,
-        }),
-      );
+        });
+        // While the timing queries are still in flight the helper yields 0;
+        // keep the seeded target instead of clobbering it back to "ready".
+        return nextTargetMs > 0 ? nextTargetMs : previousTargetMs;
+      });
     }, 0);
     return () => window.clearTimeout(updateId);
   }, [prizeTimeRaw, currentTimeRaw, currentTimeUpdatedAt]);

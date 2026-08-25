@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
-import { motionTokens, useMotionVariants } from '@/lib/motion';
+import { motionTokens, useIsInitialDocumentLoad, useMotionVariants } from '@/lib/motion';
 
 /**
  * Opacity only — deliberately no `y`.
@@ -34,11 +34,17 @@ const pageEnter = {
  *
  * Sits between layout (persistent) and page (per-route) per Next.js App
  * Router conventions, so the wrapping motion does not re-mount providers.
+ *
+ * The entrance is SKIPPED on the initial document load (`initial={false}`):
+ * animating from `opacity: 0` on first paint would server-render the whole
+ * page invisible and hold the Largest Contentful Paint hostage to JS
+ * download + hydration. Only client-side navigations animate.
  */
 export default function Template({ children }: { children: ReactNode }) {
   const variants = useMotionVariants(pageEnter);
+  const isInitialLoad = useIsInitialDocumentLoad();
   return (
-    <motion.div variants={variants} initial="initial" animate="animate">
+    <motion.div variants={variants} initial={isInitialLoad ? false : 'initial'} animate="animate">
       {children}
     </motion.div>
   );

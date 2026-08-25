@@ -1,54 +1,40 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { createConnector, http } from 'wagmi';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+import { createConfig, http } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 
 import { activeChain, localChain } from '../chains';
-import { injectedMetaMaskWallet, wagmiConfig } from '../wagmi';
-
-jest.mock('@rainbow-me/rainbowkit', () => ({
-  getDefaultConfig: jest.fn((config) => ({ kind: 'wagmi-config', ...config })),
-}));
+import { wagmiConfig, walletAppName, walletConnectProjectId } from '../wagmi';
 
 jest.mock('wagmi', () => ({
-  createConnector: jest.fn((factory) => ({ kind: 'rainbowkit-wrapped-connector', factory })),
+  createConfig: jest.fn((config) => ({ kind: 'wagmi-config', ...config })),
   http: jest.fn((url?: string) => ({ kind: 'http-transport', url })),
 }));
 
 jest.mock('wagmi/connectors', () => ({
-  injected: jest.fn((config) => (wagmiConfig: unknown) => ({
-    kind: 'injected-connector',
-    config,
-    wagmiConfig,
-  })),
+  injected: jest.fn((config) => ({ kind: 'injected-connector-fn', config })),
 }));
 
-jest.mock('@rainbow-me/rainbowkit/wallets', () => ({
-  baseAccount: jest.fn(() => ({ id: 'baseAccount', name: 'Base Account' })),
-  coinbaseWallet: jest.fn(() => ({ id: 'coinbase', name: 'Coinbase Wallet' })),
-  rabbyWallet: jest.fn(() => ({ id: 'rabby', name: 'Rabby Wallet' })),
-  rainbowWallet: jest.fn(() => ({ id: 'rainbow', name: 'Rainbow' })),
-  walletConnectWallet: jest.fn(() => ({ id: 'walletConnect', name: 'WalletConnect' })),
-}));
-
-const mockGetDefaultConfig = getDefaultConfig as jest.MockedFunction<typeof getDefaultConfig>;
-const mockCreateConnector = createConnector as jest.MockedFunction<typeof createConnector>;
+const mockCreateConfig = createConfig as jest.MockedFunction<typeof createConfig>;
 const mockHttp = http as jest.MockedFunction<typeof http>;
 const mockInjected = injected as jest.MockedFunction<typeof injected>;
 
-describe('wagmi wallet configuration', () => {
-  it('builds a RainbowKit-compatible wagmi config', () => {
+describe('wagmi wallet configuration (light boot config)', () => {
+  it('builds the config with wagmi createConfig and ssr enabled', () => {
     expect(wagmiConfig).toMatchObject({ kind: 'wagmi-config', ssr: true });
-    expect(mockGetDefaultConfig).toHaveBeenCalledWith(
-      expect.objectContaining({
-        appName: 'Cosmic Signature',
-        projectId: expect.any(String),
-        ssr: true,
-      }),
-    );
+    expect(mockCreateConfig).toHaveBeenCalledTimes(1);
+  });
+
+  it('boots with only the injected connector — heavy wallets install on demand', () => {
+    const configArg = mockCreateConfig.mock.calls[0]?.[0];
+    expect(configArg?.connectors).toHaveLength(1);
+    expect(configArg?.connectors?.[0]).toMatchObject({ kind: 'injected-connector-fn' });
+    expect(mockInjected).toHaveBeenCalledWith({ shimDisconnect: true });
   });
 
   it('registers active and local chains with HTTP transports', () => {
-    const configArg = mockGetDefaultConfig.mock.calls[0]?.[0];
+    const configArg = mockCreateConfig.mock.calls[0]?.[0];
 
     expect(configArg?.chains).toEqual(
       activeChain.id === localChain.id ? [activeChain] : [activeChain, localChain],
@@ -58,89 +44,21 @@ describe('wagmi wallet configuration', () => {
     expect(mockHttp).toHaveBeenCalled();
   });
 
-  it('passes the configured WalletConnect project id without a placeholder fallback', () => {
-    const configArg = mockGetDefaultConfig.mock.calls[0]?.[0];
-
-    expect(configArg?.projectId).toBe(
+  it('exposes the WalletConnect project id for the lazily installed wallet list', () => {
+    expect(walletConnectProjectId).toBe(
       process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim() ?? '',
     );
-    expect(configArg?.projectId).not.toBe('placeholder_get_real_id_from_cloud_walletconnect_com');
+    expect(walletConnectProjectId).not.toBe('placeholder_get_real_id_from_cloud_walletconnect_com');
+    expect(walletAppName).toBe('Cosmic Signature');
   });
 
-  it('uses an explicit wallet list so MetaMask does not use the SDK-backed default wallet', () => {
-    const configArg = mockGetDefaultConfig.mock.calls[0]?.[0];
-    const walletIds = configArg?.wallets?.flatMap((group) =>
-      group.wallets.map(
-        (createWallet) => createWallet({ appName: 'Cosmic Signature', projectId: 'test' }).id,
-      ),
-    );
-
-    expect(walletIds).toEqual(
-      expect.arrayContaining(['rabby', 'rainbow', 'baseAccount', 'metaMask', 'walletConnect']),
-    );
-    expect(configArg?.wallets?.[0]?.groupName).toBe('Popular');
-  });
-
-  it('creates MetaMask through wagmi injected connector instead of MetaMask SDK', () => {
-    const wallet = injectedMetaMaskWallet();
-    const connector = wallet.createConnector({
-      rkDetails: {
-        ...wallet,
-        index: 0,
-        groupIndex: 0,
-        groupName: 'Popular',
-        isRainbowKitConnector: true,
-      },
-    });
-
-    expect(connector).toEqual({
-      kind: 'rainbowkit-wrapped-connector',
-      factory: expect.any(Function),
-    });
-    expect(mockInjected).toHaveBeenCalledWith(
-      expect.objectContaining({
-        shimDisconnect: true,
-        unstable_shimAsyncInject: 1_000,
-        target: 'metaMask',
-      }),
-    );
-  });
-
-  it('wraps the injected connector with RainbowKit wallet metadata', () => {
-    const wallet = injectedMetaMaskWallet();
-    wallet.createConnector({
-      rkDetails: {
-        ...wallet,
-        index: 0,
-        groupIndex: 0,
-        groupName: 'Popular',
-        isRainbowKitConnector: true,
-      },
-    });
-
-    const factory = mockCreateConnector.mock.calls.at(-1)?.[0];
-    expect(factory).toBeDefined();
-    const result = factory?.({ chains: [], storage: null } as never) as Record<string, unknown>;
-
-    expect(result).toMatchObject({
-      kind: 'injected-connector',
-      rkDetails: expect.objectContaining({
-        id: 'metaMask',
-        name: 'MetaMask',
-        groupName: 'Popular',
-        isRainbowKitConnector: true,
-      }),
-    });
-  });
-
-  it('marks injected MetaMask as installed when window.ethereum advertises MetaMask', () => {
-    const originalEthereum = window.ethereum;
-    (window as unknown as { ethereum?: { isMetaMask: true } }).ethereum = { isMetaMask: true };
-
-    try {
-      expect(injectedMetaMaskWallet().installed).toBe(true);
-    } finally {
-      (window as unknown as { ethereum?: typeof originalEthereum }).ethereum = originalEthereum;
-    }
+  it('never imports RainbowKit — that would drag the wallet stack into every page', () => {
+    // This is the load-bearing bundle guarantee: config/wagmi.ts sits in the
+    // entry graph of every app page, so a single static RainbowKit import
+    // here re-adds ~95 KB gzip for every visitor.
+    const source = readFileSync(resolve(__dirname, '..', 'wagmi.ts'), 'utf-8');
+    expect(source).not.toContain('@rainbow-me/rainbowkit');
+    expect(source).not.toContain('@walletconnect');
+    expect(source).not.toContain('@coinbase');
   });
 });

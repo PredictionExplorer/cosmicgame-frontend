@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
@@ -26,9 +27,11 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <>
-      <PublicDataRouteSeoSummary route="anchoring" />
-      <AnchoringPage />
-    </>
+    <PageMessages namespaces={['anchoring', 'marketing', 'tables']}>
+      <>
+        <PublicDataRouteSeoSummary route="anchoring" />
+        <AnchoringPage />
+      </>
+    </PageMessages>
   );
 }

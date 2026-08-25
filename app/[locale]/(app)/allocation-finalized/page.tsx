@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
@@ -31,11 +32,13 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <>
-      <PublicDataRouteSeoSummary route="allocation-finalized" />
-      <Suspense>
-        <AllocationFinalizedPage />
-      </Suspense>
-    </>
+    <PageMessages namespaces={['allocation']}>
+      <>
+        <PublicDataRouteSeoSummary route="allocation-finalized" />
+        <Suspense>
+          <AllocationFinalizedPage />
+        </Suspense>
+      </>
+    </PageMessages>
   );
 }

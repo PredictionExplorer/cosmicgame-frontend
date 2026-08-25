@@ -6,14 +6,12 @@ import type { ISourceOptions } from '@tsparticles/engine';
 import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RainbowKitProvider, type Locale as RainbowKitLocale } from '@rainbow-me/rainbowkit';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
 
 import { usePathname } from '@/i18n/navigation';
 import { wagmiConfig } from '@/config/wagmi';
-import { cosmicRainbowTheme } from '@/config/rainbowkit-theme';
 import { networkConfig, getEnvValidation } from '@/config/networks';
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
@@ -26,15 +24,17 @@ import { SystemModeProvider } from '@/contexts/SystemModeContext';
 import { ApiDataProvider } from '@/contexts/ApiDataContext';
 import { ContractAddressesProvider } from '@/contexts/ContractAddressesContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { WalletUiProvider } from '@/contexts/WalletUiContext';
 import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
 import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 
-// Wallet UI stylesheet — kept scoped to Providers (the app-only tree) so
-// the landing host never ships it.
-import '@rainbow-me/rainbowkit/styles.css';
+// NOTE: RainbowKit (provider, modal, stylesheet) is intentionally NOT
+// imported here. It lives behind WalletUiProvider's dynamic import so the
+// wallet-modal chunk downloads only on connect intent — most sessions never
+// connect, and this was the largest chunk in the app-home bundle.
 
 // Viem's `call()` dynamically imports CCIP helpers on revert paths; that async chunk
 // can fail after deploys or HMR and surfaces as a misleading contract read error.
@@ -196,11 +196,6 @@ export function Providers({
   const [queryClient] = useState(() => makeQueryClient());
   const [engineReady, setEngineReady] = useState(false);
 
-  // RainbowKit ships its own translations; map our locale so the wallet
-  // modal follows the site language (zh-CN for the Chinese locale).
-  const locale = useLocale();
-  const rainbowKitLocale: RainbowKitLocale = locale === 'zh' ? 'zh-CN' : 'en-US';
-
   // Routes under /embed render a single artifact (e.g. a chart) with no app chrome
   // or background, so they can be opened standalone in their own browser window.
   const pathname = usePathname();
@@ -260,6 +255,21 @@ export function Providers({
   }, []);
 
   useEffect(() => {
+    // The ambient particle backdrop is desktop polish. Phones pay for it
+    // twice — the engine chunks over the network and a persistent rAF loop
+    // on the main thread (worse INP on mid-range devices) — while the
+    // backdrop is barely visible behind content on small screens. Skip it
+    // for coarse pointers, small viewports, and reduced-motion preferences
+    // (the CSS `motion-reduce:hidden` only hides the canvas; this keeps the
+    // engine from ever booting).
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      const skipParticles =
+        window.matchMedia('(pointer: coarse)').matches ||
+        window.matchMedia('(max-width: 767px)').matches ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (skipParticles) return undefined;
+    }
+
     let cancelled = false;
     const cancelIdleTask = scheduleIdleTask(() => {
       void (async () => {
@@ -291,7 +301,7 @@ export function Providers({
       <QueryClientProvider client={queryClient}>
         <ContractAddressesProvider>
           <LiveGameDataRefresh />
-          <RainbowKitProvider theme={cosmicRainbowTheme} locale={rainbowKitLocale}>
+          <WalletUiProvider>
             {engineReady && !bareEmbed && <ParticleBackdrop />}
             <ErrorBoundary>
               <CookiesProvider>
@@ -333,7 +343,7 @@ export function Providers({
                 },
               }}
             />
-          </RainbowKitProvider>
+          </WalletUiProvider>
         </ContractAddressesProvider>
       </QueryClientProvider>
     </WagmiProvider>

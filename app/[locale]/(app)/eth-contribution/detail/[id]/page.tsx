@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import EthDonationDetailPage from './EthDonationDetailPage';
 
@@ -32,5 +33,9 @@ export default async function Page({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  return <EthDonationDetailPage id={Number(id)} />;
+  return (
+    <PageMessages namespaces={['ethContribution']}>
+      <EthDonationDetailPage id={Number(id)} />
+    </PageMessages>
+  );
 }

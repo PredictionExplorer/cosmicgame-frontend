@@ -226,7 +226,7 @@ describe('Header (mobile)', () => {
   it('shows a mobile wallet connect button without opening the drawer', async () => {
     render(<Header />);
 
-    expect(await screen.findByRole('button', { name: 'Connect Wallet' })).toBeVisible();
+    expect(await screen.findByTestId('connect-wallet-button')).toBeVisible();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 

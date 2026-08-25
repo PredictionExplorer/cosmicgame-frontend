@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import GesturePage from './GesturePage';
 
@@ -28,5 +29,9 @@ export const revalidate = 300;
 export default async function Page({ params }: PageProps) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  return <GesturePage gestureId={parseInt(id, 10)} />;
+  return (
+    <PageMessages namespaces={['detail', 'gesture']}>
+      <GesturePage gestureId={parseInt(id, 10)} />
+    </PageMessages>
+  );
 }

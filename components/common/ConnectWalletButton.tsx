@@ -12,9 +12,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-// Static import is fine for bundle size: providers.tsx already imports
-// RainbowKitProvider statically, so the rainbowkit module ships regardless.
-import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 
 import { shortenHex } from '@/utils';
 
@@ -31,6 +28,8 @@ import { ChaosZeroButton } from '@/components/common/ChaosZeroButton';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { MobileWallet, NavLink } from '@/components/styled';
+import { Button } from '@/components/ui/button';
+import { useWalletUi } from '@/contexts/WalletUiContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 interface Balance {
@@ -62,6 +61,7 @@ const ConnectWalletButton = ({
 }: ConnectWalletButtonProps) => {
   const t = useTranslations('wallet');
   const { account } = useActiveWeb3React();
+  const { requestConnectModal, warmConnectModal } = useWalletUi();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -246,10 +246,20 @@ const ConnectWalletButton = ({
   }
 
   return (
-    // RainbowKit styles its own button and gives us no size prop, so the
-    // 44px touch target has to be enforced from the outside.
-    <div className="ml-auto [&_button]:min-h-11 sm:[&_button]:min-h-0">
-      <RainbowConnectButton />
+    // Our own trigger (not RainbowKit's ConnectButton): the wallet modal UI
+    // is deferred to a lazy chunk that mounts on demand, so nothing from
+    // RainbowKit can render before intent. Hover/focus warms the chunk so
+    // the click still feels instant.
+    <div className="ml-auto">
+      <Button
+        onClick={requestConnectModal}
+        onPointerEnter={warmConnectModal}
+        onFocus={warmConnectModal}
+        className="min-h-11 sm:min-h-0"
+        data-testid="connect-wallet-button"
+      >
+        {t('connect.button')}
+      </Button>
     </div>
   );
 };

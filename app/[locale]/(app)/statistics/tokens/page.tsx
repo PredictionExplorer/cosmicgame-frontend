@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { STATISTICS_SECTIONS } from '../statistics-sections';
 import { StatisticsPageIntro } from '../StatisticsPageIntro';
@@ -39,26 +40,28 @@ export default async function Page({ params }: PageProps) {
   const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
 
   return (
-    <>
-      <JsonLd
-        data={[
-          webPageJsonLd({
-            name: title,
-            description,
-            url: localeHref(APP_ORIGIN, section.href, locale),
-            inLanguage,
-          }),
-          breadcrumbJsonLd(
-            [
-              { name: t('breadcrumbs.statistics'), path: '/statistics' },
-              { name: t(`navigation.${section.messageKey}.label`), path: section.href },
-            ],
-            localeHref(APP_ORIGIN, '/', locale),
-          ),
-        ]}
-      />
-      <StatisticsPageIntro eyebrow={t('intro.eyebrow')} title={title} description={description} />
-      <TokensPanel />
-    </>
+    <PageMessages namespaces={['detail', 'marketing', 'statistics', 'tables']}>
+      <>
+        <JsonLd
+          data={[
+            webPageJsonLd({
+              name: title,
+              description,
+              url: localeHref(APP_ORIGIN, section.href, locale),
+              inLanguage,
+            }),
+            breadcrumbJsonLd(
+              [
+                { name: t('breadcrumbs.statistics'), path: '/statistics' },
+                { name: t(`navigation.${section.messageKey}.label`), path: section.href },
+              ],
+              localeHref(APP_ORIGIN, '/', locale),
+            ),
+          ]}
+        />
+        <StatisticsPageIntro eyebrow={t('intro.eyebrow')} title={title} description={description} />
+        <TokensPanel />
+      </>
+    </PageMessages>
   );
 }

@@ -259,22 +259,26 @@ jest.mock('../../../../components/nft/NFTImage', () => ({
   ),
 }));
 
+const specialRecipientsRenderSpy = jest.fn();
 jest.mock('../../../../components/tables/SpecialAllocationRecipients', () => ({
   SpecialAllocationRecipients: (props: {
     currentAccount?: string | null;
     latestMessage?: string;
     latestGesture?: { EvtLogId?: number; BidderAddr?: string } | null;
-  }) => (
-    <div
-      data-testid="special-allocation-recipients"
-      data-account={props.currentAccount ?? ''}
-      data-message={props.latestMessage ?? ''}
-      data-latest-gesture-id={props.latestGesture?.EvtLogId ?? ''}
-      data-latest-gesture-address={props.latestGesture?.BidderAddr ?? ''}
-    >
-      SpecialAllocationRecipients
-    </div>
-  ),
+  }) => {
+    specialRecipientsRenderSpy();
+    return (
+      <div
+        data-testid="special-allocation-recipients"
+        data-account={props.currentAccount ?? ''}
+        data-message={props.latestMessage ?? ''}
+        data-latest-gesture-id={props.latestGesture?.EvtLogId ?? ''}
+        data-latest-gesture-address={props.latestGesture?.BidderAddr ?? ''}
+      >
+        SpecialAllocationRecipients
+      </div>
+    );
+  },
 }));
 
 jest.mock('../../../../utils', () => ({
@@ -1077,7 +1081,7 @@ describe('HomePage', () => {
     expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
     expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-preview', 'true');
     expect(screen.getByText('home.form.connect.title')).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
+    expect(await screen.findByTestId('connect-wallet-button')).toBeInTheDocument();
   });
 
   it('switches from the preview to live game controls after the wallet connects', () => {
@@ -1216,6 +1220,32 @@ describe('HomePage', () => {
         jest.advanceTimersByTime(950);
       });
       expect(ticker).not.toHaveClass('animate-live-flash');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('does not re-render heavy memoized sections on countdown ticks', () => {
+    // The page re-renders every second via useNow to keep countdown-derived
+    // CTA state fresh. The heavy sections are wrapped in memo boundaries
+    // with referentially stable props, so ticks must not reconcile them —
+    // that main-thread churn was part of the mobile INP problem.
+    jest.useFakeTimers();
+    try {
+      mockUseDashboardInfo.mockReturnValue({
+        data: makeDashboardData({ CurRoundNum: 7 }),
+        isLoading: false,
+      });
+
+      render(<HomePage />);
+      const rendersAfterMount = specialRecipientsRenderSpy.mock.calls.length;
+      expect(rendersAfterMount).toBeGreaterThan(0);
+
+      act(() => {
+        jest.advanceTimersByTime(3_000);
+      });
+
+      expect(specialRecipientsRenderSpy.mock.calls.length).toBe(rendersAfterMount);
     } finally {
       jest.useRealTimers();
     }

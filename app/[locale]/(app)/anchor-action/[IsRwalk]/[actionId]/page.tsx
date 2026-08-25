@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import AnchorActionDetailPage from './AnchorActionDetailPage';
 
@@ -28,5 +29,9 @@ export const revalidate = 300;
 export default async function Page({ params }: PageProps) {
   const { locale, IsRwalk, actionId } = await params;
   setRequestLocale(locale);
-  return <AnchorActionDetailPage IsRwalk={Number(IsRwalk)} actionId={Number(actionId)} />;
+  return (
+    <PageMessages namespaces={['anchoring', 'detail']}>
+      <AnchorActionDetailPage IsRwalk={Number(IsRwalk)} actionId={Number(actionId)} />
+    </PageMessages>
+  );
 }

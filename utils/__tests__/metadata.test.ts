@@ -1,30 +1,30 @@
-import axios from 'axios';
-
 import { getMetadata, PageMetadata } from '../metadata';
 import { reportError } from '../errors';
-
-jest.mock('axios', () => {
-  const mockGet = jest.fn();
-  return {
-    __esModule: true,
-    default: {
-      create: jest.fn(() => ({ get: mockGet })),
-      get: mockGet,
-    },
-  };
-});
 
 jest.mock('../errors', () => ({ reportError: jest.fn() }));
 jest.mock('../urls', () => ({
   getProxiedUrl: (url: string) => url,
 }));
 
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedReportError = reportError as jest.MockedFunction<typeof reportError>;
+
+const mockFetch = jest.fn();
+const originalFetch = global.fetch;
+
+function htmlResponse(html: string) {
+  return { ok: true, status: 200, text: () => Promise.resolve(html) };
+}
+
+beforeAll(() => {
+  global.fetch = mockFetch as unknown as typeof fetch;
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
 
 beforeEach(() => {
   jest.clearAllMocks();
-  (axios.create as jest.Mock).mockImplementation(() => ({ get: mockedAxios.get }));
 });
 
 const fullHtml = `
@@ -40,7 +40,7 @@ const fullHtml = `
 
 describe('getMetadata', () => {
   it('parses title, description, keywords, and image from HTML', async () => {
-    mockedAxios.get.mockResolvedValue({ data: fullHtml });
+    mockFetch.mockResolvedValue(htmlResponse(fullHtml));
 
     const result = await getMetadata('https://example.com');
 
@@ -52,16 +52,19 @@ describe('getMetadata', () => {
     });
   });
 
-  it('passes the URL directly to axios (no proxy)', async () => {
-    mockedAxios.get.mockResolvedValue({ data: '<html></html>' });
+  it('fetches the URL directly (no proxy) with a timeout signal', async () => {
+    mockFetch.mockResolvedValue(htmlResponse('<html></html>'));
 
     await getMetadata('https://test.com');
 
-    expect(mockedAxios.get).toHaveBeenCalledWith('https://test.com');
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://test.com',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
   });
 
   it('returns empty strings for missing meta tags', async () => {
-    mockedAxios.get.mockResolvedValue({ data: '<html><head></head></html>' });
+    mockFetch.mockResolvedValue(htmlResponse('<html><head></head></html>'));
 
     const result = await getMetadata('https://empty.com');
 
@@ -69,9 +72,9 @@ describe('getMetadata', () => {
   });
 
   it('returns empty title when title tag is missing', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: '<html><head><meta name="description" content="desc"></head></html>',
-    });
+    mockFetch.mockResolvedValue(
+      htmlResponse('<html><head><meta name="description" content="desc"></head></html>'),
+    );
 
     const result = await getMetadata('https://no-title.com');
 
@@ -80,7 +83,7 @@ describe('getMetadata', () => {
 
   it('returns null and calls reportError on network failure', async () => {
     const err = new Error('Network Error');
-    mockedAxios.get.mockRejectedValue(err);
+    mockFetch.mockRejectedValue(err);
 
     const result = await getMetadata('https://fail.com');
 
@@ -89,7 +92,7 @@ describe('getMetadata', () => {
   });
 
   it('returns null and calls reportError on non-Error thrown value', async () => {
-    mockedAxios.get.mockRejectedValue('string error');
+    mockFetch.mockRejectedValue('string error');
 
     const result = await getMetadata('https://fail2.com');
 
@@ -97,10 +100,20 @@ describe('getMetadata', () => {
     expect(mockedReportError).toHaveBeenCalledWith('string error', 'fetch page metadata');
   });
 
+  it('returns null and calls reportError on a non-OK HTTP status', async () => {
+    mockFetch.mockResolvedValue({ ok: false, status: 500, text: () => Promise.resolve('') });
+
+    const result = await getMetadata('https://server-error.com');
+
+    expect(result).toBeNull();
+    expect(mockedReportError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.stringContaining('500') }),
+      'fetch page metadata',
+    );
+  });
+
   it('returns empty title for empty title tags', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: '<html><head><title></title></head></html>',
-    });
+    mockFetch.mockResolvedValue(htmlResponse('<html><head><title></title></head></html>'));
 
     const result = await getMetadata('https://empty-title.com');
 
@@ -108,9 +121,9 @@ describe('getMetadata', () => {
   });
 
   it('extracts description using single-quoted attributes', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: `<html><head><meta name='description' content='single quoted'></head></html>`,
-    });
+    mockFetch.mockResolvedValue(
+      htmlResponse(`<html><head><meta name='description' content='single quoted'></head></html>`),
+    );
 
     const result = await getMetadata('https://single-quote.com');
 
@@ -118,9 +131,9 @@ describe('getMetadata', () => {
   });
 
   it('does not pick up property="description" (only name="description")', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: `<html><head><meta property="description" content="wrong attr"></head></html>`,
-    });
+    mockFetch.mockResolvedValue(
+      htmlResponse(`<html><head><meta property="description" content="wrong attr"></head></html>`),
+    );
 
     const result = await getMetadata('https://property-desc.com');
 
@@ -128,7 +141,7 @@ describe('getMetadata', () => {
   });
 
   it('result has exactly the four PageMetadata keys', async () => {
-    mockedAxios.get.mockResolvedValue({ data: fullHtml });
+    mockFetch.mockResolvedValue(htmlResponse(fullHtml));
 
     const result = await getMetadata('https://example.com');
 
@@ -136,7 +149,7 @@ describe('getMetadata', () => {
   });
 
   it('PageMetadata type is assignable from a successful result', async () => {
-    mockedAxios.get.mockResolvedValue({ data: fullHtml });
+    mockFetch.mockResolvedValue(htmlResponse(fullHtml));
 
     const result = await getMetadata('https://example.com');
     const typed: PageMetadata = result!;
@@ -148,9 +161,9 @@ describe('getMetadata', () => {
   });
 
   it('does not match reversed attribute order (content before name)', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: '<html><head><meta content="reversed" name="description"></head></html>',
-    });
+    mockFetch.mockResolvedValue(
+      htmlResponse('<html><head><meta content="reversed" name="description"></head></html>'),
+    );
 
     const result = await getMetadata('https://reversed.com');
 
@@ -158,9 +171,9 @@ describe('getMetadata', () => {
   });
 
   it('returns empty title when title spans multiple lines', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: '<html><head><title>Line1\nLine2</title></head></html>',
-    });
+    mockFetch.mockResolvedValue(
+      htmlResponse('<html><head><title>Line1\nLine2</title></head></html>'),
+    );
 
     const result = await getMetadata('https://multiline-title.com');
 
@@ -168,12 +181,12 @@ describe('getMetadata', () => {
   });
 
   it('returns only the first og:image when multiple are present', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: `<html><head>
+    mockFetch.mockResolvedValue(
+      htmlResponse(`<html><head>
         <meta property="og:image" content="https://first.com/a.png">
         <meta property="og:image" content="https://second.com/b.png">
-      </head></html>`,
-    });
+      </head></html>`),
+    );
 
     const result = await getMetadata('https://multi-og.com');
 
@@ -181,9 +194,9 @@ describe('getMetadata', () => {
   });
 
   it('preserves whitespace inside meta content values', async () => {
-    mockedAxios.get.mockResolvedValue({
-      data: '<html><head><meta name="description" content=" spaced value "></head></html>',
-    });
+    mockFetch.mockResolvedValue(
+      htmlResponse('<html><head><meta name="description" content=" spaced value "></head></html>'),
+    );
 
     const result = await getMetadata('https://spaced.com');
 

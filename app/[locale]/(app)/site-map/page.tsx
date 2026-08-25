@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import SiteMapPage from './SiteMapPage';
 
@@ -31,25 +32,27 @@ export default async function Page({ params }: PageProps) {
   const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
 
   return (
-    <>
-      <JsonLd
-        data={[
-          webPageJsonLd({
-            name: t('page.jsonLdName'),
-            description,
-            url: localeHref(APP_ORIGIN, '/site-map', locale),
-            inLanguage,
-          }),
-          breadcrumbJsonLd(
-            [
-              { name: t('page.home'), path: '/' },
-              { name: t('page.title'), path: '/site-map' },
-            ],
-            localeHref(APP_ORIGIN, '/', locale),
-          ),
-        ]}
-      />
-      <SiteMapPage />
-    </>
+    <PageMessages namespaces={['siteMap']}>
+      <>
+        <JsonLd
+          data={[
+            webPageJsonLd({
+              name: t('page.jsonLdName'),
+              description,
+              url: localeHref(APP_ORIGIN, '/site-map', locale),
+              inLanguage,
+            }),
+            breadcrumbJsonLd(
+              [
+                { name: t('page.home'), path: '/' },
+                { name: t('page.title'), path: '/site-map' },
+              ],
+              localeHref(APP_ORIGIN, '/', locale),
+            ),
+          ]}
+        />
+        <SiteMapPage />
+      </>
+    </PageMessages>
   );
 }

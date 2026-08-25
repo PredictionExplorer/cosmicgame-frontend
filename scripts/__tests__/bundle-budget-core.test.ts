@@ -4,14 +4,21 @@ import path from 'node:path';
 
 import {
   DEFAULT_BUDGET_KB,
+  DEFAULT_LANDING_BUDGET_KB,
   computeGzipKb,
   evaluateBudget,
   getHomeJsFiles,
   pickHomeAssets,
-  pickTurbopackHomeAssets,
+  pickTurbopackRouteAssets,
   readManifest,
   resolveNextAsset,
 } from '../bundle-budget-core';
+
+const HOME_MANIFESTS = [
+  path.join('server', 'app', '[locale]', '(app)', 'page_client-reference-manifest.js'),
+  path.join('server', 'app', 'page_client-reference-manifest.js'),
+];
+const HOME_ROUTE_SUFFIXES = ['/app/[locale]/(app)/page', '/app/(app)/page', '/app/page'];
 
 describe('bundle budget core', () => {
   let tempDir: string;
@@ -66,9 +73,9 @@ describe('bundle budget core', () => {
     });
   });
 
-  describe('pickTurbopackHomeAssets', () => {
+  describe('pickTurbopackRouteAssets', () => {
     it('returns null when the per-route manifest does not exist', () => {
-      expect(pickTurbopackHomeAssets(tempDir)).toBeNull();
+      expect(pickTurbopackRouteAssets(tempDir, HOME_MANIFESTS, HOME_ROUTE_SUFFIXES)).toBeNull();
     });
 
     it('combines Next 16 shared and app-home client chunks', () => {
@@ -98,7 +105,7 @@ describe('bundle budget core', () => {
         ].join('\n'),
       );
 
-      expect(pickTurbopackHomeAssets(tempDir)).toEqual([
+      expect(pickTurbopackRouteAssets(tempDir, HOME_MANIFESTS, HOME_ROUTE_SUFFIXES)).toEqual([
         'static/chunks/runtime.js',
         'static/chunks/shared.js',
         'static/chunks/home.js',
@@ -115,7 +122,9 @@ describe('bundle budget core', () => {
         }),
       );
 
-      expect(pickTurbopackHomeAssets(tempDir)).toEqual(['static/chunks/main-1.js']);
+      expect(pickTurbopackRouteAssets(tempDir, HOME_MANIFESTS, HOME_ROUTE_SUFFIXES)).toEqual([
+        'static/chunks/main-1.js',
+      ]);
     });
   });
 
@@ -179,7 +188,16 @@ describe('bundle budget core', () => {
       expect(result.fileCount).toBe(1);
       expect(result.gzipKb).toBeGreaterThan(0);
       expect(result.gzipKb).toBeCloseTo(computeGzipKb([chunk]), 5);
-      expect(result.summary).toMatch(/App home JS gzip: .* \(budget 750 KB\)/);
+      expect(result.summary).toMatch(/App home JS gzip: .* \(budget 640 KB\)/);
+    });
+
+    it('labels non-default surfaces in the summary', () => {
+      const chunk = path.join(tempDir, 'landing.js');
+      writeFileSync(chunk, 'export {}');
+
+      const result = evaluateBudget([chunk], DEFAULT_LANDING_BUDGET_KB, 'Landing home');
+
+      expect(result.summary).toMatch(/Landing home JS gzip: /);
     });
 
     it('fails when the gzip size exceeds the budget', () => {
@@ -209,8 +227,11 @@ describe('bundle budget core', () => {
     });
   });
 
-  it('keeps the full app-home budget at 750 KB gzip', () => {
-    expect(DEFAULT_BUDGET_KB).toBe(750);
+  it('keeps the ratcheted budgets — raising one deserves a design conversation', () => {
+    // Measured after the RES-100 work: app home ~610 KB (wallet stack now
+    // lazy), landing ~290 KB (zod/axios removed from the marketing host).
+    expect(DEFAULT_BUDGET_KB).toBe(640);
+    expect(DEFAULT_LANDING_BUDGET_KB).toBe(320);
   });
 
   describe('directory fallback', () => {

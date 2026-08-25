@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
@@ -29,9 +30,11 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   return (
-    <>
-      <PublicDataRouteSeoSummary route="used-rwlk-nfts" />
-      <UsedRwlkNftsPage />
-    </>
+    <PageMessages namespaces={['statistics', 'tables']}>
+      <>
+        <PublicDataRouteSeoSummary route="used-rwlk-nfts" />
+        <UsedRwlkNftsPage />
+      </>
+    </PageMessages>
   );
 }

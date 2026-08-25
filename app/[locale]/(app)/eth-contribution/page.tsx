@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
@@ -30,9 +31,11 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <>
-      <PublicDataRouteSeoSummary route="eth-contribution" />
-      <EthDonations />
-    </>
+    <PageMessages namespaces={['ethContribution', 'marketing', 'tables']}>
+      <>
+        <PublicDataRouteSeoSummary route="eth-contribution" />
+        <EthDonations />
+      </>
+    </PageMessages>
   );
 }

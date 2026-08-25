@@ -231,10 +231,34 @@ jest.mock('next-intl', () => {
   };
 });
 
+// PageMessages is an async server component (it awaits getMessages) that
+// jsdom test renderers cannot await; scoping correctness has its own guard
+// (app/[locale]/(app)/__tests__/i18n-scoping.test.ts), so tests treat it as
+// a passthrough.
+jest.mock('@/components/i18n/PageMessages', () => ({
+  PageMessages: ({ children }: { children?: unknown }) => children,
+}));
+
+// The lazy wallet modal chunk imports RainbowKit + WalletConnect (untranspiled
+// ESM). Hovering/clicking a connect button in a test would pull that graph in
+// through the dynamic import, so the module is stubbed globally; the
+// deferred-mount behavior has its own suite (contexts/__tests__/
+// WalletUiContext.test.tsx) with a local probe mock.
+jest.mock('@/components/wallet/WalletUi', () => ({
+  WalletUi: () => null,
+}));
+
 jest.mock('next-intl/server', () => ({
   setRequestLocale: jest.fn(),
   getLocale: jest.fn(async () => 'en'),
-  getMessages: async () => ({}),
+  // A catalog that "contains" every namespace: PageMessages/pickMessages
+  // validate that requested namespaces exist, and tests assert on message
+  // KEYS (rendered by the useTranslations mock), not on catalog contents.
+  getMessages: async () =>
+    new Proxy({} as Record<string, unknown>, {
+      get: (_target, property) => (typeof property === 'string' ? {} : undefined),
+      has: () => true,
+    }),
   getTranslations: async (options?: string | { locale?: string; namespace?: string }) => {
     const namespace = typeof options === 'string' ? options : options?.namespace;
     const locale = typeof options === 'object' && options.locale === 'zh' ? 'zh' : 'en';

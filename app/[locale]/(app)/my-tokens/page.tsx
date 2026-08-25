@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import MyTokens from './MyTokens';
 
@@ -21,5 +22,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <MyTokens />;
+  return (
+    <PageMessages namespaces={['detail', 'myPages', 'tables']}>
+      <MyTokens />
+    </PageMessages>
+  );
 }

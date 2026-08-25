@@ -1,6 +1,18 @@
-import type { DashboardInfo } from '@/services/api';
-
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+/**
+ * The subset of the dashboard read this state machine consumes. Structural
+ * on purpose: the full DashboardInfo satisfies it, and lightweight surfaces
+ * (the landing countdown fetches a zod-free snapshot to keep the services/
+ * schema bundle out of the marketing host) can satisfy it too.
+ */
+export interface CycleStateDashboardData {
+  TsRoundStart: number;
+  LastBidderAddr: string;
+  /** Unix seconds; contract `roundActivationTime` (dashboard). */
+  ActivationTime?: number;
+  CurRoundStats?: { ActivationTime?: number } | null;
+}
 
 export type CyclePhase =
   | 'loading'
@@ -16,7 +28,7 @@ export type CyclePhase =
   | 'ready-to-finalize';
 
 export interface CycleStateInput {
-  data: DashboardInfo | null;
+  data: CycleStateDashboardData | null;
   loading: boolean;
   allocationTime: number;
   activationTime?: number | null;
@@ -50,7 +62,7 @@ function getFinitePositiveSeconds(value: unknown): number | null {
   return n > 1e12 ? n / 1000 : n;
 }
 
-export function getDashboardActivationTime(data: DashboardInfo | null): number | null {
+export function getDashboardActivationTime(data: CycleStateDashboardData | null): number | null {
   if (!data) return null;
   return (
     getFinitePositiveSeconds(data.CurRoundStats?.ActivationTime) ??

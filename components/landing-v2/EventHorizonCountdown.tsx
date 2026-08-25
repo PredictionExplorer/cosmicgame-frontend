@@ -8,12 +8,20 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
-import api from '@/services/api';
 import { getCycleState, getDashboardActivationTime, type CyclePhase } from '@/lib/cycleState';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { getLiveDataPollIntervalMs } from '@/lib/pollingCadence';
 import { getStableClientTargetTime } from '@/utils/time';
-import type { DashboardInfo } from '@/services/api';
+
+// Zod-free fetch helpers, NOT the services/api barrel: importing the barrel
+// pulled axios + the full schema module (~90 KB gzip) into the marketing
+// host's bundle for three display-only reads.
+import {
+  fetchLandingCurrentTimeSec,
+  fetchLandingDashboardSnapshot,
+  fetchLandingFinalizationTimeSec,
+  type LandingDashboardSnapshot,
+} from './landing-cycle-data';
 
 const POLL_INTERVAL_MS = 12_000;
 
@@ -22,7 +30,7 @@ type TimerPhase = CyclePhase;
 type LandingCycleTimerSample = {
   targetServerTimeSec: number | null;
   currentServerTimeSec: number | null;
-  dashboard: DashboardInfo | null;
+  dashboard: LandingDashboardSnapshot | null;
   sampledAtMs: number;
 };
 
@@ -197,9 +205,9 @@ export function getLandingCycleTimerSnapshot({
 async function fetchLandingCycleTimerSample(): Promise<LandingCycleTimerSample> {
   const sampledAtMs = Date.now();
   const [targetServerTimeSec, currentServerTimeSec, dashboard] = await Promise.all([
-    api.get_prize_time(),
-    api.get_current_time(),
-    api.get_dashboard_info(),
+    fetchLandingFinalizationTimeSec(),
+    fetchLandingCurrentTimeSec(),
+    fetchLandingDashboardSnapshot(),
   ]);
 
   return {

@@ -41,10 +41,12 @@ interface RoundInfoSectionProps {
   perPage: number;
 }
 
+// Transform-only (no opacity ramp): the first sections render in the initial
+// viewport on /current-cycle, so an opacity-0 server render would delay the
+// page's LCP until hydration.
 const sectionFade = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { y: 16 },
   visible: (i: number) => ({
-    opacity: 1,
     y: 0,
     transition: { delay: i * 0.06, duration: 0.35, ease: 'easeOut' as const },
   }),

@@ -1,16 +1,13 @@
-import axios from 'axios';
-
 import { reportError } from './errors';
 
-/** Axios instance without Cosmic API interceptors (see `services/api/client.ts`). Used for third-party HTML fetches. */
-let metadataHttp: ReturnType<typeof axios.create> | null = null;
-
-function getMetadataHttp() {
-  if (!metadataHttp) {
-    metadataHttp = axios.create({ timeout: 25_000 });
-  }
-  return metadataHttp;
-}
+/**
+ * Third-party HTML fetches use plain `fetch` — deliberately not axios.
+ * This module is re-exported through the `@/utils` barrel, so an axios
+ * import here used to drag the whole HTTP client into every bundle that
+ * touched any util (including the marketing host, which otherwise ships no
+ * transport stack at all).
+ */
+const METADATA_TIMEOUT_MS = 25_000;
 
 export interface PageMetadata {
   title: string;
@@ -28,7 +25,11 @@ export interface PageMetadata {
  */
 export async function getMetadata(url: string): Promise<PageMetadata | null> {
   try {
-    const { data: html } = await getMetadataHttp().get<string>(url);
+    const response = await fetch(url, { signal: AbortSignal.timeout(METADATA_TIMEOUT_MS) });
+    if (!response.ok) {
+      throw new Error(`metadata fetch failed with status ${response.status}`);
+    }
+    const html = await response.text();
 
     const titleMatch = html.match(/<title>(.*?)<\/title>/);
     const title = titleMatch?.[1] ?? '';

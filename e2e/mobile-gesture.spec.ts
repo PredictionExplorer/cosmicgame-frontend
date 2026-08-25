@@ -3,31 +3,17 @@ import { test, expect } from '@playwright/test';
 test.describe('Mobile gesture touch handling', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.locator('#tsparticles').waitFor({ state: 'attached', timeout: 15_000 });
   });
 
-  test('particle backdrop is structurally inert on touch devices', async ({ page }) => {
-    const particleLayer = await page.evaluate(() => {
-      const host = document.querySelector('#tsparticles') as HTMLElement | null;
-      const wrapper = host?.parentElement ?? null;
-      const canvas = host?.querySelector('canvas') as HTMLElement | null;
-
-      return {
-        hostHasStableSize: host ? host.getBoundingClientRect().width > 0 : false,
-        wrapperPointerEvents: wrapper ? window.getComputedStyle(wrapper).pointerEvents : null,
-        wrapperTouchAction: wrapper ? window.getComputedStyle(wrapper).touchAction : null,
-        wrapperPosition: wrapper ? window.getComputedStyle(wrapper).position : null,
-        canvasPointerEvents: canvas ? window.getComputedStyle(canvas).pointerEvents : null,
-        canvasPosition: canvas ? window.getComputedStyle(canvas).position : null,
-      };
-    });
-
-    expect(particleLayer.hostHasStableSize).toBe(true);
-    expect(particleLayer.wrapperPointerEvents).toBe('none');
-    expect(particleLayer.wrapperTouchAction).toBe('none');
-    expect(particleLayer.wrapperPosition).toBe('fixed');
-    expect(particleLayer.canvasPointerEvents).toBe('none');
-    expect(particleLayer.canvasPosition).not.toBe('fixed');
+  test('particle backdrop never boots on touch devices', async ({ page }) => {
+    // The strongest possible touch-safety guarantee, and a deliberate INP
+    // win: the particle engine is skipped entirely for coarse pointers and
+    // small viewports (see Providers), so there is no canvas to interfere
+    // with touch input and no persistent rAF loop competing with taps.
+    // Give the idle-callback window that used to boot the engine time to
+    // fire before asserting.
+    await page.waitForTimeout(3_000);
+    await expect(page.locator('#tsparticles')).toHaveCount(0);
   });
 
   test('foreground controls win hit-testing over the particle canvas', async ({ page }) => {

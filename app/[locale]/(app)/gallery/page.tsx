@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, collectionPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import GalleryPage from './GalleryPage';
 import { GallerySeoSummary } from './GallerySeoSummary';
@@ -34,31 +35,33 @@ export default async function Page({ params }: PageProps) {
   const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
 
   return (
-    <>
-      <JsonLd
-        data={[
-          collectionPageJsonLd({
-            name: t('jsonLd.name'),
-            // Single source of truth: the CollectionPage description is the
-            // meta description, so it is read from the meta namespace instead
-            // of being duplicated into gallery.json.
-            description: meta('gallery.description'),
-            url: localeHref(APP_ORIGIN, '/gallery', locale),
-            inLanguage,
-          }),
-          breadcrumbJsonLd(
-            [
-              { name: common('breadcrumbs.home'), path: '/' },
-              { name: common('breadcrumbs.gallery'), path: '/gallery' },
-            ],
-            localeHref(APP_ORIGIN, '/', locale),
-          ),
-        ]}
-      />
-      <GallerySeoSummary />
-      <Suspense>
-        <GalleryPage />
-      </Suspense>
-    </>
+    <PageMessages namespaces={['detail', 'gallery', 'tables']}>
+      <>
+        <JsonLd
+          data={[
+            collectionPageJsonLd({
+              name: t('jsonLd.name'),
+              // Single source of truth: the CollectionPage description is the
+              // meta description, so it is read from the meta namespace instead
+              // of being duplicated into gallery.json.
+              description: meta('gallery.description'),
+              url: localeHref(APP_ORIGIN, '/gallery', locale),
+              inLanguage,
+            }),
+            breadcrumbJsonLd(
+              [
+                { name: common('breadcrumbs.home'), path: '/' },
+                { name: common('breadcrumbs.gallery'), path: '/gallery' },
+              ],
+              localeHref(APP_ORIGIN, '/', locale),
+            ),
+          ]}
+        />
+        <GallerySeoSummary />
+        <Suspense>
+          <GalleryPage />
+        </Suspense>
+      </>
+    </PageMessages>
   );
 }

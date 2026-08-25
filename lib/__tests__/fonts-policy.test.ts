@@ -3,17 +3,26 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 /**
- * Font payload policy: body text must ship as a single variable WOFF2 per
- * family. Static TTF weights cost ~150 KB each over the wire and regressing
- * to them silently undoes one of the largest page-weight wins.
+ * Font payload policy: body text must ship as build-time-subsetted variable
+ * WOFF2 slices, display text as a single variable WOFF2. The previous
+ * self-hosted `InterVariable.woff2` carried every script Inter supports at
+ * 352 KB and was preloaded on every page — regressing to a full-range file
+ * (or static TTF weights at ~150 KB each) silently undoes one of the largest
+ * page-weight wins on mobile.
  */
 describe('font configuration policy', () => {
   const fontsConfigPath = resolve(__dirname, '..', 'fonts.ts');
   const source = readFileSync(fontsConfigPath, 'utf8');
 
-  it('loads Inter as a single variable WOFF2', () => {
-    expect(source).toContain('InterVariable.woff2');
-    expect(source).toContain("weight: '100 900'");
+  it('loads Inter through next/font/google so it is subsetted at build time', () => {
+    expect(source).toMatch(/import \{[^}]*\bInter\b[^}]*\} from 'next\/font\/google'/);
+    expect(source).toContain("subsets: ['latin', 'latin-ext']");
+    expect(source).toContain("variable: '--font-inter'");
+  });
+
+  it('does not reference a full-range local Inter file', () => {
+    expect(source).not.toContain('InterVariable');
+    expect(source).not.toMatch(/fonts\/Inter\//);
   });
 
   it('does not reference any static TTF font files', () => {
@@ -34,11 +43,12 @@ describe('font configuration policy', () => {
     expect(source).toContain("'Microsoft YaHei'");
   });
 
-  it('ships the referenced font files in public/fonts', () => {
+  it('ships the referenced local font files in public/fonts', () => {
     const publicFonts = resolve(__dirname, '..', '..', 'public', 'fonts');
-    expect(existsSync(resolve(publicFonts, 'Inter', 'fonts', 'InterVariable.woff2'))).toBe(true);
     expect(
       existsSync(resolve(publicFonts, 'ClashDisplay', 'fonts', 'ClashDisplay-Variable.woff2')),
     ).toBe(true);
+    // The local Inter directory must stay deleted; next/font/google owns Inter.
+    expect(existsSync(resolve(publicFonts, 'Inter'))).toBe(false);
   });
 });

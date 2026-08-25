@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, datasetJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { StatisticsSeoSummary } from './StatisticsSeoSummary';
 import StatisticsHubPanel from './StatisticsHubPanel';
@@ -34,26 +35,28 @@ export default async function Page({ params }: PageProps) {
   const url = localeHref(APP_ORIGIN, '/statistics', locale);
 
   return (
-    <>
-      <JsonLd
-        data={[
-          webPageJsonLd({
-            name: t('hub.jsonLd.webPageName'),
-            description: t('hub.jsonLd.webPageDescription'),
-            url,
-            inLanguage,
-          }),
-          datasetJsonLd({
-            name: t('hub.jsonLd.datasetName'),
-            description: t('hub.jsonLd.datasetDescription'),
-            url,
-            dateModified: new Date().toISOString(),
-            inLanguage,
-          }),
-        ]}
-      />
-      <StatisticsSeoSummary />
-      <StatisticsHubPanel />
-    </>
+    <PageMessages namespaces={['statistics', 'tables']}>
+      <>
+        <JsonLd
+          data={[
+            webPageJsonLd({
+              name: t('hub.jsonLd.webPageName'),
+              description: t('hub.jsonLd.webPageDescription'),
+              url,
+              inLanguage,
+            }),
+            datasetJsonLd({
+              name: t('hub.jsonLd.datasetName'),
+              description: t('hub.jsonLd.datasetDescription'),
+              url,
+              dateModified: new Date().toISOString(),
+              inLanguage,
+            }),
+          ]}
+        />
+        <StatisticsSeoSummary />
+        <StatisticsHubPanel />
+      </>
+    </PageMessages>
   );
 }

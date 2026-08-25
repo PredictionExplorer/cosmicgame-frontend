@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import SystemEventPage from './SystemEventPage';
 
@@ -32,5 +33,9 @@ export default async function Page({
 }) {
   const { locale, round, start, end } = await params;
   setRequestLocale(locale);
-  return <SystemEventPage round={Number(round)} start={Number(start)} end={Number(end)} />;
+  return (
+    <PageMessages namespaces={['coordination', 'statistics', 'tables']}>
+      <SystemEventPage round={Number(round)} start={Number(start)} end={Number(end)} />
+    </PageMessages>
+  );
 }

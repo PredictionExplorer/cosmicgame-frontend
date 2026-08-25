@@ -6,6 +6,7 @@ import { getAllFaqItems, getFaqContent } from '@/content/faq';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { createMetadata } from '@/utils/seo';
 import { JsonLd, faqPageJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import FAQPage from './FAQPage';
 
@@ -31,18 +32,20 @@ export default async function Page({ params }: PageProps) {
   ]);
 
   return (
-    <>
-      <JsonLd data={faqPageJsonLd(allItems, inLanguage)} />
-      <JsonLd
-        data={breadcrumbJsonLd(
-          [
-            { name: common('breadcrumbs.home'), path: '/' },
-            { name: faq('hero.titleHighlight'), path: '/faq' },
-          ],
-          localeHref(APP_ORIGIN, '/', locale),
-        )}
-      />
-      <FAQPage content={content} />
-    </>
+    <PageMessages namespaces={['faq']}>
+      <>
+        <JsonLd data={faqPageJsonLd(allItems, inLanguage)} />
+        <JsonLd
+          data={breadcrumbJsonLd(
+            [
+              { name: common('breadcrumbs.home'), path: '/' },
+              { name: faq('hero.titleHighlight'), path: '/faq' },
+            ],
+            localeHref(APP_ORIGIN, '/', locale),
+          )}
+        />
+        <FAQPage content={content} />
+      </>
+    </PageMessages>
   );
 }

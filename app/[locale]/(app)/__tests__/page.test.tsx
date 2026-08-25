@@ -1,88 +1,105 @@
-import axios from 'axios';
-import { headers } from 'next/headers';
+import { getCstInfoSeed, getDashboardInfoSeed } from '@/services/api/server';
 
 import { render, screen } from '@/test-utils';
 
-// lexicon-allow-start: test imports mirror sealed API module filenames.
-import { get_dashboard_info } from '../../../../services/api/rounds';
-// lexicon-allow-end
 import Page, { generateMetadata } from '../page';
 
-jest.mock('next/headers', () => ({
-  headers: jest.fn(),
+jest.mock('@/services/api/server', () => ({
+  getDashboardInfoSeed: jest.fn(),
+  getCstInfoSeed: jest.fn(),
 }));
-
-// lexicon-allow-start: test mocks mirror sealed API module filenames.
-jest.mock('../../../../services/api/rounds', () => ({
-  get_dashboard_info: jest.fn(),
-}));
-// lexicon-allow-end
 
 jest.mock('../HomePage', () => ({
   __esModule: true,
   default: ({
     initialDashboardData,
-    initialHostname,
+    initialBannerToken,
   }: {
     initialDashboardData?: { CurRoundNum?: number } | null;
-    initialHostname?: string | null;
+    initialBannerToken?: { id: number; info: { Seed?: string } } | null;
   }) => (
     <div
       data-testid="home-page"
-      data-host={initialHostname ?? ''}
       data-cycle={initialDashboardData?.CurRoundNum ?? ''}
+      data-banner-id={initialBannerToken?.id ?? ''}
+      data-banner-seed={initialBannerToken?.info.Seed ?? ''}
     />
   ),
 }));
 
-const mockHeaders = headers as jest.MockedFunction<typeof headers>;
-const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
-let axiosGetSpy: jest.SpyInstance;
+const mockGetDashboardInfoSeed = getDashboardInfoSeed as jest.MockedFunction<
+  typeof getDashboardInfoSeed
+>;
+const mockGetCstInfoSeed = getCstInfoSeed as jest.MockedFunction<typeof getCstInfoSeed>;
 
 const pageProps = { params: Promise.resolve({ locale: 'en' }) };
 
+function dashboardSeed(overrides: Record<string, unknown> = {}) {
+  return {
+    CurRoundNum: 9,
+    PrizeAmountEth: 2.5,
+    MainStats: { NumCSTokenMints: 4 },
+    ...overrides,
+  } as never;
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
-  axiosGetSpy = jest
-    .spyOn(axios, 'get')
-    .mockResolvedValue({ data: { PrizeAmountEth: 2.5 } } as never);
-  mockHeaders.mockResolvedValue(new Headers({ host: 'app.cosmicsignature.com:443' }) as never);
-  mockGetDashboardInfo.mockResolvedValue({ CurRoundNum: 9 } as never);
-});
-
-afterEach(() => {
-  axiosGetSpy.mockRestore();
+  mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed());
+  mockGetCstInfoSeed.mockResolvedValue({ Seed: 'abc123' } as never);
 });
 
 describe('app home page (server shell)', () => {
-  it('feeds server-fetched dashboard data and hostname into HomePage', async () => {
+  it('feeds the seed dashboard snapshot into HomePage', async () => {
     render(await Page(pageProps));
 
-    const home = screen.getByTestId('home-page');
-    expect(home).toHaveAttribute('data-cycle', '9');
-    expect(home).toHaveAttribute('data-host', 'app.cosmicsignature.com');
+    expect(screen.getByTestId('home-page')).toHaveAttribute('data-cycle', '9');
   });
 
-  it('falls back to a null dashboard when the API is unavailable', async () => {
-    mockGetDashboardInfo.mockRejectedValue(new Error('backend down'));
+  it('server-picks a hero banner token within the imprinted range', async () => {
+    render(await Page(pageProps));
+
+    const requestedId = mockGetCstInfoSeed.mock.calls[0]?.[0];
+    expect(requestedId).toBeGreaterThanOrEqual(0);
+    expect(requestedId).toBeLessThan(4);
+
+    const home = screen.getByTestId('home-page');
+    expect(home).toHaveAttribute('data-banner-id', String(requestedId));
+    expect(home).toHaveAttribute('data-banner-seed', 'abc123');
+  });
+
+  it('omits the banner seed when no tokens have been imprinted yet', async () => {
+    mockGetDashboardInfoSeed.mockResolvedValue(
+      dashboardSeed({ MainStats: { NumCSTokenMints: 0 } }),
+    );
+
+    render(await Page(pageProps));
+
+    expect(mockGetCstInfoSeed).not.toHaveBeenCalled();
+    expect(screen.getByTestId('home-page')).toHaveAttribute('data-banner-id', '');
+  });
+
+  it('omits the banner seed when the token read has no Seed', async () => {
+    mockGetCstInfoSeed.mockResolvedValue({ Seed: '' } as never);
+
+    render(await Page(pageProps));
+
+    expect(screen.getByTestId('home-page')).toHaveAttribute('data-banner-seed', '');
+  });
+
+  it('renders with a null dashboard when the seed read is unavailable', async () => {
+    mockGetDashboardInfoSeed.mockResolvedValue(null);
 
     render(await Page(pageProps));
 
     expect(screen.getByTestId('home-page')).toHaveAttribute('data-cycle', '');
-  });
-
-  it('passes a null hostname when no host header is present', async () => {
-    mockHeaders.mockResolvedValue(new Headers() as never);
-
-    render(await Page(pageProps));
-
-    expect(screen.getByTestId('home-page')).toHaveAttribute('data-host', '');
+    expect(mockGetCstInfoSeed).not.toHaveBeenCalled();
   });
 });
 
 describe('generateMetadata', () => {
-  it('uses the reserve description variant when the dashboard fetch succeeds', async () => {
-    axiosGetSpy.mockResolvedValue({ data: { PrizeAmountEth: 0.625 } } as never);
+  it('uses the reserve description variant when the seed read succeeds', async () => {
+    mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed({ PrizeAmountEth: 0.625 }));
 
     const metadata = await generateMetadata(pageProps);
 
@@ -92,15 +109,25 @@ describe('generateMetadata', () => {
   });
 
   it('formats a zero reserve like the historical description', async () => {
-    axiosGetSpy.mockResolvedValue({ data: {} } as never);
+    mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed({ PrizeAmountEth: 0 }));
 
     const metadata = await generateMetadata(pageProps);
 
     expect(metadata.description).toContain('0.0000 ETH Cycle Reserve');
   });
 
-  it('falls back to the reserve-free description when the dashboard fetch fails', async () => {
-    axiosGetSpy.mockRejectedValue(new Error('backend down'));
+  it('falls back to the normalized reserve field when the wire field is absent', async () => {
+    mockGetDashboardInfoSeed.mockResolvedValue(
+      dashboardSeed({ PrizeAmountEth: undefined, CurPrizeAmountEth: 1.25 }),
+    );
+
+    const metadata = await generateMetadata(pageProps);
+
+    expect(metadata.description).toContain('1.2500 ETH Cycle Reserve');
+  });
+
+  it('falls back to the reserve-free description when the seed read fails', async () => {
+    mockGetDashboardInfoSeed.mockResolvedValue(null);
 
     const metadata = await generateMetadata(pageProps);
 

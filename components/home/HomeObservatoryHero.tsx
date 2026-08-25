@@ -13,7 +13,9 @@ import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Surface } from '@/components/ui/surface';
 import NFTImage from '@/components/nft/NFTImage';
-import { fadeRise, fadeRiseStagger, useMotionVariants } from '@/lib/motion';
+// riseIn (not fadeRise): the hero holds the page's LCP text, which must stay
+// visible in the server HTML instead of fading in after hydration.
+import { fadeRiseStagger, riseIn, useMotionVariants } from '@/lib/motion';
 import type { CyclePhase } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
@@ -191,9 +193,9 @@ export function HomeObservatoryHero({
 }: HomeObservatoryHeroProps) {
   const t = useTranslations('home');
   const locale = useLocale();
-  const sectionVariants = useMotionVariants(fadeRise);
+  const sectionVariants = useMotionVariants(riseIn);
   const staggerVariants = useMotionVariants(fadeRiseStagger);
-  const itemVariants = useMotionVariants(fadeRise);
+  const itemVariants = useMotionVariants(riseIn);
 
   const cycleNumber = data?.CurRoundNum;
   const gestureCount = data?.CurNumBids ?? 0;

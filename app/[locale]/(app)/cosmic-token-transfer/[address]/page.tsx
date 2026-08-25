@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import CosmicTokenTransfersPage from './CosmicTokenTransfersPage';
 
@@ -28,5 +29,9 @@ export const revalidate = 300;
 export default async function Page({ params }: PageProps) {
   const { locale, address } = await params;
   setRequestLocale(locale);
-  return <CosmicTokenTransfersPage address={address} />;
+  return (
+    <PageMessages namespaces={['marketing', 'myPages', 'tables']}>
+      <CosmicTokenTransfersPage address={address} />
+    </PageMessages>
+  );
 }

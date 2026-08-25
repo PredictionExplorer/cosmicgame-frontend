@@ -2,8 +2,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 
-import type { DashboardInfo } from '../../../services/api';
-import api from '../../../services/api';
+import {
+  fetchLandingCurrentTimeSec,
+  fetchLandingDashboardSnapshot,
+  fetchLandingFinalizationTimeSec,
+  type LandingDashboardSnapshot,
+} from '../landing-cycle-data';
 import { EventHorizonCountdown, getLandingCycleTimerSnapshot } from '../EventHorizonCountdown';
 
 jest.mock('next/image', () => ({
@@ -11,32 +15,32 @@ jest.mock('next/image', () => ({
   default: (props: Record<string, unknown>) => <img {...props} />,
 }));
 
-jest.mock('../../../services/api', () => ({
-  __esModule: true,
-  default: {
-    get_prize_time: jest.fn(),
-    get_current_time: jest.fn(),
-    get_dashboard_info: jest.fn(),
-  },
+// The countdown reads through the zod-free landing-cycle-data module (NOT
+// the services/api barrel — that would drag axios+zod into the landing).
+jest.mock('../landing-cycle-data', () => ({
+  fetchLandingFinalizationTimeSec: jest.fn(),
+  fetchLandingCurrentTimeSec: jest.fn(),
+  fetchLandingDashboardSnapshot: jest.fn(),
 }));
 
-const mockApi = api as jest.Mocked<typeof api>;
+const mockFetchFinalization = fetchLandingFinalizationTimeSec as jest.MockedFunction<
+  typeof fetchLandingFinalizationTimeSec
+>;
+const mockFetchCurrentTime = fetchLandingCurrentTimeSec as jest.MockedFunction<
+  typeof fetchLandingCurrentTimeSec
+>;
+const mockFetchDashboard = fetchLandingDashboardSnapshot as jest.MockedFunction<
+  typeof fetchLandingDashboardSnapshot
+>;
 
-function dashboard(overrides: Partial<DashboardInfo> = {}): DashboardInfo {
+function dashboard(overrides: Partial<LandingDashboardSnapshot> = {}): LandingDashboardSnapshot {
   return {
     CurRoundNum: 12,
     CurNumBids: 34,
-    CurPrizeAmountEth: 1.25,
-    PrizeClaimTs: 0,
     TsRoundStart: 1,
     LastBidderAddr: '0x1111111111111111111111111111111111111111',
-    GestureCostEth: 0.01,
-    StakingAmountEth: 0,
-    MainStats: { NumCSTokenMints: 100 },
-    NumRaffleNFTWinnersBidding: 0,
-    NumRaffleNFTWinnersStakingRWalk: 0,
     ...overrides,
-  } as DashboardInfo;
+  };
 }
 
 describe('getLandingCycleTimerSnapshot', () => {
@@ -94,7 +98,7 @@ describe('getLandingCycleTimerSnapshot', () => {
       sample: {
         ...activeSample,
         dashboard: dashboard({
-          CurRoundStats: { TotalBids: 0, ActivationTime: activationTime },
+          CurRoundStats: { ActivationTime: activationTime },
           TsRoundStart: 0,
         }),
       },
@@ -145,9 +149,9 @@ describe('<EventHorizonCountdown />', () => {
 
   beforeEach(() => {
     jest.spyOn(Date, 'now').mockReturnValue(nowMs);
-    mockApi.get_prize_time.mockResolvedValue(1_700_007_200);
-    mockApi.get_current_time.mockResolvedValue(1_700_000_000);
-    mockApi.get_dashboard_info.mockResolvedValue(dashboard({ CurRoundNum: 21, CurNumBids: 55 }));
+    mockFetchFinalization.mockResolvedValue(1_700_007_200);
+    mockFetchCurrentTime.mockResolvedValue(1_700_000_000);
+    mockFetchDashboard.mockResolvedValue(dashboard({ CurRoundNum: 21, CurNumBids: 55 }));
   });
 
   afterEach(() => {
@@ -185,7 +189,10 @@ describe('<EventHorizonCountdown />', () => {
   });
 
   it('renders an unavailable state when the protocol clock cannot be reached', async () => {
-    mockApi.get_prize_time.mockRejectedValue(new Error('network down'));
+    // The fetch helpers degrade to null on any failure (they never throw).
+    mockFetchFinalization.mockResolvedValue(null);
+    mockFetchCurrentTime.mockResolvedValue(null);
+    mockFetchDashboard.mockResolvedValue(null);
 
     render(<EventHorizonCountdown />);
 
@@ -198,7 +205,7 @@ describe('<EventHorizonCountdown />', () => {
   });
 
   it('renders waiting state without a ticking countdown', async () => {
-    mockApi.get_dashboard_info.mockResolvedValue(
+    mockFetchDashboard.mockResolvedValue(
       dashboard({
         CurRoundNum: 21,
         CurNumBids: 0,

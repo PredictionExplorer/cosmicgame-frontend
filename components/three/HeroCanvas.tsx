@@ -12,20 +12,19 @@ import {
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-
 import { NebulaShader } from './NebulaShader';
 import { ReducedMotionFallback } from './ReducedMotionFallback';
 import { ThreeBodyOrbit } from './ThreeBodyOrbit';
-
-const QUALITY_QUERY = '(min-width: 1024px)';
+import { useCanRenderHeroCanvas } from './hero-canvas-gate';
 
 export function HeroCanvas() {
-  const reducedMotion = usePrefersReducedMotion();
-  const highQuality = useMediaQuery(QUALITY_QUERY);
+  // Defense-in-depth: consumers gate the dynamic import with the same hook
+  // (see hero-canvas-gate.ts) so this chunk never downloads on phones; this
+  // in-component check additionally handles live viewport/preference changes
+  // after the chunk has loaded.
+  const canRender = useCanRenderHeroCanvas();
 
-  if (reducedMotion || !highQuality) {
+  if (!canRender) {
     return <ReducedMotionFallback />;
   }
 

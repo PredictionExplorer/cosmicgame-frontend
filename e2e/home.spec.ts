@@ -16,6 +16,46 @@ async function ensureVisible(locator: { scrollIntoViewIfNeeded(): Promise<void> 
   await locator.scrollIntoViewIfNeeded();
 }
 
+/**
+ * Live-state probe: re-reads the dashboard from the same API URL the page
+ * itself used (self-configuring — no hardcoded backend host in the spec).
+ */
+async function fetchLiveDashboard(
+  page: import('@playwright/test').Page,
+): Promise<{ CurNumBids?: number; TsRoundStart?: number } | null> {
+  const dashboardUrl = await page.evaluate(
+    () =>
+      performance
+        .getEntriesByType('resource')
+        .map((entry) => entry.name)
+        .find((name) => name.includes('/api/cosmicgame/statistics/dashboard')) ?? null,
+  );
+  if (!dashboardUrl) return null;
+  return page.evaluate(async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) return null;
+      return (await response.json()) as { CurNumBids?: number; TsRoundStart?: number };
+    } catch {
+      return null;
+    }
+  }, dashboardUrl);
+}
+
+/**
+ * Participant-derived surfaces (ticker, special-allocation leaders) only
+ * exist once the live cycle has its first Gesture. Between cycles the
+ * backend legitimately reports zero gestures and these tests would assert
+ * on UI that is correctly absent — skip with a clear reason instead.
+ */
+async function skipUnlessCycleHasGestures(page: import('@playwright/test').Page) {
+  const dashboard = await fetchLiveDashboard(page);
+  test.skip(
+    !dashboard || !dashboard.TsRoundStart || (dashboard.CurNumBids ?? 0) === 0,
+    'live cycle has no gestures yet — participant surfaces are legitimately hidden',
+  );
+}
+
 test.describe('dApp home page @ app.cosmicsignature.com', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -38,15 +78,21 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   test('shows the Chrono Core timer at the top of the game page', async ({ page }) => {
     const chronoCore = page.getByTestId('chrono-core-timer');
     await expect(chronoCore).toBeVisible({ timeout: 15000 });
+    // .first(): in the waiting-first-gesture phase the badge and the status
+    // line both carry the phase copy, which is legitimate.
     await expect(
-      chronoCore.getByText(
-        /Next cycle opens in|Cycle is open|Cycle finalizes in|Final hour|Final 10 minutes|Final minute|Cycle ready to finalize/,
-      ),
+      chronoCore
+        .getByText(
+          /Next cycle opens in|Cycle is open|Cycle finalizes in|Final hour|Final 10 minutes|Final minute|Cycle ready to finalize/,
+        )
+        .first(),
     ).toBeVisible();
     await expect(
-      chronoCore.getByText(
-        /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|Cycle is live|less than one hour|Final minutes|Final minute|Finalization is ready/i,
-      ),
+      chronoCore
+        .getByText(
+          /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|Cycle is live|less than one hour|Final minutes|Final minute|Finalization is ready/i,
+        )
+        .first(),
     ).toBeVisible();
     await expect(chronoCore.getByRole('timer')).toBeVisible();
   });
@@ -76,12 +122,14 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('shows latest participant card', async ({ page }) => {
+    await skipUnlessCycleHasGestures(page);
     const latestParticipant = page.locator('text=/Latest Participant/i').first();
     await ensureVisible(latestParticipant);
     await expect(latestParticipant).toBeVisible();
   });
 
   test('shows special allocation recipients section', async ({ page }) => {
+    await skipUnlessCycleHasGestures(page);
     const specialAllocations = page.getByText('Special Allocation Leaders').first();
     await ensureVisible(specialAllocations);
     await expect(specialAllocations).toBeVisible({ timeout: 15000 });
@@ -131,6 +179,10 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('Chrono-Warrior card uses its own address when leaders differ', async ({ page }) => {
+    // The whole leaders section is gated on the DASHBOARD read
+    // (TsRoundStart !== 0), so mocking current_special_winners below cannot
+    // conjure it during an idle cycle.
+    await skipUnlessCycleHasGestures(page);
     const data = {
       ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
       ChronoWarriorDuration: 7200,

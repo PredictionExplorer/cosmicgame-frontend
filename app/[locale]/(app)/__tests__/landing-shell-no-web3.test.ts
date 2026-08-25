@@ -134,9 +134,47 @@ describe('LandingShell contract — no Web3 in landing bundle', () => {
     const appExternals = [...walkImports(APP_PROVIDERS)];
     expect(appExternals.some((spec) => /^wagmi(\/|$)/.test(spec))).toBe(true);
   });
+});
 
-  it('positive control: app Providers tree DOES import @rainbow-me/rainbowkit', () => {
+describe('Landing page contract — no schema/transport stack on the marketing host', () => {
+  const LANDING_PAGE = resolve(REPO_ROOT, 'app/[locale]/(landing)/landing-site/page.tsx');
+
+  it('landing-site page tree never reaches axios or zod', () => {
+    // The landing countdown once imported the services/api barrel, which
+    // pulled axios + the full zod schema module (~90 KB gzip) into the
+    // marketing bundle for three display-only reads. It now uses zod-free
+    // fetch helpers (components/landing-v2/landing-cycle-data.ts).
+    const landingPageExternals = [...walkImports(LANDING_PAGE)];
+    for (const banned of [/^axios(\/|$)/, /^zod(\/|$)/]) {
+      const hits = landingPageExternals.filter((spec) => banned.test(spec));
+      expect(hits).toEqual([]);
+    }
+  });
+
+  it('landing-site page tree is non-empty (sanity)', () => {
+    expect([...walkImports(LANDING_PAGE)].length).toBeGreaterThan(0);
+  });
+});
+
+describe('Providers contract — RainbowKit stays behind the lazy wallet chunk', () => {
+  const WALLET_CONNECTORS = resolve(REPO_ROOT, 'components/wallet/wallet-connectors.ts');
+
+  it('app Providers tree never statically reaches the wallet modal stack', () => {
+    // The wallet modal UI (RainbowKit + WalletConnect + Coinbase) is loaded
+    // through dynamic import on connect intent — see WalletUiProvider. The
+    // static walker does not follow dynamic imports, so a hit here means
+    // someone reintroduced an eager import and re-added ~100 KB gzip to
+    // every app page for every visitor.
     const appExternals = [...walkImports(APP_PROVIDERS)];
-    expect(appExternals.some((spec) => /^@rainbow-me\/rainbowkit/.test(spec))).toBe(true);
+    const heavyWalletPackages = [/^@rainbow-me\//, /^@walletconnect\//, /^@coinbase\//];
+    for (const banned of heavyWalletPackages) {
+      const hits = appExternals.filter((spec) => banned.test(spec));
+      expect(hits).toEqual([]);
+    }
+  });
+
+  it('positive control: the lazy wallet module DOES import RainbowKit', () => {
+    const walletExternals = [...walkImports(WALLET_CONNECTORS)];
+    expect(walletExternals.some((spec) => /^@rainbow-me\/rainbowkit/.test(spec))).toBe(true);
   });
 });

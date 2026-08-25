@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import EmbedEnduranceChart from './EmbedEnduranceChart';
 
@@ -44,5 +45,9 @@ export default async function Page({
 }) {
   const { locale, round } = await params;
   setRequestLocale(locale);
-  return <EmbedEnduranceChart roundNum={parseInt(round, 10)} />;
+  return (
+    <PageMessages namespaces={['statistics']}>
+      <EmbedEnduranceChart roundNum={parseInt(round, 10)} />
+    </PageMessages>
+  );
 }

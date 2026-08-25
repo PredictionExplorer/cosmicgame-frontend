@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import UserStellarSelectionNFTPage from './UserStellarSelectionNFTPage';
 
@@ -32,5 +33,9 @@ export default async function Page({
 }) {
   const { locale, address } = await params;
   setRequestLocale(locale);
-  return <UserStellarSelectionNFTPage address={address} />;
+  return (
+    <PageMessages namespaces={['statistics', 'tables']}>
+      <UserStellarSelectionNFTPage address={address} />
+    </PageMessages>
+  );
 }

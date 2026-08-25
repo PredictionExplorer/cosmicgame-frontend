@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
@@ -33,29 +34,31 @@ export default async function Page({ params }: PageProps) {
   const pageUrl = localeHref(APP_ORIGIN, '/imprint', locale);
 
   return (
-    <>
-      <JsonLd
-        data={[
-          webPageJsonLd({
-            name: imprint('seo.heading'),
-            description,
-            url: pageUrl,
-            inLanguage,
-          }),
-          breadcrumbJsonLd(
-            [
-              {
-                name: locale === 'zh' ? '首页' : 'Home',
-                path: '/',
-              },
-              { name: locale === 'zh' ? '铭刻' : 'Imprint', path: '/imprint' },
-            ],
-            localeHref(APP_ORIGIN, '/', locale),
-          ),
-        ]}
-      />
-      <PublicDataRouteSeoSummary route="imprint" />
-      <Imprint />
-    </>
+    <PageMessages namespaces={['imprint']}>
+      <>
+        <JsonLd
+          data={[
+            webPageJsonLd({
+              name: imprint('seo.heading'),
+              description,
+              url: pageUrl,
+              inLanguage,
+            }),
+            breadcrumbJsonLd(
+              [
+                {
+                  name: locale === 'zh' ? '首页' : 'Home',
+                  path: '/',
+                },
+                { name: locale === 'zh' ? '铭刻' : 'Imprint', path: '/imprint' },
+              ],
+              localeHref(APP_ORIGIN, '/', locale),
+            ),
+          ]}
+        />
+        <PublicDataRouteSeoSummary route="imprint" />
+        <Imprint />
+      </>
+    </PageMessages>
   );
 }

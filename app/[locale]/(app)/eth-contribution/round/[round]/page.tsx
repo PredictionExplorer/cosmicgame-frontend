@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createMetadata } from '@/utils/seo';
+import { PageMessages } from '@/components/i18n/PageMessages';
 
 import EthDonationByRoundPage from './EthDonationByRoundPage';
 
@@ -32,5 +33,9 @@ export default async function Page({
 }) {
   const { locale, round } = await params;
   setRequestLocale(locale);
-  return <EthDonationByRoundPage round={Number(round)} />;
+  return (
+    <PageMessages namespaces={['ethContribution', 'marketing', 'tables']}>
+      <EthDonationByRoundPage round={Number(round)} />
+    </PageMessages>
+  );
 }

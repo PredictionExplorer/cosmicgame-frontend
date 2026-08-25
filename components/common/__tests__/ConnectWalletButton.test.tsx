@@ -27,8 +27,16 @@ jest.mock('../../../hooks/useMetaMaskWatchAsset', () => ({
   }),
 }));
 
-jest.mock('@rainbow-me/rainbowkit', () => ({
-  ConnectButton: () => <button type="button">Connect Wallet</button>,
+const mockRequestConnectModal = jest.fn();
+const mockWarmConnectModal = jest.fn();
+
+jest.mock('../../../contexts/WalletUiContext', () => ({
+  useWalletUi: () => ({
+    requestConnectModal: mockRequestConnectModal,
+    warmConnectModal: mockWarmConnectModal,
+  }),
+  // test-utils wraps every render with the real provider component name.
+  WalletUiProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 jest.mock('../../ui/dropdown-menu', () => ({
@@ -60,14 +68,30 @@ function renderWalletButton() {
 describe('ConnectWalletButton', () => {
   beforeEach(() => {
     mockAccount = ACCOUNT;
+    mockRequestConnectModal.mockClear();
+    mockWarmConnectModal.mockClear();
   });
 
-  it('renders the RainbowKit connect button when disconnected', () => {
+  it('renders the deferred connect trigger when disconnected', () => {
     mockAccount = null;
 
     renderWalletButton();
 
-    expect(screen.getByRole('button', { name: /connect wallet/i })).toBeInTheDocument();
+    expect(screen.getByTestId('connect-wallet-button')).toHaveTextContent('wallet.connect.button');
+  });
+
+  it('opens the lazy wallet modal on click and warms its chunk on hover', () => {
+    mockAccount = null;
+
+    renderWalletButton();
+    const trigger = screen.getByTestId('connect-wallet-button');
+
+    fireEvent.pointerEnter(trigger);
+    expect(mockWarmConnectModal).toHaveBeenCalledTimes(1);
+    expect(mockRequestConnectModal).not.toHaveBeenCalled();
+
+    fireEvent.click(trigger);
+    expect(mockRequestConnectModal).toHaveBeenCalledTimes(1);
   });
 
   it('links connected users to the CST transfer page', async () => {

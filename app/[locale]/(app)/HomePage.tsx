@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
 import { ArrowRight, Radio } from 'lucide-react';
 import type { CountdownRenderProps } from 'react-countdown';
-import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
@@ -49,28 +48,43 @@ import {
   useDonationsNFTByRound,
   useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
-import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/activationTime';
 import { getCycleState } from '@/lib/cycleState';
-import { isLandingHost } from '@/lib/hostRouting';
-import { LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO } from '@/lib/landingFlags';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
   simulateUxScenarioGesture,
   useUxScenarioSnapshot,
 } from '@/lib/uxCycleScenarios';
-import { RootLandingPage } from '@/components/landing/RootLandingPage';
-import type { DashboardInfo, GestureInfo } from '@/services/api';
+import type { CSTTokenInfo, DashboardInfo, GestureInfo } from '@/services/api';
 import { deriveLiveCstGestureData } from '@/utils/cstGesture';
 import { formatFixed } from '@/utils/format';
 
 const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
   ssr: false,
-  loading: () => <div className="py-20" aria-hidden />,
+  // Reserves roughly the section's final height (heading + divider + one
+  // card row) in the section's own background color, so the client-only
+  // mount grows the page smoothly instead of slamming the footer downward.
+  loading: () => <div className="min-h-[36rem] bg-[#101441] py-20" aria-hidden />,
 });
 
+// This page re-renders every second (useNow keeps countdown-derived CTA
+// state honest). These sections never consume the tick, so memo boundaries
+// stop the per-second reconciliation of the heaviest subtrees — the chat
+// feed alone renders dozens of rows — which directly reduces main-thread
+// churn (INP) on mid-range phones. Their props are kept referentially
+// stable below (useMemo'd arrays, useCallback handlers).
+const MemoHomeObservatoryHero = memo(HomeObservatoryHero);
+const MemoGestureMessageChat = memo(GestureMessageChat);
+const MemoSpecialAllocationRecipients = memo(SpecialAllocationRecipients);
+const MemoAllocation = memo(Allocation);
+const MemoPublicGoodsImpactCard = memo(PublicGoodsImpactCard);
+const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
+
+// Transform-only (no opacity ramp): several of these sections sit in the
+// first viewport, and fading in from server-rendered `opacity: 0` would gate
+// their paint — and potentially the page's LCP — on hydration.
 const sectionFade = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
+  hidden: { y: 20 },
+  visible: { y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
 type HomeTranslator = ReturnType<typeof useTranslations>;
@@ -142,14 +156,14 @@ function LatestGestureTicker({
 
 interface HomePageProps {
   initialDashboardData?: DashboardInfo | null;
-  initialHostname?: string | null;
+  /** Server-picked hero artwork so the LCP image URL ships in the SSR HTML. */
+  initialBannerToken?: { id: number; info: CSTTokenInfo } | null;
 }
 
-const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomePageProps) => {
+const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: HomePageProps) => {
   const t = useTranslations('home');
   const tToast = useTranslations('toasts');
   const locale = useLocale();
-  const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
   const { notify } = useNotify();
@@ -158,12 +172,6 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   const renderInlineCountdown = ({ total }: CountdownRenderProps) => (
     <span className="font-mono tabular-nums">{formatSeconds(Math.ceil(total / 1000), locale)}</span>
   );
-
-  const [hostname, setHostname] = useState<string | null>(initialHostname);
-
-  useEffect(() => {
-    setHostname(window.location.hostname);
-  }, []);
 
   const {
     data: dashboardData,
@@ -180,9 +188,11 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
 
   const data = dashboardData ?? null;
   const loading = dashboardLoading;
-  const curGestureList = bidListData ?? [];
-  const donatedNFTs = nftDonationsData ?? [];
-  const donatedERC20Tokens = erc20DonationsData ?? [];
+  // Stable fallbacks: a bare `?? []` would mint a new array identity every
+  // second (this page ticks via useNow) and defeat the memo boundaries.
+  const curGestureList = useMemo(() => bidListData ?? [], [bidListData]);
+  const donatedNFTs = useMemo(() => nftDonationsData ?? [], [nftDonationsData]);
+  const donatedERC20Tokens = useMemo(() => erc20DonationsData ?? [], [erc20DonationsData]);
 
   // Re-renders every second so countdown comparisons (allocationTime > now,
   // claimWait > now, activationTime check) update without bare Date.now().
@@ -197,20 +207,32 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
 
   const [gesturePulseKey, setGesturePulseKey] = useState(0);
   const imprintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
+  // The server picks the first artwork (initialBannerToken) so its priority
+  // image is discoverable in the prerendered HTML; the client rotation
+  // starts from that index and the seeded query below keeps the first
+  // client render byte-identical with the SSR output.
   const bannerTokenId = useRotatingIndex({
     count: imprintedTokenCount,
     intervalMs: 15_000,
     enabled: imprintedTokenCount > 1,
     randomStart: true,
+    initialIndex: initialBannerToken?.id ?? null,
   });
 
-  const { data: bannerCSTInfo } = useCSTInfo(bannerTokenId);
+  const { data: bannerCSTInfo } = useCSTInfo(
+    bannerTokenId,
+    bannerTokenId != null && bannerTokenId === initialBannerToken?.id
+      ? initialBannerToken.info
+      : undefined,
+  );
 
   const bannerToken = useMemo(() => {
     if (bannerTokenId != null && bannerCSTInfo)
       return { seed: `0x${bannerCSTInfo.Seed}`, id: bannerTokenId };
+    if (initialBannerToken?.info.Seed)
+      return { seed: `0x${initialBannerToken.info.Seed}`, id: initialBannerToken.id };
     return null;
-  }, [bannerTokenId, bannerCSTInfo]);
+  }, [bannerTokenId, bannerCSTInfo, initialBannerToken]);
 
   const gestureForm = useGestureForm();
   const allocationFinalize = useAllocationFinalize({ data, offset });
@@ -333,13 +355,20 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     if (await onFinalize()) withPostTxRefresh(1000, 3000);
   }, [onFinalize, withPostTxRefresh]);
 
+  // Deep link from the RandomWalk collection (?randomwalk=1&tokenId=N).
+  // Read via window.location in an effect, NOT the next/navigation
+  // search-params hook: on this statically generated route that hook forces
+  // a bailout to client-side rendering, which threw away the entire
+  // server-rendered HTML (the exact LCP/CLS regression the ISR work exists
+  // to prevent). Guarded by home-rendering-policy and the no-JS e2e.
   useEffect(() => {
-    if (searchParams?.get('randomwalk')) {
-      setRwlkId(Number(searchParams.get('tokenId')));
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('randomwalk')) {
+      setRwlkId(Number(params.get('tokenId')));
       setBidType('RandomWalk');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     const handleGesturePlaced = () => setGesturePulseKey((value) => value + 1);
@@ -403,18 +432,6 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
 
-  const landingHost = hostname !== null && isLandingHost(hostname);
-  if (hostname === null) {
-    return <div className="min-h-screen bg-background" />;
-  }
-  if (landingHost && dashboardLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
   // Without the dashboard read there is no cycle number, countdown, or
   // allocation pool — rendering the page would show an idle cycle that does
   // not exist, so say the read failed and offer a retry instead.
@@ -429,15 +446,6 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
         />
       </PageShell>
     );
-  }
-
-  const roundOk = !LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO || (dashboardData?.CurRoundNum ?? -1) === 0;
-  const launchMs = parseActivationMsFromDashboard(dashboardData ?? null);
-  const showPrelaunchLanding =
-    landingHost && roundOk && launchMs != null && launchMs > localClockUtcEpochMs();
-
-  if (showPrelaunchLanding && launchMs != null) {
-    return <RootLandingPage launchTimestampMs={launchMs} />;
   }
 
   return (
@@ -455,7 +463,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
             </span>
           </div>
         )}
-        <HomeObservatoryHero
+        <MemoHomeObservatoryHero
           data={data}
           bannerToken={bannerToken}
           canOpenGesturePanel={!loading && isRoundActive}
@@ -509,7 +517,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
               <div className="mt-8">
                 {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
                 <div className="min-w-0 print:col-auto">
-                  <SpecialAllocationRecipients
+                  <MemoSpecialAllocationRecipients
                     currentAccount={account}
                     latestMessage={curGestureList[0]?.Message ?? ''}
                     latestGesture={curGestureList[0] ?? null}
@@ -670,7 +678,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                 transition={{ delay: 0.4 }}
                 className="print-motion-visible"
               >
-                <Allocation data={data} />
+                <MemoAllocation data={data} />
               </m.div>
             )}
           </div>
@@ -689,7 +697,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
             data-testid="home-chat-column"
             className="min-w-0 space-y-6 xl:sticky xl:top-[var(--sticky-offset)] xl:z-10 xl:max-h-[calc(100vh-var(--sticky-offset)-1.5rem)] xl:overflow-y-auto xl:overscroll-contain xl:pr-1 print:static print:max-h-none print:overflow-visible print:pr-0"
           >
-            <GestureMessageChat
+            <MemoGestureMessageChat
               gestures={curGestureList}
               cycleNumber={round >= 0 ? round : undefined}
               pulseKey={gesturePulseKey}
@@ -734,7 +742,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                 transition={{ delay: 0.45 }}
                 className="print-motion-visible"
               >
-                <PublicGoodsImpactCard data={data} variant="rail" />
+                <MemoPublicGoodsImpactCard data={data} variant="rail" />
               </m.div>
             )}
 
@@ -748,7 +756,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                 transition={{ delay: 0.48 }}
                 className="print-motion-visible"
               >
-                <AttachedNFTAllocationShowcase
+                <MemoAttachedNFTAllocationShowcase
                   nfts={donatedNFTs}
                   erc20Tokens={donatedERC20Tokens}
                   cycleNumber={round >= 0 ? round : undefined}
