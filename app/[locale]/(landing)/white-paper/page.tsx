@@ -26,9 +26,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { metadata } = getWhitePaperContent(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
-  // English-only for v1.0: no `locale` option, so every locale variant
-  // canonicalizes to the English URL (see the progressive-activation note
-  // in utils/seo.ts).
   return createMetadata(
     t('whitePaper.title'),
     t('whitePaper.description'),
@@ -36,6 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     metadata.path,
     {
       canonicalHost: 'landing',
+      locale,
     },
   );
 }
@@ -153,6 +151,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const content = getWhitePaperContent(locale);
+  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
   const pageUrl = localeHref(LANDING_ORIGIN, content.metadata.path, locale);
   const pdfUrl = `${LANDING_ORIGIN}${content.hero.downloadHref}`;
 
@@ -162,7 +161,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
     headline: `${content.hero.title}: ${content.hero.subtitle}`,
     description: content.metadata.description,
     url: pageUrl,
-    inLanguage: 'en',
+    inLanguage,
     datePublished: WHITE_PAPER_DATE_ISO,
     version: WHITE_PAPER_VERSION,
     author: {
@@ -197,9 +196,9 @@ export default async function WhitePaperPage({ params }: PageProps) {
         ]}
       />
 
-      <nav aria-label="Breadcrumb" className="mb-8 text-sm text-white/60">
+      <nav aria-label={content.breadcrumbs.ariaLabel} className="mb-8 text-sm text-white/60">
         <Link href="/" className="hover:text-white">
-          Home
+          {content.breadcrumbs.homeLabel}
         </Link>
         <span className="mx-2">/</span>
         <span className="text-white/80">{content.breadcrumbLabel}</span>
@@ -226,11 +225,6 @@ export default async function WhitePaperPage({ params }: PageProps) {
         <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-white/45">
           {content.hero.versionLabel} · {content.hero.dateLabel}
         </p>
-        {locale === 'zh' ? (
-          <p className="mt-3 text-sm text-white/55" lang="zh-Hans">
-            {content.zhFallbackNotice}
-          </p>
-        ) : null}
         <div className="mt-7">
           <a
             href={content.hero.downloadHref}

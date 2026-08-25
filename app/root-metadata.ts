@@ -2,6 +2,12 @@ import type { Metadata, Viewport } from 'next';
 
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
 
+// Browsers cache favicons separately from normal HTTP cache entries and per
+// origin. Increment this value whenever either favicon asset is replaced.
+export const FAVICON_VERSION = '20260825';
+export const FAVICON_SVG_URL = `/favicon.svg?v=${FAVICON_VERSION}`;
+export const FAVICON_ICO_URL = `/favicon.ico?v=${FAVICON_VERSION}`;
+
 export interface RootMetadataCopy {
   defaultTitle: string;
   defaultOgTitle: string;
@@ -48,8 +54,8 @@ export function createRootMetadata(
     description: copy.defaultDescription,
     icons: {
       icon: [
-        { url: '/favicon.svg', type: 'image/svg+xml' },
-        { url: '/favicon.ico', sizes: 'any' },
+        { url: FAVICON_SVG_URL, type: 'image/svg+xml' },
+        { url: FAVICON_ICO_URL, sizes: 'any' },
       ],
     },
     verification: {

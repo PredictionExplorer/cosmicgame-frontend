@@ -1,17 +1,19 @@
 #!/usr/bin/env tsx
 /**
- * Generates the committed white paper PDF from the content module, so the
- * web page at /white-paper and the PDF can never drift apart.
+ * Generates the committed white paper PDFs from the content modules, so the
+ * web pages at /white-paper and the PDFs can never drift apart.
  *
- *   npm run white-paper:pdf
+ *   npm run white-paper:pdf              # both languages
+ *   npm run white-paper:pdf -- --locale zh
  *
- * Pipeline: content/white-paper/en.ts -> pandoc markdown -> tectonic
- * (XeLaTeX) -> public/white-paper/cosmic-signature-white-paper-v<x>.pdf
+ * Pipeline: content/white-paper/{en,zh}.ts -> pandoc markdown -> tectonic
+ * (XeLaTeX) -> public/white-paper/cosmic-signature-white-paper-v<x>[-zh].pdf
  *
  * Requires `pandoc` and `tectonic` on PATH (both available via Homebrew).
- * Rerun after any change to the content module, and bump
- * WHITE_PAPER_VERSION in content/white-paper/types.ts for substantive
- * revisions so older copies stay citable.
+ * The Chinese build additionally uses the macOS system CJK fonts Songti SC
+ * and PingFang SC through xeCJK. Rerun after any change to a content module,
+ * and bump WHITE_PAPER_VERSION in content/white-paper/types.ts for
+ * substantive revisions so older copies stay citable.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -23,16 +25,61 @@ import { whitePaperContentEn } from '../content/white-paper/en';
 import {
   WHITE_PAPER_DATE_DISPLAY,
   WHITE_PAPER_PDF_PATH,
-  WHITE_PAPER_VERSION,
+  WHITE_PAPER_PDF_PATH_ZH,
   type WhitePaperBlock,
+  type WhitePaperContent,
   type WhitePaperSection,
 } from '../content/white-paper/types';
+import { whitePaperContentZh } from '../content/white-paper/zh';
 
 const ROOT = resolve(process.cwd());
-const OUTPUT_PATH = join(ROOT, 'public', WHITE_PAPER_PDF_PATH);
+
+type PaperLocale = 'en' | 'zh';
+
+interface LocaleBuild {
+  content: WhitePaperContent;
+  outputPath: string;
+  dateDisplay: string;
+  tocTitle: string;
+  headerIncludes: readonly string[];
+}
+
+const BASE_HEADER_INCLUDES = [
+  '\\usepackage{microtype}',
+  '\\usepackage{etoolbox}',
+  '\\AtBeginEnvironment{longtable}{\\small}',
+  '\\setlength{\\emergencystretch}{3em}',
+  '\\usepackage{needspace}',
+  '\\pretocmd{\\section}{\\needspace{5\\baselineskip}}{}{}',
+] as const;
+
+const BUILDS: Record<PaperLocale, LocaleBuild> = {
+  en: {
+    content: whitePaperContentEn,
+    outputPath: join(ROOT, 'public', WHITE_PAPER_PDF_PATH),
+    dateDisplay: WHITE_PAPER_DATE_DISPLAY,
+    tocTitle: 'Contents',
+    headerIncludes: BASE_HEADER_INCLUDES,
+  },
+  zh: {
+    content: whitePaperContentZh,
+    outputPath: join(ROOT, 'public', WHITE_PAPER_PDF_PATH_ZH),
+    dateDisplay: '2026\u5e748\u6708',
+    tocTitle: '\u76ee\u5f55',
+    headerIncludes: [
+      ...BASE_HEADER_INCLUDES,
+      // macOS system CJK fonts; xeCJK owns CJK line breaking and punctuation.
+      '\\usepackage{xeCJK}',
+      '\\setCJKmainfont{Songti SC}',
+      '\\setCJKsansfont{PingFang SC}',
+      '\\setCJKmonofont{PingFang SC}',
+      '\\renewcommand{\\abstractname}{\u6458\u8981}',
+    ],
+  },
+};
 
 /**
- * The paper's prose intentionally contains no markdown syntax, so escaping
+ * The papers' prose intentionally contains no markdown syntax, so escaping
  * every special character is safe. Formulas and addresses are emitted as
  * code spans and skip this path.
  */
@@ -52,6 +99,16 @@ function renderCell(cell: string): string {
   return escapeMarkdown(cell);
 }
 
+/** CJK codepoints render two columns wide; padding must match display width. */
+function displayWidth(text: string): number {
+  let width = 0;
+  for (const char of text) {
+    const code = char.codePointAt(0) ?? 0;
+    width += code > 0x2e7f ? 2 : 1;
+  }
+  return width;
+}
+
 /**
  * Emits a pipe table. Cell padding makes the source columns proportional to
  * their content, which pandoc turns into sensible relative column widths in
@@ -61,10 +118,10 @@ function renderTable(block: Extract<WhitePaperBlock, { kind: 'table' }>): string
   const { columns, rows, footnote } = block.table;
   const rendered = [columns.map(escapeMarkdown), ...rows.map((row) => row.map(renderCell))];
   const widths = columns.map((_, columnIndex) =>
-    Math.max(...rendered.map((row) => row[columnIndex]?.length ?? 0)),
+    Math.max(...rendered.map((row) => displayWidth(row[columnIndex] ?? ''))),
   );
   const pad = (cell: string, columnIndex: number): string =>
-    cell.padEnd(widths[columnIndex] ?? cell.length, ' ');
+    cell + ' '.repeat(Math.max(0, (widths[columnIndex] ?? 0) - displayWidth(cell)));
 
   const lines: string[] = [];
   lines.push(`| ${rendered[0]!.map(pad).join(' | ')} |`);
@@ -128,15 +185,15 @@ function renderSection(section: WhitePaperSection): string {
   return parts.join('\n\n');
 }
 
-function buildMarkdown(): string {
-  const content = whitePaperContentEn;
+function buildMarkdown(build: LocaleBuild): string {
+  const { content } = build;
   const metadata = {
     title: content.hero.title,
     subtitle: content.hero.subtitle,
     author: `${content.hero.authorName} \\hspace{0.4em} \\texttt{\\small ${content.hero.authorEmail}}`,
-    date: `Version ${WHITE_PAPER_VERSION} \\textperiodcentered\\ ${WHITE_PAPER_DATE_DISPLAY}`,
+    date: `${content.hero.versionLabel} \\textperiodcentered\\ ${build.dateDisplay}`,
     abstract: content.abstract.paragraphs.join('\n\n'),
-    lang: 'en',
+    'toc-title': build.tocTitle,
     fontsize: '11pt',
     papersize: 'letter',
     geometry: 'margin=1.1in',
@@ -145,14 +202,7 @@ function buildMarkdown(): string {
     urlcolor: 'blue',
     toccolor: 'black',
     'link-citations': true,
-    'header-includes': [
-      '\\usepackage{microtype}',
-      '\\usepackage{etoolbox}',
-      '\\AtBeginEnvironment{longtable}{\\small}',
-      '\\setlength{\\emergencystretch}{3em}',
-      '\\usepackage{needspace}',
-      '\\pretocmd{\\section}{\\needspace{5\\baselineskip}}{}{}',
-    ],
+    'header-includes': build.headerIncludes,
   };
 
   const body: string[] = [];
@@ -179,12 +229,13 @@ function buildMarkdown(): string {
   return `${frontMatter}\n\n${body.join('\n\n')}\n`;
 }
 
-function main(): void {
-  const markdown = buildMarkdown();
-  const tempDir = mkdtempSync(join(tmpdir(), 'cosmic-white-paper-'));
+function generate(locale: PaperLocale): void {
+  const build = BUILDS[locale];
+  const markdown = buildMarkdown(build);
+  const tempDir = mkdtempSync(join(tmpdir(), `cosmic-white-paper-${locale}-`));
   const markdownPath = join(tempDir, 'white-paper.md');
   writeFileSync(markdownPath, markdown, 'utf8');
-  mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
+  mkdirSync(dirname(build.outputPath), { recursive: true });
 
   try {
     execFileSync(
@@ -194,7 +245,7 @@ function main(): void {
         '--from',
         'markdown+smart',
         '--output',
-        OUTPUT_PATH,
+        build.outputPath,
         '--pdf-engine',
         'tectonic',
         '--toc',
@@ -207,10 +258,20 @@ function main(): void {
     rmSync(tempDir, { recursive: true, force: true });
   }
 
-  const sizeKb = Math.round(statSync(OUTPUT_PATH).size / 1024);
+  const sizeKb = Math.round(statSync(build.outputPath).size / 1024);
   /* eslint-disable-next-line no-console -- CLI status output; this script
      runs via `npm run white-paper:pdf` and never ships to the browser. */
-  console.log(`\u2705  wrote ${OUTPUT_PATH} (${sizeKb} KB)`);
+  console.log(`\u2705  wrote ${build.outputPath} (${sizeKb} KB)`);
+}
+
+function main(): void {
+  const localeArgIndex = process.argv.indexOf('--locale');
+  const requested = localeArgIndex === -1 ? 'all' : (process.argv[localeArgIndex + 1] ?? 'all');
+  if (requested !== 'all' && requested !== 'en' && requested !== 'zh') {
+    throw new Error(`unknown --locale value: ${requested} (expected en, zh, or all)`);
+  }
+  const locales: PaperLocale[] = requested === 'all' ? ['en', 'zh'] : [requested];
+  for (const locale of locales) generate(locale);
 }
 
 main();

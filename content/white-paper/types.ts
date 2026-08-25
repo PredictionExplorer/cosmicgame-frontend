@@ -9,12 +9,15 @@ export const WHITE_PAPER_DATE_ISO = '2026-08-24';
 export const WHITE_PAPER_DATE_DISPLAY = 'August 2026';
 
 /**
- * The committed, versioned PDF artifact under `public/`. Regenerate with
- * `npm run white-paper:pdf` whenever the content module changes, and bump
+ * The committed, versioned PDF artifacts under `public/`. Regenerate with
+ * `npm run white-paper:pdf` whenever a content module changes, and bump
  * WHITE_PAPER_VERSION for substantive revisions.
  */
 export const WHITE_PAPER_PDF_PATH =
   `/white-paper/cosmic-signature-white-paper-v${WHITE_PAPER_VERSION}.pdf` as const;
+
+export const WHITE_PAPER_PDF_PATH_ZH =
+  `/white-paper/cosmic-signature-white-paper-v${WHITE_PAPER_VERSION}-zh.pdf` as const;
 
 export interface WhitePaperTable {
   readonly columns: readonly string[];
@@ -58,6 +61,10 @@ export interface WhitePaperContent {
     readonly path: typeof WHITE_PAPER_PATH;
   };
   readonly breadcrumbLabel: string;
+  readonly breadcrumbs: {
+    readonly ariaLabel: string;
+    readonly homeLabel: string;
+  };
   readonly hero: {
     readonly eyebrow: string;
     readonly title: string;
@@ -67,18 +74,13 @@ export interface WhitePaperContent {
     readonly versionLabel: string;
     readonly dateLabel: string;
     readonly downloadLabel: string;
-    readonly downloadHref: typeof WHITE_PAPER_PDF_PATH;
+    readonly downloadHref: typeof WHITE_PAPER_PDF_PATH | typeof WHITE_PAPER_PDF_PATH_ZH;
   };
   readonly abstract: {
     readonly heading: string;
     readonly paragraphs: readonly string[];
   };
   readonly tocHeading: string;
-  /**
-   * Shown on the /zh variant while the paper itself is English-only, so the
-   * localized page states its language plainly (and zh QA has stable copy).
-   */
-  readonly zhFallbackNotice: string;
   readonly sections: readonly WhitePaperSection[];
   readonly references: {
     readonly id: string;

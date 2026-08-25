@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next';
 
+import { FAVICON_SVG_URL } from './root-metadata';
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Cosmic Signature',
@@ -12,7 +14,7 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#0f1729',
     icons: [
       {
-        src: '/favicon.svg',
+        src: FAVICON_SVG_URL,
         sizes: 'any',
         type: 'image/svg+xml',
       },

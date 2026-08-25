@@ -18,6 +18,10 @@ export const whitePaperContentEn = {
     path: WHITE_PAPER_PATH,
   },
   breadcrumbLabel: 'White Paper',
+  breadcrumbs: {
+    ariaLabel: 'Breadcrumb',
+    homeLabel: 'Home',
+  },
   hero: {
     eyebrow: 'White paper',
     title: 'Cosmic Signature',
@@ -37,7 +41,6 @@ export const whitePaperContentEn = {
     ],
   },
   tocHeading: 'Contents',
-  zhFallbackNotice: '白皮书目前提供英文版。',
   sections: [
     {
       id: 'introduction',

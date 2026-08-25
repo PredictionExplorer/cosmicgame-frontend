@@ -151,14 +151,17 @@ describe('Root layout metadata (shared by both route groups)', () => {
     );
   });
 
-  it('declares both an SVG and an ICO favicon for cross-browser support', () => {
-    const icons = metadata.icons as { icon: Array<{ url: string; type?: string }> };
-    expect(icons.icon).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ url: '/favicon.svg', type: 'image/svg+xml' }),
-        expect.objectContaining({ url: '/favicon.ico' }),
-      ]),
-    );
+  it('declares the same cache-busted SVG and ICO favicons for both hosts', () => {
+    const icons = metadata.icons as {
+      icon: Array<{ url: string; type?: string; sizes?: string }>;
+    };
+    const landingIcons = landingMetadata.icons as typeof icons;
+
+    expect(landingIcons).toEqual(icons);
+    expect(icons.icon).toEqual([
+      { url: '/favicon.svg?v=20260825', type: 'image/svg+xml' },
+      { url: '/favicon.ico?v=20260825', sizes: 'any' },
+    ]);
   });
 
   it('declares the Google Search Console verification token', () => {

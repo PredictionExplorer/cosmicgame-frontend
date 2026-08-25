@@ -169,6 +169,15 @@ function extractDescription(html: string): string {
   return html.match(/<meta[^>]+name="description"[^>]+content="([^"]+)"/)?.[1] ?? '';
 }
 
+function extractIconHrefs(html: string): string[] {
+  return [...html.matchAll(/<link\b[^>]*>/gi)]
+    .map(([tag]) => {
+      if (!/\brel=["']icon["']/i.test(tag)) return undefined;
+      return tag.match(/\bhref=["']([^"']+)["']/i)?.[1];
+    })
+    .filter((href): href is string => href !== undefined);
+}
+
 function extractOgImageUrl(html: string): string {
   const value =
     html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/)?.[1] ??
@@ -300,6 +309,42 @@ test.describe('raw HTML SEO', () => {
     expect(image.status()).toBe(200);
     expect(image.headers()['content-type']).toContain('image/png');
     expect((await image.body()).byteLength).toBeGreaterThan(10_000);
+  });
+
+  test('both hosts emit and serve the same versioned favicon assets', async ({ request }) => {
+    const expectedHrefs = ['/favicon.svg?v=20260825', '/favicon.ico?v=20260825'];
+    let baselineAssets: Buffer[] | undefined;
+
+    for (const host of [APP_HOST, LANDING_HOST]) {
+      const page = await request.get('/', { headers: hostHeaders(host) });
+      expect(page.status()).toBe(200);
+      expect(extractIconHrefs(await page.text())).toEqual(expectedHrefs);
+
+      const assets = await Promise.all(
+        expectedHrefs.map(async (href) => {
+          const response = await request.get(href, {
+            headers: hostHeaders(host),
+            maxRedirects: 0,
+          });
+          expect(response.status(), `${host}${href} must render directly`).toBe(200);
+          const contentType = response.headers()['content-type'] ?? '';
+          if (href.includes('.svg')) {
+            expect(contentType).toContain('image/svg+xml');
+          } else {
+            expect(contentType).toMatch(/^image\/(?:vnd\.microsoft\.icon|x-icon)/);
+          }
+          return response.body();
+        }),
+      );
+
+      if (baselineAssets === undefined) {
+        baselineAssets = assets;
+      } else {
+        assets.forEach((asset, index) => {
+          expect(asset.equals(baselineAssets?.[index] ?? Buffer.alloc(0))).toBe(true);
+        });
+      }
+    }
   });
 
   test('root metadata keeps canonicals and Open Graph images on the serving host', async ({

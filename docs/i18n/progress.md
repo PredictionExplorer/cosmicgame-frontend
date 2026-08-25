@@ -221,6 +221,13 @@ Implementation notes / deviations:
   through its §6 change process.
 - QA exposed and fixed a locale-root rewrite bug that served the dApp at the landing host's
   `/zh`; proxy tests now assert Chinese landing copy, not only `lang=\"zh\"`.
+- **Post-sprint addition (2026-08-25):** the `/white-paper` landing page shipped after this
+  sprint (English first, 2026-08-24) and is now fully translated. `content/white-paper/zh.ts`
+  follows the same typed en/zh module pattern; the route emits localized canonicals and
+  hreflang; denial and tax-disclaimer copy sit inside `lexicon-allow` pragmas; and a natively
+  typeset Chinese PDF (`cosmic-signature-white-paper-v1.0-zh.pdf`, xeCJK with Songti SC)
+  accompanies the English one. R records agent bilingual-accuracy and blind-fluency passes,
+  consistent with this sprint's convention.
 
 ## Sprint 3 — Core dApp
 
