@@ -79,7 +79,7 @@
   },
   "audits": {
     "title": "Cosmic Signature Audits | Verification and Contract Review",
-    "description": "Review Cosmic Signature audit status, formal verification context, smart contract review notes, and source-code verification resources."
+    "description": "The Cosmic Signature smart contracts were independently audited by Hacken. Review the report, formal verification context, and source-code verification resources."
   },
   "code": {
     "title": "Cosmic Signature Source Code | CC0 On-Chain Art Protocol",

@@ -362,7 +362,7 @@ export const faqContentZh = {
           id: 'game-security',
           question: '协议如何保障安全？',
           answer:
-            'Cosmic Signature 公开合约地址、源代码资源与验证背景，便于社区独立检查协议行为。正式审计报告与验证说明发布或更新后，应以"审计"页面所列内容为准。',
+            'Cosmic Signature 公开合约地址、源代码资源与验证背景，便于社区独立检查协议行为。智能合约已由独立安全机构 Hacken 完成审计，完整报告见"审计"页面。',
         },
         {
           id: 'fees-involved',

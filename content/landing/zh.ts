@@ -361,6 +361,7 @@ export const landingContentZh = {
           { label: '文档', href: `${APP_ORIGIN}/how-it-works` },
           { label: '合约', href: `${APP_ORIGIN}/contracts` },
           { label: '源代码', href: `${APP_ORIGIN}/code` },
+          { label: '安全审计', href: `${APP_ORIGIN}/audits` },
         ],
       },
       {

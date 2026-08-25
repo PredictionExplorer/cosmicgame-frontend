@@ -29,7 +29,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - **Contracts** (https://app.cosmicsignature.com/contracts): Smart contract addresses, ABIs, and fund distribution breakdown
 - **Source Code** (https://app.cosmicsignature.com/code): Source code and verification resources
 - **Security** (https://app.cosmicsignature.com/security): Security model, verification resources, and participant safety notes
-- **Audits** (https://app.cosmicsignature.com/audits): Audit status and formal verification context
+- **Audits** (https://app.cosmicsignature.com/audits): Hacken audit report and formal verification context
 - **Risk Disclosures** (https://app.cosmicsignature.com/risk-disclosures): Non-investment language, blockchain risks, and participant clarity
 - **Outreach** (https://app.cosmicsignature.com/marketing): Outreach Allocation program for community contributors
 - **Imprint** (https://app.cosmicsignature.com/imprint): Interface for imprinting new tokens
@@ -177,7 +177,7 @@ Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreac
 - The protocol contract is upgradeable (UUPS) by the owner, but only between cycles; the deployed implementation is publicly verified
 - Once the protocol is stable, ownership is intended to transfer to the Cosmic Council; the team may ultimately renounce ownership entirely via renounceOwnership()
 - After renunciation, no owner remains and parameters can no longer be changed or upgraded
-- All smart contracts are open-source and exact-match verified on-chain; audit and formal-verification status is published at https://app.cosmicsignature.com/audits
+- All smart contracts are open-source and exact-match verified on-chain; the contracts were independently audited by Hacken, and the report and formal-verification status are published at https://app.cosmicsignature.com/audits
 - No team wallet receives ETH from participant gestures — all reserves flow through the public smart contracts under the published allocation rules
 - If the team disappears, the protocol is self-sustaining (seeds on-chain, code open-source)
 
@@ -351,7 +351,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 - 核心协议参数只能在下一周期尚未启用时调整；周期启用时点、周期间隔及部分外围配置有各自限制
 - 协议合约采用 UUPS 升级方式，但只能在周期间调整；当前实现可在链上逐字节验证
 - 所有参与者 ETH 都依照公开合约规则在协议内流转，没有团队钱包直接接收落笔 ETH
-- 审计与形式化验证状态发布于 https://app.cosmicsignature.com/zh/audits
+- 合约已由 Hacken 完成独立审计，报告与形式化验证状态发布于 https://app.cosmicsignature.com/zh/audits
 - 长期目标是将所有权移交宇宙议会，并最终彻底放弃所有权；届时参数与实现均不再可改
 - 即使团队停止维护，链上种子与开放源代码仍允许任何人复现 NFT 作品
 

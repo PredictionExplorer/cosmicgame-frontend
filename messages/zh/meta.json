@@ -168,7 +168,7 @@
   },
   "audits": {
     "title": "Cosmic Signature 审计 · 验证与合约审查",
-    "description": "查看 Cosmic Signature 审计状态、形式化验证背景、智能合约审查说明与源代码验证资源。"
+    "description": "Cosmic Signature 智能合约已由 Hacken 完成独立审计。查看审计报告、形式化验证背景与源代码验证资源。"
   },
   "code": {
     "title": "Cosmic Signature 源代码 · CC0 链上艺术协议",

@@ -24,7 +24,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - [Contracts](https://app.cosmicsignature.com/contracts): Smart contract details and addresses
 - [Source Code](https://app.cosmicsignature.com/code): Source code and verification resources
 - [Security](https://app.cosmicsignature.com/security): Security model, verification resources, and participant safety notes
-- [Audits](https://app.cosmicsignature.com/audits): Audit status and formal verification context
+- [Audits](https://app.cosmicsignature.com/audits): Hacken audit report and formal verification context
 - [Risk Disclosures](https://app.cosmicsignature.com/risk-disclosures): Non-investment language, blockchain risks, and participant clarity
 - [Outreach](https://app.cosmicsignature.com/marketing): Outreach allocation program
 - [Imprint](https://app.cosmicsignature.com/imprint): Imprint new tokens
@@ -72,7 +72,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 ## Technical
 
 - Blockchain: Arbitrum (Ethereum Layer 2)
-- Smart contracts: Open-source Solidity contracts, exact-match verified on-chain; owner-controlled parameters until ownership moves under Cosmic Council control (audit and formal-verification status: https://app.cosmicsignature.com/audits)
+- Smart contracts: Open-source Solidity contracts, exact-match verified on-chain; owner-controlled parameters until ownership moves under Cosmic Council control (independently audited by Hacken; report and formal-verification status: https://app.cosmicsignature.com/audits)
 - NFT art: Generated from on-chain seeds using an open-source Rust program
 - Frontend: Next.js, React, TypeScript
 
@@ -99,7 +99,7 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 - [锚定](https://app.cosmicsignature.com/zh/anchoring)：锚定规则与派发记录
 - [合约](https://app.cosmicsignature.com/zh/contracts)：已部署合约地址
 - [安全](https://app.cosmicsignature.com/zh/security)：验证资源与参与安全说明
-- [审计](https://app.cosmicsignature.com/zh/audits)：审计状态与形式化验证背景
+- [审计](https://app.cosmicsignature.com/zh/audits)：Hacken 审计报告与形式化验证背景
 - [风险披露](https://app.cosmicsignature.com/zh/risk-disclosures)：区块链、钱包与协议参与风险
 
 ### 协议要点

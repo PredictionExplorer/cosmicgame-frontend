@@ -132,6 +132,12 @@ describe('Footer', () => {
     }
   });
 
+  it('renders the security audit link', () => {
+    const auditsLink = screen.getByRole('link', { name: 'footer.links.audits' });
+    expect(auditsLink).toBeInTheDocument();
+    expect(auditsLink).toHaveAttribute('href', '/audits');
+  });
+
   it('renders the site map link', () => {
     const siteMapLink = screen.getByText('footer.links.siteMap');
     expect(siteMapLink).toBeInTheDocument();

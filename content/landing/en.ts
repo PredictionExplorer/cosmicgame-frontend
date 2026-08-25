@@ -359,6 +359,7 @@ export const landingContentEn = {
           { label: 'Documentation', href: `${APP_ORIGIN}/how-it-works` },
           { label: 'Contracts', href: `${APP_ORIGIN}/contracts` },
           { label: 'Source Code', href: `${APP_ORIGIN}/code` },
+          { label: 'Security Audit', href: `${APP_ORIGIN}/audits` },
         ],
       },
       {

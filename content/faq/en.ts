@@ -362,7 +362,7 @@ export const faqContentEn = {
           id: 'game-security',
           question: 'How is the protocol’s security ensured?',
           answer:
-            'Cosmic Signature publishes contract addresses, source-code resources, and verification context so the community can inspect behavior independently. Formal audit reports and verification notes should be read from the Audits page as they are published or updated.',
+            'Cosmic Signature publishes contract addresses, source-code resources, and verification context so the community can inspect behavior independently. The smart contracts were audited by Hacken, an independent security firm, and the full report is linked from the Audits page.',
         },
         {
           id: 'fees-involved',

@@ -11,13 +11,32 @@ export function AuditsContentZh() {
       </p>
 
       <section className="mt-12 space-y-5">
-        <h2 className="text-2xl font-semibold">审查状态</h2>
+        <h2 className="text-2xl font-semibold">Hacken 独立审计</h2>
         <p className="text-muted-foreground">
-          合约页面列出了公开的 Arbitrum
-          部署与验证背景。审计报告、形式化验证说明及源代码引用发布或更新后，均应从本页面提供链接。
+          2025年末，Hacken 对 Cosmic Signature
+          智能合约进行了独立安全审查。审查范围覆盖公开仓库中的全部生产合约：驱动每个周期的核心协议、CST
+          代币、两个 NFT 系列、锚定钱包，以及配套的钱包与系统管理合约。最终报告于2026年1月发布。
+        </p>
+        <p className="text-muted-foreground">
+          报告共列出 23 项发现，其中没有严重或高危级别问题：3 项为中危、8 项为低危、12
+          项为提示性观察。多数发现属于团队已审阅并接受的设计取舍，报告对每项发现及其处理状态均有说明。
+        </p>
+        <p className="text-muted-foreground">
+          除人工审查外，Hacken 还对 14 项系统不变量进行了模糊测试，例如协议持有的 ETH
+          总额必须等于存入减去取回。全部 14 项不变量在 10,000 次运行中均保持成立。
+        </p>
+        <p>
+          <a
+            href="https://hacken.io/audits/cosmic-signature/sca-cosmic-signature-cosmicsignature-contracts-oct2025/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline-offset-4 hover:underline"
+          >
+            阅读 Hacken 审计报告全文
+          </a>
         </p>
         <p className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-sm text-muted-foreground">
-          最后审查：2026年5月31日。本页面是 Cosmic Signature 审计与验证状态的规范公开位置。
+          最后审查：2026年8月24日。本页面是 Cosmic Signature 审计与验证状态的规范公开位置。
         </p>
       </section>
 
@@ -26,7 +45,7 @@ export function AuditsContentZh() {
         <ul className="list-disc space-y-2 pl-5 text-muted-foreground">
           <li>在官方合约页面确认合约地址。</li>
           <li>在 Arbitrum 区块浏览器中比对已验证源代码与 ABI 数据。</li>
-          <li>发布后审阅形式化验证说明与审计摘要。</li>
+          <li>阅读 Hacken 审计报告，了解全部发现及其处理状态。</li>
           <li>确认应用所展示的机制与公开合约行为一致。</li>
         </ul>
       </section>
