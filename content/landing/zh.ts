@@ -358,6 +358,7 @@ export const landingContentZh = {
           { label: '打开应用', href: APP_ORIGIN },
           { label: '关于', href: '/about' },
           { label: '学习', href: '/learn' },
+          { label: '知识测验', href: '/quiz' },
           { label: '文档', href: `${APP_ORIGIN}/how-it-works` },
           { label: '合约', href: `${APP_ORIGIN}/contracts` },
           { label: '源代码', href: `${APP_ORIGIN}/code` },

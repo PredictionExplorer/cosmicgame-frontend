@@ -5,6 +5,7 @@ import { faqContentEn, faqContentZh, getAllFaqItems } from '@/content/faq';
 import { landingContentEn, landingContentZh } from '@/content/landing';
 import { learnContentEn, learnContentZh } from '@/content/learn';
 import { protocolFacts } from '@/content/protocol-facts';
+import { quizContentEn, quizContentZh } from '@/content/quiz';
 
 /**
  * Cross-copy numeric drift guard.
@@ -51,6 +52,8 @@ const sources: CopySource[] = [
   { name: 'landing-zh', text: JSON.stringify(landingContentZh) },
   { name: 'learn-en', text: JSON.stringify(learnContentEn.articles) },
   { name: 'learn-zh', text: JSON.stringify(learnContentZh.articles) },
+  { name: 'quiz-en', text: JSON.stringify(quizContentEn) },
+  { name: 'quiz-zh', text: JSON.stringify(quizContentZh) },
   { name: 'messages-en', text: readMessageCatalogs('en') },
   { name: 'messages-zh', text: readMessageCatalogs('zh') },
   { name: 'llms.txt', text: readPublicFile('llms.txt') },

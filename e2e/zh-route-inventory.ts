@@ -112,6 +112,24 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     cluster: 'landing',
     expectedText: 'Arbitrum 上的程序化链上艺术协议',
   },
+  {
+    id: 'quiz-hub',
+    pageFile: '(landing)/quiz/page.tsx',
+    publicPath: '/quiz',
+    fixturePath: '/quiz',
+    host: 'landing',
+    cluster: 'landing',
+    expectedText: '你对 Cosmic Signature 了解多少？',
+  },
+  {
+    id: 'quiz-tier',
+    pageFile: '(landing)/quiz/[tier]/page.tsx',
+    publicPath: '/quiz/[tier]',
+    fixturePath: '/quiz/basic',
+    host: 'landing',
+    cluster: 'landing',
+    expectedText: '二十五道基础题',
+  },
 
   // Sprint 3 — core dApp journey.
   {

@@ -242,6 +242,24 @@
     "title": "Cosmic Signature White Paper | A Procedural On-Chain Art Protocol",
     "description": "The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization."
   },
+  "quiz": {
+    "title": "Cosmic Signature Quiz | Test Your Protocol Knowledge",
+    "description": "One hundred questions across three tiers, drawn from the Cosmic Signature white paper: Performance Cycles, gestures, allocations, the art pipeline, and the edge cases only careful readers catch.",
+    "tiers": {
+      "basic": {
+        "title": "Basic Quiz | Cosmic Signature",
+        "description": "Twenty-five questions on Cosmic Signature fundamentals: gestures, Performance Cycles, allocation tracks, and the deterministic three-body art."
+      },
+      "medium": {
+        "title": "Medium Quiz | Cosmic Signature",
+        "description": "Twenty-five questions on the live mechanics of Cosmic Signature: Calibration Windows, the CST feedback loop, persistence tracks, and Cosmic Council rules."
+      },
+      "hard": {
+        "title": "Hard Quiz | Cosmic Signature",
+        "description": "Fifty questions on Cosmic Signature edge cases and design forensics: post-expiry semantics, defensive design, upgrade history, and the art pipeline."
+      }
+    }
+  },
   "howItWorks": {
     "title": "How Cosmic Signature Works | Performance Cycles, Gestures, and NFTs",
     "description": "Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution."

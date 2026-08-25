@@ -242,6 +242,24 @@
     "title": "Cosmic Signature 白皮书 · 程序化链上艺术协议",
     "description": "阅读 Cosmic Signature 白皮书：演绎周期、落笔、分配轨道、确定性三体 NFT 艺术、CST、锚定、宇宙议会、协议升级与全面去中心化路线。"
   },
+  "quiz": {
+    "title": "Cosmic Signature 知识测验 · 检验你的协议理解",
+    "description": "一百道题，三个层级，全部出自 Cosmic Signature 白皮书：演绎周期、落笔、分配、渲染管线，以及只有细心读者才会注意到的边界情形。",
+    "tiers": {
+      "basic": {
+        "title": "基础知识测验 · Cosmic Signature",
+        "description": "二十五道基础题：落笔、演绎周期、分配轨道，以及确定性的三体艺术。"
+      },
+      "medium": {
+        "title": "进阶知识测验 · Cosmic Signature",
+        "description": "二十五道进阶题：校准窗口、CST 反馈回路、坚守轨道与宇宙议会规则。"
+      },
+      "hard": {
+        "title": "高阶知识测验 · Cosmic Signature",
+        "description": "五十道高阶题：到期后的语义、防御式设计、升级历史与渲染管线。"
+      }
+    }
+  },
   "howItWorks": {
     "title": "Cosmic Signature 运作原理 · 演绎周期、落笔与 NFT",
     "description": "了解 Cosmic Signature 演绎周期如何展开：从校准窗口到一次次落笔，再到收官后的分配发放。"

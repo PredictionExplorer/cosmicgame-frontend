@@ -70,6 +70,30 @@ const landingStaticRoutes: SeoRoute[] = [
     changeFrequency: 'monthly',
     priority: 0.8,
   },
+  {
+    path: '/quiz',
+    host: 'landing',
+    kind: 'content',
+    index: true,
+    includeInSitemap: true,
+    hasServerVisibleContent: true,
+    lastModified: '2026-08-25',
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  },
+  ...['basic', 'medium', 'hard'].map(
+    (tier): SeoRoute => ({
+      path: `/quiz/${tier}`,
+      host: 'landing',
+      kind: 'content',
+      index: true,
+      includeInSitemap: true,
+      hasServerVisibleContent: true,
+      lastModified: '2026-08-25',
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    }),
+  ),
 ];
 
 const learnRoutes: SeoRoute[] = learnContentEn.articles.map((article) => ({

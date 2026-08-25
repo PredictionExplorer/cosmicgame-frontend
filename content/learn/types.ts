@@ -32,6 +32,13 @@ export interface LearnHubContent {
     readonly homeLabel: string;
     readonly learnLabel: string;
   };
+  /** Cross-link to the knowledge quiz, rendered after the article grid. */
+  readonly quizCta: {
+    readonly heading: string;
+    readonly body: string;
+    readonly linkLabel: string;
+    readonly href: string;
+  };
 }
 
 export interface LearnArticleUi {

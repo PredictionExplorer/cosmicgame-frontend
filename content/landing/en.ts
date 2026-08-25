@@ -356,6 +356,7 @@ export const landingContentEn = {
           { label: 'Open the App', href: APP_ORIGIN },
           { label: 'About', href: '/about' },
           { label: 'Learn', href: '/learn' },
+          { label: 'Quiz', href: '/quiz' },
           { label: 'Documentation', href: `${APP_ORIGIN}/how-it-works` },
           { label: 'Contracts', href: `${APP_ORIGIN}/contracts` },
           { label: 'Source Code', href: `${APP_ORIGIN}/code` },

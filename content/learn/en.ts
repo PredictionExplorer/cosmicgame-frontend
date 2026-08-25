@@ -558,6 +558,12 @@ export const learnContentEn = {
       homeLabel: 'Cosmic Signature',
       learnLabel: 'Learn',
     },
+    quizCta: {
+      heading: 'Think you know the protocol?',
+      body: 'One hundred questions in three tiers, drawn from the white paper. Every answer explains the rule behind it and points to the section that settles it.',
+      linkLabel: 'Take the quiz',
+      href: '/quiz',
+    },
   },
   articleUi: {
     eyebrow: 'Cosmic Signature Learn',

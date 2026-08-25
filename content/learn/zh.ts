@@ -532,6 +532,12 @@ export const learnContentZh = {
       homeLabel: 'Cosmic Signature',
       learnLabel: '学习中心',
     },
+    quizCta: {
+      heading: '自认已经读懂协议了？',
+      body: '一百道题，三个层级，全部出自白皮书。每道题都讲清背后的规则，并指向一锤定音的原文章节。',
+      linkLabel: '开始知识测验',
+      href: '/quiz',
+    },
   },
   articleUi: {
     eyebrow: 'Cosmic Signature 学习中心',

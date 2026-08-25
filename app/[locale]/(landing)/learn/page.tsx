@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ArrowRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getLearnContent } from '@/content/learn';
@@ -57,6 +58,18 @@ export default async function LearnIndexPage({ params }: PageProps) {
           </Link>
         ))}
       </div>
+
+      <aside className="mt-14 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+        <h2 className="text-xl font-semibold tracking-tight text-white">{hub.quizCta.heading}</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-white/68">{hub.quizCta.body}</p>
+        <Link
+          href={hub.quizCta.href}
+          className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
+        >
+          {hub.quizCta.linkLabel}
+          <ArrowRight aria-hidden className="h-4 w-4" />
+        </Link>
+      </aside>
     </main>
   );
 }
