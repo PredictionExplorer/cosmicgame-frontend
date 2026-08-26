@@ -467,6 +467,38 @@
       "cta": "落笔"
     }
   },
+  "deck": {
+    "title": "Cosmic Signature 观测台",
+    "intro": "一个实时进行的演绎周期：每一次落笔都会延长时钟、塑造最终签名，并排入各条分配轨道的候选之列。",
+    "newHere": "初来乍到？了解运作方式",
+    "monument": {
+      "reserveLabel": "签名分配",
+      "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附着资产",
+      "youChip": "你",
+      "fullConsole": "打开完整落笔控制台",
+      "chooseRwlkToken": "请在下方完整控制台中选择你的 RandomWalk 代币",
+      "microcopy": "每一次落笔都会延长收官时钟、铭刻参与 CST，并计入一份星选资格。"
+    },
+    "board": {
+      "title": "分配轨道",
+      "subtitle": "本周期收官时发放的全部内容",
+      "tooltip": "当前演绎周期各条分配轨道的实时一览：金额、当前持有者与现存纪录。",
+      "cstPlusNft": "1,000 CST + NFT",
+      "awaitingGesture": "等待第一笔",
+      "awaitingRecord": "暂无纪录",
+      "stellarStatus": "每一次落笔都是一份星选资格",
+      "fullBreakdown": "查看完整分配明细"
+    },
+    "composer": {
+      "title": "以落笔发声",
+      "subtitle": "留言与你的落笔一同上链",
+      "placeholder": "写一条可选的链上留言……",
+      "note": "发送即在 Arbitrum 上真实落笔——留言随之上链，并显示在落笔留言板中。",
+      "connectBody": "连接钱包即可落笔，并在落笔留言板中留言。",
+      "rwlkChip": "RWLK #{id}",
+      "rwlkChoose": "RWLK：选择代币"
+    }
+  },
   "cycleDetails": {
     "title": "查看完整周期详情",
     "subtitle": "落笔历史、排行、贡献与分配发放"

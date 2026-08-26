@@ -75,26 +75,62 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(tradeLink).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
   });
 
-  test('shows the Chrono Core timer at the top of the game page', async ({ page }) => {
-    const chronoCore = page.getByTestId('chrono-core-timer');
-    await expect(chronoCore).toBeVisible({ timeout: 15000 });
+  test('leads with the Deck header and its stable H1', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'The Cosmic Signature Observatory' }),
+    ).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('home-deck-layout')).toBeVisible();
+    const board = page.getByTestId('allocation-tracks-board');
+    await ensureVisible(board);
+    await expect(board).toBeVisible();
+    await expect(board.getByText('Allocation Tracks')).toBeVisible();
+  });
+
+  test('shows the cycle monument at the heart of the Deck', async ({ page }) => {
+    const monument = page.getByTestId('cycle-monument');
+    await expect(monument).toBeVisible({ timeout: 15000 });
     // .first(): in the waiting-first-gesture phase the badge and the status
     // line both carry the phase copy, which is legitimate.
     await expect(
-      chronoCore
+      monument
         .getByText(
           /Next cycle opens in|Cycle is open|Cycle finalizes in|Final hour|Final 10 minutes|Final minute|Cycle ready to finalize/,
         )
         .first(),
     ).toBeVisible();
     await expect(
-      chronoCore
+      monument
         .getByText(
           /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|Cycle is live|less than one hour|Final minutes|Final minute|Finalization is ready/i,
         )
         .first(),
     ).toBeVisible();
-    await expect(chronoCore.getByRole('timer')).toBeVisible();
+    await expect(monument.getByRole('timer')).toBeVisible();
+  });
+
+  test('docks the gesture composer above the chat feed while the cycle is active', async ({
+    page,
+  }) => {
+    const monument = page.getByTestId('cycle-monument');
+    await expect(monument).toBeVisible({ timeout: 15000 });
+    const phase = await monument.getAttribute('data-phase');
+    test.skip(
+      phase === 'opening-soon' || phase === 'loading' || phase === 'unavailable',
+      'composer is legitimately hidden while no cycle is active',
+    );
+
+    const composer = page.locator('[data-testid="gesture-composer"]:visible').first();
+    await ensureVisible(composer);
+    await expect(composer).toBeVisible();
+    // Disconnected visitors get the connect prompt inside the composer.
+    await expect(composer.getByText(/Connect a wallet to make a Gesture/i)).toBeVisible();
+
+    const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
+    const composerBox = await composer.boundingBox();
+    const chatBox = await chat.boundingBox();
+    expect(composerBox).not.toBeNull();
+    expect(chatBox).not.toBeNull();
+    expect(composerBox!.y + composerBox!.height).toBeLessThanOrEqual(chatBox!.y + 2);
   });
 
   test('shows gesture cost', async ({ page }) => {

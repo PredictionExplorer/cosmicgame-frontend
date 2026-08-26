@@ -260,28 +260,38 @@ test.describe('home gesture chat', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
-    const primaryColumn = page.locator('[data-testid="home-primary-column"]:visible').first();
+    const composer = page.locator('[data-testid="gesture-composer"]:visible').first();
+    const monument = page.locator('[data-testid="cycle-monument"]:visible').first();
     const cycleDetails = page.locator('[data-testid="cycle-details-link-card"]:visible').first();
     const publicGoods = page.locator('[data-testid="public-goods-impact-card"]:visible').first();
     await expect(chat.getByText('Cycle #7 · 2 messages')).toBeVisible();
     await expect(chat).toBeVisible();
+    await expect(composer).toBeVisible();
     await expect(cycleDetails).toBeVisible();
     await expect(publicGoods).toBeVisible();
 
     const viewport = page.viewportSize();
-    const primaryBox = await primaryColumn.boundingBox();
+    const monumentBox = await monument.boundingBox();
+    const composerBox = await composer.boundingBox();
     const cycleDetailsBox = await cycleDetails.boundingBox();
     const publicGoodsBox = await publicGoods.boundingBox();
     const box = await chat.boundingBox();
     expect(viewport).not.toBeNull();
-    expect(primaryBox).not.toBeNull();
+    expect(monumentBox).not.toBeNull();
+    expect(composerBox).not.toBeNull();
     expect(box).not.toBeNull();
     expect(cycleDetailsBox).not.toBeNull();
     expect(publicGoodsBox).not.toBeNull();
 
+    // The composer docks directly above the feed in the same Deck column.
+    expect(composerBox!.y + composerBox!.height).toBeLessThanOrEqual(box!.y + 2);
+    expect(Math.abs(composerBox!.x - box!.x)).toBeLessThanOrEqual(2);
+
     if (testInfo.project.name !== 'Desktop Chrome') {
       expect(box!.width).toBeLessThanOrEqual(viewport!.width);
       expect(box!.x).toBeGreaterThanOrEqual(0);
+      // Mobile stacks monument first, then composer + chat.
+      expect(monumentBox!.y + monumentBox!.height).toBeLessThanOrEqual(composerBox!.y + 2);
       expect(cycleDetailsBox!.y).toBeGreaterThan(box!.y + box!.height);
       expect(publicGoodsBox!.y).toBeGreaterThan(cycleDetailsBox!.y + cycleDetailsBox!.height);
 
@@ -296,15 +306,15 @@ test.describe('home gesture chat', () => {
       return;
     }
 
+    // Desktop Deck: chat column on the right flank, monument to its left.
     expect(box!.x).toBeGreaterThan(viewport!.width / 2);
-    expect(box!.width).toBeGreaterThan(500);
-    expect(primaryBox!.x + primaryBox!.width).toBeLessThanOrEqual(box!.x);
+    expect(box!.width).toBeGreaterThan(320);
+    expect(monumentBox!.x + monumentBox!.width).toBeLessThanOrEqual(box!.x + 2);
+    // Companion cards live in the console rail below the Deck, aligned with
+    // each other (their column widths differ from the Deck's chat column).
     expect(cycleDetailsBox!.y).toBeGreaterThan(box!.y + box!.height);
     expect(publicGoodsBox!.y).toBeGreaterThan(cycleDetailsBox!.y + cycleDetailsBox!.height);
-    expect(Math.abs(cycleDetailsBox!.x - box!.x)).toBeLessThanOrEqual(2);
-    expect(Math.abs(publicGoodsBox!.x - box!.x)).toBeLessThanOrEqual(2);
-    expect(Math.abs(cycleDetailsBox!.width - box!.width)).toBeLessThanOrEqual(2);
-    expect(Math.abs(publicGoodsBox!.width - box!.width)).toBeLessThanOrEqual(2);
-    expect(primaryBox!.x + primaryBox!.width).toBeLessThanOrEqual(publicGoodsBox!.x);
+    expect(Math.abs(cycleDetailsBox!.x - publicGoodsBox!.x)).toBeLessThanOrEqual(2);
+    expect(Math.abs(cycleDetailsBox!.width - publicGoodsBox!.width)).toBeLessThanOrEqual(2);
   });
 });

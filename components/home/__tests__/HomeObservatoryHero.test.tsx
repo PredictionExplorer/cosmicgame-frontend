@@ -171,6 +171,22 @@ describe('HomeObservatoryHero', () => {
     ).toHaveAttribute('href', '/allocation/4');
   });
 
+  it('demotes the headline to a level-2 heading in the story-section variant', () => {
+    render(<HomeObservatoryHero {...liveProps} headingLevel="h2" />);
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { level: 1, name: 'home.hero.phase.live.headline' }),
+    ).not.toBeInTheDocument();
+    // The section keeps its labelled region so aria wiring survives demotion.
+    expect(screen.getByRole('region', { name: 'home.hero.phase.live.headline' })).toHaveAttribute(
+      'aria-labelledby',
+      'home-observatory-title',
+    );
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<HomeObservatoryHero {...liveProps} />);
     await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });

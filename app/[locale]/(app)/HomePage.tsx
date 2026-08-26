@@ -3,13 +3,13 @@
 import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
-import { ArrowRight, Radio } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { CountdownRenderProps } from 'react-countdown';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds, shortenHex } from '@/utils';
+import { formatSeconds } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { reportError } from '@/utils/errors';
@@ -18,18 +18,22 @@ import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/ui/error-state';
+import { GradientText } from '@/components/ui/gradient-text';
 import { Spinner } from '@/components/ui/spinner';
 import { PageShell } from '@/components/ui/page-shell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import { GestureStatus } from '@/components/common/GestureStatus';
-import { ChronoCoreTimer } from '@/components/home/ChronoCoreTimer';
 import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
 import { GestureForm } from '@/components/home/GestureForm';
 import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
+import { AllocationTracksBoard } from '@/components/home/deck/AllocationTracksBoard';
+import { CycleMonument } from '@/components/home/deck/CycleMonument';
+import { GestureComposer } from '@/components/home/deck/GestureComposer';
+import { getGestureSubmitLabel } from '@/components/home/deck/gestureSubmitLabel';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
@@ -37,7 +41,6 @@ import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
-import { useLivePulse } from '@/hooks/useLivePulse';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import {
@@ -54,9 +57,8 @@ import {
   simulateUxScenarioGesture,
   useUxScenarioSnapshot,
 } from '@/lib/uxCycleScenarios';
-import type { CSTTokenInfo, DashboardInfo, GestureInfo } from '@/services/api';
+import type { CSTTokenInfo, DashboardInfo } from '@/services/api';
 import { deriveLiveCstGestureData } from '@/utils/cstGesture';
-import { formatFixed } from '@/utils/format';
 
 const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
   ssr: false,
@@ -87,76 +89,9 @@ const sectionFade = {
   visible: { y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
-type HomeTranslator = ReturnType<typeof useTranslations>;
-
-function formatRelativeGestureAge(timestamp: unknown, nowMs: number, t: HomeTranslator): string {
-  const numericTimestamp = Number(timestamp);
-  if (!Number.isFinite(numericTimestamp) || numericTimestamp <= 0) return t('ticker.age.justNow');
-  const elapsedSeconds = Math.max(0, Math.floor((nowMs - numericTimestamp * 1000) / 1000));
-  if (elapsedSeconds < 60) return t('ticker.age.seconds', { count: String(elapsedSeconds) });
-  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
-  if (elapsedMinutes < 60) return t('ticker.age.minutes', { count: String(elapsedMinutes) });
-  const elapsedHours = Math.floor(elapsedMinutes / 60);
-  if (elapsedHours < 24) return t('ticker.age.hours', { count: String(elapsedHours) });
-  return t('ticker.age.days', { count: String(Math.floor(elapsedHours / 24)) });
-}
-
-function getGestureKindSelectValue(gestureType: unknown): 'eth' | 'randomWalk' | 'cst' {
-  if (gestureType === 2) return 'cst';
-  if (gestureType === 1) return 'randomWalk';
-  return 'eth';
-}
-
-function LatestGestureTicker({
-  gesture,
-  pulseKey,
-}: {
-  gesture: GestureInfo | null;
-  pulseKey: number;
-}) {
-  const t = useTranslations('home');
-  const nowMs = useNow(15_000);
-  const isPulsing = useLivePulse(pulseKey);
-
-  if (!gesture) return null;
-
-  return (
-    <Link
-      href={`/gesture/${gesture.EvtLogId}`}
-      className={`mt-4 flex items-center justify-between gap-3 rounded-2xl border border-primary/15 bg-primary/[0.055] px-4 py-3 text-sm transition-colors hover:border-primary/35 hover:bg-primary/[0.08] ${
-        isPulsing ? 'animate-live-flash' : ''
-      }`}
-      aria-label={t('ticker.openLatestAria', { id: String(gesture.EvtLogId) })}
-    >
-      <span className="flex min-w-0 items-center gap-3">
-        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-primary/20">
-          <Radio className="h-4 w-4" />
-          {isPulsing && (
-            <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-emerald-300" />
-          )}
-        </span>
-        <span className="min-w-0">
-          {/* Wraps to two lines on a phone rather than truncating: the address
-              is the useful part and the ellipsis cut it off entirely. */}
-          <span className="block break-words font-medium text-foreground sm:truncate">
-            {t('ticker.gestureLine', {
-              address: shortenHex(gesture.BidderAddr, 6),
-              kind: getGestureKindSelectValue(gesture.GestureType),
-            })}
-          </span>
-          <span className="mt-0.5 block text-xs text-muted-foreground">
-            {formatRelativeGestureAge(gesture.TimeStamp, nowMs, t)}
-          </span>
-        </span>
-      </span>
-      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-    </Link>
-  );
-}
-
 interface HomePageProps {
   initialDashboardData?: DashboardInfo | null;
-  /** Server-picked hero artwork so the LCP image URL ships in the SSR HTML. */
+  /** Server-picked story artwork so its URL ships in the SSR HTML. */
   initialBannerToken?: { id: number; info: CSTTokenInfo } | null;
 }
 
@@ -207,10 +142,10 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
 
   const [gesturePulseKey, setGesturePulseKey] = useState(0);
   const imprintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
-  // The server picks the first artwork (initialBannerToken) so its priority
-  // image is discoverable in the prerendered HTML; the client rotation
-  // starts from that index and the seeded query below keeps the first
-  // client render byte-identical with the SSR output.
+  // The server picks the first artwork (initialBannerToken) so its URL is
+  // discoverable in the prerendered HTML; the client rotation starts from
+  // that index and the seeded query below keeps the first client render
+  // byte-identical with the SSR output.
   const bannerTokenId = useRotatingIndex({
     count: imprintedTokenCount,
     intervalMs: 15_000,
@@ -376,23 +311,6 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     return () => window.removeEventListener('cosmic:gesture-placed', handleGesturePlaced);
   }, []);
 
-  const getGestureLabel = () => {
-    const adj = (ethGestureInfo?.ETHPrice ?? 0) * (1 + gestureCostPlus / 100);
-    const fmt = (v: number, threshold: number) => (v > threshold ? v.toFixed(2) : v.toFixed(5));
-    if (gestureType === 'ETH') return t('form.submit.eth', { cost: fmt(adj, 0.1) });
-    if (gestureType === 'RandomWalk' && rwlkId !== -1)
-      return t('form.submit.randomWalkWithToken', {
-        tokenId: String(rwlkId),
-        cost: fmt(adj * 0.5, 0.2),
-      });
-    if (gestureType === 'CST') {
-      if (liveCstGestureData.isFree) return t('form.submit.cstFree');
-      return t('form.submit.cst', { cost: formatFixed(liveCstGestureData.CSTPrice, 2) });
-    }
-    if (gestureType === 'RandomWalk') return t('form.submit.randomWalk');
-    return t('form.submit.generic', { method: gestureType });
-  };
-
   const cycleState = getCycleState({
     data,
     loading,
@@ -412,6 +330,17 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     cycleState.isGestureOpen || cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
   const cycleTimerEnded = cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
 
+  // One shared label for every gesture submit surface (console, monument,
+  // composer) so the displayed cost can never drift between them.
+  const submitLabel = getGestureSubmitLabel({
+    t,
+    gestureType,
+    ethPrice: ethGestureInfo?.ETHPrice ?? 0,
+    gestureCostPlus,
+    rwlkId,
+    cstGestureData: liveCstGestureData,
+  });
+
   const scrollToGestureForm = useCallback(() => {
     const el = document.getElementById('make-gesture');
     if (el && typeof el.scrollIntoView === 'function') {
@@ -423,14 +352,38 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     scrollToGestureForm();
   }, [scrollToGestureForm]);
 
-  // Chat empty-state CTA: reveal the message field (Advanced) and bring the form into view.
+  // Method pills reset any picked RandomWalk token, exactly like the full
+  // console's method buttons, so a stale token can't ride along silently.
+  const handleSelectGestureType = useCallback(
+    (value: string) => {
+      setRwlkId(-1);
+      setBidType(value);
+    },
+    [setBidType, setRwlkId],
+  );
+
+  // Chat empty-state CTA: bring the composer into view and focus it. Falls
+  // back to the full console's message field when the composer isn't
+  // rendered (disconnected wallet or inactive cycle).
+  const composerInputRef = useRef<HTMLTextAreaElement | null>(null);
   const handleJoinChatCta = useCallback(() => {
+    const el = composerInputRef.current;
+    if (el) {
+      if (typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      el.focus({ preventScroll: true });
+      return;
+    }
     setAdvancedExpanded(true);
     scrollToGestureForm();
   }, [scrollToGestureForm, setAdvancedExpanded]);
 
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
+  const cycleNumber = data?.CurRoundNum;
+  const previousCycle = (cycleNumber ?? 0) - 1;
+  const hasPreviousCycle = previousCycle > 0;
 
   // Without the dashboard read there is no cycle number, countdown, or
   // allocation pool — rendering the page would show an idle cycle that does
@@ -463,40 +416,118 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
             </span>
           </div>
         )}
-        <MemoHomeObservatoryHero
-          data={data}
-          bannerToken={bannerToken}
-          canOpenGesturePanel={!loading && isRoundActive}
-          phase={cycleState.phase}
-          onPrimaryCtaClick={handlePrimaryCtaClick}
-        />
 
-        <ChronoCoreTimer
-          data={data}
-          loading={loading}
-          allocationTime={allocationTime}
-          activationTime={activationTime}
-          now={now}
-          canOpenGesturePanel={!loading && isRoundActive}
-          onPrimaryCtaClick={handlePrimaryCtaClick}
-          finalizationConfirmed={finalizationConfirmed}
-        />
-
-        <CyclePhaseGuide
-          data={data}
-          loading={loading}
-          allocationTime={allocationTime}
-          activationTime={activationTime}
-          now={now}
-          finalizationConfirmed={finalizationConfirmed}
-        />
-
+        {/* ===== DECK HEADER (page H1 — must stay in the server HTML) =====
+            A <div>, not <header>: the site banner owns the header landmark,
+            and e2e selectors like `header a[href]` must keep resolving to
+            the navigation chrome only. */}
         <div
-          data-testid="home-current-cycle-layout"
-          className="mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(28rem,36rem)] 2xl:grid-cols-[minmax(0,1.08fr)_minmax(34rem,42rem)] 2xl:gap-10"
+          data-testid="home-deck-header"
+          className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3"
+        >
+          <div className="min-w-0">
+            <div className="mb-2.5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300 animate-live-dot" />
+              {cycleNumber == null
+                ? t('hero.cycleFallback')
+                : t('hero.cycleNumber', { number: String(cycleNumber) })}
+            </div>
+            <GradientText
+              as="h1"
+              id="home-deck-title"
+              className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl"
+            >
+              {t('deck.title')}
+            </GradientText>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+              {t('deck.intro')}
+            </p>
+          </div>
+          <Link
+            href="/how-it-works"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+          >
+            {t('deck.newHere')}
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+          </Link>
+        </div>
+
+        {/* ===== THE DECK: board | monument | chat ===== */}
+        <div
+          id="deck"
+          data-testid="home-deck-layout"
+          className="grid scroll-mt-24 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] xl:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)_minmax(23rem,27rem)] 2xl:grid-cols-[minmax(20rem,25rem)_minmax(0,1fr)_minmax(25rem,30rem)] 2xl:gap-6"
+        >
+          <div
+            data-testid="home-deck-board"
+            className="order-3 min-w-0 lg:col-span-2 xl:order-1 xl:col-span-1"
+          >
+            <AllocationTracksBoard data={data} account={account} />
+          </div>
+
+          <div data-testid="home-deck-monument" className="order-1 min-w-0 xl:order-2">
+            <CycleMonument
+              data={data}
+              loading={loading}
+              allocationTime={allocationTime}
+              activationTime={activationTime}
+              now={now}
+              finalizationConfirmed={finalizationConfirmed}
+              latestGesture={curGestureList[0] ?? null}
+              pulseKey={gesturePulseKey}
+              account={account}
+              ethGestureInfo={ethGestureInfo}
+              cstGestureData={liveCstGestureData}
+              gestureType={gestureType}
+              onSelectGestureType={handleSelectGestureType}
+              canGesture={canGesture}
+              canClaim={canClaim}
+              isGesturing={isGesturing}
+              isClaiming={isClaiming}
+              claimWait={claimWait}
+              rwlkId={rwlkId}
+              gestureCostPlus={gestureCostPlus}
+              onGesture={handleGesture}
+              onFinalize={handleFinalize}
+              onOpenFullConsole={scrollToGestureForm}
+            />
+          </div>
+
+          <div data-testid="home-deck-chat" className="order-2 min-w-0 space-y-3 xl:order-3">
+            {!loading && isRoundActive && (
+              <GestureComposer
+                message={gestureForm.message}
+                setMessage={setMessage}
+                gestureType={gestureType}
+                onSelectGestureType={handleSelectGestureType}
+                showCstOption={data?.LastBidderAddr !== zeroAddress}
+                rwlkId={rwlkId}
+                account={account}
+                isGesturing={isGesturing}
+                canGesture={canGesture}
+                submitLabel={submitLabel}
+                onGesture={handleGesture}
+                onOpenFullConsole={scrollToGestureForm}
+                textareaRef={composerInputRef}
+              />
+            )}
+            <MemoGestureMessageChat
+              gestures={curGestureList}
+              cycleNumber={round >= 0 ? round : undefined}
+              pulseKey={gesturePulseKey}
+              onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
+              className="xl:h-[clamp(22rem,48vh,30rem)] 2xl:h-[clamp(24rem,46vh,32rem)] print:h-auto"
+            />
+          </div>
+        </div>
+
+        {/* ===== FULL CONSOLE + DETAIL RAIL ===== */}
+        <div
+          data-testid="home-console-layout"
+          className="mt-10 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,30rem)]"
         >
           <div data-testid="home-primary-column" className="min-w-0">
-            {/* ===== BIDDING STATUS (countdown + stats) ===== */}
+            {/* ===== STATUS (prices + personal standing) ===== */}
             <GestureStatus
               data={data}
               loading={loading}
@@ -509,24 +540,8 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
               attachedNFTCount={donatedNFTs.length}
               attachedERC20Count={donatedERC20Tokens.length}
             />
-            <LatestGestureTicker gesture={curGestureList[0] ?? null} pulseKey={gesturePulseKey} />
 
-            {/* ===== SPECIAL ALLOCATION LEADERS ===== */}
-            {data?.TsRoundStart !== 0 && (
-              /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
-              <div className="mt-8">
-                {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
-                <div className="min-w-0 print:col-auto">
-                  <MemoSpecialAllocationRecipients
-                    currentAccount={account}
-                    latestMessage={curGestureList[0]?.Message ?? ''}
-                    latestGesture={curGestureList[0] ?? null}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* ===== BID ACTION AREA ===== */}
+            {/* ===== GESTURE ACTION AREA ===== */}
             {(loading || isRoundActive) && (
               <m.div
                 id="make-gesture"
@@ -534,7 +549,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
                 initial="hidden"
                 animate="visible"
                 transition={{ delay: 0.3 }}
-                className="print-motion-visible mt-10"
+                className="print-motion-visible mt-8 scroll-mt-24"
               >
                 <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
                   <h2 className="font-display text-xl font-bold tracking-tight mb-1">
@@ -587,7 +602,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
                               </span>
                             ) : (
                               <>
-                                {getGestureLabel()} <ArrowRight className="ml-2 h-5 w-5" />
+                                {submitLabel} <ArrowRight className="ml-2 h-5 w-5" />
                               </>
                             )}
                           </Button>
@@ -669,42 +684,24 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
                 </div>
               </m.div>
             )}
-            {/* ===== PRIZE BREAKDOWN ===== */}
-            {data && (
-              <m.div
-                variants={sectionFade}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.4 }}
-                className="print-motion-visible"
-              >
-                <MemoAllocation data={data} />
-              </m.div>
+
+            {/* ===== SPECIAL ALLOCATION LEADERS (detail) ===== */}
+            {data?.TsRoundStart !== 0 && (
+              /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
+              <div className="mt-8">
+                {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
+                <div className="min-w-0 print:col-auto">
+                  <MemoSpecialAllocationRecipients
+                    currentAccount={account}
+                    latestMessage={curGestureList[0]?.Message ?? ''}
+                    latestGesture={curGestureList[0] ?? null}
+                  />
+                </div>
+              </div>
             )}
           </div>
 
-          {/*
-            The rail pins as one unit. Pinning only the chat looked right until
-            you scrolled: a sticky element travels for exactly as long as there
-            is container height beneath it, and here that height was the three
-            cards below — so they slid up through the chat, which is glass and
-            let them show straight through. Sticking the whole rail means there
-            is nothing left to scroll past it. `max-h` plus `overflow-y-auto`
-            keeps a rail taller than the viewport reachable rather than pinning
-            its lower half permanently off screen.
-          */}
-          <div
-            data-testid="home-chat-column"
-            className="min-w-0 space-y-6 xl:sticky xl:top-[var(--sticky-offset)] xl:z-10 xl:max-h-[calc(100vh-var(--sticky-offset)-1.5rem)] xl:overflow-y-auto xl:overscroll-contain xl:pr-1 print:static print:max-h-none print:overflow-visible print:pr-0"
-          >
-            <MemoGestureMessageChat
-              gestures={curGestureList}
-              cycleNumber={round >= 0 ? round : undefined}
-              pulseKey={gesturePulseKey}
-              onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
-              className="xl:h-[clamp(30rem,68vh,34rem)] 2xl:h-[clamp(32rem,64vh,36rem)] print:h-auto"
-            />
-
+          <div data-testid="home-rail-column" className="min-w-0 space-y-6">
             {/* ===== FULL ROUND DETAILS LINK ===== */}
             <m.div
               variants={sectionFade}
@@ -731,6 +728,17 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
                 <ArrowRight className="relative h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
               </Link>
             </m.div>
+
+            {hasPreviousCycle && (
+              <Link
+                href={`/allocation/${previousCycle}`}
+                data-testid="previous-cycle-link-card"
+                className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-5 py-4 text-sm text-muted-foreground transition-all duration-300 hover:border-primary/25 hover:bg-white/[0.045] hover:text-primary"
+              >
+                {t('hero.console.previousAllocations', { number: String(previousCycle) })}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
 
             {/* ===== PUBLIC GOODS IMPACT ===== */}
             {data && hasPublicGoodsImpact && (
@@ -766,6 +774,42 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
             )}
           </div>
         </div>
+
+        {/* ===== ALLOCATION BREAKDOWN ===== */}
+        {data && (
+          <m.div
+            id="allocation-breakdown"
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.4 }}
+            className="print-motion-visible scroll-mt-24"
+          >
+            <MemoAllocation data={data} />
+          </m.div>
+        )}
+
+        {/* ===== STORY: what Cosmic Signature is (crawlable, below the fold) ===== */}
+        <div data-testid="home-story-section" className="mt-12">
+          <MemoHomeObservatoryHero
+            data={data}
+            bannerToken={bannerToken}
+            canOpenGesturePanel={!loading && isRoundActive}
+            phase={cycleState.phase}
+            onPrimaryCtaClick={handlePrimaryCtaClick}
+            headingLevel="h2"
+          />
+        </div>
+
+        {/* ===== CYCLE EXPLAINER (education, crawlable) ===== */}
+        <CyclePhaseGuide
+          data={data}
+          loading={loading}
+          allocationTime={allocationTime}
+          activationTime={activationTime}
+          now={now}
+          finalizationConfirmed={finalizationConfirmed}
+        />
       </PageShell>
 
       {!loading && isRoundActive && (
@@ -775,7 +819,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
             size="lg"
             className="h-12 w-full rounded-full shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)]"
           >
-            <Link href="#make-gesture">
+            <Link href="#deck">
               {account ? t('mobileCta.makeGesture') : t('mobileCta.preview')}
             </Link>
           </Button>

@@ -13,8 +13,9 @@ import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Surface } from '@/components/ui/surface';
 import NFTImage from '@/components/nft/NFTImage';
-// riseIn (not fadeRise): the hero holds the page's LCP text, which must stay
-// visible in the server HTML instead of fading in after hydration.
+// riseIn (not fadeRise): this section's copy must stay visible in the server
+// HTML instead of fading in after hydration — it is the page's crawlable
+// story text (and held the LCP before the Deck redesign moved the H1 up).
 import { fadeRiseStagger, riseIn, useMotionVariants } from '@/lib/motion';
 import type { CyclePhase } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
@@ -32,6 +33,11 @@ interface HomeObservatoryHeroProps {
   phase: CyclePhase;
   /** When set, primary CTA submits a gesture (or finalize) instead of only scrolling. */
   onPrimaryCtaClick?: () => void;
+  /**
+   * 'h1' when this section leads the page; 'h2' when it renders as the
+   * story section below the Deck (the page H1 then lives in the Deck header).
+   */
+  headingLevel?: 'h1' | 'h2';
 }
 
 const storyCards = [
@@ -190,6 +196,7 @@ export function HomeObservatoryHero({
   canOpenGesturePanel,
   phase,
   onPrimaryCtaClick,
+  headingLevel = 'h1',
 }: HomeObservatoryHeroProps) {
   const t = useTranslations('home');
   const locale = useLocale();
@@ -258,7 +265,7 @@ export function HomeObservatoryHero({
 
               <m.div variants={itemVariants}>
                 <GradientText
-                  as="h1"
+                  as={headingLevel}
                   id="home-observatory-title"
                   className="font-display text-4xl font-bold leading-[0.96] tracking-tight sm:text-5xl lg:text-6xl"
                 >
@@ -371,10 +378,12 @@ export function HomeObservatoryHero({
                   >
                     <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-black/20">
                       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgb(var(--aurora-cyan-rgb)/0.16),transparent_34%),radial-gradient(circle_at_78%_15%,rgb(var(--nebula-violet-rgb)/0.18),transparent_38%)]" />
+                      {/* No `priority`: since the Deck redesign this section renders
+                          below the first viewport, so preloading the artwork would
+                          compete with the Deck's LCP text for bandwidth. */}
                       <NFTImage
                         src={artSrc}
                         alt={t('hero.console.artworkAlt', { id: formatId(bannerToken.id) })}
-                        priority
                         terminalFallbackSrc={null}
                         sizes="(max-width: 1024px) 100vw, 520px"
                         className="relative transition-transform duration-700 group-hover:scale-[1.025]"

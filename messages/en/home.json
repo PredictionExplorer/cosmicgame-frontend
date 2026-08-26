@@ -467,6 +467,38 @@
       "cta": "Make a Gesture"
     }
   },
+  "deck": {
+    "title": "The Cosmic Signature Observatory",
+    "intro": "One live Performance Cycle. Every Gesture extends the clock, shapes the final Signature, and stands in line for allocations.",
+    "newHere": "New here? How it works",
+    "monument": {
+      "reserveLabel": "Signature Allocation",
+      "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
+      "youChip": "You",
+      "fullConsole": "Open the full gesture console",
+      "chooseRwlkToken": "Pick your RandomWalk token in the full console below",
+      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry."
+    },
+    "board": {
+      "title": "Allocation Tracks",
+      "subtitle": "Everything this cycle distributes at finalization",
+      "tooltip": "Live view of every allocation track in the current Performance Cycle: amounts, current holders, and standing records.",
+      "cstPlusNft": "1,000 CST + NFT",
+      "awaitingGesture": "Awaiting the first Gesture",
+      "awaitingRecord": "No record yet",
+      "stellarStatus": "every Gesture is an entry",
+      "fullBreakdown": "View the full breakdown"
+    },
+    "composer": {
+      "title": "Say it with a Gesture",
+      "subtitle": "Messages travel on-chain with your gesture",
+      "placeholder": "Write an optional on-chain message…",
+      "note": "Sending makes a real Gesture on Arbitrum — the message rides along and appears in Gesture Chat.",
+      "connectBody": "Connect a wallet to make a Gesture and post a message to Gesture Chat.",
+      "rwlkChip": "RWLK #{id}",
+      "rwlkChoose": "RWLK: pick token"
+    }
+  },
   "cycleDetails": {
     "title": "View Full Cycle Details",
     "subtitle": "Gesture history, leaderboards, contributions, and allocation distribution"

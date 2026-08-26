@@ -53,7 +53,9 @@ const publicPages: PublicPage[] = [
   {
     path: '/',
     host: APP_HOST,
-    h1: /Shape the next Cosmic Signature|Next Cycle Opens Soon|Cycle #\d+ Is Open|The Final Window Is Open|Cycle Ready to Finalize/,
+    // The Deck header owns a stable H1; the phase-driven hero headline is a
+    // server-rendered H2 in the story section below.
+    h1: 'The Cosmic Signature Observatory',
     jsonLd: ['Organization', 'WebSite', 'WebApplication'],
   },
   {
