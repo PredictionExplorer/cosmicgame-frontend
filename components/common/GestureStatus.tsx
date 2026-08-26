@@ -14,6 +14,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 import { useUserInfo } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
+import { getSelectionStanding } from '@/lib/selectionStanding';
 import { cn } from '@/lib/utils';
 import { formatFixed } from '@/utils/format';
 import {
@@ -198,22 +199,12 @@ export const GestureStatus = ({
     const Gestures = (userInfoRaw?.Gestures as GestureInfo[] | undefined) || [];
     if (!Gestures.length) return null;
     const curCycleGestures = Gestures.filter((bid) => bid.RoundNum === data.CurRoundNum);
-    const pSelect = (total: number, chosen: number, yours: number) =>
-      1 - Math.pow((total - yours) / total, chosen);
-    return {
-      stellarEth:
-        pSelect(
-          curGestureList.length,
-          data.NumRaffleEthWinnersBidding ?? 1,
-          curCycleGestures.length,
-        ) * 100,
-      nft:
-        pSelect(
-          curGestureList.length,
-          data.NumRaffleNFTWinnersBidding ?? 1,
-          curCycleGestures.length,
-        ) * 100,
-    };
+    return getSelectionStanding({
+      totalGestures: curGestureList.length,
+      myGestures: curCycleGestures.length,
+      ethRecipients: data.NumRaffleEthWinnersBidding ?? 1,
+      nftRecipients: data.NumRaffleNFTWinnersBidding ?? 1,
+    });
   }, [account, data, userInfoRaw, curGestureList]);
 
   const attachedAssetVariant = getAttachedAssetVariant(attachedNFTCount, attachedERC20Count);

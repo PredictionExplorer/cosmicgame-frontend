@@ -85,7 +85,8 @@ function isAssetOrInfrastructurePath(pathname: string): boolean {
     /^\/(?:favicon|robots\.txt|sitemap\.xml|llms(?:-full)?\.txt|manifest\.webmanifest)/.test(
       pathname,
     ) ||
-    /\.(?:png|jpe?g|gif|svg|webp|ico|avif|woff2?|ttf|eot|map)$/i.test(pathname)
+    // PDFs are downloadable assets (e.g. the white paper), not locale-scoped routes.
+    /\.(?:png|jpe?g|gif|svg|webp|ico|avif|woff2?|ttf|eot|map|pdf)$/i.test(pathname)
   );
 }
 

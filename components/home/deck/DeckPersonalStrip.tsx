@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { ArrowRight, Crown, PackageOpen, Radio, User } from 'lucide-react';
+import { ArrowRight, Crown, PackageOpen, Radio, Shuffle, Sparkles, User } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds } from '@/utils';
@@ -10,13 +10,18 @@ import { Link } from '@/i18n/navigation';
 import { Surface } from '@/components/ui/surface';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useChampions } from '@/hooks/useChampions';
+import { getSelectionStanding } from '@/lib/selectionStanding';
 import { cn } from '@/lib/utils';
+import { formatCstAmount } from '@/utils/cstGesture';
+import { formatFixed } from '@/utils/format';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 
 interface DeckPersonalStripProps {
   account: string;
   data: DashboardInfo | null;
   gestures: GestureInfo[];
+  /** Estimated Participation CST a gesture would imprint right now. */
+  cstRewardPreview?: number | null;
   className?: string;
 }
 
@@ -30,7 +35,13 @@ function sameAddress(left: string | null | undefined, right: string | null | und
  * whether anything is waiting to be retrieved. Renders only when a wallet is
  * connected (gated by the page).
  */
-export function DeckPersonalStrip({ account, data, gestures, className }: DeckPersonalStripProps) {
+export function DeckPersonalStrip({
+  account,
+  data,
+  gestures,
+  cstRewardPreview = null,
+  className,
+}: DeckPersonalStripProps) {
   const t = useTranslations('home');
   const locale = useLocale();
   const champions = useChampions();
@@ -40,6 +51,21 @@ export function DeckPersonalStrip({ account, data, gestures, className }: DeckPe
   const myGestureCount = useMemo(
     () => gestures.filter((gesture) => sameAddress(gesture.BidderAddr, account)).length,
     [gestures, account],
+  );
+  const standing = useMemo(
+    () =>
+      getSelectionStanding({
+        totalGestures: gestures.length,
+        myGestures: myGestureCount,
+        ethRecipients: data?.NumRaffleEthWinnersBidding ?? 1,
+        nftRecipients: data?.NumRaffleNFTWinnersBidding ?? 1,
+      }),
+    [
+      gestures.length,
+      myGestureCount,
+      data?.NumRaffleEthWinnersBidding,
+      data?.NumRaffleNFTWinnersBidding,
+    ],
   );
 
   const { latestGesture } = champions;
@@ -108,6 +134,30 @@ export function DeckPersonalStrip({ account, data, gestures, className }: DeckPe
             <User className="h-3.5 w-3.5 shrink-0" aria-hidden />
             {t('deck.personal.gestures', { count: myGestureCount })}
           </span>
+
+          {standing && (
+            <span
+              data-testid="personal-stellar-standing"
+              className="inline-flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground"
+            >
+              <Shuffle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {t('status.standing.ethStellar')} {formatFixed(standing.stellarEth, 1)}%{' \u00b7 '}
+              {t('status.standing.nftStellar')} {formatFixed(standing.nft, 1)}%
+            </span>
+          )}
+
+          {cstRewardPreview != null && cstRewardPreview > 0 && (
+            <span
+              data-testid="personal-cst-preview"
+              className="inline-flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground"
+            >
+              <Sparkles
+                className="h-3.5 w-3.5 shrink-0 text-[rgb(var(--impact-green-rgb))]"
+                aria-hidden
+              />
+              {t('deck.personal.cstPreview', { amount: formatCstAmount(cstRewardPreview) })}
+            </span>
+          )}
 
           <span className="ms-auto">
             {hasUnretrieved ? (

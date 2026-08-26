@@ -932,11 +932,11 @@ export const whitePaperContentZh = {
       },
       {
         label: 'Cosmic Signature 应用',
-        href: 'https://app.cosmicsignature.com',
+        href: 'https://app.cosmicsignature.com/zh',
       },
       {
         label: 'Cosmic Signature 协议站点',
-        href: 'https://cosmicsignature.com',
+        href: 'https://cosmicsignature.com/zh',
       },
       {
         label: 'Hacken 对 Cosmic Signature 合约的安全审查（2026年1月）',

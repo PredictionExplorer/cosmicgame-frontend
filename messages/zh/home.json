@@ -94,7 +94,7 @@
   },
   "notifications": {
     "finalizationSoonTitle": "现在落笔——收官在即",
-    "finalizationSoonBody": "收官倒计时将在 5 分钟后归零。现在落笔即可延长周期，并参与最终分配。"
+    "finalizationSoonBody": "收官倒计时将在 {minutes} 分钟后归零。现在落笔即可延长周期，并参与最终分配。"
   },
   "chrono": {
     "sectionAria": "周期收官时间",
@@ -468,7 +468,12 @@
     },
     "system": {
       "cycleStart": "第 {number} 个周期开始——第一笔启动了时钟",
-      "enduranceRecord": "{address} 刷新坚守纪录——{duration}"
+      "enduranceRecord": "{address} 刷新坚守纪录——{duration}",
+      "chronoLead": "{address} 领跑时之勇士——{duration}"
+    },
+    "pending": {
+      "aria": "你的留言，链上确认中",
+      "label": "确认中"
     }
   },
   "deck": {
@@ -481,7 +486,13 @@
       "youChip": "你",
       "fullConsole": "打开完整落笔控制台",
       "chooseRwlkToken": "请在下方完整控制台中选择你的 RandomWalk 代币",
-      "microcopy": "每一次落笔都会延长收官时钟、铭刻参与 CST，并计入一份星选资格。"
+      "microcopy": "每一次落笔都会延长收官时钟、铭刻参与 CST，并计入一份星选资格。",
+      "notifyAria": "在周期可收官前提醒我",
+      "notifyLabel": "收官前提醒：",
+      "notifyMinutes": "{minutes} 分钟",
+      "calendarTitle": "Cosmic Signature 第 {number} 个周期开启",
+      "calendarBody": "下一演绎周期即将开放落笔。第一笔会启动收官倒计时。",
+      "calendarCta": "把开启时间加入日历"
     },
     "board": {
       "title": "分配轨道",
@@ -500,7 +511,8 @@
       "note": "发送即在 Arbitrum 上真实落笔——留言随之上链，并显示在落笔留言板中。",
       "connectBody": "连接钱包即可落笔，并在落笔留言板中留言。",
       "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK：选择代币"
+      "rwlkChoose": "RWLK：选择代币",
+      "cstFree": "当前 CST 落笔免费"
     },
     "personal": {
       "title": "你的位置",
@@ -511,7 +523,8 @@
       "extending": "正在刷新坚守纪录",
       "gestures": "{count, plural, =0 {本周期尚未落笔} other {本周期已落笔 # 次}}",
       "retrieve": "取回等待中的分配",
-      "nothingWaiting": "暂无等待取回的分配"
+      "nothingWaiting": "暂无等待取回的分配",
+      "cstPreview": "此刻落笔约可铭刻 {amount} CST"
     },
     "miniBar": {
       "aria": "周期快捷台",

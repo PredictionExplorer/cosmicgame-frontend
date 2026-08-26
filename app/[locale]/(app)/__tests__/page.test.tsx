@@ -95,6 +95,30 @@ describe('app home page (server shell)', () => {
     expect(screen.getByTestId('home-page')).toHaveAttribute('data-cycle', '');
     expect(mockGetCstInfoSeed).not.toHaveBeenCalled();
   });
+
+  it('embeds live-cycle Event JSON-LD once the cycle has started', async () => {
+    mockGetDashboardInfoSeed.mockResolvedValue(
+      dashboardSeed({ TsRoundStart: 1_700_000_000, CurRoundNum: 9 }),
+    );
+
+    const { container } = render(await Page(pageProps));
+
+    const scripts = [...container.querySelectorAll('script[type="application/ld+json"]')];
+    const eventBlock = scripts
+      .map((script) => JSON.parse(script.textContent ?? '{}') as Record<string, unknown>)
+      .find((data) => data['@type'] === 'Event');
+    expect(eventBlock).toBeDefined();
+    expect(eventBlock?.name).toBe('Cosmic Signature Performance Cycle #9');
+    expect(eventBlock?.startDate).toBe('2023-11-14T22:13:20.000Z');
+  });
+
+  it('omits the Event JSON-LD while the cycle awaits its first gesture', async () => {
+    mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed({ TsRoundStart: 0 }));
+
+    const { container } = render(await Page(pageProps));
+
+    expect(container.querySelectorAll('script[type="application/ld+json"]')).toHaveLength(0);
+  });
 });
 
 describe('generateMetadata', () => {

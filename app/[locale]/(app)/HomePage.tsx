@@ -27,9 +27,10 @@ import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocati
 import { GestureStatus } from '@/components/common/GestureStatus';
 import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
 import { GestureForm } from '@/components/home/GestureForm';
-import { GestureMessageChat } from '@/components/home/GestureMessageChat';
+import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { AllocationTracksBoard } from '@/components/home/deck/AllocationTracksBoard';
 import { CycleMonument } from '@/components/home/deck/CycleMonument';
 import { DeckMiniBar } from '@/components/home/deck/DeckMiniBar';
@@ -46,6 +47,14 @@ import { useAllocationNotification } from '@/hooks/useAllocationNotification';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
+import { useTabTitleCountdown } from '@/hooks/useTabTitleCountdown';
+import {
+  trackChatJoinCtaClicked,
+  trackComposerSheetOpened,
+  trackFinalizeSubmitted,
+  trackGestureSubmitted,
+  type GestureSurface,
+} from '@/lib/gameAnalytics';
 import {
   useDashboardInfo,
   useGestureListByCycle,
@@ -99,6 +108,13 @@ const sectionFade = {
  * always carries the full crawlable content.
  */
 const STORY_VISITED_STORAGE_KEY = 'cosmic-observatory-visited';
+
+/** Chosen "notify me before finalization" threshold, in minutes. */
+const NOTIFY_THRESHOLD_STORAGE_KEY = 'cosmic-notify-threshold-min';
+const DEFAULT_NOTIFY_THRESHOLD_MIN = 5;
+
+/** Pending optimistic chat rows expire if the indexer never echoes them. */
+const PENDING_MESSAGE_EXPIRY_MS = 90_000;
 
 interface HomePageProps {
   initialDashboardData?: DashboardInfo | null;
@@ -182,11 +198,34 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
 
   const gestureForm = useGestureForm();
   const allocationFinalize = useAllocationFinalize({ data, offset });
+
+  // "Notify me before finalization" threshold, persisted per browser. Starts
+  // at the default for hydration consistency; the effect restores the choice.
+  const [notifyThresholdMin, setNotifyThresholdMin] = useState(DEFAULT_NOTIFY_THRESHOLD_MIN);
+  useEffect(() => {
+    const stored = Number(window.localStorage.getItem(NOTIFY_THRESHOLD_STORAGE_KEY));
+    if (Number.isFinite(stored) && stored > 0) setNotifyThresholdMin(stored);
+  }, []);
+
   const { playAudio, requestNotificationPermission } = useAllocationNotification({
     allocationTime: allocationFinalize.allocationTime,
     notificationTitle: t('notifications.finalizationSoonTitle'),
-    notificationBody: t('notifications.finalizationSoonBody'),
+    notificationBody: t('notifications.finalizationSoonBody', {
+      minutes: String(notifyThresholdMin),
+    }),
+    thresholdMs: notifyThresholdMin * 60 * 1000,
   });
+
+  const handleNotifyThresholdChange = useCallback(
+    (minutes: number) => {
+      setNotifyThresholdMin(minutes);
+      window.localStorage.setItem(NOTIFY_THRESHOLD_STORAGE_KEY, String(minutes));
+      // Choosing a threshold is a clear opt-in signal — the right moment to
+      // ask the browser for notification permission.
+      requestNotificationPermission();
+    },
+    [requestNotificationPermission],
+  );
 
   const prevGestureCountRef = useRef<number>(0);
   useEffect(() => {
@@ -264,42 +303,95 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     setGesturePulseKey((value) => value + 1);
   }, [account, queryClient]);
 
-  const handleGesture = useCallback(async () => {
-    requestNotificationPermission();
-    if (uxScenario) {
-      const nextScenario = simulateUxScenarioGesture({
-        bidder: account ?? UX_SCENARIO_DEMO_ACCOUNT,
-        gestureType: gestureType as 'ETH' | 'RandomWalk' | 'CST',
-        message: gestureForm.message,
-      });
-      if (nextScenario) {
-        setMessage('');
-        setGesturePulseKey((value) => value + 1);
-        notify('success', tToast('gesture.simulated', { seconds: nextScenario.extensionSeconds }));
+  // Optimistic chat rows: a just-sent message shows instantly and is removed
+  // once the indexer echoes the real gesture (or after a safety timeout).
+  const [pendingMessages, setPendingMessages] = useState<PendingChatMessage[]>([]);
+  const pendingExpiryTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => {
+    const timers = pendingExpiryTimersRef.current;
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const recordPendingMessage = useCallback((address: string, message: string) => {
+    const id = `pending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    setPendingMessages((prev) => [...prev, { id, address, message }]);
+    pendingExpiryTimersRef.current.push(
+      setTimeout(() => {
+        setPendingMessages((prev) => prev.filter((entry) => entry.id !== id));
+      }, PENDING_MESSAGE_EXPIRY_MS),
+    );
+  }, []);
+
+  useEffect(() => {
+    setPendingMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const next = prev.filter(
+        (entry) =>
+          !curGestureList.some(
+            (gesture) =>
+              gesture.BidderAddr?.toLowerCase() === entry.address.toLowerCase() &&
+              typeof gesture.Message === 'string' &&
+              gesture.Message.trim() === entry.message,
+          ),
+      );
+      return next.length === prev.length ? prev : next;
+    });
+  }, [curGestureList]);
+
+  const handleGesture = useCallback(
+    async (source: GestureSurface = 'console') => {
+      requestNotificationPermission();
+      const trimmedMessage = gestureForm.message.trim();
+      if (uxScenario) {
+        const nextScenario = simulateUxScenarioGesture({
+          bidder: account ?? UX_SCENARIO_DEMO_ACCOUNT,
+          gestureType: gestureType as 'ETH' | 'RandomWalk' | 'CST',
+          message: gestureForm.message,
+        });
+        if (nextScenario) {
+          setMessage('');
+          setGesturePulseKey((value) => value + 1);
+          notify(
+            'success',
+            tToast('gesture.simulated', { seconds: nextScenario.extensionSeconds }),
+          );
+        }
+        return;
       }
-      return;
-    }
-    if (await (gestureType === 'CST' ? onGestureWithCST() : onGesture())) {
-      optimisticallyRecordGesture();
-      withPostTxRefresh();
-    }
-  }, [
-    account,
-    gestureForm.message,
-    gestureType,
-    notify,
-    onGesture,
-    onGestureWithCST,
-    optimisticallyRecordGesture,
-    requestNotificationPermission,
-    setMessage,
-    tToast,
-    uxScenario,
-    withPostTxRefresh,
-  ]);
-  const handleFinalize = useCallback(async () => {
-    if (await onFinalize()) withPostTxRefresh(1000, 3000);
-  }, [onFinalize, withPostTxRefresh]);
+      if (await (gestureType === 'CST' ? onGestureWithCST() : onGesture())) {
+        trackGestureSubmitted({ source, method: gestureType, hasMessage: trimmedMessage !== '' });
+        if (trimmedMessage && account) {
+          recordPendingMessage(account, trimmedMessage);
+        }
+        optimisticallyRecordGesture();
+        withPostTxRefresh();
+      }
+    },
+    [
+      account,
+      gestureForm.message,
+      gestureType,
+      notify,
+      onGesture,
+      onGestureWithCST,
+      optimisticallyRecordGesture,
+      recordPendingMessage,
+      requestNotificationPermission,
+      setMessage,
+      tToast,
+      uxScenario,
+      withPostTxRefresh,
+    ],
+  );
+  const handleFinalize = useCallback(
+    async (source: GestureSurface = 'console') => {
+      if (await onFinalize()) {
+        trackFinalizeSubmitted(source);
+        withPostTxRefresh(1000, 3000);
+      }
+    },
+    [onFinalize, withPostTxRefresh],
+  );
 
   // Deep link from the RandomWalk collection (?randomwalk=1&tokenId=N).
   // Read via window.location in an effect, NOT the next/navigation
@@ -340,6 +432,14 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
   const isRoundActive =
     cycleState.isGestureOpen || cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
   const cycleTimerEnded = cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
+  const isFinalWindow =
+    cycleState.phase === 'final-hour' ||
+    cycleState.phase === 'final-ten' ||
+    cycleState.phase === 'final-minute';
+
+  // Endgame theater: the tab title ticks during the final window so players
+  // who tabbed away can see the clock closing from anywhere.
+  useTabTitleCountdown({ enabled: isFinalWindow, targetMs: allocationTime });
 
   // One shared label for every gesture submit surface (console, monument,
   // composer) so the displayed cost can never drift between them.
@@ -426,6 +526,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
   // rendered (disconnected wallet or inactive cycle).
   const composerInputRef = useRef<HTMLTextAreaElement | null>(null);
   const handleJoinChatCta = useCallback(() => {
+    trackChatJoinCtaClicked();
     const el = composerInputRef.current;
     if (el) {
       if (typeof el.scrollIntoView === 'function') {
@@ -437,6 +538,14 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     setAdvancedExpanded(true);
     scrollToGestureForm();
   }, [scrollToGestureForm, setAdvancedExpanded]);
+
+  // Mobile bottom-sheet composer: lets phones gesture-and-post from anywhere
+  // on the page instead of scrolling back to the Deck.
+  const [composerSheetOpen, setComposerSheetOpen] = useState(false);
+  const openComposerSheet = useCallback(() => {
+    trackComposerSheetOpened();
+    setComposerSheetOpen(true);
+  }, []);
 
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
@@ -547,9 +656,11 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
               claimWait={claimWait}
               rwlkId={rwlkId}
               gestureCostPlus={gestureCostPlus}
-              onGesture={handleGesture}
-              onFinalize={handleFinalize}
+              onGesture={() => void handleGesture('monument')}
+              onFinalize={() => void handleFinalize('monument')}
               onOpenFullConsole={scrollToGestureForm}
+              notifyThresholdMin={notifyThresholdMin}
+              onNotifyThresholdChange={handleNotifyThresholdChange}
             />
           </div>
 
@@ -561,12 +672,13 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
                 gestureType={gestureType}
                 onSelectGestureType={handleSelectGestureType}
                 showCstOption={data?.LastBidderAddr !== zeroAddress}
+                cstIsFree={liveCstGestureData.isFree}
                 rwlkId={rwlkId}
                 account={account}
                 isGesturing={isGesturing}
                 canGesture={canGesture}
                 submitLabel={submitLabel}
-                onGesture={handleGesture}
+                onGesture={() => void handleGesture('composer')}
                 onOpenFullConsole={scrollToGestureForm}
                 textareaRef={composerInputRef}
               />
@@ -577,6 +689,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
               pulseKey={gesturePulseKey}
               onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
               systemEvents={feedSystemEvents}
+              pendingMessages={pendingMessages}
               className="xl:h-[clamp(22rem,48vh,30rem)] 2xl:h-[clamp(24rem,46vh,32rem)] print:h-auto"
             />
           </div>
@@ -585,7 +698,12 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
         {/* ===== YOUR POSITION (connected wallets) ===== */}
         {account && (
           <div className="mt-5">
-            <DeckPersonalStrip account={account} data={data} gestures={curGestureList} />
+            <DeckPersonalStrip
+              account={account}
+              data={data}
+              gestures={curGestureList}
+              cstRewardPreview={gestureForm.gestureCstRewardAmount}
+            />
           </div>
         )}
 
@@ -656,7 +774,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
                           <Button
                             id="gesture-submit"
                             size="lg"
-                            onClick={handleGesture}
+                            onClick={() => void handleGesture('console')}
                             className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
                             disabled={
                               isGesturing ||
@@ -684,7 +802,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
                           <>
                             <Button
                               size="lg"
-                              onClick={handleFinalize}
+                              onClick={() => void handleFinalize('console')}
                               className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
                               disabled={
                                 isClaiming || (data?.LastBidderAddr !== account && claimWait > now)
@@ -904,6 +1022,15 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
         />
       </PageShell>
 
+      {/* Endgame theater: full-viewport vignette during the final window. */}
+      {isFinalWindow && cycleState.phase !== 'final-hour' && (
+        <div
+          aria-hidden
+          data-testid="final-window-vignette"
+          className="pointer-events-none fixed inset-0 z-20 bg-[radial-gradient(ellipse_at_center,transparent_52%,rgb(var(--chrono-rose-rgb)/0.13)_80%,rgb(127_29_29/0.30))] motion-safe:animate-pulse-glow print:hidden"
+        />
+      )}
+
       <DeckMiniBar
         visible={deckOutOfView}
         data={data}
@@ -916,23 +1043,64 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
         canGesture={canGesture}
         isGesturing={isGesturing}
         submitLabel={submitLabel}
-        onGesture={handleGesture}
+        onGesture={() => void handleGesture('mini-bar')}
         onJumpToDeck={scrollToDeck}
       />
 
       {!loading && isRoundActive && (
         <div className="fixed inset-x-3 bottom-3 z-40 sm:hidden">
-          <Button
-            asChild
-            size="lg"
-            className="h-12 w-full rounded-full shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)]"
-          >
-            <Link href="#deck">
-              {account ? t('mobileCta.makeGesture') : t('mobileCta.preview')}
-            </Link>
-          </Button>
+          {account ? (
+            <Button
+              size="lg"
+              data-testid="mobile-composer-fab"
+              onClick={openComposerSheet}
+              className="h-12 w-full rounded-full shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)]"
+            >
+              {submitLabel}
+            </Button>
+          ) : (
+            <Button
+              asChild
+              size="lg"
+              className="h-12 w-full rounded-full shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)]"
+            >
+              <Link href="#deck">{t('mobileCta.preview')}</Link>
+            </Button>
+          )}
         </div>
       )}
+
+      {/* Mobile bottom-sheet composer: same shared form state as every other
+          surface, so drafts follow the player between the sheet and the Deck. */}
+      <Sheet open={composerSheetOpen} onOpenChange={setComposerSheetOpen}>
+        <SheetContent
+          side="bottom"
+          className="rounded-t-2xl border-white/[0.10] bg-[rgb(10_14_42/0.97)] p-4 pb-6 sm:hidden"
+        >
+          <SheetTitle className="sr-only">{t('deck.composer.title')}</SheetTitle>
+          <GestureComposer
+            message={gestureForm.message}
+            setMessage={setMessage}
+            gestureType={gestureType}
+            onSelectGestureType={handleSelectGestureType}
+            showCstOption={data?.LastBidderAddr !== zeroAddress}
+            cstIsFree={liveCstGestureData.isFree}
+            rwlkId={rwlkId}
+            account={account}
+            isGesturing={isGesturing}
+            canGesture={canGesture}
+            submitLabel={submitLabel}
+            onGesture={() => {
+              setComposerSheetOpen(false);
+              void handleGesture('sheet');
+            }}
+            onOpenFullConsole={() => {
+              setComposerSheetOpen(false);
+              scrollToGestureForm();
+            }}
+          />
+        </SheetContent>
+      </Sheet>
 
       <LatestNFTs />
     </LazyMotion>

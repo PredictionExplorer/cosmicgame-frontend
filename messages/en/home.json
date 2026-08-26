@@ -94,7 +94,7 @@
   },
   "notifications": {
     "finalizationSoonTitle": "Gesture now — the cycle can finalize soon",
-    "finalizationSoonBody": "The Cycle Finalization Time expires in 5 minutes. Make a Gesture now to extend the cycle and take part in the final allocations."
+    "finalizationSoonBody": "The Cycle Finalization Time expires in {minutes} minutes. Make a Gesture now to extend the cycle and take part in the final allocations."
   },
   "chrono": {
     "sectionAria": "Cycle Finalization Time",
@@ -468,7 +468,12 @@
     },
     "system": {
       "cycleStart": "Cycle #{number} began — the first Gesture started the clock",
-      "enduranceRecord": "{address} set the Endurance record — {duration}"
+      "enduranceRecord": "{address} set the Endurance record — {duration}",
+      "chronoLead": "{address} took the Chrono-Warrior lead — {duration}"
+    },
+    "pending": {
+      "aria": "Your message, confirming on-chain",
+      "label": "Confirming"
     }
   },
   "deck": {
@@ -481,7 +486,13 @@
       "youChip": "You",
       "fullConsole": "Open the full gesture console",
       "chooseRwlkToken": "Pick your RandomWalk token in the full console below",
-      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry."
+      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry.",
+      "notifyAria": "Notify me before the cycle can finalize",
+      "notifyLabel": "Alert me before finalization:",
+      "notifyMinutes": "{minutes}m",
+      "calendarTitle": "Cosmic Signature Cycle #{number} opens",
+      "calendarBody": "The next Performance Cycle opens for Gestures. The first Gesture starts the finalization clock.",
+      "calendarCta": "Add the opening to your calendar"
     },
     "board": {
       "title": "Allocation Tracks",
@@ -500,7 +511,8 @@
       "note": "Sending makes a real Gesture on Arbitrum — the message rides along and appears in Gesture Chat.",
       "connectBody": "Connect a wallet to make a Gesture and post a message to Gesture Chat.",
       "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK: pick token"
+      "rwlkChoose": "RWLK: pick token",
+      "cstFree": "CST gestures are free right now"
     },
     "personal": {
       "title": "Your position",
@@ -511,7 +523,8 @@
       "extending": "Extending the Endurance record now",
       "gestures": "{count, plural, =0 {No gestures this cycle yet} one {# gesture this cycle} other {# gestures this cycle}}",
       "retrieve": "Retrieve waiting allocations",
-      "nothingWaiting": "Nothing waiting to retrieve"
+      "nothingWaiting": "Nothing waiting to retrieve",
+      "cstPreview": "A gesture now imprints ~{amount} CST"
     },
     "miniBar": {
       "aria": "Cycle quick console",

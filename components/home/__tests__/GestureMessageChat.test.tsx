@@ -391,6 +391,69 @@ describe('GestureMessageChat', () => {
     expect(screen.getByText(/home\.chat\.messageCount\(count=2\)/)).toBeInTheDocument();
   });
 
+  it('shows pending optimistic messages on top of the feed while confirming', () => {
+    render(
+      <GestureMessageChat
+        gestures={[makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'indexed one' })]}
+        pendingMessages={[
+          {
+            id: 'pending-1',
+            address: '0x2222222222222222222222222222222222222222',
+            message: 'my fresh message',
+          },
+        ]}
+      />,
+    );
+
+    const pendingRow = screen.getByTestId('chat-pending-message');
+    expect(pendingRow).toHaveTextContent('my fresh message');
+    expect(pendingRow).toHaveTextContent('home.chat.pending.label');
+    // Pending rows render before the indexed feed.
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems[0]).toContainElement(pendingRow);
+    // The header count stays indexed-messages-only.
+    expect(screen.getByText(/home\.chat\.messageCount\(count=1\)/)).toBeInTheDocument();
+  });
+
+  it('renders pending messages even when the indexed feed is still empty', () => {
+    render(
+      <GestureMessageChat
+        gestures={[]}
+        pendingMessages={[
+          {
+            id: 'pending-1',
+            address: '0x2222222222222222222222222222222222222222',
+            message: 'first ever message',
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByTestId('chat-pending-message')).toHaveTextContent('first ever message');
+    expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
+  });
+
+  it('renders chrono-lead system events with their own styling', () => {
+    render(
+      <GestureMessageChat
+        gestures={[makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'a message' })]}
+        systemEvents={[
+          {
+            id: 'chrono-1',
+            timestamp: 1_700_000_050,
+            kind: 'chronoLead',
+            address: '0x3333333333333333333333333333333333333333',
+            durationSeconds: 1_300,
+          },
+        ]}
+      />,
+    );
+
+    const event = screen.getByTestId('chat-system-event');
+    expect(event).toHaveAttribute('data-kind', 'chronoLead');
+    expect(event).toHaveTextContent(/home\.chat\.system\.chronoLead/);
+  });
+
   it('keeps the empty state (and its CTA) when only system events exist', () => {
     render(
       <GestureMessageChat

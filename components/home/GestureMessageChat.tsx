@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Check, Copy, Crown, Info, MessageCircle, Radio, Sparkles } from 'lucide-react';
+import { Check, Copy, Crown, Info, MessageCircle, Radio, Sparkles, Swords } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -17,6 +17,7 @@ import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateT
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';
+import { Spinner } from '@/components/ui/spinner';
 import { Surface } from '@/components/ui/surface';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
@@ -27,6 +28,13 @@ import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import type { GestureInfo } from '@/services/api';
 
+/** A just-submitted message shown instantly while the indexer catches up. */
+export interface PendingChatMessage {
+  id: string;
+  address: string;
+  message: string;
+}
+
 interface GestureMessageChatProps {
   gestures: GestureInfo[];
   cycleNumber?: number;
@@ -35,11 +43,13 @@ interface GestureMessageChatProps {
   /** When provided, the empty state offers a "Make a Gesture" call to action. */
   onJoinCta?: () => void;
   /**
-   * Derived cycle moments (cycle start, Endurance records) interleaved into
-   * the feed by timestamp. Only rendered once real messages exist, so the
-   * cold-start empty state keeps its call to action.
+   * Derived cycle moments (cycle start, Endurance records, Chrono leads)
+   * interleaved into the feed by timestamp. Only rendered once real messages
+   * exist, so the cold-start empty state keeps its call to action.
    */
   systemEvents?: GestureFeedSystemEvent[];
+  /** Optimistic messages rendered on top of the feed until indexed. */
+  pendingMessages?: PendingChatMessage[];
 }
 
 interface GestureChatMessage {
@@ -189,14 +199,26 @@ function mergeFeedItems(
 
 function SystemEventRow({ event, locale }: { event: GestureFeedSystemEvent; locale: string }) {
   const t = useTranslations('home');
-  const isRecord = event.kind === 'enduranceRecord';
-  const Icon = isRecord ? Crown : Sparkles;
-  const text = isRecord
-    ? t('chat.system.enduranceRecord', {
-        address: shortenHex(event.address ?? '', 4),
-        duration: formatSeconds(event.durationSeconds ?? 0, locale),
-      })
-    : t('chat.system.cycleStart', { number: String(event.cycleNumber ?? '') });
+  const Icon =
+    event.kind === 'enduranceRecord' ? Crown : event.kind === 'chronoLead' ? Swords : Sparkles;
+  const iconClass =
+    event.kind === 'enduranceRecord'
+      ? 'text-[rgb(var(--solar-gold-rgb))]'
+      : event.kind === 'chronoLead'
+        ? 'text-[rgb(var(--nebula-violet-rgb))]'
+        : 'text-primary';
+  const text =
+    event.kind === 'cycleStart'
+      ? t('chat.system.cycleStart', { number: String(event.cycleNumber ?? '') })
+      : t(
+          event.kind === 'enduranceRecord'
+            ? 'chat.system.enduranceRecord'
+            : 'chat.system.chronoLead',
+          {
+            address: shortenHex(event.address ?? '', 4),
+            duration: formatSeconds(event.durationSeconds ?? 0, locale),
+          },
+        );
 
   return (
     <div
@@ -204,15 +226,34 @@ function SystemEventRow({ event, locale }: { event: GestureFeedSystemEvent; loca
       data-kind={event.kind}
       className="flex items-center gap-2 rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] px-3 py-2"
     >
-      <Icon
-        className={cn(
-          'h-3.5 w-3.5 shrink-0',
-          isRecord ? 'text-[rgb(var(--solar-gold-rgb))]' : 'text-primary',
-        )}
-        aria-hidden
-      />
+      <Icon className={cn('h-3.5 w-3.5 shrink-0', iconClass)} aria-hidden />
       <p className="min-w-0 text-xs leading-relaxed text-muted-foreground">{text}</p>
     </div>
+  );
+}
+
+function PendingMessageRow({ pending }: { pending: PendingChatMessage }) {
+  const t = useTranslations('home');
+
+  return (
+    <article
+      data-testid="chat-pending-message"
+      className="rounded-xl border border-primary/20 border-dashed bg-primary/[0.04] p-3 sm:rounded-2xl sm:p-4 xl:p-3.5"
+      aria-label={t('chat.pending.aria')}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="min-w-0 truncate font-mono text-sm font-semibold text-white/80">
+          {shortenHex(pending.address, 6)}
+        </span>
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/25 bg-primary/[0.08] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">
+          <Spinner size="sm" className="h-3 w-3" />
+          {t('chat.pending.label')}
+        </span>
+      </div>
+      <p className="mt-2.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/80">
+        {pending.message}
+      </p>
+    </article>
   );
 }
 
@@ -224,6 +265,7 @@ export function GestureMessageChat({
   pulseKey = 0,
   onJoinCta,
   systemEvents,
+  pendingMessages,
 }: GestureMessageChatProps) {
   const t = useTranslations('home');
   const locale = useLocale();
@@ -240,6 +282,8 @@ export function GestureMessageChat({
     () => mergeFeedItems(messages, messages.length > 0 ? (systemEvents ?? []) : []),
     [messages, systemEvents],
   );
+  const pending = pendingMessages ?? [];
+  const hasFeedContent = messages.length > 0 || pending.length > 0;
   const isPulsing = useLivePulse(pulseKey);
   // 30s tick keeps minute-level relative timestamps fresh; 0 during SSR.
   const nowMs = useNow(30_000);
@@ -319,8 +363,13 @@ export function GestureMessageChat({
             // deliberately capped desktop panel scroll here instead.
             className="relative z-[1] min-h-0 flex-1 overflow-y-visible p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60 sm:p-4 lg:max-h-[calc(100vh-13rem)] lg:overflow-y-auto xl:max-h-none xl:overflow-y-auto xl:p-4 xl:[scrollbar-gutter:stable] print:max-h-none print:overflow-visible print:[scrollbar-gutter:auto]"
           >
-            {messages.length > 0 ? (
+            {hasFeedContent ? (
               <ol className="space-y-2.5 sm:space-y-3 xl:space-y-2.5" aria-live="polite">
+                {pending.map((entry) => (
+                  <li key={entry.id}>
+                    <PendingMessageRow pending={entry} />
+                  </li>
+                ))}
                 {feedItems.map((item, index) => {
                   if (item.type === 'system') {
                     return (

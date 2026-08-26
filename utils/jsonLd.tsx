@@ -260,6 +260,43 @@ export function nftProductJsonLd({
   };
 }
 
+interface LiveCycleJsonLdOptions {
+  cycleNumber: number;
+  /** Unix seconds of the cycle's first gesture (dashboard `TsRoundStart`). */
+  startTsSeconds: number;
+  inLanguage?: string;
+}
+
+/**
+ * Structured data for the live Performance Cycle, rendered from the ISR seed
+ * so search and AI engines see the current cycle as a real, dated happening
+ * rather than an undifferentiated web page.
+ */
+export function liveCycleJsonLd({
+  cycleNumber,
+  startTsSeconds,
+  inLanguage,
+}: LiveCycleJsonLdOptions) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    '@id': `${APP_URL}/#live-cycle`,
+    name: `${SITE_NAME} Performance Cycle #${cycleNumber}`,
+    description: PROTOCOL_DESCRIPTION,
+    startDate: new Date(startTsSeconds * 1000).toISOString(),
+    eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+    eventStatus: 'https://schema.org/EventScheduled',
+    isAccessibleForFree: false,
+    location: {
+      '@type': 'VirtualLocation',
+      url: `${APP_URL}/`,
+    },
+    organizer: { '@id': `${SITE_URL}/#organization` },
+    url: `${APP_URL}/`,
+    ...(inLanguage ? { inLanguage } : {}),
+  };
+}
+
 export function JsonLd({ data }: { data: Record<string, unknown> | Record<string, unknown>[] }) {
   return (
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />

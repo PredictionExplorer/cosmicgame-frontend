@@ -24,7 +24,7 @@ describe('deriveFeedSystemEvents', () => {
     ]);
   });
 
-  it('emits an endurance-record event for every completed record stint', () => {
+  it('emits endurance-record and chrono-lead events for completed stints and reigns', () => {
     const gestures = [
       gesture({ EvtLogId: 1, TimeStamp: 1_000, BidderAddr: '0xAAA' }),
       // 0xAAA holds 500s — first record, stamped when the stint completes.
@@ -52,7 +52,28 @@ describe('deriveFeedSystemEvents', () => {
         durationSeconds: 900,
         timestamp: 2_700,
       }),
+      // 0xAAA's completed reign: from taking the record (1000) until 0xCCC
+      // took it (1800 + 500s grace of the old record = 2300) — 1300s.
+      expect.objectContaining({
+        kind: 'chronoLead',
+        address: '0xAAA',
+        durationSeconds: 1_300,
+        timestamp: 1_000,
+      }),
     ]);
+  });
+
+  it('never emits a chrono event for the live reign of the current champion', () => {
+    const gestures = [
+      gesture({ EvtLogId: 1, TimeStamp: 1_000, BidderAddr: '0xAAA' }),
+      gesture({ EvtLogId: 2, TimeStamp: 1_500, BidderAddr: '0xBBB' }),
+    ];
+
+    const events = deriveFeedSystemEvents({ gestures, roundStartTs: 0 });
+
+    // One endurance record exists (0xAAA), but its reign is still live —
+    // there is no next champion, so no chrono event can be stamped yet.
+    expect(events.filter((event) => event.kind === 'chronoLead')).toEqual([]);
   });
 
   it('sorts an unsorted gesture list before deriving stints', () => {

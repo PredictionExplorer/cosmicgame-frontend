@@ -3,6 +3,7 @@ import {
   breadcrumbJsonLd,
   collectionPageJsonLd,
   faqPageJsonLd,
+  liveCycleJsonLd,
   nftProductJsonLd,
   organizationJsonLd,
   webApplicationJsonLd,
@@ -332,6 +333,36 @@ describe('JSON-LD generators', () => {
 
     it('does not claim the NFT is available for a zero-price offer', () => {
       expect(result).not.toHaveProperty('offers');
+    });
+  });
+
+  describe('liveCycleJsonLd', () => {
+    const result = liveCycleJsonLd({
+      cycleNumber: 3,
+      startTsSeconds: 1_700_000_000,
+      inLanguage: 'en',
+    });
+
+    it('describes the running cycle as a dated virtual Event', () => {
+      expect(result['@context']).toBe('https://schema.org');
+      expect(result['@type']).toBe('Event');
+      expect(result.name).toBe('Cosmic Signature Performance Cycle #3');
+      expect(result.startDate).toBe('2023-11-14T22:13:20.000Z');
+      expect(result.eventAttendanceMode).toBe('https://schema.org/OnlineEventAttendanceMode');
+      expect(result.location).toEqual({
+        '@type': 'VirtualLocation',
+        url: 'https://app.cosmicsignature.com/',
+      });
+      expect(result.inLanguage).toBe('en');
+    });
+
+    it('points at the app host and the shared organization node', () => {
+      expect(result.url).toBe('https://app.cosmicsignature.com/');
+      expect(result.organizer).toEqual({ '@id': 'https://cosmicsignature.com/#organization' });
+    });
+
+    it('does not present participation as free', () => {
+      expect(result.isAccessibleForFree).toBe(false);
     });
   });
 });

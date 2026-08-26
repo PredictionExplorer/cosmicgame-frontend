@@ -6,7 +6,14 @@ interface UseAllocationNotificationOptions {
   allocationTime: number;
   notificationTitle?: string;
   notificationBody?: string;
+  /**
+   * How far before the finalization deadline the notification fires.
+   * Defaults to 5 minutes (the historical behavior).
+   */
+  thresholdMs?: number;
 }
+
+const DEFAULT_NOTIFICATION_THRESHOLD_MS = 5 * 60 * 1000;
 
 const NOTIFICATION_SRC = '/audio/notification.wav';
 
@@ -77,6 +84,7 @@ export function useAllocationNotification({
   allocationTime,
   notificationTitle,
   notificationBody,
+  thresholdMs = DEFAULT_NOTIFICATION_THRESHOLD_MS,
 }: UseAllocationNotificationOptions) {
   const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
   const unlockOnceRef = useRef(false);
@@ -141,7 +149,7 @@ export function useAllocationNotification({
     if (!notificationTitle || !notificationBody) return;
     const interval = setInterval(() => {
       const now = Date.now();
-      if (allocationTime && now >= allocationTime - 5 * 60 * 1000 && now <= allocationTime) {
+      if (allocationTime && now >= allocationTime - thresholdMs && now <= allocationTime) {
         sendNotification(notificationTitle, {
           body: notificationBody,
         });
@@ -154,7 +162,7 @@ export function useAllocationNotification({
     return () => {
       clearInterval(interval);
     };
-  }, [allocationTime, notificationBody, notificationTitle, sendNotification]);
+  }, [allocationTime, notificationBody, notificationTitle, sendNotification, thresholdMs]);
 
   return { playAudio, requestNotificationPermission, sendNotification } as const;
 }

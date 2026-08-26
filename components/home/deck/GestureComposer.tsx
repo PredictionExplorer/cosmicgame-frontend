@@ -21,6 +21,8 @@ interface GestureComposerProps {
   gestureType: string;
   onSelectGestureType: (value: string) => void;
   showCstOption: boolean;
+  /** True while the CST Calibration Window has fully elapsed (cost is zero). */
+  cstIsFree?: boolean;
   rwlkId: number;
   account?: string | null;
   isGesturing: boolean;
@@ -44,6 +46,7 @@ export function GestureComposer({
   gestureType,
   onSelectGestureType,
   showCstOption,
+  cstIsFree = false,
   rwlkId,
   account = null,
   isGesturing,
@@ -74,7 +77,7 @@ export function GestureComposer({
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/12 text-primary ring-1 ring-primary/20">
               <PenLine className="h-3.5 w-3.5" />
             </span>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h2
                 id="gesture-composer-title"
                 className="font-display text-sm font-bold tracking-tight"
@@ -83,6 +86,14 @@ export function GestureComposer({
               </h2>
               <p className="text-[11px] text-muted-foreground">{t('deck.composer.subtitle')}</p>
             </div>
+            {showCstOption && cstIsFree && (
+              <span
+                data-testid="composer-cst-free"
+                className="inline-flex shrink-0 items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-300"
+              >
+                {t('deck.composer.cstFree')}
+              </span>
+            )}
           </div>
 
           {account ? (

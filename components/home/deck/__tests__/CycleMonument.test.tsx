@@ -235,6 +235,60 @@ describe('CycleMonument', () => {
     );
   });
 
+  it('offers the opening as a calendar invite while the next cycle is scheduled', () => {
+    render(
+      <CycleMonument
+        {...makeProps({
+          activationTime: Math.floor(Date.now() / 1000) + 3600,
+        })}
+      />,
+    );
+
+    const calendarLink = screen.getByTestId('monument-calendar-link');
+    expect(calendarLink).toHaveAttribute('download', 'cosmic-cycle-7-opening.ics');
+    expect(calendarLink.getAttribute('href')).toContain('data:text/calendar');
+    const body = decodeURIComponent(
+      calendarLink.getAttribute('href')!.split(',').slice(1).join(','),
+    );
+    expect(body).toContain('BEGIN:VEVENT');
+    expect(body).toContain('home.deck.monument.calendarTitle(number=7)');
+  });
+
+  it('lets participants choose the notify-before-finalization threshold', async () => {
+    const user = userEvent.setup();
+    const onNotifyThresholdChange = jest.fn();
+    render(<CycleMonument {...makeProps({ notifyThresholdMin: 5, onNotifyThresholdChange })} />);
+
+    const control = screen.getByTestId('monument-notify-control');
+    const fiveMinutes = within(control).getByRole('button', {
+      name: 'home.deck.monument.notifyMinutes(minutes=5)',
+    });
+    expect(fiveMinutes).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(
+      within(control).getByRole('button', {
+        name: 'home.deck.monument.notifyMinutes(minutes=30)',
+      }),
+    );
+    expect(onNotifyThresholdChange).toHaveBeenCalledWith(30);
+  });
+
+  it('hides the notify control once no finalization countdown is running', () => {
+    render(
+      <CycleMonument
+        {...makeProps({
+          allocationTime: Date.now() - 60 * 60_000,
+          canGesture: false,
+          canClaim: true,
+          notifyThresholdMin: 5,
+          onNotifyThresholdChange: jest.fn(),
+        })}
+      />,
+    );
+
+    expect(screen.queryByTestId('monument-notify-control')).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<CycleMonument {...makeProps()} />);
     await checkA11y(container);

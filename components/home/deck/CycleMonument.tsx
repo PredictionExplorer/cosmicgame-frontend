@@ -1,7 +1,7 @@
 'use client';
 
 import type { CountdownRenderProps } from 'react-countdown';
-import { ArrowRight, Clock3, Radio } from 'lucide-react';
+import { ArrowRight, BellRing, CalendarPlus, Clock3, Radio } from 'lucide-react';
 import { zeroAddress } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Spinner } from '@/components/ui/spinner';
 import { Surface } from '@/components/ui/surface';
+import { buildCalendarInviteDataUri } from '@/lib/calendarInvite';
 import { getCycleState } from '@/lib/cycleState';
 import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
 import { useLivePulse } from '@/hooks/useLivePulse';
@@ -25,6 +26,9 @@ import type { DashboardInfo, GestureInfo } from '@/services/api';
 
 import { getGestureSubmitLabel } from './gestureSubmitLabel';
 import { viewForPhase } from './phaseView';
+
+/** Selectable "notify me before finalization" thresholds, in minutes. */
+export const NOTIFY_THRESHOLD_CHOICES_MIN = [5, 30, 60] as const;
 
 type HomeTranslator = ReturnType<typeof useTranslations>;
 
@@ -52,6 +56,9 @@ interface CycleMonumentProps {
   onGesture: () => void;
   onFinalize: () => void;
   onOpenFullConsole: () => void;
+  /** Minutes before finalization at which the browser notification fires. */
+  notifyThresholdMin?: number;
+  onNotifyThresholdChange?: (minutes: number) => void;
 }
 
 function getGestureKindSelectValue(gestureType: unknown): 'eth' | 'randomWalk' | 'cst' {
@@ -101,6 +108,8 @@ export function CycleMonument({
   onGesture,
   onFinalize,
   onOpenFullConsole,
+  notifyThresholdMin,
+  onNotifyThresholdChange,
 }: CycleMonumentProps) {
   const t = useTranslations('home');
   const locale = useLocale();
@@ -404,6 +413,35 @@ export function CycleMonument({
                 {t('deck.monument.microcopy')}
               </p>
 
+              {/* Notify-before-finalization threshold */}
+              {onNotifyThresholdChange && cycleState.isFinalizationCountdownActive && (
+                <div
+                  data-testid="monument-notify-control"
+                  role="group"
+                  aria-label={t('deck.monument.notifyAria')}
+                  className="flex flex-wrap items-center justify-center gap-1.5 text-[11px] text-muted-foreground"
+                >
+                  <BellRing className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" aria-hidden />
+                  <span>{t('deck.monument.notifyLabel')}</span>
+                  {NOTIFY_THRESHOLD_CHOICES_MIN.map((minutes) => (
+                    <button
+                      key={minutes}
+                      type="button"
+                      onClick={() => onNotifyThresholdChange(minutes)}
+                      aria-pressed={notifyThresholdMin === minutes}
+                      className={cn(
+                        'rounded-full border px-2 py-0.5 font-semibold transition-colors',
+                        notifyThresholdMin === minutes
+                          ? 'border-primary/50 bg-primary/12 text-white'
+                          : 'border-white/[0.08] bg-white/[0.02] text-muted-foreground hover:text-white',
+                      )}
+                    >
+                      {t('deck.monument.notifyMinutes', { minutes: String(minutes) })}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={onOpenFullConsole}
@@ -418,7 +456,30 @@ export function CycleMonument({
             </div>
           ) : (
             !loading && (
-              <div className="mt-5">
+              <div className="mt-5 flex flex-col items-center gap-1">
+                {/* Between cycles, offer the opening as a calendar event. */}
+                {cycleState.isOpeningSoon && (cycleState.activationTime ?? 0) > 0 && (
+                  <a
+                    data-testid="monument-calendar-link"
+                    href={buildCalendarInviteDataUri({
+                      uid: `cosmic-cycle-${data?.CurRoundNum ?? 'next'}-opening`,
+                      title: t('deck.monument.calendarTitle', {
+                        number: String(data?.CurRoundNum ?? ''),
+                      }),
+                      description: t('deck.monument.calendarBody'),
+                      url: 'https://app.cosmicsignature.com/',
+                      startSeconds: cycleState.activationTime ?? 0,
+                    })}
+                    download={`cosmic-cycle-${data?.CurRoundNum ?? 'next'}-opening.ics`}
+                    className={cn(
+                      'inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-foreground',
+                      TOUCH_TARGET_HEIGHT_CLASS,
+                    )}
+                  >
+                    <CalendarPlus className="h-4 w-4" aria-hidden />
+                    {t('deck.monument.calendarCta')}
+                  </a>
+                )}
                 <Link
                   href="/current-cycle"
                   className={cn(

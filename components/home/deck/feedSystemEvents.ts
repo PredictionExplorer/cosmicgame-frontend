@@ -10,7 +10,7 @@ export interface GestureFeedSystemEvent {
   id: string;
   /** Unix seconds; merged into the feed next to same-time messages. */
   timestamp: number;
-  kind: 'cycleStart' | 'enduranceRecord';
+  kind: 'cycleStart' | 'enduranceRecord' | 'chronoLead';
   address?: string;
   durationSeconds?: number;
   cycleNumber?: number;
@@ -24,10 +24,13 @@ interface DeriveFeedSystemEventsInput {
 }
 
 /**
- * Derives the cycle-start marker and every completed Endurance-record stint.
- * A record event is stamped at the gesture that ended the stint (the moment
- * the record length became final); the still-growing stint of the current
- * latest participant is deliberately excluded so the feed never flickers.
+ * Derives the cycle-start marker, every completed Endurance-record stint,
+ * and every Chrono-Warrior lead change. Endurance events are stamped at the
+ * gesture that ended the record stint (the moment the record length became
+ * final); Chrono events at the moment a champion's reign surpassed the
+ * standing Chrono record. The still-growing stint/reign of the current
+ * holders is deliberately excluded, so every event is deterministic from
+ * indexed data and the memoized feed never flickers with the clock.
  */
 export function deriveFeedSystemEvents({
   gestures,
@@ -49,6 +52,15 @@ export function deriveFeedSystemEvents({
     .filter((gesture) => Number.isFinite(gesture.TimeStamp) && gesture.TimeStamp > 0)
     .sort((a, b) => a.TimeStamp - b.TimeStamp);
 
+  // Record-setting stints double as the Endurance-champion lineage that the
+  // Chrono-Warrior reign segments tile over (same math as utils/endurance).
+  interface RecordStint {
+    address: string;
+    startTs: number;
+    stintSeconds: number;
+  }
+  const lineage: RecordStint[] = [];
+
   let record = 0;
   for (let i = 1; i < sorted.length; i++) {
     const holder = sorted[i - 1]!;
@@ -61,7 +73,31 @@ export function deriveFeedSystemEvents({
         address: holder.BidderAddr,
         durationSeconds: stintSeconds,
       });
+      lineage.push({ address: holder.BidderAddr, startTs: holder.TimeStamp, stintSeconds });
       record = stintSeconds;
+    }
+  }
+
+  // A champion's reign runs from the moment they took the endurance record
+  // until the next champion takes it. Only completed reigns (there IS a next
+  // champion) can be stamped without consulting the live clock.
+  let chronoRecord = 0;
+  for (let i = 0; i < lineage.length - 1; i++) {
+    const current = lineage[i]!;
+    const previous = i > 0 ? lineage[i - 1]! : null;
+    const reignStart = previous ? current.startTs + previous.stintSeconds : current.startTs;
+    const reignEnd = lineage[i + 1]!.startTs + current.stintSeconds;
+    const reignSeconds = Math.max(0, reignEnd - reignStart);
+    if (reignSeconds > chronoRecord) {
+      events.push({
+        id: `chrono-${current.address}-${reignStart}-${reignSeconds}`,
+        // The instant the growing reign passed the standing record.
+        timestamp: reignStart + chronoRecord,
+        kind: 'chronoLead',
+        address: current.address,
+        durationSeconds: reignSeconds,
+      });
+      chronoRecord = reignSeconds;
     }
   }
 

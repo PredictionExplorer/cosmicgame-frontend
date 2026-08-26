@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getCstInfoSeed, getDashboardInfoSeed } from '@/services/api/server';
 import { createMetadata } from '@/utils/seo';
 import { formatFixed } from '@/utils/format';
+import { JsonLd, liveCycleJsonLd } from '@/utils/jsonLd';
 import type { CSTTokenInfo, DashboardInfo } from '@/services/api';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -74,6 +75,8 @@ export default async function Page({ params }: PageProps) {
 
   const initialDashboardData = await getDashboardInfoSeed();
   const initialBannerToken = await pickInitialBannerToken(initialDashboardData);
+  const liveCycleStartTs = initialDashboardData?.TsRoundStart ?? 0;
+  const liveCycleNumber = initialDashboardData?.CurRoundNum ?? 0;
 
   // Deliberately NO Suspense wrapper: HomePage must render fully on the
   // server (it holds the LCP text). A future hook that suspends or bails to
@@ -81,6 +84,17 @@ export default async function Page({ params }: PageProps) {
   // not silently swap the page for an empty fallback.
   return (
     <PageMessages namespaces={['currentCycle', 'detail', 'home', 'statistics', 'tables']}>
+      {/* Structured data for the running cycle, from the same ISR seed as the
+          page itself (no request-state reads; ±15s staleness is fine). */}
+      {liveCycleStartTs > 0 && (
+        <JsonLd
+          data={liveCycleJsonLd({
+            cycleNumber: liveCycleNumber,
+            startTsSeconds: liveCycleStartTs,
+            inLanguage: locale === 'zh' ? 'zh-CN' : 'en',
+          })}
+        />
+      )}
       <HomePage
         initialDashboardData={initialDashboardData}
         initialBannerToken={initialBannerToken}

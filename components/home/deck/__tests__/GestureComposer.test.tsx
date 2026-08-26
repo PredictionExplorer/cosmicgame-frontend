@@ -129,6 +129,18 @@ describe('GestureComposer', () => {
     expect(screen.getByText('home.form.finalGestureMade')).toBeInTheDocument();
   });
 
+  it('flags free CST gestures while the Calibration Window has fully elapsed', () => {
+    const { rerender } = render(<GestureComposer {...makeProps({ cstIsFree: true })} />);
+    expect(screen.getByTestId('composer-cst-free')).toHaveTextContent('home.deck.composer.cstFree');
+
+    // Hidden before the first gesture of a cycle (CST not offered yet).
+    rerender(<GestureComposer {...makeProps({ cstIsFree: true, showCstOption: false })} />);
+    expect(screen.queryByTestId('composer-cst-free')).not.toBeInTheDocument();
+
+    rerender(<GestureComposer {...makeProps({ cstIsFree: false })} />);
+    expect(screen.queryByTestId('composer-cst-free')).not.toBeInTheDocument();
+  });
+
   it('shows a connect prompt when the wallet is disconnected', () => {
     render(<GestureComposer {...makeProps({ account: null })} />);
 

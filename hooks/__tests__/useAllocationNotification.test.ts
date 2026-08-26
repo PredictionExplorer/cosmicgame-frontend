@@ -246,5 +246,47 @@ describe('useAllocationNotification', () => {
 
       expect(mockNotification).not.toHaveBeenCalled();
     });
+
+    it('honors a custom threshold (fires at 1 hour when configured)', () => {
+      const mockNotification = setupNotificationMock('granted');
+      const allocationTime = Date.now() + 45 * 60 * 1000;
+
+      renderHook(() =>
+        useAllocationNotification({
+          allocationTime,
+          notificationTitle: WARNING_TITLE,
+          notificationBody: WARNING_BODY,
+          thresholdMs: 60 * 60 * 1000,
+        }),
+      );
+
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      expect(mockNotification).toHaveBeenCalledWith(WARNING_TITLE, {
+        body: WARNING_BODY,
+      });
+    });
+
+    it('stays quiet outside a custom threshold window', () => {
+      const mockNotification = setupNotificationMock('granted');
+      const allocationTime = Date.now() + 45 * 60 * 1000;
+
+      renderHook(() =>
+        useAllocationNotification({
+          allocationTime,
+          notificationTitle: WARNING_TITLE,
+          notificationBody: WARNING_BODY,
+          thresholdMs: 30 * 60 * 1000,
+        }),
+      );
+
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      expect(mockNotification).not.toHaveBeenCalled();
+    });
   });
 });

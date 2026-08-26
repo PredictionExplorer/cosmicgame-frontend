@@ -776,6 +776,78 @@ describe('HomePage', () => {
     expect(screen.getByTestId('deck-mini-bar')).toBeInTheDocument();
   });
 
+  it('draws the final-window vignette only inside the last ten minutes', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    mockAllocationFinalize.allocationTime = Date.now() + 5 * 60_000; // final-ten
+
+    const { rerender } = render(<HomePage />);
+    expect(screen.getByTestId('cycle-monument')).toHaveAttribute('data-phase', 'final-ten');
+    expect(screen.getByTestId('final-window-vignette')).toBeInTheDocument();
+
+    mockAllocationFinalize.allocationTime = Date.now() + 13 * 60 * 60_000; // live
+    rerender(<HomePage />);
+    expect(screen.queryByTestId('final-window-vignette')).not.toBeInTheDocument();
+  });
+
+  it('shows an optimistic pending message until the indexer echoes it', async () => {
+    const user = userEvent.setup();
+    mockGestureForm.message = 'fresh signal';
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({ data: [] });
+
+    const { rerender } = render(<HomePage />);
+    await user.click(getConsoleSubmitButton());
+
+    const pendingRow = screen.getByTestId('chat-pending-message');
+    expect(pendingRow).toHaveTextContent('fresh signal');
+
+    // The indexer echoes the gesture — the pending row clears.
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 9,
+          TimeStamp: Math.floor(Date.now() / 1000),
+          BidderAddr: '0xUser',
+          RoundNum: 5,
+          GestureType: 0,
+          Message: 'fresh signal',
+        },
+      ],
+    });
+    rerender(<HomePage />);
+    expect(screen.queryByTestId('chat-pending-message')).not.toBeInTheDocument();
+  });
+
+  it('passes the chosen notification threshold into the monument control', async () => {
+    const user = userEvent.setup();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    const control = screen.getByTestId('monument-notify-control');
+    await user.click(
+      within(control).getByRole('button', {
+        name: 'home.deck.monument.notifyMinutes(minutes=60)',
+      }),
+    );
+
+    expect(window.localStorage.getItem('cosmic-notify-threshold-min')).toBe('60');
+    expect(
+      within(control).getByRole('button', {
+        name: 'home.deck.monument.notifyMinutes(minutes=60)',
+      }),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('renders the cycle phase guide after the story section', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
@@ -1489,24 +1561,50 @@ describe('HomePage', () => {
     expect(getConsoleSubmitButton()).toBeEnabled();
   });
 
-  it('shows a sticky mobile gesture CTA labelled for the wallet state', () => {
+  it('gives connected phones a live-priced FAB that opens the composer sheet', async () => {
+    const user = userEvent.setup();
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
 
-    const { rerender } = render(<HomePage />);
-    expect(screen.getByRole('link', { name: 'home.mobileCta.makeGesture' })).toHaveAttribute(
-      'href',
-      '#deck',
-    );
-
+    // Disconnected phones keep the scroll link (no sheet to compose in).
     mockAccount = null;
-    rerender(<HomePage />);
+    const { rerender } = render(<HomePage />);
+    expect(screen.queryByTestId('mobile-composer-fab')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'home.mobileCta.preview' })).toHaveAttribute(
       'href',
       '#deck',
     );
+
+    mockAccount = '0xUser';
+    rerender(<HomePage />);
+    const fab = screen.getByTestId('mobile-composer-fab');
+    expect(fab).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
+
+    await user.click(fab);
+    // The sheet hosts a second composer sharing the same form state.
+    expect(screen.getAllByTestId('gesture-composer').length).toBe(2);
+  });
+
+  it('submits from the sheet composer and closes it', async () => {
+    const user = userEvent.setup();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+    await user.click(screen.getByTestId('mobile-composer-fab'));
+
+    const composers = screen.getAllByTestId('gesture-composer');
+    const sheetComposer = composers[composers.length - 1]!;
+    await user.click(
+      within(sheetComposer).getByRole('button', { name: /home\.form\.submit\.eth/ }),
+    );
+
+    expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
+    expect(screen.getAllByTestId('gesture-composer').length).toBe(1);
   });
 
   /* ── Live pulse and memo boundaries ─────────────────────────── */
