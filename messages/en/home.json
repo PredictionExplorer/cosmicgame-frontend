@@ -465,6 +465,10 @@
       "title": "No gesture messages yet",
       "description": "Messages attached to current-cycle gestures will appear here, newest first.",
       "cta": "Make a Gesture"
+    },
+    "system": {
+      "cycleStart": "Cycle #{number} began — the first Gesture started the clock",
+      "enduranceRecord": "{address} set the Endurance record — {duration}"
     }
   },
   "deck": {
@@ -497,6 +501,27 @@
       "connectBody": "Connect a wallet to make a Gesture and post a message to Gesture Chat.",
       "rwlkChip": "RWLK #{id}",
       "rwlkChoose": "RWLK: pick token"
+    },
+    "personal": {
+      "title": "Your position",
+      "leader": "You hold the latest Gesture",
+      "heldFor": "held {duration}",
+      "notLeader": "You are not the latest participant",
+      "enduranceIn": "Endurance record in {duration}",
+      "extending": "Extending the Endurance record now",
+      "gestures": "{count, plural, =0 {No gestures this cycle yet} one {# gesture this cycle} other {# gestures this cycle}}",
+      "retrieve": "Retrieve waiting allocations",
+      "nothingWaiting": "Nothing waiting to retrieve"
+    },
+    "miniBar": {
+      "aria": "Cycle quick console",
+      "reserve": "Signature Allocation",
+      "jump": "Back to the Deck"
+    },
+    "story": {
+      "collapsedTitle": "About Cosmic Signature",
+      "collapsedSubtitle": "The story, the artwork, and how each Performance Cycle becomes a Signature",
+      "expand": "Expand"
     }
   },
   "cycleDetails": {

@@ -356,6 +356,56 @@ describe('GestureMessageChat', () => {
     expect(screen.getByTestId('gesture-message-chat')).not.toHaveClass('animate-live-flash');
   });
 
+  it('interleaves system events into the feed by timestamp, newest first', () => {
+    render(
+      <GestureMessageChat
+        gestures={[
+          makeGesture({ EvtLogId: 1, TimeStamp: 1_700_000_100, Message: 'older message' }),
+          makeGesture({ EvtLogId: 2, TimeStamp: 1_700_000_500, Message: 'newer message' }),
+        ]}
+        systemEvents={[
+          { id: 'cycle-start-7', timestamp: 1_700_000_000, kind: 'cycleStart', cycleNumber: 7 },
+          {
+            id: 'endurance-1',
+            timestamp: 1_700_000_300,
+            kind: 'enduranceRecord',
+            address: '0x1111111111111111111111111111111111111111',
+            durationSeconds: 200,
+          },
+        ]}
+      />,
+    );
+
+    const listItems = screen.getAllByRole('listitem');
+    const order = listItems.map((item) =>
+      item.querySelector('[data-testid="chat-system-event"]')
+        ? (item.querySelector('[data-testid="chat-system-event"]') as HTMLElement).dataset.kind
+        : item.textContent?.includes('newer message')
+          ? 'newer'
+          : 'older',
+    );
+    expect(order).toEqual(['newer', 'enduranceRecord', 'older', 'cycleStart']);
+    expect(screen.getByText(/home\.chat\.system\.enduranceRecord/)).toBeInTheDocument();
+    expect(screen.getByText('home.chat.system.cycleStart(number=7)')).toBeInTheDocument();
+    // The header count stays messages-only.
+    expect(screen.getByText(/home\.chat\.messageCount\(count=2\)/)).toBeInTheDocument();
+  });
+
+  it('keeps the empty state (and its CTA) when only system events exist', () => {
+    render(
+      <GestureMessageChat
+        gestures={[makeGesture({ Message: '' })]}
+        systemEvents={[
+          { id: 'cycle-start-7', timestamp: 1_700_000_000, kind: 'cycleStart', cycleNumber: 7 },
+        ]}
+        onJoinCta={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText('home.chat.empty.title')).toBeInTheDocument();
+    expect(screen.queryByTestId('chat-system-event')).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <GestureMessageChat gestures={[makeGesture({ Message: 'Accessible gesture message' })]} />,

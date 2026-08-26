@@ -3,7 +3,7 @@
 import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import type { CountdownRenderProps } from 'react-countdown';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
@@ -32,7 +32,10 @@ import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
 import { AllocationTracksBoard } from '@/components/home/deck/AllocationTracksBoard';
 import { CycleMonument } from '@/components/home/deck/CycleMonument';
+import { DeckMiniBar } from '@/components/home/deck/DeckMiniBar';
+import { DeckPersonalStrip } from '@/components/home/deck/DeckPersonalStrip';
 import { GestureComposer } from '@/components/home/deck/GestureComposer';
+import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { getGestureSubmitLabel } from '@/components/home/deck/gestureSubmitLabel';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import Allocation from '@/components/common/Allocation';
@@ -88,6 +91,14 @@ const sectionFade = {
   hidden: { y: 20 },
   visible: { y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
+
+/**
+ * Marks the browser as a returning visitor. The story section (demoted hero)
+ * auto-collapses for returning visitors after hydration; it sits below the
+ * fold, so the collapse is never a visible layout shift, and the SSR HTML
+ * always carries the full crawlable content.
+ */
+const STORY_VISITED_STORAGE_KEY = 'cosmic-observatory-visited';
 
 interface HomePageProps {
   initialDashboardData?: DashboardInfo | null;
@@ -362,6 +373,54 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     [setBidType, setRwlkId],
   );
 
+  // Returning visitors get the story section collapsed to a disclosure row.
+  // SSR and first hydration render it expanded (state starts false), so
+  // there is no hydration mismatch; the effect flips it below the fold.
+  const [storyCollapsed, setStoryCollapsed] = useState(false);
+  useEffect(() => {
+    if (window.localStorage.getItem(STORY_VISITED_STORAGE_KEY) === '1') {
+      setStoryCollapsed(true);
+    } else {
+      window.localStorage.setItem(STORY_VISITED_STORAGE_KEY, '1');
+    }
+  }, []);
+
+  // The mini-bar appears only after the Deck scrolls out of view. jsdom has
+  // no IntersectionObserver, so the guard also keeps unit tests quiet.
+  const deckContainerRef = useRef<HTMLDivElement | null>(null);
+  const [deckOutOfView, setDeckOutOfView] = useState(false);
+  useEffect(() => {
+    const el = deckContainerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => setDeckOutOfView(entry ? !entry.isIntersecting : false),
+      // Roughly the sticky header height: the Deck counts as "gone" once it
+      // has fully passed under the chrome.
+      { rootMargin: '-96px 0px 0px 0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToDeck = useCallback(() => {
+    const el = document.getElementById('deck');
+    if (el && typeof el.scrollIntoView === 'function') {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
+
+  // Derived cycle moments for the chat feed. Memoized so the feed's memo
+  // boundary holds between polls (the page re-renders every second).
+  const feedSystemEvents = useMemo(
+    () =>
+      deriveFeedSystemEvents({
+        gestures: curGestureList,
+        cycleNumber: round >= 0 ? round : undefined,
+        roundStartTs: data?.TsRoundStart ?? 0,
+      }),
+    [curGestureList, round, data?.TsRoundStart],
+  );
+
   // Chat empty-state CTA: bring the composer into view and focus it. Falls
   // back to the full console's message field when the composer isn't
   // rendered (disconnected wallet or inactive cycle).
@@ -455,6 +514,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
         {/* ===== THE DECK: board | monument | chat ===== */}
         <div
           id="deck"
+          ref={deckContainerRef}
           data-testid="home-deck-layout"
           className="grid scroll-mt-24 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] xl:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)_minmax(23rem,27rem)] 2xl:grid-cols-[minmax(20rem,25rem)_minmax(0,1fr)_minmax(25rem,30rem)] 2xl:gap-6"
         >
@@ -516,10 +576,18 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
               cycleNumber={round >= 0 ? round : undefined}
               pulseKey={gesturePulseKey}
               onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
+              systemEvents={feedSystemEvents}
               className="xl:h-[clamp(22rem,48vh,30rem)] 2xl:h-[clamp(24rem,46vh,32rem)] print:h-auto"
             />
           </div>
         </div>
+
+        {/* ===== YOUR POSITION (connected wallets) ===== */}
+        {account && (
+          <div className="mt-5">
+            <DeckPersonalStrip account={account} data={data} gestures={curGestureList} />
+          </div>
+        )}
 
         {/* ===== FULL CONSOLE + DETAIL RAIL ===== */}
         <div
@@ -789,16 +857,40 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           </m.div>
         )}
 
-        {/* ===== STORY: what Cosmic Signature is (crawlable, below the fold) ===== */}
+        {/* ===== STORY: what Cosmic Signature is (crawlable, below the fold).
+            SSR always ships the full section; returning visitors get it
+            collapsed to this disclosure after hydration. ===== */}
         <div data-testid="home-story-section" className="mt-12">
-          <MemoHomeObservatoryHero
-            data={data}
-            bannerToken={bannerToken}
-            canOpenGesturePanel={!loading && isRoundActive}
-            phase={cycleState.phase}
-            onPrimaryCtaClick={handlePrimaryCtaClick}
-            headingLevel="h2"
-          />
+          {storyCollapsed ? (
+            <button
+              type="button"
+              data-testid="story-expand"
+              onClick={() => setStoryCollapsed(false)}
+              className="flex w-full items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 text-left transition-colors hover:border-primary/30 hover:bg-white/[0.05]"
+            >
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-foreground">
+                  {t('deck.story.collapsedTitle')}
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                  {t('deck.story.collapsedSubtitle')}
+                </span>
+              </span>
+              <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-primary">
+                {t('deck.story.expand')}
+                <ChevronDown className="h-4 w-4" aria-hidden />
+              </span>
+            </button>
+          ) : (
+            <MemoHomeObservatoryHero
+              data={data}
+              bannerToken={bannerToken}
+              canOpenGesturePanel={!loading && isRoundActive}
+              phase={cycleState.phase}
+              onPrimaryCtaClick={handlePrimaryCtaClick}
+              headingLevel="h2"
+            />
+          )}
         </div>
 
         {/* ===== CYCLE EXPLAINER (education, crawlable) ===== */}
@@ -811,6 +903,22 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           finalizationConfirmed={finalizationConfirmed}
         />
       </PageShell>
+
+      <DeckMiniBar
+        visible={deckOutOfView}
+        data={data}
+        loading={loading}
+        allocationTime={allocationTime}
+        activationTime={activationTime}
+        now={now}
+        finalizationConfirmed={finalizationConfirmed}
+        account={account}
+        canGesture={canGesture}
+        isGesturing={isGesturing}
+        submitLabel={submitLabel}
+        onGesture={handleGesture}
+        onJumpToDeck={scrollToDeck}
+      />
 
       {!loading && isRoundActive && (
         <div className="fixed inset-x-3 bottom-3 z-40 sm:hidden">

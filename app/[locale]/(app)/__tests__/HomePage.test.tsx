@@ -235,6 +235,32 @@ jest.mock('../../../../components/home/deck/AllocationTracksBoard', () => ({
   }) => mockAllocationTracksBoard(props),
 }));
 
+// Depends on ApiDataContext + champions reads; unit-tested in its own suite.
+const mockDeckPersonalStrip = jest.fn((props: { account: string; gestures: unknown[] }) => (
+  <div
+    data-testid="deck-personal-strip"
+    data-account={props.account}
+    data-gesture-count={props.gestures.length}
+  >
+    DeckPersonalStrip
+  </div>
+));
+
+jest.mock('../../../../components/home/deck/DeckPersonalStrip', () => ({
+  DeckPersonalStrip: (props: { account: string; gestures: unknown[] }) =>
+    mockDeckPersonalStrip(props),
+}));
+
+// Visibility is driven by IntersectionObserver (absent in jsdom); the bar's
+// own rendering is unit-tested in its suite. Capture props for wiring checks.
+const mockDeckMiniBar = jest.fn((props: { visible: boolean; submitLabel: string }) =>
+  props.visible ? <div data-testid="deck-mini-bar">{props.submitLabel}</div> : null,
+);
+
+jest.mock('../../../../components/home/deck/DeckMiniBar', () => ({
+  DeckMiniBar: (props: { visible: boolean; submitLabel: string }) => mockDeckMiniBar(props),
+}));
+
 jest.mock('../../../../components/attachments/DonatedNFTPrizeShowcase', () => ({
   AttachedNFTAllocationShowcase: ({
     nfts,
@@ -361,6 +387,9 @@ beforeEach(() => {
   jest.clearAllMocks();
   resetUxScenarioForTest();
   window.history.pushState({}, '', '/');
+  // The story section marks returning visitors in localStorage; without a
+  // reset, the first test in the file would leak "visited" into the rest.
+  window.localStorage.clear();
   mockAccount = '0xUser';
   mockUseEndgameChainSync.mockReturnValue({
     isConfirmationPending: false,
@@ -629,6 +658,122 @@ describe('HomePage', () => {
     expect(within(observatory).getByText('42')).toBeInTheDocument();
     expect(within(observatory).getByText('2.7500 ETH')).toBeInTheDocument();
     expect(within(observatory).getByText('7%')).toBeInTheDocument();
+  });
+
+  it('shows the personal strip for connected wallets only', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        { EvtLogId: 1, TimeStamp: 1700000000, BidderAddr: '0xUser', RoundNum: 5, Message: '' },
+      ],
+    });
+
+    const { rerender } = render(<HomePage />);
+    const strip = screen.getByTestId('deck-personal-strip');
+    expect(strip).toHaveAttribute('data-account', '0xUser');
+    expect(strip).toHaveAttribute('data-gesture-count', '1');
+    // Sits directly under the Deck, before the full console.
+    expect(screen.getByTestId('home-deck-layout').compareDocumentPosition(strip)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(strip.compareDocumentPosition(screen.getByTestId('home-console-layout'))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+
+    mockAccount = null;
+    rerender(<HomePage />);
+    expect(screen.queryByTestId('deck-personal-strip')).not.toBeInTheDocument();
+  });
+
+  it('collapses the story section for returning visitors and expands on demand', async () => {
+    const user = userEvent.setup();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    // First visit: full story, and the visit is recorded.
+    const first = render(<HomePage />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
+    ).toBeInTheDocument();
+    expect(window.localStorage.getItem('cosmic-observatory-visited')).toBe('1');
+    first.unmount();
+
+    // Return visit: collapsed to the disclosure row until expanded.
+    render(<HomePage />);
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
+    ).not.toBeInTheDocument();
+    const expand = screen.getByTestId('story-expand');
+    expect(expand).toHaveTextContent('home.deck.story.collapsedTitle');
+
+    await user.click(expand);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
+    ).toBeInTheDocument();
+  });
+
+  it('interleaves derived system events into the chat feed alongside messages', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7, TsRoundStart: 1_699_999_000 }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 1,
+          TimeStamp: 1_700_000_000,
+          BidderAddr: '0x1111111111111111111111111111111111111111',
+          RoundNum: 7,
+          GestureType: 0,
+          Message: 'first signal',
+        },
+        {
+          // 600s stint by 0x1111 completes here: a record event lands at this ts.
+          EvtLogId: 2,
+          TimeStamp: 1_700_000_600,
+          BidderAddr: '0x2222222222222222222222222222222222222222',
+          RoundNum: 7,
+          GestureType: 0,
+          Message: 'second signal',
+        },
+      ],
+    });
+
+    render(<HomePage />);
+
+    const chat = screen.getByTestId('gesture-message-chat');
+    const events = within(chat).getAllByTestId('chat-system-event');
+    expect(events.length).toBe(2);
+    expect(events.some((event) => event.dataset.kind === 'cycleStart')).toBe(true);
+    expect(events.some((event) => event.dataset.kind === 'enduranceRecord')).toBe(true);
+    // Count copy still reflects messages only.
+    expect(within(chat).getByText(/home\.chat\.messageCount\(count=2\)/)).toBeInTheDocument();
+  });
+
+  it('wires the mini-bar with the shared submit label and observer-driven visibility', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    const miniBarProps = mockDeckMiniBar.mock.calls[mockDeckMiniBar.mock.calls.length - 1]?.[0];
+    expect(miniBarProps).toEqual(
+      expect.objectContaining({
+        // jest.setup's IntersectionObserver mock always reports out-of-view,
+        // so the page must have flipped visibility through the observer path.
+        visible: true,
+        submitLabel: 'home.form.submit.eth(cost=0.01020)',
+        canGesture: true,
+      }),
+    );
+    expect(screen.getByTestId('deck-mini-bar')).toBeInTheDocument();
   });
 
   it('renders the cycle phase guide after the story section', () => {

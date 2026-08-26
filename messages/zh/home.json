@@ -465,6 +465,10 @@
       "title": "暂无落笔留言",
       "description": "当前周期随落笔附上的留言会显示在这里，最新的排在最前。",
       "cta": "落笔"
+    },
+    "system": {
+      "cycleStart": "第 {number} 个周期开始——第一笔启动了时钟",
+      "enduranceRecord": "{address} 刷新坚守纪录——{duration}"
     }
   },
   "deck": {
@@ -497,6 +501,27 @@
       "connectBody": "连接钱包即可落笔，并在落笔留言板中留言。",
       "rwlkChip": "RWLK #{id}",
       "rwlkChoose": "RWLK：选择代币"
+    },
+    "personal": {
+      "title": "你的位置",
+      "leader": "最新一笔由你写下",
+      "heldFor": "已保持 {duration}",
+      "notLeader": "最新一笔不是你写下的",
+      "enduranceIn": "距离刷新坚守纪录还有 {duration}",
+      "extending": "正在刷新坚守纪录",
+      "gestures": "{count, plural, =0 {本周期尚未落笔} other {本周期已落笔 # 次}}",
+      "retrieve": "取回等待中的分配",
+      "nothingWaiting": "暂无等待取回的分配"
+    },
+    "miniBar": {
+      "aria": "周期快捷台",
+      "reserve": "签名分配",
+      "jump": "返回观测台"
+    },
+    "story": {
+      "collapsedTitle": "关于 Cosmic Signature",
+      "collapsedSubtitle": "故事、作品，以及每个演绎周期如何凝成签名",
+      "expand": "展开"
     }
   },
   "cycleDetails": {

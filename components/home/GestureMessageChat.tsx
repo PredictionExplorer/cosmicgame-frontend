@@ -1,10 +1,16 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Check, Copy, Info, MessageCircle, Radio } from 'lucide-react';
+import { Check, Copy, Crown, Info, MessageCircle, Radio, Sparkles } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatTableAmount, getRelativeTime, resolveGestureTypeCode, shortenHex } from '@/utils';
+import {
+  formatSeconds,
+  formatTableAmount,
+  getRelativeTime,
+  resolveGestureTypeCode,
+  shortenHex,
+} from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
@@ -13,6 +19,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';
 import { Surface } from '@/components/ui/surface';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
 import { useBannedGestures } from '@/hooks/useApiQuery';
 import { useLivePulse } from '@/hooks/useLivePulse';
 import { useNow } from '@/hooks/useNow';
@@ -27,6 +34,12 @@ interface GestureMessageChatProps {
   pulseKey?: number;
   /** When provided, the empty state offers a "Make a Gesture" call to action. */
   onJoinCta?: () => void;
+  /**
+   * Derived cycle moments (cycle start, Endurance records) interleaved into
+   * the feed by timestamp. Only rendered once real messages exist, so the
+   * cold-start empty state keeps its call to action.
+   */
+  systemEvents?: GestureFeedSystemEvent[];
 }
 
 interface GestureChatMessage {
@@ -149,6 +162,60 @@ function getGestureChatMessages(
     });
 }
 
+type FeedItem =
+  | { type: 'message'; timestamp: number; entry: GestureChatMessage }
+  | { type: 'system'; timestamp: number; event: GestureFeedSystemEvent };
+
+/** Newest first; a message and a same-second system event keep the message on top. */
+function mergeFeedItems(
+  messages: GestureChatMessage[],
+  systemEvents: GestureFeedSystemEvent[],
+): FeedItem[] {
+  const items: FeedItem[] = [
+    ...messages.map(
+      (entry): FeedItem => ({ type: 'message', timestamp: entry.gesture.TimeStamp ?? 0, entry }),
+    ),
+    ...systemEvents.map(
+      (event): FeedItem => ({ type: 'system', timestamp: event.timestamp, event }),
+    ),
+  ];
+  return items.sort((a, b) => {
+    const timeDiff = b.timestamp - a.timestamp;
+    if (timeDiff !== 0) return timeDiff;
+    if (a.type !== b.type) return a.type === 'message' ? -1 : 1;
+    return 0;
+  });
+}
+
+function SystemEventRow({ event, locale }: { event: GestureFeedSystemEvent; locale: string }) {
+  const t = useTranslations('home');
+  const isRecord = event.kind === 'enduranceRecord';
+  const Icon = isRecord ? Crown : Sparkles;
+  const text = isRecord
+    ? t('chat.system.enduranceRecord', {
+        address: shortenHex(event.address ?? '', 4),
+        duration: formatSeconds(event.durationSeconds ?? 0, locale),
+      })
+    : t('chat.system.cycleStart', { number: String(event.cycleNumber ?? '') });
+
+  return (
+    <div
+      data-testid="chat-system-event"
+      data-kind={event.kind}
+      className="flex items-center gap-2 rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] px-3 py-2"
+    >
+      <Icon
+        className={cn(
+          'h-3.5 w-3.5 shrink-0',
+          isRecord ? 'text-[rgb(var(--solar-gold-rgb))]' : 'text-primary',
+        )}
+        aria-hidden
+      />
+      <p className="min-w-0 text-xs leading-relaxed text-muted-foreground">{text}</p>
+    </div>
+  );
+}
+
 /** Displays current-cycle gesture messages as a moderated, newest-first chat feed. */
 export function GestureMessageChat({
   gestures,
@@ -156,6 +223,7 @@ export function GestureMessageChat({
   className,
   pulseKey = 0,
   onJoinCta,
+  systemEvents,
 }: GestureMessageChatProps) {
   const t = useTranslations('home');
   const locale = useLocale();
@@ -167,6 +235,10 @@ export function GestureMessageChat({
   const messages = useMemo(
     () => getGestureChatMessages(gestures, bannedGestureIds),
     [gestures, bannedGestureIds],
+  );
+  const feedItems = useMemo(
+    () => mergeFeedItems(messages, messages.length > 0 ? (systemEvents ?? []) : []),
+    [messages, systemEvents],
   );
   const isPulsing = useLivePulse(pulseKey);
   // 30s tick keeps minute-level relative timestamps fresh; 0 during SSR.
@@ -249,8 +321,16 @@ export function GestureMessageChat({
           >
             {messages.length > 0 ? (
               <ol className="space-y-2.5 sm:space-y-3 xl:space-y-2.5" aria-live="polite">
-                {messages.map(({ gesture, message }, index) => {
-                  const isNewest = index === 0;
+                {feedItems.map((item, index) => {
+                  if (item.type === 'system') {
+                    return (
+                      <li key={item.event.id}>
+                        <SystemEventRow event={item.event} locale={locale} />
+                      </li>
+                    );
+                  }
+                  const { gesture, message } = item.entry;
+                  const isNewest = item.entry === messages[0];
                   const gestureId = Number.isFinite(gesture.EvtLogId) ? gesture.EvtLogId : null;
                   const gesturePosition =
                     typeof gesture.BidPosition === 'number' ? gesture.BidPosition : null;
