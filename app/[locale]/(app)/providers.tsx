@@ -45,6 +45,15 @@ const Particles = dynamic(
   { ssr: false },
 );
 
+// Local test-harness dev panel (scripts/harness). The literal env checks are
+// inlined at build time, so production builds (any non-local network, or no
+// NEXT_PUBLIC_HARNESS) drop both the flag and the dynamically imported chunk.
+const harnessUiEnabled =
+  process.env.NEXT_PUBLIC_HARNESS === '1' && process.env.NEXT_PUBLIC_NETWORK === 'local';
+const HarnessPanel = harnessUiEnabled
+  ? dynamic(() => import('@/components/dev/HarnessPanel'), { ssr: false })
+  : null;
+
 const ParticleBackdrop = memo(function ParticleBackdrop() {
   return (
     <div
@@ -321,6 +330,7 @@ export function Providers({
                 </AnchoredTokenProvider>
               </CookiesProvider>
             </ErrorBoundary>
+            {HarnessPanel ? <HarnessPanel /> : null}
             <Toaster
               position="top-right"
               theme="dark"

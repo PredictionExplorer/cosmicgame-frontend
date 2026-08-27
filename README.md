@@ -56,24 +56,27 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 
 ## Scripts
 
-| Script                       | Description                                                             |
-| ---------------------------- | ----------------------------------------------------------------------- |
-| `npm run dev`                | Start development server                                                |
-| `npm run build`              | Create production build                                                 |
-| `npm run start`              | Run production server                                                   |
-| `npm run lint`               | Run ESLint (zero warnings allowed)                                      |
-| `npm run type-check`         | Run the TypeScript compiler without emitting                            |
-| `npm run test`               | Run unit tests (Jest)                                                   |
-| `npm run test:coverage`      | Run unit tests with coverage report                                     |
-| `npm run test:seo`           | Run the SEO test subset (unit + raw-HTML e2e)                           |
-| `npm run test:e2e`           | Run end-to-end tests (Playwright)                                       |
-| `npm run test:e2e:zh`        | Run the Chinese rollout, routing, accessibility, and wallet E2E subset  |
-| `npm run test:e2e:ui`        | Run E2E tests with Playwright UI                                        |
-| `npm run test:e2e:headed`    | Run E2E tests in headed browser                                         |
-| `npm run analyze`            | Production build with bundle analyzer                                   |
-| `npm run bundle:budget`      | Check full app-home initial JS gzip payload against budget (post-build) |
-| `npm run contracts:generate` | Regenerate typed ABIs from `contracts/*.json`                           |
-| `npm run lexicon:scan`       | Enforce domain terminology in UI copy                                   |
+| Script                       | Description                                                              |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `npm run dev`                | Start development server                                                 |
+| `npm run dev:testing`        | Boot the full local game harness + app in testing mode (docs/harness.md) |
+| `npm run harness`            | Harness CLI: `up`, `down`, `reset`, `status`, `scenario`, `gesture`, …   |
+| `npm run build`              | Create production build                                                  |
+| `npm run start`              | Run production server                                                    |
+| `npm run lint`               | Run ESLint (zero warnings allowed)                                       |
+| `npm run type-check`         | Run the TypeScript compiler without emitting                             |
+| `npm run test`               | Run unit tests (Jest)                                                    |
+| `npm run test:coverage`      | Run unit tests with coverage report                                      |
+| `npm run test:seo`           | Run the SEO test subset (unit + raw-HTML e2e)                            |
+| `npm run test:e2e`           | Run end-to-end tests (Playwright), including the harness tier            |
+| `npm run test:e2e:harness`   | Run only the full-stack harness e2e tier (real chain + indexer)          |
+| `npm run test:e2e:zh`        | Run the Chinese rollout, routing, accessibility, and wallet E2E subset   |
+| `npm run test:e2e:ui`        | Run E2E tests with Playwright UI                                         |
+| `npm run test:e2e:headed`    | Run E2E tests in headed browser                                          |
+| `npm run analyze`            | Production build with bundle analyzer                                    |
+| `npm run bundle:budget`      | Check full app-home initial JS gzip payload against budget (post-build)  |
+| `npm run contracts:generate` | Regenerate typed ABIs from `contracts/*.json`                            |
+| `npm run lexicon:scan`       | Enforce domain terminology in UI copy                                    |
 
 ## Environment Variables
 
@@ -159,10 +162,15 @@ Common types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `ci`.
 
 ### Testing
 
-Unit tests use Jest with React Testing Library. E2E tests use Playwright against Desktop Chrome and Mobile Chrome viewports.
+Unit tests use Jest with React Testing Library. E2E tests use Playwright against Desktop Chrome and Mobile Chrome viewports, plus a full-stack **harness tier** that runs the real contracts on a local chain with the real indexer/API (see [docs/harness.md](docs/harness.md)).
 
 ```bash
 npm run test              # unit tests
 npm run test:coverage     # unit tests with coverage
-npm run test:e2e          # end-to-end tests
+npm run test:e2e          # end-to-end tests (mocked-API projects + harness tier)
+npm run test:e2e:harness  # harness tier only
 ```
+
+### Local game-state harness (testing mode)
+
+`npm run dev:testing` boots a complete local Cosmic Signature universe — Hardhat chain, deployed contracts, the Go indexer + API, a scenario "director" that plays the game at wall-clock speed, and this app in testing mode with a burner wallet and an in-app control panel. Named scenarios put the UI in any cycle phase on demand. Full guide: [docs/harness.md](docs/harness.md).

@@ -47,6 +47,9 @@ tsconfig.tsbuildinfo
 /playwright-report/
 /blob-report/
 
+# local game-state harness runtime (logs, pids, generated configs, deploy report)
+/.harness/
+
 # AI tooling
 .claude/
 

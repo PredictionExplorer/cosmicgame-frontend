@@ -23,4 +23,13 @@ module.exports = {
   getAddress: (addr: string) => addr,
   zeroAddress: '0x0000000000000000000000000000000000000000',
   maxUint256: BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
+  // Real implementations (pure parsing/decoding, no heavy deps): the local
+  // test-harness modules construct ABIs and decode receipt logs at import
+  // time, so these must behave like production viem.
+  parseAbi: (abi: unknown) =>
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('viem/utils') as { parseAbi: (a: unknown) => unknown }).parseAbi(abi),
+  decodeEventLog: (args: unknown) =>
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('viem/utils') as { decodeEventLog: (a: unknown) => unknown }).decodeEventLog(args),
 };

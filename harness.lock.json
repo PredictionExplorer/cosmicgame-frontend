@@ -1,0 +1,11 @@
+{
+  "$comment": "Pinned sibling-repo revisions for the local test harness (scripts/harness) and its CI job. Local runs use your working copies as-is; CI checks out exactly these refs so harness e2e results are reproducible and contract-ABI drift is a deliberate, reviewed bump of this file.",
+  "contracts": {
+    "repository": "PredictionExplorer/Cosmic-Signature",
+    "ref": "0bc80af051c16312cf51f55154aa299b2709a158"
+  },
+  "backend": {
+    "repository": "PredictionExplorer/augur-explorer",
+    "ref": "a44494f0e15cf164c5ffe02243b1e7e01e8ca861"
+  }
+}

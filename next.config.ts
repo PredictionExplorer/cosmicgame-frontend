@@ -80,6 +80,12 @@ function apiOriginRemotePatterns(): RemoteImagePattern[] {
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+  /**
+   * The local test harness (scripts/harness) runs its own dev server with a
+   * separate dist dir so it can coexist with a regular `npm run dev`/`start`
+   * on the default `.next`. Unset everywhere else.
+   */
+  ...(process.env.NEXT_DIST_DIR?.trim() ? { distDir: process.env.NEXT_DIST_DIR.trim() } : {}),
   env: {
     NEXT_PUBLIC_BUILD_COMMIT: resolveGitSha(),
     NEXT_PUBLIC_BUILD_REF: resolveGitRef(),

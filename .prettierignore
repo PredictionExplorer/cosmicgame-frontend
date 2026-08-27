@@ -1,4 +1,5 @@
 .next/
+.harness/
 node_modules/
 coverage/
 contracts/types/

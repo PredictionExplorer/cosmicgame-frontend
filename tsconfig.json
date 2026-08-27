@@ -35,7 +35,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".harness/next/types/**/*.ts",
+    ".harness/next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "contracts/types"]
+  "exclude": ["node_modules", "contracts/types", ".harness"]
 }

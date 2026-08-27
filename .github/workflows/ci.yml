@@ -89,6 +89,10 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     needs: lint-test-build
+    env:
+      # The harness tier has its own job below (it needs Docker, Go, and the
+      # sibling repos); this job runs the mocked-API projects only.
+      HARNESS_E2E: '0'
     steps:
       - uses: actions/checkout@v4
 
@@ -137,3 +141,109 @@ jobs:
 
       - name: Run e2e tests
         run: npm run test:e2e
+
+  # Full-stack tier: real contracts on a local chain + the real indexer/API,
+  # driven by the harness director (scripts/harness, docs/harness.md). The
+  # sibling repos are pinned in harness.lock.json; bumping that file is the
+  # deliberate, reviewed way to pick up contract or backend changes.
+  #
+  # If the sibling repositories are private, add a read-scoped PAT as the
+  # SIBLING_REPOS_TOKEN secret; for public repos the default token suffices.
+  harness-e2e:
+    runs-on: ubuntu-latest
+    needs: lint-test-build
+    env:
+      COSMIC_CONTRACTS_DIR: ${{ github.workspace }}/.siblings/Cosmic-Signature
+      RWCG_BACKEND_DIR: ${{ github.workspace }}/.siblings/augur-explorer
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read harness lock
+        id: lock
+        run: |
+          echo "contracts_repo=$(node -p "require('./harness.lock.json').contracts.repository")" >> "$GITHUB_OUTPUT"
+          echo "contracts_ref=$(node -p "require('./harness.lock.json').contracts.ref")" >> "$GITHUB_OUTPUT"
+          echo "backend_repo=$(node -p "require('./harness.lock.json').backend.repository")" >> "$GITHUB_OUTPUT"
+          echo "backend_ref=$(node -p "require('./harness.lock.json').backend.ref")" >> "$GITHUB_OUTPUT"
+
+      - name: Check out contracts repo (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.lock.outputs.contracts_repo }}
+          ref: ${{ steps.lock.outputs.contracts_ref }}
+          path: .siblings/Cosmic-Signature
+          token: ${{ secrets.SIBLING_REPOS_TOKEN || github.token }}
+
+      - name: Check out backend repo (pinned)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.lock.outputs.backend_repo }}
+          ref: ${{ steps.lock.outputs.backend_ref }}
+          path: .siblings/augur-explorer
+          token: ${{ secrets.SIBLING_REPOS_TOKEN || github.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Go (backend toolchain)
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: .siblings/augur-explorer/go.mod
+          cache-dependency-path: .siblings/augur-explorer/go.sum
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install contracts repo dependencies
+        run: npm ci
+        working-directory: .siblings/Cosmic-Signature
+
+      - name: Cache solc and contract artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.solc-select
+            .siblings/Cosmic-Signature/artifacts
+            .siblings/Cosmic-Signature/cache
+          key: harness-solc-${{ runner.os }}-${{ steps.lock.outputs.contracts_ref }}
+
+      - name: Install solc 0.8.34 (contracts compiler)
+        run: |
+          pipx install solc-select || pip install --user solc-select
+          solc-select install 0.8.34
+          solc-select use 0.8.34
+
+      - name: Build backend binaries
+        run: make build
+        working-directory: .siblings/augur-explorer
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: harness-playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install Playwright (chromium)
+        if: steps.harness-playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps only
+        if: steps.harness-playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run harness e2e tests
+        run: npm run test:e2e:harness
+
+      - name: Upload harness logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: harness-logs
+          path: |
+            .harness/logs
+            playwright-report
+          retention-days: 7

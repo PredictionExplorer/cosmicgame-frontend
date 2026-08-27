@@ -100,6 +100,8 @@ const config = [
   {
     ignores: [
       '.next/',
+      // Local test-harness runtime state (logs, generated configs, dist dir).
+      '.harness/',
       'node_modules/',
       'contracts/types/',
       '__mocks__/',
