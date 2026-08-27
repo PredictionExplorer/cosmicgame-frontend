@@ -10,6 +10,11 @@ jest.mock('../../../utils', () => ({
   formatSeconds: jest.fn((s: number) => `${s}s`),
 }));
 
+const mockUseMediaQuery = jest.fn<boolean, [string]>(() => false);
+jest.mock('@/hooks/useMediaQuery', () => ({
+  useMediaQuery: (query: string) => mockUseMediaQuery(query),
+}));
+
 jest.mock('../../nft/PaginationRWLKGrid', () => ({
   __esModule: true,
   default: ({ data }: { data: number[] }) => <div data-testid="rwlk-grid">{data.length} NFTs</div>,
@@ -639,5 +644,45 @@ describe('GestureForm', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<GestureForm {...defaultProps} />);
     await checkA11y(container);
+  });
+});
+
+describe('GestureForm advanced side placement', () => {
+  afterEach(() => {
+    mockUseMediaQuery.mockReturnValue(false);
+  });
+
+  it('keeps the inline accordion below the xl breakpoint even when placement is side', () => {
+    mockUseMediaQuery.mockReturnValue(false);
+    render(<GestureForm {...defaultProps} advancedPlacement="side" advancedExpanded />);
+    expect(screen.getByText('home.form.advanced.messageLabel')).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form-root')).not.toHaveAttribute('data-advanced-side');
+  });
+
+  it('at xl renders only the toggle: the Advanced body belongs to the side panel', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+    const setAdvancedExpanded = jest.fn();
+    render(
+      <GestureForm
+        {...defaultProps}
+        advancedPlacement="side"
+        advancedExpanded
+        setAdvancedExpanded={setAdvancedExpanded}
+      />,
+    );
+    expect(screen.queryByText('home.form.advanced.messageLabel')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('gesture-advanced-fields')).not.toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form-root')).toHaveAttribute('data-advanced-side', 'true');
+
+    // The trigger still toggles the shared state.
+    fireEvent.click(screen.getByRole('button', { name: /home\.form\.advanced\.title/ }));
+    expect(setAdvancedExpanded).toHaveBeenCalledWith(false);
+  });
+
+  it('inline placement ignores the viewport', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+    render(<GestureForm {...defaultProps} advancedExpanded />);
+    expect(screen.getByText('home.form.advanced.messageLabel')).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form-root')).not.toHaveAttribute('data-advanced-side');
   });
 });

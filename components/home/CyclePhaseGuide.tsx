@@ -20,6 +20,8 @@ interface CyclePhaseGuideProps {
   now: number;
   /** See useEndgameChainSync; omit for legacy local-clock behavior. */
   finalizationConfirmed?: boolean;
+  /** Merged onto the root section (e.g. `mb-0` where the parent owns spacing). */
+  className?: string;
 }
 
 const explainerStorageKey = 'cosmic-cycle-explainer-dismissed';
@@ -65,6 +67,7 @@ export function CyclePhaseGuide({
   activationTime,
   now,
   finalizationConfirmed,
+  className,
 }: CyclePhaseGuideProps) {
   const t = useTranslations('home');
   const phase = getCycleState({
@@ -90,8 +93,8 @@ export function CyclePhaseGuide({
   };
 
   return (
-    <section aria-labelledby="cycle-phase-guide-title" className="mb-8">
-      <Surface variant="glass-bordered" radius="xl" padding="none" className="p-5 sm:p-6">
+    <section aria-labelledby="cycle-phase-guide-title" className={cn('mb-8', className)}>
+      <Surface variant="glass-bordered" radius="xl" padding="none" className="p-4 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="type-eyebrow text-muted-foreground">{t('phaseGuide.eyebrow')}</p>
@@ -108,7 +111,7 @@ export function CyclePhaseGuide({
         </div>
 
         <ol
-          className="mt-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6"
+          className="mt-4 grid gap-2.5 md:grid-cols-3 xl:grid-cols-6"
           aria-label={t('phaseGuide.timelineAria')}
         >
           {timelineSteps.map((step, index) => {
@@ -119,7 +122,7 @@ export function CyclePhaseGuide({
                 key={step.id}
                 aria-current={isActive ? 'step' : undefined}
                 className={cn(
-                  'relative rounded-2xl border p-4 transition-colors',
+                  'relative rounded-2xl border p-3 transition-colors',
                   isActive
                     ? 'border-primary/40 bg-primary/[0.10] text-foreground shadow-[0_18px_70px_-56px_rgb(var(--aurora-cyan-rgb)/0.9)]'
                     : isComplete
@@ -146,10 +149,10 @@ export function CyclePhaseGuide({
                       ? t('phaseGuide.stepState.passed')
                       : t('phaseGuide.stepState.next')}
                 </span>
-                <h3 className="mt-3 text-sm font-semibold">
+                <h3 className="mt-2 text-sm font-semibold">
                   {t(`phaseGuide.steps.${step.messageKey}.label`)}
                 </h3>
-                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                   {t(`phaseGuide.steps.${step.messageKey}.detail`)}
                 </p>
               </li>
@@ -158,7 +161,7 @@ export function CyclePhaseGuide({
         </ol>
 
         {showExplainer && (
-          <div className="mt-5 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4">
+          <div className="mt-4 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3.5">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="font-display text-base font-semibold">

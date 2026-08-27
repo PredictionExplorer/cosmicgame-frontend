@@ -16,6 +16,8 @@ interface PublicGoodsImpactCardProps {
   data: DashboardInfo | null;
   variant?: 'default' | 'rail';
   className?: string;
+  /** Hidden when the card is rendered on the page the link points at. */
+  showContributionsLink?: boolean;
 }
 
 const toNumber = (value: unknown): number => {
@@ -27,6 +29,7 @@ export function PublicGoodsImpactCard({
   data,
   variant = 'default',
   className,
+  showContributionsLink = true,
 }: PublicGoodsImpactCardProps) {
   const t = useTranslations('home');
   const locale = useLocale();
@@ -101,13 +104,15 @@ export function PublicGoodsImpactCard({
               percent: formatFixed(percentage, percentage % 1 === 0 ? 0 : 2),
             })}
           </p>
-          <Link
-            href="/public-goods-contributions-cg"
-            className="mt-6 inline-flex items-center gap-2 rounded-full border border-[oklch(77.1%_0.163_161)]/40 bg-[rgb(var(--impact-green-rgb)/0.10)] px-5 py-2.5 text-sm font-medium text-[rgb(var(--impact-green-rgb))] transition hover:bg-[rgb(var(--impact-green-rgb)/0.18)]"
-          >
-            {t('publicGoods.cta')}
-            <ArrowUpRight className="h-4 w-4" aria-hidden />
-          </Link>
+          {showContributionsLink && (
+            <Link
+              href="/public-goods-contributions-cg"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-[oklch(77.1%_0.163_161)]/40 bg-[rgb(var(--impact-green-rgb)/0.10)] px-5 py-2.5 text-sm font-medium text-[rgb(var(--impact-green-rgb))] transition hover:bg-[rgb(var(--impact-green-rgb)/0.18)]"
+            >
+              {t('publicGoods.cta')}
+              <ArrowUpRight className="h-4 w-4" aria-hidden />
+            </Link>
+          )}
         </div>
 
         <div

@@ -34,6 +34,8 @@ interface AllocationData {
 
 interface AllocationProps {
   data: AllocationData | null;
+  /** The home page renders the heading itself, floated above the band. */
+  hideHeading?: boolean;
 }
 
 interface AllocationCardData {
@@ -57,7 +59,7 @@ const cardVariants = {
   }),
 };
 
-const Allocation: FC<AllocationProps> = ({ data }) => {
+const Allocation: FC<AllocationProps> = ({ data, hideHeading = false }) => {
   const t = useTranslations('home');
 
   const allocations: AllocationCardData[] = [
@@ -164,14 +166,16 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
   ];
 
   return (
-    <div className="mt-12">
-      <div className="flex items-center gap-2 mb-6">
-        <h3 className="font-display text-lg font-semibold tracking-tight">
-          {t('allocation.title')}
-        </h3>
-        <InfoTooltip content={t('allocation.titleTooltip')} />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div>
+      {!hideHeading && (
+        <div className="flex items-center gap-2 mb-4">
+          <h3 className="font-display text-lg font-semibold tracking-tight">
+            {t('allocation.title')}
+          </h3>
+          <InfoTooltip content={t('allocation.titleTooltip')} />
+        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
         {allocations.map((allocation, i) => (
           <motion.div
             key={allocation.name}
@@ -180,18 +184,18 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
             initial="hidden"
             animate="visible"
             className={cn(
-              'group relative rounded-xl border p-4 transition-all duration-300 hover:bg-white/[0.04]',
+              'group relative rounded-xl border p-3 transition-all duration-300 hover:bg-white/[0.04]',
               allocation.impact
                 ? 'border-[oklch(77.1%_0.163_161)]/30 bg-[rgb(var(--impact-green-rgb)/0.04)] glow-impact'
                 : allocation.featured
-                  ? 'gradient-border-card gradient-border-card-accent bg-white/[0.03] sm:col-span-2 lg:col-span-2'
+                  ? 'gradient-border-card gradient-border-card-accent bg-white/[0.03]'
                   : 'border-white/[0.06] bg-white/[0.02]',
             )}
           >
             <div className="flex items-start gap-3">
               <div
                 className={cn(
-                  'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors',
+                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors',
                   allocation.impact
                     ? 'bg-[rgb(var(--impact-green-rgb)/0.12)] text-[rgb(var(--impact-green-rgb))]'
                     : allocation.featured
@@ -224,22 +228,24 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                   </span>
                   <InfoTooltip content={allocation.tooltip} />
                 </div>
-                <div className="mt-2 space-y-0.5">
-                  {allocation.amounts.map((amount) => (
-                    <p
-                      key={amount}
-                      className={cn(
-                        'text-sm',
-                        allocation.impact
-                          ? 'font-medium text-[rgb(var(--impact-green-rgb))]'
-                          : allocation.featured
-                            ? 'font-medium bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
-                            : 'text-muted-foreground',
-                      )}
-                    >
-                      {amount}
+                <div className="mt-2">
+                  <p
+                    className={cn(
+                      'text-sm',
+                      allocation.impact
+                        ? 'font-medium text-[rgb(var(--impact-green-rgb))]'
+                        : allocation.featured
+                          ? 'font-medium bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
+                          : 'text-muted-foreground',
+                    )}
+                  >
+                    {allocation.amounts[0]}
+                  </p>
+                  {allocation.amounts.length > 1 && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {allocation.amounts.slice(1).join(' · ')}
                     </p>
-                  ))}
+                  )}
                 </div>
                 <div className="mt-2.5 flex items-center gap-1.5">
                   <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">

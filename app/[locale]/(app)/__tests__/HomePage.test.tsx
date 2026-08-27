@@ -199,19 +199,34 @@ jest.mock('../../../../components/home/GestureForm', () => ({
   GestureForm: ({
     previewMode = false,
     cstGestureData,
+    advancedPlacement = 'inline',
   }: {
     previewMode?: boolean;
     cstGestureData?: typeof mockGestureForm.cstGestureData;
+    advancedPlacement?: 'inline' | 'side';
   }) => (
     <div
       data-testid="gesture-form"
       data-preview={String(previewMode)}
       data-cst-duration={String(cstGestureData?.AuctionDuration ?? 0)}
       data-cst-elapsed={String(cstGestureData?.SecondsElapsed ?? 0)}
+      data-advanced-placement={advancedPlacement}
     >
       GestureForm
     </div>
   ),
+  ADVANCED_SIDE_MEDIA_QUERY: '(min-width: 1280px)',
+}));
+
+jest.mock('../../../../components/home/GestureAdvancedFields', () => ({
+  GestureAdvancedPanel: ({ showAll }: { showAll: boolean }) => (
+    <div data-testid="gesture-advanced-panel" data-show-all={String(showAll)} />
+  ),
+}));
+
+const mockUseMediaQuery = jest.fn<boolean, [string]>(() => false);
+jest.mock('../../../../hooks/useMediaQuery', () => ({
+  useMediaQuery: (query: string) => mockUseMediaQuery(query),
 }));
 
 // Data-heavy child with its own API/chain reads (useChampions); the board's
@@ -312,11 +327,13 @@ jest.mock('../../../../components/tables/SpecialAllocationRecipients', () => ({
     currentAccount?: string | null;
     latestMessage?: string;
     latestGesture?: { EvtLogId?: number; BidderAddr?: string } | null;
+    roles?: string[];
   }) => {
     specialRecipientsRenderSpy();
     return (
       <div
         data-testid="special-allocation-recipients"
+        data-roles={(props.roles ?? []).join(',')}
         data-account={props.currentAccount ?? ''}
         data-message={props.latestMessage ?? ''}
         data-latest-gesture-id={props.latestGesture?.EvtLogId ?? ''}
@@ -528,7 +545,7 @@ describe('HomePage', () => {
     expect(header.compareDocumentPosition(deck)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
-  it('renders the deck grid with the tracks board, monument, and chat panel', () => {
+  it('renders the deck grid with the leaderboard, monument, and chat panel', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),
       isLoading: false,
@@ -537,16 +554,21 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const deck = screen.getByTestId('home-deck-layout');
-    const board = screen.getByTestId('allocation-tracks-board');
+    const leaders = screen.getAllByTestId('special-allocation-recipients')[0]!;
     const monument = screen.getByTestId('cycle-monument');
     const chatColumn = screen.getByTestId('home-deck-chat');
 
-    expect(deck).toContainElement(board);
+    expect(deck).toContainElement(leaders);
     expect(deck).toContainElement(monument);
     expect(deck).toContainElement(chatColumn);
     expect(chatColumn).toContainElement(screen.getByTestId('gesture-message-chat'));
     expect(chatColumn).toContainElement(screen.getByTestId('gesture-composer'));
     expect(monument).toHaveAttribute('data-phase', 'live');
+
+    // The tracks board moved down beside the Allocation Breakdown.
+    const board = screen.getByTestId('allocation-tracks-board');
+    const band = screen.getByTestId('home-allocation-band');
+    expect(band).toContainElement(board);
     expect(board).toHaveAttribute('data-account', '0xUser');
     expect(board).toHaveAttribute('data-has-data', 'true');
   });
@@ -657,26 +679,6 @@ describe('HomePage', () => {
     expect(screen.getByTestId('monument-latest-gesture')).toHaveTextContent(/kind=cst/);
   });
 
-  it('offers monument method pills that reset the RandomWalk token on change', async () => {
-    const user = userEvent.setup();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
-      isLoading: false,
-    });
-
-    render(<HomePage />);
-
-    const pills = screen.getByTestId('monument-method-pills');
-    expect(
-      within(pills).getByRole('button', { name: /home\.form\.method\.eth\.label/ }),
-    ).toHaveAttribute('aria-pressed', 'true');
-
-    await user.click(within(pills).getByRole('button', { name: /home\.form\.method\.cst\.label/ }));
-
-    expect(mockGestureForm.setRwlkId).toHaveBeenCalledWith(-1);
-    expect(mockGestureForm.setBidType).toHaveBeenCalledWith('CST');
-  });
-
   it('renders the story hero below the deck with a level-2 heading', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42, PrizeAmountEth: 2.75 }),
@@ -725,11 +727,11 @@ describe('HomePage', () => {
     const strip = screen.getByTestId('deck-personal-strip');
     expect(strip).toHaveAttribute('data-account', '0xUser');
     expect(strip).toHaveAttribute('data-gesture-count', '1');
-    // Sits directly under the Deck, before the full console.
+    // Sits directly under the Deck, before the allocation band.
     expect(screen.getByTestId('home-deck-layout').compareDocumentPosition(strip)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
-    expect(strip.compareDocumentPosition(screen.getByTestId('home-console-layout'))).toBe(
+    expect(strip.compareDocumentPosition(screen.getByTestId('home-allocation-band'))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
 
@@ -898,7 +900,7 @@ describe('HomePage', () => {
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('renders the cycle phase guide after the story section', () => {
+  it('renders the cycle phase guide in the allocation band, before the story', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -908,7 +910,8 @@ describe('HomePage', () => {
 
     const story = screen.getByTestId('home-story-section');
     const phaseGuide = screen.getByRole('heading', { name: 'home.phaseGuide.title' });
-    expect(story.compareDocumentPosition(phaseGuide)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(screen.getByTestId('home-allocation-band')).toContainElement(phaseGuide);
+    expect(phaseGuide.compareDocumentPosition(story)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     expect(screen.getByRole('list', { name: 'home.phaseGuide.timelineAria' })).toBeInTheDocument();
   });
 
@@ -931,7 +934,7 @@ describe('HomePage', () => {
     );
   });
 
-  it('shows the rotating artwork in the deck art card, linked to its detail page', () => {
+  it('shows the rotating artwork as the full-width hero, linked to its detail page', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -941,8 +944,17 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const artCard = screen.getByTestId('deck-art-card');
-    const deck = screen.getByTestId('home-deck-layout');
-    expect(deck).toContainElement(artCard);
+    expect(artCard).toHaveAttribute('data-variant', 'hero');
+    const hero = screen.getByTestId('home-art-hero');
+    expect(hero).toContainElement(artCard);
+    // The deck header (page H1) leads; the artwork banner follows it and
+    // precedes the deck grid.
+    expect(screen.getByTestId('home-deck-header').compareDocumentPosition(hero)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(hero.compareDocumentPosition(screen.getByTestId('home-deck-layout'))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
 
     const artLink = screen.getByTestId('deck-art-link');
     expect(artLink).toHaveAttribute('href', expect.stringMatching(/^\/detail\/\d+$/));
@@ -975,6 +987,72 @@ describe('HomePage', () => {
     expect(within(artCard).queryByTestId('deck-art-link')).not.toBeInTheDocument();
   });
 
+  it('opens Advanced sideways at xl: the monument takes the chat column and hosts the panel', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseMediaQuery.mockReturnValue(true);
+
+    const { rerender } = render(<HomePage />);
+    expect(screen.getByTestId('home-deck-monument')).not.toHaveClass('xl:col-span-2');
+    expect(screen.getByTestId('home-deck-chat')).not.toHaveClass('xl:hidden');
+    expect(screen.queryByTestId('gesture-advanced-panel')).not.toBeInTheDocument();
+    // The console form is asked to open Advanced beside itself, not under.
+    expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-advanced-placement', 'side');
+
+    Object.assign(mockGestureForm, { advancedExpanded: true });
+    rerender(<HomePage />);
+    expect(screen.getByTestId('home-deck-monument')).toHaveClass('xl:col-span-2');
+    expect(screen.getByTestId('home-deck-chat')).toHaveClass('xl:hidden');
+    const panel = screen.getByTestId('gesture-advanced-panel');
+    expect(screen.getByTestId('monument-side-panel')).toContainElement(panel);
+    expect(panel).toHaveAttribute('data-show-all', 'true');
+
+    Object.assign(mockGestureForm, { advancedExpanded: false });
+    rerender(<HomePage />);
+    expect(screen.getByTestId('home-deck-monument')).not.toHaveClass('xl:col-span-2');
+    expect(screen.getByTestId('home-deck-chat')).not.toHaveClass('xl:hidden');
+    expect(screen.queryByTestId('gesture-advanced-panel')).not.toBeInTheDocument();
+    mockUseMediaQuery.mockReturnValue(false);
+  });
+
+  it('keeps Advanced inline below xl: no side panel, no column takeover', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseMediaQuery.mockReturnValue(false);
+    Object.assign(mockGestureForm, { advancedExpanded: true });
+
+    render(<HomePage />);
+    expect(screen.queryByTestId('gesture-advanced-panel')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('monument-side-panel')).not.toBeInTheDocument();
+    expect(screen.getByTestId('home-deck-monument')).not.toHaveClass('xl:col-span-2');
+    expect(screen.getByTestId('home-deck-chat')).not.toHaveClass('xl:hidden');
+  });
+
+  it('orders the deck for phones (monument, leaders, chat) and keeps the chat feed from driving the row', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<HomePage />);
+    const board = screen.getByTestId('home-deck-board');
+    const chat = screen.getByTestId('home-deck-chat');
+    const monument = screen.getByTestId('home-deck-monument');
+    expect(monument).toHaveClass('order-1', 'xl:order-2');
+    expect(board).toHaveClass('order-2', 'lg:order-3', 'xl:order-1');
+    expect(chat).toHaveClass('order-3', 'lg:order-2', 'xl:order-3');
+    // A definite xl height: the feed's length must never set the deck's height.
+    expect(screen.getByTestId('gesture-message-chat')).toHaveClass(
+      'xl:h-[clamp(22rem,48vh,30rem)]',
+      'xl:flex-auto',
+    );
+    expect(screen.getByTestId('gesture-message-chat')).not.toHaveClass('xl:flex-1');
+  });
+
+  it('keeps the leaderboard column populated before the first gesture of a cycle', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ TsRoundStart: 0, CurNumBids: 0 }),
+      isLoading: false,
+    });
+    render(<HomePage />);
+    const board = screen.getByTestId('home-deck-board');
+    expect(board.children.length).toBeGreaterThan(0);
+  });
+
   /* ── CTAs and phases ────────────────────────────────────────── */
 
   it('hero primary action only scrolls to gesture options when the cycle is active', async () => {
@@ -994,30 +1072,6 @@ describe('HomePage', () => {
       expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
       expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
       expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
-    } finally {
-      restore();
-    }
-  });
-
-  it('monument full-console action only scrolls and never submits', async () => {
-    const user = userEvent.setup();
-    const { scrollIntoView, restore } = mockScrollIntoView();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
-      isLoading: false,
-    });
-
-    try {
-      render(<HomePage />);
-
-      const monument = screen.getByTestId('cycle-monument');
-      await user.click(
-        within(monument).getByRole('button', { name: /home\.deck\.monument\.fullConsole/ }),
-      );
-
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
-      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
-      expect(mockAllocationFinalize.onFinalize).not.toHaveBeenCalled();
     } finally {
       restore();
     }
@@ -1390,7 +1444,7 @@ describe('HomePage', () => {
 
   /* ── Console layout and rail ────────────────────────────────── */
 
-  it('keeps the leaderboard right under the deck and the full console after it', () => {
+  it('keeps the leaderboard, monument console, and detail rail inside the deck', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1399,31 +1453,27 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const deck = screen.getByTestId('home-deck-layout');
-    const consoleLayout = screen.getByTestId('home-console-layout');
-    const leaders = screen.getByTestId('special-allocation-recipients');
-
-    // The previous-gesture payment, champion records, and current
-    // Chrono-Warrior must be readable before the console, not buried under it.
-    expect(deck.compareDocumentPosition(leaders)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(leaders.compareDocumentPosition(consoleLayout)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(consoleLayout).not.toContainElement(leaders);
-
-    const status = screen.getByTestId('gesture-status');
+    const leaders = screen.getAllByTestId('special-allocation-recipients')[0]!;
+    const monument = screen.getByTestId('cycle-monument');
     const form = screen.getByTestId('gesture-form');
-    const primaryColumn = screen.getByTestId('home-primary-column');
+    const status = screen.getByTestId('gesture-status');
+    const rail = screen.getByTestId('home-rail-column');
+    const chatColumn = screen.getByTestId('home-deck-chat');
 
-    expect(primaryColumn).toContainElement(status);
-    expect(primaryColumn).toContainElement(form);
-    expect(status.compareDocumentPosition(form)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    // One first viewport: records on the left, the cycle clock fused with the
+    // gesture console in the centre, chat plus the detail rail on the right.
+    expect(deck).toContainElement(leaders);
+    expect(monument).toContainElement(form);
+    expect(chatColumn).toContainElement(rail);
+    expect(rail).toContainElement(status);
 
-    // Allocation breakdown renders full-width after the console grid.
-    const allocationHeading = screen.getByText('home.allocation.title');
-    expect(consoleLayout.compareDocumentPosition(allocationHeading)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
+    // The allocation band (tracks + breakdown) follows the deck.
+    const band = screen.getByTestId('home-allocation-band');
+    expect(deck.compareDocumentPosition(band)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(band).toContainElement(screen.getByText('home.allocation.title'));
   });
 
-  it('uses a wider home shell and keeps desktop companion actions in the rail', () => {
+  it('uses a wider home shell and keeps the cycle links in the links row', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1432,15 +1482,14 @@ describe('HomePage', () => {
     const { container } = render(<HomePage />);
 
     const main = container.querySelector('main');
-    const rail = screen.getByTestId('home-rail-column');
+    const linksRow = screen.getByTestId('home-links-row');
     const cycleDetailsLink = screen.getByTestId('cycle-details-link-card');
-    const publicGoods = screen.getByTestId('public-goods-impact-card');
 
     expect(main).toHaveClass('xl:max-w-[92rem]', '2xl:max-w-[108rem]', '2xl:px-10');
-    expect(rail).toContainElement(cycleDetailsLink);
-    expect(rail).toContainElement(publicGoods);
+    expect(linksRow).toContainElement(cycleDetailsLink);
+    // The Final CST Gesture role card rides in the same row as the links.
+    expect(linksRow).toContainElement(screen.getAllByTestId('special-allocation-recipients')[1]!);
     expect(cycleDetailsLink).toHaveAttribute('href', '/current-cycle');
-    expect(publicGoods).toHaveAttribute('data-variant', 'rail');
   });
 
   it('fills the rail with attached assets when the current cycle has them', () => {
@@ -1457,7 +1506,6 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    const primaryColumn = screen.getByTestId('home-primary-column');
     const rail = screen.getByTestId('home-rail-column');
     const showcase = screen.getByTestId('attached-nft-showcase');
     const gestureStatusProps =
@@ -1467,7 +1515,6 @@ describe('HomePage', () => {
       expect.objectContaining({ attachedNFTCount: 2, attachedERC20Count: 1 }),
     );
     expect(rail).toContainElement(showcase);
-    expect(primaryColumn).not.toContainElement(showcase);
     expect(showcase).toHaveAttribute('data-count', '2');
     expect(showcase).toHaveAttribute('data-erc20-count', '1');
     expect(showcase).toHaveAttribute('data-cycle', '7');
@@ -1484,9 +1531,9 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    const rail = screen.getByTestId('home-rail-column');
+    const linksRow = screen.getByTestId('home-links-row');
 
-    expect(rail).toContainElement(screen.getByTestId('cycle-details-link-card'));
+    expect(linksRow).toContainElement(screen.getByTestId('cycle-details-link-card'));
     expect(screen.queryByTestId('home-rail-public-goods')).not.toBeInTheDocument();
     expect(screen.queryByTestId('home-rail-attached-assets')).not.toBeInTheDocument();
     expect(screen.queryByTestId('public-goods-impact-card')).not.toBeInTheDocument();
@@ -1577,14 +1624,18 @@ describe('HomePage', () => {
     expect(screen.getByText('home.allocation.title')).toBeInTheDocument();
   });
 
-  it('renders Public Goods impact card when dashboard data is loaded', () => {
+  // Public Goods is now a single tile in the Allocation Breakdown; the impact
+  // card (lifetime/vault/retrieved stats + legal disclaimer) moved to
+  // /public-goods-contributions-cg. Pinned so it cannot drift back.
+  it('states Public Goods in the Allocation Breakdown, not as a rail impact card', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText('home.publicGoods.heading')).toBeInTheDocument();
-    expect(screen.getAllByText('0.7000 ETH').length).toBeGreaterThan(0);
+    expect(screen.queryByTestId('public-goods-impact-card')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.publicGoods.heading')).not.toBeInTheDocument();
+    expect(screen.getByText('home.allocation.cards.publicGoods.name')).toBeInTheDocument();
   });
 
   it('renders link to full cycle details', () => {
@@ -1802,7 +1853,12 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByTestId('special-allocation-recipients')).toBeInTheDocument();
+    const instances = screen.getAllByTestId('special-allocation-recipients');
+    expect(instances).toHaveLength(2);
+    // Endurance Champion is folded into the Chrono-Warrior card (mergeEndurance),
+    // so the page states the endurance record exactly once.
+    expect(instances[0]).toHaveAttribute('data-roles', 'latest,chrono');
+    expect(instances[1]).toHaveAttribute('data-roles', 'lastcst');
   });
 
   it('passes account and latest message to SpecialAllocationRecipients', () => {
@@ -1822,22 +1878,11 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
-      'data-account',
-      '0xUser',
-    );
-    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
-      'data-message',
-      'hello cosmos',
-    );
-    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
-      'data-latest-gesture-id',
-      '99',
-    );
-    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
-      'data-latest-gesture-address',
-      '0xBidder',
-    );
+    const leaderboard = screen.getAllByTestId('special-allocation-recipients')[0]!;
+    expect(leaderboard).toHaveAttribute('data-account', '0xUser');
+    expect(leaderboard).toHaveAttribute('data-message', 'hello cosmos');
+    expect(leaderboard).toHaveAttribute('data-latest-gesture-id', '99');
+    expect(leaderboard).toHaveAttribute('data-latest-gesture-address', '0xBidder');
   });
 
   it('renders gesture button text', () => {
@@ -1931,14 +1976,10 @@ describe('HomePage', () => {
     await user.click(gestureButton);
     expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
 
-    // The monument mirrors the guard and points at the console's token grid.
+    // The form (with its token grid) sits right there in the monument, so no
+    // separate punt button is needed.
     const monument = screen.getByTestId('cycle-monument');
-    expect(
-      within(monument).getByRole('button', { name: /home\.deck\.monument\.chooseRwlkToken/ }),
-    ).toBeInTheDocument();
-    expect(
-      within(monument).getByRole('button', { name: /home\.form\.submit\.randomWalk/ }),
-    ).toBeDisabled();
+    expect(within(monument).getByTestId('gesture-form')).toBeInTheDocument();
   });
 
   it('renders finalize cycle button when data is available', () => {

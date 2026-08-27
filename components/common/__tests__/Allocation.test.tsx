@@ -92,8 +92,14 @@ describe('Allocation Breakdown', () => {
 
   it('shows fixed Recognition CST amount for Endurance Champion and Final CST Gesture', () => {
     render(<Prize data={mockData} />);
-    const cstAmounts = screen.getAllByText('home.allocation.amounts.fixedCst');
-    expect(cstAmounts.length).toBe(4);
+    // Tiles now headline their first amount and join the rest with dots so
+    // every tile in the 3×3 grid stays the same height. Endurance Champion and
+    // Final CST Gesture lead with the fixed CST amount…
+    expect(screen.getAllByText('home.allocation.amounts.fixedCst')).toHaveLength(2);
+    // …while Signature and Chrono-Warrior carry it in their secondary line.
+    expect(
+      screen.getAllByText(/home\.allocation\.amounts\.fixedCst · home\.allocation\.amounts\.nft/),
+    ).toHaveLength(2);
     expect(screen.getAllByText('home.allocation.amounts.fixedCstEach')).toHaveLength(2);
   });
 
@@ -101,8 +107,12 @@ describe('Allocation Breakdown', () => {
     render(<Prize data={mockData} />);
     expect(screen.getByText('home.allocation.cards.chronoWarrior.name')).toBeInTheDocument();
     expect(screen.getByText('home.allocation.amounts.eth(amount=0.5000)')).toBeInTheDocument();
-    expect(screen.getAllByText('home.allocation.amounts.fixedCst')).toHaveLength(4);
-    expect(screen.getAllByText('home.allocation.amounts.nft')).toHaveLength(4);
+    // CST + NFT ride on the tile's secondary dot-separated line.
+    expect(
+      screen.getAllByText(/home\.allocation\.amounts\.fixedCst · home\.allocation\.amounts\.nft/),
+    ).toHaveLength(2);
+    // NFT Stellar / RandomWalk tiles still state the NFT-each piece.
+    expect(screen.getAllByText(/home\.allocation\.amounts\.nftEach/)).toHaveLength(2);
   });
 
   it('renders with null data without crashing', () => {

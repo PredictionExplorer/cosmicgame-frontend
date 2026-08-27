@@ -70,7 +70,8 @@ const files: FileEntry[] = COMPONENT_FILES.map((name) => {
 
 const EXPECTED_COUNTS: Record<string, number> = {
   'home/AuctionInfo.tsx': 1,
-  'home/GestureForm.tsx': 1,
+  // GestureForm + ADVANCED_SIDE_MEDIA_QUERY (the Advanced side-panel breakpoint).
+  'home/GestureForm.tsx': 2,
   'home/CustomTabPanel.tsx': 2,
   'home/DonatedTokensSection.tsx': 1,
   'home/RoundInfoSection.tsx': 1,
@@ -101,9 +102,9 @@ describe('Component JSDoc coverage', () => {
   });
 
   describe('no export is missing from the inventory', () => {
-    it('total exported symbols across all component files is 10', () => {
+    it('total exported symbols across all component files is 11', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(10);
+      expect(total).toBe(11);
     });
   });
 

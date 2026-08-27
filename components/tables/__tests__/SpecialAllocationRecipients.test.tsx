@@ -442,6 +442,10 @@ describe('SpecialAllocationRecipients', () => {
     );
     expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(enduranceAddress);
     expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
+    // The standing endurance record sits beside the running segment chasing it.
+    expect(screen.getByTestId('chrono-endurance-window')).toHaveTextContent(
+      'tables.specialAllocation.enduranceWindow',
+    );
     expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent(
       'tables.specialAllocation.canOvertakeIn',
     );
