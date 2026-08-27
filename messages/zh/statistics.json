@@ -245,6 +245,7 @@
     "gestureTypeDistribution": "按所选间隔展示 ETH、Random Walk（以 ETH 支付）与 CST 落笔占比，仅统计当前周期。",
     "enduranceTimeline": "以甘特图展示每个周期内的领先者。每个条形代表一段领先时段，其宽度对应保持领先的时长。最宽的条形属于坚守冠军；连续担任坚守冠军时间最长的参与者则是时之勇士。可选择任意周期比较。",
     "cstWindow": "展示 CST 校准窗口在周期内的演变。每次 ETH 落笔都会略微缩短窗口；每次 CST 落笔则会延长它。窗口决定 CST 落笔价格衰减到免费的速度。可选择任意周期比较。",
+    "cstCost": "以对数刻度展示周期内每次 CST 落笔的实际成本，并同时显示落笔前分配时钟的剩余时间。周期中段的落笔往往几乎免费；而在收官阶段，密集落笔让价格来不及回落，成本可能高达数千 CST。",
     "attachedTokenDistribution": "随落笔附加的 ERC-721 资产合约与代币数量。",
     "cosmicSignatureTokenDistribution": "Cosmic Signature NFT（ERC-721）当前的持有者分布。",
     "cstBalanceDistribution": "CST（ERC-20）当前的钱包余额分布。",
@@ -281,6 +282,7 @@
       "typeDistribution": "落笔类型分布",
       "enduranceTimeline": "坚守与时之勇士时间线",
       "cstWindow": "CST 校准窗口时间线",
+      "cstCost": "CST 落笔价格走势",
       "cycleActivations": "周期启用记录"
     },
     "currentCycleOnly": "仅当前周期",
@@ -537,14 +539,16 @@
       "chronoSummary": "时之勇士：{address}，在位 {duration}",
       "gantt": "甘特图",
       "lineChart": "折线图",
+      "openWindowAria": "在新窗口中打开图表",
+      "openWindowTitle": "在新窗口中打开"
+    },
+    "cyclePicker": {
       "cycle": "周期",
       "previousCycleAria": "上一个周期",
       "nextCycleAria": "下一个周期",
       "cycleNumberAria": "周期编号",
       "liveCycle": "当前周期",
-      "jumpLive": "回到当前周期",
-      "openWindowAria": "在新窗口中打开图表",
-      "openWindowTitle": "在新窗口中打开"
+      "jumpLive": "回到当前周期"
     },
     "cstWindow": {
       "timeIntoCycle": "周期内时间",
@@ -562,13 +566,25 @@
       "empty": "此周期没有逐笔校准窗口数据。V2 事件之前索引的周期不包含该数据。",
       "selectCycle": "请选择要查看的周期。",
       "loadErrorTitle": "未能加载校准窗口时间线",
-      "loadErrorMessage": "未能获取此周期的落笔历史。",
-      "cycle": "周期",
-      "previousCycleAria": "上一个周期",
-      "nextCycleAria": "下一个周期",
-      "cycleNumberAria": "周期编号",
-      "liveCycle": "当前周期",
-      "jumpLive": "回到当前周期"
+      "loadErrorMessage": "未能获取此周期的落笔历史。"
+    },
+    "cstCost": {
+      "timeIntoCycle": "周期内时间",
+      "intoCycle": "周期开始后 {duration}",
+      "priceLine": "每次落笔支付的 CST",
+      "clockLine": "落笔前时钟剩余",
+      "cstPaid": "支付的 CST",
+      "clockBefore": "落笔前剩余时间",
+      "gestureBy": "落笔者",
+      "clickHint": "点击圆点可查看交易。",
+      "summaryMax": "最贵：{amount}（周期开始后 {when}）",
+      "summaryTotal": "总消耗：{amount}",
+      "summaryCount": "{count} 次 CST 落笔",
+      "description": "每个紫色圆点代表一次 CST 落笔的实际支付金额（对数刻度——空心圆点表示免费）。每次 CST 落笔后，价格会以约两倍于成交价重新开始，并在校准窗口内回落到免费。玫红色虚线表示每次落笔前分配时钟的剩余时间：当时钟接近归零时，密集落笔让价格来不及回落，成交价格随之飙升。点击圆点可查看交易。",
+      "empty": "此周期没有 CST 落笔。",
+      "selectCycle": "请选择要查看的周期。",
+      "loadErrorTitle": "未能加载 CST 落笔价格",
+      "loadErrorMessage": "未能获取此周期的落笔历史。"
     },
     "supply": {
       "totalSupply": "总供应量",

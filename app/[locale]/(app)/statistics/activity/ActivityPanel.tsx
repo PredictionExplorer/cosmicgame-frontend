@@ -11,6 +11,7 @@ import { LastBidSpikeChart } from '@/components/statistics/LastBidSpikeChart';
 import { BidderActivePeriodsTimeline } from '@/components/statistics/BidderActivePeriodsTimeline';
 import { BidTypeRatioChart } from '@/components/statistics/BidTypeRatioChart';
 import { CstCalibrationWindowSection } from '@/components/statistics/CstCalibrationWindowChart';
+import { CstGestureCostSection } from '@/components/statistics/CstGestureCostChart';
 import { EnduranceTimelineSection } from '@/components/statistics/EnduranceTimelineChart';
 import { SystemModesTable, type EventRow } from '@/components/tables/SystemModesTable';
 
@@ -76,6 +77,14 @@ const ActivityPanel = () => {
         icon={<Activity className="h-3.5 w-3.5" />}
       >
         <CstCalibrationWindowSection currentRoundNum={curRoundNum} />
+      </StatsSection>
+
+      <StatsSection
+        title={t('activity.sections.cstCost')}
+        tooltip={t('sectionTooltips.cstCost')}
+        icon={<Activity className="h-3.5 w-3.5" />}
+      >
+        <CstGestureCostSection currentRoundNum={curRoundNum} />
       </StatsSection>
 
       <StatsSection

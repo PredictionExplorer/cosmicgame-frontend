@@ -249,6 +249,8 @@ export const GestureInfoSchema = z
      * BidPlaced events; legacy events report -1).
      */
     CstDutchAuctionDurationInt: z.number().optional(),
+    /** Allocation-clock deadline (unix seconds) in effect after this gesture. */
+    PrizeTime: z.number().optional(),
   })
   .loose();
 export type GestureInfoParsed = z.infer<typeof GestureInfoSchema>;

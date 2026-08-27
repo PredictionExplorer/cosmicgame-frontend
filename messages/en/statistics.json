@@ -245,6 +245,7 @@
     "gestureTypeDistribution": "Share of gestures made with ETH, RandomWalk (ETH-paid), and CST over time, sampled at a chosen interval. Current cycle only.",
     "enduranceTimeline": "A Gantt of who held the lead during a cycle. Each bar is a lead stint (its width = how long that address held the lead). The widest bar is the Endurance Champion; the Chrono-Warrior is the participant whose single continuous reign as Endurance Champion lasted the longest. Pick any cycle to compare.",
     "cstWindow": "How the CST Calibration Window evolved during a cycle. Every ETH gesture shortens the window slightly; every CST gesture lengthens it. The window sets how fast the CST gesture cost decays to free. Pick any cycle to compare.",
+    "cstCost": "What each CST gesture actually cost during a cycle, on a log scale, alongside the allocation clock remaining right before it. Mid-cycle gestures are often nearly free; in the endgame, rapid gesturing leaves the cost no time to descend and prices can reach thousands of CST.",
     "attachedTokenDistribution": "Contracts and token counts for ERC-721 assets attached to gestures.",
     "cosmicSignatureTokenDistribution": "Current owner distribution for Cosmic Signature NFT ERC-721 tokens.",
     "cstBalanceDistribution": "Current wallet distribution for CST ERC-20 balances.",
@@ -281,6 +282,7 @@
       "typeDistribution": "Gesture Type Distribution",
       "enduranceTimeline": "Endurance & Chrono Timeline",
       "cstWindow": "CST Calibration Window Timeline",
+      "cstCost": "CST Gesture Cost Over Time",
       "cycleActivations": "Cycle Activations"
     },
     "currentCycleOnly": "Current cycle only",
@@ -537,14 +539,16 @@
       "chronoSummary": "Chrono-warrior: {address} reigned {duration}",
       "gantt": "Gantt",
       "lineChart": "Line chart",
+      "openWindowAria": "Open chart in a new window",
+      "openWindowTitle": "Open in new window"
+    },
+    "cyclePicker": {
       "cycle": "Round",
       "previousCycleAria": "Previous round",
       "nextCycleAria": "Next round",
       "cycleNumberAria": "Round number",
       "liveCycle": "Live round",
-      "jumpLive": "Jump to live",
-      "openWindowAria": "Open chart in a new window",
-      "openWindowTitle": "Open in new window"
+      "jumpLive": "Jump to live"
     },
     "cstWindow": {
       "timeIntoCycle": "Time into round",
@@ -562,13 +566,25 @@
       "empty": "No per-gesture Calibration Window data for this round. Rounds indexed before the V2 events do not include it.",
       "selectCycle": "Select a round to inspect.",
       "loadErrorTitle": "Failed to load Calibration Window timeline",
-      "loadErrorMessage": "Could not fetch the gesture history for this round.",
-      "cycle": "Round",
-      "previousCycleAria": "Previous round",
-      "nextCycleAria": "Next round",
-      "cycleNumberAria": "Round number",
-      "liveCycle": "Live round",
-      "jumpLive": "Jump to live"
+      "loadErrorMessage": "Could not fetch the gesture history for this round."
+    },
+    "cstCost": {
+      "timeIntoCycle": "Time into round",
+      "intoCycle": "{duration} into round",
+      "priceLine": "CST paid per gesture",
+      "clockLine": "Clock remaining before gesture",
+      "cstPaid": "CST paid",
+      "clockBefore": "Clock remaining before",
+      "gestureBy": "Gesture by",
+      "clickHint": "Click the dot to open the transaction.",
+      "summaryMax": "Priciest: {amount} ({when} into round)",
+      "summaryTotal": "Total consumed: {amount}",
+      "summaryCount": "{count} CST gestures",
+      "description": "Each violet dot is the CST actually paid for a gesture (log scale — hollow dots were free). After every CST gesture the cost resets near twice the paid amount and descends to free across the Calibration Window. The dashed rose line shows the allocation clock remaining right before each gesture: when the clock runs low, rapid gesturing leaves the cost no time to descend, so paid prices escalate. Click a dot to open its transaction.",
+      "empty": "No CST gestures in this round.",
+      "selectCycle": "Select a round to inspect.",
+      "loadErrorTitle": "Failed to load CST gesture costs",
+      "loadErrorMessage": "Could not fetch the gesture history for this round."
     },
     "supply": {
       "totalSupply": "Total supply",

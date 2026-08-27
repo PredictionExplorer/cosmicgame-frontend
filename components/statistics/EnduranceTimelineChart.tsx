@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, useState, type FC } from 'react';
+import { memo, useMemo, type FC } from 'react';
 import {
   ComposedChart,
   Area,
@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds, shortenHex } from '@/utils';
@@ -28,8 +28,8 @@ import {
 import { useGestureListByCycle, useRoundInfo, useCurrentTime } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_HEIGHT_CLASS, TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
-import { Button } from '@/components/ui/button';
+import { TOUCH_TARGET_ICON_CLASS } from '@/lib/touch-target';
+import { CyclePickerSection } from '@/components/statistics/CyclePickerSection';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -494,73 +494,11 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
   currentRoundNum,
 }) => {
   const t = useTranslations('statistics');
-  const maxRound = Math.max(0, currentRoundNum);
-  // `null` means "follow the live round": the selection is derived from
-  // currentRoundNum until the user explicitly navigates, so a new live round
-  // (or a late-arriving dashboard response) is picked up automatically.
-  const [pinnedRound, setPinnedRound] = useState<number | null>(null);
-  const selectedRound = pinnedRound === null ? maxRound : Math.min(pinnedRound, maxRound);
-  const setSelectedRound = (round: number) => {
-    const clamped = Math.min(Math.max(0, round), maxRound);
-    setPinnedRound(clamped >= maxRound ? null : clamped);
-  };
-
-  const isLive = selectedRound >= currentRoundNum;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="text-xs uppercase tracking-wider text-muted-foreground">
-          {t('charts.endurance.cycle')}
-        </span>
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            aria-label={t('charts.endurance.previousCycleAria')}
-            disabled={selectedRound <= 0}
-            onClick={() => setSelectedRound(selectedRound - 1)}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <input
-            type="number"
-            min={0}
-            max={maxRound}
-            value={selectedRound}
-            aria-label={t('charts.endurance.cycleNumberAria')}
-            onChange={(e) => {
-              const next = Number(e.target.value);
-              if (Number.isFinite(next)) {
-                setSelectedRound(Math.floor(next));
-              }
-            }}
-            className={cn(
-              'w-20 rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-center text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-              TOUCH_TARGET_HEIGHT_CLASS,
-            )}
-          />
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            aria-label={t('charts.endurance.nextCycleAria')}
-            disabled={selectedRound >= maxRound}
-            onClick={() => setSelectedRound(selectedRound + 1)}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-        {isLive ? (
-          <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            {t('charts.endurance.liveCycle')}
-          </span>
-        ) : (
-          <Button type="button" size="sm" variant="ghost" onClick={() => setPinnedRound(null)}>
-            {t('charts.endurance.jumpLive')}
-          </Button>
-        )}
+    <CyclePickerSection
+      currentRoundNum={currentRoundNum}
+      headerEnd={(selectedRound) => (
         <Link
           href={`/embed/endurance/${selectedRound}`}
           target="_blank"
@@ -574,10 +512,10 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
         >
           <ExternalLink className="h-4 w-4" />
         </Link>
-      </div>
-
-      <EnduranceTimelineChart round={selectedRound} isLive={isLive} />
-    </div>
+      )}
+    >
+      {(selectedRound, isLive) => <EnduranceTimelineChart round={selectedRound} isLive={isLive} />}
+    </CyclePickerSection>
   );
 };
 

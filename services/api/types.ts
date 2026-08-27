@@ -289,6 +289,8 @@ export interface GestureInfo extends TxInfo {
    * (from the V2 BidPlaced event). Legacy events report -1.
    */
   CstDutchAuctionDurationInt?: number;
+  /** Allocation-clock deadline (unix seconds) in effect after this gesture. */
+  PrizeTime?: number;
   [key: string]: unknown;
 }
 
