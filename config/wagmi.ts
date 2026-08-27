@@ -14,7 +14,7 @@
  *   - at boot, only for returning visitors whose last session used a heavy
  *     connector (see WalletUiProvider), so their session still restores.
  */
-import { createConfig, http } from 'wagmi';
+import { createConfig, createStorage, http } from 'wagmi';
 import type { Chain } from 'viem';
 import { injected } from 'wagmi/connectors';
 
@@ -62,6 +62,19 @@ export const wagmiTransports = {
   ),
 };
 
+/**
+ * Testing mode (the local harness, scripts/harness) keeps wallet sessions in
+ * its own storage namespace. Sessions persisted by regular dev runs on this
+ * origin (e.g. MetaMask on Arbitrum One) must never be restored against the
+ * harness chain: wagmi would reconnect them at boot and every wallet-client
+ * query would log ConnectorChainMismatchError before the burner wallet could
+ * replace the session.
+ */
+const harnessStorageNamespace =
+  process.env.NEXT_PUBLIC_HARNESS === '1' && process.env.NEXT_PUBLIC_NETWORK === 'local'
+    ? 'cosmic-harness-wagmi'
+    : null;
+
 /** Wagmi config for the app's wallet provider tree. */
 export const wagmiConfig = createConfig({
   chains: wagmiChains,
@@ -71,4 +84,5 @@ export const wagmiConfig = createConfig({
   // installed on demand — see wallet-connectors.ts.
   connectors: [injected({ shimDisconnect: true })],
   ssr: true,
+  ...(harnessStorageNamespace ? { storage: createStorage({ key: harnessStorageNamespace }) } : {}),
 });

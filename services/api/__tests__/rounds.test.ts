@@ -613,8 +613,21 @@ describe('rounds API', () => {
       );
     });
 
-    it('propagates a 400 instead of resolving to null', async () => {
+    it('resolves to null on 400 (chrono-warrior undefined early in a cycle)', async () => {
+      // The backend answers 400 while the on-chain chrono-warrior is still
+      // the unset sentinel — a defined "no live special recipients yet"
+      // state at the start of every cycle, not a failure.
       mockedAxios.get.mockRejectedValue(make400());
+      await expect(get_current_special_winners()).resolves.toBeNull();
+    });
+
+    it('still propagates server failures', async () => {
+      mockedAxios.get.mockRejectedValue(
+        Object.assign(new Error('Internal Server Error'), {
+          response: { status: 500 },
+          isAxiosError: true,
+        }),
+      );
       await expect(get_current_special_winners()).rejects.toThrow('Network response was not OK');
     });
 

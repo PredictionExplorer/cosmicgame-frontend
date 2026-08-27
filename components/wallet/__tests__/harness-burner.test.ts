@@ -7,12 +7,48 @@ jest.mock('wagmi/actions', () => ({
   getAccount: jest.fn(() => ({ connector: undefined })),
 }));
 jest.mock('wagmi/connectors', () => ({ injected: jest.fn(() => jest.fn()) }));
+jest.mock('viem/accounts', () => ({
+  privateKeyToAccount: (key: string) => ({ address: `0x${key.slice(2, 42)}` }),
+}));
+jest.mock('viem/chains', () => ({
+  hardhat: { id: 31337, rpcUrls: { default: { http: ['http://127.0.0.1:8545'] } } },
+}));
+
+import { connect, disconnect, getAccount } from 'wagmi/actions';
+import type { Config } from 'wagmi';
 
 import {
+  connectHarnessBurner,
   createBurnerProvider,
   harnessPersonaOptions,
   type BurnerWalletLike,
 } from '@/components/wallet/harness-burner';
+
+const mockedGetAccount = getAccount as jest.Mock;
+const mockedConnect = connect as jest.Mock;
+const mockedDisconnect = disconnect as jest.Mock;
+
+const BURNER_ID = 'cosmicHarnessPersonas';
+
+/** Minimal wagmi Config stand-in exercising the connector install path. */
+function fakeWagmiConfig(): Config {
+  const installed: Array<{ id: string }> = [];
+  return {
+    get connectors() {
+      return installed;
+    },
+    _internal: {
+      connectors: {
+        setup: jest.fn(() => ({ id: BURNER_ID })),
+        setState: jest.fn((update: (current: Array<{ id: string }>) => Array<{ id: string }>) => {
+          const next = update(installed.slice());
+          installed.length = 0;
+          installed.push(...next);
+        }),
+      },
+    },
+  } as unknown as Config;
+}
 
 function fakeWallet(address: `0x${string}`): BurnerWalletLike & {
   sendTransaction: jest.Mock;
@@ -108,5 +144,63 @@ describe('createBurnerProvider', () => {
     expect(listeners.get('accountsChanged')?.has(listener)).toBe(true);
     provider.removeListener('accountsChanged', listener);
     expect(listeners.get('accountsChanged')?.has(listener)).toBe(false);
+  });
+});
+
+describe('connectHarnessBurner', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('connects the burner when nothing is connected', async () => {
+    mockedGetAccount.mockReturnValue({ connector: undefined });
+    const config = fakeWagmiConfig();
+
+    const persona = await connectHarnessBurner(config);
+
+    expect(persona).toBe('Nova');
+    expect(mockedDisconnect).not.toHaveBeenCalled();
+    expect(mockedConnect).toHaveBeenCalledWith(config, {
+      connector: expect.objectContaining({ id: BURNER_ID }),
+    });
+  });
+
+  it('replaces a restored session whose connector is on the wrong chain', async () => {
+    // A stale wallet session from a mainnet dev run: connector reports
+    // Arbitrum One while the harness chain is 31337 — every wagmi client
+    // query would fail with ConnectorChainMismatchError.
+    const stale = { id: 'io.metamask', getChainId: jest.fn().mockResolvedValue(42_161) };
+    mockedGetAccount
+      .mockReturnValueOnce({ connector: stale })
+      .mockReturnValue({ connector: undefined });
+    const config = fakeWagmiConfig();
+
+    await connectHarnessBurner(config);
+
+    expect(mockedDisconnect).toHaveBeenCalledWith(config);
+    expect(mockedConnect).toHaveBeenCalledWith(config, {
+      connector: expect.objectContaining({ id: BURNER_ID }),
+    });
+  });
+
+  it('leaves a foreign wallet alone when it is on the harness chain', async () => {
+    const deliberate = { id: 'io.metamask', getChainId: jest.fn().mockResolvedValue(31_337) };
+    mockedGetAccount.mockReturnValue({ connector: deliberate });
+    const config = fakeWagmiConfig();
+
+    await connectHarnessBurner(config);
+
+    expect(mockedDisconnect).not.toHaveBeenCalled();
+    expect(mockedConnect).not.toHaveBeenCalled();
+  });
+
+  it('does not reconnect when the burner is already active', async () => {
+    mockedGetAccount.mockReturnValue({ connector: { id: BURNER_ID } });
+    const config = fakeWagmiConfig();
+
+    await connectHarnessBurner(config);
+
+    expect(mockedDisconnect).not.toHaveBeenCalled();
+    expect(mockedConnect).not.toHaveBeenCalled();
   });
 });

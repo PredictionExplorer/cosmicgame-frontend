@@ -14,6 +14,7 @@ import {
   flattenGesture,
   flattenGestureArray,
   flattenRoundInfo,
+  isAxiosError,
   pagedPath,
   type ApiListRequestOptions,
   type ApiRequestOptions,
@@ -195,12 +196,22 @@ export function get_current_special_winners(
   opts?: ApiRequestOptions,
 ): Promise<SpecialRecipients | null> {
   return apiCallRequired(async () => {
-    const { data } = await apiGet(getAPIUrl('bid/current_special_winners'), opts);
-    return validate(
-      SpecialRecipientsSchema,
-      data,
-      'SpecialRecipients[current]',
-    ) as SpecialRecipients;
+    try {
+      const { data } = await apiGet(getAPIUrl('bid/current_special_winners'), opts);
+      return validate(
+        SpecialRecipientsSchema,
+        data,
+        'SpecialRecipients[current]',
+      ) as SpecialRecipients;
+    } catch (err) {
+      // Early in a cycle the chrono-warrior is still undefined on-chain (a
+      // sentinel value), and the backend answers 400 instead of fabricating
+      // a snapshot. That is this endpoint's defined "no live special
+      // recipients yet" answer — map it to the null contract rather than an
+      // error; anything else still fails loudly per apiCallRequired policy.
+      if (isAxiosError(err) && err.response?.status === 400) return null;
+      throw err;
+    }
   });
 }
 

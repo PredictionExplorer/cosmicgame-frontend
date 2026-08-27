@@ -4,7 +4,7 @@
  * a harness-specific dist dir so a regular `npm run dev` can coexist.
  */
 
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 import type { HarnessConfig } from '../config';
@@ -67,6 +67,12 @@ export function testingModeEnv(config: HarnessConfig): Record<string, string> {
 /** Start `next dev` in testing mode and wait until it serves. */
 export async function startFrontend(config: HarnessConfig): Promise<ManagedProcess> {
   rmSync(logFileFor(config, 'web'), { force: true });
+  // Next rewrites next-env.d.ts to reference the active dist dir at boot;
+  // the harness dist dir is machine-local, so the canonical (committed)
+  // content is restored once the server is up to keep the tree clean.
+  const nextEnvFile = join(config.frontendDir, 'next-env.d.ts');
+  const canonicalNextEnv = existsSync(nextEnvFile) ? readFileSync(nextEnvFile, 'utf8') : null;
+
   const managed = spawnSupervised({
     name: 'web',
     command: 'npx',
@@ -83,5 +89,8 @@ export async function startFrontend(config: HarnessConfig): Promise<ManagedProce
     },
     { timeoutMs: 120_000 },
   );
+  if (canonicalNextEnv !== null && readFileSync(nextEnvFile, 'utf8') !== canonicalNextEnv) {
+    writeFileSync(nextEnvFile, canonicalNextEnv);
+  }
   return managed;
 }

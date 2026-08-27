@@ -32,4 +32,15 @@ module.exports = {
   decodeEventLog: (args: unknown) =>
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     (require('viem/utils') as { decodeEventLog: (a: unknown) => unknown }).decodeEventLog(args),
+  // Inert client factories for modules that build viem clients at setup time
+  // (e.g. the harness burner wallet). Tests interact through higher-level
+  // fakes; these only need to be constructible.
+  http: (url?: string) => ({ url }),
+  createWalletClient: (args: { account?: unknown }) => ({
+    account: args.account,
+    sendTransaction: async () => '0x',
+    signMessage: async () => '0x',
+    signTypedData: async () => '0x',
+  }),
+  createPublicClient: () => ({ request: async () => null }),
 };

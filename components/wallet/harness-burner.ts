@@ -175,6 +175,12 @@ function buildProvider(s: BurnerState) {
 /**
  * Install (once) and connect the burner connector on the given wagmi config.
  * Returns the active persona name.
+ *
+ * A previously persisted wallet session (e.g. MetaMask from a mainnet dev
+ * run) can be restored on a chain other than the harness chain, which makes
+ * every wagmi client query fail with ConnectorChainMismatchError. Testing
+ * mode owns the wallet state: such sessions are replaced by the burner. A
+ * foreign wallet deliberately connected on the harness chain is left alone.
  */
 export async function connectHarnessBurner(config: Config): Promise<string> {
   if (!state) state = buildState();
@@ -196,6 +202,16 @@ export async function connectHarnessBurner(config: Config): Promise<string> {
   }
   const connector = config.connectors.find((c) => c.id === CONNECTOR_ID);
   if (!connector) throw new Error('Burner connector failed to install');
+
+  const account = getAccount(config);
+  if (account.connector && account.connector.id !== CONNECTOR_ID) {
+    const connectorChainId = await account.connector.getChainId().catch(() => null);
+    if (connectorChainId === chain().id) {
+      // A working wallet on the harness chain — respect the user's choice.
+      return PERSONAS[state.personaIndex]?.name ?? 'Unknown';
+    }
+    await disconnect(config);
+  }
   if (getAccount(config).connector?.id !== CONNECTOR_ID) {
     await connect(config, { connector });
   }

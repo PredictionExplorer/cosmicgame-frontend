@@ -9,6 +9,7 @@ import { wagmiConfig, walletAppName, walletConnectProjectId } from '../wagmi';
 
 jest.mock('wagmi', () => ({
   createConfig: jest.fn((config) => ({ kind: 'wagmi-config', ...config })),
+  createStorage: jest.fn((options: { key: string }) => ({ kind: 'wagmi-storage', ...options })),
   http: jest.fn((url?: string) => ({ kind: 'http-transport', url })),
 }));
 
@@ -50,6 +51,35 @@ describe('wagmi wallet configuration (light boot config)', () => {
     );
     expect(walletConnectProjectId).not.toBe('placeholder_get_real_id_from_cloud_walletconnect_com');
     expect(walletAppName).toBe('Cosmic Signature');
+  });
+
+  it('uses default wagmi storage outside harness testing mode', () => {
+    // Hermetic jest env is sepolia without NEXT_PUBLIC_HARNESS: real user
+    // sessions must keep living under wagmi's default storage key.
+    const configArg = mockCreateConfig.mock.calls[0]?.[0];
+    expect(configArg).not.toHaveProperty('storage');
+  });
+
+  it('namespaces wallet-session storage in harness testing mode', () => {
+    // Sessions from regular dev runs (e.g. MetaMask on Arbitrum One) must be
+    // invisible to testing mode, or wagmi restores them against chain 31337
+    // and every wallet-client query logs ConnectorChainMismatchError.
+    const previousHarness = process.env.NEXT_PUBLIC_HARNESS;
+    const previousNetwork = process.env.NEXT_PUBLIC_NETWORK;
+    process.env.NEXT_PUBLIC_HARNESS = '1';
+    process.env.NEXT_PUBLIC_NETWORK = 'local';
+    jest.resetModules();
+    try {
+       
+      const harnessConfig = (require('../wagmi') as typeof import('../wagmi')).wagmiConfig;
+      expect(harnessConfig).toMatchObject({
+        storage: { kind: 'wagmi-storage', key: 'cosmic-harness-wagmi' },
+      });
+    } finally {
+      process.env.NEXT_PUBLIC_HARNESS = previousHarness;
+      process.env.NEXT_PUBLIC_NETWORK = previousNetwork;
+      jest.resetModules();
+    }
   });
 
   it('never imports RainbowKit — that would drag the wallet stack into every page', () => {
