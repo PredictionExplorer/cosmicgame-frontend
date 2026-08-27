@@ -6,6 +6,7 @@ import {
   liveCycleJsonLd,
   nftProductJsonLd,
   organizationJsonLd,
+  visualArtworkJsonLd,
   webApplicationJsonLd,
   websiteJsonLd,
 } from '@/utils/jsonLd';
@@ -307,15 +308,22 @@ describe('JSON-LD generators', () => {
       imageUrl: 'https://example.com/42.png',
     });
 
-    it('returns Product schema type', () => {
+    it('returns a dual Product + VisualArtwork schema type', () => {
       expect(result['@context']).toBe('https://schema.org');
-      expect(result['@type']).toBe('Product');
+      // Product keeps collectible rich-result eligibility; VisualArtwork
+      // tells search and AI engines the token is, first, art.
+      expect(result['@type']).toEqual(['Product', 'VisualArtwork']);
+      expect(result.artform).toBe('Digital Art');
+      expect(result.license).toContain('creativecommons.org/publicdomain/zero');
     });
 
-    it('includes token details', () => {
+    it('includes token details with licensable image metadata', () => {
       expect(result.name).toBe('Cosmic Signature NFT #42');
       expect(result.description).toBe('A unique NFT');
-      expect(result.image).toBe('https://example.com/42.png');
+      expect(result.image['@type']).toBe('ImageObject');
+      expect(result.image.contentUrl).toBe('https://example.com/42.png');
+      expect(result.image.license).toContain('creativecommons.org/publicdomain/zero');
+      expect(result.image.acquireLicensePage).toBe(result.url);
     });
 
     it('points URLs at the app subdomain (not the landing host)', () => {
@@ -333,6 +341,32 @@ describe('JSON-LD generators', () => {
 
     it('does not claim the NFT is available for a zero-price offer', () => {
       expect(result).not.toHaveProperty('offers');
+    });
+  });
+
+  describe('visualArtworkJsonLd', () => {
+    const result = visualArtworkJsonLd({
+      tokenId: 7,
+      name: 'Cosmic Signature #000007',
+      description: 'Deterministic three-body artwork',
+      imageUrl: 'https://example.com/7.png',
+      inLanguage: 'en',
+    });
+
+    it('describes the featured artwork as a licensed VisualArtwork', () => {
+      expect(result['@type']).toBe('VisualArtwork');
+      expect(result.url).toBe('https://app.cosmicsignature.com/detail/7');
+      expect(result.artMedium).toMatch(/three-body/i);
+      expect(result.license).toContain('creativecommons.org/publicdomain/zero');
+      expect(result.image['@type']).toBe('ImageObject');
+      expect(result.image.contentUrl).toBe('https://example.com/7.png');
+      expect(result.image.acquireLicensePage).toBe('https://app.cosmicsignature.com/detail/7');
+      expect(result.inLanguage).toBe('en');
+    });
+
+    it('links the artwork into the protocol entity graph', () => {
+      expect(result.creator).toEqual({ '@id': 'https://cosmicsignature.com/#organization' });
+      expect(result.isPartOf).toEqual({ '@id': 'https://cosmicsignature.com/#art-protocol' });
     });
   });
 

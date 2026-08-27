@@ -9,6 +9,19 @@ export interface LandingMetaContent {
   readonly keywords: readonly string[];
 }
 
+export interface LandingHeroArtContent {
+  readonly eyebrow: string;
+  readonly caption: string;
+  readonly cstNote: string;
+  readonly formingLabel: string;
+  readonly formingBody: string;
+  /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */
+  readonly viewAriaLabel: string;
+  /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */
+  readonly artworkAlt: string;
+  readonly galleryCta: string;
+}
+
 export interface LandingHeroContent {
   readonly eyebrow: string;
   readonly headline: string;
@@ -22,6 +35,7 @@ export interface LandingHeroContent {
   readonly galleryCta: LandingLink;
   readonly scrollAriaLabel: string;
   readonly marqueeChips: readonly string[];
+  readonly art: LandingHeroArtContent;
 }
 
 export interface LandingStage {

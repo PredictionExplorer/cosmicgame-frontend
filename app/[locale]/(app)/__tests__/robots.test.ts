@@ -74,7 +74,7 @@ describe('robots (host-aware)', () => {
 
     it('references the landing sitemap', async () => {
       const result = await robots();
-      expect(result.sitemap).toBe('https://cosmicsignature.com/sitemap.xml');
+      expect(result.sitemap).toEqual(['https://cosmicsignature.com/sitemap.xml']);
     });
 
     it('specifies the landing host', async () => {
@@ -88,9 +88,12 @@ describe('robots (host-aware)', () => {
       mockHost = 'app.cosmicsignature.com';
     });
 
-    it('references the app sitemap', async () => {
+    it('references the app sitemap plus the artwork image sitemap', async () => {
       const result = await robots();
-      expect(result.sitemap).toBe('https://app.cosmicsignature.com/sitemap.xml');
+      expect(result.sitemap).toEqual([
+        'https://app.cosmicsignature.com/sitemap.xml',
+        'https://app.cosmicsignature.com/sitemap-nfts.xml',
+      ]);
     });
 
     it('specifies the app host', async () => {

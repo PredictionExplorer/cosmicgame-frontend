@@ -38,13 +38,39 @@ const sizeClasses = {
   sm: { digit: 'text-xl', label: 'text-[10px]', pad: 'px-2.5 py-1', gap: 'gap-1.5' },
   md: { digit: 'text-3xl', label: 'text-xs', pad: 'px-3.5 py-2', gap: 'gap-2' },
   lg: { digit: 'text-5xl md:text-6xl', label: 'text-sm', pad: 'px-5 py-3', gap: 'gap-3' },
+  // `xl` is container-fluid (cqw), not viewport-based: the monument column can
+  // be as narrow as ~320px on wide desktops, so breakpoint sizing overflowed.
+  // The nearest `@container` ancestor (the monument timer box) defines 100cqw;
+  // the digit class is chosen per unit-group count in getFluidDigitClass.
   xl: {
-    digit: 'text-4xl sm:text-6xl md:text-7xl lg:text-8xl',
-    label: 'text-[11px] sm:text-sm',
-    pad: 'px-3 py-3 sm:px-5 sm:py-4',
-    gap: 'gap-2 sm:gap-3',
+    digit: '',
+    label: 'text-[clamp(9px,2.3cqw,13px)]',
+    pad: 'px-[2cqw] py-[1.4cqw]',
+    gap: 'gap-[1.4cqw]',
   },
 };
+
+/**
+ * Fluid digit sizing for the `xl` (monument) counter. Each digit cell clips
+ * its own overflow for the roll animation, so an oversized font silently cuts
+ * digits off inside the cells — the font must be provably narrower than the
+ * container. Budget per group count (glyphs ≈ 0.62em/digit + 0.35em/colon,
+ * padding and gaps are cqw-fixed), with a safety margin for font metrics:
+ *
+ * - 2 groups (MM:SS, may show tenths): ≤ ~24cqw  → 21cqw
+ * - 3 groups (HH:MM:SS):               ≤ ~17cqw  → 15cqw
+ * - 4 groups (DD:HH:MM:SS):            ≤ ~12.6cqw → 11cqw (2-digit days)
+ *   days can exceed 2 digits (long openings), shrinking further.
+ *
+ * These must stay statically analyzable literals for the Tailwind JIT.
+ */
+function getFluidDigitClass(groupCount: number, daysDigits: number): string {
+  if (groupCount <= 2) return 'text-[clamp(1.75rem,21cqw,5rem)]';
+  if (groupCount === 3) return 'text-[clamp(1.4rem,15cqw,4.5rem)]';
+  if (daysDigits >= 4) return 'text-[clamp(0.9rem,9.3cqw,2.75rem)]';
+  if (daysDigits === 3) return 'text-[clamp(1rem,10cqw,3rem)]';
+  return 'text-[clamp(1.1rem,11cqw,3.25rem)]';
+}
 
 /**
  * Pure function -- no hooks allowed here because react-countdown calls the
@@ -94,6 +120,9 @@ const Counter = ({
   const s = sizeClasses[size];
   const timeUnits = getTimeUnits(days, hours, minutes, seconds, unitLabels);
   const isMonument = size === 'xl';
+  const digitClass = isMonument
+    ? getFluidDigitClass(timeUnits.length, String(Math.max(0, days)).length)
+    : s.digit;
 
   return (
     <div className={cn('flex items-center justify-center', s.gap)}>
@@ -124,7 +153,7 @@ const Counter = ({
                   transition={isMonument ? { duration: 0.08 } : { duration: 0.25, ease: 'easeOut' }}
                   className={cn(
                     'block font-display font-bold tabular-nums tracking-tight',
-                    s.digit,
+                    digitClass,
                     isCritical
                       ? 'text-red-400'
                       : isUrgent
@@ -172,7 +201,7 @@ const Counter = ({
             <span
               className={cn(
                 'font-display font-bold self-start mt-1',
-                s.digit,
+                digitClass,
                 isCritical
                   ? 'text-red-400/50'
                   : isUrgent

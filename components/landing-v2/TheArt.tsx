@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useLocale } from 'next-intl';
 
@@ -8,60 +8,14 @@ import { formatId, getAssetsUrl } from '@/utils';
 import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
-import { networkConfig } from '@/config/networks';
 import { APP_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import NFTImage from '@/components/nft/NFTImage';
 
 import { SectionHeading } from './SectionHeading';
+import { useLandingShowcaseTokens } from './useLandingShowcaseTokens';
 
-const SHOWCASE_LIMIT = 36;
 const ROTATION_MS = 18_000;
-
-interface LandingShowcaseToken {
-  TokenId: number;
-  Seed?: string | number;
-  TokenName?: string;
-}
-
-function landingApiUrl(path: string): string {
-  const base = (networkConfig.apiUrl || '').replace(/\/+$/, '');
-  const cleanPath = path.replace(/^\/+/, '');
-  return base ? `${base}/${cleanPath}` : `/${cleanPath}`;
-}
-
-function isShowcaseToken(token: LandingShowcaseToken): boolean {
-  return Number.isFinite(token.TokenId) && token.Seed !== undefined && String(token.Seed) !== '';
-}
-
-function useLandingShowcaseTokens() {
-  const [tokens, setTokens] = useState<LandingShowcaseToken[]>([]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchTokens() {
-      try {
-        const response = await fetch(landingApiUrl(`cst/list/all/0/${SHOWCASE_LIMIT}`));
-        if (!response.ok) return;
-        const body = (await response.json()) as {
-          CosmicSignatureTokenList?: LandingShowcaseToken[];
-        };
-        if (cancelled) return;
-        setTokens((body.CosmicSignatureTokenList ?? []).filter(isShowcaseToken));
-      } catch {
-        if (!cancelled) setTokens([]);
-      }
-    }
-
-    void fetchTokens();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return tokens;
-}
 
 function GenerativeProcessVisual({ loading }: { loading: LandingContent['art']['loading'] }) {
   return (
@@ -128,6 +82,7 @@ export function TheArt({ art }: { art: LandingContent['art'] }) {
                   src={showcaseImage}
                   alt={art.showcase.artworkAlt.replace('{tokenLabel}', tokenLabel)}
                   terminalFallbackSrc={null}
+                  unavailableLabel={art.loading.label}
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="h-full aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.025]"
                 />

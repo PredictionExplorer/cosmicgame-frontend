@@ -1,7 +1,7 @@
 'use client';
 
 import type { CountdownRenderProps } from 'react-countdown';
-import { ArrowRight, BellRing, CalendarPlus, Clock3, Radio } from 'lucide-react';
+import { ArrowRight, BellRing, CalendarPlus, Clock3, Coins, Radio } from 'lucide-react';
 import { zeroAddress } from 'viem';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -21,6 +21,7 @@ import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
 import { useLivePulse } from '@/hooks/useLivePulse';
 import { cn } from '@/lib/utils';
 import { formatCstAmount, type CstGestureData } from '@/utils/cstGesture';
+import { formatGesturePayment, hasRandomWalkToken } from '@/utils/gesturePayment';
 import type { EthGestureInfo } from '@/hooks/useGestureForm';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 
@@ -59,6 +60,8 @@ interface CycleMonumentProps {
   /** Minutes before finalization at which the browser notification fires. */
   notifyThresholdMin?: number;
   onNotifyThresholdChange?: (minutes: number) => void;
+  /** Live Participation CST preview for a gesture made right now. */
+  cstRewardPreview?: number | null;
 }
 
 function getGestureKindSelectValue(gestureType: unknown): 'eth' | 'randomWalk' | 'cst' {
@@ -110,6 +113,7 @@ export function CycleMonument({
   onOpenFullConsole,
   notifyThresholdMin,
   onNotifyThresholdChange,
+  cstRewardPreview = null,
 }: CycleMonumentProps) {
   const t = useTranslations('home');
   const locale = useLocale();
@@ -217,7 +221,9 @@ export function CycleMonument({
 
           <div
             className={cn(
-              'rounded-[1.75rem] border border-white/[0.10] bg-black/20 p-4 text-center backdrop-blur-md sm:p-6',
+              // `@container`: the fluid `xl` Counter sizes its digits in cqw
+              // against this box, so the clock always fits the monument column.
+              '@container rounded-[1.75rem] border border-white/[0.10] bg-black/20 p-4 text-center backdrop-blur-md sm:p-6',
               phase === 'final-minute' && 'motion-safe:animate-urgency-pulse',
             )}
             role="timer"
@@ -276,7 +282,10 @@ export function CycleMonument({
                   )}
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-medium text-foreground">
+                  {/* Wraps on narrow phones instead of truncating — the
+                      address is the useful part and an ellipsis cuts it off
+                      (flagged by the mobile overflow audit). */}
+                  <span className="block break-words text-sm font-medium text-foreground">
                     {t('ticker.gestureLine', {
                       address: shortenHex(latestGesture.BidderAddr, 6),
                       kind: getGestureKindSelectValue(latestGesture.GestureType),
@@ -287,8 +296,25 @@ export function CycleMonument({
                       </span>
                     )}
                   </span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground">
-                    {formatRelativeGestureAge(latestGesture.TimeStamp, now, t)}
+                  {/* Exactly what the previous gesture paid — the number every
+                      next participant wants before deciding their own move. */}
+                  <span className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground">
+                    <span
+                      data-testid="monument-latest-payment"
+                      className="font-mono font-semibold tabular-nums text-primary"
+                    >
+                      {formatGesturePayment(latestGesture, t('ticker.paymentUnavailable'))}
+                    </span>
+                    {hasRandomWalkToken(latestGesture) && (
+                      <>
+                        <span aria-hidden>·</span>
+                        <span>
+                          {t('ticker.rwlkToken', { id: String(latestGesture.RWalkNFTId) })}
+                        </span>
+                      </>
+                    )}
+                    <span aria-hidden>·</span>
+                    <span>{formatRelativeGestureAge(latestGesture.TimeStamp, now, t)}</span>
                   </span>
                 </span>
               </span>
@@ -334,6 +360,21 @@ export function CycleMonument({
                 >
                   {t('deck.monument.chooseRwlkToken')}
                 </button>
+              )}
+
+              {/* CST is the protocol's coordination token — the imprint every
+                  gesture earns belongs next to the act of gesturing. */}
+              {cstRewardPreview != null && cstRewardPreview > 0 && (
+                <p
+                  data-testid="monument-cst-preview"
+                  className="inline-flex max-w-full items-center justify-center gap-1.5 rounded-full border border-[rgb(var(--nebula-violet-rgb)/0.30)] bg-[rgb(var(--nebula-violet-rgb)/0.10)] px-3 py-1.5 text-xs font-medium text-foreground/90"
+                >
+                  <Coins
+                    className="h-3.5 w-3.5 shrink-0 text-[rgb(var(--nebula-violet-rgb))]"
+                    aria-hidden
+                  />
+                  {t('deck.personal.cstPreview', { amount: formatCstAmount(cstRewardPreview) })}
+                </p>
               )}
 
               {/* Primary action */}

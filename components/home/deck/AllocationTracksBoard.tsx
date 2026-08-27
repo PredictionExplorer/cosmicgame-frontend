@@ -259,8 +259,11 @@ export function AllocationTracksBoard({
                   {row.icon}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="truncate text-xs font-semibold text-foreground">
+                  <span className="flex items-start justify-between gap-2">
+                    {/* Wraps instead of truncating: at 320px several track
+                        names don't fit on one line, and an ellipsis hides
+                        which track the row is (mobile overflow audit). */}
+                    <span className="min-w-0 break-words text-xs font-semibold text-foreground">
                       {row.title}
                     </span>
                     <span
@@ -275,7 +278,11 @@ export function AllocationTracksBoard({
                     </span>
                   </span>
                   <span className="mt-0.5 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                    <span className="min-w-0 truncate">{row.detail}</span>
+                    {/* No truncate: the detail is a leader address + record
+                        duration — the content participants come for.
+                        LeaderLine flex-wraps itself; plain strings wrap on
+                        spaces. */}
+                    <span className="min-w-0 break-words">{row.detail}</span>
                     {row.isLive && (
                       <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-emerald-300">
                         <Zap className="h-2.5 w-2.5" />

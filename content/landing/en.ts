@@ -50,6 +50,16 @@ export const landingContentEn = {
       'Cosmic Council',
       'Arbitrum One',
     ],
+    art: {
+      eyebrow: 'Live from the collection',
+      caption: 'Imprinted on-chain · CC0',
+      cstNote: `Every imprinted Signature is paired with ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST.`,
+      formingLabel: 'Signal forming',
+      formingBody: 'A Signature from the collection appears here as soon as the network responds.',
+      viewAriaLabel: 'View Cosmic Signature {tokenLabel} in the app',
+      artworkAlt: 'Cosmic Signature {tokenLabel} — deterministic three-body generative artwork',
+      galleryCta: 'Browse the full gallery',
+    },
   },
 
   cycle: {

@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { formatId, getAssetsUrl } from '@/utils';
+
 import { getCstInfoSeed, getDashboardInfoSeed } from '@/services/api/server';
 import { createMetadata } from '@/utils/seo';
 import { formatFixed } from '@/utils/format';
-import { JsonLd, liveCycleJsonLd } from '@/utils/jsonLd';
+import { JsonLd, liveCycleJsonLd, visualArtworkJsonLd } from '@/utils/jsonLd';
 import type { CSTTokenInfo, DashboardInfo } from '@/services/api';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -77,6 +79,7 @@ export default async function Page({ params }: PageProps) {
   const initialBannerToken = await pickInitialBannerToken(initialDashboardData);
   const liveCycleStartTs = initialDashboardData?.TsRoundStart ?? 0;
   const liveCycleNumber = initialDashboardData?.CurRoundNum ?? 0;
+  const tArtwork = await getTranslations({ locale, namespace: 'detail' });
 
   // Deliberately NO Suspense wrapper: HomePage must render fully on the
   // server (it holds the LCP text). A future hook that suspends or bails to
@@ -91,6 +94,19 @@ export default async function Page({ params }: PageProps) {
           data={liveCycleJsonLd({
             cycleNumber: liveCycleNumber,
             startTsSeconds: liveCycleStartTs,
+            inLanguage: locale === 'zh' ? 'zh-CN' : 'en',
+          })}
+        />
+      )}
+      {/* The featured artwork leads the page visually; give crawlers and AI
+          engines the same fact as a licensed VisualArtwork node. */}
+      {initialBannerToken?.info.Seed && (
+        <JsonLd
+          data={visualArtworkJsonLd({
+            tokenId: initialBannerToken.id,
+            name: `Cosmic Signature ${formatId(initialBannerToken.id)}`,
+            description: tArtwork('jsonLd.productDescription'),
+            imageUrl: getAssetsUrl(`cosmicsignature/0x${initialBannerToken.info.Seed}.png`),
             inLanguage: locale === 'zh' ? 'zh-CN' : 'en',
           })}
         />

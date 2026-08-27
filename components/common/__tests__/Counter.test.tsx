@@ -154,11 +154,36 @@ describe('Counter', () => {
     expect(container.querySelector('[class*="text-5xl"]')).toBeInTheDocument();
   });
 
-  it('renders with size="xl" for the game-page monument timer', () => {
+  it('renders with size="xl" using container-fluid digits (monument timer)', () => {
     const { container } = render(
       <Counter {...baseProps} days={0} hours={1} minutes={30} seconds={0} size="xl" />,
     );
-    expect(container.querySelector('[class*="lg:text-8xl"]')).toBeInTheDocument();
+    // Container-query units, not viewport breakpoints: the monument column can
+    // be far narrower than the viewport, so digits must size against the card.
+    expect(container.querySelector('[class*="cqw"]')).toBeInTheDocument();
+    expect(container.querySelector('[class*="lg:text-8xl"]')).not.toBeInTheDocument();
+  });
+
+  it('shrinks xl digits as more unit groups appear', () => {
+    const hoursOnly = render(
+      <Counter {...baseProps} days={0} hours={1} minutes={30} seconds={0} size="xl" />,
+    );
+    const threeGroupDigit = hoursOnly.container.querySelector('[class*="15cqw"]');
+    expect(threeGroupDigit).toBeInTheDocument();
+    hoursOnly.unmount();
+
+    const withDays = render(
+      <Counter {...baseProps} days={2} hours={1} minutes={30} seconds={0} size="xl" />,
+    );
+    expect(withDays.container.querySelector('[class*="11cqw"]')).toBeInTheDocument();
+    withDays.unmount();
+
+    // Long openings can show 3+ digit day counts; the font budget shrinks so
+    // the digits can never clip inside their overflow-hidden cells.
+    const farOut = render(
+      <Counter {...baseProps} days={686} hours={18} minutes={21} seconds={9} size="xl" />,
+    );
+    expect(farOut.container.querySelector('[class*="10cqw"]')).toBeInTheDocument();
   });
 
   it('applies impact tone to non-urgent countdown digits', () => {

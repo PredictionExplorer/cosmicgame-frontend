@@ -121,8 +121,8 @@ Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreac
 ### CST tokens
 
 - Type: ERC-20
-- Imprinted: dynamic Participation CST can be imprinted by gestures based on time since the previous gesture
-- Uses: Alternative gesture currency (Calibration Window), Cosmic Council coordination signalling
+- Imprinted: dynamic Participation CST can be imprinted by gestures based on time since the previous gesture; 1,000 CST pairs with every imprinted Cosmic Signature NFT
+- Uses: Alternative gesture currency (Calibration Window), Cosmic Council coordination signalling, Chaos Zero position denomination
 - Tradeable on Uniswap and other Arbitrum DEXes
 
 ### COSMIC NFT
@@ -139,6 +139,15 @@ Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreac
 - Holders can attach an unused token to an ETH gesture for a 50% Gesture Cost reduction; each RandomWalkNFT can be used once for this discount
 - Can be anchored to the protocol for Anchored-NFT Stellar Selection eligibility
 - Also trades on Axiom Zero alongside Cosmic Signature NFTs
+
+### Artwork & Media Access
+
+- Determinism: each artwork is rendered from its on-chain seed by an open-source Rust program; anyone can reproduce the exact image from the seed
+- License: CC0 — no rights reserved; images may be reused without permission
+- Canonical artwork pages: https://app.cosmicsignature.com/detail/{tokenId} (full-resolution PNG plus an orbit video per token)
+- Image sitemap for crawlers: https://app.cosmicsignature.com/sitemap-nfts.xml
+- Featured artwork: both home pages rotate a randomly chosen imprinted Signature, server-selected so the artwork URL is present in the HTML
+- Structured data: artwork pages publish Product + VisualArtwork JSON-LD with licensed ImageObject metadata
 
 ## Ecosystem
 

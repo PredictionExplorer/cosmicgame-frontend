@@ -230,6 +230,28 @@ export function breadcrumbJsonLd(segments: BreadcrumbSegment[], baseUrl: string 
   };
 }
 
+const CC0_LICENSE_URL = 'https://creativecommons.org/publicdomain/zero/1.0/';
+const ART_FORM = 'Digital Art';
+const ART_MEDIUM = 'Algorithmic generative imagery (three-body problem simulation)';
+
+/**
+ * Licensable-image metadata for an artwork PNG: `license` +
+ * `acquireLicensePage` + `creditText` are what qualifies the image for
+ * Google Images' "Licensable" treatment and tells AI crawlers the CC0 terms.
+ */
+function artworkImageObject(imageUrl: string, pageUrl: string) {
+  return {
+    '@type': 'ImageObject',
+    contentUrl: imageUrl,
+    url: imageUrl,
+    license: CC0_LICENSE_URL,
+    acquireLicensePage: pageUrl,
+    creditText: 'Cosmic Signature Protocol',
+    copyrightNotice: 'CC0 — no rights reserved',
+    creator: { '@id': `${SITE_URL}/#organization` },
+  };
+}
+
 export function nftProductJsonLd({
   tokenId,
   name,
@@ -245,18 +267,65 @@ export function nftProductJsonLd({
   url?: string;
   category?: string;
 }) {
+  const pageUrl = url ?? `${APP_URL}/detail/${tokenId}`;
   return {
     '@context': 'https://schema.org',
-    '@type': 'Product',
+    // Dual-typed: Product covers collectible/rich-result surfaces,
+    // VisualArtwork tells search and AI engines this is, first, art.
+    '@type': ['Product', 'VisualArtwork'],
     name,
     description,
-    image: imageUrl,
-    url: url ?? `${APP_URL}/detail/${tokenId}`,
+    image: artworkImageObject(imageUrl, pageUrl),
+    url: pageUrl,
     brand: {
       '@type': 'Organization',
       name: SITE_NAME,
     },
+    creator: { '@id': `${SITE_URL}/#organization` },
+    artform: ART_FORM,
+    artMedium: ART_MEDIUM,
+    license: CC0_LICENSE_URL,
+    isPartOf: { '@id': `${SITE_URL}/#art-protocol` },
     category: category ?? 'Digital Collectible',
+  };
+}
+
+/**
+ * Standalone VisualArtwork node for featured-artwork surfaces (the app and
+ * landing homes rotate a real imprinted Signature above the fold). Rendered
+ * from server-picked data so crawlers see a concrete artwork with a licensed
+ * image, not just protocol prose.
+ */
+export function visualArtworkJsonLd({
+  tokenId,
+  name,
+  description,
+  imageUrl,
+  url,
+  inLanguage,
+}: {
+  tokenId: number;
+  name: string;
+  description: string;
+  imageUrl: string;
+  url?: string;
+  inLanguage?: string;
+}) {
+  const pageUrl = url ?? `${APP_URL}/detail/${tokenId}`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VisualArtwork',
+    name,
+    description,
+    url: pageUrl,
+    image: artworkImageObject(imageUrl, pageUrl),
+    artform: ART_FORM,
+    artMedium: ART_MEDIUM,
+    license: CC0_LICENSE_URL,
+    creditText: 'Cosmic Signature Protocol',
+    creator: { '@id': `${SITE_URL}/#organization` },
+    isPartOf: { '@id': `${SITE_URL}/#art-protocol` },
+    ...(inLanguage ? { inLanguage } : {}),
   };
 }
 

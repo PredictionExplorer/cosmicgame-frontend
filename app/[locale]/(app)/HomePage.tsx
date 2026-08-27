@@ -33,6 +33,7 @@ import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { AllocationTracksBoard } from '@/components/home/deck/AllocationTracksBoard';
 import { CycleMonument } from '@/components/home/deck/CycleMonument';
+import { DeckArtCard } from '@/components/home/deck/DeckArtCard';
 import { DeckMiniBar } from '@/components/home/deck/DeckMiniBar';
 import { DeckPersonalStrip } from '@/components/home/deck/DeckPersonalStrip';
 import { GestureComposer } from '@/components/home/deck/GestureComposer';
@@ -629,8 +630,14 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
         >
           <div
             data-testid="home-deck-board"
-            className="order-3 min-w-0 lg:col-span-2 xl:order-1 xl:col-span-1"
+            // grid-cols-1 at base is load-bearing: without an explicit track
+            // the implicit `auto` column sizes to max-content, which defeats
+            // every `truncate` inside the board on narrow phones.
+            className="order-3 grid min-w-0 grid-cols-1 gap-5 lg:col-span-2 lg:grid-cols-2 xl:order-1 xl:col-span-1 xl:grid-cols-1"
           >
+            {/* Art first: the protocol is an art performance, so a real
+                imprinted Signature leads the board column. */}
+            <DeckArtCard bannerToken={bannerToken} />
             <AllocationTracksBoard data={data} account={account} />
           </div>
 
@@ -661,6 +668,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
               onOpenFullConsole={scrollToGestureForm}
               notifyThresholdMin={notifyThresholdMin}
               onNotifyThresholdChange={handleNotifyThresholdChange}
+              cstRewardPreview={gestureForm.gestureCstRewardAmount}
             />
           </div>
 
@@ -704,6 +712,25 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
               gestures={curGestureList}
               cstRewardPreview={gestureForm.gestureCstRewardAmount}
             />
+          </div>
+        )}
+
+        {/* ===== CYCLE LEADERBOARD (latest gesture, champions, records) =====
+            Sits directly under the Deck: what the previous gesture paid, who
+            holds the Endurance and Chrono records, and the final CST gesture
+            must be readable without scrolling past the console. */}
+        {data?.TsRoundStart !== 0 && (
+          /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
+          <div className="mt-8">
+            {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
+            <div className="min-w-0 print:col-auto">
+              <MemoSpecialAllocationRecipients
+                currentAccount={account}
+                latestMessage={curGestureList[0]?.Message ?? ''}
+                latestGesture={curGestureList[0] ?? null}
+                layout="grid"
+              />
+            </div>
           </div>
         )}
 
@@ -869,21 +896,6 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
                   )}
                 </div>
               </m.div>
-            )}
-
-            {/* ===== SPECIAL ALLOCATION LEADERS (detail) ===== */}
-            {data?.TsRoundStart !== 0 && (
-              /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
-              <div className="mt-8">
-                {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
-                <div className="min-w-0 print:col-auto">
-                  <MemoSpecialAllocationRecipients
-                    currentAccount={account}
-                    latestMessage={curGestureList[0]?.Message ?? ''}
-                    latestGesture={curGestureList[0] ?? null}
-                  />
-                </div>
-              </div>
             )}
           </div>
 

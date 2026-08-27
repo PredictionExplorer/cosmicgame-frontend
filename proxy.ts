@@ -20,7 +20,7 @@ export const config = {
      * Run on all paths except Next assets and public files. The negative
      * lookahead exclusions here are the standard Vercel recipe.
      */
-    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|llms(?:-full)?\\.txt|manifest.webmanifest|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map|pdf)$).*)',
+    '/((?!_next/static|_next/image|_next/data|favicon.ico|paint-worklet.js|robots.txt|sitemap.xml|sitemap-nfts.xml|llms(?:-full)?\\.txt|manifest.webmanifest|fonts|audio|images|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|avif|woff|woff2|ttf|eot|map|pdf)$).*)',
   ],
 };
 

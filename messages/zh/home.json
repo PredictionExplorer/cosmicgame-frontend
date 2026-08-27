@@ -270,6 +270,8 @@
   "ticker": {
     "openLatestAria": "查看最新落笔 {id}",
     "gestureLine": "{address} 以 {kind, select, cst {CST} randomWalk {ETH + RandomWalk} other {ETH}} 落笔",
+    "paymentUnavailable": "费用同步中…",
+    "rwlkToken": "RandomWalk #{id}",
     "age": {
       "justNow": "刚刚",
       "seconds": "{count} 秒前",
@@ -503,6 +505,14 @@
       "awaitingRecord": "暂无纪录",
       "stellarStatus": "每一次落笔都是一份星选资格",
       "fullBreakdown": "查看完整分配明细"
+    },
+    "art": {
+      "sectionAria": "精选链上艺术作品",
+      "eyebrow": "链上艺术",
+      "galleryCta": "画廊",
+      "viewAria": "查看 Cosmic Signature {id}",
+      "alt": "Cosmic Signature 艺术作品 {id} —— 确定性三体生成艺术",
+      "pairingNote": "确定性三体艺术，铭刻于链上。每枚签名作品都配有 1,000 CST。"
     },
     "composer": {
       "title": "以落笔发声",

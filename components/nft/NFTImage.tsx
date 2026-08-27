@@ -35,6 +35,13 @@ interface NFTImageProps {
    * source from the srcset. Defaults to a reasonable home/gallery value.
    */
   sizes?: string;
+  /**
+   * Localized text for the all-sources-failed state. Surfaces outside the
+   * dApp host (the landing) MUST pass this: the default comes from the
+   * `detail` message namespace, which the landing never loads, so the raw
+   * key would leak into the UI there.
+   */
+  unavailableLabel?: string;
 }
 
 const NFTImage = ({
@@ -49,6 +56,7 @@ const NFTImage = ({
   priority = false,
   loading,
   sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px',
+  unavailableLabel,
 }: NFTImageProps) => {
   const t = useTranslations('detail');
   // Resolution chain: primary src, optional fallback, then the configured terminal fallback.
@@ -86,7 +94,7 @@ const NFTImage = ({
         )}
         style={style}
       >
-        {t('image.artworkUnavailable')}
+        {unavailableLabel ?? t('image.artworkUnavailable')}
       </div>
     );
   }

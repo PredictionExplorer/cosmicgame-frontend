@@ -82,6 +82,24 @@ describe('NFTImage', () => {
     );
   });
 
+  test('landing surfaces can override the unavailable label (detail namespace not loaded there)', () => {
+    const brokenSrc = 'https://example.com/real-token-that-failed.png';
+    render(
+      <NFTImage
+        src={brokenSrc}
+        terminalFallbackSrc={null}
+        alt="Real NFT"
+        unavailableLabel="Signal forming"
+      />,
+    );
+
+    fireEvent.error(screen.getByAltText('Real NFT'));
+
+    const state = screen.getByRole('img', { name: 'Real NFT' });
+    expect(state).toHaveTextContent('Signal forming');
+    expect(state).not.toHaveTextContent('detail.image.artworkUnavailable');
+  });
+
   test('defaults to lazy loading for below-the-fold use', () => {
     const mockData = getAssetsUrl('cosmicsignature/000000.png');
     render(<NFTImage src={mockData} />);

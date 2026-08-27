@@ -564,6 +564,7 @@ describe('HomePage', () => {
           BidderAddr: '0x1111111111111111111111111111111111111111',
           RoundNum: 7,
           GestureType: 0,
+          GestureCostEth: 0.0042,
           Message: '',
         },
       ],
@@ -581,7 +582,56 @@ describe('HomePage', () => {
     expect(latest).toHaveTextContent(
       'home.ticker.gestureLine(address=0x111111....111111,kind=eth)',
     );
+    // The exact cost the previous gesture paid rides on the same line.
+    expect(within(latest).getByTestId('monument-latest-payment')).toHaveTextContent(
+      '0.0042000 ETH',
+    );
     expect(latest).toHaveTextContent('home.ticker.age.minutes(count=2)');
+  });
+
+  it('shows the CST amount a CST gesture paid, and the RandomWalk token when used', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 44,
+          TimeStamp: Math.floor(Date.now() / 1000) - 30,
+          BidderAddr: '0x3333333333333333333333333333333333333333',
+          RoundNum: 7,
+          GestureType: 2,
+          CstCost: 112.4,
+          Message: '',
+        },
+      ],
+    });
+
+    const cstView = render(<HomePage />);
+    expect(screen.getByTestId('monument-latest-payment')).toHaveTextContent('112.4000 CST');
+    cstView.unmount();
+
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 45,
+          TimeStamp: Math.floor(Date.now() / 1000) - 30,
+          BidderAddr: '0x4444444444444444444444444444444444444444',
+          RoundNum: 7,
+          GestureType: 1,
+          GestureCostEth: 0.005,
+          RWalkNFTId: 123,
+          Message: '',
+        },
+      ],
+    });
+
+    render(<HomePage />);
+    expect(screen.getByTestId('monument-latest-payment')).toHaveTextContent('0.0050000 ETH');
+    expect(screen.getByTestId('monument-latest-gesture')).toHaveTextContent(
+      'home.ticker.rwlkToken(id=123)',
+    );
   });
 
   it('labels CST gestures in the monument latest-gesture line', () => {
@@ -874,10 +924,55 @@ describe('HomePage', () => {
     expect(
       screen.getByRole('link', { name: /home\.hero\.console\.viewSignatureAria/ }),
     ).toHaveAttribute('href', expect.stringMatching(/^\/detail\/\d+$/));
-    expect(screen.getByTestId('nft-image')).toHaveAttribute(
+    const story = screen.getByTestId('home-story-section');
+    expect(within(story).getByTestId('nft-image')).toHaveAttribute(
       'alt',
       expect.stringMatching(/^home\.hero\.console\.artworkAlt\(id=#\d{6}\)$/),
     );
+  });
+
+  it('shows the rotating artwork in the deck art card, linked to its detail page', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    mockUseCSTInfo.mockReturnValue({ data: { Seed: 'abc123' } });
+
+    render(<HomePage />);
+
+    const artCard = screen.getByTestId('deck-art-card');
+    const deck = screen.getByTestId('home-deck-layout');
+    expect(deck).toContainElement(artCard);
+
+    const artLink = screen.getByTestId('deck-art-link');
+    expect(artLink).toHaveAttribute('href', expect.stringMatching(/^\/detail\/\d+$/));
+    expect(within(artCard).getByTestId('nft-image')).toHaveAttribute(
+      'alt',
+      expect.stringMatching(/^home\.deck\.art\.alt\(id=#\d{6}\)$/),
+    );
+    expect(within(artCard).getByTestId('nft-image')).toHaveAttribute(
+      'src',
+      expect.stringContaining('0xabc123/thumb_card.webp'),
+    );
+    expect(within(artCard).getByRole('link', { name: 'home.deck.art.galleryCta' })).toHaveAttribute(
+      'href',
+      '/gallery',
+    );
+  });
+
+  it('renders a calm placeholder in the deck art card when no artwork resolves', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        MainStats: { NumCSTokenMints: 0, SumCosmicGameDonationsEth: 1.2, SumWithdrawals: 0.4 },
+      }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    const artCard = screen.getByTestId('deck-art-card');
+    expect(within(artCard).getByTestId('deck-art-placeholder')).toBeInTheDocument();
+    expect(within(artCard).queryByTestId('deck-art-link')).not.toBeInTheDocument();
   });
 
   /* ── CTAs and phases ────────────────────────────────────────── */
@@ -1295,7 +1390,7 @@ describe('HomePage', () => {
 
   /* ── Console layout and rail ────────────────────────────────── */
 
-  it('keeps the full console below the deck with status, form, and leaders in order', () => {
+  it('keeps the leaderboard right under the deck and the full console after it', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1305,18 +1400,21 @@ describe('HomePage', () => {
 
     const deck = screen.getByTestId('home-deck-layout');
     const consoleLayout = screen.getByTestId('home-console-layout');
-    expect(deck.compareDocumentPosition(consoleLayout)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    const leaders = screen.getByTestId('special-allocation-recipients');
+
+    // The previous-gesture payment, champion records, and current
+    // Chrono-Warrior must be readable before the console, not buried under it.
+    expect(deck.compareDocumentPosition(leaders)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(leaders.compareDocumentPosition(consoleLayout)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(consoleLayout).not.toContainElement(leaders);
 
     const status = screen.getByTestId('gesture-status');
     const form = screen.getByTestId('gesture-form');
-    const leaders = screen.getByTestId('special-allocation-recipients');
     const primaryColumn = screen.getByTestId('home-primary-column');
 
     expect(primaryColumn).toContainElement(status);
     expect(primaryColumn).toContainElement(form);
-    expect(primaryColumn).toContainElement(leaders);
     expect(status.compareDocumentPosition(form)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(form.compareDocumentPosition(leaders)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
 
     // Allocation breakdown renders full-width after the console grid.
     const allocationHeading = screen.getByText('home.allocation.title');

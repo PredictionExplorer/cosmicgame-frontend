@@ -11,6 +11,16 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useChampions, type ChampionsState } from '@/hooks/useChampions';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import {
+  formatAttachedAssets,
+  formatGestureMethod,
+  formatGesturePayment,
+  formatReceivedCstAmount,
+  getAttachedAssetLabels,
+  getParticipationCST,
+  hasRandomWalkToken,
+  resolveGestureType,
+} from '@/utils/gesturePayment';
 import type { GestureInfo } from '@/services/api/types';
 
 interface RoleCardConfig {
@@ -34,6 +44,12 @@ interface SpecialAllocationRecipientsProps {
   currentAccount?: string | null;
   latestMessage?: string | null;
   latestGesture?: GestureInfo | null;
+  /**
+   * 'stack' keeps the cards in one column (narrow contexts like
+   * /current-cycle); 'grid' spreads the four role cards across the row so the
+   * whole leaderboard is visible near the top of the home page.
+   */
+  layout?: 'stack' | 'grid';
 }
 
 function StatusChip({ isLive, statusText }: { isLive: boolean; statusText?: string }) {
@@ -252,89 +268,6 @@ function LatestParticipantMessage({ message }: { message: string }) {
   );
 }
 
-function firstNonNegativeNumber(...values: unknown[]): number | undefined {
-  return values.find(
-    (value): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0,
-  );
-}
-
-function resolveGestureType(gesture: GestureInfo): number | undefined {
-  if (typeof gesture.GestureType === 'number') return gesture.GestureType;
-  const backendGestureType = (gesture as GestureInfo & { BidType?: unknown }).BidType;
-  return typeof backendGestureType === 'number' ? backendGestureType : undefined;
-}
-
-function formatGestureAmount(
-  amount: number | undefined,
-  unit: 'ETH' | 'CST',
-  unavailable: string,
-): string {
-  if (amount === undefined) return unavailable;
-  return `${amount.toFixed(amount > 0 && amount < 1 ? 7 : 4)} ${unit}`;
-}
-
-function formatReceivedCstAmount(amount: number | undefined, unavailable: string): string {
-  if (amount === undefined) return unavailable;
-  return `${amount.toFixed(amount > 0 && amount < 1 ? 7 : 2)} CST`;
-}
-
-function getCstGestureCost(gesture: GestureInfo): number | undefined {
-  return firstNonNegativeNumber(
-    gesture.CstCost,
-    gesture.NumCSTokensEth,
-    gesture.NumCSTTokensEth,
-    gesture.CstPriceEth,
-  );
-}
-
-function getEthGestureCost(gesture: GestureInfo): number | undefined {
-  return firstNonNegativeNumber(gesture.GestureCostEth, gesture.EthPriceEth);
-}
-
-function getParticipationCST(gesture: GestureInfo): number | undefined {
-  return firstNonNegativeNumber(
-    gesture.ParticipationCST,
-    gesture.CSTRewardEth,
-    gesture.ERC20RewardAmountEth,
-  );
-}
-
-function formatLatestGesturePayment(gesture: GestureInfo, unavailable: string): string {
-  return resolveGestureType(gesture) === 2
-    ? formatGestureAmount(getCstGestureCost(gesture), 'CST', unavailable)
-    : formatGestureAmount(getEthGestureCost(gesture), 'ETH', unavailable);
-}
-
-function formatGestureMethod(gesture: GestureInfo, unknown: string): string {
-  switch (resolveGestureType(gesture)) {
-    case 0:
-      return 'ETH';
-    case 1:
-      return 'Random Walk';
-    case 2:
-      return 'CST';
-    default:
-      return unknown;
-  }
-}
-
-function hasRandomWalkToken(gesture: GestureInfo): boolean {
-  return typeof gesture.RWalkNFTId === 'number' && gesture.RWalkNFTId >= 0;
-}
-
-function getAttachedAssetLabels(gesture: GestureInfo): string[] {
-  return [
-    gesture.NFTDonationTokenAddr && gesture.NFTDonationTokenId !== -1 ? 'NFT' : '',
-    gesture.DonatedERC20TokenAddr ? 'ERC20' : '',
-  ].filter(Boolean);
-}
-
-function formatAttachedAssets(gesture: GestureInfo, none: string): string {
-  const assets = getAttachedAssetLabels(gesture);
-  if (assets.length === 0) return none;
-  return assets.join(' + ');
-}
-
 function DetailMetric({
   label,
   value,
@@ -415,7 +348,7 @@ function LatestGestureDetails({
         <DetailMetric
           testId="latest-participant-paid-amount"
           label={t('specialAllocation.amountPaid')}
-          value={formatLatestGesturePayment(latestGesture, t('status.unavailable'))}
+          value={formatGesturePayment(latestGesture, t('status.unavailable'))}
           tone="emerald"
         />
         <DetailMetric
@@ -653,6 +586,7 @@ export const SpecialAllocationRecipients = ({
   currentAccount = null,
   latestMessage = null,
   latestGesture = null,
+  layout = 'stack',
 }: SpecialAllocationRecipientsProps = {}) => {
   const t = useTranslations('tables');
   const champions = useChampions();
@@ -769,7 +703,12 @@ export const SpecialAllocationRecipients = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-3">
+        <div
+          className={cn(
+            'grid grid-cols-1 gap-3',
+            layout === 'grid' && 'items-start md:grid-cols-2 2xl:grid-cols-4',
+          )}
+        >
           {cards.map(({ key, ...card }) =>
             champions.isLoading && !champions.hasData ? (
               <LoadingCard key={key} title={card.title} icon={card.icon} />

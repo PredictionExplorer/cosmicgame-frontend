@@ -117,7 +117,37 @@ describe('app home page (server shell)', () => {
 
     const { container } = render(await Page(pageProps));
 
-    expect(container.querySelectorAll('script[type="application/ld+json"]')).toHaveLength(0);
+    const types = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
+      (script) => (JSON.parse(script.textContent ?? '{}') as Record<string, unknown>)['@type'],
+    );
+    expect(types).not.toContain('Event');
+  });
+
+  it('embeds licensed VisualArtwork JSON-LD for the server-picked featured artwork', async () => {
+    const { container } = render(await Page(pageProps));
+
+    const artwork = [...container.querySelectorAll('script[type="application/ld+json"]')]
+      .map((script) => JSON.parse(script.textContent ?? '{}') as Record<string, unknown>)
+      .find((data) => data['@type'] === 'VisualArtwork');
+
+    expect(artwork).toBeDefined();
+    expect(String(artwork?.url)).toMatch(/\/detail\/\d+$/);
+    const image = artwork?.image as Record<string, string>;
+    expect(image.contentUrl).toContain('0xabc123.png');
+    expect(image.license).toContain('creativecommons.org/publicdomain/zero');
+  });
+
+  it('omits the VisualArtwork JSON-LD when no artwork resolves', async () => {
+    mockGetDashboardInfoSeed.mockResolvedValue(
+      dashboardSeed({ MainStats: { NumCSTokenMints: 0 } }),
+    );
+
+    const { container } = render(await Page(pageProps));
+
+    const types = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
+      (script) => (JSON.parse(script.textContent ?? '{}') as Record<string, unknown>)['@type'],
+    );
+    expect(types).not.toContain('VisualArtwork');
   });
 });
 

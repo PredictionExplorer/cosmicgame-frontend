@@ -67,6 +67,12 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
   const disallow = onAppHost ? appDisallow : landingDisallow;
 
+  // The app host additionally publishes the artwork image sitemap so every
+  // /detail/[id] page (and its PNG) is discoverable without gallery crawling.
+  const sitemaps = onAppHost
+    ? [`${siteUrl}/sitemap.xml`, `${siteUrl}/sitemap-nfts.xml`]
+    : [`${siteUrl}/sitemap.xml`];
+
   return {
     rules: [
       {
@@ -80,7 +86,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         disallow,
       },
     ],
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: sitemaps,
     host: siteUrl,
   };
 }

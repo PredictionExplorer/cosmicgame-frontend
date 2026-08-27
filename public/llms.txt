@@ -55,9 +55,17 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ## Tokens
 
-- **CST tokens**: ERC-20 coordination and utility tokens; trade on Uniswap on Arbitrum
+- **CST tokens**: ERC-20 coordination and utility tokens at the center of the protocol — CST gestures use their own Calibration Window, Cosmic Council coordination weight is denominated in CST, every gesture may imprint dynamic Participation CST, and 1,000 CST pairs with every imprinted Cosmic Signature NFT; trade on Uniswap on Arbitrum
 - **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics; trades on Axiom Zero, the zero-fee marketplace
 - **RandomWalkNFT**: Partner ERC-721 that can be attached to an ETH gesture for a one-time 50% ETH Gesture Cost reduction, or anchored for Anchored-NFT Stellar Selection eligibility
+
+## Artwork & Media
+
+- Every Cosmic Signature NFT is a deterministic render of a three-body-problem simulation seeded on-chain: the same seed always reproduces the same artwork, verifiable with the open-source Rust renderer
+- Artwork license: CC0 — no rights reserved
+- Each token has a canonical artwork page at https://app.cosmicsignature.com/detail/{tokenId} with the full-resolution PNG and an orbit video
+- Recent artwork pages and their image files are listed in the image sitemap: https://app.cosmicsignature.com/sitemap-nfts.xml
+- Both home pages (https://cosmicsignature.com/ and https://app.cosmicsignature.com/) feature a rotating, randomly chosen imprinted Signature from the collection
 
 ## Ecosystem
 

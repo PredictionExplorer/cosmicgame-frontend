@@ -270,6 +270,8 @@
   "ticker": {
     "openLatestAria": "Open latest gesture {id}",
     "gestureLine": "{address} made {kind, select, cst {a CST gesture} randomWalk {an ETH + RandomWalk gesture} other {an ETH gesture}}",
+    "paymentUnavailable": "cost syncing…",
+    "rwlkToken": "RandomWalk #{id}",
     "age": {
       "justNow": "just now",
       "seconds": "{count}s ago",
@@ -503,6 +505,14 @@
       "awaitingRecord": "No record yet",
       "stellarStatus": "every Gesture is an entry",
       "fullBreakdown": "View the full breakdown"
+    },
+    "art": {
+      "sectionAria": "Featured on-chain artwork",
+      "eyebrow": "On-Chain Artwork",
+      "galleryCta": "Gallery",
+      "viewAria": "View Cosmic Signature {id}",
+      "alt": "Cosmic Signature artwork {id} — deterministic three-body generative art",
+      "pairingNote": "Deterministic three-body art, imprinted on-chain. Every Signature is paired with 1,000 CST."
     },
     "composer": {
       "title": "Say it with a Gesture",
