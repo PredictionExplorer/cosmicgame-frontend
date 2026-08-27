@@ -33,6 +33,11 @@ jest.mock('../../../../../../components/statistics/EnduranceTimelineChart', () =
     <div data-testid="endurance-timeline-section">{currentRoundNum}</div>
   ),
 }));
+jest.mock('../../../../../../components/statistics/CstCalibrationWindowChart', () => ({
+  CstCalibrationWindowSection: ({ currentRoundNum }: { currentRoundNum: number }) => (
+    <div data-testid="cst-calibration-window-section">{currentRoundNum}</div>
+  ),
+}));
 jest.mock('../../../../../../components/tables/SystemModesTable', () => ({
   SystemModesTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="system-modes-table">{list.length} events</div>
@@ -59,12 +64,14 @@ describe('ActivityPanel', () => {
     expect(screen.getByTestId('bidder-active-periods-timeline')).toBeInTheDocument();
     expect(screen.getByTestId('bid-type-ratio-chart')).toBeInTheDocument();
     expect(screen.getByTestId('endurance-timeline-section')).toBeInTheDocument();
+    expect(screen.getByTestId('cst-calibration-window-section')).toBeInTheDocument();
   });
 
   it('feeds dashboard round data into the charts', () => {
     render(<ActivityPanel />);
     expect(screen.getByTestId('bid-type-ratio-chart')).toHaveTextContent('1700000000');
     expect(screen.getByTestId('endurance-timeline-section')).toHaveTextContent('3');
+    expect(screen.getByTestId('cst-calibration-window-section')).toHaveTextContent('3');
   });
 
   it('keeps cycle activations collapsed and unmounted by default (lazy)', () => {

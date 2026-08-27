@@ -66,6 +66,10 @@
       "title": "Allocation Tracks",
       "tooltip": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve."
     },
+    "cstWindow": {
+      "title": "CST Calibration Window",
+      "tooltip": "How the CST Calibration Window has evolved this cycle. Every ETH gesture shortens the window slightly; every CST gesture lengthens it. The window sets how fast the CST gesture cost descends to free."
+    },
     "stellarSelectionEntries": {
       "title": "Stellar Selection Entries",
       "tooltip": "Each gesture records one Stellar Selection entry. More gestures = higher Selection frequency for ETH or Cosmic Signature NFT allocations."

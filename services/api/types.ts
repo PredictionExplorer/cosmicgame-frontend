@@ -284,6 +284,11 @@ export interface GestureInfo extends TxInfo {
   DonatedERC20TokenAddr?: string;
   DonatedERC20TokenAmount?: string;
   DonatedERC20TokenAmountEth?: number;
+  /**
+   * CST Calibration Window length in seconds after this gesture's effect
+   * (from the V2 BidPlaced event). Legacy events report -1.
+   */
+  CstDutchAuctionDurationInt?: number;
   [key: string]: unknown;
 }
 

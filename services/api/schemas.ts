@@ -244,6 +244,11 @@ export const GestureInfoSchema = z
      */
     GestureCostEth: z.number().optional(),
     Message: z.string().optional(),
+    /**
+     * CST Calibration Window seconds after this gesture's effect (V2
+     * BidPlaced events; legacy events report -1).
+     */
+    CstDutchAuctionDurationInt: z.number().optional(),
   })
   .loose();
 export type GestureInfoParsed = z.infer<typeof GestureInfoSchema>;
