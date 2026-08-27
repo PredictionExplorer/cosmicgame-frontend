@@ -1,9 +1,15 @@
 import { cache } from 'react';
 
-import { flattenTx, getAPIUrl } from './client';
+import { flattenGestureArray, flattenTx, getAPIUrl } from './client';
 import { normalizeDashboardWire } from './rounds';
-import { DashboardInfoSchema, validate } from './schemas';
-import type { CSTTokenInfo, DashboardInfo } from './types';
+import {
+  DashboardInfoSchema,
+  GestureInfoSchema,
+  SpecialRecipientsSchema,
+  validate,
+  validateList,
+} from './schemas';
+import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from './types';
 
 /**
  * Server-only seed reads for ISR pages.
@@ -52,6 +58,49 @@ export const getDashboardInfoSeed = cache(async (): Promise<DashboardInfo | null
     return null;
   }
 });
+
+/** Latest gesture in the active cycle, used to make participant intelligence complete in ISR HTML. */
+export const getLatestGestureSeed = cache(
+  async (cycleNumber: number): Promise<GestureInfo | null> => {
+    if (!Number.isFinite(cycleNumber) || cycleNumber < 0) return null;
+    const raw = await fetchApiJson(
+      `bid/list/by_round/${cycleNumber}/1/0/1`, // lexicon-allow-backend-type
+      HOME_SEED_REVALIDATE_SECONDS,
+    );
+    if (raw == null || typeof raw !== 'object') return null;
+    try {
+      const gestures = flattenGestureArray<GestureInfo>(
+        (raw as { BidsByRound?: unknown }).BidsByRound,
+      );
+      return (
+        (validateList(GestureInfoSchema, gestures, 'GestureInfo[homeSeed]') as GestureInfo[])[0] ??
+        null
+      );
+    } catch {
+      return null;
+    }
+  },
+);
+
+/** Special-recipient snapshot used for the home desk's first-paint role intelligence. */
+export const getCurrentSpecialRecipientsSeed = cache(
+  async (): Promise<SpecialRecipients | null> => {
+    const raw = await fetchApiJson(
+      'bid/current_special_winners', // lexicon-allow-backend-type
+      HOME_SEED_REVALIDATE_SECONDS,
+    );
+    if (raw == null || typeof raw !== 'object') return null;
+    try {
+      return validate(
+        SpecialRecipientsSchema,
+        raw,
+        'SpecialRecipients[homeSeed]',
+      ) as SpecialRecipients;
+    } catch {
+      return null;
+    }
+  },
+);
 
 /** Single Cosmic Signature token read for the server-picked hero artwork. */
 export const getCstInfoSeed = cache(async (tokenId: number): Promise<CSTTokenInfo | null> => {

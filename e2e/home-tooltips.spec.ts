@@ -2,21 +2,21 @@ import { test } from '@playwright/test';
 
 import { expectAllLabelTooltips } from './tooltip-helpers';
 
-// Targets must exist in EVERY cycle phase: the metric cards (e.g. "ETH
-// Gesture") disappear while a cycle awaits its first gesture, which made
+// Targets must exist in EVERY cycle phase: the gesture panel (and its price
+// labels) disappears while a cycle awaits opening, which made
 // phase-dependent labels flaky between cycles.
 const HOME_TOOLTIPS = [
-  // Deck board header ("Signature Allocation" is no longer a unique label:
-  // it appears as the board's first row, the monument reserve label, and a
-  // status metric card, so the label-based helper targets unique labels).
+  // Tracks ribbon header ("Signature Allocation" is not a unique label: it
+  // appears as the clock reserve label and a ribbon row, so the label-based
+  // helper targets unique labels).
   {
     label: 'Allocation Tracks',
     expected: /Live view of every allocation track/,
   },
-  // Public-goods impact card in the console rail (rendered in all phases).
+  // Latest-participant intelligence is a primary home decision surface.
   {
-    label: 'Lifetime Contributed',
-    expected: /Automatic protocol forwards plus voluntary/,
+    label: 'Latest Participant',
+    expected: /latest gesture maker is building an endurance window/i,
   },
 ];
 

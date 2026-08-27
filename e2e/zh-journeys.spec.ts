@@ -16,7 +16,14 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
   test('moves from the gesture console through cycle and gesture details', async ({ page }) => {
     await page.goto('/zh', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page.getByText('落笔方式').first()).toBeVisible();
+    await expect(
+      page
+        .locator(
+          '[data-testid="gesture-price-strip"]:visible, [data-testid="gesture-panel"]:visible',
+        )
+        .getByText('落笔方式')
+        .first(),
+    ).toBeVisible();
 
     const timer = page.getByRole('timer').first();
     await expect(timer).toHaveAccessibleName(/周期|收官|倒计时/);

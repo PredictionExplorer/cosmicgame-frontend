@@ -223,7 +223,11 @@ export function useGestureInfo(evtLogId: number) {
   });
 }
 
-export function useGestureListByCycle(round: number, sortDir: string = 'desc') {
+export function useGestureListByCycle(
+  round: number,
+  sortDir: string = 'desc',
+  initialData?: GestureInfo[] | null,
+) {
   const scenario = useUxScenarioSnapshot();
   const liveInterval = useLivePollInterval(10_000);
   const query = useQuery<GestureInfo[]>({
@@ -234,11 +238,15 @@ export function useGestureListByCycle(round: number, sortDir: string = 'desc') {
     refetchInterval: liveInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
+    initialData: initialData ?? undefined,
+    // The ISR seed can be up to one regeneration window old; retain it for
+    // first paint, then refresh immediately after hydration.
+    initialDataUpdatedAt: initialData ? 0 : undefined,
   });
   return withUxScenarioData(query, scenario?.gestures, scenario?.createdAtMs);
 }
 
-export function useCurrentSpecialRecipients() {
+export function useCurrentSpecialRecipients(initialData?: SpecialRecipients | null) {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<SpecialRecipients | null>({
     queryKey: ['currentSpecialWinners'],
@@ -248,6 +256,8 @@ export function useCurrentSpecialRecipients() {
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
+    initialData: initialData ?? undefined,
+    initialDataUpdatedAt: initialData ? 0 : undefined,
   });
   return withUxScenarioData(query, scenario?.specialRecipients ?? undefined, scenario?.createdAtMs);
 }

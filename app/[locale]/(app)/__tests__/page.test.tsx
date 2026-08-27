@@ -1,4 +1,9 @@
-import { getCstInfoSeed, getDashboardInfoSeed } from '@/services/api/server';
+import {
+  getCstInfoSeed,
+  getCurrentSpecialRecipientsSeed,
+  getDashboardInfoSeed,
+  getLatestGestureSeed,
+} from '@/services/api/server';
 
 import { render, screen } from '@/test-utils';
 
@@ -7,6 +12,8 @@ import Page, { generateMetadata } from '../page';
 jest.mock('@/services/api/server', () => ({
   getDashboardInfoSeed: jest.fn(),
   getCstInfoSeed: jest.fn(),
+  getLatestGestureSeed: jest.fn(),
+  getCurrentSpecialRecipientsSeed: jest.fn(),
 }));
 
 jest.mock('../HomePage', () => ({
@@ -14,15 +21,21 @@ jest.mock('../HomePage', () => ({
   default: ({
     initialDashboardData,
     initialBannerToken,
+    initialLatestGesture,
+    initialSpecialRecipients,
   }: {
     initialDashboardData?: { CurRoundNum?: number } | null;
     initialBannerToken?: { id: number; info: { Seed?: string } } | null;
+    initialLatestGesture?: { EvtLogId?: number } | null;
+    initialSpecialRecipients?: { ChronoWarriorAddress?: string } | null;
   }) => (
     <div
       data-testid="home-page"
       data-cycle={initialDashboardData?.CurRoundNum ?? ''}
       data-banner-id={initialBannerToken?.id ?? ''}
       data-banner-seed={initialBannerToken?.info.Seed ?? ''}
+      data-latest-gesture-id={initialLatestGesture?.EvtLogId ?? ''}
+      data-chrono-address={initialSpecialRecipients?.ChronoWarriorAddress ?? ''}
     />
   ),
 }));
@@ -31,6 +44,12 @@ const mockGetDashboardInfoSeed = getDashboardInfoSeed as jest.MockedFunction<
   typeof getDashboardInfoSeed
 >;
 const mockGetCstInfoSeed = getCstInfoSeed as jest.MockedFunction<typeof getCstInfoSeed>;
+const mockGetLatestGestureSeed = getLatestGestureSeed as jest.MockedFunction<
+  typeof getLatestGestureSeed
+>;
+const mockGetCurrentSpecialRecipientsSeed = getCurrentSpecialRecipientsSeed as jest.MockedFunction<
+  typeof getCurrentSpecialRecipientsSeed
+>;
 
 const pageProps = { params: Promise.resolve({ locale: 'en' }) };
 
@@ -47,6 +66,10 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed());
   mockGetCstInfoSeed.mockResolvedValue({ Seed: 'abc123' } as never);
+  mockGetLatestGestureSeed.mockResolvedValue({ EvtLogId: 77 } as never);
+  mockGetCurrentSpecialRecipientsSeed.mockResolvedValue({
+    ChronoWarriorAddress: '0xChrono',
+  } as never);
 });
 
 describe('app home page (server shell)', () => {
@@ -54,6 +77,15 @@ describe('app home page (server shell)', () => {
     render(await Page(pageProps));
 
     expect(screen.getByTestId('home-page')).toHaveAttribute('data-cycle', '9');
+  });
+
+  it('seeds the latest gesture and special recipients into the first paint', async () => {
+    render(await Page(pageProps));
+
+    expect(mockGetLatestGestureSeed).toHaveBeenCalledWith(9);
+    expect(mockGetCurrentSpecialRecipientsSeed).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('home-page')).toHaveAttribute('data-latest-gesture-id', '77');
+    expect(screen.getByTestId('home-page')).toHaveAttribute('data-chrono-address', '0xChrono');
   });
 
   it('server-picks a hero banner token within the imprinted range', async () => {
@@ -94,6 +126,7 @@ describe('app home page (server shell)', () => {
 
     expect(screen.getByTestId('home-page')).toHaveAttribute('data-cycle', '');
     expect(mockGetCstInfoSeed).not.toHaveBeenCalled();
+    expect(mockGetLatestGestureSeed).not.toHaveBeenCalled();
   });
 
   it('embeds live-cycle Event JSON-LD once the cycle has started', async () => {

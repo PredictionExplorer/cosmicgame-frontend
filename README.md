@@ -98,7 +98,8 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 ├── components/
 │   ├── ui/           Design system (Radix wrappers: button, card, tooltip, skeleton, ...)
 │   ├── common/       Shared game UI (ConnectWalletButton, GestureStatus, Allocation)
-│   ├── home/         Homepage sections (GestureForm, ChronoCoreTimer, CyclePhaseGuide)
+│   ├── home/         Homepage sections (observatory/ control desk: CycleClock,
+│   │                 participant intel, GesturePanel, AllocationLedger, ActionDock)
 │   ├── layout/       Header, Footer, ErrorBoundary
 │   ├── nft/          NFT display (NFTTrait, NFTImage, LatestNFTs, grids)
 │   ├── anchoring/    Anchoring (staking) tables and actions

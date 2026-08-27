@@ -22,6 +22,8 @@ interface DeckPersonalStripProps {
   gestures: GestureInfo[];
   /** Estimated Participation CST a gesture would imprint right now. */
   cstRewardPreview?: number | null;
+  /** Removes its standalone surface when embedded in the control desk. */
+  embedded?: boolean;
   className?: string;
 }
 
@@ -40,6 +42,7 @@ export function DeckPersonalStrip({
   data,
   gestures,
   cstRewardPreview = null,
+  embedded = false,
   className,
 }: DeckPersonalStripProps) {
   const t = useTranslations('home');
@@ -86,10 +89,10 @@ export function DeckPersonalStrip({
   return (
     <Surface
       asChild
-      variant="glass"
-      radius="lg"
+      variant={embedded ? 'plain' : 'glass'}
+      radius={embedded ? 'none' : 'lg'}
       padding="none"
-      className={cn('min-w-0', className)}
+      className={cn(embedded && 'border-0 bg-transparent shadow-none', 'min-w-0', className)}
     >
       <section aria-label={t('deck.personal.title')} data-testid="deck-personal-strip">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2.5 px-4 py-3">

@@ -69,75 +69,112 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('links to trade CST on Uniswap', async ({ page }) => {
+    const isMobile = await page.evaluate(() => window.innerWidth < 1024);
+    if (isMobile) {
+      const dock = page.getByTestId('dock-open-sheet');
+      test.skip(
+        !(await dock.isVisible({ timeout: 5000 }).catch(() => false)),
+        'no active cycle, so the mobile gesture sheet is unavailable',
+      );
+      await dock.click();
+      const cstMethod = page
+        .locator('[data-testid="gesture-panel"][data-variant="sheet"]:visible')
+        .getByTestId('panel-method-cst');
+      test.skip(
+        !(await cstMethod.isVisible({ timeout: 3000 }).catch(() => false)),
+        'CST method unlocks after the first Gesture',
+      );
+      await cstMethod.click();
+    }
     const tradeLink = page.getByRole('link', { name: 'Trade CST on Uniswap' }).first();
     await ensureVisible(tradeLink);
     await expect(tradeLink).toBeVisible();
     await expect(tradeLink).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
   });
 
-  test('leads with the Deck header and its stable H1', async ({ page }) => {
+  test('leads with the pulse bar and its stable H1', async ({ page }) => {
     await expect(
       page.getByRole('heading', { level: 1, name: 'The Cosmic Signature Observatory' }),
     ).toBeVisible({ timeout: 15000 });
-    await expect(page.getByTestId('home-deck-layout')).toBeVisible();
-    const board = page.getByTestId('allocation-tracks-board');
-    await ensureVisible(board);
-    await expect(board).toBeVisible();
-    await expect(board.getByText('Allocation Tracks')).toBeVisible();
+    await expect(page.getByTestId('control-desk')).toBeVisible();
+    const ledger = page.getByTestId('allocation-ledger');
+    await ensureVisible(ledger);
+    await expect(ledger).toBeVisible();
+    await expect(ledger.getByText('Allocation Tracks')).toBeVisible();
   });
 
-  test('shows the cycle monument at the heart of the Deck', async ({ page }) => {
-    const monument = page.getByTestId('cycle-monument');
-    await expect(monument).toBeVisible({ timeout: 15000 });
+  test('shows the cycle clock at the heart of the stage', async ({ page }) => {
+    const clock = page.getByTestId('cycle-clock');
+    await expect(clock).toBeVisible({ timeout: 15000 });
     // .first(): in the waiting-first-gesture phase the badge and the status
     // line both carry the phase copy, which is legitimate.
     await expect(
-      monument
+      clock
         .getByText(
           /Next cycle opens in|Cycle is open|Cycle finalizes in|Final hour|Final 10 minutes|Final minute|Cycle ready to finalize/,
         )
         .first(),
     ).toBeVisible();
     await expect(
-      monument
+      clock
         .getByText(
           /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|Cycle is live|less than one hour|Final minutes|Final minute|Finalization is ready/i,
         )
         .first(),
     ).toBeVisible();
-    await expect(monument.getByRole('timer')).toBeVisible();
+    await expect(clock.getByRole('timer')).toBeVisible();
   });
 
-  test('docks the gesture composer above the chat feed while the cycle is active', async ({
-    page,
-  }) => {
-    const monument = page.getByTestId('cycle-monument');
-    await expect(monument).toBeVisible({ timeout: 15000 });
-    const phase = await monument.getAttribute('data-phase');
+  test('keeps the one gesture panel in the stage while the cycle is active', async ({ page }) => {
+    const clock = page.getByTestId('cycle-clock');
+    await expect(clock).toBeVisible({ timeout: 15000 });
+    const phase = await clock.getAttribute('data-phase');
     test.skip(
       phase === 'opening-soon' || phase === 'loading' || phase === 'unavailable',
-      'composer is legitimately hidden while no cycle is active',
+      'the gesture panel is legitimately hidden while no cycle is active',
     );
 
-    const composer = page.locator('[data-testid="gesture-composer"]:visible').first();
-    await ensureVisible(composer);
-    await expect(composer).toBeVisible();
-    // Disconnected visitors get the connect prompt inside the composer.
-    await expect(composer.getByText(/Connect a wallet to make a Gesture/i)).toBeVisible();
+    const isMobile = await page.evaluate(() => window.innerWidth < 1024);
+    if (isMobile) {
+      await expect(page.locator('[data-testid="gesture-panel"]:visible')).toHaveCount(0);
+      await expect(page.getByTestId('gesture-price-strip')).toBeVisible();
+      return;
+    }
 
+    const panel = page.locator('[data-testid="gesture-panel"]:visible').first();
+    await ensureVisible(panel);
+    await expect(panel).toBeVisible();
+    // Every method with a live price, in one place.
+    await expect(panel.getByTestId('panel-method-eth-cost')).toBeVisible();
+    // Disconnected visitors get the connect prompt inside the panel.
+    await expect(panel.getByTestId('connect-to-gesture')).toBeVisible();
+    await expect(panel.getByText(/Connect to submit your gesture/i)).toBeVisible();
+
+    // The panel sits in the stage, above the message feed.
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
-    const composerBox = await composer.boundingBox();
+    const panelBox = await panel.boundingBox();
     const chatBox = await chat.boundingBox();
-    expect(composerBox).not.toBeNull();
+    expect(panelBox).not.toBeNull();
     expect(chatBox).not.toBeNull();
-    expect(composerBox!.y + composerBox!.height).toBeLessThanOrEqual(chatBox!.y + 2);
+    expect(panelBox!.y + panelBox!.height).toBeLessThanOrEqual(chatBox!.y + 2);
   });
 
-  test('shows gesture cost', async ({ page }) => {
-    const gestureCost = page.locator('text=/ETH Gesture/i').first();
-    await ensureVisible(gestureCost);
-    await expect(gestureCost).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('text=/ETH/').first()).toBeVisible();
+  test('shows gesture cost per method in the panel', async ({ page }) => {
+    const clock = page.getByTestId('cycle-clock');
+    await expect(clock).toBeVisible({ timeout: 15000 });
+    const phase = await clock.getAttribute('data-phase');
+    test.skip(
+      phase === 'opening-soon' || phase === 'loading' || phase === 'unavailable',
+      'gesture prices are legitimately hidden while no cycle is active',
+    );
+
+    const isMobile = await page.evaluate(() => window.innerWidth < 1024);
+    const ethCost = isMobile
+      ? page.getByTestId('gesture-price-eth')
+      : page.locator('[data-testid="panel-method-eth-cost"]:visible').first();
+    await ensureVisible(ethCost);
+    await expect(ethCost).toBeVisible({ timeout: 15000 });
+    await expect(ethCost).toContainText(/ETH/);
   });
 
   test('shows main allocation reward', async ({ page }) => {
@@ -146,34 +183,37 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(signatureAllocation).toBeVisible();
   });
 
-  test('shows public-goods impact card', async ({ page }) => {
-    const impactCardHeading = page.getByRole('heading', {
-      name: "Funding Ethereum's core contributors.",
-    });
-    await ensureVisible(impactCardHeading);
-    await expect(impactCardHeading).toBeVisible();
+  test('keeps Public Goods compact in the ledger rather than a feature card', async ({ page }) => {
+    await expect(page.getByTestId('public-goods-impact-card')).toHaveCount(0);
+    const track = page.getByTestId('ledger-track-public-goods');
+    await ensureVisible(track);
+    await expect(track).toBeVisible();
+    await expect(track.getByRole('link')).toHaveAttribute('href', '/public-goods-contributions-cg');
+  });
+
+  test('shows detailed latest-participant intelligence', async ({ page }) => {
+    await skipUnlessCycleHasGestures(page);
+    const latest = page.getByTestId('latest-participant-intel').first();
+    await ensureVisible(latest);
+    await expect(latest).toBeVisible();
+    await expect(latest.getByText('Latest Participant')).toBeVisible();
+    await expect(latest.getByText('Amount paid')).toBeVisible();
+    await expect(latest.getByText('CST received')).toBeVisible();
+    await expect(latest.getByText('Currently in line for at finalization')).toBeVisible();
     await expect(
-      page.getByRole('link', { name: /View public-goods contributions/i }),
-    ).toHaveAttribute('href', '/public-goods-contributions-cg');
+      latest.getByRole('progressbar', { name: /Progress toward Endurance/ }),
+    ).toBeVisible();
   });
 
-  test('shows latest participant card', async ({ page }) => {
+  test('shows Endurance and Chrono intelligence in the control desk', async ({ page }) => {
     await skipUnlessCycleHasGestures(page);
-    const latestParticipant = page.locator('text=/Latest Participant/i').first();
-    await ensureVisible(latestParticipant);
-    await expect(latestParticipant).toBeVisible();
-  });
-
-  test('shows special allocation recipients section', async ({ page }) => {
-    await skipUnlessCycleHasGestures(page);
-    const specialAllocations = page.getByText('Special Allocation Leaders').first();
-    await ensureVisible(specialAllocations);
-    await expect(specialAllocations).toBeVisible({ timeout: 15000 });
-    const championLabel = page.getByText('Endurance Champion').first();
-    await ensureVisible(championLabel);
+    const intel = page.getByTestId('chrono-endurance-intel').first();
+    await ensureVisible(intel);
+    await expect(intel).toBeVisible({ timeout: 15000 });
+    await expect(intel.getByText('Endurance & Chrono')).toBeVisible();
+    const championLabel = intel.getByText('Endurance Champion').first();
     await expect(championLabel).toBeVisible();
-    const chronoLabel = page.getByText(/Chrono-Warrior|Chrono Warrior/i).first();
-    await ensureVisible(chronoLabel);
+    const chronoLabel = intel.getByText(/Chrono-Warrior|Chrono Warrior/i).first();
     await expect(chronoLabel).toBeVisible();
   });
 
@@ -207,17 +247,14 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(latestNfts).toBeVisible();
   });
 
-  test('special allocation leader labels exist', async ({ page }) => {
-    const section = page.getByText(/Endurance Champion|No holder yet/i).first();
+  test('role intelligence labels exist', async ({ page }) => {
+    const section = page.getByText(/Endurance Champion|No endurance record yet/i).first();
     await section.waitFor({ state: 'visible', timeout: 15000 });
     await ensureVisible(section);
     await expect(page.getByText(/Chrono-Warrior|Chrono Warrior/i).first()).toBeVisible();
   });
 
-  test('Chrono-Warrior card uses its own address when leaders differ', async ({ page }) => {
-    // The whole leaders section is gated on the DASHBOARD read
-    // (TsRoundStart !== 0), so mocking current_special_winners below cannot
-    // conjure it during an idle cycle.
+  test('Chrono-Warrior standing uses its own address when leaders differ', async ({ page }) => {
     await skipUnlessCycleHasGestures(page);
     const data = {
       ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
@@ -238,22 +275,29 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     });
     await page.reload({ waitUntil: 'networkidle' });
 
-    const chronoCard = page.getByTestId('special-allocation-card-chrono-warrior').first();
-    const enduranceCard = page.getByTestId('special-allocation-card-endurance-champion').first();
-    await ensureVisible(chronoCard);
-    await expect(chronoCard).toContainText(data.ChronoWarriorAddress);
-    await expect(chronoCard).not.toContainText(data.EnduranceChampionAddress);
-    await expect(enduranceCard).toContainText(data.EnduranceChampionAddress);
+    const chronoRow = page.getByTestId('chrono-role-summary').first();
+    const enduranceRow = page.getByTestId('control-desk-endurance').first();
+    await ensureVisible(chronoRow);
+    await expect(chronoRow.getByRole('link', { name: data.ChronoWarriorAddress })).toHaveAttribute(
+      'href',
+      `/user/${data.ChronoWarriorAddress}`,
+    );
+    await expect(chronoRow.getByRole('link', { name: data.EnduranceChampionAddress })).toHaveCount(
+      0,
+    );
+    await expect(
+      enduranceRow.getByRole('link', { name: data.EnduranceChampionAddress }),
+    ).toHaveAttribute('href', `/user/${data.EnduranceChampionAddress}`);
   });
 
   test('Recipient History section renders', async ({ page }) => {
-    const section = page.getByText(/Gesture history, leaderboards/i).first();
+    const section = page.getByTestId('cycle-details-link-card');
     await ensureVisible(section);
     await expect(section).toBeVisible();
   });
 
   test('Distribution of funds section renders', async ({ page }) => {
-    const section = page.locator('text=/Allocation Breakdown|Distribution of funds/').first();
+    const section = page.getByTestId('allocation-ledger');
     await ensureVisible(section);
     await expect(section).toBeVisible();
   });

@@ -475,6 +475,14 @@ describe('useChampions', () => {
     expect(result.current.latestGesture.isExtendingEnduranceRecord).toBe(true);
   });
 
+  it('forwards an ISR role seed into the snapshot hook', () => {
+    mockChampionQuery(snapshot(baseSnapshot));
+
+    renderHook(() => useChampions(baseSnapshot));
+
+    expect(mockUseSpecialAllocationSnapshot).toHaveBeenCalledWith(baseSnapshot);
+  });
+
   it('passes loading state through when data is unavailable', () => {
     mockUseSpecialAllocationSnapshot.mockReturnValue({
       snapshot: null,

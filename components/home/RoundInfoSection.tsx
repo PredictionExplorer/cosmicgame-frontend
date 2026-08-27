@@ -85,7 +85,14 @@ export function RoundInfoSection({
   return (
     <div className="space-y-16">
       {/* 1. Allocation Breakdown */}
-      <motion.div custom={0} variants={sectionFade} initial="hidden" animate="visible">
+      <motion.div
+        id="allocation-breakdown"
+        custom={0}
+        variants={sectionFade}
+        initial="hidden"
+        animate="visible"
+        className="scroll-mt-24"
+      >
         {data && <Allocation data={data} />}
       </motion.div>
 

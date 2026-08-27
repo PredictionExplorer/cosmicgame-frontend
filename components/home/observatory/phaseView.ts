@@ -1,9 +1,9 @@
 import type { CyclePhase } from '@/lib/cycleState';
 
 /**
- * Per-phase visual treatment for the cycle monument (formerly ChronoCoreTimer).
- * Message keys resolve under `home.chrono.phase.*`, which stays the single
- * source of phase copy for the countdown centerpiece.
+ * Per-phase visual treatment for the cycle clock and its satellites (pulse
+ * bar chip, action dock). Message keys resolve under `home.chrono.phase.*`,
+ * which stays the single source of phase copy for the countdown centerpiece.
  */
 export interface PhaseView {
   /** Message key segment under `home.chrono.phase.*`. */

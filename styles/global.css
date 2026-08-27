@@ -64,6 +64,21 @@
 }
 
 /*
+ * The home control desk uses a tighter header offset than generic inner
+ * pages. When maintenance copy adds a second fixed bar, restore enough
+ * clearance without making every normal visit pay for an absent banner.
+ */
+body:has([data-maintenance-banner]) .home-control-shell {
+  padding-top: calc(var(--header-height) + 3.75rem);
+}
+
+@media (max-width: 639px) {
+  body:has([data-maintenance-banner]) .home-control-shell {
+    padding-top: calc(var(--header-height) + 5rem);
+  }
+}
+
+/*
  * Layer scale.
  *
  * Stacking only compares within a shared context, so these are a shared

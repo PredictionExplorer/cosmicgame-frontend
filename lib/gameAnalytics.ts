@@ -1,10 +1,11 @@
 import { event } from '@/utils/analytics';
 
 /**
- * Which UI surface triggered a gameplay action. The Deck redesign exists to
- * move the message-attach rate, so every gesture records where it started.
+ * Which UI surface triggered a gameplay action. The observatory keeps exactly
+ * one gesture panel, so the surface distinguishes its mounts (in-page card vs
+ * mobile sheet) plus the clock's finalize action.
  */
-export type GestureSurface = 'console' | 'monument' | 'composer' | 'mini-bar' | 'sheet';
+export type GestureSurface = 'panel' | 'sheet' | 'clock';
 
 export function trackGestureSubmitted({
   source,
@@ -30,6 +31,6 @@ export function trackChatJoinCtaClicked(): void {
   event({ action: 'chat_join_cta_clicked', category: 'gameplay', label: 'chat-empty-state' });
 }
 
-export function trackComposerSheetOpened(): void {
-  event({ action: 'composer_sheet_opened', category: 'gameplay', label: 'mobile-fab' });
+export function trackGestureSheetOpened(): void {
+  event({ action: 'gesture_sheet_opened', category: 'gameplay', label: 'action-dock' });
 }

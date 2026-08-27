@@ -217,12 +217,12 @@ export async function fetchChainSpecialAllocationSnapshot({
   };
 }
 
-export function useSpecialAllocationSnapshot(): {
+export function useSpecialAllocationSnapshot(initialData?: SpecialRecipients | null): {
   snapshot: SpecialAllocationSnapshot | null;
   isLoading: boolean;
   raw: SpecialRecipients | null | undefined;
 } {
-  const apiQuery = useCurrentSpecialRecipients();
+  const apiQuery = useCurrentSpecialRecipients(initialData);
   const publicClient = usePublicClient({ chainId: activeChain.id });
   const { cosmicGame } = useContractAddresses();
   const apiHasV2 = hasApiV2SpecialAllocationData(apiQuery.data);

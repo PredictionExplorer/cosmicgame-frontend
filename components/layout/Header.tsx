@@ -555,7 +555,10 @@ const Header: FC = () => {
     <AppBarWrapper>
       <div className="mx-auto w-full max-w-7xl px-4">
         {systemMode > 0 && (
-          <div className="fixed left-0 right-0 top-[var(--header-height)] z-40 bg-amber-500/95 px-6 py-2.5 text-black backdrop-blur-sm">
+          <div
+            data-maintenance-banner
+            className="fixed left-0 right-0 top-[var(--header-height)] z-40 bg-amber-500/95 px-6 py-2.5 text-black backdrop-blur-sm"
+          >
             <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
               <p className="text-sm">
                 {systemMode === 1

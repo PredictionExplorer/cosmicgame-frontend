@@ -50,7 +50,14 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await expect(page).toHaveTitle('Cosmic Signature');
     // Gesture form section heading + method picker are client-rendered and
     // data-independent (messages/zh/home.json form group).
-    await expect(page.getByText('落笔方式').first()).toBeVisible();
+    await expect(
+      page
+        .locator(
+          '[data-testid="gesture-price-strip"]:visible, [data-testid="gesture-panel"]:visible',
+        )
+        .getByText('落笔方式')
+        .first(),
+    ).toBeVisible();
     // The public-goods impact card is part of the home shell.
     await expect(page.getByText('公共物品', { exact: false }).first()).toBeVisible();
   });

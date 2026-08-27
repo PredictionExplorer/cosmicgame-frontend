@@ -1,7 +1,7 @@
 import {
   trackChatJoinCtaClicked,
-  trackComposerSheetOpened,
   trackFinalizeSubmitted,
+  trackGestureSheetOpened,
   trackGestureSubmitted,
 } from '../gameAnalytics';
 
@@ -16,27 +16,27 @@ beforeEach(() => {
 
 describe('gameAnalytics', () => {
   it('labels gesture submissions with surface, method, and message state', () => {
-    trackGestureSubmitted({ source: 'composer', method: 'ETH', hasMessage: true });
+    trackGestureSubmitted({ source: 'panel', method: 'ETH', hasMessage: true });
     expect(mockEvent).toHaveBeenCalledWith({
       action: 'gesture_submitted',
       category: 'gameplay',
-      label: 'composer:ETH:with-message',
+      label: 'panel:ETH:with-message',
     });
 
-    trackGestureSubmitted({ source: 'console', method: 'CST', hasMessage: false });
+    trackGestureSubmitted({ source: 'sheet', method: 'CST', hasMessage: false });
     expect(mockEvent).toHaveBeenCalledWith({
       action: 'gesture_submitted',
       category: 'gameplay',
-      label: 'console:CST:no-message',
+      label: 'sheet:CST:no-message',
     });
   });
 
   it('tracks finalization, chat CTA, and sheet opens', () => {
-    trackFinalizeSubmitted('monument');
+    trackFinalizeSubmitted('clock');
     expect(mockEvent).toHaveBeenCalledWith({
       action: 'finalize_submitted',
       category: 'gameplay',
-      label: 'monument',
+      label: 'clock',
     });
 
     trackChatJoinCtaClicked();
@@ -46,11 +46,11 @@ describe('gameAnalytics', () => {
       label: 'chat-empty-state',
     });
 
-    trackComposerSheetOpened();
+    trackGestureSheetOpened();
     expect(mockEvent).toHaveBeenCalledWith({
-      action: 'composer_sheet_opened',
+      action: 'gesture_sheet_opened',
       category: 'gameplay',
-      label: 'mobile-fab',
+      label: 'action-dock',
     });
   });
 });

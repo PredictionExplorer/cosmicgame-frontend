@@ -397,6 +397,15 @@ describe('useApiQuery hooks', () => {
       expect(options.refetchIntervalInBackground).toBe(false);
       expect(options.refetchOnWindowFocus).toBe(true);
     });
+
+    it('uses an ISR seed for first paint but marks it immediately stale', () => {
+      const seed = [{ EvtLogId: 77 }] as never;
+      renderHook(() => useGestureListByCycle(7, 'desc', seed));
+
+      const options = getOptions();
+      expect(options.initialData).toBe(seed);
+      expect(options.initialDataUpdatedAt).toBe(0);
+    });
   });
 
   describe('useCurrentSpecialRecipients', () => {
@@ -415,6 +424,15 @@ describe('useApiQuery hooks', () => {
       expect(options.staleTime).toBe(15_000);
       expect(options.refetchInterval).toBe(30_000);
       expect(options.refetchIntervalInBackground).toBe(false);
+    });
+
+    it('uses an ISR role seed for first paint but refreshes after hydration', () => {
+      const seed = { ChronoWarriorAddress: '0xabc' } as never;
+      renderHook(() => useCurrentSpecialRecipients(seed));
+
+      const options = getOptions();
+      expect(options.initialData).toBe(seed);
+      expect(options.initialDataUpdatedAt).toBe(0);
     });
   });
 

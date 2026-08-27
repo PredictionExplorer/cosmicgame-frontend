@@ -4,6 +4,7 @@ import {
   __resetChainEventsTransport,
   buildEventTopicMap,
   CHAIN_EVENTS_POLL_INTERVAL_MS,
+  isAbortOnlyError,
   startCosmicEventPolling,
   WATCHED_COSMIC_EVENTS,
 } from '../chainEvents';
@@ -75,6 +76,20 @@ describe('buildEventTopicMap', () => {
     for (const topic of map.keys()) {
       expect(topic).toMatch(/^0x[0-9a-f]{64}$/);
     }
+  });
+});
+
+describe('isAbortOnlyError', () => {
+  it('recognizes direct and Promise.any-wrapped AbortErrors', () => {
+    const abort = new DOMException('signal is aborted without reason', 'AbortError');
+    expect(isAbortOnlyError(abort)).toBe(true);
+    expect(isAbortOnlyError(new AggregateError([abort, abort]))).toBe(true);
+  });
+
+  it('does not hide mixed aggregates containing a real failure', () => {
+    const abort = new DOMException('aborted', 'AbortError');
+    expect(isAbortOnlyError(new AggregateError([abort, new Error('RPC rejected')]))).toBe(false);
+    expect(isAbortOnlyError(new Error('network down'))).toBe(false);
   });
 });
 
@@ -206,5 +221,29 @@ describe('startCosmicEventPolling', () => {
     await jest.advanceTimersByTimeAsync(CHAIN_EVENTS_POLL_INTERVAL_MS);
     expect(onEvents).not.toHaveBeenCalled(); // baseline tick after recovery
     expect(fetchCalls.length).toBeGreaterThan(2);
+  });
+
+  it('silences abort-only timeout aggregates and retries on the next poll', async () => {
+    const onEvents = jest.fn();
+    global.fetch = jest.fn(
+      (_url: unknown, init?: { signal?: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener(
+            'abort',
+            () => reject(new DOMException('signal is aborted without reason', 'AbortError')),
+            { once: true },
+          );
+        }),
+    ) as never;
+
+    const stop = startCosmicEventPolling({ contractAddress: address, onEvents });
+    // Direct nodes time out first; the proxy timeout follows. Promise.any
+    // wraps each set of AbortErrors in AggregateError.
+    await jest.advanceTimersByTimeAsync(5_100);
+
+    expect(mockReportErrorThrottled).not.toHaveBeenCalled();
+    expect(onEvents).not.toHaveBeenCalled();
+
+    stop();
   });
 });

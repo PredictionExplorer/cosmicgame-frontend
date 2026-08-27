@@ -8,7 +8,7 @@ const { cycle } = ZH_ROUTE_FIXTURES;
 const TRANSLATED_TOOLTIP_NAME = /^(?:更多信息|查看“|说明“)/;
 
 const ROUTES = [
-  { path: '/zh', readyText: '落笔方式', minimum: 5 },
+  { path: '/zh', readyText: 'Cosmic Signature 观测台', minimum: 5 },
   { path: '/zh/current-cycle', readyText: '落笔总次数', minimum: 5 },
   { path: `/zh/allocation/${cycle}`, readyText: `第 ${cycle} 个周期`, minimum: 5 },
   { path: '/zh/anchoring', readyText: '锚定运作原理', minimum: 3 },

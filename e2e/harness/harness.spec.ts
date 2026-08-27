@@ -30,7 +30,7 @@ function appUrl(path = '/'): string {
 
 async function openHome(page: Page): Promise<void> {
   await page.goto(appUrl('/'), { waitUntil: 'domcontentloaded' });
-  await expect(page.getByTestId('cycle-monument')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('cycle-clock')).toBeVisible({ timeout: 30_000 });
 }
 
 test.beforeAll(async () => {
@@ -47,7 +47,7 @@ test('seeded history reaches the indexer and the app boots on it', async ({ page
 
   await openHome(page);
   await expect(page.getByTestId('gesture-message-chat')).toBeVisible();
-  await expect(page.getByTestId('home-deck-board')).toBeVisible();
+  await expect(page.getByTestId('allocation-ledger')).toBeVisible();
 });
 
 test('phase rendering follows the driven chain state', async ({ page }) => {
@@ -59,7 +59,7 @@ test('phase rendering follows the driven chain state', async ({ page }) => {
   // only follow once the API has observed the new chain state.
   await awaitIndexed('the API to observe the unopened cycle', dashboardShowsUnopenedActiveCycle);
   await openHome(page);
-  await expect(page.getByTestId('cycle-monument')).toHaveAttribute(
+  await expect(page.getByTestId('cycle-clock')).toHaveAttribute(
     'data-phase',
     'waiting-first-gesture',
     { timeout: 60_000 },
@@ -72,7 +72,7 @@ test('phase rendering follows the driven chain state', async ({ page }) => {
   );
   await awaitIndexed('the API to observe the opening gesture', dashboardShowsOpenedCycle);
   await openHome(page);
-  await expect(page.getByTestId('cycle-monument')).toHaveAttribute(
+  await expect(page.getByTestId('cycle-clock')).toHaveAttribute(
     'data-phase',
     /final-minute|final-ten|confirming|ready-to-finalize/,
     { timeout: 60_000 },
@@ -106,6 +106,7 @@ test('a gesture lands on chain, in the indexer, and in the chat', async ({ page 
 test('burner wallet and dev panel drive the game from the browser', async ({ page }) => {
   test.setTimeout(8 * 60_000);
 
+  await page.setViewportSize({ width: 1440, height: 900 });
   await openHome(page);
 
   // The panel exists only in testing mode; opening it connects the burner.
@@ -113,8 +114,14 @@ test('burner wallet and dev panel drive the game from the browser', async ({ pag
   await expect(page.getByTestId('harness-panel')).toBeVisible();
   await expect(page.getByTestId('harness-cycle-index')).not.toHaveText('…', { timeout: 30_000 });
 
-  // Burner connection flips the composer from its connect prompt to the form.
-  await expect(page.getByTestId('composer-message-input')).toBeVisible({ timeout: 30_000 });
+  // Burner connection flips the gesture panel from its connect prompt to the form.
+  await expect(page.getByTestId('gesture-message-input').first()).toBeVisible({ timeout: 30_000 });
+
+  // Connected controls are taller than the observer preview; even that
+  // participant state must keep the complete allocation ledger in view.
+  const ledgerBox = await page.getByTestId('allocation-ledger').boundingBox();
+  expect(ledgerBox).not.toBeNull();
+  expect(ledgerBox!.y + ledgerBox!.height).toBeLessThanOrEqual(900);
 
   const before = await readDashboard();
   await page.getByTestId('harness-persona-select').selectOption('Lyra');
@@ -141,7 +148,7 @@ test('endgame: finalization pays out and the next cycle opens', async ({ page })
       dashboardShowsOpenedCycle(d) && (d.PrizeClaimTs ?? Infinity) <= Math.floor(Date.now() / 1000),
   );
   await openHome(page);
-  await expect(page.getByTestId('cycle-monument')).toHaveAttribute(
+  await expect(page.getByTestId('cycle-clock')).toHaveAttribute(
     'data-phase',
     /confirming|ready-to-finalize/,
     { timeout: 60_000 },
@@ -157,9 +164,9 @@ test('endgame: finalization pays out and the next cycle opens', async ({ page })
     (d) => (d.CurRoundNum ?? 0) >= cycleBefore + 1,
   );
 
-  // The UI rolls over: the monument leaves the endgame phases.
+  // The UI rolls over: the clock leaves the endgame phases.
   await openHome(page);
-  await expect(page.getByTestId('cycle-monument')).toHaveAttribute(
+  await expect(page.getByTestId('cycle-clock')).toHaveAttribute(
     'data-phase',
     /opening-soon|waiting-first-gesture|live|approach/,
     { timeout: 90_000 },

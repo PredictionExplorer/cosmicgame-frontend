@@ -14,7 +14,7 @@ import { formatFixed } from '@/utils/format';
 
 interface PublicGoodsImpactCardProps {
   data: DashboardInfo | null;
-  variant?: 'default' | 'rail';
+  variant?: 'default' | 'rail' | 'compact';
   className?: string;
 }
 
@@ -43,6 +43,53 @@ export function PublicGoodsImpactCard({
   const lifetimeContributedEth = protocolContributionsEth + voluntaryContributionsEth;
   const vaultBalanceEth = toNumber(data.CharityBalanceEth);
   const retrievedEth = toNumber(data.MainStats.SumWithdrawals);
+
+  if (variant === 'compact') {
+    const stats = [
+      { label: t('publicGoods.thisCycle'), value: formatEthValue(currentCycleEth) },
+      { label: t('publicGoods.stats.lifetime'), value: formatEthValue(lifetimeContributedEth) },
+      { label: t('publicGoods.stats.vault'), value: formatEthValue(vaultBalanceEth) },
+      { label: t('publicGoods.stats.retrieved'), value: formatEthValue(retrievedEth) },
+    ];
+
+    return (
+      <section
+        data-testid="public-goods-impact-card"
+        data-variant="compact"
+        aria-labelledby="public-goods-impact-heading"
+        className={cn(
+          'rounded-xl border border-[oklch(77.1%_0.163_161)]/20 bg-[rgb(var(--impact-green-rgb)/0.035)] p-4',
+          className,
+        )}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[rgb(var(--impact-green-rgb))]">
+              {t('publicGoods.eyebrow')}
+            </p>
+            <h2
+              id="public-goods-impact-heading"
+              className="mt-1 font-display text-base font-bold tracking-tight text-white"
+            >
+              {t('publicGoods.heading')}
+            </h2>
+          </div>
+        </div>
+        <dl className="mt-3 grid grid-cols-2 divide-x divide-y divide-white/[0.07] overflow-hidden rounded-lg border border-white/[0.07] sm:grid-cols-4 sm:divide-y-0">
+          {stats.map((stat) => (
+            <div key={stat.label} className="min-w-0 bg-black/10 p-2.5">
+              <dt className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                {stat.label}
+              </dt>
+              <dd className="mt-1 font-mono text-xs font-semibold tabular-nums text-foreground">
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    );
+  }
 
   return (
     <section

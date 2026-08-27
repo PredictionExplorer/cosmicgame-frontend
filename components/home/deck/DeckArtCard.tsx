@@ -8,6 +8,8 @@ import { formatId, getAssetsUrl } from '@/utils';
 import { Link } from '@/i18n/navigation';
 import NFTImage from '@/components/nft/NFTImage';
 import { Surface } from '@/components/ui/surface';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
 
 interface DeckArtCardProps {
   /** Seed is `0x`-prefixed, matching the HomePage banner-token shape. */
@@ -41,7 +43,10 @@ export function DeckArtCard({ bannerToken }: DeckArtCardProps) {
           </div>
           <Link
             href="/gallery"
-            className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
+            className={cn(
+              'inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary',
+              TOUCH_TARGET_TEXT_LINK_CLASS,
+            )}
           >
             {t('deck.art.galleryCta')}
             <ArrowRight className="h-3 w-3" aria-hidden />

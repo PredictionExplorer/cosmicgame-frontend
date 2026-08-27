@@ -4,44 +4,36 @@ import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import type { CountdownRenderProps } from 'react-countdown';
 import { useQueryClient } from '@tanstack/react-query';
-import { LazyMotion, domAnimation, m } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
-
-import { formatSeconds } from '@/utils';
+import { LazyMotion, domAnimation } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { reportError } from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
-import ConnectWalletButton from '@/components/common/ConnectWalletButton';
-import { SmoothCountdown } from '@/components/common/SmoothCountdown';
-import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/ui/error-state';
-import { GradientText } from '@/components/ui/gradient-text';
-import { Spinner } from '@/components/ui/spinner';
 import { PageShell } from '@/components/ui/page-shell';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
-import { GestureStatus } from '@/components/common/GestureStatus';
 import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
-import { GestureForm } from '@/components/home/GestureForm';
 import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
-import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
-import { AllocationTracksBoard } from '@/components/home/deck/AllocationTracksBoard';
-import { CycleMonument } from '@/components/home/deck/CycleMonument';
 import { DeckArtCard } from '@/components/home/deck/DeckArtCard';
-import { DeckMiniBar } from '@/components/home/deck/DeckMiniBar';
 import { DeckPersonalStrip } from '@/components/home/deck/DeckPersonalStrip';
-import { GestureComposer } from '@/components/home/deck/GestureComposer';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
-import { getGestureSubmitLabel } from '@/components/home/deck/gestureSubmitLabel';
+import { ActionDock } from '@/components/home/observatory/ActionDock';
+import { AllocationLedger } from '@/components/home/observatory/AllocationLedger';
+import { ChronoEnduranceIntel } from '@/components/home/observatory/ChronoEnduranceIntel';
+import { ControlDesk } from '@/components/home/observatory/ControlDesk';
+import { CycleClock } from '@/components/home/observatory/CycleClock';
+import { GesturePanel } from '@/components/home/observatory/GesturePanel';
+import { GesturePriceStrip } from '@/components/home/observatory/GesturePriceStrip';
+import { LatestParticipantIntel } from '@/components/home/observatory/LatestParticipantIntel';
+import { PulseBar } from '@/components/home/observatory/PulseBar';
+import { getGestureSubmitLabel } from '@/components/home/observatory/gestureSubmitLabel';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
-import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
+import { useChampions } from '@/hooks/useChampions';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
@@ -49,10 +41,11 @@ import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import { useTabTitleCountdown } from '@/hooks/useTabTitleCountdown';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import {
   trackChatJoinCtaClicked,
-  trackComposerSheetOpened,
   trackFinalizeSubmitted,
+  trackGestureSheetOpened,
   trackGestureSubmitted,
   type GestureSurface,
 } from '@/lib/gameAnalytics';
@@ -64,13 +57,15 @@ import {
   useDonationsNFTByRound,
   useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
+import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { getCycleState } from '@/lib/cycleState';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
   simulateUxScenarioGesture,
   useUxScenarioSnapshot,
 } from '@/lib/uxCycleScenarios';
-import type { CSTTokenInfo, DashboardInfo } from '@/services/api';
+import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from '@/services/api';
 import { deriveLiveCstGestureData } from '@/utils/cstGesture';
 
 const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
@@ -89,18 +84,8 @@ const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
 // stable below (useMemo'd arrays, useCallback handlers).
 const MemoHomeObservatoryHero = memo(HomeObservatoryHero);
 const MemoGestureMessageChat = memo(GestureMessageChat);
-const MemoSpecialAllocationRecipients = memo(SpecialAllocationRecipients);
-const MemoAllocation = memo(Allocation);
-const MemoPublicGoodsImpactCard = memo(PublicGoodsImpactCard);
 const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
-
-// Transform-only (no opacity ramp): several of these sections sit in the
-// first viewport, and fading in from server-rendered `opacity: 0` would gate
-// their paint — and potentially the page's LCP — on hydration.
-const sectionFade = {
-  hidden: { y: 20 },
-  visible: { y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
-};
+const MemoDeckArtCard = memo(DeckArtCard);
 
 /**
  * Marks the browser as a returning visitor. The story section (demoted hero)
@@ -121,20 +106,24 @@ interface HomePageProps {
   initialDashboardData?: DashboardInfo | null;
   /** Server-picked story artwork so its URL ships in the SSR HTML. */
   initialBannerToken?: { id: number; info: CSTTokenInfo } | null;
+  /** Server-seeded latest gesture so participant intelligence is complete on first paint. */
+  initialLatestGesture?: GestureInfo | null;
+  /** Server-seeded role snapshot; direct-chain fallback still takes over when required. */
+  initialSpecialRecipients?: SpecialRecipients | null;
 }
 
-const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: HomePageProps) => {
+const HomePage = ({
+  initialDashboardData = null,
+  initialBannerToken = null,
+  initialLatestGesture = null,
+  initialSpecialRecipients = null,
+}: HomePageProps) => {
   const t = useTranslations('home');
   const tToast = useTranslations('toasts');
-  const locale = useLocale();
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
   const { notify } = useNotify();
   const uxScenario = useUxScenarioSnapshot();
-
-  const renderInlineCountdown = ({ total }: CountdownRenderProps) => (
-    <span className="font-mono tabular-nums">{formatSeconds(Math.ceil(total / 1000), locale)}</span>
-  );
 
   const {
     data: dashboardData,
@@ -145,7 +134,14 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
   const { data: currentTimeData, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
 
   const round = dashboardData?.CurRoundNum ?? -1;
-  const { data: bidListData } = useGestureListByCycle(round, 'desc');
+  const initialGestureList = useMemo(
+    () =>
+      initialLatestGesture && initialLatestGesture.RoundNum === round
+        ? [initialLatestGesture]
+        : undefined,
+    [initialLatestGesture, round],
+  );
+  const { data: bidListData } = useGestureListByCycle(round, 'desc', initialGestureList);
   const { data: nftDonationsData } = useDonationsNFTByRound(round);
   const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
 
@@ -198,7 +194,9 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
   }, [bannerTokenId, bannerCSTInfo, initialBannerToken]);
 
   const gestureForm = useGestureForm();
+  const champions = useChampions(initialSpecialRecipients);
   const allocationFinalize = useAllocationFinalize({ data, offset });
+  const ethUsdPrice = useTokenPrice();
 
   // "Notify me before finalization" threshold, persisted per browser. Starts
   // at the default for hydration consistency; the effect restores the choice.
@@ -255,7 +253,6 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     setBidType,
     setMessage,
     setRwlkId,
-    setAdvancedExpanded,
   } = gestureForm;
   const cstDisplayNow =
     now > 0 && (!cstGestureData.updatedAtMs || now > cstGestureData.updatedAtMs) ? now : Date.now();
@@ -340,7 +337,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
   }, [curGestureList]);
 
   const handleGesture = useCallback(
-    async (source: GestureSurface = 'console') => {
+    async (source: GestureSurface = 'panel') => {
       requestNotificationPermission();
       const trimmedMessage = gestureForm.message.trim();
       if (uxScenario) {
@@ -384,15 +381,12 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
       withPostTxRefresh,
     ],
   );
-  const handleFinalize = useCallback(
-    async (source: GestureSurface = 'console') => {
-      if (await onFinalize()) {
-        trackFinalizeSubmitted(source);
-        withPostTxRefresh(1000, 3000);
-      }
-    },
-    [onFinalize, withPostTxRefresh],
-  );
+  const handleFinalize = useCallback(async () => {
+    if (await onFinalize()) {
+      trackFinalizeSubmitted('clock');
+      withPostTxRefresh(1000, 3000);
+    }
+  }, [onFinalize, withPostTxRefresh]);
 
   // Deep link from the RandomWalk collection (?randomwalk=1&tokenId=N).
   // Read via window.location in an effect, NOT the next/navigation
@@ -437,13 +431,14 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     cycleState.phase === 'final-hour' ||
     cycleState.phase === 'final-ten' ||
     cycleState.phase === 'final-minute';
+  const showPanel = loading || isRoundActive;
 
   // Endgame theater: the tab title ticks during the final window so players
   // who tabbed away can see the clock closing from anywhere.
   useTabTitleCountdown({ enabled: isFinalWindow, targetMs: allocationTime });
 
-  // One shared label for every gesture submit surface (console, monument,
-  // composer) so the displayed cost can never drift between them.
+  // One shared label for the gesture panel and the action dock, so the
+  // displayed cost can never drift between them.
   const submitLabel = getGestureSubmitLabel({
     t,
     gestureType,
@@ -453,7 +448,9 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     cstGestureData: liveCstGestureData,
   });
 
-  const scrollToGestureForm = useCallback(() => {
+  const trackAmounts = useMemo(() => deriveAllocationTrackAmounts(data), [data]);
+
+  const scrollToGesturePanel = useCallback(() => {
     const el = document.getElementById('make-gesture');
     if (el && typeof el.scrollIntoView === 'function') {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -461,11 +458,11 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
   }, []);
 
   const handlePrimaryCtaClick = useCallback(() => {
-    scrollToGestureForm();
-  }, [scrollToGestureForm]);
+    scrollToGesturePanel();
+  }, [scrollToGesturePanel]);
 
-  // Method pills reset any picked RandomWalk token, exactly like the full
-  // console's method buttons, so a stale token can't ride along silently.
+  // Method switches reset any picked RandomWalk token so a stale token can't
+  // ride along silently.
   const handleSelectGestureType = useCallback(
     (value: string) => {
       setRwlkId(-1);
@@ -486,28 +483,22 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     }
   }, []);
 
-  // The mini-bar appears only after the Deck scrolls out of view. jsdom has
-  // no IntersectionObserver, so the guard also keeps unit tests quiet.
-  const deckContainerRef = useRef<HTMLDivElement | null>(null);
-  const [deckOutOfView, setDeckOutOfView] = useState(false);
+  // The desktop action dock appears only after the stage scrolls out of
+  // view. jsdom has no IntersectionObserver, so the guard also keeps unit
+  // tests quiet.
+  const stageContainerRef = useRef<HTMLDivElement | null>(null);
+  const [stageOutOfView, setStageOutOfView] = useState(false);
   useEffect(() => {
-    const el = deckContainerRef.current;
+    const el = stageContainerRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') return undefined;
     const observer = new IntersectionObserver(
-      ([entry]) => setDeckOutOfView(entry ? !entry.isIntersecting : false),
-      // Roughly the sticky header height: the Deck counts as "gone" once it
+      ([entry]) => setStageOutOfView(entry ? !entry.isIntersecting : false),
+      // Roughly the sticky header height: the stage counts as "gone" once it
       // has fully passed under the chrome.
       { rootMargin: '-96px 0px 0px 0px' },
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
-
-  const scrollToDeck = useCallback(() => {
-    const el = document.getElementById('deck');
-    if (el && typeof el.scrollIntoView === 'function') {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
   }, []);
 
   // Derived cycle moments for the chat feed. Memoized so the feed's memo
@@ -522,34 +513,51 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     [curGestureList, round, data?.TsRoundStart],
   );
 
-  // Chat empty-state CTA: bring the composer into view and focus it. Falls
-  // back to the full console's message field when the composer isn't
-  // rendered (disconnected wallet or inactive cycle).
-  const composerInputRef = useRef<HTMLTextAreaElement | null>(null);
+  // Chat empty-state CTA: bring the one gesture panel into view and focus
+  // its message field (messages ride on gestures).
+  const panelMessageInputRef = useRef<HTMLTextAreaElement | null>(null);
   const handleJoinChatCta = useCallback(() => {
     trackChatJoinCtaClicked();
-    const el = composerInputRef.current;
-    if (el) {
-      if (typeof el.scrollIntoView === 'function') {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      el.focus({ preventScroll: true });
-      return;
-    }
-    setAdvancedExpanded(true);
-    scrollToGestureForm();
-  }, [scrollToGestureForm, setAdvancedExpanded]);
+    scrollToGesturePanel();
+    panelMessageInputRef.current?.focus({ preventScroll: true });
+  }, [scrollToGesturePanel]);
 
-  // Mobile bottom-sheet composer: lets phones gesture-and-post from anywhere
-  // on the page instead of scrolling back to the Deck.
-  const [composerSheetOpen, setComposerSheetOpen] = useState(false);
-  const openComposerSheet = useCallback(() => {
-    trackComposerSheetOpened();
-    setComposerSheetOpen(true);
+  // Mobile bottom sheet: hosts the same gesture panel, opened from the dock,
+  // so phones can act from anywhere on the page.
+  const [gestureSheetOpen, setGestureSheetOpen] = useState(false);
+  const openGestureSheet = useCallback(() => {
+    trackGestureSheetOpened();
+    setGestureSheetOpen(true);
   }, []);
 
+  // Relative age of the newest gesture — the observer's "is this alive" pulse.
+  // The endpoint is requested in descending order, but choosing by timestamp
+  // makes the control desk resilient to stale/misordered indexer or test
+  // payloads rather than attaching transaction details to the wrong role.
+  const latestGesture = useMemo(
+    () =>
+      curGestureList.reduce<(typeof curGestureList)[number] | null>((latest, gesture) => {
+        if (!latest) return gesture;
+        const gestureTs = Number(gesture.TimeStamp) || 0;
+        const latestTs = Number(latest.TimeStamp) || 0;
+        if (gestureTs !== latestTs) return gestureTs > latestTs ? gesture : latest;
+        return (gesture.EvtLogId ?? 0) > (latest.EvtLogId ?? 0) ? gesture : latest;
+      }, null),
+    [curGestureList],
+  );
+  const lastGestureAge = useMemo(() => {
+    const timestamp = Number(latestGesture?.TimeStamp);
+    if (!Number.isFinite(timestamp) || timestamp <= 0) return null;
+    const elapsedSeconds = Math.max(0, Math.floor((now - timestamp * 1000) / 1000));
+    if (elapsedSeconds < 60) return t('ticker.age.seconds', { count: String(elapsedSeconds) });
+    const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+    if (elapsedMinutes < 60) return t('ticker.age.minutes', { count: String(elapsedMinutes) });
+    const elapsedHours = Math.floor(elapsedMinutes / 60);
+    if (elapsedHours < 24) return t('ticker.age.hours', { count: String(elapsedHours) });
+    return t('ticker.age.days', { count: String(Math.floor(elapsedHours / 24)) });
+  }, [latestGesture?.TimeStamp, now, t]);
+
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
-  const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
   const cycleNumber = data?.CurRoundNum;
   const previousCycle = (cycleNumber ?? 0) - 1;
   const hasPreviousCycle = previousCycle > 0;
@@ -575,7 +583,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
       <PageShell
         variant="data"
         backdrop="signature"
-        className="xl:max-w-[92rem] 2xl:max-w-[108rem] 2xl:px-10"
+        className="home-control-shell pb-24 pt-[var(--header-height)] max-sm:pt-[calc(var(--header-height)+0.75rem)] lg:pb-8 xl:max-w-[92rem] 2xl:max-w-[108rem] 2xl:px-10"
       >
         {uxScenario && (
           <div className="mb-5 rounded-xl border border-amber-300/25 bg-amber-300/[0.08] px-4 py-3 text-sm text-amber-100">
@@ -586,411 +594,163 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           </div>
         )}
 
-        {/* ===== DECK HEADER (page H1 — must stay in the server HTML) =====
-            A <div>, not <header>: the site banner owns the header landmark,
-            and e2e selectors like `header a[href]` must keep resolving to
-            the navigation chrome only. */}
-        <div
-          data-testid="home-deck-header"
-          className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3"
-        >
-          <div className="min-w-0">
-            <div className="mb-2.5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300 animate-live-dot" />
-              {cycleNumber == null
-                ? t('hero.cycleFallback')
-                : t('hero.cycleNumber', { number: String(cycleNumber) })}
-            </div>
-            <GradientText
-              as="h1"
-              id="home-deck-title"
-              className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl"
-            >
-              {t('deck.title')}
-            </GradientText>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-              {t('deck.intro')}
-            </p>
-          </div>
-          <Link
-            href="/how-it-works"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
-          >
-            {t('deck.newHere')}
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </Link>
-        </div>
-
-        {/* ===== THE DECK: board | monument | chat ===== */}
-        <div
-          id="deck"
-          ref={deckContainerRef}
-          data-testid="home-deck-layout"
-          className="grid scroll-mt-24 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] xl:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)_minmax(23rem,27rem)] 2xl:grid-cols-[minmax(20rem,25rem)_minmax(0,1fr)_minmax(25rem,30rem)] 2xl:gap-6"
-        >
-          <div
-            data-testid="home-deck-board"
-            // grid-cols-1 at base is load-bearing: without an explicit track
-            // the implicit `auto` column sizes to max-content, which defeats
-            // every `truncate` inside the board on narrow phones.
-            className="order-3 grid min-w-0 grid-cols-1 gap-5 lg:col-span-2 lg:grid-cols-2 xl:order-1 xl:col-span-1 xl:grid-cols-1"
-          >
-            {/* Art first: the protocol is an art performance, so a real
-                imprinted Signature leads the board column. */}
-            <DeckArtCard bannerToken={bannerToken} />
-            <AllocationTracksBoard data={data} account={account} />
-          </div>
-
-          <div data-testid="home-deck-monument" className="order-1 min-w-0 xl:order-2">
-            <CycleMonument
+        {/* ===== PARTICIPANT CONTROL DESK =====
+            One continuous surface: no independent grid cards waiting on a
+            taller sibling, and no critical role detail relegated below it. */}
+        <ControlDesk
+          ref={stageContainerRef}
+          header={
+            <PulseBar
+              cycleNumber={cycleNumber ?? null}
+              phase={cycleState.phase}
+              gestureCount={data?.CurNumBids ?? 0}
+              lastGestureAge={lastGestureAge}
+            />
+          }
+          clock={
+            <CycleClock
               data={data}
               loading={loading}
               allocationTime={allocationTime}
               activationTime={activationTime}
               now={now}
               finalizationConfirmed={finalizationConfirmed}
-              latestGesture={curGestureList[0] ?? null}
-              pulseKey={gesturePulseKey}
               account={account}
-              ethGestureInfo={ethGestureInfo}
-              cstGestureData={liveCstGestureData}
-              gestureType={gestureType}
-              onSelectGestureType={handleSelectGestureType}
-              canGesture={canGesture}
               canClaim={canClaim}
-              isGesturing={isGesturing}
               isClaiming={isClaiming}
               claimWait={claimWait}
-              rwlkId={rwlkId}
-              gestureCostPlus={gestureCostPlus}
-              onGesture={() => void handleGesture('monument')}
-              onFinalize={() => void handleFinalize('monument')}
-              onOpenFullConsole={scrollToGestureForm}
+              onFinalize={() => void handleFinalize()}
               notifyThresholdMin={notifyThresholdMin}
               onNotifyThresholdChange={handleNotifyThresholdChange}
-              cstRewardPreview={gestureForm.gestureCstRewardAmount}
+              ethUsdPrice={ethUsdPrice}
+              embedded
             />
-          </div>
-
-          <div data-testid="home-deck-chat" className="order-2 min-w-0 space-y-3 xl:order-3">
-            {!loading && isRoundActive && (
-              <GestureComposer
-                message={gestureForm.message}
-                setMessage={setMessage}
-                gestureType={gestureType}
-                onSelectGestureType={handleSelectGestureType}
-                showCstOption={data?.LastBidderAddr !== zeroAddress}
-                cstIsFree={liveCstGestureData.isFree}
-                rwlkId={rwlkId}
-                account={account}
-                isGesturing={isGesturing}
-                canGesture={canGesture}
-                submitLabel={submitLabel}
-                onGesture={() => void handleGesture('composer')}
-                onOpenFullConsole={scrollToGestureForm}
-                textareaRef={composerInputRef}
-              />
-            )}
-            <MemoGestureMessageChat
-              gestures={curGestureList}
-              cycleNumber={round >= 0 ? round : undefined}
-              pulseKey={gesturePulseKey}
-              onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
-              systemEvents={feedSystemEvents}
-              pendingMessages={pendingMessages}
-              className="xl:h-[clamp(22rem,48vh,30rem)] 2xl:h-[clamp(24rem,46vh,32rem)] print:h-auto"
-            />
-          </div>
-        </div>
-
-        {/* ===== YOUR POSITION (connected wallets) ===== */}
-        {account && (
-          <div className="mt-5">
-            <DeckPersonalStrip
-              account={account}
+          }
+          mobilePrices={
+            <GesturePriceStrip
               data={data}
-              gestures={curGestureList}
-              cstRewardPreview={gestureForm.gestureCstRewardAmount}
-            />
-          </div>
-        )}
-
-        {/* ===== CYCLE LEADERBOARD (latest gesture, champions, records) =====
-            Sits directly under the Deck: what the previous gesture paid, who
-            holds the Endurance and Chrono records, and the final CST gesture
-            must be readable without scrolling past the console. */}
-        {data?.TsRoundStart !== 0 && (
-          /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
-          <div className="mt-8">
-            {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
-            <div className="min-w-0 print:col-auto">
-              <MemoSpecialAllocationRecipients
-                currentAccount={account}
-                latestMessage={curGestureList[0]?.Message ?? ''}
-                latestGesture={curGestureList[0] ?? null}
-                layout="grid"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ===== FULL CONSOLE + DETAIL RAIL ===== */}
-        <div
-          data-testid="home-console-layout"
-          className="mt-10 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,30rem)]"
-        >
-          <div data-testid="home-primary-column" className="min-w-0">
-            {/* ===== STATUS (prices + personal standing) ===== */}
-            <GestureStatus
-              data={data}
-              loading={loading}
-              activationTime={activationTime}
-              curGestureList={curGestureList}
               ethGestureInfo={ethGestureInfo}
               cstGestureData={liveCstGestureData}
-              allocationTime={allocationTime}
-              suppressPrimaryTimer
-              attachedNFTCount={donatedNFTs.length}
-              attachedERC20Count={donatedERC20Tokens.length}
             />
+          }
+          latestParticipant={
+            <LatestParticipantIntel
+              champions={champions}
+              latestGesture={latestGesture}
+              latestMessage={latestGesture?.Message ?? ''}
+              account={account}
+              signatureEth={trackAmounts.signatureEth}
+              attachedNftCount={donatedNFTs.length}
+              attachedErc20Count={donatedERC20Tokens.length}
+            />
+          }
+          chronoEndurance={
+            <ChronoEnduranceIntel
+              champions={champions}
+              chronoEth={trackAmounts.chronoEth}
+              account={account}
+            />
+          }
+          gestureConsole={
+            showPanel ? (
+              <GesturePanel
+                data={data}
+                loading={loading}
+                isRoundActive={isRoundActive}
+                account={account}
+                form={gestureForm}
+                cstGestureData={liveCstGestureData}
+                submitLabel={submitLabel}
+                canGesture={canGesture}
+                isGesturing={isGesturing}
+                cycleTimerEnded={cycleTimerEnded}
+                onSubmit={() => void handleGesture('panel')}
+                onSelectGestureType={handleSelectGestureType}
+                variant="card"
+                messageInputRef={panelMessageInputRef}
+                embedded
+              />
+            ) : undefined
+          }
+          personal={
+            account ? (
+              <DeckPersonalStrip
+                account={account}
+                data={data}
+                gestures={curGestureList}
+                cstRewardPreview={gestureForm.gestureCstRewardAmount}
+                embedded
+              />
+            ) : undefined
+          }
+          allocationLedger={<AllocationLedger data={data} />}
+        />
 
-            {/* ===== GESTURE ACTION AREA ===== */}
-            {(loading || isRoundActive) && (
-              <m.div
-                id="make-gesture"
-                variants={sectionFade}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.3 }}
-                className="print-motion-visible mt-8 scroll-mt-24"
-              >
-                <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
-                  <h2 className="font-display text-xl font-bold tracking-tight mb-1">
-                    {t('form.title')}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mb-6">{t('form.subtitle')}</p>
-
-                  {loading ? (
-                    <div
-                      className="space-y-5"
-                      role="status"
-                      aria-label={t('form.loadingAria')}
-                      data-testid="gesture-form-skeleton"
-                    >
-                      {/* Plain Skeletons only: nesting SkeletonText would add a second role="status". */}
-                      <Skeleton className="h-3 w-3/4" />
-                      <Skeleton className="h-3 w-2/5" />
-                      <div className="grid gap-2 sm:grid-cols-3">
-                        <Skeleton className="h-16 rounded-lg" />
-                        <Skeleton className="h-16 rounded-lg" />
-                        <Skeleton className="h-16 rounded-lg" />
-                      </div>
-                      <Skeleton className="h-24 rounded-lg" />
-                      <Skeleton className="h-12 rounded-md" />
-                    </div>
-                  ) : account ? (
-                    <>
-                      <GestureForm
-                        {...gestureForm}
-                        cstGestureData={liveCstGestureData}
-                        data={data}
-                      />
-
-                      <div className="mt-6 space-y-4">
-                        {canGesture && (
-                          <Button
-                            id="gesture-submit"
-                            size="lg"
-                            onClick={() => void handleGesture('console')}
-                            className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                            disabled={
-                              isGesturing ||
-                              (gestureType === 'RandomWalk' && rwlkId === -1) ||
-                              gestureType === ''
-                            }
-                          >
-                            {isGesturing ? (
-                              <span className="flex items-center gap-2">
-                                <Spinner size="sm" /> {t('form.processing')}
-                              </span>
-                            ) : (
-                              <>
-                                {submitLabel} <ArrowRight className="ml-2 h-5 w-5" />
-                              </>
-                            )}
-                          </Button>
-                        )}
-                        {account && !canGesture && cycleTimerEnded === false && (
-                          <p className="text-sm text-muted-foreground">
-                            {t('form.finalGestureMade')}
-                          </p>
-                        )}
-                        {canClaim && (
-                          <>
-                            <Button
-                              size="lg"
-                              onClick={() => void handleFinalize('console')}
-                              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                              disabled={
-                                isClaiming || (data?.LastBidderAddr !== account && claimWait > now)
-                              }
-                            >
-                              {isClaiming ? (
-                                <span className="flex items-center gap-2">
-                                  <Spinner size="sm" /> {t('form.processing')}
-                                </span>
-                              ) : (
-                                <>
-                                  {t('form.finalize')}
-                                  <span className="flex items-center">
-                                    {claimWait > now && data?.LastBidderAddr !== account && (
-                                      <>
-                                        &nbsp;{t('form.finalizeAvailableIn')} &nbsp;
-                                        <SmoothCountdown
-                                          date={claimWait}
-                                          renderer={renderInlineCountdown}
-                                          intervalMs={1000}
-                                        />
-                                      </>
-                                    )}
-                                    &nbsp;
-                                    <ArrowRight className="h-[22px] w-[22px]" />
-                                  </span>
-                                </>
-                              )}
-                            </Button>
-                            {data?.LastBidderAddr !== account && claimWait > now && (
-                              <p className="text-sm italic text-right text-primary">
-                                {t('form.finalizeWaitNote')}
-                              </p>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    <div data-testid="connect-to-gesture" className="space-y-5">
-                      <GestureForm
-                        {...gestureForm}
-                        cstGestureData={liveCstGestureData}
-                        data={data}
-                        previewMode
-                      />
-                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-                        <h3 className="font-display text-lg font-semibold tracking-tight">
-                          {t('form.connect.title')}
-                        </h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          {t('form.connect.body')}
-                        </p>
-                        <div className="mt-4">
-                          <ConnectWalletButton
-                            isMobileView={false}
-                            loading={false}
-                            balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
-                            stakedTokenCount={{ cst: 0, rwalk: 0 }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </m.div>
-            )}
-          </div>
-
-          <div data-testid="home-rail-column" className="min-w-0 space-y-6">
-            {/* ===== FULL ROUND DETAILS LINK ===== */}
-            <m.div
-              variants={sectionFade}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.5 }}
-              className="print-motion-visible"
+        {/* ===== LIVE FEED + ARTWORK =====
+            Observer depth follows immediately after the desk. Navigation is
+            folded into this section header instead of occupying full cards. */}
+        <div className="mt-5">
+          <div
+            data-testid="home-feed-actions"
+            className="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 px-1"
+          >
+            <Link
+              href="/current-cycle"
+              data-testid="cycle-details-link-card"
+              className={`${TOUCH_TARGET_TEXT_LINK_CLASS} inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-foreground`}
             >
-              <Link
-                href="/current-cycle"
-                data-testid="cycle-details-link-card"
-                className="group relative isolate flex items-center justify-between overflow-hidden rounded-2xl border border-primary/15 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(255_255_255/0.035)_48%,rgb(var(--nebula-violet-rgb)/0.12))] p-5 shadow-[0_24px_90px_-58px_rgb(var(--aurora-cyan-rgb)/0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white/[0.055]"
-              >
-                <span className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
-                <span className="pointer-events-none absolute -bottom-14 left-8 h-28 w-28 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
-                <span className="relative min-w-0">
-                  <span className="block text-sm font-semibold text-white">
-                    {t('cycleDetails.title')}
-                  </span>
-                  <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                    {t('cycleDetails.subtitle')}
-                  </span>
-                </span>
-                <ArrowRight className="relative h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
-              </Link>
-            </m.div>
-
+              {t('cycleDetails.title')}
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            </Link>
             {hasPreviousCycle && (
               <Link
                 href={`/allocation/${previousCycle}`}
                 data-testid="previous-cycle-link-card"
-                className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-5 py-4 text-sm text-muted-foreground transition-all duration-300 hover:border-primary/25 hover:bg-white/[0.045] hover:text-primary"
+                className={`${TOUCH_TARGET_TEXT_LINK_CLASS} inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-primary`}
               >
                 {t('hero.console.previousAllocations', { number: String(previousCycle) })}
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden />
               </Link>
             )}
+          </div>
 
-            {/* ===== PUBLIC GOODS IMPACT ===== */}
-            {data && hasPublicGoodsImpact && (
-              <m.div
-                data-testid="home-rail-public-goods"
-                variants={sectionFade}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.45 }}
-                className="print-motion-visible"
-              >
-                <MemoPublicGoodsImpactCard data={data} variant="rail" />
-              </m.div>
-            )}
+          <div
+            data-testid="home-feed-layout"
+            className="mt-2 grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,23rem)]"
+          >
+            <div data-testid="home-feed-column" className="min-w-0">
+              {/* Height only at lg+: phones keep the feed in document flow. */}
+              <MemoGestureMessageChat
+                gestures={curGestureList}
+                cycleNumber={round >= 0 ? round : undefined}
+                pulseKey={gesturePulseKey}
+                onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
+                systemEvents={feedSystemEvents}
+                pendingMessages={pendingMessages}
+                className="lg:h-[clamp(20rem,48vh,28rem)] print:h-auto"
+              />
+            </div>
 
-            {/* ===== ATTACHED ASSET RECEIPT ===== */}
-            {hasAttachedAssets && (
-              <m.div
-                data-testid="home-rail-attached-assets"
-                variants={sectionFade}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.48 }}
-                className="print-motion-visible"
-              >
-                <MemoAttachedNFTAllocationShowcase
-                  nfts={donatedNFTs}
-                  erc20Tokens={donatedERC20Tokens}
-                  cycleNumber={round >= 0 ? round : undefined}
-                  variant="rail"
-                />
-              </m.div>
-            )}
+            <div data-testid="home-depth-rail" className="min-w-0 space-y-3">
+              <MemoDeckArtCard bannerToken={bannerToken} />
+              {hasAttachedAssets && (
+                <div data-testid="home-rail-attached-assets">
+                  <MemoAttachedNFTAllocationShowcase
+                    nfts={donatedNFTs}
+                    erc20Tokens={donatedERC20Tokens}
+                    cycleNumber={round >= 0 ? round : undefined}
+                    variant="rail"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-
-        {/* ===== ALLOCATION BREAKDOWN ===== */}
-        {data && (
-          <m.div
-            id="allocation-breakdown"
-            variants={sectionFade}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.4 }}
-            className="print-motion-visible scroll-mt-24"
-          >
-            <MemoAllocation data={data} />
-          </m.div>
-        )}
 
         {/* ===== STORY: what Cosmic Signature is (crawlable, below the fold).
             SSR always ships the full section; returning visitors get it
             collapsed to this disclosure after hydration. ===== */}
-        <div data-testid="home-story-section" className="mt-12">
+        <div data-testid="home-story-section" className="mt-8">
           {storyCollapsed ? (
             <button
               type="button"
@@ -1043,73 +803,47 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
         />
       )}
 
-      <DeckMiniBar
-        visible={deckOutOfView}
+      {/* The one persistent quick-action surface: routes to the gesture
+          panel (bottom sheet on phones, scroll on desktop). */}
+      <ActionDock
+        stageOutOfView={stageOutOfView}
         data={data}
         loading={loading}
         allocationTime={allocationTime}
         activationTime={activationTime}
         now={now}
         finalizationConfirmed={finalizationConfirmed}
-        account={account}
-        canGesture={canGesture}
-        isGesturing={isGesturing}
         submitLabel={submitLabel}
-        onGesture={() => void handleGesture('mini-bar')}
-        onJumpToDeck={scrollToDeck}
+        onOpenSheet={openGestureSheet}
+        onJumpToPanel={scrollToGesturePanel}
       />
 
-      {!loading && isRoundActive && (
-        <div className="fixed inset-x-3 bottom-3 z-40 sm:hidden">
-          {account ? (
-            <Button
-              size="lg"
-              data-testid="mobile-composer-fab"
-              onClick={openComposerSheet}
-              className="h-12 w-full rounded-full shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)]"
-            >
-              {submitLabel}
-            </Button>
-          ) : (
-            <Button
-              asChild
-              size="lg"
-              className="h-12 w-full rounded-full shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)]"
-            >
-              <Link href="#deck">{t('mobileCta.preview')}</Link>
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Mobile bottom-sheet composer: same shared form state as every other
-          surface, so drafts follow the player between the sheet and the Deck. */}
-      <Sheet open={composerSheetOpen} onOpenChange={setComposerSheetOpen}>
+      {/* Mobile bottom sheet: the same gesture panel, same shared form
+          state, so drafts follow the participant between mounts. */}
+      <Sheet open={gestureSheetOpen} onOpenChange={setGestureSheetOpen}>
         <SheetContent
           side="bottom"
-          className="rounded-t-2xl border-white/[0.10] bg-[rgb(10_14_42/0.97)] p-4 pb-6 sm:hidden"
+          className="max-h-[85dvh] overflow-y-auto rounded-t-2xl border-white/[0.10] bg-[rgb(10_14_42/0.97)] p-4 pb-6 lg:hidden"
         >
-          <SheetTitle className="sr-only">{t('deck.composer.title')}</SheetTitle>
-          <GestureComposer
-            message={gestureForm.message}
-            setMessage={setMessage}
-            gestureType={gestureType}
-            onSelectGestureType={handleSelectGestureType}
-            showCstOption={data?.LastBidderAddr !== zeroAddress}
-            cstIsFree={liveCstGestureData.isFree}
-            rwlkId={rwlkId}
+          <SheetTitle className="sr-only">{t('observatory.panel.sheetTitle')}</SheetTitle>
+          <GesturePanel
+            data={data}
+            loading={loading}
+            isRoundActive={isRoundActive}
             account={account}
-            isGesturing={isGesturing}
-            canGesture={canGesture}
+            form={gestureForm}
+            cstGestureData={liveCstGestureData}
             submitLabel={submitLabel}
-            onGesture={() => {
-              setComposerSheetOpen(false);
+            canGesture={canGesture}
+            isGesturing={isGesturing}
+            cycleTimerEnded={cycleTimerEnded}
+            onSubmit={() => {
+              setGestureSheetOpen(false);
               void handleGesture('sheet');
             }}
-            onOpenFullConsole={() => {
-              setComposerSheetOpen(false);
-              scrollToGestureForm();
-            }}
+            onSelectGestureType={handleSelectGestureType}
+            variant="sheet"
+            embedded
           />
         </SheetContent>
       </Sheet>

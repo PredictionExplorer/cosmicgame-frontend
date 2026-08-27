@@ -55,6 +55,20 @@ describe('PublicGoodsImpactCard', () => {
     );
   });
 
+  it('supports a small summary layout for the dedicated Public Goods page', () => {
+    render(<PublicGoodsImpactCard data={dashboardData} variant="compact" />);
+
+    const card = screen.getByTestId('public-goods-impact-card');
+    expect(card).toHaveAttribute('data-variant', 'compact');
+    expect(card).toHaveClass('p-4');
+    expect(card).toHaveTextContent('8.6415 ETH');
+    expect(card).toHaveTextContent('11.23 ETH');
+    expect(card).toHaveTextContent('0.5000 ETH');
+    expect(card).toHaveTextContent('2.5000 ETH');
+    expect(screen.queryByRole('link', { name: /home\.publicGoods\.cta/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/not a charitable contribution/)).not.toBeInTheDocument();
+  });
+
   it('renders supporting public-goods totals', () => {
     render(<PublicGoodsImpactCard data={dashboardData} />);
     expect(screen.getByText('home.publicGoods.stats.lifetime')).toBeInTheDocument();
@@ -101,6 +115,11 @@ describe('PublicGoodsImpactCard', () => {
 
   it('has no accessibility violations in the rail layout', async () => {
     const { container } = render(<PublicGoodsImpactCard data={dashboardData} variant="rail" />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations in the compact layout', async () => {
+    const { container } = render(<PublicGoodsImpactCard data={dashboardData} variant="compact" />);
     await checkA11y(container);
   });
 });

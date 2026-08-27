@@ -270,8 +270,8 @@ export function deriveChampionsState({
 }
 
 /** Reads the current special-recipient snapshot and adds precise live timer semantics for UI. */
-export function useChampions(): ChampionsState {
-  const { snapshot, isLoading } = useSpecialAllocationSnapshot();
+export function useChampions(initialData?: SpecialRecipients | null): ChampionsState {
+  const { snapshot, isLoading } = useSpecialAllocationSnapshot(initialData);
   const nowMs = useNow(1000);
 
   return useMemo(

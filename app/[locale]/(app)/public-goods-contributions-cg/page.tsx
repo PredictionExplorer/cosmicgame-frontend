@@ -31,7 +31,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <PageMessages namespaces={['marketing', 'publicGoods', 'tables']}>
+    <PageMessages namespaces={['home', 'marketing', 'publicGoods', 'tables']}>
       <>
         <PublicDataRouteSeoSummary route="public-goods-contributions-cg" />
         <CharityCGDeposits />

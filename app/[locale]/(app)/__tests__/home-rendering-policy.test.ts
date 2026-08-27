@@ -55,6 +55,20 @@ describe('home page client component rendering policy', () => {
     // window.location in an effect instead.
     expect(source).not.toContain('useSearchParams');
   });
+
+  it('uses the exact fixed-header height instead of generic inner-page top padding', () => {
+    expect(source).toContain('home-control-shell');
+    expect(source).toContain('pt-[var(--header-height)]');
+  });
+
+  it('restores safe clearance when the maintenance banner is present', () => {
+    const header = readSource('components/layout/Header.tsx');
+    const globalCss = readSource('styles/global.css');
+
+    expect(header).toContain('data-maintenance-banner');
+    expect(globalCss).toContain('body:has([data-maintenance-banner]) .home-control-shell');
+    expect(globalCss).toContain('calc(var(--header-height) + 3.75rem)');
+  });
 });
 
 describe('server seed module policy', () => {

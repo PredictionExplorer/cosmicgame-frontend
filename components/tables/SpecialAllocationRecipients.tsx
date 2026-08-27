@@ -1,26 +1,17 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Coins, Crown, Lock, MessageSquare, Swords, User, Zap } from 'lucide-react';
+import { Coins, Crown, Lock, Swords, User, Zap } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { formatSeconds } from '@/utils';
 
-import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { ChronoWarriorDetails } from '@/components/special-allocation/ChronoWarriorDetails';
+import { LatestParticipantDetails } from '@/components/special-allocation/LatestParticipantDetails';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useChampions, type ChampionsState } from '@/hooks/useChampions';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import {
-  formatAttachedAssets,
-  formatGestureMethod,
-  formatGesturePayment,
-  formatReceivedCstAmount,
-  getAttachedAssetLabels,
-  getParticipationCST,
-  hasRandomWalkToken,
-  resolveGestureType,
-} from '@/utils/gesturePayment';
 import type { GestureInfo } from '@/services/api/types';
 
 interface RoleCardConfig {
@@ -191,317 +182,6 @@ function RoleCard({
   );
 }
 
-function LatestGestureProgress({
-  latestGesture,
-  hasEnduranceRecord,
-}: {
-  latestGesture: ChampionsState['latestGesture'];
-  hasEnduranceRecord: boolean;
-}) {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-
-  if (!hasEnduranceRecord) {
-    return (
-      <div
-        data-testid="latest-participant-status"
-        className="mt-3 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-3 py-2 text-xs text-emerald-300"
-      >
-        {t('specialAllocation.firstRecordForming')}
-      </div>
-    );
-  }
-
-  const progress = Math.floor(latestGesture.progressToEnduranceChampion);
-  const isComplete = latestGesture.isExtendingEnduranceRecord;
-  const remainingCopy = latestGesture.isCurrentEnduranceChampion
-    ? t('specialAllocation.needsToExtend', {
-        duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion, locale),
-      })
-    : t('specialAllocation.needsToBecomeChampion', {
-        duration: formatSeconds(latestGesture.secondsUntilEnduranceChampion, locale),
-      });
-
-  return (
-    <div className="mt-3 rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2">
-      <div className="flex items-center justify-between gap-3">
-        <span
-          data-testid="latest-participant-remaining"
-          className={cn('text-xs', isComplete ? 'text-emerald-300' : 'text-muted-foreground')}
-        >
-          {isComplete ? t('specialAllocation.extendingRecord') : remainingCopy}
-        </span>
-        <span className="font-mono text-xs tabular-nums text-primary">{progress}%</span>
-      </div>
-      <div
-        role="progressbar"
-        aria-label={t('specialAllocation.progressAria')}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={progress}
-        className="mt-2 h-2 overflow-hidden rounded-full bg-white/[0.08]"
-      >
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
-          style={{ width: `${latestGesture.progressToEnduranceChampion}%` }}
-        />
-      </div>
-      <p className="mt-1 text-[11px] text-muted-foreground">
-        {t('specialAllocation.progressAmounts', {
-          current: formatSeconds(latestGesture.holdDuration, locale),
-          target: formatSeconds(latestGesture.durationToBeat, locale),
-        })}
-      </p>
-    </div>
-  );
-}
-
-function LatestParticipantMessage({ message }: { message: string }) {
-  return (
-    <div
-      data-testid="latest-participant-message"
-      className="mt-3 flex items-start gap-2 rounded-lg bg-white/[0.03] p-3"
-    >
-      <MessageSquare className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/50 shrink-0" />
-      <p className="break-words text-sm text-amber-300/90">&ldquo;{message}&rdquo;</p>
-    </div>
-  );
-}
-
-function DetailMetric({
-  label,
-  value,
-  testId,
-  tone = 'muted',
-}: {
-  label: string;
-  value: string;
-  testId?: string;
-  tone?: 'muted' | 'primary' | 'emerald';
-}) {
-  return (
-    <div
-      data-testid={testId}
-      className={cn(
-        'mt-2 rounded-lg border px-3 py-2',
-        tone === 'primary'
-          ? 'border-primary/20 bg-primary/[0.055] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
-          : tone === 'emerald'
-            ? 'border-emerald-400/20 bg-emerald-400/[0.055]'
-            : 'border-white/[0.06] bg-black/10',
-      )}
-    >
-      <p
-        className={cn(
-          'text-[11px] uppercase tracking-wider',
-          tone === 'primary'
-            ? 'text-primary/90'
-            : tone === 'emerald'
-              ? 'text-emerald-300'
-              : 'text-muted-foreground',
-        )}
-      >
-        {label}
-      </p>
-      <p className="mt-0.5 text-xs text-foreground">{value}</p>
-    </div>
-  );
-}
-
-function LatestGestureDetails({
-  latestGesture,
-  latestAddress,
-}: {
-  latestGesture?: GestureInfo | null;
-  latestAddress: string | null;
-}) {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  const hasGestureTime =
-    typeof latestGesture?.TimeStamp === 'number' && Number.isFinite(latestGesture.TimeStamp);
-  const gestureTimestamp =
-    typeof latestGesture?.TimeStamp === 'number' && Number.isFinite(latestGesture.TimeStamp)
-      ? latestGesture.TimeStamp
-      : 0;
-  const gestureTime = useHydrationSafeDateTime(gestureTimestamp, true, locale);
-
-  if (!latestGesture || !sameAddress(latestGesture.BidderAddr, latestAddress)) return null;
-
-  const randomWalkStatus = hasRandomWalkToken(latestGesture)
-    ? t('specialAllocation.yesToken', { id: String(latestGesture.RWalkNFTId) })
-    : resolveGestureType(latestGesture) === 1
-      ? t('status.yes')
-      : t('status.no');
-
-  return (
-    <div
-      data-testid="latest-participant-gesture-details"
-      className="mt-3 rounded-xl border border-emerald-400/20 bg-gradient-to-br from-emerald-400/[0.07] via-white/[0.025] to-transparent p-3 shadow-[0_0_30px_-22px_rgba(52,211,153,0.75)]"
-    >
-      <div className="mb-2 flex items-center gap-2">
-        <div className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
-        <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300">
-          {t('specialAllocation.lastGesture')}
-        </p>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-2">
-        <DetailMetric
-          testId="latest-participant-paid-amount"
-          label={t('specialAllocation.amountPaid')}
-          value={formatGesturePayment(latestGesture, t('status.unavailable'))}
-          tone="emerald"
-        />
-        <DetailMetric
-          label={t('specialAllocation.method')}
-          value={formatGestureMethod(latestGesture, t('status.unknown'))}
-        />
-        <DetailMetric
-          testId="latest-participant-random-walk"
-          label={t('specialAllocation.randomWalk')}
-          value={randomWalkStatus}
-        />
-        <DetailMetric
-          label={t('specialAllocation.gestureTime')}
-          value={hasGestureTime ? gestureTime : t('status.unavailable')}
-        />
-        <DetailMetric
-          testId="latest-participant-gesture-id"
-          label={t('specialAllocation.gesturePosition')}
-          value={
-            typeof latestGesture.BidPosition === 'number'
-              ? `#${latestGesture.BidPosition}`
-              : t('status.unavailable')
-          }
-        />
-        <DetailMetric
-          testId="latest-participant-cst-received"
-          label={t('specialAllocation.cstReceived')}
-          value={formatReceivedCstAmount(
-            getParticipationCST(latestGesture),
-            t('status.unavailable'),
-          )}
-          tone="emerald"
-        />
-        {getAttachedAssetLabels(latestGesture).length > 0 && (
-          <DetailMetric
-            testId="latest-participant-attached-assets"
-            label={t('specialAllocation.attachedAssets')}
-            value={formatAttachedAssets(latestGesture, t('status.none'))}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ChronoWarriorDetails({
-  chrono,
-  challenge,
-}: {
-  chrono: ChampionsState['chrono'];
-  challenge: ChampionsState['chronoChallenge'];
-}) {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-
-  if (!chrono.address) return null;
-
-  const nextMetric = (() => {
-    if (chrono.isLive) {
-      return chrono.willStopGrowingIn !== undefined && chrono.willStopGrowingIn > 0
-        ? {
-            label: t('specialAllocation.mayCloseIn'),
-            value: t('specialAllocation.mayCloseValue', {
-              duration: formatSeconds(chrono.willStopGrowingIn, locale),
-            }),
-          }
-        : { label: t('columns.status'), value: t('specialAllocation.growingNow') };
-    }
-    return {
-      label: t('specialAllocation.recordStatus'),
-      value: t('specialAllocation.standingChronoRecord'),
-    };
-  })();
-
-  const showChallenge = challenge.hasDetails && !challenge.isLive;
-
-  return (
-    <div
-      data-testid="chrono-warrior-details"
-      className="mt-3 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent p-3 shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]"
-    >
-      <div className="mb-2 flex items-center gap-2">
-        <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(21,191,253,0.9)]" />
-        <p className="text-[11px] font-medium uppercase tracking-wider text-primary/90">
-          {t('specialAllocation.chronoReign')}
-        </p>
-      </div>
-      {chrono.isLive && chrono.currentSegmentDuration !== undefined && (
-        <DetailMetric
-          testId="chrono-current-segment"
-          label={t('specialAllocation.recordGrowingSegment')}
-          value={formatSeconds(chrono.currentSegmentDuration, locale)}
-          tone="primary"
-        />
-      )}
-      <DetailMetric
-        testId="chrono-next-change"
-        label={nextMetric.label}
-        value={nextMetric.value}
-        tone={chrono.isLive ? 'emerald' : 'primary'}
-      />
-      <p className="text-[11px] leading-relaxed text-muted-foreground">
-        {t('specialAllocation.chronoDescription')}
-      </p>
-      {showChallenge && (
-        <div
-          data-testid="chrono-active-challenge"
-          className="mt-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.045] p-3"
-        >
-          <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300">
-            {t('specialAllocation.activeEnduranceChallenge')}
-          </p>
-          {challenge.address && (
-            <Link
-              href={`/user/${challenge.address}`}
-              className="mt-2 block break-all font-mono text-xs text-foreground transition-colors hover:text-primary"
-            >
-              {challenge.address}
-            </Link>
-          )}
-          {challenge.duration !== undefined && (
-            <DetailMetric
-              testId="chrono-challenge-segment"
-              label={t('specialAllocation.challengeSegment')}
-              value={formatSeconds(challenge.duration, locale)}
-              tone="emerald"
-            />
-          )}
-          <DetailMetric
-            testId="chrono-challenge-next-change"
-            label={
-              challenge.isRecordHolder
-                ? t('specialAllocation.canExtendIn')
-                : t('specialAllocation.canOvertakeIn')
-            }
-            value={
-              challenge.startsGrowingIn !== undefined
-                ? formatSeconds(challenge.startsGrowingIn, locale)
-                : challenge.isRecordHolder
-                  ? t('specialAllocation.waitingToExtend')
-                  : t('specialAllocation.waitingToOvertake')
-            }
-            tone="emerald"
-          />
-          <p className="text-[11px] leading-relaxed text-muted-foreground">
-            {t('specialAllocation.challengeDescription')}
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
   return !!left && !!right && left.toLowerCase() === right.toLowerCase();
 }
@@ -612,17 +292,13 @@ export const SpecialAllocationRecipients = ({
         </span>
       ) : null,
       extra: champions.latestGesture.address ? (
-        <>
-          <LatestGestureProgress
-            latestGesture={champions.latestGesture}
-            hasEnduranceRecord={!!champions.endurance.address}
-          />
-          <LatestGestureDetails
-            latestGesture={latestGesture}
-            latestAddress={champions.latestGesture.address}
-          />
-          {cleanLatestMessage && <LatestParticipantMessage message={cleanLatestMessage} />}
-        </>
+        <LatestParticipantDetails
+          latest={champions.latestGesture}
+          hasEnduranceRecord={!!champions.endurance.address}
+          latestGesture={latestGesture}
+          latestAddress={champions.latestGesture.address}
+          message={cleanLatestMessage}
+        />
       ) : null,
     },
     {

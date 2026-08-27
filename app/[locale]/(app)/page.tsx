@@ -3,11 +3,16 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { formatId, getAssetsUrl } from '@/utils';
 
-import { getCstInfoSeed, getDashboardInfoSeed } from '@/services/api/server';
+import {
+  getCstInfoSeed,
+  getCurrentSpecialRecipientsSeed,
+  getDashboardInfoSeed,
+  getLatestGestureSeed,
+} from '@/services/api/server';
 import { createMetadata } from '@/utils/seo';
 import { formatFixed } from '@/utils/format';
 import { JsonLd, liveCycleJsonLd, visualArtworkJsonLd } from '@/utils/jsonLd';
-import type { CSTTokenInfo, DashboardInfo } from '@/services/api';
+import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from '@/services/api';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import HomePage from './HomePage';
@@ -76,7 +81,13 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   const initialDashboardData = await getDashboardInfoSeed();
-  const initialBannerToken = await pickInitialBannerToken(initialDashboardData);
+  const [initialBannerToken, initialLatestGesture, initialSpecialRecipients] = await Promise.all([
+    pickInitialBannerToken(initialDashboardData),
+    initialDashboardData
+      ? getLatestGestureSeed(initialDashboardData.CurRoundNum)
+      : Promise.resolve<GestureInfo | null>(null),
+    getCurrentSpecialRecipientsSeed() as Promise<SpecialRecipients | null>,
+  ]);
   const liveCycleStartTs = initialDashboardData?.TsRoundStart ?? 0;
   const liveCycleNumber = initialDashboardData?.CurRoundNum ?? 0;
   const tArtwork = await getTranslations({ locale, namespace: 'detail' });
@@ -114,6 +125,8 @@ export default async function Page({ params }: PageProps) {
       <HomePage
         initialDashboardData={initialDashboardData}
         initialBannerToken={initialBannerToken}
+        initialLatestGesture={initialLatestGesture}
+        initialSpecialRecipients={initialSpecialRecipients}
       />
     </PageMessages>
   );

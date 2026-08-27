@@ -71,6 +71,30 @@ interface RawLog {
 }
 
 /**
+ * True when an error represents only deliberate request cancellation.
+ *
+ * `Promise.any()` wraps a set of aborted fetches in `AggregateError`, so
+ * checking only the outer `name` misses the common timeout/unmount path and
+ * leaks a scary "All promises were rejected" error into the Next.js overlay.
+ * Mixed aggregates still return false so genuine transport failures remain
+ * observable.
+ */
+export function isAbortOnlyError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  if ((error as { name?: unknown }).name === 'AbortError') return true;
+
+  const nested = (error as { errors?: unknown }).errors;
+  if (
+    !nested ||
+    typeof (nested as { [Symbol.iterator]?: unknown })[Symbol.iterator] !== 'function'
+  ) {
+    return false;
+  }
+  const errors = Array.from(nested as Iterable<unknown>);
+  return errors.length > 0 && errors.every(isAbortOnlyError);
+}
+
+/**
  * Maps `topic0` (keccak of the event signature) → event name for the watched
  * CosmicGame events, derived from the contract ABI.
  */
@@ -237,7 +261,13 @@ export function startCosmicEventPolling(options: CosmicEventPollingOptions): () 
       cursor = Math.max(cursor, maxSeenBlock);
       if (events.length > 0 && !stopped) onEvents(events);
     } catch (error) {
-      reportErrorThrottled(error, 'chain events poll');
+      // Timeouts and teardown aborts are transport control flow, not app
+      // failures. Reporting Promise.any's abort-only AggregateError makes
+      // Next's development overlay show "All promises were rejected" even
+      // though the next poll will retry normally.
+      if (!isAbortOnlyError(error)) {
+        reportErrorThrottled(error, 'chain events poll');
+      }
     } finally {
       inFlight = false;
     }

@@ -482,30 +482,6 @@
     "title": "The Cosmic Signature Observatory",
     "intro": "One live Performance Cycle. Every Gesture extends the clock, shapes the final Signature, and stands in line for allocations.",
     "newHere": "New here? How it works",
-    "monument": {
-      "reserveLabel": "Signature Allocation",
-      "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
-      "youChip": "You",
-      "fullConsole": "Open the full gesture console",
-      "chooseRwlkToken": "Pick your RandomWalk token in the full console below",
-      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry.",
-      "notifyAria": "Notify me before the cycle can finalize",
-      "notifyLabel": "Alert me before finalization:",
-      "notifyMinutes": "{minutes}m",
-      "calendarTitle": "Cosmic Signature Cycle #{number} opens",
-      "calendarBody": "The next Performance Cycle opens for Gestures. The first Gesture starts the finalization clock.",
-      "calendarCta": "Add the opening to your calendar"
-    },
-    "board": {
-      "title": "Allocation Tracks",
-      "subtitle": "Everything this cycle distributes at finalization",
-      "tooltip": "Live view of every allocation track in the current Performance Cycle: amounts, current holders, and standing records.",
-      "cstPlusNft": "1,000 CST + NFT",
-      "awaitingGesture": "Awaiting the first Gesture",
-      "awaitingRecord": "No record yet",
-      "stellarStatus": "every Gesture is an entry",
-      "fullBreakdown": "View the full breakdown"
-    },
     "art": {
       "sectionAria": "Featured on-chain artwork",
       "eyebrow": "On-Chain Artwork",
@@ -513,16 +489,6 @@
       "viewAria": "View Cosmic Signature {id}",
       "alt": "Cosmic Signature artwork {id} — deterministic three-body generative art",
       "pairingNote": "Deterministic three-body art, imprinted on-chain. Every Signature is paired with 1,000 CST."
-    },
-    "composer": {
-      "title": "Say it with a Gesture",
-      "subtitle": "Messages travel on-chain with your gesture",
-      "placeholder": "Write an optional on-chain message…",
-      "note": "Sending makes a real Gesture on Arbitrum — the message rides along and appears in Gesture Chat.",
-      "connectBody": "Connect a wallet to make a Gesture and post a message to Gesture Chat.",
-      "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK: pick token",
-      "cstFree": "CST gestures are free right now"
     },
     "personal": {
       "title": "Your position",
@@ -536,24 +502,79 @@
       "nothingWaiting": "Nothing waiting to retrieve",
       "cstPreview": "A gesture now imprints ~{amount} CST"
     },
-    "miniBar": {
-      "aria": "Cycle quick console",
-      "reserve": "Signature Allocation",
-      "jump": "Back to the Deck"
-    },
     "story": {
       "collapsedTitle": "About Cosmic Signature",
       "collapsedSubtitle": "The story, the artwork, and how each Performance Cycle becomes a Signature",
       "expand": "Expand"
     }
   },
+  "observatory": {
+    "pulse": {
+      "gestureCount": "{count, plural, =0 {No gestures yet} one {# gesture} other {# gestures}}",
+      "lastGestureAge": "last gesture {age}"
+    },
+    "clock": {
+      "reserveLabel": "Signature Allocation",
+      "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
+      "reserveUsd": "≈ {amount} USD",
+      "notifyAria": "Notify me before the cycle can finalize",
+      "notifyLabel": "Alert me before finalization:",
+      "notifyMinutes": "{minutes}m",
+      "calendarTitle": "Cosmic Signature Cycle #{number} opens",
+      "calendarBody": "The next Performance Cycle opens for Gestures. The first Gesture starts the finalization clock.",
+      "calendarCta": "Add the opening to your calendar"
+    },
+    "standings": {
+      "title": "Live Standings",
+      "tooltip": "Who holds each competitive track of this cycle right now. Timers run live; standings lock in only when the cycle finalizes.",
+      "youBadge": "You",
+      "latestName": "Latest Gesture",
+      "latestTooltip": "The most recent participant. If the finalization clock reached zero right now, this address would receive the Signature Allocation.",
+      "held": "held {duration}",
+      "record": "record {duration}",
+      "awaitingGesture": "Awaiting the first Gesture",
+      "awaitingRecord": "No record yet",
+      "cstPlusNft": "1,000 CST + NFT"
+    },
+    "intel": {
+      "latestSubtitle": "What the latest Gesture cost, imprinted, and is currently positioned to receive.",
+      "viewGesture": "Open Gesture",
+      "inLineFor": "Currently in line for at finalization",
+      "attachedNfts": "{count, plural, one {# attached NFT} other {# attached NFTs}}",
+      "attachedTokens": "{count, plural, one {# attached token deposit} other {# attached token deposits}}",
+      "plusCycleAttachments": "Plus {assets} held by the cycle.",
+      "enduranceChronoTitle": "Endurance & Chrono",
+      "enduranceChronoSubtitle": "The standing records and the active challenge changing them now.",
+      "liveRoleState": "Live role state"
+    },
+    "prices": {
+      "availableAfterFirst": "After first Gesture",
+      "openDockHint": "Live costs · open the action dock to participate"
+    },
+    "ribbon": {
+      "title": "Allocation Tracks",
+      "subtitle": "Everything this cycle distributes at finalization",
+      "tooltip": "Live view of every allocation track in the current Performance Cycle. Amounts grow with the reserve and distribute when the cycle finalizes.",
+      "fullBreakdown": "View the full breakdown",
+      "stellarStatus": "every Gesture is an entry",
+      "nextCycleName": "Next Cycle Seed",
+      "nextCycleTooltip": "This share is not distributed at finalization — it stays in the reserve and seeds the next Performance Cycle.",
+      "nextCycleDetail": "compounds forward",
+      "percentOfReserve": "{percent}% of reserve"
+    },
+    "dock": {
+      "aria": "Cycle quick actions",
+      "reserve": "Reserve",
+      "openPanelAria": "Open the gesture panel"
+    },
+    "panel": {
+      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry.",
+      "sheetTitle": "Make a Gesture"
+    }
+  },
   "cycleDetails": {
     "title": "View Full Cycle Details",
     "subtitle": "Gesture history, leaderboards, contributions, and allocation distribution"
-  },
-  "mobileCta": {
-    "makeGesture": "Make a Gesture",
-    "preview": "Preview Gesture Options"
   },
   "publicGoods": {
     "eyebrow": "Public Goods",

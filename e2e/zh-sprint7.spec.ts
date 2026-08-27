@@ -320,7 +320,9 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
         },
       });
     });
-    await openZh(page, '/zh');
+    // The full special-allocation cards (with participant profile links)
+    // live on the cycle details page; the home standings link to gestures.
+    await openZh(page, '/zh/current-cycle');
     const latestCard = page.getByTestId('special-allocation-card-latest-participant').first();
     await expect(latestCard).toBeVisible({ timeout: 30_000 });
     await expect(latestCard.getByRole('link', { name: ADDRESS })).toHaveAttribute(

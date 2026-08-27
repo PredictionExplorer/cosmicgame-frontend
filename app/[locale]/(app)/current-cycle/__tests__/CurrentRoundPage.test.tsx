@@ -84,8 +84,15 @@ jest.mock('../../../../../components/attachments/DonatedNFTPrizeShowcase', () =>
 }));
 
 jest.mock('../../../../../components/tables/SpecialAllocationRecipients', () => ({
-  SpecialAllocationRecipients: (props: { latestMessage?: string }) => (
-    <div data-testid="special-allocation-recipients" data-message={props.latestMessage ?? ''}>
+  SpecialAllocationRecipients: (props: {
+    latestMessage?: string;
+    latestGesture?: { EvtLogId?: number } | null;
+  }) => (
+    <div
+      data-testid="special-allocation-recipients"
+      data-message={props.latestMessage ?? ''}
+      data-gesture-id={props.latestGesture?.EvtLogId ?? ''}
+    >
       Special Allocations
     </div>
   ),
@@ -309,15 +316,26 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByTestId('special-allocation-recipients')).toBeInTheDocument();
   });
 
-  it('passes the latest gesture message to SpecialAllocationRecipients', () => {
+  it('passes the complete latest gesture and message to SpecialAllocationRecipients', () => {
     setupLoaded();
     mockUseGestureListByCycle.mockReturnValue({
-      data: [{ BidderAddr: baseDashboardData.LastBidderAddr, TimeStamp: NOW_SEC, Message: 'gm' }],
+      data: [
+        {
+          EvtLogId: 77,
+          BidderAddr: baseDashboardData.LastBidderAddr,
+          TimeStamp: NOW_SEC,
+          Message: 'gm',
+        },
+      ],
     });
     render(<CurrentRoundPage />);
     expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
       'data-message',
       'gm',
+    );
+    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-gesture-id',
+      '77',
     );
   });
 

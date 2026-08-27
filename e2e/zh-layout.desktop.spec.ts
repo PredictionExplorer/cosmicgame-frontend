@@ -88,7 +88,14 @@ test.describe('Sprint 3 Chinese layout QA', () => {
 
       await page.goto('/zh');
       await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-      await expect(page.getByText('落笔方式').first()).toBeVisible();
+      await expect(
+        page
+          .locator(
+            '[data-testid="gesture-price-strip"]:visible, [data-testid="gesture-panel"]:visible',
+          )
+          .getByText('落笔方式')
+          .first(),
+      ).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await testInfo.attach(`zh-home-${viewport.name}`, {
         body: await page.screenshot({ fullPage: true }),

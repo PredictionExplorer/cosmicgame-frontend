@@ -264,7 +264,10 @@ const CurrentRoundPage = () => {
 
         {/* Special Allocation Leaders */}
         {hasLastParticipant && (
-          <SpecialAllocationRecipients latestMessage={curGestureList[0]?.Message ?? ''} />
+          <SpecialAllocationRecipients
+            latestGesture={curGestureList[0] ?? null}
+            latestMessage={curGestureList[0]?.Message ?? ''}
+          />
         )}
 
         {/* CTA Button */}
