@@ -48,7 +48,9 @@ export function buildCalendarInviteDataUri({
     'PRODID:-//Cosmic Signature//Cycle Calendar//EN',
     'BEGIN:VEVENT',
     `UID:${uid}@cosmicsignature.com`,
-    `DTSTAMP:${toIcsUtcStamp(Math.floor(Date.now() / 1000))}`,
+    // Derived from the event start (not Date.now()) so the URI is
+    // deterministic and SSR html matches client hydration exactly.
+    `DTSTAMP:${toIcsUtcStamp(startSeconds)}`,
     `DTSTART:${toIcsUtcStamp(startSeconds)}`,
     `DTEND:${toIcsUtcStamp(endSeconds ?? startSeconds + 30 * 60)}`,
     `SUMMARY:${escapeIcsText(title)}`,

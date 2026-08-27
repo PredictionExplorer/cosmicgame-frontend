@@ -66,10 +66,6 @@
       "title": "分配轨道",
       "tooltip": "周期储备如何沿各条分配轨道发放：签名分配、时之勇士、星选、公共物品、锚定派发与滚动储备。"
     },
-    "cstWindow": {
-      "title": "CST 校准窗口",
-      "tooltip": "本周期 CST 校准窗口的演变。每次 ETH 落笔都会略微缩短窗口；每次 CST 落笔则会延长它。窗口决定 CST 落笔价格衰减到免费的速度。"
-    },
     "stellarSelectionEntries": {
       "title": "星选资格",
       "tooltip": "每一笔都计入一次星选资格；落笔越多，获得 ETH 或 Cosmic Signature NFT 分配的入选频次越高。"

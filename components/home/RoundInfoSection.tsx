@@ -15,7 +15,6 @@ import ETHSpentTable from '@/components/tables/ETHSpentTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import EthDonationTable from '@/components/tables/EthDonationTable';
 import { FundDistribution } from '@/components/tokens/FundDistribution';
-import { CstCalibrationWindowView } from '@/components/statistics/CstCalibrationWindowChart';
 import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -97,15 +96,6 @@ export function RoundInfoSection({
           <InfoTooltip content={t('sections.allocationTracks.tooltip')} />
         </div>
         <FundDistribution data={data ?? undefined} />
-      </motion.div>
-
-      {/* 2b. CST Calibration Window evolution (live cycle) */}
-      <motion.div custom={1} variants={sectionFade} initial="hidden" animate="visible">
-        <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title={t('sections.cstWindow.title')} className="flex-1" />
-          <InfoTooltip content={t('sections.cstWindow.tooltip')} />
-        </div>
-        <CstCalibrationWindowView gestures={curGestureList} isLive />
       </motion.div>
 
       {/* 3. Stellar Selection Entries */}

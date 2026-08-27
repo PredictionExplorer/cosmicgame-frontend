@@ -16,6 +16,9 @@ describe('buildCalendarInviteDataUri', () => {
     expect(body).toContain('BEGIN:VCALENDAR');
     expect(body).toContain('BEGIN:VEVENT');
     expect(body).toContain('UID:cosmic-cycle-3-opening@cosmicsignature.com');
+    // DTSTAMP mirrors the start time so output is deterministic (no
+    // Date.now()), preventing SSR/client hydration mismatches.
+    expect(body).toContain('DTSTAMP:20231114T221320Z');
     expect(body).toContain('DTSTART:20231114T221320Z');
     // Default duration: 30 minutes.
     expect(body).toContain('DTEND:20231114T224320Z');
