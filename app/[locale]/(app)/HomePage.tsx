@@ -793,7 +793,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3"
         >
           <div className="min-w-0">
-            <div className="mb-2.5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            <div className="liquid-glass-control mb-2.5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300 animate-live-dot" />
               {cycleNumber == null
                 ? t('hero.cycleFallback')
@@ -812,7 +812,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           </div>
           <Link
             href="/how-it-works"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+            className="liquid-glass-control inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
           >
             {t('deck.newHere')}
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />

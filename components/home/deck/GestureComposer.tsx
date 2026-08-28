@@ -123,7 +123,7 @@ export function GestureComposer({
                         onClick={() => onSelectGestureType(option)}
                         aria-pressed={methodValue === option}
                         className={cn(
-                          'rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
+                          'liquid-glass-control rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
                           methodValue === option
                             ? 'border-primary/50 bg-primary/12 text-white'
                             : 'border-white/[0.08] bg-white/[0.02] text-muted-foreground hover:text-white',

@@ -164,7 +164,7 @@ export function CycleMonument({
           data-testid="monument-body"
         >
           <div className="relative flex h-full flex-col px-4 py-4 text-center sm:px-6 sm:py-5">
-            <div className="mx-auto mb-3 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.045] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.24em]">
+            <div className="liquid-glass-control mx-auto mb-3 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.045] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:tracking-[0.24em]">
               <Clock3 className={cn('h-3.5 w-3.5', view.iconClass)} aria-hidden />
               {eyebrow}
               <InfoTooltip content={tooltip} className="ml-0" />

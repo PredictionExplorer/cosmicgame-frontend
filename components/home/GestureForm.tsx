@@ -176,7 +176,7 @@ export function GestureForm({
               }}
               aria-pressed={gestureType === opt.value}
               className={cn(
-                'flex-1 rounded-lg border px-3 py-2 text-center transition-all',
+                'liquid-glass-control flex-1 rounded-lg border px-3 py-2 text-center transition-all',
                 gestureType === opt.value
                   ? 'border-primary/50 bg-primary/10 text-white'
                   : 'border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:bg-white/[0.04] hover:text-white',

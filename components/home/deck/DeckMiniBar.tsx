@@ -91,7 +91,7 @@ export function DeckMiniBar({
     >
       <section
         aria-label={t('deck.miniBar.aria')}
-        className="mx-auto flex max-w-4xl items-center justify-between gap-4 rounded-full border border-white/[0.12] bg-[rgb(10_14_42/0.88)] px-4 py-2 shadow-[0_24px_80px_-40px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-xl"
+        className="mx-auto flex max-w-4xl items-center justify-between gap-4 liquid-glass-control liquid-glass-static rounded-full border border-white/[0.12] bg-[rgb(10_14_42/0.72)] px-4 py-2 shadow-[0_24px_80px_-40px_rgb(var(--aurora-cyan-rgb)/0.8)]"
       >
         <span className="flex min-w-0 items-center gap-2.5">
           <Clock3 className={cn('h-4 w-4 shrink-0', view.iconClass)} aria-hidden />

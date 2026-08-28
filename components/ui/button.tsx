@@ -10,12 +10,12 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'capitalize border-0 bg-gradient-to-r from-[#06AEEC] via-[#35C9FF] to-[#9C37FD] text-white shadow-[0_14px_40px_-22px_rgb(var(--aurora-cyan-rgb)/0.9)] hover:-translate-y-0.5 hover:brightness-110',
+          'liquid-glass-cta capitalize border-0 bg-gradient-to-r from-[#06AEEC] via-[#35C9FF] to-[#9C37FD] text-white hover:-translate-y-0.5 hover:brightness-110',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'capitalize border border-primary/50 bg-transparent px-6 text-secondary hover:bg-primary/10',
+          'liquid-glass-control capitalize border border-primary/50 bg-transparent px-6 text-secondary hover:bg-primary/10',
         secondary:
-          'relative capitalize px-6 text-primary border border-primary/50 bg-primary/[0.04] hover:-translate-y-0.5 hover:bg-primary/10',
+          'liquid-glass-control relative capitalize px-6 text-primary border border-primary/50 bg-primary/[0.04] hover:-translate-y-0.5 hover:bg-primary/10',
         ghost:
           'hover:bg-white/[0.07] hover:text-foreground hover:shadow-[0_10px_36px_-26px_rgb(var(--aurora-cyan-rgb)/0.8)]',
         link: 'text-primary underline-offset-4 hover:underline',
