@@ -57,32 +57,39 @@ function makeProps(overrides: Partial<React.ComponentProps<typeof CycleMonument>
     latestGesture,
     pulseKey: 0,
     account: '0xUser',
-    ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
-    cstGestureData: {
-      AuctionDuration: 3600,
-      CSTPrice: 1,
-      CSTPriceWei: 1000000000000000000n,
-      SecondsElapsed: 1800,
-      isFree: false,
-      source: 'api' as const,
-    },
-    gestureType: 'ETH',
-    onSelectGestureType: jest.fn(),
-    canGesture: true,
-    canClaim: false,
-    isGesturing: false,
-    isClaiming: false,
-    claimWait: 0,
-    rwlkId: -1,
-    gestureCostPlus: 2,
-    onGesture: jest.fn(),
-    onFinalize: jest.fn(),
-    onOpenFullConsole: jest.fn(),
+    // The console itself is owned by HomePage; the monument only hosts it.
+    gestureConsole: <div data-testid="console-stub" />,
     ...overrides,
   };
 }
 
 describe('CycleMonument', () => {
+  // Moved here from GestureStatus: the Signature Allocation is now stated once,
+  // by this card, so the attached-asset tooltip variants belong to it.
+  it('names attached ERC20 deposits in the Signature Allocation tooltip', async () => {
+    const user = userEvent.setup();
+    render(<CycleMonument {...makeProps({ attachedERC20Count: 1 })} />);
+
+    const reserve = screen.getByTestId('monument-reserve');
+    await user.hover(within(reserve).getByRole('button', { name: /^More information/ }));
+
+    expect(
+      await screen.findAllByText('home.status.metrics.signatureTooltip.withErc20(erc20Count=1)'),
+    ).not.toHaveLength(0);
+  });
+
+  it('names attached NFTs in the Signature Allocation tooltip', async () => {
+    const user = userEvent.setup();
+    render(<CycleMonument {...makeProps({ attachedNFTCount: 3 })} />);
+
+    const reserve = screen.getByTestId('monument-reserve');
+    await user.hover(within(reserve).getByRole('button', { name: /^More information/ }));
+
+    expect(
+      await screen.findAllByText('home.status.metrics.signatureTooltip.withNft(nftCount=3)'),
+    ).not.toHaveLength(0);
+  });
+
   it('fuses the countdown, reserve, latest gesture, and gesture action in one section', () => {
     render(<CycleMonument {...makeProps()} />);
 
@@ -98,9 +105,9 @@ describe('CycleMonument', () => {
     const latest = screen.getByTestId('monument-latest-gesture');
     expect(latest).toHaveAttribute('href', '/gesture/42');
 
-    expect(
-      within(monument).getByRole('button', { name: /home\.form\.submit\.eth\(cost=0\.01020\)/ }),
-    ).toBeEnabled();
+    // The gesture console is a slot owned by HomePage; the monument hosts it
+    // under the clock so the cycle and the act of gesturing are one surface.
+    expect(within(monument).getByTestId('console-stub')).toBeInTheDocument();
     expect(within(monument).getByText('home.deck.monument.microcopy')).toBeInTheDocument();
   });
 
@@ -114,83 +121,12 @@ describe('CycleMonument', () => {
     ).toBeInTheDocument();
   });
 
-  it('submits through the provided gesture handler', async () => {
-    const user = userEvent.setup();
-    const onGesture = jest.fn();
-    render(<CycleMonument {...makeProps({ onGesture })} />);
-
-    await user.click(screen.getByRole('button', { name: /home\.form\.submit\.eth/ }));
-
-    expect(onGesture).toHaveBeenCalledTimes(1);
-  });
-
-  it('selects gesture methods through the shared handler', async () => {
-    const user = userEvent.setup();
-    const onSelectGestureType = jest.fn();
-    render(<CycleMonument {...makeProps({ onSelectGestureType })} />);
-
-    const pills = screen.getByTestId('monument-method-pills');
-    await user.click(within(pills).getByRole('button', { name: /home\.form\.method\.cst\.label/ }));
-
-    expect(onSelectGestureType).toHaveBeenCalledWith('CST');
-  });
-
-  it('offers only the ETH method before the first gesture of a cycle', () => {
-    render(
-      <CycleMonument
-        {...makeProps({
-          data: makeDashboardData({
-            LastBidderAddr: '0x0000000000000000000000000000000000000000',
-            TsRoundStart: 0,
-          }),
-          latestGesture: null,
-        })}
-      />,
-    );
-
-    const pills = screen.getByTestId('monument-method-pills');
-    expect(
-      within(pills).getByRole('button', { name: /home\.form\.method\.eth\.label/ }),
-    ).toBeInTheDocument();
-    expect(
-      within(pills).queryByRole('button', { name: /home\.form\.method\.cst\.label/ }),
-    ).not.toBeInTheDocument();
-    expect(
-      within(pills).queryByRole('button', { name: /home\.form\.method\.randomWalk\.label/ }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('guards the RandomWalk method until a token is chosen and points at the console', async () => {
-    const user = userEvent.setup();
-    const onOpenFullConsole = jest.fn();
-    render(
-      <CycleMonument
-        {...makeProps({ gestureType: 'RandomWalk', rwlkId: -1, onOpenFullConsole })}
-      />,
-    );
-
-    expect(screen.getByRole('button', { name: /home\.form\.submit\.randomWalk/ })).toBeDisabled();
-    await user.click(screen.getByRole('button', { name: /home\.deck\.monument\.chooseRwlkToken/ }));
-    expect(onOpenFullConsole).toHaveBeenCalledTimes(1);
-  });
-
-  it('shows the finalize action once the cycle is ready and the claim is verified', async () => {
-    const user = userEvent.setup();
-    const onFinalize = jest.fn();
-    render(
-      <CycleMonument
-        {...makeProps({
-          allocationTime: Date.now() - 60 * 60_000,
-          canGesture: false,
-          canClaim: true,
-          onFinalize,
-        })}
-      />,
-    );
+  it('enters the ready-to-finalize phase once the clock passes', () => {
+    // The finalize action lives in the hosted console (see HomePage tests);
+    // the monument's own job is the phase presentation.
+    render(<CycleMonument {...makeProps({ allocationTime: Date.now() - 60 * 60_000 })} />);
 
     expect(screen.getByTestId('cycle-monument')).toHaveAttribute('data-phase', 'ready-to-finalize');
-    await user.click(screen.getByRole('button', { name: /home\.form\.finalize/ }));
-    expect(onFinalize).toHaveBeenCalledTimes(1);
   });
 
   it('holds the confirming phase without a finalize action until the chain verifies', () => {
@@ -199,8 +135,6 @@ describe('CycleMonument', () => {
         {...makeProps({
           allocationTime: Date.now() - 60 * 60_000,
           finalizationConfirmed: false,
-          canGesture: false,
-          canClaim: false,
         })}
       />,
     );
@@ -209,20 +143,13 @@ describe('CycleMonument', () => {
     expect(screen.queryByRole('button', { name: /home\.form\.finalize/ })).not.toBeInTheDocument();
   });
 
-  it('shows a connect prompt instead of the action for disconnected visitors', () => {
-    render(<CycleMonument {...makeProps({ account: null })} />);
-
-    expect(screen.getByTestId('monument-connect')).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /home\.form\.submit\.eth/ }),
-    ).not.toBeInTheDocument();
-  });
-
   it('collapses to a cycle-details link while the next cycle is opening', () => {
     render(
       <CycleMonument
         {...makeProps({
           activationTime: Math.floor(Date.now() / 1000) + 3600,
+          // HomePage passes no console outside an active round.
+          gestureConsole: undefined,
         })}
       />,
     );
@@ -240,6 +167,7 @@ describe('CycleMonument', () => {
       <CycleMonument
         {...makeProps({
           activationTime: Math.floor(Date.now() / 1000) + 3600,
+          gestureConsole: undefined,
         })}
       />,
     );
@@ -278,8 +206,6 @@ describe('CycleMonument', () => {
       <CycleMonument
         {...makeProps({
           allocationTime: Date.now() - 60 * 60_000,
-          canGesture: false,
-          canClaim: true,
           notifyThresholdMin: 5,
           onNotifyThresholdChange: jest.fn(),
         })}
@@ -292,5 +218,21 @@ describe('CycleMonument', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<CycleMonument {...makeProps()} />);
     await checkA11y(container);
+  });
+
+  it('hosts an optional side panel as a second column without touching the console', () => {
+    const { rerender } = render(<CycleMonument {...makeProps()} />);
+    expect(screen.queryByTestId('monument-side-panel')).not.toBeInTheDocument();
+    expect(screen.getByTestId('monument-body')).not.toHaveClass('xl:grid');
+
+    rerender(<CycleMonument {...makeProps({ sidePanel: <div data-testid="panel-stub" /> })} />);
+    const side = screen.getByTestId('monument-side-panel');
+    expect(side).toContainElement(screen.getByTestId('panel-stub'));
+    expect(screen.getByTestId('monument-body')).toHaveClass('xl:grid');
+    // The panel is absolutely positioned at xl so it cannot grow the card.
+    expect(side.firstElementChild).toHaveClass('xl:absolute', 'xl:inset-0', 'xl:overflow-y-auto');
+    expect(screen.getByTestId('monument-console')).toContainElement(
+      screen.getByTestId('console-stub'),
+    );
   });
 });

@@ -2,7 +2,7 @@
 
 import { useMemo, type ReactNode } from 'react';
 import { zeroAddress } from 'viem';
-import { Trophy, Coins, Zap, TrendingUp } from 'lucide-react';
+import { Coins, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -14,6 +14,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 import { useUserInfo } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
+import { getAttachedAssetValues, getAttachedAssetVariant } from '@/lib/attachedAssets';
 import { getSelectionStanding } from '@/lib/selectionStanding';
 import { cn } from '@/lib/utils';
 import { formatFixed } from '@/utils/format';
@@ -113,7 +114,7 @@ function GestureMetricCard({
   return (
     <div
       className={cn(
-        'group relative flex h-full min-h-[132px] flex-col justify-between overflow-hidden rounded-xl border p-4 backdrop-blur-sm transition-all duration-300',
+        '@container group relative flex h-full flex-col overflow-hidden rounded-xl border p-3 backdrop-blur-sm transition-all duration-300',
         'hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.055]',
         'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent',
         'after:pointer-events-none after:absolute after:-right-10 after:-top-12 after:h-28 after:w-28 after:rounded-full after:opacity-0 after:blur-2xl after:transition-opacity after:duration-300 after:content-[""] group-hover:after:opacity-100',
@@ -129,7 +130,7 @@ function GestureMetricCard({
         {icon ? (
           <div
             className={cn(
-              'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors',
+              'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors',
               palette.icon,
             )}
           >
@@ -139,39 +140,21 @@ function GestureMetricCard({
       </div>
       <div
         className={cn(
-          'relative z-[1] mt-4 text-xl font-bold tracking-tight tabular-nums',
+          // One line, always: the live CST price ticks every 500 ms and a
+          // wrapping value made the three cards (equal height) jump 28px
+          // each time the formatter dropped a trailing zero. The size follows
+          // the card's own width (14cqw ≈ the widest live value, "229.6483
+          // CST", edge to edge), clamped 14–18px, so it fits at every deck
+          // width without wrapping or clipping.
+          'relative z-[1] mt-2 whitespace-nowrap text-[clamp(0.875rem,14cqw,1.125rem)] font-bold tracking-tight tabular-nums',
           palette.value,
         )}
       >
         {value}
       </div>
-      {detail ? <div className="relative z-[1] mt-3">{detail}</div> : null}
+      {detail ? <div className="relative z-[1] mt-2">{detail}</div> : null}
     </div>
   );
-}
-
-type AttachedAssetVariant = 'base' | 'withNft' | 'withErc20' | 'withBoth';
-
-/**
- * Selects the ICU message variant for copy that enumerates the attached
- * assets included in the Signature Allocation (none / NFTs / ERC20 / both).
- */
-function getAttachedAssetVariant(nftCount: number, erc20Count: number): AttachedAssetVariant {
-  if (nftCount > 0 && erc20Count > 0) return 'withBoth';
-  if (nftCount > 0) return 'withNft';
-  if (erc20Count > 0) return 'withErc20';
-  return 'base';
-}
-
-function getAttachedAssetValues(
-  variant: AttachedAssetVariant,
-  nftCount: number,
-  erc20Count: number,
-): Record<string, number> {
-  if (variant === 'withBoth') return { nftCount, erc20Count };
-  if (variant === 'withNft') return { nftCount };
-  if (variant === 'withErc20') return { erc20Count };
-  return {};
 }
 
 export const GestureStatus = ({
@@ -273,111 +256,92 @@ export const GestureStatus = ({
               </motion.div>
             ))}
 
-          {/* Allocation + bid prices row */}
-          <div className="grid grid-cols-2 items-stretch gap-3 sm:grid-cols-4">
-            <motion.div
-              custom={0}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className="h-full"
-            >
-              <GestureMetricCard
-                label={t('status.metrics.signatureAllocation')}
-                value={`${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`}
-                icon={<Trophy className="h-5 w-5" />}
-                tone="signature"
-                tooltip={t(
-                  `status.metrics.signatureTooltip.${attachedAssetVariant}`,
-                  attachedAssetValues,
-                )}
-              />
-            </motion.div>
-
-            {data.LastBidderAddr !== zeroAddress && (
-              <>
-                <motion.div
-                  custom={1}
-                  variants={fadeUp}
-                  initial="hidden"
-                  animate="visible"
-                  className="h-full"
-                >
-                  <GestureMetricCard
-                    label={t('status.metrics.ethGesture')}
-                    value={`${(ethGestureInfo?.ETHPrice ?? 0).toFixed(5)} ETH`}
-                    icon={<Coins className="h-4 w-4" />}
-                    tone="eth"
-                    tooltip={t('status.metrics.ethGestureTooltip')}
-                  />
-                </motion.div>
-                <motion.div
-                  custom={2}
-                  variants={fadeUp}
-                  initial="hidden"
-                  animate="visible"
-                  className="h-full"
-                >
-                  <GestureMetricCard
-                    label={t('status.metrics.randomWalkGesture')}
-                    value={`${((ethGestureInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH`}
-                    icon={<TrendingUp className="h-4 w-4" />}
-                    tone="randomwalk"
-                    tooltip={t('status.metrics.randomWalkGestureTooltip')}
-                  />
-                </motion.div>
-                <motion.div
-                  custom={3}
-                  variants={fadeUp}
-                  initial="hidden"
-                  animate="visible"
-                  className="h-full"
-                >
-                  <GestureMetricCard
-                    label={t('status.metrics.cstGesture')}
-                    value={
-                      cstGestureData.isFree
-                        ? t('status.metrics.free')
-                        : `${formatCstAmount(cstGestureData.CSTPrice)} CST`
-                    }
-                    detail={
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between gap-3 text-[11px]">
-                          <span className="text-muted-foreground">
-                            {t('status.metrics.cstWindow')}
-                          </span>
-                          <span className="font-mono tabular-nums text-[rgb(var(--impact-green-rgb))]">
-                            {formatCstProgressPercent(cstAuctionProgress.percentComplete)}
-                          </span>
-                        </div>
-                        <div
-                          role="progressbar"
-                          aria-label={t('status.metrics.cstWindowProgressAria')}
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                          aria-valuenow={cstProgressValue}
-                          className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
-                        >
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] to-primary transition-all duration-500"
-                            style={{ width: `${cstAuctionProgress.percentComplete}%` }}
-                          />
-                        </div>
-                        <p className="text-[11px] text-muted-foreground">
-                          {t('status.metrics.duration', {
-                            duration: formatSeconds(cstAuctionProgress.auctionDuration, locale),
-                          })}
-                        </p>
+          {/* Gesture cost row. The Signature Allocation is deliberately not
+              repeated here — CycleMonument headlines it (monument-reserve) and the
+              Allocation Breakdown lists it. */}
+          {data.LastBidderAddr !== zeroAddress && (
+            <div className="grid grid-cols-2 items-stretch gap-3 sm:grid-cols-3">
+              <motion.div
+                custom={0}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="h-full"
+              >
+                <GestureMetricCard
+                  label={t('status.metrics.ethGesture')}
+                  value={`${(ethGestureInfo?.ETHPrice ?? 0).toFixed(5)} ETH`}
+                  icon={<Coins className="h-4 w-4" />}
+                  tone="eth"
+                  tooltip={t('status.metrics.ethGestureTooltip')}
+                />
+              </motion.div>
+              <motion.div
+                custom={1}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="h-full"
+              >
+                <GestureMetricCard
+                  label={t('status.metrics.randomWalkGesture')}
+                  value={`${((ethGestureInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH`}
+                  icon={<TrendingUp className="h-4 w-4" />}
+                  tone="randomwalk"
+                  tooltip={t('status.metrics.randomWalkGestureTooltip')}
+                />
+              </motion.div>
+              <motion.div
+                custom={2}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                className="h-full"
+              >
+                <GestureMetricCard
+                  label={t('status.metrics.cstGesture')}
+                  value={
+                    cstGestureData.isFree
+                      ? t('status.metrics.free')
+                      : `${formatCstAmount(cstGestureData.CSTPrice)} CST`
+                  }
+                  detail={
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between gap-3 text-[11px]">
+                        <span className="text-muted-foreground">
+                          {t('status.metrics.cstWindow')}
+                        </span>
+                        <span className="font-mono tabular-nums text-[rgb(var(--impact-green-rgb))]">
+                          {formatCstProgressPercent(cstAuctionProgress.percentComplete)}
+                        </span>
                       </div>
-                    }
-                    icon={<Zap className="h-4 w-4" />}
-                    tone="cst"
-                    tooltip={t('status.metrics.cstGestureTooltip')}
-                  />
-                </motion.div>
-              </>
-            )}
-          </div>
+                      <div
+                        role="progressbar"
+                        aria-label={t('status.metrics.cstWindowProgressAria')}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={cstProgressValue}
+                        className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
+                      >
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] to-primary transition-all duration-500"
+                          style={{ width: `${cstAuctionProgress.percentComplete}%` }}
+                        />
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        {t('status.metrics.duration', {
+                          duration: formatSeconds(cstAuctionProgress.auctionDuration, locale),
+                        })}
+                      </p>
+                    </div>
+                  }
+                  icon={<Zap className="h-4 w-4" />}
+                  tone="cst"
+                  tooltip={t('status.metrics.cstGestureTooltip')}
+                />
+              </motion.div>
+            </div>
+          )}
 
           {/* Selection frequency */}
           {curGestureList.length > 0 && selectionFrequency && data && (

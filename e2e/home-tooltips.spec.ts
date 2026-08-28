@@ -13,11 +13,6 @@ const HOME_TOOLTIPS = [
     label: 'Allocation Tracks',
     expected: /Live view of every allocation track/,
   },
-  // Public-goods impact card in the console rail (rendered in all phases).
-  {
-    label: 'Lifetime Contributed',
-    expected: /Automatic protocol forwards plus voluntary/,
-  },
 ];
 
 test.describe('/ tooltips', () => {

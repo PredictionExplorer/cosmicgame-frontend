@@ -245,7 +245,7 @@ const Header: FC = () => {
     <nav aria-label={t('primaryLabel')} className="flex items-center gap-4 xl:gap-6">
       {brand}
 
-      <div className="flex items-center gap-0.5 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md">
+      <div className="flex items-center gap-0.5 liquid-glass-control liquid-glass-static rounded-full border border-white/[0.07] bg-white/[0.03] p-1">
         {navs.map((nav, i) => (
           <ListNavItem key={i} nav={nav} />
         ))}

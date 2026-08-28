@@ -70,7 +70,7 @@ export function EcosystemDock({ className }: { className?: string }) {
       role="group"
       aria-label={t('ecosystem.groupLabel')}
       className={cn(
-        'flex items-center rounded-full border border-white/[0.08] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md',
+        'liquid-glass-control liquid-glass-static flex items-center rounded-full border border-white/[0.08] bg-white/[0.03] p-1',
         className,
       )}
     >

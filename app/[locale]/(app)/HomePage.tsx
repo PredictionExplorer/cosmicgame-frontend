@@ -23,16 +23,23 @@ import { Spinner } from '@/components/ui/spinner';
 import { PageShell } from '@/components/ui/page-shell';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
+import {
+  SpecialAllocationRecipients,
+  type RoleKey,
+} from '@/components/tables/SpecialAllocationRecipients';
 import { GestureStatus } from '@/components/common/GestureStatus';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
 import { GestureForm } from '@/components/home/GestureForm';
 import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
-import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { AllocationTracksBoard } from '@/components/home/deck/AllocationTracksBoard';
 import { CycleMonument } from '@/components/home/deck/CycleMonument';
+import { cn } from '@/lib/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { ADVANCED_SIDE_MEDIA_QUERY } from '@/components/home/GestureForm';
+import { GestureAdvancedPanel } from '@/components/home/GestureAdvancedFields';
 import { DeckArtCard } from '@/components/home/deck/DeckArtCard';
 import { DeckMiniBar } from '@/components/home/deck/DeckMiniBar';
 import { DeckPersonalStrip } from '@/components/home/deck/DeckPersonalStrip';
@@ -90,8 +97,14 @@ const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
 const MemoHomeObservatoryHero = memo(HomeObservatoryHero);
 const MemoGestureMessageChat = memo(GestureMessageChat);
 const MemoSpecialAllocationRecipients = memo(SpecialAllocationRecipients);
+// The hero re-renders on every 1 Hz countdown tick otherwise; its props are
+// all memoised/stable so memo() keeps the reel's videos untouched.
+const MemoDeckArtCard = memo(DeckArtCard);
+// Stable role lists: an inline array literal would be a fresh reference every
+// render and defeat memo() (the leaderboard would re-render on countdown ticks).
+const RAIL_LEADER_ROLES: RoleKey[] = ['latest', 'chrono'];
+const LINKS_ROW_ROLES: RoleKey[] = ['lastcst'];
 const MemoAllocation = memo(Allocation);
-const MemoPublicGoodsImpactCard = memo(PublicGoodsImpactCard);
 const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
 
 // Transform-only (no opacity ramp): several of these sections sit in the
@@ -174,28 +187,68 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
   // discoverable in the prerendered HTML; the client rotation starts from
   // that index and the seeded query below keeps the first client render
   // byte-identical with the SSR output.
+  // While the hero's generation reel plays, the reel (not the timer) decides
+  // when to move on: each clip runs to its end, then `reelAdvance` steps the
+  // index. The timer only rotates the still image (small screens, reduced
+  // motion, or a clip that failed to play).
+  const [reelActive, setReelActive] = useState(false);
+  const [reelAdvance, setReelAdvance] = useState(0);
+  const handleReelEnded = useCallback(() => setReelAdvance((n) => n + 1), []);
   const bannerTokenId = useRotatingIndex({
     count: imprintedTokenCount,
     intervalMs: 15_000,
-    enabled: imprintedTokenCount > 1,
+    enabled: imprintedTokenCount > 1 && !reelActive,
     randomStart: true,
     initialIndex: initialBannerToken?.id ?? null,
+    advanceSignal: reelAdvance,
   });
 
-  const { data: bannerCSTInfo } = useCSTInfo(
+  const { data: bannerCSTInfo, isError: bannerCSTError } = useCSTInfo(
     bannerTokenId,
     bannerTokenId != null && bannerTokenId === initialBannerToken?.id
       ? initialBannerToken.info
       : undefined,
   );
 
+  const resolvedBannerToken = useMemo(
+    () =>
+      bannerTokenId != null && bannerCSTInfo
+        ? { seed: `0x${bannerCSTInfo.Seed}`, id: bannerTokenId }
+        : null,
+    [bannerTokenId, bannerCSTInfo],
+  );
+  // While the next index's seed is still loading, keep showing the token we
+  // already have rather than snapping back to the server-picked first one —
+  // with the reel that snap would play a whole wrong clip. ("Adjust state
+  // when a prop changes" pattern: no effect.)
+  const [heldBannerToken, setHeldBannerToken] = useState(resolvedBannerToken);
+  if (resolvedBannerToken && resolvedBannerToken !== heldBannerToken) {
+    setHeldBannerToken(resolvedBannerToken);
+  }
   const bannerToken = useMemo(() => {
-    if (bannerTokenId != null && bannerCSTInfo)
-      return { seed: `0x${bannerCSTInfo.Seed}`, id: bannerTokenId };
+    if (resolvedBannerToken) return resolvedBannerToken;
+    if (heldBannerToken) return heldBannerToken;
     if (initialBannerToken?.info.Seed)
       return { seed: `0x${initialBannerToken.info.Seed}`, id: initialBannerToken.id };
     return null;
-  }, [bannerTokenId, bannerCSTInfo, initialBannerToken]);
+  }, [resolvedBannerToken, heldBannerToken, initialBannerToken]);
+  // The reel cannot end a clip it never got a seed for: skip such a token so
+  // rotation does not stall on one broken lookup.
+  useEffect(() => {
+    if (reelActive && bannerCSTError) setReelAdvance((n) => n + 1);
+  }, [reelActive, bannerCSTError, bannerTokenId]);
+
+  // The token the rotation shows next, resolved early so the hero reel can
+  // pre-load its clip while the current one plays.
+  const nextBannerTokenId =
+    bannerTokenId != null && imprintedTokenCount > 1
+      ? (bannerTokenId + 1) % imprintedTokenCount
+      : null;
+  const { data: nextBannerCSTInfo } = useCSTInfo(nextBannerTokenId);
+  const nextBannerToken = useMemo(() => {
+    if (nextBannerTokenId == null || !nextBannerCSTInfo?.Seed) return null;
+    return { seed: `0x${nextBannerCSTInfo.Seed}`, id: nextBannerTokenId };
+  }, [nextBannerTokenId, nextBannerCSTInfo]);
 
   const gestureForm = useGestureForm();
   const allocationFinalize = useAllocationFinalize({ data, offset });
@@ -255,8 +308,11 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     setBidType,
     setMessage,
     setRwlkId,
+    advancedExpanded,
     setAdvancedExpanded,
   } = gestureForm;
+  // Hook placement: above the early returns below (rules-of-hooks).
+  const isAdvancedSideViewport = useMediaQuery(ADVANCED_SIDE_MEDIA_QUERY);
   const cstDisplayNow =
     now > 0 && (!cstGestureData.updatedAtMs || now > cstGestureData.updatedAtMs) ? now : Date.now();
   const liveCstGestureData = useMemo(
@@ -549,7 +605,6 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
   }, []);
 
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
-  const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
   const cycleNumber = data?.CurRoundNum;
   const previousCycle = (cycleNumber ?? 0) - 1;
   const hasPreviousCycle = previousCycle > 0;
@@ -570,6 +625,148 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
     );
   }
 
+  // The full gesture console (method selector, RWLK picker, CST economics,
+  // message + attachments, submit/finalize, connect prompt). Rendered inside
+  // CycleMonument so the cycle clock and the act of gesturing are one surface;
+  // HomePage keeps all form state. Same gate the standalone section had.
+  // "Advanced" opens SIDEWAYS, not downward: at xl the monument takes the
+  // chat column's space and the Advanced body fills a full-height panel
+  // beside the monument body, so the centre card keeps its height. The same
+  // media query gates GestureForm's inline body, so the fields exist once.
+  const advancedConsoleWide =
+    advancedExpanded && isAdvancedSideViewport && !loading && isRoundActive && !!account;
+  const advancedSidePanel = advancedConsoleWide ? (
+    <GestureAdvancedPanel {...gestureForm} showAll={data?.LastBidderAddr !== zeroAddress} />
+  ) : undefined;
+
+  const gestureConsole =
+    loading || isRoundActive ? (
+      <div id="make-gesture" className="scroll-mt-28">
+        <h2 className="font-display text-lg font-bold tracking-tight mb-0.5">{t('form.title')}</h2>
+        <p className="text-sm text-muted-foreground mb-4">{t('form.subtitle')}</p>
+
+        {loading ? (
+          <div
+            className="space-y-5"
+            role="status"
+            aria-label={t('form.loadingAria')}
+            data-testid="gesture-form-skeleton"
+          >
+            {/* Plain Skeletons only: nesting SkeletonText would add a second role="status". */}
+            <Skeleton className="h-3 w-3/4" />
+            <Skeleton className="h-3 w-2/5" />
+            <div className="grid gap-2 sm:grid-cols-3">
+              <Skeleton className="h-16 rounded-lg" />
+              <Skeleton className="h-16 rounded-lg" />
+              <Skeleton className="h-16 rounded-lg" />
+            </div>
+            <Skeleton className="h-24 rounded-lg" />
+            <Skeleton className="h-12 rounded-md" />
+          </div>
+        ) : account ? (
+          <>
+            <GestureForm
+              {...gestureForm}
+              cstGestureData={liveCstGestureData}
+              data={data}
+              advancedPlacement="side"
+            />
+
+            <div className="mt-6 space-y-4">
+              {canGesture && (
+                <Button
+                  id="gesture-submit"
+                  size="lg"
+                  onClick={() => void handleGesture('console')}
+                  className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
+                  disabled={
+                    isGesturing ||
+                    (gestureType === 'RandomWalk' && rwlkId === -1) ||
+                    gestureType === ''
+                  }
+                >
+                  {isGesturing ? (
+                    <span className="flex items-center gap-2">
+                      <Spinner size="sm" /> {t('form.processing')}
+                    </span>
+                  ) : (
+                    <>
+                      {submitLabel} <ArrowRight className="ml-2 h-5 w-5" />
+                    </>
+                  )}
+                </Button>
+              )}
+              {account && !canGesture && cycleTimerEnded === false && (
+                <p className="text-sm text-muted-foreground">{t('form.finalGestureMade')}</p>
+              )}
+              {canClaim && (
+                <>
+                  <Button
+                    size="lg"
+                    onClick={() => void handleFinalize('console')}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
+                    disabled={isClaiming || (data?.LastBidderAddr !== account && claimWait > now)}
+                  >
+                    {isClaiming ? (
+                      <span className="flex items-center gap-2">
+                        <Spinner size="sm" /> {t('form.processing')}
+                      </span>
+                    ) : (
+                      <>
+                        {t('form.finalize')}
+                        <span className="flex items-center">
+                          {claimWait > now && data?.LastBidderAddr !== account && (
+                            <>
+                              &nbsp;{t('form.finalizeAvailableIn')} &nbsp;
+                              <SmoothCountdown
+                                date={claimWait}
+                                renderer={renderInlineCountdown}
+                                intervalMs={1000}
+                              />
+                            </>
+                          )}
+                          &nbsp;
+                          <ArrowRight className="h-[22px] w-[22px]" />
+                        </span>
+                      </>
+                    )}
+                  </Button>
+                  {data?.LastBidderAddr !== account && claimWait > now && (
+                    <p className="text-sm italic text-right text-primary">
+                      {t('form.finalizeWaitNote')}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </>
+        ) : (
+          <div data-testid="connect-to-gesture" className="space-y-5">
+            <GestureForm
+              {...gestureForm}
+              cstGestureData={liveCstGestureData}
+              data={data}
+              previewMode
+            />
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+              <h3 className="font-display text-lg font-semibold tracking-tight">
+                {t('form.connect.title')}
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">{t('form.connect.body')}</p>
+              <div className="mt-4">
+                <ConnectWalletButton
+                  isMobileView={false}
+                  loading={false}
+                  balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
+                  stakedTokenCount={{ cst: 0, rwalk: 0 }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    ) : undefined;
+
   return (
     <LazyMotion features={domAnimation}>
       <PageShell
@@ -587,6 +784,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
         )}
 
         {/* ===== DECK HEADER (page H1 — must stay in the server HTML) =====
+            Leads the page, above the artwork banner (Andrew, 2026-08-27).
             A <div>, not <header>: the site banner owns the header landmark,
             and e2e selectors like `header a[href]` must keep resolving to
             the navigation chrome only. */}
@@ -595,7 +793,7 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3"
         >
           <div className="min-w-0">
-            <div className="mb-2.5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            <div className="liquid-glass-control mb-2.5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300 animate-live-dot" />
               {cycleNumber == null
                 ? t('hero.cycleFallback')
@@ -614,11 +812,24 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           </div>
           <Link
             href="/how-it-works"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+            className="liquid-glass-control inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
           >
             {t('deck.newHere')}
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Link>
+        </div>
+
+        {/* ===== ARTWORK HERO =====
+            The protocol is an art performance first: a real imprinted
+            Signature fills the page's first band, right under the title. */}
+        <div data-testid="home-art-hero" className="mb-8">
+          <MemoDeckArtCard
+            bannerToken={bannerToken}
+            nextBannerToken={nextBannerToken}
+            variant="hero"
+            onReelEnded={handleReelEnded}
+            onReelActiveChange={setReelActive}
+          />
         </div>
 
         {/* ===== THE DECK: board | monument | chat ===== */}
@@ -626,22 +837,38 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           id="deck"
           ref={deckContainerRef}
           data-testid="home-deck-layout"
-          className="grid scroll-mt-24 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] xl:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)_minmax(23rem,27rem)] 2xl:grid-cols-[minmax(20rem,25rem)_minmax(0,1fr)_minmax(25rem,30rem)] 2xl:gap-6"
+          className="grid scroll-mt-24 items-start gap-5 xl:mt-14 xl:items-stretch lg:grid-cols-[minmax(0,1fr)_minmax(22rem,26rem)] xl:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)_minmax(23rem,27rem)] 2xl:grid-cols-[minmax(20rem,25rem)_minmax(0,1fr)_minmax(25rem,30rem)] 2xl:gap-6"
         >
           <div
             data-testid="home-deck-board"
             // grid-cols-1 at base is load-bearing: without an explicit track
             // the implicit `auto` column sizes to max-content, which defeats
             // every `truncate` inside the board on narrow phones.
-            className="order-3 grid min-w-0 grid-cols-1 gap-5 lg:col-span-2 lg:grid-cols-2 xl:order-1 xl:col-span-1 xl:grid-cols-1"
+            // The leaderboard heading (28px text + 16px gap) floats above the deck
+            // line at xl: the negative margin lifts it into the xl:mt-14 band so
+            // the first CARD's top edge aligns with the monument and composer.
+            className="order-2 grid min-w-0 grid-cols-1 gap-5 lg:order-3 lg:col-span-2 lg:grid-cols-2 xl:order-1 xl:col-span-1 xl:grid-cols-1 xl:-mt-11"
           >
-            {/* Art first: the protocol is an art performance, so a real
-                imprinted Signature leads the board column. */}
-            <DeckArtCard bannerToken={bannerToken} />
-            <AllocationTracksBoard data={data} account={account} />
+            {/* The cycle leaderboard rides beside the monument: what the
+                previous gesture paid and who holds the records are the context
+                for making a gesture, so they share the first viewport. */}
+            {/* Always rendered: each role card has its own empty state, and a
+                gate here (as before) left the whole left column blank while a
+                cycle waits for its first gesture. */}
+            <MemoSpecialAllocationRecipients
+              currentAccount={account}
+              latestMessage={curGestureList[0]?.Message ?? ''}
+              latestGesture={curGestureList[0] ?? null}
+              layout="stack"
+              roles={RAIL_LEADER_ROLES}
+              fillHeight
+            />
           </div>
 
-          <div data-testid="home-deck-monument" className="order-1 min-w-0 xl:order-2">
+          <div
+            data-testid="home-deck-monument"
+            className={cn('order-1 min-w-0 xl:order-2', advancedConsoleWide && 'xl:col-span-2')}
+          >
             <CycleMonument
               data={data}
               loading={loading}
@@ -652,27 +879,25 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
               latestGesture={curGestureList[0] ?? null}
               pulseKey={gesturePulseKey}
               account={account}
-              ethGestureInfo={ethGestureInfo}
-              cstGestureData={liveCstGestureData}
-              gestureType={gestureType}
-              onSelectGestureType={handleSelectGestureType}
-              canGesture={canGesture}
-              canClaim={canClaim}
-              isGesturing={isGesturing}
-              isClaiming={isClaiming}
-              claimWait={claimWait}
-              rwlkId={rwlkId}
-              gestureCostPlus={gestureCostPlus}
-              onGesture={() => void handleGesture('monument')}
-              onFinalize={() => void handleFinalize('monument')}
-              onOpenFullConsole={scrollToGestureForm}
+              gestureConsole={gestureConsole}
+              sidePanel={advancedSidePanel}
               notifyThresholdMin={notifyThresholdMin}
               onNotifyThresholdChange={handleNotifyThresholdChange}
-              cstRewardPreview={gestureForm.gestureCstRewardAmount}
+              attachedNFTCount={donatedNFTs.length}
+              attachedERC20Count={donatedERC20Tokens.length}
             />
           </div>
 
-          <div data-testid="home-deck-chat" className="order-2 min-w-0 space-y-3 xl:order-3">
+          <div
+            data-testid="home-deck-chat"
+            // Phones read monument → leaders → chat (the leaders are the
+            // context for a gesture); lg pairs monument | chat with the
+            // leaders below; xl is board | monument | chat.
+            className={cn(
+              'order-3 min-w-0 space-y-3 lg:order-2 xl:order-3 xl:flex xl:min-h-0 xl:flex-col',
+              advancedConsoleWide && 'xl:hidden',
+            )}
+          >
             {!loading && isRoundActive && (
               <GestureComposer
                 message={gestureForm.message}
@@ -698,8 +923,50 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
               onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}
               systemEvents={feedSystemEvents}
               pendingMessages={pendingMessages}
-              className="xl:h-[clamp(22rem,48vh,30rem)] 2xl:h-[clamp(24rem,46vh,32rem)] print:h-auto"
+              // The clamp is the chat's OWN size for the grid row's intrinsic
+              // height — without it a long feed makes the whole deck as tall
+              // as the feed. flex-auto (NOT flex-1, whose basis 0 discards
+              // the height) then grows it into whatever slack the
+              // monument-driven row leaves, and the list scrolls inside.
+              className="xl:h-[clamp(22rem,48vh,30rem)] xl:min-h-0 xl:flex-auto 2xl:h-[clamp(24rem,46vh,32rem)] print:max-h-none"
             />
+
+            {/* ===== DETAIL RAIL (prices, standing, links, receipts) =====
+                Lives under the chat so the deck's right column is the one
+                place for everything that supports the cycle. */}
+            <div data-testid="home-rail-column" className="space-y-6">
+              <GestureStatus
+                data={data}
+                loading={loading}
+                activationTime={activationTime}
+                curGestureList={curGestureList}
+                ethGestureInfo={ethGestureInfo}
+                cstGestureData={liveCstGestureData}
+                allocationTime={allocationTime}
+                suppressPrimaryTimer
+                attachedNFTCount={donatedNFTs.length}
+                attachedERC20Count={donatedERC20Tokens.length}
+              />
+
+              {/* ===== ATTACHED ASSET RECEIPT ===== */}
+              {hasAttachedAssets && (
+                <m.div
+                  data-testid="home-rail-attached-assets"
+                  variants={sectionFade}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: 0.48 }}
+                  className="print-motion-visible"
+                >
+                  <MemoAttachedNFTAllocationShowcase
+                    nfts={donatedNFTs}
+                    erc20Tokens={donatedERC20Tokens}
+                    cycleNumber={round >= 0 ? round : undefined}
+                    variant="rail"
+                  />
+                </m.div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -715,277 +982,100 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
           </div>
         )}
 
-        {/* ===== CYCLE LEADERBOARD (latest gesture, champions, records) =====
-            Sits directly under the Deck: what the previous gesture paid, who
-            holds the Endurance and Chrono records, and the final CST gesture
-            must be readable without scrolling past the console. */}
-        {data?.TsRoundStart !== 0 && (
-          /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
-          <div className="mt-8">
-            {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
-            <div className="min-w-0 print:col-auto">
-              <MemoSpecialAllocationRecipients
-                currentAccount={account}
-                latestMessage={curGestureList[0]?.Message ?? ''}
-                latestGesture={curGestureList[0] ?? null}
-                layout="grid"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ===== FULL CONSOLE + DETAIL RAIL ===== */}
-        <div
-          data-testid="home-console-layout"
-          className="mt-10 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,30rem)]"
-        >
-          <div data-testid="home-primary-column" className="min-w-0">
-            {/* ===== STATUS (prices + personal standing) ===== */}
-            <GestureStatus
-              data={data}
-              loading={loading}
-              activationTime={activationTime}
-              curGestureList={curGestureList}
-              ethGestureInfo={ethGestureInfo}
-              cstGestureData={liveCstGestureData}
-              allocationTime={allocationTime}
-              suppressPrimaryTimer
-              attachedNFTCount={donatedNFTs.length}
-              attachedERC20Count={donatedERC20Tokens.length}
-            />
-
-            {/* ===== GESTURE ACTION AREA ===== */}
-            {(loading || isRoundActive) && (
-              <m.div
-                id="make-gesture"
-                variants={sectionFade}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.3 }}
-                className="print-motion-visible mt-8 scroll-mt-24"
-              >
-                <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
-                  <h2 className="font-display text-xl font-bold tracking-tight mb-1">
-                    {t('form.title')}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mb-6">{t('form.subtitle')}</p>
-
-                  {loading ? (
-                    <div
-                      className="space-y-5"
-                      role="status"
-                      aria-label={t('form.loadingAria')}
-                      data-testid="gesture-form-skeleton"
-                    >
-                      {/* Plain Skeletons only: nesting SkeletonText would add a second role="status". */}
-                      <Skeleton className="h-3 w-3/4" />
-                      <Skeleton className="h-3 w-2/5" />
-                      <div className="grid gap-2 sm:grid-cols-3">
-                        <Skeleton className="h-16 rounded-lg" />
-                        <Skeleton className="h-16 rounded-lg" />
-                        <Skeleton className="h-16 rounded-lg" />
-                      </div>
-                      <Skeleton className="h-24 rounded-lg" />
-                      <Skeleton className="h-12 rounded-md" />
-                    </div>
-                  ) : account ? (
-                    <>
-                      <GestureForm
-                        {...gestureForm}
-                        cstGestureData={liveCstGestureData}
-                        data={data}
-                      />
-
-                      <div className="mt-6 space-y-4">
-                        {canGesture && (
-                          <Button
-                            id="gesture-submit"
-                            size="lg"
-                            onClick={() => void handleGesture('console')}
-                            className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                            disabled={
-                              isGesturing ||
-                              (gestureType === 'RandomWalk' && rwlkId === -1) ||
-                              gestureType === ''
-                            }
-                          >
-                            {isGesturing ? (
-                              <span className="flex items-center gap-2">
-                                <Spinner size="sm" /> {t('form.processing')}
-                              </span>
-                            ) : (
-                              <>
-                                {submitLabel} <ArrowRight className="ml-2 h-5 w-5" />
-                              </>
-                            )}
-                          </Button>
-                        )}
-                        {account && !canGesture && cycleTimerEnded === false && (
-                          <p className="text-sm text-muted-foreground">
-                            {t('form.finalGestureMade')}
-                          </p>
-                        )}
-                        {canClaim && (
-                          <>
-                            <Button
-                              size="lg"
-                              onClick={() => void handleFinalize('console')}
-                              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                              disabled={
-                                isClaiming || (data?.LastBidderAddr !== account && claimWait > now)
-                              }
-                            >
-                              {isClaiming ? (
-                                <span className="flex items-center gap-2">
-                                  <Spinner size="sm" /> {t('form.processing')}
-                                </span>
-                              ) : (
-                                <>
-                                  {t('form.finalize')}
-                                  <span className="flex items-center">
-                                    {claimWait > now && data?.LastBidderAddr !== account && (
-                                      <>
-                                        &nbsp;{t('form.finalizeAvailableIn')} &nbsp;
-                                        <SmoothCountdown
-                                          date={claimWait}
-                                          renderer={renderInlineCountdown}
-                                          intervalMs={1000}
-                                        />
-                                      </>
-                                    )}
-                                    &nbsp;
-                                    <ArrowRight className="h-[22px] w-[22px]" />
-                                  </span>
-                                </>
-                              )}
-                            </Button>
-                            {data?.LastBidderAddr !== account && claimWait > now && (
-                              <p className="text-sm italic text-right text-primary">
-                                {t('form.finalizeWaitNote')}
-                              </p>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    <div data-testid="connect-to-gesture" className="space-y-5">
-                      <GestureForm
-                        {...gestureForm}
-                        cstGestureData={liveCstGestureData}
-                        data={data}
-                        previewMode
-                      />
-                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-                        <h3 className="font-display text-lg font-semibold tracking-tight">
-                          {t('form.connect.title')}
-                        </h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          {t('form.connect.body')}
-                        </p>
-                        <div className="mt-4">
-                          <ConnectWalletButton
-                            isMobileView={false}
-                            loading={false}
-                            balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
-                            stakedTokenCount={{ cst: 0, rwalk: 0 }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </m.div>
-            )}
-          </div>
-
-          <div data-testid="home-rail-column" className="min-w-0 space-y-6">
-            {/* ===== FULL ROUND DETAILS LINK ===== */}
-            <m.div
-              variants={sectionFade}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.5 }}
-              className="print-motion-visible"
-            >
-              <Link
-                href="/current-cycle"
-                data-testid="cycle-details-link-card"
-                className="group relative isolate flex items-center justify-between overflow-hidden rounded-2xl border border-primary/15 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(255_255_255/0.035)_48%,rgb(var(--nebula-violet-rgb)/0.12))] p-5 shadow-[0_24px_90px_-58px_rgb(var(--aurora-cyan-rgb)/0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white/[0.055]"
-              >
-                <span className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
-                <span className="pointer-events-none absolute -bottom-14 left-8 h-28 w-28 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
-                <span className="relative min-w-0">
-                  <span className="block text-sm font-semibold text-white">
-                    {t('cycleDetails.title')}
-                  </span>
-                  <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                    {t('cycleDetails.subtitle')}
-                  </span>
-                </span>
-                <ArrowRight className="relative h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
-              </Link>
-            </m.div>
-
-            {hasPreviousCycle && (
-              <Link
-                href={`/allocation/${previousCycle}`}
-                data-testid="previous-cycle-link-card"
-                className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] px-5 py-4 text-sm text-muted-foreground transition-all duration-300 hover:border-primary/25 hover:bg-white/[0.045] hover:text-primary"
-              >
-                {t('hero.console.previousAllocations', { number: String(previousCycle) })}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            )}
-
-            {/* ===== PUBLIC GOODS IMPACT ===== */}
-            {data && hasPublicGoodsImpact && (
-              <m.div
-                data-testid="home-rail-public-goods"
-                variants={sectionFade}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.45 }}
-                className="print-motion-visible"
-              >
-                <MemoPublicGoodsImpactCard data={data} variant="rail" />
-              </m.div>
-            )}
-
-            {/* ===== ATTACHED ASSET RECEIPT ===== */}
-            {hasAttachedAssets && (
-              <m.div
-                data-testid="home-rail-attached-assets"
-                variants={sectionFade}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.48 }}
-                className="print-motion-visible"
-              >
-                <MemoAttachedNFTAllocationShowcase
-                  nfts={donatedNFTs}
-                  erc20Tokens={donatedERC20Tokens}
-                  cycleNumber={round >= 0 ? round : undefined}
-                  variant="rail"
-                />
-              </m.div>
-            )}
-          </div>
-        </div>
-
-        {/* ===== ALLOCATION BREAKDOWN ===== */}
-        {data && (
+        {/* ===== LINKS ROW: cycle links + the Final CST Gesture role =====
+            One full-width strip between the deck and the allocation band. */}
+        <div data-testid="home-links-row" className="mt-8 grid items-stretch gap-5 md:grid-cols-3">
+          {/* ===== FULL ROUND DETAILS LINK ===== */}
           <m.div
-            id="allocation-breakdown"
             variants={sectionFade}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.4 }}
-            className="print-motion-visible scroll-mt-24"
+            transition={{ delay: 0.5 }}
+            className="print-motion-visible h-full"
           >
-            <MemoAllocation data={data} />
+            <Link
+              href="/current-cycle"
+              data-testid="cycle-details-link-card"
+              className="group relative isolate flex h-full items-center justify-between overflow-hidden rounded-2xl border border-primary/15 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(255_255_255/0.035)_48%,rgb(var(--nebula-violet-rgb)/0.12))] p-5 shadow-[0_24px_90px_-58px_rgb(var(--aurora-cyan-rgb)/0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white/[0.055]"
+            >
+              <span className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
+              <span className="pointer-events-none absolute -bottom-14 left-8 h-28 w-28 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
+              <span className="relative min-w-0">
+                <span className="block text-sm font-semibold text-white">
+                  {t('cycleDetails.title')}
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                  {t('cycleDetails.subtitle')}
+                </span>
+              </span>
+              <ArrowRight className="relative h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
+            </Link>
           </m.div>
-        )}
+
+          {hasPreviousCycle && (
+            <Link
+              href={`/allocation/${previousCycle}`}
+              data-testid="previous-cycle-link-card"
+              className="flex h-full items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.025] p-5 text-sm text-muted-foreground transition-all duration-300 hover:border-primary/25 hover:bg-white/[0.045] hover:text-primary"
+            >
+              {t('hero.console.previousAllocations', { number: String(previousCycle) })}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
+          {data?.TsRoundStart !== 0 && (
+            <MemoSpecialAllocationRecipients
+              layout="stack"
+              roles={LINKS_ROW_ROLES}
+              hideHeading
+              fillHeight
+            />
+          )}
+        </div>
+
+        {/* ===== ALLOCATION BAND: tracks rail | breakdown + cycle explainer ===== */}
+        <div data-testid="home-allocation-band" className="mt-12">
+          {/* The heading floats above the band's line, left-aligned over the
+              tracks column — rectangles below all start on the same line. */}
+          <div className="mb-4 flex items-center gap-2">
+            <h3 className="font-display text-lg font-semibold tracking-tight">
+              {t('allocation.title')}
+            </h3>
+            <InfoTooltip content={t('allocation.titleTooltip')} />
+          </div>
+          {/* xl: the tracks card stretches so its bottom border lands on the
+              same line as the cycle-phase guide's (the guide's own trailing
+              margin is zeroed here so that line is its real border). */}
+          <div className="grid items-start gap-6 xl:grid-cols-[minmax(18rem,23rem)_minmax(0,1fr)] xl:items-stretch">
+            <AllocationTracksBoard data={data} account={account} className="xl:h-full" />
+            <div className="min-w-0">
+              {data && (
+                <m.div
+                  id="allocation-breakdown"
+                  variants={sectionFade}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: 0.4 }}
+                  className="print-motion-visible scroll-mt-24"
+                >
+                  <MemoAllocation data={data} hideHeading />
+                </m.div>
+              )}
+
+              {/* ===== CYCLE EXPLAINER (education, crawlable) ===== */}
+              <div className="mt-8">
+                <CyclePhaseGuide
+                  className="mb-0"
+                  data={data}
+                  loading={loading}
+                  allocationTime={allocationTime}
+                  activationTime={activationTime}
+                  now={now}
+                  finalizationConfirmed={finalizationConfirmed}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* ===== STORY: what Cosmic Signature is (crawlable, below the fold).
             SSR always ships the full section; returning visitors get it
@@ -1022,16 +1112,6 @@ const HomePage = ({ initialDashboardData = null, initialBannerToken = null }: Ho
             />
           )}
         </div>
-
-        {/* ===== CYCLE EXPLAINER (education, crawlable) ===== */}
-        <CyclePhaseGuide
-          data={data}
-          loading={loading}
-          allocationTime={allocationTime}
-          activationTime={activationTime}
-          now={now}
-          finalizationConfirmed={finalizationConfirmed}
-        />
       </PageShell>
 
       {/* Endgame theater: full-viewport vignette during the final window. */}

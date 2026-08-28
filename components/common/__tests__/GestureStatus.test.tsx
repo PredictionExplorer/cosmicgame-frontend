@@ -1,5 +1,3 @@
-import userEvent from '@testing-library/user-event';
-
 import { checkA11y, render, screen } from '@/test-utils';
 
 import { GestureStatus } from '../GestureStatus';
@@ -89,7 +87,7 @@ describe('GestureStatus', () => {
     expect(screen.getByText('home.status.openCycle.body')).toBeInTheDocument();
   });
 
-  it('displays Signature Allocation and gesture cost info', () => {
+  it('displays gesture cost info without repeating the Signature Allocation', () => {
     render(
       <GestureStatus
         {...baseProps}
@@ -98,7 +96,9 @@ describe('GestureStatus', () => {
         ethGestureInfo={{ ETHPrice: 0.01 }}
       />,
     );
-    expect(screen.getByText('10.5000 ETH')).toBeInTheDocument();
+    // The Signature Allocation is stated once, by CycleMonument's reserve.
+    expect(screen.queryByText('10.5000 ETH')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.status.metrics.signatureAllocation')).not.toBeInTheDocument();
     expect(screen.getByText('0.01000 ETH')).toBeInTheDocument();
     expect(screen.getByText('0.00500 ETH')).toBeInTheDocument();
     expect(screen.getByText('1.5 CST')).toBeInTheDocument();
@@ -201,7 +201,6 @@ describe('GestureStatus', () => {
 
     expect(screen.queryByText('home.status.finalizesIn')).not.toBeInTheDocument();
     expect(mockCountdownProps).toHaveLength(0);
-    expect(screen.getByText('home.status.metrics.signatureAllocation')).toBeInTheDocument();
     expect(screen.getByText('home.status.metrics.ethGesture')).toBeInTheDocument();
   });
 
@@ -310,25 +309,6 @@ describe('GestureStatus', () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/nftCount=/)).not.toBeInTheDocument();
     expect(screen.queryByText(/erc20Count=/)).not.toBeInTheDocument();
-  });
-
-  it('includes attached ERC20 tokens in the Signature Allocation tooltip copy', async () => {
-    const user = userEvent.setup();
-    render(
-      <GestureStatus
-        {...baseProps}
-        data={activeData as never}
-        allocationTime={Date.now() + 60000}
-        ethGestureInfo={{ ETHPrice: 0.01 }}
-        attachedERC20Count={1}
-      />,
-    );
-
-    await user.hover(screen.getAllByRole('button', { name: /^More information/ })[1]!);
-
-    expect(
-      await screen.findAllByText('home.status.metrics.signatureTooltip.withErc20(erc20Count=1)'),
-    ).not.toHaveLength(0);
   });
 
   it('shows ready-to-finalize copy when finalization time has passed', () => {

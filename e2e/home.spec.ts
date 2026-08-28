@@ -146,15 +146,17 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(signatureAllocation).toBeVisible();
   });
 
-  test('shows public-goods impact card', async ({ page }) => {
+  test('public-goods impact card lives on its own page, not the home page', async ({ page }) => {
+    // Moved whole from the home page (layout redesign, 2026-08).
+    await expect(
+      page.getByRole('heading', { name: "Funding Ethereum's core contributors." }),
+    ).toHaveCount(0);
+    await page.goto('/public-goods-contributions-cg', { waitUntil: 'domcontentloaded' });
     const impactCardHeading = page.getByRole('heading', {
       name: "Funding Ethereum's core contributors.",
     });
     await ensureVisible(impactCardHeading);
     await expect(impactCardHeading).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: /View public-goods contributions/i }),
-    ).toHaveAttribute('href', '/public-goods-contributions-cg');
   });
 
   test('shows latest participant card', async ({ page }) => {
@@ -239,11 +241,13 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await page.reload({ waitUntil: 'networkidle' });
 
     const chronoCard = page.getByTestId('special-allocation-card-chrono-warrior').first();
-    const enduranceCard = page.getByTestId('special-allocation-card-endurance-champion').first();
     await ensureVisible(chronoCard);
     await expect(chronoCard).toContainText(data.ChronoWarriorAddress);
     await expect(chronoCard).not.toContainText(data.EnduranceChampionAddress);
-    await expect(enduranceCard).toContainText(data.EnduranceChampionAddress);
+    // The standalone Endurance Champion card left the home deck (the record
+    // is stated inside the Chrono card's challenge block); it still renders
+    // on /current-cycle.
+    await expect(page.getByTestId('special-allocation-card-endurance-champion')).toHaveCount(0);
   });
 
   test('Recipient History section renders', async ({ page }) => {

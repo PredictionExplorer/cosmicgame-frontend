@@ -42,7 +42,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           size="sm"
           aria-label={t('languageSwitcher.label')}
           className={cn(
-            'h-11 gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 text-xs font-medium text-white/75 hover:text-white sm:h-9',
+            'liquid-glass-control h-11 gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 text-xs font-medium text-white/75 hover:text-white sm:h-9',
             className,
           )}
         >

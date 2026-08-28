@@ -50,7 +50,22 @@ interface SpecialAllocationRecipientsProps {
    * whole leaderboard is visible near the top of the home page.
    */
   layout?: 'stack' | 'grid';
+  /**
+   * Which role cards to render, in order. Defaults to all four. Lets the home
+   * page keep Latest/Chrono/Endurance in its rail while the Final CST Gesture
+   * card sits in the links row.
+   */
+  roles?: RoleKey[];
+  /** Hide the section heading (for a lone card embedded in another row). */
+  hideHeading?: boolean;
+  /**
+   * Stretch to fill the parent's height, with the last card absorbing the
+   * slack — used where card bottoms must align with a neighbouring column.
+   */
+  fillHeight?: boolean;
 }
+
+export type RoleKey = 'latest' | 'chrono' | 'endurance' | 'lastcst';
 
 function StatusChip({ isLive, statusText }: { isLive: boolean; statusText?: string }) {
   const t = useTranslations('tables');
@@ -117,7 +132,7 @@ function RoleCard({
       data-special-allocation-card
       data-testid={`special-allocation-card-${testId}`}
       className={cn(
-        'rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.04] print:border print:border-border print:animate-none',
+        'rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.04] print:border print:border-border print:animate-none',
         accent === 'primary' &&
           'border-primary/35 bg-primary/[0.04] shadow-[0_0_24px_-12px_rgba(21,191,253,0.45)]',
         accent === 'emerald' &&
@@ -127,7 +142,7 @@ function RoleCard({
       <div className="flex items-start gap-3">
         <div
           className={cn(
-            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
+            'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
             accent === 'primary'
               ? 'bg-gradient-to-br from-primary/20 to-accent/20 text-primary'
               : accent === 'emerald'
@@ -161,7 +176,7 @@ function RoleCard({
           {address ? (
             <Link
               href={`/user/${address}`}
-              className="mt-2 block break-all font-mono text-sm text-foreground print:!text-foreground transition-colors hover:text-primary"
+              className="mt-1.5 block break-all font-mono text-xs leading-relaxed text-foreground print:!text-foreground transition-colors hover:text-primary"
             >
               {address}
             </Link>
@@ -170,13 +185,13 @@ function RoleCard({
           )}
 
           {duration !== undefined && (
-            <div className="mt-3 rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2">
+            <div className="mt-2 rounded-lg border border-white/[0.06] bg-black/10 px-2.5 py-1.5">
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
                 {durationLabel}
               </p>
               <p
                 className={cn(
-                  'mt-0.5 font-mono text-base tabular-nums',
+                  'mt-0.5 font-mono text-sm tabular-nums',
                   isLive ? 'text-emerald-300' : 'text-foreground',
                 )}
               >
@@ -223,7 +238,7 @@ function LatestGestureProgress({
       });
 
   return (
-    <div className="mt-3 rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2">
+    <div className="mt-2 rounded-lg border border-white/[0.06] bg-black/10 px-2.5 py-1.5">
       <div className="flex items-center justify-between gap-3">
         <span
           data-testid="latest-participant-remaining"
@@ -239,7 +254,7 @@ function LatestGestureProgress({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={progress}
-        className="mt-2 h-2 overflow-hidden rounded-full bg-white/[0.08]"
+        className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
       >
         <div
           className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
@@ -260,7 +275,7 @@ function LatestParticipantMessage({ message }: { message: string }) {
   return (
     <div
       data-testid="latest-participant-message"
-      className="mt-3 flex items-start gap-2 rounded-lg bg-white/[0.03] p-3"
+      className="mt-2 flex items-start gap-2 rounded-lg bg-white/[0.03] p-2.5"
     >
       <MessageSquare className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/50 shrink-0" />
       <p className="break-words text-sm text-amber-300/90">&ldquo;{message}&rdquo;</p>
@@ -283,7 +298,7 @@ function DetailMetric({
     <div
       data-testid={testId}
       className={cn(
-        'mt-2 rounded-lg border px-3 py-2',
+        'mt-1.5 rounded-lg border px-2.5 py-1.5',
         tone === 'primary'
           ? 'border-primary/20 bg-primary/[0.055] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
           : tone === 'emerald'
@@ -336,15 +351,15 @@ function LatestGestureDetails({
   return (
     <div
       data-testid="latest-participant-gesture-details"
-      className="mt-3 rounded-xl border border-emerald-400/20 bg-gradient-to-br from-emerald-400/[0.07] via-white/[0.025] to-transparent p-3 shadow-[0_0_30px_-22px_rgba(52,211,153,0.75)]"
+      className="mt-2 rounded-xl border border-emerald-400/20 bg-gradient-to-br from-emerald-400/[0.07] via-white/[0.025] to-transparent p-2.5 shadow-[0_0_30px_-22px_rgba(52,211,153,0.75)]"
     >
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-1.5 flex items-center gap-2">
         <div className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
         <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300">
           {t('specialAllocation.lastGesture')}
         </p>
       </div>
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid gap-1.5 sm:grid-cols-2">
         <DetailMetric
           testId="latest-participant-paid-amount"
           label={t('specialAllocation.amountPaid')}
@@ -397,9 +412,11 @@ function LatestGestureDetails({
 function ChronoWarriorDetails({
   chrono,
   challenge,
+  endurance,
 }: {
   chrono: ChampionsState['chrono'];
   challenge: ChampionsState['chronoChallenge'];
+  endurance: ChampionsState['endurance'];
 }) {
   const t = useTranslations('tables');
   const locale = useLocale();
@@ -428,9 +445,9 @@ function ChronoWarriorDetails({
   return (
     <div
       data-testid="chrono-warrior-details"
-      className="mt-3 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent p-3 shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]"
+      className="mt-2 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent p-2.5 shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]"
     >
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-1.5 flex items-center gap-2">
         <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(21,191,253,0.9)]" />
         <p className="text-[11px] font-medium uppercase tracking-wider text-primary/90">
           {t('specialAllocation.chronoReign')}
@@ -450,13 +467,13 @@ function ChronoWarriorDetails({
         value={nextMetric.value}
         tone={chrono.isLive ? 'emerald' : 'primary'}
       />
-      <p className="text-[11px] leading-relaxed text-muted-foreground">
+      <p className="mt-1 text-[10px] leading-snug text-muted-foreground">
         {t('specialAllocation.chronoDescription')}
       </p>
       {showChallenge && (
         <div
           data-testid="chrono-active-challenge"
-          className="mt-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.045] p-3"
+          className="mt-2 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.045] p-2.5"
         >
           <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300">
             {t('specialAllocation.activeEnduranceChallenge')}
@@ -474,6 +491,16 @@ function ChronoWarriorDetails({
               testId="chrono-challenge-segment"
               label={t('specialAllocation.challengeSegment')}
               value={formatSeconds(challenge.duration, locale)}
+              tone="emerald"
+            />
+          )}
+          {/* The standing endurance record, right next to the running segment
+              that is chasing it — the two clocks a viewer wants to compare. */}
+          {endurance.address && (
+            <DetailMetric
+              testId="chrono-endurance-window"
+              label={t('specialAllocation.enduranceWindow')}
+              value={formatSeconds(endurance.duration, locale)}
               tone="emerald"
             />
           )}
@@ -587,6 +614,9 @@ export const SpecialAllocationRecipients = ({
   latestMessage = null,
   latestGesture = null,
   layout = 'stack',
+  roles,
+  hideHeading = false,
+  fillHeight = false,
 }: SpecialAllocationRecipientsProps = {}) => {
   const t = useTranslations('tables');
   const champions = useChampions();
@@ -638,7 +668,7 @@ export const SpecialAllocationRecipients = ({
       emptyText: t('specialAllocation.noEnduranceRecord'),
       accent: champions.endurance.isLive ? 'emerald' : 'muted',
       extra: champions.endurance.address ? (
-        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+        <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
           {t('specialAllocation.enduranceNote')}
         </p>
       ) : null,
@@ -659,7 +689,11 @@ export const SpecialAllocationRecipients = ({
       emptyText: t('specialAllocation.noChronoRecord'),
       accent: 'primary',
       extra: (
-        <ChronoWarriorDetails chrono={champions.chrono} challenge={champions.chronoChallenge} />
+        <ChronoWarriorDetails
+          chrono={champions.chrono}
+          challenge={champions.chronoChallenge}
+          endurance={champions.endurance}
+        />
       ),
     },
     {
@@ -672,44 +706,59 @@ export const SpecialAllocationRecipients = ({
       emptyText: t('specialAllocation.awaitingCstGesture'),
       accent: 'muted',
       extra: champions.lastCst.address ? (
-        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+        <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
           {t('specialAllocation.finalCstNote')}
         </p>
       ) : null,
     },
   ];
 
+  const visibleCards = roles
+    ? roles.flatMap((key) => cards.filter((card) => card.key === key))
+    : cards;
+
+  // Only the full leaderboard instance carries the print fallback; a lone
+  // embedded card must not duplicate it.
   const printDuplex =
-    process.env.NODE_ENV !== 'test' ? (
+    !hideHeading && process.env.NODE_ENV !== 'test' ? (
       <SpecialAllocationLeadersPrintFallback state={champions} />
     ) : null;
 
   return (
     <>
       <section
-        className="min-h-[2rem] space-y-4 print:min-h-0 print:hidden"
+        className={cn(
+          'min-h-[2rem] space-y-4 print:min-h-0 print:hidden',
+          fillHeight && 'flex h-full flex-col',
+        )}
         data-special-allocation-leaders
         aria-label={t('specialAllocation.sectionAria')}
       >
-        <div className="flex items-center gap-2">
-          <h3
-            data-testid="special-allocation-heading"
-            className="font-display text-lg font-semibold tracking-tight text-foreground print:!text-foreground"
-          >
-            {t('specialAllocation.heading')}
-          </h3>
-          <span className="print:hidden">
-            <InfoTooltip content={t('specialAllocation.headingHelp')} />
-          </span>
-        </div>
+        {!hideHeading && (
+          <div className="flex items-center gap-2">
+            <h3
+              data-testid="special-allocation-heading"
+              className="font-display text-lg font-semibold tracking-tight text-foreground print:!text-foreground"
+            >
+              {t('specialAllocation.heading')}
+            </h3>
+            <span className="print:hidden">
+              <InfoTooltip content={t('specialAllocation.headingHelp')} />
+            </span>
+          </div>
+        )}
 
         <div
           className={cn(
             'grid grid-cols-1 gap-3',
             layout === 'grid' && 'items-start md:grid-cols-2 2xl:grid-cols-4',
+            fillHeight &&
+              (visibleCards.length === 1
+                ? 'flex-1 grid-rows-[1fr]'
+                : 'flex-1 grid-rows-[auto_1fr]'),
           )}
         >
-          {cards.map(({ key, ...card }) =>
+          {visibleCards.map(({ key, ...card }) =>
             champions.isLoading && !champions.hasData ? (
               <LoadingCard key={key} title={card.title} icon={card.icon} />
             ) : (

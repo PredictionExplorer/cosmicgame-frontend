@@ -12,6 +12,13 @@ interface UseRotatingIndexOptions {
    * and the initial artwork/image never swaps right after hydration.
    */
   initialIndex?: number | null;
+  /**
+   * Event-driven advance: every CHANGE of this value (after mount) steps to
+   * the next index once, independent of the interval timer. Lets a caller
+   * rotate on its own cue — e.g. the artwork reel advancing when a clip
+   * finishes — typically with `enabled: false` so the timer stays quiet.
+   */
+  advanceSignal?: number;
 }
 
 function nextIndex(current: number, count: number): number {
@@ -25,6 +32,7 @@ export function useRotatingIndex({
   enabled = true,
   randomStart = false,
   initialIndex = null,
+  advanceSignal,
 }: UseRotatingIndexOptions): number | null {
   const normalizedCount = Math.max(0, Math.trunc(count));
   const hasValidInitialIndex =
@@ -49,6 +57,14 @@ export function useRotatingIndex({
     }, intervalMs);
     return () => window.clearInterval(timerId);
   }, [enabled, intervalMs, normalizedCount]);
+
+  // "Adjust state when a prop changes" pattern: React re-runs the render
+  // immediately with the new state, so no effect (and no extra commit).
+  const [seenAdvanceSignal, setSeenAdvanceSignal] = useState(advanceSignal);
+  if (advanceSignal !== seenAdvanceSignal) {
+    setSeenAdvanceSignal(advanceSignal);
+    setIndex((current) => nextIndex(current, normalizedCount));
+  }
 
   if (normalizedCount === 0) return null;
   return Math.min(index, normalizedCount - 1);

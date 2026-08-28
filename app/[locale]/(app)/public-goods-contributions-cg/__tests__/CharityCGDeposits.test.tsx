@@ -6,6 +6,7 @@ const mockUseCharityCGDeposits = jest.fn();
 
 jest.mock('../../../../../hooks/useApiQuery', () => ({
   useCharityCGDeposits: (...args: unknown[]) => mockUseCharityCGDeposits(...args),
+  useDashboardInfo: () => ({ data: null }),
 }));
 
 jest.mock('../../../../../components/tables/CharityDepositTable', () => ({
