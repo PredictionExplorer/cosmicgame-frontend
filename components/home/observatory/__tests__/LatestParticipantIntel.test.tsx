@@ -241,6 +241,11 @@ describe('LatestParticipantIntel', () => {
     );
 
     expect(screen.getByText('tables.specialAllocation.noLatestGesture')).toBeInTheDocument();
+    expect(screen.getByTestId('latest-participant-empty')).toHaveClass(
+      'flex-1',
+      'items-center',
+      'justify-center',
+    );
     expect(screen.queryByTestId('latest-participant-gesture-details')).not.toBeInTheDocument();
     expect(screen.queryByTestId('latest-participant-allocation-package')).not.toBeInTheDocument();
   });

@@ -29,13 +29,17 @@ function pinnedPhaseScenario(phase: TargetPhase): Scenario {
     name: phase,
     description: `Holds the UI in the "${phase}" cycle phase, re-driving the game when it drifts.`,
     run: async (ctx) => {
+      if (!(await phaseStillHolds(ctx.world, phase))) {
+        await driveToPhase(ctx.world, phase, ctx.pace, { signal: ctx.signal });
+      }
+      ctx.markReady();
       while (!ctx.signal.aborted) {
         if (ctx.isPaused()) {
           await tick(ctx, 500);
           continue;
         }
         if (!(await phaseStillHolds(ctx.world, phase))) {
-          await driveToPhase(ctx.world, phase, ctx.pace);
+          await driveToPhase(ctx.world, phase, ctx.pace, { signal: ctx.signal });
         }
         await tick(ctx, 5_000);
       }
@@ -51,6 +55,11 @@ const gestureBattleScenario: Scenario = {
     const { world } = ctx;
     const [a, b] = [world.personas[0], world.personas[1]];
     if (!a || !b) throw new Error('gesture-battle needs at least two personas');
+    const initial = await readCycleSnapshot(world);
+    if (!initial.cycleActive || initial.secondsUntilFinalization === 0n) {
+      await driveToPhase(world, 'final-ten', ctx.pace, { signal: ctx.signal });
+    }
+    ctx.markReady();
     let turn = 0;
     while (!ctx.signal.aborted) {
       if (ctx.isPaused()) {
@@ -59,7 +68,7 @@ const gestureBattleScenario: Scenario = {
       }
       const snapshot = await readCycleSnapshot(world);
       if (!snapshot.cycleActive || snapshot.secondsUntilFinalization === 0n) {
-        await driveToPhase(world, 'final-ten', ctx.pace);
+        await driveToPhase(world, 'final-ten', ctx.pace, { signal: ctx.signal });
         continue;
       }
       const persona = turn % 2 === 0 ? a : b;
@@ -80,6 +89,11 @@ const attachmentsShowcaseScenario: Scenario = {
   description: 'Fills the live cycle with ERC-20 and NFT attachments.',
   run: async (ctx) => {
     const { world } = ctx;
+    const initial = await readCycleSnapshot(world);
+    if (!initial.cycleActive || initial.secondsUntilFinalization === 0n) {
+      await driveToPhase(world, 'live', ctx.pace, { signal: ctx.signal });
+    }
+    ctx.markReady();
     while (!ctx.signal.aborted) {
       if (ctx.isPaused()) {
         await tick(ctx, 500);
@@ -87,7 +101,7 @@ const attachmentsShowcaseScenario: Scenario = {
       }
       const snapshot = await readCycleSnapshot(world);
       if (!snapshot.cycleActive || snapshot.secondsUntilFinalization === 0n) {
-        await driveToPhase(world, 'live', ctx.pace);
+        await driveToPhase(world, 'live', ctx.pace, { signal: ctx.signal });
         continue;
       }
       const persona = pickOne(world.rng, [...world.personas]);
@@ -113,6 +127,7 @@ const anchoringHeavyScenario: Scenario = {
       await performAnchorCosmicNft(world, persona);
       if (world.rng() < 0.5) await performAnchorRwlkNft(world, persona);
     }
+    ctx.markReady();
     await ambientScenario.run(ctx);
   },
 };
@@ -122,6 +137,7 @@ const quietScenario: Scenario = {
   name: 'quiet',
   description: 'No automatic activity; the game only moves when you drive it.',
   run: async (ctx) => {
+    ctx.markReady();
     while (!ctx.signal.aborted) {
       await tick(ctx, 1_000);
     }

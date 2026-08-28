@@ -13,6 +13,8 @@ export interface ScenarioContext {
   signal: AbortSignal;
   /** True while the control API has paused automatic activity. */
   isPaused: () => boolean;
+  /** Marks initial preparation complete so the panel can report a truthful state. */
+  markReady: () => void;
 }
 
 export interface Scenario {

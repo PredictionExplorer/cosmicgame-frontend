@@ -66,7 +66,7 @@ export function LatestParticipantIntel({
     <section
       aria-labelledby="latest-participant-intel-title"
       data-testid="latest-participant-intel"
-      className={cn('min-w-0 p-3', className)}
+      className={cn('flex h-full min-w-0 flex-col p-3', className)}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -166,9 +166,17 @@ export function LatestParticipantIntel({
           </div>
         </>
       ) : (
-        <p className="mt-3 text-sm italic text-muted-foreground/70">
-          {tTables('specialAllocation.noLatestGesture')}
-        </p>
+        <div
+          data-testid="latest-participant-empty"
+          className="flex min-h-36 flex-1 flex-col items-center justify-center gap-2 py-6 text-center"
+        >
+          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03] text-muted-foreground/60">
+            <User className="h-4 w-4" aria-hidden />
+          </span>
+          <p className="text-sm italic text-muted-foreground/70">
+            {tTables('specialAllocation.noLatestGesture')}
+          </p>
+        </div>
       )}
     </section>
   );

@@ -7,8 +7,15 @@ const controlMock = {
   status: {
     ready: true,
     scenario: 'quiet',
+    phase: 'live',
     pace: 'demo',
     paused: false,
+    transition: {
+      kind: 'scenario' as const,
+      state: 'running' as const,
+      target: 'quiet',
+      error: null,
+    },
     cycle: {
       index: '7',
       active: true,
@@ -22,9 +29,16 @@ const controlMock = {
     },
     personas: [{ name: 'Nova', address: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8' }],
     scenarios: ['ambient', 'quiet', 'final-ten'],
+    phases: ['final-ten'],
+    paces: ['realtime', 'demo', 'fast'],
   },
   error: null as string | null,
+  connectionError: null as string | null,
+  commandError: null as string | null,
+  clearCommandError: jest.fn(),
   switchScenario: jest.fn().mockResolvedValue(undefined),
+  driveToPhase: jest.fn().mockResolvedValue(undefined),
+  setPace: jest.fn().mockResolvedValue(undefined),
   makeGesture: jest.fn().mockResolvedValue(undefined),
   finalizeCycle: jest.fn().mockResolvedValue(undefined),
   setPaused: jest.fn().mockResolvedValue(undefined),
@@ -71,7 +85,7 @@ describe('HarnessPanel', () => {
     expect(screen.getByTestId('harness-cycle-index')).toHaveTextContent('7');
     expect(screen.getByTestId('harness-finalization-in')).toHaveTextContent('1m 35s');
 
-    await user.selectOptions(screen.getByTestId('harness-scenario-select'), 'final-ten');
+    await user.selectOptions(screen.getByTestId('harness-phase-select'), 'final-ten');
     expect(controlMock.switchScenario).toHaveBeenCalledWith('final-ten');
 
     await user.click(screen.getByTestId('harness-gesture-eth'));
@@ -84,6 +98,18 @@ describe('HarnessPanel', () => {
 
     await user.click(screen.getByTestId('harness-pause'));
     await waitFor(() => expect(controlMock.setPaused).toHaveBeenCalledWith(true));
+  });
+
+  it('separates activity, phase, and pace controls', async () => {
+    const user = userEvent.setup();
+    render(<HarnessPanel />);
+    await user.click(screen.getByTestId('harness-open'));
+
+    await user.selectOptions(screen.getByTestId('harness-scenario-select'), 'ambient');
+    expect(controlMock.switchScenario).toHaveBeenCalledWith('ambient');
+
+    await user.selectOptions(screen.getByTestId('harness-pace-select'), 'fast');
+    expect(controlMock.setPace).toHaveBeenCalledWith('fast');
   });
 
   it('switches burner personas from the selector', async () => {

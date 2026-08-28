@@ -59,3 +59,32 @@ export function getRemainingMsToAllocationTime(
       : null;
   return sec == null ? null : sec * 1000 - nowMs;
 }
+
+/**
+ * Remaining duration from a server-clock sample. Host/chain epoch skew drops
+ * out of the subtraction; only wall time elapsed since receipt is applied.
+ */
+export function getRemainingMsFromServerClock({
+  targetServerTimeSec,
+  currentServerTimeSec,
+  sampledAtMs,
+  nowMs = Date.now(),
+}: {
+  targetServerTimeSec: unknown;
+  currentServerTimeSec: unknown;
+  sampledAtMs: number;
+  nowMs?: number;
+}): number | null {
+  if (
+    typeof targetServerTimeSec !== 'number' ||
+    !Number.isFinite(targetServerTimeSec) ||
+    targetServerTimeSec <= 0 ||
+    typeof currentServerTimeSec !== 'number' ||
+    !Number.isFinite(currentServerTimeSec) ||
+    currentServerTimeSec <= 0
+  ) {
+    return null;
+  }
+  const elapsedMs = sampledAtMs > 0 ? Math.max(0, nowMs - sampledAtMs) : 0;
+  return (targetServerTimeSec - currentServerTimeSec) * 1000 - elapsedMs;
+}

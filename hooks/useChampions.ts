@@ -282,8 +282,9 @@ export function deriveChampionsState({
 export function useChampions(
   initialData?: SpecialRecipients | null,
   latestParticipantEvidence?: LatestParticipantEvidence,
+  enabled = true,
 ): ChampionsState {
-  const { snapshot, isLoading } = useSpecialAllocationSnapshot(initialData);
+  const { snapshot, isLoading } = useSpecialAllocationSnapshot(initialData, enabled);
   const nowMs = useNow(1000);
 
   return useMemo(

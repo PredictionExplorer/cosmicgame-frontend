@@ -248,7 +248,7 @@ export function CycleClock({
           </div>
 
           {/* Finalize is the clock's own action: it exists because the clock hit zero. */}
-          {!loading && canClaim && account && (
+          {!loading && cycleState.isReadyToFinalize && canClaim && account && (
             <div className={cn('mx-auto w-full max-w-md space-y-2', embedded ? 'mt-2.5' : 'mt-4')}>
               <Button
                 size="lg"

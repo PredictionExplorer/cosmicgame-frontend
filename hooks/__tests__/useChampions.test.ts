@@ -535,7 +535,15 @@ describe('useChampions', () => {
 
     renderHook(() => useChampions(baseSnapshot));
 
-    expect(mockUseSpecialAllocationSnapshot).toHaveBeenCalledWith(baseSnapshot);
+    expect(mockUseSpecialAllocationSnapshot).toHaveBeenCalledWith(baseSnapshot, true);
+  });
+
+  it('forwards a disabled state for cycles without a current Gesture', () => {
+    mockChampionQuery(null);
+
+    renderHook(() => useChampions(undefined, undefined, false));
+
+    expect(mockUseSpecialAllocationSnapshot).toHaveBeenCalledWith(undefined, false);
   });
 
   it('forwards latest evidence into the shared derivation', () => {

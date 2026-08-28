@@ -14,9 +14,18 @@ teardown('release the harness stack', async () => {
   if (ownership?.owned) {
     await stopOwnedStack();
   } else if (ownership?.previousScenario && ownership.previousScenario !== 'quiet') {
-    await switchScenario(ownership.previousScenario).catch(() => {
-      // The developer's stack disappeared mid-run; nothing to restore.
-    });
+    await switchScenario(ownership.previousScenario)
+      .then(() => {
+        // eslint-disable-next-line no-console -- visible ownership handoff in the reporter.
+        console.log(`[harness-e2e] restored scenario "${ownership.previousScenario}"`);
+      })
+      .catch((err: unknown) => {
+        console.warn(
+          `[harness-e2e] could not restore scenario "${ownership.previousScenario}": ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+      });
   }
   clearOwnership();
 });

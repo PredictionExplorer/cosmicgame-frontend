@@ -60,7 +60,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 | ---------------------------- | ------------------------------------------------------------------------ |
 | `npm run dev`                | Start development server                                                 |
 | `npm run dev:testing`        | Boot the full local game harness + app in testing mode (docs/harness.md) |
-| `npm run harness`            | Harness CLI: `up`, `down`, `reset`, `status`, `scenario`, `gesture`, …   |
+| `npm run harness`            | Harness CLI: `up`, `down`, `status`, `scenario`, `phase`, `pace`, …      |
 | `npm run build`              | Create production build                                                  |
 | `npm run start`              | Run production server                                                    |
 | `npm run lint`               | Run ESLint (zero warnings allowed)                                       |
@@ -174,4 +174,4 @@ npm run test:e2e:harness  # harness tier only
 
 ### Local game-state harness (testing mode)
 
-`npm run dev:testing` boots a complete local Cosmic Signature universe — Hardhat chain, deployed contracts, the Go indexer + API, a scenario "director" that plays the game at wall-clock speed, and this app in testing mode with a burner wallet and an in-app control panel. Named scenarios put the UI in any cycle phase on demand. Full guide: [docs/harness.md](docs/harness.md).
+`npm run dev:testing` boots a complete local Cosmic Signature universe — Hardhat chain, deployed contracts, the Go indexer + API, a scenario "director" with a controlled virtual clock, and this app in testing mode with a burner wallet and an in-app control panel. Named scenarios put the real chain and UI in any cycle phase on demand. Full guide: [docs/harness.md](docs/harness.md).

@@ -97,6 +97,7 @@ export const ambientScenario: Scenario = {
   description:
     'Endless organic activity: gestures, cycle turnover, retrievals, anchoring — at wall-clock speed.',
   run: async (ctx) => {
+    ctx.markReady();
     while (!ctx.signal.aborted) {
       if (ctx.isPaused()) {
         await tick(ctx, 500);

@@ -2,6 +2,7 @@ import {
   FINAL_SPRINT_INTERVAL_MS,
   PAST_DEADLINE_FAST_WINDOW_MS,
   getLiveDataPollIntervalMs,
+  getRemainingMsFromServerClock,
   getRemainingMsToAllocationTime,
 } from '../pollingCadence';
 
@@ -34,6 +35,29 @@ describe('getLiveDataPollIntervalMs', () => {
 
   it('never polls slower than the base cadence', () => {
     expect(getLiveDataPollIntervalMs(9 * 60_000, 2_000)).toBe(2_000);
+  });
+});
+
+describe('getRemainingMsFromServerClock', () => {
+  it('ignores host/chain epoch skew and subtracts elapsed receipt time', () => {
+    expect(
+      getRemainingMsFromServerClock({
+        targetServerTimeSec: 200_030,
+        currentServerTimeSec: 200_000,
+        sampledAtMs: 1_000,
+        nowMs: 6_000,
+      }),
+    ).toBe(25_000);
+  });
+
+  it('returns null when either server timestamp is unavailable', () => {
+    expect(
+      getRemainingMsFromServerClock({
+        targetServerTimeSec: 200_030,
+        currentServerTimeSec: undefined,
+        sampledAtMs: 1_000,
+      }),
+    ).toBeNull();
   });
 });
 

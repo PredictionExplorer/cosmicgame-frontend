@@ -77,6 +77,32 @@ test('phase rendering follows the driven chain state', async ({ page }) => {
     /final-minute|final-ten|confirming|ready-to-finalize/,
     { timeout: 60_000 },
   );
+
+  await switchScenario('ready-to-finalize');
+  await awaitCycleState(
+    'the pinned zero-cross state',
+    (status) =>
+      status.scenario === 'ready-to-finalize' &&
+      status.phase === 'ready-to-finalize' &&
+      status.transition.state === 'running',
+  );
+  await switchScenario('exclusivity-expired');
+  await awaitCycleState(
+    'the pinned post-exclusivity state',
+    (status) =>
+      status.scenario === 'exclusivity-expired' &&
+      status.phase === 'exclusivity-expired' &&
+      status.transition.target === 'exclusivity-expired' &&
+      status.transition.state === 'running',
+  );
+  await switchScenario('ready-to-finalize');
+  await awaitCycleState(
+    'ready-to-finalize to self-heal from post-exclusivity',
+    (status) =>
+      status.scenario === 'ready-to-finalize' &&
+      status.phase === 'ready-to-finalize' &&
+      status.transition.state === 'running',
+  );
 });
 
 test('a gesture lands on chain, in the indexer, and in the chat', async ({ page }) => {
@@ -136,6 +162,102 @@ test('burner wallet and dev panel drive the game from the browser', async ({ pag
   );
 });
 
+test('browser phase controls switch repeatedly and reflow inactive desktop state', async ({
+  page,
+}) => {
+  test.setTimeout(8 * 60_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openHome(page);
+  await page.getByTestId('harness-open').click();
+
+  await page.getByTestId('harness-phase-select').selectOption('live');
+  const live = await awaitCycleState(
+    'the browser-selected live phase',
+    (status) =>
+      status.scenario === 'live' &&
+      status.phase === 'live' &&
+      status.transition.state === 'running',
+  );
+  await awaitIndexed(
+    'the live phase cycle to be indexed',
+    (dashboard) =>
+      (dashboard.CurRoundNum ?? 0) >= Number(live.cycle.index) &&
+      dashboardShowsOpenedCycle(dashboard),
+  );
+  await expect(page.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'live', {
+    timeout: 90_000,
+  });
+
+  // Regression: replacing a 13-hour live target must fast-forward/cancel,
+  // never leave the panel waiting for that countdown in wall-clock time.
+  await page.getByTestId('harness-phase-select').selectOption('final-minute');
+  const finalMinute = await awaitCycleState(
+    'a rapid live-to-final-minute switch',
+    (status) =>
+      status.scenario === 'final-minute' &&
+      status.phase === 'final-minute' &&
+      status.transition.state === 'running',
+  );
+  await awaitIndexed(
+    'the final-minute cycle to be indexed',
+    (dashboard) =>
+      (dashboard.CurRoundNum ?? 0) >= Number(finalMinute.cycle.index) &&
+      dashboardShowsOpenedCycle(dashboard),
+  );
+  await expect(page.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'final-minute', {
+    timeout: 90_000,
+  });
+
+  await page.getByTestId('harness-phase-select').selectOption('opening-soon');
+  const openingSoon = await awaitCycleState(
+    'the browser-selected opening-soon phase',
+    (status) =>
+      status.scenario === 'opening-soon' &&
+      status.phase === 'opening-soon' &&
+      status.transition.state === 'running',
+  );
+  await awaitIndexed(
+    'the opening-soon cycle to be indexed',
+    (dashboard) =>
+      (dashboard.CurRoundNum ?? 0) >= Number(openingSoon.cycle.index) &&
+      !dashboardShowsOpenedCycle(dashboard),
+  );
+  await expect(page.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon', {
+    timeout: 90_000,
+  });
+  await expect(page.getByTestId('home-deck-header')).toContainText(`#${openingSoon.cycle.index}`, {
+    timeout: 90_000,
+  });
+  await expect(page.getByTestId('control-desk-gesture')).toHaveCount(0);
+  await expect(page.getByTestId('clock-finalize')).toHaveCount(0);
+  await expect(page.getByTestId('latest-participant-empty')).toBeVisible();
+
+  const [gridBox, latestBox] = await Promise.all([
+    page.getByTestId('control-desk-grid').boundingBox(),
+    page.getByTestId('control-desk-latest').boundingBox(),
+  ]);
+  expect(gridBox).not.toBeNull();
+  expect(latestBox).not.toBeNull();
+  expect(Math.abs(gridBox!.x + gridBox!.width - (latestBox!.x + latestBox!.width))).toBeLessThan(2);
+
+  // Latest selection wins even when three requests overlap; an intermediate
+  // queued target must never start after a newer target supersedes it.
+  await page.getByTestId('harness-phase-select').selectOption('live');
+  await page.getByTestId('harness-phase-select').selectOption('final-minute');
+  await page.getByTestId('harness-phase-select').selectOption('waiting-first-gesture');
+  const latestSelection = await awaitCycleState(
+    'the latest rapid phase selection',
+    (status) =>
+      status.scenario === 'waiting-first-gesture' &&
+      status.phase === 'waiting-first-gesture' &&
+      status.transition.state === 'running' &&
+      status.transition.error === null,
+  );
+  expect(Number(latestSelection.cycle.index)).toBeLessThanOrEqual(
+    Number(openingSoon.cycle.index) + 1,
+  );
+});
+
 test('endgame: finalization pays out and the next cycle opens', async ({ page }) => {
   test.setTimeout(10 * 60_000);
 
@@ -149,7 +271,11 @@ test('endgame: finalization pays out and the next cycle opens', async ({ page })
   await awaitIndexed(
     'the API to observe the expired countdown',
     (d) =>
-      dashboardShowsOpenedCycle(d) && (d.PrizeClaimTs ?? Infinity) <= Math.floor(Date.now() / 1000),
+      dashboardShowsOpenedCycle(d) &&
+      (d.PrizeClaimTs ?? Infinity) <=
+        (typeof d.CurrentChainTime === 'number'
+          ? d.CurrentChainTime
+          : Math.floor(Date.now() / 1000)),
   );
   await openHome(page);
   await expect(page.getByTestId('cycle-clock')).toHaveAttribute(

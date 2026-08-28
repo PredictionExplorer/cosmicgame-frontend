@@ -42,6 +42,13 @@ export function getRelativeTime(timestamp: number, nowSeconds?: number, locale =
   return years === 1 ? '1 year ago' : `${years} years ago`;
 }
 
+export interface ServerTimingSample {
+  targetServerTimeSec: number;
+  currentServerTimeSec: number;
+  sampledAtMs: number;
+  cycleNumber?: number;
+}
+
 interface StableClientTargetTimeArgs {
   targetServerTimeSec: number | null | undefined;
   currentServerTimeSec: number | null | undefined;

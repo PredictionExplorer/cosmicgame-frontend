@@ -1,4 +1,9 @@
-import { getCurrentSpecialRecipientsSeed, getLatestGestureSeed } from '../server';
+import {
+  getCurrentSpecialRecipientsSeed,
+  getHomeTimingSeed,
+  getLatestGestureSeed,
+  resolveHomeTimingSample,
+} from '../server';
 
 const fetchMock = jest.fn();
 
@@ -85,5 +90,66 @@ describe('home intelligence server seeds', () => {
   it('fails soft when a seed endpoint is unavailable', async () => {
     fetchMock.mockResolvedValue(response({}, false));
     await expect(getCurrentSpecialRecipientsSeed()).resolves.toBeNull();
+  });
+
+  it('fetches a coherent chain-clock sample for first paint', async () => {
+    fetchMock
+      .mockResolvedValueOnce(response({ CurRoundPrizeTime: 1_700_000_600 }))
+      .mockResolvedValueOnce(response({ CurrentTimeStamp: 1_700_000_000 }))
+      .mockResolvedValueOnce(
+        response({
+          CurRoundNum: 9,
+          TsRoundStart: 1_699_999_000,
+          LastBidderAddr: '0x1111111111111111111111111111111111111111',
+          PrizeClaimTs: 1_700_000_600,
+        }),
+      );
+
+    await expect(getHomeTimingSeed()).resolves.toEqual(
+      expect.objectContaining({
+        targetServerTimeSec: 1_700_000_600,
+        currentServerTimeSec: 1_700_000_000,
+        cycleNumber: 9,
+        sampledAtMs: expect.any(Number),
+      }),
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('rejects timing fields that cannot describe the same open cycle', () => {
+    expect(
+      resolveHomeTimingSample({
+        targetRaw: { CurRoundPrizeTime: 2_000 },
+        currentRaw: { CurrentTimeStamp: 1_000 },
+        dashboardRaw: {
+          CurRoundNum: 9,
+          TsRoundStart: 900,
+          LastBidderAddr: '0x1111111111111111111111111111111111111111',
+          PrizeClaimTs: 100,
+        },
+        sampledAtMs: 50_000,
+      }),
+    ).toBeNull();
+  });
+
+  it('drops a stale finalization target before the first Gesture', () => {
+    expect(
+      resolveHomeTimingSample({
+        targetRaw: { CurRoundPrizeTime: 2_000 },
+        currentRaw: { CurrentTimeStamp: 1_000 },
+        dashboardRaw: {
+          CurRoundNum: 10,
+          TsRoundStart: 0,
+          LastBidderAddr: '0x0000000000000000000000000000000000000000',
+          PrizeClaimTs: 100,
+        },
+        sampledAtMs: 50_000,
+      }),
+    ).toEqual({
+      targetServerTimeSec: 0,
+      currentServerTimeSec: 1_000,
+      cycleNumber: 10,
+      sampledAtMs: 50_000,
+    });
   });
 });

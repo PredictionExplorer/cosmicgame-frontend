@@ -165,6 +165,20 @@ describe('CycleClock', () => {
     expect(screen.queryByTestId('clock-notify-control')).not.toBeInTheDocument();
   });
 
+  it('never shows a stale finalize action beside an opening countdown', () => {
+    render(
+      <CycleClock
+        {...baseProps}
+        activationTime={Math.floor(Date.now() / 1000) + 3600}
+        allocationTime={Date.now() - 60_000}
+        canClaim
+      />,
+    );
+
+    expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon');
+    expect(screen.queryByTestId('clock-finalize')).not.toBeInTheDocument();
+  });
+
   it('shows the awaiting display text instead of a countdown before the first gesture', () => {
     render(
       <CycleClock

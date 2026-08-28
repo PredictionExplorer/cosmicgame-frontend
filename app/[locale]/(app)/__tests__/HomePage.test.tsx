@@ -4,7 +4,7 @@ import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
 
 import { render, screen, within, act, checkA11y } from '@/test-utils';
 
-import HomePage from '../HomePage';
+import HomePage, { resolveHomeNow } from '../HomePage';
 
 jest.mock('@rainbow-me/rainbowkit');
 
@@ -205,6 +205,7 @@ jest.mock('wagmi', () => ({
 
 const mockInvalidateQueries = jest.fn();
 const mockSetQueryData = jest.fn();
+const mockCancelQueries = jest.fn();
 
 jest.mock('next/link', () => ({
   __esModule: true,
@@ -218,6 +219,7 @@ jest.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({
     invalidateQueries: mockInvalidateQueries,
     setQueryData: mockSetQueryData,
+    cancelQueries: mockCancelQueries,
   }),
 }));
 
@@ -426,6 +428,30 @@ function getPanelSubmitButton() {
 /* ── Tests ──────────────────────────────────────────────────────── */
 
 describe('HomePage', () => {
+  it('uses the serialized timing anchor for the SSR and hydration snapshot', () => {
+    expect(resolveHomeNow(0, { sampledAtMs: 1_700_000_000_000 })).toBe(1_700_000_000_000);
+    expect(resolveHomeNow(0, null, 1_699_999_999_000)).toBe(1_699_999_999_000);
+    expect(resolveHomeNow(1_700_000_000_500, { sampledAtMs: 1_700_000_000_000 })).toBe(
+      1_700_000_000_500,
+    );
+  });
+
+  it('rejects a first-paint timing sample from a different cycle', () => {
+    render(
+      <HomePage
+        initialDashboardData={makeDashboardData({ CurRoundNum: 5 }) as never}
+        initialTimingSample={{
+          cycleNumber: 6,
+          targetServerTimeSec: 1_700_000_600,
+          currentServerTimeSec: 1_700_000_000,
+          sampledAtMs: 1_700_000_000_000,
+        }}
+      />,
+    );
+
+    expect(mockUseCurrentTime).toHaveBeenCalledWith(undefined, undefined);
+  });
+
   /* ── First viewport structure ───────────────────────────────── */
 
   it('integrates the pulse bar (page H1, cycle, phase, activity) into the control desk', () => {
@@ -624,7 +650,7 @@ describe('HomePage', () => {
 
     const challenge = screen.getByTestId('chrono-active-challenge');
     expect(challenge).toHaveTextContent('tables.specialAllocation.activeEnduranceChallenge');
-    expect(challenge).toHaveTextContent('0xEndurance');
+    expect(challenge).toHaveTextContent('0xEndura....uranc');
     expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
     expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
     expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('10m 1s');
@@ -766,6 +792,34 @@ describe('HomePage', () => {
 
     expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon');
     expect(screen.getByTestId('latest-participant-gesture-details')).toBeInTheDocument();
+  });
+
+  it('does not misclassify an open cycle when the chain clock is ahead', () => {
+    const browserNowSec = Math.floor(Date.now() / 1000);
+    const chainNowSec = browserNowSec + 28 * 60 * 60;
+    mockUseCurrentTime.mockReturnValue({
+      data: chainNowSec,
+      dataUpdatedAt: Date.now(),
+      isLoading: false,
+    });
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        CurRoundStats: {
+          TotalBids: 10,
+          ActivationTime: chainNowSec - 120,
+        },
+      }),
+      isLoading: false,
+    });
+    // Simulate the direct chain read already observing cycle N+1 while the
+    // dashboard still consistently describes open cycle N.
+    mockAllocationFinalize.activationTime = browserNowSec + 600;
+    mockAllocationFinalize.allocationTime = Date.now() + 2 * 60 * 60_000;
+
+    render(<HomePage />);
+
+    expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'approach');
+    expect(screen.getByTestId('gesture-panel')).toBeInTheDocument();
   });
 
   it('keeps mobile prices in the desk while the inline console is desktop-only', () => {
@@ -1159,6 +1213,8 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('gesture-panel')).not.toBeInTheDocument();
     expect(screen.queryByTestId('action-dock-mobile')).not.toBeInTheDocument();
     expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon');
+    expect(screen.getByTestId('control-desk-latest')).toHaveClass('lg:col-span-7', 'xl:col-span-9');
+    expect(screen.getByTestId('control-desk-chrono')).toHaveClass('lg:col-span-12');
     expect(screen.getByTestId('clock-calendar-link')).toBeInTheDocument();
     const links = screen.getAllByRole('link', {
       name: /home\.hero\.viewCycleDetails|home\.chrono\.cta\.viewCycle/,

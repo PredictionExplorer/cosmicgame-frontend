@@ -9,7 +9,7 @@ import { formatSeconds } from '@/utils';
 import { Link } from '@/i18n/navigation';
 import { Surface } from '@/components/ui/surface';
 import { useApiData } from '@/contexts/ApiDataContext';
-import { useChampions } from '@/hooks/useChampions';
+import { useChampions, type ChampionsState } from '@/hooks/useChampions';
 import { getSelectionStanding } from '@/lib/selectionStanding';
 import { cn } from '@/lib/utils';
 import { formatCstAmount } from '@/utils/cstGesture';
@@ -22,6 +22,8 @@ interface DeckPersonalStripProps {
   gestures: GestureInfo[];
   /** Estimated Participation CST a gesture would imprint right now. */
   cstRewardPreview?: number | null;
+  /** Reuses the page-level snapshot instead of issuing a duplicate role query. */
+  champions?: ChampionsState;
   /** Removes its standalone surface when embedded in the control desk. */
   embedded?: boolean;
   className?: string;
@@ -42,12 +44,14 @@ export function DeckPersonalStrip({
   data,
   gestures,
   cstRewardPreview = null,
+  champions: providedChampions,
   embedded = false,
   className,
 }: DeckPersonalStripProps) {
   const t = useTranslations('home');
   const locale = useLocale();
-  const champions = useChampions();
+  const queriedChampions = useChampions(undefined, undefined, providedChampions === undefined);
+  const champions = providedChampions ?? queriedChampions;
   const { apiData } = useApiData();
 
   const isLatest = sameAddress(data?.LastBidderAddr, account);

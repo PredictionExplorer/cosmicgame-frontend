@@ -6,7 +6,11 @@ import { useCallback } from 'react';
 import { useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 
 import api from '@/services/api';
-import { getLiveDataPollIntervalMs, getRemainingMsToAllocationTime } from '@/lib/pollingCadence';
+import {
+  getLiveDataPollIntervalMs,
+  getRemainingMsFromServerClock,
+  getRemainingMsToAllocationTime,
+} from '@/lib/pollingCadence';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 import type {
   ActionIdWithClaimInfo,
@@ -107,14 +111,18 @@ function withUxScenarioData<T>(
  */
 function useLivePollInterval(baseMs: number): () => number {
   const queryClient = useQueryClient();
-  return useCallback(
-    () =>
-      getLiveDataPollIntervalMs(
-        getRemainingMsToAllocationTime(queryClient.getQueryData(['allocationTime'])),
-        baseMs,
-      ),
-    [baseMs, queryClient],
-  );
+  return useCallback(() => {
+    const targetServerTimeSec = queryClient.getQueryData(['allocationTime']);
+    const currentServerTimeSec = queryClient.getQueryData(['currentTime']);
+    const currentTimeState = queryClient.getQueryState(['currentTime']);
+    const remainingMs =
+      getRemainingMsFromServerClock({
+        targetServerTimeSec,
+        currentServerTimeSec,
+        sampledAtMs: currentTimeState?.dataUpdatedAt ?? 0,
+      }) ?? getRemainingMsToAllocationTime(targetServerTimeSec);
+    return getLiveDataPollIntervalMs(remainingMs, baseMs);
+  }, [baseMs, queryClient]);
 }
 
 export interface DashboardInfoOptions {
@@ -171,7 +179,7 @@ export function useRoundInfo(roundNum: number) {
   });
 }
 
-export function useAllocationTime() {
+export function useAllocationTime(initialData?: number, initialDataUpdatedAt?: number) {
   const scenario = useUxScenarioSnapshot();
   const liveInterval = useLivePollInterval(10_000);
   const query = useQuery<number>({
@@ -182,6 +190,8 @@ export function useAllocationTime() {
     refetchInterval: liveInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
+    initialData,
+    initialDataUpdatedAt,
   });
   return withUxScenarioData(query, scenario?.finalizationTimeSec, scenario?.createdAtMs);
 }
@@ -246,12 +256,15 @@ export function useGestureListByCycle(
   return withUxScenarioData(query, scenario?.gestures, scenario?.createdAtMs);
 }
 
-export function useCurrentSpecialRecipients(initialData?: SpecialRecipients | null) {
+export function useCurrentSpecialRecipients(
+  initialData?: SpecialRecipients | null,
+  enabled = true,
+) {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<SpecialRecipients | null>({
     queryKey: ['currentSpecialWinners'],
     queryFn: ({ signal }) => api.get_current_special_winners({ signal }),
-    enabled: !scenario,
+    enabled: !scenario && enabled,
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
@@ -1139,7 +1152,7 @@ export function useMarketingRewardsByUser(address: string | null | undefined) {
 // System
 // ---------------------------------------------------------------------------
 
-export function useCurrentTime() {
+export function useCurrentTime(initialData?: number, initialDataUpdatedAt?: number) {
   const scenario = useUxScenarioSnapshot();
   const liveInterval = useLivePollInterval(12_000);
   const query = useQuery<number>({
@@ -1150,6 +1163,8 @@ export function useCurrentTime() {
     refetchInterval: liveInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
+    initialData,
+    initialDataUpdatedAt,
   });
   return withUxScenarioData(query, scenario?.currentTimeSec, scenario?.createdAtMs);
 }

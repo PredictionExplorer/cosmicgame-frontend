@@ -98,7 +98,10 @@ import {
 
 jest.mock('@tanstack/react-query', () => ({
   useQuery: jest.fn(() => ({ data: undefined, isLoading: false, error: null })),
-  useQueryClient: jest.fn(() => ({ getQueryData: jest.fn(() => undefined) })),
+  useQueryClient: jest.fn(() => ({
+    getQueryData: jest.fn(() => undefined),
+    getQueryState: jest.fn(() => undefined),
+  })),
   QueryClient: class QueryClient {},
   QueryClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -433,6 +436,12 @@ describe('useApiQuery hooks', () => {
       const options = getOptions();
       expect(options.initialData).toBe(seed);
       expect(options.initialDataUpdatedAt).toBe(0);
+    });
+
+    it('can suppress the endpoint while the current cycle has no Gesture', () => {
+      renderHook(() => useCurrentSpecialRecipients(undefined, false));
+
+      expect(getOptions().enabled).toBe(false);
     });
   });
 

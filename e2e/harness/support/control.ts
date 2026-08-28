@@ -18,8 +18,15 @@ export interface ControlCycleStatus {
 export interface ControlStatus {
   ready: boolean;
   scenario: string;
+  phase: string;
   pace: string;
   paused: boolean;
+  transition: {
+    kind: 'scenario' | 'phase' | 'command' | null;
+    state: 'idle' | 'driving' | 'running' | 'error';
+    target: string | null;
+    error: string | null;
+  };
   cycle: ControlCycleStatus;
   personas: Array<{ name: string; address: string }>;
 }
@@ -98,13 +105,15 @@ interface DashboardShape {
   PrizeClaimTs?: number;
   TsRoundStart?: number;
   CurRoundStats?: { ActivationTime?: number };
+  /** Test-only sample from `time/current`, attached by readDashboard. */
+  CurrentChainTime?: number;
   [key: string]: unknown;
 }
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export function dashboardShowsUnopenedActiveCycle(d: DashboardShape): boolean {
-  const nowSec = Math.floor(Date.now() / 1000);
+  const nowSec = d.CurrentChainTime ?? Math.floor(Date.now() / 1000);
   const activation = d.CurRoundStats?.ActivationTime ?? 0;
   return (
     activation > 0 && activation <= nowSec && (d.LastBidderAddr ?? ZERO_ADDRESS) === ZERO_ADDRESS
@@ -117,9 +126,20 @@ export function dashboardShowsOpenedCycle(d: DashboardShape): boolean {
 
 export async function readDashboard(): Promise<DashboardShape> {
   const state = requireStack();
-  const response = await fetch(`${apiUrl(state)}/statistics/dashboard`);
-  if (!response.ok) throw new Error(`dashboard: HTTP ${response.status}`);
-  return (await response.json()) as DashboardShape;
+  const [dashboardResponse, timeResponse] = await Promise.all([
+    fetch(`${apiUrl(state)}/statistics/dashboard`),
+    fetch(`${apiUrl(state)}/time/current`),
+  ]);
+  if (!dashboardResponse.ok) throw new Error(`dashboard: HTTP ${dashboardResponse.status}`);
+  if (!timeResponse.ok) throw new Error(`current time: HTTP ${timeResponse.status}`);
+  const dashboard = (await dashboardResponse.json()) as DashboardShape;
+  const time = (await timeResponse.json()) as { CurrentTimeStamp?: number };
+  return {
+    ...dashboard,
+    ...(typeof time.CurrentTimeStamp === 'number'
+      ? { CurrentChainTime: time.CurrentTimeStamp }
+      : {}),
+  };
 }
 
 /**

@@ -71,14 +71,24 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
 
           <div
             data-testid="control-desk-latest"
-            className="order-3 min-w-0 border-b border-white/[0.08] lg:col-span-6 lg:col-start-1 lg:row-start-2 lg:border-r xl:col-span-5 xl:col-start-4 xl:row-start-1"
+            className={cn(
+              'order-3 min-w-0 border-b border-white/[0.08]',
+              gestureConsole
+                ? 'lg:col-span-6 lg:col-start-1 lg:row-start-2 lg:border-r xl:col-span-5 xl:col-start-4 xl:row-start-1'
+                : 'lg:col-span-7 lg:col-start-6 lg:row-start-1 xl:col-span-9 xl:col-start-4',
+            )}
           >
             {latestParticipant}
           </div>
 
           <div
             data-testid="control-desk-chrono"
-            className="order-4 min-w-0 border-b border-white/[0.08] lg:col-span-6 lg:col-start-7 lg:row-start-2 xl:col-span-12 xl:col-start-1 xl:row-start-2"
+            className={cn(
+              'order-4 min-w-0 border-b border-white/[0.08]',
+              gestureConsole
+                ? 'lg:col-span-6 lg:col-start-7 lg:row-start-2 xl:col-span-12 xl:col-start-1 xl:row-start-2'
+                : 'lg:col-span-12 lg:col-start-1 lg:row-start-2',
+            )}
           >
             {chronoEndurance}
           </div>

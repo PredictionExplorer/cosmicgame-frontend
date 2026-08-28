@@ -46,6 +46,10 @@ type ParticipantInfoResult =
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
+export function isHarnessChainSnapshotPreferred(): boolean {
+  return process.env.NEXT_PUBLIC_HARNESS === '1' && process.env.NEXT_PUBLIC_NETWORK === 'local';
+}
+
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
@@ -132,16 +136,17 @@ export async function fetchChainSpecialAllocationSnapshot({
   if (!cosmicGameAddress) return null;
 
   const address = cosmicGameAddress as `0x${string}`;
+  const block = await publicClient.getBlock({ blockTag: 'latest' });
   const read = (functionName: string, args?: readonly unknown[]) =>
     publicClient.readContract({
       address,
       abi: cosmicGameAbi,
       functionName,
       args,
+      blockNumber: block.number,
     });
 
   const [
-    block,
     champions,
     storedEnduranceChampionAddress,
     storedEnduranceChampionDuration,
@@ -152,7 +157,6 @@ export async function fetchChainSpecialAllocationSnapshot({
     lastCstBidderAddress,
     roundNum,
   ] = await Promise.all([
-    publicClient.getBlock({ blockTag: 'latest' }),
     read('tryGetCurrentChampions'),
     read('enduranceChampionAddress'),
     read('enduranceChampionDuration'),
@@ -217,16 +221,29 @@ export async function fetchChainSpecialAllocationSnapshot({
   };
 }
 
-export function useSpecialAllocationSnapshot(initialData?: SpecialRecipients | null): {
+export function useSpecialAllocationSnapshot(
+  initialData?: SpecialRecipients | null,
+  enabled = true,
+): {
   snapshot: SpecialAllocationSnapshot | null;
   isLoading: boolean;
   raw: SpecialRecipients | null | undefined;
 } {
-  const apiQuery = useCurrentSpecialRecipients(initialData);
+  // A newly configured local cycle has no Chrono record yet, which the Go
+  // endpoint represents as HTTP 400. The harness already has the real local
+  // contract, so read the same fields directly instead of filling DevTools
+  // with expected request failures during every phase switch.
+  const harnessUsesChainSnapshot = isHarnessChainSnapshotPreferred();
+  const apiQuery = useCurrentSpecialRecipients(initialData, enabled && !harnessUsesChainSnapshot);
   const publicClient = usePublicClient({ chainId: activeChain.id });
   const { cosmicGame } = useContractAddresses();
-  const apiHasV2 = hasApiV2SpecialAllocationData(apiQuery.data);
-  const shouldReadChain = !!apiQuery.data && !apiHasV2 && !!publicClient && !!cosmicGame;
+  const apiData = enabled && !harnessUsesChainSnapshot ? apiQuery.data : null;
+  const apiHasV2 = hasApiV2SpecialAllocationData(apiData);
+  const shouldReadChain =
+    enabled &&
+    !!publicClient &&
+    !!cosmicGame &&
+    (harnessUsesChainSnapshot || (!!apiData && !apiHasV2));
 
   const chainQuery = useQuery<ChainSpecialAllocationSnapshot | null>({
     queryKey: ['specialAllocationChainSnapshot', cosmicGame, apiQuery.dataUpdatedAt],
@@ -253,17 +270,18 @@ export function useSpecialAllocationSnapshot(initialData?: SpecialRecipients | n
   const snapshot = useMemo(
     () =>
       normalizeSpecialAllocationSnapshot({
-        apiData: apiQuery.data,
-        chainData: chainQuery.data,
+        apiData,
+        chainData: enabled ? chainQuery.data : null,
         apiReceivedAtMs: apiQuery.dataUpdatedAt,
         chainReceivedAtMs: chainQuery.dataUpdatedAt,
       }),
-    [apiQuery.data, apiQuery.dataUpdatedAt, chainQuery.data, chainQuery.dataUpdatedAt],
+    [apiData, apiQuery.dataUpdatedAt, chainQuery.data, chainQuery.dataUpdatedAt, enabled],
   );
 
   return {
     snapshot,
-    isLoading: apiQuery.isLoading || (shouldReadChain && chainQuery.isLoading && !snapshot),
-    raw: apiQuery.data,
+    isLoading:
+      enabled && (apiQuery.isLoading || (shouldReadChain && chainQuery.isLoading && !snapshot)),
+    raw: enabled ? apiData : undefined,
   };
 }

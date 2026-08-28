@@ -77,7 +77,7 @@ export async function runDirector(config: HarnessConfig, options: DirectorOption
   await new Promise<void>((resolveShutdown) => {
     const shutdown = () => {
       log.info('Shutting down director…');
-      void runtime.stopScenario().then(() => {
+      void runtime.shutdown().then(() => {
         controlServer.close(() => resolveShutdown());
       });
     };

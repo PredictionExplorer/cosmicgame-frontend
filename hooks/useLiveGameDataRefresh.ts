@@ -64,9 +64,17 @@ export const EVENT_WINDOW_EVENTS: Partial<Record<WatchedCosmicEventName, string>
  */
 export const ETL_ECHO_DELAY_MS = 2_000;
 
-export function invalidateLiveGameQueries(queryClient: QueryClient): Promise<unknown[]> {
+const CURRENT_SPECIAL_RECIPIENTS_KEY = 'currentSpecialWinners';
+
+export function invalidateLiveGameQueries(
+  queryClient: QueryClient,
+  { includeCurrentSpecialRecipients = true }: { includeCurrentSpecialRecipients?: boolean } = {},
+): Promise<unknown[]> {
   return Promise.all(
-    LIVE_GAME_QUERY_KEYS.map((queryKey) =>
+    LIVE_GAME_QUERY_KEYS.filter(
+      (queryKey) =>
+        includeCurrentSpecialRecipients || queryKey[0] !== CURRENT_SPECIAL_RECIPIENTS_KEY,
+    ).map((queryKey) =>
       queryClient.invalidateQueries({
         queryKey,
       }),
@@ -106,15 +114,27 @@ export function useLiveGameDataRefresh() {
         window.dispatchEvent(new CustomEvent(name));
       }
 
-      const invalidateAll = (): void => {
+      const cycleFinalized = events.some((event) => event.eventName === 'MainPrizeClaimed');
+      if (cycleFinalized) {
+        void queryClient.cancelQueries({ queryKey: [CURRENT_SPECIAL_RECIPIENTS_KEY] });
+        queryClient.setQueryData([CURRENT_SPECIAL_RECIPIENTS_KEY], null);
+      }
+
+      const invalidate = (includeCurrentSpecialRecipients: boolean): void => {
         for (const queryKey of keysByHash.values()) {
+          if (!includeCurrentSpecialRecipients && queryKey[0] === CURRENT_SPECIAL_RECIPIENTS_KEY) {
+            continue;
+          }
           void queryClient.invalidateQueries({ queryKey });
         }
       };
-      invalidateAll();
+      // At rollover the backend intentionally returns 400 until the new
+      // cycle's role state exists. Refresh the dashboard first so observers
+      // disable that query before its delayed ETL-echo invalidation.
+      invalidate(!cycleFinalized);
       const timer = setTimeout(() => {
         echoTimers.delete(timer);
-        invalidateAll();
+        invalidate(!cycleFinalized);
       }, ETL_ECHO_DELAY_MS);
       echoTimers.add(timer);
     };

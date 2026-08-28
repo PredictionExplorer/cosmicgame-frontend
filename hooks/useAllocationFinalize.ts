@@ -15,6 +15,7 @@ import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { useNotify } from '@/hooks/useNotify';
 import { useAllocationTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
 import { getStableClientTargetTime } from '@/utils/time';
+import type { ServerTimingSample } from '@/utils/time';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 
 const GAS_EXTRA = BigInt(1_000_000);
@@ -23,9 +24,14 @@ const GAS_FLOOR = BigInt(2_000_000);
 interface UseAllocationFinalizeOptions {
   data: DashboardInfo | null;
   offset: number;
+  initialTimingSample?: ServerTimingSample | null;
 }
 
-export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOptions) {
+export function useAllocationFinalize({
+  data,
+  offset,
+  initialTimingSample = null,
+}: UseAllocationFinalizeOptions) {
   const t = useTranslations('toasts');
   const router = useRouter();
   const publicClient = usePublicClient();
@@ -33,11 +39,23 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
   const { notify, notifyErrorFromEthers } = useNotify();
   const uxScenario = useUxScenarioSnapshot();
 
-  const { data: prizeTimeRaw } = useAllocationTime();
-  const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
+  const { data: prizeTimeRaw } = useAllocationTime(
+    initialTimingSample?.targetServerTimeSec,
+    initialTimingSample ? 0 : undefined,
+  );
+  const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime(
+    initialTimingSample?.currentServerTimeSec,
+    initialTimingSample ? 0 : undefined,
+  );
   const { data: claimHistoryRaw } = useClaimHistory();
 
   const [allocationTime, setAllocationTime] = useState(() => {
+    if (initialTimingSample && initialTimingSample.targetServerTimeSec > 0) {
+      return (
+        initialTimingSample.sampledAtMs +
+        (initialTimingSample.targetServerTimeSec - initialTimingSample.currentServerTimeSec) * 1000
+      );
+    }
     const stableTargetMs = getStableClientTargetTime({
       targetServerTimeSec: prizeTimeRaw,
       currentServerTimeSec: currentTimeRaw,
@@ -82,12 +100,12 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
 
   const mountedRef = useRef(true);
   const inFlightRef = useRef(false);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
       mountedRef.current = false;
-    },
-    [],
-  );
+    };
+  }, []);
 
   /**
    * Claim the Signature Allocation for the current cycle.
@@ -185,14 +203,22 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
     try {
       const time = await cosmicGameContract.read.roundActivationTime?.();
       if (!mountedRef.current) return;
-      setActivationTime(Number(time ?? 0) - offset / 1000);
+      const targetServerTimeSec = Number(time ?? 0);
+      const projectedTargetMs = getStableClientTargetTime({
+        targetServerTimeSec,
+        currentServerTimeSec: currentTimeRaw,
+        currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
+      });
+      setActivationTime(
+        projectedTargetMs > 0 ? projectedTargetMs / 1000 : targetServerTimeSec - offset / 1000,
+      );
     } catch (err) {
       if (!isEmptyContractReadError(err)) {
         reportError(err, 'fetchActivationTime');
       }
       if (mountedRef.current) setActivationTime(0);
     }
-  }, [cosmicGameContract, offset, uxScenario]);
+  }, [cosmicGameContract, currentTimeRaw, currentTimeUpdatedAt, offset, uxScenario]);
 
   useEffect(() => {
     if (uxScenario) {

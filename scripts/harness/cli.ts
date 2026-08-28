@@ -18,6 +18,7 @@
  *   reset       down --wipe, then up (flags forwarded to up).
  *   status      Show process + director status.
  *   scenario    Switch the running director's scenario: `scenario final-ten`.
+ *   pace        Select realtime | demo | fast for the next configured cycle.
  *   gesture     One-shot gesture: --as <persona> --kind eth|cst|rwlk -m <msg>.
  *   finalize    Finalize the current cycle: [--as <persona>].
  *   pause       Pause automatic scenario activity.
@@ -46,6 +47,7 @@ async function controlRequest(path: string, body?: Record<string, unknown>): Pro
     method: body === undefined ? 'GET' : 'POST',
     headers: { 'content-type': 'application/json' },
     body: body === undefined ? null : JSON.stringify(body),
+    signal: AbortSignal.timeout(60_000),
   }).catch(() => {
     throw new Error(
       `Director control API is not reachable at ${url}. Is the harness running? (npm run harness -- status)`,
@@ -133,6 +135,14 @@ async function main(): Promise<void> {
       return;
     }
 
+    case 'pace': {
+      const name = rest[0];
+      if (!name) fail('Usage: harness pace <realtime|demo|fast>');
+      const result = await controlRequest('/pace', { name: parsePace(name, 'demo') });
+      process.stdout.write(`${JSON.stringify(result)}\n`);
+      return;
+    }
+
     case 'gesture': {
       const { values } = parseArgs({
         args: rest,
@@ -186,7 +196,7 @@ async function main(): Promise<void> {
     default:
       fail(
         command ? `Unknown command "${command}".` : 'Missing command.',
-        'Commands: up, down, reset, status, scenario, gesture, finalize, pause, resume. See scripts/harness/cli.ts header.',
+        'Commands: up, down, reset, status, scenario, phase, pace, gesture, finalize, pause, resume. See scripts/harness/cli.ts header.',
       );
   }
 }

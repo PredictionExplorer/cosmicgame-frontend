@@ -1,8 +1,9 @@
 import { AxiosError } from 'axios';
+import { createElement, StrictMode, type ReactNode } from 'react';
 
 import type { DashboardInfo } from '@/services/api/types';
 
-import { act, renderHook } from '@/test-utils';
+import { act, renderHook, waitFor } from '@/test-utils';
 
 const mockNotify = jest.fn();
 const mockNotifyErrorFromEthers = jest.fn();
@@ -577,8 +578,12 @@ describe('useAllocationFinalize', () => {
     expect(result.current.isClaiming).toBe(false);
   });
 
-  it('fetchActivationTime pulls from contract and applies offset', async () => {
+  it('projects contract activation time through the sampled server clock', async () => {
     mockReadActivationTime.mockResolvedValue(BigInt(2500));
+    mockUseCurrentTime.mockReturnValue({
+      data: 2000,
+      dataUpdatedAt: 1_000_000,
+    } as ReturnType<typeof useCurrentTime>);
 
     let renderResult!: ReturnType<
       typeof renderHook<ReturnType<typeof useAllocationFinalize>, unknown>
@@ -591,8 +596,23 @@ describe('useAllocationFinalize', () => {
       await renderResult.result.current.fetchActivationTime();
     });
 
-    expect(renderResult.result.current.activationTime).toBe(2500 - 10);
+    expect(renderResult.result.current.activationTime).toBe(1500);
     // Restore default
+    mockReadActivationTime.mockResolvedValue(BigInt(1000));
+  });
+
+  it('keeps activation updates enabled through Strict Mode effect replay', async () => {
+    mockReadActivationTime.mockResolvedValue(BigInt(2500));
+    mockUseCurrentTime.mockReturnValue({
+      data: 2000,
+      dataUpdatedAt: 1_000_000,
+    } as ReturnType<typeof useCurrentTime>);
+
+    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }), {
+      wrapper: ({ children }: { children: ReactNode }) => createElement(StrictMode, null, children),
+    });
+
+    await waitFor(() => expect(result.current.activationTime).toBe(1500));
     mockReadActivationTime.mockResolvedValue(BigInt(1000));
   });
 

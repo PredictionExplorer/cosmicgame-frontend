@@ -76,6 +76,18 @@ describe('ControlDesk', () => {
     expect(screen.queryByTestId('control-desk-personal')).not.toBeInTheDocument();
     expect(screen.queryByTestId('control-desk-gesture')).not.toBeInTheDocument();
     expect(screen.getByTestId('slot-ledger')).toBeInTheDocument();
+    expect(screen.getByTestId('control-desk-latest')).toHaveClass(
+      'lg:col-span-7',
+      'lg:col-start-6',
+      'lg:row-start-1',
+      'xl:col-span-9',
+      'xl:col-start-4',
+    );
+    expect(screen.getByTestId('control-desk-chrono')).toHaveClass(
+      'lg:col-span-12',
+      'lg:col-start-1',
+      'lg:row-start-2',
+    );
   });
 
   it('forwards the stage ref for ActionDock visibility tracking', () => {

@@ -111,6 +111,25 @@ describe('getLandingCycleTimerSnapshot', () => {
     expect(snapshot.showCountdown).toBe(true);
   });
 
+  it('projects activation through a chain clock that is ahead of the browser', () => {
+    const snapshot = getLandingCycleTimerSnapshot({
+      sample: {
+        ...activeSample,
+        currentServerTimeSec: 100_000,
+        dashboard: dashboard({
+          CurRoundStats: { ActivationTime: 100_600 },
+          TsRoundStart: 0,
+          LastBidderAddr: '0x0000000000000000000000000000000000000000',
+        }),
+      },
+      nowMs: sampledAtMs,
+    });
+
+    expect(snapshot.phase).toBe('opening-soon');
+    expect(snapshot.targetMs).toBe(sampledAtMs + 600_000);
+    expect(snapshot.remainingMs).toBe(600_000);
+  });
+
   it('shows ready-to-finalize when the backend target has passed', () => {
     const snapshot = getLandingCycleTimerSnapshot({
       sample: activeSample,

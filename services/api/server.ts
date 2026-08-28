@@ -1,5 +1,7 @@
 import { cache } from 'react';
 
+import type { ServerTimingSample } from '@/utils/time';
+
 import { flattenGestureArray, flattenTx, getAPIUrl } from './client';
 import { normalizeDashboardWire } from './rounds';
 import {
@@ -31,6 +33,66 @@ import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from
 /** How stale the app-home seed HTML is allowed to be, in seconds. */
 export const HOME_SEED_REVALIDATE_SECONDS = 15;
 
+/** Serializable request/render anchor for hydration-safe client clock fallbacks. */
+export function getServerRenderTimeMs(): number {
+  return Date.now();
+}
+
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const TIMING_COHERENCE_TOLERANCE_SECONDS = 30;
+
+export function resolveHomeTimingSample({
+  targetRaw,
+  currentRaw,
+  dashboardRaw,
+  sampledAtMs,
+}: {
+  targetRaw: Record<string, unknown>;
+  currentRaw: Record<string, unknown>;
+  dashboardRaw: Record<string, unknown>;
+  sampledAtMs: number;
+}): ServerTimingSample | null {
+  let targetServerTimeSec = Number(targetRaw.CurRoundPrizeTime);
+  const currentServerTimeSec = Number(currentRaw.CurrentTimeStamp);
+  const cycleNumber = Number(dashboardRaw.CurRoundNum);
+  const cycleStart = Number(dashboardRaw.TsRoundStart);
+  const latestAddress =
+    typeof dashboardRaw.LastBidderAddr === 'string' ? dashboardRaw.LastBidderAddr : '';
+  const opened = cycleStart > 0 && latestAddress.toLowerCase() !== ZERO_ADDRESS;
+
+  if (
+    !Number.isFinite(targetServerTimeSec) ||
+    targetServerTimeSec < 0 ||
+    !Number.isFinite(currentServerTimeSec) ||
+    currentServerTimeSec <= 0 ||
+    !Number.isFinite(cycleNumber) ||
+    cycleNumber < 0
+  ) {
+    return null;
+  }
+
+  if (!opened) {
+    // No finalization clock exists before the first Gesture. Discard a stale
+    // target cached from the preceding cycle while retaining the chain clock
+    // needed to project this cycle's activation timestamp.
+    targetServerTimeSec = 0;
+  } else {
+    const dashboardTarget = Number(dashboardRaw.PrizeClaimTs);
+    if (!Number.isFinite(dashboardTarget) || dashboardTarget <= 0 || targetServerTimeSec <= 0) {
+      return null;
+    }
+    const normalizedDashboardTarget =
+      dashboardTarget > 1_000_000_000 ? dashboardTarget : currentServerTimeSec + dashboardTarget;
+    if (
+      Math.abs(normalizedDashboardTarget - targetServerTimeSec) > TIMING_COHERENCE_TOLERANCE_SECONDS
+    ) {
+      return null;
+    }
+  }
+
+  return { targetServerTimeSec, currentServerTimeSec, cycleNumber, sampledAtMs };
+}
+
 async function fetchApiJson(path: string, revalidateSeconds: number): Promise<unknown> {
   try {
     const response = await fetch(getAPIUrl(path), {
@@ -57,6 +119,33 @@ export const getDashboardInfoSeed = cache(async (): Promise<DashboardInfo | null
   } catch {
     return null;
   }
+});
+
+/** Chain-clock sample used to project absolute protocol times onto the client clock. */
+export const getHomeTimingSeed = cache(async (): Promise<ServerTimingSample | null> => {
+  const [targetRaw, currentRaw, dashboardRaw] = await Promise.all([
+    fetchApiJson('rounds/current/time', HOME_SEED_REVALIDATE_SECONDS),
+    fetchApiJson('time/current', HOME_SEED_REVALIDATE_SECONDS),
+    fetchApiJson('statistics/dashboard', HOME_SEED_REVALIDATE_SECONDS),
+  ]);
+  if (
+    targetRaw == null ||
+    currentRaw == null ||
+    dashboardRaw == null ||
+    typeof targetRaw !== 'object' ||
+    typeof currentRaw !== 'object' ||
+    typeof dashboardRaw !== 'object'
+  ) {
+    return null;
+  }
+  return resolveHomeTimingSample({
+    targetRaw: targetRaw as Record<string, unknown>,
+    currentRaw: currentRaw as Record<string, unknown>,
+    dashboardRaw: dashboardRaw as Record<string, unknown>,
+    // Anchor to response receipt, not request start, so network latency does
+    // not get added to every projected countdown.
+    sampledAtMs: Date.now(),
+  });
 });
 
 /** Latest gesture in the active cycle, used to make participant intelligence complete in ISR HTML. */

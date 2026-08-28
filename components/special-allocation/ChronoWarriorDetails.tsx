@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds } from '@/utils';
+import { formatSeconds, shortenHex } from '@/utils';
 
 import type { ChampionsState } from '@/hooks/useChampions';
 import { Link } from '@/i18n/navigation';
@@ -59,12 +59,12 @@ export function ChronoWarriorDetails({
       data-testid="chrono-warrior-details"
       className={cn(
         'rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]',
-        compact ? 'p-2.5' : 'mt-3 p-3',
+        compact ? 'p-2' : 'mt-3 p-3',
       )}
     >
       <div
         className={cn(
-          compact && showChallenge && 'grid items-start gap-2 sm:grid-cols-[0.72fr_1.28fr]',
+          compact && showChallenge && 'grid items-start gap-1.5 sm:grid-cols-[0.45fr_1.55fr]',
         )}
       >
         <div>
@@ -103,7 +103,7 @@ export function ChronoWarriorDetails({
             data-testid="chrono-active-challenge"
             className={cn(
               'rounded-xl border border-emerald-400/20 bg-emerald-400/[0.045]',
-              compact ? 'p-2.5' : 'mt-3 p-3',
+              compact ? 'p-2' : 'mt-3 p-3',
             )}
           >
             <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-300">
@@ -112,9 +112,14 @@ export function ChronoWarriorDetails({
             {challenge.address && (
               <Link
                 href={`/user/${challenge.address}`}
-                className="mt-1.5 block break-all font-mono text-xs text-foreground transition-colors hover:text-primary"
+                title={challenge.address}
+                aria-label={challenge.address}
+                className={cn(
+                  'mt-1.5 block font-mono text-xs text-foreground transition-colors hover:text-primary',
+                  compact ? 'whitespace-nowrap' : 'break-all',
+                )}
               >
-                {challenge.address}
+                {compact ? shortenHex(challenge.address, 6) : challenge.address}
               </Link>
             )}
             <div className={cn('grid gap-1.5', compact && 'mt-1.5 grid-cols-3')}>
@@ -152,14 +157,11 @@ export function ChronoWarriorDetails({
                 compact={compact}
               />
             </div>
-            <p
-              className={cn(
-                'mt-1.5 text-[10px] leading-relaxed text-muted-foreground',
-                compact && 'line-clamp-1',
-              )}
-            >
-              {t('specialAllocation.challengeDescription')}
-            </p>
+            {!compact && (
+              <p className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground">
+                {t('specialAllocation.challengeDescription')}
+              </p>
+            )}
           </div>
         )}
       </div>

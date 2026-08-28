@@ -84,7 +84,7 @@ describe('ChronoEnduranceIntel', () => {
 
     const challenge = screen.getByTestId('chrono-active-challenge');
     expect(challenge).toHaveTextContent('tables.specialAllocation.activeEnduranceChallenge');
-    expect(challenge).toHaveTextContent(ENDURANCE);
+    expect(challenge).toHaveTextContent('0x111111....111111');
     expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
     expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
     expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent(

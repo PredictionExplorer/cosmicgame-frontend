@@ -1,6 +1,7 @@
 import {
   fetchChainSpecialAllocationSnapshot,
   hasApiV2SpecialAllocationData,
+  isHarnessChainSnapshotPreferred,
   keepPreviousSpecialAllocationChainSnapshot,
   normalizeSpecialAllocationSnapshot,
 } from '@/hooks/useSpecialAllocationSnapshot';
@@ -29,6 +30,27 @@ const liveEndurance = '0x3333333333333333333333333333333333333333';
 const storedEndurance = '0x1111111111111111111111111111111111111111';
 const returnedChrono = '0x4444444444444444444444444444444444444444';
 const lastCst = '0x2222222222222222222222222222222222222222';
+
+describe('harness role-source selection', () => {
+  const originalHarness = process.env.NEXT_PUBLIC_HARNESS;
+  const originalNetwork = process.env.NEXT_PUBLIC_NETWORK;
+
+  afterEach(() => {
+    if (originalHarness === undefined) delete process.env.NEXT_PUBLIC_HARNESS;
+    else process.env.NEXT_PUBLIC_HARNESS = originalHarness;
+    if (originalNetwork === undefined) delete process.env.NEXT_PUBLIC_NETWORK;
+    else process.env.NEXT_PUBLIC_NETWORK = originalNetwork;
+  });
+
+  it('uses direct contract state only in the local full-stack harness', () => {
+    process.env.NEXT_PUBLIC_HARNESS = '1';
+    process.env.NEXT_PUBLIC_NETWORK = 'local';
+    expect(isHarnessChainSnapshotPreferred()).toBe(true);
+
+    process.env.NEXT_PUBLIC_NETWORK = 'mainnet';
+    expect(isHarnessChainSnapshotPreferred()).toBe(false);
+  });
+});
 
 function mockPublicClient(returnedChronoDuration: bigint) {
   return {
@@ -179,6 +201,9 @@ describe('fetchChainSpecialAllocationSnapshot', () => {
     expect(snapshot?.data.ChronoWarriorAddress).toBe(returnedChrono);
     expect(snapshot?.data.StoredChronoWarriorDuration).toBe(50);
     expect(snapshot?.data.LastBidderLastBidTime).toBe(800);
+    for (const [request] of client.readContract.mock.calls) {
+      expect(request).toEqual(expect.objectContaining({ blockNumber: 12_345n }));
+    }
   });
 
   it('marks chain chrono live only when the source segment matches the returned duration', async () => {

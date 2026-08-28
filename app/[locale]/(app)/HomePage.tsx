@@ -58,9 +58,10 @@ import {
   useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
 import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
-import { getCycleState } from '@/lib/cycleState';
+import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import { resolveLatestGesture } from '@/lib/latestGesture';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { getStableClientTargetTime, type ServerTimingSample } from '@/utils/time';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
   simulateUxScenarioGesture,
@@ -103,6 +104,14 @@ const DEFAULT_NOTIFY_THRESHOLD_MIN = 5;
 /** Pending optimistic chat rows expire if the indexer never echoes them. */
 const PENDING_MESSAGE_EXPIRY_MS = 90_000;
 
+export function resolveHomeNow(
+  tickingNow: number,
+  timingSample?: Pick<ServerTimingSample, 'sampledAtMs'> | null,
+  initialRenderAtMs = 0,
+): number {
+  return tickingNow || timingSample?.sampledAtMs || initialRenderAtMs;
+}
+
 interface HomePageProps {
   initialDashboardData?: DashboardInfo | null;
   /** Server-picked story artwork so its URL ships in the SSR HTML. */
@@ -111,6 +120,10 @@ interface HomePageProps {
   initialLatestGesture?: GestureInfo | null;
   /** Server-seeded role snapshot; direct-chain fallback still takes over when required. */
   initialSpecialRecipients?: SpecialRecipients | null;
+  /** Server clock + finalization sample keeps ISR and hydration on the same phase. */
+  initialTimingSample?: ServerTimingSample | null;
+  /** Unconditional SSR/hydration clock fallback when timing APIs are unavailable. */
+  initialRenderAtMs?: number;
 }
 
 const HomePage = ({
@@ -118,6 +131,8 @@ const HomePage = ({
   initialBannerToken = null,
   initialLatestGesture = null,
   initialSpecialRecipients = null,
+  initialTimingSample = null,
+  initialRenderAtMs = 0,
 }: HomePageProps) => {
   const t = useTranslations('home');
   const tToast = useTranslations('toasts');
@@ -125,6 +140,12 @@ const HomePage = ({
   const queryClient = useQueryClient();
   const { notify } = useNotify();
   const uxScenario = useUxScenarioSnapshot();
+  const coherentInitialTimingSample =
+    initialTimingSample &&
+    (initialTimingSample.cycleNumber === undefined ||
+      initialTimingSample.cycleNumber === initialDashboardData?.CurRoundNum)
+      ? initialTimingSample
+      : null;
 
   const {
     data: dashboardData,
@@ -132,7 +153,10 @@ const HomePage = ({
     isError: dashboardFailed,
     refetch: refetchDashboard,
   } = useDashboardInfo(initialDashboardData);
-  const { data: currentTimeData, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
+  const { data: currentTimeData, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime(
+    coherentInitialTimingSample?.currentServerTimeSec,
+    coherentInitialTimingSample ? 0 : undefined,
+  );
 
   const round = dashboardData?.CurRoundNum ?? -1;
   const initialGestureList = useMemo(
@@ -156,8 +180,25 @@ const HomePage = ({
 
   // Re-renders every second so countdown comparisons (allocationTime > now,
   // claimWait > now, activationTime check) update without bare Date.now().
-  const now = useNow(1000);
-  const [currentTimeFallbackMs] = useState(() => Date.now());
+  const tickingNow = useNow(1000);
+  // useNow intentionally returns 0 for the hydration snapshot. Reuse the
+  // serialized timing sample for both SSR and the first client render so an
+  // active cycle does not prerender as "opening soon" and then reshape the
+  // control desk after hydration.
+  const now = resolveHomeNow(tickingNow, coherentInitialTimingSample, initialRenderAtMs);
+  const [clientClockAnchorMs, setClientClockAnchorMs] = useState(
+    () => coherentInitialTimingSample?.sampledAtMs || initialRenderAtMs || Date.now(),
+  );
+  useEffect(() => {
+    if (!coherentInitialTimingSample || currentTimeUpdatedAt > 0) return;
+    setClientClockAnchorMs((current) =>
+      current === coherentInitialTimingSample.sampledAtMs ? Date.now() : current,
+    );
+    // Re-anchor once after hydration. Keeping this out of render preserves
+    // byte-identical SSR while avoiding persistent server/browser clock skew
+    // when the immediate timing refetch fails.
+  }, [coherentInitialTimingSample, currentTimeUpdatedAt]);
+  const currentTimeAnchorMs = currentTimeUpdatedAt || clientClockAnchorMs;
   const latestResolution = useMemo(
     () =>
       resolveLatestGesture({
@@ -170,9 +211,8 @@ const HomePage = ({
 
   const offset = useMemo(() => {
     if (currentTimeData == null) return 0;
-    const sampledAtMs = currentTimeUpdatedAt || currentTimeFallbackMs;
-    return currentTimeData * 1000 - sampledAtMs;
-  }, [currentTimeData, currentTimeUpdatedAt, currentTimeFallbackMs]);
+    return currentTimeData * 1000 - currentTimeAnchorMs;
+  }, [currentTimeAnchorMs, currentTimeData]);
 
   const [gesturePulseKey, setGesturePulseKey] = useState(0);
   const imprintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
@@ -204,8 +244,17 @@ const HomePage = ({
   }, [bannerTokenId, bannerCSTInfo, initialBannerToken]);
 
   const gestureForm = useGestureForm();
-  const champions = useChampions(initialSpecialRecipients, latestResolution.evidence);
-  const allocationFinalize = useAllocationFinalize({ data, offset });
+  const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
+  const champions = useChampions(
+    initialSpecialRecipients,
+    latestResolution.evidence,
+    hasCurrentGesture,
+  );
+  const allocationFinalize = useAllocationFinalize({
+    data,
+    offset,
+    initialTimingSample: coherentInitialTimingSample,
+  });
   const ethUsdPrice = useTokenPrice();
 
   // "Notify me before finalization" threshold, persisted per browser. Starts
@@ -275,9 +324,28 @@ const HomePage = ({
     allocationTime,
     timeoutFinalize,
     isClaiming,
-    activationTime,
+    activationTime: chainActivationTime,
     onFinalize,
   } = allocationFinalize;
+  const projectedDashboardActivationTime = useMemo(() => {
+    const rawActivationTime = getDashboardActivationTime(data);
+    if (rawActivationTime == null) return 0;
+    const projectedTargetMs = getStableClientTargetTime({
+      targetServerTimeSec: rawActivationTime,
+      currentServerTimeSec: currentTimeData,
+      currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
+      fallbackNowMs: currentTimeAnchorMs,
+    });
+    return projectedTargetMs > 0 ? projectedTargetMs / 1000 : 0;
+  }, [currentTimeAnchorMs, currentTimeData, currentTimeUpdatedAt, data]);
+  // Keep phase inputs on the same cycle snapshot. Around finalization the
+  // direct chain read can already be on cycle N+1 while the indexed dashboard
+  // still describes cycle N; preferring that read produced an impossible
+  // "opening soon" clock beside the previous cycle's participant/finalize
+  // data. The chain value remains the fallback when an older API omits the
+  // dashboard activation field.
+  const activationTime =
+    projectedDashboardActivationTime > 0 ? projectedDashboardActivationTime : chainActivationTime;
 
   // Final-minute synchronizer: 1s direct-chain reads (racing both RPC nodes,
   // ETL/backend bypassed) that keep the countdown target, last bidder, and
@@ -286,11 +354,19 @@ const HomePage = ({
   const finalizationConfirmed = !endgame.isConfirmationPending;
 
   const withPostTxRefresh = useCallback(
-    (retryMs = 1500, activationMs = 3000) => {
-      void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'refresh live data'));
+    (retryMs = 1500, activationMs = 3000, includeCurrentSpecialRecipients = true) => {
+      if (!includeCurrentSpecialRecipients) {
+        void queryClient.cancelQueries({ queryKey: ['currentSpecialWinners'] });
+        queryClient.setQueryData(['currentSpecialWinners'], null);
+      }
+      void invalidateLiveGameQueries(queryClient, { includeCurrentSpecialRecipients }).catch((e) =>
+        reportError(e, 'refresh live data'),
+      );
       setMessage('');
       setTimeout(() => {
-        void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'retry live data'));
+        void invalidateLiveGameQueries(queryClient, { includeCurrentSpecialRecipients }).catch(
+          (e) => reportError(e, 'retry live data'),
+        );
       }, retryMs);
       setTimeout(() => {
         fetchActivationTime().catch((e) => reportError(e, 'fetchActivationTime'));
@@ -394,7 +470,7 @@ const HomePage = ({
   const handleFinalize = useCallback(async () => {
     if (await onFinalize()) {
       trackFinalizeSubmitted('clock');
-      withPostTxRefresh(1000, 3000);
+      withPostTxRefresh(1000, 3000, false);
     }
   }, [onFinalize, withPostTxRefresh]);
 
@@ -439,7 +515,7 @@ const HomePage = ({
   // A non-zero latest participant means a Gesture exists in this cycle even
   // if activation-time/indexer fields momentarily disagree about the phase.
   // Never let that cross-source race hide Last Gesture.
-  const showLastGesture = !!data && data.LastBidderAddr !== zeroAddress;
+  const showLastGesture = hasCurrentGesture;
   const cycleTimerEnded = cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
   const isFinalWindow =
     cycleState.phase === 'final-hour' ||
@@ -681,6 +757,7 @@ const HomePage = ({
                 data={data}
                 gestures={curGestureList}
                 cstRewardPreview={gestureForm.gestureCstRewardAmount}
+                champions={champions}
                 embedded
               />
             ) : undefined

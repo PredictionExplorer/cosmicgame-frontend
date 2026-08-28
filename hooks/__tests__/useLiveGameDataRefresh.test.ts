@@ -54,6 +54,21 @@ describe('invalidateLiveGameQueries', () => {
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['bidListByRound'] });
   });
+
+  it('can defer the early-cycle special-recipient query', async () => {
+    const queryClient = {
+      invalidateQueries: jest.fn().mockResolvedValue(undefined),
+    };
+
+    await invalidateLiveGameQueries(queryClient as never, {
+      includeCurrentSpecialRecipients: false,
+    });
+
+    expect(queryClient.invalidateQueries).not.toHaveBeenCalledWith({
+      queryKey: ['currentSpecialWinners'],
+    });
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
+  });
 });
 
 describe('EVENT_QUERY_ROUTES', () => {
@@ -81,6 +96,8 @@ describe('EVENT_QUERY_ROUTES', () => {
 
 describe('useLiveGameDataRefresh', () => {
   let invalidateQueries: jest.Mock;
+  let cancelQueries: jest.Mock;
+  let setQueryData: jest.Mock;
   let emitEvents: (events: CosmicChainEvent[]) => void;
   let stopPolling: jest.Mock;
 
@@ -88,8 +105,14 @@ describe('useLiveGameDataRefresh', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     invalidateQueries = jest.fn().mockResolvedValue(undefined);
+    cancelQueries = jest.fn().mockResolvedValue(undefined);
+    setQueryData = jest.fn();
     stopPolling = jest.fn();
-    mockUseQueryClient.mockReturnValue({ invalidateQueries } as never);
+    mockUseQueryClient.mockReturnValue({
+      invalidateQueries,
+      cancelQueries,
+      setQueryData,
+    } as never);
     mockUseContractAddresses.mockReturnValue({ cosmicGame: '0xabc' } as never);
     mockStartPolling.mockImplementation(({ onEvents }) => {
       emitEvents = onEvents;
@@ -140,6 +163,16 @@ describe('useLiveGameDataRefresh', () => {
     expect(onCycleFinalized).toHaveBeenCalledTimes(1);
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['claimHistory'] });
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['roundList'] });
+    expect(invalidateQueries).not.toHaveBeenCalledWith({
+      queryKey: ['currentSpecialWinners'],
+    });
+    expect(cancelQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
+    expect(setQueryData).toHaveBeenCalledWith(['currentSpecialWinners'], null);
+
+    jest.advanceTimersByTime(ETL_ECHO_DELAY_MS);
+    expect(invalidateQueries).not.toHaveBeenCalledWith({
+      queryKey: ['currentSpecialWinners'],
+    });
 
     window.removeEventListener('cosmic:cycle-finalized', onCycleFinalized);
   });

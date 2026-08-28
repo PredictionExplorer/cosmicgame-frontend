@@ -9,6 +9,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { createLogger } from '../log';
 
 import type { GestureKind } from './actions';
+import { HarnessTransitionAbortedError } from './planner';
 import type { DirectorRuntime } from './runtime';
 
 const log = createLogger('control');
@@ -95,6 +96,13 @@ export function startControlServer(runtime: DirectorRuntime, port: number): Serv
           sendJson(response, 200, { ok: true, phase: name });
           return;
         }
+        case '/pace': {
+          const name = asString(body.name);
+          if (!name) throw new Error('Missing pace "name"');
+          await runtime.setPace(name);
+          sendJson(response, 200, { ok: true, pace: name });
+          return;
+        }
         case '/pause':
           runtime.pause();
           sendJson(response, 200, { ok: true });
@@ -107,6 +115,10 @@ export function startControlServer(runtime: DirectorRuntime, port: number): Serv
           sendJson(response, 404, { error: `No route POST ${path}` });
       }
     } catch (err) {
+      if (err instanceof HarnessTransitionAbortedError) {
+        sendJson(response, 200, { ok: false, superseded: true });
+        return;
+      }
       sendJson(response, 400, { error: err instanceof Error ? err.message : String(err) });
     }
   }

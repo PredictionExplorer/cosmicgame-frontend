@@ -164,7 +164,15 @@ export function getLandingCycleTimerSnapshot({
     currentServerTimeUpdatedAtMs: sample.sampledAtMs,
     fallbackNowMs: nowMs,
   });
-  const activationTime = getDashboardActivationTime(sample.dashboard);
+  const rawActivationTime = getDashboardActivationTime(sample.dashboard);
+  const projectedActivationTargetMs = getStableClientTargetTime({
+    targetServerTimeSec: rawActivationTime,
+    currentServerTimeSec: sample.currentServerTimeSec,
+    currentServerTimeUpdatedAtMs: sample.sampledAtMs,
+    fallbackNowMs: nowMs,
+  });
+  const activationTime =
+    projectedActivationTargetMs > 0 ? projectedActivationTargetMs / 1000 : null;
   const state =
     !sample.dashboard || (finalizationTargetMs <= 0 && activationTime == null)
       ? getCycleState({

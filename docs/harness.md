@@ -44,8 +44,10 @@ npm run dev:testing        # boot everything + Next.js, stream logs, Ctrl-C stop
 First boot takes ~30–60 s (deploy, seeding, indexing). You get:
 
 - the app at `http://localhost:3000` in testing mode, with the amber
-  **Harness** panel (bottom-right) for scenario switching, one-shot gestures,
-  finalization, pause/resume, and the burner-wallet persona switcher;
+  **Harness** panel (bottom-right) with separate phase, activity-scenario, and
+  pace selectors plus one-shot gestures, finalization, pause/resume, and the
+  burner-wallet persona switcher. Phase transitions report `Driving…` until
+  the requested on-chain state is actually reached;
 - a burner wallet that auto-connects — no MetaMask needed, personas are
   Hardhat's well-known dev accounts;
 - ~8 backdated historical cycles (galleries, statistics, and history pages
@@ -68,6 +70,7 @@ Driving a running stack:
 ```bash
 npm run harness -- scenario gesture-battle   # switch the long-running behavior
 npm run harness -- phase ready-to-finalize   # one-shot jump, then leave it alone
+npm run harness -- pace fast                 # pace for the next configured cycle/phase
 npm run harness -- gesture --as Lyra --kind cst -m "A small mark on the spiral."
 npm run harness -- finalize
 npm run harness -- pause / resume
@@ -94,10 +97,19 @@ Game durations are reconfigured through owner setters between cycles:
 | `fast`           | 20 s              | 75 s              | Test-shaped; states reachable in seconds. |
 | `realtime`       | 1 h               | 24 h              | Production-shaped timings.                |
 
-**Wall-clock integrity:** the frontend compares on-chain timestamps against
-`Date.now()`, so the harness never leaves the chain clock ahead of the wall
-clock. Live states are reached with shortened durations, not forward time
-warps; countdowns you see are real.
+**Virtual-clock integrity:** history seeding uses absolute Hardhat timestamps
+and is capped at wall time, so seeded history never lands in the future.
+Interactive phase switching is different: if an open cycle has hours left,
+the disposable local chain advances directly to its deadline instead of
+making the developer wait. The frontend projects activation/finalization
+targets through the API's chain-clock sample, so displayed countdowns retain
+the same relative semantics as production even when the local chain has been
+fast-forwarded.
+
+Phase and scenario replacements are cancellable and serialized. Selecting a
+new target supersedes an in-flight target; one-shot gesture, finalization, and
+phase commands stop automatic activity and leave the director in `quiet`, so
+a pinned scenario cannot immediately undo a manual action.
 
 ## Backdated history seeding
 
@@ -167,6 +179,9 @@ dist dir (`.harness/next`), so a regular `npm run dev` can coexist.
   and waits; elsewhere start the daemon manually.
 - **Fresh universe wanted** — `npm run harness -- reset` (wipes the DB volume;
   the chain is in-memory and always fresh per `up`).
+- **A phase says `Driving…`** — the director is settling/configuring the real
+  chain. A normal transition should finish in seconds; a persistent error is
+  retained in the panel instead of being cleared by status polling.
 
 ## Relationship to `NEXT_PUBLIC_UX_SCENARIO`
 

@@ -7,7 +7,9 @@ import {
   getCstInfoSeed,
   getCurrentSpecialRecipientsSeed,
   getDashboardInfoSeed,
+  getHomeTimingSeed,
   getLatestGestureSeed,
+  getServerRenderTimeMs,
 } from '@/services/api/server';
 import { createMetadata } from '@/utils/seo';
 import { formatFixed } from '@/utils/format';
@@ -79,8 +81,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const initialRenderAtMs = getServerRenderTimeMs();
 
-  const initialDashboardData = await getDashboardInfoSeed();
+  const [initialDashboardData, initialTimingSample] = await Promise.all([
+    getDashboardInfoSeed(),
+    getHomeTimingSeed(),
+  ]);
   const [initialBannerToken, initialLatestGesture, initialSpecialRecipients] = await Promise.all([
     pickInitialBannerToken(initialDashboardData),
     initialDashboardData
@@ -127,6 +133,8 @@ export default async function Page({ params }: PageProps) {
         initialBannerToken={initialBannerToken}
         initialLatestGesture={initialLatestGesture}
         initialSpecialRecipients={initialSpecialRecipients}
+        initialTimingSample={initialTimingSample}
+        initialRenderAtMs={initialRenderAtMs}
       />
     </PageMessages>
   );

@@ -170,6 +170,10 @@ export async function seedHistory(world: World, cycles: number): Promise<void> {
       const parkFrom = await readChainNowSeconds(world);
       await writeCycleActivationTime(world, parkFrom + ACTIVATION_PARK_SECONDS);
       await upgradeGameToV2(world.config);
+      // The V2 reinitializer installs its own timing defaults. Re-apply the
+      // seed profile while the next cycle is parked, otherwise cycle 1 can
+      // inherit a multi-day countdown and exhaust the backdated seed budget.
+      await writePaceSetters(world, paceToSetterValues(pace));
       log.info('Game proxy now runs CosmicSignatureGameV2.');
     }
   }

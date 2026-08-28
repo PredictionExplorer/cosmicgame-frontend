@@ -9,8 +9,15 @@ import {
 const STATUS = {
   ready: true,
   scenario: 'ambient',
+  phase: 'live',
   pace: 'demo',
   paused: false,
+  transition: {
+    kind: 'scenario' as const,
+    state: 'running' as const,
+    target: 'ambient',
+    error: null,
+  },
   cycle: {
     index: '4',
     active: true,
@@ -24,6 +31,8 @@ const STATUS = {
   },
   personas: [{ name: 'Nova', address: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8' }],
   scenarios: ['ambient', 'quiet'],
+  phases: ['live', 'final-ten'],
+  paces: ['realtime', 'demo', 'fast'],
 };
 
 function mockFetchOk(): jest.Mock {
@@ -64,7 +73,7 @@ describe('useHarnessControl', () => {
     expect(result.current.error).toBeNull();
     expect(fetchMock).toHaveBeenCalledWith(
       'http://127.0.0.1:8686/status',
-      expect.objectContaining({ method: 'GET' }),
+      expect.objectContaining({ method: 'GET', headers: undefined }),
     );
     unmount();
   });
@@ -76,6 +85,8 @@ describe('useHarnessControl', () => {
 
     await act(async () => {
       await result.current.switchScenario('quiet');
+      await result.current.driveToPhase('final-ten');
+      await result.current.setPace('fast');
       await result.current.makeGesture({ persona: 'Nova', kind: 'eth' });
       await result.current.finalizeCycle();
       await result.current.setPaused(true);
@@ -85,7 +96,9 @@ describe('useHarnessControl', () => {
       .map(([url, init]) => [String(url), (init as RequestInit | undefined)?.method])
       .filter(([, method]) => method === 'POST')
       .map(([url]) => String(url).replace('http://127.0.0.1:8686', ''));
-    expect(posts).toEqual(expect.arrayContaining(['/scenario', '/gesture', '/finalize', '/pause']));
+    expect(posts).toEqual(
+      expect.arrayContaining(['/scenario', '/phase', '/pace', '/gesture', '/finalize', '/pause']),
+    );
     unmount();
   });
 
@@ -99,6 +112,36 @@ describe('useHarnessControl', () => {
     const { result, unmount } = renderHook(() => useHarnessControl());
     await waitFor(() => expect(result.current.error).toBe('director offline'));
     expect(result.current.status).toBeNull();
+    unmount();
+  });
+
+  it('keeps a command error visible after a successful status refresh', async () => {
+    global.fetch = jest.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith('/status')) {
+        return { ok: true, json: async () => STATUS } as Response;
+      }
+      if (init?.method === 'POST') {
+        return {
+          ok: false,
+          status: 400,
+          json: async () => ({ error: 'phase unavailable' }),
+        } as Response;
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    }) as unknown as typeof fetch;
+
+    const { result, unmount } = renderHook(() => useHarnessControl());
+    await waitFor(() => expect(result.current.status).not.toBeNull());
+
+    await act(async () => {
+      await expect(result.current.driveToPhase('final-ten')).rejects.toThrow('phase unavailable');
+    });
+
+    expect(result.current.commandError).toBe('phase unavailable');
+    expect(result.current.error).toBe('phase unavailable');
+    act(() => result.current.clearCommandError());
+    expect(result.current.commandError).toBeNull();
     unmount();
   });
 });

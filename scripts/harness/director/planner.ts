@@ -1,7 +1,7 @@
 /**
  * Jump-to-state planner. Reshapes the game so the UI lands in a requested
- * cycle phase (the phase names mirror lib/cycleState.ts) without ever moving
- * the chain clock ahead of the wall clock:
+ * cycle phase (the phase names mirror lib/cycleState.ts) with controlled
+ * virtual-clock advancement:
  *
  *   1. settle the current cycle (finalize it, waiting out any remaining
  *      countdown — minutes at worst under demo/fast pacing),
@@ -13,7 +13,7 @@
 import { createLogger } from '../log';
 
 import {
-  readSecondsUntilFinalization,
+  readFinalizeExclusivitySeconds,
   writeCycleActivationTime,
   writePaceSetters,
 } from './abiCalls';
@@ -21,7 +21,7 @@ import { performEthGesture, performFinalizeCycle } from './actions';
 import { readCycleSnapshot } from './gameState';
 import { paceToSetterValues, type Pace } from './pace';
 import { pickOne } from './personas';
-import { readChainNowSeconds } from './time';
+import { advanceChainTime, advanceChainTimeTo, readChainNowSeconds } from './time';
 import type { World } from './world';
 
 const log = createLogger('planner');
@@ -68,8 +68,6 @@ const PHASE_COUNTDOWN_SECONDS: Partial<Record<TargetPhase, number>> = {
   'exclusivity-expired': 8,
 };
 
-const sleep = (ms: number) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
-
 /**
  * "Parked" activation offset while the game is being reconfigured: far
  * enough that nothing activates mid-configuration, near enough that backend
@@ -78,28 +76,45 @@ const sleep = (ms: number) => new Promise((resolveSleep) => setTimeout(resolveSl
  */
 export const ACTIVATION_PARK_SECONDS = 86_400n;
 
-async function waitWallClock(world: World, condition: () => Promise<boolean>): Promise<void> {
-  while (!(await condition())) {
-    await sleep(1_500);
+export class HarnessTransitionAbortedError extends Error {
+  constructor() {
+    super('Harness state transition was superseded');
+    this.name = 'HarnessTransitionAbortedError';
   }
 }
 
+function throwIfAborted(signal?: AbortSignal): void {
+  if (signal?.aborted) throw new HarnessTransitionAbortedError();
+}
+
+export interface DriveOptions {
+  signal?: AbortSignal;
+}
+
 /**
- * Bring the game to a configurable (inactive, unopened) state. Waits out any
- * live countdown in real time — the wall-clock-integrity tradeoff, kept short
- * by demo/fast pacing — and finalizes if needed.
+ * Bring the game to a configurable (inactive, unopened) state.
+ *
+ * This is a disposable Hardhat universe, so an interactive mode switch moves
+ * its virtual clock directly to an open cycle's deadline instead of making a
+ * developer wait hours. Frontend targets are projected against the API's
+ * chain clock, preserving the production UI's relative timing semantics.
  */
-export async function settleIntoConfigurableState(world: World): Promise<void> {
+export async function settleIntoConfigurableState(
+  world: World,
+  { signal }: DriveOptions = {},
+): Promise<void> {
+  throwIfAborted(signal);
   const snapshot = await readCycleSnapshot(world);
+  throwIfAborted(signal);
   if (snapshot.cycleOpened) {
     if (snapshot.secondsUntilFinalization > 0n) {
-      log.info(
-        `Waiting ${snapshot.secondsUntilFinalization}s for the live cycle to become finalizable…`,
-      );
-      await waitWallClock(world, async () => (await readSecondsUntilFinalization(world)) === 0n);
+      log.info(`Advancing virtual clock ${snapshot.secondsUntilFinalization}s to finalize cycle…`);
+      await advanceChainTimeTo(world, snapshot.finalizationTime, { allowFuture: true });
     }
+    throwIfAborted(signal);
     await performFinalizeCycle(world);
   }
+  throwIfAborted(signal);
   // Park activation; legal while no gesture has been made this cycle.
   const chainNow = await readChainNowSeconds(world);
   await writeCycleActivationTime(world, chainNow + ACTIVATION_PARK_SECONDS);
@@ -115,42 +130,92 @@ export async function driveToPhase(
   world: World,
   target: TargetPhase,
   pace: Pace,
+  { signal }: DriveOptions = {},
 ): Promise<DriveResult> {
   log.info(`Driving game state to "${target}" (${pace.name} pace)`);
-  await settleIntoConfigurableState(world);
+  throwIfAborted(signal);
+
+  // Moving from the zero-cross to post-exclusivity does not require a new
+  // cycle. Preserve the current package and advance only the missing window.
+  if (target === 'exclusivity-expired') {
+    const current = await readCycleSnapshot(world);
+    if (current.cycleOpened) {
+      if (current.secondsUntilFinalization > 0n) {
+        await advanceChainTimeTo(world, current.finalizationTime, { allowFuture: true });
+      }
+      throwIfAborted(signal);
+      const exclusivitySeconds = await readFinalizeExclusivitySeconds(world);
+      await advanceChainTimeTo(world, current.finalizationTime + exclusivitySeconds + 1n, {
+        allowFuture: true,
+      });
+      throwIfAborted(signal);
+      if (!(await phaseStillHolds(world, target))) {
+        throw new Error(`Phase "${target}" did not hold after advancing exclusivity`);
+      }
+      return { phase: target, cycleIndex: current.cycleIndex };
+    }
+  }
+
+  await settleIntoConfigurableState(world, { signal });
 
   const shaped: Pace = { ...pace };
   const countdown = PHASE_COUNTDOWN_SECONDS[target];
   if (countdown !== undefined) shaped.initialCountdownSeconds = countdown;
   if (target === 'exclusivity-expired') shaped.finalizeExclusivitySeconds = 10;
+  throwIfAborted(signal);
   await writePaceSetters(world, paceToSetterValues(shaped));
 
+  throwIfAborted(signal);
   const chainNow = await readChainNowSeconds(world);
   if (target === 'opening-soon') {
     await writeCycleActivationTime(world, chainNow + 10n * 60n);
+    throwIfAborted(signal);
     const snapshot = await readCycleSnapshot(world);
+    if (!(await phaseStillHolds(world, target))) {
+      throw new Error(
+        `Transition reached cycle ${snapshot.cycleIndex}, but phase "${target}" did not hold`,
+      );
+    }
+    throwIfAborted(signal);
     return { phase: target, cycleIndex: snapshot.cycleIndex };
   }
 
-  await writeCycleActivationTime(world, chainNow + 2n);
-  await waitWallClock(world, async () => (await readCycleSnapshot(world)).cycleActive);
+  const activationTime = chainNow + 2n;
+  await writeCycleActivationTime(world, activationTime);
+  await advanceChainTimeTo(world, activationTime, { allowFuture: true });
+  throwIfAborted(signal);
 
   if (target === 'waiting-first-gesture') {
     const snapshot = await readCycleSnapshot(world);
+    if (!(await phaseStillHolds(world, target))) {
+      throw new Error(
+        `Transition reached cycle ${snapshot.cycleIndex}, but phase "${target}" did not hold`,
+      );
+    }
+    throwIfAborted(signal);
     return { phase: target, cycleIndex: snapshot.cycleIndex };
   }
 
   await performEthGesture(world, pickOne(world.rng, [...world.personas]));
+  throwIfAborted(signal);
 
   if (target === 'ready-to-finalize' || target === 'exclusivity-expired') {
-    await waitWallClock(world, async () => (await readSecondsUntilFinalization(world)) === 0n);
+    const opened = await readCycleSnapshot(world);
+    await advanceChainTimeTo(world, opened.finalizationTime, { allowFuture: true });
     if (target === 'exclusivity-expired') {
-      log.info('Countdown expired; waiting out the finalize-exclusivity window…');
-      await sleep(12_000);
+      log.info('Countdown expired; advancing beyond the finalize-exclusivity window…');
+      const exclusivitySeconds = await readFinalizeExclusivitySeconds(world);
+      await advanceChainTime(world, exclusivitySeconds + 1n, { allowFuture: true });
     }
   }
 
+  throwIfAborted(signal);
   const snapshot = await readCycleSnapshot(world);
+  if (!(await phaseStillHolds(world, target))) {
+    throw new Error(
+      `Transition reached cycle ${snapshot.cycleIndex}, but phase "${target}" did not hold`,
+    );
+  }
   log.info(`Reached "${target}" in cycle ${snapshot.cycleIndex}`);
   return { phase: target, cycleIndex: snapshot.cycleIndex };
 }
@@ -174,9 +239,16 @@ export async function phaseStillHolds(world: World, target: TargetPhase): Promis
       return snapshot.cycleOpened && remaining > 60 && remaining <= 10 * 60;
     case 'final-minute':
       return snapshot.cycleOpened && remaining > 0 && remaining <= 60;
-    case 'ready-to-finalize':
-    case 'exclusivity-expired':
-      return snapshot.cycleOpened && remaining === 0;
+    case 'ready-to-finalize': {
+      if (!snapshot.cycleOpened || remaining !== 0) return false;
+      const exclusivitySeconds = await readFinalizeExclusivitySeconds(world);
+      return snapshot.chainNowSeconds < snapshot.finalizationTime + exclusivitySeconds;
+    }
+    case 'exclusivity-expired': {
+      if (!snapshot.cycleOpened || remaining !== 0) return false;
+      const exclusivitySeconds = await readFinalizeExclusivitySeconds(world);
+      return snapshot.chainNowSeconds >= snapshot.finalizationTime + exclusivitySeconds;
+    }
     default: {
       const _exhaustive: never = target;
       return _exhaustive;

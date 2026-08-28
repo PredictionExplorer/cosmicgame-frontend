@@ -138,7 +138,11 @@ export function useEndgameChainSync({
         } else if (sample.roundNum > baselineRoundRef.current) {
           // Main prize claimed: the contract moved to the next round.
           setIsClaimedOnChain(true);
-          void invalidateLiveGameQueries(queryClient);
+          void queryClient.cancelQueries({ queryKey: ['currentSpecialWinners'] });
+          queryClient.setQueryData(['currentSpecialWinners'], null);
+          void invalidateLiveGameQueries(queryClient, {
+            includeCurrentSpecialRecipients: false,
+          });
           void queryClient.invalidateQueries({ queryKey: ['claimHistory'] });
           void queryClient.invalidateQueries({ queryKey: ['roundList'] });
           return;
