@@ -114,7 +114,7 @@ function GestureMetricCard({
   return (
     <div
       className={cn(
-        'group relative flex h-full flex-col overflow-hidden rounded-xl border p-3 backdrop-blur-sm transition-all duration-300',
+        '@container group relative flex h-full flex-col overflow-hidden rounded-xl border p-3 backdrop-blur-sm transition-all duration-300',
         'hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.055]',
         'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent',
         'after:pointer-events-none after:absolute after:-right-10 after:-top-12 after:h-28 after:w-28 after:rounded-full after:opacity-0 after:blur-2xl after:transition-opacity after:duration-300 after:content-[""] group-hover:after:opacity-100',
@@ -140,7 +140,13 @@ function GestureMetricCard({
       </div>
       <div
         className={cn(
-          'relative z-[1] mt-2 text-xl font-bold tracking-tight tabular-nums',
+          // One line, always: the live CST price ticks every 500 ms and a
+          // wrapping value made the three cards (equal height) jump 28px
+          // each time the formatter dropped a trailing zero. The size follows
+          // the card's own width (14cqw ≈ the widest live value, "229.6483
+          // CST", edge to edge), clamped 14–18px, so it fits at every deck
+          // width without wrapping or clipping.
+          'relative z-[1] mt-2 whitespace-nowrap text-[clamp(0.875rem,14cqw,1.125rem)] font-bold tracking-tight tabular-nums',
           palette.value,
         )}
       >
