@@ -71,6 +71,7 @@ const baseProps = {
   signatureEth: 2.75,
   attachedNftCount: 2,
   attachedErc20Count: 1,
+  showLastGesture: true,
 };
 
 describe('LatestParticipantIntel', () => {
@@ -79,6 +80,11 @@ describe('LatestParticipantIntel', () => {
 
     const intel = screen.getByTestId('latest-participant-intel');
     expect(within(intel).getByText(ADDRESS)).toHaveAttribute('href', `/user/${ADDRESS}`);
+    expect(
+      within(screen.getByTestId('latest-participant-gesture-details')).getByRole('link', {
+        name: ADDRESS,
+      }),
+    ).toHaveAttribute('href', `/user/${ADDRESS}`);
     expect(
       within(intel).getByRole('link', { name: /home\.observatory\.intel\.viewGesture/ }),
     ).toHaveAttribute('href', '/gesture/77');
@@ -147,19 +153,71 @@ describe('LatestParticipantIntel', () => {
     expect(screen.getByText(ADDRESS)).toBeInTheDocument();
   });
 
-  it('does not attach stale gesture details to a different latest participant', () => {
+  it('never hides an indexed Last Gesture because role sources temporarily disagree', () => {
+    const other = '0x9999999999999999999999999999999999999999';
     render(
       <LatestParticipantIntel
         {...baseProps}
         latestGesture={{
           ...latestGesture,
-          BidderAddr: '0x9999999999999999999999999999999999999999',
+          BidderAddr: other,
         }}
       />,
     );
 
-    expect(screen.queryByTestId('latest-participant-gesture-details')).not.toBeInTheDocument();
+    expect(screen.getByTestId('latest-participant-gesture-details')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('latest-participant-gesture-details')).getByRole('link', {
+        name: other,
+      }),
+    ).toHaveAttribute('href', `/user/${other}`);
     expect(screen.getByTestId('latest-participant-allocation-package')).toBeInTheDocument();
+  });
+
+  it.each([ADDRESS, '0x9999999999999999999999999999999999999999', null])(
+    'shows identical Last Gesture metrics for wallet state %s',
+    (account) => {
+      render(<LatestParticipantIntel {...baseProps} account={account} />);
+      expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent(
+        '0.0500000 ETH',
+      );
+      expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('123.45 CST');
+    },
+  );
+
+  it('keeps the Last Gesture panel mounted while matching transaction details sync', () => {
+    render(
+      <LatestParticipantIntel
+        {...baseProps}
+        latestGesture={null}
+        latestMessage="stale message"
+        gestureDetailsPending
+      />,
+    );
+
+    expect(screen.getByTestId('latest-participant-gesture-details')).toBeInTheDocument();
+    expect(screen.getByTestId('latest-participant-gesture-syncing')).toHaveTextContent(
+      'tables.specialAllocation.gestureDetailsSyncing',
+    );
+    expect(screen.queryByTestId('latest-participant-message')).not.toBeInTheDocument();
+  });
+
+  it('omits Last Gesture only when the active-cycle visibility contract is false', () => {
+    render(<LatestParticipantIntel {...baseProps} showLastGesture={false} />);
+    expect(screen.queryByTestId('latest-participant-gesture-details')).not.toBeInTheDocument();
+  });
+
+  it('binds the message to the displayed gesture instead of a stale external prop', () => {
+    render(
+      <LatestParticipantIntel
+        {...baseProps}
+        latestMessage="stale message"
+        latestGesture={{ ...latestGesture, Message: 'fresh message' }}
+      />,
+    );
+
+    expect(screen.getByTestId('latest-participant-message')).toHaveTextContent('fresh message');
+    expect(screen.queryByText('stale message')).not.toBeInTheDocument();
   });
 
   it('shows a stable empty state before the first gesture', () => {

@@ -59,6 +59,7 @@ import {
 } from '@/hooks/useApiQuery';
 import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { getCycleState } from '@/lib/cycleState';
+import { resolveLatestGesture } from '@/lib/latestGesture';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
@@ -157,6 +158,15 @@ const HomePage = ({
   // claimWait > now, activationTime check) update without bare Date.now().
   const now = useNow(1000);
   const [currentTimeFallbackMs] = useState(() => Date.now());
+  const latestResolution = useMemo(
+    () =>
+      resolveLatestGesture({
+        dashboardLastAddress: data?.LastBidderAddr,
+        gestures: curGestureList,
+      }),
+    [curGestureList, data?.LastBidderAddr],
+  );
+  const latestGesture = latestResolution.gesture;
 
   const offset = useMemo(() => {
     if (currentTimeData == null) return 0;
@@ -194,7 +204,7 @@ const HomePage = ({
   }, [bannerTokenId, bannerCSTInfo, initialBannerToken]);
 
   const gestureForm = useGestureForm();
-  const champions = useChampions(initialSpecialRecipients);
+  const champions = useChampions(initialSpecialRecipients, latestResolution.evidence);
   const allocationFinalize = useAllocationFinalize({ data, offset });
   const ethUsdPrice = useTokenPrice();
 
@@ -426,6 +436,10 @@ const HomePage = ({
   const claimWait = allocationTime + timeoutFinalize * 1000;
   const isRoundActive =
     cycleState.isGestureOpen || cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
+  // A non-zero latest participant means a Gesture exists in this cycle even
+  // if activation-time/indexer fields momentarily disagree about the phase.
+  // Never let that cross-source race hide Last Gesture.
+  const showLastGesture = !!data && data.LastBidderAddr !== zeroAddress;
   const cycleTimerEnded = cycleState.isReadyToFinalize || cycleState.isConfirmingFinalization;
   const isFinalWindow =
     cycleState.phase === 'final-hour' ||
@@ -530,21 +544,7 @@ const HomePage = ({
     setGestureSheetOpen(true);
   }, []);
 
-  // Relative age of the newest gesture — the observer's "is this alive" pulse.
-  // The endpoint is requested in descending order, but choosing by timestamp
-  // makes the control desk resilient to stale/misordered indexer or test
-  // payloads rather than attaching transaction details to the wrong role.
-  const latestGesture = useMemo(
-    () =>
-      curGestureList.reduce<(typeof curGestureList)[number] | null>((latest, gesture) => {
-        if (!latest) return gesture;
-        const gestureTs = Number(gesture.TimeStamp) || 0;
-        const latestTs = Number(latest.TimeStamp) || 0;
-        if (gestureTs !== latestTs) return gestureTs > latestTs ? gesture : latest;
-        return (gesture.EvtLogId ?? 0) > (latest.EvtLogId ?? 0) ? gesture : latest;
-      }, null),
-    [curGestureList],
-  );
+  // Relative age of the dashboard/list-reconciled latest gesture.
   const lastGestureAge = useMemo(() => {
     const timestamp = Number(latestGesture?.TimeStamp);
     if (!Number.isFinite(timestamp) || timestamp <= 0) return null;
@@ -642,6 +642,8 @@ const HomePage = ({
               signatureEth={trackAmounts.signatureEth}
               attachedNftCount={donatedNFTs.length}
               attachedErc20Count={donatedERC20Tokens.length}
+              showLastGesture={showLastGesture}
+              gestureDetailsPending={latestResolution.isSyncing}
             />
           }
           chronoEndurance={

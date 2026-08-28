@@ -3,10 +3,12 @@
 import { MessageSquare } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds } from '@/utils';
+import { formatSeconds, shortenHex } from '@/utils';
 
 import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import type { ChampionsState } from '@/hooks/useChampions';
+import { Link } from '@/i18n/navigation';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api/types';
 import {
@@ -34,6 +36,10 @@ export interface LatestParticipantDetailsProps {
   latestGesture?: GestureInfo | null;
   latestAddress: string | null;
   message?: string | null;
+  /** Explicit active-cycle visibility; defaults to whether a gesture record exists. */
+  showLastGesture?: boolean;
+  /** Identity is known but the matching transaction row has not indexed yet. */
+  gestureDetailsPending?: boolean;
   allocationPackage?: LatestParticipantAllocationPackage;
   compact?: boolean;
 }
@@ -113,7 +119,12 @@ function LatestGestureDetails({
   latestGesture,
   latestAddress,
   compact,
-}: Pick<LatestParticipantDetailsProps, 'latestGesture' | 'latestAddress' | 'compact'>) {
+  showLastGesture,
+  gestureDetailsPending,
+}: Pick<
+  LatestParticipantDetailsProps,
+  'latestGesture' | 'latestAddress' | 'compact' | 'showLastGesture' | 'gestureDetailsPending'
+>) {
   const t = useTranslations('tables');
   const locale = useLocale();
   const hasGestureTime =
@@ -124,13 +135,17 @@ function LatestGestureDetails({
       : 0;
   const gestureTime = useHydrationSafeDateTime(gestureTimestamp, true, locale);
 
-  if (!latestGesture || !sameAddress(latestGesture.BidderAddr, latestAddress)) return null;
+  const shouldShow = showLastGesture ?? !!latestGesture;
+  if (!shouldShow) return null;
 
-  const randomWalkStatus = hasRandomWalkToken(latestGesture)
-    ? t('specialAllocation.yesToken', { id: String(latestGesture.RWalkNFTId) })
-    : resolveGestureType(latestGesture) === 1
-      ? t('status.yes')
-      : t('status.no');
+  const randomWalkStatus = latestGesture
+    ? hasRandomWalkToken(latestGesture)
+      ? t('specialAllocation.yesToken', { id: String(latestGesture.RWalkNFTId) })
+      : resolveGestureType(latestGesture) === 1
+        ? t('status.yes')
+        : t('status.no')
+    : t('status.unavailable');
+  const gestureAddress = latestGesture?.BidderAddr ?? latestAddress;
 
   return (
     <div
@@ -145,69 +160,98 @@ function LatestGestureDetails({
         <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-300">
           {t('specialAllocation.lastGesture')}
         </p>
-      </div>
-      <div
-        className={cn('grid gap-1.5', compact ? 'grid-cols-2 xl:grid-cols-3' : 'sm:grid-cols-2')}
-      >
-        <DetailMetric
-          testId="latest-participant-paid-amount"
-          label={t('specialAllocation.amountPaid')}
-          value={formatGesturePayment(latestGesture, t('status.unavailable'))}
-          tone="emerald"
-          compact={compact}
-        />
-        <DetailMetric
-          label={t('specialAllocation.method')}
-          value={formatGestureMethod(latestGesture, t('status.unknown'))}
-          compact={compact}
-        />
-        <DetailMetric
-          testId="latest-participant-cst-received"
-          label={t('specialAllocation.cstReceived')}
-          value={formatReceivedCstAmount(
-            getParticipationCST(latestGesture),
-            t('status.unavailable'),
-          )}
-          tone="emerald"
-          compact={compact}
-        />
-        <DetailMetric
-          testId="latest-participant-random-walk"
-          label={t('specialAllocation.randomWalk')}
-          value={randomWalkStatus}
-          compact={compact}
-        />
-        <DetailMetric
-          label={t('specialAllocation.gestureTime')}
-          value={hasGestureTime ? gestureTime : t('status.unavailable')}
-          compact={compact}
-        />
-        <DetailMetric
-          testId="latest-participant-gesture-id"
-          label={t('specialAllocation.gesturePosition')}
-          value={
-            typeof latestGesture.BidPosition === 'number'
-              ? `#${latestGesture.BidPosition}`
-              : t('status.unavailable')
-          }
-          compact={compact}
-        />
-        {getAttachedAssetLabels(latestGesture).length > 0 && (
-          <DetailMetric
-            testId="latest-participant-attached-assets"
-            label={t('specialAllocation.attachedAssets')}
-            value={formatAttachedAssets(latestGesture, t('status.none'))}
-            compact={compact}
-            className={compact ? 'col-span-2 xl:col-span-3' : undefined}
-          />
+        {latestGesture && gestureAddress && (
+          <span className="ml-auto flex min-w-0 items-center gap-1 text-[9px] text-muted-foreground">
+            <span>{t('specialAllocation.gestureBy')}</span>
+            <Link
+              href={`/user/${gestureAddress}`}
+              aria-label={gestureAddress}
+              className={cn(
+                'shrink-0 font-mono text-foreground transition-colors hover:text-primary',
+                TOUCH_TARGET_TEXT_LINK_CLASS,
+              )}
+              title={gestureAddress}
+            >
+              {shortenHex(gestureAddress, 4)}
+            </Link>
+          </span>
         )}
       </div>
+      {!latestGesture ? (
+        <div
+          data-testid="latest-participant-gesture-syncing"
+          role="status"
+          className="flex min-h-20 items-center rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2 text-xs leading-relaxed text-muted-foreground"
+        >
+          {gestureDetailsPending
+            ? t('specialAllocation.gestureDetailsSyncing')
+            : t('specialAllocation.gestureDetailsUnavailable')}
+        </div>
+      ) : (
+        <>
+          <div
+            className={cn(
+              'grid gap-1.5',
+              compact ? 'grid-cols-2 xl:grid-cols-3' : 'sm:grid-cols-2',
+            )}
+          >
+            <DetailMetric
+              testId="latest-participant-paid-amount"
+              label={t('specialAllocation.amountPaid')}
+              value={formatGesturePayment(latestGesture, t('status.unavailable'))}
+              tone="emerald"
+              compact={compact}
+            />
+            <DetailMetric
+              label={t('specialAllocation.method')}
+              value={formatGestureMethod(latestGesture, t('status.unknown'))}
+              compact={compact}
+            />
+            <DetailMetric
+              testId="latest-participant-cst-received"
+              label={t('specialAllocation.cstReceived')}
+              value={formatReceivedCstAmount(
+                getParticipationCST(latestGesture),
+                t('status.unavailable'),
+              )}
+              tone="emerald"
+              compact={compact}
+            />
+            <DetailMetric
+              testId="latest-participant-random-walk"
+              label={t('specialAllocation.randomWalk')}
+              value={randomWalkStatus}
+              compact={compact}
+            />
+            <DetailMetric
+              label={t('specialAllocation.gestureTime')}
+              value={hasGestureTime ? gestureTime : t('status.unavailable')}
+              compact={compact}
+            />
+            <DetailMetric
+              testId="latest-participant-gesture-id"
+              label={t('specialAllocation.gesturePosition')}
+              value={
+                typeof latestGesture.BidPosition === 'number'
+                  ? `#${latestGesture.BidPosition}`
+                  : t('status.unavailable')
+              }
+              compact={compact}
+            />
+            {getAttachedAssetLabels(latestGesture).length > 0 && (
+              <DetailMetric
+                testId="latest-participant-attached-assets"
+                label={t('specialAllocation.attachedAssets')}
+                value={formatAttachedAssets(latestGesture, t('status.none'))}
+                compact={compact}
+                className={compact ? 'col-span-2 xl:col-span-3' : undefined}
+              />
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
-}
-
-function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
-  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
 }
 
 /**
@@ -223,13 +267,20 @@ export function LatestParticipantDetails({
   latestGesture = null,
   latestAddress,
   message = null,
+  showLastGesture,
+  gestureDetailsPending = false,
   allocationPackage,
   compact = false,
 }: LatestParticipantDetailsProps) {
-  const cleanMessage = message?.trim() ?? '';
+  // Never show a detached message while its transaction row is absent. Once
+  // the row exists, the wire value wins and the legacy prop is only a same-row
+  // compatibility fallback.
+  const cleanMessage = latestGesture
+    ? (latestGesture.Message?.trim() ?? '') || (message?.trim() ?? '')
+    : '';
 
   return (
-    <div className={cn('grid', compact ? 'gap-2' : undefined)}>
+    <div className={cn('grid min-w-0 grid-cols-1', compact ? 'gap-2' : undefined)}>
       <LatestGestureProgress
         latest={latest}
         hasEnduranceRecord={hasEnduranceRecord}
@@ -239,6 +290,8 @@ export function LatestParticipantDetails({
         latestGesture={latestGesture}
         latestAddress={latestAddress}
         compact={compact}
+        showLastGesture={showLastGesture}
+        gestureDetailsPending={gestureDetailsPending}
       />
       {allocationPackage && (
         <div

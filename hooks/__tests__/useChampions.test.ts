@@ -83,6 +83,61 @@ describe('deriveChampionsState', () => {
     expect(lockedState.endurance.duration).toBe(200);
   });
 
+  it('reconciles a stale special-recipient snapshot with fresher latest evidence', () => {
+    const freshAddress = '0x3333333333333333333333333333333333333333';
+    const state = deriveChampionsState({
+      data: {
+        ...baseSnapshot,
+        LastBidderAddress: '0x4444444444444444444444444444444444444444',
+        LastBidderLastBidTime: 900,
+      },
+      latestParticipantEvidence: {
+        address: freshAddress,
+        timestamp: 1_040,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(state.latestGesture.address).toBe(freshAddress);
+    expect(state.latestGesture.holdDuration).toBe(60);
+    expect(state.latestGesture.secondsUntilEnduranceChampion).toBe(41);
+    expect(state.latestGesture.progressToEnduranceChampion).toBeCloseTo(59.4, 1);
+  });
+
+  it('keeps known identity with a zero hold while transaction timing is indexing', () => {
+    const freshAddress = '0x3333333333333333333333333333333333333333';
+    const state = deriveChampionsState({
+      data: baseSnapshot,
+      latestParticipantEvidence: {
+        address: freshAddress,
+        timestamp: null,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(state.latestGesture.address).toBe(freshAddress);
+    expect(state.latestGesture.latestGestureTime).toBeNull();
+    expect(state.latestGesture.holdDuration).toBe(0);
+    expect(state.latestGesture.progressToEnduranceChampion).toBe(0);
+  });
+
+  it('uses fresh evidence when determining a new live Endurance Champion', () => {
+    const freshAddress = '0x3333333333333333333333333333333333333333';
+    const state = deriveChampionsState({
+      data: baseSnapshot,
+      latestParticipantEvidence: {
+        address: freshAddress,
+        timestamp: 998,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(state.endurance.address).toBe(freshAddress);
+    expect(state.endurance.duration).toBe(102);
+    expect(state.endurance.isLive).toBe(true);
+    expect(state.latestGesture.isExtendingEnduranceRecord).toBe(true);
+  });
+
   it('computes latest participant progress toward the endurance record', () => {
     const state = deriveChampionsState({
       data: {
@@ -481,6 +536,19 @@ describe('useChampions', () => {
     renderHook(() => useChampions(baseSnapshot));
 
     expect(mockUseSpecialAllocationSnapshot).toHaveBeenCalledWith(baseSnapshot);
+  });
+
+  it('forwards latest evidence into the shared derivation', () => {
+    mockChampionQuery(snapshot(baseSnapshot));
+    const evidence = {
+      address: '0x3333333333333333333333333333333333333333',
+      timestamp: 1_040,
+    };
+
+    const { result } = renderHook(() => useChampions(baseSnapshot, evidence));
+
+    expect(result.current.latestGesture.address).toBe(evidence.address);
+    expect(result.current.latestGesture.holdDuration).toBe(60);
   });
 
   it('passes loading state through when data is unavailable', () => {

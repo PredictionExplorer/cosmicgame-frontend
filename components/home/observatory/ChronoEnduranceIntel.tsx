@@ -9,6 +9,7 @@ import { ChronoWarriorDetails } from '@/components/special-allocation/ChronoWarr
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import type { ChampionsState } from '@/hooks/useChampions';
 import { Link } from '@/i18n/navigation';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 
 export interface ChronoEnduranceIntelProps {
@@ -70,7 +71,10 @@ function RoleSummary({
               href={`/user/${address}`}
               title={address}
               aria-label={address}
-              className="min-w-0 break-all font-mono text-[11px] text-foreground transition-colors hover:text-primary"
+              className={cn(
+                'min-w-0 break-all font-mono text-[11px] text-foreground transition-colors hover:text-primary',
+                TOUCH_TARGET_TEXT_LINK_CLASS,
+              )}
             >
               {shortenHex(address, 6)}
             </Link>

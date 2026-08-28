@@ -7,7 +7,10 @@ import {
   type SpecialAllocationSnapshot,
 } from '@/hooks/useSpecialAllocationSnapshot';
 import { useNow } from '@/hooks/useNow';
+import type { LatestParticipantEvidence } from '@/lib/latestGesture';
 import type { SpecialRecipients } from '@/services/api/types';
+
+export type { LatestParticipantEvidence } from '@/lib/latestGesture';
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -64,6 +67,7 @@ interface DeriveChampionsStateArgs {
   data: SpecialAllocationSnapshot | SpecialRecipients | null | undefined;
   isLoading?: boolean;
   nowMs: number;
+  latestParticipantEvidence?: LatestParticipantEvidence;
 }
 
 function cleanAddress(address: string | null | undefined): string | null {
@@ -127,13 +131,18 @@ export function deriveChampionsState({
   data,
   isLoading = false,
   nowMs,
+  latestParticipantEvidence,
 }: DeriveChampionsStateArgs): ChampionsState {
   const nowSec = Math.floor(nowMs / 1000);
   const enduranceAddress = cleanAddress(data?.EnduranceChampionAddress);
   const chronoAddress = cleanAddress(data?.ChronoWarriorAddress);
-  const latestGestureAddress = cleanAddress(data?.LastBidderAddress);
+  const latestGestureAddress = latestParticipantEvidence
+    ? cleanAddress(latestParticipantEvidence.address)
+    : cleanAddress(data?.LastBidderAddress);
   const lastCstAddress = cleanAddress(data?.LastCstBidderAddress);
-  const latestGestureTime = nonNegativeSeconds(data?.LastBidderLastBidTime);
+  const latestGestureTime = latestParticipantEvidence
+    ? nonNegativeSeconds(latestParticipantEvidence.timestamp)
+    : nonNegativeSeconds(data?.LastBidderLastBidTime);
 
   const enduranceLockedDuration = nonNegativeSeconds(data?.EnduranceChampionDuration);
   const chronoLockedDuration = nonNegativeSeconds(data?.ChronoWarriorDuration);
@@ -222,7 +231,7 @@ export function deriveChampionsState({
 
   return {
     isLoading,
-    hasData: !!data,
+    hasData: !!data || !!latestGestureAddress,
     endurance: {
       address: effectiveEnduranceAddress,
       duration: enduranceDuration,
@@ -270,7 +279,10 @@ export function deriveChampionsState({
 }
 
 /** Reads the current special-recipient snapshot and adds precise live timer semantics for UI. */
-export function useChampions(initialData?: SpecialRecipients | null): ChampionsState {
+export function useChampions(
+  initialData?: SpecialRecipients | null,
+  latestParticipantEvidence?: LatestParticipantEvidence,
+): ChampionsState {
   const { snapshot, isLoading } = useSpecialAllocationSnapshot(initialData);
   const nowMs = useNow(1000);
 
@@ -280,7 +292,8 @@ export function useChampions(initialData?: SpecialRecipients | null): ChampionsS
         data: snapshot,
         isLoading,
         nowMs,
+        latestParticipantEvidence,
       }),
-    [snapshot, isLoading, nowMs],
+    [snapshot, isLoading, nowMs, latestParticipantEvidence],
   );
 }

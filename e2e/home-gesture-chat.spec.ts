@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-const MOCK_NOW_SECONDS = 1_700_000_500;
+const MOCK_NOW_SECONDS = Math.floor(Date.now() / 1000);
 const CYCLE_NUMBER = 7;
 
 const dashboard = {
@@ -103,6 +103,21 @@ const gestures = [
   },
 ];
 
+const specialRecipients = {
+  EnduranceChampionAddress: '0x1111111111111111111111111111111111111111',
+  EnduranceChampionDuration: 600,
+  EnduranceChampionStartTimeStamp: MOCK_NOW_SECONDS - 1_200,
+  PrevEnduranceChampionDuration: 0,
+  ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
+  ChronoWarriorDuration: 1_800,
+  ChronoWarriorIsLive: false,
+  LastBidderAddress: '0x3333333333333333333333333333333333333333',
+  LastBidderLastBidTime: Math.floor(Date.now() / 1000) - 100,
+  LastCstBidderAddress: '0x3333333333333333333333333333333333333333',
+  SourceBlockNumber: 100,
+  SourceBlockTimeStamp: MOCK_NOW_SECONDS,
+};
+
 const longGestureFeed = Array.from({ length: 12 }, (_, index) => {
   const sequence = index + 1;
   return {
@@ -119,7 +134,11 @@ const longGestureFeed = Array.from({ length: 12 }, (_, index) => {
   };
 });
 
-async function mockHomeGestureChatApi(page: Page, gestureFeed = gestures) {
+async function mockHomeGestureChatApi(
+  page: Page,
+  gestureFeed = gestures,
+  roleSnapshot = specialRecipients,
+) {
   await page.route('**/api/cosmicgame/**', async (route) => {
     const url = new URL(route.request().url());
     const path = url.pathname;
@@ -173,22 +192,7 @@ async function mockHomeGestureChatApi(page: Page, gestureFeed = gestures) {
     }
 
     if (path.endsWith('/bid/current_special_winners')) {
-      await route.fulfill({
-        json: {
-          EnduranceChampionAddress: '0x1111111111111111111111111111111111111111',
-          EnduranceChampionDuration: 600,
-          EnduranceChampionStartTimeStamp: MOCK_NOW_SECONDS - 1_200,
-          PrevEnduranceChampionDuration: 0,
-          ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
-          ChronoWarriorDuration: 1_800,
-          ChronoWarriorIsLive: false,
-          LastBidderAddress: '0x3333333333333333333333333333333333333333',
-          LastBidderLastBidTime: Math.floor(Date.now() / 1000) - 100,
-          LastCstBidderAddress: '0x3333333333333333333333333333333333333333',
-          SourceBlockNumber: 100,
-          SourceBlockTimeStamp: MOCK_NOW_SECONDS,
-        },
-      });
+      await route.fulfill({ json: roleSnapshot });
       return;
     }
 
@@ -267,6 +271,50 @@ test.describe('home gesture chat', () => {
     await expect(page.getByTestId('chrono-challenge-segment')).toContainText('20m');
     await expect(page.getByTestId('chrono-challenge-record-to-beat')).toContainText('30m');
     await expect(page.getByTestId('chrono-challenge-next-change')).toContainText('10m 1s');
+  });
+
+  test('keeps Last Gesture visible while the special-recipient endpoint is stale', async ({
+    page,
+  }) => {
+    await page.unroute('**/api/cosmicgame/**');
+    await mockHomeGestureChatApi(page, gestures, {
+      ...specialRecipients,
+      LastBidderAddress: '0x9999999999999999999999999999999999999999',
+      LastBidderLastBidTime: Math.floor(Date.now() / 1000) - 500,
+    });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const latest = page.getByTestId('latest-participant-intel');
+    await expect(latest).toContainText('0x3333333333333333333333333333333333333333');
+    await expect(latest).not.toContainText('0x9999999999999999999999999999999999999999');
+    await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible();
+    await expect(page.getByTestId('latest-participant-paid-amount')).toContainText('20.0000 CST');
+    await expect(page.getByTestId('latest-participant-cst-received')).toContainText('100.00 CST');
+  });
+
+  test('keeps a syncing Last Gesture panel when the gesture list trails the dashboard', async ({
+    page,
+  }) => {
+    await page.unroute('**/api/cosmicgame/**');
+    await mockHomeGestureChatApi(
+      page,
+      gestures.filter(
+        (gesture) => gesture.BidderAddr !== '0x3333333333333333333333333333333333333333',
+      ),
+      {
+        ...specialRecipients,
+        LastBidderAddress: '0x9999999999999999999999999999999999999999',
+      },
+    );
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible();
+    await expect(page.getByTestId('latest-participant-gesture-syncing')).toContainText(
+      'Last Gesture details are syncing from the indexer.',
+    );
+    await expect(page.getByTestId('latest-participant-intel')).not.toContainText(
+      'Older message from a gesture',
+    );
   });
 
   test('fits all decision-critical desk zones in a 1440×900 first viewport', async ({

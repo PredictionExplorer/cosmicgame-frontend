@@ -11,6 +11,7 @@ import { LatestParticipantDetails } from '@/components/special-allocation/Latest
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useChampions, type ChampionsState } from '@/hooks/useChampions';
 import { Link } from '@/i18n/navigation';
+import { resolveLatestGesture } from '@/lib/latestGesture';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api/types';
 
@@ -33,8 +34,10 @@ interface RoleCardConfig {
 
 interface SpecialAllocationRecipientsProps {
   currentAccount?: string | null;
+  latestParticipantAddress?: string | null;
   latestMessage?: string | null;
   latestGesture?: GestureInfo | null;
+  showLastGesture?: boolean;
   /**
    * 'stack' keeps the cards in one column (narrow contexts like
    * /current-cycle); 'grid' spreads the four role cards across the row so the
@@ -264,12 +267,18 @@ function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsStat
 
 export const SpecialAllocationRecipients = ({
   currentAccount = null,
+  latestParticipantAddress = null,
   latestMessage = null,
   latestGesture = null,
+  showLastGesture,
   layout = 'stack',
 }: SpecialAllocationRecipientsProps = {}) => {
   const t = useTranslations('tables');
-  const champions = useChampions();
+  const latestResolution = resolveLatestGesture({
+    dashboardLastAddress: latestParticipantAddress,
+    gestures: latestGesture ? [latestGesture] : [],
+  });
+  const champions = useChampions(undefined, latestResolution.evidence);
   const isCurrentAccountLatest = sameAddress(currentAccount, champions.latestGesture.address);
   const cleanLatestMessage = latestMessage?.trim() ?? '';
 
@@ -295,9 +304,13 @@ export const SpecialAllocationRecipients = ({
         <LatestParticipantDetails
           latest={champions.latestGesture}
           hasEnduranceRecord={!!champions.endurance.address}
-          latestGesture={latestGesture}
+          latestGesture={latestResolution.gesture}
           latestAddress={champions.latestGesture.address}
           message={cleanLatestMessage}
+          showLastGesture={
+            showLastGesture ?? !!(latestResolution.address ?? champions.latestGesture.address)
+          }
+          gestureDetailsPending={latestResolution.isSyncing}
         />
       ) : null,
     },

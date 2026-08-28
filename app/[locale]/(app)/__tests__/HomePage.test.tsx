@@ -124,9 +124,12 @@ const mockChampions = {
   source: 'api-v2' as const,
 };
 
-const mockUseChampions = jest.fn((_initialData?: unknown) => mockChampions);
+const mockUseChampions = jest.fn(
+  (_initialData?: unknown, _latestEvidence?: unknown) => mockChampions,
+);
 jest.mock('../../../../hooks/useChampions', () => ({
-  useChampions: (initialData?: unknown) => mockUseChampions(initialData),
+  useChampions: (initialData?: unknown, latestEvidence?: unknown) =>
+    mockUseChampions(initialData, latestEvidence),
 }));
 
 /* ── useAllocationFinalize ──────────────────────────────────────────────── */
@@ -427,7 +430,11 @@ describe('HomePage', () => {
 
   it('integrates the pulse bar (page H1, cycle, phase, activity) into the control desk', () => {
     mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42 }),
+      data: makeDashboardData({
+        CurRoundNum: 7,
+        CurNumBids: 42,
+        LastBidderAddr: '0x1111111111111111111111111111111111111111',
+      }),
       isLoading: false,
     });
     mockUseGestureListByCycle.mockReturnValue({
@@ -586,7 +593,9 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const intel = screen.getByTestId('latest-participant-intel');
-    expect(within(intel).getByText('0xBidder')).toHaveAttribute('href', '/user/0xBidder');
+    for (const link of within(intel).getAllByText('0xBidder')) {
+      expect(link).toHaveAttribute('href', '/user/0xBidder');
+    }
     expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('0.0500000 ETH');
     expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('123.45 CST');
     expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent(
@@ -624,6 +633,141 @@ describe('HomePage', () => {
     );
   });
 
+  it('keeps Last Gesture visible when the special-recipient snapshot is stale', () => {
+    const freshAddress = '0xFresh';
+    const freshGesture = {
+      EvtLogId: 91,
+      BidPosition: 11,
+      TimeStamp: 1_700_000_200,
+      BidderAddr: freshAddress,
+      RoundNum: 5,
+      GestureType: 0,
+      GestureCostEth: 0.07,
+      ParticipationCST: 44,
+      Message: 'fresh signal',
+    };
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: freshAddress }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({ data: [freshGesture] });
+    mockUseChampions.mockImplementationOnce((_seed, evidence) => ({
+      ...mockChampions,
+      latestGesture: {
+        ...mockChampions.latestGesture,
+        address: (evidence as { address: string }).address,
+        latestGestureTime: (evidence as { timestamp: number }).timestamp,
+      },
+    }));
+
+    render(
+      <HomePage
+        initialSpecialRecipients={
+          {
+            LastBidderAddress: '0xStale',
+            LastBidderLastBidTime: 1_700_000_100,
+          } as never
+        }
+      />,
+    );
+
+    expect(mockUseChampions).toHaveBeenCalledWith(expect.anything(), {
+      address: freshAddress,
+      timestamp: freshGesture.TimeStamp,
+    });
+    expect(screen.getByTestId('latest-participant-gesture-details')).toHaveTextContent(
+      '0.0700000 ETH',
+    );
+    expect(
+      within(screen.getByTestId('latest-participant-gesture-details')).getByRole('link', {
+        name: freshAddress,
+      }),
+    ).toHaveAttribute('href', `/user/${freshAddress}`);
+    expect(screen.getByTestId('latest-participant-message')).toHaveTextContent('fresh signal');
+  });
+
+  it('shows Last Gesture syncing instead of a previous participant transaction', () => {
+    const freshAddress = '0xFresh';
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: freshAddress }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 90,
+          TimeStamp: 1_700_000_100,
+          BidderAddr: '0xPrevious',
+          RoundNum: 5,
+          GestureType: 0,
+          GestureCostEth: 0.05,
+          Message: 'stale signal',
+        },
+      ],
+    });
+    mockUseChampions.mockImplementationOnce((_seed, evidence) => ({
+      ...mockChampions,
+      latestGesture: {
+        ...mockChampions.latestGesture,
+        address: (evidence as { address: string }).address,
+        latestGestureTime: 0,
+        holdDuration: 0,
+      },
+    }));
+
+    render(<HomePage />);
+
+    expect(screen.getByTestId('latest-participant-gesture-syncing')).toHaveTextContent(
+      'tables.specialAllocation.gestureDetailsSyncing',
+    );
+    expect(
+      within(screen.getByTestId('latest-participant-intel')).queryByText('stale signal'),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('latest-participant-paid-amount')).not.toBeInTheDocument();
+  });
+
+  it('omits Last Gesture only when the cycle has no Gesture yet', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        LastBidderAddr: '0x0000000000000000000000000000000000000000',
+        TsRoundStart: 0,
+      }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({ data: [] });
+    mockAllocationFinalize.activationTime = Math.floor(Date.now() / 1000) + 3600;
+
+    render(<HomePage />);
+
+    expect(screen.queryByTestId('latest-participant-gesture-details')).not.toBeInTheDocument();
+  });
+
+  it('keeps Last Gesture visible when stale activation data says opening soon', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 90,
+          TimeStamp: 1_700_000_100,
+          BidderAddr: '0xBidder',
+          RoundNum: 5,
+          GestureType: 0,
+          GestureCostEth: 0.05,
+          Message: '',
+        },
+      ],
+    });
+    mockAllocationFinalize.activationTime = Math.floor(Date.now() / 1000) + 3600;
+
+    render(<HomePage />);
+
+    expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon');
+    expect(screen.getByTestId('latest-participant-gesture-details')).toBeInTheDocument();
+  });
+
   it('keeps mobile prices in the desk while the inline console is desktop-only', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
@@ -654,16 +798,20 @@ describe('HomePage', () => {
       LastBidderLastBidTime: 1_700_000_100,
     } as never;
     mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
+      data: makeDashboardData({ LastBidderAddr: '0xSeeded' }),
       isLoading: false,
     });
+    mockUseGestureListByCycle.mockReturnValue({ data: [seededGesture] });
 
     render(
       <HomePage initialLatestGesture={seededGesture} initialSpecialRecipients={seededRecipients} />,
     );
 
     expect(mockUseGestureListByCycle).toHaveBeenCalledWith(5, 'desc', [seededGesture]);
-    expect(mockUseChampions).toHaveBeenCalledWith(seededRecipients);
+    expect(mockUseChampions).toHaveBeenCalledWith(seededRecipients, {
+      address: '0xSeeded',
+      timestamp: 1_700_000_100,
+    });
   });
 
   /* ── Below the fold ─────────────────────────────────────────── */

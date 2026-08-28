@@ -85,13 +85,17 @@ jest.mock('../../../../../components/attachments/DonatedNFTPrizeShowcase', () =>
 
 jest.mock('../../../../../components/tables/SpecialAllocationRecipients', () => ({
   SpecialAllocationRecipients: (props: {
+    latestParticipantAddress?: string | null;
     latestMessage?: string;
     latestGesture?: { EvtLogId?: number } | null;
+    showLastGesture?: boolean;
   }) => (
     <div
       data-testid="special-allocation-recipients"
       data-message={props.latestMessage ?? ''}
       data-gesture-id={props.latestGesture?.EvtLogId ?? ''}
+      data-latest-address={props.latestParticipantAddress ?? ''}
+      data-show-last-gesture={String(props.showLastGesture ?? false)}
     >
       Special Allocations
     </div>
@@ -336,6 +340,14 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
       'data-gesture-id',
       '77',
+    );
+    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-latest-address',
+      baseDashboardData.LastBidderAddr,
+    );
+    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-show-last-gesture',
+      'true',
     );
   });
 

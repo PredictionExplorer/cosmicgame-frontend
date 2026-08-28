@@ -98,6 +98,10 @@ test('a gesture lands on chain, in the indexer, and in the chat', async ({ page 
   );
 
   await openHome(page);
+  await expect(page.getByTestId('latest-participant-gesture-details')).toBeVisible({
+    timeout: 60_000,
+  });
+  await expect(page.getByTestId('latest-participant-message')).toContainText(message);
   await expect(page.getByTestId('gesture-message-chat')).toContainText(message, {
     timeout: 60_000,
   });

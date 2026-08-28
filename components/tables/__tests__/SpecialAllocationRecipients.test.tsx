@@ -109,6 +109,7 @@ describe('SpecialAllocationRecipients', () => {
       <SpecialAllocationRecipients
         currentAccount={enduranceAddress}
         latestMessage="Signal received"
+        latestGesture={makeLatestGesture({ Message: 'Signal received' })}
       />,
     );
 
@@ -247,7 +248,7 @@ describe('SpecialAllocationRecipients', () => {
     expect(details).not.toHaveTextContent('tables.specialAllocation.attachedAssets');
   });
 
-  it('does not show latest gesture details when the gesture belongs to another participant', () => {
+  it('keeps Last Gesture details visible while recipient snapshots converge', () => {
     render(
       <SpecialAllocationRecipients
         latestGesture={makeLatestGesture({
@@ -256,7 +257,26 @@ describe('SpecialAllocationRecipients', () => {
       />,
     );
 
-    expect(screen.queryByTestId('latest-participant-gesture-details')).not.toBeInTheDocument();
+    expect(screen.getByTestId('latest-participant-gesture-details')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', {
+        name: '0x4444444444444444444444444444444444444444',
+      }),
+    ).toHaveAttribute('href', '/user/0x4444444444444444444444444444444444444444');
+  });
+
+  it('shows a syncing Last Gesture panel when dashboard identity arrives first', () => {
+    render(
+      <SpecialAllocationRecipients
+        latestParticipantAddress="0x4444444444444444444444444444444444444444"
+        showLastGesture
+      />,
+    );
+
+    expect(screen.getByTestId('latest-participant-gesture-details')).toBeInTheDocument();
+    expect(screen.getByTestId('latest-participant-gesture-syncing')).toHaveTextContent(
+      'tables.specialAllocation.gestureDetailsSyncing',
+    );
   });
 
   it('shows remaining time and accessible progress when a different latest participant is still challenging', () => {

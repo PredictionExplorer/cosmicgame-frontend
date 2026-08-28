@@ -43,6 +43,7 @@ import {
 } from '@/hooks/useApiQuery';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
+import { resolveLatestGesture } from '@/lib/latestGesture';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useNow } from '@/hooks/useNow';
@@ -73,6 +74,14 @@ const CurrentRoundPage = () => {
 
   const data = dashboardData ?? null;
   const curGestureList = useMemo(() => bidListData ?? [], [bidListData]);
+  const latestResolution = useMemo(
+    () =>
+      resolveLatestGesture({
+        dashboardLastAddress: data?.LastBidderAddr,
+        gestures: curGestureList,
+      }),
+    [curGestureList, data?.LastBidderAddr],
+  );
   const donatedNFTs = (nftDonationsData ?? []) as DonatedNFTType[];
   const ethDonations = (ethDonationsRawData ?? []) as EthDonation[];
   const donatedERC20Tokens = (erc20DonationsData ?? []) as DonatedERC20[];
@@ -265,8 +274,10 @@ const CurrentRoundPage = () => {
         {/* Special Allocation Leaders */}
         {hasLastParticipant && (
           <SpecialAllocationRecipients
-            latestGesture={curGestureList[0] ?? null}
-            latestMessage={curGestureList[0]?.Message ?? ''}
+            latestParticipantAddress={latestResolution.address}
+            latestGesture={latestResolution.gesture}
+            latestMessage={latestResolution.gesture?.Message ?? ''}
+            showLastGesture
           />
         )}
 

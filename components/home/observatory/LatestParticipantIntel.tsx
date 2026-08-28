@@ -9,6 +9,7 @@ import { LatestParticipantDetails } from '@/components/special-allocation/Latest
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import type { ChampionsState } from '@/hooks/useChampions';
 import { Link } from '@/i18n/navigation';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api';
 
@@ -20,6 +21,8 @@ export interface LatestParticipantIntelProps {
   signatureEth: number;
   attachedNftCount?: number;
   attachedErc20Count?: number;
+  showLastGesture?: boolean;
+  gestureDetailsPending?: boolean;
   className?: string;
 }
 
@@ -42,6 +45,8 @@ export function LatestParticipantIntel({
   signatureEth,
   attachedNftCount = 0,
   attachedErc20Count = 0,
+  showLastGesture,
+  gestureDetailsPending = false,
   className,
 }: LatestParticipantIntelProps) {
   const t = useTranslations('home');
@@ -112,14 +117,20 @@ export function LatestParticipantIntel({
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
             <Link
               href={`/user/${latest.address}`}
-              className="min-w-0 break-all font-mono text-xs text-foreground transition-colors hover:text-primary"
+              className={cn(
+                'min-w-0 break-all font-mono text-xs text-foreground transition-colors hover:text-primary',
+                TOUCH_TARGET_TEXT_LINK_CLASS,
+              )}
             >
               {latest.address}
             </Link>
             {latestGesture && (
               <Link
                 href={`/gesture/${latestGesture.EvtLogId}`}
-                className="inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold text-primary transition-colors hover:text-foreground"
+                className={cn(
+                  'inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold text-primary transition-colors hover:text-foreground',
+                  TOUCH_TARGET_TEXT_LINK_CLASS,
+                )}
               >
                 {t('observatory.intel.viewGesture')}
                 <ArrowRight className="h-3 w-3" aria-hidden />
@@ -134,6 +145,8 @@ export function LatestParticipantIntel({
               latestGesture={latestGesture}
               latestAddress={latest.address}
               message={latestMessage}
+              showLastGesture={showLastGesture}
+              gestureDetailsPending={gestureDetailsPending}
               compact
               allocationPackage={{
                 label: t('observatory.intel.inLineFor'),
