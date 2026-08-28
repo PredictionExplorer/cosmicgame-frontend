@@ -98,9 +98,16 @@ export function ArtReel({ current, next, poster, onEnded, onError }: ArtReelProp
       // jsdom has no media pipeline and browsers may refuse autoplay: both
       // surface here. A refusal is a failure for the reel (the poster would
       // otherwise sit still forever), so it falls back to the still image.
+      //
+      // `paused` is read BEFORE play(): it flips synchronously. The start
+      // watchdog is armed only when the clip actually needs starting — this
+      // sync also runs on scroll/visibility callbacks that land after a
+      // pre-loaded clip is already playing, and `playing` (which clears the
+      // watchdog) will not fire again for a clip that never stopped.
+      const needsStart = video.paused;
       const result = video.play() as Promise<void> | undefined;
       if (result && typeof result.catch === 'function') result.catch(() => failCurrent());
-      if (startTimer.current == null) {
+      if (needsStart && startTimer.current == null) {
         startTimer.current = window.setTimeout(() => {
           startTimer.current = null;
           failCurrent();

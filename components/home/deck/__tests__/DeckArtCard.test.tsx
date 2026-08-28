@@ -269,6 +269,24 @@ describe('DeckArtCard hero generation reel', () => {
     expect(screen.getByTestId('deck-art-reel')).toBeInTheDocument();
   });
 
+  it('does not re-arm the start watchdog for a clip that is already playing', () => {
+    // Regression: after a hand-off the pre-loaded clip starts instantly and
+    // `playing` clears the watchdog; a later visibility/scroll sync must not
+    // arm it again (no second `playing` will come), or the reel drops to the
+    // still 10 s into a perfectly good clip.
+    jest.useFakeTimers();
+    const { onReelActiveChange } = renderHero();
+    const current = screen.getByTestId('deck-art-reel-current') as HTMLVideoElement;
+    fireEvent.playing(current);
+    Object.defineProperty(current, 'paused', { configurable: true, get: () => false });
+    fireEvent(document, new Event('visibilitychange'));
+    act(() => {
+      jest.advanceTimersByTime(REEL_START_TIMEOUT_MS * 2);
+    });
+    expect(screen.getByTestId('deck-art-reel')).toBeInTheDocument();
+    expect(onReelActiveChange).toHaveBeenLastCalledWith(true);
+  });
+
   it('replays the only clip instead of fading out when there is no next token', () => {
     jest.useFakeTimers();
     const { onReelEnded } = renderHero({ nextBannerToken: null });
