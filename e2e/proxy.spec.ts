@@ -76,6 +76,21 @@ test.describe('proxy middleware', () => {
       await ctx.dispose();
     });
 
+    test('redirects /experimental-ui to the app subdomain and preserves its query', async () => {
+      const ctx = await request.newContext({
+        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+      });
+      const res = await ctx.get(`${BASE}/experimental-ui?source=landing`, {
+        maxRedirects: 0,
+      });
+
+      expect(res.status()).toBe(308);
+      expect(res.headers()['location']).toMatch(
+        expectedAppLocation('/experimental-ui?source=landing'),
+      );
+      await ctx.dispose();
+    });
+
     test('preserves query strings when redirecting', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'cosmicsignature.com' },
@@ -209,6 +224,21 @@ test.describe('proxy middleware', () => {
       const res = await ctx.get(`${BASE}/zh/gallery?round=5`, { maxRedirects: 0 });
       expect(res.status()).toBe(308);
       expect(res.headers()['location']).toMatch(expectedAppLocation('/zh/gallery?round=5'));
+      await ctx.dispose();
+    });
+
+    test('landing host keeps the locale when redirecting /zh/experimental-ui', async () => {
+      const ctx = await request.newContext({
+        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+      });
+      const res = await ctx.get(`${BASE}/zh/experimental-ui?source=landing`, {
+        maxRedirects: 0,
+      });
+
+      expect(res.status()).toBe(308);
+      expect(res.headers()['location']).toMatch(
+        expectedAppLocation('/zh/experimental-ui?source=landing'),
+      );
       await ctx.dispose();
     });
 

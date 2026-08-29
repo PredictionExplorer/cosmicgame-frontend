@@ -9,6 +9,10 @@
     "description": "Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。在演绎周期中落笔；周期收官后，周期储备将沿各条分配轨道发放，其中一条通向 Protocol Guild。",
     "descriptionWithReserve": "Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。在演绎周期中落笔；周期收官后，{reserve} 的周期储备将沿各条分配轨道发放，其中一条通向 Protocol Guild。"
   },
+  "experimentalUi": {
+    "title": "实验界面 · Cosmic Signature",
+    "description": "通过同一套实时协议数据与操作，体验另一种 Cosmic Signature 周期界面。"
+  },
   "gallery": {
     "title": "Cosmic Signature 画廊 · 确定性三体 NFT 艺术",
     "description": "浏览 Cosmic Signature NFT 作品：由确定性三体物理、链上种子与光谱渲染生成，并融入演绎周期数据。"

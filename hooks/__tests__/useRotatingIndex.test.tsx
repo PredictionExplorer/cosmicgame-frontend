@@ -43,4 +43,26 @@ describe('useRotatingIndex', () => {
     });
     expect(result.current).toBe(0);
   });
+
+  it('advances once per signal change without enabling the interval', () => {
+    const { result, rerender } = renderHook(
+      ({ signal }) =>
+        useRotatingIndex({
+          count: 3,
+          enabled: false,
+          advanceSignal: signal,
+        }),
+      { initialProps: { signal: 0 } },
+    );
+
+    expect(result.current).toBe(0);
+    rerender({ signal: 1 });
+    expect(result.current).toBe(1);
+    rerender({ signal: 1 });
+    expect(result.current).toBe(1);
+    rerender({ signal: 2 });
+    expect(result.current).toBe(2);
+    rerender({ signal: 3 });
+    expect(result.current).toBe(0);
+  });
 });

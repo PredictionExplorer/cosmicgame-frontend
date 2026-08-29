@@ -78,6 +78,7 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/detail',
   '/distributions-by-token',
   '/eth-contribution',
+  '/experimental-ui',
   '/faq',
   '/gallery',
   '/gesture',

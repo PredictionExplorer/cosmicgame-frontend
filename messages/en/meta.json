@@ -9,6 +9,10 @@
     "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the Cycle Reserve distributes across allocation tracks — including Protocol Guild.",
     "descriptionWithReserve": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the {reserve} Cycle Reserve distributes across allocation tracks — including Protocol Guild."
   },
+  "experimentalUi": {
+    "title": "Experimental UI | Cosmic Signature",
+    "description": "Explore an experimental Cosmic Signature cycle interface with the same live protocol data and actions."
+  },
   "gallery": {
     "title": "Cosmic Signature Gallery | Deterministic Three-Body NFT Art",
     "description": "Explore Cosmic Signature NFT artwork generated from deterministic three-body physics, on-chain seeds, spectral rendering, and Performance Cycle data."

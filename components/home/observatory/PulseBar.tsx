@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FlaskConical } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { GradientText } from '@/components/ui/gradient-text';
@@ -85,13 +85,24 @@ export function PulseBar({
           </p>
         </div>
       </div>
-      <Link
-        href="/how-it-works"
-        className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
-      >
-        {t('deck.newHere')}
-        <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-      </Link>
+      <div className="flex flex-wrap items-center gap-2">
+        <Link
+          href="/experimental-ui"
+          prefetch={false}
+          data-testid="experimental-ui-entry"
+          className="inline-flex items-center gap-1.5 rounded-full border border-accent/25 bg-accent/[0.06] px-3.5 py-2 text-xs font-semibold text-accent-foreground/80 transition-colors hover:border-accent/45 hover:text-white"
+        >
+          <FlaskConical className="h-3.5 w-3.5" aria-hidden />
+          {t('deck.experimentalUi')}
+        </Link>
+        <Link
+          href="/how-it-works"
+          className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
+        >
+          {t('deck.newHere')}
+          <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+        </Link>
+      </div>
     </div>
   );
 }

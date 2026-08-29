@@ -49,7 +49,7 @@ jest.mock('../../ui/dropdown-menu', () => ({
   ),
 }));
 
-function renderWalletButton() {
+function renderWalletButton(liquid = false) {
   render(
     <ConnectWalletButton
       isMobileView={false}
@@ -61,6 +61,7 @@ function renderWalletButton() {
         RWLK: 3,
       }}
       stakedTokenCount={{ cst: 4, rwalk: 5 }}
+      liquid={liquid}
     />,
   );
 }
@@ -78,6 +79,14 @@ describe('ConnectWalletButton', () => {
     renderWalletButton();
 
     expect(screen.getByTestId('connect-wallet-button')).toHaveTextContent('wallet.connect.button');
+  });
+
+  it('applies liquid glass only when explicitly requested', () => {
+    mockAccount = null;
+
+    renderWalletButton(true);
+
+    expect(screen.getByTestId('connect-wallet-button')).toHaveClass('liquid-glass-cta');
   });
 
   it('opens the lazy wallet modal on click and warms its chunk on hover', () => {

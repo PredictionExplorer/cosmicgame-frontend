@@ -12,6 +12,11 @@ interface UseRotatingIndexOptions {
    * and the initial artwork/image never swaps right after hydration.
    */
   initialIndex?: number | null;
+  /**
+   * Event-driven advance: every change after mount steps once independently
+   * of the interval timer, allowing media playback to own rotation timing.
+   */
+  advanceSignal?: number;
 }
 
 function nextIndex(current: number, count: number): number {
@@ -25,6 +30,7 @@ export function useRotatingIndex({
   enabled = true,
   randomStart = false,
   initialIndex = null,
+  advanceSignal,
 }: UseRotatingIndexOptions): number | null {
   const normalizedCount = Math.max(0, Math.trunc(count));
   const hasValidInitialIndex =
@@ -49,6 +55,12 @@ export function useRotatingIndex({
     }, intervalMs);
     return () => window.clearInterval(timerId);
   }, [enabled, intervalMs, normalizedCount]);
+
+  const [seenAdvanceSignal, setSeenAdvanceSignal] = useState(advanceSignal);
+  if (advanceSignal !== seenAdvanceSignal) {
+    setSeenAdvanceSignal(advanceSignal);
+    setIndex((current) => nextIndex(current, normalizedCount));
+  }
 
   if (normalizedCount === 0) return null;
   return Math.min(index, normalizedCount - 1);

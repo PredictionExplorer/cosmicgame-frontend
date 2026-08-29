@@ -58,6 +58,13 @@ test.describe('LCP text paints from server HTML without JavaScript', () => {
     expect(await isHiddenByOpacity(heading)).toBe(false);
   });
 
+  test('experimental UI heading is visible in the raw SSR HTML', async ({ page }) => {
+    await page.goto('/experimental-ui');
+    const heading = page.locator('main h1').first();
+    await expect(heading).toBeVisible();
+    expect(await isHiddenByOpacity(heading)).toBe(false);
+  });
+
   test('landing hero headline and subhead are visible in the raw SSR HTML', async ({ page }) => {
     await page.setExtraHTTPHeaders(LANDING_HEADERS);
     await page.goto('/');
@@ -100,7 +107,15 @@ test.describe('message scoping stays complete', () => {
   // console error (next-intl renders the raw key). The static walker
   // (i18n-scoping.test.ts) covers page/layout trees; this crawl catches
   // anything it cannot see, in both locales.
-  const routes = ['/', '/current-cycle', '/statistics', '/gallery', '/faq', '/my-anchors'];
+  const routes = [
+    '/',
+    '/experimental-ui',
+    '/current-cycle',
+    '/statistics',
+    '/gallery',
+    '/faq',
+    '/my-anchors',
+  ];
   const locales = ['', '/zh'];
 
   for (const localePrefix of locales) {

@@ -15,7 +15,7 @@ import {
 import { useLocale, useTranslations } from 'next-intl';
 import { formatEther } from 'viem';
 
-import { Link } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import type { AppLocale } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import getNAVs, { type NavDescriptor } from '@/config/nav';
@@ -136,6 +136,8 @@ const Header: FC = () => {
   const t = useTranslations('nav');
   const walletT = useTranslations('wallet');
   const locale = useLocale() as AppLocale;
+  const pathname = usePathname();
+  const experimentalUi = pathname === '/experimental-ui';
   const [mobileView, setMobileView] = useState<boolean>(false);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
@@ -245,15 +247,22 @@ const Header: FC = () => {
     <nav aria-label={t('primaryLabel')} className="flex items-center gap-4 xl:gap-6">
       {brand}
 
-      <div className="flex items-center gap-0.5 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md">
+      <div
+        className={cn(
+          'flex items-center gap-0.5 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md',
+          experimentalUi && 'liquid-glass-control liquid-glass-static',
+        )}
+      >
         {navs.map((nav, i) => (
           <ListNavItem key={i} nav={nav} />
         ))}
       </div>
 
       <div className="ml-auto flex items-center gap-3">
-        <EcosystemDock />
-        <LanguageSwitcher />
+        <EcosystemDock
+          className={experimentalUi ? 'liquid-glass-control liquid-glass-static' : undefined}
+        />
+        <LanguageSwitcher className={experimentalUi ? 'liquid-glass-control' : undefined} />
         <ConnectWalletButton
           isMobileView={false}
           loading={loading}
@@ -263,6 +272,7 @@ const Header: FC = () => {
             rwalk: anchoredRWLKTokens?.length,
           }}
           hasUnclaimedRewards={hasUnclaimedRewards}
+          liquid={experimentalUi}
         />
       </div>
     </nav>
@@ -318,6 +328,7 @@ const Header: FC = () => {
               rwalk: anchoredRWLKTokens?.length,
             }}
             hasUnclaimedRewards={hasUnclaimedRewards}
+            liquid={experimentalUi}
           />
         </div>
 
@@ -357,11 +368,14 @@ const Header: FC = () => {
                     cst: anchoredCSTokens?.length,
                     rwalk: anchoredRWLKTokens?.length,
                   }}
+                  liquid={experimentalUi}
                 />
               </div>
 
               <div className="px-5 pb-3">
-                <LanguageSwitcher className="w-full justify-center" />
+                <LanguageSwitcher
+                  className={cn('w-full justify-center', experimentalUi && 'liquid-glass-control')}
+                />
               </div>
 
               <Separator className="bg-white/[0.06]" />

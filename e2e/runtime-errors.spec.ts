@@ -9,6 +9,7 @@ import { test, expect, type Page, type ConsoleMessage } from '@playwright/test';
 
 const routes = [
   '/',
+  '/experimental-ui?uxScenario=live-mid-cycle',
   '/gallery',
   '/statistics',
   '/faq',

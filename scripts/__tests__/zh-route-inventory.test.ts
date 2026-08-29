@@ -25,8 +25,8 @@ describe('canonical localized route inventory', () => {
     const actual = collectPageFiles(LOCALE_APP_ROOT).sort();
     const inventoried = ZH_ROUTE_INVENTORY.map((route) => route.pageFile).sort();
 
-    expect(actual).toHaveLength(65);
-    expect(inventoried).toHaveLength(65);
+    expect(actual).toHaveLength(66);
+    expect(inventoried).toHaveLength(66);
     expect(inventoried).toEqual(actual);
   });
 

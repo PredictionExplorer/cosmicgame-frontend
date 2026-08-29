@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 import { shortenHex } from '@/utils';
 
 import { formatFixed } from '@/utils/format';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +51,8 @@ interface ConnectWalletButtonProps {
   balance: Balance;
   stakedTokenCount: AnchoredTokenCount;
   hasUnclaimedRewards?: boolean;
+  /** Applies the experimental liquid-glass material without changing other routes. */
+  liquid?: boolean;
 }
 
 const ConnectWalletButton = ({
@@ -58,6 +61,7 @@ const ConnectWalletButton = ({
   balance,
   stakedTokenCount,
   hasUnclaimedRewards = false,
+  liquid = false,
 }: ConnectWalletButtonProps) => {
   const t = useTranslations('wallet');
   const { account } = useActiveWeb3React();
@@ -78,7 +82,12 @@ const ConnectWalletButton = ({
 
     return (
       <DropdownMenu>
-        <DropdownMenuTrigger className="ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none hover:bg-white/[0.06] transition-colors">
+        <DropdownMenuTrigger
+          className={cn(
+            'ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
+            liquid && 'liquid-glass-control',
+          )}
+        >
           <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
           {shortenHex(account)}
           {hasUnclaimedRewards && (
@@ -255,7 +264,7 @@ const ConnectWalletButton = ({
         onClick={requestConnectModal}
         onPointerEnter={warmConnectModal}
         onFocus={warmConnectModal}
-        className="min-h-11 sm:min-h-0"
+        className={cn('min-h-11 sm:min-h-0', liquid && 'liquid-glass-cta')}
         data-testid="connect-wallet-button"
       >
         {t('connect.button')}

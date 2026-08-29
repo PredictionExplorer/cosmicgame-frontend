@@ -143,6 +143,15 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     allowBrandOnlyTitle: true,
   },
   {
+    id: 'experimental-ui',
+    pageFile: '(app)/experimental-ui/page.tsx',
+    publicPath: '/experimental-ui',
+    fixturePath: '/experimental-ui',
+    host: 'app',
+    cluster: 'core',
+    expectedText: 'Cosmic Signature 观测台',
+  },
+  {
     id: 'current-cycle',
     pageFile: '(app)/current-cycle/page.tsx',
     publicPath: '/current-cycle',

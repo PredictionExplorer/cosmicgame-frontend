@@ -372,7 +372,7 @@ jest.mock('@/i18n/navigation', () => {
     props: { href: unknown; children?: unknown; locale?: string } & Record<string, unknown>,
     ref: unknown,
   ) {
-    const { href, children, locale: _locale, ...rest } = props;
+    const { href, children, locale: _locale, prefetch: _prefetch, ...rest } = props;
     return React.createElement('a', { href: hrefToString(href), ref, ...rest }, children);
   });
   return {

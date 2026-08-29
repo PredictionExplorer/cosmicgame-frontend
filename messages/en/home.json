@@ -482,6 +482,32 @@
     "title": "The Cosmic Signature Observatory",
     "intro": "One live Performance Cycle. Every Gesture extends the clock, shapes the final Signature, and stands in line for allocations.",
     "newHere": "New here? How it works",
+    "experimentalUi": "Experimental UI",
+    "returnToCurrent": "Return to current UI",
+    "monument": {
+      "reserveLabel": "Signature Allocation",
+      "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
+      "youChip": "You",
+      "fullConsole": "Open the full gesture console",
+      "chooseRwlkToken": "Pick your RandomWalk token in the full console below",
+      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry.",
+      "notifyAria": "Notify me before the cycle can finalize",
+      "notifyLabel": "Alert me before finalization:",
+      "notifyMinutes": "{minutes}m",
+      "calendarTitle": "Cosmic Signature Cycle #{number} opens",
+      "calendarBody": "The next Performance Cycle opens for Gestures. The first Gesture starts the finalization clock.",
+      "calendarCta": "Add the opening to your calendar"
+    },
+    "board": {
+      "title": "Allocation Tracks",
+      "subtitle": "Everything this cycle distributes at finalization",
+      "tooltip": "Live view of every allocation track in the current Performance Cycle: amounts, current holders, and standing records.",
+      "cstPlusNft": "1,000 CST + NFT",
+      "awaitingGesture": "Awaiting the first Gesture",
+      "awaitingRecord": "No record yet",
+      "stellarStatus": "every Gesture is an entry",
+      "fullBreakdown": "View the full breakdown"
+    },
     "art": {
       "sectionAria": "Featured on-chain artwork",
       "eyebrow": "On-Chain Artwork",
@@ -489,6 +515,16 @@
       "viewAria": "View Cosmic Signature {id}",
       "alt": "Cosmic Signature artwork {id} — deterministic three-body generative art",
       "pairingNote": "Deterministic three-body art, imprinted on-chain. Every Signature is paired with 1,000 CST."
+    },
+    "composer": {
+      "title": "Say it with a Gesture",
+      "subtitle": "Messages travel on-chain with your gesture",
+      "placeholder": "Write an optional on-chain message…",
+      "note": "Sending makes a real Gesture on Arbitrum — the message rides along and appears in Gesture Chat.",
+      "connectBody": "Connect a wallet to make a Gesture and post a message to Gesture Chat.",
+      "rwlkChip": "RWLK #{id}",
+      "rwlkChoose": "RWLK: pick token",
+      "cstFree": "CST gestures are free right now"
     },
     "personal": {
       "title": "Your position",
@@ -502,11 +538,20 @@
       "nothingWaiting": "Nothing waiting to retrieve",
       "cstPreview": "A gesture now imprints ~{amount} CST"
     },
+    "miniBar": {
+      "aria": "Cycle quick console",
+      "reserve": "Signature Allocation",
+      "jump": "Back to the Deck"
+    },
     "story": {
       "collapsedTitle": "About Cosmic Signature",
       "collapsedSubtitle": "The story, the artwork, and how each Performance Cycle becomes a Signature",
       "expand": "Expand"
     }
+  },
+  "mobileCta": {
+    "makeGesture": "Make a Gesture",
+    "preview": "Preview Gesture Options"
   },
   "observatory": {
     "pulse": {

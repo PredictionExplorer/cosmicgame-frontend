@@ -121,6 +121,7 @@ describe('noindex classification', () => {
 
     expect(byPath['/admin']).toBe('admin');
     expect(byPath['/internal/cst-outreach-transfer']).toBe('admin');
+    expect(byPath['/experimental-ui']).toBe('tool');
     expect(byPath['/my-tokens']).toBe('personal');
     expect(byPath['/recipient-history']).toBe('personal');
   });

@@ -50,6 +50,7 @@ const NON_HARNESS_IGNORES = ['**/harness/**'];
 
 export default defineConfig({
   testDir: './e2e',
+  snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
   fullyParallel: true,
   workers: process.env.CI ? 1 : 2,
   retries: 1,
@@ -120,7 +121,7 @@ export default defineConfig({
     ? {}
     : {
         webServer: {
-          command: `PLAYWRIGHT=1 npm run build && PLAYWRIGHT=1 npm run start -- -p ${port}`,
+          command: `NEXT_PUBLIC_PLAYWRIGHT_UX_SCENARIOS=1 PLAYWRIGHT=1 npm run build && PLAYWRIGHT=1 npm run start -- -p ${port}`,
           port,
           // CI always builds from scratch. Locally, `PLAYWRIGHT_REUSE_SERVER=1`
           // attaches to an already-running production server so an audit sweep

@@ -482,6 +482,32 @@
     "title": "Cosmic Signature 观测台",
     "intro": "一个实时进行的演绎周期：每一次落笔都会延长时钟、塑造最终签名，并排入各条分配轨道的候选之列。",
     "newHere": "初来乍到？了解运作方式",
+    "experimentalUi": "实验界面",
+    "returnToCurrent": "返回当前界面",
+    "monument": {
+      "reserveLabel": "签名分配",
+      "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附着资产",
+      "youChip": "你",
+      "fullConsole": "打开完整落笔控制台",
+      "chooseRwlkToken": "请在下方完整控制台中选择你的 RandomWalk 代币",
+      "microcopy": "每一次落笔都会延长收官时钟、铭刻参与 CST，并计入一份星选资格。",
+      "notifyAria": "在周期可收官前提醒我",
+      "notifyLabel": "收官前提醒：",
+      "notifyMinutes": "{minutes} 分钟",
+      "calendarTitle": "Cosmic Signature 第 {number} 个周期开启",
+      "calendarBody": "下一演绎周期即将开放落笔。第一笔会启动收官倒计时。",
+      "calendarCta": "把开启时间加入日历"
+    },
+    "board": {
+      "title": "分配轨道",
+      "subtitle": "本周期收官时发放的全部内容",
+      "tooltip": "当前演绎周期各条分配轨道的实时一览：金额、当前持有者与现存纪录。",
+      "cstPlusNft": "1,000 CST + NFT",
+      "awaitingGesture": "等待第一笔",
+      "awaitingRecord": "暂无纪录",
+      "stellarStatus": "每一次落笔都是一份星选资格",
+      "fullBreakdown": "查看完整分配明细"
+    },
     "art": {
       "sectionAria": "精选链上艺术作品",
       "eyebrow": "链上艺术",
@@ -489,6 +515,16 @@
       "viewAria": "查看 Cosmic Signature {id}",
       "alt": "Cosmic Signature 艺术作品 {id} —— 确定性三体生成艺术",
       "pairingNote": "确定性三体艺术，铭刻于链上。每枚签名作品都配有 1,000 CST。"
+    },
+    "composer": {
+      "title": "以落笔发声",
+      "subtitle": "留言与你的落笔一同上链",
+      "placeholder": "写一条可选的链上留言……",
+      "note": "发送即在 Arbitrum 上真实落笔——留言随之上链，并显示在落笔留言板中。",
+      "connectBody": "连接钱包即可落笔，并在落笔留言板中留言。",
+      "rwlkChip": "RWLK #{id}",
+      "rwlkChoose": "RWLK：选择代币",
+      "cstFree": "当前 CST 落笔免费"
     },
     "personal": {
       "title": "你的位置",
@@ -502,11 +538,20 @@
       "nothingWaiting": "暂无等待取回的分配",
       "cstPreview": "此刻落笔约可铭刻 {amount} CST"
     },
+    "miniBar": {
+      "aria": "周期快捷台",
+      "reserve": "签名分配",
+      "jump": "返回观测台"
+    },
     "story": {
       "collapsedTitle": "关于 Cosmic Signature",
       "collapsedSubtitle": "故事、作品，以及每个演绎周期如何凝成签名",
       "expand": "展开"
     }
+  },
+  "mobileCta": {
+    "makeGesture": "落笔",
+    "preview": "预览落笔选项"
   },
   "observatory": {
     "pulse": {

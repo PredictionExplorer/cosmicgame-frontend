@@ -93,6 +93,7 @@ jobs:
       # The harness tier has its own job below (it needs Docker, Go, and the
       # sibling repos); this job runs the mocked-API projects only.
       HARNESS_E2E: '0'
+      NEXT_PUBLIC_PLAYWRIGHT_UX_SCENARIOS: '1'
     steps:
       - uses: actions/checkout@v4
 
@@ -141,6 +142,16 @@ jobs:
 
       - name: Run e2e tests
         run: npm run test:e2e
+
+      - name: Upload browser diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-diagnostics
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
 
   # Full-stack tier: real contracts on a local chain + the real indexer/API,
   # driven by the harness director (scripts/harness, docs/harness.md). The

@@ -1,0 +1,211 @@
+'use client';
+
+import { useSyncExternalStore } from 'react';
+import { ArrowRight, Check, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Link } from '@/i18n/navigation';
+import { Button } from '@/components/ui/button';
+import { Surface } from '@/components/ui/surface';
+import { getCycleState, type CyclePhase } from '@/lib/cycleState';
+import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
+import { cn } from '@/lib/utils';
+import type { DashboardInfo } from '@/services/api';
+
+interface CyclePhaseGuideProps {
+  data: DashboardInfo | null;
+  loading: boolean;
+  allocationTime: number;
+  activationTime: number;
+  now: number;
+  /** See useEndgameChainSync; omit for legacy local-clock behavior. */
+  finalizationConfirmed?: boolean;
+  /** Merged onto the root section (e.g. `mb-0` where the parent owns spacing). */
+  className?: string;
+}
+
+const explainerStorageKey = 'cosmic-cycle-explainer-dismissed';
+const explainerDismissedEvent = 'cosmic:explainer-dismissed';
+
+// localStorage as an external store: avoids setState-in-effect and renders
+// the dismissed state on the server so the explainer never flashes for
+// returning visitors.
+function subscribeToExplainerDismissal(onStoreChange: () => void): () => void {
+  window.addEventListener(explainerDismissedEvent, onStoreChange);
+  return () => window.removeEventListener(explainerDismissedEvent, onStoreChange);
+}
+const getExplainerDismissedSnapshot = (): boolean =>
+  window.localStorage.getItem(explainerStorageKey) === '1';
+const getExplainerDismissedServerSnapshot = (): boolean => true;
+
+const timelineSteps = [
+  { id: 'opening-soon', messageKey: 'openingSoon' },
+  { id: 'first-gesture', messageKey: 'firstGesture' },
+  { id: 'open', messageKey: 'open' },
+  { id: 'final-window', messageKey: 'finalWindow' },
+  { id: 'finalization', messageKey: 'finalization' },
+  { id: 'allocation', messageKey: 'allocation' },
+] as const;
+
+function phaseToTimelineId(phase: CyclePhase): (typeof timelineSteps)[number]['id'] {
+  if (phase === 'opening-soon' || phase === 'loading' || phase === 'unavailable') {
+    return 'opening-soon';
+  }
+  if (phase === 'waiting-first-gesture') return 'first-gesture';
+  if (phase === 'ready-to-finalize' || phase === 'confirming') return 'finalization';
+  if (phase === 'final-hour' || phase === 'final-ten' || phase === 'final-minute') {
+    return 'final-window';
+  }
+  if (phase === 'live' || phase === 'approach') return 'open';
+  return 'opening-soon';
+}
+
+export function CyclePhaseGuide({
+  data,
+  loading,
+  allocationTime,
+  activationTime,
+  now,
+  finalizationConfirmed,
+  className,
+}: CyclePhaseGuideProps) {
+  const t = useTranslations('home');
+  const phase = getCycleState({
+    data,
+    loading,
+    allocationTime,
+    activationTime,
+    now,
+    finalizationConfirmed,
+  }).phase;
+  const activeStepId = phaseToTimelineId(phase);
+  const activeIndex = timelineSteps.findIndex((step) => step.id === activeStepId);
+  const explainerDismissed = useSyncExternalStore(
+    subscribeToExplainerDismissal,
+    getExplainerDismissedSnapshot,
+    getExplainerDismissedServerSnapshot,
+  );
+  const showExplainer = !explainerDismissed;
+
+  const dismissExplainer = () => {
+    window.localStorage.setItem(explainerStorageKey, '1');
+    window.dispatchEvent(new Event(explainerDismissedEvent));
+  };
+
+  return (
+    <section aria-labelledby="cycle-phase-guide-title" className={cn('mb-8', className)}>
+      <Surface variant="glass-bordered" radius="xl" padding="none" className="p-4 sm:p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="type-eyebrow text-muted-foreground">{t('phaseGuide.eyebrow')}</p>
+            <h2 id="cycle-phase-guide-title" className="mt-2 font-display text-xl font-bold">
+              {t('phaseGuide.title')}
+            </h2>
+          </div>
+          <Button asChild variant="secondary" size="sm" className="liquid-glass-control">
+            <Link href="/how-it-works">
+              {t('phaseGuide.howItWorks')}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+
+        <ol
+          className="mt-4 grid gap-2.5 md:grid-cols-3 xl:grid-cols-6"
+          aria-label={t('phaseGuide.timelineAria')}
+        >
+          {timelineSteps.map((step, index) => {
+            const isActive = step.id === activeStepId;
+            const isComplete = index < activeIndex;
+            return (
+              <li
+                key={step.id}
+                aria-current={isActive ? 'step' : undefined}
+                className={cn(
+                  'relative rounded-2xl border p-3 transition-colors',
+                  isActive
+                    ? 'border-primary/40 bg-primary/[0.10] text-foreground shadow-[0_18px_70px_-56px_rgb(var(--aurora-cyan-rgb)/0.9)]'
+                    : isComplete
+                      ? 'border-emerald-300/20 bg-emerald-400/[0.045]'
+                      : 'border-white/[0.06] bg-white/[0.025]',
+                )}
+              >
+                <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  <span
+                    className={cn(
+                      'flex h-5 w-5 items-center justify-center rounded-full border text-[10px]',
+                      isActive
+                        ? 'border-primary/50 bg-primary/20 text-primary'
+                        : isComplete
+                          ? 'border-emerald-300/35 bg-emerald-400/10 text-emerald-300'
+                          : 'border-white/[0.10] bg-white/[0.03]',
+                    )}
+                  >
+                    {isComplete ? <Check className="h-3 w-3" /> : index + 1}
+                  </span>
+                  {isActive
+                    ? t('phaseGuide.stepState.now')
+                    : isComplete
+                      ? t('phaseGuide.stepState.passed')
+                      : t('phaseGuide.stepState.next')}
+                </span>
+                <h3 className="mt-2 text-sm font-semibold">
+                  {t(`phaseGuide.steps.${step.messageKey}.label`)}
+                </h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                  {t(`phaseGuide.steps.${step.messageKey}.detail`)}
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+
+        {showExplainer && (
+          <div className="mt-4 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3.5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="font-display text-base font-semibold">
+                  {t('phaseGuide.explainer.title')}
+                </h3>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+                  {t('phaseGuide.explainer.body')}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-3 text-sm">
+                  <Link
+                    className={cn(
+                      'text-primary underline-offset-4 hover:underline',
+                      TOUCH_TARGET_TEXT_LINK_CLASS,
+                    )}
+                    href="/faq"
+                  >
+                    {t('phaseGuide.explainer.faqLink')}
+                  </Link>
+                  <Link
+                    className={cn(
+                      'text-primary underline-offset-4 hover:underline',
+                      TOUCH_TARGET_TEXT_LINK_CLASS,
+                    )}
+                    href="/how-it-works"
+                  >
+                    {t('phaseGuide.explainer.walkthroughLink')}
+                  </Link>
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-label={t('phaseGuide.explainer.dismissAria')}
+                onClick={dismissExplainer}
+                className={cn(
+                  'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+                  TOUCH_TARGET_ICON_CLASS,
+                )}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+      </Surface>
+    </section>
+  );
+}

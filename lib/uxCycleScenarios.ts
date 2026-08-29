@@ -67,7 +67,9 @@ let state: UxCycleScenarioState | null = null;
 let stateName: UxCycleScenarioName | null = null;
 
 function isDevelopmentScenarioMode(): boolean {
-  return process.env.NODE_ENV !== 'production';
+  return (
+    process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_PLAYWRIGHT_UX_SCENARIOS === '1'
+  );
 }
 
 function isScenarioName(value: string | null | undefined): value is UxCycleScenarioName {

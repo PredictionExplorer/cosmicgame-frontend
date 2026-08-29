@@ -18,6 +18,10 @@ import { mockZhQualityApi } from './zh-quality-mocks';
 
 const routes = [
   { path: '/', label: 'Home' },
+  {
+    path: '/experimental-ui?uxScenario=live-mid-cycle',
+    label: 'Experimental UI',
+  },
   { path: '/allocation', label: 'Allocation' },
   { path: '/gallery', label: 'Gallery' },
   { path: '/statistics', label: 'Statistics' },

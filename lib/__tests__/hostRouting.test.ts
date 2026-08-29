@@ -186,6 +186,7 @@ describe('hostRouting', () => {
           '/anchoring',
           '/gallery',
           '/current-cycle',
+          '/experimental-ui',
           '/security',
           '/audits',
           '/risk-disclosures',
@@ -279,6 +280,7 @@ describe('hostRouting', () => {
         '/detail',
         '/distributions-by-token',
         '/eth-contribution',
+        '/experimental-ui',
         '/faq',
         '/gallery',
         '/gesture',
@@ -324,6 +326,7 @@ describe('hostRouting', () => {
     it.each([
       '/gallery',
       '/current-cycle',
+      '/experimental-ui',
       '/security',
       '/audits',
       '/risk-disclosures',

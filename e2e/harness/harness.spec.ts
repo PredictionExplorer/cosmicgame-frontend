@@ -33,6 +33,12 @@ async function openHome(page: Page): Promise<void> {
   await expect(page.getByTestId('cycle-clock')).toBeVisible({ timeout: 30_000 });
 }
 
+async function openExperimentalUi(page: Page): Promise<void> {
+  await page.goto(appUrl('/experimental-ui'), { waitUntil: 'domcontentloaded' });
+  await expect(page.getByTestId('cycle-monument')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('home-deck-layout')).toBeVisible();
+}
+
 test.beforeAll(async () => {
   // Specs own all activity; the setup project already pinned `quiet`.
   await switchScenario('quiet');
@@ -160,6 +166,45 @@ test('burner wallet and dev panel drive the game from the browser', async ({ pag
     'the panel-triggered gesture to be indexed',
     (d) => (d.CurNumBids ?? 0) > (before.CurNumBids ?? 0),
   );
+});
+
+test('experimental UI submits a real gesture and receives the indexed chat message', async ({
+  page,
+}) => {
+  test.setTimeout(8 * 60_000);
+
+  await switchScenario('live');
+  await awaitCycleState(
+    'an open cycle for the experimental UI',
+    (status) => status.cycle.opened && Number(status.cycle.secondsUntilFinalization) > 0,
+  );
+  await awaitIndexed('the experimental cycle to reach the API', dashboardShowsOpenedCycle);
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await openExperimentalUi(page);
+  await page.getByTestId('harness-open').click();
+  await expect(page.getByTestId('harness-panel')).toBeVisible();
+  await page.getByTestId('harness-persona-select').selectOption('Lyra');
+  await page.getByRole('button', { name: 'Close harness panel' }).click();
+
+  const composer = page.getByTestId('composer-message-input');
+  await expect(composer).toBeVisible({ timeout: 30_000 });
+  const message = `Experimental UI roundtrip ${Date.now()}`;
+  await composer.fill(message);
+  const submit = page.getByTestId('composer-gesture-submit');
+  await expect(submit).toBeVisible({ timeout: 30_000 });
+  await submit.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+
+  const before = await readDashboard();
+  await submit.click({ timeout: 30_000 });
+  await awaitIndexed(
+    'the experimental UI gesture to be indexed',
+    (dashboard) => (dashboard.CurNumBids ?? 0) > (before.CurNumBids ?? 0),
+  );
+
+  await expect(page.getByTestId('gesture-message-chat')).toContainText(message, {
+    timeout: 60_000,
+  });
 });
 
 test('browser phase controls switch repeatedly and reflow inactive desktop state', async ({

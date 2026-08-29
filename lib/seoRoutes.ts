@@ -158,6 +158,7 @@ const appIndexableRoutes: SeoRoute[] = [
 export const noindexAppRoutes: SeoRoute[] = [
   '/admin',
   '/admin/admin',
+  '/experimental-ui',
   '/internal/cst-outreach-transfer',
   '/my-tokens',
   '/my-anchors',
@@ -168,7 +169,12 @@ export const noindexAppRoutes: SeoRoute[] = [
 ].map((path) => ({
   path,
   host: 'app',
-  kind: path.startsWith('/admin') || path.startsWith('/internal') ? 'admin' : 'personal',
+  kind:
+    path === '/experimental-ui'
+      ? 'tool'
+      : path.startsWith('/admin') || path.startsWith('/internal')
+        ? 'admin'
+        : 'personal',
   index: false,
   includeInSitemap: false,
   hasServerVisibleContent: true,

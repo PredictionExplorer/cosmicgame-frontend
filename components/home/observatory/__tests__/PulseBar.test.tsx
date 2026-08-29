@@ -38,6 +38,13 @@ describe('PulseBar', () => {
     );
   });
 
+  it('offers the isolated experimental UI without replacing the home route', () => {
+    render(<PulseBar {...baseProps} />);
+
+    expect(screen.getByTestId('experimental-ui-entry')).toHaveAttribute('href', '/experimental-ui');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('home.deck.title');
+  });
+
   it('falls back gracefully before the cycle number resolves', () => {
     render(<PulseBar {...baseProps} cycleNumber={null} lastGestureAge={null} />);
 

@@ -5,7 +5,7 @@ import { event } from '@/utils/analytics';
  * one gesture panel, so the surface distinguishes its mounts (in-page card vs
  * mobile sheet) plus the clock's finalize action.
  */
-export type GestureSurface = 'panel' | 'sheet' | 'clock';
+export type GestureSurface = 'panel' | 'sheet' | 'clock' | 'console' | 'composer' | 'mini-bar';
 
 export function trackGestureSubmitted({
   source,
@@ -33,4 +33,8 @@ export function trackChatJoinCtaClicked(): void {
 
 export function trackGestureSheetOpened(): void {
   event({ action: 'gesture_sheet_opened', category: 'gameplay', label: 'action-dock' });
+}
+
+export function trackComposerSheetOpened(): void {
+  event({ action: 'gesture_sheet_opened', category: 'gameplay', label: 'experimental-composer' });
 }

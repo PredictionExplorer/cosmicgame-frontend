@@ -19,6 +19,10 @@ import {
 /** Every route that pins something: a rail, a sub-nav, or a toolbar. */
 const STICKY_ROUTES = [
   { id: 'home', path: '/' },
+  {
+    id: 'experimental-ui',
+    path: '/experimental-ui?uxScenario=live-mid-cycle',
+  },
   { id: 'gallery', path: '/gallery' },
   { id: 'faq', path: '/faq' },
   { id: 'statistics', path: '/statistics' },
