@@ -142,6 +142,7 @@
   "overrides": {
     "@noble/hashes": "^1.8.0",
     "axios": "^1.18.1",
+    "browserslist": "^4.28.8",
     "defu": "^6.1.5",
     "flatted": "^3.4.2",
     "follow-redirects": "^1.16.0",
