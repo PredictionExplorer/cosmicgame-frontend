@@ -5,11 +5,14 @@ import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import type { Config } from 'wagmi';
 
 import {
+  buildWalletList,
   injectedMetaMaskWallet,
   installWalletConnectors,
   restoreWalletSession,
-  walletList,
+  type WalletGroupLabels,
 } from '../wallet-connectors';
+
+const GROUP_LABELS: WalletGroupLabels = { popular: 'Popular', more: 'More' };
 
 jest.mock('wagmi', () => ({
   createConnector: jest.fn((factory) => ({ kind: 'rainbowkit-wrapped-connector', factory })),
@@ -76,11 +79,11 @@ describe('wallet-connectors runtime installation', () => {
   it('installs the RainbowKit wallet list into the live config exactly once', () => {
     const config = makeFakeConfig();
 
-    installWalletConnectors(config);
-    installWalletConnectors(config);
+    installWalletConnectors(config, GROUP_LABELS);
+    installWalletConnectors(config, GROUP_LABELS);
 
     expect(mockConnectorsForWallets).toHaveBeenCalledTimes(1);
-    expect(mockConnectorsForWallets).toHaveBeenCalledWith(walletList, {
+    expect(mockConnectorsForWallets).toHaveBeenCalledWith(buildWalletList(GROUP_LABELS), {
       appName: 'Cosmic Signature',
       projectId: 'test-project-id',
     });
@@ -94,7 +97,7 @@ describe('wallet-connectors runtime installation', () => {
   it('replays reconnect after installing connectors for returning sessions', async () => {
     const config = makeFakeConfig();
 
-    await restoreWalletSession(config);
+    await restoreWalletSession(config, GROUP_LABELS);
 
     expect(mockReconnect).toHaveBeenCalledWith(config);
   });
@@ -102,12 +105,20 @@ describe('wallet-connectors runtime installation', () => {
   it('swallows reconnect failures — an expired session is not an error', async () => {
     mockReconnect.mockRejectedValueOnce(new Error('session expired'));
 
-    await expect(restoreWalletSession(makeFakeConfig())).resolves.toBeUndefined();
+    await expect(restoreWalletSession(makeFakeConfig(), GROUP_LABELS)).resolves.toBeUndefined();
   });
 });
 
 describe('wallet list definition', () => {
+  it('renders the translated group headers passed by the caller', () => {
+    // RainbowKit's locale pack does not cover groupName, so the connect
+    // modal would otherwise show English section headers on /zh and /uk.
+    const list = buildWalletList({ popular: 'Популярні', more: 'Інші' });
+    expect(list.map((group) => group.groupName)).toEqual(['Популярні', 'Інші']);
+  });
+
   it('keeps the explicit wallet groups so MetaMask avoids the SDK-backed default', () => {
+    const walletList = buildWalletList(GROUP_LABELS);
     expect(walletList[0]?.groupName).toBe('Popular');
     const popularIds = walletList[0]?.wallets.map(
       (createWallet) => createWallet({ appName: 'Cosmic Signature', projectId: 'test' }).id,

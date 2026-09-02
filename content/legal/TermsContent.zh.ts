@@ -86,27 +86,27 @@ export const termsCopyZh = {
         {
           id: 'distribution',
           subtitle: '分配发放',
-          text: `分配按照智能合约规则自动发放。通常，每个周期会沿下列分配轨道铭刻 ${protocolFacts.typicalNftsPerCycle} 枚 Cosmic Signature NFT 与 ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString()} CST。`,
+          text: `分配按照智能合约规则自动发放。通常，每个周期会沿下列分配轨道铭刻 ${protocolFacts.typicalNftsPerCycle} 枚 Cosmic Signature NFT 与 ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('zh-CN')} CST。`,
         },
         {
           id: 'signature',
           subtitle: '签名分配',
-          text: `完成收官之笔的参与者可以取回 ${protocolFacts.mainEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString()} CST 表彰铭刻、1 枚 Cosmic Signature NFT，以及该周期中可能存在的已附加代币。`,
+          text: `完成收官之笔的参与者可以取回 ${protocolFacts.mainEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 表彰铭刻、1 枚 Cosmic Signature NFT，以及该周期中可能存在的已附加代币。`,
         },
         {
           id: 'chrono',
           subtitle: '时之勇士',
-          text: `连续保持坚守冠军身份时间最长的参与者将获得 ${protocolFacts.chronoWarriorEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString()} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
+          text: `连续保持坚守冠军身份时间最长的参与者将获得 ${protocolFacts.chronoWarriorEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
         },
         {
           id: 'endurance',
           subtitle: '坚守冠军',
-          text: `连续保持"最近一笔落笔者"身份时间最长的参与者将获得 ${protocolFacts.specialAllocationCst.toLocaleString()} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
+          text: `连续保持"最近一笔落笔者"身份时间最长的参与者将获得 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
         },
         {
           id: 'final-cst',
           subtitle: 'CST 收官之笔',
-          text: `完成本周期最后一笔 CST 落笔的参与者将获得 ${protocolFacts.specialAllocationCst.toLocaleString()} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
+          text: `完成本周期最后一笔 CST 落笔的参与者将获得 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
         },
         {
           id: 'eth-selection',
@@ -116,12 +116,12 @@ export const termsCopyZh = {
         {
           id: 'nft-selection',
           subtitle: 'NFT 星选',
-          text: `${protocolFacts.nftStellarSelectionRecipients} 位获配者各获得 ${protocolFacts.specialAllocationCst.toLocaleString()} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
+          text: `${protocolFacts.nftStellarSelectionRecipients} 位获配者各获得 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
         },
         {
           id: 'anchored-selection',
           subtitle: '锚定 NFT 星选',
-          text: `${protocolFacts.anchoredRwlkNftSelectionRecipients} 位 Random Walk NFT 锚定者各获得 ${protocolFacts.specialAllocationCst.toLocaleString()} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
+          text: `${protocolFacts.anchoredRwlkNftSelectionRecipients} 位 Random Walk NFT 锚定者各获得 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 表彰铭刻与 1 枚 Cosmic Signature NFT。`,
         },
         {
           id: 'anchor-distribution',
@@ -141,7 +141,7 @@ export const termsCopyZh = {
         {
           id: 'outreach',
           subtitle: '推广储备',
-          text: `每个周期会为推广派发与生态贡献者铭刻 ${protocolFacts.outreachReserveCst.toLocaleString()} CST。`,
+          text: `每个周期会为推广派发与生态贡献者铭刻 ${protocolFacts.outreachReserveCst.toLocaleString('zh-CN')} CST。`,
         },
         {
           id: 'retrieval',

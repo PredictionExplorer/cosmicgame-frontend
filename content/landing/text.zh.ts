@@ -48,7 +48,7 @@ export const landingTextZh = {
     art: {
       eyebrow: '来自作品集的实时展示',
       caption: '铭刻于链上 · CC0',
-      cstNote: `每枚铭刻的签名作品都配有 ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST。`,
+      cstNote: `每枚铭刻的签名作品都配有 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST。`,
       formingLabel: '信号生成中',
       formingBody: '网络响应后，这里会实时展示作品集中的一幅签名作品。',
       viewAriaLabel: '在应用中查看 Cosmic Signature {tokenLabel}',

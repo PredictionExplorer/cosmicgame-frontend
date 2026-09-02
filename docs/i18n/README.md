@@ -76,7 +76,7 @@ New i18n plumbing:
 
 ```
 i18n/
-  routing.ts      ← defineRouting({ locales: ['en', 'zh'], defaultLocale: 'en', localePrefix: 'as-needed' })
+  routing.ts      ← defineRouting({ locales: ['en', 'zh', 'uk'], defaultLocale: 'en', localePrefix: 'as-needed' })
   locale.ts       ← AppLocale, LocaleRecord<T>, normalizeLocale, pickByLocale (the only locale parser)
   localeConfig.ts ← per-locale rendering conventions: Intl tag, og:locale, JSON-LD inLanguage,
                     word spacing, week start, ellipsis, provider-error policy
@@ -85,6 +85,7 @@ i18n/
 messages/
   en/*.json       ← English catalogs (source of truth), one file per namespace
   zh/*.json       ← Chinese catalogs (same keys, same shape)
+  uk/*.json       ← Ukrainian catalogs (same keys, same shape)
 ```
 
 **No `locale === 'zh'` ternaries anywhere.** Every per-locale value lives in a
@@ -172,9 +173,12 @@ common.json     nav.json        footer.json     wallet.json
 home.json       landing.json    currentCycle.json  gallery.json  detail.json
 gesture.json    anchoring.json  allocation.json myPages.json
 statistics.json tables.json     tooltips.json   toasts.json
-errors.json     forms.json      meta.json       howItWorks.json
-siteMap.json    contracts.json  admin.json      formats.json
+errors.json     forms.json      meta.json       seo.json
+siteMap.json    contracts.json  admin.json      formats.json    …
 ```
+
+The authoritative list is `NAMESPACES` in `i18n/request.ts` (35 namespaces); `how-it-works`
+is a content module (§3.2), not a catalog.
 
 Usage: `useTranslations('gallery')` in client components, `getTranslations` in server
 components and `generateMetadata`.
@@ -183,8 +187,10 @@ components and `generateMetadata`.
 
 - Keys describe _role_, not content: `hero.headline`, not `everyGestureShapes`.
 - Never concatenate translated fragments; use ICU placeholders: `"gestureCost": "Gesture Cost: {amount} ETH"`.
-- Chinese has no plural inflection — `plural` blocks in `en` collapse to a single `other`
-  form in `zh` (see style guide §7).
+- ICU `plural` blocks carry every category the locale's `Intl.PluralRules` defines:
+  `one/other` in `en`; a single `other` in `zh`, which has no plural inflection (style
+  guide §7); `one/few/many/other` in `uk` (style-guide-uk). `npm run i18n:strict` fails on
+  a missing category.
 - Embedded markup uses `t.rich` with named tags, never raw HTML in messages.
 - A string used on 2+ pages goes in `common`/`tables`/`tooltips`, not duplicated.
 
@@ -223,8 +229,8 @@ renderer each (`TermsContent.tsx`, `PrivacyContent.tsx`, `TrustPageContent.tsx`)
 per-locale copy objects (`*.en.ts` / `*.zh.ts`), resolved via `content/legal/index.ts`.
 No JSX is duplicated per locale.
 
-**Fallback policy:** `i18n/request.ts` deep-merges `zh` messages over the `en` catalog, so
-a missing Chinese key renders English — never a raw key path. Long-form content has **no
+**Fallback policy:** `i18n/request.ts` deep-merges each translated locale's messages over
+the `en` catalog, so a missing key renders English — never a raw key path. Long-form content has **no
 runtime fallback**: the text-module types make partial translations a compile error, so a
 locale ships complete or not at all.
 
@@ -288,8 +294,8 @@ different x-height. OG images for `/uk` load the checked-in `assets/fonts/Onest-
   - `alternates.canonical` — locale-correct (`/zh/faq` canonicalizes to `/zh/faq`),
   - `alternates.languages` — hreflang map: `en` → unprefixed URL, `zh` → `/zh` URL,
     `x-default` → English,
-  - `openGraph.locale` — `en_US` / `zh_CN` (also fix the hardcoded value in
-    `app/root-metadata.ts` and the landing layout).
+  - `openGraph.locale` — `en_US` / `zh_CN` / `uk_UA` from `LocaleConfig.ogLocale` (also fix
+    the hardcoded value in `app/root-metadata.ts` and the landing layout).
 - **Page metadata** moves from inline strings into the `meta` namespace; `generateMetadata`
   reads `params.locale` and calls `getTranslations`. (~59 pages, tracked per-route in
   progress.md.)

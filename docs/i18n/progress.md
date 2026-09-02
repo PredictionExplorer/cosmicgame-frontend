@@ -24,21 +24,26 @@ states, `aria-label`s, form validation, SEO title/description, OG image text, JS
 
 ## Dashboard
 
-| Sprint | Theme                                                                      | Units                        | Status             |
-| ------ | -------------------------------------------------------------------------- | ---------------------------- | ------------------ |
-| 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**           |
-| 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**           |
-| 2      | Landing site + Learn hub                                                   | 4 routes (incl. 11 articles) | **Done**           |
-| 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | **Done**           |
-| 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | **Done**           |
-| 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | **Done**           |
-| 6      | FAQ, legal & trust pages                                                   | 10 routes                    | **Done\***         |
-| 7      | Long tail + SEO completion                                                 | 13 routes + SEO sweep        | **Done**           |
-| 8      | QA hardening & full-site fluency pass                                      | site-wide                    | **Deploy pending** |
+| Sprint | Theme                                                                      | Units                        | Status     |
+| ------ | -------------------------------------------------------------------------- | ---------------------------- | ---------- |
+| 0      | Foundations (infra, no visible translation)                                | 14 tasks                     | **Done**   |
+| 1      | Global chrome (nav, footer, wallet, shared UI)                             | 12 namespaces + 2 routes     | **Done**   |
+| 2      | Landing site + Learn hub                                                   | 7 routes (incl. 11 articles) | **Done**   |
+| 3      | Core dApp (home, cycle, gallery, detail, how-it-works)                     | 6 routes                     | **Done**   |
+| 4      | Transactions & holdings (allocations, anchoring, my-\*, transfers, toasts) | 13 routes + toasts           | **Done**   |
+| 5      | Statistics & data tables + locale formatting                               | 14 routes + formats          | **Done**   |
+| 6      | FAQ, legal & trust pages                                                   | 10 routes                    | **Done\*** |
+| 7      | Long tail + SEO completion                                                 | 14 routes + SEO sweep        | **Done**   |
+| 8      | QA hardening & full-site fluency pass                                      | site-wide                    | **Done\*** |
 
-Route accounting: 2 + 4 + 6 + 13 + 14 + 10 + 13 = **62 routes** = every `page.tsx` in
-`app/` as of 2026-07-16. New routes added to the app **must** be added here (add a row in
-the matching sprint section, or Sprint 7 if unclear).
+Route accounting: 2 + 7 + 6 + 13 + 14 + 10 + 14 = **66 routes** = every `page.tsx` in
+`app/` as of 2026-09-02 (Sprint 2 gained `/white-paper`, `/quiz`, and `/quiz/[tier]`;
+Sprint 7 gained `/experimental-ui`). New routes added to the app **must** be added here
+(add a row in the matching sprint section, or Sprint 7 if unclear).
+
+\* Sprint 8's external native-fluency and legal reviews remain owner-waived; "Done"
+records the automated hardening plus the 2026-09-02 deployment verification (see the
+Sprint 8 section), not human certification.
 
 ---
 
@@ -176,6 +181,9 @@ The public face; highest transcreation bar (style guide §2 landing register). C
 | `/about`        | `(landing)/about/page.tsx`                                                                                                                     | ✅  | ✅  | ✅  | ✅  |
 | `/learn` (hub)  | `(landing)/learn/`, `content/learn/` hub copy                                                                                                  | ✅  | ✅  | ✅  | ✅  |
 | `/learn/[slug]` | `content/learn/` articles — tracked per article below                                                                                          | ✅  | ✅  | ✅  | ✅  |
+| `/white-paper`  | `(landing)/white-paper/`, `content/white-paper/`, `public/white-paper/*-zh.pdf` — post-sprint addition, see notes                              | ✅  | ✅  | ✅  | ✅  |
+| `/quiz` (hub)   | `(landing)/quiz/`, `content/quiz/text.zh.ts` — post-sprint addition, no review pass recorded (see notes)                                       | ✅  | ✅  | ☐   | ✅  |
+| `/quiz/[tier]`  | `(landing)/quiz/[tier]/`, `content/quiz/text.{basic,medium,hard}.zh.ts` — post-sprint addition, no review pass recorded                        | ✅  | ✅  | ☐   | ✅  |
 
 Per-article tracking (all four stages apply to each):
 
@@ -228,6 +236,12 @@ Implementation notes / deviations:
   typeset Chinese PDF (`cosmic-signature-white-paper-v1.0-zh.pdf`, xeCJK with Songti SC)
   accompanies the English one. R records agent bilingual-accuracy and blind-fluency passes,
   consistent with this sprint's convention.
+- **Post-sprint addition (recorded 2026-09-02):** the `/quiz` hub and `/quiz/[tier]`
+  (`caf90a94`) shipped bilingual — `content/quiz/text*.zh.ts` mirrors the white paper's
+  terminology, structural parity is enforced by `content/__tests__/quiz-content.test.ts`,
+  the numbers join the numeric-claims gate, and both routes sit in the Sprint 8 inventory
+  that the `zh-site-qa` suite renders (Q). No separate accuracy or blind-fluency pass was
+  recorded for the quiz copy, so R stays ☐ until one is.
 
 ## Sprint 3 — Core dApp
 
@@ -466,6 +480,7 @@ plus the site-wide SEO finish.
 | `/admin/admin`                          | `(app)/admin/admin/page.tsx`                               | ✅  | ✅  | ✅  | ✅  |
 | `/internal/cst-outreach-transfer`       | `(app)/internal/`                                          | ✅  | ✅  | ✅  | ✅  |
 | `/embed/endurance/[round]`              | `(app)/embed/endurance/`                                   | ✅  | ✅  | ✅  | ✅  |
+| `/experimental-ui` (noindex)            | `(app)/experimental-ui/`, `components/home/deck/`          | ✅  | ✅  | ☐   | ✅  |
 
 **SEO sweep (cross-cutting):**
 
@@ -490,6 +505,11 @@ pages for all 12 generators and every emitted image endpoint returns a direct
 Both LLM documents include Chinese sections. Strict parity is enforced in CI at
 3,302/3,302 keys. In-repo rich-result/raw-HTML tests pass; the external Google service
 requires a deployed URL and remains a deployment verification.
+
+**Post-sprint addition (recorded 2026-09-02):** `/experimental-ui` (`d96532a9`, noindex)
+shipped with bilingual routing, `meta.experimentalUi.*` and `home.deck.*` catalog keys in
+every locale, and a place in the Sprint 8 inventory that the site-QA suites render (Q).
+No separate review pass was recorded for its copy, so R stays ☐ until one is.
 
 ## Sprint 8 — QA hardening & full-site fluency pass
 
@@ -548,13 +568,33 @@ a gesture submission, and its five-minute warning is localized in both catalogs.
 QA opens the `zh-CN` RainbowKit chooser and connects through an injected EIP-1193 test
 provider without signing or submitting a transaction.
 
-**Deployment is the remaining blocker.** At verification time,
+**Deployment was the remaining blocker at that verification.** At the time,
 `https://cosmicsignature.com/zh` and `https://app.cosmicsignature.com/zh` both returned
 HTTP 404, `https://cosmicsignature.com/sitemap.xml` returned HTTP 500, and the deployed
 `llms.txt` did not contain the Chinese section from this branch. External Lighthouse,
-Google Rich Results, and an actual browser-wallet check cannot produce valid Chinese-site
-evidence until this branch is deployed. Sprint 8 therefore remains **Deploy pending**;
-repository automation is not represented as production sign-off.
+Google Rich Results, and an actual browser-wallet check could not produce valid
+Chinese-site evidence until the branch was deployed, so Sprint 8 stayed **Deploy pending**
+until the check below.
+
+### Deployment verification — 2026-09-02
+
+The i18n branch (through `7615841d`, which also added Ukrainian) is live. Checked from
+outside the deployment: `https://cosmicsignature.com/zh`, `https://cosmicsignature.com/uk`,
+`https://app.cosmicsignature.com/zh`, and `https://app.cosmicsignature.com/uk` return
+HTTP 200 with `<html lang="zh">` / `<html lang="uk">`; both hosts' `sitemap.xml` return
+200 and carry the `zh` and `uk` hreflang alternates; the deployed `llms.txt` contains the
+Chinese and Ukrainian sections; the per-locale white-paper PDFs are served. Sprint 8 moves
+to **Done\***. The asterisk is unchanged in meaning: native fluency, external legal review,
+and named reviewer sign-off remain owner-waived, and external Lighthouse / Google Rich
+Results runs against the deployed locale pages have still not been recorded here.
+
+The same check found one live Chinese copy defect, fixed the same day: the FAQ answer for
+`how-is-participation-cst-calculated` interpolated the English `protocolFacts` gap labels
+("1 hour 后为 104 CST"). `content/faq/text.zh.ts` now maps them (`ELAPSED_ZH`, as the
+white-paper module already did), the FAQ and Terms modules pass `'zh-CN'` to every
+`toLocaleString` call, and `content/__tests__/faq.test.ts` pins the Chinese rendering.
+RainbowKit's connect-modal group headers ("Popular" / "More"), which its locale pack does
+not translate, now come from `wallet.groups.*` in every catalog.
 
 ---
 
@@ -577,6 +617,7 @@ repository automation is not represented as production sign-off.
 | 2026-07-20 | Owner expanded the request through Sprints 5–8 and waived external native/legal review; agent review is not certification            |
 | 2026-07-20 | Repo-wide zh parity reached 3,302/3,302 and now hard-fails in CI; terminology consistency is a separate CI gate                      |
 | 2026-07-20 | Owner retained native/legal waivers but requires deployed SEO/performance and non-mutating wallet validation for production sign-off |
+| 2026-09-02 | `/zh` and `/uk` verified live on both hosts; Sprint 8 moves from Deploy pending to Done\* (native/legal waivers unchanged)           |
 
 ## Risk register
 

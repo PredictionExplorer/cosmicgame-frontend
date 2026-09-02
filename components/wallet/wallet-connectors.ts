@@ -66,28 +66,49 @@ export function injectedMetaMaskWallet(): Wallet {
   };
 }
 
-export const walletList: WalletList = [
-  {
-    groupName: 'Popular',
-    wallets: [rabbyWallet, rainbowWallet, baseAccount, injectedMetaMaskWallet, walletConnectWallet],
-  },
-  {
-    groupName: 'More',
-    wallets: [coinbaseWallet],
-  },
-];
+/**
+ * Section headers RainbowKit renders above each wallet group in the connect
+ * modal. RainbowKit's own locale pack does not cover them, so callers pass
+ * the translated strings from the `wallet` catalog (`groups.*`).
+ */
+export interface WalletGroupLabels {
+  popular: string;
+  more: string;
+}
+
+export function buildWalletList(labels: WalletGroupLabels): WalletList {
+  return [
+    {
+      groupName: labels.popular,
+      wallets: [
+        rabbyWallet,
+        rainbowWallet,
+        baseAccount,
+        injectedMetaMaskWallet,
+        walletConnectWallet,
+      ],
+    },
+    {
+      groupName: labels.more,
+      wallets: [coinbaseWallet],
+    },
+  ];
+}
 
 let installed = false;
 
 /**
  * Adds the RainbowKit wallet connectors to the given config exactly once.
  * Idempotent: the modal chunk and the session-restore path can both call it.
+ * The group labels are baked into the connectors at install time, so the
+ * first caller's language holds for the rest of the page session (a locale
+ * switch is a soft navigation and does not re-run the installer).
  */
-export function installWalletConnectors(config: Config): void {
+export function installWalletConnectors(config: Config, groupLabels: WalletGroupLabels): void {
   if (installed) return;
   installed = true;
 
-  const connectorFns = connectorsForWallets(walletList, {
+  const connectorFns = connectorsForWallets(buildWalletList(groupLabels), {
     appName: walletAppName,
     projectId: walletConnectProjectId,
   });
@@ -106,8 +127,11 @@ export function installWalletConnectors(config: Config): void {
  * wagmi's reconnect so a WalletConnect/Coinbase/etc session restores even
  * though its connector was not part of the initial config.
  */
-export async function restoreWalletSession(config: Config): Promise<void> {
-  installWalletConnectors(config);
+export async function restoreWalletSession(
+  config: Config,
+  groupLabels: WalletGroupLabels,
+): Promise<void> {
+  installWalletConnectors(config, groupLabels);
   try {
     await reconnect(config);
   } catch {

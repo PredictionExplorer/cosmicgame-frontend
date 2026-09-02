@@ -2,6 +2,10 @@
   "connect": {
     "button": "连接钱包"
   },
+  "groups": {
+    "popular": "热门",
+    "more": "更多"
+  },
   "balances": {
     "eth": "ETH",
     "cst": "CST",

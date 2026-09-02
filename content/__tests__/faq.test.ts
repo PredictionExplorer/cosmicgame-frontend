@@ -77,6 +77,20 @@ describe('localized FAQ content', () => {
     expect(answer('how-are-nft-images-created')).toMatch(/380.*700.*64/);
   });
 
+  it('renders the Participation CST examples with Chinese durations, not English', () => {
+    // protocolFacts stores the example gaps as English strings ("1 hour");
+    // the zh module must map them before interpolating (regression: the
+    // deployed /zh/faq once read "1 hour 后为 104 CST").
+    const answer = findFaqItemById(faqContentZh, 'how-is-participation-cst-calculated')!.item
+      .answer;
+
+    expect(answer).not.toMatch(/\b(seconds?|hours?|days?)\b/);
+    for (const example of protocolFacts.dynamicCstRewardExamples) {
+      expect(answer).toContain(`后为 ${example.cst} CST`);
+    }
+    expect(answer).toContain('1 小时后为');
+  });
+
   it('scopes CC0 reuse claims to project-owned materials in both locales', () => {
     const english = findFaqItemById(faqContentEn, FORK_SITE_ID)!.item.answer;
     const chinese = findFaqItemById(faqContentZh, FORK_SITE_ID)!.item.answer;

@@ -2,6 +2,10 @@
   "connect": {
     "button": "Connect Wallet"
   },
+  "groups": {
+    "popular": "Popular",
+    "more": "More"
+  },
   "balances": {
     "eth": "ETH",
     "cst": "CST",

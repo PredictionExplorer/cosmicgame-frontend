@@ -2,6 +2,10 @@
   "connect": {
     "button": "Під’єднати гаманець"
   },
+  "groups": {
+    "popular": "Популярні",
+    "more": "Інші"
+  },
   "balances": {
     "eth": "ETH",
     "cst": "CST",

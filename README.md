@@ -70,13 +70,18 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 | `npm run test:seo`           | Run the SEO test subset (unit + raw-HTML e2e)                            |
 | `npm run test:e2e`           | Run end-to-end tests (Playwright), including the harness tier            |
 | `npm run test:e2e:harness`   | Run only the full-stack harness e2e tier (real chain + indexer)          |
-| `npm run test:e2e:zh`        | Run the Chinese rollout, routing, accessibility, and wallet E2E subset   |
+| `npm run test:e2e:locales`   | Run every locale's smoke/QA suites plus routing, a11y, and wallet E2E    |
 | `npm run test:e2e:ui`        | Run E2E tests with Playwright UI                                         |
 | `npm run test:e2e:headed`    | Run E2E tests in headed browser                                          |
 | `npm run analyze`            | Production build with bundle analyzer                                    |
 | `npm run bundle:budget`      | Check full app-home initial JS gzip payload against budget (post-build)  |
 | `npm run contracts:generate` | Regenerate typed ABIs from `contracts/*.json`                            |
-| `npm run lexicon:scan`       | Enforce domain terminology in UI copy                                    |
+| `npm run lexicon:scan`       | Enforce the banned-vocabulary lexicon in every locale's copy             |
+| `npm run i18n:parity`        | Per-locale catalog report (translated %, values identical to English)    |
+| `npm run i18n:strict`        | CI gate: key parity, ICU syntax, placeholders, plural categories         |
+| `npm run terminology:check`  | Glossary drift gate for every translated locale                          |
+| `npm run i18n:check`         | `i18n:strict` + `terminology:check` + `lexicon:scan` (pre-push runs it)  |
+| `npm run white-paper:pdf`    | Regenerate the per-locale white-paper PDFs (pandoc + tectonic)           |
 
 ## Environment Variables
 

@@ -68,7 +68,7 @@ Cells contain `☐` (not done) → replace with `✅` when the stage is complete
 | toasts          |  140 | ✅  | ☐   | ✅  |
 | tooltips        |    3 | ✅  | ☐   | ✅  |
 | traits          |  197 | ✅  | ☐   | ✅  |
-| wallet          |   22 | ✅  | ☐   | ✅  |
+| wallet          |   24 | ✅  | ☐   | ✅  |
 
 ## Long-form content (`content/**/*.uk.ts`)
 
@@ -87,7 +87,7 @@ Cells contain `☐` (not done) → replace with `✅` when the stage is complete
 
 ## Notes
 
-- **T** is complete for every unit: 3 745 catalog keys and every long-form module are in
+- **T** is complete for every unit: 3 747 catalog keys and every long-form module are in
   Ukrainian, `npm run i18n:check` is green (key parity, ICU syntax, placeholder parity,
   four plural categories, lexicon, terminology), and the numeric-claims guard pins every
   percentage, duration, and CST amount to `protocol-facts.ts` across the Ukrainian
@@ -112,6 +112,11 @@ Cells contain `☐` (not done) → replace with `✅` when the stage is complete
     «історія отримувачів» (public page).
   - Denial titles in `meta.json` follow the en/zh convention of JSON `\u` escapes for the
     named banned concept; rephrase if the team prefers zero banned vocabulary there.
-  - The Chinese FAQ and quiz modules still interpolate English `protocolFacts` elapsed
-    labels («1 hour») and use `toLocaleString()` without a locale; the Ukrainian modules
-    localize both — worth back-porting.
+  - «Популярні» / «Інші» (`wallet.groups.*`, added 2026-09-02) — the section headers of
+    the RainbowKit connect modal, which its own `uk-UA` pack does not cover.
+- **Back-port done (2026-09-02):** the Chinese FAQ module interpolated English
+  `protocolFacts` gap labels («1 hour») and, together with the Chinese Terms module,
+  called `toLocaleString()` without a locale. Both now follow the Ukrainian pattern
+  (`ELAPSED_ZH` map, explicit `'zh-CN'`); the quiz and white-paper modules were already
+  correct. The deployed `/zh` and `/uk` sites were verified live the same day
+  (`progress.md`, Sprint 8).

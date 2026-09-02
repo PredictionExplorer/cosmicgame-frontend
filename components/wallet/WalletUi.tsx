@@ -6,7 +6,7 @@ import {
   useConnectModal,
   type Locale as RainbowKitLocale,
 } from '@rainbow-me/rainbowkit';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 import { cosmicRainbowTheme } from '@/config/rainbowkit-theme';
@@ -52,13 +52,17 @@ const RAINBOW_KIT_LOCALES: LocaleRecord<RainbowKitLocale> = {
  */
 export function WalletUi({ connectRequestId }: { connectRequestId: number }) {
   const locale = useLocale();
+  const t = useTranslations('wallet');
   const rainbowKitLocale = pickByLocale(RAINBOW_KIT_LOCALES, locale);
 
   // Install the full wallet list into the live wagmi config BEFORE
   // RainbowKit renders, so the modal sees every wallet. useState (not
   // useEffect) runs the installer during the first render pass.
   useState(() => {
-    installWalletConnectors(wagmiConfig);
+    installWalletConnectors(wagmiConfig, {
+      popular: t('groups.popular'),
+      more: t('groups.more'),
+    });
     return null;
   });
 

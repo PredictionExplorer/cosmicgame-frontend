@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 import { reportError } from '@/utils/errors';
 
@@ -71,6 +72,15 @@ export function useWalletUi(): WalletUiContextValue {
  */
 export function WalletUiProvider({ children }: { children: ReactNode }) {
   const [connectRequestId, setConnectRequestId] = useState(0);
+  const t = useTranslations('wallet');
+
+  // RainbowKit bakes the wallet-group headers into the connectors when they
+  // are installed, so resolve them once for the page session instead of
+  // re-running the restore effect on every locale change.
+  const [walletGroupLabels] = useState(() => ({
+    popular: t('groups.popular'),
+    more: t('groups.more'),
+  }));
 
   // Session restore for returning wallet users: their previous session used
   // a connector that is not part of the light boot config (WalletConnect,
@@ -82,9 +92,11 @@ export function WalletUiProvider({ children }: { children: ReactNode }) {
     const recentConnectorId = readRecentConnectorId();
     if (!recentConnectorId || recentConnectorId === 'injected') return;
     void Promise.all([import('@/components/wallet/wallet-connectors'), import('@/config/wagmi')])
-      .then(([connectors, config]) => connectors.restoreWalletSession(config.wagmiConfig))
+      .then(([connectors, config]) =>
+        connectors.restoreWalletSession(config.wagmiConfig, walletGroupLabels),
+      )
       .catch((error) => reportError(error, 'walletSessionRestore'));
-  }, []);
+  }, [walletGroupLabels]);
 
   const requestConnectModal = useCallback(() => {
     setConnectRequestId((id) => id + 1);
