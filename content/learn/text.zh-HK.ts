@@ -1,4 +1,4 @@
-import { protocolFacts } from '@/content/protocol-facts';
+import { cstRewardFacts, isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 
 import type { LearnText } from './structure';
 import type { LearnSection } from './types';
@@ -139,7 +139,7 @@ export const learnTextZhHk = {
         {
           heading: '落筆會帶來什麼',
           body: [
-            `每一筆都會寫入目前週期，可能銘刻參與 CST，延長收官倒數，併成為最終簽名歷史的一部分。參與 CST 的數量按平方根公式計算：${protocolFacts.dynamicCstRewardFormula}。`,
+            `每一筆都會寫入目前週期，可能銘刻參與 CST，延長收官倒數，併成為最終簽名歷史的一部分。參與 CST 的數量按${isV3Mechanics ? '線性' : '平方根'}公式計算：${cstRewardFacts.formula}。`,
             `落筆價格會在週期中持續變化。ETH 落筆與 CST 落筆彼此關聯，但各有機制；校準窗口會清楚顯示價格如何變化。每筆 CST 落筆會使 CST 校準窗口延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%；每筆 ETH 落筆則會使其縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%。`,
           ],
         },
@@ -284,7 +284,9 @@ export const learnTextZhHk = {
           heading: 'CST 在協議中的作用',
           body: [
             '落筆時可能銘刻參與 CST；CST 也可用於落筆，其價格由專屬校準窗口決定。用於落筆的 CST 會直接銷燬，永久從供應量中移除，不會匯入資金池。',
-            '參與 CST 的數量會動態變化：它取決於距上一筆的時間，並採用平方根公式。間隔越久，銘刻量通常越大；連續快速落筆則可能銘刻 0 CST。',
+            isV3Mechanics
+              ? '參與 CST 的數量會動態變化：它隨距上一筆的時間線性累積。間隔越久，銘刻量按比例越大；連續快速落筆則銘刻量接近 0 CST。'
+              : '參與 CST 的數量會動態變化：它取決於距上一筆的時間，並採用平方根公式。間隔越久，銘刻量通常越大；連續快速落筆則可能銘刻 0 CST。',
             '完成委託後，CST 可在宇宙議會中用作協調權重；持有者也可將權重委託給自己。參與者依照鏈上規則協調協議變更。',
           ],
         },

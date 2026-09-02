@@ -134,6 +134,14 @@
       "message": {
         "label": "訊息長度上限",
         "tooltip": "落筆訊息允許輸入的最大字符數。"
+      },
+      "v3SignatureNfts": {
+        "label": "簽名配額 NFT 數量",
+        "tooltip": "週期收官時為簽名配額獲配者銘刻的 Cosmic Signature NFT 數量（連續編號）。"
+      },
+      "v3LateWindow": {
+        "label": "臨近收官落筆窗口",
+        "tooltip": "週期收官倒數結束前的一段時間，期間落筆價格附加以指數加速的溢價（最高約 5 倍）。"
       }
     }
   },

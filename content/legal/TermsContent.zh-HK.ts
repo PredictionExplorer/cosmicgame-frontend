@@ -1,4 +1,9 @@
-import { protocolFacts } from '@/content/protocol-facts';
+import {
+  ethDistributionFacts,
+  isV3Mechanics,
+  nftAllocationFacts,
+  protocolFacts,
+} from '@/content/protocol-facts';
 
 import type { TermsCopy } from './TermsContent';
 
@@ -55,12 +60,16 @@ export const termsCopyZhHk = {
         {
           id: 'dynamic-cst',
           subtitle: '動態 CST 銘刻',
-          text: '每筆落筆銘刻的參與 CST 並非固定數量，而是取決於距上一筆落筆經過的時間，並按平方根公式計算。極短間隔的落筆可能銘刻 0 CST。',
+          text: isV3Mechanics
+            ? '每筆落筆銘刻的參與 CST 並非固定數量，而是隨距上一筆落筆經過的時間線性累積，且每次銘刻的一部分會記入被超越的參與者。極短間隔的落筆可能銘刻 0 CST。'
+            : '每筆落筆銘刻的參與 CST 並非固定數量，而是取決於距上一筆落筆經過的時間，並按平方根公式計算。極短間隔的落筆可能銘刻 0 CST。',
         },
         {
           id: 'cst-window',
           subtitle: 'CST 校準窗口',
-          text: `CST 落筆價格會在鏈上儲存的校準窗口中逐步下降。每筆 CST 落筆會使該窗口增加約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%，每筆 ETH 落筆會使其減少約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%。`,
+          text: isV3Mechanics
+            ? 'CST 落筆價格會在校準窗口中逐步下降。每筆 CST 落筆會以其成交價的兩倍（受鏈上最低值約束）重啟該窗口，之後價格按鏈上恆定速率下降，直至歸零或另一筆 CST 落筆成交。'
+            : `CST 落筆價格會在鏈上儲存的校準窗口中逐步下降。每筆 CST 落筆會使該窗口增加約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%，每筆 ETH 落筆會使其減少約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%。`,
         },
         {
           id: 'smart-contract',
@@ -86,17 +95,17 @@ export const termsCopyZhHk = {
         {
           id: 'distribution',
           subtitle: '分配發放',
-          text: `分配按照智能合約規則自動發放。通常，每個週期會沿下列分配軌道銘刻 ${protocolFacts.typicalNftsPerCycle} 枚 Cosmic Signature NFT 與 ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('zh-HK')} CST。`,
+          text: `分配按照智能合約規則自動發放。通常，每個週期會沿下列分配軌道銘刻 ${nftAllocationFacts.typicalNftsPerCycle} 枚 Cosmic Signature NFT 與 ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString('zh-HK')} CST。`,
         },
         {
           id: 'signature',
           subtitle: '簽名分配',
-          text: `完成收官之筆的參與者可以取回 ${protocolFacts.mainEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 表彰銘刻、1 枚 Cosmic Signature NFT，以及該週期中可能存在的已附加代幣。`,
+          text: `完成收官之筆的參與者可以取回 ${ethDistributionFacts.mainEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 表彰銘刻、${nftAllocationFacts.mainPrizeNftPhrase.zhHant}，以及該週期中可能存在的已附加代幣。`,
         },
         {
           id: 'chrono',
           subtitle: '時之勇士',
-          text: `連續保持堅守冠軍身份時間最長的參與者將獲得 ${protocolFacts.chronoWarriorEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 表彰銘刻與 1 枚 Cosmic Signature NFT。`,
+          text: `連續保持堅守冠軍身份時間最長的參與者將獲得 ${ethDistributionFacts.chronoWarriorEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 表彰銘刻與 1 枚 Cosmic Signature NFT。`,
         },
         {
           id: 'endurance',
@@ -111,7 +120,7 @@ export const termsCopyZhHk = {
         {
           id: 'eth-selection',
           subtitle: 'ETH 星選',
-          text: `${protocolFacts.ethStellarSelectionRecipients} 位獲配者共同分得週期儲備中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH。`,
+          text: `${protocolFacts.ethStellarSelectionRecipients} 位獲配者共同分得週期儲備中 ${ethDistributionFacts.stellarSelectionEthPercentage}% 的 ETH。`,
         },
         {
           id: 'nft-selection',
@@ -126,12 +135,12 @@ export const termsCopyZhHk = {
         {
           id: 'anchor-distribution',
           subtitle: '錨定派發',
-          text: `${protocolFacts.anchorDistributionPercentage}% 的 ETH 按已錨定 Cosmic Signature NFT 的數量比例派發。`,
+          text: `${ethDistributionFacts.anchorDistributionPercentage}% 的 ETH 按已錨定 Cosmic Signature NFT 的數量比例派發。`,
         },
         {
           id: 'public-goods',
           subtitle: '公共物品',
-          text: `${protocolFacts.publicGoodsPercentage}% 的 ETH 會轉撥給目前公共物品受益方 Protocol Guild。`,
+          text: `${ethDistributionFacts.publicGoodsPercentage}% 的 ETH 會轉撥給目前公共物品受益方 Protocol Guild。`,
         },
         {
           id: 'compounding',

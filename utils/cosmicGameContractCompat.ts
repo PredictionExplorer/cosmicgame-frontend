@@ -81,6 +81,30 @@ const MISSING_READ_FUNCTION_MARKERS = [
 ] as const;
 
 /**
+ * Live geth/Arbitrum nodes surface a missing selector behind the UUPS proxy as an
+ * empty-data revert, which viem wraps in a ContractFunctionRevertedError carrying no
+ * decoded reason, signature, or error data — its message is just `The contract function
+ * "x" reverted.`. A genuine application revert always carries a reason string or a
+ * custom error (decoded into `data`/`signature`), so the bare shape identifies
+ * "selector absent" on nodes whose message text matches none of the markers above.
+ */
+function isReasonlessContractRevert(err: unknown): boolean {
+  if (!(err instanceof Error) || err.name !== 'ContractFunctionRevertedError') return false;
+  const revert = err as Error & {
+    reason?: unknown;
+    signature?: unknown;
+    data?: unknown;
+    raw?: unknown;
+  };
+  return (
+    !revert.reason &&
+    !revert.signature &&
+    revert.data === undefined &&
+    (revert.raw === undefined || revert.raw === '0x')
+  );
+}
+
+/**
  * True when a no-argument getter probe failed in a way consistent with the selector not
  * existing on the deployed implementation (e.g. probing a V3 getter on a V2 contract).
  * Such getters cannot legitimately revert on a version that implements them, so a
@@ -88,6 +112,7 @@ const MISSING_READ_FUNCTION_MARKERS = [
  */
 export function isMissingFunctionReadError(err: unknown): boolean {
   if (isUnrecognizedSelectorError(err)) return true;
+  if (isReasonlessContractRevert(err)) return true;
   const text = errorText(err).toLowerCase();
   if (MISSING_READ_FUNCTION_MARKERS.some((m) => text.includes(m))) return true;
 

@@ -46,7 +46,7 @@ export const landingTextZh = {
       'CC0',
       '开源',
       '确定性艺术',
-      '7% 转拨至 Protocol Guild',
+      `${ethDistributionFacts.publicGoodsPercentage}% 转拨至 Protocol Guild`,
       '宇宙议会',
       'Arbitrum One',
     ],
@@ -317,8 +317,7 @@ export const landingTextZh = {
       // lexicon-allow-start: 明确否认慈善捐赠及相关税务定性。
       {
         question: '公共物品具体指什么？',
-        answer:
-          '每个周期会将 ETH 储备的 7% 转拨至公共物品地址，目前为 Protocol Guild。Protocol Guild 是为 170 多位以太坊核心贡献者提供资助的集体机制。这是向公共物品地址转拨 ETH，并非美国税法意义上的慈善捐赠；Cosmic Signature 不对其税务处理作任何陈述。',
+        answer: `每个周期会将 ETH 储备的 ${ethDistributionFacts.publicGoodsPercentage}% 转拨至公共物品地址，目前为 Protocol Guild。Protocol Guild 是为 170 多位以太坊核心贡献者提供资助的集体机制。这是向公共物品地址转拨 ETH，并非美国税法意义上的慈善捐赠；Cosmic Signature 不对其税务处理作任何陈述。`,
       },
       // lexicon-allow-end
       {

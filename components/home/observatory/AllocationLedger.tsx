@@ -15,12 +15,17 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Link } from '@/i18n/navigation';
 import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
+
+/** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
+const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
 
 export interface AllocationLedgerProps {
   data: DashboardInfo | null;
@@ -57,7 +62,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
       key: 'signature',
       icon: <Trophy className="h-3.5 w-3.5" aria-hidden />,
       name: t('allocation.cards.signature.name'),
-      tooltip: t('allocation.cards.signature.tooltip'),
+      tooltip: t('allocation.cards.signature.tooltip', { cscNftCount: signatureNftCount }),
       amount: ethAmount(amounts.signatureEth),
       detail: recipients(1),
       href: '/current-cycle',

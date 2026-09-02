@@ -268,10 +268,10 @@ export const nftAllocationFacts: {
   typicalNftsPerCycle: number;
   /** Allocations that each pair an NFT with `specialAllocationCst`. Same in both versions. */
   nftBearingAllocations: number;
-  /** Ready-made noun phrase for the Signature Allocation NFTs, per locale. */
-  mainPrizeNftPhrase: { en: string; zh: string };
+  /** Ready-made noun phrase for the Signature Allocation NFTs, per locale (zhHant serves zh-TW and zh-HK). */
+  mainPrizeNftPhrase: { en: string; zh: string; zhHant: string; uk: string };
   /** Bare cardinal for `mainPrizeNfts`, for prose that supplies its own noun. */
-  mainPrizeNftsWord: { en: string; zh: string };
+  mainPrizeNftsWord: { en: string; zh: string; zhHant: string; uk: string };
 } = isV3Mechanics
   ? {
       mainPrizeNfts: protocolFacts.v3.mainPrizeNftsPerCycleDefault,
@@ -280,8 +280,10 @@ export const nftAllocationFacts: {
       mainPrizeNftPhrase: {
         en: 'three sequential Cosmic Signature NFTs',
         zh: '3 枚连续编号的 Cosmic Signature NFT',
+        zhHant: '3 枚連續編號的 Cosmic Signature NFT',
+        uk: '3 послідовні Cosmic Signature NFT',
       },
-      mainPrizeNftsWord: { en: 'three', zh: '3' },
+      mainPrizeNftsWord: { en: 'three', zh: '3', zhHant: '3', uk: '3' },
     }
   : {
       mainPrizeNfts: protocolFacts.mainPrizeNftsPerCycle,
@@ -290,6 +292,8 @@ export const nftAllocationFacts: {
       mainPrizeNftPhrase: {
         en: 'one Cosmic Signature NFT',
         zh: '1 枚 Cosmic Signature NFT',
+        zhHant: '1 枚 Cosmic Signature NFT',
+        uk: '1 Cosmic Signature NFT',
       },
-      mainPrizeNftsWord: { en: 'one', zh: '1' },
+      mainPrizeNftsWord: { en: 'one', zh: '1', zhHant: '1', uk: '1' },
     };
