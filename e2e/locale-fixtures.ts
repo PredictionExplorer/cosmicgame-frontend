@@ -398,7 +398,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     footer: { terms: '服務條款', privacy: '私隱政策' },
     nav: {
       primaryLabel: '主導航',
-      openMenu: '開啟選單',
+      openMenu: '打開選單',
       gallery: '畫廊',
       explore: '探索',
       help: '幫助',

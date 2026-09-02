@@ -93,7 +93,8 @@ test.describe('zh locale smoke', () => {
     const switcher = page.getByRole('button', { name: 'Language' }).last();
     await switcher.scrollIntoViewIfNeeded();
     await switcher.click();
-    await page.getByRole('menuitem', { name: '中文' }).click();
+    // Three Chinese locales share the "中文" substring; pick Simplified by its full label.
+    await page.getByRole('menuitem', { name: '简体中文', exact: true }).click();
 
     await expect(page).toHaveURL(/\/zh\/faq$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');

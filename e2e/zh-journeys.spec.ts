@@ -109,7 +109,7 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
     await page.locator('button[aria-label="Language"]:visible').first().click();
-    await page.getByRole('menuitem', { name: '中文' }).click();
+    await page.getByRole('menuitem', { name: '简体中文', exact: true }).click();
     await page.waitForURL((url) => url.pathname === `/zh/learn/${learnSlug}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
   });
