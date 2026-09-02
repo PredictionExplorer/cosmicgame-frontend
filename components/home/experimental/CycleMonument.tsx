@@ -5,6 +5,7 @@ import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight, BellRing, CalendarPlus, Clock3, Radio } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 import { shortenHex } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
@@ -22,6 +23,9 @@ import { formatGesturePayment, hasRandomWalkToken } from '@/utils/gesturePayment
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 
 import { viewForPhase } from './phaseView';
+
+/** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
+const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
 
 /** Selectable "notify me before finalization" thresholds, in minutes. */
 export const NOTIFY_THRESHOLD_CHOICES_MIN = [5, 30, 60] as const;
@@ -207,10 +211,10 @@ export function CycleMonument({
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {t('deck.monument.reserveLabel')}
                 <InfoTooltip
-                  content={t(
-                    `status.metrics.signatureTooltip.${attachedAssetVariant}`,
-                    attachedAssetValues,
-                  )}
+                  content={t(`status.metrics.signatureTooltip.${attachedAssetVariant}`, {
+                    cscNftCount: signatureNftCount,
+                    ...attachedAssetValues,
+                  })}
                   className="ml-1.5"
                 />
               </p>

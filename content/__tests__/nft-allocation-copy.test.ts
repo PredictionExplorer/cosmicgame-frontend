@@ -1,9 +1,9 @@
-import { faqContentEn } from '@/content/faq/en';
-import { faqContentZh } from '@/content/faq/zh';
-import { howItWorksContentEn } from '@/content/how-it-works/en';
-import { howItWorksContentZh } from '@/content/how-it-works/zh';
-import { landingContentEn } from '@/content/landing/en';
-import { landingContentZh } from '@/content/landing/zh';
+import { faqTextEn } from '@/content/faq/text.en';
+import { faqTextZh } from '@/content/faq/text.zh';
+import { howItWorksTextEn } from '@/content/how-it-works/text.en';
+import { howItWorksTextZh } from '@/content/how-it-works/text.zh';
+import { landingTextEn } from '@/content/landing/text.en';
+import { landingTextZh } from '@/content/landing/text.zh';
 import { termsCopyEn } from '@/content/legal/TermsContent.en';
 import { termsCopyZh } from '@/content/legal/TermsContent.zh';
 import { isV3Mechanics, nftAllocationFacts, protocolFacts } from '@/content/protocol-facts';
@@ -15,15 +15,15 @@ import { isV3Mechanics, nftAllocationFacts, protocolFacts } from '@/content/prot
  * for the Signature Allocation under V3. These tests pin both halves.
  */
 const EN_MODULES = {
-  faq: faqContentEn,
-  landing: landingContentEn,
-  howItWorks: howItWorksContentEn,
+  faq: faqTextEn,
+  landing: landingTextEn,
+  howItWorks: howItWorksTextEn,
   terms: termsCopyEn,
 };
 const ZH_MODULES = {
-  faq: faqContentZh,
-  landing: landingContentZh,
-  howItWorks: howItWorksContentZh,
+  faq: faqTextZh,
+  landing: landingTextZh,
+  howItWorks: howItWorksTextZh,
   terms: termsCopyZh,
 };
 
@@ -77,7 +77,7 @@ describe('Cosmic Signature NFT counts in static copy', () => {
       'Chrono-Warrior receives',
       'last CST gesture of the cycle receives',
     ];
-    const strings = leafStrings(faqContentEn).concat(leafStrings(termsCopyEn));
+    const strings = leafStrings(faqTextEn).concat(leafStrings(termsCopyEn));
 
     for (const role of roles) {
       const sentence = strings.find((s) => s.includes(role));
@@ -95,7 +95,7 @@ describe('Cosmic Signature NFT counts in static copy', () => {
     );
     expect(total).toBe(isV3Mechanics ? 26 : 24);
 
-    for (const mod of [termsCopyEn, faqContentEn]) {
+    for (const mod of [termsCopyEn, faqTextEn]) {
       expect(leafStrings(mod).some((s) => s.includes(`${total} Cosmic Signature NFT`))).toBe(true);
     }
   });

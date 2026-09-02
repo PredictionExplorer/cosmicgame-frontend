@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { landingContentEn } from '@/content/landing';
+import { ethDistributionFacts } from '@/content/protocol-facts';
 
 import { AllocationTracks } from '@/components/landing-v2/AllocationTracks';
 
@@ -25,12 +26,14 @@ describe('<AllocationTracks />', () => {
     expect(
       screen.getByRole('heading', { level: 3, name: /Signature Allocation/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText('25%')).toBeInTheDocument();
+    expect(screen.getByText(`${ethDistributionFacts.mainEthPercentage}%`)).toBeInTheDocument();
   });
 
-  it('renders the Public Goods Allocation card with 7% and Protocol Guild reference', () => {
+  it('renders the Public Goods Allocation card with its percentage and Protocol Guild reference', () => {
     render(<AllocationTracks tracks={landingContentEn.tracks} />);
-    expect(screen.getByText('7%')).toBeInTheDocument();
+    expect(
+      screen.getAllByText(`${ethDistributionFacts.publicGoodsPercentage}%`).length,
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Protocol Guild/i)).toBeInTheDocument();
   });
 

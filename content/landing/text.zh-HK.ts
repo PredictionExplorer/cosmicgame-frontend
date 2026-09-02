@@ -1,4 +1,9 @@
-import { protocolFacts } from '@/content/protocol-facts';
+import {
+  ethDistributionFacts,
+  isV3Mechanics,
+  nftAllocationFacts,
+  protocolFacts,
+} from '@/content/protocol-facts';
 
 import type { LandingText } from './structure';
 
@@ -41,7 +46,7 @@ export const landingTextZhHk = {
       'CC0',
       '開源',
       '確定性藝術',
-      '7% 轉撥至 Protocol Guild',
+      `${ethDistributionFacts.publicGoodsPercentage}% 轉撥至 Protocol Guild`,
       '宇宙議會',
       'Arbitrum One',
     ],
@@ -71,7 +76,9 @@ export const landingTextZhHk = {
       },
       gestures: {
         title: '落筆',
-        body: `參與者使用 ETH 或 CST 落筆。每一筆都會延長收官倒數，計入一次星選資格，還可能銘刻參與 CST；具體數量取決於距上一筆經過的時間，並按其平方根計算。ETH 落筆會使 CST 校準窗口縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%；CST 落筆則使其延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。`,
+        body: isV3Mechanics
+          ? '參與者使用 ETH 或 CST 落筆。每一筆都會延長收官倒數，計入一次星選資格，還可能銘刻參與 CST；具體數量隨距上一筆經過的時間以恆定速率累積。每筆 CST 落筆會以其成交價的兩倍重啟 CST 校準窗口，之後價格按同一恆定速率下降。'
+          : `參與者使用 ETH 或 CST 落筆。每一筆都會延長收官倒數，計入一次星選資格，還可能銘刻參與 CST；具體數量取決於距上一筆經過的時間，並按其平方根計算。ETH 落筆會使 CST 校準窗口縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%；CST 落筆則使其延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。`,
       },
       finalization: {
         title: '收官',
@@ -149,7 +156,7 @@ export const landingTextZhHk = {
     items: {
       'signature-allocation': {
         title: '簽名分配',
-        body: '寫下收官之筆的參與者獲配。其中包括 1,000 CST 與 1 枚 Cosmic Signature NFT。',
+        body: `寫下收官之筆的參與者獲配。其中包括 1,000 CST 與 ${nftAllocationFacts.mainPrizeNftPhrase.zhHant}。`,
       },
       'compounding-reserve': {
         percent: '約 50%',
@@ -198,7 +205,7 @@ export const landingTextZhHk = {
   anchoring: {
     eyebrow: '錨定',
     heading: '將 Cosmic Signature NFT 錨定至協議。',
-    body: `每個週期，${protocolFacts.anchorDistributionPercentage}% 的 ETH 週期儲備會用於錨定派發。已錨定的 Cosmic Signature NFT 會按比例累積相應份額，解錨時即可取回。每枚 NFT 僅可錨定一次，但可隨時解錨；一旦解錨，便永久失去再次錨定的資格。已錨定的 Random Walk NFT 可獲得錨定 NFT 星選資格；入選錨定者將獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT（不含 ETH）。`,
+    body: `每個週期，${ethDistributionFacts.anchorDistributionPercentage}% 的 ETH 週期儲備會用於錨定派發。已錨定的 Cosmic Signature NFT 會按比例累積相應份額，解錨時即可取回。每枚 NFT 僅可錨定一次，但可隨時解錨；一旦解錨，便永久失去再次錨定的資格。已錨定的 Random Walk NFT 可獲得錨定 NFT 星選資格；入選錨定者將獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT（不含 ETH）。`,
     bullets: [
       '每個週期累積 ETH 錨定派發，解錨時取回',
       '可隨時解錨；每枚 NFT 僅可錨定一次',
@@ -210,8 +217,8 @@ export const landingTextZhHk = {
 
   publicGoods: {
     eyebrow: '公共物品',
-    heading: `${protocolFacts.publicGoodsPercentage}% 的週期儲備，流向以太坊核心貢獻者。`,
-    body: `每個演繹週期都會將 ETH 儲備的 ${protocolFacts.publicGoodsPercentage}% 轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的集體機制。協議使用得越多，流向以太坊底層基礎設施的資源也越多。`,
+    heading: `${ethDistributionFacts.publicGoodsPercentage}% 的週期儲備，流向以太坊核心貢獻者。`,
+    body: `每個演繹週期都會將 ETH 儲備的 ${ethDistributionFacts.publicGoodsPercentage}% 轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的集體機制。協議使用得越多，流向以太坊底層基礎設施的資源也越多。`,
     disclaimerHeading: '免責聲明',
     // lexicon-allow-start: 明確否認慈善捐贈及相關稅務定性。
     disclaimer:
@@ -287,8 +294,9 @@ export const landingTextZhHk = {
       },
       {
         question: '為什麼參與 CST 的數量會變化？',
-        answer:
-          '參與 CST 的銘刻量採用平方根公式，取決於距上一筆經過的時間。沉寂越久，CST 銘刻量越大；平方根會讓增幅逐漸放緩。落筆間隔極短時，可能銘刻 0 CST。提交前，應用程式會預覽目前數額。',
+        answer: isV3Mechanics
+          ? `參與 CST 的銘刻量隨距上一筆經過的時間線性累積——按協議上線參數約為每分鐘 ${protocolFacts.v3.dynamicCstRewardPerMinuteAtLaunch} CST。沉寂越久，CST 銘刻量按比例越大；緊隨他人之後落筆則銘刻量接近 0 CST。提交前，應用程式會預覽目前數額。`
+          : '參與 CST 的銘刻量採用平方根公式，取決於距上一筆經過的時間。沉寂越久，CST 銘刻量越大；平方根會讓增幅逐漸放緩。落筆間隔極短時，可能銘刻 0 CST。提交前，應用程式會預覽目前數額。',
       },
       {
         question: 'ETH 與 CST 落筆會怎樣影響 CST 校準窗口？',
@@ -309,8 +317,7 @@ export const landingTextZhHk = {
       // lexicon-allow-start: 明確否認慈善捐贈及相關稅務定性。
       {
         question: '公共物品具體指什麼？',
-        answer:
-          '每個週期會將 ETH 儲備的 7% 轉撥至公共物品地址，目前為 Protocol Guild。Protocol Guild 是為 170 多位以太坊核心貢獻者提供資助的集體機制。這是向公共物品地址轉撥 ETH，並非美國稅法意義上的慈善捐贈；Cosmic Signature 不對其稅務處理作任何陳述。',
+        answer: `每個週期會將 ETH 儲備的 ${ethDistributionFacts.publicGoodsPercentage}% 轉撥至公共物品地址，目前為 Protocol Guild。Protocol Guild 是為 170 多位以太坊核心貢獻者提供資助的集體機制。這是向公共物品地址轉撥 ETH，並非美國稅法意義上的慈善捐贈；Cosmic Signature 不對其稅務處理作任何陳述。`,
       },
       // lexicon-allow-end
       {
