@@ -178,8 +178,36 @@ test.describe('Wallet connection state (disconnected)', () => {
   }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
 
-    await expect(page.getByText('Connect to submit your gesture')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByRole('button', { name: /connect/i }).first()).toBeVisible();
+    // The gesture panel only exists while a cycle is active (see home.spec.ts).
+    const clock = page.getByTestId('cycle-clock');
+    await expect(clock).toBeVisible({ timeout: 15000 });
+    const phase = await clock.getAttribute('data-phase');
+    test.skip(
+      phase === 'opening-soon' || phase === 'loading' || phase === 'unavailable',
+      'the gesture panel is legitimately hidden while no cycle is active',
+    );
+
+    // Phones host the one gesture panel in a bottom sheet behind the dock;
+    // desktop renders it inline in the stage.
+    const isMobile = await page.evaluate(() => window.innerWidth < 1024);
+    if (isMobile) {
+      const dock = page.getByTestId('dock-open-sheet');
+      await expect(dock).toBeVisible({ timeout: 15000 });
+      await dock.click();
+    }
+    const panel = page
+      .locator(
+        isMobile
+          ? '[data-testid="gesture-panel"][data-variant="sheet"]:visible'
+          : '[data-testid="gesture-panel"]:visible',
+      )
+      .first();
+    await expect(panel).toBeVisible({ timeout: 15000 });
+
+    const prompt = panel.getByTestId('connect-to-gesture');
+    await expect(prompt).toBeVisible();
+    await expect(prompt.getByText('Connect to submit your gesture')).toBeVisible();
+    await expect(prompt.getByRole('button', { name: /connect/i })).toBeVisible();
   });
 
   test('my-tokens page handles no wallet gracefully', async ({ page }) => {

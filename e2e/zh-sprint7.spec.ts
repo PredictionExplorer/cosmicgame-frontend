@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { mockZhQualityApi } from './zh-quality-mocks';
+import { ZH_ROUTE_FIXTURES } from './zh-route-inventory';
 
 const ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
 const MOCK_TIMESTAMP = 1710000000;
@@ -307,14 +308,19 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
 
   test('keeps special-allocation participant links inside /zh', async ({ page }) => {
     await mockZhQualityApi(page);
+    // The dashboard's LastBidderAddr is authoritative for the latest
+    // participant (lib/latestGesture.ts), so this endpoint must agree with the
+    // quality-mock dashboard; it still decides the endurance/chrono cards.
+    const latestParticipant = ZH_ROUTE_FIXTURES.address;
+    const chronoWarrior = '0x2222222222222222222222222222222222222222';
     await page.route('**/current_special_winners', async (route) => {
       await route.fulfill({
         json: {
           EnduranceChampionAddress: ADDRESS,
           EnduranceChampionDuration: 3600,
-          ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
+          ChronoWarriorAddress: chronoWarrior,
           ChronoWarriorDuration: 7200,
-          LastBidderAddress: ADDRESS,
+          LastBidderAddress: latestParticipant,
           LastBidderLastBidTime: Math.floor(Date.now() / 1000) - 60,
           LastCstBidderAddress: '0x3333333333333333333333333333333333333333',
         },
@@ -325,9 +331,14 @@ test.describe('zh Sprint 7 — long-tail routes', () => {
     await openZh(page, '/zh/current-cycle');
     const latestCard = page.getByTestId('special-allocation-card-latest-participant').first();
     await expect(latestCard).toBeVisible({ timeout: 30_000 });
-    await expect(latestCard.getByRole('link', { name: ADDRESS })).toHaveAttribute(
+    await expect(latestCard.getByRole('link', { name: latestParticipant })).toHaveAttribute(
       'href',
-      `/zh/user/${ADDRESS}`,
+      `/zh/user/${latestParticipant}`,
+    );
+    const chronoCard = page.getByTestId('special-allocation-card-chrono-warrior').first();
+    await expect(chronoCard.getByRole('link', { name: chronoWarrior })).toHaveAttribute(
+      'href',
+      `/zh/user/${chronoWarrior}`,
     );
   });
 
