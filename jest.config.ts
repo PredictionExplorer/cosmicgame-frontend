@@ -22,7 +22,10 @@ const config: Config = {
     '^@/(.*)$': '<rootDir>/$1',
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(viem|wagmi|@wagmi|@rainbow-me|@tanstack|abitype|ox)/)',
+    // Every pattern here must ALSO exempt anything listed in next.config
+    // `transpilePackages` (@formatjs), because jest ignores a path when any
+    // pattern matches it.
+    '/node_modules/(?!(viem|wagmi|@wagmi|@rainbow-me|@tanstack|abitype|ox|@formatjs)/)',
   ],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   collectCoverageFrom: [

@@ -1,0 +1,9 @@
+{
+  "gallery": {
+    "placeholder": "Пошук за ID або ім’ям токена…",
+    "ariaLabel": "Пошук NFT",
+    "clear": "Очистити пошук",
+    "submit": "Шукати",
+    "results": "{count, plural, one {# результат} few {# результати} many {# результатів} other {# результату}}"
+  }
+}

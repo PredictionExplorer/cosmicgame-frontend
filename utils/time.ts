@@ -1,4 +1,5 @@
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
+import { getLocaleConfig } from '@/i18n/localeConfig';
 
 const MINUTE = 60;
 const HOUR = 3600;
@@ -25,7 +26,8 @@ const ZH_RELATIVE_UNITS: Record<RelativeTimeUnit, string> = {
  * `en` keeps the historical forms ("2 months ago", "1 year ago", "just now");
  * `zh` follows docs/i18n/style-guide-zh.md §4 with CJK–Latin spacing
  * ("2 个月前", "刚刚"). Chinese has no plural inflection, so both counts
- * share one form.
+ * share one form. `uk` delegates to `Intl.RelativeTimeFormat`, which owns the
+ * four-way plural agreement ("1 хвилину", "2 хвилини", "5 хвилин тому").
  */
 const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
   en: {
@@ -35,6 +37,14 @@ const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
   zh: {
     justNow: '刚刚',
     ago: (count, unit) => `${count} ${ZH_RELATIVE_UNITS[unit]}前`,
+  },
+  uk: {
+    justNow: 'щойно',
+    ago: (count, unit) =>
+      new Intl.RelativeTimeFormat(getLocaleConfig('uk').intlLocale, { numeric: 'always' }).format(
+        -count,
+        unit,
+      ),
   },
 };
 
@@ -57,15 +67,18 @@ export function getRelativeTime(timestamp: number, nowSeconds?: number, locale =
  * form (the historical byte-pinned rendering); other locales render their
  * long date form.
  */
+const longIsoDateLabel = (locale: string) => (isoDate: string) =>
+  new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${isoDate}T00:00:00Z`));
+
 const ISO_DATE_LABEL_FORMATS: LocaleRecord<(isoDate: string) => string> = {
   en: (isoDate) => isoDate,
-  zh: (isoDate) =>
-    new Intl.DateTimeFormat('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      timeZone: 'UTC',
-    }).format(new Date(`${isoDate}T00:00:00Z`)),
+  zh: longIsoDateLabel('zh'),
+  uk: longIsoDateLabel('uk'),
 };
 
 /** Locale-appropriate display form of an ISO `YYYY-MM-DD` date string. */

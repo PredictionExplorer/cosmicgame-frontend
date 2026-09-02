@@ -1,6 +1,8 @@
 // lexicon-allow-start: exercises legacy URL rewrites by design
 import { expect, request, test } from '@playwright/test';
 
+import { LOCALE_CHROME, TRANSLATED_LOCALES } from './locale-fixtures';
+
 /**
  * End-to-end tests for the proxy middleware (proxy.ts).
  *
@@ -204,76 +206,94 @@ test.describe('proxy middleware', () => {
     });
   });
 
-  test.describe('locale-prefixed paths (/zh)', () => {
-    test('landing host serves /zh as the Chinese landing page (rewrite, no redirect)', async () => {
-      const ctx = await request.newContext({
-        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+  for (const locale of TRANSLATED_LOCALES) {
+    const chrome = LOCALE_CHROME[locale];
+
+    test.describe(`locale-prefixed paths (/${locale})`, () => {
+      test(`landing host serves /${locale} as the localized landing page (rewrite, no redirect)`, async () => {
+        const ctx = await request.newContext({
+          extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+        });
+        const res = await ctx.get(`${BASE}/${locale}`, { maxRedirects: 0 });
+        expect(res.status()).toBe(200);
+        const body = await res.text();
+        expect(body).toContain(`lang="${locale}"`);
+        expect(body).toContain(chrome.landingText);
+        await ctx.dispose();
       });
-      const res = await ctx.get(`${BASE}/zh`, { maxRedirects: 0 });
-      expect(res.status()).toBe(200);
-      const body = await res.text();
-      expect(body).toContain('lang="zh"');
-      expect(body).toContain('程序化链上艺术');
-      await ctx.dispose();
+
+      test(`landing host redirects /${locale}/gallery to app subdomain keeping the prefix`, async () => {
+        const ctx = await request.newContext({
+          extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+        });
+        const res = await ctx.get(`${BASE}/${locale}/gallery?round=5`, { maxRedirects: 0 });
+        expect(res.status()).toBe(308);
+        expect(res.headers()['location']).toMatch(
+          expectedAppLocation(`/${locale}/gallery?round=5`),
+        );
+        await ctx.dispose();
+      });
+
+      test(`landing host keeps the locale when redirecting /${locale}/experimental-ui`, async () => {
+        const ctx = await request.newContext({
+          extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+        });
+        const res = await ctx.get(`${BASE}/${locale}/experimental-ui?source=landing`, {
+          maxRedirects: 0,
+        });
+
+        expect(res.status()).toBe(308);
+        expect(res.headers()['location']).toMatch(
+          expectedAppLocation(`/${locale}/experimental-ui?source=landing`),
+        );
+        await ctx.dispose();
+      });
+
+      test(`landing host canonicalizes /${locale}/landing-site to /${locale}`, async () => {
+        const ctx = await request.newContext({
+          extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+        });
+        const res = await ctx.get(`${BASE}/${locale}/landing-site`, { maxRedirects: 0 });
+        expect(res.status()).toBe(308);
+        expect(res.headers()['location']).toMatch(new RegExp(`/${locale}$`));
+        await ctx.dispose();
+      });
+
+      test(`app host serves /${locale} dApp home with lang="${locale}"`, async () => {
+        const ctx = await request.newContext({
+          extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
+        });
+        const res = await ctx.get(`${BASE}/${locale}`, { maxRedirects: 0 });
+        expect(res.status()).toBe(200);
+        const body = await res.text();
+        expect(body).toContain(`lang="${locale}"`);
+        await ctx.dispose();
+      });
+
+      test(`app host redirects landing-only /${locale}/about to the apex host keeping the prefix`, async () => {
+        const ctx = await request.newContext({
+          extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
+        });
+        const res = await ctx.get(`${BASE}/${locale}/about`, { maxRedirects: 0 });
+        expect(res.status()).toBe(308);
+        expect(res.headers()['location']).toMatch(expectedLandingLocation(`/${locale}/about`));
+        await ctx.dispose();
+      });
+
+      test(`www landing host redirect preserves the /${locale} prefix`, async () => {
+        const ctx = await request.newContext({
+          extraHTTPHeaders: { Host: 'www.cosmicsignature.com' },
+        });
+        const res = await ctx.get(`${BASE}/${locale}/gallery`, { maxRedirects: 0 });
+        expect(res.status()).toBe(308);
+        expect(res.headers()['location']).toMatch(expectedLandingLocation(`/${locale}/gallery`));
+        await ctx.dispose();
+      });
     });
+  }
 
-    test('landing host redirects /zh/gallery to app subdomain keeping the prefix', async () => {
-      const ctx = await request.newContext({
-        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
-      });
-      const res = await ctx.get(`${BASE}/zh/gallery?round=5`, { maxRedirects: 0 });
-      expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toMatch(expectedAppLocation('/zh/gallery?round=5'));
-      await ctx.dispose();
-    });
-
-    test('landing host keeps the locale when redirecting /zh/experimental-ui', async () => {
-      const ctx = await request.newContext({
-        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
-      });
-      const res = await ctx.get(`${BASE}/zh/experimental-ui?source=landing`, {
-        maxRedirects: 0,
-      });
-
-      expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toMatch(
-        expectedAppLocation('/zh/experimental-ui?source=landing'),
-      );
-      await ctx.dispose();
-    });
-
-    test('landing host canonicalizes /zh/landing-site to /zh', async () => {
-      const ctx = await request.newContext({
-        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
-      });
-      const res = await ctx.get(`${BASE}/zh/landing-site`, { maxRedirects: 0 });
-      expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toMatch(/\/zh$/);
-      await ctx.dispose();
-    });
-
-    test('app host serves /zh dApp home with lang="zh"', async () => {
-      const ctx = await request.newContext({
-        extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
-      });
-      const res = await ctx.get(`${BASE}/zh`, { maxRedirects: 0 });
-      expect(res.status()).toBe(200);
-      const body = await res.text();
-      expect(body).toContain('lang="zh"');
-      await ctx.dispose();
-    });
-
-    test('app host redirects landing-only /zh/about to the apex host keeping the prefix', async () => {
-      const ctx = await request.newContext({
-        extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
-      });
-      const res = await ctx.get(`${BASE}/zh/about`, { maxRedirects: 0 });
-      expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toMatch(expectedLandingLocation('/zh/about'));
-      await ctx.dispose();
-    });
-
-    test('default-locale prefix /en/gallery canonicalizes to the unprefixed URL', async () => {
+  test.describe('default-locale prefix', () => {
+    test('/en/gallery canonicalizes to the unprefixed URL', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
       });
@@ -281,16 +301,6 @@ test.describe('proxy middleware', () => {
       // localePrefix 'as-needed': English never carries a prefix publicly.
       expect([307, 308]).toContain(res.status());
       expect(res.headers()['location']).toMatch(/\/gallery$/);
-      await ctx.dispose();
-    });
-
-    test('www landing host redirect preserves the /zh prefix', async () => {
-      const ctx = await request.newContext({
-        extraHTTPHeaders: { Host: 'www.cosmicsignature.com' },
-      });
-      const res = await ctx.get(`${BASE}/zh/gallery`, { maxRedirects: 0 });
-      expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toMatch(expectedLandingLocation('/zh/gallery'));
       await ctx.dispose();
     });
   });

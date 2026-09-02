@@ -1,0 +1,43 @@
+{
+  "tagline": "Процедурний протокол ончейн-мистецтва на Arbitrum. Кожен жест формує фінальну Сигнатуру циклу.",
+  "sections": {
+    "protocol": "Протокол",
+    "explore": "Огляд",
+    "ecosystem": "Екосистема",
+    "resources": "Ресурси",
+    "community": "Спільнота"
+  },
+  "links": {
+    "gallery": "Галерея",
+    "currentCycle": "Поточний цикл",
+    "statistics": "Статистика",
+    "contracts": "Контракти",
+    "sourceCode": "Вихідний код",
+    "allocationRecipients": "Отримувачі розподілів",
+    "anchorDistributions": "Надходження за закріплення",
+    "outreachReserve": "Резерв просування",
+    "howItWorks": "Як це працює",
+    "faq": "Поширені запитання",
+    "axiomZero": "Маркетплейс Axiom Zero",
+    "chaosZero": "Прогнози Chaos Zero",
+    "uniswap": "Обміняти CST на Uniswap",
+    "geckoTerminal": "Пул CST на GeckoTerminal",
+    "about": "Про проєкт",
+    "learn": "Навчальний центр",
+    "whitePaper": "Біла книга",
+    "audits": "Аудит безпеки",
+    "siteMap": "Мапа сайту",
+    "protocolGuild": "Protocol Guild",
+    "twitter": "Twitter / X",
+    "discord": "Discord",
+    "discover": "Знайомство з проєктом",
+    "terms": "Умови",
+    "privacy": "Конфіденційність"
+  },
+  "social": {
+    "twitterLabel": "Twitter",
+    "discordLabel": "Discord"
+  },
+  "copyright": "© {year} Cosmic Signature · Власні матеріали проєкту · CC0 1.0",
+  "colophon": "CC0 · Верифіковано · Відтворювано"
+}

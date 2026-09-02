@@ -267,47 +267,43 @@ jest.mock('next-intl/server', () => ({
     }),
   getTranslations: async (options?: string | { locale?: string; namespace?: string }) => {
     const namespace = typeof options === 'string' ? options : options?.namespace;
-    const locale = typeof options === 'object' && options.locale === 'zh' ? 'zh' : 'en';
-    const prefix = namespace ? `${namespace}.` : '';
-    const namespaceMessagesByLocale: Record<string, Record<string, Record<string, unknown>>> = {
-      en: {
-        admin: require('./messages/en/admin.json') as Record<string, unknown>,
-        code: require('./messages/en/code.json') as Record<string, unknown>,
-        common: require('./messages/en/common.json') as Record<string, unknown>,
-        contracts: require('./messages/en/contracts.json') as Record<string, unknown>,
-        coordination: require('./messages/en/coordination.json') as Record<string, unknown>,
-        detail: require('./messages/en/detail.json') as Record<string, unknown>,
-        ethContribution: require('./messages/en/ethContribution.json') as Record<string, unknown>,
-        faq: require('./messages/en/faq.json') as Record<string, unknown>,
-        imprint: require('./messages/en/imprint.json') as Record<string, unknown>,
-        legal: require('./messages/en/legal.json') as Record<string, unknown>,
-        marketing: require('./messages/en/marketing.json') as Record<string, unknown>,
-        meta: require('./messages/en/meta.json') as Record<string, unknown>,
-        publicGoods: require('./messages/en/publicGoods.json') as Record<string, unknown>,
-        seo: require('./messages/en/seo.json') as Record<string, unknown>,
-        siteMap: require('./messages/en/siteMap.json') as Record<string, unknown>,
-        statistics: require('./messages/en/statistics.json') as Record<string, unknown>,
-      },
-      zh: {
-        admin: require('./messages/zh/admin.json') as Record<string, unknown>,
-        code: require('./messages/zh/code.json') as Record<string, unknown>,
-        common: require('./messages/zh/common.json') as Record<string, unknown>,
-        contracts: require('./messages/zh/contracts.json') as Record<string, unknown>,
-        coordination: require('./messages/zh/coordination.json') as Record<string, unknown>,
-        detail: require('./messages/zh/detail.json') as Record<string, unknown>,
-        ethContribution: require('./messages/zh/ethContribution.json') as Record<string, unknown>,
-        faq: require('./messages/zh/faq.json') as Record<string, unknown>,
-        imprint: require('./messages/zh/imprint.json') as Record<string, unknown>,
-        legal: require('./messages/zh/legal.json') as Record<string, unknown>,
-        marketing: require('./messages/zh/marketing.json') as Record<string, unknown>,
-        meta: require('./messages/zh/meta.json') as Record<string, unknown>,
-        publicGoods: require('./messages/zh/publicGoods.json') as Record<string, unknown>,
-        seo: require('./messages/zh/seo.json') as Record<string, unknown>,
-        siteMap: require('./messages/zh/siteMap.json') as Record<string, unknown>,
-        statistics: require('./messages/zh/statistics.json') as Record<string, unknown>,
-      },
+    // Any locale registered in routing.locales resolves its own catalogs;
+    // unknown or absent locales fall back to the default (English) catalog.
+    const { routing } = require('./i18n/routing') as {
+      routing: { locales: readonly string[]; defaultLocale: string };
     };
-    const namespaceMessages = namespaceMessagesByLocale[locale]!;
+    const requestedLocale = typeof options === 'object' ? options.locale : undefined;
+    const locale =
+      requestedLocale && routing.locales.includes(requestedLocale)
+        ? requestedLocale
+        : routing.defaultLocale;
+    const prefix = namespace ? `${namespace}.` : '';
+    // The namespaces this mock answers from real catalogs; every other
+    // namespace renders message KEYS so tests assert on keys, not copy.
+    const catalogNamespaces = [
+      'admin',
+      'code',
+      'common',
+      'contracts',
+      'coordination',
+      'detail',
+      'ethContribution',
+      'faq',
+      'imprint',
+      'legal',
+      'marketing',
+      'meta',
+      'publicGoods',
+      'seo',
+      'siteMap',
+      'statistics',
+    ];
+    const namespaceMessages: Record<string, Record<string, unknown>> = Object.fromEntries(
+      catalogNamespaces.map((name) => [
+        name,
+        require(`./messages/${locale}/${name}.json`) as Record<string, unknown>,
+      ]),
+    );
     const statisticsMessages = namespaceMessages.statistics!;
     const resolveMessage = (key: string): unknown =>
       key

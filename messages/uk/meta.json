@@ -1,0 +1,321 @@
+{
+  "shared": {
+    "defaultTitle": "Cosmic Signature",
+    "defaultOgTitle": "Cosmic Signature — Кожен жест формує Сигнатуру.",
+    "defaultDescription": "Процедурний протокол ончейн-мистецтва на Arbitrum. Кожен ваш жест формує фінальну Сигнатуру циклу. Коли цикл завершується, протокол розподіляє резерви за понад десятьма напрямами, зокрема на Protocol Guild — механізм фінансування понад 170 ключових розробників Ethereum."
+  },
+  "home": {
+    "title": "Cosmic Signature",
+    "description": "Cosmic Signature — процедурний протокол ончейн-мистецтва на Arbitrum. Зробіть жест під час перформанс-циклу; коли він завершується, резерв циклу розподіляється за напрямами розподілу, зокрема на Protocol Guild.",
+    "descriptionWithReserve": "Cosmic Signature — процедурний протокол ончейн-мистецтва на Arbitrum. Зробіть жест під час перформанс-циклу; коли він завершується, резерв циклу обсягом {reserve} розподіляється за напрямами розподілу, зокрема на Protocol Guild."
+  },
+  "experimentalUi": {
+    "title": "Експериментальний інтерфейс | Cosmic Signature",
+    "description": "Спробуйте експериментальний інтерфейс циклу Cosmic Signature з тими самими даними протоколу наживо та тими самими діями."
+  },
+  "gallery": {
+    "title": "Галерея Cosmic Signature | Детерміноване NFT-мистецтво трьох тіл",
+    "description": "Перегляньте NFT-твори Cosmic Signature, породжені детермінованою фізикою трьох тіл, ончейн-сідами, спектральним рендерингом і даними перформанс-циклів."
+  },
+  "allocations": {
+    "title": "Отримувачі розподілів | Cosmic Signature",
+    "description": "Повна історія отримувачів розподілів Cosmic Signature, статистика циклів і розподіли ETH за всіма завершеними перформанс-циклами."
+  },
+  "anchoring": {
+    "title": "Закріплення | Cosmic Signature",
+    "description": "Закріпіть свої Cosmic Signature NFT у протоколі, щоб отримувати надходження за закріплення в ETH у кожному циклі. Перегляньте загальну статистику закріплень і дізнайтеся, як механізм працює на Arbitrum."
+  },
+  "statistics": {
+    "title": "Статистика Cosmic Signature | Перформанс-цикл, жести, NFT і CST",
+    "description": "Статистика протоколу Cosmic Signature на Arbitrum: стан перформанс-циклу, жести, активність NFT, CST, закріплення, резерви та дані розподілів."
+  },
+  "statisticsParticipation": {
+    "title": "Статистика участі | Cosmic Signature",
+    "description": "Унікальні учасники, отримувачі розподілів і автори внесків ETH, проіндексовані за всіма перформанс-циклами Cosmic Signature."
+  },
+  "statisticsTokens": {
+    "title": "Статистика розподілу токенів | Cosmic Signature",
+    "description": "Володіння Cosmic Signature NFT, розподіл балансів CST (ERC-20), історія загальної пропозиції та активи, долучені до жестів."
+  },
+  "statisticsAnchoring": {
+    "title": "Статистика закріплень | Cosmic Signature",
+    "description": "Дії закріплення та відкріплення, закріплені зараз токени й унікальні власники закріплень для Cosmic Signature і RandomWalk NFT."
+  },
+  "statisticsActivity": {
+    "title": "Статистика активності жестів | Cosmic Signature",
+    "description": "Частота жестів у часі, сплески активності, активні періоди учасників, співвідношення типів жестів, хронологія циклів та активації циклів."
+  },
+  "statisticsPerformance": {
+    "title": "Статистика результатів учасників | Cosmic Signature",
+    "description": "Таблиця лідерів за результатами учасників і розподіли, доступні для забирання, у кожному перформанс-циклі Cosmic Signature."
+  },
+  "faq": {
+    "title": "Поширені запитання про Cosmic Signature | Протокол ончейн-мистецтва на Arbitrum",
+    "description": "Відповіді на типові запитання про Cosmic Signature, перформанс-цикли, жести, CST, NFT-мистецтво трьох тіл, Arbitrum, закріплення, контракти та безпеку протоколу."
+  },
+  "myAllocations": {
+    "title": "Мої розподіли | Cosmic Signature",
+    "description": "Перегляньте й заберіть свої незабрані розподіли ETH, розподіли зоряного відбору, надходження за закріплення та долучені активи з протоколу Cosmic Signature."
+  },
+  "myAnchors": {
+    "title": "Мої закріплення | Cosmic Signature",
+    "description": "Керуйте своїми закріпленими Cosmic Signature і Random Walk NFT. Переглядайте надходження за закріплення в ETH для Cosmic Signature NFT та історію зоряного відбору закріплених NFT для Random Walk NFT."
+  },
+  "contracts": {
+    "title": "Контракти Cosmic Signature | Верифіковані смарт-контракти на Arbitrum",
+    "description": "Адреси смарт-контрактів Cosmic Signature, стан верифікації, аудити, нотатки щодо формальної верифікації та деталі розгортання на Arbitrum."
+  },
+  "terms": {
+    "title": "Умови · Cosmic Signature",
+    "description": "Умови використання процедурного протоколу ончейн-мистецтва Cosmic Signature."
+  },
+  "privacy": {
+    "title": "Конфіденційність · Cosmic Signature",
+    "description": "Практики конфіденційності для відвідувачів протоколу Cosmic Signature."
+  },
+  "pagePrivacy": {
+    "title": "Політика конфіденційності | Cosmic Signature",
+    "description": "Політика конфіденційності Cosmic Signature — як ми обробляємо дані гаманців, транзакції, безпеку та прозорість блокчейну."
+  },
+  "security": {
+    "title": "Безпека Cosmic Signature | Верифікація протоколу та захист",
+    "description": "Практики безпеки Cosmic Signature, верифікація контрактів на Arbitrum, операційний контроль і примітки щодо безпеки учасників."
+  },
+  "audits": {
+    "title": "Аудити Cosmic Signature | Верифікація та перевірка контрактів",
+    "description": "Смарт-контракти Cosmic Signature пройшли незалежний аудит Hacken. Ознайомтеся зі звітом, контекстом формальної верифікації та ресурсами для верифікації вихідного коду."
+  },
+  "code": {
+    "title": "Вихідний код Cosmic Signature | Протокол ончейн-мистецтва під CC0",
+    "description": "Вихідний код Cosmic Signature, конвеєр рендерингу, репозиторій контрактів, процес верифікації та ліцензія суспільного надбання CC0."
+  },
+  "tokenDetail": {
+    "titleFor": "Cosmic Signature NFT #{id} | Cosmic Signature",
+    "descriptionFor": "Ознаки та історія володіння Cosmic Signature NFT #{id} — детермінованого NFT трьох тіл, спектрально відрендереного на Arbitrum."
+  },
+  "gestureDetail": {
+    "title": "Інформація про жест | Cosmic Signature",
+    "description": "Докладна інформація про жест у протоколі Cosmic Signature: часова мітка, адреса учасника, вартість жесту та контекст циклу."
+  },
+  "coordinationChanges": {
+    "title": "Зміни координації | Cosmic Signature",
+    "description": "Повна історія коригувань параметрів протоколу Cosmic Signature. Відстежуйте підвищення вартості жесту, додавання часу циклу, налаштування надходжень за закріплення та інші оновлення координації."
+  },
+  "distributionsByToken": {
+    "title": "Надходження за токеном | Cosmic Signature",
+    "description": "Деталі надходжень за закріплення для конкретного Cosmic Signature NFT — історія надходжень ETH за циклами, стан забирання та сукупні надходження за закріплення."
+  },
+  "mint": {
+    "title": "Закарбувати RandomWalk NFT | Cosmic Signature",
+    "description": "Закарбуйте RandomWalk NFT на Cosmic Signature. Кожен невикористаний RandomWalk NFT можна долучити до одного ETH-жесту зі знижкою 50% на вартість ETH-жесту."
+  },
+  "systemEvent": {
+    "title": "Системні події | Cosmic Signature",
+    "description": "Події адміністрування протоколу та зміни параметрів координації для конкретного циклу Cosmic Signature."
+  },
+  "currentCycleFull": {
+    "title": "Поточний перформанс-цикл | Cosmic Signature",
+    "description": "Повні відомості про активний перформанс-цикл: історія жестів, таблиці лідерів, долучені внески та розподіл за напрямами."
+  },
+  "allocationInfo": {
+    "titleFor": "Цикл {id}: інформація про розподіл | Cosmic Signature",
+    "descriptionFor": "Докладна інформація про розподіл у циклі {id} Cosmic Signature — відомості про отримувачів, розподіл Сигнатури, результати зоряного відбору та розподіли долучених NFT."
+  },
+  "anchorAction": {
+    "title": "Деталі дії закріплення | Cosmic Signature",
+    "description": "Деталі окремої дії закріплення в Cosmic Signature — тип токена, закріплені обсяги та стан забирання надходжень."
+  },
+  "pageTerms": {
+    "title": "Умови використання | Cosmic Signature",
+    "description": "Умови використання Cosmic Signature — право на участь, механіка протоколу, розподіли, ризики, заборонені дії та юридичні положення."
+  },
+  "userStellarSelectionNft": {
+    "title": "NFT зоряного відбору | Cosmic Signature",
+    "description": "Усі Cosmic Signature NFT, розподілені цьому учаснику через зоряний відбір. Перегляньте NFT, отримані через випадковий відбір на рівні протоколу."
+  },
+  "userStellarSelectionEth": {
+    "title": "ETH зоряного відбору | Cosmic Signature",
+    "description": "Усі розподіли ETH, які цей учасник отримав через зоряний відбір. Відстежуйте розподіли за випадковим відбором у завершених циклах."
+  },
+  "publicGoodsCgContributions": {
+    "title": "Внески протоколу у суспільні блага | Cosmic Signature",
+    "description": "Автоматичні перерахування з протоколу Cosmic Signature бенефіціару суспільних благ. У кожному циклі фіксована частка резерву циклу перераховується на підтримку суспільних благ через Космічну Раду."
+  },
+  "publicGoodsRetrievals": {
+    "title": "Забрані кошти суспільних благ | Cosmic Signature",
+    "description": "Кошти, забрані зі сховища суспільних благ. У кожному циклі частка резерву циклу перераховується на адресу бенефіціара, обрану Космічною Радою."
+  },
+  "publicGoodsVoluntary": {
+    "title": "Добровільні внески у суспільні блага | Cosmic Signature",
+    "description": "Добровільні внески спільноти Cosmic Signature до сховища суспільних благ. Внески підтримують бенефіціарів, обраних через координацію Космічної Ради."
+  },
+  "allocationRetrieved": {
+    "title": "Забрані розподіли | Cosmic Signature",
+    "description": "Відомості про розподіли, забрані з протоколу Cosmic Signature, зокрема отримані суми ETH, розподіли Cosmic Signature NFT та розподіли зоряного відбору."
+  },
+  "outreach": {
+    "title": "Розподіли за просування | Cosmic Signature",
+    "description": "Долучайтеся до просування Cosmic Signature й отримуйте розподіли CST. Перегляньте найактивніших учасників екосистеми, історію розподілів і дізнайтеся, як узяти участь."
+  },
+  "outreachAddress": {
+    "title": "Розподіли за просування | Cosmic Signature",
+    "description": "Історія розподілів за просування та розподіли CST для учасника екосистеми Cosmic Signature. Перегляньте реферальну активність і внески."
+  },
+  "ethContribution": {
+    "title": "Прямі внески ETH | Cosmic Signature",
+    "description": "Зробіть внесок ETH безпосередньо до сховища суспільних благ Cosmic Signature й перегляньте повну історію внесків. Підтримуйте суспільні блага, беручи участь у протоколі."
+  },
+  "ethContributionDetail": {
+    "title": "Деталі прямого внеску ETH | Cosmic Signature",
+    "description": "Деталі окремого внеску ETH до сховища суспільних благ Cosmic Signature — адреса автора внеску, сума, цикл і необов’язкова нотатка."
+  },
+  "ethContributionByCycle": {
+    "title": "Прямі внески ETH за циклами | Cosmic Signature",
+    "description": "Прямі внески ETH до протоколу Cosmic Signature з розбивкою за перформанс-циклами."
+  },
+  "myStatistics": {
+    "title": "Моя статистика | Cosmic Signature",
+    "description": "Відстежуйте свої результати на сторінці «Моя статистика» Cosmic Signature: докладна історія жестів, стан закріплень, надходження та інше. Будьте в курсі й плануйте свою участь в ончейн-протоколі."
+  },
+  "myTokens": {
+    "title": "Мої NFT | Cosmic Signature",
+    "description": "Переглядайте Cosmic Signature NFT у під’єднаному гаманці й керуйте ними, зокрема передавайте їх на іншу адресу."
+  },
+  "transferCst": {
+    "title": "Переказати CST | Cosmic Signature",
+    "description": "Перекажіть свої токени CST Cosmic Signature на адресу іншого гаманця."
+  },
+  "cosmicSignatureTransfers": {
+    "title": "Історія передач Cosmic Signature NFT | Cosmic Signature",
+    "description": "Історія передач Cosmic Signature NFT"
+  },
+  "cosmicTokenTransfers": {
+    "title": "Історія переказів токена CST Cosmic Signature | Cosmic Signature",
+    "description": "Історія переказів токена CST Cosmic Signature"
+  },
+  "usedRwlkNfts": {
+    "title": "Використані RandomWalk NFT | Cosmic Signature",
+    "description": "RandomWalk NFT, уже долучені до ETH-жестів зі знижкою 50% на вартість жесту в Cosmic Signature. Кожен RandomWalk NFT можна використати для цієї знижки лише раз."
+  },
+  "siteMap": {
+    "title": "Мапа сайту | Cosmic Signature",
+    "description": "Усі розділи протоколу Cosmic Signature — жести, галерея NFT, закріплення, статистика, розподіли та внески у суспільні блага."
+  },
+  "nftDonations": {
+    "title": "Долучені NFT-внески | Cosmic Signature",
+    "description": "Історія NFT, які учасники спільноти долучили до жестів. Долучені NFT передаються учаснику, який отримує розподіл Сигнатури в кожному циклі."
+  },
+  "namedNfts": {
+    "title": "Іменовані Cosmic Signature NFT | Cosmic Signature",
+    "description": "Cosmic Signature NFT, яким власники дали власні імена. Кожен іменований NFT має унікальну ідентичність у колекції."
+  },
+  "recipientHistory": {
+    "title": "Історія моїх розподілів | Cosmic Signature",
+    "description": "Повна історія ваших розподілів у Cosmic Signature, зокрема розподіли Сигнатури, розподіли ETH зоряного відбору, Cosmic Signature NFT та надходження за закріплення."
+  },
+  "userProfile": {
+    "title": "Інформація про учасника {address} | Cosmic Signature",
+    "description": "Інформація про учасника {address}",
+    "invalidAddress": "Недійсна адреса"
+  },
+  "admin": {
+    "title": "Адміністрування | Cosmic Signature",
+    "description": "Адміністративні інструменти протоколу Cosmic Signature. Керування параметрами протоколу, налаштуваннями контрактів і конфігурацією системи."
+  },
+  "adminSettings": {
+    "title": "Налаштування адміністрування | Cosmic Signature",
+    "description": "Адміністративні налаштування та керування контрактами"
+  },
+  "internalCstOutreachTransfer": {
+    "title": "Переказ CST на просування | Cosmic Signature",
+    "description": "Обмежений інструмент переказу CST для налаштованого підписанта гаманця резерву просування."
+  },
+  "embedEndurance": {
+    "title": "Хронологія витривалості та часу",
+    "description": "Хронологія Чемпіона витривалості та Воїна часу для перформанс-циклу Cosmic Signature."
+  },
+  "about": {
+    "title": "Про Cosmic Signature | Ончейн-мистецтво на Arbitrum",
+    "description": "Cosmic Signature — процедурний протокол ончейн-мистецтва на Arbitrum, який перетворює жести перформанс-циклу на детерміноване NFT-мистецтво трьох тіл."
+  },
+  "learn": {
+    "title": "Навчальний центр Cosmic Signature | Ончейн-мистецтво, перформанс-цикли та Arbitrum",
+    "description": "Дізнайтеся, як працює Cosmic Signature: перформанс-цикли, жести, CST, NFT-мистецтво трьох тіл, контракти на Arbitrum, закріплення, суспільні блага та роз’яснення ризиків."
+  },
+  "whitePaper": {
+    "title": "Біла книга Cosmic Signature | Процедурний протокол ончейн-мистецтва",
+    "description": "Довідковий опис Cosmic Signature: перформанс-цикли, жести, напрями розподілу, детерміноване NFT-мистецтво трьох тіл, CST, закріплення, Космічна Рада, оновлення протоколу та шлях до повної децентралізації."
+  },
+  "quiz": {
+    "title": "Тест знань Cosmic Signature | Перевірте, як добре ви знаєте протокол",
+    "description": "Сто запитань трьох рівнів за білою книгою Cosmic Signature: перформанс-цикли, жести, розподіли, мистецький конвеєр і граничні випадки, які помічають лише уважні читачі.",
+    "tiers": {
+      "basic": {
+        "title": "Базовий тест | Cosmic Signature",
+        "description": "Двадцять п’ять запитань про основи Cosmic Signature: жести, перформанс-цикли, напрями розподілу та детерміноване мистецтво трьох тіл."
+      },
+      "medium": {
+        "title": "Середній тест | Cosmic Signature",
+        "description": "Двадцять п’ять запитань про живу механіку Cosmic Signature: вікна калібрування, зворотний зв’язок CST, напрями розподілу за тривалість лідерства та правила Космічної Ради."
+      },
+      "hard": {
+        "title": "Складний тест | Cosmic Signature",
+        "description": "П’ятдесят запитань про граничні випадки та проєктні рішення Cosmic Signature: семантика після закінчення терміну, захисне проєктування, історія оновлень і мистецький конвеєр."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "Як працює Cosmic Signature | Перформанс-цикли, жести та NFT",
+    "description": "Дізнайтеся, як розгортається перформанс-цикл Cosmic Signature — від вікна калібрування через жести до фінального розподілу."
+  },
+  "riskDisclosures": {
+    "title": "Розкриття ризиків Cosmic Signature | Не \u0456нвестиційний продукт",
+    "description": "Ознайомтеся з розкриттям ризиків Cosmic Signature щодо участі в блокчейні, взаємодії з гаманцем, NFT, CST і розподілів, а також із поясненням, чому це не \u0456нвестиційний продукт."
+  },
+  "learnArticles": {
+    "what-is-cosmic-signature": {
+      "title": "Що таке Cosmic Signature? | Cosmic Signature",
+      "description": "Cosmic Signature — процедурний протокол ончейн-мистецтва на Arbitrum, де жести перформанс-циклу формують детерміновані NFT-твори трьох тіл."
+    },
+    "how-the-performance-cycle-works": {
+      "title": "Як працює перформанс-цикл Cosmic Signature | Cosmic Signature",
+      "description": "Дізнайтеся, як перформанс-цикли Cosmic Signature використовують вікна калібрування, жести, завершення та напрями розподілу на Arbitrum."
+    },
+    "how-gestures-work": {
+      "title": "Як працюють жести в Cosmic Signature | Cosmic Signature",
+      "description": "Розберіться в ETH-жестах, CST-жестах, вартості жесту, CST участі та в тому, як жести формують кожен перформанс-цикл Cosmic Signature."
+    },
+    "three-body-nft-art": {
+      "title": "Як Cosmic Signature створює NFT-мистецтво трьох тіл | Cosmic Signature",
+      "description": "Технічне пояснення детермінованих NFT-творів Cosmic Signature, породжених ончейн-сідами та фізикою трьох тіл."
+    },
+    "cosmic-signature-on-arbitrum": {
+      "title": "Cosmic Signature на Arbitrum | Cosmic Signature",
+      "description": "Чому Cosmic Signature працює на Arbitrum і як протокол використовує інфраструктуру другого рівня Ethereum для ончейн-мистецтва."
+    },
+    "contracts-security-verification": {
+      "title": "Контракти, безпека та верифікація Cosmic Signature | Cosmic Signature",
+      "description": "Смарт-контракт Cosmic Signature, вихідний код, верифікація та контекст безпеки протоколу на Arbitrum."
+    },
+    "cst-token-and-cosmic-council": {
+      "title": "CST і Космічна Рада | Cosmic Signature",
+      "description": "Дізнайтеся, як токени CST пов’язані з жестами, координацією протоколу та Космічною Радою."
+    },
+    "anchoring-nfts": {
+      "title": "Закріплення Cosmic Signature NFT | Cosmic Signature",
+      "description": "Як працює закріплення Cosmic Signature NFT, надходження за закріплення в ETH та умови участі для Random Walk NFT."
+    },
+    "protocol-guild-public-goods": {
+      "title": "Cosmic Signature та суспільні блага Ethereum | Cosmic Signature",
+      "description": "Як Cosmic Signature спрямовує розподіл на суспільні блага до Protocol Guild — механізму фінансування ключових розробників Ethereum."
+    },
+    "collecting-and-trading-cosmic-signature": {
+      "title": "Колекціонування й обмін Cosmic Signature NFT та CST | Cosmic Signature",
+      "description": "Де обертаються активи Cosmic Signature: NFT-маркетплейс Axiom Zero без комісій, обмін CST на Uniswap у мережі Arbitrum і ринок прогнозів Chaos Zero щодо циклів."
+    },
+    "not-a-\u006cottery-not-an-\u0069nvestment": {
+      "title": "Чи Cosmic Signature — це \u043bотерея, \u043aазино або \u0456нвестиція? | Cosmic Signature",
+      "description": "Cosmic Signature — це процедурний протокол ончейн-мистецтва, а не \u043bотерея, \u043aазино, продукт \u0430зартного характеру чи \u0456нвестиційний продукт."
+    }
+  }
+}

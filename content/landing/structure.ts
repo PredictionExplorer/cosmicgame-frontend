@@ -44,7 +44,12 @@ interface LandingTrackItemStructure {
 
 interface LandingArtFactStructure {
   readonly id: string;
-  readonly value: string;
+  /**
+   * Present only when the value string is byte-identical across locales.
+   * Grouped numbers (1,000,000 vs 1 000 000) are locale-dependent and live in
+   * the text modules.
+   */
+  readonly value?: string;
 }
 
 interface LandingTableRowStructure {
@@ -90,8 +95,8 @@ export const LANDING_STRUCTURE = {
     ],
     facts: [
       { id: 'wavelength-bins', value: '64' },
-      { id: 'physics-steps', value: '1,000,000' },
-      { id: 'candidate-orbits', value: '100,000' },
+      { id: 'physics-steps' },
+      { id: 'candidate-orbits' },
       { id: 'license', value: 'CC0 1.0' },
     ],
   },
@@ -105,8 +110,9 @@ export const LANDING_STRUCTURE = {
       { id: 'eth-stellar-selection', tone: 'solar', percent: '4%' },
       { id: 'participant-nft-stellar-selection', tone: 'default' },
       { id: 'anchored-nft-stellar-selection', tone: 'default' },
-      { id: 'endurance-champion', tone: 'default', percent: '1,000 CST' },
-      { id: 'final-cst-gesture', tone: 'default', percent: '1,000 CST' },
+      // The CST badge is a grouped number, so each locale formats it itself.
+      { id: 'endurance-champion', tone: 'default' },
+      { id: 'final-cst-gesture', tone: 'default' },
     ],
   },
   anchoring: {
@@ -226,6 +232,11 @@ type LandingTableRowText<Row> = Row extends { readonly value: string }
   ? { readonly label: string }
   : { readonly label: string; readonly value: string };
 
+/** Copy for one art-pipeline fact; same rule as table rows. */
+type LandingArtFactText<Fact> = Fact extends { readonly value: string }
+  ? { readonly label: string }
+  : { readonly label: string; readonly value: string };
+
 /**
  * The complete landing copy for one locale, keyed by the skeleton's IDs so
  * the compiler rejects missing or extra translations.
@@ -266,7 +277,7 @@ export type LandingText = {
       readonly [Stage in ArtStageStructure as Stage['id']]: LandingStageText;
     };
     readonly facts: {
-      readonly [Fact in ArtFactStructure as Fact['id']]: { readonly label: string };
+      readonly [Fact in ArtFactStructure as Fact['id']]: LandingArtFactText<Fact>;
     };
   };
   readonly tracks: {

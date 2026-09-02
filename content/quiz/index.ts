@@ -7,6 +7,7 @@ import {
   type QuizText,
 } from './structure';
 import { quizTextEn } from './text.en';
+import { quizTextUk } from './text.uk';
 import { quizTextZh } from './text.zh';
 import type { QuizContent, QuizOption, QuizQuestion, QuizTier, QuizTierId } from './types';
 import { QUIZ_TIER_IDS } from './types';
@@ -49,10 +50,12 @@ function buildQuizContent(text: QuizText): QuizContent {
 
 export const quizContentEn: QuizContent = buildQuizContent(quizTextEn);
 export const quizContentZh: QuizContent = buildQuizContent(quizTextZh);
+export const quizContentUk: QuizContent = buildQuizContent(quizTextUk);
 
 const QUIZ_CONTENT: LocaleRecord<QuizContent> = {
   en: quizContentEn,
   zh: quizContentZh,
+  uk: quizContentUk,
 };
 
 export function getQuizContent(locale: string): QuizContent {

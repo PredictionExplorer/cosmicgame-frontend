@@ -2,9 +2,10 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { mergeMessages, NAMESPACES } from '../request';
+import { routing } from '../routing';
 
 describe('i18n message loading contract', () => {
-  it.each(['en', 'zh'])('has a parseable object catalog for every %s namespace', (locale) => {
+  it.each(routing.locales)('has a parseable object catalog for every %s namespace', (locale) => {
     for (const namespace of NAMESPACES) {
       const path = resolve(process.cwd(), 'messages', locale, `${namespace}.json`);
       const parsed: unknown = JSON.parse(readFileSync(path, 'utf8'));

@@ -1,6 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
 import enErrors from '@/messages/en/errors.json';
+import ukErrors from '@/messages/uk/errors.json';
 import zhErrors from '@/messages/zh/errors.json';
 
 import { reportError } from '@/utils/errors';
@@ -65,6 +66,16 @@ describe('global error boundary', () => {
     expect(screen.getByRole('button', { name: zhErrors.global.retry })).toBeInTheDocument();
   });
 
+  it('renders Ukrainian copy under the /uk prefix with the locale on <html>', () => {
+    setPathname('/uk/gallery');
+    renderGlobalError();
+
+    expect(screen.getByText(ukErrors.global.title)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: ukErrors.global.retry })).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('lang', 'uk');
+    expect(document.documentElement).toHaveAttribute('dir', 'ltr');
+  });
+
   it('falls back to English for any other locale-less path', () => {
     setPathname('/statistics/anchoring');
     renderGlobalError();
@@ -72,7 +83,9 @@ describe('global error boundary', () => {
     expect(screen.getByText(enErrors.global.title)).toBeInTheDocument();
   });
 
-  it('keeps the English and Chinese catalogs in step', () => {
-    expect(Object.keys(enErrors.global).sort()).toEqual(Object.keys(zhErrors.global).sort());
+  it('keeps every locale catalog in step with English', () => {
+    for (const catalog of [zhErrors, ukErrors]) {
+      expect(Object.keys(catalog.global).sort()).toEqual(Object.keys(enErrors.global).sort());
+    }
   });
 });

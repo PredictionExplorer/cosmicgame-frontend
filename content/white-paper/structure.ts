@@ -1,10 +1,4 @@
-import {
-  WHITE_PAPER_PDF_PATH,
-  WHITE_PAPER_PDF_PATH_ZH,
-  WHITE_PAPER_VERSION,
-  type WhitePaperBlock,
-  type WhitePaperReference,
-} from './types';
+import { WHITE_PAPER_VERSION, type WhitePaperBlock, type WhitePaperReference } from './types';
 
 /**
  * The locale-independent skeleton of the white paper.
@@ -252,7 +246,6 @@ export type WhitePaperText = {
     readonly versionLabel: string;
     readonly dateLabel: string;
     readonly downloadLabel: string;
-    readonly downloadHref: typeof WHITE_PAPER_PDF_PATH | typeof WHITE_PAPER_PDF_PATH_ZH;
   };
   readonly abstract: {
     readonly heading: string;

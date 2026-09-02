@@ -1,4 +1,5 @@
 import zhMeta from '@/messages/zh/meta.json';
+import { expectedLanguageAlternates } from '@/test-utils/i18n';
 
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
@@ -96,11 +97,7 @@ describe('Sprint 7 route metadata', () => {
       const metadata = await build({ params: zhParams() });
       expect(metadata.alternates).toEqual({
         canonical: `${APP_ORIGIN}/zh${path}`,
-        languages: {
-          en: `${APP_ORIGIN}${path}`,
-          zh: `${APP_ORIGIN}/zh${path}`,
-          'x-default': `${APP_ORIGIN}${path}`,
-        },
+        languages: expectedLanguageAlternates(APP_ORIGIN, path),
       });
       expect(metadata.openGraph).toEqual(expect.objectContaining({ locale: 'zh_CN' }));
     },
@@ -165,11 +162,7 @@ describe('Sprint 7 route metadata', () => {
     expect(zh.description).toContain('第 42 个');
     expect(zh.alternates).toEqual({
       canonical: `${APP_ORIGIN}/zh/allocation/42`,
-      languages: {
-        en: `${APP_ORIGIN}/allocation/42`,
-        zh: `${APP_ORIGIN}/zh/allocation/42`,
-        'x-default': `${APP_ORIGIN}/allocation/42`,
-      },
+      languages: expectedLanguageAlternates(APP_ORIGIN, '/allocation/42'),
     });
     expect(zh.robots).toEqual(expect.objectContaining({ index: true }));
   });

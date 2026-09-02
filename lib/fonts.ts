@@ -1,5 +1,5 @@
 import localFont from 'next/font/local';
-import { Inter, Noto_Sans_SC } from 'next/font/google';
+import { Inter, Noto_Sans_SC, Onest } from 'next/font/google';
 
 export const clashDisplay = localFont({
   src: [
@@ -49,4 +49,24 @@ export const notoSansSC = Noto_Sans_SC({
   display: 'optional',
   preload: false,
   fallback: ['PingFang SC', 'Microsoft YaHei', 'system-ui', 'sans-serif'],
+});
+
+/**
+ * Cyrillic display companion for the Ukrainian locale (docs/i18n/README.md §5).
+ *
+ * Clash Display carries no Cyrillic glyphs, so `/uk` headings are set in
+ * Onest via the `html[lang='uk']` rules in styles/global.css. Body text needs
+ * nothing extra: Inter's build-time CSS already declares the `cyrillic` and
+ * `cyrillic-ext` `unicode-range` slices (fetched on demand, never preloaded).
+ * Same loading policy as Noto Sans SC — `preload: false` keeps it off the
+ * critical path of English and Chinese pages, `display: optional` avoids a
+ * late heading metric swap on slow links.
+ */
+export const onest = Onest({
+  weight: 'variable',
+  subsets: ['cyrillic', 'cyrillic-ext', 'latin'],
+  variable: '--font-onest',
+  display: 'optional',
+  preload: false,
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
 });

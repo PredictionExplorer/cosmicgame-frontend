@@ -43,6 +43,54 @@ describe('font configuration policy', () => {
     expect(source).toContain("'Microsoft YaHei'");
   });
 
+  it('keeps the Cyrillic display companion configured without eager preload', () => {
+    expect(source).toContain('Onest');
+    expect(source).toContain("variable: '--font-onest'");
+    // Same policy as Noto Sans SC: off the critical path of every other locale.
+    const onestBlock = source.slice(source.indexOf('export const onest'));
+    expect(onestBlock).toContain("display: 'optional'");
+    expect(onestBlock).toContain('preload: false');
+    expect(onestBlock).toContain("'cyrillic'");
+  });
+
+  it('does not preload Inter Cyrillic slices on every page', () => {
+    // Inter's build-time CSS already declares the cyrillic unicode-range
+    // slices; listing them in `subsets` would only add preload tags that
+    // English and Chinese pages pay for.
+    const interBlock = source.slice(
+      source.indexOf('export const inter'),
+      source.indexOf('export const notoSansSC'),
+    );
+    expect(interBlock).not.toContain('cyrillic');
+  });
+
+  it('overrides the Ukrainian display stack outside any cascade layer', () => {
+    // :root declares --display-font-stack unlayered. Both :root and
+    // html[lang='uk'] target the <html> element, and an unlayered declaration
+    // beats any layered one regardless of specificity — an override placed
+    // inside @layer base would silently never apply.
+    const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
+    const rootIndex = css.indexOf(':root {');
+    const overrideIndex = css.indexOf("html[lang='uk'] {");
+    expect(rootIndex).toBeGreaterThan(-1);
+    expect(overrideIndex).toBeGreaterThan(rootIndex);
+    // Top-level rules are unindented; anything inside @layer is indented.
+    expect(css.slice(overrideIndex - 1, overrideIndex)).toBe('\n');
+    const overrideBlock = css.slice(overrideIndex, css.indexOf('}', overrideIndex));
+    expect(overrideBlock).toContain('--display-font-stack: var(--font-onest)');
+  });
+
+  it('limits Title-Case button labels to English', () => {
+    // Button variants use Tailwind `capitalize`; cased languages other than
+    // English write labels in sentence case, so the transform is switched off
+    // for every non-English document (unlayered, to outrank utilities).
+    const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
+    const ruleIndex = css.indexOf("html:not([lang='en']) .capitalize {");
+    expect(ruleIndex).toBeGreaterThan(-1);
+    expect(css.slice(ruleIndex - 1, ruleIndex)).toBe('\n');
+    expect(css.slice(ruleIndex, css.indexOf('}', ruleIndex))).toContain('text-transform: none');
+  });
+
   it('ships the referenced local font files in public/fonts', () => {
     const publicFonts = resolve(__dirname, '..', '..', 'public', 'fonts');
     expect(

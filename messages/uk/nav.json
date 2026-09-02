@@ -1,0 +1,118 @@
+{
+  "brand": {
+    "homeLabel": "Головна сторінка Cosmic Signature",
+    "tagline": "Протокол ончейн-мистецтва"
+  },
+  "primaryLabel": "Основна навігація",
+  "menuLabel": "Меню",
+  "drawerTitle": "Навігація",
+  "sections": {
+    "protocol": "Протокол",
+    "ecosystem": "Екосистема",
+    "myAccount": "Мій обліковий запис"
+  },
+  "links": {
+    "gallery": {
+      "label": "Галерея",
+      "description": "Усі Сигнатури, закарбовані дотепер"
+    },
+    "explore": {
+      "label": "Огляд"
+    },
+    "currentCycle": {
+      "label": "Поточний цикл",
+      "description": "Жести наживо, що формують активний цикл"
+    },
+    "allocationRecipients": {
+      "label": "Отримувачі розподілів",
+      "description": "Куди пішли резерви кожного циклу"
+    },
+    "anchorDistributions": {
+      "label": "Надходження за закріплення",
+      "description": "Закріплені NFT та їхні надходження"
+    },
+    "outreachReserve": {
+      "label": "Резерв просування",
+      "description": "Як спільнота просуває протокол"
+    },
+    "statistics": {
+      "label": "Статистика",
+      "description": "Показники та рекорди всього протоколу"
+    },
+    "contracts": {
+      "label": "Контракти",
+      "description": "Верифіковані адреси та вихідний код"
+    },
+    "help": {
+      "label": "Довідка"
+    },
+    "howItWorks": {
+      "label": "Як це працює",
+      "description": "Механіка циклу крок за кроком"
+    },
+    "faq": {
+      "label": "Поширені запитання",
+      "description": "Відповіді на типові запитання"
+    },
+    "about": {
+      "label": "Про Cosmic Signature",
+      "description": "Історія, що стоїть за протоколом"
+    },
+    "learn": {
+      "label": "Навчальний центр",
+      "description": "Посібники та глибокі розбори"
+    },
+    "whitePaper": {
+      "label": "Біла книга",
+      "description": "Повний довідник протоколу"
+    },
+    "discover": {
+      "label": "Знайомство з Cosmic Signature",
+      "description": "Мистецтво, історія та протокол"
+    },
+    "myDashboard": "Мій кабінет",
+    "myAllocations": "Мої розподіли",
+    "myNfts": "Мої NFT",
+    "myAnchors": "Мої закріплення",
+    "recipientHistory": "Історія отримувачів"
+  },
+  "ecosystem": {
+    "groupLabel": "Екосистема Cosmic Signature",
+    "uniswap": {
+      "name": "Обмін CST",
+      "product": "Uniswap",
+      "tagline": "Обмін ETH на CST через Uniswap",
+      "ariaLabel": "Обміняти CST на Uniswap",
+      "defaultLabel": "Обміняти CST на Uniswap",
+      "shortLabel": "Обмін CST"
+    },
+    "geckoTerminal": {
+      "ariaLabel": "Переглянути пул CST на GeckoTerminal",
+      "shortLabel": "Пул CST"
+    },
+    "axiomZero": {
+      "name": "Axiom Zero",
+      "product": "NFT-маркетплейс",
+      "tagline": "Колекціонуйте Cosmic Signature NFT на маркетплейсі без комісій",
+      "ariaLabel": "NFT-маркетплейс Axiom Zero",
+      "defaultLabel": "NFT на Axiom Zero",
+      "menuLabel": "Маркетплейс Axiom Zero",
+      "shortLabel": "Axiom Zero"
+    },
+    "chaosZero": {
+      "name": "Chaos Zero",
+      "product": "Ринок прогнозів",
+      "tagline": "Робіть прогнози щодо кожного циклу протоколу",
+      "ariaLabel": "Робити прогнози на Chaos Zero",
+      "defaultLabel": "Прогнози на Chaos Zero",
+      "menuLabel": "Прогнози Chaos Zero",
+      "shortLabel": "Chaos Zero"
+    }
+  },
+  "maintenance": {
+    "pendingMessage": "Режим обслуговування увімкнеться після завершення поточного розподілу. Протокол відновить роботу, щойно коригування буде завершено.",
+    "activeMessage": "Протокол у режимі обслуговування. Жести відновляться, щойно коригування параметрів буде завершено.",
+    "pendingLabel": "Очікування",
+    "activeLabel": "Обслуговування"
+  }
+}

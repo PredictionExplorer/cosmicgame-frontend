@@ -2,6 +2,7 @@ import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
 import { LEARN_STRUCTURE, type LearnText } from './structure';
 import { learnTextEn } from './text.en';
+import { learnTextUk } from './text.uk';
 import { learnTextZh } from './text.zh';
 import type { LearnArticle, LearnContent, LearnSection } from './types';
 
@@ -62,10 +63,12 @@ function buildLearnContent(text: LearnText): LearnContent {
 
 export const learnContentEn: LearnContent = buildLearnContent(learnTextEn);
 export const learnContentZh: LearnContent = buildLearnContent(learnTextZh);
+export const learnContentUk: LearnContent = buildLearnContent(learnTextUk);
 
 const LEARN_CONTENT: LocaleRecord<LearnContent> = {
   en: learnContentEn,
   zh: learnContentZh,
+  uk: learnContentUk,
 };
 
 export function getLearnContent(locale: string): LearnContent {

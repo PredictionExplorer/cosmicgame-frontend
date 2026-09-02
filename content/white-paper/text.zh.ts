@@ -1,7 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
 import type { WhitePaperText } from './structure';
-import { WHITE_PAPER_PDF_PATH_ZH, WHITE_PAPER_VERSION } from './types';
+import { WHITE_PAPER_VERSION } from './types';
 
 const cst = (amount: number): string => amount.toLocaleString('zh-CN');
 
@@ -32,7 +32,6 @@ export const whitePaperTextZh = {
     versionLabel: `版本 ${WHITE_PAPER_VERSION}`,
     dateLabel: '2026年8月',
     downloadLabel: '下载 PDF',
-    downloadHref: WHITE_PAPER_PDF_PATH_ZH,
   },
   abstract: {
     heading: '摘要',

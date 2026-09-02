@@ -3,6 +3,7 @@ import { join } from 'path';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { TRANSLATED_LOCALES } from '@/i18n/routing';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 
@@ -115,12 +116,26 @@ describe('LLM-facing protocol docs', () => {
     expect(content).toContain('COSMIC 癌症突变数据库');
   });
 
-  it.each(docs)('%s links canonical Chinese landing and app routes', (_fileName, content) => {
-    expect(content).toContain('https://cosmicsignature.com/zh');
-    expect(content).toContain('https://cosmicsignature.com/zh/learn');
-    expect(content).toContain('https://app.cosmicsignature.com/zh');
-    expect(content).toContain('https://app.cosmicsignature.com/zh/security');
-    expect(content).toContain('https://app.cosmicsignature.com/zh/audits');
-    expect(content).toContain('https://app.cosmicsignature.com/zh/risk-disclosures');
+  it.each(docs)('%s includes useful Ukrainian protocol guidance', (_fileName, content) => {
+    expect(content).toMatch(/^## Українська/m);
+    expect(content).toContain('процедурний протокол ончейн-мистецтва');
+    expect(content).toContain('48 годин');
+    expect(content).toContain(`${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT`);
+    expect(content).toContain('кожен RandomWalk NFT');
+    expect(content).toContain('базою даних мутацій раку COSMIC');
+    // Ukrainian thousands never use the English comma grouping, which a
+    // Ukrainian reader parses as a decimal point.
+    expect(content).not.toMatch(/\d,\d{3} CST[^\n]*[\u0400-\u04ff]/);
+  });
+
+  describe.each(TRANSLATED_LOCALES)('%s routes', (locale) => {
+    it.each(docs)('%s links the canonical landing and app routes', (_fileName, content) => {
+      expect(content).toContain(`https://cosmicsignature.com/${locale}`);
+      expect(content).toContain(`https://cosmicsignature.com/${locale}/learn`);
+      expect(content).toContain(`https://app.cosmicsignature.com/${locale}`);
+      expect(content).toContain(`https://app.cosmicsignature.com/${locale}/security`);
+      expect(content).toContain(`https://app.cosmicsignature.com/${locale}/audits`);
+      expect(content).toContain(`https://app.cosmicsignature.com/${locale}/risk-disclosures`);
+    });
   });
 });

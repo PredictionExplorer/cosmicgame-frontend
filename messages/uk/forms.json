@@ -1,0 +1,16 @@
+{
+  "datePicker": {
+    "previousMonth": "Попередній місяць",
+    "nextMonth": "Наступний місяць",
+    "pickDate": "Оберіть дату",
+    "weekdays": {
+      "sunday": "Нд",
+      "monday": "Пн",
+      "tuesday": "Вт",
+      "wednesday": "Ср",
+      "thursday": "Чт",
+      "friday": "Пт",
+      "saturday": "Сб"
+    }
+  }
+}

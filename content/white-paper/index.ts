@@ -1,4 +1,4 @@
-import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
+import { pickByLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
 
 import {
   WHITE_PAPER_REFERENCES_ID,
@@ -7,9 +7,11 @@ import {
   type WhitePaperText,
 } from './structure';
 import { whitePaperTextEn } from './text.en';
+import { whitePaperTextUk } from './text.uk';
 import { whitePaperTextZh } from './text.zh';
 import {
   WHITE_PAPER_PATH,
+  whitePaperPdfPath,
   type WhitePaperBlock,
   type WhitePaperContent,
   type WhitePaperSection,
@@ -29,7 +31,7 @@ interface SectionTextLoose extends HeadedBlocksText {
 }
 
 /** Composes the locale-independent skeleton with one locale's copy. */
-function buildWhitePaperContent(text: WhitePaperText): WhitePaperContent {
+function buildWhitePaperContent(locale: AppLocale, text: WhitePaperText): WhitePaperContent {
   // Parity is enforced by WhitePaperText's literal keys and block-kind tuples;
   // the builder itself only needs plain string lookups.
   const sectionTexts = text.sections as Readonly<Record<string, SectionTextLoose>>;
@@ -51,7 +53,7 @@ function buildWhitePaperContent(text: WhitePaperText): WhitePaperContent {
       versionLabel: text.hero.versionLabel,
       dateLabel: text.hero.dateLabel,
       downloadLabel: text.hero.downloadLabel,
-      downloadHref: text.hero.downloadHref,
+      downloadHref: whitePaperPdfPath(locale),
     },
     abstract: text.abstract,
     tocHeading: text.tocHeading,
@@ -87,12 +89,23 @@ function buildWhitePaperContent(text: WhitePaperText): WhitePaperContent {
   };
 }
 
-export const whitePaperContentEn: WhitePaperContent = buildWhitePaperContent(whitePaperTextEn);
-export const whitePaperContentZh: WhitePaperContent = buildWhitePaperContent(whitePaperTextZh);
+export const whitePaperContentEn: WhitePaperContent = buildWhitePaperContent(
+  'en',
+  whitePaperTextEn,
+);
+export const whitePaperContentZh: WhitePaperContent = buildWhitePaperContent(
+  'zh',
+  whitePaperTextZh,
+);
+export const whitePaperContentUk: WhitePaperContent = buildWhitePaperContent(
+  'uk',
+  whitePaperTextUk,
+);
 
 const WHITE_PAPER_CONTENT: LocaleRecord<WhitePaperContent> = {
   en: whitePaperContentEn,
   zh: whitePaperContentZh,
+  uk: whitePaperContentUk,
 };
 
 export function getWhitePaperContent(locale: string): WhitePaperContent {

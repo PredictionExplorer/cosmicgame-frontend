@@ -1,5 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
+import { LOCALE_PREFIXES } from './locale-fixtures';
+
 /**
  * Performance guardrails distilled from the RES-82 investigation. Each test
  * pins one root cause so it cannot regress silently:
@@ -116,9 +118,7 @@ test.describe('message scoping stays complete', () => {
     '/faq',
     '/my-anchors',
   ];
-  const locales = ['', '/zh'];
-
-  for (const localePrefix of locales) {
+  for (const localePrefix of LOCALE_PREFIXES) {
     test(`no missing-message errors across key routes (${localePrefix || '/en'})`, async ({
       page,
     }) => {

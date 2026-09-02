@@ -1,0 +1,74 @@
+{
+  "page": {
+    "eyebrow": "Адміністрування · Обмежений доступ",
+    "title": "Адміністрування",
+    "subtitle": "Керування жестами та системне адміністрування",
+    "gestureList": "Список жестів",
+    "loading": "Завантаження…"
+  },
+  "settings": {
+    "title": "Адміністративні методи",
+    "subtitle": "Адреси контрактів і параметри з панелі керування в режимі лише для читання.",
+    "breadcrumbs": {
+      "home": "Головна",
+      "admin": "Адміністрування",
+      "settings": "Налаштування"
+    },
+    "loading": "Завантаження…",
+    "contractTitle": "Контракт Cosmic Signature",
+    "contractDescription": "Адреси контрактів та ончейн-параметри з API панелі керування.",
+    "placeholders": {
+      "address": "Введіть адресу",
+      "number": "Введіть число"
+    },
+    "actions": {
+      "setAddress": "Встановити адресу",
+      "set": "Встановити"
+    },
+    "fields": {
+      "cosmicSignatureNft": "Адреса контракту Cosmic Signature NFT (ERC-721)",
+      "cstToken": "Адреса контракту токена Cosmic Signature CST (ERC-20)",
+      "publicGoodsVault": "Адреса контракту сховища суспільних благ",
+      "randomWalkNft": "Адреса контракту Random Walk NFT",
+      "stellarSelectionWallet": "Адреса контракту гаманця зоряного відбору",
+      "anchoringWallet": "Адреса контракту гаманця закріплення",
+      "outreachWallet": "Адреса контракту гаманця просування",
+      "businessLogic": "Адреса контракту бізнес-логіки",
+      "ethStellarRecipients": "Кількість отримувачів зоряного відбору ETH за цикл",
+      "nftStellarRecipients": "Кількість отримувачів зоряного відбору NFT за цикл",
+      "nftHolderRecipients": "Кількість отримувачів серед власників NFT за цикл",
+      "signatureAllocationPercentage": "Відсоток розподілу Сигнатури",
+      "publicGoodsPercentage": "Відсоток на суспільні блага",
+      "stellarSelectionPercentage": "Відсоток зоряного відбору",
+      "anchorDistributionPercentage": "Відсоток надходжень за закріплення",
+      "timeIncrease": "Приріст часу",
+      "allocationTimeout": "Тайм-аут, щоб забрати розподіл Сигнатури",
+      "priceIncrease": "Приріст вартості",
+      "nanosecondsExtra": "Додаткові наносекунди",
+      "initialAllocationSeconds": "Початкова кількість секунд до розподілу Сигнатури",
+      "initialGestureCostFraction": "Початкова частка вартості жесту",
+      "activationTime": "Час активації",
+      "gestureRatio": "Співвідношення ETH-жестів до CST-жестів",
+      "calibrationWindowLength": "Тривалість вікна калібрування CST на початку циклу",
+      "switchMode": "Перемкнути режим"
+    },
+    "modes": {
+      "runtime": "Робочий режим",
+      "maintenance": "Режим обслуговування"
+    }
+  },
+  "outreachTransfer": {
+    "title": "Переказ CST на просування",
+    "subtitle": "Інструмент переказу, доступний лише за прямою адресою, для налаштованого підписанта гаманця резерву просування.",
+    "roleReadError": "Не вдалося прочитати власника та скарбника резерву просування.",
+    "walletRequiredTitle": "Гаманець не під’єднано",
+    "walletRequiredDescription": "Під’єднайте гаманець поточного скарбника резерву просування, щоб надсилати винагороди в CST.",
+    "walletUnavailableTitle": "Гаманець просування недоступний",
+    "walletUnavailableDescription": "Панель керування ще не надала адресу гаманця просування.",
+    "rolesLoadingTitle": "Завантаження ролей резерву просування",
+    "rolesLoadingDescription": "Зчитування власника та скарбника MarketingWallet з контракту.",
+    "rolesErrorTitle": "Не вдалося прочитати ролі резерву просування",
+    "restrictedTitle": "Доступ обмежено",
+    "restrictedDescription": "Під’єднайте гаманець поточного скарбника резерву просування ({treasurer}), щоб користуватися цим інструментом переказу. Власник: {owner}."
+  }
+}

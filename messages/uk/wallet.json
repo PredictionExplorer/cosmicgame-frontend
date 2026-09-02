@@ -1,0 +1,34 @@
+{
+  "connect": {
+    "button": "Під’єднати гаманець"
+  },
+  "balances": {
+    "eth": "ETH",
+    "cst": "CST",
+    "cosmicNfts": "COSMIC NFT",
+    "rwlkNfts": "RWLK NFT",
+    "anchoredCst": "Закріплені Cosmic Signature NFT",
+    "anchoredRwlk": "Закріплені RWLK NFT"
+  },
+  "labels": {
+    "loading": "Завантаження…",
+    "balancesHeading": "Баланси",
+    "anchoredHeading": "Закріплено",
+    "nftCount": "{count}"
+  },
+  "account": {
+    "heading": "Обліковий запис",
+    "myDashboard": "Мій кабінет",
+    "myRewards": "Мої розподіли",
+    "myNfts": "Мої NFT",
+    "transferCst": "Переказати CST",
+    "addCstToMetaMask": "Додати CST у MetaMask",
+    "addingCstToMetaMask": "Додаємо CST у MetaMask…",
+    "myAnchors": "Мої закріплення",
+    "winningHistory": "Історія отримувачів"
+  },
+  "accessibility": {
+    "copyAddress": "Копіювати адресу гаманця",
+    "addressCopied": "Адресу гаманця скопійовано"
+  }
+}

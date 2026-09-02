@@ -94,6 +94,11 @@ describe('formatIsoDateLabel', () => {
     expect(formatIsoDateLabel('2026-08-24', 'zh')).toBe('2026年8月24日');
     expect(formatIsoDateLabel('2026-01-01', 'zh-CN')).toBe('2026年1月1日');
   });
+
+  it('renders the Ukrainian long date with the genitive month and year marker', () => {
+    expect(formatIsoDateLabel('2026-08-24', 'uk')).toBe('24 серпня 2026 р.');
+    expect(formatIsoDateLabel('2026-01-01', 'uk-UA')).toBe('1 січня 2026 р.');
+  });
 });
 
 describe('getRelativeTime', () => {
@@ -153,6 +158,16 @@ describe('getRelativeTime', () => {
     expect(getRelativeTime(NOW - 30, NOW, 'zh')).toBe('刚刚');
     expect(getRelativeTime(NOW - 7200, NOW, 'zh')).toBe('2 小时前');
     expect(getRelativeTime(NOW - 86400 * 3, NOW, 'zh')).toBe('3 天前');
+  });
+
+  it('inflects Ukrainian relative units across all four plural categories', () => {
+    expect(getRelativeTime(NOW - 30, NOW, 'uk')).toBe('щойно');
+    expect(getRelativeTime(NOW - 60, NOW, 'uk')).toBe('1 хвилину тому'); // one
+    expect(getRelativeTime(NOW - 7200, NOW, 'uk')).toBe('2 години тому'); // few
+    expect(getRelativeTime(NOW - 86400 * 5, NOW, 'uk')).toBe('5 днів тому'); // many
+    expect(getRelativeTime(NOW - 3600 * 21, NOW, 'uk-UA')).toBe('21 годину тому'); // one (21)
+    expect(getRelativeTime(NOW - 86400 * 60, NOW, 'uk')).toBe('2 місяці тому');
+    expect(getRelativeTime(NOW - 86400 * 400, NOW, 'uk')).toBe('1 рік тому');
   });
 
   it('uses Date.now when nowSeconds is not provided', () => {

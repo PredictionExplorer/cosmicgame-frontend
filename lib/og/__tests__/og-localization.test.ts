@@ -12,7 +12,11 @@ import {
   CJK_OG_FONT_FILE,
   CJK_OG_FONT_LICENSE,
   CJK_OG_FONT_NAME,
+  CYRILLIC_OG_FONT_FILE,
+  CYRILLIC_OG_FONT_LICENSE,
+  CYRILLIC_OG_FONT_NAME,
   getOgFontConfig,
+  getOgTypography,
 } from '@/lib/og/fonts';
 
 const generatorPaths = [
@@ -43,6 +47,12 @@ describe('localized Open Graph images', () => {
     );
   });
 
+  it.each(OG_ROUTES)('%s has Ukrainian visual copy and alt text', (route) => {
+    const copy = getOgCopy('uk', route);
+    expect(`${copy.alt}${copy.eyebrow}${copy.title}${copy.subhead}`).toMatch(/[\u0400-\u04ff]/);
+    expect(getOgImageMetadata('uk-UA', route)[0]?.alt).toMatch(/[\u0400-\u04ff]/);
+  });
+
   it('preserves the established English default and gallery copy', () => {
     expect(getOgCopy('en', 'default')).toEqual(
       expect.objectContaining({
@@ -60,19 +70,23 @@ describe('localized Open Graph images', () => {
     expect(resolveOgLocale('not-a-locale')).toBe('en');
   });
 
-  it('checks in a compact TTF subset with its OFL license', () => {
-    const font = readFileSync(join(process.cwd(), CJK_OG_FONT_FILE));
-    const license = readFileSync(join(process.cwd(), CJK_OG_FONT_LICENSE), 'utf8');
+  it.each([
+    ['Noto Sans SC', CJK_OG_FONT_FILE, CJK_OG_FONT_LICENSE],
+    ['Onest', CYRILLIC_OG_FONT_FILE, CYRILLIC_OG_FONT_LICENSE],
+  ])('checks in a compact %s TTF subset with its OFL license', (_name, file, licensePath) => {
+    const font = readFileSync(join(process.cwd(), file));
+    const license = readFileSync(join(process.cwd(), licensePath), 'utf8');
     expect(font.byteLength).toBeGreaterThan(20_000);
     expect(font.byteLength).toBeLessThan(250_000);
     expect(font.subarray(0, 4)).toEqual(Buffer.from([0x00, 0x01, 0x00, 0x00]));
     expect(license).toContain('SIL OPEN FONT LICENSE Version 1.1');
   });
 
-  it('embeds Noto Sans SC only for Chinese rendering', async () => {
+  it('embeds a script-specific font only where next/og defaults cannot render the copy', async () => {
     await expect(getOgFontConfig('en')).resolves.toEqual([]);
-    const [font] = await getOgFontConfig('zh');
-    expect(font).toEqual(
+
+    const [cjk] = await getOgFontConfig('zh');
+    expect(cjk).toEqual(
       expect.objectContaining({
         name: CJK_OG_FONT_NAME,
         data: expect.anything(),
@@ -80,7 +94,16 @@ describe('localized Open Graph images', () => {
         style: 'normal',
       }),
     );
-    expect(font!.data.byteLength).toBeGreaterThan(20_000);
+    expect(cjk!.data.byteLength).toBeGreaterThan(20_000);
+    expect(getOgTypography('zh').cjk).toBe(true);
+
+    const [cyrillic] = await getOgFontConfig('uk');
+    expect(cyrillic).toEqual(
+      expect.objectContaining({ name: CYRILLIC_OG_FONT_NAME, weight: 700, style: 'normal' }),
+    );
+    expect(cyrillic!.data.byteLength).toBeGreaterThan(20_000);
+    // Cyrillic is alphabetic: Latin layout metrics (uppercase eyebrows, tracking) apply.
+    expect(getOgTypography('uk').cjk).toBe(false);
   });
 
   it('routes all twelve generators through localized metadata and font loading', () => {

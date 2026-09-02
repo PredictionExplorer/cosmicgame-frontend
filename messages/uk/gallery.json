@@ -1,0 +1,120 @@
+{
+  "error": {
+    "title": "Не вдалося завантажити архів закарбувань",
+    "message": "Не вдалося прочитати колекцію Cosmic Signature. Спробуйте ще раз, щоб завантажити архів."
+  },
+  "jsonLd": {
+    "name": "Галерея Cosmic Signature"
+  },
+  "page": {
+    "eyebrowImprinted": "Колекція · закарбовано {count} NFT",
+    "eyebrowLive": "Колекція · наживо",
+    "title": "Галерея NFT",
+    "subtitle": "Досліджуйте повну колекцію Cosmic Signature NFT, закарбованих упродовж усіх циклів"
+  },
+  "intro": {
+    "badge": "Генеративний архів",
+    "description": "Кожен Cosmic Signature NFT — це унікальний твір генеративного мистецтва, породжений ончейн-сідом через фізичну симуляцію задачі трьох тіл. У типовому циклі закарбовується 24 нові NFT: чотири NFT за ролі, десять NFT зоряного відбору серед учасників і десять NFT зоряного відбору закріплених NFT для власників закріплень RandomWalk NFT."
+  },
+  "featured": {
+    "viewAria": "Переглянути Cosmic Signature {id}",
+    "alt": "Твір Cosmic Signature {id}",
+    "emptyHint": "Справжні твори колекції з’являться тут, коли стануть доступні проіндексовані NFT.",
+    "badgeImprint": "Вибране закарбування",
+    "badgeArchive": "Архів",
+    "awaitingMetadata": "Очікування метаданих"
+  },
+  "hero": {
+    "totalImprinted": {
+      "label": "Усього закарбовано",
+      "tooltip": "Загальна кількість Cosmic Signature NFT, закарбованих упродовж усіх циклів"
+    },
+    "currentlyAnchored": {
+      "label": "Зараз закріплено",
+      "tooltip": "NFT, закріплені в протоколі; їхні власники отримують надходження за закріплення"
+    },
+    "namedNfts": {
+      "label": "Іменовані NFT",
+      "tooltip": "NFT, яким власники дали унікальне власне ім’я"
+    },
+    "cycles": {
+      "label": "Цикли",
+      "tooltip": "Кількість унікальних циклів, у яких створено NFT"
+    }
+  },
+  "card": {
+    "alt": "Cosmic Signature {id}",
+    "unnamed": "Без імені",
+    "age": {
+      "justNow": "щойно",
+      "minutes": "{count}хв тому",
+      "hours": "{count}год тому",
+      "days": "{count}д тому",
+      "months": "{count} міс. тому",
+      "years": "{count} р. тому"
+    },
+    "tooltips": {
+      "round": "Закарбовано в циклі {round}",
+      "anchored": "Зараз закріплено; отримує надходження за закріплення",
+      "customName": "Цей NFT має власне ім’я",
+      "identifier": "Унікальний порядковий ідентифікатор цього Cosmic Signature NFT",
+      "mintedOn": "Закарбовано {date}"
+    }
+  },
+  "filters": {
+    "ariaLabel": "Фільтрувати NFT",
+    "all": {
+      "label": "Усі",
+      "tooltip": "Показати всі NFT колекції"
+    },
+    "anchored": {
+      "label": "Закріплені",
+      "tooltip": "NFT, які зараз закріплені й отримують надходження за закріплення"
+    },
+    "named": {
+      "label": "Іменовані",
+      "tooltip": "NFT, яким власники дали власне ім’я"
+    }
+  },
+  "sort": {
+    "ariaLabel": "Порядок сортування",
+    "tooltip": "Змінити порядок показу NFT",
+    "newest": "Спочатку нові",
+    "oldest": "Спочатку старі",
+    "cycleDesc": "Цикл (спадання)",
+    "cycleAsc": "Цикл (зростання)",
+    "rarity": "Спочатку рідкісні",
+    "chaosDesc": "Хаос (спадання)",
+    "chaosAsc": "Хаос (зростання)",
+    "syzygiesDesc": "Найбільше сизигій"
+  },
+  "list": {
+    "headers": {
+      "artwork": "Твір",
+      "token": "Токен",
+      "structure": "Структура",
+      "palette": "Палітра",
+      "spectral": "Клас",
+      "chaos": "Хаос",
+      "fate": "Доля",
+      "allocation": "Розподіл",
+      "cycle": "Цикл",
+      "age": "Закарбовано"
+    }
+  },
+  "view": {
+    "ariaLabel": "Режим перегляду",
+    "grid": "Сітка",
+    "list": "Список"
+  },
+  "pagination": {
+    "showing": "Показано <value>{start}</value>–<value>{end}</value> з <value>{total}</value> NFT",
+    "perPage": "На сторінці",
+    "perPageAria": "Елементів на сторінці",
+    "perPageTooltip": "Кількість NFT на сторінці"
+  },
+  "empty": {
+    "title": "NFT не знайдено",
+    "description": "Спробуйте змінити пошуковий запит або фільтри."
+  }
+}

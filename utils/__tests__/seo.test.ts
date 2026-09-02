@@ -1,3 +1,5 @@
+import { expectedLanguageAlternates } from '@/test-utils/i18n';
+
 import { createMetadata } from '@/utils/seo';
 
 describe('createMetadata', () => {
@@ -126,13 +128,23 @@ describe('createMetadata', () => {
 
     expect(result.alternates).toEqual({
       canonical: 'https://cosmicsignature.com/zh/learn',
-      languages: {
-        en: 'https://cosmicsignature.com/learn',
-        zh: 'https://cosmicsignature.com/zh/learn',
-        'x-default': 'https://cosmicsignature.com/learn',
-      },
+      languages: expectedLanguageAlternates('https://cosmicsignature.com', '/learn'),
     });
     expect(result.openGraph).toEqual(expect.objectContaining({ locale: 'zh_CN' }));
+  });
+
+  it('emits Ukrainian canonicals and Open Graph locale', () => {
+    const result = createMetadata('Заголовок', 'Опис', undefined, '/gallery', { locale: 'uk' });
+
+    expect(result.alternates).toEqual({
+      canonical: 'https://app.cosmicsignature.com/uk/gallery',
+      languages: expectedLanguageAlternates('https://app.cosmicsignature.com', '/gallery'),
+    });
+    expect(result.alternates?.languages).toHaveProperty(
+      'uk',
+      'https://app.cosmicsignature.com/uk/gallery',
+    );
+    expect(result.openGraph).toEqual(expect.objectContaining({ locale: 'uk_UA' }));
   });
 
   it('strips query strings from canonical paths', () => {

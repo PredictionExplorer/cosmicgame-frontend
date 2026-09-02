@@ -33,10 +33,10 @@ import { extname, join, relative, resolve } from 'node:path';
 import {
   DEFAULT_BANNED_STEMS,
   DEFAULT_BANNED_TERMS,
-  ZH_BANNED_TERMS,
+  LEXICON_PROFILES,
   buildBannedPattern,
   buildIdentifierPattern,
-  buildZhBannedPattern,
+  buildProfilePatterns,
   scanComments,
   scanContent,
   scanIdentifiers,
@@ -101,14 +101,19 @@ const EXCLUDE_DIRS: ReadonlySet<string> = new Set(
 
 const STRING_PATTERN = buildBannedPattern(DEFAULT_BANNED_TERMS);
 const IDENT_PATTERN = buildIdentifierPattern(DEFAULT_BANNED_STEMS);
-// Simplified-Chinese banned register (docs/i18n/glossary-zh.md §5). Runs on
-// every scanned file: zh copy lives in messages/zh/*.json and in the
-// content/**/text.zh.ts and content/legal/*.zh.ts modules.
-const ZH_PATTERN = buildZhBannedPattern(ZH_BANNED_TERMS);
+// Translated-locale banned registers (docs/i18n/glossary-<locale>.md). Every
+// profile runs on every scanned file: translated copy lives in
+// messages/<locale>/*.json and in content/**/*.<locale>.ts, and stray copy
+// in the wrong file is exactly what the scanner exists to catch.
+const LOCALE_PATTERNS = Object.entries(LEXICON_PROFILES).map(([locale, profile]) => ({
+  locale,
+  glossary: profile.glossary,
+  patterns: buildProfilePatterns(profile),
+}));
 
 interface PhaseCounts {
   strings: number;
-  zhStrings: number;
+  localeStrings: Record<string, number>;
   jsxText: number;
   identifiers: number;
   commentWarnings: number;
@@ -116,12 +121,26 @@ interface PhaseCounts {
 
 const counts: PhaseCounts = {
   strings: 0,
-  zhStrings: 0,
+  localeStrings: Object.fromEntries(LOCALE_PATTERNS.map(({ locale }) => [locale, 0])),
   jsxText: 0,
   identifiers: 0,
   commentWarnings: 0,
 };
 let failed = false;
+
+function scanLocaleRegisters(relPath: string, content: string): void {
+  for (const { locale, patterns } of LOCALE_PATTERNS) {
+    for (const pattern of patterns) {
+      for (const h of scanContent(content, pattern)) {
+        console.error(
+          `\u274c  ${relPath}:${h.line}  banned ${locale} term: "${h.term}" in ${h.literal}`,
+        );
+        counts.localeStrings[locale] = (counts.localeStrings[locale] ?? 0) + 1;
+        failed = true;
+      }
+    }
+  }
+}
 
 function isJsxFile(path: string): boolean {
   const e = extname(path);
@@ -144,11 +163,7 @@ function scanFile(absPath: string, relPath: string, content: string): void {
       counts.strings += 1;
       failed = true;
     }
-    for (const h of scanContent(content, ZH_PATTERN)) {
-      console.error(`\u274c  ${relPath}:${h.line}  banned zh term: "${h.term}" in ${h.literal}`);
-      counts.zhStrings += 1;
-      failed = true;
-    }
+    scanLocaleRegisters(relPath, content);
     if (flags.warnComments) {
       for (const h of scanComments(content, STRING_PATTERN)) {
         console.warn(
@@ -166,11 +181,7 @@ function scanFile(absPath: string, relPath: string, content: string): void {
     failed = true;
   }
 
-  for (const h of scanContent(content, ZH_PATTERN)) {
-    console.error(`\u274c  ${relPath}:${h.line}  banned zh term: "${h.term}" in ${h.literal}`);
-    counts.zhStrings += 1;
-    failed = true;
-  }
+  scanLocaleRegisters(relPath, content);
 
   if (flags.jsxText && isJsxFile(absPath)) {
     for (const h of scanJsxTextNodes(content, STRING_PATTERN)) {
@@ -238,11 +249,16 @@ console.log('');
 for (const dir of SCAN_DIRS) walk(dir);
 
 if (failed) {
+  const localeSummary = LOCALE_PATTERNS.map(
+    ({ locale }) => `${locale}:${counts.localeStrings[locale] ?? 0}`,
+  ).join(' ');
   console.error(
-    `\n\u274c  lexicon scan failed \u2014 strings:${counts.strings} zh:${counts.zhStrings} jsx:${counts.jsxText} identifiers:${counts.identifiers}`,
+    `\n\u274c  lexicon scan failed \u2014 strings:${counts.strings} ${localeSummary} jsx:${counts.jsxText} identifiers:${counts.identifiers}`,
   );
   console.error(
-    '   Replace banned terms per marketing/cosmic-lexicon.md (zh: docs/i18n/glossary-zh.md)',
+    `   Replace banned terms per marketing/cosmic-lexicon.md (${LOCALE_PATTERNS.map(
+      ({ locale, glossary }) => `${locale}: ${glossary}`,
+    ).join('; ')})`,
   );
   process.exit(1);
 }

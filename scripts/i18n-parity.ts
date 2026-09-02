@@ -1,73 +1,52 @@
 #!/usr/bin/env tsx
 /**
- * Message-catalog parity report (docs/i18n/README.md §7).
+ * Message-catalog integrity report and gate (docs/i18n/README.md §7).
  *
- * Compares every non-default locale's catalogs against the English source of
- * truth in messages/en/ and reports, per namespace:
- *   - missing keys (present in en, absent in the locale) — fall back to en,
- *   - empty keys (present but ''), treated the same as missing,
- *   - extra keys (absent in en) — dead weight, likely a typo or stale key.
+ * Compares every translated locale in `routing.locales` against the
+ * default-locale catalogs in messages/en/ and reports, per namespace, key
+ * parity, ICU syntax, placeholder/tag parity, plural completeness for the
+ * locale's CLDR categories, and verbatim-copy (untranslated) catalogs. The
+ * checks themselves live in ./i18n-parity-core.ts and also run under jest
+ * (i18n/__tests__/catalog-integrity.test.ts).
  *
  * Exit code:
- *   0  in report mode (default) unless namespaces are malformed.
+ *   0  in report mode (default) unless catalogs are malformed or the
+ *      messages/ directory disagrees with routing.locales.
  *   1  with --strict [ns ...] when the listed namespaces (or all, if none
- *      listed) have missing/empty/extra keys. Sprints flip namespaces to
- *      strict as their translations complete (docs/i18n/progress.md).
+ *      listed) have any problem.
  */
 /* eslint-disable no-console -- CLI report output. This file is a Node script
-   run via `yarn i18n:parity` and never ships to the browser. */
+   run via `npm run i18n:parity` and never ships to the browser. */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+import { getLocaleConfig } from '../i18n/localeConfig';
+import { routing, TRANSLATED_LOCALES } from '../i18n/routing';
+
+import {
+  checkSourceNamespace,
+  compareNamespace,
+  isPlainObject,
+  strictProblems,
+  type Messages,
+} from './i18n-parity-core';
+
 const MESSAGES_DIR = resolve(process.cwd(), 'messages');
-const DEFAULT_LOCALE = 'en';
+const DEFAULT_LOCALE = routing.defaultLocale;
 
 interface CliFlags {
   strict: boolean;
   strictNamespaces: readonly string[];
-  requiredManifest?: string;
 }
 
 function parseFlags(argv: readonly string[]): CliFlags {
   const strictIndex = argv.indexOf('--strict');
-  const requiredIndex = argv.indexOf('--required');
-  const requiredManifest = requiredIndex === -1 ? undefined : argv[requiredIndex + 1];
-  if (requiredIndex !== -1 && !requiredManifest) {
-    throw new Error('--required expects a manifest path');
-  }
-
   const strictNamespaces =
     strictIndex === -1 ? [] : argv.slice(strictIndex + 1).filter((arg) => !arg.startsWith('--'));
-  return {
-    strict: strictIndex !== -1,
-    strictNamespaces,
-    requiredManifest,
-  };
+  return { strict: strictIndex !== -1, strictNamespaces };
 }
 
-type Json = Record<string, unknown>;
-
-function isPlainObject(value: unknown): value is Json {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-/** Flattens {a:{b:'x'}} to ['a.b', ...] with empty-string values marked. */
-function flattenKeys(node: Json, prefix = ''): Map<string, boolean> {
-  const keys = new Map<string, boolean>();
-  for (const [key, value] of Object.entries(node)) {
-    const path = prefix ? `${prefix}.${key}` : key;
-    if (isPlainObject(value)) {
-      for (const [childKey, childEmpty] of flattenKeys(value, path)) {
-        keys.set(childKey, childEmpty);
-      }
-    } else {
-      keys.set(path, value === '');
-    }
-  }
-  return keys;
-}
-
-function readNamespace(locale: string, fileName: string): Json {
+function readNamespace(locale: string, fileName: string): Messages {
   const raw = readFileSync(join(MESSAGES_DIR, locale, fileName), 'utf8');
   const parsed: unknown = JSON.parse(raw);
   if (!isPlainObject(parsed)) {
@@ -82,166 +61,114 @@ function listNamespaces(locale: string): string[] {
     .sort();
 }
 
-interface RequiredManifest {
-  namespaces: Record<string, string[]>;
-}
-
-function readRequiredManifest(filePath: string): RequiredManifest {
-  const parsed: unknown = JSON.parse(readFileSync(resolve(process.cwd(), filePath), 'utf8'));
-  if (
-    !isPlainObject(parsed) ||
-    !isPlainObject(parsed.namespaces) ||
-    !Object.values(parsed.namespaces).every(
-      (selectors) =>
-        Array.isArray(selectors) && selectors.every((selector) => typeof selector === 'string'),
-    )
-  ) {
-    throw new Error(`${filePath} must contain { "namespaces": { "name": ["key", "prefix.*"] } }`);
+/** The messages/ tree must mirror routing.locales exactly — no stray or missing locale dirs. */
+function assertLocaleDirectories(): void {
+  const onDisk = readdirSync(MESSAGES_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  const expected: readonly string[] = [...routing.locales].sort();
+  const strayDirs = onDisk.filter((dir) => !expected.includes(dir));
+  const missingDirs = expected.filter((locale) => !onDisk.includes(locale));
+  if (strayDirs.length || missingDirs.length) {
+    throw new Error(
+      `messages/ must contain exactly one directory per routing locale (${expected.join(', ')})` +
+        (missingDirs.length ? `; missing: ${missingDirs.join(', ')}` : '') +
+        (strayDirs.length ? `; not a routing locale: ${strayDirs.join(', ')}` : ''),
+    );
   }
-  return parsed as unknown as RequiredManifest;
-}
-
-function expandRequiredKeys(
-  enKeys: Map<string, boolean>,
-  selectors: readonly string[],
-): Set<string> {
-  const required = new Set<string>();
-  for (const selector of selectors) {
-    if (selector === '*') {
-      for (const key of enKeys.keys()) required.add(key);
-      continue;
-    }
-    if (selector.endsWith('.*')) {
-      const prefix = selector.slice(0, -1);
-      const matches = [...enKeys.keys()].filter((key) => key.startsWith(prefix));
-      if (matches.length === 0) throw new Error(`Required selector ${selector} matches no en keys`);
-      for (const key of matches) required.add(key);
-      continue;
-    }
-    if (!enKeys.has(selector)) throw new Error(`Required en key does not exist: ${selector}`);
-    required.add(selector);
-  }
-  return required;
-}
-
-function checkRequiredManifest(filePath: string, localeNames: readonly string[]): number {
-  const manifest = readRequiredManifest(filePath);
-  let failures = 0;
-  console.log(`Sprint key gate — ${filePath}\n`);
-
-  for (const [namespace, selectors] of Object.entries(manifest.namespaces)) {
-    const namespaceFile = `${namespace}.json`;
-    if (!enNamespaces.includes(namespaceFile)) {
-      throw new Error(`Required namespace does not exist in en: ${namespace}`);
-    }
-    const enKeys = flattenKeys(readNamespace(DEFAULT_LOCALE, namespaceFile));
-    const required = expandRequiredKeys(enKeys, selectors);
-
-    for (const locale of localeNames) {
-      const localeFiles = new Set(listNamespaces(locale));
-      if (!localeFiles.has(namespaceFile)) {
-        console.error(`  ${locale}/${namespace}: missing catalog`);
-        failures += 1;
-        continue;
-      }
-      const localeKeys = flattenKeys(readNamespace(locale, namespaceFile));
-      const missing = [...required].filter(
-        (key) => !localeKeys.has(key) || localeKeys.get(key) === true,
-      );
-      const extra = selectors.includes('*')
-        ? [...localeKeys.keys()].filter((key) => !enKeys.has(key))
-        : [];
-      if (missing.length || extra.length) {
-        failures += 1;
-        console.error(
-          `  ${locale}/${namespace}: ${missing.length} missing/empty, ${extra.length} extra`,
-        );
-        for (const key of missing) console.error(`      · ${key}`);
-        for (const key of extra) console.error(`      · extra: ${key}`);
-      } else {
-        console.log(`  ${locale}/${namespace}: ${required.size} required keys present`);
-      }
-    }
-  }
-
-  console.log('');
-  return failures;
 }
 
 const flags = parseFlags(process.argv.slice(2));
-const locales = readdirSync(MESSAGES_DIR, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && entry.name !== DEFAULT_LOCALE)
-  .map((entry) => entry.name)
-  .sort();
+assertLocaleDirectories();
 
 const enNamespaces = listNamespaces(DEFAULT_LOCALE);
-let strictFailures = 0;
+let failures = 0;
 
-console.log(`i18n parity — comparing ${locales.join(', ') || '(no locales)'} against en\n`);
+const isStrict = (namespace: string): boolean =>
+  flags.strict &&
+  (flags.strictNamespaces.length === 0 || flags.strictNamespaces.includes(namespace));
 
-for (const locale of locales) {
+console.log(
+  `i18n parity — comparing ${TRANSLATED_LOCALES.join(', ') || '(no locales)'} against ${DEFAULT_LOCALE}\n`,
+);
+
+// The source catalog must itself be well-formed ICU with complete plurals.
+for (const namespaceFile of enNamespaces) {
+  const namespace = namespaceFile.replace(/\.json$/, '');
+  const report = checkSourceNamespace(
+    namespace,
+    readNamespace(DEFAULT_LOCALE, namespaceFile),
+    getLocaleConfig(DEFAULT_LOCALE).intlLocale,
+  );
+  const problems = [...report.syntaxErrors, ...report.pluralGaps];
+  if (problems.length) {
+    console.log(`  ${DEFAULT_LOCALE}/${namespace}: ${problems.length} source problem(s)`);
+    for (const problem of problems) console.log(`      · ${problem}`);
+    if (isStrict(namespace)) failures += 1;
+  }
+}
+
+for (const locale of TRANSLATED_LOCALES) {
+  const intlLocale = getLocaleConfig(locale).intlLocale;
   const localeNamespaces = new Set(listNamespaces(locale));
   let localeMissing = 0;
+  let localeIdentical = 0;
   let localeTotal = 0;
 
   for (const namespaceFile of enNamespaces) {
     const namespace = namespaceFile.replace(/\.json$/, '');
-    const enKeys = flattenKeys(readNamespace(DEFAULT_LOCALE, namespaceFile));
-    localeTotal += enKeys.size;
+    const source = readNamespace(DEFAULT_LOCALE, namespaceFile);
 
     if (!localeNamespaces.has(namespaceFile)) {
-      console.log(`  ${locale}/${namespace}: MISSING FILE (${enKeys.size} keys fall back)`);
-      localeMissing += enKeys.size;
-      strictFailures += 1;
+      const size = Object.keys(source).length;
+      console.log(`  ${locale}/${namespace}: MISSING FILE (${size} keys fall back)`);
+      localeTotal += size;
+      localeMissing += size;
+      if (isStrict(namespace)) failures += 1;
       continue;
     }
 
-    const localeKeys = flattenKeys(readNamespace(locale, namespaceFile));
-    const missing = [...enKeys.keys()].filter((key) => !localeKeys.has(key));
-    const empty = [...localeKeys.entries()]
-      .filter(([key, isEmpty]) => isEmpty && enKeys.has(key))
-      .map(([key]) => key);
-    const extra = [...localeKeys.keys()].filter((key) => !enKeys.has(key));
-    const translated = enKeys.size - missing.length - empty.length;
-    localeMissing += missing.length + empty.length;
+    const report = compareNamespace({
+      namespace,
+      source,
+      translation: readNamespace(locale, namespaceFile),
+      intlLocale,
+    });
+    const translated = report.total - report.missing.length - report.empty.length;
+    localeTotal += report.total;
+    localeMissing += report.missing.length + report.empty.length;
+    localeIdentical += report.identical.length;
 
-    const strictHere =
-      flags.strict &&
-      (flags.strictNamespaces.length === 0 || flags.strictNamespaces.includes(namespace));
-    const problems = missing.length + empty.length + extra.length;
-    if (strictHere && problems > 0) strictFailures += 1;
+    const problems = strictProblems(report);
+    if (isStrict(namespace) && problems.length > 0) failures += 1;
 
-    const pct = enKeys.size === 0 ? 100 : Math.round((translated / enKeys.size) * 100);
+    const pct = report.total === 0 ? 100 : Math.round((translated / report.total) * 100);
     console.log(
-      `  ${locale}/${namespace}: ${translated}/${enKeys.size} translated (${pct}%)` +
-        (missing.length ? ` — ${missing.length} missing` : '') +
-        (empty.length ? ` — ${empty.length} empty` : '') +
-        (extra.length ? ` — ${extra.length} EXTRA` : ''),
+      `  ${locale}/${namespace}: ${translated}/${report.total} translated (${pct}%)` +
+        (report.identical.length ? ` — ${report.identical.length} identical to source` : '') +
+        (report.untranslated ? ' — UNTRANSLATED' : '') +
+        (problems.length ? ` — ${problems.length} problem(s)` : ''),
     );
-    for (const key of [...missing.slice(0, 5), ...empty.slice(0, 5)]) {
-      console.log(`      · ${key}`);
-    }
-    if (missing.length > 5) console.log(`      · … ${missing.length - 5} more`);
-    for (const key of extra) console.log(`      · extra: ${key}`);
+    for (const problem of problems.slice(0, 8)) console.log(`      · ${problem}`);
+    if (problems.length > 8) console.log(`      · … ${problems.length - 8} more`);
   }
 
   const done = localeTotal - localeMissing;
   const pct = localeTotal === 0 ? 100 : Math.round((done / localeTotal) * 100);
-  console.log(`\n  ${locale} TOTAL: ${done}/${localeTotal} (${pct}%)\n`);
+  console.log(
+    `\n  ${locale} TOTAL: ${done}/${localeTotal} (${pct}%), ${localeIdentical} identical to source\n`,
+  );
 
   const extraNamespaces = [...localeNamespaces].filter((file) => !enNamespaces.includes(file));
   for (const file of extraNamespaces) {
-    console.log(`  ${locale}/${file}: EXTRA FILE (no en counterpart)`);
-    strictFailures += 1;
+    console.log(`  ${locale}/${file}: EXTRA FILE (no ${DEFAULT_LOCALE} counterpart)`);
+    if (flags.strict) failures += 1;
   }
 }
 
-const requiredFailures = flags.requiredManifest
-  ? checkRequiredManifest(flags.requiredManifest, locales)
-  : 0;
-
-if ((flags.strict && strictFailures > 0) || requiredFailures > 0) {
-  console.error(`❌  i18n parity failed for ${strictFailures + requiredFailures} namespace(s)`);
+if (flags.strict && failures > 0) {
+  console.error(`❌  i18n parity failed for ${failures} namespace(s)`);
   process.exit(1);
 }
 console.log('✅  i18n parity report complete');

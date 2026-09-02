@@ -5,6 +5,8 @@ import {
   buildRoundStartTimes,
   buildTopBidderActivePeriodsResponse,
   computeTimeBounds,
+  DEFAULT_ACTIVE_PERIOD_GAP_HOURS,
+  DEFAULT_ACTIVE_PERIOD_MIN_GESTURES,
   excludeCycleOpenHour,
   type GestureTimingPoint,
 } from '@/utils/biddingAnalytics';
@@ -182,8 +184,8 @@ export async function get_top_bidder_active_periods(
   finTs: number,
   opts?: TopBidderActivePeriodsOptions,
 ): Promise<TopBidderActivePeriodsResponse> {
-  const gapHours = opts?.gapHours ?? 6;
-  const minBids = opts?.minBids ?? 2;
+  const gapHours = opts?.gapHours ?? DEFAULT_ACTIVE_PERIOD_GAP_HOURS;
+  const minBids = opts?.minBids ?? DEFAULT_ACTIVE_PERIOD_MIN_GESTURES;
   try {
     const { data } = await apiGet(
       getAPIUrl(`statistics/bidding/top_active_periods/${topN}/${initTs}/${finTs}`),

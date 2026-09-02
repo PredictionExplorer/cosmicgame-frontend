@@ -1,6 +1,6 @@
-import { routing, type AppLocale } from './routing';
+import { routing, type AppLocale, type TranslatedLocale } from './routing';
 
-export type { AppLocale };
+export type { AppLocale, TranslatedLocale };
 
 /**
  * A value defined once per supported locale.
@@ -13,14 +13,19 @@ export type { AppLocale };
  */
 export type LocaleRecord<T> = Record<AppLocale, T>;
 
-/** Type guard for exact `AppLocale` values (`'en'`, `'zh'`). */
+/** Type guard for exact `AppLocale` values (`'en'`, `'zh'`, `'uk'`, …). */
 export function isAppLocale(value: unknown): value is AppLocale {
   return typeof value === 'string' && (routing.locales as readonly string[]).includes(value);
 }
 
+/** Type guard for locales that are translations of the default locale. */
+export function isTranslatedLocale(value: unknown): value is TranslatedLocale {
+  return isAppLocale(value) && value !== routing.defaultLocale;
+}
+
 /**
- * Canonicalizes locale-ish input (`zh`, `zh-CN`, `ZH_TW`, `en-US`, undefined)
- * to a supported `AppLocale`, falling back to the default locale.
+ * Canonicalizes locale-ish input (`zh`, `zh-CN`, `ZH_TW`, `uk-UA`, `en-US`,
+ * undefined) to a supported `AppLocale`, falling back to the default locale.
  *
  * The single home for the parsing that was previously copy-pasted as
  * `locale.toLowerCase().split('-')[0] === 'zh'` ternaries.

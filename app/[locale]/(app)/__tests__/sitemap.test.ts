@@ -1,4 +1,7 @@
 import sitemap from '@/app/sitemap';
+import { expectedLanguageAlternates } from '@/test-utils/i18n';
+
+import { routing, TRANSLATED_LOCALES } from '@/i18n/routing';
 
 let mockHost = 'app.cosmicsignature.com';
 
@@ -33,35 +36,36 @@ describe('sitemap (host-aware)', () => {
       expect(entries[0]!.url).toBe('https://cosmicsignature.com');
     });
 
-    it('adds English, Chinese, and x-default alternates on the landing host', async () => {
+    it('adds one alternate per locale plus x-default on the landing host', async () => {
       const entries = await sitemap();
       const learn = entries.find((entry) => entry.url === 'https://cosmicsignature.com/learn');
-      expect(learn?.alternates?.languages).toEqual({
-        en: 'https://cosmicsignature.com/learn',
-        zh: 'https://cosmicsignature.com/zh/learn',
-        'x-default': 'https://cosmicsignature.com/learn',
-      });
+      expect(learn?.alternates?.languages).toEqual(
+        expectedLanguageAlternates('https://cosmicsignature.com', '/learn'),
+      );
 
       for (const entry of entries) {
-        expect(entry.alternates?.languages?.zh).toMatch(
-          /^https:\/\/cosmicsignature\.com\/zh(?:\/|$)/,
-        );
+        for (const locale of TRANSLATED_LOCALES) {
+          expect(entry.alternates?.languages?.[locale]).toMatch(
+            new RegExp(`^https://cosmicsignature\\.com/${locale}(?:/|$)`),
+          );
+        }
       }
     });
 
-    it('emits reciprocal English and Chinese loc entries on the landing host', async () => {
+    it('emits reciprocal loc entries for every locale on the landing host', async () => {
       const entries = await sitemap();
       const urls = new Set(entries.map((entry) => entry.url));
 
-      expect(urls).toContain('https://cosmicsignature.com/zh');
-      expect(urls).toContain('https://cosmicsignature.com/zh/about');
-      expect(urls).toContain('https://cosmicsignature.com/zh/learn');
+      for (const locale of TRANSLATED_LOCALES) {
+        expect(urls).toContain(`https://cosmicsignature.com/${locale}`);
+        expect(urls).toContain(`https://cosmicsignature.com/${locale}/about`);
+        expect(urls).toContain(`https://cosmicsignature.com/${locale}/learn`);
+      }
 
       for (const entry of entries) {
         const languages = entry.alternates?.languages;
-        expect(urls).toContain(languages?.en);
-        expect(urls).toContain(languages?.zh);
-        expect(languages?.['x-default']).toBe(languages?.en);
+        for (const locale of routing.locales) expect(urls).toContain(languages?.[locale]);
+        expect(languages?.['x-default']).toBe(languages?.[routing.defaultLocale]);
       }
     });
   });
@@ -87,8 +91,15 @@ describe('sitemap (host-aware)', () => {
         expect(entry.alternates?.languages).toEqual(
           expect.objectContaining({
             en: expect.stringMatching(/^https:\/\/app\.cosmicsignature\.com/),
-            zh: expect.stringMatching(/^https:\/\/app\.cosmicsignature\.com\/zh(?:\/|$)/),
             'x-default': expect.stringMatching(/^https:\/\/app\.cosmicsignature\.com/),
+            ...Object.fromEntries(
+              TRANSLATED_LOCALES.map((locale) => [
+                locale,
+                expect.stringMatching(
+                  new RegExp(`^https://app\\.cosmicsignature\\.com/${locale}(?:/|$)`),
+                ),
+              ]),
+            ),
           }),
         );
       }
@@ -99,26 +110,25 @@ describe('sitemap (host-aware)', () => {
       const gallery = entries.find(
         (entry) => entry.url === 'https://app.cosmicsignature.com/gallery',
       );
-      expect(gallery?.alternates?.languages).toEqual({
-        en: 'https://app.cosmicsignature.com/gallery',
-        zh: 'https://app.cosmicsignature.com/zh/gallery',
-        'x-default': 'https://app.cosmicsignature.com/gallery',
-      });
+      expect(gallery?.alternates?.languages).toEqual(
+        expectedLanguageAlternates('https://app.cosmicsignature.com', '/gallery'),
+      );
     });
 
-    it('emits reciprocal English and Chinese loc entries on the app host', async () => {
+    it('emits reciprocal loc entries for every locale on the app host', async () => {
       const entries = await sitemap();
       const urls = new Set(entries.map((entry) => entry.url));
 
-      expect(urls).toContain('https://app.cosmicsignature.com/zh');
-      expect(urls).toContain('https://app.cosmicsignature.com/zh/gallery');
-      expect(urls).toContain('https://app.cosmicsignature.com/zh/statistics');
+      for (const locale of TRANSLATED_LOCALES) {
+        expect(urls).toContain(`https://app.cosmicsignature.com/${locale}`);
+        expect(urls).toContain(`https://app.cosmicsignature.com/${locale}/gallery`);
+        expect(urls).toContain(`https://app.cosmicsignature.com/${locale}/statistics`);
+      }
 
       for (const entry of entries) {
         const languages = entry.alternates?.languages;
-        expect(urls).toContain(languages?.en);
-        expect(urls).toContain(languages?.zh);
-        expect(languages?.['x-default']).toBe(languages?.en);
+        for (const locale of routing.locales) expect(urls).toContain(languages?.[locale]);
+        expect(languages?.['x-default']).toBe(languages?.[routing.defaultLocale]);
       }
     });
 

@@ -42,6 +42,7 @@ function ConnectModalOpener({ connectRequestId }: { connectRequestId: number }) 
 const RAINBOW_KIT_LOCALES: LocaleRecord<RainbowKitLocale> = {
   en: 'en-US',
   zh: 'zh-CN',
+  uk: 'uk-UA',
 };
 
 /**

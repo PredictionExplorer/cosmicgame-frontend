@@ -1,4 +1,5 @@
 import enSeo from '@/messages/en/seo.json';
+import ukSeo from '@/messages/uk/seo.json';
 import zhSeo from '@/messages/zh/seo.json';
 
 import { normalizeLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
@@ -32,6 +33,7 @@ export interface OgCopy {
 const catalogs = {
   en: enSeo.og,
   zh: zhSeo.og,
+  uk: ukSeo.og,
 } as unknown as LocaleRecord<Record<OgRoute, OgCopy>>;
 
 export function resolveOgLocale(locale: string | undefined): OgLocale {

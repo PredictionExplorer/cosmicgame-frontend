@@ -4,14 +4,17 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { basename, extname, join, relative, resolve } from 'node:path';
 
+import { TRANSLATED_LOCALES } from '../i18n/routing';
+
 import {
+  TERMINOLOGY_PACKS,
   scanTerminology,
-  validateTerminologyRules,
+  validateTerminologyPacks,
   type TerminologyHit,
 } from './terminology-consistency-core';
 
 const ROOT = resolve(process.cwd());
-const MESSAGE_ROOT = join(ROOT, 'messages', 'zh');
+const MESSAGES_ROOT = join(ROOT, 'messages');
 const CONTENT_ROOT = join(ROOT, 'content');
 const CONTENT_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.md', '.mdx', '.json']);
 
@@ -33,13 +36,17 @@ function walkFiles(directory: string): string[] {
   return files;
 }
 
-function isChineseContentFile(path: string): boolean {
+/**
+ * Per-locale content modules follow two naming conventions:
+ * `text.<locale>.ts` / `TermsContent.<locale>.ts` (structure/text split) and
+ * bare `<locale>.ts` (small areas such as content/about).
+ */
+function isLocaleContentFile(path: string, locale: string): boolean {
   if (!CONTENT_EXTENSIONS.has(extname(path))) return false;
   const name = basename(path);
   return (
-    /^zh(?:[.-]|$)/i.test(name) ||
-    /\.zh(?:[.-]|$)/i.test(name) ||
-    /(?:^|[.-])zh-hans(?:[.-]|$)/i.test(name)
+    new RegExp(`^${locale}(?:[.-]|$)`, 'i').test(name) ||
+    new RegExp(`\\.${locale}(?:[.-]|$)`, 'i').test(name)
   );
 }
 
@@ -66,57 +73,64 @@ function reportHit(file: string, location: string, hit: TerminologyHit): void {
   if (hit.excerpt) console.error(`    ${hit.excerpt}`);
 }
 
-const ruleErrors = validateTerminologyRules();
-if (ruleErrors.length > 0) {
-  for (const error of ruleErrors) console.error(`\u274c  terminology rule error: ${error}`);
+const packErrors = validateTerminologyPacks();
+if (packErrors.length > 0) {
+  for (const error of packErrors) console.error(`\u274c  terminology rule error: ${error}`);
   process.exit(1);
 }
 
-const messageFiles = walkFiles(MESSAGE_ROOT)
-  .filter((path) => extname(path) === '.json')
-  .sort();
-const contentFiles = walkFiles(CONTENT_ROOT).filter(isChineseContentFile).sort();
-
 let failureCount = 0;
 let valueCount = 0;
+const contentFiles = walkFiles(CONTENT_ROOT);
 
-console.log('\ud83d\udcd8  Simplified-Chinese terminology consistency');
-console.log(
-  `   scanning ${messageFiles.length} message catalogs and ${contentFiles.length} zh content modules`,
-);
-console.log('');
+console.log('\ud83d\udcd8  Terminology consistency');
 
-for (const path of messageFiles) {
-  const file = relative(ROOT, path);
-  const raw = readFileSync(path, 'utf8');
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch (error) {
-    console.error(`\u274c  ${file} is not valid JSON: ${String(error)}`);
-    failureCount += 1;
-    continue;
+for (const locale of TRANSLATED_LOCALES) {
+  const pack = TERMINOLOGY_PACKS[locale];
+  const messageFiles = walkFiles(join(MESSAGES_ROOT, locale))
+    .filter((path) => extname(path) === '.json')
+    .sort();
+  const localeContentFiles = contentFiles
+    .filter((path) => isLocaleContentFile(path, locale))
+    .sort();
+
+  console.log(
+    `   ${locale}: ${messageFiles.length} message catalogs, ${localeContentFiles.length} content modules (${pack.glossary})`,
+  );
+
+  for (const path of messageFiles) {
+    const file = relative(ROOT, path);
+    const raw = readFileSync(path, 'utf8');
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (error) {
+      console.error(`\u274c  ${file} is not valid JSON: ${String(error)}`);
+      failureCount += 1;
+      continue;
+    }
+
+    for (const value of flattenJsonStrings(parsed)) {
+      valueCount += 1;
+      for (const hit of scanTerminology(value.text, pack)) {
+        reportHit(file, value.location, hit);
+        failureCount += 1;
+      }
+    }
   }
 
-  for (const value of flattenJsonStrings(parsed)) {
+  for (const path of localeContentFiles) {
+    const file = relative(ROOT, path);
+    const source = readFileSync(path, 'utf8');
     valueCount += 1;
-    const hits = scanTerminology(value.text);
-    for (const hit of hits) {
-      reportHit(file, value.location, hit);
+    for (const hit of scanTerminology(source, pack)) {
+      reportHit(file, '', hit);
       failureCount += 1;
     }
   }
 }
 
-for (const path of contentFiles) {
-  const file = relative(ROOT, path);
-  const source = readFileSync(path, 'utf8');
-  valueCount += 1;
-  for (const hit of scanTerminology(source)) {
-    reportHit(file, '', hit);
-    failureCount += 1;
-  }
-}
+console.log('');
 
 if (failureCount > 0) {
   console.error(

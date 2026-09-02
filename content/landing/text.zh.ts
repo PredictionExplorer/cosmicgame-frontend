@@ -133,8 +133,9 @@ export const landingTextZh = {
     },
     facts: {
       'wavelength-bins': { label: '波长区间' },
-      'physics-steps': { label: '每组候选的物理步数' },
-      'candidate-orbits': { label: '候选轨道' },
+      // Chinese data displays keep Western grouping (glossary-zh.md §3).
+      'physics-steps': { label: '每组候选的物理步数', value: '1,000,000' },
+      'candidate-orbits': { label: '候选轨道', value: '100,000' },
       license: { label: '许可协议' },
     },
   },
@@ -182,10 +183,12 @@ export const landingTextZh = {
         body: `程序化随机选出 10 位 Random Walk NFT 锚定者，每位获配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。`,
       },
       'endurance-champion': {
+        percent: `${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST`,
         title: '坚守冠军分配',
         body: '连续坚守时间最长的参与者获配 1,000 表彰 CST 与 1 枚 Cosmic Signature NFT。',
       },
       'final-cst-gesture': {
+        percent: `${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST`,
         title: 'CST 收官之笔分配',
         body: '本周期最后一次使用 CST 落笔的参与者获配 1,000 表彰 CST 与 1 枚 Cosmic Signature NFT。',
       },

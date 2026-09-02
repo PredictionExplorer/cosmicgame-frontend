@@ -3,17 +3,19 @@
  * Generates the committed white paper PDFs from the content modules, so the
  * web pages at /white-paper and the PDFs can never drift apart.
  *
- *   npm run white-paper:pdf              # both languages
+ *   npm run white-paper:pdf              # every locale
  *   npm run white-paper:pdf -- --locale zh
  *
  * Pipeline: content/white-paper (structure.ts + text.<locale>.ts) -> pandoc
  * markdown -> tectonic (XeLaTeX) ->
- * public/white-paper/cosmic-signature-white-paper-v<x>[-zh].pdf
+ * public/white-paper/cosmic-signature-white-paper-v<x>[-<locale>].pdf
  *
  * Requires `pandoc` and `tectonic` on PATH (both available via Homebrew).
- * The Chinese build additionally uses the macOS system CJK fonts Songti SC
- * and PingFang SC through xeCJK. Rerun after any change to a content module,
- * and bump WHITE_PAPER_VERSION in content/white-paper/types.ts for
+ * Non-Latin builds use macOS system fonts: the Chinese build sets Songti SC
+ * and PingFang SC through xeCJK, the Ukrainian build sets Cyrillic-capable
+ * Times New Roman / Helvetica Neue through fontspec (Latin Modern, pandoc's
+ * default, has no Cyrillic glyphs). Rerun after any change to a content
+ * module, and bump WHITE_PAPER_VERSION in content/white-paper/types.ts for
  * substantive revisions so older copies stay citable.
  */
 
@@ -22,11 +24,14 @@ import { mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 
-import { whitePaperContentEn, whitePaperContentZh } from '../content/white-paper';
+import {
+  whitePaperContentEn,
+  whitePaperContentUk,
+  whitePaperContentZh,
+} from '../content/white-paper';
 import {
   WHITE_PAPER_DATE_DISPLAY,
-  WHITE_PAPER_PDF_PATH,
-  WHITE_PAPER_PDF_PATH_ZH,
+  whitePaperPdfPath,
   type WhitePaperBlock,
   type WhitePaperContent,
   type WhitePaperSection,
@@ -38,10 +43,11 @@ const ROOT = resolve(process.cwd());
 
 interface LocaleBuild {
   content: WhitePaperContent;
-  outputPath: string;
   dateDisplay: string;
   tocTitle: string;
   headerIncludes: readonly string[];
+  /** pandoc `lang` metadata (polyglossia hyphenation + typography); omitted when unset. */
+  lang?: string;
 }
 
 const BASE_HEADER_INCLUDES = [
@@ -54,18 +60,17 @@ const BASE_HEADER_INCLUDES = [
 ] as const;
 
 // One build per app locale: adding a locale to routing.locales fails to
-// compile here until its PDF typography and output path are decided.
+// compile here until its PDF typography is decided. Output paths derive from
+// the locale (whitePaperPdfPath), so only typography needs a decision.
 const BUILDS: LocaleRecord<LocaleBuild> = {
   en: {
     content: whitePaperContentEn,
-    outputPath: join(ROOT, 'public', WHITE_PAPER_PDF_PATH),
     dateDisplay: WHITE_PAPER_DATE_DISPLAY,
     tocTitle: 'Contents',
     headerIncludes: BASE_HEADER_INCLUDES,
   },
   zh: {
     content: whitePaperContentZh,
-    outputPath: join(ROOT, 'public', WHITE_PAPER_PDF_PATH_ZH),
     dateDisplay: '2026\u5e748\u6708',
     tocTitle: '\u76ee\u5f55',
     headerIncludes: [
@@ -76,6 +81,22 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
       '\\setCJKsansfont{PingFang SC}',
       '\\setCJKmonofont{PingFang SC}',
       '\\renewcommand{\\abstractname}{\u6458\u8981}',
+    ],
+  },
+  uk: {
+    content: whitePaperContentUk,
+    dateDisplay: '\u0441\u0435\u0440\u043f\u0435\u043d\u044c 2026',
+    tocTitle: '\u0417\u043c\u0456\u0441\u0442',
+    lang: 'uk',
+    headerIncludes: [
+      ...BASE_HEADER_INCLUDES,
+      // macOS system fonts with full Cyrillic coverage; Latin Modern has none.
+      // Formula blocks are typeset as code, so the mono face needs Cyrillic too
+      // («де T = 20 хвилин»).
+      '\\setmainfont{Times New Roman}',
+      '\\setsansfont{Helvetica Neue}',
+      '\\setmonofont[Scale=MatchLowercase]{Menlo}',
+      '\\renewcommand{\\abstractname}{\u0410\u043d\u043e\u0442\u0430\u0446\u0456\u044f}',
     ],
   },
 };
@@ -205,6 +226,7 @@ function buildMarkdown(build: LocaleBuild): string {
     toccolor: 'black',
     'link-citations': true,
     'header-includes': build.headerIncludes,
+    ...(build.lang ? { lang: build.lang } : {}),
   };
 
   const body: string[] = [];
@@ -233,11 +255,12 @@ function buildMarkdown(build: LocaleBuild): string {
 
 function generate(locale: AppLocale): void {
   const build = BUILDS[locale];
+  const outputPath = join(ROOT, 'public', whitePaperPdfPath(locale));
   const markdown = buildMarkdown(build);
   const tempDir = mkdtempSync(join(tmpdir(), `cosmic-white-paper-${locale}-`));
   const markdownPath = join(tempDir, 'white-paper.md');
   writeFileSync(markdownPath, markdown, 'utf8');
-  mkdirSync(dirname(build.outputPath), { recursive: true });
+  mkdirSync(dirname(outputPath), { recursive: true });
 
   try {
     execFileSync(
@@ -247,7 +270,7 @@ function generate(locale: AppLocale): void {
         '--from',
         'markdown+smart',
         '--output',
-        build.outputPath,
+        outputPath,
         '--pdf-engine',
         'tectonic',
         '--toc',
@@ -260,10 +283,10 @@ function generate(locale: AppLocale): void {
     rmSync(tempDir, { recursive: true, force: true });
   }
 
-  const sizeKb = Math.round(statSync(build.outputPath).size / 1024);
+  const sizeKb = Math.round(statSync(outputPath).size / 1024);
   /* eslint-disable-next-line no-console -- CLI status output; this script
      runs via `npm run white-paper:pdf` and never ships to the browser. */
-  console.log(`\u2705  wrote ${build.outputPath} (${sizeKb} KB)`);
+  console.log(`\u2705  wrote ${outputPath} (${sizeKb} KB)`);
 }
 
 function main(): void {

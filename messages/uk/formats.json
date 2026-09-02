@@ -1,0 +1,22 @@
+{
+  "liveCycleCountdown": "Відлік до завершення поточного перформанс-циклу",
+  "countdown": {
+    "days": "ДН",
+    "hours": "ГОД",
+    "minutes": "ХВ",
+    "seconds": "С"
+  },
+  "countdownLong": {
+    "days": "Дні",
+    "hours": "Години",
+    "minutes": "Хв",
+    "seconds": "С"
+  },
+  "durationCompact": {
+    "days": "д",
+    "hours": "год",
+    "minutes": "хв",
+    "seconds": "с",
+    "leftPattern": "залишилося {duration}"
+  }
+}

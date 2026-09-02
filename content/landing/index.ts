@@ -2,6 +2,7 @@ import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
 import { LANDING_STRUCTURE, type LandingStageText, type LandingText } from './structure';
 import { landingTextEn } from './text.en';
+import { landingTextUk } from './text.uk';
 import { landingTextZh } from './text.zh';
 import type { LandingContent, LandingFooterColumn, LandingTrackItem } from './types';
 
@@ -14,7 +15,9 @@ function buildLandingContent(text: LandingText): LandingContent {
   // needs plain string lookups.
   const cycleStageTexts = text.cycle.stages as Readonly<Record<string, LandingStageText>>;
   const artStageTexts = text.art.stages as Readonly<Record<string, LandingStageText>>;
-  const artFactTexts = text.art.facts as Readonly<Record<string, { label: string }>>;
+  const artFactTexts = text.art.facts as Readonly<
+    Record<string, { label: string; value?: string }>
+  >;
   const trackItemTexts = text.tracks.items as Readonly<
     Record<string, { percent?: string; title: string; body: string }>
   >;
@@ -70,7 +73,7 @@ function buildLandingContent(text: LandingText): LandingContent {
       })),
       facts: LANDING_STRUCTURE.art.facts.map((fact) => ({
         label: artFactTexts[fact.id]!.label,
-        value: fact.value,
+        value: 'value' in fact ? fact.value : artFactTexts[fact.id]!.value!,
       })),
     },
     tracks: {
@@ -146,10 +149,12 @@ function buildLandingContent(text: LandingText): LandingContent {
 
 export const landingContentEn: LandingContent = buildLandingContent(landingTextEn);
 export const landingContentZh: LandingContent = buildLandingContent(landingTextZh);
+export const landingContentUk: LandingContent = buildLandingContent(landingTextUk);
 
 const LANDING_CONTENT: LocaleRecord<LandingContent> = {
   en: landingContentEn,
   zh: landingContentZh,
+  uk: landingContentUk,
 };
 
 export function getLandingContent(locale: string): LandingContent {

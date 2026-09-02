@@ -4,7 +4,9 @@ import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import { networkConfig } from '@/config/networks';
-import { clashDisplay, inter, notoSansSC } from '@/lib/fonts';
+import { getLocaleConfig } from '@/i18n/localeConfig';
+import { routing, type AppLocale } from '@/i18n/routing';
+import { clashDisplay, inter, notoSansSC, onest } from '@/lib/fonts';
 import { apiBaseUrls } from '@/lib/serverRotation';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 
@@ -45,19 +47,20 @@ const MEDIA_PRECONNECT_ORIGINS: string[] = Array.from(
 export function RootDocument({
   children,
   headExtras,
-  locale = 'en',
+  locale = routing.defaultLocale,
 }: {
   children: ReactNode;
   /** Host-specific head content (e.g. JSON-LD blocks). */
   headExtras?: ReactNode;
-  /** BCP 47 language tag from the [locale] segment ('en' | 'zh'). */
-  locale?: string;
+  /** App locale from the [locale] segment; also selects `<html dir>`. */
+  locale?: AppLocale;
 }) {
   return (
     <html
       lang={locale}
+      dir={getLocaleConfig(locale).textDirection}
       data-scroll-behavior="smooth"
-      className={`${clashDisplay.variable} ${inter.variable} ${notoSansSC.variable}`}
+      className={`${clashDisplay.variable} ${inter.variable} ${notoSansSC.variable} ${onest.variable}`}
     >
       <head>
         {/* No `crossOrigin`: artwork loads as plain <img> requests (no CORS),

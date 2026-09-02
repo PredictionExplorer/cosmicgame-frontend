@@ -1,3 +1,5 @@
+import { TRANSLATED_LOCALES, type AppLocale } from '@/i18n/routing';
+
 import getNAVs, { type NavDescriptor } from '../nav';
 import navMessages from '../../messages/en/nav.json';
 
@@ -18,7 +20,7 @@ function t(key: string): string {
 function navs(
   status: Parameters<typeof getNAVs>[0] = null,
   account: string | null = null,
-  locale: 'en' | 'zh' = 'en',
+  locale: AppLocale = 'en',
 ) {
   return getNAVs(status, account, t, locale);
 }
@@ -91,13 +93,16 @@ describe('getNAVs', () => {
     expect(featured[0]!.external).toBe(true);
   });
 
-  it('carries Chinese locale prefixes to cross-host destinations', () => {
-    const help = navs(null, null, 'zh').find((nav) => nav.title === 'Help');
-    const routes = help?.children?.map((child) => child.route) ?? [];
-    expect(routes).toContain('https://cosmicsignature.com/zh/about');
-    expect(routes).toContain('https://cosmicsignature.com/zh/learn');
-    expect(routes).toContain('https://cosmicsignature.com/zh');
-  });
+  it.each(TRANSLATED_LOCALES)(
+    'carries the %s locale prefix to cross-host destinations',
+    (locale) => {
+      const help = navs(null, null, locale).find((nav) => nav.title === 'Help');
+      const routes = help?.children?.map((child) => child.route) ?? [];
+      expect(routes).toContain(`https://cosmicsignature.com/${locale}/about`);
+      expect(routes).toContain(`https://cosmicsignature.com/${locale}/learn`);
+      expect(routes).toContain(`https://cosmicsignature.com/${locale}`);
+    },
+  );
 
   it('adds My Allocations only when the account has something to collect', () => {
     const routesWithout = flattenRoutes(navs({ ETHRaffleToClaim: 0 }, '0x1'));

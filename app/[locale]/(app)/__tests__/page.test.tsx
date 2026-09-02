@@ -1,3 +1,5 @@
+import { expectedLanguageAlternates } from '@/test-utils/i18n';
+
 import {
   getCstInfoSeed,
   getCurrentSpecialRecipientsSeed,
@@ -246,11 +248,7 @@ describe('generateMetadata', () => {
     expect(metadata.description).toContain('procedural on-chain art protocol on Arbitrum');
     expect(metadata.alternates).toEqual({
       canonical: 'https://app.cosmicsignature.com',
-      languages: {
-        en: 'https://app.cosmicsignature.com',
-        zh: 'https://app.cosmicsignature.com/zh',
-        'x-default': 'https://app.cosmicsignature.com',
-      },
+      languages: expectedLanguageAlternates('https://app.cosmicsignature.com', '/'),
     });
   });
 });

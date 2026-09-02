@@ -7,6 +7,7 @@ import {
   type FAQText,
 } from './structure';
 import { faqTextEn } from './text.en';
+import { faqTextUk } from './text.uk';
 import { faqTextZh } from './text.zh';
 import type { FAQCategory, FAQContent, FAQItem } from './types';
 
@@ -41,10 +42,12 @@ function buildFaqContent(text: FAQText): FAQContent {
 
 export const faqContentEn: FAQContent = buildFaqContent(faqTextEn);
 export const faqContentZh: FAQContent = buildFaqContent(faqTextZh);
+export const faqContentUk: FAQContent = buildFaqContent(faqTextUk);
 
 const FAQ_CONTENT: LocaleRecord<FAQContent> = {
   en: faqContentEn,
   zh: faqContentZh,
+  uk: faqContentUk,
 };
 
 export function getFaqContent(locale: string): FAQContent {

@@ -3,15 +3,18 @@
 import { useEffect } from 'react';
 
 import enErrors from '@/messages/en/errors.json';
+import ukErrors from '@/messages/uk/errors.json';
 import zhErrors from '@/messages/zh/errors.json';
 
 import { isAppLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing } from '@/i18n/routing';
 import { reportError } from '@/utils/errors';
 
 const ERROR_CATALOGS: LocaleRecord<typeof enErrors> = {
   en: enErrors,
   zh: zhErrors,
+  uk: ukErrors,
 };
 
 /**
@@ -37,7 +40,7 @@ export default function GlobalError({
   const copy = ERROR_CATALOGS[locale].global;
 
   return (
-    <html lang={locale}>
+    <html lang={locale} dir={getLocaleConfig(locale).textDirection}>
       <body
         style={{
           minHeight: '100vh',

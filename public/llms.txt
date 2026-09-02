@@ -128,3 +128,43 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 - [Axiom Zero](https://www.axiomzero.market/cosmic-signature)：Arbitrum 上不收平台费的 NFT 市场
 - [Chaos Zero](https://chaoszero.com)：面向 Cosmic Signature 周期的预测市场；每周期的问题是本周期收官时的落笔数是否高于上一周期
 - [Uniswap CST 兑换](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)：在 Arbitrum 上兑换 CST
+
+## Українська: огляд
+
+Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Учасники роблять жести протягом перформанс-циклу; кожен жест впливає на фінальну Сигнатуру циклу. Коли цикл завершується, протокол за відкритими правилами розподіляє резерв циклу за понад десятьма напрямами розподілу, серед яких Protocol Guild — механізм підтримки основних розробників Ethereum.
+
+Cosmic Signature не пов’язаний із базою даних мутацій раку COSMIC чи мутаційними сигнатурами COSMIC у біології.
+
+### Ключові сторінки українською
+
+- [Головна сторінка](https://cosmicsignature.com/uk): огляд протоколу й ончейн-мистецтва
+- [Про проєкт](https://cosmicsignature.com/uk/about): суб’єкт протоколу, офіційні посилання та розрізнення назв
+- [Біла книга](https://cosmicsignature.com/uk/white-paper): повний опис механіки та дизайну протоколу (з PDF)
+- [Навчальний центр](https://cosmicsignature.com/uk/learn): перформанс-цикли, мистецтво трьох тіл, закріплення та суспільні блага
+- [Застосунок](https://app.cosmicsignature.com/uk): поточний цикл та інтерфейс жестів
+- [Галерея](https://app.cosmicsignature.com/uk/gallery): перегляд закарбованих Cosmic Signature NFT
+- [Як це працює](https://app.cosmicsignature.com/uk/how-it-works): повна механіка протоколу
+- [Поширені запитання](https://app.cosmicsignature.com/uk/faq): відповіді за темами
+- [Статистика](https://app.cosmicsignature.com/uk/statistics): відкриті дані протоколу
+- [Закріплення](https://app.cosmicsignature.com/uk/anchoring): правила закріплення та історія надходжень
+- [Контракти](https://app.cosmicsignature.com/uk/contracts): адреси розгорнутих контрактів
+- [Безпека](https://app.cosmicsignature.com/uk/security): ресурси для перевірки та безпечна участь
+- [Аудити](https://app.cosmicsignature.com/uk/audits): звіт аудиту Hacken і контекст формальної верифікації
+- [Розкриття ризиків](https://app.cosmicsignature.com/uk/risk-disclosures): ризики блокчейну, гаманців та участі в протоколі
+
+### Основне про протокол
+
+- Кожен цикл відкривається механізмом вікон калібрування ETH і CST; вікно CST стартує від базових 12 годин і змінюється разом з ончейн-участю
+- Кожен жест подовжує відлік до завершення на поточний часовий приріст; приріст починається з 1 години й зростає на 1% з кожним завершеним циклом
+- Учасник, який зробив завершальний жест, має ексклюзивне вікно завершення тривалістю 48 годин; після нього завершити цикл може будь-хто, і той, хто це зробить, отримує розподіл Сигнатури
+- З резерву кожного циклу 25% іде на розподіл Сигнатури, 8% — Воїну часу, 4% ділять 3 записи зоряного відбору ETH, 6% — надходження за закріплення, 7% — Protocol Guild, а близько 50% переходить у наступний цикл
+- У більшості циклів закарбовується 24 Cosmic Signature NFT разом із 24 тис. CST; разом із 3 тис. CST для резерву просування типовий фіксований обсяг становить 27 тис. CST, а CST участі закарбовуються динамічно за кожен жест
+- Кожен Cosmic Signature NFT або RandomWalk NFT можна закріпити лише раз; після відкріплення він більше не може бути закріплений
+- Невикористаний RandomWalk NFT можна долучити до ETH-жесту, і вартість цього ETH-жесту зменшиться на 50%; кожен RandomWalk NFT дає таке зменшення лише один раз
+- Для вторинних ETH та долучених активів діє термін отримання 5 тижнів; після його завершення будь-хто може забрати собі незабрані розподіли
+
+### Екосистема
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): NFT-маркетплейс на Arbitrum без комісії платформи
+- [Chaos Zero](https://chaoszero.com): ринок прогнозів для циклів Cosmic Signature; запитання кожного циклу — чи буде на момент завершення більше жестів, ніж у попередньому циклі
+- [Обмін CST на Uniswap](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): обмін CST на Arbitrum

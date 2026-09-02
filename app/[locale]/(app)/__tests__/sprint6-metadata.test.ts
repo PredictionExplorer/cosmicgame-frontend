@@ -1,4 +1,5 @@
 import zhMeta from '@/messages/zh/meta.json';
+import { expectedLanguageAlternates } from '@/test-utils/i18n';
 
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
@@ -38,11 +39,7 @@ describe('Sprint 6 route metadata', () => {
       const metadata = await build({ params: Promise.resolve({ locale: 'zh' }) });
       expect(metadata.alternates).toEqual({
         canonical: `${APP_ORIGIN}/zh${path}`,
-        languages: {
-          en: `${APP_ORIGIN}${path}`,
-          zh: `${APP_ORIGIN}/zh${path}`,
-          'x-default': `${APP_ORIGIN}${path}`,
-        },
+        languages: expectedLanguageAlternates(APP_ORIGIN, path),
       });
       expect(metadata.openGraph).toEqual(expect.objectContaining({ locale: 'zh_CN' }));
     },

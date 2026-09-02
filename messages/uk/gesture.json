@@ -1,0 +1,74 @@
+{
+  "invalid": {
+    "title": "Недійсний ID жесту",
+    "help": "Використайте в URL невід’ємний числовий ідентифікатор жесту."
+  },
+  "header": {
+    "title": "Деталі жесту",
+    "loadingSubtitle": "Завантаження даних жесту…",
+    "positionLabel": "Позиція жесту {position}",
+    "positionFallback": "Позиція жесту"
+  },
+  "empty": {
+    "title": "Інформацію про жест не знайдено.",
+    "help": "Можливо, цей ID недійсний або жест ще не потрапив до поточного індексу."
+  },
+  "sections": {
+    "transaction": {
+      "title": "Транзакція та цикл",
+      "description": "Коли зроблено жест і до якого циклу він належить."
+    },
+    "cost": {
+      "title": "Вартість і CST участі",
+      "description": "Скільки сплачено та скільки CST участі закарбовано цим жестом."
+    },
+    "type": {
+      "title": "Тип жесту",
+      "description": "Чи використано для цього жесту Random Walk NFT або CST."
+    },
+    "erc20": {
+      "title": "Долучений ERC-20",
+      "description": "Необов’язковий ERC-20-токен, долучений до цього жесту."
+    },
+    "nft": {
+      "title": "Долучений NFT",
+      "description": "Метадані NFT, долученого до цього жесту, якщо він є."
+    },
+    "message": {
+      "title": "Повідомлення",
+      "description": "Повідомлення, яке учасник залишив разом із цим жестом."
+    }
+  },
+  "rows": {
+    "datetime": "Дата й час жесту",
+    "datetimeHelp": "Відкриває транзакцію в оглядачі блоків",
+    "participantAddress": "Адреса учасника",
+    "cycleNumber": "Номер циклу",
+    "cycleValue": "Цикл {round}",
+    "gestureCost": "Вартість жесту",
+    "participationCst": "CST участі",
+    "attachedRandomWalk": "RandomWalk NFT долучено до ETH-жесту:",
+    "paidWithCst": "Сплачено в CST (ERC-20):",
+    "randomWalkId": "ID RandomWalkNFT:",
+    "erc20Address": "Адреса долученого ERC-20-токена:",
+    "erc20Amount": "Сума долученого ERC-20-токена (ETH):",
+    "nftAddress": "Адреса контракту долученого NFT:",
+    "nftId": "ID долученого NFT:",
+    "nftTokenUri": "URI токена NFT:"
+  },
+  "values": {
+    "yes": "Так",
+    "no": "Ні"
+  },
+  "nftPreview": {
+    "heading": "Попередній перегляд і метадані",
+    "collectionName": "Назва колекції",
+    "artist": "Автор",
+    "platform": "Платформа",
+    "description": "Опис"
+  },
+  "randomWalk": {
+    "previewAria": "Попередній перегляд Random Walk NFT",
+    "heading": "Random Walk NFT"
+  }
+}

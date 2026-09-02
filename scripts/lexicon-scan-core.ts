@@ -28,6 +28,17 @@
  * contracts.
  */
 
+import type { TranslatedLocale } from '../i18n/routing';
+
+import {
+  buildCjkSubstringPattern,
+  buildLatinWordPattern,
+  buildTermPattern,
+  inflect,
+  UK_NOUN_ENDINGS,
+  type TermSet,
+} from './locale-text-matchers';
+
 /** A single banned-term hit inside a scanned file. */
 export interface ScannerHit {
   /** 1-based line number of the hit. */
@@ -294,32 +305,265 @@ export const ZH_BANNED_TERMS: readonly string[] = [
 // lexicon-allow-end
 
 /**
+ * Ukrainian banned terms (docs/i18n/glossary-uk.md §5), mirroring the
+ * English categories above with the same scope — no broader. Ukrainian
+ * inflects, so the register is declared two ways:
+ *
+ *   - UK_BANNED_STEMS: word-initial stems that no unrelated word begins
+ *     with; the matcher extends over any suffix (лотере → лотереї).
+ *   - UK_BANNED_TERMS: explicit inflected forms for roots that ARE prefixes
+ *     of ordinary words (приз → призначення, гра → гравітація, майн → майно),
+ *     matched as whole words.
+ *
+ * As in English and Chinese, the only sanctioned exception is FAQ/legal
+ * denial copy inside lexicon-allow pragmas.
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const UK_BANNED_STEMS: readonly string[] = [
+  // auction / bidding
+  'аукціон',
+  'ставк',
+  'ставок',
+  // prize / winner / jackpot (виграш is safe; the verb root вигра- also begins
+  // вигравірувати "to engrave", so its forms are listed explicitly below)
+  'перемож',
+  'виграш',
+  'джекпот',
+  // lottery / raffle / sweepstakes / giveaway / casino
+  'лотере',
+  'розіграш',
+  'розігра',
+  'жереб',
+  'тираж',
+  'лототрон',
+  'роздач',
+  'казино',
+  // gambling / bets / odds / luck (парі "a bet" is deliberately absent: it is
+  // also the locative of пара "a pair" — у парі з 1 000 CST — and ставк- already
+  // covers the betting register)
+  'азарт',
+  'гральн',
+  'букмекер',
+  'тоталізатор',
+  'рулетк',
+  'удач',
+  'везінн',
+  'фортун',
+  'щасливч',
+  'пощастил',
+  'пощастит',
+  // ticket
+  'білет',
+  // game framing / competition
+  'гейм',
+  'гравц',
+  'гравець',
+  'ігров',
+  'змаган',
+  'змагат',
+  'конкурс',
+  'турнір',
+  'конкуренц',
+  'конкурент',
+  // securities / yield / earnings
+  'інвест',
+  'дивіденд',
+  'зароб',
+  'рентабельн',
+  'окупн',
+  'неоподатков',
+  'пільг',
+  // crypto slang
+  'деген',
+  'туземун',
+  'ламбо',
+  // staking / mint
+  'стейк',
+  'мінт',
+  'замінт',
+  'намінт',
+  'чекан',
+  // charity / donation
+  'благодійн',
+  'доброчинн',
+  'пожертв',
+  'донат',
+  'донор',
+  'філантроп',
+  // withdraw slang
+  'кешаут',
+  'кеш-аут',
+  // round
+  'раунд',
+];
+
+export const UK_BANNED_TERMS: readonly string[] = [
+  // auction lots and bidding rounds (лот → лоток, торг → торгівля are unrelated)
+  ...inflect('лот', ['', 'и', 'у', 'ом', 'ів', 'ам', 'ами', 'ах']),
+  'торги',
+  'торгів',
+  'торгам',
+  'торгами',
+  'торгах',
+  // prize (приз → призначення, призма)
+  ...inflect('приз', ['', 'и', 'у', 'ом', 'ів', 'ам', 'ами', 'ах']),
+  ...inflect('призов', ['ий', 'а', 'е', 'і', 'ого', 'ому', 'им', 'их', 'ими', 'у', 'ою']),
+  'куш',
+  'кушу',
+  // to win (вигра- → вигравірувати "to engrave", so no stem)
+  'виграти',
+  'виграю',
+  'виграєш',
+  'виграє',
+  'виграємо',
+  'виграєте',
+  'виграють',
+  'виграв',
+  'виграла',
+  'виграли',
+  'вигравати',
+  'виграний',
+  'виграна',
+  'виграні',
+  // game / play / player (гра → гравітація, графік; грати → also "bars")
+  'гра',
+  'гри',
+  'грі',
+  'гру',
+  'грою',
+  'ігри',
+  'ігор',
+  'іграм',
+  'іграми',
+  'іграх',
+  'грати',
+  'зіграти',
+  'пограти',
+  'граю',
+  'грає',
+  'граємо',
+  'граєте',
+  'грають',
+  'грав',
+  'грала',
+  'грали',
+  'зіграв',
+  'зіграла',
+  'зіграли',
+  'зіграй',
+  'зіграйте',
+  'пограй',
+  'пограйте',
+  // ticket (квиток → квитанція is unrelated)
+  ...inflect('квит', ['ок', 'ки', 'ка', 'ку', 'ком', 'ків', 'кам', 'ками', 'ках']),
+  // profit / income (прибут → прибуття; доход → доходити)
+  ...inflect('прибут', ['ок', 'ки', 'ку', 'ком', 'ків', 'кам', 'ками', 'ках']),
+  ...inflect('прибутков', [
+    'ий',
+    'а',
+    'е',
+    'і',
+    'ого',
+    'ому',
+    'им',
+    'их',
+    'ими',
+    'ість',
+    'ості',
+    'істю',
+  ]),
+  'дохід',
+  ...inflect('дохо', ['ди', 'ду', 'ді', 'дом', 'дів', 'дам', 'дами', 'дах']),
+  ...inflect('дохідн', [
+    'ий',
+    'а',
+    'е',
+    'і',
+    'ого',
+    'ому',
+    'им',
+    'их',
+    'ими',
+    'ість',
+    'ості',
+    'істю',
+  ]),
+  ...inflect('доходн', ['ість', 'ості', 'істю']),
+  // mining (майн → майно)
+  ...inflect('майнінг', UK_NOUN_ENDINGS),
+  ...inflect('майнер', UK_NOUN_ENDINGS),
+  // claim slang (клейм → клеймо)
+  'клейм',
+  'клейму',
+  'клеймити',
+  'клеймнути',
+  'заклеймити',
+  'клеймінг',
+  // withdraw slang phrases
+  'вивести кошти',
+  'виведення коштів',
+  'вивід коштів',
+  'зняти кошти',
+  'зняття коштів',
+  // DAO
+  'ДАО',
+  // freebie slang
+  'халява',
+  'халяви',
+  'халяву',
+  'халявний',
+  'халявна',
+  'халявне',
+  'халявні',
+];
+// lexicon-allow-end
+
+/**
+ * One banned-register profile per translated locale. The type forces a
+ * decision the moment a locale joins routing.locales; the CLI applies every
+ * profile to every scanned file, because stray copy in the wrong file is
+ * exactly what the scanner exists to catch.
+ */
+export interface LexiconProfile {
+  /** Where the register is documented. */
+  readonly glossary: string;
+  readonly termSets: readonly TermSet[];
+}
+
+export const LEXICON_PROFILES: Record<TranslatedLocale, LexiconProfile> = {
+  zh: {
+    glossary: 'docs/i18n/glossary-zh.md',
+    termSets: [{ matcher: 'cjk-substring', terms: ZH_BANNED_TERMS }],
+  },
+  uk: {
+    glossary: 'docs/i18n/glossary-uk.md',
+    termSets: [
+      { matcher: 'unicode-stem', terms: UK_BANNED_STEMS },
+      { matcher: 'unicode-word', terms: UK_BANNED_TERMS },
+    ],
+  },
+};
+
+/** Compiled patterns for a profile, in declaration order. */
+export function buildProfilePatterns(profile: LexiconProfile): RegExp[] {
+  return profile.termSets.map(buildTermPattern);
+}
+
+/**
  * Builds a case-insensitive, word-boundary-aware regex from a list of
  * banned terms. Escapes regex metacharacters so "Dutch auction" matches
  * the literal phrase and "tax-deductible" matches the literal hyphen.
  */
 export function buildBannedPattern(banned: readonly string[]): RegExp {
-  if (banned.length === 0) {
-    // An empty alternation `\b(|)\b` would match zero-width positions at
-    // every word boundary, producing a flood of empty matches. Return a
-    // pattern that matches nothing instead, so callers can safely chain.
-    return /(?!)/g;
-  }
-  const escaped = banned.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  return new RegExp(`\\b(${escaped.join('|')})\\b`, 'gi');
+  return buildLatinWordPattern(banned);
 }
 
 /**
  * CJK variant of `buildBannedPattern`: `\b` word boundaries do not exist
  * between CJK code points, so Chinese terms are matched as plain substrings.
- * Case-insensitivity is irrelevant for CJK and omitted.
  */
 export function buildZhBannedPattern(banned: readonly string[]): RegExp {
-  if (banned.length === 0) {
-    return /(?!)/g;
-  }
-  const escaped = banned.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  return new RegExp(`(${escaped.join('|')})`, 'g');
+  return buildCjkSubstringPattern(banned);
 }
 
 /**

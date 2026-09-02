@@ -8,11 +8,14 @@
 
 // lexicon-allow-start: fixture strings exercise every banned term by design
 
+import { TRANSLATED_LOCALES } from '../../i18n/routing';
 import {
   DEFAULT_BANNED_STEMS,
   DEFAULT_BANNED_TERMS,
+  LEXICON_PROFILES,
   buildBannedPattern,
   buildIdentifierPattern,
+  buildProfilePatterns,
   extractJsxTextInline,
   extractStringLiterals,
   isAbiPropertyAccess,
@@ -753,6 +756,68 @@ describe('integration: common real-world patterns', () => {
     const hits = scanContent(src, pattern);
     expect(hits).toHaveLength(1);
     expect(hits[0]!.term.toLowerCase()).toBe('staking');
+  });
+});
+
+describe('LEXICON_PROFILES', () => {
+  it('declares one profile per translated locale, each pointing at its glossary', () => {
+    expect(Object.keys(LEXICON_PROFILES).sort()).toEqual([...TRANSLATED_LOCALES].sort());
+    for (const locale of TRANSLATED_LOCALES) {
+      expect(LEXICON_PROFILES[locale].glossary).toBe(`docs/i18n/glossary-${locale}.md`);
+      expect(LEXICON_PROFILES[locale].termSets.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('keeps the zh profile equivalent to the historical substring matcher', () => {
+    const [pattern] = buildProfilePatterns(LEXICON_PROFILES.zh);
+    expect(scanContent(`const s = '参与抽奖赢大奖';`, pattern!).map((h) => h.term)).toEqual([
+      '抽奖',
+      '大奖',
+    ]);
+  });
+
+  describe('uk profile', () => {
+    const patterns = buildProfilePatterns(LEXICON_PROFILES.uk);
+    const scan = (source: string): string[] =>
+      patterns.flatMap((pattern) => scanContent(source, pattern).map((hit) => hit.term));
+
+    it('catches the gambling / investment register in any inflection', () => {
+      expect(scan(`const s = 'Візьміть участь у лотереї та виграйте приз!';`)).toEqual(
+        expect.arrayContaining(['лотереї', 'приз']),
+      );
+      expect(scan(`const s = 'зробіть ставку на аукціоні';`)).toEqual(
+        expect.arrayContaining(['ставку', 'аукціоні']),
+      );
+      expect(scan(`const s = 'Стейкінг приносить дохід інвесторам';`)).toEqual(
+        expect.arrayContaining(['Стейкінг', 'дохід', 'інвесторам']),
+      );
+      expect(scan(`const s = 'переможець отримує джекпот';`)).toEqual(
+        expect.arrayContaining(['переможець', 'джекпот']),
+      );
+    });
+
+    it('leaves the coined Ukrainian terms and look-alike words alone', () => {
+      const clean = [
+        'Кожен жест формує Сигнатуру.',
+        'Отримувач розподілу може забрати ETH після завершення перформанс-циклу.',
+        'Закріплення NFT і надходження за закріплення.',
+        'Закарбування нової Сигнатури; Зоряний відбір; Космічна Рада; суспільні блага.',
+        // Look-alikes of banned roots that are ordinary words.
+        'призначення адреси, гравітаційна задача трьох тіл, графік, майно, прибуття,',
+        'вигравірувати, доходить до фіналу, квитанція, окупант, стейк-хаус',
+      ].join(' ');
+      expect(scan(`const s = '${clean}';`)).toEqual(
+        // "стейк-хаус" starts with the staking stem: an acceptable false positive
+        // for a word that never appears in protocol copy.
+        ['стейк'],
+      );
+    });
+
+    it('matches whole-word forms case-insensitively', () => {
+      expect(scan(`const s = 'Розіграш ПРИЗІВ і Гра.';`)).toEqual(
+        expect.arrayContaining(['Розіграш', 'ПРИЗІВ', 'Гра']),
+      );
+    });
   });
 });
 

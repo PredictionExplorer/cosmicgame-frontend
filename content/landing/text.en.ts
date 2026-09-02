@@ -132,8 +132,8 @@ export const landingTextEn = {
     },
     facts: {
       'wavelength-bins': { label: 'Wavelength bins' },
-      'physics-steps': { label: 'Physics steps per candidate' },
-      'candidate-orbits': { label: 'Candidate orbits' },
+      'physics-steps': { label: 'Physics steps per candidate', value: '1,000,000' },
+      'candidate-orbits': { label: 'Candidate orbits', value: '100,000' },
       license: { label: 'License' },
     },
   },
@@ -181,10 +181,12 @@ export const landingTextEn = {
         body: `Ten randomly selected Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and one Cosmic Signature NFT.`,
       },
       'endurance-champion': {
+        percent: `${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST`,
         title: 'Endurance Champion Allocation',
         body: '1,000 Recognition CST and one Cosmic Signature NFT to the participant with the longest unbroken endurance window.',
       },
       'final-cst-gesture': {
+        percent: `${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST`,
         title: 'Final CST Gesture Allocation',
         body: '1,000 Recognition CST and one Cosmic Signature NFT to the participant who made the last CST gesture of the cycle.',
       },

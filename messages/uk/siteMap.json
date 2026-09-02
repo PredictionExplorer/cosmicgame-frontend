@@ -1,0 +1,192 @@
+{
+  "page": {
+    "title": "Мапа сайту",
+    "subtitle": "Швидкі посилання на сторінки облікового запису та публічні дані протоколу.",
+    "home": "Головна",
+    "jsonLdName": "Мапа сайту Cosmic Signature"
+  },
+  "sections": {
+    "personal": {
+      "title": "Персональні інструменти застосунку",
+      "description": "Сторінки, прив’язані до гаманця, корисні під’єднаним учасникам, але не індексуються й відсутні в XML-мапах сайту.",
+      "navLabel": "Персональні інструменти застосунку"
+    },
+    "system": {
+      "title": "Публічні сторінки протоколу",
+      "description": "Публічні таблиці лідерів, надходження, статистика, контракти та довідка.",
+      "navLabel": "Системні та довідкові сторінки"
+    },
+    "data": {
+      "title": "Сторінки даних протоколу",
+      "description": "Усі публічні маршрути даних з XML-мапи сайту в одному списку, доступному для індексації.",
+      "navLabel": "Сторінки даних протоколу"
+    },
+    "ecosystem": {
+      "title": "Екосистема",
+      "description": "Зовнішні продукти: NFT-маркетплейс Axiom Zero, ринок прогнозів Chaos Zero та обмін CST на Uniswap.",
+      "navLabel": "Ресурси екосистеми"
+    }
+  },
+  "links": {
+    "myNfts": {
+      "label": "Мої NFT",
+      "description": "Перегляд NFT для під’єднаного гаманця; не індексується."
+    },
+    "myAllocations": {
+      "label": "Мої незабрані розподіли",
+      "description": "Сторінка забирання розподілів для під’єднаного гаманця; не індексується."
+    },
+    "myAnchors": {
+      "label": "Мої закріплення",
+      "description": "Перегляд закріплень для під’єднаного гаманця; не індексується."
+    },
+    "about": {
+      "label": "Про Cosmic Signature",
+      "description": "Домівка проєкту та роз’яснення назви бренду."
+    },
+    "learn": {
+      "label": "Навчальний центр Cosmic Signature",
+      "description": "Пояснювальні матеріали, доступні для індексації пошуковими та AI-системами."
+    },
+    "whatIsCosmicSignature": {
+      "label": "Що таке Cosmic Signature?",
+      "description": "Визначення протоколу простою мовою."
+    },
+    "threeBodyArt": {
+      "label": "Посібник з NFT-мистецтва трьох тіл",
+      "description": "Як детермінована фізика породжує NFT-Сигнатури."
+    },
+    "gallery": {
+      "label": "Галерея Cosmic Signature",
+      "description": "Архів детермінованих NFT-творів."
+    },
+    "currentCycle": {
+      "label": "Поточний перформанс-цикл",
+      "description": "Стан циклу наживо та контекст жестів."
+    },
+    "howItWorks": {
+      "label": "Як це працює",
+      "description": "Механіка циклу крок за кроком."
+    },
+    "statistics": {
+      "label": "Статистика протоколу",
+      "description": "Публічні показники протоколу та джерела даних."
+    },
+    "contracts": {
+      "label": "Контракти Cosmic Signature",
+      "description": "Верифіковані адреси контрактів на Arbitrum."
+    },
+    "sourceCode": {
+      "label": "Вихідний код",
+      "description": "Конвеєр рендерингу та ресурси вихідного коду."
+    },
+    "security": {
+      "label": "Безпека",
+      "description": "Модель безпеки та ресурси для верифікації."
+    },
+    "audits": {
+      "label": "Аудити",
+      "description": "Стан аудиту та формальної верифікації."
+    },
+    "riskDisclosures": {
+      "label": "Розкриття ризиків",
+      "description": "Ризики блокчейну та роз’яснення для учасників."
+    },
+    "faq": {
+      "label": "Поширені запитання про Cosmic Signature",
+      "description": "Запитання й відповіді про механіку протоколу."
+    },
+    "terms": {
+      "label": "Умови використання",
+      "description": "Юридичні умови користування застосунком та участі."
+    },
+    "privacy": {
+      "label": "Політика конфіденційності",
+      "description": "Дані гаманця, аналітика та прозорість блокчейну."
+    },
+    "allocationRecipients": {
+      "label": "Отримувачі розподілів",
+      "description": "Куди пішли резерви кожного циклу."
+    },
+    "anchorDistributions": {
+      "label": "Надходження за закріплення",
+      "description": "Закріплені NFT та їхні надходження."
+    },
+    "outreachReserve": {
+      "label": "Резерв просування",
+      "description": "Активність спільноти з просування в CST."
+    },
+    "imprint": {
+      "label": "Закарбування",
+      "description": "Інтерфейс закарбування нових токенів."
+    },
+    "ethContributions": {
+      "label": "Внески ETH",
+      "description": "Історія внесків ETH."
+    },
+    "attachedNfts": {
+      "label": "Долучені NFT",
+      "description": "NFT, долучені до жестів у різних циклах."
+    },
+    "finalizedAllocations": {
+      "label": "Завершені розподіли",
+      "description": "Записи розподілів завершених циклів."
+    },
+    "namedNfts": {
+      "label": "Іменовані NFT",
+      "description": "NFT, яким дали власні імена."
+    },
+    "usedRwlkNfts": {
+      "label": "Використані RandomWalk NFT",
+      "description": "RandomWalk NFT, уже використані для знижки на жест."
+    },
+    "coordinationChanges": {
+      "label": "Зміни координації",
+      "description": "Історія змін параметрів протоколу."
+    },
+    "publicGoodsContributions": {
+      "label": "Внески у суспільні блага",
+      "description": "Записи розподілів на суспільні блага за циклами."
+    },
+    "voluntaryPublicGoods": {
+      "label": "Добровільні внески у суспільні блага",
+      "description": "Прямі добровільні внески до сховища."
+    },
+    "publicGoodsRetrievals": {
+      "label": "Забрані кошти суспільних благ",
+      "description": "Кошти, перераховані зі сховища суспільних благ."
+    },
+    "participationStats": {
+      "label": "Статистика: участь",
+      "description": "Аналітика учасників і жестів."
+    },
+    "tokenStats": {
+      "label": "Статистика: токени",
+      "description": "Аналітика пропозиції CST і NFT."
+    },
+    "anchoringStats": {
+      "label": "Статистика: закріплення",
+      "description": "Підсумки та історія закріплень."
+    },
+    "activityStats": {
+      "label": "Статистика: активність",
+      "description": "Аналітика активності та часових показників циклів."
+    },
+    "performanceStats": {
+      "label": "Статистика: результати",
+      "description": "Рекорди циклів та аналітика результатів учасників."
+    },
+    "axiomZero": {
+      "label": "Маркетплейс Axiom Zero",
+      "description": "NFT-маркетплейс без комісій для Cosmic Signature та Random Walk."
+    },
+    "chaosZero": {
+      "label": "Прогнози Chaos Zero",
+      "description": "Ринок прогнозів щодо кожного перформанс-циклу."
+    },
+    "uniswap": {
+      "label": "Обміняти CST на Uniswap",
+      "description": "Обмін ETH на CST у мережі Arbitrum."
+    }
+  }
+}

@@ -93,6 +93,12 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   /**
+   * `next/jest` only transforms node_modules listed here. @formatjs ships
+   * ESM-only and is parsed by the i18n catalog-integrity suite
+   * (i18n/__tests__/catalog-integrity.test.ts); no app bundle imports it.
+   */
+  transpilePackages: ['@formatjs/icu-messageformat-parser', '@formatjs/icu-skeleton-parser'],
+  /**
    * Tree-shake barrel imports for libraries we import heavily. Next compiles
    * `import { X, Y } from 'lucide-react'` as if we wrote per-icon ESM imports,
    * shaving ~100s of KB per page. Pair with direct imports in source where

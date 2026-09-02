@@ -1,15 +1,17 @@
 import { getLearnSlugs } from '@/content/learn';
-import { QUIZ_TIER_IDS, quizContentEn, quizContentZh } from '@/content/quiz';
+import { QUIZ_TIER_IDS, getQuizContent, quizContentEn } from '@/content/quiz';
 import type { QuizContent, QuizTierId } from '@/content/quiz';
 import { whitePaperContentEn, type WhitePaperContent } from '@/content/white-paper';
+
+import { routing, TRANSLATED_LOCALES } from '@/i18n/routing';
 
 /**
  * Structural guard for the knowledge quiz.
  *
  * The quiz is an educational surface: every question must resolve to exactly
  * one correct option and point at the white-paper section or learn article
- * that settles it, and the zh set must mirror the en set question for
- * question (same ids, same order, same correct answers) so the two locales
+ * that settles it, and every translated set must mirror the en set question
+ * for question (same ids, same order, same correct answers) so the locales
  * never drift apart.
  */
 
@@ -43,10 +45,10 @@ function referenceResolves(href: string): boolean {
   return false;
 }
 
-const locales: Array<[string, QuizContent]> = [
-  ['en', quizContentEn],
-  ['zh', quizContentZh],
-];
+const locales: Array<[string, QuizContent]> = routing.locales.map((locale) => [
+  locale,
+  getQuizContent(locale),
+]);
 
 describe.each(locales)('quiz content (%s)', (_locale, content) => {
   it('has the three tiers in canonical order with pinned sizes', () => {
@@ -102,35 +104,35 @@ describe.each(locales)('quiz content (%s)', (_locale, content) => {
   });
 });
 
-describe('quiz en/zh parity', () => {
-  it('locales agree on tier order, question order, correct answers, and references', () => {
-    expect(quizContentZh.tiers.map((tier) => tier.id)).toEqual(
+describe.each(TRANSLATED_LOCALES)('quiz en/%s parity', (locale) => {
+  const translated = getQuizContent(locale);
+
+  it('agrees with en on tier order, question order, correct answers, and references', () => {
+    expect(translated.tiers.map((tier) => tier.id)).toEqual(
       quizContentEn.tiers.map((tier) => tier.id),
     );
 
     for (const [tierIndex, tierEn] of quizContentEn.tiers.entries()) {
-      const tierZh = quizContentZh.tiers[tierIndex]!;
-      expect(tierZh.questions.map((question) => question.id)).toEqual(
+      const tier = translated.tiers[tierIndex]!;
+      expect(tier.questions.map((question) => question.id)).toEqual(
         tierEn.questions.map((question) => question.id),
       );
 
       for (const [questionIndex, questionEn] of tierEn.questions.entries()) {
-        const questionZh = tierZh.questions[questionIndex]!;
-        expect(questionZh.correctOptionId).toBe(questionEn.correctOptionId);
-        expect(questionZh.options.map((option) => option.id)).toEqual(
+        const question = tier.questions[questionIndex]!;
+        expect(question.correctOptionId).toBe(questionEn.correctOptionId);
+        expect(question.options.map((option) => option.id)).toEqual(
           questionEn.options.map((option) => option.id),
         );
-        expect(questionZh.reference.href).toBe(questionEn.reference.href);
-        expect(questionZh.funFact !== undefined).toBe(questionEn.funFact !== undefined);
+        expect(question.reference.href).toBe(questionEn.reference.href);
+        expect(question.funFact !== undefined).toBe(questionEn.funFact !== undefined);
       }
     }
   });
 
-  it('runner ui exposes the same feedback variant counts in both locales', () => {
-    expect(quizContentZh.ui.correctFeedback.length).toBe(quizContentEn.ui.correctFeedback.length);
-    expect(quizContentZh.ui.incorrectFeedback.length).toBe(
-      quizContentEn.ui.incorrectFeedback.length,
-    );
+  it('runner ui exposes the same feedback variant counts as en', () => {
+    expect(translated.ui.correctFeedback.length).toBe(quizContentEn.ui.correctFeedback.length);
+    expect(translated.ui.incorrectFeedback.length).toBe(quizContentEn.ui.incorrectFeedback.length);
     expect(quizContentEn.ui.correctFeedback.length).toBeGreaterThanOrEqual(2);
     expect(quizContentEn.ui.incorrectFeedback.length).toBeGreaterThanOrEqual(2);
   });

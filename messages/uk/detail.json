@@ -1,0 +1,94 @@
+{
+  "invalid": {
+    "title": "Недійсний ID токена"
+  },
+  "jsonLd": {
+    "productName": "Cosmic Signature NFT {id}",
+    "productDescription": "Унікальний генеративний NFT із процедурного протоколу ончейн-мистецтва Cosmic Signature, відрендерений на основі фізики задачі трьох тіл.",
+    "breadcrumbToken": "Токен {id}"
+  },
+  "breadcrumb": {
+    "tokenFallback": "Токен {id}"
+  },
+  "hero": {
+    "unnamedToken": "Токен без імені"
+  },
+  "badges": {
+    "stellarSelectionRecipient": "Отримувач зоряного відбору",
+    "anchorRecipient": "Отримувач за закріплення",
+    "cycleRecipient": "Отримувач циклу",
+    "enduranceChampion": "Чемпіон витривалості",
+    "receivedAsCycleRecipient": "Отримано в ролі отримувача циклу — Цикл {round}",
+    "receivedAs": "Отримано в ролі: {label}",
+    "eligibleForAnchoring": "Можна закріпити",
+    "eligibleForAnchoringTooltip": "Цей Cosmic Signature NFT ще ніколи не закріплювали; після закріплення він може отримувати надходження за закріплення в ETH.",
+    "alreadyAnchored": "Уже закріплено",
+    "alreadyAnchoredTooltip": "Цей токен уже закріплювали, і його не можна закріпити повторно."
+  },
+  "share": {
+    "trigger": "Поділитися",
+    "copyVideoLink": "Копіювати посилання на відео",
+    "copyImageLink": "Копіювати посилання на зображення",
+    "copyPageLink": "Копіювати посилання на сторінку"
+  },
+  "actions": {
+    "buyOrSellNfts": "Купити або продати NFT",
+    "viewCycleDetails": "Деталі циклу {round}"
+  },
+  "navigation": {
+    "previousToken": "Попередній токен",
+    "nextToken": "Наступний токен"
+  },
+  "sections": {
+    "nameHistory": "Історія імен",
+    "ownershipHistory": "Історія власників"
+  },
+  "transferDialog": {
+    "title": "Підтвердити передачу",
+    "description": "Схоже, у рахунку-отримувача немає жодної історії транзакцій. Ви впевнені, що хочете надіслати токен на цю адресу? Перевірте її ще раз.",
+    "confirm": "Так, передати"
+  },
+  "ownerActions": {
+    "title": "Керування токеном",
+    "titleTooltip": "Як поточний власник, ви можете показати цей токен у MetaMask, передати його або дати йому власне ім’я.",
+    "metaMaskHeading": "Показати в MetaMask",
+    "metaMaskTooltip": "Запропонувати розширенню MetaMask для браузера показати цей NFT. Імпорт NFT — експериментальна функція, недоступна в MetaMask Mobile.",
+    "addToMetaMask": "Додати NFT у MetaMask",
+    "addingToMetaMask": "Додаємо NFT у MetaMask…",
+    "transferHeading": "Передача",
+    "transferTooltip": "Надіслати цей токен на іншу адресу Ethereum. Перевірте адресу перед підтвердженням — передачу неможливо скасувати.",
+    "recipientPlaceholder": "Адреса отримувача (0x…)",
+    "transferButton": "Передати",
+    "nameHeading": "Дати ім’я токену",
+    "renameHeading": "Змінити ім’я токена",
+    "nameTooltip": "Дайте токену власне ім’я (до 32 байтів). Іменовані токени з’являються на сторінці іменованих NFT.",
+    "namePlaceholder": "Введіть ім’я токена",
+    "setName": "Зберегти ім’я",
+    "changeName": "Змінити ім’я",
+    "clearName": "Очистити",
+    "namedTokensCount": "{count, plural, one {Власне ім’я має # токен.} few {Власне ім’я мають # токени.} many {Власне ім’я мають # токенів.} other {Власне ім’я мають # токена.}}",
+    "viewAllNamedTokens": "Переглянути всі іменовані токени"
+  },
+  "metadata": {
+    "imprinted": "Закарбовано",
+    "imprintedTooltip": "Коли цей токен закарбовано ончейн. Натисніть, щоб переглянути транзакцію.",
+    "cycle": "Цикл",
+    "cycleTooltip": "Перформанс-цикл, у якому цей токен розподілено. Натисніть, щоб переглянути деталі циклу.",
+    "recipient": "Отримувач",
+    "recipientTooltip": "Адреса, яка первісно отримала цей токен під час перформанс-циклу.",
+    "owner": "Власник",
+    "ownerTooltip": "Поточний власник цього токена. Може відрізнятися від отримувача, якщо токен передавали.",
+    "roundNumber": "Цикл {round}",
+    "seed": "Сід",
+    "seedTooltip": "Унікальний випадковий сід, з якого згенеровано твір і ознаки цього токена.",
+    "copySeed": "Копіювати сід"
+  },
+  "video": {
+    "watchAnimation": "Дивитися анімацію",
+    "watchAnimationTooltip": "Кожен Cosmic Signature NFT має унікальну генеративну анімацію, породжену його сідом. Натисніть, щоб подивитися."
+  },
+  "image": {
+    "defaultAlt": "NFT",
+    "artworkUnavailable": "Твір недоступний"
+  }
+}

@@ -1,6 +1,7 @@
 import { formatUnits } from 'viem';
 
 import enFormats from '@/messages/en/formats.json';
+import ukFormats from '@/messages/uk/formats.json';
 import zhFormats from '@/messages/zh/formats.json';
 
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
@@ -48,7 +49,27 @@ interface DurationUnitLabels {
 const DURATION_UNITS: LocaleRecord<DurationUnitLabels> = {
   en: enFormats.durationCompact,
   zh: zhFormats.durationCompact,
+  uk: ukFormats.durationCompact,
 };
+
+/**
+ * Locale-abbreviated month for a month index, via Intl so a locale never
+ * needs a hand-maintained month array. `en` keeps its historical array
+ * (byte-pinned output); everything else comes through here.
+ */
+const shortMonthLabel = (locale: string, monthIndex: number): string =>
+  new Intl.DateTimeFormat(toIntlLocale(locale), { month: 'short', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(2000, monthIndex, 1)),
+  );
+
+/** `DD.MM.YYYY`, the numeric short date convention of Ukrainian (and most of Europe). */
+const numericDate = (locale: string, year: number, monthIndex: number, day: number): string =>
+  new Intl.DateTimeFormat(toIntlLocale(locale), {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, monthIndex, day)));
 
 /** Shortens a hex string (e.g., address) for display. */
 export function shortenHex(hex: string, length = 4): string {
@@ -122,12 +143,15 @@ const TIMESTAMP_DATETIME_FORMATS: LocaleRecord<(parts: TimestampParts) => string
   en: ({ monthIndex, day, hours, minutes }) =>
     `${MONTH_LABELS[monthIndex]} ${('0' + day).slice(-2)}, ${hours}:${minutes}`,
   zh: ({ monthIndex, day, hours, minutes }) => `${monthIndex + 1}月${day}日 ${hours}:${minutes}`,
+  uk: ({ monthIndex, day, hours, minutes }) =>
+    `${day} ${shortMonthLabel('uk', monthIndex)}, ${hours}:${minutes}`,
 };
 
 /**
  * Converts Unix timestamp to a locale-style date string.
  * `en` output is byte-identical to the historical format ("Jan 01, 12:34");
- * `zh` renders "1月1日 12:34" (docs/i18n/README.md §4).
+ * `zh` renders "1月1日 12:34" (docs/i18n/README.md §4); `uk` renders
+ * "1 січ., 12:34" (the day-first order Intl itself produces for uk-UA).
  *
  * Browser-local time is the historical/default behavior. Pass `utc` only for
  * deterministic server snapshots; hydration-safe UI should use
@@ -176,7 +200,8 @@ export const convertTimestampToServerDateTime = (
 /**
  * Converts seconds into a human-readable duration string.
  * `en`: "1d 2h 30m 45s" (unchanged); `zh`: "1天2小时30分45秒"
- * (docs/i18n/style-guide-zh.md §5 compact duration form).
+ * (docs/i18n/style-guide-zh.md §5 compact duration form); `uk`:
+ * "1д 2год 30хв 45с" (docs/i18n/style-guide-uk.md §5).
  */
 export const formatSeconds = (seconds: number, locale: string = 'en'): string => {
   if (seconds < 0) return ' ';
@@ -297,6 +322,7 @@ const CALENDAR_DATE_LABEL_FORMATS: LocaleRecord<
 > = {
   en: (year, monthIndex, day) => `${MONTH_LABELS[monthIndex] ?? ''} ${day}, ${year}`,
   zh: (year, monthIndex, day) => `${year}/${monthIndex + 1}/${day}`,
+  uk: (year, monthIndex, day) => numericDate('uk', year, monthIndex, day),
 };
 
 /** Formats YYYYMMDD for chart axis / tooltip labels. */
@@ -329,6 +355,8 @@ const UTC_DATETIME_LABEL_FORMATS: LocaleRecord<
   en: (year, monthIndex, day, hh, mm) =>
     `${MONTH_LABELS[monthIndex] ?? ''} ${day}, ${year} ${hh}:${mm} UTC`,
   zh: (year, monthIndex, day, hh, mm) => `${year}年${monthIndex + 1}月${day}日 ${hh}:${mm}（UTC）`,
+  uk: (year, monthIndex, day, hh, mm) =>
+    `${numericDate('uk', year, monthIndex, day)} ${hh}:${mm} UTC`,
 };
 
 const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
@@ -337,11 +365,16 @@ const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
     `${date.getUTCFullYear()}年${date.getUTCMonth() + 1}月${date.getUTCDate()}日 ${String(
       date.getUTCHours(),
     ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}（UTC）`,
+  uk: (date) =>
+    `${numericDate('uk', date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())} ${String(
+      date.getUTCHours(),
+    ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')} UTC`,
 };
 
 /**
  * "Data updated at" stamp for SEO summaries: `en` keeps the ISO-style
- * "2026-08-28 08:13 UTC"; `zh` renders "2026年8月28日 08:13（UTC）".
+ * "2026-08-28 08:13 UTC"; `zh` renders "2026年8月28日 08:13（UTC）"; `uk`
+ * renders "28.08.2026 08:13 UTC".
  */
 export function formatUtcDateTimeStamp(date: Date, locale: string = 'en'): string {
   return pickByLocale(UTC_STAMP_FORMATS, locale)(date);

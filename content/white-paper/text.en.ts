@@ -1,7 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
 import type { WhitePaperText } from './structure';
-import { WHITE_PAPER_DATE_DISPLAY, WHITE_PAPER_PDF_PATH, WHITE_PAPER_VERSION } from './types';
+import { WHITE_PAPER_DATE_DISPLAY, WHITE_PAPER_VERSION } from './types';
 
 const cst = (amount: number): string => amount.toLocaleString('en-US');
 
@@ -23,7 +23,6 @@ export const whitePaperTextEn = {
     versionLabel: `Version ${WHITE_PAPER_VERSION}`,
     dateLabel: WHITE_PAPER_DATE_DISPLAY,
     downloadLabel: 'Download PDF',
-    downloadHref: WHITE_PAPER_PDF_PATH,
   },
   abstract: {
     heading: 'Abstract',

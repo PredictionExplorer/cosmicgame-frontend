@@ -12,6 +12,11 @@ The bundled `assets/fonts/NotoSansSC-700.subset.ttf` file is a subset of Noto
 Sans CJK. It remains licensed under the SIL Open Font License 1.1; see
 [assets/fonts/OFL-NotoSansCJK.txt](assets/fonts/OFL-NotoSansCJK.txt).
 
+The bundled `assets/fonts/Onest-700.subset.ttf` file is a static weight-700
+instance of the Onest variable font, subset to Latin and Cyrillic. It remains
+licensed under the SIL Open Font License 1.1; see
+[assets/fonts/OFL-Onest.txt](assets/fonts/OFL-Onest.txt).
+
 The bundled `public/images/brands/geckoterminal-symbol.svg` file is the
 unmodified GeckoTerminal symbol distributed in the official
 [CoinGecko and GeckoTerminal brand kit](https://brand.coingecko.com/resources/brand-kit).

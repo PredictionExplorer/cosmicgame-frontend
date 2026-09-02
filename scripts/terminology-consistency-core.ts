@@ -1,19 +1,39 @@
 /**
- * Canonical Simplified-Chinese terminology guard.
+ * Canonical terminology guard for every translated locale.
  *
  * This complements (and intentionally does not duplicate) the banned-register
  * checks in lexicon-scan-core.ts. The lexicon scanner rejects legally risky
  * vocabulary; this module catches plausible but inconsistent translations of
  * approved glossary concepts.
+ *
+ * Rules live in one pack per locale under scripts/terminology/<locale>.ts;
+ * each pack names the matcher that fits its script (CJK substrings for zh,
+ * Unicode word-initial stems for inflected uk). `TERMINOLOGY_PACKS` is typed
+ * against `TranslatedLocale`, so a locale added to routing.locales must ship
+ * a pack before the type-check passes.
  */
+
+import type { TranslatedLocale } from '../i18n/routing';
+
+import { buildTermPattern, type TermMatcher } from './locale-text-matchers';
+import { UK_TERMINOLOGY_RULES } from './terminology/uk';
+import { ZH_TERMINOLOGY_RULES } from './terminology/zh';
 
 export interface TerminologyRule {
   /** English concept name used in diagnostics. */
   concept: string;
-  /** Approved rendering from docs/i18n/glossary-zh.md. */
+  /** Approved rendering from docs/i18n/glossary-<locale>.md. */
   canonical: string;
   /** Known literal translations, rejected candidates, and historic drift. */
   variants: readonly string[];
+}
+
+export interface TerminologyPack {
+  /** Where the canonical renderings are documented. */
+  readonly glossary: string;
+  /** Boundary strategy for `variants` (see locale-text-matchers.ts). */
+  readonly matcher: TermMatcher;
+  readonly rules: readonly TerminologyRule[];
 }
 
 export interface TerminologyHit {
@@ -24,133 +44,21 @@ export interface TerminologyHit {
   excerpt: string;
 }
 
-/**
- * Keep this list focused on terminology drift. Terms already enforced by
- * ZH_BANNED_TERMS (for example 质押, 铸造, 奖励, 彩票, 慈善) belong only in the
- * lexicon scanner so neither gate can silently weaken the other.
- */
-export const TERMINOLOGY_RULES: readonly TerminologyRule[] = [
-  {
-    concept: 'Gesture',
-    canonical: '落笔',
-    variants: ['手势', '姿态'],
+export const TERMINOLOGY_PACKS: Record<TranslatedLocale, TerminologyPack> = {
+  zh: {
+    glossary: 'docs/i18n/glossary-zh.md',
+    matcher: 'cjk-substring',
+    rules: ZH_TERMINOLOGY_RULES,
   },
-  {
-    concept: 'Gesture Cost',
-    canonical: '落笔价格',
-    variants: ['落笔成本', '手势价格', '手势成本'],
+  uk: {
+    glossary: 'docs/i18n/glossary-uk.md',
+    matcher: 'unicode-stem',
+    rules: UK_TERMINOLOGY_RULES,
   },
-  {
-    concept: 'Performance Cycle',
-    canonical: '演绎周期（密集界面可简称“周期”）',
-    variants: ['表演周期', '演出周期', '性能周期', '绩效周期'],
-  },
-  {
-    concept: 'Finalize / Finalization',
-    canonical: '收官',
-    variants: ['最终确定', '周期最终确定', '最终落笔'],
-  },
-  {
-    concept: 'Final Gesture',
-    canonical: '收官之笔',
-    variants: ['最后手势', '最终手势'],
-  },
-  {
-    concept: 'Allocation Recipient',
-    canonical: '获配者',
-    variants: ['分配接收者', '获奖者', '胜出者'],
-  },
-  {
-    concept: 'Stellar Selection',
-    canonical: '星选',
-    variants: ['恒星选择', '星级选择', '星空选择', '随机抽选'],
-  },
-  {
-    concept: 'Anchoring / release',
-    canonical: '锚定 / 解锚',
-    variants: ['锚固', '锚点锁定', '解除锚定', '锚定释放'],
-  },
-  {
-    concept: 'Anchor Distribution',
-    canonical: '锚定派发',
-    variants: ['锚定分发', '锚点派发'],
-  },
-  {
-    concept: 'Imprint',
-    canonical: '铭刻',
-    variants: ['刻印', '印制 NFT'],
-  },
-  {
-    concept: 'Cosmic Council',
-    canonical: '宇宙议会',
-    variants: ['宇宙委员会', '宇宙理事会'],
-  },
-  {
-    concept: 'Public Goods',
-    canonical: '公共物品',
-    variants: ['公益品', '公共产品', '公共商品'],
-  },
-  {
-    concept: 'Public Goods funding',
-    canonical: '公共物品资助',
-    variants: ['公益资助'],
-  },
-  {
-    concept: 'Compounding Cycle Reserve',
-    canonical: '滚动储备',
-    variants: ['复合周期储备', '复合储备'],
-  },
-  {
-    concept: 'Gallery',
-    canonical: '画廊',
-    variants: ['图库'],
-  },
-  {
-    concept: 'Learn Hub',
-    canonical: '学习中心',
-    variants: ['学习枢纽'],
-  },
-  {
-    concept: 'Site Map',
-    canonical: '网站地图',
-    variants: ['站点地图'],
-  },
-  {
-    concept: 'Outreach Reserve',
-    canonical: '推广储备',
-    variants: ['营销储备', '市场推广储备', '市场储备'],
-  },
-  {
-    concept: 'Outreach Allocation',
-    canonical: '推广分配',
-    variants: ['营销分配'],
-  },
-  {
-    concept: 'Participation CST',
-    canonical: '参与 CST',
-    variants: ['参与度 CST'],
-  },
-  {
-    concept: 'Recognition CST',
-    canonical: '表彰 CST',
-    variants: ['认可 CST'],
-  },
-  {
-    concept: 'Attached NFTs',
-    canonical: '已附加 NFT / 附加',
-    variants: ['附属 NFT', '挂载 NFT'],
-  },
-  {
-    concept: 'Named Tokens',
-    canonical: '已命名代币 / 命名',
-    variants: ['命名令牌', '命名通证'],
-  },
-  {
-    concept: 'Finalization countdown',
-    canonical: '收官倒计时',
-    variants: ['最终倒计时', '结束倒计时'],
-  },
-] as const;
+};
+
+/** The Simplified-Chinese rules, kept under the historical name for existing call sites. */
+export const TERMINOLOGY_RULES: readonly TerminologyRule[] = ZH_TERMINOLOGY_RULES;
 
 const ALLOW_START = 'terminology-allow-start';
 const ALLOW_END = 'terminology-allow-end';
@@ -161,8 +69,35 @@ function excerptFor(line: string): string {
   return normalized.length <= 180 ? normalized : `${normalized.slice(0, 177)}…`;
 }
 
+/** A bare rule list is treated as a CJK-substring pack (the historical default). */
+function toPack(rulesOrPack: readonly TerminologyRule[] | TerminologyPack): TerminologyPack {
+  return Array.isArray(rulesOrPack)
+    ? { glossary: TERMINOLOGY_PACKS.zh.glossary, matcher: 'cjk-substring', rules: rulesOrPack }
+    : (rulesOrPack as TerminologyPack);
+}
+
+const compiledVariants = new WeakMap<
+  TerminologyPack,
+  ReadonlyArray<{ rule: TerminologyRule; variant: string; pattern: RegExp }>
+>();
+
+function variantsOf(pack: TerminologyPack) {
+  let compiled = compiledVariants.get(pack);
+  if (!compiled) {
+    compiled = pack.rules.flatMap((rule) =>
+      rule.variants.map((variant) => ({
+        rule,
+        variant,
+        pattern: buildTermPattern({ matcher: pack.matcher, terms: [variant] }),
+      })),
+    );
+    compiledVariants.set(pack, compiled);
+  }
+  return compiled;
+}
+
 /**
- * Scans decoded user-facing text or a Chinese content source file.
+ * Scans decoded user-facing text or a translated content source file.
  *
  * Content modules may use narrowly scoped `terminology-allow-*` comments when
  * quoting third-party copy or discussing a rejected rendering. JSON catalogs
@@ -170,8 +105,10 @@ function excerptFor(line: string): string {
  */
 export function scanTerminology(
   text: string,
-  rules: readonly TerminologyRule[] = TERMINOLOGY_RULES,
+  rulesOrPack: readonly TerminologyRule[] | TerminologyPack = TERMINOLOGY_PACKS.zh,
 ): TerminologyHit[] {
+  const pack = toPack(rulesOrPack);
+  const variants = variantsOf(pack);
   const hits: TerminologyHit[] = [];
   let allowed = false;
 
@@ -186,19 +123,16 @@ export function scanTerminology(
     }
     if (allowed || line.includes(ALLOW_LINE)) return;
 
-    for (const rule of rules) {
-      for (const variant of rule.variants) {
-        let offset = line.indexOf(variant);
-        while (offset !== -1) {
-          hits.push({
-            concept: rule.concept,
-            canonical: rule.canonical,
-            variant,
-            line: index + 1,
-            excerpt: excerptFor(line),
-          });
-          offset = line.indexOf(variant, offset + variant.length);
-        }
+    for (const { rule, variant, pattern } of variants) {
+      pattern.lastIndex = 0;
+      for (const match of line.matchAll(pattern)) {
+        hits.push({
+          concept: rule.concept,
+          canonical: rule.canonical,
+          variant: match[0] === variant ? variant : `${variant} (${match[0]})`,
+          line: index + 1,
+          excerpt: excerptFor(line),
+        });
       }
     }
   });
@@ -208,6 +142,7 @@ export function scanTerminology(
 
 export function validateTerminologyRules(
   rules: readonly TerminologyRule[] = TERMINOLOGY_RULES,
+  matcher: TermMatcher = 'cjk-substring',
 ): string[] {
   const errors: string[] = [];
   const owners = new Map<string, string>();
@@ -226,7 +161,9 @@ export function validateTerminologyRules(
         errors.push(`${rule.concept} has an empty drift variant.`);
         continue;
       }
-      if (rule.canonical.includes(variant)) {
+      // A variant that matches the canonical rendering under the pack's own
+      // matcher would flag every correct usage.
+      if (buildTermPattern({ matcher, terms: [variant] }).test(rule.canonical)) {
         errors.push(`${rule.concept} canonical rendering contains its drift variant "${variant}".`);
       }
       const existingOwner = owners.get(variant);
@@ -241,4 +178,13 @@ export function validateTerminologyRules(
   }
 
   return errors;
+}
+
+/** Validates every locale's pack; returns `locale: message` strings. */
+export function validateTerminologyPacks(
+  packs: Record<string, TerminologyPack> = TERMINOLOGY_PACKS,
+): string[] {
+  return Object.entries(packs).flatMap(([locale, pack]) =>
+    validateTerminologyRules(pack.rules, pack.matcher).map((error) => `${locale}: ${error}`),
+  );
 }

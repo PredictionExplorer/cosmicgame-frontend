@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES } from './locale-fixtures';
+
 const APP_HOST = 'app.cosmicsignature.com';
 const LANDING_HOST = 'cosmicsignature.com';
 
@@ -48,6 +50,30 @@ const publicPages: PublicPage[] = [
     path: '/zh/learn/what-is-cosmic-signature',
     host: LANDING_HOST,
     h1: '什么是 Cosmic Signature？',
+    jsonLd: ['Article', 'BreadcrumbList'],
+  },
+  {
+    path: '/uk',
+    host: LANDING_HOST,
+    h1: 'Cosmic Signature: процедурне ончейн-мистецтво',
+    jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
+  },
+  {
+    path: '/uk/about',
+    host: LANDING_HOST,
+    h1: 'Про Cosmic Signature',
+    jsonLd: ['AboutPage'],
+  },
+  {
+    path: '/uk/learn',
+    host: LANDING_HOST,
+    h1: 'Дізнайтеся, як працює Cosmic Signature',
+    jsonLd: ['BreadcrumbList'],
+  },
+  {
+    path: '/uk/learn/what-is-cosmic-signature',
+    host: LANDING_HOST,
+    h1: 'Що таке Cosmic Signature?',
     jsonLd: ['Article', 'BreadcrumbList'],
   },
   {
@@ -118,6 +144,31 @@ const publicPages: PublicPage[] = [
     path: '/zh/anchoring',
     host: APP_HOST,
     h1: '锚定派发',
+    jsonLd: ['Organization', 'WebSite', 'WebApplication'],
+  },
+  {
+    path: '/uk/statistics',
+    host: APP_HOST,
+    h1: 'Статистика протоколу Cosmic Signature',
+    jsonLd: ['Organization', 'WebSite', 'WebApplication', 'WebPage', 'Dataset'],
+  },
+  {
+    path: '/uk/faq',
+    host: APP_HOST,
+    // The hero h1 renders the prefix and the gradient highlight as siblings.
+    h1: /Cosmic Signature[\s\S]{0,200}Поширені запитання/,
+    jsonLd: ['Organization', 'WebSite', 'WebApplication', 'FAQPage', 'BreadcrumbList'],
+  },
+  {
+    path: '/uk/gallery',
+    host: APP_HOST,
+    h1: 'Галерея Cosmic Signature',
+    jsonLd: ['Organization', 'WebSite', 'WebApplication', 'CollectionPage', 'BreadcrumbList'],
+  },
+  {
+    path: '/uk/anchoring',
+    host: APP_HOST,
+    h1: 'Надходження за закріплення',
     jsonLd: ['Organization', 'WebSite', 'WebApplication'],
   },
 ];
@@ -222,96 +273,89 @@ test.describe('raw HTML SEO', () => {
     });
   }
 
-  test('Sprint 2 Chinese pages emit localized canonicals, hreflang, and structured data', async ({
-    request,
-  }) => {
-    const pages = [
-      { path: '/zh', canonical: 'https://cosmicsignature.com/zh' },
-      { path: '/zh/about', canonical: 'https://cosmicsignature.com/zh/about' },
-      { path: '/zh/learn', canonical: 'https://cosmicsignature.com/zh/learn' },
-      {
-        path: '/zh/learn/what-is-cosmic-signature',
-        canonical: 'https://cosmicsignature.com/zh/learn/what-is-cosmic-signature',
-      },
-    ];
+  for (const locale of TRANSLATED_LOCALES) {
+    const seo = LOCALE_SEO[locale];
+    const script = LOCALE_CHROME[locale].script;
+    const scriptClass = script.source.replace(/^\[|\]$/g, '');
 
-    for (const page of pages) {
-      const response = await request.get(page.path, { headers: hostHeaders(LANDING_HOST) });
-      expect(response.status()).toBe(200);
-      const html = await response.text();
+    test(`${locale} landing pages emit localized canonicals, hreflang, and structured data`, async ({
+      request,
+    }) => {
+      for (const page of seo.landingPages) {
+        const response = await request.get(page.path, { headers: hostHeaders(LANDING_HOST) });
+        expect(response.status()).toBe(200);
+        const html = await response.text();
 
-      expect(html).toMatch(/<html[^>]+lang="zh"/);
-      expect(extractTitle(html)).toMatch(/[\u3400-\u9fff]/);
-      expect(extractDescription(html)).toMatch(/[\u3400-\u9fff]/);
-      expect(html).toContain(`rel="canonical" href="${page.canonical}"`);
-      expect(html).toMatch(/hreflang="en"/i);
-      expect(html).toMatch(/hreflang="zh"/i);
-      expect(html).toContain('"inLanguage":"zh-Hans"');
-    }
-  });
-
-  test('Sprint 7 Chinese app SEO is localized across metadata, summaries, and JSON-LD', async ({
-    request,
-  }) => {
-    const pages = [
-      { path: '/zh/statistics', summary: 'Cosmic Signature 协议统计' },
-      { path: '/zh/gallery', summary: '确定性 NFT 艺术' },
-      { path: '/zh/anchoring', summary: '锚定派发' },
-      { path: '/zh/allocation', summary: '分配历史' },
-      { path: '/zh/eth-contribution', summary: '直接 ETH 贡献' },
-    ];
-
-    for (const page of pages) {
-      const response = await request.get(page.path, { headers: hostHeaders(APP_HOST) });
-      expect(response.status()).toBe(200);
-      const html = await response.text();
-      const canonical = `https://${APP_HOST}${page.path}`;
-
-      expect(html).toMatch(/<html[^>]+lang="zh"/);
-      expect(extractTitle(html)).toMatch(/[\u3400-\u9fff]/);
-      expect(extractDescription(html)).toMatch(/[\u3400-\u9fff]/);
-      expect(html).toContain(`rel="canonical" href="${canonical}"`);
-      expect(html).toMatch(/hreflang="en"/i);
-      expect(html).toMatch(/hreflang="zh"/i);
-      expect(html).toMatch(/hreflang="x-default"/i);
-      expect(html).toMatch(/property="og:locale" content="zh_CN"/);
-      expect(html).toMatch(/property="og:title" content="[^"]*[\u3400-\u9fff]/);
-      expect(html).toMatch(/property="og:description" content="[^"]*[\u3400-\u9fff]/);
-      expect(html).toContain('"inLanguage":"zh-Hans"');
-      expect(html).toContain(page.summary);
-      expect(html).not.toContain('initial HTML for search engines and AI crawlers');
-
-      const nodes = collectJsonLdNodes(html);
-      for (const schemaType of ['WebSite', 'WebApplication']) {
-        const node = nodes.find((candidate) => candidate['@type'] === schemaType);
-        expect(node?.inLanguage).toBe('zh-Hans');
-        expect(node?.description).toMatch(/[\u3400-\u9fff]/);
-        expect(node?.url).toContain('/zh');
+        expect(html).toMatch(new RegExp(`<html[^>]+lang="${locale}"`));
+        expect(extractTitle(html)).toMatch(script);
+        expect(extractDescription(html)).toMatch(script);
+        expect(html).toContain(`rel="canonical" href="https://${LANDING_HOST}${page.path}"`);
+        expect(html).toMatch(/hreflang="en"/i);
+        expect(html).toMatch(new RegExp(`hreflang="${locale}"`, 'i'));
+        expect(html).toContain(`"inLanguage":"${seo.inLanguage}"`);
+        expect(html).toContain(page.h1);
       }
-      const organization = nodes.find((candidate) => candidate['@type'] === 'Organization');
-      expect(organization?.inLanguage).toBeUndefined();
-      expect(organization?.description).toMatch(/[\u3400-\u9fff]/);
-      expect(organization?.url).toContain('/zh');
-    }
-  });
-
-  test('Chinese Open Graph image endpoint renders a PNG', async ({ request }) => {
-    const response = await request.get('/zh/gallery', { headers: hostHeaders(APP_HOST) });
-    expect(response.status()).toBe(200);
-    const html = await response.text();
-    const imageUrl = extractOgImageUrl(html);
-    expect(imageUrl).toBeTruthy();
-
-    const parsed = new URL(imageUrl);
-    expect(parsed.pathname).toMatch(/^\/zh\/gallery\/opengraph-image/);
-    const image = await request.get(`${parsed.pathname}${parsed.search}`, {
-      headers: hostHeaders(APP_HOST),
-      maxRedirects: 0,
     });
-    expect(image.status()).toBe(200);
-    expect(image.headers()['content-type']).toContain('image/png');
-    expect((await image.body()).byteLength).toBeGreaterThan(10_000);
-  });
+
+    test(`${locale} app SEO is localized across metadata, summaries, and JSON-LD`, async ({
+      request,
+    }) => {
+      for (const page of seo.appSummaries) {
+        const response = await request.get(page.path, { headers: hostHeaders(APP_HOST) });
+        expect(response.status()).toBe(200);
+        const html = await response.text();
+        const canonical = `https://${APP_HOST}${page.path}`;
+
+        expect(html).toMatch(new RegExp(`<html[^>]+lang="${locale}"`));
+        expect(extractTitle(html)).toMatch(script);
+        expect(extractDescription(html)).toMatch(script);
+        expect(html).toContain(`rel="canonical" href="${canonical}"`);
+        expect(html).toMatch(/hreflang="en"/i);
+        expect(html).toMatch(new RegExp(`hreflang="${locale}"`, 'i'));
+        expect(html).toMatch(/hreflang="x-default"/i);
+        expect(html).toMatch(new RegExp(`property="og:locale" content="${seo.ogLocale}"`));
+        expect(html).toMatch(new RegExp(`property="og:title" content="[^"]*[${scriptClass}]`));
+        expect(html).toMatch(
+          new RegExp(`property="og:description" content="[^"]*[${scriptClass}]`),
+        );
+        expect(html).toContain(`"inLanguage":"${seo.inLanguage}"`);
+        expect(html).toContain(page.summary);
+        expect(html).not.toContain('initial HTML for search engines and AI crawlers');
+
+        const nodes = collectJsonLdNodes(html);
+        for (const schemaType of ['WebSite', 'WebApplication']) {
+          const node = nodes.find((candidate) => candidate['@type'] === schemaType);
+          expect(node?.inLanguage).toBe(seo.inLanguage);
+          expect(node?.description).toMatch(script);
+          expect(node?.url).toContain(`/${locale}`);
+        }
+        const organization = nodes.find((candidate) => candidate['@type'] === 'Organization');
+        expect(organization?.inLanguage).toBeUndefined();
+        expect(organization?.description).toMatch(script);
+        expect(organization?.url).toContain(`/${locale}`);
+      }
+    });
+
+    test(`${locale} Open Graph image endpoint renders a PNG`, async ({ request }) => {
+      const response = await request.get(`/${locale}/gallery`, { headers: hostHeaders(APP_HOST) });
+      expect(response.status()).toBe(200);
+      const html = await response.text();
+      const imageUrl = extractOgImageUrl(html);
+      expect(imageUrl).toBeTruthy();
+
+      const parsed = new URL(imageUrl);
+      expect(parsed.pathname).toMatch(new RegExp(`^/${locale}/gallery/opengraph-image`));
+      const image = await request.get(`${parsed.pathname}${parsed.search}`, {
+        headers: hostHeaders(APP_HOST),
+        maxRedirects: 0,
+      });
+      expect(image.status()).toBe(200);
+      expect(image.headers()['content-type']).toContain('image/png');
+      expect((await image.body()).subarray(0, 8)).toEqual(
+        Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      );
+    });
+  }
 
   test('both hosts emit and serve the same versioned favicon assets', async ({ request }) => {
     const expectedHrefs = ['/favicon.svg?v=20260825', '/favicon.ico?v=20260825'];
@@ -528,9 +572,11 @@ test.describe('raw HTML SEO', () => {
       const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]!);
       expect(locs.length).toBeGreaterThan(host === APP_HOST ? 20 : 10);
       expect(countMatches(xml, /hreflang="en"/g)).toBe(locs.length);
-      expect(countMatches(xml, /hreflang="zh"/g)).toBe(locs.length);
+      for (const locale of TRANSLATED_LOCALES) {
+        expect(countMatches(xml, new RegExp(`hreflang="${locale}"`, 'g'))).toBe(locs.length);
+        expect(xml).toContain(`href="https://${host}/${locale}`);
+      }
       expect(countMatches(xml, /hreflang="x-default"/g)).toBe(locs.length);
-      expect(xml).toContain(`href="https://${host}/zh`);
 
       for (const loc of locs) {
         const url = new URL(loc);

@@ -34,9 +34,13 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-family-display:
-    var(--font-clash-display), 'ClashDisplay-Variable', var(--font-noto-sc), 'PingFang SC',
-    'Microsoft YaHei', sans-serif;
+  /*
+   * Indirected through --display-font-stack so a locale can swap the whole
+   * display face (see the html[lang] rules below) and every consumer — the
+   * type-display / type-heading utilities and ad-hoc font-family declarations
+   * — follows without per-element overrides.
+   */
+  --font-family-display: var(--display-font-stack);
 
   /*
    * Tailwind v4 only generates `xs:` / `max-xs:` variants for a breakpoint it
@@ -61,6 +65,40 @@
   --header-height: 4.5rem; /* 72px */
   /* Breathing room between the header and anything pinned beneath it. */
   --sticky-offset: calc(var(--header-height) + 0.75rem);
+  /*
+   * Display face for Latin-script locales. CJK glyphs fall through to Noto
+   * Sans SC per glyph; Cyrillic locales replace the whole stack below.
+   */
+  --display-font-stack:
+    var(--font-clash-display), 'ClashDisplay-Variable', var(--font-noto-sc), 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+}
+
+/*
+ * Ukrainian locale typography (docs/i18n/README.md §5). Clash Display has no
+ * Cyrillic glyphs, so the display stack switches to the Onest companion face
+ * as a whole — appending Onest after Clash in the shared stack would set Latin
+ * letters (ETH, CST, brand names) in Clash and Cyrillic in Onest inside one
+ * heading, with mismatched x-heights. Body copy stays in Inter, whose Cyrillic
+ * slices load on demand.
+ *
+ * Deliberately unlayered, next to :root: both rules target the <html>
+ * element, and an unlayered :root declaration would beat any override placed
+ * inside @layer base no matter its specificity.
+ */
+html[lang='uk'] {
+  --display-font-stack: var(--font-onest), var(--font-inter), Inter, system-ui, sans-serif;
+}
+
+/*
+ * Title-Case button labels are an English convention: the Button variants
+ * apply Tailwind's `capitalize`, which would turn «Під’єднати гаманець» into
+ * «Під’єднати Гаманець». Every other language writes UI labels in sentence
+ * case (CJK has no case), so the transform is English-only. Unlayered so it
+ * outranks the utilities layer that defines `.capitalize`.
+ */
+html:not([lang='en']) .capitalize {
+  text-transform: none;
 }
 
 /*

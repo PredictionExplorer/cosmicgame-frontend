@@ -190,13 +190,22 @@ export function toTopBidderInfo(bidders: UniqueBidderPoint[], topN: number): Top
     }));
 }
 
+/**
+ * Idle gap (hours) that ends an active period, and the minimum gestures a
+ * period needs to count. Quoted in the statistics chart copy of every locale
+ * (`statistics.activePeriods.description`), so the numeric-claims test pins
+ * the prose to these values.
+ */
+export const DEFAULT_ACTIVE_PERIOD_GAP_HOURS = 6;
+export const DEFAULT_ACTIVE_PERIOD_MIN_GESTURES = 2;
+
 export function computeActivePeriods(
   gestures: GesturePoint[],
   topBidders: TopBidderInfo[],
   initTs: number,
   finTs: number,
-  gapHours = 6,
-  minBids = 2,
+  gapHours = DEFAULT_ACTIVE_PERIOD_GAP_HOURS,
+  minBids = DEFAULT_ACTIVE_PERIOD_MIN_GESTURES,
 ): BidderActivePeriod[] {
   const gapSecs = gapHours * 3600;
   const topAddrs = new Set(topBidders.map((b) => b.BidderAddr.toLowerCase()));
@@ -285,8 +294,8 @@ export function buildTopBidderActivePeriodsResponse(
   topN: number,
   initTs: number,
   finTs: number,
-  gapHours = 6,
-  minBids = 2,
+  gapHours = DEFAULT_ACTIVE_PERIOD_GAP_HOURS,
+  minBids = DEFAULT_ACTIVE_PERIOD_MIN_GESTURES,
 ): TopBidderActivePeriodsResponse {
   const topBidders = toTopBidderInfo(bidders, topN);
   return {

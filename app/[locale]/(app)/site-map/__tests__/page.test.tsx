@@ -1,4 +1,5 @@
 import zhMeta from '@/messages/zh/meta.json';
+import { expectedLanguageAlternates } from '@/test-utils/i18n';
 
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
@@ -21,11 +22,7 @@ describe('localized site-map route', () => {
     expect(metadata.description).toBe(zhMeta.siteMap.description);
     expect(metadata.alternates).toEqual({
       canonical: `${APP_ORIGIN}/zh/site-map`,
-      languages: {
-        en: `${APP_ORIGIN}/site-map`,
-        zh: `${APP_ORIGIN}/zh/site-map`,
-        'x-default': `${APP_ORIGIN}/site-map`,
-      },
+      languages: expectedLanguageAlternates(APP_ORIGIN, '/site-map'),
     });
   });
 

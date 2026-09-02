@@ -1,19 +1,23 @@
 # Internationalization (i18n) — Architecture & Handbook
 
-This document defines how Cosmic Signature becomes a multilingual site, starting with
-**Simplified Chinese (`zh`)**. It covers the technical architecture, the message/content
+This document defines how Cosmic Signature is a multilingual site. It shipped
+**Simplified Chinese (`zh`)** first and **Ukrainian (`uk`)** second; every later language
+follows the checklist in §10. It covers the technical architecture, the message/content
 structure, the translation workflow, and the quality bar. It is written so that any
-engineer or translator can pick up a sprint from [progress.md](./progress.md) and know
-exactly what to do.
+engineer or translator can pick up a unit from a progress tracker and know exactly what
+to do.
 
 **The document set:**
 
-| Document                                 | Purpose                                                                  |
-| ---------------------------------------- | ------------------------------------------------------------------------ |
-| [README.md](./README.md) (this file)     | Architecture, tooling, workflow, definition of done                      |
-| [glossary-zh.md](./glossary-zh.md)       | Canonical Chinese translation for every protocol term + banned-term list |
-| [style-guide-zh.md](./style-guide-zh.md) | Rules for making the Chinese sound native, not translated                |
-| [progress.md](./progress.md)             | Full site inventory, sprint plan, and live progress tracker              |
+| Document                                 | Purpose                                                                    |
+| ---------------------------------------- | -------------------------------------------------------------------------- |
+| [README.md](./README.md) (this file)     | Architecture, tooling, workflow, definition of done                        |
+| [glossary-zh.md](./glossary-zh.md)       | Canonical Chinese translation for every protocol term + banned-term list   |
+| [style-guide-zh.md](./style-guide-zh.md) | Rules for making the Chinese sound native, not translated                  |
+| [progress.md](./progress.md)             | Chinese rollout: full site inventory, sprint plan, and progress tracker    |
+| [glossary-uk.md](./glossary-uk.md)       | Canonical Ukrainian translation for every protocol term + banned-term list |
+| [style-guide-uk.md](./style-guide-uk.md) | Rules for making the Ukrainian sound native (cases, four plural forms)     |
+| [progress-uk.md](./progress-uk.md)       | Ukrainian rollout: per-namespace and per-area T/R/Q tracker                |
 
 > Note: `docs/` is intentionally outside the lexicon scanner's `SCAN_DIRS`
 > (see `scripts/lexicon-scan.ts`), so these documents may cite banned vocabulary
@@ -23,21 +27,24 @@ exactly what to do.
 
 ## 1. Goals and decisions (locked)
 
-- **First target language:** Simplified Chinese, mainland conventions. Locale code `zh`
-  (BCP 47 `zh-Hans`; we use the short code in URLs and catalogs).
+- **Shipped languages:** Simplified Chinese, mainland conventions — locale code `zh`
+  (BCP 47 `zh-Hans`); Ukrainian — locale code `uk` (BCP 47 `uk-UA`). We use the short
+  code in URLs and catalogs.
 - **URL strategy:** locale-prefixed paths with `localePrefix: 'as-needed'`.
-  English keeps every existing URL unchanged (`/gallery`); Chinese lives under a prefix
-  (`/zh/gallery`). This applies on **both hosts**:
-  - `cosmicsignature.com/zh` — landing, `cosmicsignature.com/zh/learn/...`
-  - `app.cosmicsignature.com/zh/gallery` — dApp
+  English keeps every existing URL unchanged (`/gallery`); every other locale lives
+  under its prefix (`/zh/gallery`, `/uk/gallery`). This applies on **both hosts**:
+  - `cosmicsignature.com/zh`, `cosmicsignature.com/uk` — landing, `…/uk/learn/...`
+  - `app.cosmicsignature.com/zh/gallery`, `app.cosmicsignature.com/uk/gallery` — dApp
 - **Everything is translated.** Every page, tooltip, toast, error, empty state, `aria-label`,
   SEO title/description, OG image text, and JSON-LD. No surface is exempt (admin/internal
   tools are translated last, but they are translated).
-- **Quality bar:** the Chinese must read as if originally written in Chinese
-  (see [style-guide-zh.md](./style-guide-zh.md)). Literal translation is a defect.
-- **Future languages** (zh-Hant, ja, ...) must be addable by: extending `locales`, adding a
-  `messages/<locale>/` directory and per-locale content modules, and writing a glossary +
-  style guide. No further architectural change.
+- **Quality bar:** every locale must read as if originally written in that language
+  (see [style-guide-zh.md](./style-guide-zh.md), [style-guide-uk.md](./style-guide-uk.md)).
+  Literal translation is a defect.
+- **Future languages** (zh-Hant, ja, ...) are added by: extending `locales`, filling the
+  `LocaleRecord` registries the compiler then lists, adding a `messages/<locale>/`
+  directory and per-locale content modules, a lexicon profile and terminology pack, an
+  e2e chrome fixture, and a glossary + style guide (§10). No further architectural change.
 
 ## 2. Library and routing architecture
 
@@ -138,7 +145,8 @@ extended with `/zh` variants of every existing case.
 
 ### 2.4 Language switcher
 
-A small globe dropdown — options `English` / `中文` — rendered in:
+A small globe dropdown — one option per entry in `routing.locales`, labeled from
+`LOCALE_LABELS` (`English` / `中文` / `Українська`) — rendered in:
 
 - the dApp header (`components/layout/`), desktop + mobile drawer,
 - the landing header and both footers.
@@ -258,8 +266,21 @@ action, Chinese renders in unstyled system fallback.
   `html[lang="zh"]` rule bumping display-heading weight to 700 and tightening
   letter-spacing to `0` (CJK must never be letter-spaced like the Latin display face).
 - System fallback chain after Noto: `"PingFang SC", "Microsoft YaHei", sans-serif`.
-- `RootDocument` receives `locale` and sets `<html lang={locale}>` — this is also what
-  activates the CSS overrides and correct line-breaking behavior.
+- `RootDocument` receives `locale` and sets `<html lang={locale}>` and `<html dir>` (from
+  `LocaleConfig.textDirection`) — this is also what activates the CSS overrides and
+  correct line-breaking behavior.
+
+**Cyrillic (Ukrainian).** Inter's build-time CSS already declares the `cyrillic` and
+`cyrillic-ext` `unicode-range` slices, so body text needs nothing extra and those slices
+are fetched on demand only (never preloaded — English pages must not pay for them).
+Clash Display, however, has no Cyrillic glyphs, so `/uk` headings switch to **Onest**
+(`next/font/google`, `--font-onest`, `preload: false`, `display: 'optional'` — the same
+policy as Noto Sans SC). The display stack is indirected through the
+`--display-font-stack` custom property in `styles/global.css`: `html[lang='uk']` replaces
+the whole stack rather than appending Onest after Clash, so Latin letters inside a
+Ukrainian heading (ETH, CST, brand names) do not render in a different face with a
+different x-height. OG images for `/uk` load the checked-in `assets/fonts/Onest-700.subset.ttf`
+(Latin + Cyrillic, OFL) through `lib/og/fonts.ts`.
 
 ## 6. SEO, metadata, and structured data
 
@@ -282,21 +303,36 @@ action, Chinese renders in unstyled system fallback.
 
 ## 7. Guardrails (CI)
 
-1. **Catalog parity — `scripts/i18n-parity.ts`** (new): compares `messages/en/**` vs
-   `messages/zh/**` key sets; reports missing/extra/empty keys per namespace. Runs in CI as
-   a _report_ during rollout, flips to _failing_ per-namespace as sprints complete (the
-   sprint's acceptance criteria include "parity enforced for its namespaces"). Mixed
-   namespaces use a checked-in required-key manifest so later-sprint English extraction can
-   land without weakening already-shipped gates; Sprint 1 runs via `yarn i18n:sprint1`.
-2. **Chinese lexicon scan**: `scripts/lexicon-scan-core.ts` gains a zh banned-term list
-   (from [glossary-zh.md §4](./glossary-zh.md)) applied to `messages/zh/**` and the
-   `content/**/text.zh.ts` / `content/legal/*.zh.ts` modules. Same allow-pragma mechanism
-   for FAQ denial copy.
-3. **E2E**: a `zh` smoke spec (home, gallery, learn, FAQ under `/zh`; switcher round-trip;
-   cookie persistence; host redirects preserve the prefix). Existing English e2e suites
-   run unchanged — they are the regression net proving `en` didn't move.
-4. **Unit**: message-loading test asserting every namespace parses and the en fallback
-   merge works; formatting tests for zh output.
+1. **Catalog integrity — `scripts/i18n-parity.ts` / `scripts/i18n-parity-core.ts`**:
+   for every locale in `routing.locales` (the `messages/` tree must mirror it exactly),
+   compares each namespace against `messages/en/**` and checks key parity, ICU syntax
+   (the same `@formatjs` parser next-intl uses), placeholder parity (same `{arguments}`,
+   no invented `<tags>`), plural completeness against the locale's CLDR categories
+   (`one/few/many/other` for uk, `other` for zh), and verbatim-copy catalogs. `npm run
+i18n:parity` reports; `npm run i18n:strict` fails CI and pre-push (via `npm run
+i18n:check`). The same checks run under jest in
+   `i18n/__tests__/catalog-integrity.test.ts`.
+2. **Lexicon scan**: `scripts/lexicon-scan-core.ts` declares one `LexiconProfile` per
+   translated locale (`LEXICON_PROFILES`, typed against `TranslatedLocale`): the zh list
+   is matched as CJK substrings, the uk list as Unicode-bounded word forms plus
+   word-initial stems (`\b` is ASCII-only, so Cyrillic needs `\p{L}` boundaries — see
+   `scripts/locale-text-matchers.ts`). Every profile runs on every scanned file. Same
+   allow-pragma mechanism for FAQ/legal denial copy.
+3. **Terminology gate**: `scripts/terminology-consistency.ts` iterates
+   `TRANSLATED_LOCALES`, scanning `messages/<locale>/**` and `content/**/*.<locale>.ts`
+   with the locale's rule pack from `scripts/terminology/<locale>.ts` (drift variants for
+   inflected languages are stems).
+4. **E2E**: `e2e/locale-fixtures.ts` holds locale lists and per-locale chrome strings;
+   `e2e/locale-smoke.ts` and `e2e/locale-site-qa.ts` are locale-parametrized runners that
+   a three-line `<locale>-smoke.spec.ts` / `<locale>-site-qa.desktop.spec.ts` plugs into.
+   Shared specs (`proxy`, `perf-guards`, `seo-raw-html`, `a11y`, `landing`) loop over the
+   translated locales. The Chinese sprint suites (`zh-*.spec.ts`) stay as the historical
+   acceptance record. `npm run test:e2e:locales` runs every locale suite.
+5. **Unit**: tests derive expectations from `routing.locales` (`test-utils/i18n.ts`
+   builds hreflang maps), so adding a locale never rewrites them; formatting tests pin
+   per-locale outputs (`utils/__tests__/format-extra.test.ts`, `time.test.ts`).
+6. **Numeric claims**: `content/__tests__/copy-numeric-claims.test.ts` checks every
+   locale's catalogs and long-form modules, matching duration nouns per language.
 
 ## 8. Translation workflow (per string, per page)
 
@@ -338,41 +374,59 @@ flowchart LR
 ## 9. Running it locally
 
 ```bash
-yarn dev
-# dApp Chinese:    http://localhost:3000/zh
-# landing Chinese: http://cosmicsignature.local:3000/zh   (see lib/hostRouting.ts for /etc/hosts setup)
-yarn i18n:strict                       # hard-fail on any en/zh catalog drift
-yarn i18n:sprint1 && yarn i18n:sprint2 && yarn i18n:sprint3
-yarn i18n:sprint4 && yarn i18n:sprint5 && yarn i18n:sprint6 && yarn i18n:sprint7
-yarn terminology:check && yarn lexicon:scan
-yarn test:e2e:zh                       # Chinese routes, QA journeys, a11y, routing, wallet
-yarn build && yarn bundle:budget       # production output and full app-home JS budget
+npm run dev
+# dApp:    http://localhost:3000/zh            http://localhost:3000/uk
+# landing: http://cosmicsignature.local:3000/zh   (see lib/hostRouting.ts for /etc/hosts setup)
+npm run i18n:parity                    # per-locale report (translated %, identical-to-source, problems)
+npm run i18n:check                     # i18n:strict + terminology:check + lexicon:scan (pre-push runs this)
+npm run test:e2e:locales               # every locale's smoke/QA suites plus a11y, routing, landing, wallet
+npm run white-paper:pdf                # regenerate the per-locale white-paper PDFs (pandoc + tectonic)
+npm run build && npm run bundle:budget # production output and full app-home JS budget
 ```
 
 To test locale detection: clear the `NEXT_LOCALE` cookie and set the browser's language to
-`zh-CN` — visiting `/` should redirect to `/zh`.
+`zh-CN` (or `uk-UA`) — visiting `/` should redirect to `/zh` (or `/uk`).
 
 ## 10. Adding the next language
 
 The compiler drives the checklist. After step 1, `npm run type-check` lists every place
-that needs a decision — there is no grep step.
+that needs a decision — there is no grep step. The Ukrainian rollout is the worked
+example: every registry below has a `uk` entry beside its `zh` one.
 
 1. **Add the locale to `locales` in [`i18n/routing.ts`](../../i18n/routing.ts).** Every
-   `LocaleRecord<T>` in the codebase now fails to compile until it has an entry:
+   `LocaleRecord<T>` / `Record<TranslatedLocale, T>` in the codebase now fails to compile
+   until it has an entry:
    - `LOCALE_LABELS` (routing.ts) — the language's own name for the switcher.
-   - `i18n/localeConfig.ts` — Intl tag, `og:locale`, JSON-LD `inLanguage`, word spacing,
-     week start, ellipsis, provider-error policy.
+   - `i18n/localeConfig.ts` — Intl tag, `og:locale`, JSON-LD `inLanguage`, text direction,
+     word spacing, week start, ellipsis, mid-sentence lowercasing, provider-error policy.
    - Format registries in `utils/format.ts` / `utils/time.ts` — date and duration
-     templates for the locale.
-   - Single-consumer registries (e.g. RainbowKit locale in `components/wallet/WalletUi.tsx`,
-     OG copy catalogs in `lib/og/copy.ts`, error catalogs in `app/global-error.tsx`).
+     templates (prefer `Intl` over hand-kept month/unit arrays; see the `uk` entries).
+   - Single-consumer registries: RainbowKit locale in `components/wallet/WalletUi.tsx`,
+     OG typography in `lib/og/fonts.ts` (a font buffer if the script is not Latin), OG copy
+     in `lib/og/copy.ts`, error catalogs in `app/global-error.tsx`, the white-paper PDF
+     typography in `scripts/generate-white-paper-pdf.ts` (output paths derive from the
+     locale), the `getTranslations` mock in `jest.setup.ts` resolves any locale.
    - Every `content/*/index.ts` text registry and `content/legal/index.ts` copy registry —
      add `text.<locale>.ts` / `*.<locale>.ts` modules; their mapped types reject missing
      or extra ids, so partial translations cannot ship.
-2. `cp -r messages/en messages/<locale>` and translate (`npm run i18n:strict` gates key
-   parity; untranslated values fall back to English at runtime while in progress).
-3. Write `glossary-<locale>.md` + `style-guide-<locale>.md` (for zh-Hant, OpenCC can
-   bootstrap from zh-Hans, but terminology and punctuation still need native review), and
-   extend `scripts/terminology-consistency-core.ts` if the language needs a glossary gate.
-4. Extend fonts if the script demands it (see §5); add the locale to e2e smoke specs.
-   hreflang maps and the sitemap derive from `routing.locales` automatically.
+   - `LEXICON_PROFILES` in `scripts/lexicon-scan-core.ts` (banned register + matcher for
+     the script) and `TERMINOLOGY_PACKS` in `scripts/terminology-consistency-core.ts`
+     (drift rules in `scripts/terminology/<locale>.ts`).
+   - `LOCALE_CHROME` in `e2e/locale-fixtures.ts` (nav/footer/switcher strings), then a
+     `<locale>-smoke.spec.ts` and `<locale>-site-qa.desktop.spec.ts` that call the shared
+     runners with the locale's QA profile; add the suite to `test:e2e:locales`.
+2. `cp -r messages/en messages/<locale>` and translate. `npm run i18n:parity` reports
+   progress (translated %, values identical to the source); `npm run i18n:strict` fails
+   on parity, ICU syntax, placeholder drift, incomplete plural categories for the locale's
+   `Intl.PluralRules`, and untranslated namespaces. Untranslated values fall back to
+   English at runtime while in progress.
+3. Write `glossary-<locale>.md` + `style-guide-<locale>.md` + `progress-<locale>.md` (for
+   zh-Hant, OpenCC can bootstrap from zh-Hans, but terminology and punctuation still need
+   native review). Decide the coined terms first — every batch of copy depends on them.
+4. Fonts: if the script is outside Latin coverage of Clash Display / Inter, add a companion
+   face with the Noto Sans SC / Onest loading policy and an `html[lang]` display-stack
+   override (§5); add a subset TTF for OG images with its license in
+   `THIRD_PARTY_NOTICES.md`. hreflang maps, the sitemap, `<html lang/dir>`, and the
+   language switcher derive from `routing.locales` automatically.
+5. Add Ukrainian-style sections to `public/llms.txt` / `public/llms-full.txt` and pin them
+   in `public/__tests__/llms.test.ts`; regenerate the white-paper PDF.

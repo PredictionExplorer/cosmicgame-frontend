@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+import { LOCALE_CHROME } from './locale-fixtures';
 import { mockZhQualityApi } from './zh-quality-mocks';
 
 /**
@@ -151,6 +152,96 @@ test.describe('A11y smoke (WCAG 2.1 AA)', () => {
     await page.goto('/zh/faq', { waitUntil: 'domcontentloaded' });
     await page.keyboard.press('Tab');
     const skipLink = page.getByRole('link', { name: '跳至主要内容' });
+    await expect(skipLink).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#main:visible').first()).toBeVisible();
+  });
+
+  const ukRoutes: ReadonlyArray<{
+    path: string;
+    label: string;
+    landing?: boolean;
+    assertAccessibleName: (page: Page) => Promise<void>;
+  }> = [
+    {
+      path: '/uk/site-map',
+      label: 'global utility',
+      assertAccessibleName: async (page) =>
+        expect(page.getByRole('heading', { name: LOCALE_CHROME.uk.siteMap.heading })).toBeVisible(),
+    },
+    {
+      path: '/uk/learn',
+      label: 'landing and Learn',
+      landing: true,
+      assertAccessibleName: async (page) =>
+        expect(
+          page.getByRole('heading', { name: 'Дізнайтеся, як працює Cosmic Signature' }),
+        ).toBeVisible(),
+    },
+    {
+      path: '/uk/gallery',
+      label: 'core dApp',
+      assertAccessibleName: async (page) =>
+        expect(page.getByRole('textbox', { name: 'Пошук NFT' })).toBeVisible(),
+    },
+    {
+      path: '/uk/anchoring',
+      label: 'transactions',
+      assertAccessibleName: async (page) =>
+        expect(page.getByRole('heading', { name: 'Як працює закріплення' })).toBeVisible(),
+    },
+    {
+      path: '/uk/statistics',
+      label: 'statistics',
+      assertAccessibleName: async (page) =>
+        expect(
+          page.getByRole('heading', { name: 'Статистика протоколу Cosmic Signature' }),
+        ).toBeVisible(),
+    },
+    {
+      path: '/uk/faq',
+      label: 'FAQ and trust',
+      assertAccessibleName: async (page) =>
+        expect(page.getByRole('textbox', { name: 'Пошук серед поширених запитань' })).toBeVisible(),
+    },
+    {
+      path: '/uk/eth-contribution',
+      label: 'long-tail contribution',
+      assertAccessibleName: async (page) =>
+        expect(
+          page.getByRole('heading', { name: 'Внески ETH', exact: true }).first(),
+        ).toBeVisible(),
+    },
+  ];
+
+  for (const route of ukRoutes) {
+    test(`Ukrainian ${route.label} page has no serious/critical violations`, async ({
+      context,
+      page,
+    }) => {
+      await context.setExtraHTTPHeaders(route.landing ? LANDING_HEADERS : {});
+      await mockZhQualityApi(page);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+      await expect(page.locator('html')).toHaveAttribute('lang', 'uk');
+      await route.assertAccessibleName(page);
+
+      const results = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .disableRules(disabledRules)
+        .analyze();
+      const seriousOrCritical = results.violations.filter(
+        (violation) => violation.impact === 'serious' || violation.impact === 'critical',
+      );
+      expect(seriousOrCritical, JSON.stringify(seriousOrCritical, null, 2)).toEqual([]);
+    });
+  }
+
+  test('Ukrainian skip link exposes its translated accessible name', async ({ page }) => {
+    await mockZhQualityApi(page);
+    await page.goto('/uk/faq', { waitUntil: 'domcontentloaded' });
+    await page.keyboard.press('Tab');
+    const skipLink = page.getByRole('link', { name: LOCALE_CHROME.uk.skipLink });
     await expect(skipLink).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.locator('#main:visible').first()).toBeVisible();

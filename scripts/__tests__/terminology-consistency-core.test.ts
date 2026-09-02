@@ -1,9 +1,65 @@
+import { TRANSLATED_LOCALES } from '../../i18n/routing';
 import {
+  TERMINOLOGY_PACKS,
   TERMINOLOGY_RULES,
   scanTerminology,
+  validateTerminologyPacks,
   validateTerminologyRules,
   type TerminologyRule,
 } from '../terminology-consistency-core';
+
+describe('terminology packs', () => {
+  it('ships one structurally sound pack per translated locale', () => {
+    expect(Object.keys(TERMINOLOGY_PACKS).sort()).toEqual([...TRANSLATED_LOCALES].sort());
+    expect(validateTerminologyPacks()).toEqual([]);
+    for (const locale of TRANSLATED_LOCALES) {
+      const { rules, glossary } = TERMINOLOGY_PACKS[locale];
+      expect(glossary).toBe(`docs/i18n/glossary-${locale}.md`);
+      expect(rules.length).toBeGreaterThanOrEqual(20);
+      expect(new Set(rules.map((rule) => rule.concept)).size).toBe(rules.length);
+    }
+  });
+});
+
+describe('Ukrainian terminology consistency', () => {
+  const uk = TERMINOLOGY_PACKS.uk;
+
+  it('catches inflected drift through word-initial stems', () => {
+    const hits = scanTerminology('Кошти надійдуть одержувачеві розподілу.', uk);
+    expect(hits).toEqual([
+      expect.objectContaining({
+        concept: 'Allocation Recipient',
+        canonical: 'отримувач',
+        variant: 'одержувач (одержувачеві)',
+        line: 1,
+      }),
+    ]);
+  });
+
+  it('does not flag the canonical renderings or words that merely contain a stem', () => {
+    expect(
+      scanTerminology(
+        'Отримувач розподілу може забрати ETH після завершення перформанс-циклу; закарбування нової Сигнатури.',
+        uk,
+      ),
+    ).toEqual([]);
+  });
+
+  it('matches multi-word drift as a phrase prefix, case-insensitively', () => {
+    const hits = scanTerminology('Наступний Цикл Продуктивності починається завтра.', uk);
+    expect(hits.map((hit) => hit.concept)).toEqual(['Performance Cycle']);
+  });
+
+  it('validates stems against the canonical rendering with the same matcher', () => {
+    // `карбуванн` is a substring of the canonical `закарбування` but never a
+    // word-initial match, so the uk pack is valid under its own matcher …
+    expect(validateTerminologyRules(uk.rules, uk.matcher)).toEqual([]);
+    // … while the substring matcher would (correctly) reject that rule.
+    expect(validateTerminologyRules(uk.rules, 'cjk-substring')).toContainEqual(
+      expect.stringContaining('Imprint canonical rendering contains its drift variant'),
+    );
+  });
+});
 
 describe('Simplified-Chinese terminology consistency', () => {
   it('keeps the checked-in rule table structurally sound', () => {

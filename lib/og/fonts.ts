@@ -6,6 +6,10 @@ export const CJK_OG_FONT_NAME = 'Noto Sans SC';
 export const CJK_OG_FONT_FILE = 'assets/fonts/NotoSansSC-700.subset.ttf';
 export const CJK_OG_FONT_LICENSE = 'assets/fonts/OFL-NotoSansCJK.txt';
 
+export const CYRILLIC_OG_FONT_NAME = 'Onest';
+export const CYRILLIC_OG_FONT_FILE = 'assets/fonts/Onest-700.subset.ttf';
+export const CYRILLIC_OG_FONT_LICENSE = 'assets/fonts/OFL-Onest.txt';
+
 interface OgFontSpec {
   readonly name: string;
   readonly file: URL;
@@ -15,8 +19,9 @@ interface OgFontSpec {
 export interface OgTypography {
   /**
    * Extra font loaded into `ImageResponse`. `null` means the locale renders
-   * fine with next/og's built-in Latin fonts. CJK locales need an explicit
-   * subset buffer — Latin-only fonts render tofu.
+   * fine with next/og's built-in Latin fonts. Every other script needs an
+   * explicit subset buffer — the built-in fonts render tofu for CJK and are
+   * not guaranteed Cyrillic coverage either.
    */
   readonly font: OgFontSpec | null;
   /** Apply CJK layout metrics (line height, spacing) in CosmicOgCard. */
@@ -32,6 +37,15 @@ const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
       weight: 700,
     },
     cjk: true,
+  },
+  uk: {
+    // Same face as the on-page Ukrainian display headings (lib/fonts.ts).
+    font: {
+      name: CYRILLIC_OG_FONT_NAME,
+      file: new URL('../../assets/fonts/Onest-700.subset.ttf', import.meta.url),
+      weight: 700,
+    },
+    cjk: false,
   },
 };
 

@@ -18,6 +18,12 @@ export interface LocaleConfig {
   /** OpenGraph `og:locale` value. */
   readonly ogLocale: string;
   /**
+   * Writing direction, emitted as `<html dir>`. Every current locale is
+   * left-to-right; the field exists so a right-to-left language is a config
+   * entry rather than a layout audit hunt.
+   */
+  readonly textDirection: 'ltr' | 'rtl';
+  /**
    * Whether the language separates words with spaces. Drives the separator
    * between compact-duration tokens ("1d 2h" vs "1天2小时") and the space
    * between an inline label and the value that follows it.
@@ -47,6 +53,7 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     intlLocale: 'en-US',
     jsonLdInLanguage: 'en',
     ogLocale: 'en_US',
+    textDirection: 'ltr',
     wordSpacing: true,
     weekStartsMonday: false,
     ellipsis: '...',
@@ -57,10 +64,24 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     intlLocale: 'zh-CN',
     jsonLdInLanguage: 'zh-Hans',
     ogLocale: 'zh_CN',
+    textDirection: 'ltr',
     wordSpacing: false,
     weekStartsMonday: true,
     ellipsis: '…',
     lowercaseMidSentence: false,
+    showRawProviderErrors: false,
+  },
+  uk: {
+    intlLocale: 'uk-UA',
+    jsonLdInLanguage: 'uk',
+    ogLocale: 'uk_UA',
+    textDirection: 'ltr',
+    wordSpacing: true,
+    weekStartsMonday: true,
+    ellipsis: '…',
+    // Ukrainian has letter case and, like English, lowercases a Title-Case
+    // phrase that lands mid-sentence.
+    lowercaseMidSentence: true,
     showRawProviderErrors: false,
   },
 };
