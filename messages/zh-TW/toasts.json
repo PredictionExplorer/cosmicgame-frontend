@@ -47,7 +47,8 @@
       "notErc20": "所選合約不符合 ERC-20 標準。",
       "insufficientAttachedToken": "錢包中的代幣餘額不足，無法附加至本次落筆。",
       "insufficientEth": "錢包中的 ETH 餘額不足。",
-      "insufficientCst": "錢包中的 CST（ERC-20）餘額不足。"
+      "insufficientCst": "錢包中的 CST（ERC-20）餘額不足。",
+      "cycleNotStarted": "下一週期尚未開始，{duration}後可落筆。"
     },
     "transaction": {
       "failed": "未能提交落筆。請檢查錢包與網路連線，重新整理目前落筆價格後重試。",
@@ -62,7 +63,9 @@
       "wrongBidType": "所選落筆類型不正確。",
       "fundTransferFailed": "資金轉移失敗。",
       "ethCostChanged": "ETH 落筆價格已變為 {required} ETH，比提交時高 {increase} ETH。請重試。",
-      "cstCostChanged": "交易處理期間，CST 落筆價格已變化。目前需 {required} CST，超過設定的 {maximum} CST 落筆價格上限。請重新整理後重試。"
+      "cstCostChanged": "交易處理期間，CST 落筆價格已變化。目前需 {required} CST，超過設定的 {maximum} CST 落筆價格上限。請重新整理後重試。",
+      "bidPlacedWithinCurrentSecond": "同一秒內已有另一筆落筆。請稍候片刻後重試。",
+      "bidHasBeenPlacedInCurrentRound": "目前週期已有落筆。"
     }
   },
   "anchor": {

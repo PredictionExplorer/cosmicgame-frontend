@@ -2,11 +2,16 @@ import '@testing-library/jest-dom';
 
 import userEvent from '@testing-library/user-event';
 
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
 import { CycleMonument } from '../CycleMonument';
+
+// Signature Allocation NFT count baked into the copy (V3: 3, V2: 1).
+const cscNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
 
 jest.mock('@rainbow-me/rainbowkit');
 
@@ -74,7 +79,9 @@ describe('CycleMonument', () => {
     await user.hover(within(reserve).getByRole('button', { name: /^More information/ }));
 
     expect(
-      await screen.findAllByText('home.status.metrics.signatureTooltip.withErc20(erc20Count=1)'),
+      await screen.findAllByText(
+        `home.status.metrics.signatureTooltip.withErc20(cscNftCount=${cscNftCount},erc20Count=1)`,
+      ),
     ).not.toHaveLength(0);
   });
 
@@ -86,7 +93,9 @@ describe('CycleMonument', () => {
     await user.hover(within(reserve).getByRole('button', { name: /^More information/ }));
 
     expect(
-      await screen.findAllByText('home.status.metrics.signatureTooltip.withNft(nftCount=3)'),
+      await screen.findAllByText(
+        `home.status.metrics.signatureTooltip.withNft(cscNftCount=${cscNftCount},nftCount=3)`,
+      ),
     ).not.toHaveLength(0);
   });
 

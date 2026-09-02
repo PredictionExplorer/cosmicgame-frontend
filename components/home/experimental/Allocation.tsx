@@ -15,9 +15,14 @@ import {
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+
+/** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
+const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
 
 interface AllocationData {
   PrizeAmountEth?: number;
@@ -66,7 +71,7 @@ const Allocation: FC<AllocationProps> = ({ data, hideHeading = false }) => {
     {
       icon: <Trophy className="h-5 w-5" />,
       name: t('allocation.cards.signature.name'),
-      tooltip: t('allocation.cards.signature.tooltip'),
+      tooltip: t('allocation.cards.signature.tooltip', { cscNftCount: signatureNftCount }),
       amounts: [
         t('allocation.amounts.eth', { amount: (data?.PrizeAmountEth ?? 0).toFixed(4) }),
         t('allocation.amounts.fixedCst'),

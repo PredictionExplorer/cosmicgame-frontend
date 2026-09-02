@@ -47,6 +47,8 @@
     "cycleValue": "Цикл {round}",
     "gestureCost": "Вартість жесту",
     "participationCst": "CST участі",
+    "cstToOutbid": "Учаснику, якого ви перевершили",
+    "cstToThis": "Учаснику цього жесту",
     "attachedRandomWalk": "RandomWalk NFT долучено до ETH-жесту:",
     "paidWithCst": "Сплачено в CST (ERC-20):",
     "randomWalkId": "ID RandomWalkNFT:",

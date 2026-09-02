@@ -6,6 +6,7 @@ import { Coins, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
 
 import Counter from '@/components/common/Counter';
@@ -26,6 +27,9 @@ import {
   getCstAuctionProgress,
   type CstGestureData,
 } from '@/utils/cstGesture';
+
+/** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
+const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
 
 interface EthGestureInfo {
   ETHPrice: number;
@@ -362,6 +366,7 @@ export const GestureStatus = ({
                 <p className="text-sm font-medium text-emerald-400">
                   {t(`status.standing.leader.${attachedAssetVariant}`, {
                     amount: (data.PrizeAmountEth ?? 0).toFixed(4),
+                    cscNftCount: signatureNftCount,
                     ...attachedAssetValues,
                   })}
                 </p>

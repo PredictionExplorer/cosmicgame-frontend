@@ -13,7 +13,7 @@
       "scope": "僅顯示已收官週期記錄",
       "scopeTooltip": "本頁僅彙總週期 API 中已收官的演繹週期；待收官週期及不屬於這些週期的分配取回記錄不計入統計。"
     },
-    "intro": "週期收官後，寫下收官之筆的參與者會取回簽名分配——{percentage}% 的週期儲備、1,000 CST 與一枚專屬 Cosmic Signature NFT。其他分配則透過時之勇士、星選、錨定派發、公共物品與滾動儲備等軌道流轉。",
+    "intro": "週期收官後，寫下收官之筆的參與者會取回簽名分配——{percentage}% 的週期儲備、1,000 CST 與{cscNftCount} 枚專屬 Cosmic Signature NFT。其他分配則透過時之勇士、星選、錨定派發、公共物品與滾動儲備等軌道流轉。",
     "reserveSplit": {
       "label": "週期儲備分配",
       "tooltip": "這些百分比表示週期收官後，ETH 儲備如何沿協議各條軌道分配。",
@@ -103,6 +103,7 @@
       "amountTooltip": "收官倒數歸零後，寫下收官之筆的參與者取回的 ETH 總額。",
       "recipient": "獲配者",
       "nft": "NFT",
+      "nfts": "NFT（多枚）",
       "nftTooltip": "在畫廊中查看這枚 Cosmic Signature NFT。",
       "finalized": "收官時間：{dateTime}",
       "viewTransaction": "查看交易",
@@ -121,7 +122,7 @@
       "cards": {
         "signature": {
           "title": "簽名分配",
-          "tooltip": "收官倒數歸零時寫下收官之筆的參與者，可取回 ETH、1,000 CST 與一枚 Cosmic Signature NFT。"
+          "tooltip": "收官倒數歸零時寫下收官之筆的參與者，可取回 ETH、1,000 CST 與{cscNftCount} 枚 Cosmic Signature NFT。"
         },
         "chrono": {
           "title": "時之勇士",

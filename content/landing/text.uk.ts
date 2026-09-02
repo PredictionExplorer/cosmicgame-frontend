@@ -1,4 +1,9 @@
-import { protocolFacts } from '@/content/protocol-facts';
+import {
+  ethDistributionFacts,
+  isV3Mechanics,
+  nftAllocationFacts,
+  protocolFacts,
+} from '@/content/protocol-facts';
 
 import type { LandingText } from './structure';
 
@@ -41,7 +46,7 @@ export const landingTextUk = {
       'CC0',
       'Відкритий код',
       'Детерміноване мистецтво',
-      '7% для Protocol Guild',
+      `${ethDistributionFacts.publicGoodsPercentage}% для Protocol Guild`,
       'Космічна Рада',
       'Arbitrum One',
     ],
@@ -70,7 +75,9 @@ export const landingTextUk = {
       },
       gestures: {
         title: 'Жести',
-        body: `Учасники роблять жести, використовуючи ETH або CST. Кожен жест подовжує час завершення циклу, додає запис у зоряний відбір і може закарбувати динамічні CST участі, кількість яких залежить від квадратного кореня часу, що минув від попереднього жесту. ETH-жести скорочують вікно калібрування CST приблизно на ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST-жести подовжують його приблизно на ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
+        body: isV3Mechanics
+          ? 'Учасники роблять жести, використовуючи ETH або CST. Кожен жест подовжує час завершення циклу, додає запис у зоряний відбір і може закарбувати динамічні CST участі, кількість яких накопичується лінійно з часом, що минув від попереднього жесту. Кожен CST-жест перезапускає вікно калібрування CST з подвоєною ціною свого виконання, після чого вартість знижується з тією самою сталою швидкістю.'
+          : `Учасники роблять жести, використовуючи ETH або CST. Кожен жест подовжує час завершення циклу, додає запис у зоряний відбір і може закарбувати динамічні CST участі, кількість яких залежить від квадратного кореня часу, що минув від попереднього жесту. ETH-жести скорочують вікно калібрування CST приблизно на ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST-жести подовжують його приблизно на ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
       },
       finalization: {
         title: 'Завершення',
@@ -148,7 +155,7 @@ export const landingTextUk = {
     items: {
       'signature-allocation': {
         title: 'Розподіл Сигнатури',
-        body: 'Учасникові, який зробив завершальний жест. Включає 1 000 CST і один Cosmic Signature NFT.',
+        body: `Учасникові, який зробив завершальний жест. Включає 1 000 CST і ${nftAllocationFacts.mainPrizeNftPhrase.uk}.`,
       },
       'compounding-reserve': {
         percent: '~50%',
@@ -197,7 +204,7 @@ export const landingTextUk = {
   anchoring: {
     eyebrow: 'Закріплення',
     heading: 'Закріпіть Cosmic Signature NFT у протоколі.',
-    body: `Закріплені Cosmic Signature NFT у кожному циклі отримують пропорційну частку надходжень за закріплення (${protocolFacts.anchorDistributionPercentage}% резерву циклу); ця частка забирається під час відкріплення. Відкріпити NFT можна будь-коли, однак кожен NFT можна закріпити лише раз, тому відкріплення назавжди позбавляє цей NFT права на закріплення. Закріплені Random Walk NFT отримують записи в зоряному відборі закріплених NFT, де відібрані власники закріплень отримують ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST і Cosmic Signature NFT (без ETH).`,
+    body: `Закріплені Cosmic Signature NFT у кожному циклі отримують пропорційну частку надходжень за закріплення (${ethDistributionFacts.anchorDistributionPercentage}% резерву циклу); ця частка забирається під час відкріплення. Відкріпити NFT можна будь-коли, однак кожен NFT можна закріпити лише раз, тому відкріплення назавжди позбавляє цей NFT права на закріплення. Закріплені Random Walk NFT отримують записи в зоряному відборі закріплених NFT, де відібрані власники закріплень отримують ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST і Cosmic Signature NFT (без ETH).`,
     bullets: [
       'Нарахування ETH у кожному циклі; забирається під час відкріплення',
       'Відкріпити можна будь-коли — кожен NFT закріплюється лише раз',
@@ -209,8 +216,8 @@ export const landingTextUk = {
 
   publicGoods: {
     eyebrow: 'Суспільні блага',
-    heading: '7% кожного циклу — на підтримку розробників ядра Ethereum.',
-    body: 'Кожен перформанс-цикл перераховує 7% свого резерву ETH Protocol Guild — колективному механізму фінансування понад 170 розробників ядра Ethereum. Що активніше використовують протокол, то більше надходить інфраструктурі, на яку спирається сам Ethereum.',
+    heading: `${ethDistributionFacts.publicGoodsPercentage}% кожного циклу — на підтримку розробників ядра Ethereum.`,
+    body: `Кожен перформанс-цикл перераховує ${ethDistributionFacts.publicGoodsPercentage}% свого резерву ETH Protocol Guild — колективному механізму фінансування понад 170 розробників ядра Ethereum. Що активніше використовують протокол, то більше надходить інфраструктурі, на яку спирається сам Ethereum.`,
     disclaimerHeading: 'Застереження',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
@@ -286,7 +293,9 @@ export const landingTextUk = {
       },
       {
         question: 'Чому кількість CST участі змінюється?',
-        answer: `Закарбування CST участі обчислюється за формулою з квадратним коренем від часу, що минув від попереднього жесту. Що довша пауза, то більше CST закарбовується, але завдяки квадратному кореню зростання сублінійне. Дуже швидкі жести можуть закарбувати 0 CST. Перед підтвердженням застосунок показує поточну кількість.`,
+        answer: isV3Mechanics
+          ? `Закарбування CST участі накопичується лінійно з часом, що минув від попереднього жесту — за стартових параметрів приблизно ${protocolFacts.v3.dynamicCstRewardPerMinuteAtLaunch} CST за хвилину. Що довша пауза, то пропорційно більше CST закарбовується; жести одразу після чужого закарбовують близько 0 CST. Перед підтвердженням застосунок показує поточну кількість.`
+          : `Закарбування CST участі обчислюється за формулою з квадратним коренем від часу, що минув від попереднього жесту. Що довша пауза, то більше CST закарбовується, але завдяки квадратному кореню зростання сублінійне. Дуже швидкі жести можуть закарбувати 0 CST. Перед підтвердженням застосунок показує поточну кількість.`,
       },
       {
         question: 'Як ETH- і CST-жести впливають на вікно калібрування CST?',
@@ -307,8 +316,7 @@ export const landingTextUk = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: 'Що саме означає «суспільні блага»?',
-        answer:
-          'Сім відсотків резерву ETH кожного циклу перераховується на адресу суспільних благ — нині це Protocol Guild. Protocol Guild — колективний механізм фінансування понад 170 розробників ядра Ethereum. Це перерахування ETH на адресу суспільних благ; воно не є благодійним внеском у розумінні податкового законодавства США, і Cosmic Signature не робить жодних заяв щодо його податкового трактування.',
+        answer: `${ethDistributionFacts.publicGoodsPercentage}% резерву ETH кожного циклу перераховується на адресу суспільних благ — нині це Protocol Guild. Protocol Guild — колективний механізм фінансування понад 170 розробників ядра Ethereum. Це перерахування ETH на адресу суспільних благ; воно не є благодійним внеском у розумінні податкового законодавства США, і Cosmic Signature не робить жодних заяв щодо його податкового трактування.`,
       },
       // lexicon-allow-end
       {

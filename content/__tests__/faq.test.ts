@@ -6,7 +6,7 @@ import {
   getFaqContent,
   type FAQContent,
 } from '@/content/faq';
-import { ethDistributionFacts, protocolFacts } from '@/content/protocol-facts';
+import { cstRewardFacts, ethDistributionFacts, protocolFacts } from '@/content/protocol-facts';
 
 import { faqPageJsonLd } from '@/utils/jsonLd';
 
@@ -85,7 +85,7 @@ describe('localized FAQ content', () => {
       .answer;
 
     expect(answer).not.toMatch(/\b(seconds?|hours?|days?)\b/);
-    for (const example of protocolFacts.dynamicCstRewardExamples) {
+    for (const example of cstRewardFacts.examples) {
       expect(answer).toContain(`后为 ${example.cst} CST`);
     }
     expect(answer).toContain('1 小时后为');

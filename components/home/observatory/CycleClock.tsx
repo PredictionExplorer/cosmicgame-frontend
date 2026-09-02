@@ -4,6 +4,7 @@ import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight, BellRing, CalendarPlus, Clock3 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
 
 import Counter from '@/components/common/Counter';
@@ -20,6 +21,9 @@ import type { DashboardInfo } from '@/services/api';
 import { Link } from '@/i18n/navigation';
 
 import { viewForPhase } from './phaseView';
+
+/** Cosmic Signature NFTs in the Signature Allocation: V3 awards 3 sequential NFTs, V2 awards 1. */
+const signatureNftCount = isV3Mechanics ? protocolFacts.v3.mainPrizeNftsPerCycleDefault : 1;
 
 /** Selectable "notify me before finalization" thresholds, in minutes. */
 export const NOTIFY_THRESHOLD_CHOICES_MIN = [5, 30, 60] as const;
@@ -217,7 +221,12 @@ export function CycleClock({
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               {t('observatory.clock.reserveLabel')}
-              <InfoTooltip content={t('status.metrics.signatureTooltip.base')} className="ml-1.5" />
+              <InfoTooltip
+                content={t('status.metrics.signatureTooltip.base', {
+                  cscNftCount: signatureNftCount,
+                })}
+                className="ml-1.5"
+              />
             </p>
             <p
               className={cn(

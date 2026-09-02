@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { landingContentEn } from '@/content/landing';
+import { ethDistributionFacts } from '@/content/protocol-facts';
 
 import { Hero } from '@/components/landing-v2/Hero';
 
@@ -86,7 +87,9 @@ describe('<Hero />', () => {
     render(<Hero hero={landingContentEn.hero} />);
     expect(screen.getByText('CC0')).toBeInTheDocument();
     expect(screen.getByText('Verified Contracts')).toBeInTheDocument();
-    expect(screen.getByText('7% to Protocol Guild')).toBeInTheDocument();
+    expect(
+      screen.getByText(`${ethDistributionFacts.publicGoodsPercentage}% to Protocol Guild`),
+    ).toBeInTheDocument();
   });
 
   it('avoids unsupported audit claims in the marquee chips', () => {

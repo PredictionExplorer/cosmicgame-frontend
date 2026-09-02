@@ -46,7 +46,7 @@ export const landingTextEn = {
       'CC0',
       'Open Source',
       'Deterministic Art',
-      '7% to Protocol Guild',
+      `${ethDistributionFacts.publicGoodsPercentage}% to Protocol Guild`,
       'Cosmic Council',
       'Arbitrum One',
     ],
@@ -215,8 +215,8 @@ export const landingTextEn = {
 
   publicGoods: {
     eyebrow: 'Public Goods',
-    heading: '7% of every cycle funds Ethereum’s core contributors.',
-    body: 'Every Performance Cycle forwards 7% of its ETH reserve to Protocol Guild — the collective funding mechanism for 170+ Ethereum core contributors. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.',
+    heading: `${ethDistributionFacts.publicGoodsPercentage}% of every cycle funds Ethereum’s core contributors.`,
+    body: `Every Performance Cycle forwards ${ethDistributionFacts.publicGoodsPercentage}% of its ETH reserve to Protocol Guild — the collective funding mechanism for 170+ Ethereum core contributors. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.`,
     disclaimerHeading: 'Disclaimer',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
@@ -315,8 +315,7 @@ export const landingTextEn = {
       // lexicon-allow-start: explicit denial of charitable-tax-treatment framing.
       {
         question: 'What exactly is Public Goods?',
-        answer:
-          'Seven percent of each cycle’s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
+        answer: `${ethDistributionFacts.publicGoodsPercentage}% of each cycle’s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.`,
       },
       // lexicon-allow-end
       {

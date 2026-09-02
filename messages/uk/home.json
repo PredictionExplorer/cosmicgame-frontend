@@ -232,10 +232,10 @@
     "metrics": {
       "signatureAllocation": "Розподіл Сигнатури",
       "signatureTooltip": {
-        "base": "ETH-частина розподілу Сигнатури; отримувач також отримує 1 000 CST і Cosmic Signature NFT.",
-        "withNft": "ETH-частина розподілу Сигнатури; отримувач також отримує 1 000 CST, Cosmic Signature NFT, а також {nftCount, plural, one {# долучений NFT} few {усі # долучені NFT} many {усі # долучених NFT} other {# долученого NFT}}.",
-        "withErc20": "ETH-частина розподілу Сигнатури; отримувач також отримує 1 000 CST, Cosmic Signature NFT, а також {erc20Count, plural, one {# долучений депозит ERC-20} few {усі # долучені депозити ERC-20} many {усі # долучених депозитів ERC-20} other {# долученого депозиту ERC-20}}.",
-        "withBoth": "ETH-частина розподілу Сигнатури; отримувач також отримує 1 000 CST, Cosmic Signature NFT, а також {nftCount, plural, one {# долучений NFT} few {усі # долучені NFT} many {усі # долучених NFT} other {# долученого NFT}} та {erc20Count, plural, one {# долучений депозит ERC-20} few {усі # долучені депозити ERC-20} many {усі # долучених депозитів ERC-20} other {# долученого депозиту ERC-20}}."
+        "base": "ETH-частина розподілу Сигнатури; отримувач також отримує 1 000 CST і {cscNftCount} Cosmic Signature NFT.",
+        "withNft": "ETH-частина розподілу Сигнатури; отримувач також отримує 1 000 CST, {cscNftCount} Cosmic Signature NFT, а також {nftCount, plural, one {# долучений NFT} few {усі # долучені NFT} many {усі # долучених NFT} other {# долученого NFT}}.",
+        "withErc20": "ETH-частина розподілу Сигнатури; отримувач також отримує 1 000 CST, {cscNftCount} Cosmic Signature NFT, а також {erc20Count, plural, one {# долучений депозит ERC-20} few {усі # долучені депозити ERC-20} many {усі # долучених депозитів ERC-20} other {# долученого депозиту ERC-20}}.",
+        "withBoth": "ETH-частина розподілу Сигнатури; отримувач також отримує 1 000 CST, {cscNftCount} Cosmic Signature NFT, а також {nftCount, plural, one {# долучений NFT} few {усі # долучені NFT} many {усі # долучених NFT} other {# долученого NFT}} та {erc20Count, plural, one {# долучений депозит ERC-20} few {усі # долучені депозити ERC-20} many {усі # долучених депозитів ERC-20} other {# долученого депозиту ERC-20}}."
       },
       "ethGesture": "ETH-жест",
       "ethGestureTooltip": "Поточна вартість жесту за ETH",
@@ -252,10 +252,10 @@
       "title": "Ваша позиція в циклі",
       "tooltip": "Показує вашу поточну позицію щодо завершального жесту та частоту зоряного відбору на основі ваших жестів у цьому циклі.",
       "leader": {
-        "base": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури ({amount} ETH, 1 000 CST, 1 Cosmic Signature NFT).",
-        "withNft": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT і {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} (див. нижче).",
-        "withErc20": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT і {erc20Count, plural, one {# долучений депозит ERC-20} few {# долучені депозити ERC-20} many {# долучених депозитів ERC-20} other {# долученого депозиту ERC-20}} (див. нижче).",
-        "withBoth": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT, {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} і {erc20Count, plural, one {# долучений депозит ERC-20} few {# долучені депозити ERC-20} many {# долучених депозитів ERC-20} other {# долученого депозиту ERC-20}} (див. нижче)."
+        "base": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури ({amount} ETH, 1 000 CST, {cscNftCount} Cosmic Signature NFT).",
+        "withNft": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, {cscNftCount} Cosmic Signature NFT і {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} (див. нижче).",
+        "withErc20": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, {cscNftCount} Cosmic Signature NFT і {erc20Count, plural, one {# долучений депозит ERC-20} few {# долучені депозити ERC-20} many {# долучених депозитів ERC-20} other {# долученого депозиту ERC-20}} (див. нижче).",
+        "withBoth": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, {cscNftCount} Cosmic Signature NFT, {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} і {erc20Count, plural, one {# долучений депозит ERC-20} few {# долучені депозити ERC-20} many {# долучених депозитів ERC-20} other {# долученого депозиту ERC-20}} (див. нижче)."
       },
       "notLeader": "Останній жест не ваш — зробіть жест ще раз, щоб знову вийти вперед, або залишайтеся серед кандидатів зоряного відбору.",
       "ethStellar": "Зоряний відбір ETH",
@@ -310,6 +310,8 @@
       "previewTitle": "Попередній розрахунок винагороди CST",
       "economicsDescription": "Чистий CST — це винагорода CST участі мінус поточна вартість CST-жесту.",
       "previewDescription": "Орієнтовна кількість динамічних CST, які ви отримаєте, якщо цей жест відбудеться. Сума залежить від часу, що минув від попереднього жесту, і кожен спосіб жесту має два захисти: максимальну вартість і мінімальну винагороду CST.",
+      "previewDescriptionV3": "Орієнтовна кількість динамічних CST, які створює цей жест. Уся сума надходить учаснику, якого ви перевершили, — а коли перевершать вас, ви отримаєте всі CST наступного жесту. До цієї суми застосовуються захист максимальної вартості та мінімальної винагороди CST.",
+      "goesToOutbid": "Повністю виплачується учаснику, якого ви перевершили; коли перевершать вас, ви отримаєте CST наступного жесту.",
       "rewardLabel": "Винагорода",
       "costLabel": "Вартість",
       "netLabel": "Чистий CST",
@@ -403,12 +405,13 @@
       "fixedCstEach": "по 1 000 CST",
       "nft": "1 Cosmic Signature NFT",
       "nftEach": "по 1 Cosmic Signature NFT",
+      "signatureNft": "{count} Cosmic Signature NFT",
       "attachedTokens": "Долучені токени (якщо є)"
     },
     "cards": {
       "signature": {
         "name": "Розподіл Сигнатури",
-        "tooltip": "Учасник, який зробив завершальний жест на момент, коли відлік дійшов до нуля, може забрати цей розподіл: ETH, 1 000 CST, Cosmic Signature NFT та долучені токени."
+        "tooltip": "Учасник, який зробив завершальний жест на момент, коли відлік дійшов до нуля, може забрати цей розподіл: ETH, 1 000 CST, {cscNftCount} Cosmic Signature NFT та долучені токени."
       },
       "publicGoods": {
         "name": "Суспільні блага",

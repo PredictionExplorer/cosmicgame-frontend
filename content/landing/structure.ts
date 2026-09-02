@@ -102,12 +102,32 @@ export const LANDING_STRUCTURE = {
   },
   tracks: {
     items: [
-      { id: 'signature-allocation', tone: 'primary', percent: '25%' },
+      {
+        id: 'signature-allocation',
+        tone: 'primary',
+        percent: `${ethDistributionFacts.mainEthPercentage}%`,
+      },
       { id: 'compounding-reserve', tone: 'aurora' },
-      { id: 'chrono-warrior', tone: 'rose', percent: '8%' },
-      { id: 'public-goods', tone: 'impact', percent: '7%' },
-      { id: 'anchor-distribution', tone: 'nebula', percent: '6%' },
-      { id: 'eth-stellar-selection', tone: 'solar', percent: '4%' },
+      {
+        id: 'chrono-warrior',
+        tone: 'rose',
+        percent: `${ethDistributionFacts.chronoWarriorEthPercentage}%`,
+      },
+      {
+        id: 'public-goods',
+        tone: 'impact',
+        percent: `${ethDistributionFacts.publicGoodsPercentage}%`,
+      },
+      {
+        id: 'anchor-distribution',
+        tone: 'nebula',
+        percent: `${ethDistributionFacts.anchorDistributionPercentage}%`,
+      },
+      {
+        id: 'eth-stellar-selection',
+        tone: 'solar',
+        percent: `${ethDistributionFacts.stellarSelectionEthPercentage}%`,
+      },
       { id: 'participant-nft-stellar-selection', tone: 'default' },
       { id: 'anchored-nft-stellar-selection', tone: 'default' },
       // The CST badge is a grouped number, so each locale formats it itself.
