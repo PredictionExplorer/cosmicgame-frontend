@@ -1,0 +1,118 @@
+{
+  "brand": {
+    "homeLabel": "Cosmic Signature 首頁",
+    "tagline": "鏈上藝術協議"
+  },
+  "primaryLabel": "主導覽",
+  "menuLabel": "開啟選單",
+  "drawerTitle": "導覽",
+  "sections": {
+    "protocol": "協議",
+    "ecosystem": "生態",
+    "myAccount": "我的帳戶"
+  },
+  "links": {
+    "gallery": {
+      "label": "畫廊",
+      "description": "瀏覽所有已銘刻的簽名作品"
+    },
+    "explore": {
+      "label": "探索"
+    },
+    "currentCycle": {
+      "label": "目前週期",
+      "description": "檢視正在塑造目前週期的即時落筆"
+    },
+    "allocationRecipients": {
+      "label": "分配名錄",
+      "description": "檢視每個週期的儲備去向"
+    },
+    "anchorDistributions": {
+      "label": "錨定配發",
+      "description": "檢視已錨定的 NFT 與配發紀錄"
+    },
+    "outreachReserve": {
+      "label": "推廣儲備",
+      "description": "檢視社群推廣動態"
+    },
+    "statistics": {
+      "label": "統計",
+      "description": "檢視協議整體指標與紀錄"
+    },
+    "contracts": {
+      "label": "合約",
+      "description": "檢視已驗證的地址與原始碼"
+    },
+    "help": {
+      "label": "說明"
+    },
+    "howItWorks": {
+      "label": "運作原理",
+      "description": "逐步了解週期機制"
+    },
+    "faq": {
+      "label": "常見問題",
+      "description": "瀏覽常見問題與解答"
+    },
+    "about": {
+      "label": "關於 Cosmic Signature",
+      "description": "了解協議背後的故事"
+    },
+    "learn": {
+      "label": "學習中心",
+      "description": "閱讀指南與深度解讀"
+    },
+    "whitePaper": {
+      "label": "白皮書",
+      "description": "協議機制與設計的完整說明"
+    },
+    "discover": {
+      "label": "探索 Cosmic Signature",
+      "description": "了解藝術、故事與協議"
+    },
+    "myDashboard": "我的儀表板",
+    "myAllocations": "我的分配",
+    "myNfts": "我的 NFT",
+    "myAnchors": "我的錨定",
+    "recipientHistory": "獲配紀錄"
+  },
+  "ecosystem": {
+    "groupLabel": "Cosmic Signature 生態",
+    "uniswap": {
+      "name": "兌換 CST",
+      "product": "Uniswap",
+      "tagline": "在 Uniswap 上用 ETH 兌換 CST",
+      "ariaLabel": "在 Uniswap 上兌換 CST",
+      "defaultLabel": "在 Uniswap 上兌換 CST",
+      "shortLabel": "兌換 CST"
+    },
+    "geckoTerminal": {
+      "ariaLabel": "在 GeckoTerminal 檢視 CST 流動性池",
+      "shortLabel": "檢視 CST 池"
+    },
+    "axiomZero": {
+      "name": "Axiom Zero",
+      "product": "NFT 市場",
+      "tagline": "在零手續費市場收藏 Cosmic Signature NFT",
+      "ariaLabel": "Axiom Zero NFT 市場",
+      "defaultLabel": "Axiom Zero 上的 NFT",
+      "menuLabel": "Axiom Zero 市場",
+      "shortLabel": "Axiom Zero"
+    },
+    "chaosZero": {
+      "name": "Chaos Zero",
+      "product": "預測市場",
+      "tagline": "預測協議每個週期的結果",
+      "ariaLabel": "前往 Chaos Zero 參與預測",
+      "defaultLabel": "在 Chaos Zero 上參與預測",
+      "menuLabel": "Chaos Zero 預測",
+      "shortLabel": "Chaos Zero"
+    }
+  },
+  "maintenance": {
+    "pendingMessage": "目前週期的分配完成後，協議將進入維護模式。參數調整完成後會重新開放。",
+    "activeMessage": "協議正在維護。參數調整完成後即可繼續落筆。",
+    "pendingLabel": "等待維護",
+    "activeLabel": "維護中"
+  }
+}

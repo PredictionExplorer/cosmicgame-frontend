@@ -1,6 +1,6 @@
 import { learnContentEn } from '@/content/learn';
 
-import { routing } from '@/i18n/routing';
+import { LOCALE_ALIASES, routing } from '@/i18n/routing';
 
 import {
   appSeoRoutes,
@@ -196,10 +196,28 @@ describe('routeUrl', () => {
 });
 
 describe('routeLanguageAlternates', () => {
-  it('emits one alternate per configured locale plus x-default', () => {
+  it('emits one alternate per configured locale and alias plus x-default', () => {
     const alternates = routeLanguageAlternates(APP_ORIGIN, '/gallery');
 
-    expect(Object.keys(alternates).sort()).toEqual([...routing.locales, 'x-default'].sort());
+    expect(Object.keys(alternates).sort()).toEqual(
+      [
+        ...routing.locales,
+        ...routing.locales.flatMap((locale) => LOCALE_ALIASES[locale]),
+        'x-default',
+      ].sort(),
+    );
+  });
+
+  it('points every alias at its locale URL', () => {
+    const alternates = routeLanguageAlternates(APP_ORIGIN, '/gallery');
+
+    for (const locale of routing.locales) {
+      for (const alias of LOCALE_ALIASES[locale]) {
+        expect(alternates[alias]).toBe(alternates[locale]);
+      }
+    }
+    expect(alternates['zh-Hant']).toBe('https://app.example.com/zh-TW/gallery');
+    expect(alternates['zh-MO']).toBe('https://app.example.com/zh-HK/gallery');
   });
 
   it('leaves the default locale unprefixed and prefixes the others', () => {

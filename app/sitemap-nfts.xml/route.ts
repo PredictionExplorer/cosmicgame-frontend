@@ -1,6 +1,7 @@
 import { networkConfig } from '@/config/networks';
 import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { languageAlternates } from '@/lib/hreflang';
 import { getAPIUrl } from '@/services/api/client';
 
 /**
@@ -63,13 +64,12 @@ async function loadRecentTokens(): Promise<SitemapTokenInfo[]> {
 function renderUrlEntry(token: SitemapTokenInfo, mediaOrigin: string): string {
   const path = `/detail/${token.TokenId}`;
   const imageLoc = xmlEscape(`${mediaOrigin}/images/new/cosmicsignature/0x${token.Seed}.png`);
-  const alternates = [
-    ...routing.locales.map(
-      (locale) =>
-        `<xhtml:link rel="alternate" hreflang="${locale}" href="${xmlEscape(localeHref(APP_ORIGIN, path, locale))}"/>`,
-    ),
-    `<xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(localeHref(APP_ORIGIN, path, routing.defaultLocale))}"/>`,
-  ].join('');
+  const alternates = Object.entries(languageAlternates(APP_ORIGIN, path))
+    .map(
+      ([hreflang, href]) =>
+        `<xhtml:link rel="alternate" hreflang="${hreflang}" href="${xmlEscape(href)}"/>`,
+    )
+    .join('');
 
   return routing.locales
     .map(

@@ -1,0 +1,38 @@
+{
+  "connect": {
+    "button": "連接錢包"
+  },
+  "groups": {
+    "popular": "熱門",
+    "more": "更多"
+  },
+  "balances": {
+    "eth": "ETH",
+    "cst": "CST",
+    "cosmicNfts": "COSMIC NFT",
+    "rwlkNfts": "RWLK NFT",
+    "anchoredCst": "已錨定 Cosmic Signature NFT",
+    "anchoredRwlk": "已錨定 RWLK NFT"
+  },
+  "labels": {
+    "loading": "載入中…",
+    "balancesHeading": "餘額",
+    "anchoredHeading": "已錨定",
+    "nftCount": "{count} 枚"
+  },
+  "account": {
+    "heading": "帳戶",
+    "myDashboard": "我的儀表板",
+    "myRewards": "我的分配",
+    "myNfts": "我的 NFT",
+    "transferCst": "轉帳 CST",
+    "addCstToMetaMask": "將 CST 添加至 MetaMask",
+    "addingCstToMetaMask": "正在添加 CST…",
+    "myAnchors": "我的錨定",
+    "winningHistory": "獲配記錄"
+  },
+  "accessibility": {
+    "copyAddress": "複製錢包地址",
+    "addressCopied": "已複製錢包地址"
+  }
+}

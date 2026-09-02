@@ -129,6 +129,86 @@ Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突�
 - [Chaos Zero](https://chaoszero.com)：面向 Cosmic Signature 周期的预测市场；每周期的问题是本周期收官时的落笔数是否高于上一周期
 - [Uniswap CST 兑换](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)：在 Arbitrum 上兑换 CST
 
+## 繁體中文（台灣）概覽
+
+Cosmic Signature 是運作於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往十餘條分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
+
+Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突變特徵沒有關聯。
+
+### 台灣繁體中文關鍵頁面
+
+- [台灣繁體中文首頁](https://cosmicsignature.com/zh-TW)：協議與鏈上藝術概覽
+- [關於](https://cosmicsignature.com/zh-TW/about)：協議主體、官方連結與名稱辨析
+- [白皮書](https://cosmicsignature.com/zh-TW/white-paper)：協議機制與設計的完整說明（台灣繁體中文與英文雙語，附 PDF）
+- [學習中心](https://cosmicsignature.com/zh-TW/learn)：演繹週期、三體藝術、錨定與公共財說明
+- [台灣繁體中文應用程式](https://app.cosmicsignature.com/zh-TW)：目前週期與落筆介面
+- [畫廊](https://app.cosmicsignature.com/zh-TW/gallery)：瀏覽已銘刻的 Cosmic Signature NFT
+- [運作原理](https://app.cosmicsignature.com/zh-TW/how-it-works)：完整協議機制
+- [常見問題](https://app.cosmicsignature.com/zh-TW/faq)：按主題整理的台灣繁體中文解答
+- [統計](https://app.cosmicsignature.com/zh-TW/statistics)：公開協議資料
+- [錨定](https://app.cosmicsignature.com/zh-TW/anchoring)：錨定規則與配發紀錄
+- [合約](https://app.cosmicsignature.com/zh-TW/contracts)：已部署合約地址
+- [安全](https://app.cosmicsignature.com/zh-TW/security)：驗證資源與參與安全說明
+- [審計](https://app.cosmicsignature.com/zh-TW/audits)：Hacken 審計報告與形式化驗證背景
+- [風險揭露](https://app.cosmicsignature.com/zh-TW/risk-disclosures)：區塊鏈、錢包與協議參與風險
+
+### 協議要點
+
+- 每個週期以 ETH 與 CST 校準窗口機制開啟；CST 窗口從 12 小時基準出發，並隨鏈上參與變化
+- 每次落筆都會按目前時間增量延長收官倒數；該增量從 1 小時起步，每有一個週期收官便增長 1%
+- 寫下收官之筆的參與者擁有 48 小時專屬收官窗口；之後任何人均可收官，實際收官者獲得簽名分配
+- 每週期儲備的 25% 進入簽名分配，8% 發往時之勇士，4% 由 3 個 ETH 星選資格共享，6% 用於錨定配發，7% 發往 Protocol Guild，約 50% 滾入下一週期
+- 絕大多數週期會銘刻 24 枚 Cosmic Signature NFT，並配套 24,000 CST；連同 3,000 CST 推廣儲備，典型固定銘刻總量為 27,000 CST，另有按落筆動態計算的參與 CST
+- 每枚 Cosmic Signature NFT 或 RandomWalk NFT 一生只能錨定一次；解錨後不再具備錨定資格
+- 未使用的 RandomWalk NFT 可附加至一筆 ETH 落筆，使該筆 ETH 落筆價格降低 50%；每枚 RandomWalk NFT 只能用於這項減免一次
+- 次級 ETH 與已附加資產設有 5 周取回期限；期限結束後，任何人都可為自己取回仍未取回的分配
+
+### 生態
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature)：Arbitrum 上不收平台費的 NFT 市場
+- [Chaos Zero](https://chaoszero.com)：面向 Cosmic Signature 週期的預測市場；每週期的問題是本週期收官時的落筆數是否高於上一週期
+- [Uniswap CST 兌換](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)：在 Arbitrum 上兌換 CST
+
+## 繁體中文（香港）概覽
+
+Cosmic Signature 是運行於 Arbitrum 的程序化鏈上藝術協議。參與者在演繹週期中落筆；每一筆都會影響週期最終的簽名作品。週期收官後，協議按公開規則將週期儲備發往十餘條分配軌道，其中包括支持以太坊核心貢獻者的 Protocol Guild。
+
+Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵沒有關聯。
+
+### 香港繁體中文關鍵頁面
+
+- [香港繁體中文主頁](https://cosmicsignature.com/zh-HK)：協議與鏈上藝術概覽
+- [關於](https://cosmicsignature.com/zh-HK/about)：協議主體、官方連結與名稱辨析
+- [白皮書](https://cosmicsignature.com/zh-HK/white-paper)：協議機制與設計的完整說明（香港繁體中文與英文雙語，附 PDF）
+- [學習中心](https://cosmicsignature.com/zh-HK/learn)：演繹週期、三體藝術、錨定與公共物品說明
+- [香港繁體中文應用程式](https://app.cosmicsignature.com/zh-HK)：目前週期與落筆介面
+- [畫廊](https://app.cosmicsignature.com/zh-HK/gallery)：瀏覽已銘刻的 Cosmic Signature NFT
+- [運作原理](https://app.cosmicsignature.com/zh-HK/how-it-works)：完整協議機制
+- [常見問題](https://app.cosmicsignature.com/zh-HK/faq)：按主題整理的香港繁體中文解答
+- [統計](https://app.cosmicsignature.com/zh-HK/statistics)：公開協議數據
+- [錨定](https://app.cosmicsignature.com/zh-HK/anchoring)：錨定規則與派發記錄
+- [合約](https://app.cosmicsignature.com/zh-HK/contracts)：已部署合約地址
+- [安全](https://app.cosmicsignature.com/zh-HK/security)：驗證資源與參與安全說明
+- [審計](https://app.cosmicsignature.com/zh-HK/audits)：Hacken 審計報告與形式化驗證背景
+- [風險披露](https://app.cosmicsignature.com/zh-HK/risk-disclosures)：區塊鏈、錢包與協議參與風險
+
+### 協議要點
+
+- 每個週期以 ETH 與 CST 校準窗口機制開啟；CST 窗口從 12 小時基準出發，並隨鏈上參與變化
+- 每次落筆都會按目前時間增量延長收官倒數；該增量從 1 小時起步，每有一個週期收官便增長 1%
+- 寫下收官之筆的參與者擁有 48 小時專屬收官窗口；之後任何人均可收官，實際收官者獲得簽名分配
+- 每週期儲備的 25% 進入簽名分配，8% 發往時之勇士，4% 由 3 個 ETH 星選資格共享，6% 用於錨定派發，7% 發往 Protocol Guild，約 50% 滾入下一週期
+- 絕大多數週期會銘刻 24 枚 Cosmic Signature NFT，並配套 24,000 CST；連同 3,000 CST 推廣儲備，典型固定銘刻總量為 27,000 CST，另有按落筆動態計算的參與 CST
+- 每枚 Cosmic Signature NFT 或 RandomWalk NFT 一生只能錨定一次；解錨後不再具備錨定資格
+- 未使用的 RandomWalk NFT 可附加至一筆 ETH 落筆，使該筆 ETH 落筆價格降低 50%；每枚 RandomWalk NFT 只能用於這項減免一次
+- 次級 ETH 與已附加資產設有 5 周取回期限；期限結束後，任何人都可為自己取回仍未取回的分配
+
+### 生態
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature)：Arbitrum 上不收平台費的 NFT 市場
+- [Chaos Zero](https://chaoszero.com)：面向 Cosmic Signature 週期的預測市場；每週期的問題是本週期收官時的落筆數是否高於上一週期
+- [Uniswap CST 兌換](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0)：在 Arbitrum 上兌換 CST
+
 ## Українська: огляд
 
 Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Учасники роблять жести протягом перформанс-циклу; кожен жест впливає на фінальну Сигнатуру циклу. Коли цикл завершується, протокол за відкритими правилами розподіляє резерв циклу за понад десятьма напрямами розподілу, серед яких Protocol Guild — механізм підтримки основних розробників Ethereum.

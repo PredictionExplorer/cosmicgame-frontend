@@ -1,0 +1,181 @@
+{
+  "error": {
+    "title": "未能載入週期數據",
+    "message": "請重新整理頁面重試。"
+  },
+  "nav": {
+    "backToHome": "返回首頁"
+  },
+  "status": {
+    "notStarted": "尚未開始"
+  },
+  "hero": {
+    "title": "第 {n} 個週期",
+    "subtitle": "開啟於 {date} · 已落筆 {count} 次",
+    "status": {
+      "openingSoon": "即將開啟",
+      "awaitingFirstGesture": "等待第一筆",
+      "readyToFinalize": "已可收官",
+      "live": "進行中"
+    },
+    "cta": {
+      "viewHomeClock": "檢視首頁時鐘",
+      "finalizeCycle": "收官",
+      "makeFirstGesture": "落下第一筆",
+      "makeGesture": "落筆"
+    },
+    "countdown": {
+      "opensIn": "週期開啟倒數",
+      "opensAt": "第 {n} 個週期將於 {date} 開啟",
+      "finalizesIn": "週期收官倒數",
+      "finalizesTooltip": "倒數歸零後，寫下收官之筆的參與者即可收官，並取回簽名分配。每一次新落筆都會延長倒數。",
+      "readyTitle": "週期已可收官",
+      "readyMessage": "收官倒數已歸零。",
+      "confirmingTitle": "正在確認收官時刻",
+      "confirmingMessage": "倒數已歸零。正在鏈上驗證最後一刻是否有新落筆延長週期。"
+    }
+  },
+  "stats": {
+    "totalGestures": {
+      "label": "落筆總次數",
+      "tooltip": "本週期的落筆總次數。每一筆也同時計入一次星選資格。"
+    },
+    "cycleReserve": {
+      "label": "週期儲備",
+      "tooltip": "簽名分配中的 ETH 部分，由寫下收官之筆的參與者取回。獲配者還將獲得 1,000 CST 與一枚 Cosmic Signature NFT。"
+    },
+    "stellarSelectionPool": {
+      "label": "星選池",
+      "tooltip": "週期收官時，這部分 ETH 將由程序化隨機選出的 {count} 位參與者均分。"
+    },
+    "publicGoods": {
+      "label": "公共財",
+      "tooltip": "每個週期，週期儲備的 {percent}% 會轉撥給 Protocol Guild。"
+    },
+    "contributedEth": {
+      "label": "ETH 貢獻",
+      "tooltip": "本週期來自社群的直接 ETH 貢獻。"
+    },
+    "attachedNfts": {
+      "label": "已附加 NFT",
+      "tooltip": "本週期社群隨落筆附加的 NFT。"
+    }
+  },
+  "sections": {
+    "allocationTracks": {
+      "title": "分配軌道",
+      "tooltip": "週期儲備如何沿各條分配軌道發放：簽名分配、時之勇士、星選、公共財、錨定配發與滾動儲備。"
+    },
+    "stellarSelectionEntries": {
+      "title": "星選資格",
+      "tooltip": "每一筆都計入一次星選資格；落筆越多，獲得 ETH 或 Cosmic Signature NFT 分配的入選頻次越高。"
+    },
+    "topEthSpenders": {
+      "title": "ETH 支出排行",
+      "tooltip": "參與者地址，按本週期落筆支出的 ETH 總額排序。"
+    },
+    "enduranceChampions": {
+      "title": "堅守冠軍",
+      "tooltip": "按參與者保持最新落筆者位置的時長排序。單次連續時長最長者將獲得一次表彰 CST 銘刻（1,000 CST），並獲配一枚 Cosmic Signature NFT。"
+    },
+    "gestureHistory": {
+      "title": "第 {n} 個週期落筆歷史",
+      "tooltip": "按時間順序記錄本週期的每一次落筆，最新的排在最前。"
+    },
+    "ethContributions": {
+      "title": "ETH 貢獻",
+      "tooltip": "本週期社群成員的直接 ETH 貢獻。"
+    },
+    "cycleRules": {
+      "title": "週期規則",
+      "tooltip": "本週期的關鍵規則與分配機制。"
+    }
+  },
+  "rules": {
+    "howItWorks": "運作原理",
+    "participation": "落筆時，你可能銘刻<em>動態的參與 CST</em>，具體數量取決於距上一筆經過的時間，並按其平方根計算。",
+    "calibration": "ETH 落筆會使 CST 校準窗口縮短約 {decreasePercent}%；CST 落筆則使其延長約 {increasePercent}%。",
+    "stellarSelection": "每一筆都計入一次星選資格。週期收官時，週期儲備的 {rafflePercent}% 將由程序化隨機選出的 {ethEntries} 位 ETH 星選獲配者均分；另有 {nftEntries} 位星選獲配者與 {anchorHolders} 位 Random Walk NFT 錨定者，各獲配一枚 Cosmic Signature NFT。",
+    "publicGoods": "每個週期，Protocol Guild 都會收到週期儲備的 {percent}%（至少 {amount} ETH）。"
+  },
+  "footer": {
+    "contractBalance": "合約餘額",
+    "cycleDuration": "週期時長",
+    "uniqueParticipants": "獨立參與者"
+  },
+  "attachedTokens": {
+    "title": "已附加代幣",
+    "tooltip": "社群隨落筆附加的 NFT 與 ERC-20 代幣，用於充實週期儲備。",
+    "erc721Tab": "ERC-721 代幣",
+    "erc20Tab": "ERC-20 代幣",
+    "erc721Empty": "本週期暫無已附加的 ERC-721 代幣。"
+  },
+  "showcase": {
+    "badge": "計入簽名分配",
+    "heading": "本週期的附加資產",
+    "cycleFallback": "目前",
+    "description": {
+      "nftOnly": "這份簡明清單記錄了隨簽名分配一同交付的社群附加資產：本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT。",
+      "erc20Only": "這份簡明清單記錄了隨簽名分配一同交付的社群附加資產：本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {erc20Count} 筆已附加的 ERC-20 代幣存入。",
+      "mixed": "這份簡明清單記錄了隨簽名分配一同交付的社群附加資產：本週期（#{cycle}）收官後，寫下收官之筆的參與者將一併獲得 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
+    },
+    "bonusReceipt": {
+      "label": "附加資產清單",
+      "nftOnly": "{nftCount} 枚 ERC-721 代幣",
+      "erc20Only": "{erc20Count} 筆 ERC-20 存入",
+      "mixed": "{nftCount} 枚 ERC-721 代幣 + {erc20Count} 筆 ERC-20 存入"
+    },
+    "summary": {
+      "assetsIncluded": "包含資產",
+      "cycle": "週期",
+      "cycleValue": "#{cycle}",
+      "preview": "預覽",
+      "previewAll": "全部可見",
+      "previewCount": "{visible} / {total}",
+      "recipientRule": "獲配規則",
+      "recipientRuleValue": "收官之筆"
+    },
+    "remainder": {
+      "nftOnly": "此處僅展示精選清單預覽，完整週期明細中還有 {nftCount} 枚已附加 NFT。",
+      "erc20Only": "此處僅展示精選清單預覽，完整週期明細中還有 {erc20Count} 筆已附加的 ERC-20 代幣存入。",
+      "mixed": "此處僅展示精選清單預覽，完整週期明細中還有 {nftCount} 枚已附加 NFT 與 {erc20Count} 筆 ERC-20 代幣存入。"
+    },
+    "nftCard": {
+      "badge": "ERC-721",
+      "fallbackTitle": "NFT #{id}",
+      "fallbackTitleUnknown": "已附加 NFT",
+      "fallbackSubtitle": "社群附加的 ERC-721",
+      "imageAlt": "已附加 NFT {name}",
+      "imageAltFallback": "已附加 NFT 分配",
+      "mediaAria": "{label}：{title}",
+      "floorEstimate": "地板價約 {price} {currency}",
+      "floorTooltip": "此為系列地板價估計，並非對這枚代幣的估值。",
+      "metadataUnavailable": "後設資料暫不可用。這枚已附加 NFT 仍計入本週期分配。",
+      "openSea": "OpenSea",
+      "explorer": "區塊瀏覽器",
+      "links": {
+        "project": "檢視 NFT",
+        "opensea": "在 OpenSea 上檢視",
+        "explorer": "檢視合約"
+      }
+    },
+    "erc20Card": {
+      "badge": "ERC-20 存入",
+      "badgeTooltipLogo": "代幣圖示來源：{source}。判斷其價值前，請先核對代幣地址。",
+      "badgeTooltipDefault": "這筆 ERC-20 代幣存入已附加至本週期，收官後將交付給簽名分配獲配者。",
+      "symbolFallback": "ERC20",
+      "nameFallback": "已附加 ERC-20 代幣",
+      "logoSourceFallback": "精選代幣後設資料",
+      "unknownAmount": "數量未知",
+      "viewToken": "檢視 {symbol} 代幣",
+      "logoAlt": "{token} 代幣圖示"
+    },
+    "facts": {
+      "tokenId": "代幣 ID",
+      "tokenIdValue": "#{id}",
+      "token": "代幣",
+      "attachedBy": "附加者",
+      "unknown": "未知"
+    }
+  }
+}

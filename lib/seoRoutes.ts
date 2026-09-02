@@ -2,8 +2,7 @@ import type { MetadataRoute } from 'next';
 
 import { learnContentEn } from '@/content/learn';
 
-import { routing } from '@/i18n/routing';
-import { localeHref } from '@/lib/hostRouting';
+import { languageAlternates } from '@/lib/hreflang';
 
 export type SeoHost = 'app' | 'landing';
 export type SeoRouteKind = 'content' | 'data' | 'tool' | 'personal' | 'admin' | 'dynamic';
@@ -210,12 +209,7 @@ export function routeUrl(baseUrl: string, path: string): string {
   return `${baseUrl}${path}`;
 }
 
+/** Sitemap `alternates.languages` for a route — see lib/hreflang.ts. */
 export function routeLanguageAlternates(baseUrl: string, path: string): Record<string, string> {
-  const normalizedPath = path || '/';
-  return {
-    ...Object.fromEntries(
-      routing.locales.map((locale) => [locale, localeHref(baseUrl, normalizedPath, locale)]),
-    ),
-    'x-default': localeHref(baseUrl, normalizedPath, routing.defaultLocale),
-  };
+  return languageAlternates(baseUrl, path);
 }

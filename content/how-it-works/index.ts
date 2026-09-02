@@ -4,6 +4,8 @@ import { HOW_IT_WORKS_STRUCTURE, type HowItWorksText } from './structure';
 import { howItWorksTextEn } from './text.en';
 import { howItWorksTextUk } from './text.uk';
 import { howItWorksTextZh } from './text.zh';
+import { howItWorksTextZhHk } from './text.zh-HK';
+import { howItWorksTextZhTw } from './text.zh-TW';
 import type { HowItWorksContent } from './types';
 
 export * from './types';
@@ -67,11 +69,15 @@ function buildHowItWorksContent(text: HowItWorksText): HowItWorksContent {
 
 export const howItWorksContentEn: HowItWorksContent = buildHowItWorksContent(howItWorksTextEn);
 export const howItWorksContentZh: HowItWorksContent = buildHowItWorksContent(howItWorksTextZh);
+export const howItWorksContentZhTw: HowItWorksContent = buildHowItWorksContent(howItWorksTextZhTw);
+export const howItWorksContentZhHk: HowItWorksContent = buildHowItWorksContent(howItWorksTextZhHk);
 export const howItWorksContentUk: HowItWorksContent = buildHowItWorksContent(howItWorksTextUk);
 
 const HOW_IT_WORKS_CONTENT: LocaleRecord<HowItWorksContent> = {
   en: howItWorksContentEn,
   zh: howItWorksContentZh,
+  'zh-TW': howItWorksContentZhTw,
+  'zh-HK': howItWorksContentZhHk,
   uk: howItWorksContentUk,
 };
 

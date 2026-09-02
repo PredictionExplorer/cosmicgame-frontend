@@ -2,9 +2,22 @@ import { readFile } from 'node:fs/promises';
 
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
+/**
+ * Checked-in weight-700 subsets for the scripts next/og's built-in Latin
+ * fonts cannot render. Each Chinese locale gets the Noto Sans face whose
+ * glyph forms match its regional standard (SC / TC / HK), regenerated
+ * together by `npm run og:fonts` (scripts/build-og-fonts.ts) from the copy in
+ * `messages/<locale>/seo.json`. Licenses: THIRD_PARTY_NOTICES.md.
+ */
 export const CJK_OG_FONT_NAME = 'Noto Sans SC';
 export const CJK_OG_FONT_FILE = 'assets/fonts/NotoSansSC-700.subset.ttf';
 export const CJK_OG_FONT_LICENSE = 'assets/fonts/OFL-NotoSansCJK.txt';
+
+export const CJK_TC_OG_FONT_NAME = 'Noto Sans TC';
+export const CJK_TC_OG_FONT_FILE = 'assets/fonts/NotoSansTC-700.subset.ttf';
+
+export const CJK_HK_OG_FONT_NAME = 'Noto Sans HK';
+export const CJK_HK_OG_FONT_FILE = 'assets/fonts/NotoSansHK-700.subset.ttf';
 
 export const CYRILLIC_OG_FONT_NAME = 'Onest';
 export const CYRILLIC_OG_FONT_FILE = 'assets/fonts/Onest-700.subset.ttf';
@@ -28,16 +41,16 @@ export interface OgTypography {
   readonly cjk: boolean;
 }
 
+const cjkTypography = (name: string, fileName: string): OgTypography => ({
+  font: { name, file: new URL(`../../assets/fonts/${fileName}`, import.meta.url), weight: 700 },
+  cjk: true,
+});
+
 const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
   en: { font: null, cjk: false },
-  zh: {
-    font: {
-      name: CJK_OG_FONT_NAME,
-      file: new URL('../../assets/fonts/NotoSansSC-700.subset.ttf', import.meta.url),
-      weight: 700,
-    },
-    cjk: true,
-  },
+  zh: cjkTypography(CJK_OG_FONT_NAME, 'NotoSansSC-700.subset.ttf'),
+  'zh-TW': cjkTypography(CJK_TC_OG_FONT_NAME, 'NotoSansTC-700.subset.ttf'),
+  'zh-HK': cjkTypography(CJK_HK_OG_FONT_NAME, 'NotoSansHK-700.subset.ttf'),
   uk: {
     // Same face as the on-page Ukrainian display headings (lib/fonts.ts).
     font: {

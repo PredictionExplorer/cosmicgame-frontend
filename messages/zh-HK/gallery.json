@@ -1,0 +1,120 @@
+{
+  "error": {
+    "title": "無法載入銘刻檔案",
+    "message": "未能讀取 Cosmic Signature 藏品列表。請重試以載入檔案。"
+  },
+  "jsonLd": {
+    "name": "Cosmic Signature 畫廊"
+  },
+  "page": {
+    "eyebrowImprinted": "作品集 · 已銘刻 {count} 枚 NFT",
+    "eyebrowLive": "作品集 · 即時",
+    "title": "NFT 畫廊",
+    "subtitle": "瀏覽各週期銘刻的全部 Cosmic Signature NFT"
+  },
+  "intro": {
+    "badge": "生成藝術檔案",
+    "description": "每枚 Cosmic Signature NFT 都是獨一無二的生成藝術，由鏈上種子經三體問題物理模擬推演而成。通常每個週期會銘刻 24 枚新 NFT：4 枚角色 NFT，10 枚經參與者 NFT 星選發放，另有 10 枚經錨定 NFT 星選發放給 Random Walk NFT 錨定者。"
+  },
+  "featured": {
+    "viewAria": "查看 Cosmic Signature {id}",
+    "alt": "Cosmic Signature 作品 {id}",
+    "emptyHint": "索引到 NFT 後，真實作品會隨即在此呈現。",
+    "badgeImprint": "精選銘刻",
+    "badgeArchive": "檔案",
+    "awaitingMetadata": "等待元數據"
+  },
+  "hero": {
+    "totalImprinted": {
+      "label": "銘刻總數",
+      "tooltip": "所有週期累計銘刻的 COSMIC NFT 總數。"
+    },
+    "currentlyAnchored": {
+      "label": "目前已錨定",
+      "tooltip": "已錨定至協議的 NFT，正在為持有者累積錨定派發。"
+    },
+    "namedNfts": {
+      "label": "已命名 NFT",
+      "tooltip": "由持有者賦予專屬名稱的 NFT。"
+    },
+    "cycles": {
+      "label": "週期數",
+      "tooltip": "銘刻過 NFT 的週期數量。"
+    }
+  },
+  "card": {
+    "alt": "Cosmic Signature {id}",
+    "unnamed": "未命名",
+    "age": {
+      "justNow": "剛剛",
+      "minutes": "{count} 分鐘前",
+      "hours": "{count} 小時前",
+      "days": "{count} 天前",
+      "months": "{count} 個月前",
+      "years": "{count} 年前"
+    },
+    "tooltips": {
+      "round": "銘刻於第 {round} 個週期。",
+      "anchored": "目前已錨定，正在累積錨定派發。",
+      "customName": "這枚 NFT 已設定專屬名稱。",
+      "identifier": "這枚 COSMIC NFT 的唯一順序編號。",
+      "mintedOn": "銘刻於 {date}。"
+    }
+  },
+  "filters": {
+    "ariaLabel": "篩選 NFT",
+    "all": {
+      "label": "全部",
+      "tooltip": "顯示作品集中的全部 NFT。"
+    },
+    "anchored": {
+      "label": "已錨定",
+      "tooltip": "目前已錨定、正在累積錨定派發的 NFT。"
+    },
+    "named": {
+      "label": "已命名",
+      "tooltip": "由持有者賦予專屬名稱的 NFT。"
+    }
+  },
+  "sort": {
+    "ariaLabel": "排序方式",
+    "tooltip": "調整 NFT 的顯示順序。",
+    "newest": "最新在前",
+    "oldest": "最早在前",
+    "cycleDesc": "週期（從高到低）",
+    "cycleAsc": "週期（從低到高）",
+    "rarity": "最稀有在前",
+    "chaosDesc": "混沌度（從高到低）",
+    "chaosAsc": "混沌度（從低到高）",
+    "syzygiesDesc": "連珠最多在前"
+  },
+  "list": {
+    "headers": {
+      "artwork": "作品",
+      "token": "代幣",
+      "structure": "結構",
+      "palette": "調色",
+      "spectral": "光譜型",
+      "chaos": "混沌度",
+      "fate": "命運",
+      "allocation": "分配",
+      "cycle": "週期",
+      "age": "銘刻時間"
+    }
+  },
+  "view": {
+    "ariaLabel": "視圖模式",
+    "grid": "網格視圖",
+    "list": "列表視圖"
+  },
+  "pagination": {
+    "showing": "共 <value>{total}</value> 枚 NFT，目前顯示第 <value>{start}</value> 至 <value>{end}</value> 枚",
+    "perPage": "每頁",
+    "perPageAria": "每頁顯示數量",
+    "perPageTooltip": "每頁顯示的 NFT 數量。"
+  },
+  "empty": {
+    "title": "未找到 NFT",
+    "description": "試試調整搜尋或篩選條件。"
+  }
+}

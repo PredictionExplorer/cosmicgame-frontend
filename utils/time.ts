@@ -22,22 +22,39 @@ const ZH_RELATIVE_UNITS: Record<RelativeTimeUnit, string> = {
   year: '年',
 };
 
+/** Traditional-script units, shared by Taiwan and Hong Kong. */
+const ZH_HANT_RELATIVE_UNITS: Record<RelativeTimeUnit, string> = {
+  minute: '分鐘',
+  hour: '小時',
+  day: '天',
+  month: '個月',
+  year: '年',
+};
+
+/**
+ * Chinese has no plural inflection, so every count shares one form; the
+ * style guides ask for a space between the numeral and the CJK unit
+ * ("2 个月前" / "2 個月前") and "刚刚" / "剛剛" for the just-now case.
+ */
+const chineseRelativeTime = (units: Record<RelativeTimeUnit, string>, justNow: string) => ({
+  justNow,
+  ago: (count: number, unit: RelativeTimeUnit) => `${count} ${units[unit]}前`,
+});
+
 /**
  * `en` keeps the historical forms ("2 months ago", "1 year ago", "just now");
- * `zh` follows docs/i18n/style-guide-zh.md §4 with CJK–Latin spacing
- * ("2 个月前", "刚刚"). Chinese has no plural inflection, so both counts
- * share one form. `uk` delegates to `Intl.RelativeTimeFormat`, which owns the
- * four-way plural agreement ("1 хвилину", "2 хвилини", "5 хвилин тому").
+ * the Chinese locales follow their style guides' §4 with CJK–Latin spacing.
+ * `uk` delegates to `Intl.RelativeTimeFormat`, which owns the four-way plural
+ * agreement ("1 хвилину", "2 хвилини", "5 хвилин тому").
  */
 const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
   en: {
     justNow: 'just now',
     ago: (count, unit) => `${count} ${unit}${count === 1 ? '' : 's'} ago`,
   },
-  zh: {
-    justNow: '刚刚',
-    ago: (count, unit) => `${count} ${ZH_RELATIVE_UNITS[unit]}前`,
-  },
+  zh: chineseRelativeTime(ZH_RELATIVE_UNITS, '刚刚'),
+  'zh-TW': chineseRelativeTime(ZH_HANT_RELATIVE_UNITS, '剛剛'),
+  'zh-HK': chineseRelativeTime(ZH_HANT_RELATIVE_UNITS, '剛剛'),
   uk: {
     justNow: 'щойно',
     ago: (count, unit) =>
@@ -78,6 +95,8 @@ const longIsoDateLabel = (locale: string) => (isoDate: string) =>
 const ISO_DATE_LABEL_FORMATS: LocaleRecord<(isoDate: string) => string> = {
   en: (isoDate) => isoDate,
   zh: longIsoDateLabel('zh'),
+  'zh-TW': longIsoDateLabel('zh-TW'),
+  'zh-HK': longIsoDateLabel('zh-HK'),
   uk: longIsoDateLabel('uk'),
 };
 

@@ -1,0 +1,40 @@
+{
+  "faqPage": {
+    "heading": "釋疑",
+    "description": "坦率解答關於 Cosmic Signature 的重要問題：協議是什麼、落筆如何運作，以及它不是什麼。"
+  },
+  "languageSwitcher": {
+    "label": "語言"
+  },
+  "accessibility": {
+    "skipToMain": "跳至主要內容",
+    "breadcrumb": "麵包屑導航",
+    "footer": "頁腳導航"
+  },
+  "breadcrumbs": {
+    "home": "主頁",
+    "gallery": "畫廊"
+  },
+  "status": {
+    "loading": "載入中",
+    "loadingEllipsis": "載入中…",
+    "loadingDots": "載入中…",
+    "noData": "暫無數據",
+    "nothingHere": "暫無內容"
+  },
+  "actions": {
+    "copyAddress": "複製地址",
+    "addressCopied": "已複製地址",
+    "copied": "已複製",
+    "cancel": "取消",
+    "close": "關閉"
+  },
+  "externalLink": {
+    "title": "即將離開 Cosmic Signature",
+    "description": "此連結來自參與者儲存在鏈上的訊息，未經審核或驗證。請確認下方網址無誤。",
+    "copy": "複製連結",
+    "copied": "已複製連結",
+    "warning": "切勿在外部網站輸入錢包助記詞或私鑰。",
+    "open": "打開連結"
+  }
+}

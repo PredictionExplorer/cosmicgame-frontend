@@ -29,10 +29,13 @@
     "indexnow:submit": "tsx scripts/indexnow-submit.ts",
     "i18n:parity": "tsx scripts/i18n-parity.ts",
     "i18n:strict": "tsx scripts/i18n-parity.ts --strict",
-    "i18n:check": "npm run i18n:strict && npm run terminology:check && npm run lexicon:scan",
+    "i18n:conventions": "tsx scripts/i18n-script-conventions.ts",
+    "i18n:check": "npm run i18n:strict && npm run i18n:conventions && npm run terminology:check && npm run lexicon:scan",
+    "i18n:derive": "tsx scripts/i18n-derive-variant.ts",
     "terminology:check": "tsx scripts/terminology-consistency.ts",
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "white-paper:pdf": "tsx scripts/generate-white-paper-pdf.ts",
+    "og:fonts": "tsx scripts/build-og-fonts.ts",
     "prepare": "husky"
   },
   "dependencies": {
@@ -107,6 +110,7 @@
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
     "@formatjs/icu-messageformat-parser": "^3.5.17",
+    "@formatjs/intl-localematcher": "^0.8.13",
     "@next/bundle-analyzer": "^16.2.4",
     "@playwright/test": "^1.58.2",
     "@testing-library/dom": "^10.4.1",
@@ -129,7 +133,9 @@
     "jest-axe": "^10.0.0",
     "jest-environment-jsdom": "^30.4.0",
     "lint-staged": "^16.3.2",
+    "opencc-js": "^1.4.2",
     "prettier": "^3.8.1",
+    "subset-font": "^2.7.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.11",
     "typescript": "^5.9.3"

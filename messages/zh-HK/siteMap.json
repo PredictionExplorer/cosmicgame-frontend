@@ -1,0 +1,192 @@
+{
+  "page": {
+    "title": "網站地圖",
+    "subtitle": "快速訪問帳戶頁面和公開協議數據。",
+    "home": "主頁",
+    "jsonLdName": "Cosmic Signature 網站地圖"
+  },
+  "sections": {
+    "personal": {
+      "title": "個人工具",
+      "description": "這些錢包專屬頁面供已連接錢包的參與者使用，不編入搜尋索引，也不會出現在 XML 網站地圖中。",
+      "navLabel": "個人工具"
+    },
+    "system": {
+      "title": "公開協議頁面",
+      "description": "查看公開榜單、派發、統計、合約與幫助內容。",
+      "navLabel": "系統與幫助頁面"
+    },
+    "data": {
+      "title": "協議數據頁面",
+      "description": "XML 網站地圖中的所有公開數據路由均彙總於此，便於瀏覽與抓取。",
+      "navLabel": "協議數據頁面"
+    },
+    "ecosystem": {
+      "title": "生態",
+      "description": "外部產品包括 Axiom Zero NFT 市場、Chaos Zero 預測市場，以及 Uniswap 上的 CST 兌換服務。",
+      "navLabel": "生態產品"
+    }
+  },
+  "links": {
+    "myNfts": {
+      "label": "我的 NFT",
+      "description": "錢包專屬的 NFT 頁面，不編入索引。"
+    },
+    "myAllocations": {
+      "label": "我的未取回分配",
+      "description": "用於取回分配的錢包專屬頁面，不編入索引。"
+    },
+    "myAnchors": {
+      "label": "我的錨定",
+      "description": "錢包專屬的錨定頁面，不編入索引。"
+    },
+    "about": {
+      "label": "關於 Cosmic Signature",
+      "description": "了解項目主體與品牌資訊。"
+    },
+    "learn": {
+      "label": "Cosmic Signature 學習中心",
+      "description": "提供便於讀者閱讀、便於 AI 和搜尋系統抓取的內容。"
+    },
+    "whatIsCosmicSignature": {
+      "label": "什麼是 Cosmic Signature？",
+      "description": "以通俗語言說明協議。"
+    },
+    "threeBodyArt": {
+      "label": "三體 NFT 藝術指南",
+      "description": "了解確定性物理如何生成簽名 NFT。"
+    },
+    "gallery": {
+      "label": "Cosmic Signature 畫廊",
+      "description": "確定性 NFT 藝術作品檔案。"
+    },
+    "currentCycle": {
+      "label": "目前演繹週期",
+      "description": "查看即時週期狀態與落筆資訊。"
+    },
+    "howItWorks": {
+      "label": "運作原理",
+      "description": "逐步了解週期機制。"
+    },
+    "statistics": {
+      "label": "協議統計",
+      "description": "查看公開協議指標與數據來源。"
+    },
+    "contracts": {
+      "label": "Cosmic Signature 合約",
+      "description": "已驗證的 Arbitrum 合約地址。"
+    },
+    "sourceCode": {
+      "label": "源代碼",
+      "description": "渲染管線與源代碼資源。"
+    },
+    "security": {
+      "label": "安全",
+      "description": "安全模型與驗證資源。"
+    },
+    "audits": {
+      "label": "審計",
+      "description": "審計與形式化驗證狀態。"
+    },
+    "riskDisclosures": {
+      "label": "風險披露",
+      "description": "區塊鏈風險與參與者須知。"
+    },
+    "faq": {
+      "label": "Cosmic Signature 常見問題",
+      "description": "協議機制的常見問答。"
+    },
+    "terms": {
+      "label": "服務條款",
+      "description": "使用應用程式與參與協議時適用的法律條款。"
+    },
+    "privacy": {
+      "label": "私隱政策",
+      "description": "錢包數據、分析與區塊鏈透明度說明。"
+    },
+    "allocationRecipients": {
+      "label": "分配名錄",
+      "description": "查看每個週期的儲備去向。"
+    },
+    "anchorDistributions": {
+      "label": "錨定派發",
+      "description": "查看已錨定的 NFT 及其派發。"
+    },
+    "outreachReserve": {
+      "label": "推廣儲備",
+      "description": "社區推廣 CST 動態。"
+    },
+    "imprint": {
+      "label": "銘刻",
+      "description": "新代幣銘刻介面。"
+    },
+    "ethContributions": {
+      "label": "ETH 貢獻",
+      "description": "ETH 貢獻記錄。"
+    },
+    "attachedNfts": {
+      "label": "已附加 NFT",
+      "description": "各週期中附加到落筆的 NFT。"
+    },
+    "finalizedAllocations": {
+      "label": "已收官週期的分配",
+      "description": "週期收官後的分配記錄。"
+    },
+    "namedNfts": {
+      "label": "已命名 NFT",
+      "description": "由所有者命名的 NFT。"
+    },
+    "usedRwlkNfts": {
+      "label": "已使用的 Random Walk NFT",
+      "description": "已用於獲得落筆價格折扣的 Random Walk NFT。"
+    },
+    "coordinationChanges": {
+      "label": "協調變更",
+      "description": "協議參數變更記錄。"
+    },
+    "publicGoodsContributions": {
+      "label": "公共物品資助",
+      "description": "按週期記錄公共物品分配。"
+    },
+    "voluntaryPublicGoods": {
+      "label": "自願公共物品資助",
+      "description": "直接存入金庫的自願貢獻。"
+    },
+    "publicGoodsRetrievals": {
+      "label": "公共物品取回",
+      "description": "從公共物品金庫轉撥的資金。"
+    },
+    "participationStats": {
+      "label": "統計：參與",
+      "description": "參與者與落筆分析。"
+    },
+    "tokenStats": {
+      "label": "統計：代幣",
+      "description": "CST 與 NFT 供應量分析。"
+    },
+    "anchoringStats": {
+      "label": "統計：錨定",
+      "description": "錨定總量與歷史記錄。"
+    },
+    "activityStats": {
+      "label": "統計：活動",
+      "description": "週期活動與時間分析。"
+    },
+    "performanceStats": {
+      "label": "統計：表現",
+      "description": "週期記錄與表現分析。"
+    },
+    "axiomZero": {
+      "label": "Axiom Zero 市場",
+      "description": "面向 Cosmic Signature 與 Random Walk 的零手續費 NFT 市場。"
+    },
+    "chaosZero": {
+      "label": "Chaos Zero 預測",
+      "description": "針對每個演繹週期的預測市場。"
+    },
+    "uniswap": {
+      "label": "在 Uniswap 上兌換 CST",
+      "description": "在 Arbitrum 上用 ETH 兌換 CST。"
+    }
+  }
+}

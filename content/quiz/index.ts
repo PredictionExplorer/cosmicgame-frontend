@@ -9,6 +9,8 @@ import {
 import { quizTextEn } from './text.en';
 import { quizTextUk } from './text.uk';
 import { quizTextZh } from './text.zh';
+import { quizTextZhHk } from './text.zh-HK';
+import { quizTextZhTw } from './text.zh-TW';
 import type { QuizContent, QuizOption, QuizQuestion, QuizTier, QuizTierId } from './types';
 import { QUIZ_TIER_IDS } from './types';
 
@@ -50,11 +52,15 @@ function buildQuizContent(text: QuizText): QuizContent {
 
 export const quizContentEn: QuizContent = buildQuizContent(quizTextEn);
 export const quizContentZh: QuizContent = buildQuizContent(quizTextZh);
+export const quizContentZhTw: QuizContent = buildQuizContent(quizTextZhTw);
+export const quizContentZhHk: QuizContent = buildQuizContent(quizTextZhHk);
 export const quizContentUk: QuizContent = buildQuizContent(quizTextUk);
 
 const QUIZ_CONTENT: LocaleRecord<QuizContent> = {
   en: quizContentEn,
   zh: quizContentZh,
+  'zh-TW': quizContentZhTw,
+  'zh-HK': quizContentZhHk,
   uk: quizContentUk,
 };
 

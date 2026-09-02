@@ -5,15 +5,20 @@ import { useEffect } from 'react';
 import enErrors from '@/messages/en/errors.json';
 import ukErrors from '@/messages/uk/errors.json';
 import zhErrors from '@/messages/zh/errors.json';
+import zhHkErrors from '@/messages/zh-HK/errors.json';
+import zhTwErrors from '@/messages/zh-TW/errors.json';
 
-import { isAppLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
+import { normalizeLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing } from '@/i18n/routing';
+import { splitLocalePrefix } from '@/lib/hostRouting';
 import { reportError } from '@/utils/errors';
 
 const ERROR_CATALOGS: LocaleRecord<typeof enErrors> = {
   en: enErrors,
   zh: zhErrors,
+  'zh-TW': zhTwErrors,
+  'zh-HK': zhHkErrors,
   uk: ukErrors,
 };
 
@@ -81,11 +86,12 @@ export default function GlobalError({
 
 /**
  * `localePrefix: 'as-needed'` means only the default locale goes unprefixed,
- * so the first path segment is enough. The document `lang` attribute is
- * unusable here: React still owns the old `<html>` at the moment this renders.
+ * so the URL prefix is enough (matched longest-first and case-insensitively,
+ * like the proxy). The document `lang` attribute is unusable here: React still
+ * owns the old `<html>` at the moment this renders.
  */
 function resolveLocaleFromLocation(): AppLocale {
   if (typeof window === 'undefined') return routing.defaultLocale;
-  const [, first] = window.location.pathname.split('/');
-  return isAppLocale(first) ? first : routing.defaultLocale;
+  const { locale } = splitLocalePrefix(window.location.pathname);
+  return normalizeLocale(locale);
 }

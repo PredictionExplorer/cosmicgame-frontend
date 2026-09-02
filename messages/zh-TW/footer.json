@@ -1,0 +1,43 @@
+{
+  "tagline": "Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。每一筆，都在塑造這一週期最終的簽名。",
+  "sections": {
+    "protocol": "協議",
+    "explore": "探索",
+    "ecosystem": "生態",
+    "resources": "資源",
+    "community": "社群"
+  },
+  "links": {
+    "gallery": "畫廊",
+    "currentCycle": "目前週期",
+    "statistics": "統計",
+    "contracts": "合約",
+    "sourceCode": "原始碼",
+    "allocationRecipients": "分配名錄",
+    "anchorDistributions": "錨定配發",
+    "outreachReserve": "推廣儲備",
+    "howItWorks": "運作原理",
+    "faq": "常見問題",
+    "axiomZero": "Axiom Zero 市場",
+    "chaosZero": "Chaos Zero 預測",
+    "uniswap": "在 Uniswap 上兌換 CST",
+    "geckoTerminal": "在 GeckoTerminal 檢視 CST 池",
+    "about": "關於",
+    "learn": "學習中心",
+    "whitePaper": "白皮書",
+    "audits": "安全審計",
+    "siteMap": "網站導覽",
+    "protocolGuild": "Protocol Guild",
+    "twitter": "X（Twitter）",
+    "discord": "Discord",
+    "discover": "探索",
+    "terms": "服務條款",
+    "privacy": "隱私權政策"
+  },
+  "social": {
+    "twitterLabel": "X（Twitter）",
+    "discordLabel": "Discord"
+  },
+  "copyright": "© {year} Cosmic Signature · 專案自有材料 · CC0 1.0",
+  "colophon": "CC0 · 已驗證 · 可復現"
+}

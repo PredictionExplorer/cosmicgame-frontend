@@ -18,6 +18,8 @@ import type { TranslatedLocale } from '../i18n/routing';
 import { buildTermPattern, type TermMatcher } from './locale-text-matchers';
 import { UK_TERMINOLOGY_RULES } from './terminology/uk';
 import { ZH_TERMINOLOGY_RULES } from './terminology/zh';
+import { ZH_HK_TERMINOLOGY_RULES } from './terminology/zh-HK';
+import { ZH_TW_TERMINOLOGY_RULES } from './terminology/zh-TW';
 
 export interface TerminologyRule {
   /** English concept name used in diagnostics. */
@@ -49,6 +51,16 @@ export const TERMINOLOGY_PACKS: Record<TranslatedLocale, TerminologyPack> = {
     glossary: 'docs/i18n/glossary-zh.md',
     matcher: 'cjk-substring',
     rules: ZH_TERMINOLOGY_RULES,
+  },
+  'zh-TW': {
+    glossary: 'docs/i18n/glossary-zh-TW.md',
+    matcher: 'cjk-substring',
+    rules: ZH_TW_TERMINOLOGY_RULES,
+  },
+  'zh-HK': {
+    glossary: 'docs/i18n/glossary-zh-HK.md',
+    matcher: 'cjk-substring',
+    rules: ZH_HK_TERMINOLOGY_RULES,
   },
   uk: {
     glossary: 'docs/i18n/glossary-uk.md',

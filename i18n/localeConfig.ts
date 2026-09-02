@@ -71,6 +71,30 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     lowercaseMidSentence: false,
     showRawProviderErrors: false,
   },
+  'zh-TW': {
+    intlLocale: 'zh-TW',
+    jsonLdInLanguage: 'zh-Hant-TW',
+    ogLocale: 'zh_TW',
+    textDirection: 'ltr',
+    wordSpacing: false,
+    // CLDR week data: Taiwan calendars start on Sunday (mainland on Monday).
+    weekStartsMonday: false,
+    ellipsis: '…',
+    lowercaseMidSentence: false,
+    showRawProviderErrors: false,
+  },
+  'zh-HK': {
+    intlLocale: 'zh-HK',
+    jsonLdInLanguage: 'zh-Hant-HK',
+    ogLocale: 'zh_HK',
+    textDirection: 'ltr',
+    wordSpacing: false,
+    // CLDR week data: Hong Kong calendars start on Sunday.
+    weekStartsMonday: false,
+    ellipsis: '…',
+    lowercaseMidSentence: false,
+    showRawProviderErrors: false,
+  },
   uk: {
     intlLocale: 'uk-UA',
     jsonLdInLanguage: 'uk',

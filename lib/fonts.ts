@@ -1,5 +1,5 @@
 import localFont from 'next/font/local';
-import { Inter, Noto_Sans_SC, Onest } from 'next/font/google';
+import { Inter, Noto_Sans_HK, Noto_Sans_SC, Noto_Sans_TC, Onest } from 'next/font/google';
 
 export const clashDisplay = localFont({
   src: [
@@ -34,7 +34,7 @@ export const inter = Inter({
 });
 
 /**
- * CJK companion face for the Chinese locale (docs/i18n/README.md §5).
+ * CJK companion face for the Simplified Chinese locale (docs/i18n/README.md §5).
  *
  * Clash Display and Inter carry no CJK glyphs, so Chinese text falls through
  * to this face. Google serves Noto Sans SC as ~100 small `unicode-range`
@@ -49,6 +49,35 @@ export const notoSansSC = Noto_Sans_SC({
   display: 'optional',
   preload: false,
   fallback: ['PingFang SC', 'Microsoft YaHei', 'system-ui', 'sans-serif'],
+});
+
+/**
+ * Traditional Chinese companions. The three Noto Sans CJK cuts share one
+ * design but differ in glyph forms: SC follows the mainland standard, TC the
+ * Taiwan Ministry of Education standard, HK the Hong Kong 常用字字形表. A
+ * Hong Kong reader shown TC forms (or a Taiwan reader shown HK forms) sees
+ * text that is legible but subtly "wrong", the typographic equivalent of a
+ * foreign accent — so each Traditional locale gets its own cut, swapped in
+ * through `--cjk-font-stack` by the `html:lang()` rules in styles/global.css.
+ * Same loading policy as Noto Sans SC: unicode-range slices fetched on
+ * demand, never preloaded, `display: optional`.
+ */
+export const notoSansTC = Noto_Sans_TC({
+  weight: 'variable',
+  subsets: ['latin'],
+  variable: '--font-noto-tc',
+  display: 'optional',
+  preload: false,
+  fallback: ['PingFang TC', 'Microsoft JhengHei', 'system-ui', 'sans-serif'],
+});
+
+export const notoSansHK = Noto_Sans_HK({
+  weight: 'variable',
+  subsets: ['latin'],
+  variable: '--font-noto-hk',
+  display: 'optional',
+  preload: false,
+  fallback: ['PingFang HK', 'Microsoft JhengHei', 'system-ui', 'sans-serif'],
 });
 
 /**

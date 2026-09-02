@@ -1,0 +1,68 @@
+{
+  "timer": {
+    "cycle": {
+      "current": "目前週期",
+      "numbered": "第 {number} 個週期",
+      "generic": "演繹週期"
+    },
+    "phases": {
+      "loading": {
+        "title": "正在同步週期倒數",
+        "body": "正在讀取協議時間，請稍候。"
+      },
+      "openingSoon": {
+        "title": "{cycle}即將開啟",
+        "body": "下一週期即將開啟。倒數歸零後即可落筆。"
+      },
+      "waitingFirstGesture": {
+        "title": "{cycle}正等待第一筆",
+        "body": "落下第一筆後，收官倒數便會啟動，下一幅簽名作品也將由此成形。"
+      },
+      "approach": {
+        "title": "{cycle}距收官還有",
+        "body": "週期正在進行。每一筆都在塑造簽名，也可能延長收官倒數。"
+      },
+      "finalHour": {
+        "title": "{cycle}進入最後一小時",
+        "body": "每一筆都可能推遲收官，併為正在成形的簽名再添一筆。"
+      },
+      "nearHorizon": {
+        "title": "{cycle}即將收官",
+        "body": "收官倒數即將歸零。接下來的片刻將決定最終形態。"
+      },
+      "ready": {
+        "title": "{cycle}已可收官",
+        "body": "收官倒數已經歸零，協議已可將本週期銘刻為最終簽名。"
+      },
+      "unavailable": {
+        "title": "無法讀取即時週期時鐘",
+        "body": "目前頁面暫時無法連接協議時鐘。請打開應用程式查看最新週期狀態。"
+      },
+      "live": {
+        "title": "{cycle}距收官還有",
+        "body": "此處顯示的倒數與應用程式內同步。每一筆都在塑造簽名，也可能推遲收官。"
+      }
+    },
+    "staticClock": {
+      "waitingFirstGesture": "等待第一筆",
+      "ready": "00:00",
+      "unavailable": "時鐘暫不可用",
+      "syncing": "同步中"
+    },
+    "liveClock": "即時週期時鐘",
+    "gestureCount": "{count} 次落筆",
+    "sameClock": "與應用程式內時鐘同步",
+    "status": {
+      "ready": "已可收官",
+      "openingSoon": "週期開啟倒數",
+      "waitingFirstGesture": "週期已開啟，等待第一筆",
+      "synchronized": "倒數已與協議時間同步"
+    },
+    "openLiveCycle": "查看即時週期",
+    "viewCstPool": "GeckoTerminal 上的 CST 池",
+    "eventHorizon": "事件地平線",
+    "countdownAria": "{label}：{duration}",
+    "durationPart": "{value}{unit}",
+    "durationSeparator": "，"
+  }
+}

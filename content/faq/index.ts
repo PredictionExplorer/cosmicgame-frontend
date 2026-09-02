@@ -9,6 +9,8 @@ import {
 import { faqTextEn } from './text.en';
 import { faqTextUk } from './text.uk';
 import { faqTextZh } from './text.zh';
+import { faqTextZhHk } from './text.zh-HK';
+import { faqTextZhTw } from './text.zh-TW';
 import type { FAQCategory, FAQContent, FAQItem } from './types';
 
 export * from './types';
@@ -42,11 +44,15 @@ function buildFaqContent(text: FAQText): FAQContent {
 
 export const faqContentEn: FAQContent = buildFaqContent(faqTextEn);
 export const faqContentZh: FAQContent = buildFaqContent(faqTextZh);
+export const faqContentZhTw: FAQContent = buildFaqContent(faqTextZhTw);
+export const faqContentZhHk: FAQContent = buildFaqContent(faqTextZhHk);
 export const faqContentUk: FAQContent = buildFaqContent(faqTextUk);
 
 const FAQ_CONTENT: LocaleRecord<FAQContent> = {
   en: faqContentEn,
   zh: faqContentZh,
+  'zh-TW': faqContentZhTw,
+  'zh-HK': faqContentZhHk,
   uk: faqContentUk,
 };
 

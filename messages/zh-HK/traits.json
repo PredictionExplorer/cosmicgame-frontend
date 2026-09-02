@@ -1,0 +1,257 @@
+{
+  "types": {
+    "structure": "結構",
+    "underlay": "底紋",
+    "accent": "點綴",
+    "symmetry": "對稱",
+    "projection": "投影",
+    "wildcard": "變數",
+    "finish": "質感",
+    "palette": "調色",
+    "spectralClass": "光譜型",
+    "massBalance": "質量配比",
+    "fate": "命運",
+    "chaos": "混沌度",
+    "syzygies": "連珠",
+    "cycle": "週期",
+    "imprinted": "銘刻時間",
+    "allocation": "分配"
+  },
+  "hints": {
+    "structure": "繪製三條軌道所用的主要視覺語彙。",
+    "underlay": "鋪在主結構之下、更淡的一層視覺語彙。",
+    "accent": "疊加於結構之上的稀疏高光語彙。",
+    "symmetry": "施加於構圖的摺疊方式：鏡像、花結或曼陀羅。",
+    "projection": "繪製軌跡所用的座標空間。",
+    "wildcard": "打破常規渲染規則的罕見變體。",
+    "finish": "施加於最終畫面的後期效果。",
+    "palette": "三個天體的色彩家族與配色方案。",
+    "spectralClass": "主導天體的恆星色彩分類，從藍白色的 O 型到紅色的 M 型。",
+    "massBalance": "三個質量的對比關係：一顆偏重的主星、一對雙星，或三體均衡。",
+    "fate": "模擬的結局：受束縛的永恆之舞，或某個天體被拋出。",
+    "chaos": "對初始條件的敏感程度，從 0（有序）到 100（動盪）。",
+    "syzygies": "三個天體排成一線的時刻。",
+    "cycle": "銘刻這枚 NFT 的演繹週期。",
+    "imprinted": "這枚 NFT 在 Arbitrum 上銘刻的時間。",
+    "allocation": "將這枚 NFT 送達首位獲配者的分配。"
+  },
+  "values": {
+    "vocabulary": {
+      "orbitRibbons": "軌道綢帶",
+      "timeChords": "時間和絃",
+      "harmonicWeave": "諧波織紋",
+      "tangentCaustics": "切線焦散",
+      "stippleConstellation": "點彩星群",
+      "nebulaVeil": "星雲薄紗"
+    },
+    "symmetry": {
+      "mirror": "鏡像",
+      "rosette": "花結 ×{n}",
+      "mandala": "曼陀羅 ×{n}"
+    },
+    "projection": {
+      "crossBraid": "交叉編結",
+      "phasePortrait": "相圖",
+      "hodograph": "速端曲線"
+    },
+    "wildcard": {
+      "yes": "是"
+    },
+    "finish": {
+      "stardust": "星塵",
+      "prism": "稜鏡"
+    },
+    "massBalance": {
+      "heavyPrimary": "主星偏重",
+      "twinBinary": "雙星並重",
+      "equalTrio": "三體均衡"
+    },
+    "fate": {
+      "eternalDance": "永恆之舞",
+      "ejection": "逃逸"
+    },
+    "allocation": {
+      "stellarSelection": "星選",
+      "anchoredSelection": "錨定 NFT 星選",
+      "finalGesture": "收官之筆",
+      "lastCstGesture": "最後 CST 落筆",
+      "enduranceChampion": "堅守冠軍",
+      "chronoWarrior": "時之勇士"
+    },
+    "palette": {
+      "pattern": "{hue}{scheme}",
+      "hues": {
+        "amber": "琥珀",
+        "aurora": "極光",
+        "cerulean": "天青",
+        "ember": "餘燼",
+        "glacial": "冰川",
+        "jade": "翡翠",
+        "nebular": "星雲",
+        "orchid": "蘭紫",
+        "rose": "玫瑰",
+        "sapphire": "藍寶石",
+        "solar": "日曜",
+        "violet": "紫羅蘭"
+      },
+      "schemes": {
+        "mono": "單色",
+        "split": "分裂",
+        "analogous": "鄰近",
+        "triad": "三色",
+        "complementary": "互補",
+        "tetrad": "四色"
+      }
+    },
+    "spectralClass": {
+      "O": {
+        "label": "O 型",
+        "tone": "藍色，最熾熱的一型"
+      },
+      "B": {
+        "label": "B 型",
+        "tone": "藍白色"
+      },
+      "A": {
+        "label": "A 型",
+        "tone": "白色"
+      },
+      "F": {
+        "label": "F 型",
+        "tone": "黃白色"
+      },
+      "G": {
+        "label": "G 型",
+        "tone": "黃色，如同太陽"
+      },
+      "K": {
+        "label": "K 型",
+        "tone": "橙色"
+      },
+      "M": {
+        "label": "M 型",
+        "tone": "紅色，最冷的一型"
+      }
+    }
+  },
+  "groups": {
+    "composition": "構圖",
+    "physics": "軌道物理",
+    "provenance": "來歷",
+    "media": "媒體文件"
+  },
+  "card": {
+    "chaosAria": "混沌度 {value}，滿分 {max}",
+    "chaosShort": "混沌度 {value}",
+    "syzygiesAria": "{count} 次連珠",
+    "syzygiesShort": "{count} 次連珠",
+    "hueStripAria": "三個天體的調色色相",
+    "spectralAria": "光譜型 {value}",
+    "fateAria": "命運：{value}",
+    "quickView": "快速預覽",
+    "quickViewAria": "快速預覽 Cosmic Signature {id}",
+    "traitsPending": "特徵待發布",
+    "traitsPendingTooltip": "這枚 Signature 的特徵元數據尚未發佈。",
+    "cycleShort": "C{n}",
+    "cycleLong": "第 {n} 個週期",
+    "cycleTooltip": "銘刻於第 {n} 個週期。",
+    "viewCycle": "查看第 {n} 個週期"
+  },
+  "rarity": {
+    "rank": "#{rank}",
+    "rankLabel": "稀有度排名",
+    "rankOf": "第 {rank} 名，共 {total} 枚",
+    "tooltip": "稀有度排名第 {rank} 名（共 {total} 枚）：衡量這枚 Signature 的特徵在整個作品集中有多罕見。最罕見的特徵：{trait}。",
+    "tooltipNoTrait": "稀有度排名第 {rank} 名（共 {total} 枚）：衡量這枚 Signature 的特徵在整個作品集中有多罕見。",
+    "rarest": "最罕見特徵",
+    "share": "{total} 枚中有 {count} 枚擁有此特徵",
+    "shareShort": "{count}/{total}",
+    "scoreLabel": "稀有度分值",
+    "unavailable": "暫未排名"
+  },
+  "facets": {
+    "title": "特徵",
+    "toggle": "特徵",
+    "toggleWithCount": "特徵 · {count}",
+    "toggleAria": "按特徵篩選",
+    "clearAll": "全部清除",
+    "clearFacet": "清除{trait}",
+    "activeAria": "已啟用的特徵篩選",
+    "removeFilter": "移除篩選 {trait}：{value}",
+    "optionAria": "{value}：{count} 枚 NFT",
+    "chaosRange": "混沌度範圍",
+    "chaosMin": "最低混沌度",
+    "chaosMax": "最高混沌度",
+    "chaosValue": "{min} 至 {max}",
+    "showMore": "再顯示 {count} 項",
+    "showLess": "收起",
+    "sheetTitle": "按特徵篩選",
+    "sheetDescription": "按每枚 Signature 的構圖、物理與來歷縮小檔案範圍。",
+    "loading": "正在索引特徵…",
+    "partial": "特徵索引仍在補全（{indexed}/{total}）",
+    "unavailable": "特徵篩選暫不可用。",
+    "retry": "重試",
+    "matches": "{count} 枚 NFT 符合條件"
+  },
+  "quickView": {
+    "title": "Cosmic Signature {id}",
+    "description": "這枚 Signature 的特徵、軌道物理與來歷。",
+    "openDetail": "打開完整頁面",
+    "playSweep": "播放光譜掃描",
+    "sweepNote": "從媒體伺服器串流較大的影片文件",
+    "hideSweep": "返回作品",
+    "previous": "上一枚 Signature",
+    "next": "下一枚 Signature",
+    "close": "關閉快速預覽",
+    "imageAlt": "Cosmic Signature {id} 作品",
+    "loading": "正在載入特徵…"
+  },
+  "panel": {
+    "title": "Signature 特徵",
+    "subtitle": "每一項特徵都由鏈上種子推演而來。同一種子，同一像素。",
+    "loading": "正在載入特徵…",
+    "unavailable": "這枚 Signature 的特徵元數據尚未發佈。元數據重新生成後，其構圖與物理資訊將在此顯示。",
+    "error": "無法載入特徵元數據。",
+    "retry": "重試",
+    "masses": "天體質量",
+    "massAria": "天體 {index}：質量 {value}",
+    "closestApproach": "最近交會",
+    "closestApproachValue": "天體 {a} 與天體 {b}，距離 {distance}",
+    "totalEnergy": "總能量",
+    "angularMomentum": "角動量",
+    "equilateralness": "等邊度",
+    "braid": "辮詞",
+    "braidCrossings": "{count} 次交叉",
+    "integrator": "積分器",
+    "steps": "{steps} 步",
+    "ejectionStep": "於第 {step} 步拋出",
+    "horizonSteps": "視界 {steps} 步",
+    "dominantWavelength": "主波長",
+    "nanometres": "{value} nm",
+    "hueDispersion": "色相離散度",
+    "degrees": "{value}°",
+    "halation": "光暈",
+    "metadataVersion": "元數據版本",
+    "image": "圖像",
+    "animation": "動畫",
+    "dimensions": "{width} × {height}",
+    "duration": "{seconds} 秒",
+    "sha256": "SHA-256",
+    "copyHash": "複製哈希",
+    "copied": "已複製",
+    "webImage": "網頁圖像（WebP）",
+    "sourceImage": "源圖像（PNG）",
+    "hqVideo": "高清影片",
+    "spectralSweep": "光譜掃描",
+    "assetManifest": "資源清單",
+    "traitSource": "特徵源文件",
+    "external": "在新標籤頁中打開文件"
+  },
+  "dna": {
+    "title": "作品集基因",
+    "subtitle": "檔案在各項核心特徵上的分佈。選擇某一段即可篩選畫廊。",
+    "segmentAria": "{value}：{count} 枚 NFT。按此特徵篩選。",
+    "legendCount": "{count}",
+    "loading": "正在讀取作品集特徵…"
+  }
+}

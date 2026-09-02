@@ -1,0 +1,22 @@
+{
+  "liveCycleCountdown": "即時演繹週期倒數",
+  "countdown": {
+    "days": "天",
+    "hours": "小時",
+    "minutes": "分",
+    "seconds": "秒"
+  },
+  "countdownLong": {
+    "days": "天",
+    "hours": "小時",
+    "minutes": "分",
+    "seconds": "秒"
+  },
+  "durationCompact": {
+    "days": "天",
+    "hours": "小時",
+    "minutes": "分",
+    "seconds": "秒",
+    "leftPattern": "剩餘{duration}"
+  }
+}

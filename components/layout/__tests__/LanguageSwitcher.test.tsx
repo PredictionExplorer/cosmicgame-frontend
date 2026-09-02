@@ -49,9 +49,11 @@ describe('LanguageSwitcher', () => {
     expect(items.map((item) => item.getAttribute('lang'))).toEqual([...routing.locales]);
   });
 
-  it('never translates language names', () => {
+  it('never translates language names, and names Chinese variants by script and region', () => {
     expect(LOCALE_LABELS.en).toBe('English');
-    expect(LOCALE_LABELS.zh).toBe('中文');
+    expect(LOCALE_LABELS.zh).toBe('简体中文');
+    expect(LOCALE_LABELS['zh-TW']).toBe('繁體中文（台灣）');
+    expect(LOCALE_LABELS['zh-HK']).toBe('繁體中文（香港）');
     expect(LOCALE_LABELS.uk).toBe('Українська');
   });
 

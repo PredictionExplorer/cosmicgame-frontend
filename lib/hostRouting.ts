@@ -127,21 +127,36 @@ export function isLandingOnlyPath(pathname: string): boolean {
 }
 
 /**
+ * Locale prefixes longest first, so `/zh-TW/…` is never read as `/zh` + `-TW/…`.
+ * Mirrors the order next-intl's own prefix matcher uses.
+ */
+const LOCALES_BY_PREFIX_LENGTH: readonly (typeof routing.locales)[number][] = [
+  ...routing.locales,
+].sort((a, b) => b.length - a.length);
+
+/**
  * Splits a configured locale prefix off a public pathname.
  * `/zh/gallery` -> `{ locale: 'zh', publicPath: '/gallery' }`;
+ * `/zh-TW/gallery` -> `{ locale: 'zh-TW', publicPath: '/gallery' }`;
  * `/gallery` -> `{ locale: undefined, publicPath: '/gallery' }`.
+ *
+ * Matching is case-insensitive like next-intl's (which then redirects
+ * `/zh-tw/…` to the canonical `/zh-TW/…`), so host checks see the same public
+ * path either way; the returned `locale` is always the canonical code.
  * Host-routing checks must always run against `publicPath`.
  */
 export function splitLocalePrefix(pathname: string): {
   locale?: (typeof routing.locales)[number];
   publicPath: string;
 } {
-  for (const locale of routing.locales) {
-    if (pathname === `/${locale}`) {
+  const lower = pathname.toLowerCase();
+  for (const locale of LOCALES_BY_PREFIX_LENGTH) {
+    const prefix = `/${locale.toLowerCase()}`;
+    if (lower === prefix) {
       return { locale, publicPath: '/' };
     }
-    if (pathname.startsWith(`/${locale}/`)) {
-      return { locale, publicPath: pathname.slice(locale.length + 1) };
+    if (lower.startsWith(`${prefix}/`)) {
+      return { locale, publicPath: pathname.slice(prefix.length) };
     }
   }
   return { publicPath: pathname || '/' };

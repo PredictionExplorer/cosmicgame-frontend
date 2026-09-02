@@ -4,13 +4,17 @@ import { aboutContentEn } from './en';
 import type { AboutContent } from './types';
 import { aboutContentUk } from './uk';
 import { aboutContentZh } from './zh';
+import { aboutContentZhHk } from './zh-HK';
+import { aboutContentZhTw } from './zh-TW';
 
 export * from './types';
-export { aboutContentEn, aboutContentUk, aboutContentZh };
+export { aboutContentEn, aboutContentUk, aboutContentZh, aboutContentZhHk, aboutContentZhTw };
 
 const ABOUT_CONTENT: LocaleRecord<AboutContent> = {
   en: aboutContentEn,
   zh: aboutContentZh,
+  'zh-TW': aboutContentZhTw,
+  'zh-HK': aboutContentZhHk,
   uk: aboutContentUk,
 };
 

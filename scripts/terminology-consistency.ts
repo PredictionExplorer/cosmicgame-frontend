@@ -2,10 +2,11 @@
 /* eslint-disable no-console -- command-line quality gate */
 
 import { readFileSync, readdirSync } from 'node:fs';
-import { basename, extname, join, relative, resolve } from 'node:path';
+import { extname, join, relative, resolve } from 'node:path';
 
 import { TRANSLATED_LOCALES } from '../i18n/routing';
 
+import { fileLocale } from './locale-files';
 import {
   TERMINOLOGY_PACKS,
   scanTerminology,
@@ -37,17 +38,13 @@ function walkFiles(directory: string): string[] {
 }
 
 /**
- * Per-locale content modules follow two naming conventions:
- * `text.<locale>.ts` / `TermsContent.<locale>.ts` (structure/text split) and
- * bare `<locale>.ts` (small areas such as content/about).
+ * Per-locale content modules (`text.<locale>.ts`, `TermsContent.<locale>.ts`,
+ * bare `<locale>.ts`) are resolved by the shared owner lookup so that a
+ * hyphenated code is matched whole — `zh` never claims `text.zh-TW.ts`.
  */
 function isLocaleContentFile(path: string, locale: string): boolean {
   if (!CONTENT_EXTENSIONS.has(extname(path))) return false;
-  const name = basename(path);
-  return (
-    new RegExp(`^${locale}(?:[.-]|$)`, 'i').test(name) ||
-    new RegExp(`\\.${locale}(?:[.-]|$)`, 'i').test(name)
-  );
+  return fileLocale(relative(ROOT, path)) === locale;
 }
 
 function flattenJsonStrings(value: unknown, prefix = ''): ScannableText[] {

@@ -1,0 +1,187 @@
+{
+  "breadcrumbs": {
+    "home": "首頁",
+    "contracts": "合約"
+  },
+  "page": {
+    "eyebrow": "已驗證合約 · Arbitrum",
+    "title": "合約地址",
+    "subtitle": "檢視 Cosmic Signature 協議的鏈上地址、配置、原始碼連結與驗證背景。",
+    "allocationAria": "分配軌道",
+    "configurationAria": "協議配置",
+    "addressesAria": "合約地址",
+    "addressesTitle": "合約地址",
+    "parametersAria": "校準窗口與星選參數"
+  },
+  "network": {
+    "chain": "鏈 ID {chainId}"
+  },
+  "entries": {
+    "protocol": {
+      "name": "Cosmic Signature 協議",
+      "description": "管理週期、落筆與分配發放的主協議代理合約"
+    },
+    "implementation": {
+      "name": "實現合約",
+      "description": "Cosmic Signature 協議代理目前指向的實現合約"
+    },
+    "cst": {
+      "name": "Cosmic Signature CST 代幣",
+      "description": "每筆落筆都可能銘刻的 ERC-20 代幣（CST），用於表達宇宙議會中的協調權重"
+    },
+    "nft": {
+      "name": "Cosmic Signature NFT",
+      "description": "作為週期分配銘刻給獲配者的 ERC-721 NFT 系列"
+    },
+    "randomWalk": {
+      "name": "RandomWalk",
+      "description": "RandomWalk NFT 系列，可附加至 ETH 落筆以獲得一次價格減免，也可錨定以取得錨定 NFT 星選資格"
+    },
+    "council": {
+      "name": "宇宙議會",
+      "description": "用於提交協調提案的鏈上協議協調合約"
+    },
+    "publicGoods": {
+      "name": "公共財金庫",
+      "description": "接收每個週期從週期儲備劃出的公共財分配"
+    },
+    "outreach": {
+      "name": "推廣儲備",
+      "description": "用於推廣配發與生態貢獻者的資金"
+    },
+    "allocations": {
+      "name": "分配錢包",
+      "description": "託管待取回分配的合約"
+    },
+    "cosmicAnchor": {
+      "name": "Cosmic Signature NFT 錨定錢包",
+      "description": "Cosmic Signature NFT 的錨定合約"
+    },
+    "rwalkAnchor": {
+      "name": "RWLK 錨定錢包",
+      "description": "RandomWalk NFT 的錨定合約"
+    }
+  },
+  "categories": {
+    "core": "核心合約",
+    "wallet": "錢包合約",
+    "anchoring": "錨定合約"
+  },
+  "search": {
+    "placeholder": "按名稱或地址搜尋合約……",
+    "ariaLabel": "搜尋合約",
+    "clearAria": "清除搜尋",
+    "empty": "沒有與「{searchTerm}」匹配的合約"
+  },
+  "addressCard": {
+    "copyAria": "複製{name}地址",
+    "explorerAria": "在區塊瀏覽器中檢視{name}"
+  },
+  "funds": {
+    "title": "分配軌道",
+    "description": "週期儲備會沿簽名分配、時之勇士、星選、公共財、錨定配發與滾動儲備等軌道流轉。",
+    "chartAria": "分配軌道條形圖",
+    "segments": {
+      "signature": {
+        "label": "簽名分配",
+        "tooltip": "完成收官之筆的參與者取回的 ETH 比例；同時還會獲得 1,000 CST 與 1 枚 Cosmic Signature NFT。"
+      },
+      "chrono": {
+        "label": "時之勇士",
+        "tooltip": "發放給時之勇士的 ETH；同時還會獲得 1,000 CST 與 1 枚 Cosmic Signature NFT。"
+      },
+      "stellar": {
+        "label": "星選",
+        "tooltip": "週期收官時，透過程序化隨機方式分配給獲配者的份額。"
+      },
+      "anchor": {
+        "label": "錨定配發",
+        "tooltip": "按已錨定 NFT 數量比例，向 Cosmic Signature NFT 錨定者配發 ETH。"
+      },
+      "publicGoods": {
+        "label": "公共財",
+        "tooltip": "每個週期轉撥給公共財受益方 Protocol Guild。"
+      },
+      "next": {
+        "label": "下一週期",
+        "tooltip": "各項分配完成後，剩餘的週期儲備會作為滾動儲備滾入下一週期。"
+      }
+    }
+  },
+  "configuration": {
+    "title": "協議配置",
+    "cards": {
+      "ethStep": {
+        "label": "ETH 落筆價格增幅",
+        "tooltip": "ETH 落筆價格採用此階梯增幅參數；CST 落筆價格則依據即時 CST 校準窗口變化。"
+      },
+      "timeIncrement": {
+        "label": "時間增量",
+        "tooltip": "每筆落筆向週期收官倒數增加的時長。每個週期收官後，增量增長 {percent}%。"
+      },
+      "cstPreview": {
+        "label": "目前參與 CST 預覽",
+        "tooltip": "若此刻落筆，預計銘刻的參與 CST。數量會動態變化，並採用公式 {formula}。"
+      },
+      "finalization": {
+        "label": "專屬收官期限",
+        "tooltip": "收官之筆參與者完成週期收官的專屬時間；期限結束後，公開收官窗口將向所有人開放。"
+      },
+      "initial": {
+        "label": "初始時間增量",
+        "tooltip": "首筆落筆後加入週期收官倒數的初始時長。"
+      },
+      "message": {
+        "label": "訊息長度上限",
+        "tooltip": "落筆訊息允許輸入的最大字元數。"
+      }
+    }
+  },
+  "parameters": {
+    "title": "校準窗口與星選參數",
+    "cstTitle": "CST 校準窗口",
+    "ethTitle": "ETH 校準窗口",
+    "duration": "總時長",
+    "elapsed": "已過時長",
+    "ceiling": "校準上限",
+    "cstDurationTooltip": "CST 校準窗口目前儲存在鏈上的時長。每筆 CST 落筆會使其延長約 {increase}%，每筆 ETH 落筆會使其縮短約 {decrease}%。",
+    "cstElapsedTooltip": "目前 CST 校準窗口已經過的時間。",
+    "cstCeilingTooltip": "目前所示 CST 校準窗口的起始落筆價格。價格會在即時儲存的窗口時長內線性下降。",
+    "ethDurationTooltip": "ETH 校準窗口的總時長；落筆價格會在此期間逐步下降。",
+    "ethElapsedTooltip": "目前 ETH 校準窗口已經過的時間。",
+    "publicGoodsAddress": "公共財地址",
+    "publicGoodsAddressTooltip": "目前從公共財金庫合約接收公共財分配的鏈上地址。",
+    "copyPublicGoodsAria": "複製公共財地址",
+    "viewPublicGoodsAria": "在區塊瀏覽器中檢視公共財地址",
+    "selection": {
+      "ethLabel": "ETH 星選獲配者",
+      "ethTooltip": "每個週期透過程序化隨機方式獲得 ETH 分配的參與者數量。",
+      "nftLabel": "NFT 星選（參與者）",
+      "nftTooltip": "每個週期透過程序化隨機方式獲得 Cosmic Signature NFT 的參與者數量。",
+      "anchorLabel": "NFT 星選（已錨定 RWLK）",
+      "anchorTooltip": "每個週期透過程序化隨機方式獲得 Cosmic Signature NFT 的 RandomWalk NFT 錨定者數量。"
+    }
+  },
+  "vault": {
+    "title": "公共財金庫操作",
+    "tooltip": "呼叫公共財金庫的 send() 函式，將金庫中的 ETH 餘額轉撥給已配置的受益方 Protocol Guild。",
+    "balance": "金庫目前餘額",
+    "description": "將金庫中可用的公共財資金轉撥給 Protocol Guild。",
+    "descriptionWithBeneficiary": "將金庫中可用的公共財資金轉撥給 Protocol Guild（{address}）。",
+    "aria": "將公共財金庫餘額轉撥給 Protocol Guild"
+  },
+  "seo": {
+    "eyebrow": "已驗證合約 · Arbitrum",
+    "heading": "Cosmic Signature 合約",
+    "description": "Cosmic Signature 公開其 Arbitrum 合約地址，便於參與者、研究人員、搜尋引擎與 AI 系統將應用體驗對應到可驗證的鏈上協議紀錄。",
+    "partialFallback": "此伺服器快照暫時無法取得即時合約地址。下方已驗證的協議代理與實現地址來自前端協議事實，作為靜態後備資料。",
+    "empty": "此伺服器快照暫時無法取得即時合約地址。下方互動式合約表格會在可用時透過 Cosmic Signature 公共 API 載入資料。",
+    "relatedAria": "合約信任資源",
+    "links": {
+      "code": "檢視 Cosmic Signature 原始碼",
+      "security": "閱讀安全概覽",
+      "audits": "檢視審計與驗證",
+      "risk": "閱讀風險揭露"
+    }
+  }
+}

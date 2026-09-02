@@ -43,6 +43,27 @@ describe('font configuration policy', () => {
     expect(source).toContain("'Microsoft YaHei'");
   });
 
+  it.each([
+    ['Noto_Sans_TC', 'notoSansTC', '--font-noto-tc', 'PingFang TC'],
+    ['Noto_Sans_HK', 'notoSansHK', '--font-noto-hk', 'PingFang HK'],
+  ])(
+    'keeps the %s Traditional companion on the Noto Sans SC loading policy',
+    (loader, exportName, variable, systemFallback) => {
+      const block = source.slice(source.indexOf(`export const ${exportName}`));
+      const end = block.indexOf('});');
+      const fontBlock = block.slice(0, end);
+      expect(fontBlock).toContain(`${loader}(`);
+      expect(fontBlock).toContain("weight: 'variable'");
+      expect(fontBlock).toContain(`variable: '${variable}'`);
+      expect(fontBlock).toContain("display: 'optional'");
+      expect(fontBlock).toContain('preload: false');
+      // Regional system fallbacks, not the Simplified ones.
+      expect(fontBlock).toContain(`'${systemFallback}'`);
+      expect(fontBlock).toContain("'Microsoft JhengHei'");
+      expect(fontBlock).not.toContain('PingFang SC');
+    },
+  );
+
   it('keeps the Cyrillic display companion configured without eager preload', () => {
     expect(source).toContain('Onest');
     expect(source).toContain("variable: '--font-onest'");
@@ -62,6 +83,14 @@ describe('font configuration policy', () => {
       source.indexOf('export const notoSansSC'),
     );
     expect(interBlock).not.toContain('cyrillic');
+    // Nor do the CJK companions: their Latin subset is only for metrics.
+    const cjkBlock = source.slice(
+      source.indexOf('export const notoSansSC'),
+      source.indexOf('export const onest'),
+    );
+    const cjkSubsets = cjkBlock.match(/subsets: \[[^\]]*\]/g) ?? [];
+    expect(cjkSubsets).toHaveLength(3);
+    for (const subsets of cjkSubsets) expect(subsets).not.toContain('cyrillic');
   });
 
   it('overrides the Ukrainian display stack outside any cascade layer', () => {
@@ -78,6 +107,32 @@ describe('font configuration policy', () => {
     expect(css.slice(overrideIndex - 1, overrideIndex)).toBe('\n');
     const overrideBlock = css.slice(overrideIndex, css.indexOf('}', overrideIndex));
     expect(overrideBlock).toContain('--display-font-stack: var(--font-onest)');
+  });
+
+  it('routes every Chinese font stack through --cjk-font-stack', () => {
+    const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
+    // The Simplified default lives on :root; no other rule may name a Noto
+    // cut directly, otherwise a Traditional page would render mainland forms.
+    expect(css).toContain("--cjk-font-stack: var(--font-noto-sc), 'PingFang SC'");
+    expect(css.match(/--font-noto-sc/g)).toHaveLength(1);
+    expect(css).toContain('var(--cjk-font-stack)');
+    expect(css).not.toMatch(/html\[lang='zh'\]/);
+    expect(css).toMatch(/html:lang\(zh\) h1/);
+  });
+
+  it.each([
+    ['zh-TW', '--font-noto-tc', 'PingFang TC'],
+    ['zh-HK', '--font-noto-hk', 'PingFang HK'],
+  ])('swaps the %s CJK stack outside any cascade layer', (locale, variable, systemFallback) => {
+    const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
+    const rootIndex = css.indexOf(':root {');
+    const overrideIndex = css.indexOf(`html:lang(${locale}) {`);
+    expect(overrideIndex).toBeGreaterThan(rootIndex);
+    // Top-level rules are unindented; anything inside @layer is indented.
+    expect(css.slice(overrideIndex - 1, overrideIndex)).toBe('\n');
+    const overrideBlock = css.slice(overrideIndex, css.indexOf('}', overrideIndex));
+    expect(overrideBlock).toContain(`--cjk-font-stack: var(${variable}), '${systemFallback}'`);
+    expect(overrideBlock).toContain("'Microsoft JhengHei'");
   });
 
   it('limits Title-Case button labels to English', () => {

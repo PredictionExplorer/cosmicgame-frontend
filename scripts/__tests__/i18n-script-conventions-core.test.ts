@@ -1,0 +1,109 @@
+import { TRANSLATED_LOCALES } from '../../i18n/routing';
+import {
+  HK_STANDARD_FORMS,
+  SCRIPT_CONVENTIONS,
+  checkScriptConventions,
+  describeViolation,
+} from '../i18n-script-conventions-core';
+
+const tw = SCRIPT_CONVENTIONS['zh-TW']!;
+const hk = SCRIPT_CONVENTIONS['zh-HK']!;
+const zh = SCRIPT_CONVENTIONS.zh!;
+
+const reasons = (text: string, conventions = tw) =>
+  checkScriptConventions(text, conventions).map((v) => `${v.reason}:${v.character}>${v.expected}`);
+
+describe('SCRIPT_CONVENTIONS', () => {
+  it('declares a decision for every translated locale', () => {
+    expect(Object.keys(SCRIPT_CONVENTIONS).sort()).toEqual([...TRANSLATED_LOCALES].sort());
+    expect(SCRIPT_CONVENTIONS.uk).toBeNull();
+  });
+
+  it('treats correct copy in each script as a fixed point', () => {
+    expect(reasons('每一筆落筆都會塑造這一週期的簽名。', tw)).toEqual([]);
+    expect(reasons('每一筆落筆都會塑造這一週期的簽名。', hk)).toEqual([]);
+    expect(reasons('每一笔落笔都会塑造这一周期的签名。', zh)).toEqual([]);
+  });
+});
+
+describe('wrong-script detection', () => {
+  it('flags Simplified characters inside Traditional copy', () => {
+    expect(reasons('每一笔落筆', tw)).toEqual(['wrong-script:笔>筆']);
+    expect(reasons('网络與錢包', hk)).toEqual(
+      expect.arrayContaining(['wrong-script:网>網', 'wrong-script:络>絡']),
+    );
+  });
+
+  it('flags Traditional characters inside Simplified copy', () => {
+    expect(reasons('每一筆落笔', zh)).toEqual(['wrong-script:筆>笔']);
+  });
+
+  it('keeps characters shared by both scripts quiet', () => {
+    // 采 is Simplified in 采用 but Traditional in 風采; 里 is a distance unit;
+    // 干 and 准 are Traditional in 干預 and 批准.
+    expect(reasons('風采 公里 干預 批准', tw)).toEqual([]);
+    expect(reasons('風采 公里 干預 批准', hk)).toEqual([]);
+  });
+
+  it('does not impose OpenCC standard forms that Taiwan and Hong Kong do not write', () => {
+    expect(reasons('社群 高峰 吃 了解', tw)).toEqual([]);
+    expect(reasons('社群 高峰 吃 了解 稅務 脫離 溫度 說明 閱讀 用戶', hk)).toEqual([]);
+  });
+
+  it('reports a Latin-only line as clean without consulting OpenCC', () => {
+    expect(reasons('ETH / CST {count}', tw)).toEqual([]);
+  });
+});
+
+describe('regional character choices', () => {
+  it('keeps Taiwan on 裡/著 and Hong Kong on 裏/着', () => {
+    expect(reasons('這裏 看着', tw)).toEqual(
+      expect.arrayContaining(['regional-form:裏>裡', 'regional-form:着>著']),
+    );
+    expect(reasons('這裡', hk)).toEqual(['regional-form:裡>裏']);
+    expect(reasons('這裡 看著', tw)).toEqual([]);
+    expect(reasons('這裏 看着', hk)).toEqual([]);
+  });
+
+  it('standardizes on 台 in both Traditional locales', () => {
+    expect(reasons('臺灣 平臺', tw)).toEqual(['regional-form:臺>台']);
+    expect(reasons('臺灣', hk)).toEqual(['regional-form:臺>台']);
+    expect(reasons('台灣 平台', tw)).toEqual([]);
+    expect(reasons('台灣 平台', hk)).toEqual([]);
+  });
+
+  it('rejects the glyph-variant code points OpenCC emits for Hong Kong', () => {
+    for (const [variant, standard] of Object.entries(HK_STANDARD_FORMS)) {
+      expect(reasons(variant, hk)).toEqual([`regional-form:${variant}>${standard}`]);
+      expect(reasons(variant, tw)).toEqual([`regional-form:${variant}>${standard}`]);
+      expect(reasons(standard, hk)).toEqual([]);
+    }
+  });
+});
+
+describe('quotation marks', () => {
+  it('requires corner brackets in Traditional copy and curly quotes in Simplified copy', () => {
+    expect(reasons('所謂“落筆”', tw)).toEqual(
+      expect.arrayContaining(['punctuation:“>「', 'punctuation:”>」']),
+    );
+    expect(reasons('所謂「落筆」', tw)).toEqual([]);
+    expect(reasons('所谓「落笔」', zh)).toEqual(
+      expect.arrayContaining(['punctuation:「>“', 'punctuation:」>”']),
+    );
+    expect(reasons('所谓“落笔”', zh)).toEqual([]);
+  });
+});
+
+describe('describeViolation', () => {
+  it('names the code point and the expected form', () => {
+    const [violation] = checkScriptConventions('落笔', tw);
+    expect(describeViolation(violation!, 'Hant')).toBe('笔 (U+7B14) is Simplified; write 筆');
+    const [quote] = checkScriptConventions('“落筆”', tw);
+    expect(describeViolation(quote!, 'Hant')).toContain('quotation mark; write 「');
+  });
+
+  it('reports each offending character once per line with its line number', () => {
+    const violations = checkScriptConventions('第一行\n落笔落笔\n第三笔', tw);
+    expect(violations.map((v) => v.line)).toEqual([2, 3]);
+  });
+});

@@ -1,0 +1,94 @@
+{
+  "invalid": {
+    "title": "代幣 ID 無效"
+  },
+  "jsonLd": {
+    "productName": "Cosmic Signature NFT #{id}",
+    "productDescription": "獨一無二的生成藝術 NFT，由三體問題物理渲染而成，出自程序化鏈上藝術協議 Cosmic Signature。",
+    "breadcrumbToken": "代幣 #{id}"
+  },
+  "breadcrumb": {
+    "tokenFallback": "代幣 {id}"
+  },
+  "hero": {
+    "unnamedToken": "未命名代幣"
+  },
+  "badges": {
+    "stellarSelectionRecipient": "星選獲配者",
+    "anchorRecipient": "錨定獲配者",
+    "cycleRecipient": "週期獲配者",
+    "enduranceChampion": "堅守冠軍",
+    "receivedAsCycleRecipient": "這枚 NFT 在第 {round} 個週期分配給週期獲配者。",
+    "receivedAs": "這枚 NFT 最初分配給{label}。",
+    "eligibleForAnchoring": "可錨定",
+    "eligibleForAnchoringTooltip": "這枚 Cosmic Signature NFT 尚未錨定過，錨定後即可累積 ETH 錨定派發。",
+    "alreadyAnchored": "已錨定過",
+    "alreadyAnchoredTooltip": "這枚代幣已錨定過，無法再次錨定。"
+  },
+  "share": {
+    "trigger": "分享",
+    "copyVideoLink": "複製影片連結",
+    "copyImageLink": "複製圖片連結",
+    "copyPageLink": "複製頁面連結"
+  },
+  "actions": {
+    "buyOrSellNfts": "買賣 NFT",
+    "viewCycleDetails": "查看第 {round} 個週期詳情"
+  },
+  "navigation": {
+    "previousToken": "上一枚代幣",
+    "nextToken": "下一枚代幣"
+  },
+  "sections": {
+    "nameHistory": "命名記錄",
+    "ownershipHistory": "流轉記錄"
+  },
+  "transferDialog": {
+    "title": "確認轉移",
+    "description": "目標帳戶似乎沒有任何交易記錄。確定要將代幣發送至該地址嗎？請再次核對。",
+    "confirm": "仍要轉移"
+  },
+  "ownerActions": {
+    "title": "管理這枚代幣",
+    "titleTooltip": "作為目前持有者，你可以在 MetaMask 中顯示、轉移或命名這枚代幣。",
+    "metaMaskHeading": "在 MetaMask 中顯示",
+    "metaMaskTooltip": "請求 MetaMask 瀏覽器擴展顯示這枚 NFT。NFT 導入仍為實驗性功能，MetaMask 流動裝置暫不支持。",
+    "addToMetaMask": "將 NFT 添加至 MetaMask",
+    "addingToMetaMask": "正在添加 NFT…",
+    "transferHeading": "轉移",
+    "transferTooltip": "將代幣發送至其他以太坊地址。轉移不可撤銷，確認前請仔細核對地址。",
+    "recipientPlaceholder": "接收地址（0x…）",
+    "transferButton": "轉移",
+    "nameHeading": "命名代幣",
+    "renameHeading": "重新命名",
+    "nameTooltip": "為代幣設定專屬名稱（最多 32 字節）。已命名的代幣會顯示在「已命名 NFT」頁面。",
+    "namePlaceholder": "輸入代幣名稱",
+    "setName": "設定名稱",
+    "changeName": "更改名稱",
+    "clearName": "清除",
+    "namedTokensCount": "目前共有 {count} 枚已命名代幣。",
+    "viewAllNamedTokens": "查看全部已命名代幣"
+  },
+  "metadata": {
+    "imprinted": "銘刻時間",
+    "imprintedTooltip": "這枚代幣在鏈上銘刻的時間。點擊可查看交易。",
+    "cycle": "週期",
+    "cycleTooltip": "這枚代幣所屬的演繹週期。點擊可查看週期詳情。",
+    "recipient": "獲配者",
+    "recipientTooltip": "演繹週期中最初收到這枚代幣的地址。",
+    "owner": "持有者",
+    "ownerTooltip": "這枚代幣的目前持有者，若經轉移則可能與獲配者不同。",
+    "roundNumber": "第 {round} 個週期",
+    "seed": "種子",
+    "seedTooltip": "用於生成這枚代幣畫面與特徵的唯一隨機種子。",
+    "copySeed": "複製種子"
+  },
+  "video": {
+    "watchAnimation": "觀看動畫",
+    "watchAnimationTooltip": "每枚 Cosmic Signature NFT 都有一段由種子生成的專屬動畫。點擊即可觀看。"
+  },
+  "image": {
+    "defaultAlt": "NFT",
+    "artworkUnavailable": "作品暫不可用"
+  }
+}

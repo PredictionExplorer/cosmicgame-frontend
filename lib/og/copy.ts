@@ -1,6 +1,8 @@
 import enSeo from '@/messages/en/seo.json';
 import ukSeo from '@/messages/uk/seo.json';
 import zhSeo from '@/messages/zh/seo.json';
+import zhHkSeo from '@/messages/zh-HK/seo.json';
+import zhTwSeo from '@/messages/zh-TW/seo.json';
 
 import { normalizeLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
 
@@ -30,11 +32,15 @@ export interface OgCopy {
   chips: string[];
 }
 
+// `satisfies` keeps the key set compiler-checked (a new locale fails here);
+// the cast only widens the JSON literal types to the OgCopy shape.
 const catalogs = {
   en: enSeo.og,
   zh: zhSeo.og,
+  'zh-TW': zhTwSeo.og,
+  'zh-HK': zhHkSeo.og,
   uk: ukSeo.og,
-} as unknown as LocaleRecord<Record<OgRoute, OgCopy>>;
+} satisfies LocaleRecord<unknown> as unknown as LocaleRecord<Record<OgRoute, OgCopy>>;
 
 export function resolveOgLocale(locale: string | undefined): OgLocale {
   return normalizeLocale(locale);

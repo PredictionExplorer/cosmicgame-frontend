@@ -28,6 +28,8 @@ import {
   whitePaperContentEn,
   whitePaperContentUk,
   whitePaperContentZh,
+  whitePaperContentZhHk,
+  whitePaperContentZhTw,
 } from '../content/white-paper';
 import {
   WHITE_PAPER_DATE_DISPLAY,
@@ -80,6 +82,35 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
       '\\setCJKmainfont{Songti SC}',
       '\\setCJKsansfont{PingFang SC}',
       '\\setCJKmonofont{PingFang SC}',
+      '\\renewcommand{\\abstractname}{\u6458\u8981}',
+    ],
+  },
+  'zh-TW': {
+    content: whitePaperContentZhTw,
+    dateDisplay: '2026\u5e748\u6708',
+    tocTitle: '\u76ee\u9304',
+    headerIncludes: [
+      ...BASE_HEADER_INCLUDES,
+      // Taiwan glyph standard: the TC cuts of the macOS system CJK fonts.
+      '\\usepackage{xeCJK}',
+      '\\setCJKmainfont{Songti TC}',
+      '\\setCJKsansfont{PingFang TC}',
+      '\\setCJKmonofont{PingFang TC}',
+      '\\renewcommand{\\abstractname}{\u6458\u8981}',
+    ],
+  },
+  'zh-HK': {
+    content: whitePaperContentZhHk,
+    dateDisplay: '2026\u5e748\u6708',
+    tocTitle: '\u76ee\u9304',
+    headerIncludes: [
+      ...BASE_HEADER_INCLUDES,
+      // Hong Kong glyph standard for sans (PingFang HK); Songti ships no HK
+      // cut, so body serif falls back to the Traditional (TC) forms.
+      '\\usepackage{xeCJK}',
+      '\\setCJKmainfont{Songti TC}',
+      '\\setCJKsansfont{PingFang HK}',
+      '\\setCJKmonofont{PingFang HK}',
       '\\renewcommand{\\abstractname}{\u6458\u8981}',
     ],
   },

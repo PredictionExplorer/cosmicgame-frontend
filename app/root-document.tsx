@@ -6,7 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { networkConfig } from '@/config/networks';
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing, type AppLocale } from '@/i18n/routing';
-import { clashDisplay, inter, notoSansSC, onest } from '@/lib/fonts';
+import { clashDisplay, inter, notoSansHK, notoSansSC, notoSansTC, onest } from '@/lib/fonts';
 import { apiBaseUrls } from '@/lib/serverRotation';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 
@@ -60,7 +60,7 @@ export function RootDocument({
       lang={locale}
       dir={getLocaleConfig(locale).textDirection}
       data-scroll-behavior="smooth"
-      className={`${clashDisplay.variable} ${inter.variable} ${notoSansSC.variable} ${onest.variable}`}
+      className={`${clashDisplay.variable} ${inter.variable} ${notoSansSC.variable} ${notoSansTC.variable} ${notoSansHK.variable} ${onest.variable}`}
     >
       <head>
         {/* No `crossOrigin`: artwork loads as plain <img> requests (no CORS),

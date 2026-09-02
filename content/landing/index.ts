@@ -4,6 +4,8 @@ import { LANDING_STRUCTURE, type LandingStageText, type LandingText } from './st
 import { landingTextEn } from './text.en';
 import { landingTextUk } from './text.uk';
 import { landingTextZh } from './text.zh';
+import { landingTextZhHk } from './text.zh-HK';
+import { landingTextZhTw } from './text.zh-TW';
 import type { LandingContent, LandingFooterColumn, LandingTrackItem } from './types';
 
 export * from './types';
@@ -149,11 +151,15 @@ function buildLandingContent(text: LandingText): LandingContent {
 
 export const landingContentEn: LandingContent = buildLandingContent(landingTextEn);
 export const landingContentZh: LandingContent = buildLandingContent(landingTextZh);
+export const landingContentZhTw: LandingContent = buildLandingContent(landingTextZhTw);
+export const landingContentZhHk: LandingContent = buildLandingContent(landingTextZhHk);
 export const landingContentUk: LandingContent = buildLandingContent(landingTextUk);
 
 const LANDING_CONTENT: LocaleRecord<LandingContent> = {
   en: landingContentEn,
   zh: landingContentZh,
+  'zh-TW': landingContentZhTw,
+  'zh-HK': landingContentZhHk,
   uk: landingContentUk,
 };
 

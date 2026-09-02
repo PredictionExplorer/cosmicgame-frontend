@@ -1,0 +1,26 @@
+{
+  "breadcrumbs": {
+    "home": "首頁",
+    "code": "原始碼"
+  },
+  "viewer": {
+    "title": "程式碼檢視器",
+    "subtitle": "檢視將種子轉換為影像的生成程式碼",
+    "description": "以下程式碼會把智慧合約生成的種子轉換為影像。你也可以在 IPFS 上檢視：",
+    "github": "公開的 GitHub 組織位於 <link>github.com/PredictionExplorer</link>。"
+  },
+  "seo": {
+    "eyebrow": "原始碼 · 確定性藝術",
+    "heading": "Cosmic Signature 原始碼",
+    "description": "Cosmic Signature 公開確定性藝術流水線的原始碼資源；這套流水線將鏈上種子轉換為三體 NFT 藝術。下方客戶端檢視器支援互動，本段服務端渲染摘要則讓抓取工具無需等待 JavaScript 即可讀取核心事實。",
+    "excerpt": "種子 -> SHA3-256 隨機流 -> 三體模擬 -> 光譜渲染器 -> Cosmic Signature NFT 影像",
+    "relatedAria": "原始碼相關頁面",
+    "links": {
+      "ipfs": "開啟已發布的 IPFS 原始碼製品",
+      "github": "開啟 GitHub 組織",
+      "contracts": "檢視已驗證合約",
+      "security": "閱讀安全說明",
+      "gallery": "瀏覽生成的 NFT 藝術"
+    }
+  }
+}

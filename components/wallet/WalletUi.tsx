@@ -38,10 +38,13 @@ function ConnectModalOpener({ connectRequestId }: { connectRequestId: number }) 
 }
 
 // RainbowKit ships its own translations; map each app locale onto the
-// nearest RainbowKit locale so the wallet modal follows the site language.
+// nearest RainbowKit locale so the wallet modal follows the site language
+// (it carries separate Taiwan and Hong Kong Traditional catalogs).
 const RAINBOW_KIT_LOCALES: LocaleRecord<RainbowKitLocale> = {
   en: 'en-US',
   zh: 'zh-CN',
+  'zh-TW': 'zh-TW',
+  'zh-HK': 'zh-HK',
   uk: 'uk-UA',
 };
 

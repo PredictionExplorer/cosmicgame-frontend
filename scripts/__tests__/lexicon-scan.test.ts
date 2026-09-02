@@ -203,6 +203,47 @@ describe('lexicon-scan.ts', () => {
     const result = runScanner(fixture.root);
     expect(result.exitCode).toBe(0);
   });
+
+  describe('locale-scoped registers (scripts/locale-files.ts)', () => {
+    it('applies a Traditional register to its own locale files', () => {
+      fixture.write('messages/zh-HK/home.json', `{ "x": "投資回報率" }`);
+      const result = runScanner(fixture.root);
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toContain('banned zh-HK term: "回報"');
+    });
+
+    it('does not apply a sibling variant register to another Chinese variant', () => {
+      // Taiwan copy legitimately says 回報問題 ("report an issue"); only the
+      // Hong Kong register bans 回報 (a financial return).
+      fixture.write('messages/zh-TW/errors.json', `{ "x": "請回報問題" }`);
+      // Mainland copy may use 博弈 for strategic interplay; only Taiwan bans it.
+      fixture.write('messages/zh/home.json', `{ "x": "多方博弈" }`);
+      const result = runScanner(fixture.root);
+      expect(result.exitCode).toBe(0);
+    });
+
+    it('applies the Taiwan register to Taiwan files', () => {
+      fixture.write('content/faq/text.zh-TW.ts', `export const x = '線上博弈';`);
+      const result = runScanner(fixture.root);
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toContain('banned zh-TW term: "博弈"');
+    });
+
+    it('still applies every register to locale-agnostic files', () => {
+      fixture.write('components/Banner.tsx', `export const x = '回報';`);
+      const result = runScanner(fixture.root);
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toContain('banned zh-HK term: "回報"');
+    });
+
+    it('still applies registers of other languages to a locale file', () => {
+      // Chinese gambling copy inside the Ukrainian catalog is stray copy.
+      fixture.write('messages/uk/home.json', `{ "x": "彩票" }`);
+      const result = runScanner(fixture.root);
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toContain('banned zh term: "彩票"');
+    });
+  });
 });
 
 // lexicon-allow-end

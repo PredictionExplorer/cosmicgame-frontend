@@ -1,0 +1,57 @@
+{
+  "generic": "操作未完成，請重試。",
+  "networkOffline": "網路已斷開，請重新連線後繼續。",
+  "walletNotConnected": "連接 Web3 錢包後即可落筆。",
+  "insufficientEth": "錢包中的 ETH 不足，無法落筆。",
+  "cycleClosed": "本週期已收官，下一演繹週期即將開啟。",
+  "state": {
+    "title": "發生錯誤",
+    "retry": "重試"
+  },
+  "boundary": {
+    "title": "發生錯誤",
+    "description": "發生了未預期的錯誤，請重試。",
+    "retry": "重試"
+  },
+  "route": {
+    "message": "渲染本頁面時出現問題，請重試或稍後再來。",
+    "titles": {
+      "app": "未能載入本頁面",
+      "allocation": "未能載入分配詳情",
+      "anchoring": "未能載入錨定配發",
+      "gallery": "未能載入畫廊",
+      "myAllocations": "未能載入我的分配",
+      "myAnchors": "未能載入我的錨定",
+      "myTokens": "未能載入我的代幣",
+      "myStatistics": "未能載入我的統計"
+    }
+  },
+  "global": {
+    "title": "應用程式發生未預期的錯誤",
+    "message": "頁面內容之外出現了問題，重新載入通常即可恢復。",
+    "retry": "重新載入"
+  },
+  "environment": {
+    "title": "缺少環境變數，應用程式無法執行。",
+    "description": "必須明確設定網路和 API URL，不能使用推斷值。",
+    "missing": "缺少或無效的變數：",
+    "resolution": "請在 shell 或 .env 檔案中設定這些變數，然後重啟開發伺服器。"
+  },
+  "apiFailure": "服務未回應，請稍後再試。",
+  "unexpected": "發生未預期的錯誤，請重試。",
+  "notFound": {
+    "title": "404：找不到頁面",
+    "description": "要找的頁面不存在或可能已遷移。Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議，請透過下方連結繼續探索。",
+    "returnHome": "返回首頁",
+    "suggestedPages": "推薦頁面",
+    "popularPages": "常用頁面",
+    "links": {
+      "home": "首頁（目前週期）",
+      "gallery": "NFT 畫廊",
+      "howItWorks": "運作原理",
+      "faq": "常見問題",
+      "statistics": "統計",
+      "anchoring": "錨定配發"
+    }
+  }
+}

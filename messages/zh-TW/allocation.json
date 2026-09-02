@@ -1,0 +1,278 @@
+{
+  "formats": {
+    "cycle": "第 {cycle} 個週期",
+    "cycleHash": "第 {cycle} 個週期",
+    "token": "代幣 #{token}",
+    "cosmicSignatureToken": "Cosmic Signature #{token}"
+  },
+  "recipients": {
+    "header": {
+      "eyebrow": "分配 · 演繹週期",
+      "title": "分配名錄",
+      "subtitle": "瀏覽所有已收官演繹週期的獲配紀錄、週期統計與分配流向。",
+      "scope": "僅顯示已收官週期紀錄",
+      "scopeTooltip": "本頁僅彙總週期 API 中已收官的演繹週期；待收官週期及不屬於這些週期的分配取回紀錄不計入統計。"
+    },
+    "intro": "週期收官後，寫下收官之筆的參與者會取回簽名分配——{percentage}% 的週期儲備、1,000 CST 與一枚專屬 Cosmic Signature NFT。其他分配則透過時之勇士、星選、錨定配發、公共財與滾動儲備等軌道流轉。",
+    "reserveSplit": {
+      "label": "週期儲備分配",
+      "tooltip": "這些百分比表示週期收官後，ETH 儲備如何沿協議各條軌道分配。",
+      "tracks": {
+        "signature": {
+          "label": "簽名分配",
+          "tooltip": "週期儲備中的主要 ETH 份額，由寫下收官之筆的參與者取回。"
+        },
+        "chrono": {
+          "label": "時之勇士",
+          "tooltip": "時之勇士分配歸本週期單次連續保持堅守冠軍位置時間最長的參與者。"
+        },
+        "stellar": {
+          "label": "ETH 星選",
+          "tooltip": "這部分 ETH 留給星選獲配者。每次落筆都會提高參與者在這些星選中的入選頻次。"
+        },
+        "anchor": {
+          "label": "錨定配發",
+          "tooltip": "ETH 將配發至在協議中錨定 Cosmic Signature NFT 的錢包。Random Walk NFT 錨定者獲得的是錨定 NFT 星選資格，而非 ETH。"
+        },
+        "publicGoods": {
+          "label": "公共財",
+          "tooltip": "本週期的 ETH 會轉撥給選定的公共財受益方，目前為 Protocol Guild。"
+        },
+        "nextCycle": {
+          "label": "下一週期",
+          "tooltip": "各項分配完成後，剩餘的週期儲備會滾入下一週期。"
+        }
+      }
+    },
+    "stats": {
+      "totalCycles": {
+        "label": "週期總數",
+        "tooltip": "目前已收官的演繹週期總數。"
+      },
+      "totalEth": {
+        "label": "ETH 發放總額",
+        "tooltip": "所有週期簽名分配中發放的 ETH 總額。"
+      },
+      "totalGestures": {
+        "label": "落筆總次數",
+        "tooltip": "所有已收官週期的累計落筆次數。"
+      },
+      "uniqueRecipients": {
+        "label": "獨立獲配者",
+        "tooltip": "曾取回簽名分配的獨立錢包地址數量。"
+      }
+    }
+  },
+  "details": {
+    "copy": {
+      "addressAria": "複製地址 {address}",
+      "addressSuccess": "地址已複製到剪貼簿"
+    },
+    "navigation": {
+      "previousAria": "上一週期",
+      "nextAria": "下一週期"
+    },
+    "recipientCard": {
+      "recipient": "獲配者",
+      "none": "無",
+      "nftToken": "NFT 編號"
+    },
+    "share": {
+      "summary": "Cosmic Signature · 第 {cycle} 個週期\n簽名分配：{amount} ETH\n獲配者：{recipient}\n落筆次數：{gestures}\n{url}",
+      "success": "週期摘要已複製到剪貼簿"
+    },
+    "invalid": {
+      "title": "週期編號無效",
+      "help": "週期編號必須為正整數。",
+      "back": "返回分配名錄"
+    },
+    "notFound": {
+      "title": "未找到分配資料",
+      "help": "暫無第 {cycle} 個週期的資料。該週期可能尚未收官。",
+      "back": "返回分配名錄"
+    },
+    "error": {
+      "title": "無法載入該週期",
+      "message": "第 {cycle} 個週期的資料載入失敗。請重試，或返回名錄。"
+    },
+    "breadcrumbs": {
+      "recipients": "分配名錄"
+    },
+    "hero": {
+      "aria": "週期概覽",
+      "amountTooltip": "收官倒數歸零後，寫下收官之筆的參與者取回的 ETH 總額。",
+      "recipient": "獲配者",
+      "nft": "NFT",
+      "nftTooltip": "在畫廊中檢視這枚 Cosmic Signature NFT。",
+      "finalized": "收官時間：{dateTime}",
+      "viewTransaction": "檢視交易",
+      "share": "分享",
+      "shareAria": "分享週期摘要"
+    },
+    "recipientSection": {
+      "aria": "週期獲配者",
+      "title": "週期獲配者",
+      "tooltip": "本週期的全部獲配者。簽名分配歸寫下收官之筆的參與者，時之勇士等符合條件的參與者還會獲得額外分配。",
+      "labels": {
+        "ethAllocation": "ETH 分配",
+        "recognitionCst": "表彰 CST",
+        "cosmicSignatureNft": "Cosmic Signature NFT"
+      },
+      "cards": {
+        "signature": {
+          "title": "簽名分配",
+          "tooltip": "收官倒數歸零時寫下收官之筆的參與者，可取回 ETH、1,000 CST 與一枚 Cosmic Signature NFT。"
+        },
+        "chrono": {
+          "title": "時之勇士",
+          "tooltip": "單次連續保持堅守冠軍位置最久的參與者，可取回 ETH、表彰 CST 與一枚 Cosmic Signature NFT。"
+        },
+        "endurance": {
+          "title": "堅守冠軍",
+          "tooltip": "單次連續保持最新落筆者身份時間最長的參與者，將獲配一枚 Cosmic Signature NFT。協議還會為其銘刻 1,000 CST（表彰 CST）。"
+        },
+        "finalCst": {
+          "title": "CST 收官之筆",
+          "tooltip": "完成本週期最後一次 CST 落筆的參與者，將獲配一枚 Cosmic Signature NFT。協議還會為其銘刻 1,000 CST（表彰 CST）。"
+        }
+      }
+    },
+    "distribution": {
+      "aria": "分配流向",
+      "title": "分配流向",
+      "tooltip": "顯示本週期儲備沿各條分配軌道的發放情況。",
+      "segments": {
+        "signature": {
+          "label": "簽名分配",
+          "tooltip": "寫下收官之筆的參與者取回了 {amount} ETH。"
+        },
+        "publicGoods": {
+          "label": "公共財",
+          "tooltip": "{amount} ETH 已轉撥給公共財受益方 Protocol Guild。"
+        },
+        "anchor": {
+          "label": "錨定配發",
+          "tooltip": "已按各錢包錨定的 Cosmic Signature NFT 數量配發 {amount} ETH。"
+        },
+        "stellar": {
+          "label": "星選",
+          "tooltip": "{amount} ETH 已分配至星選池。"
+        }
+      }
+    },
+    "statistics": {
+      "aria": "週期統計",
+      "title": "週期統計",
+      "tooltip": "彙總本週期活動與分配流向的關鍵指標。",
+      "cards": {
+        "signatureEth": {
+          "label": "簽名分配（ETH）",
+          "tooltip": "本週期寫下收官之筆的參與者取回的簽名分配 ETH。"
+        },
+        "publicGoods": {
+          "label": "公共財",
+          "tooltip": "本週期轉撥給公共財受益方 Protocol Guild 的金額。"
+        },
+        "anchor": {
+          "label": "錨定配發",
+          "tooltip": "本週期向 Cosmic Signature NFT 錨定者配發的 ETH 總額。"
+        },
+        "stellar": {
+          "label": "星選池",
+          "tooltip": "本週期分配至星選池的 ETH 總額。"
+        },
+        "gestures": {
+          "label": "落筆總次數",
+          "tooltip": "本週期的落筆總次數。"
+        },
+        "attachedNfts": {
+          "label": "已附加 NFT",
+          "tooltip": "本週期內參與者隨落筆附加的 NFT 數量。"
+        },
+        "anchoredTokens": {
+          "label": "已錨定 NFT",
+          "tooltip": "本週期在協議中錨定的 NFT 數量。"
+        },
+        "uniqueAnchorHolders": {
+          "label": "獨立錨定者",
+          "tooltip": "本週期內擁有已錨定代幣的獨立地址數量。"
+        },
+        "totalContributed": {
+          "label": "貢獻總額",
+          "tooltip": "本週期隨落筆附加的所有 ERC-20 代幣貢獻總值。"
+        }
+      }
+    },
+    "ledger": {
+      "aria": "本週期全部分配",
+      "title": "本週期全部分配",
+      "tooltip": "本週期每條分配紀錄的完整清單，包括簽名分配、時之勇士、堅守冠軍、星選、錨定配發，以及相關的 NFT 與 CST 發放。",
+      "empty": "暫無分配紀錄。"
+    },
+    "data": {
+      "divider": "詳細資料",
+      "aria": "週期數據",
+      "tabs": {
+        "gestures": "落筆歷史",
+        "endurance": "堅守冠軍",
+        "stellar": "星選",
+        "anchoring": "錨定配發",
+        "contributions": "貢獻"
+      },
+      "empty": {
+        "gestures": "本週期暫無落筆紀錄。",
+        "endurance": "本週期暫無堅守冠軍資料。",
+        "stellar": "本週期暫無星選獲配者。",
+        "anchoring": "本週期暫無錨定配發。",
+        "nfts": "本週期沒有隨落筆附加的 NFT。",
+        "erc20": "本週期沒有隨落筆附加的 ERC-20 代幣。"
+      },
+      "contributions": {
+        "nfts": "已附加 NFT",
+        "nftsTooltip": "本週期隨落筆附加的 NFT 會轉給寫下收官之筆的參與者。",
+        "erc20": "已附加 ERC-20 代幣",
+        "erc20Tooltip": "參與者隨落筆附加的 ERC-20 代幣會轉給簽名分配獲配者。"
+      }
+    }
+  },
+  "finalized": {
+    "home": "首頁",
+    "title": "週期已收官",
+    "invalid": {
+      "subtitle": "網址中需要提供有效的週期編號。",
+      "missingParameter": "<code>cycle</code> 查詢參數缺失或無效。",
+      "guidance": "可前往<allocations>我的分配</allocations>檢視已收官週期的分配。"
+    },
+    "loading": {
+      "subtitle": "正在載入第 {cycle} 個週期…",
+      "status": "載入中…"
+    },
+    "pending": {
+      "successTitle": "本週期已收官",
+      "defaultTitle": "週期已收官",
+      "successSubtitle": "第 {cycle} 個週期已在鏈上收官。",
+      "cycleBreadcrumb": "第 {cycle} 個週期",
+      "finalizedBreadcrumb": "已收官",
+      "breakdown": "分配詳情頁列有本週期的簽名分配流向、其他分配及已附加資產。",
+      "viewDetails": "檢視第 {cycle} 個週期的分配詳情",
+      "review": "也可前往<allocations>我的分配</allocations>檢視全部分配紀錄。",
+      "empty": "暫無分配資訊。"
+    },
+    "result": {
+      "title": "第 {cycle} 個週期的簽名分配已取回。",
+      "allocationBreadcrumb": "分配",
+      "retrievedBreadcrumb": "已取回",
+      "sectionTitle": "第 {cycle} 個週期的分配",
+      "sectionDescription": "本週期簽名分配各組成部分的摘要。",
+      "ethAllocation": "ETH 分配",
+      "nftId": "Cosmic Signature NFT ID",
+      "attachedTokensLabel": "已附加 NFT（ERC-721）",
+      "attachedTokens": "{count} 枚已附加 NFT（ERC-721）"
+    },
+    "next": {
+      "title": "接下來",
+      "description": "星選可能產生單獨分配，錨定則可能產生單獨的錨定配發。",
+      "body": "其他星選分配可在<allocations>我的分配</allocations>中檢視；錨定配發可在<anchors>我的錨定</anchors>中檢視。"
+    }
+  }
+}

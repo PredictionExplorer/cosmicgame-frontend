@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
-import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
+import { languageAlternates } from '@/lib/hreflang';
 
 export type CanonicalHost = 'app' | 'landing';
 
@@ -24,7 +24,7 @@ interface MetadataOptions {
   /**
    * Locale of the page being rendered (from `params.locale`). When set
    * together with `path`, the canonical points at the locale's own URL and
-   * hreflang alternates (`en`, `zh`, `x-default`) are emitted.
+   * hreflang alternates (every locale, its aliases, `x-default`) are emitted.
    *
    * PROGRESSIVE ACTIVATION (docs/i18n/progress.md, Sprint 0 note): pages that
    * have not been translated yet must NOT pass this — their `/zh` variant is
@@ -125,12 +125,7 @@ export function createMetadata(
     if (options.locale !== undefined) {
       metadata.alternates = {
         canonical: localeHref(origin, normalizedPath, options.locale),
-        languages: {
-          ...Object.fromEntries(
-            routing.locales.map((locale) => [locale, localeHref(origin, normalizedPath, locale)]),
-          ),
-          'x-default': localeHref(origin, normalizedPath, routing.defaultLocale),
-        },
+        languages: languageAlternates(origin, normalizedPath),
       };
     } else {
       metadata.alternates = { canonical: `${origin}${normalizedPath}` };

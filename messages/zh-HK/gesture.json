@@ -1,0 +1,74 @@
+{
+  "invalid": {
+    "title": "落筆 ID 無效",
+    "help": "網址中的落筆 ID 需為非負整數。"
+  },
+  "header": {
+    "title": "落筆詳情",
+    "loadingSubtitle": "正在載入落筆數據…",
+    "positionLabel": "落筆位置 #{position}",
+    "positionFallback": "落筆位置"
+  },
+  "empty": {
+    "title": "未找到落筆資訊。",
+    "help": "此 ID 可能無效，或這一筆尚未進入目前索引。"
+  },
+  "sections": {
+    "transaction": {
+      "title": "交易與週期",
+      "description": "落筆時間與所屬週期。"
+    },
+    "cost": {
+      "title": "落筆價格與參與 CST",
+      "description": "這一筆支付的金額，以及由此銘刻的參與 CST。"
+    },
+    "type": {
+      "title": "落筆類型",
+      "description": "這一筆是否使用了 Random Walk NFT 或 CST。"
+    },
+    "erc20": {
+      "title": "已附加 ERC-20",
+      "description": "隨這一筆附加的 ERC-20 代幣（如有）。"
+    },
+    "nft": {
+      "title": "已附加 NFT",
+      "description": "隨這一筆附加的 NFT 及其元數據（如有）。"
+    },
+    "message": {
+      "title": "留言",
+      "description": "參與者落筆時附上的留言。"
+    }
+  },
+  "rows": {
+    "datetime": "落筆時間",
+    "datetimeHelp": "點擊可在區塊瀏覽器中查看交易",
+    "participantAddress": "參與者地址",
+    "cycleNumber": "週期編號",
+    "cycleValue": "第 {round} 個週期",
+    "gestureCost": "落筆價格",
+    "participationCst": "參與 CST",
+    "attachedRandomWalk": "ETH 落筆是否附加 Random Walk NFT",
+    "paidWithCst": "是否使用 CST（ERC-20）支付",
+    "randomWalkId": "Random Walk NFT ID",
+    "erc20Address": "已附加 ERC-20 代幣地址",
+    "erc20Amount": "已附加 ERC-20 代幣數量（ETH）",
+    "nftAddress": "已附加 NFT 代幣地址",
+    "nftId": "已附加 NFT 代幣 ID",
+    "nftTokenUri": "NFT Token URI"
+  },
+  "values": {
+    "yes": "是",
+    "no": "否"
+  },
+  "nftPreview": {
+    "heading": "預覽與元數據",
+    "collectionName": "系列名稱",
+    "artist": "藝術家",
+    "platform": "平台",
+    "description": "描述"
+  },
+  "randomWalk": {
+    "previewAria": "Random Walk NFT 預覽",
+    "heading": "Random Walk NFT"
+  }
+}

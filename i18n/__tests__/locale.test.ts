@@ -39,27 +39,58 @@ describe('isTranslatedLocale / TRANSLATED_LOCALES', () => {
 });
 
 describe('normalizeLocale', () => {
-  it('canonicalizes regional and script variants to the base app locale', () => {
-    expect(normalizeLocale('zh')).toBe('zh');
-    expect(normalizeLocale('zh-CN')).toBe('zh');
-    expect(normalizeLocale('zh-Hans')).toBe('zh');
-    expect(normalizeLocale('ZH_TW')).toBe('zh');
-    expect(normalizeLocale('  zh-hant  ')).toBe('zh');
-    expect(normalizeLocale('en-US')).toBe('en');
-    expect(normalizeLocale('uk')).toBe('uk');
-    expect(normalizeLocale('uk-UA')).toBe('uk');
+  it('returns supported codes unchanged and accepts any casing or separator', () => {
+    for (const locale of routing.locales) expect(normalizeLocale(locale)).toBe(locale);
+    expect(normalizeLocale('ZH_TW')).toBe('zh-TW');
+    expect(normalizeLocale('zh-hk')).toBe('zh-HK');
+    expect(normalizeLocale('  Zh-Tw  ')).toBe('zh-TW');
     expect(normalizeLocale('UK_ua')).toBe('uk');
   });
 
-  it('never maps a neighbouring language onto Ukrainian', () => {
+  it('resolves regional Simplified tags to zh', () => {
+    expect(normalizeLocale('zh-CN')).toBe('zh');
+    expect(normalizeLocale('zh-Hans')).toBe('zh');
+    expect(normalizeLocale('zh-Hans-CN')).toBe('zh');
+    expect(normalizeLocale('zh-SG')).toBe('zh');
+    expect(normalizeLocale('zh-MY')).toBe('zh');
+  });
+
+  it('resolves Traditional tags to the variant that fits the script and region', () => {
+    // Bare Traditional: CLDR's likely region is Taiwan (also declared as an alias).
+    expect(normalizeLocale('zh-Hant')).toBe('zh-TW');
+    expect(normalizeLocale('  zh-hant  ')).toBe('zh-TW');
+    expect(normalizeLocale('zh-Hant-TW')).toBe('zh-TW');
+    expect(normalizeLocale('zh-Hant-HK')).toBe('zh-HK');
+    // Macau follows Hong Kong conventions (LOCALE_ALIASES).
+    expect(normalizeLocale('zh-MO')).toBe('zh-HK');
+    expect(normalizeLocale('zh-Hant-MO')).toBe('zh-HK');
+  });
+
+  it('lets script outrank region when the two disagree', () => {
+    // A Simplified reader in Taiwan is still a Simplified reader.
+    expect(normalizeLocale('zh-Hans-TW')).toBe('zh');
+    // Traditional script in an unlisted region picks a Traditional variant.
+    expect(normalizeLocale('zh-Hant-US')).toBe('zh-TW');
+  });
+
+  it('canonicalizes regional variants of single-variant languages', () => {
+    expect(normalizeLocale('en-US')).toBe('en');
+    expect(normalizeLocale('en-GB')).toBe('en');
+    expect(normalizeLocale('uk-UA')).toBe('uk');
+  });
+
+  it('never maps a neighbouring language onto another', () => {
     expect(normalizeLocale('ru')).toBe(routing.defaultLocale);
     expect(normalizeLocale('ru-UA')).toBe(routing.defaultLocale);
+    // Cantonese is negotiated by next-intl's CLDR matcher, not by the canonicalizer.
+    expect(normalizeLocale('yue')).toBe(routing.defaultLocale);
   });
 
   it('falls back to the default locale for unsupported or missing input', () => {
     expect(normalizeLocale('fr')).toBe(routing.defaultLocale);
     expect(normalizeLocale('')).toBe(routing.defaultLocale);
     expect(normalizeLocale('-')).toBe(routing.defaultLocale);
+    expect(normalizeLocale('not a tag')).toBe(routing.defaultLocale);
     expect(normalizeLocale(undefined)).toBe(routing.defaultLocale);
     expect(normalizeLocale(null)).toBe(routing.defaultLocale);
   });
@@ -70,6 +101,8 @@ describe('pickByLocale', () => {
 
   it('resolves locale-ish input through normalizeLocale', () => {
     expect(pickByLocale(record, 'zh-CN')).toBe('value:zh');
+    expect(pickByLocale(record, 'zh-Hant')).toBe('value:zh-TW');
+    expect(pickByLocale(record, 'zh-MO')).toBe('value:zh-HK');
     expect(pickByLocale(record, 'uk-UA')).toBe('value:uk');
     expect(pickByLocale(record, 'en')).toBe('value:en');
   });
@@ -85,8 +118,8 @@ describe('LocaleRecord', () => {
     // @ts-expect-error — a registry missing a locale must not compile.
     const incomplete: LocaleRecord<number> = { en: 1 };
     // @ts-expect-error — an invented locale must not compile either.
-    const invented: LocaleRecord<number> = { en: 1, zh: 2, uk: 3, fr: 4 };
-    const complete: LocaleRecord<number> = { en: 1, zh: 2, uk: 3 };
+    const invented: LocaleRecord<number> = { en: 1, zh: 2, 'zh-TW': 3, 'zh-HK': 4, uk: 5, fr: 6 };
+    const complete: LocaleRecord<number> = { en: 1, zh: 2, 'zh-TW': 3, 'zh-HK': 4, uk: 5 };
 
     expect(Object.keys(complete).sort()).toEqual([...routing.locales].sort());
     expect(incomplete).toBeDefined();

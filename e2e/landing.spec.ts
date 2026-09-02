@@ -253,34 +253,25 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     }
   });
 
-  test('keeps Ukrainian landing copy within the viewport at release breakpoints', async ({
-    page,
-  }, testInfo) => {
-    const chrome = LOCALE_CHROME.uk;
-    for (const viewport of [
-      { name: 'mobile-320', width: 320, height: 800 },
-      { name: 'tablet-768', width: 768, height: 1024 },
-      { name: 'desktop-1440', width: 1440, height: 1000 },
-    ]) {
-      await page.setViewportSize(viewport);
-      await page.goto('/uk', { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('html')).toHaveAttribute('lang', 'uk');
-      await expect(page.getByRole('heading', { level: 1 })).toContainText(chrome.landingText);
-      await expect
-        .poll(() =>
-          page.evaluate(
-            () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-          ),
-        )
-        .toBe(true);
-      await testInfo.attach(`uk-landing-${viewport.name}`, {
-        body: await page.screenshot({ fullPage: true }),
-        contentType: 'image/png',
-      });
-
-      for (const route of LOCALE_SEO.uk.landingPages.filter((entry) => entry.path !== '/uk')) {
-        await page.goto(route.path, { waitUntil: 'domcontentloaded' });
-        await expect(page.getByRole('heading', { level: 1, name: route.h1 })).toBeVisible();
+  // Every locale that joined after the Chinese sprints runs the same landing
+  // check, with its chrome strings and SEO values read from the fixtures so a
+  // new locale is one fixture entry away from coverage.
+  for (const locale of ['zh-TW', 'zh-HK', 'uk'] as const) {
+    test(`keeps ${locale} landing copy within the viewport at release breakpoints`, async ({
+      page,
+    }, testInfo) => {
+      const chrome = LOCALE_CHROME[locale];
+      const seo = LOCALE_SEO[locale];
+      const home = `/${locale}`;
+      for (const viewport of [
+        { name: 'mobile-320', width: 320, height: 800 },
+        { name: 'tablet-768', width: 768, height: 1024 },
+        { name: 'desktop-1440', width: 1440, height: 1000 },
+      ]) {
+        await page.setViewportSize(viewport);
+        await page.goto(home, { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('html')).toHaveAttribute('lang', locale);
+        await expect(page.getByRole('heading', { level: 1 })).toContainText(chrome.landingText);
         await expect
           .poll(() =>
             page.evaluate(
@@ -288,16 +279,32 @@ test.describe('Landing page @ cosmicsignature.com', () => {
             ),
           )
           .toBe(true);
-      }
-    }
+        await testInfo.attach(`${locale}-landing-${viewport.name}`, {
+          body: await page.screenshot({ fullPage: true }),
+          contentType: 'image/png',
+        });
 
-    // The landing FAQ JSON-LD must be Ukrainian too.
-    await page.goto('/uk', { waitUntil: 'domcontentloaded' });
-    const scripts = await page.locator('script[type="application/ld+json"]').allInnerTexts();
-    const faq = scripts.find((content) => content.includes('"@type":"FAQPage"'));
-    expect(faq).toContain('"inLanguage":"uk"');
-    expect(faq).toMatch(chrome.script);
-  });
+        for (const route of seo.landingPages.filter((entry) => entry.path !== home)) {
+          await page.goto(route.path, { waitUntil: 'domcontentloaded' });
+          await expect(page.getByRole('heading', { level: 1, name: route.h1 })).toBeVisible();
+          await expect
+            .poll(() =>
+              page.evaluate(
+                () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+              ),
+            )
+            .toBe(true);
+        }
+      }
+
+      // The landing FAQ JSON-LD must be in the locale too.
+      await page.goto(home, { waitUntil: 'domcontentloaded' });
+      const scripts = await page.locator('script[type="application/ld+json"]').allInnerTexts();
+      const faq = scripts.find((content) => content.includes('"@type":"FAQPage"'));
+      expect(faq).toContain(`"inLanguage":"${seo.inLanguage}"`);
+      expect(faq).toMatch(chrome.script);
+    });
+  }
 
   test('contains no banned lexicon terms in rendered HTML', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });

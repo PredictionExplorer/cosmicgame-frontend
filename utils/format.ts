@@ -3,6 +3,8 @@ import { formatUnits } from 'viem';
 import enFormats from '@/messages/en/formats.json';
 import ukFormats from '@/messages/uk/formats.json';
 import zhFormats from '@/messages/zh/formats.json';
+import zhHkFormats from '@/messages/zh-HK/formats.json';
+import zhTwFormats from '@/messages/zh-TW/formats.json';
 
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 import { getLocaleConfig } from '@/i18n/localeConfig';
@@ -49,6 +51,8 @@ interface DurationUnitLabels {
 const DURATION_UNITS: LocaleRecord<DurationUnitLabels> = {
   en: enFormats.durationCompact,
   zh: zhFormats.durationCompact,
+  'zh-TW': zhTwFormats.durationCompact,
+  'zh-HK': zhHkFormats.durationCompact,
   uk: ukFormats.durationCompact,
 };
 
@@ -139,10 +143,21 @@ interface TimestampParts {
   minutes: string;
 }
 
+/**
+ * Chinese date templates. The calendar characters 年/月/日 and the 24-hour
+ * clock are identical in Simplified and Traditional script and in every
+ * Chinese region, so the three Chinese locales share one implementation
+ * (unlike catalog copy, which differs by vocabulary and register).
+ */
+const chineseTimestamp = ({ monthIndex, day, hours, minutes }: TimestampParts): string =>
+  `${monthIndex + 1}月${day}日 ${hours}:${minutes}`;
+
 const TIMESTAMP_DATETIME_FORMATS: LocaleRecord<(parts: TimestampParts) => string> = {
   en: ({ monthIndex, day, hours, minutes }) =>
     `${MONTH_LABELS[monthIndex]} ${('0' + day).slice(-2)}, ${hours}:${minutes}`,
-  zh: ({ monthIndex, day, hours, minutes }) => `${monthIndex + 1}月${day}日 ${hours}:${minutes}`,
+  zh: chineseTimestamp,
+  'zh-TW': chineseTimestamp,
+  'zh-HK': chineseTimestamp,
   uk: ({ monthIndex, day, hours, minutes }) =>
     `${day} ${shortMonthLabel('uk', monthIndex)}, ${hours}:${minutes}`,
 };
@@ -317,11 +332,16 @@ export function fromYyyymmdd(yyyymmdd: string): string {
   return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`;
 }
 
+const chineseCalendarDate = (year: number, monthIndex: number, day: number): string =>
+  `${year}/${monthIndex + 1}/${day}`;
+
 const CALENDAR_DATE_LABEL_FORMATS: LocaleRecord<
   (year: number, monthIndex: number, day: number) => string
 > = {
   en: (year, monthIndex, day) => `${MONTH_LABELS[monthIndex] ?? ''} ${day}, ${year}`,
-  zh: (year, monthIndex, day) => `${year}/${monthIndex + 1}/${day}`,
+  zh: chineseCalendarDate,
+  'zh-TW': chineseCalendarDate,
+  'zh-HK': chineseCalendarDate,
   uk: (year, monthIndex, day) => numericDate('uk', year, monthIndex, day),
 };
 
@@ -349,22 +369,40 @@ export function yyyymmddTodayUtc(): string {
   return yyyymmddDaysAgoUtc(0);
 }
 
+const chineseUtcDateTime = (
+  year: number,
+  monthIndex: number,
+  day: number,
+  hh: string,
+  mm: string,
+): string => `${year}年${monthIndex + 1}月${day}日 ${hh}:${mm}（UTC）`;
+
 const UTC_DATETIME_LABEL_FORMATS: LocaleRecord<
   (year: number, monthIndex: number, day: number, hh: string, mm: string) => string
 > = {
   en: (year, monthIndex, day, hh, mm) =>
     `${MONTH_LABELS[monthIndex] ?? ''} ${day}, ${year} ${hh}:${mm} UTC`,
-  zh: (year, monthIndex, day, hh, mm) => `${year}年${monthIndex + 1}月${day}日 ${hh}:${mm}（UTC）`,
+  zh: chineseUtcDateTime,
+  'zh-TW': chineseUtcDateTime,
+  'zh-HK': chineseUtcDateTime,
   uk: (year, monthIndex, day, hh, mm) =>
     `${numericDate('uk', year, monthIndex, day)} ${hh}:${mm} UTC`,
 };
 
+const chineseUtcStamp = (date: Date): string =>
+  chineseUtcDateTime(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+    String(date.getUTCHours()).padStart(2, '0'),
+    String(date.getUTCMinutes()).padStart(2, '0'),
+  );
+
 const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
   en: (date) => `${date.toISOString().replace('T', ' ').slice(0, 16)} UTC`,
-  zh: (date) =>
-    `${date.getUTCFullYear()}年${date.getUTCMonth() + 1}月${date.getUTCDate()}日 ${String(
-      date.getUTCHours(),
-    ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}（UTC）`,
+  zh: chineseUtcStamp,
+  'zh-TW': chineseUtcStamp,
+  'zh-HK': chineseUtcStamp,
   uk: (date) =>
     `${numericDate('uk', date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())} ${String(
       date.getUTCHours(),
@@ -373,8 +411,8 @@ const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
 
 /**
  * "Data updated at" stamp for SEO summaries: `en` keeps the ISO-style
- * "2026-08-28 08:13 UTC"; `zh` renders "2026年8月28日 08:13（UTC）"; `uk`
- * renders "28.08.2026 08:13 UTC".
+ * "2026-08-28 08:13 UTC"; every Chinese locale renders
+ * "2026年8月28日 08:13（UTC）"; `uk` renders "28.08.2026 08:13 UTC".
  */
 export function formatUtcDateTimeStamp(date: Date, locale: string = 'en'): string {
   return pickByLocale(UTC_STAMP_FORMATS, locale)(date);

@@ -9,6 +9,8 @@ import {
 import { whitePaperTextEn } from './text.en';
 import { whitePaperTextUk } from './text.uk';
 import { whitePaperTextZh } from './text.zh';
+import { whitePaperTextZhHk } from './text.zh-HK';
+import { whitePaperTextZhTw } from './text.zh-TW';
 import {
   WHITE_PAPER_PATH,
   whitePaperPdfPath,
@@ -97,6 +99,14 @@ export const whitePaperContentZh: WhitePaperContent = buildWhitePaperContent(
   'zh',
   whitePaperTextZh,
 );
+export const whitePaperContentZhTw: WhitePaperContent = buildWhitePaperContent(
+  'zh-TW',
+  whitePaperTextZhTw,
+);
+export const whitePaperContentZhHk: WhitePaperContent = buildWhitePaperContent(
+  'zh-HK',
+  whitePaperTextZhHk,
+);
 export const whitePaperContentUk: WhitePaperContent = buildWhitePaperContent(
   'uk',
   whitePaperTextUk,
@@ -105,6 +115,8 @@ export const whitePaperContentUk: WhitePaperContent = buildWhitePaperContent(
 const WHITE_PAPER_CONTENT: LocaleRecord<WhitePaperContent> = {
   en: whitePaperContentEn,
   zh: whitePaperContentZh,
+  'zh-TW': whitePaperContentZhTw,
+  'zh-HK': whitePaperContentZhHk,
   uk: whitePaperContentUk,
 };
 

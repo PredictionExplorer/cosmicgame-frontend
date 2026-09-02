@@ -8,6 +8,8 @@ import type { TerminologyRule } from '../terminology-consistency-core';
  * 慈善) belong only in the lexicon scanner so neither gate can silently
  * weaken the other. Matched as CJK substrings (see locale-text-matchers.ts).
  */
+// lexicon-allow-start: drift variants quote the rejected renderings they catch
+// (公益 is banned in the Traditional registers and shares its characters).
 export const ZH_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Gesture',
@@ -130,3 +132,4 @@ export const ZH_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     variants: ['最终倒计时', '结束倒计时'],
   },
 ] as const;
+// lexicon-allow-end

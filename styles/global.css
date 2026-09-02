@@ -66,12 +66,33 @@
   /* Breathing room between the header and anything pinned beneath it. */
   --sticky-offset: calc(var(--header-height) + 0.75rem);
   /*
-   * Display face for Latin-script locales. CJK glyphs fall through to Noto
-   * Sans SC per glyph; Cyrillic locales replace the whole stack below.
+   * CJK companion faces (docs/i18n/README.md §5). Neither Latin face carries
+   * CJK glyphs, so Chinese text falls through to this stack per glyph. The
+   * default is the Simplified cut; the html:lang() rules below swap in the
+   * Taiwan and Hong Kong cuts, whose glyph forms follow those regions'
+   * standards. Every font-family that may render Chinese (body, display,
+   * mono) references this one property instead of naming a face.
+   */
+  --cjk-font-stack: var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei';
+  /*
+   * Display face for Latin-script locales. CJK glyphs fall through to the
+   * CJK stack per glyph; Cyrillic locales replace the whole stack below.
    */
   --display-font-stack:
-    var(--font-clash-display), 'ClashDisplay-Variable', var(--font-noto-sc), 'PingFang SC',
-    'Microsoft YaHei', sans-serif;
+    var(--font-clash-display), 'ClashDisplay-Variable', var(--cjk-font-stack), sans-serif;
+}
+
+/*
+ * Traditional Chinese locales: same layout as the Simplified default, but the
+ * Noto Sans cut (and the system fallbacks) match the regional glyph standard.
+ * Unlayered next to :root for the same reason as the Ukrainian override below.
+ */
+html:lang(zh-TW) {
+  --cjk-font-stack: var(--font-noto-tc), 'PingFang TC', 'Microsoft JhengHei';
+}
+
+html:lang(zh-HK) {
+  --cjk-font-stack: var(--font-noto-hk), 'PingFang HK', 'Microsoft JhengHei';
 }
 
 /*
@@ -173,8 +194,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
 
   body {
     @apply bg-background text-foreground;
-    font-family:
-      var(--font-inter), Inter, var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-family: var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -183,31 +203,32 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
-   * Chinese locale typography (docs/i18n/README.md §5). The Latin display
-   * face (Clash Display) has no CJK glyphs, so zh headings fall through to
-   * Noto Sans SC. CJK must never inherit Latin display tracking, and the
-   * lighter display weights read too thin in CJK strokes.
+   * Chinese typography (docs/i18n/README.md §5), shared by every Chinese
+   * locale: `:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike. The Latin
+   * display face (Clash Display) has no CJK glyphs, so Chinese headings fall
+   * through to the locale's Noto Sans cut. CJK must never inherit Latin
+   * display tracking, and the lighter display weights read too thin in CJK
+   * strokes.
    */
-  html[lang='zh'] .type-display,
-  html[lang='zh'] h1,
-  html[lang='zh'] h2,
-  html[lang='zh'] h3 {
+  html:lang(zh) .type-display,
+  html:lang(zh) h1,
+  html:lang(zh) h2,
+  html:lang(zh) h3 {
     letter-spacing: 0 !important;
     font-weight: 700;
   }
 
   /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese
      document, translated nav/table/status copy must keep natural CJK spacing. */
-  html[lang='zh'] [class*='tracking-'] {
+  html:lang(zh) [class*='tracking-'] {
     letter-spacing: 0 !important;
   }
 
   /* Keep Latin identifiers monospaced while routing CJK glyphs through the
      project font instead of an OS-dependent monospace fallback. */
-  html[lang='zh'] .font-mono {
+  html:lang(zh) .font-mono {
     font-family:
-      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, var(--font-noto-sc), 'PingFang SC',
-      'Microsoft YaHei', monospace !important;
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, var(--cjk-font-stack), monospace !important;
   }
 
   button,

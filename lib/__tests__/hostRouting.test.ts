@@ -1,3 +1,4 @@
+import { routing } from '@/i18n/routing';
 import {
   APP_ORIGIN,
   APP_ONLY_PATH_PREFIXES,
@@ -11,9 +12,54 @@ import {
   localeHref,
   localizeCrossHostHref,
   normalizeHost,
+  splitLocalePrefix,
 } from '@/lib/hostRouting';
 
 describe('hostRouting', () => {
+  describe('splitLocalePrefix', () => {
+    it('leaves unprefixed (English) paths alone', () => {
+      expect(splitLocalePrefix('/gallery')).toEqual({ publicPath: '/gallery' });
+      expect(splitLocalePrefix('/')).toEqual({ publicPath: '/' });
+      expect(splitLocalePrefix('')).toEqual({ publicPath: '/' });
+    });
+
+    it.each(routing.locales.filter((locale) => locale !== routing.defaultLocale))(
+      'splits the %s prefix off the public path',
+      (locale) => {
+        expect(splitLocalePrefix(`/${locale}`)).toEqual({ locale, publicPath: '/' });
+        expect(splitLocalePrefix(`/${locale}/gallery`)).toEqual({ locale, publicPath: '/gallery' });
+        expect(splitLocalePrefix(`/${locale}/learn/what-is-cosmic-signature`)).toEqual({
+          locale,
+          publicPath: '/learn/what-is-cosmic-signature',
+        });
+      },
+    );
+
+    it('never reads a region-qualified locale as its base language', () => {
+      expect(splitLocalePrefix('/zh-TW/gallery')).toEqual({
+        locale: 'zh-TW',
+        publicPath: '/gallery',
+      });
+      expect(splitLocalePrefix('/zh-HK')).toEqual({ locale: 'zh-HK', publicPath: '/' });
+      expect(splitLocalePrefix('/zh/gallery')).toEqual({ locale: 'zh', publicPath: '/gallery' });
+    });
+
+    it('matches prefixes case-insensitively and returns the canonical code', () => {
+      expect(splitLocalePrefix('/zh-tw/gallery')).toEqual({
+        locale: 'zh-TW',
+        publicPath: '/gallery',
+      });
+      expect(splitLocalePrefix('/ZH-HK')).toEqual({ locale: 'zh-HK', publicPath: '/' });
+      expect(splitLocalePrefix('/Uk/about')).toEqual({ locale: 'uk', publicPath: '/about' });
+    });
+
+    it('does not treat look-alike segments as locales', () => {
+      expect(splitLocalePrefix('/zhang')).toEqual({ publicPath: '/zhang' });
+      expect(splitLocalePrefix('/zh-TWx/gallery')).toEqual({ publicPath: '/zh-TWx/gallery' });
+      expect(splitLocalePrefix('/ukraine')).toEqual({ publicPath: '/ukraine' });
+    });
+  });
+
   describe('normalizeHost', () => {
     it('returns empty string for null', () => {
       expect(normalizeHost(null)).toBe('');

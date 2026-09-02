@@ -1,0 +1,18 @@
+{
+  "protocol": {
+    "title": "協議公共財資助",
+    "subtitle": "Cosmic Signature 協議自動轉入公共財金庫的資金",
+    "description": "每個週期，協議都會自動將一定比例的週期儲備轉入公共財金庫。宇宙議會協調確定資金流向的公共財受益方，讓協議參與與生態建設直接相連。"
+  },
+  "voluntary": {
+    "title": "自願公共財資助",
+    "subtitle": "社群成員自願轉入公共財金庫的資金",
+    "description": "除協議自動轉撥外，社群成員也可自願向公共財金庫貢獻資金。這些鏈上紀錄展現了 Cosmic Signature 社群對公共財建設的持續支援。"
+  },
+  "retrievals": {
+    "title": "公共財取回",
+    "subtitle": "從公共財金庫取回的資金",
+    "description": "此處紀錄 Cosmic Signature 公共財金庫的全部取回操作。每筆資金都會轉撥給由宇宙議會協調選定的公共財受益方。"
+  },
+  "loading": "載入中…"
+}

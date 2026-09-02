@@ -1,0 +1,91 @@
+{
+  "loadingAria": "正在載入推廣分配",
+  "hero": {
+    "title": "透過<highlight>推廣 Cosmic Signature</highlight> 獲得 CST 分配",
+    "description": "參與 Cosmic Signature 推廣；每項經核實的推廣行動，都可獲得 CST 分配。",
+    "learnHow": "了解參與方式"
+  },
+  "stats": {
+    "heading": "推廣計劃統計",
+    "infoAria": "查看「{label}」說明",
+    "valueAria": "{label}：{value} {suffix}",
+    "totalAllocations": {
+      "label": "累計分配",
+      "tooltip": "自推廣計劃啟動以來，向所有推廣貢獻者發放的 CST 總量。"
+    },
+    "activeContributors": {
+      "label": "推廣貢獻者",
+      "tooltip": "收到過推廣分配的獨立錢包地址數。"
+    },
+    "transactions": {
+      "label": "分配交易",
+      "tooltip": "已處理的推廣分配交易總數。"
+    }
+  },
+  "howItWorks": {
+    "title": "參與方式",
+    "infoAria": "查看參與方式說明",
+    "tooltip": "透過 3 個步驟參與 Cosmic Signature 推廣並獲得分配。",
+    "stepInfoAria": "查看「{title}」說明",
+    "steps": {
+      "promote": {
+        "title": "開展推廣",
+        "description": "在社交平台、博客和社區中介紹 Cosmic Signature。",
+        "tooltip": "可創作內容、分享推薦連結、撰寫博客文章或製作影片，參與 Cosmic Signature 推廣。"
+      },
+      "verify": {
+        "title": "接受核實",
+        "description": "團隊會審閱並核實推廣行動。",
+        "tooltip": "推廣團隊會綜合評估傳播範圍、內容質素與真實性，再確認相應分配。"
+      },
+      "receive": {
+        "title": "獲得 CST",
+        "description": "CST 分配會直接發放至錢包。",
+        "tooltip": "核實完成後，CST 將透過鏈上交易發送至錢包地址；分配額會參考推廣行動的實際影響。"
+      }
+    }
+  },
+  "leaderboard": {
+    "title": "推廣貢獻榜",
+    "infoAria": "查看推廣貢獻榜說明",
+    "tooltip": "按推廣活動累計獲配的 CST 排名。",
+    "empty": "暫無推廣貢獻者。",
+    "rewardCountOne": "{count} 筆分配",
+    "rewardCountOther": "{count} 筆分配"
+  },
+  "history": {
+    "title": "推廣分配記錄",
+    "infoAria": "查看推廣分配記錄說明",
+    "tooltip": "按時間順序列出全部推廣分配交易。",
+    "showingOne": "共 <strong>{count}</strong> 筆分配",
+    "showingOther": "共 <strong>{count}</strong> 筆分配",
+    "emptyTitle": "暫無推廣分配",
+    "emptyDescription": "推廣行動透過核實並完成撥付後，記錄會顯示在這裏。"
+  },
+  "cta": {
+    "title": "準備參與推廣？",
+    "description": "加入推廣計劃，向更多人介紹 Cosmic Signature，並根據經核實的推廣行動獲得 CST 分配。",
+    "contact": "聯絡推廣團隊",
+    "contactTooltip": "聯絡團隊，了解推廣機會與分配規則。",
+    "infoAria": "查看聯絡推廣團隊的說明",
+    "infoTooltip": "團隊會協助準備推廣材料，並說明不同推廣行動對應的分配檔位。"
+  },
+  "address": {
+    "invalid": "以太坊地址無效",
+    "heading": "此參與者的推廣分配",
+    "loading": "載入中…",
+    "outreachWallet": "推廣錢包"
+  },
+  "transferForm": {
+    "title": "撥付推廣 CST",
+    "description": "調用推廣儲備合約的 `payReward` 函數；目前連接的錢包必須屬於現任財務執行人。",
+    "reserveLabel": "推廣儲備",
+    "availableLabel": "可用 CST",
+    "ownerLabel": "所有者",
+    "treasurerLabel": "財務執行人",
+    "unavailable": "暫不可用",
+    "recipientLabel": "接收地址",
+    "amountLabel": "數量",
+    "historyLink": "查看推廣儲備轉帳記錄"
+  }
+}

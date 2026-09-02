@@ -305,6 +305,190 @@ export const ZH_BANNED_TERMS: readonly string[] = [
 // lexicon-allow-end
 
 /**
+ * Traditional-Chinese banned register shared by Taiwan and Hong Kong
+ * (docs/i18n/glossary-zh-TW.md §5, glossary-zh-HK.md §5): the Simplified list
+ * above in Traditional characters, plus the pan-Traditional vocabulary that
+ * has no Simplified counterpart in our copy (公益 "charity/public welfare",
+ * 獲利 "profit"). Regional registers below add the words each place actually
+ * uses for gambling, auctions, and returns — those differ (Taiwan says 博弈
+ * and 競標, Hong Kong says 博彩 and 競投), which is why the profiles are
+ * scoped to their own locale's files (scripts/locale-files.ts).
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const ZH_HANT_BANNED_TERMS: readonly string[] = [
+  // bid / auction
+  '出價',
+  '競價',
+  '叫價',
+  '投標',
+  '拍賣',
+  '競拍',
+  '荷蘭拍',
+  // prize / jackpot
+  '獎品',
+  '獎勵',
+  '獎金',
+  '大獎',
+  '頭獎',
+  '獎池',
+  '戰利品',
+  '安慰獎',
+  // lottery / raffle / draw
+  '彩票',
+  '樂透',
+  '彩券',
+  '獎券',
+  '抽獎',
+  '抽籤',
+  '搖號',
+  '開獎',
+  '刮刮樂',
+  // winner
+  '中獎',
+  '贏家',
+  '得主',
+  '獲勝者',
+  '優勝者',
+  // gambling / bets / house
+  '賭博',
+  '賭場',
+  '賭注',
+  '賭客',
+  '博彩',
+  '下注',
+  '投注',
+  '押注',
+  '打賭',
+  '賠率',
+  '莊家',
+  '荷官',
+  // luck flavor
+  '抽中',
+  '碰運氣',
+  '拼手氣',
+  '幸運兒',
+  // game / play
+  '遊戲',
+  '玩家',
+  '玩法',
+  '試玩',
+  '闖關',
+  // competition
+  '比賽',
+  '競賽',
+  '競爭',
+  '競技',
+  '錦標賽',
+  '爭奪',
+  '對決',
+  // investment
+  '投資',
+  '理財',
+  '炒幣',
+  '建倉',
+  // yield / profit / dividend
+  '收益',
+  '年化',
+  '利息',
+  '分紅',
+  '股息',
+  '盈利',
+  '利潤',
+  '獲利',
+  // earn(ings) / income
+  '賺錢',
+  '賺取',
+  '躺賺',
+  '薅羊毛',
+  '被動收入',
+  // staking / mint / mining
+  '質押',
+  '鑄造',
+  '鑄幣',
+  '挖礦',
+  // withdraw / claim
+  '提現',
+  '提款',
+  '領取',
+  '認領',
+  // giveaway / airdrop
+  '空投',
+  '贈品',
+  '白送',
+  '免費領',
+  // charity / donation
+  '慈善',
+  '公益',
+  '捐贈',
+  '捐款',
+  '捐獻',
+  '捐助',
+  '善款',
+  // DAO
+  '去中心化自治組織',
+  // round (cycle context) — 輪次/回合 as standalone terms
+  '輪次',
+  '回合',
+  // ticket
+  '門票',
+  '入場券',
+  // tax
+  '免稅',
+  '抵稅',
+];
+
+/**
+ * Taiwan register (docs/i18n/glossary-zh-TW.md §5). 博弈 means gambling in
+ * Taiwan (博弈產業) but "strategic interplay" on the mainland; 競標/得標 are
+ * the everyday words for bidding; 報酬 is the finance word for a return
+ * (投資報酬率); 摸彩 is a lucky draw; 提領 is a withdrawal.
+ */
+export const ZH_TW_BANNED_TERMS: readonly string[] = [
+  '博弈',
+  '威力彩',
+  '大樂透',
+  '運彩',
+  '運動彩券',
+  '簽注',
+  '簽賭',
+  '摸彩',
+  '賓果',
+  '競標',
+  '標售',
+  '得標',
+  '喊價',
+  '報酬',
+  '獲利率',
+  '股利',
+  '配息',
+  '提領',
+];
+
+/**
+ * Hong Kong register (docs/i18n/glossary-zh-HK.md §5). 六合彩/賽馬/馬會 are
+ * the local lotteries and racing; 派彩 is a payout; 落注/賭波 are placing a
+ * bet; 攪珠 is the lottery draw; 競投/投得 are bidding at auction; 回報 is
+ * the finance word for a return (投資回報); 派息 is a dividend.
+ */
+export const ZH_HK_BANNED_TERMS: readonly string[] = [
+  '六合彩',
+  '賽馬',
+  '馬會',
+  '投注站',
+  '派彩',
+  '落注',
+  '賭波',
+  '賭錢',
+  '賭仔',
+  '攪珠',
+  '競投',
+  '投得',
+  '回報',
+  '派息',
+];
+// lexicon-allow-end
+
+/**
  * Ukrainian banned terms (docs/i18n/glossary-uk.md §5), mirroring the
  * English categories above with the same scope — no broader. Ukrainian
  * inflects, so the register is declared two ways:
@@ -520,9 +704,11 @@ export const UK_BANNED_TERMS: readonly string[] = [
 
 /**
  * One banned-register profile per translated locale. The type forces a
- * decision the moment a locale joins routing.locales; the CLI applies every
- * profile to every scanned file, because stray copy in the wrong file is
- * exactly what the scanner exists to catch.
+ * decision the moment a locale joins routing.locales. The CLI applies a
+ * profile to every locale-agnostic file and to every file of another
+ * language (stray copy in the wrong file is exactly what the scanner exists
+ * to catch), but not to files of a sibling variant of the same language —
+ * see `checkAppliesTo` in scripts/locale-files.ts.
  */
 export interface LexiconProfile {
   /** Where the register is documented. */
@@ -534,6 +720,20 @@ export const LEXICON_PROFILES: Record<TranslatedLocale, LexiconProfile> = {
   zh: {
     glossary: 'docs/i18n/glossary-zh.md',
     termSets: [{ matcher: 'cjk-substring', terms: ZH_BANNED_TERMS }],
+  },
+  'zh-TW': {
+    glossary: 'docs/i18n/glossary-zh-TW.md',
+    termSets: [
+      { matcher: 'cjk-substring', terms: ZH_HANT_BANNED_TERMS },
+      { matcher: 'cjk-substring', terms: ZH_TW_BANNED_TERMS },
+    ],
+  },
+  'zh-HK': {
+    glossary: 'docs/i18n/glossary-zh-HK.md',
+    termSets: [
+      { matcher: 'cjk-substring', terms: ZH_HANT_BANNED_TERMS },
+      { matcher: 'cjk-substring', terms: ZH_HK_BANNED_TERMS },
+    ],
   },
   uk: {
     glossary: 'docs/i18n/glossary-uk.md',

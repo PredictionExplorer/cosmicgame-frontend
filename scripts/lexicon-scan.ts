@@ -30,6 +30,8 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve } from 'node:path';
 
+import type { TranslatedLocale } from '../i18n/routing';
+
 import {
   DEFAULT_BANNED_STEMS,
   DEFAULT_BANNED_TERMS,
@@ -42,6 +44,7 @@ import {
   scanIdentifiers,
   scanJsxTextNodes,
 } from './lexicon-scan-core';
+import { checkAppliesTo, fileLocale } from './locale-files';
 
 const ROOT = resolve(process.cwd());
 
@@ -101,11 +104,18 @@ const EXCLUDE_DIRS: ReadonlySet<string> = new Set(
 
 const STRING_PATTERN = buildBannedPattern(DEFAULT_BANNED_TERMS);
 const IDENT_PATTERN = buildIdentifierPattern(DEFAULT_BANNED_STEMS);
-// Translated-locale banned registers (docs/i18n/glossary-<locale>.md). Every
-// profile runs on every scanned file: translated copy lives in
-// messages/<locale>/*.json and in content/**/*.<locale>.ts, and stray copy
-// in the wrong file is exactly what the scanner exists to catch.
-const LOCALE_PATTERNS = Object.entries(LEXICON_PROFILES).map(([locale, profile]) => ({
+// Translated-locale banned registers (docs/i18n/glossary-<locale>.md). A
+// profile runs on every locale-agnostic file and on every file of another
+// language (stray copy in the wrong file is exactly what the scanner exists
+// to catch), but not on a sibling variant of its own language: the Chinese
+// variants share characters while their registers differ — see
+// checkAppliesTo in scripts/locale-files.ts.
+const LOCALE_PATTERNS = (
+  Object.entries(LEXICON_PROFILES) as [
+    TranslatedLocale,
+    (typeof LEXICON_PROFILES)[TranslatedLocale],
+  ][]
+).map(([locale, profile]) => ({
   locale,
   glossary: profile.glossary,
   patterns: buildProfilePatterns(profile),
@@ -129,7 +139,9 @@ const counts: PhaseCounts = {
 let failed = false;
 
 function scanLocaleRegisters(relPath: string, content: string): void {
+  const owner = fileLocale(relPath);
   for (const { locale, patterns } of LOCALE_PATTERNS) {
+    if (!checkAppliesTo(locale, owner)) continue;
     for (const pattern of patterns) {
       for (const h of scanContent(content, pattern)) {
         console.error(
