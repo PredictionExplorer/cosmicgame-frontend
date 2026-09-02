@@ -1,0 +1,257 @@
+{
+  "types": {
+    "structure": "Structure",
+    "underlay": "Underlay",
+    "accent": "Accent",
+    "symmetry": "Symmetry",
+    "projection": "Projection",
+    "wildcard": "Wildcard",
+    "finish": "Finish",
+    "palette": "Palette",
+    "spectralClass": "Spectral Class",
+    "massBalance": "Mass Balance",
+    "fate": "Fate",
+    "chaos": "Chaos",
+    "syzygies": "Syzygies",
+    "cycle": "Cycle",
+    "imprinted": "Imprinted",
+    "allocation": "Allocation"
+  },
+  "hints": {
+    "structure": "The primary drawing vocabulary the three orbits are rendered with.",
+    "underlay": "A second, fainter vocabulary layered beneath the primary structure.",
+    "accent": "A sparse highlight vocabulary drawn over the structure.",
+    "symmetry": "The fold applied to the composition: mirror, rosette, or mandala.",
+    "projection": "The coordinate space the trajectories are plotted in.",
+    "wildcard": "An uncommon variant that breaks the usual rendering rules.",
+    "finish": "A post-processing effect applied to the final frame.",
+    "palette": "The colour family and harmony scheme of the three bodies.",
+    "spectralClass": "Stellar colour class of the dominant body, from blue-white O to red M.",
+    "massBalance": "How the three masses compare: one heavy primary, a twin pair, or three equals.",
+    "fate": "How the simulation ends: a bound eternal dance, or one body ejected.",
+    "chaos": "Sensitivity to initial conditions, scored from 0 (orderly) to 100 (turbulent).",
+    "syzygies": "Moments when all three bodies line up.",
+    "cycle": "The Performance Cycle in which the NFT was imprinted.",
+    "imprinted": "When the NFT was imprinted on Arbitrum.",
+    "allocation": "The allocation that delivered this NFT to its first recipient."
+  },
+  "values": {
+    "vocabulary": {
+      "orbitRibbons": "Orbit Ribbons",
+      "timeChords": "Time Chords",
+      "harmonicWeave": "Harmonic Weave",
+      "tangentCaustics": "Tangent Caustics",
+      "stippleConstellation": "Stipple Constellation",
+      "nebulaVeil": "Nebula Veil"
+    },
+    "symmetry": {
+      "mirror": "Mirror",
+      "rosette": "Rosette ×{n}",
+      "mandala": "Mandala ×{n}"
+    },
+    "projection": {
+      "crossBraid": "Cross Braid",
+      "phasePortrait": "Phase Portrait",
+      "hodograph": "Hodograph"
+    },
+    "wildcard": {
+      "yes": "Yes"
+    },
+    "finish": {
+      "stardust": "Stardust",
+      "prism": "Prism"
+    },
+    "massBalance": {
+      "heavyPrimary": "Heavy Primary",
+      "twinBinary": "Twin Binary",
+      "equalTrio": "Equal Trio"
+    },
+    "fate": {
+      "eternalDance": "Eternal Dance",
+      "ejection": "Ejection"
+    },
+    "allocation": {
+      "stellarSelection": "Stellar Selection",
+      "anchoredSelection": "Anchored Selection",
+      "finalGesture": "Final Gesture",
+      "lastCstGesture": "Last CST Gesture",
+      "enduranceChampion": "Endurance Champion",
+      "chronoWarrior": "Chrono-Warrior"
+    },
+    "palette": {
+      "pattern": "{hue} {scheme}",
+      "hues": {
+        "amber": "Amber",
+        "aurora": "Aurora",
+        "cerulean": "Cerulean",
+        "ember": "Ember",
+        "glacial": "Glacial",
+        "jade": "Jade",
+        "nebular": "Nebular",
+        "orchid": "Orchid",
+        "rose": "Rose",
+        "sapphire": "Sapphire",
+        "solar": "Solar",
+        "violet": "Violet"
+      },
+      "schemes": {
+        "mono": "Mono",
+        "split": "Split",
+        "analogous": "Analogous",
+        "triad": "Triad",
+        "complementary": "Complementary",
+        "tetrad": "Tetrad"
+      }
+    },
+    "spectralClass": {
+      "O": {
+        "label": "Class O",
+        "tone": "Blue, the hottest class"
+      },
+      "B": {
+        "label": "Class B",
+        "tone": "Blue-white"
+      },
+      "A": {
+        "label": "Class A",
+        "tone": "White"
+      },
+      "F": {
+        "label": "Class F",
+        "tone": "Yellow-white"
+      },
+      "G": {
+        "label": "Class G",
+        "tone": "Yellow, like the Sun"
+      },
+      "K": {
+        "label": "Class K",
+        "tone": "Orange"
+      },
+      "M": {
+        "label": "Class M",
+        "tone": "Red, the coolest class"
+      }
+    }
+  },
+  "groups": {
+    "composition": "Composition",
+    "physics": "Orbital physics",
+    "provenance": "Provenance",
+    "media": "Media"
+  },
+  "card": {
+    "chaosAria": "Chaos {value} of {max}",
+    "chaosShort": "Chaos {value}",
+    "syzygiesAria": "{count} syzygies",
+    "syzygiesShort": "{count} syzygies",
+    "hueStripAria": "Palette hues of the three bodies",
+    "spectralAria": "Spectral class {value}",
+    "fateAria": "Fate: {value}",
+    "quickView": "Quick view",
+    "quickViewAria": "Quick view of Cosmic Signature {id}",
+    "traitsPending": "Traits pending",
+    "traitsPendingTooltip": "Trait metadata has not been published for this Signature yet.",
+    "cycleShort": "C{n}",
+    "cycleLong": "Cycle {n}",
+    "cycleTooltip": "Imprinted in cycle {n}",
+    "viewCycle": "View cycle {n}"
+  },
+  "rarity": {
+    "rank": "#{rank}",
+    "rankLabel": "Rarity rank",
+    "rankOf": "Rank {rank} of {total}",
+    "tooltip": "Rarity rank {rank} of {total}: how uncommon this Signature's traits are across the collection. Rarest trait: {trait}.",
+    "tooltipNoTrait": "Rarity rank {rank} of {total}: how uncommon this Signature's traits are across the collection.",
+    "rarest": "Rarest trait",
+    "share": "{count} of {total} share this",
+    "shareShort": "{count}/{total}",
+    "scoreLabel": "Rarity score",
+    "unavailable": "Not ranked yet"
+  },
+  "facets": {
+    "title": "Traits",
+    "toggle": "Traits",
+    "toggleWithCount": "Traits · {count}",
+    "toggleAria": "Filter by trait",
+    "clearAll": "Clear all",
+    "clearFacet": "Clear {trait}",
+    "activeAria": "Active trait filters",
+    "removeFilter": "Remove filter {trait}: {value}",
+    "optionAria": "{value}: {count} NFTs",
+    "chaosRange": "Chaos range",
+    "chaosMin": "Minimum chaos",
+    "chaosMax": "Maximum chaos",
+    "chaosValue": "{min} to {max}",
+    "showMore": "Show {count} more",
+    "showLess": "Show less",
+    "sheetTitle": "Filter by trait",
+    "sheetDescription": "Narrow the archive by the composition, physics, and provenance of each Signature.",
+    "loading": "Indexing traits…",
+    "partial": "Trait index still filling in ({indexed} of {total})",
+    "unavailable": "Trait filters are unavailable right now.",
+    "retry": "Retry",
+    "matches": "{count} NFTs match"
+  },
+  "quickView": {
+    "title": "Cosmic Signature {id}",
+    "description": "Traits, orbital physics, and provenance of this Signature.",
+    "openDetail": "Open full page",
+    "playSweep": "Play spectral sweep",
+    "sweepNote": "Streams a large video from the media server",
+    "hideSweep": "Back to artwork",
+    "previous": "Previous Signature",
+    "next": "Next Signature",
+    "close": "Close quick view",
+    "imageAlt": "Cosmic Signature {id} artwork",
+    "loading": "Loading traits…"
+  },
+  "panel": {
+    "title": "Signature traits",
+    "subtitle": "Every trait is derived from the on-chain seed. Same seed, same pixels.",
+    "loading": "Loading traits…",
+    "unavailable": "Trait metadata has not been published for this Signature yet. Its composition and physics will appear here once the metadata is regenerated.",
+    "error": "Trait metadata could not be loaded.",
+    "retry": "Retry",
+    "masses": "Body masses",
+    "massAria": "Body {index}: mass {value}",
+    "closestApproach": "Closest approach",
+    "closestApproachValue": "Bodies {a} and {b} at distance {distance}",
+    "totalEnergy": "Total energy",
+    "angularMomentum": "Angular momentum",
+    "equilateralness": "Equilateralness",
+    "braid": "Braid word",
+    "braidCrossings": "{count} crossings",
+    "integrator": "Integrator",
+    "steps": "{steps} steps",
+    "ejectionStep": "Ejected at step {step}",
+    "horizonSteps": "Horizon {steps} steps",
+    "dominantWavelength": "Dominant wavelength",
+    "nanometres": "{value} nm",
+    "hueDispersion": "Hue dispersion",
+    "degrees": "{value}°",
+    "halation": "Halation",
+    "metadataVersion": "Metadata version",
+    "image": "Image",
+    "animation": "Animation",
+    "dimensions": "{width} × {height}",
+    "duration": "{seconds} s",
+    "sha256": "SHA-256",
+    "copyHash": "Copy hash",
+    "copied": "Copied",
+    "webImage": "Web image (WebP)",
+    "sourceImage": "Source image (PNG)",
+    "hqVideo": "HQ video",
+    "spectralSweep": "Spectral sweep",
+    "assetManifest": "Asset manifest",
+    "traitSource": "Trait source",
+    "external": "Opens the file in a new tab"
+  },
+  "dna": {
+    "title": "Collection DNA",
+    "subtitle": "How the archive splits across defining traits. Select a segment to filter the gallery.",
+    "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
+    "legendCount": "{count}",
+    "loading": "Reading the collection's traits…"
+  }
+}

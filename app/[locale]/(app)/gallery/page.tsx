@@ -60,7 +60,7 @@ export default async function Page({ params }: PageProps) {
   const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
 
   return (
-    <PageMessages namespaces={['detail', 'gallery', 'tables']}>
+    <PageMessages namespaces={['detail', 'gallery', 'tables', 'traits']}>
       <>
         <JsonLd
           data={[

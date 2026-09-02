@@ -1,6 +1,18 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { TOKEN_1_METADATA_V2 } from '@/lib/nftMetadata/__fixtures__/metadata';
+import {
+  normalizeTraitEntry,
+  parseCosmicSignatureMetadata,
+  scoreRarity,
+  type NftTraitEntry,
+} from '@/lib/nftMetadata';
 
-import { GalleryNFTCard, type GalleryNFTData } from '../components/GalleryNFTCard';
+import { render, screen, checkA11y, fireEvent } from '@/test-utils';
+
+import {
+  GalleryNFTCard,
+  type GalleryCardTraits,
+  type GalleryNFTData,
+} from '../components/GalleryNFTCard';
 
 jest.mock('framer-motion', () => {
   const React = require('react');
@@ -76,25 +88,39 @@ describe('GalleryNFTCard (grid)', () => {
     expect(screen.queryByText('Cosmic Pioneer')).not.toBeInTheDocument();
   });
 
-  it('renders round badge', () => {
+  it('renders the cycle chip with the coined C-prefix, never the R-prefix', () => {
     render(<GalleryNFTCard nft={fullNFT} index={0} variant="grid" />);
-    expect(screen.getByText('R7')).toBeInTheDocument();
+    expect(screen.getByText('C7')).toBeInTheDocument();
+    expect(screen.queryByText('R7')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Cycle 7')).toBeInTheDocument();
   });
 
   it('renders anchored badge when anchored', () => {
-    const { container } = render(<GalleryNFTCard nft={fullNFT} index={0} variant="grid" />);
-    const lockIcons = container.querySelectorAll('svg');
-    expect(lockIcons.length).toBeGreaterThan(0);
+    render(<GalleryNFTCard nft={fullNFT} index={0} variant="grid" />);
+    expect(screen.getByText('gallery.card.tooltips.anchored')).toBeInTheDocument();
   });
 
   it('does not render anchored badge when not anchored', () => {
     render(<GalleryNFTCard nft={unnamedNFT} index={0} variant="grid" />);
-    expect(screen.queryByText('R3')).toBeInTheDocument();
+    expect(screen.getByText('C3')).toBeInTheDocument();
+    expect(screen.queryByText('gallery.card.tooltips.anchored')).not.toBeInTheDocument();
   });
 
-  it('renders mint age', () => {
+  it('renders imprint age from the gallery catalog', () => {
     render(<GalleryNFTCard nft={fullNFT} index={0} variant="grid" />);
-    expect(screen.getByText('1d ago')).toBeInTheDocument();
+    expect(screen.getByText('gallery.card.age.days(count=1)')).toBeInTheDocument();
+  });
+
+  it('falls back to the imprint transaction time the list API ships', () => {
+    const { MintTimeStamp: _omitted, ...withoutMintTime } = fullNFT;
+    render(
+      <GalleryNFTCard
+        nft={{ ...withoutMintTime, TimeStamp: baseImprint }}
+        index={0}
+        variant="grid"
+      />,
+    );
+    expect(screen.getByText('gallery.card.age.days(count=1)')).toBeInTheDocument();
   });
 
   it('links to detail page', () => {
@@ -139,6 +165,91 @@ describe('GalleryNFTCard (list)', () => {
 
   it('has no accessibility violations in list mode', async () => {
     const { container } = render(<GalleryNFTCard nft={fullNFT} index={0} variant="list" />);
+    await checkA11y(container);
+  });
+});
+
+describe('GalleryNFTCard (traits)', () => {
+  const entry = normalizeTraitEntry(parseCosmicSignatureMetadata(TOKEN_1_METADATA_V2)!)!;
+  const rarity = scoreRarity([entry]);
+  const traitNft: GalleryNFTData = { ...fullNFT, TokenId: 1 };
+  const withTraits: GalleryCardTraits = {
+    entry,
+    rarity: rarity.byId.get(1),
+    rarityTotal: rarity.total,
+  };
+
+  it('renders the structure · palette summary from the trait catalog', () => {
+    render(<GalleryNFTCard nft={traitNft} index={0} variant="grid" traits={withTraits} />);
+    const summary = screen.getByTestId('trait-summary');
+    expect(summary).toHaveTextContent('Orbit Ribbons');
+    expect(summary).toHaveTextContent('Glacial Split');
+  });
+
+  it('renders the hue strip, spectral class, rarity rank, fate, chaos and allocation', () => {
+    render(<GalleryNFTCard nft={traitNft} index={0} variant="grid" traits={withTraits} />);
+    expect(screen.getAllByTestId('hue-strip').length).toBeGreaterThan(0);
+    expect(screen.getByTestId('spectral-class-badge')).toHaveTextContent('B');
+    expect(screen.getByTestId('rarity-rank-chip')).toHaveTextContent('#1');
+    expect(screen.getByTestId('fate-glyph')).toBeInTheDocument();
+    expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '22');
+    expect(screen.getByTestId('allocation-pill')).toHaveTextContent('Last CST Gesture');
+  });
+
+  it('shows a skeleton while the trait index is loading', () => {
+    render(<GalleryNFTCard nft={traitNft} index={0} variant="grid" />);
+    expect(screen.getByTestId('trait-skeleton')).toBeInTheDocument();
+    expect(screen.queryByTestId('trait-summary')).not.toBeInTheDocument();
+  });
+
+  it('marks tokens without published traits as pending', () => {
+    const legacy: NftTraitEntry = { id: 1, hasArtTraits: false, cycle: 0 };
+    render(
+      <GalleryNFTCard
+        nft={traitNft}
+        index={0}
+        variant="grid"
+        traits={{ entry: legacy, rarity: null, rarityTotal: 0 }}
+      />,
+    );
+    expect(screen.getByTestId('traits-pending')).toHaveTextContent('Traits pending');
+    expect(screen.queryByTestId('rarity-rank-chip')).not.toBeInTheDocument();
+  });
+
+  it('exposes a quick view button outside the detail link', () => {
+    const onQuickView = jest.fn();
+    render(
+      <GalleryNFTCard
+        nft={traitNft}
+        index={0}
+        variant="grid"
+        traits={withTraits}
+        onQuickView={onQuickView}
+      />,
+    );
+    const button = screen.getByTestId('quick-view-button');
+    expect(screen.getByRole('link')).not.toContainElement(button);
+    fireEvent.click(button);
+    expect(onQuickView).toHaveBeenCalledWith(1);
+  });
+
+  it('renders trait columns in list mode', () => {
+    render(<GalleryNFTCard nft={traitNft} index={0} variant="list" traits={withTraits} />);
+    expect(screen.getByText('Orbit Ribbons')).toBeInTheDocument();
+    expect(screen.getByText('Glacial Split')).toBeInTheDocument();
+    expect(screen.getByTestId('allocation-pill')).toHaveTextContent('Last CST Gesture');
+  });
+
+  it('has no accessibility violations with traits', async () => {
+    const { container } = render(
+      <GalleryNFTCard
+        nft={traitNft}
+        index={0}
+        variant="grid"
+        traits={withTraits}
+        onQuickView={() => {}}
+      />,
+    );
     await checkA11y(container);
   });
 });

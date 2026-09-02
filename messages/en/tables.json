@@ -47,7 +47,7 @@
       "columns": {
         "datetime": "Datetime",
         "contributorAddress": "Contributor Address",
-        "round": "Round #",
+        "round": "Cycle #",
         "tokenAddress": "Token Address",
         "tokenId": "Token ID",
         "tokenImage": "Token Image",

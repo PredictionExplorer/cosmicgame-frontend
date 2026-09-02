@@ -2,10 +2,17 @@
 
 import { useTranslations } from 'next-intl';
 
+import type { CosmicSignatureMetadata } from '@/lib/nftMetadata';
 import NFTTrait from '@/components/nft/NFTTrait';
 import { PageShell } from '@/components/ui/page-shell';
 
-const DetailPage = ({ tokenId }: { tokenId: number }) => {
+interface DetailPageProps {
+  tokenId: number;
+  /** Server-rendered metadata document (`null` when the origin has none). */
+  initialMetadata?: CosmicSignatureMetadata | null;
+}
+
+const DetailPage = ({ tokenId, initialMetadata }: DetailPageProps) => {
   const t = useTranslations('detail');
 
   if (tokenId < 0) {
@@ -18,7 +25,7 @@ const DetailPage = ({ tokenId }: { tokenId: number }) => {
 
   return (
     <PageShell variant="detail" backdrop="signature" className="max-w-none px-0">
-      <NFTTrait tokenId={tokenId} />
+      <NFTTrait tokenId={tokenId} initialMetadata={initialMetadata} />
     </PageShell>
   );
 };

@@ -45,6 +45,14 @@
   "card": {
     "alt": "Cosmic Signature {id}",
     "unnamed": "未命名",
+    "age": {
+      "justNow": "刚刚",
+      "minutes": "{count} 分钟前",
+      "hours": "{count} 小时前",
+      "days": "{count} 天前",
+      "months": "{count} 个月前",
+      "years": "{count} 年前"
+    },
     "tooltips": {
       "round": "铭刻于第 {round} 个周期。",
       "anchored": "当前已锚定，正在累积锚定派发。",
@@ -74,7 +82,25 @@
     "newest": "最新在前",
     "oldest": "最早在前",
     "cycleDesc": "周期（从高到低）",
-    "cycleAsc": "周期（从低到高）"
+    "cycleAsc": "周期（从低到高）",
+    "rarity": "最稀有在前",
+    "chaosDesc": "混沌度（从高到低）",
+    "chaosAsc": "混沌度（从低到高）",
+    "syzygiesDesc": "连珠最多在前"
+  },
+  "list": {
+    "headers": {
+      "artwork": "作品",
+      "token": "代币",
+      "structure": "结构",
+      "palette": "调色",
+      "spectral": "光谱型",
+      "chaos": "混沌度",
+      "fate": "命运",
+      "allocation": "分配",
+      "cycle": "周期",
+      "age": "铭刻时间"
+    }
   },
   "view": {
     "ariaLabel": "视图模式",

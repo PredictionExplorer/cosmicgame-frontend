@@ -337,6 +337,41 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | copy address / copied                | 复制地址 / 已复制          |                                                      |
 | view on Arbiscan                     | 在 Arbiscan 上查看         |                                                      |
 
+### 3.1 Cosmic Signature trait vocabulary（作品特征词表）
+
+The metadata pipeline (v2) publishes each Signature's traits as OpenSea-style
+attributes. The frontend never renders the wire labels: every trait type and every
+closed-set value goes through `messages/{locale}/traits.json` (mapping in
+`lib/nftMetadata/labels.ts`). Open vocabularies (palette names) are composed from a
+hue word plus a scheme word; anything the catalog does not know renders in English.
+The wire label `Round` maps to 周期, never 轮/轮次.
+
+| English (wire)                 | 中文                | Notes                                                                                                                                                                    |
+| ------------------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| trait / traits                 | 特征                | never 属性 (too generic) or 稀有属性                                                                                                                                     |
+| rarity / rarity rank           | 稀有度 / 稀有度排名 | descriptive of frequency only; no value or collectibility framing                                                                                                        |
+| Structure                      | 结构                | primary drawing vocabulary                                                                                                                                               |
+| Underlay                       | 底纹                |                                                                                                                                                                          |
+| Accent                         | 点缀                |                                                                                                                                                                          |
+| Symmetry                       | 对称                | Mirror 镜像 · Rosette ×N 花结 ×N · Mandala ×N 曼陀罗 ×N                                                                                                                  |
+| Projection                     | 投影                | Cross Braid 交叉编结 · Phase Portrait 相图 · Hodograph 速端曲线                                                                                                          |
+| Wildcard                       | 变数                | value Yes → 是                                                                                                                                                           |
+| Finish                         | 质感                | Stardust 星尘 · Prism 棱镜                                                                                                                                               |
+| Palette                        | 调色                | `{hue}{scheme}`, e.g. Glacial Split → 冰川分裂                                                                                                                           |
+| palette hue words              | 见 traits.json      | Amber 琥珀 · Aurora 极光 · Cerulean 天青 · Ember 余烬 · Glacial 冰川 · Jade 翡翠 · Nebular 星云 · Orchid 兰紫 · Rose 玫瑰 · Sapphire 蓝宝石 · Solar 日曜 · Violet 紫罗兰 |
+| palette scheme words           | 见 traits.json      | Mono 单色 · Split 分裂 · Analogous 邻近 · Triad 三色 · Complementary 互补 · Tetrad 四色                                                                                  |
+| Spectral Class                 | 光谱型              | letters O–M stay Latin: B → B 型                                                                                                                                         |
+| Mass Balance                   | 质量配比            | Heavy Primary 主星偏重 · Twin Binary 双星并重 · Equal Trio 三体均衡                                                                                                      |
+| Fate                           | 命运                | Eternal Dance 永恒之舞 · Ejection 逃逸                                                                                                                                   |
+| Chaos (index)                  | 混沌度              | 0–100                                                                                                                                                                    |
+| Syzygies                       | 连珠                | three-body alignments; 连珠 is the classical astronomical term                                                                                                           |
+| Imprinted (trait)              | 铭刻时间            |                                                                                                                                                                          |
+| Allocation (trait)             | 分配                | values reuse §2: 星选 · 锚定 NFT 星选 · 收官之笔 · 最后 CST 落笔 · 坚守冠军 · 时之勇士                                                                                   |
+| structure vocabulary values    | 见 traits.json      | Orbit Ribbons 轨道绸带 · Time Chords 时间和弦 · Harmonic Weave 谐波织纹 · Tangent Caustics 切线焦散 · Stipple Constellation 点彩星群 · Nebula Veil 星云薄纱              |
+| Collection DNA (gallery strip) | 作品集基因          |                                                                                                                                                                          |
+| quick view                     | 快速预览            |                                                                                                                                                                          |
+| spectral sweep (video)         | 光谱扫描            |                                                                                                                                                                          |
+
 ## 4. Keep in English（保留英文）
 
 Never translated, in any surface. In running Chinese text they take the CJK–Latin spacing

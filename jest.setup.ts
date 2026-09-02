@@ -141,6 +141,7 @@ jest.mock('next-intl', () => {
     publicGoods: require('./messages/en/publicGoods.json') as Record<string, unknown>,
     seo: require('./messages/en/seo.json') as Record<string, unknown>,
     statistics: statisticsMessages,
+    traits: require('./messages/en/traits.json') as Record<string, unknown>,
   };
   const resolveMessage = (messages: Record<string, unknown>, key: string): unknown =>
     key
@@ -210,7 +211,12 @@ jest.mock('next-intl', () => {
     };
     t.markup = (key: string) => `${prefix}${key}`;
     t.raw = (key: string) => `${prefix}${key}`;
-    t.has = () => true;
+    // Catalog-backed namespaces answer truthfully so components that branch
+    // on `t.has` (e.g. trait value fallbacks) behave as in production.
+    t.has = (key: string) =>
+      namespace && catalogMessages[namespace]
+        ? typeof resolveMessage(catalogMessages[namespace], key) === 'string'
+        : true;
     return t;
   };
   return {

@@ -252,6 +252,12 @@ function artworkImageObject(imageUrl: string, pageUrl: string) {
   };
 }
 
+/** A schema.org PropertyValue: one localized trait of the artwork. */
+export interface JsonLdPropertyValue {
+  name: string;
+  value: string | number;
+}
+
 export function nftProductJsonLd({
   tokenId,
   name,
@@ -259,6 +265,7 @@ export function nftProductJsonLd({
   imageUrl,
   url,
   category,
+  additionalProperty,
 }: {
   tokenId: number;
   name: string;
@@ -266,6 +273,8 @@ export function nftProductJsonLd({
   imageUrl: string;
   url?: string;
   category?: string;
+  /** Traits from the token's metadata document, already localized. */
+  additionalProperty?: readonly JsonLdPropertyValue[];
 }) {
   const pageUrl = url ?? `${APP_URL}/detail/${tokenId}`;
   return {
@@ -287,6 +296,15 @@ export function nftProductJsonLd({
     license: CC0_LICENSE_URL,
     isPartOf: { '@id': `${SITE_URL}/#art-protocol` },
     category: category ?? 'Digital Collectible',
+    ...(additionalProperty && additionalProperty.length > 0
+      ? {
+          additionalProperty: additionalProperty.map((property) => ({
+            '@type': 'PropertyValue',
+            name: property.name,
+            value: property.value,
+          })),
+        }
+      : {}),
   };
 }
 

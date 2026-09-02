@@ -6,6 +6,13 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAssetsUrl, logoImgUrl } from '@/utils';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
+import {
+  fetchNftMetadata,
+  normalizeTraitEntry,
+  traitProperties,
+  type CosmicSignatureMetadata,
+  type TraitTranslator,
+} from '@/lib/nftMetadata';
 import { getAPIUrl } from '@/services/api/client';
 import type { CSTTokenInfo } from '@/services/api/types';
 import { createMetadata } from '@/utils/seo';
@@ -61,6 +68,22 @@ const loadTokenInfo = cache(async (tokenId: number): Promise<CSTTokenInfo | null
   }
 });
 
+/**
+ * The token's metadata document (traits, palette, simulation), read once per
+ * render for the JSON-LD and the client's first paint. `null` when the media
+ * origin has no document for the id, `undefined` on transport errors — the
+ * client then loads it itself; neither ever fails the prerender.
+ */
+const loadTokenMetadata = cache(
+  async (tokenId: number): Promise<CosmicSignatureMetadata | null | undefined> => {
+    try {
+      return await fetchNftMetadata(tokenId, { next: { revalidate: 300 } });
+    } catch {
+      return undefined;
+    }
+  },
+);
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, id } = await params;
   const tokenId = parseTokenId(id);
@@ -92,25 +115,31 @@ export default async function Page({ params }: PageProps) {
   }
 
   setRequestLocale(locale);
-  const [t, tCommon, seo] = await Promise.all([
+  const [t, tCommon, seo, tTraits, tokenInfo, metadata] = await Promise.all([
     getTranslations({ locale, namespace: 'detail' }),
     getTranslations({ locale, namespace: 'common' }),
     getTranslations({ locale, namespace: 'seo' }),
+    getTranslations({ locale, namespace: 'traits' }),
+    loadTokenInfo(tokenId),
+    loadTokenMetadata(tokenId),
   ]);
 
   const name = t('jsonLd.productName', { id });
   const description = t('jsonLd.productDescription');
   const pageUrl = localeHref(APP_ORIGIN, `/detail/${id}`, locale);
-  const tokenInfo = await loadTokenInfo(tokenId);
 
   if (tokenInfo === null) {
     notFound();
   }
 
   const imageUrl = tokenImageUrl(tokenInfo?.Seed);
+  const traitEntry = metadata ? normalizeTraitEntry(metadata, tokenId) : null;
+  const additionalProperty = traitEntry?.hasArtTraits
+    ? traitProperties(tTraits as unknown as TraitTranslator, traitEntry)
+    : undefined;
 
   return (
-    <PageMessages namespaces={['detail', 'tables']}>
+    <PageMessages namespaces={['detail', 'tables', 'traits']}>
       <>
         <JsonLd
           data={nftProductJsonLd({
@@ -120,6 +149,7 @@ export default async function Page({ params }: PageProps) {
             imageUrl,
             url: pageUrl,
             category: seo('jsonLd.product.category'),
+            additionalProperty,
           })}
         />
         <JsonLd
@@ -132,7 +162,7 @@ export default async function Page({ params }: PageProps) {
             localeHref(APP_ORIGIN, '/', locale),
           )}
         />
-        <DetailPage tokenId={tokenId} />
+        <DetailPage tokenId={tokenId} initialMetadata={metadata} />
       </>
     </PageMessages>
   );

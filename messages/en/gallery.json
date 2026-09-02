@@ -45,6 +45,14 @@
   "card": {
     "alt": "Cosmic Signature {id}",
     "unnamed": "Unnamed",
+    "age": {
+      "justNow": "just now",
+      "minutes": "{count}m ago",
+      "hours": "{count}h ago",
+      "days": "{count}d ago",
+      "months": "{count}mo ago",
+      "years": "{count}y ago"
+    },
     "tooltips": {
       "round": "Imprinted in cycle {round}",
       "anchored": "Currently anchored and receiving Anchor Distributions",
@@ -74,7 +82,25 @@
     "newest": "Newest First",
     "oldest": "Oldest First",
     "cycleDesc": "Cycle (High → Low)",
-    "cycleAsc": "Cycle (Low → High)"
+    "cycleAsc": "Cycle (Low → High)",
+    "rarity": "Rarest First",
+    "chaosDesc": "Chaos (High → Low)",
+    "chaosAsc": "Chaos (Low → High)",
+    "syzygiesDesc": "Most Syzygies"
+  },
+  "list": {
+    "headers": {
+      "artwork": "Artwork",
+      "token": "Token",
+      "structure": "Structure",
+      "palette": "Palette",
+      "spectral": "Class",
+      "chaos": "Chaos",
+      "fate": "Fate",
+      "allocation": "Allocation",
+      "cycle": "Cycle",
+      "age": "Imprinted"
+    }
   },
   "view": {
     "ariaLabel": "View mode",

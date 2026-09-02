@@ -78,7 +78,7 @@
     "recipientTooltip": "The address that originally received this token during the Performance Cycle.",
     "owner": "Owner",
     "ownerTooltip": "The current holder of this token. May differ from the recipient if the token was transferred.",
-    "roundNumber": "Round #{round}",
+    "roundNumber": "Cycle #{round}",
     "seed": "Seed",
     "seedTooltip": "The unique random seed used to generate this token's artwork and traits.",
     "copySeed": "Copy seed"

@@ -42,6 +42,44 @@ export const getThumbUrl = (seed: string | number, variant: ThumbVariant): strin
   return getAssetsUrl(`cosmicsignature/0x${seed}/thumb_${variant}.webp`);
 };
 
+/** Seed as lower-case hex without a `0x` prefix, however the caller spelled it. */
+const bareSeed = (seed: string | number): string =>
+  String(seed).trim().toLowerCase().replace(/^0x/, '');
+
+/**
+ * Token metadata document (the ERC-721 `tokenURI` payload: traits, palette,
+ * simulation record, media manifest). Served by the same rotated media origin
+ * as the images. Always address it by token id: the seed form is not supported.
+ */
+export const getMetadataUrl = (tokenId: number | string): string => {
+  return `${nftCdnOrigin()}/metadata/${tokenId}`;
+};
+
+/**
+ * A file inside the per-seed asset package directory (`0x<seed>/...`). The
+ * v2 pipeline publishes web-sized derivatives and videos there next to the
+ * thumbnails; the paths are deterministic from the seed.
+ */
+export const getSeedPackageUrl = (seed: string | number, relativePath: string): string => {
+  return getAssetsUrl(`cosmicsignature/0x${bareSeed(seed)}/${relativePath.replace(/^\/+/, '')}`);
+};
+
+/**
+ * Full-resolution WebP of the artwork (same pixels as the source PNG at a
+ * fraction of the bytes). Use it for hero / lightbox surfaces and fall back to
+ * the PNG for tokens rendered before the WebP derivative existed.
+ */
+export const getWebImageUrl = (seed: string | number): string =>
+  getSeedPackageUrl(seed, 'images/web/full.webp');
+
+/** Web-encoded MP4 that sweeps through the spectral bins of the simulation. */
+export const getSpectralSweepUrl = (seed: string | number): string =>
+  getSeedPackageUrl(seed, 'videos/web/spectral_sweep.mp4');
+
+/** High-quality (HEVC) master of the main animation. */
+export const getHqVideoUrl = (seed: string | number): string =>
+  getSeedPackageUrl(seed, 'videos/hq/main.mp4');
+
 /** Returns direct RandomWalk NFT image URL. */
 export const getRWLKImageUrl = (fileName: string, variant: string = 'black_thumb.jpg'): string => {
   return `${nftCdnOrigin()}/images/randomwalk/${fileName}_${variant}`;

@@ -42,6 +42,7 @@ export const NAMESPACES = [
   'tables',
   'tooltips',
   'toasts',
+  'traits',
   'wallet',
 ] as const;
 

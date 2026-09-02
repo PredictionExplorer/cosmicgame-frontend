@@ -10,8 +10,10 @@ import { isAddress } from 'viem';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown, Expand, Trophy } from 'lucide-react';
 
-import { formatId, getAssetsUrl, getOriginUrl } from '@/utils';
+import { formatId, getAssetsUrl, getOriginUrl, getWebImageUrl } from '@/utils';
 
+import { useCollectionTraits, useNftMetadata } from '@/hooks/useNftTraits';
+import { normalizeTraitEntry, type CosmicSignatureMetadata } from '@/lib/nftMetadata';
 import { useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -58,6 +60,8 @@ import { NFTMetadata } from './NFTMetadata';
 import { NFTOwnerActions } from './NFTOwnerActions';
 import { NFTDetailSkeleton } from './NFTDetailSkeleton';
 import { NFTBreadcrumb } from './NFTBreadcrumb';
+import { HueStrip, RarityRankChip, SpectralClassBadge } from './traits';
+import { NftTraitPanel } from './traits/NftTraitPanel';
 
 interface NFTDetailInfo extends CSTTokenInfo {
   WinnerAddr?: string;
@@ -67,6 +71,11 @@ interface NFTDetailInfo extends CSTTokenInfo {
 
 interface NFTTraitProps {
   tokenId: number;
+  /**
+   * Server-rendered metadata document (`null` when the media origin has none),
+   * so the trait panel is in the first HTML paint. Omit to load on the client.
+   */
+  initialMetadata?: CosmicSignatureMetadata | null;
 }
 
 const fadeUp = {
@@ -104,8 +113,8 @@ function getAllocationTypeConfig(recordType?: number) {
   }
 }
 
-/** Full detail page for a Cosmic Signature NFT, showing metadata, image/video, naming, transfer, and ownership history. */
-const NFTTrait = ({ tokenId }: NFTTraitProps) => {
+/** Full detail page for a Cosmic Signature NFT, showing metadata, traits, image/video, naming, transfer, and ownership history. */
+const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
   const t = useTranslations('detail');
   const tCommon = useTranslations('common');
   const tToasts = useTranslations('toasts');
@@ -134,10 +143,26 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const nft = (nftRaw as NFTDetailInfo | null) ?? null;
   const transferHistory = transferHistoryRaw as (CSTTransferRecord & { TransferType?: number })[];
 
+  const {
+    data: metadata,
+    isError: metadataError,
+    refetch: refetchMetadata,
+  } = useNftMetadata(tokenId, { initialData: initialMetadata });
+  const traitEntry = useMemo(
+    () => (metadata ? normalizeTraitEntry(metadata, tokenId) : null),
+    [metadata, tokenId],
+  );
+  const { traits: collectionTraits } = useCollectionTraits();
+  const rarity = collectionTraits?.rarity.byId.get(tokenId) ?? null;
+
   const image = useMemo(() => {
     if (!nft?.Seed) return '';
     return getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
   }, [nft]);
+
+  // Same pixels as the PNG at a fraction of the bytes; the PNG stays the
+  // fallback for tokens rendered before the WebP derivative existed.
+  const heroImage = useMemo(() => (nft?.Seed ? getWebImageUrl(nft.Seed) : ''), [nft]);
 
   const video = useMemo(() => {
     if (!nft?.Seed) return '';
@@ -411,7 +436,18 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
               onClick={() => setImageOpen(true)}
               data-testid="nft-image-container"
             >
-              <NFTImage src={image} terminalFallbackSrc={null} alt={t('image.defaultAlt')} />
+              <NFTImage
+                src={heroImage || image}
+                fallbackSrc={heroImage ? image : undefined}
+                terminalFallbackSrc={null}
+                alt={t('image.defaultAlt')}
+                priority
+              />
+              <HueStrip
+                hues={traitEntry?.hues}
+                size="sm"
+                className="absolute inset-x-0 bottom-0 rounded-none"
+              />
               <div className="absolute top-3 left-3">
                 <Badge className="bg-black/50 backdrop-blur-sm text-white border-white/20 text-xs font-mono">
                   {formatId(tokenId)}
@@ -547,6 +583,18 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
               )}
             </div>
 
+            {traitEntry?.hasArtTraits ? (
+              <div className="flex flex-wrap items-center gap-2" data-testid="token-trait-badges">
+                <SpectralClassBadge value={traitEntry.spectralClass} size="md" withLabel />
+                <RarityRankChip
+                  rarity={rarity}
+                  total={collectionTraits?.rarity.total ?? 0}
+                  size="md"
+                  verbose
+                />
+              </div>
+            ) : null}
+
             {/* Round link */}
             {nft?.RoundNum != null && (
               <div className="mt-1">
@@ -575,6 +623,25 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         data-testid="metadata-section"
       >
         <NFTMetadata nft={nft} />
+      </motion.section>
+
+      {/* Traits: composition, orbital physics, provenance, media */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="print-motion-visible mt-12"
+        data-testid="traits-section"
+      >
+        <NftTraitPanel
+          tokenId={tokenId}
+          metadata={metadata}
+          entry={traitEntry}
+          isError={metadataError}
+          onRetry={() => void refetchMetadata()}
+          collectionTraits={collectionTraits}
+        />
       </motion.section>
 
       {/* Video Preview */}

@@ -12,11 +12,43 @@ import {
 } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-export type SortKey = 'newest' | 'oldest' | 'cycle-desc' | 'cycle-asc';
+export type SortKey =
+  | 'newest'
+  | 'oldest'
+  | 'cycle-desc'
+  | 'cycle-asc'
+  | 'rarity'
+  | 'chaos-desc'
+  | 'chaos-asc'
+  | 'syzygies-desc';
+
+/** Sort orders that need the collection trait index to be meaningful. */
+export const TRAIT_SORT_KEYS: readonly SortKey[] = [
+  'rarity',
+  'chaos-desc',
+  'chaos-asc',
+  'syzygies-desc',
+];
+
+/** Every sort key, for URL parsing. */
+export const SORT_KEYS: readonly SortKey[] = [
+  'newest',
+  'oldest',
+  'cycle-desc',
+  'cycle-asc',
+  ...TRAIT_SORT_KEYS,
+];
+
+/** Narrows an arbitrary string (e.g. a URL param) to a {@link SortKey}. */
+export function isSortKey(value: string | null | undefined): value is SortKey {
+  return typeof value === 'string' && (SORT_KEYS as readonly string[]).includes(value);
+}
 
 interface GallerySortSelectProps {
   value: SortKey;
   onChange: (sort: SortKey) => void;
+  /** Hide trait-based orders while the trait index is unavailable. */
+  traitSortsAvailable?: boolean;
 }
 
 const sortOptions: { value: SortKey; labelKey: string }[] = [
@@ -24,10 +56,21 @@ const sortOptions: { value: SortKey; labelKey: string }[] = [
   { value: 'oldest', labelKey: 'sort.oldest' },
   { value: 'cycle-desc', labelKey: 'sort.cycleDesc' },
   { value: 'cycle-asc', labelKey: 'sort.cycleAsc' },
+  { value: 'rarity', labelKey: 'sort.rarity' },
+  { value: 'chaos-desc', labelKey: 'sort.chaosDesc' },
+  { value: 'chaos-asc', labelKey: 'sort.chaosAsc' },
+  { value: 'syzygies-desc', labelKey: 'sort.syzygiesDesc' },
 ];
 
-export function GallerySortSelect({ value, onChange }: GallerySortSelectProps) {
+export function GallerySortSelect({
+  value,
+  onChange,
+  traitSortsAvailable = true,
+}: GallerySortSelectProps) {
   const t = useTranslations('gallery');
+  const options = traitSortsAvailable
+    ? sortOptions
+    : sortOptions.filter((opt) => !TRAIT_SORT_KEYS.includes(opt.value));
 
   return (
     <Tooltip>
@@ -42,7 +85,7 @@ export function GallerySortSelect({ value, onChange }: GallerySortSelectProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {sortOptions.map((opt) => (
+              {options.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {t(opt.labelKey)}
                 </SelectItem>
