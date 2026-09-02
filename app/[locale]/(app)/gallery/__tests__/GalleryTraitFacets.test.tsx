@@ -150,7 +150,11 @@ describe('GalleryTraitFacets', () => {
         onClearAll={noop}
       />,
     );
-    expect(screen.getByLabelText('Indexing traits…')).toBeInTheDocument();
+    // A labelled status region: role-less divs may not carry aria-label (axe aria-prohibited-attr).
+    expect(screen.getByRole('status', { name: 'Indexing traits…' })).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
     rerender(
       <GalleryTraitFacets
         collectionTraits={null}
@@ -266,7 +270,9 @@ describe('GalleryCollectionDna', () => {
     const { rerender } = render(
       <GalleryCollectionDna collectionTraits={undefined} selected={{}} onSelect={noop} />,
     );
-    expect(screen.getByLabelText("Reading the collection's traits…")).toBeInTheDocument();
+    expect(
+      screen.getByRole('status', { name: "Reading the collection's traits…" }),
+    ).toHaveAttribute('aria-busy', 'true');
     rerender(<GalleryCollectionDna collectionTraits={null} selected={{}} onSelect={noop} />);
     expect(screen.queryByTestId('collection-dna')).not.toBeInTheDocument();
   });

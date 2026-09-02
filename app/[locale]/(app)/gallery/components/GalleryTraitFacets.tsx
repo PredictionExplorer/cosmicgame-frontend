@@ -247,7 +247,12 @@ export function GalleryTraitFacets({
       ) : null}
 
       {collectionTraits === undefined ? (
-        <div className="space-y-3 px-2" aria-busy="true" aria-label={t('facets.loading')}>
+        <div
+          role="status"
+          className="space-y-3 px-2"
+          aria-busy="true"
+          aria-label={t('facets.loading')}
+        >
           {Array.from({ length: 5 }, (_, i) => (
             <div key={i} className="space-y-2">
               <Skeleton className="h-3 w-24" />

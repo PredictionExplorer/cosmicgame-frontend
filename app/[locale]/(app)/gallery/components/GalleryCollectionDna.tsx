@@ -169,7 +169,12 @@ export function GalleryCollectionDna({
         </div>
       </div>
       {collectionTraits === undefined ? (
-        <div className="grid gap-6 md:grid-cols-3" aria-busy="true" aria-label={t('dna.loading')}>
+        <div
+          role="status"
+          className="grid gap-6 md:grid-cols-3"
+          aria-busy="true"
+          aria-label={t('dna.loading')}
+        >
           {DNA_KEYS.map((key) => (
             <div key={key} className="space-y-2">
               <Skeleton className="h-3 w-16" />
