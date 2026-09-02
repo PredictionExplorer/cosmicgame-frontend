@@ -166,6 +166,47 @@ type(scope): description
 
 Common types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `ci`.
 
+### Dependencies
+
+The project installs with npm only (`packageManager` pins it; npm ignores a `resolutions` field, so pins belong in `overrides`). npm's default peer-dependency semantics apply: do not reintroduce `legacy-peer-deps` or `--force`; a genuine peer mismatch is settled with a targeted override, as below.
+
+```bash
+npm run deps:audit
+```
+
+`deps:audit` runs on pre-push and in CI and fails when any of the following holds:
+
+- an advisory is reachable from a production dependency, at any severity;
+- a high or critical advisory is reachable anywhere, including development tooling (moderate and low tooling advisories are printed, not blocking);
+- the lockfile violates a declared range (`npm ls --all` reports `invalid` or `missing`);
+- a nested override that names a root dependency drifts from the root's spec.
+
+There is no standing list of accepted advisories. Fix them in this order, and stop at the first step that works:
+
+1. `npm update <package>` — when the patched release is inside the range the consumer already declares. This is the whole fix most of the time.
+2. Bump the consuming package — when a newer release of the consumer declares a patched range.
+3. Pin in `overrides` — only when the consumer pins the vulnerable version itself. Add a row to the table below so the pin can be retired when upstream catches up.
+4. `audit-exceptions.json` at the repo root — last resort, when no patched release exists anywhere. The file does not exist while the tree is clean. Each entry needs `id`, `package`, `reason`, and `expires` (a calendar date at most 90 days out for tooling, 30 for production scope); expired, stale, or mistyped entries fail the gate, so the list cannot rot.
+
+```json
+[
+  {
+    "id": "GHSA-xxxx-xxxx-xxxx",
+    "package": "some-tool",
+    "reason": "Reached only through the e2e runner; upstream fix is in review at <link>.",
+    "expires": "2026-10-01"
+  }
+]
+```
+
+Every override is a debt with a reason and a retirement condition:
+
+| Override                         | Why it exists                                                                                                                                     | Retire when                                                       |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `@noble/hashes`                  | Dedupes the wallet stack onto one copy; `@base-org/account` and `@walletconnect/relay-auth` pin older 1.x releases that would otherwise nest.     | Both consumers declare a range that meets at one version.         |
+| `axios`                          | `@coinbase/cdp-sdk` (via `@base-org/account`) pins `axios@1.16.0` exactly, which carries a high advisory; the app's own axios is already patched. | `@coinbase/cdp-sdk` declares a patched axios range.               |
+| `@rainbow-me/rainbowkit > wagmi` | RainbowKit 2.x declares `wagmi@^2.9.0` as a peer and the app runs wagmi 3; the override repeats the root spec so npm places one wagmi.            | RainbowKit publishes a release whose peer range includes wagmi 3. |
+
 ### Testing
 
 Unit tests use Jest with React Testing Library. E2E tests use Playwright against Desktop Chrome and Mobile Chrome viewports, plus a full-stack **harness tier** that runs the real contracts on a local chain with the real indexer/API (see [docs/harness.md](docs/harness.md)).

@@ -37,10 +37,23 @@ Use npm — `packageManager` is pinned to npm and yarn refuses to run.
 - `npm run i18n:derive -- --from zh --to zh-TW` — mechanical draft of a sibling-script
   locale (never shipped as-is); `npm run og:fonts` — rebuild the CJK OG font subsets
 - `npm run test:e2e:locales` — every locale's smoke/QA suites
+- `npm run deps:audit` — dependency gate: production advisories at any severity,
+  high/critical anywhere, lockfile integrity, time-boxed exceptions
 
 Pre-commit runs prettier, eslint, and tsc on staged files. Pre-push runs the i18n gates,
 lint, type-check, dependency audit, the full jest suite with coverage, and a production
 build, so `git push` takes a minute or two.
+
+## Dependencies
+
+There is no list of accepted advisories. When `deps:audit` fails, fix in this order and stop
+at the first step that works: `npm update <package>` (the patched release is usually inside
+the consumer's declared range) → bump the consumer → pin in `overrides` only when the consumer
+pins the vulnerable version itself, with a row in README → Development → Dependencies →
+`audit-exceptions.json` as a last resort (id, package, reason, expiry ≤ 90 days; ≤ 30 for
+production scope). npm's default peer semantics apply; never add `legacy-peer-deps` or
+`--force`. A peer mismatch gets a targeted override that repeats the root spec (the
+RainbowKit → wagmi entry is the template).
 
 ## The lexicon (read this before writing any copy)
 

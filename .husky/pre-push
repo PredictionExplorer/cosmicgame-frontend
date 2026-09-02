@@ -1,1 +1,1 @@
-npm run i18n:check && npm run lint && npm run type-check && npm run audit:high && NODE_OPTIONS=--no-warnings npm run test:coverage && npm run build
+npm run i18n:check && npm run lint && npm run type-check && npm run deps:audit && NODE_OPTIONS=--no-warnings npm run test:coverage && npm run build
