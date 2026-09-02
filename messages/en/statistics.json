@@ -297,7 +297,8 @@
       "poolLabel": "Anchor Distribution Pool",
       "poolTooltip": "ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.",
       "perNftLabel": "Distribution per Cosmic Signature NFT",
-      "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.{suffix}",
+      "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
+      "perNftTooltipUnavailable": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs. The on-chain anchor pool is non-zero, but the indexed total of anchored Cosmic Signature NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-NFT rate cannot be computed.",
       "activeHoldersLabel": "Active Anchor-holders",
       "activeHoldersTooltip": "Combined active wallets currently anchoring at least one Cosmic Signature NFT or RandomWalk NFT."
     },

@@ -13,7 +13,7 @@ import {
 } from '@/services/api/server';
 import { createMetadata } from '@/utils/seo';
 import { formatFixed } from '@/utils/format';
-import { JsonLd, liveCycleJsonLd, visualArtworkJsonLd } from '@/utils/jsonLd';
+import { JsonLd, jsonLdInLanguage, liveCycleJsonLd, visualArtworkJsonLd } from '@/utils/jsonLd';
 import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from '@/services/api';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -111,7 +111,7 @@ export default async function Page({ params }: PageProps) {
           data={liveCycleJsonLd({
             cycleNumber: liveCycleNumber,
             startTsSeconds: liveCycleStartTs,
-            inLanguage: locale === 'zh' ? 'zh-CN' : 'en',
+            inLanguage: jsonLdInLanguage(locale),
           })}
         />
       )}
@@ -124,7 +124,7 @@ export default async function Page({ params }: PageProps) {
             name: `Cosmic Signature ${formatId(initialBannerToken.id)}`,
             description: tArtwork('jsonLd.productDescription'),
             imageUrl: getAssetsUrl(`cosmicsignature/0x${initialBannerToken.info.Seed}.png`),
-            inLanguage: locale === 'zh' ? 'zh-CN' : 'en',
+            inLanguage: jsonLdInLanguage(locale),
           })}
         />
       )}

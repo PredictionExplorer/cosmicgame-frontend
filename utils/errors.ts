@@ -1,5 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
+
 /**
  * Generic error-handling utilities.
  *
@@ -20,9 +22,11 @@ export interface EthProviderError {
 
 export interface EthErrorMessageOptions {
   /**
-   * The active UI locale. Provider diagnostics are intentionally hidden from
-   * Chinese UI because wallets and RPC nodes commonly return arbitrary English
-   * strings. The original error should still be passed to `reportError`.
+   * The active UI locale. Whether provider diagnostics may be shown is a
+   * per-locale policy (`showRawProviderErrors` in i18n/localeConfig.ts):
+   * wallets and RPC nodes return arbitrary English strings, so non-English
+   * locales hide them. The original error should still be passed to
+   * `reportError`.
    */
   locale?: string;
   /** Explicitly override whether the provider's raw message may be displayed. */
@@ -117,7 +121,7 @@ export function getEthErrorMessage(
   options: EthErrorMessageOptions = {},
 ): string {
   const preserveProviderMessage =
-    options.preserveProviderMessage ?? !options.locale?.toLowerCase().startsWith('zh');
+    options.preserveProviderMessage ?? getLocaleConfig(options.locale).showRawProviderErrors;
 
   if (preserveProviderMessage && isEthProviderError(err) && err.data?.message) {
     return err.data.message;

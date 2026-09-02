@@ -187,8 +187,8 @@ export function PublicGoodsImpactCard({
         </div>
       </div>
 
-      {/* Legal denial copy stays in the per-locale landing content modules
-          (content/landing/{en,zh}.ts): the message catalogs cannot carry
+      {/* Legal denial copy stays in the per-locale landing text modules
+          (content/landing/text.{en,zh}.ts): the message catalogs cannot carry
           lexicon-allow pragmas, and the zh disclaimer there is already
           reviewed legal copy. */}
       <p className="relative mt-6 border-t border-white/10 pt-4 text-xs leading-relaxed text-white/45">

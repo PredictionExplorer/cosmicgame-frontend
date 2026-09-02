@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -27,7 +27,7 @@ export default async function Page({ params }: PageProps) {
     getTranslations({ locale, namespace: 'code' }),
   ]);
   const description = meta('code.description');
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(APP_ORIGIN, '/code', locale);
 
   return (
@@ -43,11 +43,8 @@ export default async function Page({ params }: PageProps) {
             }),
             breadcrumbJsonLd(
               [
-                {
-                  name: locale === 'zh' ? '首页' : 'Home',
-                  path: '/',
-                },
-                { name: locale === 'zh' ? '源代码' : 'Source Code', path: '/code' },
+                { name: code('breadcrumbs.home'), path: '/' },
+                { name: code('breadcrumbs.code'), path: '/code' },
               ],
               localeHref(APP_ORIGIN, '/', locale),
             ),

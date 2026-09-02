@@ -226,6 +226,43 @@ describe('isInternalCallSite', () => {
     expect(isInternalCallSite(withWs, withWs.indexOf(`'x'`))).toBe(true);
     expect(isInternalCallSite(noWs, noWs.indexOf(`'x'`))).toBe(true);
   });
+
+  describe('quoted property keys', () => {
+    const at = (line: string, literal: string) => {
+      const start = line.indexOf(literal);
+      return isInternalCallSite(line, start, start + literal.length);
+    };
+
+    it('skips a quoted key opening a nested object on its own line', () => {
+      expect(at(`      'what-rewards-per-bid': {`, `'what-rewards-per-bid'`)).toBe(true);
+    });
+
+    it('skips a quoted key after an opening brace or a comma', () => {
+      expect(at(`const t = { 'donate-to-pot': 1, 'b': 2 };`, `'donate-to-pot'`)).toBe(true);
+      expect(at(`const t = { 'a': 1, 'donate-to-pot': 2 };`, `'donate-to-pot'`)).toBe(true);
+    });
+
+    it('skips JSON catalog keys but not their values', () => {
+      const line = `  "auctionLabel": "Dutch auction",`;
+      expect(at(line, `"auctionLabel"`)).toBe(true);
+      expect(at(line, `"Dutch auction"`)).toBe(false);
+    });
+
+    it('still scans ternary branches and case labels', () => {
+      expect(at(`const label = zh ? 'Dutch auction' : 'x';`, `'Dutch auction'`)).toBe(false);
+      expect(at(`  ? 'Dutch auction'`, `'Dutch auction'`)).toBe(false);
+      expect(at(`  case 'Dutch auction':`, `'Dutch auction'`)).toBe(false);
+    });
+
+    it('scans the value that follows a key', () => {
+      expect(at(`  'copy': 'Dutch auction',`, `'Dutch auction'`)).toBe(false);
+    });
+
+    it('only applies when the literal end is supplied', () => {
+      const line = `      'what-rewards-per-bid': {`;
+      expect(isInternalCallSite(line, line.indexOf(`'`))).toBe(false);
+    });
+  });
 });
 
 describe('scanContent', () => {
@@ -277,6 +314,21 @@ describe('scanContent', () => {
       `   * bid and stellarSelection are banned`,
     ].join('\n');
     expect(scanContent(src, pattern)).toEqual([]);
+  });
+
+  it('skips legacy-id object keys in content text modules but scans their copy', () => {
+    const src = [
+      `export const faqTextEn = {`,
+      `  items: {`,
+      `    'what-rewards-per-bid': {`,
+      `      question: 'What do I receive for each gesture?',`,
+      `      answer: 'Each one is a bid.',`,
+      `    },`,
+      `  },`,
+      `};`,
+    ].join('\n');
+    const hits = scanContent(src, pattern);
+    expect(hits).toEqual([{ line: 5, term: 'bid', literal: `'Each one is a bid.'` }]);
   });
 
   it('honors lexicon-allow-start/end pragmas', () => {

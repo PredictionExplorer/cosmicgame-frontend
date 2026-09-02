@@ -22,6 +22,7 @@ import { get_marketing_rewards } from '@/services/api/marketing';
 import { get_claim_history, get_dashboard_info, get_round_list } from '@/services/api/rounds';
 import { get_system_modelist } from '@/services/api/system';
 import { get_named_nfts, get_used_rwlk_nfts } from '@/services/api/tokens';
+import { formatUtcDateTimeStamp, toIntlLocale } from '@/utils/format';
 
 export type SeoSummaryRoute =
   | 'allocation'
@@ -151,14 +152,14 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
 function formatLocalizedNumber(value: unknown, locale: string, unavailable: string): string {
   const numeric = Number(value);
   return Number.isFinite(numeric)
-    ? new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US').format(numeric)
+    ? new Intl.NumberFormat(toIntlLocale(locale)).format(numeric)
     : unavailable;
 }
 
 function formatLocalizedEth(value: unknown, locale: string, unavailable: string): string {
   const numeric = Number(value);
   return Number.isFinite(numeric)
-    ? `${new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    ? `${new Intl.NumberFormat(toIntlLocale(locale), {
         maximumFractionDigits: 4,
       }).format(numeric)} ETH`
     : unavailable;
@@ -336,15 +337,6 @@ async function getSummaryCards(
   }
 }
 
-function formatUpdatedAt(date: Date, locale: string): string {
-  if (locale === 'zh') {
-    return `${date.getUTCFullYear()}年${date.getUTCMonth() + 1}月${date.getUTCDate()}日 ${String(
-      date.getUTCHours(),
-    ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}（UTC）`;
-  }
-  return `${date.toISOString().replace('T', ' ').slice(0, 16)} UTC`;
-}
-
 export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRoute }) {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'seo' });
@@ -370,7 +362,7 @@ export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRo
       </p>
       <p className="mt-3 type-body-sm text-muted-foreground">
         {t('publicData.common.lastUpdated', {
-          date: formatUpdatedAt(updatedAt, locale),
+          date: formatUtcDateTimeStamp(updatedAt, locale),
           source: t(`${prefix}.source`),
         })}
       </p>

@@ -102,8 +102,8 @@ const EXCLUDE_DIRS: ReadonlySet<string> = new Set(
 const STRING_PATTERN = buildBannedPattern(DEFAULT_BANNED_TERMS);
 const IDENT_PATTERN = buildIdentifierPattern(DEFAULT_BANNED_STEMS);
 // Simplified-Chinese banned register (docs/i18n/glossary-zh.md §5). Runs on
-// every scanned file: zh copy lives in messages/zh/*.json today and in
-// content/**/zh.ts modules as translation sprints land.
+// every scanned file: zh copy lives in messages/zh/*.json and in the
+// content/**/text.zh.ts and content/legal/*.zh.ts modules.
 const ZH_PATTERN = buildZhBannedPattern(ZH_BANNED_TERMS);
 
 interface PhaseCounts {

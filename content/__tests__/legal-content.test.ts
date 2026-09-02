@@ -1,11 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { getAuditsCopy, getRiskCopy, getSecurityCopy } from '@/content/legal';
 import { privacyCopyEn } from '@/content/legal/PrivacyContent.en';
 import { privacyCopyZh } from '@/content/legal/PrivacyContent.zh';
 import type { PrivacyCopy } from '@/content/legal/PrivacyContent';
 import { termsCopyEn } from '@/content/legal/TermsContent.en';
 import { termsCopyZh } from '@/content/legal/TermsContent.zh';
+import type { TrustPageCopy } from '@/content/legal/TrustPageContent';
 import { protocolFacts } from '@/content/protocol-facts';
 
 function termsStructure(copy: typeof termsCopyEn | typeof termsCopyZh) {
@@ -29,6 +31,18 @@ function privacyStructure(copy: typeof privacyCopyEn | typeof privacyCopyZh) {
   };
 }
 
+function trustPageStructure(copy: TrustPageCopy) {
+  return copy.sections.map((section) => ({
+    paragraphs: section.paragraphs?.length ?? 0,
+    bullets: section.bullets?.length ?? 0,
+    linkParagraph: section.linkParagraph
+      ? { kind: section.linkParagraph.kind, href: section.linkParagraph.href }
+      : null,
+    hasNote: Boolean(section.note),
+    links: section.links?.map((link) => ({ kind: link.kind, href: link.href })) ?? [],
+  }));
+}
+
 describe('localized legal content', () => {
   it('keeps Terms clause structure in exact parity', () => {
     expect(termsStructure(termsCopyZh)).toEqual(termsStructure(termsCopyEn));
@@ -38,6 +52,15 @@ describe('localized legal content', () => {
   it('keeps Privacy clause structure in exact parity', () => {
     expect(privacyStructure(privacyCopyZh)).toEqual(privacyStructure(privacyCopyEn));
     expect(privacyCopyZh.title).toBe('隐私政策');
+  });
+
+  it('keeps trust-page structure (sections, hrefs, link kinds) in exact parity', () => {
+    for (const getCopy of [getAuditsCopy, getSecurityCopy, getRiskCopy]) {
+      expect(trustPageStructure(getCopy('zh'))).toEqual(trustPageStructure(getCopy('en')));
+    }
+    expect(getAuditsCopy('zh').title).toBe('Cosmic Signature 审计');
+    expect(getSecurityCopy('zh').title).toBe('Cosmic Signature 安全');
+    expect(getRiskCopy('zh').title).toBe('Cosmic Signature 风险披露');
   });
 
   it('preserves Terms protocol facts and legal dates', () => {

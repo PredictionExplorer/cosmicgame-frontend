@@ -5,10 +5,11 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { formatYyyymmddLabel, toYyyymmdd } from '@/utils/format';
+import { formatYyyymmddLabel, toIntlLocale, toYyyymmdd } from '@/utils/format';
 
 function buildMonthGrid(month: Dayjs, weekStartsMonday: boolean): Dayjs[] {
   const monthStart = month.startOf('month');
@@ -36,7 +37,7 @@ type CalendarPanelProps = {
 function CalendarPanel({ viewMonth, onViewMonthChange, selected, onSelect }: CalendarPanelProps) {
   const t = useTranslations('forms');
   const locale = useLocale();
-  const weekStartsMonday = locale === 'zh';
+  const { weekStartsMonday } = getLocaleConfig(locale);
   const days = useMemo(
     () => buildMonthGrid(viewMonth, weekStartsMonday),
     [viewMonth, weekStartsMonday],
@@ -44,7 +45,7 @@ function CalendarPanel({ viewMonth, onViewMonthChange, selected, onSelect }: Cal
   const weekdayKeys = weekStartsMonday
     ? (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const)
     : (['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const);
-  const monthLabel = new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+  const monthLabel = new Intl.DateTimeFormat(toIntlLocale(locale), {
     month: 'long',
     year: 'numeric',
   }).format(viewMonth.toDate());

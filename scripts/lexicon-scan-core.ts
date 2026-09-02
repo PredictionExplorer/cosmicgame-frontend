@@ -6,7 +6,9 @@
  * (scripts/lexicon-scan.ts) re-imports these and adds the walk and exit.
  *
  * Three independent matchers, each returning ScannerHit[]:
- *   - scanContent: string literals (original behavior).
+ *   - scanContent: string literals (original behavior). Internal-only literals
+ *     are skipped — import paths, `id`/`data-testid`/`className` values, and
+ *     quoted property keys (`'legacy-url-fragment': {…}`, JSON catalog keys).
  *   - scanJsxTextNodes: text rendered between JSX tags — catches user-visible
  *     text that string-literal scanning misses (e.g. `<span>Cosmic Staking</span>`).
  *   - scanIdentifiers: declared names containing a banned stem — guards against
@@ -339,15 +341,30 @@ export function extractStringLiterals(line: string): Array<{ literal: string; st
 /**
  * Decides whether a given string literal, at column `start` of `line`,
  * should be skipped because it represents an internal-only string (import
- * path, DOM element ID, test selector, etc.). Returns true to skip.
+ * path, DOM element ID, test selector, object key, etc.). Returns true to skip.
  *
  * The "prefix" is the text in the line immediately before the literal.
  * We match on the trimmed trailing tokens to identify the surrounding
- * call site.
+ * call site. When `end` (the column just past the literal) is supplied, the
+ * text after the literal is consulted too, so quoted property keys can be
+ * told apart from ternary branches.
  */
-export function isInternalCallSite(line: string, start: number): boolean {
+export function isInternalCallSite(line: string, start: number, end?: number): boolean {
   const prefix = line.slice(0, start);
   const trimmedPrefix = prefix.trimEnd();
+
+  // Quoted property keys: `'what-rewards-per-bid': {` in a TS object literal
+  // or `"perNftTooltip": "…"` in a JSON catalog. A key is an identifier, never
+  // rendered copy — content modules key translations by legacy URL-fragment
+  // ids that must stay stable. The prefix guard keeps ternary branches
+  // (`cond ? 'a' : 'b'`, prefix ends in `?`) and `case 'x':` labels scanned.
+  if (
+    end !== undefined &&
+    /^\s*:(?!:)/.test(line.slice(end)) &&
+    /(?:^|[{,])$/.test(trimmedPrefix)
+  ) {
+    return true;
+  }
 
   // Imports and bare require(): `import X from 'y'`, `require('y')`.
   if (/\b(?:from|require\s*\()\s*$/.test(trimmedPrefix)) return true;
@@ -464,7 +481,7 @@ export function scanContent(content: string, pattern: RegExp): ScannerHit[] {
 
     const literals = extractStringLiterals(line);
     for (const { literal, start } of literals) {
-      if (isInternalCallSite(line, start)) continue;
+      if (isInternalCallSite(line, start, start + literal.length)) continue;
       const matches = literal.match(pattern);
       if (matches) {
         for (const m of matches) {

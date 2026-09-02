@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { useNotification } from '@/contexts/NotificationContext';
 import getErrorMessage from '@/utils/alert';
 import { isEthProviderError, isUserRejection, reportError } from '@/utils/errors';
@@ -26,7 +27,7 @@ export function useNotify() {
       reportError(err, 'ethers provider error');
       const localizedFallback = fallback ?? t('generic.rpcFailure');
 
-      if (locale.toLowerCase().startsWith('zh')) {
+      if (!getLocaleConfig(locale).showRawProviderErrors) {
         notify('error', localizedFallback);
         return;
       }

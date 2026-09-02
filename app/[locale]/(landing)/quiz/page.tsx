@@ -6,7 +6,7 @@ import { QUIZ_PATH, getQuizContent } from '@/content/quiz';
 
 import { Link } from '@/i18n/navigation';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
@@ -29,7 +29,7 @@ export default async function QuizHubPage({ params }: PageProps) {
   setRequestLocale(locale);
   const { hub, tiers } = getQuizContent(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
 
   return (
     <main id="main" tabIndex={-1} className="relative mx-auto max-w-6xl px-6 py-24 lg:py-32">

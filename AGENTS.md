@@ -70,9 +70,18 @@ sneak ordinary copy past the scanner.
 Every user-visible string ships in both locales in the same change:
 
 - UI strings: `messages/en/*.json` and `messages/zh/*.json`, identical key sets
-- Page copy: `content/**/en.ts` and `content/**/zh.ts`
-- Legal and trust pages: `content/legal/*.en.tsx` and `content/legal/*.zh.tsx`
+- Page copy: `content/<area>/structure.ts` holds the locale-independent skeleton (ids, hrefs,
+  icons, anchors) once; `text.en.ts` and `text.zh.ts` hold only copy, keyed by those ids and
+  typed so a missing or invented id fails to compile. `content/about/` is small enough to
+  keep plain `en.ts`/`zh.ts`.
+- Legal and trust pages: per-locale copy objects `content/legal/*.en.ts` / `*.zh.ts` rendered
+  by the shared `TermsContent`, `PrivacyContent`, and `TrustPageContent` components
 - Routing is next-intl: `en` is unprefixed, `zh` lives under `/zh` (`i18n/routing.ts`)
+- Never branch on `locale === 'zh'`. Per-locale values live in a `LocaleRecord<T>`
+  (`i18n/locale.ts`) resolved with `pickByLocale`; cross-cutting conventions (Intl tag,
+  `og:locale`, JSON-LD `inLanguage`, word spacing, ellipsis) come from `i18n/localeConfig.ts`.
+  Adding a locale to `routing.locales` then turns every registry into a compile error until
+  it has an entry (`docs/i18n/README.md` §10).
 
 Translate the coined term, never the underlying banned concept. Follow
 `docs/i18n/glossary-zh.md` exactly (one English term = one Chinese term, everywhere) and

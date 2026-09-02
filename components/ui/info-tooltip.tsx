@@ -3,6 +3,7 @@
 import { Info } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -29,7 +30,7 @@ export function InfoTooltip({
   const locale = useLocale();
   const defaultAriaLabel =
     content.length > 72
-      ? `${content.slice(0, 69).trimEnd()}${locale === 'zh' ? '…' : '...'}`
+      ? `${content.slice(0, 69).trimEnd()}${getLocaleConfig(locale).ellipsis}`
       : content;
   const resolvedAriaLabel =
     ariaLabel ??

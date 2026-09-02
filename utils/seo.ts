@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 
@@ -86,7 +87,7 @@ export function createMetadata(
   }
 
   if (options.locale !== undefined) {
-    openGraph.locale = options.locale === 'zh' ? 'zh_CN' : 'en_US';
+    openGraph.locale = getLocaleConfig(options.locale).ogLocale;
   }
 
   const index = options.index ?? true;

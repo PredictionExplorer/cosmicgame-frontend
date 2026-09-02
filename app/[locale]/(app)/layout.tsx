@@ -7,7 +7,13 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { routing } from '@/i18n/routing';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { APP_CHROME_NAMESPACES, pickMessages } from '@/lib/i18n/clientMessages';
-import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
+import {
+  JsonLd,
+  jsonLdInLanguage,
+  websiteJsonLd,
+  organizationJsonLd,
+  webApplicationJsonLd,
+} from '@/utils/jsonLd';
 
 import { RootDocument } from '../../root-document';
 import { createRootMetadata, rootViewport, openGraphLocale } from '../../root-metadata';
@@ -70,7 +76,7 @@ export default async function AppRootLayout({ children, params }: LayoutProps) {
   }
   setRequestLocale(locale);
   const seo = await getTranslations({ locale, namespace: 'seo' });
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
   const appUrl = localeHref(APP_ORIGIN, '/', locale);
   const protocolDescription = seo('jsonLd.app.protocolDescription');

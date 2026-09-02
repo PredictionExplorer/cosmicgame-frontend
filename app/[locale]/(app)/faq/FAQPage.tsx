@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import {
-  faqContentEn,
   findFaqItemByHash,
   findFaqItemById,
   getTotalFaqQuestionCount,
@@ -30,10 +29,10 @@ function useDebounce(value: string, delay: number): string {
 }
 
 interface FAQPageProps {
-  content?: FAQContent;
+  content: FAQContent;
 }
 
-const FAQPage = ({ content = faqContentEn }: FAQPageProps) => {
+const FAQPage = ({ content }: FAQPageProps) => {
   const t = useTranslations('faq');
   const [searchInput, setSearchInput] = useState('');
   const [expandedItems, setExpandedItems] = useState<string[]>([]);

@@ -1,4 +1,8 @@
 {
+  "breadcrumbs": {
+    "home": "Home",
+    "contracts": "Contracts"
+  },
   "page": {
     "eyebrow": "Verified Contracts · Arbitrum",
     "title": "Contract Addresses",

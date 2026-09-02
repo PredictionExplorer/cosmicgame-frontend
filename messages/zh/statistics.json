@@ -297,7 +297,8 @@
       "poolLabel": "锚定派发池",
       "poolTooltip": "当前分配至 Cosmic Signature NFT 锚定者派发池的 ETH。",
       "perNftLabel": "每枚 Cosmic Signature NFT 派发额",
-      "perNftTooltip": "当前每枚已锚定 Cosmic Signature NFT 对应的 ETH 锚定派发：链上派发池除以已索引的已锚定 NFT 总数。{suffix}",
+      "perNftTooltip": "当前每枚已锚定 Cosmic Signature NFT 对应的 ETH 锚定派发：链上派发池除以已索引的已锚定 NFT 总数。",
+      "perNftTooltipUnavailable": "当前每枚已锚定 Cosmic Signature NFT 对应的 ETH 锚定派发：链上派发池除以已索引的已锚定 NFT 总数。链上锚定派发池并非 0，但已索引的 Cosmic Signature NFT 锚定总数为 0（例如 cg_stake_stats_cst 尚未由 ETL 更新），因此无法计算每枚 NFT 的派发额。",
       "activeHoldersLabel": "活跃锚定者",
       "activeHoldersTooltip": "当前至少锚定一枚 Cosmic Signature NFT 或 Random Walk NFT 的活跃钱包合计数。"
     },

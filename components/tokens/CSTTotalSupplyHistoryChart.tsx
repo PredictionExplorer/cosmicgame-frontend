@@ -18,6 +18,7 @@ import {
   fromYyyymmdd,
   supplyHistoryBootstrapRange,
   supplyHistoryDateBounds,
+  toIntlLocale,
   toYyyymmdd,
 } from '@/utils';
 
@@ -91,7 +92,7 @@ function SupplyTooltip({ active, payload }: SupplyTooltipProps) {
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.numGestures')}</dt>
           <dd className="text-white">
-            {new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US').format(point.numBids)}
+            {new Intl.NumberFormat(toIntlLocale(locale)).format(point.numBids)}
           </dd>
         </div>
       </dl>

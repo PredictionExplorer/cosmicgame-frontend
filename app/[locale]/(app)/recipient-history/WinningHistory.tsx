@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
 import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
@@ -54,7 +55,11 @@ function WinningHistory() {
       ) : error ? (
         <ErrorState
           title={t('recipientHistory.loadError')}
-          message={locale === 'zh' ? t('recipientHistory.loadErrorDescription') : error}
+          message={
+            getLocaleConfig(locale).showRawProviderErrors
+              ? error
+              : t('recipientHistory.loadErrorDescription')
+          }
         />
       ) : !winningHistory || winningHistory.length === 0 ? (
         <EmptyState

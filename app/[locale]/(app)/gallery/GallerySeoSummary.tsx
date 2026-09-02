@@ -2,11 +2,12 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { Link } from '@/i18n/navigation';
 import { get_dashboard_info } from '@/services/api/rounds';
+import { toIntlLocale } from '@/utils/format';
 
 export async function GallerySeoSummary() {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'seo' });
-  const numberFormatter = new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US');
+  const numberFormatter = new Intl.NumberFormat(toIntlLocale(locale));
   // Resolve to null on transport failure so ISR builds never crash on a
   // temporarily unreachable API; the card then renders "Unavailable".
   const data = await get_dashboard_info().catch(() => null);

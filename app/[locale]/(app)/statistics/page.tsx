@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, datasetJsonLd, webPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, datasetJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -31,7 +31,7 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: 'statistics' });
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const url = localeHref(APP_ORIGIN, '/statistics', locale);
 
   return (

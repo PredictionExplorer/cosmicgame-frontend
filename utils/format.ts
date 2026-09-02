@@ -1,5 +1,11 @@
 import { formatUnits } from 'viem';
 
+import enFormats from '@/messages/en/formats.json';
+import zhFormats from '@/messages/zh/formats.json';
+
+import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
+import { getLocaleConfig } from '@/i18n/localeConfig';
+
 type BigNumberish = bigint | string | number;
 
 /**
@@ -10,8 +16,39 @@ type BigNumberish = bigint | string | number;
 export const UNAVAILABLE_VALUE = '—';
 
 /** Maps app locale codes to stable Intl locales. */
-export const toIntlLocale = (locale: string = 'en'): string =>
-  locale.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en-US';
+export const toIntlLocale = (locale: string = 'en'): string => getLocaleConfig(locale).intlLocale;
+
+const MONTH_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+interface DurationUnitLabels {
+  readonly days: string;
+  readonly hours: string;
+  readonly minutes: string;
+  readonly seconds: string;
+}
+
+/**
+ * Compact duration units, sourced from the `formats.durationCompact` message
+ * catalog so plain formatting utils (chart ticks, `formatSeconds`) render
+ * exactly the units that components using `useTranslations('formats')` do.
+ */
+const DURATION_UNITS: LocaleRecord<DurationUnitLabels> = {
+  en: enFormats.durationCompact,
+  zh: zhFormats.durationCompact,
+};
 
 /** Shortens a hex string (e.g., address) for display. */
 export function shortenHex(hex: string, length = 4): string {
@@ -74,6 +111,19 @@ export const formatId = (id: number | string): string => {
 
 export type TimestampTimeZone = 'local' | 'utc';
 
+interface TimestampParts {
+  monthIndex: number;
+  day: number;
+  hours: string;
+  minutes: string;
+}
+
+const TIMESTAMP_DATETIME_FORMATS: LocaleRecord<(parts: TimestampParts) => string> = {
+  en: ({ monthIndex, day, hours, minutes }) =>
+    `${MONTH_LABELS[monthIndex]} ${('0' + day).slice(-2)}, ${hours}:${minutes}`,
+  zh: ({ monthIndex, day, hours, minutes }) => `${monthIndex + 1}月${day}日 ${hours}:${minutes}`,
+};
+
 /**
  * Converts Unix timestamp to a locale-style date string.
  * `en` output is byte-identical to the historical format ("Jan 01, 12:34");
@@ -89,23 +139,8 @@ export const convertTimestampToDateTime = (
   locale: string = 'en',
   timeZone: TimestampTimeZone = 'local',
 ): string => {
-  const month_names = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-
   const date_ob = new Date(timestamp * 1000);
-  const month = timeZone === 'utc' ? date_ob.getUTCMonth() : date_ob.getMonth();
+  const monthIndex = timeZone === 'utc' ? date_ob.getUTCMonth() : date_ob.getMonth();
   const day = timeZone === 'utc' ? date_ob.getUTCDate() : date_ob.getDate();
   const hour = timeZone === 'utc' ? date_ob.getUTCHours() : date_ob.getHours();
   const minute = timeZone === 'utc' ? date_ob.getUTCMinutes() : date_ob.getMinutes();
@@ -114,14 +149,15 @@ export const convertTimestampToDateTime = (
   const minutes = ('0' + minute).slice(-2);
   const seconds = ('0' + second).slice(-2);
 
-  let result: string;
-  if (toIntlLocale(locale) === 'zh-CN') {
-    result = `${month + 1}月${day}日 ${hours}:${minutes}`;
-  } else {
-    const monthName = month_names[month];
-    const date = ('0' + day).slice(-2);
-    result = `${monthName} ${date}, ${hours}:${minutes}`;
-  }
+  let result = pickByLocale(
+    TIMESTAMP_DATETIME_FORMATS,
+    locale,
+  )({
+    monthIndex,
+    day,
+    hours,
+    minutes,
+  });
 
   if (showSecond) {
     result += `:${seconds}`;
@@ -149,22 +185,48 @@ export const formatSeconds = (seconds: number, locale: string = 'en'): string =>
   seconds = Math.floor(seconds % 60);
   let hours = Math.floor(minutes / 60);
   minutes = minutes % 60;
-  let days = Math.floor(hours / 24);
+  const days = Math.floor(hours / 24);
   hours = hours % 24;
 
-  const units =
-    toIntlLocale(locale) === 'zh-CN'
-      ? { d: '天', h: '小时', m: '分', s: '秒', sep: '' }
-      : { d: 'd', h: 'h', m: 'm', s: 's', sep: ' ' };
+  const units = pickByLocale(DURATION_UNITS, locale);
+  const sep = getLocaleConfig(locale).wordSpacing ? ' ' : '';
 
   let str = '';
-  if (days) str += `${days}${units.d}${units.sep}`;
-  if (hours || (str && (minutes || seconds))) str += `${hours}${units.h}${units.sep}`;
-  if (minutes || (str && seconds)) str += `${minutes}${units.m}${units.sep}`;
-  if (seconds) str += `${seconds}${units.s}`;
+  if (days) str += `${days}${units.days}${sep}`;
+  if (hours || (str && (minutes || seconds))) str += `${hours}${units.hours}${sep}`;
+  if (minutes || (str && seconds)) str += `${minutes}${units.minutes}${sep}`;
+  if (seconds) str += `${seconds}${units.seconds}`;
 
-  return str || `0${units.s}`;
+  return str || `0${units.seconds}`;
 };
+
+/** Compact "hours into cycle" label for chart axes, e.g. "45m", "1.5h", "2d". */
+export function formatHoursTick(hours: number, locale: string = 'en'): string {
+  const units = pickByLocale(DURATION_UNITS, locale);
+  if (hours >= 24) {
+    const d = hours / 24;
+    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${units.days}`;
+  }
+  if (hours >= 1) {
+    return `${Number.isInteger(hours) ? hours.toFixed(0) : hours.toFixed(1)}${units.hours}`;
+  }
+  return `${Math.round(hours * 60)}${units.minutes}`;
+}
+
+/** Compact duration for chart axis ticks, e.g. "45m", "1.5h", "2d". */
+export function formatDurationTick(secs: number, locale: string = 'en'): string {
+  if (secs <= 0) return '0';
+  const units = pickByLocale(DURATION_UNITS, locale);
+  if (secs >= 86400) {
+    const d = secs / 86400;
+    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${units.days}`;
+  }
+  if (secs >= 3600) {
+    const h = secs / 3600;
+    return `${Number.isInteger(h) ? h.toFixed(0) : h.toFixed(1)}${units.hours}`;
+  }
+  return `${Math.round(secs / 60)}${units.minutes}`;
+}
 /**
  * Calculates the difference between the current time and a given timestamp.
  * Returns the time difference in a human-readable format (e.g., "1d 2h 30m 45s").
@@ -230,32 +292,20 @@ export function fromYyyymmdd(yyyymmdd: string): string {
   return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`;
 }
 
-const MONTH_LABELS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+const CALENDAR_DATE_LABEL_FORMATS: LocaleRecord<
+  (year: number, monthIndex: number, day: number) => string
+> = {
+  en: (year, monthIndex, day) => `${MONTH_LABELS[monthIndex] ?? ''} ${day}, ${year}`,
+  zh: (year, monthIndex, day) => `${year}/${monthIndex + 1}/${day}`,
+};
 
 /** Formats YYYYMMDD for chart axis / tooltip labels. */
 export function formatYyyymmddLabel(yyyymmdd: string, locale: string = 'en'): string {
   if (yyyymmdd.length !== 8) return yyyymmdd;
   const year = Number(yyyymmdd.slice(0, 4));
-  const month = Number(yyyymmdd.slice(4, 6)) - 1;
+  const monthIndex = Number(yyyymmdd.slice(4, 6)) - 1;
   const day = Number(yyyymmdd.slice(6, 8));
-  if (toIntlLocale(locale) === 'zh-CN') {
-    return `${year}/${month + 1}/${day}`;
-  }
-  const monthName = MONTH_LABELS[month] ?? '';
-  return `${monthName} ${day}, ${year}`;
+  return pickByLocale(CALENDAR_DATE_LABEL_FORMATS, locale)(year, monthIndex, day);
 }
 
 /** Returns UTC YYYYMMDD for today minus `days` calendar days. */
@@ -273,27 +323,42 @@ export function yyyymmddTodayUtc(): string {
   return yyyymmddDaysAgoUtc(0);
 }
 
+const UTC_DATETIME_LABEL_FORMATS: LocaleRecord<
+  (year: number, monthIndex: number, day: number, hh: string, mm: string) => string
+> = {
+  en: (year, monthIndex, day, hh, mm) =>
+    `${MONTH_LABELS[monthIndex] ?? ''} ${day}, ${year} ${hh}:${mm} UTC`,
+  zh: (year, monthIndex, day, hh, mm) => `${year}年${monthIndex + 1}月${day}日 ${hh}:${mm}（UTC）`,
+};
+
+const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
+  en: (date) => `${date.toISOString().replace('T', ' ').slice(0, 16)} UTC`,
+  zh: (date) =>
+    `${date.getUTCFullYear()}年${date.getUTCMonth() + 1}月${date.getUTCDate()}日 ${String(
+      date.getUTCHours(),
+    ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}（UTC）`,
+};
+
+/**
+ * "Data updated at" stamp for SEO summaries: `en` keeps the ISO-style
+ * "2026-08-28 08:13 UTC"; `zh` renders "2026年8月28日 08:13（UTC）".
+ */
+export function formatUtcDateTimeStamp(date: Date, locale: string = 'en'): string {
+  return pickByLocale(UTC_STAMP_FORMATS, locale)(date);
+}
+
 /** Formats a Unix timestamp (seconds) for chart axis / tooltip labels. */
 export function formatUnixTsLabel(ts: number, withTime = false, locale: string = 'en'): string {
   const d = new Date(ts * 1000);
   const day = d.getUTCDate();
   const monthIndex = d.getUTCMonth();
   const year = d.getUTCFullYear();
-  if (toIntlLocale(locale) === 'zh-CN') {
-    if (!withTime) {
-      return `${year}/${monthIndex + 1}/${day}`;
-    }
-    const hh = String(d.getUTCHours()).padStart(2, '0');
-    const mm = String(d.getUTCMinutes()).padStart(2, '0');
-    return `${year}年${monthIndex + 1}月${day}日 ${hh}:${mm}（UTC）`;
-  }
-  const month = MONTH_LABELS[monthIndex] ?? '';
   if (!withTime) {
-    return `${month} ${day}, ${year}`;
+    return pickByLocale(CALENDAR_DATE_LABEL_FORMATS, locale)(year, monthIndex, day);
   }
   const hh = String(d.getUTCHours()).padStart(2, '0');
   const mm = String(d.getUTCMinutes()).padStart(2, '0');
-  return `${month} ${day}, ${year} ${hh}:${mm} UTC`;
+  return pickByLocale(UTC_DATETIME_LABEL_FORMATS, locale)(year, monthIndex, day, hh, mm);
 }
 
 /** Wide date range used to bootstrap CST supply history (all available days). */

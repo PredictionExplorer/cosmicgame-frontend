@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds, shortenHex } from '@/utils';
+import { formatDurationTick, formatHoursTick, formatSeconds, shortenHex } from '@/utils';
 
 import {
   getCstCalibrationTimeline,
@@ -32,34 +32,6 @@ const RWALK_COLOR = '#fbbf24'; // amber — ETH + RandomWalk gesture (shortens)
 const CST_COLOR = '#9C37FD'; // violet — CST gesture (lengthens)
 
 const CHART_HEIGHT = 360;
-
-/** Compact "hours into round" label, e.g. "45m", "1.5h", "2d". */
-function formatHoursTick(hours: number, locale: string = 'en'): string {
-  const zh = locale === 'zh';
-  if (hours >= 24) {
-    const d = hours / 24;
-    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${zh ? '天' : 'd'}`;
-  }
-  if (hours >= 1) {
-    return `${Number.isInteger(hours) ? hours.toFixed(0) : hours.toFixed(1)}${zh ? '小时' : 'h'}`;
-  }
-  return `${Math.round(hours * 60)}${zh ? '分' : 'm'}`;
-}
-
-/** Compact duration for the Y-axis ticks, e.g. "45m", "1.5h", "2d". */
-function formatDurationTick(secs: number, locale: string = 'en'): string {
-  const zh = locale === 'zh';
-  if (secs <= 0) return '0';
-  if (secs >= 86400) {
-    const d = secs / 86400;
-    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${zh ? '天' : 'd'}`;
-  }
-  if (secs >= 3600) {
-    const h = secs / 3600;
-    return `${Number.isInteger(h) ? h.toFixed(0) : h.toFixed(1)}${zh ? '小时' : 'h'}`;
-  }
-  return `${Math.round(secs / 60)}${zh ? '分' : 'm'}`;
-}
 
 function gestureColor(gestureType: number): string {
   if (gestureType === 2) return CST_COLOR;

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { SecurityContentEn } from '@/content/legal/SecurityContent.en';
-import { SecurityContentZh } from '@/content/legal/SecurityContent.zh';
+import { getSecurityCopy } from '@/content/legal';
+import { TrustPageContent } from '@/content/legal/TrustPageContent';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
@@ -27,15 +27,16 @@ export default async function SecurityPage({ params }: PageProps) {
     getTranslations({ locale, namespace: 'meta' }),
     getTranslations({ locale, namespace: 'legal' }),
   ]);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(APP_ORIGIN, '/security', locale);
+  const copy = getSecurityCopy(locale);
 
   return (
     <main id="main" tabIndex={-1} className="mx-auto max-w-4xl px-6 py-16 lg:py-24">
       <JsonLd
         data={[
           webPageJsonLd({
-            name: locale === 'zh' ? 'Cosmic Signature 安全' : 'Cosmic Signature Security',
+            name: copy.title,
             description: t('security.description'),
             url: pageUrl,
             inLanguage,
@@ -55,7 +56,7 @@ export default async function SecurityPage({ params }: PageProps) {
           ),
         ]}
       />
-      {locale === 'zh' ? <SecurityContentZh /> : <SecurityContentEn />}
+      <TrustPageContent copy={copy} locale={locale} />
     </main>
   );
 }

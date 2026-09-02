@@ -1,0 +1,71 @@
+import { pickByLocale, type LocaleRecord } from './locale';
+
+/**
+ * Per-locale rendering conventions that are configuration, not copy.
+ *
+ * Words and sentences belong in `messages/<locale>/*.json`; larger prose in
+ * `content/`. This registry holds only the mechanical conventions a locale
+ * carries — Intl tags, typography, calendar habits, error-display policy —
+ * so they are declared once instead of as scattered `locale === 'zh'`
+ * ternaries. Single-use conventions may instead live as a `LocaleRecord`
+ * next to their only consumer (e.g. the RainbowKit locale map in WalletUi).
+ */
+export interface LocaleConfig {
+  /** BCP-47 tag for `Intl.NumberFormat` / `Intl.DateTimeFormat` / `toLocaleString`. */
+  readonly intlLocale: string;
+  /** schema.org `inLanguage` value emitted in JSON-LD. */
+  readonly jsonLdInLanguage: string;
+  /** OpenGraph `og:locale` value. */
+  readonly ogLocale: string;
+  /**
+   * Whether the language separates words with spaces. Drives the separator
+   * between compact-duration tokens ("1d 2h" vs "1天2小时") and the space
+   * between an inline label and the value that follows it.
+   */
+  readonly wordSpacing: boolean;
+  /** First day of the week in calendar UI. */
+  readonly weekStartsMonday: boolean;
+  /** Ellipsis appended when truncating text. */
+  readonly ellipsis: string;
+  /**
+   * Whether an interpolated Title-Case phrase is lowercased when it lands
+   * mid-sentence ("Failed to load endurance records"). English grammar wants
+   * this; Chinese has no letter case.
+   */
+  readonly lowercaseMidSentence: boolean;
+  /**
+   * Whether raw wallet/RPC provider diagnostics may be shown to the user.
+   * Providers return arbitrary English strings, so locales other than
+   * English hide them behind the translated fallback while the original
+   * error still flows to `reportError` (docs/i18n/README.md).
+   */
+  readonly showRawProviderErrors: boolean;
+}
+
+const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
+  en: {
+    intlLocale: 'en-US',
+    jsonLdInLanguage: 'en',
+    ogLocale: 'en_US',
+    wordSpacing: true,
+    weekStartsMonday: false,
+    ellipsis: '...',
+    lowercaseMidSentence: true,
+    showRawProviderErrors: true,
+  },
+  zh: {
+    intlLocale: 'zh-CN',
+    jsonLdInLanguage: 'zh-Hans',
+    ogLocale: 'zh_CN',
+    wordSpacing: false,
+    weekStartsMonday: true,
+    ellipsis: '…',
+    lowercaseMidSentence: false,
+    showRawProviderErrors: false,
+  },
+};
+
+/** Resolves the rendering conventions for arbitrary locale-ish input. */
+export function getLocaleConfig(locale: string | null | undefined): LocaleConfig {
+  return pickByLocale(LOCALE_CONFIG, locale);
+}

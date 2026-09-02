@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 /** Props for a single statistics label/value row. */
@@ -35,17 +36,14 @@ export const CountdownRenderer = ({
 }) => {
   const t = useTranslations('formats');
   const locale = useLocale();
-  const separator = locale === 'zh' ? '' : ' ';
+  const separator = getLocaleConfig(locale).wordSpacing ? ' ' : '';
   let result = '';
   if (days) result += `${days}${t('durationCompact.days')}${separator}`;
   if (hours || result) result += `${hours}${t('durationCompact.hours')}${separator}`;
   if (minutes || result) result += `${minutes}${t('durationCompact.minutes')}${separator}`;
   if (seconds || result) result += `${seconds}${t('durationCompact.seconds')}`;
   if (result !== '') {
-    result =
-      locale === 'zh'
-        ? `${t('durationCompact.left')}${result}`
-        : `${result} ${t('durationCompact.left')}`;
+    result = t('durationCompact.leftPattern', { duration: result });
   }
   return result !== '' ? <p className="text-primary font-medium">{result}</p> : null;
 };

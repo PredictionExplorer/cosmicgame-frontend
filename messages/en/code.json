@@ -1,4 +1,8 @@
 {
+  "breadcrumbs": {
+    "home": "Home",
+    "code": "Source Code"
+  },
   "viewer": {
     "title": "Code Viewer",
     "subtitle": "View the generation code that converts seeds into images",

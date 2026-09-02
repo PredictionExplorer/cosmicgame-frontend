@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getHowItWorksContent } from '@/content/how-it-works';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 import HowToPlayPage from './HowToPlayPage';
@@ -34,7 +34,7 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const content = getHowItWorksContent(locale);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
 
   return (
     <>

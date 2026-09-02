@@ -1,4 +1,8 @@
 {
+  "breadcrumbs": {
+    "home": "首页",
+    "contracts": "合约"
+  },
   "page": {
     "eyebrow": "已验证合约 · Arbitrum",
     "title": "合约地址",

@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAboutContent } from '@/content/about';
 
 import { LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
@@ -27,7 +27,7 @@ export default async function AboutPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const content = getAboutContent(locale);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, content.metadata.path, locale);
   const aboutJsonLd = {
     '@context': 'https://schema.org',

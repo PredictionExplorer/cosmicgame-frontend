@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { RiskContentEn } from '@/content/legal/RiskContent.en';
-import { RiskContentZh } from '@/content/legal/RiskContent.zh';
+import { getRiskCopy } from '@/content/legal';
+import { TrustPageContent } from '@/content/legal/TrustPageContent';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
@@ -48,7 +48,7 @@ export default async function RiskDisclosuresPage({ params }: PageProps) {
           localeHref(APP_ORIGIN, '/', locale),
         )}
       />
-      {locale === 'zh' ? <RiskContentZh locale={locale} /> : <RiskContentEn locale={locale} />}
+      <TrustPageContent copy={getRiskCopy(locale)} locale={locale} />
     </main>
   );
 }

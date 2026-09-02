@@ -5,7 +5,7 @@ import { ArrowRight, Fingerprint, HeartHandshake, Orbit, Radio, Sparkles } from 
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatId, getAssetsUrl } from '@/utils';
+import { formatId, getAssetsUrl, toIntlLocale } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
@@ -407,9 +407,7 @@ export function HomeObservatoryHero({
                       {t('hero.console.stats.gestures')}
                     </p>
                     <p className="mt-1 break-words text-lg font-bold tabular-nums">
-                      {Math.round(animatedGestureCount).toLocaleString(
-                        locale === 'zh' ? 'zh-CN' : 'en-US',
-                      )}
+                      {Math.round(animatedGestureCount).toLocaleString(toIntlLocale(locale))}
                     </p>
                   </div>
                   <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">

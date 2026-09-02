@@ -6,8 +6,9 @@
  *   npm run white-paper:pdf              # both languages
  *   npm run white-paper:pdf -- --locale zh
  *
- * Pipeline: content/white-paper/{en,zh}.ts -> pandoc markdown -> tectonic
- * (XeLaTeX) -> public/white-paper/cosmic-signature-white-paper-v<x>[-zh].pdf
+ * Pipeline: content/white-paper (structure.ts + text.<locale>.ts) -> pandoc
+ * markdown -> tectonic (XeLaTeX) ->
+ * public/white-paper/cosmic-signature-white-paper-v<x>[-zh].pdf
  *
  * Requires `pandoc` and `tectonic` on PATH (both available via Homebrew).
  * The Chinese build additionally uses the macOS system CJK fonts Songti SC
@@ -21,7 +22,7 @@ import { mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 
-import { whitePaperContentEn } from '../content/white-paper/en';
+import { whitePaperContentEn, whitePaperContentZh } from '../content/white-paper';
 import {
   WHITE_PAPER_DATE_DISPLAY,
   WHITE_PAPER_PDF_PATH,
@@ -30,11 +31,10 @@ import {
   type WhitePaperContent,
   type WhitePaperSection,
 } from '../content/white-paper/types';
-import { whitePaperContentZh } from '../content/white-paper/zh';
+import { isAppLocale, type AppLocale, type LocaleRecord } from '../i18n/locale';
+import { routing } from '../i18n/routing';
 
 const ROOT = resolve(process.cwd());
-
-type PaperLocale = 'en' | 'zh';
 
 interface LocaleBuild {
   content: WhitePaperContent;
@@ -53,7 +53,9 @@ const BASE_HEADER_INCLUDES = [
   '\\pretocmd{\\section}{\\needspace{5\\baselineskip}}{}{}',
 ] as const;
 
-const BUILDS: Record<PaperLocale, LocaleBuild> = {
+// One build per app locale: adding a locale to routing.locales fails to
+// compile here until its PDF typography and output path are decided.
+const BUILDS: LocaleRecord<LocaleBuild> = {
   en: {
     content: whitePaperContentEn,
     outputPath: join(ROOT, 'public', WHITE_PAPER_PDF_PATH),
@@ -229,7 +231,7 @@ function buildMarkdown(build: LocaleBuild): string {
   return `${frontMatter}\n\n${body.join('\n\n')}\n`;
 }
 
-function generate(locale: PaperLocale): void {
+function generate(locale: AppLocale): void {
   const build = BUILDS[locale];
   const markdown = buildMarkdown(build);
   const tempDir = mkdtempSync(join(tmpdir(), `cosmic-white-paper-${locale}-`));
@@ -267,10 +269,12 @@ function generate(locale: PaperLocale): void {
 function main(): void {
   const localeArgIndex = process.argv.indexOf('--locale');
   const requested = localeArgIndex === -1 ? 'all' : (process.argv[localeArgIndex + 1] ?? 'all');
-  if (requested !== 'all' && requested !== 'en' && requested !== 'zh') {
-    throw new Error(`unknown --locale value: ${requested} (expected en, zh, or all)`);
+  if (requested !== 'all' && !isAppLocale(requested)) {
+    throw new Error(
+      `unknown --locale value: ${requested} (expected ${routing.locales.join(', ')}, or all)`,
+    );
   }
-  const locales: PaperLocale[] = requested === 'all' ? ['en', 'zh'] : [requested];
+  const locales: readonly AppLocale[] = requested === 'all' ? routing.locales : [requested];
   for (const locale of locales) generate(locale);
 }
 

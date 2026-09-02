@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
 import { ErrorState } from '@/components/ui/error-state';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -77,7 +78,7 @@ export function StatsSection({
         title={
           errorTitle ??
           t('shared.sectionLoadErrorTitle', {
-            title: locale === 'zh' ? title : title.toLowerCase(),
+            title: getLocaleConfig(locale).lowercaseMidSentence ? title.toLowerCase() : title,
           })
         }
         message={t('shared.serviceError')}

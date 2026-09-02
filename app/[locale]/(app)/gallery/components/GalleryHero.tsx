@@ -6,6 +6,7 @@ import { Gem, Lock, Tag, Trophy } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { toIntlLocale } from '@/utils/format';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export interface GalleryStats {
@@ -138,7 +139,7 @@ function StatCard({ value, label, icon: Icon, tooltip, gradient, loading }: Stat
                 <div className="h-8 w-16 rounded bg-white/[0.06] animate-pulse" />
               ) : (
                 <p className="text-2xl md:text-3xl font-display font-bold tracking-tight">
-                  {animatedValue.toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US')}
+                  {animatedValue.toLocaleString(toIntlLocale(locale))}
                 </p>
               )}
             </div>

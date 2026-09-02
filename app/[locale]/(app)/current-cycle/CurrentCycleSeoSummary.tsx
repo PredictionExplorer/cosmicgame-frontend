@@ -2,18 +2,19 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { Link } from '@/i18n/navigation';
 import { get_dashboard_info } from '@/services/api/rounds';
+import { toIntlLocale } from '@/utils/format';
 
 function formatNumber(value: unknown, locale: string, unavailable: string): string {
   const numeric = Number(value);
   return Number.isFinite(numeric)
-    ? new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US').format(numeric)
+    ? new Intl.NumberFormat(toIntlLocale(locale)).format(numeric)
     : unavailable;
 }
 
 function formatEth(value: unknown, locale: string, unavailable: string): string {
   const numeric = Number(value);
   return Number.isFinite(numeric)
-    ? `${new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    ? `${new Intl.NumberFormat(toIntlLocale(locale), {
         maximumFractionDigits: 4,
       }).format(numeric)} ETH`
     : unavailable;

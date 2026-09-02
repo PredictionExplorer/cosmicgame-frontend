@@ -70,12 +70,22 @@ New i18n plumbing:
 ```
 i18n/
   routing.ts      ← defineRouting({ locales: ['en', 'zh'], defaultLocale: 'en', localePrefix: 'as-needed' })
+  locale.ts       ← AppLocale, LocaleRecord<T>, normalizeLocale, pickByLocale (the only locale parser)
+  localeConfig.ts ← per-locale rendering conventions: Intl tag, og:locale, JSON-LD inLanguage,
+                    word spacing, week start, ellipsis, provider-error policy
   request.ts      ← getRequestConfig: loads + merges messages for the request locale
   navigation.ts   ← createNavigation(routing): locale-aware Link, useRouter, usePathname, redirect
 messages/
   en/*.json       ← English catalogs (source of truth), one file per namespace
   zh/*.json       ← Chinese catalogs (same keys, same shape)
 ```
+
+**No `locale === 'zh'` ternaries anywhere.** Every per-locale value lives in a
+`LocaleRecord<T>` — either in `i18n/localeConfig.ts` (cross-cutting conventions), in a
+registry next to its single consumer (e.g. the RainbowKit locale map in
+`components/wallet/WalletUi.tsx`), or in a content/copy registry (§3.2). `Record<AppLocale, T>`
+means adding a locale to `routing.locales` turns every registry into a compile error until
+an entry exists.
 
 `next.config.ts` gets wrapped with `createNextIntlPlugin()` (composes with the existing
 Sentry and bundle-analyzer wrappers).
@@ -175,31 +185,49 @@ production code. Sprint 0 converts it into the initial `messages/en/*.json` file
 **deletes it** so there is exactly one source of truth. `content/statistics-copy.ts`
 migrates into `statistics.json`/`tables.json`/`tooltips.json` during Sprint 5.
 
-### 3.2 Per-locale content modules — long-form structured content
+### 3.2 Per-locale content modules — structure/text split
 
-500-line articles don't belong in JSON. Structured long-form copy stays in typed
-TypeScript, split per locale with a shared type and a locale accessor:
+500-line articles don't belong in JSON. Long-form copy stays in typed TypeScript, but the
+locale-independent **structure** (ids, icons, hrefs, hash anchors, tones, option ids,
+correct answers, section trees, `protocolFacts` wiring) is written **once** and only the
+translated **text** is per-locale:
 
 ```
 content/
-  landing/   types.ts  en.ts  zh.ts  index.ts   ← getLandingContent(locale)
-  learn/     types.ts  en.ts  zh.ts  index.ts   ← getLearnContent(locale)
-  faq/       types.ts  en.ts  zh.ts  index.ts   ← app/(app)/faq/data/faq-data.ts moves here
-  protocol-facts.ts                             ← numbers, locale-independent (unchanged)
+  faq/         types.ts  structure.ts  text.en.ts  text.zh.ts  index.ts  ← getFaqContent(locale)
+  quiz/        (same pattern, per tier)
+  white-paper/ (same pattern)
+  landing/     (same pattern)
+  learn/       (same pattern)
+  how-it-works/(same pattern)
+  about/       types.ts  en.ts  zh.ts  index.ts   ← small enough that types.ts already holds structure
+  protocol-facts.ts                               ← numbers, locale-independent (unchanged)
 ```
 
-Legal pages (Terms, Privacy, Risk Disclosures) are markup-heavy TSX; they get per-locale
-content components (`TermsContent.en.tsx` / `TermsContent.zh.tsx`) selected by the page on
-`params.locale`. Full markup fidelity, no JSON contortions.
+`structure.ts` declares the skeleton `as const`; text modules are typed by mapped types
+over the skeleton's literal ids, so a missing or invented translation id **fails to
+compile**. `index.ts` composes skeleton + text into the public content shape (exports are
+unchanged) and resolves the locale through a `LocaleRecord` registry — see
+`content/faq/` for the reference implementation.
+
+Legal and trust pages (Terms, Privacy, Risk Disclosures, Security, Audits) share one
+renderer each (`TermsContent.tsx`, `PrivacyContent.tsx`, `TrustPageContent.tsx`) plus
+per-locale copy objects (`*.en.ts` / `*.zh.ts`), resolved via `content/legal/index.ts`.
+No JSX is duplicated per locale.
 
 **Fallback policy:** `i18n/request.ts` deep-merges `zh` messages over the `en` catalog, so
-a missing Chinese key renders English — never a raw key path. Long-form content falls back
-at _article granularity_ (a Learn article without a `zh` version serves the English
-article under `/zh`). The parity report (§6) tracks every fallback so nothing hides.
+a missing Chinese key renders English — never a raw key path. Long-form content has **no
+runtime fallback**: the text-module types make partial translations a compile error, so a
+locale ships complete or not at all.
 
 ## 4. Locale-aware formatting
 
-Current formatting is English-locked and must become locale-aware (mostly Sprint 5):
+Formatting conventions live in two places: `i18n/localeConfig.ts` for non-text conventions
+(Intl tag, week start, word spacing, ellipsis, provider-error policy) and
+`LocaleRecord`-typed format registries in `utils/format.ts` / `utils/time.ts` for
+per-locale date/duration templates (compact duration units come from the
+`formats.durationCompact` message catalog, the single source shared with
+`useTranslations('formats')` consumers). The table below records the original migration:
 
 | Today                                                            | Change                                                                                 |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -261,8 +289,9 @@ action, Chinese renders in unstyled system fallback.
    namespaces use a checked-in required-key manifest so later-sprint English extraction can
    land without weakening already-shipped gates; Sprint 1 runs via `yarn i18n:sprint1`.
 2. **Chinese lexicon scan**: `scripts/lexicon-scan-core.ts` gains a zh banned-term list
-   (from [glossary-zh.md §4](./glossary-zh.md)) applied to `messages/zh/**` and
-   `content/**/zh.ts`. Same allow-pragma mechanism for FAQ denial copy.
+   (from [glossary-zh.md §4](./glossary-zh.md)) applied to `messages/zh/**` and the
+   `content/**/text.zh.ts` / `content/legal/*.zh.ts` modules. Same allow-pragma mechanism
+   for FAQ denial copy.
 3. **E2E**: a `zh` smoke spec (home, gallery, learn, FAQ under `/zh`; switcher round-trip;
    cookie persistence; host redirects preserve the prefix). Existing English e2e suites
    run unchanged — they are the regression net proving `en` didn't move.
@@ -323,12 +352,27 @@ yarn build && yarn bundle:budget       # production output and full app-home JS 
 To test locale detection: clear the `NEXT_LOCALE` cookie and set the browser's language to
 `zh-CN` — visiting `/` should redirect to `/zh`.
 
-## 10. Adding the next language (later)
+## 10. Adding the next language
 
-1. Add the locale to `i18n/routing.ts`.
-2. `cp -r messages/en messages/<locale>` and translate (parity script tracks progress).
-3. Add `content/*/<locale>.ts` modules and legal content components.
-4. Write `glossary-<locale>.md` + `style-guide-<locale>.md` (for zh-Hant, OpenCC can
-   bootstrap from zh-Hans, but terminology and punctuation still need native review).
-5. Extend fonts/formats if the script demands it; add the locale to hreflang maps,
-   sitemap, parity CI, and e2e smoke.
+The compiler drives the checklist. After step 1, `npm run type-check` lists every place
+that needs a decision — there is no grep step.
+
+1. **Add the locale to `locales` in [`i18n/routing.ts`](../../i18n/routing.ts).** Every
+   `LocaleRecord<T>` in the codebase now fails to compile until it has an entry:
+   - `LOCALE_LABELS` (routing.ts) — the language's own name for the switcher.
+   - `i18n/localeConfig.ts` — Intl tag, `og:locale`, JSON-LD `inLanguage`, word spacing,
+     week start, ellipsis, provider-error policy.
+   - Format registries in `utils/format.ts` / `utils/time.ts` — date and duration
+     templates for the locale.
+   - Single-consumer registries (e.g. RainbowKit locale in `components/wallet/WalletUi.tsx`,
+     OG copy catalogs in `lib/og/copy.ts`, error catalogs in `app/global-error.tsx`).
+   - Every `content/*/index.ts` text registry and `content/legal/index.ts` copy registry —
+     add `text.<locale>.ts` / `*.<locale>.ts` modules; their mapped types reject missing
+     or extra ids, so partial translations cannot ship.
+2. `cp -r messages/en messages/<locale>` and translate (`npm run i18n:strict` gates key
+   parity; untranslated values fall back to English at runtime while in progress).
+3. Write `glossary-<locale>.md` + `style-guide-<locale>.md` (for zh-Hant, OpenCC can
+   bootstrap from zh-Hans, but terminology and punctuation still need native review), and
+   extend `scripts/terminology-consistency-core.ts` if the language needs a glossary gate.
+4. Extend fonts if the script demands it (see §5); add the locale to e2e smoke specs.
+   hreflang maps and the sitemap derive from `routing.locales` automatically.

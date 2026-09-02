@@ -7,7 +7,7 @@ import { QUIZ_PATH, QUIZ_TIER_IDS, getQuizContent, isQuizTierId } from '@/conten
 import { QuizRunner } from '@/components/quiz/QuizRunner';
 import { Link } from '@/i18n/navigation';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
@@ -48,7 +48,7 @@ export default async function QuizTierPage({ params }: PageProps) {
   if (!tier) notFound();
 
   const t = await getTranslations({ locale, namespace: 'meta' });
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, `${QUIZ_PATH}/${tier.id}`, locale);
 
   const quizJsonLd = {

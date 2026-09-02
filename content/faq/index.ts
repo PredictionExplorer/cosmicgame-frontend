@@ -1,12 +1,54 @@
-import { faqContentEn } from './en';
+import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
+
+import {
+  FAQ_POPULAR_QUESTION_IDS,
+  FAQ_STRUCTURE,
+  type FAQItemText,
+  type FAQText,
+} from './structure';
+import { faqTextEn } from './text.en';
+import { faqTextZh } from './text.zh';
 import type { FAQCategory, FAQContent, FAQItem } from './types';
-import { faqContentZh } from './zh';
 
 export * from './types';
-export { faqContentEn, faqContentZh };
+export * from './structure';
+
+/** Composes the locale-independent skeleton with one locale's copy. */
+function buildFaqContent(text: FAQText): FAQContent {
+  return {
+    categories: FAQ_STRUCTURE.map((category): FAQCategory => {
+      const categoryText = text[category.id];
+      // Parity is enforced by FAQText's literal keys; the builder itself only
+      // needs plain string lookups.
+      const itemTexts = categoryText.items as Readonly<Record<string, FAQItemText>>;
+      return {
+        id: category.id,
+        icon: category.icon,
+        title: categoryText.title,
+        description: categoryText.description,
+        items: category.items.map(
+          (item): FAQItem => ({
+            id: item.id,
+            ...itemTexts[item.id]!,
+            ...('hashAnchor' in item ? { hashAnchor: item.hashAnchor } : {}),
+          }),
+        ),
+      };
+    }),
+    popularQuestionIds: FAQ_POPULAR_QUESTION_IDS,
+  };
+}
+
+export const faqContentEn: FAQContent = buildFaqContent(faqTextEn);
+export const faqContentZh: FAQContent = buildFaqContent(faqTextZh);
+
+const FAQ_CONTENT: LocaleRecord<FAQContent> = {
+  en: faqContentEn,
+  zh: faqContentZh,
+};
 
 export function getFaqContent(locale: string): FAQContent {
-  return locale.toLowerCase().split('-')[0] === 'zh' ? faqContentZh : faqContentEn;
+  return pickByLocale(FAQ_CONTENT, locale);
 }
 
 export function getAllFaqItems(content: FAQContent): FAQItem[] {

@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 
+import { toIntlLocale } from '@/utils/format';
 import {
   Pagination,
   PaginationContent,
@@ -56,7 +57,7 @@ export function GalleryPagination({
 
   if (totalItems === 0) return null;
 
-  const numberLocale = locale === 'zh' ? 'zh-CN' : 'en-US';
+  const numberLocale = toIntlLocale(locale);
   const startItem = (currentPage - 1) * perPage + 1;
   const endItem = Math.min(currentPage * perPage, totalItems);
 

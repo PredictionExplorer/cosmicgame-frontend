@@ -1,4 +1,8 @@
 {
+  "breadcrumbs": {
+    "home": "首页",
+    "imprint": "铭刻"
+  },
   "page": {
     "title": "铭刻 Random Walk NFT",
     "subtitle": "拥有 Random Walk NFT，可将一笔 ETH 落笔的价格降低 50%",

@@ -14,6 +14,8 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import {
   formatCSTValue,
+  formatDurationTick,
+  formatHoursTick,
   formatSeconds,
   formatUnixTsLabel,
   getExplorerUrl,
@@ -35,34 +37,6 @@ const PRICE_COLOR = '#9C37FD'; // violet — CST actually paid
 const CLOCK_COLOR = '#fb7185'; // rose — allocation clock remaining (subdued dashed line)
 
 const CHART_HEIGHT = 360;
-
-/** Compact "hours into round" label, e.g. "45m", "1.5h", "2d". */
-function formatHoursTick(hours: number, locale: string = 'en'): string {
-  const zh = locale === 'zh';
-  if (hours >= 24) {
-    const d = hours / 24;
-    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${zh ? '天' : 'd'}`;
-  }
-  if (hours >= 1) {
-    return `${Number.isInteger(hours) ? hours.toFixed(0) : hours.toFixed(1)}${zh ? '小时' : 'h'}`;
-  }
-  return `${Math.round(hours * 60)}${zh ? '分' : 'm'}`;
-}
-
-/** Compact duration for the clock axis, e.g. "45m", "1.5h", "2d". */
-function formatDurationTick(secs: number, locale: string = 'en'): string {
-  const zh = locale === 'zh';
-  if (secs <= 0) return '0';
-  if (secs >= 86400) {
-    const d = secs / 86400;
-    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${zh ? '天' : 'd'}`;
-  }
-  if (secs >= 3600) {
-    const h = secs / 3600;
-    return `${Number.isInteger(h) ? h.toFixed(0) : h.toFixed(1)}${zh ? '小时' : 'h'}`;
-  }
-  return `${Math.round(secs / 60)}${zh ? '分' : 'm'}`;
-}
 
 /** Compact CST amount for the log-axis decade ticks: "0.01", "1", "100", "1k". */
 function formatCstTick(value: number): string {

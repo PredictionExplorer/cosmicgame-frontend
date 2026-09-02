@@ -1,6 +1,8 @@
 import enSeo from '@/messages/en/seo.json';
 import zhSeo from '@/messages/zh/seo.json';
 
+import { normalizeLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
+
 import { COSMIC_OG_SIZE } from './CosmicOgCard';
 
 export const OG_ROUTES = [
@@ -16,7 +18,7 @@ export const OG_ROUTES = [
 ] as const;
 
 export type OgRoute = (typeof OG_ROUTES)[number];
-export type OgLocale = 'en' | 'zh';
+export type OgLocale = AppLocale;
 
 export interface OgCopy {
   alt: string;
@@ -30,10 +32,10 @@ export interface OgCopy {
 const catalogs = {
   en: enSeo.og,
   zh: zhSeo.og,
-} as unknown as Record<OgLocale, Record<OgRoute, OgCopy>>;
+} as unknown as LocaleRecord<Record<OgRoute, OgCopy>>;
 
 export function resolveOgLocale(locale: string | undefined): OgLocale {
-  return locale === 'zh' ? 'zh' : 'en';
+  return normalizeLocale(locale);
 }
 
 export function getOgCopy(locale: string | undefined, route: OgRoute): OgCopy {

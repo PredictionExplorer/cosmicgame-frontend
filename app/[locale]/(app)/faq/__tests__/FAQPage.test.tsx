@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { faqContentEn } from '@/content/faq';
+
 import { render, screen, checkA11y, waitFor } from '@/test-utils';
 
 import FAQPage from '../FAQPage';
@@ -50,12 +52,12 @@ beforeEach(() => {
 
 describe('FAQPage', () => {
   it('renders the hero heading', () => {
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
     expect(screen.getByRole('heading', { name: /cosmic signature faq/i })).toBeInTheDocument();
   });
 
   it('renders all 6 category sections', () => {
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
     const categoryHeadings = [
       'Getting Started',
       'Allocations & Distributions',
@@ -70,17 +72,17 @@ describe('FAQPage', () => {
   });
 
   it('renders the Popular Questions section', () => {
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
     expect(screen.getByText('Popular Questions')).toBeInTheDocument();
   });
 
   it('renders the contact CTA', () => {
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
     expect(screen.getByText('Still have a question?')).toBeInTheDocument();
   });
 
   it('renders category navigation with All button', () => {
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
     const nav = screen.getByRole('navigation', { name: /FAQ categories/i });
     expect(nav).toBeInTheDocument();
     const allButton = nav.querySelector('button');
@@ -88,7 +90,7 @@ describe('FAQPage', () => {
   });
 
   it('renders the search input', () => {
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
     expect(
       screen.getByRole('textbox', { name: /search frequently asked questions/i }),
     ).toBeInTheDocument();
@@ -96,7 +98,7 @@ describe('FAQPage', () => {
 
   it('filters questions when searching', async () => {
     const user = userEvent.setup();
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
 
     const searchInput = screen.getByRole('textbox', {
       name: /search frequently asked questions/i,
@@ -109,7 +111,7 @@ describe('FAQPage', () => {
 
   it('shows "No questions found" for nonsense search', async () => {
     const user = userEvent.setup();
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
 
     const searchInput = screen.getByRole('textbox', {
       name: /search frequently asked questions/i,
@@ -129,7 +131,7 @@ describe('FAQPage', () => {
 
   it('hides popular questions and category nav when searching', async () => {
     const user = userEvent.setup();
-    render(<FAQPage />);
+    render(<FAQPage content={faqContentEn} />);
 
     expect(screen.getByText('Popular Questions')).toBeInTheDocument();
 
@@ -148,7 +150,7 @@ describe('FAQPage', () => {
   }, 15_000);
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<FAQPage />);
+    const { container } = render(<FAQPage content={faqContentEn} />);
     await checkA11y(container, {
       rules: {
         'heading-order': { enabled: false },

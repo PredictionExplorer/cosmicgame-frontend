@@ -1,6 +1,6 @@
-import { PrivacyContentEn } from '@/content/legal/PrivacyContent.en';
-import { PrivacyContentZh } from '@/content/legal/PrivacyContent.zh';
+import { getPrivacyCopy } from '@/content/legal';
+import { PrivacyContent } from '@/content/legal/PrivacyContent';
 
 export default function PrivacyPage({ locale = 'en' }: { locale?: string }) {
-  return locale.toLowerCase().startsWith('zh') ? <PrivacyContentZh /> : <PrivacyContentEn />;
+  return <PrivacyContent copy={getPrivacyCopy(locale)} />;
 }

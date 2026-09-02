@@ -1,45 +1,83 @@
-import { learnContentEn } from './en';
-import type { LearnArticle, LearnContent } from './types';
-import { learnContentZh } from './zh';
+import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
-const isChineseLocale = (locale: string): boolean =>
-  locale.trim().toLowerCase().split(/[-_]/, 1)[0] === 'zh';
+import { LEARN_STRUCTURE, type LearnText } from './structure';
+import { learnTextEn } from './text.en';
+import { learnTextZh } from './text.zh';
+import type { LearnArticle, LearnContent, LearnSection } from './types';
 
-const withArticleFallback = (
-  localizedContent: LearnContent,
-  fallbackContent: LearnContent,
-): LearnContent => ({
-  ...localizedContent,
-  articles: fallbackContent.articles.map(
-    (fallbackArticle) =>
-      localizedContent.articles.find((article) => article.slug === fallbackArticle.slug) ??
-      fallbackArticle,
-  ),
-});
+export * from './structure';
 
-export { learnContentEn, learnContentZh };
+/** Composes the locale-independent skeleton with one locale's copy. */
+function buildLearnContent(text: LearnText): LearnContent {
+  // Parity is enforced by LearnText's literal keys; the builder itself only
+  // needs plain string lookups.
+  const articleTexts = text.articles as Readonly<
+    Record<
+      string,
+      {
+        title: string;
+        description: string;
+        h1: string;
+        summary: string;
+        sections: readonly LearnSection[];
+        relatedLabels: readonly string[];
+      }
+    >
+  >;
+
+  return {
+    hub: {
+      meta: text.hub.meta,
+      eyebrow: text.hub.eyebrow,
+      h1: text.hub.h1,
+      intro: text.hub.intro,
+      breadcrumbs: text.hub.breadcrumbs,
+      quizCta: {
+        heading: text.hub.quizCta.heading,
+        body: text.hub.quizCta.body,
+        linkLabel: text.hub.quizCta.linkLabel,
+        href: LEARN_STRUCTURE.hub.quizCtaHref,
+      },
+    },
+    articleUi: text.articleUi,
+    articles: LEARN_STRUCTURE.articles.map((article): LearnArticle => {
+      const articleText = articleTexts[article.slug]!;
+      return {
+        slug: article.slug,
+        title: articleText.title,
+        description: articleText.description,
+        h1: articleText.h1,
+        updated: article.updated,
+        summary: articleText.summary,
+        schemaType: article.schemaType,
+        sections: articleText.sections,
+        related: article.related.map((href, index) => ({
+          label: articleText.relatedLabels[index]!,
+          href,
+        })),
+      };
+    }),
+  };
+}
+
+export const learnContentEn: LearnContent = buildLearnContent(learnTextEn);
+export const learnContentZh: LearnContent = buildLearnContent(learnTextZh);
+
+const LEARN_CONTENT: LocaleRecord<LearnContent> = {
+  en: learnContentEn,
+  zh: learnContentZh,
+};
 
 export function getLearnContent(locale: string): LearnContent {
-  if (!isChineseLocale(locale)) {
-    return learnContentEn;
-  }
-
-  return withArticleFallback(learnContentZh, learnContentEn);
+  return pickByLocale(LEARN_CONTENT, locale);
 }
 
 export function getLearnArticle(slug: string, locale: string): LearnArticle | undefined {
-  if (isChineseLocale(locale)) {
-    const localizedArticle = learnContentZh.articles.find((article) => article.slug === slug);
-    if (localizedArticle) {
-      return localizedArticle;
-    }
-  }
-
-  return learnContentEn.articles.find((article) => article.slug === slug);
+  return getLearnContent(locale).articles.find((article) => article.slug === slug);
 }
 
 export function getLearnSlugs(): string[] {
-  return learnContentEn.articles.map((article) => article.slug);
+  return LEARN_STRUCTURE.articles.map((article) => article.slug);
 }
 
 export type {

@@ -51,9 +51,8 @@ const MyAnchors = () => {
       formatDistributionPerAnchoredNftEth(
         dashboardData?.StakingAmountEth,
         dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
-        locale,
       ),
-    [dashboardData, locale],
+    [dashboardData],
   );
 
   const loading =
@@ -99,7 +98,7 @@ const MyAnchors = () => {
         value: distributionPerCST.value,
         tooltip: [
           t('anchors.stats.distributionPerNft.tooltip'),
-          distributionPerCST.tooltipSuffix
+          distributionPerCST.indexedCountUnavailable
             ? t('anchors.stats.distributionPerNft.indexUnavailableSuffix')
             : '',
         ]

@@ -1,8 +1,14 @@
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
 
 interface FAQItem {
   question: string;
   answer: string;
+}
+
+/** schema.org `inLanguage` value for the given app locale. */
+export function jsonLdInLanguage(locale: string): string {
+  return getLocaleConfig(locale).jsonLdInLanguage;
 }
 
 const SITE_URL = LANDING_ORIGIN;

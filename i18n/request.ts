@@ -90,9 +90,11 @@ export default getRequestConfig(async ({ requestLocale }) => {
     ? requested
     : routing.defaultLocale;
 
-  const english = await loadLocaleMessages('en');
+  // The default locale's catalog is the complete source of truth every other
+  // locale is merged over.
+  const base = await loadLocaleMessages(routing.defaultLocale);
   const messages =
-    locale === 'en' ? english : mergeMessages(english, await loadLocaleMessages(locale));
+    locale === routing.defaultLocale ? base : mergeMessages(base, await loadLocaleMessages(locale));
 
   return { locale, messages };
 });

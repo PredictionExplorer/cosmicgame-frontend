@@ -5,7 +5,7 @@ import { PageMessages } from '@/components/i18n/PageMessages';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { getCstInfoSeed, getDashboardInfoSeed } from '@/services/api/server';
 import type { CSTTokenInfo, DashboardInfo } from '@/services/api';
-import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 import ExperimentalHomePage from './ExperimentalHomePage';
@@ -68,7 +68,7 @@ export default async function Page({ params }: PageProps) {
             name: meta('experimentalUi.title'),
             description,
             url: pageUrl,
-            inLanguage: locale === 'zh' ? 'zh-Hans' : 'en',
+            inLanguage: jsonLdInLanguage(locale),
           }),
           breadcrumbJsonLd(
             [

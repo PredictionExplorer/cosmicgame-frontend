@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -37,7 +37,7 @@ export default async function Page({ params }: PageProps) {
   const t = await getTranslations({ locale, namespace: 'statistics' });
   const title = t(`navigation.${section.messageKey}.title`);
   const description = t(`navigation.${section.messageKey}.description`);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
 
   return (
     <PageMessages namespaces={['marketing', 'statistics', 'tables']}>

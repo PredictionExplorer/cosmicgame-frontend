@@ -1,45 +1,76 @@
+import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
+
 const MINUTE = 60;
 const HOUR = 3600;
 const DAY = 86400;
 const MONTH = 2592000; // 30 days
 const YEAR = 31536000; // 365 days
 
+type RelativeTimeUnit = 'minute' | 'hour' | 'day' | 'month' | 'year';
+
+interface RelativeTimeLabels {
+  readonly justNow: string;
+  readonly ago: (count: number, unit: RelativeTimeUnit) => string;
+}
+
+const ZH_RELATIVE_UNITS: Record<RelativeTimeUnit, string> = {
+  minute: '分钟',
+  hour: '小时',
+  day: '天',
+  month: '个月',
+  year: '年',
+};
+
 /**
- * Converts a Unix timestamp (seconds) to a human-readable relative time string.
- * `en` returns e.g. "2 months ago", "1 year ago", "just now" (unchanged);
- * `zh` returns "2 个月前", "1 年前", "刚刚" (CJK–Latin spacing per
- * docs/i18n/style-guide-zh.md §4). Chinese has no plural inflection, so both
- * counts share one form.
+ * `en` keeps the historical forms ("2 months ago", "1 year ago", "just now");
+ * `zh` follows docs/i18n/style-guide-zh.md §4 with CJK–Latin spacing
+ * ("2 个月前", "刚刚"). Chinese has no plural inflection, so both counts
+ * share one form.
  */
+const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
+  en: {
+    justNow: 'just now',
+    ago: (count, unit) => `${count} ${unit}${count === 1 ? '' : 's'} ago`,
+  },
+  zh: {
+    justNow: '刚刚',
+    ago: (count, unit) => `${count} ${ZH_RELATIVE_UNITS[unit]}前`,
+  },
+};
+
+/** Converts a Unix timestamp (seconds) to a human-readable relative time string. */
 export function getRelativeTime(timestamp: number, nowSeconds?: number, locale = 'en'): string {
   const now = nowSeconds ?? Math.floor(Date.now() / 1000);
   const diff = now - timestamp;
-  const zh = locale.toLowerCase().startsWith('zh');
+  const labels = pickByLocale(RELATIVE_TIME_LABELS, locale);
 
-  if (diff < MINUTE) return zh ? '刚刚' : 'just now';
-  if (diff < HOUR) {
-    const mins = Math.floor(diff / MINUTE);
-    if (zh) return `${mins} 分钟前`;
-    return mins === 1 ? '1 minute ago' : `${mins} minutes ago`;
-  }
-  if (diff < DAY) {
-    const hrs = Math.floor(diff / HOUR);
-    if (zh) return `${hrs} 小时前`;
-    return hrs === 1 ? '1 hour ago' : `${hrs} hours ago`;
-  }
-  if (diff < MONTH) {
-    const days = Math.floor(diff / DAY);
-    if (zh) return `${days} 天前`;
-    return days === 1 ? '1 day ago' : `${days} days ago`;
-  }
-  if (diff < YEAR) {
-    const months = Math.floor(diff / MONTH);
-    if (zh) return `${months} 个月前`;
-    return months === 1 ? '1 month ago' : `${months} months ago`;
-  }
-  const years = Math.floor(diff / YEAR);
-  if (zh) return `${years} 年前`;
-  return years === 1 ? '1 year ago' : `${years} years ago`;
+  if (diff < MINUTE) return labels.justNow;
+  if (diff < HOUR) return labels.ago(Math.floor(diff / MINUTE), 'minute');
+  if (diff < DAY) return labels.ago(Math.floor(diff / HOUR), 'hour');
+  if (diff < MONTH) return labels.ago(Math.floor(diff / DAY), 'day');
+  if (diff < YEAR) return labels.ago(Math.floor(diff / MONTH), 'month');
+  return labels.ago(Math.floor(diff / YEAR), 'year');
+}
+
+/**
+ * Formats an ISO `YYYY-MM-DD` date for display. English keeps the raw ISO
+ * form (the historical byte-pinned rendering); other locales render their
+ * long date form.
+ */
+const ISO_DATE_LABEL_FORMATS: LocaleRecord<(isoDate: string) => string> = {
+  en: (isoDate) => isoDate,
+  zh: (isoDate) =>
+    new Intl.DateTimeFormat('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(`${isoDate}T00:00:00Z`)),
+};
+
+/** Locale-appropriate display form of an ISO `YYYY-MM-DD` date string. */
+export function formatIsoDateLabel(isoDate: string, locale: string = 'en'): string {
+  return pickByLocale(ISO_DATE_LABEL_FORMATS, locale)(isoDate);
 }
 
 export interface ServerTimingSample {

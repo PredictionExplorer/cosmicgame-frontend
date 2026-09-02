@@ -59,7 +59,6 @@ const AnchoringPanel = () => {
   const distributionPerCst = formatDistributionPerAnchoredNftEth(
     dashboardData?.StakingAmountEth,
     cstAnchorStats?.TotalTokensStaked,
-    locale,
   );
   const totalActiveAnchorHolders =
     (cstAnchorStats?.NumActiveStakers ?? 0) + (rwlkAnchorStats?.NumActiveStakers ?? 0);
@@ -89,9 +88,9 @@ const AnchoringPanel = () => {
     {
       label: t('anchoringPage.snapshot.perNftLabel'),
       value: distributionPerCst.value,
-      tooltip: t('anchoringPage.snapshot.perNftTooltip', {
-        suffix: distributionPerCst.tooltipSuffix,
-      }),
+      tooltip: distributionPerCst.indexedCountUnavailable
+        ? t('anchoringPage.snapshot.perNftTooltipUnavailable')
+        : t('anchoringPage.snapshot.perNftTooltip'),
       icon: <TrendingUp className="h-4 w-4" />,
     },
     {

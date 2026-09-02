@@ -17,6 +17,6 @@
     "hours": "h",
     "minutes": "m",
     "seconds": "s",
-    "left": "left"
+    "leftPattern": "{duration} left"
   }
 }

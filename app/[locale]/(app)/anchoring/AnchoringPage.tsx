@@ -52,9 +52,8 @@ const AnchoringPage = () => {
       formatDistributionPerAnchoredNftEth(
         dashboardData?.StakingAmountEth,
         dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
-        locale,
       ),
-    [dashboardData, locale],
+    [dashboardData],
   );
 
   const heroStats = useMemo(
@@ -86,7 +85,7 @@ const AnchoringPage = () => {
       {
         label: t('overview.stats.distributionPerNft.label'),
         value: distributionPerNft.value,
-        tooltip: distributionPerNft.tooltipSuffix
+        tooltip: distributionPerNft.indexedCountUnavailable
           ? t('overview.stats.distributionPerNft.tooltipUnavailable')
           : t('overview.stats.distributionPerNft.tooltip'),
         icon: <TrendingUp className="h-4 w-4" />,

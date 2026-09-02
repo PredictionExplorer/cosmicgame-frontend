@@ -10,6 +10,7 @@ import {
   JsonLd,
   breadcrumbJsonLd,
   collectionPageJsonLd,
+  jsonLdInLanguage,
   visualArtworkJsonLd,
 } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
@@ -57,7 +58,7 @@ export default async function Page({ params }: PageProps) {
     getTranslations({ locale, namespace: 'detail' }),
     loadLatestImprint(),
   ]);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
 
   return (
     <PageMessages namespaces={['detail', 'gallery', 'tables', 'traits']}>

@@ -9,7 +9,13 @@ import { getLandingContent } from '@/content/landing';
 import { routing } from '@/i18n/routing';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { LANDING_CHROME_NAMESPACES, pickMessages } from '@/lib/i18n/clientMessages';
-import { JsonLd, artProtocolJsonLd, organizationJsonLd, websiteJsonLd } from '@/utils/jsonLd';
+import {
+  JsonLd,
+  artProtocolJsonLd,
+  jsonLdInLanguage,
+  organizationJsonLd,
+  websiteJsonLd,
+} from '@/utils/jsonLd';
 
 import { RootDocument } from '../../root-document';
 import { createRootMetadata, rootViewport, openGraphLocale } from '../../root-metadata';
@@ -66,7 +72,7 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
   setRequestLocale(locale);
   const { meta } = getLandingContent(locale);
   const seo = await getTranslations({ locale, namespace: 'seo' });
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
   // The landing's page copy lives in content/** modules, so client
   // components here only reach the small chrome set — scoping keeps the

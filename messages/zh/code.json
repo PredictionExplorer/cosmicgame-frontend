@@ -1,4 +1,8 @@
 {
+  "breadcrumbs": {
+    "home": "首页",
+    "code": "源代码"
+  },
   "viewer": {
     "title": "代码查看器",
     "subtitle": "查看将种子转换为图像的生成代码",

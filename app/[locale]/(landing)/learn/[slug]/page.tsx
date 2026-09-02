@@ -5,9 +5,11 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getLearnArticle, getLearnContent, getLearnSlugs } from '@/content/learn';
 
 import { Link } from '@/i18n/navigation';
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
+import { formatIsoDateLabel } from '@/utils/time';
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -15,16 +17,6 @@ interface PageProps {
 
 function sectionId(articleSlug: string, index: number): string {
   return `${articleSlug}-section-${index + 1}`;
-}
-
-function displayUpdatedDate(value: string, locale: string): string {
-  if (locale !== 'zh') return value;
-  return new Intl.DateTimeFormat('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${value}T00:00:00Z`));
 }
 
 export function generateStaticParams() {
@@ -76,7 +68,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
   const article = getLearnArticle(slug, locale);
   if (!article) notFound();
   const { articleUi } = getLearnContent(locale);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
 
   const url = localeHref(LANDING_ORIGIN, `/learn/${article.slug}`, locale);
   const articleJsonLd = {
@@ -134,9 +126,9 @@ export default async function LearnArticlePage({ params }: PageProps) {
         <p className="mt-6 text-lg leading-8 text-white/78">{article.summary}</p>
         <p className="mt-4 text-sm text-white/50">
           {articleUi.lastUpdatedLabel}
-          {locale === 'zh' ? null : ' '}
+          {getLocaleConfig(locale).wordSpacing ? ' ' : null}
           <time dateTime={article.updated}>
-            {displayUpdatedDate(article.updated, locale)}
+            {formatIsoDateLabel(article.updated, locale)}
           </time> · {articleUi.publisherLabel}
         </p>
 

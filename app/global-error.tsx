@@ -5,7 +5,14 @@ import { useEffect } from 'react';
 import enErrors from '@/messages/en/errors.json';
 import zhErrors from '@/messages/zh/errors.json';
 
+import { isAppLocale, type AppLocale, type LocaleRecord } from '@/i18n/locale';
+import { routing } from '@/i18n/routing';
 import { reportError } from '@/utils/errors';
+
+const ERROR_CATALOGS: LocaleRecord<typeof enErrors> = {
+  en: enErrors,
+  zh: zhErrors,
+};
 
 /**
  * Last-resort boundary for failures in the root layout itself, where no
@@ -27,7 +34,7 @@ export default function GlobalError({
   }, [error]);
 
   const locale = resolveLocaleFromLocation();
-  const copy = (locale === 'zh' ? zhErrors : enErrors).global;
+  const copy = ERROR_CATALOGS[locale].global;
 
   return (
     <html lang={locale}>
@@ -70,12 +77,12 @@ export default function GlobalError({
 }
 
 /**
- * `localePrefix: 'as-needed'` means only Chinese carries a prefix, so the
- * first path segment is enough. The document `lang` attribute is unusable
- * here: React still owns the old `<html>` at the moment this renders.
+ * `localePrefix: 'as-needed'` means only the default locale goes unprefixed,
+ * so the first path segment is enough. The document `lang` attribute is
+ * unusable here: React still owns the old `<html>` at the moment this renders.
  */
-function resolveLocaleFromLocation(): 'en' | 'zh' {
-  if (typeof window === 'undefined') return 'en';
+function resolveLocaleFromLocation(): AppLocale {
+  if (typeof window === 'undefined') return routing.defaultLocale;
   const [, first] = window.location.pathname.split('/');
-  return first === 'zh' ? 'zh' : 'en';
+  return isAppLocale(first) ? first : routing.defaultLocale;
 }

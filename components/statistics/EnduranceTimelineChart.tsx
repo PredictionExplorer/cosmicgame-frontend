@@ -15,7 +15,7 @@ import {
 import { ExternalLink } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds, shortenHex } from '@/utils';
+import { formatDurationTick, formatHoursTick, formatSeconds, shortenHex } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import {
@@ -41,19 +41,6 @@ const RECORD_COLOR = '#fbbf24'; // amber — a stint that set a new endurance re
 
 const TICK_COUNT = 6;
 const LANE_SCROLL_THRESHOLD = 14;
-
-/** Compact "hours into round" label, e.g. "45m", "1.5h", "2d". */
-function formatHoursTick(hours: number, locale: string = 'en'): string {
-  const zh = locale === 'zh';
-  if (hours >= 24) {
-    const d = hours / 24;
-    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${zh ? '天' : 'd'}`;
-  }
-  if (hours >= 1) {
-    return `${Number.isInteger(hours) ? hours.toFixed(0) : hours.toFixed(1)}${zh ? '小时' : 'h'}`;
-  }
-  return `${Math.round(hours * 60)}${zh ? '分' : 'm'}`;
-}
 
 const pct = (v: number): string => `${Math.max(0, Math.min(100, v * 100))}%`;
 
@@ -97,21 +84,6 @@ function RoleBadge({
 }
 
 const LINE_CHART_HEIGHT = 360;
-
-/** Compact duration for the line chart's Y-axis ticks, e.g. "45m", "1.5h", "2d". */
-function formatDurationTick(secs: number, locale: string = 'en'): string {
-  const zh = locale === 'zh';
-  if (secs <= 0) return '0';
-  if (secs >= 86400) {
-    const d = secs / 86400;
-    return `${Number.isInteger(d) ? d.toFixed(0) : d.toFixed(1)}${zh ? '天' : 'd'}`;
-  }
-  if (secs >= 3600) {
-    const h = secs / 3600;
-    return `${Number.isInteger(h) ? h.toFixed(0) : h.toFixed(1)}${zh ? '小时' : 'h'}`;
-  }
-  return `${Math.round(secs / 60)}${zh ? '分' : 'm'}`;
-}
 
 type TimelineTooltipProps = {
   active?: boolean;

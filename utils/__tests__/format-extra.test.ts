@@ -12,10 +12,58 @@ import {
   supplyHistoryDateBounds,
   formatYyyymmddLabel,
   formatUnixTsLabel,
+  formatUtcDateTimeStamp,
+  formatHoursTick,
+  formatDurationTick,
   convertTimestampToDateTime,
   convertTimestampToServerDateTime,
   formatGroupedNumber,
 } from '../format';
+
+describe('chart tick formatters', () => {
+  it('formats hours into compact minute, hour, and day ticks', () => {
+    expect(formatHoursTick(0.75)).toBe('45m');
+    expect(formatHoursTick(1)).toBe('1h');
+    expect(formatHoursTick(1.5)).toBe('1.5h');
+    expect(formatHoursTick(24)).toBe('1d');
+    expect(formatHoursTick(36)).toBe('1.5d');
+  });
+
+  it('formats seconds into compact minute, hour, and day ticks', () => {
+    expect(formatDurationTick(0)).toBe('0');
+    expect(formatDurationTick(-5)).toBe('0');
+    expect(formatDurationTick(2700)).toBe('45m');
+    expect(formatDurationTick(3600)).toBe('1h');
+    expect(formatDurationTick(5400)).toBe('1.5h');
+    expect(formatDurationTick(86400)).toBe('1d');
+    expect(formatDurationTick(129600)).toBe('1.5d');
+  });
+
+  it('uses the shared durationCompact catalog units in Chinese', () => {
+    expect(formatHoursTick(0.75, 'zh')).toBe('45分');
+    expect(formatHoursTick(1.5, 'zh')).toBe('1.5小时');
+    expect(formatHoursTick(48, 'zh-CN')).toBe('2天');
+    expect(formatDurationTick(2700, 'zh')).toBe('45分');
+    expect(formatDurationTick(5400, 'zh')).toBe('1.5小时');
+    expect(formatDurationTick(172800, 'zh-CN')).toBe('2天');
+  });
+});
+
+describe('formatUtcDateTimeStamp', () => {
+  const stamp = new Date('2026-08-28T08:13:45Z');
+
+  it('keeps the ISO-style English stamp used by SEO summaries', () => {
+    expect(formatUtcDateTimeStamp(stamp)).toBe('2026-08-28 08:13 UTC');
+    expect(formatUtcDateTimeStamp(stamp, 'en-US')).toBe('2026-08-28 08:13 UTC');
+  });
+
+  it('renders the Chinese long form with fullwidth parentheses', () => {
+    expect(formatUtcDateTimeStamp(stamp, 'zh')).toBe('2026年8月28日 08:13（UTC）');
+    expect(formatUtcDateTimeStamp(new Date('2026-01-05T00:07:00Z'), 'zh-Hans')).toBe(
+      '2026年1月5日 00:07（UTC）',
+    );
+  });
+});
 
 describe('formatTableAmount', () => {
   it('renders zero as a bare 0', () => {

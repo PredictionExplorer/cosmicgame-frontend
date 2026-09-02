@@ -7,6 +7,7 @@ import { formatEther, isAddress, maxUint256, parseEther, parseUnits } from 'viem
 import { randomWalkNftAbi as NFT_ABI, cosmicTokenAbi as ERC20_ABI } from '@/contracts/abis';
 import { cosmicGameAbi } from '@/contracts/abis';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import api from '@/services/api';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
@@ -680,9 +681,9 @@ export function useGestureForm() {
       reportError(err, 'gesture-eth');
       const descriptor = getContractErrorDescriptor(err, ethGestureInfo?.ETHPrice);
       const localizedMessage = descriptor ? t(descriptor.key, descriptor.values) : null;
-      const detailed = locale.toLowerCase().startsWith('zh')
-        ? null
-        : formatCustomContractError(err);
+      const detailed = getLocaleConfig(locale).showRawProviderErrors
+        ? formatCustomContractError(err)
+        : null;
       const combined = [localizedMessage, detailed].filter(Boolean).join('\n\n');
       if (combined) {
         notify('error', combined);
@@ -801,9 +802,9 @@ export function useGestureForm() {
         displayedPriceWei: submittedCstPriceMaxLimit,
       });
       const localizedMessage = descriptor ? t(descriptor.key, descriptor.values) : null;
-      const detailed = locale.toLowerCase().startsWith('zh')
-        ? null
-        : formatCustomContractError(err);
+      const detailed = getLocaleConfig(locale).showRawProviderErrors
+        ? formatCustomContractError(err)
+        : null;
       if (localizedMessage || detailed) {
         notify('error', [localizedMessage, detailed].filter(Boolean).join('\n\n'));
       } else if (isContractRevertError(err)) {

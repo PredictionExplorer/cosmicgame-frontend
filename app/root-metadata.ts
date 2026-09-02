@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
 
 // Browsers cache favicons separately from normal HTTP cache entries and per
@@ -31,7 +32,7 @@ const englishRootMetadataCopy: RootMetadataCopy = {
 
 /** Maps a routing locale to the OpenGraph `og:locale` value. */
 export function openGraphLocale(locale: string): string {
-  return locale === 'zh' ? 'zh_CN' : 'en_US';
+  return getLocaleConfig(locale).ogLocale;
 }
 
 /**

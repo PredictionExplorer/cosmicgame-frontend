@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
@@ -64,9 +65,9 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
         ) : error ? (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
             <p className="text-lg font-semibold text-destructive">
-              {locale === 'zh'
-                ? t('systemEvent.loadError')
-                : error.message || t('systemEvent.loadError')}
+              {getLocaleConfig(locale).showRawProviderErrors
+                ? error.message || t('systemEvent.loadError')
+                : t('systemEvent.loadError')}
             </p>
           </div>
         ) : (

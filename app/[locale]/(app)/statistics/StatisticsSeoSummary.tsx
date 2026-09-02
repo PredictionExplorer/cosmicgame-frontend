@@ -3,30 +3,22 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { get_dashboard_info } from '@/services/api/rounds';
+import { formatUtcDateTimeStamp, toIntlLocale } from '@/utils/format';
 
 function formatNumber(value: unknown, locale: string, unavailable: string): string {
   const numeric = Number(value);
   return Number.isFinite(numeric)
-    ? new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US').format(numeric)
+    ? new Intl.NumberFormat(toIntlLocale(locale)).format(numeric)
     : unavailable;
 }
 
 function formatEth(value: unknown, locale: string, unavailable: string): string {
   const numeric = Number(value);
   return Number.isFinite(numeric)
-    ? `${new Intl.NumberFormat(locale === 'zh' ? 'zh-CN' : 'en-US', {
+    ? `${new Intl.NumberFormat(toIntlLocale(locale), {
         maximumFractionDigits: 4,
       }).format(numeric)} ETH`
     : unavailable;
-}
-
-function formatUpdatedAt(date: Date, locale: string): string {
-  if (locale === 'zh') {
-    return `${date.getUTCFullYear()}年${date.getUTCMonth() + 1}月${date.getUTCDate()}日 ${String(
-      date.getUTCHours(),
-    ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}（UTC）`;
-  }
-  return date.toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
 }
 
 interface SummaryMetricProps {
@@ -72,7 +64,7 @@ export async function StatisticsSeoSummary() {
         {t('hub.seo.description')}
       </p>
       <p className="mt-3 type-body-sm text-muted-foreground">
-        {t('hub.seo.lastUpdated', { date: formatUpdatedAt(updatedAt, locale) })}
+        {t('hub.seo.lastUpdated', { date: formatUtcDateTimeStamp(updatedAt, locale) })}
         {!hasLiveData ? t('hub.seo.unavailableSuffix') : ''}
       </p>
 

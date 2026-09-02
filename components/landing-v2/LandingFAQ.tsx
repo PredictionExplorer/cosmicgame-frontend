@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { JsonLd, faqPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, faqPageJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 
 import { SectionHeading } from './SectionHeading';
 
@@ -23,7 +23,7 @@ export function LandingFAQ({ faq }: { faq: LandingContent['faq'] }) {
 
   return (
     <section id="faq" className="relative border-t border-white/10 bg-[#0D0521] py-28 sm:py-40">
-      <JsonLd data={faqPageJsonLd(faqItems, locale === 'zh' ? 'zh-Hans' : 'en')} />
+      <JsonLd data={faqPageJsonLd(faqItems, jsonLdInLanguage(locale))} />
       <div className="mx-auto max-w-4xl px-6 lg:px-12">
         <SectionHeading
           eyebrow={faq.eyebrow}

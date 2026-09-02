@@ -13,7 +13,7 @@ import {
 
 import { Link } from '@/i18n/navigation';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
@@ -151,7 +151,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const content = getWhitePaperContent(locale);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(LANDING_ORIGIN, content.metadata.path, locale);
   const pdfUrl = `${LANDING_ORIGIN}${content.hero.downloadHref}`;
 

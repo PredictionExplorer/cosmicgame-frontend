@@ -4,19 +4,18 @@ describe('formatDistributionPerAnchoredNftEth', () => {
   it('returns ratio when pool and count are positive', () => {
     const r = formatDistributionPerAnchoredNftEth(2, 4);
     expect(r.value).toBe('0.500000 ETH');
-    expect(r.tooltipSuffix).toBe('');
+    expect(r.indexedCountUnavailable).toBe(false);
   });
 
-  it('returns pool only when count is zero but pool is positive', () => {
+  it('flags the stale index when count is zero but pool is positive', () => {
     const r = formatDistributionPerAnchoredNftEth(0.22579451528661923, 0);
     expect(r.value).toBe('0.225795 ETH');
-    expect(r.tooltipSuffix).toContain('anchored Cosmic Signature NFTs');
-    expect(r.tooltipSuffix).toContain('per-NFT rate');
-    expect(r.tooltipSuffix).toContain('cg_stake_stats_cst');
+    expect(r.indexedCountUnavailable).toBe(true);
   });
 
   it('returns placeholder when pool is zero', () => {
     expect(formatDistributionPerAnchoredNftEth(0, 10).value).toBe('--');
     expect(formatDistributionPerAnchoredNftEth(0, 0).value).toBe('--');
+    expect(formatDistributionPerAnchoredNftEth(0, 0).indexedCountUnavailable).toBe(false);
   });
 });

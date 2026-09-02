@@ -433,7 +433,8 @@ phrasing (legally dangerous), meme slang (梭哈、冲、上车).
 1. Propose the change in a PR that edits this file: old term, new term, rationale,
    affected surfaces.
 2. In the **same PR**, update every existing usage: search `messages/zh/**`,
-   `content/**/zh*`, and legal `*.zh.tsx` content components for the old term.
+   `content/**/text*.zh.ts`, `content/about/zh.ts`, and the legal `content/legal/*.zh.ts`
+   copy modules for the old term.
 3. A native-fluency reviewer approves the term; an engineer confirms the sweep is
    complete (no stale occurrences).
 4. If the term is scanner-relevant (banned or replaces a banned concept), update the zh

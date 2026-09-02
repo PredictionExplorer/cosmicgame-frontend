@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { AuditsContentEn } from '@/content/legal/AuditsContent.en';
-import { AuditsContentZh } from '@/content/legal/AuditsContent.zh';
+import { getAuditsCopy } from '@/content/legal';
+import { TrustPageContent } from '@/content/legal/TrustPageContent';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
-import { JsonLd, breadcrumbJsonLd, webPageJsonLd } from '@/utils/jsonLd';
+import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 interface PageProps {
@@ -27,15 +27,16 @@ export default async function AuditsPage({ params }: PageProps) {
     getTranslations({ locale, namespace: 'meta' }),
     getTranslations({ locale, namespace: 'legal' }),
   ]);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const pageUrl = localeHref(APP_ORIGIN, '/audits', locale);
+  const copy = getAuditsCopy(locale);
 
   return (
     <main id="main" tabIndex={-1} className="mx-auto max-w-4xl px-6 py-16 lg:py-24">
       <JsonLd
         data={[
           webPageJsonLd({
-            name: locale === 'zh' ? 'Cosmic Signature 审计' : 'Cosmic Signature Audits',
+            name: copy.title,
             description: t('audits.description'),
             url: pageUrl,
             inLanguage,
@@ -55,7 +56,7 @@ export default async function AuditsPage({ params }: PageProps) {
           ),
         ]}
       />
-      {locale === 'zh' ? <AuditsContentZh /> : <AuditsContentEn />}
+      <TrustPageContent copy={copy} locale={locale} />
     </main>
   );
 }

@@ -8,6 +8,7 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { useLocale } from 'next-intl';
 
+import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 import { cosmicRainbowTheme } from '@/config/rainbowkit-theme';
 import { wagmiConfig } from '@/config/wagmi';
 
@@ -36,6 +37,13 @@ function ConnectModalOpener({ connectRequestId }: { connectRequestId: number }) 
   return null;
 }
 
+// RainbowKit ships its own translations; map each app locale onto the
+// nearest RainbowKit locale so the wallet modal follows the site language.
+const RAINBOW_KIT_LOCALES: LocaleRecord<RainbowKitLocale> = {
+  en: 'en-US',
+  zh: 'zh-CN',
+};
+
 /**
  * The deferred RainbowKit surface. Mounted (and downloaded) only after a
  * visitor asks to connect — see WalletUiProvider. Renders no layout of its
@@ -43,9 +51,7 @@ function ConnectModalOpener({ connectRequestId }: { connectRequestId: number }) 
  */
 export function WalletUi({ connectRequestId }: { connectRequestId: number }) {
   const locale = useLocale();
-  // RainbowKit ships its own translations; map our locale so the wallet
-  // modal follows the site language (zh-CN for the Chinese locale).
-  const rainbowKitLocale: RainbowKitLocale = locale === 'zh' ? 'zh-CN' : 'en-US';
+  const rainbowKitLocale = pickByLocale(RAINBOW_KIT_LOCALES, locale);
 
   // Install the full wallet list into the live wagmi config BEFORE
   // RainbowKit renders, so the modal sees every wallet. useState (not

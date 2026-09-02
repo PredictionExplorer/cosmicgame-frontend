@@ -5,7 +5,7 @@ import { getAllFaqItems, getFaqContent } from '@/content/faq';
 
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { createMetadata } from '@/utils/seo';
-import { JsonLd, faqPageJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
+import { JsonLd, faqPageJsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import FAQPage from './FAQPage';
@@ -25,7 +25,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   const content = getFaqContent(locale);
   const allItems = getAllFaqItems(content);
-  const inLanguage = locale === 'zh' ? 'zh-Hans' : 'en';
+  const inLanguage = jsonLdInLanguage(locale);
   const [common, faq] = await Promise.all([
     getTranslations({ locale, namespace: 'common' }),
     getTranslations({ locale, namespace: 'faq' }),
