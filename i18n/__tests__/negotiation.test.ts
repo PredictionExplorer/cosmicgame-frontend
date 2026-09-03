@@ -15,7 +15,17 @@ import { routing, TRANSLATED_LOCALES } from '../routing';
  * scripts/i18n-negotiation-probe.ts); the matcher is ESM-only, so it runs
  * through tsx rather than being imported into the jsdom suite.
  */
-const FALLBACK_HEADERS = ['en-GB,en;q=0.9', 'ja-JP', 'fr-FR,fr;q=0.9'] as const;
+/**
+ * Headers that must land on the default locale: a regional English, and
+ * languages the site does not ship. The guard below keeps this list honest —
+ * a language that later joins routing.locales must move to its own
+ * NEGOTIATION_PROBES entry instead of silently asserting that its readers are
+ * sent to English.
+ */
+const FALLBACK_HEADERS = ['en-GB,en;q=0.9', 'de-DE,de;q=0.9', 'fr-FR,fr;q=0.9'] as const;
+
+const headerLanguage = (header: string): string =>
+  new Intl.Locale(header.split(',')[0]!.trim()).language;
 
 const CASES: ReadonlyArray<readonly [header: string, expected: string]> = [
   ...TRANSLATED_LOCALES.flatMap((locale) =>
@@ -51,4 +61,15 @@ describe('Accept-Language negotiation', () => {
       expect(negotiated[header]).toBe(routing.defaultLocale);
     }
   });
+
+  it('probes fallback only with languages the site does not translate', () => {
+    const translated = new Set(TRANSLATED_LOCALES.map((locale) => localeLanguage(locale)));
+    for (const header of FALLBACK_HEADERS) {
+      expect(translated.has(headerLanguage(header))).toBe(false);
+    }
+  });
 });
+
+function localeLanguage(locale: string): string {
+  return new Intl.Locale(locale).language;
+}

@@ -823,9 +823,11 @@ export const KO_BANNED_TERMS: readonly string[] = [
  * One banned-register profile per translated locale. The type forces a
  * decision the moment a locale joins routing.locales. The CLI applies a
  * profile to every locale-agnostic file and to every file of another
- * language (stray copy in the wrong file is exactly what the scanner exists
- * to catch), but not to files of a sibling variant of the same language —
- * see `checkAppliesTo` in scripts/locale-files.ts.
+ * language written in a different family of characters (stray copy in the
+ * wrong file is exactly what the scanner exists to catch), but not to files
+ * of a sibling variant of the same language or of another language sharing
+ * its script — Chinese and Japanese write the same characters with different
+ * meanings — see `checkAppliesTo` in scripts/locale-files.ts.
  */
 export interface LexiconProfile {
   /** Where the register is documented. */

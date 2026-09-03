@@ -18,6 +18,7 @@
  * docs) is locale-agnostic and returns `undefined`.
  */
 
+import { getLocaleConfig } from '../i18n/localeConfig';
 import { routing, type AppLocale } from '../i18n/routing';
 
 const LOCALES_LONGEST_FIRST: readonly AppLocale[] = [...routing.locales].sort(
@@ -69,12 +70,18 @@ export function localeLanguage(locale: AppLocale): string {
  * Whether a locale-specific check (banned register, terminology pack) applies
  * to a file. A locale-agnostic file gets every check — stray translated copy
  * in the wrong place is exactly what the gates exist to catch. A file owned
- * by a locale gets its own check plus the checks of every OTHER language;
- * sibling variants of the same language are skipped, because they share
- * characters while differing in register (Hong Kong bans 回報 "return", Taiwan
- * writes 回報問題 "report an issue").
+ * by a locale gets its own check plus the checks of every other language
+ * written in a different family of characters. Two kinds of neighbour are
+ * skipped because they share characters while differing in vocabulary:
+ * sibling variants of the same language (Hong Kong bans 回報 "return", Taiwan
+ * writes 回報問題 "report an issue"), and other languages of the same
+ * `ScriptFamily` (Japanese bans 利益 "profit" where Chinese 利益 "interest" is
+ * ordinary; Taiwan bans 報酬 "return" where Japanese 報酬 is a plain
+ * "remuneration"). Korean and Ukrainian checks still run on Japanese and
+ * Chinese files, where they can only match genuinely stray copy.
  */
 export function checkAppliesTo(checkLocale: AppLocale, owner: AppLocale | undefined): boolean {
   if (owner === undefined || owner === checkLocale) return true;
-  return localeLanguage(owner) !== localeLanguage(checkLocale);
+  if (localeLanguage(owner) === localeLanguage(checkLocale)) return false;
+  return getLocaleConfig(owner).scriptFamily !== getLocaleConfig(checkLocale).scriptFamily;
 }

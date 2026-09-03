@@ -121,16 +121,11 @@ describe('LocaleRecord', () => {
     // @ts-expect-error — a registry missing a locale must not compile.
     const incomplete: LocaleRecord<number> = { en: 1 };
     const invented: LocaleRecord<number> = {
-      en: 1,
-      zh: 2,
-      'zh-TW': 3,
-      'zh-HK': 4,
-      uk: 5,
-      ko: 6,
+      ...recordFromLocales((locale) => locale.length),
       // @ts-expect-error — an invented locale must not compile either.
       fr: 7,
     };
-    const complete: LocaleRecord<number> = { en: 1, zh: 2, 'zh-TW': 3, 'zh-HK': 4, uk: 5, ko: 6 };
+    const complete: LocaleRecord<number> = recordFromLocales((locale) => locale.length);
 
     expect(Object.keys(complete).sort()).toEqual([...routing.locales].sort());
     expect(incomplete).toBeDefined();
