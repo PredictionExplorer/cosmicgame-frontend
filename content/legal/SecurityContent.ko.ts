@@ -1,45 +1,45 @@
 import type { TrustPageCopy } from './TrustPageContent';
 
-/** English copy for /security, rendered by TrustPageContent. */
+/** Korean copy for /security, rendered by TrustPageContent. */
 export const securityCopyKo: TrustPageCopy = {
-  eyebrow: 'Trust and security',
-  title: 'Cosmic Signature Security',
+  eyebrow: '신뢰와 보안',
+  title: 'Cosmic Signature 보안',
   intro:
-    'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Its security posture depends on public smart contracts, transparent protocol data, careful wallet interactions, and clear participant education.',
+    'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 보안 태세는 공개된 스마트 컨트랙트, 투명한 프로토콜 데이터, 신중한 지갑 상호작용, 참여자를 위한 명확한 안내에 기반합니다.',
   sections: [
     {
-      heading: 'Security Model',
+      heading: '보안 모델',
       paragraphs: [
-        'Protocol actions are recorded by Arbitrum smart contracts. Public pages should let users and crawlers inspect the contract addresses, source-code resources, verification context, and operational assumptions before connecting a wallet or making a gesture.',
+        '프로토콜 작업은 Arbitrum 스마트 컨트랙트에 기록됩니다. 공개 페이지는 사용자와 크롤러가 지갑을 연결하거나 제스처를 남기기 전에 컨트랙트 주소, 소스 코드 자료, 검증 맥락, 운영상의 전제를 살펴볼 수 있도록 해야 합니다.',
       ],
       bullets: [
-        'Use the official app at `https://app.cosmicsignature.com/`.',
-        'Verify contract addresses from the contracts page before interacting on-chain.',
-        'Review wallet prompts carefully; blockchain transactions cannot be reversed.',
-        'Do not treat CST, NFTs, gestures, or allocations as guaranteed financial outcomes.',
+        '공식 앱(`https://app.cosmicsignature.com/`)을 이용해 주세요.',
+        '온체인에서 상호작용하기 전에 컨트랙트 페이지에서 컨트랙트 주소를 확인해 주세요.',
+        '지갑에 표시되는 요청 내용을 신중하게 검토해 주세요. 블록체인 트랜잭션은 되돌릴 수 없습니다.',
+        'CST, NFT, 제스처, 배분을 보장된 재정적 결과로 여겨서는 안 됩니다.',
       ],
     },
     {
-      heading: 'Verification Resources',
+      heading: '검증 자료',
       paragraphs: [
-        'The strongest security signal is consistency between visible app content, verified contracts, source code, and live Arbitrum data.',
+        '가장 강력한 보안 신호는 앱에 표시되는 내용, 검증된 컨트랙트, 소스 코드, 실시간 Arbitrum 데이터가 서로 일치하는 것입니다.',
       ],
       links: [
         {
           kind: 'app',
           href: '/contracts',
-          label: 'Cosmic Signature contracts and Arbitrum addresses',
+          label: 'Cosmic Signature 컨트랙트와 Arbitrum 주소',
         },
         {
           kind: 'app',
           href: '/code',
-          label: 'Cosmic Signature source code and rendering pipeline',
+          label: 'Cosmic Signature 소스 코드와 렌더링 파이프라인',
         },
-        { kind: 'app', href: '/audits', label: 'Audits and formal verification notes' },
+        { kind: 'app', href: '/audits', label: '보안 감사와 정형 검증 안내' },
         {
           kind: 'app',
           href: '/risk-disclosures',
-          label: 'Risk disclosures and participant clarity',
+          label: '위험 고지와 참여자 안내',
         },
       ],
     },

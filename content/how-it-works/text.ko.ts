@@ -2,224 +2,220 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { HowItWorksText } from './structure';
 
-/** English how-it-works copy, keyed by the skeleton in structure.ts. */
+/** 한국어 작동 원리 copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextKo = {
   metadata: {
-    title: 'How Cosmic Signature Works | Performance Cycles, Gestures, and NFTs',
+    title: 'Cosmic Signature 작동 원리 | 퍼포먼스 사이클, 제스처, NFT',
     description:
-      'Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution.',
+      'Cosmic Signature 퍼포먼스 사이클이 보정 구간에서 제스처를 거쳐 최종 배분까지 어떻게 펼쳐지는지 알아봅니다.',
   },
   jsonLd: {
-    name: 'How Cosmic Signature Works',
+    name: 'Cosmic Signature 작동 원리',
     description:
-      'Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution.',
+      'Cosmic Signature 퍼포먼스 사이클이 보정 구간에서 제스처를 거쳐 최종 배분까지 어떻게 펼쳐지는지 알아봅니다.',
   },
   breadcrumbs: {
-    homeLabel: 'Home',
-    pageLabel: 'How It Works',
+    homeLabel: '홈',
+    pageLabel: '작동 원리',
   },
   hero: {
-    badge: 'Procedural On-Chain Art Protocol',
-    headingLead: 'How Cosmic Signature',
-    headingAccent: 'Works',
+    badge: '절차적 온체인 아트 프로토콜',
+    headingLead: 'Cosmic Signature',
+    headingAccent: '작동 원리',
     paragraph:
-      'Gesture. Endure. Shape the Signature. Participants make gestures during a Performance Cycle. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across more than ten tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
-    primaryCtaLabel: 'Open the Protocol',
-    secondaryCtaLabel: 'Learn More',
+      '제스처를 남깁니다. 시간을 견딥니다. 시그니처를 빚어냅니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클 마감 시각이 지나면 사이클을 마감할 수 있습니다. 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
+    primaryCtaLabel: '프로토콜 열기',
+    secondaryCtaLabel: '자세히 알아보기',
   },
   overview: {
-    heading: 'How It Works',
-    subhead: 'Three steps to participate and shape the Cycle Reserve',
+    heading: '작동 원리',
+    subhead: '참여하고 사이클 준비금을 빚어 가는 세 단계',
     cards: [
       {
-        title: 'Gesture',
+        title: '제스처',
         description:
-          'Make a gesture with ETH or CST (ERC-20). Each gesture extends the Cycle Finalization Time, records a Stellar Selection entry, and shapes the evolving Signature.',
-        tooltip: `Gestures can be made with ETH or CST tokens (ERC-20). Attaching a Random Walk NFT to an ETH gesture grants a one-time ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction.`,
+          'ETH 또는 CST(ERC-20)로 제스처를 남깁니다. 제스처마다 사이클 마감 시각이 연장되고, 별빛 선정 자격이 기록되며, 변화하는 시그니처가 빚어집니다.',
+        tooltip: `제스처는 ETH 또는 CST 토큰(ERC-20)으로 남길 수 있습니다. ETH 제스처에 Random Walk NFT를 첨부하면 ETH 제스처 비용을 한 번 ${protocolFacts.randomWalkDiscountPercentage}% 할인받습니다.`,
       },
       {
-        title: 'Endure',
+        title: '지속',
         description:
-          'The cycle runs until the Cycle Finalization Time expires. Each new gesture adds the current time increment to the stored finalization time.',
+          '사이클은 사이클 마감 시각이 지날 때까지 이어집니다. 새 제스처마다 저장된 마감 시각에 현재 시간 증가량이 더해집니다.',
         tooltip:
-          'The time increment starts around one hour and grows gradually across cycles. CST Gesture Cost uses a dynamic Calibration Window that ETH and CST gestures move in opposite directions.',
+          '시간 증가량은 약 1시간에서 시작해 사이클을 거치며 조금씩 늘어납니다. CST 제스처 비용은 동적인 보정 구간을 따르며, ETH 제스처와 CST 제스처가 이 구간을 서로 반대 방향으로 움직입니다.',
       },
       {
-        title: 'Receive',
+        title: '수령',
         description:
-          'Participate in allocations when the cycle finalizes — Signature Allocation, Stellar Selections, Anchor Distributions, and more.',
-        tooltip: `The participant who made the Final Gesture receives ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT. Stellar Selection recipients, anchor-holders, and other participants also receive allocations.`,
+          '사이클이 마감되면 시그니처 배분, 별빛 선정, 앵커링 지급 등 여러 배분에 참여합니다.',
+        tooltip: `최종 제스처를 남긴 참여자는 사이클 준비금의 ${protocolFacts.mainEthPercentage}%, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT를 받습니다. 별빛 선정 수령자, 앵커링 보유자, 다른 참여자도 배분을 받습니다.`,
       },
     ],
   },
   rewardBreakdown: {
-    heading: 'What Every Gesture Imprints',
-    subhead: 'Participation imprints multiple allocation tracks per cycle.',
+    heading: '제스처마다 각인되는 것',
+    subhead: '참여 한 번이 사이클마다 여러 배분 경로에 반영됩니다.',
     items: [
       {
-        title: 'Dynamic Participation CST',
-        description:
-          'Each gesture may imprint CST based on how long it has been since the previous gesture.',
-        tooltip: `Participation CST uses a square-root formula: ${protocolFacts.dynamicCstRewardFormula}. Rapid gestures can receive 0 CST; longer quiet periods create larger imprints.`,
+        title: '동적 참여 CST',
+        description: '제스처마다 이전 제스처 이후 흐른 시간에 따라 CST가 각인될 수 있습니다.',
+        tooltip: `참여 CST는 제곱근 공식을 따릅니다: ${protocolFacts.dynamicCstRewardFormula}. 빠르게 이어진 제스처는 0 CST를 받을 수 있고, 공백이 길수록 더 많이 각인됩니다.`,
       },
       {
-        title: 'Stellar Selection Entry',
-        description:
-          'Each gesture records an entry in Stellar Selection for end-of-cycle allocations.',
-        tooltip: `When the cycle finalizes, entries are randomly selected: three participants share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
+        title: '별빛 선정 자격',
+        description: '제스처마다 사이클 마감 시 배분을 위한 별빛 선정 자격이 기록됩니다.',
+        tooltip: `사이클이 마감되면 자격이 무작위로 선정됩니다. 참여자 세 명이 사이클 준비금 ETH의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다.`,
       },
       {
-        title: 'Cosmic Signature NFT Selection',
-        description: `Ten participants receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a unique Cosmic Signature NFT via Stellar Selection each cycle.`,
-        tooltip: `Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT each cycle.`,
+        title: 'Cosmic Signature NFT 선정',
+        description: `사이클마다 참여자 열 명이 별빛 선정으로 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 고유한 Cosmic Signature NFT를 받습니다.`,
+        tooltip: `사이클마다 별빛 선정 수령자 열 명과 Random Walk NFT 앵커링 보유자 열 명이 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
       },
       {
-        title: 'Signature Allocation',
-        description: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
+        title: '시그니처 배분',
+        description: `최종 제스처를 남긴 참여자는 사이클 준비금 ETH의 ${protocolFacts.mainEthPercentage}%, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT를 회수할 수 있습니다.`,
         tooltip:
-          'The Cycle Reserve grows from all gestures. The participant who made the Final Gesture retrieves the Signature Allocation via the protocol contract.',
+          '사이클 준비금은 모든 제스처에서 쌓입니다. 최종 제스처를 남긴 참여자가 프로토콜 컨트랙트를 통해 시그니처 배분을 회수합니다.',
       },
     ],
   },
   gameCycle: {
-    heading: 'Lifecycle of a Performance Cycle',
-    subhead: 'Every cycle follows this sequence from open to finalization.',
+    heading: '퍼포먼스 사이클의 흐름',
+    subhead: '모든 사이클은 시작부터 마감까지 이 순서를 따릅니다.',
     phases: [
       {
-        label: 'Cycle Opens',
-        description: `A new Performance Cycle begins. The first ETH Calibration Window opens, and the CST Calibration Window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference that then changes with participation.`,
+        label: '사이클 시작',
+        description: `새 퍼포먼스 사이클이 시작됩니다. 첫 ETH 보정 구간이 열리고, CST 보정 구간은 ${protocolFacts.initialCstCalibrationWindowHours}시간을 기준으로 시작해 참여에 따라 달라집니다.`,
         tooltip:
-          'Calibration Windows let participants gesture at falling cost. The Cycle Reserve starts at zero plus the Compounding Reserve from the previous cycle.',
+          '보정 구간에서는 내려가는 비용으로 제스처를 남길 수 있습니다. 사이클 준비금은 0에서 시작하되 이전 사이클의 누적 준비금이 더해집니다.',
       },
       {
-        label: 'Participants Gesture',
-        description: `Each gesture adds the current time increment to Cycle Finalization Time. Participation CST is dynamic, and ETH/CST gestures move the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% down or ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% up.`,
+        label: '참여자의 제스처',
+        description: `제스처마다 사이클 마감 시각에 현재 시간 증가량이 더해집니다. 참여 CST는 동적이며, ETH 제스처와 CST 제스처는 CST 보정 구간을 각각 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄이거나 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다.`,
         tooltip:
-          'Participation CST follows a square-root formula based on elapsed time since the previous gesture. The current app preview is the source of truth for the exact CST amount.',
+          '참여 CST는 이전 제스처 이후 흐른 시간에 제곱근 공식을 적용해 정해집니다. 정확한 CST 양은 앱의 현재 미리 보기가 기준입니다.',
       },
       {
-        label: 'Cycle Finalization Time Expires',
+        label: '사이클 마감 시각 도달',
         description:
-          'When the countdown reaches zero, the participant who made the Final Gesture becomes eligible to finalize the cycle.',
-        tooltip: `Gestures remain possible until finalization actually executes — a late gesture extends the stored time and takes over the Final Gesture position. The Final Gesture participant has a ${protocolFacts.finalGestureExclusivityHours}-hour exclusive finalization window; afterwards anyone may finalize and receives the Signature Allocation.`,
+          '카운트다운이 0에 이르면 최종 제스처를 남긴 참여자가 사이클을 마감할 자격을 얻습니다.',
+        tooltip: `마감이 실제로 실행되기 전까지는 제스처를 남길 수 있습니다. 늦게 남긴 제스처는 저장된 시각을 연장하고 최종 제스처 자리를 넘겨받습니다. 최종 제스처 참여자에게는 ${protocolFacts.finalGestureExclusivityHours}시간의 단독 마감 구간이 주어지며, 그 뒤에는 누구나 마감할 수 있고 마감한 사람이 시그니처 배분을 받습니다.`,
       },
       {
-        label: 'Cycle Finalizes',
-        description: `The participant who made the Final Gesture retrieves the Signature Allocation: ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
+        label: '사이클 마감',
+        description: `최종 제스처를 남긴 참여자가 시그니처 배분(사이클 준비금의 ${protocolFacts.mainEthPercentage}%, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT)을 회수합니다.`,
         tooltip:
-          'The Signature Allocation retrieval happens via the protocol contract. The CST and Cosmic Signature NFT are imprinted automatically.',
+          '시그니처 배분 회수는 프로토콜 컨트랙트를 통해 이루어집니다. CST와 Cosmic Signature NFT는 자동으로 각인됩니다.',
       },
       {
-        label: 'Stellar Selections',
-        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
+        label: '별빛 선정',
+        description: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. NFT 별빛 선정 수령자 열 명과 앵커링 NFT 별빛 선정 수령자 열 명은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
         tooltip:
-          'Entries are recorded per gesture. More gestures means higher Selection frequency. Random Walk NFT anchor-holders have a separate Stellar Selection.',
+          '자격은 제스처마다 기록됩니다. 제스처가 많을수록 선정 빈도가 높아집니다. Random Walk NFT 앵커링 보유자에게는 별도의 별빛 선정이 있습니다.',
       },
       {
-        label: 'Next Cycle',
+        label: '다음 사이클',
         description:
-          'About half of the Cycle Reserve rolls forward as the Compounding Reserve, and the next cycle begins with fresh Calibration Windows.',
+          '사이클 준비금의 약 절반이 누적 준비금으로 이월되고, 다음 사이클이 새 보정 구간과 함께 시작됩니다.',
         tooltip:
-          'The Compounding Cycle Reserve means the protocol accumulates value rather than extracts it. The live contracts report the current window durations and costs.',
+          '누적 준비금은 프로토콜이 가치를 빼내지 않고 쌓아 간다는 뜻입니다. 현재 구간 길이와 비용은 실시간 컨트랙트가 알려 줍니다.',
       },
     ],
   },
   stepByStep: {
-    heading: 'Getting Started',
-    subhead: 'From wallet connection to your first gesture in three steps.',
-    stepLabel: 'STEP',
+    heading: '시작하기',
+    subhead: '지갑 연결부터 첫 제스처까지 세 단계',
+    stepLabel: '단계',
     steps: [
       {
-        title: 'Connect Your Wallet',
+        title: '지갑 연결',
         tooltip:
-          'Arbitrum is a Layer 2 blockchain on Ethereum with lower gas fees and faster transactions.',
+          'Arbitrum은 이더리움 위의 레이어 2 블록체인으로, 가스 비용이 낮고 트랜잭션이 빠릅니다.',
         highlights: [
-          'Click the "Connect Wallet" button at the top of the page.',
-          'Use a wallet that supports the Arbitrum blockchain, such as MetaMask.',
-          'Switch your network to Arbitrum when prompted, then approve permissions.',
-          'Your wallet address will appear in the header once connected.',
+          '페이지 상단의 ‘지갑 연결’ 버튼을 누릅니다.',
+          'MetaMask처럼 Arbitrum 블록체인을 지원하는 지갑을 사용합니다.',
+          '안내가 나오면 네트워크를 Arbitrum으로 전환하고 권한을 승인합니다.',
+          '연결되면 지갑 주소가 헤더에 표시됩니다.',
         ],
       },
       {
-        title: 'Check the Gesture Cost',
+        title: '제스처 비용 확인',
         tooltip:
-          'Gas fees on Arbitrum are typically a few cents — much cheaper than Ethereum mainnet.',
+          'Arbitrum의 가스 비용은 보통 몇 센트 수준으로, 이더리움 메인넷보다 훨씬 저렴합니다.',
         highlights: [
-          'Review the Cycle Finalization Time — every gesture adds the current time increment to the stored finalization time.',
-          'Check the current Gesture Cost in ETH or CST before committing.',
-          'Review the live Participation CST preview; the amount changes with time since the previous gesture.',
-          'Note the Signature Allocation amount to see the potential ETH distribution.',
-          'Ensure your wallet holds the Gesture Cost plus a small amount for gas fees.',
+          '사이클 마감 시각을 확인합니다. 제스처마다 저장된 마감 시각에 현재 시간 증가량이 더해집니다.',
+          '제스처를 남기기 전에 현재 ETH 또는 CST 제스처 비용을 확인합니다.',
+          '실시간 참여 CST 미리 보기를 확인합니다. 이 양은 이전 제스처 이후 흐른 시간에 따라 달라집니다.',
+          '시그니처 배분 금액을 보고 예상되는 ETH 배분 규모를 확인합니다.',
+          '지갑에 제스처 비용과 소액의 가스 비용이 있는지 확인합니다.',
         ],
       },
       {
-        title: 'Make Your Gesture',
-        tooltip: `Each Random Walk NFT can be used once for the ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction - choose your moment wisely.`,
+        title: '제스처 남기기',
+        tooltip: `Random Walk NFT 하나는 ETH 제스처 비용 ${protocolFacts.randomWalkDiscountPercentage}% 할인에 한 번만 쓸 수 있으므로, 순간을 잘 골라 사용하는 것이 좋습니다.`,
         highlights: [
-          `Choose ETH, optionally attach a Random Walk NFT for a ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction, or make a CST (ERC-20) gesture.`,
-          'Click "Gesture Now" and confirm the transaction in your wallet.',
-          'Your gesture extends the Cycle Finalization Time and updates the ETH/CST cost state.',
-          'Every gesture records a Stellar Selection entry and may imprint dynamic Participation CST automatically.',
+          `ETH로 제스처를 남기거나(원한다면 Random Walk NFT를 첨부해 ETH 제스처 비용을 ${protocolFacts.randomWalkDiscountPercentage}% 할인받을 수 있습니다), CST(ERC-20)로 제스처를 남깁니다.`,
+          '‘제스처 남기기’를 누르고 지갑에서 트랜잭션을 확인합니다.',
+          '제스처는 사이클 마감 시각을 연장하고 ETH/CST 비용 상태를 갱신합니다.',
+          '모든 제스처는 별빛 선정 자격을 기록하며, 동적 참여 CST를 자동으로 각인할 수 있습니다.',
         ],
       },
     ],
   },
   proTips: {
-    heading: 'Pro Tips & Strategy',
-    subhead: 'Practical guidance for maximizing participation across allocation tracks.',
+    heading: '활용 팁과 전략',
+    subhead: '여러 배분 경로에 걸쳐 참여를 최대한 살리는 실용적인 안내',
     tips: [
       {
-        title: 'Watch Both Calibration Windows',
+        title: '두 보정 구간을 함께 살피기',
         description:
-          'ETH and CST Gesture Costs follow separate live windows, and each gesture changes the CST window.',
+          'ETH 제스처 비용과 CST 제스처 비용은 각각의 실시간 구간을 따르며, 제스처마다 CST 구간이 달라집니다.',
         tooltip:
-          'ETH gestures slightly shorten the CST Calibration Window; CST gestures slightly lengthen it. The live app panels show the current cost path.',
+          'ETH 제스처는 CST 보정 구간을 조금 줄이고, CST 제스처는 조금 늘립니다. 앱의 실시간 패널에서 현재 비용 경로를 볼 수 있습니다.',
       },
       {
-        title: 'Attach a Random Walk NFT',
-        description: `Holding a Random Walk NFT grants a one-time ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction.`,
+        title: 'Random Walk NFT 첨부하기',
+        description: `Random Walk NFT를 보유하면 ETH 제스처 비용을 한 번 ${protocolFacts.randomWalkDiscountPercentage}% 할인받을 수 있습니다.`,
         tooltip:
-          'Each Random Walk NFT can be used once for the cost reduction. Save it for a higher-cost gesture to maximize the effect.',
+          'Random Walk NFT 하나는 할인에 한 번만 쓸 수 있습니다. 비용이 높은 제스처에 아껴 쓰면 효과가 가장 큽니다.',
       },
       {
-        title: 'Stack Stellar Selection Entries',
+        title: '별빛 선정 자격 쌓기',
         description:
-          'Each gesture records one Stellar Selection entry. More gestures means higher Selection frequency.',
-        tooltip: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
+          '제스처마다 별빛 선정 자격이 한 건씩 기록됩니다. 제스처가 많을수록 선정 빈도가 높아집니다.',
+        tooltip: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. 참여자 NFT 수령자 열 명과 Random Walk NFT 앵커링 보유자 열 명은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
       },
       {
-        title: 'Use a Burner Wallet',
+        title: '전용 지갑 사용하기',
         description:
-          'The smart contracts are publicly source-verified on-chain, but using a dedicated wallet for participation adds an extra layer of safety.',
+          '스마트 컨트랙트는 온체인에서 소스가 공개 검증되어 있지만, 참여 전용 지갑을 따로 쓰면 안전성이 한층 높아집니다.',
         tooltip:
-          'A burner wallet isolates your protocol activity from your main holdings for additional security. Audit and verification status is published on the Audits page.',
+          '전용 지갑은 프로토콜 활동을 주요 보유 자산과 분리해 보안을 높입니다. 보안 감사와 검증 상태는 보안 감사 페이지에 공개되어 있습니다.',
       },
       {
-        title: 'Watch the Finalization Time',
-        description:
-          'Each gesture adds the current time increment to the stored Cycle Finalization Time.',
+        title: '마감 시각 지켜보기',
+        description: '제스처마다 저장된 사이클 마감 시각에 현재 시간 증가량이 더해집니다.',
         tooltip:
-          'Gesturing near the deadline positions you closest to the Final Gesture, but another participant can still gesture after you until the cycle is finalized.',
+          '마감 직전에 제스처를 남기면 최종 제스처 자리에 가장 가까워지지만, 사이클이 마감되기 전까지는 다른 참여자가 뒤이어 제스처를 남길 수 있습니다.',
       },
       {
-        title: 'Gesture with CST',
-        description:
-          'Use CST as an alternative gesture currency through the CST Calibration Window.',
-        tooltip: `A CST gesture records a Stellar Selection entry, extends the timer, may imprint dynamic Participation CST, and lengthens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
+        title: 'CST로 제스처 남기기',
+        description: 'CST 보정 구간을 통해 CST를 또 하나의 제스처 수단으로 쓸 수 있습니다.',
+        tooltip: `CST 제스처는 별빛 선정 자격을 기록하고, 타이머를 연장하고, 동적 참여 CST를 각인할 수 있으며, CST 보정 구간을 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다.`,
       },
     ],
   },
   faqCallout: {
-    heading: 'Have Questions?',
-    body: 'Read the FAQ for detailed answers on cycle mechanics, allocation tracks, tokens, and everything else about Cosmic Signature.',
-    ctaLabel: 'Browse FAQ',
+    heading: '궁금한 점이 있나요?',
+    body: '사이클 메커니즘, 배분 경로, 토큰 등 Cosmic Signature의 모든 것에 관한 자세한 답은 자주 묻는 질문에서 확인할 수 있습니다.',
+    ctaLabel: '자주 묻는 질문 보기',
   },
   callToAction: {
-    heading: 'Ready to Make Your First Gesture?',
+    heading: '첫 제스처를 남길 준비가 되었나요?',
     // The JSX original rendered a literal "\u2019" because unicode escapes are
     // not processed inside JSX text; this is the intentional fix to a real ’.
-    body: 'Join the active Performance Cycle. Connect your wallet and make your first gesture to start imprinting CST and shaping the cycle’s Signature.',
-    primaryCtaLabel: 'Open the Protocol',
+    body: '지금 진행 중인 퍼포먼스 사이클에 참여해 주세요. 지갑을 연결하고 첫 제스처를 남기면 CST가 각인되고 사이클의 시그니처가 빚어지기 시작합니다.',
+    primaryCtaLabel: '프로토콜 열기',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

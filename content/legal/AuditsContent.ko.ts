@@ -1,41 +1,41 @@
 import type { TrustPageCopy } from './TrustPageContent';
 
-/** English copy for /audits, rendered by TrustPageContent. */
+/** Korean copy for /audits, rendered by TrustPageContent. */
 export const auditsCopyKo: TrustPageCopy = {
-  eyebrow: 'Audits and verification',
-  title: 'Cosmic Signature Audits',
+  eyebrow: '보안 감사와 검증',
+  title: 'Cosmic Signature 보안 감사',
   intro:
-    'Cosmic Signature makes contract review context crawlable so participants, researchers, search engines, and AI systems can understand how the protocol is verified and where to inspect its public implementation.',
+    'Cosmic Signature는 컨트랙트 검토 맥락을 크롤링 가능한 형태로 공개하여, 참여자, 연구자, 검색 엔진, AI 시스템이 프로토콜의 검증 방식과 공개 구현을 살펴볼 위치를 이해할 수 있게 합니다.',
   sections: [
     {
-      heading: 'Independent Audit by Hacken',
+      heading: 'Hacken의 독립 보안 감사',
       paragraphs: [
-        'In late 2025, Hacken carried out an independent security review of the Cosmic Signature smart contracts. The engagement covered the production contracts in the public repository, from the core protocol that runs each cycle to the CST token, both NFT collections, the anchoring wallets, and the wallet and system management contracts that support them. Hacken published the final report in January 2026.',
-        'The report lists 23 findings, none of them critical or high severity: 3 medium, 8 low, and 12 informational observations. Most describe design tradeoffs the team reviewed and accepted, and the report explains each finding along with its status.',
-        'Alongside the manual review, Hacken ran fuzz tests against 14 system invariants, properties such as the requirement that the ETH held by the protocol always equals deposits minus withdrawals. All 14 held across 10,000 runs.',
+        'Hacken은 2025년 말 Cosmic Signature 스마트 컨트랙트의 독립 보안 검토를 수행했습니다. 검토는 공개 저장소의 운영 컨트랙트를 대상으로 하여, 각 사이클을 운영하는 핵심 프로토콜부터 CST 토큰, 두 NFT 컬렉션, 앵커링 지갑, 그리고 이를 지원하는 지갑 및 시스템 관리 컨트랙트까지 아울렀습니다. Hacken은 2026년 1월에 최종 보고서를 공개했습니다.',
+        '보고서에는 23건의 발견 사항이 실려 있으며, 심각도가 치명 또는 높음인 항목은 없습니다. 중간 3건, 낮음 8건, 정보성 관찰 12건입니다. 대부분은 팀이 검토하고 수용한 설계상의 절충을 설명한 것이며, 보고서는 각 발견 사항을 그 상태와 함께 설명합니다.',
+        '수동 검토와 함께 Hacken은 시스템 불변 조건 14개를 대상으로 퍼즈 테스트를 실행했습니다. 불변 조건은 예컨대 프로토콜이 보유한 ETH가 항상 적립된 금액에서 회수된 금액을 뺀 값과 같아야 한다는 요건과 같은 성질을 말합니다. 14개 모두 10,000회 실행에서 유지되었습니다.',
       ],
       linkParagraph: {
         kind: 'external',
         href: 'https://hacken.io/audits/cosmic-signature/sca-cosmic-signature-cosmicsignature-contracts-oct2025/',
-        label: 'Read the full Hacken audit report',
+        label: 'Hacken 보안 감사 보고서 전문 읽기',
       },
-      note: 'Last reviewed: 2026-08-24. This page is the canonical public location for Cosmic Signature audit and verification status.',
+      note: '최종 검토: 2026년 8월 24일. 이 페이지는 Cosmic Signature의 보안 감사 및 검증 현황을 확인할 수 있는 공식 공개 페이지입니다.',
     },
     {
-      heading: 'Verification Checklist',
+      heading: '검증 체크리스트',
       bullets: [
-        'Confirm the contract address on the official contracts page.',
-        'Compare verified source code and ABI data on the Arbitrum block explorer.',
-        'Read the Hacken audit report for the full findings and their status.',
-        'Confirm that visible app mechanics match the public contract behavior.',
+        '공식 컨트랙트 페이지에서 컨트랙트 주소를 확인해 주세요.',
+        'Arbitrum 블록 탐색기에서 검증된 소스 코드와 ABI 데이터를 비교해 주세요.',
+        'Hacken 보안 감사 보고서에서 전체 발견 사항과 그 상태를 확인해 주세요.',
+        '앱에 표시되는 메커니즘이 공개된 컨트랙트 동작과 일치하는지 확인해 주세요.',
       ],
     },
     {
-      heading: 'Related Trust Resources',
+      heading: '관련 신뢰 자료',
       links: [
-        { kind: 'app', href: '/contracts', label: 'Verified Arbitrum contract addresses' },
-        { kind: 'app', href: '/code', label: 'Source code and deterministic rendering resources' },
-        { kind: 'app', href: '/security', label: 'Security overview' },
+        { kind: 'app', href: '/contracts', label: '검증된 Arbitrum 컨트랙트 주소' },
+        { kind: 'app', href: '/code', label: '소스 코드와 결정론적 렌더링 자료' },
+        { kind: 'app', href: '/security', label: '보안 개요' },
       ],
     },
   ],

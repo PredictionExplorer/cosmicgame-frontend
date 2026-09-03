@@ -129,11 +129,11 @@
         },
         "endurance": {
           "title": "수호 챔피언",
-          "tooltip": "최근 제스처 자리를 가장 오랫동안 끊김 없이 지킨 참여자입니다. 1,000 CST의 공로 CST 각인과 Cosmic Signature NFT를 받습니다."
+          "tooltip": "최근 제스처 자리를 가장 오랫동안 끊김 없이 지킨 참여자입니다. 공로 CST 1,000개 각인과 Cosmic Signature NFT를 받습니다."
         },
         "finalCst": {
           "title": "최종 CST 제스처",
-          "tooltip": "이 사이클에서 최종 CST 제스처를 남긴 참여자입니다. 1,000 CST의 공로 CST 각인과 Cosmic Signature NFT를 받습니다."
+          "tooltip": "이 사이클에서 최종 CST 제스처를 남긴 참여자입니다. 공로 CST 1,000개 각인과 Cosmic Signature NFT를 받습니다."
         }
       }
     },

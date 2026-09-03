@@ -76,7 +76,7 @@
     },
     "enduranceChampions": {
       "title": "수호 챔피언",
-      "tooltip": "최근 제스처 자리를 얼마나 오래 지켰는지에 따라 참여자를 정렬한 목록입니다. 가장 오랫동안 연속으로 자리를 지킨 참여자는 1,000 CST의 공로 CST 각인과 Cosmic Signature NFT를 받습니다."
+      "tooltip": "최근 제스처 자리를 얼마나 오래 지켰는지에 따라 참여자를 정렬한 목록입니다. 가장 오랫동안 연속으로 자리를 지킨 참여자는 공로 CST 1,000개 각인과 Cosmic Signature NFT를 받습니다."
     },
     "gestureHistory": {
       "title": "사이클 {n} 제스처 내역",
