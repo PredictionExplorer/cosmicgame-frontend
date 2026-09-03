@@ -108,6 +108,20 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     lowercaseMidSentence: true,
     showRawProviderErrors: false,
   },
+  ko: {
+    intlLocale: 'ko-KR',
+    jsonLdInLanguage: 'ko',
+    ogLocale: 'ko_KR',
+    textDirection: 'ltr',
+    // Korean separates words with spaces (unlike Chinese): "1일 2시간".
+    wordSpacing: true,
+    // CLDR week data: Korean calendars start on Sunday.
+    weekStartsMonday: false,
+    ellipsis: '…',
+    // Hangul has no letter case.
+    lowercaseMidSentence: false,
+    showRawProviderErrors: false,
+  },
 };
 
 /** Resolves the rendering conventions for arbitrary locale-ish input. */

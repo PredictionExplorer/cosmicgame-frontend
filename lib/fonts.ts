@@ -1,5 +1,12 @@
 import localFont from 'next/font/local';
-import { Inter, Noto_Sans_HK, Noto_Sans_SC, Noto_Sans_TC, Onest } from 'next/font/google';
+import {
+  Inter,
+  Noto_Sans_HK,
+  Noto_Sans_KR,
+  Noto_Sans_SC,
+  Noto_Sans_TC,
+  Onest,
+} from 'next/font/google';
 
 import type { LocaleRecord } from '@/i18n/locale';
 
@@ -83,6 +90,23 @@ export const notoSansHK = Noto_Sans_HK({
 });
 
 /**
+ * Hangul companion for the Korean locale. Noto Sans KR is the Korean cut of
+ * Noto Sans CJK, so Korean text falls through per glyph exactly like the
+ * Chinese locales do: Latin tokens (ETH, CST, Arbitrum) stay in Clash Display
+ * and Inter, Hangul syllables render in Noto Sans KR via `--cjk-font-stack`
+ * under `html:lang(ko)` (styles/global.css). Same loading policy as the other
+ * CJK cuts; the system fallbacks are the Korean faces macOS and Windows ship.
+ */
+export const notoSansKR = Noto_Sans_KR({
+  weight: 'variable',
+  subsets: ['latin'],
+  variable: '--font-noto-kr',
+  display: 'optional',
+  preload: false,
+  fallback: ['Apple SD Gothic Neo', 'Malgun Gothic', 'system-ui', 'sans-serif'],
+});
+
+/**
  * Cyrillic display companion for the Ukrainian locale (docs/i18n/README.md §5).
  *
  * Clash Display carries no Cyrillic glyphs, so `/uk` headings are set in
@@ -118,6 +142,7 @@ export const LOCALE_COMPANION_FONTS: LocaleRecord<FontWithVariable | null> = {
   'zh-TW': notoSansTC,
   'zh-HK': notoSansHK,
   uk: onest,
+  ko: notoSansKR,
 };
 
 /**

@@ -1,0 +1,187 @@
+{
+  "breadcrumbs": {
+    "home": "홈",
+    "contracts": "컨트랙트"
+  },
+  "page": {
+    "eyebrow": "검증된 컨트랙트 · Arbitrum",
+    "title": "컨트랙트 주소",
+    "subtitle": "Cosmic Signature 프로토콜의 온체인 주소, 구성, 소스 링크, 검증 정보입니다.",
+    "allocationAria": "배분 경로",
+    "configurationAria": "프로토콜 구성",
+    "addressesAria": "컨트랙트 주소",
+    "addressesTitle": "컨트랙트 주소",
+    "parametersAria": "보정 구간 및 별빛 선정 매개변수"
+  },
+  "network": {
+    "chain": "체인 {chainId}"
+  },
+  "entries": {
+    "protocol": {
+      "name": "Cosmic Signature 프로토콜",
+      "description": "사이클, 제스처, 배분을 관리하는 메인 프로토콜 프록시 컨트랙트"
+    },
+    "implementation": {
+      "name": "구현 컨트랙트",
+      "description": "Cosmic Signature 프로토콜 프록시 컨트랙트 뒤에서 실제로 동작하는 현재 구현 컨트랙트"
+    },
+    "cst": {
+      "name": "Cosmic Signature CST 토큰",
+      "description": "제스처마다 각인되며 우주 평의회에서 조율 가중치를 행사하는 데 쓰이는 ERC-20 토큰(CST)"
+    },
+    "nft": {
+      "name": "Cosmic Signature NFT",
+      "description": "사이클 수령자에게 배분으로 각인되는 ERC-721 NFT 컬렉션"
+    },
+    "randomWalk": {
+      "name": "RandomWalk",
+      "description": "ETH 제스처에 첨부해 1회 할인을 받거나, 앵커링하여 앵커링 NFT 별빛 선정 자격을 얻을 수 있는 RandomWalk NFT 컬렉션"
+    },
+    "council": {
+      "name": "우주 평의회",
+      "description": "조율 제안을 처리하는 온체인 프로토콜 조율 컨트랙트"
+    },
+    "publicGoods": {
+      "name": "공공재 금고",
+      "description": "사이클마다 사이클 준비금에서 공공재 배분을 받는 금고 컨트랙트"
+    },
+    "outreach": {
+      "name": "홍보 준비금",
+      "description": "홍보 배분과 생태계 기여자 지원에 쓰이는 자금"
+    },
+    "allocations": {
+      "name": "배분 지갑",
+      "description": "회수를 기다리는 배분을 보관하는 에스크로 컨트랙트"
+    },
+    "cosmicAnchor": {
+      "name": "Cosmic Signature NFT 앵커링 지갑",
+      "description": "Cosmic Signature NFT 앵커링 컨트랙트"
+    },
+    "rwalkAnchor": {
+      "name": "RWLK 앵커링 지갑",
+      "description": "RandomWalk NFT 앵커링 컨트랙트"
+    }
+  },
+  "categories": {
+    "core": "핵심 컨트랙트",
+    "wallet": "지갑 컨트랙트",
+    "anchoring": "앵커링 컨트랙트"
+  },
+  "search": {
+    "placeholder": "이름 또는 주소로 컨트랙트 검색…",
+    "ariaLabel": "컨트랙트 검색",
+    "clearAria": "검색어 지우기",
+    "empty": "“{searchTerm}”에 해당하는 컨트랙트가 없습니다"
+  },
+  "addressCard": {
+    "copyAria": "{name} 주소 복사",
+    "explorerAria": "블록 탐색기에서 {name} 보기"
+  },
+  "funds": {
+    "title": "배분 경로",
+    "description": "사이클 준비금은 시그니처 배분, 시간의 전사, 별빛 선정, 공공재, 앵커링 지급, 누적 준비금의 배분 경로로 나뉩니다.",
+    "chartAria": "배분 경로 막대 차트",
+    "segments": {
+      "signature": {
+        "label": "시그니처 배분",
+        "tooltip": "최종 제스처를 남긴 참여자가 회수하는 ETH 비율. 이 참여자는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다"
+      },
+      "chrono": {
+        "label": "시간의 전사",
+        "tooltip": "시간의 전사에게 돌아가는 ETH 배분. 시간의 전사는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다"
+      },
+      "stellar": {
+        "label": "별빛 선정",
+        "tooltip": "사이클이 마감될 때 무작위로 선정된 참여자에게 배분되는 몫"
+      },
+      "anchor": {
+        "label": "앵커링 지급",
+        "tooltip": "앵커링된 NFT 수에 비례해 Cosmic Signature NFT 앵커링 보유자에게 돌아가는 ETH 앵커링 지급"
+      },
+      "publicGoods": {
+        "label": "공공재",
+        "tooltip": "매 사이클 공공재 수령처(Protocol Guild)로 전달됩니다"
+      },
+      "next": {
+        "label": "다음 사이클",
+        "tooltip": "누적 준비금으로 다음 사이클에 이월되는 나머지 자금입니다."
+      }
+    }
+  },
+  "configuration": {
+    "title": "프로토콜 구성",
+    "cards": {
+      "ethStep": {
+        "label": "ETH 제스처 비용 인상률",
+        "tooltip": "ETH 제스처 비용은 이 인상률 매개변수를 따릅니다. CST 제스처 비용은 실시간 CST 보정 구간을 따릅니다."
+      },
+      "timeIncrement": {
+        "label": "시간 증가량",
+        "tooltip": "제스처마다 사이클 마감 시각에 이만큼의 시간이 더해집니다. 증가량은 사이클마다 {percent}%씩 늘어납니다."
+      },
+      "cstPreview": {
+        "label": "현재 참여 CST 미리보기",
+        "tooltip": "지금 제스처를 남길 때 예상되는 참여 CST입니다. 이 값은 동적으로 변하며 {formula} 공식을 따릅니다."
+      },
+      "finalization": {
+        "label": "마감 제한 시간",
+        "tooltip": "공개 마감 구간이 열려 누구나 마감할 수 있게 되기 전까지, 최종 제스처 참여자가 사이클을 마감할 수 있는 시간"
+      },
+      "initial": {
+        "label": "초기 시간 증가량",
+        "tooltip": "첫 제스처를 남길 때 더해지는 초기 사이클 마감 시간"
+      },
+      "message": {
+        "label": "메시지 최대 길이",
+        "tooltip": "제스처 메시지에 허용되는 최대 글자 수"
+      }
+    }
+  },
+  "parameters": {
+    "title": "보정 구간 및 별빛 선정 매개변수",
+    "cstTitle": "CST 보정 구간",
+    "ethTitle": "ETH 보정 구간",
+    "duration": "지속 시간",
+    "elapsed": "경과 시간",
+    "ceiling": "보정 상한",
+    "cstDurationTooltip": "현재 저장된 CST 보정 구간의 지속 시간입니다. CST 제스처는 이를 약 {increase}% 늘리고, ETH 제스처는 약 {decrease}% 줄입니다.",
+    "cstElapsedTooltip": "현재 CST 보정 구간에서 이미 지난 시간",
+    "cstCeilingTooltip": "현재 표시된 CST 보정 구간의 시작 제스처 비용입니다. 비용은 저장된 지속 시간에 걸쳐 선형으로 내려갑니다.",
+    "ethDurationTooltip": "제스처 비용이 시간에 따라 내려가는 ETH 보정 구간의 전체 지속 시간",
+    "ethElapsedTooltip": "현재 ETH 보정 구간에서 이미 지난 시간",
+    "publicGoodsAddress": "공공재 주소",
+    "publicGoodsAddressTooltip": "공공재 금고 컨트랙트에서 공공재 배분을 현재 받고 있는 온체인 주소",
+    "copyPublicGoodsAria": "공공재 주소 복사",
+    "viewPublicGoodsAria": "블록 탐색기에서 공공재 주소 보기",
+    "selection": {
+      "ethLabel": "ETH 별빛 선정 수령자",
+      "ethTooltip": "매 사이클 ETH 배분을 받도록 무작위로 선정되는 참여자 수",
+      "nftLabel": "NFT 별빛 선정 (참여자)",
+      "nftTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 참여자 수",
+      "anchorLabel": "NFT 별빛 선정 (앵커링 RWLK)",
+      "anchorTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 RandomWalk NFT 앵커링 보유자 수"
+    }
+  },
+  "vault": {
+    "title": "공공재 금고 작업",
+    "tooltip": "공공재 금고의 send() 함수를 호출해 금고의 ETH 잔액을 설정된 Protocol Guild 수령처로 전달합니다.",
+    "balance": "현재 금고 잔액",
+    "description": "금고에 있는 공공재 자금을 Protocol Guild로 전달합니다.",
+    "descriptionWithBeneficiary": "금고에 있는 공공재 자금을 Protocol Guild({address})로 전달합니다.",
+    "aria": "공공재 금고 잔액을 Protocol Guild로 전달"
+  },
+  "seo": {
+    "eyebrow": "검증된 컨트랙트 · Arbitrum",
+    "heading": "Cosmic Signature 컨트랙트",
+    "description": "Cosmic Signature는 공개 Arbitrum 컨트랙트 주소를 게시하여, 참여자와 연구자, 검색 엔진, AI 시스템이 앱에서 보는 내용을 검증 가능한 온체인 프로토콜 기록과 연결할 수 있게 합니다.",
+    "partialFallback": "이 서버 스냅숏에서는 실시간 컨트랙트 주소 데이터를 일시적으로 사용할 수 없습니다. 아래의 검증된 프로토콜 프록시 및 구현 컨트랙트 주소는 프런트엔드 프로토콜 정보에서 가져온 정적 대체값입니다.",
+    "empty": "서버 스냅숏에서 실시간 컨트랙트 주소를 일시적으로 사용할 수 없습니다. 아래의 대화형 컨트랙트 표는 공개 Cosmic Signature API를 사용할 수 있게 되면 자동으로 채워집니다.",
+    "relatedAria": "컨트랙트 신뢰 자료",
+    "links": {
+      "code": "Cosmic Signature 소스 코드 살펴보기",
+      "security": "보안 개요 읽기",
+      "audits": "보안 감사 및 검증 살펴보기",
+      "risk": "위험 고지 읽기"
+    }
+  }
+}

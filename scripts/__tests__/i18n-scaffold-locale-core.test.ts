@@ -36,14 +36,14 @@ function fixtureTree(): string {
 
 describe('scaffoldLocaleProblem', () => {
   it('accepts a canonical tag that is not yet a routing locale', () => {
-    expect(scaffoldLocaleProblem('ko')).toBeUndefined();
+    expect(scaffoldLocaleProblem('ja')).toBeUndefined();
     expect(scaffoldLocaleProblem('pt-BR')).toBeUndefined();
   });
 
   it('rejects malformed, non-canonical, and already registered tags', () => {
     expect(scaffoldLocaleProblem('not a tag')).toMatch(/not a BCP 47/);
     expect(scaffoldLocaleProblem('zh_tw')).toMatch(/not a BCP 47/);
-    expect(scaffoldLocaleProblem('KO')).toMatch(/write it as "ko"/);
+    expect(scaffoldLocaleProblem('JA')).toMatch(/write it as "ja"/);
     expect(scaffoldLocaleProblem('zh-tw')).toMatch(/write it as "zh-TW"/);
     for (const locale of routing.locales) {
       expect(scaffoldLocaleProblem(locale)).toMatch(/already a routing locale/);
@@ -70,40 +70,40 @@ describe('scaffoldLocale', () => {
   });
 
   it('writes every per-locale file with identifiers renamed and skeleton files left alone', () => {
-    const result = scaffoldLocale({ root, locale: 'ko' });
+    const result = scaffoldLocale({ root, locale: 'ja' });
 
     expect(result.written).toEqual([
-      'messages/ko/common.json',
-      'messages/ko/nav.json',
-      'content/about/ko.ts',
-      'content/faq/text.ko.ts',
-      'content/legal/TermsContent.ko.ts',
-      'content/quiz/text.basic.ko.ts',
-      'scripts/terminology/ko.ts',
-      'e2e/ko-smoke.spec.ts',
-      'e2e/ko-site-qa.desktop.spec.ts',
-      'docs/i18n/glossary-ko.md',
-      'docs/i18n/style-guide-ko.md',
-      'docs/i18n/progress-ko.md',
+      'messages/ja/common.json',
+      'messages/ja/nav.json',
+      'content/about/ja.ts',
+      'content/faq/text.ja.ts',
+      'content/legal/TermsContent.ja.ts',
+      'content/quiz/text.basic.ja.ts',
+      'scripts/terminology/ja.ts',
+      'e2e/ja-smoke.spec.ts',
+      'e2e/ja-site-qa.desktop.spec.ts',
+      'docs/i18n/glossary-ja.md',
+      'docs/i18n/style-guide-ja.md',
+      'docs/i18n/progress-ja.md',
     ]);
     expect(result.skipped).toEqual([]);
 
     const read = (path: string) => readFileSync(join(root, path), 'utf8');
-    expect(read('messages/ko/common.json')).toBe(read('messages/en/common.json'));
-    expect(read('content/faq/text.ko.ts')).toContain('export const faqTextKo: FAQText');
-    expect(read('content/quiz/text.basic.ko.ts')).toBe(
-      "import { quizTextKo } from './text.ko';\n\nexport const QUIZ_BASIC_KO = { hub: quizTextKo };\n",
+    expect(read('messages/ja/common.json')).toBe(read('messages/en/common.json'));
+    expect(read('content/faq/text.ja.ts')).toContain('export const faqTextJa: FAQText');
+    expect(read('content/quiz/text.basic.ja.ts')).toBe(
+      "import { quizTextJa } from './text.ja';\n\nexport const QUIZ_BASIC_JA = { hub: quizTextJa };\n",
     );
-    expect(read('content/about/ko.ts')).toContain('aboutContentKo');
-    expect(read('content/legal/TermsContent.ko.ts')).toContain('termsCopyKo');
-    expect(existsSync(join(root, 'content/faq/structure.ko.ts'))).toBe(false);
-    expect(existsSync(join(root, 'content/__tests__/ignored.ko.ts'))).toBe(false);
+    expect(read('content/about/ja.ts')).toContain('aboutContentJa');
+    expect(read('content/legal/TermsContent.ja.ts')).toContain('termsCopyJa');
+    expect(existsSync(join(root, 'content/faq/structure.ja.ts'))).toBe(false);
+    expect(existsSync(join(root, 'content/__tests__/ignored.ja.ts'))).toBe(false);
 
-    expect(read('scripts/terminology/ko.ts')).toContain(
-      'export const KO_TERMINOLOGY_RULES: readonly TerminologyRule[] = [];',
+    expect(read('scripts/terminology/ja.ts')).toContain(
+      'export const JA_TERMINOLOGY_RULES: readonly TerminologyRule[] = [];',
     );
-    expect(read('e2e/ko-smoke.spec.ts')).toContain("defineLocaleSmoke('ko')");
-    expect(read('e2e/ko-site-qa.desktop.spec.ts')).toContain("locale: 'ko'");
+    expect(read('e2e/ja-smoke.spec.ts')).toContain("defineLocaleSmoke('ja')");
+    expect(read('e2e/ja-site-qa.desktop.spec.ts')).toContain("locale: 'ja'");
   });
 
   it('pre-fills the progress tracker with the real catalog key counts and module list', () => {
@@ -120,16 +120,16 @@ describe('scaffoldLocale', () => {
 
   it('keeps existing files unless asked to overwrite', () => {
     writeFileSync(join(root, 'messages', 'en', 'common.json'), '{"ok": "OK"}\n');
-    mkdirSync(join(root, 'messages', 'ko'), { recursive: true });
-    writeFileSync(join(root, 'messages', 'ko', 'common.json'), '{"ok": "확인"}\n');
+    mkdirSync(join(root, 'messages', 'ja'), { recursive: true });
+    writeFileSync(join(root, 'messages', 'ja', 'common.json'), '{"ok": "了解"}\n');
 
-    const first = scaffoldLocale({ root, locale: 'ko' });
-    expect(first.skipped).toEqual(['messages/ko/common.json']);
-    expect(readFileSync(join(root, 'messages/ko/common.json'), 'utf8')).toBe('{"ok": "확인"}\n');
+    const first = scaffoldLocale({ root, locale: 'ja' });
+    expect(first.skipped).toEqual(['messages/ja/common.json']);
+    expect(readFileSync(join(root, 'messages/ja/common.json'), 'utf8')).toBe('{"ok": "了解"}\n');
 
-    const second = scaffoldLocale({ root, locale: 'ko', overwrite: true });
+    const second = scaffoldLocale({ root, locale: 'ja', overwrite: true });
     expect(second.skipped).toEqual([]);
-    expect(readFileSync(join(root, 'messages/ko/common.json'), 'utf8')).toBe('{"ok": "OK"}\n');
+    expect(readFileSync(join(root, 'messages/ja/common.json'), 'utf8')).toBe('{"ok": "OK"}\n');
   });
 
   it('can copy from a sibling locale instead of the default', () => {
@@ -151,11 +151,11 @@ describe('scaffoldLocale', () => {
 
 describe('nextSteps', () => {
   it('walks from routing registration to the surfaces outside the compiler', () => {
-    const steps = nextSteps('ko');
-    expect(steps[0]).toContain("Add 'ko' to LOCALES in i18n/routing.ts (label: 한국어)");
+    const steps = nextSteps('ja');
+    expect(steps[0]).toContain("Add 'ja' to LOCALES in i18n/routing.ts (label: 日本語)");
     expect(steps.some((step) => step.includes('content/*/index.ts'))).toBe(true);
-    expect(steps.some((step) => step.includes('html:lang(ko)'))).toBe(true);
-    expect(steps.some((step) => step.includes('glossary-ko.md'))).toBe(true);
-    expect(steps.at(-1)).toContain('progress-ko.md');
+    expect(steps.some((step) => step.includes('html:lang(ja)'))).toBe(true);
+    expect(steps.some((step) => step.includes('glossary-ja.md'))).toBe(true);
+    expect(steps.at(-1)).toContain('progress-ja.md');
   });
 });

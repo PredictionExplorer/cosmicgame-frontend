@@ -1,4 +1,5 @@
 import enSeo from '@/messages/en/seo.json';
+import koSeo from '@/messages/ko/seo.json';
 import ukSeo from '@/messages/uk/seo.json';
 import zhSeo from '@/messages/zh/seo.json';
 import zhHkSeo from '@/messages/zh-HK/seo.json';
@@ -40,6 +41,7 @@ const catalogs = {
   'zh-TW': zhTwSeo.og,
   'zh-HK': zhHkSeo.og,
   uk: ukSeo.og,
+  ko: koSeo.og,
 } satisfies LocaleRecord<unknown> as unknown as LocaleRecord<Record<OgRoute, OgCopy>>;
 
 export function resolveOgLocale(locale: string | undefined): OgLocale {

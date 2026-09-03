@@ -65,6 +65,9 @@ export const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
     font: ogFont('Onest', 'Onest-700.subset.ttf', 'OFL-Onest.txt'),
     cjk: false,
   },
+  // Hangul syllable blocks share the CJK square rhythm (Noto Sans KR is the
+  // Korean cut of Noto Sans CJK), so the CJK layout metrics apply.
+  ko: { font: ogFont('Noto Sans KR', 'NotoSansKR-700.subset.ttf', NOTO_CJK_LICENSE), cjk: true },
 };
 
 /** OG typography (font buffer requirement + CJK layout flag) for a locale. */

@@ -16,6 +16,7 @@
 import type { TranslatedLocale } from '../i18n/routing';
 
 import { buildTermPattern, type TermMatcher } from './locale-text-matchers';
+import { KO_TERMINOLOGY_RULES } from './terminology/ko';
 import { UK_TERMINOLOGY_RULES } from './terminology/uk';
 import { ZH_TERMINOLOGY_RULES } from './terminology/zh';
 import { ZH_HK_TERMINOLOGY_RULES } from './terminology/zh-HK';
@@ -66,6 +67,13 @@ export const TERMINOLOGY_PACKS: Record<TranslatedLocale, TerminologyPack> = {
     glossary: 'docs/i18n/glossary-uk.md',
     matcher: 'unicode-stem',
     rules: UK_TERMINOLOGY_RULES,
+  },
+  ko: {
+    glossary: 'docs/i18n/glossary-ko.md',
+    // Hangul compounds join without spaces and particles attach to the noun,
+    // so drift is matched as substrings, as for the Chinese locales.
+    matcher: 'cjk-substring',
+    rules: KO_TERMINOLOGY_RULES,
   },
 };
 

@@ -1,0 +1,120 @@
+{
+  "error": {
+    "title": "각인 아카이브를 불러올 수 없습니다",
+    "message": "Cosmic Signature 컬렉션을 읽지 못했습니다. 다시 시도해 아카이브를 불러와 주세요."
+  },
+  "jsonLd": {
+    "name": "Cosmic Signature 갤러리"
+  },
+  "page": {
+    "eyebrowImprinted": "컬렉션 · 각인된 NFT {count}개",
+    "eyebrowLive": "컬렉션 · 실시간",
+    "title": "NFT 갤러리",
+    "subtitle": "모든 사이클에 걸쳐 각인된 Cosmic Signature NFT 컬렉션 전체를 살펴볼 수 있습니다"
+  },
+  "intro": {
+    "badge": "제너러티브 아카이브",
+    "description": "Cosmic Signature NFT 하나하나는 온체인 시드에서 삼체 문제 물리 시뮬레이션을 거쳐 태어난 고유한 제너러티브 아트입니다. 일반적인 사이클에서는 새 NFT 24개가 각인됩니다. 역할 NFT가 4개, 참여자 대상 별빛 선정이 10개, RandomWalk NFT 앵커링 보유자를 위한 앵커링 NFT 별빛 선정이 10개입니다."
+  },
+  "featured": {
+    "viewAria": "Cosmic Signature {id} 보기",
+    "alt": "Cosmic Signature 작품 {id}",
+    "emptyHint": "인덱싱된 NFT가 있으면 실제 컬렉션 작품이 여기에 표시됩니다.",
+    "badgeImprint": "대표 각인",
+    "badgeArchive": "아카이브",
+    "awaitingMetadata": "메타데이터 대기 중"
+  },
+  "hero": {
+    "totalImprinted": {
+      "label": "총 각인 수",
+      "tooltip": "모든 사이클에 걸쳐 각인된 COSMIC NFT의 총수"
+    },
+    "currentlyAnchored": {
+      "label": "현재 앵커링됨",
+      "tooltip": "프로토콜에 앵커링되어 소유자에게 앵커링 지급이 돌아가는 NFT"
+    },
+    "namedNfts": {
+      "label": "이름 붙인 NFT",
+      "tooltip": "소유자가 고유한 이름을 붙인 NFT"
+    },
+    "cycles": {
+      "label": "사이클 수",
+      "tooltip": "NFT를 만들어 낸 사이클의 수"
+    }
+  },
+  "card": {
+    "alt": "Cosmic Signature {id}",
+    "unnamed": "이름 없음",
+    "age": {
+      "justNow": "방금",
+      "minutes": "{count}분 전",
+      "hours": "{count}시간 전",
+      "days": "{count}일 전",
+      "months": "{count}개월 전",
+      "years": "{count}년 전"
+    },
+    "tooltips": {
+      "round": "사이클 {round}에서 각인됨",
+      "anchored": "현재 앵커링되어 앵커링 지급을 받고 있음",
+      "customName": "이 NFT에는 고유한 이름이 붙어 있습니다",
+      "identifier": "이 COSMIC NFT의 고유 일련번호",
+      "mintedOn": "각인 일시: {date}"
+    }
+  },
+  "filters": {
+    "ariaLabel": "NFT 필터",
+    "all": {
+      "label": "전체",
+      "tooltip": "컬렉션의 모든 NFT 표시"
+    },
+    "anchored": {
+      "label": "앵커링됨",
+      "tooltip": "현재 앵커링되어 앵커링 지급을 받고 있는 NFT"
+    },
+    "named": {
+      "label": "이름 있음",
+      "tooltip": "소유자가 이름을 붙인 NFT"
+    }
+  },
+  "sort": {
+    "ariaLabel": "정렬 순서",
+    "tooltip": "NFT 표시 순서를 변경합니다",
+    "newest": "최신순",
+    "oldest": "오래된순",
+    "cycleDesc": "사이클 높은 순",
+    "cycleAsc": "사이클 낮은 순",
+    "rarity": "희귀도 높은 순",
+    "chaosDesc": "카오스 높은 순",
+    "chaosAsc": "카오스 낮은 순",
+    "syzygiesDesc": "삭망 많은 순"
+  },
+  "list": {
+    "headers": {
+      "artwork": "작품",
+      "token": "토큰",
+      "structure": "구조",
+      "palette": "팔레트",
+      "spectral": "분광형",
+      "chaos": "카오스",
+      "fate": "운명",
+      "allocation": "배분",
+      "cycle": "사이클",
+      "age": "각인 시점"
+    }
+  },
+  "view": {
+    "ariaLabel": "보기 방식",
+    "grid": "격자 보기",
+    "list": "목록 보기"
+  },
+  "pagination": {
+    "showing": "전체 NFT <value>{total}</value>개 중 <value>{start}</value>~<value>{end}</value>번째 표시",
+    "perPage": "페이지당",
+    "perPageAria": "페이지당 항목 수",
+    "perPageTooltip": "페이지당 표시되는 NFT 수"
+  },
+  "empty": {
+    "title": "NFT를 찾을 수 없습니다",
+    "description": "검색어나 필터를 조정해 다시 시도해 주세요."
+  }
+}

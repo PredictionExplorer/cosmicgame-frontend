@@ -1,0 +1,74 @@
+{
+  "page": {
+    "eyebrow": "관리자 · 접근 제한",
+    "title": "관리자",
+    "subtitle": "제스처 및 시스템 관리",
+    "gestureList": "제스처 목록",
+    "loading": "불러오는 중…"
+  },
+  "settings": {
+    "title": "관리 메서드",
+    "subtitle": "대시보드 컨트랙트 주소와 매개변수를 읽기 전용으로 표시합니다.",
+    "breadcrumbs": {
+      "home": "홈",
+      "admin": "관리자",
+      "settings": "설정"
+    },
+    "loading": "불러오는 중…",
+    "contractTitle": "Cosmic Signature 컨트랙트",
+    "contractDescription": "대시보드 API에서 가져온 컨트랙트 주소와 온체인 매개변수 목록입니다.",
+    "placeholders": {
+      "address": "주소를 입력해 주세요",
+      "number": "숫자를 입력해 주세요"
+    },
+    "actions": {
+      "setAddress": "주소 설정",
+      "set": "설정"
+    },
+    "fields": {
+      "cosmicSignatureNft": "Cosmic Signature NFT (ERC-721) 컨트랙트 주소",
+      "cstToken": "Cosmic Signature CST 토큰 (ERC-20) 컨트랙트 주소",
+      "publicGoodsVault": "공공재 금고 컨트랙트 주소",
+      "randomWalkNft": "RandomWalk NFT 컨트랙트 주소",
+      "stellarSelectionWallet": "별빛 선정 지갑 컨트랙트 주소",
+      "anchoringWallet": "앵커링 지갑 컨트랙트 주소",
+      "outreachWallet": "홍보 지갑 컨트랙트 주소",
+      "businessLogic": "비즈니스 로직 컨트랙트 주소",
+      "ethStellarRecipients": "사이클별 ETH 별빛 선정 수령자 수",
+      "nftStellarRecipients": "사이클별 NFT 별빛 선정 수령자 수",
+      "nftHolderRecipients": "사이클별 NFT 보유자 수령자 수",
+      "signatureAllocationPercentage": "시그니처 배분 비율",
+      "publicGoodsPercentage": "공공재 비율",
+      "stellarSelectionPercentage": "별빛 선정 비율",
+      "anchorDistributionPercentage": "앵커링 지급 비율",
+      "timeIncrease": "시간 증가",
+      "allocationTimeout": "시그니처 배분 회수 제한 시간",
+      "priceIncrease": "비용 증가",
+      "nanosecondsExtra": "추가 나노초",
+      "initialAllocationSeconds": "시그니처 배분까지의 초기 시간 (초)",
+      "initialGestureCostFraction": "초기 제스처 비용 비율",
+      "activationTime": "활성화 시각",
+      "gestureRatio": "ETH 제스처 대 CST 제스처 비율",
+      "calibrationWindowLength": "사이클 시작 CST 보정 구간 길이",
+      "switchMode": "모드 전환"
+    },
+    "modes": {
+      "runtime": "실행 모드",
+      "maintenance": "점검 모드"
+    }
+  },
+  "outreachTransfer": {
+    "title": "CST 홍보 전송",
+    "subtitle": "설정된 홍보 준비금 지갑 서명자를 위한, URL로만 접근하는 전송 도구입니다.",
+    "roleReadError": "홍보 준비금의 소유자와 재무 담당자를 읽을 수 없습니다.",
+    "walletRequiredTitle": "지갑 미연결",
+    "walletRequiredDescription": "CST 홍보 배분을 전송하려면 현재 홍보 준비금 재무 담당자 지갑을 연결해 주세요.",
+    "walletUnavailableTitle": "홍보 지갑을 사용할 수 없음",
+    "walletUnavailableDescription": "대시보드에서 아직 홍보 지갑 주소를 제공하지 않았습니다.",
+    "rolesLoadingTitle": "홍보 준비금 역할을 불러오는 중",
+    "rolesLoadingDescription": "컨트랙트에서 홍보 지갑(MarketingWallet)의 소유자와 재무 담당자를 읽는 중입니다.",
+    "rolesErrorTitle": "홍보 준비금 역할을 읽을 수 없음",
+    "restrictedTitle": "접근 제한",
+    "restrictedDescription": "URL로만 접근하는 이 전송 도구를 사용하려면 현재 홍보 준비금 재무 담당자({treasurer}) 지갑을 연결해 주세요. 소유자: {owner}."
+  }
+}

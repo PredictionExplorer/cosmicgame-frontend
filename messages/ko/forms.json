@@ -1,0 +1,16 @@
+{
+  "datePicker": {
+    "previousMonth": "이전 달",
+    "nextMonth": "다음 달",
+    "pickDate": "날짜 선택",
+    "weekdays": {
+      "sunday": "일",
+      "monday": "월",
+      "tuesday": "화",
+      "wednesday": "수",
+      "thursday": "목",
+      "friday": "금",
+      "saturday": "토"
+    }
+  }
+}

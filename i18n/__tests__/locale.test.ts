@@ -77,6 +77,9 @@ describe('normalizeLocale', () => {
     expect(normalizeLocale('en-US')).toBe('en');
     expect(normalizeLocale('en-GB')).toBe('en');
     expect(normalizeLocale('uk-UA')).toBe('uk');
+    expect(normalizeLocale('ko-KR')).toBe('ko');
+    expect(normalizeLocale('ko-KP')).toBe('ko');
+    expect(normalizeLocale('ko-Kore-KR')).toBe('ko');
   });
 
   it('never maps a neighbouring language onto another', () => {
@@ -117,9 +120,17 @@ describe('LocaleRecord', () => {
   it('requires an entry for every routing locale at compile time', () => {
     // @ts-expect-error — a registry missing a locale must not compile.
     const incomplete: LocaleRecord<number> = { en: 1 };
-    // @ts-expect-error — an invented locale must not compile either.
-    const invented: LocaleRecord<number> = { en: 1, zh: 2, 'zh-TW': 3, 'zh-HK': 4, uk: 5, fr: 6 };
-    const complete: LocaleRecord<number> = { en: 1, zh: 2, 'zh-TW': 3, 'zh-HK': 4, uk: 5 };
+    const invented: LocaleRecord<number> = {
+      en: 1,
+      zh: 2,
+      'zh-TW': 3,
+      'zh-HK': 4,
+      uk: 5,
+      ko: 6,
+      // @ts-expect-error — an invented locale must not compile either.
+      fr: 7,
+    };
+    const complete: LocaleRecord<number> = { en: 1, zh: 2, 'zh-TW': 3, 'zh-HK': 4, uk: 5, ko: 6 };
 
     expect(Object.keys(complete).sort()).toEqual([...routing.locales].sort());
     expect(incomplete).toBeDefined();

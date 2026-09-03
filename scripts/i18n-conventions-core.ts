@@ -201,6 +201,41 @@ export const LOCALE_CONVENTIONS: Record<TranslatedLocale, LocaleConventions | nu
   // Ukrainian is written in one script and its style rules (cases, four
   // plural forms, «» quotes) need a reader, not a regular expression.
   uk: null,
+  // Korean (docs/i18n/style-guide-ko.md): one script, but four defects a
+  // regular expression catches reliably.
+  ko: {
+    styleGuide: 'docs/i18n/style-guide-ko.md',
+    script: null,
+    disallowedPatterns: [
+      {
+        // 을/를, 이/가, 은/는, 와/과, (으)로 change with the final sound of the
+        // preceding word, which an interpolated value or plural `#` does not
+        // have. Counters (개, 회, 명, 번째) are sound-independent and allowed.
+        pattern: /[}#](?:을|를|이|가|은|는|와|과|으로|로)(?![가-힣])/,
+        reason:
+          'sound-dependent particle glued to a placeholder; restructure so the particle follows a fixed noun (style-guide-ko §3)',
+      },
+      {
+        pattern:
+          /(?:을|이|은|와|으)\((?:를|가|는|과|로)\)|\((?:을|이|은|와|으)\)(?:를|가|는|과|로)/,
+        reason:
+          'hedged particle 을(를) / (으)로; rewrite so the particle attaches to a known word (style-guide-ko §3)',
+      },
+      {
+        pattern: /[。，、；：！？（）「」『』]/,
+        reason:
+          'full-width punctuation or corner brackets; Korean uses ASCII marks and “ ” quotes (style-guide-ko §4)',
+      },
+      {
+        pattern: /당신|귀하/,
+        reason: 'second-person pronoun; Korean drops the subject (style-guide-ko §2)',
+      },
+      {
+        pattern: /되어지/,
+        reason: 'double passive 되어지다; write the simple passive 되다 (style-guide-ko §3)',
+      },
+    ],
+  },
 };
 
 export interface ConventionViolation {

@@ -1,0 +1,257 @@
+{
+  "types": {
+    "structure": "구조",
+    "underlay": "밑그림",
+    "accent": "악센트",
+    "symmetry": "대칭",
+    "projection": "투영",
+    "wildcard": "와일드카드",
+    "finish": "질감",
+    "palette": "팔레트",
+    "spectralClass": "분광형",
+    "massBalance": "질량 균형",
+    "fate": "운명",
+    "chaos": "카오스",
+    "syzygies": "삭망",
+    "cycle": "사이클",
+    "imprinted": "각인",
+    "allocation": "배분"
+  },
+  "hints": {
+    "structure": "세 궤도를 그려 내는 주된 드로잉 어휘입니다.",
+    "underlay": "주 구조 아래에 더 흐릿하게 깔리는 두 번째 어휘입니다.",
+    "accent": "구조 위에 드물게 얹히는 강조 어휘입니다.",
+    "symmetry": "구도에 적용되는 대칭 방식으로, 거울, 로제트, 만다라 가운데 하나입니다.",
+    "projection": "궤적을 그려 넣는 좌표 공간입니다.",
+    "wildcard": "통상의 렌더링 규칙을 벗어나는 드문 변형입니다.",
+    "finish": "최종 프레임에 적용되는 후처리 효과입니다.",
+    "palette": "세 천체의 색 계열과 배색 방식입니다.",
+    "spectralClass": "주된 천체의 항성 색 분류로, 청백색 O형부터 적색 M형까지 이어집니다.",
+    "massBalance": "세 천체의 질량 관계로, 무거운 주성 하나, 쌍둥이 쌍성, 균등한 삼체 가운데 하나입니다.",
+    "fate": "시뮬레이션의 결말로, 서로 묶인 영원한 춤이거나 천체 하나의 방출입니다.",
+    "chaos": "초기 조건 민감도를 0(질서)부터 100(격동)까지 점수로 나타냅니다.",
+    "syzygies": "세 천체가 모두 일직선으로 늘어서는 순간입니다.",
+    "cycle": "이 NFT가 각인된 퍼포먼스 사이클입니다.",
+    "imprinted": "이 NFT가 Arbitrum에 각인된 시점입니다.",
+    "allocation": "이 NFT를 첫 수령자에게 전달한 배분입니다."
+  },
+  "values": {
+    "vocabulary": {
+      "orbitRibbons": "궤도 리본",
+      "timeChords": "시간 화음",
+      "harmonicWeave": "조화 직조",
+      "tangentCaustics": "접선 커스틱",
+      "stippleConstellation": "점묘 별자리",
+      "nebulaVeil": "성운 베일"
+    },
+    "symmetry": {
+      "mirror": "거울",
+      "rosette": "로제트 ×{n}",
+      "mandala": "만다라 ×{n}"
+    },
+    "projection": {
+      "crossBraid": "교차 엮음",
+      "phasePortrait": "위상 초상",
+      "hodograph": "호도그래프"
+    },
+    "wildcard": {
+      "yes": "예"
+    },
+    "finish": {
+      "stardust": "별가루",
+      "prism": "프리즘"
+    },
+    "massBalance": {
+      "heavyPrimary": "무거운 주성",
+      "twinBinary": "쌍둥이 쌍성",
+      "equalTrio": "균등 삼체"
+    },
+    "fate": {
+      "eternalDance": "영원한 춤",
+      "ejection": "방출"
+    },
+    "allocation": {
+      "stellarSelection": "별빛 선정",
+      "anchoredSelection": "앵커링 선정",
+      "finalGesture": "최종 제스처",
+      "lastCstGesture": "최종 CST 제스처",
+      "enduranceChampion": "수호 챔피언",
+      "chronoWarrior": "시간의 전사"
+    },
+    "palette": {
+      "pattern": "{hue} {scheme}",
+      "hues": {
+        "amber": "앰버",
+        "aurora": "오로라",
+        "cerulean": "세룰리안",
+        "ember": "불씨",
+        "glacial": "빙하",
+        "jade": "비취",
+        "nebular": "성운",
+        "orchid": "난초",
+        "rose": "장미",
+        "sapphire": "사파이어",
+        "solar": "태양",
+        "violet": "제비꽃"
+      },
+      "schemes": {
+        "mono": "단색",
+        "split": "분할",
+        "analogous": "유사",
+        "triad": "삼색",
+        "complementary": "보색",
+        "tetrad": "사색"
+      }
+    },
+    "spectralClass": {
+      "O": {
+        "label": "O형",
+        "tone": "청색, 가장 뜨거운 분광형"
+      },
+      "B": {
+        "label": "B형",
+        "tone": "청백색"
+      },
+      "A": {
+        "label": "A형",
+        "tone": "백색"
+      },
+      "F": {
+        "label": "F형",
+        "tone": "황백색"
+      },
+      "G": {
+        "label": "G형",
+        "tone": "황색, 태양과 같은 분광형"
+      },
+      "K": {
+        "label": "K형",
+        "tone": "주황색"
+      },
+      "M": {
+        "label": "M형",
+        "tone": "적색, 가장 차가운 분광형"
+      }
+    }
+  },
+  "groups": {
+    "composition": "구도",
+    "physics": "궤도 물리",
+    "provenance": "출처",
+    "media": "미디어"
+  },
+  "card": {
+    "chaosAria": "카오스 {max}점 만점에 {value}점",
+    "chaosShort": "카오스 {value}",
+    "syzygiesAria": "삭망 {count}회",
+    "syzygiesShort": "삭망 {count}회",
+    "hueStripAria": "세 천체의 팔레트 색상",
+    "spectralAria": "분광형 {value}",
+    "fateAria": "운명: {value}",
+    "quickView": "빠른 보기",
+    "quickViewAria": "Cosmic Signature {id} 빠른 보기",
+    "traitsPending": "특성 대기 중",
+    "traitsPendingTooltip": "이 시그니처의 특성 메타데이터가 아직 게시되지 않았습니다.",
+    "cycleShort": "C{n}",
+    "cycleLong": "사이클 {n}",
+    "cycleTooltip": "사이클 {n}에서 각인됨",
+    "viewCycle": "사이클 {n} 보기"
+  },
+  "rarity": {
+    "rank": "#{rank}",
+    "rankLabel": "희귀도 순위",
+    "rankOf": "{total}개 중 {rank}위",
+    "tooltip": "희귀도 순위 {total}개 중 {rank}위: 이 시그니처의 특성이 컬렉션 전체에서 얼마나 드문지 나타냅니다. 가장 희귀한 특성: {trait}.",
+    "tooltipNoTrait": "희귀도 순위 {total}개 중 {rank}위: 이 시그니처의 특성이 컬렉션 전체에서 얼마나 드문지 나타냅니다.",
+    "rarest": "가장 희귀한 특성",
+    "share": "{total}개 중 {count}개가 공유",
+    "shareShort": "{count}/{total}",
+    "scoreLabel": "희귀도 점수",
+    "unavailable": "아직 순위 없음"
+  },
+  "facets": {
+    "title": "특성",
+    "toggle": "특성",
+    "toggleWithCount": "특성 · {count}",
+    "toggleAria": "특성별 필터",
+    "clearAll": "모두 지우기",
+    "clearFacet": "{trait} 지우기",
+    "activeAria": "적용된 특성 필터",
+    "removeFilter": "{trait}: {value} 필터 제거",
+    "optionAria": "{value}: NFT {count}개",
+    "chaosRange": "카오스 범위",
+    "chaosMin": "최소 카오스",
+    "chaosMax": "최대 카오스",
+    "chaosValue": "{min}~{max}",
+    "showMore": "{count}개 더 보기",
+    "showLess": "접기",
+    "sheetTitle": "특성별 필터",
+    "sheetDescription": "각 시그니처의 구도, 물리, 출처로 아카이브 범위를 좁힙니다.",
+    "loading": "특성을 인덱싱하는 중…",
+    "partial": "특성 인덱스를 아직 채우는 중 ({total}개 중 {indexed}개)",
+    "unavailable": "지금은 특성 필터를 사용할 수 없습니다.",
+    "retry": "다시 시도",
+    "matches": "일치하는 NFT {count}개"
+  },
+  "quickView": {
+    "title": "Cosmic Signature {id}",
+    "description": "이 시그니처의 특성, 궤도 물리, 출처입니다.",
+    "openDetail": "전체 페이지 열기",
+    "playSweep": "스펙트럼 스윕 재생",
+    "sweepNote": "미디어 서버에서 용량이 큰 영상을 스트리밍합니다",
+    "hideSweep": "작품으로 돌아가기",
+    "previous": "이전 시그니처",
+    "next": "다음 시그니처",
+    "close": "빠른 보기 닫기",
+    "imageAlt": "Cosmic Signature {id} 작품",
+    "loading": "특성을 불러오는 중…"
+  },
+  "panel": {
+    "title": "시그니처 특성",
+    "subtitle": "모든 특성은 온체인 시드에서 비롯됩니다. 같은 시드면 같은 픽셀입니다.",
+    "loading": "특성을 불러오는 중…",
+    "unavailable": "이 시그니처의 특성 메타데이터가 아직 게시되지 않았습니다. 메타데이터가 다시 생성되면 구도와 물리 정보가 여기에 표시됩니다.",
+    "error": "특성 메타데이터를 불러오지 못했습니다.",
+    "retry": "다시 시도",
+    "masses": "천체 질량",
+    "massAria": "천체 {index}: 질량 {value}",
+    "closestApproach": "최근접 거리",
+    "closestApproachValue": "천체 {a}, {b} 사이의 거리 {distance}",
+    "totalEnergy": "총 에너지",
+    "angularMomentum": "각운동량",
+    "equilateralness": "정삼각형 유사도",
+    "braid": "브레이드 워드",
+    "braidCrossings": "교차 {count}회",
+    "integrator": "적분기",
+    "steps": "{steps}단계",
+    "ejectionStep": "{step}단계에서 방출",
+    "horizonSteps": "시뮬레이션 범위 {steps}단계",
+    "dominantWavelength": "주파장",
+    "nanometres": "{value} nm",
+    "hueDispersion": "색상 분산",
+    "degrees": "{value}°",
+    "halation": "헐레이션",
+    "metadataVersion": "메타데이터 버전",
+    "image": "이미지",
+    "animation": "애니메이션",
+    "dimensions": "{width} × {height}",
+    "duration": "{seconds}초",
+    "sha256": "SHA-256",
+    "copyHash": "해시 복사",
+    "copied": "복사됨",
+    "webImage": "웹 이미지 (WebP)",
+    "sourceImage": "원본 이미지 (PNG)",
+    "hqVideo": "고화질 영상",
+    "spectralSweep": "스펙트럼 스윕",
+    "assetManifest": "에셋 매니페스트",
+    "traitSource": "특성 원본",
+    "external": "새 탭에서 파일을 엽니다"
+  },
+  "dna": {
+    "title": "컬렉션 DNA",
+    "subtitle": "아카이브가 주요 특성별로 어떻게 나뉘는지 보여 줍니다. 구간을 선택하면 갤러리가 필터링됩니다.",
+    "segmentAria": "{value}: NFT {count}개. 이 특성으로 필터링합니다.",
+    "legendCount": "{count}",
+    "loading": "컬렉션 특성을 읽는 중…"
+  }
+}

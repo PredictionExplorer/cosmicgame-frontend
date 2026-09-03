@@ -1,6 +1,7 @@
 import { formatUnits } from 'viem';
 
 import enFormats from '@/messages/en/formats.json';
+import koFormats from '@/messages/ko/formats.json';
 import ukFormats from '@/messages/uk/formats.json';
 import zhFormats from '@/messages/zh/formats.json';
 import zhHkFormats from '@/messages/zh-HK/formats.json';
@@ -54,6 +55,7 @@ const DURATION_UNITS: LocaleRecord<DurationUnitLabels> = {
   'zh-TW': zhTwFormats.durationCompact,
   'zh-HK': zhHkFormats.durationCompact,
   uk: ukFormats.durationCompact,
+  ko: koFormats.durationCompact,
 };
 
 /**
@@ -71,6 +73,18 @@ const numericDate = (locale: string, year: number, monthIndex: number, day: numb
   new Intl.DateTimeFormat(toIntlLocale(locale), {
     day: '2-digit',
     month: '2-digit',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, monthIndex, day)));
+
+/**
+ * `2026. 1. 5.` — the Korean numeric date (KS X ISO 8601 as Intl renders it
+ * for ko-KR: year first, unpadded, a dot and a space after each part).
+ */
+const koreanNumericDate = (year: number, monthIndex: number, day: number): string =>
+  new Intl.DateTimeFormat(toIntlLocale('ko'), {
+    day: 'numeric',
+    month: 'numeric',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(Date.UTC(year, monthIndex, day)));
@@ -160,6 +174,8 @@ const TIMESTAMP_DATETIME_FORMATS: LocaleRecord<(parts: TimestampParts) => string
   'zh-HK': chineseTimestamp,
   uk: ({ monthIndex, day, hours, minutes }) =>
     `${day} ${shortMonthLabel('uk', monthIndex)}, ${hours}:${minutes}`,
+  // "1월 5일 12:34": Sino-Korean month and day counters attach to the digits.
+  ko: ({ monthIndex, day, hours, minutes }) => `${monthIndex + 1}월 ${day}일 ${hours}:${minutes}`,
 };
 
 /**
@@ -343,6 +359,7 @@ const CALENDAR_DATE_LABEL_FORMATS: LocaleRecord<
   'zh-TW': chineseCalendarDate,
   'zh-HK': chineseCalendarDate,
   uk: (year, monthIndex, day) => numericDate('uk', year, monthIndex, day),
+  ko: koreanNumericDate,
 };
 
 /** Formats YYYYMMDD for chart axis / tooltip labels. */
@@ -387,6 +404,8 @@ const UTC_DATETIME_LABEL_FORMATS: LocaleRecord<
   'zh-HK': chineseUtcDateTime,
   uk: (year, monthIndex, day, hh, mm) =>
     `${numericDate('uk', year, monthIndex, day)} ${hh}:${mm} UTC`,
+  ko: (year, monthIndex, day, hh, mm) =>
+    `${koreanNumericDate(year, monthIndex, day)} ${hh}:${mm} UTC`,
 };
 
 const chineseUtcStamp = (date: Date): string =>
@@ -407,12 +426,17 @@ const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
     `${numericDate('uk', date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())} ${String(
       date.getUTCHours(),
     ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')} UTC`,
+  ko: (date) =>
+    `${koreanNumericDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())} ${String(
+      date.getUTCHours(),
+    ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')} UTC`,
 };
 
 /**
  * "Data updated at" stamp for SEO summaries: `en` keeps the ISO-style
  * "2026-08-28 08:13 UTC"; every Chinese locale renders
- * "2026年8月28日 08:13（UTC）"; `uk` renders "28.08.2026 08:13 UTC".
+ * "2026年8月28日 08:13（UTC）"; `uk` renders "28.08.2026 08:13 UTC"; `ko`
+ * renders "2026. 8. 28. 08:13 UTC".
  */
 export function formatUtcDateTimeStamp(date: Date, locale: string = 'en'): string {
   return pickByLocale(UTC_STAMP_FORMATS, locale)(date);

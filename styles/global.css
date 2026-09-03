@@ -96,6 +96,19 @@ html:lang(zh-HK) {
 }
 
 /*
+ * Korean: Hangul falls through to the Korean cut of Noto Sans CJK the same
+ * way Chinese falls through to its regional cut; Latin tokens keep the Latin
+ * faces. `keep-all` stops the browser from breaking a Korean word between
+ * syllables (the CJK default), which is the single most visible typographic
+ * defect in Korean web copy; long unbroken tokens (addresses, hashes) already
+ * wrap or truncate through their own utilities.
+ */
+html:lang(ko) {
+  --cjk-font-stack: var(--font-noto-kr), 'Apple SD Gothic Neo', 'Malgun Gothic';
+  word-break: keep-all;
+}
+
+/*
  * Ukrainian locale typography (docs/i18n/README.md §5). Clash Display has no
  * Cyrillic glyphs, so the display stack switches to the Onest companion face
  * as a whole — appending Onest after Clash in the shared stack would set Latin
@@ -203,32 +216,49 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
-   * Chinese typography (docs/i18n/README.md §5), shared by every Chinese
-   * locale: `:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike. The Latin
-   * display face (Clash Display) has no CJK glyphs, so Chinese headings fall
-   * through to the locale's Noto Sans cut. CJK must never inherit Latin
-   * display tracking, and the lighter display weights read too thin in CJK
-   * strokes.
+   * CJK typography (docs/i18n/README.md §5), shared by every Chinese locale
+   * (`:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike) and by Korean. The
+   * Latin display face (Clash Display) has no CJK or Hangul glyphs, so these
+   * headings fall through to the locale's Noto Sans cut. CJK must never
+   * inherit Latin display tracking, and the lighter display weights read too
+   * thin in CJK strokes.
    */
   html:lang(zh) .type-display,
   html:lang(zh) h1,
   html:lang(zh) h2,
-  html:lang(zh) h3 {
+  html:lang(zh) h3,
+  html:lang(ko) .type-display,
+  html:lang(ko) h1,
+  html:lang(ko) h2,
+  html:lang(ko) h3 {
     letter-spacing: 0 !important;
     font-weight: 700;
   }
 
-  /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese
-     document, translated nav/table/status copy must keep natural CJK spacing. */
-  html:lang(zh) [class*='tracking-'] {
+  /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese or
+     Korean document, translated nav/table/status copy must keep natural
+     CJK spacing. */
+  html:lang(zh) [class*='tracking-'],
+  html:lang(ko) [class*='tracking-'] {
     letter-spacing: 0 !important;
   }
 
-  /* Keep Latin identifiers monospaced while routing CJK glyphs through the
-     project font instead of an OS-dependent monospace fallback. */
-  html:lang(zh) .font-mono {
+  /* Keep Latin identifiers monospaced while routing CJK and Hangul glyphs
+     through the project font instead of an OS-dependent monospace fallback. */
+  html:lang(zh) .font-mono,
+  html:lang(ko) .font-mono {
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, var(--cjk-font-stack), monospace !important;
+  }
+
+  /*
+   * `keep-all` on the Korean document must not defeat the address/hash
+   * wrapping below: `anywhere` on .font-mono still applies, but keep-all
+   * forbids the break inside the token, so monospace tokens opt back into
+   * per-character breaking.
+   */
+  html:lang(ko) .font-mono {
+    word-break: break-all;
   }
 
   button,

@@ -1,0 +1,278 @@
+{
+  "formats": {
+    "cycle": "사이클 {cycle}",
+    "cycleHash": "사이클 {cycle}",
+    "token": "토큰 #{token}",
+    "cosmicSignatureToken": "Cosmic Signature #{token}"
+  },
+  "recipients": {
+    "header": {
+      "eyebrow": "배분 · 퍼포먼스 사이클",
+      "title": "배분 수령자",
+      "subtitle": "마감된 모든 퍼포먼스 사이클의 배분 수령자와 사이클 통계, 배분 내역을 살펴볼 수 있습니다.",
+      "scope": "마감된 사이클 기록만 포함",
+      "scopeTooltip": "이 페이지는 사이클 API가 제공하는 마감된 퍼포먼스 사이클만 집계합니다. 진행 중인 사이클과 이와 무관한 배분 회수 기록은 합계에 포함되지 않습니다."
+    },
+    "intro": "퍼포먼스 사이클이 마감되면 최종 제스처를 남긴 참여자가 시그니처 배분을 회수합니다. 시그니처 배분은 사이클 준비금의 {percentage}%, 1,000 CST, 그리고 고유한 Cosmic Signature NFT 하나로 구성됩니다. 그 밖의 배분은 시간의 전사, 별빛 선정, 앵커링 지급, 공공재, 누적 준비금 경로로 이어집니다.",
+    "reserveSplit": {
+      "label": "사이클 준비금 배분 비율",
+      "tooltip": "마감된 사이클의 ETH 준비금이 프로토콜의 각 배분 경로로 나뉘는 비율입니다.",
+      "tracks": {
+        "signature": {
+          "label": "시그니처",
+          "tooltip": "시그니처 배분은 핵심 ETH 배분으로, 최종 제스처를 남긴 참여자가 회수합니다."
+        },
+        "chrono": {
+          "label": "시간의 전사",
+          "tooltip": "시간의 전사 배분은 자신의 제스처로 사이클을 가장 오랜 시간 이끈 참여자에게 돌아갑니다."
+        },
+        "stellar": {
+          "label": "별빛 선정 ETH",
+          "tooltip": "별빛 선정 수령자에게 돌아가는 ETH입니다. 제스처 한 건마다 별빛 선정 자격이 하나씩 기록됩니다."
+        },
+        "anchor": {
+          "label": "앵커링",
+          "tooltip": "프로토콜에 Cosmic Signature NFT를 앵커링한 지갑에 지급되는 ETH입니다. RandomWalk NFT 앵커링에는 ETH 대신 앵커링 NFT 별빛 선정 자격이 주어집니다."
+        },
+        "publicGoods": {
+          "label": "공공재",
+          "tooltip": "사이클에서 지정된 공공재 수령처로 전달되는 ETH입니다. 현재 수령처는 Protocol Guild입니다."
+        },
+        "nextCycle": {
+          "label": "다음 사이클",
+          "tooltip": "배분이 모두 이루어진 뒤 남은 사이클 준비금은 다음 퍼포먼스 사이클로 이월됩니다."
+        }
+      }
+    },
+    "stats": {
+      "totalCycles": {
+        "label": "총 사이클 수",
+        "tooltip": "지금까지 마감된 퍼포먼스 사이클의 총 개수를 나타냅니다."
+      },
+      "totalEth": {
+        "label": "총 배분 ETH",
+        "tooltip": "모든 사이클에서 시그니처 배분으로 전달된 ETH의 합계입니다."
+      },
+      "totalGestures": {
+        "label": "총 제스처 수",
+        "tooltip": "마감된 모든 사이클에서 남겨진 제스처의 누적 합계입니다."
+      },
+      "uniqueRecipients": {
+        "label": "고유 수령자",
+        "tooltip": "시그니처 배분을 회수한 서로 다른 지갑 주소의 개수를 나타냅니다."
+      }
+    }
+  },
+  "details": {
+    "copy": {
+      "addressAria": "{address} 주소 복사",
+      "addressSuccess": "주소가 클립보드에 복사되었습니다"
+    },
+    "navigation": {
+      "previousAria": "이전 사이클",
+      "nextAria": "다음 사이클"
+    },
+    "recipientCard": {
+      "recipient": "수령자",
+      "none": "없음",
+      "nftToken": "NFT 토큰"
+    },
+    "share": {
+      "summary": "Cosmic Signature 사이클 {cycle}\n시그니처 배분: {amount} ETH\n수령자: {recipient}\n제스처 수: {gestures}\n{url}",
+      "success": "사이클 요약이 클립보드에 복사되었습니다"
+    },
+    "invalid": {
+      "title": "유효하지 않은 사이클 번호",
+      "help": "사이클 번호는 양의 정수여야 합니다.",
+      "back": "배분 수령자로 돌아가기"
+    },
+    "notFound": {
+      "title": "배분 데이터를 찾을 수 없습니다",
+      "help": "사이클 {cycle} 데이터가 없습니다. 아직 마감되지 않은 사이클일 수 있습니다.",
+      "back": "배분 수령자로 돌아가기"
+    },
+    "error": {
+      "title": "이 사이클을 불러오지 못했습니다",
+      "message": "사이클 {cycle} 데이터를 불러오지 못했습니다. 다시 시도하거나 수령자 목록으로 돌아가 주세요."
+    },
+    "breadcrumbs": {
+      "recipients": "배분 수령자"
+    },
+    "hero": {
+      "aria": "사이클 개요",
+      "amountTooltip": "카운트다운이 0이 된 순간 최종 제스처를 남긴 참여자가 회수한 ETH 총액입니다.",
+      "recipient": "수령자",
+      "nft": "NFT",
+      "nftTooltip": "이 Cosmic Signature NFT를 갤러리에서 볼 수 있습니다.",
+      "finalized": "{dateTime}에 마감됨",
+      "viewTransaction": "트랜잭션 보기",
+      "share": "공유",
+      "shareAria": "사이클 요약 공유"
+    },
+    "recipientSection": {
+      "aria": "사이클 수령자",
+      "title": "사이클 수령자",
+      "tooltip": "이 사이클의 모든 배분 수령자입니다. 시그니처 배분은 최종 제스처를 남긴 참여자에게 돌아가고, 특별한 역할을 맡은 참여자는 추가 배분을 받습니다.",
+      "labels": {
+        "ethAllocation": "ETH 배분",
+        "recognitionCst": "공로 CST",
+        "cosmicSignatureNft": "Cosmic Signature NFT"
+      },
+      "cards": {
+        "signature": {
+          "title": "시그니처 배분",
+          "tooltip": "카운트다운이 0이 된 순간 최종 제스처를 남긴 참여자입니다. ETH 시그니처 배분과 1,000 CST, Cosmic Signature NFT를 회수합니다."
+        },
+        "chrono": {
+          "title": "시간의 전사",
+          "tooltip": "수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자입니다. ETH와 공로 CST, Cosmic Signature NFT를 회수합니다."
+        },
+        "endurance": {
+          "title": "수호 챔피언",
+          "tooltip": "최근 제스처 자리를 가장 오랫동안 끊김 없이 지킨 참여자입니다. 1,000 CST의 공로 CST 각인과 Cosmic Signature NFT를 받습니다."
+        },
+        "finalCst": {
+          "title": "최종 CST 제스처",
+          "tooltip": "이 사이클에서 최종 CST 제스처를 남긴 참여자입니다. 1,000 CST의 공로 CST 각인과 Cosmic Signature NFT를 받습니다."
+        }
+      }
+    },
+    "distribution": {
+      "aria": "배분 구성",
+      "title": "배분 구성",
+      "tooltip": "이 사이클의 준비금이 각 배분 경로로 어떻게 나뉘었는지 보여 주는 도표입니다.",
+      "segments": {
+        "signature": {
+          "label": "시그니처 배분",
+          "tooltip": "최종 제스처를 남긴 참여자가 회수한 {amount} ETH"
+        },
+        "publicGoods": {
+          "label": "공공재",
+          "tooltip": "공공재 수령처 (Protocol Guild)로 전달된 {amount} ETH"
+        },
+        "anchor": {
+          "label": "앵커링 지급",
+          "tooltip": "각 지갑이 앵커링한 Cosmic Signature NFT 수에 비례해 지급된 {amount} ETH"
+        },
+        "stellar": {
+          "label": "별빛 선정",
+          "tooltip": "별빛 선정 풀에 배분된 {amount} ETH"
+        }
+      }
+    },
+    "statistics": {
+      "aria": "사이클 통계",
+      "title": "사이클 통계",
+      "tooltip": "이 사이클의 활동과 배분 구성을 요약한 핵심 지표입니다.",
+      "cards": {
+        "signatureEth": {
+          "label": "시그니처 배분 ETH",
+          "tooltip": "이 사이클의 최종 제스처를 남긴 참여자가 회수한 시그니처 배분의 ETH 부분입니다."
+        },
+        "publicGoods": {
+          "label": "공공재",
+          "tooltip": "이 사이클에서 공공재 수령처 (Protocol Guild)로 전달된 금액입니다."
+        },
+        "anchor": {
+          "label": "앵커링 지급",
+          "tooltip": "이 사이클에서 Cosmic Signature NFT를 앵커링한 참여자에게 지급된 ETH 총액입니다."
+        },
+        "stellar": {
+          "label": "별빛 선정 풀",
+          "tooltip": "이 사이클 동안 별빛 선정 풀에 배분된 ETH 총액입니다."
+        },
+        "gestures": {
+          "label": "총 제스처 수",
+          "tooltip": "이 사이클 동안 남겨진 모든 제스처의 합계입니다."
+        },
+        "attachedNfts": {
+          "label": "첨부된 NFT",
+          "tooltip": "이 사이클 동안 참여자가 제스처에 첨부한 NFT의 개수를 나타냅니다."
+        },
+        "anchoredTokens": {
+          "label": "앵커링된 토큰",
+          "tooltip": "이 사이클 기준으로 프로토콜에 앵커링된 NFT 토큰의 개수를 나타냅니다."
+        },
+        "uniqueAnchorHolders": {
+          "label": "고유 앵커링 보유자",
+          "tooltip": "이 사이클 동안 토큰을 앵커링해 둔 서로 다른 주소의 개수를 나타냅니다."
+        },
+        "totalContributed": {
+          "label": "총 기여액",
+          "tooltip": "이 사이클 동안 제스처에 첨부된 모든 ERC-20 토큰 기여를 합한 가치입니다."
+        }
+      }
+    },
+    "ledger": {
+      "aria": "이 사이클의 모든 배분",
+      "title": "이 사이클의 모든 배분",
+      "tooltip": "이 사이클의 모든 배분 기록을 담은 전체 원장입니다. 시그니처 배분, 시간의 전사, 수호 챔피언, 별빛 선정, 앵커링 지급, 그리고 이와 관련된 NFT/CST 배분이 포함됩니다.",
+      "empty": "아직 배분 기록이 없습니다."
+    },
+    "data": {
+      "divider": "상세 데이터",
+      "aria": "사이클 데이터",
+      "tabs": {
+        "gestures": "제스처 내역",
+        "endurance": "수호 챔피언",
+        "stellar": "별빛 선정",
+        "anchoring": "앵커링 지급",
+        "contributions": "기여"
+      },
+      "empty": {
+        "gestures": "이 사이클에서는 제스처가 없었습니다.",
+        "endurance": "이 사이클의 수호 챔피언 데이터가 없습니다.",
+        "stellar": "이 사이클에는 별빛 선정 수령자가 없습니다.",
+        "anchoring": "이 사이클에서는 앵커링 지급이 없었습니다.",
+        "nfts": "이 사이클에서는 제스처에 첨부된 NFT가 없습니다.",
+        "erc20": "이 사이클에서는 제스처에 첨부된 ERC-20 토큰이 없습니다."
+      },
+      "contributions": {
+        "nfts": "첨부된 NFT",
+        "nftsTooltip": "이 사이클 동안 제스처에 첨부된 NFT로, 최종 제스처를 남긴 참여자에게 전달됩니다.",
+        "erc20": "첨부된 ERC-20 토큰",
+        "erc20Tooltip": "참여자가 제스처에 첨부한 ERC-20 토큰으로, 시그니처 배분 수령자에게 전달됩니다."
+      }
+    }
+  },
+  "finalized": {
+    "home": "홈",
+    "title": "배분 마감 완료",
+    "invalid": {
+      "subtitle": "이 페이지를 열려면 URL에 유효한 사이클 번호가 필요합니다.",
+      "missingParameter": "<code>cycle</code> 쿼리 매개변수가 없거나 잘못되었습니다.",
+      "guidance": "마감된 사이클은 <allocations>내 배분</allocations>에서 확인할 수 있습니다."
+    },
+    "loading": {
+      "subtitle": "사이클 {cycle} 불러오는 중…",
+      "status": "불러오는 중…"
+    },
+    "pending": {
+      "successTitle": "이 사이클의 마감을 완료했습니다",
+      "defaultTitle": "배분 마감 완료",
+      "successSubtitle": "사이클 {cycle} 마감이 온체인에 기록되었습니다.",
+      "cycleBreadcrumb": "사이클 {cycle}",
+      "finalizedBreadcrumb": "마감됨",
+      "breakdown": "시그니처 배분 구성, 그 밖의 배분, 첨부된 토큰 등 배분 상세는 이 사이클의 배분 상세 페이지에서 볼 수 있습니다.",
+      "viewDetails": "사이클 {cycle} 배분 상세 보기",
+      "review": "<allocations>내 배분</allocations>에서도 전체 내역을 확인할 수 있습니다.",
+      "empty": "배분 정보가 없습니다."
+    },
+    "result": {
+      "title": "축하합니다. 사이클 {cycle} 시그니처 배분을 받았습니다.",
+      "allocationBreadcrumb": "배분",
+      "retrievedBreadcrumb": "회수됨",
+      "sectionTitle": "사이클 {cycle} 배분",
+      "sectionDescription": "이 사이클의 시그니처 배분 구성 요약입니다.",
+      "ethAllocation": "ETH 배분",
+      "nftId": "Cosmic Signature NFT ID",
+      "attachedTokensLabel": "첨부된 NFT (ERC-721)",
+      "attachedTokens": "{count, plural, other {첨부된 NFT #개}} (ERC-721)"
+    },
+    "next": {
+      "title": "다음 단계",
+      "description": "별빛 선정으로 별도의 배분이, 앵커링으로 별도의 앵커링 지급이 생길 수 있습니다.",
+      "body": "별빛 선정에서 추가 배분이 있을 수도 있습니다. 배분은 <allocations>내 배분</allocations> 페이지에서, 앵커링 지급은 <anchors>내 앵커링</anchors> 페이지에서 확인할 수 있습니다."
+    }
+  }
+}

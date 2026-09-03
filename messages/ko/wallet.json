@@ -1,0 +1,38 @@
+{
+  "connect": {
+    "button": "지갑 연결"
+  },
+  "groups": {
+    "popular": "인기",
+    "more": "기타"
+  },
+  "balances": {
+    "eth": "ETH",
+    "cst": "CST",
+    "cosmicNfts": "Cosmic NFT",
+    "rwlkNfts": "RWLK NFT",
+    "anchoredCst": "앵커링된 Cosmic Signature NFT",
+    "anchoredRwlk": "앵커링된 RWLK NFT"
+  },
+  "labels": {
+    "loading": "불러오는 중…",
+    "balancesHeading": "잔액",
+    "anchoredHeading": "앵커링",
+    "nftCount": "{count}"
+  },
+  "account": {
+    "heading": "계정",
+    "myDashboard": "내 대시보드",
+    "myRewards": "내 배분",
+    "myNfts": "내 NFT",
+    "transferCst": "CST 전송",
+    "addCstToMetaMask": "MetaMask에 CST 추가",
+    "addingCstToMetaMask": "MetaMask에 CST 추가 중…",
+    "myAnchors": "내 앵커링",
+    "winningHistory": "내 배분 내역"
+  },
+  "accessibility": {
+    "copyAddress": "지갑 주소 복사",
+    "addressCopied": "지갑 주소 복사됨"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "timer": {
+    "cycle": {
+      "current": "현재 사이클",
+      "numbered": "사이클 {number}",
+      "generic": "퍼포먼스 사이클"
+    },
+    "phases": {
+      "loading": {
+        "title": "사이클 지평선을 동기화하는 중",
+        "body": "카운트다운을 표시하기 전에 실시간 프로토콜 시계를 읽고 있습니다."
+      },
+      "openingSoon": {
+        "title": "{cycle} 시작이 다가옵니다",
+        "body": "다음 사이클이 시작을 준비하고 있습니다. 이 카운트다운이 0이 되면 제스처를 남길 수 있습니다."
+      },
+      "waitingFirstGesture": {
+        "title": "{cycle}, 첫 제스처를 기다립니다",
+        "body": "첫 제스처가 사이클 마감 카운트다운에 불을 붙이고, 다음 시그니처를 빚어내기 시작합니다."
+      },
+      "approach": {
+        "title": "{cycle} 마감까지",
+        "body": "사이클이 진행 중입니다. 모든 제스처가 시그니처를 빚어내고 마감 카운트다운을 연장할 수 있습니다."
+      },
+      "finalHour": {
+        "title": "{cycle}, 마지막 한 시간에 들어섭니다",
+        "body": "새 제스처 하나하나가 지평선을 뒤로 밀고, 변해 가는 시그니처에 흔적을 하나 더 남길 수 있습니다."
+      },
+      "nearHorizon": {
+        "title": "{cycle}, 지평선에 다가섭니다",
+        "body": "사이클 마감 시각이 거의 다가왔습니다. 다음 몇 순간이 최종 형태를 결정합니다."
+      },
+      "ready": {
+        "title": "{cycle}, 마감할 준비가 되었습니다",
+        "body": "지평선이 닫혔습니다. 프로토콜이 이 사이클을 최종 시그니처로 바꿀 준비를 마쳤습니다."
+      },
+      "unavailable": {
+        "title": "실시간 사이클 시계에 연결할 수 없습니다",
+        "body": "이 페이지에서 프로토콜 시계에 연결하지 못했습니다. 최신 사이클 상태는 앱에서 확인할 수 있습니다."
+      },
+      "live": {
+        "title": "{cycle} 마감까지",
+        "body": "앱에 표시되는 것과 같은 실시간 사이클 마감 시각입니다. 모든 제스처가 시그니처를 빚어내고 지평선을 뒤로 밀 수 있습니다."
+      }
+    },
+    "staticClock": {
+      "waitingFirstGesture": "첫 제스처 대기 중",
+      "ready": "00:00",
+      "unavailable": "시계 연결 불가",
+      "syncing": "동기화 중"
+    },
+    "liveClock": "실시간 사이클 시계",
+    "gestureCount": "{count, plural, other {제스처 #개}}",
+    "sameClock": "앱과 같은 시계",
+    "status": {
+      "ready": "마감 준비 완료",
+      "openingSoon": "사이클 시작 카운트다운",
+      "waitingFirstGesture": "열려 있으며 첫 제스처를 기다리는 중",
+      "synchronized": "프로토콜 시간에 동기화된 카운트다운"
+    },
+    "openLiveCycle": "실시간 사이클 열기",
+    "viewCstPool": "GeckoTerminal의 CST 풀",
+    "eventHorizon": "사건의 지평선",
+    "countdownAria": "{label}: {duration}",
+    "durationPart": "{value}{unit}",
+    "durationSeparator": " "
+  }
+}

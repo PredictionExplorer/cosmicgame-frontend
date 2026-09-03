@@ -22,6 +22,7 @@ export const SCRIPT_PATTERNS: Record<TranslatedLocale, RegExp> = {
   'zh-TW': /[\u3400-\u9fff]/,
   'zh-HK': /[\u3400-\u9fff]/,
   uk: /[\u0400-\u04ff]/,
+  ko: /[\uac00-\ud7a3]/,
 };
 
 /**
@@ -53,6 +54,14 @@ export const DURATION_NOUNS: LocaleRecord<DurationNouns> = {
     hours: 'годин[аиу]?',
     weeks: 'тиж(?:день|н[іяю]|нів|нями|нях|нем)',
     days: 'д(?:ень|н[іяю]|нів|нями|нях|нем)',
+  },
+  ko: {
+    // Sino-Korean counters attach to the digit: 48시간, 5주, 1일.
+    hours: '시간',
+    weeks: '주',
+    days: '일',
+    // 8월 15일 is a calendar date (August 15), not a 15-day duration.
+    notAfter: '월\\s?',
   },
 };
 
@@ -113,6 +122,16 @@ export const LLMS_SECTIONS: Record<TranslatedLocale, LlmsSectionExpectation> = {
     // Ukrainian reader parses as a decimal point.
     forbiddenNumberFormat: /\d,\d{3} CST[^\n]*[\u0400-\u04ff]/,
   },
+  ko: {
+    heading: '한국어',
+    phrases: [
+      '절차적 온체인 아트 프로토콜',
+      '48시간',
+      `Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개`,
+      '각 RandomWalk NFT',
+      'COSMIC 암 돌연변이 데이터베이스',
+    ],
+  },
 };
 
 /**
@@ -125,4 +144,5 @@ export const NEGOTIATION_PROBES: Record<TranslatedLocale, readonly string[]> = {
   'zh-TW': ['zh-TW,zh;q=0.9,en;q=0.8', 'zh-Hant', 'zh-Hant-TW'],
   'zh-HK': ['zh-HK,zh-TW;q=0.9,zh;q=0.8', 'zh-Hant-HK', 'zh-Hant-MO', 'zh-MO', 'yue', 'yue-HK'],
   uk: ['uk-UA,uk;q=0.9', 'uk'],
+  ko: ['ko-KR,ko;q=0.9,en-US;q=0.8', 'ko', 'ko-KP'],
 };

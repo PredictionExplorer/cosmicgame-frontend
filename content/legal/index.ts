@@ -1,26 +1,31 @@
 import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
 import { auditsCopyEn } from './AuditsContent.en';
+import { auditsCopyKo } from './AuditsContent.ko';
 import { auditsCopyUk } from './AuditsContent.uk';
 import { auditsCopyZh } from './AuditsContent.zh';
 import { auditsCopyZhHk } from './AuditsContent.zh-HK';
 import { auditsCopyZhTw } from './AuditsContent.zh-TW';
 import { privacyCopyEn } from './PrivacyContent.en';
+import { privacyCopyKo } from './PrivacyContent.ko';
 import { privacyCopyUk } from './PrivacyContent.uk';
 import { privacyCopyZh } from './PrivacyContent.zh';
 import { privacyCopyZhHk } from './PrivacyContent.zh-HK';
 import { privacyCopyZhTw } from './PrivacyContent.zh-TW';
 import { riskCopyEn } from './RiskContent.en';
+import { riskCopyKo } from './RiskContent.ko';
 import { riskCopyUk } from './RiskContent.uk';
 import { riskCopyZh } from './RiskContent.zh';
 import { riskCopyZhHk } from './RiskContent.zh-HK';
 import { riskCopyZhTw } from './RiskContent.zh-TW';
 import { securityCopyEn } from './SecurityContent.en';
+import { securityCopyKo } from './SecurityContent.ko';
 import { securityCopyUk } from './SecurityContent.uk';
 import { securityCopyZh } from './SecurityContent.zh';
 import { securityCopyZhHk } from './SecurityContent.zh-HK';
 import { securityCopyZhTw } from './SecurityContent.zh-TW';
 import { termsCopyEn } from './TermsContent.en';
+import { termsCopyKo } from './TermsContent.ko';
 import { termsCopyUk } from './TermsContent.uk';
 import { termsCopyZh } from './TermsContent.zh';
 import { termsCopyZhHk } from './TermsContent.zh-HK';
@@ -42,6 +47,7 @@ const TERMS_COPY: LocaleRecord<TermsCopy> = {
   'zh-TW': termsCopyZhTw,
   'zh-HK': termsCopyZhHk,
   uk: termsCopyUk,
+  ko: termsCopyKo,
 };
 const PRIVACY_COPY: LocaleRecord<PrivacyCopy> = {
   en: privacyCopyEn,
@@ -49,6 +55,7 @@ const PRIVACY_COPY: LocaleRecord<PrivacyCopy> = {
   'zh-TW': privacyCopyZhTw,
   'zh-HK': privacyCopyZhHk,
   uk: privacyCopyUk,
+  ko: privacyCopyKo,
 };
 const AUDITS_COPY: LocaleRecord<TrustPageCopy> = {
   en: auditsCopyEn,
@@ -56,6 +63,7 @@ const AUDITS_COPY: LocaleRecord<TrustPageCopy> = {
   'zh-TW': auditsCopyZhTw,
   'zh-HK': auditsCopyZhHk,
   uk: auditsCopyUk,
+  ko: auditsCopyKo,
 };
 const SECURITY_COPY: LocaleRecord<TrustPageCopy> = {
   en: securityCopyEn,
@@ -63,6 +71,7 @@ const SECURITY_COPY: LocaleRecord<TrustPageCopy> = {
   'zh-TW': securityCopyZhTw,
   'zh-HK': securityCopyZhHk,
   uk: securityCopyUk,
+  ko: securityCopyKo,
 };
 const RISK_COPY: LocaleRecord<TrustPageCopy> = {
   en: riskCopyEn,
@@ -70,6 +79,7 @@ const RISK_COPY: LocaleRecord<TrustPageCopy> = {
   'zh-TW': riskCopyZhTw,
   'zh-HK': riskCopyZhHk,
   uk: riskCopyUk,
+  ko: riskCopyKo,
 };
 
 export function getTermsCopy(locale: string): TermsCopy {

@@ -45,8 +45,16 @@ const chineseRelativeTime = (units: Record<RelativeTimeUnit, string>, justNow: s
  * `en` keeps the historical forms ("2 months ago", "1 year ago", "just now");
  * the Chinese locales follow their style guides' §4 with CJK–Latin spacing.
  * `uk` delegates to `Intl.RelativeTimeFormat`, which owns the four-way plural
- * agreement ("1 хвилину", "2 хвилини", "5 хвилин тому").
+ * agreement ("1 хвилину", "2 хвилини", "5 хвилин тому"); so does `ko`, whose
+ * counters attach to the digit ("2시간 전", "3개월 전").
  */
+const intlRelativeTime = (locale: string) => ({
+  ago: (count: number, unit: RelativeTimeUnit) =>
+    new Intl.RelativeTimeFormat(getLocaleConfig(locale).intlLocale, { numeric: 'always' }).format(
+      -count,
+      unit,
+    ),
+});
 const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
   en: {
     justNow: 'just now',
@@ -55,14 +63,8 @@ const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
   zh: chineseRelativeTime(ZH_RELATIVE_UNITS, '刚刚'),
   'zh-TW': chineseRelativeTime(ZH_HANT_RELATIVE_UNITS, '剛剛'),
   'zh-HK': chineseRelativeTime(ZH_HANT_RELATIVE_UNITS, '剛剛'),
-  uk: {
-    justNow: 'щойно',
-    ago: (count, unit) =>
-      new Intl.RelativeTimeFormat(getLocaleConfig('uk').intlLocale, { numeric: 'always' }).format(
-        -count,
-        unit,
-      ),
-  },
+  uk: { justNow: 'щойно', ...intlRelativeTime('uk') },
+  ko: { justNow: '방금', ...intlRelativeTime('ko') },
 };
 
 /** Converts a Unix timestamp (seconds) to a human-readable relative time string. */
@@ -98,6 +100,7 @@ const ISO_DATE_LABEL_FORMATS: LocaleRecord<(isoDate: string) => string> = {
   'zh-TW': longIsoDateLabel('zh-TW'),
   'zh-HK': longIsoDateLabel('zh-HK'),
   uk: longIsoDateLabel('uk'),
+  ko: longIsoDateLabel('ko'),
 };
 
 /** Locale-appropriate display form of an ISO `YYYY-MM-DD` date string. */

@@ -26,6 +26,7 @@ import { dirname, join, resolve } from 'node:path';
 
 import {
   whitePaperContentEn,
+  whitePaperContentKo,
   whitePaperContentUk,
   whitePaperContentZh,
   whitePaperContentZhHk,
@@ -128,6 +129,23 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
       '\\setsansfont{Helvetica Neue}',
       '\\setmonofont[Scale=MatchLowercase]{Menlo}',
       '\\renewcommand{\\abstractname}{\u0410\u043d\u043e\u0442\u0430\u0446\u0456\u044f}',
+    ],
+  },
+  ko: {
+    content: whitePaperContentKo,
+    dateDisplay: '2026\ub144 8\uc6d4',
+    tocTitle: '\ubaa9\ucc28',
+    headerIncludes: [
+      ...BASE_HEADER_INCLUDES,
+      // macOS system Korean fonts through xeCJK. Korean separates words with
+      // spaces, which xeCJK must be told to keep (CJKspace); its punctuation
+      // handling stays plain because Korean uses ASCII marks.
+      '\\usepackage{xeCJK}',
+      '\\xeCJKsetup{CJKspace=true, PunctStyle=plain}',
+      '\\setCJKmainfont{AppleMyungjo}',
+      '\\setCJKsansfont{Apple SD Gothic Neo}',
+      '\\setCJKmonofont{Apple SD Gothic Neo}',
+      '\\renewcommand{\\abstractname}{\uc694\uc57d}',
     ],
   },
 };

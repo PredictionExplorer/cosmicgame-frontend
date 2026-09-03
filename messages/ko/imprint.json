@@ -1,0 +1,32 @@
+{
+  "breadcrumbs": {
+    "home": "홈",
+    "imprint": "각인"
+  },
+  "page": {
+    "title": "Random Walk NFT 각인",
+    "subtitle": "Random Walk NFT를 보유하면 ETH 제스처 비용이 50% 할인됩니다",
+    "description": "RandomWalk NFT는 보유자에게 Cosmic Signature 프로토콜 안에서 전략적 이점을 주는 고유한 디지털 소장품입니다. ETH 제스처에 RandomWalk NFT를 첨부하면 ETH 제스처 비용이 50% 할인되며, 사이클 후반에는 이 차이가 크게 다가옵니다. 각 RandomWalk NFT는 이 할인에 한 번만 쓸 수 있으므로, 가장 효과적인 순간을 골라 사용하는 것이 좋습니다. 이 제스처 첨부는 앵커링 NFT 별빛 선정 자격을 위한 RandomWalk NFT 앵커링과는 별개입니다.",
+    "currentCost": "현재 각인 비용",
+    "submit": "지금 각인하기",
+    "myNfts": "내 Random Walk NFT"
+  },
+  "seo": {
+    "eyebrow": "RandomWalk NFT 각인 · Arbitrum",
+    "heading": "RandomWalk NFT 각인",
+    "description": "Cosmic Signature 참여를 위해 RandomWalk NFT를 각인합니다. 사용하지 않은 RandomWalk NFT는 ETH 제스처 한 건에 첨부해 제스처 비용을 50% 할인받을 수 있습니다.",
+    "source": "Cosmic Signature 공개 프로토콜 구성 API",
+    "lastUpdated": "최종 업데이트: {date}. 데이터 출처: {source}. 아래의 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색 엔진과 AI 크롤러를 위해 초기 HTML에 포함됩니다.",
+    "relatedAria": "RandomWalk NFT 각인 관련 페이지",
+    "cards": {
+      "cycle": "현재 퍼포먼스 사이클",
+      "cost": "현재 ETH 제스처 비용",
+      "discount": "RandomWalk 할인"
+    },
+    "links": {
+      "cycle": "현재 퍼포먼스 사이클 열기",
+      "learn": "제스처 작동 원리 알아보기",
+      "used": "사용된 RandomWalk NFT 보기"
+    }
+  }
+}

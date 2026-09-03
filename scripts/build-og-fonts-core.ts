@@ -31,6 +31,7 @@ export const OG_FONT_SOURCES: Readonly<Record<TranslatedLocale, FontSource | nul
   'zh-TW': { path: 'ofl/notosanstc/NotoSansTC[wght].ttf' },
   'zh-HK': { path: 'ofl/notosanshk/NotoSansHK[wght].ttf' },
   uk: { path: 'ofl/onest/Onest[wght].ttf' },
+  ko: { path: 'ofl/notosanskr/NotoSansKR[wght].ttf' },
 };
 
 /** Punctuation the card layout may render around CJK copy. */

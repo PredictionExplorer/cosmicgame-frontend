@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import enErrors from '@/messages/en/errors.json';
+import koErrors from '@/messages/ko/errors.json';
 import ukErrors from '@/messages/uk/errors.json';
 import zhErrors from '@/messages/zh/errors.json';
 import zhHkErrors from '@/messages/zh-HK/errors.json';
@@ -20,6 +21,7 @@ const ERROR_CATALOGS: LocaleRecord<typeof enErrors> = {
   'zh-TW': zhTwErrors,
   'zh-HK': zhHkErrors,
   uk: ukErrors,
+  ko: koErrors,
 };
 
 /**

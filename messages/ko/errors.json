@@ -1,0 +1,57 @@
+{
+  "generic": "별지도 밖으로 벗어났습니다. 다시 시도해 주세요.",
+  "networkOffline": "네트워크에 연결되어 있지 않습니다. 다시 연결한 뒤 계속해 주세요.",
+  "walletNotConnected": "제스처를 남기려면 Web3 지갑을 연결해 주세요.",
+  "insufficientEth": "이 제스처에 필요한 ETH가 지갑에 부족합니다.",
+  "cycleClosed": "이 사이클은 마감되었습니다. 다음 퍼포먼스 사이클이 곧 시작됩니다.",
+  "state": {
+    "title": "문제가 발생했습니다",
+    "retry": "다시 시도"
+  },
+  "boundary": {
+    "title": "문제가 발생했습니다",
+    "description": "예기치 않은 오류가 발생했습니다.",
+    "retry": "다시 시도"
+  },
+  "route": {
+    "message": "이 페이지를 표시하는 중 문제가 발생했습니다. 다시 시도하거나 잠시 후 다시 방문해 주세요.",
+    "titles": {
+      "app": "페이지를 불러오지 못했습니다",
+      "allocation": "배분 상세를 불러오지 못했습니다",
+      "anchoring": "앵커링 지급을 불러오지 못했습니다",
+      "gallery": "갤러리를 불러오지 못했습니다",
+      "myAllocations": "내 배분을 불러오지 못했습니다",
+      "myAnchors": "내 앵커링을 불러오지 못했습니다",
+      "myTokens": "내 토큰을 불러오지 못했습니다",
+      "myStatistics": "내 통계를 불러오지 못했습니다"
+    }
+  },
+  "global": {
+    "title": "앱에 예기치 않은 오류가 발생했습니다",
+    "message": "페이지 콘텐츠 바깥에서 문제가 발생했습니다. 대개 새로 고치면 해결됩니다.",
+    "retry": "새로 고침"
+  },
+  "environment": {
+    "title": "환경 변수가 설정되지 않아 실행할 수 없습니다.",
+    "description": "네트워크나 API URL의 기본값을 임의로 가정하지 않습니다. 버그의 원인이 되기 때문입니다.",
+    "missing": "누락되었거나 유효하지 않음:",
+    "resolution": "셸이나 .env 파일에 설정한 뒤 개발 서버를 다시 시작해 주세요."
+  },
+  "apiFailure": "서비스가 응답하지 않습니다. 잠시 후 다시 시도해 주세요.",
+  "unexpected": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.",
+  "notFound": {
+    "title": "404 — 페이지를 찾을 수 없습니다",
+    "description": "요청한 페이지가 없거나 다른 곳으로 옮겨졌을 수 있습니다. Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 아래 링크에서 원하는 페이지를 찾을 수 있습니다.",
+    "returnHome": "홈으로",
+    "suggestedPages": "추천 페이지",
+    "popularPages": "인기 페이지",
+    "links": {
+      "home": "홈: 현재 사이클",
+      "gallery": "NFT 갤러리",
+      "howItWorks": "작동 원리",
+      "faq": "자주 묻는 질문",
+      "statistics": "통계",
+      "anchoring": "앵커링 지급"
+    }
+  }
+}

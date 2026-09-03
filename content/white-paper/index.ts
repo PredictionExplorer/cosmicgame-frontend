@@ -7,6 +7,7 @@ import {
   type WhitePaperText,
 } from './structure';
 import { whitePaperTextEn } from './text.en';
+import { whitePaperTextKo } from './text.ko';
 import { whitePaperTextUk } from './text.uk';
 import { whitePaperTextZh } from './text.zh';
 import { whitePaperTextZhHk } from './text.zh-HK';
@@ -111,6 +112,10 @@ export const whitePaperContentUk: WhitePaperContent = buildWhitePaperContent(
   'uk',
   whitePaperTextUk,
 );
+export const whitePaperContentKo: WhitePaperContent = buildWhitePaperContent(
+  'ko',
+  whitePaperTextKo,
+);
 
 const WHITE_PAPER_CONTENT: LocaleRecord<WhitePaperContent> = {
   en: whitePaperContentEn,
@@ -118,6 +123,7 @@ const WHITE_PAPER_CONTENT: LocaleRecord<WhitePaperContent> = {
   'zh-TW': whitePaperContentZhTw,
   'zh-HK': whitePaperContentZhHk,
   uk: whitePaperContentUk,
+  ko: whitePaperContentKo,
 };
 
 export function getWhitePaperContent(locale: string): WhitePaperContent {

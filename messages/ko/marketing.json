@@ -1,0 +1,91 @@
+{
+  "loadingAria": "홍보 배분 불러오는 중",
+  "hero": {
+    "title": "Cosmic Signature를 <highlight>널리 알리면</highlight> CST 홍보 배분을 받습니다",
+    "description": "Cosmic Signature를 알리고, 검증된 홍보 활동마다 CST 홍보 배분을 받습니다.",
+    "learnHow": "참여 방법 보기"
+  },
+  "stats": {
+    "heading": "홍보 프로그램 통계",
+    "infoAria": "{label} 안내",
+    "valueAria": "{label}: {value}{suffix}",
+    "totalAllocations": {
+      "label": "총 홍보 배분",
+      "tooltip": "출범 이후 모든 홍보 기여자에게 전달된 CST 총량"
+    },
+    "activeContributors": {
+      "label": "활동 중인 홍보 기여자",
+      "tooltip": "홍보 배분을 받은 고유 지갑 주소 수"
+    },
+    "transactions": {
+      "label": "홍보 배분 트랜잭션",
+      "tooltip": "처리된 개별 홍보 배분 건수"
+    }
+  },
+  "howItWorks": {
+    "title": "참여 방법",
+    "infoAria": "참여 방법 안내",
+    "tooltip": "세 단계로 Cosmic Signature 홍보 배분을 받기 시작할 수 있습니다",
+    "stepInfoAria": "{title} 상세 안내",
+    "steps": {
+      "promote": {
+        "title": "알리기",
+        "description": "소셜 미디어, 블로그, 커뮤니티에서 Cosmic Signature를 소개합니다.",
+        "tooltip": "콘텐츠 제작, 추천 링크 공유, 블로그 글 작성, 영상 제작 등 Cosmic Signature를 알리는 활동이면 자격이 됩니다."
+      },
+      "verify": {
+        "title": "검증받기",
+        "description": "팀이 홍보 활동을 검토하고 검증합니다.",
+        "tooltip": "홍보 팀이 홍보 활동의 도달 범위, 품질, 진정성을 평가한 뒤 홍보 배분을 승인합니다."
+      },
+      "receive": {
+        "title": "CST 받기",
+        "description": "CST 홍보 배분이 지갑으로 직접 전달됩니다.",
+        "tooltip": "검증이 끝나면 CST가 온체인으로 지갑 주소에 전송됩니다. 배분 규모는 홍보 활동의 영향력에 따라 달라집니다."
+      }
+    }
+  },
+  "leaderboard": {
+    "title": "주요 홍보 기여자",
+    "infoAria": "주요 홍보 기여자 안내",
+    "tooltip": "홍보 활동으로 받은 CST 총량 기준 순위",
+    "empty": "아직 홍보 기여자가 없습니다.",
+    "rewardCountOne": "홍보 배분 {count}건",
+    "rewardCountOther": "홍보 배분 {count}건"
+  },
+  "history": {
+    "title": "홍보 배분 내역",
+    "infoAria": "홍보 배분 내역 안내",
+    "tooltip": "모든 홍보 배분을 시간순으로 정리한 전체 기록",
+    "showingOne": "홍보 배분 <strong>{count}</strong>건 표시",
+    "showingOther": "홍보 배분 <strong>{count}</strong>건 표시",
+    "emptyTitle": "아직 전달된 홍보 배분이 없습니다",
+    "emptyDescription": "홍보 활동이 검증되고 배분이 전달되면 여기에 표시됩니다."
+  },
+  "cta": {
+    "title": "함께 알릴 준비가 되셨나요?",
+    "description": "홍보 프로그램에 참여하면 Cosmic Signature를 세상에 알리고 CST 홍보 배분을 받을 수 있습니다.",
+    "contact": "홍보 팀에 문의",
+    "contactTooltip": "홍보 기회와 홍보 배분 구조를 상의할 수 있습니다",
+    "infoAria": "홍보 팀 문의 안내",
+    "infoTooltip": "팀이 홍보 자료 준비를 돕고 홍보 배분 단계를 안내합니다"
+  },
+  "address": {
+    "invalid": "유효하지 않은 이더리움 주소",
+    "heading": "이 참여자의 홍보 배분",
+    "loading": "불러오는 중…",
+    "outreachWallet": "홍보 지갑"
+  },
+  "transferForm": {
+    "title": "CST 홍보 배분 전달",
+    "description": "홍보 준비금 컨트랙트의 `payReward` 함수를 호출합니다. 연결된 지갑이 현재 재무 담당자여야 합니다.",
+    "reserveLabel": "홍보 준비금",
+    "availableLabel": "사용 가능 CST",
+    "ownerLabel": "소유자",
+    "treasurerLabel": "재무 담당자",
+    "unavailable": "사용 불가",
+    "recipientLabel": "수령 주소",
+    "amountLabel": "수량",
+    "historyLink": "홍보 준비금 전송 내역 보기"
+  }
+}

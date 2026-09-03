@@ -1,0 +1,94 @@
+{
+  "invalid": {
+    "title": "유효하지 않은 토큰 ID"
+  },
+  "jsonLd": {
+    "productName": "Cosmic Signature NFT #{id}",
+    "productDescription": "절차적 온체인 아트 프로토콜 Cosmic Signature가 삼체 문제 물리로 렌더링한 고유한 제너러티브 NFT입니다.",
+    "breadcrumbToken": "토큰 #{id}"
+  },
+  "breadcrumb": {
+    "tokenFallback": "토큰 {id}"
+  },
+  "hero": {
+    "unnamedToken": "이름 없는 토큰"
+  },
+  "badges": {
+    "stellarSelectionRecipient": "별빛 선정 수령자",
+    "anchorRecipient": "앵커링 수령자",
+    "cycleRecipient": "사이클 수령자",
+    "enduranceChampion": "수호 챔피언",
+    "receivedAsCycleRecipient": "사이클 {round}에서 사이클 수령자로 받음",
+    "receivedAs": "{label} 자격으로 받음",
+    "eligibleForAnchoring": "앵커링 가능",
+    "eligibleForAnchoringTooltip": "이 Cosmic Signature NFT는 아직 앵커링된 적이 없어, 앵커링하면 ETH 앵커링 지급을 받을 수 있습니다.",
+    "alreadyAnchored": "이미 앵커링됨",
+    "alreadyAnchoredTooltip": "이 토큰은 이미 앵커링된 적이 있어 다시 앵커링할 수 없습니다."
+  },
+  "share": {
+    "trigger": "공유",
+    "copyVideoLink": "영상 링크 복사",
+    "copyImageLink": "이미지 링크 복사",
+    "copyPageLink": "페이지 링크 복사"
+  },
+  "actions": {
+    "buyOrSellNfts": "NFT 구매 또는 판매",
+    "viewCycleDetails": "사이클 {round} 상세 보기"
+  },
+  "navigation": {
+    "previousToken": "이전 토큰",
+    "nextToken": "다음 토큰"
+  },
+  "sections": {
+    "nameHistory": "이름 변경 내역",
+    "ownershipHistory": "소유 내역"
+  },
+  "transferDialog": {
+    "title": "전송 확인",
+    "description": "받는 주소에 트랜잭션 내역이 없는 것으로 보입니다. 이 주소로 토큰을 전송하시겠습니까? 주소를 다시 한번 확인해 주세요.",
+    "confirm": "예, 전송"
+  },
+  "ownerActions": {
+    "title": "내 토큰 관리",
+    "titleTooltip": "현재 소유자는 이 토큰을 MetaMask에 표시하거나 전송하거나 원하는 이름을 붙일 수 있습니다.",
+    "metaMaskHeading": "MetaMask에 표시",
+    "metaMaskTooltip": "MetaMask 브라우저 확장 프로그램에 이 NFT를 표시하도록 요청합니다. NFT 추가는 실험적인 기능으로, MetaMask 모바일에서는 지원되지 않습니다.",
+    "addToMetaMask": "MetaMask에 NFT 추가",
+    "addingToMetaMask": "MetaMask에 NFT 추가 중…",
+    "transferHeading": "전송",
+    "transferTooltip": "이 토큰을 다른 이더리움 주소로 보냅니다. 전송은 되돌릴 수 없으므로 확인 전에 주소를 다시 한번 점검해 주세요.",
+    "recipientPlaceholder": "받는 주소 (0x...)",
+    "transferButton": "전송",
+    "nameHeading": "토큰 이름 붙이기",
+    "renameHeading": "토큰 이름 변경",
+    "nameTooltip": "토큰에 원하는 이름을 붙일 수 있습니다 (최대 32바이트). 이름 붙인 토큰은 이름 붙인 NFT 페이지에 표시됩니다.",
+    "namePlaceholder": "토큰 이름 입력",
+    "setName": "이름 설정",
+    "changeName": "이름 변경",
+    "clearName": "지우기",
+    "namedTokensCount": "이름 붙인 토큰이 {count}개 있습니다.",
+    "viewAllNamedTokens": "이름 붙인 토큰 모두 보기"
+  },
+  "metadata": {
+    "imprinted": "각인 일시",
+    "imprintedTooltip": "이 토큰이 온체인에 각인된 시점입니다. 클릭하면 트랜잭션을 볼 수 있습니다.",
+    "cycle": "사이클",
+    "cycleTooltip": "이 토큰이 배분된 퍼포먼스 사이클입니다. 클릭하면 사이클 상세 정보를 볼 수 있습니다.",
+    "recipient": "수령자",
+    "recipientTooltip": "퍼포먼스 사이클에서 이 토큰을 처음 받은 주소입니다.",
+    "owner": "소유자",
+    "ownerTooltip": "이 토큰의 현재 보유자입니다. 토큰이 전송되었다면 수령자와 다를 수 있습니다.",
+    "roundNumber": "사이클 {round}",
+    "seed": "시드",
+    "seedTooltip": "이 토큰의 작품과 특성을 생성하는 데 사용된 고유한 무작위 시드입니다.",
+    "copySeed": "시드 복사"
+  },
+  "video": {
+    "watchAnimation": "애니메이션 보기",
+    "watchAnimationTooltip": "모든 Cosmic Signature NFT에는 시드에서 비롯된 고유한 제너러티브 애니메이션이 있습니다. 클릭하면 재생됩니다."
+  },
+  "image": {
+    "defaultAlt": "NFT",
+    "artworkUnavailable": "작품을 불러올 수 없습니다"
+  }
+}

@@ -1,0 +1,796 @@
+{
+  "navigation": {
+    "ariaLabel": "통계 섹션",
+    "overview": {
+      "label": "개요",
+      "title": "Cosmic Signature 프로토콜 통계",
+      "description": "Arbitrum 위 Cosmic Signature 프로토콜의 과거 데이터와 전체 지표입니다. 참여, 토큰, 앵커링, 활동, 성과 섹션에서 상세 내용을 볼 수 있습니다."
+    },
+    "participation": {
+      "label": "참여",
+      "title": "참여 통계",
+      "description": "모든 Cosmic Signature 퍼포먼스 사이클에 걸쳐 인덱싱된 고유 참여자, 배분 수령자, ETH 기여자입니다."
+    },
+    "tokens": {
+      "label": "토큰",
+      "title": "토큰 분포 통계",
+      "description": "Cosmic Signature NFT 소유 현황, CST(ERC-20) 잔액 분포, 총 공급량 내역, 제스처에 첨부된 자산입니다."
+    },
+    "anchoring": {
+      "label": "앵커링",
+      "title": "앵커링 통계",
+      "description": "Cosmic Signature NFT와 RandomWalk NFT의 앵커링 및 해제 작업, 현재 앵커링된 토큰, 고유 앵커링 보유자입니다."
+    },
+    "activity": {
+      "label": "활동",
+      "title": "제스처 활동 통계",
+      "description": "시간별 제스처 빈도, 활동 급증, 참여자 활동 구간, 제스처 유형 구성, 사이클 타임라인, 사이클 활성화입니다."
+    },
+    "performance": {
+      "label": "성과",
+      "title": "참여자 성과 통계",
+      "description": "참여자 성과 순위표와 모든 Cosmic Signature 퍼포먼스 사이클의 회수 대상 배분 결과입니다."
+    }
+  },
+  "intro": {
+    "eyebrow": "프로토콜 통계 · Arbitrum"
+  },
+  "breadcrumbs": {
+    "statistics": "통계"
+  },
+  "shared": {
+    "noDataTitle": "아직 데이터 없음",
+    "sectionLoadErrorTitle": "{title} 데이터를 불러오지 못했습니다",
+    "serviceError": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "hub": {
+    "loadErrorTitle": "통계를 불러오지 못했습니다",
+    "loadErrorMessage": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
+    "exploreTitle": "통계 탐색",
+    "exploreAria": "통계 섹션 페이지",
+    "currentCycleTitle": "현재 사이클 데이터가 필요한가요?",
+    "currentCycleSubtitle": "제스처 내역, 순위표, 실시간 사이클 상세 정보 보기",
+    "protocolEconomyTitle": "프로토콜 경제",
+    "anchoringGlanceTitle": "앵커링 한눈에 보기",
+    "anchoringGlanceDescription": "현재 Cosmic Signature NFT {cosmicCount}개와 RandomWalk NFT {randomWalkCount}개가 앵커링되어 있습니다. 앵커링 작업, 앵커링된 토큰, 고유 앵커링 보유자는 앵커링 통계 페이지에서 확인할 수 있습니다.",
+    "anchoringGlanceLink": "앵커링 통계",
+    "headlines": {
+      "uniqueParticipants": "고유 참여자",
+      "nftsImprinted": "각인된 NFT",
+      "nftsAnchored": "앵커링된 NFT",
+      "gesturesThisCycle": "이번 사이클 제스처",
+      "allocationsDistributed": "완료된 배분"
+    },
+    "pendingStellarRetrievals": "수령자 {count}명이 총 {amount}의 자금을 아직 회수하지 않았습니다",
+    "voluntaryContributionSummary": "{count}건, 총 {amount}",
+    "jsonLd": {
+      "webPageName": "Cosmic Signature 프로토콜 통계",
+      "webPageDescription": "Arbitrum 위 Cosmic Signature 프로토콜의 공개 통계입니다. 퍼포먼스 사이클 상태, 제스처, NFT, CST, 앵커링, 준비금, 배분 데이터를 포함합니다.",
+      "datasetName": "Cosmic Signature 프로토콜 통계 스냅샷",
+      "datasetDescription": "Arbitrum 스마트 컨트랙트와 Cosmic Signature API에서 인덱싱한 공개 프로토콜 활동을 크롤링 가능한 형태로 요약한 데이터입니다."
+    },
+    "seo": {
+      "eyebrow": "프로토콜 통계 · Arbitrum",
+      "heading": "Cosmic Signature 프로토콜 통계",
+      "description": "이 페이지는 Arbitrum 위 Cosmic Signature 프로토콜의 공개 활동을 추적합니다. 퍼포먼스 사이클 상태, 제스처, Cosmic Signature NFT, CST, 앵커링, 준비금, 배분 데이터를 포함합니다. 아래 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색 엔진과 AI 크롤러를 위해 초기 HTML에 담겨 있습니다.",
+      "lastUpdated": "최근 업데이트: {date}",
+      "unavailableSuffix": ". 실시간 데이터가 일시적으로 제공되지 않아 지금은 프로토콜 설명 정보만 표시됩니다.",
+      "dataSource": "데이터는 프로토콜의 Arbitrum 스마트 컨트랙트 활동을 인덱싱하는 공개 Cosmic Signature API에서 가져옵니다. 프로토콜 작동 원리와 검증 정보는 아래 크롤링 가능한 링크에서 확인할 수 있습니다.",
+      "relatedPagesAria": "통계 관련 페이지",
+      "links": {
+        "currentCycle": "현재 퍼포먼스 사이클 보기",
+        "howItWorks": "Cosmic Signature 작동 원리 알아보기",
+        "contracts": "검증된 Arbitrum 컨트랙트 살펴보기",
+        "faq": "Cosmic Signature 자주 묻는 질문 읽기"
+      },
+      "unavailable": "확인 불가"
+    }
+  },
+  "metrics": {
+    "activePerformanceCycle": {
+      "label": "현재 퍼포먼스 사이클",
+      "tooltip": "공개 Cosmic Signature API가 인덱싱한 현재 퍼포먼스 사이클 번호입니다.",
+      "seoDescription": "Arbitrum 위 Cosmic Signature 활동에서 인덱싱한 현재 퍼포먼스 사이클 번호입니다."
+    },
+    "activeCycleGestures": {
+      "label": "현재 사이클 제스처",
+      "tooltip": "현재 퍼포먼스 사이클에서 지금까지 인덱싱된 제스처 수를 나타냅니다.",
+      "seoDescription": "현재 퍼포먼스 사이클에서 인덱싱된 제스처 수를 나타냅니다."
+    },
+    "totalCycles": {
+      "label": "총 사이클 수",
+      "tooltip": "프로토콜 출범 이후 완료되었거나 현재 인덱싱되어 있는 퍼포먼스 사이클의 총계입니다."
+    },
+    "allocationsDistributed": {
+      "label": "완료된 배분",
+      "tooltip": "모든 사이클에 걸쳐 인덱싱된 배분 기록입니다. 수령자 배분뿐 아니라 앵커링 지급 적립처럼 프로토콜이 남긴 배분 기록도 포함합니다."
+    },
+    "cosmicSignatureNftsImprinted": {
+      "label": "각인된 Cosmic Signature NFT",
+      "shortLabel": "각인된 NFT",
+      "tooltip": "인덱싱된 모든 사이클에 걸쳐 프로토콜이 각인한 Cosmic Signature NFT(ERC-721) 토큰의 누적 개수를 나타냅니다. 값이 0이면 통계 API가 현재 이 카운터에 인덱싱된 각인을 보고하지 않고 있다는 뜻입니다.",
+      "seoDescription": "인덱싱된 모든 사이클에 걸쳐 프로토콜이 각인한 Cosmic Signature NFT(ERC-721) 토큰의 누적 개수를 나타냅니다."
+    },
+    "contractBalance": {
+      "label": "컨트랙트 잔액",
+      "seoLabel": "프로토콜 컨트랙트 잔액",
+      "tooltip": "Cosmic Signature 프로토콜 컨트랙트가 현재 보유한 ETH입니다. 향후 배분, 회수, 사이클 전환에 따라 달라집니다.",
+      "seoDescription": "Cosmic Signature 프로토콜 컨트랙트가 현재 보유한 ETH입니다. 향후 배분 흐름에 따라 달라집니다."
+    },
+    "numAllocationsDistributed": {
+      "label": "완료된 배분 건수",
+      "tooltip": "인덱싱된 배분 기록의 개수를 나타냅니다. cg_prize 행이 있으면 이를 사용하고, 없으면 수령자 배분 합계를 집계한 값으로 대체합니다."
+    },
+    "totalSignatureAllocationsDistributed": {
+      "label": "시그니처 배분 총액",
+      "tooltip": "인덱싱된 사이클에 걸쳐 최종 제스처 수령자에게 시그니처 배분으로 전달된 ETH 총액입니다."
+    },
+    "stellarSelectionEthDeposited": {
+      "label": "별빛 선정 ETH 적립",
+      "tooltip": "인덱싱된 퍼포먼스 사이클에 걸쳐 별빛 선정 풀에 배분된 ETH 총액입니다."
+    },
+    "stellarSelectionEthRetrieved": {
+      "label": "별빛 선정 ETH 회수",
+      "tooltip": "선정된 수령자가 별빛 선정 풀에서 회수한 ETH 총액입니다."
+    },
+    "totalSupplyErc20": {
+      "label": "총 공급량 (ERC-20)",
+      "tooltip": "참여와 조율에 쓰이는 ERC-20 토큰인 CST의 현재 총 공급량입니다."
+    },
+    "totalCstConsumed": {
+      "label": "총 CST 소모량",
+      "tooltip": "참여자가 CST 제스처를 남기며 사용한 CST의 누적량입니다."
+    },
+    "cstConsumedCurrentCycle": {
+      "label": "이번 사이클 CST 소모량",
+      "tooltip": "현재 퍼포먼스 사이클에서 참여자가 CST 제스처에 지금까지 사용한 CST입니다."
+    },
+    "ethInGesturesCurrentCycle": {
+      "label": "이번 사이클 제스처 ETH",
+      "tooltip": "현재 퍼포먼스 사이클에서 참여자가 ETH 제스처로 지금까지 지불한 ETH 총액입니다."
+    },
+    "cstGestures": {
+      "label": "CST 제스처",
+      "tooltip": "인덱싱된 사이클에 걸쳐 ETH 대신 CST로 남긴 제스처 수를 나타냅니다."
+    },
+    "outreachReserve": {
+      "label": "홍보 준비금",
+      "tooltip": "홍보 및 생태계 기여자를 위해 각인된 CST로, 제스처마다 각인되는 참여 CST나 NFT와 함께 각인되는 공로 CST와는 별개입니다."
+    },
+    "outreachTransactions": {
+      "label": "홍보 트랜잭션",
+      "tooltip": "인덱싱된 홍보 준비금 배분 트랜잭션 수를 나타냅니다."
+    },
+    "randomWalkNftsUsed": {
+      "label": "사용된 RandomWalk NFT",
+      "tooltip": "일회성 제스처 비용 할인을 위해 ETH 제스처에 이미 첨부된 RandomWalk NFT입니다."
+    },
+    "namedTokens": {
+      "label": "이름 붙인 토큰",
+      "tooltip": "소유자가 직접 지은 이름이 현재 붙어 있는 Cosmic Signature NFT입니다."
+    },
+    "uniqueParticipants": {
+      "label": "고유 참여자",
+      "tooltip": "인덱싱된 제스처를 한 번 이상 남긴 고유 지갑 주소입니다."
+    },
+    "uniqueRecipients": {
+      "label": "고유 수령자",
+      "tooltip": "프로토콜에서 인덱싱된 배분을 한 번 이상 받은 고유 지갑 주소입니다."
+    },
+    "uniqueEthContributors": {
+      "label": "고유 ETH 기여자",
+      "tooltip": "프로토콜에 ETH를 기여한 고유 지갑 주소입니다."
+    },
+    "uniqueAnchorHolders": {
+      "label": "고유 앵커링 보유자",
+      "tooltip": "Cosmic Signature NFT 또는 RandomWalk NFT를 앵커링한 고유 지갑을 합산한 값입니다."
+    },
+    "cosmicSignatureNftHolders": {
+      "label": "Cosmic Signature NFT 보유자",
+      "tooltip": "현재 Cosmic Signature NFT를 한 개 이상 보유한 고유 지갑 주소입니다."
+    },
+    "cstErc20Holders": {
+      "label": "CST (ERC-20) 보유자",
+      "tooltip": "현재 CST ERC-20 토큰을 보유한 고유 지갑 주소입니다."
+    },
+    "attachedNfts": {
+      "label": "첨부된 NFT",
+      "tooltip": "참여자가 제스처에 첨부하고 앱이 인덱싱한 ERC-721 토큰입니다."
+    },
+    "publicGoodsBalance": {
+      "label": "공공재 잔액",
+      "tooltip": "공공재 수령처에 배분되었으며 인덱싱된 프로토콜 잔액에 아직 반영되어 있는 ETH입니다."
+    },
+    "totalContributedEth": {
+      "label": "총 기여 ETH",
+      "tooltip": "인덱싱된 모든 사이클에 걸쳐 프로토콜에 기여된 ETH 총액입니다."
+    },
+    "protocolContributions": {
+      "label": "프로토콜 기여",
+      "tooltip": "Cosmic Signature 프로토콜을 통해 전송되어 인덱싱된 공공재 기여 트랜잭션 수를 나타냅니다."
+    },
+    "protocolContributionsSum": {
+      "label": "프로토콜 기여 합계",
+      "tooltip": "인덱싱된 Cosmic Signature 프로토콜 공공재 기여 트랜잭션으로 기여된 ETH 총액입니다."
+    },
+    "voluntaryContributions": {
+      "label": "자발적 기여",
+      "tooltip": "커뮤니티 구성원이 필수 사이클 흐름과 별개로 자발적으로 기여한 ETH입니다."
+    },
+    "publicGoodsRetrievals": {
+      "label": "공공재 회수 건수",
+      "tooltip": "공공재 금고에서 이루어진 인덱싱된 회수 트랜잭션 수를 나타냅니다."
+    },
+    "totalPublicGoodsRetrieved": {
+      "label": "공공재 회수 총액",
+      "tooltip": "공공재 금고에서 회수된 ETH 총액입니다."
+    }
+  },
+  "groups": {
+    "allocationEconomy": {
+      "label": "배분 경제",
+      "tooltip": "퍼포먼스 사이클이 마감될 때 생성되는 누적 배분 기록과 ETH 흐름입니다."
+    },
+    "tokenEconomy": {
+      "label": "토큰 경제",
+      "tooltip": "CST와 NFT 카운터입니다. CST는 ERC-20 토큰이고, Cosmic Signature NFT는 ERC-721 토큰입니다."
+    },
+    "publicGoods": {
+      "label": "공공재 및 기여",
+      "tooltip": "공공재 및 첨부 자산과 관련된 프로토콜 잔액과 기여 흐름입니다."
+    }
+  },
+  "sectionTooltips": {
+    "attachedAssets": "제스처에 첨부된 ERC-721 및 ERC-20 자산입니다. 전체 사이클 기준 또는 현재 퍼포먼스 사이클 기준으로 볼 수 있습니다.",
+    "gestureTypeDistribution": "ETH, RandomWalk(ETH 지불), CST로 남긴 제스처의 비중을 선택한 간격으로 샘플링해 시간 흐름에 따라 보여 줍니다. 현재 사이클만 해당합니다.",
+    "enduranceTimeline": "사이클 동안 누가 선두를 지켰는지 보여 주는 간트 차트입니다. 각 막대는 하나의 선두 유지 구간이며, 막대 너비는 해당 주소가 선두를 지킨 시간입니다. 가장 넓은 막대가 수호 챔피언이고, 시간의 전사는 수호 챔피언 지위를 끊기지 않고 가장 오래 유지한 참여자입니다. 비교할 사이클을 자유롭게 선택할 수 있습니다.",
+    "cstWindow": "사이클 동안 CST 보정 구간이 어떻게 변해 왔는지 보여 줍니다. ETH 제스처는 구간을 조금씩 줄이고, CST 제스처는 구간을 늘립니다. 이 구간은 CST 제스처 비용이 0까지 내려가는 속도를 정합니다. 비교할 사이클을 자유롭게 선택할 수 있습니다.",
+    "cstCost": "사이클 동안 각 CST 제스처에 실제로 든 비용을 로그 스케일로, 제스처 직전에 남아 있던 마감 시간과 함께 보여 줍니다. 사이클 중반의 제스처는 비용이 거의 0에 가까운 경우가 많지만, 종반에 제스처가 빠르게 이어지면 비용이 내려갈 시간이 없어 수천 CST에 이를 수 있습니다.",
+    "attachedTokenDistribution": "제스처에 첨부된 ERC-721 자산의 컨트랙트와 토큰 수를 보여 줍니다.",
+    "cosmicSignatureTokenDistribution": "Cosmic Signature NFT(ERC-721) 토큰의 현재 소유자 분포입니다.",
+    "cstBalanceDistribution": "CST ERC-20 잔액의 현재 지갑별 분포입니다.",
+    "cstTotalSupply": "시간에 따른 각인과 소모를 포함한 CST ERC-20 공급량 변화 내역입니다.",
+    "cycleActivations": "프로토콜 사이클이나 모드가 언제 활성화되고 종료되었는지 보여 주는 시스템 이벤트 구간입니다.",
+    "uniqueParticipants": "인덱싱된 제스처가 한 번 이상 있는 지갑을 제스처 수 순으로 정렬했습니다.",
+    "uniqueRecipients": "인덱싱된 프로토콜 배분을 받은 지갑입니다.",
+    "uniqueEthContributors": "프로토콜에 ETH를 기여한 지갑입니다.",
+    "anchorReleaseActions": "선택한 NFT 유형의 앵커링 및 해제 작업을 시간순으로 보여 줍니다.",
+    "anchoredTokens": "선택한 앵커링 지갑에 현재 앵커링된 토큰입니다.",
+    "uniqueAnchorHolders": "선택한 NFT 유형을 앵커링하거나 해제한 지갑입니다.",
+    "gestureFrequency": "프로토콜 활동 패턴이 드러나도록 인덱싱된 제스처 수를 시간 단위로 묶었습니다.",
+    "gestureSpikes": "주변 시간대와 비교해 제스처 활동이 급격히 변한 구간입니다.",
+    "participantActivePeriods": "가장 활발한 지갑의 인덱싱된 최장 연속 참여 구간입니다."
+  },
+  "anchoringTooltips": {
+    "cstActiveAnchorHolders": "현재 Cosmic Signature NFT를 한 개 이상 앵커링 중인 지갑입니다.",
+    "cstAnchorDistributionDeposits": "Cosmic Signature NFT 앵커링 지급 풀에 ETH가 적립된 총 횟수를 나타냅니다.",
+    "cstTotalAnchorDistributions": "Cosmic Signature NFT 앵커링 보유자에게 앵커링 지급으로 전달된 ETH 총액입니다.",
+    "cstTotalTokensAnchored": "현재 프로토콜에 앵커링된 Cosmic Signature NFT 수를 나타냅니다.",
+    "cstUnretrievedAnchorDistributions": "Cosmic Signature NFT 앵커링 보유자에게 배분되었지만 아직 회수되지 않은 앵커링 지급입니다.",
+    "rwlkActiveAnchorHolders": "현재 RandomWalk NFT를 한 개 이상 앵커링 중인 지갑입니다.",
+    "rwlkTotalTokensImprinted": "앵커링 NFT 별빛 선정을 통해 RandomWalk NFT 앵커링 보유자에게 각인된 Cosmic Signature NFT와 짝지어진 CST를 모두 합한 값입니다.",
+    "rwlkTotalTokensAnchored": "현재 프로토콜에 앵커링된 RandomWalk NFT 수를 나타냅니다.",
+    "cstGroup": "Cosmic Signature NFT 앵커링에서는 현재 앵커링된 Cosmic Signature NFT가 ETH 앵커링 지급을 나누어 받습니다.",
+    "rwlkGroup": "RandomWalk NFT 앵커링은 앵커링 NFT 별빛 선정 배분 자격을 부여합니다."
+  },
+  "activity": {
+    "heading": "제스처 활동",
+    "sections": {
+      "frequency": "시간별 제스처 빈도",
+      "spikes": "제스처 급증",
+      "activePeriods": "상위 참여자 20명 활동 구간",
+      "typeDistribution": "제스처 유형 분포",
+      "enduranceTimeline": "수호 챔피언 · 시간의 전사 타임라인",
+      "cstWindow": "CST 보정 구간 타임라인",
+      "cstCost": "시간별 CST 제스처 비용",
+      "cycleActivations": "사이클 활성화"
+    },
+    "currentCycleOnly": "현재 사이클만",
+    "emptyCycleActivations": "아직 인덱싱된 사이클 활성화가 없습니다"
+  },
+  "anchoringPage": {
+    "snapshot": {
+      "cosmicSignatureLabel": "앵커링된 Cosmic Signature NFT",
+      "cosmicSignatureTooltip": "현재 프로토콜에 앵커링되어 앵커링 지급을 나누고 있는 Cosmic Signature NFT를 모두 합한 값입니다.",
+      "randomWalkLabel": "앵커링된 RandomWalk NFT",
+      "randomWalkTooltip": "현재 앵커링되어 앵커링 NFT 별빛 선정 자격을 갖춘 RandomWalk NFT를 모두 합한 값입니다.",
+      "poolLabel": "앵커링 지급 풀",
+      "poolTooltip": "Cosmic Signature NFT 앵커링 보유자를 위한 앵커링 지급 풀에 현재 배분된 ETH입니다.",
+      "perNftLabel": "Cosmic Signature NFT당 지급액",
+      "perNftTooltip": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액으로, 온체인 풀을 인덱싱된 앵커링 NFT 총수로 나눈 값입니다.",
+      "perNftTooltipUnavailable": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액으로, 온체인 풀을 인덱싱된 앵커링 NFT 총수로 나눈 값입니다. 온체인 앵커링 풀은 0이 아니지만 인덱싱된 Cosmic Signature NFT 앵커링 총수가 0이어서(예: ETL이 cg_stake_stats_cst를 갱신하지 않음) NFT당 지급액을 계산할 수 없습니다.",
+      "activeHoldersLabel": "활성 앵커링 보유자",
+      "activeHoldersTooltip": "현재 Cosmic Signature NFT 또는 RandomWalk NFT를 한 개 이상 앵커링 중인 활성 지갑을 합산한 값입니다."
+    },
+    "description": "앵커링된 NFT는 Cosmic Signature의 핵심 요소입니다. Cosmic Signature NFT는 ETH 앵커링 지급을 나누어 받고, RandomWalk NFT는 앵커링 NFT 별빛 선정에 참여합니다.",
+    "historyLink": "앵커링 내역 보기",
+    "tableDescription": "아래 탭에서 앵커링/해제 작업, 현재 앵커링된 토큰, 전체 앵커링 합계를 이루는 고유 지갑을 살펴볼 수 있습니다.",
+    "tabs": {
+      "cosmicSignature": "Cosmic Signature NFT",
+      "randomWalk": "RandomWalk NFT"
+    },
+    "groups": {
+      "cosmicSignature": "Cosmic Signature NFT 앵커링 개요",
+      "randomWalk": "RWLK 앵커링 개요"
+    },
+    "stats": {
+      "activeHolders": "활성 앵커링 보유자 수",
+      "distributionDeposits": "앵커링 지급 적립 횟수",
+      "totalDistributions": "앵커링 지급 총액",
+      "tokensImprinted": "각인된 토큰 총수",
+      "tokensAnchored": "앵커링된 토큰 총수",
+      "unretrievedDistributions": "미회수 앵커링 지급"
+    },
+    "tables": {
+      "actions": "앵커링 / 해제 작업",
+      "anchoredTokens": "앵커링된 토큰",
+      "uniqueHolders": "고유 앵커링 보유자"
+    },
+    "empty": {
+      "actions": "아직 앵커링 작업이 없습니다",
+      "tokens": "현재 앵커링된 토큰이 없습니다",
+      "holders": "아직 앵커링 보유자가 없습니다"
+    }
+  },
+  "participation": {
+    "sections": {
+      "participants": "고유 참여자",
+      "recipients": "고유 수령자",
+      "contributors": "고유 ETH 기여자"
+    },
+    "empty": {
+      "participantsTitle": "아직 참여자가 없습니다",
+      "participantsDescription": "첫 제스처가 인덱싱되면 지갑이 여기에 표시됩니다.",
+      "recipientsTitle": "아직 수령자가 없습니다",
+      "recipientsDescription": "첫 배분이 인덱싱되면 지갑이 여기에 표시됩니다.",
+      "contributorsTitle": "아직 ETH 기여가 없습니다",
+      "contributorsDescription": "첫 ETH 기여가 인덱싱되면 지갑이 여기에 표시됩니다."
+    }
+  },
+  "tokens": {
+    "sections": {
+      "nftDistribution": "Cosmic Signature NFT (ERC-721)",
+      "cstDistribution": "CST (ERC-20) 잔액 분포",
+      "totalSupply": "CST 총 공급량",
+      "attachedDistribution": "첨부 토큰 분포",
+      "attachedAssets": "첨부 자산"
+    },
+    "empty": {
+      "nftTitle": "아직 각인된 Cosmic Signature NFT가 없습니다",
+      "nftDescription": "NFT가 각인되면 소유자 분포가 여기에 표시됩니다.",
+      "cstTitle": "아직 CST 잔액이 없습니다",
+      "cstDescription": "CST가 유통되기 시작하면 지갑 잔액 분포가 여기에 표시됩니다.",
+      "contractsTitle": "아직 첨부된 ERC-721 컨트랙트가 없습니다"
+    },
+    "supplyTabs": {
+      "date": "날짜별",
+      "gesture": "제스처별"
+    }
+  },
+  "attachedAssets": {
+    "scopeAria": "첨부된 NFT 범위",
+    "scopeAll": "모든 사이클",
+    "scopeCurrent": "현재 사이클",
+    "nftTab": "NFT (ERC-721)",
+    "erc20Tab": "토큰 (ERC-20)",
+    "nftLoadError": "첨부된 NFT를 불러오지 못했습니다",
+    "erc20LoadError": "첨부된 ERC-20 토큰을 불러오지 못했습니다",
+    "serviceError": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
+    "emptyCurrentTitle": "이번 사이클에 첨부된 NFT가 없습니다",
+    "emptyAllTitle": "아직 첨부된 NFT가 없습니다",
+    "emptyCurrentDescription": "현재 퍼포먼스 사이클 동안 제스처에 첨부된 NFT가 여기에 표시됩니다.",
+    "emptyAllDescription": "모든 사이클의 첨부된 NFT가 여기에 표시됩니다.",
+    "erc20Description": "현재 퍼포먼스 사이클 동안 제스처에 첨부된 ERC-20 토큰입니다."
+  },
+  "performance": {
+    "leaderboardTitle": "참여자 성과",
+    "claimsTitle": "사이클별 배분 회수",
+    "leaderboard": {
+      "description": "모든 사이클에 걸친 참여자별 순 ETH와 순증감률입니다. 수치는 <em>ETH만</em> 기준으로 하며, 배분으로 받은 ETH에서 제스처에 사용한 ETH를 뺀 값입니다. CST와 NFT 배분은 참고 정보로 함께 표시됩니다. CST만 사용한 참여자는 ETH 순증감률이 표시되지 않습니다.",
+      "sort": {
+        "netEth": "순 ETH 높은 순",
+        "netPercent": "순증감률 높은 순",
+        "allocationRate": "배분율 높은 순",
+        "spender": "지출 많은 순",
+        "nfts": "NFT 많은 순"
+      },
+      "minimumGestures": "최소 제스처 수",
+      "cstOnly": "(CST만 사용)",
+      "cstOnlyTooltip": "ETH 지출 없음 (CST만 사용한 참여자)",
+      "noEthReceivedTooltip": "아직 돌려받은 ETH가 없습니다. 이 참여자는 지금까지 ETH 배분을 받지 않았습니다",
+      "loadErrorTitle": "성과 순위표를 불러오지 못했습니다",
+      "loadErrorMessage": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
+      "empty": "이 필터에 해당하는 참여자가 아직 없습니다.",
+      "columns": {
+        "participant": "참여자",
+        "allocationRate": "배분율",
+        "gestures": "제스처",
+        "spent": "지출 (ETH)",
+        "received": "수령 (ETH)",
+        "net": "순액 (ETH)",
+        "netPercent": "순증감률",
+        "allocations": "배분"
+      }
+    },
+    "claims": {
+      "description": "사이클마다 배분되는 회수 대상 자산입니다. 수령자가 직접 회수해야 하는 2차 ETH 배분, 첨부된 NFT, 첨부된 ERC-20이 여기에 해당합니다. 직접 전달되는 자산(시그니처 배분 ETH, 각인된 CST와 NFT)은 회수 절차가 없으므로 제외됩니다. 수령자는 보통 즉시 회수하며, 회수 기간이 지난 뒤 남은 자산은 누구나 회수할 수 있습니다.",
+      "loadErrorTitle": "배분 회수 내역을 불러오지 못했습니다",
+      "loadErrorMessage": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
+      "empty": "아직 배분된 회수 대상 자산이 없습니다.",
+      "columns": {
+        "cycle": "사이클",
+        "awarded": "배분 (회수 대상)",
+        "unclaimed": "미회수",
+        "claimedPercent": "회수율",
+        "averageTime": "평균 회수 시간",
+        "details": "상세"
+      },
+      "allClaimed": "모두 회수됨",
+      "unclaimedCount": "미회수 {count}건",
+      "viewUnclaimed": "미회수 자산 보기",
+      "explore": "탐색",
+      "dialog": {
+        "unclaimedTitle": "미회수 자산: 사이클 {cycle}",
+        "expired": "회수 기간이 종료되었습니다. 이제 누구나 이 자산을 회수할 수 있습니다.",
+        "closesIn": "회수 기간이 {duration} 후 종료됩니다.",
+        "asset": "자산",
+        "recipient": "수령자",
+        "detail": "상세",
+        "exploreTitle": "사이클 {cycle} 탐색",
+        "exploreDescription": "수령자별 회수 소요 시간이 표시된 회수 트랜잭션과 이번 사이클에 첨부된 토큰입니다.",
+        "claimTransactions": "회수 트랜잭션",
+        "noClaims": "이 사이클에는 기록된 회수가 없습니다.",
+        "claimedAfter": "회수 소요 시간",
+        "when": "시각",
+        "transaction": "트랜잭션",
+        "sweptBy": "기한 후 회수: {address}",
+        "attachedTokens": "첨부된 토큰",
+        "noAttached": "이 사이클에는 첨부된 토큰이 없습니다.",
+        "token": "토큰",
+        "attachedBy": "첨부자"
+      },
+      "assets": {
+        "eth": "ETH",
+        "nft": "첨부된 NFT",
+        "erc20": "첨부된 ERC-20"
+      }
+    }
+  },
+  "charts": {
+    "frequency": {
+      "bucket": "집계 단위",
+      "daily": "일별",
+      "hourly": "시간별",
+      "gestures": "제스처",
+      "uniqueParticipants": "고유 참여자",
+      "loadErrorTitle": "제스처 빈도를 불러오지 못했습니다",
+      "loadErrorMessage": "선택한 범위의 제스처 빈도를 불러오지 못했습니다.",
+      "empty": "이 기간에는 제스처 활동이 없습니다.",
+      "openingExcluded": "각 사이클 시작 후 첫 1시간 동안의 제스처는 제외했습니다. 시작 직후에는 활동이 유난히 집중되어 있어, 포함하면 이 차트가 왜곡되기 때문입니다."
+    },
+    "spikes": {
+      "count": "급증 ({count})",
+      "groupAria": "감지된 제스처 급증",
+      "previousAria": "이전 급증",
+      "nextAria": "다음 급증",
+      "summary": "시간당 최고 {peak}개 · 급증 구간 총 {total}개 · {date}",
+      "viewing": "급증 #{index} 보기: {start} → {end}",
+      "gestures": "제스처: {count}",
+      "loadErrorTitle": "제스처 급증을 불러오지 못했습니다",
+      "loadErrorMessage": "급증 감지 데이터를 불러오지 못했습니다.",
+      "empty": "인덱싱된 내역에서 감지된 제스처 급증이 없습니다.",
+      "noneRecent": "최근에는 급증이 없습니다.",
+      "selectEarlier": "위에서 급증 번호를 선택하면 과거로 이동해 이전 활동 급증을 살펴볼 수 있습니다.",
+      "emptyWindow": "선택한 급증 구간에는 시간별 데이터가 없습니다."
+    },
+    "activePeriods": {
+      "description": "상위 참여자 {count}명의 활동 구간입니다(연속 제스처 간 간격이 6시간 이하인 제스처 2개 이상). 각 막대는 하나의 연속 활동 구간입니다.",
+      "participant": "참여자",
+      "ariaLabel": "{address}: {start}부터 {end}까지 제스처 {count}개",
+      "tooltipSummary": "제스처 {count}개 · {minutes}분 지속",
+      "loadErrorTitle": "활동 구간을 불러오지 못했습니다",
+      "loadErrorMessage": "상위 참여자 활동 타임라인을 불러오지 못했습니다.",
+      "empty": "상위 참여자의 활동 구간을 찾지 못했습니다."
+    },
+    "typeRatio": {
+      "totalGestures": "총 제스처 수",
+      "sampleEvery": "샘플 간격",
+      "interpolation": "보간",
+      "intervals": {
+        "oneHour": "1시간",
+        "sixHours": "6시간",
+        "twelveHours": "12시간",
+        "oneDay": "1일"
+      },
+      "linear": "직선",
+      "step": "계단",
+      "smooth": "곡선",
+      "notStarted": "현재 사이클이 아직 시작되지 않았습니다.",
+      "loadErrorTitle": "제스처 유형 분포를 불러오지 못했습니다",
+      "loadErrorMessage": "현재 사이클의 제스처 유형 구성을 불러오지 못했습니다.",
+      "empty": "현재 사이클에는 아직 제스처 활동이 없습니다.",
+      "description": "각 샘플은 해당 구간 안의 제스처 유형 구성입니다(구간별 값이며 누적이 아닙니다). 제스처가 없는 구간은 모든 유형이 0%로 표시됩니다."
+    },
+    "endurance": {
+      "timeIntoCycle": "사이클 경과 시간",
+      "intoCycle": "사이클 시작 후 {duration}",
+      "currentLeadWindow": "현재 선두 구간",
+      "enduranceRecord": "최장 선두 기록",
+      "enduranceChampionRecord": "수호 챔피언 기록",
+      "chronoRecord": "시간의 전사 기록",
+      "leadHeldBy": "선두",
+      "legendEndurance": "수호 챔피언 (최장 단일 선두 유지)",
+      "legendChrono": "시간의 전사 (최장 지위 유지)",
+      "legendLead": "선두 유지",
+      "legendNewRecord": "신기록 수립",
+      "enduranceChampion": "수호 챔피언",
+      "enduranceChampionAbbr": "수호",
+      "chronoWarrior": "시간의 전사",
+      "chronoWarriorAbbr": "전사",
+      "newRecord": "신기록",
+      "roleEndurance": " (수호 챔피언)",
+      "roleNewRecord": " (신기록)",
+      "stintAria": "{address} • {duration} 선두 유지 • 사이클 시작 후 {from} → {to}{role}",
+      "description": "각 막대는 하나의 선두 유지 구간으로, 한 주소가 제스처를 남긴 뒤 다음 제스처가 들어오기까지 선두를 지킨 시간을 나타냅니다. 막대가 넓을수록 선두를 오래 지킨 것입니다. 앰버색 테두리 막대는 당시 최장 선두 신기록을 세운 구간이고, 보라색 막대는 전체에서 가장 긴 단일 선두 유지 구간(수호 챔피언), 장미색 행은 그 지위를 전체적으로 가장 오래 지킨 참여자(시간의 전사)입니다. 막대에 마우스를 올리면 상세 정보가 표시됩니다.",
+      "selectCycle": "살펴볼 사이클을 선택해 주세요.",
+      "loadErrorTitle": "선두 유지 기록을 불러오지 못했습니다",
+      "loadErrorMessage": "이 사이클의 제스처 내역을 불러오지 못했습니다.",
+      "empty": "이 사이클에는 아직 선두 기록이 없습니다.",
+      "championSummary": "수호 챔피언: {address} · {duration} 선두 유지",
+      "chronoSummary": "시간의 전사: {address} · {duration} 지위 유지",
+      "gantt": "간트",
+      "lineChart": "선 차트",
+      "openWindowAria": "차트를 새 창에서 열기",
+      "openWindowTitle": "새 창에서 열기"
+    },
+    "cyclePicker": {
+      "cycle": "사이클",
+      "previousCycleAria": "이전 사이클",
+      "nextCycleAria": "다음 사이클",
+      "cycleNumberAria": "사이클 번호",
+      "liveCycle": "실시간 사이클",
+      "jumpLive": "실시간으로 이동"
+    },
+    "cstWindow": {
+      "timeIntoCycle": "사이클 경과 시간",
+      "intoCycle": "사이클 시작 후 {duration}",
+      "window": "CST 보정 구간",
+      "windowAfter": "이 제스처 이후 구간",
+      "typeEth": "ETH 제스처 (단축)",
+      "typeRandomWalk": "ETH + RandomWalk 제스처 (단축)",
+      "typeCst": "CST 제스처 (연장)",
+      "summaryMin": "최소: {duration}",
+      "summaryMax": "최대: {duration}",
+      "summaryCurrent": "현재: {duration}",
+      "summaryFinal": "마감 시점: {duration}",
+      "description": "CST 보정 구간은 CST 제스처 비용이 시작값에서 0까지 내려가는 데 걸리는 시간을 정합니다. ETH 제스처는 구간을 조금씩 줄이고, CST 제스처는 구간을 늘립니다. 각 점은 제스처 하나이며 유형별로 색이 다릅니다. 선은 해당 제스처 이후 적용되는 구간을 나타냅니다.",
+      "empty": "이 사이클에는 제스처별 보정 구간 데이터가 없습니다. V2 이벤트 이전에 인덱싱된 사이클에는 이 데이터가 포함되지 않습니다.",
+      "selectCycle": "살펴볼 사이클을 선택해 주세요.",
+      "loadErrorTitle": "보정 구간 타임라인을 불러오지 못했습니다",
+      "loadErrorMessage": "이 사이클의 제스처 내역을 불러오지 못했습니다."
+    },
+    "cstCost": {
+      "timeIntoCycle": "사이클 경과 시간",
+      "intoCycle": "사이클 시작 후 {duration}",
+      "priceLine": "제스처별 지불 CST",
+      "clockLine": "제스처 직전 남은 마감 시간",
+      "cstPaid": "지불한 CST",
+      "clockBefore": "직전 남은 마감 시간",
+      "gestureBy": "참여자",
+      "clickHint": "점을 클릭하면 트랜잭션이 열립니다.",
+      "summaryMax": "최고 비용: {amount} (사이클 시작 후 {when})",
+      "summaryTotal": "총 소모: {amount}",
+      "summaryCount": "CST 제스처 {count}개",
+      "description": "보라색 점은 각 제스처에 실제로 지불한 CST입니다(로그 스케일이며, 빈 점은 비용이 0이었던 제스처입니다). CST 제스처마다 비용은 지불액의 약 두 배로 재설정된 뒤 보정 구간에 걸쳐 0까지 내려갑니다. 장미색 점선은 각 제스처 직전에 남아 있던 마감 시간입니다. 남은 시간이 얼마 없을 때 제스처가 빠르게 이어지면 비용이 내려갈 틈이 없어 지불 비용이 치솟습니다. 점을 클릭하면 해당 트랜잭션이 열립니다.",
+      "empty": "이 사이클에는 CST 제스처가 없습니다.",
+      "selectCycle": "살펴볼 사이클을 선택해 주세요.",
+      "loadErrorTitle": "CST 제스처 비용을 불러오지 못했습니다",
+      "loadErrorMessage": "이 사이클의 제스처 내역을 불러오지 못했습니다."
+    },
+    "supply": {
+      "totalSupply": "총 공급량",
+      "imprint": "각인",
+      "consume": "소모",
+      "net": "순 변동",
+      "numGestures": "제스처 수",
+      "from": "시작일",
+      "to": "종료일",
+      "update": "차트 업데이트",
+      "invalidRange": "시작 날짜는 종료 날짜와 같거나 그 이전이어야 합니다.",
+      "loadErrorTitle": "공급량 내역을 불러오지 못했습니다",
+      "loadDateError": "선택한 범위의 CST 총 공급량을 불러오지 못했습니다.",
+      "emptyDate": "이 날짜 범위에는 공급량 내역이 없습니다.",
+      "gesture": "제스처 {number}",
+      "gestureType": "제스처 유형",
+      "gestureInfoId": "제스처 정보 ID",
+      "loadGestureError": "제스처별 CST 총 공급량을 불러오지 못했습니다.",
+      "emptyGesture": "제스처별 공급량 내역이 없습니다."
+    },
+    "balance": {
+      "outreachWallet": "홍보 지갑",
+      "others": "기타"
+    }
+  },
+  "recipientHistory": {
+    "pageTitle": "내 배분 내역",
+    "connectedTitle": "내 배분 내역",
+    "subtitle": "지난 배분 회수 및 수령 내역 보기",
+    "disconnectedDescription": "모든 Cosmic Signature 퍼포먼스 사이클에 걸친 전체 배분 내역을 확인할 수 있습니다. 시그니처 배분 회수, ETH 별빛 선정 배분, Cosmic Signature NFT 배분, 앵커링 지급이 포함됩니다.",
+    "connectedDescription": "모든 Cosmic Signature 퍼포먼스 사이클에 걸친 전체 배분 내역을 확인할 수 있습니다. 시그니처 배분 회수, 별빛 선정 ETH 배분, Cosmic Signature NFT 배분, 앵커링 지급이 포함됩니다.",
+    "walletTitle": "지갑이 연결되지 않았습니다",
+    "walletDescription": "배분 내역을 보려면 지갑을 연결해 주세요.",
+    "loadError": "배분 내역을 불러오지 못했습니다",
+    "loadErrorDescription": "잠시 후 다시 시도해 주세요.",
+    "emptyTitle": "아직 배분이 없습니다",
+    "emptyDescription": "현재 기록된 배분이 없습니다."
+  },
+  "namedNfts": {
+    "eyebrow": "이름 붙인 NFT · {count}",
+    "title": "이름 붙인 Cosmic Signature NFT",
+    "subtitle": "직접 지은 이름이 붙은 Cosmic Signature NFT 둘러보기",
+    "description": "Cosmic Signature NFT 소유자는 자신의 NFT에 직접 이름을 붙여 컬렉션 안에서 고유한 정체성을 부여할 수 있습니다. 이름 붙인 NFT는 갤러리에서 눈에 띄며 소유자의 개성을 담습니다.",
+    "emptyTitle": "이름 붙인 NFT 없음",
+    "emptyDescription": "아직 이름이 붙은 Cosmic Signature NFT가 없습니다."
+  },
+  "attachedNfts": {
+    "eyebrow": "첨부된 NFT · {count}",
+    "title": "첨부된 NFT 기여",
+    "subtitle": "여러 사이클에 걸쳐 커뮤니티 구성원이 제스처에 첨부한 NFT",
+    "description": "커뮤니티 구성원은 고급 옵션을 통해 자신의 NFT(ERC-721)를 제스처에 첨부할 수 있습니다. 첨부된 NFT는 사이클이 마감될 때 시그니처 배분을 받는 참여자에게 전달되어, ETH를 넘어 배분을 더 풍성하게 합니다."
+  },
+  "usedRwlkNfts": {
+    "eyebrow": "사용된 RWLK · {count}",
+    "title": "사용된 Random Walk NFT",
+    "subtitle": "일회성 50% 제스처 비용 할인을 위해 ETH 제스처에 첨부된 Random Walk NFT",
+    "description": "RandomWalk NFT 보유자는 아직 사용하지 않은 NFT를 ETH 제스처에 첨부해 Cosmic Signature에서 제스처 비용을 50% 할인받을 수 있습니다. 한 번 사용된 RandomWalk NFT는 여기에 기록됩니다. 각 NFT는 이 할인에 한 번만 쓸 수 있으므로, 언제 사용할지가 전략적인 선택이 됩니다.",
+    "loading": "불러오는 중…",
+    "empty": "아직 NFT가 없습니다."
+  },
+  "stellarSelectionEth": {
+    "invalidAddress": "유효하지 않은 주소",
+    "user": "사용자",
+    "heading": "이 참여자에게 배분된 별빛 선정 ETH",
+    "retrievable": "회수 가능한 배분: {amount} ETH",
+    "retrieveAll": "모두 회수",
+    "empty": "아직 별빛 선정 ETH가 없습니다."
+  },
+  "stellarSelectionNft": {
+    "invalidAddress": "유효하지 않은 주소",
+    "user": "사용자",
+    "heading": "이 참여자에게 배분된 별빛 선정 NFT",
+    "loading": "불러오는 중…",
+    "empty": "아직 NFT 배분이 없습니다.",
+    "isRandomWalk": "RandomWalk 여부",
+    "isAnchorHolder": "앵커링 보유자 여부"
+  },
+  "systemEvent": {
+    "titleBeforeCycle": "사이클 {cycle} 이전에 설정된 시스템 구성",
+    "titleBeforeDeployment": "배포 이전에 설정된 시스템 구성",
+    "range": "이벤트 로그 범위 {start}~{end}",
+    "breadcrumbs": {
+      "home": "홈",
+      "coordination": "조율 변경 내역",
+      "beforeCycle": "사이클 {cycle} 이전",
+      "deployment": "배포"
+    },
+    "loading": "불러오는 중…",
+    "loadError": "시스템 이벤트를 불러오지 못했습니다",
+    "explainEvent": "{event} 설명 보기",
+    "adminEvents": {
+      "undefined": "정의되지 않음",
+      "publicGoodsPercentage": "공공재 금고로 지정된 자금의 배분 비율이 변경되었습니다.",
+      "signatureAllocationPercentage": "시그니처 배분에 지정된 자금의 배분 비율이 변경되었습니다.",
+      "stellarSelectionPercentage": "별빛 선정 배분에 지정된 자금의 배분 비율이 변경되었습니다.",
+      "anchorDistributionPercentage": "앵커링 지급에 지정된 자금의 배분 비율이 변경되었습니다.",
+      "stellarEthRecipients": "사이클당 별빛 선정 수령자 수가 변경되었습니다.",
+      "stellarNftRecipients": "사이클당 별빛 선정 NFT 수령자 수가 변경되었습니다.",
+      "cycleActivationDelay": "사이클 활성화 전 지연 시간이 변경되었습니다.",
+      "anchoredRandomWalkRecipients": "앵커링된 RandomWalk NFT 대상 별빛 선정 NFT 수령자 수가 변경되었습니다.",
+      "publicGoodsVaultAddress": "공공재 금고 주소가 변경되었습니다.",
+      "randomWalkContractAddress": "RandomWalkNFT 컨트랙트 주소가 변경되었습니다.",
+      "allocationsWalletAddress": "배분 지갑(배분 에스크로) 주소가 변경되었습니다.",
+      "anchoringWalletAddress": "앵커링 지갑 주소가 변경되었습니다.",
+      "randomWalkAnchoringWalletAddress": "RandomWalk NFT 앵커링 지갑 주소가 변경되었습니다.",
+      "outreachWalletAddress": "홍보 지갑 주소가 변경되었습니다.",
+      "cstContractAddress": "Cosmic Signature CST 토큰(ERC-20) 컨트랙트 주소가 변경되었습니다.",
+      "cosmicSignatureNftAddress": "Cosmic Signature NFT(ERC-721) 컨트랙트 주소가 변경되었습니다.",
+      "contractUpgrade": "CosmicSignature 컨트랙트가 업그레이드되었습니다.",
+      "timeIncreaseRatio": "시간 증가 비율이 변경되었습니다.",
+      "finalizationTimeout": "배분 마감 제한 시간이 변경되었습니다.",
+      "gestureCostIncreaseRatio": "제스처 비용 증가 비율이 변경되었습니다.",
+      "gestureTimeIncrement": "제스처마다 늘어나는 마감 시간 증가량이 변경되었습니다.",
+      "initialFinalizationDivisor": "초기 사이클 마감 시각을 구하는 제수(mainPrizeTimeIncrementInMicroSeconds / 제수)가 변경되었습니다.",
+      "treasurerAddress": "홍보 지갑 주소가 변경되었습니다.",
+      "activationTime": "사이클 활성화 시각이 변경되었습니다.",
+      "cstCalibrationLength": "시작 CST 보정 구간의 길이가 변경되었습니다.",
+      "erc20Multiplier": "ERC-20 토큰 배분 배수가 변경되었습니다.",
+      "minimumCstGestureCost": "CST 시작 제스처 비용의 최소 한도가 변경되었습니다.",
+      "outreachAllocationPercentage": "홍보 배분에 지정된 자금의 배분 비율이 변경되었습니다.",
+      "tokenAllocationPercentage": "토큰 배분에 지정된 자금의 배분 비율이 변경되었습니다.",
+      "maxMessageLength": "제스처 메시지의 최대 길이가 변경되었습니다.",
+      "tokenScriptUrl": "토큰 생성 스크립트 URL이 변경되었습니다.",
+      "nftBaseUri": "CosmicSignature NFT BaseURI가 변경되었습니다.",
+      "contractInitialized": "컨트랙트 초기화 완료",
+      "ownershipTransferred": "컨트랙트 소유권이 이전되었습니다.",
+      "allocationRetrievalTimeout": "배분 회수 제한 시간이 변경되었습니다.",
+      "ethCalibrationDurationDivisor": "ETH 보정 구간 지속 시간이 변경되었습니다.",
+      "ethCalibrationEndingCostDivisor": "ETH 보정 구간 종료 시점 제스처 비용의 제수가 변경되었습니다.",
+      "chronoWarriorEthPercentage": "시간의 전사 ETH 배분에 지정된 자금의 배분 비율이 변경되었습니다."
+    }
+  },
+  "attachedNftCard": {
+    "viewNamed": "첨부된 NFT {name} 보기",
+    "viewId": "첨부된 NFT {id} 보기",
+    "imageAltNamed": "첨부된 NFT {name}",
+    "imageAlt": "첨부된 NFT",
+    "unknownToken": "알 수 없는 토큰",
+    "attached": "첨부됨"
+  },
+  "attachedNftLinks": {
+    "viewNft": "NFT 보기",
+    "viewOpenSea": "OpenSea에서 보기",
+    "viewContract": "컨트랙트 보기",
+    "detailsUnavailable": "NFT 상세 정보 없음",
+    "contractUnavailable": "컨트랙트 정보 없음"
+  },
+  "publicDataSummaries": {
+    "common": {
+      "lastUpdated": "최근 업데이트: {date}. 데이터 출처: {source}. 아래 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색 엔진과 AI 크롤러를 위해 초기 HTML에 담겨 있습니다.",
+      "relatedPagesAria": "{heading} 관련 페이지",
+      "unavailable": "확인 불가"
+    },
+    "attachedNfts": {
+      "eyebrow": "첨부된 NFT 기여 · Arbitrum",
+      "heading": "첨부된 NFT 기여",
+      "description": "Cosmic Signature 제스처에 첨부된 NFT를 둘러볼 수 있습니다. 첨부된 ERC-721 토큰은 사이클이 마감될 때 시그니처 배분을 받는 참여자에게 전달됩니다.",
+      "source": "Cosmic Signature 공개 첨부 NFT API",
+      "cards": {
+        "records": "첨부된 NFT 기록",
+        "contracts": "고유 NFT 컨트랙트",
+        "contributors": "기여자 지갑"
+      },
+      "links": {
+        "gallery": "Cosmic Signature 갤러리 탐색",
+        "cycle": "현재 퍼포먼스 사이클 보기",
+        "learn": "첨부가 사이클에서 하는 역할 알아보기"
+      }
+    },
+    "namedNfts": {
+      "eyebrow": "이름 붙인 NFT · Arbitrum",
+      "heading": "이름 붙인 Cosmic Signature NFT",
+      "description": "소유자가 직접 이름을 붙인 Cosmic Signature NFT를 둘러볼 수 있습니다. 토큰의 정체성, 갤러리 탐색, 온체인 컬렉션 내역이 여기서 이어집니다.",
+      "source": "Cosmic Signature 공개 토큰 API",
+      "cards": {
+        "named": "이름 붙인 Cosmic Signature NFT",
+        "owners": "현재 소유자",
+        "collection": "컬렉션"
+      },
+      "links": {
+        "gallery": "전체 갤러리 탐색",
+        "learn": "작품 알아보기",
+        "code": "렌더링 소스 코드 살펴보기"
+      }
+    },
+    "usedRwlkNfts": {
+      "eyebrow": "RandomWalk NFT 사용 · Arbitrum",
+      "heading": "사용된 RandomWalk NFT",
+      "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT를 살펴볼 수 있습니다.",
+      "source": "Cosmic Signature 공개 RandomWalk 사용 API",
+      "cards": {
+        "used": "사용된 RandomWalk NFT",
+        "discount": "일회성 할인",
+        "scope": "사용 범위",
+        "scopeValue": "NFT당 제스처 한 번"
+      },
+      "links": {
+        "imprint": "RandomWalk NFT 각인",
+        "learn": "제스처 작동 원리 알아보기",
+        "cycle": "현재 사이클 데이터 보기"
+      }
+    }
+  },
+  "routeError": {
+    "title": "통계를 불러오지 못했습니다",
+    "message": "이 통계 페이지를 표시하는 중 문제가 발생했습니다. 다시 시도하거나 잠시 후 다시 방문해 주세요."
+  }
+}

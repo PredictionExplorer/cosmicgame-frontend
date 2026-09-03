@@ -1,0 +1,423 @@
+{
+  "publicData": {
+    "common": {
+      "unavailable": "데이터 없음",
+      "lastUpdated": "마지막 업데이트: {date}. 데이터 출처: {source}. 아래 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색엔진과 AI 크롤러를 위해 초기 HTML에 포함됩니다.",
+      "relatedPagesAria": "{heading} 관련 페이지"
+    },
+    "routes": {
+      "allocation": {
+        "eyebrow": "배분 내역 · Arbitrum",
+        "heading": "배분 수령자",
+        "description": "마감된 퍼포먼스 사이클에 걸친 Cosmic Signature의 공개 배분 내역을 둘러볼 수 있습니다. 시그니처 배분, 별빛 선정, 앵커링 지급, 공공재 흐름이 포함됩니다.",
+        "source": "Cosmic Signature 공개 사이클 API",
+        "links": {
+          "statistics": "프로토콜 통계 보기",
+          "learn": "사이클 마감 과정 알아보기",
+          "contracts": "컨트랙트 주소 확인"
+        },
+        "cards": {
+          "finalizedCycles": {
+            "label": "마감된 사이클",
+            "tooltip": "배분 데이터가 마감된 퍼포먼스 사이클 수를 나타냅니다."
+          },
+          "recipients": {
+            "label": "시그니처 배분 수령자",
+            "tooltip": "최종 제스처를 남겨 시그니처 배분을 받은 서로 다른 지갑 수를 나타냅니다."
+          },
+          "totalEth": {
+            "label": "시그니처 배분 ETH 총액",
+            "tooltip": "사이클 기록을 바탕으로 집계한, 마감된 사이클 전체의 시그니처 배분 ETH 합계입니다."
+          }
+        }
+      },
+      "anchoring": {
+        "eyebrow": "앵커링 지급 · Arbitrum",
+        "heading": "앵커링 지급",
+        "description": "Cosmic Signature NFT 앵커링, ETH 앵커링 지급 기록, RandomWalk NFT 앵커링, 앵커링 NFT 별빛 선정 각인 기록을 추적할 수 있습니다.",
+        "source": "Cosmic Signature 공개 앵커링 API",
+        "links": {
+          "statistics": "앵커링 통계 보기",
+          "learn": "앵커링 알아보기",
+          "gallery": "Cosmic Signature NFT 둘러보기"
+        },
+        "cards": {
+          "actions": {
+            "label": "앵커링 / 해제 작업"
+          },
+          "tokens": {
+            "label": "현재 앵커링된 토큰"
+          },
+          "distributions": {
+            "label": "앵커링 지급 기록"
+          }
+        }
+      },
+      "marketing": {
+        "eyebrow": "홍보 배분 · Arbitrum",
+        "heading": "홍보 배분",
+        "description": "프로토콜을 널리 알리는 데 힘을 보탠 생태계 기여자를 위한 Cosmic Signature 홍보 배분 내역과 CST 배분 현황을 확인할 수 있습니다.",
+        "source": "Cosmic Signature 공개 홍보 배분 API",
+        "links": {
+          "faq": "자주 묻는 질문 읽기",
+          "statistics": "프로토콜 통계 보기",
+          "siteMap": "공개 페이지 둘러보기"
+        },
+        "cards": {
+          "records": {
+            "label": "홍보 배분 기록"
+          },
+          "reserve": {
+            "label": "홍보 준비금"
+          },
+          "contributors": {
+            "label": "고유 홍보 기여자"
+          }
+        }
+      },
+      "imprint": {
+        "eyebrow": "RandomWalk NFT 각인 · Arbitrum",
+        "heading": "RandomWalk NFT 각인",
+        "description": "Cosmic Signature 참여를 위해 RandomWalk NFT를 각인합니다. 사용하지 않은 RandomWalk NFT는 ETH 제스처 하나에 첨부해 제스처 비용을 50% 낮출 수 있습니다.",
+        "source": "Cosmic Signature 공개 프로토콜 구성 API",
+        "links": {
+          "cycle": "진행 중인 퍼포먼스 사이클 열기",
+          "learn": "제스처 알아보기",
+          "used": "사용된 RandomWalk NFT 보기"
+        },
+        "cards": {
+          "cycle": {
+            "label": "진행 중인 퍼포먼스 사이클"
+          },
+          "cost": {
+            "label": "현재 ETH 제스처 비용"
+          },
+          "discount": {
+            "label": "RandomWalk 할인"
+          }
+        }
+      },
+      "eth-contribution": {
+        "eyebrow": "직접 ETH 기여 · Arbitrum",
+        "heading": "직접 ETH 기여",
+        "description": "Cosmic Signature 공공재 금고에 직접 기여된 ETH와 그에 딸린 공개 메모, 사이클, 기여자 기록을 둘러볼 수 있습니다.",
+        "source": "Cosmic Signature 공개 기여 API",
+        "links": {
+          "protocol": "프로토콜 공공재 기여",
+          "voluntary": "자발적 공공재 기록",
+          "risk": "위험 고지 읽기"
+        },
+        "cards": {
+          "records": {
+            "label": "직접 기여 기록"
+          },
+          "totalEth": {
+            "label": "직접 ETH 기여 총액"
+          },
+          "contributors": {
+            "label": "고유 기여자"
+          }
+        }
+      },
+      "attached-nfts": {
+        "eyebrow": "첨부된 NFT 기여 · Arbitrum",
+        "heading": "첨부된 NFT 기여",
+        "description": "Cosmic Signature 제스처에 첨부된 NFT를 둘러볼 수 있습니다. 첨부된 ERC-721 토큰은 사이클이 마감될 때 시그니처 배분을 받는 참여자에게 전달됩니다.",
+        "source": "Cosmic Signature 공개 첨부 NFT API",
+        "links": {
+          "gallery": "Cosmic Signature 갤러리 둘러보기",
+          "cycle": "현재 퍼포먼스 사이클 보기",
+          "learn": "첨부가 사이클에서 하는 역할 알아보기"
+        },
+        "cards": {
+          "records": {
+            "label": "첨부된 NFT 기록"
+          },
+          "contracts": {
+            "label": "고유 NFT 컨트랙트"
+          },
+          "contributors": {
+            "label": "기여자 지갑"
+          }
+        }
+      },
+      "allocation-finalized": {
+        "eyebrow": "회수된 배분 · Arbitrum",
+        "heading": "회수된 배분",
+        "description": "Cosmic Signature의 공개 배분 회수 기록을 살펴볼 수 있습니다. ETH 수령, Cosmic Signature NFT 배분, 별빛 선정 배분이 포함됩니다.",
+        "source": "Cosmic Signature 공개 배분 회수 API",
+        "links": {
+          "allocation": "배분 수령자 보기",
+          "statistics": "종합 통계 보기",
+          "contracts": "검증된 컨트랙트 확인"
+        },
+        "cards": {
+          "records": {
+            "label": "회수된 배분 기록"
+          },
+          "eth": {
+            "label": "회수된 ETH"
+          },
+          "recipients": {
+            "label": "수령자 지갑"
+          }
+        }
+      },
+      "named-nfts": {
+        "eyebrow": "이름 붙인 NFT · Arbitrum",
+        "heading": "이름 붙인 Cosmic Signature NFT",
+        "description": "소유자가 직접 이름을 붙인 Cosmic Signature NFT를 둘러볼 수 있습니다. 토큰의 정체성, 갤러리 탐색, 온체인 컬렉션 이력이 하나로 이어집니다.",
+        "source": "Cosmic Signature 공개 토큰 API",
+        "links": {
+          "gallery": "전체 갤러리 둘러보기",
+          "learn": "작품 알아보기",
+          "code": "렌더링 소스 코드 확인"
+        },
+        "cards": {
+          "named": {
+            "label": "이름 붙인 Cosmic Signature NFT"
+          },
+          "owners": {
+            "label": "현재 소유자"
+          },
+          "collection": {
+            "label": "컬렉션",
+            "value": "Cosmic Signature ERC-721"
+          }
+        }
+      },
+      "used-rwlk-nfts": {
+        "eyebrow": "RandomWalk NFT 사용 현황 · Arbitrum",
+        "heading": "사용된 RandomWalk NFT",
+        "description": "1회 한정 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT를 확인할 수 있습니다.",
+        "source": "Cosmic Signature 공개 RandomWalk 사용 기록 API",
+        "links": {
+          "imprint": "RandomWalk NFT 각인",
+          "learn": "제스처 알아보기",
+          "cycle": "현재 사이클 데이터 보기"
+        },
+        "cards": {
+          "used": {
+            "label": "사용된 RandomWalk NFT"
+          },
+          "discount": {
+            "label": "1회 한정 할인"
+          },
+          "scope": {
+            "label": "사용 범위",
+            "value": "NFT당 제스처 1회"
+          }
+        }
+      },
+      "coordination-changes": {
+        "eyebrow": "조율 변경 · Arbitrum",
+        "heading": "조율 변경 내역",
+        "description": "프로토콜 모드 변경, 매개변수 업데이트, 이후 사이클에 영향을 주는 관리 기록 등 Cosmic Signature의 공개 조율 변경 내역을 확인할 수 있습니다.",
+        "source": "Cosmic Signature 공개 시스템 이벤트 API",
+        "links": {
+          "security": "보안 개요 읽기",
+          "audits": "보안 감사와 검증 확인",
+          "learn": "CST와 조율 알아보기"
+        },
+        "cards": {
+          "records": {
+            "label": "조율 변경 기록"
+          },
+          "governance": {
+            "label": "조율 기구",
+            "value": "우주 평의회"
+          },
+          "network": {
+            "label": "네트워크",
+            "value": "Arbitrum"
+          }
+        }
+      },
+      "public-goods-contributions-cg": {
+        "eyebrow": "프로토콜 공공재 기여 · Arbitrum",
+        "heading": "프로토콜 공공재 기여",
+        "description": "프로토콜 사이클에서 공공재 금고와 지정된 수령처(현재 Protocol Guild)로 자동 전달되는 Cosmic Signature 공공재 기여를 추적할 수 있습니다.",
+        "source": "Cosmic Signature 공개 공공재 API",
+        "links": {
+          "learn": "공공재 알아보기",
+          "retrievals": "공공재 회수 내역 보기",
+          "statistics": "공공재 통계 보기"
+        },
+        "cards": {
+          "records": {
+            "label": "프로토콜 기여 기록"
+          },
+          "totalEth": {
+            "label": "프로토콜 공공재 ETH"
+          },
+          "track": {
+            "label": "배분 경로",
+            "value": "공공재"
+          }
+        }
+      },
+      "public-goods-contributions-voluntary": {
+        "eyebrow": "자발적 공공재 기여 · Arbitrum",
+        "heading": "자발적 공공재 기여",
+        "description": "Cosmic Signature 커뮤니티의 자발적 공공재 기여를 사이클 맥락, 기여자 기록과 함께 둘러볼 수 있습니다.",
+        "source": "Cosmic Signature 공개 공공재 API",
+        "links": {
+          "direct": "직접 ETH 기여 보기",
+          "protocol": "프로토콜 공공재 기여",
+          "risk": "위험 고지 읽기"
+        },
+        "cards": {
+          "records": {
+            "label": "자발적 기여 기록"
+          },
+          "totalEth": {
+            "label": "자발적 공공재 ETH"
+          },
+          "contributors": {
+            "label": "기여자 지갑"
+          }
+        }
+      },
+      "public-goods-retrievals": {
+        "eyebrow": "공공재 회수 · Arbitrum",
+        "heading": "공공재 회수",
+        "description": "사이클 준비금이 지정된 공공재 수령처(현재 Protocol Guild)로 전달되는 Cosmic Signature 공공재 금고의 회수 내역을 확인할 수 있습니다.",
+        "source": "Cosmic Signature 공개 공공재 API",
+        "links": {
+          "protocol": "프로토콜 공공재 기여",
+          "voluntary": "자발적 공공재 기여",
+          "contracts": "공개 컨트랙트 주소 확인"
+        },
+        "cards": {
+          "records": {
+            "label": "공공재 회수 기록"
+          },
+          "totalEth": {
+            "label": "회수된 공공재 ETH"
+          },
+          "track": {
+            "label": "수령처 경로",
+            "value": "공공재 금고"
+          }
+        }
+      }
+    }
+  },
+  "gallerySummary": {
+    "eyebrow": "결정론적 NFT 아트 · Arbitrum",
+    "heading": "Cosmic Signature 갤러리",
+    "description": "결정론적 삼체 물리, 온체인 시드, 스펙트럼 렌더링, 퍼포먼스 사이클 데이터로 생성된 Cosmic Signature NFT 작품을 감상할 수 있습니다. 모든 시그니처는 프로토콜 기록으로 재현 가능하며, 특정 사이클의 맥락을 담고 있습니다.",
+    "unavailable": "데이터 없음",
+    "cards": {
+      "imprinted": "각인된 NFT",
+      "process": "아트 생성 과정",
+      "processValue": "삼체 시뮬레이션",
+      "license": "라이선스",
+      "licenseValue": "CC0 준수"
+    },
+    "relatedAria": "갤러리 관련 페이지",
+    "links": {
+      "learn": "Cosmic Signature 작동 원리 알아보기",
+      "code": "렌더링 소스 코드 확인",
+      "statistics": "프로토콜 통계 보기"
+    }
+  },
+  "currentCycleSummary": {
+    "eyebrow": "진행 중인 퍼포먼스 사이클 · Arbitrum",
+    "heading": "현재 Cosmic Signature 퍼포먼스 사이클",
+    "description": "이 페이지는 진행 중인 Cosmic Signature 퍼포먼스 사이클을 추적합니다. 공개 제스처 수, 사이클 준비금 현황, 첨부 자산, 배분 경로, 마감 상태를 담고 있으며, 아래 대화형 콘솔은 실시간 앱 데이터로 채워집니다.",
+    "unavailable": "데이터 없음",
+    "cards": {
+      "cycle": "사이클",
+      "gestures": "제스처",
+      "reserve": "현재 준비금"
+    },
+    "relatedAria": "현재 사이클 관련 페이지",
+    "links": {
+      "learn": "퍼포먼스 사이클 작동 원리 알아보기",
+      "statistics": "프로토콜 통계 보기",
+      "contracts": "검증된 컨트랙트 확인"
+    }
+  },
+  "jsonLd": {
+    "app": {
+      "protocolDescription": "Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 모든 제스처가 사이클의 최종 시그니처를 빚어내고, 프로토콜은 준비금을 Protocol Guild를 포함한 10개가 넘는 배분 경로로 배분합니다.",
+      "webApplicationDescription": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클이 마감되면 프로토콜이 10개가 넘는 경로로 배분을 실행합니다.",
+      "browserRequirements": "Web3 호환 브라우저 또는 지갑 확장 프로그램이 필요합니다."
+    },
+    "artProtocol": {
+      "creditText": "Cosmic Signature 프로토콜",
+      "genre": "제너러티브 아트"
+    },
+    "product": {
+      "category": "디지털 수집품"
+    }
+  },
+  "og": {
+    "default": {
+      "alt": "Cosmic Signature — 모든 제스처가 시그니처를 빚어냅니다.",
+      "eyebrow": "Cosmic Signature",
+      "title": "모든 제스처가 시그니처를 빚어냅니다.",
+      "subhead": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다.",
+      "chips": ["CC0", "온체인 검증", "7% Protocol Guild"]
+    },
+    "gallery": {
+      "alt": "Cosmic Signature — 갤러리",
+      "eyebrow": "갤러리",
+      "title": "삼체의 궤적을 온체인에서 렌더링합니다.",
+      "subhead": "모든 시그니처는 스펙트럼 렌더링을 거친 결정론적 삼체 시뮬레이션입니다. 같은 시드, 같은 픽셀.",
+      "chips": ["CC0", "결정론적", "재현 가능"]
+    },
+    "currentCycle": {
+      "alt": "Cosmic Signature — 지금 진행 중인 퍼포먼스 사이클.",
+      "eyebrow": "현재 사이클",
+      "title": "퍼포먼스 사이클, 지금 진행 중입니다.",
+      "subhead": "제스처 내역, 순위표, 첨부된 기여, 배분 현황을 실시간으로 확인합니다.",
+      "chips": ["실시간", "Arbitrum One", "온체인"]
+    },
+    "anchoring": {
+      "alt": "Cosmic Signature — 앵커링",
+      "eyebrow": "앵커링",
+      "title": "시그니처를 앵커링하면 사이클마다 몫을 받습니다.",
+      "subhead": "앵커링된 Cosmic Signature NFT는 사이클별 앵커링 지급을 비례하여 받습니다. 해제는 언제든 가능합니다.",
+      "chips": ["잠금 없음", "사이클별 ETH", "별빛 선정"]
+    },
+    "faq": {
+      "alt": "Cosmic Signature — 자주 묻는 질문",
+      "eyebrow": "자주 묻는 질문",
+      "title": "궁금한 점에 분명하게 답합니다.",
+      "subhead": "퍼포먼스 사이클, 제스처, 배분, 앵커링, 프로토콜 조율을 다룹니다.",
+      "chips": ["CC0", "온체인 검증", "7% Protocol Guild"]
+    },
+    "howItWorks": {
+      "alt": "Cosmic Signature — 작동 원리",
+      "eyebrow": "작동 원리",
+      "title": "보정에서 배분까지, 네 단계로 진행됩니다.",
+      "subhead": "사이클이 열립니다. 제스처를 남깁니다. 마감합니다. 프로토콜이 준비금을 배분합니다.",
+      "chips": ["보정", "제스처", "배분"]
+    },
+    "gesture": {
+      "alt": "Cosmic Signature — 제스처",
+      "eyebrow": "제스처",
+      "eyebrowWithValue": "제스처 순번 #{value}",
+      "title": "시그니처에 각인을 남깁니다.",
+      "subhead": "제스처마다 사이클 마감 시각이 늘어나고, 참여 CST가 각인되며, 사이클의 시그니처가 계속 빚어집니다.",
+      "chips": ["CC0", "온체인 검증", "7% Protocol Guild"]
+    },
+    "allocation": {
+      "alt": "Cosmic Signature — 사이클 준비금 배분 결과",
+      "eyebrow": "배분",
+      "eyebrowWithValue": "사이클 {value}",
+      "title": "사이클 준비금 배분 결과",
+      "subhead": "사이클 준비금이 10개가 넘는 배분 경로로 어떻게 배분되었는지 보여 줍니다.",
+      "chips": ["시그니처", "시간의 전사", "앵커링"]
+    },
+    "participant": {
+      "alt": "Cosmic Signature — 참여자",
+      "eyebrow": "참여자",
+      "title": "참여자",
+      "subhead": "모든 퍼포먼스 사이클에 걸친 제스처, 배분, 앵커링, 기여 내역입니다.",
+      "chips": ["제스처", "배분", "앵커링"]
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "faqPage": {
+    "heading": "자주 묻는 질문",
+    "description": "Cosmic Signature를 두고 분명하게 답해 두어야 할 질문: 프로토콜은 무엇이고, 제스처는 어떻게 작동하며, 무엇이 아닌지."
+  },
+  "languageSwitcher": {
+    "label": "언어"
+  },
+  "accessibility": {
+    "skipToMain": "본문으로 건너뛰기",
+    "breadcrumb": "탐색 경로",
+    "footer": "푸터"
+  },
+  "breadcrumbs": {
+    "home": "홈",
+    "gallery": "갤러리"
+  },
+  "status": {
+    "loading": "불러오는 중",
+    "loadingEllipsis": "불러오는 중…",
+    "loadingDots": "불러오는 중…",
+    "noData": "데이터가 없습니다.",
+    "nothingHere": "아직 표시할 내용이 없습니다"
+  },
+  "actions": {
+    "copyAddress": "주소 복사",
+    "addressCopied": "주소 복사됨",
+    "copied": "복사됨",
+    "cancel": "취소",
+    "close": "닫기"
+  },
+  "externalLink": {
+    "title": "Cosmic Signature를 벗어납니다",
+    "description": "이 링크는 온체인에 저장된 참여자 메시지에서 가져온 것입니다. 검토나 검증을 거치지 않았으므로, 아래 주소가 예상한 곳인지 확인해 주세요.",
+    "copy": "링크 복사",
+    "copied": "링크 복사됨",
+    "warning": "외부 사이트에 지갑 시드 문구나 개인 키를 입력해서는 절대 안 됩니다.",
+    "open": "링크 열기"
+  }
+}

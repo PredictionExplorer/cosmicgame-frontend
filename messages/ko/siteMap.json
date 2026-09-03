@@ -1,0 +1,192 @@
+{
+  "page": {
+    "title": "사이트맵",
+    "subtitle": "계정 페이지와 공개 프로토콜 데이터로 바로 이동하는 링크 모음입니다.",
+    "home": "홈",
+    "jsonLdName": "Cosmic Signature 사이트맵"
+  },
+  "sections": {
+    "personal": {
+      "title": "개인 도구",
+      "description": "지갑별 페이지는 지갑을 연결한 참여자에게 유용하지만, 검색 색인에서 제외되며 XML 사이트맵에도 포함되지 않습니다.",
+      "navLabel": "개인 도구"
+    },
+    "system": {
+      "title": "공개 프로토콜 페이지",
+      "description": "공개 순위표, 배분 내역, 통계, 컨트랙트, 도움말 페이지입니다.",
+      "navLabel": "시스템 및 도움말 페이지"
+    },
+    "data": {
+      "title": "프로토콜 데이터 페이지",
+      "description": "XML 사이트맵에 실린 모든 공개 데이터 경로를 한 목록에 모았습니다.",
+      "navLabel": "프로토콜 데이터 페이지"
+    },
+    "ecosystem": {
+      "title": "생태계",
+      "description": "Axiom Zero NFT 마켓플레이스, Chaos Zero 예측 시장, Uniswap CST 거래 등 외부 서비스로 이어집니다.",
+      "navLabel": "생태계 링크"
+    }
+  },
+  "links": {
+    "myNfts": {
+      "label": "내 NFT",
+      "description": "지갑별 NFT 보기 페이지입니다. 검색 색인에서 제외됩니다."
+    },
+    "myAllocations": {
+      "label": "내 미회수 배분",
+      "description": "지갑별 배분 회수 페이지입니다. 검색 색인에서 제외됩니다."
+    },
+    "myAnchors": {
+      "label": "내 앵커링",
+      "description": "지갑별 앵커링 페이지입니다. 검색 색인에서 제외됩니다."
+    },
+    "about": {
+      "label": "Cosmic Signature 소개",
+      "description": "프로토콜을 대표하는 소개 페이지이자 브랜드 안내입니다."
+    },
+    "learn": {
+      "label": "Cosmic Signature 학습 센터",
+      "description": "AI와 검색 시스템이 크롤링할 수 있는 해설 문서입니다."
+    },
+    "whatIsCosmicSignature": {
+      "label": "Cosmic Signature란 무엇인가요?",
+      "description": "프로토콜을 쉬운 말로 풀어 쓴 정의입니다."
+    },
+    "threeBodyArt": {
+      "label": "삼체 NFT 아트 안내",
+      "description": "결정론적 물리가 시그니처 NFT를 만들어 내는 과정입니다."
+    },
+    "gallery": {
+      "label": "Cosmic Signature 갤러리",
+      "description": "결정론적 NFT 작품 아카이브입니다."
+    },
+    "currentCycle": {
+      "label": "현재 퍼포먼스 사이클",
+      "description": "진행 중인 사이클의 상태와 제스처 현황입니다."
+    },
+    "howItWorks": {
+      "label": "작동 원리",
+      "description": "사이클 메커니즘을 단계별로 설명합니다."
+    },
+    "statistics": {
+      "label": "프로토콜 통계",
+      "description": "공개 프로토콜 지표와 데이터 출처입니다."
+    },
+    "contracts": {
+      "label": "Cosmic Signature 컨트랙트",
+      "description": "검증된 Arbitrum 컨트랙트 주소입니다."
+    },
+    "sourceCode": {
+      "label": "소스 코드",
+      "description": "렌더링 파이프라인과 소스 코드 자료입니다."
+    },
+    "security": {
+      "label": "보안",
+      "description": "보안 모델과 검증 자료입니다."
+    },
+    "audits": {
+      "label": "보안 감사",
+      "description": "보안 감사와 정형 검증 현황입니다."
+    },
+    "riskDisclosures": {
+      "label": "위험 고지",
+      "description": "블록체인 위험과 참여 관련 고지 사항입니다."
+    },
+    "faq": {
+      "label": "Cosmic Signature 자주 묻는 질문",
+      "description": "프로토콜 메커니즘에 관한 질문에 답합니다."
+    },
+    "terms": {
+      "label": "이용약관",
+      "description": "앱 이용과 참여에 적용되는 법적 조건입니다."
+    },
+    "privacy": {
+      "label": "개인정보 처리방침",
+      "description": "지갑 데이터, 분석 도구, 블록체인 투명성에 관한 안내입니다."
+    },
+    "allocationRecipients": {
+      "label": "배분 수령자",
+      "description": "각 사이클의 준비금이 어디로 배분되었는지 보여 줍니다."
+    },
+    "anchorDistributions": {
+      "label": "앵커링 지급",
+      "description": "앵커링된 NFT와 그 지급 내역입니다."
+    },
+    "outreachReserve": {
+      "label": "홍보 준비금",
+      "description": "커뮤니티 홍보 CST 활동 내역입니다."
+    },
+    "imprint": {
+      "label": "각인",
+      "description": "새 토큰을 각인하는 화면입니다."
+    },
+    "ethContributions": {
+      "label": "ETH 기여",
+      "description": "ETH 기여 내역입니다."
+    },
+    "attachedNfts": {
+      "label": "첨부된 NFT",
+      "description": "여러 사이클에 걸쳐 제스처에 첨부된 NFT입니다."
+    },
+    "finalizedAllocations": {
+      "label": "완료된 배분",
+      "description": "마감된 사이클의 배분 기록입니다."
+    },
+    "namedNfts": {
+      "label": "이름 붙인 NFT",
+      "description": "소유자가 직접 이름을 붙인 NFT입니다."
+    },
+    "usedRwlkNfts": {
+      "label": "사용된 Random Walk NFT",
+      "description": "제스처 할인에 이미 사용된 Random Walk NFT입니다."
+    },
+    "coordinationChanges": {
+      "label": "조율 변경 내역",
+      "description": "프로토콜 매개변수 변경 이력입니다."
+    },
+    "publicGoodsContributions": {
+      "label": "공공재 기여",
+      "description": "사이클별 공공재 배분 기록입니다."
+    },
+    "voluntaryPublicGoods": {
+      "label": "자발적 공공재 기여",
+      "description": "공공재 금고에 직접 이루어진 자발적 기여입니다."
+    },
+    "publicGoodsRetrievals": {
+      "label": "공공재 회수 내역",
+      "description": "공공재 금고에서 전달된 자금입니다."
+    },
+    "participationStats": {
+      "label": "통계: 참여",
+      "description": "참여자와 제스처 분석입니다."
+    },
+    "tokenStats": {
+      "label": "통계: 토큰",
+      "description": "CST와 NFT 공급량 분석입니다."
+    },
+    "anchoringStats": {
+      "label": "통계: 앵커링",
+      "description": "앵커링 총계와 이력입니다."
+    },
+    "activityStats": {
+      "label": "통계: 활동",
+      "description": "사이클 활동과 시간대 분석입니다."
+    },
+    "performanceStats": {
+      "label": "통계: 성과",
+      "description": "사이클 기록과 성과 분석입니다."
+    },
+    "axiomZero": {
+      "label": "Axiom Zero 마켓플레이스",
+      "description": "Cosmic Signature와 Random Walk를 위한 수수료 없는 NFT 마켓플레이스입니다."
+    },
+    "chaosZero": {
+      "label": "Chaos Zero 예측",
+      "description": "각 퍼포먼스 사이클을 다루는 예측 시장입니다."
+    },
+    "uniswap": {
+      "label": "Uniswap에서 CST 거래",
+      "description": "Arbitrum에서 ETH를 CST로 스왑합니다."
+    }
+  }
+}

@@ -703,6 +703,123 @@ export const UK_BANNED_TERMS: readonly string[] = [
 // lexicon-allow-end
 
 /**
+ * Korean banned register (docs/i18n/glossary-ko.md §5): the words Korean
+ * actually uses for the banned concepts. Korean compounds join without
+ * spaces (재투자 "reinvest", NFT민팅) and particles attach directly to the
+ * noun (도박을, 투자자에게), so the terms are matched as substrings like the
+ * Chinese lists. Every entry was checked against the Korean the site does
+ * need: words dropped because a common innocent word contains them are
+ * listed in the glossary as reviewer cautions — 내기 (a bet) hides in 보내기
+ * "send", 호가 (an asking price) in 번호가 "the number is", 시합 (a match)
+ * in 표시합니다 "displays", 수입 (income) in 개수입니다 "is the count", 청구
+ * stays available for the legal sense of "claim". Terms that a rarer
+ * innocent word contains stay banned and the
+ * glossary tells writers which word to use instead (배경 for 백그라운드,
+ * 불리한 결과 for 불이익, 손해 배상 for 보상금).
+ *
+ * As in English and Chinese, the only sanctioned exception is FAQ/legal
+ * denial copy inside lexicon-allow pragmas (or `\uXXXX` escapes in JSON).
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const KO_BANNED_TERMS: readonly string[] = [
+  // auction / bidding
+  '경매',
+  '입찰',
+  '낙찰',
+  '옥션',
+  '비드',
+  '비딩',
+  '더치 옥션',
+  // prize / jackpot
+  '상금',
+  '경품',
+  '잭팟',
+  '대박',
+  '당첨금',
+  // winner
+  '당첨',
+  '승자',
+  '우승',
+  // lottery / raffle / sweepstakes
+  '추첨',
+  '복권',
+  '로또',
+  '뽑기',
+  '응모',
+  // gambling / bets / odds
+  '도박',
+  '베팅',
+  '배팅',
+  '카지노',
+  '갬블',
+  '사행',
+  '판돈',
+  '배당',
+  // luck flavor
+  '행운',
+  '럭키',
+  '찬스',
+  // ticket
+  '티켓',
+  '참가권',
+  // game framing / competition
+  '게임',
+  '게이머',
+  '플레이어',
+  '승부',
+  '경쟁',
+  '대회',
+  '토너먼트',
+  '콘테스트',
+  // securities / yield / earnings
+  '투자',
+  '재테크',
+  '수익',
+  '이익',
+  '이윤',
+  '소득',
+  '이자율',
+  '이자 수익',
+  '이자 소득',
+  // tax
+  '면세',
+  '세금 공제',
+  // crypto slang
+  '존버',
+  '가즈아',
+  '떡상',
+  // staking
+  '스테이킹',
+  '예치',
+  '락업',
+  // mint / mining
+  '민팅',
+  '민트',
+  '채굴',
+  // withdraw / claim slang
+  '인출',
+  '출금',
+  '클레임',
+  '캐시아웃',
+  '현금화',
+  '페이아웃',
+  // charity / donation
+  '자선',
+  '기부',
+  '후원',
+  '모금',
+  '도네이션',
+  // DAO
+  '다오',
+  // marketing
+  '마케팅',
+  // round
+  '라운드',
+  '회차',
+];
+// lexicon-allow-end
+
+/**
  * One banned-register profile per translated locale. The type forces a
  * decision the moment a locale joins routing.locales. The CLI applies a
  * profile to every locale-agnostic file and to every file of another
@@ -741,6 +858,10 @@ export const LEXICON_PROFILES: Record<TranslatedLocale, LexiconProfile> = {
       { matcher: 'unicode-stem', terms: UK_BANNED_STEMS },
       { matcher: 'unicode-word', terms: UK_BANNED_TERMS },
     ],
+  },
+  ko: {
+    glossary: 'docs/i18n/glossary-ko.md',
+    termSets: [{ matcher: 'cjk-substring', terms: KO_BANNED_TERMS }],
   },
 };
 
