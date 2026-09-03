@@ -4,6 +4,7 @@ import enFormats from '@/messages/en/formats.json';
 import jaFormats from '@/messages/ja/formats.json';
 import koFormats from '@/messages/ko/formats.json';
 import ukFormats from '@/messages/uk/formats.json';
+import viFormats from '@/messages/vi/formats.json';
 import zhFormats from '@/messages/zh/formats.json';
 import zhHkFormats from '@/messages/zh-HK/formats.json';
 import zhTwFormats from '@/messages/zh-TW/formats.json';
@@ -58,6 +59,7 @@ const DURATION_UNITS: LocaleRecord<DurationUnitLabels> = {
   uk: ukFormats.durationCompact,
   ko: koFormats.durationCompact,
   ja: jaFormats.durationCompact,
+  vi: viFormats.durationCompact,
 };
 
 /**
@@ -181,13 +183,18 @@ const TIMESTAMP_DATETIME_FORMATS: LocaleRecord<(parts: TimestampParts) => string
   ko: ({ monthIndex, day, hours, minutes }) => `${monthIndex + 1}월 ${day}일 ${hours}:${minutes}`,
   // "1月5日 12:34", the same 月/日 template as Chinese (style-guide-ja §5).
   ja: hanTimestamp,
+  // "5/1, 12:34": Vietnamese writes numeric day/month dates (style-guide-vi
+  // §5); CLDR's abbreviated month ("Tháng 1") is a standalone form that
+  // reads wrong mid-string.
+  vi: ({ monthIndex, day, hours, minutes }) => `${day}/${monthIndex + 1}, ${hours}:${minutes}`,
 };
 
 /**
  * Converts Unix timestamp to a locale-style date string.
  * `en` output is byte-identical to the historical format ("Jan 01, 12:34");
  * `zh` renders "1月1日 12:34" (docs/i18n/README.md §4); `uk` renders
- * "1 січ., 12:34" (the day-first order Intl itself produces for uk-UA).
+ * "1 січ., 12:34" (the day-first order Intl itself produces for uk-UA); `vi`
+ * renders "1/1, 12:34".
  *
  * Browser-local time is the historical/default behavior. Pass `utc` only for
  * deterministic server snapshots; hydration-safe UI should use
@@ -367,6 +374,8 @@ const CALENDAR_DATE_LABEL_FORMATS: LocaleRecord<
   ko: koreanNumericDate,
   // "2026/1/5": the slash-separated numeric date Intl renders for ja-JP.
   ja: hanCalendarDate,
+  // "05/01/2026": the DD/MM/YYYY numeric date Intl renders for vi-VN.
+  vi: (year, monthIndex, day) => numericDate('vi', year, monthIndex, day),
 };
 
 /** Formats YYYYMMDD for chart axis / tooltip labels. */
@@ -415,6 +424,8 @@ const UTC_DATETIME_LABEL_FORMATS: LocaleRecord<
     `${koreanNumericDate(year, monthIndex, day)} ${hh}:${mm} UTC`,
   // Japanese writes 年月日 dates and full-width parentheses like Chinese.
   ja: hanUtcDateTime,
+  vi: (year, monthIndex, day, hh, mm) =>
+    `${numericDate('vi', year, monthIndex, day)} ${hh}:${mm} UTC`,
 };
 
 const hanUtcStamp = (date: Date): string =>
@@ -440,13 +451,17 @@ const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
       date.getUTCHours(),
     ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')} UTC`,
   ja: hanUtcStamp,
+  vi: (date) =>
+    `${numericDate('vi', date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())} ${String(
+      date.getUTCHours(),
+    ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')} UTC`,
 };
 
 /**
  * "Data updated at" stamp for SEO summaries: `en` keeps the ISO-style
  * "2026-08-28 08:13 UTC"; every Chinese locale renders
  * "2026年8月28日 08:13（UTC）"; `uk` renders "28.08.2026 08:13 UTC"; `ko`
- * renders "2026. 8. 28. 08:13 UTC".
+ * renders "2026. 8. 28. 08:13 UTC"; `vi` renders "28/08/2026 08:13 UTC".
  */
 export function formatUtcDateTimeStamp(date: Date, locale: string = 'en'): string {
   return pickByLocale(UTC_STAMP_FORMATS, locale)(date);

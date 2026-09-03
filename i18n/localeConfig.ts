@@ -157,6 +157,25 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     lowercaseMidSentence: false,
     showRawProviderErrors: false,
   },
+  vi: {
+    intlLocale: 'vi-VN',
+    // Latin alphabet with stacked diacritics (ế, ợ, ữ): the same family as
+    // English, so the Vietnamese banned register is never applied to English
+    // source files' siblings in another script and vice versa.
+    scriptFamily: 'latin',
+    jsonLdInLanguage: 'vi',
+    ogLocale: 'vi_VN',
+    textDirection: 'ltr',
+    // Vietnamese writes every syllable as a spaced word: "1 ngày 2 giờ".
+    wordSpacing: true,
+    // CLDR week data: Vietnamese calendars start on Monday (thứ Hai).
+    weekStartsMonday: true,
+    ellipsis: '…',
+    // Vietnamese has letter case and, like English, lowercases a Title-Case
+    // phrase that lands mid-sentence.
+    lowercaseMidSentence: true,
+    showRawProviderErrors: false,
+  },
 };
 
 /** Resolves the rendering conventions for arbitrary locale-ish input. */

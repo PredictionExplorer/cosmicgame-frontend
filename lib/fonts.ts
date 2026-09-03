@@ -133,19 +133,30 @@ export const notoSansJP = Noto_Sans_JP({
 });
 
 /**
- * Cyrillic display companion for the Ukrainian locale (docs/i18n/README.md §5).
+ * Display companion for the alphabetic locales Clash Display cannot set
+ * (docs/i18n/README.md §5): Ukrainian and Vietnamese.
  *
- * Clash Display carries no Cyrillic glyphs, so `/uk` headings are set in
- * Onest via the `html[lang='uk']` rules in styles/global.css. Body text needs
- * nothing extra: Inter's build-time CSS already declares the `cyrillic` and
- * `cyrillic-ext` `unicode-range` slices (fetched on demand, never preloaded).
- * Same loading policy as Noto Sans SC — `preload: false` keeps it off the
- * critical path of English and Chinese pages, `display: optional` avoids a
- * late heading metric swap on slow links.
+ * Clash Display carries no Cyrillic glyphs and only 44 of the 132 letters
+ * Vietnamese writes (none of the stacked-diacritic forms ế, ợ, ữ, nor Ơ/Ư),
+ * so `/uk` and `/vi` headings are set in Onest — one face for both, swapped
+ * in by the `html[lang='uk'], html:lang(vi)` rule in styles/global.css. Body
+ * text needs nothing extra: Inter's build-time CSS already declares the
+ * `cyrillic`, `cyrillic-ext`, and `vietnamese` `unicode-range` slices
+ * (fetched on demand, never preloaded).
+ *
+ * Google Fonts serves Onest's `vietnamese` slice (U+1EA0–1EF9 and the horned
+ * vowels) in the same CSS, and next/font self-hosts every slice of that CSS
+ * when `preload` is off — `subsets` only names slices to preload, and is
+ * validated against next/font's bundled font metadata, which predates
+ * Onest's Vietnamese coverage and does not list `vietnamese`. So the option
+ * stays on the Cyrillic and Latin sets while the Vietnamese slice ships
+ * regardless. Same loading policy as Noto Sans SC — off the critical path of
+ * every other locale's pages, `display: optional` avoids a late heading
+ * metric swap on slow links.
  */
 export const onest = Onest({
   weight: 'variable',
-  subsets: ['cyrillic', 'cyrillic-ext', 'latin'],
+  subsets: ['cyrillic', 'cyrillic-ext', 'latin', 'latin-ext'],
   variable: '--font-onest',
   display: 'optional',
   preload: false,
@@ -170,6 +181,7 @@ export const LOCALE_COMPANION_FONTS: LocaleRecord<FontWithVariable | null> = {
   uk: onest,
   ko: notoSansKR,
   ja: notoSansJP,
+  vi: onest,
 };
 
 /**

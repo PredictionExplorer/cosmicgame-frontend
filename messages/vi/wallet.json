@@ -1,0 +1,38 @@
+{
+  "connect": {
+    "button": "Connect Wallet"
+  },
+  "groups": {
+    "popular": "Popular",
+    "more": "More"
+  },
+  "balances": {
+    "eth": "ETH",
+    "cst": "CST",
+    "cosmicNfts": "COSMIC NFTs",
+    "rwlkNfts": "RWLK NFTs",
+    "anchoredCst": "Anchored Cosmic Signature NFTs",
+    "anchoredRwlk": "Anchored RWLK NFTs"
+  },
+  "labels": {
+    "loading": "Loading...",
+    "balancesHeading": "Balances",
+    "anchoredHeading": "Anchored",
+    "nftCount": "{count}"
+  },
+  "account": {
+    "heading": "Account",
+    "myDashboard": "My Dashboard",
+    "myRewards": "My Rewards",
+    "myNfts": "My NFTs",
+    "transferCst": "Transfer CST",
+    "addCstToMetaMask": "Add CST to MetaMask",
+    "addingCstToMetaMask": "Adding CST to MetaMask...",
+    "myAnchors": "My Anchors",
+    "winningHistory": "Winning History"
+  },
+  "accessibility": {
+    "copyAddress": "Copy wallet address",
+    "addressCopied": "Wallet address copied"
+  }
+}

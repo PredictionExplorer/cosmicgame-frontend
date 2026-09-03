@@ -1,0 +1,363 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "releasing": "Releasing...",
+    "anchor": "Anchor",
+    "release": "Release",
+    "yes": "Yes",
+    "no": "No",
+    "empty": {
+      "actions": "No actions yet.",
+      "distributions": "No distributions yet.",
+      "allocations": "No allocations yet.",
+      "tokens": "No tokens yet."
+    },
+    "actions": {
+      "releaseMany": "Release Many",
+      "cancel": "Cancel"
+    },
+    "aria": {
+      "expandRow": "expand row",
+      "actions": "Actions"
+    }
+  },
+  "overview": {
+    "errorTitle": "Error loading anchoring data",
+    "errorMessage": "Unable to load anchoring data. Please try again later.",
+    "eyebrow": "Anchor Distributions · Live",
+    "title": "Anchor Distributions",
+    "subtitle": "Overview of global anchoring activity and distribution history",
+    "intro": {
+      "description": "Anchor your Cosmic Signature NFTs to share {percentage}% of each cycle's Cycle Reserve through ETH Anchor Distributions. Anchor RandomWalk NFTs to enter the Anchored-NFT Stellar Selection.",
+      "flow": "{percentage}% anchor flow"
+    },
+    "stats": {
+      "pool": {
+        "label": "Anchor Distribution Pool",
+        "tooltip": "Total ETH currently allocated to the Anchor Distribution pool, distributed proportionally to Cosmic Signature NFT anchor-holders each cycle."
+      },
+      "cosmicSignatureAnchored": {
+        "label": "Cosmic Signature NFTs Anchored",
+        "tooltip": "Total number of Cosmic Signature NFTs currently anchored to the protocol across all anchor-holders."
+      },
+      "randomWalkAnchored": {
+        "label": "RWLK NFTs Anchored",
+        "tooltip": "Total number of RandomWalk NFTs currently anchored. Anchored RandomWalk NFTs are eligible for Anchored-NFT Stellar Selection via on-chain random selection."
+      },
+      "distributionPerNft": {
+        "label": "Distribution per NFT",
+        "tooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
+        "tooltipUnavailable": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs. The on-chain anchor pool is non-zero, but the indexed total of anchored Cosmic Signature NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-NFT rate cannot be computed."
+      },
+      "uniqueHolders": {
+        "label": "Unique Anchor-holders",
+        "tooltip": "Number of distinct wallet addresses that have anchored Cosmic Signature NFTs."
+      }
+    },
+    "cta": {
+      "title": "Start Anchoring",
+      "description": "Anchor your Cosmic Signature NFTs to receive a share of each cycle's Anchor Distribution pool."
+    },
+    "sections": {
+      "cosmicSignature": "Cosmic Signature NFT",
+      "randomWalk": "RandomWalk NFT"
+    }
+  },
+  "howItWorks": {
+    "title": "How Anchoring Works",
+    "intro": "New to anchoring? Expand any section below to learn more.",
+    "items": {
+      "whatIsAnchoring": {
+        "question": "What is Anchoring?",
+        "answer": "Anchoring lets you dedicate NFTs to the protocol. Cosmic Signature NFT anchors receive ETH Anchor Distributions, while RandomWalk NFT anchors enter Anchored-NFT Stellar Selection. You can release an anchor at any time to reclaim your NFTs; Cosmic Signature NFT releases also retrieve accumulated ETH distributions. Important: each NFT can be anchored only once, ever — once released, that NFT can never be anchored again."
+      },
+      "cosmicSignature": {
+        "question": "Cosmic Signature NFT Anchoring",
+        "answer": "Anchor your Cosmic Signature NFTs to receive ETH from the Anchor Distribution pool. Each cycle, 6% of the Cycle Reserve is distributed proportionally among all Cosmic Signature NFT anchor-holders based on how many NFTs they have anchored. Distributions accumulate automatically and are paid out when you release an anchor. If no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle's share stays in the Cycle Reserve."
+      },
+      "randomWalk": {
+        "question": "RandomWalk (RWLK) Anchoring",
+        "answer": "Anchor your RandomWalk NFTs to take part in Anchored-NFT Stellar Selection. Each cycle, ten selections are drawn among anchored RandomWalk NFTs through on-chain random selection; each selection receives 1,000 CST and one newly imprinted Cosmic Signature NFT. Selections are drawn with replacement, so the same anchor-holder can be selected more than once. RandomWalk anchors receive no ETH."
+      },
+      "calculation": {
+        "question": "How are distributions calculated?",
+        "answer": "Cosmic Signature NFT Anchor Distributions are proportional: if you have anchored one tenth of all anchored Cosmic Signature NFTs, you receive one tenth of each ETH distribution deposit. RandomWalk NFT anchoring uses an on-chain random-selection mechanism for Anchored-NFT Stellar Selection, so anchoring more RandomWalk NFTs increases your selection chance rather than an ETH distribution share."
+      },
+      "anchorOnce": {
+        "question": "Can I re-anchor an NFT after releasing it?",
+        "answer": "No. The anchoring contracts record every NFT that has ever been anchored, and an NFT is allowed to be anchored only once. Releasing an anchor pays out any accumulated ETH distributions (for Cosmic Signature NFTs) and returns the NFT to your wallet, but permanently ends that NFT's anchoring eligibility. Only release when you want to exit anchoring for that NFT entirely."
+      }
+    }
+  },
+  "anchorActionDetail": {
+    "title": "Anchor action",
+    "subtitle": "Anchor Action for {token} NFT",
+    "error": "Unable to load anchor action details. Please try again later.",
+    "breadcrumbs": {
+      "home": "Home",
+      "myAnchors": "My Anchors",
+      "action": "Action #{id}"
+    },
+    "empty": "No data found for this anchor action.",
+    "token": {
+      "title": "Token",
+      "randomWalkDescription": "Random Walk NFT used in this action.",
+      "cosmicSignatureDescription": "Cosmic Signature NFT used in this action.",
+      "actionId": "Action ID",
+      "holderAddress": "Anchor-holder address",
+      "tokenId": "Token ID",
+      "labels": {
+        "randomWalk": "RandomWalk",
+        "cosmicSignature": "Cosmic Signature"
+      }
+    },
+    "anchor": {
+      "title": "Anchor",
+      "description": "When tokens were anchored to the protocol.",
+      "datetime": "Anchored datetime",
+      "tokenCount": "Number of anchored tokens"
+    },
+    "release": {
+      "title": "Release",
+      "description": "When the anchor was released.",
+      "datetime": "Released datetime",
+      "tokenCount": "Number of anchored tokens"
+    }
+  },
+  "distributionsByToken": {
+    "title": "Anchor Distribution Details for Token {tokenId}",
+    "subtitle": "Distributions for {address}",
+    "breadcrumbs": {
+      "home": "Home",
+      "user": "User",
+      "token": "Token #{tokenId}"
+    },
+    "details": {
+      "anchorTitle": "Anchor",
+      "releaseTitle": "Release Anchor",
+      "anchoredDatetime": "Anchored datetime",
+      "releasedDatetime": "Released datetime",
+      "anchoredNfts": "Number of anchored NFTs",
+      "distribution": "Distribution"
+    },
+    "columns": {
+      "details": "Details",
+      "depositDatetime": "Deposit Datetime",
+      "cycle": "Cycle",
+      "depositId": "Deposit Id",
+      "retrieved": "Is Retrieved?",
+      "distributionEth": "Distribution (ETH)"
+    }
+  },
+  "tables": {
+    "availableTokens": {
+      "empty": "No available tokens.",
+      "selection": {
+        "all": "Select All",
+        "currentPage": "Select Current Page",
+        "none": "Select None"
+      },
+      "columns": {
+        "imprintDatetime": "Imprint Datetime",
+        "ownerAddress": "Owner Address",
+        "tokenId": "Token ID",
+        "tokenName": "Token Name",
+        "cycle": "Cycle",
+        "recipientAddress": "Recipient Address"
+      },
+      "actions": {
+        "anchor": "Anchor",
+        "anchoring": "Anchoring...",
+        "anchorMany": "Anchor Many"
+      },
+      "aria": {
+        "actions": "Actions"
+      }
+    },
+    "globalAnchorActions": {
+      "headers": {
+        "anchorDatetime": {
+          "desktop": "Anchor Datetime",
+          "mobile": "Datetime",
+          "tooltip": "Timestamp when the anchor or release action was indexed."
+        },
+        "actionType": {
+          "desktop": "Action Type",
+          "mobile": "Type",
+          "tooltip": "Whether this row anchored or released NFTs."
+        },
+        "tokenId": {
+          "desktop": "Token ID",
+          "mobile": "Token",
+          "tooltip": "Token involved in the anchor or release action."
+        },
+        "holderAddress": {
+          "desktop": "Anchor-holder Address",
+          "mobile": "Holder",
+          "tooltip": "Wallet address that anchored or released tokens."
+        },
+        "nftCount": {
+          "desktop": "Number of NFTs",
+          "mobile": "NFTs",
+          "tooltip": "Anchored NFT count after this action."
+        }
+      }
+    },
+    "retrievedDistributions": {
+      "columns": {
+        "depositDatetime": "Deposit Datetime",
+        "depositId": "Deposit ID",
+        "cycle": "Round",
+        "depositAmountEth": "Deposit Amount (ETH)",
+        "retrievedAmountEth": "Collected Amount (ETH)"
+      }
+    },
+    "unretrievedDistributions": {
+      "columns": {
+        "depositDatetime": "Deposit Datetime",
+        "depositId": "Deposit ID",
+        "anchoredTokens": "Anchored Tokens (You / Total)",
+        "unretrievedTokens": "Unretrieved Tokens",
+        "depositAmountEth": "Deposit Amount (ETH)",
+        "distributionAmountEth": "Distribution Amount (ETH)",
+        "unretrievedAmountEth": "Unretrieved Amount (ETH)"
+      },
+      "summary": "Your retrievable distributions are {amount} ETH",
+      "releaseAll": "Release & Retrieve All",
+      "dialog": {
+        "title": "Release Tokens & Retrieve Distributions",
+        "description": "This will <strong>release all your anchored Cosmic Signature NFTs</strong> and forward <amountStrong>{amount} ETH</amountStrong> in accumulated distributions to your wallet.",
+        "warning": "<strong>Permanent action:</strong> Once released, these Cosmic Signature NFTs cannot be anchored again. Only proceed if you want to exit anchoring entirely.",
+        "confirm": "Release & Retrieve"
+      }
+    },
+    "distributionsByDeposit": {
+      "columns": {
+        "depositDatetime": "Deposit Datetime",
+        "depositCycle": "Deposit Cycle",
+        "depositId": "Deposit ID",
+        "totalDepositAmount": "Total Deposit Amount",
+        "totalRetrievedAmount": "Total Retrieved Amount",
+        "yourRetrievableAmount": "Your Retrievable Amount",
+        "fullyRetrieved": "Fully Retrieved?",
+        "totalAnchoredNfts": "Total Anchored NFTs",
+        "totalRetrievedTokens": "Total Retrieved Tokens",
+        "yourAnchoredTokens": "Your Anchored Tokens"
+      }
+    },
+    "globalDistributions": {
+      "cycleDetails": "ETH Anchor Distributions for Cycle {cycle}",
+      "columns": {
+        "depositDatetime": "Deposit Datetime",
+        "cycle": "Cycle",
+        "totalAnchoredTokens": "Total Anchored Tokens",
+        "totalDepositedEth": "Total Deposited (ETH)",
+        "fullyRetrieved": "Fully Retrieved?",
+        "pendingEth": "Pending to Retrieve (ETH)"
+      }
+    },
+    "randomWalkImprints": {
+      "columns": {
+        "datetime": "Datetime",
+        "recipient": "Recipient",
+        "cycle": "Cycle",
+        "tokenId": "Token ID"
+      }
+    },
+    "tokenDistributions": {
+      "columns": {
+        "tokenId": "Token ID",
+        "retrievedEth": "Retrieved Distributions (ETH)",
+        "retrievableEth": "Distributions to Retrieve (ETH)"
+      }
+    },
+    "anchorActions": {
+      "columns": {
+        "datetime": "Action Datetime",
+        "type": "Action Type",
+        "tokenId": "Token ID",
+        "nftCount": "Number of NFTs"
+      }
+    },
+    "anchoredTokens": {
+      "selection": {
+        "all": "Select All",
+        "currentPage": "Select Current Page",
+        "none": "Select None"
+      },
+      "columns": {
+        "image": "Token Image",
+        "tokenId": "Token ID",
+        "actionId": "Anchor Action ID",
+        "datetime": "Anchor Datetime",
+        "accumulatedDistributions": "Accumulated Distributions"
+      }
+    },
+    "globalAnchoredTokens": {
+      "headers": {
+        "anchorDatetime": {
+          "desktop": "Anchor Datetime",
+          "mobile": "Datetime",
+          "tooltip": "Timestamp when the token was anchored."
+        },
+        "actionId": {
+          "desktop": "Action ID",
+          "mobile": "Action",
+          "tooltip": "Anchor action record linked to this token."
+        },
+        "tokenId": {
+          "desktop": "Token ID",
+          "mobile": "Token",
+          "tooltip": "Anchored token identifier."
+        },
+        "holderAddress": {
+          "desktop": "Anchor-holder Address",
+          "mobile": "Holder",
+          "tooltip": "Wallet address that anchored or released tokens."
+        }
+      }
+    }
+  },
+  "panels": {
+    "shared": {
+      "anchoredTokens": "Anchored Tokens",
+      "available": "Available for Anchoring",
+      "history": "Anchor / Release History",
+      "historyTooltip": "A chronological record of all your anchor and release transactions."
+    },
+    "cosmicSignature": {
+      "anchoredTooltip": "Cosmic Signature NFTs you currently have anchored. You receive ETH Anchor Distributions proportional to how many Cosmic Signature NFTs you anchor.",
+      "availableTooltip": "Cosmic Signature NFTs in your wallet that can be anchored to start receiving ETH Anchor Distributions.",
+      "distributions": "Anchor Distributions",
+      "distributionsTooltip": "ETH Anchor Distributions allocated to each anchored Cosmic Signature NFT. Unretrieved distributions can be collected by releasing the anchor."
+    },
+    "randomWalk": {
+      "anchoredTooltip": "RandomWalk NFTs you currently have anchored. Each anchored RandomWalk NFT is eligible for on-chain random selection in Anchored-NFT Stellar Selection.",
+      "availableTooltip": "RandomWalk NFTs in your wallet that can be anchored for Anchored-NFT Stellar Selection eligibility, not ETH Anchor Distributions.",
+      "selection": "Anchored-NFT Stellar Selection",
+      "selectionTooltip": "Cosmic Signature NFTs and paired CST imprinted when this wallet wins Anchored-NFT Stellar Selection through the on-chain random selection mechanism."
+    }
+  },
+  "lifecycle": {
+    "ariaLabel": "Anchor lifecycle",
+    "stages": {
+      "anchor": {
+        "label": "Anchor",
+        "description": "NFT deposited into the protocol"
+      },
+      "active": {
+        "label": "Active",
+        "description": "Receiving per-cycle distributions"
+      },
+      "retrievable": {
+        "label": "Retrievable",
+        "description": "Available to retrieve"
+      },
+      "retrieved": {
+        "label": "Retrieved",
+        "description": "Returned to your wallet"
+      }
+    }
+  }
+}

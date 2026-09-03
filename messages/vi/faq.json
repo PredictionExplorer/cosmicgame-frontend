@@ -1,0 +1,94 @@
+{
+  "hero": {
+    "badge": "Knowledge Base",
+    "titlePrefix": "Cosmic Signature",
+    "titleHighlight": "FAQ",
+    "subtitle": "Everything you need to know about Cosmic Signature — from getting started to advanced game mechanics.",
+    "answerCount": "{count}+ Answers",
+    "answerCountTooltip": "Comprehensive answers covering every aspect of Cosmic Signature.",
+    "categoryCount": "{count} Categories",
+    "alwaysUpdated": "Always Updated"
+  },
+  "search": {
+    "placeholder": "Search questions...",
+    "ariaLabel": "Search frequently asked questions",
+    "clear": "Clear",
+    "clearAria": "Clear search",
+    "noResults": "No questions found. Try a different search term.",
+    "resultCount": "Showing {resultCount} of {totalCount} questions"
+  },
+  "navigation": {
+    "ariaLabel": "FAQ categories",
+    "all": "All"
+  },
+  "category": {
+    "expandAll": "Expand All",
+    "collapseAll": "Collapse All",
+    "expandAllAria": "Expand all questions",
+    "collapseAllAria": "Collapse all questions",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "copyLinkAria": "Copy link to this question"
+  },
+  "popular": {
+    "heading": "Popular Questions",
+    "tooltip": "These are the most commonly asked questions by new participants."
+  },
+  "empty": {
+    "heading": "No questions found",
+    "descriptionPrefix": "Try a different search term or",
+    "clearAction": "clear the search"
+  },
+  "contact": {
+    "heading": "Still have a question?",
+    "description": "Can't find what you're looking for? Our community is always happy to help. Reach out on any of these channels and we'll get back to you as soon as possible.",
+    "x": "Twitter / X",
+    "discord": "Discord"
+  },
+  "tooltips": {
+    "enduranceChampion": {
+      "term": "Endurance Champion",
+      "content": "A special title given to the participant who held the most-recent-gesture position for the longest uninterrupted interval within a Performance Cycle."
+    },
+    "chronoWarrior": {
+      "term": "Chrono-Warrior",
+      "content": "An even rarer title — the participant who held the Endurance Champion position for the longest consecutive interval."
+    },
+    "calibrationWindow": {
+      "term": "Calibration Window",
+      "content": "A price-discovery window where Gesture Cost starts high and descends over time from the Calibration Ceiling toward the Calibration Floor. The longer you wait, the lower the cost."
+    },
+    "cosmicCouncil": {
+      "term": "Cosmic Council",
+      "content": "The on-chain coordination body where CST holders submit Coordination Proposals and express Support or Opposition — for example, selecting the Public Goods Beneficiary that receives each cycle's public-goods allocation."
+    },
+    "cst": {
+      "term": "CST",
+      "content": "CST tokens — the ERC-20 tokens imprinted with every gesture. Used on the Cosmic Council and as alternative gesture currency."
+    },
+    "erc20": {
+      "term": "ERC-20",
+      "content": "A widely used Ethereum token standard for fungible (interchangeable) tokens."
+    },
+    "erc721": {
+      "term": "ERC-721",
+      "content": "The Ethereum token standard for non-fungible tokens (NFTs) — each token is unique."
+    },
+    "layer2": {
+      "term": "Layer 2",
+      "content": "A secondary protocol built on top of Ethereum that processes transactions faster and cheaper while inheriting Ethereum's security."
+    },
+    "rollup": {
+      "term": "rollup",
+      "content": "A Layer 2 technique that bundles many transactions into one, dramatically reducing costs while keeping Ethereum-level security."
+    },
+    "randomWalkNft": {
+      "term": "Random Walk NFT",
+      "content": "A sister NFT collection. Attaching one to an ETH gesture grants a one-time 50% ETH Gesture Cost reduction."
+    },
+    "renounceOwnership": {
+      "term": "renouncing ownership",
+      "content": "An irreversible smart-contract action that permanently gives up the team's ability to change protocol parameters."
+    }
+  }
+}

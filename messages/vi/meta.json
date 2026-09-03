@@ -1,0 +1,321 @@
+{
+  "shared": {
+    "defaultTitle": "Cosmic Signature",
+    "defaultOgTitle": "Cosmic Signature — Every Gesture Shapes the Signature.",
+    "defaultDescription": "A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors."
+  },
+  "home": {
+    "title": "Cosmic Signature",
+    "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the Cycle Reserve distributes across allocation tracks — including Protocol Guild.",
+    "descriptionWithReserve": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the {reserve} Cycle Reserve distributes across allocation tracks — including Protocol Guild."
+  },
+  "experimentalUi": {
+    "title": "Experimental UI | Cosmic Signature",
+    "description": "Explore an experimental Cosmic Signature cycle interface with the same live protocol data and actions."
+  },
+  "gallery": {
+    "title": "Cosmic Signature Gallery | Deterministic Three-Body NFT Art",
+    "description": "Explore Cosmic Signature NFT artwork generated from deterministic three-body physics, on-chain seeds, spectral rendering, and Performance Cycle data."
+  },
+  "allocations": {
+    "title": "Allocation Recipients | Cosmic Signature",
+    "description": "View the complete history of Cosmic Signature allocation recipients, cycle statistics, and ETH distributions across all finalized Performance Cycles."
+  },
+  "anchoring": {
+    "title": "Anchoring | Cosmic Signature",
+    "description": "Anchor your Cosmic Signature NFTs to the protocol to receive per-cycle ETH Anchor Distributions. View global anchoring statistics and how the mechanism works on Arbitrum."
+  },
+  "statistics": {
+    "title": "Cosmic Signature Statistics | Performance Cycle, Gestures, NFTs, and CST",
+    "description": "View Cosmic Signature protocol statistics on Arbitrum, including Performance Cycle status, gestures, NFT activity, CST, anchoring, reserves, and allocation data."
+  },
+  "statisticsParticipation": {
+    "title": "Participation Statistics | Cosmic Signature",
+    "description": "Unique participants, allocation recipients, and ETH contributors indexed across all Cosmic Signature Performance Cycles."
+  },
+  "statisticsTokens": {
+    "title": "Token Distribution Statistics | Cosmic Signature",
+    "description": "Cosmic Signature NFT ownership, CST (ERC-20) balance distribution, total supply history, and assets attached to gestures."
+  },
+  "statisticsAnchoring": {
+    "title": "Anchoring Statistics | Cosmic Signature",
+    "description": "Anchor and release actions, currently anchored tokens, and unique anchor-holders for Cosmic Signature and RandomWalk NFTs."
+  },
+  "statisticsActivity": {
+    "title": "Gesture Activity Statistics | Cosmic Signature",
+    "description": "Gesture frequency over time, activity spikes, participant active periods, gesture-type mix, cycle timelines, and cycle activations."
+  },
+  "statisticsPerformance": {
+    "title": "Participant Performance Statistics | Cosmic Signature",
+    "description": "Participant performance leaderboard and claimable allocation outcomes for every Cosmic Signature Performance Cycle."
+  },
+  "faq": {
+    "title": "Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol",
+    "description": "Answers to common questions about Cosmic Signature, Performance Cycles, gestures, CST, three-body NFT art, Arbitrum, anchoring, contracts, and protocol security."
+  },
+  "myAllocations": {
+    "title": "My Allocations | Cosmic Signature",
+    "description": "View and retrieve your pending ETH allocations, Stellar Selection distributions, Anchor Distributions, and attached assets from the Cosmic Signature protocol."
+  },
+  "myAnchors": {
+    "title": "My Anchors | Cosmic Signature",
+    "description": "Manage your anchored Cosmic Signature and Random Walk NFTs. View ETH Anchor Distributions for Cosmic Signature NFTs and Anchored-NFT Stellar Selection history for Random Walk NFTs."
+  },
+  "contracts": {
+    "title": "Cosmic Signature Contracts | Verified Arbitrum Smart Contracts",
+    "description": "Find Cosmic Signature smart contract addresses, verification status, audits, formal verification notes, and Arbitrum deployment details."
+  },
+  "terms": {
+    "title": "Terms · Cosmic Signature",
+    "description": "Terms of use for the Cosmic Signature procedural on-chain art protocol."
+  },
+  "privacy": {
+    "title": "Privacy · Cosmic Signature",
+    "description": "Privacy practices for visitors to the Cosmic Signature protocol."
+  },
+  "pagePrivacy": {
+    "title": "Privacy Policy | Cosmic Signature",
+    "description": "Privacy Policy for Cosmic Signature — how we handle wallet data, transactions, security, and blockchain transparency."
+  },
+  "security": {
+    "title": "Cosmic Signature Security | Protocol Verification and Safety",
+    "description": "Review Cosmic Signature security practices, Arbitrum contract verification, operational controls, and participant safety notes."
+  },
+  "audits": {
+    "title": "Cosmic Signature Audits | Verification and Contract Review",
+    "description": "The Cosmic Signature smart contracts were independently audited by Hacken. Review the report, formal verification context, and source-code verification resources."
+  },
+  "code": {
+    "title": "Cosmic Signature Source Code | CC0 On-Chain Art Protocol",
+    "description": "Explore the Cosmic Signature source code, rendering pipeline, contract repository, verification workflow, and CC0 public-domain license."
+  },
+  "tokenDetail": {
+    "titleFor": "Cosmic Signature NFT #{id} | Cosmic Signature",
+    "descriptionFor": "Attributes and ownership history of Cosmic Signature NFT #{id} - a deterministic three-body NFT rendered spectrally on Arbitrum."
+  },
+  "gestureDetail": {
+    "title": "Gesture Information | Cosmic Signature",
+    "description": "View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol."
+  },
+  "coordinationChanges": {
+    "title": "Coordination Changes | Cosmic Signature",
+    "description": "Complete history of protocol parameter adjustments in Cosmic Signature. Track Gesture-Cost step-ups, cycle time additions, Anchor Distribution settings, and other coordination updates."
+  },
+  "distributionsByToken": {
+    "title": "Distributions By Token | Cosmic Signature",
+    "description": "Anchor Distribution details for a specific Cosmic Signature NFT — per-cycle ETH distribution history, retrieval status, and cumulative Anchor Distributions."
+  },
+  "mint": {
+    "title": "Imprint RandomWalk NFT | Cosmic Signature",
+    "description": "Imprint a RandomWalk NFT on Cosmic Signature. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
+  },
+  "systemEvent": {
+    "title": "System Events | Cosmic Signature",
+    "description": "Protocol administration events and coordination parameter changes for a specific Cosmic Signature cycle."
+  },
+  "currentCycleFull": {
+    "title": "Current Performance Cycle | Cosmic Signature",
+    "description": "Full details for the active Performance Cycle: gesture history, leaderboards, attached contributions, and allocation distribution."
+  },
+  "allocationInfo": {
+    "titleFor": "Cycle #{id} Allocation Information | Cosmic Signature",
+    "descriptionFor": "Detailed allocation information for Cosmic Signature cycle #{id} — recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations."
+  },
+  "anchorAction": {
+    "title": "Anchor Action Detail | Cosmic Signature",
+    "description": "Details of a specific anchor action in Cosmic Signature — token type, anchored amounts, and distribution retrieval status."
+  },
+  "pageTerms": {
+    "title": "Terms of Service | Cosmic Signature",
+    "description": "Terms of Service for Cosmic Signature — eligibility, protocol mechanics, allocations, risks, prohibited activities, and legal terms."
+  },
+  "userStellarSelectionNft": {
+    "title": "Stellar Selection NFTs | Cosmic Signature",
+    "description": "All Cosmic Signature NFTs allocated to this participant through Stellar Selection. Browse NFTs received via on-chain random selection."
+  },
+  "userStellarSelectionEth": {
+    "title": "Stellar Selection ETH | Cosmic Signature",
+    "description": "All ETH allocations this participant received through Stellar Selection. Track random-selection allocations across completed cycles."
+  },
+  "publicGoodsCgContributions": {
+    "title": "Protocol Public-Goods Contributions | Cosmic Signature",
+    "description": "Automatic forwards from the Cosmic Signature protocol to the Public Goods Beneficiary. Each cycle, a fixed share of the Cycle Reserve is forwarded to support public goods via the Cosmic Council."
+  },
+  "publicGoodsRetrievals": {
+    "title": "Public Goods Retrievals | Cosmic Signature",
+    "description": "Retrievals from the Public Goods Vault. Each cycle, a share of the Cycle Reserve is forwarded to a beneficiary address selected by the Cosmic Council."
+  },
+  "publicGoodsVoluntary": {
+    "title": "Voluntary Public-Goods Contributions | Cosmic Signature",
+    "description": "Voluntary contributions to the Public Goods Vault from the Cosmic Signature community. Contributions support beneficiaries selected through Cosmic Council coordination."
+  },
+  "allocationRetrieved": {
+    "title": "Retrieved Allocations | Cosmic Signature",
+    "description": "Details of retrieved allocations from the Cosmic Signature protocol, including ETH receipts, Cosmic Signature NFT allocations, and Stellar Selection allocations."
+  },
+  "outreach": {
+    "title": "Outreach Allocations | Cosmic Signature",
+    "description": "Contribute to Cosmic Signature outreach and receive CST allocations. See top ecosystem contributors, allocation history, and how to take part."
+  },
+  "outreachAddress": {
+    "title": "Outreach Allocations | Cosmic Signature",
+    "description": "Outreach allocation history and CST allocations for a Cosmic Signature ecosystem contributor. Review referral activity and contributions."
+  },
+  "ethContribution": {
+    "title": "Direct ETH Contributions | Cosmic Signature",
+    "description": "Contribute ETH directly to the Cosmic Signature Public Goods Vault and view the complete contribution history. Support public goods while taking part in the protocol."
+  },
+  "ethContributionDetail": {
+    "title": "Direct ETH Contribution Detail | Cosmic Signature",
+    "description": "Details of a specific ETH contribution to the Cosmic Signature Public Goods Vault — contributor address, amount, cycle, and optional note."
+  },
+  "ethContributionByCycle": {
+    "title": "Direct ETH Contributions by Cycle | Cosmic Signature",
+    "description": "Direct ETH contributions to the Cosmic Signature protocol broken down by Performance Cycle."
+  },
+  "myStatistics": {
+    "title": "My Statistics | Cosmic Signature",
+    "description": "Track your performance with Cosmic Signature's My Statistics page. View detailed gesture history, anchor status, distributions, and more. Stay informed and optimize your participation in our on-chain protocol."
+  },
+  "myTokens": {
+    "title": "My NFTs | Cosmic Signature",
+    "description": "View and manage the Cosmic Signature NFTs in your connected wallet, including optional transfers to another address."
+  },
+  "transferCst": {
+    "title": "Transfer CST | Cosmic Signature",
+    "description": "Send your Cosmic Signature CST tokens to another wallet address."
+  },
+  "cosmicSignatureTransfers": {
+    "title": "Cosmic Signature NFT Transfer History | Cosmic Signature",
+    "description": "Cosmic Signature NFT Transfer History"
+  },
+  "cosmicTokenTransfers": {
+    "title": "Cosmic Signature CST Token Transfer History | Cosmic Signature",
+    "description": "Cosmic Signature CST Token Transfer History"
+  },
+  "usedRwlkNfts": {
+    "title": "Used RandomWalk NFTs | Cosmic Signature",
+    "description": "RandomWalk NFTs already attached to ETH gestures for a 50% Gesture-Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount."
+  },
+  "siteMap": {
+    "title": "Site Map | Cosmic Signature",
+    "description": "Navigate every section of the Cosmic Signature protocol — gestures, NFT gallery, anchoring, statistics, allocations, and public-goods contributions."
+  },
+  "nftDonations": {
+    "title": "Attached NFT Contributions | Cosmic Signature",
+    "description": "Browse the history of NFTs attached to gestures by community members. Attached NFTs forward to the participant who receives the Signature Allocation each cycle."
+  },
+  "namedNfts": {
+    "title": "Named Cosmic Signature NFTs | Cosmic Signature",
+    "description": "Browse Cosmic Signature NFTs that have been given custom names by their owners. Each named NFT carries a unique identity within the collection."
+  },
+  "recipientHistory": {
+    "title": "My Allocation History | Cosmic Signature",
+    "description": "View your complete allocation history in Cosmic Signature, including Signature Allocations, ETH Stellar Selection distributions, Cosmic Signature NFTs, and Anchor Distributions."
+  },
+  "userProfile": {
+    "title": "Information for User {address} | Cosmic Signature",
+    "description": "Information for User {address}",
+    "invalidAddress": "Invalid Address"
+  },
+  "admin": {
+    "title": "Admin | Cosmic Signature",
+    "description": "Administrative controls for the Cosmic Signature protocol. Manage protocol parameters, contract settings, and system configuration."
+  },
+  "adminSettings": {
+    "title": "Admin Settings | Cosmic Signature",
+    "description": "Administrative settings and contract management"
+  },
+  "internalCstOutreachTransfer": {
+    "title": "CST Outreach Transfer | Cosmic Signature",
+    "description": "Restricted CST transfer tool for the configured outreach reserve wallet signer."
+  },
+  "embedEndurance": {
+    "title": "Endurance & Chrono Timeline",
+    "description": "Endurance Champion and Chrono-Warrior timeline for a Cosmic Signature Performance Cycle."
+  },
+  "about": {
+    "title": "About Cosmic Signature | On-Chain Art on Arbitrum",
+    "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum that turns Performance Cycle gestures into deterministic three-body NFT art."
+  },
+  "learn": {
+    "title": "Learn Cosmic Signature | On-Chain Art, Performance Cycles, and Arbitrum",
+    "description": "Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications."
+  },
+  "whitePaper": {
+    "title": "Cosmic Signature White Paper | A Procedural On-Chain Art Protocol",
+    "description": "The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization."
+  },
+  "quiz": {
+    "title": "Cosmic Signature Quiz | Test Your Protocol Knowledge",
+    "description": "One hundred questions across three tiers, drawn from the Cosmic Signature white paper: Performance Cycles, gestures, allocations, the art pipeline, and the edge cases only careful readers catch.",
+    "tiers": {
+      "basic": {
+        "title": "Basic Quiz | Cosmic Signature",
+        "description": "Twenty-five questions on Cosmic Signature fundamentals: gestures, Performance Cycles, allocation tracks, and the deterministic three-body art."
+      },
+      "medium": {
+        "title": "Medium Quiz | Cosmic Signature",
+        "description": "Twenty-five questions on the live mechanics of Cosmic Signature: Calibration Windows, the CST feedback loop, persistence tracks, and Cosmic Council rules."
+      },
+      "hard": {
+        "title": "Hard Quiz | Cosmic Signature",
+        "description": "Fifty questions on Cosmic Signature edge cases and design forensics: post-expiry semantics, defensive design, upgrade history, and the art pipeline."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "How Cosmic Signature Works | Performance Cycles, Gestures, and NFTs",
+    "description": "Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution."
+  },
+  "riskDisclosures": {
+    "title": "Cosmic Signature Risk Disclosures | Not an \u0049nvestment Product",
+    "description": "Read Cosmic Signature risk disclosures covering blockchain participation, wallet interactions, NFTs, CST, allocations, and non-\u0069nvestment language."
+  },
+  "learnArticles": {
+    "what-is-cosmic-signature": {
+      "title": "What Is Cosmic Signature? | Cosmic Signature",
+      "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum where Performance Cycle gestures shape deterministic three-body NFT artwork."
+    },
+    "how-the-performance-cycle-works": {
+      "title": "How the Cosmic Signature Performance Cycle Works | Cosmic Signature",
+      "description": "Learn how Cosmic Signature Performance Cycles use Calibration Windows, gestures, finalization, and allocation tracks on Arbitrum."
+    },
+    "how-gestures-work": {
+      "title": "How Gestures Work in Cosmic Signature | Cosmic Signature",
+      "description": "Understand ETH gestures, CST gestures, Gesture Cost, Participation CST, and how gestures shape each Cosmic Signature Performance Cycle."
+    },
+    "three-body-nft-art": {
+      "title": "How Cosmic Signature Generates Three-Body NFT Art | Cosmic Signature",
+      "description": "A technical explanation of deterministic Cosmic Signature NFT artwork generated from on-chain seeds and three-body physics."
+    },
+    "cosmic-signature-on-arbitrum": {
+      "title": "Cosmic Signature on Arbitrum | Cosmic Signature",
+      "description": "Why Cosmic Signature runs on Arbitrum and how the protocol uses Ethereum Layer 2 infrastructure for on-chain art."
+    },
+    "contracts-security-verification": {
+      "title": "Cosmic Signature Contracts, Security, and Verification | Cosmic Signature",
+      "description": "Find the Cosmic Signature smart contract, source code, verification, and security context for the Arbitrum protocol."
+    },
+    "cst-token-and-cosmic-council": {
+      "title": "CST and the Cosmic Council | Cosmic Signature",
+      "description": "Learn how CST tokens relate to gestures, protocol coordination, and the Cosmic Council."
+    },
+    "anchoring-nfts": {
+      "title": "Anchoring Cosmic Signature NFTs | Cosmic Signature",
+      "description": "How anchoring works for Cosmic Signature NFTs, ETH Anchor Distributions, and Random Walk NFT eligibility."
+    },
+    "protocol-guild-public-goods": {
+      "title": "Cosmic Signature and Ethereum Public Goods | Cosmic Signature",
+      "description": "How Cosmic Signature routes a public-goods allocation to Protocol Guild, the funding mechanism for Ethereum core contributors."
+    },
+    "collecting-and-trading-cosmic-signature": {
+      "title": "Collecting and Trading Cosmic Signature NFTs and CST | Cosmic Signature",
+      "description": "Where Cosmic Signature assets trade: the zero-fee Axiom Zero NFT marketplace, Uniswap CST swaps on Arbitrum, and the Chaos Zero prediction market for cycles."
+    },
+    "not-a-\u006cottery-not-an-\u0069nvestment": {
+      "title": "Is Cosmic Signature a \u004cottery, \u0043asino, or \u0049nvestment? | Cosmic Signature",
+      "description": "Cosmic Signature is a procedural on-chain art protocol, not a \u006cottery, \u0063asino, \u0067ambling product, or \u0069nvestment product."
+    }
+  }
+}

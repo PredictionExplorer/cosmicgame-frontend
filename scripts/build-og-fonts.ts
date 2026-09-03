@@ -7,14 +7,16 @@
  *   npm run og:fonts              # every locale with an OG font
  *   npm run og:fonts -- zh-HK uk  # selected locales
  *
- * Glyph set per locale: every character of its OG copy
- * (`messages/<locale>/seo.json` → `og.*`), printable ASCII for dynamic values,
- * and the punctuation the card may emit (see ./build-og-fonts-core.ts).
- * Sources are the variable TTFs of the google/fonts repository at a pinned
- * commit, instanced at wght=700 and subset with harfbuzz (subset-font), so a
- * rebuild is reproducible byte for byte. Rerun after changing any translated
- * `seo.json` og copy; lib/og/__tests__/og-localization.test.ts fails when a
- * subset no longer covers its copy.
+ * Glyph set per subset file: every character of the OG copy of each locale
+ * that embeds it (`messages/<locale>/seo.json` → `og.*`), printable ASCII for
+ * dynamic values, and the punctuation the card may emit (see
+ * ./build-og-fonts-core.ts). A face shared by several locales (Onest for
+ * `uk` and `vi`) is cut once from the union of their copy. Sources are the
+ * variable TTFs of the google/fonts repository at a pinned commit, instanced
+ * at wght=700 and subset with harfbuzz (subset-font), so a rebuild is
+ * reproducible byte for byte. Rerun after changing any translated `seo.json`
+ * og copy; lib/og/__tests__/og-localization.test.ts fails when a subset no
+ * longer covers its copy.
  */
 
 /* eslint-disable no-console -- CLI output; runs via npm scripts, never ships to the browser. */
@@ -25,16 +27,15 @@ import { fileURLToPath } from 'node:url';
 
 import subsetFont from 'subset-font';
 
-import type { OgFontSpec } from '../lib/og/fonts';
-import { routing, type TranslatedLocale } from '../i18n/routing';
+import { routing } from '../i18n/routing';
 
 import {
   GOOGLE_FONTS_COMMIT,
-  OG_FONT_SOURCES,
-  ogFontLocales,
-  ogGlyphText,
+  ogFontBuilds,
+  ogGlyphTextForBuild,
   sourceRegistryProblems,
   type FontSource,
+  type OgFontBuild,
 } from './build-og-fonts-core';
 import { uncoveredCharacters } from './font-cmap';
 
@@ -54,9 +55,8 @@ async function fetchSource(source: FontSource): Promise<Buffer> {
   return buffer;
 }
 
-async function build(locale: TranslatedLocale, font: OgFontSpec): Promise<void> {
-  const source = OG_FONT_SOURCES[locale]!;
-  const text = ogGlyphText(ROOT, locale);
+async function build({ font, source, locales }: OgFontBuild): Promise<void> {
+  const text = ogGlyphTextForBuild(ROOT, { font, source, locales });
   const subset = await subsetFont(await fetchSource(source), text, {
     targetFormat: 'sfnt',
     variationAxes: { wght: font.weight },
@@ -73,7 +73,7 @@ async function build(locale: TranslatedLocale, font: OgFontSpec): Promise<void> 
   console.log(
     `write assets/fonts/${basename(target)}  ${subset.byteLength.toLocaleString('en-US')} bytes, ${
       Array.from(text).length
-    } code points`,
+    } code points (${locales.join(', ')})`,
   );
 }
 
@@ -81,23 +81,29 @@ async function main(): Promise<void> {
   const problems = sourceRegistryProblems();
   if (problems.length > 0) throw new Error(problems.join('\n'));
 
-  const candidates = ogFontLocales();
+  const candidates = ogFontBuilds();
   const requested = process.argv.slice(2).filter((arg) => !arg.startsWith('-'));
   const selected =
     requested.length === 0
       ? candidates
-      : requested.map((code) => {
-          const candidate = candidates.find((entry) => entry.locale === code);
-          if (!candidate) {
-            const known = candidates.map((entry) => entry.locale).join(', ');
-            const hint = (routing.locales as readonly string[]).includes(code)
-              ? 'renders with the built-in Latin fonts'
-              : 'is not a routing locale';
-            throw new Error(`${code} ${hint}; locales with an OG font: ${known}`);
-          }
-          return candidate;
-        });
-  for (const { locale, font } of selected) await build(locale, font);
+      : Array.from(
+          new Set(
+            requested.map((code) => {
+              const candidate = candidates.find((entry) =>
+                (entry.locales as readonly string[]).includes(code),
+              );
+              if (!candidate) {
+                const known = candidates.flatMap((entry) => entry.locales).join(', ');
+                const hint = (routing.locales as readonly string[]).includes(code)
+                  ? 'renders with the built-in Latin fonts'
+                  : 'is not a routing locale';
+                throw new Error(`${code} ${hint}; locales with an OG font: ${known}`);
+              }
+              return candidate;
+            }),
+          ),
+        );
+  for (const candidate of selected) await build(candidate);
 }
 
 main().catch((error: unknown) => {

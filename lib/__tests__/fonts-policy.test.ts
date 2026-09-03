@@ -96,14 +96,15 @@ describe('font configuration policy', () => {
     for (const subsets of cjkSubsets) expect(subsets).not.toContain('cyrillic');
   });
 
-  it('overrides the Ukrainian display stack outside any cascade layer', () => {
-    // :root declares --display-font-stack unlayered. Both :root and
-    // html[lang='uk'] target the <html> element, and an unlayered declaration
+  it('overrides the Ukrainian and Vietnamese display stacks outside any cascade layer', () => {
+    // :root declares --display-font-stack unlayered. Both :root and the
+    // html[lang] rule target the <html> element, and an unlayered declaration
     // beats any layered one regardless of specificity — an override placed
-    // inside @layer base would silently never apply.
+    // inside @layer base would silently never apply. One rule serves both
+    // alphabetic locales Clash Display cannot set.
     const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
     const rootIndex = css.indexOf(':root {');
-    const overrideIndex = css.indexOf("html[lang='uk'] {");
+    const overrideIndex = css.indexOf("html[lang='uk'],\nhtml:lang(vi) {");
     expect(rootIndex).toBeGreaterThan(-1);
     expect(overrideIndex).toBeGreaterThan(rootIndex);
     // Top-level rules are unindented; anything inside @layer is indented.
@@ -120,6 +121,50 @@ describe('font configuration policy', () => {
     const variables = [...source.matchAll(/variable: '(--font-[a-z-]+)'/g)].map((m) => m[1]);
     expect(variables.length).toBeGreaterThanOrEqual(7);
     for (const variable of variables) expect(css).toContain(`var(${variable})`);
+  });
+
+  it('wires every companion face into a rule scoped to its locale', () => {
+    // LOCALE_COMPANION_FONTS records the decision; this proves the CSS acted
+    // on it. A locale whose companion face no `html:lang()` (or `html[lang]`)
+    // rule references — or that only the site-wide :root default names — would
+    // load the face and still render its headings in the default stack. The
+    // registry is read from the source because next/font cannot run under
+    // jest; the CSS is scanned rule by rule, comments stripped.
+    const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
+    const registry = source.slice(
+      source.indexOf('export const LOCALE_COMPANION_FONTS'),
+      source.indexOf('};', source.indexOf('export const LOCALE_COMPANION_FONTS')),
+    );
+    const entries = [...registry.matchAll(/^\s+'?([a-zA-Z-]+)'?: ([a-zA-Z]+),$/gm)].map(
+      (m): [locale: string, exportName: string] => [m[1]!, m[2]!],
+    );
+    expect(entries.length).toBeGreaterThanOrEqual(8);
+    const variableOf = (exportName: string): string => {
+      const block = source.slice(source.indexOf(`export const ${exportName} =`));
+      return /variable: '(--font-[a-z-]+)'/.exec(block)![1]!;
+    };
+    const rules = [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{};]+)\{([^{}]*)\}/g)].map(
+      (m) => ({ selector: m[1]!.trim(), body: m[2]! }),
+    );
+    for (const [locale, exportName] of entries) {
+      if (exportName === 'null') continue;
+      const variable = variableOf(exportName);
+      const selectors = rules
+        .filter((rule) => rule.body.includes(`var(${variable})`))
+        .map((rule) => rule.selector);
+      const scoped = selectors.some(
+        (selector) =>
+          selector.includes(`html:lang(${locale})`) || selector.includes(`html[lang='${locale}']`),
+      );
+      // The Simplified cut is the site-wide default on :root; every other
+      // face must be swapped in by a rule that names its locale.
+      const isSiteDefault = selectors.includes(':root');
+      expect({ locale, variable, wired: scoped || isSiteDefault }).toEqual({
+        locale,
+        variable,
+        wired: true,
+      });
+    }
   });
 
   it('routes every Chinese font stack through --cjk-font-stack', () => {

@@ -1,0 +1,16 @@
+{
+  "datePicker": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "pickDate": "Pick a date",
+    "weekdays": {
+      "sunday": "Su",
+      "monday": "Mo",
+      "tuesday": "Tu",
+      "wednesday": "We",
+      "thursday": "Th",
+      "friday": "Fr",
+      "saturday": "Sa"
+    }
+  }
+}

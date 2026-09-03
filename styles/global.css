@@ -122,18 +122,21 @@ html:lang(ja) {
 }
 
 /*
- * Ukrainian locale typography (docs/i18n/README.md §5). Clash Display has no
- * Cyrillic glyphs, so the display stack switches to the Onest companion face
- * as a whole — appending Onest after Clash in the shared stack would set Latin
- * letters (ETH, CST, brand names) in Clash and Cyrillic in Onest inside one
- * heading, with mismatched x-heights. Body copy stays in Inter, whose Cyrillic
- * slices load on demand.
+ * Ukrainian and Vietnamese typography (docs/i18n/README.md §5). Clash Display
+ * has no Cyrillic glyphs and lacks most Vietnamese letters (the stacked
+ * diacritics ế, ợ, ữ and the horned Ơ/Ư), so both locales switch the display
+ * stack to the Onest companion face as a whole — appending Onest after Clash
+ * in the shared stack would set Latin letters (ETH, CST, brand names) in
+ * Clash and the rest of the heading in Onest, with mismatched x-heights and,
+ * in Vietnamese, per-letter font changes inside one word. Body copy stays in
+ * Inter, whose Cyrillic and Vietnamese slices load on demand.
  *
  * Deliberately unlayered, next to :root: both rules target the <html>
  * element, and an unlayered :root declaration would beat any override placed
  * inside @layer base no matter its specificity.
  */
-html[lang='uk'] {
+html[lang='uk'],
+html:lang(vi) {
   --display-font-stack: var(--font-onest), var(--font-inter), Inter, system-ui, sans-serif;
 }
 

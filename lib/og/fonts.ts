@@ -4,11 +4,13 @@ import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
 /**
  * Checked-in weight-700 subsets for the scripts next/og's built-in Latin
- * fonts cannot render (tofu for CJK, no guaranteed Cyrillic coverage). Every
- * subset is cut by `npm run og:fonts` (scripts/build-og-fonts.ts) from the copy
- * in `messages/<locale>/seo.json`, so a locale's entry here and its source row
- * there travel together; lib/og/__tests__/og-localization.test.ts fails when a
- * subset no longer covers its copy. Licenses: THIRD_PARTY_NOTICES.md.
+ * fonts cannot render (tofu for CJK, no guaranteed Cyrillic or Vietnamese
+ * coverage). Every subset is cut by `npm run og:fonts`
+ * (scripts/build-og-fonts.ts) from the copy in `messages/<locale>/seo.json`,
+ * so a locale's entry here and its source row there travel together; when
+ * several locales share one face (Onest for `uk` and `vi`) they share one
+ * file, cut from the union of their copy. lib/og/__tests__/og-localization.test.ts
+ * fails when a subset no longer covers its copy. Licenses: THIRD_PARTY_NOTICES.md.
  */
 export interface OgFontSpec {
   /** Family name the card's CSS refers to. */
@@ -43,6 +45,14 @@ const ogFont = (name: string, fileName: string, license: string): OgFontSpec => 
 });
 
 /**
+ * Same face as the on-page Ukrainian and Vietnamese display headings
+ * (lib/fonts.ts). One spec object for both locales: `getOgFontConfig` caches
+ * font buffers by family name, so two locales naming one family must point
+ * at one file.
+ */
+const ONEST = ogFont('Onest', 'Onest-700.subset.ttf', 'OFL-Onest.txt');
+
+/**
  * One entry per locale: adding a locale to routing.locales fails to compile
  * here until its OG typography is decided. Each Chinese locale gets the Noto
  * Sans face whose glyph forms match its regional standard (SC / TC / HK).
@@ -59,10 +69,9 @@ export const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
     cjk: true,
   },
   uk: {
-    // Same face as the on-page Ukrainian display headings (lib/fonts.ts).
     // Cyrillic is alphabetic, so the Latin layout metrics (uppercase
     // eyebrows, tracking) apply.
-    font: ogFont('Onest', 'Onest-700.subset.ttf', 'OFL-Onest.txt'),
+    font: ONEST,
     cjk: false,
   },
   // Hangul syllable blocks share the CJK square rhythm (Noto Sans KR is the
@@ -71,6 +80,9 @@ export const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
   // The Japanese cut: kanji follow the JIS glyph standard, which differs
   // from every Chinese cut, and kana need a Japanese face.
   ja: { font: ogFont('Noto Sans JP', 'NotoSansJP-700.subset.ttf', NOTO_CJK_LICENSE), cjk: true },
+  // Vietnamese is a Latin alphabet with stacked diacritics next/og's built-in
+  // fonts do not carry; the Latin layout metrics apply.
+  vi: { font: ONEST, cjk: false },
 };
 
 /** OG typography (font buffer requirement + CJK layout flag) for a locale. */

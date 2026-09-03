@@ -1,0 +1,22 @@
+{
+  "liveCycleCountdown": "Live Performance Cycle countdown",
+  "countdown": {
+    "days": "DAYS",
+    "hours": "HRS",
+    "minutes": "MIN",
+    "seconds": "SEC"
+  },
+  "countdownLong": {
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Min",
+    "seconds": "Sec"
+  },
+  "durationCompact": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s",
+    "leftPattern": "{duration} left"
+  }
+}

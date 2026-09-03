@@ -6,6 +6,14 @@
  * every catalog value and copy module of the locale is checked against it.
  * Locale-generic like the other gates: a new locale adds an entry here.
  *
+ * One check applies to every locale regardless of its entry: catalog values
+ * and copy modules must be in Unicode Normalization Form C
+ * (`checkNormalization`). Decomposed diacritics (`e` + U+0301 for é) render
+ * identically, so a reader never sees them, but they break the whole-word
+ * matchers of the lexicon and terminology gates, string equality in tests,
+ * and the glyph sets the OG subsets are cut from. Vietnamese, with up to two
+ * marks per vowel, is where a paste from a decomposed source is likeliest.
+ *
  * Two kinds of check compose an entry:
  *
  * - **Script conventions** (the Chinese locales). Character conversion is
@@ -151,6 +159,39 @@ function applyStandardForms(text: string): string {
   }
   return out;
 }
+
+/**
+ * Defects shared by every language written in a spaced alphabet with ASCII
+ * punctuation (Vietnamese today; the model for the next Latin- or
+ * Cyrillic-script locale). East Asian characters and full-width marks in
+ * such a catalog are copy pasted from the wrong locale, and a regular
+ * expression finds them reliably.
+ */
+export const ALPHABETIC_SCRIPT_PATTERNS: readonly DisallowedPattern[] = [
+  {
+    pattern: /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u,
+    reason: 'East Asian character; this copy is written in an alphabet',
+  },
+  {
+    pattern:
+      /[\u3000\u3001\u3002\uff0c\uff1a\uff1b\uff01\uff1f\uff08\uff09\u300c-\u300f\u3010\u3011\u300a\u300b]/,
+    reason:
+      'full-width punctuation or corner brackets; alphabetic copy uses ASCII marks and “ ” quotes',
+  },
+  {
+    pattern: /[\uff10-\uff19\uff21-\uff3a\uff41-\uff5a]/,
+    reason: 'full-width digits or Latin letters; use ASCII digits and letters',
+  },
+];
+
+/**
+ * One Vietnamese letter that carries a diacritic, precomposed (NFC): the
+ * marked vowels of Latin-1 and Latin Extended-A/B plus the Latin Extended
+ * Additional block. Used to anchor punctuation rules to Vietnamese text so
+ * they never fire on the TypeScript around a copy module.
+ */
+const VIETNAMESE_LETTER =
+  '[\\u00C0-\\u00C3\\u00C8-\\u00CA\\u00CC\\u00CD\\u00D2-\\u00D5\\u00D9\\u00DA\\u00DD\\u00E0-\\u00E3\\u00E8-\\u00EA\\u00EC\\u00ED\\u00F2-\\u00F5\\u00F9\\u00FA\\u00FD\\u0102\\u0103\\u0110\\u0111\\u0128\\u0129\\u0168\\u0169\\u01A0\\u01A1\\u01AF\\u01B0\\u1EA0-\\u1EF9]';
 
 export const LOCALE_CONVENTIONS: Record<TranslatedLocale, LocaleConventions | null> = {
   zh: {
@@ -301,6 +342,38 @@ export const LOCALE_CONVENTIONS: Record<TranslatedLocale, LocaleConventions | nu
       },
     ],
   },
+  // Vietnamese (docs/i18n/style-guide-vi.md): a Latin alphabet with stacked
+  // diacritics, spaced syllables, and ASCII punctuation. The shared
+  // alphabetic-script rules plus the defects a regular expression catches.
+  vi: {
+    styleGuide: 'docs/i18n/style-guide-vi.md',
+    script: null,
+    disallowedPatterns: [
+      ...ALPHABETIC_SCRIPT_PATTERNS,
+      {
+        // Vietnamese puts no space before a sentence mark; a space there is
+        // the French habit or a broken copy-paste. The letter before the space
+        // must be a Vietnamese one, so TypeScript syntax (`a ? b : c`) in a
+        // copy module never trips it.
+        pattern: new RegExp(`${VIETNAMESE_LETTER} [,.;:?!](?=\\s|$|["'”’)\\]])`, 'u'),
+        reason:
+          'space before a sentence mark; Vietnamese attaches , . ; : ? ! to the word (style-guide-vi §4)',
+      },
+      {
+        // Three ASCII dots count only next to Vietnamese text, so a spread
+        // (`...sections`) in a copy module is not an ellipsis.
+        pattern: new RegExp(
+          `(?<=${VIETNAMESE_LETTER})\\.\\.\\.|\\.\\.\\.(?=${VIETNAMESE_LETTER})`,
+          'u',
+        ),
+        reason: 'three dots as an ellipsis; write a single … (style-guide-vi §4)',
+      },
+      {
+        pattern: /quý khách|quý vị/i,
+        reason: 'customer-service address; the reader is "bạn" throughout (style-guide-vi §2)',
+      },
+    ],
+  },
 };
 
 export interface ConventionViolation {
@@ -309,15 +382,44 @@ export interface ConventionViolation {
   readonly character: string;
   /** The expected form, or for a pattern its `reason`. */
   readonly expected: string;
-  readonly reason: 'wrong-script' | 'regional-form' | 'punctuation' | 'pattern';
+  readonly reason: 'wrong-script' | 'regional-form' | 'punctuation' | 'pattern' | 'normalization';
   readonly excerpt: string;
 }
 
 const HAN = /\p{Script=Han}/u;
+const COMBINING_MARK = /\p{M}/u;
 
 function excerptFor(line: string): string {
   const normalized = line.trim().replace(/\s+/g, ' ');
   return normalized.length <= 120 ? normalized : `${normalized.slice(0, 117)}…`;
+}
+
+/**
+ * Checks that text is in Normalization Form C. Every locale's copy is held to
+ * this, with or without declared conventions. Each line that changes under
+ * NFC is reported once, naming the first decomposed sequence found.
+ */
+export function checkNormalization(text: string): ConventionViolation[] {
+  const violations: ConventionViolation[] = [];
+  text.split('\n').forEach((line, index) => {
+    if (line.normalize('NFC') === line) return;
+    // The first base character with its run of combining marks is the culprit
+    // a reader can act on; the whole line is what the fix normalizes.
+    const characters = Array.from(line);
+    const markIndex = characters.findIndex((character) => COMBINING_MARK.test(character));
+    let end = markIndex;
+    while (end + 1 < characters.length && COMBINING_MARK.test(characters[end + 1]!)) end += 1;
+    const sequence =
+      markIndex > 0 ? characters.slice(markIndex - 1, end + 1).join('') : line.trim();
+    violations.push({
+      line: index + 1,
+      character: sequence,
+      expected: sequence.normalize('NFC'),
+      reason: 'normalization',
+      excerpt: excerptFor(line),
+    });
+  });
+  return violations;
 }
 
 /**
@@ -413,14 +515,20 @@ export function checkDisallowedPatterns(
   return violations;
 }
 
-/** Every violation of a locale's conventions in one text, script checks first. */
+/**
+ * Every violation in one text: the universal normalization check, then the
+ * locale's script checks, then its disallowed patterns. `null` conventions
+ * (a locale whose style rules need a reader, not a regular expression) still
+ * get the universal check.
+ */
 export function checkConventions(
   text: string,
-  conventions: LocaleConventions,
+  conventions: LocaleConventions | null,
 ): ConventionViolation[] {
   return [
-    ...(conventions.script ? checkScriptConventions(text, conventions.script) : []),
-    ...checkDisallowedPatterns(text, conventions.disallowedPatterns),
+    ...checkNormalization(text),
+    ...(conventions?.script ? checkScriptConventions(text, conventions.script) : []),
+    ...(conventions ? checkDisallowedPatterns(text, conventions.disallowedPatterns) : []),
   ];
 }
 
@@ -473,7 +581,6 @@ export function localeConventionFiles(
 /** Every violation in a locale's catalogs and copy modules under `root`. */
 export function scanLocaleConventions(root: string, locale: TranslatedLocale): LocatedViolation[] {
   const conventions = LOCALE_CONVENTIONS[locale];
-  if (!conventions) return [];
   const { catalogs, modules } = localeConventionFiles(root, locale);
   const found: LocatedViolation[] = [];
 
@@ -496,10 +603,11 @@ export function scanLocaleConventions(root: string, locale: TranslatedLocale): L
 }
 
 /** One-line summary of what a locale's gate checks, for CLI output. */
-export function describeConventions(conventions: LocaleConventions): string {
+export function describeConventions(conventions: LocaleConventions | null): string {
   const parts = [
-    ...(conventions.script ? [`${conventions.script.script} script`] : []),
-    ...(conventions.disallowedPatterns.length > 0
+    'NFC',
+    ...(conventions?.script ? [`${conventions.script.script} script`] : []),
+    ...(conventions && conventions.disallowedPatterns.length > 0
       ? [`${conventions.disallowedPatterns.length} pattern(s)`]
       : []),
   ];
@@ -508,12 +616,14 @@ export function describeConventions(conventions: LocaleConventions): string {
 
 export function describeViolation(
   violation: ConventionViolation,
-  conventions: LocaleConventions,
+  conventions: LocaleConventions | null,
 ): string {
   const codePoint = (character: string): string =>
     `U+${character.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`;
-  const script = conventions.script?.script ?? 'Hans';
+  const script = conventions?.script?.script ?? 'Hans';
   switch (violation.reason) {
+    case 'normalization':
+      return `"${violation.character}" is not in Normalization Form C; write the precomposed "${violation.expected}" (run the text through String.prototype.normalize('NFC'))`;
     case 'wrong-script':
       return violation.character.length === 1
         ? `${violation.character} (${codePoint(violation.character)}) is ${

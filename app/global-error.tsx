@@ -6,6 +6,7 @@ import enErrors from '@/messages/en/errors.json';
 import jaErrors from '@/messages/ja/errors.json';
 import koErrors from '@/messages/ko/errors.json';
 import ukErrors from '@/messages/uk/errors.json';
+import viErrors from '@/messages/vi/errors.json';
 import zhErrors from '@/messages/zh/errors.json';
 import zhHkErrors from '@/messages/zh-HK/errors.json';
 import zhTwErrors from '@/messages/zh-TW/errors.json';
@@ -24,6 +25,7 @@ const ERROR_CATALOGS: LocaleRecord<typeof enErrors> = {
   uk: ukErrors,
   ko: koErrors,
   ja: jaErrors,
+  vi: viErrors,
 };
 
 /**

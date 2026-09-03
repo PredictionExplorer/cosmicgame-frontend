@@ -29,6 +29,7 @@ import {
   whitePaperContentJa,
   whitePaperContentKo,
   whitePaperContentUk,
+  whitePaperContentVi,
   whitePaperContentZh,
   whitePaperContentZhHk,
   whitePaperContentZhTw,
@@ -169,6 +170,22 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
       '\\setCJKsansfont[BoldFont={Hiragino Sans W6}]{Hiragino Sans W3}',
       '\\setCJKmonofont{Hiragino Sans W3}',
       '\\renewcommand{\\abstractname}{\u6982\u8981}',
+    ],
+  },
+  vi: {
+    content: whitePaperContentVi,
+    dateDisplay: 'th\u00e1ng 8 n\u0103m 2026',
+    tocTitle: 'M\u1ee5c l\u1ee5c',
+    lang: 'vi',
+    headerIncludes: [
+      ...BASE_HEADER_INCLUDES,
+      // macOS system fonts with full Vietnamese coverage (stacked diacritics,
+      // horned Ơ/Ư); Latin Modern has none. The same faces as the Ukrainian
+      // build, so the two alphabetic papers share one typographic voice.
+      '\\setmainfont{Times New Roman}',
+      '\\setsansfont{Helvetica Neue}',
+      '\\setmonofont[Scale=MatchLowercase]{Menlo}',
+      '\\renewcommand{\\abstractname}{T\u00f3m t\u1eaft}',
     ],
   },
 };

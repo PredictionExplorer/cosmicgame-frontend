@@ -7,6 +7,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { OG_TYPOGRAPHY, type OgFontSpec } from '../lib/og/fonts';
 import { TRANSLATED_LOCALES, type AppLocale, type TranslatedLocale } from '../i18n/routing';
@@ -24,7 +25,9 @@ export interface FontSource {
  * next/og's built-in Latin fonts. Typed against the translated locales so a
  * locale whose `OG_TYPOGRAPHY` entry embeds a font cannot register without
  * naming its source here (`sourceRegistryProblems` checks the converse too).
- * The output file name is the one `OG_TYPOGRAPHY` embeds.
+ * The output file name is the one `OG_TYPOGRAPHY` embeds; locales that embed
+ * the same file must name the same source, and the build cuts that file from
+ * the union of their copy (`ogFontBuilds`).
  */
 export const OG_FONT_SOURCES: Readonly<Record<TranslatedLocale, FontSource | null>> = {
   zh: { path: 'ofl/notosanssc/NotoSansSC[wght].ttf' },
@@ -33,6 +36,8 @@ export const OG_FONT_SOURCES: Readonly<Record<TranslatedLocale, FontSource | nul
   uk: { path: 'ofl/onest/Onest[wght].ttf' },
   ko: { path: 'ofl/notosanskr/NotoSansKR[wght].ttf' },
   ja: { path: 'ofl/notosansjp/NotoSansJP[wght].ttf' },
+  // Onest carries the Vietnamese letters Clash Display lacks; shared with `uk`.
+  vi: { path: 'ofl/onest/Onest[wght].ttf' },
 };
 
 /** Punctuation the card layout may render around CJK copy. */
@@ -77,7 +82,43 @@ export function ogFontLocales(): ReadonlyArray<{ locale: TranslatedLocale; font:
   });
 }
 
-/** Both registries must agree on which locales embed a font. */
+/** One subset file to cut: its source, every locale it serves, and the copy it must cover. */
+export interface OgFontBuild {
+  readonly font: OgFontSpec;
+  readonly source: FontSource;
+  /** In routing order; the first locale names the build in CLI output. */
+  readonly locales: readonly TranslatedLocale[];
+}
+
+/**
+ * The subset files to write, one per distinct output file. A face shared by
+ * several locales (Onest for Ukrainian and Vietnamese) is cut once from the
+ * union of their copy, so each locale's OG images render with the same
+ * buffer `getOgFontConfig` caches under the family name.
+ */
+export function ogFontBuilds(): readonly OgFontBuild[] {
+  const byFile = new Map<string, { font: OgFontSpec; locales: TranslatedLocale[] }>();
+  for (const { locale, font } of ogFontLocales()) {
+    const key = fileURLToPath(font.file);
+    const build = byFile.get(key);
+    if (build) build.locales.push(locale);
+    else byFile.set(key, { font, locales: [locale] });
+  }
+  return Array.from(byFile.values(), ({ font, locales }) => ({
+    font,
+    source: OG_FONT_SOURCES[locales[0]!]!,
+    locales,
+  }));
+}
+
+/** Every distinct character the locales sharing one subset file may render. */
+export function ogGlyphTextForBuild(root: string, build: OgFontBuild): string {
+  return Array.from(
+    new Set(build.locales.flatMap((locale) => Array.from(ogGlyphText(root, locale)))),
+  ).join('');
+}
+
+/** Both registries must agree on which locales embed a font, and on shared files. */
 export function sourceRegistryProblems(): string[] {
   const problems: string[] = [];
   for (const locale of TRANSLATED_LOCALES) {
@@ -92,6 +133,30 @@ export function sourceRegistryProblems(): string[] {
       problems.push(
         `${locale} has a font source in OG_FONT_SOURCES but renders with next/og defaults (lib/og/fonts.ts)`,
       );
+    }
+  }
+  // Locales that embed one file must cut it from one source and name one
+  // family; otherwise the last build wins and the other locale's OG images
+  // silently render with the wrong glyph set.
+  const byFile = new Map<string, Array<{ locale: TranslatedLocale; font: OgFontSpec }>>();
+  for (const entry of ogFontLocales()) {
+    const key = fileURLToPath(entry.font.file);
+    byFile.set(key, [...(byFile.get(key) ?? []), entry]);
+  }
+  for (const entries of byFile.values()) {
+    const [first, ...rest] = entries;
+    if (!first) continue;
+    for (const other of rest) {
+      if (OG_FONT_SOURCES[other.locale]?.path !== OG_FONT_SOURCES[first.locale]?.path) {
+        problems.push(
+          `${first.locale} and ${other.locale} embed the same OG subset file but name different sources in OG_FONT_SOURCES`,
+        );
+      }
+      if (other.font.name !== first.font.name) {
+        problems.push(
+          `${first.locale} and ${other.locale} embed the same OG subset file under different family names (lib/og/fonts.ts)`,
+        );
+      }
     }
   }
   return problems;

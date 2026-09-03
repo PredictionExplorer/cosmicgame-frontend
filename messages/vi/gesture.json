@@ -1,0 +1,74 @@
+{
+  "invalid": {
+    "title": "Invalid Gesture Id",
+    "help": "Use a non-negative numeric gesture identifier in the URL."
+  },
+  "header": {
+    "title": "Gesture details",
+    "loadingSubtitle": "Loading gesture data…",
+    "positionLabel": "Gesture Position #{position}",
+    "positionFallback": "Gesture Position"
+  },
+  "empty": {
+    "title": "No gesture information found.",
+    "help": "This ID may be invalid or the gesture is not in the current index."
+  },
+  "sections": {
+    "transaction": {
+      "title": "Transaction and cycle",
+      "description": "When the gesture was made and which cycle it belongs to."
+    },
+    "cost": {
+      "title": "Cost and Participation CST",
+      "description": "What was paid and the Participation CST imprinted by this gesture."
+    },
+    "type": {
+      "title": "Gesture type",
+      "description": "Whether a Random Walk NFT or CST was used for this gesture."
+    },
+    "erc20": {
+      "title": "Attached ERC-20",
+      "description": "Optional ERC-20 token attached to this gesture."
+    },
+    "nft": {
+      "title": "Attached NFT",
+      "description": "Metadata for the NFT attached to this gesture, when present."
+    },
+    "message": {
+      "title": "Message",
+      "description": "Message left by the participant with this gesture."
+    }
+  },
+  "rows": {
+    "datetime": "Gesture datetime",
+    "datetimeHelp": "Opens the transaction on the block explorer",
+    "participantAddress": "Participant address",
+    "cycleNumber": "Cycle number",
+    "cycleValue": "Cycle {round}",
+    "gestureCost": "Gesture cost",
+    "participationCst": "Participation CST",
+    "attachedRandomWalk": "Attached RandomWalk NFT to ETH gesture:",
+    "paidWithCst": "Paid with CST (ERC-20):",
+    "randomWalkId": "RandomWalkNFT ID:",
+    "erc20Address": "Attached ERC-20 Token Address:",
+    "erc20Amount": "Attached ERC-20 Token Amount (ETH):",
+    "nftAddress": "Attached NFT Token Address:",
+    "nftId": "Attached NFT Token ID:",
+    "nftTokenUri": "NFT Token URI:"
+  },
+  "values": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nftPreview": {
+    "heading": "Preview and metadata",
+    "collectionName": "Collection name",
+    "artist": "Artist",
+    "platform": "Platform",
+    "description": "Description"
+  },
+  "randomWalk": {
+    "previewAria": "Random Walk NFT preview",
+    "heading": "Random Walk NFT"
+  }
+}

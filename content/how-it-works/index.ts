@@ -5,6 +5,7 @@ import { howItWorksTextEn } from './text.en';
 import { howItWorksTextJa } from './text.ja';
 import { howItWorksTextKo } from './text.ko';
 import { howItWorksTextUk } from './text.uk';
+import { howItWorksTextVi } from './text.vi';
 import { howItWorksTextZh } from './text.zh';
 import { howItWorksTextZhHk } from './text.zh-HK';
 import { howItWorksTextZhTw } from './text.zh-TW';
@@ -76,6 +77,7 @@ export const howItWorksContentZhHk: HowItWorksContent = buildHowItWorksContent(h
 export const howItWorksContentUk: HowItWorksContent = buildHowItWorksContent(howItWorksTextUk);
 export const howItWorksContentKo: HowItWorksContent = buildHowItWorksContent(howItWorksTextKo);
 export const howItWorksContentJa: HowItWorksContent = buildHowItWorksContent(howItWorksTextJa);
+export const howItWorksContentVi: HowItWorksContent = buildHowItWorksContent(howItWorksTextVi);
 
 const HOW_IT_WORKS_CONTENT: LocaleRecord<HowItWorksContent> = {
   en: howItWorksContentEn,
@@ -85,6 +87,7 @@ const HOW_IT_WORKS_CONTENT: LocaleRecord<HowItWorksContent> = {
   uk: howItWorksContentUk,
   ko: howItWorksContentKo,
   ja: howItWorksContentJa,
+  vi: howItWorksContentVi,
 };
 
 export function getHowItWorksContent(locale: string): HowItWorksContent {

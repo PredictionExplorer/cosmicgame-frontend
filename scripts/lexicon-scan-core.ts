@@ -968,6 +968,174 @@ export const JA_BANNED_TERMS: readonly string[] = [
 // lexicon-allow-end
 
 /**
+ * Vietnamese banned register (docs/i18n/glossary-vi.md §5): the words
+ * Vietnamese actually uses for the banned concepts. Vietnamese is a Latin
+ * alphabet with stacked diacritics, written one spaced syllable at a time,
+ * so the terms are matched as whole words with Unicode boundaries
+ * (`unicode-word`; JavaScript's `\b` stops at every diacritic). Because a
+ * word boundary is also a syllable boundary, a bare syllable that another
+ * innocent compound contains is deliberately absent and its compounds are
+ * listed instead: thưởng hides in thưởng thức "to appreciate (art)", lời in
+ * lời nhắn "message", rút in rút gọn "shorten", vòng in vòng lặp "loop",
+ * hiệp in hiệp hội "association", bạc in bạc "silver". Terms are
+ * case-insensitive; every entry carries a diacritic or a Vietnamese-only
+ * spelling so the profile never re-flags English (see DEFAULT_BANNED_TERMS).
+ *
+ * As in every other locale, the only sanctioned exception is FAQ/legal
+ * denial copy inside lexicon-allow pragmas (or `\uXXXX` escapes in JSON).
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const VI_BANNED_TERMS: readonly string[] = [
+  // auction / bidding
+  'đấu giá',
+  'đấu thầu',
+  'bỏ thầu',
+  'đặt giá',
+  'trả giá',
+  'ra giá',
+  'phiên đấu',
+  // prize / jackpot / reward
+  'giải thưởng',
+  'phần thưởng',
+  'tiền thưởng',
+  'trúng thưởng',
+  'trao thưởng',
+  'nhận thưởng',
+  'lĩnh thưởng',
+  'trả thưởng',
+  'khen thưởng',
+  'độc đắc',
+  // winner / win / lose
+  'thắng',
+  'chiến thắng',
+  'thắng cuộc',
+  'thắng giải',
+  'người thắng',
+  'người trúng',
+  'đoạt giải',
+  'giành giải',
+  'trúng giải',
+  'trúng số',
+  'thua',
+  'thua cuộc',
+  'thua lỗ',
+  // lottery / raffle / draw
+  'xổ số',
+  'vé số',
+  'số đề',
+  'lô tô',
+  'lô đề',
+  'rút thăm',
+  'bốc thăm',
+  'quay số',
+  'quay thưởng',
+  'vòng quay',
+  // luck flavor
+  'may mắn',
+  'vận may',
+  'cầu may',
+  'ăn may',
+  'may rủi',
+  'hên xui',
+  'số đỏ',
+  'đỏ đen',
+  // gambling / bets / odds
+  'cá cược',
+  'đặt cược',
+  'cược',
+  'kèo',
+  'đánh bạc',
+  'cờ bạc',
+  'sòng bạc',
+  'sòng bài',
+  'đánh bài',
+  'nhà cái',
+  'con bạc',
+  // ticket
+  'vé',
+  'tấm vé',
+  // game framing / competition
+  'trò chơi',
+  'người chơi',
+  'chơi',
+  'ván',
+  'lượt chơi',
+  'giải đấu',
+  'thi đấu',
+  'trận đấu',
+  'hiệp đấu',
+  'vòng đấu',
+  'vòng chơi',
+  'vòng cược',
+  'đối đầu',
+  'đối thủ',
+  'so tài',
+  'tranh tài',
+  'cạnh tranh',
+  'cuộc đua',
+  'cuộc thi',
+  // securities / yield / earnings
+  'đầu tư',
+  'nhà đầu tư',
+  'lợi nhuận',
+  'lợi tức',
+  'lợi suất',
+  'lãi',
+  'lãi suất',
+  'tiền lãi',
+  'sinh lời',
+  'sinh lãi',
+  'sinh lợi',
+  'kiếm lời',
+  'kiếm tiền',
+  'có lời',
+  'thu lợi',
+  'thu nhập',
+  'cổ tức',
+  'cổ phiếu',
+  'chứng khoán',
+  'lướt sóng',
+  // tax
+  'miễn thuế',
+  // staking / deposit
+  'đặt cọc',
+  'ký gửi',
+  'thế chấp',
+  'gửi tiết kiệm',
+  // mint / mining
+  'đúc',
+  'khai thác',
+  'đào coin',
+  'đào tiền',
+  'thợ đào',
+  // withdraw / claim slang
+  'rút tiền',
+  'rút về',
+  'rút vốn',
+  'rút lời',
+  'rút ETH',
+  'lĩnh tiền',
+  // charity / donation
+  'từ thiện',
+  'quyên góp',
+  'quyên tặng',
+  'hiến tặng',
+  'thiện nguyện',
+  'làm phúc',
+  'cứu trợ',
+  'ủng hộ',
+  // DAO
+  'tự trị phi tập trung',
+  // marketing
+  'tiếp thị',
+  'quảng cáo',
+  'quảng bá',
+  'khuyến mãi',
+  'khuyến mại',
+];
+// lexicon-allow-end
+
+/**
  * One banned-register profile per translated locale. The type forces a
  * decision the moment a locale joins routing.locales. The CLI applies a
  * profile to every locale-agnostic file and to every file of another
@@ -1016,6 +1184,12 @@ export const LEXICON_PROFILES: Record<TranslatedLocale, LexiconProfile> = {
   ja: {
     glossary: 'docs/i18n/glossary-ja.md',
     termSets: [{ matcher: 'cjk-substring', terms: JA_BANNED_TERMS }],
+  },
+  vi: {
+    glossary: 'docs/i18n/glossary-vi.md',
+    // Spaced Latin syllables with diacritics: whole words under Unicode
+    // boundaries, never `latin-word`, whose ASCII `\b` breaks at every ế or ợ.
+    termSets: [{ matcher: 'unicode-word', terms: VI_BANNED_TERMS }],
   },
 };
 

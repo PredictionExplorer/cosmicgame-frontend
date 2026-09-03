@@ -1,0 +1,32 @@
+{
+  "breadcrumbs": {
+    "home": "Home",
+    "imprint": "Imprint"
+  },
+  "page": {
+    "title": "Imprint Random Walk NFT",
+    "subtitle": "Own a Random Walk NFT and receive a 50% reduction in ETH Gesture Cost",
+    "description": "RandomWalk NFTs are unique digital collectibles that grant holders a strategic advantage in the Cosmic Signature protocol. By attaching a RandomWalk NFT to an ETH gesture, you receive a 50% reduction in ETH Gesture Cost - a significant edge late in the cycle. Each RandomWalk NFT can be used once for this discount, so choose your moment wisely for maximum impact. This gesture attachment is separate from anchoring RandomWalk NFTs for Anchored-NFT Stellar Selection eligibility.",
+    "currentCost": "Current imprint cost",
+    "submit": "Imprint Now",
+    "myNfts": "My Random Walk NFTs"
+  },
+  "seo": {
+    "eyebrow": "RandomWalk NFT imprinting · Arbitrum",
+    "heading": "Imprint RandomWalk NFT",
+    "description": "Imprint RandomWalk NFTs for Cosmic Signature participation. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% Gesture Cost reduction.",
+    "source": "Cosmic Signature public protocol configuration APIs",
+    "lastUpdated": "Last updated: {date}. Data source: {source}. The interactive tables below hydrate with live app data, while this summary is present in the initial HTML for search engines and AI crawlers.",
+    "relatedAria": "Imprint RandomWalk NFT related pages",
+    "cards": {
+      "cycle": "Active Performance Cycle",
+      "cost": "Current ETH Gesture Cost",
+      "discount": "RandomWalk Discount"
+    },
+    "links": {
+      "cycle": "Open the active Performance Cycle",
+      "learn": "Learn how gestures work",
+      "used": "View used RandomWalk NFTs"
+    }
+  }
+}

@@ -25,6 +25,11 @@ export const SCRIPT_PATTERNS: Record<TranslatedLocale, RegExp> = {
   ko: /[\uac00-\ud7a3]/,
   // Hiragana, katakana, or kanji — Japanese copy always mixes at least two.
   ja: /[\u3040-\u30ff\u3400-\u9fff]/,
+  // A Vietnamese letter with a diacritic: the marked vowels of Latin-1 (à, é,
+  // ì …), ă â ê ô ơ ư đ ĩ ũ, or any tone-marked vowel of the Latin Extended
+  // Additional block (ế, ợ, ữ …). Plain ASCII could be English; no Vietnamese
+  // sentence goes long without one of these.
+  vi: /[\u00c0-\u00c3\u00c8-\u00ca\u00cc\u00cd\u00d2-\u00d5\u00d9\u00da\u00dd\u00e0-\u00e3\u00e8-\u00ea\u00ec\u00ed\u00f2-\u00f5\u00f9\u00fa\u00fd\u0102\u0103\u0110\u0111\u0128\u0129\u0168\u0169\u01a0\u01a1\u01af\u01b0\u1ea0-\u1ef9]/,
 };
 
 /**
@@ -72,6 +77,13 @@ export const DURATION_NOUNS: LocaleRecord<DurationNouns> = {
     days: '日間?',
     // 8月15日 is a calendar date (August 15), not a 15-day duration.
     notAfter: '月\\s?',
+  },
+  vi: {
+    // No inflection: 48 giờ, 5 tuần, 1 ngày / 7 ngày. Dates put the noun
+    // first (ngày 15 tháng 8), so a figure followed by ngày is a duration.
+    hours: 'giờ',
+    weeks: 'tuần',
+    days: 'ngày',
   },
 };
 
@@ -152,6 +164,19 @@ export const LLMS_SECTIONS: Record<TranslatedLocale, LlmsSectionExpectation> = {
       'COSMICがん変異データベース',
     ],
   },
+  vi: {
+    heading: 'Tiếng Việt',
+    phrases: [
+      'giao thức nghệ thuật tạo sinh trên chuỗi',
+      '48 giờ',
+      `${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT`,
+      'mỗi RandomWalk NFT',
+      'cơ sở dữ liệu đột biến ung thư COSMIC',
+    ],
+    // Vietnamese groups thousands with a dot and reads the English comma as
+    // a decimal separator.
+    forbiddenNumberFormat: /\d,\d{3} CST[^\n]*[\u1ea0-\u1ef9]/,
+  },
 };
 
 /**
@@ -166,4 +191,5 @@ export const NEGOTIATION_PROBES: Record<TranslatedLocale, readonly string[]> = {
   uk: ['uk-UA,uk;q=0.9', 'uk'],
   ko: ['ko-KR,ko;q=0.9,en-US;q=0.8', 'ko', 'ko-KP'],
   ja: ['ja-JP,ja;q=0.9,en-US;q=0.8', 'ja', 'ja-JP'],
+  vi: ['vi-VN,vi;q=0.9,en-US;q=0.8', 'vi', 'vi-VN'],
 };

@@ -57,7 +57,9 @@ const chineseRelativeTime = (units: Record<RelativeTimeUnit, string>, justNow: s
  * agreement ("1 хвилину", "2 хвилини", "5 хвилин тому"); so does `ko`, whose
  * counters attach to the digit ("2시간 전", "3개월 전"). `ja` does not: CLDR
  * renders "2 時間前" with a space, while the Japanese style guide (§4) runs
- * digits and counters together ("2時間前", "3か月前", "たった今").
+ * digits and counters together ("2時間前", "3か月前", "たった今"). `vi`
+ * delegates too: Vietnamese has no plural inflection, and CLDR's spaced
+ * "2 giờ trước" / "3 tháng trước" is exactly the style guide's form.
  */
 const intlRelativeTime = (locale: string) => ({
   ago: (count: number, unit: RelativeTimeUnit) =>
@@ -80,6 +82,7 @@ const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
     justNow: 'たった今',
     ago: (count, unit) => `${count}${JA_RELATIVE_UNITS[unit]}前`,
   },
+  vi: { justNow: 'vừa xong', ...intlRelativeTime('vi') },
 };
 
 /** Converts a Unix timestamp (seconds) to a human-readable relative time string. */
@@ -117,6 +120,7 @@ const ISO_DATE_LABEL_FORMATS: LocaleRecord<(isoDate: string) => string> = {
   uk: longIsoDateLabel('uk'),
   ko: longIsoDateLabel('ko'),
   ja: longIsoDateLabel('ja'),
+  vi: longIsoDateLabel('vi'),
 };
 
 /** Locale-appropriate display form of an ISO `YYYY-MM-DD` date string. */

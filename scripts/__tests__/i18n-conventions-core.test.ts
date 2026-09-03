@@ -148,12 +148,24 @@ describe('disallowed patterns', () => {
     expect(checkConventions('每一笔落筆', twLocale).map((v) => v.reason)).toEqual(['wrong-script']);
   });
 
-  it('is described alongside the script checks', () => {
-    expect(describeConventions(fixture)).toBe('2 pattern(s)');
-    expect(describeConventions(twLocale)).toBe('Hant script');
+  it('is described alongside the universal and script checks', () => {
+    expect(describeConventions(fixture)).toBe('NFC, 2 pattern(s)');
+    expect(describeConventions(twLocale)).toBe('NFC, Hant script');
     expect(
       describeConventions({ ...twLocale, disallowedPatterns: fixture.disallowedPatterns }),
-    ).toBe('Hant script, 2 pattern(s)');
+    ).toBe('NFC, Hant script, 2 pattern(s)');
+    // A locale without declared conventions still gets the universal check.
+    expect(describeConventions(null)).toBe('NFC');
+  });
+
+  it('holds every locale to Normalization Form C, with or without conventions', () => {
+    const decomposed = 'Vi\u0065\u0302\u0323t';
+    expect(checkConventions(decomposed, null).map((v) => v.reason)).toEqual(['normalization']);
+    expect(checkConventions(decomposed, fixture).map((v) => v.reason)).toEqual(['normalization']);
+    expect(checkConventions('Việt', null)).toEqual([]);
+    const [violation] = checkConventions(decomposed, null);
+    expect(describeViolation(violation!, null)).toContain('is not in Normalization Form C');
+    expect(describeViolation(violation!, null)).toContain('"ệ"');
   });
 });
 

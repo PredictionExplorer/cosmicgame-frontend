@@ -5,6 +5,7 @@ import { aboutContentJa } from './ja';
 import { aboutContentKo } from './ko';
 import type { AboutContent } from './types';
 import { aboutContentUk } from './uk';
+import { aboutContentVi } from './vi';
 import { aboutContentZh } from './zh';
 import { aboutContentZhHk } from './zh-HK';
 import { aboutContentZhTw } from './zh-TW';
@@ -15,6 +16,7 @@ export {
   aboutContentJa,
   aboutContentKo,
   aboutContentUk,
+  aboutContentVi,
   aboutContentZh,
   aboutContentZhHk,
   aboutContentZhTw,
@@ -28,6 +30,7 @@ const ABOUT_CONTENT: LocaleRecord<AboutContent> = {
   uk: aboutContentUk,
   ko: aboutContentKo,
   ja: aboutContentJa,
+  vi: aboutContentVi,
 };
 
 export function getAboutContent(locale: string): AboutContent {
