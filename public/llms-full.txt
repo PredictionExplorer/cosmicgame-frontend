@@ -900,3 +900,107 @@ Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC�
 
 **質問: デプロイ済みのコントラクトと検証のリソースはどこで見られますか？**
 回答: コントラクトアドレスは https://app.cosmicsignature.com/ja/contracts 、セキュリティの説明は https://app.cosmicsignature.com/ja/security 、監査の状況は https://app.cosmicsignature.com/ja/audits で確認できます。
+
+## Tiếng Việt: mô tả đầy đủ
+
+### Về Cosmic Signature
+
+Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, kết nối việc tham gia trên chuỗi, nghệ thuật tạo sinh và sự hỗ trợ hàng hóa công trong một cơ chế công khai duy nhất. Trong mỗi chu kỳ trình diễn, người tham gia đặt nét bút bằng ETH hoặc CST; mỗi nét bút kéo dài đếm ngược hoàn tất, ghi nhận một lượt Tinh tuyển và tiếp tục định hình Signature cuối cùng của chu kỳ.
+
+Tác phẩm NFT sinh ra từ bài toán ba vật thể trong vật lý. Một chương trình mã nguồn mở viết bằng Rust đọc seed trên chuỗi, mô phỏng chuyển động của ba thiên thể và vẽ quỹ đạo của chúng. Cùng một seed luôn tạo ra cùng một hình ảnh và video, nên bất kỳ ai cũng có thể tái tạo tác phẩm.
+
+Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học.
+
+### Cấu trúc trang tiếng Việt
+
+#### Giới thiệu và học tập
+
+- **Trang chủ**: https://cosmicsignature.com/vi
+- **Về Cosmic Signature**: https://cosmicsignature.com/vi/about
+- **Trung tâm học tập**: https://cosmicsignature.com/vi/learn
+- **Cosmic Signature là gì?**: https://cosmicsignature.com/vi/learn/what-is-cosmic-signature
+- **Nghệ thuật NFT ba vật thể**: https://cosmicsignature.com/vi/learn/three-body-nft-art
+- **Cơ chế hàng hóa công**: https://cosmicsignature.com/vi/learn/protocol-guild-public-goods
+
+#### Ứng dụng và dữ liệu công khai
+
+- **Trang chủ ứng dụng**: https://app.cosmicsignature.com/vi
+- **Chu kỳ trình diễn hiện tại**: https://app.cosmicsignature.com/vi/current-cycle
+- **Phòng trưng bày**: https://app.cosmicsignature.com/vi/gallery
+- **Cách hoạt động**: https://app.cosmicsignature.com/vi/how-it-works
+- **Câu hỏi thường gặp**: https://app.cosmicsignature.com/vi/faq
+- **Người nhận phân bổ**: https://app.cosmicsignature.com/vi/allocation
+- **Neo giữ**: https://app.cosmicsignature.com/vi/anchoring
+- **Thống kê**: https://app.cosmicsignature.com/vi/statistics
+- **Đóng góp ETH trực tiếp**: https://app.cosmicsignature.com/vi/eth-contribution
+- **Đóng góp Hàng hóa công**: https://app.cosmicsignature.com/vi/public-goods-contributions-cg
+- **Hợp đồng**: https://app.cosmicsignature.com/vi/contracts
+- **Mã nguồn**: https://app.cosmicsignature.com/vi/code
+- **Bảo mật**: https://app.cosmicsignature.com/vi/security
+- **Kiểm toán**: https://app.cosmicsignature.com/vi/audits
+- **Công bố rủi ro**: https://app.cosmicsignature.com/vi/risk-disclosures
+
+### Chu kỳ trình diễn và nét bút
+
+1. Một chu kỳ mới bắt đầu với cửa sổ hiệu chỉnh ETH. Cửa sổ hiệu chỉnh CST khởi đầu từ mốc tham chiếu 12 giờ và thay đổi theo mức tham gia trên chuỗi.
+2. Mỗi nét bút kéo dài đếm ngược hoàn tất thêm mức tăng thời gian hiện tại. Mức tăng ban đầu là 1 giờ và lớn thêm 1% sau mỗi chu kỳ hoàn tất.
+3. Nét bút có thể đặt bằng ETH hoặc CST, và nét bút đầu tiên của mỗi chu kỳ phải là ETH. Chi phí nét bút CST giảm dần trong cửa sổ hiệu chỉnh hiện tại, và CST đã dùng bị đốt.
+4. Nét bút CST kéo dài cửa sổ hiệu chỉnh CST khoảng 0,4%, nét bút ETH rút ngắn nó khoảng 0,398%.
+5. Người đặt nét bút cuối cùng có cửa sổ hoàn tất ưu tiên 48 giờ sau khi đếm ngược về không. Vẫn có thể đặt nét bút cho đến khi chu kỳ thực sự hoàn tất, và sau cửa sổ ưu tiên, bất kỳ ai cũng có thể hoàn tất chu kỳ; người thực sự hoàn tất nhận phân bổ Signature.
+6. Mỗi nét bút thêm một lượt Tinh tuyển và có thể khắc CST tham gia động theo thời gian kể từ nét bút trước. Công thức dùng căn bậc hai, nên nét bút dồn dập có thể khắc 0 CST, còn khoảng cách càng dài thì lượng CST càng lớn với tốc độ tăng chậm dần.
+7. Một RandomWalk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH đó. Mỗi RandomWalk NFT chỉ dùng được một lần.
+
+### Phân bổ theo từng chu kỳ
+
+- **25%**: Phân bổ Signature, dành cho người tham gia thực sự hoàn tất chu kỳ
+- **8%**: ETH phân bổ cho Chiến binh Thời gian
+- **4%**: Chia cho 3 lượt ETH Tinh tuyển
+- **6%**: Phân phối neo giữ cho những người nắm giữ Cosmic Signature NFT đang neo giữ
+- **7%**: Phân bổ Hàng hóa công, hiện chuyển đến Protocol Guild
+- **Khoảng 50%**: Chuyển sang chu kỳ tiếp theo dưới dạng Dự trữ tích lũy
+- **3.000 CST**: Khắc cho Dự trữ truyền thông và phân phối cho những người tham gia hệ sinh thái
+
+Trong phần lớn các chu kỳ, 24 Cosmic Signature NFT được khắc, mỗi NFT đi cùng 1.000 CST. Một cho phân bổ Signature, một cho người nhận nét bút CST cuối cùng, một cho Quán quân Bền bỉ, một cho Chiến binh Thời gian, mười cho NFT Tinh tuyển dành cho người tham gia và mười cho Tinh tuyển NFT neo giữ. Cộng 3.000 CST của Dự trữ truyền thông, lượng CST cố định được khắc khi hoàn tất một chu kỳ điển hình là 27.000 CST, chưa kể CST tham gia được khắc động theo từng nét bút.
+
+### Neo giữ và nhận về
+
+- Cosmic Signature NFT đang neo giữ chia đều 6% ETH của mỗi chu kỳ dưới dạng phân phối neo giữ, và ETH tích lũy được nhận về khi gỡ neo
+- RandomWalk NFT đang neo giữ chỉ tham gia Tinh tuyển NFT neo giữ và không nhận phân phối neo giữ bằng ETH
+- Mỗi Cosmic Signature NFT hoặc mỗi RandomWalk NFT chỉ có thể neo giữ một lần; sau khi gỡ neo, NFT đó không thể neo giữ lại
+- Nếu không có Cosmic Signature NFT nào đang neo giữ khi chu kỳ hoàn tất, 6% của chu kỳ đó ở lại trong Dự trữ chu kỳ
+- Các phân bổ ETH phụ, ERC-20 và ERC-721 được giữ trong ví phân bổ; sau thời hạn nhận về 5 tuần, bất kỳ ai cũng có thể nhận về phân bổ chưa được nhận cho chính họ
+
+### Token và hệ sinh thái
+
+- **CST**: Token ERC-20 dùng cho điều phối và tiện ích. Dùng để đặt nét bút trong cửa sổ hiệu chỉnh CST và biểu thị trọng số điều phối trong Hội đồng Vũ trụ
+- **Cosmic Signature NFT**: ERC-721 của nghệ thuật tạo sinh ba vật thể. Seed lưu trên chuỗi, và tác phẩm có thể tái tạo bằng chương trình Rust mã nguồn mở
+- **RandomWalk NFT**: Giảm chi phí nét bút ETH một lần, và khi neo giữ thì tham gia Tinh tuyển NFT neo giữ
+- **Axiom Zero** (https://www.axiomzero.market/cosmic-signature): Sàn NFT trên Arbitrum không thu phí nền tảng, giao dịch được xử lý trực tiếp trên chuỗi
+- **Chaos Zero** (https://chaoszero.com): Thị trường dự đoán dành cho Cosmic Signature. Mỗi chu kỳ đặt câu hỏi: Chu kỳ này có hoàn tất với nhiều nét bút hơn chu kỳ trước không? Kết quả được quyết định bởi dữ liệu công khai trên chuỗi
+- **Uniswap**: https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0
+
+### Điều phối và tin cậy
+
+- Các tham số cốt lõi của giao thức chỉ có thể thay đổi trước khi chu kỳ tiếp theo kích hoạt; thời điểm kích hoạt chu kỳ, độ trễ giữa các chu kỳ và một số thiết lập ngoại vi có giới hạn riêng
+- Hợp đồng giao thức dùng mô hình nâng cấp UUPS, nhưng chỉ có thể nâng cấp giữa các chu kỳ, và bản triển khai hiện tại có thể xác minh trên chuỗi đến từng byte
+- Toàn bộ ETH của người tham gia chỉ di chuyển trong giao thức theo quy tắc hợp đồng đã công bố, và không ví nào của đội ngũ trực tiếp nhận ETH từ nét bút
+- Các hợp đồng đã được Hacken kiểm toán độc lập; báo cáo và tình trạng kiểm chứng hình thức được công bố tại https://app.cosmicsignature.com/vi/audits
+- Mục tiêu dài hạn là chuyển quyền sở hữu cho Hội đồng Vũ trụ và cuối cùng từ bỏ quyền sở hữu hoàn toàn. Sau đó, không tham số hay bản triển khai nào có thể thay đổi
+- Nếu đội ngũ ngừng hỗ trợ, seed trên chuỗi và mã nguồn mở vẫn cho phép bất kỳ ai tái tạo tác phẩm NFT
+
+### Câu hỏi thường gặp bằng tiếng Việt
+
+**Hỏi: Tôi có thể tham gia nếu không có NFT không?**
+Trả lời: Có. Bất kỳ ai cũng có thể đặt nét bút trực tiếp mà không cần sở hữu NFT. RandomWalk NFT chỉ là một lựa chọn tùy ý để giảm chi phí một lần.
+
+**Hỏi: Phân bổ Signature gồm những gì?**
+Trả lời: 25% Dự trữ chu kỳ, 1.000 CST, một Cosmic Signature NFT độc nhất, cùng các token của dự án khác được đính kèm vào nét bút.
+
+**Hỏi: Tinh tuyển diễn ra như thế nào?**
+Trả lời: Mỗi nét bút thêm một lượt Tinh tuyển. Khi chu kỳ hoàn tất, 3 lượt ETH Tinh tuyển chia 4% Dự trữ chu kỳ; 10 lượt NFT Tinh tuyển dành cho người tham gia và 10 lượt Tinh tuyển NFT neo giữ được quyết định riêng, mỗi lượt đi cùng 1.000 CST và một Cosmic Signature NFT.
+
+**Hỏi: Tác phẩm NFT được tạo ra như thế nào?**
+Trả lời: Hợp đồng lưu seed, và chương trình Rust mã nguồn mở dùng seed đó để chạy mô phỏng vật lý ba vật thể rồi kết xuất quang phổ. Cùng một seed luôn tạo ra cùng những điểm ảnh.
+
+**Hỏi: Tôi có thể xem các hợp đồng đã triển khai và tài nguyên xác minh ở đâu?**
+Trả lời: Địa chỉ hợp đồng tại https://app.cosmicsignature.com/vi/contracts, giải thích về bảo mật tại https://app.cosmicsignature.com/vi/security, và tình trạng kiểm toán tại https://app.cosmicsignature.com/vi/audits.

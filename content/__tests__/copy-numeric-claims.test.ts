@@ -144,9 +144,10 @@ const allowedCstAmounts = new Set<number>([
  * comma — and copy may type any space where Intl emits a no-break space. The
  * ASCII dot is also accepted as a decimal mark wherever it is not the
  * grouping mark, since protocol figures such as 0.398% are quoted that way
- * across catalogs. The mixed-language llms docs accept every locale's
- * grouping mark; a dot followed by exactly three digits is a thousands group
- * there ("1.000 CST"), any other dot a decimal ("0.398%").
+ * across catalogs. The mixed-language llms docs accept every locale's marks:
+ * a comma or space before exactly three digits is a group, a dot followed by
+ * exactly three digits is a thousands group there ("1.000 CST"), and any
+ * other dot or comma is a decimal ("0.398%", "0,398%").
  */
 interface NumberGrammar {
   readonly groupClass: string;
@@ -161,7 +162,7 @@ const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g
 
 function numberGrammar(locale: AppLocale | undefined): NumberGrammar {
   if (!locale) {
-    return { groupClass: `[,${SPACE_GROUP_MARKS}]`, decimalClass: '[.]', dotGroups: true };
+    return { groupClass: `[,${SPACE_GROUP_MARKS}]`, decimalClass: '[.,]', dotGroups: true };
   }
   const parts = new Intl.NumberFormat(getLocaleConfig(locale).intlLocale).formatToParts(1234567.5);
   const group = parts.find((part) => part.type === 'group')?.value ?? ',';
@@ -175,10 +176,13 @@ function numberGrammar(locale: AppLocale | undefined): NumberGrammar {
 }
 
 function parseNumber(raw: string, grammar: NumberGrammar, grouped: boolean): number {
-  let text = grouped ? raw.replace(new RegExp(grammar.groupClass, 'g'), '') : raw;
-  // "1.000" / "24.000": dots that each precede exactly three digits are groups.
-  if (grouped && grammar.dotGroups && /^\d{1,3}(?:\.\d{3})+$/.test(text)) {
-    text = text.replace(/\./g, '');
+  let text = raw;
+  if (grouped) {
+    // A grouping mark is only a grouping mark before exactly three digits;
+    // "1,5" in a comma-decimal language stays a fraction.
+    text = text.replace(new RegExp(`${grammar.groupClass}(?=\\d{3}(?!\\d))`, 'g'), '');
+    // "1.000" / "24.000": dots that each precede exactly three digits are groups.
+    if (grammar.dotGroups && /^\d{1,3}(?:\.\d{3})+$/.test(text)) text = text.replace(/\./g, '');
   }
   return Number(text.replace(new RegExp(grammar.decimalClass), '.'));
 }

@@ -328,3 +328,43 @@ Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC�
 - [Axiom Zero](https://www.axiomzero.market/cosmic-signature): プラットフォーム手数料のないArbitrumのNFTマーケットプレイス
 - [Chaos Zero](https://chaoszero.com): Cosmic Signatureのサイクルを扱う予測市場。サイクルごとに「このサイクルは前のサイクルより多い筆数で確定するか？」を問います
 - [UniswapでのCSTスワップ](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Arbitrum上でのCSTのスワップ
+
+## Tiếng Việt: tổng quan
+
+Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn, và mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối Dự trữ chu kỳ qua hơn mười luồng phân bổ theo các quy tắc đã công bố, bao gồm Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum.
+
+Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học.
+
+### Các trang chính bằng tiếng Việt
+
+- [Trang chủ tiếng Việt](https://cosmicsignature.com/vi): Tổng quan về giao thức và nghệ thuật trên chuỗi
+- [Về Cosmic Signature](https://cosmicsignature.com/vi/about): Thực thể giao thức, liên kết chính thức và phân biệt tên gọi
+- [Sách trắng](https://cosmicsignature.com/vi/white-paper): Mô tả đầy đủ về cơ chế và thiết kế của giao thức (tiếng Việt và tiếng Anh, có bản PDF)
+- [Trung tâm học tập](https://cosmicsignature.com/vi/learn): Giải thích về chu kỳ trình diễn, nghệ thuật ba vật thể, neo giữ và hàng hóa công
+- [Ứng dụng tiếng Việt](https://app.cosmicsignature.com/vi): Giao diện chu kỳ hiện tại và nét bút
+- [Phòng trưng bày](https://app.cosmicsignature.com/vi/gallery): Xem các Cosmic Signature NFT đã khắc
+- [Cách hoạt động](https://app.cosmicsignature.com/vi/how-it-works): Toàn bộ cơ chế của giao thức
+- [Câu hỏi thường gặp](https://app.cosmicsignature.com/vi/faq): Giải đáp bằng tiếng Việt, sắp theo chủ đề
+- [Thống kê](https://app.cosmicsignature.com/vi/statistics): Dữ liệu giao thức công khai
+- [Neo giữ](https://app.cosmicsignature.com/vi/anchoring): Quy tắc neo giữ và lịch sử phân phối
+- [Hợp đồng](https://app.cosmicsignature.com/vi/contracts): Địa chỉ các hợp đồng đã triển khai
+- [Bảo mật](https://app.cosmicsignature.com/vi/security): Tài nguyên xác minh và hướng dẫn tham gia an toàn
+- [Kiểm toán](https://app.cosmicsignature.com/vi/audits): Báo cáo kiểm toán của Hacken và bối cảnh kiểm chứng hình thức
+- [Công bố rủi ro](https://app.cosmicsignature.com/vi/risk-disclosures): Rủi ro về blockchain, ví và việc tham gia giao thức
+
+### Những điểm chính của giao thức
+
+- Mỗi chu kỳ bắt đầu với cơ chế cửa sổ hiệu chỉnh ETH và CST. Cửa sổ hiệu chỉnh CST khởi đầu từ mốc tham chiếu 12 giờ và thay đổi theo mức tham gia trên chuỗi
+- Mỗi nét bút kéo dài đếm ngược hoàn tất thêm mức tăng thời gian hiện tại. Mức tăng khởi đầu ở 1 giờ và lớn thêm 1% sau mỗi chu kỳ hoàn tất
+- Người đặt nét bút cuối cùng có cửa sổ hoàn tất ưu tiên 48 giờ. Sau đó bất kỳ ai cũng có thể hoàn tất chu kỳ, và người thực sự hoàn tất nhận phân bổ Signature
+- Trong Dự trữ chu kỳ, 25% dành cho phân bổ Signature, 8% cho Chiến binh Thời gian, 4% chia cho 3 lượt ETH Tinh tuyển, 6% cho phân phối neo giữ, 7% chuyển đến Protocol Guild, và khoảng 50% chuyển sang chu kỳ tiếp theo
+- Trong phần lớn các chu kỳ, 24 Cosmic Signature NFT được khắc cùng với 24.000 CST. Cộng 3.000 CST của Dự trữ truyền thông, tổng lượng khắc cố định của một chu kỳ điển hình là 27.000 CST, chưa kể CST tham gia được tính động theo từng nét bút
+- Mỗi Cosmic Signature NFT hoặc mỗi RandomWalk NFT chỉ có thể được neo giữ đúng một lần trong đời; sau khi gỡ neo, nó không thể neo giữ lại
+- Một RandomWalk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH đó. Mỗi RandomWalk NFT chỉ dùng được một lần cho mức giảm này
+- ETH phụ và tài sản đính kèm có thời hạn nhận về 5 tuần; sau thời hạn đó, bất kỳ ai cũng có thể nhận về phân bổ chưa được nhận cho chính họ
+
+### Hệ sinh thái
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): Sàn NFT trên Arbitrum không thu phí nền tảng
+- [Chaos Zero](https://chaoszero.com): Thị trường dự đoán về các chu kỳ của Cosmic Signature. Mỗi chu kỳ đặt câu hỏi: Chu kỳ này có hoàn tất với nhiều nét bút hơn chu kỳ trước không?
+- [Hoán đổi CST trên Uniswap](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Hoán đổi CST trên Arbitrum

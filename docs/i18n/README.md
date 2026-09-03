@@ -4,8 +4,9 @@ This document defines how Cosmic Signature is a multilingual site. It shipped
 **Simplified Chinese (`zh`)** first, **Ukrainian (`uk`)** second, then the two
 **Traditional Chinese variants (`zh-TW`, `zh-HK`)**, then **Korean (`ko`)** — the first
 language added with `npm run i18n:scaffold` — then **Japanese (`ja`)**, the first language
-sharing a script family with an existing one; every later language follows the checklist
-in §10. It covers the technical architecture, the message/content structure, the
+sharing a script family with an existing one, then **Vietnamese (`vi`)**, the first
+alphabetic language after Ukrainian and the first whose letters the display face lacks;
+every later language follows the checklist in §10. It covers the technical architecture, the message/content structure, the
 translation workflow, and the quality bar. It is written so that any engineer or translator
 can pick up a unit from a progress tracker and know exactly what to do.
 
@@ -32,6 +33,9 @@ can pick up a unit from a progress tracker and know exactly what to do.
 | [glossary-ja.md](./glossary-ja.md)             | Canonical Japanese translation for every protocol term + banned register              |
 | [style-guide-ja.md](./style-guide-ja.md)       | Rules for making the Japanese sound native (です・ます, no spaces, counters, kinsoku) |
 | [progress-ja.md](./progress-ja.md)             | Japanese rollout: per-namespace and per-area T/R/Q tracker                            |
+| [glossary-vi.md](./glossary-vi.md)             | Canonical Vietnamese translation for every protocol term + banned register            |
+| [style-guide-vi.md](./style-guide-vi.md)       | Rules for making the Vietnamese sound native (bạn, ASCII marks, dot grouping, NFC)    |
+| [progress-vi.md](./progress-vi.md)             | Vietnamese rollout: per-namespace and per-area T/R/Q tracker                          |
 
 > Note: `docs/` is intentionally outside the lexicon scanner's `SCAN_DIRS`
 > (see `scripts/lexicon-scan.ts`), so these documents may cite banned vocabulary
@@ -46,7 +50,7 @@ can pick up a unit from a progress tracker and know exactly what to do.
   (alias `zh-Hant`); Hong Kong Traditional Chinese — `zh-HK` (alias `zh-MO`, Macau
   follows Hong Kong conventions); Ukrainian — `uk`; Korean — `ko` (`ko-KR` and `ko-KP`
   resolve to it by same-language affinity); Japanese — `ja` (`ja-JP` resolves to it the
-  same way).
+  same way); Vietnamese — `vi` (`vi-VN` resolves to it the same way).
 - **Locale codes are canonical BCP 47 tags, chosen to match what browsers send.** A bare
   language code is the CLDR default variant of that language (`zh` = Simplified,
   mainland); further variants of the same language carry the region that distinguishes
@@ -71,9 +75,9 @@ can pick up a unit from a progress tracker and know exactly what to do.
   tools are translated last, but they are translated).
 - **Quality bar:** every locale must read as if originally written in that language
   (see [style-guide-zh.md](./style-guide-zh.md), [style-guide-uk.md](./style-guide-uk.md),
-  [style-guide-ko.md](./style-guide-ko.md), [style-guide-ja.md](./style-guide-ja.md)).
-  Literal translation is a defect.
-- **Future languages** (ja, ...) are added by: running `npm run i18n:scaffold` (which
+  [style-guide-ko.md](./style-guide-ko.md), [style-guide-ja.md](./style-guide-ja.md),
+  [style-guide-vi.md](./style-guide-vi.md)). Literal translation is a defect.
+- **Future languages** are added by: running `npm run i18n:scaffold` (which
   writes the `messages/<locale>/` directory, the per-locale content modules, the gate
   stub, the e2e suites, and the document templates), extending `locales`, and filling the
   `LocaleRecord` registries the compiler then lists — lexicon profile, terminology pack,
@@ -112,7 +116,7 @@ New i18n plumbing:
 
 ```
 i18n/
-  routing.ts      ← defineRouting({ locales: ['en', 'zh', 'zh-TW', 'zh-HK', 'uk', 'ko', 'ja'], … }), LOCALE_LABELS, LOCALE_ALIASES
+  routing.ts      ← defineRouting({ locales: ['en', 'zh', 'zh-TW', 'zh-HK', 'uk', 'ko', 'ja', 'vi'], … }), LOCALE_LABELS, LOCALE_ALIASES
   locale.ts       ← AppLocale, LocaleRecord<T>, normalizeLocale, pickByLocale (the only locale parser)
   localeConfig.ts ← per-locale rendering conventions: Intl tag, og:locale, JSON-LD inLanguage,
                     word spacing, week start, ellipsis, provider-error policy
@@ -128,6 +132,7 @@ messages/
   uk/*.json       ← Ukrainian catalogs
   ko/*.json       ← Korean catalogs
   ja/*.json       ← Japanese catalogs
+  vi/*.json       ← Vietnamese catalogs
 ```
 
 `normalizeLocale` resolves locale-ish input in four steps: exact code (any casing, `_`
@@ -250,9 +255,9 @@ components and `generateMetadata`.
 - Keys describe _role_, not content: `hero.headline`, not `everyGestureShapes`.
 - Never concatenate translated fragments; use ICU placeholders: `"gestureCost": "Gesture Cost: {amount} ETH"`.
 - ICU `plural` blocks carry every category the locale's `Intl.PluralRules` defines:
-  `one/other` in `en`; a single `other` in `zh`, `ko`, and `ja`, which have no plural inflection
-  (style guides §7 — Korean keeps the block so `#` formats the number and puts the counter
-  inside it); `one/few/many/other` in `uk` (style-guide-uk). `npm run i18n:strict` fails on
+  `one/other` in `en`; a single `other` in `zh`, `ko`, `ja`, and `vi`, which have no plural
+  inflection (style guides §7 — Korean keeps the block so `#` formats the number and puts the
+  counter inside it); `one/few/many/other` in `uk` (style-guide-uk). `npm run i18n:strict` fails on
   a missing category.
 - Embedded markup uses `t.rich` with named tags, never raw HTML in messages.
 - A string used on 2+ pages goes in `common`/`tables`/`tooltips`, not duplicated.
@@ -385,6 +390,31 @@ Ukrainian heading (ETH, CST, brand names) do not render in a different face with
 different x-height. OG images for `/uk` load `assets/fonts/Onest-700.subset.ttf`, cut by
 `npm run og:fonts` like the CJK subsets, through `lib/og/fonts.ts`.
 
+**Vietnamese (Latin with stacked diacritics).** Vietnamese is written in the Latin
+alphabet, but with 134 letters the Latin-1 repertoire does not have: the horned Ơ/Ư, the
+breve Ă, and up to two marks stacked on one vowel (ế, ợ, ữ, ẫ — the Latin Extended
+Additional block, U+1EA0–1EF9). Inter's build-time CSS declares a `vietnamese`
+`unicode-range` slice, so body text again needs nothing extra. Clash Display, a display face
+with a Western-European repertoire, carries only 44 of those letters, so a Vietnamese
+heading set in it would fall back glyph by glyph — one word in two faces. Vietnamese
+therefore reuses the Ukrainian solution: `LOCALE_COMPANION_FONTS.vi` is Onest, and the
+`--display-font-stack` rule in `styles/global.css` lists `html[lang='uk'], html:lang(vi)`
+together. Google Fonts serves Onest's Vietnamese slice in the same CSS, and next/font
+self-hosts every slice when `preload` is off; the `subsets` option only names slices to
+preload and is validated against next/font's bundled font metadata, which predates Onest's
+Vietnamese coverage — so the option stays on the Cyrillic and Latin sets while the
+Vietnamese slice ships regardless (the comment on `onest` in `lib/fonts.ts` records this).
+The OG subset is shared too: `OG_TYPOGRAPHY.uk` and `.vi` point at one `Onest-700.subset.ttf`,
+and `npm run og:fonts` cuts every shared file once from the **union** of the copy of every
+locale that embeds it (`ogFontBuilds` in `scripts/build-og-fonts-core.ts`);
+`sourceRegistryProblems` rejects two locales that embed one file under different sources
+or family names. Two rules generalize from this rollout: (1) a display face is a per-locale
+decision, never a per-script one — check the actual letter repertoire, since "Latin"
+covers Vietnamese and Clash Display does not; (2) stacked diacritics need vertical room, so
+never set Vietnamese below `line-height: 1.3`. The white-paper PDF uses the same macOS
+faces as the Ukrainian build (Times New Roman, Helvetica Neue, Menlo), which carry the
+full Vietnamese repertoire; Latin Modern does not.
+
 ## 6. SEO, metadata, and structured data
 
 - **`utils/seo.ts` → `createMetadata`** gains a `locale` + `path` requirement and emits:
@@ -411,7 +441,7 @@ different x-height. OG images for `/uk` load `assets/fonts/Onest-700.subset.ttf`
    compares each namespace against `messages/en/**` and checks key parity, ICU syntax
    (the same `@formatjs` parser next-intl uses), placeholder parity (same `{arguments}`,
    no invented `<tags>`), plural completeness against the locale's CLDR categories
-   (`one/few/many/other` for uk, `other` for zh and ko), and verbatim-copy catalogs. It
+   (`one/few/many/other` for uk, `other` for zh, ko, ja, and vi), and verbatim-copy catalogs. It
    then reports every long-form content area (`scripts/i18n-content-areas.ts`) as the
    share of prose still identical to the English, and `--strict` fails an area that is
    untranslated — a scaffolded module cannot ship as a translation. `npm run
@@ -428,7 +458,14 @@ i18n:check`). The same checks run under jest in
    and add regional registers (`ZH_TW_BANNED_TERMS`: 博弈, 競標, 報酬…; `ZH_HK_BANNED_TERMS`:
    六合彩, 派彩, 回報…), and the ja list (`JA_BANNED_TERMS`) is matched as substrings too,
    with the same innocent-word audit (ロト hides in プロトコル, ベット in アルファベット, プレイ
-   in ディスプレイ, so the list carries 宝くじ / ベッティング / プレイヤー instead). A profile
+   in ディスプレイ, so the list carries 宝くじ / ベッティング / プレイヤー instead). The vi list
+   (`VI_BANNED_TERMS`) is matched as Unicode-bounded whole words (`unicode-word`, never the
+   ASCII `latin-word` matcher, whose `\b` breaks at every diacritic); because Vietnamese
+   spaces every syllable, a word boundary is a syllable boundary, so a bare syllable that
+   an innocent compound contains is never listed and its compounds are (thưởng thức "to
+   appreciate" stays legal, giải thưởng does not; lời nhắn "message" stays legal, kiếm lời
+   does not). Every vi entry carries a diacritic or a Vietnamese-only spelling so the
+   profile can never re-flag English. A profile
    runs on every locale-agnostic file and on every file of another language written in a
    different **script family**, but not on a sibling variant of its own language and not on
    another language of the same family: sibling variants share characters while their
@@ -438,19 +475,28 @@ i18n:check`). The same checks run under jest in
    where Japanese 報酬 is plain "remuneration"). Each locale declares its family in
    `LocaleConfig.scriptFamily` (`latin` / `han` / `hangul` / `cyrillic`); Korean and
    Ukrainian checks therefore still run on Japanese and Chinese files, where they can only
-   match genuinely stray copy. File ownership and this scoping are resolved by
+   match genuinely stray copy, and the Vietnamese profile (family `latin`) never runs on
+   English files — which is why its entries must never be plain ASCII. File ownership and this scoping are resolved by
    `checkAppliesTo` in `scripts/locale-files.ts`, shared by all three CLIs. Same allow-pragma mechanism for FAQ/legal denial copy; JSON
    catalogs, which cannot carry pragmas, use `\uXXXX` escapes for denial copy.
 3. **Terminology gate**: `scripts/terminology-consistency.ts` iterates
    `TRANSLATED_LOCALES`, scanning `messages/<locale>/**` and `content/**/*.<locale>.ts`
    with the locale's rule pack from `scripts/terminology/<locale>.ts` (drift variants for
-   inflected languages are stems). The `zh-TW` and `zh-HK` packs also catch cross-variant
+   inflected languages are stems; the vi pack uses `unicode-word` and lists only
+   multi-syllable variants, for the same boundary reason as the lexicon). The `zh-TW` and
+   `zh-HK` packs also catch cross-variant
    vocabulary (網絡 in Taiwan copy, 網路 in Hong Kong copy, 使用者 vs 用戶), which is what
    makes a Traditional site read as "converted" to a native reader.
 4. **Copy conventions** — `scripts/i18n-conventions.ts` (`npm run i18n:conventions`, part
    of `i18n:check`; jest twin `i18n/__tests__/conventions.test.ts`): one
    `LOCALE_CONVENTIONS` entry per translated locale in `scripts/i18n-conventions-core.ts`
-   (`null` when the language has no mechanical conventions worth a gate). An entry
+   (`null` when the language has no mechanical conventions worth a gate). One check runs
+   for **every** translated locale regardless of its entry: every catalog value and copy
+   module must be in Unicode Normalization Form C (`checkNormalization`). Decomposed
+   diacritics (`e` + U+0302 + U+0301 for ế) render identically, so no reader notices them,
+   but they break the whole-word lexicon and terminology matchers, string equality in
+   tests, and the glyph sets the OG subsets are cut from; Vietnamese, with up to two marks
+   per vowel, is where a paste from a decomposed source is likeliest. An entry then
    composes two kinds of check. _Script conventions_ (the Chinese locales): every catalog
    value and copy module must be a fixed point of its own OpenCC rendering (no Simplified
    character in Traditional copy and vice versa, phrase-aware, with a short allowlist of
@@ -461,6 +507,12 @@ i18n:check`). The same checks run under jest in
    expressions for constructions the style guide rules out, each with the reason shown in
    diagnostics — a sound-dependent Korean particle glued to an ICU placeholder, full-width
    punctuation in a language that uses ASCII marks, a pronoun the register drops.
+   `ALPHABETIC_SCRIPT_PATTERNS` is the shared set for any spaced-alphabet locale (East
+   Asian characters, full-width marks and alphanumerics — a paste from the wrong locale);
+   `LOCALE_CONVENTIONS.vi` spreads it and adds the Vietnamese rules (no space before a
+   sentence mark, a single … rather than three dots, never _quý khách_ / _quý vị_), each
+   anchored to a Vietnamese letter so the TypeScript around a copy module never trips
+   them. The next Latin- or Cyrillic-script locale starts from the same spread.
 5. **E2E**: `e2e/locale-fixtures.ts` holds locale lists and per-locale chrome strings;
    `e2e/locale-smoke.ts` and `e2e/locale-site-qa.ts` are locale-parametrized runners that
    a three-line `<locale>-smoke.spec.ts` / `<locale>-site-qa.desktop.spec.ts` plugs into
@@ -534,17 +586,20 @@ npm run build && npm run bundle:budget # production output and full app-home JS 
 ```
 
 To test locale detection: clear the `NEXT_LOCALE` cookie and set the browser's language to
-`zh-CN` (or `zh-TW`, `zh-HK`, `uk-UA`, `ko-KR`) — visiting `/` should redirect to `/zh` (or
-`/zh-TW`, `/zh-HK`, `/uk`, `/ko`). `zh-Hant` lands on `/zh-TW`, `zh-MO` on `/zh-HK`, `zh-SG`
-on `/zh`, `ko-KP` on `/ko`.
+`zh-CN` (or `zh-TW`, `zh-HK`, `uk-UA`, `ko-KR`, `vi-VN`) — visiting `/` should redirect to
+`/zh` (or `/zh-TW`, `/zh-HK`, `/uk`, `/ko`, `/vi`). `zh-Hant` lands on `/zh-TW`, `zh-MO` on
+`/zh-HK`, `zh-SG` on `/zh`, `ko-KP` on `/ko`.
 
 ## 10. Adding the next language
 
 One command writes the files, the compiler lists the decisions, and the test suite lists
 the artifacts — there is no grep step. The Korean rollout is the worked example for a new
 language (a non-Latin script with its own conventions gate and companion font); the
-Ukrainian rollout is the earlier worked example; the Taiwan and Hong Kong rollouts are the
-worked example for a new variant of an existing language (same steps, plus §10.1).
+Ukrainian rollout is the earlier worked example; the Vietnamese rollout is the worked
+example for a Latin-script language whose letters the display face lacks (a shared
+companion face and OG subset, a whole-word banned register, the alphabetic conventions
+spread); the Taiwan and Hong Kong rollouts are the worked example for a new variant of an
+existing language (same steps, plus §10.1).
 
 1. **Scaffold the files:** `npm run i18n:scaffold -- --locale <bcp47>` (the canonical tag
    browsers send: the bare language code for the CLDR default variant, region-qualified
@@ -559,7 +614,8 @@ i18n:strict` reports every catalog and content area as UNTRANSLATED until it is 
    `npm run type-check`. Every `LocaleRecord<T>` / `Record<TranslatedLocale, T>` in the
    codebase now fails to compile until it has an entry, each next to the decision it needs:
    - `LOCALE_LABELS` (routing.ts) — the language's own name for the switcher (for
-     variants, in the variant's own script and region wording: 繁體中文（香港）);
+     variants, in the variant's own script and region wording: 繁體中文（香港）); it also
+     labels the crawlable language directory in both footers;
      `LOCALE_ALIASES` — extra tags the locale serves (`zh-Hant`, `zh-MO`); they become
      hreflang alternates and `normalizeLocale` hits. Empty is fine.
    - `i18n/localeConfig.ts` — Intl tag, `og:locale`, JSON-LD `inLanguage`, text direction,
@@ -580,7 +636,9 @@ i18n:strict` reports every catalog and content area as UNTRANSLATED until it is 
      import the scaffolded modules; their mapped types reject missing or extra ids, so
      partial translations cannot ship.
    - `LEXICON_PROFILES` in `scripts/lexicon-scan-core.ts` (banned register + matcher for
-     the script), `TERMINOLOGY_PACKS` in `scripts/terminology-consistency-core.ts` (drift
+     the script — `cjk-substring` for unspaced scripts, `unicode-word` for a spaced
+     alphabet with diacritics, `unicode-stem` for an inflected one; never `latin-word`
+     for anything but English), `TERMINOLOGY_PACKS` in `scripts/terminology-consistency-core.ts` (drift
      rules in `scripts/terminology/<locale>.ts`), and `LOCALE_CONVENTIONS` in
      `scripts/i18n-conventions-core.ts` (script checks for a second Chinese script,
      disallowed patterns for anything a regular expression can catch — Korean's particle,
@@ -599,10 +657,16 @@ i18n:strict` reports every catalog and content area as UNTRANSLATED until it is 
    test; then the blind read of style guide §8 with the English hidden. `npm run
 i18n:parity` shows progress per namespace and per content area; untranslated catalog
    values fall back to English at runtime while in progress, long-form modules do not.
-5. **Typography:** if the script is outside the Latin coverage of Clash Display / Inter,
-   add a companion face with the Noto Sans / Onest loading policy and an `html:lang()`
-   override of the relevant stack property (§5), pin it in the locale's site-QA profile,
-   and run `npm run og:fonts`, recording the license in `THIRD_PARTY_NOTICES.md`. hreflang
+5. **Typography:** check the display face against the language's actual letter
+   repertoire, not its script name — "Latin" covers Vietnamese, and Clash Display does not
+   (`lib/__tests__/display-font-coverage.test.ts` fails when a locale with no companion
+   face has glyphs Clash Display lacks). If the repertoire is outside Clash Display /
+   Inter, add a companion face with the Noto Sans / Onest loading policy and an
+   `html:lang()` override of the relevant stack property (§5; a face shared with an
+   existing locale joins that locale's selector list and OG subset), pin it in the
+   locale's site-QA profile, and run `npm run og:fonts`, recording the license in
+   `THIRD_PARTY_NOTICES.md`. `lib/__tests__/fonts-policy.test.ts` proves every entry in
+   `LOCALE_COMPANION_FONTS` is referenced by a rule scoped to its locale. hreflang
    maps, the sitemap, `<html lang/dir>`, and the language switcher derive from
    `routing.locales` automatically.
 6. **Artifacts** (`i18n/__tests__/locale-artifacts.test.ts` fails until they exist): the
