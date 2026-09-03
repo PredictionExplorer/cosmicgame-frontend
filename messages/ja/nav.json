@@ -1,0 +1,118 @@
+{
+  "brand": {
+    "homeLabel": "Cosmic Signatureホーム",
+    "tagline": "オンチェーンアート・プロトコル"
+  },
+  "primaryLabel": "メインナビゲーション",
+  "menuLabel": "メニュー",
+  "drawerTitle": "ナビゲーション",
+  "sections": {
+    "protocol": "プロトコル",
+    "ecosystem": "エコシステム",
+    "myAccount": "アカウント"
+  },
+  "links": {
+    "gallery": {
+      "label": "ギャラリー",
+      "description": "これまでに刻印されたすべてのシグネチャー"
+    },
+    "explore": {
+      "label": "探索"
+    },
+    "currentCycle": {
+      "label": "現在のサイクル",
+      "description": "進行中のサイクルを形づくる直近の一筆"
+    },
+    "allocationRecipients": {
+      "label": "配分の受領者",
+      "description": "各サイクルの準備金の行き先"
+    },
+    "anchorDistributions": {
+      "label": "係留配分",
+      "description": "係留中のNFTとその配分"
+    },
+    "outreachReserve": {
+      "label": "広報準備金",
+      "description": "コミュニティへの広報活動"
+    },
+    "statistics": {
+      "label": "統計",
+      "description": "プロトコル全体の指標と記録"
+    },
+    "contracts": {
+      "label": "コントラクト",
+      "description": "検証済みのアドレスとソースコード"
+    },
+    "help": {
+      "label": "ヘルプ"
+    },
+    "howItWorks": {
+      "label": "仕組み",
+      "description": "サイクルの仕組みを順を追って"
+    },
+    "faq": {
+      "label": "よくある質問",
+      "description": "よく寄せられる質問への回答"
+    },
+    "about": {
+      "label": "Cosmic Signatureについて",
+      "description": "プロトコルの背景にある物語"
+    },
+    "learn": {
+      "label": "学習ハブ",
+      "description": "ガイドと詳しい解説"
+    },
+    "whitePaper": {
+      "label": "ホワイトペーパー",
+      "description": "プロトコルの完全なリファレンス"
+    },
+    "discover": {
+      "label": "Cosmic Signatureを知る",
+      "description": "アート、物語、そしてプロトコル"
+    },
+    "myDashboard": "ダッシュボード",
+    "myAllocations": "自分の配分",
+    "myNfts": "自分のNFT",
+    "myAnchors": "自分の係留",
+    "recipientHistory": "受領履歴"
+  },
+  "ecosystem": {
+    "groupLabel": "Cosmic Signatureエコシステム",
+    "uniswap": {
+      "name": "CSTを取引",
+      "product": "Uniswap",
+      "tagline": "UniswapでETHをCSTにスワップ",
+      "ariaLabel": "UniswapでCSTを取引",
+      "defaultLabel": "UniswapでCSTを取引",
+      "shortLabel": "CSTを取引"
+    },
+    "geckoTerminal": {
+      "ariaLabel": "GeckoTerminalでCSTプールを見る",
+      "shortLabel": "CSTプールを見る"
+    },
+    "axiomZero": {
+      "name": "Axiom Zero",
+      "product": "NFTマーケットプレイス",
+      "tagline": "手数料ゼロのマーケットプレイスでCosmic Signature NFTを集める",
+      "ariaLabel": "Axiom Zero NFTマーケットプレイス",
+      "defaultLabel": "Axiom ZeroのNFT",
+      "menuLabel": "Axiom Zeroマーケットプレイス",
+      "shortLabel": "Axiom Zero"
+    },
+    "chaosZero": {
+      "name": "Chaos Zero",
+      "product": "予測市場",
+      "tagline": "プロトコルの各サイクルについて予測する",
+      "ariaLabel": "Chaos Zeroで予測する",
+      "defaultLabel": "Chaos Zeroで予測する",
+      "menuLabel": "Chaos Zeroの予測",
+      "shortLabel": "Chaos Zero"
+    }
+  },
+  "maintenance": {
+    "pendingMessage": "現在の配分が確定した後にメンテナンスモードに入ります。調整が完了するとプロトコルは再開します。",
+    "activeMessage": "プロトコルはメンテナンスモードです。パラメーターの調整が完了すると一筆を再開できます。",
+    "pendingLabel": "待機中",
+    "activeLabel": "メンテナンス"
+  }
+}

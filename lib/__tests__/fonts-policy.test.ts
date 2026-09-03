@@ -112,6 +112,16 @@ describe('font configuration policy', () => {
     expect(overrideBlock).toContain('--display-font-stack: var(--font-onest)');
   });
 
+  it('references every declared font variable from a stack in global.css', () => {
+    // A face whose CSS variable no rule reads is loaded for nothing — and its
+    // locale silently renders in the default cut, which for a Japanese or
+    // Hong Kong reader means the wrong glyph forms.
+    const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
+    const variables = [...source.matchAll(/variable: '(--font-[a-z-]+)'/g)].map((m) => m[1]);
+    expect(variables.length).toBeGreaterThanOrEqual(7);
+    for (const variable of variables) expect(css).toContain(`var(${variable})`);
+  });
+
   it('routes every Chinese font stack through --cjk-font-stack', () => {
     const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
     // The Simplified default lives on :root; no other rule may name a Noto
@@ -124,18 +134,39 @@ describe('font configuration policy', () => {
   });
 
   it.each([
-    ['zh-TW', '--font-noto-tc', 'PingFang TC'],
-    ['zh-HK', '--font-noto-hk', 'PingFang HK'],
-  ])('swaps the %s CJK stack outside any cascade layer', (locale, variable, systemFallback) => {
+    ['zh-TW', '--font-noto-tc', 'PingFang TC', 'Microsoft JhengHei'],
+    ['zh-HK', '--font-noto-hk', 'PingFang HK', 'Microsoft JhengHei'],
+    ['ko', '--font-noto-kr', 'Apple SD Gothic Neo', 'Malgun Gothic'],
+    ['ja', '--font-noto-jp', 'Hiragino Sans', 'Meiryo'],
+  ])(
+    'swaps the %s CJK stack outside any cascade layer',
+    (locale, variable, appleFallback, windowsFallback) => {
+      const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
+      const rootIndex = css.indexOf(':root {');
+      const overrideIndex = css.indexOf(`html:lang(${locale}) {`);
+      expect(overrideIndex).toBeGreaterThan(rootIndex);
+      // Top-level rules are unindented; anything inside @layer is indented.
+      expect(css.slice(overrideIndex - 1, overrideIndex)).toBe('\n');
+      // Prettier wraps long comma lists onto a continuation line.
+      const overrideBlock = css
+        .slice(overrideIndex, css.indexOf('}', overrideIndex))
+        .replace(/\s+/g, ' ');
+      expect(overrideBlock).toContain(`--cjk-font-stack: var(${variable}), '${appleFallback}'`);
+      expect(overrideBlock).toContain(`'${windowsFallback}'`);
+    },
+  );
+
+  it('gives Japanese CJK line breaking, not the Korean keep-all', () => {
+    // `keep-all` is right for Korean (never split a word between syllables)
+    // and wrong for Japanese, which has no word spaces to fall back on; the
+    // Japanese rule tightens kinsoku instead.
     const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
-    const rootIndex = css.indexOf(':root {');
-    const overrideIndex = css.indexOf(`html:lang(${locale}) {`);
-    expect(overrideIndex).toBeGreaterThan(rootIndex);
-    // Top-level rules are unindented; anything inside @layer is indented.
-    expect(css.slice(overrideIndex - 1, overrideIndex)).toBe('\n');
-    const overrideBlock = css.slice(overrideIndex, css.indexOf('}', overrideIndex));
-    expect(overrideBlock).toContain(`--cjk-font-stack: var(${variable}), '${systemFallback}'`);
-    expect(overrideBlock).toContain("'Microsoft JhengHei'");
+    const jaIndex = css.indexOf('html:lang(ja) {');
+    const jaBlock = css.slice(jaIndex, css.indexOf('}', jaIndex));
+    expect(jaBlock).toContain('line-break: strict');
+    expect(jaBlock).not.toContain('keep-all');
+    const koIndex = css.indexOf('html:lang(ko) {');
+    expect(css.slice(koIndex, css.indexOf('}', koIndex))).toContain('word-break: keep-all');
   });
 
   it('limits Title-Case button labels to English', () => {

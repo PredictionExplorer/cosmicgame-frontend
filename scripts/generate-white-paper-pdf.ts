@@ -26,6 +26,7 @@ import { dirname, join, resolve } from 'node:path';
 
 import {
   whitePaperContentEn,
+  whitePaperContentJa,
   whitePaperContentKo,
   whitePaperContentUk,
   whitePaperContentZh,
@@ -149,6 +150,25 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
       '\\setCJKsansfont{Apple SD Gothic Neo}',
       '\\setCJKmonofont{Apple SD Gothic Neo}',
       '\\renewcommand{\\abstractname}{\uc694\uc57d}',
+    ],
+  },
+  ja: {
+    content: whitePaperContentJa,
+    dateDisplay: '2026\u5e748\u6708',
+    tocTitle: '\u76ee\u6b21',
+    headerIncludes: [
+      ...BASE_HEADER_INCLUDES,
+      // macOS system Japanese fonts (JIS glyph forms) through xeCJK. Hiragino
+      // ships its weights as separately named faces, so the bold cut is bound
+      // explicitly; full-width punctuation keeps xeCJK's default handling, and
+      // the CJK–Latin glue stays off because the copy runs Japanese and Latin
+      // tokens together without spaces (style-guide-ja §4).
+      '\\usepackage{xeCJK}',
+      '\\xeCJKsetup{CJKecglue={}}',
+      '\\setCJKmainfont[BoldFont={Hiragino Mincho ProN W6}]{Hiragino Mincho ProN W3}',
+      '\\setCJKsansfont[BoldFont={Hiragino Sans W6}]{Hiragino Sans W3}',
+      '\\setCJKmonofont{Hiragino Sans W3}',
+      '\\renewcommand{\\abstractname}{\u6982\u8981}',
     ],
   },
 };

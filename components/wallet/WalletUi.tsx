@@ -47,6 +47,7 @@ const RAINBOW_KIT_LOCALES: LocaleRecord<RainbowKitLocale> = {
   'zh-HK': 'zh-HK',
   uk: 'uk-UA',
   ko: 'ko-KR',
+  ja: 'ja-JP',
 };
 
 /**

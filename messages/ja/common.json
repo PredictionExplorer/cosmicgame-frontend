@@ -1,0 +1,40 @@
+{
+  "faqPage": {
+    "heading": "よくある質問",
+    "description": "Cosmic Signatureについて率直に答えておきたい質問——プロトコルとは何か、一筆はどう働くのか、そして何ではないのか。"
+  },
+  "languageSwitcher": {
+    "label": "言語"
+  },
+  "accessibility": {
+    "skipToMain": "メインコンテンツへスキップ",
+    "breadcrumb": "パンくずリスト",
+    "footer": "フッター"
+  },
+  "breadcrumbs": {
+    "home": "ホーム",
+    "gallery": "ギャラリー"
+  },
+  "status": {
+    "loading": "読み込み中",
+    "loadingEllipsis": "読み込み中…",
+    "loadingDots": "読み込み中…",
+    "noData": "データがありません。",
+    "nothingHere": "まだ何もありません"
+  },
+  "actions": {
+    "copyAddress": "アドレスをコピー",
+    "addressCopied": "アドレスをコピーしました",
+    "copied": "コピーしました",
+    "cancel": "キャンセル",
+    "close": "閉じる"
+  },
+  "externalLink": {
+    "title": "Cosmic Signatureから離れます",
+    "description": "このリンクは、オンチェーンに保存された参加者のメッセージに含まれていたものです。審査も検証もされていません。下のリンク先が想定どおりか確認してください。",
+    "copy": "リンクをコピー",
+    "copied": "リンクをコピーしました",
+    "warning": "外部サイトでウォレットのシードフレーズや秘密鍵を入力しないでください。",
+    "open": "リンクを開く"
+  }
+}

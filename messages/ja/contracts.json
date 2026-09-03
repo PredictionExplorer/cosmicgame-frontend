@@ -1,0 +1,187 @@
+{
+  "breadcrumbs": {
+    "home": "ホーム",
+    "contracts": "コントラクト"
+  },
+  "page": {
+    "eyebrow": "検証済みコントラクト · Arbitrum",
+    "title": "コントラクトアドレス",
+    "subtitle": "Cosmic Signatureプロトコルのオンチェーンアドレス、構成、ソースへのリンク、検証の背景。",
+    "allocationAria": "配分トラック",
+    "configurationAria": "プロトコル構成",
+    "addressesAria": "コントラクトアドレス",
+    "addressesTitle": "コントラクトアドレス",
+    "parametersAria": "調律期間と星選のパラメーター"
+  },
+  "network": {
+    "chain": "チェーン{chainId}"
+  },
+  "entries": {
+    "protocol": {
+      "name": "Cosmic Signatureプロトコル",
+      "description": "サイクル、一筆、配分の分配を管理する主なプロトコルのプロキシコントラクト"
+    },
+    "implementation": {
+      "name": "実装コントラクト",
+      "description": "Cosmic Signatureプロトコルのプロキシコントラクトの背後にある現在の実装"
+    },
+    "cst": {
+      "name": "Cosmic Signature CSTトークン",
+      "description": "一筆ごとに刻印され、宇宙評議会で調整ウェイトを表すために使われるERC-20トークン（CST）"
+    },
+    "nft": {
+      "name": "Cosmic Signature NFT",
+      "description": "サイクルの受領者への配分として刻印されるERC-721 NFTコレクション"
+    },
+    "randomWalk": {
+      "name": "RandomWalk",
+      "description": "一度だけの割引のためにETH一筆に添付するか、係留NFT星選の対象となるために係留できるRandomWalk NFTコレクション"
+    },
+    "council": {
+      "name": "宇宙評議会",
+      "description": "調整提案のためのオンチェーンのプロトコル調整コントラクト"
+    },
+    "publicGoods": {
+      "name": "公共財金庫",
+      "description": "各サイクルのサイクル準備金から公共財配分を受け取ります"
+    },
+    "outreach": {
+      "name": "広報準備金",
+      "description": "広報配分とエコシステムの貢献者のために配分された資金"
+    },
+    "allocations": {
+      "name": "配分ウォレット",
+      "description": "受け取りを待つ配分を保管するエスクローコントラクト"
+    },
+    "cosmicAnchor": {
+      "name": "Cosmic Signature NFT係留ウォレット",
+      "description": "Cosmic Signature NFTの係留コントラクト"
+    },
+    "rwalkAnchor": {
+      "name": "RWLK係留ウォレット",
+      "description": "RandomWalk NFTの係留コントラクト"
+    }
+  },
+  "categories": {
+    "core": "コアコントラクト",
+    "wallet": "ウォレットコントラクト",
+    "anchoring": "係留コントラクト"
+  },
+  "search": {
+    "placeholder": "名前またはアドレスでコントラクトを検索…",
+    "ariaLabel": "コントラクトを検索",
+    "clearAria": "検索をクリア",
+    "empty": "「{searchTerm}」に一致するコントラクトはありません"
+  },
+  "addressCard": {
+    "copyAria": "{name}のアドレスをコピー",
+    "explorerAria": "{name}をブロックエクスプローラーで見る"
+  },
+  "funds": {
+    "title": "配分トラック",
+    "description": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、公共財、係留配分、そして累積準備金。",
+    "chartAria": "配分トラックの棒グラフ",
+    "segments": {
+      "signature": {
+        "label": "シグネチャー配分",
+        "tooltip": "最後の一筆を入れた参加者が受け取るETHの割合。1,000 CSTとCosmic Signature NFTも受け取ります"
+      },
+      "chrono": {
+        "label": "時の戦士",
+        "tooltip": "時の戦士へのETH配分。1,000 CSTとCosmic Signature NFTも受け取ります"
+      },
+      "stellar": {
+        "label": "星選",
+        "tooltip": "サイクルが確定したときに、無作為に選ばれた参加者へ配られる部分"
+      },
+      "anchor": {
+        "label": "係留配分",
+        "tooltip": "Cosmic Signature NFTの係留者へ、係留NFT数に比例して配られるETHの係留配分"
+      },
+      "publicGoods": {
+        "label": "公共財",
+        "tooltip": "サイクルごとに公共財の受け手（Protocol Guild）へ送られます"
+      },
+      "next": {
+        "label": "次のサイクル",
+        "tooltip": "累積準備金として次のサイクルへ持ち越される残りの資金。"
+      }
+    }
+  },
+  "configuration": {
+    "title": "プロトコル構成",
+    "cards": {
+      "ethStep": {
+        "label": "ETH一筆の費用の上げ幅",
+        "tooltip": "ETH一筆の費用はこの上げ幅のパラメーターに従います。CST一筆の費用はライブのCST調律期間に従います。"
+      },
+      "timeIncrement": {
+        "label": "時間増分",
+        "tooltip": "一筆ごとにこの時間がサイクル確定時刻に加わります。増分はサイクルごとに{percent}%ずつ大きくなります。"
+      },
+      "cstPreview": {
+        "label": "現在の参加CSTのプレビュー",
+        "tooltip": "今一筆を入れた場合の参加CSTの見込み。量は動的で、{formula}を使います。"
+      },
+      "finalization": {
+        "label": "確定タイムアウト",
+        "tooltip": "公開確定期間が誰にでも開かれる前に、最後の一筆の参加者がサイクルを確定できる時間"
+      },
+      "initial": {
+        "label": "初期時間増分",
+        "tooltip": "最初の一筆が入れられたときに加わる初期のサイクル確定時刻"
+      },
+      "message": {
+        "label": "メッセージの最大長",
+        "tooltip": "一筆のメッセージに許される最大文字数"
+      }
+    }
+  },
+  "parameters": {
+    "title": "調律期間と星選のパラメーター",
+    "cstTitle": "CST調律期間",
+    "ethTitle": "ETH調律期間",
+    "duration": "長さ",
+    "elapsed": "経過時間",
+    "ceiling": "調律上限",
+    "cstDurationTooltip": "CST調律期間のライブの保存された長さ。CST一筆は約{increase}%長くし、ETH一筆は約{decrease}%短くします。",
+    "cstElapsedTooltip": "現在のCST調律期間ですでに経過した時間",
+    "cstCeilingTooltip": "現在表示されているCST調律期間の開始時の一筆の費用。費用は保存された長さの間に線形に下がります。",
+    "ethDurationTooltip": "一筆の費用が時間とともに下がるETH調律期間の全体の長さ",
+    "ethElapsedTooltip": "現在のETH調律期間ですでに経過した時間",
+    "publicGoodsAddress": "公共財アドレス",
+    "publicGoodsAddressTooltip": "公共財金庫コントラクトから公共財配分を現在受け取っているオンチェーンアドレス",
+    "copyPublicGoodsAria": "公共財アドレスをコピー",
+    "viewPublicGoodsAria": "公共財アドレスをブロックエクスプローラーで見る",
+    "selection": {
+      "ethLabel": "ETH星選の受領者",
+      "ethTooltip": "サイクルごとにETH配分を受け取るために無作為に選ばれる参加者の数",
+      "nftLabel": "NFT星選（参加者）",
+      "nftTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれる参加者の数",
+      "anchorLabel": "NFT星選（係留RWLK）",
+      "anchorTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれるRandomWalk NFT係留者の数"
+    }
+  },
+  "vault": {
+    "title": "公共財金庫の操作",
+    "tooltip": "公共財金庫のsend()関数を呼び出し、金庫のETH残高を設定済みのProtocol Guildの受け手へ送ります。",
+    "balance": "現在の金庫残高",
+    "description": "金庫にある公共財の資金をProtocol Guildへ送ります。",
+    "descriptionWithBeneficiary": "金庫にある公共財の資金をProtocol Guild（{address}）へ送ります。",
+    "aria": "公共財金庫の残高をProtocol Guildへ送る"
+  },
+  "seo": {
+    "eyebrow": "検証済みコントラクト · Arbitrum",
+    "heading": "Cosmic Signatureコントラクト",
+    "description": "Cosmic Signatureは、参加者、研究者、検索エンジン、AIシステムがアプリの体験を検証可能なオンチェーンのプロトコル記録と結びつけられるように、公開のArbitrumコントラクトアドレスを公開しています。",
+    "partialFallback": "ライブのコントラクトアドレスデータは、このサーバースナップショットでは一時的に利用できません。以下の検証済みプロトコルのプロキシと実装のアドレスは、フロントエンドのプロトコル事実からの静的なフォールバックです。",
+    "empty": "ライブのコントラクトアドレスは、サーバースナップショットでは一時的に利用できません。下の対話型コントラクトテーブルは、公開のCosmic Signature APIが利用できるようになると更新されます。",
+    "relatedAria": "コントラクトの信頼性に関するリソース",
+    "links": {
+      "code": "Cosmic Signatureのソースコードを確認する",
+      "security": "セキュリティの概要を読む",
+      "audits": "監査と検証を確認する",
+      "risk": "リスク開示を読む"
+    }
+  }
+}

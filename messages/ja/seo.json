@@ -1,0 +1,423 @@
+{
+  "publicData": {
+    "common": {
+      "unavailable": "取得不可",
+      "lastUpdated": "最終更新：{date}。データソース：{source}。下の対話型テーブルはアプリのライブデータで更新されますが、この要約は検索エンジンとAIクローラー向けに最初のHTMLに含まれています。",
+      "relatedPagesAria": "{heading}の関連ページ"
+    },
+    "routes": {
+      "allocation": {
+        "eyebrow": "配分の履歴 · Arbitrum",
+        "heading": "配分の受領者",
+        "description": "確定したパフォーマンス・サイクルにわたるCosmic Signatureの公開配分履歴——シグネチャー配分、星選、係留配分、公共財への流れ——を見る。",
+        "source": "Cosmic Signature公開サイクルAPI",
+        "links": {
+          "statistics": "プロトコル統計を見る",
+          "learn": "サイクルが確定する仕組みを学ぶ",
+          "contracts": "コントラクトアドレスを確認する"
+        },
+        "cards": {
+          "finalizedCycles": {
+            "label": "確定したサイクル",
+            "tooltip": "配分データが確定したパフォーマンス・サイクルの数。"
+          },
+          "recipients": {
+            "label": "シグネチャー配分の受領者",
+            "tooltip": "最後の一筆を入れてシグネチャー配分を受け取った異なるウォレット。"
+          },
+          "totalEth": {
+            "label": "シグネチャー配分ETHの総額",
+            "tooltip": "サイクルの記録に基づく、確定したサイクルにわたるシグネチャー配分ETHの合計。"
+          }
+        }
+      },
+      "anchoring": {
+        "eyebrow": "係留配分 · Arbitrum",
+        "heading": "係留配分",
+        "description": "Cosmic Signature NFTの公開係留、ETH係留配分の記録、RandomWalk NFTの係留、係留NFT星選の刻印を追う。",
+        "source": "Cosmic Signature公開係留API",
+        "links": {
+          "statistics": "係留統計を見る",
+          "learn": "係留について学ぶ",
+          "gallery": "Cosmic Signature NFTを探索する"
+        },
+        "cards": {
+          "actions": {
+            "label": "係留 / 解除の操作"
+          },
+          "tokens": {
+            "label": "現在係留中のトークン"
+          },
+          "distributions": {
+            "label": "係留配分の記録"
+          }
+        }
+      },
+      "marketing": {
+        "eyebrow": "広報配分 · Arbitrum",
+        "heading": "広報配分",
+        "description": "プロトコルを人々に知ってもらう手助けをするエコシステム貢献者への、Cosmic Signatureの広報配分の履歴とCST配分を確認する。",
+        "source": "Cosmic Signature公開広報配分API",
+        "links": {
+          "faq": "よくある質問を読む",
+          "statistics": "プロトコル統計を見る",
+          "siteMap": "公開ページを一覧する"
+        },
+        "cards": {
+          "records": {
+            "label": "広報配分の記録"
+          },
+          "reserve": {
+            "label": "広報準備金"
+          },
+          "contributors": {
+            "label": "ユニーク広報貢献者"
+          }
+        }
+      },
+      "imprint": {
+        "eyebrow": "RandomWalk NFTの刻印 · Arbitrum",
+        "heading": "RandomWalk NFTの刻印",
+        "description": "Cosmic Signatureに参加するためにRandomWalk NFTを刻印します。未使用のRandomWalk NFTはそれぞれ1回のETH一筆に添付でき、一筆の費用が50%引き下げられます。",
+        "source": "Cosmic Signature公開プロトコル構成API",
+        "links": {
+          "cycle": "進行中のパフォーマンス・サイクルを開く",
+          "learn": "一筆の仕組みを学ぶ",
+          "used": "使用済みのRandomWalk NFTを見る"
+        },
+        "cards": {
+          "cycle": {
+            "label": "進行中のパフォーマンス・サイクル"
+          },
+          "cost": {
+            "label": "現在のETH一筆の費用"
+          },
+          "discount": {
+            "label": "RandomWalk割引"
+          }
+        }
+      },
+      "eth-contribution": {
+        "eyebrow": "直接ETH拠出 · Arbitrum",
+        "heading": "直接ETH拠出",
+        "description": "Cosmic Signature公共財金庫への直接ETH拠出と、それに添えられた公開メモ、サイクル、拠出者の記録を見る。",
+        "source": "Cosmic Signature公開拠出API",
+        "links": {
+          "protocol": "プロトコルの公共財拠出",
+          "voluntary": "自発的な公共財の記録",
+          "risk": "リスク開示を読む"
+        },
+        "cards": {
+          "records": {
+            "label": "直接拠出の記録"
+          },
+          "totalEth": {
+            "label": "直接ETH拠出の総額"
+          },
+          "contributors": {
+            "label": "ユニーク拠出者"
+          }
+        }
+      },
+      "attached-nfts": {
+        "eyebrow": "添付されたNFT拠出 · Arbitrum",
+        "heading": "添付されたNFT拠出",
+        "description": "Cosmic Signatureの一筆に添付されたNFTを見る。添付されたERC-721トークンは、サイクルが確定するとシグネチャー配分を受け取る参加者へ送られます。",
+        "source": "Cosmic Signature公開添付NFT API",
+        "links": {
+          "gallery": "Cosmic Signatureギャラリーを探索する",
+          "cycle": "現在のパフォーマンス・サイクルを見る",
+          "learn": "添付がサイクルにどう関わるかを学ぶ"
+        },
+        "cards": {
+          "records": {
+            "label": "添付NFTの記録"
+          },
+          "contracts": {
+            "label": "ユニークNFTコントラクト"
+          },
+          "contributors": {
+            "label": "拠出者ウォレット"
+          }
+        }
+      },
+      "allocation-finalized": {
+        "eyebrow": "受け取り済みの配分 · Arbitrum",
+        "heading": "受け取り済みの配分",
+        "description": "ETHの受領、Cosmic Signature NFTの配分、星選の配分を含む、Cosmic Signatureの公開配分受け取り記録を調べる。",
+        "source": "Cosmic Signature公開配分受け取りAPI",
+        "links": {
+          "allocation": "配分の受領者を見る",
+          "statistics": "集計統計を見る",
+          "contracts": "検証済みコントラクトを確認する"
+        },
+        "cards": {
+          "records": {
+            "label": "受け取り済み配分の記録"
+          },
+          "eth": {
+            "label": "受け取ったETH"
+          },
+          "recipients": {
+            "label": "受領者ウォレット"
+          }
+        }
+      },
+      "named-nfts": {
+        "eyebrow": "名前付きNFT · Arbitrum",
+        "heading": "名前付きCosmic Signature NFT",
+        "description": "所有者が固有の名前を付けたCosmic Signature NFTを見る。トークンのアイデンティティ、ギャラリーでの発見、オンチェーンのコレクション履歴を結びつけます。",
+        "source": "Cosmic Signature公開トークンAPI",
+        "links": {
+          "gallery": "ギャラリー全体を探索する",
+          "learn": "アートについて学ぶ",
+          "code": "レンダリングのソースコードを確認する"
+        },
+        "cards": {
+          "named": {
+            "label": "名前付きCosmic Signature NFT"
+          },
+          "owners": {
+            "label": "現在の所有者"
+          },
+          "collection": {
+            "label": "コレクション",
+            "value": "Cosmic Signature ERC-721"
+          }
+        }
+      },
+      "used-rwlk-nfts": {
+        "eyebrow": "RandomWalk NFTの使用 · Arbitrum",
+        "heading": "使用済みのRandomWalk NFT",
+        "description": "一度だけの一筆の費用の割引のためにETH一筆にすでに添付されたRandomWalk NFTを確認する。",
+        "source": "Cosmic Signature公開RandomWalk使用API",
+        "links": {
+          "imprint": "RandomWalk NFTを刻印する",
+          "learn": "一筆の仕組みを学ぶ",
+          "cycle": "現在のサイクルデータを見る"
+        },
+        "cards": {
+          "used": {
+            "label": "使用済みのRandomWalk NFT"
+          },
+          "discount": {
+            "label": "一度だけの割引"
+          },
+          "scope": {
+            "label": "使用範囲",
+            "value": "NFTごとに一筆1回"
+          }
+        }
+      },
+      "coordination-changes": {
+        "eyebrow": "調整の変更 · Arbitrum",
+        "heading": "調整の変更履歴",
+        "description": "プロトコルモードの変更、パラメーターの更新、今後のサイクルに影響する管理記録を含む、Cosmic Signatureの公開調整変更を確認する。",
+        "source": "Cosmic Signature公開システムイベントAPI",
+        "links": {
+          "security": "セキュリティの概要を読む",
+          "audits": "監査と検証を確認する",
+          "learn": "CSTと調整について学ぶ"
+        },
+        "cards": {
+          "records": {
+            "label": "調整変更の記録"
+          },
+          "governance": {
+            "label": "調整機構",
+            "value": "宇宙評議会"
+          },
+          "network": {
+            "label": "ネットワーク",
+            "value": "Arbitrum"
+          }
+        }
+      },
+      "public-goods-contributions-cg": {
+        "eyebrow": "プロトコルの公共財拠出 · Arbitrum",
+        "heading": "プロトコルの公共財拠出",
+        "description": "プロトコルのサイクルから公共財金庫と、設定された受け手——現在はProtocol Guild——へのCosmic Signatureの自動公共財送付を追う。",
+        "source": "Cosmic Signature公開公共財API",
+        "links": {
+          "learn": "公共財について学ぶ",
+          "retrievals": "公共財の受け取りを見る",
+          "statistics": "公共財の統計を見る"
+        },
+        "cards": {
+          "records": {
+            "label": "プロトコル拠出の記録"
+          },
+          "totalEth": {
+            "label": "プロトコル公共財ETH"
+          },
+          "track": {
+            "label": "配分トラック",
+            "value": "公共財"
+          }
+        }
+      },
+      "public-goods-contributions-voluntary": {
+        "eyebrow": "自発的な公共財拠出 · Arbitrum",
+        "heading": "自発的な公共財拠出",
+        "description": "サイクルの文脈と拠出者の記録を含む、Cosmic Signatureコミュニティからの自発的な公共財拠出を見る。",
+        "source": "Cosmic Signature公開公共財API",
+        "links": {
+          "direct": "直接ETH拠出を見る",
+          "protocol": "プロトコルの公共財拠出",
+          "risk": "リスク開示を読む"
+        },
+        "cards": {
+          "records": {
+            "label": "自発的な拠出の記録"
+          },
+          "totalEth": {
+            "label": "自発的な公共財ETH"
+          },
+          "contributors": {
+            "label": "拠出者ウォレット"
+          }
+        }
+      },
+      "public-goods-retrievals": {
+        "eyebrow": "公共財の受け取り · Arbitrum",
+        "heading": "公共財の受け取り",
+        "description": "サイクル準備金が設定された公共財の受け手——現在はProtocol Guild——への支援を送るCosmic Signature公共財金庫からの受け取りを確認する。",
+        "source": "Cosmic Signature公開公共財API",
+        "links": {
+          "protocol": "プロトコルの公共財拠出",
+          "voluntary": "自発的な公共財拠出",
+          "contracts": "公開コントラクトアドレスを確認する"
+        },
+        "cards": {
+          "records": {
+            "label": "公共財受け取りの記録"
+          },
+          "totalEth": {
+            "label": "受け取られた公共財ETH"
+          },
+          "track": {
+            "label": "受け手トラック",
+            "value": "公共財金庫"
+          }
+        }
+      }
+    }
+  },
+  "gallerySummary": {
+    "eyebrow": "決定論的NFTアート · Arbitrum",
+    "heading": "Cosmic Signatureギャラリー",
+    "description": "決定論的な三体物理、オンチェーンのシード、スペクトルレンダリング、パフォーマンス・サイクルのデータから生成されたCosmic Signature NFTのアートワークを探索する。各シグネチャーはプロトコルの記録から再現でき、特定のサイクルの文脈を表しています。",
+    "unavailable": "取得不可",
+    "cards": {
+      "imprinted": "刻印済みNFT",
+      "process": "アートの過程",
+      "processValue": "三体シミュレーション",
+      "license": "ライセンス",
+      "licenseValue": "CC0準拠"
+    },
+    "relatedAria": "ギャラリーの関連ページ",
+    "links": {
+      "learn": "Cosmic Signatureの仕組みを学ぶ",
+      "code": "レンダリングのソースコードを確認する",
+      "statistics": "プロトコル統計を見る"
+    }
+  },
+  "currentCycleSummary": {
+    "eyebrow": "ライブのパフォーマンス・サイクル · Arbitrum",
+    "heading": "現在のCosmic Signatureパフォーマンス・サイクル",
+    "description": "このページは、公開の筆数、サイクル準備金の文脈、添付されたアセット、配分トラック、確定状況を含む、進行中のCosmic Signatureパフォーマンス・サイクルを追います。下の対話型コンソールはアプリのライブデータで更新されます。",
+    "unavailable": "取得不可",
+    "cards": {
+      "cycle": "サイクル",
+      "gestures": "筆数",
+      "reserve": "準備金のスナップショット"
+    },
+    "relatedAria": "現在のサイクルの関連ページ",
+    "links": {
+      "learn": "パフォーマンス・サイクルの仕組みを学ぶ",
+      "statistics": "プロトコル統計を見る",
+      "contracts": "検証済みコントラクトを確認する"
+    }
+  },
+  "jsonLd": {
+    "app": {
+      "protocolDescription": "Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。すべての一筆がサイクルの最終シグネチャーを形づくり、プロトコルは準備金をProtocol Guildを含む10を超える配分トラックへ配ります。",
+      "webApplicationDescription": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。参加者はパフォーマンス・サイクルの間に一筆を入れ、サイクルが確定するとプロトコルは10を超えるトラックへ配分を配ります。",
+      "browserRequirements": "Web3対応のブラウザーまたはウォレット拡張機能が必要です"
+    },
+    "artProtocol": {
+      "creditText": "Cosmic Signatureプロトコル",
+      "genre": "ジェネラティブアート"
+    },
+    "product": {
+      "category": "デジタルコレクティブル"
+    }
+  },
+  "og": {
+    "default": {
+      "alt": "Cosmic Signature——すべての一筆がシグネチャーを形づくる。",
+      "eyebrow": "Cosmic Signature",
+      "title": "すべての一筆がシグネチャーを形づくる。",
+      "subhead": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。",
+      "chips": ["CC0", "オンチェーンで検証済み", "Protocol Guild 7%"]
+    },
+    "gallery": {
+      "alt": "Cosmic Signature——ギャラリー",
+      "eyebrow": "ギャラリー",
+      "title": "三体の軌跡を、オンチェーンで描く。",
+      "subhead": "すべてのシグネチャーは決定論的な三体シミュレーションをスペクトルレンダリングしたもの。同じシードなら、同じピクセル。",
+      "chips": ["CC0", "決定論的", "再現可能なアート"]
+    },
+    "currentCycle": {
+      "alt": "Cosmic Signature——パフォーマンス・サイクル、ライブ。",
+      "eyebrow": "現在のサイクル",
+      "title": "パフォーマンス・サイクル、ライブ。",
+      "subhead": "一筆の履歴、順位表、添付された拠出、配分の分布——リアルタイムで。",
+      "chips": ["ライブ", "Arbitrum One", "オンチェーン"]
+    },
+    "anchoring": {
+      "alt": "Cosmic Signature——係留",
+      "eyebrow": "係留",
+      "title": "シグネチャーを係留し、サイクルごとに分け前を受け取る。",
+      "subhead": "係留中のCosmic Signature NFTは、サイクルごとの係留配分を比例して受け取ります。解除はいつでも。",
+      "chips": ["ロックなし", "サイクルごとのETH", "星選"]
+    },
+    "faq": {
+      "alt": "Cosmic Signature——よくある質問",
+      "eyebrow": "よくある質問",
+      "title": "率直に答えておきたい質問。",
+      "subhead": "パフォーマンス・サイクル、一筆、配分、係留、プロトコルの調整。",
+      "chips": ["CC0", "オンチェーンで検証済み", "Protocol Guild 7%"]
+    },
+    "howItWorks": {
+      "alt": "Cosmic Signature——仕組み",
+      "eyebrow": "仕組み",
+      "title": "調律から配分まで、四つの段階で。",
+      "subhead": "サイクルを開く。一筆を入れる。確定する。プロトコルが準備金を配る。",
+      "chips": ["調律", "一筆", "配分"]
+    },
+    "gesture": {
+      "alt": "Cosmic Signature——一筆",
+      "eyebrow": "一筆",
+      "eyebrowWithValue": "一筆の順位 #{value}",
+      "title": "シグネチャーへの刻印。",
+      "subhead": "一筆ごとにサイクル確定時刻が延び、参加CSTが刻印され、変化し続けるサイクルのシグネチャーが形づくられます。",
+      "chips": ["CC0", "オンチェーンで検証済み", "Protocol Guild 7%"]
+    },
+    "allocation": {
+      "alt": "Cosmic Signature——配分の分布",
+      "eyebrow": "配分",
+      "eyebrowWithValue": "サイクル{value}",
+      "title": "配分の分布",
+      "subhead": "サイクル準備金が10を超える配分トラックへどう配られたか。",
+      "chips": ["シグネチャー", "時の戦士", "係留"]
+    },
+    "participant": {
+      "alt": "Cosmic Signature——参加者",
+      "eyebrow": "参加者",
+      "title": "参加者",
+      "subhead": "すべてのパフォーマンス・サイクルにわたる一筆、配分、係留、拠出。",
+      "chips": ["一筆", "配分", "係留"]
+    }
+  }
+}

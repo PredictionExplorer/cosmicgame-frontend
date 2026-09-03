@@ -1,0 +1,655 @@
+{
+  "error": {
+    "title": "ライブのサイクルデータを利用できません",
+    "message": "プロトコルのデータサービスに到達できなかったため、現在のサイクルを表示できません。しばらくしてからもう一度お試しください。"
+  },
+  "hero": {
+    "cycleFallback": "サイクル",
+    "cycleNumber": "サイクル{number}",
+    "phase": {
+      "openingSoon": {
+        "badge": "まもなく開始",
+        "headline": "次のサイクルはまもなく始まります",
+        "body": "{cycleLabel}が開始の準備をしています。下のカウントダウンは、一筆を入れられるようになる正確な時刻を示します。",
+        "cta": "サイクルの詳細を見る"
+      },
+      "waitingFirstGesture": {
+        "badge": "最初の一筆を受け付け中",
+        "headline": "{cycleLabel}が始まりました",
+        "body": "最初の一筆を入れて確定までの時計を動かし、このサイクルのシグネチャーを形づくり始めましょう。",
+        "cta": "最初の一筆を入れる"
+      },
+      "confirming": {
+        "badge": "オンチェーンで検証中",
+        "headline": "最後の瞬間を確認中",
+        "body": "時計がゼロになりました。サイクルを確定する前に、最後の一瞬に入った一筆がないかチェーンを確認しています。",
+        "cta": "サイクルの詳細を見る"
+      },
+      "readyToFinalize": {
+        "badge": "確定できる状態",
+        "headline": "サイクルは確定できる状態です",
+        "body": "確定までの時計がゼロになりました。サイクルはいま閉じて、準備金をオンチェーンで配ることができます。",
+        "cta": "サイクルを確定"
+      },
+      "finalWindow": {
+        "badge": "最終局面",
+        "headline": "最終局面が開いています",
+        "body": "いま主役は確定までの時計です。新しい一筆はまだ時間を延ばし、結末を描き変えることができます。",
+        "cta": "一筆を入れる"
+      },
+      "loading": {
+        "badge": "サイクル状態を同期中",
+        "headline": "サイクルを同期しています",
+        "body": "ライブの状態を表示する前に、プロトコル時刻と現在のサイクルデータを読み取っています。",
+        "cta": "サイクルの詳細を見る"
+      },
+      "unavailable": {
+        "badge": "時計を利用できません",
+        "headline": "サイクル状態を利用できません",
+        "body": "アプリはライブのサイクル時計に到達できませんでした。サイクルの詳細には最新のインデックス済みデータが表示されることがあります。",
+        "cta": "サイクルの詳細を見る"
+      },
+      "live": {
+        "badge": "Arbitrumでライブ",
+        "headline": "次のCosmic Signatureを形づくる",
+        "body": "Cosmic Signatureはライブのパフォーマンス・サイクルです。一筆ごとに目に見える痕跡が残り、参加CSTが刻印され、プロトコルの準備金がネットワークを支えるEthereumの公共財へ向かいます。",
+        "cta": "一筆を入れる"
+      }
+    },
+    "story": {
+      "gestures": {
+        "title": "一筆がアートを形づくる",
+        "body": "一つひとつの動きが、パフォーマンス・サイクルを最終的なオンチェーンのシグネチャーへと導きます。"
+      },
+      "cst": {
+        "title": "CSTが参加を記録する",
+        "body": "参加CSTは、ともに生み出したサイクルの痕跡を携えています。"
+      },
+      "publicGoods": {
+        "title": "配分が公共財を支える",
+        "body": "プロトコルの準備金は、Protocol Guildを含む配分トラックへ流れます。"
+      }
+    },
+    "viewCycleDetails": "サイクルの詳細を見る",
+    "artUnavailable": {
+      "eyebrow": "生成されたシグネチャーを待っています",
+      "body": "インデックス済みのトークンメタデータが利用できるようになると、実際のCosmic Signatureのアートワークがここに表示されます。"
+    },
+    "console": {
+      "ariaLabel": "現在のサイクルの観測所",
+      "eyebrow": "観測所コンソール",
+      "cycleLoading": "サイクルを読み込み中",
+      "parameters": "パラメーター",
+      "viewSignatureAria": "Cosmic Signature {id}を見る",
+      "artworkAlt": "Cosmic Signatureのアートワーク{id}",
+      "signatureBadge": "シグネチャー{id}",
+      "stats": {
+        "gestures": "筆数",
+        "signature": "シグネチャー",
+        "publicGoods": "公共財",
+        "publicGoodsFallback": "10以上のトラック"
+      },
+      "previousAllocations": "サイクル{number}の配分"
+    }
+  },
+  "notifications": {
+    "finalizationSoonTitle": "いま一筆を——サイクルはまもなく確定できます",
+    "finalizationSoonBody": "サイクル確定時刻まであと{minutes}分です。いま一筆を入れてサイクルを延ばし、最終的な配分に参加しましょう。"
+  },
+  "chrono": {
+    "sectionAria": "サイクル確定時刻",
+    "timerAria": "{label}。{status}",
+    "phase": {
+      "loading": {
+        "eyebrow": "サイクル時計を同期中",
+        "label": "同期中",
+        "status": "ライブのサイクルタイマーを読み取っています。",
+        "tooltip": "現在のサイクル状態を表示する前に、アプリがプロトコル時刻と同期しています。",
+        "display": "同期中"
+      },
+      "unavailable": {
+        "eyebrow": "サイクル時計を利用できません",
+        "label": "時計を利用できません",
+        "status": "ライブタイマーは一時的に利用できません。",
+        "tooltip": "ライブのサイクル時計に到達できませんでした。最新のインデックス済み状態はサイクルの詳細で確認してください。",
+        "display": "同期中"
+      },
+      "openingSoon": {
+        "eyebrow": "次のサイクル開始まで",
+        "label": "まもなく開始",
+        "status": "次のサイクルを待っています。このカウントダウンがゼロになると一筆を入れられます。",
+        "tooltip": "この時計はサイクル開始までのカウントダウンです。ゼロになると、最初の一筆が確定までの時計を動かします。"
+      },
+      "waitingFirstGesture": {
+        "eyebrow": "サイクルは開始済み",
+        "label": "最初の一筆を待っています",
+        "status": "サイクルは始まっています。最初の一筆が確定までの時計を動かします。",
+        "tooltip": "確定までのカウントダウンはまだ動いていません。最初の一筆がサイクルタイマーを始動させ、このシグネチャーを形づくり始めます。",
+        "display": "最初の一筆を待っています"
+      },
+      "approach": {
+        "eyebrow": "サイクル確定まで",
+        "label": "12時間未満",
+        "status": "サイクルは進行中です。一筆ごとに確定までの時計が延びることがあります。",
+        "tooltip": "これがサイクル確定時刻です。ゼロになると、最後の一筆の参加者がサイクルを確定できます。"
+      },
+      "finalHour": {
+        "eyebrow": "最後の1時間",
+        "label": "最後の1時間",
+        "status": "このサイクルを確定できるまで1時間を切りました。",
+        "tooltip": "確定までの時計は1時間未満です。新しい一筆はまだサイクル確定時刻を延ばせます。"
+      },
+      "finalTen": {
+        "eyebrow": "最後の10分",
+        "label": "最後の10分",
+        "status": "最後の数分です。一筆はまだ結末を変えられます。",
+        "tooltip": "サイクルは最後の10分に入っています。時計は切迫していますが、新しい一筆はまだそれを延ばせます。"
+      },
+      "finalMinute": {
+        "eyebrow": "最後の1分",
+        "label": "最後の1分",
+        "status": "最後の1分です。0.1秒単位で動いています。",
+        "tooltip": "確定までの時計は最後の1分です。ゼロになると、サイクルは確定できる状態になります。"
+      },
+      "confirming": {
+        "eyebrow": "オンチェーンで検証中",
+        "label": "確認中",
+        "status": "時計がゼロになりました。最後の一瞬の一筆がサイクルを延ばしていないか、オンチェーンで確認しています。",
+        "tooltip": "この端末でカウントダウンがゼロになりました。サイクルを確定できる状態として表示する前に、アプリは期限が本当に過ぎたことをブロックチェーンで直接検証します。最後の数秒の一筆がまだ延ばしている可能性があるためです。",
+        "display": "00:00"
+      },
+      "readyToFinalize": {
+        "eyebrow": "サイクルは確定できる状態",
+        "label": "準備完了",
+        "status": "確定の準備ができました。新しい一筆はまだサイクルを延ばせます。",
+        "tooltip": "サイクル確定時刻がゼロになりました。最後の一筆の参加者が確定できます。優先確定期間の後は誰でも確定でき、シグネチャー配分を受け取ります。確定が実行されるまで、一筆は引き続き入れられます。",
+        "display": "00:00"
+      },
+      "live": {
+        "eyebrow": "サイクル確定まで",
+        "label": "サイクルは進行中",
+        "status": "サイクルは進行中です。一筆ごとに確定までの時計が延びることがあります。",
+        "tooltip": "これがサイクル確定時刻です。ゼロになると、最後の一筆の参加者がサイクルを確定できます。"
+      }
+    },
+    "cta": {
+      "finalize": "サイクルを確定",
+      "makeFirstGesture": "最初の一筆を入れる",
+      "makeGesture": "一筆を入れる",
+      "viewCycle": "サイクルを見る"
+    }
+  },
+  "phaseGuide": {
+    "eyebrow": "サイクルの段階",
+    "title": "このパフォーマンス・サイクルの現在地",
+    "howItWorks": "仕組み",
+    "timelineAria": "パフォーマンス・サイクルの段階",
+    "stepState": {
+      "now": "現在",
+      "passed": "完了",
+      "next": "次"
+    },
+    "steps": {
+      "openingSoon": {
+        "label": "まもなく開始",
+        "detail": "次のサイクルは予定され、開始を待っています。"
+      },
+      "firstGesture": {
+        "label": "最初の一筆",
+        "detail": "最初の一筆が確定までの時計を動かします。"
+      },
+      "open": {
+        "label": "サイクル進行中",
+        "detail": "一筆がシグネチャーを形づくり、時間を延ばします。"
+      },
+      "finalWindow": {
+        "label": "最終局面",
+        "detail": "時計はゼロに近づきます。新しい一筆はまだそれを延ばせます。"
+      },
+      "finalization": {
+        "label": "確定",
+        "detail": "最後の一筆の参加者がサイクルを閉じることができます。"
+      },
+      "allocation": {
+        "label": "配分",
+        "detail": "準備金がプロトコルのトラックへ配られます。"
+      }
+    },
+    "explainer": {
+      "title": "初めてですか？サイクルを30秒で。",
+      "body": "サイクルの開始を待ち、一筆を入れられるようになったら一筆を入れ、確定までの時計を見守ります。一筆ごとに最終的なシグネチャーが形づくられ、時間が延び、配分を受け取る位置にいる参加者が更新されます。時間が尽きるとサイクルは確定し、準備金がオンチェーンで配られます。",
+      "faqLink": "よくある質問を読む",
+      "walkthroughLink": "詳しい手順を見る",
+      "dismissAria": "サイクルの説明を閉じる"
+    }
+  },
+  "status": {
+    "opensAt": "サイクル{cycle}は{dateTime}に始まります",
+    "finalizesIn": "サイクル確定まで",
+    "finalizesInTooltip": "このタイマーがゼロになると、最後の一筆を入れた参加者がサイクルを確定してシグネチャー配分を受け取れます。新しい一筆はそれぞれタイマーを延ばします。",
+    "readyToFinalize": "サイクルは確定できる状態です",
+    "clockReachedZero": "確定までの時計がゼロになりました。",
+    "metrics": {
+      "signatureAllocation": "シグネチャー配分",
+      "signatureTooltip": {
+        "base": "シグネチャー配分のETH部分。受領者は1,000 CSTとCosmic Signature NFTも受け取ります。",
+        "withNft": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT、そして{nftCount, plural, other {添付された#点のNFTすべて}}も受け取ります。",
+        "withErc20": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT、そして{erc20Count, plural, other {添付された#件のERC20トークン添付分すべて}}も受け取ります。",
+        "withBoth": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT、そして{nftCount, plural, other {添付された#点のNFT}}と{erc20Count, plural, other {添付された#件のERC20トークン添付分}}のすべても受け取ります。"
+      },
+      "ethGesture": "ETH一筆",
+      "ethGestureTooltip": "ETHで一筆を入れる現在の費用",
+      "randomWalkGesture": "ETH + RandomWalk一筆",
+      "randomWalkGestureTooltip": "RandomWalk NFTをETH一筆に添付すると、ETH一筆の費用が50%引き下げられます",
+      "cstGesture": "CST一筆",
+      "cstGestureTooltip": "CSTで一筆を入れます。費用はライブの調律期間を通じて下がり、CST一筆はその期間を長く、ETH一筆は短くします。",
+      "free": "費用なし",
+      "cstWindow": "CST期間",
+      "cstWindowProgressAria": "CST調律期間の進み具合",
+      "duration": "長さ{duration}"
+    },
+    "standing": {
+      "title": "このサイクルでの位置",
+      "tooltip": "このサイクルでの一筆に基づく、現在の最後の一筆の位置と星選の選定頻度を示します。",
+      "leader": {
+        "base": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点）を受け取ります。",
+        "withNft": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{nftCount, plural, other {添付された#点のNFTすべて}}）を受け取ります。",
+        "withErc20": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{erc20Count, plural, other {添付された#件のERC20トークン添付分すべて}}）を受け取ります。",
+        "withBoth": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{nftCount, plural, other {添付された#点のNFT}}と{erc20Count, plural, other {添付された#件のERC20トークン添付分}}のすべて）を受け取ります。"
+      },
+      "notLeader": "最新の参加者ではありません。もう一度一筆を入れて先頭に立つか、そのまま星選の対象でいることもできます。",
+      "ethStellar": "ETH星選",
+      "nftStellar": "NFT星選"
+    },
+    "openCycle": {
+      "cycleNumber": "サイクル{cycle}",
+      "title": "サイクルを開く",
+      "body": "最初のETH一筆のための調律期間が開いています。一筆を入れましょう。"
+    }
+  },
+  "ticker": {
+    "openLatestAria": "最新の一筆{id}を開く",
+    "gestureLine": "{address}が{kind, select, cst {CST一筆} randomWalk {ETH + RandomWalk一筆} other {ETH一筆}}を入れました",
+    "paymentUnavailable": "費用を同期中…",
+    "rwlkToken": "RandomWalk #{id}",
+    "age": {
+      "justNow": "たった今",
+      "seconds": "{count}秒前",
+      "minutes": "{count}分前",
+      "hours": "{count}時間前",
+      "days": "{count}日前"
+    }
+  },
+  "form": {
+    "title": "一筆を入れる",
+    "subtitle": "一筆の方法を選んで、進行中のサイクルに参加しましょう。",
+    "loadingAria": "一筆のフォームを読み込み中",
+    "methodLabel": "一筆の方法",
+    "method": {
+      "eth": {
+        "label": "ETH",
+        "desc": "Etherで支払う"
+      },
+      "randomWalk": {
+        "label": "ETH + RWLK",
+        "desc": "50%割引"
+      },
+      "cst": {
+        "label": "CST",
+        "desc": "ERC-20"
+      }
+    },
+    "rwlk": {
+      "title": "自分のRandom Walk NFT",
+      "tooltipAria": "RandomWalkによる一筆の割引について",
+      "tooltip": "RandomWalk NFTをETH一筆に添付すると、一筆の費用が50%引き下げられます。各NFTは一度しか使えません。"
+    },
+    "cstTrade": "この方法で一筆を入れるにはCSTが必要ですか？Uniswapを通じてArbitrum上でETHをCSTに交換できます。",
+    "reward": {
+      "economicsTitle": "CST一筆の収支",
+      "previewTitle": "参加CSTのプレビュー",
+      "economicsDescription": "純CSTは、参加CSTから現在のCST一筆の費用を引いたものです。",
+      "previewDescription": "この一筆が届いた場合に受け取る動的なCSTの見込み。量は前の一筆からの経過時間に依存し、どの一筆の方法にも二つの保護があります：費用の上限と最低参加CSTです。",
+      "rewardLabel": "参加CST",
+      "costLabel": "費用",
+      "netLabel": "純CST",
+      "cstAmount": "{amount} CST",
+      "minAccepted": "受け入れ最小値：{value}",
+      "minAcceptedAny": "0 CSTを含むどの量でも",
+      "minAcceptedAria": "受け入れ最小CSTの意味",
+      "minAcceptedTooltip": "トランザクションが受け入れる参加CSTの最小量です。現在のプレビューから最低参加CST保護の許容幅を引いた値です。確認の時点でコントラクトがそれより少なく刻印する場合、一筆はより少ない量を受け入れる代わりに取り消されます。",
+      "minAcceptedTooltipAny": "「どの参加CSTでも受け入れる」は受け入れ最小値0を送るので、動的なCSTの量がゼロであっても一筆は届きます。",
+      "netPositive": "この一筆が届けば、参加CSTがCSTの費用を上回ります。",
+      "netNegative": "ほとんどのCST一筆は、受け取るCSTより多くのCSTを使います。",
+      "durationMismatch": "APIが{apiDuration}を報告したため、オンチェーンの長さ（{contractDuration}）を使用します。"
+    },
+    "preview": "ライブの一筆の選択肢をここでプレビューできます。ウォレットを接続すると、メッセージを書き、アセットを添付し、Arbitrumで一筆を送信できます。",
+    "advanced": {
+      "title": "詳細設定",
+      "messageLabel": "メッセージ",
+      "messageOptionalHint": "（任意、{maxLength}文字）",
+      "messageTooltipAria": "一筆のメッセージの仕組み",
+      "messageTooltip": "一筆チャットに表示されるメッセージを添えられます。メッセージは一筆とともにオンチェーンに記録され、ブロックチェーン上に永久に残ります。",
+      "messagePlaceholder": "一筆に添えるメッセージ…",
+      "attachIntro": "一筆にトークンやNFTを添付したり、一筆の費用の衝突防止を調整したりできます。",
+      "minCstProtection": {
+        "title": "最低参加CST保護",
+        "body": "参加CSTは経過時間に基づく平方根の式を使います。この設定は、トランザクションの確認前に別の一筆が先に届いて量が下がった場合に守ってくれます。",
+        "acceptAnyAria": "どの参加CSTでも受け入れる",
+        "acceptAnyTitle": "0を含むどの参加CSTでも受け入れる",
+        "acceptAnyBody": "受け入れ最小CSTとして0を送ります。確認前に動的なCSTの量が変わっても一筆を届けたい場合に使います。",
+        "toleranceLabel": "許容する減少幅",
+        "minAmount": "最小{amount} CST",
+        "revertNote": "トランザクションが届く時点でコントラクトがこの最小値より少ないCSTを刻印する場合、一筆はより少ない動的CSTの量を受け入れる代わりに取り消されます。"
+      },
+      "attachNft": "NFTを添付",
+      "attachToken": "トークンを添付",
+      "tokenContractLabel": "コントラクトアドレス",
+      "tokenAmountLabel": "数量",
+      "nftContractLabel": "NFTコントラクトアドレス",
+      "nftIdLabel": "トークンID",
+      "nftIdPlaceholder": "トークンID",
+      "collision": {
+        "title": "衝突防止",
+        "raiseBy": "上乗せ幅",
+        "approxCost": "≈ {amount} ETH",
+        "note": "二つの一筆が同じブロックに届いたときの衝突を避けるため、一筆の費用を{percent}%上乗せします。費用が恒久的に上がるわけではありません。"
+      }
+    },
+    "submit": {
+      "eth": "ETHで一筆（{cost} ETH）",
+      "randomWalkWithToken": "ETH + RandomWalkトークン{tokenId}で一筆（{cost} ETH）",
+      "randomWalk": "ETH + RandomWalkで一筆",
+      "cst": "CSTで一筆（{cost} CST）",
+      "cstFree": "CSTで一筆（費用なし）",
+      "generic": "{method}で一筆"
+    },
+    "processing": "処理中…",
+    "finalGestureMade": "このサイクルの最後の一筆を入れました。タイマーが終わったら、下の「サイクルを確定」を使ってください。",
+    "finalize": "サイクルを確定",
+    "finalizeAvailableIn": "利用可能まで",
+    "finalizeWaitNote": "最後の一筆を入れた参加者がサイクルを確定するのをお待ちください。",
+    "connect": {
+      "title": "接続して一筆を送信",
+      "body": "上のライブの一筆の方法と費用を確認し、MetaMaskまたは他のウォレットを接続してArbitrumで送信してください。"
+    }
+  },
+  "calibration": {
+    "defaultTitle": "調律期間",
+    "defaultSubtitle": "この期間が進むにつれて一筆の費用は下がります。",
+    "defaultEndedMessage": "調律期間は終了しました。",
+    "firstGestureTitle": "最初の一筆の調律期間",
+    "firstGestureSubtitle": "この開始期間が進むにつれて、最初のETH一筆の費用は下がります。",
+    "cstTitle": "CST調律期間",
+    "cstSubtitle": "CSTの費用はこの動的な期間を通じて下がります。ETH一筆は約{decreasePercent}%短くし、CST一筆は約{increasePercent}%長くします。",
+    "cstEndedMessage": "調律期間が終わりました。費用なしで一筆を入れられます。",
+    "dynamicDuration": "動的な長さ",
+    "progressLabel": "進み具合",
+    "percentComplete": "{percent}完了",
+    "progressAria": "{title}の進み具合",
+    "durationLabel": "調律期間の長さ",
+    "elapsedLabel": "経過",
+    "remainingLabel": "残り"
+  },
+  "allocation": {
+    "title": "配分の内訳",
+    "titleTooltip": "サイクルが確定したときに、10を超えるトラックへ配られる配分。",
+    "recipientCount": "{count, plural, other {受領者#人}}",
+    "amounts": {
+      "eth": "{amount} ETH",
+      "ethEach": "各{amount} ETH",
+      "fixedCst": "1,000 CST",
+      "fixedCstEach": "各1,000 CST",
+      "nft": "Cosmic Signature NFT 1点",
+      "nftEach": "各Cosmic Signature NFT 1点",
+      "attachedTokens": "添付されたトークン（あれば）"
+    },
+    "cards": {
+      "signature": {
+        "name": "シグネチャー配分",
+        "tooltip": "カウントダウンがゼロになった時点で最後の一筆を入れていた参加者が受け取れる配分：ETH、1,000 CST、Cosmic Signature NFT、添付されたトークン。"
+      },
+      "publicGoods": {
+        "name": "公共財",
+        "tooltip": "すべてのサイクル準備金の{percent}%が、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ送られます。",
+        "recipientLabel": "Protocol Guild"
+      },
+      "ethStellar": {
+        "name": "ETH星選",
+        "tooltip": "サイクルの対象の中から無作為に選ばれた参加者がETHの配分を分け合います。"
+      },
+      "nftStellar": {
+        "name": "NFT星選",
+        "tooltip": "サイクルの対象の中から無作為に選ばれた参加者が功労CSTとCosmic Signature NFTを受け取ります。"
+      },
+      "randomWalkAnchor": {
+        "name": "RandomWalk係留者",
+        "tooltip": "RandomWalk NFTの係留者は功労CSTとCosmic Signature NFTを受け取ることがあります。"
+      },
+      "cosmicAnchor": {
+        "name": "Cosmic Signatureの係留",
+        "tooltip": "Cosmic Signature NFTの係留者はサイクルごとの係留配分を分け合います。",
+        "recipientLabel": "比例配分 · すべての係留者"
+      },
+      "chronoWarrior": {
+        "name": "時の戦士配分",
+        "tooltip": "持久チャンピオンの位置を最も長く連続して保った参加者が、サイクル準備金の一定割合とCosmic Signature NFTを受け取ります。"
+      },
+      "endurance": {
+        "name": "持久チャンピオン",
+        "tooltip": "最新の一筆の主として最も長く連続して留まった参加者。1,000 CSTの功労CSTとCosmic Signature NFTを受け取ります。"
+      },
+      "finalCst": {
+        "name": "最後のCST一筆",
+        "tooltip": "サイクルで最後のCST一筆を入れた参加者は、1,000 CSTの功労CSTとCosmic Signature NFTを受け取ります。"
+      }
+    }
+  },
+  "chat": {
+    "liveFeed": "ライブフィード",
+    "title": "一筆チャット",
+    "joinTooltipAria": "一筆チャットへの参加方法",
+    "joinTooltip": "チャットに参加しますか？一筆を入れて、任意のメッセージを添えてください。一筆に添えられたメッセージはここに表示されます。",
+    "currentCycle": "現在のサイクル",
+    "cycleNumber": "サイクル{number}",
+    "messageCount": "{count, plural, =0 {まだメッセージはありません} other {#件のメッセージ}}",
+    "messageAria": "{address}からの一筆のメッセージ",
+    "openPositionAria": "一筆の順位{position}を開く",
+    "badge": {
+      "eth": "{amount} ETH",
+      "ethFallback": "ETH",
+      "ethRwlk": "{amount} ETH + RWLK",
+      "rwlkFallback": "ETH + RWLK",
+      "cst": "{amount} CST",
+      "cstFallback": "CST"
+    },
+    "empty": {
+      "title": "一筆のメッセージはまだありません",
+      "description": "現在のサイクルの一筆に添えられたメッセージが、新しいものから順にここに表示されます。",
+      "cta": "一筆を入れる"
+    },
+    "system": {
+      "cycleStart": "サイクル{number}が始まりました——最初の一筆が時計を動かしました",
+      "enduranceRecord": "{address}が持久記録を打ち立てました——{duration}",
+      "chronoLead": "{address}が時の戦士の先頭に立ちました——{duration}"
+    },
+    "pending": {
+      "aria": "自分のメッセージ、オンチェーンで確認中",
+      "label": "確認中"
+    }
+  },
+  "deck": {
+    "title": "Cosmic Signature観測所",
+    "intro": "一つのライブのパフォーマンス・サイクル。一筆ごとに時計が延び、最終的なシグネチャーが形づくられ、配分を受け取る列に並びます。",
+    "newHere": "初めてですか？仕組みを見る",
+    "experimentalUi": "実験的なUI",
+    "returnToCurrent": "現在のUIに戻る",
+    "monument": {
+      "reserveLabel": "シグネチャー配分",
+      "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1点 · 添付されたアセット",
+      "youChip": "自分",
+      "fullConsole": "一筆のフルコンソールを開く",
+      "chooseRwlkToken": "下のフルコンソールでRandomWalkトークンを選んでください",
+      "microcopy": "一筆ごとに確定までの時計が延び、参加CSTが刻印され、星選の対象として数えられます。",
+      "notifyAria": "サイクルが確定できるようになる前に通知する",
+      "notifyLabel": "確定前に通知：",
+      "notifyMinutes": "{minutes}分",
+      "calendarTitle": "Cosmic Signatureサイクル{number}が始まります",
+      "calendarBody": "次のパフォーマンス・サイクルで一筆を入れられるようになります。最初の一筆が確定までの時計を動かします。",
+      "calendarCta": "開始をカレンダーに追加"
+    },
+    "board": {
+      "title": "配分トラック",
+      "subtitle": "このサイクルが確定時に配るすべてのもの",
+      "tooltip": "現在のパフォーマンス・サイクルのすべての配分トラックのライブ表示：金額、現在の保持者、現在の記録。",
+      "cstPlusNft": "1,000 CST + NFT",
+      "awaitingGesture": "最初の一筆を待っています",
+      "awaitingRecord": "記録はまだありません",
+      "stellarStatus": "一筆はすべて対象になります",
+      "fullBreakdown": "内訳をすべて見る"
+    },
+    "art": {
+      "sectionAria": "注目のオンチェーンアートワーク",
+      "eyebrow": "オンチェーンアートワーク",
+      "galleryCta": "ギャラリー",
+      "viewAria": "Cosmic Signature {id}を見る",
+      "alt": "Cosmic Signatureのアートワーク{id}——決定論的な三体ジェネラティブアート",
+      "pairingNote": "オンチェーンに刻印された決定論的な三体アート。すべてのシグネチャーには1,000 CSTが添えられています。"
+    },
+    "composer": {
+      "title": "一筆で語る",
+      "subtitle": "メッセージは一筆とともにオンチェーンを旅します",
+      "placeholder": "任意のオンチェーンメッセージを書く…",
+      "note": "送信するとArbitrumで実際の一筆が入れられます。メッセージはそれに乗って、一筆チャットに表示されます。",
+      "connectBody": "ウォレットを接続すると、一筆を入れて一筆チャットにメッセージを投稿できます。",
+      "rwlkChip": "RWLK #{id}",
+      "rwlkChoose": "RWLK：トークンを選ぶ",
+      "cstFree": "CST一筆はいま費用なしです"
+    },
+    "personal": {
+      "title": "現在の位置",
+      "leader": "最新の一筆を保持しています",
+      "heldFor": "保持{duration}",
+      "notLeader": "最新の参加者ではありません",
+      "enduranceIn": "持久記録まで{duration}",
+      "extending": "いま持久記録を延ばしています",
+      "gestures": "{count, plural, =0 {このサイクルではまだ一筆を入れていません} other {このサイクルで#筆}}",
+      "retrieve": "待機中の配分を受け取る",
+      "nothingWaiting": "受け取りを待つものはありません",
+      "cstPreview": "いま一筆を入れると約{amount} CSTが刻印されます"
+    },
+    "miniBar": {
+      "aria": "サイクルのクイックコンソール",
+      "reserve": "シグネチャー配分",
+      "jump": "デッキに戻る"
+    },
+    "story": {
+      "collapsedTitle": "Cosmic Signatureについて",
+      "collapsedSubtitle": "物語、アートワーク、そして各パフォーマンス・サイクルがシグネチャーになるまで",
+      "expand": "展開"
+    }
+  },
+  "mobileCta": {
+    "makeGesture": "一筆を入れる",
+    "preview": "一筆の選択肢をプレビュー"
+  },
+  "observatory": {
+    "pulse": {
+      "gestureCount": "{count, plural, =0 {まだ一筆はありません} other {#筆}}",
+      "lastGestureAge": "最新の一筆：{age}"
+    },
+    "clock": {
+      "reserveLabel": "シグネチャー配分",
+      "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1点 · 添付されたアセット",
+      "reserveUsd": "≈ {amount} USD",
+      "notifyAria": "サイクルが確定できるようになる前に通知する",
+      "notifyLabel": "確定前に通知：",
+      "notifyMinutes": "{minutes}分",
+      "calendarTitle": "Cosmic Signatureサイクル{number}が始まります",
+      "calendarBody": "次のパフォーマンス・サイクルで一筆を入れられるようになります。最初の一筆が確定までの時計を動かします。",
+      "calendarCta": "開始をカレンダーに追加"
+    },
+    "standings": {
+      "title": "ライブ順位",
+      "tooltip": "このサイクルの各トラックをいま誰が保持しているか。タイマーはライブで動き、順位はサイクルが確定したときにだけ固定されます。",
+      "youBadge": "自分",
+      "latestName": "最新の一筆",
+      "latestTooltip": "最新の参加者です。確定までの時計がいまゼロになれば、このアドレスがシグネチャー配分を受け取ります。",
+      "held": "保持{duration}",
+      "record": "記録{duration}",
+      "awaitingGesture": "最初の一筆を待っています",
+      "awaitingRecord": "記録はまだありません",
+      "cstPlusNft": "1,000 CST + NFT"
+    },
+    "intel": {
+      "latestSubtitle": "最新の一筆の費用、刻印されたもの、そして現在受け取る位置にあるもの。",
+      "viewGesture": "一筆を開く",
+      "inLineFor": "確定時に受け取る位置にあるもの",
+      "attachedNfts": "{count, plural, other {添付されたNFT #点}}",
+      "attachedTokens": "{count, plural, other {添付されたトークン添付分#件}}",
+      "plusCycleAttachments": "さらに、サイクルが保持する{assets}。",
+      "enduranceChronoTitle": "持久と時の戦士",
+      "enduranceChronoSubtitle": "現在の記録と、それをいま変えようとしている進行中のチャレンジ。",
+      "liveRoleState": "ライブの役割の状態"
+    },
+    "prices": {
+      "availableAfterFirst": "最初の一筆の後",
+      "openDockHint": "ライブの費用 · 参加するにはアクションドックを開いてください"
+    },
+    "ribbon": {
+      "title": "配分トラック",
+      "subtitle": "このサイクルが確定時に配るすべてのもの",
+      "tooltip": "現在のパフォーマンス・サイクルのすべての配分トラックのライブ表示。金額は準備金とともに増え、サイクルが確定したときに配られます。",
+      "fullBreakdown": "内訳をすべて見る",
+      "stellarStatus": "一筆はすべて対象になります",
+      "nextCycleName": "次サイクル繰越分",
+      "nextCycleTooltip": "この分は確定時には配られません。準備金に残り、次のパフォーマンス・サイクルの種になります。",
+      "nextCycleDetail": "次へ累積",
+      "percentOfReserve": "準備金の{percent}%"
+    },
+    "dock": {
+      "aria": "サイクルのクイックアクション",
+      "reserve": "準備金",
+      "openPanelAria": "一筆のパネルを開く"
+    },
+    "panel": {
+      "microcopy": "一筆ごとに確定までの時計が延び、参加CSTが刻印され、星選の対象として数えられます。",
+      "sheetTitle": "一筆を入れる"
+    }
+  },
+  "cycleDetails": {
+    "title": "サイクルの詳細をすべて見る",
+    "subtitle": "一筆の履歴、順位表、拠出、配分の分布"
+  },
+  "publicGoods": {
+    "eyebrow": "公共財",
+    "heading": "Ethereumのコア貢献者を支える。",
+    "thisCycle": "このサイクル",
+    "body": "すべてのパフォーマンス・サイクルの{percent}%が、170人以上のEthereumコア貢献者の資金支援メカニズムであるProtocol Guildへ送られます。",
+    "cta": "公共財拠出を見る",
+    "stats": {
+      "lifetime": "累計拠出額",
+      "lifetimeTooltip": "プロトコルからの自動送付と自発的な公共財拠出の合計。",
+      "vault": "現在の金庫残高",
+      "vaultTooltip": "受け取り前に公共財金庫に保管されているETH。",
+      "retrieved": "受け取り済み",
+      "retrievedTooltip": "受け手のために公共財金庫から受け取られたETHの総額。"
+    }
+  },
+  "latestNfts": {
+    "title": "最新のNFT",
+    "dividerAlt": "区切り",
+    "previousAria": "前の最新NFT",
+    "nextAria": "次の最新NFT",
+    "empty": {
+      "title": "Cosmic Signature NFTはまだ刻印されていません。",
+      "body": "パフォーマンス・サイクルが確定し、新しい決定論的な三体アートワークが生まれるにつれて、ギャラリーは満ちていきます。",
+      "cta": "ギャラリーを開く"
+    }
+  },
+  "rwlkGrid": {
+    "searchPlaceholder": "NFT IDを入力",
+    "searchIconAlt": "検索アイコン",
+    "empty": "見つかりませんでした"
+  }
+}

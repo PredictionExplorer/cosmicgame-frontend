@@ -2,6 +2,7 @@ import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
 import { LEARN_STRUCTURE, type LearnText } from './structure';
 import { learnTextEn } from './text.en';
+import { learnTextJa } from './text.ja';
 import { learnTextKo } from './text.ko';
 import { learnTextUk } from './text.uk';
 import { learnTextZh } from './text.zh';
@@ -70,6 +71,7 @@ export const learnContentZhTw: LearnContent = buildLearnContent(learnTextZhTw);
 export const learnContentZhHk: LearnContent = buildLearnContent(learnTextZhHk);
 export const learnContentUk: LearnContent = buildLearnContent(learnTextUk);
 export const learnContentKo: LearnContent = buildLearnContent(learnTextKo);
+export const learnContentJa: LearnContent = buildLearnContent(learnTextJa);
 
 const LEARN_CONTENT: LocaleRecord<LearnContent> = {
   en: learnContentEn,
@@ -78,6 +80,7 @@ const LEARN_CONTENT: LocaleRecord<LearnContent> = {
   'zh-HK': learnContentZhHk,
   uk: learnContentUk,
   ko: learnContentKo,
+  ja: learnContentJa,
 };
 
 export function getLearnContent(locale: string): LearnContent {

@@ -1,0 +1,192 @@
+{
+  "page": {
+    "title": "サイトマップ",
+    "subtitle": "アカウントページと公開プロトコルデータへのクイックリンク。",
+    "home": "ホーム",
+    "jsonLdName": "Cosmic Signatureサイトマップ"
+  },
+  "sections": {
+    "personal": {
+      "title": "個人ツール",
+      "description": "ウォレット固有のページは接続中の参加者に役立ちますが、noindexでXMLサイトマップにも含まれません。",
+      "navLabel": "個人ツール"
+    },
+    "system": {
+      "title": "公開プロトコルページ",
+      "description": "公開の順位表、配分、統計、コントラクト、ヘルプ。",
+      "navLabel": "システムとヘルプのページ"
+    },
+    "data": {
+      "title": "プロトコルデータページ",
+      "description": "XMLサイトマップに載るすべての公開データルートを、クロール可能な一つの一覧に。",
+      "navLabel": "プロトコルデータページ"
+    },
+    "ecosystem": {
+      "title": "エコシステム",
+      "description": "外部プロダクト：Axiom Zero NFTマーケットプレイス、Chaos Zero予測市場、UniswapでのCST取引。",
+      "navLabel": "エコシステムのリンク先"
+    }
+  },
+  "links": {
+    "myNfts": {
+      "label": "自分のNFT",
+      "description": "ウォレット固有のNFT表示。noindex。"
+    },
+    "myAllocations": {
+      "label": "未受け取りの配分",
+      "description": "ウォレット固有の配分受け取り表示。noindex。"
+    },
+    "myAnchors": {
+      "label": "自分の係留",
+      "description": "ウォレット固有の係留表示。noindex。"
+    },
+    "about": {
+      "label": "Cosmic Signatureについて",
+      "description": "エンティティのホームとブランドの明確化。"
+    },
+    "learn": {
+      "label": "Cosmic Signature学習ハブ",
+      "description": "AIと検索システムのためのクロール可能な解説。"
+    },
+    "whatIsCosmicSignature": {
+      "label": "Cosmic Signatureとは？",
+      "description": "プロトコルのわかりやすい定義。"
+    },
+    "threeBodyArt": {
+      "label": "三体NFTアートガイド",
+      "description": "決定論的な物理がシグネチャーNFTを生成する仕組み。"
+    },
+    "gallery": {
+      "label": "Cosmic Signatureギャラリー",
+      "description": "決定論的NFTアートのアーカイブ。"
+    },
+    "currentCycle": {
+      "label": "現在のパフォーマンス・サイクル",
+      "description": "ライブのサイクル状態と一筆の文脈。"
+    },
+    "howItWorks": {
+      "label": "仕組み",
+      "description": "サイクルの仕組みを順を追って。"
+    },
+    "statistics": {
+      "label": "プロトコル統計",
+      "description": "公開プロトコルの指標とデータソース。"
+    },
+    "contracts": {
+      "label": "Cosmic Signatureコントラクト",
+      "description": "検証済みのArbitrumコントラクトアドレス。"
+    },
+    "sourceCode": {
+      "label": "ソースコード",
+      "description": "レンダリングパイプラインとソースコードのリソース。"
+    },
+    "security": {
+      "label": "セキュリティ",
+      "description": "セキュリティモデルと検証のリソース。"
+    },
+    "audits": {
+      "label": "監査",
+      "description": "監査と形式検証の状況。"
+    },
+    "riskDisclosures": {
+      "label": "リスク開示",
+      "description": "ブロックチェーンのリスクと参加者向けの明確化の開示。"
+    },
+    "faq": {
+      "label": "Cosmic Signatureよくある質問",
+      "description": "プロトコルの仕組みに関する質問と回答。"
+    },
+    "terms": {
+      "label": "利用規約",
+      "description": "アプリの利用と参加に関する法的条件。"
+    },
+    "privacy": {
+      "label": "プライバシーポリシー",
+      "description": "ウォレットデータ、アナリティクス、ブロックチェーンの透明性。"
+    },
+    "allocationRecipients": {
+      "label": "配分の受領者",
+      "description": "各サイクルの準備金の行き先。"
+    },
+    "anchorDistributions": {
+      "label": "係留配分",
+      "description": "係留中のNFTとその配分。"
+    },
+    "outreachReserve": {
+      "label": "広報準備金",
+      "description": "コミュニティ広報のCST活動。"
+    },
+    "imprint": {
+      "label": "刻印",
+      "description": "新しいトークンの刻印インターフェース。"
+    },
+    "ethContributions": {
+      "label": "ETH拠出",
+      "description": "ETH拠出の履歴。"
+    },
+    "attachedNfts": {
+      "label": "添付されたNFT",
+      "description": "各サイクルで一筆に添付されたNFT。"
+    },
+    "finalizedAllocations": {
+      "label": "確定済みの配分",
+      "description": "確定したサイクル配分の記録。"
+    },
+    "namedNfts": {
+      "label": "名前付きNFT",
+      "description": "固有の名前が付けられたNFT。"
+    },
+    "usedRwlkNfts": {
+      "label": "使用済みのRandomWalk NFT",
+      "description": "一筆の割引にすでに使われたRandomWalk NFT。"
+    },
+    "coordinationChanges": {
+      "label": "調整の変更履歴",
+      "description": "プロトコルのパラメーター変更の履歴。"
+    },
+    "publicGoodsContributions": {
+      "label": "公共財拠出",
+      "description": "サイクルごとの公共財配分の記録。"
+    },
+    "voluntaryPublicGoods": {
+      "label": "自発的な公共財拠出",
+      "description": "金庫への直接の自発的な拠出。"
+    },
+    "publicGoodsRetrievals": {
+      "label": "公共財の受け取り",
+      "description": "公共財金庫から送られた資金。"
+    },
+    "participationStats": {
+      "label": "統計：参加",
+      "description": "参加者と一筆の分析。"
+    },
+    "tokenStats": {
+      "label": "統計：トークン",
+      "description": "CSTとNFTの供給量の分析。"
+    },
+    "anchoringStats": {
+      "label": "統計：係留",
+      "description": "係留の合計と履歴。"
+    },
+    "activityStats": {
+      "label": "統計：活動",
+      "description": "サイクルの活動とタイミングの分析。"
+    },
+    "performanceStats": {
+      "label": "統計：実績",
+      "description": "サイクルの記録と実績の分析。"
+    },
+    "axiomZero": {
+      "label": "Axiom Zeroマーケットプレイス",
+      "description": "Cosmic SignatureとRandom Walkのための手数料ゼロのNFTマーケットプレイス。"
+    },
+    "chaosZero": {
+      "label": "Chaos Zeroの予測",
+      "description": "各パフォーマンス・サイクルについての予測市場。"
+    },
+    "uniswap": {
+      "label": "UniswapでCSTを取引",
+      "description": "Arbitrum上でETHをCSTにスワップ。"
+    }
+  }
+}

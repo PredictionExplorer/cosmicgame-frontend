@@ -1,0 +1,74 @@
+{
+  "invalid": {
+    "title": "一筆IDが無効です",
+    "help": "URLには0以上の数値の一筆IDを指定してください。"
+  },
+  "header": {
+    "title": "一筆の詳細",
+    "loadingSubtitle": "一筆のデータを読み込み中…",
+    "positionLabel": "一筆の順位 #{position}",
+    "positionFallback": "一筆の順位"
+  },
+  "empty": {
+    "title": "一筆の情報が見つかりません。",
+    "help": "IDが無効か、この一筆が現在のインデックスに含まれていない可能性があります。"
+  },
+  "sections": {
+    "transaction": {
+      "title": "トランザクションとサイクル",
+      "description": "この一筆が入れられた時刻と、属するサイクル。"
+    },
+    "cost": {
+      "title": "費用と参加CST",
+      "description": "支払われた金額と、この一筆で刻印された参加CST。"
+    },
+    "type": {
+      "title": "一筆の種類",
+      "description": "この一筆にRandom Walk NFTまたはCSTが使われたかどうか。"
+    },
+    "erc20": {
+      "title": "添付されたERC-20",
+      "description": "この一筆に添付された任意のERC-20トークン。"
+    },
+    "nft": {
+      "title": "添付されたNFT",
+      "description": "この一筆に添付されたNFTのメタデータ（ある場合）。"
+    },
+    "message": {
+      "title": "メッセージ",
+      "description": "参加者がこの一筆に添えたメッセージ。"
+    }
+  },
+  "rows": {
+    "datetime": "一筆の日時",
+    "datetimeHelp": "ブロックエクスプローラーでトランザクションを開きます",
+    "participantAddress": "参加者アドレス",
+    "cycleNumber": "サイクル番号",
+    "cycleValue": "サイクル{round}",
+    "gestureCost": "一筆の費用",
+    "participationCst": "参加CST",
+    "attachedRandomWalk": "ETH一筆に添付されたRandomWalk NFT：",
+    "paidWithCst": "CST（ERC-20）で支払い：",
+    "randomWalkId": "RandomWalkNFT ID：",
+    "erc20Address": "添付されたERC-20トークンのアドレス：",
+    "erc20Amount": "添付されたERC-20トークンの数量（ETH）：",
+    "nftAddress": "添付されたNFTトークンのアドレス：",
+    "nftId": "添付されたNFTトークンID：",
+    "nftTokenUri": "NFTトークンURI："
+  },
+  "values": {
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "nftPreview": {
+    "heading": "プレビューとメタデータ",
+    "collectionName": "コレクション名",
+    "artist": "アーティスト",
+    "platform": "プラットフォーム",
+    "description": "説明"
+  },
+  "randomWalk": {
+    "previewAria": "Random Walk NFTのプレビュー",
+    "heading": "Random Walk NFT"
+  }
+}

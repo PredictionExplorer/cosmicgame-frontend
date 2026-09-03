@@ -1,0 +1,257 @@
+{
+  "types": {
+    "structure": "構造",
+    "underlay": "下地",
+    "accent": "アクセント",
+    "symmetry": "対称",
+    "projection": "投影",
+    "wildcard": "ワイルドカード",
+    "finish": "質感",
+    "palette": "パレット",
+    "spectralClass": "スペクトル型",
+    "massBalance": "質量バランス",
+    "fate": "運命",
+    "chaos": "カオス",
+    "syzygies": "朔望",
+    "cycle": "サイクル",
+    "imprinted": "刻印",
+    "allocation": "配分"
+  },
+  "hints": {
+    "structure": "三つの軌道を描く主要な描画語彙。",
+    "underlay": "主要な構造の下に重ねられた、より淡い第二の語彙。",
+    "accent": "構造の上にまばらに描かれる強調の語彙。",
+    "symmetry": "構図に施される折り返し：鏡像、ロゼット、マンダラ。",
+    "projection": "軌跡を描き出す座標空間。",
+    "wildcard": "通常の描画規則を破る、珍しい変種。",
+    "finish": "最終フレームに適用される後処理の効果。",
+    "palette": "三つの天体の色の系統と調和の配色。",
+    "spectralClass": "主となる天体の恒星色の型。青白のOから赤のMまで。",
+    "massBalance": "三つの質量の比較：重い主星が一つ、双子の対、あるいは三つが等しい。",
+    "fate": "シミュレーションの結末：束縛された永遠の舞か、一つの天体の放出か。",
+    "chaos": "初期条件への感度。0（秩序）から100（乱流）までのスコア。",
+    "syzygies": "三つの天体がすべて一直線に並んだ瞬間。",
+    "cycle": "このNFTが刻印されたパフォーマンス・サイクル。",
+    "imprinted": "このNFTがArbitrumに刻印された時刻。",
+    "allocation": "このNFTを最初の受領者に届けた配分。"
+  },
+  "values": {
+    "vocabulary": {
+      "orbitRibbons": "軌道リボン",
+      "timeChords": "時の和音",
+      "harmonicWeave": "調和の織り",
+      "tangentCaustics": "接線コースティクス",
+      "stippleConstellation": "点描星座",
+      "nebulaVeil": "星雲のヴェール"
+    },
+    "symmetry": {
+      "mirror": "鏡像",
+      "rosette": "ロゼット×{n}",
+      "mandala": "マンダラ×{n}"
+    },
+    "projection": {
+      "crossBraid": "交差編み",
+      "phasePortrait": "位相図",
+      "hodograph": "ホドグラフ"
+    },
+    "wildcard": {
+      "yes": "あり"
+    },
+    "finish": {
+      "stardust": "星屑",
+      "prism": "プリズム"
+    },
+    "massBalance": {
+      "heavyPrimary": "重い主星",
+      "twinBinary": "双子の連星",
+      "equalTrio": "均等な三体"
+    },
+    "fate": {
+      "eternalDance": "永遠の舞",
+      "ejection": "放出"
+    },
+    "allocation": {
+      "stellarSelection": "星選",
+      "anchoredSelection": "係留星選",
+      "finalGesture": "最後の一筆",
+      "lastCstGesture": "最後のCST一筆",
+      "enduranceChampion": "持久チャンピオン",
+      "chronoWarrior": "時の戦士"
+    },
+    "palette": {
+      "pattern": "{hue}{scheme}",
+      "hues": {
+        "amber": "アンバー",
+        "aurora": "オーロラ",
+        "cerulean": "セルリアン",
+        "ember": "残り火",
+        "glacial": "氷河",
+        "jade": "翡翠",
+        "nebular": "星雲",
+        "orchid": "蘭",
+        "rose": "薔薇",
+        "sapphire": "サファイア",
+        "solar": "太陽",
+        "violet": "菫"
+      },
+      "schemes": {
+        "mono": "単色",
+        "split": "分裂",
+        "analogous": "類似",
+        "triad": "三色",
+        "complementary": "補色",
+        "tetrad": "四色"
+      }
+    },
+    "spectralClass": {
+      "O": {
+        "label": "O型",
+        "tone": "青、最も高温の型"
+      },
+      "B": {
+        "label": "B型",
+        "tone": "青白"
+      },
+      "A": {
+        "label": "A型",
+        "tone": "白"
+      },
+      "F": {
+        "label": "F型",
+        "tone": "黄白"
+      },
+      "G": {
+        "label": "G型",
+        "tone": "黄、太陽と同じ"
+      },
+      "K": {
+        "label": "K型",
+        "tone": "橙"
+      },
+      "M": {
+        "label": "M型",
+        "tone": "赤、最も低温の型"
+      }
+    }
+  },
+  "groups": {
+    "composition": "構図",
+    "physics": "軌道の物理",
+    "provenance": "来歴",
+    "media": "メディア"
+  },
+  "card": {
+    "chaosAria": "カオス{value}（最大{max}）",
+    "chaosShort": "カオス{value}",
+    "syzygiesAria": "朔望{count}回",
+    "syzygiesShort": "朔望{count}",
+    "hueStripAria": "三つの天体のパレットの色相",
+    "spectralAria": "スペクトル型{value}",
+    "fateAria": "運命：{value}",
+    "quickView": "クイックビュー",
+    "quickViewAria": "Cosmic Signature {id}のクイックビュー",
+    "traitsPending": "特性は準備中",
+    "traitsPendingTooltip": "このシグネチャーの特性メタデータはまだ公開されていません。",
+    "cycleShort": "C{n}",
+    "cycleLong": "サイクル{n}",
+    "cycleTooltip": "サイクル{n}で刻印",
+    "viewCycle": "サイクル{n}を見る"
+  },
+  "rarity": {
+    "rank": "#{rank}",
+    "rankLabel": "希少度ランク",
+    "rankOf": "{total}点中{rank}位",
+    "tooltip": "希少度ランク{total}点中{rank}位：このシグネチャーの特性がコレクション全体でどれほど珍しいかを示します。最も希少な特性：{trait}。",
+    "tooltipNoTrait": "希少度ランク{total}点中{rank}位：このシグネチャーの特性がコレクション全体でどれほど珍しいかを示します。",
+    "rarest": "最も希少な特性",
+    "share": "{total}点中{count}点が共有",
+    "shareShort": "{count}/{total}",
+    "scoreLabel": "希少度スコア",
+    "unavailable": "まだランク付けされていません"
+  },
+  "facets": {
+    "title": "特性",
+    "toggle": "特性",
+    "toggleWithCount": "特性 · {count}",
+    "toggleAria": "特性で絞り込む",
+    "clearAll": "すべてクリア",
+    "clearFacet": "{trait}をクリア",
+    "activeAria": "有効な特性フィルター",
+    "removeFilter": "{trait}のフィルターを外す：{value}",
+    "optionAria": "{value}：{count}点のNFT",
+    "chaosRange": "カオスの範囲",
+    "chaosMin": "カオスの最小値",
+    "chaosMax": "カオスの最大値",
+    "chaosValue": "{min}〜{max}",
+    "showMore": "さらに{count}件を表示",
+    "showLess": "表示を減らす",
+    "sheetTitle": "特性で絞り込む",
+    "sheetDescription": "各シグネチャーの構図、物理、来歴でアーカイブを絞り込みます。",
+    "loading": "特性をインデックス中…",
+    "partial": "特性インデックスはまだ作成中です（{total}点中{indexed}点）",
+    "unavailable": "特性フィルターは現在利用できません。",
+    "retry": "再試行",
+    "matches": "{count}点のNFTが一致"
+  },
+  "quickView": {
+    "title": "Cosmic Signature {id}",
+    "description": "このシグネチャーの特性、軌道の物理、来歴。",
+    "openDetail": "ページ全体を開く",
+    "playSweep": "スペクトルスイープを再生",
+    "sweepNote": "メディアサーバーから大きな動画をストリーミングします",
+    "hideSweep": "アートワークに戻る",
+    "previous": "前のシグネチャー",
+    "next": "次のシグネチャー",
+    "close": "クイックビューを閉じる",
+    "imageAlt": "Cosmic Signature {id}のアートワーク",
+    "loading": "特性を読み込み中…"
+  },
+  "panel": {
+    "title": "シグネチャーの特性",
+    "subtitle": "すべての特性はオンチェーンのシードから導かれます。同じシードなら、同じピクセルです。",
+    "loading": "特性を読み込み中…",
+    "unavailable": "このシグネチャーの特性メタデータはまだ公開されていません。メタデータが再生成されると、構図と物理がここに表示されます。",
+    "error": "特性メタデータを読み込めませんでした。",
+    "retry": "再試行",
+    "masses": "天体の質量",
+    "massAria": "天体{index}：質量{value}",
+    "closestApproach": "最接近",
+    "closestApproachValue": "天体{a}と{b}、距離{distance}",
+    "totalEnergy": "全エネルギー",
+    "angularMomentum": "角運動量",
+    "equilateralness": "正三角形度",
+    "braid": "ブレイド語",
+    "braidCrossings": "交差{count}回",
+    "integrator": "積分器",
+    "steps": "{steps}ステップ",
+    "ejectionStep": "ステップ{step}で放出",
+    "horizonSteps": "地平線{steps}ステップ",
+    "dominantWavelength": "主波長",
+    "nanometres": "{value} nm",
+    "hueDispersion": "色相の分散",
+    "degrees": "{value}°",
+    "halation": "ハレーション",
+    "metadataVersion": "メタデータのバージョン",
+    "image": "画像",
+    "animation": "アニメーション",
+    "dimensions": "{width} × {height}",
+    "duration": "{seconds}秒",
+    "sha256": "SHA-256",
+    "copyHash": "ハッシュをコピー",
+    "copied": "コピーしました",
+    "webImage": "Web画像（WebP）",
+    "sourceImage": "元画像（PNG）",
+    "hqVideo": "高画質動画",
+    "spectralSweep": "スペクトルスイープ",
+    "assetManifest": "アセットマニフェスト",
+    "traitSource": "特性のソース",
+    "external": "ファイルを新しいタブで開きます"
+  },
+  "dna": {
+    "title": "コレクションDNA",
+    "subtitle": "アーカイブが主要な特性ごとにどう分かれているか。セグメントを選ぶとギャラリーを絞り込めます。",
+    "segmentAria": "{value}：{count}点のNFT。この特性で絞り込みます。",
+    "legendCount": "{count}",
+    "loading": "コレクションの特性を読み取り中…"
+  }
+}

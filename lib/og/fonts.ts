@@ -68,6 +68,9 @@ export const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
   // Hangul syllable blocks share the CJK square rhythm (Noto Sans KR is the
   // Korean cut of Noto Sans CJK), so the CJK layout metrics apply.
   ko: { font: ogFont('Noto Sans KR', 'NotoSansKR-700.subset.ttf', NOTO_CJK_LICENSE), cjk: true },
+  // The Japanese cut: kanji follow the JIS glyph standard, which differs
+  // from every Chinese cut, and kana need a Japanese face.
+  ja: { font: ogFont('Noto Sans JP', 'NotoSansJP-700.subset.ttf', NOTO_CJK_LICENSE), cjk: true },
 };
 
 /** OG typography (font buffer requirement + CJK layout flag) for a locale. */

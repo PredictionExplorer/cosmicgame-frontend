@@ -2,6 +2,7 @@ import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
 import { LANDING_STRUCTURE, type LandingStageText, type LandingText } from './structure';
 import { landingTextEn } from './text.en';
+import { landingTextJa } from './text.ja';
 import { landingTextKo } from './text.ko';
 import { landingTextUk } from './text.uk';
 import { landingTextZh } from './text.zh';
@@ -156,6 +157,7 @@ export const landingContentZhTw: LandingContent = buildLandingContent(landingTex
 export const landingContentZhHk: LandingContent = buildLandingContent(landingTextZhHk);
 export const landingContentUk: LandingContent = buildLandingContent(landingTextUk);
 export const landingContentKo: LandingContent = buildLandingContent(landingTextKo);
+export const landingContentJa: LandingContent = buildLandingContent(landingTextJa);
 
 const LANDING_CONTENT: LocaleRecord<LandingContent> = {
   en: landingContentEn,
@@ -164,6 +166,7 @@ const LANDING_CONTENT: LocaleRecord<LandingContent> = {
   'zh-HK': landingContentZhHk,
   uk: landingContentUk,
   ko: landingContentKo,
+  ja: landingContentJa,
 };
 
 export function getLandingContent(locale: string): LandingContent {

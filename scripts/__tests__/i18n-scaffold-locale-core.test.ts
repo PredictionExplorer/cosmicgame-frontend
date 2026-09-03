@@ -36,14 +36,14 @@ function fixtureTree(): string {
 
 describe('scaffoldLocaleProblem', () => {
   it('accepts a canonical tag that is not yet a routing locale', () => {
-    expect(scaffoldLocaleProblem('ja')).toBeUndefined();
+    expect(scaffoldLocaleProblem('de')).toBeUndefined();
     expect(scaffoldLocaleProblem('pt-BR')).toBeUndefined();
   });
 
   it('rejects malformed, non-canonical, and already registered tags', () => {
     expect(scaffoldLocaleProblem('not a tag')).toMatch(/not a BCP 47/);
     expect(scaffoldLocaleProblem('zh_tw')).toMatch(/not a BCP 47/);
-    expect(scaffoldLocaleProblem('JA')).toMatch(/write it as "ja"/);
+    expect(scaffoldLocaleProblem('DE')).toMatch(/write it as "de"/);
     expect(scaffoldLocaleProblem('zh-tw')).toMatch(/write it as "zh-TW"/);
     for (const locale of routing.locales) {
       expect(scaffoldLocaleProblem(locale)).toMatch(/already a routing locale/);

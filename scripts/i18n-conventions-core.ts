@@ -236,6 +236,71 @@ export const LOCALE_CONVENTIONS: Record<TranslatedLocale, LocaleConventions | nu
       },
     ],
   },
+  // Japanese (docs/i18n/style-guide-ja.md): one language, three scripts, and
+  // a handful of defects a regular expression catches reliably.
+  ja: {
+    styleGuide: 'docs/i18n/style-guide-ja.md',
+    script: null,
+    disallowedPatterns: [
+      {
+        pattern: /[\uff61-\uff9f]/,
+        reason: 'half-width katakana; write full-width katakana (style-guide-ja §4)',
+      },
+      {
+        pattern: /[\uff10-\uff19\uff21-\uff3a\uff41-\uff5a]/,
+        reason:
+          'full-width digits or Latin letters; use ASCII digits and letters (style-guide-ja §4)',
+      },
+      {
+        pattern: /\u3000/,
+        reason:
+          'ideographic space U+3000; Japanese UI copy never spaces with it (style-guide-ja §4)',
+      },
+      {
+        // Full-width punctuation belongs after Japanese text; an ASCII period,
+        // comma, question or exclamation mark there is a leftover from the
+        // English source. Digits and Latin keep their ASCII marks ("1.5 ETH").
+        pattern:
+          /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー][.,?!](?=\s|$|["'」』)])/u,
+        reason:
+          'ASCII sentence punctuation after Japanese text; write 。、？！ (style-guide-ja §4)',
+      },
+      {
+        // Three ASCII dots count only next to Japanese text, so a spread
+        // (`...sections`) in a copy module is not an ellipsis.
+        pattern:
+          /(?<=[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー])\.\.\.|\.\.\.(?=[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー」』])|・・・|。。。|‥/u,
+        reason: 'three dots or nakaguro run as an ellipsis; write a single … (style-guide-ja §4)',
+      },
+      {
+        // Japanese does not space words: a half-width space between Japanese
+        // text and a Latin token, digit, or placeholder is the English
+        // source showing through (48時間, Cosmic Signatureは, {count}件). A
+        // `#42`-style identifier may keep its space.
+        pattern:
+          /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー。、] [A-Za-z0-9{]|[A-Za-z0-9}%] [\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー]/u,
+        reason:
+          'space between Japanese text and a Latin token, digit, or placeholder; Japanese runs them together (style-guide-ja §4)',
+      },
+      {
+        pattern: /あなた|貴方|貴殿|貴女/,
+        reason: 'second-person pronoun; Japanese drops the subject (style-guide-ja §2)',
+      },
+      {
+        // Dropped long vowels are a prefix of the canonical spelling, so the
+        // terminology gate (substrings) cannot express them.
+        pattern: /(?:ユーザ|サーバ|ブラウザ|コンピュータ|シグネチャ|プレイヤ|フォルダ)(?![ー])/,
+        reason:
+          'katakana loanword without its long vowel; write ユーザー / サーバー / ブラウザー / シグネチャー (style-guide-ja §4)',
+      },
+      {
+        // Characters that exist only in Simplified or Traditional Chinese
+        // orthography mark Chinese copy pasted into a Japanese catalog.
+        pattern: /[们这們這麼嗎么怎您沒]/,
+        reason: 'Chinese-only character; this is not Japanese (style-guide-ja §1)',
+      },
+    ],
+  },
 };
 
 export interface ConventionViolation {

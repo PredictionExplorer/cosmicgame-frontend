@@ -1,0 +1,94 @@
+{
+  "invalid": {
+    "title": "トークンIDが無効です"
+  },
+  "jsonLd": {
+    "productName": "Cosmic Signature NFT #{id}",
+    "productDescription": "プロシージャル・オンチェーンアート・プロトコルCosmic Signatureから生まれた、三体問題の物理からレンダリングされたユニークなジェネラティブNFT。",
+    "breadcrumbToken": "トークン #{id}"
+  },
+  "breadcrumb": {
+    "tokenFallback": "トークン{id}"
+  },
+  "hero": {
+    "unnamedToken": "名前のないトークン"
+  },
+  "badges": {
+    "stellarSelectionRecipient": "星選の受領者",
+    "anchorRecipient": "係留の受領者",
+    "cycleRecipient": "サイクル受領者",
+    "enduranceChampion": "持久チャンピオン",
+    "receivedAsCycleRecipient": "サイクル{round}のサイクル受領者として受領",
+    "receivedAs": "{label}として受領",
+    "eligibleForAnchoring": "係留可能",
+    "eligibleForAnchoringTooltip": "このCosmic Signature NFTはまだ係留されたことがなく、係留するとETHの係留配分を受け取れます。",
+    "alreadyAnchored": "係留済み",
+    "alreadyAnchoredTooltip": "このトークンはすでに係留されたことがあり、再び係留することはできません。"
+  },
+  "share": {
+    "trigger": "共有",
+    "copyVideoLink": "動画リンクをコピー",
+    "copyImageLink": "画像リンクをコピー",
+    "copyPageLink": "ページリンクをコピー"
+  },
+  "actions": {
+    "buyOrSellNfts": "NFTを売買する",
+    "viewCycleDetails": "サイクル{round}の詳細を見る"
+  },
+  "navigation": {
+    "previousToken": "前のトークン",
+    "nextToken": "次のトークン"
+  },
+  "sections": {
+    "nameHistory": "名前の履歴",
+    "ownershipHistory": "所有権の履歴"
+  },
+  "transferDialog": {
+    "title": "移転の確認",
+    "description": "送付先のアカウントにはトランザクション履歴がないようです。本当にこのアドレスへトークンを送りますか？もう一度ご確認ください。",
+    "confirm": "はい、移転します"
+  },
+  "ownerActions": {
+    "title": "トークンを管理する",
+    "titleTooltip": "現在の所有者として、このトークンをMetaMaskに表示したり、移転したり、任意の名前を付けたりできます。",
+    "metaMaskHeading": "MetaMaskに表示",
+    "metaMaskTooltip": "MetaMaskブラウザー拡張機能にこのNFTの表示を求めます。NFTのインポートは実験的な機能で、MetaMask Mobileでは利用できません。",
+    "addToMetaMask": "NFTをMetaMaskに追加",
+    "addingToMetaMask": "NFTをMetaMaskに追加しています…",
+    "transferHeading": "移転",
+    "transferTooltip": "このトークンを別のEthereumアドレスへ送ります。確認する前にアドレスをもう一度確かめてください。移転は取り消せません。",
+    "recipientPlaceholder": "送付先アドレス（0x…）",
+    "transferButton": "移転",
+    "nameHeading": "トークンに名前を付ける",
+    "renameHeading": "トークン名を変更",
+    "nameTooltip": "トークンに任意の名前を付けられます（最大32バイト）。名前付きトークンは名前付きNFTのページに表示されます。",
+    "namePlaceholder": "トークン名を入力",
+    "setName": "名前を設定",
+    "changeName": "名前を変更",
+    "clearName": "クリア",
+    "namedTokensCount": "名前の付いたトークンは{count}件あります。",
+    "viewAllNamedTokens": "名前付きトークンをすべて見る"
+  },
+  "metadata": {
+    "imprinted": "刻印日時",
+    "imprintedTooltip": "このトークンがオンチェーンに刻印された時刻です。クリックするとトランザクションを表示します。",
+    "cycle": "サイクル",
+    "cycleTooltip": "このトークンが配分されたパフォーマンス・サイクルです。クリックするとサイクルの詳細を表示します。",
+    "recipient": "受領者",
+    "recipientTooltip": "パフォーマンス・サイクルの中でこのトークンを最初に受領したアドレスです。",
+    "owner": "所有者",
+    "ownerTooltip": "このトークンの現在の保有者です。トークンが移転されていれば受領者と異なることがあります。",
+    "roundNumber": "サイクル{round}",
+    "seed": "シード",
+    "seedTooltip": "このトークンのアートワークと特性の生成に使われた唯一の乱数シードです。",
+    "copySeed": "シードをコピー"
+  },
+  "video": {
+    "watchAnimation": "アニメーションを見る",
+    "watchAnimationTooltip": "各Cosmic Signature NFTには、そのシードから導かれた固有のジェネラティブアニメーションがあります。クリックして再生します。"
+  },
+  "image": {
+    "defaultAlt": "NFT",
+    "artworkUnavailable": "アートワークを利用できません"
+  }
+}

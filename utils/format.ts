@@ -1,6 +1,7 @@
 import { formatUnits } from 'viem';
 
 import enFormats from '@/messages/en/formats.json';
+import jaFormats from '@/messages/ja/formats.json';
 import koFormats from '@/messages/ko/formats.json';
 import ukFormats from '@/messages/uk/formats.json';
 import zhFormats from '@/messages/zh/formats.json';
@@ -56,6 +57,7 @@ const DURATION_UNITS: LocaleRecord<DurationUnitLabels> = {
   'zh-HK': zhHkFormats.durationCompact,
   uk: ukFormats.durationCompact,
   ko: koFormats.durationCompact,
+  ja: jaFormats.durationCompact,
 };
 
 /**
@@ -158,24 +160,27 @@ interface TimestampParts {
 }
 
 /**
- * Chinese date templates. The calendar characters 年/月/日 and the 24-hour
- * clock are identical in Simplified and Traditional script and in every
- * Chinese region, so the three Chinese locales share one implementation
- * (unlike catalog copy, which differs by vocabulary and register).
+ * Han-character date templates. The calendar characters 年/月/日 and the
+ * 24-hour clock are identical in Simplified and Traditional script, in every
+ * Chinese region, and in Japanese, so the three Chinese locales and `ja`
+ * share one implementation (unlike catalog copy, which differs by
+ * vocabulary and register).
  */
-const chineseTimestamp = ({ monthIndex, day, hours, minutes }: TimestampParts): string =>
+const hanTimestamp = ({ monthIndex, day, hours, minutes }: TimestampParts): string =>
   `${monthIndex + 1}月${day}日 ${hours}:${minutes}`;
 
 const TIMESTAMP_DATETIME_FORMATS: LocaleRecord<(parts: TimestampParts) => string> = {
   en: ({ monthIndex, day, hours, minutes }) =>
     `${MONTH_LABELS[monthIndex]} ${('0' + day).slice(-2)}, ${hours}:${minutes}`,
-  zh: chineseTimestamp,
-  'zh-TW': chineseTimestamp,
-  'zh-HK': chineseTimestamp,
+  zh: hanTimestamp,
+  'zh-TW': hanTimestamp,
+  'zh-HK': hanTimestamp,
   uk: ({ monthIndex, day, hours, minutes }) =>
     `${day} ${shortMonthLabel('uk', monthIndex)}, ${hours}:${minutes}`,
   // "1월 5일 12:34": Sino-Korean month and day counters attach to the digits.
   ko: ({ monthIndex, day, hours, minutes }) => `${monthIndex + 1}월 ${day}일 ${hours}:${minutes}`,
+  // "1月5日 12:34", the same 月/日 template as Chinese (style-guide-ja §5).
+  ja: hanTimestamp,
 };
 
 /**
@@ -348,18 +353,20 @@ export function fromYyyymmdd(yyyymmdd: string): string {
   return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`;
 }
 
-const chineseCalendarDate = (year: number, monthIndex: number, day: number): string =>
+const hanCalendarDate = (year: number, monthIndex: number, day: number): string =>
   `${year}/${monthIndex + 1}/${day}`;
 
 const CALENDAR_DATE_LABEL_FORMATS: LocaleRecord<
   (year: number, monthIndex: number, day: number) => string
 > = {
   en: (year, monthIndex, day) => `${MONTH_LABELS[monthIndex] ?? ''} ${day}, ${year}`,
-  zh: chineseCalendarDate,
-  'zh-TW': chineseCalendarDate,
-  'zh-HK': chineseCalendarDate,
+  zh: hanCalendarDate,
+  'zh-TW': hanCalendarDate,
+  'zh-HK': hanCalendarDate,
   uk: (year, monthIndex, day) => numericDate('uk', year, monthIndex, day),
   ko: koreanNumericDate,
+  // "2026/1/5": the slash-separated numeric date Intl renders for ja-JP.
+  ja: hanCalendarDate,
 };
 
 /** Formats YYYYMMDD for chart axis / tooltip labels. */
@@ -386,7 +393,7 @@ export function yyyymmddTodayUtc(): string {
   return yyyymmddDaysAgoUtc(0);
 }
 
-const chineseUtcDateTime = (
+const hanUtcDateTime = (
   year: number,
   monthIndex: number,
   day: number,
@@ -399,17 +406,19 @@ const UTC_DATETIME_LABEL_FORMATS: LocaleRecord<
 > = {
   en: (year, monthIndex, day, hh, mm) =>
     `${MONTH_LABELS[monthIndex] ?? ''} ${day}, ${year} ${hh}:${mm} UTC`,
-  zh: chineseUtcDateTime,
-  'zh-TW': chineseUtcDateTime,
-  'zh-HK': chineseUtcDateTime,
+  zh: hanUtcDateTime,
+  'zh-TW': hanUtcDateTime,
+  'zh-HK': hanUtcDateTime,
   uk: (year, monthIndex, day, hh, mm) =>
     `${numericDate('uk', year, monthIndex, day)} ${hh}:${mm} UTC`,
   ko: (year, monthIndex, day, hh, mm) =>
     `${koreanNumericDate(year, monthIndex, day)} ${hh}:${mm} UTC`,
+  // Japanese writes 年月日 dates and full-width parentheses like Chinese.
+  ja: hanUtcDateTime,
 };
 
-const chineseUtcStamp = (date: Date): string =>
-  chineseUtcDateTime(
+const hanUtcStamp = (date: Date): string =>
+  hanUtcDateTime(
     date.getUTCFullYear(),
     date.getUTCMonth(),
     date.getUTCDate(),
@@ -419,9 +428,9 @@ const chineseUtcStamp = (date: Date): string =>
 
 const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
   en: (date) => `${date.toISOString().replace('T', ' ').slice(0, 16)} UTC`,
-  zh: chineseUtcStamp,
-  'zh-TW': chineseUtcStamp,
-  'zh-HK': chineseUtcStamp,
+  zh: hanUtcStamp,
+  'zh-TW': hanUtcStamp,
+  'zh-HK': hanUtcStamp,
   uk: (date) =>
     `${numericDate('uk', date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())} ${String(
       date.getUTCHours(),
@@ -430,6 +439,7 @@ const UTC_STAMP_FORMATS: LocaleRecord<(date: Date) => string> = {
     `${koreanNumericDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())} ${String(
       date.getUTCHours(),
     ).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')} UTC`,
+  ja: hanUtcStamp,
 };
 
 /**

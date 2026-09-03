@@ -7,6 +7,7 @@ import {
   type FAQText,
 } from './structure';
 import { faqTextEn } from './text.en';
+import { faqTextJa } from './text.ja';
 import { faqTextKo } from './text.ko';
 import { faqTextUk } from './text.uk';
 import { faqTextZh } from './text.zh';
@@ -49,6 +50,7 @@ export const faqContentZhTw: FAQContent = buildFaqContent(faqTextZhTw);
 export const faqContentZhHk: FAQContent = buildFaqContent(faqTextZhHk);
 export const faqContentUk: FAQContent = buildFaqContent(faqTextUk);
 export const faqContentKo: FAQContent = buildFaqContent(faqTextKo);
+export const faqContentJa: FAQContent = buildFaqContent(faqTextJa);
 
 const FAQ_CONTENT: LocaleRecord<FAQContent> = {
   en: faqContentEn,
@@ -57,6 +59,7 @@ const FAQ_CONTENT: LocaleRecord<FAQContent> = {
   'zh-HK': faqContentZhHk,
   uk: faqContentUk,
   ko: faqContentKo,
+  ja: faqContentJa,
 };
 
 export function getFaqContent(locale: string): FAQContent {

@@ -1,0 +1,68 @@
+{
+  "timer": {
+    "cycle": {
+      "current": "現在のサイクル",
+      "numbered": "サイクル{number}",
+      "generic": "パフォーマンス・サイクル"
+    },
+    "phases": {
+      "loading": {
+        "title": "サイクルの地平線を同期しています",
+        "body": "カウントダウンを表示する前に、プロトコルのライブ時計を読み取っています。"
+      },
+      "openingSoon": {
+        "title": "{cycle}はまもなく始まります",
+        "body": "次のサイクルが開始の準備をしています。このカウントダウンがゼロになると、一筆を入れられるようになります。"
+      },
+      "waitingFirstGesture": {
+        "title": "{cycle}は最初の一筆を待っています",
+        "body": "最初の一筆がサイクル確定時刻に火を入れ、次のシグネチャーを形づくり始めます。"
+      },
+      "approach": {
+        "title": "{cycle}の確定まで",
+        "body": "サイクルは進行中です。一筆ごとにシグネチャーが形づくられ、確定までの時計が延びることがあります。"
+      },
+      "finalHour": {
+        "title": "{cycle}は最後の1時間に入りました",
+        "body": "新しい一筆はそれぞれ地平線を延ばし、変化し続けるシグネチャーにもう一つの痕跡を残せます。"
+      },
+      "nearHorizon": {
+        "title": "{cycle}は地平線の間近です",
+        "body": "サイクル確定時刻がもう目の前です。これからの数瞬が最終的な形を決めます。"
+      },
+      "ready": {
+        "title": "{cycle}は確定できる状態です",
+        "body": "地平線は閉じました。プロトコルはサイクルを最終シグネチャーへ変える準備ができています。"
+      },
+      "unavailable": {
+        "title": "ライブのサイクル時計を利用できません",
+        "body": "ランディングページからプロトコルの時計に到達できませんでした。最新のサイクル状態はアプリで確認してください。"
+      },
+      "live": {
+        "title": "{cycle}の確定まで",
+        "body": "アプリに表示されているものと同じ、ライブのサイクル確定時刻です。一筆ごとにシグネチャーが形づくられ、地平線が延びることがあります。"
+      }
+    },
+    "staticClock": {
+      "waitingFirstGesture": "最初の一筆を待っています",
+      "ready": "00:00",
+      "unavailable": "時計を利用できません",
+      "syncing": "同期中"
+    },
+    "liveClock": "ライブのサイクル時計",
+    "gestureCount": "{count, plural, other {#筆}}",
+    "sameClock": "アプリと同じ時計",
+    "status": {
+      "ready": "確定できる状態",
+      "openingSoon": "サイクル開始までのカウントダウン",
+      "waitingFirstGesture": "開始済み、最初の一筆を待っています",
+      "synchronized": "プロトコル時刻に同期したカウントダウン"
+    },
+    "openLiveCycle": "進行中のサイクルを開く",
+    "viewCstPool": "GeckoTerminalのCSTプール",
+    "eventHorizon": "事象の地平線",
+    "countdownAria": "{label}：{duration}",
+    "durationPart": "{value}{unit}",
+    "durationSeparator": " "
+  }
+}

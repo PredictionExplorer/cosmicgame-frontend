@@ -16,6 +16,7 @@
 import type { TranslatedLocale } from '../i18n/routing';
 
 import { buildTermPattern, type TermMatcher } from './locale-text-matchers';
+import { JA_TERMINOLOGY_RULES } from './terminology/ja';
 import { KO_TERMINOLOGY_RULES } from './terminology/ko';
 import { UK_TERMINOLOGY_RULES } from './terminology/uk';
 import { ZH_TERMINOLOGY_RULES } from './terminology/zh';
@@ -74,6 +75,13 @@ export const TERMINOLOGY_PACKS: Record<TranslatedLocale, TerminologyPack> = {
     // so drift is matched as substrings, as for the Chinese locales.
     matcher: 'cjk-substring',
     rules: KO_TERMINOLOGY_RULES,
+  },
+  ja: {
+    glossary: 'docs/i18n/glossary-ja.md',
+    // No word spaces and particles glued to the noun: substrings, as for
+    // Chinese and Korean.
+    matcher: 'cjk-substring',
+    rules: JA_TERMINOLOGY_RULES,
   },
 };
 

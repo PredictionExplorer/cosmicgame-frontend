@@ -1,0 +1,43 @@
+{
+  "tagline": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。すべての一筆が、サイクルの最終シグネチャーを形づくります。",
+  "sections": {
+    "protocol": "プロトコル",
+    "explore": "探索",
+    "ecosystem": "エコシステム",
+    "resources": "リソース",
+    "community": "コミュニティ"
+  },
+  "links": {
+    "gallery": "ギャラリー",
+    "currentCycle": "現在のサイクル",
+    "statistics": "統計",
+    "contracts": "コントラクト",
+    "sourceCode": "ソースコード",
+    "allocationRecipients": "配分の受領者",
+    "anchorDistributions": "係留配分",
+    "outreachReserve": "広報準備金",
+    "howItWorks": "仕組み",
+    "faq": "よくある質問",
+    "axiomZero": "Axiom Zeroマーケットプレイス",
+    "chaosZero": "Chaos Zeroの予測",
+    "uniswap": "UniswapでCSTを取引",
+    "geckoTerminal": "GeckoTerminalでCSTプールを見る",
+    "about": "概要",
+    "learn": "学ぶ",
+    "whitePaper": "ホワイトペーパー",
+    "audits": "セキュリティ監査",
+    "siteMap": "サイトマップ",
+    "protocolGuild": "Protocol Guild",
+    "twitter": "Twitter / X",
+    "discord": "Discord",
+    "discover": "知る",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー"
+  },
+  "social": {
+    "twitterLabel": "Twitter",
+    "discordLabel": "Discord"
+  },
+  "copyright": "© {year} Cosmic Signature · プロジェクト所有の素材 · CC0 1.0",
+  "colophon": "CC0 · 検証済み · 再現可能"
+}

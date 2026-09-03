@@ -1,0 +1,74 @@
+{
+  "page": {
+    "eyebrow": "管理者 · 制限付き",
+    "title": "管理者",
+    "subtitle": "一筆の管理とシステム管理",
+    "gestureList": "一筆の一覧",
+    "loading": "読み込み中…"
+  },
+  "settings": {
+    "title": "管理メソッド",
+    "subtitle": "ダッシュボードのコントラクトアドレスとパラメーターの読み取り専用ビュー。",
+    "breadcrumbs": {
+      "home": "ホーム",
+      "admin": "管理者",
+      "settings": "設定"
+    },
+    "loading": "読み込み中…",
+    "contractTitle": "Cosmic Signatureコントラクト",
+    "contractDescription": "ダッシュボードAPIから取得したコントラクトアドレスとオンチェーンのパラメーター。",
+    "placeholders": {
+      "address": "アドレスを入力",
+      "number": "数値を入力"
+    },
+    "actions": {
+      "setAddress": "アドレスを設定",
+      "set": "設定"
+    },
+    "fields": {
+      "cosmicSignatureNft": "Cosmic Signature NFT（ERC-721）コントラクトアドレス",
+      "cstToken": "Cosmic Signature CSTトークン（ERC-20）コントラクトアドレス",
+      "publicGoodsVault": "公共財金庫コントラクトアドレス",
+      "randomWalkNft": "RandomWalk NFTコントラクトアドレス",
+      "stellarSelectionWallet": "星選ウォレットコントラクトアドレス",
+      "anchoringWallet": "係留ウォレットコントラクトアドレス",
+      "outreachWallet": "広報ウォレットコントラクトアドレス",
+      "businessLogic": "ビジネスロジックコントラクトアドレス",
+      "ethStellarRecipients": "サイクルあたりのETH星選受領者数",
+      "nftStellarRecipients": "サイクルあたりのNFT星選受領者数",
+      "nftHolderRecipients": "サイクルあたりのNFT保有者受領者数",
+      "signatureAllocationPercentage": "シグネチャー配分の割合",
+      "publicGoodsPercentage": "公共財の割合",
+      "stellarSelectionPercentage": "星選の割合",
+      "anchorDistributionPercentage": "係留配分の割合",
+      "timeIncrease": "時間増加",
+      "allocationTimeout": "シグネチャー配分の受け取りタイムアウト",
+      "priceIncrease": "価格上昇",
+      "nanosecondsExtra": "追加ナノ秒",
+      "initialAllocationSeconds": "シグネチャー配分までの初期秒数",
+      "initialGestureCostFraction": "初期一筆の費用の比率",
+      "activationTime": "有効化時刻",
+      "gestureRatio": "ETHとCSTの一筆の比率",
+      "calibrationWindowLength": "サイクル開始時のCST調律期間の長さ",
+      "switchMode": "モードの切り替え"
+    },
+    "modes": {
+      "runtime": "実行モード",
+      "maintenance": "メンテナンスモード"
+    }
+  },
+  "outreachTransfer": {
+    "title": "CST広報送付",
+    "subtitle": "設定された広報準備金ウォレットの署名者向けの、URL限定の送付ツール。",
+    "roleReadError": "広報準備金の所有者と財務担当者を読み取れませんでした。",
+    "walletRequiredTitle": "ウォレットが接続されていません",
+    "walletRequiredDescription": "CST広報配分を送付するには、現在の広報準備金の財務担当者ウォレットを接続してください。",
+    "walletUnavailableTitle": "広報ウォレットを利用できません",
+    "walletUnavailableDescription": "ダッシュボードはまだ広報ウォレットのアドレスを提供していません。",
+    "rolesLoadingTitle": "広報準備金の役割を読み込み中",
+    "rolesLoadingDescription": "コントラクトからMarketingWalletの所有者と財務担当者を読み取っています。",
+    "rolesErrorTitle": "広報準備金の役割を読み取れませんでした",
+    "restrictedTitle": "アクセスが制限されています",
+    "restrictedDescription": "このURL限定の送付ツールを使うには、現在の広報準備金の財務担当者（{treasurer}）を接続してください。所有者：{owner}。"
+  }
+}

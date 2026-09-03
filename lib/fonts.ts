@@ -2,6 +2,7 @@ import localFont from 'next/font/local';
 import {
   Inter,
   Noto_Sans_HK,
+  Noto_Sans_JP,
   Noto_Sans_KR,
   Noto_Sans_SC,
   Noto_Sans_TC,
@@ -107,6 +108,31 @@ export const notoSansKR = Noto_Sans_KR({
 });
 
 /**
+ * Japanese companion. Noto Sans JP is the Japanese cut of Noto Sans CJK: its
+ * kanji follow the JIS glyph standard (a Japanese reader shown the mainland
+ * or Taiwan forms of 直, 骨, or 令 sees text that looks Chinese), and it
+ * carries the kana the Chinese cuts only nominally cover. Swapped into
+ * `--cjk-font-stack` by `html:lang(ja)` (styles/global.css); same loading
+ * policy as the other cuts, with the Japanese faces macOS and Windows ship
+ * as system fallbacks.
+ */
+export const notoSansJP = Noto_Sans_JP({
+  weight: 'variable',
+  subsets: ['latin'],
+  variable: '--font-noto-jp',
+  display: 'optional',
+  preload: false,
+  fallback: [
+    'Hiragino Sans',
+    'Hiragino Kaku Gothic ProN',
+    'Yu Gothic',
+    'Meiryo',
+    'system-ui',
+    'sans-serif',
+  ],
+});
+
+/**
  * Cyrillic display companion for the Ukrainian locale (docs/i18n/README.md §5).
  *
  * Clash Display carries no Cyrillic glyphs, so `/uk` headings are set in
@@ -143,6 +169,7 @@ export const LOCALE_COMPANION_FONTS: LocaleRecord<FontWithVariable | null> = {
   'zh-HK': notoSansHK,
   uk: onest,
   ko: notoSansKR,
+  ja: notoSansJP,
 };
 
 /**

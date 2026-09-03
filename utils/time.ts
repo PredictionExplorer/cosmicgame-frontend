@@ -31,6 +31,15 @@ const ZH_HANT_RELATIVE_UNITS: Record<RelativeTimeUnit, string> = {
   year: '年',
 };
 
+/** Japanese units; か月 (not 個月/ヶ月) is the style guide's spelling for months. */
+const JA_RELATIVE_UNITS: Record<RelativeTimeUnit, string> = {
+  minute: '分',
+  hour: '時間',
+  day: '日',
+  month: 'か月',
+  year: '年',
+};
+
 /**
  * Chinese has no plural inflection, so every count shares one form; the
  * style guides ask for a space between the numeral and the CJK unit
@@ -46,7 +55,9 @@ const chineseRelativeTime = (units: Record<RelativeTimeUnit, string>, justNow: s
  * the Chinese locales follow their style guides' §4 with CJK–Latin spacing.
  * `uk` delegates to `Intl.RelativeTimeFormat`, which owns the four-way plural
  * agreement ("1 хвилину", "2 хвилини", "5 хвилин тому"); so does `ko`, whose
- * counters attach to the digit ("2시간 전", "3개월 전").
+ * counters attach to the digit ("2시간 전", "3개월 전"). `ja` does not: CLDR
+ * renders "2 時間前" with a space, while the Japanese style guide (§4) runs
+ * digits and counters together ("2時間前", "3か月前", "たった今").
  */
 const intlRelativeTime = (locale: string) => ({
   ago: (count: number, unit: RelativeTimeUnit) =>
@@ -65,6 +76,10 @@ const RELATIVE_TIME_LABELS: LocaleRecord<RelativeTimeLabels> = {
   'zh-HK': chineseRelativeTime(ZH_HANT_RELATIVE_UNITS, '剛剛'),
   uk: { justNow: 'щойно', ...intlRelativeTime('uk') },
   ko: { justNow: '방금', ...intlRelativeTime('ko') },
+  ja: {
+    justNow: 'たった今',
+    ago: (count, unit) => `${count}${JA_RELATIVE_UNITS[unit]}前`,
+  },
 };
 
 /** Converts a Unix timestamp (seconds) to a human-readable relative time string. */
@@ -101,6 +116,7 @@ const ISO_DATE_LABEL_FORMATS: LocaleRecord<(isoDate: string) => string> = {
   'zh-HK': longIsoDateLabel('zh-HK'),
   uk: longIsoDateLabel('uk'),
   ko: longIsoDateLabel('ko'),
+  ja: longIsoDateLabel('ja'),
 };
 
 /** Locale-appropriate display form of an ISO `YYYY-MM-DD` date string. */

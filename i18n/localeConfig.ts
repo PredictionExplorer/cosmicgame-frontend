@@ -142,6 +142,21 @@ const LOCALE_CONFIG: LocaleRecord<LocaleConfig> = {
     lowercaseMidSentence: false,
     showRawProviderErrors: false,
   },
+  ja: {
+    intlLocale: 'ja-JP',
+    scriptFamily: 'han',
+    jsonLdInLanguage: 'ja',
+    ogLocale: 'ja_JP',
+    textDirection: 'ltr',
+    // Japanese runs words together like Chinese: "1日2時間", "48時間".
+    wordSpacing: false,
+    // CLDR week data: Japanese calendars start on Sunday.
+    weekStartsMonday: false,
+    ellipsis: '…',
+    // Kana and kanji have no letter case.
+    lowercaseMidSentence: false,
+    showRawProviderErrors: false,
+  },
 };
 
 /** Resolves the rendering conventions for arbitrary locale-ish input. */

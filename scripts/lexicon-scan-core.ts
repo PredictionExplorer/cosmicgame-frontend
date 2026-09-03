@@ -820,6 +820,154 @@ export const KO_BANNED_TERMS: readonly string[] = [
 // lexicon-allow-end
 
 /**
+ * Japanese banned register (docs/i18n/glossary-ja.md §5): the words Japanese
+ * actually uses for the banned concepts. Japanese writes without spaces and
+ * attaches particles directly (投資を, 抽選で), so the terms are matched as
+ * substrings like the Chinese and Korean lists — which is also why several
+ * obvious candidates are deliberately absent: ロト hides in プロトコル
+ * "protocol", ベット in アルファベット "alphabet", プレイ in ディスプレイ
+ * "display", and bare くじ in ordinary hiragana runs, so the list carries
+ * 宝くじ / くじ引き / ベッティング / プレイヤー instead. Terms that a rarer
+ * innocent word contains stay banned and the glossary names the word to
+ * use instead (背景 for バックグラウンド, 関係者 for ステークホルダー, 損害 or
+ * 不都合 for 不利益).
+ *
+ * As in English and Chinese, the only sanctioned exception is FAQ/legal
+ * denial copy inside lexicon-allow pragmas (or `\uXXXX` escapes in JSON).
+ */
+// lexicon-allow-start: banned-term list for the scanner itself
+export const JA_BANNED_TERMS: readonly string[] = [
+  // auction / bidding
+  'オークション',
+  '競売',
+  '入札',
+  '落札',
+  '競り',
+  // prize / jackpot
+  '賞金',
+  '賞品',
+  '景品',
+  '懸賞',
+  '大当たり',
+  'ジャックポット',
+  // winner
+  '当選',
+  '勝者',
+  '優勝',
+  '勝利',
+  '受賞',
+  // lottery / raffle / sweepstakes
+  '抽選',
+  '抽籤',
+  '宝くじ',
+  'くじ引き',
+  'ロッタリー',
+  'ラッフル',
+  '福引',
+  'ガチャ',
+  // gambling / bets / odds
+  'ギャンブル',
+  '賭博',
+  '賭け',
+  '賭場',
+  'カジノ',
+  '胴元',
+  'オッズ',
+  'ベッティング',
+  'パチンコ',
+  // luck flavor
+  '幸運',
+  'ラッキー',
+  '運試し',
+  '一発逆転',
+  'チャンス',
+  // ticket
+  'チケット',
+  '参加券',
+  // game framing / competition
+  'ゲーム',
+  'ゲーマー',
+  'プレイヤー',
+  '勝負',
+  '対戦',
+  '対決',
+  'トーナメント',
+  '大会',
+  'コンテスト',
+  '競争',
+  '競技',
+  'バトル',
+  // securities / yield / earnings
+  '投資',
+  '利回り',
+  '収益',
+  '利益',
+  '利潤',
+  '儲け',
+  '儲かる',
+  '稼ぐ',
+  '稼げる',
+  '利息',
+  '利子',
+  '配当',
+  'リターン',
+  '収入',
+  '所得',
+  '資産運用',
+  '運用益',
+  '金利',
+  // tax
+  '免税',
+  '税控除',
+  // crypto slang
+  'ガチホ',
+  '爆上げ',
+  '億り人',
+  // staking
+  'ステーキング',
+  'ステーク',
+  'ロックアップ',
+  '預け入れ',
+  '預入',
+  // mint / mining
+  'ミント',
+  'ミンティング',
+  '鋳造',
+  'マイニング',
+  '採掘',
+  // withdraw / claim slang
+  '引き出し',
+  '出金',
+  'キャッシュアウト',
+  '換金',
+  '現金化',
+  'クレーム',
+  'ペイアウト',
+  '払い出し',
+  // charity / donation
+  '慈善',
+  'チャリティ',
+  '寄付',
+  '寄附',
+  '寄贈',
+  '募金',
+  '献金',
+  'ドネーション',
+  // DAO
+  'ダオ',
+  // marketing
+  'マーケティング',
+  '宣伝',
+  '広告',
+  '販促',
+  'プロモーション',
+  // round
+  'ラウンド',
+  '回戦',
+];
+// lexicon-allow-end
+
+/**
  * One banned-register profile per translated locale. The type forces a
  * decision the moment a locale joins routing.locales. The CLI applies a
  * profile to every locale-agnostic file and to every file of another
@@ -864,6 +1012,10 @@ export const LEXICON_PROFILES: Record<TranslatedLocale, LexiconProfile> = {
   ko: {
     glossary: 'docs/i18n/glossary-ko.md',
     termSets: [{ matcher: 'cjk-substring', terms: KO_BANNED_TERMS }],
+  },
+  ja: {
+    glossary: 'docs/i18n/glossary-ja.md',
+    termSets: [{ matcher: 'cjk-substring', terms: JA_BANNED_TERMS }],
   },
 };
 

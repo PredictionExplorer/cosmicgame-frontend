@@ -1,0 +1,424 @@
+{
+  "shared": {
+    "home": "ホーム",
+    "user": "ユーザー",
+    "walletNotConnected": "ウォレットが接続されていません",
+    "loading": "読み込み中…",
+    "unavailable": "取得不可",
+    "yes": "はい",
+    "no": "いいえ",
+    "datetime": "日時",
+    "from": "送付元",
+    "to": "送付先",
+    "tokenId": "トークンID",
+    "cycle": "サイクル",
+    "recipient": "受領者"
+  },
+  "allocations": {
+    "eyebrow": "個人 · 配分",
+    "title": "自分の配分",
+    "subtitle": "未受け取りの配分をすべて確認して受け取る",
+    "walletDescription": "配分を確認して受け取るにはウォレットを接続してください。",
+    "loadErrorTitle": "読み込みに失敗しました",
+    "loadErrorMessage": "未受け取りの配分データを読み込めませんでした",
+    "sections": {
+      "eth": "受け取れるETH配分",
+      "anchors": "Cosmic Signature NFTの係留配分",
+      "nfts": "添付されたNFT",
+      "erc20": "添付されたERC-20トークン"
+    },
+    "empty": {
+      "ethTitle": "ETH配分はまだありません",
+      "ethDescription": "一筆を入れて星選に参加すると、ETH配分を受け取れます。",
+      "nftTitle": "添付されたNFTはありません",
+      "nftDescription": "サイクル中に一筆に添付されたNFTがここに表示されます。",
+      "erc20Title": "添付されたトークンはありません",
+      "erc20Description": "サイクル中に一筆に添付されたERC-20トークンがここに表示されます。"
+    },
+    "retrievable": "受け取り可能：",
+    "retrieving": "受け取り中…",
+    "retrieveAll": "すべて受け取る",
+    "viewHistory": "配分履歴を見る"
+  },
+  "anchors": {
+    "eyebrow": "個人 · 係留",
+    "title": "自分の係留",
+    "subtitle": "係留中のNFTを管理し、Cosmic Signature NFTの配分を確認する",
+    "walletDescription": "係留を管理するにはウォレットを接続してください。",
+    "tabs": {
+      "cosmicSignature": "Cosmic Signatureの係留",
+      "randomWalk": "Random Walkの係留"
+    },
+    "stats": {
+      "cosmicSignature": {
+        "label": "係留中のCosmic Signature NFT",
+        "tooltip": "現在係留しているCosmic Signature NFTの数。Cosmic Signature NFTを多く係留するほど、ETH係留配分の分け前が増えます。"
+      },
+      "randomWalk": {
+        "label": "係留中のRandom Walk NFT",
+        "tooltip": "現在係留しているRandom Walk NFTの数。係留中の各Random Walk NFTは係留NFT星選の対象です。"
+      },
+      "unretrieved": {
+        "label": "未受け取りの配分",
+        "tooltip": "係留中のCosmic Signature NFTに配分されたが、まだ受け取っていないETH係留配分。Cosmic Signature NFTの係留を解除すると、累積した配分を自動的に受け取ります。"
+      },
+      "distributionPerNft": {
+        "label": "Cosmic Signature NFTあたりの配分",
+        "tooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分。係留プール全体（オンチェーン）を、インデックス済みの係留Cosmic Signature NFT数で割って計算します。",
+        "indexUnavailableSuffix": "オンチェーンの係留プールはゼロではありませんが、インデックス済みの係留Cosmic Signature NFT総数がゼロのため（例：cg_stake_stats_cstがETLで更新されていない）、NFTあたりの値を計算できません。"
+      }
+    }
+  },
+  "statistics": {
+    "page": {
+      "invalidAddress": "無効なアドレス",
+      "ariaOwn": "自分の統計",
+      "ariaUser": "ユーザー統計",
+      "ownTitle": "自分の統計",
+      "userTitle": "参加者プロフィール",
+      "ownSubtitle": "実績と活動履歴をまとめたダッシュボード",
+      "userSubtitle": "別の参加者の統計と活動を表示しています",
+      "emptyTitle": "活動はまだありません",
+      "emptyDescription": "このアカウントはまだパフォーマンス・サイクルに参加していません。一筆を入れて始めましょう。",
+      "sections": {
+        "gestureHistory": "一筆の履歴",
+        "recipientHistory": "受領履歴",
+        "anchoring": "係留",
+        "tokenHoldings": "トークン保有",
+        "outreachAllocations": "広報配分",
+        "claimableAssets": "受け取れるアセット"
+      }
+    },
+    "hero": {
+      "ethBalance": {
+        "label": "ETH残高",
+        "tooltip": "このウォレットの現在のETH残高。"
+      },
+      "cstBalance": {
+        "label": "CST残高",
+        "tooltip": "一筆、功労CSTの配分、送付によるCSTトークン（ERC-20）の残高。"
+      },
+      "signatureAllocations": {
+        "label": "受け取ったシグネチャー配分",
+        "tooltip": "サイクル確定時刻が切れる前に最後の一筆を入れて、シグネチャー配分を受け取った回数。"
+      },
+      "totalEth": {
+        "label": "星選ETHの総額",
+        "tooltip": "すべてのサイクルで星選を通じて配分されたETHの総額。受け取り済みと未受け取りの両方を含みます。"
+      },
+      "gestures": {
+        "label": "入れた一筆",
+        "tooltip": "すべてのパフォーマンス・サイクルで入れた一筆の総数。"
+      },
+      "selectionFrequency": {
+        "label": "選定頻度",
+        "tooltip": "現在のサイクルでの星選の最良の選定頻度。全体の筆数に対する自分の筆数と、選ばれる受領者の数から計算します。"
+      }
+    },
+    "activity": {
+      "title": "活動の概要",
+      "groups": {
+        "gestures": "一筆",
+        "stellarSelections": "星選",
+        "anchoring": "係留"
+      },
+      "gesturesMade": {
+        "label": "入れた一筆",
+        "tooltip": "すべてのサイクルでの一筆の総数。"
+      },
+      "maxGesture": {
+        "label": "最大の一筆",
+        "tooltip": "これまでに入れた一筆のうち最も大きなもの。"
+      },
+      "ethSelections": {
+        "label": "ETH星選の配分",
+        "tooltip": "受け取ったETH星選配分の件数。"
+      },
+      "nftsReceived": {
+        "label": "受け取ったNFT",
+        "tooltip": "星選の刻印を通じて受け取ったCosmic Signature NFT。"
+      },
+      "anchorActions": {
+        "label": "係留操作",
+        "tooltip": "RandomWalk NFTの係留と解除の操作の合計。"
+      },
+      "distributionsReceived": {
+        "label": "係留配分の総額",
+        "tooltip": "Cosmic Signature NFTの係留によるETH係留配分の総額。受け取り済みと未受け取りの両方を含みます。"
+      }
+    },
+    "quickActions": {
+      "anchor": {
+        "label": "NFTを係留",
+        "description": "ETH配分のためにCosmic Signature NFTを、星選のためにRandom Walk NFTを係留する"
+      },
+      "gesture": {
+        "label": "一筆を入れる",
+        "description": "進行中のサイクルに参加する"
+      },
+      "transfers": {
+        "label": "NFT移転を見る",
+        "description": "Cosmic Signature NFTの移転履歴"
+      },
+      "stellarSelection": {
+        "label": "星選の履歴",
+        "description": "星選の配分とETH積立"
+      }
+    },
+    "stellarSelection": {
+      "currentFrequency": "現在のサイクルの選定頻度",
+      "ethProbability": {
+        "label": "ETH星選",
+        "tooltip": "このサイクルでETH星選配分に選ばれる頻度。全体の筆数に対する自分の割合と、選ばれるETH星選受領者の数に基づきます。"
+      },
+      "nftProbability": {
+        "label": "NFT星選",
+        "tooltip": "このサイクルでCosmic Signature NFT星選の刻印に選ばれる頻度。全体の筆数に対する自分の割合に基づきます。"
+      },
+      "totalEth": {
+        "label": "星選ETHの総額",
+        "tooltip": "すべてのサイクルで星選を通じて配分されたETHの総額。受け取り済みと未受け取りの両方を含みます。"
+      },
+      "ethRetrieved": {
+        "label": "受け取ったETH",
+        "tooltip": "星選の配分からウォレットにすでに受け取ったETH。"
+      },
+      "unretrievedNfts": {
+        "label": "未受け取りのNFT",
+        "tooltip": "シグネチャー配分とともに受け取ったが、まだ受け取っていない添付NFT。"
+      },
+      "stellarSelectionNfts": {
+        "label": "星選NFT",
+        "tooltip": "星選を通じて刻印されたCosmic Signature NFT。"
+      },
+      "allocationNfts": {
+        "label": "配分NFT",
+        "tooltip": "配分として受け取ったCosmic Signature NFTの総数（すべての刻印種類を合わせたもの）。"
+      },
+      "cosmicSignatureNfts": {
+        "label": "受け取ったCosmic Signature NFT",
+        "tooltip": "すべてのサイクルで受け取ったCosmic Signature NFTの総数。"
+      }
+    },
+    "anchoring": {
+      "tabs": {
+        "cosmicSignature": "Cosmic Signatureの係留",
+        "randomWalk": "Random Walkの係留"
+      },
+      "empty": {
+        "cosmicSignatureTitle": "係留の活動はまだありません",
+        "cosmicSignatureDescription": "Cosmic Signature NFTを係留すると、サイクルごとにETHの係留配分を受け取れます。",
+        "randomWalkTitle": "RandomWalkの係留はまだありません",
+        "randomWalkDescription": "RandomWalk NFTを係留すると、係留NFT星選に参加できます。"
+      },
+      "stats": {
+        "anchorActions": {
+          "label": "係留操作",
+          "cosmicSignatureTooltip": "Cosmic Signature NFTを係留した回数。",
+          "randomWalkTooltip": "RandomWalk NFTを係留した回数。"
+        },
+        "releaseActions": {
+          "label": "解除操作",
+          "cosmicSignatureTooltip": "係留中のCosmic Signature NFTを解除した回数。",
+          "randomWalkTooltip": "係留中のRandomWalk NFTを解除した回数。"
+        },
+        "nftsWithDistributions": {
+          "label": "配分のあるNFT",
+          "tooltip": "係留配分が累積している係留中のCosmic Signature NFTの数。"
+        },
+        "totalDistributions": {
+          "label": "配分の総額",
+          "tooltip": "係留から受け取ったETH係留配分の総額（受け取り済み + 未受け取り）。"
+        },
+        "unretrievedDistributions": {
+          "label": "未受け取りの配分",
+          "tooltip": "配分されたが、まだウォレットに受け取っていない係留配分。"
+        },
+        "nftsAnchored": {
+          "label": "係留中のNFT",
+          "tooltip": "現在係留中のRandomWalk NFTの総数。"
+        },
+        "nftsImprinted": {
+          "label": "刻印されたNFT",
+          "tooltip": "係留NFT星選を通じて受け取ったCosmic Signature NFT。"
+        }
+      },
+      "sections": {
+        "actions": "係留 / 解除の操作",
+        "distributionsByToken": "トークン別の係留配分",
+        "distributionsByDeposit": "積立別の係留配分",
+        "retrievedDistributions": "受け取り済みの係留配分",
+        "unretrievedDistributions": "未受け取りの係留配分",
+        "anchoredNftSelection": "係留NFT星選"
+      }
+    },
+    "donatedAssets": {
+      "nfts": {
+        "title": "受け取った添付NFT",
+        "tooltip": "他の参加者が添付し、シグネチャー配分の一部として受け取ったNFT。未受け取りのNFTはウォレットに受け取れます。",
+        "unclaimed": "未受け取り{count}点",
+        "claimAll": "すべてのNFTを受け取る",
+        "emptyTitle": "添付されたNFTはありません",
+        "emptyDescription": "シグネチャー配分を通じて受け取った添付NFTはまだありません。"
+      },
+      "erc20": {
+        "title": "添付されたERC20トークン",
+        "tooltip": "他の参加者が添付したERC20トークン。未受け取りのトークンはウォレットに受け取れます。",
+        "unclaimed": "未受け取り{count}件",
+        "claimAll": "すべてのトークンを受け取る",
+        "emptyTitle": "添付されたトークンはありません",
+        "emptyDescription": "受け取った添付ERC20トークンはまだありません。"
+      }
+    }
+  },
+  "tokens": {
+    "page": {
+      "title": "自分のNFT",
+      "subtitle": "接続中のウォレットにあるCosmic Signature NFT",
+      "marketplace": "NFTを売買する",
+      "walletDescription": "NFTを確認して管理するにはウォレットを接続してください。",
+      "loadErrorTitle": "トークンを読み込めませんでした",
+      "loadErrorMessage": "Cosmic Signature NFTを読み込めませんでした。",
+      "ownedTitle": "所有しているCosmic Signature NFT",
+      "transferTitle": "NFTを移転",
+      "transferSubtitle": "任意：選択したCosmic Signature NFTを別のウォレットへ送ります。",
+      "transferDescription": "別のアドレスへ送る準備ができたときだけ、このウォレットからNFTを選んでください。"
+    },
+    "table": {
+      "empty": "トークンはまだありません。",
+      "details": "詳細",
+      "datetime": "日時",
+      "tokenId": "トークンID",
+      "tokenName": "トークン名",
+      "cycle": "サイクル",
+      "recipientAddress": "受領者アドレス",
+      "currentlyAnchored": "現在係留中？",
+      "anchoredOnce": "係留したことがある？",
+      "allocationType": "配分の種類",
+      "types": {
+        "stellarSelection": "Cosmic Signature NFT星選",
+        "anchoredNftSelection": "係留NFT星選（RandomWalk係留者）",
+        "signatureAllocation": "シグネチャー配分の受領者（サイクル{cycle}）",
+        "enduranceChampion": "持久チャンピオン",
+        "lastCstParticipant": "最後のCST参加者"
+      }
+    }
+  },
+  "transferCst": {
+    "page": {
+      "title": "CSTの送付",
+      "subtitle": "Cosmic Signature CSTトークンを別のアドレスへ送ります。",
+      "walletDescription": "自分の残高からCSTを送付するにはウォレットを接続してください。",
+      "sourceLabel": "接続中のウォレット",
+      "description": "接続中のウォレットからCSTを送付します。トランザクションはウォレットで署名され、CSTトークンコントラクトへ直接送られます。"
+    },
+    "form": {
+      "title": "CSTの送付",
+      "sourceWallet": "送付元ウォレット",
+      "defaultDescription": "接続中のウォレットから任意のアドレスへCSTを送ります。",
+      "available": "利用可能なCST",
+      "balanceReadError": "このウォレットのCST残高を読み取れませんでした。もう一度お試しください。",
+      "decimalsReadWarning": "CSTのdecimalsを読み取れないため、小数点以下18桁と仮定します。",
+      "recipientAddress": "送付先アドレス",
+      "amount": "数量",
+      "sendAria": "CSTを送る",
+      "sending": "送信中…",
+      "send": "CSTを送る",
+      "viewHistory": "CST送付履歴を見る",
+      "confirmed": "送付が確認されました。",
+      "viewTransaction": "トランザクションを見る"
+    }
+  },
+  "nftTransfer": {
+    "defaultDescription": "Cosmic Signature NFTを1点以上選び、別のウォレットアドレスへ送ります。",
+    "marketplacePrompt": "直接送るのではなく売りたい場合は、マーケットプレイスでCosmic Signature NFTを出品または取得できます。",
+    "marketplace": "NFTを売買する",
+    "sourceWallet": "送付元ウォレット",
+    "ownedNfts": "所有NFT",
+    "selected": "選択済み",
+    "recipientAddress": "送付先アドレス",
+    "empty": "このウォレットにCosmic Signature NFTはありません。",
+    "pickerTitle": "移転するNFTを選ぶ",
+    "pickerSummary": "移転できる{total}点のうち{selected}点を選択中。",
+    "selectAll": "移転できるものをすべて選択",
+    "selectPage": "このページを選択",
+    "clear": "選択を解除",
+    "listAria": "Cosmic Signature NFT",
+    "selectAria": "NFT #{id}を選択",
+    "nftLabel": "NFT #{id}",
+    "tokenId": "トークンID",
+    "customName": "カスタム名",
+    "noCustomName": "カスタム名なし",
+    "generationCycle": "生成サイクル",
+    "cycle": "サイクル{cycle}",
+    "cycleUnavailable": "サイクルのデータを利用できません",
+    "status": "状態",
+    "statusLabels": {
+      "anchored": "係留中——移転する前に解除してください",
+      "ownerChanged": "所有者が変わりました——移転する前に再読み込みしてください",
+      "selected": "選択済み",
+      "transferable": "移転可能"
+    },
+    "progress": {
+      "transferred": "{total}点のうち{completed}点のNFTを移転しました",
+      "stopped": "NFT #{id}で移転が止まりました",
+      "current": "現在のNFT：#{id}"
+    },
+    "confirmation": {
+      "latest": "最新の移転が確認されました。",
+      "multiple": "{count}件の移転が確認されました。",
+      "viewLatest": "最新のトランザクションを見る"
+    },
+    "sendAria": "選択したNFTを送る",
+    "sending": "送信中…",
+    "send": "選択したNFTを送る",
+    "viewHistory": "NFT移転履歴を見る",
+    "warning": {
+      "title": "送付先にトランザクション履歴がありません",
+      "description": "このアドレスにはまだトランザクションがないようです。送る前に送付先をもう一度確認してください。NFTの移転は取り消せません。",
+      "cancel": "キャンセル",
+      "continue": "移転を続ける"
+    }
+  },
+  "transferHistory": {
+    "loading": "読み込み中…",
+    "walletLabels": {
+      "cosmicSignatureAnchoring": "Cosmic Signature NFT係留ウォレット",
+      "randomWalkAnchoring": "RandomWalk係留ウォレット",
+      "outreach": "広報ウォレット",
+      "stellarSelection": "星選ウォレット",
+      "publicGoods": "公共財金庫"
+    },
+    "breadcrumbs": {
+      "nft": "NFT移転",
+      "cst": "CST送付"
+    },
+    "nft": {
+      "title": "Cosmic Signature NFTの移転履歴",
+      "empty": "NFTの移転はまだありません。",
+      "invalidAddress": {
+        "title": "無効なアドレス",
+        "description": "NFT移転履歴を見るには、有効なウォレットアドレスを入力してください。"
+      }
+    },
+    "cst": {
+      "title": "Cosmic Signature CSTの送付履歴",
+      "empty": "CSTの送付はまだありません。",
+      "invalidAddress": {
+        "title": "無効なアドレス",
+        "description": "CST送付履歴を見るには、有効なウォレットアドレスを入力してください。"
+      },
+      "value": "数量（CST）"
+    }
+  },
+  "stellarSelectionAllocations": {
+    "datetime": "日時",
+    "cycle": "サイクル",
+    "recipient": "受領者",
+    "expirationDate": "有効期限",
+    "amount": "金額（ETH）",
+    "retrieved": "受け取り済み",
+    "expired": "{date}（期限切れ）",
+    "remaining": "{date}（{remaining}）"
+  }
+}

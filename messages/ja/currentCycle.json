@@ -1,0 +1,181 @@
+{
+  "error": {
+    "title": "サイクルデータを読み込めませんでした",
+    "message": "ページを再読み込みしてもう一度お試しください。"
+  },
+  "nav": {
+    "backToHome": "ホームに戻る"
+  },
+  "status": {
+    "notStarted": "未開始"
+  },
+  "hero": {
+    "title": "サイクル{n}",
+    "subtitle": "{date}に開始 • {count, plural, other {{count}筆}}の一筆",
+    "status": {
+      "openingSoon": "まもなく開始",
+      "awaitingFirstGesture": "最初の一筆を待っています",
+      "readyToFinalize": "確定できる状態",
+      "live": "ライブ"
+    },
+    "cta": {
+      "viewHomeClock": "ホームの時計を見る",
+      "finalizeCycle": "サイクルを確定",
+      "makeFirstGesture": "最初の一筆を入れる",
+      "makeGesture": "一筆を入れる"
+    },
+    "countdown": {
+      "opensIn": "サイクル開始まで",
+      "opensAt": "サイクル{n}は{date}に始まります",
+      "finalizesIn": "サイクル確定まで",
+      "finalizesTooltip": "このタイマーがゼロになると、最後の一筆を入れた参加者がサイクルを確定してシグネチャー配分を受け取れます。新しい一筆はそれぞれタイマーを延ばします。",
+      "readyTitle": "サイクルは確定できる状態です",
+      "readyMessage": "確定までの時計がゼロになりました。",
+      "confirmingTitle": "最後の瞬間を確認中",
+      "confirmingMessage": "時計がゼロになりました。サイクルを確定する前に、最後の一瞬に入った一筆がないかチェーンを確認しています。"
+    }
+  },
+  "stats": {
+    "totalGestures": {
+      "label": "一筆の総数",
+      "tooltip": "このサイクルで入れられた一筆の総数。それぞれの一筆は星選の対象にもなります。"
+    },
+    "cycleReserve": {
+      "label": "サイクル準備金",
+      "tooltip": "最後の一筆を入れた参加者が受け取るシグネチャー配分のETH部分。受領者は1,000 CSTとCosmic Signature NFTも受け取ります。"
+    },
+    "stellarSelectionPool": {
+      "label": "星選プール",
+      "tooltip": "サイクルが確定すると、無作為に選ばれた{count}人の参加者に分けられるETH。"
+    },
+    "publicGoods": {
+      "label": "公共財",
+      "tooltip": "サイクルごとに、サイクル準備金の{percent}%がProtocol Guildへ送られます。"
+    },
+    "contributedEth": {
+      "label": "拠出されたETH",
+      "tooltip": "このサイクルでコミュニティから直接拠出されたETH。"
+    },
+    "attachedNfts": {
+      "label": "添付されたNFT",
+      "tooltip": "このサイクルでコミュニティが一筆に添付したNFT。"
+    }
+  },
+  "sections": {
+    "allocationTracks": {
+      "title": "配分トラック",
+      "tooltip": "サイクル準備金が配分トラックにどう分かれるか：シグネチャー配分、時の戦士、星選、公共財、係留配分、そして累積準備金。"
+    },
+    "stellarSelectionEntries": {
+      "title": "星選の対象",
+      "tooltip": "一筆ごとに星選の対象が1件記録されます。一筆が多いほど、ETHまたはCosmic Signature NFTの配分に選ばれる頻度が高まります。"
+    },
+    "topEthSpenders": {
+      "title": "ETH支出の上位",
+      "tooltip": "このサイクルで一筆に使ったETHの総額で並べた参加者アドレス。"
+    },
+    "enduranceChampions": {
+      "title": "持久チャンピオン",
+      "tooltip": "最新の一筆を入れた参加者の位置をどれだけ長く保ったかで並べた参加者。最も長く連続して保った参加者は、1,000 CSTの功労CSTとCosmic Signature NFTを受け取ります。"
+    },
+    "gestureHistory": {
+      "title": "一筆の履歴——サイクル{n}",
+      "tooltip": "このサイクルで入れられたすべての一筆の時系列の記録。新しいものから表示します。"
+    },
+    "ethContributions": {
+      "title": "ETH拠出",
+      "tooltip": "このサイクル中にコミュニティメンバーが直接拠出したETH。"
+    },
+    "cycleRules": {
+      "title": "サイクルのルール",
+      "tooltip": "このサイクルの主なルールと配分の仕組み。"
+    }
+  },
+  "rules": {
+    "howItWorks": "仕組み",
+    "participation": "一筆を入れると、<em>動的な参加CST</em>を刻印できます。その量は、前の一筆からの経過時間に基づく平方根の式で決まります。",
+    "calibration": "ETH一筆はCST調律期間を約{decreasePercent}%短くし、CST一筆は約{increasePercent}%長くします。",
+    "stellarSelection": "一筆ごとに星選の対象が1件記録されます。{ethEntries}件の対象がサイクル準備金の{rafflePercent}%を受け取ります。さらに{nftEntries}人の星選受領者と{anchorHolders}人のRandom Walk NFT係留者がCosmic Signature NFTを受け取ります。",
+    "publicGoods": "Protocol Guildはサイクルごとにサイクル準備金の{percent}%（少なくとも{amount} ETH）を受け取ります。"
+  },
+  "footer": {
+    "contractBalance": "コントラクト残高",
+    "cycleDuration": "サイクルの長さ",
+    "uniqueParticipants": "ユニーク参加者"
+  },
+  "attachedTokens": {
+    "title": "添付されたトークン",
+    "tooltip": "サイクル準備金を豊かにするためにコミュニティが一筆に添付したNFTとERC-20トークン。",
+    "erc721Tab": "ERC721トークン",
+    "erc20Tab": "ERC20トークン",
+    "erc721Empty": "このサイクルではERC721トークンは添付されませんでした。"
+  },
+  "showcase": {
+    "badge": "シグネチャー配分に含まれます",
+    "heading": "このサイクルに添付されたボーナスアセット",
+    "cycleFallback": "現在",
+    "description": {
+      "nftOnly": "シグネチャー配分とともに移るコミュニティ添付アセットの簡潔な受領証です。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFTすべて}}を受け取ります。",
+      "erc20Only": "シグネチャー配分とともに移るコミュニティ添付アセットの簡潔な受領証です。サイクル{cycle}が確定すると、最後の一筆の参加者が{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分すべて}}を受け取ります。",
+      "mixed": "シグネチャー配分とともに移るコミュニティ添付アセットの簡潔な受領証です。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFT}}と{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分}}のすべてを受け取ります。"
+    },
+    "bonusReceipt": {
+      "label": "ボーナス受領証",
+      "nftOnly": "{nftCount, plural, other {ERC-721トークン{nftCount}点}}",
+      "erc20Only": "{erc20Count, plural, other {ERC-20添付分{erc20Count}件}}",
+      "mixed": "{nftCount, plural, other {ERC-721トークン{nftCount}点}} + {erc20Count, plural, other {ERC-20添付分{erc20Count}件}}"
+    },
+    "summary": {
+      "assetsIncluded": "含まれるアセット",
+      "cycle": "サイクル",
+      "cycleValue": "#{cycle}",
+      "preview": "プレビュー",
+      "previewAll": "すべて表示中",
+      "previewCount": "{total}件中{visible}件",
+      "recipientRule": "受領者のルール",
+      "recipientRuleValue": "最後の一筆"
+    },
+    "remainder": {
+      "nftOnly": "注目の受領証プレビューを表示しています。サイクルの詳細では、さらに{nftCount, plural, other {{nftCount}点の添付NFT}}を確認できます。",
+      "erc20Only": "注目の受領証プレビューを表示しています。サイクルの詳細では、さらに{erc20Count, plural, other {{erc20Count}件の添付ERC-20トークン添付分}}を確認できます。",
+      "mixed": "注目の受領証プレビューを表示しています。サイクルの詳細では、さらに{nftCount, plural, other {{nftCount}点の添付NFT}}と{erc20Count, plural, other {{erc20Count}件の添付ERC-20トークン添付分}}を確認できます。"
+    },
+    "nftCard": {
+      "badge": "ERC-721",
+      "fallbackTitle": "NFT #{id}",
+      "fallbackTitleUnknown": "添付されたNFT",
+      "fallbackSubtitle": "コミュニティが添付したERC-721",
+      "imageAlt": "添付されたNFT {name}",
+      "imageAltFallback": "添付NFTの配分",
+      "mediaAria": "{label}：{title}",
+      "floorEstimate": "フロア 約{price} {currency}",
+      "floorTooltip": "コレクションのフロア価格の目安であり、この特定のトークンの評価額ではありません。",
+      "metadataUnavailable": "メタデータを利用できません。添付されたNFTはこのサイクルの配分に含まれたままです。",
+      "openSea": "OpenSea",
+      "explorer": "エクスプローラー",
+      "links": {
+        "project": "NFTを見る",
+        "opensea": "OpenSeaで見る",
+        "explorer": "コントラクトを見る"
+      }
+    },
+    "erc20Card": {
+      "badge": "ERC-20添付分",
+      "badgeTooltipLogo": "ロゴの出典：{source}。価値を判断する前にトークンアドレスを確認してください。",
+      "badgeTooltipDefault": "このERC-20トークン添付分はサイクルに添付されており、確定時にシグネチャー配分の受領者へ渡ります。",
+      "symbolFallback": "ERC20",
+      "nameFallback": "添付されたERC20トークン",
+      "logoSourceFallback": "キュレーションされたトークンメタデータ",
+      "unknownAmount": "数量不明",
+      "viewToken": "{symbol}トークンを見る",
+      "logoAlt": "{token}トークンのロゴ"
+    },
+    "facts": {
+      "tokenId": "トークンID",
+      "tokenIdValue": "#{id}",
+      "token": "トークン",
+      "attachedBy": "添付者",
+      "unknown": "不明"
+    }
+  }
+}

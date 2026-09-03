@@ -1,0 +1,91 @@
+{
+  "loadingAria": "広報配分を読み込み中",
+  "hero": {
+    "title": "Cosmic Signatureを<highlight>広く伝えれば</highlight>、CSTの広報配分を受け取れます",
+    "description": "Cosmic Signatureを伝え、検証された広報活動ごとにCSTの広報配分を受け取ります。",
+    "learnHow": "参加の流れを見る"
+  },
+  "stats": {
+    "heading": "広報プログラムの統計",
+    "infoAria": "{label}の説明",
+    "valueAria": "{label}：{value}{suffix}",
+    "totalAllocations": {
+      "label": "広報配分の総量",
+      "tooltip": "開始以来、すべての広報貢献者へ送られたCSTの総量"
+    },
+    "activeContributors": {
+      "label": "活動中の広報貢献者",
+      "tooltip": "広報配分を受け取ったユニークなウォレットアドレスの数"
+    },
+    "transactions": {
+      "label": "広報配分のトランザクション",
+      "tooltip": "処理された個別の広報配分の件数"
+    }
+  },
+  "howItWorks": {
+    "title": "参加の流れ",
+    "infoAria": "参加の流れの説明",
+    "tooltip": "三つのステップでCosmic Signatureの広報配分を受け取り始められます",
+    "stepInfoAria": "{title}の詳細",
+    "steps": {
+      "promote": {
+        "title": "伝える",
+        "description": "ソーシャルメディア、ブログ、コミュニティでCosmic Signatureを紹介します。",
+        "tooltip": "コンテンツ制作、紹介リンクの共有、ブログ記事の執筆、動画の制作など、Cosmic Signatureを伝える活動が対象になります。"
+      },
+      "verify": {
+        "title": "検証を受ける",
+        "description": "チームが広報活動を確認し、検証します。",
+        "tooltip": "広報チームが活動の到達範囲、品質、真正性を評価してから広報配分を承認します。"
+      },
+      "receive": {
+        "title": "CSTを受け取る",
+        "description": "CSTの広報配分がウォレットへ直接送られます。",
+        "tooltip": "検証が済むと、CSTがオンチェーンでウォレットアドレスへ送られます。配分の規模は広報活動の影響力に応じて変わります。"
+      }
+    }
+  },
+  "leaderboard": {
+    "title": "主な広報貢献者",
+    "infoAria": "主な広報貢献者の説明",
+    "tooltip": "広報活動で受け取ったCSTの総量に基づく順位",
+    "empty": "まだ広報貢献者はいません。",
+    "rewardCountOne": "広報配分{count}件",
+    "rewardCountOther": "広報配分{count}件"
+  },
+  "history": {
+    "title": "広報配分の履歴",
+    "infoAria": "広報配分の履歴の説明",
+    "tooltip": "すべての広報配分を時系列に並べた完全な記録",
+    "showingOne": "広報配分<strong>{count}</strong>件を表示",
+    "showingOther": "広報配分<strong>{count}</strong>件を表示",
+    "emptyTitle": "まだ送られた広報配分はありません",
+    "emptyDescription": "広報活動が検証され、配分が送られるとここに表示されます。"
+  },
+  "cta": {
+    "title": "一緒に伝える準備はできましたか？",
+    "description": "広報プログラムに参加すると、Cosmic Signatureを世界に伝えてCSTの広報配分を受け取れます。",
+    "contact": "広報チームに連絡",
+    "contactTooltip": "広報の機会や広報配分の仕組みについて相談できます",
+    "infoAria": "広報チームへの連絡の説明",
+    "infoTooltip": "チームが広報資料の準備を手伝い、広報配分の段階を案内します"
+  },
+  "address": {
+    "invalid": "無効なEthereumアドレス",
+    "heading": "この参加者の広報配分",
+    "loading": "読み込み中…",
+    "outreachWallet": "広報ウォレット"
+  },
+  "transferForm": {
+    "title": "CST広報配分を送付",
+    "description": "広報準備金コントラクトの`payReward`関数を呼び出します。接続中のウォレットが現在の財務担当者である必要があります。",
+    "reserveLabel": "広報準備金",
+    "availableLabel": "利用可能なCST",
+    "ownerLabel": "所有者",
+    "treasurerLabel": "財務担当者",
+    "unavailable": "取得不可",
+    "recipientLabel": "送付先アドレス",
+    "amountLabel": "数量",
+    "historyLink": "広報準備金の送付履歴を見る"
+  }
+}

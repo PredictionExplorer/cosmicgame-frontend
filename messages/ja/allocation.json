@@ -1,0 +1,278 @@
+{
+  "formats": {
+    "cycle": "サイクル{cycle}",
+    "cycleHash": "サイクル{cycle}",
+    "token": "トークン #{token}",
+    "cosmicSignatureToken": "Cosmic Signature #{token}"
+  },
+  "recipients": {
+    "header": {
+      "eyebrow": "配分 · パフォーマンス・サイクル",
+      "title": "配分の受領者",
+      "subtitle": "確定したすべてのパフォーマンス・サイクルにわたる配分の受領者、サイクル統計、配分の分布の完全な履歴。",
+      "scope": "確定したサイクルの記録のみ",
+      "scopeTooltip": "このページはサイクルAPIから確定済みのパフォーマンス・サイクルを要約しています。未確定のサイクルや、関係のない配分受け取りの記録はこれらの合計に含まれません。"
+    },
+    "intro": "パフォーマンス・サイクルが確定すると、最後の一筆を入れた参加者がシグネチャー配分——サイクル準備金の{percentage}%、1,000 CST、そして唯一のCosmic Signature NFT——を受け取ります。さらに、時の戦士、星選、係留配分、公共財、累積準備金を通じて追加の配分が流れます。",
+    "reserveSplit": {
+      "label": "サイクル準備金の内訳",
+      "tooltip": "確定したサイクルのETH準備金がプロトコルの各トラックにどう配分されるかを割合で示します。",
+      "tracks": {
+        "signature": {
+          "label": "シグネチャー",
+          "tooltip": "シグネチャー配分は主なETH配分で、最後の一筆を入れた参加者が受け取ります。"
+        },
+        "chrono": {
+          "label": "時の戦士",
+          "tooltip": "時の戦士配分は、一筆によってサイクルを最も長い時間支えた参加者に渡ります。"
+        },
+        "stellar": {
+          "label": "星選ETH",
+          "tooltip": "星選の受領者のために取り置かれるETH。一筆ごとに、参加者がこの配分に選ばれる頻度が生まれます。"
+        },
+        "anchor": {
+          "label": "係留",
+          "tooltip": "Cosmic Signature NFTをプロトコルに係留しているウォレットへ配られるETH。RandomWalk NFTの係留はETHではなく、係留NFT星選の対象になります。"
+        },
+        "publicGoods": {
+          "label": "公共財",
+          "tooltip": "サイクルから選ばれた公共財の受け手（現在はProtocol Guild）へ送られるETH。"
+        },
+        "nextCycle": {
+          "label": "次のサイクル",
+          "tooltip": "確定した配分が行われた後、残りのサイクル準備金は次のパフォーマンス・サイクルへ累積します。"
+        }
+      }
+    },
+    "stats": {
+      "totalCycles": {
+        "label": "総サイクル数",
+        "tooltip": "これまでに確定したパフォーマンス・サイクルの総数。"
+      },
+      "totalEth": {
+        "label": "配られたETHの総額",
+        "tooltip": "すべてのサイクルでシグネチャー配分として配られたETHの合計。"
+      },
+      "totalGestures": {
+        "label": "一筆の総数",
+        "tooltip": "確定したすべてのサイクルで入れられた一筆の累計。"
+      },
+      "uniqueRecipients": {
+        "label": "ユニーク受領者",
+        "tooltip": "シグネチャー配分を受け取ったことのある異なるウォレットアドレスの数。"
+      }
+    }
+  },
+  "details": {
+    "copy": {
+      "addressAria": "アドレス{address}をコピー",
+      "addressSuccess": "アドレスをクリップボードにコピーしました"
+    },
+    "navigation": {
+      "previousAria": "前のサイクル",
+      "nextAria": "次のサイクル"
+    },
+    "recipientCard": {
+      "recipient": "受領者",
+      "none": "なし",
+      "nftToken": "NFTトークン"
+    },
+    "share": {
+      "summary": "サイクル{cycle}——Cosmic Signature\nシグネチャー配分：{amount} ETH\n受領者：{recipient}\n筆数：{gestures}\n{url}",
+      "success": "サイクルの要約をクリップボードにコピーしました"
+    },
+    "invalid": {
+      "title": "サイクル番号が無効です",
+      "help": "サイクル番号は正の整数でなければなりません。",
+      "back": "配分の受領者に戻る"
+    },
+    "notFound": {
+      "title": "配分データが見つかりません",
+      "help": "サイクル{cycle}のデータはありません。サイクルはまだ確定していない可能性があります。",
+      "back": "配分の受領者に戻る"
+    },
+    "error": {
+      "title": "このサイクルを読み込めませんでした",
+      "message": "サイクル{cycle}のデータを読み込めませんでした。再試行するか、受領者の一覧に戻ってください。"
+    },
+    "breadcrumbs": {
+      "recipients": "配分の受領者"
+    },
+    "hero": {
+      "aria": "サイクルのヒーロー",
+      "amountTooltip": "カウントダウンがゼロになった時点で最後の一筆を入れていた参加者が受け取ったETHの総額。",
+      "recipient": "受領者",
+      "nft": "NFT",
+      "nftTooltip": "このCosmic Signature NFTをギャラリーで見る。",
+      "finalized": "{dateTime}に確定",
+      "viewTransaction": "トランザクションを見る",
+      "share": "共有",
+      "shareAria": "サイクルの要約を共有"
+    },
+    "recipientSection": {
+      "aria": "サイクルの受領者",
+      "title": "サイクルの受領者",
+      "tooltip": "このサイクルのすべての配分受領者。シグネチャー配分は最後の一筆を入れた参加者に渡り、特別な役割には追加の配分があります。",
+      "labels": {
+        "ethAllocation": "ETH配分",
+        "recognitionCst": "功労CST",
+        "cosmicSignatureNft": "Cosmic Signature NFT"
+      },
+      "cards": {
+        "signature": {
+          "title": "シグネチャー配分",
+          "tooltip": "カウントダウンがゼロになった時点で最後の一筆を入れていた参加者。ETHのシグネチャー配分、1,000 CST、Cosmic Signature NFTを受け取ります。"
+        },
+        "chrono": {
+          "title": "時の戦士",
+          "tooltip": "持久チャンピオンの位置を最も長く連続して保った参加者。ETH、功労CST、Cosmic Signature NFTを受け取ります。"
+        },
+        "endurance": {
+          "title": "持久チャンピオン",
+          "tooltip": "最新の一筆の位置を最も長く途切れずに保った参加者。1,000 CSTの功労CSTとCosmic Signature NFTを受け取ります。"
+        },
+        "finalCst": {
+          "title": "最後のCST一筆",
+          "tooltip": "サイクルで最後のCST一筆を入れた参加者。1,000 CSTの功労CSTとCosmic Signature NFTを受け取ります。"
+        }
+      }
+    },
+    "distribution": {
+      "aria": "配分の分布",
+      "title": "配分の分布",
+      "tooltip": "このサイクルのサイクル準備金が配分トラックにどう配られたかを視覚的に示します。",
+      "segments": {
+        "signature": {
+          "label": "シグネチャー配分",
+          "tooltip": "最後の一筆を入れた参加者が受け取った{amount} ETH。"
+        },
+        "publicGoods": {
+          "label": "公共財",
+          "tooltip": "公共財の受け手（Protocol Guild）へ送られた{amount} ETH。"
+        },
+        "anchor": {
+          "label": "係留配分",
+          "tooltip": "各ウォレットが係留しているCosmic Signature NFTの数に比例して配られた{amount} ETH。"
+        },
+        "stellar": {
+          "label": "星選",
+          "tooltip": "星選プールに配分された{amount} ETH。"
+        }
+      }
+    },
+    "statistics": {
+      "aria": "サイクル統計",
+      "title": "サイクル統計",
+      "tooltip": "このサイクルの活動と配分の分布を要約する主な指標。",
+      "cards": {
+        "signatureEth": {
+          "label": "シグネチャー配分ETH",
+          "tooltip": "このサイクルで最後の一筆を入れた参加者が受け取ったシグネチャー配分のETH部分。"
+        },
+        "publicGoods": {
+          "label": "公共財",
+          "tooltip": "このサイクルから公共財の受け手（Protocol Guild）へ送られた金額。"
+        },
+        "anchor": {
+          "label": "係留配分",
+          "tooltip": "このサイクルでCosmic Signature NFTを係留していた参加者に配られたETHの総額。"
+        },
+        "stellar": {
+          "label": "星選プール",
+          "tooltip": "このサイクル全体で星選プールに配分されたETHの総額。"
+        },
+        "gestures": {
+          "label": "一筆の総数",
+          "tooltip": "このサイクル中に入れられた一筆の総数。"
+        },
+        "attachedNfts": {
+          "label": "添付されたNFT",
+          "tooltip": "このサイクル中に参加者が一筆に添付したNFTの数。"
+        },
+        "anchoredTokens": {
+          "label": "係留中のトークン",
+          "tooltip": "このサイクルでプロトコルに係留されていたNFTトークンの数。"
+        },
+        "uniqueAnchorHolders": {
+          "label": "ユニーク係留者",
+          "tooltip": "このサイクル中にトークンを係留していた異なるアドレスの数。"
+        },
+        "totalContributed": {
+          "label": "拠出の総額",
+          "tooltip": "このサイクル中に一筆に添付されたすべてのERC-20トークン拠出の合計価値。"
+        }
+      }
+    },
+    "ledger": {
+      "aria": "このサイクルのすべての配分",
+      "title": "このサイクルのすべての配分",
+      "tooltip": "このサイクルのすべての配分記録の完全な台帳——シグネチャー配分、時の戦士、持久チャンピオン、星選、係留配分、および関連するNFT/CSTの配分。",
+      "empty": "配分の記録はまだありません。"
+    },
+    "data": {
+      "divider": "詳細データ",
+      "aria": "サイクルデータ",
+      "tabs": {
+        "gestures": "一筆の履歴",
+        "endurance": "持久チャンピオン",
+        "stellar": "星選",
+        "anchoring": "係留配分",
+        "contributions": "拠出"
+      },
+      "empty": {
+        "gestures": "このサイクルでは一筆は入れられませんでした。",
+        "endurance": "このサイクルの持久チャンピオンのデータはありません。",
+        "stellar": "このサイクルには星選の受領者がいません。",
+        "anchoring": "このサイクルでは係留配分は配られませんでした。",
+        "nfts": "このサイクルでは一筆にNFTは添付されませんでした。",
+        "erc20": "このサイクルでは一筆にERC-20トークンは添付されませんでした。"
+      },
+      "contributions": {
+        "nfts": "添付されたNFT",
+        "nftsTooltip": "このサイクル中に一筆に添付され、最後の一筆を入れた参加者へ送られたNFT。",
+        "erc20": "添付されたERC-20トークン",
+        "erc20Tooltip": "参加者が一筆に添付し、シグネチャー配分の受領者へ送られたERC-20トークン。"
+      }
+    }
+  },
+  "finalized": {
+    "home": "ホーム",
+    "title": "配分が確定しました",
+    "invalid": {
+      "subtitle": "このページにはURLに有効なサイクル番号が必要です。",
+      "missingParameter": "<code>cycle</code>クエリパラメーターがないか無効です。",
+      "guidance": "完了したサイクルを確認するには<allocations>自分の配分</allocations>を開いてください。"
+    },
+    "loading": {
+      "subtitle": "サイクル{cycle}を読み込み中…",
+      "status": "読み込み中…"
+    },
+    "pending": {
+      "successTitle": "このサイクルを完了しました",
+      "defaultTitle": "配分が確定しました",
+      "successSubtitle": "サイクル{cycle}はオンチェーンで確定しました。",
+      "cycleBreadcrumb": "サイクル{cycle}",
+      "finalizedBreadcrumb": "確定済み",
+      "breakdown": "配分の内訳（シグネチャー配分の分布、その他の配分、添付されたトークン）は、このサイクルの配分詳細ページにあります。",
+      "viewDetails": "サイクル{cycle}の配分詳細を見る",
+      "review": "<allocations>自分の配分</allocations>でもすべてを確認できます。",
+      "empty": "配分の情報はありません。"
+    },
+    "result": {
+      "title": "おめでとうございます。サイクル{cycle}のシグネチャー配分を受け取りました。",
+      "allocationBreadcrumb": "配分",
+      "retrievedBreadcrumb": "受け取り済み",
+      "sectionTitle": "サイクル{cycle}の配分",
+      "sectionDescription": "このサイクルのシグネチャー配分の構成要素の要約。",
+      "ethAllocation": "ETH配分",
+      "nftId": "Cosmic Signature NFT ID",
+      "attachedTokensLabel": "添付されたNFT（ERC-721）",
+      "attachedTokens": "{count, plural, other {添付されたNFT #点}}（ERC-721）"
+    },
+    "next": {
+      "title": "次のステップ",
+      "description": "星選から別の配分が生まれることがあり、係留からは別の係留配分が生まれることがあります。",
+      "body": "星選から追加の配分がある可能性もあります。配分を確認するには<allocations>自分の配分</allocations>ページへ。係留配分は<anchors>自分の係留</anchors>ページで確認できます。"
+    }
+  }
+}

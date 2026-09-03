@@ -1,0 +1,26 @@
+{
+  "breadcrumbs": {
+    "home": "ホーム",
+    "code": "ソースコード"
+  },
+  "viewer": {
+    "title": "コードビューアー",
+    "subtitle": "シードを画像に変換する生成コードを見る",
+    "description": "以下のコードは、スマートコントラクトが生成したシードを画像に変換します。IPFSでも公開しています：",
+    "github": "公開GitHub組織は<link>github.com/PredictionExplorer</link>にあります。"
+  },
+  "seo": {
+    "eyebrow": "ソースコード · 決定論的アート",
+    "heading": "Cosmic Signatureソースコード",
+    "description": "Cosmic Signatureは、オンチェーンのシードを三体NFTアートへ変換する決定論的な作品パイプラインのソースコードを公開しています。下のクライアント側ビューアーは対話的に操作でき、このサーバーレンダリングされた要約はJavaScriptが動く前にクローラーへ要点を伝えます。",
+    "excerpt": "シード -> SHA3-256乱数ストリーム -> 三体シミュレーション -> スペクトルレンダラー -> Cosmic Signature NFT画像",
+    "relatedAria": "ソースコードの関連ページ",
+    "links": {
+      "ipfs": "公開済みのIPFSソースアーティファクトを開く",
+      "github": "GitHub組織を開く",
+      "contracts": "検証済みコントラクトを確認する",
+      "security": "セキュリティに関する注記を読む",
+      "gallery": "生成されたNFTアートを探索する"
+    }
+  }
+}

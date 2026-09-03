@@ -1,0 +1,38 @@
+{
+  "connect": {
+    "button": "ウォレットを接続"
+  },
+  "groups": {
+    "popular": "人気",
+    "more": "その他"
+  },
+  "balances": {
+    "eth": "ETH",
+    "cst": "CST",
+    "cosmicNfts": "COSMIC NFT",
+    "rwlkNfts": "RWLK NFT",
+    "anchoredCst": "係留中のCosmic Signature NFT",
+    "anchoredRwlk": "係留中のRWLK NFT"
+  },
+  "labels": {
+    "loading": "読み込み中…",
+    "balancesHeading": "残高",
+    "anchoredHeading": "係留中",
+    "nftCount": "{count}"
+  },
+  "account": {
+    "heading": "アカウント",
+    "myDashboard": "ダッシュボード",
+    "myRewards": "自分の配分",
+    "myNfts": "自分のNFT",
+    "transferCst": "CSTを送付",
+    "addCstToMetaMask": "CSTをMetaMaskに追加",
+    "addingCstToMetaMask": "CSTをMetaMaskに追加しています…",
+    "myAnchors": "自分の係留",
+    "winningHistory": "受領履歴"
+  },
+  "accessibility": {
+    "copyAddress": "ウォレットアドレスをコピー",
+    "addressCopied": "ウォレットアドレスをコピーしました"
+  }
+}

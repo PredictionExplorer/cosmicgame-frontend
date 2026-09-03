@@ -1,0 +1,796 @@
+{
+  "navigation": {
+    "ariaLabel": "統計のセクション",
+    "overview": {
+      "label": "概要",
+      "title": "Cosmic Signatureプロトコル統計",
+      "description": "Arbitrum上のCosmic Signatureプロトコルの履歴データと全体の指標。参加、トークン、係留、活動、実績の詳しいセクションがあります。"
+    },
+    "participation": {
+      "label": "参加",
+      "title": "参加統計",
+      "description": "すべてのCosmic Signatureパフォーマンス・サイクルでインデックスされたユニーク参加者、配分の受領者、ETH拠出者。"
+    },
+    "tokens": {
+      "label": "トークン",
+      "title": "トークン分布統計",
+      "description": "Cosmic Signature NFTの所有、CST（ERC-20）残高の分布、総供給量の履歴、一筆に添付されたアセット。"
+    },
+    "anchoring": {
+      "label": "係留",
+      "title": "係留統計",
+      "description": "Cosmic Signature NFTとRandomWalk NFTの係留と解除の操作、現在係留中のトークン、ユニーク係留者。"
+    },
+    "activity": {
+      "label": "活動",
+      "title": "一筆の活動統計",
+      "description": "時間ごとの一筆の頻度、活動の急増、参加者の活動期間、一筆の種類の構成、サイクルのタイムライン、サイクルの有効化。"
+    },
+    "performance": {
+      "label": "実績",
+      "title": "参加者の実績統計",
+      "description": "すべてのCosmic Signatureパフォーマンス・サイクルにおける参加者の実績順位表と、受け取れる配分の結果。"
+    }
+  },
+  "intro": {
+    "eyebrow": "プロトコル統計 · Arbitrum"
+  },
+  "breadcrumbs": {
+    "statistics": "統計"
+  },
+  "shared": {
+    "noDataTitle": "データはまだありません",
+    "sectionLoadErrorTitle": "{title}を読み込めませんでした",
+    "serviceError": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "hub": {
+    "loadErrorTitle": "統計を読み込めませんでした",
+    "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
+    "exploreTitle": "統計を探索",
+    "exploreAria": "統計のセクションページ",
+    "currentCycleTitle": "現在のサイクルのデータをお探しですか？",
+    "currentCycleSubtitle": "一筆の履歴、順位表、ライブのサイクル詳細を見る",
+    "protocolEconomyTitle": "プロトコルの経済",
+    "anchoringGlanceTitle": "係留の概観",
+    "anchoringGlanceDescription": "現在、{cosmicCount}点のCosmic Signature NFTと{randomWalkCount}点のRandomWalk NFTが係留されています。係留操作、係留中のトークン、ユニーク係留者は係留統計ページで確認できます。",
+    "anchoringGlanceLink": "係留統計",
+    "headlines": {
+      "uniqueParticipants": "ユニーク参加者",
+      "nftsImprinted": "刻印されたNFT",
+      "nftsAnchored": "係留中のNFT",
+      "gesturesThisCycle": "このサイクルの一筆",
+      "allocationsDistributed": "配られた配分"
+    },
+    "pendingStellarRetrievals": "{count}人の受領者が、合計{amount}の資金をまだ受け取っていません",
+    "voluntaryContributionSummary": "{count}件、合計{amount}",
+    "jsonLd": {
+      "webPageName": "Cosmic Signatureプロトコル統計",
+      "webPageDescription": "パフォーマンス・サイクルの状態、一筆、NFT、CST、係留、準備金、配分データを含む、Arbitrum上のCosmic Signatureプロトコルの公開統計。",
+      "datasetName": "Cosmic Signatureプロトコル統計スナップショット",
+      "datasetDescription": "ArbitrumのスマートコントラクトとCosmic Signature APIからインデックスされた、Cosmic Signatureプロトコルの公開活動のクロール可能な要約。"
+    },
+    "seo": {
+      "eyebrow": "プロトコル統計 · Arbitrum",
+      "heading": "Cosmic Signatureプロトコル統計",
+      "description": "このページは、パフォーマンス・サイクルの状態、一筆、Cosmic Signature NFT、CST、係留、準備金、配分データを含む、Arbitrum上のCosmic Signatureプロトコルの公開活動を追います。下の対話型テーブルはアプリのライブデータで更新されますが、この要約は検索エンジンとAIクローラー向けに最初のHTMLに含まれています。",
+      "lastUpdated": "最終更新：{date}",
+      "unavailableSuffix": "。ライブデータは一時的に利用できないため、このページはプロトコルの説明的な文脈を表示しています。",
+      "dataSource": "データは、プロトコルのArbitrumスマートコントラクト活動をインデックスする公開のCosmic Signature APIから取得しています。プロトコルの仕組みと検証の詳細は、下のクロール可能なリンクをご覧ください。",
+      "relatedPagesAria": "統計の関連ページ",
+      "links": {
+        "currentCycle": "現在のパフォーマンス・サイクルを見る",
+        "howItWorks": "Cosmic Signatureの仕組みを学ぶ",
+        "contracts": "検証済みのArbitrumコントラクトを確認する",
+        "faq": "Cosmic Signatureのよくある質問を読む"
+      },
+      "unavailable": "取得不可"
+    }
+  },
+  "metrics": {
+    "activePerformanceCycle": {
+      "label": "進行中のパフォーマンス・サイクル",
+      "tooltip": "公開のCosmic Signature APIがインデックスしている現在のパフォーマンス・サイクル番号。",
+      "seoDescription": "Arbitrum上のCosmic Signatureの活動からインデックスされた現在のパフォーマンス・サイクル番号。"
+    },
+    "activeCycleGestures": {
+      "label": "進行中サイクルの一筆",
+      "tooltip": "進行中のパフォーマンス・サイクルでこれまでに入れられたインデックス済みの一筆の数。",
+      "seoDescription": "進行中のパフォーマンス・サイクルのインデックス済み筆数。"
+    },
+    "totalCycles": {
+      "label": "総サイクル数",
+      "tooltip": "プロトコル開始以来、完了した、または現在インデックスされているパフォーマンス・サイクルの総数。"
+    },
+    "allocationsDistributed": {
+      "label": "配られた配分",
+      "tooltip": "すべてのサイクルにわたるインデックス済みの配分記録。受領者への配分と、係留配分の積立などプロトコル配分のマーカーを含みます。"
+    },
+    "cosmicSignatureNftsImprinted": {
+      "label": "刻印されたCosmic Signature NFT",
+      "shortLabel": "刻印されたNFT",
+      "tooltip": "インデックス済みのすべてのサイクルでプロトコルが刻印したCosmic Signature NFT（ERC-721）トークンの累計。値が0の場合、統計APIが現在このカウンターについてインデックス済みの刻印を報告していないことを意味します。",
+      "seoDescription": "インデックス済みのすべてのサイクルでプロトコルが刻印したCosmic Signature NFT（ERC-721）トークンの累計。"
+    },
+    "contractBalance": {
+      "label": "コントラクト残高",
+      "seoLabel": "プロトコルコントラクト残高",
+      "tooltip": "今後の配分、受け取り、サイクルの移行の前にCosmic Signatureプロトコルコントラクトが現在保有しているETH。",
+      "seoDescription": "今後の配分の流れの前にCosmic Signatureプロトコルコントラクトが現在保有しているETH。"
+    },
+    "numAllocationsDistributed": {
+      "label": "配られた配分の件数",
+      "tooltip": "インデックス済みの配分記録の件数。利用できる場合はcg_prizeの行を使い、なければ受領者への配分合計の集計にフォールバックします。"
+    },
+    "totalSignatureAllocationsDistributed": {
+      "label": "配られたシグネチャー配分の総額",
+      "tooltip": "インデックス済みのサイクルにわたって、最後の一筆の受領者へシグネチャー配分として配られたETHの総額。"
+    },
+    "stellarSelectionEthDeposited": {
+      "label": "星選ETHの積立",
+      "tooltip": "インデックス済みのパフォーマンス・サイクルにわたって星選プールに配分されたETHの総額。"
+    },
+    "stellarSelectionEthRetrieved": {
+      "label": "星選ETHの受け取り",
+      "tooltip": "選ばれた受領者が星選プールから受け取ったETHの総額。"
+    },
+    "totalSupplyErc20": {
+      "label": "総供給量（ERC-20）",
+      "tooltip": "参加と調整に使われるERC-20トークン、CSTの現在の総供給量。"
+    },
+    "totalCstConsumed": {
+      "label": "消費されたCSTの総量",
+      "tooltip": "参加者がCST一筆を入れる際に使ったCSTの累計。"
+    },
+    "cstConsumedCurrentCycle": {
+      "label": "このサイクルで消費されたCST",
+      "tooltip": "進行中のパフォーマンス・サイクルでこれまでに参加者がCST一筆に使ったCST。"
+    },
+    "ethInGesturesCurrentCycle": {
+      "label": "このサイクルの一筆のETH",
+      "tooltip": "進行中のパフォーマンス・サイクルでこれまでに参加者がETH一筆で支払ったETHの総額。"
+    },
+    "cstGestures": {
+      "label": "CSTでの一筆",
+      "tooltip": "インデックス済みのサイクルにわたって、ETHではなくCSTで入れられた一筆の数。"
+    },
+    "outreachReserve": {
+      "label": "広報準備金",
+      "tooltip": "広報とエコシステムの貢献者のために刻印されたCST。一筆ごとの参加CSTやNFTに伴う功労CSTとは別のものです。"
+    },
+    "outreachTransactions": {
+      "label": "広報トランザクション",
+      "tooltip": "インデックス済みの広報準備金配分トランザクションの数。"
+    },
+    "randomWalkNftsUsed": {
+      "label": "使用されたRandomWalk NFT",
+      "tooltip": "一度だけの一筆の費用の割引のためにETH一筆にすでに添付されたRandomWalk NFT。"
+    },
+    "namedTokens": {
+      "label": "名前付きトークン",
+      "tooltip": "所有者が付けた固有の名前を現在持っているCosmic Signature NFT。"
+    },
+    "uniqueParticipants": {
+      "label": "ユニーク参加者",
+      "tooltip": "インデックス済みの一筆を少なくとも1回入れたユニークなウォレットアドレス。"
+    },
+    "uniqueRecipients": {
+      "label": "ユニーク受領者",
+      "tooltip": "プロトコルからインデックス済みの配分を少なくとも1件受け取ったユニークなウォレットアドレス。"
+    },
+    "uniqueEthContributors": {
+      "label": "ユニークETH拠出者",
+      "tooltip": "プロトコルへETHを拠出したユニークなウォレットアドレス。"
+    },
+    "uniqueAnchorHolders": {
+      "label": "ユニーク係留者",
+      "tooltip": "Cosmic Signature NFTまたはRandomWalk NFTを係留したことのあるユニークなウォレットの合計。"
+    },
+    "cosmicSignatureNftHolders": {
+      "label": "Cosmic Signature NFT保有者",
+      "tooltip": "Cosmic Signature NFTを少なくとも1点現在保有しているユニークなウォレットアドレス。"
+    },
+    "cstErc20Holders": {
+      "label": "CST（ERC-20）保有者",
+      "tooltip": "CST（ERC-20）トークンを現在保有しているユニークなウォレットアドレス。"
+    },
+    "attachedNfts": {
+      "label": "添付されたNFT",
+      "tooltip": "参加者が一筆に添付し、アプリがインデックスしたERC-721トークン。"
+    },
+    "publicGoodsBalance": {
+      "label": "公共財の残高",
+      "tooltip": "公共財の受け手に配分され、インデックス済みのプロトコル残高にまだ反映されているETH。"
+    },
+    "totalContributedEth": {
+      "label": "拠出されたETHの総額",
+      "tooltip": "インデックス済みのすべてのサイクルにわたってプロトコルへ拠出されたETHの総額。"
+    },
+    "protocolContributions": {
+      "label": "プロトコル拠出",
+      "tooltip": "Cosmic Signatureプロトコルを通じて送られたインデックス済みの公共財拠出トランザクションの数。"
+    },
+    "protocolContributionsSum": {
+      "label": "プロトコル拠出の合計",
+      "tooltip": "インデックス済みのCosmic Signatureプロトコル公共財拠出トランザクションを通じて拠出されたETHの総額。"
+    },
+    "voluntaryContributions": {
+      "label": "自発的な拠出",
+      "tooltip": "必須のサイクルの流れの外で、コミュニティメンバーが自発的に行ったETH拠出。"
+    },
+    "publicGoodsRetrievals": {
+      "label": "公共財の受け取り",
+      "tooltip": "公共財金庫からのインデックス済みの受け取りトランザクションの数。"
+    },
+    "totalPublicGoodsRetrieved": {
+      "label": "受け取られた公共財の総額",
+      "tooltip": "公共財金庫から受け取られたETHの総額。"
+    }
+  },
+  "groups": {
+    "allocationEconomy": {
+      "label": "配分の経済",
+      "tooltip": "パフォーマンス・サイクルが確定するときに生まれる累積の配分記録とETHの流れ。"
+    },
+    "tokenEconomy": {
+      "label": "トークンの経済",
+      "tooltip": "CSTとNFTのカウンター。CSTはERC-20トークン、Cosmic Signature NFTはERC-721トークンです。"
+    },
+    "publicGoods": {
+      "label": "公共財と拠出",
+      "tooltip": "公共財と添付されたアセットに関わるプロトコルの残高と拠出の流れ。"
+    }
+  },
+  "sectionTooltips": {
+    "attachedAssets": "一筆に添付されたERC-721とERC-20のアセット。すべてのサイクル、または現在のパフォーマンス・サイクルだけを表示できます。",
+    "gestureTypeDistribution": "ETH、RandomWalk（ETH支払い）、CSTで入れられた一筆の割合の時間推移を、選んだ間隔でサンプリングしたもの。現在のサイクルのみ。",
+    "enduranceTimeline": "サイクル中に誰が先頭を保っていたかのガントチャート。各バーは先頭の保持区間で、幅はそのアドレスが先頭を保った時間です。最も幅の広いバーが持久チャンピオン。時の戦士は、持久チャンピオンとしての単一の連続した保持が最も長かった参加者です。任意のサイクルを選んで比較できます。",
+    "cstWindow": "サイクル中にCST調律期間がどう推移したか。ETH一筆はそれぞれ期間をわずかに短くし、CST一筆はそれぞれ長くします。この期間が、CST一筆の費用が費用なしまで下がる速さを決めます。任意のサイクルを選んで比較できます。",
+    "cstCost": "サイクル中に各CST一筆に実際にかかった費用を対数目盛で、その直前に残っていた配分時計とともに示します。サイクル中盤の一筆はほとんど費用なしのことが多く、終盤では一筆が続いて費用が下がる時間がなくなり、価格が数千CSTに達することもあります。",
+    "attachedTokenDistribution": "一筆に添付されたERC-721アセットのコントラクトとトークン数。",
+    "cosmicSignatureTokenDistribution": "Cosmic Signature NFT（ERC-721）トークンの現在の所有者分布。",
+    "cstBalanceDistribution": "CST（ERC-20）残高の現在のウォレット分布。",
+    "cstTotalSupply": "刻印と消費を含む、CST（ERC-20）供給量の時間推移。",
+    "cycleActivations": "プロトコルのサイクルやモードが有効になり、終了した時期を示すシステムイベントの期間。",
+    "uniqueParticipants": "インデックス済みの一筆を少なくとも1回入れたウォレット。筆数順。",
+    "uniqueRecipients": "インデックス済みのプロトコル配分を受け取ったウォレット。",
+    "uniqueEthContributors": "プロトコルへETHを拠出したウォレット。",
+    "anchorReleaseActions": "選択したNFTの種類の、時系列の係留と解除の操作。",
+    "anchoredTokens": "選択した係留ウォレットで現在係留中のトークン。",
+    "uniqueAnchorHolders": "選択したNFTの種類を係留または解除したことのあるウォレット。",
+    "gestureFrequency": "プロトコルの活動パターンを示すために、時間ごとにまとめたインデックス済みの筆数。",
+    "gestureSpikes": "周囲の活動と比べて一筆の活動が急に変化した期間。",
+    "participantActivePeriods": "最も活発なウォレットについての、インデックス済みの最長の活動期間。"
+  },
+  "anchoringTooltips": {
+    "cstActiveAnchorHolders": "Cosmic Signature NFTを少なくとも1点現在係留しているウォレット。",
+    "cstAnchorDistributionDeposits": "Cosmic Signature NFT係留配分プールへの積立イベントの総数。",
+    "cstTotalAnchorDistributions": "Cosmic Signature NFTの係留者へ係留配分として配られたETHの総額。",
+    "cstTotalTokensAnchored": "プロトコルに現在係留されているCosmic Signature NFTの数。",
+    "cstUnretrievedAnchorDistributions": "配分されたが、Cosmic Signature NFTの係留者がまだ受け取っていない係留配分。",
+    "rwlkActiveAnchorHolders": "RandomWalk NFTを少なくとも1点現在係留しているウォレット。",
+    "rwlkTotalTokensImprinted": "係留NFT星選を通じてRandomWalk NFTの係留者のために刻印されたCosmic Signature NFTと、それに伴うCSTの総数。",
+    "rwlkTotalTokensAnchored": "プロトコルに現在係留されているRandomWalk NFTの数。",
+    "cstGroup": "Cosmic Signature NFTの係留は、現在係留中のCosmic Signature NFTの間でETHの係留配分を分け合います。",
+    "rwlkGroup": "RandomWalk NFTの係留は、係留NFT星選の配分の対象資格を与えます。"
+  },
+  "activity": {
+    "heading": "一筆の活動",
+    "sections": {
+      "frequency": "一筆の頻度の推移",
+      "spikes": "一筆の急増",
+      "activePeriods": "上位20参加者の活動期間",
+      "typeDistribution": "一筆の種類の分布",
+      "enduranceTimeline": "持久と時の戦士のタイムライン",
+      "cstWindow": "CST調律期間のタイムライン",
+      "cstCost": "CST一筆の費用の推移",
+      "cycleActivations": "サイクルの有効化"
+    },
+    "currentCycleOnly": "現在のサイクルのみ",
+    "emptyCycleActivations": "インデックス済みのサイクル有効化はまだありません"
+  },
+  "anchoringPage": {
+    "snapshot": {
+      "cosmicSignatureLabel": "係留中のCosmic Signature NFT",
+      "cosmicSignatureTooltip": "プロトコルに現在係留され、係留配分を分け合っているCosmic Signature NFTの総数。",
+      "randomWalkLabel": "係留中のRandomWalk NFT",
+      "randomWalkTooltip": "現在係留され、係留NFT星選の対象となっているRandomWalk NFTの総数。",
+      "poolLabel": "係留配分プール",
+      "poolTooltip": "Cosmic Signature NFTの係留者のために係留配分プールに現在配分されているETH。",
+      "perNftLabel": "Cosmic Signature NFTあたりの配分",
+      "perNftTooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。",
+      "perNftTooltipUnavailable": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。オンチェーンの係留プールはゼロではありませんが、インデックス済みの係留Cosmic Signature NFT総数がゼロのため（例：cg_stake_stats_cstがETLで更新されていない）、NFTあたりの値を計算できません。",
+      "activeHoldersLabel": "活動中の係留者",
+      "activeHoldersTooltip": "Cosmic Signature NFTまたはRandomWalk NFTを少なくとも1点現在係留している活動中のウォレットの合計。"
+    },
+    "description": "係留されたNFTはCosmic Signatureの中核です。Cosmic Signature NFTはETHの係留配分を分け合い、RandomWalk NFTは係留NFT星選に参加します。",
+    "historyLink": "係留の履歴を見る",
+    "tableDescription": "下のタブで、係留 / 解除の操作、現在係留中のトークン、そして係留の全体合計を支えるユニークなウォレットを調べられます。",
+    "tabs": {
+      "cosmicSignature": "Cosmic Signature NFT",
+      "randomWalk": "RandomWalk NFT"
+    },
+    "groups": {
+      "cosmicSignature": "Cosmic Signature NFT係留の概要",
+      "randomWalk": "RWLK係留の概要"
+    },
+    "stats": {
+      "activeHolders": "活動中の係留者数",
+      "distributionDeposits": "係留配分の積立回数",
+      "totalDistributions": "係留配分の総額",
+      "tokensImprinted": "刻印されたトークンの総数",
+      "tokensAnchored": "係留中のトークンの総数",
+      "unretrievedDistributions": "未受け取りの係留配分"
+    },
+    "tables": {
+      "actions": "係留 / 解除の操作",
+      "anchoredTokens": "係留中のトークン",
+      "uniqueHolders": "ユニーク係留者"
+    },
+    "empty": {
+      "actions": "係留操作はまだありません",
+      "tokens": "現在係留中のトークンはありません",
+      "holders": "係留者はまだいません"
+    }
+  },
+  "participation": {
+    "sections": {
+      "participants": "ユニーク参加者",
+      "recipients": "ユニーク受領者",
+      "contributors": "ユニークETH拠出者"
+    },
+    "empty": {
+      "participantsTitle": "参加者はまだいません",
+      "participantsDescription": "最初のインデックス済みの一筆の後、ウォレットがここに表示されます。",
+      "recipientsTitle": "受領者はまだいません",
+      "recipientsDescription": "最初のインデックス済みの配分を受け取った後、ウォレットがここに表示されます。",
+      "contributorsTitle": "ETH拠出はまだありません",
+      "contributorsDescription": "最初のインデックス済みのETH拠出の後、ウォレットがここに表示されます。"
+    }
+  },
+  "tokens": {
+    "sections": {
+      "nftDistribution": "Cosmic Signature NFT（ERC-721）",
+      "cstDistribution": "CST（ERC-20）残高の分布",
+      "totalSupply": "CST総供給量",
+      "attachedDistribution": "添付されたトークンの分布",
+      "attachedAssets": "添付されたアセット"
+    },
+    "empty": {
+      "nftTitle": "Cosmic Signature NFTはまだ刻印されていません",
+      "nftDescription": "NFTが刻印されると、所有者の分布がここに表示されます。",
+      "cstTitle": "CSTの残高はまだありません",
+      "cstDescription": "CSTが流通し始めると、ウォレットの残高分布がここに表示されます。",
+      "contractsTitle": "添付されたERC-721コントラクトはまだありません"
+    },
+    "supplyTabs": {
+      "date": "日付別",
+      "gesture": "一筆別"
+    }
+  },
+  "attachedAssets": {
+    "scopeAria": "添付NFTの範囲",
+    "scopeAll": "すべてのサイクル",
+    "scopeCurrent": "現在のサイクル",
+    "nftTab": "NFT（ERC-721）",
+    "erc20Tab": "トークン（ERC-20）",
+    "nftLoadError": "添付されたNFTを読み込めませんでした",
+    "erc20LoadError": "添付されたERC-20トークンを読み込めませんでした",
+    "serviceError": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
+    "emptyCurrentTitle": "このサイクルで添付されたNFTはありません",
+    "emptyAllTitle": "添付されたNFTはまだありません",
+    "emptyCurrentDescription": "現在のパフォーマンス・サイクル中に一筆に添付されたNFTがここに表示されます。",
+    "emptyAllDescription": "すべてのサイクルの添付されたNFTがここに表示されます。",
+    "erc20Description": "現在のパフォーマンス・サイクル中に一筆に添付されたERC-20トークン。"
+  },
+  "performance": {
+    "leaderboardTitle": "参加者の実績",
+    "claimsTitle": "サイクル別の配分の受け取り",
+    "leaderboard": {
+      "description": "すべてのサイクルにわたる、参加者ごとの純ETHと増減率。数値は<em>ETHのみ</em>で、配分で受け取ったETHから一筆に使ったETHを引いたものです。CSTとNFTの配分は参考として示します。CSTだけを使った参加者にはETHの増減は表示されません。",
+      "sort": {
+        "netEth": "純ETHが多い順",
+        "netPercent": "純増減率が高い順",
+        "allocationRate": "配分率が高い順",
+        "spender": "支出が多い順",
+        "nfts": "NFTが多い順"
+      },
+      "minimumGestures": "最小筆数",
+      "cstOnly": "（CSTのみ）",
+      "cstOnlyTooltip": "ETHの支出なし（CSTのみの参加者）",
+      "noEthReceivedTooltip": "まだETHを受け取っていません。この参加者はこれまでETHの配分を受けていません",
+      "loadErrorTitle": "実績の順位表を読み込めませんでした",
+      "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
+      "empty": "この絞り込みに一致する参加者はまだいません。",
+      "columns": {
+        "participant": "参加者",
+        "allocationRate": "配分率",
+        "gestures": "筆数",
+        "spent": "支出（ETH）",
+        "received": "受領（ETH）",
+        "net": "純額（ETH）",
+        "netPercent": "純増減率",
+        "allocations": "配分"
+      }
+    },
+    "claims": {
+      "description": "サイクルごとに与えられ、受領者自身が受け取るアセット——二次的なETH配分、添付されたNFT、添付されたERC-20。直接支払われるアセット（主ETH、刻印されたCSTとNFT）は受け取り操作が不要なため含みません。受領者は通常すぐに受け取ります。受け取り期間を過ぎて残ったものは、誰でも取得できます。",
+      "loadErrorTitle": "配分の受け取りを読み込めませんでした",
+      "loadErrorMessage": "統計サービスから応答がありませんでした。しばらくしてからもう一度お試しください。",
+      "empty": "受け取れるアセットはまだ与えられていません。",
+      "columns": {
+        "cycle": "サイクル",
+        "awarded": "付与（受け取り可）",
+        "unclaimed": "未受け取り",
+        "claimedPercent": "受け取り率",
+        "averageTime": "平均受け取り時間",
+        "details": "詳細"
+      },
+      "allClaimed": "すべて受け取り済み",
+      "unclaimedCount": "未受け取り{count}件",
+      "viewUnclaimed": "未受け取りのアセットを見る",
+      "explore": "探索",
+      "dialog": {
+        "unclaimedTitle": "未受け取りのアセット——サイクル{cycle}",
+        "expired": "受け取り期間は終了しました。これらのアセットは誰でも取得できます。",
+        "closesIn": "受け取り期間は{duration}後に終了します。",
+        "asset": "アセット",
+        "recipient": "受領者",
+        "detail": "詳細",
+        "exploreTitle": "サイクル{cycle}を探索",
+        "exploreDescription": "各受領者がかかった時間つきの受け取りトランザクションと、このサイクルで添付されたトークン。",
+        "claimTransactions": "受け取りトランザクション",
+        "noClaims": "このサイクルに記録された受け取りはありません。",
+        "claimedAfter": "受け取りまでの時間",
+        "when": "日時",
+        "transaction": "トランザクション",
+        "sweptBy": "{address}が取得",
+        "attachedTokens": "添付されたトークン",
+        "noAttached": "このサイクルで添付されたトークンはありません。",
+        "token": "トークン",
+        "attachedBy": "添付者"
+      },
+      "assets": {
+        "eth": "ETH",
+        "nft": "添付されたNFT",
+        "erc20": "添付されたERC-20"
+      }
+    }
+  },
+  "charts": {
+    "frequency": {
+      "bucket": "集計単位",
+      "daily": "日別",
+      "hourly": "時間別",
+      "gestures": "筆数",
+      "uniqueParticipants": "ユニーク参加者",
+      "loadErrorTitle": "一筆の頻度を読み込めませんでした",
+      "loadErrorMessage": "選択した範囲の一筆の頻度を取得できませんでした。",
+      "empty": "この期間に一筆の活動はありません。",
+      "openingExcluded": "各サイクルの開始後1時間の一筆は除外しています。開始直後の活動は極端に集中するため、含めるとこのグラフが歪んでしまいます。"
+    },
+    "spikes": {
+      "count": "急増（{count}）",
+      "groupAria": "検出された一筆の急増",
+      "previousAria": "前の急増",
+      "nextAria": "次の急増",
+      "summary": "ピーク 毎時{peak}筆 · 急増中の合計{total} · {date}",
+      "viewing": "急増 #{index}を表示中：{start} → {end}",
+      "gestures": "筆数：{count}",
+      "loadErrorTitle": "一筆の急増を読み込めませんでした",
+      "loadErrorMessage": "急増検出データを取得できませんでした。",
+      "empty": "インデックス済みの履歴に一筆の急増は検出されていません。",
+      "noneRecent": "最近の急増はありません。",
+      "selectEarlier": "上で急増の番号を選ぶと過去にさかのぼり、以前の活動の急増を調べられます。",
+      "emptyWindow": "選択した急増の期間に時間別の集計はありません。"
+    },
+    "activePeriods": {
+      "description": "上位{count}参加者の活動期間（連続する一筆の間隔が6時間以内で、2筆以上）。各バーが一つのまとまりです。",
+      "participant": "参加者",
+      "ariaLabel": "{address}：{start}から{end}まで{count}筆",
+      "tooltipSummary": "{count}筆 · {minutes}分間",
+      "loadErrorTitle": "活動期間を読み込めませんでした",
+      "loadErrorMessage": "上位参加者の活動タイムラインを取得できませんでした。",
+      "empty": "上位参加者の活動期間は見つかりませんでした。"
+    },
+    "typeRatio": {
+      "totalGestures": "一筆の総数",
+      "sampleEvery": "サンプル間隔",
+      "interpolation": "補間",
+      "intervals": {
+        "oneHour": "1時間",
+        "sixHours": "6時間",
+        "twelveHours": "12時間",
+        "oneDay": "1日"
+      },
+      "linear": "線形",
+      "step": "段階",
+      "smooth": "滑らか",
+      "notStarted": "現在のサイクルはまだ始まっていません。",
+      "loadErrorTitle": "一筆の種類の分布を読み込めませんでした",
+      "loadErrorMessage": "現在のサイクルの一筆の種類の構成を取得できませんでした。",
+      "empty": "現在のサイクルに一筆の活動はまだありません。",
+      "description": "各サンプルは、その区間内の一筆の種類の構成です（区間ごとで、累積ではありません）。一筆のない区間はすべての種類が0%になります。"
+    },
+    "endurance": {
+      "timeIntoCycle": "サイクル開始からの時間",
+      "intoCycle": "開始から{duration}",
+      "currentLeadWindow": "現在の先頭の期間",
+      "enduranceRecord": "持久記録",
+      "enduranceChampionRecord": "持久チャンピオンの記録",
+      "chronoRecord": "時の戦士の記録",
+      "leadHeldBy": "先頭の保持者",
+      "legendEndurance": "持久チャンピオン（最長の単一保持）",
+      "legendChrono": "時の戦士（最長の保持期間）",
+      "legendLead": "先頭の保持",
+      "legendNewRecord": "新記録",
+      "enduranceChampion": "持久チャンピオン",
+      "enduranceChampionAbbr": "EC",
+      "chronoWarrior": "時の戦士",
+      "chronoWarriorAbbr": "CW",
+      "newRecord": "新記録",
+      "roleEndurance": "（持久チャンピオン）",
+      "roleNewRecord": "（新記録）",
+      "stintAria": "{address} • 保持{duration} • 開始から{from} → {to}{role}",
+      "description": "各バーは先頭の保持区間です。あるアドレスが一筆を入れてから次の一筆が届くまで先頭を保った時間で、バーの幅がその長さを表します。琥珀色の枠のバーはその時点での新しい持久記録、紫のバーは全体で最も長い単一の保持（持久チャンピオン）、薔薇色のレーンは称号を最も長く保った参加者（時の戦士）です。バーにカーソルを合わせると詳細が表示されます。",
+      "selectCycle": "調べるサイクルを選んでください。",
+      "loadErrorTitle": "持久のタイムラインを読み込めませんでした",
+      "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。",
+      "empty": "このサイクルにはまだ先頭記録がありません",
+      "championSummary": "持久チャンピオン：{address}が{duration}保持",
+      "chronoSummary": "時の戦士：{address}が{duration}保持",
+      "gantt": "ガント",
+      "lineChart": "折れ線グラフ",
+      "openWindowAria": "グラフを新しいウィンドウで開く",
+      "openWindowTitle": "新しいウィンドウで開く"
+    },
+    "cyclePicker": {
+      "cycle": "サイクル",
+      "previousCycleAria": "前のサイクル",
+      "nextCycleAria": "次のサイクル",
+      "cycleNumberAria": "サイクル番号",
+      "liveCycle": "ライブのサイクル",
+      "jumpLive": "ライブへ移動"
+    },
+    "cstWindow": {
+      "timeIntoCycle": "サイクル開始からの時間",
+      "intoCycle": "開始から{duration}",
+      "window": "CST調律期間",
+      "windowAfter": "この一筆の後の期間",
+      "typeEth": "ETH一筆（短くする）",
+      "typeRandomWalk": "ETH + RandomWalk一筆（短くする）",
+      "typeCst": "CST一筆（長くする）",
+      "summaryMin": "最短：{duration}",
+      "summaryMax": "最長：{duration}",
+      "summaryCurrent": "現在：{duration}",
+      "summaryFinal": "確定時：{duration}",
+      "description": "CST調律期間は、CST一筆の費用が開始値から費用なしまで下がるのにかかる時間を決めます。ETH一筆はそれぞれ期間をわずかに短くし、CST一筆はそれぞれ長くします。各点は種類ごとに色分けされた一筆で、線はその後に有効な期間です。",
+      "empty": "このサイクルには一筆ごとの調律期間データがありません。V2イベントより前にインデックスされたサイクルには含まれていません。",
+      "selectCycle": "調べるサイクルを選んでください。",
+      "loadErrorTitle": "調律期間のタイムラインを読み込めませんでした",
+      "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。"
+    },
+    "cstCost": {
+      "timeIntoCycle": "サイクル開始からの時間",
+      "intoCycle": "開始から{duration}",
+      "priceLine": "一筆ごとに支払われたCST",
+      "clockLine": "一筆の直前に残っていた時計",
+      "cstPaid": "支払われたCST",
+      "clockBefore": "直前に残っていた時計",
+      "gestureBy": "一筆の主",
+      "clickHint": "点をクリックするとトランザクションを開きます。",
+      "summaryMax": "最高額：{amount}（開始から{when}）",
+      "summaryTotal": "消費合計：{amount}",
+      "summaryCount": "CST一筆{count}筆",
+      "description": "紫の点はそれぞれ、一筆に実際に支払われたCSTです（対数目盛。白抜きの点は費用なし）。CST一筆のたびに費用は支払額の約2倍にリセットされ、調律期間をかけて費用なしまで下がります。薔薇色の破線は各一筆の直前に残っていた配分時計です。時計が少なくなると一筆が続いて費用の下がる時間がなくなり、支払額が上がっていきます。点をクリックするとトランザクションを開きます。",
+      "empty": "このサイクルにCST一筆はありません。",
+      "selectCycle": "調べるサイクルを選んでください。",
+      "loadErrorTitle": "CST一筆の費用を読み込めませんでした",
+      "loadErrorMessage": "このサイクルの一筆の履歴を取得できませんでした。"
+    },
+    "supply": {
+      "totalSupply": "総供給量",
+      "imprint": "刻印",
+      "consume": "焼却",
+      "net": "純増減",
+      "numGestures": "筆数",
+      "from": "開始",
+      "to": "終了",
+      "update": "グラフを更新",
+      "invalidRange": "開始日は終了日と同じか、それより前でなければなりません。",
+      "loadErrorTitle": "供給量の履歴を読み込めませんでした",
+      "loadDateError": "選択した範囲のCST総供給量を取得できませんでした。",
+      "emptyDate": "この期間の供給量の履歴はありません。",
+      "gesture": "一筆{number}",
+      "gestureType": "一筆の種類",
+      "gestureInfoId": "一筆の情報ID",
+      "loadGestureError": "一筆別のCST総供給量を取得できませんでした。",
+      "emptyGesture": "一筆別の供給量の履歴はありません。"
+    },
+    "balance": {
+      "outreachWallet": "広報ウォレット",
+      "others": "その他"
+    }
+  },
+  "recipientHistory": {
+    "pageTitle": "自分の配分履歴",
+    "connectedTitle": "自分の配分の履歴",
+    "subtitle": "過去の配分の受け取りと配分を見る",
+    "disconnectedDescription": "すべてのCosmic Signatureパフォーマンス・サイクルにわたる配分の完全な履歴を追います。シグネチャー配分の受け取り、ETH星選の配分、Cosmic Signature NFTの配分、係留配分を含みます。",
+    "connectedDescription": "すべてのCosmic Signatureパフォーマンス・サイクルにわたる配分の完全な履歴を追います。シグネチャー配分の受け取り、星選ETHの配分、Cosmic Signature NFTの配分、係留配分を含みます。",
+    "walletTitle": "ウォレットが接続されていません",
+    "walletDescription": "配分の履歴を見るにはウォレットを接続してください。",
+    "loadError": "配分の履歴を読み込めませんでした",
+    "loadErrorDescription": "しばらくしてからもう一度お試しください。",
+    "emptyTitle": "配分はまだありません",
+    "emptyDescription": "現在、記録された配分はありません。"
+  },
+  "namedNfts": {
+    "eyebrow": "名前付きNFT · {count}",
+    "title": "名前付きCosmic Signature NFT",
+    "subtitle": "固有の名前が付けられたCosmic Signature NFTを見る",
+    "description": "Cosmic Signature NFTの所有者はNFTに固有の名前を付けて、コレクションの中で唯一のアイデンティティを生み出せます。名前付きNFTはギャラリーで目立ち、所有者の個性を携えています。",
+    "emptyTitle": "名前付きNFTはありません",
+    "emptyDescription": "名前を付けられたCosmic Signature NFTはまだありません。"
+  },
+  "attachedNfts": {
+    "eyebrow": "添付されたNFT · {count}",
+    "title": "添付されたNFT拠出",
+    "subtitle": "各サイクルでコミュニティメンバーが一筆に添付したNFT",
+    "description": "コミュニティメンバーは詳細設定から、自分のNFT（ERC-721）を一筆に添付できます。添付されたNFTは、サイクルが確定するとシグネチャー配分を受け取る参加者へ送られ、配分をETHだけでないものにします。"
+  },
+  "usedRwlkNfts": {
+    "eyebrow": "使用済みRWLK · {count}",
+    "title": "使用済みのRandom Walk NFT",
+    "subtitle": "一度だけの50%の一筆の費用の割引のためにETH一筆に添付されたRandom Walk NFT",
+    "description": "RandomWalk NFTの保有者は、未使用のNFTをETH一筆に添付して、Cosmic Signatureでの一筆の費用を50%引き下げられます。使用されたRandomWalk NFTはここに記録されます。各NFTはこの割引に一度しか使えないため、使うタイミングが戦略的な判断になります。",
+    "loading": "読み込み中…",
+    "empty": "NFTはまだありません。"
+  },
+  "stellarSelectionEth": {
+    "invalidAddress": "無効なアドレス",
+    "user": "ユーザー",
+    "heading": "この参加者に配分された星選ETH",
+    "retrievable": "受け取れる配分は{amount} ETHです",
+    "retrieveAll": "すべて受け取る",
+    "empty": "星選ETHはまだありません。"
+  },
+  "stellarSelectionNft": {
+    "invalidAddress": "無効なアドレス",
+    "user": "ユーザー",
+    "heading": "この参加者に配分された星選NFT",
+    "loading": "読み込み中…",
+    "empty": "NFTの配分はまだありません。",
+    "isRandomWalk": "RandomWalkか",
+    "isAnchorHolder": "係留者か"
+  },
+  "systemEvent": {
+    "titleBeforeCycle": "サイクル{cycle}より前に設定されたシステム構成",
+    "titleBeforeDeployment": "デプロイより前に設定されたシステム構成",
+    "range": "イベントログの範囲：{start}〜{end}",
+    "breadcrumbs": {
+      "home": "ホーム",
+      "coordination": "調整の変更",
+      "beforeCycle": "サイクル{cycle}より前",
+      "deployment": "デプロイ"
+    },
+    "loading": "読み込み中…",
+    "loadError": "システムイベントを読み込めませんでした",
+    "explainEvent": "{event}の説明",
+    "adminEvents": {
+      "undefined": "未定義",
+      "publicGoodsPercentage": "公共財金庫に指定された資金の配分割合が変更されました。",
+      "signatureAllocationPercentage": "シグネチャー配分に指定された資金の配分割合が変更されました。",
+      "stellarSelectionPercentage": "星選の配分に指定された資金の配分割合が変更されました。",
+      "anchorDistributionPercentage": "係留配分に指定された資金の配分割合が変更されました。",
+      "stellarEthRecipients": "サイクルあたりの星選受領者数が変更されました。",
+      "stellarNftRecipients": "サイクルあたりの星選NFT受領者数が変更されました。",
+      "cycleActivationDelay": "サイクル有効化前の遅延時間が変更されました。",
+      "anchoredRandomWalkRecipients": "係留RandomWalk NFTの星選NFT受領者数が変更されました。",
+      "publicGoodsVaultAddress": "公共財金庫のアドレスが変更されました。",
+      "randomWalkContractAddress": "RandomWalkNFTコントラクトのアドレスが変更されました。",
+      "allocationsWalletAddress": "配分ウォレット（配分エスクロー）のアドレスが変更されました。",
+      "anchoringWalletAddress": "係留ウォレットのアドレスが変更されました。",
+      "randomWalkAnchoringWalletAddress": "RandomWalk NFT係留ウォレットのアドレスが変更されました。",
+      "outreachWalletAddress": "広報ウォレットのアドレスが変更されました。",
+      "cstContractAddress": "Cosmic Signature CSTトークン（ERC-20）コントラクトのアドレスが変更されました。",
+      "cosmicSignatureNftAddress": "Cosmic Signature NFT（ERC-721）コントラクトのアドレスが変更されました。",
+      "contractUpgrade": "CosmicSignatureコントラクトがアップグレードされました。",
+      "timeIncreaseRatio": "時間増加の比率が変更されました。",
+      "finalizationTimeout": "配分確定のタイムアウトが変更されました。",
+      "gestureCostIncreaseRatio": "一筆の費用の上昇率が変更されました。",
+      "gestureTimeIncrement": "一筆ごとの配分時間の増分の値が変更されました。",
+      "initialFinalizationDivisor": "初期のサイクル確定時刻を導く除数（mainPrizeTimeIncrementInMicroSeconds / divisor）が変更されました。",
+      "treasurerAddress": "広報ウォレットのアドレスが変更されました。",
+      "activationTime": "サイクルの有効化時刻が変更されました。",
+      "cstCalibrationLength": "開始時のCST調律期間の長さが変更されました。",
+      "erc20Multiplier": "ERC20配分倍率が変更されました。",
+      "minimumCstGestureCost": "CSTでの開始一筆の費用の下限が変更されました。",
+      "outreachAllocationPercentage": "広報配分に指定された資金の配分割合が変更されました。",
+      "tokenAllocationPercentage": "トークン配分に指定された資金の配分割合が変更されました。",
+      "maxMessageLength": "一筆のメッセージの最大長が変更されました。",
+      "tokenScriptUrl": "トークン生成スクリプトのURLが変更されました。",
+      "nftBaseUri": "CosmicSignature NFTのBaseURIが変更されました。",
+      "contractInitialized": "コントラクトの初期化が完了しました",
+      "ownershipTransferred": "コントラクトの所有権が移転されました。",
+      "allocationRetrievalTimeout": "配分を受け取るためのタイムアウト時間が変更されました。",
+      "ethCalibrationDurationDivisor": "ETH調律期間の長さが変更されました。",
+      "ethCalibrationEndingCostDivisor": "ETH調律期間終了時の一筆の費用の除数が変更されました。",
+      "chronoWarriorEthPercentage": "時の戦士のETH配分に指定された資金の配分割合が変更されました。"
+    }
+  },
+  "attachedNftCard": {
+    "viewNamed": "添付されたNFT {name}を見る",
+    "viewId": "添付されたNFT {id}を見る",
+    "imageAltNamed": "添付されたNFT {name}",
+    "imageAlt": "添付されたNFT",
+    "unknownToken": "不明なトークン",
+    "attached": "添付済み"
+  },
+  "attachedNftLinks": {
+    "viewNft": "NFTを見る",
+    "viewOpenSea": "OpenSeaで見る",
+    "viewContract": "コントラクトを見る",
+    "detailsUnavailable": "NFTの詳細を利用できません",
+    "contractUnavailable": "コントラクトを利用できません"
+  },
+  "publicDataSummaries": {
+    "common": {
+      "lastUpdated": "最終更新：{date}。データソース：{source}。下の対話型テーブルはアプリのライブデータで更新されますが、この要約は検索エンジンとAIクローラー向けに最初のHTMLに含まれています。",
+      "relatedPagesAria": "{heading}の関連ページ",
+      "unavailable": "取得不可"
+    },
+    "attachedNfts": {
+      "eyebrow": "添付されたNFT拠出 · Arbitrum",
+      "heading": "添付されたNFT拠出",
+      "description": "Cosmic Signatureの一筆に添付されたNFTを見る。添付されたERC-721トークンは、サイクルが確定するとシグネチャー配分を受け取る参加者へ送られます。",
+      "source": "Cosmic Signature公開添付NFT API",
+      "cards": {
+        "records": "添付NFTの記録",
+        "contracts": "ユニークNFTコントラクト",
+        "contributors": "拠出者ウォレット"
+      },
+      "links": {
+        "gallery": "Cosmic Signatureギャラリーを探索する",
+        "cycle": "現在のパフォーマンス・サイクルを見る",
+        "learn": "添付がサイクルにどう関わるかを学ぶ"
+      }
+    },
+    "namedNfts": {
+      "eyebrow": "名前付きNFT · Arbitrum",
+      "heading": "名前付きCosmic Signature NFT",
+      "description": "所有者が固有の名前を付けたCosmic Signature NFTを見る。トークンのアイデンティティ、ギャラリーでの発見、オンチェーンのコレクション履歴を結びつけます。",
+      "source": "Cosmic Signature公開トークンAPI",
+      "cards": {
+        "named": "名前付きCosmic Signature NFT",
+        "owners": "現在の所有者",
+        "collection": "コレクション"
+      },
+      "links": {
+        "gallery": "ギャラリー全体を探索する",
+        "learn": "アートについて学ぶ",
+        "code": "レンダリングのソースコードを確認する"
+      }
+    },
+    "usedRwlkNfts": {
+      "eyebrow": "RandomWalk NFTの使用 · Arbitrum",
+      "heading": "使用済みのRandomWalk NFT",
+      "description": "一度だけの一筆の費用の割引のためにETH一筆にすでに添付されたRandomWalk NFTを確認する。",
+      "source": "Cosmic Signature公開RandomWalk使用API",
+      "cards": {
+        "used": "使用済みのRandomWalk NFT",
+        "discount": "一度だけの割引",
+        "scope": "使用範囲",
+        "scopeValue": "NFTごとに一筆1回"
+      },
+      "links": {
+        "imprint": "RandomWalk NFTを刻印する",
+        "learn": "一筆の仕組みを学ぶ",
+        "cycle": "現在のサイクルデータを見る"
+      }
+    }
+  },
+  "routeError": {
+    "title": "統計を読み込めませんでした",
+    "message": "この統計ページの表示中に問題が発生しました。再試行するか、しばらくしてからもう一度お越しください。"
+  }
+}

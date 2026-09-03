@@ -109,6 +109,19 @@ html:lang(ko) {
 }
 
 /*
+ * Japanese: the JIS-form cut of Noto Sans CJK, with the Japanese system faces
+ * as fallbacks. Japanese breaks lines between any two characters like
+ * Chinese, so `keep-all` would be wrong here; `line-break: strict` applies the
+ * stricter kinsoku rules (no line may start with a small kana or the
+ * prolonged-sound mark ー), which the default `auto` relaxes.
+ */
+html:lang(ja) {
+  --cjk-font-stack:
+    var(--font-noto-jp), 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo';
+  line-break: strict;
+}
+
+/*
  * Ukrainian locale typography (docs/i18n/README.md §5). Clash Display has no
  * Cyrillic glyphs, so the display stack switches to the Onest companion face
  * as a whole — appending Onest after Clash in the shared stack would set Latin
@@ -217,11 +230,11 @@ body:has([data-maintenance-banner]) .home-control-shell {
 
   /*
    * CJK typography (docs/i18n/README.md §5), shared by every Chinese locale
-   * (`:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike) and by Korean. The
-   * Latin display face (Clash Display) has no CJK or Hangul glyphs, so these
-   * headings fall through to the locale's Noto Sans cut. CJK must never
-   * inherit Latin display tracking, and the lighter display weights read too
-   * thin in CJK strokes.
+   * (`:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike), by Korean, and by
+   * Japanese. The Latin display face (Clash Display) has no CJK, Hangul, or
+   * kana glyphs, so these headings fall through to the locale's Noto Sans
+   * cut. CJK must never inherit Latin display tracking, and the lighter
+   * display weights read too thin in CJK strokes.
    */
   html:lang(zh) .type-display,
   html:lang(zh) h1,
@@ -230,23 +243,43 @@ body:has([data-maintenance-banner]) .home-control-shell {
   html:lang(ko) .type-display,
   html:lang(ko) h1,
   html:lang(ko) h2,
-  html:lang(ko) h3 {
+  html:lang(ko) h3,
+  html:lang(ja) .type-display,
+  html:lang(ja) h1,
+  html:lang(ja) h2,
+  html:lang(ja) h3 {
     letter-spacing: 0 !important;
     font-weight: 700;
   }
 
-  /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese or
-     Korean document, translated nav/table/status copy must keep natural
-     CJK spacing. */
+  /*
+   * Japanese has no spaces to break at, so a heading wraps wherever the line
+   * ends — often mid-word (東京 | 都). `auto-phrase` asks the browser to break
+   * between phrases instead (Chrome 119+, BudouX); engines without it keep the
+   * default per-character behavior.
+   */
+  html:lang(ja) .type-display,
+  html:lang(ja) h1,
+  html:lang(ja) h2,
+  html:lang(ja) h3 {
+    word-break: auto-phrase;
+  }
+
+  /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese,
+     Korean, or Japanese document, translated nav/table/status copy must keep
+     natural CJK spacing. */
   html:lang(zh) [class*='tracking-'],
-  html:lang(ko) [class*='tracking-'] {
+  html:lang(ko) [class*='tracking-'],
+  html:lang(ja) [class*='tracking-'] {
     letter-spacing: 0 !important;
   }
 
-  /* Keep Latin identifiers monospaced while routing CJK and Hangul glyphs
-     through the project font instead of an OS-dependent monospace fallback. */
+  /* Keep Latin identifiers monospaced while routing CJK, Hangul, and kana
+     glyphs through the project font instead of an OS-dependent monospace
+     fallback. */
   html:lang(zh) .font-mono,
-  html:lang(ko) .font-mono {
+  html:lang(ko) .font-mono,
+  html:lang(ja) .font-mono {
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, var(--cjk-font-stack), monospace !important;
   }

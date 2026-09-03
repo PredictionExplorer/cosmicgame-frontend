@@ -23,6 +23,8 @@ export const SCRIPT_PATTERNS: Record<TranslatedLocale, RegExp> = {
   'zh-HK': /[\u3400-\u9fff]/,
   uk: /[\u0400-\u04ff]/,
   ko: /[\uac00-\ud7a3]/,
+  // Hiragana, katakana, or kanji — Japanese copy always mixes at least two.
+  ja: /[\u3040-\u30ff\u3400-\u9fff]/,
 };
 
 /**
@@ -62,6 +64,14 @@ export const DURATION_NOUNS: LocaleRecord<DurationNouns> = {
     days: '일',
     // 8월 15일 is a calendar date (August 15), not a 15-day duration.
     notAfter: '월\\s?',
+  },
+  ja: {
+    // Counters attach to the digit with no space: 48時間, 5週間, 1日 / 7日間.
+    hours: '時間',
+    weeks: '週間?',
+    days: '日間?',
+    // 8月15日 is a calendar date (August 15), not a 15-day duration.
+    notAfter: '月\\s?',
   },
 };
 
@@ -132,6 +142,16 @@ export const LLMS_SECTIONS: Record<TranslatedLocale, LlmsSectionExpectation> = {
       'COSMIC 암 돌연변이 데이터베이스',
     ],
   },
+  ja: {
+    heading: '日本語',
+    phrases: [
+      'プロシージャル・オンチェーンアート・プロトコル',
+      '48時間',
+      `${protocolFacts.typicalNftsPerCycle}枚のCosmic Signature NFT`,
+      '各RandomWalk NFT',
+      'COSMICがん変異データベース',
+    ],
+  },
 };
 
 /**
@@ -145,4 +165,5 @@ export const NEGOTIATION_PROBES: Record<TranslatedLocale, readonly string[]> = {
   'zh-HK': ['zh-HK,zh-TW;q=0.9,zh;q=0.8', 'zh-Hant-HK', 'zh-Hant-MO', 'zh-MO', 'yue', 'yue-HK'],
   uk: ['uk-UA,uk;q=0.9', 'uk'],
   ko: ['ko-KR,ko;q=0.9,en-US;q=0.8', 'ko', 'ko-KP'],
+  ja: ['ja-JP,ja;q=0.9,en-US;q=0.8', 'ja', 'ja-JP'],
 };

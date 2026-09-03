@@ -7,6 +7,7 @@ import {
   type QuizText,
 } from './structure';
 import { quizTextEn } from './text.en';
+import { quizTextJa } from './text.ja';
 import { quizTextKo } from './text.ko';
 import { quizTextUk } from './text.uk';
 import { quizTextZh } from './text.zh';
@@ -57,6 +58,7 @@ export const quizContentZhTw: QuizContent = buildQuizContent(quizTextZhTw);
 export const quizContentZhHk: QuizContent = buildQuizContent(quizTextZhHk);
 export const quizContentUk: QuizContent = buildQuizContent(quizTextUk);
 export const quizContentKo: QuizContent = buildQuizContent(quizTextKo);
+export const quizContentJa: QuizContent = buildQuizContent(quizTextJa);
 
 const QUIZ_CONTENT: LocaleRecord<QuizContent> = {
   en: quizContentEn,
@@ -65,6 +67,7 @@ const QUIZ_CONTENT: LocaleRecord<QuizContent> = {
   'zh-HK': quizContentZhHk,
   uk: quizContentUk,
   ko: quizContentKo,
+  ja: quizContentJa,
 };
 
 export function getQuizContent(locale: string): QuizContent {

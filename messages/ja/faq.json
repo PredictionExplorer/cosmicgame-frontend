@@ -1,0 +1,94 @@
+{
+  "hero": {
+    "badge": "ナレッジベース",
+    "titlePrefix": "Cosmic Signature",
+    "titleHighlight": "よくある質問",
+    "subtitle": "Cosmic Signatureについて知っておきたいことすべて——はじめの一歩から高度な仕組みまで。",
+    "answerCount": "{count}件以上の回答",
+    "answerCountTooltip": "Cosmic Signatureのあらゆる側面を網羅した詳しい回答です。",
+    "categoryCount": "{count}カテゴリー",
+    "alwaysUpdated": "常に最新"
+  },
+  "search": {
+    "placeholder": "質問を検索…",
+    "ariaLabel": "よくある質問を検索",
+    "clear": "クリア",
+    "clearAria": "検索をクリア",
+    "noResults": "質問が見つかりません。別の語句で検索してみてください。",
+    "resultCount": "{totalCount}件中{resultCount}件を表示"
+  },
+  "navigation": {
+    "ariaLabel": "よくある質問のカテゴリー",
+    "all": "すべて"
+  },
+  "category": {
+    "expandAll": "すべて開く",
+    "collapseAll": "すべて閉じる",
+    "expandAllAria": "すべての質問を開く",
+    "collapseAllAria": "すべての質問を閉じる",
+    "copyLink": "リンクをコピー",
+    "copied": "コピーしました",
+    "copyLinkAria": "この質問へのリンクをコピー"
+  },
+  "popular": {
+    "heading": "よく読まれている質問",
+    "tooltip": "新しい参加者から最も多く寄せられる質問です。"
+  },
+  "empty": {
+    "heading": "質問が見つかりません",
+    "descriptionPrefix": "別の語句で検索するか、",
+    "clearAction": "検索をクリアしてください"
+  },
+  "contact": {
+    "heading": "まだ質問がありますか？",
+    "description": "お探しの答えが見つからない場合は、コミュニティがいつでも力になります。以下のいずれかのチャンネルからご連絡ください。できるだけ早くお返事します。",
+    "x": "Twitter / X",
+    "discord": "Discord"
+  },
+  "tooltips": {
+    "enduranceChampion": {
+      "term": "持久チャンピオン",
+      "content": "パフォーマンス・サイクルの中で、最新の一筆の位置を最も長く途切れずに保った参加者に与えられる特別な称号です。"
+    },
+    "chronoWarrior": {
+      "term": "時の戦士",
+      "content": "さらに希少な称号——持久チャンピオンの位置を最も長く連続して保った参加者です。"
+    },
+    "calibrationWindow": {
+      "term": "調律期間",
+      "content": "一筆の費用が高い水準から始まり、調律上限から調律下限へ向かって時間とともに下がっていく価格決定の期間です。待てば待つほど費用は下がります。"
+    },
+    "cosmicCouncil": {
+      "term": "宇宙評議会",
+      "content": "CST保有者が調整提案を提出し、支持または反対を表明するオンチェーンの調整機関です。たとえば、各サイクルの公共財配分を受け取る公共財の受け手を選びます。"
+    },
+    "cst": {
+      "term": "CST",
+      "content": "CSTトークン——一筆ごとに刻印されるERC-20トークンです。宇宙評議会で使われ、一筆の代替通貨にもなります。"
+    },
+    "erc20": {
+      "term": "ERC-20",
+      "content": "代替可能（交換可能）なトークンのために広く使われているEthereumのトークン規格です。"
+    },
+    "erc721": {
+      "term": "ERC-721",
+      "content": "非代替性トークン（NFT）のためのEthereumのトークン規格です。各トークンは唯一のものです。"
+    },
+    "layer2": {
+      "term": "レイヤー2",
+      "content": "Ethereumの上に築かれた二次的なプロトコルで、Ethereumのセキュリティを引き継ぎながらトランザクションをより速く、より安く処理します。"
+    },
+    "rollup": {
+      "term": "ロールアップ",
+      "content": "多数のトランザクションを一つにまとめるレイヤー2の技術で、Ethereum水準のセキュリティを保ちながらコストを大幅に下げます。"
+    },
+    "randomWalkNft": {
+      "term": "Random Walk NFT",
+      "content": "姉妹NFTコレクションです。ETH一筆に添付すると、ETH一筆の費用が一度だけ50%引き下げられます。"
+    },
+    "renounceOwnership": {
+      "term": "所有権の放棄",
+      "content": "プロトコルのパラメーターを変更するチームの権限を永久に手放す、取り消せないスマートコントラクトの操作です。"
+    }
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "error": {
+    "title": "刻印アーカイブを読み込めません",
+    "message": "Cosmic Signatureコレクションを読み取れませんでした。再試行してアーカイブを読み込んでください。"
+  },
+  "jsonLd": {
+    "name": "Cosmic Signatureギャラリー"
+  },
+  "page": {
+    "eyebrowImprinted": "コレクション · 刻印済みNFT {count}点",
+    "eyebrowLive": "コレクション · ライブ",
+    "title": "NFTギャラリー",
+    "subtitle": "すべてのサイクルで刻印されたCosmic Signature NFTコレクションの全体を探索する"
+  },
+  "intro": {
+    "badge": "ジェネラティブ・アーカイブ",
+    "description": "各Cosmic Signature NFTは、オンチェーンのシードから三体問題の物理シミュレーションを経て導かれた、唯一のジェネラティブアート作品です。標準的なサイクルでは24点の新しいNFTが刻印されます。役割NFTが4点、参加者の星選NFTが10点、そしてRandomWalk NFTの係留者に向けた係留NFT星選が10点です。"
+  },
+  "featured": {
+    "viewAria": "Cosmic Signature {id}を見る",
+    "alt": "Cosmic Signatureのアートワーク{id}",
+    "emptyHint": "インデックス済みのNFTが利用できるようになると、実際のコレクション作品がここに表示されます。",
+    "badgeImprint": "注目の刻印",
+    "badgeArchive": "アーカイブ",
+    "awaitingMetadata": "メタデータ待ち"
+  },
+  "hero": {
+    "totalImprinted": {
+      "label": "刻印総数",
+      "tooltip": "すべてのサイクルで刻印されたCOSMIC NFTの総数"
+    },
+    "currentlyAnchored": {
+      "label": "現在係留中",
+      "tooltip": "プロトコルに係留され、所有者のために配分を受け取っているNFT"
+    },
+    "namedNfts": {
+      "label": "名前付きNFT",
+      "tooltip": "所有者によって固有の名前を付けられたNFT"
+    },
+    "cycles": {
+      "label": "サイクル",
+      "tooltip": "NFTを生み出したサイクルの数"
+    }
+  },
+  "card": {
+    "alt": "Cosmic Signature {id}",
+    "unnamed": "名前なし",
+    "age": {
+      "justNow": "たった今",
+      "minutes": "{count}分前",
+      "hours": "{count}時間前",
+      "days": "{count}日前",
+      "months": "{count}か月前",
+      "years": "{count}年前"
+    },
+    "tooltips": {
+      "round": "サイクル{round}で刻印",
+      "anchored": "現在係留中で、係留配分を受け取っています",
+      "customName": "このNFTには固有の名前があります",
+      "identifier": "このCOSMIC NFTの固有の連番",
+      "mintedOn": "{date}に刻印"
+    }
+  },
+  "filters": {
+    "ariaLabel": "NFTを絞り込む",
+    "all": {
+      "label": "すべて",
+      "tooltip": "コレクションのすべてのNFTを表示"
+    },
+    "anchored": {
+      "label": "係留中",
+      "tooltip": "現在係留中で係留配分を受け取っているNFT"
+    },
+    "named": {
+      "label": "名前付き",
+      "tooltip": "所有者が固有の名前を付けたNFT"
+    }
+  },
+  "sort": {
+    "ariaLabel": "並び順",
+    "tooltip": "NFTの表示順を変更",
+    "newest": "新しい順",
+    "oldest": "古い順",
+    "cycleDesc": "サイクル（大→小）",
+    "cycleAsc": "サイクル（小→大）",
+    "rarity": "希少なものから",
+    "chaosDesc": "カオス（高→低）",
+    "chaosAsc": "カオス（低→高）",
+    "syzygiesDesc": "朔望の多い順"
+  },
+  "list": {
+    "headers": {
+      "artwork": "アートワーク",
+      "token": "トークン",
+      "structure": "構造",
+      "palette": "パレット",
+      "spectral": "型",
+      "chaos": "カオス",
+      "fate": "運命",
+      "allocation": "配分",
+      "cycle": "サイクル",
+      "age": "刻印"
+    }
+  },
+  "view": {
+    "ariaLabel": "表示モード",
+    "grid": "グリッド表示",
+    "list": "リスト表示"
+  },
+  "pagination": {
+    "showing": "<value>{total}</value>点中<value>{start}</value>〜<value>{end}</value>点のNFTを表示",
+    "perPage": "1ページあたり",
+    "perPageAria": "1ページあたりの件数",
+    "perPageTooltip": "1ページに表示するNFTの数"
+  },
+  "empty": {
+    "title": "NFTが見つかりません",
+    "description": "検索条件や絞り込みを変えて、お探しのものを見つけてください。"
+  }
+}

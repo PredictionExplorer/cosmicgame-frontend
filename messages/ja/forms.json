@@ -1,0 +1,16 @@
+{
+  "datePicker": {
+    "previousMonth": "前の月",
+    "nextMonth": "次の月",
+    "pickDate": "日付を選択",
+    "weekdays": {
+      "sunday": "日",
+      "monday": "月",
+      "tuesday": "火",
+      "wednesday": "水",
+      "thursday": "木",
+      "friday": "金",
+      "saturday": "土"
+    }
+  }
+}
