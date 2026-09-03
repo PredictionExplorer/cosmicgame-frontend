@@ -248,3 +248,43 @@ Cosmic Signature не пов’язаний із базою даних мута�
 - [Axiom Zero](https://www.axiomzero.market/cosmic-signature): NFT-маркетплейс на Arbitrum без комісії платформи
 - [Chaos Zero](https://chaoszero.com): ринок прогнозів для циклів Cosmic Signature; запитання кожного циклу — чи буде на момент завершення більше жестів, ніж у попередньому циклі
 - [Обмін CST на Uniswap](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): обмін CST на Arbitrum
+
+## 한국어 개요
+
+Cosmic Signature는 Arbitrum 위에서 작동하는 절차적 온체인 아트 프로토콜입니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 모든 제스처는 사이클의 최종 시그니처에 영향을 줍니다. 사이클이 마감되면 프로토콜은 공개된 규칙에 따라 사이클 준비금을 10개가 넘는 배분 경로로 배분하며, 그 가운데에는 이더리움 핵심 기여자를 지원하는 Protocol Guild가 있습니다.
+
+Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 관련이 없습니다.
+
+### 한국어 주요 페이지
+
+- [한국어 홈](https://cosmicsignature.com/ko): 프로토콜과 온체인 아트 개요
+- [소개](https://cosmicsignature.com/ko/about): 프로토콜 주체, 공식 링크, 이름 구분
+- [백서](https://cosmicsignature.com/ko/white-paper): 프로토콜 메커니즘과 설계의 전체 설명 (한국어와 영어, PDF 포함)
+- [학습 센터](https://cosmicsignature.com/ko/learn): 퍼포먼스 사이클, 삼체 아트, 앵커링, 공공재 설명
+- [한국어 앱](https://app.cosmicsignature.com/ko): 현재 사이클과 제스처 인터페이스
+- [갤러리](https://app.cosmicsignature.com/ko/gallery): 각인된 Cosmic Signature NFT 둘러보기
+- [작동 원리](https://app.cosmicsignature.com/ko/how-it-works): 전체 프로토콜 메커니즘
+- [자주 묻는 질문](https://app.cosmicsignature.com/ko/faq): 주제별로 정리한 한국어 답변
+- [통계](https://app.cosmicsignature.com/ko/statistics): 공개 프로토콜 데이터
+- [앵커링](https://app.cosmicsignature.com/ko/anchoring): 앵커링 규칙과 지급 내역
+- [컨트랙트](https://app.cosmicsignature.com/ko/contracts): 배포된 컨트랙트 주소
+- [보안](https://app.cosmicsignature.com/ko/security): 검증 자료와 안전한 참여 안내
+- [보안 감사](https://app.cosmicsignature.com/ko/audits): Hacken 감사 보고서와 정형 검증 배경
+- [위험 고지](https://app.cosmicsignature.com/ko/risk-disclosures): 블록체인, 지갑, 프로토콜 참여의 위험
+
+### 프로토콜 요점
+
+- 모든 사이클은 ETH 및 CST 보정 구간 메커니즘으로 시작합니다. CST 보정 구간은 12시간 기준에서 출발해 온체인 참여에 따라 달라집니다
+- 모든 제스처는 현재 시간 증가량만큼 마감 카운트다운을 연장합니다. 시간 증가량은 1시간에서 시작해 사이클이 마감될 때마다 1% 늘어납니다
+- 최종 제스처를 남긴 참여자에게는 48시간의 우선 마감 구간이 주어집니다. 그 뒤에는 누구나 사이클을 마감할 수 있으며, 실제로 마감한 사람이 시그니처 배분을 받습니다
+- 각 사이클 준비금의 25%는 시그니처 배분으로, 8%는 시간의 전사에게, 4%는 ETH 별빛 선정 자격 3건이 나누어 받고, 6%는 앵커링 지급에, 7%는 Protocol Guild에 전달되며, 약 50%는 다음 사이클로 이월됩니다
+- 대부분의 사이클에서는 Cosmic Signature NFT 24개가 각인되고 여기에 24,000 CST가 함께 각인됩니다. 홍보 준비금 3,000 CST를 더하면 일반적인 사이클의 고정 각인 총량은 27,000 CST이며, 제스처마다 동적으로 계산되는 참여 CST는 별도입니다
+- 각 Cosmic Signature NFT 또는 RandomWalk NFT는 평생 한 번만 앵커링할 수 있으며, 앵커링을 해제하면 다시 앵커링할 수 없습니다
+- 사용하지 않은 RandomWalk NFT는 ETH 제스처 하나에 첨부해 그 ETH 제스처의 비용을 50% 할인받을 수 있습니다. 각 RandomWalk NFT는 이 할인에 한 번만 쓸 수 있습니다
+- 2차 ETH와 첨부 자산에는 5주의 회수 기한이 있으며, 기한이 지나면 누구나 미회수 배분을 자기 몫으로 회수할 수 있습니다
+
+### 생태계
+
+- [Axiom Zero](https://www.axiomzero.market/cosmic-signature): 플랫폼 수수료가 없는 Arbitrum NFT 마켓플레이스
+- [Chaos Zero](https://chaoszero.com): Cosmic Signature 사이클을 다루는 예측 시장. 사이클마다 "이번 사이클은 이전 사이클보다 더 많은 제스처로 마감될 것인가?"를 묻습니다
+- [Uniswap CST 교환](https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0): Arbitrum에서 CST 교환

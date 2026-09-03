@@ -1,29 +1,33 @@
 # Internationalization (i18n) — Architecture & Handbook
 
 This document defines how Cosmic Signature is a multilingual site. It shipped
-**Simplified Chinese (`zh`)** first, **Ukrainian (`uk`)** second, and then the two
-**Traditional Chinese variants (`zh-TW`, `zh-HK`)**; every later language follows the
-checklist in §10. It covers the technical architecture, the message/content structure, the
+**Simplified Chinese (`zh`)** first, **Ukrainian (`uk`)** second, then the two
+**Traditional Chinese variants (`zh-TW`, `zh-HK`)**, then **Korean (`ko`)** — the first
+language added with `npm run i18n:scaffold`; every later language follows the checklist in
+§10. It covers the technical architecture, the message/content structure, the
 translation workflow, and the quality bar. It is written so that any engineer or translator
 can pick up a unit from a progress tracker and know exactly what to do.
 
 **The document set:**
 
-| Document                                       | Purpose                                                                        |
-| ---------------------------------------------- | ------------------------------------------------------------------------------ |
-| [README.md](./README.md) (this file)           | Architecture, tooling, workflow, definition of done                            |
-| [glossary-zh.md](./glossary-zh.md)             | Canonical Simplified Chinese translation for every protocol term + banned list |
-| [style-guide-zh.md](./style-guide-zh.md)       | Rules for making the Simplified Chinese sound native, not translated           |
-| [progress-zh.md](./progress-zh.md)             | Simplified Chinese rollout: site inventory, sprint plan, progress tracker      |
-| [glossary-zh-TW.md](./glossary-zh-TW.md)       | Taiwan Traditional Chinese terms, Taiwan vocabulary, banned register           |
-| [style-guide-zh-TW.md](./style-guide-zh-TW.md) | What differs for Taiwan: vocabulary, characters (裡/著/台), 「」, review hunts |
-| [progress-zh-TW.md](./progress-zh-TW.md)       | Taiwan rollout: per-namespace and per-area T/R/Q tracker                       |
-| [glossary-zh-HK.md](./glossary-zh-HK.md)       | Hong Kong Traditional Chinese terms, Hong Kong vocabulary, banned register     |
-| [style-guide-zh-HK.md](./style-guide-zh-HK.md) | What differs for Hong Kong: written Chinese, 裏/着, standard Big5 forms, 「」  |
-| [progress-zh-HK.md](./progress-zh-HK.md)       | Hong Kong rollout: per-namespace and per-area T/R/Q tracker                    |
-| [glossary-uk.md](./glossary-uk.md)             | Canonical Ukrainian translation for every protocol term + banned-term list     |
-| [style-guide-uk.md](./style-guide-uk.md)       | Rules for making the Ukrainian sound native (cases, four plural forms)         |
-| [progress-uk.md](./progress-uk.md)             | Ukrainian rollout: per-namespace and per-area T/R/Q tracker                    |
+| Document                                       | Purpose                                                                          |
+| ---------------------------------------------- | -------------------------------------------------------------------------------- |
+| [README.md](./README.md) (this file)           | Architecture, tooling, workflow, definition of done                              |
+| [glossary-zh.md](./glossary-zh.md)             | Canonical Simplified Chinese translation for every protocol term + banned list   |
+| [style-guide-zh.md](./style-guide-zh.md)       | Rules for making the Simplified Chinese sound native, not translated             |
+| [progress-zh.md](./progress-zh.md)             | Simplified Chinese rollout: site inventory, sprint plan, progress tracker        |
+| [glossary-zh-TW.md](./glossary-zh-TW.md)       | Taiwan Traditional Chinese terms, Taiwan vocabulary, banned register             |
+| [style-guide-zh-TW.md](./style-guide-zh-TW.md) | What differs for Taiwan: vocabulary, characters (裡/著/台), 「」, review hunts   |
+| [progress-zh-TW.md](./progress-zh-TW.md)       | Taiwan rollout: per-namespace and per-area T/R/Q tracker                         |
+| [glossary-zh-HK.md](./glossary-zh-HK.md)       | Hong Kong Traditional Chinese terms, Hong Kong vocabulary, banned register       |
+| [style-guide-zh-HK.md](./style-guide-zh-HK.md) | What differs for Hong Kong: written Chinese, 裏/着, standard Big5 forms, 「」    |
+| [progress-zh-HK.md](./progress-zh-HK.md)       | Hong Kong rollout: per-namespace and per-area T/R/Q tracker                      |
+| [glossary-uk.md](./glossary-uk.md)             | Canonical Ukrainian translation for every protocol term + banned-term list       |
+| [style-guide-uk.md](./style-guide-uk.md)       | Rules for making the Ukrainian sound native (cases, four plural forms)           |
+| [progress-uk.md](./progress-uk.md)             | Ukrainian rollout: per-namespace and per-area T/R/Q tracker                      |
+| [glossary-ko.md](./glossary-ko.md)             | Canonical Korean translation for every protocol term + banned register           |
+| [style-guide-ko.md](./style-guide-ko.md)       | Rules for making the Korean sound native (합쇼체, particles, counters, keep-all) |
+| [progress-ko.md](./progress-ko.md)             | Korean rollout: per-namespace and per-area T/R/Q tracker                         |
 
 > Note: `docs/` is intentionally outside the lexicon scanner's `SCAN_DIRS`
 > (see `scripts/lexicon-scan.ts`), so these documents may cite banned vocabulary
@@ -36,7 +40,8 @@ can pick up a unit from a progress tracker and know exactly what to do.
 - **Shipped languages:** Simplified Chinese, mainland conventions, also serving Singapore
   — locale code `zh` (hreflang alias `zh-Hans`); Taiwan Traditional Chinese — `zh-TW`
   (alias `zh-Hant`); Hong Kong Traditional Chinese — `zh-HK` (alias `zh-MO`, Macau
-  follows Hong Kong conventions); Ukrainian — `uk`.
+  follows Hong Kong conventions); Ukrainian — `uk`; Korean — `ko` (`ko-KR` and `ko-KP`
+  resolve to it by same-language affinity).
 - **Locale codes are canonical BCP 47 tags, chosen to match what browsers send.** A bare
   language code is the CLDR default variant of that language (`zh` = Simplified,
   mainland); further variants of the same language carry the region that distinguishes
@@ -51,7 +56,7 @@ can pick up a unit from a progress tracker and know exactly what to do.
   rewrites it (§10).
 - **URL strategy:** locale-prefixed paths with `localePrefix: 'as-needed'`.
   English keeps every existing URL unchanged (`/gallery`); every other locale lives
-  under its prefix (`/zh/gallery`, `/zh-TW/gallery`, `/uk/gallery`). Prefixes are matched
+  under its prefix (`/zh/gallery`, `/zh-TW/gallery`, `/uk/gallery`, `/ko/gallery`). Prefixes are matched
   case-insensitively and longest-first (`/zh-tw/…` redirects to `/zh-TW/…`; `/zh-TW`
   is never read as `/zh` + `-TW`). This applies on **both hosts**:
   - `cosmicsignature.com/zh`, `cosmicsignature.com/zh-TW`, `cosmicsignature.com/uk` — landing
@@ -60,12 +65,14 @@ can pick up a unit from a progress tracker and know exactly what to do.
   SEO title/description, OG image text, and JSON-LD. No surface is exempt (admin/internal
   tools are translated last, but they are translated).
 - **Quality bar:** every locale must read as if originally written in that language
-  (see [style-guide-zh.md](./style-guide-zh.md), [style-guide-uk.md](./style-guide-uk.md)).
-  Literal translation is a defect.
-- **Future languages** (ja, ...) are added by: extending `locales`, filling the
-  `LocaleRecord` registries the compiler then lists, adding a `messages/<locale>/`
-  directory and per-locale content modules, a lexicon profile and terminology pack, an
-  e2e chrome fixture, and a glossary + style guide (§10). No further architectural change.
+  (see [style-guide-zh.md](./style-guide-zh.md), [style-guide-uk.md](./style-guide-uk.md),
+  [style-guide-ko.md](./style-guide-ko.md)). Literal translation is a defect.
+- **Future languages** (ja, ...) are added by: running `npm run i18n:scaffold` (which
+  writes the `messages/<locale>/` directory, the per-locale content modules, the gate
+  stub, the e2e suites, and the document templates), extending `locales`, and filling the
+  `LocaleRecord` registries the compiler then lists — lexicon profile, terminology pack,
+  conventions, fonts, e2e fixtures, test expectations (§10). No further architectural
+  change.
   A further variant of an existing language (`pt-BR` beside `pt`, say) follows the same
   path plus `LOCALE_ALIASES` and, for a second script, an entry in `LOCALE_CONVENTIONS`.
 
@@ -99,7 +106,7 @@ New i18n plumbing:
 
 ```
 i18n/
-  routing.ts      ← defineRouting({ locales: ['en', 'zh', 'zh-TW', 'zh-HK', 'uk'], … }), LOCALE_LABELS, LOCALE_ALIASES
+  routing.ts      ← defineRouting({ locales: ['en', 'zh', 'zh-TW', 'zh-HK', 'uk', 'ko'], … }), LOCALE_LABELS, LOCALE_ALIASES
   locale.ts       ← AppLocale, LocaleRecord<T>, normalizeLocale, pickByLocale (the only locale parser)
   localeConfig.ts ← per-locale rendering conventions: Intl tag, og:locale, JSON-LD inLanguage,
                     word spacing, week start, ellipsis, provider-error policy
@@ -113,6 +120,7 @@ messages/
   zh-TW/*.json    ← Taiwan Traditional Chinese catalogs
   zh-HK/*.json    ← Hong Kong Traditional Chinese catalogs
   uk/*.json       ← Ukrainian catalogs
+  ko/*.json       ← Korean catalogs
 ```
 
 `normalizeLocale` resolves locale-ish input in four steps: exact code (any casing, `_`
@@ -220,8 +228,9 @@ components and `generateMetadata`.
 - Keys describe _role_, not content: `hero.headline`, not `everyGestureShapes`.
 - Never concatenate translated fragments; use ICU placeholders: `"gestureCost": "Gesture Cost: {amount} ETH"`.
 - ICU `plural` blocks carry every category the locale's `Intl.PluralRules` defines:
-  `one/other` in `en`; a single `other` in `zh`, which has no plural inflection (style
-  guide §7); `one/few/many/other` in `uk` (style-guide-uk). `npm run i18n:strict` fails on
+  `one/other` in `en`; a single `other` in `zh` and `ko`, which have no plural inflection
+  (style guides §7 — Korean keeps the block so `#` formats the number and puts the counter
+  inside it); `one/few/many/other` in `uk` (style-guide-uk). `npm run i18n:strict` fails on
   a missing category.
 - Embedded markup uses `t.rich` with named tags, never raw HTML in messages.
 - A string used on 2+ pages goes in `common`/`tables`/`tooltips`, not duplicated.
@@ -314,6 +323,19 @@ action, Chinese renders in unstyled system fallback.
   OG images embed the matching weight-700 subset, regenerated by `npm run og:fonts`
   (`scripts/build-og-fonts.ts`) from the copy in each locale's `seo.json`; the OG tests
   fail when a subset no longer covers its copy.
+- **Hangul (Korean).** Noto Sans KR is the Korean cut of the same family, loaded with the
+  same policy (`--font-noto-kr`); `html:lang(ko)` swaps it into `--cjk-font-stack`, so
+  Korean falls through per glyph like Chinese (Latin tokens stay in Clash / Inter). The
+  CJK heading rule (weight 700, tracking 0) covers `:lang(ko)` too, and `html:lang(ko)`
+  sets `word-break: keep-all` — the browser's CJK default breaks a Korean word between
+  syllables, which is the most visible typographic defect in Korean web copy;
+  `.font-mono` opts back into `break-all` so addresses still wrap.
+- **The companion face is a registry.** `LOCALE_COMPANION_FONTS` in `lib/fonts.ts` records
+  one face (or `null`) per locale, `RootDocument` derives its font-variable classes from
+  it, and `OG_TYPOGRAPHY` (`lib/og/fonts.ts`) + `OG_FONT_SOURCES`
+  (`scripts/build-og-fonts-core.ts`) do the same for the OG subsets — all four cuts and
+  Onest are built by one `npm run og:fonts` run, and a unit test fails when the two OG
+  registries disagree or a notice is missing from `THIRD_PARTY_NOTICES.md`.
 - `RootDocument` receives `locale` and sets `<html lang={locale}>` and `<html dir>` (from
   `LocaleConfig.textDirection`) — this is also what activates the CSS overrides and
   correct line-breaking behavior.
@@ -327,8 +349,8 @@ policy as Noto Sans SC). The display stack is indirected through the
 `--display-font-stack` custom property in `styles/global.css`: `html[lang='uk']` replaces
 the whole stack rather than appending Onest after Clash, so Latin letters inside a
 Ukrainian heading (ETH, CST, brand names) do not render in a different face with a
-different x-height. OG images for `/uk` load the checked-in `assets/fonts/Onest-700.subset.ttf`
-(Latin + Cyrillic, OFL) through `lib/og/fonts.ts`.
+different x-height. OG images for `/uk` load `assets/fonts/Onest-700.subset.ttf`, cut by
+`npm run og:fonts` like the CJK subsets, through `lib/og/fonts.ts`.
 
 ## 6. SEO, metadata, and structured data
 
@@ -356,7 +378,10 @@ different x-height. OG images for `/uk` load the checked-in `assets/fonts/Onest-
    compares each namespace against `messages/en/**` and checks key parity, ICU syntax
    (the same `@formatjs` parser next-intl uses), placeholder parity (same `{arguments}`,
    no invented `<tags>`), plural completeness against the locale's CLDR categories
-   (`one/few/many/other` for uk, `other` for zh), and verbatim-copy catalogs. `npm run
+   (`one/few/many/other` for uk, `other` for zh and ko), and verbatim-copy catalogs. It
+   then reports every long-form content area (`scripts/i18n-content-areas.ts`) as the
+   share of prose still identical to the English, and `--strict` fails an area that is
+   untranslated — a scaffolded module cannot ship as a translation. `npm run
 i18n:parity` reports; `npm run i18n:strict` fails CI and pre-push (via `npm run
 i18n:check`). The same checks run under jest in
    `i18n/__tests__/catalog-integrity.test.ts`.
@@ -364,7 +389,9 @@ i18n:check`). The same checks run under jest in
    translated locale (`LEXICON_PROFILES`, typed against `TranslatedLocale`): the Chinese
    lists are matched as CJK substrings, the uk list as Unicode-bounded word forms plus
    word-initial stems (`\b` is ASCII-only, so Cyrillic needs `\p{L}` boundaries — see
-   `scripts/locale-text-matchers.ts`). The Traditional locales share `ZH_HANT_BANNED_TERMS`
+   `scripts/locale-text-matchers.ts`), the ko list as Hangul substrings (compounds join
+   without spaces and particles attach to the noun; `KO_BANNED_TERMS` documents the
+   innocent words each entry was checked against). The Traditional locales share `ZH_HANT_BANNED_TERMS`
    and add regional registers (`ZH_TW_BANNED_TERMS`: 博弈, 競標, 報酬…; `ZH_HK_BANNED_TERMS`:
    六合彩, 派彩, 回報…). A profile runs on every locale-agnostic file and on every file of
    another language, but not on a sibling variant of its own language: the variants share
@@ -402,9 +429,14 @@ i18n:check`). The same checks run under jest in
 6. **Unit**: tests derive expectations from `routing.locales` (`test-utils/i18n.ts`
    builds hreflang maps including aliases), so adding a locale never rewrites them;
    formatting tests pin per-locale outputs (`utils/__tests__/format-extra.test.ts`,
-   `time.test.ts`).
+   `time.test.ts`). What a suite needs to know about a language — its script pattern,
+   duration nouns, `llms.txt` section, Accept-Language probes — lives in the typed
+   registries of `test-utils/locale-expectations.ts`, so a new locale fails to compile
+   until it declares them, and `i18n/__tests__/locale-artifacts.test.ts` fails until its
+   glossary, style guide, progress tracker, white-paper PDF, and OG font notice exist.
 7. **Numeric claims**: `content/__tests__/copy-numeric-claims.test.ts` checks every
-   locale's catalogs and long-form modules, matching duration nouns per language.
+   locale's catalogs and long-form modules, matching duration nouns per language from
+   `DURATION_NOUNS` (Korean declares a lookbehind so `8월 15일` is a date, not 15 days).
 
 ## 8. Translation workflow (per string, per page)
 
@@ -447,74 +479,93 @@ flowchart LR
 
 ```bash
 npm run dev
-# dApp:    http://localhost:3000/zh   http://localhost:3000/zh-TW   http://localhost:3000/zh-HK   http://localhost:3000/uk
+# dApp:    http://localhost:3000/zh   http://localhost:3000/zh-TW   http://localhost:3000/zh-HK   http://localhost:3000/uk   http://localhost:3000/ko
 # landing: http://cosmicsignature.local:3000/zh-TW   (see lib/hostRouting.ts for /etc/hosts setup)
-npm run i18n:parity                    # per-locale report (translated %, identical-to-source, problems)
+npm run i18n:parity                    # per-locale report: catalogs (translated %, identical-to-source, problems) and long-form content
 npm run i18n:check                     # i18n:strict + i18n:conventions + terminology:check + lexicon:scan (pre-push runs this)
+npm run i18n:scaffold -- --locale ja   # every per-locale file for a new language, then the compiler lists the registries
 npm run i18n:derive -- --from zh --to zh-TW   # bootstrap a sibling-script draft (never ships as-is)
-npm run og:fonts                       # regenerate the CJK OG font subsets after changing Chinese og copy
+npm run og:fonts                       # regenerate every OG font subset after changing a translated og copy
 npm run test:e2e:locales               # every locale's smoke/QA suites plus a11y, routing, landing, wallet
 npm run white-paper:pdf                # regenerate the per-locale white-paper PDFs (pandoc + tectonic)
 npm run build && npm run bundle:budget # production output and full app-home JS budget
 ```
 
 To test locale detection: clear the `NEXT_LOCALE` cookie and set the browser's language to
-`zh-CN` (or `zh-TW`, `zh-HK`, `uk-UA`) — visiting `/` should redirect to `/zh` (or `/zh-TW`,
-`/zh-HK`, `/uk`). `zh-Hant` lands on `/zh-TW`, `zh-MO` on `/zh-HK`, `zh-SG` on `/zh`.
+`zh-CN` (or `zh-TW`, `zh-HK`, `uk-UA`, `ko-KR`) — visiting `/` should redirect to `/zh` (or
+`/zh-TW`, `/zh-HK`, `/uk`, `/ko`). `zh-Hant` lands on `/zh-TW`, `zh-MO` on `/zh-HK`, `zh-SG`
+on `/zh`, `ko-KP` on `/ko`.
 
 ## 10. Adding the next language
 
-The compiler drives the checklist. After step 1, `npm run type-check` lists every place
-that needs a decision — there is no grep step. The Ukrainian rollout is the worked
-example for a new language; the Taiwan and Hong Kong rollouts are the worked example for
-a new variant of an existing language (same steps, plus §10.1).
+One command writes the files, the compiler lists the decisions, and the test suite lists
+the artifacts — there is no grep step. The Korean rollout is the worked example for a new
+language (a non-Latin script with its own conventions gate and companion font); the
+Ukrainian rollout is the earlier worked example; the Taiwan and Hong Kong rollouts are the
+worked example for a new variant of an existing language (same steps, plus §10.1).
 
-1. **Add the locale to `locales` in [`i18n/routing.ts`](../../i18n/routing.ts).** Choose the
-   canonical BCP 47 tag browsers send: the bare language code for the CLDR default
-   variant, region-qualified codes for further variants. Every `LocaleRecord<T>` /
-   `Record<TranslatedLocale, T>` in the codebase now fails to compile until it has an entry:
+1. **Scaffold the files:** `npm run i18n:scaffold -- --locale <bcp47>` (the canonical tag
+   browsers send: the bare language code for the CLDR default variant, region-qualified
+   codes for further variants). It writes `messages/<locale>/*.json` as copies of the
+   English, every `content/**` copy module with its identifiers renamed (`faqTextEn` →
+   `faqTextKo`), `scripts/terminology/<locale>.ts`, `e2e/<locale>-smoke.spec.ts` and
+   `<locale>-site-qa.desktop.spec.ts` (Latin font defaults), and
+   `docs/i18n/{glossary,style-guide,progress}-<locale>.md` templates with the real catalog
+   key counts — then prints the steps below. Nothing it writes is copy: `npm run
+i18n:strict` reports every catalog and content area as UNTRANSLATED until it is rewritten.
+2. **Register the locale in [`i18n/routing.ts`](../../i18n/routing.ts)** and run
+   `npm run type-check`. Every `LocaleRecord<T>` / `Record<TranslatedLocale, T>` in the
+   codebase now fails to compile until it has an entry, each next to the decision it needs:
    - `LOCALE_LABELS` (routing.ts) — the language's own name for the switcher (for
-     variants, in the variant's own script and region wording: 繁體中文（香港）).
-   - `LOCALE_ALIASES` (routing.ts) — extra tags the locale serves (`zh-Hant`, `zh-MO`);
-     they become hreflang alternates and `normalizeLocale` hits. Empty is fine.
+     variants, in the variant's own script and region wording: 繁體中文（香港）);
+     `LOCALE_ALIASES` — extra tags the locale serves (`zh-Hant`, `zh-MO`); they become
+     hreflang alternates and `normalizeLocale` hits. Empty is fine.
    - `i18n/localeConfig.ts` — Intl tag, `og:locale`, JSON-LD `inLanguage`, text direction,
-     word spacing, week start (check CLDR: Taiwan and Hong Kong start on Sunday, the
-     mainland on Monday), ellipsis, mid-sentence lowercasing, provider-error policy.
+     word spacing (Korean spaces words, Chinese does not), week start (check CLDR: Taiwan,
+     Hong Kong, and Korea start on Sunday, the mainland and Ukraine on Monday), ellipsis,
+     mid-sentence lowercasing, provider-error policy.
    - Format registries in `utils/format.ts` / `utils/time.ts` — date and duration
-     templates (prefer `Intl` over hand-kept month/unit arrays; see the `uk` entries).
+     templates (prefer `Intl` over hand-kept month/unit arrays; see the `uk` and `ko`
+     entries, which delegate to `Intl.DateTimeFormat` / `Intl.RelativeTimeFormat`).
    - Single-consumer registries: RainbowKit locale in `components/wallet/WalletUi.tsx`,
-     OG typography in `lib/og/fonts.ts` (a font buffer if the script is not Latin), OG copy
-     in `lib/og/copy.ts`, error catalogs in `app/global-error.tsx`, the white-paper PDF
-     typography in `scripts/generate-white-paper-pdf.ts` (output paths derive from the
-     locale), the `getTranslations` mock in `jest.setup.ts` resolves any locale.
+     the companion face in `LOCALE_COMPANION_FONTS` (`lib/fonts.ts`), OG typography in
+     `lib/og/fonts.ts` and its source in `scripts/build-og-fonts-core.ts` (a font subset if
+     the script is not Latin), OG copy in `lib/og/copy.ts`, error catalogs in
+     `app/global-error.tsx`, the white-paper PDF typography in
+     `scripts/generate-white-paper-pdf.ts` (output paths derive from the locale); the
+     `getTranslations` mock in `jest.setup.ts` resolves any locale.
    - Every `content/*/index.ts` text registry and `content/legal/index.ts` copy registry —
-     add `text.<locale>.ts` / `*.<locale>.ts` modules; their mapped types reject missing
-     or extra ids, so partial translations cannot ship.
+     import the scaffolded modules; their mapped types reject missing or extra ids, so
+     partial translations cannot ship.
    - `LEXICON_PROFILES` in `scripts/lexicon-scan-core.ts` (banned register + matcher for
      the script), `TERMINOLOGY_PACKS` in `scripts/terminology-consistency-core.ts` (drift
      rules in `scripts/terminology/<locale>.ts`), and `LOCALE_CONVENTIONS` in
      `scripts/i18n-conventions-core.ts` (script checks for a second Chinese script,
-     disallowed patterns for anything a regular expression can catch, `null` when the
+     disallowed patterns for anything a regular expression can catch — Korean's particle,
+     punctuation, pronoun, and double-passive rules are the model — `null` when the
      language needs neither).
-   - `LOCALE_CHROME`, `LOCALE_SEO`, and `LOCALE_ROUTE_TEXT` in `e2e/locale-fixtures.ts`,
-     then a `<locale>-smoke.spec.ts` and `<locale>-site-qa.desktop.spec.ts` that call the
-     shared runners with the locale's QA profile; add the suite to `test:e2e:locales` and
-     the locale to the landing loop in `e2e/landing.spec.ts`.
-2. `cp -r messages/en messages/<locale>` and translate. `npm run i18n:parity` reports
-   progress (translated %, values identical to the source); `npm run i18n:strict` fails
-   on parity, ICU syntax, placeholder drift, incomplete plural categories for the locale's
-   `Intl.PluralRules`, and untranslated namespaces. Untranslated values fall back to
-   English at runtime while in progress.
-3. Write `glossary-<locale>.md` + `style-guide-<locale>.md` + `progress-<locale>.md`.
-   Decide the coined terms first — every batch of copy depends on them.
-4. Fonts: if the script is outside Latin coverage of Clash Display / Inter, add a companion
-   face with the Noto Sans / Onest loading policy and an `html:lang()` override of the
-   relevant stack property (§5); add its OG subset to `scripts/build-og-fonts.ts` and run
-   `npm run og:fonts`, recording the license in `THIRD_PARTY_NOTICES.md`. hreflang maps,
-   the sitemap, `<html lang/dir>`, and the language switcher derive from
+   - `LOCALE_CHROME`, `LOCALE_SEO`, and `LOCALE_ROUTE_TEXT` in `e2e/locale-fixtures.ts`
+     (the strings the rendered pages must contain — decide them here, then make the copy
+     match), and the test registries in `test-utils/locale-expectations.ts` (script
+     pattern, duration nouns, `llms.txt` section, Accept-Language probes).
+3. **Write `glossary-<locale>.md` and `style-guide-<locale>.md` first** — every batch of
+   copy depends on the coined terms. Record terms the English never coined in the
+   glossary the first time a sentence needs them (glossary-ko.md §3.2 is the model) and
+   encode drift in the terminology pack so the gate enforces them.
+4. **Translate.** Catalogs and modules in batches against the glossary; after each batch
+   `npm run i18n:check` (parity, conventions, terminology, lexicon) and the numeric-claims
+   test; then the blind read of style guide §8 with the English hidden. `npm run
+i18n:parity` shows progress per namespace and per content area; untranslated catalog
+   values fall back to English at runtime while in progress, long-form modules do not.
+5. **Typography:** if the script is outside the Latin coverage of Clash Display / Inter,
+   add a companion face with the Noto Sans / Onest loading policy and an `html:lang()`
+   override of the relevant stack property (§5), pin it in the locale's site-QA profile,
+   and run `npm run og:fonts`, recording the license in `THIRD_PARTY_NOTICES.md`. hreflang
+   maps, the sitemap, `<html lang/dir>`, and the language switcher derive from
    `routing.locales` automatically.
-5. Add locale sections to `public/llms.txt` / `public/llms-full.txt` (the tests pin the
-   canonical routes for every translated locale); regenerate the white-paper PDF.
+6. **Artifacts** (`i18n/__tests__/locale-artifacts.test.ts` fails until they exist): the
+   locale sections of `public/llms.txt` / `public/llms-full.txt`, `npm run white-paper:pdf
+-- --locale <locale>`, the lexicon table column in `AGENTS.md`, and the progress tracker.
 
 ### 10.1 Adding a variant of an existing language
 

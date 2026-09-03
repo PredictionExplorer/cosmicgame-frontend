@@ -139,9 +139,12 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
       ...BASE_HEADER_INCLUDES,
       // macOS system Korean fonts through xeCJK. Korean separates words with
       // spaces, which xeCJK must be told to keep (CJKspace); its punctuation
-      // handling stays plain because Korean uses ASCII marks.
+      // handling stays plain because Korean uses ASCII marks; and the
+      // automatic CJK–Latin glue is switched off, because Korean counters
+      // attach to digits (10개, 2026년) and Latin tokens already carry real
+      // spaces in the copy.
       '\\usepackage{xeCJK}',
-      '\\xeCJKsetup{CJKspace=true, PunctStyle=plain}',
+      '\\xeCJKsetup{CJKspace=true, PunctStyle=plain, CJKecglue={}}',
       '\\setCJKmainfont{AppleMyungjo}',
       '\\setCJKsansfont{Apple SD Gothic Neo}',
       '\\setCJKmonofont{Apple SD Gothic Neo}',

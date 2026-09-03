@@ -89,7 +89,10 @@ describe('font configuration policy', () => {
       source.indexOf('export const onest'),
     );
     const cjkSubsets = cjkBlock.match(/subsets: \[[^\]]*\]/g) ?? [];
-    expect(cjkSubsets).toHaveLength(3);
+    // One `subsets` per Noto Sans CJK cut (SC, TC, HK, KR, …).
+    const cjkLoaders = cjkBlock.match(/Noto_Sans_[A-Z]+\(/g) ?? [];
+    expect(cjkLoaders.length).toBeGreaterThanOrEqual(3);
+    expect(cjkSubsets).toHaveLength(cjkLoaders.length);
     for (const subsets of cjkSubsets) expect(subsets).not.toContain('cyrillic');
   });
 

@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Cosmic Signature frontend — agent guide
 
-Multilingual (en / zh / zh-TW / zh-HK / uk) Next.js App Router frontend for Cosmic
+Multilingual (en / zh / zh-TW / zh-HK / uk / ko) Next.js App Router frontend for Cosmic
 Signature, a procedural on-chain art protocol on Arbitrum. One codebase serves two hosts:
 
 - `app/[locale]/(landing)/` → cosmicsignature.com (marketing site, no wallet stack)
@@ -30,12 +30,17 @@ Use npm — `packageManager` is pinned to npm and yarn refuses to run.
 - `npm run lexicon:scan` — banned-vocabulary gate (every locale), see next section
 - `npm run i18n:parity` — per-locale catalog report; `npm run i18n:strict` — the CI gate
   (key parity, ICU syntax, placeholder parity, plural categories, untranslated catalogs)
-- `npm run i18n:conventions` — script gate for the Chinese locales (no Simplified
-  characters in Traditional copy or vice versa, regional character choices, 「」 vs “”)
+- `npm run i18n:conventions` — copy-conventions gate: Chinese script rules (no Simplified
+  characters in Traditional copy or vice versa, regional character choices, 「」 vs “”) and
+  per-locale disallowed patterns (Korean particles glued to placeholders, full-width
+  punctuation, dropped pronoun)
 - `npm run terminology:check` — glossary drift gate for every translated locale
 - `npm run i18n:check` — strict + conventions + terminology + lexicon in one go (pre-push runs this)
-- `npm run i18n:derive -- --from zh --to zh-TW` — mechanical draft of a sibling-script
-  locale (never shipped as-is); `npm run og:fonts` — rebuild the CJK OG font subsets
+- `npm run i18n:scaffold -- --locale xx` — every per-locale file for a new language
+  (catalogs, copy modules, gate stub, e2e suites, doc templates), then the compiler lists
+  the registries; `npm run i18n:derive -- --from zh --to zh-TW` — mechanical draft of a
+  sibling-script locale (never shipped as-is); `npm run og:fonts` — rebuild every OG font
+  subset
 - `npm run test:e2e:locales` — every locale's smoke/QA suites
 - `npm run deps:audit` — dependency gate: production advisories at any severity,
   high/critical anywhere, lockfile integrity, time-boxed exceptions
@@ -64,21 +69,21 @@ across `app/`, `components/`, `content/`, `messages/`, `public/`, and more, appl
 English list plus one banned register per translated locale. Use the coined terms
 instead:
 
-| Banned concept    | Use in English            | zh (Simplified) | zh-TW (Taiwan)  | zh-HK (Hong Kong) | Use in Ukrainian           |
-| ----------------- | ------------------------- | --------------- | --------------- | ----------------- | -------------------------- |
-| bid               | Gesture                   | 落笔            | 落筆            | 落筆              | жест                       |
-| round             | Cycle / Performance Cycle | 周期 / 演绎周期 | 週期 / 演繹週期 | 週期 / 演繹週期   | цикл / перформанс-цикл     |
-| Dutch auction     | Calibration Window        | 校准窗口        | 校準窗口        | 校準窗口          | вікно калібрування         |
-| prize             | Allocation                | 分配            | 分配            | 分配              | розподіл                   |
-| winner            | Recipient                 | 获配者          | 獲配者          | 獲配者            | отримувач                  |
-| raffle / draw     | Stellar Selection         | 星选            | 星選            | 星選              | зоряний відбір             |
-| staking           | Anchoring                 | 锚定            | 錨定            | 錨定              | закріплення                |
-| yield             | Anchor Distribution       | 锚定派发        | 錨定配發        | 錨定派發          | надходження за закріплення |
-| withdraw / claim  | Retrieve                  | 取回            | 取回            | 取回              | забрати                    |
-| mint              | Imprint                   | 铭刻            | 銘刻            | 銘刻              | закарбувати                |
-| DAO               | Cosmic Council            | 宇宙议会        | 宇宙議會        | 宇宙議會          | Космічна Рада              |
-| charity, donation | Public Goods              | 公共物品        | 公共財          | 公共物品          | суспільні блага            |
-| marketing         | Outreach Reserve          | 推广储备        | 推廣儲備        | 推廣儲備          | резерв просування          |
+| Banned concept    | Use in English            | zh (Simplified) | zh-TW (Taiwan)  | zh-HK (Hong Kong) | Use in Ukrainian           | Use in Korean            |
+| ----------------- | ------------------------- | --------------- | --------------- | ----------------- | -------------------------- | ------------------------ |
+| bid               | Gesture                   | 落笔            | 落筆            | 落筆              | жест                       | 제스처                   |
+| round             | Cycle / Performance Cycle | 周期 / 演绎周期 | 週期 / 演繹週期 | 週期 / 演繹週期   | цикл / перформанс-цикл     | 사이클 / 퍼포먼스 사이클 |
+| Dutch auction     | Calibration Window        | 校准窗口        | 校準窗口        | 校準窗口          | вікно калібрування         | 보정 구간                |
+| prize             | Allocation                | 分配            | 分配            | 分配              | розподіл                   | 배분                     |
+| winner            | Recipient                 | 获配者          | 獲配者          | 獲配者            | отримувач                  | 수령자                   |
+| raffle / draw     | Stellar Selection         | 星选            | 星選            | 星選              | зоряний відбір             | 별빛 선정                |
+| staking           | Anchoring                 | 锚定            | 錨定            | 錨定              | закріплення                | 앵커링                   |
+| yield             | Anchor Distribution       | 锚定派发        | 錨定配發        | 錨定派發          | надходження за закріплення | 앵커링 지급              |
+| withdraw / claim  | Retrieve                  | 取回            | 取回            | 取回              | забрати                    | 회수                     |
+| mint              | Imprint                   | 铭刻            | 銘刻            | 銘刻              | закарбувати                | 각인                     |
+| DAO               | Cosmic Council            | 宇宙议会        | 宇宙議會        | 宇宙議會          | Космічна Рада              | 우주 평의회              |
+| charity, donation | Public Goods              | 公共物品        | 公共財          | 公共物品          | суспільні блага            | 공공재                   |
+| marketing         | Outreach Reserve          | 推广储备        | 推廣儲備        | 推廣儲備          | резерв просування          | 홍보 준비금              |
 
 The three Chinese locales are separate locales, not character conversions of one another:
 each has its own vocabulary (Taiwan 網路/軟體/使用者/隱私權政策, Hong Kong
@@ -88,10 +93,18 @@ banned register (Taiwan 博弈/競標/報酬, Hong Kong 六合彩/派彩/回報)
 i18n:conventions` enforces the script and character rules; the terminology packs in
 `scripts/terminology/zh-TW.ts` and `zh-HK.ts` enforce the vocabulary.
 
+Korean is written in 합쇼체 (-합니다) with the reader never named (no 당신), ASCII
+punctuation, counters attached to digits (48시간, 3개), and no sound-dependent particle
+(을/를, 이/가, 은/는, 와/과, (으)로) directly after an ICU placeholder — `npm run
+i18n:conventions` rejects those, `docs/i18n/style-guide-ko.md` explains how to restructure,
+and the Korean banned register (경매, 당첨, 추첨, 도박, 투자, 수익, 스테이킹, 예치, 민팅, 기부,
+마케팅, 라운드 …) is matched as substrings, so innocent words that contain one are avoided
+(배경 not 백그라운드, 횟수 not 회수 for counts).
+
 The machine-enforced lists live in `scripts/lexicon-scan-core.ts` (`DEFAULT_BANNED_TERMS`
 plus `LEXICON_PROFILES`, one per translated locale); the frozen glossaries with rationale
 and more mappings are `docs/i18n/glossary-zh.md`, `glossary-zh-TW.md`, `glossary-zh-HK.md`,
-and `glossary-uk.md`. The allow pragmas (`// lexicon-allow-start` … `// lexicon-allow-end`,
+`glossary-uk.md`, and `glossary-ko.md`. The allow pragmas (`// lexicon-allow-start` … `// lexicon-allow-end`,
 `// lexicon-allow-abi`, `// lexicon-allow-backend-type`) are reserved for FAQ/legal denial
 copy ("this is not a lottery"), ABI method names, and sealed backend wire-format fields;
 JSON catalogs, which cannot carry pragmas, use `\uXXXX` escapes for the same denial copy.
@@ -103,7 +116,7 @@ Every user-visible string ships in every locale in the same change:
 
 - UI strings: `messages/<locale>/*.json` for every locale in `routing.locales`, identical
   key sets. ICU plural blocks carry every category the locale's `Intl.PluralRules`
-  defines (`one/other` for en, `other` for zh, `one/few/many/other` for uk) — the
+  defines (`one/other` for en, `other` for zh and ko, `one/few/many/other` for uk) — the
   `i18n:strict` gate and `i18n/__tests__/catalog-integrity.test.ts` check this, along
   with placeholder parity and ICU syntax.
 - Page copy: `content/<area>/structure.ts` holds the locale-independent skeleton (ids, hrefs,
@@ -113,7 +126,7 @@ Every user-visible string ships in every locale in the same change:
 - Legal and trust pages: per-locale copy objects `content/legal/*.<locale>.ts` rendered by
   the shared `TermsContent`, `PrivacyContent`, and `TrustPageContent` components
 - Routing is next-intl: `en` is unprefixed, every other locale lives under its prefix
-  (`/zh`, `/zh-TW`, `/zh-HK`, `/uk`) on both hosts (`i18n/routing.ts`). Locale codes are
+  (`/zh`, `/zh-TW`, `/zh-HK`, `/uk`, `/ko`) on both hosts (`i18n/routing.ts`). Locale codes are
   canonical BCP 47 tags: the bare language code is the CLDR default variant, further
   variants carry their region; `LOCALE_ALIASES` lists extra tags a locale serves.
 - Never branch on a locale literal (`locale === 'zh'`) and never truncate a locale to its
@@ -132,7 +145,7 @@ Every user-visible string ships in every locale in the same change:
 Translate the coined term, never the underlying banned concept. Follow the locale's
 glossary exactly (one English term = one target term, everywhere) and its style guide for
 tone, grammar, dates, and typography: `docs/i18n/glossary-zh.md` + `style-guide-zh.md`,
-`docs/i18n/glossary-uk.md` + `style-guide-uk.md`.
+`docs/i18n/glossary-uk.md` + `style-guide-uk.md`, `docs/i18n/glossary-ko.md` + `style-guide-ko.md`.
 
 ## Copy is test-pinned
 
@@ -157,10 +170,11 @@ tone, grammar, dates, and typography: `docs/i18n/glossary-zh.md` + `style-guide-
 - Tailwind CSS v4 + shadcn/ui + lucide-react. No Material UI.
 - Typography utilities in `styles/typography.css`: `type-display-*`, `type-eyebrow`,
   `type-body-*`. The display face is `--display-font-stack` (Clash Display, then the
-  `--cjk-font-stack` for CJK glyphs — Noto Sans SC by default, swapped to the TC / HK cut
-  by `html:lang(zh-TW)` / `html:lang(zh-HK)` because each region has its own glyph
-  standard; `html[lang='uk']` swaps in Onest because Clash has no Cyrillic) — see
-  `lib/fonts.ts` and `docs/i18n/README.md` §5.
+  `--cjk-font-stack` for CJK glyphs — Noto Sans SC by default, swapped to the TC / HK / KR
+  cut by `html:lang(zh-TW)` / `html:lang(zh-HK)` / `html:lang(ko)` because each region
+  has its own glyph standard; `html[lang='uk']` swaps in Onest because Clash has no
+  Cyrillic). Each locale's companion face is declared in `LOCALE_COMPANION_FONTS`
+  (`lib/fonts.ts`); see `docs/i18n/README.md` §5.
 - The wallet stack (wagmi/RainbowKit) exists only in the `(app)` route group; keep the
   landing free of it.
 - Every informational page has `generateMetadata` (titles and descriptions in
