@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 
 import { landingContentEn } from '@/content/landing';
 
+import { LOCALE_LABELS, routing } from '@/i18n/routing';
 import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 
 describe('<LandingFooter />', () => {
@@ -45,6 +46,19 @@ describe('<LandingFooter />', () => {
       expect(link).toHaveAttribute('target', '_blank');
       expect(link.getAttribute('rel')).toContain('noopener');
     }
+  });
+
+  it('renders the crawlable language directory with a link per locale', () => {
+    render(<LandingFooter footer={landingContentEn.footer} />);
+    const directory = screen.getByRole('navigation', { name: 'common.languageSwitcher.label' });
+    const links = within(directory).getAllByRole('link');
+    expect(links.map((link) => link.textContent)).toEqual(
+      routing.locales.map((locale) => LOCALE_LABELS[locale]),
+    );
+    // Landing pages link the same page in every language at its canonical URL.
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(
+      routing.locales.map((locale) => (locale === routing.defaultLocale ? '/' : `/${locale}`)),
+    );
   });
 
   it('renders the CC0 colophon', () => {

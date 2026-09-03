@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import type { AppLocale } from '@/i18n/routing';
-import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { LanguageDirectory } from '@/components/layout/LanguageDirectory';
 import { FooterWrapper } from '@/components/styled';
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
@@ -228,6 +228,10 @@ const Footer = () => {
             ))}
           </div>
 
+          <div className="border-t border-white/10 py-5">
+            <LanguageDirectory />
+          </div>
+
           <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-xs sm:flex-row">
             <div className="flex flex-col items-center gap-1 sm:items-start">
               <p className="text-white/50">{t('copyright', { year: new Date().getFullYear() })}</p>
@@ -258,7 +262,6 @@ const Footer = () => {
               >
                 {t('links.privacy')}
               </Link>
-              <LanguageSwitcher />
             </div>
           </div>
         </div>

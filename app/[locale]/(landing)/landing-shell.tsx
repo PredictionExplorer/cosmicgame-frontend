@@ -34,6 +34,7 @@ import { Toaster } from 'sonner';
 
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
+import { LanguageDirectory } from '@/components/layout/LanguageDirectory';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -42,7 +43,10 @@ import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
 export function LandingShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const showUtilitySwitcher = pathname !== '/' && pathname !== '/landing-site';
+  // The landing home brings its own header pill and footer directory
+  // (Hero, LandingFooter); every other marketing page gets the utility pill
+  // top-right and the crawlable language directory as its footer.
+  const showUtilityChrome = pathname !== '/' && pathname !== '/landing-site';
 
   useEffect(() => {
     installGlobalErrorHandlers();
@@ -53,12 +57,19 @@ export function LandingShell({ children }: { children: ReactNode }) {
       <CookiesProvider>
         <TooltipProvider delayDuration={200} skipDelayDuration={300}>
           <SkipLink />
-          {showUtilitySwitcher ? (
+          {showUtilityChrome ? (
             <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-6">
               <LanguageSwitcher />
             </div>
           ) : null}
           <ErrorBoundary>{children}</ErrorBoundary>
+          {showUtilityChrome ? (
+            <footer className="relative mx-auto w-full max-w-6xl px-6 pb-12">
+              <div className="border-t border-white/10 pt-6">
+                <LanguageDirectory />
+              </div>
+            </footer>
+          ) : null}
           <Toaster
             position="top-right"
             theme="dark"

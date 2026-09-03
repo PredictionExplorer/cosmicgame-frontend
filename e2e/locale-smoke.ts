@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { LOCALE_CHROME, TRANSLATED_LOCALES, routing } from './locale-fixtures';
+import { LOCALE_CHROME, LOCALE_LABELS, TRANSLATED_LOCALES, routing } from './locale-fixtures';
 
 type TranslatedLocale = (typeof TRANSLATED_LOCALES)[number];
 
@@ -138,6 +138,46 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
 
       await page.reload();
       await expect(page.locator('html')).toHaveAttribute('lang', routing.defaultLocale);
+    });
+
+    test('the footer language directory links every locale to the same page', async ({
+      page,
+      context,
+    }) => {
+      await page.goto(`${prefix}/faq`);
+      const directory = page.locator('footer').getByRole('navigation', {
+        name: chrome.switcherLabel,
+      });
+      await directory.scrollIntoViewIfNeeded();
+
+      // Server-rendered anchors at the canonical URL of every edition — the
+      // same URLs the hreflang alternates advertise, and the one place a
+      // crawler or a no-JS reader discovers the other languages from.
+      const links = directory.getByRole('link');
+      await expect(links).toHaveCount(routing.locales.length);
+      for (const candidate of routing.locales) {
+        const link = directory.getByRole('link', { name: LOCALE_LABELS[candidate], exact: true });
+        const candidatePrefix = candidate === routing.defaultLocale ? '' : `/${candidate}`;
+        await expect(link).toHaveAttribute('href', `${candidatePrefix}/faq`);
+        await expect(link).toHaveAttribute('hreflang', candidate);
+        await expect(link).toHaveAttribute('lang', candidate);
+      }
+      await expect(
+        directory.getByRole('link', { name: chrome.switcherOption, exact: true }),
+      ).toHaveAttribute('aria-current', 'true');
+
+      // A plain click behaves like the pill: same route, cookie persisted.
+      await directory
+        .getByRole('link', { name: englishChrome.switcherOption, exact: true })
+        .click();
+      await page.waitForURL((url) => url.pathname === '/faq');
+      await expect(page.locator('html')).toHaveAttribute('lang', routing.defaultLocale);
+      await expect
+        .poll(async () => {
+          const cookies = await context.cookies();
+          return cookies.find((cookie) => cookie.name === 'NEXT_LOCALE')?.value;
+        })
+        .toBe(routing.defaultLocale);
     });
 
     test('switching between two translated locales keeps the route', async ({ page }) => {

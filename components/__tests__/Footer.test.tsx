@@ -4,8 +4,9 @@ import Footer from '@/components/layout/Footer';
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
+import { LOCALE_LABELS, routing } from '@/i18n/routing';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -122,6 +123,14 @@ describe('Footer', () => {
     expect(geckoTerminal).toHaveAttribute('href', CST_GECKOTERMINAL_POOL_URL);
     expect(geckoTerminal).toHaveAttribute('target', '_blank');
     expect(geckoTerminal).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('renders the crawlable language directory with a link per locale', () => {
+    const directory = screen.getByRole('navigation', { name: 'common.languageSwitcher.label' });
+    const links = within(directory).getAllByRole('link');
+    expect(links.map((link) => link.textContent)).toEqual(
+      routing.locales.map((locale) => LOCALE_LABELS[locale]),
+    );
   });
 
   it('provides server-rendered crawl paths for the header dropdown destinations', () => {

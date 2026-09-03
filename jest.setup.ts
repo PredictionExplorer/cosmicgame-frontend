@@ -377,12 +377,20 @@ jest.mock('@/i18n/navigation', () => {
     const { href, children, locale: _locale, prefetch: _prefetch, ...rest } = props;
     return React.createElement('a', { href: hrefToString(href), ref, ...rest }, children);
   });
+  // Mirrors `localePrefix: 'as-needed'`: the default locale stays unprefixed,
+  // every other locale lives under its prefix (`/vi/gallery`, `/vi` for `/`).
+  const getPathname = (args: { href: unknown; locale?: string }) => {
+    const pathname = hrefToString(args?.href);
+    const { routing } = require('./i18n/routing') as { routing: { defaultLocale: string } };
+    if (!args?.locale || args.locale === routing.defaultLocale) return pathname;
+    return pathname === '/' ? `/${args.locale}` : `/${args.locale}${pathname}`;
+  };
   return {
     Link,
     useRouter: () => nav().useRouter(),
     usePathname: () => nav().usePathname(),
     redirect: (href: unknown) => nav().redirect?.(hrefToString(href)),
     permanentRedirect: (href: unknown) => nav().permanentRedirect?.(hrefToString(href)),
-    getPathname: (args: { href: unknown }) => hrefToString(args?.href),
+    getPathname,
   };
 });

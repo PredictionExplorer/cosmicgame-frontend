@@ -6,13 +6,13 @@
  * `scripts/__tests__/locale-e2e-fixtures.test.ts` asserts that each
  * translated locale also has its chrome fixture here.
  */
-import { routing, TRANSLATED_LOCALES } from '../i18n/routing';
+import { LOCALE_LABELS, routing, TRANSLATED_LOCALES } from '../i18n/routing';
 import { SCRIPT_PATTERNS } from '../test-utils/locale-expectations';
 
 import { ROUTE_FIXTURES } from './locale-route-inventory';
 import { ZH_ROUTE_INVENTORY } from './zh-route-inventory';
 
-export { routing, TRANSLATED_LOCALES };
+export { LOCALE_LABELS, routing, TRANSLATED_LOCALES };
 
 /** URL prefixes for every locale: '' for the default, '/zh', '/uk', … */
 export const LOCALE_PREFIXES: readonly string[] = routing.locales.map((locale) =>

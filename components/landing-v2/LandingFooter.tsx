@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
-import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { LanguageDirectory } from '@/components/layout/LanguageDirectory';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) {
@@ -60,12 +60,13 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
           </nav>
         </div>
 
-        <div className="mt-16 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-8 text-xs text-white/50 sm:flex-row sm:items-center">
+        <div className="mt-16 border-t border-white/10 pt-6">
+          <LanguageDirectory />
+        </div>
+
+        <div className="mt-6 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-8 text-xs text-white/50 sm:flex-row sm:items-center">
           <p>{footer.copyright.replace('{year}', String(new Date().getFullYear()))}</p>
-          <div className="flex items-center gap-4">
-            <p className="font-mono uppercase tracking-[0.24em]">{footer.colophon}</p>
-            <LanguageSwitcher />
-          </div>
+          <p className="font-mono uppercase tracking-[0.24em]">{footer.colophon}</p>
         </div>
       </div>
     </footer>

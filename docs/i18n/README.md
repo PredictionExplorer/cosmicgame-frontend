@@ -198,32 +198,51 @@ extended with `/zh` variants of every existing case.
 
 ### 2.4 Language switcher
 
-One component, `components/layout/LanguageSwitcher.tsx`, in three variants; every option
-comes from `routing.locales` and is labeled from `LOCALE_LABELS` (`English` / `简体中文` /
-`繁體中文（台灣）` / `繁體中文（香港）` / `Українська` / `한국어` / `日本語`), so a new locale
-appears everywhere the moment it is registered:
+Two components, one contract: every option comes from `routing.locales` and is labeled
+from `LOCALE_LABELS` (`English` / `简体中文` / `繁體中文（台灣）` / `繁體中文（香港）` /
+`Українська` / `한국어` / `日本語` / `Tiếng Việt`), so a new locale appears everywhere the
+moment it is registered.
+
+`components/layout/LanguageSwitcher.tsx` is the header control, in three variants:
 
 - **`pill`** (default) — a globe, the current language written in its own name, and a
   chevron, so the control reads as a chooser rather than a status badge. Opens a menu
   headed by the localized "Language" label with one **radio item** per language
-  (`menuitemradio`, the active one checked). Rendered in the desktop dApp header, the
-  landing header, and both footers.
+  (`menuitemradio`, the active one checked). Rendered in the desktop dApp header and the
+  landing header.
 - **`compact`** — the same menu behind an icon-only globe, for the mobile dApp header where
   the wallet button owns the width. Language choice is therefore reachable from every
   header without opening the drawer.
 - **`list`** — every language laid out as a `radiogroup` of tappable rows, for the mobile
   drawer, where a nested menu would hide the choice behind a second tap.
 
-Behavior is shared: switching calls `router.replace(pathname + search + hash, { locale })`
-from `i18n/navigation.ts` (preserves the current route and params), and next-intl persists
-the choice in the `NEXT_LOCALE` cookie so subsequent visits to unprefixed URLs redirect to
-the preferred locale. Each option carries `lang="<locale>"` so assistive technology switches
-voice per option, and the trigger's visible label does too. Language names are never
-translated — the Japanese option always reads 日本語, the English option always reads
-English — and the three Chinese locales are named by script and region so no two options
-collapse into "中文". The unit test (`components/layout/__tests__/LanguageSwitcher.test.tsx`)
-pins the roles, the `lang` tags, and the labels; the locale smoke suites drive the pill
-round-trip end to end.
+`components/layout/LanguageDirectory.tsx` is the footer directory, mounted in both footers
+and, on the marketing pages that have no footer of their own (`/about`, `/learn`,
+`/white-paper`, `/quiz`), rendered by `LandingShell` as the page footer: a `<nav>` landmark
+named with the same localized "Language" label that lists every language as a **real link**
+to the current page in that language. The switcher menus are client-only
+and never appear in the raw HTML, so the directory is the one surface where crawlers and
+no-JS readers discover the other editions of a page. Its hrefs are the canonical URLs from
+`getPathname` (English unprefixed, everything else under its prefix) — the same URLs the
+`hreflang` alternates in `<head>` advertise — and each link carries `hreflang`, its own
+`lang`, `rel="alternate"` on the other languages, and `aria-current="true"` on the active
+one. Clicking is progressively enhanced: a plain click switches exactly like the pill (below),
+while a modified or middle click leaves the browser's open-in-new-tab behavior alone and only
+records the choice through `i18n/localeCookie.ts` (`rememberLocale`), because the middleware
+redirects unprefixed URLs to the remembered language and an English page would otherwise
+reopen in the old one.
+
+Switching behavior is shared: both call `router.replace(pathname + search + hash, { locale })`
+from `i18n/navigation.ts` (preserves the current route and params), and next-intl's client
+router persists the choice in the `NEXT_LOCALE` cookie so subsequent visits to unprefixed
+URLs redirect to the preferred locale (the middleware itself never writes the cookie, see
+§2.3). Each option carries `lang="<locale>"` so assistive technology switches voice per
+option, and the pill's visible label does too. Language names are never translated — the
+Japanese option always reads 日本語, the English option always reads English — and the three
+Chinese locales are named by script and region so no two options collapse into "中文". The
+unit tests (`components/layout/__tests__/LanguageSwitcher.test.tsx`, `LanguageDirectory.test.tsx`)
+pin the roles, the `lang` / `hreflang` tags, the canonical hrefs, and the labels; the locale
+smoke suites drive the pill round-trip and the directory's links end to end.
 
 ## 3. Where strings live
 
