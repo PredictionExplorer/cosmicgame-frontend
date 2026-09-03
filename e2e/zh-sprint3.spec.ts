@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { dismissOpenTooltips, expectTooltipFullyVisible, openTooltip } from './tooltip-helpers';
 
 /**
- * Sprint 3 Chinese coverage (docs/i18n/progress.md): the core dApp routes —
+ * Sprint 3 Chinese coverage (docs/i18n/progress-zh.md): the core dApp routes —
  * home, current-cycle, gallery, detail, gesture, how-it-works — render
  * translated copy under /zh, including tooltips.
  *

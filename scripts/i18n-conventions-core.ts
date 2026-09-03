@@ -1,23 +1,29 @@
 /**
- * Script conventions for the Chinese locales (docs/i18n/README.md §7).
+ * Copy conventions per translated locale (docs/i18n/README.md §7): the
+ * language-specific defects that parity, terminology, and lexicon checks
+ * cannot see but a native reader notices first. One entry per locale
+ * (`null` when the language has no mechanical conventions worth a gate);
+ * every catalog value and copy module of the locale is checked against it.
+ * Locale-generic like the other gates: a new locale adds an entry here.
  *
- * Character conversion is the number-one defect in Traditional Chinese
- * localizations: a Simplified character pasted into a Traditional catalog, a
- * Taiwan character choice in Hong Kong copy (裡 for 裏), curly quotes where
- * corner brackets belong. None of it is caught by parity or terminology
- * checks; all of it is what a native reader notices first. This module
- * declares one convention set per translated locale (`null` for languages
- * with a single script) and checks catalog values and copy modules against
- * it. Locale-generic like the other gates: a new locale adds an entry here.
+ * Two kinds of check compose an entry:
  *
- * Script detection asks OpenCC for the locale's own rendering of the text
- * (`cn→tw` for Taiwan, `cn→hk` for Hong Kong, `t→cn` for the mainland) and
- * reports every character the conversion would change. Text already in the
- * right script is a fixed point, so correct copy produces no diff; a
- * Simplified 发 in Traditional copy (or a Traditional 發 in Simplified copy)
- * does. Phrase-aware conversion keeps legitimately shared characters quiet
- * (風采 vs 採用). The one exception OpenCC cannot know about is the glossary's
- * choice of 台 over 臺 for Taiwan, listed as a shared character.
+ * - **Script conventions** (the Chinese locales). Character conversion is
+ *   the number-one defect in Traditional Chinese localizations: a Simplified
+ *   character pasted into a Traditional catalog, a Taiwan character choice in
+ *   Hong Kong copy (裡 for 裏), curly quotes where corner brackets belong.
+ *   Detection asks OpenCC for the locale's own rendering of the text (`cn→tw`
+ *   for Taiwan, `cn→hk` for Hong Kong, `t→cn` for the mainland) and reports
+ *   every character the conversion would change. Text already in the right
+ *   script is a fixed point, so correct copy produces no diff; a Simplified 发
+ *   in Traditional copy (or a Traditional 發 in Simplified copy) does.
+ *   Phrase-aware conversion keeps legitimately shared characters quiet (風采
+ *   vs 採用). The one exception OpenCC cannot know about is the glossary's
+ *   choice of 台 over 臺 for Taiwan, listed as a shared character.
+ * - **Disallowed patterns** (any language). Constructions the style guide
+ *   rules out and a regular expression can find: a sound-dependent Korean
+ *   particle glued to an ICU placeholder, full-width punctuation in a
+ *   language that uses ASCII marks, a pronoun the register drops.
  */
 
 import { readFileSync, readdirSync } from 'node:fs';
@@ -63,10 +69,9 @@ export const HK_STANDARD_FORMS: Readonly<Record<string, string>> = {
   啓: '啟',
 };
 
+/** OpenCC-backed script checks for a Chinese locale. */
 export interface ScriptConventions {
   readonly script: ChineseScript;
-  /** Where the conventions are documented. */
-  readonly styleGuide: string;
   /** This locale's rendering of arbitrary Chinese text; a fixed point for correct copy. */
   readonly expectedForm: (text: string) => string;
   /** Characters of another variant's convention → the expected form. */
@@ -75,6 +80,23 @@ export interface ScriptConventions {
   readonly forbiddenPunctuation: Readonly<Record<string, string>>;
   /** Characters the glossary keeps although `expectedForm` would change them. */
   readonly sharedCharacters: readonly string[];
+}
+
+/** A construction that is always a defect in this locale's copy, found by pattern. */
+export interface DisallowedPattern {
+  /** Matched per line; the `g` and `u` flags are added if absent. */
+  readonly pattern: RegExp;
+  /** What to write instead, with a style-guide section, as shown in diagnostics. */
+  readonly reason: string;
+}
+
+export interface LocaleConventions {
+  /** Where the conventions are documented. */
+  readonly styleGuide: string;
+  /** Script checks, or `null` for a language written in one script. */
+  readonly script: ScriptConventions | null;
+  /** Pattern checks; empty when the script checks say everything. */
+  readonly disallowedPatterns: readonly DisallowedPattern[];
 }
 
 const TRADITIONAL_QUOTES: Readonly<Record<string, string>> = {
@@ -130,51 +152,64 @@ function applyStandardForms(text: string): string {
   return out;
 }
 
-export const SCRIPT_CONVENTIONS: Record<TranslatedLocale, ScriptConventions | null> = {
+export const LOCALE_CONVENTIONS: Record<TranslatedLocale, LocaleConventions | null> = {
   zh: {
-    script: 'Hans',
     styleGuide: 'docs/i18n/style-guide-zh.md',
-    expectedForm: toSimplified,
-    forbiddenCharacters: {},
-    forbiddenPunctuation: SIMPLIFIED_QUOTES,
-    sharedCharacters: [],
+    script: {
+      script: 'Hans',
+      expectedForm: toSimplified,
+      forbiddenCharacters: {},
+      forbiddenPunctuation: SIMPLIFIED_QUOTES,
+      sharedCharacters: [],
+    },
+    disallowedPatterns: [],
   },
   'zh-TW': {
-    script: 'Hant',
     styleGuide: 'docs/i18n/style-guide-zh-TW.md',
-    expectedForm: toTaiwan,
-    forbiddenCharacters: {
-      // Taiwan writes 裡 and 著 in every sense; 裏/着 are Hong Kong choices.
-      裏: '裡',
-      着: '著',
-      // The glossary standardizes on 台 (台灣, 平台), the everyday form.
-      臺: '台',
-      ...HK_STANDARD_FORMS,
+    script: {
+      script: 'Hant',
+      expectedForm: toTaiwan,
+      forbiddenCharacters: {
+        // Taiwan writes 裡 and 著 in every sense; 裏/着 are Hong Kong choices.
+        裏: '裡',
+        着: '著',
+        // The glossary standardizes on 台 (台灣, 平台), the everyday form.
+        臺: '台',
+        ...HK_STANDARD_FORMS,
+      },
+      forbiddenPunctuation: TRADITIONAL_QUOTES,
+      sharedCharacters: SHARED_TRADITIONAL_CHARACTERS,
     },
-    forbiddenPunctuation: TRADITIONAL_QUOTES,
-    sharedCharacters: SHARED_TRADITIONAL_CHARACTERS,
+    disallowedPatterns: [],
   },
   'zh-HK': {
-    script: 'Hant',
     styleGuide: 'docs/i18n/style-guide-zh-HK.md',
-    expectedForm: (text) => applyStandardForms(toHongKong(text)),
-    forbiddenCharacters: {
-      // Hong Kong writes 裏, not the Taiwan 裡.
-      裡: '裏',
-      臺: '台',
-      ...HK_STANDARD_FORMS,
+    script: {
+      script: 'Hant',
+      expectedForm: (text) => applyStandardForms(toHongKong(text)),
+      forbiddenCharacters: {
+        // Hong Kong writes 裏, not the Taiwan 裡.
+        裡: '裏',
+        臺: '台',
+        ...HK_STANDARD_FORMS,
+      },
+      forbiddenPunctuation: TRADITIONAL_QUOTES,
+      sharedCharacters: SHARED_TRADITIONAL_CHARACTERS,
     },
-    forbiddenPunctuation: TRADITIONAL_QUOTES,
-    sharedCharacters: SHARED_TRADITIONAL_CHARACTERS,
+    disallowedPatterns: [],
   },
+  // Ukrainian is written in one script and its style rules (cases, four
+  // plural forms, «» quotes) need a reader, not a regular expression.
   uk: null,
 };
 
 export interface ConventionViolation {
   readonly line: number;
+  /** The offending character, or the text a disallowed pattern matched. */
   readonly character: string;
+  /** The expected form, or for a pattern its `reason`. */
   readonly expected: string;
-  readonly reason: 'wrong-script' | 'regional-form' | 'punctuation';
+  readonly reason: 'wrong-script' | 'regional-form' | 'punctuation' | 'pattern';
   readonly excerpt: string;
 }
 
@@ -186,8 +221,9 @@ function excerptFor(line: string): string {
 }
 
 /**
- * Checks text (a catalog value or a whole copy module) against a locale's
- * conventions. Each distinct offending character is reported once per line.
+ * Checks text (a catalog value or a whole copy module) against a Chinese
+ * locale's script conventions. Each distinct offending character is reported
+ * once per line.
  */
 export function checkScriptConventions(
   text: string,
@@ -232,6 +268,60 @@ export function checkScriptConventions(
   });
 
   return violations;
+}
+
+const globalPatterns = new WeakMap<DisallowedPattern, RegExp>();
+
+/** The pattern with the flags `matchAll` needs, compiled once per entry. */
+function globalPattern(entry: DisallowedPattern): RegExp {
+  let compiled = globalPatterns.get(entry);
+  if (!compiled) {
+    const flags = new Set([...entry.pattern.flags, 'g', 'u']);
+    compiled = new RegExp(entry.pattern.source, [...flags].join(''));
+    globalPatterns.set(entry, compiled);
+  }
+  return compiled;
+}
+
+/**
+ * Checks text against a locale's disallowed patterns. Each distinct match of
+ * each pattern is reported once per line.
+ */
+export function checkDisallowedPatterns(
+  text: string,
+  patterns: readonly DisallowedPattern[],
+): ConventionViolation[] {
+  if (patterns.length === 0) return [];
+  const violations: ConventionViolation[] = [];
+  text.split('\n').forEach((line, index) => {
+    for (const entry of patterns) {
+      const seen = new Set<string>();
+      for (const match of line.matchAll(globalPattern(entry))) {
+        const matched = match[0];
+        if (!matched || seen.has(matched)) continue;
+        seen.add(matched);
+        violations.push({
+          line: index + 1,
+          character: matched,
+          expected: entry.reason,
+          reason: 'pattern',
+          excerpt: excerptFor(line),
+        });
+      }
+    }
+  });
+  return violations;
+}
+
+/** Every violation of a locale's conventions in one text, script checks first. */
+export function checkConventions(
+  text: string,
+  conventions: LocaleConventions,
+): ConventionViolation[] {
+  return [
+    ...(conventions.script ? checkScriptConventions(text, conventions.script) : []),
+    ...checkDisallowedPatterns(text, conventions.disallowedPatterns),
+  ];
 }
 
 export interface LocatedViolation {
@@ -282,7 +372,7 @@ export function localeConventionFiles(
 
 /** Every violation in a locale's catalogs and copy modules under `root`. */
 export function scanLocaleConventions(root: string, locale: TranslatedLocale): LocatedViolation[] {
-  const conventions = SCRIPT_CONVENTIONS[locale];
+  const conventions = LOCALE_CONVENTIONS[locale];
   if (!conventions) return [];
   const { catalogs, modules } = localeConventionFiles(root, locale);
   const found: LocatedViolation[] = [];
@@ -291,23 +381,38 @@ export function scanLocaleConventions(root: string, locale: TranslatedLocale): L
     const file = relative(root, path);
     const parsed = JSON.parse(readFileSync(path, 'utf8')) as unknown;
     for (const { location, text } of flattenStrings(parsed)) {
-      for (const violation of checkScriptConventions(text, conventions)) {
+      for (const violation of checkConventions(text, conventions)) {
         found.push({ file, location, violation });
       }
     }
   }
   for (const path of modules) {
     const file = relative(root, path);
-    for (const violation of checkScriptConventions(readFileSync(path, 'utf8'), conventions)) {
+    for (const violation of checkConventions(readFileSync(path, 'utf8'), conventions)) {
       found.push({ file, location: '', violation });
     }
   }
   return found;
 }
 
-export function describeViolation(violation: ConventionViolation, script: ChineseScript): string {
+/** One-line summary of what a locale's gate checks, for CLI output. */
+export function describeConventions(conventions: LocaleConventions): string {
+  const parts = [
+    ...(conventions.script ? [`${conventions.script.script} script`] : []),
+    ...(conventions.disallowedPatterns.length > 0
+      ? [`${conventions.disallowedPatterns.length} pattern(s)`]
+      : []),
+  ];
+  return parts.join(', ');
+}
+
+export function describeViolation(
+  violation: ConventionViolation,
+  conventions: LocaleConventions,
+): string {
   const codePoint = (character: string): string =>
     `U+${character.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`;
+  const script = conventions.script?.script ?? 'Hans';
   switch (violation.reason) {
     case 'wrong-script':
       return violation.character.length === 1
@@ -319,5 +424,7 @@ export function describeViolation(violation: ConventionViolation, script: Chines
       return `${violation.character} (${codePoint(violation.character)}) is another variant's form; write ${violation.expected}`;
     case 'punctuation':
       return `${violation.character} is the other script's quotation mark; write ${violation.expected}`;
+    case 'pattern':
+      return `"${violation.character}": ${violation.expected}`;
   }
 }

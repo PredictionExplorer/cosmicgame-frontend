@@ -4,7 +4,7 @@ The **single source of truth** for how Cosmic Signature's coined vocabulary is r
 Traditional Chinese for Taiwan (`zh-TW`). One English term = one Chinese term, everywhere.
 Machine-enforced by `scripts/terminology/zh-TW.ts` (drift), `ZH_HANT_BANNED_TERMS` +
 `ZH_TW_BANNED_TERMS` in `scripts/lexicon-scan-core.ts` (banned register), and
-`scripts/i18n-script-conventions-core.ts` (script, character forms, quotation marks).
+`scripts/i18n-conventions-core.ts` (script, character forms, quotation marks).
 
 `zh-TW` is **not** a character conversion of `zh`. The coined terms were re-decided for a
 Taipei reader; the everyday vocabulary follows Taiwan usage (網路、軟體、資訊、使用者、
@@ -188,5 +188,5 @@ Style-level cautions (reviewer judgment): 行銷 (marketing — use 推廣), 回
 As [glossary-zh.md §6](./glossary-zh.md#6-change-process术语变更流程), sweeping
 `messages/zh-TW/**`, `content/**/*.zh-TW.ts`, `content/about/zh-TW.ts`, and updating
 `scripts/terminology/zh-TW.ts` (drift), `ZH_TW_BANNED_TERMS` (register), or
-`SCRIPT_CONVENTIONS['zh-TW']` (characters) in the same PR. A change to a term shared with
+`LOCALE_CONVENTIONS['zh-TW']` (characters) in the same PR. A change to a term shared with
 Hong Kong is made in both glossaries or deliberately not.

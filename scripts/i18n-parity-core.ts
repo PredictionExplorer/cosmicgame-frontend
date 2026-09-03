@@ -16,6 +16,10 @@
  *     locale's CLDR categories (`one/few/many/other` for uk, `other` for zh),
  *   - untranslated namespace: a catalog whose every value equals the source
  *     is a copied file, not a translation.
+ *
+ * Long-form content (content/**, see ./i18n-content-areas.ts) is shaped by
+ * mapped types, so only the last check applies to it: `compareContent`
+ * measures how much of a module still reads exactly like the English source.
  */
 import {
   parse,
@@ -261,6 +265,73 @@ export function strictProblems(report: NamespaceReport): readonly string[] {
     ...report.pluralGaps.map((entry) => `plural: ${entry}`),
     ...(report.untranslated ? [`untranslated: every value equals the source catalog`] : []),
   ];
+}
+
+export interface ContentReport {
+  readonly area: string;
+  /** Prose leaves (see `isProse`) present in both source and translation. */
+  readonly total: number;
+  /** Paths whose translated prose equals the source verbatim. */
+  readonly identical: readonly string[];
+  /** True when every comparable leaf is a verbatim copy (a scaffolded, untranslated module). */
+  readonly untranslated: boolean;
+}
+
+/**
+ * Whether a source-locale leaf is prose worth comparing. Composed content
+ * carries the locale-independent skeleton too (ids, slugs, icon names,
+ * hrefs, option keys), which is single tokens without whitespace; prose in
+ * the source locale is multi-word. One-word labels are left out with the
+ * skeleton, which under-counts prose slightly but never mistakes an id for
+ * an untranslated sentence.
+ */
+function isProse(value: string): boolean {
+  return /\p{L}/u.test(value) && /\s/.test(value.trim());
+}
+
+/** Flattens any JSON-like value to `path → leaf`, descending into arrays (`items[2].title`). */
+export function flattenContent(node: unknown, prefix = ''): Map<string, unknown> {
+  const leaves = new Map<string, unknown>();
+  if (Array.isArray(node)) {
+    node.forEach((item, index) => {
+      for (const [path, value] of flattenContent(item, `${prefix}[${index}]`))
+        leaves.set(path, value);
+    });
+  } else if (isPlainObject(node)) {
+    for (const [key, value] of Object.entries(node)) {
+      const path = prefix ? `${prefix}.${key}` : key;
+      for (const [childPath, childValue] of flattenContent(value, path)) {
+        leaves.set(childPath, childValue);
+      }
+    }
+  } else {
+    leaves.set(prefix || '(root)', node);
+  }
+  return leaves;
+}
+
+/**
+ * Compares one locale's long-form content with the source locale's. Mapped
+ * types already guarantee the shape, so the only question is whether the
+ * prose was translated: skeleton tokens and leaves the translation does not
+ * carry (a paragraph list of another length) are not comparable. Shared
+ * brand names ("Cosmic Signature NFT") stay identical in every locale, which
+ * is why only a module whose EVERY comparable leaf is verbatim counts as
+ * untranslated.
+ */
+export function compareContent(area: string, source: unknown, translation: unknown): ContentReport {
+  const sourceLeaves = flattenContent(source);
+  const translatedLeaves = flattenContent(translation);
+  const identical: string[] = [];
+  let total = 0;
+  for (const [path, sourceValue] of sourceLeaves) {
+    const translatedValue = translatedLeaves.get(path);
+    if (typeof sourceValue !== 'string' || typeof translatedValue !== 'string') continue;
+    if (!isProse(sourceValue)) continue;
+    total += 1;
+    if (sourceValue === translatedValue) identical.push(path);
+  }
+  return { area, total, identical, untranslated: total > 0 && identical.length === total };
 }
 
 /**

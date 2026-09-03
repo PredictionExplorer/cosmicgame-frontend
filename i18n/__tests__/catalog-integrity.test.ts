@@ -1,8 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { CONTENT_AREAS } from '../../scripts/i18n-content-areas';
 import {
   checkSourceNamespace,
+  compareContent,
   compareNamespace,
   strictProblems,
   type Messages,
@@ -50,4 +52,16 @@ describe.each(TRANSLATED_LOCALES)('%s catalogs', (locale) => {
       expect(strictProblems(report)).toEqual([]);
     },
   );
+});
+
+describe.each(TRANSLATED_LOCALES)('%s long-form content', (locale) => {
+  // The mapped types make a partial module a compile error; this is the
+  // runtime half — a scaffolded module that still reads as English must not
+  // ship as a translation.
+  it.each(CONTENT_AREAS.map((entry) => entry.area))('%s is translated', (area) => {
+    const { read } = CONTENT_AREAS.find((entry) => entry.area === area)!;
+    const report = compareContent(area, read(routing.defaultLocale), read(locale));
+    expect(report.total).toBeGreaterThan(0);
+    expect(report.untranslated).toBe(false);
+  });
 });

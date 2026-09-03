@@ -7,6 +7,7 @@
  * translated locale also has its chrome fixture here.
  */
 import { routing, TRANSLATED_LOCALES } from '../i18n/routing';
+import { SCRIPT_PATTERNS } from '../test-utils/locale-expectations';
 
 import { ROUTE_FIXTURES } from './locale-route-inventory';
 import { ZH_ROUTE_INVENTORY } from './zh-route-inventory';
@@ -20,7 +21,7 @@ export const LOCALE_PREFIXES: readonly string[] = routing.locales.map((locale) =
 
 /** Strings the shared chrome renders in each translated locale (nav, footer, switcher). */
 export interface LocaleChromeFixture {
-  /** Regex matching at least one character of the language's script. */
+  /** Regex matching at least one character of the language's script (SCRIPT_PATTERNS). */
   readonly script: RegExp;
   /** Accessible name of the language switcher trigger in this locale. */
   readonly switcherLabel: string;
@@ -354,7 +355,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
 
 export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
   zh: {
-    script: /[\u3400-\u9fff]/,
+    script: SCRIPT_PATTERNS.zh,
     switcherLabel: '语言',
     switcherOption: '简体中文',
     footer: { terms: '服务条款', privacy: '隐私政策' },
@@ -373,7 +374,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     landingText: '程序化链上艺术',
   },
   'zh-TW': {
-    script: /[\u3400-\u9fff]/,
+    script: SCRIPT_PATTERNS['zh-TW'],
     switcherLabel: '語言',
     switcherOption: '繁體中文（台灣）',
     footer: { terms: '服務條款', privacy: '隱私權政策' },
@@ -392,7 +393,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     landingText: '程序化鏈上藝術',
   },
   'zh-HK': {
-    script: /[\u3400-\u9fff]/,
+    script: SCRIPT_PATTERNS['zh-HK'],
     switcherLabel: '語言',
     switcherOption: '繁體中文（香港）',
     footer: { terms: '服務條款', privacy: '私隱政策' },
@@ -411,7 +412,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     landingText: '程序化鏈上藝術',
   },
   uk: {
-    script: /[\u0400-\u04ff]/,
+    script: SCRIPT_PATTERNS.uk,
     switcherLabel: 'Мова',
     switcherOption: 'Українська',
     footer: { terms: 'Умови', privacy: 'Конфіденційність' },

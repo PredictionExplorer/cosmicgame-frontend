@@ -14,7 +14,7 @@ can pick up a unit from a progress tracker and know exactly what to do.
 | [README.md](./README.md) (this file)           | Architecture, tooling, workflow, definition of done                            |
 | [glossary-zh.md](./glossary-zh.md)             | Canonical Simplified Chinese translation for every protocol term + banned list |
 | [style-guide-zh.md](./style-guide-zh.md)       | Rules for making the Simplified Chinese sound native, not translated           |
-| [progress.md](./progress.md)                   | Simplified Chinese rollout: site inventory, sprint plan, progress tracker      |
+| [progress-zh.md](./progress-zh.md)             | Simplified Chinese rollout: site inventory, sprint plan, progress tracker      |
 | [glossary-zh-TW.md](./glossary-zh-TW.md)       | Taiwan Traditional Chinese terms, Taiwan vocabulary, banned register           |
 | [style-guide-zh-TW.md](./style-guide-zh-TW.md) | What differs for Taiwan: vocabulary, characters (裡/著/台), 「」, review hunts |
 | [progress-zh-TW.md](./progress-zh-TW.md)       | Taiwan rollout: per-namespace and per-area T/R/Q tracker                       |
@@ -67,7 +67,7 @@ can pick up a unit from a progress tracker and know exactly what to do.
   directory and per-locale content modules, a lexicon profile and terminology pack, an
   e2e chrome fixture, and a glossary + style guide (§10). No further architectural change.
   A further variant of an existing language (`pt-BR` beside `pt`, say) follows the same
-  path plus `LOCALE_ALIASES` and, for a second script, an entry in `SCRIPT_CONVENTIONS`.
+  path plus `LOCALE_ALIASES` and, for a second script, an entry in `LOCALE_CONVENTIONS`.
 
 ## 2. Library and routing architecture
 
@@ -340,7 +340,7 @@ different x-height. OG images for `/uk` load the checked-in `assets/fonts/Onest-
     the hardcoded value in `app/root-metadata.ts` and the landing layout).
 - **Page metadata** moves from inline strings into the `meta` namespace; `generateMetadata`
   reads `params.locale` and calls `getTranslations`. (~59 pages, tracked per-route in
-  progress.md.)
+  progress-zh.md.)
 - **`app/sitemap.ts` / `lib/seoRoutes.ts`**: every URL entry gains `alternates.languages`.
 - **JSON-LD** (`utils/jsonLd.ts`): translated `name`/`description`, `inLanguage: 'zh-Hans'`
   on zh pages; FAQ JSON-LD uses the zh FAQ content.
@@ -378,15 +378,20 @@ i18n:check`). The same checks run under jest in
    inflected languages are stems). The `zh-TW` and `zh-HK` packs also catch cross-variant
    vocabulary (網絡 in Taiwan copy, 網路 in Hong Kong copy, 使用者 vs 用戶), which is what
    makes a Traditional site read as "converted" to a native reader.
-4. **Script conventions** — `scripts/i18n-script-conventions.ts` (`npm run
-i18n:conventions`, part of `i18n:check`; jest twin `i18n/__tests__/script-conventions.test.ts`):
-   one `SCRIPT_CONVENTIONS` entry per translated locale (`null` for single-script
-   languages). Every catalog value and copy module of a Chinese locale must be a fixed
-   point of its own OpenCC rendering (no Simplified character in Traditional copy and vice
-   versa, phrase-aware, with a short allowlist of genuinely shared characters such as
-   台/里/干/准), must use its regional character choices (Taiwan 裡/著/台, Hong Kong 裏/着
-   and the standard Big5 code points rather than OpenCC's glyph variants 説/閲/户/税), and
-   must use its quotation marks (「」『』 in Traditional copy, “” in Simplified).
+4. **Copy conventions** — `scripts/i18n-conventions.ts` (`npm run i18n:conventions`, part
+   of `i18n:check`; jest twin `i18n/__tests__/conventions.test.ts`): one
+   `LOCALE_CONVENTIONS` entry per translated locale in `scripts/i18n-conventions-core.ts`
+   (`null` when the language has no mechanical conventions worth a gate). An entry
+   composes two kinds of check. _Script conventions_ (the Chinese locales): every catalog
+   value and copy module must be a fixed point of its own OpenCC rendering (no Simplified
+   character in Traditional copy and vice versa, phrase-aware, with a short allowlist of
+   genuinely shared characters such as 台/里/干/准), must use its regional character
+   choices (Taiwan 裡/著/台, Hong Kong 裏/着 and the standard Big5 code points rather than
+   OpenCC's glyph variants 説/閲/户/税), and must use its quotation marks (「」『』 in
+   Traditional copy, “” in Simplified). _Disallowed patterns_ (any language): regular
+   expressions for constructions the style guide rules out, each with the reason shown in
+   diagnostics — a sound-dependent Korean particle glued to an ICU placeholder, full-width
+   punctuation in a language that uses ASCII marks, a pronoun the register drops.
 5. **E2E**: `e2e/locale-fixtures.ts` holds locale lists and per-locale chrome strings;
    `e2e/locale-smoke.ts` and `e2e/locale-site-qa.ts` are locale-parametrized runners that
    a three-line `<locale>-smoke.spec.ts` / `<locale>-site-qa.desktop.spec.ts` plugs into
@@ -412,7 +417,7 @@ flowchart LR
   extract --> translate --> review --> qa
 ```
 
-**Stage definitions (these are the four columns in progress.md):**
+**Stage definitions (these are the four columns in progress-zh.md):**
 
 - **E — Extracted.** No hardcoded user-facing string remains in the file(s); English
   catalog/content entry exists; English rendering unchanged (spot-check + tests).
@@ -434,7 +439,7 @@ flowchart LR
 - One glossary. If a translator wants a different term, they change
   [glossary-zh.md](./glossary-zh.md) in the same PR and update all prior uses (grep the
   catalogs) — no silent divergence.
-- Commit prefix `i18n(zh): …`; progress.md is updated in the same PR that changes status.
+- Commit prefix `i18n(zh): …`; progress-zh.md is updated in the same PR that changes status.
 - `protocol-facts.ts` numbers are never restated in prose — interpolate them, exactly as
   the English does.
 
@@ -487,9 +492,10 @@ a new variant of an existing language (same steps, plus §10.1).
      or extra ids, so partial translations cannot ship.
    - `LEXICON_PROFILES` in `scripts/lexicon-scan-core.ts` (banned register + matcher for
      the script), `TERMINOLOGY_PACKS` in `scripts/terminology-consistency-core.ts` (drift
-     rules in `scripts/terminology/<locale>.ts`), and `SCRIPT_CONVENTIONS` in
-     `scripts/i18n-script-conventions-core.ts` (`null` unless the language has more than
-     one script).
+     rules in `scripts/terminology/<locale>.ts`), and `LOCALE_CONVENTIONS` in
+     `scripts/i18n-conventions-core.ts` (script checks for a second Chinese script,
+     disallowed patterns for anything a regular expression can catch, `null` when the
+     language needs neither).
    - `LOCALE_CHROME`, `LOCALE_SEO`, and `LOCALE_ROUTE_TEXT` in `e2e/locale-fixtures.ts`,
      then a `<locale>-smoke.spec.ts` and `<locale>-site-qa.desktop.spec.ts` that call the
      shared runners with the locale's QA profile; add the suite to `test:e2e:locales` and
@@ -530,7 +536,7 @@ is different is how the copy starts and what the gates must additionally catch:
    diverge and why (錨定配發 vs 錨定派發), the everyday vocabulary that marks the variant
    (使用者 vs 用戶), the character choices (裡/裏), and the banned words the region actually
    uses for the banned concepts (博弈 vs 博彩). Encode each of those in, respectively, the
-   terminology pack, the terminology pack, `SCRIPT_CONVENTIONS`, and the lexicon profile.
+   terminology pack, the terminology pack, `LOCALE_CONVENTIONS`, and the lexicon profile.
 4. Rewrite the draft against the glossary and style guide — the copy stage is the work.
    The sibling's fixtures in `e2e/locale-fixtures.ts` are the template for the variant's
    route texts, but pin the variant's own vocabulary so the suite proves the right variant

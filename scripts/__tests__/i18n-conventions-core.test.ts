@@ -1,22 +1,36 @@
 import { TRANSLATED_LOCALES } from '../../i18n/routing';
 import {
   HK_STANDARD_FORMS,
-  SCRIPT_CONVENTIONS,
+  LOCALE_CONVENTIONS,
+  checkConventions,
+  checkDisallowedPatterns,
   checkScriptConventions,
+  describeConventions,
   describeViolation,
-} from '../i18n-script-conventions-core';
+  type LocaleConventions,
+} from '../i18n-conventions-core';
 
-const tw = SCRIPT_CONVENTIONS['zh-TW']!;
-const hk = SCRIPT_CONVENTIONS['zh-HK']!;
-const zh = SCRIPT_CONVENTIONS.zh!;
+const twLocale = LOCALE_CONVENTIONS['zh-TW']!;
+const hkLocale = LOCALE_CONVENTIONS['zh-HK']!;
+const tw = twLocale.script!;
+const hk = hkLocale.script!;
+const zh = LOCALE_CONVENTIONS.zh!.script!;
 
 const reasons = (text: string, conventions = tw) =>
   checkScriptConventions(text, conventions).map((v) => `${v.reason}:${v.character}>${v.expected}`);
 
-describe('SCRIPT_CONVENTIONS', () => {
+describe('LOCALE_CONVENTIONS', () => {
   it('declares a decision for every translated locale', () => {
-    expect(Object.keys(SCRIPT_CONVENTIONS).sort()).toEqual([...TRANSLATED_LOCALES].sort());
-    expect(SCRIPT_CONVENTIONS.uk).toBeNull();
+    expect(Object.keys(LOCALE_CONVENTIONS).sort()).toEqual([...TRANSLATED_LOCALES].sort());
+    expect(LOCALE_CONVENTIONS.uk).toBeNull();
+  });
+
+  it('gives every Chinese locale script checks and documents them in a style guide', () => {
+    for (const locale of ['zh', 'zh-TW', 'zh-HK'] as const) {
+      const conventions = LOCALE_CONVENTIONS[locale]!;
+      expect(conventions.script).not.toBeNull();
+      expect(conventions.styleGuide).toBe(`docs/i18n/style-guide-${locale}.md`);
+    }
   });
 
   it('treats correct copy in each script as a fixed point', () => {
@@ -94,12 +108,73 @@ describe('quotation marks', () => {
   });
 });
 
+describe('disallowed patterns', () => {
+  const fixture: LocaleConventions = {
+    styleGuide: 'docs/i18n/style-guide-xx.md',
+    script: null,
+    disallowedPatterns: [
+      { pattern: /\bcolour\b/i, reason: 'American spelling (style guide §4)' },
+      { pattern: /[。，]/, reason: 'ASCII punctuation only' },
+    ],
+  };
+
+  it('reports each distinct match once per line with the pattern reason', () => {
+    const violations = checkDisallowedPatterns(
+      'The colour and the COLOUR, colour again。\nclean line\nsecond。，',
+      fixture.disallowedPatterns,
+    );
+    expect(violations.map((v) => `${v.line}:${v.reason}:${v.character}`)).toEqual([
+      '1:pattern:colour',
+      '1:pattern:COLOUR',
+      '1:pattern:。',
+      '3:pattern:。',
+      '3:pattern:，',
+    ]);
+    expect(violations[0]!.expected).toBe('American spelling (style guide §4)');
+  });
+
+  it('adds the global and unicode flags without mutating the declared pattern', () => {
+    const [entry] = fixture.disallowedPatterns;
+    expect(entry!.pattern.flags).toBe('i');
+    checkDisallowedPatterns('colour colour', fixture.disallowedPatterns);
+    expect(entry!.pattern.flags).toBe('i');
+    expect(entry!.pattern.lastIndex).toBe(0);
+  });
+
+  it('composes with script checks in checkConventions', () => {
+    expect(checkConventions('clean', fixture)).toEqual([]);
+    expect(checkConventions('colour', fixture)).toHaveLength(1);
+    // Chinese entries carry no patterns; their violations come from the script checks alone.
+    expect(checkConventions('每一笔落筆', twLocale).map((v) => v.reason)).toEqual(['wrong-script']);
+  });
+
+  it('is described alongside the script checks', () => {
+    expect(describeConventions(fixture)).toBe('2 pattern(s)');
+    expect(describeConventions(twLocale)).toBe('Hant script');
+    expect(
+      describeConventions({ ...twLocale, disallowedPatterns: fixture.disallowedPatterns }),
+    ).toBe('Hant script, 2 pattern(s)');
+  });
+});
+
 describe('describeViolation', () => {
   it('names the code point and the expected form', () => {
     const [violation] = checkScriptConventions('落笔', tw);
-    expect(describeViolation(violation!, 'Hant')).toBe('笔 (U+7B14) is Simplified; write 筆');
+    expect(describeViolation(violation!, twLocale)).toBe('笔 (U+7B14) is Simplified; write 筆');
     const [quote] = checkScriptConventions('“落筆”', tw);
-    expect(describeViolation(quote!, 'Hant')).toContain('quotation mark; write 「');
+    expect(describeViolation(quote!, twLocale)).toContain('quotation mark; write 「');
+  });
+
+  it('quotes the matched text and the reason for a disallowed pattern', () => {
+    const conventions: LocaleConventions = {
+      styleGuide: 'docs/i18n/style-guide-xx.md',
+      script: null,
+      disallowedPatterns: [{ pattern: /\{\w+\}을/, reason: 'particle glued to a placeholder' }],
+    };
+    const [violation] = checkConventions('{amount}을 보내기', conventions);
+    expect(describeViolation(violation!, conventions)).toBe(
+      '"{amount}을": particle glued to a placeholder',
+    );
   });
 
   it('reports each offending character once per line with its line number', () => {

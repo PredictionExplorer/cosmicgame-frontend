@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * Sprint 0 smoke coverage for the Chinese locale (docs/i18n/progress.md).
+ * Sprint 0 smoke coverage for the Chinese locale (docs/i18n/progress-zh.md).
  *
  * Sprint 1 translates global chrome and shared UI while later-sprint route
  * bodies continue to use English fallback copy.

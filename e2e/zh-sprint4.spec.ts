@@ -10,7 +10,7 @@ import {
 } from './zh-sprint4-helpers';
 
 /**
- * Sprint 4 Chinese coverage (docs/i18n/progress.md): all transaction and
+ * Sprint 4 Chinese coverage (docs/i18n/progress-zh.md): all transaction and
  * holdings routes render stable translated page-shell copy under /zh.
  *
  * Backend reads are intercepted in zh-sprint4-helpers.ts. Assertions avoid

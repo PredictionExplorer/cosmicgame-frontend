@@ -1,9 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { uncoveredCharacters } from '@/scripts/font-cmap';
+import { SCRIPT_PATTERNS } from '@/test-utils/locale-expectations';
 
-import { routing } from '@/i18n/routing';
+import { getLocaleConfig } from '@/i18n/localeConfig';
+import { routing, TRANSLATED_LOCALES } from '@/i18n/routing';
 import {
   OG_ROUTES,
   formatOgEyebrow,
@@ -11,20 +14,7 @@ import {
   getOgImageMetadata,
   resolveOgLocale,
 } from '@/lib/og/copy';
-import {
-  CJK_HK_OG_FONT_FILE,
-  CJK_HK_OG_FONT_NAME,
-  CJK_OG_FONT_FILE,
-  CJK_OG_FONT_LICENSE,
-  CJK_OG_FONT_NAME,
-  CJK_TC_OG_FONT_FILE,
-  CJK_TC_OG_FONT_NAME,
-  CYRILLIC_OG_FONT_FILE,
-  CYRILLIC_OG_FONT_LICENSE,
-  CYRILLIC_OG_FONT_NAME,
-  getOgFontConfig,
-  getOgTypography,
-} from '@/lib/og/fonts';
+import { OG_TYPOGRAPHY, getOgFontConfig, getOgTypography } from '@/lib/og/fonts';
 
 const generatorPaths = [
   'app/[locale]/(app)/opengraph-image.tsx',
@@ -43,33 +33,32 @@ const generatorPaths = [
 
 const CHINESE_LOCALES = ['zh', 'zh-TW', 'zh-HK'] as const;
 
+/** Locales whose OG images embed a checked-in subset. */
+const FONT_LOCALES = routing.locales.filter((locale) => OG_TYPOGRAPHY[locale].font !== null);
+
 describe('localized Open Graph images', () => {
-  it.each(CHINESE_LOCALES.flatMap((locale) => OG_ROUTES.map((route) => [locale, route] as const)))(
-    '%s %s has Chinese visual copy and alt text',
-    (locale, route) => {
-      const copy = getOgCopy(locale, route);
-      expect(`${copy.alt}${copy.eyebrow}${copy.title}${copy.subhead}`).toMatch(/[\u3400-\u9fff]/);
-      expect(getOgImageMetadata(locale, route)[0]).toEqual(
-        expect.objectContaining({
-          alt: expect.stringMatching(/[\u3400-\u9fff]/),
-          contentType: 'image/png',
-          size: { width: 1200, height: 630 },
-        }),
-      );
-    },
-  );
+  it.each(
+    TRANSLATED_LOCALES.flatMap((locale) => OG_ROUTES.map((route) => [locale, route] as const)),
+  )('%s %s has visual copy and alt text in its own script', (locale, route) => {
+    const script = SCRIPT_PATTERNS[locale];
+    const copy = getOgCopy(locale, route);
+    expect(`${copy.alt}${copy.eyebrow}${copy.title}${copy.subhead}`).toMatch(script);
+    expect(getOgImageMetadata(locale, route)[0]).toEqual(
+      expect.objectContaining({
+        alt: expect.stringMatching(script),
+        contentType: 'image/png',
+        size: { width: 1200, height: 630 },
+      }),
+    );
+    // The locale's Intl tag (`uk-UA`, `zh-TW`) resolves to the same copy.
+    expect(getOgImageMetadata(getLocaleConfig(locale).intlLocale, route)[0]?.alt).toMatch(script);
+  });
 
   it('gives each Chinese variant its own copy, not a shared catalog', () => {
     // Traditional variants must not fall back to the Simplified catalog, and
     // Taiwan and Hong Kong copy differ in vocabulary, not only in characters.
     expect(getOgCopy('zh-TW', 'default').title).not.toBe(getOgCopy('zh', 'default').title);
     expect(getOgCopy('zh-HK', 'default').title).not.toBe(getOgCopy('zh', 'default').title);
-  });
-
-  it.each(OG_ROUTES)('%s has Ukrainian visual copy and alt text', (route) => {
-    const copy = getOgCopy('uk', route);
-    expect(`${copy.alt}${copy.eyebrow}${copy.title}${copy.subhead}`).toMatch(/[\u0400-\u04ff]/);
-    expect(getOgImageMetadata('uk-UA', route)[0]?.alt).toMatch(/[\u0400-\u04ff]/);
   });
 
   it('preserves the established English default and gallery copy', () => {
@@ -93,21 +82,17 @@ describe('localized Open Graph images', () => {
     expect(resolveOgLocale('not-a-locale')).toBe('en');
   });
 
-  it.each([
-    ['Noto Sans SC', CJK_OG_FONT_FILE, CJK_OG_FONT_LICENSE],
-    ['Noto Sans TC', CJK_TC_OG_FONT_FILE, CJK_OG_FONT_LICENSE],
-    ['Noto Sans HK', CJK_HK_OG_FONT_FILE, CJK_OG_FONT_LICENSE],
-    ['Onest', CYRILLIC_OG_FONT_FILE, CYRILLIC_OG_FONT_LICENSE],
-  ])('checks in a compact %s TTF subset with its OFL license', (_name, file, licensePath) => {
-    const font = readFileSync(join(process.cwd(), file));
-    const license = readFileSync(join(process.cwd(), licensePath), 'utf8');
+  it.each(FONT_LOCALES)('%s checks in a compact TTF subset with its OFL license', (locale) => {
+    const spec = OG_TYPOGRAPHY[locale].font!;
+    const font = readFileSync(fileURLToPath(spec.file));
+    const license = readFileSync(fileURLToPath(spec.license), 'utf8');
     expect(font.byteLength).toBeGreaterThan(20_000);
     expect(font.byteLength).toBeLessThan(250_000);
     expect(font.subarray(0, 4)).toEqual(Buffer.from([0x00, 0x01, 0x00, 0x00]));
     expect(license).toContain('SIL OPEN FONT LICENSE Version 1.1');
   });
 
-  it.each(CHINESE_LOCALES)(
+  it.each(FONT_LOCALES)(
     'ships a %s subset that covers every character of its OG copy (npm run og:fonts)',
     async (locale) => {
       const [font] = await getOgFontConfig(locale);
@@ -128,11 +113,7 @@ describe('localized Open Graph images', () => {
   );
 
   it('embeds the regional Noto Sans cut for each Chinese locale', async () => {
-    const names = {
-      zh: CJK_OG_FONT_NAME,
-      'zh-TW': CJK_TC_OG_FONT_NAME,
-      'zh-HK': CJK_HK_OG_FONT_NAME,
-    };
+    const names = { zh: 'Noto Sans SC', 'zh-TW': 'Noto Sans TC', 'zh-HK': 'Noto Sans HK' };
     for (const locale of CHINESE_LOCALES) {
       const [font] = await getOgFontConfig(locale);
       expect(font?.name).toBe(names[locale]);
@@ -150,7 +131,7 @@ describe('localized Open Graph images', () => {
     const [cjk] = await getOgFontConfig('zh');
     expect(cjk).toEqual(
       expect.objectContaining({
-        name: CJK_OG_FONT_NAME,
+        name: OG_TYPOGRAPHY.zh.font!.name,
         data: expect.anything(),
         weight: 700,
         style: 'normal',
@@ -161,7 +142,7 @@ describe('localized Open Graph images', () => {
 
     const [cyrillic] = await getOgFontConfig('uk');
     expect(cyrillic).toEqual(
-      expect.objectContaining({ name: CYRILLIC_OG_FONT_NAME, weight: 700, style: 'normal' }),
+      expect.objectContaining({ name: OG_TYPOGRAPHY.uk.font!.name, weight: 700, style: 'normal' }),
     );
     expect(cyrillic!.data.byteLength).toBeGreaterThan(20_000);
     // Cyrillic is alphabetic: Latin layout metrics (uppercase eyebrows, tracking) apply.

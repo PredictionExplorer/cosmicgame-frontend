@@ -26,7 +26,7 @@ interface MetadataOptions {
    * together with `path`, the canonical points at the locale's own URL and
    * hreflang alternates (every locale, its aliases, `x-default`) are emitted.
    *
-   * PROGRESSIVE ACTIVATION (docs/i18n/progress.md, Sprint 0 note): pages that
+   * PROGRESSIVE ACTIVATION (docs/i18n/progress-zh.md, Sprint 0 note): pages that
    * have not been translated yet must NOT pass this — their `/zh` variant is
    * an English duplicate, so it should keep canonicalizing to the English URL
    * and stay out of hreflang. Pass the locale as each page's translation

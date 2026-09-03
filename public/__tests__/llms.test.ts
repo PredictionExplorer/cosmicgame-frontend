@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 import { protocolFacts } from '@/content/protocol-facts';
+import { LLMS_SECTIONS } from '@/test-utils/locale-expectations';
 
 import { TRANSLATED_LOCALES } from '@/i18n/routing';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
@@ -107,28 +108,21 @@ describe('LLM-facing protocol docs', () => {
   });
   // lexicon-allow-end
 
-  it.each(docs)('%s includes useful Simplified Chinese protocol guidance', (_fileName, content) => {
-    expect(content).toMatch(/^## 中文/m);
-    expect(content).toContain('程序化链上艺术协议');
-    expect(content).toContain('48 小时');
-    expect(content).toContain(`${protocolFacts.typicalNftsPerCycle} 枚 Cosmic Signature NFT`);
-    expect(content).toContain('每枚 RandomWalk NFT 只能');
-    expect(content).toContain('COSMIC 癌症突变数据库');
-  });
+  // Every translated locale owns a section in both docs; what it must say is
+  // declared once in LLMS_SECTIONS, so a new locale cannot register without
+  // telling crawlers about itself in its own language.
+  describe.each(TRANSLATED_LOCALES)('%s section', (locale) => {
+    const section = LLMS_SECTIONS[locale];
+    const escapedHeading = section.heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-  it.each(docs)('%s includes useful Ukrainian protocol guidance', (_fileName, content) => {
-    expect(content).toMatch(/^## Українська/m);
-    expect(content).toContain('процедурний протокол ончейн-мистецтва');
-    expect(content).toContain('48 годин');
-    expect(content).toContain(`${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT`);
-    expect(content).toContain('кожен RandomWalk NFT');
-    expect(content).toContain('базою даних мутацій раку COSMIC');
-    // Ukrainian thousands never use the English comma grouping, which a
-    // Ukrainian reader parses as a decimal point.
-    expect(content).not.toMatch(/\d,\d{3} CST[^\n]*[\u0400-\u04ff]/);
-  });
+    it.each(docs)('%s includes useful protocol guidance in the locale', (_fileName, content) => {
+      expect(content).toMatch(new RegExp(`^## ${escapedHeading}`, 'm'));
+      for (const phrase of section.phrases) expect(content).toContain(phrase);
+      if (section.forbiddenNumberFormat) {
+        expect(content).not.toMatch(section.forbiddenNumberFormat);
+      }
+    });
 
-  describe.each(TRANSLATED_LOCALES)('%s routes', (locale) => {
     it.each(docs)('%s links the canonical landing and app routes', (_fileName, content) => {
       expect(content).toContain(`https://cosmicsignature.com/${locale}`);
       expect(content).toContain(`https://cosmicsignature.com/${locale}/learn`);

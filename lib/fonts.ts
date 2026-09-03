@@ -1,6 +1,8 @@
 import localFont from 'next/font/local';
 import { Inter, Noto_Sans_HK, Noto_Sans_SC, Noto_Sans_TC, Onest } from 'next/font/google';
 
+import type { LocaleRecord } from '@/i18n/locale';
+
 export const clashDisplay = localFont({
   src: [
     {
@@ -99,3 +101,34 @@ export const onest = Onest({
   preload: false,
   fallback: ['system-ui', 'Arial', 'sans-serif'],
 });
+
+/** A next/font face declared with a CSS `variable` (all of the faces above). */
+type FontWithVariable = typeof inter;
+
+/**
+ * The companion face each locale needs beyond Clash Display + Inter, or
+ * `null` when the Latin faces cover its script. Adding a locale to
+ * routing.locales fails to compile here until the decision is recorded; the
+ * matching `html:lang()` rule in styles/global.css then swaps the face into
+ * the right stack (§5), and the locale's site-QA suite asserts it renders.
+ */
+export const LOCALE_COMPANION_FONTS: LocaleRecord<FontWithVariable | null> = {
+  en: null,
+  zh: notoSansSC,
+  'zh-TW': notoSansTC,
+  'zh-HK': notoSansHK,
+  uk: onest,
+};
+
+/**
+ * `className` for `<html>`: every font's CSS-variable class, so each locale's
+ * `html:lang()` rule finds its variable defined. Companion faces cost nothing
+ * on pages that never use them (`preload: false`, unicode-range slices).
+ */
+export const FONT_VARIABLE_CLASS_NAMES: string = Array.from(
+  new Set(
+    [clashDisplay, inter, ...Object.values(LOCALE_COMPANION_FONTS)]
+      .filter((font): font is FontWithVariable => font !== null)
+      .map((font) => font.variable),
+  ),
+).join(' ');

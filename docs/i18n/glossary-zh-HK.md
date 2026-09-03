@@ -4,7 +4,7 @@ The **single source of truth** for how Cosmic Signature's coined vocabulary is r
 Traditional Chinese for Hong Kong (`zh-HK`). One English term = one Chinese term, everywhere.
 Machine-enforced by `scripts/terminology/zh-HK.ts` (drift), `ZH_HANT_BANNED_TERMS` +
 `ZH_HK_BANNED_TERMS` in `scripts/lexicon-scan-core.ts` (banned register), and
-`scripts/i18n-script-conventions-core.ts` (script, character forms, quotation marks).
+`scripts/i18n-conventions-core.ts` (script, character forms, quotation marks).
 
 `zh-HK` is **written Hong Kong Chinese**: standard written Chinese with Hong Kong's own IT,
 finance, and civic vocabulary (網絡、軟件、用戶、智能合約、私隱、數碼、流動裝置、主頁), the
@@ -161,6 +161,6 @@ Style-level cautions (reviewer judgment): Cantonese colloquialisms in UI copy (�
 
 As [glossary-zh.md §6](./glossary-zh.md#6-change-process术语变更流程), sweeping
 `messages/zh-HK/**`, `content/**/*.zh-HK.ts`, `content/about/zh-HK.ts`, and updating
-`scripts/terminology/zh-HK.ts`, `ZH_HK_BANNED_TERMS`, or `SCRIPT_CONVENTIONS['zh-HK']` in
+`scripts/terminology/zh-HK.ts`, `ZH_HK_BANNED_TERMS`, or `LOCALE_CONVENTIONS['zh-HK']` in
 the same PR. A change to a term shared with Taiwan is made in both glossaries or
 deliberately not.

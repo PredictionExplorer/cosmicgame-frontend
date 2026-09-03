@@ -6,6 +6,7 @@ import { getLandingContent } from '@/content/landing';
 import { getLearnContent } from '@/content/learn';
 import { protocolFacts } from '@/content/protocol-facts';
 import { getQuizContent } from '@/content/quiz';
+import { DURATION_NOUNS, type DurationNouns } from '@/test-utils/locale-expectations';
 
 import { routing } from '@/i18n/routing';
 import { DEFAULT_ACTIVE_PERIOD_GAP_HOURS } from '@/utils/biddingAnalytics';
@@ -20,9 +21,11 @@ import { DEFAULT_ACTIVE_PERIOD_GAP_HOURS } from '@/utils/biddingAnalytics';
  * reworded or a new one is introduced, this test forces it through the
  * verified facts module instead of hardcoded prose.
  *
- * Duration words are matched per language (English and Ukrainian inflect
- * their unit nouns; Chinese durations use 小时/周/天), so a translated figure
- * is held to the same facts as the English it renders.
+ * Duration words are matched per language through the `DURATION_NOUNS`
+ * registry (English and Ukrainian inflect their unit nouns; Chinese durations
+ * use 小时/周/天), so a translated figure is held to the same facts as the
+ * English it renders, and a new locale cannot ship without declaring its
+ * nouns.
  */
 
 interface CopySource {
@@ -59,11 +62,21 @@ const sources: CopySource[] = [
   { name: 'llms-full.txt', text: readPublicFile('llms-full.txt') },
 ];
 
-// Unit nouns per language. Ukrainian forms cover every plural category
-// (година/години/годин/годину, тиждень/тижні/тижнів, день/дні/днів/дня).
-const HOUR_WORDS = 'hours?|годин[аиу]?|小时';
-const WEEK_WORDS = 'weeks?|тиж(?:день|н[іяю]|нів|нями|нях|нем)|周';
-const DAY_WORDS = 'days?|д(?:ень|н[іяю]|нів|нями|нях|нем)|天';
+type DurationUnit = keyof Pick<DurationNouns, 'hours' | 'weeks' | 'days'>;
+
+/**
+ * `48 hours`, `48-hour`, `48 годин`, `48 小時`: one pattern per locale so a
+ * language can guard its own false positives (a lookbehind for calendar
+ * dates). Every pattern runs against every source — stray English in a
+ * translated catalog is held to the facts too.
+ */
+function durationPatterns(unit: DurationUnit): readonly RegExp[] {
+  return routing.locales.map((locale) => {
+    const nouns = DURATION_NOUNS[locale];
+    const guard = nouns.notAfter ? `(?<!${nouns.notAfter})` : '';
+    return new RegExp(`${guard}(\\d+(?:\\.\\d+)?)[- ]?(?:${nouns[unit]})(?![\\p{L}])`, 'giu');
+  });
+}
 
 const allowedPercents = new Set<number>([
   // Chart prose uses the neutral zero boundary ("no activity shows 0%").
@@ -125,14 +138,19 @@ function parseNumber(raw: string): number {
   return Number(raw.replace(new RegExp(THOUSANDS_SEPARATOR, 'g'), ''));
 }
 
-function collect(text: string, pattern: RegExp): Array<{ value: number; context: string }> {
+function collect(
+  text: string,
+  patterns: RegExp | readonly RegExp[],
+): Array<{ value: number; context: string }> {
   const hits: Array<{ value: number; context: string }> = [];
-  for (const match of text.matchAll(pattern)) {
-    const index = match.index ?? 0;
-    hits.push({
-      value: parseNumber(match[1]!),
-      context: text.slice(Math.max(0, index - 60), index + 60).replace(/\s+/g, ' '),
-    });
+  for (const pattern of Array.isArray(patterns) ? patterns : [patterns as RegExp]) {
+    for (const match of text.matchAll(pattern)) {
+      const index = match.index ?? 0;
+      hits.push({
+        value: parseNumber(match[1]!),
+        context: text.slice(Math.max(0, index - 60), index + 60).replace(/\s+/g, ' '),
+      });
+    }
   }
   return hits;
 }
@@ -163,7 +181,7 @@ describe('copy numeric claims stay pinned to protocolFacts', () => {
   it.each(sources)('$name: every "N hours" figure is verified', ({ name, text }) => {
     assertAllowed(
       name,
-      collect(text, new RegExp(`(\\d+(?:\\.\\d+)?)[- ]?(?:${HOUR_WORDS})(?![\\p{L}])`, 'giu')),
+      collect(text, durationPatterns('hours')),
       allowedHourFigures,
       'hour figure',
     );
@@ -172,19 +190,14 @@ describe('copy numeric claims stay pinned to protocolFacts', () => {
   it.each(sources)('$name: every "N weeks" figure is verified', ({ name, text }) => {
     assertAllowed(
       name,
-      collect(text, new RegExp(`(\\d+(?:\\.\\d+)?)[- ]?(?:${WEEK_WORDS})(?![\\p{L}])`, 'giu')),
+      collect(text, durationPatterns('weeks')),
       allowedWeekFigures,
       'week figure',
     );
   });
 
   it.each(sources)('$name: every "N days" figure is verified', ({ name, text }) => {
-    assertAllowed(
-      name,
-      collect(text, new RegExp(`(\\d+(?:\\.\\d+)?)[- ]?(?:${DAY_WORDS})(?![\\p{L}])`, 'giu')),
-      allowedDayFigures,
-      'day figure',
-    );
+    assertAllowed(name, collect(text, durationPatterns('days')), allowedDayFigures, 'day figure');
   });
 
   it.each(sources)('$name: every "N CST" amount is verified', ({ name, text }) => {

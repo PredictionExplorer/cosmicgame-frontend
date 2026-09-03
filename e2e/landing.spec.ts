@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { LOCALE_CHROME, LOCALE_SEO } from './locale-fixtures';
+import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES } from './locale-fixtures';
 
 /**
  * End-to-end tests for the landing site at cosmicsignature.com.
@@ -253,10 +253,11 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     }
   });
 
-  // Every locale that joined after the Chinese sprints runs the same landing
-  // check, with its chrome strings and SEO values read from the fixtures so a
-  // new locale is one fixture entry away from coverage.
-  for (const locale of ['zh-TW', 'zh-HK', 'uk'] as const) {
+  // Every translated locale runs the same landing check, with its chrome
+  // strings and SEO values read from the fixtures, so a new locale is covered
+  // the moment it is registered (the Simplified Chinese sprint case above
+  // stays as the historical acceptance record).
+  for (const locale of TRANSLATED_LOCALES) {
     test(`keeps ${locale} landing copy within the viewport at release breakpoints`, async ({
       page,
     }, testInfo) => {

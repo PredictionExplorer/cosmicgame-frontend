@@ -4,28 +4,19 @@ import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
 
 /**
  * Checked-in weight-700 subsets for the scripts next/og's built-in Latin
- * fonts cannot render. Each Chinese locale gets the Noto Sans face whose
- * glyph forms match its regional standard (SC / TC / HK), regenerated
- * together by `npm run og:fonts` (scripts/build-og-fonts.ts) from the copy in
- * `messages/<locale>/seo.json`. Licenses: THIRD_PARTY_NOTICES.md.
+ * fonts cannot render (tofu for CJK, no guaranteed Cyrillic coverage). Every
+ * subset is cut by `npm run og:fonts` (scripts/build-og-fonts.ts) from the copy
+ * in `messages/<locale>/seo.json`, so a locale's entry here and its source row
+ * there travel together; lib/og/__tests__/og-localization.test.ts fails when a
+ * subset no longer covers its copy. Licenses: THIRD_PARTY_NOTICES.md.
  */
-export const CJK_OG_FONT_NAME = 'Noto Sans SC';
-export const CJK_OG_FONT_FILE = 'assets/fonts/NotoSansSC-700.subset.ttf';
-export const CJK_OG_FONT_LICENSE = 'assets/fonts/OFL-NotoSansCJK.txt';
-
-export const CJK_TC_OG_FONT_NAME = 'Noto Sans TC';
-export const CJK_TC_OG_FONT_FILE = 'assets/fonts/NotoSansTC-700.subset.ttf';
-
-export const CJK_HK_OG_FONT_NAME = 'Noto Sans HK';
-export const CJK_HK_OG_FONT_FILE = 'assets/fonts/NotoSansHK-700.subset.ttf';
-
-export const CYRILLIC_OG_FONT_NAME = 'Onest';
-export const CYRILLIC_OG_FONT_FILE = 'assets/fonts/Onest-700.subset.ttf';
-export const CYRILLIC_OG_FONT_LICENSE = 'assets/fonts/OFL-Onest.txt';
-
-interface OgFontSpec {
+export interface OgFontSpec {
+  /** Family name the card's CSS refers to. */
   readonly name: string;
+  /** Checked-in subset under assets/fonts. */
   readonly file: URL;
+  /** OFL text under assets/fonts. */
+  readonly license: URL;
   readonly weight: 700;
 }
 
@@ -33,31 +24,45 @@ export interface OgTypography {
   /**
    * Extra font loaded into `ImageResponse`. `null` means the locale renders
    * fine with next/og's built-in Latin fonts. Every other script needs an
-   * explicit subset buffer — the built-in fonts render tofu for CJK and are
-   * not guaranteed Cyrillic coverage either.
+   * explicit subset buffer.
    */
   readonly font: OgFontSpec | null;
-  /** Apply CJK layout metrics (line height, spacing) in CosmicOgCard. */
+  /** Apply CJK layout metrics (line height, spacing, no uppercase) in CosmicOgCard. */
   readonly cjk: boolean;
 }
 
-const cjkTypography = (name: string, fileName: string): OgTypography => ({
-  font: { name, file: new URL(`../../assets/fonts/${fileName}`, import.meta.url), weight: 700 },
-  cjk: true,
+const asset = (fileName: string): URL => new URL(`../../assets/fonts/${fileName}`, import.meta.url);
+
+const NOTO_CJK_LICENSE = 'OFL-NotoSansCJK.txt';
+
+const ogFont = (name: string, fileName: string, license: string): OgFontSpec => ({
+  name,
+  file: asset(fileName),
+  license: asset(license),
+  weight: 700,
 });
 
-const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
+/**
+ * One entry per locale: adding a locale to routing.locales fails to compile
+ * here until its OG typography is decided. Each Chinese locale gets the Noto
+ * Sans face whose glyph forms match its regional standard (SC / TC / HK).
+ */
+export const OG_TYPOGRAPHY: LocaleRecord<OgTypography> = {
   en: { font: null, cjk: false },
-  zh: cjkTypography(CJK_OG_FONT_NAME, 'NotoSansSC-700.subset.ttf'),
-  'zh-TW': cjkTypography(CJK_TC_OG_FONT_NAME, 'NotoSansTC-700.subset.ttf'),
-  'zh-HK': cjkTypography(CJK_HK_OG_FONT_NAME, 'NotoSansHK-700.subset.ttf'),
+  zh: { font: ogFont('Noto Sans SC', 'NotoSansSC-700.subset.ttf', NOTO_CJK_LICENSE), cjk: true },
+  'zh-TW': {
+    font: ogFont('Noto Sans TC', 'NotoSansTC-700.subset.ttf', NOTO_CJK_LICENSE),
+    cjk: true,
+  },
+  'zh-HK': {
+    font: ogFont('Noto Sans HK', 'NotoSansHK-700.subset.ttf', NOTO_CJK_LICENSE),
+    cjk: true,
+  },
   uk: {
     // Same face as the on-page Ukrainian display headings (lib/fonts.ts).
-    font: {
-      name: CYRILLIC_OG_FONT_NAME,
-      file: new URL('../../assets/fonts/Onest-700.subset.ttf', import.meta.url),
-      weight: 700,
-    },
+    // Cyrillic is alphabetic, so the Latin layout metrics (uppercase
+    // eyebrows, tracking) apply.
+    font: ogFont('Onest', 'Onest-700.subset.ttf', 'OFL-Onest.txt'),
     cjk: false,
   },
 };
