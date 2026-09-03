@@ -1,94 +1,94 @@
 {
   "hero": {
-    "badge": "Knowledge Base",
-    "titlePrefix": "Cosmic Signature",
-    "titleHighlight": "FAQ",
-    "subtitle": "Everything you need to know about Cosmic Signature — from getting started to advanced game mechanics.",
-    "answerCount": "{count}+ Answers",
-    "answerCountTooltip": "Comprehensive answers covering every aspect of Cosmic Signature.",
-    "categoryCount": "{count} Categories",
-    "alwaysUpdated": "Always Updated"
+    "badge": "Cơ sở kiến thức",
+    "titlePrefix": "Câu hỏi thường gặp về",
+    "titleHighlight": "Cosmic Signature",
+    "subtitle": "Mọi điều bạn cần biết về Cosmic Signature — từ những bước đầu tiên đến các cơ chế nâng cao của giao thức.",
+    "answerCount": "{count}+ câu trả lời",
+    "answerCountTooltip": "Những câu trả lời đầy đủ bao quát mọi khía cạnh của Cosmic Signature.",
+    "categoryCount": "{count} chuyên mục",
+    "alwaysUpdated": "Luôn được cập nhật"
   },
   "search": {
-    "placeholder": "Search questions...",
-    "ariaLabel": "Search frequently asked questions",
-    "clear": "Clear",
-    "clearAria": "Clear search",
-    "noResults": "No questions found. Try a different search term.",
-    "resultCount": "Showing {resultCount} of {totalCount} questions"
+    "placeholder": "Tìm câu hỏi…",
+    "ariaLabel": "Tìm trong câu hỏi thường gặp",
+    "clear": "Xóa",
+    "clearAria": "Xóa tìm kiếm",
+    "noResults": "Không tìm thấy câu hỏi nào. Hãy thử từ khóa khác.",
+    "resultCount": "Đang hiển thị {resultCount} trong {totalCount} câu hỏi"
   },
   "navigation": {
-    "ariaLabel": "FAQ categories",
-    "all": "All"
+    "ariaLabel": "Chuyên mục câu hỏi thường gặp",
+    "all": "Tất cả"
   },
   "category": {
-    "expandAll": "Expand All",
-    "collapseAll": "Collapse All",
-    "expandAllAria": "Expand all questions",
-    "collapseAllAria": "Collapse all questions",
-    "copyLink": "Copy link",
-    "copied": "Copied!",
-    "copyLinkAria": "Copy link to this question"
+    "expandAll": "Mở rộng tất cả",
+    "collapseAll": "Thu gọn tất cả",
+    "expandAllAria": "Mở rộng tất cả câu hỏi",
+    "collapseAllAria": "Thu gọn tất cả câu hỏi",
+    "copyLink": "Sao chép liên kết",
+    "copied": "Đã sao chép!",
+    "copyLinkAria": "Sao chép liên kết đến câu hỏi này"
   },
   "popular": {
-    "heading": "Popular Questions",
-    "tooltip": "These are the most commonly asked questions by new participants."
+    "heading": "Câu hỏi phổ biến",
+    "tooltip": "Đây là những câu hỏi người tham gia mới đặt ra nhiều nhất."
   },
   "empty": {
-    "heading": "No questions found",
-    "descriptionPrefix": "Try a different search term or",
-    "clearAction": "clear the search"
+    "heading": "Không tìm thấy câu hỏi nào",
+    "descriptionPrefix": "Hãy thử từ khóa khác hoặc",
+    "clearAction": "xóa tìm kiếm"
   },
   "contact": {
-    "heading": "Still have a question?",
-    "description": "Can't find what you're looking for? Our community is always happy to help. Reach out on any of these channels and we'll get back to you as soon as possible.",
+    "heading": "Vẫn còn câu hỏi?",
+    "description": "Không tìm thấy điều bạn cần? Cộng đồng luôn sẵn lòng giúp đỡ. Hãy liên hệ qua bất kỳ kênh nào dưới đây và chúng tôi sẽ phản hồi sớm nhất có thể.",
     "x": "Twitter / X",
     "discord": "Discord"
   },
   "tooltips": {
     "enduranceChampion": {
-      "term": "Endurance Champion",
-      "content": "A special title given to the participant who held the most-recent-gesture position for the longest uninterrupted interval within a Performance Cycle."
+      "term": "Quán quân Bền bỉ",
+      "content": "Danh hiệu đặc biệt dành cho người tham gia giữ vị trí nét bút gần nhất trong khoảng thời gian liên tục dài nhất của một chu kỳ trình diễn."
     },
     "chronoWarrior": {
-      "term": "Chrono-Warrior",
-      "content": "An even rarer title — the participant who held the Endurance Champion position for the longest consecutive interval."
+      "term": "Chiến binh Thời gian",
+      "content": "Danh hiệu còn hiếm hơn — người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng thời gian liên tục dài nhất."
     },
     "calibrationWindow": {
-      "term": "Calibration Window",
-      "content": "A price-discovery window where Gesture Cost starts high and descends over time from the Calibration Ceiling toward the Calibration Floor. The longer you wait, the lower the cost."
+      "term": "Cửa sổ hiệu chỉnh",
+      "content": "Một cửa sổ khám phá giá, trong đó chi phí nét bút bắt đầu ở mức cao rồi giảm dần theo thời gian từ trần hiệu chỉnh xuống sàn hiệu chỉnh. Càng chờ lâu, chi phí càng thấp."
     },
     "cosmicCouncil": {
-      "term": "Cosmic Council",
-      "content": "The on-chain coordination body where CST holders submit Coordination Proposals and express Support or Opposition — for example, selecting the Public Goods Beneficiary that receives each cycle's public-goods allocation."
+      "term": "Hội đồng Vũ trụ",
+      "content": "Cơ quan điều phối trên chuỗi, nơi người nắm giữ CST gửi các đề xuất điều phối và bày tỏ tán thành hoặc phản đối — ví dụ như chọn đơn vị thụ hưởng Hàng hóa công sẽ nhận phần phân bổ hàng hóa công của mỗi chu kỳ."
     },
     "cst": {
       "term": "CST",
-      "content": "CST tokens — the ERC-20 tokens imprinted with every gesture. Used on the Cosmic Council and as alternative gesture currency."
+      "content": "Token CST — các token ERC-20 được khắc cùng mỗi nét bút. Dùng trong Hội đồng Vũ trụ và làm phương thức thanh toán thay thế cho nét bút."
     },
     "erc20": {
       "term": "ERC-20",
-      "content": "A widely used Ethereum token standard for fungible (interchangeable) tokens."
+      "content": "Tiêu chuẩn token phổ biến của Ethereum dành cho các token có thể thay thế lẫn nhau."
     },
     "erc721": {
       "term": "ERC-721",
-      "content": "The Ethereum token standard for non-fungible tokens (NFTs) — each token is unique."
+      "content": "Tiêu chuẩn token của Ethereum dành cho token không thể thay thế (NFT) — mỗi token là độc nhất."
     },
     "layer2": {
       "term": "Layer 2",
-      "content": "A secondary protocol built on top of Ethereum that processes transactions faster and cheaper while inheriting Ethereum's security."
+      "content": "Một giao thức thứ cấp xây trên Ethereum, xử lý giao dịch nhanh hơn và rẻ hơn trong khi kế thừa tính bảo mật của Ethereum."
     },
     "rollup": {
       "term": "rollup",
-      "content": "A Layer 2 technique that bundles many transactions into one, dramatically reducing costs while keeping Ethereum-level security."
+      "content": "Một kỹ thuật Layer 2 gom nhiều giao dịch thành một, giảm chi phí đáng kể mà vẫn giữ mức bảo mật của Ethereum."
     },
     "randomWalkNft": {
       "term": "Random Walk NFT",
-      "content": "A sister NFT collection. Attaching one to an ETH gesture grants a one-time 50% ETH Gesture Cost reduction."
+      "content": "Một bộ sưu tập NFT chị em. Đính kèm một NFT này vào nét bút ETH giúp giảm 50% chi phí nét bút ETH một lần."
     },
     "renounceOwnership": {
-      "term": "renouncing ownership",
-      "content": "An irreversible smart-contract action that permanently gives up the team's ability to change protocol parameters."
+      "term": "từ bỏ quyền sở hữu",
+      "content": "Một hành động không thể đảo ngược trên hợp đồng thông minh, vĩnh viễn tước bỏ khả năng của đội ngũ trong việc thay đổi tham số giao thức."
     }
   }
 }

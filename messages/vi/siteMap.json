@@ -1,192 +1,192 @@
 {
   "page": {
-    "title": "Site Map",
-    "subtitle": "Quick links to account pages and public protocol data.",
-    "home": "Home",
-    "jsonLdName": "Cosmic Signature Site Map"
+    "title": "Sơ đồ trang",
+    "subtitle": "Liên kết nhanh đến các trang tài khoản và dữ liệu giao thức công khai.",
+    "home": "Trang chủ",
+    "jsonLdName": "Sơ đồ trang Cosmic Signature"
   },
   "sections": {
     "personal": {
-      "title": "Personal App Tools",
-      "description": "Wallet-specific pages are useful to connected participants but are noindexed and absent from XML sitemaps.",
-      "navLabel": "Personal app tools"
+      "title": "Công cụ ứng dụng cá nhân",
+      "description": "Các trang gắn với ví hữu ích cho người tham gia đã kết nối, nhưng không được lập chỉ mục và không có trong sitemap XML.",
+      "navLabel": "Công cụ ứng dụng cá nhân"
     },
     "system": {
-      "title": "Public Protocol Pages",
-      "description": "Public leaderboards, distributions, stats, contracts, and help.",
-      "navLabel": "System and help pages"
+      "title": "Trang giao thức công khai",
+      "description": "Bảng xếp hạng công khai, phân phối, thống kê, hợp đồng và trợ giúp.",
+      "navLabel": "Trang hệ thống và trợ giúp"
     },
     "data": {
-      "title": "Protocol Data Pages",
-      "description": "Every public data route from the XML sitemap, in one crawlable list.",
-      "navLabel": "Protocol data pages"
+      "title": "Trang dữ liệu giao thức",
+      "description": "Mọi đường dẫn dữ liệu công khai trong sitemap XML, gom trong một danh sách có thể thu thập.",
+      "navLabel": "Trang dữ liệu giao thức"
     },
     "ecosystem": {
-      "title": "Ecosystem",
-      "description": "External product surfaces: the Axiom Zero NFT marketplace, the Chaos Zero prediction market, and Uniswap CST trading.",
-      "navLabel": "Ecosystem destinations"
+      "title": "Hệ sinh thái",
+      "description": "Các sản phẩm bên ngoài: sàn NFT Axiom Zero, thị trường dự đoán Chaos Zero và giao dịch CST trên Uniswap.",
+      "navLabel": "Điểm đến trong hệ sinh thái"
     }
   },
   "links": {
     "myNfts": {
-      "label": "My NFTs",
-      "description": "Wallet-specific NFT view; noindexed."
+      "label": "NFT của tôi",
+      "description": "Trang NFT gắn với ví; không lập chỉ mục."
     },
     "myAllocations": {
-      "label": "My Unretrieved Allocations",
-      "description": "Wallet-specific allocation retrieval view; noindexed."
+      "label": "Phân bổ chưa nhận về của tôi",
+      "description": "Trang nhận về phân bổ gắn với ví; không lập chỉ mục."
     },
     "myAnchors": {
-      "label": "My Anchors",
-      "description": "Wallet-specific anchoring view; noindexed."
+      "label": "Neo giữ của tôi",
+      "description": "Trang neo giữ gắn với ví; không lập chỉ mục."
     },
     "about": {
-      "label": "About Cosmic Signature",
-      "description": "Entity home and brand disambiguation."
+      "label": "Về Cosmic Signature",
+      "description": "Trang chủ của thực thể và phân biệt thương hiệu."
     },
     "learn": {
-      "label": "Cosmic Signature Learn Hub",
-      "description": "Crawlable explainers for AI and search systems."
+      "label": "Trung tâm học tập Cosmic Signature",
+      "description": "Bài giải thích có thể thu thập dành cho hệ thống AI và tìm kiếm."
     },
     "whatIsCosmicSignature": {
-      "label": "What Is Cosmic Signature?",
-      "description": "Plain-English definition of the protocol."
+      "label": "Cosmic Signature là gì?",
+      "description": "Định nghĩa giao thức bằng ngôn ngữ giản dị."
     },
     "threeBodyArt": {
-      "label": "Three-Body NFT Art Guide",
-      "description": "How deterministic physics generates Signature NFTs."
+      "label": "Hướng dẫn nghệ thuật NFT ba vật thể",
+      "description": "Cách vật lý tất định tạo ra các Signature NFT."
     },
     "gallery": {
-      "label": "Cosmic Signature Gallery",
-      "description": "Deterministic NFT artwork archive."
+      "label": "Phòng trưng bày Cosmic Signature",
+      "description": "Kho lưu trữ tác phẩm NFT tất định."
     },
     "currentCycle": {
-      "label": "Current Performance Cycle",
-      "description": "Live cycle state and gesture context."
+      "label": "Chu kỳ trình diễn hiện tại",
+      "description": "Trạng thái chu kỳ trực tiếp và bối cảnh nét bút."
     },
     "howItWorks": {
-      "label": "How It Works",
-      "description": "The cycle mechanics, step by step."
+      "label": "Cách hoạt động",
+      "description": "Cơ chế chu kỳ, từng bước một."
     },
     "statistics": {
-      "label": "Protocol Statistics",
-      "description": "Public protocol metrics and data sources."
+      "label": "Thống kê giao thức",
+      "description": "Số liệu giao thức công khai và nguồn dữ liệu."
     },
     "contracts": {
-      "label": "Cosmic Signature Contracts",
-      "description": "Verified Arbitrum contract addresses."
+      "label": "Hợp đồng Cosmic Signature",
+      "description": "Địa chỉ hợp đồng Arbitrum đã xác minh."
     },
     "sourceCode": {
-      "label": "Source Code",
-      "description": "Rendering pipeline and source-code resources."
+      "label": "Mã nguồn",
+      "description": "Quy trình kết xuất và tài nguyên mã nguồn."
     },
     "security": {
-      "label": "Security",
-      "description": "Security model and verification resources."
+      "label": "Bảo mật",
+      "description": "Mô hình bảo mật và tài nguyên xác minh."
     },
     "audits": {
-      "label": "Audits",
-      "description": "Audit and formal verification status."
+      "label": "Kiểm toán",
+      "description": "Tình trạng kiểm toán và kiểm chứng hình thức."
     },
     "riskDisclosures": {
-      "label": "Risk Disclosures",
-      "description": "Blockchain risk and participant-clarity disclosures."
+      "label": "Công bố rủi ro",
+      "description": "Công bố về rủi ro blockchain và sự minh bạch với người tham gia."
     },
     "faq": {
-      "label": "Cosmic Signature FAQ",
-      "description": "Questions and answers about protocol mechanics."
+      "label": "Câu hỏi thường gặp về Cosmic Signature",
+      "description": "Câu hỏi và trả lời về cơ chế giao thức."
     },
     "terms": {
-      "label": "Terms of Service",
-      "description": "Legal terms for app use and participation."
+      "label": "Điều khoản dịch vụ",
+      "description": "Điều khoản pháp lý cho việc sử dụng ứng dụng và tham gia."
     },
     "privacy": {
-      "label": "Privacy Policy",
-      "description": "Wallet data, analytics, and blockchain transparency."
+      "label": "Chính sách quyền riêng tư",
+      "description": "Dữ liệu ví, phân tích và tính minh bạch của blockchain."
     },
     "allocationRecipients": {
-      "label": "Allocation Recipients",
-      "description": "Where each cycle’s reserves went."
+      "label": "Người nhận phân bổ",
+      "description": "Dự trữ của từng chu kỳ đã đi về đâu."
     },
     "anchorDistributions": {
-      "label": "Anchor Distributions",
-      "description": "Anchored NFTs and their distributions."
+      "label": "Phân phối neo giữ",
+      "description": "Các NFT đang neo giữ và phần phân phối của chúng."
     },
     "outreachReserve": {
-      "label": "Outreach Reserve",
-      "description": "Community outreach CST activity."
+      "label": "Dự trữ truyền thông",
+      "description": "Hoạt động CST truyền thông cộng đồng."
     },
     "imprint": {
-      "label": "Imprint",
-      "description": "Imprint interface for new tokens."
+      "label": "Khắc",
+      "description": "Giao diện khắc token mới."
     },
     "ethContributions": {
-      "label": "ETH Contributions",
-      "description": "History of ETH contributions."
+      "label": "Đóng góp ETH",
+      "description": "Lịch sử đóng góp ETH."
     },
     "attachedNfts": {
-      "label": "Attached NFTs",
-      "description": "NFTs attached to gestures across cycles."
+      "label": "NFT đính kèm",
+      "description": "Các NFT đính kèm vào nét bút qua các chu kỳ."
     },
     "finalizedAllocations": {
-      "label": "Finalized Allocations",
-      "description": "Record of finalized cycle allocations."
+      "label": "Phân bổ đã hoàn tất",
+      "description": "Bản ghi phân bổ của các chu kỳ đã hoàn tất."
     },
     "namedNfts": {
-      "label": "Named NFTs",
-      "description": "NFTs given custom names."
+      "label": "NFT đã đặt tên",
+      "description": "Các NFT được đặt tên tùy chỉnh."
     },
     "usedRwlkNfts": {
-      "label": "Used RandomWalk NFTs",
-      "description": "RandomWalk NFTs already used for gesture discounts."
+      "label": "RandomWalk NFT đã sử dụng",
+      "description": "Các RandomWalk NFT đã dùng để giảm chi phí nét bút."
     },
     "coordinationChanges": {
-      "label": "Coordination Changes",
-      "description": "History of protocol parameter changes."
+      "label": "Thay đổi điều phối",
+      "description": "Lịch sử thay đổi tham số giao thức."
     },
     "publicGoodsContributions": {
-      "label": "Public Goods Contributions",
-      "description": "Per-cycle Public Goods Allocation records."
+      "label": "Đóng góp Hàng hóa công",
+      "description": "Bản ghi phân bổ Hàng hóa công theo từng chu kỳ."
     },
     "voluntaryPublicGoods": {
-      "label": "Voluntary Public Goods Contributions",
-      "description": "Direct voluntary contributions to the vault."
+      "label": "Đóng góp Hàng hóa công tự nguyện",
+      "description": "Các khoản đóng góp tự nguyện trực tiếp vào kho."
     },
     "publicGoodsRetrievals": {
-      "label": "Public Goods Retrievals",
-      "description": "Funds forwarded from the Public Goods Vault."
+      "label": "Nhận về Hàng hóa công",
+      "description": "Các khoản chuyển từ Kho Hàng hóa công."
     },
     "participationStats": {
-      "label": "Statistics: Participation",
-      "description": "Participant and gesture analytics."
+      "label": "Thống kê: Tham gia",
+      "description": "Phân tích về người tham gia và nét bút."
     },
     "tokenStats": {
-      "label": "Statistics: Tokens",
-      "description": "CST and NFT supply analytics."
+      "label": "Thống kê: Token",
+      "description": "Phân tích nguồn cung CST và NFT."
     },
     "anchoringStats": {
-      "label": "Statistics: Anchoring",
-      "description": "Anchoring totals and history."
+      "label": "Thống kê: Neo giữ",
+      "description": "Tổng số và lịch sử neo giữ."
     },
     "activityStats": {
-      "label": "Statistics: Activity",
-      "description": "Cycle activity and timing analytics."
+      "label": "Thống kê: Hoạt động",
+      "description": "Phân tích hoạt động và thời gian của chu kỳ."
     },
     "performanceStats": {
-      "label": "Statistics: Performance",
-      "description": "Cycle records and performance analytics."
+      "label": "Thống kê: Thành tích",
+      "description": "Kỷ lục chu kỳ và phân tích thành tích."
     },
     "axiomZero": {
-      "label": "Axiom Zero Marketplace",
-      "description": "Zero-fee NFT marketplace for Cosmic Signature and Random Walk."
+      "label": "Sàn Axiom Zero",
+      "description": "Sàn NFT không thu phí dành cho Cosmic Signature và Random Walk."
     },
     "chaosZero": {
-      "label": "Chaos Zero Predictions",
-      "description": "Prediction market on each Performance Cycle."
+      "label": "Dự đoán Chaos Zero",
+      "description": "Thị trường dự đoán về từng chu kỳ trình diễn."
     },
     "uniswap": {
-      "label": "Trade CST on Uniswap",
-      "description": "Swap ETH for CST on Arbitrum."
+      "label": "Giao dịch CST trên Uniswap",
+      "description": "Hoán đổi ETH sang CST trên Arbitrum."
     }
   }
 }

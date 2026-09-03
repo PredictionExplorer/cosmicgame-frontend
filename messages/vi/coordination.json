@@ -1,12 +1,12 @@
 {
   "page": {
-    "title": "Coordination Changes",
-    "subtitle": "History of protocol parameter changes and admin events",
-    "description": "The Cosmic Signature protocol parameters can be adjusted by the contract owner during cycle activation windows. This log provides full transparency into every change, including Gesture Cost step-ups, time additions, and Anchor Distribution settings. Once ownership is renounced, all parameters become permanently immutable.",
-    "loading": "Loading..."
+    "title": "Thay đổi điều phối",
+    "subtitle": "Lịch sử thay đổi tham số giao thức và các sự kiện quản trị",
+    "description": "Chủ sở hữu hợp đồng có thể điều chỉnh các tham số của giao thức Cosmic Signature trong những cửa sổ kích hoạt chu kỳ. Nhật ký này minh bạch hóa hoàn toàn mọi thay đổi, bao gồm các bước tăng chi phí nét bút, mức cộng thêm thời gian và thiết lập phân phối neo giữ. Sau khi quyền sở hữu được từ bỏ, mọi tham số trở thành bất biến vĩnh viễn.",
+    "loading": "Đang tải…"
   },
   "events": {
-    "undefined": "Undefined",
+    "undefined": "Không xác định",
     "publicGoodsPercentage": "CharityPercentageChanged",
     "signatureAllocationPercentage": "PrizePercentageChanged",
     "stellarSelectionPercentage": "RafflePercentageChanged",
@@ -39,7 +39,7 @@
     "maxMessageLength": "MaxMessageLengthChanged",
     "tokenScriptUrl": "TokenGenerationScriptURLEvent",
     "nftBaseUri": "BaseURI (CosmicSignature)",
-    "contractInitialized": "Initialized (Initialized event, openzeppelin)",
+    "contractInitialized": "Initialized (sự kiện Initialized, openzeppelin)",
     "ownershipTransferred": "OwnershipTransferred",
     "allocationRetrievalTimeout": "TimeoutDurationToWithdrawPrizesChanged",
     "ethCalibrationDurationDivisor": "EthDutchAuctionDurationDivisorChanged",

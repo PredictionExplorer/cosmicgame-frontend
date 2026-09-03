@@ -1,9 +1,9 @@
 {
   "gallery": {
-    "placeholder": "Search by token ID or name...",
-    "ariaLabel": "Search NFTs",
-    "clear": "Clear search",
-    "submit": "Search",
-    "results": "{count, plural, one {# result} other {# results}}"
+    "placeholder": "Tìm theo mã token hoặc tên…",
+    "ariaLabel": "Tìm NFT",
+    "clear": "Xóa tìm kiếm",
+    "submit": "Tìm",
+    "results": "{count, plural, other {# kết quả}}"
   }
 }

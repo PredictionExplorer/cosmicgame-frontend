@@ -1,187 +1,187 @@
 {
   "breadcrumbs": {
-    "home": "Home",
-    "contracts": "Contracts"
+    "home": "Trang chủ",
+    "contracts": "Hợp đồng"
   },
   "page": {
-    "eyebrow": "Verified Contracts · Arbitrum",
-    "title": "Contract Addresses",
-    "subtitle": "On-chain addresses, configuration, source links, and verification context for the Cosmic Signature protocol.",
-    "allocationAria": "Allocation Tracks",
-    "configurationAria": "Protocol Configuration",
-    "addressesAria": "Contract Addresses",
-    "addressesTitle": "Contract Addresses",
-    "parametersAria": "Calibration Window and Stellar Selection Parameters"
+    "eyebrow": "Hợp đồng đã xác minh · Arbitrum",
+    "title": "Địa chỉ hợp đồng",
+    "subtitle": "Địa chỉ trên chuỗi, cấu hình, liên kết mã nguồn và bối cảnh xác minh của giao thức Cosmic Signature.",
+    "allocationAria": "Các luồng phân bổ",
+    "configurationAria": "Cấu hình giao thức",
+    "addressesAria": "Địa chỉ hợp đồng",
+    "addressesTitle": "Địa chỉ hợp đồng",
+    "parametersAria": "Tham số cửa sổ hiệu chỉnh và Tinh tuyển"
   },
   "network": {
-    "chain": "Chain {chainId}"
+    "chain": "Chuỗi {chainId}"
   },
   "entries": {
     "protocol": {
-      "name": "Cosmic Signature Protocol",
-      "description": "The main protocol proxy contract that manages cycles, gestures, and allocation distribution"
+      "name": "Giao thức Cosmic Signature",
+      "description": "Hợp đồng proxy chính của giao thức, quản lý chu kỳ, nét bút và việc phân phối phân bổ"
     },
     "implementation": {
-      "name": "Implementation Contract",
-      "description": "The current implementation behind the Cosmic Signature Protocol proxy contract"
+      "name": "Hợp đồng triển khai",
+      "description": "Bản triển khai hiện tại phía sau hợp đồng proxy của giao thức Cosmic Signature"
     },
     "cst": {
-      "name": "Cosmic Signature CST Token",
-      "description": "ERC-20 token (CST) imprinted with every gesture and used to express Coordination Weight on the Cosmic Council"
+      "name": "Token CST của Cosmic Signature",
+      "description": "Token ERC-20 (CST) được khắc cùng mỗi nét bút và dùng để thể hiện trọng số điều phối trong Hội đồng Vũ trụ"
     },
     "nft": {
       "name": "Cosmic Signature NFT",
-      "description": "ERC-721 NFT collection imprinted as allocations to cycle recipients"
+      "description": "Bộ sưu tập NFT ERC-721 được khắc làm phân bổ cho người nhận của mỗi chu kỳ"
     },
     "randomWalk": {
       "name": "RandomWalk",
-      "description": "RandomWalk NFT collection that can be attached to ETH gestures for a one-time discount or anchored for Anchored-NFT Stellar Selection eligibility"
+      "description": "Bộ sưu tập RandomWalk NFT có thể đính kèm vào nét bút ETH để được giảm giá một lần, hoặc neo giữ để thuộc diện Tinh tuyển NFT neo giữ"
     },
     "council": {
-      "name": "Cosmic Council",
-      "description": "On-chain Protocol Coordination contract for Coordination Proposals"
+      "name": "Hội đồng Vũ trụ",
+      "description": "Hợp đồng điều phối giao thức trên chuỗi dành cho các đề xuất điều phối"
     },
     "publicGoods": {
-      "name": "Public Goods Vault",
-      "description": "Receives the Public Goods Allocation from each cycle's Cycle Reserve"
+      "name": "Kho Hàng hóa công",
+      "description": "Nhận phần phân bổ Hàng hóa công từ Dự trữ chu kỳ của mỗi chu kỳ"
     },
     "outreach": {
-      "name": "Outreach Reserve",
-      "description": "Funds allocated for outreach distributions and ecosystem contributors"
+      "name": "Dự trữ truyền thông",
+      "description": "Khoản được phân bổ cho các đợt phân phối truyền thông và những người đóng góp cho hệ sinh thái"
     },
     "allocations": {
-      "name": "Allocations Wallet",
-      "description": "Escrow contract holding allocations awaiting retrieval"
+      "name": "Ví phân bổ",
+      "description": "Hợp đồng ký quỹ giữ các phân bổ đang chờ được nhận về"
     },
     "cosmicAnchor": {
-      "name": "Cosmic Signature NFT Anchoring Wallet",
-      "description": "Anchoring contract for Cosmic Signature NFTs"
+      "name": "Ví neo giữ Cosmic Signature NFT",
+      "description": "Hợp đồng neo giữ dành cho Cosmic Signature NFT"
     },
     "rwalkAnchor": {
-      "name": "RWLK Anchoring Wallet",
-      "description": "Anchoring contract for RandomWalk NFTs"
+      "name": "Ví neo giữ RWLK",
+      "description": "Hợp đồng neo giữ dành cho RandomWalk NFT"
     }
   },
   "categories": {
-    "core": "Core Contracts",
-    "wallet": "Wallet Contracts",
-    "anchoring": "Anchoring Contracts"
+    "core": "Hợp đồng cốt lõi",
+    "wallet": "Hợp đồng ví",
+    "anchoring": "Hợp đồng neo giữ"
   },
   "search": {
-    "placeholder": "Search contracts by name or address...",
-    "ariaLabel": "Search contracts",
-    "clearAria": "Clear search",
-    "empty": "No contracts match “{searchTerm}”"
+    "placeholder": "Tìm hợp đồng theo tên hoặc địa chỉ…",
+    "ariaLabel": "Tìm hợp đồng",
+    "clearAria": "Xóa tìm kiếm",
+    "empty": "Không có hợp đồng nào khớp với “{searchTerm}”"
   },
   "addressCard": {
-    "copyAria": "Copy {name} address",
-    "explorerAria": "View {name} on block explorer"
+    "copyAria": "Sao chép địa chỉ {name}",
+    "explorerAria": "Xem {name} trên trình khám phá khối"
   },
   "funds": {
-    "title": "Allocation Tracks",
-    "description": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve.",
-    "chartAria": "Allocation tracks bar chart",
+    "title": "Các luồng phân bổ",
+    "description": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, Hàng hóa công, phân phối neo giữ và Dự trữ tích lũy.",
+    "chartAria": "Biểu đồ cột các luồng phân bổ",
     "segments": {
       "signature": {
-        "label": "Signature Allocation",
-        "tooltip": "ETH percentage retrieved by the participant who made the Final Gesture; they also receive 1,000 CST and a Cosmic Signature NFT"
+        "label": "Phân bổ Signature",
+        "tooltip": "Tỷ lệ ETH được nhận về bởi người tham gia đặt nét bút cuối cùng; người này cũng nhận 1.000 CST và một Cosmic Signature NFT"
       },
       "chrono": {
-        "label": "Chrono-Warrior",
-        "tooltip": "ETH allocation to the Chrono-Warrior, who also receives 1,000 CST and a Cosmic Signature NFT"
+        "label": "Chiến binh Thời gian",
+        "tooltip": "Phân bổ ETH cho Chiến binh Thời gian, người cũng nhận 1.000 CST và một Cosmic Signature NFT"
       },
       "stellar": {
-        "label": "Stellar Selection",
-        "tooltip": "Portion distributed to randomly selected participants when the cycle finalizes"
+        "label": "Tinh tuyển",
+        "tooltip": "Phần được phân phối cho những người tham gia được chọn ngẫu nhiên khi chu kỳ hoàn tất"
       },
       "anchor": {
-        "label": "Anchor Distribution",
-        "tooltip": "ETH Anchor Distributions to Cosmic Signature NFT anchor-holders, proportional to anchored NFT count"
+        "label": "Phân phối neo giữ",
+        "tooltip": "Phân phối neo giữ bằng ETH cho những người neo giữ Cosmic Signature NFT, tỷ lệ theo số NFT đang neo giữ"
       },
       "publicGoods": {
-        "label": "Public Goods",
-        "tooltip": "Forwarded to the Public Goods Beneficiary (Protocol Guild) each cycle"
+        "label": "Hàng hóa công",
+        "tooltip": "Được chuyển đến đơn vị thụ hưởng Hàng hóa công (Protocol Guild) mỗi chu kỳ"
       },
       "next": {
-        "label": "Next cycle",
-        "tooltip": "Remaining funds that roll forward into the next cycle as the Compounding Cycle Reserve."
+        "label": "Chu kỳ tiếp theo",
+        "tooltip": "Phần còn lại được chuyển sang chu kỳ tiếp theo dưới dạng Dự trữ tích lũy."
       }
     }
   },
   "configuration": {
-    "title": "Protocol Configuration",
+    "title": "Cấu hình giao thức",
     "cards": {
       "ethStep": {
-        "label": "ETH Gesture-Cost Step-Up",
-        "tooltip": "ETH gesture cost uses this step-up parameter. CST gesture cost follows the live CST Calibration Window."
+        "label": "Bước tăng chi phí nét bút ETH",
+        "tooltip": "Chi phí nét bút ETH dùng tham số bước tăng này. Chi phí nét bút CST đi theo cửa sổ hiệu chỉnh CST trực tiếp."
       },
       "timeIncrement": {
-        "label": "Time Increment",
-        "tooltip": "Each gesture adds this much time to the Cycle Finalization Time. The increment grows by {percent}% with each cycle."
+        "label": "Mức tăng thời gian",
+        "tooltip": "Mỗi nét bút cộng thêm khoảng thời gian này vào thời điểm hoàn tất chu kỳ. Mức tăng lớn thêm {percent}% sau mỗi chu kỳ."
       },
       "cstPreview": {
-        "label": "Current Participation CST Preview",
-        "tooltip": "Estimated Participation CST if a gesture lands now. The amount is dynamic and uses {formula}."
+        "label": "Xem trước CST tham gia hiện tại",
+        "tooltip": "CST tham gia ước tính nếu một nét bút được đặt ngay lúc này. Con số này thay đổi liên tục và dùng {formula}."
       },
       "finalization": {
-        "label": "Finalization Timeout",
-        "tooltip": "Time the Final Gesture participant has to finalize the cycle before the Open-Finalization Window opens to anyone"
+        "label": "Thời hạn hoàn tất",
+        "tooltip": "Khoảng thời gian người đặt nét bút cuối cùng có để hoàn tất chu kỳ trước khi cửa sổ hoàn tất mở ra cho bất kỳ ai"
       },
       "initial": {
-        "label": "Initial Time Increment",
-        "tooltip": "The initial Cycle Finalization Time added when the first gesture is made"
+        "label": "Mức tăng thời gian ban đầu",
+        "tooltip": "Thời điểm hoàn tất chu kỳ ban đầu được cộng thêm khi nét bút đầu tiên được đặt"
       },
       "message": {
-        "label": "Max Message Length",
-        "tooltip": "Maximum character length allowed in gesture messages"
+        "label": "Độ dài lời nhắn tối đa",
+        "tooltip": "Số ký tự tối đa được phép trong lời nhắn của nét bút"
       }
     }
   },
   "parameters": {
-    "title": "Calibration Window & Stellar Selection Parameters",
-    "cstTitle": "CST Calibration Window",
-    "ethTitle": "ETH Calibration Window",
-    "duration": "Duration",
-    "elapsed": "Elapsed Duration",
-    "ceiling": "Calibration Ceiling",
-    "cstDurationTooltip": "Live stored duration of the CST Calibration Window. CST gestures lengthen it by about {increase}%; ETH gestures shorten it by about {decrease}%.",
-    "cstElapsedTooltip": "Time already elapsed in the current CST Calibration Window",
-    "cstCeilingTooltip": "Starting Gesture Cost of the CST Calibration Window currently displayed. The cost descends linearly across the live stored duration.",
-    "ethDurationTooltip": "Total duration of the ETH Calibration Window where Gesture Cost descends over time",
-    "ethElapsedTooltip": "Time already elapsed in the current ETH Calibration Window",
-    "publicGoodsAddress": "Public Goods Address",
-    "publicGoodsAddressTooltip": "The on-chain address currently receiving the Public Goods Allocation from the Public Goods Vault contract",
-    "copyPublicGoodsAria": "Copy Public Goods address",
-    "viewPublicGoodsAria": "View Public Goods address on block explorer",
+    "title": "Tham số cửa sổ hiệu chỉnh và Tinh tuyển",
+    "cstTitle": "Cửa sổ hiệu chỉnh CST",
+    "ethTitle": "Cửa sổ hiệu chỉnh ETH",
+    "duration": "Thời lượng",
+    "elapsed": "Thời gian đã trôi qua",
+    "ceiling": "Trần hiệu chỉnh",
+    "cstDurationTooltip": "Thời lượng đang được lưu của cửa sổ hiệu chỉnh CST. Nét bút CST kéo dài nó khoảng {increase}%; nét bút ETH rút ngắn nó khoảng {decrease}%.",
+    "cstElapsedTooltip": "Thời gian đã trôi qua trong cửa sổ hiệu chỉnh CST hiện tại",
+    "cstCeilingTooltip": "Chi phí nét bút khởi điểm của cửa sổ hiệu chỉnh CST đang hiển thị. Chi phí giảm tuyến tính trong suốt thời lượng đang được lưu.",
+    "ethDurationTooltip": "Tổng thời lượng của cửa sổ hiệu chỉnh ETH, trong đó chi phí nét bút giảm dần theo thời gian",
+    "ethElapsedTooltip": "Thời gian đã trôi qua trong cửa sổ hiệu chỉnh ETH hiện tại",
+    "publicGoodsAddress": "Địa chỉ Hàng hóa công",
+    "publicGoodsAddressTooltip": "Địa chỉ trên chuỗi hiện đang nhận phần phân bổ Hàng hóa công từ hợp đồng Kho Hàng hóa công",
+    "copyPublicGoodsAria": "Sao chép địa chỉ Hàng hóa công",
+    "viewPublicGoodsAria": "Xem địa chỉ Hàng hóa công trên trình khám phá khối",
     "selection": {
-      "ethLabel": "ETH Stellar Selection Recipients",
-      "ethTooltip": "Number of participants randomly selected to receive ETH allocations each cycle",
-      "nftLabel": "NFT Stellar Selection (Participants)",
-      "nftTooltip": "Number of participants randomly selected to receive Cosmic Signature NFTs each cycle",
-      "anchorLabel": "NFT Stellar Selection (Anchored RWLK)",
-      "anchorTooltip": "Number of RandomWalk NFT anchor-holders randomly selected to receive Cosmic Signature NFTs each cycle"
+      "ethLabel": "Người nhận ETH Tinh tuyển",
+      "ethTooltip": "Số người tham gia được chọn ngẫu nhiên để nhận phân bổ ETH mỗi chu kỳ",
+      "nftLabel": "NFT Tinh tuyển (người tham gia)",
+      "nftTooltip": "Số người tham gia được chọn ngẫu nhiên để nhận Cosmic Signature NFT mỗi chu kỳ",
+      "anchorLabel": "NFT Tinh tuyển (RWLK neo giữ)",
+      "anchorTooltip": "Số người neo giữ RandomWalk NFT được chọn ngẫu nhiên để nhận Cosmic Signature NFT mỗi chu kỳ"
     }
   },
   "vault": {
-    "title": "Public Goods Vault Action",
-    "tooltip": "Calls the Public Goods Vault send() function to forward the vault's ETH balance to the configured Protocol Guild beneficiary.",
-    "balance": "In vault now",
-    "description": "Forward available public-goods funds from the vault to Protocol Guild.",
-    "descriptionWithBeneficiary": "Forward available public-goods funds from the vault to Protocol Guild ({address}).",
-    "aria": "Forward Public Goods Vault balance to Protocol Guild"
+    "title": "Thao tác Kho Hàng hóa công",
+    "tooltip": "Gọi hàm send() của Kho Hàng hóa công để chuyển số dư ETH của kho đến đơn vị thụ hưởng Protocol Guild đã cấu hình.",
+    "balance": "Hiện có trong kho",
+    "description": "Chuyển khoản hàng hóa công khả dụng từ kho đến Protocol Guild.",
+    "descriptionWithBeneficiary": "Chuyển khoản hàng hóa công khả dụng từ kho đến Protocol Guild ({address}).",
+    "aria": "Chuyển số dư Kho Hàng hóa công đến Protocol Guild"
   },
   "seo": {
-    "eyebrow": "Verified contracts · Arbitrum",
-    "heading": "Cosmic Signature Contracts",
-    "description": "Cosmic Signature publishes its public Arbitrum contract addresses so participants, researchers, search engines, and AI systems can connect the app experience to verifiable on-chain protocol records.",
-    "partialFallback": "Live contract address data is temporarily unavailable in this server snapshot. The verified protocol proxy and implementation addresses below are the static fallback from the frontend protocol facts.",
-    "empty": "Live contract addresses are temporarily unavailable in the server snapshot. The interactive contract table below will hydrate from the public Cosmic Signature API when available.",
-    "relatedAria": "Contract trust resources",
+    "eyebrow": "Hợp đồng đã xác minh · Arbitrum",
+    "heading": "Hợp đồng Cosmic Signature",
+    "description": "Cosmic Signature công khai các địa chỉ hợp đồng Arbitrum của mình để người tham gia, nhà nghiên cứu, công cụ tìm kiếm và hệ thống AI có thể kết nối trải nghiệm ứng dụng với các bản ghi giao thức có thể xác minh trên chuỗi.",
+    "partialFallback": "Dữ liệu địa chỉ hợp đồng trực tiếp tạm thời không khả dụng trong bản chụp phía máy chủ này. Địa chỉ proxy và hợp đồng triển khai đã xác minh bên dưới là dữ liệu dự phòng tĩnh từ các thông số giao thức của giao diện.",
+    "empty": "Địa chỉ hợp đồng trực tiếp tạm thời không khả dụng trong bản chụp phía máy chủ. Bảng hợp đồng tương tác bên dưới sẽ nạp dữ liệu từ API công khai của Cosmic Signature khi có.",
+    "relatedAria": "Tài nguyên tin cậy về hợp đồng",
     "links": {
-      "code": "Review Cosmic Signature source code",
-      "security": "Read the security overview",
-      "audits": "Review audits and verification",
-      "risk": "Read risk disclosures"
+      "code": "Xem mã nguồn Cosmic Signature",
+      "security": "Đọc tổng quan bảo mật",
+      "audits": "Xem kiểm toán và xác minh",
+      "risk": "Đọc công bố rủi ro"
     }
   }
 }

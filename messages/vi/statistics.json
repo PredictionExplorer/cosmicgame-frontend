@@ -1,796 +1,796 @@
 {
   "navigation": {
-    "ariaLabel": "Statistics sections",
+    "ariaLabel": "Các mục thống kê",
     "overview": {
-      "label": "Overview",
-      "title": "Cosmic Signature Protocol Statistics",
-      "description": "Historical data and overall metrics for the Cosmic Signature protocol on Arbitrum, with detailed sections for participation, tokens, anchoring, activity, and performance."
+      "label": "Tổng quan",
+      "title": "Thống kê giao thức Cosmic Signature",
+      "description": "Dữ liệu lịch sử và số liệu tổng thể của giao thức Cosmic Signature trên Arbitrum, với các mục chi tiết về tham gia, token, neo giữ, hoạt động và thành tích."
     },
     "participation": {
-      "label": "Participation",
-      "title": "Participation Statistics",
-      "description": "Unique participants, allocation recipients, and ETH contributors indexed across all Cosmic Signature Performance Cycles."
+      "label": "Tham gia",
+      "title": "Thống kê tham gia",
+      "description": "Người tham gia riêng biệt, người nhận phân bổ và người đóng góp ETH được lập chỉ mục qua mọi chu kỳ trình diễn của Cosmic Signature."
     },
     "tokens": {
-      "label": "Tokens",
-      "title": "Token Distribution Statistics",
-      "description": "Cosmic Signature NFT ownership, CST (ERC-20) balance distribution, total supply history, and assets attached to gestures."
+      "label": "Token",
+      "title": "Thống kê phân bố token",
+      "description": "Quyền sở hữu Cosmic Signature NFT, phân bố số dư CST (ERC-20), lịch sử tổng cung và các tài sản đính kèm vào nét bút."
     },
     "anchoring": {
-      "label": "Anchoring",
-      "title": "Anchoring Statistics",
-      "description": "Anchor and release actions, currently anchored tokens, and unique anchor-holders for Cosmic Signature and RandomWalk NFTs."
+      "label": "Neo giữ",
+      "title": "Thống kê neo giữ",
+      "description": "Thao tác neo giữ và gỡ neo, token đang neo giữ và người neo giữ riêng biệt của Cosmic Signature và RandomWalk NFT."
     },
     "activity": {
-      "label": "Activity",
-      "title": "Gesture Activity Statistics",
-      "description": "Gesture frequency over time, activity spikes, participant active periods, gesture-type mix, cycle timelines, and cycle activations."
+      "label": "Hoạt động",
+      "title": "Thống kê hoạt động nét bút",
+      "description": "Tần suất nét bút theo thời gian, các đợt tăng vọt hoạt động, khoảng hoạt động của người tham gia, tỷ lệ loại nét bút, dòng thời gian chu kỳ và các lần kích hoạt chu kỳ."
     },
     "performance": {
-      "label": "Performance",
-      "title": "Participant Performance Statistics",
-      "description": "Participant performance leaderboard and claimable allocation outcomes for every Cosmic Signature Performance Cycle."
+      "label": "Thành tích",
+      "title": "Thống kê thành tích người tham gia",
+      "description": "Bảng xếp hạng thành tích người tham gia và kết quả phân bổ có thể nhận về của mọi chu kỳ trình diễn Cosmic Signature."
     }
   },
   "intro": {
-    "eyebrow": "Protocol Statistics · Arbitrum"
+    "eyebrow": "Thống kê giao thức · Arbitrum"
   },
   "breadcrumbs": {
-    "statistics": "Statistics"
+    "statistics": "Thống kê"
   },
   "shared": {
-    "noDataTitle": "No data yet",
-    "sectionLoadErrorTitle": "Failed to load {title}",
-    "serviceError": "The statistics service did not respond. Try again in a moment."
+    "noDataTitle": "Chưa có dữ liệu",
+    "sectionLoadErrorTitle": "Không tải được {title}",
+    "serviceError": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút."
   },
   "hub": {
-    "loadErrorTitle": "Failed to load statistics",
-    "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
-    "exploreTitle": "Explore Statistics",
-    "exploreAria": "Statistics section pages",
-    "currentCycleTitle": "Looking for current cycle data?",
-    "currentCycleSubtitle": "View gesture history, leaderboards, and live cycle details",
-    "protocolEconomyTitle": "Protocol Economy",
-    "anchoringGlanceTitle": "Anchoring at a Glance",
-    "anchoringGlanceDescription": "{cosmicCount} Cosmic Signature NFTs and {randomWalkCount} RandomWalk NFTs are currently anchored. See anchor actions, anchored tokens, and unique anchor-holders on the anchoring statistics page.",
-    "anchoringGlanceLink": "Anchoring statistics",
+    "loadErrorTitle": "Không tải được thống kê",
+    "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+    "exploreTitle": "Khám phá thống kê",
+    "exploreAria": "Các trang mục thống kê",
+    "currentCycleTitle": "Tìm dữ liệu chu kỳ hiện tại?",
+    "currentCycleSubtitle": "Xem lịch sử nét bút, bảng xếp hạng và chi tiết chu kỳ trực tiếp",
+    "protocolEconomyTitle": "Dòng chảy của giao thức",
+    "anchoringGlanceTitle": "Neo giữ trong nháy mắt",
+    "anchoringGlanceDescription": "{cosmicCount} Cosmic Signature NFT và {randomWalkCount} RandomWalk NFT hiện đang neo giữ. Xem thao tác neo giữ, token đang neo giữ và người neo giữ riêng biệt trên trang thống kê neo giữ.",
+    "anchoringGlanceLink": "Thống kê neo giữ",
     "headlines": {
-      "uniqueParticipants": "unique participants",
-      "nftsImprinted": "NFTs imprinted",
-      "nftsAnchored": "NFTs anchored",
-      "gesturesThisCycle": "gestures this cycle",
-      "allocationsDistributed": "allocations distributed"
+      "uniqueParticipants": "người tham gia riêng biệt",
+      "nftsImprinted": "NFT đã khắc",
+      "nftsAnchored": "NFT đang neo giữ",
+      "gesturesThisCycle": "nét bút trong chu kỳ này",
+      "allocationsDistributed": "phân bổ đã phân phối"
     },
-    "pendingStellarRetrievals": "{count} recipients have yet to retrieve funds totaling {amount}",
-    "voluntaryContributionSummary": "{count} totaling {amount}",
+    "pendingStellarRetrievals": "{count} người nhận chưa nhận về tổng cộng {amount}",
+    "voluntaryContributionSummary": "{count} với tổng cộng {amount}",
     "jsonLd": {
-      "webPageName": "Cosmic Signature Protocol Statistics",
-      "webPageDescription": "Public Cosmic Signature protocol statistics on Arbitrum, including Performance Cycle status, gestures, NFTs, CST, anchoring, reserves, and allocation data.",
-      "datasetName": "Cosmic Signature Protocol Statistics Snapshot",
-      "datasetDescription": "A crawlable summary of public Cosmic Signature protocol activity indexed from Arbitrum smart contracts and the Cosmic Signature API."
+      "webPageName": "Thống kê giao thức Cosmic Signature",
+      "webPageDescription": "Thống kê công khai của giao thức Cosmic Signature trên Arbitrum, gồm trạng thái chu kỳ trình diễn, nét bút, NFT, CST, neo giữ, dự trữ và dữ liệu phân bổ.",
+      "datasetName": "Ảnh chụp thống kê giao thức Cosmic Signature",
+      "datasetDescription": "Bản tóm tắt có thể thu thập về hoạt động công khai của giao thức Cosmic Signature, được lập chỉ mục từ các hợp đồng thông minh Arbitrum và API của Cosmic Signature."
     },
     "seo": {
-      "eyebrow": "Protocol statistics · Arbitrum",
-      "heading": "Cosmic Signature Protocol Statistics",
-      "description": "This page tracks public Cosmic Signature protocol activity on Arbitrum, including Performance Cycle status, gestures, Cosmic Signature NFTs, CST, anchoring, reserves, and allocation data. The interactive tables below hydrate with live app data, while this summary is available in the initial HTML for search engines and AI crawlers.",
-      "lastUpdated": "Last updated: {date}",
-      "unavailableSuffix": ". Live data is temporarily unavailable; this page is showing explanatory protocol context.",
-      "dataSource": "Data comes from the public Cosmic Signature API, which indexes Arbitrum smart contract activity for the protocol. For protocol mechanics and verification details, use the crawlable links below.",
-      "relatedPagesAria": "Statistics related pages",
+      "eyebrow": "Thống kê giao thức · Arbitrum",
+      "heading": "Thống kê giao thức Cosmic Signature",
+      "description": "Trang này theo dõi hoạt động công khai của giao thức Cosmic Signature trên Arbitrum, gồm trạng thái chu kỳ trình diễn, nét bút, Cosmic Signature NFT, CST, neo giữ, dự trữ và dữ liệu phân bổ. Các bảng tương tác bên dưới sẽ nạp dữ liệu trực tiếp từ ứng dụng, còn bản tóm tắt này có sẵn trong HTML ban đầu cho công cụ tìm kiếm và trình thu thập dữ liệu AI.",
+      "lastUpdated": "Cập nhật lần cuối: {date}",
+      "unavailableSuffix": ". Dữ liệu trực tiếp tạm thời không khả dụng; trang này đang hiển thị bối cảnh giải thích về giao thức.",
+      "dataSource": "Dữ liệu đến từ API công khai của Cosmic Signature, vốn lập chỉ mục hoạt động hợp đồng thông minh Arbitrum của giao thức. Về cơ chế giao thức và chi tiết xác minh, hãy dùng các liên kết có thể thu thập bên dưới.",
+      "relatedPagesAria": "Các trang liên quan đến thống kê",
       "links": {
-        "currentCycle": "View the current Performance Cycle",
-        "howItWorks": "Learn how Cosmic Signature works",
-        "contracts": "Review verified Arbitrum contracts",
-        "faq": "Read the Cosmic Signature FAQ"
+        "currentCycle": "Xem chu kỳ trình diễn hiện tại",
+        "howItWorks": "Tìm hiểu cách Cosmic Signature hoạt động",
+        "contracts": "Xem các hợp đồng Arbitrum đã xác minh",
+        "faq": "Đọc câu hỏi thường gặp về Cosmic Signature"
       },
-      "unavailable": "Unavailable"
+      "unavailable": "Không khả dụng"
     }
   },
   "metrics": {
     "activePerformanceCycle": {
-      "label": "Active Performance Cycle",
-      "tooltip": "The current Performance Cycle number indexed by the public Cosmic Signature API.",
-      "seoDescription": "Current Performance Cycle number indexed from Cosmic Signature activity on Arbitrum."
+      "label": "Chu kỳ trình diễn đang diễn ra",
+      "tooltip": "Số chu kỳ trình diễn hiện tại được API công khai của Cosmic Signature lập chỉ mục.",
+      "seoDescription": "Số chu kỳ trình diễn hiện tại được lập chỉ mục từ hoạt động Cosmic Signature trên Arbitrum."
     },
     "activeCycleGestures": {
-      "label": "Active Cycle Gestures",
-      "tooltip": "Number of indexed gestures made in the active Performance Cycle so far.",
-      "seoDescription": "Indexed gesture count for the active Performance Cycle."
+      "label": "Nét bút của chu kỳ đang diễn ra",
+      "tooltip": "Số nét bút được lập chỉ mục đã đặt trong chu kỳ trình diễn đang diễn ra đến nay.",
+      "seoDescription": "Số nét bút được lập chỉ mục của chu kỳ trình diễn đang diễn ra."
     },
     "totalCycles": {
-      "label": "Total Cycles",
-      "tooltip": "Total Performance Cycles completed or currently indexed since protocol launch."
+      "label": "Tổng số chu kỳ",
+      "tooltip": "Tổng số chu kỳ trình diễn đã hoàn thành hoặc đang được lập chỉ mục kể từ khi giao thức ra mắt."
     },
     "allocationsDistributed": {
-      "label": "Allocations Distributed",
-      "tooltip": "Indexed allocation records across all cycles. Includes recipient allocations and protocol allocation markers such as Anchor Distribution deposits."
+      "label": "Phân bổ đã phân phối",
+      "tooltip": "Các bản ghi phân bổ được lập chỉ mục qua mọi chu kỳ. Gồm phân bổ cho người nhận và các dấu mốc phân bổ của giao thức như các đợt nạp phân phối neo giữ."
     },
     "cosmicSignatureNftsImprinted": {
-      "label": "Cosmic Signature NFTs Imprinted",
-      "shortLabel": "NFTs Imprinted",
-      "tooltip": "Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles. A value of 0 means the statistics API is currently reporting no indexed imprints for this counter.",
-      "seoDescription": "Cumulative Cosmic Signature NFT ERC-721 tokens imprinted by the protocol across all indexed cycles."
+      "label": "Cosmic Signature NFT đã khắc",
+      "shortLabel": "NFT đã khắc",
+      "tooltip": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục. Giá trị 0 nghĩa là API thống kê hiện không báo cáo lần khắc nào được lập chỉ mục cho bộ đếm này.",
+      "seoDescription": "Số token ERC-721 Cosmic Signature NFT tích lũy mà giao thức đã khắc qua mọi chu kỳ được lập chỉ mục."
     },
     "contractBalance": {
-      "label": "Contract Balance",
-      "seoLabel": "Protocol Contract Balance",
-      "tooltip": "ETH currently held by the Cosmic Signature protocol contract before future allocations, retrievals, or cycle transitions.",
-      "seoDescription": "ETH currently held by the Cosmic Signature protocol contract before future allocation flows."
+      "label": "Số dư hợp đồng",
+      "seoLabel": "Số dư hợp đồng giao thức",
+      "tooltip": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các phân bổ, lần nhận về hoặc chuyển tiếp chu kỳ trong tương lai.",
+      "seoDescription": "ETH hiện được hợp đồng giao thức Cosmic Signature nắm giữ trước các dòng phân bổ trong tương lai."
     },
     "numAllocationsDistributed": {
-      "label": "Num Allocations Distributed",
-      "tooltip": "Indexed allocation-record count. Uses cg_prize rows when available, otherwise falls back to aggregated recipient allocation totals."
+      "label": "Số phân bổ đã phân phối",
+      "tooltip": "Số bản ghi phân bổ được lập chỉ mục. Dùng các hàng cg_prize khi có, nếu không thì dùng tổng phân bổ theo người nhận đã tổng hợp."
     },
     "totalSignatureAllocationsDistributed": {
-      "label": "Total Signature Allocations Distributed",
-      "tooltip": "Total ETH distributed through Signature Allocations to final-gesture recipients across indexed cycles."
+      "label": "Tổng phân bổ Signature đã phân phối",
+      "tooltip": "Tổng ETH đã phân phối qua phân bổ Signature cho người đặt nét bút cuối cùng trong các chu kỳ được lập chỉ mục."
     },
     "stellarSelectionEthDeposited": {
-      "label": "Stellar Selection ETH Deposited",
-      "tooltip": "Total ETH allocated into Stellar Selection pools across indexed Performance Cycles."
+      "label": "ETH Tinh tuyển đã nạp",
+      "tooltip": "Tổng ETH đã phân bổ vào các quỹ Tinh tuyển qua các chu kỳ trình diễn được lập chỉ mục."
     },
     "stellarSelectionEthRetrieved": {
-      "label": "Stellar Selection ETH Retrieved",
-      "tooltip": "Total ETH retrieved by selected recipients from Stellar Selection pools."
+      "label": "ETH Tinh tuyển đã nhận về",
+      "tooltip": "Tổng ETH những người nhận được chọn đã nhận về từ các quỹ Tinh tuyển."
     },
     "totalSupplyErc20": {
-      "label": "Total Supply (ERC-20)",
-      "tooltip": "Current total supply of CST tokens, the ERC-20 token used for participation and coordination."
+      "label": "Tổng cung (ERC-20)",
+      "tooltip": "Tổng cung hiện tại của token CST, token ERC-20 dùng để tham gia và điều phối."
     },
     "totalCstConsumed": {
-      "label": "Total CST Consumed",
-      "tooltip": "Cumulative CST spent by participants when making CST gestures."
+      "label": "Tổng CST đã tiêu thụ",
+      "tooltip": "CST tích lũy mà người tham gia đã chi khi đặt nét bút CST."
     },
     "cstConsumedCurrentCycle": {
-      "label": "CST Consumed This Cycle",
-      "tooltip": "CST spent by participants making CST gestures during the active Performance Cycle so far."
+      "label": "CST đã tiêu thụ trong chu kỳ này",
+      "tooltip": "CST người tham gia đã chi khi đặt nét bút CST trong chu kỳ trình diễn đang diễn ra đến nay."
     },
     "ethInGesturesCurrentCycle": {
-      "label": "ETH in Gestures This Cycle",
-      "tooltip": "Total ETH paid by participants in ETH gestures during the active Performance Cycle so far."
+      "label": "ETH trong nét bút của chu kỳ này",
+      "tooltip": "Tổng ETH người tham gia đã trả cho nét bút ETH trong chu kỳ trình diễn đang diễn ra đến nay."
     },
     "cstGestures": {
-      "label": "Gestures with CST",
-      "tooltip": "Number of gestures made with CST instead of ETH across indexed cycles."
+      "label": "Nét bút bằng CST",
+      "tooltip": "Số nét bút đặt bằng CST thay vì ETH trong các chu kỳ được lập chỉ mục."
     },
     "outreachReserve": {
-      "label": "Outreach Reserve",
-      "tooltip": "CST imprinted for outreach and ecosystem contributors, separate from per-gesture Participation CST and NFT-paired Recognition CST."
+      "label": "Dự trữ truyền thông",
+      "tooltip": "CST được khắc cho những người đóng góp truyền thông và hệ sinh thái, tách biệt với CST tham gia theo từng nét bút và CST ghi nhận đi kèm NFT."
     },
     "outreachTransactions": {
-      "label": "Outreach Transactions",
-      "tooltip": "Number of indexed Outreach Reserve distribution transactions."
+      "label": "Giao dịch truyền thông",
+      "tooltip": "Số giao dịch phân phối từ Dự trữ truyền thông được lập chỉ mục."
     },
     "randomWalkNftsUsed": {
-      "label": "RandomWalk NFTs Used",
-      "tooltip": "RandomWalk NFTs already attached to ETH gestures for a one-time Gesture Cost reduction."
+      "label": "RandomWalk NFT đã sử dụng",
+      "tooltip": "Các RandomWalk NFT đã được đính kèm vào nét bút ETH để giảm chi phí nét bút một lần."
     },
     "namedTokens": {
-      "label": "Named Tokens",
-      "tooltip": "Cosmic Signature NFTs that currently have a custom owner-assigned name."
+      "label": "Token đã đặt tên",
+      "tooltip": "Các Cosmic Signature NFT hiện có tên tùy chỉnh do chủ sở hữu đặt."
     },
     "uniqueParticipants": {
-      "label": "Unique Participants",
-      "tooltip": "Unique wallet addresses that have made at least one indexed gesture."
+      "label": "Người tham gia riêng biệt",
+      "tooltip": "Các địa chỉ ví riêng biệt đã đặt ít nhất một nét bút được lập chỉ mục."
     },
     "uniqueRecipients": {
-      "label": "Unique Recipients",
-      "tooltip": "Unique wallet addresses that have received at least one indexed allocation from the protocol."
+      "label": "Người nhận riêng biệt",
+      "tooltip": "Các địa chỉ ví riêng biệt đã nhận ít nhất một phân bổ được lập chỉ mục từ giao thức."
     },
     "uniqueEthContributors": {
-      "label": "Unique ETH Contributors",
-      "tooltip": "Unique wallet addresses that contributed ETH to the protocol."
+      "label": "Người đóng góp ETH riêng biệt",
+      "tooltip": "Các địa chỉ ví riêng biệt đã đóng góp ETH cho giao thức."
     },
     "uniqueAnchorHolders": {
-      "label": "Unique Anchor-holders",
-      "tooltip": "Combined unique wallets that have anchored Cosmic Signature NFTs or RandomWalk NFTs."
+      "label": "Người neo giữ riêng biệt",
+      "tooltip": "Tổng số ví riêng biệt đã neo giữ Cosmic Signature NFT hoặc RandomWalk NFT."
     },
     "cosmicSignatureNftHolders": {
-      "label": "Cosmic Signature NFT Holders",
-      "tooltip": "Unique wallet addresses currently holding at least one Cosmic Signature NFT."
+      "label": "Người nắm giữ Cosmic Signature NFT",
+      "tooltip": "Các địa chỉ ví riêng biệt hiện đang nắm giữ ít nhất một Cosmic Signature NFT."
     },
     "cstErc20Holders": {
-      "label": "CST (ERC-20) Holders",
-      "tooltip": "Unique wallet addresses currently holding CST ERC-20 tokens."
+      "label": "Người nắm giữ CST (ERC-20)",
+      "tooltip": "Các địa chỉ ví riêng biệt hiện đang nắm giữ token CST ERC-20."
     },
     "attachedNfts": {
-      "label": "Attached NFTs",
-      "tooltip": "ERC-721 tokens attached to gestures by participants and indexed by the app."
+      "label": "NFT đính kèm",
+      "tooltip": "Các token ERC-721 người tham gia đã đính kèm vào nét bút và được ứng dụng lập chỉ mục."
     },
     "publicGoodsBalance": {
-      "label": "Public Goods Balance",
-      "tooltip": "ETH allocated to the Public Goods Beneficiary and still reflected in indexed protocol balances."
+      "label": "Số dư Hàng hóa công",
+      "tooltip": "ETH đã phân bổ cho đơn vị thụ hưởng Hàng hóa công và vẫn được phản ánh trong số dư giao thức đã lập chỉ mục."
     },
     "totalContributedEth": {
-      "label": "Total Contributed ETH",
-      "tooltip": "Total ETH contributed to the protocol across all indexed cycles."
+      "label": "Tổng ETH đã đóng góp",
+      "tooltip": "Tổng ETH đã đóng góp cho giao thức qua mọi chu kỳ được lập chỉ mục."
     },
     "protocolContributions": {
-      "label": "Protocol Contributions",
-      "tooltip": "Number of indexed public-goods contribution transactions sent through the Cosmic Signature protocol."
+      "label": "Đóng góp của giao thức",
+      "tooltip": "Số giao dịch đóng góp hàng hóa công được lập chỉ mục gửi qua giao thức Cosmic Signature."
     },
     "protocolContributionsSum": {
-      "label": "Protocol Contributions Sum",
-      "tooltip": "Total ETH contributed through indexed Cosmic Signature protocol public-goods contribution transactions."
+      "label": "Tổng đóng góp của giao thức",
+      "tooltip": "Tổng ETH đã đóng góp qua các giao dịch đóng góp hàng hóa công của giao thức Cosmic Signature được lập chỉ mục."
     },
     "voluntaryContributions": {
-      "label": "Voluntary Contributions",
-      "tooltip": "ETH contributions made voluntarily by community members outside required cycle flows."
+      "label": "Đóng góp tự nguyện",
+      "tooltip": "Các khoản đóng góp ETH tự nguyện của thành viên cộng đồng ngoài các dòng bắt buộc của chu kỳ."
     },
     "publicGoodsRetrievals": {
-      "label": "Public Goods Retrievals",
-      "tooltip": "Number of indexed retrieval transactions from the Public Goods Vault."
+      "label": "Nhận về Hàng hóa công",
+      "tooltip": "Số giao dịch nhận về từ Kho Hàng hóa công được lập chỉ mục."
     },
     "totalPublicGoodsRetrieved": {
-      "label": "Total Public Goods Retrieved",
-      "tooltip": "Total ETH retrieved from the Public Goods Vault."
+      "label": "Tổng Hàng hóa công đã nhận về",
+      "tooltip": "Tổng ETH đã nhận về từ Kho Hàng hóa công."
     }
   },
   "groups": {
     "allocationEconomy": {
-      "label": "Allocation Economy",
-      "tooltip": "Cumulative allocation records and ETH flows produced when Performance Cycles finalize."
+      "label": "Dòng chảy phân bổ",
+      "tooltip": "Các bản ghi phân bổ tích lũy và dòng ETH được tạo ra khi các chu kỳ trình diễn hoàn tất."
     },
     "tokenEconomy": {
-      "label": "Token Economy",
-      "tooltip": "CST and NFT counters. CST is the ERC-20 token; Cosmic Signature NFTs are ERC-721 tokens."
+      "label": "Dòng chảy token",
+      "tooltip": "Bộ đếm CST và NFT. CST là token ERC-20; Cosmic Signature NFT là token ERC-721."
     },
     "publicGoods": {
-      "label": "Public Goods & Contributions",
-      "tooltip": "Protocol balances and contribution flows related to public goods and attached assets."
+      "label": "Hàng hóa công và đóng góp",
+      "tooltip": "Số dư giao thức và dòng đóng góp liên quan đến hàng hóa công và tài sản đính kèm."
     }
   },
   "sectionTooltips": {
-    "attachedAssets": "ERC-721 and ERC-20 assets attached to gestures, viewable for all cycles or only the current Performance Cycle.",
-    "gestureTypeDistribution": "Share of gestures made with ETH, RandomWalk (ETH-paid), and CST over time, sampled at a chosen interval. Current cycle only.",
-    "enduranceTimeline": "A Gantt of who held the lead during a cycle. Each bar is a lead stint (its width = how long that address held the lead). The widest bar is the Endurance Champion; the Chrono-Warrior is the participant whose single continuous reign as Endurance Champion lasted the longest. Pick any cycle to compare.",
-    "cstWindow": "How the CST Calibration Window evolved during a cycle. Every ETH gesture shortens the window slightly; every CST gesture lengthens it. The window sets how fast the CST gesture cost decays to free. Pick any cycle to compare.",
-    "cstCost": "What each CST gesture actually cost during a cycle, on a log scale, alongside the allocation clock remaining right before it. Mid-cycle gestures are often nearly free; in the endgame, rapid gesturing leaves the cost no time to descend and prices can reach thousands of CST.",
-    "attachedTokenDistribution": "Contracts and token counts for ERC-721 assets attached to gestures.",
-    "cosmicSignatureTokenDistribution": "Current owner distribution for Cosmic Signature NFT ERC-721 tokens.",
-    "cstBalanceDistribution": "Current wallet distribution for CST ERC-20 balances.",
-    "cstTotalSupply": "Historical CST ERC-20 supply changes, including imprints and consumption over time.",
-    "cycleActivations": "System event windows that show when protocol cycles or modes became active and ended.",
-    "uniqueParticipants": "Wallets with at least one indexed gesture, sorted by gesture count.",
-    "uniqueRecipients": "Wallets that received indexed protocol allocations.",
-    "uniqueEthContributors": "Wallets that contributed ETH to the protocol.",
-    "anchorReleaseActions": "Chronological anchor and release actions for the selected NFT type.",
-    "anchoredTokens": "Tokens currently anchored in the selected anchoring wallet.",
-    "uniqueAnchorHolders": "Wallets that have anchored or released the selected NFT type.",
-    "gestureFrequency": "Indexed gesture counts grouped over time to show protocol activity patterns.",
-    "gestureSpikes": "Periods where gesture activity changed quickly compared with surrounding activity.",
-    "participantActivePeriods": "The longest indexed active participation windows for the most active wallets."
+    "attachedAssets": "Các tài sản ERC-721 và ERC-20 đính kèm vào nét bút, có thể xem cho mọi chu kỳ hoặc chỉ chu kỳ trình diễn hiện tại.",
+    "gestureTypeDistribution": "Tỷ lệ nét bút đặt bằng ETH, RandomWalk (trả bằng ETH) và CST theo thời gian, lấy mẫu theo khoảng đã chọn. Chỉ chu kỳ hiện tại.",
+    "enduranceTimeline": "Biểu đồ Gantt về ai đã giữ vị trí dẫn đầu trong một chu kỳ. Mỗi thanh là một đoạn dẫn đầu (độ rộng = thời gian địa chỉ đó giữ vị trí dẫn đầu). Thanh rộng nhất là Quán quân Bền bỉ; Chiến binh Thời gian là người tham gia có một lần làm Quán quân Bền bỉ liên tục lâu nhất. Chọn bất kỳ chu kỳ nào để so sánh.",
+    "cstWindow": "Cửa sổ hiệu chỉnh CST đã biến đổi thế nào trong một chu kỳ. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Cửa sổ quyết định chi phí nét bút CST giảm về không nhanh đến đâu. Chọn bất kỳ chu kỳ nào để so sánh.",
+    "cstCost": "Mỗi nét bút CST thực sự tốn bao nhiêu trong một chu kỳ, trên thang log, cùng với thời gian còn lại của đồng hồ phân bổ ngay trước đó. Nét bút giữa chu kỳ thường gần như không tốn chi phí; ở giai đoạn cuối, đặt nét bút liên tục khiến chi phí không có thời gian giảm và có thể lên tới hàng nghìn CST.",
+    "attachedTokenDistribution": "Hợp đồng và số token của các tài sản ERC-721 đính kèm vào nét bút.",
+    "cosmicSignatureTokenDistribution": "Phân bố chủ sở hữu hiện tại của các token ERC-721 Cosmic Signature NFT.",
+    "cstBalanceDistribution": "Phân bố ví hiện tại theo số dư CST ERC-20.",
+    "cstTotalSupply": "Thay đổi nguồn cung CST ERC-20 theo lịch sử, gồm các lần khắc và tiêu thụ theo thời gian.",
+    "cycleActivations": "Các cửa sổ sự kiện hệ thống cho biết khi nào các chu kỳ hoặc chế độ của giao thức bắt đầu và kết thúc.",
+    "uniqueParticipants": "Các ví có ít nhất một nét bút được lập chỉ mục, sắp xếp theo số nét bút.",
+    "uniqueRecipients": "Các ví đã nhận phân bổ được lập chỉ mục từ giao thức.",
+    "uniqueEthContributors": "Các ví đã đóng góp ETH cho giao thức.",
+    "anchorReleaseActions": "Các thao tác neo giữ và gỡ neo theo thời gian của loại NFT đã chọn.",
+    "anchoredTokens": "Các token hiện đang neo giữ trong ví neo giữ đã chọn.",
+    "uniqueAnchorHolders": "Các ví đã neo giữ hoặc gỡ neo loại NFT đã chọn.",
+    "gestureFrequency": "Số nét bút được lập chỉ mục gom theo thời gian để thể hiện các mẫu hoạt động của giao thức.",
+    "gestureSpikes": "Các khoảng thời gian hoạt động nét bút thay đổi nhanh so với hoạt động xung quanh.",
+    "participantActivePeriods": "Các khoảng tham gia hoạt động dài nhất được lập chỉ mục của những ví hoạt động nhiều nhất."
   },
   "anchoringTooltips": {
-    "cstActiveAnchorHolders": "Wallets currently anchoring at least one Cosmic Signature NFT.",
-    "cstAnchorDistributionDeposits": "Total deposit events into the Cosmic Signature NFT Anchor Distribution pool.",
-    "cstTotalAnchorDistributions": "Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders.",
-    "cstTotalTokensAnchored": "Number of Cosmic Signature NFTs currently anchored in the protocol.",
-    "cstUnretrievedAnchorDistributions": "Anchor Distributions allocated but not yet retrieved by Cosmic Signature NFT anchor-holders.",
-    "rwlkActiveAnchorHolders": "Wallets currently anchoring at least one RandomWalk NFT.",
-    "rwlkTotalTokensImprinted": "Total Cosmic Signature NFTs and paired CST imprinted for RandomWalk NFT anchor-holders through Anchored-NFT Stellar Selection.",
-    "rwlkTotalTokensAnchored": "Number of RandomWalk NFTs currently anchored in the protocol.",
-    "cstGroup": "Cosmic Signature NFT anchoring shares ETH Anchor Distributions among currently anchored Cosmic Signature NFTs.",
-    "rwlkGroup": "RandomWalk NFT anchoring provides eligibility for Anchored-NFT Stellar Selection allocations."
+    "cstActiveAnchorHolders": "Các ví hiện đang neo giữ ít nhất một Cosmic Signature NFT.",
+    "cstAnchorDistributionDeposits": "Tổng số sự kiện nạp vào quỹ phân phối neo giữ Cosmic Signature NFT.",
+    "cstTotalAnchorDistributions": "Tổng ETH đã phân phối dưới dạng phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
+    "cstTotalTokensAnchored": "Số Cosmic Signature NFT hiện đang neo giữ trong giao thức.",
+    "cstUnretrievedAnchorDistributions": "Phân phối neo giữ đã phân bổ nhưng những người neo giữ Cosmic Signature NFT chưa nhận về.",
+    "rwlkActiveAnchorHolders": "Các ví hiện đang neo giữ ít nhất một RandomWalk NFT.",
+    "rwlkTotalTokensImprinted": "Tổng Cosmic Signature NFT và CST đi kèm đã khắc cho những người neo giữ RandomWalk NFT thông qua Tinh tuyển NFT neo giữ.",
+    "rwlkTotalTokensAnchored": "Số RandomWalk NFT hiện đang neo giữ trong giao thức.",
+    "cstGroup": "Neo giữ Cosmic Signature NFT chia sẻ phân phối neo giữ ETH giữa các Cosmic Signature NFT hiện đang neo giữ.",
+    "rwlkGroup": "Neo giữ RandomWalk NFT mang lại diện nhận phân bổ Tinh tuyển NFT neo giữ."
   },
   "activity": {
-    "heading": "Gesture Activity",
+    "heading": "Hoạt động nét bút",
     "sections": {
-      "frequency": "Gesture Frequency Over Time",
-      "spikes": "Gesture Spikes",
-      "activePeriods": "Top 20 Participant Active Periods",
-      "typeDistribution": "Gesture Type Distribution",
-      "enduranceTimeline": "Endurance & Chrono Timeline",
-      "cstWindow": "CST Calibration Window Timeline",
-      "cstCost": "CST Gesture Cost Over Time",
-      "cycleActivations": "Cycle Activations"
+      "frequency": "Tần suất nét bút theo thời gian",
+      "spikes": "Đợt tăng vọt nét bút",
+      "activePeriods": "Khoảng hoạt động của 20 người tham gia hàng đầu",
+      "typeDistribution": "Phân bố loại nét bút",
+      "enduranceTimeline": "Dòng thời gian Bền bỉ và Chrono",
+      "cstWindow": "Dòng thời gian cửa sổ hiệu chỉnh CST",
+      "cstCost": "Chi phí nét bút CST theo thời gian",
+      "cycleActivations": "Kích hoạt chu kỳ"
     },
-    "currentCycleOnly": "Current cycle only",
-    "emptyCycleActivations": "No cycle activations indexed yet"
+    "currentCycleOnly": "Chỉ chu kỳ hiện tại",
+    "emptyCycleActivations": "Chưa có lần kích hoạt chu kỳ nào được lập chỉ mục"
   },
   "anchoringPage": {
     "snapshot": {
-      "cosmicSignatureLabel": "Cosmic Signature NFTs Anchored",
-      "cosmicSignatureTooltip": "Total number of Cosmic Signature NFTs currently anchored in the protocol and sharing Anchor Distributions.",
-      "randomWalkLabel": "RandomWalk NFTs Anchored",
-      "randomWalkTooltip": "Total number of RandomWalk NFTs currently anchored and eligible for Anchored-NFT Stellar Selection.",
-      "poolLabel": "Anchor Distribution Pool",
-      "poolTooltip": "ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.",
-      "perNftLabel": "Distribution per Cosmic Signature NFT",
-      "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
-      "perNftTooltipUnavailable": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs. The on-chain anchor pool is non-zero, but the indexed total of anchored Cosmic Signature NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-NFT rate cannot be computed.",
-      "activeHoldersLabel": "Active Anchor-holders",
-      "activeHoldersTooltip": "Combined active wallets currently anchoring at least one Cosmic Signature NFT or RandomWalk NFT."
+      "cosmicSignatureLabel": "Cosmic Signature NFT đang neo giữ",
+      "cosmicSignatureTooltip": "Tổng số Cosmic Signature NFT hiện đang neo giữ trong giao thức và chia sẻ phân phối neo giữ.",
+      "randomWalkLabel": "RandomWalk NFT đang neo giữ",
+      "randomWalkTooltip": "Tổng số RandomWalk NFT hiện đang neo giữ và thuộc diện Tinh tuyển NFT neo giữ.",
+      "poolLabel": "Quỹ phân phối neo giữ",
+      "poolTooltip": "ETH hiện được phân bổ vào quỹ phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
+      "perNftLabel": "Phân phối mỗi Cosmic Signature NFT",
+      "perNftTooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục.",
+      "perNftTooltipUnavailable": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục. Quỹ neo giữ trên chuỗi khác không, nhưng tổng số Cosmic Signature NFT neo giữ đã lập chỉ mục lại bằng không (ví dụ cg_stake_stats_cst chưa được ETL cập nhật), nên không thể tính mức mỗi NFT.",
+      "activeHoldersLabel": "Người neo giữ đang hoạt động",
+      "activeHoldersTooltip": "Tổng số ví đang hoạt động hiện neo giữ ít nhất một Cosmic Signature NFT hoặc RandomWalk NFT."
     },
-    "description": "Anchored NFTs are a core part of Cosmic Signature: Cosmic Signature NFTs share ETH Anchor Distributions, while RandomWalk NFTs participate in Anchored-NFT Stellar Selection.",
-    "historyLink": "View anchor history",
-    "tableDescription": "Use the tabs below to inspect anchor/release actions, currently anchored tokens, and the unique wallets behind the global anchoring totals.",
+    "description": "NFT đang neo giữ là phần cốt lõi của Cosmic Signature: Cosmic Signature NFT chia sẻ phân phối neo giữ ETH, còn RandomWalk NFT tham gia Tinh tuyển NFT neo giữ.",
+    "historyLink": "Xem lịch sử neo giữ",
+    "tableDescription": "Dùng các thẻ bên dưới để xem thao tác neo giữ/gỡ neo, token đang neo giữ và những ví riêng biệt phía sau các tổng số neo giữ toàn cầu.",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
       "randomWalk": "RandomWalk NFT"
     },
     "groups": {
-      "cosmicSignature": "Cosmic Signature NFT Anchoring Overview",
-      "randomWalk": "RWLK Anchoring Overview"
+      "cosmicSignature": "Tổng quan neo giữ Cosmic Signature NFT",
+      "randomWalk": "Tổng quan neo giữ RWLK"
     },
     "stats": {
-      "activeHolders": "Number of Active Anchor-holders",
-      "distributionDeposits": "Number of Anchor-Distribution Deposits",
-      "totalDistributions": "Total Anchor Distributions",
-      "tokensImprinted": "Total Tokens Imprinted",
-      "tokensAnchored": "Total Tokens Anchored",
-      "unretrievedDistributions": "Unretrieved Anchor Distributions"
+      "activeHolders": "Số người neo giữ đang hoạt động",
+      "distributionDeposits": "Số đợt nạp phân phối neo giữ",
+      "totalDistributions": "Tổng phân phối neo giữ",
+      "tokensImprinted": "Tổng token đã khắc",
+      "tokensAnchored": "Tổng token đang neo giữ",
+      "unretrievedDistributions": "Phân phối neo giữ chưa nhận về"
     },
     "tables": {
-      "actions": "Anchor / Release Actions",
-      "anchoredTokens": "Anchored Tokens",
-      "uniqueHolders": "Unique Anchor-holders"
+      "actions": "Thao tác neo giữ / gỡ neo",
+      "anchoredTokens": "Token đang neo giữ",
+      "uniqueHolders": "Người neo giữ riêng biệt"
     },
     "empty": {
-      "actions": "No anchor actions yet",
-      "tokens": "No tokens currently anchored",
-      "holders": "No anchor-holders yet"
+      "actions": "Chưa có thao tác neo giữ",
+      "tokens": "Hiện không có token nào đang neo giữ",
+      "holders": "Chưa có người neo giữ"
     }
   },
   "participation": {
     "sections": {
-      "participants": "Unique Participants",
-      "recipients": "Unique Recipients",
-      "contributors": "Unique ETH Contributors"
+      "participants": "Người tham gia riêng biệt",
+      "recipients": "Người nhận riêng biệt",
+      "contributors": "Người đóng góp ETH riêng biệt"
     },
     "empty": {
-      "participantsTitle": "No participants yet",
-      "participantsDescription": "Wallets appear here after their first indexed gesture.",
-      "recipientsTitle": "No recipients yet",
-      "recipientsDescription": "Wallets appear here after receiving their first indexed allocation.",
-      "contributorsTitle": "No ETH contributions yet",
-      "contributorsDescription": "Wallets appear here after their first indexed ETH contribution."
+      "participantsTitle": "Chưa có người tham gia",
+      "participantsDescription": "Các ví xuất hiện ở đây sau nét bút được lập chỉ mục đầu tiên.",
+      "recipientsTitle": "Chưa có người nhận",
+      "recipientsDescription": "Các ví xuất hiện ở đây sau khi nhận phân bổ được lập chỉ mục đầu tiên.",
+      "contributorsTitle": "Chưa có đóng góp ETH",
+      "contributorsDescription": "Các ví xuất hiện ở đây sau khoản đóng góp ETH được lập chỉ mục đầu tiên."
     }
   },
   "tokens": {
     "sections": {
       "nftDistribution": "Cosmic Signature NFT (ERC-721)",
-      "cstDistribution": "CST (ERC-20) Balance Distribution",
-      "totalSupply": "CST Total Supply",
-      "attachedDistribution": "Attached Token Distribution",
-      "attachedAssets": "Attached Assets"
+      "cstDistribution": "Phân bố số dư CST (ERC-20)",
+      "totalSupply": "Tổng cung CST",
+      "attachedDistribution": "Phân bố token đính kèm",
+      "attachedAssets": "Tài sản đính kèm"
     },
     "empty": {
-      "nftTitle": "No Cosmic Signature NFTs imprinted yet",
-      "nftDescription": "Owner distribution appears here once NFTs are imprinted.",
-      "cstTitle": "No CST balances yet",
-      "cstDescription": "Wallet balance distribution appears here once CST is in circulation.",
-      "contractsTitle": "No attached ERC-721 contracts yet"
+      "nftTitle": "Chưa có Cosmic Signature NFT nào được khắc",
+      "nftDescription": "Phân bố chủ sở hữu xuất hiện ở đây khi NFT được khắc.",
+      "cstTitle": "Chưa có số dư CST",
+      "cstDescription": "Phân bố số dư ví xuất hiện ở đây khi CST được lưu hành.",
+      "contractsTitle": "Chưa có hợp đồng ERC-721 đính kèm"
     },
     "supplyTabs": {
-      "date": "By date",
-      "gesture": "By gesture"
+      "date": "Theo ngày",
+      "gesture": "Theo nét bút"
     }
   },
   "attachedAssets": {
-    "scopeAria": "Attached NFT scope",
-    "scopeAll": "All cycles",
-    "scopeCurrent": "Current cycle",
-    "nftTab": "NFTs (ERC-721)",
-    "erc20Tab": "Tokens (ERC-20)",
-    "nftLoadError": "Failed to load attached NFTs",
-    "erc20LoadError": "Failed to load attached ERC-20 tokens",
-    "serviceError": "The statistics service did not respond. Try again in a moment.",
-    "emptyCurrentTitle": "No NFTs attached this cycle",
-    "emptyAllTitle": "No NFTs have been attached yet",
-    "emptyCurrentDescription": "NFTs attached to gestures during the current Performance Cycle will appear here.",
-    "emptyAllDescription": "Attached NFTs from all cycles will appear here.",
-    "erc20Description": "ERC-20 tokens attached to gestures during the current Performance Cycle."
+    "scopeAria": "Phạm vi NFT đính kèm",
+    "scopeAll": "Mọi chu kỳ",
+    "scopeCurrent": "Chu kỳ hiện tại",
+    "nftTab": "NFT (ERC-721)",
+    "erc20Tab": "Token (ERC-20)",
+    "nftLoadError": "Không tải được NFT đính kèm",
+    "erc20LoadError": "Không tải được token ERC-20 đính kèm",
+    "serviceError": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+    "emptyCurrentTitle": "Chưa có NFT đính kèm trong chu kỳ này",
+    "emptyAllTitle": "Chưa có NFT nào được đính kèm",
+    "emptyCurrentDescription": "Các NFT đính kèm vào nét bút trong chu kỳ trình diễn hiện tại sẽ xuất hiện ở đây.",
+    "emptyAllDescription": "NFT đính kèm từ mọi chu kỳ sẽ xuất hiện ở đây.",
+    "erc20Description": "Các token ERC-20 đính kèm vào nét bút trong chu kỳ trình diễn hiện tại."
   },
   "performance": {
-    "leaderboardTitle": "Participant Performance",
-    "claimsTitle": "Allocation Claims by Cycle",
+    "leaderboardTitle": "Thành tích người tham gia",
+    "claimsTitle": "Nhận về phân bổ theo chu kỳ",
     "leaderboard": {
-      "description": "Net ETH and return per participant, across all cycles. Figures are <em>ETH-only</em> — ETH received from allocations minus ETH spent on gestures; CST and NFT allocations are shown as context. Participants who only used CST show no ETH return.",
+      "description": "ETH ròng và tỷ lệ ròng theo từng người tham gia, qua mọi chu kỳ. Các con số <em>chỉ tính ETH</em> — ETH nhận từ phân bổ trừ ETH đã chi cho nét bút; phân bổ CST và NFT được hiển thị làm bối cảnh. Người tham gia chỉ dùng CST không có số liệu ETH ròng.",
       "sort": {
-        "netEth": "Highest Net ETH",
-        "netPercent": "Highest Net %",
-        "allocationRate": "Best Allocation Rate",
-        "spender": "Biggest Spender",
-        "nfts": "Most NFTs"
+        "netEth": "ETH ròng cao nhất",
+        "netPercent": "% ròng cao nhất",
+        "allocationRate": "Tỷ lệ phân bổ tốt nhất",
+        "spender": "Chi nhiều nhất",
+        "nfts": "Nhiều NFT nhất"
       },
-      "minimumGestures": "Min gestures",
-      "cstOnly": "(CST-only)",
-      "cstOnlyTooltip": "No ETH spent (CST-only participant)",
-      "noEthReceivedTooltip": "No ETH received back yet — this participant has not received an ETH allocation so far",
-      "loadErrorTitle": "Failed to load the performance leaderboard",
-      "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
-      "empty": "No participants match this filter yet.",
+      "minimumGestures": "Số nét bút tối thiểu",
+      "cstOnly": "(chỉ CST)",
+      "cstOnlyTooltip": "Không chi ETH (người tham gia chỉ dùng CST)",
+      "noEthReceivedTooltip": "Chưa có ETH quay về — người tham gia này chưa nhận phân bổ ETH nào đến nay",
+      "loadErrorTitle": "Không tải được bảng xếp hạng thành tích",
+      "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+      "empty": "Chưa có người tham gia nào khớp với bộ lọc này.",
       "columns": {
-        "participant": "Participant",
-        "allocationRate": "Allocation Rate",
-        "gestures": "Gestures",
-        "spent": "Spent (ETH)",
-        "received": "Received (ETH)",
-        "net": "Net (ETH)",
-        "netPercent": "Net %",
-        "allocations": "Allocations"
+        "participant": "Người tham gia",
+        "allocationRate": "Tỷ lệ phân bổ",
+        "gestures": "Nét bút",
+        "spent": "Đã chi (ETH)",
+        "received": "Đã nhận (ETH)",
+        "net": "Ròng (ETH)",
+        "netPercent": "% ròng",
+        "allocations": "Phân bổ"
       }
     },
     "claims": {
-      "description": "Claimable assets awarded each cycle — secondary ETH allocations, attached NFTs, and attached ERC-20s that recipients withdraw themselves. Directly-paid assets (main ETH, imprinted CST and NFTs) are excluded, since they aren’t claimed. Recipients normally claim right away; anything left past the claim window can be swept by anyone.",
-      "loadErrorTitle": "Failed to load allocation claims",
-      "loadErrorMessage": "The statistics service did not respond. Try again in a moment.",
-      "empty": "No claimable assets awarded yet.",
+      "description": "Các tài sản có thể nhận về được trao mỗi chu kỳ — phân bổ ETH phụ, NFT đính kèm và ERC-20 đính kèm mà người nhận tự nhận về. Các tài sản trả trực tiếp (ETH chính, CST và NFT đã khắc) không được tính, vì chúng không cần nhận về. Người nhận thường nhận về ngay; bất kỳ thứ gì còn lại sau cửa sổ nhận về đều có thể được bất kỳ ai quét.",
+      "loadErrorTitle": "Không tải được dữ liệu nhận về phân bổ",
+      "loadErrorMessage": "Dịch vụ thống kê không phản hồi. Hãy thử lại sau ít phút.",
+      "empty": "Chưa có tài sản có thể nhận về nào được trao.",
       "columns": {
-        "cycle": "Cycle",
-        "awarded": "Awarded (claimable)",
-        "unclaimed": "Unclaimed",
-        "claimedPercent": "Claimed %",
-        "averageTime": "Avg Claim Time",
-        "details": "Details"
+        "cycle": "Chu kỳ",
+        "awarded": "Đã trao (có thể nhận về)",
+        "unclaimed": "Chưa nhận về",
+        "claimedPercent": "% đã nhận về",
+        "averageTime": "Thời gian nhận về trung bình",
+        "details": "Chi tiết"
       },
-      "allClaimed": "All claimed",
-      "unclaimedCount": "{count} unclaimed",
-      "viewUnclaimed": "View unclaimed assets",
-      "explore": "Explore",
+      "allClaimed": "Đã nhận về tất cả",
+      "unclaimedCount": "{count} chưa nhận về",
+      "viewUnclaimed": "Xem tài sản chưa nhận về",
+      "explore": "Khám phá",
       "dialog": {
-        "unclaimedTitle": "Unclaimed assets — Cycle {cycle}",
-        "expired": "The claim window has closed — these assets can now be swept by anyone.",
-        "closesIn": "Claim window closes in {duration}.",
-        "asset": "Asset",
-        "recipient": "Recipient",
-        "detail": "Detail",
-        "exploreTitle": "Explore Cycle {cycle}",
-        "exploreDescription": "Claim transactions with how long each recipient took, and the tokens attached this cycle.",
-        "claimTransactions": "Claim transactions",
-        "noClaims": "No claims recorded for this cycle.",
-        "claimedAfter": "Claimed After",
-        "when": "When",
-        "transaction": "Transaction",
-        "sweptBy": "swept by {address}",
-        "attachedTokens": "Attached tokens",
-        "noAttached": "No tokens attached this cycle.",
+        "unclaimedTitle": "Tài sản chưa nhận về — Chu kỳ {cycle}",
+        "expired": "Cửa sổ nhận về đã đóng — những tài sản này giờ có thể được bất kỳ ai quét.",
+        "closesIn": "Cửa sổ nhận về đóng sau {duration}.",
+        "asset": "Tài sản",
+        "recipient": "Người nhận",
+        "detail": "Chi tiết",
+        "exploreTitle": "Khám phá chu kỳ {cycle}",
+        "exploreDescription": "Các giao dịch nhận về cùng thời gian mỗi người nhận đã mất, và các token đính kèm trong chu kỳ này.",
+        "claimTransactions": "Giao dịch nhận về",
+        "noClaims": "Không có lần nhận về nào được ghi nhận cho chu kỳ này.",
+        "claimedAfter": "Nhận về sau",
+        "when": "Khi nào",
+        "transaction": "Giao dịch",
+        "sweptBy": "được quét bởi {address}",
+        "attachedTokens": "Token đính kèm",
+        "noAttached": "Không có token nào được đính kèm trong chu kỳ này.",
         "token": "Token",
-        "attachedBy": "Attached By"
+        "attachedBy": "Đính kèm bởi"
       },
       "assets": {
         "eth": "ETH",
-        "nft": "Attached NFT",
-        "erc20": "Attached ERC-20"
+        "nft": "NFT đính kèm",
+        "erc20": "ERC-20 đính kèm"
       }
     }
   },
   "charts": {
     "frequency": {
-      "bucket": "Bucket",
-      "daily": "Daily",
-      "hourly": "Hourly",
-      "gestures": "Gestures",
-      "uniqueParticipants": "Unique participants",
-      "loadErrorTitle": "Failed to load gesture frequency",
-      "loadErrorMessage": "Could not fetch gesture frequency for the selected range.",
-      "empty": "No gesture activity in this time range.",
-      "openingExcluded": "Gestures in the first hour after each cycle opens are excluded — opening activity is unusually concentrated and would otherwise skew this chart."
+      "bucket": "Khoảng gộp",
+      "daily": "Theo ngày",
+      "hourly": "Theo giờ",
+      "gestures": "Nét bút",
+      "uniqueParticipants": "Người tham gia riêng biệt",
+      "loadErrorTitle": "Không tải được tần suất nét bút",
+      "loadErrorMessage": "Không lấy được tần suất nét bút cho khoảng đã chọn.",
+      "empty": "Không có hoạt động nét bút trong khoảng thời gian này.",
+      "openingExcluded": "Nét bút trong giờ đầu sau khi mỗi chu kỳ mở không được tính — hoạt động lúc mở tập trung bất thường và sẽ làm lệch biểu đồ này."
     },
     "spikes": {
-      "count": "Spikes ({count})",
-      "groupAria": "Detected gesture spikes",
-      "previousAria": "Previous spike",
-      "nextAria": "Next spike",
-      "summary": "Peak {peak} gestures/hr · {total} total in spike · {date}",
-      "viewing": "Viewing spike #{index}: {start} → {end}",
-      "gestures": "Gestures: {count}",
-      "loadErrorTitle": "Failed to load gesture spikes",
-      "loadErrorMessage": "Could not fetch spike detection data.",
-      "empty": "No gesture spikes detected in indexed history.",
-      "noneRecent": "No spikes recently.",
-      "selectEarlier": "Select a spike index above to scroll into the past and inspect earlier activity bursts.",
-      "emptyWindow": "No hourly buckets for the selected spike window."
+      "count": "Đợt tăng vọt ({count})",
+      "groupAria": "Các đợt tăng vọt nét bút được phát hiện",
+      "previousAria": "Đợt tăng vọt trước",
+      "nextAria": "Đợt tăng vọt sau",
+      "summary": "Đỉnh {peak} nét bút/giờ · tổng {total} trong đợt · {date}",
+      "viewing": "Đang xem đợt tăng vọt #{index}: {start} → {end}",
+      "gestures": "Nét bút: {count}",
+      "loadErrorTitle": "Không tải được các đợt tăng vọt nét bút",
+      "loadErrorMessage": "Không lấy được dữ liệu phát hiện đợt tăng vọt.",
+      "empty": "Không phát hiện đợt tăng vọt nét bút nào trong lịch sử đã lập chỉ mục.",
+      "noneRecent": "Gần đây không có đợt tăng vọt.",
+      "selectEarlier": "Chọn một chỉ số đợt tăng vọt ở trên để cuộn về quá khứ và xem các đợt hoạt động sớm hơn.",
+      "emptyWindow": "Không có khoảng gộp theo giờ cho cửa sổ đợt tăng vọt đã chọn."
     },
     "activePeriods": {
-      "description": "Active periods for top {count} participants (≥2 gestures with ≤6h gap between consecutive gestures). Each bar is one burst.",
-      "participant": "Participant",
-      "ariaLabel": "{address}: {count} gestures from {start} to {end}",
-      "tooltipSummary": "{count} gestures · {minutes} min span",
-      "loadErrorTitle": "Failed to load active periods",
-      "loadErrorMessage": "Could not fetch top participant activity timeline.",
-      "empty": "No active gesture periods found for top participants."
+      "description": "Khoảng hoạt động của {count} người tham gia hàng đầu (≥2 nét bút với khoảng cách ≤6 giờ giữa hai nét bút liên tiếp). Mỗi thanh là một đợt.",
+      "participant": "Người tham gia",
+      "ariaLabel": "{address}: {count} nét bút từ {start} đến {end}",
+      "tooltipSummary": "{count} nét bút · kéo dài {minutes} phút",
+      "loadErrorTitle": "Không tải được các khoảng hoạt động",
+      "loadErrorMessage": "Không lấy được dòng thời gian hoạt động của những người tham gia hàng đầu.",
+      "empty": "Không tìm thấy khoảng hoạt động nét bút nào của những người tham gia hàng đầu."
     },
     "typeRatio": {
-      "totalGestures": "Total gestures",
-      "sampleEvery": "Sample every",
-      "interpolation": "Interpolation",
+      "totalGestures": "Tổng số nét bút",
+      "sampleEvery": "Lấy mẫu mỗi",
+      "interpolation": "Nội suy",
       "intervals": {
-        "oneHour": "1h",
-        "sixHours": "6h",
-        "twelveHours": "12h",
-        "oneDay": "1d"
+        "oneHour": "1 giờ",
+        "sixHours": "6 giờ",
+        "twelveHours": "12 giờ",
+        "oneDay": "1 ngày"
       },
-      "linear": "Linear",
-      "step": "Step",
-      "smooth": "Smooth",
-      "notStarted": "The current round hasn’t started yet.",
-      "loadErrorTitle": "Failed to load gesture-type distribution",
-      "loadErrorMessage": "Could not fetch the gesture-type composition for the current round.",
-      "empty": "No gesture activity in the current round yet.",
-      "description": "Each sample is the gesture-type mix within that window (per-interval, not cumulative). Windows with no gestures show 0% for all types."
+      "linear": "Tuyến tính",
+      "step": "Bậc",
+      "smooth": "Mượt",
+      "notStarted": "Chu kỳ hiện tại chưa bắt đầu.",
+      "loadErrorTitle": "Không tải được phân bố loại nét bút",
+      "loadErrorMessage": "Không lấy được cơ cấu loại nét bút của chu kỳ hiện tại.",
+      "empty": "Chưa có hoạt động nét bút trong chu kỳ hiện tại.",
+      "description": "Mỗi mẫu là tỷ lệ loại nét bút trong cửa sổ đó (theo từng khoảng, không tích lũy). Cửa sổ không có nét bút hiển thị 0% cho mọi loại."
     },
     "endurance": {
-      "timeIntoCycle": "Time into round",
-      "intoCycle": "{duration} into round",
-      "currentLeadWindow": "Current lead window",
-      "enduranceRecord": "Endurance record",
-      "enduranceChampionRecord": "Endurance champion record",
-      "chronoRecord": "Chrono-warrior record",
-      "leadHeldBy": "Lead held by",
-      "legendEndurance": "Endurance champion (longest single hold)",
-      "legendChrono": "Chrono-warrior (longest reign)",
-      "legendLead": "Lead held",
-      "legendNewRecord": "New record set",
-      "enduranceChampion": "Endurance Champion",
-      "enduranceChampionAbbr": "EC",
-      "chronoWarrior": "Chrono-Warrior",
-      "chronoWarriorAbbr": "CW",
-      "newRecord": "new record",
-      "roleEndurance": " (Endurance Champion)",
-      "roleNewRecord": " (new record)",
-      "stintAria": "{address} • held {duration} • {from} → {to} into round{role}",
-      "description": "Each bar is a lead stint — an address holding the lead from one gesture until the next gesture arrives. Bar width is how long they held the lead. Amber-outlined bars set a new endurance record at the time; the violet bar is the single longest hold of all (Endurance Champion); the rose lane held the title longest overall (Chrono-Warrior). Hover a bar for details.",
-      "selectCycle": "Select a round to inspect.",
-      "loadErrorTitle": "Failed to load endurance timeline",
-      "loadErrorMessage": "Could not fetch the gesture history for this round.",
-      "empty": "No lead activity in this round yet.",
-      "championSummary": "Endurance champion: {address} held {duration}",
-      "chronoSummary": "Chrono-warrior: {address} reigned {duration}",
+      "timeIntoCycle": "Thời gian trong chu kỳ",
+      "intoCycle": "{duration} trong chu kỳ",
+      "currentLeadWindow": "Khoảng dẫn đầu hiện tại",
+      "enduranceRecord": "Kỷ lục bền bỉ",
+      "enduranceChampionRecord": "Kỷ lục Quán quân Bền bỉ",
+      "chronoRecord": "Kỷ lục Chiến binh Thời gian",
+      "leadHeldBy": "Dẫn đầu bởi",
+      "legendEndurance": "Quán quân Bền bỉ (lần giữ đơn lẻ dài nhất)",
+      "legendChrono": "Chiến binh Thời gian (thời gian giữ vị trí dài nhất)",
+      "legendLead": "Đã dẫn đầu",
+      "legendNewRecord": "Lập kỷ lục mới",
+      "enduranceChampion": "Quán quân Bền bỉ",
+      "enduranceChampionAbbr": "QB",
+      "chronoWarrior": "Chiến binh Thời gian",
+      "chronoWarriorAbbr": "CT",
+      "newRecord": "kỷ lục mới",
+      "roleEndurance": " (Quán quân Bền bỉ)",
+      "roleNewRecord": " (kỷ lục mới)",
+      "stintAria": "{address} • đã giữ {duration} • {from} → {to} trong chu kỳ{role}",
+      "description": "Mỗi thanh là một đoạn dẫn đầu — một địa chỉ giữ vị trí dẫn đầu từ một nét bút đến khi nét bút kế tiếp xuất hiện. Độ rộng thanh là thời gian họ dẫn đầu. Thanh viền hổ phách lập kỷ lục bền bỉ mới tại thời điểm đó; thanh tím là lần giữ đơn lẻ dài nhất (Quán quân Bền bỉ); làn hồng giữ danh hiệu lâu nhất tổng thể (Chiến binh Thời gian). Di chuột lên thanh để xem chi tiết.",
+      "selectCycle": "Chọn một chu kỳ để xem.",
+      "loadErrorTitle": "Không tải được dòng thời gian bền bỉ",
+      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này.",
+      "empty": "Chưa có hoạt động dẫn đầu trong chu kỳ này.",
+      "championSummary": "Quán quân Bền bỉ: {address} đã giữ {duration}",
+      "chronoSummary": "Chiến binh Thời gian: {address} đã giữ vị trí {duration}",
       "gantt": "Gantt",
-      "lineChart": "Line chart",
-      "openWindowAria": "Open chart in a new window",
-      "openWindowTitle": "Open in new window"
+      "lineChart": "Biểu đồ đường",
+      "openWindowAria": "Mở biểu đồ trong cửa sổ mới",
+      "openWindowTitle": "Mở trong cửa sổ mới"
     },
     "cyclePicker": {
-      "cycle": "Round",
-      "previousCycleAria": "Previous round",
-      "nextCycleAria": "Next round",
-      "cycleNumberAria": "Round number",
-      "liveCycle": "Live round",
-      "jumpLive": "Jump to live"
+      "cycle": "Chu kỳ",
+      "previousCycleAria": "Chu kỳ trước",
+      "nextCycleAria": "Chu kỳ sau",
+      "cycleNumberAria": "Số chu kỳ",
+      "liveCycle": "Chu kỳ trực tiếp",
+      "jumpLive": "Đến chu kỳ trực tiếp"
     },
     "cstWindow": {
-      "timeIntoCycle": "Time into round",
-      "intoCycle": "{duration} into round",
-      "window": "CST Calibration Window",
-      "windowAfter": "Window after this gesture",
-      "typeEth": "ETH gesture (shortens)",
-      "typeRandomWalk": "ETH + RandomWalk gesture (shortens)",
-      "typeCst": "CST gesture (lengthens)",
-      "summaryMin": "Low: {duration}",
-      "summaryMax": "High: {duration}",
-      "summaryCurrent": "Now: {duration}",
-      "summaryFinal": "At finalization: {duration}",
-      "description": "The CST Calibration Window sets how long a CST gesture's cost takes to descend from its starting value to free. Every ETH gesture shortens the window slightly; every CST gesture lengthens it. Each dot is a gesture, colored by type; the line is the window in effect after it.",
-      "empty": "No per-gesture Calibration Window data for this round. Rounds indexed before the V2 events do not include it.",
-      "selectCycle": "Select a round to inspect.",
-      "loadErrorTitle": "Failed to load Calibration Window timeline",
-      "loadErrorMessage": "Could not fetch the gesture history for this round."
+      "timeIntoCycle": "Thời gian trong chu kỳ",
+      "intoCycle": "{duration} trong chu kỳ",
+      "window": "Cửa sổ hiệu chỉnh CST",
+      "windowAfter": "Cửa sổ sau nét bút này",
+      "typeEth": "Nét bút ETH (rút ngắn)",
+      "typeRandomWalk": "Nét bút ETH + RandomWalk (rút ngắn)",
+      "typeCst": "Nét bút CST (kéo dài)",
+      "summaryMin": "Thấp: {duration}",
+      "summaryMax": "Cao: {duration}",
+      "summaryCurrent": "Hiện tại: {duration}",
+      "summaryFinal": "Khi hoàn tất: {duration}",
+      "description": "Cửa sổ hiệu chỉnh CST quyết định chi phí một nét bút CST mất bao lâu để giảm từ giá khởi điểm về không. Mỗi nét bút ETH rút ngắn cửa sổ một chút; mỗi nét bút CST kéo dài nó. Mỗi chấm là một nét bút, tô màu theo loại; đường kẻ là cửa sổ có hiệu lực sau nét bút đó.",
+      "empty": "Không có dữ liệu cửa sổ hiệu chỉnh theo từng nét bút cho chu kỳ này. Các chu kỳ được lập chỉ mục trước các sự kiện V2 không có dữ liệu này.",
+      "selectCycle": "Chọn một chu kỳ để xem.",
+      "loadErrorTitle": "Không tải được dòng thời gian cửa sổ hiệu chỉnh",
+      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này."
     },
     "cstCost": {
-      "timeIntoCycle": "Time into round",
-      "intoCycle": "{duration} into round",
-      "priceLine": "CST paid per gesture",
-      "clockLine": "Clock remaining before gesture",
-      "cstPaid": "CST paid",
-      "clockBefore": "Clock remaining before",
-      "gestureBy": "Gesture by",
-      "clickHint": "Click the dot to open the transaction.",
-      "summaryMax": "Priciest: {amount} ({when} into round)",
-      "summaryTotal": "Total consumed: {amount}",
-      "summaryCount": "{count} CST gestures",
-      "description": "Each violet dot is the CST actually paid for a gesture (log scale — hollow dots were free). After every CST gesture the cost resets near twice the paid amount and descends to free across the Calibration Window. The dashed rose line shows the allocation clock remaining right before each gesture: when the clock runs low, rapid gesturing leaves the cost no time to descend, so paid prices escalate. Click a dot to open its transaction.",
-      "empty": "No CST gestures in this round.",
-      "selectCycle": "Select a round to inspect.",
-      "loadErrorTitle": "Failed to load CST gesture costs",
-      "loadErrorMessage": "Could not fetch the gesture history for this round."
+      "timeIntoCycle": "Thời gian trong chu kỳ",
+      "intoCycle": "{duration} trong chu kỳ",
+      "priceLine": "CST đã trả mỗi nét bút",
+      "clockLine": "Đồng hồ còn lại trước nét bút",
+      "cstPaid": "CST đã trả",
+      "clockBefore": "Đồng hồ còn lại trước đó",
+      "gestureBy": "Nét bút của",
+      "clickHint": "Nhấn vào chấm để mở giao dịch.",
+      "summaryMax": "Cao nhất: {amount} ({when} trong chu kỳ)",
+      "summaryTotal": "Tổng đã tiêu thụ: {amount}",
+      "summaryCount": "{count} nét bút CST",
+      "description": "Mỗi chấm tím là lượng CST thực trả cho một nét bút (thang log — chấm rỗng là không tốn chi phí). Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Đường hồng đứt nét là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang. Nhấn vào một chấm để mở giao dịch của nó.",
+      "empty": "Không có nét bút CST trong chu kỳ này.",
+      "selectCycle": "Chọn một chu kỳ để xem.",
+      "loadErrorTitle": "Không tải được chi phí nét bút CST",
+      "loadErrorMessage": "Không lấy được lịch sử nét bút của chu kỳ này."
     },
     "supply": {
-      "totalSupply": "Total supply",
-      "imprint": "Mint",
-      "consume": "Burn",
-      "net": "Net",
-      "numGestures": "Num gestures",
-      "from": "From",
-      "to": "To",
-      "update": "Update chart",
-      "invalidRange": "Start date must be on or before end date.",
-      "loadErrorTitle": "Failed to load supply history",
-      "loadDateError": "Could not fetch CST total supply for the selected range.",
-      "emptyDate": "No supply history for this date range.",
-      "gesture": "Gesture {number}",
-      "gestureType": "Gesture type",
-      "gestureInfoId": "Gesture info id",
-      "loadGestureError": "Could not fetch CST total supply by gesture.",
-      "emptyGesture": "No supply history by gesture."
+      "totalSupply": "Tổng cung",
+      "imprint": "Khắc",
+      "consume": "Đốt",
+      "net": "Ròng",
+      "numGestures": "Số nét bút",
+      "from": "Từ",
+      "to": "Đến",
+      "update": "Cập nhật biểu đồ",
+      "invalidRange": "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.",
+      "loadErrorTitle": "Không tải được lịch sử nguồn cung",
+      "loadDateError": "Không lấy được tổng cung CST cho khoảng đã chọn.",
+      "emptyDate": "Không có lịch sử nguồn cung cho khoảng ngày này.",
+      "gesture": "Nét bút {number}",
+      "gestureType": "Loại nét bút",
+      "gestureInfoId": "Mã thông tin nét bút",
+      "loadGestureError": "Không lấy được tổng cung CST theo nét bút.",
+      "emptyGesture": "Không có lịch sử nguồn cung theo nét bút."
     },
     "balance": {
-      "outreachWallet": "Marketing Wallet",
-      "others": "Others"
+      "outreachWallet": "Ví truyền thông",
+      "others": "Khác"
     }
   },
   "recipientHistory": {
-    "pageTitle": "My Allocation History",
-    "connectedTitle": "History of My Allocations",
-    "subtitle": "View your past allocation retrievals and distributions",
-    "disconnectedDescription": "Track your complete allocation history across all Cosmic Signature Performance Cycles. This includes Signature Allocation retrievals, ETH Stellar Selection distributions, Cosmic Signature NFT allocations, and Anchor Distributions.",
-    "connectedDescription": "Track your complete allocation history across all Cosmic Signature Performance Cycles. This includes Signature Allocation retrievals, Stellar Selection ETH allocations, Cosmic Signature NFT allocations, and Anchor Distributions.",
-    "walletTitle": "Wallet not connected",
-    "walletDescription": "Please connect your wallet to see your allocation history.",
-    "loadError": "Failed to load allocation history",
-    "loadErrorDescription": "Please try again in a moment.",
-    "emptyTitle": "No allocations yet",
-    "emptyDescription": "You currently have no recorded allocations."
+    "pageTitle": "Lịch sử phân bổ của tôi",
+    "connectedTitle": "Lịch sử phân bổ của tôi",
+    "subtitle": "Xem các lần nhận về phân bổ và phân phối trước đây của bạn",
+    "disconnectedDescription": "Theo dõi toàn bộ lịch sử phân bổ của bạn qua mọi chu kỳ trình diễn Cosmic Signature. Bao gồm các lần nhận về phân bổ Signature, phân phối ETH Tinh tuyển, phân bổ Cosmic Signature NFT và phân phối neo giữ.",
+    "connectedDescription": "Theo dõi toàn bộ lịch sử phân bổ của bạn qua mọi chu kỳ trình diễn Cosmic Signature. Bao gồm các lần nhận về phân bổ Signature, phân bổ ETH Tinh tuyển, phân bổ Cosmic Signature NFT và phân phối neo giữ.",
+    "walletTitle": "Chưa kết nối ví",
+    "walletDescription": "Vui lòng kết nối ví để xem lịch sử phân bổ của bạn.",
+    "loadError": "Không tải được lịch sử phân bổ",
+    "loadErrorDescription": "Vui lòng thử lại sau ít phút.",
+    "emptyTitle": "Chưa có phân bổ",
+    "emptyDescription": "Bạn hiện chưa có phân bổ nào được ghi nhận."
   },
   "namedNfts": {
-    "eyebrow": "Named NFTs · {count}",
-    "title": "Named Cosmic Signature NFTs",
-    "subtitle": "Browse Cosmic Signature NFTs that have been given custom names",
-    "description": "Cosmic Signature NFT owners can give their NFTs custom names, creating a unique identity within the collection. Named NFTs stand out in the gallery and carry the personal touch of their owners.",
-    "emptyTitle": "No named NFTs",
-    "emptyDescription": "No Cosmic Signature NFTs have been named yet."
+    "eyebrow": "NFT đã đặt tên · {count}",
+    "title": "Cosmic Signature NFT đã đặt tên",
+    "subtitle": "Duyệt các Cosmic Signature NFT đã được đặt tên tùy chỉnh",
+    "description": "Chủ sở hữu Cosmic Signature NFT có thể đặt tên tùy chỉnh cho NFT của mình, tạo nên một danh tính độc nhất trong bộ sưu tập. NFT đã đặt tên nổi bật trong phòng trưng bày và mang dấu ấn cá nhân của chủ sở hữu.",
+    "emptyTitle": "Không có NFT đã đặt tên",
+    "emptyDescription": "Chưa có Cosmic Signature NFT nào được đặt tên."
   },
   "attachedNfts": {
-    "eyebrow": "Attached NFTs · {count}",
-    "title": "Attached NFT Contributions",
-    "subtitle": "NFTs attached to gestures by community members across cycles",
-    "description": "Community members can attach their NFTs (ERC-721) to gestures using the advanced options. Attached NFTs forward to the participant who receives the Signature Allocation when the cycle finalizes, enriching the distribution beyond ETH."
+    "eyebrow": "NFT đính kèm · {count}",
+    "title": "Đóng góp NFT đính kèm",
+    "subtitle": "Các NFT thành viên cộng đồng đã đính kèm vào nét bút qua các chu kỳ",
+    "description": "Thành viên cộng đồng có thể đính kèm NFT (ERC-721) của mình vào nét bút bằng các tùy chọn nâng cao. NFT đính kèm được chuyển đến người tham gia nhận phân bổ Signature khi chu kỳ hoàn tất, làm giàu phần phân phối ngoài ETH."
   },
   "usedRwlkNfts": {
-    "eyebrow": "Used RWLK · {count}",
-    "title": "Used Random Walk NFTs",
-    "subtitle": "Random Walk NFTs attached to ETH gestures for the one-time 50% Gesture Cost reduction",
-    "description": "RandomWalk NFT holders can attach an unused NFT to an ETH gesture for a 50% Gesture Cost reduction in Cosmic Signature. Once used, a RandomWalk NFT is recorded here. Each NFT can only be used once for this discount, making the timing of its use a strategic decision.",
-    "loading": "Loading...",
-    "empty": "No NFTs yet."
+    "eyebrow": "RWLK đã sử dụng · {count}",
+    "title": "Random Walk NFT đã sử dụng",
+    "subtitle": "Các Random Walk NFT đã đính kèm vào nét bút ETH để giảm 50% chi phí nét bút một lần",
+    "description": "Người nắm giữ RandomWalk NFT có thể đính kèm một NFT chưa sử dụng vào nét bút ETH để giảm 50% chi phí nét bút trong Cosmic Signature. Sau khi sử dụng, RandomWalk NFT được ghi lại ở đây. Mỗi NFT chỉ dùng được một lần cho mức giảm giá này, nên thời điểm sử dụng là một quyết định chiến thuật.",
+    "loading": "Đang tải…",
+    "empty": "Chưa có NFT nào."
   },
   "stellarSelectionEth": {
-    "invalidAddress": "Invalid Address",
-    "user": "User",
-    "heading": "Stellar Selection ETH allocated to this participant",
-    "retrievable": "Your retrievable allocations are {amount} ETH",
-    "retrieveAll": "Retrieve All",
-    "empty": "No Stellar Selection ETH yet."
+    "invalidAddress": "Địa chỉ không hợp lệ",
+    "user": "Người dùng",
+    "heading": "ETH Tinh tuyển được phân bổ cho người tham gia này",
+    "retrievable": "Phân bổ bạn có thể nhận về là {amount} ETH",
+    "retrieveAll": "Nhận về tất cả",
+    "empty": "Chưa có ETH Tinh tuyển."
   },
   "stellarSelectionNft": {
-    "invalidAddress": "Invalid Address",
-    "user": "User",
-    "heading": "Stellar Selection NFTs allocated to this participant",
-    "loading": "Loading...",
-    "empty": "No NFT allocations yet.",
-    "isRandomWalk": "Is RandomWalk",
-    "isAnchorHolder": "Is Anchor-holder"
+    "invalidAddress": "Địa chỉ không hợp lệ",
+    "user": "Người dùng",
+    "heading": "NFT Tinh tuyển được phân bổ cho người tham gia này",
+    "loading": "Đang tải…",
+    "empty": "Chưa có phân bổ NFT.",
+    "isRandomWalk": "Là RandomWalk",
+    "isAnchorHolder": "Là người neo giữ"
   },
   "systemEvent": {
-    "titleBeforeCycle": "System Configuration Made Before Cycle {cycle}",
-    "titleBeforeDeployment": "System Configuration Made Before Deployment",
-    "range": "Event log range {start}–{end}",
+    "titleBeforeCycle": "Cấu hình hệ thống được thiết lập trước chu kỳ {cycle}",
+    "titleBeforeDeployment": "Cấu hình hệ thống được thiết lập trước khi triển khai",
+    "range": "Phạm vi nhật ký sự kiện {start}–{end}",
     "breadcrumbs": {
-      "home": "Home",
-      "coordination": "Coordination changes",
-      "beforeCycle": "Before cycle {cycle}",
-      "deployment": "Deployment"
+      "home": "Trang chủ",
+      "coordination": "Thay đổi điều phối",
+      "beforeCycle": "Trước chu kỳ {cycle}",
+      "deployment": "Triển khai"
     },
-    "loading": "Loading...",
-    "loadError": "Failed to load system events",
-    "explainEvent": "Explain {event}",
+    "loading": "Đang tải…",
+    "loadError": "Không tải được sự kiện hệ thống",
+    "explainEvent": "Giải thích {event}",
     "adminEvents": {
-      "undefined": "Undefined",
-      "publicGoodsPercentage": "The allocation percentage for the funds designated to the Public Goods Vault has been changed.",
-      "signatureAllocationPercentage": "The allocation percentage for funds designated for allocation rewards has been changed.",
-      "stellarSelectionPercentage": "The allocation percentage for funds designated for Stellar Selection distributions has been changed.",
-      "anchorDistributionPercentage": "The allocation percentage for funds designated for anchor distributions has been changed.",
-      "stellarEthRecipients": "The number of Stellar Selection recipients per cycle has been changed.",
-      "stellarNftRecipients": "The number of Stellar Selection NFT recipients per cycle has been changed.",
-      "cycleActivationDelay": "The delay duration time before cycle activation has been changed.",
-      "anchoredRandomWalkRecipients": "The number of Stellar Selection NFT recipients for anchored RandomWalk NFTs has been changed.",
-      "publicGoodsVaultAddress": "The address of the public goods vault has been changed.",
-      "randomWalkContractAddress": "The address of the RandomWalkNFT contract has been changed.",
-      "allocationsWalletAddress": "The address of the Allocations Wallet (allocation escrow) has been changed.",
-      "anchoringWalletAddress": "The address of the anchoring wallet has been changed.",
-      "randomWalkAnchoringWalletAddress": "The address of the RandomWalk NFT anchoring wallet has been changed.",
-      "outreachWalletAddress": "The address of the outreach wallet has been changed.",
-      "cstContractAddress": "The address of the Cosmic Signature CST Token (ERC-20) contract has been changed.",
-      "cosmicSignatureNftAddress": "The address of the Cosmic Signature NFT (ERC-721) contract has been changed.",
-      "contractUpgrade": "The CosmicSignature contract has been upgraded.",
-      "timeIncreaseRatio": "The ratio of the time increasement has been changed.",
-      "finalizationTimeout": "The timeout for finalizing allocation has been changed.",
-      "gestureCostIncreaseRatio": "The ratio of the gesture cost increasement has been changed.",
-      "gestureTimeIncrement": "The value for the increment of allocation time after every gesture has been changed.",
-      "initialFinalizationDivisor": "The divisor used to derive the initial Cycle Finalization Time (mainPrizeTimeIncrementInMicroSeconds / divisor) has been changed.",
-      "treasurerAddress": "The address of the outreach wallet has been changed.",
-      "activationTime": "The cycle activation time has been changed.",
-      "cstCalibrationLength": "The length of the starting CST Calibration Window has been changed.",
-      "erc20Multiplier": "The ERC20 reward multiplier has been changed.",
-      "minimumCstGestureCost": "The minimum limit for the starting gesture cost with CST has been changed.",
-      "outreachAllocationPercentage": "The allocation percentage for funds designated for outreach distributions has been changed.",
-      "tokenAllocationPercentage": "The allocation percentage for funds designated for token rewards has been changed.",
-      "maxMessageLength": "The max length of the gesture message has been changed.",
-      "tokenScriptUrl": "Token Generation Script URL has been changed.",
-      "nftBaseUri": "CosmicSignature NFT BaseURI has been changed.",
-      "contractInitialized": "Contract initialization completed",
-      "ownershipTransferred": "The ownership of the contract has been transferred.",
-      "allocationRetrievalTimeout": "The timeout duration to retrieve allocations has been changed.",
-      "ethCalibrationDurationDivisor": "The ETH Calibration Window duration has been changed.",
-      "ethCalibrationEndingCostDivisor": "The divisor for ETH Calibration Window ending gesture cost has been changed.",
-      "chronoWarriorEthPercentage": "The allocation percentage for funds designated for chrono warrior ETH allocations has been changed."
+      "undefined": "Không xác định",
+      "publicGoodsPercentage": "Tỷ lệ phân bổ cho khoản dành cho Kho Hàng hóa công đã được thay đổi.",
+      "signatureAllocationPercentage": "Tỷ lệ phân bổ cho khoản dành cho phân bổ Signature đã được thay đổi.",
+      "stellarSelectionPercentage": "Tỷ lệ phân bổ cho khoản dành cho phân phối Tinh tuyển đã được thay đổi.",
+      "anchorDistributionPercentage": "Tỷ lệ phân bổ cho khoản dành cho phân phối neo giữ đã được thay đổi.",
+      "stellarEthRecipients": "Số người nhận Tinh tuyển mỗi chu kỳ đã được thay đổi.",
+      "stellarNftRecipients": "Số người nhận NFT Tinh tuyển mỗi chu kỳ đã được thay đổi.",
+      "cycleActivationDelay": "Khoảng trễ trước khi kích hoạt chu kỳ đã được thay đổi.",
+      "anchoredRandomWalkRecipients": "Số người nhận NFT Tinh tuyển dành cho RandomWalk NFT đang neo giữ đã được thay đổi.",
+      "publicGoodsVaultAddress": "Địa chỉ của Kho Hàng hóa công đã được thay đổi.",
+      "randomWalkContractAddress": "Địa chỉ của hợp đồng RandomWalkNFT đã được thay đổi.",
+      "allocationsWalletAddress": "Địa chỉ của ví phân bổ (ký quỹ phân bổ) đã được thay đổi.",
+      "anchoringWalletAddress": "Địa chỉ của ví neo giữ đã được thay đổi.",
+      "randomWalkAnchoringWalletAddress": "Địa chỉ của ví neo giữ RandomWalk NFT đã được thay đổi.",
+      "outreachWalletAddress": "Địa chỉ của ví truyền thông đã được thay đổi.",
+      "cstContractAddress": "Địa chỉ của hợp đồng token CST của Cosmic Signature (ERC-20) đã được thay đổi.",
+      "cosmicSignatureNftAddress": "Địa chỉ của hợp đồng Cosmic Signature NFT (ERC-721) đã được thay đổi.",
+      "contractUpgrade": "Hợp đồng CosmicSignature đã được nâng cấp.",
+      "timeIncreaseRatio": "Tỷ lệ tăng thời gian đã được thay đổi.",
+      "finalizationTimeout": "Thời hạn hoàn tất phân bổ đã được thay đổi.",
+      "gestureCostIncreaseRatio": "Tỷ lệ tăng chi phí nét bút đã được thay đổi.",
+      "gestureTimeIncrement": "Giá trị cộng thêm vào thời gian phân bổ sau mỗi nét bút đã được thay đổi.",
+      "initialFinalizationDivisor": "Số chia dùng để suy ra thời điểm hoàn tất chu kỳ ban đầu (mainPrizeTimeIncrementInMicroSeconds / số chia) đã được thay đổi.",
+      "treasurerAddress": "Địa chỉ của ví truyền thông đã được thay đổi.",
+      "activationTime": "Thời điểm kích hoạt chu kỳ đã được thay đổi.",
+      "cstCalibrationLength": "Độ dài của cửa sổ hiệu chỉnh CST khởi đầu đã được thay đổi.",
+      "erc20Multiplier": "Hệ số nhân ERC20 đã được thay đổi.",
+      "minimumCstGestureCost": "Giới hạn tối thiểu cho chi phí nét bút khởi điểm bằng CST đã được thay đổi.",
+      "outreachAllocationPercentage": "Tỷ lệ phân bổ cho khoản dành cho phân phối truyền thông đã được thay đổi.",
+      "tokenAllocationPercentage": "Tỷ lệ phân bổ cho khoản dành cho phân bổ token đã được thay đổi.",
+      "maxMessageLength": "Độ dài tối đa của lời nhắn nét bút đã được thay đổi.",
+      "tokenScriptUrl": "URL của kịch bản tạo token đã được thay đổi.",
+      "nftBaseUri": "BaseURI của CosmicSignature NFT đã được thay đổi.",
+      "contractInitialized": "Đã hoàn thành khởi tạo hợp đồng",
+      "ownershipTransferred": "Quyền sở hữu hợp đồng đã được chuyển giao.",
+      "allocationRetrievalTimeout": "Thời hạn nhận về phân bổ đã được thay đổi.",
+      "ethCalibrationDurationDivisor": "Thời lượng cửa sổ hiệu chỉnh ETH đã được thay đổi.",
+      "ethCalibrationEndingCostDivisor": "Số chia cho chi phí nét bút cuối cửa sổ hiệu chỉnh ETH đã được thay đổi.",
+      "chronoWarriorEthPercentage": "Tỷ lệ phân bổ cho khoản dành cho phân bổ ETH Chiến binh Thời gian đã được thay đổi."
     }
   },
   "attachedNftCard": {
-    "viewNamed": "View attached NFT {name}",
-    "viewId": "View attached NFT {id}",
-    "imageAltNamed": "Attached NFT {name}",
-    "imageAlt": "Attached NFT",
-    "unknownToken": "Unknown token",
-    "attached": "Attached"
+    "viewNamed": "Xem NFT đính kèm {name}",
+    "viewId": "Xem NFT đính kèm {id}",
+    "imageAltNamed": "NFT đính kèm {name}",
+    "imageAlt": "NFT đính kèm",
+    "unknownToken": "Token không xác định",
+    "attached": "Đã đính kèm"
   },
   "attachedNftLinks": {
-    "viewNft": "View NFT",
-    "viewOpenSea": "View on OpenSea",
-    "viewContract": "View contract",
-    "detailsUnavailable": "NFT details unavailable",
-    "contractUnavailable": "Contract unavailable"
+    "viewNft": "Xem NFT",
+    "viewOpenSea": "Xem trên OpenSea",
+    "viewContract": "Xem hợp đồng",
+    "detailsUnavailable": "Chi tiết NFT không khả dụng",
+    "contractUnavailable": "Hợp đồng không khả dụng"
   },
   "publicDataSummaries": {
     "common": {
-      "lastUpdated": "Last updated: {date}. Data source: {source}. The interactive tables below hydrate with live app data, while this summary is present in the initial HTML for search engines and AI crawlers.",
-      "relatedPagesAria": "{heading} related pages",
-      "unavailable": "Unavailable"
+      "lastUpdated": "Cập nhật lần cuối: {date}. Nguồn dữ liệu: {source}. Các bảng tương tác bên dưới sẽ nạp dữ liệu trực tiếp từ ứng dụng, còn bản tóm tắt này có sẵn trong HTML ban đầu cho công cụ tìm kiếm và trình thu thập dữ liệu AI.",
+      "relatedPagesAria": "Các trang liên quan đến {heading}",
+      "unavailable": "Không khả dụng"
     },
     "attachedNfts": {
-      "eyebrow": "Attached NFT contributions · Arbitrum",
-      "heading": "Attached NFT Contributions",
-      "description": "Browse NFTs attached to Cosmic Signature gestures. Attached ERC-721 tokens forward to the participant who receives the Signature Allocation when a cycle finalizes.",
-      "source": "Cosmic Signature public attached NFT APIs",
+      "eyebrow": "Đóng góp NFT đính kèm · Arbitrum",
+      "heading": "Đóng góp NFT đính kèm",
+      "description": "Duyệt các NFT đính kèm vào nét bút Cosmic Signature. Token ERC-721 đính kèm được chuyển đến người tham gia nhận phân bổ Signature khi chu kỳ hoàn tất.",
+      "source": "Các API NFT đính kèm công khai của Cosmic Signature",
       "cards": {
-        "records": "Attached NFT Records",
-        "contracts": "Unique NFT Contracts",
-        "contributors": "Contributor Wallets"
+        "records": "Bản ghi NFT đính kèm",
+        "contracts": "Hợp đồng NFT riêng biệt",
+        "contributors": "Ví người đóng góp"
       },
       "links": {
-        "gallery": "Explore Cosmic Signature gallery",
-        "cycle": "View the current Performance Cycle",
-        "learn": "Learn how attachments fit the cycle"
+        "gallery": "Khám phá phòng trưng bày Cosmic Signature",
+        "cycle": "Xem chu kỳ trình diễn hiện tại",
+        "learn": "Tìm hiểu vai trò của đính kèm trong chu kỳ"
       }
     },
     "namedNfts": {
-      "eyebrow": "Named NFTs · Arbitrum",
-      "heading": "Named Cosmic Signature NFTs",
-      "description": "Browse Cosmic Signature NFTs that owners have given custom names, connecting token identity, gallery discovery, and on-chain collection history.",
-      "source": "Cosmic Signature public token APIs",
+      "eyebrow": "NFT đã đặt tên · Arbitrum",
+      "heading": "Cosmic Signature NFT đã đặt tên",
+      "description": "Duyệt các Cosmic Signature NFT được chủ sở hữu đặt tên tùy chỉnh, kết nối danh tính token, khám phá phòng trưng bày và lịch sử bộ sưu tập trên chuỗi.",
+      "source": "Các API token công khai của Cosmic Signature",
       "cards": {
-        "named": "Named Cosmic Signature NFTs",
-        "owners": "Current Owners",
-        "collection": "Collection"
+        "named": "Cosmic Signature NFT đã đặt tên",
+        "owners": "Chủ sở hữu hiện tại",
+        "collection": "Bộ sưu tập"
       },
       "links": {
-        "gallery": "Explore the full gallery",
-        "learn": "Learn about the art",
-        "code": "Review rendering source code"
+        "gallery": "Khám phá toàn bộ phòng trưng bày",
+        "learn": "Tìm hiểu về nghệ thuật",
+        "code": "Xem mã nguồn kết xuất"
       }
     },
     "usedRwlkNfts": {
-      "eyebrow": "RandomWalk NFT usage · Arbitrum",
-      "heading": "Used RandomWalk NFTs",
-      "description": "Review RandomWalk NFTs that have already been attached to ETH gestures for their one-time Gesture Cost reduction.",
-      "source": "Cosmic Signature public RandomWalk usage APIs",
+      "eyebrow": "Sử dụng RandomWalk NFT · Arbitrum",
+      "heading": "RandomWalk NFT đã sử dụng",
+      "description": "Xem các RandomWalk NFT đã được đính kèm vào nét bút ETH để hưởng mức giảm chi phí nét bút một lần.",
+      "source": "Các API sử dụng RandomWalk công khai của Cosmic Signature",
       "cards": {
-        "used": "Used RandomWalk NFTs",
-        "discount": "One-Time Discount",
-        "scope": "Usage Scope",
-        "scopeValue": "One gesture per NFT"
+        "used": "RandomWalk NFT đã sử dụng",
+        "discount": "Giảm giá một lần",
+        "scope": "Phạm vi sử dụng",
+        "scopeValue": "Một nét bút mỗi NFT"
       },
       "links": {
-        "imprint": "Imprint RandomWalk NFTs",
-        "learn": "Learn how gestures work",
-        "cycle": "View current cycle data"
+        "imprint": "Khắc RandomWalk NFT",
+        "learn": "Tìm hiểu cách nét bút vận hành",
+        "cycle": "Xem dữ liệu chu kỳ hiện tại"
       }
     }
   },
   "routeError": {
-    "title": "Statistics failed to load",
-    "message": "Something went wrong while rendering this statistics page. Try again, or come back in a moment."
+    "title": "Không tải được thống kê",
+    "message": "Đã xảy ra lỗi khi hiển thị trang thống kê này. Hãy thử lại, hoặc quay lại sau ít phút."
   }
 }

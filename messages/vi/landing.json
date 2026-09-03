@@ -1,66 +1,66 @@
 {
   "timer": {
     "cycle": {
-      "current": "the current cycle",
-      "numbered": "Cycle #{number}",
-      "generic": "Performance Cycle"
+      "current": "chu kỳ hiện tại",
+      "numbered": "Chu kỳ #{number}",
+      "generic": "Chu kỳ trình diễn"
     },
     "phases": {
       "loading": {
-        "title": "Synchronizing the cycle horizon",
-        "body": "Reading the live protocol clock before the countdown appears."
+        "title": "Đang đồng bộ chân trời chu kỳ",
+        "body": "Đang đọc đồng hồ giao thức trực tiếp trước khi hiển thị đếm ngược."
       },
       "openingSoon": {
-        "title": "{cycle} opens soon",
-        "body": "The next cycle is preparing to open. When this countdown reaches zero, Gestures become available."
+        "title": "{cycle} sắp mở",
+        "body": "Chu kỳ tiếp theo đang chuẩn bị mở. Khi đếm ngược về không, nét bút sẽ sẵn sàng."
       },
       "waitingFirstGesture": {
-        "title": "{cycle} is waiting for its first Gesture",
-        "body": "The first Gesture ignites the Cycle Finalization Time and starts shaping the next Signature."
+        "title": "{cycle} đang chờ nét bút đầu tiên",
+        "body": "Nét bút đầu tiên khởi động thời điểm hoàn tất chu kỳ và bắt đầu định hình Signature tiếp theo."
       },
       "approach": {
-        "title": "{cycle} finalizes in",
-        "body": "The cycle is live. Each Gesture shapes the Signature and can extend the finalization clock."
+        "title": "{cycle} hoàn tất sau",
+        "body": "Chu kỳ đang diễn ra. Mỗi nét bút định hình Signature và có thể kéo dài đồng hồ hoàn tất."
       },
       "finalHour": {
-        "title": "{cycle} is entering the final hour",
-        "body": "Every new Gesture can extend the horizon and leave one more trace on the evolving Signature."
+        "title": "{cycle} đang bước vào giờ cuối",
+        "body": "Mỗi nét bút mới có thể kéo dài chân trời và để lại thêm một dấu vết trên Signature đang biến chuyển."
       },
       "nearHorizon": {
-        "title": "{cycle} is near the horizon",
-        "body": "The Cycle Finalization Time is almost here. The next moments decide the final shape."
+        "title": "{cycle} đang tiến gần chân trời",
+        "body": "Thời điểm hoàn tất chu kỳ đã cận kề. Những khoảnh khắc tiếp theo sẽ quyết định hình dạng cuối cùng."
       },
       "ready": {
-        "title": "{cycle} is ready to finalize",
-        "body": "The horizon has closed. The protocol is ready to transform the cycle into a final Signature."
+        "title": "{cycle} đã sẵn sàng hoàn tất",
+        "body": "Chân trời đã khép lại. Giao thức sẵn sàng chuyển chu kỳ thành một Signature cuối cùng."
       },
       "unavailable": {
-        "title": "Live cycle clock unavailable",
-        "body": "The landing page could not reach the protocol clock. Open the app for the latest cycle state."
+        "title": "Đồng hồ chu kỳ trực tiếp không khả dụng",
+        "body": "Trang giới thiệu không kết nối được với đồng hồ giao thức. Hãy mở ứng dụng để xem trạng thái chu kỳ mới nhất."
       },
       "live": {
-        "title": "{cycle} finalizes in",
-        "body": "This is the same live Cycle Finalization Time shown in the app. Each Gesture shapes the Signature and can extend the horizon."
+        "title": "{cycle} hoàn tất sau",
+        "body": "Đây chính là thời điểm hoàn tất chu kỳ trực tiếp được hiển thị trong ứng dụng. Mỗi nét bút định hình Signature và có thể kéo dài chân trời."
       }
     },
     "staticClock": {
-      "waitingFirstGesture": "Awaiting first Gesture",
+      "waitingFirstGesture": "Đang chờ nét bút đầu tiên",
       "ready": "00:00",
-      "unavailable": "Clock unavailable",
-      "syncing": "Syncing"
+      "unavailable": "Đồng hồ không khả dụng",
+      "syncing": "Đang đồng bộ"
     },
-    "liveClock": "Live cycle clock",
-    "gestureCount": "{count, plural, one {# Gesture} other {# Gestures}}",
-    "sameClock": "Same clock as the app",
+    "liveClock": "Đồng hồ chu kỳ trực tiếp",
+    "gestureCount": "{count, plural, other {# nét bút}}",
+    "sameClock": "Cùng đồng hồ với ứng dụng",
     "status": {
-      "ready": "Ready to finalize",
-      "openingSoon": "Countdown to cycle opening",
-      "waitingFirstGesture": "Open and waiting for the first Gesture",
-      "synchronized": "Countdown synchronized to protocol time"
+      "ready": "Sẵn sàng hoàn tất",
+      "openingSoon": "Đếm ngược đến lúc mở chu kỳ",
+      "waitingFirstGesture": "Đã mở và đang chờ nét bút đầu tiên",
+      "synchronized": "Đếm ngược đồng bộ với thời gian giao thức"
     },
-    "openLiveCycle": "Open live cycle",
-    "viewCstPool": "CST pool on GeckoTerminal",
-    "eventHorizon": "Event horizon",
+    "openLiveCycle": "Mở chu kỳ trực tiếp",
+    "viewCstPool": "Pool CST trên GeckoTerminal",
+    "eventHorizon": "Chân trời sự kiện",
     "countdownAria": "{label}: {duration}",
     "durationPart": "{value} {unit}",
     "durationSeparator": ", "

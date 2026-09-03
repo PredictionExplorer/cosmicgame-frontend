@@ -1,74 +1,74 @@
 {
   "invalid": {
-    "title": "Invalid Gesture Id",
-    "help": "Use a non-negative numeric gesture identifier in the URL."
+    "title": "Mã nét bút không hợp lệ",
+    "help": "Hãy dùng một mã định danh nét bút dạng số không âm trong URL."
   },
   "header": {
-    "title": "Gesture details",
-    "loadingSubtitle": "Loading gesture data…",
-    "positionLabel": "Gesture Position #{position}",
-    "positionFallback": "Gesture Position"
+    "title": "Chi tiết nét bút",
+    "loadingSubtitle": "Đang tải dữ liệu nét bút…",
+    "positionLabel": "Vị trí nét bút #{position}",
+    "positionFallback": "Vị trí nét bút"
   },
   "empty": {
-    "title": "No gesture information found.",
-    "help": "This ID may be invalid or the gesture is not in the current index."
+    "title": "Không tìm thấy thông tin nét bút.",
+    "help": "Mã này có thể không hợp lệ hoặc nét bút chưa có trong chỉ mục hiện tại."
   },
   "sections": {
     "transaction": {
-      "title": "Transaction and cycle",
-      "description": "When the gesture was made and which cycle it belongs to."
+      "title": "Giao dịch và chu kỳ",
+      "description": "Nét bút được đặt khi nào và thuộc chu kỳ nào."
     },
     "cost": {
-      "title": "Cost and Participation CST",
-      "description": "What was paid and the Participation CST imprinted by this gesture."
+      "title": "Chi phí và CST tham gia",
+      "description": "Số tiền đã trả và CST tham gia được khắc bởi nét bút này."
     },
     "type": {
-      "title": "Gesture type",
-      "description": "Whether a Random Walk NFT or CST was used for this gesture."
+      "title": "Loại nét bút",
+      "description": "Nét bút này có dùng Random Walk NFT hay CST hay không."
     },
     "erc20": {
-      "title": "Attached ERC-20",
-      "description": "Optional ERC-20 token attached to this gesture."
+      "title": "ERC-20 đính kèm",
+      "description": "Token ERC-20 tùy chọn được đính kèm vào nét bút này."
     },
     "nft": {
-      "title": "Attached NFT",
-      "description": "Metadata for the NFT attached to this gesture, when present."
+      "title": "NFT đính kèm",
+      "description": "Siêu dữ liệu của NFT được đính kèm vào nét bút này, nếu có."
     },
     "message": {
-      "title": "Message",
-      "description": "Message left by the participant with this gesture."
+      "title": "Lời nhắn",
+      "description": "Lời nhắn mà người tham gia để lại cùng nét bút này."
     }
   },
   "rows": {
-    "datetime": "Gesture datetime",
-    "datetimeHelp": "Opens the transaction on the block explorer",
-    "participantAddress": "Participant address",
-    "cycleNumber": "Cycle number",
-    "cycleValue": "Cycle {round}",
-    "gestureCost": "Gesture cost",
-    "participationCst": "Participation CST",
-    "attachedRandomWalk": "Attached RandomWalk NFT to ETH gesture:",
-    "paidWithCst": "Paid with CST (ERC-20):",
-    "randomWalkId": "RandomWalkNFT ID:",
-    "erc20Address": "Attached ERC-20 Token Address:",
-    "erc20Amount": "Attached ERC-20 Token Amount (ETH):",
-    "nftAddress": "Attached NFT Token Address:",
-    "nftId": "Attached NFT Token ID:",
-    "nftTokenUri": "NFT Token URI:"
+    "datetime": "Thời điểm nét bút",
+    "datetimeHelp": "Mở giao dịch trên trình khám phá khối",
+    "participantAddress": "Địa chỉ người tham gia",
+    "cycleNumber": "Số chu kỳ",
+    "cycleValue": "Chu kỳ {round}",
+    "gestureCost": "Chi phí nét bút",
+    "participationCst": "CST tham gia",
+    "attachedRandomWalk": "RandomWalk NFT đính kèm vào nét bút ETH:",
+    "paidWithCst": "Thanh toán bằng CST (ERC-20):",
+    "randomWalkId": "Mã RandomWalkNFT:",
+    "erc20Address": "Địa chỉ token ERC-20 đính kèm:",
+    "erc20Amount": "Số lượng token ERC-20 đính kèm (ETH):",
+    "nftAddress": "Địa chỉ token NFT đính kèm:",
+    "nftId": "Mã token NFT đính kèm:",
+    "nftTokenUri": "URI token NFT:"
   },
   "values": {
-    "yes": "Yes",
-    "no": "No"
+    "yes": "Có",
+    "no": "Không"
   },
   "nftPreview": {
-    "heading": "Preview and metadata",
-    "collectionName": "Collection name",
-    "artist": "Artist",
-    "platform": "Platform",
-    "description": "Description"
+    "heading": "Xem trước và siêu dữ liệu",
+    "collectionName": "Tên bộ sưu tập",
+    "artist": "Nghệ sĩ",
+    "platform": "Nền tảng",
+    "description": "Mô tả"
   },
   "randomWalk": {
-    "previewAria": "Random Walk NFT preview",
+    "previewAria": "Xem trước Random Walk NFT",
     "heading": "Random Walk NFT"
   }
 }

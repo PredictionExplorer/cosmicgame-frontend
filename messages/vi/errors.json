@@ -1,57 +1,57 @@
 {
-  "generic": "Something went off the star map. Please try again.",
-  "networkOffline": "No network. Reconnect to continue.",
-  "walletNotConnected": "Connect a Web3 wallet to make a gesture.",
-  "insufficientEth": "Not enough ETH in your wallet for this gesture.",
-  "cycleClosed": "This cycle has closed. The next Performance Cycle opens soon.",
+  "generic": "Có gì đó đã lệch khỏi bản đồ sao. Vui lòng thử lại.",
+  "networkOffline": "Không có mạng. Kết nối lại để tiếp tục.",
+  "walletNotConnected": "Kết nối ví Web3 để đặt nét bút.",
+  "insufficientEth": "Ví không đủ ETH cho nét bút này.",
+  "cycleClosed": "Chu kỳ này đã đóng. Chu kỳ trình diễn tiếp theo sẽ sớm mở.",
   "state": {
-    "title": "Something went wrong",
-    "retry": "Try again"
+    "title": "Đã xảy ra lỗi",
+    "retry": "Thử lại"
   },
   "boundary": {
-    "title": "Something went wrong",
-    "description": "An unexpected error occurred.",
-    "retry": "Try Again"
+    "title": "Đã xảy ra lỗi",
+    "description": "Một lỗi không mong đợi đã xảy ra.",
+    "retry": "Thử lại"
   },
   "route": {
-    "message": "Something went wrong while rendering this page. Try again, or come back in a moment.",
+    "message": "Đã xảy ra lỗi khi hiển thị trang này. Hãy thử lại, hoặc quay lại sau ít phút.",
     "titles": {
-      "app": "This page failed to load",
-      "allocation": "Allocation details failed to load",
-      "anchoring": "Anchor distributions failed to load",
-      "gallery": "The gallery failed to load",
-      "myAllocations": "Your allocations failed to load",
-      "myAnchors": "Your anchors failed to load",
-      "myTokens": "Your tokens failed to load",
-      "myStatistics": "Your statistics failed to load"
+      "app": "Không tải được trang này",
+      "allocation": "Không tải được chi tiết phân bổ",
+      "anchoring": "Không tải được phân phối neo giữ",
+      "gallery": "Không tải được phòng trưng bày",
+      "myAllocations": "Không tải được phân bổ của bạn",
+      "myAnchors": "Không tải được neo giữ của bạn",
+      "myTokens": "Không tải được token của bạn",
+      "myStatistics": "Không tải được thống kê của bạn"
     }
   },
   "global": {
-    "title": "The app hit an unexpected error",
-    "message": "Something went wrong outside the page content. Reloading usually clears it.",
-    "retry": "Reload"
+    "title": "Ứng dụng gặp lỗi không mong đợi",
+    "message": "Đã xảy ra lỗi bên ngoài nội dung trang. Tải lại thường sẽ khắc phục được.",
+    "retry": "Tải lại"
   },
   "environment": {
-    "title": "Can't run because environment variables aren't set.",
-    "description": "We can't assume any defaults for networks or API URLs — that is prone to bugs.",
-    "missing": "Missing or invalid:",
-    "resolution": "Set them in your shell or in a .env file, then restart the dev server."
+    "title": "Không thể chạy vì các biến môi trường chưa được thiết lập.",
+    "description": "Chúng tôi không thể giả định giá trị mặc định cho mạng hay URL API — cách đó dễ sinh lỗi.",
+    "missing": "Thiếu hoặc không hợp lệ:",
+    "resolution": "Hãy thiết lập chúng trong shell hoặc trong tệp .env, rồi khởi động lại máy chủ phát triển."
   },
-  "apiFailure": "The service did not respond. Try again in a moment.",
-  "unexpected": "Unexpected error. Please try again.",
+  "apiFailure": "Dịch vụ không phản hồi. Hãy thử lại sau ít phút.",
+  "unexpected": "Lỗi không mong đợi. Vui lòng thử lại.",
   "notFound": {
-    "title": "404 — Page Not Found",
-    "description": "The page you’re looking for doesn’t exist or may have been moved. Cosmic Signature is a procedural on-chain art protocol on Arbitrum — explore the links below to find what you need.",
-    "returnHome": "Return Home",
-    "suggestedPages": "Suggested pages",
-    "popularPages": "Popular pages",
+    "title": "404 — Không tìm thấy trang",
+    "description": "Trang bạn tìm không tồn tại hoặc có thể đã được chuyển đi. Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum — hãy khám phá các liên kết bên dưới để tìm điều bạn cần.",
+    "returnHome": "Về trang chủ",
+    "suggestedPages": "Trang gợi ý",
+    "popularPages": "Trang phổ biến",
     "links": {
-      "home": "Home — Active Cycle",
-      "gallery": "NFT Gallery",
-      "howItWorks": "How It Works",
-      "faq": "FAQ",
-      "statistics": "Statistics",
-      "anchoring": "Anchor Distributions"
+      "home": "Trang chủ — Chu kỳ đang diễn ra",
+      "gallery": "Phòng trưng bày NFT",
+      "howItWorks": "Cách hoạt động",
+      "faq": "Câu hỏi thường gặp",
+      "statistics": "Thống kê",
+      "anchoring": "Phân phối neo giữ"
     }
   }
 }

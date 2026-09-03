@@ -1,91 +1,91 @@
 {
-  "loadingAria": "Loading marketing rewards",
+  "loadingAria": "Đang tải phân bổ truyền thông",
   "hero": {
-    "title": "E<legacy>arn</legacy> Rewards by <highlight>Spreading the Word</highlight>",
-    "description": "Promote Cosmic Signature and receive CST distributions for every verified outreach activity.",
-    "learnHow": "Learn How"
+    "title": "Nhận phân bổ CST khi <highlight>lan tỏa câu chuyện</highlight>",
+    "description": "Giới thiệu Cosmic Signature và nhận phân phối CST cho mỗi hoạt động truyền thông đã được xác minh.",
+    "learnHow": "Tìm hiểu cách thức"
   },
   "stats": {
-    "heading": "Outreach Program Statistics",
-    "infoAria": "Info about {label}",
+    "heading": "Thống kê chương trình truyền thông",
+    "infoAria": "Thông tin về {label}",
     "valueAria": "{label}: {value}{suffix}",
     "totalAllocations": {
-      "label": "Total Allocations",
-      "tooltip": "Total CST tokens forwarded to all outreach contributors since launch"
+      "label": "Tổng phân bổ",
+      "tooltip": "Tổng số token CST đã chuyển cho mọi người đóng góp truyền thông kể từ khi ra mắt"
     },
     "activeContributors": {
-      "label": "Active Outreach Contributors",
-      "tooltip": "Number of unique wallet addresses that have received outreach allocations"
+      "label": "Người đóng góp truyền thông đang hoạt động",
+      "tooltip": "Số địa chỉ ví riêng biệt đã nhận phân bổ truyền thông"
     },
     "transactions": {
-      "label": "Allocation Transactions",
-      "tooltip": "Total number of individual allocation payouts processed"
+      "label": "Giao dịch phân bổ",
+      "tooltip": "Tổng số lần chi trả phân bổ riêng lẻ đã được xử lý"
     }
   },
   "howItWorks": {
-    "title": "How It Works",
-    "infoAria": "Info about how it works",
-    "tooltip": "Three simple steps to start receiving outreach distributions with Cosmic Signature",
-    "stepInfoAria": "More info about {title}",
+    "title": "Cách tham gia",
+    "infoAria": "Thông tin về cách tham gia",
+    "tooltip": "Ba bước đơn giản để bắt đầu nhận phân phối truyền thông cùng Cosmic Signature",
+    "stepInfoAria": "Thông tin thêm về {title}",
     "steps": {
       "promote": {
-        "title": "Promote",
-        "description": "Share Cosmic Signature across social media, blogs, and communities.",
-        "tooltip": "Create content, share referral links, write blog posts, or produce videos about Cosmic Signature to qualify."
+        "title": "Giới thiệu",
+        "description": "Chia sẻ Cosmic Signature trên mạng xã hội, blog và các cộng đồng.",
+        "tooltip": "Tạo nội dung, chia sẻ liên kết giới thiệu, viết bài blog hoặc làm video về Cosmic Signature để đủ điều kiện."
       },
       "verify": {
-        "title": "Get Verified",
-        "description": "Our team reviews and verifies your promotional activity.",
-        "tooltip": "The marketing team evaluates reach, quality, and authenticity of your promotional efforts before approving rewards."
+        "title": "Được xác minh",
+        "description": "Đội ngũ xem xét và xác minh hoạt động giới thiệu của bạn.",
+        "tooltip": "Đội ngũ truyền thông đánh giá độ lan tỏa, chất lượng và tính xác thực của hoạt động giới thiệu trước khi duyệt phân bổ."
       },
       "receive": {
-        "title": "Receive CST",
-        "description": "Receive CST token allocations directly to your wallet.",
-        "tooltip": "Once verified, CST tokens are sent on-chain to your wallet address. Allocations scale with the impact of your outreach."
+        "title": "Nhận CST",
+        "description": "Nhận phân bổ token CST trực tiếp vào ví của bạn.",
+        "tooltip": "Sau khi được xác minh, token CST được gửi trên chuỗi đến địa chỉ ví của bạn. Mức phân bổ tăng theo tác động của hoạt động truyền thông."
       }
     }
   },
   "leaderboard": {
-    "title": "Top Marketers",
-    "infoAria": "Info about top marketers",
-    "tooltip": "Rankings based on total CST earned from marketing activities",
-    "empty": "No marketers yet.",
-    "rewardCountOne": "{count} reward",
-    "rewardCountOther": "{count} rewards"
+    "title": "Người truyền thông hàng đầu",
+    "infoAria": "Thông tin về người truyền thông hàng đầu",
+    "tooltip": "Xếp hạng theo tổng CST đã nhận từ các hoạt động truyền thông",
+    "empty": "Chưa có người truyền thông nào.",
+    "rewardCountOne": "{count} lần phân bổ",
+    "rewardCountOther": "{count} lần phân bổ"
   },
   "history": {
-    "title": "Reward History",
-    "infoAria": "Info about reward history",
-    "tooltip": "Complete chronological log of all marketing reward distributions",
-    "showingOne": "Showing <strong>{count}</strong> reward",
-    "showingOther": "Showing <strong>{count}</strong> rewards",
-    "emptyTitle": "No rewards distributed yet",
-    "emptyDescription": "Rewards will appear here once marketing activities are verified and paid out."
+    "title": "Lịch sử phân bổ",
+    "infoAria": "Thông tin về lịch sử phân bổ",
+    "tooltip": "Nhật ký đầy đủ theo thời gian của mọi lần phân phối truyền thông",
+    "showingOne": "Đang hiển thị <strong>{count}</strong> lần phân bổ",
+    "showingOther": "Đang hiển thị <strong>{count}</strong> lần phân bổ",
+    "emptyTitle": "Chưa có phân bổ nào được phân phối",
+    "emptyDescription": "Các phân bổ sẽ xuất hiện ở đây khi hoạt động truyền thông được xác minh và chi trả."
   },
   "cta": {
-    "title": "Ready to Contribute?",
-    "description": "Join our outreach program and receive CST distributions for promoting Cosmic Signature to the world.",
-    "contact": "Contact Marketing Team",
-    "contactTooltip": "Reach out to discuss promotional opportunities and reward structures",
-    "infoAria": "Info about contacting the marketing team",
-    "infoTooltip": "Our team will help you get started with promotional materials and discuss reward tiers"
+    "title": "Sẵn sàng đóng góp?",
+    "description": "Tham gia chương trình truyền thông và nhận phân phối CST khi giới thiệu Cosmic Signature đến thế giới.",
+    "contact": "Liên hệ đội ngũ truyền thông",
+    "contactTooltip": "Liên hệ để trao đổi về cơ hội giới thiệu và cấu trúc phân bổ",
+    "infoAria": "Thông tin về việc liên hệ đội ngũ truyền thông",
+    "infoTooltip": "Đội ngũ sẽ giúp bạn bắt đầu với tài liệu giới thiệu và trao đổi về các mức phân bổ"
   },
   "address": {
-    "invalid": "Invalid Ethereum Address",
-    "heading": "Marketing Rewards for User",
-    "loading": "Loading...",
-    "outreachWallet": "Marketing Wallet"
+    "invalid": "Địa chỉ Ethereum không hợp lệ",
+    "heading": "Phân bổ truyền thông của người dùng",
+    "loading": "Đang tải…",
+    "outreachWallet": "Ví truyền thông"
   },
   "transferForm": {
-    "title": "Pay CST Reward",
-    "description": "Calls the outreach reserve contract's `payReward` function. The connected wallet must be the current treasurer.",
-    "reserveLabel": "Outreach reserve",
-    "availableLabel": "Available CST",
-    "ownerLabel": "Owner",
-    "treasurerLabel": "Treasurer",
-    "unavailable": "Unavailable",
-    "recipientLabel": "Recipient address",
-    "amountLabel": "Amount",
-    "historyLink": "View outreach reserve transfers"
+    "title": "Chi CST phân bổ",
+    "description": "Gọi hàm `payReward` của hợp đồng Dự trữ truyền thông. Ví đang kết nối phải là thủ quỹ hiện tại.",
+    "reserveLabel": "Dự trữ truyền thông",
+    "availableLabel": "CST khả dụng",
+    "ownerLabel": "Chủ sở hữu",
+    "treasurerLabel": "Thủ quỹ",
+    "unavailable": "Không khả dụng",
+    "recipientLabel": "Địa chỉ người nhận",
+    "amountLabel": "Số lượng",
+    "historyLink": "Xem các lần chuyển của Dự trữ truyền thông"
   }
 }

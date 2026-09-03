@@ -1,298 +1,298 @@
 {
   "error": {
-    "title": "Live cycle data unavailable",
-    "message": "We couldn't reach the protocol data service, so the current cycle can't be shown. Try again in a moment."
+    "title": "Dữ liệu chu kỳ trực tiếp không khả dụng",
+    "message": "Không kết nối được với dịch vụ dữ liệu giao thức, nên chưa thể hiển thị chu kỳ hiện tại. Hãy thử lại sau ít phút."
   },
   "hero": {
-    "cycleFallback": "The cycle",
-    "cycleNumber": "Cycle #{number}",
+    "cycleFallback": "Chu kỳ",
+    "cycleNumber": "Chu kỳ #{number}",
     "phase": {
       "openingSoon": {
-        "badge": "Opening soon",
-        "headline": "Next Cycle Opens Soon",
-        "body": "{cycleLabel} is preparing to open. The countdown below shows exactly when Gestures become available.",
-        "cta": "View Cycle Details"
+        "badge": "Sắp mở",
+        "headline": "Chu kỳ tiếp theo sắp mở",
+        "body": "{cycleLabel} đang chuẩn bị mở. Đếm ngược bên dưới cho biết chính xác khi nào nét bút sẵn sàng.",
+        "cta": "Xem chi tiết chu kỳ"
       },
       "waitingFirstGesture": {
-        "badge": "Open for first Gesture",
-        "headline": "{cycleLabel} Is Open",
-        "body": "Make the first Gesture to start the finalization clock and begin shaping this cycle's Signature.",
-        "cta": "Make the first Gesture"
+        "badge": "Mở cho nét bút đầu tiên",
+        "headline": "{cycleLabel} đã mở",
+        "body": "Đặt nét bút đầu tiên để khởi động đồng hồ hoàn tất và bắt đầu định hình Signature của chu kỳ này.",
+        "cta": "Đặt nét bút đầu tiên"
       },
       "confirming": {
-        "badge": "Verifying on-chain",
-        "headline": "Confirming the Final Moment",
-        "body": "The clock reached zero. Checking the chain for a last-second Gesture before the cycle can finalize.",
-        "cta": "View Cycle Details"
+        "badge": "Đang xác minh trên chuỗi",
+        "headline": "Đang xác nhận khoảnh khắc cuối",
+        "body": "Đồng hồ đã về không. Đang kiểm tra chuỗi xem có nét bút nào ở giây cuối trước khi chu kỳ có thể hoàn tất.",
+        "cta": "Xem chi tiết chu kỳ"
       },
       "readyToFinalize": {
-        "badge": "Ready to finalize",
-        "headline": "Cycle Ready to Finalize",
-        "body": "The finalization clock reached zero. The cycle can now close and distribute its reserve on-chain.",
-        "cta": "Finalize Cycle"
+        "badge": "Sẵn sàng hoàn tất",
+        "headline": "Chu kỳ sẵn sàng hoàn tất",
+        "body": "Đồng hồ hoàn tất đã về không. Chu kỳ giờ có thể khép lại và phân phối dự trữ trên chuỗi.",
+        "cta": "Hoàn tất chu kỳ"
       },
       "finalWindow": {
-        "badge": "Final window",
-        "headline": "The Final Window Is Open",
-        "body": "The finalization clock is the main event now. A new Gesture can still extend time and reshape the ending.",
-        "cta": "Make a Gesture"
+        "badge": "Cửa sổ cuối",
+        "headline": "Cửa sổ cuối đã mở",
+        "body": "Đồng hồ hoàn tất giờ là tâm điểm. Một nét bút mới vẫn có thể kéo dài thời gian và định hình lại kết thúc.",
+        "cta": "Đặt nét bút"
       },
       "loading": {
-        "badge": "Syncing cycle state",
-        "headline": "Syncing the Cycle",
-        "body": "Reading protocol time and current cycle data before showing the live state.",
-        "cta": "View Cycle Details"
+        "badge": "Đang đồng bộ trạng thái chu kỳ",
+        "headline": "Đang đồng bộ chu kỳ",
+        "body": "Đang đọc thời gian giao thức và dữ liệu chu kỳ hiện tại trước khi hiển thị trạng thái trực tiếp.",
+        "cta": "Xem chi tiết chu kỳ"
       },
       "unavailable": {
-        "badge": "Clock unavailable",
-        "headline": "Cycle State Unavailable",
-        "body": "The app could not reach the live cycle clock. Cycle details may still show the latest indexed data.",
-        "cta": "View Cycle Details"
+        "badge": "Đồng hồ không khả dụng",
+        "headline": "Trạng thái chu kỳ không khả dụng",
+        "body": "Ứng dụng không kết nối được với đồng hồ chu kỳ trực tiếp. Chi tiết chu kỳ có thể vẫn hiển thị dữ liệu đã lập chỉ mục mới nhất.",
+        "cta": "Xem chi tiết chu kỳ"
       },
       "live": {
-        "badge": "Live on Arbitrum",
-        "headline": "Shape the next Cosmic Signature",
-        "body": "Cosmic Signature is a live Performance Cycle where each Gesture leaves a visible trace, imprints Participation CST, and helps direct protocol reserves toward the Ethereum public goods that keep the network alive.",
-        "cta": "Make a Gesture"
+        "badge": "Trực tiếp trên Arbitrum",
+        "headline": "Định hình Cosmic Signature tiếp theo",
+        "body": "Cosmic Signature là một chu kỳ trình diễn trực tiếp, nơi mỗi nét bút để lại một dấu vết hữu hình, khắc CST tham gia và giúp hướng dự trữ giao thức đến những hàng hóa công của Ethereum đang giữ cho mạng lưới sống động.",
+        "cta": "Đặt nét bút"
       }
     },
     "story": {
       "gestures": {
-        "title": "Gestures shape the art",
-        "body": "Every move bends the Performance Cycle toward its final on-chain Signature."
+        "title": "Nét bút định hình nghệ thuật",
+        "body": "Mỗi bước đi uốn chu kỳ trình diễn về phía Signature cuối cùng trên chuỗi."
       },
       "cst": {
-        "title": "CST records participation",
-        "body": "Participation CST carries a trace of the cycle you helped create."
+        "title": "CST ghi lại sự tham gia",
+        "body": "CST tham gia mang dấu vết của chu kỳ bạn đã góp phần tạo nên."
       },
       "publicGoods": {
-        "title": "Allocations fund public goods",
-        "body": "Protocol reserves flow across allocation tracks, including Protocol Guild."
+        "title": "Phân bổ tài trợ hàng hóa công",
+        "body": "Dự trữ giao thức chảy qua các luồng phân bổ, bao gồm Protocol Guild."
       }
     },
-    "viewCycleDetails": "View Cycle Details",
+    "viewCycleDetails": "Xem chi tiết chu kỳ",
     "artUnavailable": {
-      "eyebrow": "Awaiting generated Signature",
-      "body": "Real Cosmic Signature artwork will appear here once indexed token metadata is available."
+      "eyebrow": "Đang chờ Signature được tạo",
+      "body": "Tác phẩm Cosmic Signature thật sẽ xuất hiện ở đây khi có siêu dữ liệu token đã lập chỉ mục."
     },
     "console": {
-      "ariaLabel": "Current cycle observatory",
-      "eyebrow": "Observatory Console",
-      "cycleLoading": "Cycle loading",
-      "parameters": "Parameters",
-      "viewSignatureAria": "View Cosmic Signature {id}",
-      "artworkAlt": "Cosmic Signature artwork {id}",
+      "ariaLabel": "Đài quan sát chu kỳ hiện tại",
+      "eyebrow": "Bảng điều khiển Đài quan sát",
+      "cycleLoading": "Đang tải chu kỳ",
+      "parameters": "Tham số",
+      "viewSignatureAria": "Xem Cosmic Signature {id}",
+      "artworkAlt": "Tác phẩm Cosmic Signature {id}",
       "signatureBadge": "Signature {id}",
       "stats": {
-        "gestures": "Gestures",
+        "gestures": "Nét bút",
         "signature": "Signature",
-        "publicGoods": "Public Goods",
-        "publicGoodsFallback": "10+ tracks"
+        "publicGoods": "Hàng hóa công",
+        "publicGoodsFallback": "Hơn 10 luồng"
       },
-      "previousAllocations": "Cycle {number} allocations"
+      "previousAllocations": "Phân bổ chu kỳ {number}"
     }
   },
   "notifications": {
-    "finalizationSoonTitle": "Gesture now — the cycle can finalize soon",
-    "finalizationSoonBody": "The Cycle Finalization Time expires in {minutes} minutes. Make a Gesture now to extend the cycle and take part in the final allocations."
+    "finalizationSoonTitle": "Đặt nét bút ngay — chu kỳ có thể sớm hoàn tất",
+    "finalizationSoonBody": "Thời điểm hoàn tất chu kỳ hết hạn sau {minutes} phút. Đặt nét bút ngay để kéo dài chu kỳ và tham gia vào các phân bổ cuối cùng."
   },
   "chrono": {
-    "sectionAria": "Cycle Finalization Time",
+    "sectionAria": "Thời điểm hoàn tất chu kỳ",
     "timerAria": "{label}. {status}",
     "phase": {
       "loading": {
-        "eyebrow": "Cycle clock syncing",
-        "label": "Syncing",
-        "status": "Reading the live cycle timer.",
-        "tooltip": "The app is synchronizing with protocol time before showing the current cycle state.",
-        "display": "Syncing"
+        "eyebrow": "Đang đồng bộ đồng hồ chu kỳ",
+        "label": "Đang đồng bộ",
+        "status": "Đang đọc bộ đếm chu kỳ trực tiếp.",
+        "tooltip": "Ứng dụng đang đồng bộ với thời gian giao thức trước khi hiển thị trạng thái chu kỳ hiện tại.",
+        "display": "Đang đồng bộ"
       },
       "unavailable": {
-        "eyebrow": "Cycle clock unavailable",
-        "label": "Clock unavailable",
-        "status": "Live timer temporarily unavailable.",
-        "tooltip": "The live cycle clock could not be reached. Open cycle details for the latest indexed state.",
-        "display": "Syncing"
+        "eyebrow": "Đồng hồ chu kỳ không khả dụng",
+        "label": "Đồng hồ không khả dụng",
+        "status": "Bộ đếm trực tiếp tạm thời không khả dụng.",
+        "tooltip": "Không kết nối được với đồng hồ chu kỳ trực tiếp. Mở chi tiết chu kỳ để xem trạng thái đã lập chỉ mục mới nhất.",
+        "display": "Đang đồng bộ"
       },
       "openingSoon": {
-        "eyebrow": "Next cycle opens in",
-        "label": "Opening soon",
-        "status": "Waiting for the next cycle. Gestures open when this countdown reaches zero.",
-        "tooltip": "This clock counts down to cycle opening. Once it reaches zero, the first Gesture can start the finalization clock."
+        "eyebrow": "Chu kỳ tiếp theo mở sau",
+        "label": "Sắp mở",
+        "status": "Đang chờ chu kỳ tiếp theo. Nét bút sẽ mở khi đếm ngược này về không.",
+        "tooltip": "Đồng hồ này đếm ngược đến lúc mở chu kỳ. Khi về không, nét bút đầu tiên có thể khởi động đồng hồ hoàn tất."
       },
       "waitingFirstGesture": {
-        "eyebrow": "Cycle is open",
-        "label": "Awaiting first Gesture",
-        "status": "Cycle is open. The first Gesture starts the finalization clock.",
-        "tooltip": "No finalization countdown is running yet. The first Gesture starts the cycle timer and begins shaping this Signature.",
-        "display": "Awaiting first Gesture"
+        "eyebrow": "Chu kỳ đã mở",
+        "label": "Đang chờ nét bút đầu tiên",
+        "status": "Chu kỳ đã mở. Nét bút đầu tiên khởi động đồng hồ hoàn tất.",
+        "tooltip": "Chưa có đếm ngược hoàn tất nào đang chạy. Nét bút đầu tiên khởi động bộ đếm chu kỳ và bắt đầu định hình Signature này.",
+        "display": "Đang chờ nét bút đầu tiên"
       },
       "approach": {
-        "eyebrow": "Cycle finalizes in",
-        "label": "Under 12 hours",
-        "status": "Cycle is live. Each Gesture can extend the finalization clock.",
-        "tooltip": "This is the Cycle Finalization Time. When it reaches zero, the Final Gesture participant may finalize the cycle."
+        "eyebrow": "Chu kỳ hoàn tất sau",
+        "label": "Dưới 12 giờ",
+        "status": "Chu kỳ đang diễn ra. Mỗi nét bút có thể kéo dài đồng hồ hoàn tất.",
+        "tooltip": "Đây là thời điểm hoàn tất chu kỳ. Khi về không, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ."
       },
       "finalHour": {
-        "eyebrow": "Final hour",
-        "label": "Final hour",
-        "status": "Less than one hour remains before this cycle can finalize.",
-        "tooltip": "The finalization clock is under one hour. New Gestures can still extend the Cycle Finalization Time."
+        "eyebrow": "Giờ cuối",
+        "label": "Giờ cuối",
+        "status": "Còn chưa đến một giờ trước khi chu kỳ này có thể hoàn tất.",
+        "tooltip": "Đồng hồ hoàn tất còn dưới một giờ. Nét bút mới vẫn có thể kéo dài thời điểm hoàn tất chu kỳ."
       },
       "finalTen": {
-        "eyebrow": "Final 10 minutes",
-        "label": "Final 10 minutes",
-        "status": "Final minutes. Every Gesture can still change the ending.",
-        "tooltip": "The cycle is inside the final ten minutes. The clock is urgent, but a new Gesture can still extend it."
+        "eyebrow": "10 phút cuối",
+        "label": "10 phút cuối",
+        "status": "Những phút cuối. Mỗi nét bút vẫn có thể thay đổi kết thúc.",
+        "tooltip": "Chu kỳ đang trong mười phút cuối. Đồng hồ đã gấp, nhưng một nét bút mới vẫn có thể kéo dài nó."
       },
       "finalMinute": {
-        "eyebrow": "Final minute",
-        "label": "Final minute",
-        "status": "Final minute. Tenths are live.",
-        "tooltip": "The finalization clock is in its last minute. If it reaches zero, the cycle becomes ready to finalize."
+        "eyebrow": "Phút cuối",
+        "label": "Phút cuối",
+        "status": "Phút cuối. Đang hiển thị từng phần mười giây.",
+        "tooltip": "Đồng hồ hoàn tất đang ở phút cuối. Nếu về không, chu kỳ sẽ sẵn sàng hoàn tất."
       },
       "confirming": {
-        "eyebrow": "Verifying on-chain",
-        "label": "Confirming",
-        "status": "The clock reached zero. Confirming on-chain that no last-second Gesture extended the cycle.",
-        "tooltip": "The countdown reached zero on this device. Before showing the cycle as ready to finalize, the app verifies directly against the blockchain that the deadline truly passed - a Gesture in the final seconds can still have extended it.",
+        "eyebrow": "Đang xác minh trên chuỗi",
+        "label": "Đang xác nhận",
+        "status": "Đồng hồ đã về không. Đang xác nhận trên chuỗi rằng không có nét bút giây cuối nào kéo dài chu kỳ.",
+        "tooltip": "Đếm ngược đã về không trên thiết bị này. Trước khi hiển thị chu kỳ là sẵn sàng hoàn tất, ứng dụng xác minh trực tiếp với blockchain rằng thời hạn thực sự đã qua - một nét bút ở những giây cuối vẫn có thể đã kéo dài nó.",
         "display": "00:00"
       },
       "readyToFinalize": {
-        "eyebrow": "Cycle ready to finalize",
-        "label": "Ready",
-        "status": "Finalization is ready. A new Gesture can still extend the cycle.",
-        "tooltip": "The Cycle Finalization Time reached zero. The Final Gesture participant may finalize; after the exclusivity window, anyone may finalize and receives the Signature Allocation. Gestures remain possible until finalization executes.",
+        "eyebrow": "Chu kỳ sẵn sàng hoàn tất",
+        "label": "Sẵn sàng",
+        "status": "Đã sẵn sàng hoàn tất. Một nét bút mới vẫn có thể kéo dài chu kỳ.",
+        "tooltip": "Thời điểm hoàn tất chu kỳ đã về không. Người đặt nét bút cuối cùng có thể hoàn tất; sau cửa sổ ưu tiên, bất kỳ ai cũng có thể hoàn tất và nhận phân bổ Signature. Vẫn có thể đặt nét bút cho đến khi việc hoàn tất được thực thi.",
         "display": "00:00"
       },
       "live": {
-        "eyebrow": "Cycle finalizes in",
-        "label": "Cycle is live",
-        "status": "Cycle is live. Each Gesture can extend the finalization clock.",
-        "tooltip": "This is the Cycle Finalization Time. When it reaches zero, the Final Gesture participant may finalize the cycle."
+        "eyebrow": "Chu kỳ hoàn tất sau",
+        "label": "Chu kỳ đang diễn ra",
+        "status": "Chu kỳ đang diễn ra. Mỗi nét bút có thể kéo dài đồng hồ hoàn tất.",
+        "tooltip": "Đây là thời điểm hoàn tất chu kỳ. Khi về không, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ."
       }
     },
     "cta": {
-      "finalize": "Finalize Cycle",
-      "makeFirstGesture": "Make the first Gesture",
-      "makeGesture": "Make a Gesture",
-      "viewCycle": "View Cycle"
+      "finalize": "Hoàn tất chu kỳ",
+      "makeFirstGesture": "Đặt nét bút đầu tiên",
+      "makeGesture": "Đặt nét bút",
+      "viewCycle": "Xem chu kỳ"
     }
   },
   "phaseGuide": {
-    "eyebrow": "Cycle phase",
-    "title": "Where this Performance Cycle is now",
-    "howItWorks": "How it works",
-    "timelineAria": "Performance Cycle phases",
+    "eyebrow": "Giai đoạn chu kỳ",
+    "title": "Chu kỳ trình diễn này đang ở đâu",
+    "howItWorks": "Cách hoạt động",
+    "timelineAria": "Các giai đoạn của chu kỳ trình diễn",
     "stepState": {
-      "now": "Now",
-      "passed": "Passed",
-      "next": "Next"
+      "now": "Hiện tại",
+      "passed": "Đã qua",
+      "next": "Tiếp theo"
     },
     "steps": {
       "openingSoon": {
-        "label": "Opening Soon",
-        "detail": "The next cycle is scheduled and waiting to open."
+        "label": "Sắp mở",
+        "detail": "Chu kỳ tiếp theo đã được lên lịch và đang chờ mở."
       },
       "firstGesture": {
-        "label": "First Gesture",
-        "detail": "The first Gesture starts the finalization clock."
+        "label": "Nét bút đầu tiên",
+        "detail": "Nét bút đầu tiên khởi động đồng hồ hoàn tất."
       },
       "open": {
-        "label": "Open Cycle",
-        "detail": "Gestures shape the Signature and extend time."
+        "label": "Chu kỳ mở",
+        "detail": "Nét bút định hình Signature và kéo dài thời gian."
       },
       "finalWindow": {
-        "label": "Final Window",
-        "detail": "The clock nears zero. A new Gesture can still extend it."
+        "label": "Cửa sổ cuối",
+        "detail": "Đồng hồ tiến gần về không. Một nét bút mới vẫn có thể kéo dài nó."
       },
       "finalization": {
-        "label": "Finalization",
-        "detail": "The Final Gesture participant can close the cycle."
+        "label": "Hoàn tất",
+        "detail": "Người đặt nét bút cuối cùng có thể khép lại chu kỳ."
       },
       "allocation": {
-        "label": "Allocation",
-        "detail": "The reserve distributes across protocol tracks."
+        "label": "Phân bổ",
+        "detail": "Dự trữ được phân phối qua các luồng của giao thức."
       }
     },
     "explainer": {
-      "title": "New here? Read the cycle in 30 seconds.",
-      "body": "Wait for the cycle to open, make a Gesture once Gestures are available, and watch the finalization clock. Each Gesture helps shape the final Signature, can extend time, and updates who is in line for allocations. When time expires, the cycle finalizes and the reserve distributes on-chain.",
-      "faqLink": "Read the FAQ",
-      "walkthroughLink": "See the full walkthrough",
-      "dismissAria": "Dismiss cycle explainer"
+      "title": "Mới đến đây? Hiểu chu kỳ trong 30 giây.",
+      "body": "Chờ chu kỳ mở, đặt một nét bút khi nét bút sẵn sàng, và theo dõi đồng hồ hoàn tất. Mỗi nét bút giúp định hình Signature cuối cùng, có thể kéo dài thời gian và cập nhật ai đang trong hàng nhận phân bổ. Khi hết thời gian, chu kỳ hoàn tất và dự trữ được phân phối trên chuỗi.",
+      "faqLink": "Đọc câu hỏi thường gặp",
+      "walkthroughLink": "Xem hướng dẫn đầy đủ",
+      "dismissAria": "Đóng phần giải thích chu kỳ"
     }
   },
   "status": {
-    "opensAt": "Cycle {cycle} opens at {dateTime}",
-    "finalizesIn": "Cycle finalizes in",
-    "finalizesInTooltip": "When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer.",
-    "readyToFinalize": "Cycle Ready to Finalize",
-    "clockReachedZero": "The finalization clock reached zero.",
+    "opensAt": "Chu kỳ {cycle} mở vào {dateTime}",
+    "finalizesIn": "Chu kỳ hoàn tất sau",
+    "finalizesInTooltip": "Khi bộ đếm này về không, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận phân bổ Signature. Mỗi nét bút mới kéo dài bộ đếm.",
+    "readyToFinalize": "Chu kỳ sẵn sàng hoàn tất",
+    "clockReachedZero": "Đồng hồ hoàn tất đã về không.",
     "metrics": {
-      "signatureAllocation": "Signature Allocation",
+      "signatureAllocation": "Phân bổ Signature",
       "signatureTooltip": {
-        "base": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT.",
-        "withNft": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {nftCount, plural, one {the attached NFT} other {all # attached NFTs}}.",
-        "withErc20": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}}.",
-        "withBoth": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}}."
+        "base": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT.",
+        "withNft": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, một Cosmic Signature NFT và {nftCount, plural, other {toàn bộ # NFT đính kèm}}.",
+        "withErc20": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, một Cosmic Signature NFT và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}}.",
+        "withBoth": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, một Cosmic Signature NFT, cùng {nftCount, plural, other {toàn bộ # NFT đính kèm}} và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}}."
       },
-      "ethGesture": "ETH Gesture",
-      "ethGestureTooltip": "Current cost to make a gesture with ETH",
-      "randomWalkGesture": "ETH + RandomWalk Gesture",
-      "randomWalkGestureTooltip": "50% ETH Gesture Cost reduction when attaching a RandomWalk NFT to an ETH gesture",
-      "cstGesture": "CST Gesture",
-      "cstGestureTooltip": "Gesture with CST. Cost descends through the live Calibration Window, which CST gestures lengthen and ETH gestures shorten.",
-      "free": "FREE",
-      "cstWindow": "CST Window",
-      "cstWindowProgressAria": "CST Calibration Window progress",
-      "duration": "Duration {duration}"
+      "ethGesture": "Nét bút ETH",
+      "ethGestureTooltip": "Chi phí hiện tại để đặt nét bút bằng ETH",
+      "randomWalkGesture": "Nét bút ETH + RandomWalk",
+      "randomWalkGestureTooltip": "Giảm 50% chi phí nét bút ETH khi đính kèm RandomWalk NFT vào nét bút ETH",
+      "cstGesture": "Nét bút CST",
+      "cstGestureTooltip": "Đặt nét bút bằng CST. Chi phí giảm dần qua cửa sổ hiệu chỉnh trực tiếp, vốn được nét bút CST kéo dài và nét bút ETH rút ngắn.",
+      "free": "KHÔNG TỐN CHI PHÍ",
+      "cstWindow": "Cửa sổ CST",
+      "cstWindowProgressAria": "Tiến độ cửa sổ hiệu chỉnh CST",
+      "duration": "Thời lượng {duration}"
     },
     "standing": {
-      "title": "Your Cycle Standing",
-      "tooltip": "Shows your current Final Gesture standing and Stellar Selection frequency based on your gestures this cycle.",
+      "title": "Vị thế của bạn trong chu kỳ",
+      "tooltip": "Hiển thị vị thế nét bút cuối cùng hiện tại và tần suất Tinh tuyển của bạn dựa trên các nét bút trong chu kỳ này.",
       "leader": {
-        "base": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT).",
-        "withNft": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} shown below).",
-        "withErc20": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below).",
-        "withBoth": "You made the most recent gesture. If no one else gestures, you receive the Signature Allocation ({amount} ETH, 1,000 CST, 1 Cosmic Signature NFT, plus {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}} shown below)."
+        "base": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT).",
+        "withNft": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} bên dưới).",
+        "withErc20": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới).",
+        "withBoth": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới)."
       },
-      "notLeader": "You are not the most recent participant — gesture again to take the lead, or remain eligible for Stellar Selection.",
-      "ethStellar": "ETH Stellar Selection",
-      "nftStellar": "NFT Stellar Selection"
+      "notLeader": "Bạn không phải người tham gia gần nhất — đặt thêm nét bút để dẫn đầu, hoặc tiếp tục thuộc diện Tinh tuyển.",
+      "ethStellar": "ETH Tinh tuyển",
+      "nftStellar": "NFT Tinh tuyển"
     },
     "openCycle": {
-      "cycleNumber": "Cycle {cycle}",
-      "title": "Open the Cycle",
-      "body": "The Calibration Window for the first ETH gesture is open. Make your gesture."
+      "cycleNumber": "Chu kỳ {cycle}",
+      "title": "Mở chu kỳ",
+      "body": "Cửa sổ hiệu chỉnh cho nét bút ETH đầu tiên đã mở. Hãy đặt nét bút của bạn."
     }
   },
   "ticker": {
-    "openLatestAria": "Open latest gesture {id}",
-    "gestureLine": "{address} made {kind, select, cst {a CST gesture} randomWalk {an ETH + RandomWalk gesture} other {an ETH gesture}}",
-    "paymentUnavailable": "cost syncing…",
+    "openLatestAria": "Mở nét bút mới nhất {id}",
+    "gestureLine": "{address} đã đặt {kind, select, cst {một nét bút CST} randomWalk {một nét bút ETH + RandomWalk} other {một nét bút ETH}}",
+    "paymentUnavailable": "đang đồng bộ chi phí…",
     "rwlkToken": "RandomWalk #{id}",
     "age": {
-      "justNow": "just now",
-      "seconds": "{count}s ago",
-      "minutes": "{count}m ago",
-      "hours": "{count}h ago",
-      "days": "{count}d ago"
+      "justNow": "vừa xong",
+      "seconds": "{count} giây trước",
+      "minutes": "{count} phút trước",
+      "hours": "{count} giờ trước",
+      "days": "{count} ngày trước"
     }
   },
   "form": {
-    "title": "Make Your Gesture",
-    "subtitle": "Choose a gesture method and participate in the active cycle.",
-    "loadingAria": "Loading gesture form",
-    "methodLabel": "Gesture Method",
+    "title": "Đặt nét bút của bạn",
+    "subtitle": "Chọn một phương thức nét bút và tham gia chu kỳ đang diễn ra.",
+    "loadingAria": "Đang tải biểu mẫu nét bút",
+    "methodLabel": "Phương thức nét bút",
     "method": {
       "eth": {
         "label": "ETH",
-        "desc": "Pay with Ether"
+        "desc": "Thanh toán bằng Ether"
       },
       "randomWalk": {
         "label": "ETH + RWLK",
-        "desc": "50% discount"
+        "desc": "Giảm 50%"
       },
       "cst": {
         "label": "CST",
@@ -300,161 +300,161 @@
       }
     },
     "rwlk": {
-      "title": "Your Random Walk NFTs",
-      "tooltipAria": "About RandomWalk gesture discounts",
-      "tooltip": "Attach a RandomWalk NFT to an ETH gesture to receive a 50% Gesture Cost reduction. Each NFT can only be used once."
+      "title": "Random Walk NFT của bạn",
+      "tooltipAria": "Về mức giảm chi phí nét bút với RandomWalk",
+      "tooltip": "Đính kèm một RandomWalk NFT vào nét bút ETH để được giảm 50% chi phí nét bút. Mỗi NFT chỉ dùng được một lần."
     },
-    "cstTrade": "Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.",
+    "cstTrade": "Cần CST cho phương thức nét bút này? Hoán đổi ETH sang CST trên Arbitrum qua Uniswap.",
     "reward": {
-      "economicsTitle": "CST Gesture Economics",
-      "previewTitle": "CST Reward Preview",
-      "economicsDescription": "Net CST is the Participation CST reward minus the current CST gesture cost.",
-      "previewDescription": "Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.",
-      "rewardLabel": "Reward",
-      "costLabel": "Cost",
-      "netLabel": "Net CST",
+      "economicsTitle": "Cân đối CST của nét bút",
+      "previewTitle": "Xem trước CST tham gia",
+      "economicsDescription": "CST ròng là CST tham gia nhận được trừ đi chi phí nét bút CST hiện tại.",
+      "previewDescription": "Lượng CST động ước tính bạn nhận nếu nét bút này được ghi nhận. Số lượng phụ thuộc vào thời gian kể từ nét bút trước, và mỗi phương thức nét bút có hai bảo đảm: chi phí tối đa và CST tham gia tối thiểu.",
+      "rewardLabel": "Nhận",
+      "costLabel": "Chi phí",
+      "netLabel": "CST ròng",
       "cstAmount": "{amount} CST",
-      "minAccepted": "Min accepted: {value}",
-      "minAcceptedAny": "any reward, including 0 CST",
-      "minAcceptedAria": "What Min accepted CST means",
-      "minAcceptedTooltip": "The minimum Participation CST reward your transaction will accept. It is the current preview minus your Minimum CST Reward Protection tolerance. If the contract would imprint less by confirmation, the gesture reverts instead of accepting a lower reward.",
-      "minAcceptedTooltipAny": "Accept any CST reward sends a minimum accepted reward of 0, so the gesture can land with any dynamic CST reward, including none.",
-      "netPositive": "The CST reward exceeds the CST cost if this lands.",
-      "netNegative": "Most CST gestures spend more CST than they receive.",
-      "durationMismatch": "Using on-chain duration ({contractDuration}) because the API reported {apiDuration}."
+      "minAccepted": "Mức chấp nhận tối thiểu: {value}",
+      "minAcceptedAny": "mọi mức, kể cả 0 CST",
+      "minAcceptedAria": "Mức chấp nhận tối thiểu CST nghĩa là gì",
+      "minAcceptedTooltip": "Lượng CST tham gia tối thiểu mà giao dịch của bạn sẽ chấp nhận. Đó là bản xem trước hiện tại trừ đi biên độ bảo đảm CST tham gia tối thiểu của bạn. Nếu hợp đồng sẽ khắc ít hơn vào lúc xác nhận, nét bút bị hoàn nguyên thay vì chấp nhận mức thấp hơn.",
+      "minAcceptedTooltipAny": "Chấp nhận mọi mức CST tham gia gửi mức chấp nhận tối thiểu là 0, nên nét bút có thể được ghi nhận với bất kỳ lượng CST động nào, kể cả không có.",
+      "netPositive": "CST tham gia nhận được vượt chi phí CST nếu nét bút này được ghi nhận.",
+      "netNegative": "Hầu hết nét bút CST tiêu nhiều CST hơn lượng nhận được.",
+      "durationMismatch": "Đang dùng thời lượng trên chuỗi ({contractDuration}) vì API báo {apiDuration}."
     },
-    "preview": "Preview the live gesture options here. Connect a wallet to write your message, attach assets, and submit the gesture on Arbitrum.",
+    "preview": "Xem trước các tùy chọn nét bút trực tiếp tại đây. Kết nối ví để viết lời nhắn, đính kèm tài sản và gửi nét bút trên Arbitrum.",
     "advanced": {
-      "title": "Advanced",
-      "messageLabel": "Message",
-      "messageOptionalHint": "(optional, {maxLength} chars)",
-      "messageTooltipAria": "How gesture messages work",
-      "messageTooltip": "Leave a message to appear in Gesture Chat. Your message is recorded on-chain with your gesture and remains on the blockchain permanently.",
-      "messagePlaceholder": "Leave a message with your gesture...",
-      "attachIntro": "Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.",
+      "title": "Nâng cao",
+      "messageLabel": "Lời nhắn",
+      "messageOptionalHint": "(tùy chọn, {maxLength} ký tự)",
+      "messageTooltipAria": "Lời nhắn nét bút hoạt động thế nào",
+      "messageTooltip": "Để lại lời nhắn để hiển thị trong Trò chuyện nét bút. Lời nhắn được ghi trên chuỗi cùng nét bút và tồn tại vĩnh viễn trên blockchain.",
+      "messagePlaceholder": "Để lại lời nhắn cùng nét bút của bạn…",
+      "attachIntro": "Đính kèm token hoặc NFT vào nét bút, hoặc điều chỉnh mức chống trùng chi phí nét bút.",
       "minCstProtection": {
-        "title": "Minimum CST Reward Protection",
-        "body": "Participation CST uses a square-root formula based on elapsed time. This setting protects you if another gesture lands first and lowers the amount before your transaction confirms.",
-        "acceptAnyAria": "Accept any CST reward",
-        "acceptAnyTitle": "Accept any CST reward, including 0",
-        "acceptAnyBody": "Sends a minimum accepted CST reward of 0. Use this when you prefer the gesture to land even if the dynamic CST amount changes before confirmation.",
-        "toleranceLabel": "Allow reward to move down by",
-        "minAmount": "min {amount} CST",
-        "revertNote": "If the contract would imprint less CST than this minimum by the time your transaction lands, the gesture should revert instead of accepting a lower dynamic CST amount."
+        "title": "Bảo đảm CST tham gia tối thiểu",
+        "body": "CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua. Thiết lập này bảo vệ bạn nếu một nét bút khác đến trước và hạ thấp số lượng trước khi giao dịch của bạn được xác nhận.",
+        "acceptAnyAria": "Chấp nhận mọi mức CST tham gia",
+        "acceptAnyTitle": "Chấp nhận mọi mức CST tham gia, kể cả 0",
+        "acceptAnyBody": "Gửi mức CST tham gia chấp nhận tối thiểu là 0. Dùng khi bạn muốn nét bút được ghi nhận ngay cả khi lượng CST động thay đổi trước lúc xác nhận.",
+        "toleranceLabel": "Cho phép mức nhận giảm tối đa",
+        "minAmount": "tối thiểu {amount} CST",
+        "revertNote": "Nếu hợp đồng sẽ khắc ít CST hơn mức tối thiểu này vào lúc giao dịch của bạn được ghi nhận, nét bút sẽ bị hoàn nguyên thay vì chấp nhận lượng CST động thấp hơn."
       },
-      "attachNft": "Attach NFT",
-      "attachToken": "Attach Token",
-      "tokenContractLabel": "Contract Address",
-      "tokenAmountLabel": "Amount",
-      "nftContractLabel": "NFT Contract Address",
-      "nftIdLabel": "Token ID",
-      "nftIdPlaceholder": "Token ID",
+      "attachNft": "Đính kèm NFT",
+      "attachToken": "Đính kèm token",
+      "tokenContractLabel": "Địa chỉ hợp đồng",
+      "tokenAmountLabel": "Số lượng",
+      "nftContractLabel": "Địa chỉ hợp đồng NFT",
+      "nftIdLabel": "Mã token",
+      "nftIdPlaceholder": "Mã token",
       "collision": {
-        "title": "Collision Prevention",
-        "raiseBy": "Raise by",
+        "title": "Chống trùng",
+        "raiseBy": "Tăng thêm",
         "approxCost": "≈ {amount} ETH",
-        "note": "Bumps Gesture Cost by {percent}% to avoid collision when two gestures land in the same block. Does not permanently raise the cost."
+        "note": "Nâng chi phí nét bút thêm {percent}% để tránh trùng khi hai nét bút rơi vào cùng một khối. Không làm tăng chi phí vĩnh viễn."
       }
     },
     "submit": {
-      "eth": "Gesture with ETH ({cost} ETH)",
-      "randomWalkWithToken": "Gesture with ETH + RandomWalk token {tokenId} ({cost} ETH)",
-      "randomWalk": "Gesture with ETH + RandomWalk",
-      "cst": "Gesture with CST ({cost} CST)",
-      "cstFree": "Gesture with CST (FREE GESTURE)",
-      "generic": "Gesture with {method}"
+      "eth": "Đặt nét bút bằng ETH ({cost} ETH)",
+      "randomWalkWithToken": "Đặt nét bút bằng ETH + token RandomWalk {tokenId} ({cost} ETH)",
+      "randomWalk": "Đặt nét bút bằng ETH + RandomWalk",
+      "cst": "Đặt nét bút bằng CST ({cost} CST)",
+      "cstFree": "Đặt nét bút bằng CST (KHÔNG TỐN CHI PHÍ)",
+      "generic": "Đặt nét bút bằng {method}"
     },
-    "processing": "Processing...",
-    "finalGestureMade": "You made the final gesture for this cycle. When the timer ends, use Finalize Cycle below.",
-    "finalize": "Finalize Cycle",
-    "finalizeAvailableIn": "available in",
-    "finalizeWaitNote": "Please wait for the participant who made the Final Gesture to finalize the cycle.",
+    "processing": "Đang xử lý…",
+    "finalGestureMade": "Bạn đã đặt nét bút cuối cùng của chu kỳ này. Khi bộ đếm kết thúc, hãy dùng Hoàn tất chu kỳ bên dưới.",
+    "finalize": "Hoàn tất chu kỳ",
+    "finalizeAvailableIn": "khả dụng sau",
+    "finalizeWaitNote": "Vui lòng chờ người tham gia đặt nét bút cuối cùng hoàn tất chu kỳ.",
     "connect": {
-      "title": "Connect to submit your gesture",
-      "body": "Review the live gesture methods and costs above, then connect MetaMask or another wallet to submit on Arbitrum."
+      "title": "Kết nối để gửi nét bút",
+      "body": "Xem các phương thức và chi phí nét bút trực tiếp ở trên, rồi kết nối MetaMask hoặc ví khác để gửi trên Arbitrum."
     }
   },
   "calibration": {
-    "defaultTitle": "Calibration Window",
-    "defaultSubtitle": "Gesture cost descends as this window progresses.",
-    "defaultEndedMessage": "Calibration Window closed.",
-    "firstGestureTitle": "First Gesture Calibration Window",
-    "firstGestureSubtitle": "The first ETH gesture cost descends while this opening window progresses.",
-    "cstTitle": "CST Calibration Window",
-    "cstSubtitle": "CST cost descends through this dynamic window. ETH gestures shorten it by about {decreasePercent}%; CST gestures lengthen it by about {increasePercent}%.",
-    "cstEndedMessage": "Calibration Window ended — you can gesture for free.",
-    "dynamicDuration": "Dynamic Duration",
-    "progressLabel": "Progress",
-    "percentComplete": "{percent} complete",
-    "progressAria": "{title} progress",
-    "durationLabel": "Calibration Window Duration",
-    "elapsedLabel": "Elapsed",
-    "remainingLabel": "Remaining"
+    "defaultTitle": "Cửa sổ hiệu chỉnh",
+    "defaultSubtitle": "Chi phí nét bút giảm dần khi cửa sổ này tiến triển.",
+    "defaultEndedMessage": "Cửa sổ hiệu chỉnh đã đóng.",
+    "firstGestureTitle": "Cửa sổ hiệu chỉnh nét bút đầu tiên",
+    "firstGestureSubtitle": "Chi phí nét bút ETH đầu tiên giảm dần khi cửa sổ mở đầu này tiến triển.",
+    "cstTitle": "Cửa sổ hiệu chỉnh CST",
+    "cstSubtitle": "Chi phí CST giảm dần qua cửa sổ động này. Nét bút ETH rút ngắn nó khoảng {decreasePercent}%; nét bút CST kéo dài nó khoảng {increasePercent}%.",
+    "cstEndedMessage": "Cửa sổ hiệu chỉnh đã kết thúc — bạn có thể đặt nét bút không tốn chi phí.",
+    "dynamicDuration": "Thời lượng động",
+    "progressLabel": "Tiến độ",
+    "percentComplete": "Hoàn thành {percent}",
+    "progressAria": "Tiến độ {title}",
+    "durationLabel": "Thời lượng cửa sổ hiệu chỉnh",
+    "elapsedLabel": "Đã trôi qua",
+    "remainingLabel": "Còn lại"
   },
   "allocation": {
-    "title": "Allocation Breakdown",
-    "titleTooltip": "Allocations distributed when the cycle finalizes across more than ten tracks.",
-    "recipientCount": "{count, plural, one {# recipient} other {# recipients}}",
+    "title": "Chi tiết phân bổ",
+    "titleTooltip": "Các phân bổ được phân phối khi chu kỳ hoàn tất qua hơn mười luồng.",
+    "recipientCount": "{count, plural, other {# người nhận}}",
     "amounts": {
       "eth": "{amount} ETH",
-      "ethEach": "{amount} ETH each",
-      "fixedCst": "1,000 CST",
-      "fixedCstEach": "1,000 CST each",
+      "ethEach": "{amount} ETH mỗi người",
+      "fixedCst": "1.000 CST",
+      "fixedCstEach": "1.000 CST mỗi người",
       "nft": "1 Cosmic Signature NFT",
-      "nftEach": "1 Cosmic Signature NFT each",
-      "attachedTokens": "Attached tokens (if any)"
+      "nftEach": "1 Cosmic Signature NFT mỗi người",
+      "attachedTokens": "Token đính kèm (nếu có)"
     },
     "cards": {
       "signature": {
-        "name": "Signature Allocation",
-        "tooltip": "The participant who made the Final Gesture when the countdown reaches zero may retrieve this allocation: ETH, 1,000 CST, a Cosmic Signature NFT, and attached tokens."
+        "name": "Phân bổ Signature",
+        "tooltip": "Người tham gia đặt nét bút cuối cùng khi đếm ngược về không có thể nhận về phân bổ này: ETH, 1.000 CST, một Cosmic Signature NFT và các token đính kèm."
       },
       "publicGoods": {
-        "name": "Public Goods",
-        "tooltip": "{percent}% of every Cycle Reserve is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.",
+        "name": "Hàng hóa công",
+        "tooltip": "{percent}% của mỗi Dự trữ chu kỳ được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
         "recipientLabel": "Protocol Guild"
       },
       "ethStellar": {
-        "name": "ETH Stellar Selection",
-        "tooltip": "Participants are selected at random from the cycle entries to share an allocation of ETH."
+        "name": "ETH Tinh tuyển",
+        "tooltip": "Người tham gia được chọn ngẫu nhiên từ các lượt trong chu kỳ để chia một phần phân bổ ETH."
       },
       "nftStellar": {
-        "name": "NFT Stellar Selection",
-        "tooltip": "Participants are selected at random from the cycle entries to receive Recognition CST and Cosmic Signature NFTs."
+        "name": "NFT Tinh tuyển",
+        "tooltip": "Người tham gia được chọn ngẫu nhiên từ các lượt trong chu kỳ để nhận CST ghi nhận và Cosmic Signature NFT."
       },
       "randomWalkAnchor": {
-        "name": "RandomWalk Anchor-holder",
-        "tooltip": "Anchor-holders of RandomWalk NFTs may receive Recognition CST and Cosmic Signature NFTs."
+        "name": "Người neo giữ RandomWalk",
+        "tooltip": "Người neo giữ RandomWalk NFT có thể nhận CST ghi nhận và Cosmic Signature NFT."
       },
       "cosmicAnchor": {
-        "name": "Cosmic Signature Anchor",
-        "tooltip": "Anchor-holders of Cosmic Signature NFTs share the per-cycle Anchor Distribution.",
-        "recipientLabel": "Proportional · all anchor-holders"
+        "name": "Neo giữ Cosmic Signature",
+        "tooltip": "Người neo giữ Cosmic Signature NFT chia sẻ phân phối neo giữ của mỗi chu kỳ.",
+        "recipientLabel": "Theo tỷ lệ · mọi người neo giữ"
       },
       "chronoWarrior": {
-        "name": "Chrono-Warrior Allocation",
-        "tooltip": "The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve and a Cosmic Signature NFT."
+        "name": "Phân bổ Chiến binh Thời gian",
+        "tooltip": "Người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng liên tục dài nhất nhận một tỷ lệ Dự trữ chu kỳ và một Cosmic Signature NFT."
       },
       "endurance": {
-        "name": "Endurance Champion",
-        "tooltip": "The participant who remained the most recent gesture maker for the longest consecutive interval. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+        "name": "Quán quân Bền bỉ",
+        "tooltip": "Người tham gia giữ vị trí người đặt nét bút gần nhất trong khoảng liên tục dài nhất. Nhận 1.000 CST ghi nhận và một Cosmic Signature NFT."
       },
       "finalCst": {
-        "name": "Final CST Gesture",
-        "tooltip": "The participant who made the last CST gesture of the cycle receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+        "name": "Nét bút CST cuối cùng",
+        "tooltip": "Người tham gia đặt nét bút CST cuối cùng của chu kỳ nhận 1.000 CST ghi nhận và một Cosmic Signature NFT."
       }
     }
   },
   "chat": {
-    "liveFeed": "Live Feed",
-    "title": "Gesture Chat",
-    "joinTooltipAria": "How to join Gesture Chat",
-    "joinTooltip": "Want to join the chat? Make a gesture and leave an optional message. Messages attached to gestures appear here.",
-    "currentCycle": "Current cycle",
-    "cycleNumber": "Cycle #{number}",
-    "messageCount": "{count, plural, =0 {No messages yet} one {# message} other {# messages}}",
-    "messageAria": "Gesture message from {address}",
-    "openPositionAria": "Open gesture position {position}",
+    "liveFeed": "Dòng trực tiếp",
+    "title": "Trò chuyện nét bút",
+    "joinTooltipAria": "Cách tham gia Trò chuyện nét bút",
+    "joinTooltip": "Muốn tham gia trò chuyện? Hãy đặt một nét bút và để lại lời nhắn tùy chọn. Lời nhắn đính kèm nét bút sẽ xuất hiện ở đây.",
+    "currentCycle": "Chu kỳ hiện tại",
+    "cycleNumber": "Chu kỳ #{number}",
+    "messageCount": "{count, plural, =0 {Chưa có lời nhắn} other {# lời nhắn}}",
+    "messageAria": "Lời nhắn nét bút từ {address}",
+    "openPositionAria": "Mở vị trí nét bút {position}",
     "badge": {
       "eth": "{amount} ETH",
       "ethFallback": "ETH",
@@ -464,192 +464,192 @@
       "cstFallback": "CST"
     },
     "empty": {
-      "title": "No gesture messages yet",
-      "description": "Messages attached to current-cycle gestures will appear here, newest first.",
-      "cta": "Make a Gesture"
+      "title": "Chưa có lời nhắn nét bút",
+      "description": "Lời nhắn đính kèm nét bút của chu kỳ hiện tại sẽ xuất hiện ở đây, mới nhất trước.",
+      "cta": "Đặt nét bút"
     },
     "system": {
-      "cycleStart": "Cycle #{number} began — the first Gesture started the clock",
-      "enduranceRecord": "{address} set the Endurance record — {duration}",
-      "chronoLead": "{address} took the Chrono-Warrior lead — {duration}"
+      "cycleStart": "Chu kỳ #{number} bắt đầu — nét bút đầu tiên đã khởi động đồng hồ",
+      "enduranceRecord": "{address} lập kỷ lục Bền bỉ — {duration}",
+      "chronoLead": "{address} vươn lên dẫn đầu Chiến binh Thời gian — {duration}"
     },
     "pending": {
-      "aria": "Your message, confirming on-chain",
-      "label": "Confirming"
+      "aria": "Lời nhắn của bạn, đang xác nhận trên chuỗi",
+      "label": "Đang xác nhận"
     }
   },
   "deck": {
-    "title": "The Cosmic Signature Observatory",
-    "intro": "One live Performance Cycle. Every Gesture extends the clock, shapes the final Signature, and stands in line for allocations.",
-    "newHere": "New here? How it works",
-    "experimentalUi": "Experimental UI",
-    "returnToCurrent": "Return to current UI",
+    "title": "Đài quan sát Cosmic Signature",
+    "intro": "Một chu kỳ trình diễn trực tiếp. Mỗi nét bút kéo dài đồng hồ, định hình Signature cuối cùng và xếp hàng nhận phân bổ.",
+    "newHere": "Mới đến đây? Cách hoạt động",
+    "experimentalUi": "Giao diện thử nghiệm",
+    "returnToCurrent": "Quay về giao diện hiện tại",
     "monument": {
-      "reserveLabel": "Signature Allocation",
-      "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
-      "youChip": "You",
-      "fullConsole": "Open the full gesture console",
-      "chooseRwlkToken": "Pick your RandomWalk token in the full console below",
-      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry.",
-      "notifyAria": "Notify me before the cycle can finalize",
-      "notifyLabel": "Alert me before finalization:",
-      "notifyMinutes": "{minutes}m",
-      "calendarTitle": "Cosmic Signature Cycle #{number} opens",
-      "calendarBody": "The next Performance Cycle opens for Gestures. The first Gesture starts the finalization clock.",
-      "calendarCta": "Add the opening to your calendar"
+      "reserveLabel": "Phân bổ Signature",
+      "reserveExtras": "+ 1.000 CST · 1 Cosmic Signature NFT · tài sản đính kèm",
+      "youChip": "Bạn",
+      "fullConsole": "Mở bảng điều khiển nét bút đầy đủ",
+      "chooseRwlkToken": "Chọn token RandomWalk của bạn trong bảng điều khiển đầy đủ bên dưới",
+      "microcopy": "Mỗi nét bút kéo dài đồng hồ hoàn tất, khắc CST tham gia và được tính là một lượt Tinh tuyển.",
+      "notifyAria": "Thông báo cho tôi trước khi chu kỳ có thể hoàn tất",
+      "notifyLabel": "Nhắc tôi trước khi hoàn tất:",
+      "notifyMinutes": "{minutes} phút",
+      "calendarTitle": "Chu kỳ Cosmic Signature #{number} mở",
+      "calendarBody": "Chu kỳ trình diễn tiếp theo mở cho nét bút. Nét bút đầu tiên khởi động đồng hồ hoàn tất.",
+      "calendarCta": "Thêm thời điểm mở vào lịch của bạn"
     },
     "board": {
-      "title": "Allocation Tracks",
-      "subtitle": "Everything this cycle distributes at finalization",
-      "tooltip": "Live view of every allocation track in the current Performance Cycle: amounts, current holders, and standing records.",
-      "cstPlusNft": "1,000 CST + NFT",
-      "awaitingGesture": "Awaiting the first Gesture",
-      "awaitingRecord": "No record yet",
-      "stellarStatus": "every Gesture is an entry",
-      "fullBreakdown": "View the full breakdown"
+      "title": "Các luồng phân bổ",
+      "subtitle": "Mọi thứ chu kỳ này phân phối khi hoàn tất",
+      "tooltip": "Góc nhìn trực tiếp về mọi luồng phân bổ trong chu kỳ trình diễn hiện tại: số lượng, người đang giữ và các kỷ lục đang đứng.",
+      "cstPlusNft": "1.000 CST + NFT",
+      "awaitingGesture": "Đang chờ nét bút đầu tiên",
+      "awaitingRecord": "Chưa có kỷ lục",
+      "stellarStatus": "mỗi nét bút là một lượt",
+      "fullBreakdown": "Xem chi tiết đầy đủ"
     },
     "art": {
-      "sectionAria": "Featured on-chain artwork",
-      "eyebrow": "On-Chain Artwork",
-      "galleryCta": "Gallery",
-      "viewAria": "View Cosmic Signature {id}",
-      "alt": "Cosmic Signature artwork {id} — deterministic three-body generative art",
-      "pairingNote": "Deterministic three-body art, imprinted on-chain. Every Signature is paired with 1,000 CST."
+      "sectionAria": "Tác phẩm trên chuỗi nổi bật",
+      "eyebrow": "Tác phẩm trên chuỗi",
+      "galleryCta": "Phòng trưng bày",
+      "viewAria": "Xem Cosmic Signature {id}",
+      "alt": "Tác phẩm Cosmic Signature {id} — nghệ thuật tạo sinh ba vật thể tất định",
+      "pairingNote": "Nghệ thuật ba vật thể tất định, khắc trên chuỗi. Mỗi Signature đi cùng 1.000 CST."
     },
     "composer": {
-      "title": "Say it with a Gesture",
-      "subtitle": "Messages travel on-chain with your gesture",
-      "placeholder": "Write an optional on-chain message…",
-      "note": "Sending makes a real Gesture on Arbitrum — the message rides along and appears in Gesture Chat.",
-      "connectBody": "Connect a wallet to make a Gesture and post a message to Gesture Chat.",
+      "title": "Nói lên bằng một nét bút",
+      "subtitle": "Lời nhắn đi trên chuỗi cùng nét bút của bạn",
+      "placeholder": "Viết một lời nhắn tùy chọn trên chuỗi…",
+      "note": "Gửi sẽ tạo một nét bút thật trên Arbitrum — lời nhắn đi kèm và xuất hiện trong Trò chuyện nét bút.",
+      "connectBody": "Kết nối ví để đặt nét bút và đăng lời nhắn lên Trò chuyện nét bút.",
       "rwlkChip": "RWLK #{id}",
-      "rwlkChoose": "RWLK: pick token",
-      "cstFree": "CST gestures are free right now"
+      "rwlkChoose": "RWLK: chọn token",
+      "cstFree": "Nét bút CST hiện không tốn chi phí"
     },
     "personal": {
-      "title": "Your position",
-      "leader": "You hold the latest Gesture",
-      "heldFor": "held {duration}",
-      "notLeader": "You are not the latest participant",
-      "enduranceIn": "Endurance record in {duration}",
-      "extending": "Extending the Endurance record now",
-      "gestures": "{count, plural, =0 {No gestures this cycle yet} one {# gesture this cycle} other {# gestures this cycle}}",
-      "retrieve": "Retrieve waiting allocations",
-      "nothingWaiting": "Nothing waiting to retrieve",
-      "cstPreview": "A gesture now imprints ~{amount} CST"
+      "title": "Vị thế của bạn",
+      "leader": "Bạn đang giữ nét bút mới nhất",
+      "heldFor": "đã giữ {duration}",
+      "notLeader": "Bạn không phải người tham gia gần nhất",
+      "enduranceIn": "Kỷ lục Bền bỉ sau {duration}",
+      "extending": "Đang nối dài kỷ lục Bền bỉ",
+      "gestures": "{count, plural, =0 {Chưa có nét bút trong chu kỳ này} other {# nét bút trong chu kỳ này}}",
+      "retrieve": "Nhận về các phân bổ đang chờ",
+      "nothingWaiting": "Không có gì đang chờ nhận về",
+      "cstPreview": "Một nét bút lúc này khắc ~{amount} CST"
     },
     "miniBar": {
-      "aria": "Cycle quick console",
-      "reserve": "Signature Allocation",
-      "jump": "Back to the Deck"
+      "aria": "Bảng điều khiển nhanh của chu kỳ",
+      "reserve": "Phân bổ Signature",
+      "jump": "Quay về Đài quan sát"
     },
     "story": {
-      "collapsedTitle": "About Cosmic Signature",
-      "collapsedSubtitle": "The story, the artwork, and how each Performance Cycle becomes a Signature",
-      "expand": "Expand"
+      "collapsedTitle": "Về Cosmic Signature",
+      "collapsedSubtitle": "Câu chuyện, tác phẩm và cách mỗi chu kỳ trình diễn trở thành một Signature",
+      "expand": "Mở rộng"
     }
   },
   "mobileCta": {
-    "makeGesture": "Make a Gesture",
-    "preview": "Preview Gesture Options"
+    "makeGesture": "Đặt nét bút",
+    "preview": "Xem trước tùy chọn nét bút"
   },
   "observatory": {
     "pulse": {
-      "gestureCount": "{count, plural, =0 {No gestures yet} one {# gesture} other {# gestures}}",
-      "lastGestureAge": "last gesture {age}"
+      "gestureCount": "{count, plural, =0 {Chưa có nét bút} other {# nét bút}}",
+      "lastGestureAge": "nét bút gần nhất {age}"
     },
     "clock": {
-      "reserveLabel": "Signature Allocation",
-      "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
+      "reserveLabel": "Phân bổ Signature",
+      "reserveExtras": "+ 1.000 CST · 1 Cosmic Signature NFT · tài sản đính kèm",
       "reserveUsd": "≈ {amount} USD",
-      "notifyAria": "Notify me before the cycle can finalize",
-      "notifyLabel": "Alert me before finalization:",
-      "notifyMinutes": "{minutes}m",
-      "calendarTitle": "Cosmic Signature Cycle #{number} opens",
-      "calendarBody": "The next Performance Cycle opens for Gestures. The first Gesture starts the finalization clock.",
-      "calendarCta": "Add the opening to your calendar"
+      "notifyAria": "Thông báo cho tôi trước khi chu kỳ có thể hoàn tất",
+      "notifyLabel": "Nhắc tôi trước khi hoàn tất:",
+      "notifyMinutes": "{minutes} phút",
+      "calendarTitle": "Chu kỳ Cosmic Signature #{number} mở",
+      "calendarBody": "Chu kỳ trình diễn tiếp theo mở cho nét bút. Nét bút đầu tiên khởi động đồng hồ hoàn tất.",
+      "calendarCta": "Thêm thời điểm mở vào lịch của bạn"
     },
     "standings": {
-      "title": "Live Standings",
-      "tooltip": "Who holds each competitive track of this cycle right now. Timers run live; standings lock in only when the cycle finalizes.",
-      "youBadge": "You",
-      "latestName": "Latest Gesture",
-      "latestTooltip": "The most recent participant. If the finalization clock reached zero right now, this address would receive the Signature Allocation.",
-      "held": "held {duration}",
-      "record": "record {duration}",
-      "awaitingGesture": "Awaiting the first Gesture",
-      "awaitingRecord": "No record yet",
-      "cstPlusNft": "1,000 CST + NFT"
+      "title": "Thứ hạng trực tiếp",
+      "tooltip": "Ai đang giữ từng luồng của chu kỳ này ngay lúc này. Bộ đếm chạy trực tiếp; thứ hạng chỉ chốt khi chu kỳ hoàn tất.",
+      "youBadge": "Bạn",
+      "latestName": "Nét bút mới nhất",
+      "latestTooltip": "Người tham gia gần nhất. Nếu đồng hồ hoàn tất về không ngay lúc này, địa chỉ này sẽ nhận phân bổ Signature.",
+      "held": "đã giữ {duration}",
+      "record": "kỷ lục {duration}",
+      "awaitingGesture": "Đang chờ nét bút đầu tiên",
+      "awaitingRecord": "Chưa có kỷ lục",
+      "cstPlusNft": "1.000 CST + NFT"
     },
     "intel": {
-      "latestSubtitle": "What the latest Gesture cost, imprinted, and is currently positioned to receive.",
-      "viewGesture": "Open Gesture",
-      "inLineFor": "Currently in line for at finalization",
-      "attachedNfts": "{count, plural, one {# attached NFT} other {# attached NFTs}}",
-      "attachedTokens": "{count, plural, one {# attached token deposit} other {# attached token deposits}}",
-      "plusCycleAttachments": "Plus {assets} held by the cycle.",
-      "enduranceChronoTitle": "Endurance & Chrono",
-      "enduranceChronoSubtitle": "The standing records and the active challenge changing them now.",
-      "liveRoleState": "Live role state"
+      "latestSubtitle": "Nét bút mới nhất đã tốn bao nhiêu, khắc những gì và hiện đang trong hàng nhận gì.",
+      "viewGesture": "Mở nét bút",
+      "inLineFor": "Hiện đang trong hàng nhận khi hoàn tất",
+      "attachedNfts": "{count, plural, other {# NFT đính kèm}}",
+      "attachedTokens": "{count, plural, other {# khoản nạp token đính kèm}}",
+      "plusCycleAttachments": "Cộng thêm {assets} chu kỳ đang giữ.",
+      "enduranceChronoTitle": "Bền bỉ và Chrono",
+      "enduranceChronoSubtitle": "Các kỷ lục đang đứng và thử thách đang diễn ra làm thay đổi chúng.",
+      "liveRoleState": "Trạng thái vai trò trực tiếp"
     },
     "prices": {
-      "availableAfterFirst": "After first Gesture",
-      "openDockHint": "Live costs · open the action dock to participate"
+      "availableAfterFirst": "Sau nét bút đầu tiên",
+      "openDockHint": "Chi phí trực tiếp · mở thanh thao tác để tham gia"
     },
     "ribbon": {
-      "title": "Allocation Tracks",
-      "subtitle": "Everything this cycle distributes at finalization",
-      "tooltip": "Live view of every allocation track in the current Performance Cycle. Amounts grow with the reserve and distribute when the cycle finalizes.",
-      "fullBreakdown": "View the full breakdown",
-      "stellarStatus": "every Gesture is an entry",
-      "nextCycleName": "Next Cycle Seed",
-      "nextCycleTooltip": "This share is not distributed at finalization — it stays in the reserve and seeds the next Performance Cycle.",
-      "nextCycleDetail": "compounds forward",
-      "percentOfReserve": "{percent}% of reserve"
+      "title": "Các luồng phân bổ",
+      "subtitle": "Mọi thứ chu kỳ này phân phối khi hoàn tất",
+      "tooltip": "Góc nhìn trực tiếp về mọi luồng phân bổ trong chu kỳ trình diễn hiện tại. Số lượng tăng theo dự trữ và được phân phối khi chu kỳ hoàn tất.",
+      "fullBreakdown": "Xem chi tiết đầy đủ",
+      "stellarStatus": "mỗi nét bút là một lượt",
+      "nextCycleName": "Phần khởi đầu chu kỳ sau",
+      "nextCycleTooltip": "Phần này không được phân phối khi hoàn tất — nó ở lại trong dự trữ và khởi đầu chu kỳ trình diễn tiếp theo.",
+      "nextCycleDetail": "tích lũy chuyển tiếp",
+      "percentOfReserve": "{percent}% dự trữ"
     },
     "dock": {
-      "aria": "Cycle quick actions",
-      "reserve": "Reserve",
-      "openPanelAria": "Open the gesture panel"
+      "aria": "Thao tác nhanh của chu kỳ",
+      "reserve": "Dự trữ",
+      "openPanelAria": "Mở bảng nét bút"
     },
     "panel": {
-      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry.",
-      "sheetTitle": "Make a Gesture"
+      "microcopy": "Mỗi nét bút kéo dài đồng hồ hoàn tất, khắc CST tham gia và được tính là một lượt Tinh tuyển.",
+      "sheetTitle": "Đặt nét bút"
     }
   },
   "cycleDetails": {
-    "title": "View Full Cycle Details",
-    "subtitle": "Gesture history, leaderboards, contributions, and allocation distribution"
+    "title": "Xem chi tiết chu kỳ đầy đủ",
+    "subtitle": "Lịch sử nét bút, bảng xếp hạng, đóng góp và phân phối phân bổ"
   },
   "publicGoods": {
-    "eyebrow": "Public Goods",
-    "heading": "Funding Ethereum's core contributors.",
-    "thisCycle": "This cycle",
-    "body": "{percent}% of every Performance Cycle is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.",
-    "cta": "View public-goods contributions",
+    "eyebrow": "Hàng hóa công",
+    "heading": "Tài trợ những người đóng góp cốt lõi cho Ethereum.",
+    "thisCycle": "Chu kỳ này",
+    "body": "{percent}% của mỗi chu kỳ trình diễn được chuyển đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.",
+    "cta": "Xem đóng góp hàng hóa công",
     "stats": {
-      "lifetime": "Lifetime Contributed",
-      "lifetimeTooltip": "Automatic protocol forwards plus voluntary public-goods contributions.",
-      "vault": "In Vault Now",
-      "vaultTooltip": "ETH currently held in the Public Goods Vault before retrieval.",
-      "retrieved": "Already Retrieved",
-      "retrievedTooltip": "Total ETH retrieved from the Public Goods Vault for beneficiaries."
+      "lifetime": "Tổng đã đóng góp",
+      "lifetimeTooltip": "Các khoản chuyển tự động của giao thức cộng với đóng góp hàng hóa công tự nguyện.",
+      "vault": "Hiện có trong kho",
+      "vaultTooltip": "ETH hiện được giữ trong Kho Hàng hóa công trước khi được nhận về.",
+      "retrieved": "Đã nhận về",
+      "retrievedTooltip": "Tổng ETH đã nhận về từ Kho Hàng hóa công cho các đơn vị thụ hưởng."
     }
   },
   "latestNfts": {
-    "title": "Latest NFTs",
-    "dividerAlt": "divider",
-    "previousAria": "Previous latest NFTs",
-    "nextAria": "Next latest NFTs",
+    "title": "NFT mới nhất",
+    "dividerAlt": "đường phân cách",
+    "previousAria": "NFT mới nhất trước đó",
+    "nextAria": "NFT mới nhất tiếp theo",
     "empty": {
-      "title": "No Cosmic Signature NFTs have been imprinted yet.",
-      "body": "The gallery will fill as Performance Cycles finalize and new deterministic three-body artworks are created.",
-      "cta": "Open the gallery"
+      "title": "Chưa có Cosmic Signature NFT nào được khắc.",
+      "body": "Phòng trưng bày sẽ đầy dần khi các chu kỳ trình diễn hoàn tất và những tác phẩm ba vật thể tất định mới được tạo ra.",
+      "cta": "Mở phòng trưng bày"
     }
   },
   "rwlkGrid": {
-    "searchPlaceholder": "Enter NFT ID",
-    "searchIconAlt": "search icon",
-    "empty": "Nothing Found!"
+    "searchPlaceholder": "Nhập mã NFT",
+    "searchIconAlt": "biểu tượng tìm kiếm",
+    "empty": "Không tìm thấy gì!"
   }
 }

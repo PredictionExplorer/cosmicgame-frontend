@@ -1,38 +1,38 @@
 {
   "connect": {
-    "button": "Connect Wallet"
+    "button": "Kết nối ví"
   },
   "groups": {
-    "popular": "Popular",
-    "more": "More"
+    "popular": "Phổ biến",
+    "more": "Khác"
   },
   "balances": {
     "eth": "ETH",
     "cst": "CST",
-    "cosmicNfts": "COSMIC NFTs",
-    "rwlkNfts": "RWLK NFTs",
-    "anchoredCst": "Anchored Cosmic Signature NFTs",
-    "anchoredRwlk": "Anchored RWLK NFTs"
+    "cosmicNfts": "COSMIC NFT",
+    "rwlkNfts": "RWLK NFT",
+    "anchoredCst": "Cosmic Signature NFT đang neo giữ",
+    "anchoredRwlk": "RWLK NFT đang neo giữ"
   },
   "labels": {
-    "loading": "Loading...",
-    "balancesHeading": "Balances",
-    "anchoredHeading": "Anchored",
+    "loading": "Đang tải…",
+    "balancesHeading": "Số dư",
+    "anchoredHeading": "Đang neo giữ",
     "nftCount": "{count}"
   },
   "account": {
-    "heading": "Account",
-    "myDashboard": "My Dashboard",
-    "myRewards": "My Rewards",
-    "myNfts": "My NFTs",
-    "transferCst": "Transfer CST",
-    "addCstToMetaMask": "Add CST to MetaMask",
-    "addingCstToMetaMask": "Adding CST to MetaMask...",
-    "myAnchors": "My Anchors",
-    "winningHistory": "Winning History"
+    "heading": "Tài khoản",
+    "myDashboard": "Bảng điều khiển của tôi",
+    "myRewards": "Phân bổ của tôi",
+    "myNfts": "NFT của tôi",
+    "transferCst": "Chuyển CST",
+    "addCstToMetaMask": "Thêm CST vào MetaMask",
+    "addingCstToMetaMask": "Đang thêm CST vào MetaMask…",
+    "myAnchors": "Neo giữ của tôi",
+    "winningHistory": "Lịch sử nhận phân bổ"
   },
   "accessibility": {
-    "copyAddress": "Copy wallet address",
-    "addressCopied": "Wallet address copied"
+    "copyAddress": "Sao chép địa chỉ ví",
+    "addressCopied": "Đã sao chép địa chỉ ví"
   }
 }

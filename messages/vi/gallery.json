@@ -1,120 +1,120 @@
 {
   "error": {
-    "title": "Unable to load the imprint archive",
-    "message": "The Cosmic Signature collection could not be read. Try again to load the archive."
+    "title": "Không tải được kho lưu trữ khắc",
+    "message": "Không đọc được bộ sưu tập Cosmic Signature. Hãy thử lại để tải kho lưu trữ."
   },
   "jsonLd": {
-    "name": "Cosmic Signature Gallery"
+    "name": "Phòng trưng bày Cosmic Signature"
   },
   "page": {
-    "eyebrowImprinted": "Collection · {count} NFTs Imprinted",
-    "eyebrowLive": "Collection · Live",
-    "title": "NFT Gallery",
-    "subtitle": "Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
+    "eyebrowImprinted": "Bộ sưu tập · {count} NFT đã khắc",
+    "eyebrowLive": "Bộ sưu tập · Trực tiếp",
+    "title": "Phòng trưng bày NFT",
+    "subtitle": "Khám phá trọn bộ sưu tập Cosmic Signature NFT được khắc qua mọi chu kỳ"
   },
   "intro": {
-    "badge": "Generative archive",
-    "description": "Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed via three-body-problem physics simulations. In a typical cycle, 24 new NFTs are imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT Stellar Selection NFTs for RandomWalk NFT anchor-holders."
+    "badge": "Kho lưu trữ tạo sinh",
+    "description": "Mỗi Cosmic Signature NFT là một tác phẩm nghệ thuật tạo sinh độc nhất, bắt nguồn từ một seed trên chuỗi qua các mô phỏng vật lý bài toán ba vật thể. Trong một chu kỳ điển hình, 24 NFT mới được khắc: bốn NFT theo vai trò, mười NFT Tinh tuyển dành cho người tham gia, và mười NFT Tinh tuyển NFT neo giữ dành cho những người neo giữ RandomWalk NFT."
   },
   "featured": {
-    "viewAria": "View Cosmic Signature {id}",
-    "alt": "Cosmic Signature artwork {id}",
-    "emptyHint": "Real collection artwork appears here when indexed NFTs are available.",
-    "badgeImprint": "Featured imprint",
-    "badgeArchive": "Archive",
-    "awaitingMetadata": "Awaiting metadata"
+    "viewAria": "Xem Cosmic Signature {id}",
+    "alt": "Tác phẩm Cosmic Signature {id}",
+    "emptyHint": "Tác phẩm thật của bộ sưu tập sẽ xuất hiện ở đây khi có NFT đã lập chỉ mục.",
+    "badgeImprint": "Tác phẩm nổi bật",
+    "badgeArchive": "Kho lưu trữ",
+    "awaitingMetadata": "Đang chờ siêu dữ liệu"
   },
   "hero": {
     "totalImprinted": {
-      "label": "Total Imprinted",
-      "tooltip": "The total number of COSMIC NFTs imprinted across all cycles"
+      "label": "Tổng số đã khắc",
+      "tooltip": "Tổng số COSMIC NFT đã được khắc qua mọi chu kỳ"
     },
     "currentlyAnchored": {
-      "label": "Currently Anchored",
-      "tooltip": "NFTs anchored to the protocol, receiving distributions for their owners"
+      "label": "Đang neo giữ",
+      "tooltip": "Các NFT đang neo giữ với giao thức và nhận phân phối cho chủ sở hữu"
     },
     "namedNfts": {
-      "label": "Named NFTs",
-      "tooltip": "NFTs that have been given a unique custom name by their owner"
+      "label": "NFT đã đặt tên",
+      "tooltip": "Các NFT đã được chủ sở hữu đặt một tên tùy chỉnh độc nhất"
     },
     "cycles": {
-      "label": "Cycles",
-      "tooltip": "The number of unique cycles that have produced NFTs"
+      "label": "Chu kỳ",
+      "tooltip": "Số chu kỳ riêng biệt đã tạo ra NFT"
     }
   },
   "card": {
     "alt": "Cosmic Signature {id}",
-    "unnamed": "Unnamed",
+    "unnamed": "Chưa đặt tên",
     "age": {
-      "justNow": "just now",
-      "minutes": "{count}m ago",
-      "hours": "{count}h ago",
-      "days": "{count}d ago",
-      "months": "{count}mo ago",
-      "years": "{count}y ago"
+      "justNow": "vừa xong",
+      "minutes": "{count} phút trước",
+      "hours": "{count} giờ trước",
+      "days": "{count} ngày trước",
+      "months": "{count} tháng trước",
+      "years": "{count} năm trước"
     },
     "tooltips": {
-      "round": "Imprinted in cycle {round}",
-      "anchored": "Currently anchored and receiving Anchor Distributions",
-      "customName": "This NFT has a custom name",
-      "identifier": "Unique sequential identifier for this COSMIC NFT",
-      "mintedOn": "Imprinted on {date}"
+      "round": "Được khắc trong chu kỳ {round}",
+      "anchored": "Đang neo giữ và nhận phân phối neo giữ",
+      "customName": "NFT này có tên tùy chỉnh",
+      "identifier": "Mã định danh tuần tự độc nhất của COSMIC NFT này",
+      "mintedOn": "Được khắc vào {date}"
     }
   },
   "filters": {
-    "ariaLabel": "Filter NFTs",
+    "ariaLabel": "Lọc NFT",
     "all": {
-      "label": "All",
-      "tooltip": "Show all NFTs in the collection"
+      "label": "Tất cả",
+      "tooltip": "Hiển thị mọi NFT trong bộ sưu tập"
     },
     "anchored": {
-      "label": "Anchored",
-      "tooltip": "NFTs currently anchored and receiving Anchor Distributions"
+      "label": "Đang neo giữ",
+      "tooltip": "Các NFT đang neo giữ và nhận phân phối neo giữ"
     },
     "named": {
-      "label": "Named",
-      "tooltip": "NFTs given a custom name by their owner"
+      "label": "Đã đặt tên",
+      "tooltip": "Các NFT được chủ sở hữu đặt tên tùy chỉnh"
     }
   },
   "sort": {
-    "ariaLabel": "Sort order",
-    "tooltip": "Change the order NFTs are displayed",
-    "newest": "Newest First",
-    "oldest": "Oldest First",
-    "cycleDesc": "Cycle (High → Low)",
-    "cycleAsc": "Cycle (Low → High)",
-    "rarity": "Rarest First",
-    "chaosDesc": "Chaos (High → Low)",
-    "chaosAsc": "Chaos (Low → High)",
-    "syzygiesDesc": "Most Syzygies"
+    "ariaLabel": "Thứ tự sắp xếp",
+    "tooltip": "Thay đổi thứ tự hiển thị NFT",
+    "newest": "Mới nhất trước",
+    "oldest": "Cũ nhất trước",
+    "cycleDesc": "Chu kỳ (cao → thấp)",
+    "cycleAsc": "Chu kỳ (thấp → cao)",
+    "rarity": "Hiếm nhất trước",
+    "chaosDesc": "Hỗn độn (cao → thấp)",
+    "chaosAsc": "Hỗn độn (thấp → cao)",
+    "syzygiesDesc": "Nhiều sóc vọng nhất"
   },
   "list": {
     "headers": {
-      "artwork": "Artwork",
+      "artwork": "Tác phẩm",
       "token": "Token",
-      "structure": "Structure",
-      "palette": "Palette",
-      "spectral": "Class",
-      "chaos": "Chaos",
-      "fate": "Fate",
-      "allocation": "Allocation",
-      "cycle": "Cycle",
-      "age": "Imprinted"
+      "structure": "Cấu trúc",
+      "palette": "Bảng màu",
+      "spectral": "Lớp",
+      "chaos": "Hỗn độn",
+      "fate": "Vận mệnh",
+      "allocation": "Phân bổ",
+      "cycle": "Chu kỳ",
+      "age": "Đã khắc"
     }
   },
   "view": {
-    "ariaLabel": "View mode",
-    "grid": "Grid view",
-    "list": "List view"
+    "ariaLabel": "Chế độ xem",
+    "grid": "Xem dạng lưới",
+    "list": "Xem dạng danh sách"
   },
   "pagination": {
-    "showing": "Showing <value>{start}</value> - <value>{end}</value> of <value>{total}</value> NFTs",
-    "perPage": "Per page",
-    "perPageAria": "Items per page",
-    "perPageTooltip": "Number of NFTs displayed per page"
+    "showing": "Đang hiển thị <value>{start}</value> - <value>{end}</value> trong <value>{total}</value> NFT",
+    "perPage": "Mỗi trang",
+    "perPageAria": "Số mục mỗi trang",
+    "perPageTooltip": "Số NFT hiển thị trên mỗi trang"
   },
   "empty": {
-    "title": "No NFTs found",
-    "description": "Try adjusting your search or filters to find what you're looking for."
+    "title": "Không tìm thấy NFT nào",
+    "description": "Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc để tìm điều bạn cần."
   }
 }

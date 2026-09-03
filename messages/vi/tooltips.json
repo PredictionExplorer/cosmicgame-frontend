@@ -1,5 +1,5 @@
 {
-  "moreInformation": "More information: {content}",
-  "moreInformationAbout": "More information about {label}",
-  "explainColumn": "Explain column: {column}"
+  "moreInformation": "Thông tin thêm: {content}",
+  "moreInformationAbout": "Thông tin thêm về {label}",
+  "explainColumn": "Giải thích cột: {column}"
 }

@@ -1,321 +1,321 @@
 {
   "shared": {
     "defaultTitle": "Cosmic Signature",
-    "defaultOgTitle": "Cosmic Signature — Every Gesture Shapes the Signature.",
-    "defaultDescription": "A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors."
+    "defaultOgTitle": "Cosmic Signature — Mỗi nét bút đều định hình Signature.",
+    "defaultDescription": "Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Mỗi nét bút bạn đặt đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ của mình qua hơn mười luồng phân bổ — bao gồm Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum."
   },
   "home": {
     "title": "Cosmic Signature",
-    "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the Cycle Reserve distributes across allocation tracks — including Protocol Guild.",
-    "descriptionWithReserve": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the {reserve} Cycle Reserve distributes across allocation tracks — including Protocol Guild."
+    "description": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Đặt nét bút trong chu kỳ trình diễn; khi chu kỳ hoàn tất, Dự trữ chu kỳ được phân phối qua các luồng phân bổ — bao gồm Protocol Guild.",
+    "descriptionWithReserve": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Đặt nét bút trong chu kỳ trình diễn; khi chu kỳ hoàn tất, Dự trữ chu kỳ {reserve} được phân phối qua các luồng phân bổ — bao gồm Protocol Guild."
   },
   "experimentalUi": {
-    "title": "Experimental UI | Cosmic Signature",
-    "description": "Explore an experimental Cosmic Signature cycle interface with the same live protocol data and actions."
+    "title": "Giao diện thử nghiệm | Cosmic Signature",
+    "description": "Khám phá giao diện chu kỳ thử nghiệm của Cosmic Signature với cùng dữ liệu và thao tác giao thức trực tiếp."
   },
   "gallery": {
-    "title": "Cosmic Signature Gallery | Deterministic Three-Body NFT Art",
-    "description": "Explore Cosmic Signature NFT artwork generated from deterministic three-body physics, on-chain seeds, spectral rendering, and Performance Cycle data."
+    "title": "Phòng trưng bày Cosmic Signature | Nghệ thuật NFT ba vật thể tất định",
+    "description": "Khám phá tác phẩm Cosmic Signature NFT được tạo từ vật lý ba vật thể tất định, seed trên chuỗi, kết xuất quang phổ và dữ liệu chu kỳ trình diễn."
   },
   "allocations": {
-    "title": "Allocation Recipients | Cosmic Signature",
-    "description": "View the complete history of Cosmic Signature allocation recipients, cycle statistics, and ETH distributions across all finalized Performance Cycles."
+    "title": "Người nhận phân bổ | Cosmic Signature",
+    "description": "Xem toàn bộ lịch sử người nhận phân bổ của Cosmic Signature, thống kê chu kỳ và các đợt phân phối ETH qua mọi chu kỳ trình diễn đã hoàn tất."
   },
   "anchoring": {
-    "title": "Anchoring | Cosmic Signature",
-    "description": "Anchor your Cosmic Signature NFTs to the protocol to receive per-cycle ETH Anchor Distributions. View global anchoring statistics and how the mechanism works on Arbitrum."
+    "title": "Neo giữ | Cosmic Signature",
+    "description": "Neo giữ Cosmic Signature NFT với giao thức để nhận phân phối neo giữ ETH theo từng chu kỳ. Xem thống kê neo giữ toàn cầu và cách cơ chế này vận hành trên Arbitrum."
   },
   "statistics": {
-    "title": "Cosmic Signature Statistics | Performance Cycle, Gestures, NFTs, and CST",
-    "description": "View Cosmic Signature protocol statistics on Arbitrum, including Performance Cycle status, gestures, NFT activity, CST, anchoring, reserves, and allocation data."
+    "title": "Thống kê Cosmic Signature | Chu kỳ trình diễn, nét bút, NFT và CST",
+    "description": "Xem thống kê giao thức Cosmic Signature trên Arbitrum, gồm trạng thái chu kỳ trình diễn, nét bút, hoạt động NFT, CST, neo giữ, dự trữ và dữ liệu phân bổ."
   },
   "statisticsParticipation": {
-    "title": "Participation Statistics | Cosmic Signature",
-    "description": "Unique participants, allocation recipients, and ETH contributors indexed across all Cosmic Signature Performance Cycles."
+    "title": "Thống kê tham gia | Cosmic Signature",
+    "description": "Người tham gia riêng biệt, người nhận phân bổ và người đóng góp ETH được lập chỉ mục qua mọi chu kỳ trình diễn của Cosmic Signature."
   },
   "statisticsTokens": {
-    "title": "Token Distribution Statistics | Cosmic Signature",
-    "description": "Cosmic Signature NFT ownership, CST (ERC-20) balance distribution, total supply history, and assets attached to gestures."
+    "title": "Thống kê phân bố token | Cosmic Signature",
+    "description": "Quyền sở hữu Cosmic Signature NFT, phân bố số dư CST (ERC-20), lịch sử tổng cung và các tài sản đính kèm vào nét bút."
   },
   "statisticsAnchoring": {
-    "title": "Anchoring Statistics | Cosmic Signature",
-    "description": "Anchor and release actions, currently anchored tokens, and unique anchor-holders for Cosmic Signature and RandomWalk NFTs."
+    "title": "Thống kê neo giữ | Cosmic Signature",
+    "description": "Thao tác neo giữ và gỡ neo, token đang neo giữ và người neo giữ riêng biệt của Cosmic Signature và RandomWalk NFT."
   },
   "statisticsActivity": {
-    "title": "Gesture Activity Statistics | Cosmic Signature",
-    "description": "Gesture frequency over time, activity spikes, participant active periods, gesture-type mix, cycle timelines, and cycle activations."
+    "title": "Thống kê hoạt động nét bút | Cosmic Signature",
+    "description": "Tần suất nét bút theo thời gian, các đợt tăng vọt hoạt động, khoảng hoạt động của người tham gia, tỷ lệ loại nét bút, dòng thời gian chu kỳ và các lần kích hoạt chu kỳ."
   },
   "statisticsPerformance": {
-    "title": "Participant Performance Statistics | Cosmic Signature",
-    "description": "Participant performance leaderboard and claimable allocation outcomes for every Cosmic Signature Performance Cycle."
+    "title": "Thống kê thành tích người tham gia | Cosmic Signature",
+    "description": "Bảng xếp hạng thành tích người tham gia và kết quả phân bổ có thể nhận về của mọi chu kỳ trình diễn Cosmic Signature."
   },
   "faq": {
-    "title": "Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol",
-    "description": "Answers to common questions about Cosmic Signature, Performance Cycles, gestures, CST, three-body NFT art, Arbitrum, anchoring, contracts, and protocol security."
+    "title": "Câu hỏi thường gặp về Cosmic Signature | Giao thức nghệ thuật trên chuỗi Arbitrum",
+    "description": "Giải đáp những câu hỏi phổ biến về Cosmic Signature, chu kỳ trình diễn, nét bút, CST, nghệ thuật NFT ba vật thể, Arbitrum, neo giữ, hợp đồng và bảo mật giao thức."
   },
   "myAllocations": {
-    "title": "My Allocations | Cosmic Signature",
-    "description": "View and retrieve your pending ETH allocations, Stellar Selection distributions, Anchor Distributions, and attached assets from the Cosmic Signature protocol."
+    "title": "Phân bổ của tôi | Cosmic Signature",
+    "description": "Xem và nhận về các phân bổ ETH đang chờ, phân phối Tinh tuyển, phân phối neo giữ và tài sản đính kèm từ giao thức Cosmic Signature."
   },
   "myAnchors": {
-    "title": "My Anchors | Cosmic Signature",
-    "description": "Manage your anchored Cosmic Signature and Random Walk NFTs. View ETH Anchor Distributions for Cosmic Signature NFTs and Anchored-NFT Stellar Selection history for Random Walk NFTs."
+    "title": "Neo giữ của tôi | Cosmic Signature",
+    "description": "Quản lý các Cosmic Signature và Random Walk NFT đang neo giữ. Xem phân phối neo giữ ETH cho Cosmic Signature NFT và lịch sử Tinh tuyển NFT neo giữ cho Random Walk NFT."
   },
   "contracts": {
-    "title": "Cosmic Signature Contracts | Verified Arbitrum Smart Contracts",
-    "description": "Find Cosmic Signature smart contract addresses, verification status, audits, formal verification notes, and Arbitrum deployment details."
+    "title": "Hợp đồng Cosmic Signature | Hợp đồng thông minh Arbitrum đã xác minh",
+    "description": "Tra cứu địa chỉ hợp đồng thông minh Cosmic Signature, tình trạng xác minh, kiểm toán, ghi chú kiểm chứng hình thức và chi tiết triển khai trên Arbitrum."
   },
   "terms": {
-    "title": "Terms · Cosmic Signature",
-    "description": "Terms of use for the Cosmic Signature procedural on-chain art protocol."
+    "title": "Điều khoản · Cosmic Signature",
+    "description": "Điều khoản sử dụng giao thức nghệ thuật tạo sinh trên chuỗi Cosmic Signature."
   },
   "privacy": {
-    "title": "Privacy · Cosmic Signature",
-    "description": "Privacy practices for visitors to the Cosmic Signature protocol."
+    "title": "Quyền riêng tư · Cosmic Signature",
+    "description": "Thực hành về quyền riêng tư đối với khách truy cập giao thức Cosmic Signature."
   },
   "pagePrivacy": {
-    "title": "Privacy Policy | Cosmic Signature",
-    "description": "Privacy Policy for Cosmic Signature — how we handle wallet data, transactions, security, and blockchain transparency."
+    "title": "Chính sách quyền riêng tư | Cosmic Signature",
+    "description": "Chính sách quyền riêng tư của Cosmic Signature — cách chúng tôi xử lý dữ liệu ví, giao dịch, bảo mật và tính minh bạch của blockchain."
   },
   "security": {
-    "title": "Cosmic Signature Security | Protocol Verification and Safety",
-    "description": "Review Cosmic Signature security practices, Arbitrum contract verification, operational controls, and participant safety notes."
+    "title": "Bảo mật Cosmic Signature | Xác minh và an toàn giao thức",
+    "description": "Xem các thực hành bảo mật của Cosmic Signature, xác minh hợp đồng trên Arbitrum, kiểm soát vận hành và ghi chú an toàn cho người tham gia."
   },
   "audits": {
-    "title": "Cosmic Signature Audits | Verification and Contract Review",
-    "description": "The Cosmic Signature smart contracts were independently audited by Hacken. Review the report, formal verification context, and source-code verification resources."
+    "title": "Kiểm toán Cosmic Signature | Xác minh và rà soát hợp đồng",
+    "description": "Các hợp đồng thông minh của Cosmic Signature đã được Hacken kiểm toán độc lập. Xem báo cáo, bối cảnh kiểm chứng hình thức và tài nguyên xác minh mã nguồn."
   },
   "code": {
-    "title": "Cosmic Signature Source Code | CC0 On-Chain Art Protocol",
-    "description": "Explore the Cosmic Signature source code, rendering pipeline, contract repository, verification workflow, and CC0 public-domain license."
+    "title": "Mã nguồn Cosmic Signature | Giao thức nghệ thuật trên chuỗi CC0",
+    "description": "Khám phá mã nguồn Cosmic Signature, quy trình kết xuất, kho hợp đồng, quy trình xác minh và giấy phép phạm vi công cộng CC0."
   },
   "tokenDetail": {
     "titleFor": "Cosmic Signature NFT #{id} | Cosmic Signature",
-    "descriptionFor": "Attributes and ownership history of Cosmic Signature NFT #{id} - a deterministic three-body NFT rendered spectrally on Arbitrum."
+    "descriptionFor": "Đặc tính và lịch sử sở hữu của Cosmic Signature NFT #{id} - một NFT ba vật thể tất định được kết xuất quang phổ trên Arbitrum."
   },
   "gestureDetail": {
-    "title": "Gesture Information | Cosmic Signature",
-    "description": "View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol."
+    "title": "Thông tin nét bút | Cosmic Signature",
+    "description": "Xem thông tin chi tiết về nét bút gồm dấu thời gian, địa chỉ người tham gia, chi phí nét bút và bối cảnh chu kỳ của giao thức Cosmic Signature."
   },
   "coordinationChanges": {
-    "title": "Coordination Changes | Cosmic Signature",
-    "description": "Complete history of protocol parameter adjustments in Cosmic Signature. Track Gesture-Cost step-ups, cycle time additions, Anchor Distribution settings, and other coordination updates."
+    "title": "Thay đổi điều phối | Cosmic Signature",
+    "description": "Lịch sử đầy đủ các lần điều chỉnh tham số giao thức Cosmic Signature. Theo dõi bước tăng chi phí nét bút, mức cộng thêm thời gian chu kỳ, thiết lập phân phối neo giữ và các cập nhật điều phối khác."
   },
   "distributionsByToken": {
-    "title": "Distributions By Token | Cosmic Signature",
-    "description": "Anchor Distribution details for a specific Cosmic Signature NFT — per-cycle ETH distribution history, retrieval status, and cumulative Anchor Distributions."
+    "title": "Phân phối theo token | Cosmic Signature",
+    "description": "Chi tiết phân phối neo giữ của một Cosmic Signature NFT cụ thể — lịch sử phân phối ETH theo chu kỳ, trạng thái nhận về và phân phối neo giữ tích lũy."
   },
   "mint": {
-    "title": "Imprint RandomWalk NFT | Cosmic Signature",
-    "description": "Imprint a RandomWalk NFT on Cosmic Signature. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount."
+    "title": "Khắc RandomWalk NFT | Cosmic Signature",
+    "description": "Khắc một RandomWalk NFT trên Cosmic Signature. Mỗi RandomWalk NFT chưa sử dụng có thể đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút ETH."
   },
   "systemEvent": {
-    "title": "System Events | Cosmic Signature",
-    "description": "Protocol administration events and coordination parameter changes for a specific Cosmic Signature cycle."
+    "title": "Sự kiện hệ thống | Cosmic Signature",
+    "description": "Các sự kiện quản trị giao thức và thay đổi tham số điều phối của một chu kỳ Cosmic Signature cụ thể."
   },
   "currentCycleFull": {
-    "title": "Current Performance Cycle | Cosmic Signature",
-    "description": "Full details for the active Performance Cycle: gesture history, leaderboards, attached contributions, and allocation distribution."
+    "title": "Chu kỳ trình diễn hiện tại | Cosmic Signature",
+    "description": "Chi tiết đầy đủ về chu kỳ trình diễn đang diễn ra: lịch sử nét bút, bảng xếp hạng, đóng góp đính kèm và phân phối phân bổ."
   },
   "allocationInfo": {
-    "titleFor": "Cycle #{id} Allocation Information | Cosmic Signature",
-    "descriptionFor": "Detailed allocation information for Cosmic Signature cycle #{id} — recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations."
+    "titleFor": "Thông tin phân bổ chu kỳ #{id} | Cosmic Signature",
+    "descriptionFor": "Thông tin phân bổ chi tiết của chu kỳ Cosmic Signature #{id} — chi tiết người nhận, phân phối phân bổ Signature, kết quả Tinh tuyển và phân bổ NFT đính kèm."
   },
   "anchorAction": {
-    "title": "Anchor Action Detail | Cosmic Signature",
-    "description": "Details of a specific anchor action in Cosmic Signature — token type, anchored amounts, and distribution retrieval status."
+    "title": "Chi tiết thao tác neo giữ | Cosmic Signature",
+    "description": "Chi tiết về một thao tác neo giữ cụ thể trong Cosmic Signature — loại token, số lượng đã neo giữ và trạng thái nhận về phân phối."
   },
   "pageTerms": {
-    "title": "Terms of Service | Cosmic Signature",
-    "description": "Terms of Service for Cosmic Signature — eligibility, protocol mechanics, allocations, risks, prohibited activities, and legal terms."
+    "title": "Điều khoản dịch vụ | Cosmic Signature",
+    "description": "Điều khoản dịch vụ của Cosmic Signature — điều kiện tham gia, cơ chế giao thức, phân bổ, rủi ro, hành vi bị cấm và các điều khoản pháp lý."
   },
   "userStellarSelectionNft": {
-    "title": "Stellar Selection NFTs | Cosmic Signature",
-    "description": "All Cosmic Signature NFTs allocated to this participant through Stellar Selection. Browse NFTs received via on-chain random selection."
+    "title": "NFT Tinh tuyển | Cosmic Signature",
+    "description": "Mọi Cosmic Signature NFT được phân bổ cho người tham gia này thông qua Tinh tuyển. Duyệt các NFT nhận được qua lựa chọn ngẫu nhiên trên chuỗi."
   },
   "userStellarSelectionEth": {
-    "title": "Stellar Selection ETH | Cosmic Signature",
-    "description": "All ETH allocations this participant received through Stellar Selection. Track random-selection allocations across completed cycles."
+    "title": "ETH Tinh tuyển | Cosmic Signature",
+    "description": "Mọi phân bổ ETH người tham gia này nhận được thông qua Tinh tuyển. Theo dõi các phân bổ từ lựa chọn ngẫu nhiên qua các chu kỳ đã hoàn thành."
   },
   "publicGoodsCgContributions": {
-    "title": "Protocol Public-Goods Contributions | Cosmic Signature",
-    "description": "Automatic forwards from the Cosmic Signature protocol to the Public Goods Beneficiary. Each cycle, a fixed share of the Cycle Reserve is forwarded to support public goods via the Cosmic Council."
+    "title": "Đóng góp Hàng hóa công của giao thức | Cosmic Signature",
+    "description": "Các khoản chuyển tự động từ giao thức Cosmic Signature đến đơn vị thụ hưởng Hàng hóa công. Mỗi chu kỳ, một phần cố định của Dự trữ chu kỳ được chuyển để hỗ trợ hàng hóa công thông qua Hội đồng Vũ trụ."
   },
   "publicGoodsRetrievals": {
-    "title": "Public Goods Retrievals | Cosmic Signature",
-    "description": "Retrievals from the Public Goods Vault. Each cycle, a share of the Cycle Reserve is forwarded to a beneficiary address selected by the Cosmic Council."
+    "title": "Nhận về Hàng hóa công | Cosmic Signature",
+    "description": "Các lần nhận về từ Kho Hàng hóa công. Mỗi chu kỳ, một phần Dự trữ chu kỳ được chuyển đến địa chỉ thụ hưởng do Hội đồng Vũ trụ lựa chọn."
   },
   "publicGoodsVoluntary": {
-    "title": "Voluntary Public-Goods Contributions | Cosmic Signature",
-    "description": "Voluntary contributions to the Public Goods Vault from the Cosmic Signature community. Contributions support beneficiaries selected through Cosmic Council coordination."
+    "title": "Đóng góp Hàng hóa công tự nguyện | Cosmic Signature",
+    "description": "Các khoản đóng góp tự nguyện vào Kho Hàng hóa công từ cộng đồng Cosmic Signature. Đóng góp hỗ trợ các đơn vị thụ hưởng do Hội đồng Vũ trụ điều phối lựa chọn."
   },
   "allocationRetrieved": {
-    "title": "Retrieved Allocations | Cosmic Signature",
-    "description": "Details of retrieved allocations from the Cosmic Signature protocol, including ETH receipts, Cosmic Signature NFT allocations, and Stellar Selection allocations."
+    "title": "Phân bổ đã nhận về | Cosmic Signature",
+    "description": "Chi tiết các phân bổ đã nhận về từ giao thức Cosmic Signature, gồm biên nhận ETH, phân bổ Cosmic Signature NFT và phân bổ Tinh tuyển."
   },
   "outreach": {
-    "title": "Outreach Allocations | Cosmic Signature",
-    "description": "Contribute to Cosmic Signature outreach and receive CST allocations. See top ecosystem contributors, allocation history, and how to take part."
+    "title": "Phân bổ truyền thông | Cosmic Signature",
+    "description": "Đóng góp cho hoạt động truyền thông của Cosmic Signature và nhận phân bổ CST. Xem những người đóng góp hàng đầu cho hệ sinh thái, lịch sử phân bổ và cách tham gia."
   },
   "outreachAddress": {
-    "title": "Outreach Allocations | Cosmic Signature",
-    "description": "Outreach allocation history and CST allocations for a Cosmic Signature ecosystem contributor. Review referral activity and contributions."
+    "title": "Phân bổ truyền thông | Cosmic Signature",
+    "description": "Lịch sử phân bổ truyền thông và phân bổ CST của một người đóng góp cho hệ sinh thái Cosmic Signature. Xem hoạt động giới thiệu và đóng góp."
   },
   "ethContribution": {
-    "title": "Direct ETH Contributions | Cosmic Signature",
-    "description": "Contribute ETH directly to the Cosmic Signature Public Goods Vault and view the complete contribution history. Support public goods while taking part in the protocol."
+    "title": "Đóng góp ETH trực tiếp | Cosmic Signature",
+    "description": "Đóng góp ETH trực tiếp vào Kho Hàng hóa công của Cosmic Signature và xem toàn bộ lịch sử đóng góp. Hỗ trợ hàng hóa công trong khi tham gia giao thức."
   },
   "ethContributionDetail": {
-    "title": "Direct ETH Contribution Detail | Cosmic Signature",
-    "description": "Details of a specific ETH contribution to the Cosmic Signature Public Goods Vault — contributor address, amount, cycle, and optional note."
+    "title": "Chi tiết đóng góp ETH trực tiếp | Cosmic Signature",
+    "description": "Chi tiết một khoản đóng góp ETH cụ thể vào Kho Hàng hóa công của Cosmic Signature — địa chỉ người đóng góp, số tiền, chu kỳ và lời nhắn tùy chọn."
   },
   "ethContributionByCycle": {
-    "title": "Direct ETH Contributions by Cycle | Cosmic Signature",
-    "description": "Direct ETH contributions to the Cosmic Signature protocol broken down by Performance Cycle."
+    "title": "Đóng góp ETH trực tiếp theo chu kỳ | Cosmic Signature",
+    "description": "Các khoản đóng góp ETH trực tiếp cho giao thức Cosmic Signature, phân theo chu kỳ trình diễn."
   },
   "myStatistics": {
-    "title": "My Statistics | Cosmic Signature",
-    "description": "Track your performance with Cosmic Signature's My Statistics page. View detailed gesture history, anchor status, distributions, and more. Stay informed and optimize your participation in our on-chain protocol."
+    "title": "Thống kê của tôi | Cosmic Signature",
+    "description": "Theo dõi hoạt động của bạn với trang Thống kê của tôi của Cosmic Signature. Xem lịch sử nét bút chi tiết, trạng thái neo giữ, phân phối và nhiều hơn nữa. Luôn nắm thông tin và tối ưu việc tham gia giao thức trên chuỗi của bạn."
   },
   "myTokens": {
-    "title": "My NFTs | Cosmic Signature",
-    "description": "View and manage the Cosmic Signature NFTs in your connected wallet, including optional transfers to another address."
+    "title": "NFT của tôi | Cosmic Signature",
+    "description": "Xem và quản lý các Cosmic Signature NFT trong ví đang kết nối, bao gồm tùy chọn chuyển giao đến địa chỉ khác."
   },
   "transferCst": {
-    "title": "Transfer CST | Cosmic Signature",
-    "description": "Send your Cosmic Signature CST tokens to another wallet address."
+    "title": "Chuyển CST | Cosmic Signature",
+    "description": "Gửi token CST của Cosmic Signature đến một địa chỉ ví khác."
   },
   "cosmicSignatureTransfers": {
-    "title": "Cosmic Signature NFT Transfer History | Cosmic Signature",
-    "description": "Cosmic Signature NFT Transfer History"
+    "title": "Lịch sử chuyển giao Cosmic Signature NFT | Cosmic Signature",
+    "description": "Lịch sử chuyển giao Cosmic Signature NFT"
   },
   "cosmicTokenTransfers": {
-    "title": "Cosmic Signature CST Token Transfer History | Cosmic Signature",
-    "description": "Cosmic Signature CST Token Transfer History"
+    "title": "Lịch sử chuyển token CST của Cosmic Signature | Cosmic Signature",
+    "description": "Lịch sử chuyển token CST của Cosmic Signature"
   },
   "usedRwlkNfts": {
-    "title": "Used RandomWalk NFTs | Cosmic Signature",
-    "description": "RandomWalk NFTs already attached to ETH gestures for a 50% Gesture-Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount."
+    "title": "RandomWalk NFT đã sử dụng | Cosmic Signature",
+    "description": "Các RandomWalk NFT đã được đính kèm vào nét bút ETH để giảm 50% chi phí nét bút trong Cosmic Signature. Mỗi RandomWalk NFT chỉ dùng được một lần cho mức giảm giá này."
   },
   "siteMap": {
-    "title": "Site Map | Cosmic Signature",
-    "description": "Navigate every section of the Cosmic Signature protocol — gestures, NFT gallery, anchoring, statistics, allocations, and public-goods contributions."
+    "title": "Sơ đồ trang | Cosmic Signature",
+    "description": "Điều hướng mọi phần của giao thức Cosmic Signature — nét bút, phòng trưng bày NFT, neo giữ, thống kê, phân bổ và đóng góp hàng hóa công."
   },
   "nftDonations": {
-    "title": "Attached NFT Contributions | Cosmic Signature",
-    "description": "Browse the history of NFTs attached to gestures by community members. Attached NFTs forward to the participant who receives the Signature Allocation each cycle."
+    "title": "Đóng góp NFT đính kèm | Cosmic Signature",
+    "description": "Duyệt lịch sử các NFT thành viên cộng đồng đã đính kèm vào nét bút. NFT đính kèm được chuyển đến người tham gia nhận phân bổ Signature của mỗi chu kỳ."
   },
   "namedNfts": {
-    "title": "Named Cosmic Signature NFTs | Cosmic Signature",
-    "description": "Browse Cosmic Signature NFTs that have been given custom names by their owners. Each named NFT carries a unique identity within the collection."
+    "title": "Cosmic Signature NFT đã đặt tên | Cosmic Signature",
+    "description": "Duyệt các Cosmic Signature NFT đã được chủ sở hữu đặt tên tùy chỉnh. Mỗi NFT đã đặt tên mang một danh tính độc nhất trong bộ sưu tập."
   },
   "recipientHistory": {
-    "title": "My Allocation History | Cosmic Signature",
-    "description": "View your complete allocation history in Cosmic Signature, including Signature Allocations, ETH Stellar Selection distributions, Cosmic Signature NFTs, and Anchor Distributions."
+    "title": "Lịch sử phân bổ của tôi | Cosmic Signature",
+    "description": "Xem toàn bộ lịch sử phân bổ của bạn trong Cosmic Signature, gồm phân bổ Signature, phân phối ETH Tinh tuyển, Cosmic Signature NFT và phân phối neo giữ."
   },
   "userProfile": {
-    "title": "Information for User {address} | Cosmic Signature",
-    "description": "Information for User {address}",
-    "invalidAddress": "Invalid Address"
+    "title": "Thông tin người dùng {address} | Cosmic Signature",
+    "description": "Thông tin người dùng {address}",
+    "invalidAddress": "Địa chỉ không hợp lệ"
   },
   "admin": {
-    "title": "Admin | Cosmic Signature",
-    "description": "Administrative controls for the Cosmic Signature protocol. Manage protocol parameters, contract settings, and system configuration."
+    "title": "Quản trị | Cosmic Signature",
+    "description": "Bảng điều khiển quản trị của giao thức Cosmic Signature. Quản lý tham số giao thức, thiết lập hợp đồng và cấu hình hệ thống."
   },
   "adminSettings": {
-    "title": "Admin Settings | Cosmic Signature",
-    "description": "Administrative settings and contract management"
+    "title": "Thiết lập quản trị | Cosmic Signature",
+    "description": "Thiết lập quản trị và quản lý hợp đồng"
   },
   "internalCstOutreachTransfer": {
-    "title": "CST Outreach Transfer | Cosmic Signature",
-    "description": "Restricted CST transfer tool for the configured outreach reserve wallet signer."
+    "title": "Chuyển CST truyền thông | Cosmic Signature",
+    "description": "Công cụ chuyển CST hạn chế dành cho người ký ví Dự trữ truyền thông đã cấu hình."
   },
   "embedEndurance": {
-    "title": "Endurance & Chrono Timeline",
-    "description": "Endurance Champion and Chrono-Warrior timeline for a Cosmic Signature Performance Cycle."
+    "title": "Dòng thời gian Bền bỉ và Chrono",
+    "description": "Dòng thời gian Quán quân Bền bỉ và Chiến binh Thời gian của một chu kỳ trình diễn Cosmic Signature."
   },
   "about": {
-    "title": "About Cosmic Signature | On-Chain Art on Arbitrum",
-    "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum that turns Performance Cycle gestures into deterministic three-body NFT art."
+    "title": "Về Cosmic Signature | Nghệ thuật trên chuỗi Arbitrum",
+    "description": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, biến các nét bút của chu kỳ trình diễn thành nghệ thuật NFT ba vật thể tất định."
   },
   "learn": {
-    "title": "Learn Cosmic Signature | On-Chain Art, Performance Cycles, and Arbitrum",
-    "description": "Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications."
+    "title": "Tìm hiểu Cosmic Signature | Nghệ thuật trên chuỗi, chu kỳ trình diễn và Arbitrum",
+    "description": "Tìm hiểu cách Cosmic Signature hoạt động: chu kỳ trình diễn, nét bút, CST, nghệ thuật NFT ba vật thể, hợp đồng Arbitrum, neo giữ, hàng hóa công và giải đáp về rủi ro."
   },
   "whitePaper": {
-    "title": "Cosmic Signature White Paper | A Procedural On-Chain Art Protocol",
-    "description": "The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization."
+    "title": "Sách trắng Cosmic Signature | Giao thức nghệ thuật tạo sinh trên chuỗi",
+    "description": "Bản mô tả tham chiếu của Cosmic Signature: chu kỳ trình diễn, nét bút, các luồng phân bổ, nghệ thuật NFT ba vật thể tất định, CST, neo giữ, Hội đồng Vũ trụ, nâng cấp giao thức và con đường đến phi tập trung hoàn toàn."
   },
   "quiz": {
-    "title": "Cosmic Signature Quiz | Test Your Protocol Knowledge",
-    "description": "One hundred questions across three tiers, drawn from the Cosmic Signature white paper: Performance Cycles, gestures, allocations, the art pipeline, and the edge cases only careful readers catch.",
+    "title": "Trắc nghiệm Cosmic Signature | Kiểm tra kiến thức về giao thức",
+    "description": "Một trăm câu hỏi trong ba cấp độ, rút từ sách trắng Cosmic Signature: chu kỳ trình diễn, nét bút, phân bổ, quy trình nghệ thuật và những trường hợp đặc biệt chỉ người đọc kỹ mới nhận ra.",
     "tiers": {
       "basic": {
-        "title": "Basic Quiz | Cosmic Signature",
-        "description": "Twenty-five questions on Cosmic Signature fundamentals: gestures, Performance Cycles, allocation tracks, and the deterministic three-body art."
+        "title": "Trắc nghiệm cơ bản | Cosmic Signature",
+        "description": "Hai mươi lăm câu hỏi về những điều căn bản của Cosmic Signature: nét bút, chu kỳ trình diễn, các luồng phân bổ và nghệ thuật ba vật thể tất định."
       },
       "medium": {
-        "title": "Medium Quiz | Cosmic Signature",
-        "description": "Twenty-five questions on the live mechanics of Cosmic Signature: Calibration Windows, the CST feedback loop, persistence tracks, and Cosmic Council rules."
+        "title": "Trắc nghiệm trung cấp | Cosmic Signature",
+        "description": "Hai mươi lăm câu hỏi về cơ chế vận hành của Cosmic Signature: cửa sổ hiệu chỉnh, vòng phản hồi CST, các luồng bền bỉ và quy tắc của Hội đồng Vũ trụ."
       },
       "hard": {
-        "title": "Hard Quiz | Cosmic Signature",
-        "description": "Fifty questions on Cosmic Signature edge cases and design forensics: post-expiry semantics, defensive design, upgrade history, and the art pipeline."
+        "title": "Trắc nghiệm nâng cao | Cosmic Signature",
+        "description": "Năm mươi câu hỏi về các trường hợp đặc biệt và phân tích thiết kế của Cosmic Signature: ngữ nghĩa sau hết hạn, thiết kế phòng vệ, lịch sử nâng cấp và quy trình nghệ thuật."
       }
     }
   },
   "howItWorks": {
-    "title": "How Cosmic Signature Works | Performance Cycles, Gestures, and NFTs",
-    "description": "Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution."
+    "title": "Cosmic Signature hoạt động như thế nào | Chu kỳ trình diễn, nét bút và NFT",
+    "description": "Tìm hiểu một chu kỳ trình diễn Cosmic Signature diễn ra thế nào — từ cửa sổ hiệu chỉnh, qua các nét bút, đến phân phối phân bổ cuối cùng."
   },
   "riskDisclosures": {
-    "title": "Cosmic Signature Risk Disclosures | Not an \u0049nvestment Product",
-    "description": "Read Cosmic Signature risk disclosures covering blockchain participation, wallet interactions, NFTs, CST, allocations, and non-\u0069nvestment language."
+    "title": "Công bố rủi ro Cosmic Signature | Không phải sản phẩm \u0111\u1ea7u t\u01b0",
+    "description": "Đọc công bố rủi ro của Cosmic Signature về việc tham gia blockchain, tương tác ví, NFT, CST, phân bổ và cách diễn đạt không mang tính \u0111\u1ea7u t\u01b0."
   },
   "learnArticles": {
     "what-is-cosmic-signature": {
-      "title": "What Is Cosmic Signature? | Cosmic Signature",
-      "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum where Performance Cycle gestures shape deterministic three-body NFT artwork."
+      "title": "Cosmic Signature là gì? | Cosmic Signature",
+      "description": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, nơi các nét bút của chu kỳ trình diễn định hình tác phẩm NFT ba vật thể tất định."
     },
     "how-the-performance-cycle-works": {
-      "title": "How the Cosmic Signature Performance Cycle Works | Cosmic Signature",
-      "description": "Learn how Cosmic Signature Performance Cycles use Calibration Windows, gestures, finalization, and allocation tracks on Arbitrum."
+      "title": "Chu kỳ trình diễn Cosmic Signature hoạt động như thế nào | Cosmic Signature",
+      "description": "Tìm hiểu cách các chu kỳ trình diễn Cosmic Signature dùng cửa sổ hiệu chỉnh, nét bút, hoàn tất và các luồng phân bổ trên Arbitrum."
     },
     "how-gestures-work": {
-      "title": "How Gestures Work in Cosmic Signature | Cosmic Signature",
-      "description": "Understand ETH gestures, CST gestures, Gesture Cost, Participation CST, and how gestures shape each Cosmic Signature Performance Cycle."
+      "title": "Nét bút vận hành thế nào trong Cosmic Signature | Cosmic Signature",
+      "description": "Hiểu về nét bút ETH, nét bút CST, chi phí nét bút, CST tham gia và cách nét bút định hình mỗi chu kỳ trình diễn Cosmic Signature."
     },
     "three-body-nft-art": {
-      "title": "How Cosmic Signature Generates Three-Body NFT Art | Cosmic Signature",
-      "description": "A technical explanation of deterministic Cosmic Signature NFT artwork generated from on-chain seeds and three-body physics."
+      "title": "Cosmic Signature tạo ra nghệ thuật NFT ba vật thể như thế nào | Cosmic Signature",
+      "description": "Giải thích kỹ thuật về tác phẩm Cosmic Signature NFT tất định được tạo từ seed trên chuỗi và vật lý ba vật thể."
     },
     "cosmic-signature-on-arbitrum": {
-      "title": "Cosmic Signature on Arbitrum | Cosmic Signature",
-      "description": "Why Cosmic Signature runs on Arbitrum and how the protocol uses Ethereum Layer 2 infrastructure for on-chain art."
+      "title": "Cosmic Signature trên Arbitrum | Cosmic Signature",
+      "description": "Vì sao Cosmic Signature chạy trên Arbitrum và cách giao thức dùng hạ tầng Layer 2 của Ethereum cho nghệ thuật trên chuỗi."
     },
     "contracts-security-verification": {
-      "title": "Cosmic Signature Contracts, Security, and Verification | Cosmic Signature",
-      "description": "Find the Cosmic Signature smart contract, source code, verification, and security context for the Arbitrum protocol."
+      "title": "Hợp đồng, bảo mật và xác minh của Cosmic Signature | Cosmic Signature",
+      "description": "Tra cứu hợp đồng thông minh, mã nguồn, xác minh và bối cảnh bảo mật của giao thức Cosmic Signature trên Arbitrum."
     },
     "cst-token-and-cosmic-council": {
-      "title": "CST and the Cosmic Council | Cosmic Signature",
-      "description": "Learn how CST tokens relate to gestures, protocol coordination, and the Cosmic Council."
+      "title": "CST và Hội đồng Vũ trụ | Cosmic Signature",
+      "description": "Tìm hiểu token CST liên hệ thế nào với nét bút, điều phối giao thức và Hội đồng Vũ trụ."
     },
     "anchoring-nfts": {
-      "title": "Anchoring Cosmic Signature NFTs | Cosmic Signature",
-      "description": "How anchoring works for Cosmic Signature NFTs, ETH Anchor Distributions, and Random Walk NFT eligibility."
+      "title": "Neo giữ Cosmic Signature NFT | Cosmic Signature",
+      "description": "Cách neo giữ vận hành với Cosmic Signature NFT, phân phối neo giữ ETH và diện Tinh tuyển của Random Walk NFT."
     },
     "protocol-guild-public-goods": {
-      "title": "Cosmic Signature and Ethereum Public Goods | Cosmic Signature",
-      "description": "How Cosmic Signature routes a public-goods allocation to Protocol Guild, the funding mechanism for Ethereum core contributors."
+      "title": "Cosmic Signature và hàng hóa công của Ethereum | Cosmic Signature",
+      "description": "Cách Cosmic Signature chuyển một phần phân bổ hàng hóa công đến Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum."
     },
     "collecting-and-trading-cosmic-signature": {
-      "title": "Collecting and Trading Cosmic Signature NFTs and CST | Cosmic Signature",
-      "description": "Where Cosmic Signature assets trade: the zero-fee Axiom Zero NFT marketplace, Uniswap CST swaps on Arbitrum, and the Chaos Zero prediction market for cycles."
+      "title": "Sưu tầm và giao dịch Cosmic Signature NFT và CST | Cosmic Signature",
+      "description": "Nơi các tài sản Cosmic Signature được giao dịch: sàn NFT không thu phí Axiom Zero, hoán đổi CST trên Uniswap tại Arbitrum và thị trường dự đoán Chaos Zero cho các chu kỳ."
     },
     "not-a-\u006cottery-not-an-\u0069nvestment": {
-      "title": "Is Cosmic Signature a \u004cottery, \u0043asino, or \u0049nvestment? | Cosmic Signature",
-      "description": "Cosmic Signature is a procedural on-chain art protocol, not a \u006cottery, \u0063asino, \u0067ambling product, or \u0069nvestment product."
+      "title": "Cosmic Signature có phải là x\u1ed5 s\u1ed1, s\u00f2ng b\u1ea1c hay \u0111\u1ea7u t\u01b0? | Cosmic Signature",
+      "description": "Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi, không phải x\u1ed5 s\u1ed1, s\u00f2ng b\u1ea1c, sản phẩm c\u1edd b\u1ea1c hay sản phẩm \u0111\u1ea7u t\u01b0."
     }
   }
 }

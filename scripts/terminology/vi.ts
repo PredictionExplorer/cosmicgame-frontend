@@ -96,13 +96,7 @@ export const VI_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Anchor Distribution',
     canonical: 'phân phối neo giữ',
-    variants: [
-      'phân bổ neo giữ',
-      'khoản neo giữ',
-      'thu nhập neo giữ',
-      'phân chia neo giữ',
-      'hoa lợi neo giữ',
-    ],
+    variants: ['phân bổ neo giữ', 'khoản neo giữ', 'phân chia neo giữ', 'hoa lợi neo giữ'],
   },
   {
     concept: 'Retrieve',
@@ -149,20 +143,13 @@ export const VI_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
       'dự trữ tiếp cận',
       'quỹ tiếp cận',
       'dự trữ lan tỏa',
-      'dự trữ quảng bá',
       'ngân sách truyền thông',
     ],
   },
   {
     concept: 'Compounding Cycle Reserve',
     canonical: 'Dự trữ tích lũy',
-    variants: [
-      'dự trữ lãi kép',
-      'dự trữ cộng dồn',
-      'dự trữ gộp',
-      'quỹ tích lũy',
-      'dự trữ chuyển tiếp',
-    ],
+    variants: ['dự trữ cộng dồn', 'dự trữ gộp', 'quỹ tích lũy', 'dự trữ chuyển tiếp'],
   },
   {
     concept: 'Signature (the artwork)',

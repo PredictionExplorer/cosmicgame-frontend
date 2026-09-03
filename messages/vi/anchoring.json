@@ -1,63 +1,63 @@
 {
   "common": {
-    "loading": "Loading...",
-    "processing": "Processing...",
-    "releasing": "Releasing...",
-    "anchor": "Anchor",
-    "release": "Release",
-    "yes": "Yes",
-    "no": "No",
+    "loading": "Đang tải…",
+    "processing": "Đang xử lý…",
+    "releasing": "Đang gỡ neo…",
+    "anchor": "Neo giữ",
+    "release": "Gỡ neo",
+    "yes": "Có",
+    "no": "Không",
     "empty": {
-      "actions": "No actions yet.",
-      "distributions": "No distributions yet.",
-      "allocations": "No allocations yet.",
-      "tokens": "No tokens yet."
+      "actions": "Chưa có thao tác nào.",
+      "distributions": "Chưa có phân phối nào.",
+      "allocations": "Chưa có phân bổ nào.",
+      "tokens": "Chưa có token nào."
     },
     "actions": {
-      "releaseMany": "Release Many",
-      "cancel": "Cancel"
+      "releaseMany": "Gỡ neo nhiều",
+      "cancel": "Hủy"
     },
     "aria": {
-      "expandRow": "expand row",
-      "actions": "Actions"
+      "expandRow": "mở rộng hàng",
+      "actions": "Thao tác"
     }
   },
   "overview": {
-    "errorTitle": "Error loading anchoring data",
-    "errorMessage": "Unable to load anchoring data. Please try again later.",
-    "eyebrow": "Anchor Distributions · Live",
-    "title": "Anchor Distributions",
-    "subtitle": "Overview of global anchoring activity and distribution history",
+    "errorTitle": "Lỗi khi tải dữ liệu neo giữ",
+    "errorMessage": "Không tải được dữ liệu neo giữ. Vui lòng thử lại sau.",
+    "eyebrow": "Phân phối neo giữ · Trực tiếp",
+    "title": "Phân phối neo giữ",
+    "subtitle": "Tổng quan hoạt động neo giữ toàn cầu và lịch sử phân phối",
     "intro": {
-      "description": "Anchor your Cosmic Signature NFTs to share {percentage}% of each cycle's Cycle Reserve through ETH Anchor Distributions. Anchor RandomWalk NFTs to enter the Anchored-NFT Stellar Selection.",
-      "flow": "{percentage}% anchor flow"
+      "description": "Neo giữ Cosmic Signature NFT của bạn để chia sẻ {percentage}% Dự trữ chu kỳ của mỗi chu kỳ thông qua phân phối neo giữ bằng ETH. Neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ.",
+      "flow": "Luồng neo giữ {percentage}%"
     },
     "stats": {
       "pool": {
-        "label": "Anchor Distribution Pool",
-        "tooltip": "Total ETH currently allocated to the Anchor Distribution pool, distributed proportionally to Cosmic Signature NFT anchor-holders each cycle."
+        "label": "Quỹ phân phối neo giữ",
+        "tooltip": "Tổng ETH hiện được phân bổ vào quỹ phân phối neo giữ, phân phối theo tỷ lệ cho những người neo giữ Cosmic Signature NFT mỗi chu kỳ."
       },
       "cosmicSignatureAnchored": {
-        "label": "Cosmic Signature NFTs Anchored",
-        "tooltip": "Total number of Cosmic Signature NFTs currently anchored to the protocol across all anchor-holders."
+        "label": "Cosmic Signature NFT đang neo giữ",
+        "tooltip": "Tổng số Cosmic Signature NFT hiện đang neo giữ với giao thức trên mọi người neo giữ."
       },
       "randomWalkAnchored": {
-        "label": "RWLK NFTs Anchored",
-        "tooltip": "Total number of RandomWalk NFTs currently anchored. Anchored RandomWalk NFTs are eligible for Anchored-NFT Stellar Selection via on-chain random selection."
+        "label": "RWLK NFT đang neo giữ",
+        "tooltip": "Tổng số RandomWalk NFT hiện đang neo giữ. RandomWalk NFT đang neo giữ thuộc diện Tinh tuyển NFT neo giữ thông qua lựa chọn ngẫu nhiên trên chuỗi."
       },
       "distributionPerNft": {
-        "label": "Distribution per NFT",
-        "tooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
-        "tooltipUnavailable": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs. The on-chain anchor pool is non-zero, but the indexed total of anchored Cosmic Signature NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-NFT rate cannot be computed."
+        "label": "Phân phối mỗi NFT",
+        "tooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục.",
+        "tooltipUnavailable": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục. Quỹ neo giữ trên chuỗi khác không, nhưng tổng số Cosmic Signature NFT neo giữ đã lập chỉ mục lại bằng không (ví dụ cg_stake_stats_cst chưa được ETL cập nhật), nên không thể tính mức mỗi NFT."
       },
       "uniqueHolders": {
-        "label": "Unique Anchor-holders",
-        "tooltip": "Number of distinct wallet addresses that have anchored Cosmic Signature NFTs."
+        "label": "Người neo giữ riêng biệt",
+        "tooltip": "Số địa chỉ ví riêng biệt đã neo giữ Cosmic Signature NFT."
       }
     },
     "cta": {
-      "title": "Start Anchoring",
-      "description": "Anchor your Cosmic Signature NFTs to receive a share of each cycle's Anchor Distribution pool."
+      "title": "Bắt đầu neo giữ",
+      "description": "Neo giữ Cosmic Signature NFT của bạn để nhận một phần quỹ phân phối neo giữ của mỗi chu kỳ."
     },
     "sections": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -65,298 +65,298 @@
     }
   },
   "howItWorks": {
-    "title": "How Anchoring Works",
-    "intro": "New to anchoring? Expand any section below to learn more.",
+    "title": "Neo giữ hoạt động như thế nào",
+    "intro": "Mới làm quen với neo giữ? Mở rộng bất kỳ mục nào bên dưới để tìm hiểu thêm.",
     "items": {
       "whatIsAnchoring": {
-        "question": "What is Anchoring?",
-        "answer": "Anchoring lets you dedicate NFTs to the protocol. Cosmic Signature NFT anchors receive ETH Anchor Distributions, while RandomWalk NFT anchors enter Anchored-NFT Stellar Selection. You can release an anchor at any time to reclaim your NFTs; Cosmic Signature NFT releases also retrieve accumulated ETH distributions. Important: each NFT can be anchored only once, ever — once released, that NFT can never be anchored again."
+        "question": "Neo giữ là gì?",
+        "answer": "Neo giữ cho phép bạn dành riêng NFT cho giao thức. Neo giữ Cosmic Signature NFT nhận phân phối neo giữ bằng ETH, còn neo giữ RandomWalk NFT thì thuộc diện Tinh tuyển NFT neo giữ. Bạn có thể gỡ neo bất cứ lúc nào để NFT trở về ví của bạn; gỡ neo Cosmic Signature NFT cũng nhận về các khoản phân phối ETH đã tích lũy. Lưu ý quan trọng: mỗi NFT chỉ được neo giữ đúng một lần — sau khi gỡ neo, NFT đó không bao giờ có thể neo giữ lại."
       },
       "cosmicSignature": {
-        "question": "Cosmic Signature NFT Anchoring",
-        "answer": "Anchor your Cosmic Signature NFTs to receive ETH from the Anchor Distribution pool. Each cycle, 6% of the Cycle Reserve is distributed proportionally among all Cosmic Signature NFT anchor-holders based on how many NFTs they have anchored. Distributions accumulate automatically and are paid out when you release an anchor. If no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle's share stays in the Cycle Reserve."
+        "question": "Neo giữ Cosmic Signature NFT",
+        "answer": "Neo giữ Cosmic Signature NFT của bạn để nhận ETH từ quỹ phân phối neo giữ. Mỗi chu kỳ, 6% Dự trữ chu kỳ được phân phối theo tỷ lệ cho mọi người neo giữ Cosmic Signature NFT dựa trên số NFT họ đã neo giữ. Các khoản phân phối tích lũy tự động và được chi trả khi bạn gỡ neo. Nếu không có Cosmic Signature NFT nào đang neo giữ khi một chu kỳ hoàn tất, phần của chu kỳ đó ở lại trong Dự trữ chu kỳ."
       },
       "randomWalk": {
-        "question": "RandomWalk (RWLK) Anchoring",
-        "answer": "Anchor your RandomWalk NFTs to take part in Anchored-NFT Stellar Selection. Each cycle, ten selections are drawn among anchored RandomWalk NFTs through on-chain random selection; each selection receives 1,000 CST and one newly imprinted Cosmic Signature NFT. Selections are drawn with replacement, so the same anchor-holder can be selected more than once. RandomWalk anchors receive no ETH."
+        "question": "Neo giữ RandomWalk (RWLK)",
+        "answer": "Neo giữ RandomWalk NFT của bạn để tham gia Tinh tuyển NFT neo giữ. Mỗi chu kỳ, mười lượt chọn được thực hiện trong số các RandomWalk NFT đang neo giữ thông qua lựa chọn ngẫu nhiên trên chuỗi; mỗi lượt chọn nhận 1.000 CST và một Cosmic Signature NFT mới khắc. Các lượt chọn có hoàn lại, nên cùng một người neo giữ có thể được chọn nhiều lần. Neo giữ RandomWalk không nhận ETH."
       },
       "calculation": {
-        "question": "How are distributions calculated?",
-        "answer": "Cosmic Signature NFT Anchor Distributions are proportional: if you have anchored one tenth of all anchored Cosmic Signature NFTs, you receive one tenth of each ETH distribution deposit. RandomWalk NFT anchoring uses an on-chain random-selection mechanism for Anchored-NFT Stellar Selection, so anchoring more RandomWalk NFTs increases your selection chance rather than an ETH distribution share."
+        "question": "Phân phối được tính như thế nào?",
+        "answer": "Phân phối neo giữ Cosmic Signature NFT tính theo tỷ lệ: nếu bạn neo giữ một phần mười tổng số Cosmic Signature NFT đang neo giữ, bạn nhận một phần mười của mỗi đợt nạp phân phối ETH. Neo giữ RandomWalk NFT dùng cơ chế lựa chọn ngẫu nhiên trên chuỗi cho Tinh tuyển NFT neo giữ, nên neo giữ thêm RandomWalk NFT làm tăng cơ hội được chọn thay vì tăng phần phân phối ETH."
       },
       "anchorOnce": {
-        "question": "Can I re-anchor an NFT after releasing it?",
-        "answer": "No. The anchoring contracts record every NFT that has ever been anchored, and an NFT is allowed to be anchored only once. Releasing an anchor pays out any accumulated ETH distributions (for Cosmic Signature NFTs) and returns the NFT to your wallet, but permanently ends that NFT's anchoring eligibility. Only release when you want to exit anchoring for that NFT entirely."
+        "question": "Tôi có thể neo giữ lại một NFT sau khi gỡ neo không?",
+        "answer": "Không. Các hợp đồng neo giữ ghi lại mọi NFT đã từng được neo giữ, và mỗi NFT chỉ được phép neo giữ một lần. Gỡ neo sẽ chi trả các khoản phân phối ETH đã tích lũy (với Cosmic Signature NFT) và trả NFT về ví của bạn, nhưng chấm dứt vĩnh viễn khả năng neo giữ của NFT đó. Chỉ gỡ neo khi bạn muốn rời hoàn toàn khỏi việc neo giữ NFT đó."
       }
     }
   },
   "anchorActionDetail": {
-    "title": "Anchor action",
-    "subtitle": "Anchor Action for {token} NFT",
-    "error": "Unable to load anchor action details. Please try again later.",
+    "title": "Thao tác neo giữ",
+    "subtitle": "Thao tác neo giữ cho {token} NFT",
+    "error": "Không tải được chi tiết thao tác neo giữ. Vui lòng thử lại sau.",
     "breadcrumbs": {
-      "home": "Home",
-      "myAnchors": "My Anchors",
-      "action": "Action #{id}"
+      "home": "Trang chủ",
+      "myAnchors": "Neo giữ của tôi",
+      "action": "Thao tác #{id}"
     },
-    "empty": "No data found for this anchor action.",
+    "empty": "Không tìm thấy dữ liệu cho thao tác neo giữ này.",
     "token": {
       "title": "Token",
-      "randomWalkDescription": "Random Walk NFT used in this action.",
-      "cosmicSignatureDescription": "Cosmic Signature NFT used in this action.",
-      "actionId": "Action ID",
-      "holderAddress": "Anchor-holder address",
-      "tokenId": "Token ID",
+      "randomWalkDescription": "Random Walk NFT được dùng trong thao tác này.",
+      "cosmicSignatureDescription": "Cosmic Signature NFT được dùng trong thao tác này.",
+      "actionId": "Mã thao tác",
+      "holderAddress": "Địa chỉ người neo giữ",
+      "tokenId": "Mã token",
       "labels": {
         "randomWalk": "RandomWalk",
         "cosmicSignature": "Cosmic Signature"
       }
     },
     "anchor": {
-      "title": "Anchor",
-      "description": "When tokens were anchored to the protocol.",
-      "datetime": "Anchored datetime",
-      "tokenCount": "Number of anchored tokens"
+      "title": "Neo giữ",
+      "description": "Thời điểm các token được neo giữ với giao thức.",
+      "datetime": "Thời điểm neo giữ",
+      "tokenCount": "Số token đang neo giữ"
     },
     "release": {
-      "title": "Release",
-      "description": "When the anchor was released.",
-      "datetime": "Released datetime",
-      "tokenCount": "Number of anchored tokens"
+      "title": "Gỡ neo",
+      "description": "Thời điểm neo được gỡ.",
+      "datetime": "Thời điểm gỡ neo",
+      "tokenCount": "Số token đang neo giữ"
     }
   },
   "distributionsByToken": {
-    "title": "Anchor Distribution Details for Token {tokenId}",
-    "subtitle": "Distributions for {address}",
+    "title": "Chi tiết phân phối neo giữ của token {tokenId}",
+    "subtitle": "Phân phối cho {address}",
     "breadcrumbs": {
-      "home": "Home",
-      "user": "User",
+      "home": "Trang chủ",
+      "user": "Người dùng",
       "token": "Token #{tokenId}"
     },
     "details": {
-      "anchorTitle": "Anchor",
-      "releaseTitle": "Release Anchor",
-      "anchoredDatetime": "Anchored datetime",
-      "releasedDatetime": "Released datetime",
-      "anchoredNfts": "Number of anchored NFTs",
-      "distribution": "Distribution"
+      "anchorTitle": "Neo giữ",
+      "releaseTitle": "Gỡ neo",
+      "anchoredDatetime": "Thời điểm neo giữ",
+      "releasedDatetime": "Thời điểm gỡ neo",
+      "anchoredNfts": "Số NFT đang neo giữ",
+      "distribution": "Phân phối"
     },
     "columns": {
-      "details": "Details",
-      "depositDatetime": "Deposit Datetime",
-      "cycle": "Cycle",
-      "depositId": "Deposit Id",
-      "retrieved": "Is Retrieved?",
-      "distributionEth": "Distribution (ETH)"
+      "details": "Chi tiết",
+      "depositDatetime": "Thời điểm nạp",
+      "cycle": "Chu kỳ",
+      "depositId": "Mã khoản nạp",
+      "retrieved": "Đã nhận về?",
+      "distributionEth": "Phân phối (ETH)"
     }
   },
   "tables": {
     "availableTokens": {
-      "empty": "No available tokens.",
+      "empty": "Không có token khả dụng.",
       "selection": {
-        "all": "Select All",
-        "currentPage": "Select Current Page",
-        "none": "Select None"
+        "all": "Chọn tất cả",
+        "currentPage": "Chọn trang hiện tại",
+        "none": "Bỏ chọn"
       },
       "columns": {
-        "imprintDatetime": "Imprint Datetime",
-        "ownerAddress": "Owner Address",
-        "tokenId": "Token ID",
-        "tokenName": "Token Name",
-        "cycle": "Cycle",
-        "recipientAddress": "Recipient Address"
+        "imprintDatetime": "Thời điểm khắc",
+        "ownerAddress": "Địa chỉ chủ sở hữu",
+        "tokenId": "Mã token",
+        "tokenName": "Tên token",
+        "cycle": "Chu kỳ",
+        "recipientAddress": "Địa chỉ người nhận"
       },
       "actions": {
-        "anchor": "Anchor",
-        "anchoring": "Anchoring...",
-        "anchorMany": "Anchor Many"
+        "anchor": "Neo giữ",
+        "anchoring": "Đang neo giữ…",
+        "anchorMany": "Neo giữ nhiều"
       },
       "aria": {
-        "actions": "Actions"
+        "actions": "Thao tác"
       }
     },
     "globalAnchorActions": {
       "headers": {
         "anchorDatetime": {
-          "desktop": "Anchor Datetime",
-          "mobile": "Datetime",
-          "tooltip": "Timestamp when the anchor or release action was indexed."
+          "desktop": "Thời điểm neo giữ",
+          "mobile": "Thời điểm",
+          "tooltip": "Dấu thời gian khi thao tác neo giữ hoặc gỡ neo được lập chỉ mục."
         },
         "actionType": {
-          "desktop": "Action Type",
-          "mobile": "Type",
-          "tooltip": "Whether this row anchored or released NFTs."
+          "desktop": "Loại thao tác",
+          "mobile": "Loại",
+          "tooltip": "Hàng này là thao tác neo giữ hay gỡ neo NFT."
         },
         "tokenId": {
-          "desktop": "Token ID",
+          "desktop": "Mã token",
           "mobile": "Token",
-          "tooltip": "Token involved in the anchor or release action."
+          "tooltip": "Token liên quan đến thao tác neo giữ hoặc gỡ neo."
         },
         "holderAddress": {
-          "desktop": "Anchor-holder Address",
-          "mobile": "Holder",
-          "tooltip": "Wallet address that anchored or released tokens."
+          "desktop": "Địa chỉ người neo giữ",
+          "mobile": "Người giữ",
+          "tooltip": "Địa chỉ ví đã neo giữ hoặc gỡ neo token."
         },
         "nftCount": {
-          "desktop": "Number of NFTs",
-          "mobile": "NFTs",
-          "tooltip": "Anchored NFT count after this action."
+          "desktop": "Số NFT",
+          "mobile": "NFT",
+          "tooltip": "Số NFT đang neo giữ sau thao tác này."
         }
       }
     },
     "retrievedDistributions": {
       "columns": {
-        "depositDatetime": "Deposit Datetime",
-        "depositId": "Deposit ID",
-        "cycle": "Round",
-        "depositAmountEth": "Deposit Amount (ETH)",
-        "retrievedAmountEth": "Collected Amount (ETH)"
+        "depositDatetime": "Thời điểm nạp",
+        "depositId": "Mã khoản nạp",
+        "cycle": "Chu kỳ",
+        "depositAmountEth": "Số tiền nạp (ETH)",
+        "retrievedAmountEth": "Số tiền đã nhận (ETH)"
       }
     },
     "unretrievedDistributions": {
       "columns": {
-        "depositDatetime": "Deposit Datetime",
-        "depositId": "Deposit ID",
-        "anchoredTokens": "Anchored Tokens (You / Total)",
-        "unretrievedTokens": "Unretrieved Tokens",
-        "depositAmountEth": "Deposit Amount (ETH)",
-        "distributionAmountEth": "Distribution Amount (ETH)",
-        "unretrievedAmountEth": "Unretrieved Amount (ETH)"
+        "depositDatetime": "Thời điểm nạp",
+        "depositId": "Mã khoản nạp",
+        "anchoredTokens": "Token đang neo giữ (bạn / tổng)",
+        "unretrievedTokens": "Token chưa nhận về",
+        "depositAmountEth": "Số tiền nạp (ETH)",
+        "distributionAmountEth": "Số tiền phân phối (ETH)",
+        "unretrievedAmountEth": "Số tiền chưa nhận về (ETH)"
       },
-      "summary": "Your retrievable distributions are {amount} ETH",
-      "releaseAll": "Release & Retrieve All",
+      "summary": "Phân phối bạn có thể nhận về là {amount} ETH",
+      "releaseAll": "Gỡ neo và nhận về tất cả",
       "dialog": {
-        "title": "Release Tokens & Retrieve Distributions",
-        "description": "This will <strong>release all your anchored Cosmic Signature NFTs</strong> and forward <amountStrong>{amount} ETH</amountStrong> in accumulated distributions to your wallet.",
-        "warning": "<strong>Permanent action:</strong> Once released, these Cosmic Signature NFTs cannot be anchored again. Only proceed if you want to exit anchoring entirely.",
-        "confirm": "Release & Retrieve"
+        "title": "Gỡ neo token và nhận về phân phối",
+        "description": "Thao tác này sẽ <strong>gỡ neo toàn bộ Cosmic Signature NFT bạn đang neo giữ</strong> và chuyển <amountStrong>{amount} ETH</amountStrong> phân phối tích lũy về ví của bạn.",
+        "warning": "<strong>Hành động vĩnh viễn:</strong> sau khi gỡ neo, những Cosmic Signature NFT này không thể neo giữ lại. Chỉ tiếp tục nếu bạn muốn rời hoàn toàn khỏi việc neo giữ.",
+        "confirm": "Gỡ neo và nhận về"
       }
     },
     "distributionsByDeposit": {
       "columns": {
-        "depositDatetime": "Deposit Datetime",
-        "depositCycle": "Deposit Cycle",
-        "depositId": "Deposit ID",
-        "totalDepositAmount": "Total Deposit Amount",
-        "totalRetrievedAmount": "Total Retrieved Amount",
-        "yourRetrievableAmount": "Your Retrievable Amount",
-        "fullyRetrieved": "Fully Retrieved?",
-        "totalAnchoredNfts": "Total Anchored NFTs",
-        "totalRetrievedTokens": "Total Retrieved Tokens",
-        "yourAnchoredTokens": "Your Anchored Tokens"
+        "depositDatetime": "Thời điểm nạp",
+        "depositCycle": "Chu kỳ nạp",
+        "depositId": "Mã khoản nạp",
+        "totalDepositAmount": "Tổng số tiền nạp",
+        "totalRetrievedAmount": "Tổng số tiền đã nhận về",
+        "yourRetrievableAmount": "Số tiền bạn có thể nhận về",
+        "fullyRetrieved": "Đã nhận về toàn bộ?",
+        "totalAnchoredNfts": "Tổng NFT đang neo giữ",
+        "totalRetrievedTokens": "Tổng token đã nhận về",
+        "yourAnchoredTokens": "Token bạn đang neo giữ"
       }
     },
     "globalDistributions": {
-      "cycleDetails": "ETH Anchor Distributions for Cycle {cycle}",
+      "cycleDetails": "Phân phối neo giữ ETH của chu kỳ {cycle}",
       "columns": {
-        "depositDatetime": "Deposit Datetime",
-        "cycle": "Cycle",
-        "totalAnchoredTokens": "Total Anchored Tokens",
-        "totalDepositedEth": "Total Deposited (ETH)",
-        "fullyRetrieved": "Fully Retrieved?",
-        "pendingEth": "Pending to Retrieve (ETH)"
+        "depositDatetime": "Thời điểm nạp",
+        "cycle": "Chu kỳ",
+        "totalAnchoredTokens": "Tổng token đang neo giữ",
+        "totalDepositedEth": "Tổng đã nạp (ETH)",
+        "fullyRetrieved": "Đã nhận về toàn bộ?",
+        "pendingEth": "Chờ nhận về (ETH)"
       }
     },
     "randomWalkImprints": {
       "columns": {
-        "datetime": "Datetime",
-        "recipient": "Recipient",
-        "cycle": "Cycle",
-        "tokenId": "Token ID"
+        "datetime": "Thời điểm",
+        "recipient": "Người nhận",
+        "cycle": "Chu kỳ",
+        "tokenId": "Mã token"
       }
     },
     "tokenDistributions": {
       "columns": {
-        "tokenId": "Token ID",
-        "retrievedEth": "Retrieved Distributions (ETH)",
-        "retrievableEth": "Distributions to Retrieve (ETH)"
+        "tokenId": "Mã token",
+        "retrievedEth": "Phân phối đã nhận về (ETH)",
+        "retrievableEth": "Phân phối chờ nhận về (ETH)"
       }
     },
     "anchorActions": {
       "columns": {
-        "datetime": "Action Datetime",
-        "type": "Action Type",
-        "tokenId": "Token ID",
-        "nftCount": "Number of NFTs"
+        "datetime": "Thời điểm thao tác",
+        "type": "Loại thao tác",
+        "tokenId": "Mã token",
+        "nftCount": "Số NFT"
       }
     },
     "anchoredTokens": {
       "selection": {
-        "all": "Select All",
-        "currentPage": "Select Current Page",
-        "none": "Select None"
+        "all": "Chọn tất cả",
+        "currentPage": "Chọn trang hiện tại",
+        "none": "Bỏ chọn"
       },
       "columns": {
-        "image": "Token Image",
-        "tokenId": "Token ID",
-        "actionId": "Anchor Action ID",
-        "datetime": "Anchor Datetime",
-        "accumulatedDistributions": "Accumulated Distributions"
+        "image": "Hình token",
+        "tokenId": "Mã token",
+        "actionId": "Mã thao tác neo giữ",
+        "datetime": "Thời điểm neo giữ",
+        "accumulatedDistributions": "Phân phối tích lũy"
       }
     },
     "globalAnchoredTokens": {
       "headers": {
         "anchorDatetime": {
-          "desktop": "Anchor Datetime",
-          "mobile": "Datetime",
-          "tooltip": "Timestamp when the token was anchored."
+          "desktop": "Thời điểm neo giữ",
+          "mobile": "Thời điểm",
+          "tooltip": "Dấu thời gian khi token được neo giữ."
         },
         "actionId": {
-          "desktop": "Action ID",
-          "mobile": "Action",
-          "tooltip": "Anchor action record linked to this token."
+          "desktop": "Mã thao tác",
+          "mobile": "Thao tác",
+          "tooltip": "Bản ghi thao tác neo giữ liên kết với token này."
         },
         "tokenId": {
-          "desktop": "Token ID",
+          "desktop": "Mã token",
           "mobile": "Token",
-          "tooltip": "Anchored token identifier."
+          "tooltip": "Mã định danh của token đang neo giữ."
         },
         "holderAddress": {
-          "desktop": "Anchor-holder Address",
-          "mobile": "Holder",
-          "tooltip": "Wallet address that anchored or released tokens."
+          "desktop": "Địa chỉ người neo giữ",
+          "mobile": "Người giữ",
+          "tooltip": "Địa chỉ ví đã neo giữ hoặc gỡ neo token."
         }
       }
     }
   },
   "panels": {
     "shared": {
-      "anchoredTokens": "Anchored Tokens",
-      "available": "Available for Anchoring",
-      "history": "Anchor / Release History",
-      "historyTooltip": "A chronological record of all your anchor and release transactions."
+      "anchoredTokens": "Token đang neo giữ",
+      "available": "Có thể neo giữ",
+      "history": "Lịch sử neo giữ / gỡ neo",
+      "historyTooltip": "Bản ghi theo thời gian của mọi giao dịch neo giữ và gỡ neo của bạn."
     },
     "cosmicSignature": {
-      "anchoredTooltip": "Cosmic Signature NFTs you currently have anchored. You receive ETH Anchor Distributions proportional to how many Cosmic Signature NFTs you anchor.",
-      "availableTooltip": "Cosmic Signature NFTs in your wallet that can be anchored to start receiving ETH Anchor Distributions.",
-      "distributions": "Anchor Distributions",
-      "distributionsTooltip": "ETH Anchor Distributions allocated to each anchored Cosmic Signature NFT. Unretrieved distributions can be collected by releasing the anchor."
+      "anchoredTooltip": "Các Cosmic Signature NFT bạn đang neo giữ. Bạn nhận phân phối neo giữ ETH theo tỷ lệ số Cosmic Signature NFT đã neo giữ.",
+      "availableTooltip": "Các Cosmic Signature NFT trong ví có thể neo giữ để bắt đầu nhận phân phối neo giữ ETH.",
+      "distributions": "Phân phối neo giữ",
+      "distributionsTooltip": "Phân phối neo giữ ETH được phân bổ cho từng Cosmic Signature NFT đang neo giữ. Các khoản chưa nhận về có thể được nhận về bằng cách gỡ neo."
     },
     "randomWalk": {
-      "anchoredTooltip": "RandomWalk NFTs you currently have anchored. Each anchored RandomWalk NFT is eligible for on-chain random selection in Anchored-NFT Stellar Selection.",
-      "availableTooltip": "RandomWalk NFTs in your wallet that can be anchored for Anchored-NFT Stellar Selection eligibility, not ETH Anchor Distributions.",
-      "selection": "Anchored-NFT Stellar Selection",
-      "selectionTooltip": "Cosmic Signature NFTs and paired CST imprinted when this wallet wins Anchored-NFT Stellar Selection through the on-chain random selection mechanism."
+      "anchoredTooltip": "Các RandomWalk NFT bạn đang neo giữ. Mỗi RandomWalk NFT đang neo giữ thuộc diện lựa chọn ngẫu nhiên trên chuỗi trong Tinh tuyển NFT neo giữ.",
+      "availableTooltip": "Các RandomWalk NFT trong ví có thể neo giữ để thuộc diện Tinh tuyển NFT neo giữ, không phải để nhận phân phối neo giữ ETH.",
+      "selection": "Tinh tuyển NFT neo giữ",
+      "selectionTooltip": "Cosmic Signature NFT và CST đi kèm được khắc khi ví này được chọn trong Tinh tuyển NFT neo giữ thông qua cơ chế lựa chọn ngẫu nhiên trên chuỗi."
     }
   },
   "lifecycle": {
-    "ariaLabel": "Anchor lifecycle",
+    "ariaLabel": "Vòng đời neo giữ",
     "stages": {
       "anchor": {
-        "label": "Anchor",
-        "description": "NFT deposited into the protocol"
+        "label": "Neo giữ",
+        "description": "NFT được nạp vào giao thức"
       },
       "active": {
-        "label": "Active",
-        "description": "Receiving per-cycle distributions"
+        "label": "Đang hoạt động",
+        "description": "Nhận phân phối theo từng chu kỳ"
       },
       "retrievable": {
-        "label": "Retrievable",
-        "description": "Available to retrieve"
+        "label": "Có thể nhận về",
+        "description": "Sẵn sàng để nhận về"
       },
       "retrieved": {
-        "label": "Retrieved",
-        "description": "Returned to your wallet"
+        "label": "Đã nhận về",
+        "description": "Đã trả về ví của bạn"
       }
     }
   }

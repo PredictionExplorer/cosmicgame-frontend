@@ -1,40 +1,40 @@
 {
   "faqPage": {
-    "heading": "Clarifications",
-    "description": "Questions worth answering plainly about Cosmic Signature — what the protocol is, how gestures work, and what it is not."
+    "heading": "Giải đáp",
+    "description": "Những câu hỏi đáng được trả lời thẳng thắn về Cosmic Signature — giao thức là gì, nét bút vận hành thế nào, và nó không phải là gì."
   },
   "languageSwitcher": {
-    "label": "Language"
+    "label": "Ngôn ngữ"
   },
   "accessibility": {
-    "skipToMain": "Skip to main content",
-    "breadcrumb": "Breadcrumb",
-    "footer": "Footer"
+    "skipToMain": "Chuyển đến nội dung chính",
+    "breadcrumb": "Đường dẫn điều hướng",
+    "footer": "Chân trang"
   },
   "breadcrumbs": {
-    "home": "Home",
-    "gallery": "Gallery"
+    "home": "Trang chủ",
+    "gallery": "Phòng trưng bày"
   },
   "status": {
-    "loading": "Loading",
-    "loadingEllipsis": "Loading…",
-    "loadingDots": "Loading...",
-    "noData": "No data available.",
-    "nothingHere": "Nothing here yet"
+    "loading": "Đang tải",
+    "loadingEllipsis": "Đang tải…",
+    "loadingDots": "Đang tải…",
+    "noData": "Không có dữ liệu.",
+    "nothingHere": "Chưa có gì ở đây"
   },
   "actions": {
-    "copyAddress": "Copy address",
-    "addressCopied": "Address copied",
-    "copied": "Copied",
-    "cancel": "Cancel",
-    "close": "Close"
+    "copyAddress": "Sao chép địa chỉ",
+    "addressCopied": "Đã sao chép địa chỉ",
+    "copied": "Đã sao chép",
+    "cancel": "Hủy",
+    "close": "Đóng"
   },
   "externalLink": {
-    "title": "Leaving Cosmic Signature",
-    "description": "This link comes from a participant message stored on-chain. It has not been reviewed or verified — check that the destination below is what you expect.",
-    "copy": "Copy link",
-    "copied": "Link copied",
-    "warning": "Never enter your wallet seed phrase or private keys on an external site.",
-    "open": "Open Link"
+    "title": "Bạn đang rời Cosmic Signature",
+    "description": "Liên kết này đến từ một thông điệp của người tham gia được lưu trên chuỗi. Nó chưa được kiểm tra hay xác minh — hãy chắc chắn rằng địa chỉ đích bên dưới đúng như bạn mong đợi.",
+    "copy": "Sao chép liên kết",
+    "copied": "Đã sao chép liên kết",
+    "warning": "Không bao giờ nhập cụm từ khôi phục hay khóa riêng của ví trên một trang web bên ngoài.",
+    "open": "Mở liên kết"
   }
 }

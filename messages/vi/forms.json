@@ -1,16 +1,16 @@
 {
   "datePicker": {
-    "previousMonth": "Previous month",
-    "nextMonth": "Next month",
-    "pickDate": "Pick a date",
+    "previousMonth": "Tháng trước",
+    "nextMonth": "Tháng sau",
+    "pickDate": "Chọn ngày",
     "weekdays": {
-      "sunday": "Su",
-      "monday": "Mo",
-      "tuesday": "Tu",
-      "wednesday": "We",
-      "thursday": "Th",
-      "friday": "Fr",
-      "saturday": "Sa"
+      "sunday": "CN",
+      "monday": "T2",
+      "tuesday": "T3",
+      "wednesday": "T4",
+      "thursday": "T5",
+      "friday": "T6",
+      "saturday": "T7"
     }
   }
 }

@@ -1,118 +1,118 @@
 {
   "brand": {
-    "homeLabel": "Cosmic Signature home",
-    "tagline": "On-chain art protocol"
+    "homeLabel": "Trang chủ Cosmic Signature",
+    "tagline": "Giao thức nghệ thuật trên chuỗi"
   },
-  "primaryLabel": "Primary",
-  "menuLabel": "menu",
-  "drawerTitle": "Navigation",
+  "primaryLabel": "Điều hướng chính",
+  "menuLabel": "Menu",
+  "drawerTitle": "Điều hướng",
   "sections": {
-    "protocol": "Protocol",
-    "ecosystem": "Ecosystem",
-    "myAccount": "My Account"
+    "protocol": "Giao thức",
+    "ecosystem": "Hệ sinh thái",
+    "myAccount": "Tài khoản của tôi"
   },
   "links": {
     "gallery": {
-      "label": "Gallery",
-      "description": "Every Signature imprinted so far"
+      "label": "Phòng trưng bày",
+      "description": "Mọi Signature đã được khắc đến nay"
     },
     "explore": {
-      "label": "Explore"
+      "label": "Khám phá"
     },
     "currentCycle": {
-      "label": "Current Cycle",
-      "description": "Live gestures shaping the active cycle"
+      "label": "Chu kỳ hiện tại",
+      "description": "Những nét bút đang định hình chu kỳ này"
     },
     "allocationRecipients": {
-      "label": "Allocation Recipients",
-      "description": "Where each cycle’s reserves went"
+      "label": "Người nhận phân bổ",
+      "description": "Dự trữ của từng chu kỳ đã đi về đâu"
     },
     "anchorDistributions": {
-      "label": "Anchor Distributions",
-      "description": "Anchored NFTs and their distributions"
+      "label": "Phân phối neo giữ",
+      "description": "Các NFT đang neo giữ và phần phân phối của chúng"
     },
     "outreachReserve": {
-      "label": "Outreach Reserve",
-      "description": "Community outreach activity"
+      "label": "Dự trữ truyền thông",
+      "description": "Hoạt động truyền thông cộng đồng"
     },
     "statistics": {
-      "label": "Statistics",
-      "description": "Protocol-wide metrics and records"
+      "label": "Thống kê",
+      "description": "Số liệu và kỷ lục toàn giao thức"
     },
     "contracts": {
-      "label": "Contracts",
-      "description": "Verified addresses and source code"
+      "label": "Hợp đồng",
+      "description": "Địa chỉ đã xác minh và mã nguồn"
     },
     "help": {
-      "label": "Help"
+      "label": "Trợ giúp"
     },
     "howItWorks": {
-      "label": "How It Works",
-      "description": "The cycle mechanics, step by step"
+      "label": "Cách hoạt động",
+      "description": "Cơ chế chu kỳ, từng bước một"
     },
     "faq": {
-      "label": "FAQ",
-      "description": "Answers to common questions"
+      "label": "Câu hỏi thường gặp",
+      "description": "Giải đáp những câu hỏi phổ biến"
     },
     "about": {
-      "label": "About Cosmic Signature",
-      "description": "The story behind the protocol"
+      "label": "Về Cosmic Signature",
+      "description": "Câu chuyện phía sau giao thức"
     },
     "learn": {
-      "label": "Learn Hub",
-      "description": "Guides and deep dives"
+      "label": "Trung tâm học tập",
+      "description": "Hướng dẫn và bài viết chuyên sâu"
     },
     "whitePaper": {
-      "label": "White Paper",
-      "description": "The complete protocol reference"
+      "label": "Sách trắng",
+      "description": "Tài liệu tham chiếu đầy đủ về giao thức"
     },
     "discover": {
-      "label": "Discover Cosmic Signature",
-      "description": "The art, the story, and the protocol"
+      "label": "Khám phá Cosmic Signature",
+      "description": "Nghệ thuật, câu chuyện và giao thức"
     },
-    "myDashboard": "My Dashboard",
-    "myAllocations": "My Allocations",
-    "myNfts": "My NFTs",
-    "myAnchors": "My Anchors",
-    "recipientHistory": "Recipient History"
+    "myDashboard": "Bảng điều khiển của tôi",
+    "myAllocations": "Phân bổ của tôi",
+    "myNfts": "NFT của tôi",
+    "myAnchors": "Neo giữ của tôi",
+    "recipientHistory": "Lịch sử nhận phân bổ"
   },
   "ecosystem": {
-    "groupLabel": "Cosmic Signature ecosystem",
+    "groupLabel": "Hệ sinh thái Cosmic Signature",
     "uniswap": {
-      "name": "Trade CST",
+      "name": "Giao dịch CST",
       "product": "Uniswap",
-      "tagline": "Swap ETH for CST on Uniswap",
-      "ariaLabel": "Trade CST on Uniswap",
-      "defaultLabel": "Trade CST on Uniswap",
-      "shortLabel": "Trade CST"
+      "tagline": "Hoán đổi ETH sang CST trên Uniswap",
+      "ariaLabel": "Giao dịch CST trên Uniswap",
+      "defaultLabel": "Giao dịch CST trên Uniswap",
+      "shortLabel": "Giao dịch CST"
     },
     "geckoTerminal": {
-      "ariaLabel": "View the CST pool on GeckoTerminal",
-      "shortLabel": "View CST pool"
+      "ariaLabel": "Xem pool CST trên GeckoTerminal",
+      "shortLabel": "Xem pool CST"
     },
     "axiomZero": {
       "name": "Axiom Zero",
-      "product": "NFT marketplace",
-      "tagline": "Collect Cosmic Signature NFTs on the zero-fee marketplace",
-      "ariaLabel": "Axiom Zero NFT marketplace",
-      "defaultLabel": "NFTs on Axiom Zero",
-      "menuLabel": "Axiom Zero Marketplace",
+      "product": "Sàn NFT",
+      "tagline": "Sưu tầm Cosmic Signature NFT trên sàn không thu phí",
+      "ariaLabel": "Sàn NFT Axiom Zero",
+      "defaultLabel": "NFT trên Axiom Zero",
+      "menuLabel": "Sàn Axiom Zero",
       "shortLabel": "Axiom Zero"
     },
     "chaosZero": {
       "name": "Chaos Zero",
-      "product": "Prediction market",
-      "tagline": "Make predictions on each cycle of the protocol",
-      "ariaLabel": "Make predictions on Chaos Zero",
-      "defaultLabel": "Make Predictions on Chaos Zero",
-      "menuLabel": "Chaos Zero Predictions",
+      "product": "Thị trường dự đoán",
+      "tagline": "Đưa ra dự đoán cho từng chu kỳ của giao thức",
+      "ariaLabel": "Đưa ra dự đoán trên Chaos Zero",
+      "defaultLabel": "Dự đoán trên Chaos Zero",
+      "menuLabel": "Dự đoán Chaos Zero",
       "shortLabel": "Chaos Zero"
     }
   },
   "maintenance": {
-    "pendingMessage": "Maintenance mode activates after the current allocation finalizes. The protocol reopens once adjustments are complete.",
-    "activeMessage": "Protocol is in maintenance mode. Gestures will resume once parameter adjustments are complete.",
-    "pendingLabel": "Pending",
-    "activeLabel": "Maintenance"
+    "pendingMessage": "Chế độ bảo trì sẽ kích hoạt sau khi phân bổ hiện tại hoàn tất. Giao thức mở lại khi các điều chỉnh hoàn thành.",
+    "activeMessage": "Giao thức đang ở chế độ bảo trì. Nét bút sẽ tiếp tục khi việc điều chỉnh tham số hoàn thành.",
+    "pendingLabel": "Đang chờ",
+    "activeLabel": "Bảo trì"
   }
 }

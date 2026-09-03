@@ -69,21 +69,21 @@ across `app/`, `components/`, `content/`, `messages/`, `public/`, and more, appl
 English list plus one banned register per translated locale. Use the coined terms
 instead:
 
-| Banned concept    | Use in English            | zh (Simplified) | zh-TW (Taiwan)  | zh-HK (Hong Kong) | Use in Ukrainian           | Use in Korean            | Use in Japanese                     |
-| ----------------- | ------------------------- | --------------- | --------------- | ----------------- | -------------------------- | ------------------------ | ----------------------------------- |
-| bid               | Gesture                   | 落笔            | 落筆            | 落筆              | жест                       | 제스처                   | 一筆                                |
-| round             | Cycle / Performance Cycle | 周期 / 演绎周期 | 週期 / 演繹週期 | 週期 / 演繹週期   | цикл / перформанс-цикл     | 사이클 / 퍼포먼스 사이클 | サイクル / パフォーマンス・サイクル |
-| Dutch auction     | Calibration Window        | 校准窗口        | 校準窗口        | 校準窗口          | вікно калібрування         | 보정 구간                | 調律期間                            |
-| prize             | Allocation                | 分配            | 分配            | 分配              | розподіл                   | 배분                     | 配分                                |
-| winner            | Recipient                 | 获配者          | 獲配者          | 獲配者            | отримувач                  | 수령자                   | 受領者                              |
-| raffle / draw     | Stellar Selection         | 星选            | 星選            | 星選              | зоряний відбір             | 별빛 선정                | 星選                                |
-| staking           | Anchoring                 | 锚定            | 錨定            | 錨定              | закріплення                | 앵커링                   | 係留                                |
-| yield             | Anchor Distribution       | 锚定派发        | 錨定配發        | 錨定派發          | надходження за закріплення | 앵커링 지급              | 係留配分                            |
-| withdraw / claim  | Retrieve                  | 取回            | 取回            | 取回              | забрати                    | 회수                     | 受け取る                            |
-| mint              | Imprint                   | 铭刻            | 銘刻            | 銘刻              | закарбувати                | 각인                     | 刻印                                |
-| DAO               | Cosmic Council            | 宇宙议会        | 宇宙議會        | 宇宙議會          | Космічна Рада              | 우주 평의회              | 宇宙評議会                          |
-| charity, donation | Public Goods              | 公共物品        | 公共財          | 公共物品          | суспільні блага            | 공공재                   | 公共財                              |
-| marketing         | Outreach Reserve          | 推广储备        | 推廣儲備        | 推廣儲備          | резерв просування          | 홍보 준비금              | 広報準備金                          |
+| Banned concept    | Use in English            | zh (Simplified) | zh-TW (Taiwan)  | zh-HK (Hong Kong) | Use in Ukrainian           | Use in Korean            | Use in Japanese                     | Use in Vietnamese          |
+| ----------------- | ------------------------- | --------------- | --------------- | ----------------- | -------------------------- | ------------------------ | ----------------------------------- | -------------------------- |
+| bid               | Gesture                   | 落笔            | 落筆            | 落筆              | жест                       | 제스처                   | 一筆                                | nét bút                    |
+| round             | Cycle / Performance Cycle | 周期 / 演绎周期 | 週期 / 演繹週期 | 週期 / 演繹週期   | цикл / перформанс-цикл     | 사이클 / 퍼포먼스 사이클 | サイクル / パフォーマンス・サイクル | chu kỳ / chu kỳ trình diễn |
+| Dutch auction     | Calibration Window        | 校准窗口        | 校準窗口        | 校準窗口          | вікно калібрування         | 보정 구간                | 調律期間                            | cửa sổ hiệu chỉnh          |
+| prize             | Allocation                | 分配            | 分配            | 分配              | розподіл                   | 배분                     | 配分                                | phân bổ                    |
+| winner            | Recipient                 | 获配者          | 獲配者          | 獲配者            | отримувач                  | 수령자                   | 受領者                              | người nhận                 |
+| raffle / draw     | Stellar Selection         | 星选            | 星選            | 星選              | зоряний відбір             | 별빛 선정                | 星選                                | Tinh tuyển                 |
+| staking           | Anchoring                 | 锚定            | 錨定            | 錨定              | закріплення                | 앵커링                   | 係留                                | neo giữ                    |
+| yield             | Anchor Distribution       | 锚定派发        | 錨定配發        | 錨定派發          | надходження за закріплення | 앵커링 지급              | 係留配分                            | phân phối neo giữ          |
+| withdraw / claim  | Retrieve                  | 取回            | 取回            | 取回              | забрати                    | 회수                     | 受け取る                            | nhận về                    |
+| mint              | Imprint                   | 铭刻            | 銘刻            | 銘刻              | закарбувати                | 각인                     | 刻印                                | khắc                       |
+| DAO               | Cosmic Council            | 宇宙议会        | 宇宙議會        | 宇宙議會          | Космічна Рада              | 우주 평의회              | 宇宙評議会                          | Hội đồng Vũ trụ            |
+| charity, donation | Public Goods              | 公共物品        | 公共財          | 公共物品          | суспільні блага            | 공공재                   | 公共財                              | Hàng hóa công              |
+| marketing         | Outreach Reserve          | 推广储备        | 推廣儲備        | 推廣儲備          | резерв просування          | 홍보 준비금              | 広報準備金                          | Dự trữ truyền thông        |
 
 The three Chinese locales are separate locales, not character conversions of one another:
 each has its own vocabulary (Taiwan 網路/軟體/使用者/隱私權政策, Hong Kong
@@ -113,6 +113,21 @@ avoided (背景 not バックグラウンド, 関係者 not ステークホル�
 Japanese share Han characters with different meanings, so a locale's banned register is
 never applied to another language of the same `scriptFamily` (`i18n/localeConfig.ts`,
 `checkAppliesTo` in `scripts/locale-files.ts`).
+
+Vietnamese is written in a spaced Latin alphabet with stacked diacritics, addresses the
+reader as bạn (never quý khách / quý vị), uses ASCII punctuation attached to the word,
+“ ” quotes, a single … for the ellipsis, dot-grouped thousands (1.000 CST), and digit-space-
+unit durations (48 giờ, 5 tuần) — `npm run i18n:conventions` rejects East Asian characters,
+full-width marks, a space before a sentence mark, three-dot ellipses, and the
+customer-service address, and every catalog must be in Normalization Form C (decomposed
+diacritics break the whole-word gates); `docs/i18n/style-guide-vi.md` explains the rules.
+The Vietnamese banned register (đấu giá, đặt cược, xổ số, trúng thưởng, thắng, đầu tư, lợi
+nhuận, đặt cọc, đúc, rút tiền, quyên góp, ủng hộ, tiếp thị, vòng đấu …) is matched as whole
+words under Unicode boundaries (never the ASCII `\b` matcher, which breaks at every
+diacritic), so a bare syllable that an innocent compound contains is never banned and its
+compounds are listed instead (thưởng thức "to appreciate" stays legal, giải thưởng does
+not). Clash Display lacks most Vietnamese letters, so Vietnamese headings share the Onest
+display companion with Ukrainian.
 
 The machine-enforced lists live in `scripts/lexicon-scan-core.ts` (`DEFAULT_BANNED_TERMS`
 plus `LEXICON_PROFILES`, one per translated locale); the frozen glossaries with rationale

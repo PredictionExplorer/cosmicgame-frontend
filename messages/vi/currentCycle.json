@@ -1,181 +1,181 @@
 {
   "error": {
-    "title": "Failed to load cycle data",
-    "message": "Please refresh the page to try again."
+    "title": "Không tải được dữ liệu chu kỳ",
+    "message": "Vui lòng tải lại trang để thử lại."
   },
   "nav": {
-    "backToHome": "Back to Home"
+    "backToHome": "Về trang chủ"
   },
   "status": {
-    "notStarted": "Not started"
+    "notStarted": "Chưa bắt đầu"
   },
   "hero": {
-    "title": "Cycle #{n}",
-    "subtitle": "Opened {date} • {count, plural, one {{count} gesture} other {{count} gestures}} made",
+    "title": "Chu kỳ #{n}",
+    "subtitle": "Mở ngày {date} • đã có {count, plural, other {{count} nét bút}}",
     "status": {
-      "openingSoon": "Opening soon",
-      "awaitingFirstGesture": "Awaiting first Gesture",
-      "readyToFinalize": "Ready to finalize",
-      "live": "Live"
+      "openingSoon": "Sắp mở",
+      "awaitingFirstGesture": "Đang chờ nét bút đầu tiên",
+      "readyToFinalize": "Sẵn sàng hoàn tất",
+      "live": "Đang diễn ra"
     },
     "cta": {
-      "viewHomeClock": "View Home Clock",
-      "finalizeCycle": "Finalize Cycle",
-      "makeFirstGesture": "Make the first Gesture",
-      "makeGesture": "Make a Gesture"
+      "viewHomeClock": "Xem đồng hồ trang chủ",
+      "finalizeCycle": "Hoàn tất chu kỳ",
+      "makeFirstGesture": "Đặt nét bút đầu tiên",
+      "makeGesture": "Đặt nét bút"
     },
     "countdown": {
-      "opensIn": "Cycle opens in",
-      "opensAt": "Cycle {n} opens at {date}",
-      "finalizesIn": "Cycle finalizes in",
-      "finalizesTooltip": "When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation. Each new gesture extends the timer.",
-      "readyTitle": "Cycle Ready to Finalize",
-      "readyMessage": "The finalization clock reached zero.",
-      "confirmingTitle": "Confirming the Final Moment",
-      "confirmingMessage": "The clock reached zero. Checking the chain for a last-second Gesture before the cycle can finalize."
+      "opensIn": "Chu kỳ mở sau",
+      "opensAt": "Chu kỳ {n} mở vào {date}",
+      "finalizesIn": "Chu kỳ hoàn tất sau",
+      "finalizesTooltip": "Khi bộ đếm này về không, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ Signature. Mỗi nét bút mới kéo dài bộ đếm.",
+      "readyTitle": "Chu kỳ sẵn sàng hoàn tất",
+      "readyMessage": "Đồng hồ hoàn tất đã về không.",
+      "confirmingTitle": "Đang xác nhận khoảnh khắc cuối",
+      "confirmingMessage": "Đồng hồ đã về không. Đang kiểm tra chuỗi xem có nét bút nào ở giây cuối trước khi chu kỳ có thể hoàn tất."
     }
   },
   "stats": {
     "totalGestures": {
-      "label": "Total Gestures",
-      "tooltip": "Total gestures made in this cycle. Each gesture is also a Stellar Selection entry."
+      "label": "Tổng số nét bút",
+      "tooltip": "Tổng số nét bút đã đặt trong chu kỳ này. Mỗi nét bút cũng là một lượt thuộc diện Tinh tuyển."
     },
     "cycleReserve": {
-      "label": "Cycle Reserve",
-      "tooltip": "ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture. The recipient also receives 1,000 CST and a Cosmic Signature NFT."
+      "label": "Dự trữ chu kỳ",
+      "tooltip": "Phần ETH của phân bổ Signature được người tham gia đặt nét bút cuối cùng nhận về. Người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT."
     },
     "stellarSelectionPool": {
-      "label": "Stellar Selection Pool",
-      "tooltip": "ETH split across {count} randomly selected participants when the cycle finalizes."
+      "label": "Quỹ Tinh tuyển",
+      "tooltip": "ETH được chia cho {count} người tham gia được chọn ngẫu nhiên khi chu kỳ hoàn tất."
     },
     "publicGoods": {
-      "label": "Public Goods",
-      "tooltip": "{percent}% of the Cycle Reserve is forwarded to Protocol Guild each cycle."
+      "label": "Hàng hóa công",
+      "tooltip": "{percent}% Dự trữ chu kỳ được chuyển đến Protocol Guild mỗi chu kỳ."
     },
     "contributedEth": {
-      "label": "Contributed ETH",
-      "tooltip": "Direct ETH contributions from the community this cycle."
+      "label": "ETH đã đóng góp",
+      "tooltip": "Các khoản đóng góp ETH trực tiếp từ cộng đồng trong chu kỳ này."
     },
     "attachedNfts": {
-      "label": "Attached NFTs",
-      "tooltip": "NFTs attached to gestures by the community this cycle."
+      "label": "NFT đính kèm",
+      "tooltip": "Các NFT cộng đồng đã đính kèm vào nét bút trong chu kỳ này."
     }
   },
   "sections": {
     "allocationTracks": {
-      "title": "Allocation Tracks",
-      "tooltip": "How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve."
+      "title": "Các luồng phân bổ",
+      "tooltip": "Cách Dự trữ chu kỳ được phân phối qua các luồng phân bổ: phân bổ Signature, Chiến binh Thời gian, Tinh tuyển, Hàng hóa công, phân phối neo giữ và Dự trữ tích lũy."
     },
     "stellarSelectionEntries": {
-      "title": "Stellar Selection Entries",
-      "tooltip": "Each gesture records one Stellar Selection entry. More gestures = higher Selection frequency for ETH or Cosmic Signature NFT allocations."
+      "title": "Lượt Tinh tuyển",
+      "tooltip": "Mỗi nét bút ghi nhận một lượt Tinh tuyển. Càng nhiều nét bút, tần suất được chọn nhận phân bổ ETH hoặc Cosmic Signature NFT càng cao."
     },
     "topEthSpenders": {
-      "title": "Top ETH Spenders",
-      "tooltip": "Participant addresses ranked by total ETH spent on gestures this cycle."
+      "title": "Người chi ETH nhiều nhất",
+      "tooltip": "Địa chỉ người tham gia xếp theo tổng ETH đã chi cho nét bút trong chu kỳ này."
     },
     "enduranceChampions": {
-      "title": "Endurance Champions",
-      "tooltip": "Participants ranked by how long they remained the most-recent gesture maker. The one with the longest consecutive interval receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
+      "title": "Quán quân Bền bỉ",
+      "tooltip": "Người tham gia xếp theo thời gian giữ vị trí người đặt nét bút gần nhất. Người có khoảng thời gian liên tục dài nhất nhận 1.000 CST ghi nhận và một Cosmic Signature NFT."
     },
     "gestureHistory": {
-      "title": "Gesture History — Cycle {n}",
-      "tooltip": "Chronological record of every gesture made in this cycle, newest first."
+      "title": "Lịch sử nét bút — Chu kỳ {n}",
+      "tooltip": "Bản ghi theo thời gian của mọi nét bút trong chu kỳ này, mới nhất trước."
     },
     "ethContributions": {
-      "title": "ETH Contributions",
-      "tooltip": "Direct ETH contributions made by community members during this cycle."
+      "title": "Đóng góp ETH",
+      "tooltip": "Các khoản đóng góp ETH trực tiếp của thành viên cộng đồng trong chu kỳ này."
     },
     "cycleRules": {
-      "title": "Cycle Rules",
-      "tooltip": "Key rules and allocation mechanics for this cycle."
+      "title": "Quy tắc chu kỳ",
+      "tooltip": "Các quy tắc chính và cơ chế phân bổ của chu kỳ này."
     }
   },
   "rules": {
-    "howItWorks": "How it works",
-    "participation": "When you gesture, you may imprint <em>dynamic Participation CST</em>. The amount uses a square-root formula based on how long it has been since the previous gesture.",
-    "calibration": "ETH gestures shorten the CST Calibration Window by about {decreasePercent}%; CST gestures lengthen it by about {increasePercent}%.",
-    "stellarSelection": "Each gesture records one Stellar Selection entry. {ethEntries} entries receive {rafflePercent}% of the Cycle Reserve. {nftEntries} additional Selection recipients and {anchorHolders} Random Walk NFT anchor-holders receive a Cosmic Signature NFT.",
-    "publicGoods": "Protocol Guild receives {percent}% of the Cycle Reserve (at least {amount} ETH) each cycle."
+    "howItWorks": "Cách hoạt động",
+    "participation": "Khi đặt nét bút, bạn có thể khắc <em>CST tham gia động</em>. Số lượng tính theo công thức căn bậc hai dựa trên khoảng thời gian kể từ nét bút trước.",
+    "calibration": "Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng {decreasePercent}%; nét bút CST kéo dài nó khoảng {increasePercent}%.",
+    "stellarSelection": "Mỗi nét bút ghi nhận một lượt Tinh tuyển. {ethEntries} lượt nhận {rafflePercent}% Dự trữ chu kỳ. {nftEntries} người nhận Tinh tuyển khác và {anchorHolders} người neo giữ Random Walk NFT nhận một Cosmic Signature NFT.",
+    "publicGoods": "Protocol Guild nhận {percent}% Dự trữ chu kỳ (ít nhất {amount} ETH) mỗi chu kỳ."
   },
   "footer": {
-    "contractBalance": "Contract Balance",
-    "cycleDuration": "Cycle Duration",
-    "uniqueParticipants": "Unique Participants"
+    "contractBalance": "Số dư hợp đồng",
+    "cycleDuration": "Thời lượng chu kỳ",
+    "uniqueParticipants": "Người tham gia riêng biệt"
   },
   "attachedTokens": {
-    "title": "Attached Tokens",
-    "tooltip": "NFTs and ERC-20 tokens attached to gestures by the community to enrich the cycle's Cycle Reserve.",
-    "erc721Tab": "ERC721 Tokens",
-    "erc20Tab": "ERC20 Tokens",
-    "erc721Empty": "No ERC721 tokens were attached this cycle."
+    "title": "Token đính kèm",
+    "tooltip": "NFT và token ERC-20 do cộng đồng đính kèm vào nét bút để làm giàu Dự trữ chu kỳ.",
+    "erc721Tab": "Token ERC721",
+    "erc20Tab": "Token ERC20",
+    "erc721Empty": "Không có token ERC721 nào được đính kèm trong chu kỳ này."
   },
   "showcase": {
-    "badge": "Included in Signature Allocation",
-    "heading": "Bonus assets attached to this cycle",
-    "cycleFallback": "current",
+    "badge": "Nằm trong phân bổ Signature",
+    "heading": "Tài sản bổ sung đính kèm chu kỳ này",
+    "cycleFallback": "hiện tại",
     "description": {
-      "nftOnly": "A compact receipt for the community-attached assets that travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} when Cycle #{cycle} finalizes.",
-      "erc20Only": "A compact receipt for the community-attached assets that travel with the Signature Allocation. The Final Gesture participant receives {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes.",
-      "mixed": "A compact receipt for the community-attached assets that travel with the Signature Allocation. The Final Gesture participant receives {nftCount, plural, one {the attached NFT} other {all {nftCount} attached NFTs}} and {erc20Count, plural, one {the attached ERC-20 token deposit} other {all {erc20Count} attached ERC-20 token deposits}} when Cycle #{cycle} finalizes."
+      "nftOnly": "Biên nhận gọn cho các tài sản cộng đồng đính kèm đi cùng phân bổ Signature. Người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} khi chu kỳ #{cycle} hoàn tất.",
+      "erc20Only": "Biên nhận gọn cho các tài sản cộng đồng đính kèm đi cùng phân bổ Signature. Người đặt nét bút cuối cùng nhận {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}} khi chu kỳ #{cycle} hoàn tất.",
+      "mixed": "Biên nhận gọn cho các tài sản cộng đồng đính kèm đi cùng phân bổ Signature. Người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}} khi chu kỳ #{cycle} hoàn tất."
     },
     "bonusReceipt": {
-      "label": "Bonus Receipt",
-      "nftOnly": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}}",
-      "erc20Only": "{erc20Count, plural, one {{erc20Count} ERC-20 deposit} other {{erc20Count} ERC-20 deposits}}",
-      "mixed": "{nftCount, plural, one {{nftCount} ERC-721 token} other {{nftCount} ERC-721 tokens}} + {erc20Count, plural, one {{erc20Count} ERC-20 deposit} other {{erc20Count} ERC-20 deposits}}"
+      "label": "Biên nhận bổ sung",
+      "nftOnly": "{nftCount, plural, other {{nftCount} token ERC-721}}",
+      "erc20Only": "{erc20Count, plural, other {{erc20Count} khoản nạp ERC-20}}",
+      "mixed": "{nftCount, plural, other {{nftCount} token ERC-721}} + {erc20Count, plural, other {{erc20Count} khoản nạp ERC-20}}"
     },
     "summary": {
-      "assetsIncluded": "Assets included",
-      "cycle": "Cycle",
+      "assetsIncluded": "Tài sản bao gồm",
+      "cycle": "Chu kỳ",
       "cycleValue": "#{cycle}",
-      "preview": "Preview",
-      "previewAll": "All visible",
-      "previewCount": "{visible} of {total}",
-      "recipientRule": "Recipient rule",
-      "recipientRuleValue": "Final Gesture"
+      "preview": "Xem trước",
+      "previewAll": "Hiển thị tất cả",
+      "previewCount": "{visible} trong {total}",
+      "recipientRule": "Quy tắc người nhận",
+      "recipientRuleValue": "Nét bút cuối cùng"
     },
     "remainder": {
-      "nftOnly": "Showing the featured receipt preview. Plus {nftCount, plural, one {{nftCount} more attached NFT} other {{nftCount} more attached NFTs}} in the full cycle details.",
-      "erc20Only": "Showing the featured receipt preview. Plus {erc20Count, plural, one {{erc20Count} more attached ERC-20 token deposit} other {{erc20Count} more attached ERC-20 token deposits}} in the full cycle details.",
-      "mixed": "Showing the featured receipt preview. Plus {nftCount, plural, one {{nftCount} more attached NFT} other {{nftCount} more attached NFTs}} and {erc20Count, plural, one {{erc20Count} more attached ERC-20 token deposit} other {{erc20Count} more attached ERC-20 token deposits}} in the full cycle details."
+      "nftOnly": "Đang hiển thị bản xem trước biên nhận nổi bật. Còn {nftCount, plural, other {{nftCount} NFT đính kèm khác}} trong chi tiết chu kỳ đầy đủ.",
+      "erc20Only": "Đang hiển thị bản xem trước biên nhận nổi bật. Còn {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}} trong chi tiết chu kỳ đầy đủ.",
+      "mixed": "Đang hiển thị bản xem trước biên nhận nổi bật. Còn {nftCount, plural, other {{nftCount} NFT đính kèm khác}} và {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}} trong chi tiết chu kỳ đầy đủ."
     },
     "nftCard": {
       "badge": "ERC-721",
       "fallbackTitle": "NFT #{id}",
-      "fallbackTitleUnknown": "Attached NFT",
-      "fallbackSubtitle": "Community-attached ERC-721",
-      "imageAlt": "Attached NFT {name}",
-      "imageAltFallback": "Attached NFT allocation",
+      "fallbackTitleUnknown": "NFT đính kèm",
+      "fallbackSubtitle": "ERC-721 do cộng đồng đính kèm",
+      "imageAlt": "NFT đính kèm {name}",
+      "imageAltFallback": "Phân bổ NFT đính kèm",
       "mediaAria": "{label}: {title}",
-      "floorEstimate": "Floor ~{price} {currency}",
-      "floorTooltip": "Collection floor estimate, not an appraisal of this specific token.",
-      "metadataUnavailable": "Metadata unavailable. The attached NFT is still part of this cycle allocation.",
+      "floorEstimate": "Giá sàn ~{price} {currency}",
+      "floorTooltip": "Ước tính giá sàn của bộ sưu tập, không phải định giá cho token cụ thể này.",
+      "metadataUnavailable": "Siêu dữ liệu không khả dụng. NFT đính kèm vẫn thuộc phân bổ của chu kỳ này.",
       "openSea": "OpenSea",
-      "explorer": "Explorer",
+      "explorer": "Trình khám phá",
       "links": {
-        "project": "View NFT",
-        "opensea": "View on OpenSea",
-        "explorer": "View contract"
+        "project": "Xem NFT",
+        "opensea": "Xem trên OpenSea",
+        "explorer": "Xem hợp đồng"
       }
     },
     "erc20Card": {
-      "badge": "ERC-20 deposit",
-      "badgeTooltipLogo": "Logo from {source}; verify the token address before assigning value.",
-      "badgeTooltipDefault": "This ERC-20 token deposit is attached to the cycle and goes to the Signature Allocation recipient when finalized.",
+      "badge": "Khoản nạp ERC-20",
+      "badgeTooltipLogo": "Logo từ {source}; hãy xác minh địa chỉ token trước khi gán giá trị.",
+      "badgeTooltipDefault": "Khoản nạp token ERC-20 này được đính kèm vào chu kỳ và sẽ về tay người nhận phân bổ Signature khi hoàn tất.",
       "symbolFallback": "ERC20",
-      "nameFallback": "Attached ERC20 token",
-      "logoSourceFallback": "curated token metadata",
-      "unknownAmount": "Unknown amount",
-      "viewToken": "View {symbol} token",
-      "logoAlt": "{token} token logo"
+      "nameFallback": "Token ERC20 đính kèm",
+      "logoSourceFallback": "siêu dữ liệu token đã tuyển chọn",
+      "unknownAmount": "Số lượng không xác định",
+      "viewToken": "Xem token {symbol}",
+      "logoAlt": "Logo token {token}"
     },
     "facts": {
-      "tokenId": "Token ID",
+      "tokenId": "Mã token",
       "tokenIdValue": "#{id}",
       "token": "Token",
-      "attachedBy": "Attached by",
-      "unknown": "Unknown"
+      "attachedBy": "Đính kèm bởi",
+      "unknown": "Không xác định"
     }
   }
 }

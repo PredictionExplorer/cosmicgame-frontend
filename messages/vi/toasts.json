@@ -1,188 +1,188 @@
 {
-  "gestureSubmitted": "Gesture submitted. Waiting for confirmation.",
-  "gestureConfirmed": "Gesture confirmed. The cycle continues.",
-  "allocationRetrieved": "Allocation retrieved to your wallet.",
-  "anchorSet": "NFT anchored to the protocol.",
-  "anchorReleased": "Anchor released.",
-  "cycleFinalized": "Cycle finalized. Allocations distributed.",
-  "walletTransactionCancelled": "Transaction not sent — you cancelled it in your wallet.",
-  "unexpectedError": "Unexpected error. Please try again.",
+  "gestureSubmitted": "Đã gửi nét bút. Đang chờ xác nhận.",
+  "gestureConfirmed": "Nét bút đã được xác nhận. Chu kỳ tiếp tục.",
+  "allocationRetrieved": "Đã nhận về phân bổ vào ví của bạn.",
+  "anchorSet": "NFT đã được neo giữ với giao thức.",
+  "anchorReleased": "Đã gỡ neo.",
+  "cycleFinalized": "Chu kỳ đã hoàn tất. Các phân bổ đã được phân phối.",
+  "walletTransactionCancelled": "Giao dịch chưa được gửi — bạn đã hủy trong ví.",
+  "unexpectedError": "Lỗi không mong đợi. Vui lòng thử lại.",
   "generic": {
-    "unexpectedError": "Unexpected error. Please try again.",
-    "rpcFailure": "The transaction could not be completed. Check your wallet and network connection, then try again.",
-    "receiptFailure": "The transaction was sent but could not be confirmed. Check its status in your wallet or a block explorer before trying again.",
-    "transactionFailed": "Transaction failed. Please try again."
+    "unexpectedError": "Lỗi không mong đợi. Vui lòng thử lại.",
+    "rpcFailure": "Không thể hoàn thành giao dịch. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
+    "receiptFailure": "Giao dịch đã được gửi nhưng chưa thể xác nhận. Hãy kiểm tra trạng thái trong ví hoặc trên trình khám phá khối trước khi thử lại.",
+    "transactionFailed": "Giao dịch thất bại. Vui lòng thử lại."
   },
   "wallet": {
-    "connect": "Please connect your wallet.",
-    "connectCorrectNetwork": "Please connect your wallet and ensure you are on the correct network.",
-    "notReady": "Your wallet is not ready. Reconnect and try again.",
-    "stillConnecting": "Wallet is still connecting. Please try again in a moment."
+    "connect": "Vui lòng kết nối ví.",
+    "connectCorrectNetwork": "Vui lòng kết nối ví và đảm bảo bạn đang ở đúng mạng.",
+    "notReady": "Ví chưa sẵn sàng. Hãy kết nối lại và thử lại.",
+    "stillConnecting": "Ví vẫn đang kết nối. Vui lòng thử lại sau ít phút."
   },
   "watchAsset": {
-    "metaMaskRequired": "Connect MetaMask to add this asset.",
-    "providerUnavailable": "MetaMask is not ready. Reconnect it and try again.",
-    "cstUnavailable": "The CST token address is not available yet.",
-    "nftUnavailable": "The Cosmic Signature NFT contract address is not available yet.",
-    "cstAdded": "CST was added to MetaMask.",
-    "nftAdded": "This Cosmic Signature NFT was added to MetaMask.",
-    "notAdded": "The asset was not added to MetaMask.",
-    "cancelled": "The MetaMask request was cancelled.",
-    "cstFailed": "MetaMask could not add CST. Please try again.",
-    "nftFailed": "MetaMask could not add this NFT. NFT import is experimental and requires the MetaMask browser extension."
+    "metaMaskRequired": "Kết nối MetaMask để thêm tài sản này.",
+    "providerUnavailable": "MetaMask chưa sẵn sàng. Hãy kết nối lại và thử lại.",
+    "cstUnavailable": "Địa chỉ token CST chưa có sẵn.",
+    "nftUnavailable": "Địa chỉ hợp đồng Cosmic Signature NFT chưa có sẵn.",
+    "cstAdded": "Đã thêm CST vào MetaMask.",
+    "nftAdded": "Đã thêm Cosmic Signature NFT này vào MetaMask.",
+    "notAdded": "Tài sản chưa được thêm vào MetaMask.",
+    "cancelled": "Yêu cầu MetaMask đã bị hủy.",
+    "cstFailed": "MetaMask không thể thêm CST. Vui lòng thử lại.",
+    "nftFailed": "MetaMask không thể thêm NFT này. Tính năng nhập NFT đang thử nghiệm và yêu cầu tiện ích MetaMask trên trình duyệt."
   },
   "network": {
-    "unavailable": "Network unavailable — please reconnect your wallet.",
-    "switchForGesture": "Switch your wallet to the app network before making a gesture.",
-    "wrongChain": "Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again."
+    "unavailable": "Mạng không khả dụng — vui lòng kết nối lại ví.",
+    "switchForGesture": "Hãy chuyển ví sang mạng của ứng dụng trước khi đặt nét bút.",
+    "wrongChain": "Ví vẫn đang kết nối hoặc MetaMask đang ở sai chuỗi. Hãy chuyển sang mạng của ứng dụng và thử lại."
   },
   "gesture": {
-    "simulated": "Simulated gesture placed. Timer extended by {seconds, plural, one {# second} other {# seconds}}.",
-    "confirmed": "Gesture confirmed. The cycle continues.",
+    "simulated": "Đã đặt nét bút mô phỏng. Bộ đếm được kéo dài thêm {seconds, plural, other {# giây}}.",
+    "confirmed": "Nét bút đã được xác nhận. Chu kỳ tiếp tục.",
     "validation": {
-      "notNftOwner": "You aren't the owner of the token!",
-      "tokenDecimalsWarning": "Token doesn't implement decimals(); assuming 18 decimal places.",
-      "invalidContractAddress": "The address provided is not a valid contract address!",
-      "notErc721": "The attached NFT contract is not an ERC721 token contract.",
-      "notErc20": "The attached token contract is not an ERC20 token contract.",
-      "insufficientAttachedToken": "Insufficient token balance to attach to this gesture.",
-      "insufficientEth": "Insufficient ETH balance! There isn't enough ETH in your wallet.",
-      "insufficientCst": "Insufficient CST balance! There isn't enough CST (ERC-20) in your wallet."
+      "notNftOwner": "Bạn không phải chủ sở hữu của token này!",
+      "tokenDecimalsWarning": "Token không triển khai decimals(); giả định 18 chữ số thập phân.",
+      "invalidContractAddress": "Địa chỉ đã cung cấp không phải là địa chỉ hợp đồng hợp lệ!",
+      "notErc721": "Hợp đồng NFT đính kèm không phải là hợp đồng token ERC721.",
+      "notErc20": "Hợp đồng token đính kèm không phải là hợp đồng token ERC20.",
+      "insufficientAttachedToken": "Số dư token không đủ để đính kèm vào nét bút này.",
+      "insufficientEth": "Số dư ETH không đủ! Ví của bạn không có đủ ETH.",
+      "insufficientCst": "Số dư CST không đủ! Ví của bạn không có đủ CST (ERC-20)."
     },
     "transaction": {
-      "failed": "Unable to submit the gesture. Check your wallet and network connection, refresh the current cost, and try again.",
-      "cstReverted": "The CST gesture reverted. Another gesture may have landed first, causing your max CST cost or minimum CST reward protection to fail. Refresh the preview and try again, or choose \"Accept any CST reward\" if you are comfortable receiving 0 CST."
+      "failed": "Không thể gửi nét bút. Hãy kiểm tra ví và kết nối mạng, làm mới chi phí hiện tại, rồi thử lại.",
+      "cstReverted": "Nét bút CST đã bị hoàn nguyên. Có thể một nét bút khác đã đến trước, khiến mức chi phí CST tối đa hoặc bảo đảm CST tham gia tối thiểu của bạn không được đáp ứng. Hãy làm mới bản xem trước và thử lại, hoặc chọn “Chấp nhận mọi mức CST tham gia” nếu bạn sẵn lòng nhận 0 CST."
     },
     "contractErrors": {
-      "insufficientReceivedBidAmount": "The current Gesture Cost is greater than the amount you transferred.",
-      "usedRandomWalkNft": "This RandomWalk NFT has already been used for a gesture.",
-      "callerIsNotNftOwner": "You are not the owner of this NFT.",
-      "roundIsInactive": "The current cycle is not active.",
-      "tooLongBidMessage": "Your gesture message is too long.",
-      "wrongBidType": "Wrong gesture type selected.",
-      "fundTransferFailed": "Fund transfer failed.",
-      "ethCostChanged": "Gesture Cost rose by {increase} ETH while your transaction was in transit. The new required cost is {required} ETH. Please try again.",
-      "cstCostChanged": "CST Gesture Cost changed while your transaction was in transit, likely because another gesture landed first. The contract required {required} CST, above your {maximum} CST maximum. Refresh and try again."
+      "insufficientReceivedBidAmount": "Chi phí nét bút hiện tại lớn hơn số tiền bạn đã chuyển.",
+      "usedRandomWalkNft": "RandomWalk NFT này đã được dùng cho một nét bút.",
+      "callerIsNotNftOwner": "Bạn không phải chủ sở hữu của NFT này.",
+      "roundIsInactive": "Chu kỳ hiện tại không hoạt động.",
+      "tooLongBidMessage": "Lời nhắn nét bút của bạn quá dài.",
+      "wrongBidType": "Đã chọn sai loại nét bút.",
+      "fundTransferFailed": "Chuyển tiền thất bại.",
+      "ethCostChanged": "Chi phí nét bút đã tăng {increase} ETH trong khi giao dịch của bạn đang được gửi. Chi phí mới cần thiết là {required} ETH. Vui lòng thử lại.",
+      "cstCostChanged": "Chi phí nét bút CST đã thay đổi trong khi giao dịch của bạn đang được gửi, có thể do một nét bút khác đã đến trước. Hợp đồng yêu cầu {required} CST, cao hơn mức tối đa {maximum} CST của bạn. Hãy làm mới và thử lại."
     }
   },
   "anchor": {
-    "walletNotReady": "Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again.",
-    "anchored": "{count, plural, one {# NFT was anchored to the protocol.} other {# NFTs were anchored to the protocol.}}",
-    "released": "{count, plural, one {# selected anchor was released successfully.} other {# selected anchors were released successfully.}}",
-    "releasedWithDistributions": "{count, plural, one {# selected anchor was released and its accumulated ETH Anchor Distributions were retrieved.} other {# selected anchors were released and their accumulated ETH Anchor Distributions were retrieved.}}",
-    "failed": "The anchor transaction could not be completed. Check your wallet and network connection, then try again."
+    "walletNotReady": "Ví vẫn đang kết nối hoặc MetaMask đang ở sai chuỗi. Hãy chuyển sang mạng của ứng dụng và thử lại.",
+    "anchored": "{count, plural, other {# NFT đã được neo giữ với giao thức.}}",
+    "released": "{count, plural, other {# neo đã chọn đã được gỡ thành công.}}",
+    "releasedWithDistributions": "{count, plural, other {# neo đã chọn đã được gỡ và các khoản phân phối neo giữ ETH tích lũy đã được nhận về.}}",
+    "failed": "Không thể hoàn thành giao dịch neo giữ. Hãy kiểm tra ví và kết nối mạng, rồi thử lại."
   },
   "allocation": {
-    "retrieved": "Allocation retrieved to your wallet."
+    "retrieved": "Đã nhận về phân bổ vào ví của bạn."
   },
   "finalize": {
-    "roundDidNotAdvance": "Claim transaction succeeded but the cycle did not advance. Please refresh the page.",
-    "metadataUpdating": "Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.",
-    "failed": "Unable to finalize the cycle. Check your wallet and network connection, then try again.",
+    "roundDidNotAdvance": "Giao dịch hoàn tất đã thành công nhưng chu kỳ chưa chuyển tiếp. Vui lòng tải lại trang.",
+    "metadataUpdating": "Chu kỳ đã hoàn tất trên chuỗi. Siêu dữ liệu token có thể vẫn đang cập nhật — hãy kiểm tra Phân bổ của tôi hoặc tải lại sau.",
+    "failed": "Không thể hoàn tất chu kỳ. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
     "contractErrors": {
-      "mainPrizeEarlyClaim": "Not enough time has elapsed to retrieve the Signature Allocation.",
-      "mainPrizeClaimDenied": "Only the Last Participant is permitted to retrieve the Signature Allocation.",
-      "noGestures": "No gestures have been made in the current cycle yet."
+      "mainPrizeEarlyClaim": "Chưa đủ thời gian để nhận về phân bổ Signature.",
+      "mainPrizeClaimDenied": "Chỉ người tham gia cuối cùng mới được nhận về phân bổ Signature.",
+      "noGestures": "Chưa có nét bút nào trong chu kỳ hiện tại."
     }
   },
   "claim": {
-    "walletNotConnected": "Please connect your wallet and ensure you are on the correct network.",
-    "failed": "An error occurred",
-    "stellarEthSuccess": "Stellar Selection ETH retrieved to your wallet.",
-    "nftSuccess": "Attached NFT retrieved to your wallet.",
-    "nftsSuccess": "{count, plural, one {# attached NFT retrieved to your wallet.} other {# attached NFTs retrieved to your wallet.}}",
-    "tokenSuccess": "Attached ERC-20 token retrieved to your wallet.",
-    "tokensSuccess": "{count, plural, one {# attached ERC-20 token retrieved to your wallet.} other {# attached ERC-20 tokens retrieved to your wallet.}}",
-    "retrieving": "Retrieving..."
+    "walletNotConnected": "Vui lòng kết nối ví và đảm bảo bạn đang ở đúng mạng.",
+    "failed": "Đã xảy ra lỗi",
+    "stellarEthSuccess": "Đã nhận về ETH Tinh tuyển vào ví của bạn.",
+    "nftSuccess": "Đã nhận về NFT đính kèm vào ví của bạn.",
+    "nftsSuccess": "{count, plural, other {Đã nhận về # NFT đính kèm vào ví của bạn.}}",
+    "tokenSuccess": "Đã nhận về token ERC-20 đính kèm vào ví của bạn.",
+    "tokensSuccess": "{count, plural, other {Đã nhận về # token ERC-20 đính kèm vào ví của bạn.}}",
+    "retrieving": "Đang nhận về…"
   },
   "transfer": {
     "common": {
-      "sourceUnavailable": "Source wallet is not available.",
-      "invalidRecipient": "Enter a valid recipient address.",
-      "invalidAmount": "Enter a valid CST amount.",
-      "invalidDecimals": "Enter a CST amount with a valid number of decimals.",
-      "amountPositive": "Enter an amount greater than zero."
+      "sourceUnavailable": "Ví nguồn không khả dụng.",
+      "invalidRecipient": "Nhập một địa chỉ người nhận hợp lệ.",
+      "invalidAmount": "Nhập một số lượng CST hợp lệ.",
+      "invalidDecimals": "Nhập số lượng CST với số chữ số thập phân hợp lệ.",
+      "amountPositive": "Nhập một số lượng lớn hơn không."
     },
     "cst": {
-      "tokenUnavailable": "CST token address is not available yet.",
-      "walletRequired": "Connect your wallet before sending CST.",
-      "sourceWalletRequired": "Connect the source wallet before sending CST from it.",
-      "balanceLoading": "CST balance is still loading. Please try again in a moment.",
-      "insufficientBalance": "Insufficient CST balance.",
-      "decimalsWarning": "Unable to read CST decimals; assuming 18 decimal places.",
-      "confirmed": "CST transfer confirmed.",
-      "failed": "Unable to send CST. Please try again."
+      "tokenUnavailable": "Địa chỉ token CST chưa có sẵn.",
+      "walletRequired": "Kết nối ví trước khi gửi CST.",
+      "sourceWalletRequired": "Kết nối ví nguồn trước khi gửi CST từ ví đó.",
+      "balanceLoading": "Số dư CST vẫn đang tải. Vui lòng thử lại sau ít phút.",
+      "insufficientBalance": "Số dư CST không đủ.",
+      "decimalsWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
+      "confirmed": "Đã xác nhận chuyển CST.",
+      "failed": "Không thể gửi CST. Vui lòng thử lại."
     },
     "nft": {
-      "contractUnavailable": "Cosmic Signature NFT contract address is not available yet.",
-      "walletRequired": "Connect your wallet before sending NFTs.",
-      "sourceWalletRequired": "Connect the source wallet before sending NFTs from it.",
-      "recipientMustDiffer": "Enter a recipient address different from your connected wallet.",
-      "selectOne": "Select at least one transferable NFT.",
-      "confirmed": "{count, plural, one {NFT transfer confirmed.} other {# NFT transfers confirmed.}}",
-      "detailTransferConfirmed": "NFT transfer confirmed.",
-      "recipientCheckFailed": "Could not check the recipient address. Check your wallet and network connection, then try again.",
-      "failed": "Unable to send selected NFTs. Please try again.",
-      "failedToken": "Unable to transfer NFT #{tokenId}. Please try again.",
-      "nameSet": "The token name has been changed successfully!",
-      "nameCleared": "The token name has been cleared successfully!",
-      "nameSetFailed": "An error occurred while setting the token name. Please try again.",
-      "nameClearFailed": "An error occurred while clearing the token name. Please try again."
+      "contractUnavailable": "Địa chỉ hợp đồng Cosmic Signature NFT chưa có sẵn.",
+      "walletRequired": "Kết nối ví trước khi gửi NFT.",
+      "sourceWalletRequired": "Kết nối ví nguồn trước khi gửi NFT từ ví đó.",
+      "recipientMustDiffer": "Nhập một địa chỉ người nhận khác với ví đang kết nối.",
+      "selectOne": "Chọn ít nhất một NFT có thể chuyển giao.",
+      "confirmed": "{count, plural, other {Đã xác nhận # lần chuyển giao NFT.}}",
+      "detailTransferConfirmed": "Đã xác nhận chuyển giao NFT.",
+      "recipientCheckFailed": "Không kiểm tra được địa chỉ người nhận. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
+      "failed": "Không thể gửi các NFT đã chọn. Vui lòng thử lại.",
+      "failedToken": "Không thể chuyển giao NFT #{tokenId}. Vui lòng thử lại.",
+      "nameSet": "Tên token đã được thay đổi thành công!",
+      "nameCleared": "Tên token đã được xóa thành công!",
+      "nameSetFailed": "Đã xảy ra lỗi khi đặt tên token. Vui lòng thử lại.",
+      "nameClearFailed": "Đã xảy ra lỗi khi xóa tên token. Vui lòng thử lại."
     },
     "marketingCst": {
-      "tokenUnavailable": "CST token address is not available yet.",
-      "walletRequired": "Connect your wallet before paying a CST reward.",
-      "reserveUnavailable": "Outreach reserve wallet is not available.",
-      "treasurerUnavailable": "Marketing wallet treasurer is not available.",
-      "treasurerRequired": "Connect the current marketing wallet treasurer before paying CST rewards.",
-      "balanceLoading": "Outreach reserve CST balance is still loading. Please try again in a moment.",
-      "insufficientBalance": "Insufficient outreach reserve CST balance.",
-      "decimalsWarning": "Unable to read CST decimals; assuming 18 decimal places.",
-      "balanceReadFailed": "Unable to read the outreach reserve CST balance. Please try again.",
-      "confirmed": "Marketing CST reward confirmed.",
-      "failed": "Unable to pay CST reward. Please try again.",
-      "loading": "Loading...",
-      "pay": "Pay CST Reward",
-      "paying": "Paying...",
-      "viewTransaction": "View transaction"
+      "tokenUnavailable": "Địa chỉ token CST chưa có sẵn.",
+      "walletRequired": "Kết nối ví trước khi chi CST phân bổ.",
+      "reserveUnavailable": "Ví Dự trữ truyền thông không khả dụng.",
+      "treasurerUnavailable": "Thủ quỹ ví truyền thông không khả dụng.",
+      "treasurerRequired": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông trước khi chi CST phân bổ.",
+      "balanceLoading": "Số dư CST của Dự trữ truyền thông vẫn đang tải. Vui lòng thử lại sau ít phút.",
+      "insufficientBalance": "Số dư CST của Dự trữ truyền thông không đủ.",
+      "decimalsWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
+      "balanceReadFailed": "Không đọc được số dư CST của Dự trữ truyền thông. Vui lòng thử lại.",
+      "confirmed": "Đã xác nhận CST phân bổ truyền thông.",
+      "failed": "Không thể chi CST phân bổ. Vui lòng thử lại.",
+      "loading": "Đang tải…",
+      "pay": "Chi CST phân bổ",
+      "paying": "Đang chi…",
+      "viewTransaction": "Xem giao dịch"
     }
   },
   "contribution": {
-    "connectWallet": "Please connect your wallet to contribute ETH.",
-    "connectWalletInline": "Connect your wallet to contribute ETH.",
-    "invalidAmount": "Enter an ETH amount greater than 0.",
-    "invalidUrl": "Enter a valid URL beginning with http:// or https://.",
-    "invalidUrlInline": "Use an http:// or https:// URL.",
-    "contractUnavailable": "Please connect your wallet and ensure you are on the correct network.",
-    "formSubmitted": "{amount} ETH contribution confirmed.",
-    "formSubmittedWithInfo": "{amount} ETH contribution with information confirmed.",
-    "submitted": "{amount} ETH was contributed successfully!",
-    "submittedWithInfo": "{amount} ETH with information was contributed successfully!",
-    "formFailed": "ETH contribution failed, please check your input and try again.",
-    "failed": "Contribution failed, please try again.",
-    "failedWithInfo": "Contribution with information failed, please check your input.",
-    "submitting": "Submitting...",
+    "connectWallet": "Vui lòng kết nối ví để đóng góp ETH.",
+    "connectWalletInline": "Kết nối ví để đóng góp ETH.",
+    "invalidAmount": "Nhập một số ETH lớn hơn 0.",
+    "invalidUrl": "Nhập một URL hợp lệ bắt đầu bằng http:// hoặc https://.",
+    "invalidUrlInline": "Dùng URL http:// hoặc https://.",
+    "contractUnavailable": "Vui lòng kết nối ví và đảm bảo bạn đang ở đúng mạng.",
+    "formSubmitted": "Đã xác nhận đóng góp {amount} ETH.",
+    "formSubmittedWithInfo": "Đã xác nhận đóng góp {amount} ETH kèm thông tin.",
+    "submitted": "Đã đóng góp {amount} ETH thành công!",
+    "submittedWithInfo": "Đã đóng góp {amount} ETH kèm thông tin thành công!",
+    "formFailed": "Đóng góp ETH thất bại, hãy kiểm tra thông tin nhập và thử lại.",
+    "failed": "Đóng góp thất bại, vui lòng thử lại.",
+    "failedWithInfo": "Đóng góp kèm thông tin thất bại, hãy kiểm tra thông tin nhập.",
+    "submitting": "Đang gửi…",
     "publicGoodsVault": {
-      "none": "No public-goods funds are waiting in the vault.",
-      "connectWallet": "Connect your wallet to forward Public Goods Vault funds.",
-      "forwarded": "Public-goods funds were forwarded to Protocol Guild.",
-      "failed": "Unable to forward Public Goods Vault funds.",
-      "forwarding": "Forwarding...",
-      "forward": "Forward to Protocol Guild",
-      "nothing": "Nothing to Forward"
+      "none": "Không có khoản hàng hóa công nào đang chờ trong kho.",
+      "connectWallet": "Kết nối ví để chuyển khoản từ Kho Hàng hóa công.",
+      "forwarded": "Khoản hàng hóa công đã được chuyển đến Protocol Guild.",
+      "failed": "Không thể chuyển khoản từ Kho Hàng hóa công.",
+      "forwarding": "Đang chuyển…",
+      "forward": "Chuyển đến Protocol Guild",
+      "nothing": "Không có gì để chuyển"
     }
   },
   "imprint": {
-    "contractUnavailable": "The Random Walk NFT contract is unavailable. Connect your wallet on the correct network and try again.",
-    "confirmed": "Random Walk NFT imprint confirmed.",
-    "failed": "Imprint failed",
-    "imprinting": "Imprinting..."
+    "contractUnavailable": "Hợp đồng Random Walk NFT không khả dụng. Hãy kết nối ví trên đúng mạng và thử lại.",
+    "confirmed": "Đã xác nhận khắc Random Walk NFT.",
+    "failed": "Khắc thất bại",
+    "imprinting": "Đang khắc…"
   },
   "admin": {
     "gestureBan": {
-      "banned": "Gesture was banned successfully!",
-      "unbanned": "Gesture was unbanned successfully!",
-      "failed": "An error occurred"
+      "banned": "Đã chặn nét bút thành công!",
+      "unbanned": "Đã bỏ chặn nét bút thành công!",
+      "failed": "Đã xảy ra lỗi"
     }
   }
 }

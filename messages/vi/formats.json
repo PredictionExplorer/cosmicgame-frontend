@@ -1,22 +1,22 @@
 {
-  "liveCycleCountdown": "Live Performance Cycle countdown",
+  "liveCycleCountdown": "Đếm ngược trực tiếp của chu kỳ trình diễn",
   "countdown": {
-    "days": "DAYS",
-    "hours": "HRS",
-    "minutes": "MIN",
-    "seconds": "SEC"
+    "days": "NGÀY",
+    "hours": "GIỜ",
+    "minutes": "PHÚT",
+    "seconds": "GIÂY"
   },
   "countdownLong": {
-    "days": "Days",
-    "hours": "Hours",
-    "minutes": "Min",
-    "seconds": "Sec"
+    "days": "Ngày",
+    "hours": "Giờ",
+    "minutes": "Phút",
+    "seconds": "Giây"
   },
   "durationCompact": {
-    "days": "d",
-    "hours": "h",
-    "minutes": "m",
+    "days": "ng",
+    "hours": "g",
+    "minutes": "ph",
     "seconds": "s",
-    "leftPattern": "{duration} left"
+    "leftPattern": "còn {duration}"
   }
 }

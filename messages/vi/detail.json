@@ -1,94 +1,94 @@
 {
   "invalid": {
-    "title": "Invalid Token Id"
+    "title": "Mã token không hợp lệ"
   },
   "jsonLd": {
     "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics.",
+    "productDescription": "NFT tạo sinh độc nhất từ giao thức nghệ thuật tạo sinh trên chuỗi Cosmic Signature, được kết xuất từ vật lý của bài toán ba vật thể.",
     "breadcrumbToken": "Token #{id}"
   },
   "breadcrumb": {
     "tokenFallback": "Token {id}"
   },
   "hero": {
-    "unnamedToken": "Unnamed Token"
+    "unnamedToken": "Token chưa đặt tên"
   },
   "badges": {
-    "stellarSelectionRecipient": "Stellar Selection Recipient",
-    "anchorRecipient": "Anchor Recipient",
-    "cycleRecipient": "Cycle Recipient",
-    "enduranceChampion": "Endurance Champion",
-    "receivedAsCycleRecipient": "Received as the Cycle Recipient in Cycle #{round}",
-    "receivedAs": "Received as a {label}",
-    "eligibleForAnchoring": "Eligible for Anchoring",
-    "eligibleForAnchoringTooltip": "This Cosmic Signature NFT has never been anchored and can receive ETH Anchor Distributions when anchored.",
-    "alreadyAnchored": "Already Anchored",
-    "alreadyAnchoredTooltip": "This token has already been anchored and cannot be anchored again."
+    "stellarSelectionRecipient": "Người nhận Tinh tuyển",
+    "anchorRecipient": "Người nhận neo giữ",
+    "cycleRecipient": "Người nhận của chu kỳ",
+    "enduranceChampion": "Quán quân Bền bỉ",
+    "receivedAsCycleRecipient": "Nhận với vai trò người nhận của chu kỳ trong chu kỳ #{round}",
+    "receivedAs": "Nhận với vai trò {label}",
+    "eligibleForAnchoring": "Đủ điều kiện neo giữ",
+    "eligibleForAnchoringTooltip": "Cosmic Signature NFT này chưa từng được neo giữ và có thể nhận phân phối neo giữ bằng ETH khi được neo giữ.",
+    "alreadyAnchored": "Đã neo giữ",
+    "alreadyAnchoredTooltip": "Token này đã từng được neo giữ và không thể neo giữ lại."
   },
   "share": {
-    "trigger": "Share",
-    "copyVideoLink": "Copy Video Link",
-    "copyImageLink": "Copy Image Link",
-    "copyPageLink": "Copy Page Link"
+    "trigger": "Chia sẻ",
+    "copyVideoLink": "Sao chép liên kết video",
+    "copyImageLink": "Sao chép liên kết hình ảnh",
+    "copyPageLink": "Sao chép liên kết trang"
   },
   "actions": {
-    "buyOrSellNfts": "Buy or sell NFTs",
-    "viewCycleDetails": "View Cycle #{round} Details"
+    "buyOrSellNfts": "Mua hoặc bán NFT",
+    "viewCycleDetails": "Xem chi tiết chu kỳ #{round}"
   },
   "navigation": {
-    "previousToken": "Previous token",
-    "nextToken": "Next token"
+    "previousToken": "Token trước",
+    "nextToken": "Token sau"
   },
   "sections": {
-    "nameHistory": "Name History",
-    "ownershipHistory": "Ownership History"
+    "nameHistory": "Lịch sử tên",
+    "ownershipHistory": "Lịch sử sở hữu"
   },
   "transferDialog": {
-    "title": "Confirm Transfer",
-    "description": "The destination account doesn't appear to have any transaction history. Are you sure you want to send the token to this address? Please double-check it.",
-    "confirm": "Yes, Transfer"
+    "title": "Xác nhận chuyển giao",
+    "description": "Tài khoản đích dường như chưa có lịch sử giao dịch nào. Bạn có chắc muốn gửi token đến địa chỉ này? Vui lòng kiểm tra lại thật kỹ.",
+    "confirm": "Có, chuyển giao"
   },
   "ownerActions": {
-    "title": "Manage Your Token",
-    "titleTooltip": "As the current owner, you can display this token in MetaMask, transfer it, or set a custom name.",
-    "metaMaskHeading": "Display in MetaMask",
-    "metaMaskTooltip": "Prompt the MetaMask browser extension to display this NFT. NFT import is experimental and is not available in MetaMask Mobile.",
-    "addToMetaMask": "Add NFT to MetaMask",
-    "addingToMetaMask": "Adding NFT to MetaMask...",
-    "transferHeading": "Transfer",
-    "transferTooltip": "Send this token to another Ethereum address. Double-check the address before confirming — transfers are irreversible.",
-    "recipientPlaceholder": "Recipient address (0x...)",
-    "transferButton": "Transfer",
-    "nameHeading": "Name Token",
-    "renameHeading": "Rename Token",
-    "nameTooltip": "Give your token a custom name (max 32 bytes). Named tokens appear on the Named NFTs page.",
-    "namePlaceholder": "Enter token name",
-    "setName": "Set Name",
-    "changeName": "Change Name",
-    "clearName": "Clear",
-    "namedTokensCount": "There are {count} tokens with a name.",
-    "viewAllNamedTokens": "View all named tokens"
+    "title": "Quản lý token của bạn",
+    "titleTooltip": "Với vai trò chủ sở hữu hiện tại, bạn có thể hiển thị token này trong MetaMask, chuyển giao nó, hoặc đặt tên tùy chỉnh.",
+    "metaMaskHeading": "Hiển thị trong MetaMask",
+    "metaMaskTooltip": "Yêu cầu tiện ích MetaMask trên trình duyệt hiển thị NFT này. Tính năng nhập NFT đang thử nghiệm và chưa có trên MetaMask Mobile.",
+    "addToMetaMask": "Thêm NFT vào MetaMask",
+    "addingToMetaMask": "Đang thêm NFT vào MetaMask…",
+    "transferHeading": "Chuyển giao",
+    "transferTooltip": "Gửi token này đến một địa chỉ Ethereum khác. Kiểm tra kỹ địa chỉ trước khi xác nhận — việc chuyển giao không thể đảo ngược.",
+    "recipientPlaceholder": "Địa chỉ người nhận (0x…)",
+    "transferButton": "Chuyển giao",
+    "nameHeading": "Đặt tên token",
+    "renameHeading": "Đổi tên token",
+    "nameTooltip": "Đặt cho token một tên tùy chỉnh (tối đa 32 byte). Token đã đặt tên xuất hiện trên trang NFT đã đặt tên.",
+    "namePlaceholder": "Nhập tên token",
+    "setName": "Đặt tên",
+    "changeName": "Đổi tên",
+    "clearName": "Xóa",
+    "namedTokensCount": "Hiện có {count} token đã được đặt tên.",
+    "viewAllNamedTokens": "Xem tất cả token đã đặt tên"
   },
   "metadata": {
-    "imprinted": "Imprinted",
-    "imprintedTooltip": "When this token was imprinted on-chain. Click to view the transaction.",
-    "cycle": "Cycle",
-    "cycleTooltip": "The Performance Cycle in which this token was allocated. Click to view cycle details.",
-    "recipient": "Recipient",
-    "recipientTooltip": "The address that originally received this token during the Performance Cycle.",
-    "owner": "Owner",
-    "ownerTooltip": "The current holder of this token. May differ from the recipient if the token was transferred.",
-    "roundNumber": "Cycle #{round}",
+    "imprinted": "Đã khắc",
+    "imprintedTooltip": "Thời điểm token này được khắc lên chuỗi. Nhấn để xem giao dịch.",
+    "cycle": "Chu kỳ",
+    "cycleTooltip": "Chu kỳ trình diễn trong đó token này được phân bổ. Nhấn để xem chi tiết chu kỳ.",
+    "recipient": "Người nhận",
+    "recipientTooltip": "Địa chỉ đã nhận token này ban đầu trong chu kỳ trình diễn.",
+    "owner": "Chủ sở hữu",
+    "ownerTooltip": "Người nắm giữ token này hiện tại. Có thể khác với người nhận nếu token đã được chuyển giao.",
+    "roundNumber": "Chu kỳ #{round}",
     "seed": "Seed",
-    "seedTooltip": "The unique random seed used to generate this token's artwork and traits.",
-    "copySeed": "Copy seed"
+    "seedTooltip": "Seed ngẫu nhiên độc nhất được dùng để tạo tác phẩm và đặc tính của token này.",
+    "copySeed": "Sao chép seed"
   },
   "video": {
-    "watchAnimation": "Watch Animation",
-    "watchAnimationTooltip": "Each Cosmic Signature NFT has a unique generative animation derived from its seed. Click to watch."
+    "watchAnimation": "Xem hoạt ảnh",
+    "watchAnimationTooltip": "Mỗi Cosmic Signature NFT có một hoạt ảnh tạo sinh độc nhất bắt nguồn từ seed của nó. Nhấn để xem."
   },
   "image": {
     "defaultAlt": "NFT",
-    "artworkUnavailable": "Artwork unavailable"
+    "artworkUnavailable": "Tác phẩm không khả dụng"
   }
 }

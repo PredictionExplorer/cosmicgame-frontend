@@ -1,32 +1,32 @@
 {
   "breadcrumbs": {
-    "home": "Home",
-    "imprint": "Imprint"
+    "home": "Trang chủ",
+    "imprint": "Khắc"
   },
   "page": {
-    "title": "Imprint Random Walk NFT",
-    "subtitle": "Own a Random Walk NFT and receive a 50% reduction in ETH Gesture Cost",
-    "description": "RandomWalk NFTs are unique digital collectibles that grant holders a strategic advantage in the Cosmic Signature protocol. By attaching a RandomWalk NFT to an ETH gesture, you receive a 50% reduction in ETH Gesture Cost - a significant edge late in the cycle. Each RandomWalk NFT can be used once for this discount, so choose your moment wisely for maximum impact. This gesture attachment is separate from anchoring RandomWalk NFTs for Anchored-NFT Stellar Selection eligibility.",
-    "currentCost": "Current imprint cost",
-    "submit": "Imprint Now",
-    "myNfts": "My Random Walk NFTs"
+    "title": "Khắc Random Walk NFT",
+    "subtitle": "Sở hữu một Random Walk NFT để được giảm 50% chi phí nét bút ETH",
+    "description": "RandomWalk NFT là những vật phẩm số độc nhất mang lại cho người nắm giữ một lợi thế chiến thuật trong giao thức Cosmic Signature. Khi đính kèm một RandomWalk NFT vào nét bút ETH, bạn được giảm 50% chi phí nét bút ETH — một lợi thế đáng kể ở giai đoạn cuối chu kỳ. Mỗi RandomWalk NFT chỉ dùng được một lần cho mức giảm giá này, vì vậy hãy chọn thời điểm khôn ngoan để đạt hiệu quả cao nhất. Việc đính kèm vào nét bút này tách biệt với việc neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ.",
+    "currentCost": "Chi phí khắc hiện tại",
+    "submit": "Khắc ngay",
+    "myNfts": "Random Walk NFT của tôi"
   },
   "seo": {
-    "eyebrow": "RandomWalk NFT imprinting · Arbitrum",
-    "heading": "Imprint RandomWalk NFT",
-    "description": "Imprint RandomWalk NFTs for Cosmic Signature participation. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% Gesture Cost reduction.",
-    "source": "Cosmic Signature public protocol configuration APIs",
-    "lastUpdated": "Last updated: {date}. Data source: {source}. The interactive tables below hydrate with live app data, while this summary is present in the initial HTML for search engines and AI crawlers.",
-    "relatedAria": "Imprint RandomWalk NFT related pages",
+    "eyebrow": "Khắc RandomWalk NFT · Arbitrum",
+    "heading": "Khắc RandomWalk NFT",
+    "description": "Khắc RandomWalk NFT để tham gia Cosmic Signature. Mỗi RandomWalk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút.",
+    "source": "Các API cấu hình giao thức công khai của Cosmic Signature",
+    "lastUpdated": "Cập nhật lần cuối: {date}. Nguồn dữ liệu: {source}. Các bảng tương tác bên dưới sẽ nạp dữ liệu trực tiếp từ ứng dụng, còn bản tóm tắt này có sẵn trong HTML ban đầu cho công cụ tìm kiếm và trình thu thập dữ liệu AI.",
+    "relatedAria": "Các trang liên quan đến Khắc RandomWalk NFT",
     "cards": {
-      "cycle": "Active Performance Cycle",
-      "cost": "Current ETH Gesture Cost",
-      "discount": "RandomWalk Discount"
+      "cycle": "Chu kỳ trình diễn đang diễn ra",
+      "cost": "Chi phí nét bút ETH hiện tại",
+      "discount": "Giảm giá RandomWalk"
     },
     "links": {
-      "cycle": "Open the active Performance Cycle",
-      "learn": "Learn how gestures work",
-      "used": "View used RandomWalk NFTs"
+      "cycle": "Mở chu kỳ trình diễn đang diễn ra",
+      "learn": "Tìm hiểu cách nét bút vận hành",
+      "used": "Xem các RandomWalk NFT đã sử dụng"
     }
   }
 }

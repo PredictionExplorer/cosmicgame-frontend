@@ -1,424 +1,424 @@
 {
   "shared": {
-    "home": "Home",
-    "user": "User",
-    "walletNotConnected": "Wallet not connected",
-    "loading": "Loading...",
-    "unavailable": "Unavailable",
-    "yes": "Yes",
-    "no": "No",
-    "datetime": "Datetime",
-    "from": "From",
-    "to": "To",
-    "tokenId": "Token ID",
-    "cycle": "Cycle",
-    "recipient": "Recipient"
+    "home": "Trang chủ",
+    "user": "Người dùng",
+    "walletNotConnected": "Chưa kết nối ví",
+    "loading": "Đang tải…",
+    "unavailable": "Không khả dụng",
+    "yes": "Có",
+    "no": "Không",
+    "datetime": "Thời điểm",
+    "from": "Từ",
+    "to": "Đến",
+    "tokenId": "Mã token",
+    "cycle": "Chu kỳ",
+    "recipient": "Người nhận"
   },
   "allocations": {
-    "eyebrow": "Personal · Allocations",
-    "title": "My Allocations",
-    "subtitle": "View and retrieve all your pending allocations",
-    "walletDescription": "Connect your wallet to view and retrieve your allocations.",
-    "loadErrorTitle": "Failed to load",
-    "loadErrorMessage": "Failed to load pending allocations data",
+    "eyebrow": "Cá nhân · Phân bổ",
+    "title": "Phân bổ của tôi",
+    "subtitle": "Xem và nhận về mọi phân bổ đang chờ của bạn",
+    "walletDescription": "Kết nối ví để xem và nhận về phân bổ của bạn.",
+    "loadErrorTitle": "Không tải được",
+    "loadErrorMessage": "Không tải được dữ liệu phân bổ đang chờ",
     "sections": {
-      "eth": "Retrievable ETH Allocations",
-      "anchors": "Cosmic Signature NFT Anchor Distributions",
-      "nfts": "Attached NFTs",
-      "erc20": "Attached ERC-20 Tokens"
+      "eth": "Phân bổ ETH có thể nhận về",
+      "anchors": "Phân phối neo giữ Cosmic Signature NFT",
+      "nfts": "NFT đính kèm",
+      "erc20": "Token ERC-20 đính kèm"
     },
     "empty": {
-      "ethTitle": "No ETH allocations yet",
-      "ethDescription": "Participate in Stellar Selection by making gestures to receive ETH allocations.",
-      "nftTitle": "No attached NFTs",
-      "nftDescription": "NFTs attached to gestures during cycles will appear here.",
-      "erc20Title": "No attached tokens",
-      "erc20Description": "ERC-20 tokens attached to gestures during cycles will appear here."
+      "ethTitle": "Chưa có phân bổ ETH",
+      "ethDescription": "Tham gia Tinh tuyển bằng cách đặt nét bút để nhận phân bổ ETH.",
+      "nftTitle": "Không có NFT đính kèm",
+      "nftDescription": "Các NFT đính kèm vào nét bút trong các chu kỳ sẽ xuất hiện ở đây.",
+      "erc20Title": "Không có token đính kèm",
+      "erc20Description": "Các token ERC-20 đính kèm vào nét bút trong các chu kỳ sẽ xuất hiện ở đây."
     },
-    "retrievable": "Retrievable:",
-    "retrieving": "Retrieving...",
-    "retrieveAll": "Retrieve All",
-    "viewHistory": "View Allocation History"
+    "retrievable": "Có thể nhận về:",
+    "retrieving": "Đang nhận về…",
+    "retrieveAll": "Nhận về tất cả",
+    "viewHistory": "Xem lịch sử phân bổ"
   },
   "anchors": {
-    "eyebrow": "Personal · Anchors",
-    "title": "My Anchors",
-    "subtitle": "Manage your anchored NFTs and view Cosmic Signature NFT distributions",
-    "walletDescription": "Please connect your wallet to manage your anchors.",
+    "eyebrow": "Cá nhân · Neo giữ",
+    "title": "Neo giữ của tôi",
+    "subtitle": "Quản lý các NFT đang neo giữ và xem phân phối Cosmic Signature NFT",
+    "walletDescription": "Vui lòng kết nối ví để quản lý neo giữ của bạn.",
     "tabs": {
-      "cosmicSignature": "Cosmic Signature Anchoring",
-      "randomWalk": "Random Walk Anchoring"
+      "cosmicSignature": "Neo giữ Cosmic Signature",
+      "randomWalk": "Neo giữ Random Walk"
     },
     "stats": {
       "cosmicSignature": {
-        "label": "Your Anchored Cosmic Signature NFTs",
-        "tooltip": "Number of Cosmic Signature NFTs you currently have anchored. Anchoring more Cosmic Signature NFTs increases your share of ETH Anchor Distributions."
+        "label": "Cosmic Signature NFT bạn đang neo giữ",
+        "tooltip": "Số Cosmic Signature NFT bạn hiện đang neo giữ. Neo giữ thêm Cosmic Signature NFT làm tăng phần phân phối neo giữ ETH của bạn."
       },
       "randomWalk": {
-        "label": "Your Anchored Random Walk NFTs",
-        "tooltip": "Number of Random Walk NFTs you currently have anchored. Each anchored Random Walk NFT is eligible for Anchored-NFT Stellar Selection."
+        "label": "Random Walk NFT bạn đang neo giữ",
+        "tooltip": "Số Random Walk NFT bạn hiện đang neo giữ. Mỗi Random Walk NFT đang neo giữ thuộc diện Tinh tuyển NFT neo giữ."
       },
       "unretrieved": {
-        "label": "Unretrieved Distributions",
-        "tooltip": "ETH Anchor Distributions allocated to your anchored Cosmic Signature NFTs but not yet retrieved. Releasing a Cosmic Signature NFT anchor automatically retrieves its accumulated distributions."
+        "label": "Phân phối chưa nhận về",
+        "tooltip": "Phân phối neo giữ ETH được phân bổ cho các Cosmic Signature NFT bạn đang neo giữ nhưng chưa nhận về. Gỡ neo một Cosmic Signature NFT sẽ tự động nhận về các khoản phân phối đã tích lũy của nó."
       },
       "distributionPerNft": {
-        "label": "Distribution per Cosmic Signature NFT",
-        "tooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT, calculated as the total anchoring pool (on-chain) divided by the indexed number of anchored Cosmic Signature NFTs.",
-        "indexUnavailableSuffix": "The on-chain anchor pool is non-zero, but the indexed total of anchored Cosmic Signature NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-NFT rate cannot be computed."
+        "label": "Phân phối mỗi Cosmic Signature NFT",
+        "tooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ, tính bằng tổng quỹ neo giữ (trên chuỗi) chia cho số Cosmic Signature NFT neo giữ đã lập chỉ mục.",
+        "indexUnavailableSuffix": "Quỹ neo giữ trên chuỗi khác không, nhưng tổng số Cosmic Signature NFT neo giữ đã lập chỉ mục lại bằng không (ví dụ cg_stake_stats_cst chưa được ETL cập nhật), nên không thể tính mức mỗi NFT."
       }
     }
   },
   "statistics": {
     "page": {
-      "invalidAddress": "Invalid Address",
-      "ariaOwn": "My Statistics",
-      "ariaUser": "User Statistics",
-      "ownTitle": "My Statistics",
-      "userTitle": "User Profile",
-      "ownSubtitle": "Your complete performance dashboard and activity history",
-      "userSubtitle": "Viewing another participant’s statistics and activity",
-      "emptyTitle": "No activity yet",
-      "emptyDescription": "This account hasn't participated in any Performance Cycles yet. Make a gesture to get started!",
+      "invalidAddress": "Địa chỉ không hợp lệ",
+      "ariaOwn": "Thống kê của tôi",
+      "ariaUser": "Thống kê người dùng",
+      "ownTitle": "Thống kê của tôi",
+      "userTitle": "Hồ sơ người tham gia",
+      "ownSubtitle": "Bảng điều khiển đầy đủ về hoạt động và lịch sử của bạn",
+      "userSubtitle": "Đang xem thống kê và hoạt động của một người tham gia khác",
+      "emptyTitle": "Chưa có hoạt động",
+      "emptyDescription": "Tài khoản này chưa tham gia chu kỳ trình diễn nào. Hãy đặt một nét bút để bắt đầu!",
       "sections": {
-        "gestureHistory": "Gesture History",
-        "recipientHistory": "Recipient History",
-        "anchoring": "Anchoring",
-        "tokenHoldings": "Token Holdings",
-        "outreachAllocations": "Outreach Allocations",
-        "claimableAssets": "Claimable Assets"
+        "gestureHistory": "Lịch sử nét bút",
+        "recipientHistory": "Lịch sử nhận phân bổ",
+        "anchoring": "Neo giữ",
+        "tokenHoldings": "Token đang nắm giữ",
+        "outreachAllocations": "Phân bổ truyền thông",
+        "claimableAssets": "Tài sản có thể nhận về"
       }
     },
     "hero": {
       "ethBalance": {
-        "label": "ETH Balance",
-        "tooltip": "Your current ETH balance in this wallet."
+        "label": "Số dư ETH",
+        "tooltip": "Số dư ETH hiện tại trong ví này."
       },
       "cstBalance": {
-        "label": "CST Balance",
-        "tooltip": "Your CST token (ERC-20) balance from gestures, Recognition CST allocations, and transfers."
+        "label": "Số dư CST",
+        "tooltip": "Số dư token CST (ERC-20) của bạn từ nét bút, phân bổ CST ghi nhận và các lần chuyển."
       },
       "signatureAllocations": {
-        "label": "Signature Allocations Received",
-        "tooltip": "Number of times you retrieved the Signature Allocation by making the Final Gesture before the Cycle Finalization Time expired."
+        "label": "Phân bổ Signature đã nhận",
+        "tooltip": "Số lần bạn nhận về phân bổ Signature nhờ đặt nét bút cuối cùng trước khi thời điểm hoàn tất chu kỳ hết hạn."
       },
       "totalEth": {
-        "label": "Total Stellar Selection ETH",
-        "tooltip": "Total ETH allocated through Stellar Selection across all cycles, including retrieved and unretrieved amounts."
+        "label": "Tổng ETH Tinh tuyển",
+        "tooltip": "Tổng ETH được phân bổ qua Tinh tuyển trong mọi chu kỳ, gồm cả khoản đã nhận về và chưa nhận về."
       },
       "gestures": {
-        "label": "Gestures Made",
-        "tooltip": "Total number of gestures you have made across all Performance Cycles."
+        "label": "Nét bút đã đặt",
+        "tooltip": "Tổng số nét bút bạn đã đặt trong mọi chu kỳ trình diễn."
       },
       "selectionFrequency": {
-        "label": "Selection Frequency",
-        "tooltip": "Your best Stellar Selection frequency in the current cycle, calculated from your gesture count relative to total gestures and the number of selected recipients."
+        "label": "Tần suất được chọn",
+        "tooltip": "Tần suất Tinh tuyển tốt nhất của bạn trong chu kỳ hiện tại, tính từ số nét bút của bạn so với tổng số nét bút và số người nhận được chọn."
       }
     },
     "activity": {
-      "title": "Activity Overview",
+      "title": "Tổng quan hoạt động",
       "groups": {
-        "gestures": "Gestures",
-        "stellarSelections": "Stellar Selections",
-        "anchoring": "Anchoring"
+        "gestures": "Nét bút",
+        "stellarSelections": "Tinh tuyển",
+        "anchoring": "Neo giữ"
       },
       "gesturesMade": {
-        "label": "Gestures Made",
-        "tooltip": "Total gestures across all cycles."
+        "label": "Nét bút đã đặt",
+        "tooltip": "Tổng số nét bút trong mọi chu kỳ."
       },
       "maxGesture": {
-        "label": "Max Gesture",
-        "tooltip": "The highest single gesture you have ever made."
+        "label": "Nét bút lớn nhất",
+        "tooltip": "Nét bút đơn lẻ lớn nhất bạn từng đặt."
       },
       "ethSelections": {
-        "label": "ETH Stellar Selection Allocations",
-        "tooltip": "Number of ETH Stellar Selection allocations you have received."
+        "label": "Phân bổ ETH Tinh tuyển",
+        "tooltip": "Số phân bổ ETH Tinh tuyển bạn đã nhận."
       },
       "nftsReceived": {
-        "label": "NFTs Received",
-        "tooltip": "Cosmic Signature NFTs received through Stellar Selection imprints."
+        "label": "NFT đã nhận",
+        "tooltip": "Cosmic Signature NFT nhận được qua các lần khắc Tinh tuyển."
       },
       "anchorActions": {
-        "label": "Anchor Actions",
-        "tooltip": "Combined anchor and release actions for RandomWalk NFTs."
+        "label": "Thao tác neo giữ",
+        "tooltip": "Tổng số thao tác neo giữ và gỡ neo RandomWalk NFT."
       },
       "distributionsReceived": {
-        "label": "Total Anchor Distributions",
-        "tooltip": "Total ETH Anchor Distributions from anchoring Cosmic Signature NFTs, including retrieved and unretrieved amounts."
+        "label": "Tổng phân phối neo giữ",
+        "tooltip": "Tổng phân phối neo giữ ETH từ việc neo giữ Cosmic Signature NFT, gồm cả khoản đã nhận về và chưa nhận về."
       }
     },
     "quickActions": {
       "anchor": {
-        "label": "Anchor NFTs",
-        "description": "Anchor Cosmic Signature NFTs for ETH distributions or Random Walk NFTs for Stellar Selection"
+        "label": "Neo giữ NFT",
+        "description": "Neo giữ Cosmic Signature NFT để nhận phân phối ETH hoặc Random Walk NFT để thuộc diện Tinh tuyển"
       },
       "gesture": {
-        "label": "Make a Gesture",
-        "description": "Take part in the active cycle"
+        "label": "Đặt nét bút",
+        "description": "Tham gia chu kỳ đang diễn ra"
       },
       "transfers": {
-        "label": "View NFT Transfers",
-        "description": "Cosmic Signature NFT transfer history"
+        "label": "Xem chuyển giao NFT",
+        "description": "Lịch sử chuyển giao Cosmic Signature NFT"
       },
       "stellarSelection": {
-        "label": "Stellar Selection History",
-        "description": "Your Stellar Selection allocations and ETH deposits"
+        "label": "Lịch sử Tinh tuyển",
+        "description": "Phân bổ Tinh tuyển và các khoản nạp ETH của bạn"
       }
     },
     "stellarSelection": {
-      "currentFrequency": "Current Cycle Selection Frequency",
+      "currentFrequency": "Tần suất được chọn trong chu kỳ hiện tại",
       "ethProbability": {
-        "label": "ETH Stellar Selection",
-        "tooltip": "Your selection frequency for an ETH Stellar Selection allocation this cycle, based on your share of total gestures and the number of ETH Stellar Selection recipients chosen."
+        "label": "ETH Tinh tuyển",
+        "tooltip": "Tần suất bạn được chọn nhận phân bổ ETH Tinh tuyển trong chu kỳ này, dựa trên phần nét bút của bạn trong tổng số và số người nhận ETH Tinh tuyển được chọn."
       },
       "nftProbability": {
-        "label": "NFT Stellar Selection",
-        "tooltip": "Your selection frequency for a Cosmic Signature NFT Stellar Selection imprint this cycle, based on your share of total gestures."
+        "label": "NFT Tinh tuyển",
+        "tooltip": "Tần suất bạn được chọn nhận một lần khắc Cosmic Signature NFT Tinh tuyển trong chu kỳ này, dựa trên phần nét bút của bạn trong tổng số."
       },
       "totalEth": {
-        "label": "Total Stellar Selection ETH",
-        "tooltip": "Total ETH allocated through Stellar Selection across all cycles, including retrieved and unretrieved amounts."
+        "label": "Tổng ETH Tinh tuyển",
+        "tooltip": "Tổng ETH được phân bổ qua Tinh tuyển trong mọi chu kỳ, gồm cả khoản đã nhận về và chưa nhận về."
       },
       "ethRetrieved": {
-        "label": "ETH Retrieved",
-        "tooltip": "ETH already retrieved from Stellar Selection allocations to your wallet."
+        "label": "ETH đã nhận về",
+        "tooltip": "ETH đã nhận về ví của bạn từ các phân bổ Tinh tuyển."
       },
       "unretrievedNfts": {
-        "label": "Unretrieved NFTs",
-        "tooltip": "Attached NFTs received with the Signature Allocation but not yet retrieved."
+        "label": "NFT chưa nhận về",
+        "tooltip": "NFT đính kèm nhận cùng phân bổ Signature nhưng chưa nhận về."
       },
       "stellarSelectionNfts": {
-        "label": "Stellar Selection NFTs",
-        "tooltip": "Cosmic Signature NFTs imprinted through Stellar Selection."
+        "label": "NFT Tinh tuyển",
+        "tooltip": "Cosmic Signature NFT được khắc qua Tinh tuyển."
       },
       "allocationNfts": {
-        "label": "Allocation NFTs",
-        "tooltip": "Total Cosmic Signature NFTs received as allocations (all imprint types combined)."
+        "label": "NFT phân bổ",
+        "tooltip": "Tổng Cosmic Signature NFT nhận được dưới dạng phân bổ (mọi loại khắc cộng lại)."
       },
       "cosmicSignatureNfts": {
-        "label": "Cosmic Signature NFTs Received",
-        "tooltip": "Total Cosmic Signature NFTs received across all cycles."
+        "label": "Cosmic Signature NFT đã nhận",
+        "tooltip": "Tổng Cosmic Signature NFT nhận được trong mọi chu kỳ."
       }
     },
     "anchoring": {
       "tabs": {
-        "cosmicSignature": "Cosmic Signature Anchoring",
-        "randomWalk": "Random Walk Anchoring"
+        "cosmicSignature": "Neo giữ Cosmic Signature",
+        "randomWalk": "Neo giữ Random Walk"
       },
       "empty": {
-        "cosmicSignatureTitle": "No anchoring activity yet",
-        "cosmicSignatureDescription": "Anchor your Cosmic Signature NFTs to receive ETH Anchor Distributions each cycle.",
-        "randomWalkTitle": "No RandomWalk anchoring yet",
-        "randomWalkDescription": "Anchor your RandomWalk NFTs to take part in Anchored-NFT Stellar Selection."
+        "cosmicSignatureTitle": "Chưa có hoạt động neo giữ",
+        "cosmicSignatureDescription": "Neo giữ Cosmic Signature NFT của bạn để nhận phân phối neo giữ ETH mỗi chu kỳ.",
+        "randomWalkTitle": "Chưa neo giữ RandomWalk",
+        "randomWalkDescription": "Neo giữ RandomWalk NFT của bạn để tham gia Tinh tuyển NFT neo giữ."
       },
       "stats": {
         "anchorActions": {
-          "label": "Anchor Actions",
-          "cosmicSignatureTooltip": "Number of times you have anchored Cosmic Signature NFTs.",
-          "randomWalkTooltip": "Number of times you have anchored RandomWalk NFTs."
+          "label": "Thao tác neo giữ",
+          "cosmicSignatureTooltip": "Số lần bạn đã neo giữ Cosmic Signature NFT.",
+          "randomWalkTooltip": "Số lần bạn đã neo giữ RandomWalk NFT."
         },
         "releaseActions": {
-          "label": "Release Actions",
-          "cosmicSignatureTooltip": "Number of times you have released anchored Cosmic Signature NFTs.",
-          "randomWalkTooltip": "Number of times you have released anchored RandomWalk NFTs."
+          "label": "Thao tác gỡ neo",
+          "cosmicSignatureTooltip": "Số lần bạn đã gỡ neo Cosmic Signature NFT.",
+          "randomWalkTooltip": "Số lần bạn đã gỡ neo RandomWalk NFT."
         },
         "nftsWithDistributions": {
-          "label": "NFTs with Distributions",
-          "tooltip": "Number of anchored Cosmic Signature NFTs that have accumulated Anchor Distributions."
+          "label": "NFT có phân phối",
+          "tooltip": "Số Cosmic Signature NFT đang neo giữ đã tích lũy phân phối neo giữ."
         },
         "totalDistributions": {
-          "label": "Total Distributions",
-          "tooltip": "Total ETH Anchor Distributions received from anchoring (retrieved + unretrieved)."
+          "label": "Tổng phân phối",
+          "tooltip": "Tổng phân phối neo giữ ETH nhận được từ việc neo giữ (đã nhận về + chưa nhận về)."
         },
         "unretrievedDistributions": {
-          "label": "Unretrieved Distributions",
-          "tooltip": "Anchor Distributions allocated but not yet retrieved to your wallet."
+          "label": "Phân phối chưa nhận về",
+          "tooltip": "Phân phối neo giữ đã được phân bổ nhưng chưa nhận về ví của bạn."
         },
         "nftsAnchored": {
-          "label": "NFTs Anchored",
-          "tooltip": "Total RandomWalk NFTs currently anchored."
+          "label": "NFT đang neo giữ",
+          "tooltip": "Tổng RandomWalk NFT hiện đang neo giữ."
         },
         "nftsImprinted": {
-          "label": "NFTs Imprinted",
-          "tooltip": "Cosmic Signature NFTs received through Anchored-NFT Stellar Selection."
+          "label": "NFT đã khắc",
+          "tooltip": "Cosmic Signature NFT nhận được qua Tinh tuyển NFT neo giữ."
         }
       },
       "sections": {
-        "actions": "Anchor / Release Actions",
-        "distributionsByToken": "Anchor Distributions by Token",
-        "distributionsByDeposit": "Anchor Distributions by Deposit",
-        "retrievedDistributions": "Retrieved Anchor Distributions",
-        "unretrievedDistributions": "Unretrieved Anchor Distributions",
-        "anchoredNftSelection": "Anchored-NFT Stellar Selection"
+        "actions": "Thao tác neo giữ / gỡ neo",
+        "distributionsByToken": "Phân phối neo giữ theo token",
+        "distributionsByDeposit": "Phân phối neo giữ theo khoản nạp",
+        "retrievedDistributions": "Phân phối neo giữ đã nhận về",
+        "unretrievedDistributions": "Phân phối neo giữ chưa nhận về",
+        "anchoredNftSelection": "Tinh tuyển NFT neo giữ"
       }
     },
     "donatedAssets": {
       "nfts": {
-        "title": "Attached NFTs Received",
-        "tooltip": "NFTs attached by other participants and received as part of the Signature Allocation. Unretrieved NFTs can be retrieved to your wallet.",
-        "unclaimed": "{count} unclaimed",
-        "claimAll": "Claim All NFTs",
-        "emptyTitle": "No attached NFTs",
-        "emptyDescription": "You haven't received any attached NFTs through the Signature Allocation yet."
+        "title": "NFT đính kèm đã nhận",
+        "tooltip": "Các NFT do người tham gia khác đính kèm và được nhận cùng phân bổ Signature. NFT chưa nhận về có thể được nhận về ví của bạn.",
+        "unclaimed": "{count} chưa nhận về",
+        "claimAll": "Nhận về tất cả NFT",
+        "emptyTitle": "Không có NFT đính kèm",
+        "emptyDescription": "Bạn chưa nhận được NFT đính kèm nào qua phân bổ Signature."
       },
       "erc20": {
-        "title": "Attached ERC20 Tokens",
-        "tooltip": "ERC20 tokens attached by other participants. Unretrieved tokens can be retrieved to your wallet.",
-        "unclaimed": "{count} unclaimed",
-        "claimAll": "Claim All Tokens",
-        "emptyTitle": "No attached tokens",
-        "emptyDescription": "You haven't received any attached ERC20 tokens yet."
+        "title": "Token ERC20 đính kèm",
+        "tooltip": "Các token ERC20 do người tham gia khác đính kèm. Token chưa nhận về có thể được nhận về ví của bạn.",
+        "unclaimed": "{count} chưa nhận về",
+        "claimAll": "Nhận về tất cả token",
+        "emptyTitle": "Không có token đính kèm",
+        "emptyDescription": "Bạn chưa nhận được token ERC20 đính kèm nào."
       }
     }
   },
   "tokens": {
     "page": {
-      "title": "My NFTs",
-      "subtitle": "Cosmic Signature NFTs in your connected wallet",
-      "marketplace": "Buy or sell NFTs",
-      "walletDescription": "Please connect your wallet to view and manage your NFTs.",
-      "loadErrorTitle": "Failed to load tokens",
-      "loadErrorMessage": "Failed to load Cosmic Signature NFTs.",
-      "ownedTitle": "Cosmic Signature NFTs I Own",
-      "transferTitle": "Transfer NFTs",
-      "transferSubtitle": "Optional: send selected Cosmic Signature NFTs to another wallet.",
-      "transferDescription": "Select NFTs from this wallet only when you are ready to send them to another address."
+      "title": "NFT của tôi",
+      "subtitle": "Các Cosmic Signature NFT trong ví đang kết nối",
+      "marketplace": "Mua hoặc bán NFT",
+      "walletDescription": "Vui lòng kết nối ví để xem và quản lý NFT của bạn.",
+      "loadErrorTitle": "Không tải được token",
+      "loadErrorMessage": "Không tải được Cosmic Signature NFT.",
+      "ownedTitle": "Cosmic Signature NFT tôi sở hữu",
+      "transferTitle": "Chuyển giao NFT",
+      "transferSubtitle": "Tùy chọn: gửi các Cosmic Signature NFT đã chọn đến một ví khác.",
+      "transferDescription": "Chỉ chọn NFT từ ví này khi bạn đã sẵn sàng gửi chúng đến địa chỉ khác."
     },
     "table": {
-      "empty": "No tokens yet.",
-      "details": "Details",
-      "datetime": "Datetime",
-      "tokenId": "Token ID",
-      "tokenName": "Token Name",
-      "cycle": "Cycle",
-      "recipientAddress": "Recipient Address",
-      "currentlyAnchored": "Currently Anchored?",
-      "anchoredOnce": "Anchored Once?",
-      "allocationType": "Allocation Type",
+      "empty": "Chưa có token nào.",
+      "details": "Chi tiết",
+      "datetime": "Thời điểm",
+      "tokenId": "Mã token",
+      "tokenName": "Tên token",
+      "cycle": "Chu kỳ",
+      "recipientAddress": "Địa chỉ người nhận",
+      "currentlyAnchored": "Đang neo giữ?",
+      "anchoredOnce": "Đã neo giữ một lần?",
+      "allocationType": "Loại phân bổ",
       "types": {
-        "stellarSelection": "Cosmic Signature NFT Stellar Selection",
-        "anchoredNftSelection": "Anchored-NFT Stellar Selection (RandomWalk anchor-holder)",
-        "signatureAllocation": "Signature Allocation Recipient (#{cycle})",
-        "enduranceChampion": "Endurance Champion",
-        "lastCstParticipant": "Last CST Participant"
+        "stellarSelection": "Tinh tuyển Cosmic Signature NFT",
+        "anchoredNftSelection": "Tinh tuyển NFT neo giữ (người neo giữ RandomWalk)",
+        "signatureAllocation": "Người nhận phân bổ Signature (#{cycle})",
+        "enduranceChampion": "Quán quân Bền bỉ",
+        "lastCstParticipant": "Người tham gia CST cuối cùng"
       }
     }
   },
   "transferCst": {
     "page": {
-      "title": "Transfer CST",
-      "subtitle": "Send your Cosmic Signature CST tokens to another address.",
-      "walletDescription": "Connect your wallet to transfer CST from your own balance.",
-      "sourceLabel": "Connected wallet",
-      "description": "Transfer CST from your connected wallet. The transaction is signed by your wallet and sent directly to the CST token contract."
+      "title": "Chuyển CST",
+      "subtitle": "Gửi token CST của Cosmic Signature đến một địa chỉ khác.",
+      "walletDescription": "Kết nối ví để chuyển CST từ số dư của bạn.",
+      "sourceLabel": "Ví đang kết nối",
+      "description": "Chuyển CST từ ví đang kết nối. Giao dịch được ví của bạn ký và gửi trực tiếp đến hợp đồng token CST."
     },
     "form": {
-      "title": "Transfer CST",
-      "sourceWallet": "Source wallet",
-      "defaultDescription": "Send CST from your connected wallet to any address.",
-      "available": "Available CST",
-      "balanceReadError": "Unable to read this wallet CST balance. Please try again.",
-      "decimalsReadWarning": "Unable to read CST decimals; assuming 18 decimal places.",
-      "recipientAddress": "Recipient address",
-      "amount": "Amount",
-      "sendAria": "Send CST",
-      "sending": "Sending...",
-      "send": "Send CST",
-      "viewHistory": "View CST transfer history",
-      "confirmed": "Transfer confirmed.",
-      "viewTransaction": "View transaction"
+      "title": "Chuyển CST",
+      "sourceWallet": "Ví nguồn",
+      "defaultDescription": "Gửi CST từ ví đang kết nối đến bất kỳ địa chỉ nào.",
+      "available": "CST khả dụng",
+      "balanceReadError": "Không đọc được số dư CST của ví này. Vui lòng thử lại.",
+      "decimalsReadWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
+      "recipientAddress": "Địa chỉ người nhận",
+      "amount": "Số lượng",
+      "sendAria": "Gửi CST",
+      "sending": "Đang gửi…",
+      "send": "Gửi CST",
+      "viewHistory": "Xem lịch sử chuyển CST",
+      "confirmed": "Đã xác nhận chuyển.",
+      "viewTransaction": "Xem giao dịch"
     }
   },
   "nftTransfer": {
-    "defaultDescription": "Select one or more Cosmic Signature NFTs and send them to another wallet address.",
-    "marketplacePrompt": "Looking to sell instead of sending directly? Use the marketplace to list or acquire Cosmic Signature NFTs.",
-    "marketplace": "Buy or sell NFTs",
-    "sourceWallet": "Source wallet",
-    "ownedNfts": "Owned NFTs",
-    "selected": "Selected",
-    "recipientAddress": "Recipient address",
-    "empty": "You do not have any Cosmic Signature NFTs in this wallet.",
-    "pickerTitle": "Choose NFTs to transfer",
-    "pickerSummary": "{selected} selected of {total} transferable NFTs.",
-    "selectAll": "Select all transferable",
-    "selectPage": "Select current page",
-    "clear": "Clear selection",
-    "listAria": "Cosmic Signature NFTs",
-    "selectAria": "Select NFT #{id}",
+    "defaultDescription": "Chọn một hoặc nhiều Cosmic Signature NFT và gửi chúng đến một địa chỉ ví khác.",
+    "marketplacePrompt": "Muốn bán thay vì gửi trực tiếp? Hãy dùng sàn để niêm yết hoặc sưu tầm Cosmic Signature NFT.",
+    "marketplace": "Mua hoặc bán NFT",
+    "sourceWallet": "Ví nguồn",
+    "ownedNfts": "NFT đang sở hữu",
+    "selected": "Đã chọn",
+    "recipientAddress": "Địa chỉ người nhận",
+    "empty": "Bạn không có Cosmic Signature NFT nào trong ví này.",
+    "pickerTitle": "Chọn NFT để chuyển giao",
+    "pickerSummary": "Đã chọn {selected} trong {total} NFT có thể chuyển giao.",
+    "selectAll": "Chọn tất cả NFT có thể chuyển giao",
+    "selectPage": "Chọn trang hiện tại",
+    "clear": "Bỏ chọn",
+    "listAria": "Cosmic Signature NFT",
+    "selectAria": "Chọn NFT #{id}",
     "nftLabel": "NFT #{id}",
-    "tokenId": "Token ID",
-    "customName": "Custom name",
-    "noCustomName": "No custom name",
-    "generationCycle": "Generation cycle",
-    "cycle": "Cycle {cycle}",
-    "cycleUnavailable": "Cycle data not available",
-    "status": "Status",
+    "tokenId": "Mã token",
+    "customName": "Tên tùy chỉnh",
+    "noCustomName": "Không có tên tùy chỉnh",
+    "generationCycle": "Chu kỳ tạo",
+    "cycle": "Chu kỳ {cycle}",
+    "cycleUnavailable": "Không có dữ liệu chu kỳ",
+    "status": "Trạng thái",
     "statusLabels": {
-      "anchored": "Anchored - release before transfer",
-      "ownerChanged": "Owner changed - refresh before transfer",
-      "selected": "Selected",
-      "transferable": "Transferable"
+      "anchored": "Đang neo giữ - gỡ neo trước khi chuyển giao",
+      "ownerChanged": "Chủ sở hữu đã thay đổi - tải lại trước khi chuyển giao",
+      "selected": "Đã chọn",
+      "transferable": "Có thể chuyển giao"
     },
     "progress": {
-      "transferred": "Transferred {completed} of {total} NFTs",
-      "stopped": "Transfer stopped at NFT #{id}",
-      "current": "Current NFT: #{id}"
+      "transferred": "Đã chuyển giao {completed} trong {total} NFT",
+      "stopped": "Chuyển giao dừng ở NFT #{id}",
+      "current": "NFT hiện tại: #{id}"
     },
     "confirmation": {
-      "latest": "Latest transfer confirmed.",
-      "multiple": "{count} transfers confirmed.",
-      "viewLatest": "View latest transaction"
+      "latest": "Đã xác nhận lần chuyển giao mới nhất.",
+      "multiple": "Đã xác nhận {count} lần chuyển giao.",
+      "viewLatest": "Xem giao dịch mới nhất"
     },
-    "sendAria": "Send selected NFTs",
-    "sending": "Sending...",
-    "send": "Send Selected NFTs",
-    "viewHistory": "View NFT transfer history",
+    "sendAria": "Gửi các NFT đã chọn",
+    "sending": "Đang gửi…",
+    "send": "Gửi NFT đã chọn",
+    "viewHistory": "Xem lịch sử chuyển giao NFT",
     "warning": {
-      "title": "Recipient has no transaction history",
-      "description": "This address appears to have no transactions yet. Double-check the recipient before sending; NFT transfers cannot be undone.",
-      "cancel": "Cancel",
-      "continue": "Continue transfer"
+      "title": "Người nhận chưa có lịch sử giao dịch",
+      "description": "Địa chỉ này dường như chưa có giao dịch nào. Hãy kiểm tra kỹ người nhận trước khi gửi; việc chuyển giao NFT không thể hoàn tác.",
+      "cancel": "Hủy",
+      "continue": "Tiếp tục chuyển giao"
     }
   },
   "transferHistory": {
-    "loading": "Loading...",
+    "loading": "Đang tải…",
     "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT Anchoring Wallet",
-      "randomWalkAnchoring": "RandomWalk Anchoring Wallet",
-      "outreach": "Outreach Wallet",
-      "stellarSelection": "Stellar Selection Wallet",
-      "publicGoods": "Public Goods Vault"
+      "cosmicSignatureAnchoring": "Ví neo giữ Cosmic Signature NFT",
+      "randomWalkAnchoring": "Ví neo giữ RandomWalk",
+      "outreach": "Ví truyền thông",
+      "stellarSelection": "Ví Tinh tuyển",
+      "publicGoods": "Kho Hàng hóa công"
     },
     "breadcrumbs": {
-      "nft": "NFT transfers",
-      "cst": "CST transfers"
+      "nft": "Chuyển giao NFT",
+      "cst": "Chuyển CST"
     },
     "nft": {
-      "title": "Cosmic Signature Transfers",
-      "empty": "No NFT transfers yet.",
+      "title": "Chuyển giao Cosmic Signature",
+      "empty": "Chưa có lần chuyển giao NFT nào.",
       "invalidAddress": {
-        "title": "Invalid address",
-        "description": "Enter a valid wallet address to view NFT transfer history."
+        "title": "Địa chỉ không hợp lệ",
+        "description": "Nhập một địa chỉ ví hợp lệ để xem lịch sử chuyển giao NFT."
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST Token Transfers",
-      "empty": "No CST transfers yet.",
+      "title": "Chuyển token CST của Cosmic Signature",
+      "empty": "Chưa có lần chuyển CST nào.",
       "invalidAddress": {
-        "title": "Invalid address",
-        "description": "Enter a valid wallet address to view CST transfer history."
+        "title": "Địa chỉ không hợp lệ",
+        "description": "Nhập một địa chỉ ví hợp lệ để xem lịch sử chuyển CST."
       },
-      "value": "Value (CST)"
+      "value": "Giá trị (CST)"
     }
   },
   "stellarSelectionAllocations": {
-    "datetime": "Datetime",
-    "cycle": "Cycle",
-    "recipient": "Recipient",
-    "expirationDate": "Expiration Date",
-    "amount": "Amount (ETH)",
-    "retrieved": "Retrieved",
-    "expired": "{date} (Expired)",
+    "datetime": "Thời điểm",
+    "cycle": "Chu kỳ",
+    "recipient": "Người nhận",
+    "expirationDate": "Ngày hết hạn",
+    "amount": "Số tiền (ETH)",
+    "retrieved": "Đã nhận về",
+    "expired": "{date} (Đã hết hạn)",
     "remaining": "{date} ({remaining})"
   }
 }

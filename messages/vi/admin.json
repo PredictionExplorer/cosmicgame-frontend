@@ -1,74 +1,74 @@
 {
   "page": {
-    "eyebrow": "Admin · Restricted",
-    "title": "Admin",
-    "subtitle": "Manage gestures and system administration",
-    "gestureList": "Gesture List",
-    "loading": "Loading..."
+    "eyebrow": "Quản trị · Hạn chế truy cập",
+    "title": "Quản trị",
+    "subtitle": "Quản lý nét bút và quản trị hệ thống",
+    "gestureList": "Danh sách nét bút",
+    "loading": "Đang tải…"
   },
   "settings": {
-    "title": "Administrative methods",
-    "subtitle": "Read-only view of dashboard contract addresses and parameters.",
+    "title": "Phương thức quản trị",
+    "subtitle": "Chế độ chỉ đọc cho các địa chỉ hợp đồng và tham số của bảng điều khiển.",
     "breadcrumbs": {
-      "home": "Home",
-      "admin": "Admin",
-      "settings": "Settings"
+      "home": "Trang chủ",
+      "admin": "Quản trị",
+      "settings": "Thiết lập"
     },
-    "loading": "Loading...",
-    "contractTitle": "Cosmic Signature Contract",
-    "contractDescription": "Contract addresses and on-chain parameters from the dashboard API.",
+    "loading": "Đang tải…",
+    "contractTitle": "Hợp đồng Cosmic Signature",
+    "contractDescription": "Địa chỉ hợp đồng và tham số trên chuỗi từ API bảng điều khiển.",
     "placeholders": {
-      "address": "Enter address here",
-      "number": "Enter number here"
+      "address": "Nhập địa chỉ tại đây",
+      "number": "Nhập số tại đây"
     },
     "actions": {
-      "setAddress": "Set Address",
-      "set": "Set"
+      "setAddress": "Đặt địa chỉ",
+      "set": "Đặt"
     },
     "fields": {
-      "cosmicSignatureNft": "Cosmic Signature NFT (ERC-721) contract address",
-      "cstToken": "Cosmic Signature CST Token (ERC-20) contract address",
-      "publicGoodsVault": "Public Goods Vault contract address",
-      "randomWalkNft": "RandomWalk NFT contract address",
-      "stellarSelectionWallet": "Stellar Selection wallet contract address",
-      "anchoringWallet": "Anchoring wallet contract address",
-      "outreachWallet": "Outreach wallet contract address",
-      "businessLogic": "Business logic contract address",
-      "ethStellarRecipients": "Number of ETH Stellar Selection recipients per cycle",
-      "nftStellarRecipients": "Number of NFT Stellar Selection recipients per cycle",
-      "nftHolderRecipients": "Number of NFT holder recipients per cycle",
-      "signatureAllocationPercentage": "Signature Allocation percentage",
-      "publicGoodsPercentage": "Public Goods percentage",
-      "stellarSelectionPercentage": "Stellar Selection percentage",
-      "anchorDistributionPercentage": "Anchor Distribution percentage",
-      "timeIncrease": "Time increase",
-      "allocationTimeout": "Timeout to retrieve Signature Allocation",
-      "priceIncrease": "Price increase",
-      "nanosecondsExtra": "Nano seconds extra",
-      "initialAllocationSeconds": "Initial seconds until Signature Allocation",
-      "initialGestureCostFraction": "Initial Gesture Cost fraction",
-      "activationTime": "Activation time",
-      "gestureRatio": "ETH to CST Gesture ratio",
-      "calibrationWindowLength": "Cycle start CST Calibration Window length",
-      "switchMode": "Switch mode"
+      "cosmicSignatureNft": "Địa chỉ hợp đồng Cosmic Signature NFT (ERC-721)",
+      "cstToken": "Địa chỉ hợp đồng token CST của Cosmic Signature (ERC-20)",
+      "publicGoodsVault": "Địa chỉ hợp đồng Kho Hàng hóa công",
+      "randomWalkNft": "Địa chỉ hợp đồng RandomWalk NFT",
+      "stellarSelectionWallet": "Địa chỉ hợp đồng ví Tinh tuyển",
+      "anchoringWallet": "Địa chỉ hợp đồng ví neo giữ",
+      "outreachWallet": "Địa chỉ hợp đồng ví truyền thông",
+      "businessLogic": "Địa chỉ hợp đồng logic nghiệp vụ",
+      "ethStellarRecipients": "Số người nhận ETH Tinh tuyển mỗi chu kỳ",
+      "nftStellarRecipients": "Số người nhận NFT Tinh tuyển mỗi chu kỳ",
+      "nftHolderRecipients": "Số người nắm giữ NFT được nhận mỗi chu kỳ",
+      "signatureAllocationPercentage": "Tỷ lệ phân bổ Signature",
+      "publicGoodsPercentage": "Tỷ lệ Hàng hóa công",
+      "stellarSelectionPercentage": "Tỷ lệ Tinh tuyển",
+      "anchorDistributionPercentage": "Tỷ lệ phân phối neo giữ",
+      "timeIncrease": "Mức tăng thời gian",
+      "allocationTimeout": "Thời hạn nhận về phân bổ Signature",
+      "priceIncrease": "Mức tăng giá",
+      "nanosecondsExtra": "Nano giây cộng thêm",
+      "initialAllocationSeconds": "Số giây ban đầu đến phân bổ Signature",
+      "initialGestureCostFraction": "Tỷ lệ chi phí nét bút ban đầu",
+      "activationTime": "Thời điểm kích hoạt",
+      "gestureRatio": "Tỷ lệ nét bút ETH so với CST",
+      "calibrationWindowLength": "Độ dài cửa sổ hiệu chỉnh CST khi mở chu kỳ",
+      "switchMode": "Chuyển chế độ"
     },
     "modes": {
-      "runtime": "Runtime Mode",
-      "maintenance": "Maintenance Mode"
+      "runtime": "Chế độ vận hành",
+      "maintenance": "Chế độ bảo trì"
     }
   },
   "outreachTransfer": {
-    "title": "CST Outreach Transfer",
-    "subtitle": "URL-only transfer tool for the configured outreach reserve wallet signer.",
-    "roleReadError": "Unable to read the outreach reserve owner and treasurer.",
-    "walletRequiredTitle": "Wallet not connected",
-    "walletRequiredDescription": "Connect the current outreach reserve treasurer wallet to pay CST rewards.",
-    "walletUnavailableTitle": "Marketing wallet unavailable",
-    "walletUnavailableDescription": "The dashboard has not provided a marketing wallet address yet.",
-    "rolesLoadingTitle": "Loading outreach reserve roles",
-    "rolesLoadingDescription": "Reading the MarketingWallet owner and treasurer from the contract.",
-    "rolesErrorTitle": "Unable to read outreach reserve roles",
-    "restrictedTitle": "Access restricted",
-    "restrictedDescription": "Connect the current outreach reserve treasurer ({treasurer}) to use this URL-only transfer tool. Owner: {owner}."
+    "title": "Chuyển CST truyền thông",
+    "subtitle": "Công cụ chuyển chỉ truy cập qua URL dành cho người ký ví Dự trữ truyền thông đã cấu hình.",
+    "roleReadError": "Không đọc được chủ sở hữu và thủ quỹ của Dự trữ truyền thông.",
+    "walletRequiredTitle": "Chưa kết nối ví",
+    "walletRequiredDescription": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông để chi CST phân bổ.",
+    "walletUnavailableTitle": "Ví truyền thông không khả dụng",
+    "walletUnavailableDescription": "Bảng điều khiển chưa cung cấp địa chỉ ví truyền thông.",
+    "rolesLoadingTitle": "Đang tải vai trò của Dự trữ truyền thông",
+    "rolesLoadingDescription": "Đang đọc chủ sở hữu và thủ quỹ của MarketingWallet từ hợp đồng.",
+    "rolesErrorTitle": "Không đọc được vai trò của Dự trữ truyền thông",
+    "restrictedTitle": "Truy cập bị hạn chế",
+    "restrictedDescription": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông ({treasurer}) để dùng công cụ chuyển chỉ truy cập qua URL này. Chủ sở hữu: {owner}."
   }
 }
