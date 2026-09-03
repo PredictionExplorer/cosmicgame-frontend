@@ -123,6 +123,7 @@ async function expectLocalePreservingLinks(page: Page, locale: string): Promise<
   const links = await page.locator('a[href]').evaluateAll((anchors) =>
     anchors.map((anchor) => ({
       href: anchor.getAttribute('href') ?? '',
+      hreflang: anchor.getAttribute('hreflang'),
       text: (anchor.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 100),
     })),
   );
@@ -136,6 +137,10 @@ async function expectLocalePreservingLinks(page: Page, locale: string): Promise<
     ) {
       continue;
     }
+    // The footer language directory links the same page in every other
+    // language on purpose; an anchor that declares `hreflang` is an alternate,
+    // not a link that dropped the prefix.
+    if (link.hreflang) continue;
 
     let url: URL;
     try {

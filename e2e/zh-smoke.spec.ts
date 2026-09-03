@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { switchLanguage } from './locale-smoke';
+
 /**
  * Sprint 0 smoke coverage for the Chinese locale (docs/i18n/progress-zh.md).
  *
@@ -89,12 +91,9 @@ test.describe('zh locale smoke', () => {
     await page.goto('/faq');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
-    // Switch to Chinese via the footer switcher.
-    const switcher = page.getByRole('button', { name: 'Language' }).last();
-    await switcher.scrollIntoViewIfNeeded();
-    await switcher.click();
-    // Three Chinese locales share the "中文" substring; pick Simplified by its full label.
-    await page.getByRole('menuitemradio', { name: '简体中文', exact: true }).click();
+    // Switch to Chinese via the header switcher. Three Chinese locales share
+    // the "中文" substring; the helper matches the full label exactly.
+    await switchLanguage(page, 'Language', '简体中文');
 
     await expect(page).toHaveURL(/\/zh\/faq$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
@@ -112,10 +111,7 @@ test.describe('zh locale smoke', () => {
     await expect(page).toHaveURL(/\/zh\/faq$/);
 
     // Switch back to English.
-    const zhSwitcher = page.getByRole('button', { name: '语言' }).last();
-    await zhSwitcher.scrollIntoViewIfNeeded();
-    await zhSwitcher.click();
-    await page.getByRole('menuitemradio', { name: 'English' }).click();
+    await switchLanguage(page, '语言', 'English');
 
     // NOTE: a bare /\/faq$/ regex would also match the OLD /zh/faq URL and
     // let assertions run before the navigation lands — match exactly.

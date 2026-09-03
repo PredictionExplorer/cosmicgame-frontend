@@ -872,11 +872,11 @@ export const whitePaperTextVi = {
       },
       {
         label: 'Ứng dụng Cosmic Signature',
-        href: 'https://app.cosmicsignature.com',
+        href: 'https://app.cosmicsignature.com/vi',
       },
       {
         label: 'Trang giao thức Cosmic Signature',
-        href: 'https://cosmicsignature.com',
+        href: 'https://cosmicsignature.com/vi',
       },
       {
         label: 'Rà soát bảo mật của Hacken đối với các hợp đồng Cosmic Signature, tháng 1 năm 2026',

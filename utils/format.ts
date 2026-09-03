@@ -190,14 +190,11 @@ const TIMESTAMP_DATETIME_FORMATS: LocaleRecord<(parts: TimestampParts) => string
 };
 
 /**
- * Converts Unix timestamp to a locale-style date string.
- * `en` output is byte-identical to the historical format ("Jan 01, 12:34");
- * `zh` renders "1月1日 12:34" (docs/i18n/README.md §4); `uk` renders
- * "1 січ., 12:34" (the day-first order Intl itself produces for uk-UA); `vi`
- * renders "1/1, 12:34".
- *
- * Browser-local time is the historical/default behavior. Pass `utc` only for
- * deterministic server snapshots; hydration-safe UI should use
+ * Converts Unix timestamp to a locale-style date string (docs/i18n/README.md
+ * §4): `en` "Jan 01, 12:34" (the historical format, byte-identical), `zh`
+ * "1月1日 12:34", `uk` "1 січ., 12:34" (Intl's own day-first order), `vi`
+ * "1/1, 12:34". Browser-local time by default; pass `utc` only for
+ * deterministic server snapshots — hydration-safe UI should use
  * `HydrationSafeDateTime` or `useHydrationSafeDateTime`.
  */
 export const convertTimestampToDateTime = (

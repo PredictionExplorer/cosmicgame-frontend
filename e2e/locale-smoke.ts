@@ -1,8 +1,35 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { LOCALE_CHROME, LOCALE_LABELS, TRANSLATED_LOCALES, routing } from './locale-fixtures';
 
 type TranslatedLocale = (typeof TRANSLATED_LOCALES)[number];
+
+/**
+ * Opens the header language menu (trigger named `label`) and returns it.
+ *
+ * The pill lives in the header only — the footer carries the crawlable
+ * language directory — and the header is server-rendered in its desktop
+ * layout, then re-rendered for phones once React has hydrated. A locator
+ * resolved before that swap points at a detached button, and a click before
+ * hydration is dropped by a menu that has not mounted yet, so the trigger is
+ * re-resolved (visible instances only) and the click retried until the menu
+ * is actually open.
+ */
+export async function openLanguageMenu(page: Page, label: string): Promise<Locator> {
+  const menu = page.getByRole('menu');
+  await expect(async () => {
+    const trigger = page.getByRole('button', { name: label }).filter({ visible: true }).first();
+    await trigger.click({ timeout: 5_000 });
+    await expect(menu).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+  return menu;
+}
+
+/** Switches language through the header menu: `label` names the trigger, `option` the language. */
+export async function switchLanguage(page: Page, label: string, option: string): Promise<void> {
+  const menu = await openLanguageMenu(page, label);
+  await menu.getByRole('menuitemradio', { name: option, exact: true }).click();
+}
 
 /**
  * Smoke coverage for one translated locale: the locale prefix serves both
@@ -100,10 +127,7 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
       await page.goto('/faq');
       await expect(page.locator('html')).toHaveAttribute('lang', routing.defaultLocale);
 
-      const switcher = page.getByRole('button', { name: englishChrome.switcherLabel }).last();
-      await switcher.scrollIntoViewIfNeeded();
-      await switcher.click();
-      await page.getByRole('menuitemradio', { name: chrome.switcherOption }).click();
+      await switchLanguage(page, englishChrome.switcherLabel, chrome.switcherOption);
 
       await expect(page).toHaveURL(new RegExp(`${prefix}/faq$`));
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
@@ -121,10 +145,7 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
       await expect(page).toHaveURL(new RegExp(`${prefix}/faq$`));
 
       // Switch back to English.
-      const localizedSwitcher = page.getByRole('button', { name: chrome.switcherLabel }).last();
-      await localizedSwitcher.scrollIntoViewIfNeeded();
-      await localizedSwitcher.click();
-      await page.getByRole('menuitemradio', { name: englishChrome.switcherOption }).click();
+      await switchLanguage(page, chrome.switcherLabel, englishChrome.switcherOption);
 
       // A bare /\/faq$/ regex would also match the OLD prefixed URL — match exactly.
       await page.waitForURL((url) => url.pathname === '/faq');
@@ -186,10 +207,7 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
       const otherChrome = LOCALE_CHROME[other!];
 
       await page.goto(`${prefix}/gallery`);
-      const switcher = page.getByRole('button', { name: chrome.switcherLabel }).last();
-      await switcher.scrollIntoViewIfNeeded();
-      await switcher.click();
-      await page.getByRole('menuitemradio', { name: otherChrome.switcherOption }).click();
+      await switchLanguage(page, chrome.switcherLabel, otherChrome.switcherOption);
 
       await expect(page).toHaveURL(new RegExp(`/${other}/gallery$`));
       await expect(page.locator('html')).toHaveAttribute('lang', other!);
