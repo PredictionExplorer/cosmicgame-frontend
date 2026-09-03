@@ -104,12 +104,12 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
     }
 
     await page.locator('button[aria-label="语言"]:visible').first().click();
-    await page.getByRole('menuitem', { name: 'English' }).click();
+    await page.getByRole('menuitemradio', { name: 'English' }).click();
     await page.waitForURL((url) => url.pathname === `/learn/${learnSlug}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
     await page.locator('button[aria-label="Language"]:visible').first().click();
-    await page.getByRole('menuitem', { name: '简体中文', exact: true }).click();
+    await page.getByRole('menuitemradio', { name: '简体中文', exact: true }).click();
     await page.waitForURL((url) => url.pathname === `/zh/learn/${learnSlug}`);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
   });

@@ -103,7 +103,7 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
       const switcher = page.getByRole('button', { name: englishChrome.switcherLabel }).last();
       await switcher.scrollIntoViewIfNeeded();
       await switcher.click();
-      await page.getByRole('menuitem', { name: chrome.switcherOption }).click();
+      await page.getByRole('menuitemradio', { name: chrome.switcherOption }).click();
 
       await expect(page).toHaveURL(new RegExp(`${prefix}/faq$`));
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
@@ -124,7 +124,7 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
       const localizedSwitcher = page.getByRole('button', { name: chrome.switcherLabel }).last();
       await localizedSwitcher.scrollIntoViewIfNeeded();
       await localizedSwitcher.click();
-      await page.getByRole('menuitem', { name: englishChrome.switcherOption }).click();
+      await page.getByRole('menuitemradio', { name: englishChrome.switcherOption }).click();
 
       // A bare /\/faq$/ regex would also match the OLD prefixed URL — match exactly.
       await page.waitForURL((url) => url.pathname === '/faq');
@@ -149,7 +149,7 @@ export function defineLocaleSmoke(locale: TranslatedLocale): void {
       const switcher = page.getByRole('button', { name: chrome.switcherLabel }).last();
       await switcher.scrollIntoViewIfNeeded();
       await switcher.click();
-      await page.getByRole('menuitem', { name: otherChrome.switcherOption }).click();
+      await page.getByRole('menuitemradio', { name: otherChrome.switcherOption }).click();
 
       await expect(page).toHaveURL(new RegExp(`/${other}/gallery$`));
       await expect(page.locator('html')).toHaveAttribute('lang', other!);

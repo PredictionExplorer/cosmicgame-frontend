@@ -94,7 +94,7 @@ test.describe('zh locale smoke', () => {
     await switcher.scrollIntoViewIfNeeded();
     await switcher.click();
     // Three Chinese locales share the "中文" substring; pick Simplified by its full label.
-    await page.getByRole('menuitem', { name: '简体中文', exact: true }).click();
+    await page.getByRole('menuitemradio', { name: '简体中文', exact: true }).click();
 
     await expect(page).toHaveURL(/\/zh\/faq$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
@@ -115,7 +115,7 @@ test.describe('zh locale smoke', () => {
     const zhSwitcher = page.getByRole('button', { name: '语言' }).last();
     await zhSwitcher.scrollIntoViewIfNeeded();
     await zhSwitcher.click();
-    await page.getByRole('menuitem', { name: 'English' }).click();
+    await page.getByRole('menuitemradio', { name: 'English' }).click();
 
     // NOTE: a bare /\/faq$/ regex would also match the OLD /zh/faq URL and
     // let assertions run before the navigation lands — match exactly.

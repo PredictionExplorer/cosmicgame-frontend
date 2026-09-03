@@ -318,18 +318,24 @@ const Header: FC = () => {
           </span>
         </Link>
 
-        <div className="ml-auto max-w-[12rem] overflow-hidden">
-          <ConnectWalletButton
-            isMobileView
-            balance={balance}
-            loading={loading}
-            stakedTokenCount={{
-              cst: anchoredCSTokens?.length,
-              rwalk: anchoredRWLKTokens?.length,
-            }}
-            hasUnclaimedRewards={hasUnclaimedRewards}
-            liquid={experimentalUi}
+        <div className="ml-auto flex items-center gap-2">
+          <LanguageSwitcher
+            variant="compact"
+            className={experimentalUi ? 'liquid-glass-control' : undefined}
           />
+          <div className="max-w-[12rem] overflow-hidden">
+            <ConnectWalletButton
+              isMobileView
+              balance={balance}
+              loading={loading}
+              stakedTokenCount={{
+                cst: anchoredCSTokens?.length,
+                rwalk: anchoredRWLKTokens?.length,
+              }}
+              hasUnclaimedRewards={hasUnclaimedRewards}
+              liquid={experimentalUi}
+            />
+          </div>
         </div>
 
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
@@ -372,10 +378,8 @@ const Header: FC = () => {
                 />
               </div>
 
-              <div className="px-5 pb-3">
-                <LanguageSwitcher
-                  className={cn('w-full justify-center', experimentalUi && 'liquid-glass-control')}
-                />
+              <div className="px-5 pb-4">
+                <LanguageSwitcher variant="list" />
               </div>
 
               <Separator className="bg-white/[0.06]" />
