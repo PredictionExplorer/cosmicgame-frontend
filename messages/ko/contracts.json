@@ -84,23 +84,23 @@
     "segments": {
       "signature": {
         "label": "시그니처 배분",
-        "tooltip": "최종 제스처를 남긴 참여자가 회수하는 ETH 비율. 이 참여자는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다"
+        "tooltip": "최종 제스처를 남긴 참여자가 회수하는 ETH 비율입니다. 이 참여자는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다."
       },
       "chrono": {
         "label": "시간의 전사",
-        "tooltip": "시간의 전사에게 돌아가는 ETH 배분. 시간의 전사는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다"
+        "tooltip": "시간의 전사에게 돌아가는 ETH 배분입니다. 시간의 전사는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다."
       },
       "stellar": {
         "label": "별빛 선정",
-        "tooltip": "사이클이 마감될 때 무작위로 선정된 참여자에게 배분되는 몫"
+        "tooltip": "사이클이 마감될 때 무작위로 선정된 참여자에게 배분되는 몫입니다."
       },
       "anchor": {
         "label": "앵커링 지급",
-        "tooltip": "앵커링된 NFT 수에 비례해 Cosmic Signature NFT 앵커링 보유자에게 돌아가는 ETH 앵커링 지급"
+        "tooltip": "앵커링된 NFT 수에 비례해 Cosmic Signature NFT 앵커링 보유자에게 돌아가는 ETH 앵커링 지급입니다."
       },
       "publicGoods": {
         "label": "공공재",
-        "tooltip": "매 사이클 공공재 수령처(Protocol Guild)로 전달됩니다"
+        "tooltip": "매 사이클 공공재 수령처(Protocol Guild)로 전달됩니다."
       },
       "next": {
         "label": "다음 사이클",
@@ -120,20 +120,20 @@
         "tooltip": "제스처마다 사이클 마감 시각에 이만큼의 시간이 더해집니다. 증가량은 사이클마다 {percent}%씩 늘어납니다."
       },
       "cstPreview": {
-        "label": "현재 참여 CST 미리보기",
+        "label": "현재 참여 CST 미리 보기",
         "tooltip": "지금 제스처를 남길 때 예상되는 참여 CST입니다. 이 값은 동적으로 변하며 {formula} 공식을 따릅니다."
       },
       "finalization": {
         "label": "마감 제한 시간",
-        "tooltip": "공개 마감 구간이 열려 누구나 마감할 수 있게 되기 전까지, 최종 제스처 참여자가 사이클을 마감할 수 있는 시간"
+        "tooltip": "공개 마감 구간이 열려 누구나 마감할 수 있게 되기 전까지, 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있는 시간입니다."
       },
       "initial": {
         "label": "초기 시간 증가량",
-        "tooltip": "첫 제스처를 남길 때 더해지는 초기 사이클 마감 시간"
+        "tooltip": "첫 제스처를 남길 때 더해지는 초기 사이클 마감 시간입니다."
       },
       "message": {
         "label": "메시지 최대 길이",
-        "tooltip": "제스처 메시지에 허용되는 최대 글자 수"
+        "tooltip": "제스처 메시지에 허용되는 최대 글자 수입니다."
       }
     }
   },
@@ -145,21 +145,21 @@
     "elapsed": "경과 시간",
     "ceiling": "보정 상한",
     "cstDurationTooltip": "현재 저장된 CST 보정 구간의 지속 시간입니다. CST 제스처는 이를 약 {increase}% 늘리고, ETH 제스처는 약 {decrease}% 줄입니다.",
-    "cstElapsedTooltip": "현재 CST 보정 구간에서 이미 지난 시간",
+    "cstElapsedTooltip": "현재 CST 보정 구간에서 이미 지난 시간입니다.",
     "cstCeilingTooltip": "현재 표시된 CST 보정 구간의 시작 제스처 비용입니다. 비용은 저장된 지속 시간에 걸쳐 선형으로 내려갑니다.",
-    "ethDurationTooltip": "제스처 비용이 시간에 따라 내려가는 ETH 보정 구간의 전체 지속 시간",
-    "ethElapsedTooltip": "현재 ETH 보정 구간에서 이미 지난 시간",
+    "ethDurationTooltip": "제스처 비용이 시간에 따라 내려가는 ETH 보정 구간의 전체 지속 시간입니다.",
+    "ethElapsedTooltip": "현재 ETH 보정 구간에서 이미 지난 시간입니다.",
     "publicGoodsAddress": "공공재 주소",
-    "publicGoodsAddressTooltip": "공공재 금고 컨트랙트에서 공공재 배분을 현재 받고 있는 온체인 주소",
+    "publicGoodsAddressTooltip": "공공재 금고 컨트랙트에서 공공재 배분을 현재 받고 있는 온체인 주소입니다.",
     "copyPublicGoodsAria": "공공재 주소 복사",
     "viewPublicGoodsAria": "블록 탐색기에서 공공재 주소 보기",
     "selection": {
       "ethLabel": "ETH 별빛 선정 수령자",
-      "ethTooltip": "매 사이클 ETH 배분을 받도록 무작위로 선정되는 참여자 수",
+      "ethTooltip": "매 사이클 ETH 배분을 받도록 무작위로 선정되는 참여자 수입니다.",
       "nftLabel": "NFT 별빛 선정 (참여자)",
-      "nftTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 참여자 수",
+      "nftTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 참여자 수입니다.",
       "anchorLabel": "NFT 별빛 선정 (앵커링 RWLK)",
-      "anchorTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 RandomWalk NFT 앵커링 보유자 수"
+      "anchorTooltip": "매 사이클 Cosmic Signature NFT를 받도록 무작위로 선정되는 RandomWalk NFT 앵커링 보유자 수입니다."
     }
   },
   "vault": {

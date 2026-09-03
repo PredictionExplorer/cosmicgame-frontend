@@ -55,7 +55,7 @@
       }
     },
     "erc20": {
-      "empty": "아직 첨부된 ERC20 토큰이 없습니다.",
+      "empty": "아직 첨부된 ERC-20 토큰이 없습니다.",
       "columns": {
         "datetime": "일시",
         "cycle": "사이클",
@@ -202,7 +202,7 @@
     "listAria": "사이클별 배분 수령자"
   },
   "anchoringRecipient": {
-    "empty": "사이클이 끝난 시점에 앵커링된 토큰이 없어 적립 금액이 공공재 주소로 전달되었습니다."
+    "empty": "사이클이 마감된 시점에 앵커링된 토큰이 없어 적립 금액이 공공재 주소로 전달되었습니다."
   },
   "banGesture": {
     "banned": "제스처가 차단되었습니다.",
@@ -283,7 +283,7 @@
     "attachedAssets": "첨부 자산",
     "yesToken": "예, 토큰 #{id}",
     "mayCloseIn": "종료 예상",
-    "mayCloseValue": "최근 유지 구간이 수호 기록을 넘으면 {duration} 후",
+    "mayCloseValue": "최근 유지 구간이 수호 챔피언 기록을 넘으면 {duration} 후",
     "growingNow": "증가 중",
     "recordStatus": "기록 상태",
     "standingChronoRecord": "시간의 전사 기록 유지 중",
@@ -318,7 +318,7 @@
     "finalCstTooltip": "사이클의 최종 CST 제스처를 남긴 참여자에게는 공로 CST 1,000개가 각인되고 Cosmic Signature NFT 1개가 배분됩니다.",
     "awaitingCstGesture": "첫 CST 제스처 대기 중",
     "finalCstNote": "이 자리는 CST 제스처로만 바뀌며, ETH 제스처와 Random Walk 제스처는 영향을 주지 않습니다.",
-    "headingHelp": "현재 사이클이 마감되면 특별 배분을 받을 차례에 있는 참여자입니다. 자리는 새 제스처마다 바뀔 수 있습니다.",
+    "headingHelp": "현재 사이클이 마감되면 특별 배분을 받을 자리에 있는 참여자입니다. 자리는 새 제스처마다 바뀔 수 있습니다.",
     "printCurrentHold": "현재 유지 시간: {duration}",
     "printWindow": "유지 구간: {duration}",
     "printReign": "유지 기간: {duration}"

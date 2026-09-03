@@ -102,7 +102,7 @@
     "chaosZero": {
       "name": "Chaos Zero",
       "product": "예측 시장",
-      "tagline": "프로토콜의 사이클마다 예측 참여",
+      "tagline": "사이클마다 예측에 참여",
       "ariaLabel": "Chaos Zero에서 예측 참여",
       "defaultLabel": "Chaos Zero에서 예측 참여",
       "menuLabel": "Chaos Zero 예측",
@@ -110,7 +110,7 @@
     }
   },
   "maintenance": {
-    "pendingMessage": "현재 사이클의 배분이 마감되면 유지 관리 모드가 시작됩니다. 조정이 끝나면 프로토콜이 다시 열립니다.",
+    "pendingMessage": "현재 사이클의 배분이 끝나면 유지 관리 모드가 시작됩니다. 조정이 마무리되면 프로토콜이 다시 열립니다.",
     "activeMessage": "프로토콜이 유지 관리 모드입니다. 매개변수 조정이 끝나면 제스처가 다시 열립니다.",
     "pendingLabel": "대기 중",
     "activeLabel": "유지 관리"

@@ -2,9 +2,9 @@
   "page": {
     "title": "ETH 기여",
     "subtitle": "Cosmic Signature 공공재 금고에 ETH를 직접 기여합니다",
-    "description": "우주 평의회의 조율을 거쳐 선정된 수령처를 뒷받침하기 위해 Cosmic Signature 공공재 금고에 ETH를 직접 기여할 수 있습니다. 기여에는 제목, 메시지, URL을 선택적으로 덧붙일 수 있습니다. 사이클별 상위 기여자는 홈 페이지에 소개될 수 있습니다.",
+    "description": "우주 평의회의 조율을 거쳐 선정된 수령처를 뒷받침하기 위해 Cosmic Signature 공공재 금고에 ETH를 직접 기여할 수 있습니다. 기여에는 제목, 메시지, URL을 선택적으로 덧붙일 수 있습니다. 사이클별 상위 기여자는 홈 화면에 소개될 수 있습니다.",
     "formTitle": "기여하기",
-    "amountLabel": "금액 (ETH)",
+    "amountLabel": "금액(ETH)",
     "informationLabel": "정보",
     "optionalJson": "(선택, JSON)",
     "informationPlaceholder": "'{'\"name\": \"이름\", \"message\": \"...\"'}'",
@@ -15,7 +15,7 @@
   "form": {
     "defaultTitle": "ETH 기여하기",
     "defaultDescription": "컨트랙트는 기여를 현재 진행 중인 사이클에 기록합니다.",
-    "amountLabel": "금액 (ETH)",
+    "amountLabel": "금액(ETH)",
     "optional": "(선택)",
     "titleLabel": "제목",
     "titlePlaceholder": "기여 제목",
@@ -48,12 +48,12 @@
     "titleLabel": "제목",
     "messageLabel": "메시지",
     "urlLabel": "URL",
-    "linkPreviewTitle": "링크 미리보기",
+    "linkPreviewTitle": "링크 미리 보기",
     "linkPreviewDescription": "기여자가 남긴 URL에서 가져온 메타데이터입니다.",
     "metaDescriptionLabel": "메타 설명",
     "metaKeywordsLabel": "메타 키워드",
     "metaImageTitle": "메타 이미지",
-    "metaImageDescription": "Open Graph 또는 소셜 미리보기 이미지입니다.",
+    "metaImageDescription": "Open Graph 또는 소셜 미리 보기 이미지입니다.",
     "metaImageAlt": "메타 이미지"
   },
   "cycle": {

@@ -2,7 +2,7 @@
   "shared": {
     "defaultTitle": "Cosmic Signature",
     "defaultOgTitle": "Cosmic Signature — 모든 제스처가 시그니처를 빚어냅니다.",
-    "defaultDescription": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 제스처 하나하나가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 10개가 넘는 배분 경로로 배분하며, 여기에는 이더리움 핵심 기여자 170명 이상을 지원하는 자금 조달 체계 Protocol Guild도 포함됩니다."
+    "defaultDescription": "Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 제스처 하나하나가 사이클의 최종 시그니처를 빚어냅니다. 사이클이 마감되면 프로토콜은 준비금을 10개가 넘는 배분 경로로 배분하며, 여기에는 이더리움 핵심 기여자 170명 이상을 지원하는 자금 지원 메커니즘 Protocol Guild도 포함됩니다."
   },
   "home": {
     "title": "Cosmic Signature",
@@ -99,7 +99,7 @@
   },
   "coordinationChanges": {
     "title": "조율 변경 내역 | Cosmic Signature",
-    "description": "Cosmic Signature 프로토콜 매개변수 변경의 전체 내역입니다. 제스처 비용 단계 인상, 사이클 시간 추가, 앵커링 지급 설정 등 조율 변경 사항을 추적할 수 있습니다."
+    "description": "Cosmic Signature 프로토콜 매개변수 변경의 전체 내역입니다. 제스처 비용 인상률, 사이클 시간 추가, 앵커링 지급 설정 등 조율 변경 사항을 추적할 수 있습니다."
   },
   "distributionsByToken": {
     "title": "토큰별 앵커링 지급 내역 | Cosmic Signature",
@@ -307,11 +307,11 @@
     },
     "protocol-guild-public-goods": {
       "title": "Cosmic Signature와 이더리움 공공재 | Cosmic Signature",
-      "description": "Cosmic Signature가 이더리움 핵심 기여자를 지원하는 자금 조달 체계인 Protocol Guild로 공공재 배분을 전달하는 방식을 설명합니다."
+      "description": "Cosmic Signature가 이더리움 핵심 기여자를 지원하는 자금 지원 메커니즘인 Protocol Guild로 공공재 배분을 전달하는 방식을 설명합니다."
     },
     "collecting-and-trading-cosmic-signature": {
       "title": "Cosmic Signature NFT와 CST 수집 및 거래 | Cosmic Signature",
-      "description": "Cosmic Signature 자산이 거래되는 곳을 안내합니다. 수수료 없는 Axiom Zero NFT 마켓플레이스, Arbitrum 위 Uniswap CST 스왑, 사이클을 다루는 Chaos Zero 예측 시장을 소개합니다."
+      "description": "Cosmic Signature 자산이 거래되는 곳을 안내합니다. 수수료 없는 Axiom Zero NFT 마켓플레이스, Arbitrum 위 Uniswap CST 교환, 사이클을 다루는 Chaos Zero 예측 시장을 소개합니다."
     },
     "not-a-\u006cottery-not-an-\u0069nvestment": {
       "title": "Cosmic Signature는 \uBCF5\uAD8C이나 \uCE74\uC9C0\uB178, \uD22C\uC790 상품인가요? | Cosmic Signature",

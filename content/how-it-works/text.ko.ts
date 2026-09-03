@@ -29,25 +29,25 @@ export const howItWorksTextKo = {
   },
   overview: {
     heading: '작동 원리',
-    subhead: '참여하고 사이클 준비금을 빚어 가는 세 단계',
+    subhead: '참여하고 사이클 준비금을 쌓아 가는 세 단계',
     cards: [
       {
         title: '제스처',
         description:
-          'ETH 또는 CST(ERC-20)로 제스처를 남깁니다. 제스처마다 사이클 마감 시각이 연장되고, 별빛 선정 자격이 기록되며, 변화하는 시그니처가 빚어집니다.',
+          'ETH 또는 CST(ERC-20)로 제스처를 남깁니다. 제스처마다 사이클 마감 시각이 연장되고, 별빛 선정 자격이 기록되며, 시그니처가 조금씩 빚어집니다.',
         tooltip: `제스처는 ETH 또는 CST 토큰(ERC-20)으로 남길 수 있습니다. ETH 제스처에 Random Walk NFT를 첨부하면 ETH 제스처 비용을 한 번 ${protocolFacts.randomWalkDiscountPercentage}% 할인받습니다.`,
       },
       {
         title: '지속',
         description:
-          '사이클은 사이클 마감 시각이 지날 때까지 이어집니다. 새 제스처마다 저장된 마감 시각에 현재 시간 증가량이 더해집니다.',
+          '사이클은 마감 시각이 지날 때까지 이어집니다. 새 제스처마다 저장된 마감 시각에 현재 시간 증가량이 더해집니다.',
         tooltip:
           '시간 증가량은 약 1시간에서 시작해 사이클을 거치며 조금씩 늘어납니다. CST 제스처 비용은 동적인 보정 구간을 따르며, ETH 제스처와 CST 제스처가 이 구간을 서로 반대 방향으로 움직입니다.',
       },
       {
         title: '수령',
         description:
-          '사이클이 마감되면 시그니처 배분, 별빛 선정, 앵커링 지급 등 여러 배분에 참여합니다.',
+          '사이클이 마감되면 시그니처 배분, 별빛 선정, 앵커링 지급 등 여러 배분의 대상이 됩니다.',
         tooltip: `최종 제스처를 남긴 참여자는 사이클 준비금의 ${protocolFacts.mainEthPercentage}%, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT를 받습니다. 별빛 선정 수령자, 앵커링 보유자, 다른 참여자도 배분을 받습니다.`,
       },
     ],
@@ -63,7 +63,7 @@ export const howItWorksTextKo = {
       },
       {
         title: '별빛 선정 자격',
-        description: '제스처마다 사이클 마감 시 배분을 위한 별빛 선정 자격이 기록됩니다.',
+        description: '제스처마다 별빛 선정 자격이 기록되어 사이클 마감 시 배분에 반영됩니다.',
         tooltip: `사이클이 마감되면 자격이 무작위로 선정됩니다. 참여자 세 명이 사이클 준비금 ETH의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다.`,
       },
       {
@@ -75,7 +75,7 @@ export const howItWorksTextKo = {
         title: '시그니처 배분',
         description: `최종 제스처를 남긴 참여자는 사이클 준비금 ETH의 ${protocolFacts.mainEthPercentage}%, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT를 회수할 수 있습니다.`,
         tooltip:
-          '사이클 준비금은 모든 제스처에서 쌓입니다. 최종 제스처를 남긴 참여자가 프로토콜 컨트랙트를 통해 시그니처 배분을 회수합니다.',
+          '사이클 준비금은 제스처를 남길 때마다 쌓입니다. 최종 제스처를 남긴 참여자가 프로토콜 컨트랙트를 통해 시그니처 배분을 회수합니다.',
       },
     ],
   },
@@ -87,7 +87,7 @@ export const howItWorksTextKo = {
         label: '사이클 시작',
         description: `새 퍼포먼스 사이클이 시작됩니다. 첫 ETH 보정 구간이 열리고, CST 보정 구간은 ${protocolFacts.initialCstCalibrationWindowHours}시간을 기준으로 시작해 참여에 따라 달라집니다.`,
         tooltip:
-          '보정 구간에서는 내려가는 비용으로 제스처를 남길 수 있습니다. 사이클 준비금은 0에서 시작하되 이전 사이클의 누적 준비금이 더해집니다.',
+          '보정 구간에서는 점점 내려가는 비용으로 제스처를 남길 수 있습니다. 사이클 준비금은 0에서 시작하되 이전 사이클의 누적 준비금이 더해집니다.',
       },
       {
         label: '참여자의 제스처',
@@ -99,7 +99,7 @@ export const howItWorksTextKo = {
         label: '사이클 마감 시각 도달',
         description:
           '카운트다운이 0에 이르면 최종 제스처를 남긴 참여자가 사이클을 마감할 자격을 얻습니다.',
-        tooltip: `마감이 실제로 실행되기 전까지는 제스처를 남길 수 있습니다. 늦게 남긴 제스처는 저장된 시각을 연장하고 최종 제스처 자리를 넘겨받습니다. 최종 제스처 참여자에게는 ${protocolFacts.finalGestureExclusivityHours}시간의 단독 마감 구간이 주어지며, 그 뒤에는 누구나 마감할 수 있고 마감한 사람이 시그니처 배분을 받습니다.`,
+        tooltip: `마감이 실제로 실행되기 전까지는 제스처를 남길 수 있습니다. 늦게 남긴 제스처는 저장된 시각을 연장하고 최종 제스처 자리를 넘겨받습니다. 최종 제스처 참여자에게는 ${protocolFacts.finalGestureExclusivityHours}시간의 우선 마감 구간이 주어지며, 그 뒤에는 누구나 마감할 수 있고 마감한 사람이 시그니처 배분을 받습니다.`,
       },
       {
         label: '사이클 마감',
@@ -118,7 +118,7 @@ export const howItWorksTextKo = {
         description:
           '사이클 준비금의 약 절반이 누적 준비금으로 이월되고, 다음 사이클이 새 보정 구간과 함께 시작됩니다.',
         tooltip:
-          '누적 준비금은 프로토콜이 가치를 빼내지 않고 쌓아 간다는 뜻입니다. 현재 구간 길이와 비용은 실시간 컨트랙트가 알려 줍니다.',
+          '누적 준비금은 프로토콜이 가치를 빼내지 않고 쌓아 간다는 뜻입니다. 현재 구간 길이와 비용은 컨트랙트의 실시간 값이 기준입니다.',
       },
     ],
   },
@@ -147,14 +147,14 @@ export const howItWorksTextKo = {
           '제스처를 남기기 전에 현재 ETH 또는 CST 제스처 비용을 확인합니다.',
           '실시간 참여 CST 미리 보기를 확인합니다. 이 양은 이전 제스처 이후 흐른 시간에 따라 달라집니다.',
           '시그니처 배분 금액을 보고 예상되는 ETH 배분 규모를 확인합니다.',
-          '지갑에 제스처 비용과 소액의 가스 비용이 있는지 확인합니다.',
+          '제스처 비용과 소액의 가스 비용을 낼 잔액이 지갑에 있는지 확인합니다.',
         ],
       },
       {
         title: '제스처 남기기',
-        tooltip: `Random Walk NFT 하나는 ETH 제스처 비용 ${protocolFacts.randomWalkDiscountPercentage}% 할인에 한 번만 쓸 수 있으므로, 순간을 잘 골라 사용하는 것이 좋습니다.`,
+        tooltip: `Random Walk NFT 하나는 ETH 제스처 비용 ${protocolFacts.randomWalkDiscountPercentage}% 할인에 한 번만 쓸 수 있으므로, 때를 잘 골라 쓰는 것이 좋습니다.`,
         highlights: [
-          `ETH로 제스처를 남기거나(원한다면 Random Walk NFT를 첨부해 ETH 제스처 비용을 ${protocolFacts.randomWalkDiscountPercentage}% 할인받을 수 있습니다), CST(ERC-20)로 제스처를 남깁니다.`,
+          `ETH 또는 CST(ERC-20)로 제스처를 남깁니다. ETH 제스처에는 Random Walk NFT를 첨부해 비용을 ${protocolFacts.randomWalkDiscountPercentage}% 할인받을 수도 있습니다.`,
           '‘제스처 남기기’를 누르고 지갑에서 트랜잭션을 확인합니다.',
           '제스처는 사이클 마감 시각을 연장하고 ETH/CST 비용 상태를 갱신합니다.',
           '모든 제스처는 별빛 선정 자격을 기록하며, 동적 참여 CST를 자동으로 각인할 수 있습니다.',
@@ -183,7 +183,7 @@ export const howItWorksTextKo = {
         title: '별빛 선정 자격 쌓기',
         description:
           '제스처마다 별빛 선정 자격이 한 건씩 기록됩니다. 제스처가 많을수록 선정 빈도가 높아집니다.',
-        tooltip: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. 참여자 NFT 수령자 열 명과 Random Walk NFT 앵커링 보유자 열 명은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
+        tooltip: `ETH 별빛 선정 수령자 세 명이 사이클 준비금의 ${protocolFacts.stellarSelectionEthPercentage}%를 나누어 받습니다. NFT 별빛 선정 수령자 열 명과 Random Walk NFT 앵커링 보유자 열 명은 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다.`,
       },
       {
         title: '전용 지갑 사용하기',
@@ -201,20 +201,20 @@ export const howItWorksTextKo = {
       {
         title: 'CST로 제스처 남기기',
         description: 'CST 보정 구간을 통해 CST를 또 하나의 제스처 수단으로 쓸 수 있습니다.',
-        tooltip: `CST 제스처는 별빛 선정 자격을 기록하고, 타이머를 연장하고, 동적 참여 CST를 각인할 수 있으며, CST 보정 구간을 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다.`,
+        tooltip: `CST 제스처는 별빛 선정 자격을 기록하고, 사이클 마감 시각을 연장하고, 동적 참여 CST를 각인할 수 있으며, CST 보정 구간을 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다.`,
       },
     ],
   },
   faqCallout: {
     heading: '궁금한 점이 있나요?',
-    body: '사이클 메커니즘, 배분 경로, 토큰 등 Cosmic Signature의 모든 것에 관한 자세한 답은 자주 묻는 질문에서 확인할 수 있습니다.',
+    body: '사이클 메커니즘, 배분 경로, 토큰 등 Cosmic Signature에 관한 자세한 답은 자주 묻는 질문에 정리되어 있습니다.',
     ctaLabel: '자주 묻는 질문 보기',
   },
   callToAction: {
     heading: '첫 제스처를 남길 준비가 되었나요?',
     // The JSX original rendered a literal "\u2019" because unicode escapes are
     // not processed inside JSX text; this is the intentional fix to a real ’.
-    body: '지금 진행 중인 퍼포먼스 사이클에 참여해 주세요. 지갑을 연결하고 첫 제스처를 남기면 CST가 각인되고 사이클의 시그니처가 빚어지기 시작합니다.',
+    body: '지금 진행 중인 퍼포먼스 사이클에 참여해 주세요. 지갑을 연결하고 첫 제스처를 남기면 참여 CST가 각인될 수 있고, 사이클의 시그니처가 빚어지기 시작합니다.',
     primaryCtaLabel: '프로토콜 열기',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',

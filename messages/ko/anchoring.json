@@ -48,7 +48,7 @@
       "distributionPerNft": {
         "label": "NFT당 지급액",
         "tooltip": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액입니다. 온체인 풀을 인덱싱된 앵커링 NFT 총 개수로 나눈 값입니다.",
-        "tooltipUnavailable": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액입니다. 온체인 풀을 인덱싱된 앵커링 NFT 총 개수로 나눈 값입니다. 온체인 앵커링 풀은 0이 아니지만 인덱싱된 앵커링 Cosmic Signature NFT 총 개수가 0이어서 (예: ETL이 cg_stake_stats_cst를 갱신하지 않은 경우) NFT당 지급액을 계산할 수 없습니다."
+        "tooltipUnavailable": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액입니다. 온체인 풀을 인덱싱된 앵커링 NFT 총 개수로 나눈 값입니다. 온체인 앵커링 풀은 0이 아니지만 인덱싱된 앵커링 Cosmic Signature NFT 총 개수가 0이어서(예: ETL이 cg_stake_stats_cst를 갱신하지 않은 경우) NFT당 지급액을 계산할 수 없습니다."
       },
       "uniqueHolders": {
         "label": "고유 앵커링 보유자",
@@ -86,7 +86,7 @@
       },
       "anchorOnce": {
         "question": "해제한 NFT를 다시 앵커링할 수 있나요?",
-        "answer": "없습니다. 앵커링 컨트랙트는 한 번이라도 앵커링된 NFT를 모두 기록하며, 각 NFT는 단 한 번만 앵커링할 수 있습니다. 앵커링을 해제하면 Cosmic Signature NFT의 경우 누적된 ETH 지급액이 전달되고 NFT는 지갑으로 돌아오지만, 그 NFT의 앵커링 자격은 영구히 사라집니다. 해당 NFT의 앵커링을 완전히 끝내려는 경우에만 해제해 주세요."
+        "answer": "다시 앵커링할 수 없습니다. 앵커링 컨트랙트는 한 번이라도 앵커링된 NFT를 모두 기록하며, 각 NFT는 단 한 번만 앵커링할 수 있습니다. 앵커링을 해제하면 Cosmic Signature NFT의 경우 누적된 ETH 지급액이 전달되고 NFT는 지갑으로 돌아오지만, 그 NFT의 앵커링 자격은 영구히 사라집니다. 해당 NFT의 앵커링을 완전히 끝내려는 경우에만 해제해 주세요."
       }
     }
   },
@@ -147,7 +147,7 @@
       "cycle": "사이클",
       "depositId": "적립 ID",
       "retrieved": "회수 여부",
-      "distributionEth": "지급액 (ETH)"
+      "distributionEth": "지급액(ETH)"
     }
   },
   "tables": {
@@ -209,8 +209,8 @@
         "depositDatetime": "적립 일시",
         "depositId": "적립 ID",
         "cycle": "사이클",
-        "depositAmountEth": "적립 금액 (ETH)",
-        "retrievedAmountEth": "회수 금액 (ETH)"
+        "depositAmountEth": "적립 금액(ETH)",
+        "retrievedAmountEth": "회수 금액(ETH)"
       }
     },
     "unretrievedDistributions": {
@@ -219,9 +219,9 @@
         "depositId": "적립 ID",
         "anchoredTokens": "앵커링된 토큰 (내 보유 / 전체)",
         "unretrievedTokens": "미회수 토큰",
-        "depositAmountEth": "적립 금액 (ETH)",
-        "distributionAmountEth": "지급 금액 (ETH)",
-        "unretrievedAmountEth": "미회수 금액 (ETH)"
+        "depositAmountEth": "적립 금액(ETH)",
+        "distributionAmountEth": "지급 금액(ETH)",
+        "unretrievedAmountEth": "미회수 금액(ETH)"
       },
       "summary": "회수 가능한 지급액: {amount} ETH",
       "releaseAll": "모두 해제 및 회수",
@@ -252,9 +252,9 @@
         "depositDatetime": "적립 일시",
         "cycle": "사이클",
         "totalAnchoredTokens": "앵커링된 토큰 합계",
-        "totalDepositedEth": "총 적립 (ETH)",
+        "totalDepositedEth": "총 적립(ETH)",
         "fullyRetrieved": "전액 회수 여부",
-        "pendingEth": "회수 대기 (ETH)"
+        "pendingEth": "회수 대기(ETH)"
       }
     },
     "randomWalkImprints": {
@@ -268,8 +268,8 @@
     "tokenDistributions": {
       "columns": {
         "tokenId": "토큰 ID",
-        "retrievedEth": "회수한 지급액 (ETH)",
-        "retrievableEth": "회수 가능 지급액 (ETH)"
+        "retrievedEth": "회수한 지급액(ETH)",
+        "retrievableEth": "회수 가능 지급액(ETH)"
       }
     },
     "anchorActions": {

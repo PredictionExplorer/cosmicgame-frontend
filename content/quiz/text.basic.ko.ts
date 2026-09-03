@@ -43,7 +43,7 @@ export const basicQuestionsTextKo = {
       d: '스테이블코인을 포함한 모든 ERC-20',
     },
     explanation:
-      '입구는 정확히 둘, ETH 제스처와 CST 제스처입니다. 다른 ERC-20 토큰은 첨부 자산으로 제스처에 실을 수 있지만 제스처 자체의 대가가 되지는 못합니다. 제스처 비용은 오직 ETH 또는 CST로만 지불됩니다.',
+      '참여 방법은 정확히 둘, ETH 제스처와 CST 제스처입니다. 다른 ERC-20 토큰은 첨부 자산으로 제스처에 실을 수 있지만 제스처 자체의 대가가 되지는 못합니다. 제스처 비용은 오직 ETH 또는 CST로만 지불됩니다.',
     referenceLabel: '백서 §4 — 제스처',
   },
   'countdown-extension': {
@@ -61,13 +61,13 @@ export const basicQuestionsTextKo = {
   'final-gesture-role': {
     prompt: '카운트다운이 막 만료되었습니다. 누가 먼저 사이클을 마감할 수 있나요?',
     options: {
-      a: '제스처가 가장 뒤에 남은 참여자, 즉 최종 제스처 참여자',
+      a: '가장 나중에 제스처를 남긴 참여자, 즉 최종 제스처 참여자',
       b: '사이클 동안 제스처를 가장 많이 남긴 참여자',
       c: '프로토콜 소유자',
       d: '사이클의 첫 제스처를 남긴 참여자',
     },
     explanation:
-      '사이클 마감 시각이 지나면 최종 제스처 참여자가 마감할 수 있게 되며, 처음에는 이 참여자만 마감할 수 있습니다. 여기서 횟수는 전혀 중요하지 않습니다. 때맞춰 남겨 맨 마지막 자리에 선 제스처 하나가, 그보다 앞선 제스처 백 건보다 우선합니다.',
+      '사이클 마감 시각이 지나면 최종 제스처 참여자가 마감할 수 있게 되고, 처음에는 이 참여자만 마감할 수 있습니다. 제스처를 몇 번 남겼는지는 전혀 중요하지 않습니다. 때맞춰 맨 마지막 자리를 차지한 제스처 하나가 그보다 앞선 제스처 백 건보다 우선합니다.',
     referenceLabel: '백서 §3.3 — 마감과 공개 마감 구간',
   },
   'sleepy-beneficiary': {
@@ -96,7 +96,7 @@ export const basicQuestionsTextKo = {
     referenceLabel: '백서 §5.1 — 마감 시 배분',
   },
   'compounding-reserve': {
-    prompt: '왜 퍼포먼스 사이클은 매번 이전보다 큰 준비금으로 시작하나요?',
+    prompt: '퍼포먼스 사이클은 왜 매번 이전보다 큰 준비금으로 시작하나요?',
     options: {
       a: `모든 사이클 준비금의 약 ${protocolFacts.compoundingReservePercentage}%는 결코 배분되지 않고 다음 사이클로 이월됩니다.`,
       b: '팀이 사이클 사이에 준비금을 채워 넣습니다.',
@@ -104,7 +104,7 @@ export const basicQuestionsTextKo = {
       d: '우주 평의회가 표결로 새 ETH를 준비금에 넣습니다.',
     },
     explanation:
-      '배분되는 다섯 ETH 경로를 합하면 준비금의 절반이고, 나머지는 자동으로 쌓입니다. 누구도 무엇을 채워 넣지 않고, 어떤 프로토콜도 ETH를 각인할 수는 없습니다. 성장은 순전히 기계적입니다. 프로토콜은 빼내지 않고 쌓아 갑니다.',
+      '배분되는 다섯 ETH 경로를 합하면 준비금의 절반이고, 나머지는 자동으로 쌓입니다. 누가 채워 넣는 것도 아니고, 어떤 프로토콜도 ETH를 각인할 수는 없습니다. 성장은 순전히 기계적입니다. 프로토콜은 빼내지 않고 쌓아 갑니다.',
     referenceLabel: '백서 §5.1 — 마감 시 배분',
   },
   'art-engine': {
@@ -128,10 +128,10 @@ export const basicQuestionsTextKo = {
       a: '어떤 기기에서든 픽셀 하나까지 동일한 이미지가 나옵니다.',
       b: '작은 무작위 변화가 섞인 비슷한 이미지가 나옵니다.',
       c: '하드웨어가 다르면 다른 이미지가 나옵니다.',
-      d: '저해상도 미리보기만 나옵니다. 완전한 작품에는 프로젝트 서버가 필요합니다.',
+      d: '저해상도 미리 보기만 나옵니다. 완전한 작품에는 프로젝트 서버가 필요합니다.',
     },
     explanation:
-      '결정론은 가정이 아니라 강제됩니다. 같은 시드는 어떤 기기에서든 비트 하나까지 같은 이미지를 만듭니다. 렌더링된 프레임의 SHA-256 해시를 지속적 통합에서 검사하므로, 출력이 조금이라도 어긋나면 빌드가 실패합니다.',
+      '결정론은 가정이 아니라 강제되는 원칙입니다. 같은 시드는 어떤 기기에서든 비트 하나까지 같은 이미지를 만듭니다. 렌더링된 프레임의 SHA-256 해시를 지속적 통합에서 검사하므로, 출력이 조금이라도 어긋나면 빌드가 실패합니다.',
     referenceLabel: '백서 §6.2 — 재현 가능성과 라이선스',
   },
   'cst-supply-origin': {
@@ -161,7 +161,7 @@ export const basicQuestionsTextKo = {
   'public-goods-beneficiary': {
     prompt: `모든 사이클은 준비금의 ${protocolFacts.publicGoodsPercentage}%를 공공재 배분으로 전달합니다. 지금은 누가 받고 있나요?`,
     options: {
-      a: '170명이 넘는 이더리움 코어 기여자를 위한 자금 지원 메커니즘인 Protocol Guild',
+      a: '이더리움 핵심 기여자 170여 명을 지원하는 자금 지원 메커니즘인 Protocol Guild',
       b: '프로토콜 팀의 운영 지갑',
       c: 'Arbitrum 검증자',
       d: '무작위로 선정된 NFT 보유자',
@@ -172,7 +172,7 @@ export const basicQuestionsTextKo = {
   },
   'anchoring-basic': {
     prompt:
-      'Mira가 자신의 Cosmic Signature NFT를 프로토콜에 앵커링합니다. 앵커링은 Mira에게 무엇을 해 주나요?',
+      'Mira가 자신의 Cosmic Signature NFT를 프로토콜에 앵커링합니다. Mira에게는 어떤 효과가 있나요?',
     options: {
       a: `앵커링된 동안 사이클마다 ${protocolFacts.anchorDistributionPercentage}% 앵커링 지급 가운데 비례하는 몫이 NFT에 쌓이고, 앵커링을 해제할 때 회수합니다.`,
       b: 'NFT를 마켓플레이스에 판매 등록합니다.',
@@ -180,7 +180,7 @@ export const basicQuestionsTextKo = {
       d: '새 시드로 작품을 다시 렌더링합니다.',
     },
     explanation:
-      '앵커링은 프로토콜이 장기적인 참여를 이어 가는 방식입니다. 앵커링된 Cosmic Signature NFT는 앵커링 지급을 비율대로 나누고, 쌓인 ETH는 해제 시 회수합니다. NFT 자체는 결코 변하지 않습니다. 시드와 작품은 영구적입니다.',
+      '앵커링은 장기적인 참여 의지를 표현하는 프로토콜의 방식입니다. 앵커링된 Cosmic Signature NFT는 앵커링 지급을 비율대로 나누고, 쌓인 ETH는 해제 시 회수합니다. NFT 자체는 결코 변하지 않습니다. 시드와 작품은 영구적입니다.',
     referenceLabel: '백서 §8 — 앵커링',
   },
   'anchor-once-ever': {
@@ -198,12 +198,12 @@ export const basicQuestionsTextKo = {
   'random-walk-perk': {
     prompt: 'Sol이 보유한 Random Walk NFT를 ETH 제스처에 첨부합니다. 어떻게 되나요?',
     options: {
-      a: `그 제스처의 비용이 ${protocolFacts.randomWalkDiscountPercentage}% 낮아집니다. NFT는 Sol의 지갑에 남지만 사용됨으로 표시되며, 이는 영구적으로 단 한 번뿐입니다.`,
-      b: '비용 인하의 대가로 NFT가 프로토콜에 전송됩니다.',
+      a: `그 제스처의 비용이 ${protocolFacts.randomWalkDiscountPercentage}% 낮아집니다. NFT는 Sol의 지갑에 남지만 사용됨으로 표시되고, 첨부는 NFT마다 영구히 단 한 번뿐입니다.`,
+      b: '할인의 대가로 NFT가 프로토콜에 전송됩니다.',
       c: '제스처 비용이 0이 됩니다.',
       d: 'NFT가 그 제스처가 각인하는 참여 CST를 두 배로 늘립니다.',
     },
-    explanation: `Random Walk NFT를 첨부하면 ETH 제스처 한 건의 비용이 ${protocolFacts.randomWalkDiscountPercentage}% 줄어듭니다. NFT는 전송되지 않고, 컨트랙트가 사용됨으로 표시할 뿐입니다. 각 Random Walk NFT는 모든 사이클을 통틀어 정확히 한 번만 첨부할 수 있으므로, 이 비용 인하는 소모성 자원입니다.`,
+    explanation: `Random Walk NFT를 첨부하면 ETH 제스처 한 건의 비용이 ${protocolFacts.randomWalkDiscountPercentage}% 줄어듭니다. NFT는 전송되지 않고, 컨트랙트가 사용됨으로 표시할 뿐입니다. 각 Random Walk NFT는 모든 사이클을 통틀어 정확히 한 번만 첨부할 수 있으므로, 이 할인은 소모성 자원입니다.`,
     referenceLabel: '백서 §4.2 — Random Walk NFT 첨부',
   },
   'first-gesture-currency': {
@@ -215,7 +215,7 @@ export const basicQuestionsTextKo = {
       d: '사이클은 프로토콜 소유자만 열 수 있습니다.',
     },
     explanation:
-      '모든 사이클은 ETH 보정 구간이 값을 매기는 ETH 제스처로 열려야 합니다. 사이클이 진행되기 시작하면 CST가 두 번째 입구가 됩니다. 사이클을 여는 특권 계정은 없습니다. 첫 제스처를 남기는 사람이 사이클을 엽니다.',
+      '모든 사이클은 ETH 보정 구간이 비용을 정하는 ETH 제스처로 열려야 합니다. 사이클이 진행되기 시작하면 CST가 두 번째 참여 방법이 됩니다. 사이클을 여는 특권 계정은 없습니다. 첫 제스처를 남기는 사람이 사이클을 엽니다.',
     referenceLabel: '백서 §4.3 — CST 제스처',
   },
   'message-on-gesture': {
@@ -240,7 +240,7 @@ export const basicQuestionsTextKo = {
       d: '앱의 백엔드 서버가 전송을 실행합니다.',
     },
     explanation:
-      '기계적 배분은 프로토콜을 떠받치는 세 가지 특성 가운데 하나입니다. 참여자와 배분 규칙 사이에 재량을 가진 계정은 없고, 제스처의 ETH를 받는 팀 지갑도 없습니다. 앱과 서버는 컨트랙트가 이미 한 일을 보여 줄 뿐입니다.',
+      '기계적 배분은 프로토콜을 떠받치는 세 가지 특성 가운데 하나입니다. 참여자와 배분 규칙 사이에 재량을 행사하는 계정은 없고, 제스처의 ETH를 받는 팀 지갑도 없습니다. 앱과 서버는 컨트랙트가 이미 한 일을 보여 줄 뿐입니다.',
     referenceLabel: '백서 §1 — 서론',
   },
   'nft-count-typical': {
@@ -257,19 +257,19 @@ export const basicQuestionsTextKo = {
   'chrono-endurance-exist': {
     prompt: '수호 챔피언 경로와 시간의 전사 경로는 무엇을 측정하나요?',
     options: {
-      a: '시간에 걸쳐 얼마나 오래 버텼는지를 측정합니다. 누가 가장 나중에 또는 가장 많이 제스처를 남겼는지는 아닙니다.',
+      a: '얼마나 오래 버텼는지를 측정합니다. 누가 가장 나중에, 또는 가장 많이 제스처를 남겼는지가 아닙니다.',
       b: '사이클 동안 누가 ETH를 가장 많이 썼는지 측정합니다.',
       c: '누가 제스처를 가장 많이 남겼는지 측정합니다.',
       d: '사이클이 열릴 때 누가 먼저 제스처를 남겼는지 측정합니다.',
     },
     explanation:
-      '두 경로는 위치가 아니라 얼마나 오래 버텼는지를 측정합니다. 수호 챔피언은 최근 제스처의 자리를 끊기지 않고 가장 오래 지킨 참여자이고, 시간의 전사는 수호 챔피언 칭호 자체를 가장 오래 지킨 참여자입니다. 더 많이 쓰거나 더 많이 제스처를 남겨도 어느 쪽도 직접 결정되지 않습니다.',
+      '두 경로는 위치가 아니라 얼마나 오래 버텼는지를 측정합니다. 수호 챔피언은 최근 제스처의 자리를 끊기지 않고 가장 오래 지킨 참여자이고, 시간의 전사는 수호 챔피언 칭호 자체를 가장 오래 지킨 참여자입니다. ETH를 더 많이 쓰거나 제스처를 더 많이 남긴다고 해서 어느 쪽 칭호가 정해지는 것은 아닙니다.',
     referenceLabel: '백서 §5.2 — 수호 챔피언과 시간의 전사',
   },
   'stellar-selection-what': {
     prompt: '별빛 선정이란 무엇인가요?',
     options: {
-      a: '사이클 동안 제스처마다 기록된 자격 가운데에서 마감 시 컨트랙트가 수령자를 선정하는 메커니즘',
+      a: '사이클 동안 제스처마다 기록된 자격 가운데 마감 시 컨트랙트가 수령자를 선정하는 메커니즘',
       b: '활동량으로 참여자 순위를 매기는 순위표',
       c: 'NFT 작품에 부여되는 희귀도 등급',
       d: '작품 속 별자리에 이름을 붙이는 체계',
@@ -312,7 +312,7 @@ export const basicQuestionsTextKo = {
       d: '기록되지 않습니다. 합계만 남습니다.',
     },
     explanation:
-      '프로토콜은 Arbitrum One 위에서 실행되고, 중요한 기록, 곧 모든 제스처와 시드와 배분은 온체인에 있습니다. 그래서 작품은 재현 가능하고, 배분은 어떤 서버도 신뢰하지 않은 채 누구나 확인할 수 있습니다.',
+      '프로토콜은 Arbitrum One 위에서 실행되고, 중요한 기록, 곧 모든 제스처와 시드와 배분은 온체인에 있습니다. 그래서 작품은 재현 가능하고, 배분은 어떤 서버도 신뢰할 필요 없이 누구나 확인할 수 있습니다.',
     referenceLabel: '학습 센터: Arbitrum 위의 Cosmic Signature',
   },
 } as const satisfies QuizTierQuestionsText<'basic'>;

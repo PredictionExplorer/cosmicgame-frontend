@@ -148,7 +148,7 @@
         },
         "publicGoods": {
           "label": "공공재",
-          "tooltip": "공공재 수령처 (Protocol Guild)로 전달된 {amount} ETH"
+          "tooltip": "공공재 수령처(Protocol Guild)로 전달된 {amount} ETH"
         },
         "anchor": {
           "label": "앵커링 지급",
@@ -171,7 +171,7 @@
         },
         "publicGoods": {
           "label": "공공재",
-          "tooltip": "이 사이클에서 공공재 수령처 (Protocol Guild)로 전달된 금액입니다."
+          "tooltip": "이 사이클에서 공공재 수령처(Protocol Guild)로 전달된 금액입니다."
         },
         "anchor": {
           "label": "앵커링 지급",
@@ -266,7 +266,7 @@
       "sectionDescription": "이 사이클의 시그니처 배분 구성 요약입니다.",
       "ethAllocation": "ETH 배분",
       "nftId": "Cosmic Signature NFT ID",
-      "attachedTokensLabel": "첨부된 NFT (ERC-721)",
+      "attachedTokensLabel": "첨부된 NFT(ERC-721)",
       "attachedTokens": "{count, plural, other {첨부된 NFT #개}} (ERC-721)"
     },
     "next": {

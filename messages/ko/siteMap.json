@@ -186,7 +186,7 @@
     },
     "uniswap": {
       "label": "Uniswap에서 CST 거래",
-      "description": "Arbitrum에서 ETH를 CST로 스왑합니다."
+      "description": "Arbitrum에서 ETH를 CST로 교환합니다."
     }
   }
 }

@@ -26,8 +26,8 @@
       "set": "설정"
     },
     "fields": {
-      "cosmicSignatureNft": "Cosmic Signature NFT (ERC-721) 컨트랙트 주소",
-      "cstToken": "Cosmic Signature CST 토큰 (ERC-20) 컨트랙트 주소",
+      "cosmicSignatureNft": "Cosmic Signature NFT(ERC-721) 컨트랙트 주소",
+      "cstToken": "Cosmic Signature CST 토큰(ERC-20) 컨트랙트 주소",
       "publicGoodsVault": "공공재 금고 컨트랙트 주소",
       "randomWalkNft": "RandomWalk NFT 컨트랙트 주소",
       "stellarSelectionWallet": "별빛 선정 지갑 컨트랙트 주소",

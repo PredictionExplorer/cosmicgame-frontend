@@ -261,7 +261,9 @@ export const KO_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Trait',
     canonical: '특성',
-    variants: ['속성', '트레잇', '트레이트'],
+    // 속성 is left to reviewer judgment: as a substring it sits inside
+    // 지속성, 영속성, and 귀속성, all legitimate words.
+    variants: ['트레잇', '트레이트'],
   },
   {
     concept: 'Rarity',
@@ -317,5 +319,86 @@ export const KO_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     concept: 'Copied',
     canonical: '복사됨',
     variants: ['복사 완료', '카피됨'],
+  },
+  // Protocol nouns fixed during the rollout (glossary §3.2).
+  {
+    concept: 'Exclusivity window',
+    canonical: '우선 마감 구간',
+    variants: ['독점 구간', '독점 마감 구간', '단독 마감 구간', '우선 구간'],
+  },
+  {
+    concept: 'Time increment',
+    canonical: '시간 증가량',
+    variants: ['증분'],
+  },
+  {
+    concept: 'Parameter',
+    canonical: '매개변수',
+    variants: ['파라미터', '패러미터'],
+  },
+  {
+    concept: 'Premium (V3 multiplier)',
+    canonical: '할증 배수',
+    variants: ['할증 배율'],
+  },
+  {
+    concept: 'Dust threshold',
+    canonical: '더스트 기준값',
+    variants: ['더스트 기준치', '소액 기준치'],
+  },
+  {
+    concept: 'Trade-off',
+    canonical: '절충',
+    variants: ['트레이드오프', '트레이드 오프'],
+  },
+  {
+    concept: 'Snapshot',
+    canonical: '스냅숏',
+    variants: ['스냅샷'],
+  },
+  {
+    concept: 'Reentrancy guard',
+    canonical: '재진입 방지 장치',
+    variants: ['재진입 가드'],
+  },
+  {
+    concept: 'Seed phrase',
+    canonical: '시드 구문',
+    variants: ['시드 문구', '니모닉'],
+  },
+  {
+    concept: 'Ethereum core contributors',
+    canonical: '이더리움 핵심 기여자',
+    variants: ['코어 기여자', '핵심 개발자'],
+  },
+  {
+    concept: 'Funding mechanism (Protocol Guild)',
+    canonical: '자금 지원 메커니즘',
+    variants: ['자금 조달 메커니즘', '자금 메커니즘', '자금 조달 체계', '펀딩 메커니즘'],
+  },
+  {
+    concept: 'Preview',
+    canonical: '미리 보기',
+    variants: ['미리보기', '프리뷰'],
+  },
+  {
+    concept: 'Swap (Uniswap)',
+    canonical: '교환',
+    variants: ['스왑'],
+  },
+  {
+    concept: 'Block explorer',
+    canonical: '블록 탐색기',
+    variants: ['블록 익스플로러', '익스플로러'],
+  },
+  {
+    concept: 'Digital collectible',
+    canonical: '디지털 수집품',
+    variants: ['디지털 소장품', '컬렉터블'],
+  },
+  {
+    concept: 'Asset',
+    canonical: '에셋',
+    variants: ['애셋', '어셋'],
   },
 ];

@@ -43,8 +43,8 @@
       "notNftOwner": "이 토큰의 소유자가 아닙니다.",
       "tokenDecimalsWarning": "토큰이 decimals()를 구현하지 않아 18자리로 간주합니다.",
       "invalidContractAddress": "입력한 주소는 올바른 컨트랙트 주소가 아닙니다.",
-      "notErc721": "첨부한 NFT 컨트랙트가 ERC721 토큰 컨트랙트가 아닙니다.",
-      "notErc20": "첨부한 토큰 컨트랙트가 ERC20 토큰 컨트랙트가 아닙니다.",
+      "notErc721": "첨부한 NFT 컨트랙트가 ERC-721 토큰 컨트랙트가 아닙니다.",
+      "notErc20": "첨부한 토큰 컨트랙트가 ERC-20 토큰 컨트랙트가 아닙니다.",
       "insufficientAttachedToken": "이 제스처에 첨부할 토큰 잔액이 부족합니다.",
       "insufficientEth": "ETH 잔액이 부족합니다. 지갑에 ETH가 충분하지 않습니다.",
       "insufficientCst": "CST 잔액이 부족합니다. 지갑에 CST(ERC-20)가 충분하지 않습니다."
@@ -59,7 +59,7 @@
       "callerIsNotNftOwner": "이 NFT의 소유자가 아닙니다.",
       "roundIsInactive": "현재 사이클이 활성 상태가 아닙니다.",
       "tooLongBidMessage": "제스처 메시지가 너무 깁니다.",
-      "wrongBidType": "잘못된 제스처 유형이 선택되었습니다.",
+      "wrongBidType": "제스처 유형이 잘못 선택되었습니다.",
       "fundTransferFailed": "자금 전송에 실패했습니다.",
       "ethCostChanged": "트랜잭션이 전송되는 동안 제스처 비용이 {increase} ETH 올랐습니다. 새로 필요한 비용은 {required} ETH입니다. 다시 시도해 주세요.",
       "cstCostChanged": "트랜잭션이 전송되는 동안 CST 제스처 비용이 바뀌었습니다. 다른 제스처가 먼저 처리된 것으로 보입니다. 컨트랙트가 요구한 {required} CST가 설정한 최대치 {maximum} CST를 넘었습니다. 새로 고친 뒤 다시 시도해 주세요."
@@ -81,7 +81,7 @@
     "failed": "사이클을 마감할 수 없습니다. 지갑과 네트워크 연결을 확인한 뒤 다시 시도해 주세요.",
     "contractErrors": {
       "mainPrizeEarlyClaim": "시그니처 배분을 회수할 수 있는 시간이 아직 되지 않았습니다.",
-      "mainPrizeClaimDenied": "시그니처 배분은 최종 참여자만 회수할 수 있습니다.",
+      "mainPrizeClaimDenied": "시그니처 배분은 최종 제스처를 남긴 참여자만 회수할 수 있습니다.",
       "noGestures": "현재 사이클에 아직 제스처가 없습니다."
     }
   },

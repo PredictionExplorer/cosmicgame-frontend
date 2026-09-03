@@ -32,8 +32,11 @@ website or a good Korean fintech app say this?", then write that.
   do not appear (the conventions gate rejects 당신 and 귀하). Where English says "your
   wallet", Korean says 지갑 or 내 지갑 (the possessive of the first person, as in 내 배분).
 - **Sentence register:** 합쇼체 everywhere — statements end in **‑합니다 / ‑입니다**,
-  questions in **‑합니까 / ‑입니까**, requests in **‑해 주세요** (never the stiff ‑하십시오,
-  never the chatty 해요체 ‑해요 / ‑예요). One register across the whole site.
+  questions in **‑인가요 / ‑나요 / ‑까요** (FAQ, quiz) or **‑합니까 / ‑입니까** (formal
+  copy), requests in **‑해 주세요** (never the stiff ‑하십시오, never the chatty 해요체 ‑해요
+  / ‑예요 / ‑죠, never the bare ‑하세요 in chrome). The subject honorific **‑시‑** is fine
+  in a direct question or request to the reader (준비되셨나요?, 확인해 주세요), never for
+  the protocol or a third party. One register across the whole site.
 - **Tone:** calm, precise, art-institution. No hype, no exclamation marks in UI chrome,
   no emoji, no meme slang, no ㅋㅋ.
 - **Buttons and CTAs:** noun phrases — 제스처 남기기 · 회수 · 지갑 연결 · Arbiscan에서 보기.
@@ -113,6 +116,9 @@ placeholder or a plural `#`** — the conventions gate rejects `{amount}을`, `{
   sentence. Where a dash is unavoidable, use — (U+2014) with spaces.
 - **Ellipsis:** the single character … (U+2026), no space before it: 불러오는 중…
 - **Middle dot:** · (U+00B7) between short list items (일 · 시 · 분 · 초).
+- **Parentheses:** closed up to the word they qualify, in labels and prose alike —
+  금액(ETH), NFT(ERC-721), 수령처(Protocol Guild)로. A particle after a closing
+  parenthesis attaches directly.
 - **Percent:** no space before % (50%). This matches the on-screen formatters and the
   numeric-claims test that pins every percentage to `protocol-facts.ts`.
 - **Decimals and thousands:** the dot and the comma, as in English and as

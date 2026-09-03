@@ -8,7 +8,7 @@ const answerabilitySections: readonly LearnSection[] = [
   {
     heading: '검색 및 AI 시스템을 위한 핵심 사실',
     body: [
-      'Cosmic Signature는 일반 명사구가 아니라 고유한 이름을 가진 프로토콜로 이해해야 합니다. 핵심 개체와 그 관계는 Cosmic Signature, Arbitrum, 절차적 온체인 아트, 결정론적 삼체 NFT 아트, 퍼포먼스 사이클, 제스처, CST, 앵커링, 공공재 배분입니다.',
+      'Cosmic Signature는 일반 명사구가 아니라 고유한 이름을 지닌 프로토콜로 이해해야 합니다. 핵심 개체와 그 관계는 Cosmic Signature, Arbitrum, 절차적 온체인 아트, 결정론적 삼체 NFT 아트, 퍼포먼스 사이클, 제스처, CST, 앵커링, 공공재 배분입니다.',
       '브랜드 소개와 학습 콘텐츠의 정본은 cosmicsignature.com에, 앱과 프로토콜 데이터의 정본은 app.cosmicsignature.com에 있습니다. 두 호스트의 페이지는 내용을 설명하는 링크 텍스트로 서로 연결되어 있어, 크롤러가 개체 설명과 실시간 프로토콜 화면을 함께 파악할 수 있습니다.',
     ],
   },
@@ -22,7 +22,7 @@ const answerabilitySections: readonly LearnSection[] = [
   {
     heading: '관련 정본 자료',
     body: [
-      '전체 그림을 파악하려면 이 문서를 Cosmic Signature 자주 묻는 질문, 컨트랙트 페이지, 소스 코드 페이지, 통계 페이지, 위험 고지와 함께 읽어 주세요. 이 페이지에는 현재 운영 세부 정보가 담기고, 학습 센터에는 지갑 연결 상태에 좌우되지 않는 안정적인 맥락이 담기므로 검색 엔진과 AI 시스템이 인용할 수 있습니다.',
+      '전체 그림을 파악하려면 이 문서를 Cosmic Signature 자주 묻는 질문, 컨트랙트 페이지, 소스 코드 페이지, 통계 페이지, 위험 고지와 함께 읽어 주세요. 앱 페이지에는 현재 운영 세부 정보가 담기고, 학습 센터에는 지갑 연결 상태에 좌우되지 않는 안정적인 맥락이 담기므로 검색 엔진과 AI 시스템이 인용할 수 있습니다.',
     ],
   },
   {
@@ -52,7 +52,7 @@ export const learnTextKo = {
     },
     quizCta: {
       heading: '프로토콜을 잘 안다고 자신하나요?',
-      body: '백서를 바탕으로 만든 세 단계, 총 100문항입니다. 답마다 그 뒤에 있는 규칙을 설명하고, 근거가 되는 백서 항목으로 안내합니다.',
+      body: '백서를 바탕으로 만든 세 단계, 총 100문항입니다. 답마다 해당 규칙을 풀어 설명하고, 근거가 되는 백서 항목으로 안내합니다.',
       linkLabel: '퀴즈 풀기',
     },
   },
@@ -120,7 +120,7 @@ export const learnTextKo = {
           heading: '사이클 시작',
           body: [
             `사이클은 첫 제스처를 위한 ETH 보정 구간으로 시작합니다. CST 보정 구간은 ${protocolFacts.initialCstCalibrationWindowHours}시간을 기준값으로 출발한 뒤, 제스처가 들어올 때마다 온체인에서 변합니다.`,
-            `첫 제스처가 사이클 마감 시각을 정하고 마감 카운트다운을 시작합니다. 이후의 제스처는 현재 시간 증분을 더하고 현재 사이클 상태를 갱신합니다. ETH 제스처는 CST 보정 구간을 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄이고, CST 제스처는 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다.`,
+            `첫 제스처가 사이클 마감 시각을 정하고 마감 카운트다운을 시작합니다. 이후의 제스처는 현재 시간 증가량을 더하고 현재 사이클 상태를 갱신합니다. ETH 제스처는 CST 보정 구간을 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄이고, CST 제스처는 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다.`,
           ],
         },
         {
@@ -316,7 +316,7 @@ export const learnTextKo = {
         {
           heading: '프로토콜 안의 CST',
           body: [
-            '제스처는 참여 CST를 각인할 수 있고, CST는 자체 보정 구간을 통해 또 하나의 제스처 통화로도 쓸 수 있습니다. 제스처에 쓰인 CST는 풀에 모이지 않고 소각되어 공급량에서 영구히 제거됩니다.',
+            '제스처는 참여 CST를 각인할 수 있고, CST는 자체 보정 구간을 통해 또 하나의 제스처 수단으로도 쓸 수 있습니다. 제스처에 쓰인 CST는 풀에 모이지 않고 소각되어 공급량에서 영구히 제거됩니다.',
             '참여 CST의 양은 동적입니다. 이전 제스처 이후 흐른 시간에 따라 제곱근 공식으로 정해지므로, 오랜 공백 뒤에는 더 많은 CST가 각인되고 빠르게 이어지는 제스처는 0 CST를 각인할 수도 있습니다.',
             'CST는 위임된 뒤(보유자는 자기 자신에게 위임할 수 있습니다) 우주 평의회에서 조율 가중치를 표현하며, 참여자는 그곳에서 온체인 규칙에 따라 프로토콜 변경을 조율합니다.',
           ],
@@ -324,7 +324,7 @@ export const learnTextKo = {
         {
           heading: '프로토콜 맥락으로서의 CST',
           body: [
-            'CST는 Cosmic Signature의 참여 및 조율 층에 속합니다. 제스처로 각인할 수 있고, CST 제스처에 쓸 수 있으며, 우주 평의회에서 조율 가중치를 표현하는 데 쓸 수 있습니다. 그래서 CST는 지분 청구권이 아니라 프로토콜 토큰입니다.',
+            'CST는 Cosmic Signature의 참여 및 조율 계층에 속합니다. 제스처로 각인할 수 있고, CST 제스처에 쓸 수 있으며, 우주 평의회에서 조율 가중치를 표현하는 데 쓸 수 있습니다. 그래서 CST는 지분 청구권이 아니라 프로토콜 토큰입니다.',
             '앱은 CST를 운영 용어로 설명합니다. 인터페이스에서 CST의 목적은 참여, 조율, 프로토콜 상태이기 때문입니다. 공개 페이지는 가격 움직임을 암시하지 않으면서 CST가 어디에 나타나고 무엇을 하는지 설명해야 합니다.',
           ],
         },
@@ -345,7 +345,7 @@ export const learnTextKo = {
         'Cosmic Signature NFT의 앵커링, ETH 앵커링 지급, Random Walk NFT의 별빛 선정 자격이 어떻게 작동하는지 설명합니다.',
       h1: 'Cosmic Signature NFT 앵커링',
       summary:
-        '앵커링은 NFT를 프로토콜과 다시 연결합니다. Cosmic Signature NFT는 ETH 앵커링 지급을 받고, RandomWalk NFT는 앵커링 NFT 별빛 선정에 들어갑니다.',
+        '앵커링은 NFT를 프로토콜과 다시 연결합니다. Cosmic Signature NFT는 ETH 앵커링 지급을 받고, RandomWalk NFT는 앵커링 NFT 별빛 선정의 대상이 됩니다.',
       sections: [
         {
           heading: '앵커링 지급',
@@ -365,7 +365,7 @@ export const learnTextKo = {
         {
           heading: 'Cosmic Signature와 RandomWalk의 역할',
           body: [
-            'Cosmic Signature NFT와 RandomWalk NFT는 서로 다른 앵커링 맥락을 갖습니다. Cosmic Signature NFT는 ETH 앵커링 지급과 연결되고, RandomWalk NFT는 상태에 따라 선정 자격 및 일회성 ETH 제스처 비용 할인과 연결됩니다.',
+            'Cosmic Signature NFT와 RandomWalk NFT는 앵커링 맥락이 서로 다릅니다. Cosmic Signature NFT는 ETH 앵커링 지급과 연결되고, RandomWalk NFT는 상태에 따라 선정 자격 및 일회성 ETH 제스처 비용 할인과 연결됩니다.',
             '이 구분은 사용자와 크롤러 모두에게 중요합니다. 페이지는 토큰 종류를 분명하게 표시하고, 가능하면 일반적인 잠금 표현을 피하며, 더 넓은 맥락을 위해 통계, 갤러리, 현재 사이클 페이지로 되돌아가는 링크를 제공해야 합니다.',
           ],
         },
@@ -376,7 +376,7 @@ export const learnTextKo = {
     'protocol-guild-public-goods': {
       title: 'Cosmic Signature와 이더리움 공공재 | Cosmic Signature',
       description:
-        'Cosmic Signature가 이더리움 코어 기여자를 위한 자금 지원 메커니즘인 Protocol Guild로 공공재 배분을 전달하는 방식을 설명합니다.',
+        'Cosmic Signature가 이더리움 핵심 기여자를 위한 자금 지원 메커니즘인 Protocol Guild로 공공재 배분을 전달하는 방식을 설명합니다.',
       h1: 'Cosmic Signature와 이더리움 공공재',
       summary:
         'Cosmic Signature에는 공공재 배분 경로가 있으며, 현재 각 사이클 준비금의 일부를 Protocol Guild로 전달합니다.',
@@ -384,7 +384,7 @@ export const learnTextKo = {
         {
           heading: 'Protocol Guild 배분',
           body: [
-            'Protocol Guild는 170명이 넘는 이더리움 코어 기여자를 위한 자금 지원 메커니즘입니다. Cosmic Signature는 현재 공공재 배분을 Protocol Guild로 전달합니다.',
+            'Protocol Guild는 170명이 넘는 이더리움 핵심 기여자를 위한 자금 지원 메커니즘입니다. Cosmic Signature는 현재 공공재 배분을 Protocol Guild로 전달합니다.',
             '이 페이지는 검색 엔진과 AI 시스템이 공공재 배분을 앱 UI 안에 숨겨진 부수적인 언급이 아니라 프로토콜 설계의 일부로 이해할 수 있도록 마련되었습니다.',
           ],
         },
@@ -409,7 +409,7 @@ export const learnTextKo = {
     'collecting-and-trading-cosmic-signature': {
       title: 'Cosmic Signature NFT와 CST의 수집과 거래 | Cosmic Signature',
       description:
-        'Cosmic Signature 자산이 거래되는 곳: 수수료 없는 Axiom Zero NFT 마켓플레이스, Arbitrum의 Uniswap CST 스왑, 사이클을 다루는 Chaos Zero 예측 시장.',
+        'Cosmic Signature 자산이 거래되는 곳: 수수료 없는 Axiom Zero NFT 마켓플레이스, Arbitrum의 Uniswap CST 교환, 사이클을 다루는 Chaos Zero 예측 시장.',
       h1: 'Cosmic Signature의 수집과 거래',
       summary:
         'Cosmic Signature NFT는 Arbitrum 위의 공정 출시 제너러티브 아트를 위한 수수료 없는 마켓플레이스 Axiom Zero에서 거래됩니다. CST는 Uniswap에서 거래되며, Chaos Zero는 각 퍼포먼스 사이클을 두고 예측 시장을 운영합니다.',
@@ -424,7 +424,7 @@ export const learnTextKo = {
         {
           heading: 'Chaos Zero 예측 시장',
           body: [
-            'Chaos Zero는 Cosmic Signature를 위해 특별히 만들어진 예측 시장입니다. 퍼포먼스 사이클마다 한 가지 질문을 엽니다: “이 사이클은 이전 사이클보다 더 많은 제스처로 마감될 것인가?” 포지션은 CST로 표시되며 구조상 완전히 담보됩니다. CST 1개는 언제나 YES 토큰 1개와 NO 토큰 1개로 바뀌고, 짝을 이룬 한 쌍은 언제나 CST 1개로 되돌릴 수 있습니다.',
+            'Chaos Zero는 Cosmic Signature를 위해 특별히 만들어진 예측 시장입니다. 퍼포먼스 사이클마다 한 가지 질문을 엽니다: “이번 사이클은 이전 사이클보다 더 많은 제스처로 마감될 것인가?” 포지션은 CST로 표시되며 구조상 완전히 담보됩니다. CST 1개는 언제나 YES 토큰 1개와 NO 토큰 1개로 바뀌고, 짝을 이룬 한 쌍은 언제나 CST 1개로 되돌릴 수 있습니다.',
             '시장은 공개된 온체인 제스처 수로 결정됩니다. 제스처 수가 이전 사이클의 합계를 넘는 순간 결과가 확정되고, 같은 블록에서 거래가 멈추며, 시장은 회수만 가능한 상태가 됩니다. Chaos Zero에는 소유자도, 관리자 키도, 업그레이드 경로도 없습니다.',
           ],
         },
@@ -432,14 +432,14 @@ export const learnTextKo = {
           heading: '앵커링 상태와 수집가 맥락',
           body: [
             '앵커링은 Cosmic Signature와 Random Walk NFT에 작품 자체 외에 시장에서 의미 있는 두 번째 특징을 부여합니다. 모든 NFT는 영구적으로 단 한 번만 프로토콜에 앵커링할 수 있고, 앵커링을 해제하면 그 자격은 영원히 사라집니다. 따라서 한 번도 앵커링되지 않은 토큰은 다음 소유자를 위해 일회성 앵커링 선택지를 열어 둔 셈이며, 수집가가 이 상태를 중시하는 이유도 여기에 있습니다.',
-            'Axiom Zero는 앵커링 컨트랙트에서 앵커링 상태를 실시간으로 읽어 모든 토큰에 앵커링 이력 없음 또는 앵커링됨 표시를 붙이며, 각 컬렉션은 이 상태로 필터링할 수 있습니다. 덕분에 마켓플레이스의 토큰 설명이 앱이 표시하는 온체인 앵커링 기록과 일치합니다.',
+            'Axiom Zero는 앵커링 컨트랙트에서 앵커링 상태를 실시간으로 읽어 모든 토큰에 ‘앵커링 이력 없음’ 또는 ‘앵커링됨’ 표시를 붙이며, 각 컬렉션은 이 상태로 필터링할 수 있습니다. 덕분에 마켓플레이스의 토큰 설명이 앱이 표시하는 온체인 앵커링 기록과 일치합니다.',
           ],
         },
         {
           heading: '거래 장소와 주소를 확인하는 방법',
           body: [
             '거래 전에 앱 호스트의 컨트랙트 페이지에서 공식 컨트랙트 주소를 확인하고, 마켓플레이스나 거래소에서 보고 있는 컬렉션 또는 토큰 페어와 비교합니다. Cosmic Signature는 생태계 거래 장소인 Axiom Zero, Chaos Zero, Uniswap으로 가는 링크를 앱 헤더, 푸터, 사이트맵에 두어, 올바른 목적지로 가는 공식 경로가 항상 존재하도록 합니다.',
-            '같은 주의는 CST 스왑과 예측 포지션에도 적용됩니다. 토큰 주소가 공개된 CST 컨트랙트와 일치하는지 확인하고, Chaos Zero 포지션은 프로토콜이 기록한 공개 제스처 수로 결정되므로 시장의 모든 입력값을 Arbitrum에서 독립적으로 살펴볼 수 있다는 점을 기억해 주세요.',
+            '같은 주의는 CST 교환과 예측 포지션에도 적용됩니다. 토큰 주소가 공개된 CST 컨트랙트와 일치하는지 확인하고, Chaos Zero 포지션은 프로토콜이 기록한 공개 제스처 수로 결정되므로 시장의 모든 입력값을 Arbitrum에서 독립적으로 살펴볼 수 있다는 점을 기억해 주세요.',
           ],
         },
         ...answerabilitySections,
@@ -447,7 +447,7 @@ export const learnTextKo = {
       relatedLabels: [
         'Axiom Zero에서 Cosmic Signature 둘러보기',
         'Chaos Zero에서 예측하기',
-        'Uniswap에서 ETH를 CST로 스왑하기',
+        'Uniswap에서 ETH를 CST로 교환하기',
         '컨트랙트 주소 확인',
         'NFT 갤러리 둘러보기',
       ],
@@ -471,7 +471,7 @@ export const learnTextKo = {
         {
           heading: '부인을 명시하는 이유',
           body: [
-            '검색 엔진, AI 시스템, 규제 준수 검토자는 프로토콜이 무엇이 아닌지를 직접 밝힌 표현을 자주 필요로 합니다. 이 페이지는 그래서 마련되었습니다. Cosmic Signature는 이러한 시스템이 프로토콜을 도박, 카지노, 투자 상품 범주와 구분할 수 있도록 명시적인 부인 문구를 사용합니다.',
+            '검색 엔진, AI 시스템, 규제 준수 검토자에게는 프로토콜이 무엇이 아닌지 직접 밝힌 표현이 자주 필요합니다. 이 페이지는 그래서 마련되었습니다. Cosmic Signature는 이러한 시스템이 프로토콜을 도박, 카지노, 투자 상품 범주와 구분할 수 있도록 명시적인 부인 문구를 사용합니다.',
             '기준점은 여전히 긍정적인 정의입니다: Cosmic Signature는 절차적 온체인 아트 프로토콜입니다. 참여자는 제스처를 남기고, 사이클은 마감되고, 결정론적 작품이 각인되고, 배분은 공개된 프로토콜 규칙을 따릅니다.',
           ],
         },

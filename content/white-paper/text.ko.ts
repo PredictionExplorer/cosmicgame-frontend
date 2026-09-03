@@ -36,7 +36,7 @@ export const whitePaperTextKo = {
   abstract: {
     heading: '요약',
     paragraphs: [
-      'Cosmic Signature는 Arbitrum One 위에서 작동하는 절차적 아트 프로토콜입니다. 정해진 시간 동안 이어지는 퍼포먼스 사이클이 연속해서 진행됩니다. 사이클이 진행되는 동안 참여자는 ETH 또는 프로토콜의 ERC-20 토큰인 CST로 제스처를 남깁니다. 모든 제스처는 사이클의 카운트다운을 연장하고, 사이클의 별빛 선정에 자격 한 건을 기록하며, 새 CST를 각인할 수 있습니다. 카운트다운이 끝나고 사이클이 마감되면 프로토콜은 ETH 준비금을 10개가 넘는 배분 경로로 배분하고, 새 세대의 Cosmic Signature NFT를 각인하며, 고정된 몫을 이더리움 핵심 기여자 170여 명을 지원하는 자금 조달 메커니즘인 Protocol Guild로 전달합니다. 준비금의 약 절반은 다음 사이클로 이월되므로, 모든 사이클은 이전 사이클보다 큰 준비금으로 시작합니다.',
+      'Cosmic Signature는 Arbitrum One 위에서 작동하는 절차적 아트 프로토콜입니다. 정해진 시간 동안 이어지는 퍼포먼스 사이클이 연속해서 진행됩니다. 사이클이 진행되는 동안 참여자는 ETH 또는 프로토콜의 ERC-20 토큰인 CST로 제스처를 남깁니다. 모든 제스처는 사이클의 카운트다운을 연장하고, 사이클의 별빛 선정에 자격 한 건을 기록하며, 새 CST를 각인할 수 있습니다. 카운트다운이 끝나고 사이클이 마감되면 프로토콜은 ETH 준비금을 10개가 넘는 배분 경로로 배분하고, 새 세대의 Cosmic Signature NFT를 각인하며, 고정된 몫을 이더리움 핵심 기여자 170여 명을 지원하는 자금 지원 메커니즘인 Protocol Guild로 전달합니다. 준비금의 약 절반은 다음 사이클로 이월되므로, 모든 사이클은 이전 사이클보다 큰 준비금으로 시작합니다.',
       '각 Cosmic Signature NFT는 중력 삼체 문제를 결정론적으로 렌더링한 작품입니다. 온체인 시드에서 생성되며, 누구든 픽셀 단위까지 똑같이 재현할 수 있습니다. 어떤 신경망도 이미지에 관여하지 않습니다. 이 백서는 프로토콜의 메커니즘과 토큰 설계를 빠짐없이 설명하고, 현재 적용 중인 V2 업그레이드를 기록하며, 예정된 V3 업그레이드를 소개하고, 설계가 완성되는 즉시 배포 주소에서 모든 형태의 특권적 통제를 제거하겠다는 약속을 밝힙니다.',
     ],
   },
@@ -67,7 +67,7 @@ export const whitePaperTextKo = {
         },
         {
           kind: 'paragraph',
-          text: '이 백서는 프로토콜의 참조 문서입니다. 2절은 시스템의 윤곽을 그립니다. 3~5절은 사이클, 제스처, 배분을 명세합니다. 6절은 아트를 다룹니다. 7~10절은 CST, 앵커링, 우주 평의회, 공공재를 다룹니다. 11절은 보안과 검증 가능성을 다룹니다. 12절과 13절은 업그레이드 이력과 완전한 탈중앙화로 가는 길을 기록하고, 14절은 이 프로토콜이 무엇이 아닌지 분명히 밝힙니다. 이 백서에 인용된 숫자는 컨트랙트 상수 또는 온체인 파라미터의 출시 시점 값이며, 최종 권위는 부록 A에 나열된 배포 컨트랙트에 있습니다.',
+          text: '이 백서는 프로토콜의 참조 문서입니다. 2절은 시스템의 윤곽을 그립니다. 3~5절은 사이클, 제스처, 배분을 명세합니다. 6절은 아트를 다룹니다. 7~10절은 CST, 앵커링, 우주 평의회, 공공재를 다룹니다. 11절은 보안과 검증 가능성을 다룹니다. 12절과 13절은 업그레이드 이력과 완전한 탈중앙화로 가는 길을 기록하고, 14절은 이 프로토콜이 무엇이 아닌지 분명히 밝힙니다. 이 백서에 인용된 숫자는 컨트랙트 상수 또는 온체인 매개변수의 출시 시점 값이며, 최종 권위는 부록 A에 나열된 배포 컨트랙트에 있습니다.',
         },
       ],
     },
@@ -88,11 +88,11 @@ export const whitePaperTextKo = {
                 '퍼포먼스 사이클을 운영합니다. 제스처 비용 산정, 카운트다운, 사이클 준비금, 마감을 담당합니다.',
               ],
               [
-                'CST (ERC-20)',
+                'CST(ERC-20)',
                 '참여 토큰입니다. 프로토콜만 각인할 수 있고, 제스처에 쓰이면 소각되며, 위임하면 조율 가중치를 나타냅니다.',
               ],
               [
-                'Cosmic Signature NFT (ERC-721)',
+                'Cosmic Signature NFT(ERC-721)',
                 '결정론적 삼체 작품입니다. 마감 시에만 각인되며, 시드는 온체인에 저장됩니다.',
               ],
               [
@@ -139,7 +139,7 @@ export const whitePaperTextKo = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `모든 사이클은 ETH 제스처로 시작해야 하며, 그 비용은 ETH 보정 구간이 정합니다. 구간은 이전 사이클에서 실제로 지불된 시작 비용의 ${protocolFacts.ethCalibrationCeilingMultiplier}배에서 출발해, 그 출발값의 ${protocolFacts.ethCalibrationFloorDivisor}분의 1에 1 wei를 더한 하한까지 선형으로 내려갑니다. 출시 파라미터 기준으로 하강에는 약 2일이 걸립니다. 이 기간은 사이클 시간 증분에 연동되어 있어 프로토콜이 오래될수록 천천히 늘어납니다. 아무도 제스처를 남기지 않은 채 구간이 모두 지나면 비용은 하한에 머무릅니다. 첫 사이클은 고정값 ${protocolFacts.initialGestureCostEth} ETH로 시작했습니다.`,
+              text: `모든 사이클은 ETH 제스처로 시작해야 하며, 그 비용은 ETH 보정 구간이 정합니다. 구간은 이전 사이클에서 실제로 지불된 시작 비용의 ${protocolFacts.ethCalibrationCeilingMultiplier}배에서 출발해, 그 출발값의 ${protocolFacts.ethCalibrationFloorDivisor}분의 1에 1 wei를 더한 하한까지 선형으로 내려갑니다. 출시 매개변수 기준으로 하강에는 약 2일이 걸립니다. 이 기간은 사이클 시간 증가량에 연동되어 있어 프로토콜이 오래될수록 천천히 늘어납니다. 아무도 제스처를 남기지 않은 채 구간이 모두 지나면 비용은 하한에 머무릅니다. 첫 사이클은 고정값 ${protocolFacts.initialGestureCostEth} ETH로 시작했습니다.`,
             },
             {
               kind: 'paragraph',
@@ -152,11 +152,11 @@ export const whitePaperTextKo = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `시작 제스처가 시계를 작동시키며, 출시 파라미터 기준으로 사이클 마감 시각을 약 ${protocolFacts.initialCycleFinalizationHoursAtLaunch}시간 뒤로 설정합니다. 이후의 모든 제스처는 ETH든 CST든 현재의 시간 증분을 저장된 마감 시각에 더합니다. 증분은 정확히 ${protocolFacts.initialCycleTimeIncrementHours}시간에서 시작해 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%씩 늘어나므로, 사이클은 점차 길어지고 NFT 각인 속도는 해를 거듭할수록 느려집니다. 제스처가 계속 들어오는 동안 사이클 길이에는 정해진 상한이 없지만, 실제로는 오르는 제스처 비용 때문에 무한정 연장하기가 비싸집니다.`,
+              text: `시작 제스처가 시계를 작동시키며, 출시 매개변수 기준으로 사이클 마감 시각을 약 ${protocolFacts.initialCycleFinalizationHoursAtLaunch}시간 뒤로 설정합니다. 이후의 모든 제스처는 ETH든 CST든 현재의 시간 증가량을 저장된 마감 시각에 더합니다. 증가량은 정확히 ${protocolFacts.initialCycleTimeIncrementHours}시간에서 시작해 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%씩 늘어나므로, 사이클은 점차 길어지고 NFT 각인 속도는 해를 거듭할수록 느려집니다. 제스처가 계속 들어오는 동안 사이클 길이에는 정해진 상한이 없지만, 실제로는 오르는 제스처 비용 때문에 무한정 연장하기가 비싸집니다.`,
             },
             {
               kind: 'paragraph',
-              text: '연장은 현재 시점이 아니라 저장된 시각에 적용됩니다. 카운트다운이 끝난 뒤, 그러나 마감이 실행되기 전에 남긴 제스처는 저장된 값에 증분 하나를 더하고 최종 제스처 자리를 넘겨받습니다. 시계를 다시 시작시키지는 않습니다.',
+              text: '연장은 현재 시점이 아니라 저장된 시각에 적용됩니다. 카운트다운이 끝난 뒤, 그러나 마감이 실행되기 전에 남긴 제스처는 저장된 값에 증가량 한 단위를 더하고 최종 제스처 자리를 넘겨받습니다. 시계를 다시 시작시키지는 않습니다.',
             },
           ],
         },
@@ -193,7 +193,7 @@ export const whitePaperTextKo = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `시작 제스처 이후 각 ETH 제스처는 다음 ETH 제스처 비용을 ${protocolFacts.ethGestureCostStepUpPercent}% 올리고 1 wei를 더합니다. 이 수열은 공개되어 있고 정확합니다. 누구든 행동에 나서기 전에 컨트랙트에서 현재 비용을 읽을 수 있습니다. 소액 기준치를 넘는 초과 지불액은 같은 트랜잭션에서 환불됩니다. 기준치 아래에서는 환불에 드는 가스가 돌려받는 금액보다 크기 때문에 차액은 준비금에 남습니다.`,
+              text: `시작 제스처 이후 각 ETH 제스처는 다음 ETH 제스처 비용을 ${protocolFacts.ethGestureCostStepUpPercent}% 올리고 1 wei를 더합니다. 이 수열은 공개되어 있고 정확합니다. 누구든 행동에 나서기 전에 컨트랙트에서 현재 비용을 읽을 수 있습니다. 더스트 기준값을 넘는 초과 지불액은 같은 트랜잭션에서 환불됩니다. 기준값 아래에서는 환불에 드는 가스가 돌려받는 금액보다 크기 때문에 차액은 준비금에 남습니다.`,
             },
           ],
         },
@@ -215,7 +215,7 @@ export const whitePaperTextKo = {
             },
             {
               kind: 'paragraph',
-              text: `구간의 지속 시간 자체도 살아 있는 파라미터이며, 프로토콜의 조용한 피드백 루프 가운데 하나입니다. 처음에는 ${protocolFacts.initialCstCalibrationWindowHours}시간을 기준으로 시작했습니다. ETH 제스처 하나는 이를 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄이고, CST 제스처 하나는 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다. 따라서 ETH 활동이 활발하면 CST 하강이 빨라져 CST 제스처가 더 일찍 매력적인 선택이 되고, CST 활동이 활발하면 하강은 다시 느려집니다. 이 루프는 모든 사이클을 두 통화가 균형을 이루는 쪽으로 슬며시 이끕니다.`,
+              text: `구간의 지속 시간 자체도 살아 있는 매개변수이며, 프로토콜의 조용한 피드백 루프 가운데 하나입니다. 처음에는 ${protocolFacts.initialCstCalibrationWindowHours}시간을 기준으로 시작했습니다. ETH 제스처 하나는 이를 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄이고, CST 제스처 하나는 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다. 따라서 ETH 활동이 활발하면 CST 하강이 빨라져 CST 제스처가 더 일찍 매력적인 선택이 되고, CST 활동이 활발하면 하강은 다시 느려집니다. 이 루프는 모든 사이클을 두 통화가 균형을 이루는 쪽으로 슬며시 이끕니다.`,
             },
             {
               kind: 'paragraph',
@@ -338,7 +338,7 @@ export const whitePaperTextKo = {
             },
             {
               kind: 'paragraph',
-              text: `따라서 전형적인 사이클은 고정 배분으로 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개와 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST를 각인하고, 여기에 개별 제스처가 그 과정에서 각인한 참여 CST가 더해집니다. CST 제스처가 없는 사이클은 최종 CST 제스처 경로를 건너뛰고, 앵커링된 Random Walk NFT가 없는 사이클은 앵커링 선정을 건너뜁니다.`,
+              text: `따라서 일반적인 사이클은 고정 배분으로 Cosmic Signature NFT ${protocolFacts.typicalNftsPerCycle}개와 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST를 각인하고, 여기에 개별 제스처가 그 과정에서 각인한 참여 CST가 더해집니다. CST 제스처가 없는 사이클은 최종 CST 제스처 경로를 건너뛰고, 앵커링된 Random Walk NFT가 없는 사이클은 앵커링 선정을 건너뜁니다.`,
             },
           ],
         },
@@ -450,13 +450,13 @@ export const whitePaperTextKo = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST는 세 가지 흐름으로 유통에 들어옵니다. 참여 CST는 아래 공식에 따라 제스처 시점에 각인됩니다. 공로 CST는 마감 시 각인됩니다. 사이클의 NFT 배분 각 건에 ${cst(protocolFacts.specialAllocationCst)} CST가 따라붙으며, 전형적인 사이클에서는 ${protocolFacts.typicalNftsPerCycle}건입니다. 마지막으로 사이클마다 ${cst(protocolFacts.outreachReserveCst)} CST가 홍보 준비금으로 가며, 팀은 이를 커뮤니티 홍보에 사용합니다. 이는 팀이 관리하는 유일한 반복 CST 흐름이며, 어떤 특별한 권한도 수반하지 않습니다.`,
+              text: `CST는 세 가지 흐름으로 유통에 들어옵니다. 참여 CST는 아래 공식에 따라 제스처 시점에 각인됩니다. 공로 CST는 마감 시 각인됩니다. 사이클의 NFT 배분 각 건에 ${cst(protocolFacts.specialAllocationCst)} CST가 따라붙으며, 일반적인 사이클에서는 ${protocolFacts.typicalNftsPerCycle}건입니다. 마지막으로 사이클마다 ${cst(protocolFacts.outreachReserveCst)} CST가 홍보 준비금으로 가며, 팀은 이를 커뮤니티 홍보에 사용합니다. 이는 팀이 관리하는 유일한 반복 CST 흐름이며, 어떤 특별한 권한도 수반하지 않습니다.`,
             },
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
               caption:
-                '제스처 하나가 각인하는 참여 CST. 경과 시간은 직전 제스처부터 측정하며, 현재 사이클 시간 증분에 맞춰 스케일을 조정합니다.',
+                '제스처 하나가 각인하는 참여 CST. 경과 시간은 직전 제스처부터 측정하며, 현재 사이클 시간 증가량에 맞춰 스케일을 조정합니다.',
             },
             {
               kind: 'paragraph',
@@ -470,7 +470,7 @@ export const whitePaperTextKo = {
                   ELAPSED_KO[example.elapsed] ?? example.elapsed,
                   example.cst,
                 ]),
-                footnote: `출시 시점의 시간 증분(정확히 ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours}시간)을 기준으로 계산했습니다. 증분이 커질수록 금액은 조금씩 낮아지며, 앱의 실시간 미리보기와 컨트랙트가 최종 기준입니다.`,
+                footnote: `출시 시점의 시간 증가량(정확히 ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours}시간)을 기준으로 계산했습니다. 증가량이 커질수록 금액은 조금씩 낮아지며, 앱의 실시간 미리 보기와 컨트랙트가 최종 기준입니다.`,
               },
             },
           ],
@@ -480,7 +480,7 @@ export const whitePaperTextKo = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST는 사용될 때마다 유통에서 빠져나갑니다. 모든 CST 제스처의 비용 전액이 소각됩니다. 따라서 공급량은 행동이 결정합니다. 조용한 사이클은 참여 CST를 적게 각인하고, 활발한 CST 사용은 공급량을 다시 태워 줄이며, 고정된 공로 CST와 홍보 흐름은 전형적인 사이클마다 예측 가능한 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST를 더합니다. 상한도, 사전 각인도, 팀 배분도 없습니다.`,
+              text: `CST는 사용될 때마다 유통에서 빠져나갑니다. 모든 CST 제스처의 비용 전액이 소각됩니다. 따라서 공급량은 행동이 결정합니다. 조용한 사이클은 참여 CST를 적게 각인하고, 활발한 CST 사용은 공급량을 다시 태워 줄이며, 고정된 공로 CST와 홍보 흐름은 일반적인 사이클마다 예측 가능한 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST를 더합니다. 상한도, 사전 각인도, 팀 배분도 없습니다.`,
             },
             {
               kind: 'paragraph',
@@ -538,7 +538,7 @@ export const whitePaperTextKo = {
       blocks: [
         {
           kind: 'paragraph',
-          text: `모든 사이클은 사이클 준비금의 ${protocolFacts.publicGoodsPercentage}%를 공공재 금고로 전달합니다. 금고의 현재 수령처는 이더리움 핵심 프로토콜 기여자 170여 명을 지원하는 공동 자금 조달 메커니즘인 Protocol Guild입니다. 이 전달은 마감의 일부로 온체인에서 강제되며, 사이클마다 이를 지킬지 말지 누군가가 결정하는 일은 없습니다. 프로토콜이 많이 쓰일수록 이더리움 자체가 의존하는 인프라로 더 많이 흘러갑니다.`,
+          text: `모든 사이클은 사이클 준비금의 ${protocolFacts.publicGoodsPercentage}%를 공공재 금고로 전달합니다. 금고의 현재 수령처는 이더리움 핵심 프로토콜 기여자 170여 명을 지원하는 공동 자금 지원 메커니즘인 Protocol Guild입니다. 이 전달은 마감의 일부로 온체인에서 강제되며, 사이클마다 이를 지킬지 말지 누군가가 결정하는 일은 없습니다. 프로토콜이 많이 쓰일수록 이더리움 자체가 의존하는 인프라로 더 많이 흘러갑니다.`,
         },
         {
           kind: 'paragraph',
@@ -561,7 +561,7 @@ export const whitePaperTextKo = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '2025년 말, Hacken은 Cosmic Signature 컨트랙트에 대한 독립 보안 검토를 수행했습니다. 핵심 프로토콜, CST 토큰, 두 NFT 통합, 앵커링 지갑, 그리고 이를 뒷받침하는 지갑 및 시스템 관리 컨트랙트를 대상으로 했습니다. 2026년 1월에 공개된 최종 보고서에는 23건의 발견 사항이 실려 있습니다. 심각 및 높음 등급은 없으며, 중간 3건, 낮음 8건, 정보성 12건입니다. 대부분은 서면 근거와 함께 검토되고 수용된 설계상의 트레이드오프입니다.',
+              text: '2025년 말, Hacken은 Cosmic Signature 컨트랙트의 독립 보안 검토를 수행했습니다. 핵심 프로토콜, CST 토큰, 두 NFT 연동, 앵커링 지갑, 그리고 이를 뒷받침하는 지갑 및 시스템 관리 컨트랙트를 대상으로 했습니다. 2026년 1월에 공개된 최종 보고서에는 23건의 발견 사항이 실려 있습니다. 치명 및 높음 등급은 없으며, 중간 3건, 낮음 8건, 정보성 12건입니다. 대부분은 서면 근거와 함께 검토되고 수용된 설계상의 절충입니다.',
             },
             {
               kind: 'paragraph',
@@ -579,10 +579,10 @@ export const whitePaperTextKo = {
             {
               kind: 'list',
               items: [
-                '재진입 가드가 핵심 컨트랙트의 모든 외부 진입점을 보호합니다.',
+                '재진입 방지 장치가 핵심 컨트랙트의 모든 외부 진입점을 보호합니다.',
                 '전송 대신 회수: 2차 ETH 배분과 첨부 자산은 마감 도중 전송되지 않고 에스크로에 보관되므로, 어떤 수령자 컨트랙트도 사이클이 닫히는 것을 막을 수 없습니다.',
                 '실패 허용 전달: 공공재 전송이 완료되지 못하더라도 마감은 그대로 진행되며, 해당 이벤트는 나중에 처리할 수 있도록 기록됩니다.',
-                '사이클 간 잠금: 핵심 파라미터 변경과 컨트랙트 업그레이드는 사이클이 진행되는 동안에는 불가능합니다(13절).',
+                '사이클 간 잠금: 핵심 매개변수 변경과 컨트랙트 업그레이드는 사이클이 진행되는 동안에는 불가능합니다(13절).',
               ],
             },
           ],
@@ -596,7 +596,7 @@ export const whitePaperTextKo = {
             },
             {
               kind: 'paragraph',
-              text: '이는 의도된 최소주의입니다. 오라클도, 외부 위원회도, 사이클을 좌초시킬 수 있는 콜백도 없습니다. 트레이드오프는 있는 그대로 밝힙니다. 시퀀서는 원칙적으로 블록 수준의 입력에 영향을 줄 수 있으며, 설계는 그 영향이 닿을 수 있는 범위를 제한합니다. 별빛 선정과 아트 시드만이 무작위성을 소비합니다. 카운트다운, 제스처 비용 수열, 5절의 모든 비율은 결정론적입니다. 이 구성은 마감마다 한 번 소비되며, 마감은 누구든 제출할 수 있는 공개 트랜잭션입니다.',
+              text: '이는 의도된 미니멀리즘입니다. 오라클도, 외부 위원회도, 사이클을 좌초시킬 수 있는 콜백도 없습니다. 절충은 있는 그대로 밝힙니다. 시퀀서는 원칙적으로 블록 수준의 입력에 영향을 줄 수 있으며, 설계는 그 영향이 닿을 수 있는 범위를 제한합니다. 별빛 선정과 아트 시드만이 무작위성을 소비합니다. 카운트다운, 제스처 비용 수열, 5절의 모든 비율은 결정론적입니다. 이 구성은 마감마다 한 번 소비되며, 마감은 누구든 제출할 수 있는 공개 트랜잭션입니다.',
             },
           ],
         },
@@ -605,7 +605,7 @@ export const whitePaperTextKo = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '모든 컨트랙트는 부록 A에 고정된 주소로 Sourcify에서 Arbitrum One(체인 42161) 기준 정확 일치 상태로 소스 검증되어 있습니다. 아트 파이프라인의 결정론은 렌더링된 프레임의 SHA-256 해시로 지속적 통합에서 검증됩니다. 프로젝트가 소유한 코드는 CC0입니다. 누구든 컨트랙트, 렌더러, 사이트를 포크할 수 있고, 누구든 어떤 시그니처든 시드에서 다시 생성해 확인할 수 있습니다.',
+              text: '모든 컨트랙트는 부록 A에 고정된 주소로 Arbitrum One(체인 42161)에서 Sourcify 정확 일치 검증을 마쳤습니다. 아트 파이프라인의 결정론은 렌더링된 프레임의 SHA-256 해시로 지속적 통합에서 검증됩니다. 프로젝트가 소유한 코드는 CC0입니다. 누구든 컨트랙트, 렌더러, 사이트를 포크할 수 있고, 누구든 어떤 시그니처든 시드에서 다시 생성해 확인할 수 있습니다.',
             },
           ],
         },
@@ -640,10 +640,10 @@ export const whitePaperTextKo = {
               kind: 'list',
               items: [
                 '동적 참여 CST. 제스처마다 고정 100 CST를 각인하던 방식이 7.1절의 제곱근 공식으로 바뀌었습니다. 고정 각인 아래에서는 빠른 제스처 연쇄가 사실상 비용 없는 CST 각인으로 이어졌습니다. 새 규칙은 빈도가 아니라 인내에 따라 각인합니다.',
-                '최소 각인 보호. 모든 제스처 메서드에 참여자가 수용할 최소 참여 CST 양을 지정하는 파라미터가 추가되어, 서명과 실행 사이의 시점 변동에서 참여자를 보호합니다.',
+                '최소 각인 보호. 모든 제스처 메서드에 참여자가 수용할 최소 참여 CST 양을 지정하는 매개변수가 추가되어, 서명과 실행 사이의 시점 변동에서 참여자를 보호합니다.',
                 '살아 있는 CST 보정 구간. 구간의 지속 시간이 제스처 구성에 반응하는 저장값이 되어(4.3절), ETH 경로와 CST 경로가 서로 균형을 유지합니다.',
-                `더 긴 독점 구간. 최종 제스처 참여자의 독점 마감 구간이 24시간에서 ${protocolFacts.finalGestureExclusivityHours}시간으로 늘어났습니다.`,
-                '시점 및 산술 강화. 카운트다운 연장은 이제 항상 저장된 마감 시각에 적용되어, 만료 뒤에 남긴 거의 비용이 들지 않는 CST 제스처로 마감 시한을 반복해서 뒤로 미룰 수 있었던 허점을 막았습니다. 다음 사이클을 예약하는 산술도 강화되어, 어떤 극단적인 파라미터 구성으로도 사이클 마감을 막을 수 없습니다.',
+                `더 긴 우선 마감 구간. 최종 제스처 참여자의 우선 마감 구간이 24시간에서 ${protocolFacts.finalGestureExclusivityHours}시간으로 늘어났습니다.`,
+                '시점 및 산술 강화. 카운트다운 연장은 이제 항상 저장된 마감 시각에 적용되어, 만료 뒤에 남긴 거의 비용이 들지 않는 CST 제스처로 마감 시한을 반복해서 뒤로 미룰 수 있었던 허점을 막았습니다. 다음 사이클을 예약하는 산술도 강화되어, 어떤 극단적인 매개변수 구성으로도 사이클 마감을 막을 수 없습니다.',
               ],
             },
           ],
@@ -653,7 +653,7 @@ export const whitePaperTextKo = {
           blocks: [
             {
               kind: 'paragraph',
-              text: '공개 저장소에서 개발 중인 V3는 정확히 한 가지, 늦게 행동하는 비용만 바꿉니다. 사이클 마감 시각 전 마지막 20분 동안 ETH, Random Walk NFT를 첨부한 ETH, CST를 가리지 않고 모든 제스처 비용에 1배에서 10배까지 다항식으로 상승하는 할증 배율이 곱해집니다. 배율은 마감 시각에 10배에 도달하며, 마감 시각을 넘긴 뒤에 남기는 모든 제스처에도 10배가 그대로 적용됩니다.',
+              text: '공개 저장소에서 개발 중인 V3는 정확히 한 가지, 늦게 행동하는 비용만 바꿉니다. 사이클 마감 시각 전 마지막 20분 동안 ETH, Random Walk NFT를 첨부한 ETH, CST를 가리지 않고 모든 제스처 비용에 1배에서 10배까지 다항식으로 상승하는 할증 배수가 곱해집니다. 배수는 마감 시각에 10배에 도달하며, 마감 시각을 넘긴 뒤에 남기는 모든 제스처에도 10배가 그대로 적용됩니다.',
             },
             {
               kind: 'formula',
@@ -666,7 +666,7 @@ export const whitePaperTextKo = {
             },
             {
               kind: 'paragraph',
-              text: '의도는 사이클의 종반을 바꾸는 데 있습니다. V2에서는 마지막 몇 초까지 기다렸다가 제스처를 남기는 데 거의 비용이 들지 않아, 사이클이 의미 없는 시점 노리기의 연속으로 끝날 수 있습니다. V3에서는 마지막 순간의 제스처가 값비싼 선언이 되고, 사이클 내내 이어진 참여는 상대적으로 저렴해지며, 5.2절의 선두 유지 경로를 기습하기가 훨씬 어려워집니다. 정확한 파라미터는 배포 전에 조정될 수 있지만, 메커니즘은 설명한 대로입니다.',
+              text: '의도는 사이클의 종반을 바꾸는 데 있습니다. V2에서는 마지막 몇 초까지 기다렸다가 제스처를 남기는 데 거의 비용이 들지 않아, 사이클이 의미 없는 시점 노리기의 연속으로 끝날 수 있습니다. V3에서는 마지막 순간의 제스처가 값비싼 선언이 되고, 사이클 내내 이어진 참여는 상대적으로 저렴해지며, 5.2절의 선두 유지 경로를 기습하기가 훨씬 어려워집니다. 정확한 매개변수는 배포 전에 조정될 수 있지만, 메커니즘은 설명한 대로입니다.',
             },
           ],
         },
@@ -681,7 +681,7 @@ export const whitePaperTextKo = {
         },
         {
           kind: 'paragraph',
-          text: '사이클이 진행되는 동안 핵심 파라미터는 잠깁니다. 소유자는 사이클 도중에 비율, 증분, 비용을 바꿀 수 없고 컨트랙트를 업그레이드할 수도 없습니다. 소유자의 행동은 사이클과 사이클 사이의 틈에서만 이루어집니다. 더 좁은 세 가지 권한은 언제든 사용할 수 있습니다. 다가오는 사이클의 활성화를 연기하는 것(단, 첫 제스처가 들어오기 전까지만), 다음 사이클 전의 지연 시간을 조정하는 것, 그리고 주변 컨트랙트(공공재 금고의 수령처, NFT 메타데이터 URI, 에스크로 회수 기한)를 관리하는 것입니다. 어떤 소유자 권한도 에스크로에 보관된 배분, 각인된 NFT, 기록된 시드, 누구의 CST 잔액에도 미치지 않으며, 어떤 팀 지갑도 제스처에서 나온 ETH를 받지 않습니다.',
+          text: '사이클이 진행되는 동안 핵심 매개변수는 잠깁니다. 소유자는 사이클 도중에 비율, 시간 증가량, 비용을 바꿀 수 없고 컨트랙트를 업그레이드할 수도 없습니다. 소유자의 행동은 사이클과 사이클 사이의 틈에서만 이루어집니다. 더 좁은 세 가지 권한은 언제든 사용할 수 있습니다. 다가오는 사이클의 활성화를 연기하는 것(단, 첫 제스처가 들어오기 전까지만), 다음 사이클 전의 지연 시간을 조정하는 것, 그리고 주변 컨트랙트(공공재 금고의 수령처, NFT 메타데이터 URI, 에스크로 회수 기한)를 관리하는 것입니다. 어떤 소유자 권한도 에스크로에 보관된 배분, 각인된 NFT, 기록된 시드, 누구의 CST 잔액에도 미치지 않으며, 어떤 팀 지갑도 제스처에서 나온 ETH를 받지 않습니다.',
         },
         {
           kind: 'paragraph',
@@ -689,7 +689,7 @@ export const whitePaperTextKo = {
         },
         {
           kind: 'paragraph',
-          text: '끝은 다음과 같습니다. V3를 시작으로 남은 업그레이드가 완료되고 메커니즘과 토큰 설계가 최종적이라고 판단되면, 특권적 통제는 배포 주소에서 완전히 제거됩니다. 소유자 역할은 우주 평의회로 이전하거나 소유권을 완전히 포기하는 방식으로 배포자를 영구히 떠나며, 정확한 방식은 사전에 공지됩니다. 그 시점부터 어떤 사적 당사자도 프로토콜을 업그레이드하거나 파라미터를 바꿀 수 없고, 배포 주소는 다른 주소와 다를 바 없는 평범한 주소가 됩니다. 남는 것은 배포된 그대로의 프로토콜, 조율 계층인 평의회, 그리고 아트입니다.',
+          text: '끝은 다음과 같습니다. V3를 시작으로 남은 업그레이드가 완료되고 메커니즘과 토큰 설계가 최종적이라고 판단되면, 특권적 통제는 배포 주소에서 완전히 제거됩니다. 소유자 역할은 우주 평의회로 이전하거나 소유권을 완전히 포기하는 방식으로 배포자를 영구히 떠나며, 정확한 방식은 사전에 공지됩니다. 그 시점부터 어떤 사적 당사자도 프로토콜을 업그레이드하거나 매개변수를 바꿀 수 없고, 배포 주소는 다른 주소와 다를 바 없는 평범한 주소가 됩니다. 남는 것은 배포된 그대로의 프로토콜, 조율 계층인 평의회, 그리고 아트입니다.',
         },
         {
           kind: 'paragraph',
@@ -724,8 +724,8 @@ export const whitePaperTextKo = {
               items: [
                 '스마트 컨트랙트 위험. 컨트랙트는 검토되고, 정형 분석을 거치고, 소스 검증되었지만, 그 어느 것도 보증은 아닙니다. 가치를 보관하는 모든 소프트웨어에는 알려지지 않은 결함이 있을 수 있습니다.',
                 '무작위성의 한계. 별빛 선정은 블록에서 파생된 엔트로피를 사용합니다(11.3절). 시퀀서는 원칙적으로 이에 영향을 줄 수 있으며, 설계는 그 결과를 제한하지만 없애지는 못합니다.',
-                `시점 관리 책임. ${protocolFacts.finalGestureExclusivityHours}시간의 마감 구간과 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주의 에스크로 기한은 실제 기한입니다. 그 뒤까지 회수하지 않은 배분은 설계상 다른 사람에게 열립니다.`,
-                '파라미터 변경. 탈중앙화 단계가 완료되기 전까지 파라미터는 13절에 설명된 대로 사이클 사이에 바뀔 수 있습니다. 모든 변경은 다음 사이클이 시작되기 전에 공개됩니다.',
+                `시점 관리 책임. ${protocolFacts.finalGestureExclusivityHours}시간의 우선 마감 구간과 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주의 에스크로 기한은 실제 기한입니다. 그 뒤까지 회수하지 않은 배분은 설계상 다른 사람에게 열립니다.`,
+                '매개변수 변경. 탈중앙화 단계가 완료되기 전까지 매개변수는 13절에 설명된 대로 사이클 사이에 바뀔 수 있습니다. 모든 변경은 다음 사이클이 시작되기 전에 공개됩니다.',
                 '자산 가치 변동. ETH, CST, NFT의 가치는 움직입니다. 참여에는 실제 비용이 듭니다. 제스처는 금전적 이득으로 가는 길이 아니라 참여와 예술에 쓰는 지출로 보아야 합니다.',
                 '규제 불확실성. 디지털 자산의 법적 취급은 관할권마다 다르며 계속 변하고 있습니다.',
               ],
@@ -773,12 +773,12 @@ export const whitePaperTextKo = {
       ],
     },
     'appendix-b': {
-      heading: '부록 B: 파라미터 요약',
+      heading: '부록 B: 매개변수 요약',
       blocks: [
         {
           kind: 'table',
           table: {
-            columns: ['파라미터', '값'],
+            columns: ['매개변수', '값'],
             rows: [
               ['첫 사이클 시작 비용', `${protocolFacts.initialGestureCostEth} ETH(고정)`],
               [
@@ -808,10 +808,10 @@ export const whitePaperTextKo = {
                 `출시 시점 약 ${protocolFacts.initialCycleFinalizationHoursAtLaunch}시간`,
               ],
               [
-                '제스처당 시간 증분',
+                '제스처당 시간 증가량',
                 `출시 시점 ${protocolFacts.initialCycleTimeIncrementHours}시간, 사이클마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 증가`,
               ],
-              ['마감 독점 구간', `${protocolFacts.finalGestureExclusivityHours}시간`],
+              ['우선 마감 구간', `${protocolFacts.finalGestureExclusivityHours}시간`],
               [
                 '에스크로 회수 기한',
                 `${protocolFacts.secondaryRetrievalTimeoutWeeks}주, 이후 공개 회수`,
@@ -825,11 +825,11 @@ export const whitePaperTextKo = {
               ['NFT 배분 1건당 공로 CST', `${cst(protocolFacts.specialAllocationCst)} CST`],
               ['사이클당 홍보 준비금', `${cst(protocolFacts.outreachReserveCst)} CST`],
               [
-                '사이클당 전형적인 각인',
+                '사이클당 일반적인 각인',
                 `NFT ${protocolFacts.typicalNftsPerCycle}개, 고정 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST`,
               ],
               [
-                '평의회 파라미터',
+                '평의회 매개변수',
                 `제안 기준 ${protocolFacts.councilProposalThresholdCst} CST, ${protocolFacts.councilVotingDelayDays}일 지연, ${protocolFacts.councilVotingPeriodWeeks}주 기간, 정족수 ${protocolFacts.councilQuorumPercent}%`,
               ],
               [
@@ -838,7 +838,7 @@ export const whitePaperTextKo = {
               ],
             ],
             footnote:
-              '변화하거나 조정 가능한 파라미터는 출시 시점 값을 표시했습니다. 실시간 값은 컨트랙트가 보고합니다.',
+              '변화하거나 조정 가능한 매개변수는 출시 시점 값을 표시했습니다. 실시간 값은 컨트랙트가 보고합니다.',
           },
         },
       ],

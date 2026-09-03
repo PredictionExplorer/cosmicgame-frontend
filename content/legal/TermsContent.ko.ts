@@ -35,7 +35,7 @@ export const termsCopyKo = {
         {
           id: 'wallet',
           subtitle: '지갑 관리 책임',
-          text: 'Web3 지갑과 개인 키의 보안을 유지하는 책임은 전적으로 사용자에게 있습니다. Cosmic Signature는 개인 키나 시드 문구를 절대 요구하지 않습니다. 지갑에 접근할 수 없게 되면 NFT와 자금을 영구적으로 잃을 수 있습니다.',
+          text: 'Web3 지갑과 개인 키의 보안을 유지하는 책임은 전적으로 사용자에게 있습니다. Cosmic Signature는 개인 키나 시드 구문을 절대 요구하지 않습니다. 지갑에 접근할 수 없게 되면 NFT와 자금을 영구적으로 잃을 수 있습니다.',
         },
         {
           id: 'compliance',
@@ -122,7 +122,7 @@ export const termsCopyKo = {
         {
           id: 'anchored-selection',
           subtitle: '앵커링 NFT 별빛 선정',
-          text: `별빛 선정으로 정해진 RandomWalk NFT 앵커링 보유자 ${protocolFacts.anchoredRwlkNftSelectionRecipients}명이 각각 공로 CST ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')}개와 Cosmic Signature NFT 1개를 받습니다.`,
+          text: `별빛 선정으로 정해진 Random Walk NFT 앵커링 보유자 ${protocolFacts.anchoredRwlkNftSelectionRecipients}명이 각각 공로 CST ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')}개와 Cosmic Signature NFT 1개를 받습니다.`,
         },
         {
           id: 'anchor-distribution',

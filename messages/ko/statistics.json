@@ -66,7 +66,7 @@
     "jsonLd": {
       "webPageName": "Cosmic Signature 프로토콜 통계",
       "webPageDescription": "Arbitrum 위 Cosmic Signature 프로토콜의 공개 통계입니다. 퍼포먼스 사이클 상태, 제스처, NFT, CST, 앵커링, 준비금, 배분 데이터를 포함합니다.",
-      "datasetName": "Cosmic Signature 프로토콜 통계 스냅샷",
+      "datasetName": "Cosmic Signature 프로토콜 통계 스냅숏",
       "datasetDescription": "Arbitrum 스마트 컨트랙트와 Cosmic Signature API에서 인덱싱한 공개 프로토콜 활동을 크롤링 가능한 형태로 요약한 데이터입니다."
     },
     "seo": {
@@ -134,7 +134,7 @@
       "tooltip": "선정된 수령자가 별빛 선정 풀에서 회수한 ETH 총액입니다."
     },
     "totalSupplyErc20": {
-      "label": "총 공급량 (ERC-20)",
+      "label": "총 공급량(ERC-20)",
       "tooltip": "참여와 조율에 쓰이는 ERC-20 토큰인 CST의 현재 총 공급량입니다."
     },
     "totalCstConsumed": {
@@ -190,7 +190,7 @@
       "tooltip": "현재 Cosmic Signature NFT를 한 개 이상 보유한 고유 지갑 주소입니다."
     },
     "cstErc20Holders": {
-      "label": "CST (ERC-20) 보유자",
+      "label": "CST(ERC-20) 보유자",
       "tooltip": "현재 CST ERC-20 토큰을 보유한 고유 지갑 주소입니다."
     },
     "attachedNfts": {
@@ -199,7 +199,7 @@
     },
     "publicGoodsBalance": {
       "label": "공공재 잔액",
-      "tooltip": "공공재 수령처에 배분되었으며 인덱싱된 프로토콜 잔액에 아직 반영되어 있는 ETH입니다."
+      "tooltip": "공공재 수령처에 배분되었지만 인덱싱된 프로토콜 잔액에 아직 반영되어 있는 ETH입니다."
     },
     "totalContributedEth": {
       "label": "총 기여 ETH",
@@ -349,8 +349,8 @@
   },
   "tokens": {
     "sections": {
-      "nftDistribution": "Cosmic Signature NFT (ERC-721)",
-      "cstDistribution": "CST (ERC-20) 잔액 분포",
+      "nftDistribution": "Cosmic Signature NFT(ERC-721)",
+      "cstDistribution": "CST(ERC-20) 잔액 분포",
       "totalSupply": "CST 총 공급량",
       "attachedDistribution": "첨부 토큰 분포",
       "attachedAssets": "첨부 자산"
@@ -371,8 +371,8 @@
     "scopeAria": "첨부된 NFT 범위",
     "scopeAll": "모든 사이클",
     "scopeCurrent": "현재 사이클",
-    "nftTab": "NFT (ERC-721)",
-    "erc20Tab": "토큰 (ERC-20)",
+    "nftTab": "NFT(ERC-721)",
+    "erc20Tab": "토큰(ERC-20)",
     "nftLoadError": "첨부된 NFT를 불러오지 못했습니다",
     "erc20LoadError": "첨부된 ERC-20 토큰을 불러오지 못했습니다",
     "serviceError": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
@@ -396,8 +396,8 @@
       },
       "minimumGestures": "최소 제스처 수",
       "cstOnly": "(CST만 사용)",
-      "cstOnlyTooltip": "ETH 지출 없음 (CST만 사용한 참여자)",
-      "noEthReceivedTooltip": "아직 돌려받은 ETH가 없습니다. 이 참여자는 지금까지 ETH 배분을 받지 않았습니다",
+      "cstOnlyTooltip": "ETH 지출 없음(CST만 사용한 참여자)",
+      "noEthReceivedTooltip": "아직 받은 ETH가 없습니다. 이 참여자는 지금까지 ETH 배분을 받지 않았습니다",
       "loadErrorTitle": "성과 순위표를 불러오지 못했습니다",
       "loadErrorMessage": "통계 서비스가 응답하지 않았습니다. 잠시 후 다시 시도해 주세요.",
       "empty": "이 필터에 해당하는 참여자가 아직 없습니다.",
@@ -405,9 +405,9 @@
         "participant": "참여자",
         "allocationRate": "배분율",
         "gestures": "제스처",
-        "spent": "지출 (ETH)",
-        "received": "수령 (ETH)",
-        "net": "순액 (ETH)",
+        "spent": "지출(ETH)",
+        "received": "수령(ETH)",
+        "net": "순액(ETH)",
         "netPercent": "순증감률",
         "allocations": "배분"
       }
@@ -530,7 +530,7 @@
       "newRecord": "신기록",
       "roleEndurance": " (수호 챔피언)",
       "roleNewRecord": " (신기록)",
-      "stintAria": "{address} • {duration} 선두 유지 • 사이클 시작 후 {from} → {to}{role}",
+      "stintAria": "{address} · {duration} 선두 유지 · 사이클 시작 후 {from} → {to}{role}",
       "description": "각 막대는 하나의 선두 유지 구간으로, 한 주소가 제스처를 남긴 뒤 다음 제스처가 들어오기까지 선두를 지킨 시간을 나타냅니다. 막대가 넓을수록 선두를 오래 지킨 것입니다. 앰버색 테두리 막대는 당시 최장 선두 신기록을 세운 구간이고, 보라색 막대는 전체에서 가장 긴 단일 선두 유지 구간(수호 챔피언), 장미색 행은 그 지위를 전체적으로 가장 오래 지킨 참여자(시간의 전사)입니다. 막대에 마우스를 올리면 상세 정보가 표시됩니다.",
       "selectCycle": "살펴볼 사이클을 선택해 주세요.",
       "loadErrorTitle": "선두 유지 기록을 불러오지 못했습니다",
@@ -616,7 +616,7 @@
     "connectedTitle": "내 배분 내역",
     "subtitle": "지난 배분 회수 및 수령 내역 보기",
     "disconnectedDescription": "모든 Cosmic Signature 퍼포먼스 사이클에 걸친 전체 배분 내역을 확인할 수 있습니다. 시그니처 배분 회수, ETH 별빛 선정 배분, Cosmic Signature NFT 배분, 앵커링 지급이 포함됩니다.",
-    "connectedDescription": "모든 Cosmic Signature 퍼포먼스 사이클에 걸친 전체 배분 내역을 확인할 수 있습니다. 시그니처 배분 회수, 별빛 선정 ETH 배분, Cosmic Signature NFT 배분, 앵커링 지급이 포함됩니다.",
+    "connectedDescription": "모든 Cosmic Signature 퍼포먼스 사이클에 걸친 전체 배분 내역을 확인할 수 있습니다. 시그니처 배분 회수, ETH 별빛 선정 배분, Cosmic Signature NFT 배분, 앵커링 지급이 포함됩니다.",
     "walletTitle": "지갑이 연결되지 않았습니다",
     "walletDescription": "배분 내역을 보려면 지갑을 연결해 주세요.",
     "loadError": "배분 내역을 불러오지 못했습니다",
@@ -702,7 +702,7 @@
       "initialFinalizationDivisor": "초기 사이클 마감 시각을 구하는 제수(mainPrizeTimeIncrementInMicroSeconds / 제수)가 변경되었습니다.",
       "treasurerAddress": "홍보 지갑 주소가 변경되었습니다.",
       "activationTime": "사이클 활성화 시각이 변경되었습니다.",
-      "cstCalibrationLength": "시작 CST 보정 구간의 길이가 변경되었습니다.",
+      "cstCalibrationLength": "사이클 시작 CST 보정 구간의 길이가 변경되었습니다.",
       "erc20Multiplier": "ERC-20 토큰 배분 배수가 변경되었습니다.",
       "minimumCstGestureCost": "CST 시작 제스처 비용의 최소 한도가 변경되었습니다.",
       "outreachAllocationPercentage": "홍보 배분에 지정된 자금의 배분 비율이 변경되었습니다.",
@@ -780,7 +780,7 @@
         "used": "사용된 RandomWalk NFT",
         "discount": "일회성 할인",
         "scope": "사용 범위",
-        "scopeValue": "NFT당 제스처 한 번"
+        "scopeValue": "NFT당 제스처 1회"
       },
       "links": {
         "imprint": "RandomWalk NFT 각인",

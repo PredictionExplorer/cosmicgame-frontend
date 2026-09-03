@@ -440,51 +440,74 @@ wire label `Round` maps to 사이클, never 라운드.
 Terms the English copy uses without coining them, fixed here the first time a Korean
 sentence needed them so every surface says the same thing:
 
-| English                                    | 한국어                                 | Notes                                                              |
-| ------------------------------------------ | -------------------------------------- | ------------------------------------------------------------------ |
-| time increment                             | 시간 증가량                            |                                                                    |
-| exclusivity window (Final Gesture)         | 우선 마감 구간                         | parallel to 공개 마감 구간; never bare 우선 구간                   |
-| finalizer                                  | 마감 실행자                            |                                                                    |
-| cycle beneficiary                          | 사이클 수령자                          | 수혜자 is drift; 시그니처 배분 수령자 when the role is spelled out |
-| Allocations Wallet / escrow                | 배분 지갑 / 에스크로                   |                                                                    |
-| Public Goods Vault                         | 공공재 금고                            |                                                                    |
-| calibration ceiling / floor                | 보정 상한 / 하한                       |                                                                    |
-| Minimum CST Reward Protection              | 최소 참여 CST 보호                     | the "reward" is 참여 CST, never 보상                               |
-| Recognition CST imprint of 1,000 CST       | 공로 CST 1,000개                       | counter form; never 1,000 CST의 공로 CST                           |
-| Stellar Selection entry / draw             | 별빛 선정 자격 / 선정                  | "with replacement" → 복원 추출 (statistics term)                   |
-| Selection stage (art pipeline, Borda)      | 선별                                   | keeps 선정 for 별빛 선정                                           |
-| RandomWalk discount / cost reduction       | 할인                                   | never 감면                                                         |
-| burn (CST) / consumed (statistics)         | 소각 / 소모                            | mirrors the English distinction                                    |
-| leaderboard / live standings               | 순위표 / 실시간 현황                   | 리더보드 has a gaming flavor                                       |
-| free (a gesture may become free)           | 비용 없음 / 비용 없이                  | reframe; never 무료 as a selling word                              |
-| Next Cycle Seed (reserve share)            | 다음 사이클 이월분                     | 시드 is reserved for the RNG seed                                  |
-| Net % / Spent / Received / Net             | 순증감률 / 지출 / 수령 / 순액          | never 수익률                                                       |
-| Gesture Duration / Champion Time / reign   | 유지 시간 / 선두 유지 시간 / 유지 기간 |                                                                    |
-| (You) badge                                | (나)                                   |                                                                    |
-| Amount (ETH) / Amount (token quantity)     | 금액 / 수량                            |                                                                    |
-| From / To (transfers)                      | 보낸 주소 / 받는 주소                  |                                                                    |
-| treasurer (Outreach Reserve)               | 재무 담당자                            |                                                                    |
-| Unavailable (metric fallback)              | 확인 불가                              | 데이터 없음 is the empty state                                     |
-| Deck / Observatory                         | 관측소                                 |                                                                    |
-| How It Works (marketing steps section)     | 참여 방법                              | the page itself stays 작동 원리                                    |
-| Bucket / Interpolation                     | 집계 단위 / 보간                       |                                                                    |
-| divisor                                    | 제수                                   |                                                                    |
-| block explorer                             | 블록 탐색기                            |                                                                    |
-| prediction market                          | 예측 시장                              |                                                                    |
-| ecosystem                                  | 생태계                                 |                                                                    |
-| Governance Surface (Council)               | 조율 기구                              | 거버넌스 is drift                                                  |
-| Digital Collectible                        | 디지털 수집품                          |                                                                    |
-| lock-up / No Lockup                        | 잠금 / 잠금 없음                       | 락업 is banned                                                     |
-| premine                                    | 사전 각인                              |                                                                    |
-| revert (transaction)                       | 되돌려집니다                           |                                                                    |
-| premium (V3 multiplier)                    | 할증 배수                              |                                                                    |
-| dust threshold                             | 더스트 기준값                          |                                                                    |
-| title (Endurance Champion, Chrono-Warrior) | 칭호                                   |                                                                    |
-| Published by                               | 게시자                                 | 발행 is drift                                                      |
-| COSMIC mutational signatures (denial)      | 돌연변이 시그니처                      | the genomics term                                                  |
+| English                                    | 한국어                                                        | Notes                                                                |
+| ------------------------------------------ | ------------------------------------------------------------- | -------------------------------------------------------------------- |
+| time increment                             | 시간 증가량                                                   |                                                                      |
+| exclusivity window (Final Gesture)         | 우선 마감 구간                                                | parallel to 공개 마감 구간; never bare 우선 구간                     |
+| finalizer                                  | 마감 실행자                                                   |                                                                      |
+| cycle beneficiary                          | 사이클 수령자                                                 | 수혜자 is drift; 시그니처 배분 수령자 when the role is spelled out   |
+| Allocations Wallet / escrow                | 배분 지갑 / 에스크로                                          |                                                                      |
+| Public Goods Vault                         | 공공재 금고                                                   |                                                                      |
+| calibration ceiling / floor                | 보정 상한 / 하한                                              |                                                                      |
+| Minimum CST Reward Protection              | 최소 참여 CST 보호                                            | the "reward" is 참여 CST, never 보상                                 |
+| Recognition CST imprint of 1,000 CST       | 공로 CST 1,000개                                              | counter form; never 1,000 CST의 공로 CST                             |
+| Stellar Selection entry / draw             | 별빛 선정 자격 / 선정                                         | "with replacement" → 복원 추출 (statistics term)                     |
+| Selection stage (art pipeline, Borda)      | 선별                                                          | keeps 선정 for 별빛 선정                                             |
+| RandomWalk discount / cost reduction       | 할인                                                          | never 감면                                                           |
+| burn (CST) / consumed (statistics)         | 소각 / 소모                                                   | mirrors the English distinction                                      |
+| leaderboard / live standings               | 순위표 / 실시간 현황                                          | 리더보드 has a gaming flavor                                         |
+| free (a gesture may become free)           | 비용 없음 / 비용 없이                                         | reframe; never 무료 as a selling word                                |
+| Next Cycle Seed (reserve share)            | 다음 사이클 이월분                                            | 시드 is reserved for the RNG seed                                    |
+| Net % / Spent / Received / Net             | 순증감률 / 지출 / 수령 / 순액                                 | never 수익률                                                         |
+| Gesture Duration / Champion Time / reign   | 유지 시간 / 선두 유지 시간 / 유지 기간                        |                                                                      |
+| (You) badge                                | (나)                                                          |                                                                      |
+| Amount (ETH) / Amount (token quantity)     | 금액 / 수량                                                   |                                                                      |
+| From / To (transfers)                      | 보낸 주소 / 받는 주소                                         |                                                                      |
+| treasurer (Outreach Reserve)               | 재무 담당자                                                   |                                                                      |
+| Unavailable (metric fallback)              | 확인 불가                                                     | 데이터 없음 is the empty state                                       |
+| Deck / Observatory                         | 관측소                                                        |                                                                      |
+| How It Works (marketing steps section)     | 참여 방법                                                     | the page itself stays 작동 원리                                      |
+| Bucket / Interpolation                     | 집계 단위 / 보간                                              |                                                                      |
+| divisor                                    | 제수                                                          |                                                                      |
+| block explorer                             | 블록 탐색기                                                   |                                                                      |
+| prediction market                          | 예측 시장                                                     |                                                                      |
+| ecosystem                                  | 생태계                                                        |                                                                      |
+| Governance Surface (Council)               | 조율 기구                                                     | 거버넌스 is drift                                                    |
+| Digital Collectible                        | 디지털 수집품                                                 |                                                                      |
+| lock-up / No Lockup                        | 잠금 / 잠금 없음                                              | 락업 is banned                                                       |
+| premine                                    | 사전 각인                                                     |                                                                      |
+| revert (transaction)                       | 되돌려집니다                                                  |                                                                      |
+| premium (V3 multiplier)                    | 할증 배수                                                     |                                                                      |
+| dust threshold                             | 더스트 기준값                                                 |                                                                      |
+| title (Endurance Champion, Chrono-Warrior) | 칭호                                                          |                                                                      |
+| Published by                               | 게시자                                                        | 발행 is drift                                                        |
+| COSMIC mutational signatures (denial)      | 돌연변이 시그니처                                             | the genomics term                                                    |
+| parameter                                  | 매개변수                                                      | never 파라미터                                                       |
+| trade-off                                  | 절충                                                          | never 트레이드오프                                                   |
+| snapshot                                   | 스냅숏                                                        | the 외래어 표기법 form; never 스냅샷                                 |
+| reentrancy guard                           | 재진입 방지 장치                                              |                                                                      |
+| seed phrase                                | 시드 구문                                                     | 시드 alone is the RNG seed                                           |
+| Ethereum core contributors                 | 이더리움 핵심 기여자                                          | never 코어 기여자                                                    |
+| funding mechanism (Protocol Guild)         | 자금 지원 메커니즘                                            |                                                                      |
+| preview                                    | 미리 보기                                                     | spaced (dependent noun); never 미리보기                              |
+| swap (Uniswap)                             | 교환                                                          | never 스왑                                                           |
+| asset (attached ERC-20 / media asset)      | 에셋                                                          | the dev-UI norm; third-party dependencies → 제3자 의존성, 글꼴, 에셋 |
+| typical cycle                              | 일반적인 사이클                                               |                                                                      |
+| severity: critical / informational         | 치명 / 정보성                                                 | audit findings                                                       |
+| Anchored Selection (trait chip)            | 앵커링 선정                                                   | sanctioned short form of 앵커링 NFT 별빛 선정                        |
+| Knowledge Base (FAQ badge)                 | 지식 베이스                                                   |                                                                      |
+| Chaos Zero market question                 | 이번 사이클은 이전 사이클보다 더 많은 제스처로 마감될 것인가? | quoted verbatim wherever the market is described                     |
 
 Narrative durations that are not protocol facts are spelled with native numerals (열 시간,
 이틀, 하루), so the numeric-claims guard never mistakes them for a pinned figure.
+
+**Random Walk NFT / RandomWalk NFT.** The English itself uses both (the brand is "Random
+Walk NFT", the contract is `RandomWalkNFT`, and several strings say "RandomWalk NFT").
+Mirror the spelling of each English source string; never "translate" one form into the
+other.
+
+**Reviewer cautions for substring-matched drift.** 속성 is not a scanner variant of 특성
+because it sits inside 지속성, 영속성, and 귀속성; a reviewer still rejects 속성 for _trait_.
 
 ## 4. Keep in English (영문 유지)
 

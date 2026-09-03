@@ -47,7 +47,7 @@ export const mediumQuestionsTextKo = {
       d: '공공재로 전달됩니다.',
     },
     explanation:
-      '더스트 기준치를 넘는 초과 지불은 같은 트랜잭션에서 환불됩니다. 그 기준치 아래에서는 환불에 드는 가스가 돌려받는 금액보다 크기 때문에 차액이 준비금에 남습니다. 이는 벌칙이 아니라 의도된 배려의 경계선입니다.',
+      '더스트 기준값을 넘는 초과 지불은 같은 트랜잭션에서 환불됩니다. 기준값 아래에서는 환불에 드는 가스가 돌려받는 금액보다 크기 때문에 차액이 준비금에 남습니다. 벌칙이 아니라, 참여자를 배려해 의도적으로 정한 경계선입니다.',
     referenceLabel: '백서 §4.1 — ETH 제스처',
   },
   'cst-window-restart': {
@@ -128,7 +128,7 @@ export const mediumQuestionsTextKo = {
   },
   'chrono-definition': {
     prompt:
-      '앞 문항에서 Ari가 세운 열 시간 기록이 Bea가 깨기 전까지 이틀 더 유지됩니다. 시간의 전사는 누구를 측정하나요?',
+      '앞 문항에서 Ari가 세운 열 시간 기록이 Bea가 깨기 전까지 이틀 더 유지됩니다. 시간의 전사 경로는 무엇을 재나요?',
     options: {
       a: '수호 챔피언 칭호를 끊기지 않고 가장 오래 유지한 사람입니다. Ari가 기록을 지킨 이틀은 Ari의 몫으로 셈해집니다.',
       b: '다른 참여자의 제스처 뒤에 가장 빨리 반응하는 사람입니다.',
@@ -181,7 +181,7 @@ export const mediumQuestionsTextKo = {
       c: '아무것도 받지 않습니다. 앵커링할 수 있는 것은 Cosmic Signature NFT만입니다.',
       d: '앵커링을 해제할 때 한 번 CST를 받습니다.',
     },
-    explanation: `Random Walk NFT는 별도로, 그리고 다른 목적으로 앵커링됩니다. 앵커링 NFT 별빛 선정에서 사이클마다 ${protocolFacts.anchoredRwlkNftSelectionRecipients}건이 선정되며, 각 건에 CST와 Cosmic Signature NFT 1개가 딸려 갑니다. ETH 앵커링 지급은 오직 앵커링된 Cosmic Signature NFT의 것입니다. Random Walk 앵커링에는 ETH가 없습니다.`,
+    explanation: `Random Walk NFT는 별도로, 그리고 다른 목적으로 앵커링됩니다. 앵커링 NFT 별빛 선정에서 사이클마다 ${protocolFacts.anchoredRwlkNftSelectionRecipients}건이 선정되며, 각 건에 CST와 Cosmic Signature NFT 1개가 딸려 갑니다. ETH 앵커링 지급은 앵커링된 Cosmic Signature NFT에만 돌아갑니다. Random Walk 앵커링에는 ETH가 없습니다.`,
     referenceLabel: '백서 §8 — 앵커링',
   },
   'exclusivity-window': {
@@ -205,7 +205,7 @@ export const mediumQuestionsTextKo = {
       c: '소각됩니다.',
       d: 'Juno가 나타날 때까지 에스크로에서 무기한 대기합니다.',
     },
-    explanation: `에스크로에 있는 배분과 첨부 자산은 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주 동안 기다립니다. 그 뒤에는 컨트랙트가 누구에게든 미회수 배분을 자기 것으로 회수하도록 허용합니다. 이 규칙은 공개 마감 구간과 같은 원리입니다. 모든 배분은 결국 원하는 손에 닿습니다. 배분은 제때 회수해 주세요.`,
+    explanation: `에스크로에 있는 배분과 첨부 자산은 ${protocolFacts.secondaryRetrievalTimeoutWeeks}주 동안 기다립니다. 그 뒤에는 누구든 미회수 배분을 자기 것으로 회수할 수 있습니다. 이 규칙은 공개 마감 구간과 같은 원리입니다. 모든 배분은 결국 원하는 손에 닿습니다. 배분은 제때 회수해 주세요.`,
     referenceLabel: '백서 §5.4 — 전달, 에스크로, 회수 기한',
   },
   'push-vs-pull': {
@@ -217,7 +217,7 @@ export const mediumQuestionsTextKo = {
       d: 'CST만 에스크로에 들어가고, ETH는 모두 바로 나갑니다.',
     },
     explanation:
-      '배분은 의도적으로 푸시와 풀로 나뉩니다. 사이클 수령자의 ETH와 공공재 전달은 마감 중에 곧바로 보내지고, 그 밖의 ETH 배분은 배분 지갑에 놓여 각 수령자가 회수합니다. CST와 NFT는 수령자에게 직접 각인됩니다.',
+      '배분은 의도적으로 직접 전달과 회수, 두 방식으로 나뉩니다. 사이클 수령자의 ETH와 공공재 전달은 마감 중에 곧바로 보내지고, 그 밖의 ETH 배분은 배분 지갑에 놓여 각 수령자가 회수합니다. CST와 NFT는 수령자에게 직접 각인됩니다.',
     referenceLabel: '백서 §5.4 — 전달, 에스크로, 회수 기한',
   },
   'council-proposal-threshold': {

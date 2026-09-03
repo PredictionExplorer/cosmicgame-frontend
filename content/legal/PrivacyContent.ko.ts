@@ -103,7 +103,7 @@ export const privacyCopyKo = {
         {
           id: 'wallet',
           subtitle: '지갑 제어',
-          text: '사용자는 지갑에 대한 완전한 제어권을 유지하며, 언제든지 플랫폼과의 연결을 해제할 수 있습니다.',
+          text: '지갑의 제어권은 전적으로 사용자에게 있으며, 언제든지 플랫폼과의 연결을 해제할 수 있습니다.',
         },
         {
           id: 'permanence',

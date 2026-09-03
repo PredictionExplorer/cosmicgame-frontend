@@ -1,8 +1,8 @@
 {
   "publicData": {
     "common": {
-      "unavailable": "데이터 없음",
-      "lastUpdated": "마지막 업데이트: {date}. 데이터 출처: {source}. 아래 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색엔진과 AI 크롤러를 위해 초기 HTML에 포함됩니다.",
+      "unavailable": "확인 불가",
+      "lastUpdated": "최근 업데이트: {date}. 데이터 출처: {source}. 아래 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색 엔진과 AI 크롤러를 위해 초기 HTML에 담겨 있습니다.",
       "relatedPagesAria": "{heading} 관련 페이지"
     },
     "routes": {
@@ -100,7 +100,7 @@
       "eth-contribution": {
         "eyebrow": "직접 ETH 기여 · Arbitrum",
         "heading": "직접 ETH 기여",
-        "description": "Cosmic Signature 공공재 금고에 직접 기여된 ETH와 그에 딸린 공개 메모, 사이클, 기여자 기록을 둘러볼 수 있습니다.",
+        "description": "Cosmic Signature 공공재 금고에 직접 기여된 ETH와 함께 공개 메모, 사이클, 기여자 기록을 둘러볼 수 있습니다.",
         "source": "Cosmic Signature 공개 기여 API",
         "links": {
           "protocol": "프로토콜 공공재 기여",
@@ -189,7 +189,7 @@
       "used-rwlk-nfts": {
         "eyebrow": "RandomWalk NFT 사용 현황 · Arbitrum",
         "heading": "사용된 RandomWalk NFT",
-        "description": "1회 한정 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT를 확인할 수 있습니다.",
+        "description": "일회성 제스처 비용 할인을 위해 이미 ETH 제스처에 첨부된 RandomWalk NFT를 확인할 수 있습니다.",
         "source": "Cosmic Signature 공개 RandomWalk 사용 기록 API",
         "links": {
           "imprint": "RandomWalk NFT 각인",
@@ -201,7 +201,7 @@
             "label": "사용된 RandomWalk NFT"
           },
           "discount": {
-            "label": "1회 한정 할인"
+            "label": "일회성 할인"
           },
           "scope": {
             "label": "사용 범위",
@@ -307,7 +307,7 @@
     "eyebrow": "결정론적 NFT 아트 · Arbitrum",
     "heading": "Cosmic Signature 갤러리",
     "description": "결정론적 삼체 물리, 온체인 시드, 스펙트럼 렌더링, 퍼포먼스 사이클 데이터로 생성된 Cosmic Signature NFT 작품을 감상할 수 있습니다. 모든 시그니처는 프로토콜 기록으로 재현 가능하며, 특정 사이클의 맥락을 담고 있습니다.",
-    "unavailable": "데이터 없음",
+    "unavailable": "확인 불가",
     "cards": {
       "imprinted": "각인된 NFT",
       "process": "아트 생성 과정",
@@ -326,7 +326,7 @@
     "eyebrow": "진행 중인 퍼포먼스 사이클 · Arbitrum",
     "heading": "현재 Cosmic Signature 퍼포먼스 사이클",
     "description": "이 페이지는 진행 중인 Cosmic Signature 퍼포먼스 사이클을 추적합니다. 공개 제스처 수, 사이클 준비금 현황, 첨부 자산, 배분 경로, 마감 상태를 담고 있으며, 아래 대화형 콘솔은 실시간 앱 데이터로 채워집니다.",
-    "unavailable": "데이터 없음",
+    "unavailable": "확인 불가",
     "cards": {
       "cycle": "사이클",
       "gestures": "제스처",
@@ -400,7 +400,7 @@
       "alt": "Cosmic Signature — 제스처",
       "eyebrow": "제스처",
       "eyebrowWithValue": "제스처 순번 #{value}",
-      "title": "시그니처에 각인을 남깁니다.",
+      "title": "시그니처에 흔적을 남깁니다.",
       "subhead": "제스처마다 사이클 마감 시각이 늘어나고, 참여 CST가 각인되며, 사이클의 시그니처가 계속 빚어집니다.",
       "chips": ["CC0", "온체인 검증", "7% Protocol Guild"]
     },
