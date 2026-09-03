@@ -4,7 +4,7 @@ import { defineLocaleSiteQa } from './locale-site-qa';
 /**
  * Full-site Ukrainian route QA at release widths. Clash Display has no
  * Cyrillic glyphs, so headings must resolve to the Onest companion face
- * (styles/global.css swaps the display stack under html[lang='uk']); body
+ * (styles/global.css swaps the display stack under html:lang(uk)); body
  * copy stays in Inter, whose Cyrillic slices load on demand.
  */
 defineLocaleSiteQa({

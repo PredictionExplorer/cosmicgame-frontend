@@ -119,7 +119,7 @@ Cells contain `☐` (not done) → replace with `✅` when the stage is complete
   (chữ ký is the cryptographic signature), tạo sinh for both "procedural" and "generative"
   (thủ tục is paperwork), bạn for the reader and tôi only in "của tôi" labels.
 - **Typography.** Clash Display carries 44 of the 132 Vietnamese letters; headings switch to
-  Onest through `html[lang='uk'], html:lang(vi)`. next/font's bundled Onest metadata predates
+  Onest through `html:lang(uk), html:lang(vi)`. next/font's bundled Onest metadata predates
   its Vietnamese subset, so `subsets` stays on the Cyrillic and Latin sets while the slice
   ships through the CSS (`preload: false` self-hosts every slice) — see `lib/fonts.ts`.
 - **R and Q are open.** R needs a native-fluency blind pass (style guide §8, pass 2); Q is

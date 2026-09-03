@@ -96,21 +96,36 @@ describe('font configuration policy', () => {
     for (const subsets of cjkSubsets) expect(subsets).not.toContain('cyrillic');
   });
 
-  it('overrides the Ukrainian and Vietnamese display stacks outside any cascade layer', () => {
+  it('overrides the display stack for every Onest locale outside any cascade layer', () => {
     // :root declares --display-font-stack unlayered. Both :root and the
-    // html[lang] rule target the <html> element, and an unlayered declaration
+    // html:lang() rule target the <html> element, and an unlayered declaration
     // beats any layered one regardless of specificity — an override placed
-    // inside @layer base would silently never apply. One rule serves both
-    // alphabetic locales Clash Display cannot set.
+    // inside @layer base would silently never apply. One rule serves every
+    // alphabetic locale Clash Display cannot set; the locales it must name
+    // are derived from LOCALE_COMPANION_FONTS, so a tenth Onest locale that is
+    // registered but not added to the selector fails here.
     const css = readFileSync(resolve(__dirname, '..', '..', 'styles', 'global.css'), 'utf8');
+    const registry = source.slice(
+      source.indexOf('export const LOCALE_COMPANION_FONTS'),
+      source.indexOf('};', source.indexOf('export const LOCALE_COMPANION_FONTS')),
+    );
+    const onestLocales = [...registry.matchAll(/^\s+'?([a-zA-Z-]+)'?: onest,$/gm)].map(
+      (m) => m[1]!,
+    );
+    expect(onestLocales.length).toBeGreaterThanOrEqual(2);
+
     const rootIndex = css.indexOf(':root {');
-    const overrideIndex = css.indexOf("html[lang='uk'],\nhtml:lang(vi) {");
+    const overrideIndex = css.indexOf('--display-font-stack: var(--font-onest)');
     expect(rootIndex).toBeGreaterThan(-1);
     expect(overrideIndex).toBeGreaterThan(rootIndex);
+    const ruleStart = css.lastIndexOf('}', overrideIndex) + 1;
+    const selector = css.slice(ruleStart, css.indexOf('{', ruleStart)).trim();
     // Top-level rules are unindented; anything inside @layer is indented.
-    expect(css.slice(overrideIndex - 1, overrideIndex)).toBe('\n');
-    const overrideBlock = css.slice(overrideIndex, css.indexOf('}', overrideIndex));
-    expect(overrideBlock).toContain('--display-font-stack: var(--font-onest)');
+    expect(css.slice(css.indexOf(selector) - 1, css.indexOf(selector))).toBe('\n');
+    // `html:lang()` matches the language and its regional variants (AGENTS.md);
+    // the attribute form would miss `uk-UA`.
+    expect(selector).not.toMatch(/html\[lang=/);
+    for (const locale of onestLocales) expect(selector).toContain(`html:lang(${locale})`);
   });
 
   it('references every declared font variable from a stack in global.css', () => {

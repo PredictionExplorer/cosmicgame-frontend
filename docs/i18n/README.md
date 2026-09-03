@@ -403,7 +403,7 @@ are fetched on demand only (never preloaded — English pages must not pay for t
 Clash Display, however, has no Cyrillic glyphs, so `/uk` headings switch to **Onest**
 (`next/font/google`, `--font-onest`, `preload: false`, `display: 'optional'` — the same
 policy as Noto Sans SC). The display stack is indirected through the
-`--display-font-stack` custom property in `styles/global.css`: `html[lang='uk']` replaces
+`--display-font-stack` custom property in `styles/global.css`: `html:lang(uk)` replaces
 the whole stack rather than appending Onest after Clash, so Latin letters inside a
 Ukrainian heading (ETH, CST, brand names) do not render in a different face with a
 different x-height. OG images for `/uk` load `assets/fonts/Onest-700.subset.ttf`, cut by
@@ -417,7 +417,7 @@ Additional block, U+1EA0–1EF9). Inter's build-time CSS declares a `vietnamese`
 with a Western-European repertoire, carries only 44 of those letters, so a Vietnamese
 heading set in it would fall back glyph by glyph — one word in two faces. Vietnamese
 therefore reuses the Ukrainian solution: `LOCALE_COMPANION_FONTS.vi` is Onest, and the
-`--display-font-stack` rule in `styles/global.css` lists `html[lang='uk'], html:lang(vi)`
+`--display-font-stack` rule in `styles/global.css` lists `html:lang(uk), html:lang(vi)`
 together. Google Fonts serves Onest's Vietnamese slice in the same CSS, and next/font
 self-hosts every slice when `preload` is off; the `subsets` option only names slices to
 preload and is validated against next/font's bundled font metadata, which predates Onest's
@@ -433,6 +433,17 @@ covers Vietnamese and Clash Display does not; (2) stacked diacritics need vertic
 never set Vietnamese below `line-height: 1.3`. The white-paper PDF uses the same macOS
 faces as the Ukrainian build (Times New Roman, Helvetica Neue, Menlo), which carry the
 full Vietnamese repertoire; Latin Modern does not.
+
+Rule (1) is machine-checked: `lib/__tests__/display-font-coverage.test.ts` reads Clash
+Display's `cmap` and every letter of each alphabetic locale's catalogs and content modules.
+A locale whose copy needs a letter Clash lacks must have a companion face in
+`LOCALE_COMPANION_FONTS` **and** a `--display-font-stack` override under its `html:lang()`
+in `styles/global.css`; a locale Clash covers in full must not carry the override. So a
+tenth alphabet (Polish, Turkish, Russian, …) fails on its first translated string rather
+than shipping headings set in two faces — and if Onest also covers it, the fix is one
+`onest` entry plus one selector in the shared rule, which `lib/__tests__/fonts-policy.test.ts`
+derives from the registry. CJK locales are exempt: Clash for Latin tokens plus the regional
+Noto cut per glyph is their intended rendering.
 
 ## 6. SEO, metadata, and structured data
 

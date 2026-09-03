@@ -155,6 +155,8 @@ describe('nextSteps', () => {
     expect(steps[0]).toContain("Add 'ja' to LOCALES in i18n/routing.ts (label: 日本語)");
     expect(steps.some((step) => step.includes('content/*/index.ts'))).toBe(true);
     expect(steps.some((step) => step.includes('html:lang(ja)'))).toBe(true);
+    // The Vietnamese lesson: a Latin alphabet is not proof Clash Display covers it.
+    expect(steps.some((step) => step.includes('display-font-coverage.test.ts'))).toBe(true);
     expect(steps.some((step) => step.includes('glossary-ja.md'))).toBe(true);
     expect(steps.at(-1)).toContain('progress-ja.md');
   });

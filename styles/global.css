@@ -36,7 +36,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   /*
    * Indirected through --display-font-stack so a locale can swap the whole
-   * display face (see the html[lang] rules below) and every consumer — the
+   * display face (see the html:lang() rules below) and every consumer — the
    * type-display / type-heading utilities and ad-hoc font-family declarations
    * — follows without per-element overrides.
    */
@@ -135,7 +135,7 @@ html:lang(ja) {
  * element, and an unlayered :root declaration would beat any override placed
  * inside @layer base no matter its specificity.
  */
-html[lang='uk'],
+html:lang(uk),
 html:lang(vi) {
   --display-font-stack: var(--font-onest), var(--font-inter), Inter, system-ui, sans-serif;
 }

@@ -139,7 +139,7 @@ export const notoSansJP = Noto_Sans_JP({
  * Clash Display carries no Cyrillic glyphs and only 44 of the 132 letters
  * Vietnamese writes (none of the stacked-diacritic forms ế, ợ, ữ, nor Ơ/Ư),
  * so `/uk` and `/vi` headings are set in Onest — one face for both, swapped
- * in by the `html[lang='uk'], html:lang(vi)` rule in styles/global.css. Body
+ * in by the `html:lang(uk), html:lang(vi)` rule in styles/global.css. Body
  * text needs nothing extra: Inter's build-time CSS already declares the
  * `cyrillic`, `cyrillic-ext`, and `vietnamese` `unicode-range` slices
  * (fetched on demand, never preloaded).

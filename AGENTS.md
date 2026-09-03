@@ -201,9 +201,11 @@ tone, grammar, dates, and typography: `docs/i18n/glossary-zh.md` + `style-guide-
   `type-body-*`. The display face is `--display-font-stack` (Clash Display, then the
   `--cjk-font-stack` for CJK glyphs — Noto Sans SC by default, swapped to the TC / HK / KR
   cut by `html:lang(zh-TW)` / `html:lang(zh-HK)` / `html:lang(ko)` / `html:lang(ja)` because each region
-  has its own glyph standard; `html[lang='uk']` swaps in Onest because Clash has no
-  Cyrillic). Each locale's companion face is declared in `LOCALE_COMPANION_FONTS`
-  (`lib/fonts.ts`); see `docs/i18n/README.md` §5.
+  has its own glyph standard; `html:lang(uk)` / `html:lang(vi)` swap the whole display
+  stack to Onest because Clash has no Cyrillic and few Vietnamese letters). Each locale's
+  companion face is declared in `LOCALE_COMPANION_FONTS` (`lib/fonts.ts`), and
+  `lib/__tests__/display-font-coverage.test.ts` derives from the copy itself which
+  alphabetic locales need one; see `docs/i18n/README.md` §5.
 - The wallet stack (wagmi/RainbowKit) exists only in the `(app)` route group; keep the
   landing free of it.
 - Every informational page has `generateMetadata` (titles and descriptions in
