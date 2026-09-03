@@ -127,6 +127,28 @@ export function isLandingOnlyPath(pathname: string): boolean {
 }
 
 /**
+ * The INTERNAL route that renders the landing home. proxy.ts rewrites `/`
+ * on the marketing host to it and canonicalizes direct requests away from it;
+ * it must never appear in a link, a canonical, or a Location header.
+ */
+export const LANDING_SITE_INTERNAL_PATH = '/landing-site';
+
+/**
+ * The public path for a locale-stripped pathname. Everything maps to itself
+ * except the landing home, which `usePathname` reports as the internal
+ * `/landing-site` route while the page prerenders (there is no request URL
+ * to read at build time) and as `/` once the browser has the real URL. Links
+ * built from the pathname — the language directory's alternates — go through
+ * this so both renders agree and neither leaks the internal route.
+ */
+export function publicPathname(pathname: string): string {
+  return pathname === LANDING_SITE_INTERNAL_PATH ||
+    pathname.startsWith(`${LANDING_SITE_INTERNAL_PATH}/`)
+    ? '/'
+    : pathname;
+}
+
+/**
  * Locale prefixes longest first, so `/zh-TW/…` is never read as `/zh` + `-TW/…`.
  * Mirrors the order next-intl's own prefix matcher uses.
  */

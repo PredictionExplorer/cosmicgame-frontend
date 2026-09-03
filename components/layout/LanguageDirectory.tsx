@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { rememberLocale } from '@/i18n/localeCookie';
 import { getPathname, usePathname, useRouter } from '@/i18n/navigation';
 import { LOCALE_LABELS, routing, type AppLocale } from '@/i18n/routing';
+import { publicPathname } from '@/lib/hostRouting';
 import { cn } from '@/lib/utils';
 
 interface LanguageDirectoryProps {
@@ -41,7 +42,9 @@ export function LanguageDirectory({ className }: LanguageDirectoryProps) {
   const t = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
+  // The landing home prerenders under its internal `/landing-site` route;
+  // its public path is `/` (see `publicPathname`).
+  const pathname = publicPathname(usePathname());
   const label = t('languageSwitcher.label');
 
   const switchTo = (next: AppLocale) => {

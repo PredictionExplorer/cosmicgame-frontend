@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES } from './locale-fixtures';
+import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES, routing } from './locale-fixtures';
 
 /**
  * End-to-end tests for the landing site at cosmicsignature.com.
@@ -356,6 +356,24 @@ test.describe('Landing page @ cosmicsignature.com', () => {
       const rel = await link.getAttribute('rel');
       expect(target).toBe('_blank');
       expect(rel ?? '').toContain('noopener');
+    }
+  });
+
+  test('footer language directory links every edition of the home at its public URL', async ({
+    page,
+  }) => {
+    // The home renders under the internal `/landing-site` route (rewritten
+    // from `/`), and that is what the prerender sees as its pathname — the
+    // directory must still link `/`, `/zh`, … and never leak the internal route.
+    for (const path of ['/', '/vi']) {
+      await page.goto(path, { waitUntil: 'domcontentloaded' });
+      const directory = page.locator('footer').getByTestId('language-directory');
+      const hrefs = await directory
+        .getByRole('link')
+        .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+      expect(hrefs).toEqual(
+        routing.locales.map((locale) => (locale === routing.defaultLocale ? '/' : `/${locale}`)),
+      );
     }
   });
 

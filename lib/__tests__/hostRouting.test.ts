@@ -9,7 +9,9 @@ import {
   isLandingHost,
   isLandingOnlyPath,
   isLegacyWwwLandingHost,
+  LANDING_SITE_INTERNAL_PATH,
   localeHref,
+  publicPathname,
   localizeCrossHostHref,
   normalizeHost,
   splitLocalePrefix,
@@ -429,6 +431,23 @@ describe('hostRouting', () => {
       expect(isLandingOnlyPath('/statistics')).toBe(false);
       expect(isLandingOnlyPath('/gallery')).toBe(false);
       expect(isLandingOnlyPath('/faq')).toBe(false);
+    });
+  });
+
+  describe('publicPathname', () => {
+    it('maps the internal landing-site route to the public root', () => {
+      // usePathname reports the internal route while the landing home
+      // prerenders; a link built from it would leak `/landing-site`.
+      expect(publicPathname(LANDING_SITE_INTERNAL_PATH)).toBe('/');
+      expect(publicPathname('/landing-site/')).toBe('/');
+    });
+
+    it('leaves every public path alone', () => {
+      for (const path of ['/', '/faq', '/about', '/learn/what-is-cosmic-signature', '/gallery']) {
+        expect(publicPathname(path)).toBe(path);
+      }
+      // A page whose name merely starts with the same letters is not the landing.
+      expect(publicPathname('/landing-sites')).toBe('/landing-sites');
     });
   });
 });

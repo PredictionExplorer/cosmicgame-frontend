@@ -39,6 +39,7 @@ import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { usePathname } from '@/i18n/navigation';
+import { publicPathname } from '@/lib/hostRouting';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
 export function LandingShell({ children }: { children: ReactNode }) {
@@ -46,7 +47,7 @@ export function LandingShell({ children }: { children: ReactNode }) {
   // The landing home brings its own header pill and footer directory
   // (Hero, LandingFooter); every other marketing page gets the utility pill
   // top-right and the crawlable language directory as its footer.
-  const showUtilityChrome = pathname !== '/' && pathname !== '/landing-site';
+  const showUtilityChrome = publicPathname(pathname) !== '/';
 
   useEffect(() => {
     installGlobalErrorHandlers();
