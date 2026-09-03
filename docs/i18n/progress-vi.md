@@ -122,6 +122,16 @@ Cells contain `☐` (not done) → replace with `✅` when the stage is complete
   Onest through `html:lang(uk), html:lang(vi)`. next/font's bundled Onest metadata predates
   its Vietnamese subset, so `subsets` stays on the Cyrillic and Latin sets while the slice
   ships through the CSS (`preload: false` self-hosts every slice) — see `lib/fonts.ts`.
+- **2026-09-03 — automated Q floor green.** `e2e/vi-smoke.spec.ts` (Desktop + Mobile Chrome)
+  and `e2e/vi-site-qa.desktop.spec.ts` (every inventoried route at 320/768/1440: script,
+  Onest headings, Inter body, locale-preserving links, no English fallbacks) pass against a
+  production build, alongside the full locale sweep (`npm run test:e2e:locales`). Fixture
+  strings in `e2e/locale-fixtures.ts` were re-pinned to the shipped copy where the draft
+  wording had moved during translation, and the white paper's app/site links now carry `/vi`
+  like every other translation.
+- **Language directory.** Every footer (app, landing home, and the marketing pages that had
+  no footer) now carries the crawlable language directory (README §2.4), so `/vi/<path>` is
+  linked from every other edition of the page and Tiếng Việt is discoverable without JS.
 - **R and Q are open.** R needs a native-fluency blind pass (style guide §8, pass 2); Q is
-  the rendered `/vi` walk at 320/768/1440 with `e2e/vi-site-qa.desktop.spec.ts` as the
-  automated floor.
+  the human rendered `/vi` walk at 320/768/1440 (tooltips, toasts, edge states) on top of the
+  automated floor above.
