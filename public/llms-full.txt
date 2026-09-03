@@ -796,3 +796,107 @@ Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 C
 
 **질문: 배포된 컨트랙트와 검증 자료는 어디에서 볼 수 있나요?**
 답변: 컨트랙트 주소는 https://app.cosmicsignature.com/ko/contracts , 보안 설명은 https://app.cosmicsignature.com/ko/security , 감사 현황은 https://app.cosmicsignature.com/ko/audits 에서 확인할 수 있습니다.
+
+## 日本語：完全な説明
+
+### Cosmic Signatureについて
+
+Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルで、オンチェーンの参加、ジェネラティブアート、公共財の支援を一つの公開された仕組みに結びつけます。パフォーマンス・サイクルごとに参加者はETHまたはCSTで一筆を入れ、すべての一筆が確定までのカウントダウンを延ばし、星選の対象を1件加え、サイクルの最終シグネチャーを形づくり続けます。
+
+NFTのアートワークは物理学の三体問題から生まれます。Rustで書かれたオープンソースのプログラムがオンチェーンのシードを読み、三つの天体の運動をシミュレーションしてその軌跡を描きます。同じシードは常に同じ画像と動画を生むので、誰でも作品を再現できます。
+
+Cosmic Signatureは、COSMICがん変異データベースや生物学のCOSMIC変異シグネチャーとは関係がありません。
+
+### 日本語サイトの構造
+
+#### 紹介と学習
+
+- **ホーム**: https://cosmicsignature.com/ja
+- **概要**: https://cosmicsignature.com/ja/about
+- **学習ハブ**: https://cosmicsignature.com/ja/learn
+- **Cosmic Signatureとは？**: https://cosmicsignature.com/ja/learn/what-is-cosmic-signature
+- **三体NFTアート**: https://cosmicsignature.com/ja/learn/three-body-nft-art
+- **公共財の仕組み**: https://cosmicsignature.com/ja/learn/protocol-guild-public-goods
+
+#### アプリと公開データ
+
+- **アプリのホーム**: https://app.cosmicsignature.com/ja
+- **現在のパフォーマンス・サイクル**: https://app.cosmicsignature.com/ja/current-cycle
+- **ギャラリー**: https://app.cosmicsignature.com/ja/gallery
+- **仕組み**: https://app.cosmicsignature.com/ja/how-it-works
+- **よくある質問**: https://app.cosmicsignature.com/ja/faq
+- **配分の受領者**: https://app.cosmicsignature.com/ja/allocation
+- **係留**: https://app.cosmicsignature.com/ja/anchoring
+- **統計**: https://app.cosmicsignature.com/ja/statistics
+- **直接ETH拠出**: https://app.cosmicsignature.com/ja/eth-contribution
+- **公共財拠出**: https://app.cosmicsignature.com/ja/public-goods-contributions-cg
+- **コントラクト**: https://app.cosmicsignature.com/ja/contracts
+- **ソースコード**: https://app.cosmicsignature.com/ja/code
+- **セキュリティ**: https://app.cosmicsignature.com/ja/security
+- **監査**: https://app.cosmicsignature.com/ja/audits
+- **リスク開示**: https://app.cosmicsignature.com/ja/risk-disclosures
+
+### パフォーマンス・サイクルと一筆
+
+1. 新しいサイクルはETH調律期間で始まります。CST調律期間は12時間の基準から出発し、オンチェーンの参加に応じて変わります。
+2. すべての一筆は現在の時間増分の分だけ確定までのカウントダウンを延ばします。時間増分は最初は1時間で、サイクルが確定するごとに1%ずつ増えます。
+3. 一筆はETHまたはCSTで入れられ、各サイクルの最初の一筆はETHでなければなりません。CST一筆の費用は現在の調律期間の間に徐々に下がり、使われたCSTは焼却されます。
+4. CST一筆はCST調律期間を約0.4%長くし、ETH一筆は約0.398%短くします。
+5. 最後の一筆を入れた参加者には、カウントダウンがゼロになった後、48時間の優先確定期間が与えられます。サイクルが実際に確定するまで一筆は引き続き入れられ、優先確定期間が過ぎると誰でもサイクルを確定でき、実際に確定した人がシグネチャー配分を受け取ります。
+6. すべての一筆は星選の対象を1件加え、前の一筆からの経過時間に応じて動的な参加CSTを刻印することがあります。計算には平方根の式が使われるので、続けざまの一筆は0 CSTを刻印することがあり、間隔が長いほど多くのCSTが刻印されますが、増え方は徐々に緩やかになります。
+7. 未使用のRandomWalk NFTは1回のETH一筆に添付でき、そのETH一筆の費用が50%割引されます。各RandomWalk NFTは一度しか使えません。
+
+### サイクルごとの配分
+
+- **25%**: シグネチャー配分。サイクルを実際に確定した参加者が受け取ります
+- **8%**: 時の戦士に配分されるETH
+- **4%**: 3件のETH星選の対象が分け合います
+- **6%**: 係留中のCosmic Signature NFTの保有者のための係留配分
+- **7%**: 公共財配分。現在はProtocol Guildへ送られます
+- **約50%**: 累積準備金として次のサイクルへ持ち越されます
+- **3,000 CST**: 広報準備金として刻印され、エコシステムの参加者へ配られます
+
+大多数のサイクルでは24枚のCosmic Signature NFTが刻印され、各NFTには1,000 CSTが伴います。1枚はシグネチャー配分、1枚は最後のCST一筆の受領者、1枚は持久チャンピオン、1枚は時の戦士、10枚は参加者向けのNFT星選、10枚は係留NFT星選へ配られます。広報準備金の3,000 CSTを加えると、サイクル確定時に固定で刻印されるCSTは標準的に27,000 CSTで、一筆ごとに動的に刻印される参加CSTは別に計算されます。
+
+### 係留と受け取り
+
+- 係留中のCosmic Signature NFTは、サイクルごとにETHの6%を係留配分として等しく分け合い、累積したETHは係留を解除したときに受け取ります
+- 係留中のRandomWalk NFTは係留NFT星選にだけ参加し、ETHの係留配分は受け取りません
+- 各Cosmic Signature NFTまたは各RandomWalk NFTは一度だけ係留でき、解除するとそのNFTは再び係留できません
+- サイクル確定時に係留中のCosmic Signature NFTが一つもなければ、そのサイクルの6%はサイクル準備金に残ります
+- 二次的なETH、ERC-20、ERC-721の配分は配分ウォレットに保管され、5週間の受け取り期限が過ぎると誰でも未受け取りの配分を自分のものとして受け取れます
+
+### トークンとエコシステム
+
+- **CST**: 調整とユーティリティのためのERC-20トークンです。CST調律期間で一筆を入れるのに使われ、宇宙評議会で調整の意思を表します
+- **Cosmic Signature NFT**: 三体ジェネラティブアートのERC-721です。シードはオンチェーンに保存され、作品はRustのオープンソースプログラムで再現できます
+- **RandomWalk NFT**: ETH一筆の費用を一度だけ割引し、係留すると係留NFT星選に参加します
+- **Axiom Zero** (https://www.axiomzero.market/cosmic-signature): プラットフォーム手数料のないArbitrumのNFTマーケットプレイスで、取引はオンチェーンで直接処理されます
+- **Chaos Zero** (https://chaoszero.com): Cosmic Signatureのための予測市場です。サイクルごとに「このサイクルは前のサイクルより多い筆数で確定するか？」を問い、結果は公開のオンチェーンデータで決まります
+- **Uniswap**: https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0
+
+### 調整と信頼
+
+- 中核のプロトコルパラメーターは次のサイクルが有効になる前にだけ変更でき、サイクルの有効化時刻、サイクル間の遅延、一部の周辺設定には別の制限があります
+- プロトコルコントラクトはUUPSアップグレード方式を使いますが、アップグレードはサイクルの間にだけ可能で、現在の実装はオンチェーンでバイト単位に検証できます
+- 参加者のすべてのETHは公開されたコントラクトのルールに従ってプロトコルの中だけで動き、どのチームのウォレットも一筆のETHを直接受け取りません
+- コントラクトはHackenの独立監査を受けており、報告書と形式検証の状況は https://app.cosmicsignature.com/ja/audits で公開されています
+- 長期的な目標は、所有権を宇宙評議会へ移し、最終的に所有権を完全に放棄することです。その後はパラメーターも実装も変えられません
+- チームが支援をやめても、オンチェーンのシードとオープンソースのコードがあるので、誰でもNFTの作品を再現できます
+
+### 日本語のよくある質問
+
+**質問: NFTがなくても参加できますか？**
+回答: はい。NFTを持っていなくても、誰でも直接一筆を入れられます。RandomWalk NFTは費用を一度だけ割引する任意の選択肢にすぎません。
+
+**質問: シグネチャー配分には何が含まれますか？**
+回答: サイクル準備金の25%、1,000 CST、唯一のCosmic Signature NFT 1枚、そして一筆に添付された他のプロジェクトのトークンです。
+
+**質問: 星選はどのように行われますか？**
+回答: すべての一筆は星選の対象を1件加えます。サイクルが確定すると、3件のETH星選の対象がサイクル準備金の4%を分け合い、参加者向けのNFT星選10件と係留NFT星選10件が別に決まり、各件には1,000 CSTとCosmic Signature NFT 1枚が伴います。
+
+**質問: NFTのアートワークはどのように生成されますか？**
+回答: コントラクトがシードを保存し、Rustのオープンソースプログラムがそのシードで三体の物理シミュレーションを実行してからスペクトルレンダリングを行います。同じシードは常に同じピクセルを生みます。
+
+**質問: デプロイ済みのコントラクトと検証のリソースはどこで見られますか？**
+回答: コントラクトアドレスは https://app.cosmicsignature.com/ja/contracts 、セキュリティの説明は https://app.cosmicsignature.com/ja/security 、監査の状況は https://app.cosmicsignature.com/ja/audits で確認できます。

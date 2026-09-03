@@ -3,31 +3,35 @@
 This document defines how Cosmic Signature is a multilingual site. It shipped
 **Simplified Chinese (`zh`)** first, **Ukrainian (`uk`)** second, then the two
 **Traditional Chinese variants (`zh-TW`, `zh-HK`)**, then **Korean (`ko`)** — the first
-language added with `npm run i18n:scaffold`; every later language follows the checklist in
-§10. It covers the technical architecture, the message/content structure, the
+language added with `npm run i18n:scaffold` — then **Japanese (`ja`)**, the first language
+sharing a script family with an existing one; every later language follows the checklist
+in §10. It covers the technical architecture, the message/content structure, the
 translation workflow, and the quality bar. It is written so that any engineer or translator
 can pick up a unit from a progress tracker and know exactly what to do.
 
 **The document set:**
 
-| Document                                       | Purpose                                                                          |
-| ---------------------------------------------- | -------------------------------------------------------------------------------- |
-| [README.md](./README.md) (this file)           | Architecture, tooling, workflow, definition of done                              |
-| [glossary-zh.md](./glossary-zh.md)             | Canonical Simplified Chinese translation for every protocol term + banned list   |
-| [style-guide-zh.md](./style-guide-zh.md)       | Rules for making the Simplified Chinese sound native, not translated             |
-| [progress-zh.md](./progress-zh.md)             | Simplified Chinese rollout: site inventory, sprint plan, progress tracker        |
-| [glossary-zh-TW.md](./glossary-zh-TW.md)       | Taiwan Traditional Chinese terms, Taiwan vocabulary, banned register             |
-| [style-guide-zh-TW.md](./style-guide-zh-TW.md) | What differs for Taiwan: vocabulary, characters (裡/著/台), 「」, review hunts   |
-| [progress-zh-TW.md](./progress-zh-TW.md)       | Taiwan rollout: per-namespace and per-area T/R/Q tracker                         |
-| [glossary-zh-HK.md](./glossary-zh-HK.md)       | Hong Kong Traditional Chinese terms, Hong Kong vocabulary, banned register       |
-| [style-guide-zh-HK.md](./style-guide-zh-HK.md) | What differs for Hong Kong: written Chinese, 裏/着, standard Big5 forms, 「」    |
-| [progress-zh-HK.md](./progress-zh-HK.md)       | Hong Kong rollout: per-namespace and per-area T/R/Q tracker                      |
-| [glossary-uk.md](./glossary-uk.md)             | Canonical Ukrainian translation for every protocol term + banned-term list       |
-| [style-guide-uk.md](./style-guide-uk.md)       | Rules for making the Ukrainian sound native (cases, four plural forms)           |
-| [progress-uk.md](./progress-uk.md)             | Ukrainian rollout: per-namespace and per-area T/R/Q tracker                      |
-| [glossary-ko.md](./glossary-ko.md)             | Canonical Korean translation for every protocol term + banned register           |
-| [style-guide-ko.md](./style-guide-ko.md)       | Rules for making the Korean sound native (합쇼체, particles, counters, keep-all) |
-| [progress-ko.md](./progress-ko.md)             | Korean rollout: per-namespace and per-area T/R/Q tracker                         |
+| Document                                       | Purpose                                                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [README.md](./README.md) (this file)           | Architecture, tooling, workflow, definition of done                                   |
+| [glossary-zh.md](./glossary-zh.md)             | Canonical Simplified Chinese translation for every protocol term + banned list        |
+| [style-guide-zh.md](./style-guide-zh.md)       | Rules for making the Simplified Chinese sound native, not translated                  |
+| [progress-zh.md](./progress-zh.md)             | Simplified Chinese rollout: site inventory, sprint plan, progress tracker             |
+| [glossary-zh-TW.md](./glossary-zh-TW.md)       | Taiwan Traditional Chinese terms, Taiwan vocabulary, banned register                  |
+| [style-guide-zh-TW.md](./style-guide-zh-TW.md) | What differs for Taiwan: vocabulary, characters (裡/著/台), 「」, review hunts        |
+| [progress-zh-TW.md](./progress-zh-TW.md)       | Taiwan rollout: per-namespace and per-area T/R/Q tracker                              |
+| [glossary-zh-HK.md](./glossary-zh-HK.md)       | Hong Kong Traditional Chinese terms, Hong Kong vocabulary, banned register            |
+| [style-guide-zh-HK.md](./style-guide-zh-HK.md) | What differs for Hong Kong: written Chinese, 裏/着, standard Big5 forms, 「」         |
+| [progress-zh-HK.md](./progress-zh-HK.md)       | Hong Kong rollout: per-namespace and per-area T/R/Q tracker                           |
+| [glossary-uk.md](./glossary-uk.md)             | Canonical Ukrainian translation for every protocol term + banned-term list            |
+| [style-guide-uk.md](./style-guide-uk.md)       | Rules for making the Ukrainian sound native (cases, four plural forms)                |
+| [progress-uk.md](./progress-uk.md)             | Ukrainian rollout: per-namespace and per-area T/R/Q tracker                           |
+| [glossary-ko.md](./glossary-ko.md)             | Canonical Korean translation for every protocol term + banned register                |
+| [style-guide-ko.md](./style-guide-ko.md)       | Rules for making the Korean sound native (합쇼체, particles, counters, keep-all)      |
+| [progress-ko.md](./progress-ko.md)             | Korean rollout: per-namespace and per-area T/R/Q tracker                              |
+| [glossary-ja.md](./glossary-ja.md)             | Canonical Japanese translation for every protocol term + banned register              |
+| [style-guide-ja.md](./style-guide-ja.md)       | Rules for making the Japanese sound native (です・ます, no spaces, counters, kinsoku) |
+| [progress-ja.md](./progress-ja.md)             | Japanese rollout: per-namespace and per-area T/R/Q tracker                            |
 
 > Note: `docs/` is intentionally outside the lexicon scanner's `SCAN_DIRS`
 > (see `scripts/lexicon-scan.ts`), so these documents may cite banned vocabulary
@@ -41,7 +45,8 @@ can pick up a unit from a progress tracker and know exactly what to do.
   — locale code `zh` (hreflang alias `zh-Hans`); Taiwan Traditional Chinese — `zh-TW`
   (alias `zh-Hant`); Hong Kong Traditional Chinese — `zh-HK` (alias `zh-MO`, Macau
   follows Hong Kong conventions); Ukrainian — `uk`; Korean — `ko` (`ko-KR` and `ko-KP`
-  resolve to it by same-language affinity).
+  resolve to it by same-language affinity); Japanese — `ja` (`ja-JP` resolves to it the
+  same way).
 - **Locale codes are canonical BCP 47 tags, chosen to match what browsers send.** A bare
   language code is the CLDR default variant of that language (`zh` = Simplified,
   mainland); further variants of the same language carry the region that distinguishes
@@ -66,7 +71,8 @@ can pick up a unit from a progress tracker and know exactly what to do.
   tools are translated last, but they are translated).
 - **Quality bar:** every locale must read as if originally written in that language
   (see [style-guide-zh.md](./style-guide-zh.md), [style-guide-uk.md](./style-guide-uk.md),
-  [style-guide-ko.md](./style-guide-ko.md)). Literal translation is a defect.
+  [style-guide-ko.md](./style-guide-ko.md), [style-guide-ja.md](./style-guide-ja.md)).
+  Literal translation is a defect.
 - **Future languages** (ja, ...) are added by: running `npm run i18n:scaffold` (which
   writes the `messages/<locale>/` directory, the per-locale content modules, the gate
   stub, the e2e suites, and the document templates), extending `locales`, and filling the
@@ -106,7 +112,7 @@ New i18n plumbing:
 
 ```
 i18n/
-  routing.ts      ← defineRouting({ locales: ['en', 'zh', 'zh-TW', 'zh-HK', 'uk', 'ko'], … }), LOCALE_LABELS, LOCALE_ALIASES
+  routing.ts      ← defineRouting({ locales: ['en', 'zh', 'zh-TW', 'zh-HK', 'uk', 'ko', 'ja'], … }), LOCALE_LABELS, LOCALE_ALIASES
   locale.ts       ← AppLocale, LocaleRecord<T>, normalizeLocale, pickByLocale (the only locale parser)
   localeConfig.ts ← per-locale rendering conventions: Intl tag, og:locale, JSON-LD inLanguage,
                     word spacing, week start, ellipsis, provider-error policy
@@ -121,6 +127,7 @@ messages/
   zh-HK/*.json    ← Hong Kong Traditional Chinese catalogs
   uk/*.json       ← Ukrainian catalogs
   ko/*.json       ← Korean catalogs
+  ja/*.json       ← Japanese catalogs
 ```
 
 `normalizeLocale` resolves locale-ish input in four steps: exact code (any casing, `_`
@@ -228,7 +235,7 @@ components and `generateMetadata`.
 - Keys describe _role_, not content: `hero.headline`, not `everyGestureShapes`.
 - Never concatenate translated fragments; use ICU placeholders: `"gestureCost": "Gesture Cost: {amount} ETH"`.
 - ICU `plural` blocks carry every category the locale's `Intl.PluralRules` defines:
-  `one/other` in `en`; a single `other` in `zh` and `ko`, which have no plural inflection
+  `one/other` in `en`; a single `other` in `zh`, `ko`, and `ja`, which have no plural inflection
   (style guides §7 — Korean keeps the block so `#` formats the number and puts the counter
   inside it); `one/few/many/other` in `uk` (style-guide-uk). `npm run i18n:strict` fails on
   a missing category.
@@ -330,6 +337,17 @@ action, Chinese renders in unstyled system fallback.
   sets `word-break: keep-all` — the browser's CJK default breaks a Korean word between
   syllables, which is the most visible typographic defect in Korean web copy;
   `.font-mono` opts back into `break-all` so addresses still wrap.
+- **Kanji and kana (Japanese).** Noto Sans JP is the Japanese cut (`--font-noto-jp`): its
+  kanji follow the JIS glyph standard, which differs from every Chinese cut (直, 骨, 令 are
+  drawn differently), and it carries the kana the Chinese cuts only nominally cover.
+  `html:lang(ja)` swaps it into `--cjk-font-stack` with the Japanese system faces as
+  fallbacks and sets `line-break: strict` (kinsoku: no line starts with a small kana or ー);
+  it deliberately does **not** set `keep-all`, which is right for Korean and wrong for a
+  language with no word spaces. Display headings additionally opt into
+  `word-break: auto-phrase` so browsers that support it break between phrases rather than
+  mid-word. The CJK heading, tracking, and mono rules cover `:lang(ja)` alongside `zh` and
+  `ko`. The white-paper PDF binds Hiragino's separately named weights explicitly
+  (`BoldFont={Hiragino Mincho ProN W6}`), because fontspec cannot infer them.
 - **The companion face is a registry.** `LOCALE_COMPANION_FONTS` in `lib/fonts.ts` records
   one face (or `null`) per locale, `RootDocument` derives its font-variable classes from
   it, and `OG_TYPOGRAPHY` (`lib/og/fonts.ts`) + `OG_FONT_SOURCES`
@@ -393,11 +411,20 @@ i18n:check`). The same checks run under jest in
    without spaces and particles attach to the noun; `KO_BANNED_TERMS` documents the
    innocent words each entry was checked against). The Traditional locales share `ZH_HANT_BANNED_TERMS`
    and add regional registers (`ZH_TW_BANNED_TERMS`: 博弈, 競標, 報酬…; `ZH_HK_BANNED_TERMS`:
-   六合彩, 派彩, 回報…). A profile runs on every locale-agnostic file and on every file of
-   another language, but not on a sibling variant of its own language: the variants share
-   characters while their registers differ (Hong Kong bans 回報 "return"; Taiwan writes
-   回報問題 "report an issue"). File ownership is resolved by `scripts/locale-files.ts`,
-   shared by all three CLIs. Same allow-pragma mechanism for FAQ/legal denial copy; JSON
+   六合彩, 派彩, 回報…), and the ja list (`JA_BANNED_TERMS`) is matched as substrings too,
+   with the same innocent-word audit (ロト hides in プロトコル, ベット in アルファベット, プレイ
+   in ディスプレイ, so the list carries 宝くじ / ベッティング / プレイヤー instead). A profile
+   runs on every locale-agnostic file and on every file of another language written in a
+   different **script family**, but not on a sibling variant of its own language and not on
+   another language of the same family: sibling variants share characters while their
+   registers differ (Hong Kong bans 回報 "return"; Taiwan writes 回報問題 "report an
+   issue"), and Chinese and Japanese share Han characters while their vocabularies differ
+   (Japanese bans 利益 "profit" where Chinese 利益 "interest" is ordinary; Taiwan bans 報酬
+   where Japanese 報酬 is plain "remuneration"). Each locale declares its family in
+   `LocaleConfig.scriptFamily` (`latin` / `han` / `hangul` / `cyrillic`); Korean and
+   Ukrainian checks therefore still run on Japanese and Chinese files, where they can only
+   match genuinely stray copy. File ownership and this scoping are resolved by
+   `checkAppliesTo` in `scripts/locale-files.ts`, shared by all three CLIs. Same allow-pragma mechanism for FAQ/legal denial copy; JSON
    catalogs, which cannot carry pragmas, use `\uXXXX` escapes for denial copy.
 3. **Terminology gate**: `scripts/terminology-consistency.ts` iterates
    `TRANSLATED_LOCALES`, scanning `messages/<locale>/**` and `content/**/*.<locale>.ts`
@@ -479,7 +506,7 @@ flowchart LR
 
 ```bash
 npm run dev
-# dApp:    http://localhost:3000/zh   http://localhost:3000/zh-TW   http://localhost:3000/zh-HK   http://localhost:3000/uk   http://localhost:3000/ko
+# dApp:    http://localhost:3000/zh   http://localhost:3000/zh-TW   http://localhost:3000/zh-HK   http://localhost:3000/uk   http://localhost:3000/ko   http://localhost:3000/ja
 # landing: http://cosmicsignature.local:3000/zh-TW   (see lib/hostRouting.ts for /etc/hosts setup)
 npm run i18n:parity                    # per-locale report: catalogs (translated %, identical-to-source, problems) and long-form content
 npm run i18n:check                     # i18n:strict + i18n:conventions + terminology:check + lexicon:scan (pre-push runs this)
