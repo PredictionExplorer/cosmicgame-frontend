@@ -1,41 +1,41 @@
 import type { TrustPageCopy } from './TrustPageContent';
 
-/** English copy for /audits, rendered by TrustPageContent. */
+/** Vietnamese copy for /audits, rendered by TrustPageContent. */
 export const auditsCopyVi: TrustPageCopy = {
-  eyebrow: 'Audits and verification',
-  title: 'Cosmic Signature Audits',
+  eyebrow: 'Kiểm toán và xác minh',
+  title: 'Kiểm toán Cosmic Signature',
   intro:
-    'Cosmic Signature makes contract review context crawlable so participants, researchers, search engines, and AI systems can understand how the protocol is verified and where to inspect its public implementation.',
+    'Cosmic Signature công khai bối cảnh rà soát hợp đồng ở dạng có thể thu thập được, để người tham gia, nhà nghiên cứu, công cụ tìm kiếm và hệ thống AI hiểu giao thức được xác minh như thế nào và có thể kiểm tra bản triển khai công khai của nó ở đâu.',
   sections: [
     {
-      heading: 'Independent Audit by Hacken',
+      heading: 'Kiểm toán độc lập bởi Hacken',
       paragraphs: [
-        'In late 2025, Hacken carried out an independent security review of the Cosmic Signature smart contracts. The engagement covered the production contracts in the public repository, from the core protocol that runs each cycle to the CST token, both NFT collections, the anchoring wallets, and the wallet and system management contracts that support them. Hacken published the final report in January 2026.',
-        'The report lists 23 findings, none of them critical or high severity: 3 medium, 8 low, and 12 informational observations. Most describe design tradeoffs the team reviewed and accepted, and the report explains each finding along with its status.',
-        'Alongside the manual review, Hacken ran fuzz tests against 14 system invariants, properties such as the requirement that the ETH held by the protocol always equals deposits minus withdrawals. All 14 held across 10,000 runs.',
+        'Cuối năm 2025, Hacken đã thực hiện một cuộc rà soát bảo mật độc lập các hợp đồng thông minh của Cosmic Signature. Phạm vi bao gồm các hợp đồng đang vận hành trong kho mã công khai, từ giao thức cốt lõi điều hành mỗi chu kỳ đến token CST, cả hai bộ sưu tập NFT, các ví neo giữ, cùng các hợp đồng quản lý ví và hệ thống hỗ trợ chúng. Hacken công bố báo cáo cuối cùng vào tháng 1 năm 2026.',
+        'Báo cáo liệt kê 23 phát hiện, không có phát hiện nào ở mức nghiêm trọng hay cao: 3 mức trung bình, 8 mức thấp và 12 quan sát mang tính thông tin. Phần lớn mô tả những cân nhắc thiết kế mà đội ngũ đã xem xét và chấp nhận, và báo cáo giải thích từng phát hiện cùng trạng thái của nó.',
+        'Bên cạnh rà soát thủ công, Hacken đã chạy kiểm thử fuzz với 14 bất biến của hệ thống, chẳng hạn yêu cầu rằng lượng ETH giao thức nắm giữ luôn bằng số đã nạp trừ số đã rút ra. Cả 14 bất biến đều giữ vững qua 10.000 lượt chạy.',
       ],
       linkParagraph: {
         kind: 'external',
         href: 'https://hacken.io/audits/cosmic-signature/sca-cosmic-signature-cosmicsignature-contracts-oct2025/',
-        label: 'Read the full Hacken audit report',
+        label: 'Đọc toàn bộ báo cáo kiểm toán của Hacken',
       },
-      note: 'Last reviewed: 2026-08-24. This page is the canonical public location for Cosmic Signature audit and verification status.',
+      note: 'Rà soát lần cuối: 24/08/2026. Trang này là nơi công khai chính thức về tình trạng kiểm toán và xác minh của Cosmic Signature.',
     },
     {
-      heading: 'Verification Checklist',
+      heading: 'Danh mục xác minh',
       bullets: [
-        'Confirm the contract address on the official contracts page.',
-        'Compare verified source code and ABI data on the Arbitrum block explorer.',
-        'Read the Hacken audit report for the full findings and their status.',
-        'Confirm that visible app mechanics match the public contract behavior.',
+        'Xác nhận địa chỉ hợp đồng trên trang hợp đồng chính thức.',
+        'So sánh mã nguồn đã xác minh và dữ liệu ABI trên trình khám phá khối của Arbitrum.',
+        'Đọc báo cáo kiểm toán của Hacken để xem đầy đủ các phát hiện và trạng thái của chúng.',
+        'Xác nhận rằng cơ chế hiển thị trong ứng dụng khớp với hành vi công khai của hợp đồng.',
       ],
     },
     {
-      heading: 'Related Trust Resources',
+      heading: 'Tài nguyên tin cậy liên quan',
       links: [
-        { kind: 'app', href: '/contracts', label: 'Verified Arbitrum contract addresses' },
-        { kind: 'app', href: '/code', label: 'Source code and deterministic rendering resources' },
-        { kind: 'app', href: '/security', label: 'Security overview' },
+        { kind: 'app', href: '/contracts', label: 'Địa chỉ hợp đồng Arbitrum đã xác minh' },
+        { kind: 'app', href: '/code', label: 'Mã nguồn và tài nguyên kết xuất tất định' },
+        { kind: 'app', href: '/security', label: 'Tổng quan bảo mật' },
       ],
     },
   ],

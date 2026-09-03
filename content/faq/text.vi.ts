@@ -2,360 +2,378 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { FAQText } from './structure';
 
-/** English FAQ copy, keyed by the skeleton in structure.ts. */
+const ELAPSED_VI: Record<string, string> = {
+  '0 seconds': '0 giây',
+  '1 second': '1 giây',
+  '60 seconds': '60 giây',
+  '1 hour': '1 giờ',
+  '1 day': '1 ngày',
+};
+
+/** Vietnamese decimal mark for a protocol figure quoted in English notation ("1.73"). */
+const viDecimal = (value: string): string => value.replace('.', ',');
+
+const cstAmount = protocolFacts.specialAllocationCst.toLocaleString('vi-VN');
+const outreachCst = protocolFacts.outreachReserveCst.toLocaleString('vi-VN');
+const cstWindowDecrease =
+  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture.toLocaleString('vi-VN');
+const cstWindowIncrease =
+  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture.toLocaleString('vi-VN');
+
+/** Vietnamese FAQ copy, keyed by the skeleton in structure.ts. */
 export const faqTextVi = {
   'getting-started': {
-    title: 'Getting Started',
-    description: 'The basics of Cosmic Signature and how to participate',
+    title: 'Bắt đầu',
+    description: 'Những điều cơ bản về Cosmic Signature và cách tham gia',
     items: {
       'what-is-cosmic-signature': {
-        question: 'What is Cosmic Signature?',
+        question: 'Cosmic Signature là gì?',
         answer:
-          'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
+          'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong một chu kỳ trình diễn; mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ của mình qua hơn mười luồng phân bổ — bao gồm Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum.',
       },
       'is-cosmic-signature-related-to-biology': {
-        question: 'Is Cosmic Signature related to the COSMIC biology database?',
+        question: 'Cosmic Signature có liên quan đến cơ sở dữ liệu sinh học COSMIC không?',
         answer:
-          'No. Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app focused on deterministic three-body NFT art.',
+          'Không. Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi tập trung vào nghệ thuật NFT ba vật thể tất định.',
       },
       'how-does-the-bidding-game-work': {
-        question: 'How does a Performance Cycle work?',
-        answer: `Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures with ETH or CST add the current time increment to the stored finalization time, with the increment starting at one hour and growing ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per finalized cycle. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive ${protocolFacts.finalGestureExclusivityHours}-hour window to finalize the cycle and retrieve the Signature Allocation; gestures remain possible until the cycle is actually finalized.`,
+        question: 'Một chu kỳ trình diễn hoạt động như thế nào?',
+        answer: `Mỗi chu kỳ mở ra với một cửa sổ hiệu chỉnh ETH cho nét bút đầu tiên. Nét bút đầu tiên đó khởi động thời điểm hoàn tất chu kỳ, hiện mặc định khoảng 24 giờ. Các nét bút tiếp theo bằng ETH hoặc CST cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất đã lưu, với mức tăng khởi đầu là một giờ và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Khi thời điểm hoàn tất chu kỳ hết hạn, người tham gia đặt nét bút cuối cùng có một cửa sổ ưu tiên ${protocolFacts.finalGestureExclusivityHours} giờ để hoàn tất chu kỳ và nhận về phân bổ Signature; vẫn có thể đặt nét bút cho đến khi chu kỳ thực sự được hoàn tất.`,
       },
       'what-type-of-gestures-are-available': {
-        question: 'What types of gestures are available?',
+        question: 'Có những loại nét bút nào?',
         answer:
-          'Gestures can be made with ETH or CST tokens (ERC-20). The first gesture of every cycle must be an ETH gesture; after that, ETH and CST gestures can be mixed freely. You may also attach a Random Walk NFT to an ETH gesture to receive a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. CST gestures use their own Calibration Window: the CST Gesture Cost descends while the window runs, and the window length itself changes after every ETH or CST gesture.',
+          'Nét bút có thể đặt bằng ETH hoặc token CST (ERC-20). Nét bút đầu tiên của mỗi chu kỳ phải là nét bút ETH; sau đó, nét bút ETH và CST có thể xen kẽ tự do. Bạn cũng có thể đính kèm một Random Walk NFT vào nét bút ETH để được giảm 50% chi phí nét bút ETH. Cosmic Signature NFT (ERC-721) là tài sản phân bổ và neo giữ; chúng không được chấp nhận làm phương thức thanh toán cho nét bút. Nét bút CST dùng cửa sổ hiệu chỉnh riêng: chi phí nét bút CST giảm dần khi cửa sổ chạy, và độ dài cửa sổ tự thay đổi sau mỗi nét bút ETH hoặc CST.',
       },
       'can-i-participate-without-nfts': {
-        question: "Can I participate if I don't own any NFTs?",
+        question: 'Tôi có thể tham gia nếu không sở hữu NFT nào không?',
         answer:
-          'Yes. Anyone can participate in a Cosmic Signature Performance Cycle by making a gesture. An unused Random Walk NFT can be attached to an ETH gesture for a 50% Gesture Cost reduction.',
+          'Có. Bất kỳ ai cũng có thể tham gia một chu kỳ trình diễn Cosmic Signature bằng cách đặt nét bút. Một Random Walk NFT chưa sử dụng có thể được đính kèm vào nét bút ETH để giảm 50% chi phí nét bút.',
       },
       'how-can-i-get-involved': {
-        question: 'How can I get involved?',
+        question: 'Tôi có thể tham gia bằng cách nào?',
         answer:
-          'You can participate by making gestures during a Performance Cycle, or by contributing an NFT from your project to be attached to a participant’s gesture. Join the Discord to meet other participants.',
+          'Bạn có thể tham gia bằng cách đặt nét bút trong một chu kỳ trình diễn, hoặc đóng góp một NFT từ dự án của bạn để đính kèm vào nét bút của người tham gia. Hãy tham gia Discord để gặp những người tham gia khác.',
       },
       'how-long-does-each-round-last': {
-        question: 'How long does each Performance Cycle last?',
-        answer: `Each cycle begins when the first ETH gesture is made, which starts the Cycle Finalization Time at roughly 24 times the current time increment (about one day at launch). Every later gesture adds the current time increment, which started at exactly one hour and grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with each finalized cycle. A cycle can therefore last much longer than a day if gestures keep arriving before finalization.`,
+        question: 'Mỗi chu kỳ trình diễn kéo dài bao lâu?',
+        answer: `Mỗi chu kỳ bắt đầu khi nét bút ETH đầu tiên được đặt, khởi động thời điểm hoàn tất chu kỳ ở khoảng 24 lần mức tăng thời gian hiện tại (khoảng một ngày khi ra mắt). Mỗi nét bút sau đó cộng thêm mức tăng thời gian hiện tại, vốn khởi đầu ở đúng một giờ và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Vì vậy một chu kỳ có thể kéo dài hơn một ngày rất nhiều nếu nét bút liên tục xuất hiện trước khi hoàn tất.`,
       },
       'can-i-place-multiple-gestures': {
-        question: 'Can I make multiple gestures in one cycle?',
+        question: 'Tôi có thể đặt nhiều nét bút trong một chu kỳ không?',
         answer:
-          'Yes. Each gesture can imprint Participation CST into your wallet, increases your entry count for Stellar Selections, and shapes the cycle’s evolving Signature. The Participation CST amount is dynamic: it depends on how much time has passed since the previous gesture, so a longer quiet period creates a larger CST imprint than a rapid follow-up gesture.',
+          'Có. Mỗi nét bút có thể khắc CST tham gia vào ví của bạn, tăng số lượt của bạn trong Tinh tuyển và định hình Signature đang biến chuyển của chu kỳ. Lượng CST tham gia là động: nó phụ thuộc vào khoảng thời gian đã trôi qua kể từ nét bút trước, nên một khoảng lặng dài tạo ra lần khắc CST lớn hơn so với một nét bút nối tiếp dồn dập.',
       },
     },
   },
   'allocations-and-rewards': {
-    title: 'Allocations & Distributions',
-    description: 'What participants may receive when the cycle finalizes',
+    title: 'Phân bổ và phân phối',
+    description: 'Người tham gia có thể nhận gì khi chu kỳ hoàn tất',
     items: {
       'what-is-the-main-allocation': {
-        question: 'What is the Signature Allocation?',
+        question: 'Phân bổ Signature là gì?',
         answer:
-          'The Signature Allocation is received by the participant who made the Final Gesture of a cycle. It includes one Cosmic Signature NFT, a Recognition CST imprint of 1,000 CST, and 25% of the Cycle Reserve in ETH, plus any tokens or NFTs attached to participant gestures during the cycle.',
+          'Phân bổ Signature thuộc về người tham gia đặt nét bút cuối cùng của một chu kỳ. Nó bao gồm một Cosmic Signature NFT, 1.000 CST ghi nhận và 25% Dự trữ chu kỳ bằng ETH, cộng với mọi token hoặc NFT được đính kèm vào nét bút của người tham gia trong chu kỳ.',
       },
       'what-rewards-per-bid': {
-        question: 'What do I receive for each gesture?',
-        answer: `Every gesture records one entry in end-of-cycle Stellar Selections, updates your Endurance Window contribution toward the Endurance Champion and Chrono-Warrior tracks, and may imprint Participation CST. Participation CST is calculated with a square-root formula: ${protocolFacts.dynamicCstRewardFormula}. In plain English, the amount grows with the time since the previous gesture, but at a slowing rate. Very rapid gestures can receive 0 CST; a longer gap can produce a much larger CST imprint.`,
+        question: 'Tôi nhận được gì cho mỗi nét bút?',
+        answer: `Mỗi nét bút ghi nhận một lượt trong Tinh tuyển cuối chu kỳ, cập nhật đóng góp khoảng bền bỉ của bạn cho các luồng Quán quân Bền bỉ và Chiến binh Thời gian, và có thể khắc CST tham gia. CST tham gia được tính theo công thức căn bậc hai: ${protocolFacts.dynamicCstRewardFormula}. Nói đơn giản, lượng này tăng theo thời gian kể từ nét bút trước, nhưng với tốc độ chậm dần. Nét bút quá dồn dập có thể nhận 0 CST; một khoảng cách dài hơn có thể tạo ra lần khắc CST lớn hơn nhiều.`,
       },
       'how-does-the-stellarSelection-work': {
-        question: 'How does Stellar Selection work?',
-        answer: `Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects entries from the pool: ${protocolFacts.ethStellarSelectionRecipients} selections share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.nftStellarSelectionRecipients} selections each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} selections among anchored Random Walk NFTs also receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and Cosmic Signature NFTs. Selections are drawn with replacement, so the same address can be selected more than once in a cycle. Selection frequency increases with the number of gestures you make.`,
+        question: 'Tinh tuyển hoạt động như thế nào?',
+        answer: `Mỗi nét bút ghi nhận một lượt Tinh tuyển. Cuối mỗi chu kỳ, hợp đồng thông minh chọn ngẫu nhiên các lượt từ quỹ: ${protocolFacts.ethStellarSelectionRecipients} lượt chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ bằng ETH, ${protocolFacts.nftStellarSelectionRecipients} lượt mỗi lượt nhận ${cstAmount} CST và một Cosmic Signature NFT, và ${protocolFacts.anchoredRwlkNftSelectionRecipients} lượt trong số các Random Walk NFT đang neo giữ cũng nhận ${cstAmount} CST và Cosmic Signature NFT. Các lượt chọn có hoàn lại, nên cùng một địa chỉ có thể được chọn nhiều lần trong một chu kỳ. Tần suất được chọn tăng theo số nét bút bạn đặt.`,
       },
       'how-random-selection-works': {
-        question: 'How are random selections made?',
+        question: 'Việc chọn ngẫu nhiên được thực hiện thế nào?',
         answer:
-          'Stellar Selection uses on-chain randomness sources at cycle finalization time, including Arbitrum-provided block context and fallback entropy sources. Participant Stellar Selection is entry-weighted: each gesture adds an entry, so more gestures increase selection frequency. Anchored-NFT Stellar Selection is separate and is based on anchored Random Walk NFT eligibility rather than the participant gesture-entry pool.',
+          'Tinh tuyển dùng các nguồn ngẫu nhiên trên chuỗi tại thời điểm hoàn tất chu kỳ, gồm bối cảnh khối do Arbitrum cung cấp và các nguồn entropy dự phòng. Tinh tuyển dành cho người tham gia tính theo lượt: mỗi nét bút thêm một lượt, nên càng nhiều nét bút thì tần suất được chọn càng cao. Tinh tuyển NFT neo giữ là một cơ chế riêng, dựa trên diện Random Walk NFT đang neo giữ thay vì quỹ lượt nét bút của người tham gia.',
       },
       'how-do-i-claim-my-allocation': {
-        question: 'How do I retrieve my allocation if I’m a recipient?',
-        answer: `Recipients retrieve allocations through the app and protocol contracts. The Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours of exclusive time after the Cycle Finalization Time to finalize the cycle and retrieve the Signature Allocation. After that, the Open-Finalization Window begins: anyone may finalize the cycle, and the smart contract treats whoever finalizes as the cycle beneficiary — the finalizer receives the entire Signature Allocation (the ETH share, the ${protocolFacts.specialAllocationCst.toLocaleString()} CST imprint, the Cosmic Signature NFT, and priority over attached assets). Secondary ETH and attached-token or attached-NFT allocations sit in the Allocations Wallet escrow with a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks; once it expires, the contracts permit anyone to retrieve an unretrieved allocation for themselves. Retrieve promptly.`,
+        question: 'Tôi nhận về phân bổ bằng cách nào nếu là người nhận?',
+        answer: `Người nhận nhận về phân bổ thông qua ứng dụng và các hợp đồng giao thức. Người đặt nét bút cuối cùng có ${protocolFacts.finalGestureExclusivityHours} giờ ưu tiên sau thời điểm hoàn tất chu kỳ để hoàn tất chu kỳ và nhận về phân bổ Signature. Sau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất chu kỳ, và hợp đồng thông minh coi người hoàn tất là người nhận của chu kỳ — người hoàn tất nhận toàn bộ phân bổ Signature (phần ETH, ${cstAmount} CST được khắc, Cosmic Signature NFT và quyền ưu tiên với các tài sản đính kèm). Các phân bổ ETH phụ cùng phân bổ token hoặc NFT đính kèm nằm trong ký quỹ của ví phân bổ với một thời hạn nhận về riêng, mặc định là ${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần; khi hết hạn, các hợp đồng cho phép bất kỳ ai nhận về một phân bổ chưa được nhận cho chính họ. Hãy nhận về kịp thời.`,
       },
       'how-does-anchoring-work': {
-        question: 'How does Anchoring work?',
-        answer: `Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions: each finalized cycle allocates ${protocolFacts.anchorDistributionPercentage}% of the Cycle Reserve, split equally per anchored Cosmic Signature NFT, and the accumulated ETH is paid out when you release the anchor. Random Walk NFTs can also be anchored, but only for Anchored-NFT Stellar Selection eligibility — selected anchor-holders receive CST and Cosmic Signature NFTs, not ETH. Two rules to know: every NFT can be anchored only once, ever (after you release an anchor, that NFT can never be anchored again), and if no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle's ${protocolFacts.anchorDistributionPercentage}% simply stays in the Cycle Reserve. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.`,
+        question: 'Neo giữ hoạt động như thế nào?',
+        answer: `Cosmic Signature NFT có thể được neo giữ với giao thức để nhận phân phối neo giữ bằng ETH: mỗi chu kỳ hoàn tất phân bổ ${protocolFacts.anchorDistributionPercentage}% Dự trữ chu kỳ, chia đều cho mỗi Cosmic Signature NFT đang neo giữ, và ETH tích lũy được chi trả khi bạn gỡ neo. Random Walk NFT cũng có thể được neo giữ, nhưng chỉ để thuộc diện Tinh tuyển NFT neo giữ — những người neo giữ được chọn nhận CST và Cosmic Signature NFT, không nhận ETH. Hai quy tắc cần biết: mỗi NFT chỉ được neo giữ đúng một lần (sau khi bạn gỡ neo, NFT đó không bao giờ có thể neo giữ lại), và nếu không có Cosmic Signature NFT nào đang neo giữ khi một chu kỳ hoàn tất, ${protocolFacts.anchorDistributionPercentage}% của chu kỳ đó chỉ đơn giản ở lại trong Dự trữ chu kỳ. CST (ERC-20) không thể neo giữ. Hãy vào trang Neo giữ của tôi (từ menu tài khoản) để quản lý neo giữ.`,
       },
       'what-are-marketing-rewards': {
-        question: 'What is the Outreach Reserve?',
-        answer: `You can receive CST tokens (ERC-20) for helping promote the protocol. The Outreach Reserve imprints ${protocolFacts.outreachReserveCst.toLocaleString()} CST per cycle and distributes it to ecosystem contributors. Contact the Outreach Custodian via Discord for guidance.`,
+        question: 'Dự trữ truyền thông là gì?',
+        answer: `Bạn có thể nhận token CST (ERC-20) khi giúp giới thiệu giao thức. Dự trữ truyền thông khắc ${outreachCst} CST mỗi chu kỳ và phân phối cho những người đóng góp cho hệ sinh thái. Hãy liên hệ người phụ trách truyền thông qua Discord để được hướng dẫn.`,
       },
       'how-many-nfts-minted': {
-        question: 'How many Cosmic Signature NFTs are imprinted each cycle?',
-        answer: `In the vast majority of cycles, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ${protocolFacts.nftStellarSelectionRecipients} for NFT Stellar Selection recipients, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection. Each of those ${protocolFacts.typicalNftsPerCycle} NFT allocations also includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST. If a cycle has no CST gestures or no anchored Random Walk NFTs, those specific imprints are skipped for that cycle.`,
+        question: 'Mỗi chu kỳ có bao nhiêu Cosmic Signature NFT được khắc?',
+        answer: `Trong phần lớn các chu kỳ, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT được khắc: một cho người nhận phân bổ Signature, một cho người nhận nét bút CST cuối cùng, một cho Quán quân Bền bỉ, một cho Chiến binh Thời gian, ${protocolFacts.nftStellarSelectionRecipients} cho người nhận NFT Tinh tuyển, và ${protocolFacts.anchoredRwlkNftSelectionRecipients} cho những người neo giữ Random Walk NFT được chọn qua Tinh tuyển NFT neo giữ. Mỗi phân bổ NFT trong ${protocolFacts.typicalNftsPerCycle} phân bổ đó cũng đi kèm ${cstAmount} CST. Nếu một chu kỳ không có nét bút CST hoặc không có Random Walk NFT đang neo giữ, những lần khắc tương ứng sẽ được bỏ qua trong chu kỳ đó.`,
       },
       'what-happens-to-remaining-eth': {
-        question: 'What happens to the remaining ETH in the Cycle Reserve?',
+        question: 'ETH còn lại trong Dự trữ chu kỳ sẽ đi đâu?',
         answer:
-          'About half of the Cycle Reserve rolls forward into the next Performance Cycle as the Compounding Cycle Reserve, increasing the starting balance for the following cycle. The protocol compounds rather than extracts.',
+          'Khoảng một nửa Dự trữ chu kỳ chuyển tiếp vào chu kỳ trình diễn tiếp theo dưới dạng Dự trữ tích lũy, nâng số dư khởi điểm của chu kỳ sau. Giao thức tích lũy thay vì rút ra.',
       },
       'what-happens-to-attached-assets': {
-        question: 'What happens to tokens or NFTs attached to gestures?',
-        answer: `ERC-20 tokens or ERC-721 NFTs attached to gestures are held in escrow by the Allocations Wallet contract; they do not join the ETH Cycle Reserve. After finalization, the cycle beneficiary (normally the Final Gesture participant) has exclusive priority to retrieve them. If attached assets remain unretrieved past the secondary retrieval timeout, currently ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks by default, the contracts permit anyone to retrieve them for themselves.`,
+        question: 'Điều gì xảy ra với token hoặc NFT đính kèm vào nét bút?',
+        answer: `Token ERC-20 hoặc NFT ERC-721 đính kèm vào nét bút được hợp đồng ví phân bổ giữ trong ký quỹ; chúng không nhập vào Dự trữ chu kỳ bằng ETH. Sau khi hoàn tất, người nhận của chu kỳ (thường là người đặt nét bút cuối cùng) có quyền ưu tiên độc quyền để nhận về chúng. Nếu tài sản đính kèm vẫn chưa được nhận về sau thời hạn nhận về phụ, hiện mặc định là ${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần, các hợp đồng cho phép bất kỳ ai nhận về chúng cho chính họ.`,
       },
       'who-receives-10-percent': {
-        question: 'Who receives the public-goods allocation from the Cycle Reserve?',
+        question: 'Ai nhận phần phân bổ hàng hóa công từ Dự trữ chu kỳ?',
         answer:
-          'Seven percent of the Cycle Reserve is forwarded to the Public Goods Vault at finalization, and anyone can then forward the vault balance to the configured Public Goods Beneficiary. The current beneficiary is Protocol Guild — the collective funding mechanism for 170+ Ethereum core contributors. Today the beneficiary address is set by the protocol owner; the intent is for the Cosmic Council to direct it once ownership moves under Council control.',
+          'Bảy phần trăm Dự trữ chu kỳ được chuyển đến Kho Hàng hóa công khi hoàn tất, và sau đó bất kỳ ai cũng có thể chuyển số dư của kho đến đơn vị thụ hưởng Hàng hóa công đã cấu hình. Đơn vị thụ hưởng hiện tại là Protocol Guild — cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho Ethereum. Hiện nay địa chỉ thụ hưởng do chủ sở hữu giao thức thiết lập; dự định là Hội đồng Vũ trụ sẽ điều hướng nó khi quyền sở hữu chuyển sang Hội đồng kiểm soát.',
       },
     },
   },
   'game-mechanics': {
-    title: 'Cycle Mechanics',
-    description: 'Deep dive into gesture timing and protocol rules',
+    title: 'Cơ chế chu kỳ',
+    description: 'Đi sâu vào thời điểm nét bút và quy tắc giao thức',
     items: {
       'how-does-price-increase': {
-        question: 'How does Gesture Cost change across a cycle?',
+        question: 'Chi phí nét bút thay đổi thế nào trong một chu kỳ?',
         answer:
-          'ETH and CST Gesture Costs follow separate on-chain paths. ETH Gesture Cost uses an ETH Calibration Window and then steps upward after ETH gestures. CST Gesture Cost descends through the current CST Calibration Window. That CST window is not static: ETH gestures shorten it slightly, while CST gestures lengthen it slightly, so the cost path reacts to the balance of ETH and CST participation.',
+          'Chi phí nét bút ETH và CST đi theo hai đường riêng trên chuỗi. Chi phí nét bút ETH dùng cửa sổ hiệu chỉnh ETH rồi tăng theo bậc sau các nét bút ETH. Chi phí nét bút CST giảm dần qua cửa sổ hiệu chỉnh CST hiện tại. Cửa sổ CST đó không tĩnh: nét bút ETH rút ngắn nó một chút, còn nét bút CST kéo dài nó một chút, nên đường chi phí phản ứng theo cán cân giữa tham gia bằng ETH và CST.',
       },
       'what-is-dutch-auction': {
-        question: 'What is the Calibration Window?',
-        answer: `A Calibration Window is a cost-discovery window in which Gesture Cost descends linearly from a Calibration Ceiling over a known duration. ETH gestures and CST gestures use separate windows with different floors: the ETH Gesture Cost descends to a floor of about 1/${protocolFacts.ethCalibrationFloorDivisor} of its ceiling, while the CST Gesture Cost descends all the way to ${protocolFacts.cstCalibrationFloorCst} — a free CST gesture is possible if the window fully elapses. The CST Calibration Window currently starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference, but it is stored on-chain and changes after every gesture: each CST gesture increases the window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, and each ETH gesture decreases it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
+        question: 'Cửa sổ hiệu chỉnh là gì?',
+        answer: `Cửa sổ hiệu chỉnh là một cửa sổ khám phá chi phí, trong đó chi phí nét bút giảm tuyến tính từ trần hiệu chỉnh trong một thời lượng đã biết. Nét bút ETH và nét bút CST dùng hai cửa sổ riêng với hai sàn khác nhau: chi phí nét bút ETH giảm đến sàn khoảng 1/${protocolFacts.ethCalibrationFloorDivisor} trần của nó, còn chi phí nét bút CST giảm hẳn về ${protocolFacts.cstCalibrationFloorCst} — một nét bút CST không tốn chi phí là khả thi nếu cửa sổ trôi qua hoàn toàn. Cửa sổ hiệu chỉnh CST hiện khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ, nhưng nó được lưu trên chuỗi và thay đổi sau mỗi nét bút: mỗi nét bút CST tăng cửa sổ khoảng ${cstWindowIncrease}%, và mỗi nét bút ETH giảm nó khoảng ${cstWindowDecrease}%.`,
       },
       'how-is-participation-cst-calculated': {
-        question: 'How is Participation CST calculated?',
-        answer: `Participation CST uses a square-root formula based on elapsed time since the previous gesture: ${protocolFacts.dynamicCstRewardFormula}. The square root matters because it rewards longer quiet periods without making the reward grow linearly forever. At the launch parameters (a time increment of exactly one hour), examples are approximately ${protocolFacts.dynamicCstRewardExamples.map((example) => `${example.cst} CST after ${example.elapsed}`).join(', ')}. The increment grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per finalized cycle, so live amounts drift slightly below these over time. The live app preview and the contract are the source of truth for the exact amount at the moment your gesture lands.`,
+        question: 'CST tham gia được tính như thế nào?',
+        answer: `CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua kể từ nét bút trước: ${protocolFacts.dynamicCstRewardFormula}. Căn bậc hai quan trọng vì nó ghi nhận những khoảng lặng dài hơn mà không để lượng nhận tăng tuyến tính mãi mãi. Với các tham số lúc ra mắt (mức tăng thời gian đúng một giờ), các ví dụ xấp xỉ là ${protocolFacts.dynamicCstRewardExamples.map((example) => `${viDecimal(example.cst)} CST sau ${ELAPSED_VI[example.elapsed] ?? example.elapsed}`).join(', ')}. Mức tăng lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên lượng thực tế theo thời gian trôi thấp hơn một chút so với các con số này. Bản xem trước trực tiếp trong ứng dụng và hợp đồng là nguồn chính xác cho lượng đúng tại thời điểm nét bút của bạn được ghi nhận.`,
       },
       'why-minimum-cst-reward-protection': {
-        question: 'What is Minimum CST Reward Protection?',
+        question: 'Bảo đảm CST tham gia tối thiểu là gì?',
         answer:
-          'Before you submit a gesture, the app previews the expected Participation CST amount and sends a minimum CST amount you are willing to accept. If another gesture lands first, your expected amount may change. Minimum CST Reward Protection can stop the transaction if the resulting CST imprint would be below your chosen minimum. You can also choose to accept any CST amount, including 0 CST, if you prefer the gesture to proceed whenever the cost checks pass.',
+          'Trước khi bạn gửi nét bút, ứng dụng xem trước lượng CST tham gia dự kiến và gửi kèm mức CST tối thiểu bạn sẵn lòng chấp nhận. Nếu một nét bút khác đến trước, lượng dự kiến của bạn có thể thay đổi. Bảo đảm CST tham gia tối thiểu có thể dừng giao dịch nếu lần khắc CST kết quả thấp hơn mức tối thiểu bạn đã chọn. Bạn cũng có thể chọn chấp nhận mọi lượng CST, kể cả 0 CST, nếu muốn nét bút được tiến hành miễn là các kiểm tra chi phí đạt.',
       },
       'how-cst-calibration-window-changes': {
-        question: 'How does each gesture change the CST Calibration Window?',
-        answer: `Every ETH or CST gesture updates the stored CST Calibration Window. A CST gesture lengthens the window by duration / ${protocolFacts.cstCalibrationWindowChangeDivisor}, which is about +${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% before integer truncation. An ETH gesture shortens it by approximately duration / ${protocolFacts.cstCalibrationWindowChangeDivisor + 1}, about -${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%. A shorter window makes CST Gesture Cost fall faster; a longer window makes it fall more slowly.`,
+        question: 'Mỗi nét bút làm thay đổi cửa sổ hiệu chỉnh CST như thế nào?',
+        answer: `Mỗi nét bút ETH hoặc CST đều cập nhật cửa sổ hiệu chỉnh CST đã lưu. Một nét bút CST kéo dài cửa sổ thêm thời lượng / ${protocolFacts.cstCalibrationWindowChangeDivisor}, tức khoảng +${cstWindowIncrease}% trước khi làm tròn xuống số nguyên. Một nét bút ETH rút ngắn nó khoảng thời lượng / ${protocolFacts.cstCalibrationWindowChangeDivisor + 1}, tức khoảng -${cstWindowDecrease}%. Cửa sổ ngắn hơn khiến chi phí nét bút CST giảm nhanh hơn; cửa sổ dài hơn khiến nó giảm chậm hơn.`,
       },
       'what-is-open-finalization-window': {
-        question: 'What is the Open-Finalization Window?',
-        answer: `When the Cycle Finalization Time expires, the Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours of exclusive time to finalize the cycle. If they do not finalize during that exclusivity window, anyone may call the finalization transaction — and the smart contract makes whoever finalizes the cycle beneficiary. The finalizer receives the full Signature Allocation (ETH share, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, the Cosmic Signature NFT, and priority over attached assets), so the Final Gesture participant should finalize before the window ends. Open finalization keeps the protocol moving even if the Final Gesture participant disappears.`,
+        question: 'Cửa sổ hoàn tất mở là gì?',
+        answer: `Khi thời điểm hoàn tất chu kỳ hết hạn, người đặt nét bút cuối cùng có ${protocolFacts.finalGestureExclusivityHours} giờ ưu tiên để hoàn tất chu kỳ. Nếu họ không hoàn tất trong cửa sổ ưu tiên đó, bất kỳ ai cũng có thể gọi giao dịch hoàn tất — và hợp đồng thông minh coi người hoàn tất là người nhận của chu kỳ. Người hoàn tất nhận toàn bộ phân bổ Signature (phần ETH, ${cstAmount} CST, Cosmic Signature NFT và quyền ưu tiên với các tài sản đính kèm), nên người đặt nét bút cuối cùng nên hoàn tất trước khi cửa sổ kết thúc. Hoàn tất mở giữ cho giao thức tiếp tục vận hành ngay cả khi người đặt nét bút cuối cùng biến mất.`,
       },
       'what-is-endurance-champion': {
-        question: 'What is an Endurance Champion?',
+        question: 'Quán quân Bền bỉ là gì?',
         answer:
-          'The participant who remained the most recent gesture maker for the longest consecutive interval within a cycle (the longest gap before another gesture arrived). When the cycle finalizes, the Endurance Champion receives a Recognition CST imprint of 1,000 CST and one Cosmic Signature NFT.',
+          'Người tham gia giữ vị trí người đặt nét bút gần nhất trong khoảng liên tục dài nhất của một chu kỳ (khoảng cách dài nhất trước khi một nét bút khác xuất hiện). Khi chu kỳ hoàn tất, Quán quân Bền bỉ nhận 1.000 CST ghi nhận và một Cosmic Signature NFT.',
       },
       'what-is-final-cst-gesture': {
-        question: 'What is the Final CST Gesture?',
+        question: 'Nét bút CST cuối cùng là gì?',
         answer:
-          'The Final CST Gesture is the last gesture made with CST tokens during a cycle. When the cycle finalizes, the participant who made it receives a Recognition CST imprint of 1,000 CST and one Cosmic Signature NFT.',
+          'Nét bút CST cuối cùng là nét bút sau cùng được đặt bằng token CST trong một chu kỳ. Khi chu kỳ hoàn tất, người tham gia đặt nét bút đó nhận 1.000 CST ghi nhận và một Cosmic Signature NFT.',
       },
       'what-is-chrono-warrior': {
-        question: 'What is a Chrono-Warrior?',
-        answer: `The participant who held the Endurance Champion position for the longest consecutive interval. Analogous to the Endurance Champion being the longest-reigning recent gesture maker, the Chrono-Warrior is the longest-reigning Endurance Champion. When the cycle finalizes, the Chrono-Warrior receives ${protocolFacts.chronoWarriorEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, and one Cosmic Signature NFT.`,
+        question: 'Chiến binh Thời gian là gì?',
+        answer: `Người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng liên tục dài nhất. Tương tự như Quán quân Bền bỉ là người đặt nét bút gần nhất giữ vị trí lâu nhất, Chiến binh Thời gian là Quán quân Bền bỉ giữ vị trí lâu nhất. Khi chu kỳ hoàn tất, Chiến binh Thời gian nhận ${protocolFacts.chronoWarriorEthPercentage}% Dự trữ chu kỳ bằng ETH, ${cstAmount} CST và một Cosmic Signature NFT.`,
       },
       'does-time-per-bid-stay-same': {
-        question: 'Does the time added per gesture always stay the same?',
-        answer: `No. The time added after each gesture started at exactly one hour at launch and grows by ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% every time a cycle finalizes. Because a larger increment also makes each cycle last longer, the growth naturally slows down in calendar time.`,
+        question: 'Thời gian cộng thêm cho mỗi nét bút có luôn giữ nguyên không?',
+        answer: `Không. Thời gian cộng thêm sau mỗi nét bút khởi đầu ở đúng một giờ khi ra mắt và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% mỗi lần một chu kỳ hoàn tất. Vì mức tăng lớn hơn cũng khiến mỗi chu kỳ kéo dài hơn, nên đà tăng tự nhiên chậm lại theo thời gian lịch.`,
       },
       'why-time-per-bid-increases': {
-        question: 'Why does the time added per gesture increase over time?',
+        question: 'Vì sao thời gian cộng thêm cho mỗi nét bút tăng dần theo thời gian?',
         answer:
-          'The mechanism limits the long-term rate at which Cosmic Signature NFTs are imprinted. Slower cycles mean fewer new NFTs enter circulation per unit time, preserving scarcity.',
+          'Cơ chế này giới hạn tốc độ khắc Cosmic Signature NFT về dài hạn. Chu kỳ chậm hơn nghĩa là ít NFT mới đi vào lưu hành hơn trên mỗi đơn vị thời gian, giữ gìn sự khan hiếm.',
       },
       'how-time-increase-affects-game': {
-        question: 'How does the increase in time per gesture affect the protocol?',
+        question: 'Việc tăng thời gian mỗi nét bút ảnh hưởng thế nào đến giao thức?',
         answer:
-          'As the time added per gesture increases, cycles run longer on average. The change is gradual, preserving a smooth participation experience while limiting total Cosmic Signature NFT supply over long time horizons.',
+          'Khi thời gian cộng thêm cho mỗi nét bút tăng, các chu kỳ trung bình kéo dài hơn. Sự thay đổi diễn ra từ từ, giữ trải nghiệm tham gia mượt mà trong khi giới hạn tổng cung Cosmic Signature NFT trên những khung thời gian dài.',
       },
       'what-if-two-gestures-same-time': {
-        question: 'What happens if two gestures are submitted at the same time?',
+        question: 'Điều gì xảy ra nếu hai nét bút được gửi cùng lúc?',
         answer:
-          'Transactions on Arbitrum are processed in the order they are included by the sequencer. If two gestures arrive at the same moment, the one confirmed first is the valid gesture.',
+          'Giao dịch trên Arbitrum được xử lý theo thứ tự mà sequencer đưa vào. Nếu hai nét bút đến cùng một khoảnh khắc, nét bút được xác nhận trước là nét bút hợp lệ.',
       },
       'is-there-game-theory': {
-        question: 'Is there a strategic element in Cosmic Signature?',
+        question: 'Cosmic Signature có yếu tố chiến thuật không?',
         answer:
-          'Yes. Participant timing, gesture frequency, and method (ETH vs CST vs Random Walk attachment) all shape how allocations distribute. The social dynamics and protocol design are designed so that multiple strategies can succeed across different allocation tracks.',
+          'Có. Thời điểm của người tham gia, tần suất nét bút và phương thức (ETH so với CST so với đính kèm Random Walk) đều định hình cách các phân bổ được phân phối. Động lực xã hội và thiết kế giao thức được xây dựng để nhiều chiến thuật khác nhau đều có thể thành công trên các luồng phân bổ khác nhau.',
       },
     },
   },
   'tokens-and-nfts': {
-    title: 'Tokens & Cosmic Signatures',
-    description: 'CST, the on-chain art, and digital assets',
+    title: 'Token và Cosmic Signature',
+    description: 'CST, nghệ thuật trên chuỗi và tài sản số',
     items: {
       'what-are-cst-and-dao': {
-        question: 'What are CST tokens and the Cosmic Council?',
+        question: 'Token CST và Hội đồng Vũ trụ là gì?',
         answer:
-          'Every gesture can imprint CST tokens, which express Coordination Weight on the Cosmic Council. The Council coordinates the protocol on-chain: CST holders submit Coordination Proposals and express Support or Opposition (delegate your CST — to yourself or another address — to activate that weight). The Council is designed to direct protocol parameters, including which Public Goods Beneficiary receives the 7% allocation, once contract ownership moves under Council control; today those settings are still managed by the protocol owner.',
+          'Mỗi nét bút có thể khắc token CST, thứ biểu thị trọng số điều phối trong Hội đồng Vũ trụ. Hội đồng điều phối giao thức trên chuỗi: người nắm giữ CST gửi các đề xuất điều phối và bày tỏ tán thành hoặc phản đối (ủy quyền CST của bạn — cho chính bạn hoặc một địa chỉ khác — để kích hoạt trọng số đó). Hội đồng được thiết kế để điều hướng các tham số giao thức, bao gồm đơn vị thụ hưởng Hàng hóa công nào nhận phần phân bổ 7%, khi quyền sở hữu hợp đồng chuyển sang Hội đồng kiểm soát; hiện nay các thiết lập đó vẫn do chủ sở hữu giao thức quản lý.',
       },
       'what-can-i-do-with-cst': {
-        question: 'What can I do with CST tokens?',
+        question: 'Tôi có thể làm gì với token CST?',
         answer:
-          'CST tokens can be used as an alternative to ETH for gestures through the CST Calibration Window; CST spent on a gesture is burned (permanently removed from supply) rather than pooled. Gestures can also imprint Participation CST, but the amount is dynamic and depends on how long it has been since the previous gesture. CST also expresses Coordination Weight on the Cosmic Council once delegated (you can delegate to yourself).',
+          'Token CST có thể dùng thay cho ETH khi đặt nét bút thông qua cửa sổ hiệu chỉnh CST; CST chi cho một nét bút được đốt (loại bỏ vĩnh viễn khỏi nguồn cung) thay vì gom vào quỹ. Nét bút cũng có thể khắc CST tham gia, nhưng lượng này là động và phụ thuộc vào khoảng thời gian kể từ nét bút trước. CST cũng biểu thị trọng số điều phối trong Hội đồng Vũ trụ sau khi được ủy quyền (bạn có thể ủy quyền cho chính mình).',
       },
       'what-makes-nfts-unique': {
-        question: 'What makes Cosmic Signature NFTs unique?',
+        question: 'Điều gì làm Cosmic Signature NFT trở nên độc nhất?',
         answer:
-          'Cosmic Signature NFTs are on-chain and self-sustaining. Each NFT is imprinted with a randomly generated seed stored in the smart contract. The image and video are rendered from this seed using an open-source Rust pipeline. The seed determines the three celestial bodies’ starting conditions, producing a unique chaotic trajectory for each NFT.',
+          'Cosmic Signature NFT nằm trên chuỗi và tự duy trì. Mỗi NFT được khắc với một seed sinh ngẫu nhiên lưu trong hợp đồng thông minh. Hình ảnh và video được kết xuất từ seed này bằng một quy trình Rust mã nguồn mở. Seed quyết định điều kiện khởi đầu của ba thiên thể, tạo ra một quỹ đạo hỗn độn độc nhất cho mỗi NFT.',
       },
       'how-are-nft-images-created': {
-        question: 'How are the NFT images created?',
+        question: 'Hình ảnh NFT được tạo ra như thế nào?',
         answer:
-          'Each Cosmic Signature NFT visualizes the three-body problem in Newtonian gravity. The pipeline simulates three celestial bodies under gravity and spectrally renders their trajectories across 64 wavelength bins spanning 380–700 nanometers, creating a unique chaotic pattern for every NFT.',
+          'Mỗi Cosmic Signature NFT trực quan hóa bài toán ba vật thể trong lực hấp dẫn Newton. Quy trình mô phỏng ba thiên thể dưới lực hấp dẫn và kết xuất quang phổ quỹ đạo của chúng qua 64 dải bước sóng trải từ 380–700 nanomet, tạo nên một hoa văn hỗn độn độc nhất cho mỗi NFT.',
       },
       'significance-of-random-seed': {
-        question: 'Why is each NFT generated from an on-chain seed?',
+        question: 'Vì sao mỗi NFT được tạo từ một seed trên chuỗi?',
         answer:
-          'The seed-based pipeline ensures long-term reproducibility. Unlike NFT projects whose images rely on centralized servers, every Cosmic Signature NFT’s seed is stored on Arbitrum. Anyone can independently regenerate the NFT image and video at any time using the open-source Rust pipeline — pixel-for-pixel identical to the original.',
+          'Quy trình dựa trên seed bảo đảm khả năng tái tạo lâu dài. Khác với các dự án NFT mà hình ảnh phụ thuộc vào máy chủ tập trung, seed của mỗi Cosmic Signature NFT được lưu trên Arbitrum. Bất kỳ ai cũng có thể độc lập tạo lại hình ảnh và video NFT vào bất cứ lúc nào bằng quy trình Rust mã nguồn mở — giống bản gốc đến từng điểm ảnh.',
       },
       'is-nft-supply-limited': {
-        question: 'Is the number of Cosmic Signature NFTs limited?',
-        answer: `Yes, in practice. The time added per gesture grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle, so cycles gradually lengthen and the pace of NFT imprinting slows. There is no hard supply cap in the contract, but the slowing cycle rhythm makes Cosmic Signature NFTs an increasingly scarce resource over time.`,
+        question: 'Số lượng Cosmic Signature NFT có giới hạn không?',
+        answer: `Có, trên thực tế. Thời gian cộng thêm cho mỗi nét bút lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên các chu kỳ dần kéo dài và tốc độ khắc NFT chậm lại. Hợp đồng không có giới hạn cung cứng, nhưng nhịp chu kỳ chậm dần khiến Cosmic Signature NFT ngày càng khan hiếm theo thời gian.`,
       },
       'impact-of-limiting-nfts': {
-        question: 'What is the impact of the limited NFT supply?',
+        question: 'Nguồn cung NFT giới hạn có tác động gì?',
         answer:
-          'The growing gesture-time increment and slowing imprint pace preserve scarcity. Each new Cosmic Signature NFT represents a progressively rarer slice of the cumulative protocol history.',
+          'Mức tăng thời gian nét bút ngày càng lớn và tốc độ khắc chậm dần giữ gìn sự khan hiếm. Mỗi Cosmic Signature NFT mới đại diện cho một lát cắt ngày càng hiếm của lịch sử tích lũy của giao thức.',
       },
       'connection-with-randomwalknft': {
-        question: 'What is the connection with Random Walk NFT?',
+        question: 'Mối liên hệ với Random Walk NFT là gì?',
         answer:
-          'Random Walk NFT holders can attach an unused token to one ETH gesture for a 50% ETH Gesture Cost reduction. Random Walk NFT anchor-holders also receive entries into the Anchored-NFT Stellar Selection each cycle.',
+          'Người nắm giữ Random Walk NFT có thể đính kèm một token chưa sử dụng vào một nét bút ETH để giảm 50% chi phí nét bút ETH. Người neo giữ Random Walk NFT cũng nhận các lượt Tinh tuyển NFT neo giữ mỗi chu kỳ.',
       },
       'how-to-trade-nfts-tokens': {
-        question: 'How can I trade or sell my Cosmic Signature NFTs or CST?',
+        question: 'Tôi có thể giao dịch hoặc bán Cosmic Signature NFT hay CST bằng cách nào?',
         answer:
-          'Cosmic Signature NFTs trade on Axiom Zero (axiomzero.market), the zero-fee NFT marketplace built for Cosmic Signature and Random Walk NFTs, and CST trades on Uniswap on Arbitrum. Both are standard ERC-721 and ERC-20 assets, so any other Arbitrum marketplace or exchange that supports those standards works too, including OpenSea.',
+          'Cosmic Signature NFT được giao dịch trên Axiom Zero (axiomzero.market), sàn NFT không thu phí được xây cho Cosmic Signature và Random Walk NFT, còn CST được giao dịch trên Uniswap tại Arbitrum. Cả hai đều là tài sản ERC-721 và ERC-20 tiêu chuẩn, nên bất kỳ sàn hay nơi trao đổi nào khác trên Arbitrum hỗ trợ các tiêu chuẩn này cũng dùng được, kể cả OpenSea.',
       },
       'where-to-buy-cosmic-signature-nfts': {
-        question: 'Where can I buy or sell Cosmic Signature NFTs?',
+        question: 'Tôi có thể mua hoặc bán Cosmic Signature NFT ở đâu?',
         answer:
-          'The primary venue is Axiom Zero (https://www.axiomzero.market/cosmic-signature), a zero-fee NFT marketplace on Arbitrum built for fair-launch generative art. Listings and sales settle directly on-chain, sellers receive the full sale amount, and every token page shows the NFT’s anchor status read live from the anchoring contracts — a never-anchored token keeps its one-time anchoring option open for its next owner.',
+          'Nơi chính là Axiom Zero (https://www.axiomzero.market/cosmic-signature), sàn NFT không thu phí trên Arbitrum được xây cho nghệ thuật tạo sinh ra mắt công bằng. Niêm yết và giao dịch bán được thanh toán trực tiếp trên chuỗi, người bán nhận trọn số tiền bán, và mỗi trang token hiển thị trạng thái neo giữ của NFT đọc trực tiếp từ các hợp đồng neo giữ — một token chưa từng neo giữ vẫn giữ nguyên lựa chọn neo giữ một lần cho chủ sở hữu kế tiếp.',
       },
       'cosmic-signature-prediction-market': {
-        question: 'Is there a prediction market for Cosmic Signature?',
+        question: 'Có thị trường dự đoán cho Cosmic Signature không?',
         answer:
-          'Yes. Chaos Zero (https://chaoszero.com) is a prediction market built specifically for Cosmic Signature. Each Performance Cycle it opens one question: will this cycle finalize with more gestures than the previous one? Positions are denominated in CST and fully collateralized by construction, and markets resolve from the public on-chain gesture count with no owner or admin keys.',
+          'Có. Chaos Zero (https://chaoszero.com) là thị trường dự đoán được xây riêng cho Cosmic Signature. Mỗi chu kỳ trình diễn nó mở một câu hỏi: Chu kỳ này có hoàn tất với nhiều nét bút hơn chu kỳ trước không? Các vị thế được tính bằng CST và được bảo chứng đầy đủ theo thiết kế, và thị trường được giải quyết từ số nét bút công khai trên chuỗi, không có khóa chủ sở hữu hay quản trị.',
       },
       'participate-dao-without-bidding': {
-        question: 'Can I participate in the Cosmic Council without making a gesture?',
+        question: 'Tôi có thể tham gia Hội đồng Vũ trụ mà không đặt nét bút không?',
         answer:
-          'Yes. You can acquire CST on a supported exchange and use it to express Coordination Weight on the Cosmic Council after delegating it (to yourself or another address). Making gestures remains the primary way to imprint new CST.',
+          'Có. Bạn có thể có CST trên một nơi trao đổi được hỗ trợ và dùng nó để biểu thị trọng số điều phối trong Hội đồng Vũ trụ sau khi ủy quyền (cho chính bạn hoặc một địa chỉ khác). Đặt nét bút vẫn là cách chính để khắc CST mới.',
       },
       'donate-nfts-to-game': {
-        question: 'How can other NFT projects contribute their tokens to a cycle?',
+        question: 'Các dự án NFT khác có thể đóng góp token của họ vào một chu kỳ bằng cách nào?',
         answer:
-          'Projects can attach their tokens (ERC-721 or ERC-20) to a gesture using the "Advanced" pane. Provide the contract address and token ID or amount and submit the gesture. Attached tokens are held in the Allocations Wallet escrow and flow to the Signature Allocation recipient after finalization.',
+          'Các dự án có thể đính kèm token của mình (ERC-721 hoặc ERC-20) vào một nét bút bằng khung “Nâng cao”. Cung cấp địa chỉ hợp đồng cùng mã token hoặc số lượng rồi gửi nét bút. Token đính kèm được giữ trong ký quỹ của ví phân bổ và chảy về người nhận phân bổ Signature sau khi hoàn tất.',
       },
     },
   },
   'arbitrum-and-technical': {
-    title: 'Arbitrum & Technical',
-    description: 'Network setup, wallets, and technical details',
+    title: 'Arbitrum và kỹ thuật',
+    description: 'Thiết lập mạng, ví và chi tiết kỹ thuật',
     items: {
       'what-is-arbitrum': {
-        question: 'What is Arbitrum and why is Cosmic Signature deployed on it?',
+        question: 'Arbitrum là gì và vì sao Cosmic Signature được triển khai trên đó?',
         answer:
-          'Arbitrum is an Ethereum Layer 2 rollup that speeds up transactions and reduces fees. Cosmic Signature deploys on Arbitrum to offer sub-cent gas costs and faster finality while preserving Ethereum’s security guarantees.',
+          'Arbitrum là một rollup Layer 2 của Ethereum, giúp giao dịch nhanh hơn và phí thấp hơn. Cosmic Signature triển khai trên Arbitrum để có chi phí gas dưới một xu và độ hoàn tất nhanh hơn trong khi vẫn giữ các bảo đảm an toàn của Ethereum.',
       },
       'why-arbitrum-not-ethereum': {
-        question: 'Why Arbitrum and not Ethereum mainnet?',
+        question: 'Vì sao là Arbitrum mà không phải mạng chính Ethereum?',
         answer:
-          'Most on-chain activity is migrating to Layer 2s. Arbitrum offers dramatically lower gas costs while maintaining the same security model as Ethereum Layer 1 — making it the right home for a gesture-heavy protocol like Cosmic Signature.',
+          'Phần lớn hoạt động trên chuỗi đang chuyển sang các Layer 2. Arbitrum có chi phí gas thấp hơn đáng kể trong khi giữ nguyên mô hình bảo mật của Ethereum Layer 1 — khiến nó trở thành ngôi nhà phù hợp cho một giao thức nhiều nét bút như Cosmic Signature.',
       },
       'arbitrum-security': {
-        question: 'What makes Arbitrum as secure as Ethereum Layer 1?',
+        question: 'Điều gì làm Arbitrum an toàn như Ethereum Layer 1?',
         answer:
-          'Arbitrum is a rollup, not a sidechain. Every batch of transactions is posted back to Ethereum mainnet. This anchors Arbitrum’s security in Ethereum itself: the data and dispute resolution live on Layer 1.',
+          'Arbitrum là một rollup, không phải sidechain. Mỗi lô giao dịch được đăng trở lại mạng chính Ethereum. Điều này neo tính bảo mật của Arbitrum vào chính Ethereum: dữ liệu và việc giải quyết tranh chấp nằm trên Layer 1.',
       },
       'how-to-get-eth-on-arbitrum': {
-        question: 'How do I get ETH on Arbitrum?',
+        question: 'Tôi lấy ETH trên Arbitrum bằng cách nào?',
         answer:
-          'Bridge ETH from Ethereum mainnet using the official Arbitrum bridge or other supported bridges. Your ETH is locked on Ethereum and an equivalent amount becomes available on Arbitrum. Bridging requires an Ethereum Layer 1 gas payment.',
+          'Chuyển ETH từ mạng chính Ethereum qua cầu Arbitrum chính thức hoặc các cầu được hỗ trợ khác. ETH của bạn được khóa trên Ethereum và một lượng tương đương trở nên khả dụng trên Arbitrum. Việc chuyển qua cầu cần trả gas trên Ethereum Layer 1.',
       },
       'existing-wallet-on-arbitrum': {
-        question: 'Can I use my existing Ethereum wallet on Arbitrum?',
+        question: 'Tôi có thể dùng ví Ethereum hiện có trên Arbitrum không?',
         answer:
-          'Yes. The same private keys sign transactions on both networks. You just need to add the Arbitrum network to your wallet’s network list.',
+          'Có. Cùng một khóa riêng ký giao dịch trên cả hai mạng. Bạn chỉ cần thêm mạng Arbitrum vào danh sách mạng của ví.',
       },
       'view-tokens-on-arbitrum': {
-        question: 'How do I view my CST tokens and Cosmic Signature NFTs on Arbitrum?',
+        question: 'Tôi xem token CST và Cosmic Signature NFT trên Arbitrum bằng cách nào?',
         answer:
-          'View them directly on the Cosmic Signature website, or add the contract addresses to your wallet manually. Contract addresses are published on the Contracts page and in the community Discord.',
+          'Xem trực tiếp trên trang web Cosmic Signature, hoặc thêm địa chỉ hợp đồng vào ví theo cách thủ công. Địa chỉ hợp đồng được công bố trên trang Hợp đồng và trong Discord của cộng đồng.',
       },
       'trade-on-arbitrum': {
-        question: 'Can I trade my Cosmic Signature NFTs and CST on Arbitrum?',
+        question: 'Tôi có thể giao dịch Cosmic Signature NFT và CST trên Arbitrum không?',
         answer:
-          'Yes. Cosmic Signature NFTs trade on Axiom Zero, the zero-fee marketplace for the collection, and CST trades on Uniswap. Both are standard ERC-721 and ERC-20 assets on Arbitrum, so any marketplace or exchange that supports those standards works. Always confirm the contract address before trading.',
+          'Có. Cosmic Signature NFT được giao dịch trên Axiom Zero, sàn không thu phí dành cho bộ sưu tập, và CST được giao dịch trên Uniswap. Cả hai đều là tài sản ERC-721 và ERC-20 tiêu chuẩn trên Arbitrum, nên bất kỳ sàn hay nơi trao đổi nào hỗ trợ các tiêu chuẩn này cũng dùng được. Luôn xác nhận địa chỉ hợp đồng trước khi giao dịch.',
       },
       'verify-bid-success': {
-        question: 'How can I confirm that my gesture was submitted successfully?',
+        question: 'Tôi xác nhận nét bút đã được gửi thành công bằng cách nào?',
         answer:
-          'Successful gestures are confirmed on Arbitrum and visible on the Arbitrum block explorer (Arbiscan). Your transaction hash can be pasted into the explorer to verify the gesture.',
+          'Nét bút thành công được xác nhận trên Arbitrum và hiển thị trên trình khám phá khối của Arbitrum (Arbiscan). Bạn có thể dán mã băm giao dịch vào trình khám phá để xác minh nét bút.',
       },
       'game-security': {
-        question: 'How is the protocol’s security ensured?',
+        question: 'Tính bảo mật của giao thức được bảo đảm như thế nào?',
         answer:
-          'Cosmic Signature publishes contract addresses, source-code resources, and verification context so the community can inspect behavior independently. The smart contracts were audited by Hacken, an independent security firm, and the full report is linked from the Audits page.',
+          'Cosmic Signature công khai địa chỉ hợp đồng, tài nguyên mã nguồn và bối cảnh xác minh để cộng đồng có thể độc lập kiểm tra hành vi. Các hợp đồng thông minh đã được Hacken, một công ty bảo mật độc lập, kiểm toán, và báo cáo đầy đủ được liên kết từ trang Kiểm toán.',
       },
       'fees-involved': {
-        question: 'Are there any fees involved?',
+        question: 'Có khoản phí nào không?',
         answer:
-          'Beyond the Gesture Cost itself, you pay Arbitrum network gas fees for each transaction. Gas fees fluctuate with network conditions and are not controlled by Cosmic Signature.',
+          'Ngoài chính chi phí nét bút, bạn trả phí gas của mạng Arbitrum cho mỗi giao dịch. Phí gas dao động theo điều kiện mạng và không do Cosmic Signature kiểm soát.',
       },
     },
   },
   'trust-and-governance': {
-    title: 'Trust & Coordination',
-    description: 'Transparency, team control, and the open-source vision',
+    title: 'Tin cậy và điều phối',
+    description: 'Minh bạch, quyền kiểm soát của đội ngũ và tầm nhìn mã nguồn mở',
     items: {
       'team-controls': {
-        question: 'What controls does the team have over the protocol?',
+        question: 'Đội ngũ có những quyền kiểm soát nào đối với giao thức?',
         answer:
-          'Initially, the team has the ability to adjust certain parameters of the protocol, such as gesture-time increments or allocation-track percentages. This control is implemented through the smart contract\'s "Ownable" pattern and is scoped to the inter-cycle window: once the next cycle activates — which happens before its first gesture — the core protocol parameters are locked until that cycle finalizes. A few narrower controls remain available outside that lock: the owner can postpone a cycle’s activation until its first gesture arrives, adjust the delay before the next cycle at any time, and manage peripheral contracts (the Public Goods Vault beneficiary, NFT metadata URIs, and the Allocations Wallet retrieval timeout) at any time. The protocol contract is also upgradeable (UUPS) by the owner, but only between cycles; the currently deployed implementation is the publicly verified V2.',
+          'Ban đầu, đội ngũ có khả năng điều chỉnh một số tham số của giao thức, như mức tăng thời gian nét bút hay tỷ lệ các luồng phân bổ. Quyền kiểm soát này được triển khai qua mẫu “Ownable” của hợp đồng thông minh và giới hạn trong cửa sổ giữa các chu kỳ: một khi chu kỳ tiếp theo kích hoạt — điều xảy ra trước nét bút đầu tiên của nó — các tham số cốt lõi của giao thức bị khóa cho đến khi chu kỳ đó hoàn tất. Một vài quyền kiểm soát hẹp hơn vẫn khả dụng ngoài khóa đó: chủ sở hữu có thể lùi thời điểm kích hoạt một chu kỳ cho đến khi nét bút đầu tiên xuất hiện, điều chỉnh độ trễ trước chu kỳ tiếp theo bất cứ lúc nào, và quản lý các hợp đồng ngoại vi (đơn vị thụ hưởng của Kho Hàng hóa công, URI siêu dữ liệu NFT và thời hạn nhận về của ví phân bổ) bất cứ lúc nào. Hợp đồng giao thức cũng có thể được chủ sở hữu nâng cấp (UUPS), nhưng chỉ giữa các chu kỳ; bản triển khai hiện tại là V2 đã được xác minh công khai.',
       },
       'will-team-always-have-control': {
-        question: "Will the team always have control over the protocol's parameters?",
+        question: 'Đội ngũ có luôn nắm quyền kiểm soát các tham số của giao thức không?',
         answer:
-          'No. Once the protocol is stable, ownership transfers to the Cosmic Council. Parameter changes thereafter occur only through Protocol Coordination proposals that clear the Coordination Quorum.',
+          'Không. Khi giao thức ổn định, quyền sở hữu được chuyển giao cho Hội đồng Vũ trụ. Sau đó các thay đổi tham số chỉ diễn ra thông qua các đề xuất điều phối giao thức đạt túc số điều phối.',
       },
       'what-is-renounce-ownership': {
-        question: 'What does "renouncing ownership" mean?',
+        question: '“Từ bỏ quyền sở hữu” nghĩa là gì?',
         answer:
-          'Renouncing ownership is an Ownable-contract function that permanently transfers control away from the deployer address. Once called, no privileged role can modify the contract’s parameters.',
+          'Từ bỏ quyền sở hữu là một hàm của hợp đồng Ownable, chuyển giao vĩnh viễn quyền kiểm soát khỏi địa chỉ triển khai. Sau khi được gọi, không vai trò đặc quyền nào có thể sửa đổi tham số của hợp đồng.',
       },
       'why-renounce-ownership': {
-        question: 'Why would the team renounce ownership?',
+        question: 'Vì sao đội ngũ lại từ bỏ quyền sở hữu?',
         answer:
-          'The goal is a fair and decentralized protocol. Renouncing ownership ensures that the protocol’s rules cannot be changed arbitrarily once live — strengthening trust and predictability for participants.',
+          'Mục tiêu là một giao thức công bằng và phi tập trung. Từ bỏ quyền sở hữu bảo đảm các quy tắc của giao thức không thể bị thay đổi tùy tiện sau khi vận hành — củng cố niềm tin và tính dự đoán được cho người tham gia.',
       },
       'how-team-profits': {
-        question: 'How does the Cosmic Signature team receive value from the protocol?',
+        question: 'Đội ngũ Cosmic Signature nhận giá trị từ giao thức bằng cách nào?',
         answer:
-          'No team wallet receives ETH from participant gestures. All ETH flows into the Cycle Reserve and is distributed per the allocation tracks. The team’s alignment with the protocol is held indirectly through Random Walk NFTs; success of the protocol may increase the cultural value of those NFTs. Primary motivations are curiosity, creativity, and contributing to open-source public goods.',
+          'Không có ví nào của đội ngũ nhận ETH từ nét bút của người tham gia. Toàn bộ ETH chảy vào Dự trữ chu kỳ và được phân phối theo các luồng phân bổ. Sự gắn kết của đội ngũ với giao thức được giữ gián tiếp qua các Random Walk NFT; thành công của giao thức có thể làm tăng giá trị văn hóa của những NFT đó. Động lực chính là sự tò mò, sáng tạo và đóng góp cho hàng hóa công mã nguồn mở.',
       },
       'why-was-cs-created': {
-        question: 'Why was Cosmic Signature created?',
+        question: 'Vì sao Cosmic Signature được tạo ra?',
         answer:
-          'Cosmic Signature was born from a fascination with chaos theory and the unsolvable nature of the three-body problem. The idea of unique, deterministic art generated from on-chain seeds was both intriguing and fitting for a public-goods-aligned protocol.',
+          'Cosmic Signature ra đời từ niềm say mê với lý thuyết hỗn độn và bản chất không thể giải của bài toán ba vật thể. Ý tưởng về nghệ thuật tất định, độc nhất được tạo từ seed trên chuỗi vừa hấp dẫn vừa phù hợp với một giao thức gắn với hàng hóa công.',
       },
       'what-if-team-disappears': {
-        question: 'What if the team disappears?',
+        question: 'Nếu đội ngũ biến mất thì sao?',
         answer:
-          'The protocol is designed to be self-sustaining. Seeds are stored on-chain; anyone can regenerate NFT images and videos using the open-source Rust pipeline. This ensures the continued availability of every Cosmic Signature NFT regardless of the team’s status.',
+          'Giao thức được thiết kế để tự duy trì. Seed được lưu trên chuỗi; bất kỳ ai cũng có thể tạo lại hình ảnh và video NFT bằng quy trình Rust mã nguồn mở. Điều này bảo đảm mọi Cosmic Signature NFT luôn sẵn có bất kể tình trạng của đội ngũ.',
       },
       'can-create-competing-site': {
-        question: 'Can I fork this and build my own site?',
+        question: 'Tôi có thể phân nhánh dự án này và xây trang web riêng không?',
         answer:
-          'Absolutely. Project-owned contracts, shaders, renderers, pages, and documentation are dedicated under CC0 1.0 — no rights reserved. Third-party dependencies, fonts, and assets retain their own licenses; see THIRD_PARTY_NOTICES.md.',
+          'Hoàn toàn được. Hợp đồng, shader, bộ kết xuất, trang web và tài liệu thuộc dự án được công bố theo CC0 1.0 — không bảo lưu quyền nào. Các phụ thuộc bên thứ ba, phông chữ và tài sản giữ giấy phép riêng của chúng; xem THIRD_PARTY_NOTICES.md.',
       },
       'donate-to-pot': {
-        question: 'Can I contribute ETH to the Cycle Reserve without making a gesture?',
+        question: 'Tôi có thể đóng góp ETH vào Dự trữ chu kỳ mà không đặt nét bút không?',
         answer:
-          'Yes. The protocol contract exposes dedicated contribution functions that accept ETH independent of a gesture, and you may attach a note that can surface on the cycle’s contribution list. Use the app’s contribution flow rather than a plain wallet transfer: ETH sent directly to the protocol address is processed as an ETH gesture, not as a contribution. Reach out via Discord for details.',
+          'Có. Hợp đồng giao thức có các hàm đóng góp riêng nhận ETH độc lập với nét bút, và bạn có thể đính kèm một lời nhắn có thể xuất hiện trên danh sách đóng góp của chu kỳ. Hãy dùng luồng đóng góp trong ứng dụng thay vì chuyển ví thông thường: ETH gửi trực tiếp đến địa chỉ giao thức được xử lý như một nét bút ETH, không phải một khoản đóng góp. Liên hệ qua Discord để biết chi tiết.',
       },
       'get-help': {
-        question: 'How can I get help if I have questions?',
+        question: 'Tôi có thể được trợ giúp ở đâu khi có câu hỏi?',
         answer:
-          'The community and support team are available via Discord, X / Twitter, and the support email listed on the Contacts page.',
+          'Cộng đồng và đội hỗ trợ có mặt trên Discord, X / Twitter và qua email hỗ trợ ghi trên trang Liên hệ.',
       },
       'stay-updated': {
-        question: 'How can I stay updated on Cosmic Signature news?',
+        question: 'Tôi theo dõi tin tức Cosmic Signature bằng cách nào?',
         answer:
-          'Follow the official social media channels and join the Discord community for the latest announcements, protocol coordination proposals, and cycle recaps.',
+          'Theo dõi các kênh mạng xã hội chính thức và tham gia cộng đồng Discord để nhận thông báo mới nhất, các đề xuất điều phối giao thức và tóm tắt chu kỳ.',
       },
     },
   },

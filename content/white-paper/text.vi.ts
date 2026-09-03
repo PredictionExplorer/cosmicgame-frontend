@@ -1,729 +1,740 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
 import type { WhitePaperText } from './structure';
-import { WHITE_PAPER_DATE_DISPLAY, WHITE_PAPER_VERSION } from './types';
+import { WHITE_PAPER_VERSION } from './types';
 
-const cst = (amount: number): string => amount.toLocaleString('en-US');
+const cst = (amount: number): string => amount.toLocaleString('vi-VN');
+const percent = (value: number): string => value.toLocaleString('vi-VN');
+/** Vietnamese decimal mark for a protocol figure quoted in English notation ("0.0001"). */
+const viDecimal = (value: string | number): string => String(value).replace('.', ',');
 
-/** English white-paper copy, keyed by the skeleton in structure.ts. */
+const ELAPSED_VI: Record<string, string> = {
+  '0 seconds': '0 giây',
+  '1 second': '1 giây',
+  '60 seconds': '60 giây',
+  '1 hour': '1 giờ',
+  '1 day': '1 ngày',
+};
+
+/** Vietnamese white-paper copy, keyed by the skeleton in structure.ts. */
 export const whitePaperTextVi = {
   metadata: {
-    title: 'Cosmic Signature White Paper | A Procedural On-Chain Art Protocol',
+    title: 'Sách trắng Cosmic Signature | Giao thức nghệ thuật tạo sinh trên chuỗi',
     description:
-      'The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization.',
+      'Bản mô tả tham chiếu của Cosmic Signature: chu kỳ trình diễn, nét bút, các luồng phân bổ, nghệ thuật NFT ba vật thể tất định, CST, neo giữ, Hội đồng Vũ trụ, nâng cấp giao thức và con đường đến phi tập trung hoàn toàn.',
   },
-  breadcrumbLabel: 'White Paper',
+  breadcrumbLabel: 'Sách trắng',
   breadcrumbs: {
-    ariaLabel: 'Breadcrumb',
-    homeLabel: 'Home',
+    ariaLabel: 'Đường dẫn điều hướng',
+    homeLabel: 'Trang chủ',
   },
   hero: {
-    eyebrow: 'White paper',
-    subtitle: 'A Procedural On-Chain Art Protocol on Arbitrum',
-    versionLabel: `Version ${WHITE_PAPER_VERSION}`,
-    dateLabel: WHITE_PAPER_DATE_DISPLAY,
-    downloadLabel: 'Download PDF',
+    eyebrow: 'Sách trắng',
+    subtitle: 'Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum',
+    versionLabel: `Phiên bản ${WHITE_PAPER_VERSION}`,
+    dateLabel: 'tháng 8 năm 2026',
+    downloadLabel: 'Tải PDF',
   },
   abstract: {
-    heading: 'Abstract',
+    heading: 'Tóm tắt',
     paragraphs: [
-      'Cosmic Signature is a procedural art protocol on Arbitrum One. It runs as a sequence of timed Performance Cycles. During a cycle, participants make gestures with ETH or with CST, the protocol\u2019s ERC-20 token. Every gesture extends the cycle\u2019s countdown, records an entry in the cycle\u2019s Stellar Selections, and can imprint new CST. When the countdown expires and the cycle is finalized, the protocol distributes its ETH reserve across more than ten allocation tracks, imprints a new generation of Cosmic Signature NFTs, and forwards a fixed share to Protocol Guild, the funding mechanism for more than 170 Ethereum core contributors. About half of the reserve rolls forward, so each cycle begins larger than the last.',
-      'Each Cosmic Signature NFT is a deterministic rendering of the gravitational three-body problem, generated from an on-chain seed and reproducible by anyone, pixel for pixel. No neural network touches the image. This paper describes the mechanics and token design in full, documents the V2 upgrade that is live today, presents the planned V3 upgrade, and sets out the commitment to remove every form of privileged control from the deploying address once the design is complete.',
+      'Cosmic Signature là một giao thức nghệ thuật tạo sinh trên Arbitrum One. Nó vận hành như một chuỗi các chu kỳ trình diễn có giới hạn thời gian. Trong một chu kỳ, người tham gia đặt nét bút bằng ETH hoặc bằng CST, token ERC-20 của giao thức. Mỗi nét bút kéo dài đếm ngược của chu kỳ, ghi nhận một lượt trong Tinh tuyển của chu kỳ và có thể khắc CST mới. Khi đếm ngược hết hạn và chu kỳ được hoàn tất, giao thức phân phối dự trữ ETH của mình qua hơn mười luồng phân bổ, khắc một thế hệ Cosmic Signature NFT mới, và chuyển một phần cố định đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum. Khoảng một nửa dự trữ được chuyển sang chu kỳ sau, nên mỗi chu kỳ bắt đầu lớn hơn chu kỳ trước.',
+      'Mỗi Cosmic Signature NFT là một bản kết xuất tất định của bài toán ba vật thể hấp dẫn, được tạo từ một seed trên chuỗi và bất kỳ ai cũng có thể tái tạo đến từng điểm ảnh. Không mạng thần kinh nào chạm vào hình ảnh. Bài viết này mô tả đầy đủ cơ chế và thiết kế token, ghi lại nâng cấp V2 đang vận hành hôm nay, trình bày nâng cấp V3 dự kiến, và nêu cam kết loại bỏ mọi hình thức kiểm soát đặc quyền khỏi địa chỉ triển khai một khi thiết kế hoàn thành.',
     ],
   },
-  tocHeading: 'Contents',
+  tocHeading: 'Mục lục',
   sections: {
     introduction: {
-      heading: 'Introduction',
+      heading: 'Giới thiệu',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Cosmic Signature began with two convictions. The first is that generative art is most interesting when nothing about it is arbitrary: when every image is the output of a physical process, fixed by a seed, and anyone can rerun that process to verify the result. The second is that a protocol which holds ETH on behalf of its participants owes them a mechanical, readable answer to the question of where every wei goes.',
+          text: 'Cosmic Signature bắt đầu từ hai niềm tin. Thứ nhất, nghệ thuật tạo sinh thú vị nhất khi không có gì trong nó là tùy tiện: khi mỗi hình ảnh là đầu ra của một quá trình vật lý, được cố định bởi một seed, và bất kỳ ai cũng có thể chạy lại quá trình đó để kiểm chứng kết quả. Thứ hai, một giao thức giữ ETH thay cho những người tham gia nợ họ một câu trả lời cơ học, dễ đọc cho câu hỏi mỗi wei đi về đâu.',
         },
         {
           kind: 'paragraph',
-          text: 'The result is a protocol built around time. A Performance Cycle opens, fills with gestures, and closes when its countdown runs out. A gesture is a small on-chain act: it carries ETH or CST, it may carry a short message or an attached asset, and it pushes the cycle\u2019s finalization time further into the future. The participant whose gesture stands last when the countdown expires, the Final Gesture, finalizes the cycle. Finalization distributes the reserve, imprints the cycle\u2019s NFTs, and prepares the next cycle.',
+          text: 'Kết quả là một giao thức xây quanh thời gian. Một chu kỳ trình diễn mở ra, đầy dần bằng nét bút, và khép lại khi đếm ngược của nó cạn. Một nét bút là một hành động nhỏ trên chuỗi: nó mang ETH hoặc CST, có thể mang một lời nhắn ngắn hoặc một tài sản đính kèm, và nó đẩy thời điểm hoàn tất của chu kỳ xa hơn về tương lai. Người tham gia có nét bút đứng cuối khi đếm ngược hết hạn, nét bút cuối cùng, sẽ hoàn tất chu kỳ. Hoàn tất phân phối dự trữ, khắc các NFT của chu kỳ và chuẩn bị chu kỳ tiếp theo.',
         },
         {
           kind: 'paragraph',
-          text: 'Three properties anchor the design.',
+          text: 'Ba đặc tính neo giữ thiết kế này.',
         },
         {
           kind: 'list',
           items: [
-            'Determinism. The artwork is computed from a seed recorded on-chain at imprint time. The rendering pipeline is open source, and the same seed always produces the same image and video, bit for bit.',
-            'Mechanical distribution. Allocation percentages are constants in verified contracts. No discretionary account sits between participants and the distribution rules, and no team wallet receives ETH from gestures.',
-            'A finite role for the team. Owner powers are narrow, are locked while a cycle runs, and are scheduled to be removed entirely once the remaining upgrades land.',
+            'Tính tất định. Tác phẩm được tính từ một seed ghi trên chuỗi lúc khắc. Quy trình kết xuất là mã nguồn mở, và cùng một seed luôn tạo ra cùng một hình ảnh và video, đến từng bit.',
+            'Phân phối cơ học. Tỷ lệ phân bổ là các hằng số trong hợp đồng đã xác minh. Không tài khoản tùy quyết nào đứng giữa người tham gia và quy tắc phân phối, và không ví nào của đội ngũ nhận ETH từ nét bút.',
+            'Một vai trò hữu hạn cho đội ngũ. Quyền của chủ sở hữu rất hẹp, bị khóa trong khi một chu kỳ chạy, và được lên lịch loại bỏ hoàn toàn khi các nâng cấp còn lại được triển khai.',
           ],
         },
         {
           kind: 'paragraph',
-          text: 'This paper is the reference description of the protocol. Section 2 sketches the system. Sections 3 through 5 specify cycles, gestures, and allocations. Section 6 covers the art. Sections 7 through 10 cover CST, anchoring, the Cosmic Council, and Public Goods. Section 11 covers security and verifiability. Sections 12 and 13 record the upgrade history and the road to full decentralization, and Section 14 states plainly what the protocol is not. Numbers quoted in this paper are contract constants or launch values of on-chain parameters; the deployed contracts, listed in Appendix A, remain the final authority.',
+          text: 'Bài viết này là bản mô tả tham chiếu của giao thức. Mục 2 phác thảo hệ thống. Các mục 3 đến 5 đặc tả chu kỳ, nét bút và phân bổ. Mục 6 nói về nghệ thuật. Các mục 7 đến 10 nói về CST, neo giữ, Hội đồng Vũ trụ và Hàng hóa công. Mục 11 nói về bảo mật và khả năng xác minh. Các mục 12 và 13 ghi lại lịch sử nâng cấp và con đường đến phi tập trung hoàn toàn, và Mục 14 nêu thẳng giao thức không phải là gì. Các con số trong bài là hằng số hợp đồng hoặc giá trị lúc ra mắt của các tham số trên chuỗi; các hợp đồng đã triển khai, liệt kê ở Phụ lục A, vẫn là thẩm quyền cuối cùng.',
         },
       ],
     },
     'protocol-overview': {
-      heading: 'Protocol Overview',
+      heading: 'Tổng quan giao thức',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'The system consists of one core contract and a ring of narrow, single-purpose contracts around it. The core, deployed behind an upgradeable proxy, runs the cycles: it prices gestures, tracks the countdown, holds the Cycle Reserve, and executes finalization. Around it sit the CST token, the Cosmic Signature NFT collection, an escrow wallet for allocations, two anchoring wallets, the Public Goods Vault, the Outreach Reserve, and the Cosmic Council.',
+          text: 'Hệ thống gồm một hợp đồng cốt lõi và một vành các hợp đồng hẹp, đơn mục đích bao quanh. Hợp đồng cốt lõi, triển khai sau một proxy có thể nâng cấp, điều hành các chu kỳ: nó định chi phí nét bút, theo dõi đếm ngược, giữ Dự trữ chu kỳ và thực thi hoàn tất. Xung quanh nó là token CST, bộ sưu tập Cosmic Signature NFT, một ví ký quỹ cho phân bổ, hai ví neo giữ, Kho Hàng hóa công, Dự trữ truyền thông và Hội đồng Vũ trụ.',
         },
         {
           kind: 'table',
           table: {
-            columns: ['Component', 'Role'],
+            columns: ['Thành phần', 'Vai trò'],
             rows: [
               [
-                'Protocol contract',
-                'Runs Performance Cycles: gesture pricing, the countdown, the Cycle Reserve, and finalization.',
+                'Hợp đồng giao thức',
+                'Điều hành các chu kỳ trình diễn: chi phí nét bút, đếm ngược, Dự trữ chu kỳ và hoàn tất.',
               ],
               [
                 'CST (ERC-20)',
-                'Participation token. Imprinted only by the protocol, burned when spent on gestures, and expresses Coordination Weight once delegated.',
+                'Token tham gia. Chỉ giao thức mới khắc được, bị đốt khi chi cho nét bút, và biểu thị trọng số điều phối sau khi được ủy quyền.',
               ],
               [
                 'Cosmic Signature NFT (ERC-721)',
-                'Deterministic three-body artwork. Imprinted only at finalization, with its seed stored on-chain.',
+                'Tác phẩm ba vật thể tất định. Chỉ được khắc khi hoàn tất, với seed lưu trên chuỗi.',
               ],
               [
                 'Random Walk NFT',
-                'An earlier generative collection from the same team. Grants a one-time Gesture Cost reduction and a separate anchored Selection track.',
+                'Một bộ sưu tập tạo sinh trước đó của cùng đội ngũ. Mang lại mức giảm chi phí nét bút một lần và một luồng Tinh tuyển neo giữ riêng.',
               ],
               [
-                'Allocations Wallet',
-                'Escrow for secondary ETH allocations and assets attached to gestures, with an open retrieval timeout.',
+                'Ví phân bổ',
+                'Ký quỹ cho các phân bổ ETH phụ và tài sản đính kèm vào nét bút, với một thời hạn nhận về mở.',
               ],
               [
-                'Anchoring wallets',
-                'One for Cosmic Signature NFTs (ETH Anchor Distributions) and one for Random Walk NFTs (Selection eligibility).',
+                'Các ví neo giữ',
+                'Một cho Cosmic Signature NFT (phân phối neo giữ ETH) và một cho Random Walk NFT (diện Tinh tuyển).',
               ],
               [
-                'Public Goods Vault',
-                'Receives and forwards the per-cycle Public Goods Allocation. The beneficiary is currently Protocol Guild.',
+                'Kho Hàng hóa công',
+                'Nhận và chuyển tiếp phân bổ Hàng hóa công theo từng chu kỳ. Đơn vị thụ hưởng hiện là Protocol Guild.',
               ],
               [
-                'Outreach Reserve',
-                `Receives ${cst(protocolFacts.outreachReserveCst)} CST per cycle for community outreach.`,
+                'Dự trữ truyền thông',
+                `Nhận ${cst(protocolFacts.outreachReserveCst)} CST mỗi chu kỳ cho truyền thông cộng đồng.`,
               ],
               [
-                'Cosmic Council',
-                'On-chain coordination body in which delegated CST expresses Coordination Weight.',
+                'Hội đồng Vũ trụ',
+                'Cơ quan điều phối trên chuỗi, trong đó CST được ủy quyền biểu thị trọng số điều phối.',
               ],
             ],
           },
         },
         {
           kind: 'paragraph',
-          text: 'Around the contracts, an ecosystem has grown: the app at app.cosmicsignature.com, the Axiom Zero marketplace for the NFTs, Uniswap liquidity for CST on Arbitrum, and Chaos Zero, a prediction venue for cycle outcomes. None of these are required. Every mechanic in this paper can be exercised directly against the contracts.',
+          text: 'Quanh các hợp đồng, một hệ sinh thái đã lớn lên: ứng dụng tại app.cosmicsignature.com, sàn Axiom Zero cho các NFT, thanh khoản Uniswap cho CST trên Arbitrum, và Chaos Zero, một nơi dự đoán kết quả chu kỳ. Không thứ nào là bắt buộc. Mọi cơ chế trong bài viết này đều có thể thực hiện trực tiếp với các hợp đồng.',
         },
       ],
     },
     'performance-cycle': {
-      heading: 'The Performance Cycle',
+      heading: 'Chu kỳ trình diễn',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'A cycle is a window in time. It opens with descending-cost Calibration Windows, fills with gestures, and ends when the Cycle Finalization Time expires and someone finalizes it. This section covers the clock; Section 4 covers the gestures themselves.',
+          text: 'Một chu kỳ là một khoảng thời gian. Nó mở ra với các cửa sổ hiệu chỉnh giá giảm dần, đầy dần bằng nét bút, và kết thúc khi thời điểm hoàn tất chu kỳ hết hạn và ai đó hoàn tất nó. Mục này nói về đồng hồ; Mục 4 nói về chính các nét bút.',
         },
       ],
       subsections: {
         'eth-calibration-window': {
-          heading: 'Opening and the ETH Calibration Window',
+          heading: 'Mở chu kỳ và cửa sổ hiệu chỉnh ETH',
           blocks: [
             {
               kind: 'paragraph',
-              text: `Each cycle must open with an ETH gesture, and the ETH Calibration Window sets its cost. The window begins at ${protocolFacts.ethCalibrationCeilingMultiplier} times the opening cost actually paid in the previous cycle and declines linearly to a floor of one two-hundredth of that starting value, plus one wei. At launch parameters the descent takes about two days; its duration is tied to the cycle time increment, so it stretches slowly as the protocol ages. If the window fully elapses before anyone gestures, the cost simply rests at the floor. The first cycle opened at a fixed ${protocolFacts.initialGestureCostEth} ETH.`,
+              text: `Mỗi chu kỳ phải mở bằng một nét bút ETH, và cửa sổ hiệu chỉnh ETH đặt chi phí của nó. Cửa sổ bắt đầu ở ${protocolFacts.ethCalibrationCeilingMultiplier} lần chi phí mở đầu thực trả trong chu kỳ trước và giảm tuyến tính về sàn bằng một phần hai trăm giá trị khởi đầu đó, cộng một wei. Với các tham số lúc ra mắt, đường giảm mất khoảng hai ngày; thời lượng của nó gắn với mức tăng thời gian của chu kỳ, nên nó giãn dần khi giao thức già đi. Nếu cửa sổ trôi qua hoàn toàn trước khi có ai đặt nét bút, chi phí chỉ đơn giản nằm ở sàn. Chu kỳ đầu tiên mở ở mức cố định ${viDecimal(protocolFacts.initialGestureCostEth)} ETH.`,
             },
             {
               kind: 'paragraph',
-              text: 'This opening mechanism performs price discovery without an order book. If the previous cycle opened too cheap, the doubling restores headroom; if the doubled value proves too high, the two-day descent finds the level at which someone is willing to begin.',
+              text: 'Cơ chế mở này thực hiện khám phá giá mà không cần sổ lệnh. Nếu chu kỳ trước mở quá rẻ, việc gấp đôi khôi phục biên độ; nếu mức gấp đôi lại quá cao, đường giảm hai ngày tìm ra mức mà ai đó sẵn lòng bắt đầu.',
             },
           ],
         },
         countdown: {
-          heading: 'The Countdown',
+          heading: 'Đếm ngược',
           blocks: [
             {
               kind: 'paragraph',
-              text: `The opening gesture starts the clock, setting the Cycle Finalization Time about ${protocolFacts.initialCycleFinalizationHoursAtLaunch} hours ahead at launch parameters. Every subsequent gesture, whether ETH or CST, adds the current time increment to the stored finalization time. The increment began at exactly one hour and grows by ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle, so cycles lengthen gradually and the pace of NFT imprinting slows over the years. There is no hard bound on a cycle\u2019s length while gestures keep arriving; in practice, rising Gesture Costs make indefinite extension expensive.`,
+              text: `Nét bút mở khởi động đồng hồ, đặt thời điểm hoàn tất chu kỳ khoảng ${protocolFacts.initialCycleFinalizationHoursAtLaunch} giờ về phía trước với các tham số lúc ra mắt. Mỗi nét bút tiếp theo, dù ETH hay CST, cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất đã lưu. Mức tăng khởi đầu ở đúng một giờ và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên các chu kỳ dài dần và tốc độ khắc NFT chậm lại qua năm tháng. Không có giới hạn cứng cho độ dài một chu kỳ khi nét bút vẫn liên tục xuất hiện; trên thực tế, chi phí nét bút tăng dần khiến việc kéo dài vô hạn trở nên tốn kém.`,
             },
             {
               kind: 'paragraph',
-              text: 'Extensions apply to the stored time, not to the present moment. A gesture made after the countdown has expired, but before finalization executes, adds one increment to the stored value and takes over the Final Gesture position. It does not restart the clock.',
+              text: 'Việc kéo dài áp lên thời gian đã lưu, không phải thời điểm hiện tại. Một nét bút đặt sau khi đếm ngược đã hết hạn, nhưng trước khi việc hoàn tất được thực thi, cộng một mức tăng vào giá trị đã lưu và giành lấy vị trí nét bút cuối cùng. Nó không khởi động lại đồng hồ.',
             },
           ],
         },
         finalization: {
-          heading: 'Finalization and the Open-Finalization Window',
+          heading: 'Hoàn tất và cửa sổ hoàn tất mở',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'When the Cycle Finalization Time expires, the participant who made the Final Gesture becomes eligible to finalize. Finalization is one transaction: it reads the protocol\u2019s ETH balance, distributes the allocation tracks of Section 5, imprints the cycle\u2019s NFTs and CST, records the seed for each new artwork, and schedules the next cycle.',
+              text: 'Khi thời điểm hoàn tất chu kỳ hết hạn, người tham gia đặt nét bút cuối cùng đủ điều kiện hoàn tất. Hoàn tất là một giao dịch: nó đọc số dư ETH của giao thức, phân phối các luồng phân bổ của Mục 5, khắc NFT và CST của chu kỳ, ghi seed cho mỗi tác phẩm mới, và lên lịch chu kỳ tiếp theo.',
             },
             {
               kind: 'paragraph',
-              text: `The Final Gesture participant holds this right exclusively for ${protocolFacts.finalGestureExclusivityHours} hours. After that, the Open-Finalization Window begins: anyone may finalize, and the contract treats whoever does as the cycle\u2019s beneficiary, with everything the role carries: the Signature Allocation\u2019s ETH share, its CST imprint, its NFT, and priority over attached assets. The rule is deliberately unforgiving. It keeps the protocol alive if a participant disappears, and it prices carelessness: a beneficiary who does not act within two days has left the role open to the first caller.`,
+              text: `Người đặt nét bút cuối cùng giữ quyền này độc quyền trong ${protocolFacts.finalGestureExclusivityHours} giờ. Sau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất, và hợp đồng coi người làm việc đó là người nhận của chu kỳ, cùng mọi thứ vai trò này mang theo: phần ETH của phân bổ Signature, lần khắc CST của nó, NFT của nó và quyền ưu tiên với các tài sản đính kèm. Quy tắc này cố ý không nhân nhượng. Nó giữ giao thức sống nếu một người tham gia biến mất, và nó khiến sự bất cẩn phải trả một cái giá: một người nhận không hành động trong hai ngày đã để ngỏ vai trò cho người gọi đầu tiên.`,
             },
             {
               kind: 'paragraph',
-              text: `After finalization, the next cycle activates following a short delay, ${protocolFacts.defaultNextCycleDelayMinutes} minutes by default, and its Calibration Windows open.`,
+              text: `Sau khi hoàn tất, chu kỳ tiếp theo kích hoạt sau một độ trễ ngắn, mặc định ${protocolFacts.defaultNextCycleDelayMinutes} phút, và các cửa sổ hiệu chỉnh của nó mở ra.`,
             },
           ],
         },
       },
     },
     gestures: {
-      heading: 'Gestures',
+      heading: 'Nét bút',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Gestures are the protocol\u2019s only input. Each one, regardless of currency, extends the countdown, records one entry in the cycle\u2019s participant Stellar Selections, updates the endurance clocks of Section 5.2, and can imprint Participation CST as described in Section 7.1.',
+          text: 'Nét bút là đầu vào duy nhất của giao thức. Mỗi nét bút, bất kể loại tiền, kéo dài đếm ngược, ghi nhận một lượt trong Tinh tuyển dành cho người tham gia của chu kỳ, cập nhật các đồng hồ bền bỉ của Mục 5.2, và có thể khắc CST tham gia như mô tả ở Mục 7.1.',
         },
       ],
       subsections: {
         'eth-gestures': {
-          heading: 'ETH Gestures',
+          heading: 'Nét bút ETH',
           blocks: [
             {
               kind: 'paragraph',
-              text: `After the opening gesture, each ETH gesture raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%, plus one wei. The sequence is public and exact: anyone can read the current cost from the contract before acting. Overpayment above a dust threshold is refunded in the same transaction; below that threshold a refund would cost more in gas than it returns, so the difference stays in the reserve.`,
+              text: `Sau nét bút mở, mỗi nét bút ETH nâng chi phí nét bút ETH tiếp theo lên ${protocolFacts.ethGestureCostStepUpPercent}%, cộng một wei. Chuỗi số là công khai và chính xác: bất kỳ ai cũng có thể đọc chi phí hiện tại từ hợp đồng trước khi hành động. Phần trả dư vượt ngưỡng vụn được hoàn lại trong cùng giao dịch; dưới ngưỡng đó, việc hoàn lại tốn nhiều gas hơn số tiền trả về, nên phần chênh ở lại trong dự trữ.`,
             },
           ],
         },
         'random-walk-attachment': {
-          heading: 'Random Walk NFT Attachment',
+          heading: 'Đính kèm Random Walk NFT',
           blocks: [
             {
               kind: 'paragraph',
-              text: `A participant who owns a Random Walk NFT may attach it to one ETH gesture for a ${protocolFacts.randomWalkDiscountPercentage}% reduction in that gesture\u2019s cost. The NFT is not transferred; the contract marks it used. Each Random Walk NFT can be attached exactly once across all cycles, which makes the reduction a consumable resource and ties a fixed external collection into the protocol\u2019s economy.`,
+              text: `Người tham gia sở hữu một Random Walk NFT có thể đính kèm nó vào một nét bút ETH để giảm ${protocolFacts.randomWalkDiscountPercentage}% chi phí của nét bút đó. NFT không được chuyển đi; hợp đồng đánh dấu nó đã dùng. Mỗi Random Walk NFT chỉ có thể đính kèm đúng một lần qua mọi chu kỳ, điều khiến mức giảm trở thành một tài nguyên tiêu hao và gắn một bộ sưu tập bên ngoài cố định vào dòng chảy của giao thức.`,
             },
           ],
         },
         'cst-gestures': {
-          heading: 'CST Gestures',
+          heading: 'Nét bút CST',
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST offers a second way in. The CST Calibration Window starts at ${protocolFacts.cstCalibrationCeilingMultiplier} times the cost paid for the previous CST gesture, and never below ${protocolFacts.cstCalibrationCeilingMinCst} CST, then declines linearly to zero over the window\u2019s duration. Every CST gesture restarts the window from its new starting value, and the CST spent is burned, permanently removed from supply.`,
+              text: `CST cho một lối vào thứ hai. Cửa sổ hiệu chỉnh CST bắt đầu ở ${protocolFacts.cstCalibrationCeilingMultiplier} lần chi phí trả cho nét bút CST trước, và không bao giờ dưới ${protocolFacts.cstCalibrationCeilingMinCst} CST, rồi giảm tuyến tính về không trong thời lượng của cửa sổ. Mỗi nét bút CST khởi động lại cửa sổ từ giá trị khởi đầu mới, và CST đã chi bị đốt, loại bỏ vĩnh viễn khỏi nguồn cung.`,
             },
             {
               kind: 'paragraph',
-              text: `The window\u2019s duration is itself a live parameter, and it is one of the protocol\u2019s quieter feedback loops. It began at a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference. Each ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, and each CST gesture lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%. Heavy ETH activity therefore speeds the CST descent, making CST gestures attractive sooner; heavy CST activity slows it back down. The loop nudges every cycle toward a balanced mix of the two currencies.`,
+              text: `Thời lượng của cửa sổ tự thân là một tham số sống, và là một trong những vòng phản hồi lặng lẽ của giao thức. Nó khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ. Mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, và mỗi nét bút CST kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%. Vì vậy hoạt động ETH sôi động đẩy nhanh đường giảm của CST, khiến nét bút CST sớm trở nên hấp dẫn; hoạt động CST sôi động lại làm chậm nó. Vòng lặp này đẩy mỗi chu kỳ về một cán cân hài hòa giữa hai loại tiền.`,
             },
             {
               kind: 'paragraph',
-              text: 'Because the descent can reach zero, a long quiet period can make a CST gesture nearly free. That is intentional. It guarantees the cycle can always be extended by anyone holding even a small CST balance, and the burn on every CST gesture ties the token\u2019s supply to actual use. A participant submitting a CST gesture specifies the maximum cost they accept, so a gesture landing later than expected cannot spend more than authorized.',
+              text: 'Vì đường giảm có thể chạm không, một khoảng yên lặng dài có thể khiến một nét bút CST gần như không tốn gì. Đó là có chủ đích. Nó bảo đảm chu kỳ luôn có thể được kéo dài bởi bất kỳ ai nắm giữ dù chỉ một ít CST, và việc đốt trong mỗi nét bút CST gắn nguồn cung của token với việc sử dụng thực tế. Người tham gia gửi nét bút CST chỉ định chi phí tối đa họ chấp nhận, nên một nét bút đến muộn hơn dự kiến không thể chi nhiều hơn mức được cho phép.',
             },
             {
               kind: 'paragraph',
-              text: 'The first gesture of every cycle must be ETH; CST gestures are available from the second gesture onward.',
+              text: 'Nét bút đầu tiên của mỗi chu kỳ phải là ETH; nét bút CST khả dụng từ nét bút thứ hai trở đi.',
             },
           ],
         },
         'messages-and-attachments': {
-          heading: 'Messages and Attached Assets',
+          heading: 'Lời nhắn và tài sản đính kèm',
           blocks: [
             {
               kind: 'paragraph',
-              text: `A gesture may carry a message of up to ${protocolFacts.gestureMessageMaxLength} bytes, recorded on-chain alongside it. A gesture may also attach ERC-20 tokens or an ERC-721 NFT. Attached assets do not join the ETH reserve; they are held by the Allocations Wallet, and the cycle\u2019s beneficiary has priority to retrieve them after finalization, subject to the open retrieval timeout of Section 5.4.`,
+              text: `Một nét bút có thể mang lời nhắn tối đa ${protocolFacts.gestureMessageMaxLength} byte, ghi trên chuỗi cùng với nó. Một nét bút cũng có thể đính kèm token ERC-20 hoặc một NFT ERC-721. Tài sản đính kèm không nhập vào dự trữ ETH; chúng được ví phân bổ giữ, và người nhận của chu kỳ có quyền ưu tiên nhận về chúng sau khi hoàn tất, chịu thời hạn nhận về mở của Mục 5.4.`,
             },
           ],
         },
       },
     },
     'allocation-tracks': {
-      heading: 'The Cycle Reserve and Allocation Tracks',
+      heading: 'Dự trữ chu kỳ và các luồng phân bổ',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'All ETH paid for gestures accumulates in the protocol contract, together with roughly half of every previous cycle\u2019s reserve. This balance is the Cycle Reserve. Finalization reads it once and distributes fixed percentages of it.',
+          text: 'Toàn bộ ETH trả cho nét bút tích lũy trong hợp đồng giao thức, cùng với khoảng một nửa dự trữ của mọi chu kỳ trước. Số dư này là Dự trữ chu kỳ. Hoàn tất đọc nó một lần và phân phối các tỷ lệ cố định của nó.',
         },
       ],
       subsections: {
         'distribution-at-finalization': {
-          heading: 'Distribution at Finalization',
+          heading: 'Phân phối khi hoàn tất',
           blocks: [
             {
               kind: 'table',
               table: {
-                columns: ['ETH track', 'Share of Cycle Reserve', 'Recipient'],
+                columns: ['Luồng ETH', 'Phần của Dự trữ chu kỳ', 'Người nhận'],
                 rows: [
                   [
-                    'Signature Allocation',
+                    'Phân bổ Signature',
                     `${protocolFacts.mainEthPercentage}%`,
-                    'The cycle beneficiary, normally the Final Gesture participant.',
+                    'Người nhận của chu kỳ, thường là người đặt nét bút cuối cùng.',
                   ],
                   [
-                    'Chrono-Warrior Allocation',
+                    'Phân bổ Chiến binh Thời gian',
                     `${protocolFacts.chronoWarriorEthPercentage}%`,
-                    'The longest-reigning Endurance Champion (Section 5.2).',
+                    'Quán quân Bền bỉ giữ vị trí lâu nhất (Mục 5.2).',
                   ],
                   [
-                    'Public Goods Allocation',
+                    'Phân bổ Hàng hóa công',
                     `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild, via the Public Goods Vault.',
+                    'Protocol Guild, qua Kho Hàng hóa công.',
                   ],
                   [
-                    'Anchor Distribution',
+                    'Phân phối neo giữ',
                     `${protocolFacts.anchorDistributionPercentage}%`,
-                    'Anchored Cosmic Signature NFTs, pro rata.',
+                    'Các Cosmic Signature NFT đang neo giữ, theo tỷ lệ.',
                   ],
                   [
-                    'ETH Stellar Selection',
+                    'ETH Tinh tuyển',
                     `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `${protocolFacts.ethStellarSelectionRecipients} entries drawn from the cycle\u2019s gesture pool, sharing the amount equally.`,
+                    `${protocolFacts.ethStellarSelectionRecipients} lượt được chọn từ quỹ nét bút của chu kỳ, chia đều số tiền.`,
                   ],
                   [
-                    'Compounding Cycle Reserve',
-                    `~${protocolFacts.compoundingReservePercentage}% (the remainder)`,
-                    'Rolls forward into the next cycle.',
+                    'Dự trữ tích lũy',
+                    `~${protocolFacts.compoundingReservePercentage}% (phần còn lại)`,
+                    'Chuyển tiếp vào chu kỳ tiếp theo.',
                   ],
                 ],
                 footnote:
-                  'Percentages are read against the protocol\u2019s ETH balance at the moment of finalization.',
+                  'Tỷ lệ phần trăm được tính trên số dư ETH của giao thức vào khoảnh khắc hoàn tất.',
               },
             },
             {
               kind: 'paragraph',
-              text: 'The five distributed tracks sum to half of the reserve. The remainder compounds: the protocol accumulates rather than extracts, and each cycle opens with a larger reserve than the last. If a cycle finalizes with no Cosmic Signature NFTs anchored, that cycle\u2019s Anchor Distribution is skipped and its share compounds as well.',
+              text: 'Năm luồng được phân phối cộng lại bằng một nửa dự trữ. Phần còn lại tích lũy: giao thức tích lũy thay vì rút ra, và mỗi chu kỳ mở ra với dự trữ lớn hơn chu kỳ trước. Nếu một chu kỳ hoàn tất mà không có Cosmic Signature NFT nào đang neo giữ, phân phối neo giữ của chu kỳ đó bị bỏ qua và phần của nó cũng tích lũy.',
             },
             {
               kind: 'table',
               table: {
-                columns: ['CST and NFT track', 'Distribution', 'Recipient'],
+                columns: ['Luồng CST và NFT', 'Phân phối', 'Người nhận'],
                 rows: [
                   [
-                    'Signature Allocation',
-                    `${cst(protocolFacts.specialAllocationCst)} CST and one NFT`,
-                    'The cycle beneficiary.',
+                    'Phân bổ Signature',
+                    `${cst(protocolFacts.specialAllocationCst)} CST và một NFT`,
+                    'Người nhận của chu kỳ.',
                   ],
                   [
-                    'Chrono-Warrior',
-                    `${cst(protocolFacts.specialAllocationCst)} CST and one NFT`,
-                    'The Chrono-Warrior.',
+                    'Chiến binh Thời gian',
+                    `${cst(protocolFacts.specialAllocationCst)} CST và một NFT`,
+                    'Chiến binh Thời gian.',
                   ],
                   [
-                    'Endurance Champion',
-                    `${cst(protocolFacts.specialAllocationCst)} CST and one NFT`,
-                    'The Endurance Champion.',
+                    'Quán quân Bền bỉ',
+                    `${cst(protocolFacts.specialAllocationCst)} CST và một NFT`,
+                    'Quán quân Bền bỉ.',
                   ],
                   [
-                    'Final CST Gesture',
-                    `${cst(protocolFacts.specialAllocationCst)} CST and one NFT`,
-                    'The participant who made the cycle\u2019s last CST gesture.',
+                    'Nét bút CST cuối cùng',
+                    `${cst(protocolFacts.specialAllocationCst)} CST và một NFT`,
+                    'Người tham gia đặt nét bút CST sau cùng của chu kỳ.',
                   ],
                   [
-                    'NFT Stellar Selection',
-                    `${cst(protocolFacts.specialAllocationCst)} CST and one NFT, ${protocolFacts.nftStellarSelectionRecipients} times`,
-                    `${protocolFacts.nftStellarSelectionRecipients} entries drawn from the gesture pool.`,
+                    'NFT Tinh tuyển',
+                    `${cst(protocolFacts.specialAllocationCst)} CST và một NFT, ${protocolFacts.nftStellarSelectionRecipients} lần`,
+                    `${protocolFacts.nftStellarSelectionRecipients} lượt được chọn từ quỹ nét bút.`,
                   ],
                   [
-                    'Anchored-NFT Stellar Selection',
-                    `${cst(protocolFacts.specialAllocationCst)} CST and one NFT, ${protocolFacts.anchoredRwlkNftSelectionRecipients} times`,
-                    `${protocolFacts.anchoredRwlkNftSelectionRecipients} draws across anchored Random Walk NFTs.`,
+                    'Tinh tuyển NFT neo giữ',
+                    `${cst(protocolFacts.specialAllocationCst)} CST và một NFT, ${protocolFacts.anchoredRwlkNftSelectionRecipients} lần`,
+                    `${protocolFacts.anchoredRwlkNftSelectionRecipients} lượt chọn trên các Random Walk NFT đang neo giữ.`,
                   ],
                   [
-                    'Outreach Reserve',
+                    'Dự trữ truyền thông',
                     `${cst(protocolFacts.outreachReserveCst)} CST`,
-                    'Community outreach (Section 7.1).',
+                    'Truyền thông cộng đồng (Mục 7.1).',
                   ],
                 ],
               },
             },
             {
               kind: 'paragraph',
-              text: `A typical cycle therefore imprints ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs and ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST in fixed distributions, plus whatever Participation CST individual gestures imprinted along the way. Cycles with no CST gestures skip the Final CST Gesture track; cycles with no anchored Random Walk NFTs skip the anchored Selection.`,
+              text: `Vì vậy một chu kỳ điển hình khắc ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFT và ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST trong các phân phối cố định, cộng với lượng CST tham gia mà các nét bút riêng lẻ đã khắc dọc đường. Chu kỳ không có nét bút CST bỏ qua luồng nét bút CST cuối cùng; chu kỳ không có Random Walk NFT đang neo giữ bỏ qua Tinh tuyển neo giữ.`,
             },
           ],
         },
         'endurance-and-chrono': {
-          heading: 'Endurance Champion and Chrono-Warrior',
+          heading: 'Quán quân Bền bỉ và Chiến binh Thời gian',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'Two tracks measure persistence rather than position. The Endurance Champion is the participant who remained the most recent gesture maker for the longest unbroken interval during the cycle: the longest quiet gap that a single gesture survived. The Chrono-Warrior sits one level up: the participant who held the Endurance Champion title itself for the longest unbroken interval.',
+              text: 'Hai luồng đo sự bền bỉ thay vì vị trí. Quán quân Bền bỉ là người tham gia giữ vị trí người đặt nét bút gần nhất trong khoảng liên tục dài nhất của chu kỳ: khoảng lặng dài nhất mà một nét bút đơn lẻ trụ qua. Chiến binh Thời gian ở một tầng cao hơn: người tham gia giữ chính danh hiệu Quán quân Bền bỉ trong khoảng liên tục dài nhất.',
             },
             {
               kind: 'paragraph',
-              text: 'The distinction is subtle but real. A participant who gestures during a slow afternoon and is not displaced for ten hours sets a strong endurance interval. Whether they end the cycle as its Chrono-Warrior depends on how long that record stands before another participant surpasses it. Endurance measures the gap you created; the Chrono track measures how long your record survived. Both resolve only at finalization.',
+              text: 'Sự khác biệt tinh tế nhưng có thật. Một người tham gia đặt nét bút vào một buổi chiều chậm rãi và không bị thay thế trong mười giờ lập nên một khoảng bền bỉ mạnh. Họ có khép lại chu kỳ với vai trò Chiến binh Thời gian hay không tùy vào kỷ lục đó đứng vững bao lâu trước khi một người tham gia khác vượt qua. Bền bỉ đo khoảng lặng bạn tạo ra; luồng Chrono đo kỷ lục của bạn trụ được bao lâu. Cả hai chỉ được quyết định khi hoàn tất.',
             },
           ],
         },
         'stellar-selections': {
-          heading: 'Stellar Selections',
+          heading: 'Tinh tuyển',
           blocks: [
             {
               kind: 'paragraph',
-              text: `Each gesture records one entry in the cycle\u2019s participant Selection pool. At finalization, the contract draws ${protocolFacts.ethStellarSelectionRecipients} entries for the ETH Stellar Selection, which share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally, and ${protocolFacts.nftStellarSelectionRecipients} entries for the NFT Stellar Selection. Draws are made with replacement, so the same participant can be drawn more than once, and entries scale with gestures made: selection frequency is proportional to participation.`,
+              text: `Mỗi nét bút ghi nhận một lượt vào quỹ Tinh tuyển dành cho người tham gia của chu kỳ. Khi hoàn tất, hợp đồng chọn ${protocolFacts.ethStellarSelectionRecipients} lượt cho ETH Tinh tuyển, chia đều ${protocolFacts.stellarSelectionEthPercentage}% dự trữ, và ${protocolFacts.nftStellarSelectionRecipients} lượt cho NFT Tinh tuyển. Các lượt chọn có hoàn lại, nên cùng một người tham gia có thể được chọn nhiều lần, và số lượt tăng theo số nét bút đã đặt: tần suất được chọn tỷ lệ với mức tham gia.`,
             },
             {
               kind: 'paragraph',
-              text: `A separate Anchored-NFT Stellar Selection runs across anchored Random Walk NFTs: ${protocolFacts.anchoredRwlkNftSelectionRecipients} draws, weighted by the number of NFTs each holder has anchored. This track distributes CST and Cosmic Signature NFTs only; it carries no ETH.`,
+              text: `Một Tinh tuyển NFT neo giữ riêng chạy trên các Random Walk NFT đang neo giữ: ${protocolFacts.anchoredRwlkNftSelectionRecipients} lượt chọn, cân theo số NFT mỗi người đã neo giữ. Luồng này chỉ phân phối CST và Cosmic Signature NFT; nó không mang ETH.`,
             },
             {
               kind: 'paragraph',
-              text: 'The randomness behind these draws is constructed on-chain at finalization. Section 11.3 describes its sources and its limits.',
+              text: 'Độ ngẫu nhiên phía sau các lượt chọn này được xây trên chuỗi khi hoàn tất. Mục 11.3 mô tả nguồn và hạn chế của nó.',
             },
           ],
         },
         'delivery-and-timeouts': {
-          heading: 'Delivery, Escrow, and Timeouts',
+          heading: 'Giao nhận, ký quỹ và thời hạn',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'Distribution is deliberately split between push and pull. The Signature Allocation\u2019s ETH goes directly to the beneficiary during finalization, as does the Public Goods forwarding. The Chrono-Warrior\u2019s ETH and the ETH Selection shares are placed in the Allocations Wallet, an escrow contract, from which each recipient retrieves at their convenience. CST and NFTs are imprinted directly to their recipients during finalization.',
+              text: 'Việc phân phối được cố ý chia thành đẩy và kéo. ETH của phân bổ Signature đi thẳng đến người nhận trong lúc hoàn tất, khoản chuyển Hàng hóa công cũng vậy. ETH của Chiến binh Thời gian và các phần ETH Tinh tuyển được đặt vào ví phân bổ, một hợp đồng ký quỹ, từ đó mỗi người nhận nhận về khi thuận tiện. CST và NFT được khắc trực tiếp cho người nhận trong lúc hoàn tất.',
             },
             {
               kind: 'paragraph',
-              text: `Escrowed allocations and attached assets wait ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks. After that, the contracts permit anyone to retrieve an unretrieved allocation for themselves. The rule mirrors the Open-Finalization Window: nothing in the protocol waits forever on an absent participant, and every distribution eventually reaches a hand that wants it. Retrieve promptly.`,
+              text: `Phân bổ ký quỹ và tài sản đính kèm chờ ${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần. Sau đó, các hợp đồng cho phép bất kỳ ai nhận về một phân bổ chưa được nhận cho chính họ. Quy tắc này phản chiếu cửa sổ hoàn tất mở: không gì trong giao thức chờ mãi một người tham gia vắng mặt, và mọi phân phối cuối cùng đều đến tay người muốn nó. Hãy nhận về kịp thời.`,
             },
           ],
         },
       },
     },
     'the-art': {
-      heading: 'The Art: Deterministic Three-Body Signatures',
+      heading: 'Nghệ thuật: những Signature ba vật thể tất định',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Every Cosmic Signature NFT is a rendering of the gravitational three-body problem: three celestial bodies of comparable mass orbiting under Newtonian gravity. The three-body problem has no general closed-form solution, and its trajectories are chaotic; an imperceptible change in starting conditions produces a completely different dance. That chaos is the collection\u2019s engine. The seed decides the starting conditions, physics does the rest, and no two Signatures repeat.',
+          text: 'Mỗi Cosmic Signature NFT là một bản kết xuất của bài toán ba vật thể hấp dẫn: ba thiên thể có khối lượng tương đương quay quanh nhau dưới lực hấp dẫn Newton. Bài toán ba vật thể không có nghiệm dạng đóng tổng quát, và quỹ đạo của nó là hỗn độn; một thay đổi không thể nhận ra trong điều kiện khởi đầu tạo ra một vũ điệu hoàn toàn khác. Sự hỗn độn đó là động cơ của bộ sưu tập. Seed quyết định điều kiện khởi đầu, vật lý làm phần còn lại, và không hai Signature nào lặp lại.',
         },
         {
           kind: 'paragraph',
-          text: 'No generative model is involved at any stage. There is no training data, no sampling, and no prompt. The pipeline is a physics simulation followed by a renderer, written in Rust, published as open source, and fully deterministic.',
+          text: 'Không có mô hình tạo sinh nào tham gia ở bất kỳ giai đoạn nào. Không có dữ liệu huấn luyện, không lấy mẫu và không câu lệnh. Quy trình là một mô phỏng vật lý nối tiếp bởi một bộ kết xuất, viết bằng Rust, công bố dưới dạng mã nguồn mở và hoàn toàn tất định.',
         },
       ],
       subsections: {
         'art-pipeline': {
-          heading: 'The Pipeline',
+          heading: 'Quy trình',
           blocks: [
             {
               kind: 'list',
               items: [
-                'Seed. At imprint time the contract derives a 32-byte seed from on-chain data (Section 11.3) and stores it with the NFT. The seed initializes a SHA3-256 random number generator; everything downstream is a pure function of it.',
-                'Simulation. One hundred thousand candidate configurations are integrated for one million physics steps each, using a fourth-order Yoshida symplectic integrator, which preserves the system\u2019s energy behavior over long horizons.',
-                'Selection. A Borda rank aggregation scores candidates on chaos and on the equilateralness of the triangle the bodies form, then picks the most visually interesting orbit from the pool.',
-                'Camera. A slow elliptical camera drift moves the viewpoint through the orbit, giving each Signature a cinematic parallax.',
-                'Color. Colors are mixed in the OKLab perceptual space with 120-degree hue separation per body, modulated by drift and a sine wave.',
-                'Spectral rendering. Sixty-four wavelength bins spanning 380 to 700 nanometers render the orbit trails with velocity-dependent thickness and depth of field.',
-                'Finishing. AgX tonemapping, bloom, OpenSimplex nebula layers, and color grading complete the frame.',
+                'Seed. Lúc khắc, hợp đồng suy ra một seed 32 byte từ dữ liệu trên chuỗi (Mục 11.3) và lưu nó cùng NFT. Seed khởi tạo một bộ tạo số ngẫu nhiên SHA3-256; mọi thứ phía sau là hàm thuần của nó.',
+                'Mô phỏng. Một trăm nghìn cấu hình ứng viên được tích phân một triệu bước vật lý mỗi cấu hình, dùng bộ tích phân symplectic Yoshida bậc bốn, vốn bảo toàn hành vi năng lượng của hệ trên những khoảng dài.',
+                'Chọn lọc. Một phép tổng hợp xếp hạng Borda chấm điểm các ứng viên theo độ hỗn độn và độ đều cạnh của tam giác mà ba vật thể tạo thành, rồi chọn quỹ đạo thú vị nhất về thị giác từ nhóm.',
+                'Máy quay. Một chuyển động máy quay hình elip chậm rãi đưa điểm nhìn xuyên qua quỹ đạo, mang lại cho mỗi Signature hiệu ứng thị sai điện ảnh.',
+                'Màu sắc. Màu được pha trong không gian cảm nhận OKLab với độ tách sắc 120 độ cho mỗi vật thể, điều biến bởi độ trôi và một sóng sin.',
+                'Kết xuất quang phổ. Sáu mươi tư dải bước sóng trải từ 380 đến 700 nanomet kết xuất các vệt quỹ đạo với độ dày phụ thuộc vận tốc và độ sâu trường ảnh.',
+                'Hoàn thiện. Ánh xạ tông AgX, hiệu ứng bloom, các lớp tinh vân OpenSimplex và cân màu hoàn thiện khung hình.',
               ],
             },
             {
               kind: 'paragraph',
-              text: 'The output for every NFT is a 16-bit PNG and a 30-second H.265 video.',
+              text: 'Đầu ra cho mỗi NFT là một ảnh PNG 16 bit và một video H.265 dài 30 giây.',
             },
           ],
         },
         'reproducibility-and-license': {
-          heading: 'Reproducibility and License',
+          heading: 'Khả năng tái tạo và giấy phép',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'Determinism is enforced, not assumed. The same seed produces the same image, pixel for pixel, on any machine, and SHA-256 hashes of generated frames are asserted in continuous integration. Because every seed is stored on-chain and the pipeline is public, the collection does not depend on any server. If every server disappeared tomorrow, every Signature could be regenerated from the chain.',
+              text: 'Tính tất định được bảo đảm bằng cơ chế, không phải giả định. Cùng một seed tạo ra cùng một hình ảnh, đến từng điểm ảnh, trên bất kỳ máy nào, và mã băm SHA-256 của các khung hình đã tạo được kiểm định trong tích hợp liên tục. Vì mọi seed được lưu trên chuỗi và quy trình là công khai, bộ sưu tập không phụ thuộc vào máy chủ nào. Nếu mọi máy chủ biến mất vào ngày mai, mọi Signature đều có thể tạo lại từ chuỗi.',
             },
             {
               kind: 'paragraph',
-              text: 'Owners may name their NFTs on-chain, up to 32 bytes. Project-owned contracts, shaders, and rendering pipelines are dedicated under CC0 1.0, with no rights reserved; third-party dependencies retain their own licenses.',
+              text: 'Chủ sở hữu có thể đặt tên NFT của mình trên chuỗi, tối đa 32 byte. Hợp đồng, shader và quy trình kết xuất thuộc dự án được công bố theo CC0 1.0, không bảo lưu quyền nào; các phụ thuộc bên thứ ba giữ giấy phép riêng của chúng.',
             },
           ],
         },
       },
     },
     cst: {
-      heading: 'The CST Token',
+      heading: 'Token CST',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'CST is the protocol\u2019s ERC-20 token. Its supply starts at zero, and the token contract accepts imprint and burn instructions only from the protocol contract. Every CST in circulation traces back to participation in a cycle.',
+          text: 'CST là token ERC-20 của giao thức. Nguồn cung của nó bắt đầu từ không, và hợp đồng token chỉ nhận lệnh khắc và đốt từ hợp đồng giao thức. Mọi CST đang lưu hành đều truy về việc tham gia một chu kỳ.',
         },
       ],
       subsections: {
         'imprint-rules': {
-          heading: 'Imprint Rules',
+          heading: 'Quy tắc khắc',
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST enters circulation through three flows. Participation CST is imprinted at gesture time by the formula below. Recognition CST is imprinted at finalization: ${cst(protocolFacts.specialAllocationCst)} CST accompanies each of the cycle\u2019s NFT distributions, ${protocolFacts.typicalNftsPerCycle} in a typical cycle. Finally, ${cst(protocolFacts.outreachReserveCst)} CST per cycle goes to the Outreach Reserve, which the team uses for community outreach; it is the only recurring CST flow the team directs, and it carries no special powers.`,
+              text: `CST đi vào lưu hành qua ba dòng. CST tham gia được khắc lúc đặt nét bút theo công thức dưới đây. CST ghi nhận được khắc khi hoàn tất: ${cst(protocolFacts.specialAllocationCst)} CST đi cùng mỗi lần phân phối NFT của chu kỳ, ${protocolFacts.typicalNftsPerCycle} lần trong một chu kỳ điển hình. Cuối cùng, ${cst(protocolFacts.outreachReserveCst)} CST mỗi chu kỳ đi vào Dự trữ truyền thông, mà đội ngũ dùng cho truyền thông cộng đồng; đây là dòng CST định kỳ duy nhất đội ngũ điều hướng, và nó không mang quyền đặc biệt nào.`,
             },
             {
               kind: 'formula',
               formula: protocolFacts.dynamicCstRewardFormula,
               caption:
-                'Participation CST imprinted by a gesture. Elapsed time is measured since the previous gesture and scaled against the current cycle time increment.',
+                'CST tham gia được khắc bởi một nét bút. Thời gian trôi qua được đo kể từ nét bút trước và tỷ lệ theo mức tăng thời gian hiện tại của chu kỳ.',
             },
             {
               kind: 'paragraph',
-              text: 'In plain terms, the amount grows with the square root of the time since the previous gesture. A gesture arriving one second after the last imprints almost nothing; a gesture that ends a day of silence imprints hundreds of CST.',
+              text: 'Nói đơn giản, lượng này tăng theo căn bậc hai của thời gian kể từ nét bút trước. Một nét bút đến một giây sau nét trước khắc gần như không có gì; một nét bút kết thúc một ngày yên lặng khắc hàng trăm CST.',
             },
             {
               kind: 'table',
               table: {
-                columns: ['Time since previous gesture', 'Participation CST'],
+                columns: ['Thời gian kể từ nét bút trước', 'CST tham gia'],
                 rows: protocolFacts.dynamicCstRewardExamples.map((example) => [
-                  example.elapsed,
-                  example.cst,
+                  ELAPSED_VI[example.elapsed] ?? example.elapsed,
+                  viDecimal(example.cst),
                 ]),
-                footnote: `Computed at the launch time increment of exactly ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} hour. Amounts drift slightly lower as the increment grows; the live app preview and the contract are the source of truth.`,
+                footnote: `Tính với mức tăng thời gian lúc ra mắt là đúng ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} giờ. Lượng thực tế trôi thấp hơn một chút khi mức tăng lớn dần; bản xem trước trực tiếp trong ứng dụng và hợp đồng là nguồn chính xác.`,
               },
             },
           ],
         },
         'supply-dynamics': {
-          heading: 'Burning and Supply Dynamics',
+          heading: 'Đốt và động lực nguồn cung',
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST leaves circulation whenever it is spent: the full cost of every CST gesture is burned. Supply is therefore shaped by behavior. Quiet cycles imprint little Participation CST, active CST usage burns supply back down, and the fixed Recognition and Outreach flows add a predictable ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST per typical cycle. There is no cap, no premine, and no team allocation.`,
+              text: `CST rời khỏi lưu hành mỗi khi được chi: toàn bộ chi phí của mỗi nét bút CST bị đốt. Vì vậy nguồn cung được định hình bởi hành vi. Chu kỳ yên ắng khắc ít CST tham gia, việc dùng CST sôi động đốt nguồn cung xuống, và các dòng ghi nhận và truyền thông cố định thêm một lượng dự đoán được là ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST mỗi chu kỳ điển hình. Không có giới hạn, không khắc trước và không phần dành cho đội ngũ.`,
             },
             {
               kind: 'paragraph',
-              text: 'The square-root formula is itself a supply control, introduced in the V2 upgrade (Section 12.2). The original design imprinted a flat 100 CST per gesture, which made machine-speed gesture sequences an unbounded source of new CST. Under the current rule, a burst of rapid gestures imprints approximately zero, while patient participation is what creates supply.',
+              text: 'Chính công thức căn bậc hai là một cơ chế kiểm soát nguồn cung, được đưa vào trong nâng cấp V2 (Mục 12.2). Thiết kế ban đầu khắc một mức cố định 100 CST mỗi nét bút, điều khiến các chuỗi nét bút tốc độ máy trở thành nguồn CST mới không giới hạn. Với quy tắc hiện tại, một loạt nét bút dồn dập khắc xấp xỉ không, trong khi sự tham gia kiên nhẫn mới là điều tạo ra nguồn cung.',
             },
           ],
         },
         'coordination-weight': {
-          heading: 'Coordination Weight',
+          heading: 'Trọng số điều phối',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'CST doubles as the weight token of the Cosmic Council (Section 9). Weight activates on delegation: a holder delegates to themselves or to another address, and each CST then expresses one unit of Coordination Weight. The token uses timestamp-based checkpoints, so proposal snapshots refer to wall-clock time rather than block numbers.',
+              text: 'CST đồng thời là token trọng số của Hội đồng Vũ trụ (Mục 9). Trọng số kích hoạt khi ủy quyền: người nắm giữ ủy quyền cho chính mình hoặc một địa chỉ khác, và từ đó mỗi CST biểu thị một đơn vị trọng số điều phối. Token dùng các điểm kiểm dựa trên dấu thời gian, nên ảnh chụp nhanh của đề xuất tham chiếu thời gian thực thay vì số khối.',
             },
           ],
         },
       },
     },
     anchoring: {
-      heading: 'Anchoring',
+      heading: 'Neo giữ',
       blocks: [
         {
           kind: 'paragraph',
-          text: `Anchoring is the protocol\u2019s form of long-term alignment. An owner may anchor a Cosmic Signature NFT to the protocol; while it is anchored, it accrues a proportional share of each cycle\u2019s ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution. The accrued ETH is retrieved when the anchor is released. There is no fixed term and no penalty, but anchoring is a once-per-NFT decision: each NFT can be anchored only once, ever, so releasing it permanently ends that NFT\u2019s anchoring eligibility.`,
+          text: `Neo giữ là hình thức gắn kết dài hạn của giao thức. Chủ sở hữu có thể neo giữ một Cosmic Signature NFT với giao thức; trong khi neo giữ, nó tích lũy một phần theo tỷ lệ của ${protocolFacts.anchorDistributionPercentage}% phân phối neo giữ mỗi chu kỳ. ETH tích lũy được nhận về khi gỡ neo. Không có kỳ hạn cố định và không có phạt, nhưng neo giữ là quyết định một lần cho mỗi NFT: mỗi NFT chỉ được neo giữ đúng một lần, nên gỡ neo chấm dứt vĩnh viễn khả năng neo giữ của NFT đó.`,
         },
         {
           kind: 'paragraph',
-          text: 'The once-ever rule replaces the usual lock-up schedule with a single irreversible choice, and it gives the anchored set a real cost of exit. Whether to keep an NFT anchored is a live decision every cycle; whether to release it is a permanent one.',
+          text: 'Quy tắc một-lần-duy-nhất thay lịch khóa thông thường bằng một lựa chọn không thể đảo ngược, và nó cho tập hợp đang neo giữ một cái giá thực sự khi rời đi. Giữ một NFT neo giữ là quyết định sống động mỗi chu kỳ; gỡ neo là quyết định vĩnh viễn.',
         },
         {
           kind: 'paragraph',
-          text: `Random Walk NFTs anchor separately and for a different purpose: anchored Random Walk NFTs receive draws in the Anchored-NFT Stellar Selection (Section 5.3), ${protocolFacts.anchoredRwlkNftSelectionRecipients} per cycle, each carrying ${cst(protocolFacts.specialAllocationCst)} CST and a Cosmic Signature NFT. Random Walk anchoring carries no ETH distributions. The same once-ever rule applies.`,
+          text: `Random Walk NFT neo giữ riêng và với mục đích khác: Random Walk NFT đang neo giữ nhận các lượt chọn trong Tinh tuyển NFT neo giữ (Mục 5.3), ${protocolFacts.anchoredRwlkNftSelectionRecipients} lượt mỗi chu kỳ, mỗi lượt mang ${cst(protocolFacts.specialAllocationCst)} CST và một Cosmic Signature NFT. Neo giữ Random Walk không mang phân phối ETH. Cùng quy tắc một-lần-duy-nhất được áp dụng.`,
         },
       ],
     },
     'cosmic-council': {
-      heading: 'The Cosmic Council',
+      heading: 'Hội đồng Vũ trụ',
       blocks: [
         {
           kind: 'paragraph',
-          text: `The Cosmic Council is the protocol\u2019s on-chain coordination body, built on the audited OpenZeppelin Governor framework with CST as its weight token. Any address holding at least ${protocolFacts.councilProposalThresholdCst} CST of delegated weight may submit a Coordination Proposal. Proposals wait through a ${protocolFacts.councilVotingDelayDays}-day coordination delay, then remain open for a ${protocolFacts.councilVotingPeriodWeeks}-week coordination period.`,
+          text: `Hội đồng Vũ trụ là cơ quan điều phối trên chuỗi của giao thức, xây trên khung Governor đã được kiểm toán của OpenZeppelin với CST làm token trọng số. Bất kỳ địa chỉ nào nắm ít nhất ${protocolFacts.councilProposalThresholdCst} CST trọng số được ủy quyền đều có thể gửi một đề xuất điều phối. Đề xuất chờ qua độ trễ điều phối ${protocolFacts.councilVotingDelayDays} ngày, rồi mở trong giai đoạn điều phối ${protocolFacts.councilVotingPeriodWeeks} tuần.`,
         },
         {
           kind: 'paragraph',
-          text: `A proposal passes when two conditions hold: Support exceeds Opposition, and Support plus Abstain weight reaches the Coordination Quorum of ${protocolFacts.councilQuorumPercent}% of total CST supply. Opposition weight does not count toward the quorum. Expressing weight is a cryptographic act, not a share or an equity instrument, and delegation can be changed at any time.`,
+          text: `Một đề xuất được thông qua khi hai điều kiện đồng thời đúng: tán thành vượt phản đối, và trọng số tán thành cộng bỏ trống chạm túc số điều phối ${protocolFacts.councilQuorumPercent}% tổng cung CST. Trọng số phản đối không được tính vào túc số. Bày tỏ trọng số là một hành động mật mã, không phải cổ phần hay công cụ vốn, và việc ủy quyền có thể thay đổi bất cứ lúc nào.`,
         },
         {
           kind: 'paragraph',
-          text: 'Today the Council coordinates alongside the team\u2019s scoped owner role. After the decentralization step of Section 13, it is the only coordination layer the protocol has.',
+          text: 'Hôm nay Hội đồng điều phối song song với vai trò chủ sở hữu có giới hạn của đội ngũ. Sau bước phi tập trung của Mục 13, đó là lớp điều phối duy nhất mà giao thức có.',
         },
       ],
     },
     'public-goods': {
-      heading: 'Public Goods',
+      heading: 'Hàng hóa công',
       blocks: [
         {
           kind: 'paragraph',
-          text: `Every cycle forwards ${protocolFacts.publicGoodsPercentage}% of the Cycle Reserve to the Public Goods Vault, whose beneficiary is currently Protocol Guild, the collective funding mechanism for more than 170 Ethereum core protocol contributors. The forwarding is enforced on-chain as part of finalization; no one decides each cycle whether to honor it. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.`,
+          text: `Mỗi chu kỳ chuyển ${protocolFacts.publicGoodsPercentage}% Dự trữ chu kỳ đến Kho Hàng hóa công, mà đơn vị thụ hưởng hiện là Protocol Guild, cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho giao thức Ethereum. Việc chuyển tiếp được thực thi trên chuỗi như một phần của hoàn tất; không ai quyết định mỗi chu kỳ có tôn trọng nó hay không. Giao thức càng được sử dụng nhiều, càng nhiều giá trị chảy về hạ tầng mà chính Ethereum nương tựa vào.`,
         },
         {
           kind: 'paragraph',
-          text: 'The reasoning is simple. Cosmic Signature exists because Ethereum\u2019s base layer keeps working, and a protocol that lives on public infrastructure should fund it the way it does everything else: mechanically, on a schedule, in public. The vault also accepts voluntary ETH contributions directly, outside any cycle.',
+          text: 'Lý lẽ rất đơn giản. Cosmic Signature tồn tại vì lớp nền của Ethereum tiếp tục hoạt động, và một giao thức sống trên hạ tầng công cộng nên tài trợ cho nó theo cách nó làm mọi việc khác: cơ học, theo lịch, công khai. Kho cũng nhận các khoản đóng góp ETH tự nguyện trực tiếp, ngoài bất kỳ chu kỳ nào.',
         },
         {
           // lexicon-allow-start: tax-status disclaimer must name the concepts it denies.
           kind: 'note',
-          text: 'This is a forwarding of ETH to a public-goods address, currently Protocol Guild. It is not a charitable contribution or a donation in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment in any jurisdiction.',
+          text: 'Đây là việc chuyển tiếp ETH đến một địa chỉ hàng hóa công, hiện là Protocol Guild. Đây không phải là khoản đóng góp từ thiện hay quyên góp theo nghĩa thuế của Hoa Kỳ, và Cosmic Signature không đưa ra cam kết nào về cách xử lý thuế của nó ở bất kỳ khu vực pháp lý nào.',
           // lexicon-allow-end
         },
       ],
     },
     security: {
-      heading: 'Security, Randomness, and Verifiability',
+      heading: 'Bảo mật, độ ngẫu nhiên và khả năng xác minh',
       blocks: [],
       subsections: {
         'independent-review': {
-          heading: 'Independent Review',
+          heading: 'Rà soát độc lập',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'In late 2025, Hacken carried out an independent security review of the Cosmic Signature contracts, covering the core protocol, the CST token, both NFT integrations, the anchoring wallets, and the supporting wallet and system-management contracts. The final report, published in January 2026, lists 23 findings: none critical, none high severity, 3 medium, 8 low, and 12 informational, most of them design trade-offs reviewed and accepted with written rationale.',
+              text: 'Cuối năm 2025, Hacken đã thực hiện một cuộc rà soát bảo mật độc lập các hợp đồng Cosmic Signature, bao gồm giao thức cốt lõi, token CST, cả hai tích hợp NFT, các ví neo giữ, cùng các hợp đồng ví và quản lý hệ thống hỗ trợ. Báo cáo cuối cùng, công bố vào tháng 1 năm 2026, liệt kê 23 phát hiện: không có mức nghiêm trọng, không có mức cao, 3 trung bình, 8 thấp và 12 mang tính thông tin, phần lớn là những cân nhắc thiết kế đã được xem xét và chấp nhận với lý do bằng văn bản.',
             },
             {
               kind: 'paragraph',
-              text: 'Alongside the manual review, Hacken fuzz-tested 14 system invariants, properties such as the protocol\u2019s ETH balance always equaling deposits minus distributions. All 14 held across 10,000 runs. The full report is public and linked in the references.',
+              text: 'Bên cạnh rà soát thủ công, Hacken đã kiểm thử fuzz 14 bất biến của hệ thống, những thuộc tính như số dư ETH của giao thức luôn bằng số đã nạp trừ số đã phân phối. Cả 14 đều giữ vững qua 10.000 lượt chạy. Báo cáo đầy đủ là công khai và được liên kết trong phần tham chiếu.',
             },
             {
               kind: 'paragraph',
-              text: 'Beyond external review, the repository carries Certora formal verification specifications, Solidity SMTChecker configuration, Slither static analysis, and a test suite that targets complete coverage of the Solidity sources.',
+              text: 'Ngoài rà soát bên ngoài, kho mã mang các đặc tả kiểm chứng hình thức Certora, cấu hình SMTChecker của Solidity, phân tích tĩnh Slither và một bộ kiểm thử nhắm đến độ phủ hoàn toàn các mã nguồn Solidity.',
             },
           ],
         },
         'defensive-design': {
-          heading: 'Defensive Design',
+          heading: 'Thiết kế phòng vệ',
           blocks: [
             {
               kind: 'list',
               items: [
-                'Reentrancy guards protect every external entry point of the core contract.',
-                'Pull over push: secondary ETH allocations and attached assets sit in escrow rather than being sent during finalization, so no recipient contract can block a cycle from closing.',
-                'Failure-tolerant forwarding: if the Public Goods transfer cannot complete, finalization proceeds anyway and the event is recorded for later handling.',
-                'Inter-cycle locks: core parameter changes and contract upgrades are impossible while a cycle is running (Section 13).',
+                'Bộ chặn tái nhập bảo vệ mọi điểm vào bên ngoài của hợp đồng cốt lõi.',
+                'Kéo thay cho đẩy: các phân bổ ETH phụ và tài sản đính kèm nằm trong ký quỹ thay vì được gửi trong lúc hoàn tất, nên không hợp đồng người nhận nào có thể chặn một chu kỳ khép lại.',
+                'Chuyển tiếp chịu lỗi: nếu khoản chuyển Hàng hóa công không thể hoàn thành, hoàn tất vẫn tiến hành và sự kiện được ghi lại để xử lý sau.',
+                'Khóa giữa các chu kỳ: thay đổi tham số cốt lõi và nâng cấp hợp đồng là bất khả trong khi một chu kỳ đang chạy (Mục 13).',
               ],
             },
           ],
         },
         randomness: {
-          heading: 'Randomness',
+          heading: 'Độ ngẫu nhiên',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'The protocol needs randomness twice: for Selection draws at finalization and for each new NFT\u2019s seed. It builds a seed on-chain by folding together the previous block hash, the current base fee, and Arbitrum-specific entropy from the ArbSys and ArbGasInfo precompiles: the previous Arbitrum block hash, the gas backlog, and L1 pricing counters. Individual values are then drawn from that seed with keccak256. The precompile calls are failure-tolerant; if one is unavailable, the construction falls back to the remaining sources.',
+              text: 'Giao thức cần độ ngẫu nhiên hai lần: cho các lượt chọn Tinh tuyển khi hoàn tất và cho seed của mỗi NFT mới. Nó xây một seed trên chuỗi bằng cách gộp mã băm khối trước, phí cơ sở hiện tại và entropy riêng của Arbitrum từ các precompile ArbSys và ArbGasInfo: mã băm khối Arbitrum trước, lượng gas tồn đọng và các bộ đếm định giá L1. Các giá trị riêng lẻ sau đó được rút từ seed này bằng keccak256. Các lời gọi precompile chịu lỗi; nếu một lời gọi không khả dụng, cấu trúc dùng các nguồn còn lại.',
             },
             {
               kind: 'paragraph',
-              text: 'This is deliberate minimalism: no oracle, no external committee, no callback that could strand a cycle. The trade-off is stated plainly. A sequencer could in principle influence block-level inputs, and the design bounds what that influence could reach. Selection draws and art seeds are the only consumers of randomness; the countdown, the Gesture Cost sequence, and every percentage in Section 5 are deterministic. The construction is consumed once per finalization, and finalization is a public transaction anyone can submit.',
+              text: 'Đây là chủ nghĩa tối giản có chủ đích: không oracle, không ủy ban bên ngoài, không callback có thể làm kẹt một chu kỳ. Sự cân nhắc được nêu thẳng. Về nguyên tắc, sequencer có thể ảnh hưởng đến các đầu vào cấp khối, và thiết kế giới hạn phạm vi mà ảnh hưởng đó có thể chạm tới. Các lượt chọn Tinh tuyển và seed nghệ thuật là những nơi duy nhất tiêu thụ độ ngẫu nhiên; đếm ngược, chuỗi chi phí nét bút và mọi tỷ lệ trong Mục 5 đều tất định. Cấu trúc được dùng một lần mỗi lần hoàn tất, và hoàn tất là một giao dịch công khai bất kỳ ai cũng có thể gửi.',
             },
           ],
         },
         'open-verification': {
-          heading: 'Open Verification',
+          heading: 'Xác minh mở',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'All contracts are source-verified with exact-match status on Sourcify for Arbitrum One (chain 42161), at the addresses fixed in Appendix A. The art pipeline\u2019s determinism is asserted in continuous integration with SHA-256 hashes of rendered frames. Project-owned code is CC0: anyone may fork the contracts, the renderer, or the site, and anyone can check any Signature by regenerating it from its seed.',
+              text: 'Mọi hợp đồng đều được xác minh mã nguồn với trạng thái khớp chính xác trên Sourcify cho Arbitrum One (chuỗi 42161), tại các địa chỉ cố định trong Phụ lục A. Tính tất định của quy trình nghệ thuật được kiểm định trong tích hợp liên tục bằng mã băm SHA-256 của các khung hình đã kết xuất. Mã thuộc dự án là CC0: bất kỳ ai cũng có thể phân nhánh hợp đồng, bộ kết xuất hay trang web, và bất kỳ ai cũng có thể kiểm tra bất kỳ Signature nào bằng cách tạo lại nó từ seed.',
             },
           ],
         },
       },
     },
     'upgrade-history': {
-      heading: 'Deployment History and the Road Ahead',
+      heading: 'Lịch sử triển khai và con đường phía trước',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Cosmic Signature is designed to be finished. Upgradability exists so the mechanics can be corrected against observed behavior during the protocol\u2019s early life, and it ends when the design does. This section records what has shipped and what remains.',
+          text: 'Cosmic Signature được thiết kế để hoàn thành. Khả năng nâng cấp tồn tại để cơ chế có thể được hiệu chỉnh theo hành vi quan sát được trong giai đoạn đầu đời của giao thức, và nó kết thúc khi thiết kế kết thúc. Mục này ghi lại những gì đã triển khai và những gì còn lại.',
         },
       ],
       subsections: {
         v1: {
-          heading: 'V1: Launch',
+          heading: 'V1: Ra mắt',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'V1 launched the protocol on Arbitrum One behind a UUPS upgradeable proxy: cycles, gestures, the allocation tracks, anchoring, the Council, and the art pipeline, essentially as described in this paper. Upgrades require the owner and are only possible between cycles. There is deliberately no mechanism for changing the contract mid-cycle, whatever the circumstances.',
+              text: 'V1 ra mắt giao thức trên Arbitrum One sau một proxy có thể nâng cấp UUPS: chu kỳ, nét bút, các luồng phân bổ, neo giữ, Hội đồng và quy trình nghệ thuật, về cơ bản như mô tả trong bài viết này. Nâng cấp yêu cầu chủ sở hữu và chỉ có thể diễn ra giữa các chu kỳ. Cố ý không có cơ chế nào để thay đổi hợp đồng giữa chu kỳ, bất kể hoàn cảnh.',
             },
           ],
         },
         v2: {
-          heading: 'The V2 Upgrade, Live Today',
+          heading: 'Nâng cấp V2, đang vận hành hôm nay',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'V2 is the implementation deployed today. It made five changes, each a response to observed or anticipated behavior.',
+              text: 'V2 là bản triển khai đang chạy hôm nay. Nó thực hiện năm thay đổi, mỗi thay đổi là một phản hồi trước hành vi quan sát được hoặc dự kiến.',
             },
             {
               kind: 'list',
               items: [
-                'Dynamic Participation CST. The flat 100 CST per gesture became the square-root formula of Section 7.1. Flat imprinting turned rapid gesture sequences into free CST; the new rule imprints by patience, not by frequency.',
-                'Minimum-imprint guards. Every gesture method gained a parameter for the smallest Participation CST amount the participant will accept, protecting them from timing shifts between signing and execution.',
-                'A living CST Calibration Window. The window\u2019s duration became a stored value that responds to the gesture mix (Section 4.3), so the ETH and CST paths keep each other in balance.',
-                `A longer exclusivity window. The Final Gesture participant\u2019s exclusive finalization window grew from 24 to ${protocolFacts.finalGestureExclusivityHours} hours.`,
-                'Timing and arithmetic hardening. Countdown extensions now always apply to the stored finalization time, closing a loophole in which near-free CST gestures made after expiry could repeatedly push the deadline outward. The arithmetic that schedules the next cycle was also hardened so that no parameter configuration, however extreme, can prevent a cycle from finalizing.',
+                'CST tham gia động. Mức cố định 100 CST mỗi nét bút trở thành công thức căn bậc hai của Mục 7.1. Khắc cố định biến các chuỗi nét bút dồn dập thành CST không tốn chi phí; quy tắc mới khắc theo sự kiên nhẫn, không theo tần suất.',
+                'Bảo đảm khắc tối thiểu. Mọi phương thức nét bút có thêm một tham số cho lượng CST tham gia nhỏ nhất mà người tham gia chấp nhận, bảo vệ họ trước những dịch chuyển thời gian giữa lúc ký và lúc thực thi.',
+                'Một cửa sổ hiệu chỉnh CST sống. Thời lượng của cửa sổ trở thành một giá trị được lưu, phản ứng theo cơ cấu nét bút (Mục 4.3), để hai đường ETH và CST giữ cân bằng cho nhau.',
+                `Cửa sổ độc quyền dài hơn. Cửa sổ hoàn tất độc quyền của người đặt nét bút cuối cùng tăng từ 24 lên ${protocolFacts.finalGestureExclusivityHours} giờ.`,
+                'Siết chặt thời gian và phép tính. Việc kéo dài đếm ngược nay luôn áp lên thời điểm hoàn tất đã lưu, đóng một lỗ hổng trong đó những nét bút CST gần như không tốn chi phí đặt sau khi hết hạn có thể liên tục đẩy thời hạn ra xa. Phép tính lên lịch chu kỳ tiếp theo cũng được siết chặt để không cấu hình tham số nào, dù cực đoan đến đâu, có thể ngăn một chu kỳ hoàn tất.',
               ],
             },
           ],
         },
         v3: {
-          heading: 'The Planned V3 Upgrade',
+          heading: 'Nâng cấp V3 dự kiến',
           blocks: [
             {
               kind: 'paragraph',
-              text: 'V3, currently in development in the public repository, changes exactly one thing: the cost of acting late. During the final 20 minutes before the Cycle Finalization Time, every Gesture Cost, whether ETH, ETH with a Random Walk NFT, or CST, is multiplied by a premium that ramps polynomially from 1x to 10x, reaching 10x at the deadline and staying there for any gesture made during overtime.',
+              text: 'V3, hiện đang được phát triển trong kho mã công khai, thay đổi đúng một điều: giá của việc hành động muộn. Trong 20 phút cuối trước thời điểm hoàn tất chu kỳ, mọi chi phí nét bút, dù ETH, ETH kèm Random Walk NFT hay CST, được nhân với một hệ số cộng thêm tăng theo đa thức từ 1 lần lên 10 lần, chạm 10 lần tại thời hạn và giữ ở đó cho bất kỳ nét bút nào đặt trong giờ bù.',
             },
             {
               kind: 'formula',
-              formula: 'm(t) = 1 + 9 \u00b7 (t / T)^8, where T = 20 minutes',
+              formula: 'm(t) = 1 + 9 \u00b7 (t / T)^8, với T = 20 phút',
               caption:
-                'Late-cycle cost premium, with t the time elapsed within the final 20-minute window.',
+                'Hệ số cộng thêm chi phí cuối chu kỳ, với t là thời gian đã trôi qua trong cửa sổ 20 phút cuối.',
             },
             {
               kind: 'paragraph',
-              text: 'The exponent matters. Because the ramp is eighth-order, the premium is nearly invisible for most of the window and steep only at the very end: about 1.04x ten minutes before the deadline, about 1.9x at five minutes, about 7x at one minute, and 10x at zero.',
+              text: 'Số mũ quan trọng. Vì đường tăng là bậc tám, hệ số gần như vô hình trong phần lớn cửa sổ và chỉ dốc lên ở những phút cuối: khoảng 1,04 lần mười phút trước thời hạn, khoảng 1,9 lần khi còn năm phút, khoảng 7 lần khi còn một phút, và 10 lần ở không.',
             },
             {
               kind: 'paragraph',
-              text: 'The intent is to change the endgame. Under V2, waiting until the last seconds to gesture is nearly free, so a cycle can end in a flurry of low-signal timing moves. Under V3, a last-moment gesture is an expensive statement, sustained participation through the cycle is comparatively cheap, and the endurance tracks of Section 5.2 become much harder to ambush. Exact parameters may still be tuned before deployment; the mechanism is as described.',
+              text: 'Ý định là thay đổi giai đoạn cuối. Dưới V2, chờ đến những giây cuối để đặt nét bút gần như không tốn gì, nên một chu kỳ có thể kết thúc trong một loạt các nước đi canh thời gian ít ý nghĩa. Dưới V3, một nét bút phút chót là một tuyên bố đắt giá, sự tham gia bền vững xuyên chu kỳ tương đối rẻ, và các luồng bền bỉ của Mục 5.2 trở nên khó bị tập kích hơn nhiều. Các tham số chính xác có thể còn được tinh chỉnh trước khi triển khai; cơ chế đúng như đã mô tả.',
             },
           ],
         },
       },
     },
     decentralization: {
-      heading: 'The Path to Full Decentralization',
+      heading: 'Con đường đến phi tập trung hoàn toàn',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'The protocol currently has an owner: the address that deployed it. The role is real, and this paper does not minimize it. It is also narrow by construction and temporary by commitment.',
+          text: 'Giao thức hiện có một chủ sở hữu: địa chỉ đã triển khai nó. Vai trò này là thật, và bài viết này không hạ thấp nó. Nó cũng hẹp theo cấu trúc và tạm thời theo cam kết.',
         },
         {
           kind: 'paragraph',
-          text: 'While a cycle is running, the core parameters are locked. The owner cannot change percentages, increments, or costs mid-cycle, and cannot upgrade the contract; owner actions live in the gap between cycles. Three narrower controls remain available at any time: postponing an upcoming cycle\u2019s activation, though only until its first gesture arrives; adjusting the delay before the next cycle; and managing peripheral contracts, meaning the Public Goods Vault\u2019s beneficiary, NFT metadata URIs, and the escrow retrieval timeout. No owner power reaches escrowed allocations, imprinted NFTs, recorded seeds, or anyone\u2019s CST balance, and no team wallet receives ETH from gestures.',
+          text: 'Trong khi một chu kỳ đang chạy, các tham số cốt lõi bị khóa. Chủ sở hữu không thể thay đổi tỷ lệ, mức tăng hay chi phí giữa chu kỳ, và không thể nâng cấp hợp đồng; hành động của chủ sở hữu nằm ở khoảng trống giữa các chu kỳ. Ba quyền kiểm soát hẹp hơn vẫn khả dụng bất cứ lúc nào: lùi thời điểm kích hoạt của một chu kỳ sắp tới, nhưng chỉ đến khi nét bút đầu tiên của nó xuất hiện; điều chỉnh độ trễ trước chu kỳ tiếp theo; và quản lý các hợp đồng ngoại vi, tức đơn vị thụ hưởng của Kho Hàng hóa công, URI siêu dữ liệu NFT và thời hạn nhận về của ký quỹ. Không quyền nào của chủ sở hữu chạm tới phân bổ ký quỹ, NFT đã khắc, seed đã ghi hay số dư CST của bất kỳ ai, và không ví nào của đội ngũ nhận ETH từ nét bút.',
         },
         {
           kind: 'paragraph',
-          text: 'These powers exist because the mechanism is novel. V2 exists because live behavior taught lessons no simulation would have caught, and V3 exists for the same reason. A bounded, public adjustment period is how the design gets finished. The strongest power in the list is the upgrade itself, and even it is public: a new implementation is visible and verifiable on-chain before the next cycle begins.',
+          text: 'Những quyền này tồn tại vì cơ chế còn mới. V2 tồn tại vì hành vi thực tế dạy những bài học không mô phỏng nào bắt được, và V3 tồn tại vì cùng lý do. Một giai đoạn điều chỉnh có giới hạn, công khai là cách thiết kế được hoàn thành. Quyền mạnh nhất trong danh sách là chính việc nâng cấp, và ngay cả nó cũng công khai: một bản triển khai mới hiển thị và có thể xác minh trên chuỗi trước khi chu kỳ tiếp theo bắt đầu.',
         },
         {
           kind: 'paragraph',
-          text: 'It ends as follows. Once the remaining upgrades are complete, beginning with V3, and the mechanics and token design are judged final, privileged control will be removed from the deploying address entirely. The owner role will leave the deployer permanently, either by transfer to the Cosmic Council or by outright renouncement, with the exact mechanism announced in advance. From that point, no private party can upgrade the protocol or change its parameters, and the deploying address holds nothing that any other address does not. What remains is the protocol as deployed, the Council as its coordination layer, and the art.',
+          text: 'Nó kết thúc như sau. Khi các nâng cấp còn lại hoàn thành, bắt đầu từ V3, và cơ chế cùng thiết kế token được xem là cuối cùng, quyền kiểm soát đặc quyền sẽ được loại bỏ hoàn toàn khỏi địa chỉ triển khai. Vai trò chủ sở hữu sẽ rời khỏi người triển khai vĩnh viễn, bằng cách chuyển cho Hội đồng Vũ trụ hoặc từ bỏ hoàn toàn, với cơ chế chính xác được thông báo trước. Từ thời điểm đó, không bên tư nhân nào có thể nâng cấp giao thức hay thay đổi tham số của nó, và địa chỉ triển khai không nắm gì mà bất kỳ địa chỉ nào khác không có. Những gì còn lại là giao thức như đã triển khai, Hội đồng làm lớp điều phối, và nghệ thuật.',
         },
         {
           kind: 'paragraph',
-          text: 'Every step of this process is publicly visible on-chain, including the last one.',
+          text: 'Mỗi bước của quá trình này đều hiển thị công khai trên chuỗi, kể cả bước cuối.',
         },
       ],
     },
     clarifications: {
-      heading: 'Clarifications and Risk Factors',
+      heading: 'Giải đáp và các yếu tố rủi ro',
       blocks: [],
       subsections: {
         'what-it-is-not': {
-          heading: 'What Cosmic Signature Is Not',
+          heading: 'Cosmic Signature không phải là gì',
           blocks: [
             // lexicon-allow-start: denial copy must name the concepts it denies, matching FAQ practice.
             {
               kind: 'paragraph',
-              text: 'Cosmic Signature is not a lottery, a casino, or a gambling product. There is no house, no dealer, and no bet. Participants exchange value for participation itself: every gesture is an expressive act that shapes the artwork, extends the cycle, and is recorded permanently on-chain. The protocol retains no operator\u2019s margin of any kind; every allocation track in Section 5 flows to participants, to anchored NFTs, to the compounding reserve, or to public goods.',
+              text: 'Cosmic Signature không phải xổ số, sòng bạc hay sản phẩm cờ bạc. Không có nhà cái, không có người chia bài và không có cược. Người tham gia trao đổi giá trị để lấy chính sự tham gia: mỗi nét bút là một hành động biểu đạt định hình tác phẩm, kéo dài chu kỳ và được ghi vĩnh viễn trên chuỗi. Giao thức không giữ lại bất kỳ biên lợi nào của người điều hành; mọi luồng phân bổ trong Mục 5 đều chảy đến người tham gia, các NFT đang neo giữ, dự trữ tích lũy hoặc hàng hóa công.',
             },
             {
               kind: 'paragraph',
-              text: 'Cosmic Signature is not an investment product, and nothing in this paper is investment advice or an offer of securities. CST and Cosmic Signature NFTs are participation and art objects. The protocol makes no promises about their price, liquidity, or future value, and no one should acquire them with an expectation of profit from the efforts of others.',
+              text: 'Cosmic Signature không phải sản phẩm đầu tư, và không gì trong bài viết này là lời khuyên đầu tư hay lời chào bán chứng khoán. CST và Cosmic Signature NFT là những vật phẩm tham gia và nghệ thuật. Giao thức không hứa hẹn gì về giá, thanh khoản hay giá trị tương lai của chúng, và không ai nên có chúng với kỳ vọng lợi nhuận từ công sức của người khác.',
             },
             // lexicon-allow-end
           ],
         },
         'risk-factors': {
-          heading: 'Risk Factors',
+          heading: 'Các yếu tố rủi ro',
           blocks: [
             {
               kind: 'list',
               items: [
-                'Smart contract risk. The contracts are reviewed, formally analyzed, and source-verified, and none of that is a guarantee. Unknown defects can exist in any software that holds value.',
-                'Randomness limits. Selection draws use block-derived entropy (Section 11.3). A sequencer could in principle influence it; the design bounds the consequences but cannot eliminate them.',
-                `Timing responsibilities. The ${protocolFacts.finalGestureExclusivityHours}-hour finalization window and the ${protocolFacts.secondaryRetrievalTimeoutWeeks}-week escrow timeout are real deadlines. Allocations left unretrieved past them become available to others, by design.`,
-                'Parameter changes. Until the decentralization step completes, parameters can change between cycles as described in Section 13. Every change is public before the next cycle begins.',
-                'Asset volatility. The values of ETH, CST, and NFTs move. Participation costs real money; treat gestures as expenditure on participation and art, not as a path to financial gain.',
-                'Regulatory uncertainty. The legal treatment of digital assets varies by jurisdiction and continues to evolve.',
+                'Rủi ro hợp đồng thông minh. Các hợp đồng đã được rà soát, phân tích hình thức và xác minh mã nguồn, và không điều nào trong đó là bảo đảm. Những khiếm khuyết chưa biết có thể tồn tại trong bất kỳ phần mềm nào giữ giá trị.',
+                'Hạn chế của độ ngẫu nhiên. Các lượt chọn Tinh tuyển dùng entropy suy từ khối (Mục 11.3). Về nguyên tắc, sequencer có thể ảnh hưởng đến nó; thiết kế giới hạn hậu quả nhưng không thể loại bỏ chúng.',
+                `Trách nhiệm về thời gian. Cửa sổ hoàn tất ${protocolFacts.finalGestureExclusivityHours} giờ và thời hạn ký quỹ ${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần là những thời hạn có thật. Phân bổ chưa được nhận về sau các thời hạn đó trở thành khả dụng cho người khác, theo thiết kế.`,
+                'Thay đổi tham số. Đến khi bước phi tập trung hoàn tất, tham số có thể thay đổi giữa các chu kỳ như mô tả ở Mục 13. Mọi thay đổi đều công khai trước khi chu kỳ tiếp theo bắt đầu.',
+                'Biến động tài sản. Giá trị của ETH, CST và NFT dao động. Tham gia tốn tiền thật; hãy coi nét bút là khoản chi cho sự tham gia và nghệ thuật, không phải con đường đến lợi ích tài chính.',
+                'Bất định về quy định. Cách xử lý pháp lý đối với tài sản số khác nhau theo khu vực pháp lý và tiếp tục thay đổi.',
               ],
             },
           ],
@@ -731,155 +742,152 @@ export const whitePaperTextVi = {
       },
     },
     conclusion: {
-      heading: 'Conclusion',
+      heading: 'Kết luận',
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Cosmic Signature is an attempt to build a generative art protocol that needs no one\u2019s permission and, eventually, no one\u2019s stewardship. The mechanics are small enough to specify completely: descending-cost windows, a countdown that gestures extend, fixed allocation percentages, a compounding reserve, and art that is a pure function of physics and a seed. The upgrades that remain are few and public. When they are done, the owner role goes away, and what is left is what this paper describes: a clock, a reserve, a token, a council, and an unbroken series of Signatures, each one the record of the hands that shaped it.',
+          text: 'Cosmic Signature là một nỗ lực xây dựng một giao thức nghệ thuật tạo sinh không cần sự cho phép của ai và, cuối cùng, không cần ai chăm sóc. Cơ chế đủ nhỏ để đặc tả trọn vẹn: những cửa sổ chi phí giảm dần, một đếm ngược mà nét bút kéo dài, các tỷ lệ phân bổ cố định, một dự trữ tích lũy, và nghệ thuật là hàm thuần của vật lý và một seed. Những nâng cấp còn lại là ít và công khai. Khi chúng hoàn thành, vai trò chủ sở hữu biến mất, và những gì còn lại là điều bài viết này mô tả: một đồng hồ, một dự trữ, một token, một hội đồng, và một chuỗi Signature không đứt đoạn, mỗi Signature là bản ghi của những bàn tay đã định hình nó.',
         },
       ],
     },
     'appendix-a': {
-      heading: 'Appendix A: Verified Contract Addresses',
+      heading: 'Phụ lục A: Địa chỉ hợp đồng đã xác minh',
       blocks: [
         {
           kind: 'table',
           table: {
-            columns: ['Contract', 'Address (Arbitrum One)'],
+            columns: ['Hợp đồng', 'Địa chỉ (Arbitrum One)'],
             rows: [
-              ['Protocol contract (proxy)', protocolFacts.contractAddresses.proxy],
-              ['Protocol implementation (V2)', protocolFacts.contractAddresses.implementation],
-              ['CST token', protocolFacts.contractAddresses.cstToken],
+              ['Hợp đồng giao thức (proxy)', protocolFacts.contractAddresses.proxy],
+              ['Bản triển khai giao thức (V2)', protocolFacts.contractAddresses.implementation],
+              ['Token CST', protocolFacts.contractAddresses.cstToken],
               ['Cosmic Signature NFT', protocolFacts.contractAddresses.cosmicSignatureNft],
               ['Random Walk NFT', protocolFacts.contractAddresses.randomWalkNft],
-              ['Cosmic Council', protocolFacts.contractAddresses.cosmicCouncil],
-              ['Public Goods Vault', protocolFacts.contractAddresses.publicGoodsVault],
-              ['Outreach Reserve', protocolFacts.contractAddresses.outreachReserve],
-              ['Allocations Wallet', protocolFacts.contractAddresses.allocationsWallet],
+              ['Hội đồng Vũ trụ', protocolFacts.contractAddresses.cosmicCouncil],
+              ['Kho Hàng hóa công', protocolFacts.contractAddresses.publicGoodsVault],
+              ['Dự trữ truyền thông', protocolFacts.contractAddresses.outreachReserve],
+              ['Ví phân bổ', protocolFacts.contractAddresses.allocationsWallet],
               [
-                'Anchoring Wallet, Cosmic Signature NFTs',
+                'Ví neo giữ, Cosmic Signature NFT',
                 protocolFacts.contractAddresses.cosmicSignatureNftAnchoringWallet,
               ],
-              [
-                'Anchoring Wallet, Random Walk NFTs',
-                protocolFacts.contractAddresses.rwlkAnchoringWallet,
-              ],
+              ['Ví neo giữ, Random Walk NFT', protocolFacts.contractAddresses.rwlkAnchoringWallet],
             ],
             footnote:
-              'All contracts are exact-match verified on Sourcify for chain 42161. The proxy address is the protocol\u2019s permanent address; implementations change only through the public upgrade process described in Sections 12 and 13.',
+              'Mọi hợp đồng đều được xác minh khớp chính xác trên Sourcify cho chuỗi 42161. Địa chỉ proxy là địa chỉ vĩnh viễn của giao thức; các bản triển khai chỉ thay đổi qua quy trình nâng cấp công khai mô tả ở các Mục 12 và 13.',
           },
         },
       ],
     },
     'appendix-b': {
-      heading: 'Appendix B: Parameters at a Glance',
+      heading: 'Phụ lục B: Các tham số trong nháy mắt',
       blocks: [
         {
           kind: 'table',
           table: {
-            columns: ['Parameter', 'Value'],
+            columns: ['Tham số', 'Giá trị'],
             rows: [
-              ['Opening cost, first cycle', `${protocolFacts.initialGestureCostEth} ETH (fixed)`],
               [
-                'ETH Calibration Window ceiling',
-                `${protocolFacts.ethCalibrationCeilingMultiplier}x the previous cycle\u2019s opening cost paid`,
+                'Chi phí mở đầu, chu kỳ đầu tiên',
+                `${viDecimal(protocolFacts.initialGestureCostEth)} ETH (cố định)`,
               ],
               [
-                'ETH Calibration Window floor',
-                `ceiling / ${protocolFacts.ethCalibrationFloorDivisor}, plus one wei`,
+                'Trần cửa sổ hiệu chỉnh ETH',
+                `${protocolFacts.ethCalibrationCeilingMultiplier} lần chi phí mở đầu đã trả của chu kỳ trước`,
               ],
               [
-                'ETH Gesture Cost step-up',
-                `${protocolFacts.ethGestureCostStepUpPercent}% per ETH gesture, plus one wei`,
+                'Sàn cửa sổ hiệu chỉnh ETH',
+                `trần / ${protocolFacts.ethCalibrationFloorDivisor}, cộng một wei`,
               ],
               [
-                'Random Walk NFT reduction',
-                `${protocolFacts.randomWalkDiscountPercentage}%, once ever per NFT`,
+                'Bước tăng chi phí nét bút ETH',
+                `${protocolFacts.ethGestureCostStepUpPercent}% mỗi nét bút ETH, cộng một wei`,
               ],
               [
-                'CST Calibration Window ceiling',
-                `max(${protocolFacts.cstCalibrationCeilingMultiplier}x last CST cost paid, ${protocolFacts.cstCalibrationCeilingMinCst} CST)`,
-              ],
-              ['CST Calibration Window floor', `${protocolFacts.cstCalibrationFloorCst} CST`],
-              [
-                'CST Calibration Window duration',
-                `${protocolFacts.initialCstCalibrationWindowHours}-hour initial reference; about \u2212${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% per ETH gesture, +${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% per CST gesture`,
+                'Mức giảm với Random Walk NFT',
+                `${protocolFacts.randomWalkDiscountPercentage}%, một lần duy nhất cho mỗi NFT`,
               ],
               [
-                'Initial countdown after opening gesture',
-                `about ${protocolFacts.initialCycleFinalizationHoursAtLaunch} hours at launch`,
+                'Trần cửa sổ hiệu chỉnh CST',
+                `max(${protocolFacts.cstCalibrationCeilingMultiplier} lần chi phí CST trả gần nhất, ${protocolFacts.cstCalibrationCeilingMinCst} CST)`,
+              ],
+              ['Sàn cửa sổ hiệu chỉnh CST', `${protocolFacts.cstCalibrationFloorCst} CST`],
+              [
+                'Thời lượng cửa sổ hiệu chỉnh CST',
+                `mốc tham chiếu ban đầu ${protocolFacts.initialCstCalibrationWindowHours} giờ; khoảng \u2212${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}% mỗi nét bút ETH, +${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}% mỗi nét bút CST`,
               ],
               [
-                'Time increment per gesture',
-                `${protocolFacts.initialCycleTimeIncrementHours} hour at launch, growing ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per cycle`,
+                'Đếm ngược ban đầu sau nét bút mở',
+                `khoảng ${protocolFacts.initialCycleFinalizationHoursAtLaunch} giờ lúc ra mắt`,
               ],
               [
-                'Finalization exclusivity window',
-                `${protocolFacts.finalGestureExclusivityHours} hours`,
+                'Mức tăng thời gian mỗi nét bút',
+                `${protocolFacts.initialCycleTimeIncrementHours} giờ lúc ra mắt, lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% mỗi chu kỳ`,
+              ],
+              ['Cửa sổ hoàn tất độc quyền', `${protocolFacts.finalGestureExclusivityHours} giờ`],
+              [
+                'Thời hạn nhận về ký quỹ',
+                `${protocolFacts.secondaryRetrievalTimeoutWeeks} tuần, sau đó nhận về mở`,
+              ],
+              ['Giới hạn lời nhắn nét bút', `${protocolFacts.gestureMessageMaxLength} byte`],
+              [
+                'Các luồng phân bổ ETH',
+                `${protocolFacts.mainEthPercentage}% Signature, ${protocolFacts.chronoWarriorEthPercentage}% Chiến binh Thời gian, ${protocolFacts.publicGoodsPercentage}% Hàng hóa công, ${protocolFacts.anchorDistributionPercentage}% phân phối neo giữ, ${protocolFacts.stellarSelectionEthPercentage}% ETH Tinh tuyển`,
               ],
               [
-                'Escrow retrieval timeout',
-                `${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks, then open retrieval`,
-              ],
-              ['Gesture message limit', `${protocolFacts.gestureMessageMaxLength} bytes`],
-              [
-                'ETH allocation tracks',
-                `${protocolFacts.mainEthPercentage}% Signature, ${protocolFacts.chronoWarriorEthPercentage}% Chrono-Warrior, ${protocolFacts.publicGoodsPercentage}% Public Goods, ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution, ${protocolFacts.stellarSelectionEthPercentage}% ETH Stellar Selection`,
+                'Dự trữ tích lũy',
+                `khoảng ${protocolFacts.compoundingReservePercentage}% chuyển tiếp`,
               ],
               [
-                'Compounding Cycle Reserve',
-                `about ${protocolFacts.compoundingReservePercentage}% rolls forward`,
-              ],
-              [
-                'Recognition CST per NFT distribution',
+                'CST ghi nhận mỗi lần phân phối NFT',
                 `${cst(protocolFacts.specialAllocationCst)} CST`,
               ],
-              ['Outreach Reserve per cycle', `${cst(protocolFacts.outreachReserveCst)} CST`],
+              ['Dự trữ truyền thông mỗi chu kỳ', `${cst(protocolFacts.outreachReserveCst)} CST`],
               [
-                'Typical imprints per cycle',
-                `${protocolFacts.typicalNftsPerCycle} NFTs, ${cst(protocolFacts.typicalCstImprintsPerCycle)} fixed CST`,
+                'Lần khắc điển hình mỗi chu kỳ',
+                `${protocolFacts.typicalNftsPerCycle} NFT, ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST cố định`,
               ],
               [
-                'Council parameters',
-                `${protocolFacts.councilProposalThresholdCst} CST proposal threshold, ${protocolFacts.councilVotingDelayDays}-day delay, ${protocolFacts.councilVotingPeriodWeeks}-week period, ${protocolFacts.councilQuorumPercent}% quorum`,
+                'Tham số Hội đồng',
+                `ngưỡng đề xuất ${protocolFacts.councilProposalThresholdCst} CST, độ trễ ${protocolFacts.councilVotingDelayDays} ngày, giai đoạn ${protocolFacts.councilVotingPeriodWeeks} tuần, túc số ${protocolFacts.councilQuorumPercent}%`,
               ],
               [
-                'Delay before next cycle',
-                `${protocolFacts.defaultNextCycleDelayMinutes} minutes by default, owner-adjustable`,
+                'Độ trễ trước chu kỳ tiếp theo',
+                `mặc định ${protocolFacts.defaultNextCycleDelayMinutes} phút, chủ sở hữu có thể điều chỉnh`,
               ],
             ],
             footnote:
-              'Launch values are shown where a parameter evolves or is adjustable; the contracts report live values.',
+              'Giá trị lúc ra mắt được hiển thị khi một tham số biến đổi hoặc có thể điều chỉnh; các hợp đồng báo cáo giá trị trực tiếp.',
           },
         },
       ],
     },
   },
   references: {
-    heading: 'References',
+    heading: 'Tham chiếu',
     items: [
       {
-        label: 'Cosmic Signature contracts repository (source, tests, verification tooling)',
+        label: 'Kho mã hợp đồng Cosmic Signature (mã nguồn, kiểm thử, công cụ xác minh)',
         href: 'https://github.com/PredictionExplorer/Cosmic-Signature',
       },
       {
-        label: 'Cosmic Signature app',
+        label: 'Ứng dụng Cosmic Signature',
         href: 'https://app.cosmicsignature.com',
       },
       {
-        label: 'Cosmic Signature protocol site',
+        label: 'Trang giao thức Cosmic Signature',
         href: 'https://cosmicsignature.com',
       },
       {
-        label: 'Hacken security review of the Cosmic Signature contracts, January 2026',
+        label: 'Rà soát bảo mật của Hacken đối với các hợp đồng Cosmic Signature, tháng 1 năm 2026',
         href: 'https://hacken.io/audits/cosmic-signature/sca-cosmic-signature-cosmicsignature-contracts-oct2025/',
       },
       {
-        label: 'Protocol Guild documentation',
+        label: 'Tài liệu Protocol Guild',
         href: 'https://protocol-guild.readthedocs.io',
       },
       {
-        label: 'OpenZeppelin Governor documentation',
+        label: 'Tài liệu OpenZeppelin Governor',
         href: 'https://docs.openzeppelin.com/contracts/5.x/governance',
       },
       {
@@ -889,5 +897,5 @@ export const whitePaperTextVi = {
     ],
   },
   licenseNote:
-    'This paper, like all project-owned Cosmic Signature materials, is dedicated to the public domain under CC0 1.0.',
+    'Bài viết này, như mọi tài liệu thuộc dự án Cosmic Signature, được đưa vào phạm vi công cộng theo CC0 1.0.',
 } satisfies WhitePaperText;

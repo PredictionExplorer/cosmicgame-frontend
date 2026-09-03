@@ -2,224 +2,226 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { HowItWorksText } from './structure';
 
-/** English how-it-works copy, keyed by the skeleton in structure.ts. */
+const cstAmount = protocolFacts.specialAllocationCst.toLocaleString('vi-VN');
+const cstWindowDecrease =
+  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture.toLocaleString('vi-VN');
+const cstWindowIncrease =
+  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture.toLocaleString('vi-VN');
+
+/** Vietnamese how-it-works copy, keyed by the skeleton in structure.ts. */
 export const howItWorksTextVi = {
   metadata: {
-    title: 'How Cosmic Signature Works | Performance Cycles, Gestures, and NFTs',
+    title: 'Cosmic Signature hoạt động như thế nào | Chu kỳ trình diễn, nét bút và NFT',
     description:
-      'Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution.',
+      'Tìm hiểu một chu kỳ trình diễn Cosmic Signature diễn ra thế nào — từ cửa sổ hiệu chỉnh, qua các nét bút, đến phân phối phân bổ cuối cùng.',
   },
   jsonLd: {
-    name: 'How Cosmic Signature Works',
+    name: 'Cosmic Signature hoạt động như thế nào',
     description:
-      'Learn how a Cosmic Signature Performance Cycle unfolds — from the Calibration Window through Gestures to final allocation distribution.',
+      'Tìm hiểu một chu kỳ trình diễn Cosmic Signature diễn ra thế nào — từ cửa sổ hiệu chỉnh, qua các nét bút, đến phân phối phân bổ cuối cùng.',
   },
   breadcrumbs: {
-    homeLabel: 'Home',
-    pageLabel: 'How It Works',
+    homeLabel: 'Trang chủ',
+    pageLabel: 'Cách hoạt động',
   },
   hero: {
-    badge: 'Procedural On-Chain Art Protocol',
-    headingLead: 'How Cosmic Signature',
-    headingAccent: 'Works',
+    badge: 'Giao thức nghệ thuật tạo sinh trên chuỗi',
+    headingLead: 'Cosmic Signature',
+    headingAccent: 'hoạt động như thế nào',
     paragraph:
-      'Gesture. Endure. Shape the Signature. Participants make gestures during a Performance Cycle. When the Cycle Finalization Time expires, the cycle can be finalized and allocations distribute across more than ten tracks — including the Signature Allocation, Anchor Distributions, and Protocol Guild.',
-    primaryCtaLabel: 'Open the Protocol',
-    secondaryCtaLabel: 'Learn More',
+      'Đặt nét bút. Bền bỉ. Định hình Signature. Người tham gia đặt nét bút trong một chu kỳ trình diễn. Khi thời điểm hoàn tất chu kỳ hết hạn, chu kỳ có thể được hoàn tất và các phân bổ được phân phối qua hơn mười luồng — bao gồm phân bổ Signature, phân phối neo giữ và Protocol Guild.',
+    primaryCtaLabel: 'Mở giao thức',
+    secondaryCtaLabel: 'Tìm hiểu thêm',
   },
   overview: {
-    heading: 'How It Works',
-    subhead: 'Three steps to participate and shape the Cycle Reserve',
+    heading: 'Cách hoạt động',
+    subhead: 'Ba bước để tham gia và định hình Dự trữ chu kỳ',
     cards: [
       {
-        title: 'Gesture',
+        title: 'Đặt nét bút',
         description:
-          'Make a gesture with ETH or CST (ERC-20). Each gesture extends the Cycle Finalization Time, records a Stellar Selection entry, and shapes the evolving Signature.',
-        tooltip: `Gestures can be made with ETH or CST tokens (ERC-20). Attaching a Random Walk NFT to an ETH gesture grants a one-time ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction.`,
+          'Đặt nét bút bằng ETH hoặc CST (ERC-20). Mỗi nét bút kéo dài thời điểm hoàn tất chu kỳ, ghi nhận một lượt Tinh tuyển và định hình Signature đang biến chuyển.',
+        tooltip: `Nét bút có thể đặt bằng ETH hoặc token CST (ERC-20). Đính kèm một Random Walk NFT vào nét bút ETH mang lại mức giảm ${protocolFacts.randomWalkDiscountPercentage}% chi phí nét bút ETH một lần.`,
       },
       {
-        title: 'Endure',
+        title: 'Bền bỉ',
         description:
-          'The cycle runs until the Cycle Finalization Time expires. Each new gesture adds the current time increment to the stored finalization time.',
+          'Chu kỳ chạy đến khi thời điểm hoàn tất chu kỳ hết hạn. Mỗi nét bút mới cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất đã lưu.',
         tooltip:
-          'The time increment starts around one hour and grows gradually across cycles. CST Gesture Cost uses a dynamic Calibration Window that ETH and CST gestures move in opposite directions.',
+          'Mức tăng thời gian khởi đầu khoảng một giờ và lớn dần qua các chu kỳ. Chi phí nét bút CST dùng một cửa sổ hiệu chỉnh động mà nét bút ETH và CST đẩy theo hai hướng ngược nhau.',
       },
       {
-        title: 'Receive',
+        title: 'Nhận',
         description:
-          'Participate in allocations when the cycle finalizes — Signature Allocation, Stellar Selections, Anchor Distributions, and more.',
-        tooltip: `The participant who made the Final Gesture receives ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT. Stellar Selection recipients, anchor-holders, and other participants also receive allocations.`,
+          'Tham gia vào các phân bổ khi chu kỳ hoàn tất — phân bổ Signature, Tinh tuyển, phân phối neo giữ và nhiều hơn nữa.',
+        tooltip: `Người tham gia đặt nét bút cuối cùng nhận ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, ${cstAmount} CST và một Cosmic Signature NFT. Người nhận Tinh tuyển, người neo giữ và những người tham gia khác cũng nhận phân bổ.`,
       },
     ],
   },
   rewardBreakdown: {
-    heading: 'What Every Gesture Imprints',
-    subhead: 'Participation imprints multiple allocation tracks per cycle.',
+    heading: 'Mỗi nét bút khắc những gì',
+    subhead: 'Việc tham gia khắc vào nhiều luồng phân bổ mỗi chu kỳ.',
     items: [
       {
-        title: 'Dynamic Participation CST',
-        description:
-          'Each gesture may imprint CST based on how long it has been since the previous gesture.',
-        tooltip: `Participation CST uses a square-root formula: ${protocolFacts.dynamicCstRewardFormula}. Rapid gestures can receive 0 CST; longer quiet periods create larger imprints.`,
+        title: 'CST tham gia động',
+        description: 'Mỗi nét bút có thể khắc CST dựa trên khoảng thời gian kể từ nét bút trước.',
+        tooltip: `CST tham gia dùng công thức căn bậc hai: ${protocolFacts.dynamicCstRewardFormula}. Nét bút dồn dập có thể nhận 0 CST; khoảng lặng dài hơn tạo ra lần khắc lớn hơn.`,
       },
       {
-        title: 'Stellar Selection Entry',
-        description:
-          'Each gesture records an entry in Stellar Selection for end-of-cycle allocations.',
-        tooltip: `When the cycle finalizes, entries are randomly selected: three participants share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH.`,
+        title: 'Lượt Tinh tuyển',
+        description: 'Mỗi nét bút ghi nhận một lượt Tinh tuyển cho các phân bổ cuối chu kỳ.',
+        tooltip: `Khi chu kỳ hoàn tất, các lượt được chọn ngẫu nhiên: ba người tham gia chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ bằng ETH.`,
       },
       {
-        title: 'Cosmic Signature NFT Selection',
-        description: `Ten participants receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a unique Cosmic Signature NFT via Stellar Selection each cycle.`,
-        tooltip: `Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT each cycle.`,
+        title: 'Tinh tuyển Cosmic Signature NFT',
+        description: `Mười người tham gia nhận ${cstAmount} CST và một Cosmic Signature NFT độc nhất qua Tinh tuyển mỗi chu kỳ.`,
+        tooltip: `Mười người nhận Tinh tuyển cộng mười người neo giữ Random Walk NFT, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT mỗi chu kỳ.`,
       },
       {
-        title: 'Signature Allocation',
-        description: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
+        title: 'Phân bổ Signature',
+        description: `Người tham gia đặt nét bút cuối cùng có thể nhận về ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ bằng ETH, ${cstAmount} CST và một Cosmic Signature NFT.`,
         tooltip:
-          'The Cycle Reserve grows from all gestures. The participant who made the Final Gesture retrieves the Signature Allocation via the protocol contract.',
+          'Dự trữ chu kỳ lớn dần từ mọi nét bút. Người tham gia đặt nét bút cuối cùng nhận về phân bổ Signature qua hợp đồng giao thức.',
       },
     ],
   },
   gameCycle: {
-    heading: 'Lifecycle of a Performance Cycle',
-    subhead: 'Every cycle follows this sequence from open to finalization.',
+    heading: 'Vòng đời của một chu kỳ trình diễn',
+    subhead: 'Mỗi chu kỳ đi theo trình tự này từ lúc mở đến khi hoàn tất.',
     phases: [
       {
-        label: 'Cycle Opens',
-        description: `A new Performance Cycle begins. The first ETH Calibration Window opens, and the CST Calibration Window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference that then changes with participation.`,
+        label: 'Chu kỳ mở',
+        description: `Một chu kỳ trình diễn mới bắt đầu. Cửa sổ hiệu chỉnh ETH đầu tiên mở ra, và cửa sổ hiệu chỉnh CST khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ, rồi thay đổi theo mức tham gia.`,
         tooltip:
-          'Calibration Windows let participants gesture at falling cost. The Cycle Reserve starts at zero plus the Compounding Reserve from the previous cycle.',
+          'Cửa sổ hiệu chỉnh cho phép người tham gia đặt nét bút với chi phí giảm dần. Dự trữ chu kỳ bắt đầu từ không cộng với Dự trữ tích lũy từ chu kỳ trước.',
       },
       {
-        label: 'Participants Gesture',
-        description: `Each gesture adds the current time increment to Cycle Finalization Time. Participation CST is dynamic, and ETH/CST gestures move the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% down or ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% up.`,
+        label: 'Người tham gia đặt nét bút',
+        description: `Mỗi nét bút cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất chu kỳ. CST tham gia là động, và nét bút ETH/CST đẩy cửa sổ hiệu chỉnh CST xuống khoảng ${cstWindowDecrease}% hoặc lên khoảng ${cstWindowIncrease}%.`,
         tooltip:
-          'Participation CST follows a square-root formula based on elapsed time since the previous gesture. The current app preview is the source of truth for the exact CST amount.',
+          'CST tham gia đi theo công thức căn bậc hai dựa trên thời gian đã trôi qua kể từ nét bút trước. Bản xem trước hiện tại trong ứng dụng là nguồn chính xác cho lượng CST.',
       },
       {
-        label: 'Cycle Finalization Time Expires',
+        label: 'Thời điểm hoàn tất chu kỳ hết hạn',
         description:
-          'When the countdown reaches zero, the participant who made the Final Gesture becomes eligible to finalize the cycle.',
-        tooltip: `Gestures remain possible until finalization actually executes — a late gesture extends the stored time and takes over the Final Gesture position. The Final Gesture participant has a ${protocolFacts.finalGestureExclusivityHours}-hour exclusive finalization window; afterwards anyone may finalize and receives the Signature Allocation.`,
+          'Khi đếm ngược về không, người tham gia đặt nét bút cuối cùng đủ điều kiện hoàn tất chu kỳ.',
+        tooltip: `Vẫn có thể đặt nét bút cho đến khi việc hoàn tất thực sự được thực thi — một nét bút muộn kéo dài thời gian đã lưu và giành lấy vị trí nét bút cuối cùng. Người đặt nét bút cuối cùng có cửa sổ hoàn tất ưu tiên ${protocolFacts.finalGestureExclusivityHours} giờ; sau đó bất kỳ ai cũng có thể hoàn tất và nhận phân bổ Signature.`,
       },
       {
-        label: 'Cycle Finalizes',
-        description: `The participant who made the Final Gesture retrieves the Signature Allocation: ${protocolFacts.mainEthPercentage}% of the Cycle Reserve, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
+        label: 'Chu kỳ hoàn tất',
+        description: `Người tham gia đặt nét bút cuối cùng nhận về phân bổ Signature: ${protocolFacts.mainEthPercentage}% Dự trữ chu kỳ, ${cstAmount} CST và một Cosmic Signature NFT.`,
         tooltip:
-          'The Signature Allocation retrieval happens via the protocol contract. The CST and Cosmic Signature NFT are imprinted automatically.',
+          'Việc nhận về phân bổ Signature diễn ra qua hợp đồng giao thức. CST và Cosmic Signature NFT được khắc tự động.',
       },
       {
-        label: 'Stellar Selections',
-        description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
+        label: 'Tinh tuyển',
+        description: `Ba người nhận ETH Tinh tuyển chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ. Mười người nhận NFT Tinh tuyển cộng mười người nhận Tinh tuyển NFT neo giữ, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT.`,
         tooltip:
-          'Entries are recorded per gesture. More gestures means higher Selection frequency. Random Walk NFT anchor-holders have a separate Stellar Selection.',
+          'Lượt được ghi nhận theo từng nét bút. Càng nhiều nét bút, tần suất được chọn càng cao. Người neo giữ Random Walk NFT có một Tinh tuyển riêng.',
       },
       {
-        label: 'Next Cycle',
+        label: 'Chu kỳ tiếp theo',
         description:
-          'About half of the Cycle Reserve rolls forward as the Compounding Reserve, and the next cycle begins with fresh Calibration Windows.',
+          'Khoảng một nửa Dự trữ chu kỳ chuyển tiếp làm Dự trữ tích lũy, và chu kỳ tiếp theo bắt đầu với những cửa sổ hiệu chỉnh mới.',
         tooltip:
-          'The Compounding Cycle Reserve means the protocol accumulates value rather than extracts it. The live contracts report the current window durations and costs.',
+          'Dự trữ tích lũy nghĩa là giao thức tích lũy giá trị thay vì rút ra. Các hợp đồng trực tiếp báo cáo thời lượng cửa sổ và chi phí hiện tại.',
       },
     ],
   },
   stepByStep: {
-    heading: 'Getting Started',
-    subhead: 'From wallet connection to your first gesture in three steps.',
-    stepLabel: 'STEP',
+    heading: 'Bắt đầu',
+    subhead: 'Từ kết nối ví đến nét bút đầu tiên trong ba bước.',
+    stepLabel: 'BƯỚC',
     steps: [
       {
-        title: 'Connect Your Wallet',
+        title: 'Kết nối ví',
         tooltip:
-          'Arbitrum is a Layer 2 blockchain on Ethereum with lower gas fees and faster transactions.',
+          'Arbitrum là một blockchain Layer 2 trên Ethereum với phí gas thấp hơn và giao dịch nhanh hơn.',
         highlights: [
-          'Click the "Connect Wallet" button at the top of the page.',
-          'Use a wallet that supports the Arbitrum blockchain, such as MetaMask.',
-          'Switch your network to Arbitrum when prompted, then approve permissions.',
-          'Your wallet address will appear in the header once connected.',
+          'Nhấn nút “Kết nối ví” ở đầu trang.',
+          'Dùng một ví hỗ trợ blockchain Arbitrum, chẳng hạn MetaMask.',
+          'Chuyển mạng sang Arbitrum khi được yêu cầu, rồi chấp thuận quyền truy cập.',
+          'Địa chỉ ví của bạn sẽ xuất hiện trên đầu trang sau khi kết nối.',
         ],
       },
       {
-        title: 'Check the Gesture Cost',
+        title: 'Kiểm tra chi phí nét bút',
         tooltip:
-          'Gas fees on Arbitrum are typically a few cents — much cheaper than Ethereum mainnet.',
+          'Phí gas trên Arbitrum thường chỉ vài xu — rẻ hơn nhiều so với mạng chính Ethereum.',
         highlights: [
-          'Review the Cycle Finalization Time — every gesture adds the current time increment to the stored finalization time.',
-          'Check the current Gesture Cost in ETH or CST before committing.',
-          'Review the live Participation CST preview; the amount changes with time since the previous gesture.',
-          'Note the Signature Allocation amount to see the potential ETH distribution.',
-          'Ensure your wallet holds the Gesture Cost plus a small amount for gas fees.',
+          'Xem thời điểm hoàn tất chu kỳ — mỗi nét bút cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất đã lưu.',
+          'Kiểm tra chi phí nét bút hiện tại bằng ETH hoặc CST trước khi quyết định.',
+          'Xem bản xem trước CST tham gia trực tiếp; lượng này thay đổi theo thời gian kể từ nét bút trước.',
+          'Lưu ý số tiền phân bổ Signature để thấy mức phân phối ETH tiềm năng.',
+          'Đảm bảo ví của bạn có đủ chi phí nét bút cộng một khoản nhỏ cho phí gas.',
         ],
       },
       {
-        title: 'Make Your Gesture',
-        tooltip: `Each Random Walk NFT can be used once for the ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction - choose your moment wisely.`,
+        title: 'Đặt nét bút',
+        tooltip: `Mỗi Random Walk NFT chỉ dùng được một lần cho mức giảm ${protocolFacts.randomWalkDiscountPercentage}% chi phí nét bút ETH - hãy chọn thời điểm khôn ngoan.`,
         highlights: [
-          `Choose ETH, optionally attach a Random Walk NFT for a ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction, or make a CST (ERC-20) gesture.`,
-          'Click "Gesture Now" and confirm the transaction in your wallet.',
-          'Your gesture extends the Cycle Finalization Time and updates the ETH/CST cost state.',
-          'Every gesture records a Stellar Selection entry and may imprint dynamic Participation CST automatically.',
+          `Chọn ETH, tùy chọn đính kèm một Random Walk NFT để giảm ${protocolFacts.randomWalkDiscountPercentage}% chi phí nét bút ETH, hoặc đặt nét bút bằng CST (ERC-20).`,
+          'Nhấn “Đặt nét bút ngay” và xác nhận giao dịch trong ví.',
+          'Nét bút của bạn kéo dài thời điểm hoàn tất chu kỳ và cập nhật trạng thái chi phí ETH/CST.',
+          'Mỗi nét bút ghi nhận một lượt Tinh tuyển và có thể tự động khắc CST tham gia động.',
         ],
       },
     ],
   },
   proTips: {
-    heading: 'Pro Tips & Strategy',
-    subhead: 'Practical guidance for maximizing participation across allocation tracks.',
+    heading: 'Mẹo và chiến thuật',
+    subhead: 'Hướng dẫn thực tế để tối đa hóa sự tham gia qua các luồng phân bổ.',
     tips: [
       {
-        title: 'Watch Both Calibration Windows',
+        title: 'Theo dõi cả hai cửa sổ hiệu chỉnh',
         description:
-          'ETH and CST Gesture Costs follow separate live windows, and each gesture changes the CST window.',
+          'Chi phí nét bút ETH và CST đi theo hai cửa sổ trực tiếp riêng, và mỗi nét bút làm thay đổi cửa sổ CST.',
         tooltip:
-          'ETH gestures slightly shorten the CST Calibration Window; CST gestures slightly lengthen it. The live app panels show the current cost path.',
+          'Nét bút ETH rút ngắn nhẹ cửa sổ hiệu chỉnh CST; nét bút CST kéo dài nhẹ nó. Các bảng trực tiếp trong ứng dụng hiển thị đường đi chi phí hiện tại.',
       },
       {
-        title: 'Attach a Random Walk NFT',
-        description: `Holding a Random Walk NFT grants a one-time ${protocolFacts.randomWalkDiscountPercentage}% ETH Gesture Cost reduction.`,
+        title: 'Đính kèm một Random Walk NFT',
+        description: `Nắm giữ một Random Walk NFT mang lại mức giảm ${protocolFacts.randomWalkDiscountPercentage}% chi phí nét bút ETH một lần.`,
         tooltip:
-          'Each Random Walk NFT can be used once for the cost reduction. Save it for a higher-cost gesture to maximize the effect.',
+          'Mỗi Random Walk NFT chỉ dùng được một lần cho mức giảm chi phí. Hãy để dành cho một nét bút có chi phí cao hơn để tối đa hóa hiệu quả.',
       },
       {
-        title: 'Stack Stellar Selection Entries',
+        title: 'Tích lũy lượt Tinh tuyển',
         description:
-          'Each gesture records one Stellar Selection entry. More gestures means higher Selection frequency.',
-        tooltip: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
+          'Mỗi nét bút ghi nhận một lượt Tinh tuyển. Càng nhiều nét bút, tần suất được chọn càng cao.',
+        tooltip: `Ba người nhận ETH Tinh tuyển chia ${protocolFacts.stellarSelectionEthPercentage}% Dự trữ chu kỳ. Mười người tham gia nhận NFT và mười người neo giữ Random Walk NFT, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT.`,
       },
       {
-        title: 'Use a Burner Wallet',
+        title: 'Dùng một ví phụ',
         description:
-          'The smart contracts are publicly source-verified on-chain, but using a dedicated wallet for participation adds an extra layer of safety.',
+          'Các hợp đồng thông minh đã được xác minh mã nguồn công khai trên chuỗi, nhưng dùng một ví riêng để tham gia thêm một lớp an toàn.',
         tooltip:
-          'A burner wallet isolates your protocol activity from your main holdings for additional security. Audit and verification status is published on the Audits page.',
+          'Ví phụ tách hoạt động trên giao thức khỏi tài sản chính của bạn để tăng bảo mật. Tình trạng kiểm toán và xác minh được công bố trên trang Kiểm toán.',
       },
       {
-        title: 'Watch the Finalization Time',
+        title: 'Theo dõi thời điểm hoàn tất',
         description:
-          'Each gesture adds the current time increment to the stored Cycle Finalization Time.',
+          'Mỗi nét bút cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất chu kỳ đã lưu.',
         tooltip:
-          'Gesturing near the deadline positions you closest to the Final Gesture, but another participant can still gesture after you until the cycle is finalized.',
+          'Đặt nét bút gần thời hạn đưa bạn đến gần vị trí nét bút cuối cùng nhất, nhưng người tham gia khác vẫn có thể đặt nét bút sau bạn cho đến khi chu kỳ được hoàn tất.',
       },
       {
-        title: 'Gesture with CST',
+        title: 'Đặt nét bút bằng CST',
         description:
-          'Use CST as an alternative gesture currency through the CST Calibration Window.',
-        tooltip: `A CST gesture records a Stellar Selection entry, extends the timer, may imprint dynamic Participation CST, and lengthens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
+          'Dùng CST làm phương thức thanh toán thay thế cho nét bút thông qua cửa sổ hiệu chỉnh CST.',
+        tooltip: `Một nét bút CST ghi nhận một lượt Tinh tuyển, kéo dài bộ đếm, có thể khắc CST tham gia động, và kéo dài cửa sổ hiệu chỉnh CST khoảng ${cstWindowIncrease}%.`,
       },
     ],
   },
   faqCallout: {
-    heading: 'Have Questions?',
-    body: 'Read the FAQ for detailed answers on cycle mechanics, allocation tracks, tokens, and everything else about Cosmic Signature.',
-    ctaLabel: 'Browse FAQ',
+    heading: 'Còn câu hỏi?',
+    body: 'Đọc câu hỏi thường gặp để có câu trả lời chi tiết về cơ chế chu kỳ, các luồng phân bổ, token và mọi điều khác về Cosmic Signature.',
+    ctaLabel: 'Xem câu hỏi thường gặp',
   },
   callToAction: {
-    heading: 'Ready to Make Your First Gesture?',
-    // The JSX original rendered a literal "\u2019" because unicode escapes are
-    // not processed inside JSX text; this is the intentional fix to a real ’.
-    body: 'Join the active Performance Cycle. Connect your wallet and make your first gesture to start imprinting CST and shaping the cycle’s Signature.',
-    primaryCtaLabel: 'Open the Protocol',
+    heading: 'Sẵn sàng đặt nét bút đầu tiên?',
+    body: 'Tham gia chu kỳ trình diễn đang diễn ra. Kết nối ví và đặt nét bút đầu tiên để bắt đầu khắc CST và định hình Signature của chu kỳ.',
+    primaryCtaLabel: 'Mở giao thức',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',
   },

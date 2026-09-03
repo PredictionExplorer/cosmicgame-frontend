@@ -1,44 +1,44 @@
 import type { TrustPageCopy } from './TrustPageContent';
 
-/** English copy for /risk-disclosures, rendered by TrustPageContent. */
+/** Vietnamese copy for /risk-disclosures, rendered by TrustPageContent. */
 export const riskCopyVi: TrustPageCopy = {
-  eyebrow: 'Risk and participant clarity',
-  title: 'Cosmic Signature Risk Disclosures',
+  eyebrow: 'Rủi ro và sự minh bạch với người tham gia',
+  title: 'Công bố rủi ro Cosmic Signature',
   // lexicon-allow-start: explicit legal denial copy must name the denied categories.
   intro:
-    'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. It is not a lottery, casino, gambling product, investment product, or promise of financial results.',
+    'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Đây không phải xổ số, sòng bạc, sản phẩm cờ bạc, sản phẩm đầu tư hay lời hứa về kết quả tài chính.',
   // lexicon-allow-end
   sections: [
     {
-      heading: 'Key Risks',
+      heading: 'Các rủi ro chính',
       bullets: [
-        'Blockchain transactions are public and generally irreversible.',
-        'Wallet security, private keys, and transaction approvals are user responsibilities.',
-        'Network congestion, RPC outages, indexer delays, or app issues can affect UX.',
-        'Protocol parameters, allocations, and timing should be reviewed before participating.',
+        'Giao dịch blockchain là công khai và thường không thể đảo ngược.',
+        'Bảo mật ví, khóa riêng và việc chấp thuận giao dịch là trách nhiệm của người dùng.',
+        'Tắc nghẽn mạng, gián đoạn RPC, độ trễ của bộ lập chỉ mục hoặc sự cố ứng dụng có thể ảnh hưởng đến trải nghiệm.',
+        'Nên xem kỹ tham số giao thức, phân bổ và thời điểm trước khi tham gia.',
         // lexicon-allow-start: denial copy states that no financial return is guaranteed.
-        'CST and NFTs should not be understood as guaranteed returns or financial products.',
+        'Không nên hiểu CST và NFT là lợi nhuận được bảo đảm hay sản phẩm tài chính.',
         // lexicon-allow-end
       ],
     },
     {
-      heading: 'What Participants Do',
+      heading: 'Người tham gia làm gì',
       paragraphs: [
-        'Participants make gestures during Performance Cycles. Gestures can influence the evolving protocol state, imprint Participation CST, and contribute to the context of deterministic Cosmic Signature NFT art. Outcomes are defined by public smart-contract mechanics, not by off-chain promises.',
+        'Người tham gia đặt nét bút trong các chu kỳ trình diễn. Nét bút có thể ảnh hưởng đến trạng thái đang biến chuyển của giao thức, khắc CST tham gia và góp vào bối cảnh của nghệ thuật Cosmic Signature NFT tất định. Kết quả được định nghĩa bởi cơ chế công khai của hợp đồng thông minh, không phải bởi những lời hứa ngoài chuỗi.',
       ],
     },
     {
-      heading: 'Related Pages',
+      heading: 'Trang liên quan',
       links: [
         // lexicon-allow-start: link label names the categories denied by the linked page.
         {
           kind: 'landing',
           href: '/learn/not-a-lottery-not-an-investment',
-          label: 'Is Cosmic Signature a lottery, casino, or investment?',
+          label: 'Cosmic Signature có phải là xổ số, sòng bạc hay đầu tư?',
         },
         // lexicon-allow-end
-        { kind: 'app', href: '/terms', label: 'Terms of Service' },
-        { kind: 'app', href: '/security', label: 'Security overview' },
+        { kind: 'app', href: '/terms', label: 'Điều khoản dịch vụ' },
+        { kind: 'app', href: '/security', label: 'Tổng quan bảo mật' },
       ],
     },
   ],

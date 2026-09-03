@@ -133,7 +133,7 @@ export const VI_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
   {
     concept: 'Public Goods',
     canonical: 'Hàng hóa công',
-    variants: ['hàng hóa công cộng', 'lợi ích công', 'công ích', 'của công', 'tài sản công'],
+    variants: ['hàng hóa công cộng', 'lợi ích công', 'công ích', 'tài sản công'],
   },
   {
     concept: 'Outreach Reserve',

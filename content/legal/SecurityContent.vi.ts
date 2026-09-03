@@ -1,45 +1,45 @@
 import type { TrustPageCopy } from './TrustPageContent';
 
-/** English copy for /security, rendered by TrustPageContent. */
+/** Vietnamese copy for /security, rendered by TrustPageContent. */
 export const securityCopyVi: TrustPageCopy = {
-  eyebrow: 'Trust and security',
-  title: 'Cosmic Signature Security',
+  eyebrow: 'Tin cậy và bảo mật',
+  title: 'Bảo mật Cosmic Signature',
   intro:
-    'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Its security posture depends on public smart contracts, transparent protocol data, careful wallet interactions, and clear participant education.',
+    'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Thế trận bảo mật của nó dựa trên các hợp đồng thông minh công khai, dữ liệu giao thức minh bạch, tương tác ví cẩn trọng và việc hướng dẫn rõ ràng cho người tham gia.',
   sections: [
     {
-      heading: 'Security Model',
+      heading: 'Mô hình bảo mật',
       paragraphs: [
-        'Protocol actions are recorded by Arbitrum smart contracts. Public pages should let users and crawlers inspect the contract addresses, source-code resources, verification context, and operational assumptions before connecting a wallet or making a gesture.',
+        'Các hành động của giao thức được các hợp đồng thông minh trên Arbitrum ghi lại. Các trang công khai nên cho người dùng và trình thu thập dữ liệu kiểm tra địa chỉ hợp đồng, tài nguyên mã nguồn, bối cảnh xác minh và các giả định vận hành trước khi kết nối ví hoặc đặt nét bút.',
       ],
       bullets: [
-        'Use the official app at `https://app.cosmicsignature.com/`.',
-        'Verify contract addresses from the contracts page before interacting on-chain.',
-        'Review wallet prompts carefully; blockchain transactions cannot be reversed.',
-        'Do not treat CST, NFTs, gestures, or allocations as guaranteed financial outcomes.',
+        'Dùng ứng dụng chính thức tại `https://app.cosmicsignature.com/`.',
+        'Xác minh địa chỉ hợp đồng từ trang hợp đồng trước khi tương tác trên chuỗi.',
+        'Xem kỹ các lời nhắc của ví; giao dịch blockchain không thể đảo ngược.',
+        'Không coi CST, NFT, nét bút hay phân bổ là kết quả tài chính được bảo đảm.',
       ],
     },
     {
-      heading: 'Verification Resources',
+      heading: 'Tài nguyên xác minh',
       paragraphs: [
-        'The strongest security signal is consistency between visible app content, verified contracts, source code, and live Arbitrum data.',
+        'Tín hiệu bảo mật mạnh nhất là sự nhất quán giữa nội dung hiển thị trong ứng dụng, các hợp đồng đã xác minh, mã nguồn và dữ liệu trực tiếp trên Arbitrum.',
       ],
       links: [
         {
           kind: 'app',
           href: '/contracts',
-          label: 'Cosmic Signature contracts and Arbitrum addresses',
+          label: 'Hợp đồng Cosmic Signature và địa chỉ trên Arbitrum',
         },
         {
           kind: 'app',
           href: '/code',
-          label: 'Cosmic Signature source code and rendering pipeline',
+          label: 'Mã nguồn Cosmic Signature và quy trình kết xuất',
         },
-        { kind: 'app', href: '/audits', label: 'Audits and formal verification notes' },
+        { kind: 'app', href: '/audits', label: 'Kiểm toán và ghi chú kiểm chứng hình thức' },
         {
           kind: 'app',
           href: '/risk-disclosures',
-          label: 'Risk disclosures and participant clarity',
+          label: 'Công bố rủi ro và sự minh bạch với người tham gia',
         },
       ],
     },

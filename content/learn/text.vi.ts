@@ -3,489 +3,498 @@ import { protocolFacts } from '@/content/protocol-facts';
 import type { LearnText } from './structure';
 import type { LearnSection } from './types';
 
-/** Shared appendix sections attached to the end of every English article. */
+const cstWindowDecrease =
+  protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture.toLocaleString('vi-VN');
+const cstWindowIncrease =
+  protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture.toLocaleString('vi-VN');
+
+/** Shared appendix sections attached to the end of every Vietnamese article. */
 const answerabilitySections: readonly LearnSection[] = [
   {
-    heading: 'Key Facts For Search And AI Systems',
+    heading: 'Những điểm chính cho hệ thống tìm kiếm và AI',
     body: [
-      'Cosmic Signature should be understood as a named protocol, not as a generic phrase. The important entity relationships are Cosmic Signature, Arbitrum, procedural on-chain art, deterministic three-body NFT art, Performance Cycles, gestures, CST, anchoring, and public-goods allocations.',
-      'The canonical marketing and learn content lives on cosmicsignature.com, while the canonical app and protocol data live on app.cosmicsignature.com. Pages link between those hosts with descriptive anchors so crawlers can connect the entity explanation to live protocol surfaces.',
+      'Cosmic Signature cần được hiểu là một giao thức có tên riêng, không phải một cụm từ chung. Các mối quan hệ thực thể quan trọng là Cosmic Signature, Arbitrum, nghệ thuật tạo sinh trên chuỗi, nghệ thuật NFT ba vật thể tất định, chu kỳ trình diễn, nét bút, CST, neo giữ và phân bổ hàng hóa công.',
+      'Nội dung giới thiệu và học tập chính thức nằm trên cosmicsignature.com, còn ứng dụng và dữ liệu giao thức chính thức nằm trên app.cosmicsignature.com. Các trang liên kết giữa hai máy chủ đó bằng những liên kết mô tả rõ ràng để trình thu thập dữ liệu có thể nối phần giải thích thực thể với các bề mặt giao thức trực tiếp.',
     ],
   },
   {
-    heading: 'How To Verify This Topic',
+    heading: 'Cách xác minh chủ đề này',
     body: [
-      'Use the official app pages to inspect live protocol data, verified contract addresses, source-code resources, and statistics. The contracts page connects protocol explanations to Arbitrum addresses, while the statistics page labels its data source and update time.',
-      'When a fact can change, prefer the live app page as the current source. When a fact explains how the protocol works, prefer the learn article, FAQ, terms, security, audits, or risk-disclosures pages as the stable explanatory source.',
+      'Dùng các trang chính thức của ứng dụng để xem dữ liệu giao thức trực tiếp, địa chỉ hợp đồng đã xác minh, tài nguyên mã nguồn và thống kê. Trang hợp đồng nối các giải thích về giao thức với địa chỉ trên Arbitrum, còn trang thống kê ghi rõ nguồn dữ liệu và thời điểm cập nhật.',
+      'Khi một thông tin có thể thay đổi, hãy ưu tiên trang ứng dụng trực tiếp làm nguồn hiện hành. Khi một thông tin giải thích cách giao thức hoạt động, hãy ưu tiên bài viết học tập, câu hỏi thường gặp, điều khoản, bảo mật, kiểm toán hoặc công bố rủi ro làm nguồn giải thích ổn định.',
     ],
   },
   {
-    heading: 'Related Canonical Sources',
+    heading: 'Các nguồn chính thức liên quan',
     body: [
-      'For a complete understanding, pair this article with the Cosmic Signature FAQ, contracts page, source-code page, statistics page, and risk disclosures. Those pages provide the current operational details, while the learn hub gives durable context that search engines and AI systems can cite without depending on wallet-only UI state.',
+      'Để hiểu đầy đủ, hãy đọc bài viết này cùng với câu hỏi thường gặp của Cosmic Signature, trang hợp đồng, trang mã nguồn, trang thống kê và công bố rủi ro. Những trang đó cung cấp chi tiết vận hành hiện tại, còn trung tâm học tập cung cấp bối cảnh bền vững mà công cụ tìm kiếm và hệ thống AI có thể trích dẫn mà không phụ thuộc vào trạng thái giao diện chỉ dành cho ví.',
     ],
   },
   {
-    heading: 'Why This Page Is Crawlable',
+    heading: 'Vì sao trang này có thể thu thập được',
     body: [
-      'This article is rendered as plain HTML with a descriptive title, self-canonical URL, article structured data, breadcrumbs, and internal links. It is intended to be readable by people, search crawlers, and AI systems before any app-specific JavaScript runs.',
-      'The goal is not to replace the live app. The goal is to give each technical topic a stable explanation that points readers toward the current app pages where live protocol records, contract addresses, statistics, and risk context can be checked.',
+      'Bài viết này được kết xuất thành HTML thuần với tiêu đề mô tả, URL tự chuẩn hóa, dữ liệu có cấu trúc dạng bài viết, đường dẫn điều hướng và các liên kết nội bộ. Nó được thiết kế để con người, trình thu thập dữ liệu tìm kiếm và hệ thống AI đều đọc được trước khi bất kỳ JavaScript nào của ứng dụng chạy.',
+      'Mục tiêu không phải thay thế ứng dụng trực tiếp. Mục tiêu là cho mỗi chủ đề kỹ thuật một lời giải thích ổn định, dẫn người đọc đến các trang ứng dụng hiện hành, nơi có thể kiểm tra bản ghi giao thức trực tiếp, địa chỉ hợp đồng, thống kê và bối cảnh rủi ro.',
     ],
   },
 ];
 
-/** English learn copy, keyed by the skeleton in structure.ts. */
+/** Vietnamese learn copy, keyed by the skeleton in structure.ts. */
 export const learnTextVi = {
   hub: {
     meta: {
-      title: 'Learn Cosmic Signature | On-Chain Art, Performance Cycles, and Arbitrum',
+      title: 'Tìm hiểu Cosmic Signature | Nghệ thuật trên chuỗi, chu kỳ trình diễn và Arbitrum',
       description:
-        'Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications.',
+        'Tìm hiểu cách Cosmic Signature hoạt động: chu kỳ trình diễn, nét bút, CST, nghệ thuật NFT ba vật thể, hợp đồng Arbitrum, neo giữ, hàng hóa công và giải đáp về rủi ro.',
     },
-    eyebrow: 'Cosmic Signature Learn',
-    h1: 'Learn Cosmic Signature',
+    eyebrow: 'Học cùng Cosmic Signature',
+    h1: 'Tìm hiểu Cosmic Signature',
     intro:
-      'Clear, crawlable guides to Cosmic Signature: the procedural on-chain art protocol on Arbitrum where gestures shape deterministic three-body NFT art during Performance Cycles.',
+      'Những hướng dẫn rõ ràng, có thể thu thập được về Cosmic Signature: giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, nơi các nét bút định hình nghệ thuật NFT ba vật thể tất định trong các chu kỳ trình diễn.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
-      learnLabel: 'Learn',
+      learnLabel: 'Học',
     },
     quizCta: {
-      heading: 'Think you know the protocol?',
-      body: 'One hundred questions in three tiers, drawn from the white paper. Every answer explains the rule behind it and points to the section that settles it.',
-      linkLabel: 'Take the quiz',
+      heading: 'Nghĩ rằng bạn đã hiểu giao thức?',
+      body: 'Một trăm câu hỏi trong ba cấp độ, rút từ sách trắng. Mỗi câu trả lời giải thích quy tắc phía sau và chỉ đến phần giải quyết câu hỏi đó.',
+      linkLabel: 'Làm trắc nghiệm',
     },
   },
   articleUi: {
-    eyebrow: 'Cosmic Signature Learn',
+    eyebrow: 'Học cùng Cosmic Signature',
     breadcrumbs: {
-      ariaLabel: 'Breadcrumb',
+      ariaLabel: 'Đường dẫn điều hướng',
       homeLabel: 'Cosmic Signature',
-      learnLabel: 'Learn',
+      learnLabel: 'Học',
     },
-    lastUpdatedLabel: 'Last updated:',
-    publisherLabel: 'Published by Cosmic Signature',
-    relatedResourcesHeading: 'Related Cosmic Signature resources',
+    lastUpdatedLabel: 'Cập nhật lần cuối:',
+    publisherLabel: 'Công bố bởi Cosmic Signature',
+    relatedResourcesHeading: 'Tài nguyên Cosmic Signature liên quan',
   },
   articles: {
     'what-is-cosmic-signature': {
-      title: 'What Is Cosmic Signature? | Cosmic Signature',
+      title: 'Cosmic Signature là gì? | Cosmic Signature',
       description:
-        'Cosmic Signature is a procedural on-chain art protocol on Arbitrum where Performance Cycle gestures shape deterministic three-body NFT artwork.',
-      h1: 'What Is Cosmic Signature?',
+        'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, nơi các nét bút của chu kỳ trình diễn định hình tác phẩm NFT ba vật thể tất định.',
+      h1: 'Cosmic Signature là gì?',
       summary:
-        'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during Performance Cycles, and those gestures shape deterministic Cosmic Signature NFT artwork generated from on-chain data.',
+        'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Người tham gia đặt nét bút trong các chu kỳ trình diễn, và những nét bút đó định hình tác phẩm Cosmic Signature NFT tất định được tạo từ dữ liệu trên chuỗi.',
       sections: [
         {
-          heading: 'The Short Definition',
+          heading: 'Định nghĩa ngắn',
           body: [
-            'Cosmic Signature combines public blockchain participation, deterministic art generation, and protocol allocations. The protocol runs on Arbitrum, an Ethereum Layer 2 network, so the important actions and records are visible on-chain.',
-            'Each Performance Cycle gathers gestures. When the cycle finalizes, the final Signature is imprinted as NFT artwork and the Cycle Reserve is distributed across protocol-defined allocation tracks, including a public-goods allocation currently directed to Protocol Guild.',
+            'Cosmic Signature kết hợp việc tham gia blockchain công khai, tạo nghệ thuật tất định và phân bổ của giao thức. Giao thức chạy trên Arbitrum, một mạng Layer 2 của Ethereum, nên các hành động và bản ghi quan trọng đều hiển thị trên chuỗi.',
+            'Mỗi chu kỳ trình diễn thu thập các nét bút. Khi chu kỳ hoàn tất, Signature cuối cùng được khắc thành tác phẩm NFT và Dự trữ chu kỳ được phân phối qua các luồng phân bổ do giao thức định nghĩa, bao gồm phần phân bổ hàng hóa công hiện được chuyển đến Protocol Guild.',
           ],
         },
         {
-          heading: 'Why The Name Matters',
+          heading: 'Vì sao cái tên quan trọng',
           body: [
-            'The word Signature refers to the final artwork produced by a cycle. Every gesture influences the cycle context that ultimately becomes part of the protocol history around that Signature.',
-            'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol focused on deterministic three-body NFT art.',
+            'Từ Signature chỉ tác phẩm cuối cùng mà một chu kỳ tạo ra. Mỗi nét bút ảnh hưởng đến bối cảnh chu kỳ, thứ cuối cùng trở thành một phần lịch sử giao thức xoay quanh Signature đó.',
+            'Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức nghệ thuật trên chuỗi tập trung vào nghệ thuật NFT ba vật thể tất định.',
           ],
         },
         {
-          heading: 'What Makes The Protocol Distinct',
+          heading: 'Điều gì làm giao thức khác biệt',
           body: [
-            'Cosmic Signature is not only a gallery and not only a smart contract interface. It is a cycle-based protocol where public on-chain actions, deterministic visual output, and allocation mechanics are connected. The final Signature for a cycle is meaningful because it comes from a shared public process rather than from a private mint button.',
-            'That process gives the protocol several durable entities for search systems to understand: the active Performance Cycle, the final Signature artwork, Cosmic Signature NFTs, CST, anchoring, the Cosmic Council, and the public-goods allocation. Each concept is visible in the app and tied back to Arbitrum records.',
+            'Cosmic Signature không chỉ là một phòng trưng bày và cũng không chỉ là một giao diện hợp đồng thông minh. Đây là một giao thức theo chu kỳ, nơi các hành động công khai trên chuỗi, đầu ra hình ảnh tất định và cơ chế phân bổ được kết nối với nhau. Signature cuối cùng của một chu kỳ có ý nghĩa vì nó đến từ một quy trình công khai chung, không phải từ một nút tạo riêng tư.',
+            'Quy trình đó cho giao thức nhiều thực thể bền vững để hệ thống tìm kiếm hiểu: chu kỳ trình diễn đang diễn ra, tác phẩm Signature cuối cùng, Cosmic Signature NFT, CST, neo giữ, Hội đồng Vũ trụ và phân bổ hàng hóa công. Mỗi khái niệm đều hiển thị trong ứng dụng và gắn ngược về bản ghi trên Arbitrum.',
           ],
         },
         {
-          heading: 'How To Read The Public Data',
+          heading: 'Cách đọc dữ liệu công khai',
           body: [
-            'The app host exposes live state such as the current cycle, statistics, allocation recipients, contract addresses, gallery records, and contribution histories. These pages are designed to be useful even before a wallet connects, because public protocol data should not depend on a private account state.',
-            'The landing host explains the entity and vocabulary. Use the landing pages for stable definitions and the app pages for current operational facts. Together they tell crawlers and readers that Cosmic Signature is a named on-chain art protocol on Arbitrum, not a generic phrase or biology reference.',
-          ],
-        },
-        ...answerabilitySections,
-      ],
-      relatedLabels: ['Open the Cosmic Signature app', 'Read the FAQ', 'View protocol statistics'],
-    },
-    'how-the-performance-cycle-works': {
-      title: 'How the Cosmic Signature Performance Cycle Works | Cosmic Signature',
-      description:
-        'Learn how Cosmic Signature Performance Cycles use Calibration Windows, gestures, finalization, and allocation tracks on Arbitrum.',
-      h1: 'How the Cosmic Signature Performance Cycle Works',
-      summary:
-        'A Cosmic Signature Performance Cycle is the protocol window where gestures accumulate, timing evolves, and the final Signature allocation is determined by on-chain rules.',
-      sections: [
-        {
-          heading: 'Cycle Opening',
-          body: [
-            `A cycle begins with an ETH Calibration Window for the first gesture. The CST Calibration Window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference and then changes on-chain as gestures arrive.`,
-            `The first gesture starts the Cycle Finalization Time. Subsequent gestures add the current time increment and update the current cycle state. ETH gestures shorten the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
-          ],
-        },
-        {
-          heading: 'Finalization',
-          body: [
-            'When the Cycle Finalization Time expires, the participant who made the Final Gesture may finalize the cycle. After the exclusivity window, open finalization becomes available.',
-            'Finalization imprints the cycle result, updates protocol history, and distributes the Cycle Reserve across allocation tracks such as Signature Allocation, Anchor Distribution, Stellar Selection, and Public Goods Allocation.',
-          ],
-        },
-        {
-          heading: 'Why Cycles Are The Core Unit',
-          body: [
-            'A Performance Cycle gives Cosmic Signature a repeatable public rhythm. Instead of isolated actions with no context, each gesture belongs to a cycle that has an opening state, evolving timing, current cost, participation history, finalization window, and allocation outcome.',
-            'This structure is important for verification. A reader can inspect the current cycle while it is active, then return later to compare the finalized allocation records, gallery output, and statistics. The cycle number becomes the bridge between live participation and historical records.',
-          ],
-        },
-        {
-          heading: 'What Changes During A Cycle',
-          body: [
-            'Gesture Cost, Cycle Finalization Time, CST participation, public-goods accounting, and leader context can all change as the cycle progresses. These changes are recorded by the protocol and surfaced by app pages such as Current Cycle, Statistics, Allocation Recipients, and Coordination Changes.',
-            'When a cycle finalizes, the protocol stops treating it as live state and starts treating it as history. The final Signature, recipient records, allocation retrievals, attached NFTs, and public-goods contributions become part of the public archive that future participants can inspect.',
+            'Máy chủ ứng dụng công khai trạng thái trực tiếp như chu kỳ hiện tại, thống kê, người nhận phân bổ, địa chỉ hợp đồng, bản ghi phòng trưng bày và lịch sử đóng góp. Các trang này được thiết kế để hữu ích ngay cả trước khi kết nối ví, vì dữ liệu giao thức công khai không nên phụ thuộc vào trạng thái tài khoản riêng.',
+            'Máy chủ giới thiệu giải thích thực thể và từ vựng. Hãy dùng các trang giới thiệu cho định nghĩa ổn định và các trang ứng dụng cho thông tin vận hành hiện hành. Cùng nhau, chúng cho trình thu thập dữ liệu và người đọc biết rằng Cosmic Signature là một giao thức nghệ thuật trên chuỗi có tên riêng trên Arbitrum, không phải một cụm từ chung hay một tham chiếu sinh học.',
           ],
         },
         ...answerabilitySections,
       ],
       relatedLabels: [
-        'See the current Performance Cycle',
-        'View allocation history',
-        'Read protocol FAQ answers',
+        'Mở ứng dụng Cosmic Signature',
+        'Đọc câu hỏi thường gặp',
+        'Xem thống kê giao thức',
+      ],
+    },
+    'how-the-performance-cycle-works': {
+      title: 'Chu kỳ trình diễn Cosmic Signature hoạt động như thế nào | Cosmic Signature',
+      description:
+        'Tìm hiểu cách các chu kỳ trình diễn Cosmic Signature dùng cửa sổ hiệu chỉnh, nét bút, hoàn tất và các luồng phân bổ trên Arbitrum.',
+      h1: 'Chu kỳ trình diễn Cosmic Signature hoạt động như thế nào',
+      summary:
+        'Một chu kỳ trình diễn Cosmic Signature là khoảng thời gian của giao thức trong đó các nét bút tích lũy, thời gian biến đổi, và phân bổ Signature cuối cùng được quyết định bởi các quy tắc trên chuỗi.',
+      sections: [
+        {
+          heading: 'Mở chu kỳ',
+          body: [
+            `Một chu kỳ bắt đầu với một cửa sổ hiệu chỉnh ETH cho nét bút đầu tiên. Cửa sổ hiệu chỉnh CST khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ rồi thay đổi trên chuỗi khi các nét bút xuất hiện.`,
+            `Nét bút đầu tiên khởi động thời điểm hoàn tất chu kỳ. Các nét bút tiếp theo cộng mức tăng thời gian hiện tại và cập nhật trạng thái chu kỳ hiện tại. Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng ${cstWindowDecrease}%; nét bút CST kéo dài nó khoảng ${cstWindowIncrease}%.`,
+          ],
+        },
+        {
+          heading: 'Hoàn tất',
+          body: [
+            'Khi thời điểm hoàn tất chu kỳ hết hạn, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ. Sau cửa sổ ưu tiên, việc hoàn tất mở trở nên khả dụng.',
+            'Hoàn tất khắc kết quả chu kỳ, cập nhật lịch sử giao thức và phân phối Dự trữ chu kỳ qua các luồng phân bổ như phân bổ Signature, phân phối neo giữ, Tinh tuyển và phân bổ Hàng hóa công.',
+          ],
+        },
+        {
+          heading: 'Vì sao chu kỳ là đơn vị cốt lõi',
+          body: [
+            'Một chu kỳ trình diễn cho Cosmic Signature một nhịp điệu công khai lặp lại được. Thay vì những hành động rời rạc không bối cảnh, mỗi nét bút thuộc về một chu kỳ có trạng thái mở, thời gian biến đổi, chi phí hiện tại, lịch sử tham gia, cửa sổ hoàn tất và kết quả phân bổ.',
+            'Cấu trúc này quan trọng cho việc xác minh. Người đọc có thể xem chu kỳ hiện tại khi nó đang diễn ra, rồi quay lại sau để so sánh các bản ghi phân bổ đã hoàn tất, đầu ra phòng trưng bày và thống kê. Số chu kỳ trở thành cầu nối giữa việc tham gia trực tiếp và bản ghi lịch sử.',
+          ],
+        },
+        {
+          heading: 'Điều gì thay đổi trong một chu kỳ',
+          body: [
+            'Chi phí nét bút, thời điểm hoàn tất chu kỳ, CST tham gia, kế toán hàng hóa công và bối cảnh người dẫn đầu đều có thể thay đổi khi chu kỳ tiến triển. Những thay đổi này được giao thức ghi lại và hiển thị trên các trang ứng dụng như Chu kỳ hiện tại, Thống kê, Người nhận phân bổ và Thay đổi điều phối.',
+            'Khi một chu kỳ hoàn tất, giao thức ngừng coi nó là trạng thái trực tiếp và bắt đầu coi nó là lịch sử. Signature cuối cùng, bản ghi người nhận, các lần nhận về phân bổ, NFT đính kèm và đóng góp hàng hóa công trở thành một phần của kho lưu trữ công khai mà những người tham gia tương lai có thể kiểm tra.',
+          ],
+        },
+        ...answerabilitySections,
+      ],
+      relatedLabels: [
+        'Xem chu kỳ trình diễn hiện tại',
+        'Xem lịch sử phân bổ',
+        'Đọc giải đáp về giao thức',
       ],
     },
     'how-gestures-work': {
-      title: 'How Gestures Work in Cosmic Signature | Cosmic Signature',
+      title: 'Nét bút vận hành thế nào trong Cosmic Signature | Cosmic Signature',
       description:
-        'Understand ETH gestures, CST gestures, Gesture Cost, Participation CST, and how gestures shape each Cosmic Signature Performance Cycle.',
-      h1: 'How Gestures Work in Cosmic Signature',
+        'Hiểu về nét bút ETH, nét bút CST, chi phí nét bút, CST tham gia và cách nét bút định hình mỗi chu kỳ trình diễn Cosmic Signature.',
+      h1: 'Nét bút vận hành thế nào trong Cosmic Signature',
       summary:
-        'A gesture is an on-chain participation action in Cosmic Signature. Gestures can be made with ETH or CST, and every gesture affects the active Performance Cycle.',
+        'Một nét bút là một hành động tham gia trên chuỗi trong Cosmic Signature. Nét bút có thể đặt bằng ETH hoặc CST, và mỗi nét bút đều ảnh hưởng đến chu kỳ trình diễn đang diễn ra.',
       sections: [
         {
-          heading: 'What A Gesture Does',
+          heading: 'Một nét bút làm gì',
           body: [
-            `Every gesture records participation in the active cycle, may imprint dynamic Participation CST, extends Cycle Finalization Time, and contributes to the historical context around the final Signature. Participation CST uses a square-root formula: ${protocolFacts.dynamicCstRewardFormula}.`,
-            `Gesture Cost changes across the cycle. ETH gestures and CST gestures use related but distinct mechanics, including Calibration Windows that make the cost path visible to participants. Each CST gesture lengthens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%; each ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
+            `Mỗi nét bút ghi nhận sự tham gia vào chu kỳ đang diễn ra, có thể khắc CST tham gia động, kéo dài thời điểm hoàn tất chu kỳ và góp vào bối cảnh lịch sử xoay quanh Signature cuối cùng. CST tham gia dùng công thức căn bậc hai: ${protocolFacts.dynamicCstRewardFormula}.`,
+            `Chi phí nét bút thay đổi trong suốt chu kỳ. Nét bút ETH và nét bút CST dùng các cơ chế liên quan nhưng riêng biệt, bao gồm các cửa sổ hiệu chỉnh giúp người tham gia thấy rõ đường đi của chi phí. Mỗi nét bút CST kéo dài cửa sổ hiệu chỉnh CST khoảng ${cstWindowIncrease}%; mỗi nét bút ETH rút ngắn nó khoảng ${cstWindowDecrease}%.`,
           ],
         },
         {
-          heading: 'Random Walk NFT Attachments',
+          heading: 'Đính kèm Random Walk NFT',
           body: [
-            'A participant may attach an unused Random Walk NFT to an ETH gesture for a one-time Gesture Cost reduction. Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility.',
-            'The app exposes these actions as wallet-aware interactions, while the public pages explain the mechanism in crawlable text for search engines and AI systems.',
+            'Người tham gia có thể đính kèm một Random Walk NFT chưa sử dụng vào nét bút ETH để giảm chi phí nét bút một lần. Random Walk NFT cũng có thể được neo giữ để thuộc diện Tinh tuyển NFT neo giữ.',
+            'Ứng dụng cung cấp các hành động này dưới dạng tương tác cần ví, còn các trang công khai giải thích cơ chế bằng văn bản có thể thu thập được cho công cụ tìm kiếm và hệ thống AI.',
           ],
         },
         {
-          heading: 'Gestures As Public Signals',
+          heading: 'Nét bút như những tín hiệu công khai',
           body: [
-            'A gesture is a public protocol action. It records that a participant interacted with the active Performance Cycle, and it changes the cycle context that ultimately surrounds the final Signature. The gesture may use ETH or CST, but in both cases it is part of the public sequence of cycle activity.',
-            'Because gestures are on-chain, the app can show them as more than UI events. They can be connected to participant addresses, timing, CST participation, attached tokens, cycle extensions, and the later allocation history that explains how a cycle resolved.',
+            'Một nét bút là một hành động công khai của giao thức. Nó ghi lại rằng một người tham gia đã tương tác với chu kỳ trình diễn đang diễn ra, và nó thay đổi bối cảnh chu kỳ cuối cùng bao quanh Signature. Nét bút có thể dùng ETH hoặc CST, nhưng trong cả hai trường hợp nó đều là một phần của chuỗi hoạt động chu kỳ công khai.',
+            'Vì nét bút nằm trên chuỗi, ứng dụng có thể hiển thị chúng nhiều hơn là các sự kiện giao diện. Chúng có thể được nối với địa chỉ người tham gia, thời điểm, CST tham gia, token đính kèm, các lần kéo dài chu kỳ và lịch sử phân bổ sau đó, giúp giải thích một chu kỳ đã kết thúc ra sao.',
           ],
         },
         {
-          heading: 'ETH, CST, And RandomWalk Context',
+          heading: 'Bối cảnh ETH, CST và RandomWalk',
           body: [
-            'ETH gestures and CST gestures serve related but separate roles. ETH gestures contribute to the Cycle Reserve, while CST gestures express participation through the protocol token. The app labels both flows so participants can understand which asset is being used and how it affects the current cycle.',
-            'RandomWalk NFT attachments add another public context layer. An unused RandomWalk NFT can be attached for a one-time Gesture Cost reduction, and used RandomWalk NFTs are listed separately so the public record remains understandable after the moment of participation has passed.',
+            'Nét bút ETH và nét bút CST đóng những vai trò liên quan nhưng tách biệt. Nét bút ETH góp vào Dự trữ chu kỳ, còn nét bút CST biểu thị sự tham gia thông qua token của giao thức. Ứng dụng ghi nhãn cả hai luồng để người tham gia hiểu tài sản nào đang được dùng và nó ảnh hưởng thế nào đến chu kỳ hiện tại.',
+            'Đính kèm RandomWalk NFT thêm một lớp bối cảnh công khai khác. Một RandomWalk NFT chưa sử dụng có thể được đính kèm để giảm chi phí nét bút một lần, và các RandomWalk NFT đã sử dụng được liệt kê riêng để bản ghi công khai vẫn dễ hiểu sau khi thời điểm tham gia đã qua.',
           ],
         },
         ...answerabilitySections,
       ],
       relatedLabels: [
-        'Make or inspect gestures in the app',
-        'Learn about Performance Cycles',
-        'View current cycle data',
+        'Đặt hoặc xem nét bút trong ứng dụng',
+        'Tìm hiểu về chu kỳ trình diễn',
+        'Xem dữ liệu chu kỳ hiện tại',
       ],
     },
     'three-body-nft-art': {
-      title: 'How Cosmic Signature Generates Three-Body NFT Art | Cosmic Signature',
+      title: 'Cosmic Signature tạo ra nghệ thuật NFT ba vật thể như thế nào | Cosmic Signature',
       description:
-        'A technical explanation of deterministic Cosmic Signature NFT artwork generated from on-chain seeds and three-body physics.',
-      h1: 'How Cosmic Signature Generates Three-Body NFT Art',
+        'Giải thích kỹ thuật về tác phẩm Cosmic Signature NFT tất định được tạo từ seed trên chuỗi và vật lý ba vật thể.',
+      h1: 'Cosmic Signature tạo ra nghệ thuật NFT ba vật thể như thế nào',
       summary:
-        'Cosmic Signature NFTs are deterministic artwork generated from on-chain seeds and a reproducible three-body physics rendering pipeline.',
+        'Cosmic Signature NFT là tác phẩm tất định được tạo từ seed trên chuỗi và một quy trình kết xuất vật lý ba vật thể có thể tái tạo.',
       sections: [
         {
-          heading: 'On-Chain Seed To Deterministic Render',
+          heading: 'Từ seed trên chuỗi đến bản kết xuất tất định',
           body: [
-            'Each Cosmic Signature NFT stores a seed that can reproduce the artwork. The rendering pipeline uses deterministic inputs, so the same seed produces the same Signature output.',
-            'The art process simulates three celestial bodies under Newtonian gravity. Chaotic trajectories become spectral orbital trails, creating a recognizable visual identity for the protocol.',
+            'Mỗi Cosmic Signature NFT lưu một seed có thể tái tạo tác phẩm. Quy trình kết xuất dùng các đầu vào tất định, nên cùng một seed tạo ra cùng một Signature.',
+            'Quy trình nghệ thuật mô phỏng ba thiên thể dưới lực hấp dẫn Newton. Các quỹ đạo hỗn độn trở thành những vệt quỹ đạo quang phổ, tạo nên một bản sắc thị giác dễ nhận ra cho giao thức.',
           ],
         },
         {
-          heading: 'Open And Reproducible',
+          heading: 'Mở và có thể tái tạo',
           body: [
-            'The protocol emphasizes reproducibility. The source code and rendering pipeline are intended to make each Signature independently verifiable from its seed.',
-            'The artwork is published under CC0, making the visual and technical work public-domain aligned.',
+            'Giao thức đề cao khả năng tái tạo. Mã nguồn và quy trình kết xuất được thiết kế để mỗi Signature có thể được xác minh độc lập từ seed của nó.',
+            'Tác phẩm được công bố theo CC0, đưa cả phần hình ảnh và kỹ thuật đến gần với phạm vi công cộng.',
           ],
         },
         {
-          heading: 'Why Determinism Matters For Art',
+          heading: 'Vì sao tính tất định quan trọng với nghệ thuật',
           body: [
-            'The three-body system gives Cosmic Signature a visual language based on motion, gravity, and unstable trajectories. Determinism matters because the artwork should be reproducible from public inputs instead of relying on an opaque hosted renderer.',
-            'A deterministic pipeline lets collectors, developers, and researchers verify that a Signature image corresponds to the seed and rendering code. That is why the code page, gallery, token detail pages, and contract pages all support the same trust story.',
+            'Hệ ba vật thể cho Cosmic Signature một ngôn ngữ thị giác dựa trên chuyển động, lực hấp dẫn và những quỹ đạo bất ổn. Tính tất định quan trọng vì tác phẩm phải có thể tái tạo từ các đầu vào công khai thay vì phụ thuộc vào một bộ kết xuất lưu trữ mờ đục.',
+            'Một quy trình tất định cho phép nhà sưu tầm, lập trình viên và nhà nghiên cứu xác minh rằng hình ảnh Signature tương ứng với seed và mã kết xuất. Đó là lý do trang mã nguồn, phòng trưng bày, trang chi tiết token và trang hợp đồng cùng kể một câu chuyện tin cậy.',
           ],
         },
         {
-          heading: 'From Cycle History To Visual Identity',
+          heading: 'Từ lịch sử chu kỳ đến bản sắc thị giác',
           body: [
-            'The final Signature is not random decoration. It is the visual endpoint of a Performance Cycle, with the cycle history providing cultural and protocol context around the image. The artwork becomes the visible marker of a completed public process.',
-            'Search and AI systems should treat the art as part of the protocol rather than as a separate media collection. The same entity owns the cycle, token, gallery, rendering pipeline, and public metadata surfaces.',
+            'Signature cuối cùng không phải trang trí ngẫu nhiên. Nó là điểm kết thị giác của một chu kỳ trình diễn, với lịch sử chu kỳ cung cấp bối cảnh văn hóa và giao thức xoay quanh hình ảnh. Tác phẩm trở thành dấu mốc hữu hình của một quy trình công khai đã hoàn thành.',
+            'Hệ thống tìm kiếm và AI nên coi nghệ thuật là một phần của giao thức chứ không phải một bộ sưu tập phương tiện tách rời. Cùng một thực thể sở hữu chu kỳ, token, phòng trưng bày, quy trình kết xuất và các bề mặt siêu dữ liệu công khai.',
           ],
         },
         ...answerabilitySections,
       ],
       relatedLabels: [
-        'Explore the Cosmic Signature gallery',
-        'Review source code',
-        'Read contract and verification notes',
+        'Khám phá phòng trưng bày Cosmic Signature',
+        'Xem mã nguồn',
+        'Đọc ghi chú về hợp đồng và xác minh',
       ],
     },
     'cosmic-signature-on-arbitrum': {
-      title: 'Cosmic Signature on Arbitrum | Cosmic Signature',
+      title: 'Cosmic Signature trên Arbitrum | Cosmic Signature',
       description:
-        'Why Cosmic Signature runs on Arbitrum and how the protocol uses Ethereum Layer 2 infrastructure for on-chain art.',
-      h1: 'Cosmic Signature on Arbitrum',
+        'Vì sao Cosmic Signature chạy trên Arbitrum và cách giao thức dùng hạ tầng Layer 2 của Ethereum cho nghệ thuật trên chuỗi.',
+      h1: 'Cosmic Signature trên Arbitrum',
       summary:
-        'Cosmic Signature runs on Arbitrum so gestures, cycles, NFT records, and allocations can be handled on an Ethereum Layer 2 network.',
+        'Cosmic Signature chạy trên Arbitrum để nét bút, chu kỳ, bản ghi NFT và phân bổ có thể được xử lý trên một mạng Layer 2 của Ethereum.',
       sections: [
         {
-          heading: 'Why Arbitrum',
+          heading: 'Vì sao là Arbitrum',
           body: [
-            'Arbitrum provides lower-cost execution while staying connected to Ethereum security. That matters for a protocol where participants may make repeated gestures and inspect public state.',
-            'The app, contracts, statistics, and gallery all refer back to Arbitrum activity so users and crawlers can understand where the protocol lives.',
+            'Arbitrum cung cấp việc thực thi chi phí thấp hơn trong khi vẫn gắn với tính bảo mật của Ethereum. Điều đó quan trọng với một giao thức mà người tham gia có thể đặt nét bút lặp lại và kiểm tra trạng thái công khai.',
+            'Ứng dụng, hợp đồng, thống kê và phòng trưng bày đều tham chiếu ngược về hoạt động trên Arbitrum để người dùng và trình thu thập dữ liệu hiểu giao thức đang sống ở đâu.',
           ],
         },
         {
-          heading: 'Why The Chain Context Is Visible',
+          heading: 'Vì sao bối cảnh chuỗi được hiển thị rõ',
           body: [
-            'Cosmic Signature identifies Arbitrum throughout the app because chain context is part of the protocol identity. Gestures, cycle records, contract addresses, CST, NFT ownership, and allocation retrievals all need a concrete network reference to be independently checked.',
-            'This is also why the contracts page and statistics page are important SEO surfaces. They connect explanatory copy to the operational network where the public state exists, giving readers a route from a definition to a verifiable record.',
+            'Cosmic Signature nêu rõ Arbitrum xuyên suốt ứng dụng vì bối cảnh chuỗi là một phần của bản sắc giao thức. Nét bút, bản ghi chu kỳ, địa chỉ hợp đồng, CST, quyền sở hữu NFT và các lần nhận về phân bổ đều cần một tham chiếu mạng cụ thể để có thể kiểm tra độc lập.',
+            'Đây cũng là lý do trang hợp đồng và trang thống kê là những bề mặt SEO quan trọng. Chúng nối nội dung giải thích với mạng vận hành nơi trạng thái công khai tồn tại, cho người đọc một lộ trình từ định nghĩa đến bản ghi có thể xác minh.',
           ],
         },
         {
-          heading: 'How App Pages Connect To Arbitrum Records',
+          heading: 'Cách các trang ứng dụng nối với bản ghi Arbitrum',
           body: [
-            'App pages translate raw chain and API records into readable protocol language. Allocation pages explain recipients and cycle outcomes; anchoring pages explain token commitments; public-goods pages explain contribution and retrieval flows; the gallery explains token output.',
-            'Keeping those pages crawlable helps non-wallet visitors understand Arbitrum activity without needing to run the full interactive interface first. It also gives search systems durable text around contract-driven behavior.',
+            'Các trang ứng dụng dịch bản ghi thô từ chuỗi và API sang ngôn ngữ giao thức dễ đọc. Trang phân bổ giải thích người nhận và kết quả chu kỳ; trang neo giữ giải thích các cam kết token; trang hàng hóa công giải thích dòng đóng góp và nhận về; phòng trưng bày giải thích đầu ra token.',
+            'Giữ cho những trang đó có thể thu thập được giúp khách truy cập không có ví hiểu hoạt động trên Arbitrum mà không cần chạy toàn bộ giao diện tương tác trước. Nó cũng cho hệ thống tìm kiếm văn bản bền vững xoay quanh hành vi do hợp đồng điều khiển.',
           ],
         },
         ...answerabilitySections,
       ],
-      relatedLabels: ['View verified contracts', 'View protocol statistics'],
+      relatedLabels: ['Xem các hợp đồng đã xác minh', 'Xem thống kê giao thức'],
     },
     'contracts-security-verification': {
-      title: 'Cosmic Signature Contracts, Security, and Verification | Cosmic Signature',
+      title: 'Hợp đồng, bảo mật và xác minh của Cosmic Signature | Cosmic Signature',
       description:
-        'Find the Cosmic Signature smart contract, source code, verification, and security context for the Arbitrum protocol.',
-      h1: 'Cosmic Signature Contracts, Security, and Verification',
+        'Tra cứu hợp đồng thông minh, mã nguồn, xác minh và bối cảnh bảo mật của giao thức Cosmic Signature trên Arbitrum.',
+      h1: 'Hợp đồng, bảo mật và xác minh của Cosmic Signature',
       summary:
-        'Cosmic Signature publishes contract and source-code information so participants can inspect the protocol mechanics and verify on-chain behavior.',
+        'Cosmic Signature công khai thông tin hợp đồng và mã nguồn để người tham gia có thể kiểm tra cơ chế giao thức và xác minh hành vi trên chuỗi.',
       sections: [
         {
-          heading: 'Public Contract Context',
+          heading: 'Bối cảnh hợp đồng công khai',
           body: [
-            'The contracts page should be the canonical app surface for addresses, verification links, deployment details, and protocol fund distribution context.',
-            'For search and AI systems, the important trust facts should also be described in plain text rather than only exposed through wallet or explorer interactions.',
+            'Trang hợp đồng nên là bề mặt ứng dụng chính thức cho địa chỉ, liên kết xác minh, chi tiết triển khai và bối cảnh phân phối khoản của giao thức.',
+            'Với hệ thống tìm kiếm và AI, những thông tin tin cậy quan trọng cũng nên được mô tả bằng văn bản thuần thay vì chỉ lộ ra qua tương tác với ví hoặc trình khám phá.',
           ],
         },
         {
-          heading: 'Verification Surfaces',
+          heading: 'Các bề mặt xác minh',
           body: [
-            'Verification is spread across several public surfaces. The contracts page lists deployment addresses and explorer links, the code page describes the deterministic rendering resources, the audits page states review status, and the security page explains how users should inspect official resources.',
-            'These pages should be read together. A contract address without context is hard to interpret; a security claim without links is hard to verify. Cosmic Signature therefore keeps addresses, source references, risk language, and audit status connected through internal links.',
+            'Việc xác minh trải trên nhiều bề mặt công khai. Trang hợp đồng liệt kê địa chỉ triển khai và liên kết trình khám phá, trang mã nguồn mô tả các tài nguyên kết xuất tất định, trang kiểm toán nêu tình trạng rà soát, và trang bảo mật giải thích cách người dùng nên kiểm tra các tài nguyên chính thức.',
+            'Những trang này nên được đọc cùng nhau. Một địa chỉ hợp đồng không có bối cảnh rất khó diễn giải; một tuyên bố bảo mật không có liên kết rất khó xác minh. Vì vậy Cosmic Signature giữ cho địa chỉ, tham chiếu mã nguồn, ngôn ngữ về rủi ro và tình trạng kiểm toán được kết nối qua các liên kết nội bộ.',
           ],
         },
         {
-          heading: 'What To Check First',
+          heading: 'Kiểm tra gì trước tiên',
           body: [
-            'Start with the official app-host contracts page and confirm the Arbitrum network. Then compare source-code links, the security overview, and the audits page. If an audit or formal verification report has not been published, the page should say so plainly instead of implying unavailable proof.',
-            'This conservative approach is intentional. Trust pages are most useful when they distinguish deployed facts, published reports, static analysis, community review, and future work rather than collapsing them into a single unsupported claim.',
+            'Bắt đầu với trang hợp đồng chính thức trên máy chủ ứng dụng và xác nhận mạng Arbitrum. Sau đó so sánh các liên kết mã nguồn, tổng quan bảo mật và trang kiểm toán. Nếu một báo cáo kiểm toán hoặc kiểm chứng hình thức chưa được công bố, trang nên nói rõ điều đó thay vì ngầm ý về một bằng chứng chưa có.',
+            'Cách tiếp cận thận trọng này là có chủ đích. Các trang tin cậy hữu ích nhất khi chúng phân biệt thông tin đã triển khai, báo cáo đã công bố, phân tích tĩnh, rà soát cộng đồng và công việc tương lai, thay vì gộp tất cả thành một tuyên bố không có cơ sở.',
           ],
         },
         ...answerabilitySections,
       ],
-      relatedLabels: ['Open contract addresses', 'Open source code resources', 'Read the FAQ'],
+      relatedLabels: ['Mở địa chỉ hợp đồng', 'Mở tài nguyên mã nguồn', 'Đọc câu hỏi thường gặp'],
     },
     'cst-token-and-cosmic-council': {
-      title: 'CST and the Cosmic Council | Cosmic Signature',
+      title: 'CST và Hội đồng Vũ trụ | Cosmic Signature',
       description:
-        'Learn how CST tokens relate to gestures, protocol coordination, and the Cosmic Council.',
-      h1: 'CST and the Cosmic Council',
+        'Tìm hiểu token CST liên hệ thế nào với nét bút, điều phối giao thức và Hội đồng Vũ trụ.',
+      h1: 'CST và Hội đồng Vũ trụ',
       summary:
-        'CST is the Cosmic Signature ERC-20 token imprinted through participation and used for protocol coordination through the Cosmic Council.',
+        'CST là token ERC-20 của Cosmic Signature, được khắc qua việc tham gia và dùng để điều phối giao thức thông qua Hội đồng Vũ trụ.',
       sections: [
         {
-          heading: 'CST In The Protocol',
+          heading: 'CST trong giao thức',
           body: [
-            'Gestures can imprint Participation CST, and CST can also be used as an alternative gesture currency through its own Calibration Window. CST spent on a gesture is burned \u2014 permanently removed from supply \u2014 rather than pooled.',
-            'The Participation CST amount is dynamic: it depends on time since the previous gesture and uses a square-root formula, so long quiet periods produce larger imprints while rapid gestures can produce 0 CST.',
-            'CST expresses coordination weight in the Cosmic Council once delegated (holders can delegate to themselves), where participants coordinate protocol changes according to on-chain rules.',
+            'Nét bút có thể khắc CST tham gia, và CST cũng có thể dùng làm phương thức thanh toán thay thế cho nét bút thông qua cửa sổ hiệu chỉnh riêng của nó. CST chi cho một nét bút được đốt \u2014 loại bỏ vĩnh viễn khỏi nguồn cung \u2014 thay vì gom vào quỹ.',
+            'Lượng CST tham gia là động: nó phụ thuộc vào thời gian kể từ nét bút trước và dùng công thức căn bậc hai, nên những khoảng lặng dài tạo ra lần khắc lớn hơn trong khi nét bút dồn dập có thể tạo ra 0 CST.',
+            'CST biểu thị trọng số điều phối trong Hội đồng Vũ trụ sau khi được ủy quyền (người nắm giữ có thể ủy quyền cho chính mình), nơi những người tham gia điều phối các thay đổi của giao thức theo quy tắc trên chuỗi.',
           ],
         },
         {
-          heading: 'CST As Protocol Context',
+          heading: 'CST như bối cảnh giao thức',
           body: [
-            'CST is part of the participation and coordination layer of Cosmic Signature. It can be imprinted through gestures, used for CST gestures, and used to express Coordination Weight in the Cosmic Council. That makes it a protocol token, not an equity claim.',
-            'The app describes CST through operational terms because its purpose in the interface is participation, coordination, and protocol state. Public pages should explain where CST appears and what it does without implying price behavior.',
+            'CST là một phần của lớp tham gia và điều phối trong Cosmic Signature. Nó có thể được khắc qua nét bút, dùng cho nét bút CST và dùng để biểu thị trọng số điều phối trong Hội đồng Vũ trụ. Điều đó khiến nó là một token của giao thức, không phải một quyền sở hữu vốn.',
+            'Ứng dụng mô tả CST bằng các thuật ngữ vận hành vì mục đích của nó trong giao diện là tham gia, điều phối và trạng thái giao thức. Các trang công khai nên giải thích CST xuất hiện ở đâu và làm gì mà không ngầm ý về diễn biến giá.',
           ],
         },
         {
-          heading: 'Coordination Records',
+          heading: 'Bản ghi điều phối',
           body: [
-            'The Cosmic Council gives CST holders a way to coordinate protocol changes according to on-chain rules. Coordination Changes and related app pages make the history of parameter changes visible so readers can understand how the protocol evolves.',
-            'For search and AI systems, this matters because governance-style language can be ambiguous. Cosmic Signature uses Cosmic Council terminology to describe protocol coordination while keeping legal and risk disclosures separate and explicit.',
+            'Hội đồng Vũ trụ cho người nắm giữ CST một cách để điều phối các thay đổi của giao thức theo quy tắc trên chuỗi. Trang Thay đổi điều phối và các trang ứng dụng liên quan hiển thị lịch sử thay đổi tham số để người đọc hiểu giao thức tiến hóa ra sao.',
+            'Với hệ thống tìm kiếm và AI, điều này quan trọng vì ngôn ngữ kiểu quản trị có thể mơ hồ. Cosmic Signature dùng thuật ngữ Hội đồng Vũ trụ để mô tả việc điều phối giao thức trong khi giữ các công bố pháp lý và rủi ro tách biệt và rõ ràng.',
           ],
         },
         ...answerabilitySections,
       ],
-      relatedLabels: ['Read how gestures work', 'Open the app'],
+      relatedLabels: ['Đọc cách nét bút vận hành', 'Mở ứng dụng'],
     },
     'anchoring-nfts': {
-      title: 'Anchoring Cosmic Signature NFTs | Cosmic Signature',
+      title: 'Neo giữ Cosmic Signature NFT | Cosmic Signature',
       description:
-        'How anchoring works for Cosmic Signature NFTs, ETH Anchor Distributions, and Random Walk NFT eligibility.',
-      h1: 'Anchoring Cosmic Signature NFTs',
+        'Cách neo giữ vận hành với Cosmic Signature NFT, phân phối neo giữ ETH và diện Tinh tuyển của Random Walk NFT.',
+      h1: 'Neo giữ Cosmic Signature NFT',
       summary:
-        'Anchoring connects NFTs back to the protocol: Cosmic Signature NFTs receive ETH Anchor Distributions, while RandomWalk NFTs enter Anchored-NFT Stellar Selection.',
+        'Neo giữ nối NFT trở lại với giao thức: Cosmic Signature NFT nhận phân phối neo giữ ETH, còn RandomWalk NFT thuộc diện Tinh tuyển NFT neo giữ.',
       sections: [
         {
-          heading: 'Anchor Distributions',
+          heading: 'Phân phối neo giữ',
           body: [
-            'Cosmic Signature NFTs can be anchored to the protocol. Anchored Cosmic Signature NFTs share the ETH Anchor Distribution for a cycle according to the protocol rules, and the accumulated ETH is retrieved when the anchor is released.',
-            'Random Walk NFTs have a separate anchoring role for Anchored-NFT Stellar Selection eligibility; they do not receive ETH Anchor Distributions.',
-            'Each NFT \u2014 Cosmic Signature or Random Walk \u2014 can be anchored only once. Releasing an anchor returns the NFT and any accumulated distributions, but that NFT can never be anchored again.',
+            'Cosmic Signature NFT có thể được neo giữ với giao thức. Cosmic Signature NFT đang neo giữ chia sẻ phân phối neo giữ ETH của một chu kỳ theo quy tắc giao thức, và ETH tích lũy được nhận về khi gỡ neo.',
+            'Random Walk NFT có vai trò neo giữ riêng để thuộc diện Tinh tuyển NFT neo giữ; chúng không nhận phân phối neo giữ ETH.',
+            'Mỗi NFT \u2014 Cosmic Signature hay Random Walk \u2014 chỉ được neo giữ đúng một lần. Gỡ neo trả lại NFT cùng mọi khoản phân phối đã tích lũy, nhưng NFT đó không bao giờ có thể neo giữ lại.',
           ],
         },
         {
-          heading: 'What Anchoring Makes Public',
+          heading: 'Neo giữ công khai điều gì',
           body: [
-            'Anchoring connects an NFT back to the protocol after it has been imprinted or acquired. Public anchoring pages show anchor and release actions, anchored token counts, distribution records, and related RandomWalk NFT activity.',
-            'This makes anchoring understandable as a public protocol mechanism rather than a private wallet-only feature. A crawler can see the purpose of the page and the kinds of records it contains before any client-side table hydrates.',
+            'Neo giữ nối một NFT trở lại với giao thức sau khi nó đã được khắc hoặc được sở hữu. Các trang neo giữ công khai hiển thị thao tác neo giữ và gỡ neo, số token đang neo giữ, bản ghi phân phối và hoạt động RandomWalk NFT liên quan.',
+            'Điều này khiến neo giữ dễ hiểu như một cơ chế công khai của giao thức thay vì một tính năng riêng tư chỉ dành cho ví. Một trình thu thập dữ liệu có thể thấy mục đích của trang và các loại bản ghi nó chứa trước khi bất kỳ bảng phía máy khách nào được nạp.',
           ],
         },
         {
-          heading: 'Cosmic Signature And RandomWalk Roles',
+          heading: 'Vai trò của Cosmic Signature và RandomWalk',
           body: [
-            'Cosmic Signature NFTs and RandomWalk NFTs have different anchoring contexts. Cosmic Signature NFTs connect to ETH Anchor Distributions, while RandomWalk NFTs can connect to selection eligibility and one-time ETH gesture discounts depending on their state.',
-            'The distinction matters for both users and crawlers. Pages should label token types clearly, avoid generic lockup language where possible, and point back to statistics, gallery, and current-cycle pages for broader context.',
+            'Cosmic Signature NFT và RandomWalk NFT có bối cảnh neo giữ khác nhau. Cosmic Signature NFT gắn với phân phối neo giữ ETH, còn RandomWalk NFT có thể gắn với diện được chọn và mức giảm chi phí nét bút ETH một lần tùy theo trạng thái của chúng.',
+            'Sự phân biệt này quan trọng với cả người dùng và trình thu thập dữ liệu. Các trang nên ghi nhãn loại token rõ ràng, tránh ngôn ngữ khóa tài sản chung chung khi có thể, và chỉ ngược về các trang thống kê, phòng trưng bày và chu kỳ hiện tại để có bối cảnh rộng hơn.',
           ],
         },
         ...answerabilitySections,
       ],
-      relatedLabels: ['Open anchoring tools', 'Explore the gallery'],
+      relatedLabels: ['Mở công cụ neo giữ', 'Khám phá phòng trưng bày'],
     },
     'protocol-guild-public-goods': {
-      title: 'Cosmic Signature and Ethereum Public Goods | Cosmic Signature',
+      title: 'Cosmic Signature và hàng hóa công của Ethereum | Cosmic Signature',
       description:
-        'How Cosmic Signature routes a public-goods allocation to Protocol Guild, the funding mechanism for Ethereum core contributors.',
-      h1: 'Cosmic Signature and Ethereum Public Goods',
+        'Cách Cosmic Signature chuyển một phần phân bổ hàng hóa công đến Protocol Guild, cơ chế tài trợ cho những người đóng góp cốt lõi cho Ethereum.',
+      h1: 'Cosmic Signature và hàng hóa công của Ethereum',
       summary:
-        'Cosmic Signature includes a public-goods allocation track that currently forwards a portion of each Cycle Reserve to Protocol Guild.',
+        'Cosmic Signature có một luồng phân bổ hàng hóa công, hiện chuyển một phần của mỗi Dự trữ chu kỳ đến Protocol Guild.',
       sections: [
         {
-          heading: 'Protocol Guild Allocation',
+          heading: 'Phân bổ cho Protocol Guild',
           body: [
-            'Protocol Guild is the funding mechanism for 170+ Ethereum core contributors. Cosmic Signature currently forwards the public-goods allocation to Protocol Guild.',
-            'This page exists so search engines and AI systems can understand that the public-goods allocation is part of the protocol design, not a side note hidden inside the app UI.',
+            'Protocol Guild là cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum. Cosmic Signature hiện chuyển phần phân bổ hàng hóa công đến Protocol Guild.',
+            'Trang này tồn tại để công cụ tìm kiếm và hệ thống AI hiểu rằng phân bổ hàng hóa công là một phần trong thiết kế giao thức, không phải một ghi chú phụ ẩn trong giao diện ứng dụng.',
           ],
         },
         {
-          heading: 'Why Public Goods Are Part Of The Protocol',
+          heading: 'Vì sao hàng hóa công là một phần của giao thức',
           body: [
-            'Public-goods forwarding is a protocol-level allocation track rather than an occasional marketing statement. A portion of the Cycle Reserve is directed to a public-goods beneficiary, currently Protocol Guild, according to the rules surfaced in the app.',
-            'This gives the public-goods pages a specific job: show contribution records, retrieval records, beneficiary context, and the relationship between cycle participation and Ethereum ecosystem support.',
+            'Việc chuyển tiếp hàng hóa công là một luồng phân bổ ở cấp giao thức chứ không phải một tuyên bố truyền thông thi thoảng. Một phần Dự trữ chu kỳ được chuyển đến một đơn vị thụ hưởng hàng hóa công, hiện là Protocol Guild, theo các quy tắc hiển thị trong ứng dụng.',
+            'Điều này cho các trang hàng hóa công một nhiệm vụ cụ thể: hiển thị bản ghi đóng góp, bản ghi nhận về, bối cảnh đơn vị thụ hưởng và mối quan hệ giữa việc tham gia chu kỳ và sự hỗ trợ hệ sinh thái Ethereum.',
           ],
         },
         {
-          heading: 'How To Verify Public-Goods Flow',
+          heading: 'Cách xác minh dòng hàng hóa công',
           body: [
-            'Use the public-goods contribution pages for deposited amounts and the retrieval page for funds forwarded from the vault. Use the contracts page for addresses and the statistics page for aggregate context.',
-            'The language should remain precise. Cosmic Signature can describe forwarding to public goods and Protocol Guild, but it should not imply tax treatment or special legal status beyond what the public records actually support.',
+            'Dùng các trang đóng góp hàng hóa công để xem số đã nạp và trang nhận về để xem các khoản được chuyển từ kho. Dùng trang hợp đồng để xem địa chỉ và trang thống kê để có bối cảnh tổng hợp.',
+            'Ngôn ngữ cần giữ chính xác. Cosmic Signature có thể mô tả việc chuyển tiếp đến hàng hóa công và Protocol Guild, nhưng không nên ngầm ý về cách xử lý thuế hay địa vị pháp lý đặc biệt vượt quá những gì bản ghi công khai thực sự chứng minh.',
           ],
         },
         ...answerabilitySections,
       ],
-      relatedLabels: ['View public-goods contribution records', 'Learn how cycles work'],
+      relatedLabels: ['Xem bản ghi đóng góp hàng hóa công', 'Tìm hiểu cách chu kỳ vận hành'],
     },
     'collecting-and-trading-cosmic-signature': {
-      title: 'Collecting and Trading Cosmic Signature NFTs and CST | Cosmic Signature',
+      title: 'Sưu tầm và giao dịch Cosmic Signature NFT và CST | Cosmic Signature',
       description:
-        'Where Cosmic Signature assets trade: the zero-fee Axiom Zero NFT marketplace, Uniswap CST swaps on Arbitrum, and the Chaos Zero prediction market for cycles.',
-      h1: 'Collecting and Trading Cosmic Signature',
+        'Nơi các tài sản Cosmic Signature được giao dịch: sàn NFT không thu phí Axiom Zero, hoán đổi CST trên Uniswap tại Arbitrum và thị trường dự đoán Chaos Zero cho các chu kỳ.',
+      h1: 'Sưu tầm và giao dịch Cosmic Signature',
       summary:
-        'Cosmic Signature NFTs trade on Axiom Zero, the zero-fee marketplace for fair-launch generative art on Arbitrum. CST trades on Uniswap, and Chaos Zero runs a prediction market on each Performance Cycle.',
+        'Cosmic Signature NFT được giao dịch trên Axiom Zero, sàn không thu phí dành cho nghệ thuật tạo sinh ra mắt công bằng trên Arbitrum. CST được giao dịch trên Uniswap, và Chaos Zero vận hành một thị trường dự đoán cho mỗi chu kỳ trình diễn.',
       sections: [
         {
-          heading: 'Where The Assets Trade',
+          heading: 'Các tài sản được giao dịch ở đâu',
           body: [
-            'Cosmic Signature NFTs are standard ERC-721 tokens on Arbitrum, and their primary marketplace is Axiom Zero. Axiom Zero is built for fair-launch generative art: it charges no platform fee, listings and sales settle directly on-chain in a single transaction, and sellers receive the full sale amount. The marketplace lists both Axiom Zero collections \u2014 Cosmic Signature and Random Walk \u2014 and reads every price it displays straight from verified marketplace contracts.',
-            'CST is a standard ERC-20 token and trades on Uniswap on Arbitrum. Because both assets follow open token standards, any Arbitrum marketplace or exchange that supports ERC-721 or ERC-20 can also handle them; always confirm contract addresses against the official contracts page before trading.',
+            'Cosmic Signature NFT là token ERC-721 tiêu chuẩn trên Arbitrum, và sàn chính của chúng là Axiom Zero. Axiom Zero được xây cho nghệ thuật tạo sinh ra mắt công bằng: không thu phí nền tảng, niêm yết và giao dịch bán được thanh toán trực tiếp trên chuỗi trong một giao dịch duy nhất, và người bán nhận trọn số tiền bán. Sàn liệt kê cả hai bộ sưu tập của Axiom Zero \u2014 Cosmic Signature và Random Walk \u2014 và đọc mọi mức giá hiển thị thẳng từ các hợp đồng sàn đã xác minh.',
+            'CST là token ERC-20 tiêu chuẩn và được giao dịch trên Uniswap tại Arbitrum. Vì cả hai tài sản đều theo các tiêu chuẩn token mở, bất kỳ sàn hay nơi trao đổi nào trên Arbitrum hỗ trợ ERC-721 hoặc ERC-20 cũng có thể xử lý chúng; luôn đối chiếu địa chỉ hợp đồng với trang hợp đồng chính thức trước khi giao dịch.',
           ],
         },
         {
-          heading: 'The Chaos Zero Prediction Market',
+          heading: 'Thị trường dự đoán Chaos Zero',
           body: [
-            'Chaos Zero is a prediction market built specifically for Cosmic Signature. Every Performance Cycle it opens a single question: will this cycle finalize with more gestures than the previous one? Positions are denominated in CST and are fully collateralized by construction \u2014 one CST always converts into one YES plus one NO token, and a matching pair always redeems for one CST.',
-            'Markets resolve from the public on-chain gesture count. The moment the count crosses the previous cycle\u2019s total, the outcome is certain, trading halts in the same block, and the market becomes withdraw-only. Chaos Zero has no owner, no admin keys, and no upgrade path.',
+            'Chaos Zero là thị trường dự đoán được xây riêng cho Cosmic Signature. Mỗi chu kỳ trình diễn nó mở một câu hỏi duy nhất: Chu kỳ này có hoàn tất với nhiều nét bút hơn chu kỳ trước không? Các vị thế được tính bằng CST và được bảo chứng đầy đủ theo thiết kế \u2014 một CST luôn chuyển thành một token YES cộng một token NO, và một cặp khớp nhau luôn đổi lại được một CST.',
+            'Thị trường được giải quyết từ số nét bút công khai trên chuỗi. Khoảnh khắc số nét bút vượt tổng của chu kỳ trước, kết quả là chắc chắn, giao dịch dừng ngay trong cùng khối, và thị trường chỉ còn cho phép rút vị thế. Chaos Zero không có chủ sở hữu, không có khóa quản trị và không có đường nâng cấp.',
           ],
         },
         {
-          heading: 'Anchor Status And Collector Context',
+          heading: 'Trạng thái neo giữ và bối cảnh sưu tầm',
           body: [
-            'Anchoring gives Cosmic Signature and Random Walk NFTs a second market-relevant property besides the artwork itself. Every NFT can be anchored to the protocol exactly once, ever, and releasing an anchor permanently ends that eligibility. A never-anchored token therefore keeps its one-time anchoring option open for its next owner, which is why collectors often value that status.',
-            'Axiom Zero reads anchor status live from the anchoring contracts and labels every token as never anchored or anchored, and each collection can be filtered by that status. This keeps the marketplace description of a token consistent with the on-chain anchoring records that the app itself displays.',
+            'Neo giữ cho Cosmic Signature và Random Walk NFT một thuộc tính thứ hai có ý nghĩa với thị trường ngoài chính tác phẩm. Mỗi NFT chỉ có thể được neo giữ với giao thức đúng một lần, và gỡ neo chấm dứt vĩnh viễn diện đó. Vì vậy một token chưa từng neo giữ vẫn giữ nguyên lựa chọn neo giữ một lần cho chủ sở hữu kế tiếp, đó là lý do nhà sưu tầm thường coi trọng trạng thái này.',
+            'Axiom Zero đọc trạng thái neo giữ trực tiếp từ các hợp đồng neo giữ và ghi nhãn mỗi token là chưa từng neo giữ hoặc đã neo giữ, và mỗi bộ sưu tập có thể lọc theo trạng thái đó. Điều này giữ cho mô tả của sàn về một token nhất quán với các bản ghi neo giữ trên chuỗi mà chính ứng dụng hiển thị.',
           ],
         },
         {
-          heading: 'How To Verify Venues And Addresses',
+          heading: 'Cách xác minh địa điểm và địa chỉ',
           body: [
-            'Before trading, confirm the official contract addresses on the app-host contracts page and compare them with the collection or token pair you are viewing on a marketplace or exchange. Cosmic Signature links its ecosystem venues \u2014 Axiom Zero, Chaos Zero, and Uniswap \u2014 from the app header, footer, and site map so there is always an official navigation path to the correct destination.',
-            'The same caution applies to CST swaps and prediction positions: check that the token address matches the published CST contract, and remember that Chaos Zero positions resolve from public gesture counts recorded by the protocol, so every input to the market can be independently inspected on Arbitrum.',
+            'Trước khi giao dịch, hãy xác nhận địa chỉ hợp đồng chính thức trên trang hợp đồng của máy chủ ứng dụng và so sánh với bộ sưu tập hoặc cặp token bạn đang xem trên sàn hay nơi trao đổi. Cosmic Signature liên kết các địa điểm trong hệ sinh thái \u2014 Axiom Zero, Chaos Zero và Uniswap \u2014 từ đầu trang, chân trang và sơ đồ trang của ứng dụng để luôn có một lộ trình điều hướng chính thức đến đúng đích.',
+            'Sự thận trọng tương tự áp dụng cho hoán đổi CST và vị thế dự đoán: kiểm tra địa chỉ token khớp với hợp đồng CST đã công bố, và nhớ rằng vị thế trên Chaos Zero được giải quyết từ số nét bút công khai do giao thức ghi lại, nên mọi đầu vào của thị trường đều có thể kiểm tra độc lập trên Arbitrum.',
           ],
         },
         ...answerabilitySections,
       ],
       relatedLabels: [
-        'Browse Cosmic Signature on Axiom Zero',
-        'Make predictions on Chaos Zero',
-        'Swap ETH for CST on Uniswap',
-        'Verify contract addresses',
-        'Explore the NFT gallery',
+        'Duyệt Cosmic Signature trên Axiom Zero',
+        'Đưa ra dự đoán trên Chaos Zero',
+        'Hoán đổi ETH sang CST trên Uniswap',
+        'Xác minh địa chỉ hợp đồng',
+        'Khám phá phòng trưng bày NFT',
       ],
     },
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
     'not-a-lottery-not-an-investment': {
-      title: 'Is Cosmic Signature a Lottery, Casino, or Investment? | Cosmic Signature',
+      title: 'Cosmic Signature có phải là xổ số, sòng bạc hay đầu tư? | Cosmic Signature',
       description:
-        'Cosmic Signature is a procedural on-chain art protocol, not a lottery, casino, gambling product, or investment product.',
-      h1: 'Is Cosmic Signature a Lottery, Casino, or Investment?',
+        'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi, không phải xổ số, sòng bạc, sản phẩm cờ bạc hay sản phẩm đầu tư.',
+      h1: 'Cosmic Signature có phải là xổ số, sòng bạc hay đầu tư?',
       summary:
-        'Cosmic Signature is a procedural on-chain art protocol. It is not a lottery, casino, gambling product, or investment product.',
+        'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi. Đây không phải xổ số, sòng bạc, sản phẩm cờ bạc hay sản phẩm đầu tư.',
       sections: [
         {
-          heading: 'Plain-Language Clarification',
+          heading: 'Giải thích bằng ngôn ngữ giản dị',
           body: [
-            'Participants make gestures during Performance Cycles. The protocol distributes allocations across defined tracks when a cycle finalizes. There is no house, no dealer, and no bet.',
-            'CST expresses participation and coordination weight within the protocol. It is not equity, profit share, dividend, or an investment contract. Cosmic Signature makes no representation about token price or future market behavior.',
+            'Người tham gia đặt nét bút trong các chu kỳ trình diễn. Giao thức phân phối phân bổ qua các luồng đã định nghĩa khi một chu kỳ hoàn tất. Không có nhà cái, không có người chia bài và không có cược.',
+            'CST biểu thị sự tham gia và trọng số điều phối trong giao thức. Nó không phải cổ phần, quyền hưởng lợi nhuận, cổ tức hay hợp đồng đầu tư. Cosmic Signature không đưa ra cam kết nào về giá token hay diễn biến thị trường tương lai.',
           ],
         },
         {
-          heading: 'Why The Denial Is Explicit',
+          heading: 'Vì sao lời phủ nhận được nêu rõ',
           body: [
-            'This page exists because search engines, AI systems, and compliance reviewers often need direct language about what a protocol is not. Cosmic Signature uses explicit denial wording so those systems can distinguish the protocol from gambling, casino, and investment-product categories.',
-            'The positive definition remains the anchor: Cosmic Signature is a procedural on-chain art protocol. Participants make gestures, cycles finalize, deterministic artwork is imprinted, and allocations follow public protocol rules.',
+            'Trang này tồn tại vì công cụ tìm kiếm, hệ thống AI và người rà soát tuân thủ thường cần ngôn ngữ trực tiếp về việc một giao thức không phải là gì. Cosmic Signature dùng cách diễn đạt phủ nhận rõ ràng để những hệ thống đó phân biệt giao thức với các hạng mục cờ bạc, sòng bạc và sản phẩm đầu tư.',
+            'Định nghĩa khẳng định vẫn là điểm tựa: Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi. Người tham gia đặt nét bút, chu kỳ hoàn tất, tác phẩm tất định được khắc, và phân bổ tuân theo các quy tắc công khai của giao thức.',
           ],
         },
         {
-          heading: 'How To Read Allocation Language',
+          heading: 'Cách đọc ngôn ngữ phân bổ',
           body: [
-            'Allocation language describes protocol distributions after a cycle finalizes. It does not describe profit share, dividend rights, equity, or promised financial return. Risk disclosures and terms should be read before participating.',
-            'The app keeps wallet actions separate from explanatory content so visitors can understand the protocol without connecting a wallet. That separation also helps crawlers extract the denial and definition from plain HTML.',
+            'Ngôn ngữ phân bổ mô tả các phân phối của giao thức sau khi một chu kỳ hoàn tất. Nó không mô tả quyền hưởng lợi nhuận, quyền hưởng cổ tức, cổ phần hay lợi nhuận tài chính được hứa hẹn. Nên đọc công bố rủi ro và điều khoản trước khi tham gia.',
+            'Ứng dụng giữ các hành động ví tách biệt với nội dung giải thích để khách truy cập có thể hiểu giao thức mà không cần kết nối ví. Sự tách biệt đó cũng giúp trình thu thập dữ liệu trích lời phủ nhận và định nghĩa từ HTML thuần.',
           ],
         },
         ...answerabilitySections,
       ],
-      relatedLabels: ['Read the Terms of Service', 'Read the FAQ'],
+      relatedLabels: ['Đọc Điều khoản dịch vụ', 'Đọc câu hỏi thường gặp'],
     },
     // lexicon-allow-end
   },

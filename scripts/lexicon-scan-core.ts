@@ -1088,7 +1088,6 @@ export const VI_BANNED_TERMS: readonly string[] = [
   'sinh lợi',
   'kiếm lời',
   'kiếm tiền',
-  'có lời',
   'thu lợi',
   'thu nhập',
   'cổ tức',
