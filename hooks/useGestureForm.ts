@@ -39,6 +39,11 @@ import { useNotify } from '@/hooks/useNotify';
 import { useRequireChain } from '@/hooks/useRequireChain';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@/utils/cstGesture';
+import {
+  LATE_GESTURE_CURVE_HEADROOM_PERCENT,
+  computeMaxLateGesturePrice,
+  resolveLateGesturePhase,
+} from '@/utils/lateBidPricing';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 
 export type { CstGestureData } from '@/utils/cstGesture';
@@ -478,11 +483,83 @@ export function useGestureForm() {
     }
   };
 
+  /**
+   * V3 late-gesture price cap for the given live quote, or null when the
+   * regular `gestureCostPlus` headroom should apply (V1/V2 deployment, no
+   * gestures in the cycle yet, outside the late-gesture window, or reads
+   * unavailable). See utils/lateBidPricing.ts for the policy.
+   */
+  const getLateGestureCap = async (
+    quotedPrice: bigint,
+    track: 'eth' | 'cst',
+  ): Promise<bigint | null> => {
+    if (!cstRewardToOutbidBidder) return null; // V1/V2: no late-gesture premium exists.
+    try {
+      const read = cosmicGameContract!.read;
+      // The premium only applies when the cycle has a last gesturer.
+      const lastGesturer = (await read.lastBidderAddress?.()) as string | undefined;
+      if (!lastGesturer || !lastGesturer.startsWith('0x') || BigInt(lastGesturer) === 0n) {
+        return null;
+      }
+      const [remaining, window] = await Promise.all([
+        read.getDurationUntilMainPrize?.() as Promise<bigint | undefined>,
+        read.getRoundLateBidDuration?.() as Promise<bigint | undefined>,
+      ]);
+      if (remaining === undefined || window === undefined) return null;
+      const phase = resolveLateGesturePhase(remaining, window);
+      if (phase === 'normal') return null;
+      if (phase === 'curve') {
+        // On the shallow part of the curve a bigger percentage is enough.
+        const plus = Math.max(gestureCostPlus, LATE_GESTURE_CURVE_HEADROOM_PERCENT);
+        return (quotedPrice * BigInt(Math.round((100 + plus) * 100))) / 10_000n;
+      }
+      // Last minute (or overdue): the cost can reach the full premium (~5× the
+      // premium-free base) before the transaction mines, so use the exact
+      // contract maximum. ETH overpayment is refunded in the same transaction;
+      // the CST limit is only a cap the contract never charges above.
+      const [premiumBaseMultiplier, premiumExponent, incrementMicroSeconds] = await Promise.all([
+        read.roundLateBidPricePremiumAmountBaseMultiplier?.() as Promise<bigint | undefined>,
+        read.roundLateBidPricePremiumAmountExponent?.() as Promise<bigint | undefined>,
+        read.mainPrizeTimeIncrementInMicroSeconds?.() as Promise<bigint | undefined>,
+      ]);
+      if (
+        premiumBaseMultiplier === undefined ||
+        premiumExponent === undefined ||
+        incrementMicroSeconds === undefined
+      ) {
+        return null;
+      }
+      // ETH exposes the premium-free base directly; for CST the live quote
+      // (base + current premium) over-approximates the base, which is safe
+      // because the limit is never charged, only compared against.
+      const basePrice =
+        track === 'eth'
+          ? (((await read.nextEthBidPrice?.()) as bigint | undefined) ?? quotedPrice)
+          : quotedPrice;
+      const cap = computeMaxLateGesturePrice({
+        basePrice,
+        roundLateBidDuration: window,
+        premiumBaseMultiplier,
+        mainPrizeTimeIncrementInMicroSeconds: incrementMicroSeconds,
+        premiumExponent,
+      });
+      // Never cap below the live quote (defensive; the max is ≥ any live price).
+      return cap > quotedPrice ? cap : quotedPrice;
+    } catch (e) {
+      reportError(e, 'late gesture price cap');
+      return null;
+    }
+  };
+
   const getNextEthGestureCostWithModifiers = async () => {
     const base = (await cosmicGameContract!.read.getNextEthBidPrice?.()) as bigint;
-    let price = (base * parseEther((100 + gestureCostPlus).toString())) / parseEther('100');
+    const lateCap = await getLateGestureCap(base, 'eth');
+    let price =
+      lateCap ?? (base * parseEther((100 + gestureCostPlus).toString())) / parseEther('100');
     if (gestureType === 'RandomWalk') {
-      price = (price * parseEther('50')) / parseEther('100');
+      // The contract charges ceil(price / 2) for RandomWalk gestures; round the
+      // late cap up so it still covers the charge at the exact maximum.
+      price = lateCap != null ? (price + 1n) / 2n : (price * parseEther('50')) / parseEther('100');
     }
     return price;
   };
@@ -813,9 +890,11 @@ export function useGestureForm() {
       // Apply the user's max-cost tolerance (same knob as ETH gestures). On V2 the CST cost
       // only declines between quote and confirmation, but inside the V3 late-gesture window it
       // rises every second — without headroom the transaction would revert on a stale quote.
+      // Near the deadline a percentage cannot keep up, so the V3 cap takes over there.
       // The contract charges the actual cost; the limit is only a cap.
+      const lateCap = await getLateGestureCap(quotedCstPrice, 'cst');
       const priceMaxLimit =
-        (quotedCstPrice * BigInt(Math.round((100 + gestureCostPlus) * 100))) / 10_000n;
+        lateCap ?? (quotedCstPrice * BigInt(Math.round((100 + gestureCostPlus) * 100))) / 10_000n;
       submittedCstPriceMaxLimit = priceMaxLimit;
 
       if (priceMaxLimit > 0n) {

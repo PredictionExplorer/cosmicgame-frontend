@@ -53,6 +53,10 @@ describe('invalidateLiveGameQueries', () => {
     expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(LIVE_GAME_QUERY_KEYS.length);
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['bidListByRound'] });
+    // Regression: the account-menu balances (userBalance) and win counts
+    // (userInfo) previously waited for their 30s poll after a gesture landed.
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['userBalance'] });
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['userInfo'] });
   });
 
   it('can defer the early-cycle special-recipient query', async () => {
