@@ -1,8 +1,8 @@
 {
   "page": {
     "title": "ETH 기여",
-    "subtitle": "Cosmic Signature 공공재 금고에 ETH를 직접 기여합니다",
-    "description": "우주 평의회의 조율을 거쳐 선정된 수령처를 뒷받침하기 위해 Cosmic Signature 공공재 금고에 ETH를 직접 기여할 수 있습니다. 기여에는 제목, 메시지, URL을 선택적으로 덧붙일 수 있습니다. 사이클별 상위 기여자는 홈 화면에 소개될 수 있습니다.",
+    "subtitle": "사이클 준비금에 ETH를 직접 기여합니다",
+    "description": "제스처를 남기지 않고 Cosmic Signature 사이클 준비금에 ETH를 직접 기여할 수 있습니다. 제목, 메시지, URL은 선택적으로 남길 수 있으며, 기여는 현재 사이클에 기록됩니다.",
     "formTitle": "기여하기",
     "amountLabel": "금액(ETH)",
     "informationLabel": "정보",
@@ -24,7 +24,7 @@
     "messagePlaceholder": "기여에 남길 메모를 입력해 주세요",
     "contributeWithMessage": "메시지 포함 기여",
     "contributeEth": "ETH 기여",
-    "structuredHelp": "선택 항목은 구조화된 JSON으로 저장되어 기여 상세 페이지에 표시됩니다."
+    "structuredHelp": "선택 항목에 입력한 내용은 기여 상세 페이지에 표시됩니다."
   },
   "detail": {
     "invalidId": "유효하지 않은 기여 ID",

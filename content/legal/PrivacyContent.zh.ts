@@ -8,9 +8,7 @@ export const privacyCopyZh = {
   lastUpdated: '最后更新：2026年7月20日',
   introductionTitle: '引言',
   introduction: [
-    // lexicon-allow-start: 忠实保留英文源文将产品称作区块链游戏的既有表述。
-    'Cosmic Signature 是构建在 Arbitrum（以太坊二层网络）上的去中心化区块链游戏。作为去中心化应用（dApp），我们在数据与隐私方面的运作方式不同于传统 Web 应用。',
-    // lexicon-allow-end
+    'Cosmic Signature 是构建在 Arbitrum（以太坊二层网络）上的程序化链上艺术协议。作为去中心化应用（dApp），我们在数据与隐私方面的运作方式不同于传统 Web 应用。',
     '本隐私政策说明我们如何处理与你使用 Cosmic Signature 有关的信息。使用本平台，即表示你同意我们按照本政策收集及使用信息。',
   ],
   sections: [
@@ -130,7 +128,7 @@ export const privacyCopyZh = {
     {
       id: 'changes',
       subtitle: '政策变更',
-      text: '我们可能不时更新本隐私政策。若有变更，我们会在本页面发布新版隐私政策并更新"最后更新"日期，以此通知你。建议定期查看本隐私政策，了解是否发生变更。',
+      text: '我们可能不时更新本隐私政策。若有变更，我们会在本页面发布新版隐私政策并更新“最后更新”日期，以此通知你。建议定期查看本隐私政策，了解是否发生变更。',
     },
     {
       id: 'contact',

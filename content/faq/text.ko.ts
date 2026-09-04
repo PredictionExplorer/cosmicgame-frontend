@@ -3,7 +3,10 @@ import { protocolFacts } from '@/content/protocol-facts';
 import type { FAQText } from './structure';
 
 /** protocolFacts stores the example gaps as English strings; render them in Korean. */
-const ELAPSED_KO: Record<string, string> = {
+const ELAPSED_KO: Record<
+  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
+  string
+> = {
   '0 seconds': '0초',
   '1 second': '1초',
   '60 seconds': '60초',
@@ -126,7 +129,7 @@ export const faqTextKo = {
       },
       'how-is-participation-cst-calculated': {
         question: '참여 CST는 어떻게 계산되나요?',
-        answer: `참여 CST는 이전 제스처 이후 흐른 시간에 제곱근 공식을 적용해 계산합니다: ${protocolFacts.dynamicCstRewardFormula}. 제곱근을 쓰는 이유는 긴 공백을 더 크게 반영하되, 양이 끝없이 선형으로 늘어나지는 않게 하기 위해서입니다. 출시 매개변수(시간 증가량 정확히 1시간) 기준의 예시는 대략 다음과 같습니다: ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_KO[example.elapsed] ?? example.elapsed}에 ${example.cst} CST`).join(', ')}. 시간 증가량은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어나므로, 실제 양은 시간이 지날수록 이 예시보다 조금씩 낮아집니다. 제스처가 반영되는 순간의 정확한 양은 앱의 실시간 미리 보기와 컨트랙트가 기준입니다.`,
+        answer: `참여 CST는 이전 제스처 이후 흐른 시간에 제곱근 공식을 적용해 계산합니다: ${protocolFacts.dynamicCstRewardFormula}. 제곱근을 쓰는 이유는 긴 공백을 더 크게 반영하되, 양이 끝없이 선형으로 늘어나지는 않게 하기 위해서입니다. 출시 매개변수(시간 증가량 정확히 1시간) 기준의 예시는 대략 다음과 같습니다: ${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_KO[example.elapsed]}에 ${example.cst} CST`).join(', ')}. 시간 증가량은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어나므로, 실제 양은 시간이 지날수록 이 예시보다 조금씩 낮아집니다. 제스처가 반영되는 순간의 정확한 양은 앱의 실시간 미리 보기와 컨트랙트가 기준입니다.`,
       },
       'why-minimum-cst-reward-protection': {
         question: '최소 참여 CST 보호란 무엇인가요?',
@@ -172,7 +175,7 @@ export const faqTextKo = {
       'what-if-two-gestures-same-time': {
         question: '두 제스처가 동시에 제출되면 어떻게 되나요?',
         answer:
-          'Arbitrum의 트랜잭션은 시퀀서가 포함한 순서대로 처리됩니다. 두 제스처가 같은 순간에 도착하면 먼저 확인된 것이 유효한 제스처가 됩니다.',
+          'Arbitrum 트랜잭션은 시퀀서가 포함한 순서대로 처리됩니다. 뒤의 제스처는 앞의 제스처가 반영된 상태에서 실행됩니다. 최대 비용과 최소 참여 CST 조건을 충족하면 뒤의 제스처도 실행되고, 충족하지 못하면 취소됩니다. 취소된 경우 미리 보기를 갱신한 뒤 다시 시도해 주세요.',
       },
       'is-there-game-theory': {
         question: 'Cosmic Signature에 전략적 요소가 있나요?',
@@ -212,7 +215,7 @@ export const faqTextKo = {
       },
       'is-nft-supply-limited': {
         question: 'Cosmic Signature NFT의 수는 제한되어 있나요?',
-        answer: `실질적으로 그렇습니다. 제스처마다 더해지는 시간은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어나므로 사이클은 점차 길어지고 NFT 각인 속도는 느려집니다. 컨트랙트에 고정된 공급 상한은 없지만, 느려지는 사이클 리듬 때문에 Cosmic Signature NFT는 시간이 갈수록 더 희귀해집니다.`,
+        answer: `컨트랙트에 고정된 공급 상한은 없습니다. 제스처마다 더해지는 시간은 사이클이 마감될 때마다 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% 늘어납니다. 이 구조로 사이클이 길어지는 경향이 생기고 NFT 각인 속도가 억제됩니다. 실제 각인 속도는 참여 상황에 따라서도 달라집니다.`,
       },
       'impact-of-limiting-nfts': {
         question: 'NFT 공급이 제한되면 어떤 영향이 있나요?',
@@ -258,7 +261,7 @@ export const faqTextKo = {
       'what-is-arbitrum': {
         question: 'Arbitrum이란 무엇이며, Cosmic Signature는 왜 Arbitrum에 배포되었나요?',
         answer:
-          'Arbitrum은 트랜잭션을 빠르게 하고 수수료를 낮추는 이더리움 레이어 2 롤업입니다. Cosmic Signature는 이더리움의 보안 보장을 유지하면서 1센트 미만의 가스 비용과 더 빠른 확정을 제공하기 위해 Arbitrum에 배포되었습니다.',
+          'Arbitrum은 이더리움을 기반으로 하는 레이어 2 롤업입니다. 처리 비용을 낮추고 트랜잭션을 효율적으로 처리하도록 설계되어, 제스처를 반복해서 남기는 Cosmic Signature에 적합합니다. 실제 가스 비용은 네트워크 혼잡도와 작업 내용에 따라 달라집니다.',
       },
       'why-arbitrum-not-ethereum': {
         question: '이더리움 메인넷이 아니라 왜 Arbitrum인가요?',
@@ -339,7 +342,7 @@ export const faqTextKo = {
       'why-was-cs-created': {
         question: 'Cosmic Signature는 왜 만들어졌나요?',
         answer:
-          'Cosmic Signature는 카오스 이론과 삼체 문제의 풀리지 않는 성질에 매혹된 데서 태어났습니다. 온체인 시드에서 생성되는 고유하고 결정론적인 아트라는 발상은 흥미로울 뿐 아니라 공공재를 지향하는 프로토콜에 잘 어울렸습니다.',
+          'Cosmic Signature는 카오스 이론과 삼체 문제의 복잡성에 대한 관심에서 시작되었습니다. 온체인 시드에서 생성되는 고유하고 결정론적인 아트라는 발상은 흥미로울 뿐 아니라 공공재를 지향하는 프로토콜에 잘 어울렸습니다.',
       },
       'what-if-team-disappears': {
         question: '팀이 사라지면 어떻게 되나요?',
@@ -359,7 +362,7 @@ export const faqTextKo = {
       'get-help': {
         question: '궁금한 점이 있을 때 어디에서 도움을 받을 수 있나요?',
         answer:
-          '커뮤니티와 지원팀은 Discord, X / Twitter, 그리고 연락처 페이지에 안내된 지원 이메일을 통해 만날 수 있습니다.',
+          'Discord, X / Twitter, 지원 이메일로 문의할 수 있습니다. 공식 링크와 이메일 주소는 ‘Cosmic Signature 소개’ 페이지에서 확인해 주세요.',
       },
       'stay-updated': {
         question: 'Cosmic Signature 소식은 어떻게 받아 볼 수 있나요?',

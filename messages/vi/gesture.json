@@ -1,7 +1,7 @@
 {
   "invalid": {
     "title": "Mã nét bút không hợp lệ",
-    "help": "Hãy dùng một mã định danh nét bút dạng số không âm trong URL."
+    "help": "Мã nét bút trong URL phải là số nguyên không âm."
   },
   "header": {
     "title": "Chi tiết nét bút",
@@ -11,7 +11,7 @@
   },
   "empty": {
     "title": "Không tìm thấy thông tin nét bút.",
-    "help": "Mã này có thể không hợp lệ hoặc nét bút chưa có trong chỉ mục hiện tại."
+    "help": "Mã nét bút có thể không hợp lệ hoặc dữ liệu chưa được cập nhật."
   },
   "sections": {
     "transaction": {
@@ -20,7 +20,7 @@
     },
     "cost": {
       "title": "Chi phí và CST tham gia",
-      "description": "Số tiền đã trả và CST tham gia được khắc bởi nét bút này."
+      "description": "Số tiền đã trả và lượng CST tham gia được khắc khi đặt nét bút."
     },
     "type": {
       "title": "Loại nét bút",
@@ -51,7 +51,7 @@
     "paidWithCst": "Thanh toán bằng CST (ERC-20):",
     "randomWalkId": "Mã RandomWalkNFT:",
     "erc20Address": "Địa chỉ token ERC-20 đính kèm:",
-    "erc20Amount": "Số lượng token ERC-20 đính kèm (ETH):",
+    "erc20Amount": "Số lượng token ERC-20 đính kèm:",
     "nftAddress": "Địa chỉ token NFT đính kèm:",
     "nftId": "Mã token NFT đính kèm:",
     "nftTokenUri": "URI token NFT:"

@@ -4,7 +4,7 @@
   },
   "jsonLd": {
     "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "プロシージャル・オンチェーンアート・プロトコルCosmic Signatureから生まれた、三体問題の物理からレンダリングされたユニークなジェネラティブNFT。",
+    "productDescription": "Cosmic Signatureから生まれたジェネラティブNFT。三体問題の物理シミュレーションが、一点ごとに異なる軌跡を描きます。",
     "breadcrumbToken": "トークン #{id}"
   },
   "breadcrumb": {
@@ -45,14 +45,14 @@
   },
   "transferDialog": {
     "title": "移転の確認",
-    "description": "送付先のアカウントにはトランザクション履歴がないようです。本当にこのアドレスへトークンを送りますか？もう一度ご確認ください。",
+    "description": "送付先アドレスにはトランザクション履歴が見つかりません。送付先に間違いがないか、もう一度確認してください。",
     "confirm": "はい、移転します"
   },
   "ownerActions": {
     "title": "トークンを管理する",
-    "titleTooltip": "現在の所有者として、このトークンをMetaMaskに表示したり、移転したり、任意の名前を付けたりできます。",
+    "titleTooltip": "このトークンの所有者は、名前の設定や送付、MetaMaskへの表示追加ができます。",
     "metaMaskHeading": "MetaMaskに表示",
-    "metaMaskTooltip": "MetaMaskブラウザー拡張機能にこのNFTの表示を求めます。NFTのインポートは実験的な機能で、MetaMask Mobileでは利用できません。",
+    "metaMaskTooltip": "MetaMaskのブラウザー拡張機能にこのNFTを追加します。NFTのインポートは実験的な機能で、MetaMask Mobileには対応していません。",
     "addToMetaMask": "NFTをMetaMaskに追加",
     "addingToMetaMask": "NFTをMetaMaskに追加しています…",
     "transferHeading": "移転",

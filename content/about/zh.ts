@@ -13,7 +13,7 @@ export const aboutContentZh = {
       'Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议，以演绎周期中的落笔生成确定性的三体 NFT 艺术。',
   },
   breadcrumbLabel: '关于',
-  eyebrow: '协议主页',
+  eyebrow: '关于协议',
   heading: '关于 Cosmic Signature',
   body: {
     paragraphs: [

@@ -52,7 +52,7 @@
       "live": {
         "badge": "Live on Arbitrum",
         "headline": "Shape the next Cosmic Signature",
-        "body": "Cosmic Signature is a live Performance Cycle where each Gesture leaves a visible trace, imprints Participation CST, and helps direct protocol reserves toward the Ethereum public goods that keep the network alive.",
+        "body": "Each gesture leaves a trace in the Performance Cycle, may imprint Participation CST, and helps direct protocol reserves to the public goods that sustain Ethereum.",
         "cta": "Make a Gesture"
       }
     },
@@ -217,7 +217,7 @@
     },
     "explainer": {
       "title": "New here? Read the cycle in 30 seconds.",
-      "body": "Wait for the cycle to open, make a Gesture once Gestures are available, and watch the finalization clock. Each Gesture helps shape the final Signature, can extend time, and updates who is in line for allocations. When time expires, the cycle finalizes and the reserve distributes on-chain.",
+      "body": "When a cycle opens, you can make a gesture and follow the finalization clock. Each gesture helps shape the final Signature, can extend the time, and updates allocation eligibility. Once time expires, the cycle can be finalized and its reserve distributed on-chain.",
       "faqLink": "Read the FAQ",
       "walkthroughLink": "See the full walkthrough",
       "dismissAria": "Dismiss cycle explainer"
@@ -232,7 +232,7 @@
     "metrics": {
       "signatureAllocation": "Signature Allocation",
       "signatureTooltip": {
-        "base": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT.",
+        "base": "The ETH portion of the Signature Allocation. The recipient also receives 1,000 CST and a Cosmic Signature NFT.",
         "withNft": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {nftCount, plural, one {the attached NFT} other {all # attached NFTs}}.",
         "withErc20": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}}.",
         "withBoth": "The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and {nftCount, plural, one {the attached NFT} other {all # attached NFTs}} and {erc20Count, plural, one {the attached ERC20 token deposit} other {all # attached ERC20 token deposits}}."
@@ -407,7 +407,7 @@
     "cards": {
       "signature": {
         "name": "Signature Allocation",
-        "tooltip": "The participant who made the Final Gesture when the countdown reaches zero may retrieve this allocation: ETH, 1,000 CST, a Cosmic Signature NFT, and attached tokens."
+        "tooltip": "After the countdown reaches zero, the participant who made the Final Gesture may finalize the cycle and retrieve this allocation: ETH, 1,000 CST, a Cosmic Signature NFT, and attached tokens."
       },
       "publicGoods": {
         "name": "Public Goods",
@@ -490,7 +490,7 @@
       "youChip": "You",
       "fullConsole": "Open the full gesture console",
       "chooseRwlkToken": "Pick your RandomWalk token in the full console below",
-      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry.",
+      "microcopy": "Each gesture extends the finalization clock, may imprint Participation CST, and adds a Stellar Selection entry.",
       "notifyAria": "Notify me before the cycle can finalize",
       "notifyLabel": "Alert me before finalization:",
       "notifyMinutes": "{minutes}m",
@@ -574,7 +574,7 @@
       "tooltip": "Who holds each competitive track of this cycle right now. Timers run live; standings lock in only when the cycle finalizes.",
       "youBadge": "You",
       "latestName": "Latest Gesture",
-      "latestTooltip": "The most recent participant. If the finalization clock reached zero right now, this address would receive the Signature Allocation.",
+      "latestTooltip": "The most recent participant. After the clock reaches zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation.",
       "held": "held {duration}",
       "record": "record {duration}",
       "awaitingGesture": "Awaiting the first Gesture",
@@ -613,7 +613,7 @@
       "openPanelAria": "Open the gesture panel"
     },
     "panel": {
-      "microcopy": "Each Gesture extends the finalization clock, imprints Participation CST, and counts as a Stellar Selection entry.",
+      "microcopy": "Each gesture extends the finalization clock, may imprint Participation CST, and adds a Stellar Selection entry.",
       "sheetTitle": "Make a Gesture"
     }
   },

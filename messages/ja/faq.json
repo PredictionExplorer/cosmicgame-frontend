@@ -3,7 +3,7 @@
     "badge": "ナレッジベース",
     "titlePrefix": "Cosmic Signature",
     "titleHighlight": "よくある質問",
-    "subtitle": "Cosmic Signatureについて知っておきたいことすべて——はじめの一歩から高度な仕組みまで。",
+    "subtitle": "初めての参加から詳しい仕組みまで、Cosmic Signatureの疑問に答えます。",
     "answerCount": "{count}件以上の回答",
     "answerCountTooltip": "Cosmic Signatureのあらゆる側面を網羅した詳しい回答です。",
     "categoryCount": "{count}カテゴリー",
@@ -40,8 +40,8 @@
     "clearAction": "検索をクリアしてください"
   },
   "contact": {
-    "heading": "まだ質問がありますか？",
-    "description": "お探しの答えが見つからない場合は、コミュニティがいつでも力になります。以下のいずれかのチャンネルからご連絡ください。できるだけ早くお返事します。",
+    "heading": "ほかに知りたいことはありますか？",
+    "description": "お探しの答えが見つからない場合は、以下のチャンネルでコミュニティにご相談ください。",
     "x": "Twitter / X",
     "discord": "Discord"
   },
@@ -52,7 +52,7 @@
     },
     "chronoWarrior": {
       "term": "時の戦士",
-      "content": "さらに希少な称号——持久チャンピオンの位置を最も長く連続して保った参加者です。"
+      "content": "持久チャンピオンの称号を最も長く連続して保持した参加者に与えられる称号です。"
     },
     "calibrationWindow": {
       "term": "調律期間",
@@ -64,7 +64,7 @@
     },
     "cst": {
       "term": "CST",
-      "content": "CSTトークン——一筆ごとに刻印されるERC-20トークンです。宇宙評議会で使われ、一筆の代替通貨にもなります。"
+      "content": "一筆を入れた際に刻印されることがあるERC-20トークンです。一筆の費用に使うほか、宇宙評議会の調整ウェイトにもなります。"
     },
     "erc20": {
       "term": "ERC-20",

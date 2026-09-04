@@ -19,7 +19,7 @@
   "featured": {
     "viewAria": "View Cosmic Signature {id}",
     "alt": "Cosmic Signature artwork {id}",
-    "emptyHint": "Real collection artwork appears here when indexed NFTs are available.",
+    "emptyHint": "Collection artwork appears here once it has loaded.",
     "badgeImprint": "Featured imprint",
     "badgeArchive": "Archive",
     "awaitingMetadata": "Awaiting metadata"

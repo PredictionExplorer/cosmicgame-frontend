@@ -71,7 +71,7 @@
   },
   "privacy": {
     "title": "プライバシー · Cosmic Signature",
-    "description": "Cosmic Signatureプロトコルの訪問者に対するプライバシーの取り扱い。"
+    "description": "Cosmic Signatureを利用する際の情報の収集、利用、保護について説明します。"
   },
   "pagePrivacy": {
     "title": "プライバシーポリシー | Cosmic Signature",
@@ -91,7 +91,7 @@
   },
   "tokenDetail": {
     "titleFor": "Cosmic Signature NFT #{id} | Cosmic Signature",
-    "descriptionFor": "Cosmic Signature NFT #{id}の属性と所有権の履歴——Arbitrum上でスペクトルレンダリングされた決定論的な三体NFT。"
+    "descriptionFor": "Cosmic Signature NFT #{id}の特性と所有権の履歴。三体問題の物理計算とスペクトルレンダリングから生まれた作品です。"
   },
   "gestureDetail": {
     "title": "一筆の情報 | Cosmic Signature",
@@ -139,15 +139,15 @@
   },
   "publicGoodsCgContributions": {
     "title": "プロトコルの公共財拠出 | Cosmic Signature",
-    "description": "Cosmic Signatureプロトコルから公共財の受け手への自動送付。サイクルごとに、サイクル準備金の一定の分が宇宙評議会を通じて公共財の支援に送られます。"
+    "description": "サイクル準備金から公共財金庫への自動送付を確認できます。資金は、設定されている公共財の受け手へ届けられます。"
   },
   "publicGoodsRetrievals": {
     "title": "公共財の受け取り | Cosmic Signature",
-    "description": "公共財金庫からの受け取り。サイクルごとに、サイクル準備金の一部が宇宙評議会の選んだ受け手のアドレスへ送られます。"
+    "description": "公共財金庫から、設定されている公共財の受け手へ送られた資金の履歴を確認できます。"
   },
   "publicGoodsVoluntary": {
     "title": "自発的な公共財拠出 | Cosmic Signature",
-    "description": "Cosmic Signatureコミュニティによる公共財金庫への自発的な拠出。拠出は、宇宙評議会の調整で選ばれた受け手を支えます。"
+    "description": "Cosmic Signatureコミュニティによる公共財金庫への拠出履歴です。拠出は、設定されている公共財の受け手を支えます。"
   },
   "allocationRetrieved": {
     "title": "受け取り済みの配分 | Cosmic Signature",
@@ -163,11 +163,11 @@
   },
   "ethContribution": {
     "title": "直接ETH拠出 | Cosmic Signature",
-    "description": "Cosmic Signature公共財金庫へETHを直接拠出し、拠出の完全な履歴を見る。プロトコルに参加しながら公共財を支える。"
+    "description": "一筆を入れずに、Cosmic Signatureのサイクル準備金へETHを直接拠出できます。公開された拠出履歴も確認できます。"
   },
   "ethContributionDetail": {
     "title": "直接ETH拠出の詳細 | Cosmic Signature",
-    "description": "Cosmic Signature公共財金庫への特定のETH拠出の詳細——拠出者アドレス、金額、サイクル、任意のメモ。"
+    "description": "サイクル準備金へのETH拠出の詳細です。拠出者アドレス、金額、サイクル、添えられたメモを確認できます。"
   },
   "ethContributionByCycle": {
     "title": "サイクル別の直接ETH拠出 | Cosmic Signature",
@@ -175,7 +175,7 @@
   },
   "myStatistics": {
     "title": "自分の統計 | Cosmic Signature",
-    "description": "Cosmic Signatureの「自分の統計」ページで実績を追う。詳しい一筆の履歴、係留の状態、配分などを確認し、オンチェーンプロトコルへの参加を最適化する。"
+    "description": "一筆の履歴、係留の状態、受け取った配分など、Cosmic Signatureでの活動を詳しく確認できます。"
   },
   "myTokens": {
     "title": "自分のNFT | Cosmic Signature",
@@ -260,13 +260,13 @@
       },
       "hard": {
         "title": "上級クイズ | Cosmic Signature",
-        "description": "Cosmic Signatureの細部と設計の解剖に関する50問：期限切れ後の意味論、防御的な設計、アップグレードの歴史、アートパイプライン。"
+        "description": "Cosmic Signatureの設計を掘り下げる50問。期限が過ぎた後の動作、安全性を高める設計、アップグレードの歴史、アートパイプラインを扱います。"
       }
     }
   },
   "howItWorks": {
     "title": "Cosmic Signatureの仕組み | パフォーマンス・サイクル、一筆、NFT",
-    "description": "Cosmic Signatureのパフォーマンス・サイクルがどう進むかを学ぶ——調律期間から一筆、そして最終的な配分の分配まで。"
+    "description": "調律期間から一筆、確定と配分まで、Cosmic Signatureのパフォーマンス・サイクルを順に解説します。"
   },
   "riskDisclosures": {
     "title": "Cosmic Signatureリスク開示 | \u6295\u8cc7\u5546\u54c1ではありません",

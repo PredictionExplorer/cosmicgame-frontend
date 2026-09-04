@@ -29,6 +29,7 @@ import {
   checkSourceNamespace,
   compareContent,
   compareNamespace,
+  flattenMessages,
   isPlainObject,
   strictProblems,
   type Messages,
@@ -104,7 +105,12 @@ for (const namespaceFile of enNamespaces) {
     readNamespace(DEFAULT_LOCALE, namespaceFile),
     getLocaleConfig(DEFAULT_LOCALE).intlLocale,
   );
-  const problems = [...report.syntaxErrors, ...report.pluralGaps];
+  const problems = [
+    ...report.empty.map((key) => `empty: ${key}`),
+    ...report.invalidValues.map((key) => `not a string: ${key}`),
+    ...report.syntaxErrors,
+    ...report.pluralGaps,
+  ];
   if (problems.length) {
     console.log(`  ${DEFAULT_LOCALE}/${namespace}: ${problems.length} source problem(s)`);
     for (const problem of problems) console.log(`      · ${problem}`);
@@ -124,7 +130,7 @@ for (const locale of TRANSLATED_LOCALES) {
     const source = readNamespace(DEFAULT_LOCALE, namespaceFile);
 
     if (!localeNamespaces.has(namespaceFile)) {
-      const size = Object.keys(source).length;
+      const size = flattenMessages(source).size;
       console.log(`  ${locale}/${namespace}: MISSING FILE (${size} keys fall back)`);
       localeTotal += size;
       localeMissing += size;
@@ -138,17 +144,18 @@ for (const locale of TRANSLATED_LOCALES) {
       translation: readNamespace(locale, namespaceFile),
       intlLocale,
     });
-    const translated = report.total - report.missing.length - report.empty.length;
+    const populated =
+      report.total - report.missing.length - report.empty.length - report.invalidValues.length;
     localeTotal += report.total;
-    localeMissing += report.missing.length + report.empty.length;
+    localeMissing += report.missing.length + report.empty.length + report.invalidValues.length;
     localeIdentical += report.identical.length;
 
     const problems = strictProblems(report);
     if (isStrict(namespace) && problems.length > 0) failures += 1;
 
-    const pct = report.total === 0 ? 100 : Math.round((translated / report.total) * 100);
+    const pct = report.total === 0 ? 100 : Math.round((populated / report.total) * 100);
     console.log(
-      `  ${locale}/${namespace}: ${translated}/${report.total} translated (${pct}%)` +
+      `  ${locale}/${namespace}: ${populated}/${report.total} populated (${pct}%)` +
         (report.identical.length ? ` — ${report.identical.length} identical to source` : '') +
         (report.untranslated ? ' — UNTRANSLATED' : '') +
         (problems.length ? ` — ${problems.length} problem(s)` : ''),
@@ -160,7 +167,7 @@ for (const locale of TRANSLATED_LOCALES) {
   const done = localeTotal - localeMissing;
   const pct = localeTotal === 0 ? 100 : Math.round((done / localeTotal) * 100);
   console.log(
-    `\n  ${locale} TOTAL: ${done}/${localeTotal} (${pct}%), ${localeIdentical} identical to source\n`,
+    `\n  ${locale} TOTAL: ${done}/${localeTotal} populated (${pct}%), ${localeIdentical} identical to source\n`,
   );
 
   const extraNamespaces = [...localeNamespaces].filter((file) => !enNamespaces.includes(file));
@@ -181,14 +188,14 @@ for (const locale of TRANSLATED_LOCALES) {
     const translated = report.total - report.identical.length;
     const areaPct = report.total === 0 ? 100 : Math.round((translated / report.total) * 100);
     console.log(
-      `  ${locale} content/${area}: ${translated}/${report.total} translated (${areaPct}%)` +
+      `  ${locale} content/${area}: ${translated}/${report.total} different from source (${areaPct}%)` +
         (report.identical.length ? ` — ${report.identical.length} identical to source` : '') +
         (report.untranslated ? ' — UNTRANSLATED' : ''),
     );
     if (report.untranslated && flags.strict && flags.strictNamespaces.length === 0) failures += 1;
   }
   console.log(
-    `\n  ${locale} CONTENT: ${contentTotal - contentIdentical}/${contentTotal} translated, ${contentIdentical} identical to source\n`,
+    `\n  ${locale} CONTENT: ${contentTotal - contentIdentical}/${contentTotal} different from source, ${contentIdentical} identical to source\n`,
   );
 }
 
@@ -197,3 +204,4 @@ if (flags.strict && failures > 0) {
   process.exit(1);
 }
 console.log('✅  i18n parity report complete');
+console.log('Coverage and source differences do not measure translation accuracy or fluency.');

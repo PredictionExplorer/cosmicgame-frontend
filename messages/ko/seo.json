@@ -2,7 +2,7 @@
   "publicData": {
     "common": {
       "unavailable": "확인 불가",
-      "lastUpdated": "최근 업데이트: {date}. 데이터 출처: {source}. 아래 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색 엔진과 AI 크롤러를 위해 초기 HTML에 담겨 있습니다.",
+      "lastUpdated": "최종 업데이트: {date}. 데이터 출처: {source}.",
       "relatedPagesAria": "{heading} 관련 페이지"
     },
     "routes": {
@@ -100,7 +100,7 @@
       "eth-contribution": {
         "eyebrow": "직접 ETH 기여 · Arbitrum",
         "heading": "직접 ETH 기여",
-        "description": "Cosmic Signature 공공재 금고에 직접 기여된 ETH와 함께 공개 메모, 사이클, 기여자 기록을 둘러볼 수 있습니다.",
+        "description": "사이클 준비금에 직접 기여된 ETH와 함께 남긴 메모, 해당 사이클, 기여자 기록을 확인할 수 있습니다.",
         "source": "Cosmic Signature 공개 기여 API",
         "links": {
           "protocol": "프로토콜 공공재 기여",
@@ -166,7 +166,7 @@
       "named-nfts": {
         "eyebrow": "이름 붙인 NFT · Arbitrum",
         "heading": "이름 붙인 Cosmic Signature NFT",
-        "description": "소유자가 직접 이름을 붙인 Cosmic Signature NFT를 둘러볼 수 있습니다. 토큰의 정체성, 갤러리 탐색, 온체인 컬렉션 이력이 하나로 이어집니다.",
+        "description": "소유자가 직접 이름을 붙인 Cosmic Signature NFT를 둘러볼 수 있습니다. 작품을 감상하고 온체인에 기록된 이력을 살펴보세요.",
         "source": "Cosmic Signature 공개 토큰 API",
         "links": {
           "gallery": "전체 갤러리 둘러보기",
@@ -259,7 +259,7 @@
       "public-goods-contributions-voluntary": {
         "eyebrow": "자발적 공공재 기여 · Arbitrum",
         "heading": "자발적 공공재 기여",
-        "description": "Cosmic Signature 커뮤니티의 자발적 공공재 기여를 사이클 맥락, 기여자 기록과 함께 둘러볼 수 있습니다.",
+        "description": "Cosmic Signature 커뮤니티의 자발적 공공재 기여를 해당 사이클과 기여자 기록별로 살펴볼 수 있습니다.",
         "source": "Cosmic Signature 공개 공공재 API",
         "links": {
           "direct": "직접 ETH 기여 보기",
@@ -325,7 +325,7 @@
   "currentCycleSummary": {
     "eyebrow": "진행 중인 퍼포먼스 사이클 · Arbitrum",
     "heading": "현재 Cosmic Signature 퍼포먼스 사이클",
-    "description": "이 페이지는 진행 중인 Cosmic Signature 퍼포먼스 사이클을 추적합니다. 공개 제스처 수, 사이클 준비금 현황, 첨부 자산, 배분 경로, 마감 상태를 담고 있으며, 아래 대화형 콘솔은 실시간 앱 데이터로 채워집니다.",
+    "description": "진행 중인 사이클의 제스처 수, 준비금, 첨부 자산, 배분 경로, 마감 상태를 확인할 수 있습니다. 최신 데이터는 아래 화면에 표시됩니다.",
     "unavailable": "확인 불가",
     "cards": {
       "cycle": "사이클",

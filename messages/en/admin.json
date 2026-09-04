@@ -44,7 +44,7 @@
       "timeIncrease": "Time increase",
       "allocationTimeout": "Timeout to retrieve Signature Allocation",
       "priceIncrease": "Price increase",
-      "nanosecondsExtra": "Nano seconds extra",
+      "nanosecondsExtra": "Additional nanoseconds",
       "initialAllocationSeconds": "Initial seconds until Signature Allocation",
       "initialGestureCostFraction": "Initial Gesture Cost fraction",
       "activationTime": "Activation time",
@@ -59,16 +59,16 @@
   },
   "outreachTransfer": {
     "title": "CST Outreach Transfer",
-    "subtitle": "URL-only transfer tool for the configured outreach reserve wallet signer.",
+    "subtitle": "Send CST allocations from the Outreach Reserve treasurer wallet.",
     "roleReadError": "Unable to read the outreach reserve owner and treasurer.",
     "walletRequiredTitle": "Wallet not connected",
-    "walletRequiredDescription": "Connect the current outreach reserve treasurer wallet to pay CST rewards.",
-    "walletUnavailableTitle": "Marketing wallet unavailable",
-    "walletUnavailableDescription": "The dashboard has not provided a marketing wallet address yet.",
+    "walletRequiredDescription": "Connect the current Outreach Reserve treasurer wallet to send CST allocations.",
+    "walletUnavailableTitle": "Outreach Reserve wallet unavailable",
+    "walletUnavailableDescription": "The Outreach Reserve wallet address is not available yet.",
     "rolesLoadingTitle": "Loading outreach reserve roles",
-    "rolesLoadingDescription": "Reading the MarketingWallet owner and treasurer from the contract.",
+    "rolesLoadingDescription": "Reading the Outreach Reserve owner and treasurer from the contract.",
     "rolesErrorTitle": "Unable to read outreach reserve roles",
     "restrictedTitle": "Access restricted",
-    "restrictedDescription": "Connect the current outreach reserve treasurer ({treasurer}) to use this URL-only transfer tool. Owner: {owner}."
+    "restrictedDescription": "Connect the current Outreach Reserve treasurer wallet ({treasurer}) to use this form. Owner: {owner}."
   }
 }

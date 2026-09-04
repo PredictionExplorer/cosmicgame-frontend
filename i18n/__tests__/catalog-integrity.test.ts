@@ -34,6 +34,8 @@ describe('source catalogs', () => {
     );
     expect(report.syntaxErrors).toEqual([]);
     expect(report.pluralGaps).toEqual([]);
+    expect(report.empty).toEqual([]);
+    expect(report.invalidValues).toEqual([]);
   });
 });
 

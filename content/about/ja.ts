@@ -13,11 +13,11 @@ export const aboutContentJa = {
       'Cosmic Signatureは、パフォーマンス・サイクルの一筆から決定論的な三体NFTアートを生成するArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。',
   },
   breadcrumbLabel: '概要',
-  eyebrow: 'エンティティのホーム',
+  eyebrow: 'プロトコルの紹介',
   heading: 'Cosmic Signatureについて',
   body: {
     paragraphs: [
-      'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。各パフォーマンス・サイクルの間、参加者はETHまたはCSTで一筆を入れ、その一つひとつが最終的なシグネチャー——オンチェーンのデータから生成され、三体問題の物理シミュレーションを通してレンダリングされる決定論的なNFTアートワーク——を形づくります。',
+      'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。参加者がETHまたはCSTで一筆を入れるたびに、そのサイクルのシグネチャーが形づくられます。シグネチャーは、オンチェーンのデータと三体問題の物理シミュレーションから生まれる決定論的なNFT作品です。',
       'このプロトコルは、公開され検証可能な仕組みを軸に設計されています。Arbitrumのスマートコントラクトが一筆、サイクル、配分トラック、CST、係留、NFTの刻印を記録します。アートワークはシードから再現でき、プロジェクトはオープンソースのコード、CC0のアート、公共財の支援を重視しています。',
       'Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。オンチェーンアートのプロトコルとアプリです。',
     ],
@@ -27,7 +27,7 @@ export const aboutContentJa = {
     // lexicon-allow-end
   },
   officialResources: {
-    heading: '公式リソース',
+    heading: '公式情報',
     links: [
       { id: 'app', label: 'Cosmic Signatureアプリ', href: ABOUT_RESOURCE_HREFS.app },
       {
@@ -35,7 +35,7 @@ export const aboutContentJa = {
         label: '検証済みのArbitrumコントラクト',
         href: ABOUT_RESOURCE_HREFS.contracts,
       },
-      { id: 'code', label: 'ソースコードのリソース', href: ABOUT_RESOURCE_HREFS.code },
+      { id: 'code', label: 'ソースコード', href: ABOUT_RESOURCE_HREFS.code },
       { id: 'x', label: 'X / Twitter', href: ABOUT_RESOURCE_HREFS.x },
       { id: 'discord', label: 'Discord', href: ABOUT_RESOURCE_HREFS.discord },
       { id: 'github', label: 'GitHub', href: ABOUT_RESOURCE_HREFS.github },

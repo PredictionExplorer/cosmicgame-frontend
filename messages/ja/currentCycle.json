@@ -11,7 +11,7 @@
   },
   "hero": {
     "title": "サイクル{n}",
-    "subtitle": "{date}に開始 • {count, plural, other {{count}筆}}の一筆",
+    "subtitle": "{date}に開始・{count, plural, other {{count}筆}}",
     "status": {
       "openingSoon": "まもなく開始",
       "awaitingFirstGesture": "最初の一筆を待っています",
@@ -31,8 +31,8 @@
       "finalizesTooltip": "このタイマーがゼロになると、最後の一筆を入れた参加者がサイクルを確定してシグネチャー配分を受け取れます。新しい一筆はそれぞれタイマーを延ばします。",
       "readyTitle": "サイクルは確定できる状態です",
       "readyMessage": "確定までの時計がゼロになりました。",
-      "confirmingTitle": "最後の瞬間を確認中",
-      "confirmingMessage": "時計がゼロになりました。サイクルを確定する前に、最後の一瞬に入った一筆がないかチェーンを確認しています。"
+      "confirmingTitle": "確定直前の一筆を確認中",
+      "confirmingMessage": "カウントダウンがゼロになりました。直前の一筆で確定時刻が延びていないか、チェーン上で確認しています。"
     }
   },
   "stats": {
@@ -112,7 +112,7 @@
   },
   "showcase": {
     "badge": "シグネチャー配分に含まれます",
-    "heading": "このサイクルに添付されたボーナスアセット",
+    "heading": "このサイクルに添付されたアセット",
     "cycleFallback": "現在",
     "description": {
       "nftOnly": "シグネチャー配分とともに移るコミュニティ添付アセットの簡潔な受領証です。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFTすべて}}を受け取ります。",
@@ -120,7 +120,7 @@
       "mixed": "シグネチャー配分とともに移るコミュニティ添付アセットの簡潔な受領証です。サイクル{cycle}が確定すると、最後の一筆の参加者が{nftCount, plural, other {添付された{nftCount}点のNFT}}と{erc20Count, plural, other {添付された{erc20Count}件のERC-20トークン添付分}}のすべてを受け取ります。"
     },
     "bonusReceipt": {
-      "label": "ボーナス受領証",
+      "label": "追加アセットの内訳",
       "nftOnly": "{nftCount, plural, other {ERC-721トークン{nftCount}点}}",
       "erc20Only": "{erc20Count, plural, other {ERC-20添付分{erc20Count}件}}",
       "mixed": "{nftCount, plural, other {ERC-721トークン{nftCount}点}} + {erc20Count, plural, other {ERC-20添付分{erc20Count}件}}"

@@ -98,10 +98,10 @@ describe('CTBalanceDistributionChart', () => {
     expect(items).toHaveLength(3);
   });
 
-  it('labels marketing wallet address as Marketing Wallet', () => {
+  it('labels marketing wallet address as Outreach Wallet', () => {
     const list = [createEntry('0xMarketingWallet', 500)];
     render(<CTBalanceDistributionChart list={list} />);
-    expect(screen.getByText(/Marketing Wallet/)).toBeInTheDocument();
+    expect(screen.getByText(/Outreach Wallet/)).toBeInTheDocument();
   });
 
   it('groups entries beyond DISPLAY_LIMIT into Others', () => {

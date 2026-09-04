@@ -10,7 +10,7 @@ export const securityCopyJa: TrustPageCopy = {
     {
       heading: 'セキュリティモデル',
       paragraphs: [
-        'プロトコルの操作はArbitrumのスマートコントラクトに記録されます。公開ページは、ウォレットを接続したり一筆を入れたりする前に、利用者とクローラーがコントラクトアドレス、ソースコードのリソース、検証の背景、運用上の前提を調べられるようにするべきです。',
+        'プロトコルの操作はArbitrumのスマートコントラクトに記録されます。ウォレットを接続して一筆を入れる前に、公開ページでコントラクトアドレス、ソースコード、検証範囲、運用上の前提を確認できます。',
       ],
       bullets: [
         '公式アプリ`https://app.cosmicsignature.com/`を使う。',
@@ -39,7 +39,7 @@ export const securityCopyJa: TrustPageCopy = {
         {
           kind: 'app',
           href: '/risk-disclosures',
-          label: 'リスク開示と参加者向けの明確化',
+          label: 'リスク開示と参加にあたっての注意事項',
         },
       ],
     },

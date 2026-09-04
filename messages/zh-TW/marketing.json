@@ -60,7 +60,7 @@
     "showingOne": "共 <strong>{count}</strong> 筆分配",
     "showingOther": "共 <strong>{count}</strong> 筆分配",
     "emptyTitle": "暫無推廣分配",
-    "emptyDescription": "推廣行動透過驗證並完成撥付後，紀錄會顯示在這裡。"
+    "emptyDescription": "推廣行動通過驗證並完成撥付後，紀錄會顯示在這裡。"
   },
   "cta": {
     "title": "準備參與推廣？",
@@ -68,7 +68,7 @@
     "contact": "聯絡推廣團隊",
     "contactTooltip": "聯絡團隊，了解推廣機會與分配規則。",
     "infoAria": "檢視聯絡推廣團隊的說明",
-    "infoTooltip": "團隊會協助準備推廣材料，並說明不同推廣行動對應的分配檔位。"
+    "infoTooltip": "團隊會協助準備推廣素材，並說明各類推廣行動的分配標準。"
   },
   "address": {
     "invalid": "以太坊地址無效",

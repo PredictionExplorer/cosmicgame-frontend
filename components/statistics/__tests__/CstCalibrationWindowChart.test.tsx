@@ -155,7 +155,7 @@ describe('CstCalibrationWindowView', () => {
   it('renders the legend for all three gesture types and the explainer', () => {
     render(<CstCalibrationWindowView gestures={gestures} isLive />);
 
-    expect(screen.getByText('ETH + RandomWalk gesture (shortens)')).toBeInTheDocument();
+    expect(screen.getByText('ETH + Random Walk gesture (shortens)')).toBeInTheDocument();
     expect(screen.getAllByText('CST gesture (lengthens)').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Every ETH gesture shortens the window/)).toBeInTheDocument();
   });
@@ -164,7 +164,7 @@ describe('CstCalibrationWindowView', () => {
     render(<CstCalibrationWindowView gestures={legacyGestures} isLive />);
 
     expect(
-      screen.getByText(/No per-gesture Calibration Window data for this round/),
+      screen.getByText(/No per-gesture Calibration Window data for this cycle/),
     ).toBeInTheDocument();
     expect(screen.queryByTestId('composed-chart')).not.toBeInTheDocument();
   });
@@ -184,7 +184,7 @@ describe('CstCalibrationWindowChart', () => {
   it('asks the user to select a round when none is chosen', () => {
     render(<CstCalibrationWindowChart round={-1} isLive={false} />);
 
-    expect(screen.getByText('Select a round to inspect.')).toBeInTheDocument();
+    expect(screen.getByText('Select a cycle to inspect.')).toBeInTheDocument();
   });
 
   it('shows a spinner while the gesture list loads', () => {
@@ -237,46 +237,46 @@ describe('CstCalibrationWindowSection round picker', () => {
   it('starts on the live round', () => {
     render(<CstCalibrationWindowSection currentRoundNum={5} />);
 
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(5);
-    expect(screen.getByText('Live round')).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
+    expect(screen.getByText('Live cycle')).toBeInTheDocument();
   });
 
   it('follows the live round when it advances', () => {
     const { rerender } = render(<CstCalibrationWindowSection currentRoundNum={5} />);
     rerender(<CstCalibrationWindowSection currentRoundNum={6} />);
 
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(6);
-    expect(screen.getByText('Live round')).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(6);
+    expect(screen.getByText('Live cycle')).toBeInTheDocument();
   });
 
   it('keeps a user-pinned round when the live round advances', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<CstCalibrationWindowSection currentRoundNum={5} />);
 
-    await user.click(screen.getByRole('button', { name: 'Previous round' }));
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(4);
+    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
 
     rerender(<CstCalibrationWindowSection currentRoundNum={6} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(4);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
   });
 
   it('resumes following live after "Jump to live"', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<CstCalibrationWindowSection currentRoundNum={5} />);
 
-    await user.click(screen.getByRole('button', { name: 'Previous round' }));
+    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
     await user.click(screen.getByRole('button', { name: 'Jump to live' }));
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(5);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
 
     rerender(<CstCalibrationWindowSection currentRoundNum={7} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(7);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(7);
   });
 
   it('accepts a typed round number, clamped to the valid range', async () => {
     const user = userEvent.setup();
     render(<CstCalibrationWindowSection currentRoundNum={5} />);
 
-    const input = screen.getByRole('spinbutton', { name: 'Round number' });
+    const input = screen.getByRole('spinbutton', { name: 'Cycle number' });
     await user.clear(input);
     await user.type(input, '3');
     expect(input).toHaveValue(3);
@@ -284,9 +284,9 @@ describe('CstCalibrationWindowSection round picker', () => {
 
   it('follows a late-arriving dashboard round (initial -1)', () => {
     const { rerender } = render(<CstCalibrationWindowSection currentRoundNum={-1} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(0);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(0);
 
     rerender(<CstCalibrationWindowSection currentRoundNum={4} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(4);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
   });
 });

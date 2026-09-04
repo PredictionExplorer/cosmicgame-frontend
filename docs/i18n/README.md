@@ -564,6 +564,24 @@ i18n:check`). The same checks run under jest in
 
 ## 8. Translation workflow (per string, per page)
 
+Catalog coverage is not an editorial quality score. The parity report counts populated
+entries and exact matches with English; neither proves accuracy or natural phrasing.
+Shared names and units may remain identical, while a fully populated catalog can still
+contain literal translations or untranslated event names. The integrity gate also checks
+raw-message lists, rejects non-string leaves, and rejects whitespace in place of prose.
+
+Write for the person using the page. Operational messages should say what happened and
+what to do next. Keep implementation details such as hydration, crawler indexing, and
+internal data-table names out of reader-facing copy. Explain protocol terms in natural
+sentences instead of translating English metaphors word for word. Review Chinese regional
+variants independently: character conversion cannot distinguish a software application
+from applying a reduction, or a table row from a column.
+
+Editorial changes must preserve the underlying rule: an expired countdown permits
+finalization; it does not execute it. Participation CST can be zero. Carrying a reserve
+forward does not guarantee growth. Check these distinctions in labels, tooltips, quizzes,
+articles, and downloadable documents as well as the main explanation.
+
 ```mermaid
 flowchart LR
   extract["Extract: replace hardcoded string with t() key + en catalog entry"]
@@ -605,7 +623,7 @@ flowchart LR
 npm run dev
 # dApp:    http://localhost:3000/zh   http://localhost:3000/zh-TW   http://localhost:3000/zh-HK   http://localhost:3000/uk   http://localhost:3000/ko   http://localhost:3000/ja
 # landing: http://cosmicsignature.local:3000/zh-TW   (see lib/hostRouting.ts for /etc/hosts setup)
-npm run i18n:parity                    # per-locale report: catalogs (translated %, identical-to-source, problems) and long-form content
+npm run i18n:parity                    # per-locale report: populated entries, source matches, integrity problems, and long-form content
 npm run i18n:check                     # i18n:strict + i18n:conventions + terminology:check + lexicon:scan (pre-push runs this)
 npm run i18n:scaffold -- --locale ja   # every per-locale file for a new language, then the compiler lists the registries
 npm run i18n:derive -- --from zh --to zh-TW   # bootstrap a sibling-script draft (never ships as-is)

@@ -1,8 +1,8 @@
 {
   "page": {
     "title": "ETH Contributions",
-    "subtitle": "Contribute ETH directly to the Cosmic Signature Public Goods Vault",
-    "description": "Contribute ETH directly to the Cosmic Signature Public Goods Vault to support beneficiaries selected through Cosmic Council coordination. You can include an optional title, message, and URL with your contribution. Top contributors for each cycle may be featured on the home page.",
+    "subtitle": "Contribute ETH directly to the Cycle Reserve",
+    "description": "Add ETH to the Cycle Reserve without making a gesture. You can include an optional note with your contribution, which is recorded for the active cycle.",
     "formTitle": "Make a Contribution",
     "amountLabel": "Amount (ETH)",
     "informationLabel": "Information",

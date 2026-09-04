@@ -32,7 +32,7 @@ export const mediumQuestionsTextKo = {
       c: '사이클이 마감될 때까지 그대로입니다.',
       d: `더 많은 활동을 끌어들이기 위해 ${protocolFacts.ethGestureCostStepUpPercent}% 내려갑니다.`,
     },
-    explanation: `첫 제스처 뒤로는 ETH 제스처마다 다음 ETH 제스처 비용이 ${protocolFacts.ethGestureCostStepUpPercent}%에 1 wei를 더한 만큼 올라가므로, 비용은 언제나 커집니다. 행동하기 전에 누구든 컨트랙트에서 현재 비용을 읽을 수 있습니다. 놀랄 일은 없고, 올라가는 계단만 있습니다.`,
+    explanation: `첫 제스처 뒤로는 ETH 제스처마다 다음 ETH 제스처 비용이 ${protocolFacts.ethGestureCostStepUpPercent}%에 1 wei를 더한 만큼 올라가므로, 비용은 언제나 커집니다. 행동하기 전에 누구든 컨트랙트에서 현재 비용을 읽을 수 있습니다. 비용이 오르는 방식이 정해져 있어 미리 확인할 수 있습니다.`,
     funFact:
       '덧붙이는 1 wei에는 이유가 있습니다. 비용이 너무 작아 백분율이 0으로 반올림되는 경우에도 엄격한 증가를 보장합니다.',
     referenceLabel: '백서 §4.1 — ETH 제스처',
@@ -47,7 +47,7 @@ export const mediumQuestionsTextKo = {
       d: '공공재로 전달됩니다.',
     },
     explanation:
-      '더스트 기준값을 넘는 초과 지불은 같은 트랜잭션에서 환불됩니다. 기준값 아래에서는 환불에 드는 가스가 돌려받는 금액보다 크기 때문에 차액이 준비금에 남습니다. 벌칙이 아니라, 참여자를 배려해 의도적으로 정한 경계선입니다.',
+      '더스트 기준값을 넘는 초과 지불은 같은 트랜잭션에서 환불됩니다. 기준값 아래에서는 환불에 드는 가스가 돌려받는 금액보다 크기 때문에 차액이 준비금에 남습니다. 소액 환불의 가스 비용이 환불액보다 커지는 일을 막기 위한 기준입니다.',
     referenceLabel: '백서 §4.1 — ETH 제스처',
   },
   'cst-window-restart': {
@@ -65,25 +65,24 @@ export const mediumQuestionsTextKo = {
     prompt:
       '프로토콜이 오랫동안 조용했고 CST 보정 구간이 완전히 지났습니다. 지금은 어떤 상태인가요?',
     options: {
-      a: 'CST 제스처 비용이 거의 0입니다. CST 잔액이 조금이라도 있는 사람은 누구나 사이클을 연장할 수 있습니다.',
+      a: 'CST 제스처 비용은 0입니다. 실행에는 현재 사이클 규칙이 적용되며 가스 비용이 별도로 필요합니다.',
       b: '사이클이 저절로 마감됩니다.',
       c: 'ETH 제스처가 들어올 때까지 CST 제스처가 비활성화됩니다.',
       d: 'CST 비용이 상한까지 올라 있습니다.',
     },
     explanation:
-      '하강은 0에 이를 수 있고, 이는 의도된 설계입니다. CST를 조금이라도 가진 사람이면 누구든 언제나 사이클을 연장할 수 있다는 보장입니다. 사이클은 결코 저절로 마감되지 않습니다. 마감은 언제나 누군가가 보내는 트랜잭션입니다.',
+      'CST 보정 구간이 모두 지나면 CST 제스처 비용은 0이 됩니다. 그래도 현재 사이클의 실행 조건을 충족해야 하며, 가스 비용은 별도로 듭니다. 비용이 0이라는 사실만으로 제스처 실행이나 시간 연장이 보장되지는 않습니다. 사이클 마감에도 별도의 트랜잭션이 필요합니다.',
     referenceLabel: '백서 §4.3 — CST 제스처',
   },
   'window-feedback-loop': {
-    prompt:
-      'ETH 제스처가 사이클에 한바탕 몰아칩니다. CST 보정 구간의 지속 시간에는 어떤 영향이 있나요?',
+    prompt: 'ETH 제스처가 연달아 들어옵니다. CST 보정 구간의 길이는 어떻게 달라지나요?',
     options: {
       a: `ETH 제스처마다 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%씩 짧아져서, CST 비용이 더 빨리 내려가고 CST 제스처가 더 일찍 매력적인 선택이 됩니다.`,
       b: `ETH 제스처마다 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%씩 길어져서 CST 하강이 느려집니다.`,
       c: '아무 영향도 없습니다. 두 통화는 서로 독립적입니다.',
       d: '구간이 원래 지속 시간으로 재설정됩니다.',
     },
-    explanation: `구간의 지속 시간은 실시간으로 변하는 매개변수이자 프로토콜의 조용한 피드백 루프 가운데 하나입니다. ETH 제스처는 구간을 건당 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄이고, CST 제스처는 건당 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다. ETH 활동이 활발하면 CST 하강이 빨라지고, CST 활동이 활발하면 다시 느려집니다. 그렇게 모든 사이클을 균형 잡힌 조합 쪽으로 슬며시 밀어 줍니다.`,
+    explanation: `구간 길이는 참여 상황에 따라 변하며, ETH와 CST 사용을 조정하는 요소로 작동합니다. ETH 제스처는 구간을 건당 약 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% 줄이고, CST 제스처는 건당 약 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% 늘립니다. ETH 활동이 활발하면 CST 하강이 빨라지고, CST 활동이 활발하면 다시 느려집니다. 이 구조를 통해 ETH와 CST 사용량의 변화가 서로의 비용에 반영됩니다.`,
     referenceLabel: '백서 §4.3 — CST 제스처',
   },
   'participation-cst-timing': {
@@ -97,7 +96,7 @@ export const mediumQuestionsTextKo = {
     },
     explanation: `참여 CST는 직전 제스처 이후 흐른 시간의 제곱근에 따라 커집니다. 1초 뒤에 들어온 제스처는 거의 아무것도 각인하지 못하고(약 ${oneSecondExample.cst} CST), 하루의 침묵을 끝낸 제스처는 수백 CST를 각인합니다(약 ${oneDayExample.cst} CST). 제스처마다 고정 ${cst(100)} CST를 주던 것은 원래 V1의 규칙이었습니다. 이 규칙은 기계 속도의 연속 제스처를 대가 없는 CST로 바꿔 버렸고, 바로 그래서 V2가 이를 대체했습니다.`,
     funFact:
-      '의미 있는 CST를 각인하는 유일한 길은 기다림입니다. 매초 제스처를 쏟아 내는 봇이 각인하는 양은 사실상 0입니다.',
+      '참여 CST는 이전 제스처와의 간격이 길수록 많아집니다. 아주 짧은 간격으로 반복해 남긴 제스처의 참여 CST는 거의 0입니다. 공로 CST와 홍보 준비금에는 별도의 각인 규칙이 적용됩니다.',
     referenceLabel: '백서 §7.1 — 각인 규칙',
   },
   'cst-max-cost-protection': {
@@ -115,7 +114,7 @@ export const mediumQuestionsTextKo = {
   },
   'endurance-definition': {
     prompt:
-      'Ari가 한산한 오후에 제스처를 남기고, 열 시간 내리 아무도 그 자리를 밀어내지 않습니다. 이 사이클에서 가장 긴 공백입니다. Ari는 어떤 칭호를 바라볼 수 있나요?',
+      'Ari가 제스처를 남긴 뒤 열 시간 동안 새로운 제스처가 없었습니다. 이 사이클에서 가장 긴 선두 유지 기록입니다. 현재 Ari는 어떤 칭호의 대상인가요?',
     options: {
       a: '수호 챔피언. 가장 긴 구간 동안 끊기지 않고 최근 제스처의 자리를 지켰기 때문입니다.',
       b: '시간의 전사. 칭호를 가장 오래 유지했기 때문입니다.',
@@ -128,7 +127,7 @@ export const mediumQuestionsTextKo = {
   },
   'chrono-definition': {
     prompt:
-      '앞 문항에서 Ari가 세운 열 시간 기록이 Bea가 깨기 전까지 이틀 더 유지됩니다. 시간의 전사 경로는 무엇을 재나요?',
+      'Ari가 열 시간의 선두 유지 기록을 세우고, Bea가 이를 경신하기 전까지 이틀 동안 수호 챔피언 자리를 지켰습니다. 시간의 전사 경로는 무엇을 측정하나요?',
     options: {
       a: '수호 챔피언 칭호를 끊기지 않고 가장 오래 유지한 사람입니다. Ari가 기록을 지킨 이틀은 Ari의 몫으로 셈해집니다.',
       b: '다른 참여자의 제스처 뒤에 가장 빨리 반응하는 사람입니다.',
@@ -136,7 +135,7 @@ export const mediumQuestionsTextKo = {
       d: '사이클의 최종 제스처를 남기는 사람입니다.',
     },
     explanation:
-      '수호 챔피언 경로는 만들어 낸 공백을 측정하고, 시간의 전사 경로는 그 기록이 얼마나 오래 살아남았는지를 측정합니다. Ari의 선두 유지 구간은 열 시간이었지만 수호 챔피언으로 있던 기간은 이틀이었고, 시간의 전사 경로가 셈하는 것은 바로 그 기간입니다. 둘 다 마감 시점에야 확정됩니다.',
+      '수호 챔피언 경로는 만들어 낸 공백을 측정하고, 시간의 전사 경로는 그 기록이 얼마나 오래 유지되었는지를 측정합니다. Ari의 선두 유지 구간은 열 시간이었지만 수호 챔피언으로 있던 기간은 이틀이었고, 시간의 전사 경로가 셈하는 것은 바로 그 기간입니다. 둘 다 마감 시점에야 확정됩니다.',
     referenceLabel: '백서 §5.2 — 수호 챔피언과 시간의 전사',
   },
   'eth-selection-count': {
@@ -158,7 +157,7 @@ export const mediumQuestionsTextKo = {
       c: `${cst(protocolFacts.outreachReserveCst)} CST를 받으며, 1건이 선정됩니다.`,
       d: `NFT 1개만 받으며, ${protocolFacts.typicalNftsPerCycle}건이 선정됩니다.`,
     },
-    explanation: `NFT 별빛 선정은 자격 ${protocolFacts.nftStellarSelectionRecipients}건을 선정하고, 각 건에는 ${cst(protocolFacts.specialAllocationCst)} CST와 NFT 1개가 딸려 갑니다. 공로 CST는 언제나 NFT와 함께 움직입니다. 마감 시 이루어지는 모든 NFT 배분은 둘을 짝지어 전달합니다.`,
+    explanation: `NFT 별빛 선정은 자격 ${protocolFacts.nftStellarSelectionRecipients}건을 선정하고, 각 건에는 ${cst(protocolFacts.specialAllocationCst)} CST와 NFT 1개가 딸려 갑니다. 공로 CST는 해당 NFT와 함께 배분됩니다. 마감 시 이루어지는 모든 NFT 배분은 둘을 짝지어 전달합니다.`,
     referenceLabel: '백서 §5.1 — 마감 시 배분',
   },
   'draws-with-replacement': {

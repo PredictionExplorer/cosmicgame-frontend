@@ -219,10 +219,10 @@ Fix, then re-run `npm run i18n:check`.
 > **Cosmic Signatureは宝くじですか？**
 > いいえ。Cosmic Signatureのパフォーマンス・サイクルは、公開されたオンチェーンのアート・パフォーマンス
 > です。すべての一筆は記録された行為であり、すべての配分はプロトコルによって事前に定められ、
-> シグネチャーは記録された一筆から決定論的に刻印されます。帽子から引くものは何もありません。
+> シグネチャーは記録された一筆から決定論的に刻印されます。結果は、公開されたプロトコルのルールに従って決まります。
 
 Notes: 宝くじ appears only because this is denial copy (inside a `lexicon-allow` pragma in
 the module); the question is a full-width ？ with no space before it; いいえ。 opens the
 answer as a complete sentence; 一筆 / 配分 / シグネチャー / 刻印 are the glossary terms; the
-final idiom is re-created, not transliterated; no space separates Cosmic Signature from the
+English idiom is replaced with a direct explanation of how the result is determined; no space separates Cosmic Signature from the
 particle は.

@@ -12,11 +12,11 @@
   "seo": {
     "eyebrow": "源代碼 · 確定性藝術",
     "heading": "Cosmic Signature 源代碼",
-    "description": "Cosmic Signature 公開確定性藝術流水線的源代碼資源；這套流水線將鏈上種子轉換為三體 NFT 藝術。下方客戶端查看器支援互動，本段服務端渲染摘要則讓抓取工具無需等待 JavaScript 即可讀取核心事實。",
+    "description": "查看 Cosmic Signature 確定性藝術管線的源代碼，了解鏈上種子如何透過三體模擬生成 NFT 圖像。",
     "excerpt": "種子 -> SHA3-256 隨機流 -> 三體模擬 -> 光譜渲染器 -> Cosmic Signature NFT 圖像",
     "relatedAria": "源代碼相關頁面",
     "links": {
-      "ipfs": "打開已發佈的 IPFS 源代碼製品",
+      "ipfs": "查看 IPFS 上已發佈的源代碼",
       "github": "打開 GitHub 組織",
       "contracts": "查看已驗證合約",
       "security": "閱讀安全說明",

@@ -2,7 +2,7 @@
   "loadingAria": "Đang tải phân bổ truyền thông",
   "hero": {
     "title": "Nhận phân bổ CST khi <highlight>lan tỏa câu chuyện</highlight>",
-    "description": "Giới thiệu Cosmic Signature và nhận phân phối CST cho mỗi hoạt động truyền thông đã được xác minh.",
+    "description": "Giới thiệu Cosmic Signature và nhận phân bổ CST cho hoạt động truyền thông được xác minh.",
     "learnHow": "Tìm hiểu cách thức"
   },
   "stats": {
@@ -14,12 +14,12 @@
       "tooltip": "Tổng số token CST đã chuyển cho mọi người đóng góp truyền thông kể từ khi ra mắt"
     },
     "activeContributors": {
-      "label": "Người đóng góp truyền thông đang hoạt động",
+      "label": "Người tham gia truyền thông",
       "tooltip": "Số địa chỉ ví riêng biệt đã nhận phân bổ truyền thông"
     },
     "transactions": {
       "label": "Giao dịch phân bổ",
-      "tooltip": "Tổng số lần chi trả phân bổ riêng lẻ đã được xử lý"
+      "tooltip": "Tổng số giao dịch phân bổ đã xử lý"
     }
   },
   "howItWorks": {
@@ -34,7 +34,7 @@
         "tooltip": "Tạo nội dung, chia sẻ liên kết giới thiệu, viết bài blog hoặc làm video về Cosmic Signature để đủ điều kiện."
       },
       "verify": {
-        "title": "Được xác minh",
+        "title": "Xác minh hoạt động",
         "description": "Đội ngũ xem xét và xác minh hoạt động giới thiệu của bạn.",
         "tooltip": "Đội ngũ truyền thông đánh giá độ lan tỏa, chất lượng và tính xác thực của hoạt động giới thiệu trước khi duyệt phân bổ."
       },
@@ -46,10 +46,10 @@
     }
   },
   "leaderboard": {
-    "title": "Người truyền thông hàng đầu",
-    "infoAria": "Thông tin về người truyền thông hàng đầu",
+    "title": "Người đóng góp nổi bật",
+    "infoAria": "Thông tin về người đóng góp nổi bật",
     "tooltip": "Xếp hạng theo tổng CST đã nhận từ các hoạt động truyền thông",
-    "empty": "Chưa có người truyền thông nào.",
+    "empty": "Chưa có người tham gia truyền thông.",
     "rewardCountOne": "{count} lần phân bổ",
     "rewardCountOther": "{count} lần phân bổ"
   },
@@ -59,12 +59,12 @@
     "tooltip": "Nhật ký đầy đủ theo thời gian của mọi lần phân phối truyền thông",
     "showingOne": "Đang hiển thị <strong>{count}</strong> lần phân bổ",
     "showingOther": "Đang hiển thị <strong>{count}</strong> lần phân bổ",
-    "emptyTitle": "Chưa có phân bổ nào được phân phối",
-    "emptyDescription": "Các phân bổ sẽ xuất hiện ở đây khi hoạt động truyền thông được xác minh và chi trả."
+    "emptyTitle": "Chưa có phân bổ",
+    "emptyDescription": "Các khoản phân bổ sẽ xuất hiện tại đây sau khi hoạt động truyền thông được xác minh và CST được chuyển."
   },
   "cta": {
     "title": "Sẵn sàng đóng góp?",
-    "description": "Tham gia chương trình truyền thông và nhận phân phối CST khi giới thiệu Cosmic Signature đến thế giới.",
+    "description": "Tham gia chương trình truyền thông, giới thiệu Cosmic Signature và nhận phân bổ CST.",
     "contact": "Liên hệ đội ngũ truyền thông",
     "contactTooltip": "Liên hệ để trao đổi về cơ hội giới thiệu và cấu trúc phân bổ",
     "infoAria": "Thông tin về việc liên hệ đội ngũ truyền thông",
@@ -78,7 +78,7 @@
   },
   "transferForm": {
     "title": "Chi CST phân bổ",
-    "description": "Gọi hàm `payReward` của hợp đồng Dự trữ truyền thông. Ví đang kết nối phải là thủ quỹ hiện tại.",
+    "description": "Chuyển CST từ Dự trữ truyền thông. Ví đang kết nối phải là ví thủ quỹ hiện tại.",
     "reserveLabel": "Dự trữ truyền thông",
     "availableLabel": "CST khả dụng",
     "ownerLabel": "Chủ sở hữu",

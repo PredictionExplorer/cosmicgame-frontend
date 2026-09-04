@@ -30,15 +30,15 @@
       "finalizesIn": "Chu kỳ hoàn tất sau",
       "finalizesTooltip": "Khi bộ đếm này về không, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ Signature. Mỗi nét bút mới kéo dài bộ đếm.",
       "readyTitle": "Chu kỳ sẵn sàng hoàn tất",
-      "readyMessage": "Đồng hồ hoàn tất đã về không.",
-      "confirmingTitle": "Đang xác nhận khoảnh khắc cuối",
-      "confirmingMessage": "Đồng hồ đã về không. Đang kiểm tra chuỗi xem có nét bút nào ở giây cuối trước khi chu kỳ có thể hoàn tất."
+      "readyMessage": "Đếm ngược hoàn tất đã về không.",
+      "confirmingTitle": "Đang kiểm tra trạng thái chu kỳ",
+      "confirmingMessage": "Đếm ngược đã về 0. Đang kiểm tra xem có nét bút nào vừa được ghi nhận trên chuỗi trước khi cho phép hoàn tất chu kỳ."
     }
   },
   "stats": {
     "totalGestures": {
       "label": "Tổng số nét bút",
-      "tooltip": "Tổng số nét bút đã đặt trong chu kỳ này. Mỗi nét bút cũng là một lượt thuộc diện Tinh tuyển."
+      "tooltip": "Tổng số nét bút trong chu kỳ này. Mỗi nét bút ghi nhận thêm một lượt Tinh tuyển."
     },
     "cycleReserve": {
       "label": "Dự trữ chu kỳ",
@@ -94,7 +94,7 @@
   "rules": {
     "howItWorks": "Cách hoạt động",
     "participation": "Khi đặt nét bút, bạn có thể khắc <em>CST tham gia động</em>. Số lượng tính theo công thức căn bậc hai dựa trên khoảng thời gian kể từ nét bút trước.",
-    "calibration": "Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng {decreasePercent}%; nét bút CST kéo dài nó khoảng {increasePercent}%.",
+    "calibration": "Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng {decreasePercent}%; nét bút CST kéo dài cửa sổ này khoảng {increasePercent}%.",
     "stellarSelection": "Mỗi nét bút ghi nhận một lượt Tinh tuyển. {ethEntries} lượt nhận {rafflePercent}% Dự trữ chu kỳ. {nftEntries} người nhận Tinh tuyển khác và {anchorHolders} người neo giữ Random Walk NFT nhận một Cosmic Signature NFT.",
     "publicGoods": "Protocol Guild nhận {percent}% Dự trữ chu kỳ (ít nhất {amount} ETH) mỗi chu kỳ."
   },
@@ -112,15 +112,15 @@
   },
   "showcase": {
     "badge": "Nằm trong phân bổ Signature",
-    "heading": "Tài sản bổ sung đính kèm chu kỳ này",
+    "heading": "Tài sản đính kèm trong chu kỳ này",
     "cycleFallback": "hiện tại",
     "description": {
-      "nftOnly": "Biên nhận gọn cho các tài sản cộng đồng đính kèm đi cùng phân bổ Signature. Người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} khi chu kỳ #{cycle} hoàn tất.",
-      "erc20Only": "Biên nhận gọn cho các tài sản cộng đồng đính kèm đi cùng phân bổ Signature. Người đặt nét bút cuối cùng nhận {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}} khi chu kỳ #{cycle} hoàn tất.",
-      "mixed": "Biên nhận gọn cho các tài sản cộng đồng đính kèm đi cùng phân bổ Signature. Người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}} khi chu kỳ #{cycle} hoàn tất."
+      "nftOnly": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}}.",
+      "erc20Only": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}.",
+      "mixed": "Tài sản cộng đồng đính kèm thuộc phân bổ Signature. Khi chu kỳ #{cycle} hoàn tất, người đặt nét bút cuối cùng nhận {nftCount, plural, other {toàn bộ {nftCount} NFT đính kèm}} và {erc20Count, plural, other {toàn bộ {erc20Count} khoản nạp token ERC-20 đính kèm}}."
     },
     "bonusReceipt": {
-      "label": "Biên nhận bổ sung",
+      "label": "Tài sản bổ sung",
       "nftOnly": "{nftCount, plural, other {{nftCount} token ERC-721}}",
       "erc20Only": "{erc20Count, plural, other {{erc20Count} khoản nạp ERC-20}}",
       "mixed": "{nftCount, plural, other {{nftCount} token ERC-721}} + {erc20Count, plural, other {{erc20Count} khoản nạp ERC-20}}"
@@ -136,9 +136,9 @@
       "recipientRuleValue": "Nét bút cuối cùng"
     },
     "remainder": {
-      "nftOnly": "Đang hiển thị bản xem trước biên nhận nổi bật. Còn {nftCount, plural, other {{nftCount} NFT đính kèm khác}} trong chi tiết chu kỳ đầy đủ.",
-      "erc20Only": "Đang hiển thị bản xem trước biên nhận nổi bật. Còn {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}} trong chi tiết chu kỳ đầy đủ.",
-      "mixed": "Đang hiển thị bản xem trước biên nhận nổi bật. Còn {nftCount, plural, other {{nftCount} NFT đính kèm khác}} và {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}} trong chi tiết chu kỳ đầy đủ."
+      "nftOnly": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {nftCount, plural, other {{nftCount} NFT đính kèm khác}}.",
+      "erc20Only": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}}.",
+      "mixed": "Đang hiển thị một số tài sản. Trang chi tiết chu kỳ còn có {nftCount, plural, other {{nftCount} NFT đính kèm khác}} và {erc20Count, plural, other {{erc20Count} khoản nạp token ERC-20 đính kèm khác}}."
     },
     "nftCard": {
       "badge": "ERC-721",
@@ -161,11 +161,11 @@
     },
     "erc20Card": {
       "badge": "Khoản nạp ERC-20",
-      "badgeTooltipLogo": "Logo từ {source}; hãy xác minh địa chỉ token trước khi gán giá trị.",
+      "badgeTooltipLogo": "Logo từ {source}. Hãy kiểm tra địa chỉ token trước khi đánh giá giá trị.",
       "badgeTooltipDefault": "Khoản nạp token ERC-20 này được đính kèm vào chu kỳ và sẽ về tay người nhận phân bổ Signature khi hoàn tất.",
       "symbolFallback": "ERC20",
       "nameFallback": "Token ERC20 đính kèm",
-      "logoSourceFallback": "siêu dữ liệu token đã tuyển chọn",
+      "logoSourceFallback": "nguồn siêu dữ liệu token đã chọn",
       "unknownAmount": "Số lượng không xác định",
       "viewToken": "Xem token {symbol}",
       "logoAlt": "Logo token {token}"

@@ -67,15 +67,15 @@
       "webPageName": "Cosmic Signatureプロトコル統計",
       "webPageDescription": "パフォーマンス・サイクルの状態、一筆、NFT、CST、係留、準備金、配分データを含む、Arbitrum上のCosmic Signatureプロトコルの公開統計。",
       "datasetName": "Cosmic Signatureプロトコル統計スナップショット",
-      "datasetDescription": "ArbitrumのスマートコントラクトとCosmic Signature APIからインデックスされた、Cosmic Signatureプロトコルの公開活動のクロール可能な要約。"
+      "datasetDescription": "ArbitrumスマートコントラクトとCosmic Signature APIの記録に基づく、プロトコルの公開活動の集計です。"
     },
     "seo": {
       "eyebrow": "プロトコル統計 · Arbitrum",
       "heading": "Cosmic Signatureプロトコル統計",
-      "description": "このページは、パフォーマンス・サイクルの状態、一筆、Cosmic Signature NFT、CST、係留、準備金、配分データを含む、Arbitrum上のCosmic Signatureプロトコルの公開活動を追います。下の対話型テーブルはアプリのライブデータで更新されますが、この要約は検索エンジンとAIクローラー向けに最初のHTMLに含まれています。",
+      "description": "Arbitrum上の公開記録に基づくプロトコル統計です。サイクルの状態、一筆、NFT、CST、係留、準備金、配分の推移を確認できます。",
       "lastUpdated": "最終更新：{date}",
-      "unavailableSuffix": "。ライブデータは一時的に利用できないため、このページはプロトコルの説明的な文脈を表示しています。",
-      "dataSource": "データは、プロトコルのArbitrumスマートコントラクト活動をインデックスする公開のCosmic Signature APIから取得しています。プロトコルの仕組みと検証の詳細は、下のクロール可能なリンクをご覧ください。",
+      "unavailableSuffix": "。現在は最新データを取得できないため、プロトコルの説明のみ表示しています。",
+      "dataSource": "データは、Arbitrum上の活動を集計するCosmic Signatureの公開APIから取得しています。仕組みと検証の詳細は、以下の関連ページをご覧ください。",
       "relatedPagesAria": "統計の関連ページ",
       "links": {
         "currentCycle": "現在のパフォーマンス・サイクルを見る",
@@ -119,7 +119,7 @@
     },
     "numAllocationsDistributed": {
       "label": "配られた配分の件数",
-      "tooltip": "インデックス済みの配分記録の件数。利用できる場合はcg_prizeの行を使い、なければ受領者への配分合計の集計にフォールバックします。"
+      "tooltip": "集計済みの配分記録の件数です。個別記録が取得できない場合は、受領者別の配分件数の合計を表示します。"
     },
     "totalSignatureAllocationsDistributed": {
       "label": "配られたシグネチャー配分の総額",
@@ -245,7 +245,7 @@
     "gestureTypeDistribution": "ETH、RandomWalk（ETH支払い）、CSTで入れられた一筆の割合の時間推移を、選んだ間隔でサンプリングしたもの。現在のサイクルのみ。",
     "enduranceTimeline": "サイクル中に誰が先頭を保っていたかのガントチャート。各バーは先頭の保持区間で、幅はそのアドレスが先頭を保った時間です。最も幅の広いバーが持久チャンピオン。時の戦士は、持久チャンピオンとしての単一の連続した保持が最も長かった参加者です。任意のサイクルを選んで比較できます。",
     "cstWindow": "サイクル中にCST調律期間がどう推移したか。ETH一筆はそれぞれ期間をわずかに短くし、CST一筆はそれぞれ長くします。この期間が、CST一筆の費用が費用なしまで下がる速さを決めます。任意のサイクルを選んで比較できます。",
-    "cstCost": "サイクル中に各CST一筆に実際にかかった費用を対数目盛で、その直前に残っていた配分時計とともに示します。サイクル中盤の一筆はほとんど費用なしのことが多く、終盤では一筆が続いて費用が下がる時間がなくなり、価格が数千CSTに達することもあります。",
+    "cstCost": "サイクル中に各CST一筆に実際にかかった費用を対数目盛で、その直前に残っていた確定までの残り時間とともに示します。サイクル中盤の一筆はほとんど費用なしのことが多く、終盤では一筆が続いて費用が下がる時間がなくなり、価格が数千CSTに達することもあります。",
     "attachedTokenDistribution": "一筆に添付されたERC-721アセットのコントラクトとトークン数。",
     "cosmicSignatureTokenDistribution": "Cosmic Signature NFT（ERC-721）トークンの現在の所有者分布。",
     "cstBalanceDistribution": "CST（ERC-20）残高の現在のウォレット分布。",
@@ -298,7 +298,7 @@
       "poolTooltip": "Cosmic Signature NFTの係留者のために係留配分プールに現在配分されているETH。",
       "perNftLabel": "Cosmic Signature NFTあたりの配分",
       "perNftTooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。",
-      "perNftTooltipUnavailable": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。オンチェーンの係留プールはゼロではありませんが、インデックス済みの係留Cosmic Signature NFT総数がゼロのため（例：cg_stake_stats_cstがETLで更新されていない）、NFTあたりの値を計算できません。",
+      "perNftTooltipUnavailable": "NFT 1点あたりのETH係留配分は、プール残高を係留中のNFT総数で割って求めます。現在、残高とNFT数が同期していないため計算できません。",
       "activeHoldersLabel": "活動中の係留者",
       "activeHoldersTooltip": "Cosmic Signature NFTまたはRandomWalk NFTを少なくとも1点現在係留している活動中のウォレットの合計。"
     },
@@ -437,7 +437,7 @@
         "recipient": "受領者",
         "detail": "詳細",
         "exploreTitle": "サイクル{cycle}を探索",
-        "exploreDescription": "各受領者がかかった時間つきの受け取りトランザクションと、このサイクルで添付されたトークン。",
+        "exploreDescription": "受領者ごとの受け取りトランザクション、受け取りまでの時間、このサイクルに添付されたトークンを確認できます。",
         "claimTransactions": "受け取りトランザクション",
         "noClaims": "このサイクルに記録された受け取りはありません。",
         "claimedAfter": "受け取りまでの時間",
@@ -484,7 +484,7 @@
       "emptyWindow": "選択した急増の期間に時間別の集計はありません。"
     },
     "activePeriods": {
-      "description": "上位{count}参加者の活動期間（連続する一筆の間隔が6時間以内で、2筆以上）。各バーが一つのまとまりです。",
+      "description": "活動が多い上位{count}人の参加者を表示しています。間隔が6時間以内で2筆以上続いた期間を、一つの活動期間としてまとめています。各バーがその期間を表します。",
       "participant": "参加者",
       "ariaLabel": "{address}：{start}から{end}まで{count}筆",
       "tooltipSummary": "{count}筆 · {minutes}分間",
@@ -573,15 +573,15 @@
       "timeIntoCycle": "サイクル開始からの時間",
       "intoCycle": "開始から{duration}",
       "priceLine": "一筆ごとに支払われたCST",
-      "clockLine": "一筆の直前に残っていた時計",
+      "clockLine": "一筆の直前の残り時間",
       "cstPaid": "支払われたCST",
-      "clockBefore": "直前に残っていた時計",
-      "gestureBy": "一筆の主",
+      "clockBefore": "直前の残り時間",
+      "gestureBy": "一筆を入れた参加者",
       "clickHint": "点をクリックするとトランザクションを開きます。",
       "summaryMax": "最高額：{amount}（開始から{when}）",
       "summaryTotal": "消費合計：{amount}",
       "summaryCount": "CST一筆{count}筆",
-      "description": "紫の点はそれぞれ、一筆に実際に支払われたCSTです（対数目盛。白抜きの点は費用なし）。CST一筆のたびに費用は支払額の約2倍にリセットされ、調律期間をかけて費用なしまで下がります。薔薇色の破線は各一筆の直前に残っていた配分時計です。時計が少なくなると一筆が続いて費用の下がる時間がなくなり、支払額が上がっていきます。点をクリックするとトランザクションを開きます。",
+      "description": "紫の点はそれぞれ、一筆に実際に支払われたCSTです（対数目盛。白抜きの点は費用なし）。CST一筆のたびに費用は支払額の約2倍にリセットされ、調律期間をかけて費用なしまで下がります。薔薇色の破線は各一筆の直前に残っていた確定までの残り時間です。時計が少なくなると一筆が続いて費用の下がる時間がなくなり、支払額が上がっていきます。点をクリックするとトランザクションを開きます。",
       "empty": "このサイクルにCST一筆はありません。",
       "selectCycle": "調べるサイクルを選んでください。",
       "loadErrorTitle": "CST一筆の費用を読み込めませんでした",
@@ -687,7 +687,7 @@
       "cycleActivationDelay": "サイクル有効化前の遅延時間が変更されました。",
       "anchoredRandomWalkRecipients": "係留RandomWalk NFTの星選NFT受領者数が変更されました。",
       "publicGoodsVaultAddress": "公共財金庫のアドレスが変更されました。",
-      "randomWalkContractAddress": "RandomWalkNFTコントラクトのアドレスが変更されました。",
+      "randomWalkContractAddress": "RandomWalk NFTコントラクトのアドレスが変更されました。",
       "allocationsWalletAddress": "配分ウォレット（配分エスクロー）のアドレスが変更されました。",
       "anchoringWalletAddress": "係留ウォレットのアドレスが変更されました。",
       "randomWalkAnchoringWalletAddress": "RandomWalk NFT係留ウォレットのアドレスが変更されました。",
@@ -700,7 +700,7 @@
       "gestureCostIncreaseRatio": "一筆の費用の上昇率が変更されました。",
       "gestureTimeIncrement": "一筆ごとの配分時間の増分の値が変更されました。",
       "initialFinalizationDivisor": "初期のサイクル確定時刻を導く除数（mainPrizeTimeIncrementInMicroSeconds / divisor）が変更されました。",
-      "treasurerAddress": "広報ウォレットのアドレスが変更されました。",
+      "treasurerAddress": "広報準備金の財務担当者アドレスが変更されました。",
       "activationTime": "サイクルの有効化時刻が変更されました。",
       "cstCalibrationLength": "開始時のCST調律期間の長さが変更されました。",
       "erc20Multiplier": "ERC20配分倍率が変更されました。",
@@ -735,7 +735,7 @@
   },
   "publicDataSummaries": {
     "common": {
-      "lastUpdated": "最終更新：{date}。データソース：{source}。下の対話型テーブルはアプリのライブデータで更新されますが、この要約は検索エンジンとAIクローラー向けに最初のHTMLに含まれています。",
+      "lastUpdated": "最終更新：{date}。データソース：{source}。",
       "relatedPagesAria": "{heading}の関連ページ",
       "unavailable": "取得不可"
     },
@@ -758,7 +758,7 @@
     "namedNfts": {
       "eyebrow": "名前付きNFT · Arbitrum",
       "heading": "名前付きCosmic Signature NFT",
-      "description": "所有者が固有の名前を付けたCosmic Signature NFTを見る。トークンのアイデンティティ、ギャラリーでの発見、オンチェーンのコレクション履歴を結びつけます。",
+      "description": "所有者が名前を付けたCosmic Signature NFTを紹介します。作品とオンチェーンの来歴をあわせて確認できます。",
       "source": "Cosmic Signature公開トークンAPI",
       "cards": {
         "named": "名前付きCosmic Signature NFT",
@@ -774,7 +774,7 @@
     "usedRwlkNfts": {
       "eyebrow": "RandomWalk NFTの使用 · Arbitrum",
       "heading": "使用済みのRandomWalk NFT",
-      "description": "一度だけの一筆の費用の割引のためにETH一筆にすでに添付されたRandomWalk NFTを確認する。",
+      "description": "ETH一筆の割引に使用済みのRandomWalk NFTを確認できます。各NFTを割引に使えるのは一度だけです。",
       "source": "Cosmic Signature公開RandomWalk使用API",
       "cards": {
         "used": "使用済みのRandomWalk NFT",

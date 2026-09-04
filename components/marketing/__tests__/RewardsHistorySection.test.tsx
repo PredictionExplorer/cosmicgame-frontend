@@ -60,12 +60,12 @@ const makeReward = (id: number): MarketingReward => ({
 describe('RewardsHistorySection', () => {
   it('renders the section heading', () => {
     renderWithTooltip(<RewardsHistorySection rewards={[]} />);
-    expect(screen.getByText('Reward History')).toBeInTheDocument();
+    expect(screen.getByText('Allocation History')).toBeInTheDocument();
   });
 
   it('shows empty state when no rewards', () => {
     renderWithTooltip(<RewardsHistorySection rewards={[]} />);
-    expect(screen.getByText('No rewards distributed yet')).toBeInTheDocument();
+    expect(screen.getByText('No allocations yet')).toBeInTheDocument();
   });
 
   it('renders the table when rewards exist', () => {
@@ -78,13 +78,13 @@ describe('RewardsHistorySection', () => {
     const rewards = [makeReward(1), makeReward(2), makeReward(3)];
     renderWithTooltip(<RewardsHistorySection rewards={rewards} />);
     expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText(/rewards$/)).toBeInTheDocument();
+    expect(screen.getByText(/allocations$/)).toBeInTheDocument();
   });
 
   it('uses singular form for one reward', () => {
     renderWithTooltip(<RewardsHistorySection rewards={[makeReward(1)]} />);
     expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText(/reward$/)).toBeInTheDocument();
+    expect(screen.getByText(/allocation$/)).toBeInTheDocument();
   });
 
   it('does not show count badge for empty list', () => {
@@ -94,7 +94,7 @@ describe('RewardsHistorySection', () => {
 
   it('has an info tooltip trigger', () => {
     renderWithTooltip(<RewardsHistorySection rewards={[]} />);
-    expect(screen.getByLabelText('Info about reward history')).toBeInTheDocument();
+    expect(screen.getByLabelText('About allocation history')).toBeInTheDocument();
   });
 
   it('has no accessibility violations with rewards', async () => {

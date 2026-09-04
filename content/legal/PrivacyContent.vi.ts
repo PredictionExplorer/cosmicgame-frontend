@@ -8,7 +8,7 @@ export const privacyCopyVi = {
   lastUpdated: 'Cập nhật lần cuối: 20 tháng 7 năm 2026',
   introductionTitle: 'Giới thiệu',
   introduction: [
-    'Cosmic Signature là một ứng dụng blockchain phi tập trung xây trên Arbitrum, một mạng Layer 2 của Ethereum. Là một ứng dụng phi tập trung (dApp), chúng tôi vận hành khác với các ứng dụng web truyền thống trong vấn đề dữ liệu và quyền riêng tư.',
+    'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, một mạng Layer 2 của Ethereum. Ứng dụng phi tập trung (dApp) này xử lý dữ liệu và quyền riêng tư theo cách khác với ứng dụng web truyền thống.',
     'Chính sách quyền riêng tư này mô tả cách chúng tôi xử lý thông tin liên quan đến việc bạn sử dụng Cosmic Signature. Khi sử dụng nền tảng, bạn đồng ý với việc thu thập và sử dụng thông tin theo chính sách này.',
   ],
   sections: [
@@ -61,7 +61,7 @@ export const privacyCopyVi = {
         {
           id: 'blockchain',
           subtitle: 'Bảo mật blockchain',
-          text: 'Việc thanh toán của giao thức diễn ra trên Arbitrum, một mạng Layer 2 của Ethereum. Riêng việc kết nối ví không mang tính lưu ký và không chuyển tài sản. Tuy nhiên, khi bạn chấp thuận và ký một hành động trên hợp đồng thông minh một cách rõ ràng, giao dịch đó có thể chuyển tài sản đến một hợp đồng của giao thức hoặc khóa chúng ở đó đến khi các điều kiện gỡ hoặc nhận về tương ứng được đáp ứng.',
+          text: 'Việc thanh toán của giao thức diễn ra trên Arbitrum, một mạng Layer 2 của Ethereum. Việc kết nối ví không chuyển quyền kiểm soát ví hay tài sản cho chúng tôi. Tuy nhiên, khi bạn chấp thuận và ký một hành động trên hợp đồng thông minh một cách rõ ràng, giao dịch đó có thể chuyển tài sản đến một hợp đồng của giao thức hoặc khóa chúng ở đó đến khi các điều kiện gỡ hoặc nhận về tương ứng được đáp ứng.',
         },
         {
           id: 'infrastructure',
@@ -82,7 +82,7 @@ export const privacyCopyVi = {
         {
           id: 'public-chain',
           subtitle: 'Dữ liệu blockchain công khai',
-          text: 'Mọi giao dịch blockchain đều công khai theo bản chất. Địa chỉ ví, nét bút, quyền sở hữu NFT và phân bổ của bạn hiển thị trên blockchain và qua nền tảng của chúng tôi.',
+          text: 'Giao dịch blockchain vốn là dữ liệu công khai. Địa chỉ ví, nét bút, quyền sở hữu NFT và phân bổ của bạn hiển thị trên blockchain và qua nền tảng của chúng tôi.',
         },
         {
           id: 'third-party',
@@ -108,7 +108,7 @@ export const privacyCopyVi = {
         {
           id: 'permanence',
           subtitle: 'Tính vĩnh viễn của blockchain',
-          text: 'Xin lưu ý rằng giao dịch blockchain là vĩnh viễn và không thể xóa. Một khi nét bút đã được đặt hoặc NFT đã được chuyển giao, thông tin này tồn tại trên blockchain mãi mãi.',
+          text: 'Giao dịch blockchain được lưu vĩnh viễn và không thể xóa. Một khi nét bút đã được đặt hoặc NFT đã được chuyển giao, thông tin này tồn tại trên blockchain mãi mãi.',
         },
         {
           id: 'cookies',

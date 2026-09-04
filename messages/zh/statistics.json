@@ -72,7 +72,7 @@
     "seo": {
       "eyebrow": "协议统计 · Arbitrum",
       "heading": "Cosmic Signature 协议统计",
-      "description": "本页汇总 Cosmic Signature 在 Arbitrum 上的公开协议活动，包括演绎周期状态、落笔、Cosmic Signature NFT、CST、锚定、储备与分配数据。下方交互式表格会载入实时应用数据；此摘要则直接写入初始 HTML，便于搜索引擎与 AI 抓取。",
+      "description": "本页汇总 Cosmic Signature 在 Arbitrum 上的公开协议活动，包括演绎周期状态、落笔、Cosmic Signature NFT、CST、锚定、储备与分配数据。",
       "lastUpdated": "更新时间：{date}",
       "unavailableSuffix": "。实时数据暂不可用，当前显示协议机制说明。",
       "dataSource": "数据来自 Cosmic Signature 公共 API，该 API 索引协议在 Arbitrum 上的智能合约活动。可通过下方链接了解协议机制与验证信息。",
@@ -119,7 +119,7 @@
     },
     "numAllocationsDistributed": {
       "label": "已发放分配数量",
-      "tooltip": "已索引的分配记录数。优先使用 cg_prize 记录；若不可用，则采用获配者分配总数的汇总值。"
+      "tooltip": "已索引的分配记录数；详细记录暂不可用时，采用获配者分配总数的汇总值。"
     },
     "totalSignatureAllocationsDistributed": {
       "label": "签名分配总额",
@@ -298,7 +298,7 @@
       "poolTooltip": "当前分配至 Cosmic Signature NFT 锚定者派发池的 ETH。",
       "perNftLabel": "每枚 Cosmic Signature NFT 派发额",
       "perNftTooltip": "当前每枚已锚定 Cosmic Signature NFT 对应的 ETH 锚定派发：链上派发池除以已索引的已锚定 NFT 总数。",
-      "perNftTooltipUnavailable": "当前每枚已锚定 Cosmic Signature NFT 对应的 ETH 锚定派发：链上派发池除以已索引的已锚定 NFT 总数。链上锚定派发池并非 0，但已索引的 Cosmic Signature NFT 锚定总数为 0（例如 cg_stake_stats_cst 尚未由 ETL 更新），因此无法计算每枚 NFT 的派发额。",
+      "perNftTooltipUnavailable": "链上锚定派发池已有余额，但已索引的 Cosmic Signature NFT 锚定数量尚未同步，暂时无法计算每枚 NFT 的派发额。",
       "activeHoldersLabel": "活跃锚定者",
       "activeHoldersTooltip": "当前至少锚定一枚 Cosmic Signature NFT 或 Random Walk NFT 的活跃钱包合计数。"
     },
@@ -557,7 +557,7 @@
       "window": "CST 校准窗口",
       "windowAfter": "此次落笔后的窗口",
       "typeEth": "ETH 落笔（缩短）",
-      "typeRandomWalk": "ETH + RandomWalk 落笔（缩短）",
+      "typeRandomWalk": "ETH + Random Walk 落笔（缩短）",
       "typeCst": "CST 落笔（延长）",
       "summaryMin": "最短：{duration}",
       "summaryMax": "最长：{duration}",
@@ -581,7 +581,7 @@
       "summaryMax": "最贵：{amount}（周期开始后 {when}）",
       "summaryTotal": "总消耗：{amount}",
       "summaryCount": "{count} 次 CST 落笔",
-      "description": "每个紫色圆点代表一次 CST 落笔的实际支付金额（对数刻度——空心圆点表示免费）。每次 CST 落笔后，价格会以约两倍于成交价重新开始，并在校准窗口内回落到免费。玫红色虚线表示每次落笔前分配时钟的剩余时间：当时钟接近归零时，密集落笔让价格来不及回落，成交价格随之飙升。点击圆点可查看交易。",
+      "description": "每个紫色圆点代表一次 CST 落笔的实际支付金额（对数刻度——空心圆点表示免费）。每次 CST 落笔后，价格会以约两倍于落笔价格重新开始，并在校准窗口内回落到免费。玫红色虚线表示每次落笔前分配时钟的剩余时间：当时钟接近归零时，密集落笔让价格来不及回落，落笔价格随之飙升。点击圆点可查看交易。",
       "empty": "此周期没有 CST 落笔。",
       "selectCycle": "请选择要查看的周期。",
       "loadErrorTitle": "未能加载 CST 落笔价格",
@@ -691,7 +691,7 @@
       "allocationsWalletAddress": "分配钱包（分配托管合约）地址已变更。",
       "anchoringWalletAddress": "锚定钱包地址已变更。",
       "randomWalkAnchoringWalletAddress": "Random Walk NFT 锚定钱包地址已变更。",
-      "outreachWalletAddress": "推广钱包地址已变更。",
+      "outreachWalletAddress": "推广储备财务执行人地址已变更。",
       "cstContractAddress": "Cosmic Signature CST 代币（ERC-20）合约地址已变更。",
       "cosmicSignatureNftAddress": "Cosmic Signature NFT（ERC-721）合约地址已变更。",
       "contractUpgrade": "CosmicSignature 合约已升级。",
@@ -700,7 +700,7 @@
       "gestureCostIncreaseRatio": "落笔价格增量比例已变更。",
       "gestureTimeIncrement": "每次落笔增加的分配时长已变更。",
       "initialFinalizationDivisor": "用于计算初始周期收官时间的除数（mainPrizeTimeIncrementInMicroSeconds / divisor）已变更。",
-      "treasurerAddress": "推广钱包地址已变更。",
+      "treasurerAddress": "推广储备财务执行人地址已变更。",
       "activationTime": "周期启用时间已变更。",
       "cstCalibrationLength": "周期开始时的 CST 校准窗口长度已变更。",
       "erc20Multiplier": "ERC-20 代币分配倍数已变更。",
@@ -735,7 +735,7 @@
   },
   "publicDataSummaries": {
     "common": {
-      "lastUpdated": "更新时间：{date}。数据来源：{source}。下方交互式表格会载入实时应用数据；此摘要则直接写入初始 HTML，便于搜索引擎与 AI 抓取。",
+      "lastUpdated": "更新时间：{date}。数据来源：{source}。",
       "relatedPagesAria": "{heading}相关页面",
       "unavailable": "暂不可用"
     },

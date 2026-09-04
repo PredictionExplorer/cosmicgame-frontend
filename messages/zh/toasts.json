@@ -61,8 +61,8 @@
       "tooLongBidMessage": "落笔留言过长。",
       "wrongBidType": "所选落笔类型不正确。",
       "fundTransferFailed": "资金转移失败。",
-      "ethCostChanged": "ETH 落笔价格已变为 {required} ETH，比提交时高 {increase} ETH。请重试。",
-      "cstCostChanged": "交易处理期间，CST 落笔价格已变化。当前需 {required} CST，超过设置的 {maximum} CST 落笔价格上限。请刷新后重试。"
+      "ethCostChanged": "ETH 落笔价格已升至 {required} ETH，比提交时高 {increase} ETH。请重试。",
+      "cstCostChanged": "交易处理期间，CST 落笔价格已变化。当前需 {required} CST，超过你设置的 {maximum} CST 上限。请刷新后重试。"
     }
   },
   "anchor": {
@@ -143,7 +143,7 @@
       "failed": "未能拨付推广 CST。请检查钱包与网络连接后重试。",
       "loading": "加载中…",
       "pay": "拨付推广 CST",
-      "paying": "发放中…",
+      "paying": "拨付中…",
       "viewTransaction": "查看交易"
     }
   },

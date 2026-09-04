@@ -2,7 +2,10 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { FAQText } from './structure';
 
-const ELAPSED_VI: Record<string, string> = {
+const ELAPSED_VI: Record<
+  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
+  string
+> = {
   '0 seconds': '0 giây',
   '1 second': '1 giây',
   '60 seconds': '60 giây',
@@ -38,7 +41,7 @@ export const faqTextVi = {
       },
       'how-does-the-bidding-game-work': {
         question: 'Một chu kỳ trình diễn hoạt động như thế nào?',
-        answer: `Mỗi chu kỳ mở ra với một cửa sổ hiệu chỉnh ETH cho nét bút đầu tiên. Nét bút đầu tiên đó khởi động thời điểm hoàn tất chu kỳ, hiện mặc định khoảng 24 giờ. Các nét bút tiếp theo bằng ETH hoặc CST cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất đã lưu, với mức tăng khởi đầu là một giờ và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Khi thời điểm hoàn tất chu kỳ hết hạn, người tham gia đặt nét bút cuối cùng có một cửa sổ ưu tiên ${protocolFacts.finalGestureExclusivityHours} giờ để hoàn tất chu kỳ và nhận về phân bổ Signature; vẫn có thể đặt nét bút cho đến khi chu kỳ thực sự được hoàn tất.`,
+        answer: `Mỗi chu kỳ mở ra với một cửa sổ hiệu chỉnh ETH cho nét bút đầu tiên. Nét bút đầu tiên đó khởi động thời điểm hoàn tất chu kỳ, hiện mặc định khoảng 24 giờ. Các nét bút tiếp theo bằng ETH hoặc CST cộng mức tăng thời gian hiện tại vào thời điểm hoàn tất đã lưu, với mức tăng khởi đầu là một giờ và lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Khi đếm ngược hoàn tất về 0, người tham gia đặt nét bút cuối cùng có một cửa sổ ưu tiên ${protocolFacts.finalGestureExclusivityHours} giờ để hoàn tất chu kỳ và nhận về phân bổ Signature; vẫn có thể đặt nét bút cho đến khi chu kỳ thực sự được hoàn tất.`,
       },
       'what-type-of-gestures-are-available': {
         question: 'Có những loại nét bút nào?',
@@ -62,7 +65,7 @@ export const faqTextVi = {
       'can-i-place-multiple-gestures': {
         question: 'Tôi có thể đặt nhiều nét bút trong một chu kỳ không?',
         answer:
-          'Có. Mỗi nét bút có thể khắc CST tham gia vào ví của bạn, tăng số lượt của bạn trong Tinh tuyển và định hình Signature đang biến chuyển của chu kỳ. Lượng CST tham gia là động: nó phụ thuộc vào khoảng thời gian đã trôi qua kể từ nét bút trước, nên một khoảng lặng dài tạo ra lần khắc CST lớn hơn so với một nét bút nối tiếp dồn dập.',
+          'Có. Mỗi nét bút có thể khắc CST tham gia vào ví của bạn, tăng số lượt của bạn trong Tinh tuyển và định hình Signature đang biến chuyển của chu kỳ. Lượng CST tham gia thay đổi theo thời gian kể từ nét bút trước. Khoảng cách dài hơn cho lượng CST được khắc lớn hơn so với hai nét bút nối tiếp sát nhau.',
       },
     },
   },
@@ -77,7 +80,7 @@ export const faqTextVi = {
       },
       'what-rewards-per-bid': {
         question: 'Tôi nhận được gì cho mỗi nét bút?',
-        answer: `Mỗi nét bút ghi nhận một lượt trong Tinh tuyển cuối chu kỳ, cập nhật đóng góp khoảng bền bỉ của bạn cho các luồng Quán quân Bền bỉ và Chiến binh Thời gian, và có thể khắc CST tham gia. CST tham gia được tính theo công thức căn bậc hai: ${protocolFacts.dynamicCstRewardFormula}. Nói đơn giản, lượng này tăng theo thời gian kể từ nét bút trước, nhưng với tốc độ chậm dần. Nét bút quá dồn dập có thể nhận 0 CST; một khoảng cách dài hơn có thể tạo ra lần khắc CST lớn hơn nhiều.`,
+        answer: `Mỗi nét bút ghi nhận một lượt trong Tinh tuyển cuối chu kỳ, cập nhật thời gian dẫn đầu liên quan đến Quán quân Bền bỉ và Chiến binh Thời gian, và có thể khắc CST tham gia. CST tham gia được tính theo công thức căn bậc hai: ${protocolFacts.dynamicCstRewardFormula}. Nói đơn giản, lượng này tăng theo thời gian kể từ nét bút trước, nhưng với tốc độ chậm dần. Nét bút quá dồn dập có thể nhận 0 CST; một khoảng cách dài hơn có thể tạo ra lần khắc CST lớn hơn nhiều.`,
       },
       'how-does-the-stellarSelection-work': {
         question: 'Tinh tuyển hoạt động như thế nào?',
@@ -107,7 +110,7 @@ export const faqTextVi = {
       'what-happens-to-remaining-eth': {
         question: 'ETH còn lại trong Dự trữ chu kỳ sẽ đi đâu?',
         answer:
-          'Khoảng một nửa Dự trữ chu kỳ chuyển tiếp vào chu kỳ trình diễn tiếp theo dưới dạng Dự trữ tích lũy, nâng số dư khởi điểm của chu kỳ sau. Giao thức tích lũy thay vì rút ra.',
+          'Khoảng một nửa Dự trữ chu kỳ chuyển tiếp vào chu kỳ trình diễn tiếp theo dưới dạng Dự trữ tích lũy, nâng số dư khởi điểm của chu kỳ sau. Phần ETH này tiếp tục được tích lũy trong giao thức.',
       },
       'what-happens-to-attached-assets': {
         question: 'Điều gì xảy ra với token hoặc NFT đính kèm vào nét bút?',
@@ -135,7 +138,7 @@ export const faqTextVi = {
       },
       'how-is-participation-cst-calculated': {
         question: 'CST tham gia được tính như thế nào?',
-        answer: `CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua kể từ nét bút trước: ${protocolFacts.dynamicCstRewardFormula}. Căn bậc hai quan trọng vì nó ghi nhận những khoảng lặng dài hơn mà không để lượng nhận tăng tuyến tính mãi mãi. Với các tham số lúc ra mắt (mức tăng thời gian đúng một giờ), các ví dụ xấp xỉ là ${protocolFacts.dynamicCstRewardExamples.map((example) => `${viDecimal(example.cst)} CST sau ${ELAPSED_VI[example.elapsed] ?? example.elapsed}`).join(', ')}. Mức tăng lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên lượng thực tế theo thời gian trôi thấp hơn một chút so với các con số này. Bản xem trước trực tiếp trong ứng dụng và hợp đồng là nguồn chính xác cho lượng đúng tại thời điểm nét bút của bạn được ghi nhận.`,
+        answer: `CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua kể từ nét bút trước: ${protocolFacts.dynamicCstRewardFormula}. Công thức căn bậc hai cho lượng CST lớn hơn khi khoảng cách giữa hai nét bút dài hơn, nhưng mức tăng chậm hơn thời gian chờ. Với các tham số lúc ra mắt (mức tăng thời gian đúng một giờ), các ví dụ xấp xỉ là ${protocolFacts.dynamicCstRewardExamples.map((example) => `${viDecimal(example.cst)} CST sau ${ELAPSED_VI[example.elapsed]}`).join(', ')}. Mức tăng lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên lượng thực tế theo thời gian trôi thấp hơn một chút so với các con số này. Ứng dụng hiển thị lượng CST ước tính hiện tại. Hợp đồng xác định lượng thực tế khi nét bút được xử lý.`,
       },
       'why-minimum-cst-reward-protection': {
         question: 'Bảo đảm CST tham gia tối thiểu là gì?',
@@ -148,7 +151,7 @@ export const faqTextVi = {
       },
       'what-is-open-finalization-window': {
         question: 'Cửa sổ hoàn tất mở là gì?',
-        answer: `Khi thời điểm hoàn tất chu kỳ hết hạn, người đặt nét bút cuối cùng có ${protocolFacts.finalGestureExclusivityHours} giờ ưu tiên để hoàn tất chu kỳ. Nếu họ không hoàn tất trong cửa sổ ưu tiên đó, bất kỳ ai cũng có thể gọi giao dịch hoàn tất — và hợp đồng thông minh coi người hoàn tất là người nhận của chu kỳ. Người hoàn tất nhận toàn bộ phân bổ Signature (phần ETH, ${cstAmount} CST, Cosmic Signature NFT và quyền ưu tiên với các tài sản đính kèm), nên người đặt nét bút cuối cùng nên hoàn tất trước khi cửa sổ kết thúc. Hoàn tất mở giữ cho giao thức tiếp tục vận hành ngay cả khi người đặt nét bút cuối cùng biến mất.`,
+        answer: `Khi đếm ngược hoàn tất về 0, người đặt nét bút cuối cùng có ${protocolFacts.finalGestureExclusivityHours} giờ ưu tiên để hoàn tất chu kỳ. Nếu họ không hoàn tất trong cửa sổ ưu tiên đó, bất kỳ ai cũng có thể gọi giao dịch hoàn tất — và hợp đồng thông minh coi người hoàn tất là người nhận của chu kỳ. Người hoàn tất nhận toàn bộ phân bổ Signature (phần ETH, ${cstAmount} CST, Cosmic Signature NFT và quyền ưu tiên với các tài sản đính kèm), nên người đặt nét bút cuối cùng nên hoàn tất trước khi cửa sổ kết thúc. Hoàn tất mở giữ cho giao thức tiếp tục vận hành ngay cả khi người đặt nét bút cuối cùng biến mất.`,
       },
       'what-is-endurance-champion': {
         question: 'Quán quân Bền bỉ là gì?',
@@ -176,12 +179,12 @@ export const faqTextVi = {
       'how-time-increase-affects-game': {
         question: 'Việc tăng thời gian mỗi nét bút ảnh hưởng thế nào đến giao thức?',
         answer:
-          'Khi thời gian cộng thêm cho mỗi nét bút tăng, các chu kỳ trung bình kéo dài hơn. Sự thay đổi diễn ra từ từ, giữ trải nghiệm tham gia mượt mà trong khi giới hạn tổng cung Cosmic Signature NFT trên những khung thời gian dài.',
+          'Khi thời gian cộng thêm cho mỗi nét bút tăng, các chu kỳ trung bình kéo dài hơn. Sự thay đổi diễn ra từ từ, giữ trải nghiệm tham gia mượt mà và có xu hướng làm chậm tốc độ khắc NFT trong dài hạn, tùy theo hoạt động của người tham gia.',
       },
       'what-if-two-gestures-same-time': {
         question: 'Điều gì xảy ra nếu hai nét bút được gửi cùng lúc?',
         answer:
-          'Giao dịch trên Arbitrum được xử lý theo thứ tự mà sequencer đưa vào. Nếu hai nét bút đến cùng một khoảnh khắc, nét bút được xác nhận trước là nét bút hợp lệ.',
+          'Arbitrum xử lý giao dịch tuần tự theo thứ tự do sequencer sắp xếp. Nét bút được xử lý trước sẽ cập nhật trạng thái giao thức. Nét bút sau vẫn có thể thành công nếu đáp ứng giới hạn chi phí tối đa và CST tham gia tối thiểu; nếu không, hợp đồng sẽ hoàn nguyên giao dịch.',
       },
       'is-there-game-theory': {
         question: 'Cosmic Signature có yếu tố chiến thuật không?',
@@ -221,12 +224,12 @@ export const faqTextVi = {
       },
       'is-nft-supply-limited': {
         question: 'Số lượng Cosmic Signature NFT có giới hạn không?',
-        answer: `Có, trên thực tế. Thời gian cộng thêm cho mỗi nét bút lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất, nên các chu kỳ dần kéo dài và tốc độ khắc NFT chậm lại. Hợp đồng không có giới hạn cung cứng, nhưng nhịp chu kỳ chậm dần khiến Cosmic Signature NFT ngày càng khan hiếm theo thời gian.`,
+        answer: `Hợp đồng không đặt giới hạn tối đa cho tổng số NFT. Thời gian cộng thêm cho mỗi nét bút tăng ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Điều này có xu hướng kéo dài chu kỳ và làm chậm tốc độ khắc NFT, nhưng tốc độ thực tế còn phụ thuộc vào hoạt động của người tham gia.`,
       },
       'impact-of-limiting-nfts': {
-        question: 'Nguồn cung NFT giới hạn có tác động gì?',
+        question: 'Nhịp chu kỳ ảnh hưởng thế nào đến số NFT mới?',
         answer:
-          'Mức tăng thời gian nét bút ngày càng lớn và tốc độ khắc chậm dần giữ gìn sự khan hiếm. Mỗi Cosmic Signature NFT mới đại diện cho một lát cắt ngày càng hiếm của lịch sử tích lũy của giao thức.',
+          'Thời gian cộng thêm tăng dần có xu hướng kéo dài chu kỳ và giảm số NFT được khắc trong cùng một khoảng thời gian. Mỗi Cosmic Signature NFT ghi lại một phần lịch sử của giao thức; tổng cung không có giới hạn cố định.',
       },
       'connection-with-randomwalknft': {
         question: 'Mối liên hệ với Random Walk NFT là gì?',
@@ -256,7 +259,7 @@ export const faqTextVi = {
       'donate-nfts-to-game': {
         question: 'Các dự án NFT khác có thể đóng góp token của họ vào một chu kỳ bằng cách nào?',
         answer:
-          'Các dự án có thể đính kèm token của mình (ERC-721 hoặc ERC-20) vào một nét bút bằng khung “Nâng cao”. Cung cấp địa chỉ hợp đồng cùng mã token hoặc số lượng rồi gửi nét bút. Token đính kèm được giữ trong ký quỹ của ví phân bổ và chảy về người nhận phân bổ Signature sau khi hoàn tất.',
+          'Các dự án có thể đính kèm token của mình (ERC-721 hoặc ERC-20) vào một nét bút bằng khung “Nâng cao”. Cung cấp địa chỉ hợp đồng cùng mã token hoặc số lượng rồi gửi nét bút. Token đính kèm được giữ trong ví phân bổ để người nhận phân bổ Signature nhận về sau khi chu kỳ hoàn tất.',
       },
     },
   },
@@ -267,7 +270,7 @@ export const faqTextVi = {
       'what-is-arbitrum': {
         question: 'Arbitrum là gì và vì sao Cosmic Signature được triển khai trên đó?',
         answer:
-          'Arbitrum là một rollup Layer 2 của Ethereum, giúp giao dịch nhanh hơn và phí thấp hơn. Cosmic Signature triển khai trên Arbitrum để có chi phí gas dưới một xu và độ hoàn tất nhanh hơn trong khi vẫn giữ các bảo đảm an toàn của Ethereum.',
+          'Arbitrum là rollup Layer 2 của Ethereum, được thiết kế để giảm chi phí giao dịch. Cosmic Signature sử dụng Arbitrum để hỗ trợ việc đặt nét bút thường xuyên, đồng thời dựa vào Ethereum để công bố dữ liệu và giải quyết tranh chấp. Phí gas thay đổi theo điều kiện mạng.',
       },
       'why-arbitrum-not-ethereum': {
         question: 'Vì sao là Arbitrum mà không phải mạng chính Ethereum?',
@@ -348,7 +351,7 @@ export const faqTextVi = {
       'why-was-cs-created': {
         question: 'Vì sao Cosmic Signature được tạo ra?',
         answer:
-          'Cosmic Signature ra đời từ niềm say mê với lý thuyết hỗn độn và bản chất không thể giải của bài toán ba vật thể. Ý tưởng về nghệ thuật tất định, độc nhất được tạo từ seed trên chuỗi vừa hấp dẫn vừa phù hợp với một giao thức gắn với hàng hóa công.',
+          'Cosmic Signature ra đời từ niềm say mê với lý thuyết hỗn độn và sự phức tạp của bài toán ba vật thể. Ý tưởng về nghệ thuật tất định, độc nhất được tạo từ seed trên chuỗi vừa hấp dẫn vừa phù hợp với một giao thức gắn với hàng hóa công.',
       },
       'what-if-team-disappears': {
         question: 'Nếu đội ngũ biến mất thì sao?',
@@ -368,7 +371,7 @@ export const faqTextVi = {
       'get-help': {
         question: 'Tôi có thể được trợ giúp ở đâu khi có câu hỏi?',
         answer:
-          'Cộng đồng và đội hỗ trợ có mặt trên Discord, X / Twitter và qua email hỗ trợ ghi trên trang Liên hệ.',
+          'Bạn có thể liên hệ cộng đồng và đội hỗ trợ qua Discord, X / Twitter hoặc email. Các liên kết chính thức nằm trên trang Giới thiệu.',
       },
       'stay-updated': {
         question: 'Tôi theo dõi tin tức Cosmic Signature bằng cách nào?',

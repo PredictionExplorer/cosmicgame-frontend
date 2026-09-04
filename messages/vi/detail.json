@@ -4,7 +4,7 @@
   },
   "jsonLd": {
     "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "NFT tạo sinh độc nhất từ giao thức nghệ thuật tạo sinh trên chuỗi Cosmic Signature, được kết xuất từ vật lý của bài toán ba vật thể.",
+    "productDescription": "Cosmic Signature NFT là tác phẩm tạo sinh độc nhất trên chuỗi, được tạo từ mô phỏng bài toán ba vật thể.",
     "breadcrumbToken": "Token #{id}"
   },
   "breadcrumb": {
@@ -18,7 +18,7 @@
     "anchorRecipient": "Người nhận neo giữ",
     "cycleRecipient": "Người nhận của chu kỳ",
     "enduranceChampion": "Quán quân Bền bỉ",
-    "receivedAsCycleRecipient": "Nhận với vai trò người nhận của chu kỳ trong chu kỳ #{round}",
+    "receivedAsCycleRecipient": "Nhận phân bổ với vai trò người nhận của chu kỳ #{round}",
     "receivedAs": "Nhận với vai trò {label}",
     "eligibleForAnchoring": "Đủ điều kiện neo giữ",
     "eligibleForAnchoringTooltip": "Cosmic Signature NFT này chưa từng được neo giữ và có thể nhận phân phối neo giữ bằng ETH khi được neo giữ.",
@@ -45,12 +45,12 @@
   },
   "transferDialog": {
     "title": "Xác nhận chuyển giao",
-    "description": "Tài khoản đích dường như chưa có lịch sử giao dịch nào. Bạn có chắc muốn gửi token đến địa chỉ này? Vui lòng kiểm tra lại thật kỹ.",
+    "description": "Địa chỉ người nhận dường như chưa có lịch sử giao dịch. Hãy kiểm tra kỹ địa chỉ trước khi xác nhận chuyển token.",
     "confirm": "Có, chuyển giao"
   },
   "ownerActions": {
     "title": "Quản lý token của bạn",
-    "titleTooltip": "Với vai trò chủ sở hữu hiện tại, bạn có thể hiển thị token này trong MetaMask, chuyển giao nó, hoặc đặt tên tùy chỉnh.",
+    "titleTooltip": "Chủ sở hữu hiện tại có thể thêm token vào MetaMask, chuyển giao hoặc đặt tên token.",
     "metaMaskHeading": "Hiển thị trong MetaMask",
     "metaMaskTooltip": "Yêu cầu tiện ích MetaMask trên trình duyệt hiển thị NFT này. Tính năng nhập NFT đang thử nghiệm và chưa có trên MetaMask Mobile.",
     "addToMetaMask": "Thêm NFT vào MetaMask",
@@ -85,7 +85,7 @@
   },
   "video": {
     "watchAnimation": "Xem hoạt ảnh",
-    "watchAnimationTooltip": "Mỗi Cosmic Signature NFT có một hoạt ảnh tạo sinh độc nhất bắt nguồn từ seed của nó. Nhấn để xem."
+    "watchAnimationTooltip": "Mỗi Cosmic Signature NFT có hoạt ảnh tạo sinh riêng, được tạo từ seed của tác phẩm. Nhấn để xem."
   },
   "image": {
     "defaultAlt": "NFT",

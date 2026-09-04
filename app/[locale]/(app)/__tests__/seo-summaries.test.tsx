@@ -239,9 +239,7 @@ describe('server-visible SEO summaries', () => {
     render(await PublicDataRouteSeoSummary({ route }));
 
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
-    expect(
-      screen.getByText(/initial HTML for search engines and AI crawlers/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Last updated: .+ Source: /i)).toBeInTheDocument();
   });
 
   it('renders allocation totals from finalized rounds instead of claim history', async () => {
@@ -286,7 +284,7 @@ describe('server-visible SEO summaries', () => {
       'href',
       '/statistics',
     );
-    expect(screen.getByText(/最后更新：/)).toBeInTheDocument();
+    expect(screen.getByText(/更新时间：/)).toBeInTheDocument();
     expect(screen.queryByText(/initial HTML for search engines/i)).not.toBeInTheDocument();
   });
 

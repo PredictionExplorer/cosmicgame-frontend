@@ -2,14 +2,14 @@
   "publicData": {
     "common": {
       "unavailable": "Không khả dụng",
-      "lastUpdated": "Cập nhật lần cuối: {date}. Nguồn dữ liệu: {source}. Các bảng tương tác bên dưới sẽ nạp dữ liệu trực tiếp từ ứng dụng, còn bản tóm tắt này có sẵn trong HTML ban đầu cho công cụ tìm kiếm và trình thu thập dữ liệu AI.",
+      "lastUpdated": "Cập nhật: {date}. Nguồn: {source}.",
       "relatedPagesAria": "Các trang liên quan đến {heading}"
     },
     "routes": {
       "allocation": {
         "eyebrow": "Lịch sử phân bổ · Arbitrum",
         "heading": "Người nhận phân bổ",
-        "description": "Duyệt lịch sử phân bổ công khai của Cosmic Signature qua các chu kỳ trình diễn đã hoàn tất, gồm phân bổ Signature, Tinh tuyển, phân phối neo giữ và các dòng hàng hóa công.",
+        "description": "Lịch sử phân bổ của các chu kỳ Cosmic Signature đã hoàn tất: phân bổ Signature, Tinh tuyển, phân phối neo giữ và phần dành cho Hàng hóa công.",
         "source": "Các API chu kỳ công khai của Cosmic Signature",
         "links": {
           "statistics": "Xem thống kê giao thức",
@@ -100,7 +100,7 @@
       "eth-contribution": {
         "eyebrow": "Đóng góp ETH trực tiếp · Arbitrum",
         "heading": "Đóng góp ETH trực tiếp",
-        "description": "Duyệt các khoản đóng góp ETH trực tiếp vào Kho Hàng hóa công của Cosmic Signature cùng lời nhắn công khai, chu kỳ và bản ghi người đóng góp đi kèm.",
+        "description": "Xem các khoản đóng góp ETH trực tiếp vào dự trữ chu kỳ Cosmic Signature cùng thông tin người đóng góp, chu kỳ và lời nhắn công khai.",
         "source": "Các API đóng góp công khai của Cosmic Signature",
         "links": {
           "protocol": "Đóng góp hàng hóa công của giao thức",
@@ -166,7 +166,7 @@
       "named-nfts": {
         "eyebrow": "NFT đã đặt tên · Arbitrum",
         "heading": "Cosmic Signature NFT đã đặt tên",
-        "description": "Duyệt các Cosmic Signature NFT được chủ sở hữu đặt tên tùy chỉnh, kết nối danh tính token, khám phá phòng trưng bày và lịch sử bộ sưu tập trên chuỗi.",
+        "description": "Khám phá Cosmic Signature NFT đã được chủ sở hữu đặt tên. Xem tác phẩm, thông tin token và lịch sử sở hữu trên chuỗi.",
         "source": "Các API token công khai của Cosmic Signature",
         "links": {
           "gallery": "Khám phá toàn bộ phòng trưng bày",
@@ -325,12 +325,12 @@
   "currentCycleSummary": {
     "eyebrow": "Chu kỳ trình diễn trực tiếp · Arbitrum",
     "heading": "Chu kỳ trình diễn Cosmic Signature hiện tại",
-    "description": "Trang này theo dõi chu kỳ trình diễn Cosmic Signature đang diễn ra, gồm số nét bút công khai, bối cảnh dự trữ chu kỳ, tài sản đính kèm, các luồng phân bổ và trạng thái hoàn tất. Bảng điều khiển tương tác bên dưới sẽ nạp dữ liệu trực tiếp từ ứng dụng.",
+    "description": "Theo dõi chu kỳ Cosmic Signature hiện tại: số nét bút, dự trữ, tài sản đính kèm, các luồng phân bổ và trạng thái hoàn tất.",
     "unavailable": "Không khả dụng",
     "cards": {
       "cycle": "Chu kỳ",
       "gestures": "Nét bút",
-      "reserve": "Ảnh chụp dự trữ"
+      "reserve": "Dự trữ hiện tại"
     },
     "relatedAria": "Các trang liên quan đến chu kỳ hiện tại",
     "links": {
@@ -364,7 +364,7 @@
     "gallery": {
       "alt": "Cosmic Signature — Phòng trưng bày",
       "eyebrow": "Phòng trưng bày",
-      "title": "Quỹ đạo ba vật thể, kết xuất trên chuỗi.",
+      "title": "Nghệ thuật ba vật thể từ seed trên chuỗi.",
       "subhead": "Mỗi Signature là một mô phỏng ba vật thể tất định, được kết xuất quang phổ. Cùng seed, cùng điểm ảnh.",
       "chips": ["CC0", "Tất định", "Nghệ thuật tái tạo được"]
     },
@@ -401,14 +401,14 @@
       "eyebrow": "Nét bút",
       "eyebrowWithValue": "Vị trí nét bút #{value}",
       "title": "Một dấu khắc trên Signature.",
-      "subhead": "Mỗi nét bút kéo dài thời điểm hoàn tất chu kỳ, khắc CST tham gia và định hình Signature đang biến chuyển của chu kỳ.",
+      "subhead": "Mỗi nét bút kéo dài chu kỳ, định hình Signature và có thể khắc CST tham gia.",
       "chips": ["CC0", "Đã xác minh trên chuỗi", "7% Protocol Guild"]
     },
     "allocation": {
-      "alt": "Cosmic Signature — Phân phối phân bổ",
+      "alt": "Cosmic Signature — Cơ cấu phân bổ",
       "eyebrow": "Phân bổ",
       "eyebrowWithValue": "Chu kỳ #{value}",
-      "title": "Phân phối phân bổ",
+      "title": "Cơ cấu phân bổ",
       "subhead": "Dự trữ chu kỳ đã được phân phối qua hơn mười luồng phân bổ như thế nào.",
       "chips": ["Signature", "Chiến binh Thời gian", "Neo giữ"]
     },

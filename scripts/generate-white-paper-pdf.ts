@@ -11,18 +11,31 @@
  * public/white-paper/cosmic-signature-white-paper-v<x>[-<locale>].pdf
  *
  * Requires `pandoc` and `tectonic` on PATH (both available via Homebrew).
- * Non-Latin builds use macOS system fonts: the Chinese build sets Songti SC
+ * Most non-Latin builds use macOS system fonts: the Chinese build sets Songti SC
  * and PingFang SC through xeCJK, the Ukrainian build sets Cyrillic-capable
  * Times New Roman / Helvetica Neue through fontspec (Latin Modern, pandoc's
- * default, has no Cyrillic glyphs). Rerun after any change to a content
+ * default, has no Cyrillic glyphs). Japanese and Korean embed regular and bold
+ * Noto Sans JP/KR subsets from the pinned Google Fonts source used by the OG font builder;
+ * this avoids system CID fonts that some PDF readers cannot resolve.
+ * Rerun after any change to a content
  * module, and bump WHITE_PAPER_VERSION in content/white-paper/types.ts for
  * substantive revisions so older copies stay citable.
  */
 
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
+
+import subsetFont from 'subset-font';
 
 import {
   whitePaperContentEn,
@@ -44,6 +57,9 @@ import {
 import { isAppLocale, type AppLocale, type LocaleRecord } from '../i18n/locale';
 import { routing } from '../i18n/routing';
 
+import { GOOGLE_FONTS_COMMIT, type FontSource } from './build-og-fonts-core';
+import { uncoveredCharacters } from './font-cmap';
+
 const ROOT = resolve(process.cwd());
 
 interface LocaleBuild {
@@ -51,6 +67,10 @@ interface LocaleBuild {
   dateDisplay: string;
   tocTitle: string;
   headerIncludes: readonly string[];
+  /** An embeddable font, subset at body and heading weights from all of this paper's copy. */
+  embeddedCjkFont?: FontSource;
+  /** Width used by pandoc to choose whether table columns need wrapping. */
+  markdownColumns?: number;
   /** pandoc `lang` metadata (polyglossia hyphenation + typography); omitted when unset. */
   lang?: string;
 }
@@ -137,9 +157,11 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
     content: whitePaperContentKo,
     dateDisplay: '2026\ub144 8\uc6d4',
     tocTitle: '\ubaa9\ucc28',
+    embeddedCjkFont: { path: 'ofl/notosanskr/NotoSansKR[wght].ttf' },
+    markdownColumns: 80,
     headerIncludes: [
       ...BASE_HEADER_INCLUDES,
-      // macOS system Korean fonts through xeCJK. Korean separates words with
+      // Korean separates words with
       // spaces, which xeCJK must be told to keep (CJKspace); its punctuation
       // handling stays plain because Korean uses ASCII marks; and the
       // automatic CJK–Latin glue is switched off, because Korean counters
@@ -147,9 +169,6 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
       // spaces in the copy.
       '\\usepackage{xeCJK}',
       '\\xeCJKsetup{CJKspace=true, PunctStyle=plain, CJKecglue={}}',
-      '\\setCJKmainfont{AppleMyungjo}',
-      '\\setCJKsansfont{Apple SD Gothic Neo}',
-      '\\setCJKmonofont{Apple SD Gothic Neo}',
       '\\renewcommand{\\abstractname}{\uc694\uc57d}',
     ],
   },
@@ -157,18 +176,14 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
     content: whitePaperContentJa,
     dateDisplay: '2026\u5e748\u6708',
     tocTitle: '\u76ee\u6b21',
+    embeddedCjkFont: { path: 'ofl/notosansjp/NotoSansJP[wght].ttf' },
     headerIncludes: [
       ...BASE_HEADER_INCLUDES,
-      // macOS system Japanese fonts (JIS glyph forms) through xeCJK. Hiragino
-      // ships its weights as separately named faces, so the bold cut is bound
-      // explicitly; full-width punctuation keeps xeCJK's default handling, and
-      // the CJK–Latin glue stays off because the copy runs Japanese and Latin
-      // tokens together without spaces (style-guide-ja §4).
+      // The regular and bold fonts are prepared from this paper's full copy.
+      // CJK–Latin glue stays off because Japanese and Latin tokens run
+      // together without spaces (style-guide-ja §4).
       '\\usepackage{xeCJK}',
       '\\xeCJKsetup{CJKecglue={}}',
-      '\\setCJKmainfont[BoldFont={Hiragino Mincho ProN W6}]{Hiragino Mincho ProN W3}',
-      '\\setCJKsansfont[BoldFont={Hiragino Sans W6}]{Hiragino Sans W3}',
-      '\\setCJKmonofont{Hiragino Sans W3}',
       '\\renewcommand{\\abstractname}{\u6982\u8981}',
     ],
   },
@@ -189,6 +204,62 @@ const BUILDS: LocaleRecord<LocaleBuild> = {
     ],
   },
 };
+
+/**
+ * Embed static TrueType subsets rather than relying on a reader's CJK language
+ * packs. The small OG subsets are unsuitable here: body copy needs many more
+ * glyphs, and the paper uses both regular and bold text.
+ */
+async function prepareCjkFonts(build: LocaleBuild, tempDir: string): Promise<LocaleBuild> {
+  const source = build.embeddedCjkFont;
+  if (!source) return build;
+
+  const cacheDir = join(ROOT, 'node_modules', '.cache', 'og-fonts', GOOGLE_FONTS_COMMIT);
+  const cachePath = join(cacheDir, basename(source.path));
+  let font: Buffer;
+  if (existsSync(cachePath)) {
+    font = readFileSync(cachePath);
+  } else {
+    const url = `https://raw.githubusercontent.com/google/fonts/${GOOGLE_FONTS_COMMIT}/${encodeURI(source.path)}`;
+    const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+    if (!response.ok) throw new Error(`Font download failed: ${response.status} (${url})`);
+    font = Buffer.from(await response.arrayBuffer());
+    mkdirSync(cacheDir, { recursive: true });
+    writeFileSync(cachePath, font);
+  }
+
+  const printableAscii = Array.from({ length: 95 }, (_, index) =>
+    String.fromCharCode(index + 32),
+  ).join('');
+  const text = Array.from(
+    new Set(
+      `${JSON.stringify(build.content)}${build.dateDisplay}${build.tocTitle}${printableAscii}`,
+    ),
+  ).join('');
+  for (const [style, weight] of [
+    ['regular', 400],
+    ['bold', 700],
+  ] as const) {
+    const subset = await subsetFont(font, text, {
+      targetFormat: 'sfnt',
+      variationAxes: { wght: weight },
+    });
+    const missing = uncoveredCharacters(subset, text);
+    if (missing.length) throw new Error(`PDF font lacks glyphs: ${missing.join(' ')}`);
+    writeFileSync(join(tempDir, `paper-cjk-${style}.ttf`), subset);
+  }
+
+  const options = `Path={${tempDir}/},BoldFont=paper-cjk-bold.ttf,ItalicFont=paper-cjk-regular.ttf,BoldItalicFont=paper-cjk-bold.ttf`;
+  return {
+    ...build,
+    headerIncludes: [
+      ...build.headerIncludes,
+      `\\setCJKmainfont[${options}]{paper-cjk-regular.ttf}`,
+      `\\setCJKsansfont[${options}]{paper-cjk-regular.ttf}`,
+      `\\setCJKmonofont[${options}]{paper-cjk-regular.ttf}`,
+    ],
+  };
+}
 
 /**
  * The papers' prose intentionally contains no markdown syntax, so escaping
@@ -264,6 +335,11 @@ function wrapFormula(formula: string): string {
   return formula.replace(/ \/ /g, '\n    / ');
 }
 
+/** Explicit raw blocks let pandoc still parse Markdown inside a LaTeX container. */
+function rawLatex(value: string): string {
+  return `\`\`\`{=latex}\n${value}\n\`\`\``;
+}
+
 function renderBlock(block: WhitePaperBlock): string {
   switch (block.kind) {
     case 'paragraph':
@@ -272,9 +348,16 @@ function renderBlock(block: WhitePaperBlock): string {
       return block.items.map((item) => `- ${escapeMarkdown(item)}`).join('\n');
     case 'formula': {
       const code = `\`\`\`\n${wrapFormula(block.formula)}\n\`\`\``;
-      return block.caption
+      const contents = block.caption
         ? `${code}\n\n\\noindent {\\small \\emph{${latexEscape(block.caption)}}}`
         : code;
+      // A formula without its explanation on the same page is hard to read.
+      // These compact blocks fit comfortably on a page at the existing size.
+      return [
+        rawLatex('\\noindent\\begin{minipage}{\\linewidth}'),
+        contents,
+        rawLatex('\\end{minipage}'),
+      ].join('\n\n');
     }
     case 'note':
       return `> ${escapeMarkdown(block.text)}`;
@@ -288,9 +371,13 @@ function renderSection(section: WhitePaperSection): string {
   const title = /^\d+$/.test(section.number)
     ? `${section.number}. ${section.heading}`
     : section.heading;
+  // longtable may start on the next page even when a heading itself fits.
+  // Reserve room for the heading, table header, and initial rows together.
+  if (section.blocks[0]?.kind === 'table') parts.push('\\needspace{8\\baselineskip}');
   parts.push(`# ${escapeMarkdown(title)}`);
   for (const block of section.blocks) parts.push(renderBlock(block));
   for (const subsection of section.subsections ?? []) {
+    if (subsection.blocks[0]?.kind === 'table') parts.push('\\needspace{8\\baselineskip}');
     parts.push(`## ${subsection.number} ${escapeMarkdown(subsection.heading)}`);
     for (const block of subsection.blocks) parts.push(renderBlock(block));
   }
@@ -323,6 +410,9 @@ function buildMarkdown(build: LocaleBuild): string {
     body.push(renderSection(section));
   }
 
+  // References and the closing citation form one short block. A page break
+  // before the block is preferable to a final page containing only a license.
+  body.push(rawLatex('\\noindent\\begin{minipage}{\\linewidth}'));
   body.push(`# ${escapeMarkdown(content.references.heading)}`);
   body.push(
     content.references.items
@@ -337,21 +427,22 @@ function buildMarkdown(build: LocaleBuild): string {
   body.push(
     `\\noindent {\\small ${latexEscape(content.citation)}\\par\\smallskip\\noindent ${latexEscape(content.licenseNote)}}`,
   );
+  body.push(rawLatex('\\end{minipage}'));
 
   const frontMatter = `---\n${JSON.stringify(metadata, null, 2)}\n---`;
   return `${frontMatter}\n\n${body.join('\n\n')}\n`;
 }
 
-function generate(locale: AppLocale): void {
-  const build = BUILDS[locale];
+async function generate(locale: AppLocale): Promise<void> {
   const outputPath = join(ROOT, 'public', whitePaperPdfPath(locale));
-  const markdown = buildMarkdown(build);
   const tempDir = mkdtempSync(join(tmpdir(), `cosmic-white-paper-${locale}-`));
-  const markdownPath = join(tempDir, 'white-paper.md');
-  writeFileSync(markdownPath, markdown, 'utf8');
-  mkdirSync(dirname(outputPath), { recursive: true });
 
   try {
+    const build = await prepareCjkFonts(BUILDS[locale], tempDir);
+    const markdown = buildMarkdown(build);
+    const markdownPath = join(tempDir, 'white-paper.md');
+    writeFileSync(markdownPath, markdown, 'utf8');
+    mkdirSync(dirname(outputPath), { recursive: true });
     execFileSync(
       'pandoc',
       [
@@ -364,7 +455,7 @@ function generate(locale: AppLocale): void {
         'tectonic',
         '--toc',
         '--toc-depth=2',
-        '--columns=110',
+        `--columns=${build.markdownColumns ?? 110}`,
       ],
       { stdio: 'inherit' },
     );
@@ -378,7 +469,7 @@ function generate(locale: AppLocale): void {
   console.log(`\u2705  wrote ${outputPath} (${sizeKb} KB)`);
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const localeArgIndex = process.argv.indexOf('--locale');
   const requested = localeArgIndex === -1 ? 'all' : (process.argv[localeArgIndex + 1] ?? 'all');
   if (requested !== 'all' && !isAppLocale(requested)) {
@@ -387,7 +478,10 @@ function main(): void {
     );
   }
   const locales: readonly AppLocale[] = requested === 'all' ? routing.locales : [requested];
-  for (const locale of locales) generate(locale);
+  for (const locale of locales) await generate(locale);
 }
 
-main();
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});

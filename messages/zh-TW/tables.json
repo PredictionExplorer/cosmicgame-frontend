@@ -175,7 +175,7 @@
     "loadingNft": "正在載入 NFT"
   },
   "tableHeaderHelp": {
-    "explainColumn": "說明「{column}」列"
+    "explainColumn": "說明「{column}」欄"
   },
   "adminEvents": {
     "empty": "暫無事件。"
@@ -202,7 +202,7 @@
     "listAria": "按週期排列的獲配者列表"
   },
   "anchoringRecipient": {
-    "empty": "週期收官時沒有已錨定代幣，存入資金已轉撥至公共財地址。"
+    "empty": "週期收官時沒有已錨定的 Cosmic Signature NFT，該週期的錨定配發份額留在週期儲備中。"
   },
   "banGesture": {
     "banned": "落筆已停用。",
@@ -290,7 +290,7 @@
     "chronoReign": "在位時段",
     "recordGrowingSegment": "紀錄延長時段",
     "chronoDescription": "時之勇士紀錄按連續擔任堅守冠軍的最長時長計算。",
-    "activeEnduranceChallenge": "目前堅守程序",
+    "activeEnduranceChallenge": "目前堅守進程",
     "challengeSegment": "本次堅守時段",
     "recordToBeat": "待超越紀錄",
     "canExtendIn": "距延長紀錄還需",

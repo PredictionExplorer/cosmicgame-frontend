@@ -48,9 +48,7 @@ const rewardBreakdown = howItWorksContentEn.rewardBreakdown;
 describe('RewardBreakdown', () => {
   it('renders the section heading', () => {
     renderWithTooltip(<RewardBreakdown rewardBreakdown={rewardBreakdown} />);
-    expect(
-      screen.getByRole('heading', { name: 'What Every Gesture Imprints' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'What a Gesture Can Lead To' })).toBeInTheDocument();
   });
 
   it('renders all four reward titles', () => {

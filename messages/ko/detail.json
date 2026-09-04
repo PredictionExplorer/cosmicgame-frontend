@@ -50,7 +50,7 @@
   },
   "ownerActions": {
     "title": "내 토큰 관리",
-    "titleTooltip": "현재 소유자는 이 토큰을 MetaMask에 표시하거나 전송하거나 원하는 이름을 붙일 수 있습니다.",
+    "titleTooltip": "이 토큰의 소유자는 이름을 설정하거나 다른 주소로 전송할 수 있으며, MetaMask에 NFT를 추가해 표시할 수도 있습니다.",
     "metaMaskHeading": "MetaMask에 표시",
     "metaMaskTooltip": "MetaMask 브라우저 확장 프로그램에 이 NFT를 표시하도록 요청합니다. NFT 추가는 실험적인 기능으로, MetaMask 모바일에서는 지원되지 않습니다.",
     "addToMetaMask": "MetaMask에 NFT 추가",

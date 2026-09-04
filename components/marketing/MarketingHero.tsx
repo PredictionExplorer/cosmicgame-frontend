@@ -28,7 +28,6 @@ export function MarketingHero() {
 
       <h2 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
         {t.rich('hero.title', {
-          legacy: (chunks) => <>{chunks}</>,
           highlight: (chunks) => (
             <span className="bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent">
               {chunks}

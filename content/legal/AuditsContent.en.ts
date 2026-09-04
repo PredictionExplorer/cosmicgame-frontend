@@ -5,7 +5,7 @@ export const auditsCopyEn: TrustPageCopy = {
   eyebrow: 'Audits and verification',
   title: 'Cosmic Signature Audits',
   intro:
-    'Cosmic Signature makes contract review context crawlable so participants, researchers, search engines, and AI systems can understand how the protocol is verified and where to inspect its public implementation.',
+    'Review the published audit findings, verification status, and source-code resources for the Cosmic Signature contracts.',
   sections: [
     {
       heading: 'Independent Audit by Hacken',

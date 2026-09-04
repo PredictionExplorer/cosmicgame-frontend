@@ -1,8 +1,8 @@
 {
   "page": {
     "title": "ETH拠出",
-    "subtitle": "Cosmic Signature公共財金庫へETHを直接拠出する",
-    "description": "Cosmic Signature公共財金庫へETHを直接拠出し、宇宙評議会の調整で選ばれた受け手を支えます。拠出には任意でタイトル、メッセージ、URLを添えられます。各サイクルの主な拠出者はホームページで紹介されることがあります。",
+    "subtitle": "サイクル準備金へETHを直接拠出する",
+    "description": "一筆を入れずに、Cosmic Signatureのサイクル準備金へETHを直接拠出できます。タイトル、メッセージ、URLも任意で添えられます。拠出は現在のサイクルに記録されます。",
     "formTitle": "拠出する",
     "amountLabel": "金額（ETH）",
     "informationLabel": "情報",
@@ -24,7 +24,7 @@
     "messagePlaceholder": "拠出に添えるメモ（任意）",
     "contributeWithMessage": "メッセージを添えて拠出",
     "contributeEth": "ETHを拠出",
-    "structuredHelp": "任意項目は、拠出の詳細ページ向けに構造化JSONとして保存されます。"
+    "structuredHelp": "任意項目に入力した内容は、拠出の詳細ページに表示されます。"
   },
   "detail": {
     "invalidId": "拠出IDが無効です",
@@ -36,7 +36,7 @@
     "notFound": "拠出が見つかりません。",
     "subtitle": "拠出 #{id}",
     "contributionTitle": "拠出",
-    "contributionDescription": "オンチェーンの拠出記録とサイクルの文脈。",
+    "contributionDescription": "オンチェーンに記録された拠出の内容と、対象のサイクルです。",
     "datetimeLabel": "拠出日時",
     "explorerHelp": "ブロックエクスプローラーでトランザクションを開きます",
     "contributorAddressLabel": "拠出者アドレス",
@@ -44,7 +44,7 @@
     "cycleValue": "サイクル{cycle}",
     "amountLabel": "金額",
     "messageTitle": "拠出者のメッセージ",
-    "messageDescription": "拠出データに含まれる構造化された項目。",
+    "messageDescription": "この拠出に添えられたタイトルやメッセージです。",
     "titleLabel": "タイトル",
     "messageLabel": "メッセージ",
     "urlLabel": "URL",

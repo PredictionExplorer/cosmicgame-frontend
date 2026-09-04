@@ -23,7 +23,7 @@ export const howItWorksTextKo = {
     headingLead: 'Cosmic Signature',
     headingAccent: '작동 원리',
     paragraph:
-      '제스처를 남깁니다. 시간을 견딥니다. 시그니처를 빚어냅니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클 마감 시각이 지나면 사이클을 마감할 수 있습니다. 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
+      '제스처를 남기고, 시간을 지켜보며, 시그니처를 함께 빚어냅니다. 참여자는 퍼포먼스 사이클 동안 제스처를 남기고, 사이클 마감 시각이 지나면 사이클을 마감할 수 있습니다. 배분은 시그니처 배분, 앵커링 지급, Protocol Guild를 비롯한 10개가 넘는 경로로 이루어집니다.',
     primaryCtaLabel: '프로토콜 열기',
     secondaryCtaLabel: '자세히 알아보기',
   },
@@ -53,7 +53,7 @@ export const howItWorksTextKo = {
     ],
   },
   rewardBreakdown: {
-    heading: '제스처마다 각인되는 것',
+    heading: '제스처가 이어 주는 배분',
     subhead: '참여 한 번이 사이클마다 여러 배분 경로에 반영됩니다.',
     items: [
       {
@@ -75,7 +75,7 @@ export const howItWorksTextKo = {
         title: '시그니처 배분',
         description: `최종 제스처를 남긴 참여자는 사이클 준비금 ETH의 ${protocolFacts.mainEthPercentage}%, ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST, Cosmic Signature NFT를 회수할 수 있습니다.`,
         tooltip:
-          '사이클 준비금은 제스처를 남길 때마다 쌓입니다. 최종 제스처를 남긴 참여자가 프로토콜 컨트랙트를 통해 시그니처 배분을 회수합니다.',
+          '사이클 준비금은 ETH 제스처로 쌓입니다. 최종 제스처를 남긴 참여자가 프로토콜 컨트랙트를 통해 시그니처 배분을 회수합니다.',
       },
     ],
   },
@@ -141,7 +141,7 @@ export const howItWorksTextKo = {
       {
         title: '제스처 비용 확인',
         tooltip:
-          'Arbitrum의 가스 비용은 보통 몇 센트 수준으로, 이더리움 메인넷보다 훨씬 저렴합니다.',
+          '가스 비용은 네트워크 상황과 작업 내용에 따라 달라집니다. 제스처 비용과 별도로 필요하므로, 전송 전에 지갑에 표시된 예상 비용을 확인해 주세요.',
         highlights: [
           '사이클 마감 시각을 확인합니다. 제스처마다 저장된 마감 시각에 현재 시간 증가량이 더해집니다.',
           '제스처를 남기기 전에 현재 ETH 또는 CST 제스처 비용을 확인합니다.',

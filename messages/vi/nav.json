@@ -25,11 +25,11 @@
     },
     "allocationRecipients": {
       "label": "Người nhận phân bổ",
-      "description": "Dự trữ của từng chu kỳ đã đi về đâu"
+      "description": "Chi tiết phân bổ dự trữ của từng chu kỳ"
     },
     "anchorDistributions": {
       "label": "Phân phối neo giữ",
-      "description": "Các NFT đang neo giữ và phần phân phối của chúng"
+      "description": "NFT đang neo giữ và các khoản phân phối tương ứng"
     },
     "outreachReserve": {
       "label": "Dự trữ truyền thông",
@@ -111,7 +111,7 @@
   },
   "maintenance": {
     "pendingMessage": "Chế độ bảo trì sẽ kích hoạt sau khi phân bổ hiện tại hoàn tất. Giao thức mở lại khi các điều chỉnh hoàn thành.",
-    "activeMessage": "Giao thức đang ở chế độ bảo trì. Nét bút sẽ tiếp tục khi việc điều chỉnh tham số hoàn thành.",
+    "activeMessage": "Giao thức đang bảo trì. Bạn có thể tiếp tục đặt nét bút sau khi điều chỉnh tham số xong.",
     "pendingLabel": "Đang chờ",
     "activeLabel": "Bảo trì"
   }

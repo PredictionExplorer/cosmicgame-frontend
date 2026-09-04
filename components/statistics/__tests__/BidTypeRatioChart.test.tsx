@@ -233,7 +233,7 @@ describe('BidTypeRatioChart', () => {
   it('says the cycle has not started and skips the query when there is no start time', () => {
     render(<BidTypeRatioChart roundStartTs={0} />);
 
-    expect(screen.getByText(/round hasn’t started yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/cycle hasn’t started yet/i)).toBeInTheDocument();
     expect(screen.queryByTestId('area-chart')).not.toBeInTheDocument();
     expect(lastQueryArgs()[3]).toBe(false);
   });
@@ -242,7 +242,7 @@ describe('BidTypeRatioChart', () => {
     mockUseBidTypeRatio.mockReturnValue(okQuery([]));
     render(<BidTypeRatioChart roundStartTs={ROUND_START} />);
 
-    expect(screen.getByText('No gesture activity in the current round yet.')).toBeInTheDocument();
+    expect(screen.getByText('No gesture activity in the current cycle yet.')).toBeInTheDocument();
     expect(screen.queryByTestId('area-chart')).not.toBeInTheDocument();
   });
 

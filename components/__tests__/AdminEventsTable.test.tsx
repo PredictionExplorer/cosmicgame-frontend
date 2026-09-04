@@ -32,8 +32,8 @@ describe('AdminEventsTable', () => {
     expect(
       screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
     ).toBeInTheDocument();
-    // RecordType 1 is 'CharityPercentageChanged' with type 'percentage'
-    expect(screen.getByText('CharityPercentageChanged')).toBeInTheDocument();
+    // The event is presented as a readable description, with its percentage.
+    expect(screen.getByText('Public Goods percentage changed')).toBeInTheDocument();
     expect(screen.getByText('25%')).toBeInTheDocument();
   });
 

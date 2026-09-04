@@ -32,57 +32,57 @@ beforeEach(() => {
 describe('EnduranceTimelineSection round picker', () => {
   it('starts on the live round', () => {
     render(<EnduranceTimelineSection currentRoundNum={5} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(5);
-    expect(screen.getByText('Live round')).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
+    expect(screen.getByText('Live cycle')).toBeInTheDocument();
   });
 
   it('follows the live round when it advances (regression: stale selection)', () => {
     const { rerender } = render(<EnduranceTimelineSection currentRoundNum={5} />);
     rerender(<EnduranceTimelineSection currentRoundNum={6} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(6);
-    expect(screen.getByText('Live round')).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(6);
+    expect(screen.getByText('Live cycle')).toBeInTheDocument();
   });
 
   it('keeps a user-pinned round when the live round advances', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<EnduranceTimelineSection currentRoundNum={5} />);
 
-    await user.click(screen.getByRole('button', { name: 'Previous round' }));
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(4);
+    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
 
     rerender(<EnduranceTimelineSection currentRoundNum={6} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(4);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
   });
 
   it('resumes following live after "Jump to live"', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<EnduranceTimelineSection currentRoundNum={5} />);
 
-    await user.click(screen.getByRole('button', { name: 'Previous round' }));
+    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
     await user.click(screen.getByRole('button', { name: 'Jump to live' }));
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(5);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
 
     rerender(<EnduranceTimelineSection currentRoundNum={7} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(7);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(7);
   });
 
   it('re-pins to live when stepping forward to the newest round', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<EnduranceTimelineSection currentRoundNum={5} />);
 
-    await user.click(screen.getByRole('button', { name: 'Previous round' }));
-    await user.click(screen.getByRole('button', { name: 'Next round' }));
-    expect(screen.getByText('Live round')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
+    await user.click(screen.getByRole('button', { name: 'Next cycle' }));
+    expect(screen.getByText('Live cycle')).toBeInTheDocument();
 
     rerender(<EnduranceTimelineSection currentRoundNum={6} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(6);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(6);
   });
 
   it('follows a late-arriving dashboard round (initial -1)', () => {
     const { rerender } = render(<EnduranceTimelineSection currentRoundNum={-1} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(0);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(0);
 
     rerender(<EnduranceTimelineSection currentRoundNum={4} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(4);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
   });
 });

@@ -9,7 +9,7 @@ export const landingTextJa = {
   meta: {
     title: 'Cosmic Signature：Arbitrum上のプロシージャル・オンチェーンアート・プロトコル',
     description:
-      'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。すべての一筆がサイクルの最終シグネチャーを形づくり、プロトコルは準備金を、その結果を形づくったすべての人へ——Ethereum自身が依存するインフラも含めて——配り直します。',
+      'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。一筆を重ねることでサイクルのシグネチャーが生まれ、準備金は参加者やEthereumを支えるインフラへ配分されます。',
     keywords: [
       'Cosmic Signature',
       'プロシージャルアート・プロトコル',
@@ -30,7 +30,7 @@ export const landingTextJa = {
     headlineLead: 'Cosmic Signature：プロシージャル・オンチェーンアート ·',
     headlineAccent: 'Arbitrum',
     subhead:
-      'すべての一筆がシグネチャーを形づくる。パフォーマンス・サイクルの間に一筆を入れると、その一つひとつがサイクルの最終シグネチャーを形づくります。サイクルが確定すると、プロトコルは準備金を10を超える配分トラックへ配ります。その中には、Ethereum自身が依存するインフラも含まれます。',
+      '一筆を重ねるたびに、シグネチャーが形づくられます。サイクルが確定すると、準備金は10を超える配分トラックへ。参加者に加え、Ethereumを支えるインフラにも届けられます。',
     biologyDisclaimer:
       'Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。オンチェーンアートのプロトコルとアプリです。',
     primaryCtaLabel: 'アプリを開く',
@@ -48,10 +48,10 @@ export const landingTextJa = {
       'Arbitrum One',
     ],
     art: {
-      eyebrow: 'コレクションからライブで',
+      eyebrow: 'コレクションの作品',
       caption: 'オンチェーンに刻印 · CC0',
       cstNote: `刻印されたシグネチャーにはそれぞれ${cst} CSTが添えられています。`,
-      formingLabel: 'シグナル形成中',
+      formingLabel: '作品を読み込み中',
       formingBody: 'ネットワークが応答すると、コレクションのシグネチャーがここに表示されます。',
       viewAriaLabel: 'Cosmic Signature {tokenLabel}をアプリで見る',
       artworkAlt: 'Cosmic Signature {tokenLabel}——決定論的な三体ジェネラティブアートワーク',
@@ -63,7 +63,7 @@ export const landingTextJa = {
     eyebrow: 'サイクル',
     heading: 'パフォーマンス・サイクル、開始から確定まで。',
     description:
-      'サイクルとは時間の窓です。調律期間で開き、一筆で満たされ、サイクル確定時刻が切れると確定します。運営する側も、仲介する者もいません。あるのはプロトコルだけです。',
+      'サイクルは調律期間から始まり、一筆を重ねながら続いていきます。確定時刻を過ぎると、サイクルを確定できます。進行を取り仕切る人や仲介者はおらず、プロトコルのルールに従って動きます。',
     stages: {
       opening: {
         title: 'サイクル開始',
@@ -75,7 +75,7 @@ export const landingTextJa = {
       },
       finalization: {
         title: '確定',
-        body: 'サイクル確定時刻が切れると、最後の一筆を入れた参加者がサイクルを確定できます。優先確定期間の後は、公開確定期間が誰にでも開かれます。',
+        body: 'サイクル確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。優先確定期間が過ぎると公開確定期間に入り、誰でも確定できます。',
       },
       allocations: {
         title: '配分',
@@ -86,9 +86,9 @@ export const landingTextJa = {
 
   art: {
     eyebrow: 'アート',
-    heading: '三体問題を、オンチェーンで描く。',
+    heading: 'オンチェーンのシードから描く、三体問題。',
     description:
-      'すべてのCosmic Signature NFTは、ニュートン重力のもとで軌道を描く三つの天体を可視化したものです。三つの天体は本質的にカオスな軌跡を生みます。AIはなし。学習データもなし。あるのは決定論的な物理だけ。同じシード → ピクセル単位で同一の出力。',
+      'Cosmic Signature NFTは、ニュートン重力のもとで動く三つの天体の軌跡を描きます。その複雑な模様は、AIや学習データを使わず、決定論的な物理計算から生まれます。同じシードからは、ピクセル単位で同じ作品を再現できます。',
     loading: {
       label: 'ライブアーカイブを同期中',
       description:
@@ -117,15 +117,15 @@ export const landingTextJa = {
       },
       camera: {
         title: 'カメラ',
-        body: 'ゆっくりとした楕円軌道のカメラの揺らぎが、三体の舞を通してそれぞれのシグネチャーに映画のような視差を与えます。',
+        body: 'カメラがゆっくりと楕円軌道を巡り、三つの天体の動きを捉えます。視点の変化が、作品に映画のような奥行きを生みます。',
       },
       color: {
         title: '色',
-        body: '色は知覚的なOKLab空間で混ぜられ、天体ごとに120°の色相差を持ち、揺らぎと正弦波で変調されます。',
+        body: '人の色の知覚に合わせたOKLab空間で色を混ぜます。天体ごとに色相を120°ずつずらし、緩やかな変化と正弦波で色を変調します。',
       },
       'spectral-render': {
         title: 'スペクトルレンダリング',
-        body: '380から700ナノメートルまでの64の波長ビンが、速度に応じた太さと被写界深度で軌道の軌跡を描きます。',
+        body: '380から700ナノメートルの波長を64のビンに分けて軌跡を描きます。線の太さは天体の速度に応じて変わり、被写界深度が奥行きを添えます。',
       },
       signature: {
         title: 'シグネチャー',
@@ -144,7 +144,7 @@ export const landingTextJa = {
     eyebrow: '配分トラック',
     heading: 'プロトコルがサイクル準備金を配る、10を超える道筋。',
     description:
-      'サイクルが確定すると、プロトコルはETHとCSTの準備金を、持久、タイミング、献身、参加を認める配分トラックへ配ります。ETH準備金のおよそ半分は次のサイクルへ累積します。',
+      'サイクルが確定すると、プロトコルはETHとCSTの準備金を、継続の長さ、タイミング、関わり方、参加を反映する配分トラックへ配ります。ETH準備金のおよそ半分は次のサイクルへ累積します。',
     cardLabel: '配分',
     items: {
       'signature-allocation': {
@@ -158,7 +158,7 @@ export const landingTextJa = {
       },
       'chrono-warrior': {
         title: '時の戦士配分',
-        body: `持久チャンピオンの位置を最も長く連続して保った参加者へ。${cst} CSTとCosmic Signature NFT 1点を含みます。`,
+        body: `持久チャンピオンの称号を最も長く連続して保持した参加者へ。${cst} CSTとCosmic Signature NFT 1点を含みます。`,
       },
       'public-goods': {
         title: '公共財配分',
@@ -185,12 +185,12 @@ export const landingTextJa = {
       'endurance-champion': {
         percent: `${cst} CST`,
         title: '持久チャンピオン配分',
-        body: '最も長く途切れなかった持久の期間を持つ参加者へ、1,000 CSTの功労CSTとCosmic Signature NFT 1点。',
+        body: '最新の一筆を入れた参加者として最も長く先頭を保持した参加者に、1,000 CSTの功労CSTとCosmic Signature NFT 1点が配分されます。',
       },
       'final-cst-gesture': {
         percent: `${cst} CST`,
         title: '最後のCST一筆配分',
-        body: 'サイクルで最後のCST一筆を入れた参加者へ、1,000 CSTの功労CSTとCosmic Signature NFT 1点。',
+        body: 'サイクルで最後のCST一筆を入れた参加者に、1,000 CSTの功労CSTとCosmic Signature NFT 1点が配分されます。',
       },
     },
   },
@@ -203,7 +203,7 @@ export const landingTextJa = {
       'サイクルごとにETHが積み上がり、係留解除時に受け取ります',
       '係留はいつでも解除できます。各NFTの係留は一度だけです',
       'Random Walkの係留は星選の対象になります',
-      '固定期間もペナルティもありません。解除はNFTごとに取り消せません',
+      'ロック期間やペナルティはありません。一度解除したNFTは再び係留できません',
     ],
     ctaLabel: 'アプリで係留する',
   },
@@ -211,7 +211,7 @@ export const landingTextJa = {
   publicGoods: {
     eyebrow: '公共財',
     heading: 'すべてのサイクルの7%が、Ethereumのコア貢献者を支えます。',
-    body: 'すべてのパフォーマンス・サイクルは、ETH準備金の7%を、170人以上のEthereumコア貢献者の共同資金支援メカニズムであるProtocol Guildへ送ります。プロトコルが使われるほど、Ethereum自身が依存するインフラへ多くが流れます。',
+    body: 'すべてのパフォーマンス・サイクルは、ETH準備金の7%を、170人以上のEthereumコア貢献者の共同資金支援メカニズムであるProtocol Guildへ送ります。プロトコルの利用が増えるほど、Ethereumを支えるインフラへ届く資金も増えます。',
     disclaimerHeading: '免責事項',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
@@ -219,7 +219,7 @@ export const landingTextJa = {
     // lexicon-allow-end
     card: {
       label: 'サイクル配分',
-      description: 'すべてのパフォーマンス・サイクルのうち、Protocol Guildへ送られる割合。',
+      description: '各サイクルのETH準備金からProtocol Guildへ送られる割合です。',
       tableRows: {
         contributors: { label: 'Protocol Guildの貢献者' },
         enforcement: { label: '執行', value: 'オンチェーン' },
@@ -260,7 +260,7 @@ export const landingTextJa = {
       },
       {
         title: '検証状況',
-        body: 'アプリは公開コントラクトアドレス、ソースコードのリソース、検証の背景、監査 / 報告書の状況をつなぎ、公開されたものを誰でも調べられるようにします。',
+        body: '公開コントラクトのアドレス、ソースコード、検証の範囲、監査報告書の公開状況をアプリで確認できます。',
       },
       {
         title: '再現可能なアート',
@@ -271,7 +271,7 @@ export const landingTextJa = {
 
   faq: {
     eyebrow: 'よくある質問',
-    heading: '率直に答えておきたい質問。',
+    heading: 'よく寄せられる疑問に答えます。',
     items: [
       // lexicon-allow-start: explicit denial of lottery, casino, gambling, house, dealer, and bet categories.
       {
@@ -283,12 +283,12 @@ export const landingTextJa = {
       {
         question: '参加者として、実際には何をするのですか？',
         answer:
-          '一筆を入れます。各一筆はETHまたはCSTのトランザクションで、サイクル確定時刻を延ばし、星選の対象を記録し、動的な参加CSTを刻印することがあり、サイクルのシグネチャーを形づくります。Cosmic Signature NFTを係留して係留配分の分け前を受け取ることもできます。100 CST以上を保有していれば、宇宙評議会を通じて調整提案を提出することもできます。',
+          '一筆を入れます。各一筆はETHまたはCSTのトランザクションで、サイクル確定時刻を延ばし、星選の対象を記録し、動的な参加CSTを刻印することがあり、サイクルのシグネチャーを形づくります。Cosmic Signature NFTを係留すると、係留配分の対象にもなります。100 CST以上を保有していれば、宇宙評議会を通じて調整提案を提出することもできます。',
       },
       {
         question: '参加CSTの量はなぜ変わるのですか？',
         answer:
-          '参加CSTの刻印は、前の一筆からの経過時間に基づく平方根の式を使います。静かな時間が長いほどCSTの刻印は大きくなりますが、平方根のため増え方は線形より緩やかです。ごく短い間隔の一筆は0 CSTを刻印することがあります。送信前にアプリが現在の量をプレビューします。',
+          '参加CSTの刻印は、前の一筆からの経過時間に基づく平方根の式を使います。前の一筆から時間が空くほど刻印されるCSTは増えますが、平方根を使うため、増加のペースは次第に緩やかになります。ごく短い間隔の一筆は0 CSTを刻印することがあります。送信前にアプリが現在の量をプレビューします。',
       },
       {
         question: 'ETH一筆とCST一筆はCST調律期間にどう影響しますか？',
@@ -314,7 +314,7 @@ export const landingTextJa = {
       },
       // lexicon-allow-end
       {
-        question: 'アートとは、技術的には何ですか？',
+        question: '作品はどのような技術で作られていますか？',
         answer:
           '各Cosmic Signature NFTは、ニュートン力学による三体シミュレーションの決定論的なレンダリングです。オンチェーンのシードが候補軌道（4次ヨシダ・シンプレクティック積分器でシミュレーションした10万通りの中から）を選び、それがOKLabの色の混合とともに64の波長ビンでスペクトルレンダリングされます。パイプラインはCC0のもとで完全にオープンソースで、誰でもシードからシグネチャーを再現できます。',
       },
@@ -377,7 +377,7 @@ export const landingTextJa = {
 
   notFound: {
     heading: '星図の外へ。',
-    description: 'この座標はプロトコルの外へ流れ出てしまいました。シグネチャーへ戻りましょう。',
+    description: 'お探しのページは見つかりませんでした。シグネチャーの世界へ戻りましょう。',
     ctaLabel: 'シグネチャーへ戻る',
   },
 } satisfies LandingText;

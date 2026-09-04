@@ -29,11 +29,11 @@
     },
     "empty": {
       "ethTitle": "Chưa có phân bổ ETH",
-      "ethDescription": "Tham gia Tinh tuyển bằng cách đặt nét bút để nhận phân bổ ETH.",
+      "ethDescription": "Mỗi nét bút được tính vào Tinh tuyển, qua đó bạn có thể nhận phân bổ ETH.",
       "nftTitle": "Không có NFT đính kèm",
-      "nftDescription": "Các NFT đính kèm vào nét bút trong các chu kỳ sẽ xuất hiện ở đây.",
+      "nftDescription": "NFT đính kèm được phân bổ cho ví này sẽ xuất hiện tại đây.",
       "erc20Title": "Không có token đính kèm",
-      "erc20Description": "Các token ERC-20 đính kèm vào nét bút trong các chu kỳ sẽ xuất hiện ở đây."
+      "erc20Description": "Token ERC-20 đính kèm được phân bổ cho ví này sẽ xuất hiện tại đây."
     },
     "retrievable": "Có thể nhận về:",
     "retrieving": "Đang nhận về…",
@@ -65,7 +65,7 @@
       "distributionPerNft": {
         "label": "Phân phối mỗi Cosmic Signature NFT",
         "tooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ, tính bằng tổng quỹ neo giữ (trên chuỗi) chia cho số Cosmic Signature NFT neo giữ đã lập chỉ mục.",
-        "indexUnavailableSuffix": "Quỹ neo giữ trên chuỗi khác không, nhưng tổng số Cosmic Signature NFT neo giữ đã lập chỉ mục lại bằng không (ví dụ cg_stake_stats_cst chưa được ETL cập nhật), nên không thể tính mức mỗi NFT."
+        "indexUnavailableSuffix": "Quỹ trên chuỗi có ETH nhưng dữ liệu chưa ghi nhận Cosmic Signature NFT nào đang neo giữ. Chưa thể tính mức phân phối cho mỗi NFT cho đến khi số liệu được cập nhật."
       }
     }
   },
@@ -79,7 +79,7 @@
       "ownSubtitle": "Bảng điều khiển đầy đủ về hoạt động và lịch sử của bạn",
       "userSubtitle": "Đang xem thống kê và hoạt động của một người tham gia khác",
       "emptyTitle": "Chưa có hoạt động",
-      "emptyDescription": "Tài khoản này chưa tham gia chu kỳ trình diễn nào. Hãy đặt một nét bút để bắt đầu!",
+      "emptyDescription": "Tài khoản này chưa tham gia chu kỳ trình diễn nào. Đặt nét bút để bắt đầu.",
       "sections": {
         "gestureHistory": "Lịch sử nét bút",
         "recipientHistory": "Lịch sử nhận phân bổ",
@@ -100,7 +100,7 @@
       },
       "signatureAllocations": {
         "label": "Phân bổ Signature đã nhận",
-        "tooltip": "Số lần bạn nhận về phân bổ Signature nhờ đặt nét bút cuối cùng trước khi thời điểm hoàn tất chu kỳ hết hạn."
+        "tooltip": "Số lần ví này đã nhận về phân bổ Signature."
       },
       "totalEth": {
         "label": "Tổng ETH Tinh tuyển",
@@ -127,8 +127,8 @@
         "tooltip": "Tổng số nét bút trong mọi chu kỳ."
       },
       "maxGesture": {
-        "label": "Nét bút lớn nhất",
-        "tooltip": "Nét bút đơn lẻ lớn nhất bạn từng đặt."
+        "label": "Chi phí nét bút cao nhất",
+        "tooltip": "Chi phí cao nhất từng trả cho một nét bút."
       },
       "ethSelections": {
         "label": "Phân bổ ETH Tinh tuyển",
@@ -293,7 +293,7 @@
       "cycle": "Chu kỳ",
       "recipientAddress": "Địa chỉ người nhận",
       "currentlyAnchored": "Đang neo giữ?",
-      "anchoredOnce": "Đã neo giữ một lần?",
+      "anchoredOnce": "Đã từng neo giữ?",
       "allocationType": "Loại phân bổ",
       "types": {
         "stellarSelection": "Tinh tuyển Cosmic Signature NFT",
@@ -325,7 +325,7 @@
       "sending": "Đang gửi…",
       "send": "Gửi CST",
       "viewHistory": "Xem lịch sử chuyển CST",
-      "confirmed": "Đã xác nhận chuyển.",
+      "confirmed": "Đã xác nhận chuyển CST.",
       "viewTransaction": "Xem giao dịch"
     }
   },

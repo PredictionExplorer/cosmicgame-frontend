@@ -8,7 +8,7 @@
   "sections": {
     "personal": {
       "title": "개인 도구",
-      "description": "지갑별 페이지는 지갑을 연결한 참여자에게 유용하지만, 검색 색인에서 제외되며 XML 사이트맵에도 포함되지 않습니다.",
+      "description": "지갑을 연결해 내 NFT, 배분, 앵커링을 확인하고 관리할 수 있습니다.",
       "navLabel": "개인 도구"
     },
     "system": {
@@ -18,7 +18,7 @@
     },
     "data": {
       "title": "프로토콜 데이터 페이지",
-      "description": "XML 사이트맵에 실린 모든 공개 데이터 경로를 한 목록에 모았습니다.",
+      "description": "공개된 프로토콜 데이터 페이지를 한곳에서 찾아볼 수 있습니다.",
       "navLabel": "프로토콜 데이터 페이지"
     },
     "ecosystem": {
@@ -30,23 +30,23 @@
   "links": {
     "myNfts": {
       "label": "내 NFT",
-      "description": "지갑별 NFT 보기 페이지입니다. 검색 색인에서 제외됩니다."
+      "description": "연결한 지갑의 NFT를 확인하고 관리합니다."
     },
     "myAllocations": {
       "label": "내 미회수 배분",
-      "description": "지갑별 배분 회수 페이지입니다. 검색 색인에서 제외됩니다."
+      "description": "연결한 지갑의 미회수 배분을 확인합니다."
     },
     "myAnchors": {
       "label": "내 앵커링",
-      "description": "지갑별 앵커링 페이지입니다. 검색 색인에서 제외됩니다."
+      "description": "연결한 지갑의 앵커링을 확인하고 관리합니다."
     },
     "about": {
       "label": "Cosmic Signature 소개",
-      "description": "프로토콜을 대표하는 소개 페이지이자 브랜드 안내입니다."
+      "description": "프로토콜의 개요와 공식 자료를 소개합니다."
     },
     "learn": {
       "label": "Cosmic Signature 학습 센터",
-      "description": "AI와 검색 시스템이 크롤링할 수 있는 해설 문서입니다."
+      "description": "작동 원리와 참여 방법을 쉽게 설명합니다."
     },
     "whatIsCosmicSignature": {
       "label": "Cosmic Signature란 무엇인가요?",

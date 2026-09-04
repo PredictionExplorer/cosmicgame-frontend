@@ -8,7 +8,10 @@ const percent = (value: number): string => value.toLocaleString('vi-VN');
 /** Vietnamese decimal mark for a protocol figure quoted in English notation ("0.0001"). */
 const viDecimal = (value: string | number): string => String(value).replace('.', ',');
 
-const ELAPSED_VI: Record<string, string> = {
+const ELAPSED_VI: Record<
+  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
+  string
+> = {
   '0 seconds': '0 giây',
   '1 second': '1 giây',
   '60 seconds': '60 giây',
@@ -38,8 +41,8 @@ export const whitePaperTextVi = {
   abstract: {
     heading: 'Tóm tắt',
     paragraphs: [
-      'Cosmic Signature là một giao thức nghệ thuật tạo sinh trên Arbitrum One. Nó vận hành như một chuỗi các chu kỳ trình diễn có giới hạn thời gian. Trong một chu kỳ, người tham gia đặt nét bút bằng ETH hoặc bằng CST, token ERC-20 của giao thức. Mỗi nét bút kéo dài đếm ngược của chu kỳ, ghi nhận một lượt trong Tinh tuyển của chu kỳ và có thể khắc CST mới. Khi đếm ngược hết hạn và chu kỳ được hoàn tất, giao thức phân phối dự trữ ETH của mình qua hơn mười luồng phân bổ, khắc một thế hệ Cosmic Signature NFT mới, và chuyển một phần cố định đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum. Khoảng một nửa dự trữ được chuyển sang chu kỳ sau, nên mỗi chu kỳ bắt đầu lớn hơn chu kỳ trước.',
-      'Mỗi Cosmic Signature NFT là một bản kết xuất tất định của bài toán ba vật thể hấp dẫn, được tạo từ một seed trên chuỗi và bất kỳ ai cũng có thể tái tạo đến từng điểm ảnh. Không mạng thần kinh nào chạm vào hình ảnh. Bài viết này mô tả đầy đủ cơ chế và thiết kế token, ghi lại nâng cấp V2 đang vận hành hôm nay, trình bày nâng cấp V3 dự kiến, và nêu cam kết loại bỏ mọi hình thức kiểm soát đặc quyền khỏi địa chỉ triển khai một khi thiết kế hoàn thành.',
+      'Cosmic Signature là một giao thức nghệ thuật tạo sinh trên Arbitrum One. Nó vận hành như một chuỗi các chu kỳ trình diễn có giới hạn thời gian. Trong một chu kỳ, người tham gia đặt nét bút bằng ETH hoặc bằng CST, token ERC-20 của giao thức. Mỗi nét bút kéo dài đếm ngược của chu kỳ, ghi nhận một lượt trong Tinh tuyển của chu kỳ và có thể khắc CST mới. Khi đếm ngược hết hạn và chu kỳ được hoàn tất, giao thức phân phối dự trữ ETH của mình qua hơn mười luồng phân bổ, khắc một thế hệ Cosmic Signature NFT mới, và chuyển một phần cố định đến Protocol Guild, cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum. Khoảng một nửa dự trữ được chuyển sang chu kỳ sau. Số dư mở đầu không nhất thiết tăng qua từng chu kỳ; mức dự trữ còn phụ thuộc vào ETH mới được đóng góp.',
+      'Mỗi Cosmic Signature NFT là một bản kết xuất tất định của bài toán ba vật thể hấp dẫn, được tạo từ một seed trên chuỗi và bất kỳ ai cũng có thể tái tạo đến từng điểm ảnh. Hình ảnh được tạo mà không sử dụng mạng thần kinh. Bài viết này mô tả đầy đủ cơ chế và thiết kế token, ghi lại nâng cấp V2 đang vận hành hôm nay, trình bày nâng cấp V3 dự kiến, và nêu cam kết loại bỏ mọi hình thức kiểm soát đặc quyền khỏi địa chỉ triển khai một khi thiết kế hoàn thành.',
     ],
   },
   tocHeading: 'Mục lục',
@@ -49,21 +52,21 @@ export const whitePaperTextVi = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Cosmic Signature bắt đầu từ hai niềm tin. Thứ nhất, nghệ thuật tạo sinh thú vị nhất khi không có gì trong nó là tùy tiện: khi mỗi hình ảnh là đầu ra của một quá trình vật lý, được cố định bởi một seed, và bất kỳ ai cũng có thể chạy lại quá trình đó để kiểm chứng kết quả. Thứ hai, một giao thức giữ ETH thay cho những người tham gia nợ họ một câu trả lời cơ học, dễ đọc cho câu hỏi mỗi wei đi về đâu.',
+          text: 'Cosmic Signature bắt đầu từ hai niềm tin. Thứ nhất, nghệ thuật tạo sinh thú vị nhất khi không có gì trong nó là tùy tiện: khi mỗi hình ảnh là đầu ra của một quá trình vật lý, được cố định bởi một seed, và bất kỳ ai cũng có thể chạy lại quá trình đó để kiểm chứng kết quả. Thứ hai, một giao thức giữ ETH thay cho những người tham gia cần giải thích rõ, bằng các quy tắc có thể kiểm tra, mỗi wei được chuyển đi đâu.',
         },
         {
           kind: 'paragraph',
-          text: 'Kết quả là một giao thức xây quanh thời gian. Một chu kỳ trình diễn mở ra, đầy dần bằng nét bút, và khép lại khi đếm ngược của nó cạn. Một nét bút là một hành động nhỏ trên chuỗi: nó mang ETH hoặc CST, có thể mang một lời nhắn ngắn hoặc một tài sản đính kèm, và nó đẩy thời điểm hoàn tất của chu kỳ xa hơn về tương lai. Người tham gia có nét bút đứng cuối khi đếm ngược hết hạn, nét bút cuối cùng, sẽ hoàn tất chu kỳ. Hoàn tất phân phối dự trữ, khắc các NFT của chu kỳ và chuẩn bị chu kỳ tiếp theo.',
+          text: 'Kết quả là một giao thức xây quanh thời gian. Chu kỳ trình diễn mở ra, phát triển qua các nét bút và có thể được hoàn tất khi đếm ngược về 0. Một nét bút là một hành động nhỏ trên chuỗi: nó mang ETH hoặc CST, có thể mang một lời nhắn ngắn hoặc một tài sản đính kèm, và nó đẩy thời điểm hoàn tất của chu kỳ xa hơn về tương lai. Người tham gia có nét bút đứng cuối khi đếm ngược hết hạn, nét bút cuối cùng, sẽ hoàn tất chu kỳ. Hoàn tất phân phối dự trữ, khắc các NFT của chu kỳ và chuẩn bị chu kỳ tiếp theo.',
         },
         {
           kind: 'paragraph',
-          text: 'Ba đặc tính neo giữ thiết kế này.',
+          text: 'Thiết kế dựa trên ba nguyên tắc.',
         },
         {
           kind: 'list',
           items: [
             'Tính tất định. Tác phẩm được tính từ một seed ghi trên chuỗi lúc khắc. Quy trình kết xuất là mã nguồn mở, và cùng một seed luôn tạo ra cùng một hình ảnh và video, đến từng bit.',
-            'Phân phối cơ học. Tỷ lệ phân bổ là các hằng số trong hợp đồng đã xác minh. Không tài khoản tùy quyết nào đứng giữa người tham gia và quy tắc phân phối, và không ví nào của đội ngũ nhận ETH từ nét bút.',
+            'Phân phối theo quy tắc. Các hợp đồng đã xác minh thực thi quy tắc phân bổ của giao thức. Không tài khoản tùy quyết nào đứng giữa người tham gia và quy tắc phân phối, và không ví nào của đội ngũ nhận ETH từ nét bút.',
             'Một vai trò hữu hạn cho đội ngũ. Quyền của chủ sở hữu rất hẹp, bị khóa trong khi một chu kỳ chạy, và được lên lịch loại bỏ hoàn toàn khi các nâng cấp còn lại được triển khai.',
           ],
         },
@@ -78,7 +81,7 @@ export const whitePaperTextVi = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Hệ thống gồm một hợp đồng cốt lõi và một vành các hợp đồng hẹp, đơn mục đích bao quanh. Hợp đồng cốt lõi, triển khai sau một proxy có thể nâng cấp, điều hành các chu kỳ: nó định chi phí nét bút, theo dõi đếm ngược, giữ Dự trữ chu kỳ và thực thi hoàn tất. Xung quanh nó là token CST, bộ sưu tập Cosmic Signature NFT, một ví ký quỹ cho phân bổ, hai ví neo giữ, Kho Hàng hóa công, Dự trữ truyền thông và Hội đồng Vũ trụ.',
+          text: 'Hệ thống gồm một hợp đồng cốt lõi và các hợp đồng chuyên trách hỗ trợ. Hợp đồng cốt lõi, triển khai sau một proxy có thể nâng cấp, điều hành các chu kỳ: nó định chi phí nét bút, theo dõi đếm ngược, giữ Dự trữ chu kỳ và thực thi hoàn tất. Xung quanh nó là token CST, bộ sưu tập Cosmic Signature NFT, một ví ký quỹ cho phân bổ, hai ví neo giữ, Kho Hàng hóa công, Dự trữ truyền thông và Hội đồng Vũ trụ.',
         },
         {
           kind: 'table',
@@ -135,7 +138,7 @@ export const whitePaperTextVi = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Một chu kỳ là một khoảng thời gian. Nó mở ra với các cửa sổ hiệu chỉnh giá giảm dần, đầy dần bằng nét bút, và kết thúc khi thời điểm hoàn tất chu kỳ hết hạn và ai đó hoàn tất nó. Mục này nói về đồng hồ; Mục 4 nói về chính các nét bút.',
+          text: 'Một chu kỳ là một khoảng thời gian. Nó mở ra với các cửa sổ hiệu chỉnh giá giảm dần, đầy dần bằng nét bút, và kết thúc khi đếm ngược hoàn tất về 0 và ai đó hoàn tất nó. Mục này nói về đồng hồ; Mục 4 nói về chính các nét bút.',
         },
       ],
       subsections: {
@@ -144,7 +147,7 @@ export const whitePaperTextVi = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `Mỗi chu kỳ phải mở bằng một nét bút ETH, và cửa sổ hiệu chỉnh ETH đặt chi phí của nó. Cửa sổ bắt đầu ở ${protocolFacts.ethCalibrationCeilingMultiplier} lần chi phí mở đầu thực trả trong chu kỳ trước và giảm tuyến tính về sàn bằng một phần hai trăm giá trị khởi đầu đó, cộng một wei. Với các tham số lúc ra mắt, đường giảm mất khoảng hai ngày; thời lượng của nó gắn với mức tăng thời gian của chu kỳ, nên nó giãn dần khi giao thức già đi. Nếu cửa sổ trôi qua hoàn toàn trước khi có ai đặt nét bút, chi phí chỉ đơn giản nằm ở sàn. Chu kỳ đầu tiên mở ở mức cố định ${viDecimal(protocolFacts.initialGestureCostEth)} ETH.`,
+              text: `Mỗi chu kỳ phải mở bằng một nét bút ETH, và cửa sổ hiệu chỉnh ETH đặt chi phí của nó. Cửa sổ bắt đầu ở ${protocolFacts.ethCalibrationCeilingMultiplier} lần chi phí mở đầu thực trả trong chu kỳ trước và giảm tuyến tính về sàn bằng một phần hai trăm giá trị khởi đầu đó, cộng một wei. Với các tham số lúc ra mắt, đường giảm mất khoảng hai ngày; thời lượng của nó gắn với mức tăng thời gian của chu kỳ, nên nó giãn dần qua các chu kỳ hoạt động. Nếu cửa sổ trôi qua hoàn toàn trước khi có ai đặt nét bút, chi phí chỉ đơn giản nằm ở sàn. Chu kỳ đầu tiên mở ở mức cố định ${viDecimal(protocolFacts.initialGestureCostEth)} ETH.`,
             },
             {
               kind: 'paragraph',
@@ -170,11 +173,11 @@ export const whitePaperTextVi = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'Khi thời điểm hoàn tất chu kỳ hết hạn, người tham gia đặt nét bút cuối cùng đủ điều kiện hoàn tất. Hoàn tất là một giao dịch: nó đọc số dư ETH của giao thức, phân phối các luồng phân bổ của Mục 5, khắc NFT và CST của chu kỳ, ghi seed cho mỗi tác phẩm mới, và lên lịch chu kỳ tiếp theo.',
+              text: 'Khi đếm ngược hoàn tất về 0, người tham gia đặt nét bút cuối cùng đủ điều kiện hoàn tất. Hoàn tất là một giao dịch: nó đọc số dư ETH của giao thức, phân phối các luồng phân bổ của Mục 5, khắc NFT và CST của chu kỳ, ghi seed cho mỗi tác phẩm mới, và lên lịch chu kỳ tiếp theo.',
             },
             {
               kind: 'paragraph',
-              text: `Người đặt nét bút cuối cùng giữ quyền này độc quyền trong ${protocolFacts.finalGestureExclusivityHours} giờ. Sau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất, và hợp đồng coi người làm việc đó là người nhận của chu kỳ, cùng mọi thứ vai trò này mang theo: phần ETH của phân bổ Signature, lần khắc CST của nó, NFT của nó và quyền ưu tiên với các tài sản đính kèm. Quy tắc này cố ý không nhân nhượng. Nó giữ giao thức sống nếu một người tham gia biến mất, và nó khiến sự bất cẩn phải trả một cái giá: một người nhận không hành động trong hai ngày đã để ngỏ vai trò cho người gọi đầu tiên.`,
+              text: `Người đặt nét bút cuối cùng giữ quyền này độc quyền trong ${protocolFacts.finalGestureExclusivityHours} giờ. Sau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất, và hợp đồng coi người làm việc đó là người nhận của chu kỳ, cùng mọi thứ vai trò này mang theo: phần ETH của phân bổ Signature, lần khắc CST của nó, NFT của nó và quyền ưu tiên với các tài sản đính kèm. Quy tắc này giúp giao thức tiếp tục hoạt động khi người nhận không thực hiện thao tác. Nếu không hoàn tất trong hai ngày ưu tiên, người nhận nhường quyền này cho người đầu tiên gửi giao dịch hoàn tất hợp lệ.`,
             },
             {
               kind: 'paragraph',
@@ -189,7 +192,7 @@ export const whitePaperTextVi = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Nét bút là đầu vào duy nhất của giao thức. Mỗi nét bút, bất kể loại tiền, kéo dài đếm ngược, ghi nhận một lượt trong Tinh tuyển dành cho người tham gia của chu kỳ, cập nhật các đồng hồ bền bỉ của Mục 5.2, và có thể khắc CST tham gia như mô tả ở Mục 7.1.',
+          text: 'Nét bút là thao tác thúc đẩy chu kỳ trình diễn. Mỗi nét bút, bất kể loại tiền, kéo dài đếm ngược, ghi nhận một lượt trong Tinh tuyển dành cho người tham gia của chu kỳ, cập nhật các đồng hồ bền bỉ của Mục 5.2, và có thể khắc CST tham gia như mô tả ở Mục 7.1.',
         },
       ],
       subsections: {
@@ -198,7 +201,7 @@ export const whitePaperTextVi = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `Sau nét bút mở, mỗi nét bút ETH nâng chi phí nét bút ETH tiếp theo lên ${protocolFacts.ethGestureCostStepUpPercent}%, cộng một wei. Chuỗi số là công khai và chính xác: bất kỳ ai cũng có thể đọc chi phí hiện tại từ hợp đồng trước khi hành động. Phần trả dư vượt ngưỡng vụn được hoàn lại trong cùng giao dịch; dưới ngưỡng đó, việc hoàn lại tốn nhiều gas hơn số tiền trả về, nên phần chênh ở lại trong dự trữ.`,
+              text: `Sau nét bút mở, mỗi nét bút ETH nâng chi phí nét bút ETH tiếp theo lên ${protocolFacts.ethGestureCostStepUpPercent}%, cộng một wei. Chuỗi số là công khai và chính xác: bất kỳ ai cũng có thể đọc chi phí hiện tại từ hợp đồng trước khi hành động. Phần trả dư vượt ngưỡng tối thiểu được hoàn lại trong cùng giao dịch; dưới ngưỡng đó, việc hoàn lại tốn nhiều gas hơn số tiền trả về, nên phần chênh ở lại trong dự trữ.`,
             },
           ],
         },
@@ -220,7 +223,7 @@ export const whitePaperTextVi = {
             },
             {
               kind: 'paragraph',
-              text: `Thời lượng của cửa sổ tự thân là một tham số sống, và là một trong những vòng phản hồi lặng lẽ của giao thức. Nó khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ. Mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, và mỗi nét bút CST kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%. Vì vậy hoạt động ETH sôi động đẩy nhanh đường giảm của CST, khiến nét bút CST sớm trở nên hấp dẫn; hoạt động CST sôi động lại làm chậm nó. Vòng lặp này đẩy mỗi chu kỳ về một cán cân hài hòa giữa hai loại tiền.`,
+              text: `Thời lượng cửa sổ thay đổi theo hoạt động, tạo thành một cơ chế phản hồi của giao thức. Nó khởi đầu từ mốc tham chiếu ${protocolFacts.initialCstCalibrationWindowHours} giờ. Mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, và mỗi nét bút CST kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%. Vì vậy hoạt động ETH sôi động đẩy nhanh đường giảm của CST, khiến nét bút CST sớm trở nên hấp dẫn; hoạt động CST sôi động lại làm chậm nó. Vòng lặp này đẩy mỗi chu kỳ về một cán cân hài hòa giữa hai loại tiền.`,
             },
             {
               kind: 'paragraph',
@@ -297,7 +300,7 @@ export const whitePaperTextVi = {
             },
             {
               kind: 'paragraph',
-              text: 'Năm luồng được phân phối cộng lại bằng một nửa dự trữ. Phần còn lại tích lũy: giao thức tích lũy thay vì rút ra, và mỗi chu kỳ mở ra với dự trữ lớn hơn chu kỳ trước. Nếu một chu kỳ hoàn tất mà không có Cosmic Signature NFT nào đang neo giữ, phân phối neo giữ của chu kỳ đó bị bỏ qua và phần của nó cũng tích lũy.',
+              text: 'Năm luồng được phân phối cộng lại bằng một nửa dự trữ. Phần còn lại được giữ cho chu kỳ tiếp theo. Cơ chế này không bảo đảm dự trữ tăng qua từng chu kỳ; số dư còn phụ thuộc vào ETH mới được đóng góp. Nếu một chu kỳ hoàn tất mà không có Cosmic Signature NFT nào đang neo giữ, phân phối neo giữ của chu kỳ đó bị bỏ qua và phần của nó cũng tích lũy.',
             },
             {
               kind: 'table',
@@ -357,7 +360,7 @@ export const whitePaperTextVi = {
             },
             {
               kind: 'paragraph',
-              text: 'Sự khác biệt tinh tế nhưng có thật. Một người tham gia đặt nét bút vào một buổi chiều chậm rãi và không bị thay thế trong mười giờ lập nên một khoảng bền bỉ mạnh. Họ có khép lại chu kỳ với vai trò Chiến binh Thời gian hay không tùy vào kỷ lục đó đứng vững bao lâu trước khi một người tham gia khác vượt qua. Bền bỉ đo khoảng lặng bạn tạo ra; luồng Chrono đo kỷ lục của bạn trụ được bao lâu. Cả hai chỉ được quyết định khi hoàn tất.',
+              text: 'Sự khác biệt tinh tế nhưng có thật. Một người tham gia đặt nét bút vào một buổi chiều chậm rãi và không bị thay thế trong mười giờ lập nên một khoảng thời gian dẫn đầu mạnh. Họ có khép lại chu kỳ với vai trò Chiến binh Thời gian hay không tùy vào kỷ lục đó đứng vững bao lâu trước khi một người tham gia khác vượt qua. Quán quân Bền bỉ được xác định theo thời gian một nét bút giữ vị trí gần nhất; Chiến binh Thời gian được xác định theo thời gian giữ danh hiệu Quán quân Bền bỉ. Cả hai chỉ được quyết định khi hoàn tất.',
             },
           ],
         },
@@ -383,7 +386,7 @@ export const whitePaperTextVi = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'Việc phân phối được cố ý chia thành đẩy và kéo. ETH của phân bổ Signature đi thẳng đến người nhận trong lúc hoàn tất, khoản chuyển Hàng hóa công cũng vậy. ETH của Chiến binh Thời gian và các phần ETH Tinh tuyển được đặt vào ví phân bổ, một hợp đồng ký quỹ, từ đó mỗi người nhận nhận về khi thuận tiện. CST và NFT được khắc trực tiếp cho người nhận trong lúc hoàn tất.',
+              text: 'Phân bổ có hai cách chuyển: gửi trực tiếp và để người nhận tự nhận về. ETH của phân bổ Signature đi thẳng đến người nhận trong lúc hoàn tất, khoản chuyển Hàng hóa công cũng vậy. ETH của Chiến binh Thời gian và các phần ETH Tinh tuyển được đặt vào ví phân bổ, một hợp đồng ký quỹ, từ đó mỗi người nhận nhận về khi thuận tiện. CST và NFT được khắc trực tiếp cho người nhận trong lúc hoàn tất.',
             },
             {
               kind: 'paragraph',
@@ -447,7 +450,7 @@ export const whitePaperTextVi = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'CST là token ERC-20 của giao thức. Nguồn cung của nó bắt đầu từ không, và hợp đồng token chỉ nhận lệnh khắc và đốt từ hợp đồng giao thức. Mọi CST đang lưu hành đều truy về việc tham gia một chu kỳ.',
+          text: 'CST là token ERC-20 của giao thức. Nguồn cung của nó bắt đầu từ không, và hợp đồng token chỉ nhận lệnh khắc và đốt từ hợp đồng giao thức. Mọi CST đang lưu hành đều được khắc qua những cơ chế do giao thức quy định trong các chu kỳ.',
         },
       ],
       subsections: {
@@ -473,10 +476,10 @@ export const whitePaperTextVi = {
               table: {
                 columns: ['Thời gian kể từ nét bút trước', 'CST tham gia'],
                 rows: protocolFacts.dynamicCstRewardExamples.map((example) => [
-                  ELAPSED_VI[example.elapsed] ?? example.elapsed,
+                  ELAPSED_VI[example.elapsed],
                   viDecimal(example.cst),
                 ]),
-                footnote: `Tính với mức tăng thời gian lúc ra mắt là đúng ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} giờ. Lượng thực tế trôi thấp hơn một chút khi mức tăng lớn dần; bản xem trước trực tiếp trong ứng dụng và hợp đồng là nguồn chính xác.`,
+                footnote: `Tính với mức tăng thời gian lúc ra mắt là đúng ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} giờ. Với cùng khoảng thời gian chờ, lượng CST giảm nhẹ khi mức tăng thời gian lớn dần. Ứng dụng hiển thị ước tính hiện tại; hợp đồng xác định số lượng khi giao dịch được xử lý.`,
               },
             },
           ],
@@ -486,11 +489,11 @@ export const whitePaperTextVi = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST rời khỏi lưu hành mỗi khi được chi: toàn bộ chi phí của mỗi nét bút CST bị đốt. Vì vậy nguồn cung được định hình bởi hành vi. Chu kỳ yên ắng khắc ít CST tham gia, việc dùng CST sôi động đốt nguồn cung xuống, và các dòng ghi nhận và truyền thông cố định thêm một lượng dự đoán được là ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST mỗi chu kỳ điển hình. Không có giới hạn, không khắc trước và không phần dành cho đội ngũ.`,
+              text: `CST rời khỏi lưu hành mỗi khi được chi: toàn bộ chi phí của mỗi nét bút CST bị đốt. Vì vậy nguồn cung được định hình bởi hành vi. Chu kỳ yên ắng khắc ít CST tham gia, việc dùng CST sôi động đốt nguồn cung xuống, và các dòng ghi nhận và truyền thông cố định thêm một lượng dự đoán được là ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST mỗi chu kỳ điển hình. Tổng cung không có giới hạn cố định và bắt đầu từ 0. Dự trữ truyền thông là luồng CST định kỳ do đội ngũ điều phối, như mô tả ở Mục 7.1.`,
             },
             {
               kind: 'paragraph',
-              text: 'Chính công thức căn bậc hai là một cơ chế kiểm soát nguồn cung, được đưa vào trong nâng cấp V2 (Mục 12.2). Thiết kế ban đầu khắc một mức cố định 100 CST mỗi nét bút, điều khiến các chuỗi nét bút tốc độ máy trở thành nguồn CST mới không giới hạn. Với quy tắc hiện tại, một loạt nét bút dồn dập khắc xấp xỉ không, trong khi sự tham gia kiên nhẫn mới là điều tạo ra nguồn cung.',
+              text: 'Chính công thức căn bậc hai là một cơ chế kiểm soát nguồn cung, được đưa vào trong nâng cấp V2 (Mục 12.2). Thiết kế ban đầu khắc một mức cố định 100 CST mỗi nét bút, điều khiến các chuỗi nét bút tốc độ máy trở thành nguồn CST mới không giới hạn. Với quy tắc hiện tại, nét bút quá gần nhau có thể khắc gần 0 CST tham gia. Khoảng cách dài hơn thường cho lượng CST tham gia lớn hơn; CST ghi nhận và Dự trữ truyền thông tuân theo các quy tắc khắc riêng.',
             },
           ],
         },
@@ -514,11 +517,11 @@ export const whitePaperTextVi = {
         },
         {
           kind: 'paragraph',
-          text: 'Quy tắc một-lần-duy-nhất thay lịch khóa thông thường bằng một lựa chọn không thể đảo ngược, và nó cho tập hợp đang neo giữ một cái giá thực sự khi rời đi. Giữ một NFT neo giữ là quyết định sống động mỗi chu kỳ; gỡ neo là quyết định vĩnh viễn.',
+          text: 'Mỗi NFT chỉ được neo giữ một lần, nhưng không bị buộc giữ đến một thời hạn cố định. Chủ sở hữu có thể tiếp tục neo giữ qua các chu kỳ hoặc gỡ neo bất cứ lúc nào; sau khi gỡ neo, NFT không thể neo giữ lại.',
         },
         {
           kind: 'paragraph',
-          text: `Random Walk NFT neo giữ riêng và với mục đích khác: Random Walk NFT đang neo giữ nhận các lượt chọn trong Tinh tuyển NFT neo giữ (Mục 5.3), ${protocolFacts.anchoredRwlkNftSelectionRecipients} lượt mỗi chu kỳ, mỗi lượt mang ${cst(protocolFacts.specialAllocationCst)} CST và một Cosmic Signature NFT. Neo giữ Random Walk không mang phân phối ETH. Cùng quy tắc một-lần-duy-nhất được áp dụng.`,
+          text: `Random Walk NFT neo giữ riêng và với mục đích khác: Random Walk NFT đang neo giữ nhận các lượt chọn trong Tinh tuyển NFT neo giữ (Mục 5.3), ${protocolFacts.anchoredRwlkNftSelectionRecipients} lượt mỗi chu kỳ, mỗi lượt mang ${cst(protocolFacts.specialAllocationCst)} CST và một Cosmic Signature NFT. Neo giữ Random Walk không mang phân phối ETH. Quy tắc chỉ neo giữ một lần cũng áp dụng cho Random Walk NFT.`,
         },
       ],
     },
@@ -647,7 +650,7 @@ export const whitePaperTextVi = {
               items: [
                 'CST tham gia động. Mức cố định 100 CST mỗi nét bút trở thành công thức căn bậc hai của Mục 7.1. Khắc cố định biến các chuỗi nét bút dồn dập thành CST không tốn chi phí; quy tắc mới khắc theo sự kiên nhẫn, không theo tần suất.',
                 'Bảo đảm khắc tối thiểu. Mọi phương thức nét bút có thêm một tham số cho lượng CST tham gia nhỏ nhất mà người tham gia chấp nhận, bảo vệ họ trước những dịch chuyển thời gian giữa lúc ký và lúc thực thi.',
-                'Một cửa sổ hiệu chỉnh CST sống. Thời lượng của cửa sổ trở thành một giá trị được lưu, phản ứng theo cơ cấu nét bút (Mục 4.3), để hai đường ETH và CST giữ cân bằng cho nhau.',
+                'Cửa sổ hiệu chỉnh CST thay đổi theo hoạt động. Thời lượng của cửa sổ trở thành một giá trị được lưu, phản ứng theo cơ cấu nét bút (Mục 4.3), để hai đường ETH và CST giữ cân bằng cho nhau.',
                 `Cửa sổ độc quyền dài hơn. Cửa sổ hoàn tất độc quyền của người đặt nét bút cuối cùng tăng từ 24 lên ${protocolFacts.finalGestureExclusivityHours} giờ.`,
                 'Siết chặt thời gian và phép tính. Việc kéo dài đếm ngược nay luôn áp lên thời điểm hoàn tất đã lưu, đóng một lỗ hổng trong đó những nét bút CST gần như không tốn chi phí đặt sau khi hết hạn có thể liên tục đẩy thời hạn ra xa. Phép tính lên lịch chu kỳ tiếp theo cũng được siết chặt để không cấu hình tham số nào, dù cực đoan đến đâu, có thể ngăn một chu kỳ hoàn tất.',
               ],
@@ -659,7 +662,7 @@ export const whitePaperTextVi = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'V3, hiện đang được phát triển trong kho mã công khai, thay đổi đúng một điều: giá của việc hành động muộn. Trong 20 phút cuối trước thời điểm hoàn tất chu kỳ, mọi chi phí nét bút, dù ETH, ETH kèm Random Walk NFT hay CST, được nhân với một hệ số cộng thêm tăng theo đa thức từ 1 lần lên 10 lần, chạm 10 lần tại thời hạn và giữ ở đó cho bất kỳ nét bút nào đặt trong giờ bù.',
+              text: 'V3, hiện đang được phát triển trong kho mã công khai, thay đổi đúng một điều: giá của việc hành động muộn. Trong 20 phút cuối trước thời điểm hoàn tất chu kỳ, mọi chi phí nét bút, dù ETH, ETH kèm Random Walk NFT hay CST, được nhân với một hệ số cộng thêm tăng theo đa thức từ 1 lần lên 10 lần, chạm 10 lần tại thời hạn và giữ ở đó cho bất kỳ nét bút nào đặt sau thời hạn.',
             },
             {
               kind: 'formula',
@@ -669,11 +672,11 @@ export const whitePaperTextVi = {
             },
             {
               kind: 'paragraph',
-              text: 'Số mũ quan trọng. Vì đường tăng là bậc tám, hệ số gần như vô hình trong phần lớn cửa sổ và chỉ dốc lên ở những phút cuối: khoảng 1,04 lần mười phút trước thời hạn, khoảng 1,9 lần khi còn năm phút, khoảng 7 lần khi còn một phút, và 10 lần ở không.',
+              text: 'Số mũ quan trọng. Vì đường tăng là bậc tám, hệ số gần như vô hình trong phần lớn cửa sổ và chỉ dốc lên ở những phút cuối: khoảng 1,04 lần mười phút trước thời hạn, khoảng 1,9 lần khi còn năm phút, khoảng 7 lần khi còn một phút, và 10 lần tại thời điểm đếm ngược về 0.',
             },
             {
               kind: 'paragraph',
-              text: 'Ý định là thay đổi giai đoạn cuối. Dưới V2, chờ đến những giây cuối để đặt nét bút gần như không tốn gì, nên một chu kỳ có thể kết thúc trong một loạt các nước đi canh thời gian ít ý nghĩa. Dưới V3, một nét bút phút chót là một tuyên bố đắt giá, sự tham gia bền vững xuyên chu kỳ tương đối rẻ, và các luồng bền bỉ của Mục 5.2 trở nên khó bị tập kích hơn nhiều. Các tham số chính xác có thể còn được tinh chỉnh trước khi triển khai; cơ chế đúng như đã mô tả.',
+              text: 'Ý định là thay đổi giai đoạn cuối. Dưới V2, chờ đến những giây cuối để đặt nét bút gần như không tốn gì, nên một chu kỳ có thể kết thúc trong nhiều nét bút được dồn vào những giây cuối. Dưới V3, một nét bút phút chót là một thao tác có chi phí cao hơn, sự tham gia bền vững xuyên chu kỳ tương đối rẻ, và các luồng bền bỉ của Mục 5.2 ít bị thay đổi bởi các nét bút dồn dập vào phút cuối. Các tham số chính xác có thể còn được tinh chỉnh trước khi triển khai; cơ chế đúng như đã mô tả.',
             },
           ],
         },
@@ -780,7 +783,7 @@ export const whitePaperTextVi = {
       ],
     },
     'appendix-b': {
-      heading: 'Phụ lục B: Các tham số trong nháy mắt',
+      heading: 'Phụ lục B: Tổng hợp tham số',
       blocks: [
         {
           kind: 'table',

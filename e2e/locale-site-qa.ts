@@ -241,22 +241,17 @@ async function expectNoUnexpectedEnglishHeadings(
   profile: LocaleQaProfile,
 ): Promise<void> {
   // Streamed routes park their payload in a hidden staging div for a frame;
-  // poll for settled, visible headings rather than sampling once.
-  if (!route.allowNoHeading) {
-    await expect
-      .poll(() => readVisibleHeadings(page), {
-        message: `no visible headings rendered on ${route.id}`,
-      })
-      .not.toBe('');
-  }
-
-  const headings = await readVisibleHeadings(page);
-  if (!headings && route.allowNoHeading) return;
-  expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
-  expect(headings, `${profile.locale} heading missing on ${route.id}`).toMatch(profile.script);
-  for (const fallback of UNEXPECTED_ENGLISH_FALLBACKS) {
-    expect(headings, `unexpected English heading fallback on ${route.id}`).not.toMatch(fallback);
-  }
+  // validate a single snapshot per attempt. Reading again after a successful
+  // poll can race with React replacing the streamed subtree.
+  await expect(async () => {
+    const headings = await readVisibleHeadings(page);
+    if (!headings && route.allowNoHeading) return;
+    expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
+    expect(headings, `${profile.locale} heading missing on ${route.id}`).toMatch(profile.script);
+    for (const fallback of UNEXPECTED_ENGLISH_FALLBACKS) {
+      expect(headings, `unexpected English heading fallback on ${route.id}`).not.toMatch(fallback);
+    }
+  }).toPass({ timeout: 15_000 });
 }
 
 async function expectNoUnexpectedEnglishUiCopy(

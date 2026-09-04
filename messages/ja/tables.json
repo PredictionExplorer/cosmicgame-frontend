@@ -202,7 +202,7 @@
     "listAria": "サイクルごとの配分の受領者"
   },
   "anchoringRecipient": {
-    "empty": "サイクル終了時に係留中のトークンはありませんでした。積立額は公共財アドレスへ送られました。"
+    "empty": "サイクル確定時に係留中のCosmic Signature NFTがなかったため、このサイクルの係留配分はサイクル準備金に残りました。"
   },
   "banGesture": {
     "banned": "一筆を非表示にしました。",
@@ -271,7 +271,7 @@
     "progressAria": "持久チャンピオンへの進み具合",
     "progressAmounts": "{target}のうち{current}",
     "lastGesture": "最新の一筆",
-    "gestureBy": "一筆の主",
+    "gestureBy": "一筆を入れた参加者",
     "gestureDetailsSyncing": "最新の一筆の詳細をインデクサーから同期しています。",
     "gestureDetailsUnavailable": "最新の一筆のトランザクション詳細は一時的に利用できません。",
     "amountPaid": "支払額",
@@ -305,7 +305,7 @@
     "currentHold": "現在の保持",
     "noLatestGesture": "最新の一筆はまだありません",
     "enduranceChampion": "持久チャンピオン",
-    "enduranceTooltip": "最新の一筆の位置を最も長く途切れずに保った参加者。タイマーは、その参加者が最新の一筆の主である間だけ伸びます。",
+    "enduranceTooltip": "一筆を入れてから次の一筆が入るまで、最も長く先頭を保持した参加者です。現在も先頭を保持している場合は、時間が延び続けます。",
     "enduranceWindow": "持久の期間",
     "noEnduranceRecord": "持久の記録はまだありません",
     "enduranceNote": "累計ではなく、最新の参加者としての単一の最長期間です。",
@@ -318,7 +318,7 @@
     "finalCstTooltip": "サイクルで最後のCST一筆を入れた参加者は、1,000 CSTの功労CSTとCosmic Signature NFTを受け取ります。",
     "awaitingCstGesture": "最初のCST一筆を待っています",
     "finalCstNote": "この役割を更新するのはCST一筆だけです。ETHとRandom Walkの一筆は更新しません。",
-    "headingHelp": "これらの参加者は現在、サイクルが確定したときに特別配分を受け取る位置にいます。順位は新しい一筆ごとに変わることがあります。",
+    "headingHelp": "現時点で、サイクル確定時の特別配分の対象となる参加者です。新たな一筆によって対象者が変わることがあります。",
     "printCurrentHold": "現在の保持：{duration}",
     "printWindow": "期間：{duration}",
     "printReign": "保持期間：{duration}"

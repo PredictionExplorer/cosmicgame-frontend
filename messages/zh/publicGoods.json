@@ -2,7 +2,7 @@
   "protocol": {
     "title": "协议公共物品资助",
     "subtitle": "Cosmic Signature 协议自动转入公共物品金库的资金",
-    "description": "每个周期，协议都会自动将一定比例的周期储备转入公共物品金库。宇宙议会协调确定资金流向的公共物品受益方，让协议参与与生态建设直接相连。"
+    "description": "周期收官时，协议会将一定比例的周期储备转入公共物品金库，由金库为当前配置的公共物品受益方保管。"
   },
   "voluntary": {
     "title": "自愿公共物品资助",
@@ -12,7 +12,7 @@
   "retrievals": {
     "title": "公共物品取回",
     "subtitle": "从公共物品金库取回的资金",
-    "description": "此处记录 Cosmic Signature 公共物品金库的全部取回操作。每笔资金都会转拨给由宇宙议会协调选定的公共物品受益方。"
+    "description": "查看 Cosmic Signature 公共物品金库转拨给当前配置受益方的资金记录。"
   },
   "loading": "加载中…"
 }

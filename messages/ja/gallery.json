@@ -1,7 +1,7 @@
 {
   "error": {
     "title": "刻印アーカイブを読み込めません",
-    "message": "Cosmic Signatureコレクションを読み取れませんでした。再試行してアーカイブを読み込んでください。"
+    "message": "コレクションを読み込めませんでした。もう一度お試しください。"
   },
   "jsonLd": {
     "name": "Cosmic Signatureギャラリー"
@@ -10,7 +10,7 @@
     "eyebrowImprinted": "コレクション · 刻印済みNFT {count}点",
     "eyebrowLive": "コレクション · ライブ",
     "title": "NFTギャラリー",
-    "subtitle": "すべてのサイクルで刻印されたCosmic Signature NFTコレクションの全体を探索する"
+    "subtitle": "これまでのサイクルで生まれたCosmic Signature NFTを一覧で楽しめます"
   },
   "intro": {
     "badge": "ジェネラティブ・アーカイブ",
@@ -19,7 +19,7 @@
   "featured": {
     "viewAria": "Cosmic Signature {id}を見る",
     "alt": "Cosmic Signatureのアートワーク{id}",
-    "emptyHint": "インデックス済みのNFTが利用できるようになると、実際のコレクション作品がここに表示されます。",
+    "emptyHint": "NFTのデータを取得すると、コレクションの作品がここに表示されます。",
     "badgeImprint": "注目の刻印",
     "badgeArchive": "アーカイブ",
     "awaitingMetadata": "メタデータ待ち"
@@ -115,6 +115,6 @@
   },
   "empty": {
     "title": "NFTが見つかりません",
-    "description": "検索条件や絞り込みを変えて、お探しのものを見つけてください。"
+    "description": "条件を変更すると、ほかの作品が見つかる場合があります。"
   }
 }

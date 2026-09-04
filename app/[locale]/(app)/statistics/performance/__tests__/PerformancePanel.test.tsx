@@ -15,7 +15,7 @@ describe('PerformancePanel', () => {
     render(<PerformancePanel />);
     expect(screen.getByText('Participant Performance')).toBeInTheDocument();
     expect(screen.getByTestId('roi-leaderboard-section')).toBeInTheDocument();
-    expect(screen.getByText('Allocation Claims by Cycle')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Retrievals by Cycle')).toBeInTheDocument();
     expect(screen.getByTestId('claims-by-round-section')).toBeInTheDocument();
   });
 

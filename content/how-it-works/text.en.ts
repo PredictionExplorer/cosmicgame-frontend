@@ -53,8 +53,8 @@ export const howItWorksTextEn = {
     ],
   },
   rewardBreakdown: {
-    heading: 'What Every Gesture Imprints',
-    subhead: 'Participation imprints multiple allocation tracks per cycle.',
+    heading: 'What a Gesture Can Lead To',
+    subhead: 'Participation CST and the allocation tracks available each cycle.',
     items: [
       {
         title: 'Dynamic Participation CST',
@@ -77,7 +77,7 @@ export const howItWorksTextEn = {
         title: 'Signature Allocation',
         description: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST, and a Cosmic Signature NFT.`,
         tooltip:
-          'The Cycle Reserve grows from all gestures. The participant who made the Final Gesture retrieves the Signature Allocation via the protocol contract.',
+          'ETH gestures add to the Cycle Reserve. The participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation through the protocol contract.',
       },
     ],
   },
@@ -113,7 +113,7 @@ export const howItWorksTextEn = {
         label: 'Stellar Selections',
         description: `Three ETH Stellar Selection recipients share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients each receive ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST and a Cosmic Signature NFT.`,
         tooltip:
-          'Entries are recorded per gesture. More gestures means higher Selection frequency. Random Walk NFT anchor-holders have a separate Stellar Selection.',
+          'Each gesture adds an entry. More entries increase the chance of selection but do not guarantee it. Anchored Random Walk NFTs take part in a separate Stellar Selection.',
       },
       {
         label: 'Next Cycle',
@@ -143,7 +143,7 @@ export const howItWorksTextEn = {
       {
         title: 'Check the Gesture Cost',
         tooltip:
-          'Gas fees on Arbitrum are typically a few cents — much cheaper than Ethereum mainnet.',
+          'Check the gas estimate in your wallet before confirming. Network fees vary and are separate from the Gesture Cost.',
         highlights: [
           'Review the Cycle Finalization Time — every gesture adds the current time increment to the stored finalization time.',
           'Check the current Gesture Cost in ETH or CST before committing.',

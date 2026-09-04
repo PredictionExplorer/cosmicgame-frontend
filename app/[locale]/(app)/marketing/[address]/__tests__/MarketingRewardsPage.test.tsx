@@ -23,7 +23,7 @@ describe('MarketingRewardsPage', () => {
   it('renders heading with valid address', () => {
     mockUseMarketingRewardsByUser.mockReturnValue({ data: [], isLoading: false });
     render(<MarketingRewardsPage address={VALID_ADDRESS} />);
-    expect(screen.getByText('Marketing Rewards for User')).toBeInTheDocument();
+    expect(screen.getByText('Outreach Allocations for This Participant')).toBeInTheDocument();
   });
 
   it('shows invalid address message for bad input', () => {

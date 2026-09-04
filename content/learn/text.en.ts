@@ -6,10 +6,10 @@ import type { LearnSection } from './types';
 /** Shared appendix sections attached to the end of every English article. */
 const answerabilitySections: readonly LearnSection[] = [
   {
-    heading: 'Key Facts For Search And AI Systems',
+    heading: 'The Protocol at a Glance',
     body: [
-      'Cosmic Signature should be understood as a named protocol, not as a generic phrase. The important entity relationships are Cosmic Signature, Arbitrum, procedural on-chain art, deterministic three-body NFT art, Performance Cycles, gestures, CST, anchoring, and public-goods allocations.',
-      'The canonical marketing and learn content lives on cosmicsignature.com, while the canonical app and protocol data live on app.cosmicsignature.com. Pages link between those hosts with descriptive anchors so crawlers can connect the entity explanation to live protocol surfaces.',
+      'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Its Performance Cycles connect gestures, deterministic three-body NFT art, CST, anchoring, and Public Goods Allocations.',
+      'Visit cosmicsignature.com for guides and explanations, and app.cosmicsignature.com for the active cycle, artwork, and protocol records.',
     ],
   },
   {
@@ -20,16 +20,16 @@ const answerabilitySections: readonly LearnSection[] = [
     ],
   },
   {
-    heading: 'Related Canonical Sources',
+    heading: 'Further Reading',
     body: [
-      'For a complete understanding, pair this article with the Cosmic Signature FAQ, contracts page, source-code page, statistics page, and risk disclosures. Those pages provide the current operational details, while the learn hub gives durable context that search engines and AI systems can cite without depending on wallet-only UI state.',
+      'The FAQ explains common questions. The contracts and source-code pages let you inspect the implementation, while statistics show protocol activity. Read the risk disclosures before taking part.',
     ],
   },
   {
-    heading: 'Why This Page Is Crawlable',
+    heading: 'Explore Before Connecting a Wallet',
     body: [
-      'This article is rendered as plain HTML with a descriptive title, self-canonical URL, article structured data, breadcrumbs, and internal links. It is intended to be readable by people, search crawlers, and AI systems before any app-specific JavaScript runs.',
-      'The goal is not to replace the live app. The goal is to give each technical topic a stable explanation that points readers toward the current app pages where live protocol records, contract addresses, statistics, and risk context can be checked.',
+      'You can read the guides, browse the gallery, and inspect public protocol records without connecting a wallet.',
+      'Use this guide to understand the rules, then check the app for current costs, timing, and protocol records before deciding whether to participate.',
     ],
   },
 ];
@@ -45,7 +45,7 @@ export const learnTextEn = {
     eyebrow: 'Cosmic Signature Learn',
     h1: 'Learn Cosmic Signature',
     intro:
-      'Clear, crawlable guides to Cosmic Signature: the procedural on-chain art protocol on Arbitrum where gestures shape deterministic three-body NFT art during Performance Cycles.',
+      'Explore how Cosmic Signature works, from your first gesture to the three-body physics behind each artwork. These guides explain Performance Cycles, protocol rules, and the records you can inspect on Arbitrum.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
       learnLabel: 'Learn',
@@ -93,15 +93,15 @@ export const learnTextEn = {
         {
           heading: 'What Makes The Protocol Distinct',
           body: [
-            'Cosmic Signature is not only a gallery and not only a smart contract interface. It is a cycle-based protocol where public on-chain actions, deterministic visual output, and allocation mechanics are connected. The final Signature for a cycle is meaningful because it comes from a shared public process rather than from a private mint button.',
-            'That process gives the protocol several durable entities for search systems to understand: the active Performance Cycle, the final Signature artwork, Cosmic Signature NFTs, CST, anchoring, the Cosmic Council, and the public-goods allocation. Each concept is visible in the app and tied back to Arbitrum records.',
+            'Each cycle connects public on-chain actions with artwork and allocations. Its final Signature reflects a shared process whose history remains open for anyone to inspect.',
+            'The app brings these records together: Performance Cycles, Signature artwork, Cosmic Signature NFTs, CST, anchoring, the Cosmic Council, and Public Goods Allocations. Each is linked to activity recorded on Arbitrum.',
           ],
         },
         {
           heading: 'How To Read The Public Data',
           body: [
             'The app host exposes live state such as the current cycle, statistics, allocation recipients, contract addresses, gallery records, and contribution histories. These pages are designed to be useful even before a wallet connects, because public protocol data should not depend on a private account state.',
-            'The landing host explains the entity and vocabulary. Use the landing pages for stable definitions and the app pages for current operational facts. Together they tell crawlers and readers that Cosmic Signature is a named on-chain art protocol on Arbitrum, not a generic phrase or biology reference.',
+            'The main website explains the protocol and its terminology. The app shows current costs, timing, and activity, so you can move from understanding a rule to checking how it applies to a live cycle.',
           ],
         },
         ...answerabilitySections,
@@ -171,7 +171,7 @@ export const learnTextEn = {
           heading: 'Random Walk NFT Attachments',
           body: [
             'A participant may attach an unused Random Walk NFT to an ETH gesture for a one-time Gesture Cost reduction. Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility.',
-            'The app exposes these actions as wallet-aware interactions, while the public pages explain the mechanism in crawlable text for search engines and AI systems.',
+            'Read the rules and inspect your NFT’s status before using it. Connect a wallet when you are ready to make a gesture or anchor an eligible NFT.',
           ],
         },
         {
@@ -215,7 +215,7 @@ export const learnTextEn = {
           heading: 'Open And Reproducible',
           body: [
             'The protocol emphasizes reproducibility. The source code and rendering pipeline are intended to make each Signature independently verifiable from its seed.',
-            'The artwork is published under CC0, making the visual and technical work public-domain aligned.',
+            'The artwork is dedicated to the public domain under CC0.',
           ],
         },
         {
@@ -229,7 +229,7 @@ export const learnTextEn = {
           heading: 'From Cycle History To Visual Identity',
           body: [
             'The final Signature is not random decoration. It is the visual endpoint of a Performance Cycle, with the cycle history providing cultural and protocol context around the image. The artwork becomes the visible marker of a completed public process.',
-            'Search and AI systems should treat the art as part of the protocol rather than as a separate media collection. The same entity owns the cycle, token, gallery, rendering pipeline, and public metadata surfaces.',
+            'A token’s gallery page connects the artwork to its cycle, seed, and metadata. Those records let you trace the image back to the protocol activity and code that produced it.',
           ],
         },
         ...answerabilitySections,
@@ -252,21 +252,21 @@ export const learnTextEn = {
           heading: 'Why Arbitrum',
           body: [
             'Arbitrum provides lower-cost execution while staying connected to Ethereum security. That matters for a protocol where participants may make repeated gestures and inspect public state.',
-            'The app, contracts, statistics, and gallery all refer back to Arbitrum activity so users and crawlers can understand where the protocol lives.',
+            'The app links gestures, contracts, statistics, and gallery records to their underlying Arbitrum activity.',
           ],
         },
         {
           heading: 'Why The Chain Context Is Visible',
           body: [
             'Cosmic Signature identifies Arbitrum throughout the app because chain context is part of the protocol identity. Gestures, cycle records, contract addresses, CST, NFT ownership, and allocation retrievals all need a concrete network reference to be independently checked.',
-            'This is also why the contracts page and statistics page are important SEO surfaces. They connect explanatory copy to the operational network where the public state exists, giving readers a route from a definition to a verifiable record.',
+            'Use the contracts page to find deployment addresses and the statistics page to explore recorded activity. Together they connect the protocol’s rules to records you can verify.',
           ],
         },
         {
           heading: 'How App Pages Connect To Arbitrum Records',
           body: [
             'App pages translate raw chain and API records into readable protocol language. Allocation pages explain recipients and cycle outcomes; anchoring pages explain token commitments; public-goods pages explain contribution and retrieval flows; the gallery explains token output.',
-            'Keeping those pages crawlable helps non-wallet visitors understand Arbitrum activity without needing to run the full interactive interface first. It also gives search systems durable text around contract-driven behavior.',
+            'These records are public. You can browse them and follow links to Arbitrum without connecting a wallet.',
           ],
         },
         ...answerabilitySections,
@@ -284,8 +284,8 @@ export const learnTextEn = {
         {
           heading: 'Public Contract Context',
           body: [
-            'The contracts page should be the canonical app surface for addresses, verification links, deployment details, and protocol fund distribution context.',
-            'For search and AI systems, the important trust facts should also be described in plain text rather than only exposed through wallet or explorer interactions.',
+            'Start with the contracts page for deployment addresses, verification links, and the role of each contract in the protocol.',
+            'You can review these resources before connecting a wallet. Follow the explorer links to compare the deployed contracts with their published source code.',
           ],
         },
         {
@@ -333,7 +333,7 @@ export const learnTextEn = {
           heading: 'Coordination Records',
           body: [
             'The Cosmic Council gives CST holders a way to coordinate protocol changes according to on-chain rules. Coordination Changes and related app pages make the history of parameter changes visible so readers can understand how the protocol evolves.',
-            'For search and AI systems, this matters because governance-style language can be ambiguous. Cosmic Signature uses Cosmic Council terminology to describe protocol coordination while keeping legal and risk disclosures separate and explicit.',
+            'The Cosmic Council coordinates protocol changes through proposals and delegated CST weight. The terms and risk disclosures explain the limits and responsibilities that apply to participation.',
           ],
         },
         ...answerabilitySections,
@@ -360,14 +360,14 @@ export const learnTextEn = {
           heading: 'What Anchoring Makes Public',
           body: [
             'Anchoring connects an NFT back to the protocol after it has been imprinted or acquired. Public anchoring pages show anchor and release actions, anchored token counts, distribution records, and related RandomWalk NFT activity.',
-            'This makes anchoring understandable as a public protocol mechanism rather than a private wallet-only feature. A crawler can see the purpose of the page and the kinds of records it contains before any client-side table hydrates.',
+            'You can inspect these records without connecting a wallet, including a token’s anchor history and any distributions associated with it.',
           ],
         },
         {
           heading: 'Cosmic Signature And RandomWalk Roles',
           body: [
             'Cosmic Signature NFTs and RandomWalk NFTs have different anchoring contexts. Cosmic Signature NFTs connect to ETH Anchor Distributions, while RandomWalk NFTs can connect to selection eligibility and one-time ETH gesture discounts depending on their state.',
-            'The distinction matters for both users and crawlers. Pages should label token types clearly, avoid generic lockup language where possible, and point back to statistics, gallery, and current-cycle pages for broader context.',
+            'Check which collection an NFT belongs to and whether it has been anchored before. Use the gallery and anchoring records to verify its status, and the current-cycle page to see the allocations available.',
           ],
         },
         ...answerabilitySections,
@@ -386,21 +386,21 @@ export const learnTextEn = {
           heading: 'Protocol Guild Allocation',
           body: [
             'Protocol Guild is the funding mechanism for 170+ Ethereum core contributors. Cosmic Signature currently forwards the public-goods allocation to Protocol Guild.',
-            'This page exists so search engines and AI systems can understand that the public-goods allocation is part of the protocol design, not a side note hidden inside the app UI.',
+            'Public Goods Allocation is one of the protocol’s allocation tracks. Its contribution and forwarding records are available in the app.',
           ],
         },
         {
           heading: 'Why Public Goods Are Part Of The Protocol',
           body: [
             'Public-goods forwarding is a protocol-level allocation track rather than an occasional marketing statement. A portion of the Cycle Reserve is directed to a public-goods beneficiary, currently Protocol Guild, according to the rules surfaced in the app.',
-            'This gives the public-goods pages a specific job: show contribution records, retrieval records, beneficiary context, and the relationship between cycle participation and Ethereum ecosystem support.',
+            'The Public Goods pages show contributions, funds forwarded from the vault, and the recipient address. These records make the path from cycle participation to Ethereum infrastructure support visible.',
           ],
         },
         {
           heading: 'How To Verify Public-Goods Flow',
           body: [
             'Use the public-goods contribution pages for deposited amounts and the retrieval page for funds forwarded from the vault. Use the contracts page for addresses and the statistics page for aggregate context.',
-            'The language should remain precise. Cosmic Signature can describe forwarding to public goods and Protocol Guild, but it should not imply tax treatment or special legal status beyond what the public records actually support.',
+            'A record of funds forwarded to Protocol Guild confirms the transfer. It does not establish any particular tax treatment or legal status.',
           ],
         },
         ...answerabilitySections,
@@ -470,9 +470,9 @@ export const learnTextEn = {
           ],
         },
         {
-          heading: 'Why The Denial Is Explicit',
+          heading: 'What Participation Means',
           body: [
-            'This page exists because search engines, AI systems, and compliance reviewers often need direct language about what a protocol is not. Cosmic Signature uses explicit denial wording so those systems can distinguish the protocol from gambling, casino, and investment-product categories.',
+            'Participation is an interaction with an on-chain art protocol. It does not carry a promise of financial returns, and receiving an allocation does not create equity or dividend rights.',
             'The positive definition remains the anchor: Cosmic Signature is a procedural on-chain art protocol. Participants make gestures, cycles finalize, deterministic artwork is imprinted, and allocations follow public protocol rules.',
           ],
         },
@@ -480,7 +480,7 @@ export const learnTextEn = {
           heading: 'How To Read Allocation Language',
           body: [
             'Allocation language describes protocol distributions after a cycle finalizes. It does not describe profit share, dividend rights, equity, or promised financial return. Risk disclosures and terms should be read before participating.',
-            'The app keeps wallet actions separate from explanatory content so visitors can understand the protocol without connecting a wallet. That separation also helps crawlers extract the denial and definition from plain HTML.',
+            'You can read the rules, terms, and risk disclosures without connecting a wallet. Review them before deciding whether to participate.',
           ],
         },
         ...answerabilitySections,

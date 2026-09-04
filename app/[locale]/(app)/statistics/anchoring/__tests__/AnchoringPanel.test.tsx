@@ -71,14 +71,14 @@ describe('AnchoringPanel', () => {
     render(<AnchoringPanel />);
     expect(screen.getByText('Cosmic Signature NFTs Anchored')).toBeInTheDocument();
     expect(screen.getAllByText('11').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('RandomWalk NFTs Anchored')).toBeInTheDocument();
+    expect(screen.getByText('Random Walk NFTs Anchored')).toBeInTheDocument();
     expect(screen.getAllByText('26').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders CST/RWLK anchoring tabs', () => {
     render(<AnchoringPanel />);
     expect(screen.getByRole('tab', { name: 'Cosmic Signature NFT' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'RandomWalk NFT' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Random Walk NFT' })).toBeInTheDocument();
   });
 
   it('passes anchor-action data through to the actions table', () => {

@@ -9,7 +9,7 @@
     "header": {
       "eyebrow": "配分 · パフォーマンス・サイクル",
       "title": "配分の受領者",
-      "subtitle": "確定したすべてのパフォーマンス・サイクルにわたる配分の受領者、サイクル統計、配分の分布の完全な履歴。",
+      "subtitle": "確定したすべてのサイクルについて、配分の受領者、統計、配分の内訳を確認できます。",
       "scope": "確定したサイクルの記録のみ",
       "scopeTooltip": "このページはサイクルAPIから確定済みのパフォーマンス・サイクルを要約しています。未確定のサイクルや、関係のない配分受け取りの記録はこれらの合計に含まれません。"
     },
@@ -24,11 +24,11 @@
         },
         "chrono": {
           "label": "時の戦士",
-          "tooltip": "時の戦士配分は、一筆によってサイクルを最も長い時間支えた参加者に渡ります。"
+          "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者への配分です。"
         },
         "stellar": {
           "label": "星選ETH",
-          "tooltip": "星選の受領者のために取り置かれるETH。一筆ごとに、参加者がこの配分に選ばれる頻度が生まれます。"
+          "tooltip": "星選の受領者に配分されるETHです。一筆を入れるたびに選定の対象が1件加わります。"
         },
         "anchor": {
           "label": "係留",
@@ -99,8 +99,8 @@
       "recipients": "配分の受領者"
     },
     "hero": {
-      "aria": "サイクルのヒーロー",
-      "amountTooltip": "カウントダウンがゼロになった時点で最後の一筆を入れていた参加者が受け取ったETHの総額。",
+      "aria": "サイクルの概要",
+      "amountTooltip": "このサイクルのシグネチャー配分として受け取られたETHの総額です。",
       "recipient": "受領者",
       "nft": "NFT",
       "nftTooltip": "このCosmic Signature NFTをギャラリーで見る。",
@@ -121,15 +121,15 @@
       "cards": {
         "signature": {
           "title": "シグネチャー配分",
-          "tooltip": "カウントダウンがゼロになった時点で最後の一筆を入れていた参加者。ETHのシグネチャー配分、1,000 CST、Cosmic Signature NFTを受け取ります。"
+          "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、Cosmic Signature NFTが含まれます。"
         },
         "chrono": {
           "title": "時の戦士",
-          "tooltip": "持久チャンピオンの位置を最も長く連続して保った参加者。ETH、功労CST、Cosmic Signature NFTを受け取ります。"
+          "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者です。ETH、功労CST、Cosmic Signature NFTを受け取ります。"
         },
         "endurance": {
           "title": "持久チャンピオン",
-          "tooltip": "最新の一筆の位置を最も長く途切れずに保った参加者。1,000 CSTの功労CSTとCosmic Signature NFTを受け取ります。"
+          "tooltip": "最新の一筆を入れた参加者として、最も長く先頭を保持した参加者です。1,000 CSTの功労CSTとCosmic Signature NFTを受け取ります。"
         },
         "finalCst": {
           "title": "最後のCST一筆",
@@ -263,7 +263,7 @@
       "allocationBreadcrumb": "配分",
       "retrievedBreadcrumb": "受け取り済み",
       "sectionTitle": "サイクル{cycle}の配分",
-      "sectionDescription": "このサイクルのシグネチャー配分の構成要素の要約。",
+      "sectionDescription": "このサイクルで受け取ったシグネチャー配分の内訳です。",
       "ethAllocation": "ETH配分",
       "nftId": "Cosmic Signature NFT ID",
       "attachedTokensLabel": "添付されたNFT（ERC-721）",
@@ -271,7 +271,7 @@
     },
     "next": {
       "title": "次のステップ",
-      "description": "星選から別の配分が生まれることがあり、係留からは別の係留配分が生まれることがあります。",
+      "description": "星選の配分や、係留による係留配分が別にある場合があります。",
       "body": "星選から追加の配分がある可能性もあります。配分を確認するには<allocations>自分の配分</allocations>ページへ。係留配分は<anchors>自分の係留</anchors>ページで確認できます。"
     }
   }

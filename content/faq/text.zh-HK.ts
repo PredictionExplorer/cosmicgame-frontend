@@ -3,7 +3,10 @@ import { protocolFacts } from '@/content/protocol-facts';
 import type { FAQText } from './structure';
 
 /** protocolFacts stores the example gaps as English strings; render them in zh. */
-const ELAPSED_ZH_HK: Record<string, string> = {
+const ELAPSED_ZH_HK: Record<
+  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
+  string
+> = {
   '0 seconds': '0 秒',
   '1 second': '1 秒',
   '60 seconds': '60 秒',
@@ -126,12 +129,12 @@ export const faqTextZhHk = {
       },
       'how-is-participation-cst-calculated': {
         question: '參與 CST 如何計算？',
-        answer: `參與 CST 按距上一筆落筆的時間，以平方根公式計算：${protocolFacts.dynamicCstRewardFormula}。採用平方根，是為了讓較長的靜默期獲得更多 CST，同時避免數量永遠線性增長。按協議上線時恰為 1 小時的時間增量計算，示例約為：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH_HK[example.elapsed] ?? example.elapsed}後為 ${example.cst} CST`).join('、')}。每個週期收官後，時間增量會增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此即時數量會隨時間逐漸略低於這些示例。落筆實際成交時，應以應用程式中的即時預覽和合約計算為準。`,
+        answer: `參與 CST 按距上一筆落筆的時間，以平方根公式計算：${protocolFacts.dynamicCstRewardFormula}。採用平方根，是為了讓較長的靜默期獲得更多 CST，同時避免數量永遠線性增長。按協議上線時恰為 1 小時的時間增量計算，示例約為：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH_HK[example.elapsed]}後為 ${example.cst} CST`).join('、')}。每個週期收官後，時間增量會增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此即時數量會隨時間逐漸略低於這些示例。落筆實際成交時，應以應用程式中的即時預覽和合約計算為準。`,
       },
       'why-minimum-cst-reward-protection': {
         question: '什麼是最低 CST 銘刻保護？',
         answer:
-          '提交落筆前，應用程式會預覽預計獲得的參與 CST，並把你願意接受的最低 CST 數量發送給合約。若另一筆落筆搶先成交，預計數量可能改變；如果最終銘刻量低於你設定的下限，最低 CST 銘刻保護可以阻止交易。你也可以選擇接受任意數量，包括 0 CST；此時只要價格檢查透過，落筆便可繼續。',
+          '提交落筆前，應用程式會預覽預計獲得的參與 CST，並把你願意接受的最低 CST 數量發送給合約。若另一筆落筆搶先成交，預計數量可能改變；如果最終銘刻量低於你設定的下限，最低 CST 銘刻保護可以阻止交易。你也可以選擇接受任意數量，包括 0 CST；此時只要價格檢查通過，落筆便可繼續。',
       },
       'how-cst-calibration-window-changes': {
         question: '每筆落筆如何改變 CST 校準窗口？',
@@ -172,7 +175,7 @@ export const faqTextZhHk = {
       'what-if-two-gestures-same-time': {
         question: '兩筆落筆同時提交會怎樣？',
         answer:
-          'Arbitrum 交易按照排序器納入區塊的順序處理。若兩筆落筆在同一時刻到達，先獲確認的一筆為有效落筆。',
+          'Arbitrum 的排序器會確定交易順序。每筆落筆都按執行時的協議狀態檢查；後一筆仍可能成功，但前一筆可能改變落筆價格或參與 CST 銘刻量。若變化超出你設定的保護範圍，交易便會還原。',
       },
       'is-there-game-theory': {
         question: '參與 Cosmic Signature 是否需要策略？',
@@ -212,7 +215,7 @@ export const faqTextZhHk = {
       },
       'is-nft-supply-limited': {
         question: 'Cosmic Signature NFT 的數量有限嗎？',
-        answer: `從實際發行節奏看，是的。每個週期收官後，每筆落筆增加的時間都會增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，使週期逐漸變長、NFT 銘刻速度逐步放緩。合約並未設定硬性供應上限，但不斷放慢的週期節奏會讓 Cosmic Signature NFT 隨時間日益稀缺。`,
+        answer: `合約沒有硬性供應上限。每個週期收官後，落筆時間增量會增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，通常會使週期變長、NFT 銘刻節奏放緩。實際銘刻速度也取決於參與情況。`,
       },
       'impact-of-limiting-nfts': {
         question: 'NFT 供應增速受限會帶來什麼影響？',
@@ -247,7 +250,7 @@ export const faqTextZhHk = {
       'donate-nfts-to-game': {
         question: '其他 NFT 項目如何向某個週期貢獻代幣？',
         answer:
-          '項目方可在落筆介面的「高級」面板中附加 ERC-721 或 ERC-20 代幣。填寫合約地址、代幣 ID 或數量後提交落筆。附加的代幣會由分配錢包託管，並在週期收官後流向簽名分配獲配者。',
+          '項目方可在落筆介面的「高級選項」面板中附加 ERC-721 或 ERC-20 代幣。填寫合約地址、代幣 ID 或數量後提交落筆。附加的代幣會由分配錢包託管，並在週期收官後流向簽名分配獲配者。',
       },
     },
   },
@@ -258,7 +261,7 @@ export const faqTextZhHk = {
       'what-is-arbitrum': {
         question: 'Arbitrum 是什麼？Cosmic Signature 為什麼部署在這裏？',
         answer:
-          'Arbitrum 是以太坊 Layer 2 彙總網絡，可加快交易並降低費用。Cosmic Signature 部署在 Arbitrum 上，既能把燃料費降至不足 1 美分並更快確認交易，又能保留以太坊的安全保障。',
+          'Arbitrum 是以太坊 Layer 2 彙總網絡，旨在以更低成本處理交易。Cosmic Signature 使用它來支援頻繁的鏈上互動。費用會隨網絡狀況變化，Arbitrum 也有自身的執行與結算規則。',
       },
       'why-arbitrum-not-ethereum': {
         question: '為什麼選擇 Arbitrum，而不是以太坊主網？',
@@ -358,8 +361,7 @@ export const faqTextZhHk = {
       },
       'get-help': {
         question: '遇到問題時，如何獲得幫助？',
-        answer:
-          '可透過 Discord、X / Twitter，以及「聯絡方式」頁面所列的支援電郵聯絡社區與支援團隊。',
+        answer: '可使用「關於」頁面列出的官方 Discord、X / Twitter 連結或支援電郵聯絡我們。',
       },
       'stay-updated': {
         question: '如何關注 Cosmic Signature 的最新動態？',

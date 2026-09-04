@@ -60,7 +60,7 @@ describe('HowToPlayPage', () => {
 
   it('renders the reward breakdown section', () => {
     render(<HowToPlayPage content={howItWorksContentEn} />);
-    expect(screen.getByText('What Every Gesture Imprints')).toBeInTheDocument();
+    expect(screen.getByText('What a Gesture Can Lead To')).toBeInTheDocument();
   });
 
   it('renders the game cycle section', () => {

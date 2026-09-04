@@ -14,7 +14,7 @@
       "tokens": "Chưa có token nào."
     },
     "actions": {
-      "releaseMany": "Gỡ neo nhiều",
+      "releaseMany": "Gỡ neo đã chọn",
       "cancel": "Hủy"
     },
     "aria": {
@@ -27,9 +27,9 @@
     "errorMessage": "Không tải được dữ liệu neo giữ. Vui lòng thử lại sau.",
     "eyebrow": "Phân phối neo giữ · Trực tiếp",
     "title": "Phân phối neo giữ",
-    "subtitle": "Tổng quan hoạt động neo giữ toàn cầu và lịch sử phân phối",
+    "subtitle": "Tổng quan hoạt động neo giữ trong giao thức và lịch sử phân phối",
     "intro": {
-      "description": "Neo giữ Cosmic Signature NFT của bạn để chia sẻ {percentage}% Dự trữ chu kỳ của mỗi chu kỳ thông qua phân phối neo giữ bằng ETH. Neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ.",
+      "description": "Neo giữ Cosmic Signature NFT để nhận phần tương ứng trong {percentage}% dự trữ dành cho phân phối neo giữ bằng ETH mỗi chu kỳ. Neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ.",
       "flow": "Luồng neo giữ {percentage}%"
     },
     "stats": {
@@ -39,7 +39,7 @@
       },
       "cosmicSignatureAnchored": {
         "label": "Cosmic Signature NFT đang neo giữ",
-        "tooltip": "Tổng số Cosmic Signature NFT hiện đang neo giữ với giao thức trên mọi người neo giữ."
+        "tooltip": "Tổng số Cosmic Signature NFT đang neo giữ trong toàn giao thức."
       },
       "randomWalkAnchored": {
         "label": "RWLK NFT đang neo giữ",
@@ -47,8 +47,8 @@
       },
       "distributionPerNft": {
         "label": "Phân phối mỗi NFT",
-        "tooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục.",
-        "tooltipUnavailable": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục. Quỹ neo giữ trên chuỗi khác không, nhưng tổng số Cosmic Signature NFT neo giữ đã lập chỉ mục lại bằng không (ví dụ cg_stake_stats_cst chưa được ETL cập nhật), nên không thể tính mức mỗi NFT."
+        "tooltip": "ETH phân phối neo giữ cho mỗi Cosmic Signature NFT: số dư quỹ trên chuỗi chia cho tổng số NFT đang neo giữ đã được ghi nhận.",
+        "tooltipUnavailable": "Quỹ trên chuỗi có ETH nhưng dữ liệu chưa ghi nhận Cosmic Signature NFT nào đang neo giữ. Chưa thể tính mức phân phối cho mỗi NFT cho đến khi số liệu được cập nhật."
       },
       "uniqueHolders": {
         "label": "Người neo giữ riêng biệt",
@@ -169,7 +169,7 @@
       "actions": {
         "anchor": "Neo giữ",
         "anchoring": "Đang neo giữ…",
-        "anchorMany": "Neo giữ nhiều"
+        "anchorMany": "Neo giữ đã chọn"
       },
       "aria": {
         "actions": "Thao tác"
@@ -228,7 +228,7 @@
       "dialog": {
         "title": "Gỡ neo token và nhận về phân phối",
         "description": "Thao tác này sẽ <strong>gỡ neo toàn bộ Cosmic Signature NFT bạn đang neo giữ</strong> và chuyển <amountStrong>{amount} ETH</amountStrong> phân phối tích lũy về ví của bạn.",
-        "warning": "<strong>Hành động vĩnh viễn:</strong> sau khi gỡ neo, những Cosmic Signature NFT này không thể neo giữ lại. Chỉ tiếp tục nếu bạn muốn rời hoàn toàn khỏi việc neo giữ.",
+        "warning": "<strong>Không thể hoàn tác:</strong> sau khi gỡ neo, những Cosmic Signature NFT này không thể neo giữ lại. Chỉ tiếp tục nếu bạn đã quyết định ngừng neo giữ các NFT này.",
         "confirm": "Gỡ neo và nhận về"
       }
     },

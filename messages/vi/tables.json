@@ -16,7 +16,7 @@
     "stellarSelection": "Chưa có phân bổ Tinh tuyển.",
     "tokens": "Chưa có token nào.",
     "holders": "Chưa có người nắm giữ.",
-    "spenders": "Chưa có người chi.",
+    "spenders": "Chưa có dữ liệu chi tiêu.",
     "enduranceChampions": "Chưa có Quán quân Bền bỉ.",
     "attachedNfts": "Chưa có NFT đính kèm.",
     "attachedTokens": "Chưa có token đính kèm.",
@@ -202,11 +202,11 @@
     "listAria": "Người nhận phân bổ theo chu kỳ"
   },
   "anchoringRecipient": {
-    "empty": "Không có token nào đang neo giữ khi chu kỳ kết thúc. Khoản nạp đã được chuyển đến địa chỉ Hàng hóa công."
+    "empty": "Khi chu kỳ hoàn tất, không có NFT nào đang neo giữ. Phần phân phối neo giữ được giữ lại trong dự trữ chu kỳ."
   },
   "banGesture": {
-    "banned": "Đã chặn nét bút thành công!",
-    "unbanned": "Đã bỏ chặn nét bút thành công!",
+    "banned": "Đã chặn nét bút.",
+    "unbanned": "Đã bỏ chặn nét bút.",
     "error": "Đã xảy ra lỗi",
     "ban": "Chặn",
     "unban": "Bỏ chặn"
@@ -217,7 +217,7 @@
     "viewContribution": "Xem đóng góp {id}"
   },
   "endurance": {
-    "liveHelp": "Người tham gia này cũng là người đặt nét bút gần nhất, nên khoảng bền bỉ này vẫn đang tăng.",
+    "liveHelp": "Nét bút gần nhất vẫn thuộc về người tham gia này, nên thời gian dẫn đầu tiếp tục tăng.",
     "championTime": "Thời gian dẫn đầu",
     "chronoWarrior": "Chiến binh Thời gian"
   },
@@ -272,7 +272,7 @@
     "progressAmounts": "{current} trên {target}",
     "lastGesture": "Nét bút gần nhất",
     "gestureBy": "Nét bút của",
-    "gestureDetailsSyncing": "Chi tiết nét bút gần nhất đang được đồng bộ từ bộ lập chỉ mục.",
+    "gestureDetailsSyncing": "Đang cập nhật chi tiết nét bút gần nhất.",
     "gestureDetailsUnavailable": "Chi tiết giao dịch của nét bút gần nhất tạm thời không khả dụng.",
     "amountPaid": "Số tiền đã trả",
     "method": "Phương thức",
@@ -287,21 +287,21 @@
     "growingNow": "Đang tăng",
     "recordStatus": "Trạng thái kỷ lục",
     "standingChronoRecord": "Kỷ lục Chiến binh Thời gian đang giữ",
-    "chronoReign": "Thời gian giữ vị trí Chrono",
+    "chronoReign": "Thời gian giữ danh hiệu Chiến binh Thời gian",
     "recordGrowingSegment": "Đoạn đang nối dài kỷ lục",
-    "chronoDescription": "Chiến binh Thời gian là kỷ lục đang giữ về thời gian liên tục làm Quán quân Bền bỉ.",
+    "chronoDescription": "Chiến binh Thời gian là người giữ danh hiệu Quán quân Bền bỉ lâu nhất trong một khoảng liên tục.",
     "activeEnduranceChallenge": "Thử thách Bền bỉ đang diễn ra",
     "challengeSegment": "Đoạn thử thách",
     "recordToBeat": "Kỷ lục cần vượt",
     "canExtendIn": "Có thể nối dài sau",
     "canOvertakeIn": "Có thể vượt lên sau",
-    "waitingToExtend": "Đang chờ nối dài kỷ lục Chrono",
-    "waitingToOvertake": "Đang chờ vượt kỷ lục Chrono",
+    "waitingToExtend": "Đang chờ nối dài kỷ lục Chiến binh Thời gian",
+    "waitingToOvertake": "Đang chờ vượt kỷ lục Chiến binh Thời gian",
     "challengeDescription": "Đếm ngược này thuộc về Quán quân Bền bỉ hiện tại, không nhất thiết là Chiến binh Thời gian đang giữ kỷ lục.",
     "heading": "Người dẫn đầu phân bổ đặc biệt",
     "sectionAria": "Người dẫn đầu phân bổ đặc biệt",
     "latestParticipant": "Người tham gia gần nhất",
-    "latestTooltip": "Người đặt nét bút gần nhất đang xây một khoảng bền bỉ. Họ phải giữ vị trí lâu hơn khoảng bền bỉ của Quán quân Bền bỉ hiện tại để vươn lên dẫn đầu.",
+    "latestTooltip": "Thời gian dẫn đầu của người đặt nét bút gần nhất đang tăng. Để trở thành Quán quân Bền bỉ, khoảng dẫn đầu này phải dài hơn kỷ lục hiện tại.",
     "currentHold": "Đang giữ",
     "noLatestGesture": "Chưa có nét bút gần nhất",
     "enduranceChampion": "Quán quân Bền bỉ",
@@ -318,14 +318,14 @@
     "finalCstTooltip": "Người tham gia đặt nét bút CST cuối cùng của chu kỳ nhận 1.000 CST ghi nhận và một Cosmic Signature NFT.",
     "awaitingCstGesture": "Đang chờ nét bút CST đầu tiên",
     "finalCstNote": "Chỉ nét bút CST cập nhật vai trò này; nét bút ETH và Random Walk thì không.",
-    "headingHelp": "Những người tham gia này hiện đang trong hàng nhận phân bổ đặc biệt khi chu kỳ hoàn tất. Vị trí có thể thay đổi sau mỗi nét bút mới.",
+    "headingHelp": "Những người tham gia này hiện đủ điều kiện nhận các phân bổ đặc biệt khi chu kỳ hoàn tất. Người giữ vai trò có thể thay đổi sau mỗi nét bút mới.",
     "printCurrentHold": "Đang giữ: {duration}",
     "printWindow": "Khoảng: {duration}",
     "printReign": "Thời gian giữ vị trí: {duration}"
   },
   "stellarSelection": {
     "ethDeposit": "Khoản nạp ETH",
-    "anchoredNft": "Cosmic Signature NFT Tinh tuyển NFT neo giữ",
+    "anchoredNft": "Cosmic Signature NFT từ Tinh tuyển NFT neo giữ",
     "signatureNftSelection": "Tinh tuyển Cosmic Signature NFT",
     "signatureNft": "Cosmic Signature NFT"
   },

@@ -9,7 +9,7 @@ export const landingTextVi = {
   meta: {
     title: 'Cosmic Signature: Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum',
     description:
-      'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Mỗi nét bút đều định hình Signature cuối cùng của chu kỳ, và giao thức phân phối lại dự trữ của mình cho tất cả những ai đã định hình kết quả — bao gồm cả hạ tầng mà chính Ethereum nương tựa vào.',
+      'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Nét bút của người tham gia định hình Signature; dự trữ chu kỳ được phân bổ theo quy tắc công khai, trong đó có phần hỗ trợ hạ tầng Ethereum.',
     keywords: [
       'Cosmic Signature',
       'giao thức nghệ thuật tạo sinh',
@@ -30,7 +30,7 @@ export const landingTextVi = {
     headlineLead: 'Cosmic Signature: Nghệ thuật tạo sinh trên chuỗi',
     headlineAccent: 'Arbitrum',
     subhead:
-      'Mỗi nét bút đều định hình Signature. Đặt nét bút trong một chu kỳ trình diễn, và mỗi nét bút đều định hình Signature cuối cùng của chu kỳ. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ của mình qua hơn mười luồng phân bổ — bao gồm cả hạ tầng mà chính Ethereum nương tựa vào.',
+      'Mỗi nét bút trong chu kỳ trình diễn đều để lại dấu ấn trên Signature cuối cùng. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ qua hơn mười luồng phân bổ, trong đó có phần hỗ trợ hạ tầng Ethereum.',
     biologyDisclaimer:
       'Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi.',
     primaryCtaLabel: 'Mở ứng dụng',
@@ -63,7 +63,7 @@ export const landingTextVi = {
     eyebrow: 'Chu kỳ',
     heading: 'Một chu kỳ trình diễn, từ lúc mở đến khi hoàn tất.',
     description:
-      'Một chu kỳ là một khoảng thời gian. Nó mở ra bằng một cửa sổ hiệu chỉnh, đầy dần bằng các nét bút, và hoàn tất khi thời điểm hoàn tất chu kỳ hết hạn. Không có trung gian. Không có người điều khiển. Chỉ có giao thức.',
+      'Chu kỳ mở bằng cửa sổ hiệu chỉnh, tiếp nối qua những nét bút và sẵn sàng hoàn tất khi đếm ngược về 0. Các bước diễn ra theo quy tắc của giao thức, không cần bên trung gian điều hành.',
     stages: {
       opening: {
         title: 'Mở chu kỳ',
@@ -75,7 +75,7 @@ export const landingTextVi = {
       },
       finalization: {
         title: 'Hoàn tất',
-        body: 'Khi thời điểm hoàn tất chu kỳ hết hạn, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ. Sau cửa sổ ưu tiên, cửa sổ hoàn tất mở ra cho bất kỳ ai.',
+        body: 'Khi đếm ngược về 0, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ. Sau cửa sổ ưu tiên, cửa sổ hoàn tất mở cho phép bất kỳ ai thực hiện thao tác này.',
       },
       allocations: {
         title: 'Phân bổ',
@@ -86,13 +86,12 @@ export const landingTextVi = {
 
   art: {
     eyebrow: 'Nghệ thuật',
-    heading: 'Bài toán ba vật thể, kết xuất trên chuỗi.',
+    heading: 'Bài toán ba vật thể trở thành nghệ thuật trên chuỗi.',
     description:
       'Mỗi Cosmic Signature NFT trực quan hóa ba thiên thể quay quanh nhau dưới lực hấp dẫn Newton. Ba vật thể tạo ra những quỹ đạo hỗn độn về bản chất. Không AI. Không dữ liệu huấn luyện. Chỉ có vật lý tất định. Cùng seed → cùng kết quả, đến từng điểm ảnh.',
     loading: {
       label: 'Đang đồng bộ kho lưu trữ trực tiếp',
-      description:
-        'Các NFT thật đã tạo sẽ xuất hiện ở đây ngay khi có siêu dữ liệu token đã lập chỉ mục.',
+      description: 'Tác phẩm sẽ xuất hiện tại đây sau khi siêu dữ liệu NFT được cập nhật.',
     },
     showcase: {
       liveLabel: 'Signature trực tiếp',
@@ -117,7 +116,7 @@ export const landingTextVi = {
       },
       camera: {
         title: 'Máy quay',
-        body: 'Một chuyển động máy quay hình elip chậm rãi mang lại cho mỗi Signature hiệu ứng thị sai điện ảnh xuyên qua vũ điệu ba vật thể.',
+        body: 'Máy quay di chuyển chậm theo quỹ đạo elip, tạo hiệu ứng thị sai và chiều sâu điện ảnh cho chuyển động của ba vật thể.',
       },
       color: {
         title: 'Màu sắc',
@@ -154,7 +153,7 @@ export const landingTextVi = {
       'compounding-reserve': {
         percent: '~50%',
         title: 'Dự trữ tích lũy',
-        body: 'Chuyển sang chu kỳ trình diễn tiếp theo. Giao thức tích lũy thay vì rút ra.',
+        body: 'Được giữ lại và tích lũy vào dự trữ của chu kỳ trình diễn tiếp theo.',
       },
       'chrono-warrior': {
         title: 'Phân bổ Chiến binh Thời gian',
@@ -185,7 +184,7 @@ export const landingTextVi = {
       'endurance-champion': {
         percent: `${cstAmount} CST`,
         title: 'Phân bổ Quán quân Bền bỉ',
-        body: '1.000 CST ghi nhận và một Cosmic Signature NFT dành cho người tham gia có khoảng bền bỉ liên tục dài nhất.',
+        body: '1.000 CST ghi nhận và một Cosmic Signature NFT dành cho người giữ vị trí người đặt nét bút gần nhất lâu nhất trong một khoảng liên tục.',
       },
       'final-cst-gesture': {
         percent: `${cstAmount} CST`,
@@ -211,7 +210,7 @@ export const landingTextVi = {
   publicGoods: {
     eyebrow: 'Hàng hóa công',
     heading: '7% của mỗi chu kỳ tài trợ những người đóng góp cốt lõi cho Ethereum.',
-    body: 'Mỗi chu kỳ trình diễn chuyển 7% dự trữ ETH của mình đến Protocol Guild — cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho Ethereum. Giao thức càng được sử dụng nhiều, càng nhiều giá trị chảy về hạ tầng mà chính Ethereum nương tựa vào.',
+    body: 'Mỗi chu kỳ trình diễn chuyển 7% dự trữ ETH của mình đến Protocol Guild — cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho Ethereum. Hoạt động trong giao thức góp phần duy trì nguồn hỗ trợ cho hạ tầng Ethereum.',
     disclaimerHeading: 'Lưu ý',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
@@ -232,7 +231,7 @@ export const landingTextVi = {
   council: {
     eyebrow: 'Hội đồng Vũ trụ',
     heading: 'Điều phối giao thức, trên chuỗi.',
-    body: 'Hội đồng Vũ trụ điều phối giao thức trên chuỗi. Người nắm giữ CST ủy quyền trọng số của mình (cho chính họ hoặc một địa chỉ khác), gửi các đề xuất điều phối, và bày tỏ tán thành hoặc phản đối. Túc số điều phối đạt được khi trọng số tán thành cộng trọng số bỏ trống chạm 3% nguồn cung CST. Ngưỡng đề xuất: 100 CST.',
+    body: 'Hội đồng Vũ trụ điều phối giao thức trên chuỗi. Người nắm giữ CST ủy quyền trọng số cho chính mình hoặc địa chỉ khác để gửi đề xuất và bày tỏ tán thành, phản đối hoặc bỏ trống. Túc số điều phối đạt được khi tổng trọng số tán thành và bỏ trống bằng ít nhất 3% nguồn cung CST. Ngưỡng đề xuất: 100 CST.',
     columns: [
       {
         title: 'Đề xuất điều phối',
@@ -240,11 +239,11 @@ export const landingTextVi = {
       },
       {
         title: 'Trọng số điều phối',
-        body: 'Mỗi CST biểu thị một đơn vị trọng số sau khi được ủy quyền. Việc bày tỏ là một chữ ký mật mã, không phải cổ phần hay công cụ vốn.',
+        body: 'Mỗi CST biểu thị một đơn vị trọng số sau khi được ủy quyền. Ý kiến được ghi nhận bằng chữ ký mật mã; CST không đại diện cho cổ phần hay công cụ vốn.',
       },
       {
         title: 'Túc số điều phối',
-        body: 'Một đề xuất được thông qua nếu tán thành vượt phản đối và trọng số tán thành cộng bỏ trống chạm 3% tổng cung CST. Trọng số phản đối không được tính vào túc số.',
+        body: 'Đề xuất được thông qua khi trọng số tán thành lớn hơn phản đối và tổng trọng số tán thành cùng bỏ trống đạt ít nhất 3% tổng cung CST. Trọng số phản đối không được tính vào túc số.',
       },
     ],
   },
@@ -252,7 +251,7 @@ export const landingTextVi = {
   verifiability: {
     eyebrow: 'Khả năng xác minh',
     heading: 'Mở, đã xác minh, có thể tái tạo.',
-    body: 'Bất kỳ ai cũng có thể xác minh một Signature bằng cách tạo lại nó từ seed. Xác minh hợp đồng, ghi chú phân tích tĩnh và tình trạng kiểm toán được công bố qua ứng dụng khi các báo cáo sẵn có. Tài liệu thuộc dự án trong kho mã này được công bố theo CC0 1.0; các phụ thuộc bên thứ ba, phông chữ và tài sản giữ giấy phép riêng của chúng.',
+    body: 'Bất kỳ ai cũng có thể kiểm tra Signature bằng cách tái tạo tác phẩm từ seed. Ứng dụng công bố thông tin xác minh hợp đồng, phân tích tĩnh và tình trạng kiểm toán khi có báo cáo. Tài liệu thuộc dự án trong kho mã này được công bố theo CC0 1.0; các phụ thuộc bên thứ ba, phông chữ và tài sản giữ giấy phép riêng của chúng.',
     pillars: [
       {
         title: 'CC0 1.0',
@@ -287,7 +286,7 @@ export const landingTextVi = {
       },
       {
         question: 'Vì sao lượng CST tham gia thay đổi?',
-        answer: `Lần khắc CST tham gia dùng công thức căn bậc hai dựa trên khoảng thời gian kể từ nét bút trước. Khoảng lặng càng dài, lần khắc CST càng lớn, nhưng căn bậc hai khiến mức tăng dưới tuyến tính. Nét bút quá dồn dập có thể khắc 0 CST. Ứng dụng xem trước lượng hiện tại trước khi bạn gửi.`,
+        answer: `Lượng CST tham gia được tính theo căn bậc hai của thời gian kể từ nét bút trước. Khoảng cách càng dài, lượng CST càng lớn, nhưng tăng chậm hơn thời gian chờ. Hai nét bút quá gần nhau có thể khiến lượng CST được khắc bằng 0. Ứng dụng hiển thị số lượng ước tính trước khi bạn gửi.`,
       },
       {
         question: 'Nét bút ETH và CST ảnh hưởng thế nào đến cửa sổ hiệu chỉnh CST?',
@@ -375,8 +374,9 @@ export const landingTextVi = {
   },
 
   notFound: {
-    heading: 'Lạc khỏi bản đồ sao.',
-    description: 'Tọa độ này đã trôi ra ngoài giao thức. Hãy quay về với Signature.',
-    ctaLabel: 'Quay về Signature',
+    heading: 'Không tìm thấy trang.',
+    description:
+      'Trang này không tồn tại hoặc đã được chuyển đi. Hãy trở về trang chủ để tiếp tục khám phá.',
+    ctaLabel: 'Về trang chủ',
   },
 } satisfies LandingText;

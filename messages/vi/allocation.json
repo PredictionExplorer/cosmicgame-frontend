@@ -9,9 +9,9 @@
     "header": {
       "eyebrow": "Phân bổ · Chu kỳ trình diễn",
       "title": "Người nhận phân bổ",
-      "subtitle": "Duyệt toàn bộ lịch sử người nhận phân bổ, thống kê chu kỳ và các đợt phân phối phân bổ qua mọi chu kỳ trình diễn đã hoàn tất.",
+      "subtitle": "Lịch sử người nhận phân bổ, thống kê và chi tiết phân bổ của mọi chu kỳ trình diễn đã hoàn tất.",
       "scope": "Chỉ gồm các bản ghi chu kỳ đã hoàn tất",
-      "scopeTooltip": "Trang này tóm tắt các chu kỳ trình diễn đã hoàn tất từ API chu kỳ. Các chu kỳ đang chờ và những bản ghi nhận về phân bổ không liên quan không được tính vào các tổng này."
+      "scopeTooltip": "Số liệu chỉ bao gồm các chu kỳ trình diễn đã hoàn tất. Chu kỳ đang chờ và các lần nhận về không liên quan không được tính vào tổng."
     },
     "intro": "Khi một chu kỳ trình diễn hoàn tất, người tham gia đặt nét bút cuối cùng nhận về phân bổ Signature — {percentage}% Dự trữ chu kỳ, 1.000 CST và một Cosmic Signature NFT độc nhất. Các phân bổ khác chảy qua Chiến binh Thời gian, Tinh tuyển, phân phối neo giữ, Hàng hóa công và Dự trữ tích lũy.",
     "reserveSplit": {
@@ -23,8 +23,8 @@
           "tooltip": "Phân bổ Signature là phân bổ ETH chính, được người tham gia đặt nét bút cuối cùng nhận về."
         },
         "chrono": {
-          "label": "Chrono",
-          "tooltip": "Phân bổ Chiến binh Thời gian thuộc về người tham gia có nét bút đưa chu kỳ đi qua khoảng thời gian dài nhất."
+          "label": "Chiến binh Thời gian",
+          "tooltip": "Phân bổ Chiến binh Thời gian dành cho người giữ danh hiệu Quán quân Bền bỉ lâu nhất trong một khoảng liên tục."
         },
         "stellar": {
           "label": "ETH Tinh tuyển",
@@ -32,7 +32,7 @@
         },
         "anchor": {
           "label": "Neo giữ",
-          "tooltip": "ETH phân phối cho các ví có Cosmic Signature NFT đang neo giữ với giao thức. Neo giữ RandomWalk NFT chỉ mang lại diện Tinh tuyển NFT neo giữ, không phải ETH."
+          "tooltip": "ETH được phân phối cho ví có Cosmic Signature NFT đang neo giữ. Neo giữ RandomWalk NFT chỉ giúp thuộc diện Tinh tuyển NFT neo giữ, không nhận phân phối ETH."
         },
         "publicGoods": {
           "label": "Hàng hóa công",
@@ -121,7 +121,7 @@
       "cards": {
         "signature": {
           "title": "Phân bổ Signature",
-          "tooltip": "Người tham gia đặt nét bút cuối cùng khi đếm ngược về không. Nhận về phân bổ Signature bằng ETH, 1.000 CST và một Cosmic Signature NFT."
+          "tooltip": "Khi đếm ngược về 0, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ Signature: ETH, 1.000 CST và một Cosmic Signature NFT."
         },
         "chrono": {
           "title": "Chiến binh Thời gian",
@@ -138,9 +138,9 @@
       }
     },
     "distribution": {
-      "aria": "Phân phối phân bổ",
-      "title": "Phân phối phân bổ",
-      "tooltip": "Biểu đồ chi tiết cách Dự trữ chu kỳ của chu kỳ này được phân phối qua các luồng phân bổ.",
+      "aria": "Cơ cấu phân bổ",
+      "title": "Cơ cấu phân bổ",
+      "tooltip": "Biểu đồ thể hiện cách dự trữ chu kỳ được phân bổ theo từng luồng.",
       "segments": {
         "signature": {
           "label": "Phân bổ Signature",
@@ -240,7 +240,7 @@
     "title": "Phân bổ đã hoàn tất",
     "invalid": {
       "subtitle": "Trang này cần một số chu kỳ hợp lệ trong URL.",
-      "missingParameter": "Thiếu hoặc không hợp lệ tham số truy vấn <code>cycle</code>.",
+      "missingParameter": "Tham số <code>cycle</code> trong URL bị thiếu hoặc không hợp lệ.",
       "guidance": "Mở <allocations>Phân bổ của tôi</allocations> để xem lại các chu kỳ đã hoàn thành."
     },
     "loading": {
@@ -248,7 +248,7 @@
       "status": "Đang tải…"
     },
     "pending": {
-      "successTitle": "Bạn đã hoàn thành chu kỳ này",
+      "successTitle": "Bạn đã hoàn tất chu kỳ này",
       "defaultTitle": "Phân bổ đã hoàn tất",
       "successSubtitle": "Chu kỳ {cycle} đã được hoàn tất trên chuỗi.",
       "cycleBreadcrumb": "Chu kỳ {cycle}",
@@ -259,7 +259,7 @@
       "empty": "Không có thông tin phân bổ."
     },
     "result": {
-      "title": "Chúc mừng! Đã nhận phân bổ Signature của chu kỳ {cycle}.",
+      "title": "Đã nhận phân bổ Signature của chu kỳ {cycle}.",
       "allocationBreadcrumb": "Phân bổ",
       "retrievedBreadcrumb": "Đã nhận về",
       "sectionTitle": "Phân bổ chu kỳ {cycle}",
@@ -271,7 +271,7 @@
     },
     "next": {
       "title": "Bước tiếp theo",
-      "description": "Tinh tuyển có thể tạo ra các phân bổ riêng, còn neo giữ có thể tạo ra các phân phối neo giữ riêng.",
+      "description": "Ngoài phân bổ Signature, bạn có thể có phân bổ từ Tinh tuyển hoặc khoản phân phối neo giữ.",
       "body": "Cũng có thể có thêm phân bổ từ Tinh tuyển. Để xem phân bổ của bạn, hãy vào trang <allocations>Phân bổ của tôi</allocations>. Với phân phối neo giữ, hãy xem trang <anchors>Neo giữ của tôi</anchors>."
     }
   }

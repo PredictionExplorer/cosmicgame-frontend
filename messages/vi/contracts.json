@@ -6,7 +6,7 @@
   "page": {
     "eyebrow": "Hợp đồng đã xác minh · Arbitrum",
     "title": "Địa chỉ hợp đồng",
-    "subtitle": "Địa chỉ trên chuỗi, cấu hình, liên kết mã nguồn và bối cảnh xác minh của giao thức Cosmic Signature.",
+    "subtitle": "Địa chỉ, cấu hình, mã nguồn và thông tin xác minh các hợp đồng của Cosmic Signature.",
     "allocationAria": "Các luồng phân bổ",
     "configurationAria": "Cấu hình giao thức",
     "addressesAria": "Địa chỉ hợp đồng",
@@ -27,7 +27,7 @@
     },
     "cst": {
       "name": "Token CST của Cosmic Signature",
-      "description": "Token ERC-20 (CST) được khắc cùng mỗi nét bút và dùng để thể hiện trọng số điều phối trong Hội đồng Vũ trụ"
+      "description": "Token ERC-20 (CST) có thể được khắc khi đặt nét bút và dùng để xác định trọng số điều phối trong Hội đồng Vũ trụ"
     },
     "nft": {
       "name": "Cosmic Signature NFT",
@@ -144,7 +144,7 @@
     "duration": "Thời lượng",
     "elapsed": "Thời gian đã trôi qua",
     "ceiling": "Trần hiệu chỉnh",
-    "cstDurationTooltip": "Thời lượng đang được lưu của cửa sổ hiệu chỉnh CST. Nét bút CST kéo dài nó khoảng {increase}%; nét bút ETH rút ngắn nó khoảng {decrease}%.",
+    "cstDurationTooltip": "Thời lượng hiện tại của cửa sổ hiệu chỉnh CST. Nét bút CST kéo dài cửa sổ khoảng {increase}%; nét bút ETH rút ngắn khoảng {decrease}%.",
     "cstElapsedTooltip": "Thời gian đã trôi qua trong cửa sổ hiệu chỉnh CST hiện tại",
     "cstCeilingTooltip": "Chi phí nét bút khởi điểm của cửa sổ hiệu chỉnh CST đang hiển thị. Chi phí giảm tuyến tính trong suốt thời lượng đang được lưu.",
     "ethDurationTooltip": "Tổng thời lượng của cửa sổ hiệu chỉnh ETH, trong đó chi phí nét bút giảm dần theo thời gian",
@@ -164,19 +164,19 @@
   },
   "vault": {
     "title": "Thao tác Kho Hàng hóa công",
-    "tooltip": "Gọi hàm send() của Kho Hàng hóa công để chuyển số dư ETH của kho đến đơn vị thụ hưởng Protocol Guild đã cấu hình.",
+    "tooltip": "Chuyển số dư ETH từ Kho Hàng hóa công đến đơn vị thụ hưởng đã cấu hình là Protocol Guild.",
     "balance": "Hiện có trong kho",
-    "description": "Chuyển khoản hàng hóa công khả dụng từ kho đến Protocol Guild.",
-    "descriptionWithBeneficiary": "Chuyển khoản hàng hóa công khả dụng từ kho đến Protocol Guild ({address}).",
+    "description": "Chuyển khoản dành cho Hàng hóa công hiện có trong kho đến Protocol Guild.",
+    "descriptionWithBeneficiary": "Chuyển khoản dành cho Hàng hóa công hiện có trong kho đến Protocol Guild ({address}).",
     "aria": "Chuyển số dư Kho Hàng hóa công đến Protocol Guild"
   },
   "seo": {
     "eyebrow": "Hợp đồng đã xác minh · Arbitrum",
     "heading": "Hợp đồng Cosmic Signature",
-    "description": "Cosmic Signature công khai các địa chỉ hợp đồng Arbitrum của mình để người tham gia, nhà nghiên cứu, công cụ tìm kiếm và hệ thống AI có thể kết nối trải nghiệm ứng dụng với các bản ghi giao thức có thể xác minh trên chuỗi.",
-    "partialFallback": "Dữ liệu địa chỉ hợp đồng trực tiếp tạm thời không khả dụng trong bản chụp phía máy chủ này. Địa chỉ proxy và hợp đồng triển khai đã xác minh bên dưới là dữ liệu dự phòng tĩnh từ các thông số giao thức của giao diện.",
-    "empty": "Địa chỉ hợp đồng trực tiếp tạm thời không khả dụng trong bản chụp phía máy chủ. Bảng hợp đồng tương tác bên dưới sẽ nạp dữ liệu từ API công khai của Cosmic Signature khi có.",
-    "relatedAria": "Tài nguyên tin cậy về hợp đồng",
+    "description": "Tra cứu địa chỉ hợp đồng Cosmic Signature trên Arbitrum để kiểm tra mã nguồn, cấu hình và các giao dịch trên chuỗi.",
+    "partialFallback": "Chưa tải được danh sách địa chỉ hiện tại. Bên dưới là địa chỉ proxy và hợp đồng triển khai đã xác minh, được lưu trong cấu hình giao thức.",
+    "empty": "Tạm thời chưa tải được địa chỉ hợp đồng. Danh sách sẽ xuất hiện khi dịch vụ dữ liệu hoạt động trở lại.",
+    "relatedAria": "Mã nguồn, bảo mật và xác minh hợp đồng",
     "links": {
       "code": "Xem mã nguồn Cosmic Signature",
       "security": "Đọc tổng quan bảo mật",

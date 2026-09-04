@@ -71,7 +71,7 @@
   },
   "privacy": {
     "title": "Quyền riêng tư · Cosmic Signature",
-    "description": "Thực hành về quyền riêng tư đối với khách truy cập giao thức Cosmic Signature."
+    "description": "Cách Cosmic Signature xử lý dữ liệu và bảo vệ quyền riêng tư của khách truy cập."
   },
   "pagePrivacy": {
     "title": "Chính sách quyền riêng tư | Cosmic Signature",
@@ -91,7 +91,7 @@
   },
   "tokenDetail": {
     "titleFor": "Cosmic Signature NFT #{id} | Cosmic Signature",
-    "descriptionFor": "Đặc tính và lịch sử sở hữu của Cosmic Signature NFT #{id} - một NFT ba vật thể tất định được kết xuất quang phổ trên Arbitrum."
+    "descriptionFor": "Đặc tính và lịch sử sở hữu của Cosmic Signature NFT #{id}, tác phẩm ba vật thể được kết xuất quang phổ từ seed lưu trên Arbitrum."
   },
   "gestureDetail": {
     "title": "Thông tin nét bút | Cosmic Signature",
@@ -139,15 +139,15 @@
   },
   "publicGoodsCgContributions": {
     "title": "Đóng góp Hàng hóa công của giao thức | Cosmic Signature",
-    "description": "Các khoản chuyển tự động từ giao thức Cosmic Signature đến đơn vị thụ hưởng Hàng hóa công. Mỗi chu kỳ, một phần cố định của Dự trữ chu kỳ được chuyển để hỗ trợ hàng hóa công thông qua Hội đồng Vũ trụ."
+    "description": "Theo dõi phần dự trữ được Cosmic Signature tự động chuyển đến Kho Hàng hóa công mỗi chu kỳ để hỗ trợ đơn vị thụ hưởng đã cấu hình."
   },
   "publicGoodsRetrievals": {
     "title": "Nhận về Hàng hóa công | Cosmic Signature",
-    "description": "Các lần nhận về từ Kho Hàng hóa công. Mỗi chu kỳ, một phần Dự trữ chu kỳ được chuyển đến địa chỉ thụ hưởng do Hội đồng Vũ trụ lựa chọn."
+    "description": "Các khoản chuyển từ Kho Hàng hóa công đến địa chỉ thụ hưởng được cấu hình trong hợp đồng."
   },
   "publicGoodsVoluntary": {
     "title": "Đóng góp Hàng hóa công tự nguyện | Cosmic Signature",
-    "description": "Các khoản đóng góp tự nguyện vào Kho Hàng hóa công từ cộng đồng Cosmic Signature. Đóng góp hỗ trợ các đơn vị thụ hưởng do Hội đồng Vũ trụ điều phối lựa chọn."
+    "description": "Đóng góp tự nguyện của cộng đồng Cosmic Signature vào Kho Hàng hóa công để hỗ trợ đơn vị thụ hưởng được cấu hình trong hợp đồng."
   },
   "allocationRetrieved": {
     "title": "Phân bổ đã nhận về | Cosmic Signature",
@@ -163,11 +163,11 @@
   },
   "ethContribution": {
     "title": "Đóng góp ETH trực tiếp | Cosmic Signature",
-    "description": "Đóng góp ETH trực tiếp vào Kho Hàng hóa công của Cosmic Signature và xem toàn bộ lịch sử đóng góp. Hỗ trợ hàng hóa công trong khi tham gia giao thức."
+    "description": "Đóng góp ETH trực tiếp vào dự trữ chu kỳ của Cosmic Signature mà không đặt nét bút. Xem lịch sử đóng góp và lời nhắn đi kèm."
   },
   "ethContributionDetail": {
     "title": "Chi tiết đóng góp ETH trực tiếp | Cosmic Signature",
-    "description": "Chi tiết một khoản đóng góp ETH cụ thể vào Kho Hàng hóa công của Cosmic Signature — địa chỉ người đóng góp, số tiền, chu kỳ và lời nhắn tùy chọn."
+    "description": "Chi tiết đóng góp ETH vào dự trữ chu kỳ Cosmic Signature: địa chỉ người đóng góp, số tiền, chu kỳ và lời nhắn."
   },
   "ethContributionByCycle": {
     "title": "Đóng góp ETH trực tiếp theo chu kỳ | Cosmic Signature",
@@ -175,7 +175,7 @@
   },
   "myStatistics": {
     "title": "Thống kê của tôi | Cosmic Signature",
-    "description": "Theo dõi hoạt động của bạn với trang Thống kê của tôi của Cosmic Signature. Xem lịch sử nét bút chi tiết, trạng thái neo giữ, phân phối và nhiều hơn nữa. Luôn nắm thông tin và tối ưu việc tham gia giao thức trên chuỗi của bạn."
+    "description": "Theo dõi lịch sử nét bút, phân bổ, NFT và trạng thái neo giữ của ví trong Cosmic Signature."
   },
   "myTokens": {
     "title": "NFT của tôi | Cosmic Signature",
@@ -231,7 +231,7 @@
     "description": "Công cụ chuyển CST hạn chế dành cho người ký ví Dự trữ truyền thông đã cấu hình."
   },
   "embedEndurance": {
-    "title": "Dòng thời gian Bền bỉ và Chrono",
+    "title": "Dòng thời gian Quán quân Bền bỉ và Chiến binh Thời gian",
     "description": "Dòng thời gian Quán quân Bền bỉ và Chiến binh Thời gian của một chu kỳ trình diễn Cosmic Signature."
   },
   "about": {
@@ -248,7 +248,7 @@
   },
   "quiz": {
     "title": "Trắc nghiệm Cosmic Signature | Kiểm tra kiến thức về giao thức",
-    "description": "Một trăm câu hỏi trong ba cấp độ, rút từ sách trắng Cosmic Signature: chu kỳ trình diễn, nét bút, phân bổ, quy trình nghệ thuật và những trường hợp đặc biệt chỉ người đọc kỹ mới nhận ra.",
+    "description": "Một trăm câu hỏi ở ba cấp độ, dựa trên sách trắng Cosmic Signature: chu kỳ trình diễn, nét bút, phân bổ, quy trình tạo tác phẩm và các trường hợp đặc biệt.",
     "tiers": {
       "basic": {
         "title": "Trắc nghiệm cơ bản | Cosmic Signature",

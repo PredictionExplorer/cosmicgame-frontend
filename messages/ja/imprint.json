@@ -16,7 +16,7 @@
     "heading": "RandomWalk NFTの刻印",
     "description": "Cosmic Signatureに参加するためにRandomWalk NFTを刻印します。未使用のRandomWalk NFTはそれぞれ1回のETH一筆に添付でき、一筆の費用が50%引き下げられます。",
     "source": "Cosmic Signature公開プロトコル構成API",
-    "lastUpdated": "最終更新：{date}。データソース：{source}。下の対話型テーブルはアプリのライブデータで更新されますが、この要約は検索エンジンとAIクローラー向けに最初のHTMLに含まれています。",
+    "lastUpdated": "最終更新：{date}。データソース：{source}。",
     "relatedAria": "RandomWalk NFTの刻印の関連ページ",
     "cards": {
       "cycle": "進行中のパフォーマンス・サイクル",

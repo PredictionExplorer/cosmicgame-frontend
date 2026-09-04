@@ -50,7 +50,7 @@ export const landingTextZhHk = {
       caption: '銘刻於鏈上 · CC0',
       cstNote: `每枚銘刻的簽名作品都配有 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST。`,
       formingLabel: '信號生成中',
-      formingBody: '網絡回應後，這裏會即時展示作品集中的一幅簽名作品。',
+      formingBody: '作品載入完成後，便會在這裏顯示。',
       viewAriaLabel: '在應用程式中查看 Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature {tokenLabel} —— 確定性三體生成藝術作品',
       galleryCta: '瀏覽完整畫廊',
@@ -86,7 +86,7 @@ export const landingTextZhHk = {
 
   art: {
     eyebrow: '藝術',
-    heading: '三體問題，鏈上渲染。',
+    heading: '三體軌跡，由鏈上種子生成。',
     description:
       '每枚 Cosmic Signature NFT 都呈現 3 個天體在牛頓引力下的運動軌跡。三體運動天生混沌。沒有 AI，沒有訓練數據，只有確定性的物理。同一種子生成的畫面逐像素一致。',
     loading: {
@@ -158,7 +158,7 @@ export const landingTextZhHk = {
       },
       'chrono-warrior': {
         title: '時之勇士分配',
-        body: `單次連續保持領先時間最長的參與者獲配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
+        body: `單次連續保持堅守冠軍身份時間最長的參與者獲配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
       },
       'public-goods': {
         title: '公共物品分配',

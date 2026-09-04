@@ -8,7 +8,7 @@
   "sections": {
     "personal": {
       "title": "個人ツール",
-      "description": "ウォレット固有のページは接続中の参加者に役立ちますが、noindexでXMLサイトマップにも含まれません。",
+      "description": "ウォレットを接続して、自分のNFT、配分、係留を管理できます。",
       "navLabel": "個人ツール"
     },
     "system": {
@@ -18,7 +18,7 @@
     },
     "data": {
       "title": "プロトコルデータページ",
-      "description": "XMLサイトマップに載るすべての公開データルートを、クロール可能な一つの一覧に。",
+      "description": "公開されているプロトコルデータをまとめて探せます。",
       "navLabel": "プロトコルデータページ"
     },
     "ecosystem": {
@@ -30,23 +30,23 @@
   "links": {
     "myNfts": {
       "label": "自分のNFT",
-      "description": "ウォレット固有のNFT表示。noindex。"
+      "description": "接続中のウォレットのNFTを確認・管理できます。"
     },
     "myAllocations": {
       "label": "未受け取りの配分",
-      "description": "ウォレット固有の配分受け取り表示。noindex。"
+      "description": "ウォレットの未受け取り配分を確認できます。"
     },
     "myAnchors": {
       "label": "自分の係留",
-      "description": "ウォレット固有の係留表示。noindex。"
+      "description": "ウォレットの係留を確認・管理できます。"
     },
     "about": {
       "label": "Cosmic Signatureについて",
-      "description": "エンティティのホームとブランドの明確化。"
+      "description": "プロトコルの概要と公式情報を紹介します。"
     },
     "learn": {
       "label": "Cosmic Signature学習ハブ",
-      "description": "AIと検索システムのためのクロール可能な解説。"
+      "description": "仕組みや参加方法をわかりやすく解説します。"
     },
     "whatIsCosmicSignature": {
       "label": "Cosmic Signatureとは？",

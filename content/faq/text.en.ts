@@ -163,7 +163,7 @@ export const faqTextEn = {
       'what-if-two-gestures-same-time': {
         question: 'What happens if two gestures are submitted at the same time?',
         answer:
-          'Transactions on Arbitrum are processed in the order they are included by the sequencer. If two gestures arrive at the same moment, the one confirmed first is the valid gesture.',
+          'The sequencer orders transactions on Arbitrum. Each gesture is checked against the protocol state when it executes. A later gesture can still succeed, but an earlier one may change its cost or Participation CST amount. If those changes exceed the protections set for your gesture, the transaction will revert.',
       },
       'is-there-game-theory': {
         question: 'Is there a strategic element in Cosmic Signature?',
@@ -203,7 +203,7 @@ export const faqTextEn = {
       },
       'is-nft-supply-limited': {
         question: 'Is the number of Cosmic Signature NFTs limited?',
-        answer: `Yes, in practice. The time added per gesture grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle, so cycles gradually lengthen and the pace of NFT imprinting slows. There is no hard supply cap in the contract, but the slowing cycle rhythm makes Cosmic Signature NFTs an increasingly scarce resource over time.`,
+        answer: `The contract has no hard supply cap. The time added per gesture grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle, which tends to lengthen cycles and slow the pace of NFT imprinting. The actual pace also depends on participation.`,
       },
       'impact-of-limiting-nfts': {
         question: 'What is the impact of the limited NFT supply?',
@@ -249,7 +249,7 @@ export const faqTextEn = {
       'what-is-arbitrum': {
         question: 'What is Arbitrum and why is Cosmic Signature deployed on it?',
         answer:
-          'Arbitrum is an Ethereum Layer 2 rollup that speeds up transactions and reduces fees. Cosmic Signature deploys on Arbitrum to offer sub-cent gas costs and faster finality while preserving Ethereum’s security guarantees.',
+          'Arbitrum is an Ethereum Layer 2 rollup designed to process transactions at lower cost. Cosmic Signature uses it for frequent on-chain interactions. Fees vary with network conditions, and Arbitrum has its own execution and settlement rules.',
       },
       'why-arbitrum-not-ethereum': {
         question: 'Why Arbitrum and not Ethereum mainnet?',
@@ -350,7 +350,7 @@ export const faqTextEn = {
       'get-help': {
         question: 'How can I get help if I have questions?',
         answer:
-          'The community and support team are available via Discord, X / Twitter, and the support email listed on the Contacts page.',
+          'Use the official Discord and X / Twitter links, or the support email listed on the About page.',
       },
       'stay-updated': {
         question: 'How can I stay updated on Cosmic Signature news?',

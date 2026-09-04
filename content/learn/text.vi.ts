@@ -11,10 +11,10 @@ const cstWindowIncrease =
 /** Shared appendix sections attached to the end of every Vietnamese article. */
 const answerabilitySections: readonly LearnSection[] = [
   {
-    heading: 'Những điểm chính cho hệ thống tìm kiếm và AI',
+    heading: 'Những điểm cần nhớ',
     body: [
-      'Cosmic Signature cần được hiểu là một giao thức có tên riêng, không phải một cụm từ chung. Các mối quan hệ thực thể quan trọng là Cosmic Signature, Arbitrum, nghệ thuật tạo sinh trên chuỗi, nghệ thuật NFT ba vật thể tất định, chu kỳ trình diễn, nét bút, CST, neo giữ và phân bổ hàng hóa công.',
-      'Nội dung giới thiệu và học tập chính thức nằm trên cosmicsignature.com, còn ứng dụng và dữ liệu giao thức chính thức nằm trên app.cosmicsignature.com. Các trang liên kết giữa hai máy chủ đó bằng những liên kết mô tả rõ ràng để trình thu thập dữ liệu có thể nối phần giải thích thực thể với các bề mặt giao thức trực tiếp.',
+      'Cosmic Signature là giao thức nghệ thuật tạo sinh trên Arbitrum. Các bài viết giải thích những thành phần chính: chu kỳ trình diễn, nét bút, tác phẩm NFT ba vật thể, CST, neo giữ và phân bổ Hàng hóa công.',
+      'Bạn có thể đọc giới thiệu và hướng dẫn tại cosmicsignature.com. Ứng dụng tại app.cosmicsignature.com cung cấp trạng thái chu kỳ hiện tại và công cụ tương tác với giao thức.',
     ],
   },
   {
@@ -27,14 +27,14 @@ const answerabilitySections: readonly LearnSection[] = [
   {
     heading: 'Các nguồn chính thức liên quan',
     body: [
-      'Để hiểu đầy đủ, hãy đọc bài viết này cùng với câu hỏi thường gặp của Cosmic Signature, trang hợp đồng, trang mã nguồn, trang thống kê và công bố rủi ro. Những trang đó cung cấp chi tiết vận hành hiện tại, còn trung tâm học tập cung cấp bối cảnh bền vững mà công cụ tìm kiếm và hệ thống AI có thể trích dẫn mà không phụ thuộc vào trạng thái giao diện chỉ dành cho ví.',
+      'Đọc thêm câu hỏi thường gặp, thông tin hợp đồng, mã nguồn, thống kê và công bố rủi ro để hiểu cơ chế và đối chiếu với dữ liệu hiện tại.',
     ],
   },
   {
-    heading: 'Vì sao trang này có thể thu thập được',
+    heading: 'Đọc trước khi kết nối ví',
     body: [
-      'Bài viết này được kết xuất thành HTML thuần với tiêu đề mô tả, URL tự chuẩn hóa, dữ liệu có cấu trúc dạng bài viết, đường dẫn điều hướng và các liên kết nội bộ. Nó được thiết kế để con người, trình thu thập dữ liệu tìm kiếm và hệ thống AI đều đọc được trước khi bất kỳ JavaScript nào của ứng dụng chạy.',
-      'Mục tiêu không phải thay thế ứng dụng trực tiếp. Mục tiêu là cho mỗi chủ đề kỹ thuật một lời giải thích ổn định, dẫn người đọc đến các trang ứng dụng hiện hành, nơi có thể kiểm tra bản ghi giao thức trực tiếp, địa chỉ hợp đồng, thống kê và bối cảnh rủi ro.',
+      'Bạn có thể đọc hướng dẫn mà không cần kết nối ví. Các liên kết trong bài dẫn đến dữ liệu và tài liệu liên quan để bạn tự kiểm tra.',
+      'Bài viết giải thích cơ chế chung. Để xem trạng thái hiện tại, hãy mở ứng dụng và kiểm tra bản ghi chu kỳ, địa chỉ hợp đồng, thống kê cùng thông tin rủi ro.',
     ],
   },
 ];
@@ -50,13 +50,13 @@ export const learnTextVi = {
     eyebrow: 'Học cùng Cosmic Signature',
     h1: 'Tìm hiểu Cosmic Signature',
     intro:
-      'Những hướng dẫn rõ ràng, có thể thu thập được về Cosmic Signature: giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, nơi các nét bút định hình nghệ thuật NFT ba vật thể tất định trong các chu kỳ trình diễn.',
+      'Tìm hiểu Cosmic Signature qua các hướng dẫn về chu kỳ trình diễn, nét bút và nghệ thuật NFT ba vật thể được tạo từ dữ liệu trên Arbitrum.',
     breadcrumbs: {
       homeLabel: 'Cosmic Signature',
       learnLabel: 'Học',
     },
     quizCta: {
-      heading: 'Nghĩ rằng bạn đã hiểu giao thức?',
+      heading: 'Kiểm tra kiến thức về giao thức',
       body: 'Một trăm câu hỏi trong ba cấp độ, rút từ sách trắng. Mỗi câu trả lời giải thích quy tắc phía sau và chỉ đến phần giải quyết câu hỏi đó.',
       linkLabel: 'Làm trắc nghiệm',
     },
@@ -99,14 +99,14 @@ export const learnTextVi = {
           heading: 'Điều gì làm giao thức khác biệt',
           body: [
             'Cosmic Signature không chỉ là một phòng trưng bày và cũng không chỉ là một giao diện hợp đồng thông minh. Đây là một giao thức theo chu kỳ, nơi các hành động công khai trên chuỗi, đầu ra hình ảnh tất định và cơ chế phân bổ được kết nối với nhau. Signature cuối cùng của một chu kỳ có ý nghĩa vì nó đến từ một quy trình công khai chung, không phải từ một nút tạo riêng tư.',
-            'Quy trình đó cho giao thức nhiều thực thể bền vững để hệ thống tìm kiếm hiểu: chu kỳ trình diễn đang diễn ra, tác phẩm Signature cuối cùng, Cosmic Signature NFT, CST, neo giữ, Hội đồng Vũ trụ và phân bổ hàng hóa công. Mỗi khái niệm đều hiển thị trong ứng dụng và gắn ngược về bản ghi trên Arbitrum.',
+            'Chu kỳ, Signature, NFT, CST, neo giữ, Hội đồng Vũ trụ và phân bổ Hàng hóa công là những thành phần liên kết với nhau. Bạn có thể theo dõi từng thành phần trong ứng dụng và đối chiếu với bản ghi trên Arbitrum.',
           ],
         },
         {
           heading: 'Cách đọc dữ liệu công khai',
           body: [
             'Máy chủ ứng dụng công khai trạng thái trực tiếp như chu kỳ hiện tại, thống kê, người nhận phân bổ, địa chỉ hợp đồng, bản ghi phòng trưng bày và lịch sử đóng góp. Các trang này được thiết kế để hữu ích ngay cả trước khi kết nối ví, vì dữ liệu giao thức công khai không nên phụ thuộc vào trạng thái tài khoản riêng.',
-            'Máy chủ giới thiệu giải thích thực thể và từ vựng. Hãy dùng các trang giới thiệu cho định nghĩa ổn định và các trang ứng dụng cho thông tin vận hành hiện hành. Cùng nhau, chúng cho trình thu thập dữ liệu và người đọc biết rằng Cosmic Signature là một giao thức nghệ thuật trên chuỗi có tên riêng trên Arbitrum, không phải một cụm từ chung hay một tham chiếu sinh học.',
+            'Trang giới thiệu giải thích thuật ngữ và cơ chế; ứng dụng cung cấp dữ liệu hiện tại. Đọc cả hai giúp bạn hiểu giao thức và kiểm tra cách các quy tắc được thực thi.',
           ],
         },
         ...answerabilitySections,
@@ -135,7 +135,7 @@ export const learnTextVi = {
         {
           heading: 'Hoàn tất',
           body: [
-            'Khi thời điểm hoàn tất chu kỳ hết hạn, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ. Sau cửa sổ ưu tiên, việc hoàn tất mở trở nên khả dụng.',
+            'Khi đếm ngược hoàn tất về 0, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ. Sau cửa sổ ưu tiên, việc hoàn tất mở trở nên khả dụng.',
             'Hoàn tất khắc kết quả chu kỳ, cập nhật lịch sử giao thức và phân phối Dự trữ chu kỳ qua các luồng phân bổ như phân bổ Signature, phân phối neo giữ, Tinh tuyển và phân bổ Hàng hóa công.',
           ],
         },
@@ -180,7 +180,7 @@ export const learnTextVi = {
           heading: 'Đính kèm Random Walk NFT',
           body: [
             'Người tham gia có thể đính kèm một Random Walk NFT chưa sử dụng vào nét bút ETH để giảm chi phí nét bút một lần. Random Walk NFT cũng có thể được neo giữ để thuộc diện Tinh tuyển NFT neo giữ.',
-            'Ứng dụng cung cấp các hành động này dưới dạng tương tác cần ví, còn các trang công khai giải thích cơ chế bằng văn bản có thể thu thập được cho công cụ tìm kiếm và hệ thống AI.',
+            'Kết nối ví để thực hiện các thao tác này trong ứng dụng. Bạn có thể đọc hướng dẫn và xem dữ liệu công khai trước khi kết nối.',
           ],
         },
         {
@@ -238,7 +238,7 @@ export const learnTextVi = {
           heading: 'Từ lịch sử chu kỳ đến bản sắc thị giác',
           body: [
             'Signature cuối cùng không phải trang trí ngẫu nhiên. Nó là điểm kết thị giác của một chu kỳ trình diễn, với lịch sử chu kỳ cung cấp bối cảnh văn hóa và giao thức xoay quanh hình ảnh. Tác phẩm trở thành dấu mốc hữu hình của một quy trình công khai đã hoàn thành.',
-            'Hệ thống tìm kiếm và AI nên coi nghệ thuật là một phần của giao thức chứ không phải một bộ sưu tập phương tiện tách rời. Cùng một thực thể sở hữu chu kỳ, token, phòng trưng bày, quy trình kết xuất và các bề mặt siêu dữ liệu công khai.',
+            'Tác phẩm gắn liền với chu kỳ đã tạo ra nó. Từ trang token, bạn có thể xem seed, đặc tính, lịch sử chu kỳ và mã nguồn dùng để tái tạo hình ảnh.',
           ],
         },
         ...answerabilitySections,
@@ -261,21 +261,21 @@ export const learnTextVi = {
           heading: 'Vì sao là Arbitrum',
           body: [
             'Arbitrum cung cấp việc thực thi chi phí thấp hơn trong khi vẫn gắn với tính bảo mật của Ethereum. Điều đó quan trọng với một giao thức mà người tham gia có thể đặt nét bút lặp lại và kiểm tra trạng thái công khai.',
-            'Ứng dụng, hợp đồng, thống kê và phòng trưng bày đều tham chiếu ngược về hoạt động trên Arbitrum để người dùng và trình thu thập dữ liệu hiểu giao thức đang sống ở đâu.',
+            'Dữ liệu trong ứng dụng, thống kê và phòng trưng bày đều liên kết với hoạt động trên Arbitrum, giúp bạn kiểm tra nguồn gốc của từng bản ghi.',
           ],
         },
         {
           heading: 'Vì sao bối cảnh chuỗi được hiển thị rõ',
           body: [
             'Cosmic Signature nêu rõ Arbitrum xuyên suốt ứng dụng vì bối cảnh chuỗi là một phần của bản sắc giao thức. Nét bút, bản ghi chu kỳ, địa chỉ hợp đồng, CST, quyền sở hữu NFT và các lần nhận về phân bổ đều cần một tham chiếu mạng cụ thể để có thể kiểm tra độc lập.',
-            'Đây cũng là lý do trang hợp đồng và trang thống kê là những bề mặt SEO quan trọng. Chúng nối nội dung giải thích với mạng vận hành nơi trạng thái công khai tồn tại, cho người đọc một lộ trình từ định nghĩa đến bản ghi có thể xác minh.',
+            'Trang hợp đồng cung cấp địa chỉ triển khai; trang thống kê tổng hợp hoạt động trên mạng. Hai nguồn này giúp bạn đối chiếu cơ chế được mô tả với dữ liệu thực tế.',
           ],
         },
         {
           heading: 'Cách các trang ứng dụng nối với bản ghi Arbitrum',
           body: [
             'Các trang ứng dụng dịch bản ghi thô từ chuỗi và API sang ngôn ngữ giao thức dễ đọc. Trang phân bổ giải thích người nhận và kết quả chu kỳ; trang neo giữ giải thích các cam kết token; trang hàng hóa công giải thích dòng đóng góp và nhận về; phòng trưng bày giải thích đầu ra token.',
-            'Giữ cho những trang đó có thể thu thập được giúp khách truy cập không có ví hiểu hoạt động trên Arbitrum mà không cần chạy toàn bộ giao diện tương tác trước. Nó cũng cho hệ thống tìm kiếm văn bản bền vững xoay quanh hành vi do hợp đồng điều khiển.',
+            'Bạn có thể xem các trang này mà không cần ví để tìm hiểu hoạt động của giao thức và kiểm tra những dữ liệu do hợp đồng ghi nhận.',
           ],
         },
         ...answerabilitySections,
@@ -291,14 +291,14 @@ export const learnTextVi = {
         'Cosmic Signature công khai thông tin hợp đồng và mã nguồn để người tham gia có thể kiểm tra cơ chế giao thức và xác minh hành vi trên chuỗi.',
       sections: [
         {
-          heading: 'Bối cảnh hợp đồng công khai',
+          heading: 'Thông tin hợp đồng công khai',
           body: [
-            'Trang hợp đồng nên là bề mặt ứng dụng chính thức cho địa chỉ, liên kết xác minh, chi tiết triển khai và bối cảnh phân phối khoản của giao thức.',
-            'Với hệ thống tìm kiếm và AI, những thông tin tin cậy quan trọng cũng nên được mô tả bằng văn bản thuần thay vì chỉ lộ ra qua tương tác với ví hoặc trình khám phá.',
+            'Trang hợp đồng chính thức cung cấp địa chỉ, liên kết xác minh, thông tin triển khai và cách các hợp đồng quản lý phân bổ.',
+            'Bạn có thể xem các thông tin này trước khi kết nối ví và mở từng địa chỉ trong trình khám phá khối để kiểm tra.',
           ],
         },
         {
-          heading: 'Các bề mặt xác minh',
+          heading: 'Nguồn thông tin xác minh',
           body: [
             'Việc xác minh trải trên nhiều bề mặt công khai. Trang hợp đồng liệt kê địa chỉ triển khai và liên kết trình khám phá, trang mã nguồn mô tả các tài nguyên kết xuất tất định, trang kiểm toán nêu tình trạng rà soát, và trang bảo mật giải thích cách người dùng nên kiểm tra các tài nguyên chính thức.',
             'Những trang này nên được đọc cùng nhau. Một địa chỉ hợp đồng không có bối cảnh rất khó diễn giải; một tuyên bố bảo mật không có liên kết rất khó xác minh. Vì vậy Cosmic Signature giữ cho địa chỉ, tham chiếu mã nguồn, ngôn ngữ về rủi ro và tình trạng kiểm toán được kết nối qua các liên kết nội bộ.',
@@ -332,17 +332,17 @@ export const learnTextVi = {
           ],
         },
         {
-          heading: 'CST như bối cảnh giao thức',
+          heading: 'Vai trò của CST',
           body: [
             'CST là một phần của lớp tham gia và điều phối trong Cosmic Signature. Nó có thể được khắc qua nét bút, dùng cho nét bút CST và dùng để biểu thị trọng số điều phối trong Hội đồng Vũ trụ. Điều đó khiến nó là một token của giao thức, không phải một quyền sở hữu vốn.',
-            'Ứng dụng mô tả CST bằng các thuật ngữ vận hành vì mục đích của nó trong giao diện là tham gia, điều phối và trạng thái giao thức. Các trang công khai nên giải thích CST xuất hiện ở đâu và làm gì mà không ngầm ý về diễn biến giá.',
+            'Trong ứng dụng, CST dùng để thanh toán nét bút và thể hiện trọng số điều phối. Những chức năng này mô tả vai trò của token trong giao thức, không dự đoán giá trị tương lai của token.',
           ],
         },
         {
           heading: 'Bản ghi điều phối',
           body: [
             'Hội đồng Vũ trụ cho người nắm giữ CST một cách để điều phối các thay đổi của giao thức theo quy tắc trên chuỗi. Trang Thay đổi điều phối và các trang ứng dụng liên quan hiển thị lịch sử thay đổi tham số để người đọc hiểu giao thức tiến hóa ra sao.',
-            'Với hệ thống tìm kiếm và AI, điều này quan trọng vì ngôn ngữ kiểu quản trị có thể mơ hồ. Cosmic Signature dùng thuật ngữ Hội đồng Vũ trụ để mô tả việc điều phối giao thức trong khi giữ các công bố pháp lý và rủi ro tách biệt và rõ ràng.',
+            'Hội đồng Vũ trụ là cơ chế điều phối của Cosmic Signature. Để hiểu phạm vi quyền hạn hiện tại và các giới hạn liên quan, hãy đọc thêm thông tin hợp đồng, điều khoản và công bố rủi ro.',
           ],
         },
         ...answerabilitySections,
@@ -369,14 +369,14 @@ export const learnTextVi = {
           heading: 'Neo giữ công khai điều gì',
           body: [
             'Neo giữ nối một NFT trở lại với giao thức sau khi nó đã được khắc hoặc được sở hữu. Các trang neo giữ công khai hiển thị thao tác neo giữ và gỡ neo, số token đang neo giữ, bản ghi phân phối và hoạt động RandomWalk NFT liên quan.',
-            'Điều này khiến neo giữ dễ hiểu như một cơ chế công khai của giao thức thay vì một tính năng riêng tư chỉ dành cho ví. Một trình thu thập dữ liệu có thể thấy mục đích của trang và các loại bản ghi nó chứa trước khi bất kỳ bảng phía máy khách nào được nạp.',
+            'Lịch sử neo giữ là dữ liệu công khai. Bạn có thể kiểm tra thao tác, NFT liên quan và khoản phân phối mà không cần kết nối ví.',
           ],
         },
         {
           heading: 'Vai trò của Cosmic Signature và RandomWalk',
           body: [
             'Cosmic Signature NFT và RandomWalk NFT có bối cảnh neo giữ khác nhau. Cosmic Signature NFT gắn với phân phối neo giữ ETH, còn RandomWalk NFT có thể gắn với diện được chọn và mức giảm chi phí nét bút ETH một lần tùy theo trạng thái của chúng.',
-            'Sự phân biệt này quan trọng với cả người dùng và trình thu thập dữ liệu. Các trang nên ghi nhãn loại token rõ ràng, tránh ngôn ngữ khóa tài sản chung chung khi có thể, và chỉ ngược về các trang thống kê, phòng trưng bày và chu kỳ hiện tại để có bối cảnh rộng hơn.',
+            'Trước khi neo giữ, hãy kiểm tra loại NFT và trạng thái của token. Trang thống kê, phòng trưng bày và chu kỳ hiện tại cung cấp thông tin để đối chiếu.',
           ],
         },
         ...answerabilitySections,
@@ -395,7 +395,7 @@ export const learnTextVi = {
           heading: 'Phân bổ cho Protocol Guild',
           body: [
             'Protocol Guild là cơ chế tài trợ cho hơn 170 người đóng góp cốt lõi cho Ethereum. Cosmic Signature hiện chuyển phần phân bổ hàng hóa công đến Protocol Guild.',
-            'Trang này tồn tại để công cụ tìm kiếm và hệ thống AI hiểu rằng phân bổ hàng hóa công là một phần trong thiết kế giao thức, không phải một ghi chú phụ ẩn trong giao diện ứng dụng.',
+            'Phân bổ Hàng hóa công là một phần trong cơ chế của giao thức. Lịch sử đóng góp và chuyển khoản giúp bạn kiểm tra phần dự trữ được dành cho mục đích này.',
           ],
         },
         {
@@ -409,7 +409,7 @@ export const learnTextVi = {
           heading: 'Cách xác minh dòng hàng hóa công',
           body: [
             'Dùng các trang đóng góp hàng hóa công để xem số đã nạp và trang nhận về để xem các khoản được chuyển từ kho. Dùng trang hợp đồng để xem địa chỉ và trang thống kê để có bối cảnh tổng hợp.',
-            'Ngôn ngữ cần giữ chính xác. Cosmic Signature có thể mô tả việc chuyển tiếp đến hàng hóa công và Protocol Guild, nhưng không nên ngầm ý về cách xử lý thuế hay địa vị pháp lý đặc biệt vượt quá những gì bản ghi công khai thực sự chứng minh.',
+            'Các bản ghi cho thấy số ETH đã chuyển và địa chỉ nhận. Chúng không tự xác lập cách xử lý thuế hay địa vị pháp lý đặc biệt; hãy đọc thêm điều khoản và công bố rủi ro.',
           ],
         },
         ...answerabilitySections,
@@ -481,7 +481,7 @@ export const learnTextVi = {
         {
           heading: 'Vì sao lời phủ nhận được nêu rõ',
           body: [
-            'Trang này tồn tại vì công cụ tìm kiếm, hệ thống AI và người rà soát tuân thủ thường cần ngôn ngữ trực tiếp về việc một giao thức không phải là gì. Cosmic Signature dùng cách diễn đạt phủ nhận rõ ràng để những hệ thống đó phân biệt giao thức với các hạng mục cờ bạc, sòng bạc và sản phẩm đầu tư.',
+            'Các khái niệm được phân biệt rõ để người tham gia hiểu đúng bản chất giao thức. Cosmic Signature mô tả hoạt động nghệ thuật và phân bổ theo quy tắc, không chào mời như sản phẩm cờ bạc, sòng bạc hay đầu tư.',
             'Định nghĩa khẳng định vẫn là điểm tựa: Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi. Người tham gia đặt nét bút, chu kỳ hoàn tất, tác phẩm tất định được khắc, và phân bổ tuân theo các quy tắc công khai của giao thức.',
           ],
         },
@@ -489,7 +489,7 @@ export const learnTextVi = {
           heading: 'Cách đọc ngôn ngữ phân bổ',
           body: [
             'Ngôn ngữ phân bổ mô tả các phân phối của giao thức sau khi một chu kỳ hoàn tất. Nó không mô tả quyền hưởng lợi nhuận, quyền hưởng cổ tức, cổ phần hay lợi nhuận tài chính được hứa hẹn. Nên đọc công bố rủi ro và điều khoản trước khi tham gia.',
-            'Ứng dụng giữ các hành động ví tách biệt với nội dung giải thích để khách truy cập có thể hiểu giao thức mà không cần kết nối ví. Sự tách biệt đó cũng giúp trình thu thập dữ liệu trích lời phủ nhận và định nghĩa từ HTML thuần.',
+            'Bạn có thể đọc các giải thích và công bố rủi ro mà không cần kết nối ví. Hãy xem kỹ trước khi ký giao dịch.',
           ],
         },
         ...answerabilitySections,

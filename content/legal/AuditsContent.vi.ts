@@ -5,14 +5,14 @@ export const auditsCopyVi: TrustPageCopy = {
   eyebrow: 'Kiểm toán và xác minh',
   title: 'Kiểm toán Cosmic Signature',
   intro:
-    'Cosmic Signature công khai bối cảnh rà soát hợp đồng ở dạng có thể thu thập được, để người tham gia, nhà nghiên cứu, công cụ tìm kiếm và hệ thống AI hiểu giao thức được xác minh như thế nào và có thể kiểm tra bản triển khai công khai của nó ở đâu.',
+    'Trang này tổng hợp kết quả rà soát hợp đồng Cosmic Signature và liên kết đến các báo cáo. Bạn có thể xem phạm vi kiểm toán, các vấn đề được ghi nhận và bản triển khai công khai của giao thức.',
   sections: [
     {
       heading: 'Kiểm toán độc lập bởi Hacken',
       paragraphs: [
         'Cuối năm 2025, Hacken đã thực hiện một cuộc rà soát bảo mật độc lập các hợp đồng thông minh của Cosmic Signature. Phạm vi bao gồm các hợp đồng đang vận hành trong kho mã công khai, từ giao thức cốt lõi điều hành mỗi chu kỳ đến token CST, cả hai bộ sưu tập NFT, các ví neo giữ, cùng các hợp đồng quản lý ví và hệ thống hỗ trợ chúng. Hacken công bố báo cáo cuối cùng vào tháng 1 năm 2026.',
         'Báo cáo liệt kê 23 phát hiện, không có phát hiện nào ở mức nghiêm trọng hay cao: 3 mức trung bình, 8 mức thấp và 12 quan sát mang tính thông tin. Phần lớn mô tả những cân nhắc thiết kế mà đội ngũ đã xem xét và chấp nhận, và báo cáo giải thích từng phát hiện cùng trạng thái của nó.',
-        'Bên cạnh rà soát thủ công, Hacken đã chạy kiểm thử fuzz với 14 bất biến của hệ thống, chẳng hạn yêu cầu rằng lượng ETH giao thức nắm giữ luôn bằng số đã nạp trừ số đã rút ra. Cả 14 bất biến đều giữ vững qua 10.000 lượt chạy.',
+        'Bên cạnh rà soát thủ công, Hacken đã chạy kiểm thử fuzz với 14 bất biến của hệ thống, chẳng hạn yêu cầu rằng lượng ETH giao thức nắm giữ luôn bằng số đã nạp trừ số đã nhận về. Cả 14 bất biến đều giữ vững qua 10.000 lượt chạy.',
       ],
       linkParagraph: {
         kind: 'external',
@@ -31,7 +31,7 @@ export const auditsCopyVi: TrustPageCopy = {
       ],
     },
     {
-      heading: 'Tài nguyên tin cậy liên quan',
+      heading: 'Tài liệu bảo mật liên quan',
       links: [
         { kind: 'app', href: '/contracts', label: 'Địa chỉ hợp đồng Arbitrum đã xác minh' },
         { kind: 'app', href: '/code', label: 'Mã nguồn và tài nguyên kết xuất tất định' },

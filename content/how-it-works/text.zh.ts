@@ -46,7 +46,7 @@ export const howItWorksTextZh = {
       },
       {
         title: '获配',
-        description: '周期收官后，即可参与各项分配——签名分配、星选、锚定派发等。',
+        description: '周期收官后，协议会按规则发放签名分配、星选分配与锚定派发等。',
         tooltip: `写下收官之笔的参与者会获得周期储备的 ${protocolFacts.mainEthPercentage}%、${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST 与 1 枚 Cosmic Signature NFT。星选获配者、锚定者及其他参与者也会获得相应分配。`,
       },
     ],
@@ -199,7 +199,7 @@ export const howItWorksTextZh = {
   },
   callToAction: {
     heading: '准备落下第一笔了吗？',
-    body: '加入正在推进的演绎周期。连接钱包，落下你的第一笔，开始铭刻 CST，塑造这一周期的签名。',
+    body: '加入当前演绎周期。连接钱包，落下第一笔，共同塑造这一周期的签名。',
     primaryCtaLabel: '进入协议',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',

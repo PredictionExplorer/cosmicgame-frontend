@@ -2,7 +2,7 @@
   "protocol": {
     "title": "Protocol Public-Goods Contributions",
     "subtitle": "Automatic forwards from the Cosmic Signature protocol to the Public Goods Vault",
-    "description": "Each cycle, a percentage of the Cycle Reserve is automatically forwarded to the Public Goods Vault. The Cosmic Council coordinates which public-goods beneficiaries receive these funds, creating a direct link between participation and ecosystem impact."
+    "description": "When a cycle finalizes, a percentage of its Cycle Reserve is forwarded to the Public Goods Vault. The vault holds these funds for the configured Public Goods recipient."
   },
   "voluntary": {
     "title": "Voluntary Public-Goods Contributions",
@@ -12,7 +12,7 @@
   "retrievals": {
     "title": "Public Goods Retrievals",
     "subtitle": "Funds retrieved from the Public Goods Vault",
-    "description": "This page tracks all retrievals from the Cosmic Signature Public Goods Vault. Each retrieval represents public-goods funds being forwarded to beneficiaries selected through Cosmic Council coordination."
+    "description": "Track funds forwarded from the Cosmic Signature Public Goods Vault to its configured Public Goods recipient."
   },
   "loading": "Loading..."
 }

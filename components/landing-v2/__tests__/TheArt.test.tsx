@@ -77,7 +77,7 @@ describe('<TheArt />', () => {
 
     await waitFor(() => expect(global.fetch).toHaveBeenCalled());
     expect(screen.getByText('Awaiting metadata')).toBeInTheDocument();
-    expect(screen.getByText(/Real generated NFTs appear here/)).toBeInTheDocument();
+    expect(screen.getByText(/Artwork appears here/)).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /View Cosmic Signature/ })).not.toBeInTheDocument();
   });
 

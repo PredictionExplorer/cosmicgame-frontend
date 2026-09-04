@@ -1,7 +1,7 @@
 {
   "invalid": {
     "title": "유효하지 않은 제스처 ID",
-    "help": "URL에는 0 이상의 숫자 제스처 ID를 사용해 주세요."
+    "help": "URL의 제스처 ID는 0 이상의 숫자여야 합니다."
   },
   "header": {
     "title": "제스처 상세",
@@ -11,12 +11,12 @@
   },
   "empty": {
     "title": "제스처 정보를 찾을 수 없습니다.",
-    "help": "ID가 잘못되었거나 이 제스처가 아직 현재 인덱스에 없을 수 있습니다."
+    "help": "ID가 잘못되었거나 아직 제스처 데이터가 반영되지 않았을 수 있습니다."
   },
   "sections": {
     "transaction": {
       "title": "트랜잭션과 사이클",
-      "description": "제스처를 남긴 시점과 소속 사이클입니다."
+      "description": "제스처를 남긴 시점과 해당 사이클입니다."
     },
     "cost": {
       "title": "비용과 참여 CST",
@@ -28,11 +28,11 @@
     },
     "erc20": {
       "title": "첨부된 ERC-20",
-      "description": "이 제스처에 선택적으로 첨부된 ERC-20 토큰입니다."
+      "description": "이 제스처에 첨부한 ERC-20 토큰입니다."
     },
     "nft": {
       "title": "첨부된 NFT",
-      "description": "이 제스처에 첨부된 NFT가 있는 경우 해당 NFT의 메타데이터입니다."
+      "description": "첨부된 NFT가 있으면 해당 메타데이터를 표시합니다."
     },
     "message": {
       "title": "메시지",
@@ -51,7 +51,7 @@
     "paidWithCst": "CST(ERC-20) 지불 여부:",
     "randomWalkId": "RandomWalk NFT ID:",
     "erc20Address": "첨부된 ERC-20 토큰 주소:",
-    "erc20Amount": "첨부된 ERC-20 토큰 수량(ETH):",
+    "erc20Amount": "첨부된 ERC-20 토큰 수량:",
     "nftAddress": "첨부된 NFT 토큰 주소:",
     "nftId": "첨부된 NFT 토큰 ID:",
     "nftTokenUri": "NFT 토큰 URI:"

@@ -1,13 +1,13 @@
 {
   "page": {
     "title": "ETH 貢獻",
-    "subtitle": "直接向 Cosmic Signature 公共財金庫貢獻 ETH",
-    "description": "直接向 Cosmic Signature 公共財金庫貢獻 ETH，支持由宇宙議會協調選定的公共財受益方。貢獻時可附上標題、留言和網址；每個週期貢獻額較高的參與者可能會展示在首頁。",
+    "subtitle": "直接向 Cosmic Signature 週期儲備貢獻 ETH",
+    "description": "無需落筆，也可直接向 Cosmic Signature 週期儲備貢獻 ETH。貢獻時可附上標題、留言和網址；每個週期貢獻額較高的參與者可能會展示在首頁。",
     "formTitle": "貢獻 ETH",
     "amountLabel": "金額（ETH）",
     "informationLabel": "附加資訊",
     "optionalJson": "（可選，JSON）",
-    "informationPlaceholder": "'{'\"name\": 「你的名稱」, \"message\": 「留言」'}'",
+    "informationPlaceholder": "'{'\"name\": \"你的名稱\", \"message\": \"留言\"'}'",
     "contribute": "貢獻",
     "contributeWithInfo": "附帶資訊並貢獻",
     "historyTitle": "貢獻紀錄"
@@ -50,8 +50,8 @@
     "urlLabel": "網址",
     "linkPreviewTitle": "連結預覽",
     "linkPreviewDescription": "從貢獻者提供的網址取得的後設資料。",
-    "metaDescriptionLabel": "元描述",
-    "metaKeywordsLabel": "元關鍵詞",
+    "metaDescriptionLabel": "網頁描述",
+    "metaKeywordsLabel": "網頁關鍵字",
     "metaImageTitle": "預覽影像",
     "metaImageDescription": "Open Graph 或社交平台預覽影像。",
     "metaImageAlt": "連結預覽影像"

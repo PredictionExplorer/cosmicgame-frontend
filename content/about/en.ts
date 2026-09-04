@@ -13,7 +13,7 @@ export const aboutContentEn = {
       'Cosmic Signature is a procedural on-chain art protocol on Arbitrum that generates deterministic three-body NFT art from Performance Cycle gestures.',
   },
   breadcrumbLabel: 'About',
-  eyebrow: 'Entity home',
+  eyebrow: 'About the protocol',
   heading: 'About Cosmic Signature',
   body: {
     paragraphs: [

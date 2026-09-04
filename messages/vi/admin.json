@@ -7,7 +7,7 @@
     "loading": "Đang tải…"
   },
   "settings": {
-    "title": "Phương thức quản trị",
+    "title": "Tham số quản trị",
     "subtitle": "Chế độ chỉ đọc cho các địa chỉ hợp đồng và tham số của bảng điều khiển.",
     "breadcrumbs": {
       "home": "Trang chủ",
@@ -59,16 +59,16 @@
   },
   "outreachTransfer": {
     "title": "Chuyển CST truyền thông",
-    "subtitle": "Công cụ chuyển chỉ truy cập qua URL dành cho người ký ví Dự trữ truyền thông đã cấu hình.",
+    "subtitle": "Công cụ chuyển CST dành cho ví được phép quản lý Dự trữ truyền thông. Truy cập bằng liên kết trực tiếp.",
     "roleReadError": "Không đọc được chủ sở hữu và thủ quỹ của Dự trữ truyền thông.",
     "walletRequiredTitle": "Chưa kết nối ví",
     "walletRequiredDescription": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông để chi CST phân bổ.",
     "walletUnavailableTitle": "Ví truyền thông không khả dụng",
     "walletUnavailableDescription": "Bảng điều khiển chưa cung cấp địa chỉ ví truyền thông.",
     "rolesLoadingTitle": "Đang tải vai trò của Dự trữ truyền thông",
-    "rolesLoadingDescription": "Đang đọc chủ sở hữu và thủ quỹ của MarketingWallet từ hợp đồng.",
+    "rolesLoadingDescription": "Đang đọc thông tin chủ sở hữu và thủ quỹ từ hợp đồng Dự trữ truyền thông.",
     "rolesErrorTitle": "Không đọc được vai trò của Dự trữ truyền thông",
     "restrictedTitle": "Truy cập bị hạn chế",
-    "restrictedDescription": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông ({treasurer}) để dùng công cụ chuyển chỉ truy cập qua URL này. Chủ sở hữu: {owner}."
+    "restrictedDescription": "Kết nối ví thủ quỹ hiện tại của Dự trữ truyền thông ({treasurer}) để sử dụng công cụ chuyển CST. Chủ sở hữu: {owner}."
   }
 }

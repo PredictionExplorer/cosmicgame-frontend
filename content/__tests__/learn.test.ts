@@ -56,12 +56,21 @@ describe('learnArticles', () => {
     }
   });
 
-  it('keeps every article substantial enough for crawler-visible answer extraction', () => {
+  it('provides readable explanations without publishing crawler implementation instructions', () => {
     for (const article of learnArticles) {
-      const words = [article.summary, ...article.sections.flatMap((section) => section.body)].join(
+      const text = [article.summary, ...article.sections.flatMap((section) => section.body)].join(
         ' ',
       );
-      expect(words.split(/\s+/).filter(Boolean).length).toBeGreaterThanOrEqual(450);
+      // A word-count target encouraged repetitive SEO instructions in reader
+      // copy. Check the actual defect and keep section completeness explicit.
+      expect(text).not.toMatch(
+        /search (?:engines|systems|crawlers)|AI systems|SEO surfaces|client-side table hydrates/i,
+      );
+      for (const section of article.sections) {
+        expect(section.heading.trim()).not.toBe('');
+        expect(section.body.length).toBeGreaterThan(0);
+        expect(section.body.every((paragraph) => paragraph.trim().length > 0)).toBe(true);
+      }
     }
   });
 

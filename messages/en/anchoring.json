@@ -48,7 +48,7 @@
       "distributionPerNft": {
         "label": "Distribution per NFT",
         "tooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
-        "tooltipUnavailable": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs. The on-chain anchor pool is non-zero, but the indexed total of anchored Cosmic Signature NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-NFT rate cannot be computed."
+        "tooltipUnavailable": "The Anchor Distribution per NFT is unavailable while the anchored NFT count is being updated. The on-chain pool already contains ETH."
       },
       "uniqueHolders": {
         "label": "Unique Anchor-holders",

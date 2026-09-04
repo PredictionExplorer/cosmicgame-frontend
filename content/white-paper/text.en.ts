@@ -52,7 +52,7 @@ export const whitePaperTextEn = {
           kind: 'list',
           items: [
             'Determinism. The artwork is computed from a seed recorded on-chain at imprint time. The rendering pipeline is open source, and the same seed always produces the same image and video, bit for bit.',
-            'Mechanical distribution. Allocation percentages are constants in verified contracts. No discretionary account sits between participants and the distribution rules, and no team wallet receives ETH from gestures.',
+            'Mechanical distribution. The deployed contracts execute the allocation rules at finalization. No discretionary account sits between participants and those rules, and no team wallet receives ETH from gestures.',
             'A finite role for the team. Owner powers are narrow, are locked while a cycle runs, and are scheduled to be removed entirely once the remaining upgrades land.',
           ],
         },
@@ -178,7 +178,7 @@ export const whitePaperTextEn = {
       blocks: [
         {
           kind: 'paragraph',
-          text: 'Gestures are the protocol\u2019s only input. Each one, regardless of currency, extends the countdown, records one entry in the cycle\u2019s participant Stellar Selections, updates the endurance clocks of Section 5.2, and can imprint Participation CST as described in Section 7.1.',
+          text: 'Gestures drive each Performance Cycle. Each one, regardless of currency, extends the countdown, records one entry in the cycle’s participant Stellar Selections, updates the endurance clocks of Section 5.2, and can imprint Participation CST as described in Section 7.1.',
         },
       ],
       subsections: {
@@ -286,7 +286,7 @@ export const whitePaperTextEn = {
             },
             {
               kind: 'paragraph',
-              text: 'The five distributed tracks sum to half of the reserve. The remainder compounds: the protocol accumulates rather than extracts, and each cycle opens with a larger reserve than the last. If a cycle finalizes with no Cosmic Signature NFTs anchored, that cycle\u2019s Anchor Distribution is skipped and its share compounds as well.',
+              text: 'The five distributed tracks account for about half of the reserve. The remainder carries forward into the next cycle. Its size depends on the ETH added and distributed; a larger reserve is not guaranteed each cycle. If no Cosmic Signature NFTs are anchored at finalization, the Anchor Distribution is skipped and its share also remains in the Cycle Reserve.',
             },
             {
               kind: 'table',
@@ -475,11 +475,11 @@ export const whitePaperTextEn = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST leaves circulation whenever it is spent: the full cost of every CST gesture is burned. Supply is therefore shaped by behavior. Quiet cycles imprint little Participation CST, active CST usage burns supply back down, and the fixed Recognition and Outreach flows add a predictable ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST per typical cycle. There is no cap, no premine, and no team allocation.`,
+              text: `CST leaves circulation whenever it is spent: the full cost of every CST gesture is burned. Supply is therefore shaped by behavior. Quiet cycles imprint little Participation CST, active CST usage burns supply back down, and the fixed Recognition and Outreach flows add ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST per typical cycle. Supply started at zero and has no hard cap. The recurring team-directed CST flow is the Outreach Reserve described in Section 7.1.`,
             },
             {
               kind: 'paragraph',
-              text: 'The square-root formula is itself a supply control, introduced in the V2 upgrade (Section 12.2). The original design imprinted a flat 100 CST per gesture, which made machine-speed gesture sequences an unbounded source of new CST. Under the current rule, a burst of rapid gestures imprints approximately zero, while patient participation is what creates supply.',
+              text: 'The square-root formula limits Participation CST and was introduced in the V2 upgrade (Section 12.2). The original design imprinted a flat 100 CST per gesture. Under the current rule, rapid successive gestures imprint little or no Participation CST, while longer intervals produce larger amounts. Recognition CST and the Outreach Reserve remain separate sources of supply.',
             },
           ],
         },

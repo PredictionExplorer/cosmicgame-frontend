@@ -105,6 +105,10 @@ const config = [
       'node_modules/',
       'contracts/types/',
       '__mocks__/',
+      // Playwright recreates these directories while browser checks run.
+      // Generated reports are not source and must not race with the linter.
+      'test-results/',
+      'blob-report/',
       'playwright-report/',
       'coverage/',
       'commitlint.config.mjs',

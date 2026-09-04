@@ -6,7 +6,10 @@ import { WHITE_PAPER_VERSION } from './types';
 const cst = (amount: number): string => amount.toLocaleString('zh-HK');
 
 /** protocolFacts stores the example gaps as English strings; render them in zh. */
-const ELAPSED_ZH_HK: Record<string, string> = {
+const ELAPSED_ZH_HK: Record<
+  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
+  string
+> = {
   '0 seconds': '0 秒',
   '1 second': '1 秒',
   '60 seconds': '60 秒',
@@ -36,7 +39,7 @@ export const whitePaperTextZhHk = {
   abstract: {
     heading: '摘要',
     paragraphs: [
-      'Cosmic Signature 是部署在 Arbitrum One 上的程序化藝術協議，以一個個限時的演繹週期運轉。週期進行中，參與者以 ETH 或協議的 ERC-20 代幣 CST 落筆：每一筆都會延長收官倒數，計入一次星選資格，還可能銘刻新的 CST。倒數結束、週期收官後，協議將 ETH 儲備分配至十餘條軌道，銘刻新一代 Cosmic Signature NFT，並把固定份額轉撥給 Protocol Guild，即 170 餘位以太坊核心貢獻者的資助機制。約一半儲備滾入下一週期，每個新週期都以更大的儲備開場。',
+      'Cosmic Signature 是部署在 Arbitrum One 上的程序化藝術協議，以一個個限時的演繹週期運轉。週期進行中，參與者以 ETH 或協議的 ERC-20 代幣 CST 落筆：每一筆都會延長收官倒數，計入一次星選資格，還可能銘刻新的 CST。倒數結束、週期收官後，協議將 ETH 儲備分配至十餘條軌道，銘刻新一代 Cosmic Signature NFT，並把固定份額轉撥給 Protocol Guild，即 170 餘位以太坊核心貢獻者的資助機制。約一半儲備滾入下一週期，儲備規模還取決於各週期新加入的 ETH。',
       '每枚 Cosmic Signature NFT 都是對引力三體問題的確定性渲染：作品由鏈上種子生成，任何人都能逐像素復現，全程沒有神經網絡參與。本文完整闡述協議機制與代幣設計，記錄已上線的 V2 升級，介紹規劃中的 V3 升級，並闡明一項承諾：待設計定稿，部署者地址將交出全部特權控制。',
     ],
   },
@@ -51,7 +54,7 @@ export const whitePaperTextZhHk = {
         },
         {
           kind: 'paragraph',
-          text: '由此而來的，是一個圍繞時間構建的協議。演繹週期開啟，在一次次落筆中延展，倒數歸零後落幕。落筆是一次小小的鏈上行為：攜帶 ETH 或 CST，可附上一句短訊息或一份資產，並把週期的收官時間向後推。倒數結束時，最後落下的那一筆就是收官之筆，其參與者可完成收官：發放儲備、銘刻本週期的 NFT，併為下一週期做好準備。',
+          text: '由此而來的，是一個圍繞時間構建的協議。演繹週期開啟，在一次次落筆中延展，倒數歸零後落幕。落筆是一次小小的鏈上行為：攜帶 ETH 或 CST，可附上一句短訊息或一份資產，並把週期的收官時間向後推。倒數結束時，最後落下的那一筆就是收官之筆，其參與者可完成收官：發放儲備、銘刻本週期的 NFT，並為下一週期做好準備。',
         },
         {
           kind: 'paragraph',
@@ -61,8 +64,8 @@ export const whitePaperTextZhHk = {
           kind: 'list',
           items: [
             '確定性。作品由銘刻時記錄在鏈上的種子計算而來。渲染管線開源，同一種子永遠產出同一圖像與影片，逐比特一致。',
-            '機械化發放。分配比例是已驗證合約中的常量。參與者與發放規則之間沒有任何自由裁量的帳戶，也沒有團隊錢包從落筆中收取 ETH。',
-            '有限的團隊角色。所有者權限範圍很窄，在週期運行期間全部鎖定，並將在剩餘升級完成後徹底移除。',
+            '機械化發放。分配由已驗證合約按鏈上規則執行。參與者與發放規則之間沒有任何自由裁量的帳戶，也沒有團隊錢包從落筆中收取 ETH。',
+            '有限的團隊角色。所有者權限範圍有限，核心參數在週期運作期間鎖定，並將在剩餘升級完成後徹底移除。',
           ],
         },
         {
@@ -157,7 +160,7 @@ export const whitePaperTextZhHk = {
             },
             {
               kind: 'paragraph',
-              text: `這項權利在 ${protocolFacts.finalGestureExclusivityHours} 小時內專屬於收官之筆參與者。窗口過後進入公開收官：任何人都可收官，合約會把實際收官者視為週期受益方，該角色的一切隨之歸屬，包括簽名分配的 ETH 份額、CST 銘刻、NFT，以及對已附加資產的優先權。這條規則刻意不留情面：即使參與者消失，協議照樣前行；疏忽也有價格，受益方兩天內不出手，角色就向第一位來者敞開。`,
+              text: `這項權利在 ${protocolFacts.finalGestureExclusivityHours} 小時內專屬於收官之筆參與者。窗口過後進入公開收官：任何人都可收官，合約會把實際收官者視為週期受益方，該角色的一切隨之歸屬，包括簽名分配的 ETH 份額、CST 銘刻、NFT，以及對已附加資產的優先權。這項期限讓協議能夠繼續運作：受益方若未在專屬窗口內收官，其他人即可接手並獲得該角色對應的分配。`,
             },
             {
               kind: 'paragraph',
@@ -172,7 +175,7 @@ export const whitePaperTextZhHk = {
       blocks: [
         {
           kind: 'paragraph',
-          text: '落筆是協議唯一的輸入。無論使用哪種貨幣，每一筆都會延長倒數、在參與者星選池中計入一次資格、更新第 5.2 節的堅守時鐘，還可能按第 7.1 節銘刻參與 CST。',
+          text: '落筆推動演繹週期。無論使用哪種貨幣，每一筆都會延長倒數、在參與者星選池中計入一次資格、更新第 5.2 節的堅守時鐘，還可能按第 7.1 節銘刻參與 CST。',
         },
       ],
       subsections: {
@@ -279,7 +282,7 @@ export const whitePaperTextZhHk = {
             },
             {
               kind: 'paragraph',
-              text: '五條發放軌道合計正好一半，其餘滾動累積：協議滾動累積，而非抽取，每個週期都以比上一週期更大的儲備開場。若收官時沒有任何已錨定的 Cosmic Signature NFT，該週期的錨定派發將跳過，這部分份額同樣滾入下一週期。',
+              text: '五條發放軌道合計正好一半，其餘滾動累積：協議滾動累積，而非抽取，下一週期的起始儲備來自這筆留存，其規模不保證逐週期增長。若收官時沒有任何已錨定的 Cosmic Signature NFT，該週期的錨定派發將跳過，這部分份額同樣滾入下一週期。',
             },
             {
               kind: 'table',
@@ -398,7 +401,7 @@ export const whitePaperTextZhHk = {
                 '模擬。十萬組候選構型分別透過四階 Yoshida 辛積分器演算，每組推進 1,000,000 個物理步；這種積分器能在長時間尺度上保持系統的能量行為。',
                 '遴選。Borda 排序聚合按混沌程度與三角形的等邊程度為候選打分，選出視覺上最有意味的一條軌道。',
                 '鏡頭。緩慢的橢圓鏡頭漂移穿行於軌道之間，賦予每幅簽名電影般的視差。',
-                '色彩。色彩在 OKLab 感知色彩空間中混合，各天體色相相隔 120°，並由漂移與正弦波調製。',
+                '色彩。在 OKLab 感知色彩空間中混合，各天體色相相隔 120°，並由漂移與正弦波調製。',
                 '光譜渲染。從 380 至 700 納米劃分 64 個波長區間，以隨速度變化的線寬和景深渲染軌跡。',
                 '收尾。AgX 色調映射、輝光、OpenSimplex 星雲層與色彩分級共同完成畫面。',
               ],
@@ -454,7 +457,7 @@ export const whitePaperTextZhHk = {
               table: {
                 columns: ['距上一筆的時間', '參與 CST'],
                 rows: protocolFacts.dynamicCstRewardExamples.map((example) => [
-                  ELAPSED_ZH_HK[example.elapsed] ?? example.elapsed,
+                  ELAPSED_ZH_HK[example.elapsed],
                   example.cst,
                 ]),
                 footnote: `按上線時恰為 ${protocolFacts.dynamicCstRewardExamplesAssumeIncrementHours} 小時的時間增量計算。增量逐週期增長後，實際數額會略低於表中值；即時預覽與合約本身才是最終依據。`,
@@ -467,7 +470,7 @@ export const whitePaperTextZhHk = {
           blocks: [
             {
               kind: 'paragraph',
-              text: `CST 一經使用即離開流通：每筆 CST 落筆支付的全部價格都會銷燬。供應量因此由行為塑造：沉寂的週期銘刻的參與 CST 不多，活躍的 CST 使用又把供應量燒回去，固定的表彰與推廣兩條流則為每個典型週期穩定注入 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST。沒有上限，沒有預留份額，也沒有團隊分配。`,
+              text: `CST 一經使用即離開流通：每筆 CST 落筆支付的全部價格都會銷燬。供應量因此由行為塑造：沉寂的週期銘刻的參與 CST 不多，活躍的 CST 使用又把供應量燒回去，固定的表彰與推廣兩條流則為每個典型週期穩定注入 ${cst(protocolFacts.typicalCstImprintsPerCycle)} CST。沒有硬性供應上限，也沒有上線預留份額；推廣儲備則按上述規則逐週期銘刻。`,
             },
             {
               kind: 'paragraph',
@@ -495,7 +498,7 @@ export const whitePaperTextZhHk = {
         },
         {
           kind: 'paragraph',
-          text: '一生一次的規則，用一個不可逆的抉擇取代了常見的鎖定時間表，也讓已錨定的集合有了真實的退出成本。要不要繼續錨定，是每個週期都可以重新掂量的活問題；要不要解錨，則是永久的決定。',
+          text: '錨定沒有固定鎖定期，持有者可以自行決定何時解錨。不過，解錨會永久用盡這枚 NFT 的錨定資格，因此每次決定都需要同時考慮目前派發與今後的參與方式。',
         },
         {
           kind: 'paragraph',
@@ -583,7 +586,7 @@ export const whitePaperTextZhHk = {
             },
             {
               kind: 'paragraph',
-              text: '這是有意的極簡：不引入預言機，不依賴外部委員會，也沒有任何可能讓週期擱淺的回調。取捨擺在明處：排序器理論上可以影響區塊級輸入，而設計限定了這種影響所能觸及的範圍。隨機性的消費者只有星選與藝術種子；倒數、落筆價格序列和第 5 節的每一個百分比都是確定性的。整個構造每次收官只使用一次，而收官本身是任何人都能提交的公開交易。',
+              text: '這是有意的極簡：不引入預言機，不依賴外部委員會，也沒有任何可能讓週期擱淺的回調。取捨擺在明處：排序器理論上可以影響區塊級輸入，而設計限定了這種影響所能觸及的範圍。只有星選與藝術種子使用這套隨機性；倒數、落筆價格序列和第 5 節的每一個百分比都是確定性的。整個構造每次收官只使用一次，而收官本身是任何人都能提交的公開交易。',
             },
           ],
         },

@@ -12,7 +12,7 @@
   "seo": {
     "eyebrow": "Source code · deterministic art",
     "heading": "Cosmic Signature Source Code",
-    "description": "Cosmic Signature exposes source-code resources for the deterministic artwork pipeline that turns on-chain seeds into three-body NFT art. The client-side viewer below is interactive, while this server-rendered summary gives crawlers the key facts before JavaScript runs.",
+    "description": "Explore the source code that turns on-chain seeds into reproducible three-body NFT artwork. Use the viewer below to inspect the rendering code or open the published source files.",
     "excerpt": "seed -> SHA3-256 random stream -> three-body simulation -> spectral renderer -> Cosmic Signature NFT image",
     "relatedAria": "Source code related pages",
     "links": {

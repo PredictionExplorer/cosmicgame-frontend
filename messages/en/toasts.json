@@ -40,14 +40,14 @@
     "simulated": "Simulated gesture placed. Timer extended by {seconds, plural, one {# second} other {# seconds}}.",
     "confirmed": "Gesture confirmed. The cycle continues.",
     "validation": {
-      "notNftOwner": "You aren't the owner of the token!",
+      "notNftOwner": "This NFT does not belong to your connected wallet.",
       "tokenDecimalsWarning": "Token doesn't implement decimals(); assuming 18 decimal places.",
-      "invalidContractAddress": "The address provided is not a valid contract address!",
-      "notErc721": "The attached NFT contract is not an ERC721 token contract.",
-      "notErc20": "The attached token contract is not an ERC20 token contract.",
+      "invalidContractAddress": "Enter a valid contract address.",
+      "notErc721": "The attached NFT must use an ERC-721 contract.",
+      "notErc20": "The attached token must use an ERC-20 contract.",
       "insufficientAttachedToken": "Insufficient token balance to attach to this gesture.",
-      "insufficientEth": "Insufficient ETH balance! There isn't enough ETH in your wallet.",
-      "insufficientCst": "Insufficient CST balance! There isn't enough CST (ERC-20) in your wallet."
+      "insufficientEth": "Your wallet does not have enough ETH for this gesture.",
+      "insufficientCst": "Your wallet does not have enough CST for this gesture."
     },
     "transaction": {
       "failed": "Unable to submit the gesture. Check your wallet and network connection, refresh the current cost, and try again.",
@@ -68,7 +68,7 @@
   "anchor": {
     "walletNotReady": "Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again.",
     "anchored": "{count, plural, one {# NFT was anchored to the protocol.} other {# NFTs were anchored to the protocol.}}",
-    "released": "{count, plural, one {# selected anchor was released successfully.} other {# selected anchors were released successfully.}}",
+    "released": "{count, plural, one {# selected anchor released.} other {# selected anchors released.}}",
     "releasedWithDistributions": "{count, plural, one {# selected anchor was released and its accumulated ETH Anchor Distributions were retrieved.} other {# selected anchors were released and their accumulated ETH Anchor Distributions were retrieved.}}",
     "failed": "The anchor transaction could not be completed. Check your wallet and network connection, then try again."
   },
@@ -76,7 +76,7 @@
     "retrieved": "Allocation retrieved to your wallet."
   },
   "finalize": {
-    "roundDidNotAdvance": "Claim transaction succeeded but the cycle did not advance. Please refresh the page.",
+    "roundDidNotAdvance": "The finalization transaction succeeded, but the cycle has not advanced. Please refresh the page.",
     "metadataUpdating": "Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.",
     "failed": "Unable to finalize the cycle. Check your wallet and network connection, then try again.",
     "contractErrors": {
@@ -124,25 +124,25 @@
       "recipientCheckFailed": "Could not check the recipient address. Check your wallet and network connection, then try again.",
       "failed": "Unable to send selected NFTs. Please try again.",
       "failedToken": "Unable to transfer NFT #{tokenId}. Please try again.",
-      "nameSet": "The token name has been changed successfully!",
-      "nameCleared": "The token name has been cleared successfully!",
+      "nameSet": "Token name updated.",
+      "nameCleared": "Token name cleared.",
       "nameSetFailed": "An error occurred while setting the token name. Please try again.",
       "nameClearFailed": "An error occurred while clearing the token name. Please try again."
     },
     "marketingCst": {
       "tokenUnavailable": "CST token address is not available yet.",
-      "walletRequired": "Connect your wallet before paying a CST reward.",
+      "walletRequired": "Connect your wallet to send a CST allocation.",
       "reserveUnavailable": "Outreach reserve wallet is not available.",
-      "treasurerUnavailable": "Marketing wallet treasurer is not available.",
-      "treasurerRequired": "Connect the current marketing wallet treasurer before paying CST rewards.",
+      "treasurerUnavailable": "The Outreach Reserve treasurer address is unavailable.",
+      "treasurerRequired": "Connect the Outreach Reserve treasurer wallet to send CST allocations.",
       "balanceLoading": "Outreach reserve CST balance is still loading. Please try again in a moment.",
       "insufficientBalance": "Insufficient outreach reserve CST balance.",
       "decimalsWarning": "Unable to read CST decimals; assuming 18 decimal places.",
       "balanceReadFailed": "Unable to read the outreach reserve CST balance. Please try again.",
-      "confirmed": "Marketing CST reward confirmed.",
-      "failed": "Unable to pay CST reward. Please try again.",
+      "confirmed": "Outreach Reserve CST allocation confirmed.",
+      "failed": "Unable to send the CST allocation. Please try again.",
       "loading": "Loading...",
-      "pay": "Pay CST Reward",
+      "pay": "Send CST Allocation",
       "paying": "Paying...",
       "viewTransaction": "View transaction"
     }
@@ -155,9 +155,9 @@
     "invalidUrlInline": "Use an http:// or https:// URL.",
     "contractUnavailable": "Please connect your wallet and ensure you are on the correct network.",
     "formSubmitted": "{amount} ETH contribution confirmed.",
-    "formSubmittedWithInfo": "{amount} ETH contribution with information confirmed.",
-    "submitted": "{amount} ETH was contributed successfully!",
-    "submittedWithInfo": "{amount} ETH with information was contributed successfully!",
+    "formSubmittedWithInfo": "{amount} ETH contribution and accompanying information confirmed.",
+    "submitted": "{amount} ETH contribution confirmed.",
+    "submittedWithInfo": "{amount} ETH contribution and accompanying information confirmed.",
     "formFailed": "ETH contribution failed, please check your input and try again.",
     "failed": "Contribution failed, please try again.",
     "failedWithInfo": "Contribution with information failed, please check your input.",

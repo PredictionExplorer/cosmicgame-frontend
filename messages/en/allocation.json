@@ -11,7 +11,7 @@
       "title": "Allocation Recipients",
       "subtitle": "Browse the complete history of allocation recipients, cycle statistics, and allocation distributions across all finalized Performance Cycles.",
       "scope": "Finalized round records only",
-      "scopeTooltip": "This page summarizes finalized Performance Cycles from the round API. Pending cycles and unrelated allocation retrieval records are not included in these totals."
+      "scopeTooltip": "Totals cover finalized Performance Cycles. Active cycles and separate allocation retrieval records are excluded."
     },
     "intro": "When a Performance Cycle finalizes, the participant who made the Final Gesture retrieves the Signature Allocation — {percentage}% of the Cycle Reserve, 1,000 CST, and a unique Cosmic Signature NFT. Additional allocations flow through Chrono-Warrior, Stellar Selection, Anchor Distributions, Public Goods, and the Compounding Cycle Reserve.",
     "reserveSplit": {
@@ -24,7 +24,7 @@
         },
         "chrono": {
           "label": "Chrono",
-          "tooltip": "The Chrono-Warrior allocation goes to the participant whose gesture carried the cycle through the most time."
+          "tooltip": "The Chrono-Warrior allocation goes to the participant who held the Endurance Champion position for the longest consecutive interval."
         },
         "stellar": {
           "label": "Stellar ETH",
@@ -121,7 +121,7 @@
       "cards": {
         "signature": {
           "title": "Signature Allocation",
-          "tooltip": "The participant who made the Final Gesture when the countdown reached zero. Retrieves the Signature Allocation in ETH, 1,000 CST, and a Cosmic Signature NFT."
+          "tooltip": "After the countdown reaches zero, the participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation: ETH, 1,000 CST, and a Cosmic Signature NFT."
         },
         "chrono": {
           "title": "Chrono-Warrior",

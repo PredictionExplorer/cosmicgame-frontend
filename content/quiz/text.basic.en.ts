@@ -31,7 +31,7 @@ export const basicQuestionsTextEn = {
       d: 'A message posted in the community channels.',
     },
     explanation:
-      'Gestures are the protocol\u2019s only input. Each one carries ETH or CST, pushes the Cycle Finalization Time further out, records one entry in the cycle\u2019s Stellar Selections, and can imprint Participation CST. You never draw anything by hand — the artwork is computed from a seed at finalization.',
+      'Gestures drive the active cycle. Each one carries ETH or CST, extends the Cycle Finalization Time, records one entry in the cycle’s Stellar Selections, and can imprint Participation CST. The artwork is computed from a seed recorded at finalization; participants do not draw it by hand.',
     referenceLabel: 'White paper \u00a74 \u2014 Gestures',
   },
   'two-currencies': {
@@ -79,7 +79,7 @@ export const basicQuestionsTextEn = {
       c: 'The cycle finalizes, but the Final Gesture participant still receives everything.',
       d: 'Nothing happens until the Cosmic Council votes to intervene.',
     },
-    explanation: `The Final Gesture participant holds the right exclusively for ${protocolFacts.finalGestureExclusivityHours} hours. After that, the Open-Finalization Window begins: anyone may finalize, and the contract treats whoever does as the cycle\u2019s beneficiary, with everything the role carries. The rule is deliberately unforgiving \u2014 it keeps the protocol alive if a participant disappears, and it prices carelessness.`,
+    explanation: `The Final Gesture participant has the exclusive right to finalize for ${protocolFacts.finalGestureExclusivityHours} hours. After that, the Open-Finalization Window begins: anyone may finalize and become the cycle’s beneficiary, receiving the allocations assigned to that role. This lets the protocol continue if the Final Gesture participant does not return.`,
     funFact:
       'Nothing in the protocol waits forever on an absent participant. Every deadline eventually opens to the first caller.',
     referenceLabel: 'White paper \u00a73.3 \u2014 Finalization',
@@ -96,7 +96,7 @@ export const basicQuestionsTextEn = {
     referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
   },
   'compounding-reserve': {
-    prompt: 'Why does each Performance Cycle open with a larger reserve than the last?',
+    prompt: 'How does part of the Cycle Reserve carry over into the next Performance Cycle?',
     options: {
       a: `About ${protocolFacts.compoundingReservePercentage}% of every cycle\u2019s reserve is never distributed \u2014 it rolls forward into the next cycle.`,
       b: 'The team tops the reserve up between cycles.',
@@ -104,7 +104,7 @@ export const basicQuestionsTextEn = {
       d: 'The Cosmic Council votes fresh ETH into the reserve.',
     },
     explanation:
-      'The five distributed ETH tracks sum to half of the reserve; the remainder compounds automatically. No one tops anything up, and no protocol can imprint ETH \u2014 the growth is purely mechanical. The protocol accumulates rather than extracts.',
+      'The five distributed ETH tracks account for about half of the reserve. The remainder carries forward into the next cycle. This does not guarantee a larger reserve each time: its size also depends on the ETH added during the cycle.',
     referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
   },
   'art-engine': {
@@ -137,13 +137,13 @@ export const basicQuestionsTextEn = {
   'cst-supply-origin': {
     prompt: 'Where does CST come from?',
     options: {
-      a: 'Supply starts at zero, and only the protocol contract can imprint it \u2014 every CST traces back to participation in a cycle.',
+      a: 'Supply starts at zero, and only the protocol contract can imprint CST through its defined mechanisms.',
       b: 'A large allocation was created for the team at launch.',
       c: 'It was distributed for free to early wallets before launch.',
       d: 'Anyone can imprint CST by calling the token contract.',
     },
     explanation:
-      'The CST token contract accepts imprint and burn instructions only from the protocol contract, and supply started at zero. There is no cap, no premine, and no team allocation \u2014 patient participation is the only source of new CST.',
+      'CST supply started at zero, and the token contract accepts imprint and burn instructions only from the protocol contract. New CST comes from the protocol’s defined mechanisms, including Participation CST, cycle allocations, and the Outreach Reserve. There is no hard supply cap.',
     referenceLabel: 'White paper \u00a77 \u2014 The CST Token',
   },
   'cst-on-spend': {
@@ -155,7 +155,7 @@ export const basicQuestionsTextEn = {
       d: 'It is returned to Rio when the cycle finalizes.',
     },
     explanation:
-      'The full cost of every CST gesture is burned. That ties the token\u2019s supply to actual use: quiet cycles imprint little, and heavy CST activity burns supply back down. Nothing flows to any treasury \u2014 there is none.',
+      'The full cost of every CST gesture is burned, permanently removing those tokens from supply. The CST spent on a gesture is not transferred to a treasury or added to the Cycle Reserve.',
     referenceLabel: 'White paper \u00a77.2 \u2014 Burning and Supply Dynamics',
   },
   'public-goods-beneficiary': {
@@ -184,7 +184,7 @@ export const basicQuestionsTextEn = {
     referenceLabel: 'White paper \u00a78 \u2014 Anchoring',
   },
   'anchor-once-ever': {
-    prompt: 'Mira later releases her anchor. Can she anchor that NFT again next month?',
+    prompt: 'Mira releases an anchored NFT. Can she anchor that NFT again next month?',
     options: {
       a: 'No \u2014 each NFT can be anchored only once, ever. Releasing is permanent.',
       b: 'Yes, after a short cooldown.',
@@ -234,7 +234,7 @@ export const basicQuestionsTextEn = {
   'who-runs-cycles': {
     prompt: 'Who decides how each cycle\u2019s ETH is distributed?',
     options: {
-      a: 'No one \u2014 allocation percentages are constants in verified contracts, executed mechanically at finalization.',
+      a: 'The protocol contracts execute the allocation rules at finalization.',
       b: 'The team reviews each cycle and signs the distribution.',
       c: 'An oracle service computes the split.',
       d: 'The app\u2019s backend servers issue the transfers.',

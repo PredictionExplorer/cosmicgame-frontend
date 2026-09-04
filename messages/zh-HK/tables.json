@@ -175,7 +175,7 @@
     "loadingNft": "正在載入 NFT"
   },
   "tableHeaderHelp": {
-    "explainColumn": "說明「{column}」列"
+    "explainColumn": "說明「{column}」欄"
   },
   "adminEvents": {
     "empty": "暫無事件。"
@@ -202,7 +202,7 @@
     "listAria": "按週期排列的獲配者列表"
   },
   "anchoringRecipient": {
-    "empty": "週期收官時沒有已錨定代幣，存入資金已轉撥至公共物品地址。"
+    "empty": "週期收官時沒有已錨定的 Cosmic Signature NFT，該週期的錨定派發份額留在週期儲備中。"
   },
   "banGesture": {
     "banned": "落筆已禁用。",

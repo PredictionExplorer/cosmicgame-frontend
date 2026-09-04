@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Cosmic Signature frontend — agent guide
 
-Multilingual (en / zh / zh-TW / zh-HK / uk / ko / ja) Next.js App Router frontend for Cosmic
+Multilingual (en / zh / zh-TW / zh-HK / uk / ko / ja / vi) Next.js App Router frontend for Cosmic
 Signature, a procedural on-chain art protocol on Arbitrum. One codebase serves two hosts:
 
 - `app/[locale]/(landing)/` → cosmicsignature.com (marketing site, no wallet stack)
@@ -154,7 +154,7 @@ Every user-visible string ships in every locale in the same change:
 - Legal and trust pages: per-locale copy objects `content/legal/*.<locale>.ts` rendered by
   the shared `TermsContent`, `PrivacyContent`, and `TrustPageContent` components
 - Routing is next-intl: `en` is unprefixed, every other locale lives under its prefix
-  (`/zh`, `/zh-TW`, `/zh-HK`, `/uk`, `/ko`, `/ja`) on both hosts (`i18n/routing.ts`). Locale codes are
+  (`/zh`, `/zh-TW`, `/zh-HK`, `/uk`, `/ko`, `/ja`, `/vi`) on both hosts (`i18n/routing.ts`). Locale codes are
   canonical BCP 47 tags: the bare language code is the CLDR default variant, further
   variants carry their region; `LOCALE_ALIASES` lists extra tags a locale serves.
 - Never branch on a locale literal (`locale === 'zh'`) and never truncate a locale to its

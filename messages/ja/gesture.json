@@ -1,7 +1,7 @@
 {
   "invalid": {
     "title": "一筆IDが無効です",
-    "help": "URLには0以上の数値の一筆IDを指定してください。"
+    "help": "URLの一筆IDには0以上の数値を指定してください。"
   },
   "header": {
     "title": "一筆の詳細",
@@ -11,7 +11,7 @@
   },
   "empty": {
     "title": "一筆の情報が見つかりません。",
-    "help": "IDが無効か、この一筆が現在のインデックスに含まれていない可能性があります。"
+    "help": "IDが正しくないか、一筆のデータがまだ反映されていない可能性があります。"
   },
   "sections": {
     "transaction": {
@@ -32,7 +32,7 @@
     },
     "nft": {
       "title": "添付されたNFT",
-      "description": "この一筆に添付されたNFTのメタデータ（ある場合）。"
+      "description": "NFTが添付されている場合、そのメタデータを表示します。"
     },
     "message": {
       "title": "メッセージ",
@@ -49,9 +49,9 @@
     "participationCst": "参加CST",
     "attachedRandomWalk": "ETH一筆に添付されたRandomWalk NFT：",
     "paidWithCst": "CST（ERC-20）で支払い：",
-    "randomWalkId": "RandomWalkNFT ID：",
+    "randomWalkId": "RandomWalk NFT ID：",
     "erc20Address": "添付されたERC-20トークンのアドレス：",
-    "erc20Amount": "添付されたERC-20トークンの数量（ETH）：",
+    "erc20Amount": "添付されたERC-20トークンの数量：",
     "nftAddress": "添付されたNFTトークンのアドレス：",
     "nftId": "添付されたNFTトークンID：",
     "nftTokenUri": "NFTトークンURI："

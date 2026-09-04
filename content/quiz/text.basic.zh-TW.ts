@@ -17,8 +17,7 @@ export const basicQuestionsTextZhTw = {
     },
     explanation:
       'Cosmic Signature 是程序化藝術協議：限時的演繹週期在一次次落筆中延展，收官時銘刻確定性的三體藝術作品。整條管線沒有任何 AI 參與——作品是由種子驅動的物理計算，與文字提示詞式的影像服務恰好相反。',
-    funFact:
-      '這個名字與知名的癌症突變資料庫 COSMIC 撞了車。協議與它毫無關係——文件中專門寫明瞭這一點。',
+    funFact: 'COSMIC 也是一個癌症突變資料庫的名稱，兩者沒有關聯。協議文件對此有明確說明。',
     referenceLabel: '學習中心：什麼是 Cosmic Signature？',
   },
   'what-is-a-gesture': {
@@ -27,10 +26,10 @@ export const basicQuestionsTextZhTw = {
       a: '一次攜帶 ETH 或 CST 的鏈上行為：延長週期倒數，並計入一次星選資格。',
       b: '為社群請願收集的鏈下簽名。',
       c: '你親手繪製、新增到作品上的一道筆觸。',
-      d: '在社群頻道里發布的一條訊息。',
+      d: '在社群頻道裡發布的一條訊息。',
     },
     explanation:
-      '落筆是協議唯一的輸入。每一筆都攜帶 ETH 或 CST，把週期收官時間向後推，在本週期星選池中計入一次資格，還可能銘刻參與 CST。沒有任何東西需要親手去畫——作品在收官時由種子計算而來。',
+      '落筆推動演繹週期。每一筆都攜帶 ETH 或 CST，把週期收官時間向後推，在本週期星選池中計入一次資格，還可能銘刻參與 CST。沒有任何東西需要親手去畫——作品在收官時由種子計算而來。',
     referenceLabel: '白皮書 §4 · 落筆',
   },
   'two-currencies': {
@@ -92,7 +91,7 @@ export const basicQuestionsTextZhTw = {
     referenceLabel: '白皮書 §5.1 · 收官時的發放',
   },
   'compounding-reserve': {
-    prompt: '為什麼每個演繹週期都以比上一週期更大的儲備開場？',
+    prompt: '週期儲備如何延續至下一個演繹週期？',
     options: {
       a: `每週期約 ${protocolFacts.compoundingReservePercentage}% 的儲備從不發放——它滾入下一週期。`,
       b: '團隊在週期之間補充儲備。',
@@ -100,7 +99,7 @@ export const basicQuestionsTextZhTw = {
       d: '宇宙議會表決向儲備註入新的 ETH。',
     },
     explanation:
-      '五條發放的 ETH 軌道合計正好一半，其餘自動滾動累積。沒有人補充任何東西，協議也無法憑空創造 ETH——增長純粹是機械的。協議滾動累積，而非抽取。',
+      '五條 ETH 分配軌道合計約佔儲備的一半，其餘會滾入下一週期。這不保證每個週期的儲備都比上一週期更大；儲備規模還取決於週期內新增的 ETH。',
     referenceLabel: '白皮書 §5.1 · 收官時的發放',
   },
   'art-engine': {
@@ -131,13 +130,13 @@ export const basicQuestionsTextZhTw = {
   'cst-supply-origin': {
     prompt: 'CST 從哪裡來？',
     options: {
-      a: '供應量從零起步，只有協議合約能銘刻它——流通中的每一枚 CST 都能追溯到某個週期裡的一次參與。',
+      a: '供應量從零起步，僅由協議合約按既定機制銘刻。',
       b: '上線時為團隊預留了一大筆份額。',
       c: '上線前免費發放給了早期錢包。',
       d: '任何人呼叫代幣合約都能銘刻 CST。',
     },
     explanation:
-      'CST 代幣合約只接受協議合約的銘刻與銷燬指令，供應量從零起步。沒有上限，沒有預留份額，也沒有團隊分配——耐心的參與是新 CST 的唯一來源。',
+      'CST 供應量從零起步，代幣合約只接受協議合約的銘刻與銷毀指令。新的 CST 來自既定機制：落筆時的參與 CST、週期收官時的表彰 CST，以及推廣儲備。合約沒有硬性供應上限。',
     referenceLabel: '白皮書 §7 · CST 代幣',
   },
   'cst-on-spend': {
@@ -149,7 +148,7 @@ export const basicQuestionsTextZhTw = {
       d: '週期收官時退還給 Rio。',
     },
     explanation:
-      '每筆 CST 落筆支付的全部價格都會銷燬。這把代幣供應量與真實使用綁在一起：沉寂的週期銘刻得少，活躍的 CST 使用又把供應量燒回去。沒有任何金庫來接收它——因為根本不存在。',
+      '每筆 CST 落筆支付的全部 CST 都會銷毀，永久移出供應量，不會轉入任何金庫。供應量同時受各項銘刻機制影響，因此既取決於新銘刻的數量，也取決於落筆消耗的數量。',
     referenceLabel: '白皮書 §7.2 · 銷燬與供應動態',
   },
   'public-goods-beneficiary': {
@@ -177,7 +176,7 @@ export const basicQuestionsTextZhTw = {
     referenceLabel: '白皮書 §8 · 錨定',
   },
   'anchor-once-ever': {
-    prompt: '之後 Mira 解錨了。下個月她還能再錨定這枚 NFT 嗎？',
+    prompt: 'Mira 解錨了一枚 NFT。下個月還能再錨定這枚 NFT 嗎？',
     options: {
       a: '不能——每枚 NFT 一生僅可錨定一次，解錨是永久的。',
       b: '可以，等一段冷卻期就行。',
@@ -226,7 +225,7 @@ export const basicQuestionsTextZhTw = {
   'who-runs-cycles': {
     prompt: '每個週期的 ETH 如何發放，由誰決定？',
     options: {
-      a: '沒有人——分配比例是已驗證合約中的常量，收官時機械執行。',
+      a: '由合約執行——已驗證合約會在收官時按協議規則分配。',
       b: '團隊逐週期審核並簽署發放。',
       c: '由一個預言機服務計算分配。',
       d: '由應用程式的後端伺服器發出轉帳。',

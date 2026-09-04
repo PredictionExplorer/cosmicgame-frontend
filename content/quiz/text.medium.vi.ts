@@ -49,7 +49,7 @@ export const mediumQuestionsTextVi = {
       d: 'Nó được chuyển đến Hàng hóa công.',
     },
     explanation:
-      'Phần trả dư vượt ngưỡng vụn được hoàn lại trong cùng giao dịch. Dưới ngưỡng đó, việc hoàn lại tốn nhiều gas hơn số tiền trả về, nên phần chênh ở lại trong dự trữ \u2014 một điểm cắt lịch thiệp có chủ đích, không phải hình phạt.',
+      'Phần trả dư vượt ngưỡng tối thiểu được hoàn lại trong cùng giao dịch. Dưới ngưỡng đó, việc hoàn lại tốn nhiều gas hơn số tiền trả về, nên phần chênh ở lại trong dự trữ. Quy tắc này tránh việc chi phí hoàn trả lớn hơn số tiền được hoàn.',
     referenceLabel: 'Sách trắng \u00a74.1 \u2014 Nét bút ETH',
   },
   'cst-window-restart': {
@@ -67,13 +67,13 @@ export const mediumQuestionsTextVi = {
     prompt:
       'Giao thức đã yên ắng một quãng dài, và cửa sổ hiệu chỉnh CST đã trôi qua hoàn toàn. Điều gì đúng lúc này?',
     options: {
-      a: 'Một nét bút CST gần như không tốn gì \u2014 bất kỳ ai nắm giữ dù chỉ một ít CST cũng có thể kéo dài chu kỳ.',
+      a: 'Chi phí nét bút CST có thể về 0. Nét bút vẫn phải đáp ứng quy tắc chu kỳ hiện tại và trả phí gas.',
       b: 'Chu kỳ tự hoàn tất.',
       c: 'Nét bút CST bị vô hiệu cho đến khi có một nét bút ETH.',
       d: 'Chi phí CST đã tăng đến trần.',
     },
     explanation:
-      'Đường giảm có thể chạm không, và đó là có chủ đích: nó bảo đảm chu kỳ luôn có thể được kéo dài bởi bất kỳ ai nắm giữ một ít CST. Chu kỳ không bao giờ tự hoàn tất \u2014 hoàn tất luôn là một giao dịch do ai đó gửi.',
+      'Khi cửa sổ hiệu chỉnh CST đi hết, chi phí nét bút CST có thể về 0. Giao dịch vẫn phải đáp ứng các điều kiện hiện tại của hợp đồng và trả phí gas. Chu kỳ không tự hoàn tất; cần có người gửi giao dịch hoàn tất.',
     referenceLabel: 'Sách trắng \u00a74.3 \u2014 Nét bút CST',
   },
   'window-feedback-loop': {
@@ -85,7 +85,7 @@ export const mediumQuestionsTextVi = {
       c: 'Không gì cả \u2014 hai loại tiền độc lập với nhau.',
       d: 'Cửa sổ đặt lại về thời lượng ban đầu.',
     },
-    explanation: `Thời lượng của cửa sổ là một tham số sống và là một trong những vòng phản hồi lặng lẽ của giao thức: mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, mỗi nét bút CST kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%. Hoạt động ETH sôi động đẩy nhanh đường giảm của CST, và hoạt động CST sôi động lại làm chậm nó \u2014 đẩy mỗi chu kỳ về một cán cân hài hòa.`,
+    explanation: `Thời lượng cửa sổ thay đổi theo hoạt động, tạo cơ chế phản hồi giữa hai cách thanh toán: mỗi nét bút ETH rút ngắn nó khoảng ${percent(protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture)}%, mỗi nét bút CST kéo dài nó khoảng ${percent(protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture)}%. Hoạt động ETH sôi động đẩy nhanh đường giảm của CST, và hoạt động CST sôi động lại làm chậm nó \u2014 đẩy mỗi chu kỳ về một cán cân hài hòa.`,
     referenceLabel: 'Sách trắng \u00a74.3 \u2014 Nét bút CST',
   },
   'participation-cst-timing': {
@@ -99,7 +99,7 @@ export const mediumQuestionsTextVi = {
     },
     explanation: `CST tham gia tăng theo căn bậc hai của thời gian kể từ nét bút trước: một nét bút đến sau một giây khắc gần như không có gì (khoảng ${viDecimal(oneSecondExample.cst)} CST), trong khi nét kết thúc một ngày yên lặng khắc hàng trăm (khoảng ${viDecimal(oneDayExample.cst)} CST). Mức cố định ${cst(100)} CST mỗi nét bút là quy tắc V1 ban đầu \u2014 nó biến những chuỗi tốc độ máy thành CST không tốn chi phí, chính là lý do V2 thay thế nó.`,
     funFact:
-      'Kiên nhẫn là cách duy nhất để khắc lượng CST đáng kể. Một bot dồn dập đặt nét bút mỗi giây khắc được xấp xỉ không.',
+      'Khoảng cách giữa hai nét bút quyết định lượng CST tham gia. Nét bút liên tiếp quá gần nhau có thể khắc gần 0 CST tham gia; CST ghi nhận và Dự trữ truyền thông được khắc theo quy tắc riêng.',
     referenceLabel: 'Sách trắng \u00a77.1 \u2014 Quy tắc khắc',
   },
   'cst-max-cost-protection': {
@@ -117,7 +117,7 @@ export const mediumQuestionsTextVi = {
   },
   'endurance-definition': {
     prompt:
-      'Ari đặt nét bút vào một buổi chiều chậm rãi và không ai thay thế anh trong mười giờ liền \u2014 khoảng lặng dài nhất của chu kỳ. Anh đang trong hàng nhận danh hiệu nào?',
+      'Ari đặt nét bút vào một buổi chiều chậm rãi và không ai thay thế anh trong mười giờ liền \u2014 khoảng lặng dài nhất của chu kỳ. Anh hiện đủ điều kiện nhận danh hiệu nào?',
     options: {
       a: 'Quán quân Bền bỉ \u2014 anh giữ vị trí người đặt nét bút gần nhất trong khoảng liên tục dài nhất.',
       b: 'Chiến binh Thời gian \u2014 anh giữ một danh hiệu trong thời gian dài nhất.',
@@ -130,7 +130,7 @@ export const mediumQuestionsTextVi = {
   },
   'chrono-definition': {
     prompt:
-      'Kỷ lục mười giờ của Ari từ câu trước đứng vững thêm hai ngày trước khi Bea vượt qua. Chiến binh Thời gian đang đo ai?',
+      'Ari lập kỷ lục giữ vị trí nét bút gần nhất trong mười giờ và giữ danh hiệu Quán quân Bền bỉ hai ngày trước khi Bea vượt qua. Khoảng thời gian nào được tính cho danh hiệu Chiến binh Thời gian?',
     options: {
       a: 'Bất kỳ ai giữ danh hiệu Quán quân Bền bỉ trong khoảng liên tục dài nhất \u2014 hai ngày Ari giữ kỷ lục được tính cho anh.',
       b: 'Bất kỳ ai phản ứng nhanh nhất sau nét bút của người tham gia khác.',
@@ -138,7 +138,7 @@ export const mediumQuestionsTextVi = {
       d: 'Bất kỳ ai đặt nét bút cuối cùng của chu kỳ.',
     },
     explanation:
-      'Bền bỉ đo khoảng lặng bạn tạo ra; luồng Chrono đo kỷ lục của bạn trụ được bao lâu. Khoảng bền bỉ của Ari là mười giờ, nhưng thời gian anh giữ vị trí Quán quân Bền bỉ kéo dài hai ngày \u2014 và chính thời gian giữ vị trí đó là điều luồng Chiến binh Thời gian chấm điểm. Cả hai chỉ được quyết định khi hoàn tất.',
+      'Quán quân Bền bỉ được tính theo thời gian giữ vị trí nét bút gần nhất; Chiến binh Thời gian được tính theo thời gian giữ danh hiệu Quán quân Bền bỉ. Khoảng bền bỉ của Ari là mười giờ, nhưng thời gian anh giữ vị trí Quán quân Bền bỉ kéo dài hai ngày \u2014 và chính thời gian giữ vị trí đó là điều luồng Chiến binh Thời gian chấm điểm. Cả hai chỉ được quyết định khi hoàn tất.',
     referenceLabel: 'Sách trắng \u00a75.2 \u2014 Quán quân Bền bỉ và Chiến binh Thời gian',
   },
   'eth-selection-count': {
@@ -220,7 +220,7 @@ export const mediumQuestionsTextVi = {
       d: 'Chỉ CST được ký quỹ; toàn bộ ETH đi trực tiếp.',
     },
     explanation:
-      'Việc phân phối được cố ý chia thành đẩy và kéo. ETH của người nhận chu kỳ và khoản chuyển Hàng hóa công được đẩy đi trong lúc hoàn tất; các phân bổ ETH phụ được đặt vào ví phân bổ để từng người nhận nhận về. CST và NFT được khắc trực tiếp cho người nhận.',
+      'Phân bổ được gửi trực tiếp hoặc giữ lại để người nhận tự nhận về. ETH của người nhận chu kỳ và khoản chuyển Hàng hóa công được đẩy đi trong lúc hoàn tất; các phân bổ ETH phụ được đặt vào ví phân bổ để từng người nhận nhận về. CST và NFT được khắc trực tiếp cho người nhận.',
     referenceLabel: 'Sách trắng \u00a75.4 \u2014 Giao nhận, ký quỹ và thời hạn',
   },
   'council-proposal-threshold': {
@@ -258,7 +258,7 @@ export const mediumQuestionsTextVi = {
   },
   'weight-activation': {
     prompt:
-      'Rook nắm CST trong ví nhưng chưa bao giờ đụng đến Hội đồng. CST của anh biểu thị bao nhiêu trọng số điều phối?',
+      'Rook nắm CST trong ví nhưng chưa từng ủy quyền trọng số trong Hội đồng. CST của anh biểu thị bao nhiêu trọng số điều phối?',
     options: {
       a: 'Không có \u2014 trọng số chỉ kích hoạt khi ủy quyền, cho chính anh hoặc một địa chỉ khác.',
       b: 'Một đơn vị cho mỗi CST, tự động.',
@@ -278,7 +278,7 @@ export const mediumQuestionsTextVi = {
       c: 'Nó gấp đôi mỗi chu kỳ.',
       d: 'Nó co lại khi có thêm người tham gia.',
     },
-    explanation: `Mức tăng lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Sự tích lũy lặng lẽ làm việc của nó: các chu kỳ dài ra, tốc độ khắc NFT chậm lại, và nhịp điệu của giao thức giãn ra theo thiết kế khi nó già đi.`,
+    explanation: `Mức tăng lớn thêm ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% sau mỗi chu kỳ hoàn tất. Mức tăng này có xu hướng kéo dài chu kỳ và làm chậm tốc độ khắc NFT. Thời lượng thực tế còn phụ thuộc vào hoạt động của người tham gia.`,
     referenceLabel: 'Sách trắng \u00a73.2 \u2014 Đếm ngược',
   },
   'typical-cst-fixed': {

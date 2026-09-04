@@ -34,12 +34,15 @@ export function isPlainObject(value: unknown): value is Messages {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** Flattens `{a:{b:'x'}}` to `Map { 'a.b' => 'x' }` (leaf values only). */
-export function flattenMessages(node: Messages, prefix = ''): Map<string, unknown> {
+/** Flattens messages; bracketed list indices preserve the shape expected by `t.raw` consumers. */
+export function flattenMessages(
+  node: Messages | readonly unknown[],
+  prefix = '',
+): Map<string, unknown> {
   const leaves = new Map<string, unknown>();
   for (const [key, value] of Object.entries(node)) {
-    const path = prefix ? `${prefix}.${key}` : key;
-    if (isPlainObject(value)) {
+    const path = Array.isArray(node) ? `${prefix}[${key}]` : prefix ? `${prefix}.${key}` : key;
+    if (isPlainObject(value) || (Array.isArray(value) && value.length > 0)) {
       for (const [childPath, childValue] of flattenMessages(value, path)) {
         leaves.set(childPath, childValue);
       }
@@ -137,6 +140,8 @@ export interface NamespaceReport {
   readonly total: number;
   readonly missing: readonly string[];
   readonly empty: readonly string[];
+  /** Keys whose leaf value is not a string (next-intl cannot render them). */
+  readonly invalidValues: readonly string[];
   readonly extra: readonly string[];
   /** Keys whose translated value equals the source value verbatim. */
   readonly identical: readonly string[];
@@ -172,6 +177,7 @@ export function compareNamespace({
 
   const missing: string[] = [];
   const empty: string[] = [];
+  const invalidValues: string[] = [];
   const identical: string[] = [];
   const syntaxErrors: string[] = [];
   const signatureMismatches: string[] = [];
@@ -183,11 +189,20 @@ export function compareNamespace({
       continue;
     }
     const translatedValue = translatedLeaves.get(key);
-    if (translatedValue === '') {
+    if (typeof translatedValue !== 'string') {
+      invalidValues.push(key);
+      continue;
+    }
+    // A punctuation-only source can legitimately become a space (for
+    // example a localized duration separator). Prose cannot disappear.
+    if (
+      translatedValue === '' ||
+      (translatedValue.trim() === '' && /[\p{L}\p{N}]/u.test(String(sourceValue)))
+    ) {
       empty.push(key);
       continue;
     }
-    if (typeof translatedValue !== 'string' || typeof sourceValue !== 'string') {
+    if (typeof sourceValue !== 'string') {
       continue;
     }
     if (translatedValue === sourceValue) identical.push(key);
@@ -238,13 +253,14 @@ export function compareNamespace({
   }
 
   const extra = [...translatedLeaves.keys()].filter((key) => !sourceLeaves.has(key));
-  const comparable = sourceLeaves.size - missing.length - empty.length;
+  const comparable = sourceLeaves.size - missing.length - empty.length - invalidValues.length;
 
   return {
     namespace,
     total: sourceLeaves.size,
     missing,
     empty,
+    invalidValues,
     extra,
     identical,
     syntaxErrors,
@@ -259,6 +275,7 @@ export function strictProblems(report: NamespaceReport): readonly string[] {
   return [
     ...report.missing.map((key) => `missing: ${key}`),
     ...report.empty.map((key) => `empty: ${key}`),
+    ...report.invalidValues.map((key) => `not a string: ${key}`),
     ...report.extra.map((key) => `extra: ${key}`),
     ...report.syntaxErrors.map((entry) => `icu syntax: ${entry}`),
     ...report.signatureMismatches.map((entry) => `icu signature: ${entry}`),
@@ -342,11 +359,20 @@ export function checkSourceNamespace(
   namespace: string,
   source: Messages,
   intlLocale: string,
-): Pick<NamespaceReport, 'namespace' | 'syntaxErrors' | 'pluralGaps'> {
+): Pick<NamespaceReport, 'namespace' | 'empty' | 'invalidValues' | 'syntaxErrors' | 'pluralGaps'> {
+  const empty: string[] = [];
+  const invalidValues: string[] = [];
   const syntaxErrors: string[] = [];
   const pluralGaps: string[] = [];
   for (const [key, value] of flattenMessages(source)) {
-    if (typeof value !== 'string') continue;
+    if (typeof value !== 'string') {
+      invalidValues.push(key);
+      continue;
+    }
+    if (value.trim() === '') {
+      empty.push(key);
+      continue;
+    }
     let signature: IcuSignature;
     try {
       signature = icuSignature(value);
@@ -362,5 +388,5 @@ export function checkSourceNamespace(
       }
     }
   }
-  return { namespace, syntaxErrors, pluralGaps };
+  return { namespace, empty, invalidValues, syntaxErrors, pluralGaps };
 }

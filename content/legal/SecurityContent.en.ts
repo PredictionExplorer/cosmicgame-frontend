@@ -10,7 +10,7 @@ export const securityCopyEn: TrustPageCopy = {
     {
       heading: 'Security Model',
       paragraphs: [
-        'Protocol actions are recorded by Arbitrum smart contracts. Public pages should let users and crawlers inspect the contract addresses, source-code resources, verification context, and operational assumptions before connecting a wallet or making a gesture.',
+        'Arbitrum smart contracts record protocol actions. Before connecting a wallet or making a gesture, review the published contract addresses, source code, verification reports, and operational assumptions.',
       ],
       bullets: [
         'Use the official app at `https://app.cosmicsignature.com/`.',

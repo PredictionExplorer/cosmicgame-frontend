@@ -61,13 +61,13 @@ export const mediumQuestionsTextZh = {
   'cst-free-quiet': {
     prompt: '协议沉寂了很久，CST 校准窗口已经走完。现在的事实是什么？',
     options: {
-      a: '一笔 CST 落笔近乎免费——任何持有一点 CST 的人都能延续周期。',
+      a: 'CST 落笔价格已降至零，无需支付 CST，但仍需支付网络燃料费。',
       b: '周期自动完成收官。',
       c: '在 ETH 落笔到来之前，CST 落笔被禁用。',
       d: 'CST 价格已升至上限。',
     },
     explanation:
-      '价格能降到零，而且是有意为之：只要有人持有哪怕一点 CST，周期就总能延续。周期从不自行收官——收官永远是某个人发出的一笔交易。',
+      '校准窗口完整走完后，CST 落笔价格可降至零。落笔仍需支付网络燃料费，并满足当前周期规则。收官也需要有人提交交易，周期不会自动收官。',
     referenceLabel: '白皮书 §4.3 · CST 落笔',
   },
   'window-feedback-loop': {
@@ -91,7 +91,8 @@ export const mediumQuestionsTextZh = {
       d: '都是零——只有收官才铭刻 CST。',
     },
     explanation: `参与 CST 随距上一笔时间的平方根增长：一秒后跟进的一笔几乎什么也铭刻不到（约 ${oneSecondExample.cst} CST），终结一整天沉默的一笔能铭刻数百（约 ${oneDayExample.cst} CST）。每笔固定 ${cst(100)} CST 正是最初的 V1 规则——它让机器速度的连续落笔凭空生成 CST，V2 因此将其替换。`,
-    funFact: '耐心是铭刻可观 CST 的唯一方式。每秒落一笔的机器人，铭刻量约等于零。',
+    funFact:
+      '落笔间隔越长，每笔铭刻的参与 CST 越多；连续快速落笔则可能只铭刻少量 CST，甚至为零。表彰 CST 与推广储备另有各自的铭刻机制。',
     referenceLabel: '白皮书 §7.1 · 铭刻规则',
   },
   'cst-max-cost-protection': {
@@ -120,7 +121,8 @@ export const mediumQuestionsTextZh = {
     referenceLabel: '白皮书 §5.2 · 坚守冠军与时之勇士',
   },
   'chrono-definition': {
-    prompt: '上一题里 Ari 的十小时纪录又保持了两天才被 Bea 刷新。时之勇士衡量的究竟是什么？',
+    prompt:
+      'Ari 创下十小时的坚守纪录，连续保持坚守冠军身份两天后，纪录才被 Bea 刷新。时之勇士衡量的是什么？',
     options: {
       a: '谁连续在位坚守冠军最久——Ari 保持纪录的那两天都算在他头上。',
       b: '谁在他人落笔后反应最快。',
@@ -264,7 +266,7 @@ export const mediumQuestionsTextZh = {
       c: '每个周期翻倍。',
       d: '参与者越多，它越短。',
     },
-    explanation: `增量在每个周期收官后增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%。复利安静地做着自己的工作：周期变长，NFT 的铭刻节奏放缓，协议的节拍随岁月刻意舒展。`,
+    explanation: `增量在每个周期收官后增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%。增量逐周期累积，使周期逐渐变长，NFT 的铭刻节奏也随之放缓。`,
     referenceLabel: '白皮书 §3.2 · 收官倒计时',
   },
   'typical-cst-fixed': {

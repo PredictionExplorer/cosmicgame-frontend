@@ -1,8 +1,8 @@
 {
-  "loadingAria": "Loading marketing rewards",
+  "loadingAria": "Loading outreach allocations",
   "hero": {
-    "title": "E<legacy>arn</legacy> Rewards by <highlight>Spreading the Word</highlight>",
-    "description": "Promote Cosmic Signature and receive CST distributions for every verified outreach activity.",
+    "title": "Receive CST for <highlight>Spreading the Word</highlight>",
+    "description": "Share Cosmic Signature with others. Approved outreach contributions can receive CST allocations.",
     "learnHow": "Learn How"
   },
   "stats": {
@@ -36,7 +36,7 @@
       "verify": {
         "title": "Get Verified",
         "description": "Our team reviews and verifies your promotional activity.",
-        "tooltip": "The marketing team evaluates reach, quality, and authenticity of your promotional efforts before approving rewards."
+        "tooltip": "The team reviews the reach, quality, and authenticity of your outreach before approving an allocation."
       },
       "receive": {
         "title": "Receive CST",
@@ -46,39 +46,39 @@
     }
   },
   "leaderboard": {
-    "title": "Top Marketers",
-    "infoAria": "Info about top marketers",
-    "tooltip": "Rankings based on total CST earned from marketing activities",
-    "empty": "No marketers yet.",
-    "rewardCountOne": "{count} reward",
-    "rewardCountOther": "{count} rewards"
+    "title": "Top Outreach Contributors",
+    "infoAria": "About top outreach contributors",
+    "tooltip": "Contributors ranked by total CST received for outreach",
+    "empty": "No outreach contributors yet.",
+    "rewardCountOne": "{count} allocation",
+    "rewardCountOther": "{count} allocations"
   },
   "history": {
-    "title": "Reward History",
-    "infoAria": "Info about reward history",
-    "tooltip": "Complete chronological log of all marketing reward distributions",
-    "showingOne": "Showing <strong>{count}</strong> reward",
-    "showingOther": "Showing <strong>{count}</strong> rewards",
-    "emptyTitle": "No rewards distributed yet",
-    "emptyDescription": "Rewards will appear here once marketing activities are verified and paid out."
+    "title": "Allocation History",
+    "infoAria": "About allocation history",
+    "tooltip": "A chronological record of outreach allocations",
+    "showingOne": "Showing <strong>{count}</strong> allocation",
+    "showingOther": "Showing <strong>{count}</strong> allocations",
+    "emptyTitle": "No allocations yet",
+    "emptyDescription": "Approved outreach allocations appear here after they are sent."
   },
   "cta": {
     "title": "Ready to Contribute?",
     "description": "Join our outreach program and receive CST distributions for promoting Cosmic Signature to the world.",
-    "contact": "Contact Marketing Team",
-    "contactTooltip": "Reach out to discuss promotional opportunities and reward structures",
-    "infoAria": "Info about contacting the marketing team",
-    "infoTooltip": "Our team will help you get started with promotional materials and discuss reward tiers"
+    "contact": "Contact the Outreach Team",
+    "contactTooltip": "Discuss outreach opportunities and how allocations are determined",
+    "infoAria": "About contacting the outreach team",
+    "infoTooltip": "The team can help with outreach materials and explain the allocation process"
   },
   "address": {
     "invalid": "Invalid Ethereum Address",
-    "heading": "Marketing Rewards for User",
+    "heading": "Outreach Allocations for This Participant",
     "loading": "Loading...",
-    "outreachWallet": "Marketing Wallet"
+    "outreachWallet": "Outreach Reserve Wallet"
   },
   "transferForm": {
-    "title": "Pay CST Reward",
-    "description": "Calls the outreach reserve contract's `payReward` function. The connected wallet must be the current treasurer.",
+    "title": "Send a CST Allocation",
+    "description": "Send CST from the Outreach Reserve. Connect the current treasurer wallet to use this form.",
     "reserveLabel": "Outreach reserve",
     "availableLabel": "Available CST",
     "ownerLabel": "Owner",

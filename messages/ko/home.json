@@ -10,19 +10,19 @@
       "openingSoon": {
         "badge": "시작 임박",
         "headline": "다음 사이클이 곧 시작됩니다",
-        "body": "{cycleLabel} 시작이 다가옵니다. 제스처를 남길 수 있는 정확한 시각은 아래 카운트다운에서 확인해 주세요.",
+        "body": "{cycleLabel} 시작이 다가옵니다. 제스처를 남길 수 있을 때까지 남은 시간은 아래 카운트다운에서 확인할 수 있습니다.",
         "cta": "사이클 상세 보기"
       },
       "waitingFirstGesture": {
         "badge": "첫 제스처 대기 중",
-        "headline": "{cycleLabel}, 지금 열려 있습니다",
+        "headline": "{cycleLabel}, 첫 제스처를 기다립니다",
         "body": "첫 제스처를 남기면 마감 카운트다운이 시작되고, 이 사이클의 시그니처가 모습을 갖추기 시작합니다.",
         "cta": "첫 제스처 남기기"
       },
       "confirming": {
         "badge": "온체인 검증 중",
-        "headline": "마지막 순간을 확인하는 중",
-        "body": "카운트다운이 0에 도달했습니다. 사이클을 마감하기 전에 마지막 순간의 제스처가 있었는지 체인에서 확인하고 있습니다.",
+        "headline": "마감 직전 제스처를 확인하는 중",
+        "body": "카운트다운이 0에 도달했습니다. 직전 제스처로 마감 시각이 연장되었는지 체인에서 확인하고 있습니다.",
         "cta": "사이클 상세 보기"
       },
       "readyToFinalize": {
@@ -33,8 +33,8 @@
       },
       "finalWindow": {
         "badge": "마지막 구간",
-        "headline": "마지막 구간이 열렸습니다",
-        "body": "이제 마감 카운트다운이 무대의 중심입니다. 새 제스처는 여전히 시간을 연장하고 결말을 다시 빚어낼 수 있습니다.",
+        "headline": "마감 시각이 다가옵니다",
+        "body": "마감까지 얼마 남지 않았습니다. 새 제스처를 남기면 시간을 연장하고 시그니처에 새로운 흔적을 더할 수 있습니다.",
         "cta": "제스처 남기기"
       },
       "loading": {
@@ -44,22 +44,22 @@
         "cta": "사이클 상세 보기"
       },
       "unavailable": {
-        "badge": "시계 연결 불가",
+        "badge": "시각 확인 불가",
         "headline": "사이클 상태를 확인할 수 없습니다",
-        "body": "실시간 사이클 시계에 연결할 수 없습니다. 사이클 상세에서는 최근 인덱싱된 데이터를 볼 수 있습니다.",
+        "body": "현재 사이클 시각을 불러오지 못했습니다. 사이클 상세에서 최근에 수집된 데이터를 확인할 수 있습니다.",
         "cta": "사이클 상세 보기"
       },
       "live": {
         "badge": "Arbitrum에서 진행 중",
         "headline": "다음 Cosmic Signature를 빚어낼 시간입니다",
-        "body": "Cosmic Signature는 실시간으로 이어지는 퍼포먼스 사이클입니다. 모든 제스처는 눈에 보이는 흔적을 남기고, 참여 CST를 각인하며, 프로토콜 준비금이 네트워크를 지탱하는 이더리움 공공재로 흘러가도록 힘을 보탭니다.",
+        "body": "Cosmic Signature의 퍼포먼스 사이클은 제스처가 더해질 때마다 달라집니다. 제스처마다 참여 기록이 남고, 참여 CST가 각인될 수 있습니다. 프로토콜 준비금은 네트워크를 지탱하는 이더리움 공공재에도 배분됩니다.",
         "cta": "제스처 남기기"
       }
     },
     "story": {
       "gestures": {
         "title": "제스처가 예술을 빚어냅니다",
-        "body": "모든 움직임이 퍼포먼스 사이클을 최종 온체인 시그니처로 이끕니다."
+        "body": "제스처가 쌓이면서 퍼포먼스 사이클의 최종 온체인 시그니처가 완성됩니다."
       },
       "cst": {
         "title": "CST가 참여를 기록합니다",
@@ -72,7 +72,7 @@
     },
     "viewCycleDetails": "사이클 상세 보기",
     "artUnavailable": {
-      "eyebrow": "생성된 시그니처 대기 중",
+      "eyebrow": "시그니처 불러오는 중",
       "body": "토큰 메타데이터가 인덱싱되면 실제 Cosmic Signature 작품이 여기에 표시됩니다."
     },
     "console": {
@@ -93,7 +93,7 @@
     }
   },
   "notifications": {
-    "finalizationSoonTitle": "지금 제스처를 남겨 주세요: 사이클이 곧 마감될 수 있습니다",
+    "finalizationSoonTitle": "사이클 마감 시각이 다가옵니다",
     "finalizationSoonBody": "사이클 마감 시각까지 {minutes}분 남았습니다. 지금 제스처를 남기면 사이클을 연장하고 최종 배분에 참여할 수 있습니다."
   },
   "chrono": {
@@ -108,10 +108,10 @@
         "display": "동기화 중"
       },
       "unavailable": {
-        "eyebrow": "사이클 시계 연결 불가",
-        "label": "시계 연결 불가",
+        "eyebrow": "사이클 시각 확인 불가",
+        "label": "시각 확인 불가",
         "status": "실시간 타이머를 잠시 사용할 수 없습니다.",
-        "tooltip": "실시간 사이클 시계에 연결할 수 없습니다. 최근 인덱싱된 상태는 사이클 상세에서 확인해 주세요.",
+        "tooltip": "현재 사이클 시각을 불러오지 못했습니다. 최근에 수집된 상태는 사이클 상세에서 확인해 주세요.",
         "display": "동기화 중"
       },
       "openingSoon": {
@@ -137,7 +137,7 @@
         "eyebrow": "마지막 한 시간",
         "label": "마지막 한 시간",
         "status": "이 사이클을 마감할 수 있는 시각까지 한 시간이 채 남지 않았습니다.",
-        "tooltip": "마감 카운트다운이 한 시간 아래로 내려왔습니다. 새 제스처는 여전히 사이클 마감 시각을 연장할 수 있습니다."
+        "tooltip": "마감까지 한 시간도 남지 않았습니다. 새 제스처를 남기면 사이클 마감 시각을 연장할 수 있습니다."
       },
       "finalTen": {
         "eyebrow": "마지막 10분",
@@ -148,7 +148,7 @@
       "finalMinute": {
         "eyebrow": "마지막 1분",
         "label": "마지막 1분",
-        "status": "마지막 1분입니다. 0.1초 단위로 흐릅니다.",
+        "status": "마감까지 1분 남았습니다. 남은 시간을 0.1초 단위로 표시합니다.",
         "tooltip": "마감 카운트다운이 마지막 1분에 들어섰습니다. 0이 되면 사이클은 마감 준비 상태가 됩니다."
       },
       "confirming": {
@@ -192,7 +192,7 @@
     "steps": {
       "openingSoon": {
         "label": "시작 임박",
-        "detail": "다음 사이클이 예정되어 시작을 기다리고 있습니다."
+        "detail": "다음 사이클의 시작 시각을 기다리고 있습니다."
       },
       "firstGesture": {
         "label": "첫 제스처",
@@ -212,12 +212,12 @@
       },
       "allocation": {
         "label": "배분",
-        "detail": "준비금이 프로토콜의 배분 경로로 배분됩니다."
+        "detail": "프로토콜에 정해진 경로에 따라 준비금이 배분됩니다."
       }
     },
     "explainer": {
-      "title": "처음이신가요? 30초면 사이클을 이해할 수 있습니다.",
-      "body": "사이클이 열리기를 기다렸다가 제스처를 남기고, 마감 카운트다운을 지켜봅니다. 모든 제스처는 최종 시그니처를 빚어내는 데 힘을 보태고, 시간을 연장할 수 있으며, 누가 배분을 받을 차례인지 새로 정합니다. 시간이 다 되면 사이클이 마감되고 준비금이 온체인에서 배분됩니다.",
+      "title": "처음이라면, 30초로 살펴보는 사이클",
+      "body": "사이클이 시작되면 제스처를 남기고 마감 카운트다운을 지켜봅니다. 제스처마다 시그니처에 흔적이 더해지고, 시간이 연장될 수 있으며, 배분 대상이 바뀝니다. 마감 시각이 지나면 사이클을 마감할 수 있고, 준비금은 온체인에서 배분됩니다.",
       "faqLink": "자주 묻는 질문 보기",
       "walkthroughLink": "전체 안내 보기",
       "dismissAria": "사이클 안내 닫기"
@@ -309,38 +309,38 @@
       "economicsTitle": "CST 제스처 계산",
       "previewTitle": "참여 CST 미리 보기",
       "economicsDescription": "순 CST는 각인되는 참여 CST에서 현재 CST 제스처 비용을 뺀 값입니다.",
-      "previewDescription": "이 제스처가 반영될 때 받게 되는 동적 CST의 예상치입니다. 금액은 이전 제스처 이후 흐른 시간에 따라 달라지며, 모든 제스처 방식에는 최대 비용과 최소 참여 CST라는 두 가지 보호 장치가 있습니다.",
+      "previewDescription": "이 제스처로 각인될 참여 CST의 예상 수량입니다. 수량은 이전 제스처 이후 흐른 시간에 따라 달라집니다. 모든 제스처 방식에서 최대 비용과 최소 참여 CST를 설정할 수 있습니다.",
       "rewardLabel": "참여 CST",
       "costLabel": "비용",
       "netLabel": "순 CST",
       "cstAmount": "{amount} CST",
-      "minAccepted": "최소 허용: {value}",
-      "minAcceptedAny": "0 CST를 포함한 모든 금액",
+      "minAccepted": "최소 허용 수량: {value}",
+      "minAcceptedAny": "0 CST를 포함한 모든 수량",
       "minAcceptedAria": "최소 허용 CST의 의미",
-      "minAcceptedTooltip": "트랜잭션이 받아들이는 참여 CST의 최소 금액입니다. 현재 미리 보기 금액에서 최소 참여 CST 보호의 허용 폭을 뺀 값입니다. 확인 시점에 컨트랙트가 이보다 적게 각인하게 되면, 제스처는 더 적은 금액을 받아들이지 않고 되돌려집니다.",
-      "minAcceptedTooltipAny": "‘모든 참여 CST 허용’은 최소 허용 금액을 0으로 보내므로, 동적 CST가 얼마든, 심지어 0이어도 제스처가 반영됩니다.",
+      "minAcceptedTooltip": "이 트랜잭션에서 허용할 참여 CST의 최소 수량입니다. 현재 미리 보기 수량에서 최소 참여 CST 보호의 허용 폭을 빼서 계산합니다. 확인 시점에 각인되는 수량이 이 값보다 적으면 제스처 트랜잭션이 취소됩니다.",
+      "minAcceptedTooltipAny": "‘모든 참여 CST 허용’을 선택하면 최소 수량이 0으로 설정됩니다. 참여 CST가 0이어도 제스처 트랜잭션을 실행할 수 있습니다.",
       "netPositive": "이 제스처가 반영되면 각인되는 CST가 비용보다 많습니다.",
       "netNegative": "대부분의 CST 제스처는 받는 CST보다 더 많은 CST를 씁니다.",
       "durationMismatch": "API 보고값({apiDuration})과 달라 온체인 지속 시간({contractDuration})을 사용합니다."
     },
     "preview": "실시간 제스처 옵션을 여기에서 미리 볼 수 있습니다. 지갑을 연결하면 메시지를 쓰고, 자산을 첨부하고, Arbitrum에 제스처를 제출할 수 있습니다.",
     "advanced": {
-      "title": "고급",
+      "title": "상세 설정",
       "messageLabel": "메시지",
       "messageOptionalHint": "(선택, 최대 {maxLength}자)",
       "messageTooltipAria": "제스처 메시지 안내",
       "messageTooltip": "제스처 채팅에 표시될 메시지를 남길 수 있습니다. 메시지는 제스처와 함께 온체인에 기록되어 블록체인에 영구히 남습니다.",
       "messagePlaceholder": "제스처와 함께 남길 메시지…",
-      "attachIntro": "제스처에 토큰이나 NFT를 첨부하거나, 제스처 비용 충돌 방지를 조정할 수 있습니다.",
+      "attachIntro": "제스처에 토큰이나 NFT를 첨부하고, 비용 상승에 대비해 허용할 추가 금액을 설정할 수 있습니다.",
       "minCstProtection": {
         "title": "최소 참여 CST 보호",
-        "body": "참여 CST는 경과 시간에 제곱근 공식을 적용해 정해집니다. 이 설정은 다른 제스처가 먼저 반영되어 트랜잭션 확인 전에 금액이 줄어드는 경우에 대비합니다.",
+        "body": "참여 CST 수량은 경과 시간에 제곱근 공식을 적용해 정합니다. 다른 제스처가 먼저 반영되어 수량이 줄어드는 경우에 대비해, 허용할 최소 수량을 설정할 수 있습니다.",
         "acceptAnyAria": "모든 참여 CST 허용",
         "acceptAnyTitle": "0을 포함한 모든 참여 CST 허용",
-        "acceptAnyBody": "최소 허용 참여 CST를 0으로 보냅니다. 확인 전에 동적 CST 금액이 바뀌더라도 제스처가 반영되기를 원할 때 사용합니다.",
+        "acceptAnyBody": "허용할 참여 CST의 최소 수량을 0으로 설정합니다. 확인 전에 참여 CST 수량이 바뀌어도 제스처를 실행하려면 이 옵션을 선택해 주세요.",
         "toleranceLabel": "참여 CST 감소 허용 폭",
         "minAmount": "최소 {amount} CST",
-        "revertNote": "트랜잭션이 반영되는 시점에 컨트랙트가 이 최소값보다 적은 CST를 각인하게 되면, 제스처는 더 적은 동적 CST 금액을 받아들이지 않고 되돌려집니다."
+        "revertNote": "확인 시점에 각인되는 CST가 이 최소 수량보다 적으면 제스처 트랜잭션이 취소됩니다."
       },
       "attachNft": "NFT 첨부",
       "attachToken": "토큰 첨부",
@@ -365,12 +365,12 @@
       "generic": "{method} 제스처 남기기"
     },
     "processing": "처리 중…",
-    "finalGestureMade": "이 사이클의 최종 제스처를 남겼습니다. 타이머가 끝나면 아래의 ‘사이클 마감’을 사용해 주세요.",
+    "finalGestureMade": "현재 가장 최근 제스처를 남긴 지갑입니다. 카운트다운이 0이 되면 아래의 ‘사이클 마감’에서 진행할 수 있습니다.",
     "finalize": "사이클 마감",
-    "finalizeAvailableIn": "가능 시각까지",
+    "finalizeAvailableIn": "마감 가능 시각까지",
     "finalizeWaitNote": "최종 제스처를 남긴 참여자가 사이클을 마감할 때까지 기다려 주세요.",
     "connect": {
-      "title": "제스처를 제출하려면 지갑을 연결해 주세요",
+      "title": "지갑 연결 후 제스처 남기기",
       "body": "위의 실시간 제스처 방식과 비용을 확인한 뒤, MetaMask 또는 다른 지갑을 연결해 Arbitrum에 제출할 수 있습니다."
     }
   },
@@ -383,11 +383,11 @@
     "cstTitle": "CST 보정 구간",
     "cstSubtitle": "CST 비용은 이 동적 구간을 따라 내려갑니다. ETH 제스처는 구간을 약 {decreasePercent}% 줄이고, CST 제스처는 약 {increasePercent}% 늘립니다.",
     "cstEndedMessage": "보정 구간이 끝났습니다. 지금은 비용 없이 제스처를 남길 수 있습니다.",
-    "dynamicDuration": "동적 지속 시간",
+    "dynamicDuration": "현재 구간 길이",
     "progressLabel": "진행률",
     "percentComplete": "{percent} 진행",
     "progressAria": "{title} 진행률",
-    "durationLabel": "보정 구간 지속 시간",
+    "durationLabel": "보정 구간 길이",
     "elapsedLabel": "경과",
     "remainingLabel": "남음"
   },
@@ -407,7 +407,7 @@
     "cards": {
       "signature": {
         "name": "시그니처 배분",
-        "tooltip": "카운트다운이 0이 되는 순간 최종 제스처를 남긴 참여자가 이 배분을 회수할 수 있습니다. ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 첨부 토큰이 포함됩니다."
+        "tooltip": "마감 시각이 지나면 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있습니다. 시그니처 배분에는 ETH, 1,000 CST, Cosmic Signature NFT 1개와 첨부 토큰이 포함됩니다."
       },
       "publicGoods": {
         "name": "공공재",
@@ -480,7 +480,7 @@
   },
   "deck": {
     "title": "Cosmic Signature 관측소",
-    "intro": "하나의 실시간 퍼포먼스 사이클. 모든 제스처는 카운트다운을 연장하고, 최종 시그니처를 빚어내며, 배분을 기다리는 줄에 섭니다.",
+    "intro": "제스처가 더해질 때마다 시간이 연장되고 시그니처가 모습을 갖추는 퍼포먼스 사이클입니다. 참여 기록에 따라 사이클 마감 시 배분 대상이 됩니다.",
     "newHere": "처음이신가요? 작동 원리",
     "experimentalUi": "실험적 UI",
     "returnToCurrent": "기존 UI로 돌아가기",
@@ -490,7 +490,7 @@
       "youChip": "나",
       "fullConsole": "전체 제스처 콘솔 열기",
       "chooseRwlkToken": "아래 전체 콘솔에서 RandomWalk 토큰을 선택해 주세요",
-      "microcopy": "모든 제스처는 마감 카운트다운을 연장하고, 참여 CST를 각인하며, 별빛 선정 자격 한 건이 됩니다.",
+      "microcopy": "제스처마다 마감 시각이 연장되고 별빛 선정 자격이 기록됩니다. 경과 시간에 따라 참여 CST가 각인될 수도 있습니다.",
       "notifyAria": "사이클 마감 전에 알림 받기",
       "notifyLabel": "마감 전 알림:",
       "notifyMinutes": "{minutes}분",
@@ -500,7 +500,7 @@
     },
     "board": {
       "title": "배분 경로",
-      "subtitle": "이 사이클이 마감 시 배분하는 모든 것",
+      "subtitle": "이 사이클의 마감 시 배분 내역",
       "tooltip": "현재 퍼포먼스 사이클의 모든 배분 경로와 그 금액, 현재 보유자, 현재 기록을 실시간으로 보여 줍니다.",
       "cstPlusNft": "1,000 CST + NFT",
       "awaitingGesture": "첫 제스처 대기 중",
@@ -520,7 +520,7 @@
       "title": "제스처로 전하는 한마디",
       "subtitle": "메시지는 제스처와 함께 온체인에 기록됩니다",
       "placeholder": "온체인에 남길 메시지 (선택)…",
-      "note": "전송하면 Arbitrum에 실제 제스처가 남고, 메시지는 그 제스처에 실려 제스처 채팅에 나타납니다.",
+      "note": "전송하면 Arbitrum에 제스처가 기록되고, 함께 남긴 메시지가 제스처 채팅에 표시됩니다.",
       "connectBody": "지갑을 연결하면 제스처를 남기고 제스처 채팅에 메시지를 올릴 수 있습니다.",
       "rwlkChip": "RWLK #{id}",
       "rwlkChoose": "RWLK: 토큰 선택",
@@ -528,9 +528,9 @@
     },
     "personal": {
       "title": "내 위치",
-      "leader": "최근 제스처는 내 것입니다",
+      "leader": "현재 가장 최근 제스처를 남긴 지갑입니다",
       "heldFor": "{duration} 유지",
-      "notLeader": "최근 참여자가 아닙니다",
+      "notLeader": "현재 가장 최근 제스처는 다른 지갑이 남겼습니다",
       "enduranceIn": "{duration} 뒤 선두 유지 기록 경신",
       "extending": "지금 선두 유지 기록을 늘려 가고 있습니다",
       "gestures": "{count, plural, =0 {이번 사이클에 아직 제스처 없음} other {이번 사이클 제스처 #개}}",
@@ -574,7 +574,7 @@
       "tooltip": "이 사이클의 각 경로를 지금 누가 지키고 있는지 보여 줍니다. 타이머는 실시간으로 흐르며, 현황은 사이클이 마감될 때 확정됩니다.",
       "youBadge": "나",
       "latestName": "최근 제스처",
-      "latestTooltip": "가장 최근 참여자입니다. 지금 마감 카운트다운이 0이 되면 이 주소가 시그니처 배분을 받습니다.",
+      "latestTooltip": "현재 가장 최근 제스처를 남긴 참여자입니다. 이 상태로 사이클을 마감하면 시그니처 배분 수령자가 됩니다.",
       "held": "{duration} 유지",
       "record": "기록 {duration}",
       "awaitingGesture": "첫 제스처 대기 중",
@@ -582,15 +582,15 @@
       "cstPlusNft": "1,000 CST + NFT"
     },
     "intel": {
-      "latestSubtitle": "최근 제스처의 비용과 각인된 CST, 그리고 마감 시 받을 예정인 배분.",
+      "latestSubtitle": "최근 제스처의 비용, 각인된 CST, 현재 배분 대상인 항목을 확인할 수 있습니다.",
       "viewGesture": "제스처 열기",
-      "inLineFor": "마감 시 받을 예정",
+      "inLineFor": "현재 배분 대상",
       "attachedNfts": "{count, plural, other {첨부 NFT #개}}",
       "attachedTokens": "{count, plural, other {첨부 토큰 적립 #건}}",
       "plusCycleAttachments": "사이클이 보관 중인 {assets} 포함.",
       "enduranceChronoTitle": "수호 챔피언과 시간의 전사",
-      "enduranceChronoSubtitle": "현재 기록과 그 기록을 바꾸어 가는 지금의 도전.",
-      "liveRoleState": "실시간 역할 상태"
+      "enduranceChronoSubtitle": "현재 선두 유지 기록과 기록 경신까지 남은 시간입니다.",
+      "liveRoleState": "현재 역할"
     },
     "prices": {
       "availableAfterFirst": "첫 제스처 이후",
@@ -598,7 +598,7 @@
     },
     "ribbon": {
       "title": "배분 경로",
-      "subtitle": "이 사이클이 마감 시 배분하는 모든 것",
+      "subtitle": "이 사이클의 마감 시 배분 내역",
       "tooltip": "현재 퍼포먼스 사이클의 모든 배분 경로를 실시간으로 보여 줍니다. 금액은 준비금과 함께 늘어나고, 사이클이 마감될 때 배분됩니다.",
       "fullBreakdown": "전체 내역 보기",
       "stellarStatus": "제스처 하나가 자격 하나",
@@ -613,7 +613,7 @@
       "openPanelAria": "제스처 패널 열기"
     },
     "panel": {
-      "microcopy": "모든 제스처는 마감 카운트다운을 연장하고, 참여 CST를 각인하며, 별빛 선정 자격 한 건이 됩니다.",
+      "microcopy": "제스처마다 마감 시각이 연장되고 별빛 선정 자격이 기록됩니다. 경과 시간에 따라 참여 CST가 각인될 수도 있습니다.",
       "sheetTitle": "제스처 남기기"
     }
   },

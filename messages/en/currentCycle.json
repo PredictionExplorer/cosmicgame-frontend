@@ -68,7 +68,7 @@
     },
     "stellarSelectionEntries": {
       "title": "Stellar Selection Entries",
-      "tooltip": "Each gesture records one Stellar Selection entry. More gestures = higher Selection frequency for ETH or Cosmic Signature NFT allocations."
+      "tooltip": "Each gesture adds a Stellar Selection entry. More entries increase the chance of receiving ETH or a Cosmic Signature NFT, but do not guarantee an allocation."
     },
     "topEthSpenders": {
       "title": "Top ETH Spenders",
@@ -105,7 +105,7 @@
   },
   "attachedTokens": {
     "title": "Attached Tokens",
-    "tooltip": "NFTs and ERC-20 tokens attached to gestures by the community to enrich the cycle's Cycle Reserve.",
+    "tooltip": "NFTs and ERC-20 tokens attached to gestures for the cycle’s allocation recipient.",
     "erc721Tab": "ERC721 Tokens",
     "erc20Tab": "ERC20 Tokens",
     "erc721Empty": "No ERC721 tokens were attached this cycle."

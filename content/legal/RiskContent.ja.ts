@@ -2,7 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Japanese copy for /risk-disclosures, rendered by TrustPageContent. */
 export const riskCopyJa: TrustPageCopy = {
-  eyebrow: 'リスクと参加者向けの明確化',
+  eyebrow: 'リスクと参加にあたっての注意事項',
   title: 'Cosmic Signatureリスク開示',
   // lexicon-allow-start: explicit legal denial copy must name the denied categories.
   intro:
@@ -14,7 +14,7 @@ export const riskCopyJa: TrustPageCopy = {
       bullets: [
         'ブロックチェーンのトランザクションは公開され、一般に取り消せません。',
         'ウォレットの安全、秘密鍵、トランザクションの承認は利用者の責任です。',
-        'ネットワークの混雑、RPCの障害、インデクサーの遅延、アプリの問題がUXに影響することがあります。',
+        'ネットワークの混雑、RPCの障害、データ反映の遅延、アプリの不具合により、表示や操作に支障が出ることがあります。',
         '参加する前に、プロトコルのパラメーター、配分、タイミングを確認するべきです。',
         // lexicon-allow-start: denial copy states that no financial return is guaranteed.
         'CSTとNFTは、保証されたリターンや金融商品として理解されるべきではありません。',
@@ -24,7 +24,7 @@ export const riskCopyJa: TrustPageCopy = {
     {
       heading: '参加者がすること',
       paragraphs: [
-        '参加者はパフォーマンス・サイクルの間に一筆を入れます。一筆は変化し続けるプロトコルの状態に影響し、参加CSTを刻印し、決定論的なCosmic Signature NFTアートの文脈に寄与します。結果は公開されたスマートコントラクトの仕組みによって定まり、オフチェーンの約束によるものではありません。',
+        '参加者はパフォーマンス・サイクルの間に一筆を入れます。一筆はプロトコルの状態に影響し、参加CSTが刻印されることもあります。その記録が、決定論的なCosmic Signature NFT作品の背景を形づくります。結果は公開スマートコントラクトのルールで決まり、オフチェーンでの約束に基づくものではありません。',
       ],
     },
     {

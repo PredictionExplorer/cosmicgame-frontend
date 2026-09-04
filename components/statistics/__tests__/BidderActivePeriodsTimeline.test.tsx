@@ -80,7 +80,7 @@ describe('BidderActivePeriodsTimeline', () => {
   it('explains how many participants the timeline covers', () => {
     render(<BidderActivePeriodsTimeline />);
 
-    expect(screen.getByText(/Active periods for top 20 participants/i)).toBeInTheDocument();
+    expect(screen.getByText(/Active periods for the top 20 participants/i)).toBeInTheDocument();
   });
 
   it('draws one lane per ranked participant with a link and a gesture count', () => {

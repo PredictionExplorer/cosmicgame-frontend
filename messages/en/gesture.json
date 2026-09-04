@@ -1,7 +1,7 @@
 {
   "invalid": {
-    "title": "Invalid Gesture Id",
-    "help": "Use a non-negative numeric gesture identifier in the URL."
+    "title": "Invalid gesture ID",
+    "help": "The gesture ID in the address must be a whole number, zero or greater."
   },
   "header": {
     "title": "Gesture details",
@@ -11,7 +11,7 @@
   },
   "empty": {
     "title": "No gesture information found.",
-    "help": "This ID may be invalid or the gesture is not in the current index."
+    "help": "Check the gesture ID. A recent gesture may take a moment to appear."
   },
   "sections": {
     "transaction": {
@@ -40,21 +40,21 @@
     }
   },
   "rows": {
-    "datetime": "Gesture datetime",
+    "datetime": "Date and time",
     "datetimeHelp": "Opens the transaction on the block explorer",
     "participantAddress": "Participant address",
     "cycleNumber": "Cycle number",
     "cycleValue": "Cycle {round}",
     "gestureCost": "Gesture cost",
     "participationCst": "Participation CST",
-    "attachedRandomWalk": "Attached RandomWalk NFT to ETH gesture:",
-    "paidWithCst": "Paid with CST (ERC-20):",
-    "randomWalkId": "RandomWalkNFT ID:",
-    "erc20Address": "Attached ERC-20 Token Address:",
-    "erc20Amount": "Attached ERC-20 Token Amount (ETH):",
-    "nftAddress": "Attached NFT Token Address:",
-    "nftId": "Attached NFT Token ID:",
-    "nftTokenUri": "NFT Token URI:"
+    "attachedRandomWalk": "Random Walk NFT used for this ETH gesture",
+    "paidWithCst": "Paid with CST (ERC-20)",
+    "randomWalkId": "Random Walk NFT ID",
+    "erc20Address": "Attached ERC-20 contract address",
+    "erc20Amount": "Attached ERC-20 token amount",
+    "nftAddress": "Attached NFT contract address",
+    "nftId": "Attached NFT ID",
+    "nftTokenUri": "NFT metadata URI"
   },
   "values": {
     "yes": "Yes",

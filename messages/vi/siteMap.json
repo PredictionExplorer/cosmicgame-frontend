@@ -8,7 +8,7 @@
   "sections": {
     "personal": {
       "title": "Công cụ ứng dụng cá nhân",
-      "description": "Các trang gắn với ví hữu ích cho người tham gia đã kết nối, nhưng không được lập chỉ mục và không có trong sitemap XML.",
+      "description": "Kết nối ví để quản lý NFT, neo giữ và các khoản phân bổ.",
       "navLabel": "Công cụ ứng dụng cá nhân"
     },
     "system": {
@@ -18,7 +18,7 @@
     },
     "data": {
       "title": "Trang dữ liệu giao thức",
-      "description": "Mọi đường dẫn dữ liệu công khai trong sitemap XML, gom trong một danh sách có thể thu thập.",
+      "description": "Tra cứu lịch sử giao dịch, tài sản và hoạt động của giao thức.",
       "navLabel": "Trang dữ liệu giao thức"
     },
     "ecosystem": {
@@ -30,23 +30,23 @@
   "links": {
     "myNfts": {
       "label": "NFT của tôi",
-      "description": "Trang NFT gắn với ví; không lập chỉ mục."
+      "description": "Xem và quản lý NFT trong ví đang kết nối."
     },
     "myAllocations": {
       "label": "Phân bổ chưa nhận về của tôi",
-      "description": "Trang nhận về phân bổ gắn với ví; không lập chỉ mục."
+      "description": "Xem và nhận về các khoản phân bổ của ví đang kết nối."
     },
     "myAnchors": {
       "label": "Neo giữ của tôi",
-      "description": "Trang neo giữ gắn với ví; không lập chỉ mục."
+      "description": "Quản lý NFT đang neo giữ và xem phân phối tương ứng."
     },
     "about": {
       "label": "Về Cosmic Signature",
-      "description": "Trang chủ của thực thể và phân biệt thương hiệu."
+      "description": "Giới thiệu giao thức và các nguồn thông tin chính thức."
     },
     "learn": {
       "label": "Trung tâm học tập Cosmic Signature",
-      "description": "Bài giải thích có thể thu thập dành cho hệ thống AI và tìm kiếm."
+      "description": "Hướng dẫn về chu kỳ, nét bút, tác phẩm và các cơ chế của giao thức."
     },
     "whatIsCosmicSignature": {
       "label": "Cosmic Signature là gì?",
@@ -106,11 +106,11 @@
     },
     "allocationRecipients": {
       "label": "Người nhận phân bổ",
-      "description": "Dự trữ của từng chu kỳ đã đi về đâu."
+      "description": "Chi tiết phân bổ dự trữ của từng chu kỳ."
     },
     "anchorDistributions": {
       "label": "Phân phối neo giữ",
-      "description": "Các NFT đang neo giữ và phần phân phối của chúng."
+      "description": "NFT đang neo giữ và các khoản phân phối tương ứng."
     },
     "outreachReserve": {
       "label": "Dự trữ truyền thông",

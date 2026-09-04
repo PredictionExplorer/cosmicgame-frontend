@@ -52,7 +52,7 @@
       "live": {
         "badge": "实时运行于 Arbitrum",
         "headline": "塑造下一幅 Cosmic Signature",
-        "body": "Cosmic Signature 是实时进行的演绎周期：每一笔都留下可见的痕迹，铭刻参与 CST，并推动协议储备流向以太坊赖以运转的公共物品。",
+        "body": "Cosmic Signature 的演绎周期实时展开：每一笔都留下可见的痕迹，可能铭刻参与 CST，并推动协议储备流向以太坊赖以运转的公共物品。",
         "cta": "落笔"
       }
     },
@@ -217,7 +217,7 @@
     },
     "explainer": {
       "title": "初来乍到？30 秒读懂周期。",
-      "body": "等周期开启后落笔，并留意收官倒计时。每一笔都在塑造最终的签名，可能延长时间，也会更新有望获配的人选。倒计时走完，周期便会收官，储备随即在链上发放。",
+      "body": "周期开启后即可落笔，并留意收官倒计时。每一笔都在塑造最终签名，可能延长时间，也会更新有望获配的人选。倒计时归零后即可收官；收官完成后，储备会在链上发放。",
       "faqLink": "阅读常见问题",
       "walkthroughLink": "查看完整流程",
       "dismissAria": "关闭周期简介"
@@ -239,8 +239,8 @@
       },
       "ethGesture": "ETH 落笔",
       "ethGestureTooltip": "当前以 ETH 落笔的价格。",
-      "randomWalkGesture": "ETH + RandomWalk 落笔",
-      "randomWalkGestureTooltip": "ETH 落笔附加一枚 RandomWalk NFT，落笔价格减半。",
+      "randomWalkGesture": "ETH + Random Walk 落笔",
+      "randomWalkGestureTooltip": "ETH 落笔附加一枚 Random Walk NFT，落笔价格减半。",
       "cstGesture": "CST 落笔",
       "cstGestureTooltip": "以 CST 落笔。价格会随校准窗口推进而下降；CST 落笔使窗口延长，ETH 落笔使其缩短。",
       "free": "免费",
@@ -269,9 +269,9 @@
   },
   "ticker": {
     "openLatestAria": "查看最新落笔 {id}",
-    "gestureLine": "{address} 以 {kind, select, cst {CST} randomWalk {ETH + RandomWalk} other {ETH}} 落笔",
+    "gestureLine": "{address} 以 {kind, select, cst {CST} randomWalk {ETH + Random Walk} other {ETH}} 落笔",
     "paymentUnavailable": "费用同步中…",
-    "rwlkToken": "RandomWalk #{id}",
+    "rwlkToken": "Random Walk #{id}",
     "age": {
       "justNow": "刚刚",
       "seconds": "{count} 秒前",
@@ -301,8 +301,8 @@
     },
     "rwlk": {
       "title": "你的 Random Walk NFT",
-      "tooltipAria": "了解 RandomWalk 落笔价格减半规则",
-      "tooltip": "ETH 落笔附加一枚 RandomWalk NFT，落笔价格即减半。每枚 NFT 仅可使用一次。"
+      "tooltipAria": "了解 Random Walk 落笔价格减半规则",
+      "tooltip": "ETH 落笔附加一枚 Random Walk NFT，落笔价格即减半。每枚 NFT 仅可使用一次。"
     },
     "cstTrade": "缺少 CST？可通过 Uniswap 在 Arbitrum 上用 ETH 兑换 CST。",
     "reward": {
@@ -358,8 +358,8 @@
     },
     "submit": {
       "eth": "以 ETH 落笔（{cost} ETH）",
-      "randomWalkWithToken": "以 ETH + RandomWalk 代币 {tokenId} 落笔（{cost} ETH）",
-      "randomWalk": "以 ETH + RandomWalk 落笔",
+      "randomWalkWithToken": "以 ETH + Random Walk 代币 {tokenId} 落笔（{cost} ETH）",
+      "randomWalk": "以 ETH + Random Walk 落笔",
       "cst": "以 CST 落笔（{cost} CST）",
       "cstFree": "以 CST 落笔（免费）",
       "generic": "以 {method} 落笔"
@@ -407,7 +407,7 @@
     "cards": {
       "signature": {
         "name": "签名分配",
-        "tooltip": "倒计时归零时写下收官之笔的参与者，可取回这份分配：ETH、1,000 CST、一枚 Cosmic Signature NFT，以及已附加的代币。"
+        "tooltip": "倒计时归零后，写下收官之笔的参与者可取回这份分配：ETH、1,000 CST、一枚 Cosmic Signature NFT，以及已附加的代币。"
       },
       "publicGoods": {
         "name": "公共物品",
@@ -423,8 +423,8 @@
         "tooltip": "协议从本周期的星选资格中程序化随机选出参与者，每位获配表彰 CST 与 Cosmic Signature NFT。"
       },
       "randomWalkAnchor": {
-        "name": "RandomWalk 锚定者",
-        "tooltip": "RandomWalk NFT 的锚定者可能获配表彰 CST 与 Cosmic Signature NFT。"
+        "name": "Random Walk 锚定者",
+        "tooltip": "Random Walk NFT 的锚定者可能获配表彰 CST 与 Cosmic Signature NFT。"
       },
       "cosmicAnchor": {
         "name": "Cosmic Signature 锚定",
@@ -486,11 +486,11 @@
     "returnToCurrent": "返回当前界面",
     "monument": {
       "reserveLabel": "签名分配",
-      "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附着资产",
+      "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附加资产",
       "youChip": "你",
       "fullConsole": "打开完整落笔控制台",
-      "chooseRwlkToken": "请在下方完整控制台中选择你的 RandomWalk 代币",
-      "microcopy": "每一次落笔都会延长收官时钟、铭刻参与 CST，并计入一份星选资格。",
+      "chooseRwlkToken": "请在下方完整控制台中选择你的 Random Walk 代币",
+      "microcopy": "每次落笔都会延长收官倒计时、增加一次星选资格，并可能铭刻参与 CST。",
       "notifyAria": "在周期可收官前提醒我",
       "notifyLabel": "收官前提醒：",
       "notifyMinutes": "{minutes} 分钟",
@@ -560,7 +560,7 @@
     },
     "clock": {
       "reserveLabel": "签名分配",
-      "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附着资产",
+      "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附加资产",
       "reserveUsd": "≈ {amount} 美元",
       "notifyAria": "在周期可收官前提醒我",
       "notifyLabel": "收官前提醒：",
@@ -571,10 +571,10 @@
     },
     "standings": {
       "title": "实时席位",
-      "tooltip": "本周期各条竞逐轨道此刻的持有者。计时实时进行；席位仅在周期收官时锁定。",
+      "tooltip": "本周期各条分配轨道的当前人选。计时持续更新，人选在周期收官时才会确定。",
       "youBadge": "你",
       "latestName": "最新落笔",
-      "latestTooltip": "最近一位落笔的参与者。若收官时钟此刻归零，这个地址将获配签名分配。",
+      "latestTooltip": "最新落笔者。周期收官时，仍保持这一位置的参与者可获得签名分配。",
       "held": "已保持 {duration}",
       "record": "纪录 {duration}",
       "awaitingGesture": "等待第一笔",
@@ -585,8 +585,8 @@
       "latestSubtitle": "最近一笔的实际支出、铭刻所得，以及当前对应的待定分配。",
       "viewGesture": "查看这次落笔",
       "inLineFor": "若此刻收官，当前对应",
-      "attachedNfts": "{count, plural, other {# 件附着 NFT}}",
-      "attachedTokens": "{count, plural, other {# 笔附着代币存入}}",
+      "attachedNfts": "{count, plural, other {# 件附加 NFT}}",
+      "attachedTokens": "{count, plural, other {# 笔附加代币存入}}",
       "plusCycleAttachments": "另含本周期持有的 {assets}。",
       "enduranceChronoTitle": "坚守与时之勇士",
       "enduranceChronoSubtitle": "现存纪录，以及此刻正在改变纪录的坚守进程。",
@@ -613,7 +613,7 @@
       "openPanelAria": "打开落笔面板"
     },
     "panel": {
-      "microcopy": "每一次落笔都会延长收官时钟、铭刻参与 CST，并计入一份星选资格。",
+      "microcopy": "每次落笔都会延长收官倒计时、增加一次星选资格，并可能铭刻参与 CST。",
       "sheetTitle": "落笔"
     }
   },

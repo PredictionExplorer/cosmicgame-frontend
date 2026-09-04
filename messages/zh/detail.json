@@ -4,7 +4,7 @@
   },
   "jsonLd": {
     "productName": "Cosmic Signature NFT #{id}",
-    "productDescription": "独一无二的生成艺术 NFT，由三体问题物理渲染而成，出自程序化链上艺术协议 Cosmic Signature。",
+    "productDescription": "Cosmic Signature 的生成艺术 NFT，以三体物理模拟生成独一无二的图像。",
     "breadcrumbToken": "代币 #{id}"
   },
   "breadcrumb": {
@@ -50,7 +50,7 @@
   },
   "ownerActions": {
     "title": "管理这枚代币",
-    "titleTooltip": "作为当前持有者，你可以在 MetaMask 中显示、转移或命名这枚代币。",
+    "titleTooltip": "作为当前持有者，你可以转移或命名这枚代币，也可以将它添加至 MetaMask。",
     "metaMaskHeading": "在 MetaMask 中显示",
     "metaMaskTooltip": "请求 MetaMask 浏览器扩展显示这枚 NFT。NFT 导入仍为实验性功能，MetaMask 移动端暂不支持。",
     "addToMetaMask": "将 NFT 添加至 MetaMask",

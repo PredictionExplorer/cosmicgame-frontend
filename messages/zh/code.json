@@ -12,11 +12,11 @@
   "seo": {
     "eyebrow": "源代码 · 确定性艺术",
     "heading": "Cosmic Signature 源代码",
-    "description": "Cosmic Signature 公开确定性艺术流水线的源代码资源；这套流水线将链上种子转换为三体 NFT 艺术。下方客户端查看器支持交互，本段服务端渲染摘要则让抓取工具无需等待 JavaScript 即可读取核心事实。",
+    "description": "查看 Cosmic Signature 确定性艺术管线的源代码，了解链上种子如何通过三体模拟生成 NFT 图像。",
     "excerpt": "种子 -> SHA3-256 随机流 -> 三体模拟 -> 光谱渲染器 -> Cosmic Signature NFT 图像",
     "relatedAria": "源代码相关页面",
     "links": {
-      "ipfs": "打开已发布的 IPFS 源代码制品",
+      "ipfs": "查看 IPFS 上已发布的源代码",
       "github": "打开 GitHub 组织",
       "contracts": "查看已验证合约",
       "security": "阅读安全说明",

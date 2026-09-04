@@ -197,22 +197,17 @@ async function expectNoUnexpectedEnglishHeadings(
   // staging div and only moves into the layout on the next frame. `body`
   // already carries the text at that point, so the checks around this one pass
   // while every heading still computes as `display: none`. Poll rather than
-  // sample once — everything after this reads the settled DOM.
-  if (!route.allowNoHeading) {
-    await expect
-      .poll(() => readVisibleHeadings(page), {
-        message: `no visible headings rendered on ${route.id}`,
-      })
-      .not.toBe('');
-  }
-
-  const headings = await readVisibleHeadings(page);
-  if (!headings && route.allowNoHeading) return;
-  expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
-  expect(headings, `Chinese heading missing on ${route.id}`).toMatch(CJK);
-  for (const fallback of UNEXPECTED_ENGLISH_FALLBACKS) {
-    expect(headings, `unexpected English heading fallback on ${route.id}`).not.toMatch(fallback);
-  }
+  // sample once. Validate one snapshot per attempt: a second read after a
+  // successful poll can catch React replacing that same streamed subtree.
+  await expect(async () => {
+    const headings = await readVisibleHeadings(page);
+    if (!headings && route.allowNoHeading) return;
+    expect(headings, `no visible headings rendered on ${route.id}`).not.toBe('');
+    expect(headings, `Chinese heading missing on ${route.id}`).toMatch(CJK);
+    for (const fallback of UNEXPECTED_ENGLISH_FALLBACKS) {
+      expect(headings, `unexpected English heading fallback on ${route.id}`).not.toMatch(fallback);
+    }
+  }).toPass({ timeout: 15_000 });
 }
 
 async function expectNoUnexpectedEnglishUiCopy(

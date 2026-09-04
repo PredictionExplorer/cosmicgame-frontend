@@ -160,7 +160,7 @@ describe('CstGestureCostView', () => {
   it('shows the priciest / total / count summary', () => {
     render(<CstGestureCostView gestures={gestures} />);
 
-    expect(screen.getByText(/^Priciest: 3500\.00 CST/)).toBeInTheDocument();
+    expect(screen.getByText(/^Highest cost: 3500\.00 CST/)).toBeInTheDocument();
     expect(screen.getByText(/^Total consumed: 3650\.00 CST/)).toBeInTheDocument();
     expect(screen.getByText('3 CST gestures')).toBeInTheDocument();
   });
@@ -201,7 +201,7 @@ describe('CstGestureCostView', () => {
   it('shows the empty state when the round has no CST gestures', () => {
     render(<CstGestureCostView gestures={ethOnlyGestures} />);
 
-    expect(screen.getByText('No CST gestures in this round.')).toBeInTheDocument();
+    expect(screen.getByText('No CST gestures in this cycle.')).toBeInTheDocument();
     expect(screen.queryByTestId('composed-chart')).not.toBeInTheDocument();
   });
 
@@ -220,7 +220,7 @@ describe('CstGestureCostChart', () => {
   it('asks the user to select a round when none is chosen', () => {
     render(<CstGestureCostChart round={-1} />);
 
-    expect(screen.getByText('Select a round to inspect.')).toBeInTheDocument();
+    expect(screen.getByText('Select a cycle to inspect.')).toBeInTheDocument();
   });
 
   it('shows a spinner while the gesture list loads', () => {
@@ -264,29 +264,29 @@ describe('CstGestureCostSection round picker', () => {
   it('starts on the live round', () => {
     render(<CstGestureCostSection currentRoundNum={5} />);
 
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(5);
-    expect(screen.getByText('Live round')).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
+    expect(screen.getByText('Live cycle')).toBeInTheDocument();
   });
 
   it('keeps a user-pinned round when the live round advances', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<CstGestureCostSection currentRoundNum={5} />);
 
-    await user.click(screen.getByRole('button', { name: 'Previous round' }));
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(4);
+    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
 
     rerender(<CstGestureCostSection currentRoundNum={6} />);
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(4);
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(4);
   });
 
   it('resumes following live after "Jump to live"', async () => {
     const user = userEvent.setup();
     render(<CstGestureCostSection currentRoundNum={5} />);
 
-    await user.click(screen.getByRole('button', { name: 'Previous round' }));
+    await user.click(screen.getByRole('button', { name: 'Previous cycle' }));
     await user.click(screen.getByRole('button', { name: 'Jump to live' }));
 
-    expect(screen.getByRole('spinbutton', { name: 'Round number' })).toHaveValue(5);
-    expect(screen.getByText('Live round')).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: 'Cycle number' })).toHaveValue(5);
+    expect(screen.getByText('Live cycle')).toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 {
   "invalid": {
-    "title": "Invalid Token Id"
+    "title": "Invalid token ID"
   },
   "jsonLd": {
     "productName": "Cosmic Signature NFT #{id}",
@@ -50,7 +50,7 @@
   },
   "ownerActions": {
     "title": "Manage Your Token",
-    "titleTooltip": "As the current owner, you can display this token in MetaMask, transfer it, or set a custom name.",
+    "titleTooltip": "As the current owner, you can transfer this NFT, give it a name, or add it to MetaMask.",
     "metaMaskHeading": "Display in MetaMask",
     "metaMaskTooltip": "Prompt the MetaMask browser extension to display this NFT. NFT import is experimental and is not available in MetaMask Mobile.",
     "addToMetaMask": "Add NFT to MetaMask",

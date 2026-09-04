@@ -8,7 +8,7 @@
   "sections": {
     "personal": {
       "title": "個人工具",
-      "description": "這些錢包專屬頁面供已連接錢包的參與者使用，不編入搜尋索引，也不會出現在 XML 網站導覽中。",
+      "description": "連接錢包後，可在這些頁面查看和管理 NFT、分配與錨定。",
       "navLabel": "個人工具"
     },
     "system": {
@@ -18,7 +18,7 @@
     },
     "data": {
       "title": "協議資料頁面",
-      "description": "XML 網站導覽中的所有公開資料路由均彙總於此，便於瀏覽與抓取。",
+      "description": "集中瀏覽公開協議紀錄與統計資料。",
       "navLabel": "協議資料頁面"
     },
     "ecosystem": {
@@ -30,23 +30,23 @@
   "links": {
     "myNfts": {
       "label": "我的 NFT",
-      "description": "錢包專屬的 NFT 頁面，不編入索引。"
+      "description": "查看並管理錢包中的 NFT。"
     },
     "myAllocations": {
       "label": "我的未取回分配",
-      "description": "用於取回分配的錢包專屬頁面，不編入索引。"
+      "description": "查看並取回待取回分配。"
     },
     "myAnchors": {
       "label": "我的錨定",
-      "description": "錢包專屬的錨定頁面，不編入索引。"
+      "description": "管理已錨定 NFT 與錨定配發。"
     },
     "about": {
       "label": "關於 Cosmic Signature",
-      "description": "了解專案主體與品牌資訊。"
+      "description": "了解協議、藝術與生態。"
     },
     "learn": {
       "label": "Cosmic Signature 學習中心",
-      "description": "提供便於讀者閱讀、便於 AI 和搜尋系統抓取的內容。"
+      "description": "閱讀協議指南與深入解說。"
     },
     "whatIsCosmicSignature": {
       "label": "什麼是 Cosmic Signature？",

@@ -48,7 +48,7 @@
       "distributionPerNft": {
         "label": "NFTあたりの配分",
         "tooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。",
-        "tooltipUnavailable": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。オンチェーンの係留プールはゼロではありませんが、インデックス済みの係留Cosmic Signature NFT総数がゼロのため（例：cg_stake_stats_cstがETLで更新されていない）、NFTあたりの値を計算できません。"
+        "tooltipUnavailable": "NFT 1点あたりのETH係留配分は、プール残高を係留中のNFT総数で割って求めます。現在、残高とNFT数のデータが同期していないため計算できません。"
       },
       "uniqueHolders": {
         "label": "ユニーク係留者",
@@ -57,7 +57,7 @@
     },
     "cta": {
       "title": "係留を始める",
-      "description": "Cosmic Signature NFTを係留して、各サイクルの係留配分プールの分け前を受け取りましょう。"
+      "description": "Cosmic Signature NFTを係留すると、各サイクルの係留配分の対象になります。"
     },
     "sections": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -70,7 +70,7 @@
     "items": {
       "whatIsAnchoring": {
         "question": "係留とは？",
-        "answer": "係留とは、NFTをプロトコルに捧げることです。Cosmic Signature NFTの係留はETHの係留配分を受け取り、RandomWalk NFTの係留は係留NFT星選の対象になります。係留はいつでも解除してNFTを取り戻せます。Cosmic Signature NFTの解除では、累積したETHの配分も受け取ります。重要：各NFTを係留できるのは生涯で一度だけです。一度解除したNFTは、二度と係留できません。"
+        "answer": "係留とは、NFTをプロトコルのコントラクトに置くことです。Cosmic Signature NFTはETHの係留配分、RandomWalk NFTは係留NFT星選の対象になります。いつでも解除してNFTをウォレットに戻せます。Cosmic Signature NFTの場合は、累積したETHも解除時に受け取ります。各NFTを係留できるのは一度だけです。一度解除すると、同じNFTを再び係留することはできません。"
       },
       "cosmicSignature": {
         "question": "Cosmic Signature NFTの係留",

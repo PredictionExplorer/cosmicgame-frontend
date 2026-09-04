@@ -28,7 +28,7 @@
         },
         "stellar": {
           "label": "ETH 星选",
-          "tooltip": "这部分 ETH 留给星选获配者。每次落笔都会提高参与者在这些星选中的入选频次。"
+          "tooltip": "这部分 ETH 留给星选获配者。每次落笔都会增加一次星选资格，提高获选概率。"
         },
         "anchor": {
           "label": "锚定派发",
@@ -121,7 +121,7 @@
       "cards": {
         "signature": {
           "title": "签名分配",
-          "tooltip": "收官倒计时归零时写下收官之笔的参与者，可取回 ETH、1,000 CST 与一枚 Cosmic Signature NFT。"
+          "tooltip": "收官倒计时归零后，写下收官之笔的参与者可取回 ETH、1,000 CST 与一枚 Cosmic Signature NFT。"
         },
         "chrono": {
           "title": "时之勇士",

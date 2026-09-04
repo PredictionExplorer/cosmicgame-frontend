@@ -15,6 +15,16 @@ describe('flattenMessages', () => {
       ['e', 'z'],
     ]);
   });
+
+  it('includes strings in raw-message lists so they receive the same integrity checks', () => {
+    expect([
+      ...flattenMessages({ chips: ['Art', 'Protocol'], cards: [{ title: 'Gallery' }] }),
+    ]).toEqual([
+      ['chips[0]', 'Art'],
+      ['chips[1]', 'Protocol'],
+      ['cards[0].title', 'Gallery'],
+    ]);
+  });
 });
 
 describe('icuSignature', () => {
@@ -84,6 +94,46 @@ describe('compareNamespace', () => {
     expect(report.missing).toEqual(['count']);
     expect(report.empty).toEqual(['title']);
     expect(report.extra).toEqual(['nested.stale']);
+  });
+
+  it('rejects whitespace-only text and non-string leaves instead of counting them as translations', () => {
+    const report = compareNamespace({
+      namespace: 'n',
+      source: { title: 'Gallery', count: 'Count', action: 'Open', nested: { help: 'Help' } },
+      translation: { title: ' \n\t', count: 3, action: null, nested: { help: false } },
+      intlLocale: 'uk-UA',
+    });
+    expect(report.empty).toEqual(['title']);
+    expect(report.invalidValues).toEqual(['count', 'action', 'nested.help']);
+    expect(strictProblems(report)).toEqual([
+      'empty: title',
+      'not a string: count',
+      'not a string: action',
+      'not a string: nested.help',
+    ]);
+    expect(report.untranslated).toBe(false);
+  });
+
+  it('allows a localized space separator without allowing whitespace-only prose', () => {
+    const report = compareNamespace({
+      namespace: 'timer',
+      source: { separator: ', ', label: 'Duration' },
+      translation: { separator: ' ', label: '期間' },
+      intlLocale: 'ja-JP',
+    });
+    expect(strictProblems(report)).toEqual([]);
+  });
+
+  it('rejects an object substituted for a raw-message list, even with matching numeric keys', () => {
+    const report = compareNamespace({
+      namespace: 'seo',
+      source: { chips: ['Art', 'Protocol'] },
+      translation: { chips: { '0': '作品', '1': 'プロトコル' } },
+      intlLocale: 'ja-JP',
+    });
+    expect(report.missing).toEqual(['chips[0]', 'chips[1]']);
+    expect(report.extra).toEqual(['chips.0', 'chips.1']);
+    expect(strictProblems(report)).toHaveLength(4);
   });
 
   it('flags plural blocks that lack the locale categories, but not extra categories', () => {
@@ -169,6 +219,8 @@ describe('checkSourceNamespace', () => {
   it('validates the source catalog against its own plural rules', () => {
     expect(checkSourceNamespace('n', { ok: '{n, plural, one {#} other {#}}' }, 'en-US')).toEqual({
       namespace: 'n',
+      empty: [],
+      invalidValues: [],
       syntaxErrors: [],
       pluralGaps: [],
     });
@@ -176,8 +228,22 @@ describe('checkSourceNamespace', () => {
       checkSourceNamespace('n', { bad: '{n, plural, other {#}}', broken: '{' }, 'en-US'),
     ).toEqual({
       namespace: 'n',
+      empty: [],
+      invalidValues: [],
       syntaxErrors: [expect.stringMatching(/^broken: /)],
       pluralGaps: ['bad: {n, plural} lacks one'],
+    });
+  });
+
+  it('rejects blank and non-string source messages too', () => {
+    expect(
+      checkSourceNamespace('n', { blank: '\t ', count: 1, list: [], nil: null }, 'en-US'),
+    ).toEqual({
+      namespace: 'n',
+      empty: ['blank'],
+      invalidValues: ['count', 'list', 'nil'],
+      syntaxErrors: [],
+      pluralGaps: [],
     });
   });
 });

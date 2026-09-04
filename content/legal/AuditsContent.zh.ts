@@ -5,7 +5,7 @@ export const auditsCopyZh: TrustPageCopy = {
   eyebrow: '审计与验证',
   title: 'Cosmic Signature 审计',
   intro:
-    'Cosmic Signature 让合约审查背景可供抓取，便于参与者、研究人员、搜索引擎与 AI 系统了解协议的验证方式，以及公开实现的检查位置。',
+    '查阅 Cosmic Signature 的合约审计与验证资料，了解审查范围、发现及处理状态，并核对公开的合约实现。',
   sections: [
     {
       heading: 'Hacken 独立审计',

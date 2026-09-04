@@ -29,9 +29,9 @@ describe('AddressLink', () => {
     expect(mobileLink).toHaveAttribute('href', url);
   });
 
-  it('renders "Marketing Wallet" for marketing address', () => {
+  it('renders "Outreach Reserve Wallet" for marketing address', () => {
     render(<AddressLink address={TEST_MARKETING_WALLET} url="/user/marketing" />);
-    const links = screen.getAllByText('Marketing Wallet');
+    const links = screen.getAllByText('Outreach Reserve Wallet');
     expect(links.length).toBeGreaterThanOrEqual(1);
   });
 

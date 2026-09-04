@@ -18,17 +18,17 @@
     "allocation": "Phân bổ"
   },
   "hints": {
-    "structure": "Ngôn ngữ vẽ chính mà ba quỹ đạo được kết xuất theo.",
-    "underlay": "Một ngôn ngữ thứ hai, mờ hơn, xếp bên dưới cấu trúc chính.",
-    "accent": "Một ngôn ngữ điểm sáng thưa thớt vẽ phủ lên cấu trúc.",
+    "structure": "Kiểu nét chính dùng để thể hiện ba quỹ đạo.",
+    "underlay": "Lớp nét phụ, mờ hơn, nằm dưới cấu trúc chính.",
+    "accent": "Các điểm sáng thưa được vẽ lên trên cấu trúc.",
     "symmetry": "Phép gấp áp lên bố cục: gương, hoa thị hoặc mandala.",
     "projection": "Không gian tọa độ mà các quỹ đạo được vẽ trong đó.",
     "wildcard": "Một biến thể hiếm gặp phá vỡ các quy tắc kết xuất thông thường.",
     "finish": "Hiệu ứng hậu xử lý áp lên khung hình cuối.",
-    "palette": "Họ màu và cách phối hài hòa của ba vật thể.",
+    "palette": "Nhóm màu và cách phối màu của ba vật thể.",
     "spectralClass": "Lớp màu sao của vật thể chủ đạo, từ O xanh trắng đến M đỏ.",
-    "massBalance": "Ba khối lượng so với nhau thế nào: một sao chính nặng, một cặp song sinh, hay ba vật cân bằng.",
-    "fate": "Mô phỏng kết thúc ra sao: một vũ điệu vĩnh cửu ràng buộc, hay một vật thể bị phóng xuất.",
+    "massBalance": "Tương quan khối lượng giữa ba vật thể: một vật thể chính nặng hơn, một cặp tương đương hoặc ba vật thể cân bằng.",
+    "fate": "Kết cục mô phỏng: ba vật thể tiếp tục chuyển động cùng nhau hoặc một vật thể bị phóng xuất.",
     "chaos": "Độ nhạy với điều kiện ban đầu, chấm từ 0 (trật tự) đến 100 (hỗn loạn).",
     "syzygies": "Những khoảnh khắc cả ba vật thể xếp thẳng hàng.",
     "cycle": "Chu kỳ trình diễn trong đó NFT được khắc.",
@@ -138,7 +138,7 @@
     "composition": "Bố cục",
     "physics": "Vật lý quỹ đạo",
     "provenance": "Nguồn gốc",
-    "media": "Phương tiện"
+    "media": "Hình ảnh và video"
   },
   "card": {
     "chaosAria": "Hỗn độn {value} trên {max}",
@@ -150,7 +150,7 @@
     "fateAria": "Vận mệnh: {value}",
     "quickView": "Xem nhanh",
     "quickViewAria": "Xem nhanh Cosmic Signature {id}",
-    "traitsPending": "Đặc tính đang chờ",
+    "traitsPending": "Đang chờ dữ liệu đặc tính",
     "traitsPendingTooltip": "Siêu dữ liệu đặc tính của Signature này chưa được công bố.",
     "cycleShort": "CK{n}",
     "cycleLong": "Chu kỳ {n}",
@@ -198,7 +198,7 @@
     "description": "Đặc tính, vật lý quỹ đạo và nguồn gốc của Signature này.",
     "openDetail": "Mở trang đầy đủ",
     "playSweep": "Phát quét quang phổ",
-    "sweepNote": "Truyền một video lớn từ máy chủ phương tiện",
+    "sweepNote": "Video dung lượng lớn được phát trực tiếp từ máy chủ",
     "hideSweep": "Quay lại tác phẩm",
     "previous": "Signature trước",
     "next": "Signature sau",
@@ -220,7 +220,7 @@
     "totalEnergy": "Tổng năng lượng",
     "angularMomentum": "Mô men động lượng",
     "equilateralness": "Độ đều cạnh",
-    "braid": "Từ bím",
+    "braid": "Chuỗi ký hiệu bện",
     "braidCrossings": "{count} điểm giao",
     "integrator": "Bộ tích phân",
     "steps": "{steps} bước",
@@ -249,7 +249,7 @@
   },
   "dna": {
     "title": "DNA bộ sưu tập",
-    "subtitle": "Kho lưu trữ phân chia theo các đặc tính định danh như thế nào. Chọn một phân đoạn để lọc phòng trưng bày.",
+    "subtitle": "Phân bố các đặc tính chính trong bộ sưu tập. Chọn một phần của biểu đồ để lọc phòng trưng bày.",
     "segmentAria": "{value}: {count} NFT. Lọc theo đặc tính này.",
     "legendCount": "{count}",
     "loading": "Đang đọc đặc tính của bộ sưu tập…"

@@ -1,8 +1,8 @@
 {
   "page": {
     "title": "Đóng góp ETH",
-    "subtitle": "Đóng góp ETH trực tiếp vào Kho Hàng hóa công của Cosmic Signature",
-    "description": "Đóng góp ETH trực tiếp vào Kho Hàng hóa công của Cosmic Signature để hỗ trợ các đơn vị thụ hưởng do Hội đồng Vũ trụ điều phối lựa chọn. Bạn có thể kèm theo tiêu đề, lời nhắn và URL tùy chọn cùng khoản đóng góp. Những người đóng góp nhiều nhất trong mỗi chu kỳ có thể được giới thiệu trên trang chủ.",
+    "subtitle": "Đóng góp ETH trực tiếp vào dự trữ chu kỳ của Cosmic Signature",
+    "description": "Đóng góp ETH vào dự trữ chu kỳ của Cosmic Signature mà không đặt nét bút. Bạn có thể gửi kèm tiêu đề, lời nhắn và URL. Người đóng góp nhiều nhất mỗi chu kỳ có thể được giới thiệu trên trang chủ.",
     "formTitle": "Đóng góp",
     "amountLabel": "Số tiền (ETH)",
     "informationLabel": "Thông tin",
@@ -24,7 +24,7 @@
     "messagePlaceholder": "Để lại một lời nhắn tùy chọn cùng khoản đóng góp",
     "contributeWithMessage": "Đóng góp kèm lời nhắn",
     "contributeEth": "Đóng góp ETH",
-    "structuredHelp": "Các trường tùy chọn được lưu dưới dạng JSON có cấu trúc cho trang chi tiết đóng góp."
+    "structuredHelp": "Thông tin tùy chọn sẽ xuất hiện trên trang chi tiết đóng góp."
   },
   "detail": {
     "invalidId": "Mã đóng góp không hợp lệ",
@@ -36,7 +36,7 @@
     "notFound": "Không tìm thấy khoản đóng góp.",
     "subtitle": "Đóng góp #{id}",
     "contributionTitle": "Đóng góp",
-    "contributionDescription": "Bản ghi đóng góp trên chuỗi và bối cảnh chu kỳ.",
+    "contributionDescription": "Giao dịch đóng góp trên chuỗi và chu kỳ tương ứng.",
     "datetimeLabel": "Thời điểm đóng góp",
     "explorerHelp": "Mở giao dịch trên trình khám phá khối",
     "contributorAddressLabel": "Địa chỉ người đóng góp",
@@ -44,17 +44,17 @@
     "cycleValue": "Chu kỳ {cycle}",
     "amountLabel": "Số tiền",
     "messageTitle": "Lời nhắn của người đóng góp",
-    "messageDescription": "Các trường có cấu trúc từ dữ liệu đóng góp.",
+    "messageDescription": "Thông tin người đóng góp đã gửi kèm.",
     "titleLabel": "Tiêu đề",
     "messageLabel": "Lời nhắn",
     "urlLabel": "URL",
     "linkPreviewTitle": "Xem trước liên kết",
     "linkPreviewDescription": "Siêu dữ liệu lấy từ URL của người đóng góp.",
-    "metaDescriptionLabel": "Mô tả meta",
-    "metaKeywordsLabel": "Từ khóa meta",
-    "metaImageTitle": "Hình ảnh meta",
+    "metaDescriptionLabel": "Mô tả liên kết",
+    "metaKeywordsLabel": "Từ khóa",
+    "metaImageTitle": "Hình ảnh xem trước",
     "metaImageDescription": "Hình ảnh xem trước Open Graph hoặc mạng xã hội.",
-    "metaImageAlt": "Hình ảnh meta"
+    "metaImageAlt": "Hình ảnh xem trước liên kết"
   },
   "cycle": {
     "invalidNumber": "Số chu kỳ không hợp lệ",

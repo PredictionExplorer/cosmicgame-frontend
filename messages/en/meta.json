@@ -139,15 +139,15 @@
   },
   "publicGoodsCgContributions": {
     "title": "Protocol Public-Goods Contributions | Cosmic Signature",
-    "description": "Automatic forwards from the Cosmic Signature protocol to the Public Goods Beneficiary. Each cycle, a fixed share of the Cycle Reserve is forwarded to support public goods via the Cosmic Council."
+    "description": "Public Goods Allocations from each finalized Cosmic Signature cycle. Follow funds from the Cycle Reserve to the Public Goods Vault."
   },
   "publicGoodsRetrievals": {
     "title": "Public Goods Retrievals | Cosmic Signature",
-    "description": "Retrievals from the Public Goods Vault. Each cycle, a share of the Cycle Reserve is forwarded to a beneficiary address selected by the Cosmic Council."
+    "description": "Funds forwarded from the Cosmic Signature Public Goods Vault to its configured Public Goods recipient."
   },
   "publicGoodsVoluntary": {
     "title": "Voluntary Public-Goods Contributions | Cosmic Signature",
-    "description": "Voluntary contributions to the Public Goods Vault from the Cosmic Signature community. Contributions support beneficiaries selected through Cosmic Council coordination."
+    "description": "Voluntary contributions from the Cosmic Signature community to the Public Goods Vault for its configured recipient."
   },
   "allocationRetrieved": {
     "title": "Retrieved Allocations | Cosmic Signature",

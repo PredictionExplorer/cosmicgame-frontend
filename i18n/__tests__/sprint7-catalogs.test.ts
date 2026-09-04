@@ -39,12 +39,12 @@ describe('Sprint 7 focused catalogs', () => {
     expect(zhAdmin.outreachTransfer.restrictedTitle).toBe('访问受限');
   });
 
-  it('preserves the existing English rendering', () => {
+  it('pins the reviewed English rendering', () => {
     expect(enEthContribution.page.title).toBe('ETH Contributions');
     expect(enEthContribution.form.contributeWithMessage).toBe('Contribute with Message');
     expect(enPublicGoods.protocol.title).toBe('Protocol Public-Goods Contributions');
     expect(enMarketing.hero.title).toBe(
-      'E<legacy>arn</legacy> Rewards by <highlight>Spreading the Word</highlight>',
+      'Receive CST for <highlight>Spreading the Word</highlight>',
     );
     expect(enCoordination.page.title).toBe('Coordination Changes');
     expect(enAdmin.settings.title).toBe('Administrative methods');

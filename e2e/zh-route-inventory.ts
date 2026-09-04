@@ -509,7 +509,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/imprint',
     host: 'app',
     cluster: 'trust',
-    expectedText: '铭刻 RandomWalk NFT',
+    expectedText: '铭刻 Random Walk NFT',
   },
   {
     id: 'contracts',

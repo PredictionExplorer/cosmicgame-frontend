@@ -17,12 +17,11 @@ export const basicQuestionsTextZh = {
     },
     explanation:
       'Cosmic Signature 是程序化艺术协议：限时的演绎周期在一次次落笔中延展，收官时铭刻确定性的三体艺术作品。整条管线没有任何 AI 参与——作品是由种子驱动的物理计算，与文字提示词式的图像服务恰好相反。',
-    funFact:
-      '这个名字与知名的癌症突变数据库 COSMIC 撞了车。协议与它毫无关系——文档中专门写明了这一点。',
+    funFact: 'COSMIC 也是一个癌症突变数据库的名称，两者没有关联。协议文档对此有明确说明。',
     referenceLabel: '学习中心：什么是 Cosmic Signature？',
   },
   'what-is-a-gesture': {
-    prompt: '在协议术语中，"落笔"指什么？',
+    prompt: '在协议术语中，“落笔”指什么？',
     options: {
       a: '一次携带 ETH 或 CST 的链上行为：延长周期倒计时，并计入一次星选资格。',
       b: '为社区请愿收集的链下签名。',
@@ -30,7 +29,7 @@ export const basicQuestionsTextZh = {
       d: '在社区频道里发布的一条消息。',
     },
     explanation:
-      '落笔是协议唯一的输入。每一笔都携带 ETH 或 CST，把周期收官时间向后推，在本周期星选池中计入一次资格，还可能铭刻参与 CST。没有任何东西需要亲手去画——作品在收官时由种子计算而来。',
+      '落笔推动演绎周期。每一笔都携带 ETH 或 CST，把周期收官时间向后推，在本周期星选池中计入一次资格，还可能铭刻参与 CST。没有任何东西需要亲手去画——作品在收官时由种子计算而来。',
     referenceLabel: '白皮书 §4 · 落笔',
   },
   'two-currencies': {
@@ -92,7 +91,7 @@ export const basicQuestionsTextZh = {
     referenceLabel: '白皮书 §5.1 · 收官时的发放',
   },
   'compounding-reserve': {
-    prompt: '为什么每个演绎周期都以比上一周期更大的储备开场？',
+    prompt: '周期储备如何延续至下一个演绎周期？',
     options: {
       a: `每周期约 ${protocolFacts.compoundingReservePercentage}% 的储备从不发放——它滚入下一周期。`,
       b: '团队在周期之间补充储备。',
@@ -100,7 +99,7 @@ export const basicQuestionsTextZh = {
       d: '宇宙议会表决向储备注入新的 ETH。',
     },
     explanation:
-      '五条发放的 ETH 轨道合计正好一半，其余自动滚动累积。没有人补充任何东西，协议也无法凭空创造 ETH——增长纯粹是机械的。协议滚动累积，而非抽取。',
+      '五条 ETH 分配轨道合计约占储备的一半，其余会滚入下一周期。这不保证每个周期的储备都比上一周期更大；储备规模还取决于周期内新增的 ETH。',
     referenceLabel: '白皮书 §5.1 · 收官时的发放',
   },
   'art-engine': {
@@ -131,13 +130,13 @@ export const basicQuestionsTextZh = {
   'cst-supply-origin': {
     prompt: 'CST 从哪里来？',
     options: {
-      a: '供应量从零起步，只有协议合约能铭刻它——流通中的每一枚 CST 都能追溯到某个周期里的一次参与。',
+      a: '供应量从零起步，仅由协议合约按既定机制铭刻。',
       b: '上线时为团队预留了一大笔份额。',
       c: '上线前免费发放给了早期钱包。',
       d: '任何人调用代币合约都能铭刻 CST。',
     },
     explanation:
-      'CST 代币合约只接受协议合约的铭刻与销毁指令，供应量从零起步。没有上限，没有预留份额，也没有团队分配——耐心的参与是新 CST 的唯一来源。',
+      'CST 供应量从零起步，代币合约只接受协议合约的铭刻与销毁指令。新的 CST 来自既定机制：落笔时的参与 CST、周期收官时的表彰 CST，以及推广储备。合约没有硬性供应上限。',
     referenceLabel: '白皮书 §7 · CST 代币',
   },
   'cst-on-spend': {
@@ -149,7 +148,7 @@ export const basicQuestionsTextZh = {
       d: '周期收官时退还给 Rio。',
     },
     explanation:
-      '每笔 CST 落笔支付的全部价格都会销毁。这把代币供应量与真实使用绑在一起：沉寂的周期铭刻得少，活跃的 CST 使用又把供应量烧回去。没有任何金库来接收它——因为根本不存在。',
+      '每笔 CST 落笔支付的全部 CST 都会销毁，永久移出供应量，不会转入任何金库。供应量同时受各项铭刻机制影响，因此既取决于新铭刻的数量，也取决于落笔消耗的数量。',
     referenceLabel: '白皮书 §7.2 · 销毁与供应动态',
   },
   'public-goods-beneficiary': {
@@ -177,7 +176,7 @@ export const basicQuestionsTextZh = {
     referenceLabel: '白皮书 §8 · 锚定',
   },
   'anchor-once-ever': {
-    prompt: '之后 Mira 解锚了。下个月她还能再锚定这枚 NFT 吗？',
+    prompt: 'Mira 解锚了一枚 NFT。下个月还能再锚定这枚 NFT 吗？',
     options: {
       a: '不能——每枚 NFT 一生仅可锚定一次，解锚是永久的。',
       b: '可以，等一段冷却期就行。',
@@ -226,7 +225,7 @@ export const basicQuestionsTextZh = {
   'who-runs-cycles': {
     prompt: '每个周期的 ETH 如何发放，由谁决定？',
     options: {
-      a: '没有人——分配比例是已验证合约中的常量，收官时机械执行。',
+      a: '由合约执行——已验证合约会在收官时按协议规则分配。',
       b: '团队逐周期审核并签署发放。',
       c: '由一个预言机服务计算分配。',
       d: '由应用的后端服务器发出转账。',
@@ -291,7 +290,7 @@ export const basicQuestionsTextZh = {
       d: '协议承诺 NFT 的价值会随时间上涨。',
     },
     explanation:
-      '每条分配轨道流向的都是参与者、已锚定的 NFT、滚动储备或公共物品——不存在运营方抽成。白皮书不对价格、流动性或未来价值作任何承诺，并直言任何人都不应带着"凭他人努力获取金钱"的预期取得 CST 或 NFT。',
+      '每条分配轨道流向的都是参与者、已锚定的 NFT、滚动储备或公共物品——不存在运营方抽成。白皮书不对价格、流动性或未来价值作任何承诺，并直言任何人都不应带着“凭他人努力获取金钱”的预期取得 CST 或 NFT。',
     referenceLabel: '白皮书 §14.1 · Cosmic Signature 不是什么',
   },
   'where-recorded': {

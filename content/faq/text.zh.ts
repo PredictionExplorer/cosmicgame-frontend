@@ -3,7 +3,10 @@ import { protocolFacts } from '@/content/protocol-facts';
 import type { FAQText } from './structure';
 
 /** protocolFacts stores the example gaps as English strings; render them in zh. */
-const ELAPSED_ZH: Record<string, string> = {
+const ELAPSED_ZH: Record<
+  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
+  string
+> = {
   '0 seconds': '0 秒',
   '1 second': '1 秒',
   '60 seconds': '60 秒',
@@ -126,7 +129,7 @@ export const faqTextZh = {
       },
       'how-is-participation-cst-calculated': {
         question: '参与 CST 如何计算？',
-        answer: `参与 CST 按距上一笔落笔的时间，以平方根公式计算：${protocolFacts.dynamicCstRewardFormula}。采用平方根，是为了让较长的静默期获得更多 CST，同时避免数量永远线性增长。按协议上线时恰为 1 小时的时间增量计算，示例约为：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH[example.elapsed] ?? example.elapsed}后为 ${example.cst} CST`).join('、')}。每个周期收官后，时间增量会增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此实时数量会随时间逐渐略低于这些示例。落笔实际成交时，应以应用中的实时预览和合约计算为准。`,
+        answer: `参与 CST 按距上一笔落笔的时间，以平方根公式计算：${protocolFacts.dynamicCstRewardFormula}。采用平方根，是为了让较长的静默期获得更多 CST，同时避免数量永远线性增长。按协议上线时恰为 1 小时的时间增量计算，示例约为：${protocolFacts.dynamicCstRewardExamples.map((example) => `${ELAPSED_ZH[example.elapsed]}后为 ${example.cst} CST`).join('、')}。每个周期收官后，时间增量会增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，因此实时数量会随时间逐渐略低于这些示例。落笔实际成交时，应以应用中的实时预览和合约计算为准。`,
       },
       'why-minimum-cst-reward-protection': {
         question: '什么是最低 CST 铭刻保护？',
@@ -144,7 +147,7 @@ export const faqTextZh = {
       'what-is-endurance-champion': {
         question: '什么是坚守冠军？',
         answer:
-          '一个周期内，保持"最近一笔落笔者"身份时间最长的参与者，即下一笔落笔出现前拥有最长连续间隔的人，会成为坚守冠军。周期收官时，坚守冠军将获得 1,000 CST 的表彰铭刻与 1 枚 Cosmic Signature NFT。',
+          '一个周期内，保持“最近一笔落笔者”身份时间最长的参与者，即下一笔落笔出现前拥有最长连续间隔的人，会成为坚守冠军。周期收官时，坚守冠军将获得 1,000 CST 的表彰铭刻与 1 枚 Cosmic Signature NFT。',
       },
       'what-is-final-cst-gesture': {
         question: '什么是 CST 收官之笔？',
@@ -172,7 +175,7 @@ export const faqTextZh = {
       'what-if-two-gestures-same-time': {
         question: '两笔落笔同时提交会怎样？',
         answer:
-          'Arbitrum 交易按照排序器纳入区块的顺序处理。若两笔落笔在同一时刻到达，先获确认的一笔为有效落笔。',
+          'Arbitrum 的排序器会确定交易顺序。每笔落笔都按执行时的协议状态检查；后一笔仍可能成功，但前一笔可能改变落笔价格或参与 CST 铭刻量。若变化超出你设置的保护范围，交易就会回退。',
       },
       'is-there-game-theory': {
         question: '参与 Cosmic Signature 是否需要策略？',
@@ -212,7 +215,7 @@ export const faqTextZh = {
       },
       'is-nft-supply-limited': {
         question: 'Cosmic Signature NFT 的数量有限吗？',
-        answer: `从实际发行节奏看，是的。每个周期收官后，每笔落笔增加的时间都会增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，使周期逐渐变长、NFT 铭刻速度逐步放缓。合约并未设置硬性供应上限，但不断放慢的周期节奏会让 Cosmic Signature NFT 随时间日益稀缺。`,
+        answer: `合约没有硬性供应上限。每个周期收官后，落笔时间增量会增长 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%，通常会使周期变长、NFT 铭刻节奏放缓。实际铭刻速度也取决于参与情况。`,
       },
       'impact-of-limiting-nfts': {
         question: 'NFT 供应增速受限会带来什么影响？',
@@ -247,7 +250,7 @@ export const faqTextZh = {
       'donate-nfts-to-game': {
         question: '其他 NFT 项目如何向某个周期贡献代币？',
         answer:
-          '项目方可在落笔界面的"高级"面板中附加 ERC-721 或 ERC-20 代币。填写合约地址、代币 ID 或数量后提交落笔。附加的代币会由分配钱包托管，并在周期收官后流向签名分配获配者。',
+          '项目方可在落笔界面的“高级”面板中附加 ERC-721 或 ERC-20 代币。填写合约地址、代币 ID 或数量后提交落笔。附加的代币会由分配钱包托管，并在周期收官后流向签名分配获配者。',
       },
     },
   },
@@ -258,7 +261,7 @@ export const faqTextZh = {
       'what-is-arbitrum': {
         question: 'Arbitrum 是什么？Cosmic Signature 为什么部署在这里？',
         answer:
-          'Arbitrum 是以太坊 Layer 2 汇总网络，可加快交易并降低费用。Cosmic Signature 部署在 Arbitrum 上，既能把燃料费降至不足 1 美分并更快确认交易，又能保留以太坊的安全保障。',
+          'Arbitrum 是以太坊 Layer 2 汇总网络，旨在以更低成本处理交易。Cosmic Signature 使用它来支持频繁的链上交互。费用会随网络状况变化，Arbitrum 也有自身的执行与结算规则。',
       },
       'why-arbitrum-not-ethereum': {
         question: '为什么选择 Arbitrum，而不是以太坊主网？',
@@ -283,7 +286,7 @@ export const faqTextZh = {
       'view-tokens-on-arbitrum': {
         question: '如何查看 Arbitrum 上的 CST 与 Cosmic Signature NFT？',
         answer:
-          '可以直接在 Cosmic Signature 网站查看，也可手动把合约地址添加至钱包。所有合约地址都公布在"合约"页面与社区 Discord 中。',
+          '可以直接在 Cosmic Signature 网站查看，也可手动把合约地址添加至钱包。所有合约地址都公布在“合约”页面与社区 Discord 中。',
       },
       'trade-on-arbitrum': {
         question: '可以在 Arbitrum 上交易 Cosmic Signature NFT 与 CST 吗？',
@@ -298,7 +301,7 @@ export const faqTextZh = {
       'game-security': {
         question: '协议如何保障安全？',
         answer:
-          'Cosmic Signature 公开合约地址、源代码资源与验证背景，便于社区独立检查协议行为。智能合约已由独立安全机构 Hacken 完成审计，完整报告见"审计"页面。',
+          'Cosmic Signature 公开合约地址、源代码资源与验证背景，便于社区独立检查协议行为。智能合约已由独立安全机构 Hacken 完成审计，完整报告见“审计”页面。',
       },
       'fees-involved': {
         question: '参与需要支付哪些费用？',
@@ -322,7 +325,7 @@ export const faqTextZh = {
           '不会。协议稳定后，所有权将移交宇宙议会。此后，参数只能通过达到协调法定权重的协议协调提案变更。',
       },
       'what-is-renounce-ownership': {
-        question: '"放弃所有权"是什么意思？',
+        question: '“放弃所有权”是什么意思？',
         answer:
           '放弃所有权是 Ownable 合约的一项函数，会永久把控制权从部署者地址移走。调用后，任何特权角色都无法再修改合约参数。',
       },
@@ -358,7 +361,7 @@ export const faqTextZh = {
       },
       'get-help': {
         question: '遇到问题时，如何获得帮助？',
-        answer: '可通过 Discord、X / Twitter，以及"联系方式"页面所列的支持邮箱联系社区与支持团队。',
+        answer: '可使用“关于”页面列出的官方 Discord、X / Twitter 链接或支持邮箱联系我们。',
       },
       'stay-updated': {
         question: '如何关注 Cosmic Signature 的最新动态？',

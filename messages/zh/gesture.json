@@ -11,7 +11,7 @@
   },
   "empty": {
     "title": "未找到落笔信息。",
-    "help": "此 ID 可能无效，或这一笔尚未进入当前索引。"
+    "help": "此 ID 可能无效，或这一笔尚未被索引收录。"
   },
   "sections": {
     "transaction": {
@@ -51,7 +51,7 @@
     "paidWithCst": "是否使用 CST（ERC-20）支付",
     "randomWalkId": "Random Walk NFT ID",
     "erc20Address": "已附加 ERC-20 代币地址",
-    "erc20Amount": "已附加 ERC-20 代币数量（ETH）",
+    "erc20Amount": "已附加 ERC-20 代币数量",
     "nftAddress": "已附加 NFT 代币地址",
     "nftId": "已附加 NFT 代币 ID",
     "nftTokenUri": "NFT Token URI"

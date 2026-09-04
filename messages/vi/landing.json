@@ -7,32 +7,32 @@
     },
     "phases": {
       "loading": {
-        "title": "Đang đồng bộ chân trời chu kỳ",
-        "body": "Đang đọc đồng hồ giao thức trực tiếp trước khi hiển thị đếm ngược."
+        "title": "Đang đồng bộ thời gian chu kỳ",
+        "body": "Đang lấy thời gian từ giao thức để hiển thị đếm ngược."
       },
       "openingSoon": {
         "title": "{cycle} sắp mở",
-        "body": "Chu kỳ tiếp theo đang chuẩn bị mở. Khi đếm ngược về không, nét bút sẽ sẵn sàng."
+        "body": "Chu kỳ tiếp theo sắp mở. Bạn có thể đặt nét bút khi đếm ngược về 0."
       },
       "waitingFirstGesture": {
         "title": "{cycle} đang chờ nét bút đầu tiên",
-        "body": "Nét bút đầu tiên khởi động thời điểm hoàn tất chu kỳ và bắt đầu định hình Signature tiếp theo."
+        "body": "Nét bút đầu tiên bắt đầu đếm ngược đến khi hoàn tất chu kỳ và định hình Signature tiếp theo."
       },
       "approach": {
         "title": "{cycle} hoàn tất sau",
-        "body": "Chu kỳ đang diễn ra. Mỗi nét bút định hình Signature và có thể kéo dài đồng hồ hoàn tất."
+        "body": "Chu kỳ đang diễn ra. Mỗi nét bút định hình Signature và có thể kéo dài thời gian đến khi hoàn tất."
       },
       "finalHour": {
         "title": "{cycle} đang bước vào giờ cuối",
-        "body": "Mỗi nét bút mới có thể kéo dài chân trời và để lại thêm một dấu vết trên Signature đang biến chuyển."
+        "body": "Mỗi nét bút mới có thể kéo dài chu kỳ và để lại thêm dấu vết trên Signature đang hình thành."
       },
       "nearHorizon": {
-        "title": "{cycle} đang tiến gần chân trời",
+        "title": "{cycle} sắp đến thời điểm hoàn tất",
         "body": "Thời điểm hoàn tất chu kỳ đã cận kề. Những khoảnh khắc tiếp theo sẽ quyết định hình dạng cuối cùng."
       },
       "ready": {
         "title": "{cycle} đã sẵn sàng hoàn tất",
-        "body": "Chân trời đã khép lại. Giao thức sẵn sàng chuyển chu kỳ thành một Signature cuối cùng."
+        "body": "Đếm ngược đã về 0. Giao thức đã sẵn sàng hoàn tất chu kỳ và khắc Signature."
       },
       "unavailable": {
         "title": "Đồng hồ chu kỳ trực tiếp không khả dụng",
@@ -40,7 +40,7 @@
       },
       "live": {
         "title": "{cycle} hoàn tất sau",
-        "body": "Đây chính là thời điểm hoàn tất chu kỳ trực tiếp được hiển thị trong ứng dụng. Mỗi nét bút định hình Signature và có thể kéo dài chân trời."
+        "body": "Thời gian đến khi hoàn tất chu kỳ được đồng bộ với ứng dụng. Mỗi nét bút định hình Signature và có thể kéo dài chu kỳ."
       }
     },
     "staticClock": {

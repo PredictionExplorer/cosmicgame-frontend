@@ -28,7 +28,7 @@ export const landingTextEn = {
     headlineLead: 'Cosmic Signature: Procedural On-Chain Art on',
     headlineAccent: 'Arbitrum',
     subhead:
-      'Every Gesture Shapes the Signature. Make a gesture during a Performance Cycle, and every gesture shapes the cycle’s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including the infrastructure Ethereum itself depends on.',
+      'Every gesture helps shape the cycle’s final Signature. Take part during a Performance Cycle; when it finalizes, the protocol distributes its reserves across more than ten allocation tracks, including support for the infrastructure Ethereum depends on.',
     biologyDisclaimer:
       'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
     primaryCtaLabel: 'Open the App',
@@ -59,9 +59,9 @@ export const landingTextEn = {
 
   cycle: {
     eyebrow: 'The Cycle',
-    heading: 'A Performance Cycle, from open to finalization.',
+    heading: 'A Performance Cycle, from opening to finalization.',
     description:
-      'A cycle is a window in time. It opens with a Calibration Window, fills with gestures, and finalizes when the Cycle Finalization Time expires. No houses. No dealers. Just the protocol.',
+      'A cycle opens with a Calibration Window and evolves as participants make gestures. Once the Cycle Finalization Time expires, the cycle can be finalized and its allocations distributed.',
     stages: {
       opening: {
         title: 'Cycle Opening',
@@ -84,13 +84,12 @@ export const landingTextEn = {
 
   art: {
     eyebrow: 'The Art',
-    heading: 'The Three Body Problem, rendered on-chain.',
+    heading: 'Three-body physics. Art from an on-chain seed.',
     description:
       'Every Cosmic Signature NFT visualizes three celestial bodies orbiting under Newtonian gravity. Three bodies produce fundamentally chaotic trajectories. No AI. No training data. Just deterministic physics. Same seed → identical output, pixel for pixel.',
     loading: {
-      label: 'Live archive syncing',
-      description:
-        'Real generated NFTs appear here as soon as indexed token metadata is available.',
+      label: 'Loading the collection',
+      description: 'Artwork appears here as soon as the collection data is available.',
     },
     showcase: {
       liveLabel: 'Live Signature',
@@ -373,8 +372,8 @@ export const landingTextEn = {
   },
 
   notFound: {
-    heading: 'Off the star map.',
-    description: 'This coordinate has drifted outside the protocol. Return to the Signature.',
-    ctaLabel: 'Back to the Signature',
+    heading: 'Page not found',
+    description: 'This page may have moved, or the address may be incorrect.',
+    ctaLabel: 'Back to the home page',
   },
 } satisfies LandingText;

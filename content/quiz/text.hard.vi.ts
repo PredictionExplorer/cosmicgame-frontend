@@ -14,7 +14,7 @@ const viDecimal = (value: string | number): string => String(value).replace('.',
 export const hardQuestionsTextVi = {
   'late-gesture-semantics': {
     prompt:
-      'Đếm ngược đã hết hạn một phút trước, nhưng chưa ai hoàn tất. Fen lén đặt một nét bút. Chính xác nó làm gì?',
+      'Đếm ngược đã hết hạn một phút trước, nhưng chưa ai hoàn tất. Fen đặt một nét bút. Chính xác nó làm gì?',
     options: {
       a: 'Nó cộng một mức tăng vào thời điểm hoàn tất đã lưu và giành lấy vị trí nét bút cuối cùng \u2014 nó không khởi động lại đồng hồ.',
       b: 'Nó khởi động lại toàn bộ đếm ngược từ thời điểm hiện tại.',
@@ -22,7 +22,7 @@ export const hardQuestionsTextVi = {
       d: 'Nó được tính cho chu kỳ tiếp theo.',
     },
     explanation:
-      'Việc kéo dài áp lên thời gian đã lưu, không phải thời điểm hiện tại. Một nét bút đặt sau khi hết hạn nhưng trước khi việc hoàn tất được thực thi cộng một mức tăng vào giá trị đã lưu và giành lấy vị trí nét bút cuối cùng. Đồng hồ không bao giờ khởi động lại \u2014 đó là lý do những cú giành vị trí muộn luôn mỏng như lưỡi dao.',
+      'Việc kéo dài áp lên thời gian đã lưu, không phải thời điểm hiện tại. Một nét bút đặt sau khi hết hạn nhưng trước khi việc hoàn tất được thực thi cộng một mức tăng vào giá trị đã lưu và giành lấy vị trí nét bút cuối cùng. Đếm ngược không được đặt lại từ thời điểm hiện tại, nên sau nét bút muộn này, chu kỳ vẫn có thể đã đủ điều kiện hoàn tất.',
     referenceLabel: 'Sách trắng \u00a73.2 \u2014 Đếm ngược',
   },
   'refusing-beneficiary': {
@@ -35,7 +35,7 @@ export const hardQuestionsTextVi = {
       d: 'Giao thức tạm dừng cho đến khi chủ sở hữu can thiệp.',
     },
     explanation:
-      'Phân bổ Signature được đẩy đến người nhận trong lúc hoàn tất, nên một người nhận từ chối ETH khiến chính lời gọi hoàn tất của mình bị hoàn nguyên. Giao thức không bận tâm: khi cửa sổ độc quyền trôi qua, cửa sổ hoàn tất mở cho bất kỳ ai hoàn tất và tự trở thành người nhận. Một ví đối nghịch chỉ có thể phá hỏng vị trí của chính nó.',
+      'Phân bổ Signature được đẩy đến người nhận trong lúc hoàn tất, nên một người nhận từ chối ETH khiến chính lời gọi hoàn tất của mình bị hoàn nguyên. Cơ chế xử lý trường hợp này như sau: khi cửa sổ độc quyền trôi qua, cửa sổ hoàn tất mở cho bất kỳ ai hoàn tất và tự trở thành người nhận. Ví từ chối ETH không thể giữ quyền hoàn tất vô thời hạn.',
     referenceLabel: 'Sách trắng \u00a73.3 \u2014 Hoàn tất',
   },
   'refusing-chrono': {
@@ -48,7 +48,7 @@ export const hardQuestionsTextVi = {
       d: 'Hội đồng Vũ trụ chuyển hướng phần đó sang một địa chỉ khác.',
     },
     explanation:
-      'Kéo thay cho đẩy: các phân bổ ETH phụ nằm trong ký quỹ thay vì được gửi trong lúc hoàn tất, chính là để không hợp đồng người nhận nào có thể chặn một chu kỳ khép lại. ETH của ví đối nghịch chờ trong ví phân bổ \u2014 nơi mà, nếu không được nhận về đủ lâu, cuối cùng nó thuộc về bất kỳ ai.',
+      'Người nhận tự nhận về thay vì nhận chuyển trực tiếp: các phân bổ ETH phụ nằm trong ký quỹ thay vì được gửi trong lúc hoàn tất, chính là để không hợp đồng người nhận nào có thể chặn một chu kỳ khép lại. ETH của ví đối nghịch chờ trong ví phân bổ \u2014 nơi mà, nếu không được nhận về đủ lâu, cuối cùng nó thuộc về bất kỳ ai.',
     referenceLabel: 'Sách trắng \u00a711.2 \u2014 Thiết kế phòng vệ',
   },
   'public-goods-transfer-fails': {
@@ -61,7 +61,7 @@ export const hardQuestionsTextVi = {
       d: 'Phần đó lặng lẽ được cộng vào phân bổ của người nhận chu kỳ.',
     },
     explanation:
-      'Chuyển tiếp chịu lỗi là một lựa chọn thiết kế có chủ đích: một sự cố ở Kho Hàng hóa công không bao giờ được làm kẹt một chu kỳ. Hoàn tất hoàn thành, sự cố được ghi trên chuỗi, và việc chuyển tiếp được xử lý sau. Hãy so với cú đẩy cho người nhận chu kỳ, vốn có bị hoàn nguyên \u2014 nhưng chỉ chính giao dịch của người gọi.',
+      'Chuyển tiếp chịu lỗi là một lựa chọn thiết kế có chủ đích: một sự cố ở Kho Hàng hóa công không bao giờ được làm kẹt một chu kỳ. Hoàn tất hoàn thành, sự cố được ghi trên chuỗi, và việc chuyển tiếp được xử lý sau. Khác với khoản chuyển trực tiếp cho người nhận chu kỳ, giao dịch có thể bị hoàn nguyên \u2014 nhưng chỉ chính giao dịch của người gọi.',
     referenceLabel: 'Sách trắng \u00a711.2 \u2014 Thiết kế phòng vệ',
   },
   'no-anchored-nfts': {
@@ -87,7 +87,7 @@ export const hardQuestionsTextVi = {
       d: `${cst(protocolFacts.specialAllocationCst)} CST của nó bị đốt để phản đối.`,
     },
     explanation:
-      'Chu kỳ không có nét bút CST đơn giản bỏ qua luồng nét bút CST cuối cùng \u2014 không có người nhận thay thế nào được chỉ định, và hoàn tất diễn ra bình thường. Nguyên tắc bỏ-qua-không-thay-thế cũng áp dụng cho Tinh tuyển Random Walk neo giữ khi không có gì đang neo giữ.',
+      'Chu kỳ không có nét bút CST đơn giản bỏ qua luồng nét bút CST cuối cùng \u2014 không có người nhận thay thế nào được chỉ định, và hoàn tất diễn ra bình thường. Nguyên tắc bỏ qua luồng mà không chỉ định người thay thế cũng áp dụng cho Tinh tuyển Random Walk neo giữ khi không có gì đang neo giữ.',
     referenceLabel: 'Sách trắng \u00a75.1 \u2014 Phân phối khi hoàn tất',
   },
   'randomness-sources': {
@@ -111,7 +111,7 @@ export const hardQuestionsTextVi = {
       d: 'Người tham gia có nhiều nét bút có thể dự đoán các lượt chọn.',
     },
     explanation:
-      'Sự cân nhắc được nói ra, không giấu đi: về nguyên tắc, sequencer có thể ảnh hưởng đến các đầu vào cấp khối. Thiết kế giới hạn bán kính ảnh hưởng \u2014 các lượt chọn Tinh tuyển và seed nghệ thuật là những nơi duy nhất tiêu thụ độ ngẫu nhiên, cấu trúc được dùng một lần mỗi lần hoàn tất, và hoàn tất là một giao dịch công khai bất kỳ ai cũng có thể gửi.',
+      'Sự cân nhắc được nói ra, không giấu đi: về nguyên tắc, sequencer có thể ảnh hưởng đến các đầu vào cấp khối. Thiết kế giới hạn phạm vi ảnh hưởng \u2014 các lượt chọn Tinh tuyển và seed nghệ thuật là những nơi duy nhất tiêu thụ độ ngẫu nhiên, cấu trúc được dùng một lần mỗi lần hoàn tất, và hoàn tất là một giao dịch công khai bất kỳ ai cũng có thể gửi.',
     referenceLabel: 'Sách trắng \u00a711.3 \u2014 Độ ngẫu nhiên',
   },
   'precompile-unavailable': {
@@ -124,7 +124,7 @@ export const hardQuestionsTextVi = {
       d: 'Chủ sở hữu cung cấp một seed thay thế.',
     },
     explanation:
-      'Mọi nguồn entropy đều là tùy chọn theo thiết kế: nếu một lời gọi precompile không khả dụng, cấu trúc chỉ đơn giản gộp những nguồn còn lại. Chủ đề này lặp lại xuyên suốt giao thức \u2014 không gì bên ngoài, kể cả precompile của chính Arbitrum, được phép giữ việc hoàn tất làm con tin.',
+      'Mọi nguồn entropy đều là tùy chọn theo thiết kế: nếu một lời gọi precompile không khả dụng, cấu trúc chỉ đơn giản gộp những nguồn còn lại. Chủ đề này lặp lại xuyên suốt giao thức \u2014 không gì bên ngoài, kể cả precompile của chính Arbitrum, được phép ngăn chu kỳ hoàn tất.',
     referenceLabel: 'Sách trắng \u00a711.3 \u2014 Độ ngẫu nhiên',
   },
   'v2-flat-cst-problem': {
@@ -149,7 +149,7 @@ export const hardQuestionsTextVi = {
       d: 'Nó là một khoản thuế trên nét bút do Hội đồng kiểm soát.',
     },
     explanation:
-      'CST tham gia phụ thuộc vào thời gian kể từ nét bút trước \u2014 và khoảng cách đó có thể co lại giữa lúc ký và lúc thực thi nếu ai khác đến trước. Bảo đảm khắc tối thiểu cho người tham gia nêu sàn của mình, biến một nỗi thất vọng thầm lặng thành một lần hoàn nguyên sạch sẽ.',
+      'CST tham gia phụ thuộc vào thời gian kể từ nét bút trước \u2014 và khoảng cách đó có thể co lại giữa lúc ký và lúc thực thi nếu ai khác đến trước. Bảo đảm khắc tối thiểu cho người tham gia nêu sàn của mình, biến việc nhận ít CST hơn dự kiến thành một giao dịch bị hoàn nguyên theo giới hạn đã chọn.',
     referenceLabel: 'Sách trắng \u00a712.2 \u2014 Nâng cấp V2',
   },
   'v2-exclusivity-change': {
@@ -172,7 +172,7 @@ export const hardQuestionsTextVi = {
       d: 'NFT đang neo giữ có thể được gỡ neo và neo giữ lại trong một giao dịch.',
     },
     explanation:
-      'Khi chi phí CST đã giảm về gần không, những nét bút sau hết hạn gần như không tốn gì \u2014 và nếu mỗi nét kéo dài thời hạn từ thời điểm hiện tại, một chu kỳ có thể bị kéo lê vô thời hạn với vài xu. Neo việc kéo dài vào thời gian đã lưu đã đóng lỗ hổng; cùng đợt nâng cấp đó siết chặt phép tính lịch trình để không cấu hình tham số nào có thể ngăn việc hoàn tất.',
+      'Khi chi phí CST đã giảm về gần không, những nét bút sau hết hạn gần như không tốn gì \u2014 và nếu mỗi nét kéo dài thời hạn từ thời điểm hiện tại, một chu kỳ có thể bị kéo lê vô thời hạn với chi phí rất thấp. Neo việc kéo dài vào thời gian đã lưu đã đóng lỗ hổng; cùng đợt nâng cấp đó siết chặt phép tính lịch trình để không cấu hình tham số nào có thể ngăn việc hoàn tất.',
     referenceLabel: 'Sách trắng \u00a712.2 \u2014 Nâng cấp V2',
   },
   'v3-what-changes': {
@@ -191,51 +191,51 @@ export const hardQuestionsTextVi = {
     prompt:
       'Hệ số cộng thêm của V3 là m(t) = 1 + 9\u00b7(t/T)\u2078. Vì sao số mũ bậc tám quan trọng?',
     options: {
-      a: 'Hệ số gần như vô hình trong phần lớn cửa sổ và chỉ dốc lên ở những phút cuối \u2014 khoảng 1,04 lần khi còn mười phút, 1,9 lần khi còn năm, 7 lần khi còn một, và 10 lần ở không.',
+      a: 'Hệ số gần như vô hình trong phần lớn cửa sổ và chỉ dốc lên ở những phút cuối \u2014 khoảng 1,04 lần khi còn mười phút, 1,9 lần khi còn năm, 7 lần khi còn một, và 10 lần tại thời điểm đếm ngược về 0.',
       b: 'Nó khiến hệ số tăng tuyến tính xuyên cửa sổ.',
       c: 'Nó áp trọn 10 lần cho toàn bộ cửa sổ cuối.',
       d: 'Nó chỉ ảnh hưởng đến nét bút CST.',
     },
     explanation:
-      'Một đường tăng bậc tám dồn gần như toàn bộ mức tăng vào những phút cuối: sự tham gia bình thường xuyên cửa sổ hầu như không nhận ra, trong khi một cú tập kích thời hạn phải chịu chi phí rất cao. Đường tuyến tính sẽ đánh thuế cả cửa sổ; mức 10 lần phẳng sẽ đánh thuế mọi người như nhau \u2014 số mũ là thứ nhắm hệ số cộng thêm đúng vào những kẻ rình rập.',
+      'Đường tăng bậc tám tập trung phần lớn mức tăng chi phí vào những phút cuối. Nét bút ở đầu cửa sổ chịu mức tăng nhỏ, còn nét bút gần thời hạn chịu mức tăng lớn. Đường tuyến tính hoặc hệ số cố định 10 lần sẽ phân bố mức tăng theo cách khác.',
     referenceLabel: 'Sách trắng \u00a712.3 \u2014 Nâng cấp V3 dự kiến',
   },
   'v3-overtime': {
     prompt:
-      'Dưới V3, Zed chờ đến sau khi thời hạn trôi qua và đặt nét bút trong giờ bù. Hệ số nào được áp?',
+      'Dưới V3, Zed chờ đến sau khi thời hạn trôi qua và đặt nét bút sau thời hạn. Hệ số nào được áp?',
     options: {
-      a: 'Trọn 10 lần \u2014 hệ số chạm 10 lần tại thời hạn và giữ ở đó cho mọi nét bút trong giờ bù.',
-      b: 'Không có \u2014 nét bút trong giờ bù trở về 1 lần.',
+      a: 'Trọn 10 lần \u2014 hệ số chạm 10 lần tại thời hạn và giữ ở đó cho mọi nét bút sau thời hạn.',
+      b: 'Không có \u2014 nét bút sau thời hạn trở về 1 lần.',
       c: 'Một nửa mức tối đa, 5 lần.',
-      d: 'Nét bút trong giờ bù bị chặn hoàn toàn dưới V3.',
+      d: 'Nét bút sau thời hạn bị chặn hoàn toàn dưới V3.',
     },
     explanation:
-      'Hệ số tăng lên 10 lần tại thời hạn và giữ ở 10 lần cho bất kỳ nét bút nào đặt trong giờ bù. Việc giành vị trí sau hết hạn vẫn khả thi \u2014 quy tắc thời gian đã lưu của V2 vẫn điều khiển đồng hồ \u2014 nhưng dưới V3 chúng là những tuyên bố đắt giá thay vì những cú tập kích không tốn gì.',
+      'Hệ số tăng lên 10 lần tại thời hạn và giữ ở 10 lần cho bất kỳ nét bút nào đặt sau thời hạn. Việc giành vị trí sau hết hạn vẫn khả thi \u2014 quy tắc thời gian đã lưu của V2 vẫn điều khiển đồng hồ \u2014 nhưng dưới V3 những nét bút này phải chịu hệ số chi phí cao hơn.',
     referenceLabel: 'Sách trắng \u00a712.3 \u2014 Nâng cấp V3 dự kiến',
   },
   'owner-mid-cycle': {
     prompt:
       'Giữa chu kỳ, chủ sở hữu quyết định một tỷ lệ cần thay đổi và hợp đồng cần nâng cấp. Chủ sở hữu thực sự có thể làm gì ngay lúc này?',
     options: {
-      a: 'Không gì cả \u2014 các tham số cốt lõi bị khóa và không thể nâng cấp trong khi một chu kỳ đang chạy; hành động của chủ sở hữu nằm ở khoảng trống giữa các chu kỳ.',
+      a: 'Việc thay đổi tỷ lệ và nâng cấp hợp đồng phải chờ đến khoảng giữa các chu kỳ; tham số cốt lõi bị khóa khi chu kỳ đang diễn ra.',
       b: 'Thay đổi tỷ lệ ngay lập tức, nhưng không thay mã.',
       c: 'Nâng cấp hợp đồng, nhưng không thay tham số.',
       d: 'Cả hai, với một chữ ký đồng thuận của Hội đồng.',
     },
     explanation:
-      'Trong khi một chu kỳ đang chạy, chủ sở hữu không thể thay đổi tỷ lệ, mức tăng hay chi phí, và không thể nâng cấp hợp đồng. Cố ý không có cơ chế nào để thay đổi hợp đồng giữa chu kỳ, bất kể hoàn cảnh \u2014 người tham gia luôn hành động theo những quy tắc hiển thị khi chu kỳ mở.',
+      'Khi chu kỳ đang diễn ra, chủ sở hữu không thể thay đổi các tỷ lệ cốt lõi, mức tăng thời gian hay chi phí nét bút, cũng không thể nâng cấp hợp đồng giao thức. Những quyền hẹp hơn, chẳng hạn một số thiết lập của hợp đồng phụ trợ, có giới hạn được mô tả riêng.',
     referenceLabel: 'Sách trắng \u00a713 \u2014 Con đường đến phi tập trung hoàn toàn',
   },
   'owner-cannot-reach': {
     prompt: 'Điều nào trong số này chủ sở hữu có thể chạm tới, ngay cả giữa các chu kỳ?',
     options: {
-      a: 'Không điều nào: phân bổ ký quỹ, NFT đã khắc, seed đã ghi và số dư CST đều nằm ngoài mọi quyền của chủ sở hữu.',
+      a: 'Các chức năng quản trị được mô tả không cho phép trực tiếp chuyển quyền đối với những tài sản này hoặc sửa các bản ghi này.',
       b: 'Phân bổ ký quỹ, nhưng không gì khác.',
       c: 'Seed đã ghi, để sửa tác phẩm bị hỏng.',
       d: 'Số dư CST, trong trường hợp khẩn cấp.',
     },
     explanation:
-      'Không quyền nào của chủ sở hữu chạm tới phân bổ ký quỹ, NFT đã khắc, seed đã ghi hay số dư CST của bất kỳ ai \u2014 và không ví nào của đội ngũ nhận ETH từ nét bút. Quyền lực thực sự của chủ sở hữu rất hẹp: điều chỉnh thời gian giữa các chu kỳ và quản lý ngoại vi như URI siêu dữ liệu và đơn vị thụ hưởng của kho.',
+      'Các chức năng quản trị được mô tả không cho phép trực tiếp thay đổi người nhận phân bổ ký quỹ, quyền sở hữu NFT đã khắc, seed đã ghi hoặc số dư CST. Chủ sở hữu vẫn giữ quyền nâng cấp giữa các chu kỳ theo phạm vi đã công bố, cho đến khi từ bỏ quyền kiểm soát đặc quyền.',
     referenceLabel: 'Sách trắng \u00a713 \u2014 Con đường đến phi tập trung hoàn toàn',
   },
   'owner-endgame': {
@@ -284,7 +284,7 @@ export const hardQuestionsTextVi = {
       d: 'Nghiệm dạng đóng của các phương trình ba vật thể.',
     },
     explanation:
-      'Bộ tích phân symplectic tôn trọng hình học của các hệ Hamilton, nên năng lượng không trôi qua một triệu bước \u2014 các quỹ đạo giữ được sự trung thực vật lý trong toàn bộ mô phỏng. Và không có đường tắt dạng đóng nào: bài toán ba vật thể không có nghiệm giải tích tổng quát, đó chính là toàn bộ ý nghĩa nghệ thuật.',
+      'Bộ tích phân symplectic bảo toàn cấu trúc hình học của hệ Hamilton, giúp mô phỏng ổn định trong thời gian dài. Phương pháp này không bảo đảm sai số năng lượng bằng 0. Quy trình sử dụng mô phỏng số vì bài toán ba vật thể không có nghiệm dạng đóng tổng quát.',
     referenceLabel: 'Sách trắng \u00a76.1 \u2014 Quy trình',
   },
   'art-candidates': {
@@ -308,7 +308,7 @@ export const hardQuestionsTextVi = {
       d: 'Do chủ sở hữu đầu tiên của NFT chọn lúc khắc.',
     },
     explanation:
-      'Màu được pha trong OKLab \u2014 một không gian cảm nhận nơi các khoảng cách số bằng nhau trông khác nhau như nhau với mắt người \u2014 với độ tách sắc 120 độ giữ ba vật thể phân biệt rõ về thị giác. Như mọi thứ phía sau seed, bảng màu là tất định.',
+      'Màu được pha trong OKLab \u2014 một không gian cảm nhận nơi các khoảng cách số bằng nhau tạo ra mức chênh lệch màu gần tương đương trong cảm nhận của mắt người \u2014 với độ tách sắc 120 độ giữ ba vật thể phân biệt rõ về thị giác. Như mọi thứ phía sau seed, bảng màu là tất định.',
     referenceLabel: 'Sách trắng \u00a76.1 \u2014 Quy trình',
   },
   'art-spectral': {
@@ -338,13 +338,13 @@ export const hardQuestionsTextVi = {
   'art-server-death': {
     prompt: 'Mọi máy chủ gắn với dự án biến mất vào ngày mai. Điều gì xảy ra với tác phẩm?',
     options: {
-      a: 'Mọi Signature đều có thể tạo lại từ chuỗi \u2014 seed nằm trên chuỗi và quy trình là công khai.',
+      a: 'Mọi Signature có thể được tái tạo từ seed trên chuỗi bằng quy trình kết xuất mã nguồn mở.',
       b: 'Nghệ thuật mất; chỉ siêu dữ liệu còn lại.',
       c: 'Chỉ ảnh thu nhỏ còn lại trong ví.',
       d: 'Tùy vào việc các bản ghim IPFS có được duy trì không.',
     },
     explanation:
-      'Vì mọi seed được lưu trên chuỗi và quy trình kết xuất là mã nguồn mở và tất định, bộ sưu tập không phụ thuộc vào máy chủ nào. Bất kỳ ai cũng có thể tạo lại bất kỳ Signature nào, đến từng điểm ảnh, chỉ từ chuỗi \u2014 tuyên bố về khả năng tồn tại mạnh nhất mà một bộ sưu tập NFT có thể đưa ra.',
+      'Seed được lưu trên chuỗi, còn quy trình kết xuất mã nguồn mở là tất định. Khi có seed và mã nguồn, bạn có thể tái tạo Signature đến từng điểm ảnh mà không cần máy chủ của dự án.',
     funFact:
       'Tích hợp liên tục kiểm định mã băm SHA-256 của các khung hình đã kết xuất, nên ngay cả một sai lệch vô tình một điểm ảnh trong quy trình cũng làm bản dựng thất bại.',
     referenceLabel: 'Sách trắng \u00a76.2 \u2014 Khả năng tái tạo và giấy phép',
@@ -394,7 +394,7 @@ export const hardQuestionsTextVi = {
       d: 'Báo cáo chưa bao giờ được công bố.',
     },
     explanation:
-      'Cuộc rà soát, công bố vào tháng 1 năm 2026, bao gồm giao thức cốt lõi, token CST, cả hai tích hợp NFT, các ví neo giữ và các hợp đồng hỗ trợ. Không có phát hiện nào lại chính là dấu hiệu đáng ngờ với một hệ thống cỡ này; điều quan trọng là hồ sơ mức độ \u2014 không nghiêm trọng, không cao \u2014 và báo cáo đầy đủ là công khai.',
+      'Cuộc rà soát, công bố vào tháng 1 năm 2026, bao gồm giao thức cốt lõi, token CST, cả hai tích hợp NFT, các ví neo giữ và các hợp đồng hỗ trợ. Báo cáo ghi nhận 23 vấn đề, không có vấn đề nào ở mức nghiêm trọng hoặc cao. Bạn có thể đọc toàn bộ báo cáo để xem phạm vi kiểm tra, từng vấn đề và cách xử lý.',
     referenceLabel: 'Sách trắng \u00a711.1 \u2014 Rà soát độc lập',
   },
   'hacken-invariants': {
@@ -418,7 +418,7 @@ export const hardQuestionsTextVi = {
       d: 'Kiểm thử thủ công trước mỗi bản phát hành.',
     },
     explanation:
-      'Các lớp xếp chồng: đặc tả kiểm chứng hình thức (Certora), kiểm tra dựa trên SMT, phân tích tĩnh (Slither) và kiểm thử nhắm độ phủ \u2014 cộng thêm rà soát và fuzz của Hacken ở trên. Không công cụ nào chứng minh được mọi thứ, đó chính là lý do các dự án nghiêm túc chạy tất cả.',
+      'Các lớp xếp chồng: đặc tả kiểm chứng hình thức (Certora), kiểm tra dựa trên SMT, phân tích tĩnh (Slither) và kiểm thử nhắm độ phủ \u2014 cộng thêm rà soát và fuzz của Hacken ở trên. Mỗi phương pháp kiểm tra một nhóm thuộc tính khác nhau; kết hợp chúng giúp mở rộng phạm vi kiểm tra mà không bảo đảm phần mềm hoàn toàn không có lỗi.',
     referenceLabel: 'Sách trắng \u00a711.1 \u2014 Rà soát độc lập',
   },
   'sourcify-status': {
@@ -443,7 +443,7 @@ export const hardQuestionsTextVi = {
       d: 'Chỉ giới hạn gas đã khiến tái nhập bất khả.',
     },
     explanation:
-      'Mọi điểm vào bên ngoài của hợp đồng cốt lõi đều mang bộ chặn tái nhập \u2014 dòng đầu tiên trong danh sách thiết kế phòng vệ. Kết hợp với ký quỹ kiểu kéo cho các phân bổ phụ, bề mặt tấn công cổ điển của các hợp đồng giữ giá trị được đóng hai lần.',
+      'Mọi điểm vào bên ngoài của hợp đồng cốt lõi đều mang bộ chặn tái nhập \u2014 dòng đầu tiên trong danh sách thiết kế phòng vệ. Kết hợp với ký quỹ kiểu kéo cho các phân bổ phụ, hai cơ chế giúp giảm rủi ro từ việc gọi lại hợp đồng và từ hợp đồng người nhận.',
     referenceLabel: 'Sách trắng \u00a711.2 \u2014 Thiết kế phòng vệ',
   },
   'intercycle-locks-why': {
@@ -472,7 +472,8 @@ export const hardQuestionsTextVi = {
     referenceLabel: 'Sách trắng \u00a77.3 \u2014 Trọng số điều phối',
   },
   'dust-refund': {
-    prompt: 'Pia trả dư cho nét bút ETH vài wei \u2014 dưới ngưỡng vụn. Phần chênh sẽ thế nào?',
+    prompt:
+      'Pia trả dư cho nét bút ETH vài wei \u2014 dưới ngưỡng tối thiểu. Phần chênh sẽ thế nào?',
     options: {
       a: 'Nó ở lại trong dự trữ: một khoản hoàn nhỏ như vậy tốn nhiều gas hơn số tiền trả về.',
       b: 'Nó vẫn được hoàn lại, vì nguyên tắc.',
@@ -480,7 +481,7 @@ export const hardQuestionsTextVi = {
       d: 'Nét bút bị hoàn nguyên để bảo vệ cô.',
     },
     explanation:
-      'Trên ngưỡng vụn, phần trả dư được hoàn lại trong cùng giao dịch; dưới ngưỡng đó, phần chênh ở lại trong dự trữ vì chính việc hoàn lại sẽ đốt nhiều gas hơn số tiền nó chuyển. Một sự bất đối xứng nhỏ, trung thực \u2014 được ghi rõ thay vì giấu đi.',
+      'Trên ngưỡng tối thiểu, phần trả dư được hoàn lại trong cùng giao dịch; dưới ngưỡng đó, phần chênh ở lại trong dự trữ vì chính việc hoàn lại sẽ đốt nhiều gas hơn số tiền nó chuyển. Một sự bất đối xứng nhỏ, trung thực \u2014 được ghi rõ thay vì giấu đi.',
     referenceLabel: 'Sách trắng \u00a74.1 \u2014 Nét bút ETH',
   },
   'rwlk-not-transferred': {
@@ -505,7 +506,7 @@ export const hardQuestionsTextVi = {
       d: 'Không gì cả \u2014 hoàn tất là một dịch vụ công.',
     },
     explanation:
-      'Hợp đồng coi bất kỳ ai hoàn tất trong cửa sổ mở là người nhận của chu kỳ, không hơn không kém \u2014 phần ETH, lần khắc CST, NFT và quyền ưu tiên với tài sản đính kèm. Quill chưa bao giờ cần đặt nét bút. Người đặt nét bút cuối cùng vắng mặt mất toàn bộ vai trò, không phải một phần.',
+      'Hợp đồng coi bất kỳ ai hoàn tất trong cửa sổ mở là người nhận của chu kỳ, với đầy đủ quyền của vai trò này \u2014 phần ETH, lần khắc CST, NFT và quyền ưu tiên với tài sản đính kèm. Quill chưa bao giờ cần đặt nét bút. Người đặt nét bút cuối cùng vắng mặt mất toàn bộ vai trò, không phải một phần.',
     referenceLabel: 'Sách trắng \u00a73.3 \u2014 Hoàn tất',
   },
   'attached-priority-timeout': {

@@ -57,12 +57,12 @@ export const termsCopyVi = {
         {
           id: 'protocol',
           subtitle: 'Giao thức hoạt động như thế nào',
-          text: 'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi, phi tập trung, nơi người tham gia đặt nét bút bằng ETH hoặc token CST trong một chu kỳ trình diễn. Nét bút kéo dài thời điểm hoàn tất chu kỳ, ghi nhận các lượt của giao thức và có thể khắc CST tham gia động theo công thức của hợp đồng thông minh. Khi thời điểm hoàn tất chu kỳ hết hạn, người tham gia đặt nét bút cuối cùng có thể nhận về phân bổ Signature. Các phân bổ khác được phân phối theo cấu trúc luồng phân bổ đã công bố.',
+          text: 'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi, phi tập trung, nơi người tham gia đặt nét bút bằng ETH hoặc token CST trong một chu kỳ trình diễn. Nét bút kéo dài thời điểm hoàn tất chu kỳ, ghi nhận các lượt của giao thức và có thể khắc CST tham gia động theo công thức của hợp đồng thông minh. Khi đếm ngược hoàn tất về 0, người tham gia đặt nét bút cuối cùng có thể nhận về phân bổ Signature. Các phân bổ khác được phân phối theo cấu trúc luồng phân bổ đã công bố.',
         },
         {
           id: 'dynamic-cst',
           subtitle: 'Lần khắc CST động',
-          text: 'CST tham gia được khắc bởi một nét bút không cố định. Lượng này phụ thuộc vào khoảng thời gian đã trôi qua kể từ nét bút trước và được tính theo công thức căn bậc hai. Nét bút quá dồn dập có thể khắc 0 CST.',
+          text: 'Lượng CST tham gia được khắc khi đặt nét bút không cố định. Lượng này phụ thuộc vào khoảng thời gian đã trôi qua kể từ nét bút trước và được tính theo công thức căn bậc hai. Hai nét bút quá gần nhau có thể khiến lượng CST được khắc bằng 0.',
         },
         {
           id: 'cst-window',
@@ -158,7 +158,7 @@ export const termsCopyVi = {
         {
           id: 'no-guarantee',
           subtitle: 'Không bảo đảm kết quả',
-          text: 'Việc tham gia Cosmic Signature không bảo đảm bất kỳ kết quả nào. Mọi nét bút được coi là cuối cùng, và bạn có thể mất một phần hoặc toàn bộ chi phí nét bút. Không bao giờ đặt nét bút bằng số tiền bạn không thể chấp nhận mất.',
+          text: 'Việc tham gia Cosmic Signature không bảo đảm bất kỳ kết quả nào. Mọi nét bút đã được xác nhận đều không thể hoàn tác, và bạn có thể mất một phần hoặc toàn bộ chi phí nét bút. Không bao giờ đặt nét bút bằng số tiền bạn không thể chấp nhận mất.',
         },
       ],
     },
@@ -232,7 +232,7 @@ export const termsCopyVi = {
     {
       id: 'intellectual-property',
       subtitle: 'Sở hữu trí tuệ',
-      text: 'Tài liệu thuộc dự án được bao phủ bởi tệp LICENSE gốc của kho mã được công bố theo CC0 1.0. Các phụ thuộc bên thứ ba, phông chữ, tài sản và tài liệu bên thứ ba khác giữ giấy phép riêng của chúng và không nằm trong phạm vi đó; xem THIRD_PARTY_NOTICES.md. CC0 không từ bỏ quyền nhãn hiệu hay quyền sáng chế. Bất kỳ tài liệu nào không được bao phủ bởi CC0 hoặc một giấy phép mã nguồn mở đã nêu vẫn thuộc sở hữu của chủ thể quyền tương ứng và được bảo hộ theo luật sở hữu trí tuệ áp dụng. NFT nhận qua giao thức trao cho bạn quyền sở hữu token cụ thể đó, nhưng không trao quyền sở hữu trí tuệ nền tảng trừ khi được nêu rõ.',
+      text: 'Tài liệu của dự án thuộc phạm vi tệp LICENSE ở thư mục gốc của kho mã được công bố theo CC0 1.0. Các phụ thuộc bên thứ ba, phông chữ, tài sản và tài liệu bên thứ ba khác giữ giấy phép riêng của chúng và không nằm trong phạm vi đó; xem THIRD_PARTY_NOTICES.md. CC0 không từ bỏ quyền nhãn hiệu hay quyền sáng chế. Bất kỳ tài liệu nào không thuộc phạm vi CC0 hoặc một giấy phép mã nguồn mở đã nêu vẫn thuộc sở hữu của chủ thể quyền tương ứng và được bảo hộ theo luật sở hữu trí tuệ áp dụng. NFT nhận qua giao thức trao cho bạn quyền sở hữu token cụ thể đó, nhưng không trao quyền sở hữu trí tuệ nền tảng trừ khi được nêu rõ.',
     },
     // lexicon-allow-start: boilerplate limitation-of-liability language must preserve "profits".
     {
@@ -249,7 +249,7 @@ export const termsCopyVi = {
     {
       id: 'disputes',
       subtitle: 'Giải quyết tranh chấp',
-      text: 'Mọi tranh chấp phát sinh từ các điều khoản này hoặc từ việc bạn sử dụng Cosmic Signature sẽ được giải quyết thông qua trọng tài ràng buộc theo quy tắc của Hiệp hội Trọng tài Hoa Kỳ. Bạn từ bỏ mọi quyền được xét xử bởi bồi thẩm đoàn hoặc tham gia vụ kiện tập thể.',
+      text: 'Mọi tranh chấp phát sinh từ các điều khoản này hoặc từ việc bạn sử dụng Cosmic Signature sẽ được giải quyết thông qua trọng tài có phán quyết ràng buộc theo quy tắc của Hiệp hội Trọng tài Hoa Kỳ. Bạn từ bỏ mọi quyền được xét xử bởi bồi thẩm đoàn hoặc tham gia vụ kiện tập thể.',
     },
     {
       id: 'law',

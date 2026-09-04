@@ -72,7 +72,7 @@
     "seo": {
       "eyebrow": "協議統計 · Arbitrum",
       "heading": "Cosmic Signature 協議統計",
-      "description": "本頁彙總 Cosmic Signature 在 Arbitrum 上的公開協議活動，包括演繹週期狀態、落筆、Cosmic Signature NFT、CST、錨定、儲備與分配資料。下方互動式表格會載入即時應用程式資料；此摘要則直接寫入初始 HTML，便於搜尋引擎與 AI 抓取。",
+      "description": "本頁彙總 Cosmic Signature 在 Arbitrum 上的公開協議活動，包括演繹週期狀態、落筆、Cosmic Signature NFT、CST、錨定、儲備與分配資料。",
       "lastUpdated": "更新時間：{date}",
       "unavailableSuffix": "。即時資料暫不可用，目前顯示協議機制說明。",
       "dataSource": "資料來自 Cosmic Signature 公共 API，該 API 索引協議在 Arbitrum 上的智慧合約活動。可透過下方連結了解協議機制與驗證資訊。",
@@ -119,7 +119,7 @@
     },
     "numAllocationsDistributed": {
       "label": "已發放分配數量",
-      "tooltip": "已索引的分配紀錄數。優先使用 cg_prize 紀錄；若不可用，則採用獲配者分配總數的彙總值。"
+      "tooltip": "已索引的分配紀錄數；詳細紀錄暫不可用時，採用獲配者分配總數的彙總值。"
     },
     "totalSignatureAllocationsDistributed": {
       "label": "簽名分配總額",
@@ -298,7 +298,7 @@
       "poolTooltip": "目前分配至 Cosmic Signature NFT 錨定者配發池的 ETH。",
       "perNftLabel": "每枚 Cosmic Signature NFT 配發額",
       "perNftTooltip": "目前每枚已錨定 Cosmic Signature NFT 對應的 ETH 錨定配發：鏈上配發池除以已索引的已錨定 NFT 總數。",
-      "perNftTooltipUnavailable": "目前每枚已錨定 Cosmic Signature NFT 對應的 ETH 錨定配發：鏈上配發池除以已索引的已錨定 NFT 總數。鏈上錨定配發池並非 0，但已索引的 Cosmic Signature NFT 錨定總數為 0（例如 cg_stake_stats_cst 尚未由 ETL 更新），因此無法計算每枚 NFT 的配發額。",
+      "perNftTooltipUnavailable": "鏈上錨定配發池已有餘額，但已索引的 Cosmic Signature NFT 錨定數量尚未同步，暫時無法計算每枚 NFT 的配發額。",
       "activeHoldersLabel": "活躍錨定者",
       "activeHoldersTooltip": "目前至少錨定一枚 Cosmic Signature NFT 或 Random Walk NFT 的活躍錢包合計數。"
     },
@@ -540,8 +540,8 @@
       "chronoSummary": "時之勇士：{address}，在位 {duration}",
       "gantt": "甘特圖",
       "lineChart": "折線圖",
-      "openWindowAria": "在新窗口中開啟圖表",
-      "openWindowTitle": "在新窗口中開啟"
+      "openWindowAria": "在新視窗中開啟圖表",
+      "openWindowTitle": "在新視窗中開啟"
     },
     "cyclePicker": {
       "cycle": "週期",
@@ -557,7 +557,7 @@
       "window": "CST 校準窗口",
       "windowAfter": "此次落筆後的窗口",
       "typeEth": "ETH 落筆（縮短）",
-      "typeRandomWalk": "ETH + RandomWalk 落筆（縮短）",
+      "typeRandomWalk": "ETH + Random Walk 落筆（縮短）",
       "typeCst": "CST 落筆（延長）",
       "summaryMin": "最短：{duration}",
       "summaryMax": "最長：{duration}",
@@ -581,7 +581,7 @@
       "summaryMax": "最貴：{amount}（週期開始後 {when}）",
       "summaryTotal": "總消耗：{amount}",
       "summaryCount": "{count} 次 CST 落筆",
-      "description": "每個紫色圓點代表一次 CST 落筆的實際支付金額（對數刻度——空心圓點表示免費）。每次 CST 落筆後，價格會以約兩倍於成交價重新開始，並在校準窗口內回落到免費。玫紅色虛線表示每次落筆前分配時鐘的剩餘時間：當時鍾接近歸零時，密集落筆讓價格來不及回落，成交價格隨之飆升。點選圓點可檢視交易。",
+      "description": "每個紫色圓點代表一次 CST 落筆的實際支付金額（對數刻度——空心圓點表示免費）。每次 CST 落筆後，價格會以約兩倍於落筆價格重新開始，並在校準窗口內回落到免費。玫紅色虛線表示每次落筆前分配時鐘的剩餘時間：當時鍾接近歸零時，密集落筆讓價格來不及回落，落筆價格格隨之飆升。點選圓點可檢視交易。",
       "empty": "此週期沒有 CST 落筆。",
       "selectCycle": "請選擇要檢視的週期。",
       "loadErrorTitle": "未能載入 CST 落筆價格",
@@ -691,7 +691,7 @@
       "allocationsWalletAddress": "分配錢包（分配託管合約）地址已變更。",
       "anchoringWalletAddress": "錨定錢包地址已變更。",
       "randomWalkAnchoringWalletAddress": "Random Walk NFT 錨定錢包地址已變更。",
-      "outreachWalletAddress": "推廣錢包地址已變更。",
+      "outreachWalletAddress": "推廣儲備財務執行人地址已變更。",
       "cstContractAddress": "Cosmic Signature CST 代幣（ERC-20）合約地址已變更。",
       "cosmicSignatureNftAddress": "Cosmic Signature NFT（ERC-721）合約地址已變更。",
       "contractUpgrade": "CosmicSignature 合約已升級。",
@@ -700,7 +700,7 @@
       "gestureCostIncreaseRatio": "落筆價格增量比例已變更。",
       "gestureTimeIncrement": "每次落筆增加的分配時長已變更。",
       "initialFinalizationDivisor": "用於計算初始週期收官時間的除數（mainPrizeTimeIncrementInMicroSeconds / divisor）已變更。",
-      "treasurerAddress": "推廣錢包地址已變更。",
+      "treasurerAddress": "推廣儲備財務執行人地址已變更。",
       "activationTime": "週期啟用時間已變更。",
       "cstCalibrationLength": "週期開始時的 CST 校準窗口長度已變更。",
       "erc20Multiplier": "ERC-20 代幣分配倍數已變更。",
@@ -735,7 +735,7 @@
   },
   "publicDataSummaries": {
     "common": {
-      "lastUpdated": "更新時間：{date}。資料來源：{source}。下方互動式表格會載入即時應用程式資料；此摘要則直接寫入初始 HTML，便於搜尋引擎與 AI 抓取。",
+      "lastUpdated": "更新時間：{date}。資料來源：{source}。",
       "relatedPagesAria": "{heading}相關頁面",
       "unavailable": "暫不可用"
     },

@@ -8,7 +8,7 @@ export const privacyCopyEn = {
   lastUpdated: 'Last updated: July 20, 2026',
   introductionTitle: 'Introduction',
   introduction: [
-    'Cosmic Signature is a decentralized blockchain game built on Arbitrum, an Ethereum Layer 2 network. As a decentralized application (dApp), we operate differently from traditional web applications when it comes to data and privacy.',
+    'Cosmic Signature is a procedural on-chain art protocol built on Arbitrum, an Ethereum Layer 2 network. As a decentralized application (dApp), we operate differently from traditional web applications when it comes to data and privacy.',
     'This Privacy Policy describes how we handle information in connection with your use of Cosmic Signature. By using our platform, you agree to the collection and use of information in accordance with this policy.',
   ],
   sections: [

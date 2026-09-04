@@ -1,8 +1,8 @@
 {
   "page": {
     "title": "ETH 贡献",
-    "subtitle": "直接向 Cosmic Signature 公共物品金库贡献 ETH",
-    "description": "直接向 Cosmic Signature 公共物品金库贡献 ETH，支持由宇宙议会协调选定的公共物品受益方。贡献时可附上标题、留言和网址；每个周期贡献额较高的参与者可能会展示在首页。",
+    "subtitle": "直接向 Cosmic Signature 周期储备贡献 ETH",
+    "description": "无需落笔，也可直接向 Cosmic Signature 周期储备贡献 ETH。贡献时可附上标题、留言和网址；每个周期贡献额较高的参与者可能会展示在首页。",
     "formTitle": "贡献 ETH",
     "amountLabel": "金额（ETH）",
     "informationLabel": "附加信息",
@@ -50,8 +50,8 @@
     "urlLabel": "网址",
     "linkPreviewTitle": "链接预览",
     "linkPreviewDescription": "从贡献者提供的网址获取的元数据。",
-    "metaDescriptionLabel": "元描述",
-    "metaKeywordsLabel": "元关键词",
+    "metaDescriptionLabel": "网页描述",
+    "metaKeywordsLabel": "网页关键词",
     "metaImageTitle": "预览图像",
     "metaImageDescription": "Open Graph 或社交平台预览图像。",
     "metaImageAlt": "链接预览图像"

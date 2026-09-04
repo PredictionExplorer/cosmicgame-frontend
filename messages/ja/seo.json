@@ -2,14 +2,14 @@
   "publicData": {
     "common": {
       "unavailable": "取得不可",
-      "lastUpdated": "最終更新：{date}。データソース：{source}。下の対話型テーブルはアプリのライブデータで更新されますが、この要約は検索エンジンとAIクローラー向けに最初のHTMLに含まれています。",
+      "lastUpdated": "最終更新：{date}。データソース：{source}。",
       "relatedPagesAria": "{heading}の関連ページ"
     },
     "routes": {
       "allocation": {
         "eyebrow": "配分の履歴 · Arbitrum",
         "heading": "配分の受領者",
-        "description": "確定したパフォーマンス・サイクルにわたるCosmic Signatureの公開配分履歴——シグネチャー配分、星選、係留配分、公共財への流れ——を見る。",
+        "description": "確定したサイクルの配分履歴を確認できます。シグネチャー配分、星選、係留配分、公共財への送付をまとめています。",
         "source": "Cosmic Signature公開サイクルAPI",
         "links": {
           "statistics": "プロトコル統計を見る",
@@ -56,7 +56,7 @@
       "marketing": {
         "eyebrow": "広報配分 · Arbitrum",
         "heading": "広報配分",
-        "description": "プロトコルを人々に知ってもらう手助けをするエコシステム貢献者への、Cosmic Signatureの広報配分の履歴とCST配分を確認する。",
+        "description": "Cosmic Signatureを広める活動に携わる貢献者への、広報配分とCSTの配分履歴を確認できます。",
         "source": "Cosmic Signature公開広報配分API",
         "links": {
           "faq": "よくある質問を読む",
@@ -100,7 +100,7 @@
       "eth-contribution": {
         "eyebrow": "直接ETH拠出 · Arbitrum",
         "heading": "直接ETH拠出",
-        "description": "Cosmic Signature公共財金庫への直接ETH拠出と、それに添えられた公開メモ、サイクル、拠出者の記録を見る。",
+        "description": "サイクル準備金へのETH拠出と、添えられたメモ、対象のサイクル、拠出者を確認できます。",
         "source": "Cosmic Signature公開拠出API",
         "links": {
           "protocol": "プロトコルの公共財拠出",
@@ -166,7 +166,7 @@
       "named-nfts": {
         "eyebrow": "名前付きNFT · Arbitrum",
         "heading": "名前付きCosmic Signature NFT",
-        "description": "所有者が固有の名前を付けたCosmic Signature NFTを見る。トークンのアイデンティティ、ギャラリーでの発見、オンチェーンのコレクション履歴を結びつけます。",
+        "description": "所有者が名前を付けたCosmic Signature NFTを紹介します。作品を見つけ、オンチェーンに記録された来歴をたどれます。",
         "source": "Cosmic Signature公開トークンAPI",
         "links": {
           "gallery": "ギャラリー全体を探索する",
@@ -189,7 +189,7 @@
       "used-rwlk-nfts": {
         "eyebrow": "RandomWalk NFTの使用 · Arbitrum",
         "heading": "使用済みのRandomWalk NFT",
-        "description": "一度だけの一筆の費用の割引のためにETH一筆にすでに添付されたRandomWalk NFTを確認する。",
+        "description": "ETH一筆の割引に使用済みのRandomWalk NFTを確認できます。割引に使えるのは、各NFTにつき一度だけです。",
         "source": "Cosmic Signature公開RandomWalk使用API",
         "links": {
           "imprint": "RandomWalk NFTを刻印する",
@@ -281,7 +281,7 @@
       "public-goods-retrievals": {
         "eyebrow": "公共財の受け取り · Arbitrum",
         "heading": "公共財の受け取り",
-        "description": "サイクル準備金が設定された公共財の受け手——現在はProtocol Guild——への支援を送るCosmic Signature公共財金庫からの受け取りを確認する。",
+        "description": "公共財金庫から、設定されている受け手への送付履歴を確認できます。現在の受け手はProtocol Guildです。",
         "source": "Cosmic Signature公開公共財API",
         "links": {
           "protocol": "プロトコルの公共財拠出",
@@ -306,7 +306,7 @@
   "gallerySummary": {
     "eyebrow": "決定論的NFTアート · Arbitrum",
     "heading": "Cosmic Signatureギャラリー",
-    "description": "決定論的な三体物理、オンチェーンのシード、スペクトルレンダリング、パフォーマンス・サイクルのデータから生成されたCosmic Signature NFTのアートワークを探索する。各シグネチャーはプロトコルの記録から再現でき、特定のサイクルの文脈を表しています。",
+    "description": "オンチェーンのシードと三体問題の物理計算から生まれたCosmic Signature NFTを紹介します。各作品はサイクルの記録を反映し、同じシードから再現できます。",
     "unavailable": "取得不可",
     "cards": {
       "imprinted": "刻印済みNFT",
@@ -325,7 +325,7 @@
   "currentCycleSummary": {
     "eyebrow": "ライブのパフォーマンス・サイクル · Arbitrum",
     "heading": "現在のCosmic Signatureパフォーマンス・サイクル",
-    "description": "このページは、公開の筆数、サイクル準備金の文脈、添付されたアセット、配分トラック、確定状況を含む、進行中のCosmic Signatureパフォーマンス・サイクルを追います。下の対話型コンソールはアプリのライブデータで更新されます。",
+    "description": "進行中のサイクルの筆数、準備金、添付されたアセット、配分トラック、確定状況を確認できます。最新のデータは下の操作画面に表示されます。",
     "unavailable": "取得不可",
     "cards": {
       "cycle": "サイクル",

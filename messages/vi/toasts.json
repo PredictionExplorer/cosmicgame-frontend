@@ -6,9 +6,9 @@
   "anchorReleased": "Đã gỡ neo.",
   "cycleFinalized": "Chu kỳ đã hoàn tất. Các phân bổ đã được phân phối.",
   "walletTransactionCancelled": "Giao dịch chưa được gửi — bạn đã hủy trong ví.",
-  "unexpectedError": "Lỗi không mong đợi. Vui lòng thử lại.",
+  "unexpectedError": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
   "generic": {
-    "unexpectedError": "Lỗi không mong đợi. Vui lòng thử lại.",
+    "unexpectedError": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
     "rpcFailure": "Không thể hoàn thành giao dịch. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
     "receiptFailure": "Giao dịch đã được gửi nhưng chưa thể xác nhận. Hãy kiểm tra trạng thái trong ví hoặc trên trình khám phá khối trước khi thử lại.",
     "transactionFailed": "Giao dịch thất bại. Vui lòng thử lại."
@@ -40,14 +40,14 @@
     "simulated": "Đã đặt nét bút mô phỏng. Bộ đếm được kéo dài thêm {seconds, plural, other {# giây}}.",
     "confirmed": "Nét bút đã được xác nhận. Chu kỳ tiếp tục.",
     "validation": {
-      "notNftOwner": "Bạn không phải chủ sở hữu của token này!",
+      "notNftOwner": "Ví đang kết nối không sở hữu token này.",
       "tokenDecimalsWarning": "Token không triển khai decimals(); giả định 18 chữ số thập phân.",
-      "invalidContractAddress": "Địa chỉ đã cung cấp không phải là địa chỉ hợp đồng hợp lệ!",
+      "invalidContractAddress": "Địa chỉ hợp đồng không hợp lệ.",
       "notErc721": "Hợp đồng NFT đính kèm không phải là hợp đồng token ERC721.",
       "notErc20": "Hợp đồng token đính kèm không phải là hợp đồng token ERC20.",
       "insufficientAttachedToken": "Số dư token không đủ để đính kèm vào nét bút này.",
-      "insufficientEth": "Số dư ETH không đủ! Ví của bạn không có đủ ETH.",
-      "insufficientCst": "Số dư CST không đủ! Ví của bạn không có đủ CST (ERC-20)."
+      "insufficientEth": "Ví không đủ ETH cho giao dịch này.",
+      "insufficientCst": "Ví không đủ CST (ERC-20) cho giao dịch này."
     },
     "transaction": {
       "failed": "Không thể gửi nét bút. Hãy kiểm tra ví và kết nối mạng, làm mới chi phí hiện tại, rồi thử lại.",
@@ -68,8 +68,8 @@
   "anchor": {
     "walletNotReady": "Ví vẫn đang kết nối hoặc MetaMask đang ở sai chuỗi. Hãy chuyển sang mạng của ứng dụng và thử lại.",
     "anchored": "{count, plural, other {# NFT đã được neo giữ với giao thức.}}",
-    "released": "{count, plural, other {# neo đã chọn đã được gỡ thành công.}}",
-    "releasedWithDistributions": "{count, plural, other {# neo đã chọn đã được gỡ và các khoản phân phối neo giữ ETH tích lũy đã được nhận về.}}",
+    "released": "{count, plural, other {Đã gỡ neo cho # NFT đã chọn.}}",
+    "releasedWithDistributions": "{count, plural, other {Đã gỡ neo cho # NFT và nhận về ETH tích lũy từ phân phối neo giữ.}}",
     "failed": "Không thể hoàn thành giao dịch neo giữ. Hãy kiểm tra ví và kết nối mạng, rồi thử lại."
   },
   "allocation": {
@@ -124,8 +124,8 @@
       "recipientCheckFailed": "Không kiểm tra được địa chỉ người nhận. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
       "failed": "Không thể gửi các NFT đã chọn. Vui lòng thử lại.",
       "failedToken": "Không thể chuyển giao NFT #{tokenId}. Vui lòng thử lại.",
-      "nameSet": "Tên token đã được thay đổi thành công!",
-      "nameCleared": "Tên token đã được xóa thành công!",
+      "nameSet": "Đã đổi tên token.",
+      "nameCleared": "Đã xóa tên token.",
       "nameSetFailed": "Đã xảy ra lỗi khi đặt tên token. Vui lòng thử lại.",
       "nameClearFailed": "Đã xảy ra lỗi khi xóa tên token. Vui lòng thử lại."
     },
@@ -139,7 +139,7 @@
       "insufficientBalance": "Số dư CST của Dự trữ truyền thông không đủ.",
       "decimalsWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
       "balanceReadFailed": "Không đọc được số dư CST của Dự trữ truyền thông. Vui lòng thử lại.",
-      "confirmed": "Đã xác nhận CST phân bổ truyền thông.",
+      "confirmed": "Đã xác nhận chuyển CST phân bổ truyền thông.",
       "failed": "Không thể chi CST phân bổ. Vui lòng thử lại.",
       "loading": "Đang tải…",
       "pay": "Chi CST phân bổ",
@@ -156,16 +156,16 @@
     "contractUnavailable": "Vui lòng kết nối ví và đảm bảo bạn đang ở đúng mạng.",
     "formSubmitted": "Đã xác nhận đóng góp {amount} ETH.",
     "formSubmittedWithInfo": "Đã xác nhận đóng góp {amount} ETH kèm thông tin.",
-    "submitted": "Đã đóng góp {amount} ETH thành công!",
-    "submittedWithInfo": "Đã đóng góp {amount} ETH kèm thông tin thành công!",
+    "submitted": "Đã đóng góp {amount} ETH.",
+    "submittedWithInfo": "Đã đóng góp {amount} ETH kèm thông tin.",
     "formFailed": "Đóng góp ETH thất bại, hãy kiểm tra thông tin nhập và thử lại.",
     "failed": "Đóng góp thất bại, vui lòng thử lại.",
     "failedWithInfo": "Đóng góp kèm thông tin thất bại, hãy kiểm tra thông tin nhập.",
     "submitting": "Đang gửi…",
     "publicGoodsVault": {
-      "none": "Không có khoản hàng hóa công nào đang chờ trong kho.",
+      "none": "Kho chưa có khoản nào dành cho Hàng hóa công cần chuyển.",
       "connectWallet": "Kết nối ví để chuyển khoản từ Kho Hàng hóa công.",
-      "forwarded": "Khoản hàng hóa công đã được chuyển đến Protocol Guild.",
+      "forwarded": "Đã chuyển khoản dành cho Hàng hóa công đến Protocol Guild.",
       "failed": "Không thể chuyển khoản từ Kho Hàng hóa công.",
       "forwarding": "Đang chuyển…",
       "forward": "Chuyển đến Protocol Guild",
@@ -180,8 +180,8 @@
   },
   "admin": {
     "gestureBan": {
-      "banned": "Đã chặn nét bút thành công!",
-      "unbanned": "Đã bỏ chặn nét bút thành công!",
+      "banned": "Đã chặn nét bút.",
+      "unbanned": "Đã bỏ chặn nét bút.",
       "failed": "Đã xảy ra lỗi"
     }
   }

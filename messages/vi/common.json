@@ -1,7 +1,7 @@
 {
   "faqPage": {
     "heading": "Giải đáp",
-    "description": "Những câu hỏi đáng được trả lời thẳng thắn về Cosmic Signature — giao thức là gì, nét bút vận hành thế nào, và nó không phải là gì."
+    "description": "Giải đáp về Cosmic Signature: bản chất của giao thức, cách nét bút hoạt động và những giới hạn cần biết."
   },
   "languageSwitcher": {
     "label": "Ngôn ngữ"
@@ -31,7 +31,7 @@
   },
   "externalLink": {
     "title": "Bạn đang rời Cosmic Signature",
-    "description": "Liên kết này đến từ một thông điệp của người tham gia được lưu trên chuỗi. Nó chưa được kiểm tra hay xác minh — hãy chắc chắn rằng địa chỉ đích bên dưới đúng như bạn mong đợi.",
+    "description": "Liên kết này nằm trong lời nhắn của người tham gia được lưu trên chuỗi và chưa được kiểm tra hay xác minh. Trước khi mở, hãy kiểm tra địa chỉ bên dưới có đúng nơi bạn muốn đến hay không.",
     "copy": "Sao chép liên kết",
     "copied": "Đã sao chép liên kết",
     "warning": "Không bao giờ nhập cụm từ khôi phục hay khóa riêng của ví trên một trang web bên ngoài.",

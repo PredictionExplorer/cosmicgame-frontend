@@ -167,7 +167,7 @@ export const termsCopyZh = {
         {
           id: 'warranties',
           subtitle: '不作保证',
-          text: 'Cosmic Signature 按"现状"提供，不附带任何明示或默示保证。我们不保证平台持续不中断、毫无错误或不含有害组件。',
+          text: 'Cosmic Signature 按“现状”提供，不附带任何明示或默示保证。我们不保证平台持续不中断、毫无错误或不含有害组件。',
         },
         {
           id: 'volatility',

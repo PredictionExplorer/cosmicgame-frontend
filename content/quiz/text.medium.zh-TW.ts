@@ -61,13 +61,13 @@ export const mediumQuestionsTextZhTw = {
   'cst-free-quiet': {
     prompt: '協議沉寂了很久，CST 校準窗口已經走完。現在的事實是什麼？',
     options: {
-      a: '一筆 CST 落筆近乎免費——任何持有一點 CST 的人都能延續週期。',
+      a: 'CST 落筆價格已降至零，無需支付 CST，但仍需支付網路燃料費。',
       b: '週期自動完成收官。',
       c: '在 ETH 落筆到來之前，CST 落筆被停用。',
       d: 'CST 價格已升至上限。',
     },
     explanation:
-      '價格能降到零，而且是有意為之：只要有人持有哪怕一點 CST，週期就總能延續。週期從不自行收官——收官永遠是某個人發出的一筆交易。',
+      '校準窗口完整走完後，CST 落筆價格可降至零。落筆仍需支付網路燃料費，並滿足目前週期規則。收官也需要有人提交交易，週期不會自動收官。',
     referenceLabel: '白皮書 §4.3 · CST 落筆',
   },
   'window-feedback-loop': {
@@ -91,7 +91,8 @@ export const mediumQuestionsTextZhTw = {
       d: '都是零——只有收官才銘刻 CST。',
     },
     explanation: `參與 CST 隨距上一筆時間的平方根增長：一秒後跟進的一筆幾乎什麼也銘刻不到（約 ${oneSecondExample.cst} CST），終結一整天沉默的一筆能銘刻數百（約 ${oneDayExample.cst} CST）。每筆固定 ${cst(100)} CST 正是最初的 V1 規則——它讓機器速度的連續落筆憑空生成 CST，V2 因此將其替換。`,
-    funFact: '耐心是銘刻可觀 CST 的唯一方式。每秒落一筆的機器人，銘刻量約等於零。',
+    funFact:
+      '落筆間隔越長，每筆銘刻的參與 CST 越多；連續快速落筆則可能只銘刻少量 CST，甚至為零。表彰 CST 與推廣儲備另有各自的銘刻機制。',
     referenceLabel: '白皮書 §7.1 · 銘刻規則',
   },
   'cst-max-cost-protection': {
@@ -120,7 +121,8 @@ export const mediumQuestionsTextZhTw = {
     referenceLabel: '白皮書 §5.2 · 堅守冠軍與時之勇士',
   },
   'chrono-definition': {
-    prompt: '上一題裡 Ari 的十小時紀錄又保持了兩天才被 Bea 刷新。時之勇士衡量的究竟是什麼？',
+    prompt:
+      'Ari 創下十小時的堅守紀錄，連續保持堅守冠軍身分兩天後，紀錄才被 Bea 刷新。時之勇士衡量的是什麼？',
     options: {
       a: '誰連續在位堅守冠軍最久——Ari 保持紀錄的那兩天都算在他頭上。',
       b: '誰在他人落筆後反應最快。',
@@ -264,7 +266,7 @@ export const mediumQuestionsTextZhTw = {
       c: '每個週期翻倍。',
       d: '參與者越多，它越短。',
     },
-    explanation: `增量在每個週期收官後增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%。複利安靜地做著自己的工作：週期變長，NFT 的銘刻節奏放緩，協議的節拍隨歲月刻意舒展。`,
+    explanation: `增量在每個週期收官後增長 ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%。增量逐週期累積，使週期逐漸變長，NFT 的銘刻節奏也隨之放緩。`,
     referenceLabel: '白皮書 §3.2 · 收官倒數',
   },
   'typical-cst-fixed': {

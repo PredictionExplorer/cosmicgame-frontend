@@ -6,7 +6,7 @@
   "page": {
     "title": "Khắc Random Walk NFT",
     "subtitle": "Sở hữu một Random Walk NFT để được giảm 50% chi phí nét bút ETH",
-    "description": "RandomWalk NFT là những vật phẩm số độc nhất mang lại cho người nắm giữ một lợi thế chiến thuật trong giao thức Cosmic Signature. Khi đính kèm một RandomWalk NFT vào nét bút ETH, bạn được giảm 50% chi phí nét bút ETH — một lợi thế đáng kể ở giai đoạn cuối chu kỳ. Mỗi RandomWalk NFT chỉ dùng được một lần cho mức giảm giá này, vì vậy hãy chọn thời điểm khôn ngoan để đạt hiệu quả cao nhất. Việc đính kèm vào nét bút này tách biệt với việc neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ.",
+    "description": "Mỗi RandomWalk NFT là một tác phẩm số độc nhất. Khi đính kèm một NFT chưa sử dụng vào nét bút ETH, bạn được giảm 50% chi phí nét bút, kể cả ở giai đoạn cuối chu kỳ. Mỗi NFT chỉ áp dụng mức giảm này một lần, vì vậy thời điểm sử dụng tùy thuộc vào lựa chọn của bạn. Bạn cũng có thể neo giữ RandomWalk NFT để thuộc diện Tinh tuyển NFT neo giữ; đây là cơ chế riêng, không liên quan đến việc đính kèm NFT vào nét bút.",
     "currentCost": "Chi phí khắc hiện tại",
     "submit": "Khắc ngay",
     "myNfts": "Random Walk NFT của tôi"
@@ -16,7 +16,7 @@
     "heading": "Khắc RandomWalk NFT",
     "description": "Khắc RandomWalk NFT để tham gia Cosmic Signature. Mỗi RandomWalk NFT chưa sử dụng có thể được đính kèm vào một nét bút ETH để giảm 50% chi phí nét bút.",
     "source": "Các API cấu hình giao thức công khai của Cosmic Signature",
-    "lastUpdated": "Cập nhật lần cuối: {date}. Nguồn dữ liệu: {source}. Các bảng tương tác bên dưới sẽ nạp dữ liệu trực tiếp từ ứng dụng, còn bản tóm tắt này có sẵn trong HTML ban đầu cho công cụ tìm kiếm và trình thu thập dữ liệu AI.",
+    "lastUpdated": "Cập nhật: {date}. Nguồn: {source}.",
     "relatedAria": "Các trang liên quan đến Khắc RandomWalk NFT",
     "cards": {
       "cycle": "Chu kỳ trình diễn đang diễn ra",

@@ -4,7 +4,7 @@
   },
   "jsonLd": {
     "productName": "Cosmic Signature NFT {id}",
-    "productDescription": "Унікальний генеративний NFT із процедурного протоколу ончейн-мистецтва Cosmic Signature, відрендерений на основі фізики задачі трьох тіл.",
+    "productDescription": "Унікальний генеративний NFT протоколу ончейн-мистецтва Cosmic Signature, створений за допомогою фізичної симуляції задачі трьох тіл.",
     "breadcrumbToken": "Токен {id}"
   },
   "breadcrumb": {
@@ -18,7 +18,7 @@
     "anchorRecipient": "Отримувач за закріплення",
     "cycleRecipient": "Отримувач циклу",
     "enduranceChampion": "Чемпіон витривалості",
-    "receivedAsCycleRecipient": "Отримано в ролі отримувача циклу — Цикл {round}",
+    "receivedAsCycleRecipient": "Отримано за завершальний жест у циклі {round}",
     "receivedAs": "Отримано в ролі: {label}",
     "eligibleForAnchoring": "Можна закріпити",
     "eligibleForAnchoringTooltip": "Цей Cosmic Signature NFT ще ніколи не закріплювали; після закріплення він може отримувати надходження за закріплення в ETH.",
@@ -45,12 +45,12 @@
   },
   "transferDialog": {
     "title": "Підтвердити передачу",
-    "description": "Схоже, у рахунку-отримувача немає жодної історії транзакцій. Ви впевнені, що хочете надіслати токен на цю адресу? Перевірте її ще раз.",
+    "description": "Схоже, адреса отримувача ще не має історії транзакцій. Уважно перевірте її, перш ніж підтвердити передачу токена.",
     "confirm": "Так, передати"
   },
   "ownerActions": {
     "title": "Керування токеном",
-    "titleTooltip": "Як поточний власник, ви можете показати цей токен у MetaMask, передати його або дати йому власне ім’я.",
+    "titleTooltip": "Як поточний власник, ви можете додати цей токен до MetaMask, передати його або дати йому ім’я.",
     "metaMaskHeading": "Показати в MetaMask",
     "metaMaskTooltip": "Запропонувати розширенню MetaMask для браузера показати цей NFT. Імпорт NFT — експериментальна функція, недоступна в MetaMask Mobile.",
     "addToMetaMask": "Додати NFT у MetaMask",
@@ -66,7 +66,7 @@
     "setName": "Зберегти ім’я",
     "changeName": "Змінити ім’я",
     "clearName": "Очистити",
-    "namedTokensCount": "{count, plural, one {Власне ім’я має # токен.} few {Власне ім’я мають # токени.} many {Власне ім’я мають # токенів.} other {Власне ім’я мають # токена.}}",
+    "namedTokensCount": "{count, plural, one {Ім’я надано # токену.} few {Ім’я надано # токенам.} many {Ім’я надано # токенам.} other {Ім’я надано # токена.}}",
     "viewAllNamedTokens": "Переглянути всі іменовані токени"
   },
   "metadata": {
@@ -85,7 +85,7 @@
   },
   "video": {
     "watchAnimation": "Дивитися анімацію",
-    "watchAnimationTooltip": "Кожен Cosmic Signature NFT має унікальну генеративну анімацію, породжену його сідом. Натисніть, щоб подивитися."
+    "watchAnimationTooltip": "Кожен Cosmic Signature NFT має унікальну генеративну анімацію, створену з його сіду. Натисніть, щоб переглянути."
   },
   "image": {
     "defaultAlt": "NFT",

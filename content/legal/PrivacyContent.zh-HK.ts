@@ -8,9 +8,7 @@ export const privacyCopyZhHk = {
   lastUpdated: '最後更新：2026年7月20日',
   introductionTitle: '引言',
   introduction: [
-    // lexicon-allow-start: 忠實保留英文源文將產品稱作區塊鏈遊戲的既有表述。
-    'Cosmic Signature 是構建在 Arbitrum（以太坊二層網絡）上的去中心化區塊鏈遊戲。作為去中心化應用程式（dApp），我們在數據與私隱方面的運作方式不同於傳統 Web 應用程式。',
-    // lexicon-allow-end
+    'Cosmic Signature 是構建在 Arbitrum（以太坊二層網絡）上的程序化鏈上藝術協議。作為去中心化應用程式（dApp），我們在數據與私隱方面的運作方式不同於傳統 Web 應用程式。',
     '本私隱政策說明我們如何處理與你使用 Cosmic Signature 有關的資訊。使用本平台，即表示你同意我們按照本政策收集及使用資訊。',
   ],
   sections: [

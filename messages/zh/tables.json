@@ -202,7 +202,7 @@
     "listAria": "按周期排列的获配者列表"
   },
   "anchoringRecipient": {
-    "empty": "周期收官时没有已锚定代币，存入资金已转拨至公共物品地址。"
+    "empty": "周期收官时没有已锚定的 Cosmic Signature NFT，该周期的锚定派发份额留在周期储备中。"
   },
   "banGesture": {
     "banned": "落笔已禁用。",

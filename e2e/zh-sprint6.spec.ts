@@ -78,7 +78,7 @@ test.describe('zh Sprint 6 — FAQ, legal, trust, contracts, code, and imprint',
     await expect(page.getByText('代码查看器', { exact: true })).toBeVisible();
 
     await openZh(page, '/zh/imprint');
-    await expect(page.getByRole('heading', { name: '铭刻 RandomWalk NFT' }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: '铭刻 Random Walk NFT' }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: '铭刻' })).toBeVisible();
   });
 

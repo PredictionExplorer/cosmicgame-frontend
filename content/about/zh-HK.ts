@@ -13,7 +13,7 @@ export const aboutContentZhHk = {
       'Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議，以演繹週期中的落筆生成確定性的三體 NFT 藝術。',
   },
   breadcrumbLabel: '關於',
-  eyebrow: '協議主頁',
+  eyebrow: '關於協議',
   heading: '關於 Cosmic Signature',
   body: {
     paragraphs: [

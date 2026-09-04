@@ -18,16 +18,16 @@
     "allocation": "Allocation"
   },
   "hints": {
-    "structure": "The primary drawing vocabulary the three orbits are rendered with.",
-    "underlay": "A second, fainter vocabulary layered beneath the primary structure.",
-    "accent": "A sparse highlight vocabulary drawn over the structure.",
+    "structure": "The main visual style used to render the three orbits.",
+    "underlay": "A second, fainter visual layer beneath the main structure.",
+    "accent": "A sparse layer of highlights over the structure.",
     "symmetry": "The fold applied to the composition: mirror, rosette, or mandala.",
     "projection": "The coordinate space the trajectories are plotted in.",
     "wildcard": "An uncommon variant that breaks the usual rendering rules.",
     "finish": "A post-processing effect applied to the final frame.",
     "palette": "The colour family and harmony scheme of the three bodies.",
     "spectralClass": "Stellar colour class of the dominant body, from blue-white O to red M.",
-    "massBalance": "How the three masses compare: one heavy primary, a twin pair, or three equals.",
+    "massBalance": "How the masses of the three bodies compare: one heavy primary, a twin pair, or three equals.",
     "fate": "How the simulation ends: a bound eternal dance, or one body ejected.",
     "chaos": "Sensitivity to initial conditions, scored from 0 (orderly) to 100 (turbulent).",
     "syzygies": "Moments when all three bodies line up.",
@@ -210,7 +210,7 @@
     "title": "Signature traits",
     "subtitle": "Every trait is derived from the on-chain seed. Same seed, same pixels.",
     "loading": "Loading traits…",
-    "unavailable": "Trait metadata has not been published for this Signature yet. Its composition and physics will appear here once the metadata is regenerated.",
+    "unavailable": "Trait metadata has not been published for this Signature yet. Its composition and physics will appear here when the metadata becomes available.",
     "error": "Trait metadata could not be loaded.",
     "retry": "Retry",
     "masses": "Body masses",
@@ -249,7 +249,7 @@
   },
   "dna": {
     "title": "Collection DNA",
-    "subtitle": "How the archive splits across defining traits. Select a segment to filter the gallery.",
+    "subtitle": "The collection’s distribution across its defining traits. Select a segment to filter the gallery.",
     "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
     "legendCount": "{count}",
     "loading": "Reading the collection's traits…"

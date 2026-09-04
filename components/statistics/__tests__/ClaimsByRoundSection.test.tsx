@@ -97,7 +97,7 @@ describe('ClaimsByRoundSection table', () => {
   it('explains what counts as a claimable asset', () => {
     render(<ClaimsByRoundSection />);
 
-    expect(screen.getByText(/Claimable assets awarded each cycle/)).toBeInTheDocument();
+    expect(screen.getByText(/Retrievable assets allocated each cycle/)).toBeInTheDocument();
   });
 
   it('renders one row per cycle with its number', () => {
@@ -121,16 +121,16 @@ describe('ClaimsByRoundSection table', () => {
     expect(within(row).queryByText(/^\d+ ERC-20$/)).not.toBeInTheDocument();
   });
 
-  it('offers a way into the unclaimed assets when any remain', () => {
+  it('offers a way into the unretrieved assets when any remain', () => {
     render(<ClaimsByRoundSection />);
 
-    expect(screen.getByRole('button', { name: /1 unclaimed/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /1 unretrieved/ })).toBeInTheDocument();
   });
 
-  it('shows the leftover ETH beside the unclaimed count', () => {
+  it('shows the leftover ETH beside the unretrieved count', () => {
     render(<ClaimsByRoundSection />);
 
-    expect(screen.getByRole('button', { name: /1 unclaimed/ })).toHaveTextContent('2.5000 ETH');
+    expect(screen.getByRole('button', { name: /1 unretrieved/ })).toHaveTextContent('2.5000 ETH');
   });
 
   it('says everything is claimed when nothing is outstanding', () => {
@@ -139,8 +139,8 @@ describe('ClaimsByRoundSection table', () => {
     );
     render(<ClaimsByRoundSection />);
 
-    expect(screen.getByText('All claimed')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /unclaimed/ })).not.toBeInTheDocument();
+    expect(screen.getByText('All retrieved')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /unretrieved/ })).not.toBeInTheDocument();
   });
 
   it('reports the claimed share per asset type', () => {
@@ -213,7 +213,7 @@ describe('ClaimsByRoundSection states', () => {
     mockUseClaimsByRound.mockReturnValue(okQuery([]));
     render(<ClaimsByRoundSection />);
 
-    expect(screen.getByText('No claimable assets awarded yet.')).toBeInTheDocument();
+    expect(screen.getByText('No retrievable assets allocated yet.')).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
@@ -228,28 +228,28 @@ describe('ClaimsByRoundSection states', () => {
     });
     render(<ClaimsByRoundSection />);
 
-    expect(screen.getByText('Failed to load allocation claims')).toBeInTheDocument();
+    expect(screen.getByText('Failed to load allocation retrievals')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /try again/i }));
 
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 });
 
-describe('ClaimsByRoundSection unclaimed dialog', () => {
-  it('stays closed until the unclaimed count is activated', () => {
+describe('ClaimsByRoundSection unretrieved dialog', () => {
+  it('stays closed until the unretrieved count is activated', () => {
     render(<ClaimsByRoundSection />);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('lists each unclaimed asset with its recipient', async () => {
+  it('lists each unretrieved asset with its recipient', async () => {
     const user = userEvent.setup();
     render(<ClaimsByRoundSection />);
 
-    await user.click(screen.getByRole('button', { name: /1 unclaimed/ }));
+    await user.click(screen.getByRole('button', { name: /1 unretrieved/ }));
 
     const dialog = screen.getByRole('dialog');
-    expect(within(dialog).getByText('Unclaimed assets — Cycle 12')).toBeInTheDocument();
+    expect(within(dialog).getByText('Unretrieved assets — Cycle 12')).toBeInTheDocument();
     expect(within(dialog).getAllByText('ETH').length).toBeGreaterThan(0);
     expect(within(dialog).getByText('2.5000 ETH')).toBeInTheDocument();
   });
@@ -258,9 +258,9 @@ describe('ClaimsByRoundSection unclaimed dialog', () => {
     const user = userEvent.setup();
     render(<ClaimsByRoundSection />);
 
-    await user.click(screen.getByRole('button', { name: /1 unclaimed/ }));
+    await user.click(screen.getByRole('button', { name: /1 unretrieved/ }));
 
-    expect(screen.getByText(/Claim window closes in/)).toBeInTheDocument();
+    expect(screen.getByText(/Retrieval window closes in/)).toBeInTheDocument();
   });
 
   it('says the window has closed for an expired cycle', async () => {
@@ -270,9 +270,9 @@ describe('ClaimsByRoundSection unclaimed dialog', () => {
     );
     render(<ClaimsByRoundSection />);
 
-    await user.click(screen.getByRole('button', { name: /1 unclaimed/ }));
+    await user.click(screen.getByRole('button', { name: /1 unretrieved/ }));
 
-    expect(screen.getByText(/claim window has closed/i)).toBeInTheDocument();
+    expect(screen.getByText(/retrieval window has closed/i)).toBeInTheDocument();
   });
 
   it('renders an NFT entry with its contract and token id', async () => {
@@ -294,7 +294,7 @@ describe('ClaimsByRoundSection unclaimed dialog', () => {
     );
     render(<ClaimsByRoundSection />);
 
-    await user.click(screen.getByRole('button', { name: /1 unclaimed/ }));
+    await user.click(screen.getByRole('button', { name: /1 unretrieved/ }));
 
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByText('Attached NFT')).toBeInTheDocument();
@@ -305,14 +305,14 @@ describe('ClaimsByRoundSection unclaimed dialog', () => {
     const user = userEvent.setup();
     render(<ClaimsByRoundSection />);
 
-    await user.click(screen.getByRole('button', { name: /1 unclaimed/ }));
+    await user.click(screen.getByRole('button', { name: /1 unretrieved/ }));
     await user.keyboard('{Escape}');
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /1 unclaimed/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /1 unretrieved/ })).toBeInTheDocument();
   });
 
-  it('shows a dash when an unclaimed asset has no recipient', async () => {
+  it('shows a dash when an unretrieved asset has no recipient', async () => {
     const user = userEvent.setup();
     mockUseClaimsByRound.mockReturnValue(
       okQuery([
@@ -325,7 +325,7 @@ describe('ClaimsByRoundSection unclaimed dialog', () => {
     );
     render(<ClaimsByRoundSection />);
 
-    await user.click(screen.getByRole('button', { name: /1 unclaimed/ }));
+    await user.click(screen.getByRole('button', { name: /1 unretrieved/ }));
 
     expect(within(screen.getByRole('dialog')).getByText('—')).toBeInTheDocument();
   });
@@ -355,7 +355,7 @@ describe('ClaimsByRoundSection explore dialog', () => {
     await user.click(screen.getByRole('button', { name: 'Explore' }));
 
     const dialog = screen.getByRole('dialog');
-    expect(within(dialog).getByText('Claim transactions')).toBeInTheDocument();
+    expect(within(dialog).getByText('Retrieval transactions')).toBeInTheDocument();
     expect(within(dialog).getByText('1.2500 ETH')).toBeInTheDocument();
     expect(within(dialog).getByText(/2m/)).toBeInTheDocument();
   });
@@ -383,7 +383,9 @@ describe('ClaimsByRoundSection explore dialog', () => {
 
     await user.click(screen.getByRole('button', { name: 'Explore' }));
 
-    expect(within(screen.getByRole('dialog')).getByText(/swept by/)).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('dialog')).getByText(/Retrieved after the deadline by/),
+    ).toBeInTheDocument();
   });
 
   it('does not flag a sweep when the beneficiary only differs in case', async () => {
@@ -400,7 +402,9 @@ describe('ClaimsByRoundSection explore dialog', () => {
 
     await user.click(screen.getByRole('button', { name: 'Explore' }));
 
-    expect(within(screen.getByRole('dialog')).queryByText(/swept by/)).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('dialog')).queryByText(/Retrieved after the deadline by/),
+    ).not.toBeInTheDocument();
   });
 
   it('says so when a cycle has no claims and no attached tokens', async () => {
@@ -412,7 +416,7 @@ describe('ClaimsByRoundSection explore dialog', () => {
 
     await user.click(screen.getByRole('button', { name: 'Explore' }));
 
-    expect(screen.getByText('No claims recorded for this cycle.')).toBeInTheDocument();
+    expect(screen.getByText('No retrievals recorded for this cycle.')).toBeInTheDocument();
     expect(screen.getByText('No tokens attached this cycle.')).toBeInTheDocument();
   });
 

@@ -10,7 +10,7 @@ export const securityCopyZhTw: TrustPageCopy = {
     {
       heading: '安全模型',
       paragraphs: [
-        '協議操作由 Arbitrum 智慧合約紀錄。連接錢包或落筆前，公開頁面應便於使用者與抓取工具檢查合約地址、原始碼資源、驗證背景及執行假設。',
+        '協議操作由 Arbitrum 智慧合約記錄。連接錢包或落筆前，可透過公開頁面核對合約地址、原始碼、驗證資料及協議運作所依賴的條件。',
       ],
       bullets: [
         '請使用官方應用程式 `https://app.cosmicsignature.com/`。',

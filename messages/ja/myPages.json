@@ -29,11 +29,11 @@
     },
     "empty": {
       "ethTitle": "ETH配分はまだありません",
-      "ethDescription": "一筆を入れて星選に参加すると、ETH配分を受け取れます。",
+      "ethDescription": "一筆を入れると星選の対象になります。ETH配分の受領者に選ばれると、ここで確認できます。",
       "nftTitle": "添付されたNFTはありません",
-      "nftDescription": "サイクル中に一筆に添付されたNFTがここに表示されます。",
+      "nftDescription": "このウォレットに配分された添付NFTがここに表示されます。",
       "erc20Title": "添付されたトークンはありません",
-      "erc20Description": "サイクル中に一筆に添付されたERC-20トークンがここに表示されます。"
+      "erc20Description": "このウォレットに配分された添付ERC-20トークンがここに表示されます。"
     },
     "retrievable": "受け取り可能：",
     "retrieving": "受け取り中…",
@@ -65,7 +65,7 @@
       "distributionPerNft": {
         "label": "Cosmic Signature NFTあたりの配分",
         "tooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分。係留プール全体（オンチェーン）を、インデックス済みの係留Cosmic Signature NFT数で割って計算します。",
-        "indexUnavailableSuffix": "オンチェーンの係留プールはゼロではありませんが、インデックス済みの係留Cosmic Signature NFT総数がゼロのため（例：cg_stake_stats_cstがETLで更新されていない）、NFTあたりの値を計算できません。"
+        "indexUnavailableSuffix": "現在、プール残高と係留中のNFT数が同期していないため、NFTあたりの値を計算できません。"
       }
     }
   },
@@ -100,7 +100,7 @@
       },
       "signatureAllocations": {
         "label": "受け取ったシグネチャー配分",
-        "tooltip": "サイクル確定時刻が切れる前に最後の一筆を入れて、シグネチャー配分を受け取った回数。"
+        "tooltip": "シグネチャー配分を受け取った回数です。"
       },
       "totalEth": {
         "label": "星選ETHの総額",
@@ -185,7 +185,7 @@
       },
       "unretrievedNfts": {
         "label": "未受け取りのNFT",
-        "tooltip": "シグネチャー配分とともに受け取ったが、まだ受け取っていない添付NFT。"
+        "tooltip": "シグネチャー配分の対象となった添付NFTのうち、まだウォレットで受け取っていないものです。"
       },
       "stellarSelectionNfts": {
         "label": "星選NFT",
@@ -282,7 +282,7 @@
       "ownedTitle": "所有しているCosmic Signature NFT",
       "transferTitle": "NFTを移転",
       "transferSubtitle": "任意：選択したCosmic Signature NFTを別のウォレットへ送ります。",
-      "transferDescription": "別のアドレスへ送る準備ができたときだけ、このウォレットからNFTを選んでください。"
+      "transferDescription": "別のウォレットへ送るNFTを選択してください。"
     },
     "table": {
       "empty": "トークンはまだありません。",
@@ -331,7 +331,7 @@
   },
   "nftTransfer": {
     "defaultDescription": "Cosmic Signature NFTを1点以上選び、別のウォレットアドレスへ送ります。",
-    "marketplacePrompt": "直接送るのではなく売りたい場合は、マーケットプレイスでCosmic Signature NFTを出品または取得できます。",
+    "marketplacePrompt": "NFTを売買する場合は、マーケットプレイスで出品や購入ができます。",
     "marketplace": "NFTを売買する",
     "sourceWallet": "送付元ウォレット",
     "ownedNfts": "所有NFT",

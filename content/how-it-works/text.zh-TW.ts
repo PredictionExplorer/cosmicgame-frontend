@@ -45,7 +45,7 @@ export const howItWorksTextZhTw = {
       },
       {
         title: '獲配',
-        description: '週期收官後，即可參與各項分配——簽名分配、星選、錨定配發等。',
+        description: '週期收官後，協議會按規則發放簽名分配、星選分配與錨定配發等。',
         tooltip: `寫下收官之筆的參與者會獲得週期儲備的 ${protocolFacts.mainEthPercentage}%、${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。星選獲配者、錨定者及其他參與者也會獲得相應分配。`,
       },
     ],
@@ -198,7 +198,7 @@ export const howItWorksTextZhTw = {
   },
   callToAction: {
     heading: '準備落下第一筆了嗎？',
-    body: '加入正在推進的演繹週期。連接錢包，落下你的第一筆，開始銘刻 CST，塑造這一週期的簽名。',
+    body: '加入目前演繹週期。連接錢包，落下第一筆，一起塑造這一週期的簽名。',
     primaryCtaLabel: '進入協議',
     discordCtaLabel: 'Discord',
     twitterCtaLabel: 'Twitter / X',

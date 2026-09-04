@@ -186,7 +186,7 @@ describe('AnchoringSection', () => {
   it('renders tab triggers', () => {
     render(<AnchoringSection {...defaultProps} />);
     const cstTab = screen.getByRole('tab', { name: 'Cosmic Signature NFT' });
-    const rwlkTab = screen.getByRole('tab', { name: 'RandomWalk NFT' });
+    const rwlkTab = screen.getByRole('tab', { name: 'Random Walk NFT' });
     expect(cstTab).toHaveClass('whitespace-normal');
     expect(rwlkTab).toHaveClass('whitespace-normal');
     expect(screen.getByRole('tablist')).toHaveClass('flex-wrap');
@@ -201,10 +201,10 @@ describe('AnchoringSection', () => {
   it('explains imprinted-token anchoring counters', async () => {
     const user = userEvent.setup();
     render(<AnchoringSection {...defaultProps} />);
-    await user.click(screen.getByRole('tab', { name: 'RandomWalk NFT' }));
+    await user.click(screen.getByRole('tab', { name: 'Random Walk NFT' }));
     expect(
       screen.getByText(
-        'Total Cosmic Signature NFTs and paired CST imprinted for RandomWalk NFT anchor-holders through Anchored-NFT Stellar Selection.',
+        'Total Cosmic Signature NFTs and paired CST imprinted for Random Walk NFT anchor-holders through Anchored-NFT Stellar Selection.',
       ),
     ).toBeInTheDocument();
   });

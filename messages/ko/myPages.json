@@ -31,9 +31,9 @@
       "ethTitle": "아직 ETH 배분이 없습니다",
       "ethDescription": "제스처를 남겨 별빛 선정에 참여하면 ETH 배분을 받을 수 있습니다.",
       "nftTitle": "첨부된 NFT가 없습니다",
-      "nftDescription": "사이클 중 제스처에 첨부된 NFT가 여기에 표시됩니다.",
+      "nftDescription": "이 지갑에 배분된 첨부 NFT가 여기에 표시됩니다.",
       "erc20Title": "첨부된 토큰이 없습니다",
-      "erc20Description": "사이클 중 제스처에 첨부된 ERC-20 토큰이 여기에 표시됩니다."
+      "erc20Description": "이 지갑에 배분된 첨부 ERC-20 토큰이 여기에 표시됩니다."
     },
     "retrievable": "회수 가능:",
     "retrieving": "회수 중…",
@@ -65,7 +65,7 @@
       "distributionPerNft": {
         "label": "Cosmic Signature NFT당 앵커링 지급",
         "tooltip": "앵커링된 Cosmic Signature NFT 1개당 현재 ETH 앵커링 지급으로, 온체인 앵커링 풀 총액을 인덱싱된 앵커링 Cosmic Signature NFT 수로 나누어 계산합니다.",
-        "indexUnavailableSuffix": "온체인 앵커링 풀은 0이 아니지만 인덱싱된 앵커링 Cosmic Signature NFT 총수가 0이어서(예: ETL이 cg_stake_stats_cst를 갱신하지 않음) NFT당 지급을 계산할 수 없습니다."
+        "indexUnavailableSuffix": "현재 풀 잔액과 앵커링된 NFT 수가 동기화되지 않아 NFT당 지급액을 계산할 수 없습니다."
       }
     }
   },
@@ -100,7 +100,7 @@
       },
       "signatureAllocations": {
         "label": "받은 시그니처 배분",
-        "tooltip": "사이클 마감 시각이 지나기 전에 최종 제스처를 남겨 시그니처 배분을 회수한 횟수를 나타냅니다."
+        "tooltip": "시그니처 배분을 회수한 횟수입니다."
       },
       "totalEth": {
         "label": "별빛 선정 ETH 합계",
@@ -185,7 +185,7 @@
       },
       "unretrievedNfts": {
         "label": "미회수 NFT",
-        "tooltip": "시그니처 배분과 함께 받았지만 아직 회수하지 않은 첨부 NFT입니다."
+        "tooltip": "시그니처 배분 대상으로 배정된 첨부 NFT 중 아직 지갑으로 회수하지 않은 NFT입니다."
       },
       "stellarSelectionNfts": {
         "label": "별빛 선정 NFT",
@@ -282,7 +282,7 @@
       "ownedTitle": "내가 보유한 Cosmic Signature NFT",
       "transferTitle": "NFT 전송",
       "transferSubtitle": "선택 사항: 원하는 Cosmic Signature NFT를 골라 다른 지갑으로 보냅니다.",
-      "transferDescription": "다른 주소로 보낼 준비가 되었을 때만 이 지갑의 NFT를 선택해 주세요."
+      "transferDescription": "다른 지갑으로 전송할 NFT를 선택해 주세요."
     },
     "table": {
       "empty": "아직 토큰이 없습니다.",
@@ -331,7 +331,7 @@
   },
   "nftTransfer": {
     "defaultDescription": "Cosmic Signature NFT를 하나 이상 선택해 다른 지갑 주소로 보냅니다.",
-    "marketplacePrompt": "직접 보내는 대신 판매하고 싶다면 마켓플레이스에서 Cosmic Signature NFT를 등록하거나 구매할 수 있습니다.",
+    "marketplacePrompt": "NFT를 판매하거나 구매하려면 마켓플레이스를 이용할 수 있습니다.",
     "marketplace": "NFT 구매 또는 판매",
     "sourceWallet": "보내는 지갑",
     "ownedNfts": "보유 NFT",

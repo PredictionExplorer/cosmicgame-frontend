@@ -31,9 +31,9 @@
       "ethTitle": "暂无 ETH 分配",
       "ethDescription": "落笔后即可参与 ETH 星选，获配结果由协议在链上确定。",
       "nftTitle": "暂无已附加 NFT",
-      "nftDescription": "周期内随落笔附加的 NFT 会显示在这里。",
+      "nftDescription": "分配给此钱包的已附加 NFT 会显示在这里。",
       "erc20Title": "暂无已附加代币",
-      "erc20Description": "周期内随落笔附加的 ERC-20 代币会显示在这里。"
+      "erc20Description": "分配给此钱包的已附加 ERC-20 代币会显示在这里。"
     },
     "retrievable": "可取回：",
     "retrieving": "取回中…",
@@ -100,7 +100,7 @@
       },
       "signatureAllocations": {
         "label": "已获签名分配",
-        "tooltip": "在周期收官倒计时结束前写下收官之笔，并取回签名分配的次数。"
+        "tooltip": "此钱包收到签名分配的次数。"
       },
       "totalEth": {
         "label": "星选 ETH 总额",

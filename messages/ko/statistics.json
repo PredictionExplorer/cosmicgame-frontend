@@ -67,15 +67,15 @@
       "webPageName": "Cosmic Signature 프로토콜 통계",
       "webPageDescription": "Arbitrum 위 Cosmic Signature 프로토콜의 공개 통계입니다. 퍼포먼스 사이클 상태, 제스처, NFT, CST, 앵커링, 준비금, 배분 데이터를 포함합니다.",
       "datasetName": "Cosmic Signature 프로토콜 통계 스냅숏",
-      "datasetDescription": "Arbitrum 스마트 컨트랙트와 Cosmic Signature API에서 인덱싱한 공개 프로토콜 활동을 크롤링 가능한 형태로 요약한 데이터입니다."
+      "datasetDescription": "Arbitrum 스마트 컨트랙트와 Cosmic Signature API 기록을 바탕으로 집계한 공개 프로토콜 활동 데이터입니다."
     },
     "seo": {
       "eyebrow": "프로토콜 통계 · Arbitrum",
       "heading": "Cosmic Signature 프로토콜 통계",
-      "description": "이 페이지는 Arbitrum 위 Cosmic Signature 프로토콜의 공개 활동을 추적합니다. 퍼포먼스 사이클 상태, 제스처, Cosmic Signature NFT, CST, 앵커링, 준비금, 배분 데이터를 포함합니다. 아래 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색 엔진과 AI 크롤러를 위해 초기 HTML에 담겨 있습니다.",
+      "description": "Arbitrum 공개 기록에 기반한 프로토콜 통계입니다. 사이클 상태, 제스처, NFT, CST, 앵커링, 준비금, 배분의 변화를 확인할 수 있습니다.",
       "lastUpdated": "최근 업데이트: {date}",
       "unavailableSuffix": ". 실시간 데이터가 일시적으로 제공되지 않아 지금은 프로토콜 설명 정보만 표시됩니다.",
-      "dataSource": "데이터는 프로토콜의 Arbitrum 스마트 컨트랙트 활동을 인덱싱하는 공개 Cosmic Signature API에서 가져옵니다. 프로토콜 작동 원리와 검증 정보는 아래 크롤링 가능한 링크에서 확인할 수 있습니다.",
+      "dataSource": "데이터는 Arbitrum 활동을 집계하는 Cosmic Signature 공개 API에서 가져옵니다. 작동 원리와 검증 정보는 아래 관련 페이지에서 확인할 수 있습니다.",
       "relatedPagesAria": "통계 관련 페이지",
       "links": {
         "currentCycle": "현재 퍼포먼스 사이클 보기",
@@ -119,7 +119,7 @@
     },
     "numAllocationsDistributed": {
       "label": "완료된 배분 건수",
-      "tooltip": "인덱싱된 배분 기록의 개수를 나타냅니다. cg_prize 행이 있으면 이를 사용하고, 없으면 수령자 배분 합계를 집계한 값으로 대체합니다."
+      "tooltip": "집계된 배분 기록의 건수입니다. 개별 기록을 확인할 수 없으면 수령자별 배분 건수의 합계를 표시합니다."
     },
     "totalSignatureAllocationsDistributed": {
       "label": "시그니처 배분 총액",
@@ -298,7 +298,7 @@
       "poolTooltip": "Cosmic Signature NFT 앵커링 보유자를 위한 앵커링 지급 풀에 현재 배분된 ETH입니다.",
       "perNftLabel": "Cosmic Signature NFT당 지급액",
       "perNftTooltip": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액으로, 온체인 풀을 인덱싱된 앵커링 NFT 총수로 나눈 값입니다.",
-      "perNftTooltipUnavailable": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액으로, 온체인 풀을 인덱싱된 앵커링 NFT 총수로 나눈 값입니다. 온체인 앵커링 풀은 0이 아니지만 인덱싱된 Cosmic Signature NFT 앵커링 총수가 0이어서(예: ETL이 cg_stake_stats_cst를 갱신하지 않음) NFT당 지급액을 계산할 수 없습니다.",
+      "perNftTooltipUnavailable": "NFT 한 개당 ETH 앵커링 지급액은 풀 잔액을 앵커링된 전체 NFT 수로 나누어 계산합니다. 현재 잔액과 NFT 수가 동기화되지 않아 계산할 수 없습니다.",
       "activeHoldersLabel": "활성 앵커링 보유자",
       "activeHoldersTooltip": "현재 Cosmic Signature NFT 또는 RandomWalk NFT를 한 개 이상 앵커링 중인 활성 지갑을 합산한 값입니다."
     },
@@ -687,7 +687,7 @@
       "cycleActivationDelay": "사이클 활성화 전 지연 시간이 변경되었습니다.",
       "anchoredRandomWalkRecipients": "앵커링된 RandomWalk NFT 대상 별빛 선정 NFT 수령자 수가 변경되었습니다.",
       "publicGoodsVaultAddress": "공공재 금고 주소가 변경되었습니다.",
-      "randomWalkContractAddress": "RandomWalkNFT 컨트랙트 주소가 변경되었습니다.",
+      "randomWalkContractAddress": "RandomWalk NFT 컨트랙트 주소가 변경되었습니다.",
       "allocationsWalletAddress": "배분 지갑(배분 에스크로) 주소가 변경되었습니다.",
       "anchoringWalletAddress": "앵커링 지갑 주소가 변경되었습니다.",
       "randomWalkAnchoringWalletAddress": "RandomWalk NFT 앵커링 지갑 주소가 변경되었습니다.",
@@ -700,7 +700,7 @@
       "gestureCostIncreaseRatio": "제스처 비용 증가 비율이 변경되었습니다.",
       "gestureTimeIncrement": "제스처마다 늘어나는 마감 시간 증가량이 변경되었습니다.",
       "initialFinalizationDivisor": "초기 사이클 마감 시각을 구하는 제수(mainPrizeTimeIncrementInMicroSeconds / 제수)가 변경되었습니다.",
-      "treasurerAddress": "홍보 지갑 주소가 변경되었습니다.",
+      "treasurerAddress": "홍보 준비금 재무 담당자 주소가 변경되었습니다.",
       "activationTime": "사이클 활성화 시각이 변경되었습니다.",
       "cstCalibrationLength": "사이클 시작 CST 보정 구간의 길이가 변경되었습니다.",
       "erc20Multiplier": "ERC-20 토큰 배분 배수가 변경되었습니다.",
@@ -735,7 +735,7 @@
   },
   "publicDataSummaries": {
     "common": {
-      "lastUpdated": "최근 업데이트: {date}. 데이터 출처: {source}. 아래 대화형 표는 실시간 앱 데이터로 채워지며, 이 요약은 검색 엔진과 AI 크롤러를 위해 초기 HTML에 담겨 있습니다.",
+      "lastUpdated": "최종 업데이트: {date}. 데이터 출처: {source}.",
       "relatedPagesAria": "{heading} 관련 페이지",
       "unavailable": "확인 불가"
     },
@@ -758,7 +758,7 @@
     "namedNfts": {
       "eyebrow": "이름 붙인 NFT · Arbitrum",
       "heading": "이름 붙인 Cosmic Signature NFT",
-      "description": "소유자가 직접 이름을 붙인 Cosmic Signature NFT를 둘러볼 수 있습니다. 토큰의 정체성, 갤러리 탐색, 온체인 컬렉션 내역이 여기서 이어집니다.",
+      "description": "소유자가 이름을 붙인 Cosmic Signature NFT를 소개합니다. 작품과 온체인에 기록된 이력을 함께 살펴볼 수 있습니다.",
       "source": "Cosmic Signature 공개 토큰 API",
       "cards": {
         "named": "이름 붙인 Cosmic Signature NFT",

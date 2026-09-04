@@ -30,8 +30,8 @@
   },
   "attachedAssets": {
     "actions": {
-      "claim": "Claim",
-      "claiming": "Claiming..."
+      "claim": "Retrieve",
+      "claiming": "Retrieving..."
     },
     "status": {
       "yes": "Yes",
@@ -55,7 +55,7 @@
       }
     },
     "erc20": {
-      "empty": "No attached ERC20 tokens yet.",
+      "empty": "No attached ERC-20 tokens yet.",
       "columns": {
         "datetime": "Datetime",
         "cycle": "Cycle #",
@@ -86,7 +86,7 @@
     "cycle": "Cycle",
     "cycleNumber": "Cycle Num",
     "cycleHash": "Cycle #",
-    "round": "Round",
+    "round": "Cycle",
     "participant": "Participant",
     "participantAddress": "Participant Address",
     "recipient": "Recipient",
@@ -140,8 +140,8 @@
     "numberOfContributions": "Number of Contributions",
     "totalContributedEth": "Total Contributed Amount (ETH)",
     "numberOfStellarEntries": "Number of Stellar Selection Entries",
-    "ethSelectionProbability": "Probability of Winning ETH",
-    "nftSelectionProbability": "Probability of Winning NFT",
+    "ethSelectionProbability": "ETH allocation probability",
+    "nftSelectionProbability": "NFT allocation probability",
     "expirationDate": "Expiration Date",
     "started": "Started",
     "ended": "Ended",
@@ -202,14 +202,14 @@
     "listAria": "Allocation recipients by cycle"
   },
   "anchoringRecipient": {
-    "empty": "There were no anchored tokens at the time the cycle ended. The deposit amount was forwarded to the Public Goods address."
+    "empty": "No Cosmic Signature NFTs were anchored when this cycle finalized. Its Anchor Distribution remained in the Cycle Reserve."
   },
   "banGesture": {
-    "banned": "Gesture was banned successfully!",
-    "unbanned": "Gesture was unbanned successfully!",
-    "error": "An error occurred",
-    "ban": "Ban",
-    "unban": "Unban"
+    "banned": "Gesture hidden.",
+    "unbanned": "Gesture restored.",
+    "error": "The moderation status could not be updated. Please try again.",
+    "ban": "Hide",
+    "unban": "Restore"
   },
   "ethContribution": {
     "withInfo": "Contribution with info",
@@ -218,14 +218,14 @@
   },
   "endurance": {
     "liveHelp": "This participant is also the latest gesture maker, so this endurance window is still growing.",
-    "championTime": "Champion Time",
-    "chronoWarrior": "Chrono Warrior"
+    "championTime": "Endurance duration",
+    "chronoWarrior": "Chrono-Warrior"
   },
   "gestureHistory": {
-    "randomWalkGesture": "Gesture was made using RandomWalk NFT (ID = {id})",
+    "randomWalkGesture": "Gesture made with Random Walk NFT #{id}",
     "randomWalkImageAlt": "RWLK NFT",
-    "cstGesture": "Gesture was made using CST tokens",
-    "ethGesture": "Gesture was made using ETH",
+    "cstGesture": "Gesture made with CST",
+    "ethGesture": "Gesture made with ETH",
     "nftAttached": " and a token ({address}) with ID {id} was attached",
     "erc20AttachedPrefix": " and {amount}",
     "attachedSuffix": " was attached",
@@ -237,7 +237,7 @@
   },
   "recipientHistory": {
     "notApplicable": "N/A",
-    "unretrievedHelp": "Unclaimed, go to Pending Winnings to claim.",
+    "unretrievedHelp": "Not yet retrieved. Open My Allocations to retrieve it.",
     "unretrievedAria": "Unretrieved allocation information",
     "types": {
       "mainEth": "Main ETH Allocation",
@@ -253,8 +253,8 @@
       "participantStellarEth": "ETH Stellar Selection (for participants)",
       "participantStellarCst": "Recognition CST from Stellar Selection (for participants)",
       "participantStellarNft": "CS NFT Stellar Selection (for participants)",
-      "anchorStellarCst": "Recognition CST from Anchored-NFT Stellar Selection (for RandomWalk anchor-holders)",
-      "anchorStellarNft": "CS NFT Stellar Selection (for RandomWalk anchor-holders)",
+      "anchorStellarCst": "Recognition CST from Anchored-NFT Stellar Selection (for Random Walk anchor-holders)",
+      "anchorStellarNft": "CS NFT Stellar Selection (for Random Walk anchor-holders)",
       "anchorDistributionEth": "Anchor Distribution ETH (for Cosmic Signature NFT anchor-holders)",
       "attachedNftRetrieval": "Attached NFT (timeout retrieval)",
       "attachedErc20Retrieval": "Attached ERC-20 (timeout retrieval)",
@@ -283,7 +283,7 @@
     "attachedAssets": "Attached assets",
     "yesToken": "Yes, token #{id}",
     "mayCloseIn": "May close in",
-    "mayCloseValue": "{duration} if the latest hold beats Endurance",
+    "mayCloseValue": "{duration} if the current hold exceeds the Endurance Champion record",
     "growingNow": "Growing now",
     "recordStatus": "Record status",
     "standingChronoRecord": "Standing Chrono-Warrior record",
@@ -305,12 +305,12 @@
     "currentHold": "Current hold",
     "noLatestGesture": "No latest gesture yet",
     "enduranceChampion": "Endurance Champion",
-    "enduranceTooltip": "The participant with the longest uninterrupted most-recent-gesture window. The timer only grows while that participant is still the latest gesture maker.",
+    "enduranceTooltip": "The participant with the longest single continuous period as the latest gesture maker. Their timer grows only while they remain in that position.",
     "enduranceWindow": "Endurance window",
     "noEnduranceRecord": "No endurance record yet",
-    "enduranceNote": "Longest single latest-participant window, not cumulative time.",
+    "enduranceNote": "Measured by the longest single period as the latest gesture maker; separate periods are not added together.",
     "chronoWarrior": "Chrono-Warrior",
-    "chronoWarriorPrint": "Chrono Warrior",
+    "chronoWarriorPrint": "Chrono-Warrior",
     "chronoTooltip": "The participant who held the Endurance Champion position for the longest continuous reign. Receives 8% of the Cycle Reserve, 1,000 CST, and a Cosmic Signature NFT.",
     "championReign": "Champion reign",
     "noChronoRecord": "No Chrono-Warrior record yet",
@@ -334,7 +334,7 @@
   },
   "transferHistory": {
     "signatureAnchoringWallet": "Cosmic Signature NFT Anchoring Wallet",
-    "randomWalkAnchoringWallet": "RandomWalk NFT Anchoring Wallet"
+    "randomWalkAnchoringWallet": "Random Walk NFT Anchoring Wallet"
   },
   "uniqueAnchorHolders": {
     "numAnchorActions": "Num Anchor Actions",
@@ -357,7 +357,7 @@
     "contractAddress": "Contract Address",
     "numberOfNfts": "Number of NFTs",
     "namedNftTokenId": "Token Id",
-    "isRandomWalk": "Is RandomWalk",
+    "isRandomWalk": "Is Random Walk",
     "isAnchorHolder": "Is Anchor-holder"
   },
   "statisticsTooltips": {
@@ -377,7 +377,7 @@
     "anchorHolderAddress": "Wallet address that anchored or released tokens.",
     "numAnchorActions": "Number of indexed anchor transactions made by this wallet.",
     "numReleaseActions": "Number of indexed release transactions made by this wallet.",
-    "totalImprintedTokens": "Total tokens imprinted for this anchor-holder through the relevant anchoring or allocation flow.",
+    "totalImprintedTokens": "Total tokens imprinted for this anchor-holder through anchoring or allocations.",
     "totalAnchoredTokens": "Current or cumulative anchored-token count reported for this wallet.",
     "totalDistributionEth": "Total ETH Anchor Distribution indexed for this wallet.",
     "unretrievedDistributionEth": "ETH Anchor Distribution still available for this wallet to retrieve.",

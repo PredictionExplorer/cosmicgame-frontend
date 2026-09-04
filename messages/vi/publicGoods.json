@@ -2,17 +2,17 @@
   "protocol": {
     "title": "Đóng góp Hàng hóa công của giao thức",
     "subtitle": "Các khoản chuyển tự động từ giao thức Cosmic Signature đến Kho Hàng hóa công",
-    "description": "Mỗi chu kỳ, một tỷ lệ phần trăm của Dự trữ chu kỳ được tự động chuyển đến Kho Hàng hóa công. Hội đồng Vũ trụ điều phối những đơn vị thụ hưởng hàng hóa công nào sẽ nhận các khoản này, tạo nên mối liên hệ trực tiếp giữa việc tham gia và tác động lên hệ sinh thái."
+    "description": "Mỗi chu kỳ, giao thức tự động chuyển một phần dự trữ đến Kho Hàng hóa công. Kho sau đó chuyển ETH đến đơn vị thụ hưởng được cấu hình trong hợp đồng, hiện là Protocol Guild."
   },
   "voluntary": {
     "title": "Đóng góp Hàng hóa công tự nguyện",
     "subtitle": "Các khoản đóng góp tự nguyện của thành viên cộng đồng vào Kho Hàng hóa công",
-    "description": "Ngoài các khoản chuyển tự động của giao thức, thành viên cộng đồng có thể tự nguyện đóng góp vào Kho Hàng hóa công. Những khoản đóng góp này phản ánh cam kết của cộng đồng Cosmic Signature trong việc hỗ trợ các sáng kiến hàng hóa công thông qua điều phối trên chuỗi."
+    "description": "Ngoài phần phân bổ tự động của giao thức, thành viên cộng đồng có thể tự nguyện đóng góp vào Kho Hàng hóa công để hỗ trợ đơn vị thụ hưởng đã được cấu hình."
   },
   "retrievals": {
     "title": "Nhận về Hàng hóa công",
     "subtitle": "Các khoản đã được nhận về từ Kho Hàng hóa công",
-    "description": "Trang này theo dõi mọi lần nhận về từ Kho Hàng hóa công của Cosmic Signature. Mỗi lần nhận về là một khoản hàng hóa công được chuyển đến các đơn vị thụ hưởng do Hội đồng Vũ trụ điều phối lựa chọn."
+    "description": "Trang này ghi lại các khoản đã nhận về từ Kho Hàng hóa công của Cosmic Signature và chuyển đến đơn vị thụ hưởng được cấu hình trong hợp đồng."
   },
   "loading": "Đang tải…"
 }

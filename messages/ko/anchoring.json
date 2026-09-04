@@ -30,7 +30,7 @@
     "subtitle": "전체 앵커링 활동과 지급 내역 개요",
     "intro": {
       "description": "Cosmic Signature NFT를 앵커링하면 각 사이클 준비금의 {percentage}%를 ETH 앵커링 지급으로 나누어 받습니다. RandomWalk NFT를 앵커링하면 앵커링 NFT 별빛 선정에 참여합니다.",
-      "flow": "앵커링 흐름 {percentage}%"
+      "flow": "앵커링 지급에 {percentage}%"
     },
     "stats": {
       "pool": {
@@ -48,7 +48,7 @@
       "distributionPerNft": {
         "label": "NFT당 지급액",
         "tooltip": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액입니다. 온체인 풀을 인덱싱된 앵커링 NFT 총 개수로 나눈 값입니다.",
-        "tooltipUnavailable": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액입니다. 온체인 풀을 인덱싱된 앵커링 NFT 총 개수로 나눈 값입니다. 온체인 앵커링 풀은 0이 아니지만 인덱싱된 앵커링 Cosmic Signature NFT 총 개수가 0이어서(예: ETL이 cg_stake_stats_cst를 갱신하지 않은 경우) NFT당 지급액을 계산할 수 없습니다."
+        "tooltipUnavailable": "NFT 한 개당 ETH 앵커링 지급액은 풀 잔액을 앵커링된 전체 NFT 수로 나누어 계산합니다. 현재 잔액과 NFT 수 데이터가 동기화되지 않아 계산할 수 없습니다."
       },
       "uniqueHolders": {
         "label": "고유 앵커링 보유자",

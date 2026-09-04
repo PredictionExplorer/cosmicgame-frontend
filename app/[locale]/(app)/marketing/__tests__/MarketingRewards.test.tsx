@@ -113,14 +113,14 @@ describe('MarketingRewards', () => {
   it('shows loading state when rewards are loading', () => {
     mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: true });
     render(<MarketingRewards />);
-    expect(screen.getByLabelText('Loading marketing rewards')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading outreach allocations')).toBeInTheDocument();
   });
 
   it('shows loading state when dashboard is loading', () => {
     mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: false });
     mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: true });
     render(<MarketingRewards />);
-    expect(screen.getByLabelText('Loading marketing rewards')).toBeInTheDocument();
+    expect(screen.getByLabelText('Loading outreach allocations')).toBeInTheDocument();
   });
 
   it('renders all sections when loaded', () => {

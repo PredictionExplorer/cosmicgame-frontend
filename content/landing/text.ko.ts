@@ -7,7 +7,7 @@ export const landingTextKo = {
   meta: {
     title: 'Cosmic Signature: Arbitrum 위의 절차적 온체인 아트 프로토콜',
     description:
-      'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 모든 제스처가 사이클의 최종 시그니처를 빚어내고, 프로토콜은 그 결과를 함께 빚어낸 모든 참여자에게, 그리고 이더리움 자체가 의존하는 인프라에까지 준비금을 다시 배분합니다.',
+      'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 제스처가 쌓이면서 사이클의 시그니처가 완성되고, 준비금은 참여자와 이더리움을 지탱하는 인프라에 배분됩니다.',
     keywords: [
       'Cosmic Signature',
       '절차적 아트 프로토콜',
@@ -46,7 +46,7 @@ export const landingTextKo = {
       'Arbitrum One',
     ],
     art: {
-      eyebrow: '컬렉션에서 실시간으로',
+      eyebrow: '컬렉션의 작품',
       caption: '온체인에 각인 · CC0',
       cstNote: `각인된 시그니처 한 점마다 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST가 함께 배분됩니다.`,
       formingLabel: '신호 형성 중',
@@ -61,7 +61,7 @@ export const landingTextKo = {
     eyebrow: '사이클',
     heading: '퍼포먼스 사이클, 시작에서 마감까지.',
     description:
-      '사이클은 시간 속의 한 구간입니다. 보정 구간으로 열리고, 제스처로 채워지며, 사이클 마감 시각이 지나면 마감됩니다. 하우스도 없고, 딜러도 없습니다. 오직 프로토콜만 있습니다.',
+      '사이클은 보정 구간으로 시작해 제스처가 더해지며 이어집니다. 마감 시각이 지나면 사이클을 마감할 수 있습니다. 진행을 맡는 사람이나 중개자 없이 프로토콜의 규칙에 따라 작동합니다.',
     stages: {
       opening: {
         title: '사이클 시작',
@@ -84,7 +84,7 @@ export const landingTextKo = {
 
   art: {
     eyebrow: '아트',
-    heading: '삼체 문제, 온체인에서 렌더링됩니다.',
+    heading: '온체인 시드로 그려 내는 삼체 문제.',
     description:
       '모든 Cosmic Signature NFT는 뉴턴 중력 아래 서로를 도는 세 천체를 시각화합니다. 세 천체는 본질적으로 카오스적인 궤적을 그립니다. AI도 없고, 학습 데이터도 없습니다. 오직 결정론적 물리만 있습니다. 같은 시드 → 픽셀 하나까지 같은 결과물.',
     loading: {
@@ -115,7 +115,7 @@ export const landingTextKo = {
       },
       camera: {
         title: '카메라',
-        body: '느린 타원형 카메라 드리프트가 각 시그니처에 삼체의 춤을 가로지르는 영화적인 시차 효과를 더합니다.',
+        body: '카메라가 타원형 경로를 따라 천천히 움직이며 세 천체의 궤적을 담습니다. 시점의 변화가 작품에 영화 같은 깊이감을 더합니다.',
       },
       color: {
         title: '색',
@@ -164,7 +164,7 @@ export const landingTextKo = {
       },
       'anchor-distribution': {
         title: '앵커링 지급',
-        body: '이 사이클 동안 프로토콜에 앵커링된 모든 Cosmic Signature NFT에 NFT당 균등하게 지급됩니다.',
+        body: '이 사이클 동안 프로토콜에 앵커링된 Cosmic Signature NFT마다 같은 금액이 지급됩니다.',
       },
       'eth-stellar-selection': {
         title: 'ETH 별빛 선정',
@@ -198,10 +198,10 @@ export const landingTextKo = {
     heading: 'Cosmic Signature NFT를 프로토콜에 앵커링합니다.',
     body: `앵커링된 Cosmic Signature NFT는 사이클마다 ${protocolFacts.anchorDistributionPercentage}%의 앵커링 지급을 비례하여 나누어 받으며, 그 몫은 앵커링을 해제할 때 지급됩니다. 앵커링 해제는 언제든 할 수 있지만, 각 NFT는 한 번만 앵커링할 수 있으므로 해제하면 그 NFT의 앵커링 자격은 영구히 끝납니다. 앵커링된 Random Walk NFT는 앵커링 NFT 별빛 선정 자격을 얻으며, 선정된 앵커링 보유자는 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT를 받습니다(ETH는 포함되지 않습니다).`,
     bullets: [
-      '사이클마다 ETH가 쌓이고, 앵커링 해제 시 회수',
+      '사이클마다 쌓인 ETH는 앵커링 해제 시 회수',
       '앵커링 해제는 언제든 가능, 각 NFT는 한 번만 앵커링',
       'Random Walk 앵커링은 별빛 선정에 포함',
-      '잠금 기간도 페널티도 없음, 해제는 NFT마다 영구적',
+      '잠금 기간과 페널티 없음. 해제한 NFT는 다시 앵커링할 수 없음',
     ],
     ctaLabel: '앱에서 앵커링하기',
   },
@@ -311,7 +311,7 @@ export const landingTextKo = {
       },
       // lexicon-allow-end
       {
-        question: '이 아트는 기술적으로 무엇인가요?',
+        question: '작품은 어떤 기술로 만들어지나요?',
         answer:
           '각 Cosmic Signature NFT는 뉴턴 중력 삼체 시뮬레이션의 결정론적 렌더입니다. 온체인 시드가 4차 요시다 심플렉틱 적분기로 시뮬레이션한 후보 궤도 100,000개 가운데 하나를 고르고, 그 궤도를 OKLab 색 혼합과 함께 64개의 파장 구간으로 스펙트럼 렌더링합니다. 파이프라인은 CC0로 완전히 오픈 소스이며, 누구나 시드로 시그니처를 재현할 수 있습니다.',
       },
@@ -374,7 +374,7 @@ export const landingTextKo = {
 
   notFound: {
     heading: '별 지도 밖입니다.',
-    description: '이 좌표는 프로토콜 바깥으로 흘러갔습니다. 시그니처로 돌아가 주세요.',
+    description: '요청한 페이지를 찾을 수 없습니다. 시그니처의 세계로 돌아가 주세요.',
     ctaLabel: '시그니처로 돌아가기',
   },
 } satisfies LandingText;

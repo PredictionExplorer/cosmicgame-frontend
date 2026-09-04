@@ -202,7 +202,7 @@
     "listAria": "사이클별 배분 수령자"
   },
   "anchoringRecipient": {
-    "empty": "사이클이 마감된 시점에 앵커링된 토큰이 없어 적립 금액이 공공재 주소로 전달되었습니다."
+    "empty": "사이클 마감 시 앵커링된 Cosmic Signature NFT가 없어, 해당 사이클의 앵커링 지급 몫은 사이클 준비금에 남았습니다."
   },
   "banGesture": {
     "banned": "제스처가 차단되었습니다.",

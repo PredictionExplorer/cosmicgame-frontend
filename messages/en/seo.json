@@ -2,7 +2,7 @@
   "publicData": {
     "common": {
       "unavailable": "Unavailable",
-      "lastUpdated": "Last updated: {date}. Data source: {source}. The interactive tables below hydrate with live app data, while this summary is present in the initial HTML for search engines and AI crawlers.",
+      "lastUpdated": "Last updated: {date}. Source: {source}.",
       "relatedPagesAria": "{heading} related pages"
     },
     "routes": {
@@ -10,7 +10,7 @@
         "eyebrow": "Allocation history · Arbitrum",
         "heading": "Allocation Recipients",
         "description": "Browse public Cosmic Signature allocation history across finalized Performance Cycles, including Signature Allocations, Stellar Selection, Anchor Distributions, and public-goods flows.",
-        "source": "Cosmic Signature public round APIs",
+        "source": "Cosmic Signature public cycle data",
         "links": {
           "statistics": "View protocol statistics",
           "learn": "Learn how cycles finalize",
@@ -325,7 +325,7 @@
   "currentCycleSummary": {
     "eyebrow": "Live Performance Cycle · Arbitrum",
     "heading": "Current Cosmic Signature Performance Cycle",
-    "description": "This page tracks the active Cosmic Signature Performance Cycle, including public gesture counts, cycle reserve context, attached assets, allocation tracks, and finalization status. The interactive console below hydrates with live app data.",
+    "description": "Follow the active Cosmic Signature Performance Cycle: gestures, the Cycle Reserve, attached assets, allocation tracks, and finalization status. The display below updates with live protocol data.",
     "unavailable": "Unavailable",
     "cards": {
       "cycle": "Cycle",

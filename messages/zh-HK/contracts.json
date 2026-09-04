@@ -34,8 +34,8 @@
       "description": "作為週期分配銘刻給獲配者的 ERC-721 NFT 系列"
     },
     "randomWalk": {
-      "name": "RandomWalk",
-      "description": "RandomWalk NFT 系列，可附加至 ETH 落筆以獲得一次價格減免，也可錨定以取得錨定 NFT 星選資格"
+      "name": "Random Walk",
+      "description": "Random Walk NFT 系列，可附加至 ETH 落筆以獲得一次價格減免，也可錨定以取得錨定 NFT 星選資格"
     },
     "council": {
       "name": "宇宙議會",
@@ -59,7 +59,7 @@
     },
     "rwalkAnchor": {
       "name": "RWLK 錨定錢包",
-      "description": "RandomWalk NFT 的錨定合約"
+      "description": "Random Walk NFT 的錨定合約"
     }
   },
   "categories": {
@@ -159,7 +159,7 @@
       "nftLabel": "NFT 星選（參與者）",
       "nftTooltip": "每個週期透過程序化隨機方式獲得 Cosmic Signature NFT 的參與者數量。",
       "anchorLabel": "NFT 星選（已錨定 RWLK）",
-      "anchorTooltip": "每個週期透過程序化隨機方式獲得 Cosmic Signature NFT 的 RandomWalk NFT 錨定者數量。"
+      "anchorTooltip": "每個週期透過程序化隨機方式獲得 Cosmic Signature NFT 的 Random Walk NFT 錨定者數量。"
     }
   },
   "vault": {
@@ -173,9 +173,9 @@
   "seo": {
     "eyebrow": "已驗證合約 · Arbitrum",
     "heading": "Cosmic Signature 合約",
-    "description": "Cosmic Signature 公開其 Arbitrum 合約地址，便於參與者、研究人員、搜尋引擎與 AI 系統將應用體驗對應到可驗證的鏈上協議記錄。",
-    "partialFallback": "此伺服器快照暫時無法取得即時合約地址。下方已驗證的協議代理與實現地址來自前端協議事實，作為靜態後備數據。",
-    "empty": "此伺服器快照暫時無法取得即時合約地址。下方互動式合約表格會在可用時透過 Cosmic Signature 公共 API 載入數據。",
+    "description": "查閱 Cosmic Signature 在 Arbitrum 上的合約地址，並透過源代碼與鏈上記錄驗證協議。",
+    "partialFallback": "暫時無法取得最新合約地址。下方顯示協議資料中已驗證的代理合約與實現合約地址。",
+    "empty": "暫時無法取得最新合約地址。數據恢復後，下方表格便會顯示地址。",
     "relatedAria": "合約信任資源",
     "links": {
       "code": "查看 Cosmic Signature 源代碼",

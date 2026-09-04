@@ -46,7 +46,7 @@ describe('StatisticsHubPanel', () => {
   it('renders headline stat cards from the dashboard', () => {
     render(<StatisticsHubPanel />);
     expect(screen.getByText('Total Cycles')).toBeInTheDocument();
-    expect(screen.getByText('Allocations Distributed')).toBeInTheDocument();
+    expect(screen.getByText('Allocations Distributed', { selector: 'p' })).toBeInTheDocument();
     expect(screen.getByText('Contract Balance')).toBeInTheDocument();
     expect(screen.getByText('36.16 ETH')).toBeInTheDocument();
   });

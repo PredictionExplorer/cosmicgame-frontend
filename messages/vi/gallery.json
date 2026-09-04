@@ -1,6 +1,6 @@
 {
   "error": {
-    "title": "Không tải được kho lưu trữ khắc",
+    "title": "Không tải được bộ sưu tập",
     "message": "Không đọc được bộ sưu tập Cosmic Signature. Hãy thử lại để tải kho lưu trữ."
   },
   "jsonLd": {
@@ -14,12 +14,12 @@
   },
   "intro": {
     "badge": "Kho lưu trữ tạo sinh",
-    "description": "Mỗi Cosmic Signature NFT là một tác phẩm nghệ thuật tạo sinh độc nhất, bắt nguồn từ một seed trên chuỗi qua các mô phỏng vật lý bài toán ba vật thể. Trong một chu kỳ điển hình, 24 NFT mới được khắc: bốn NFT theo vai trò, mười NFT Tinh tuyển dành cho người tham gia, và mười NFT Tinh tuyển NFT neo giữ dành cho những người neo giữ RandomWalk NFT."
+    "description": "Mỗi Cosmic Signature NFT là tác phẩm tạo sinh độc nhất, được tạo từ seed trên chuỗi bằng mô phỏng bài toán ba vật thể. Một chu kỳ điển hình khắc 24 NFT: bốn NFT dành cho các vai trò, mười NFT Tinh tuyển dành cho người tham gia và mười NFT qua Tinh tuyển NFT neo giữ dành cho người neo giữ RandomWalk NFT."
   },
   "featured": {
     "viewAria": "Xem Cosmic Signature {id}",
     "alt": "Tác phẩm Cosmic Signature {id}",
-    "emptyHint": "Tác phẩm thật của bộ sưu tập sẽ xuất hiện ở đây khi có NFT đã lập chỉ mục.",
+    "emptyHint": "Tác phẩm trong bộ sưu tập sẽ xuất hiện tại đây sau khi dữ liệu NFT được cập nhật.",
     "badgeImprint": "Tác phẩm nổi bật",
     "badgeArchive": "Kho lưu trữ",
     "awaitingMetadata": "Đang chờ siêu dữ liệu"
@@ -108,7 +108,7 @@
     "list": "Xem dạng danh sách"
   },
   "pagination": {
-    "showing": "Đang hiển thị <value>{start}</value> - <value>{end}</value> trong <value>{total}</value> NFT",
+    "showing": "Đang hiển thị <value>{start}</value>–<value>{end}</value> trong số <value>{total}</value> NFT",
     "perPage": "Mỗi trang",
     "perPageAria": "Số mục mỗi trang",
     "perPageTooltip": "Số NFT hiển thị trên mỗi trang"

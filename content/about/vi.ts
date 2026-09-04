@@ -13,12 +13,12 @@ export const aboutContentVi = {
       'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum, tạo ra nghệ thuật NFT ba vật thể tất định từ các nét bút của chu kỳ trình diễn.',
   },
   breadcrumbLabel: 'Giới thiệu',
-  eyebrow: 'Trang chủ của thực thể',
+  eyebrow: 'Về giao thức',
   heading: 'Về Cosmic Signature',
   body: {
     paragraphs: [
-      'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Trong mỗi chu kỳ trình diễn, người tham gia đặt nét bút bằng ETH hoặc CST, và mỗi nét bút góp phần định hình Signature cuối cùng: tác phẩm NFT tất định được tạo từ dữ liệu trên chuỗi và kết xuất qua một mô phỏng vật lý ba vật thể.',
-      'Giao thức được thiết kế xoay quanh các cơ chế công khai, có thể xác minh. Các hợp đồng thông minh trên Arbitrum ghi lại nét bút, chu kỳ, các luồng phân bổ, CST, neo giữ và các lần khắc NFT. Tác phẩm có thể tái tạo từ seed của nó, và dự án đề cao mã nguồn mở, nghệ thuật CC0 và việc hỗ trợ hàng hóa công.',
+      'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Trong mỗi chu kỳ trình diễn, người tham gia đặt nét bút bằng ETH hoặc CST, mỗi nét bút góp phần định hình Signature cuối cùng: tác phẩm NFT được tạo từ dữ liệu trên chuỗi bằng mô phỏng vật lý ba vật thể. Quy trình tất định cho phép tái tạo cùng một tác phẩm từ cùng dữ liệu ban đầu.',
+      'Các cơ chế của giao thức đều công khai và có thể kiểm tra. Hợp đồng thông minh trên Arbitrum ghi lại nét bút, chu kỳ, các luồng phân bổ, CST, neo giữ và hoạt động khắc NFT. Tác phẩm có thể tái tạo từ seed ban đầu. Dự án chú trọng mã nguồn mở, nghệ thuật theo CC0 và hỗ trợ Hàng hóa công.',
       'Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi.',
     ],
     // lexicon-allow-start: explicit investment-product denial for crawler and compliance clarity.

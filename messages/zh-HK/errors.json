@@ -1,6 +1,6 @@
 {
   "generic": "操作未完成，請重試。",
-  "networkOffline": "網絡已斷開，請重新連接後繼續。",
+  "networkOffline": "網絡連接已中斷，請重新連接後繼續。",
   "walletNotConnected": "連接 Web3 錢包後即可落筆。",
   "insufficientEth": "錢包中的 ETH 不足，無法落筆。",
   "cycleClosed": "本週期已收官，下一演繹週期即將開啟。",
@@ -14,7 +14,7 @@
     "retry": "重試"
   },
   "route": {
-    "message": "渲染本頁面時出現問題，請重試或稍後再來。",
+    "message": "頁面暫時無法顯示，請重試或稍後再來。",
     "titles": {
       "app": "未能載入本頁面",
       "allocation": "未能載入分配詳情",
@@ -28,7 +28,7 @@
   },
   "global": {
     "title": "應用程式發生意外錯誤",
-    "message": "頁面內容之外出現了問題，重新載入通常即可恢復。",
+    "message": "應用程式暫時無法正常運作，請重新載入。",
     "retry": "重新載入"
   },
   "environment": {

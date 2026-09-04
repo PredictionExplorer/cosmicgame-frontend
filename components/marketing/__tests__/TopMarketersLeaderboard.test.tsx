@@ -62,12 +62,12 @@ const makeReward = (addr: string, amount: number, id: number): MarketingReward =
 describe('TopMarketersLeaderboard', () => {
   it('renders the section heading', () => {
     renderWithTooltip(<TopMarketersLeaderboard rewards={[]} />);
-    expect(screen.getByText('Top Marketers')).toBeInTheDocument();
+    expect(screen.getByText('Top Outreach Contributors')).toBeInTheDocument();
   });
 
   it('shows empty state when no rewards', () => {
     renderWithTooltip(<TopMarketersLeaderboard rewards={[]} />);
-    expect(screen.getByText('No marketers yet.')).toBeInTheDocument();
+    expect(screen.getByText('No outreach contributors yet.')).toBeInTheDocument();
   });
 
   it('aggregates and ranks marketers by total earned', () => {
@@ -113,13 +113,13 @@ describe('TopMarketersLeaderboard', () => {
       makeReward('0xAAA', 30, 3),
     ];
     renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-    expect(screen.getByText('3 rewards')).toBeInTheDocument();
+    expect(screen.getByText('3 allocations')).toBeInTheDocument();
   });
 
   it('uses singular "reward" for count of 1', () => {
     const rewards = [makeReward('0xAAA', 10, 1)];
     renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-    expect(screen.getByText('1 reward')).toBeInTheDocument();
+    expect(screen.getByText('1 allocation')).toBeInTheDocument();
   });
 
   it('links to marketer detail page', () => {
@@ -131,7 +131,7 @@ describe('TopMarketersLeaderboard', () => {
 
   it('has an info tooltip trigger', () => {
     renderWithTooltip(<TopMarketersLeaderboard rewards={[]} />);
-    expect(screen.getByLabelText('Info about top marketers')).toBeInTheDocument();
+    expect(screen.getByLabelText('About top outreach contributors')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

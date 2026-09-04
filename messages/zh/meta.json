@@ -35,7 +35,7 @@
   },
   "tokenDetail": {
     "titleFor": "Cosmic Signature NFT #{id} · Cosmic Signature",
-    "descriptionFor": "Cosmic Signature NFT #{id} 的属性与流转记录。这枚确定性三体 NFT 在 Arbitrum 上经光谱渲染生成。"
+    "descriptionFor": "查看 Cosmic Signature NFT #{id} 的特征与流转记录。作品以确定性三体模拟与光谱渲染生成，并在 Arbitrum 上铭刻。"
   },
   "gestureDetail": {
     "title": "落笔详情 · Cosmic Signature",
@@ -156,7 +156,7 @@
   },
   "privacy": {
     "title": "隐私 · Cosmic Signature",
-    "description": "Cosmic Signature 协议面向访问者的隐私实践。"
+    "description": "了解 Cosmic Signature 如何处理访问者的数据与隐私。"
   },
   "pageTerms": {
     "title": "服务条款 · Cosmic Signature",
@@ -179,8 +179,8 @@
     "description": "浏览 Cosmic Signature 源代码、渲染流水线、合约仓库、验证流程与 CC0 公有领域许可。"
   },
   "mint": {
-    "title": "铭刻 RandomWalk NFT · Cosmic Signature",
-    "description": "在 Cosmic Signature 铭刻 RandomWalk NFT。每枚尚未使用的 RandomWalk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。"
+    "title": "铭刻 Random Walk NFT · Cosmic Signature",
+    "description": "在 Cosmic Signature 铭刻 Random Walk NFT。每枚尚未使用的 Random Walk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。"
   },
   "coordinationChanges": {
     "title": "协调变更 · Cosmic Signature",
@@ -192,11 +192,11 @@
   },
   "publicGoodsRetrievals": {
     "title": "公共物品取回 · Cosmic Signature",
-    "description": "查看公共物品金库的取回记录。每个周期，部分周期储备会转拨给由宇宙议会协调选定的公共物品受益方。"
+    "description": "查看公共物品金库的取回记录与资金流向，了解资金如何转拨给当前配置的公共物品受益方。"
   },
   "publicGoodsVoluntary": {
     "title": "自愿公共物品资助 · Cosmic Signature",
-    "description": "查看 Cosmic Signature 社区自愿转入公共物品金库的资金，以及由宇宙议会协调选定的公共物品受益方。"
+    "description": "查看 Cosmic Signature 社区自愿转入公共物品金库的资金，以及当前配置的公共物品受益方。"
   },
   "outreach": {
     "title": "推广分配 · Cosmic Signature",
@@ -208,7 +208,7 @@
   },
   "ethContribution": {
     "title": "直接 ETH 贡献 · Cosmic Signature",
-    "description": "直接向 Cosmic Signature 公共物品金库贡献 ETH，并查看完整贡献记录。"
+    "description": "直接向 Cosmic Signature 周期储备贡献 ETH，并查看完整贡献记录。"
   },
   "ethContributionDetail": {
     "title": "直接 ETH 贡献详情 · Cosmic Signature",

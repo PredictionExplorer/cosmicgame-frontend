@@ -99,7 +99,7 @@ describe('CstOutreachTransferPage', () => {
 
     render(<CstOutreachTransferPage />);
 
-    expect(screen.getByText('Marketing wallet unavailable')).toBeInTheDocument();
+    expect(screen.getByText('Outreach Reserve wallet unavailable')).toBeInTheDocument();
     expect(screen.queryByTestId('marketing-cst-reward-form')).not.toBeInTheDocument();
   });
 

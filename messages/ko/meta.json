@@ -139,15 +139,15 @@
   },
   "publicGoodsCgContributions": {
     "title": "프로토콜 공공재 기여 | Cosmic Signature",
-    "description": "Cosmic Signature 프로토콜이 공공재 수령처로 자동 전달한 내역입니다. 사이클마다 사이클 준비금의 일정 비율이 우주 평의회를 통해 공공재 지원에 전달됩니다."
+    "description": "사이클 준비금에서 공공재 금고로 자동 전달된 자금을 확인할 수 있습니다. 자금은 지정된 공공재 수령처에 전달됩니다."
   },
   "publicGoodsRetrievals": {
     "title": "공공재 회수 내역 | Cosmic Signature",
-    "description": "공공재 금고에서 회수된 내역입니다. 사이클마다 사이클 준비금의 일부가 우주 평의회가 선정한 수령처 주소로 전달됩니다."
+    "description": "공공재 금고에서 지정된 공공재 수령처로 전달된 자금의 회수 내역입니다."
   },
   "publicGoodsVoluntary": {
     "title": "자발적 공공재 기여 | Cosmic Signature",
-    "description": "Cosmic Signature 커뮤니티가 공공재 금고에 자발적으로 기여한 내역입니다. 기여금은 우주 평의회 조율로 선정된 수령처를 지원합니다."
+    "description": "Cosmic Signature 커뮤니티가 공공재 금고에 자발적으로 기여한 내역입니다. 기여금은 지정된 공공재 수령처를 지원합니다."
   },
   "allocationRetrieved": {
     "title": "회수된 배분 | Cosmic Signature",
@@ -163,11 +163,11 @@
   },
   "ethContribution": {
     "title": "직접 ETH 기여 | Cosmic Signature",
-    "description": "Cosmic Signature 공공재 금고에 ETH를 직접 기여하고 전체 기여 내역을 확인할 수 있습니다. 프로토콜에 참여하면서 공공재를 지원합니다."
+    "description": "제스처를 남기지 않고 Cosmic Signature 사이클 준비금에 ETH를 직접 기여하고, 공개된 기여 내역을 확인할 수 있습니다."
   },
   "ethContributionDetail": {
     "title": "직접 ETH 기여 상세 | Cosmic Signature",
-    "description": "Cosmic Signature 공공재 금고에 이루어진 특정 ETH 기여의 상세 정보입니다. 기여자 주소, 금액, 사이클, 선택 사항인 메모를 확인할 수 있습니다."
+    "description": "사이클 준비금에 기여한 ETH의 상세 정보입니다. 기여자 주소, 금액, 사이클, 함께 남긴 메모를 확인할 수 있습니다."
   },
   "ethContributionByCycle": {
     "title": "사이클별 직접 ETH 기여 | Cosmic Signature",
@@ -175,7 +175,7 @@
   },
   "myStatistics": {
     "title": "내 통계 | Cosmic Signature",
-    "description": "Cosmic Signature 내 통계 페이지에서 참여 성과를 추적합니다. 상세한 제스처 내역, 앵커링 상태, 지급 내역 등을 확인하고 온체인 프로토콜 참여를 더 알차게 이어 갈 수 있습니다."
+    "description": "제스처 내역, 앵커링 상태, 받은 배분 등 Cosmic Signature에서의 활동을 자세히 확인할 수 있습니다."
   },
   "myTokens": {
     "title": "내 NFT | Cosmic Signature",

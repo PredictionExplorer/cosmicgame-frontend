@@ -32,7 +32,7 @@ export const mediumQuestionsTextEn = {
       c: 'It stays the same until the cycle finalizes.',
       d: `It falls by ${protocolFacts.ethGestureCostStepUpPercent}% to invite more activity.`,
     },
-    explanation: `After the opening gesture, each ETH gesture raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%, plus one wei, so the cost always grows. Anyone can read the current cost from the contract before acting \u2014 there are no surprises, only a rising staircase.`,
+    explanation: `After the opening gesture, each ETH gesture raises the next ETH Gesture Cost by ${protocolFacts.ethGestureCostStepUpPercent}%, plus one wei. The current cost can be read from the contract before submitting a gesture, but it may change before the transaction executes.`,
     funFact:
       'The extra wei matters: it guarantees strict growth even when a cost is so small that a percentage of it rounds to zero.',
     referenceLabel: 'White paper \u00a74.1 \u2014 ETH Gestures',
@@ -47,7 +47,7 @@ export const mediumQuestionsTextEn = {
       d: 'It is forwarded to Public Goods.',
     },
     explanation:
-      'Overpayment above a dust threshold is refunded in the same transaction. Below that threshold a refund would cost more in gas than it returns, so the difference stays in the reserve \u2014 a deliberate courtesy cutoff, not a penalty.',
+      'Overpayment above the dust threshold is refunded in the same transaction. Smaller amounts stay in the reserve because sending them back would cost more in gas than the refund itself.',
     referenceLabel: 'White paper \u00a74.1 \u2014 ETH Gestures',
   },
   'cst-window-restart': {
@@ -58,20 +58,20 @@ export const mediumQuestionsTextEn = {
       c: `The cost locks at ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST for the rest of the cycle.`,
       d: 'The window closes and CST gestures pause until the next cycle.',
     },
-    explanation: `Every CST gesture restarts the window from its new starting value: ${protocolFacts.cstCalibrationCeilingMultiplier}x the last cost paid, with a floor of ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST on the starting point. From there the cost descends linearly to zero over the window\u2019s duration. The CST spent is burned along the way.`,
+    explanation: `Every CST gesture restarts the window from its new starting value: ${protocolFacts.cstCalibrationCeilingMultiplier}x the last cost paid, with a floor of ${cst(protocolFacts.cstCalibrationCeilingMinCst)} CST on the starting point. From there the cost descends linearly to zero over the window\u2019s duration. The CST spent on each gesture is burned.`,
     referenceLabel: 'White paper \u00a74.3 \u2014 CST Gestures',
   },
   'cst-free-quiet': {
     prompt:
       'The protocol has been quiet for a long stretch, and the CST Calibration Window has fully elapsed. What is now true?',
     options: {
-      a: 'A CST gesture costs almost nothing \u2014 anyone holding even a small CST balance can extend the cycle.',
+      a: 'The CST Gesture Cost has reached zero, so no CST payment is required for a gesture; network gas still applies.',
       b: 'The cycle finalizes itself automatically.',
       c: 'CST gestures are disabled until an ETH gesture arrives.',
       d: 'The CST cost has risen to its ceiling.',
     },
     explanation:
-      'The descent can reach zero, and that is intentional: it guarantees the cycle can always be extended by anyone holding a little CST. Cycles never finalize themselves \u2014 finalization is always a transaction someone sends.',
+      'The CST Gesture Cost can reach zero when the window fully elapses. A gesture still requires network gas and must satisfy the current cycle rules. Finalization also requires a transaction; the cycle does not finalize automatically.',
     referenceLabel: 'White paper \u00a74.3 \u2014 CST Gestures',
   },
   'window-feedback-loop': {
@@ -83,7 +83,7 @@ export const mediumQuestionsTextEn = {
       c: 'Nothing \u2014 the two currencies are independent.',
       d: 'The window resets to its original duration.',
     },
-    explanation: `The window\u2019s duration is a live parameter and one of the protocol\u2019s quieter feedback loops: ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% each, CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% each. Heavy ETH activity speeds the CST descent, and heavy CST activity slows it back down \u2014 nudging every cycle toward a balanced mix.`,
+    explanation: `The window duration changes on-chain after each gesture. ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, while CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%. Frequent ETH gestures therefore speed up the CST price decline, while frequent CST gestures slow it down.`,
     referenceLabel: 'White paper \u00a74.3 \u2014 CST Gestures',
   },
   'participation-cst-timing': {
@@ -97,7 +97,7 @@ export const mediumQuestionsTextEn = {
     },
     explanation: `Participation CST grows with the square root of the time since the previous gesture: a gesture arriving one second later imprints almost nothing (about ${oneSecondExample.cst} CST), while one that ends a day of silence imprints hundreds (about ${oneDayExample.cst} CST). The flat ${cst(100)} CST per gesture was the original V1 rule \u2014 it turned machine-speed sequences into free CST, which is exactly why V2 replaced it.`,
     funFact:
-      'Patience is the only way to imprint meaningful CST. A bot spamming gestures every second imprints approximately zero.',
+      'Longer gaps produce more Participation CST per gesture. Rapid successive gestures can imprint little or no Participation CST; Recognition CST and the Outreach Reserve are separate issuance mechanisms.',
     referenceLabel: 'White paper \u00a77.1 \u2014 Imprint Rules',
   },
   'cst-max-cost-protection': {
@@ -128,7 +128,7 @@ export const mediumQuestionsTextEn = {
   },
   'chrono-definition': {
     prompt:
-      'Ari\u2019s ten-hour record from the previous question stands unchallenged for two more days before Bea beats it. Who is the Chrono-Warrior measuring?',
+      'Ari sets a ten-hour Endurance record and holds the Endurance Champion title for two days before Bea beats it. What does the Chrono-Warrior track measure?',
     options: {
       a: 'Whoever held the Endurance Champion title for the longest unbroken interval \u2014 Ari\u2019s two days of holding the record count for him.',
       b: 'Whoever reacts fastest after another participant\u2019s gesture.',
@@ -142,47 +142,46 @@ export const mediumQuestionsTextEn = {
   'eth-selection-count': {
     prompt: 'How does the ETH Stellar Selection distribute its share at finalization?',
     options: {
-      a: `${protocolFacts.ethStellarSelectionRecipients} entries are drawn from the cycle\u2019s gesture pool and share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally.`,
-      b: `${protocolFacts.nftStellarSelectionRecipients} entries are drawn, each receiving ETH and an NFT.`,
-      c: 'One entry is drawn and receives the full share.',
+      a: `${protocolFacts.ethStellarSelectionRecipients} entries are selected from the cycle\u2019s gesture pool and share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally.`,
+      b: `${protocolFacts.nftStellarSelectionRecipients} entries are selected, each receiving ETH and an NFT.`,
+      c: 'One entry is selected and receives the full share.',
       d: 'Every participant receives an equal share.',
     },
-    explanation: `The ETH Stellar Selection draws ${protocolFacts.ethStellarSelectionRecipients} entries, which share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally. The ${protocolFacts.nftStellarSelectionRecipients}-entry figure belongs to the separate NFT Stellar Selection, which carries CST and NFTs rather than ETH.`,
+    explanation: `The ETH Stellar Selection selects ${protocolFacts.ethStellarSelectionRecipients} entries, which share ${protocolFacts.stellarSelectionEthPercentage}% of the reserve equally. The ${protocolFacts.nftStellarSelectionRecipients}-entry figure belongs to the separate NFT Stellar Selection, which carries CST and NFTs rather than ETH.`,
     referenceLabel: 'White paper \u00a75.3 \u2014 Stellar Selections',
   },
   'nft-selection-count': {
-    prompt: 'What does each NFT Stellar Selection recipient receive, and how many are drawn?',
+    prompt: 'What does each NFT Stellar Selection recipient receive, and how many are selected?',
     options: {
-      a: `${cst(protocolFacts.specialAllocationCst)} CST and one Cosmic Signature NFT, drawn ${protocolFacts.nftStellarSelectionRecipients} times from the gesture pool.`,
-      b: `A share of ETH, drawn ${protocolFacts.ethStellarSelectionRecipients} times.`,
-      c: `${cst(protocolFacts.outreachReserveCst)} CST, drawn once.`,
-      d: `One NFT only, drawn ${protocolFacts.typicalNftsPerCycle} times.`,
+      a: `${cst(protocolFacts.specialAllocationCst)} CST and one Cosmic Signature NFT, selected ${protocolFacts.nftStellarSelectionRecipients} times from the gesture pool.`,
+      b: `A share of ETH, selected ${protocolFacts.ethStellarSelectionRecipients} times.`,
+      c: `${cst(protocolFacts.outreachReserveCst)} CST, selected once.`,
+      d: `One NFT only, selected ${protocolFacts.typicalNftsPerCycle} times.`,
     },
-    explanation: `The NFT Stellar Selection draws ${protocolFacts.nftStellarSelectionRecipients} entries; each carries ${cst(protocolFacts.specialAllocationCst)} CST and one NFT. Recognition CST always travels with its NFT \u2014 every NFT distribution at finalization pairs the two.`,
+    explanation: `The NFT Stellar Selection selects ${protocolFacts.nftStellarSelectionRecipients} entries; each carries ${cst(protocolFacts.specialAllocationCst)} CST and one NFT. Recognition CST always travels with its NFT \u2014 every NFT distribution at finalization pairs the two.`,
     referenceLabel: 'White paper \u00a75.1 \u2014 Distribution at Finalization',
   },
   'draws-with-replacement': {
-    prompt:
-      'Can the same participant be drawn more than once in a cycle\u2019s Stellar Selections?',
+    prompt: 'Can the same participant be selected more than once in a cycle’s Stellar Selections?',
     options: {
-      a: 'Yes \u2014 draws are made with replacement, and entries scale with gestures made.',
-      b: 'No \u2014 each participant can be drawn at most once.',
+      a: 'Yes — selections are made with replacement, and entries scale with gestures made.',
+      b: 'No — each participant can be selected at most once.',
       c: 'Only participants with ten or more gestures can repeat.',
       d: 'Only if the Cosmic Council approves the repeat.',
     },
     explanation:
-      'Draws are made with replacement, so the same participant can be drawn more than once. Each gesture records one entry, which makes selection frequency proportional to participation \u2014 the mechanism scales with activity instead of rationing one draw per address.',
+      'Selections are made with replacement, so an address can be selected more than once. Each gesture adds one entry to the pool. More entries increase an address’s selection weight, without guaranteeing a selection.',
     referenceLabel: 'White paper \u00a75.3 \u2014 Stellar Selections',
   },
   'anchored-rwlk-track': {
     prompt: 'What do anchored Random Walk NFTs receive from a cycle?',
     options: {
-      a: `${protocolFacts.anchoredRwlkNftSelectionRecipients} draws of ${cst(protocolFacts.specialAllocationCst)} CST plus a Cosmic Signature NFT each, weighted by NFTs anchored \u2014 and no ETH.`,
+      a: `${protocolFacts.anchoredRwlkNftSelectionRecipients} selections of ${cst(protocolFacts.specialAllocationCst)} CST plus a Cosmic Signature NFT each, weighted by NFTs anchored \u2014 and no ETH.`,
       b: `A pro-rata share of the ${protocolFacts.anchorDistributionPercentage}% ETH Anchor Distribution.`,
       c: 'Nothing \u2014 only Cosmic Signature NFTs can be anchored.',
       d: 'A one-time CST payment when the anchor is released.',
     },
-    explanation: `Random Walk NFTs anchor separately and for a different purpose: they receive draws in the Anchored-NFT Stellar Selection, ${protocolFacts.anchoredRwlkNftSelectionRecipients} per cycle, each carrying CST and a Cosmic Signature NFT. The ETH Anchor Distribution belongs exclusively to anchored Cosmic Signature NFTs \u2014 Random Walk anchoring carries no ETH.`,
+    explanation: `Random Walk NFTs anchor separately and for a different purpose: they are eligible for the Anchored-NFT Stellar Selection, ${protocolFacts.anchoredRwlkNftSelectionRecipients} per cycle, each carrying CST and a Cosmic Signature NFT. The ETH Anchor Distribution belongs exclusively to anchored Cosmic Signature NFTs \u2014 Random Walk anchoring carries no ETH.`,
     referenceLabel: 'White paper \u00a78 \u2014 Anchoring',
   },
   'exclusivity-window': {
@@ -194,19 +193,19 @@ export const mediumQuestionsTextEn = {
       d: `${protocolFacts.initialCstCalibrationWindowHours} hours`,
     },
     explanation: `The exclusive window is ${protocolFacts.finalGestureExclusivityHours} hours; after that, anyone may finalize and take over the beneficiary role. The ${protocolFacts.initialCycleFinalizationHoursAtLaunch}-hour figure is the initial countdown after a cycle\u2019s opening gesture \u2014 a different clock entirely.`,
-    funFact: `V1 gave the Final Gesture participant only ${protocolFacts.initialCycleFinalizationHoursAtLaunch} hours of exclusivity. V2 doubled it after live cycles showed people genuinely sleep through deadlines.`,
+    funFact: `V1 gave the Final Gesture participant ${protocolFacts.initialCycleFinalizationHoursAtLaunch} hours of exclusivity. V2 doubled that window to allow more time for participants to finalize.`,
     referenceLabel: 'White paper \u00a73.3 \u2014 Finalization',
   },
   'escrow-timeout': {
     prompt:
-      'Juno was drawn in the ETH Stellar Selection but never retrieves her escrowed ETH. What happens after the timeout?',
+      'Juno was selected in the ETH Stellar Selection but never retrieves her escrowed ETH. What happens after the timeout?',
     options: {
       a: `After ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks, anyone may retrieve the unretrieved allocation for themselves.`,
       b: 'It returns to the Cycle Reserve.',
       c: 'It is burned.',
       d: 'It waits in escrow indefinitely until Juno appears.',
     },
-    explanation: `Escrowed allocations and attached assets wait ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks; after that, the contracts permit anyone to retrieve an unretrieved allocation for themselves. The rule mirrors the Open-Finalization Window: every distribution eventually reaches a hand that wants it. Retrieve promptly.`,
+    explanation: `Escrowed allocations and attached assets have a ${protocolFacts.secondaryRetrievalTimeoutWeeks}-week retrieval window. After that deadline, anyone can retrieve the remaining assets for themselves. Recipients should retrieve their allocations before the window closes.`,
     referenceLabel: 'White paper \u00a75.4 \u2014 Delivery, Escrow, and Timeouts',
   },
   'push-vs-pull': {
@@ -275,7 +274,7 @@ export const mediumQuestionsTextEn = {
       c: 'It doubles every cycle.',
       d: 'It shrinks as more participants join.',
     },
-    explanation: `The increment grows by ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle. Compounding quietly does its work: cycles lengthen, the pace of NFT imprinting slows, and the protocol\u2019s tempo stretches by design as it ages.`,
+    explanation: `The increment grows by ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle. Larger increments tend to lengthen cycles and slow the pace of NFT imprinting; actual cycle duration also depends on participation.`,
     referenceLabel: 'White paper \u00a73.2 \u2014 The Countdown',
   },
   'typical-cst-fixed': {

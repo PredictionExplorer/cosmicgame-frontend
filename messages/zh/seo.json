@@ -2,7 +2,7 @@
   "publicData": {
     "common": {
       "unavailable": "暂不可用",
-      "lastUpdated": "最后更新：{date}。数据来源：{source}。下方交互表格会载入应用的实时数据；本摘要则随初始 HTML 一并提供，便于搜索引擎与 AI 爬虫读取。",
+      "lastUpdated": "更新时间：{date}。数据来源：{source}。",
       "relatedPagesAria": "{heading}相关页面"
     },
     "routes": {
@@ -34,7 +34,7 @@
       "anchoring": {
         "eyebrow": "锚定派发 · Arbitrum",
         "heading": "锚定派发",
-        "description": "追踪 Cosmic Signature NFT 锚定、ETH 锚定派发记录、RandomWalk NFT 锚定，以及锚定 NFT 星选铭刻。",
+        "description": "追踪 Cosmic Signature NFT 锚定、ETH 锚定派发记录、Random Walk NFT 锚定，以及锚定 NFT 星选铭刻。",
         "source": "Cosmic Signature 公开锚定 API",
         "links": {
           "statistics": "查看锚定统计",
@@ -76,14 +76,14 @@
         }
       },
       "imprint": {
-        "eyebrow": "RandomWalk NFT 铭刻 · Arbitrum",
-        "heading": "铭刻 RandomWalk NFT",
-        "description": "铭刻 RandomWalk NFT，以参与 Cosmic Signature。每枚尚未使用的 RandomWalk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。",
+        "eyebrow": "Random Walk NFT 铭刻 · Arbitrum",
+        "heading": "铭刻 Random Walk NFT",
+        "description": "铭刻 Random Walk NFT，以参与 Cosmic Signature。每枚尚未使用的 Random Walk NFT 都可附加至一笔 ETH 落笔，使落笔价格降低 50%。",
         "source": "Cosmic Signature 公开协议配置 API",
         "links": {
           "cycle": "打开当前演绎周期",
           "learn": "了解落笔机制",
-          "used": "查看已使用的 RandomWalk NFT"
+          "used": "查看已使用的 Random Walk NFT"
         },
         "cards": {
           "cycle": {
@@ -93,14 +93,14 @@
             "label": "当前 ETH 落笔价格"
           },
           "discount": {
-            "label": "RandomWalk 减免"
+            "label": "Random Walk 减免"
           }
         }
       },
       "eth-contribution": {
         "eyebrow": "直接 ETH 贡献 · Arbitrum",
         "heading": "直接 ETH 贡献",
-        "description": "浏览直接转入 Cosmic Signature 公共物品金库的 ETH，以及随这些记录公开的留言、周期与贡献者信息。",
+        "description": "浏览直接转入 Cosmic Signature 周期储备的 ETH，以及随这些记录公开的留言、周期与贡献者信息。",
         "source": "Cosmic Signature 公开贡献 API",
         "links": {
           "protocol": "查看协议公共物品资助",
@@ -187,18 +187,18 @@
         }
       },
       "used-rwlk-nfts": {
-        "eyebrow": "RandomWalk NFT 使用记录 · Arbitrum",
-        "heading": "已使用的 RandomWalk NFT",
-        "description": "查看已经附加至 ETH 落笔、并用掉一次性落笔价格减免资格的 RandomWalk NFT。",
-        "source": "Cosmic Signature 公开 RandomWalk 使用 API",
+        "eyebrow": "Random Walk NFT 使用记录 · Arbitrum",
+        "heading": "已使用的 Random Walk NFT",
+        "description": "查看已经附加至 ETH 落笔、并用掉一次性落笔价格减免资格的 Random Walk NFT。",
+        "source": "Cosmic Signature 公开 Random Walk 使用 API",
         "links": {
-          "imprint": "铭刻 RandomWalk NFT",
+          "imprint": "铭刻 Random Walk NFT",
           "learn": "了解落笔机制",
           "cycle": "查看当前周期数据"
         },
         "cards": {
           "used": {
-            "label": "已使用的 RandomWalk NFT"
+            "label": "已使用的 Random Walk NFT"
           },
           "discount": {
             "label": "一次性减免"
@@ -325,7 +325,7 @@
   "currentCycleSummary": {
     "eyebrow": "实时演绎周期 · Arbitrum",
     "heading": "当前 Cosmic Signature 演绎周期",
-    "description": "本页追踪当前 Cosmic Signature 演绎周期，包括公开落笔次数、周期储备、已附加资产、分配轨道与收官状态。下方交互控制台会载入应用的实时数据。",
+    "description": "本页追踪当前 Cosmic Signature 演绎周期，包括公开落笔次数、周期储备、已附加资产、分配轨道与收官状态。",
     "unavailable": "暂不可用",
     "cards": {
       "cycle": "周期",
@@ -401,7 +401,7 @@
       "eyebrow": "落笔",
       "eyebrowWithValue": "落笔序号 #{value}",
       "title": "一笔，铭入签名。",
-      "subhead": "每一笔都会延长收官倒计时、铭刻参与 CST，并继续塑造周期中的签名。",
+      "subhead": "每一笔都会延长收官倒计时、继续塑造签名，并可能铭刻参与 CST。",
       "chips": ["CC0", "链上已验证", "7% Protocol Guild"]
     },
     "allocation": {

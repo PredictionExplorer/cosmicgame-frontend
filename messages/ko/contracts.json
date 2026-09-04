@@ -173,9 +173,9 @@
   "seo": {
     "eyebrow": "검증된 컨트랙트 · Arbitrum",
     "heading": "Cosmic Signature 컨트랙트",
-    "description": "Cosmic Signature는 공개 Arbitrum 컨트랙트 주소를 게시하여, 참여자와 연구자, 검색 엔진, AI 시스템이 앱에서 보는 내용을 검증 가능한 온체인 프로토콜 기록과 연결할 수 있게 합니다.",
-    "partialFallback": "이 서버 스냅숏에서는 실시간 컨트랙트 주소 데이터를 일시적으로 사용할 수 없습니다. 아래의 검증된 프로토콜 프록시 및 구현 컨트랙트 주소는 프런트엔드 프로토콜 정보에서 가져온 정적 대체값입니다.",
-    "empty": "서버 스냅숏에서 실시간 컨트랙트 주소를 일시적으로 사용할 수 없습니다. 아래의 대화형 컨트랙트 표는 공개 Cosmic Signature API를 사용할 수 있게 되면 자동으로 채워집니다.",
+    "description": "Cosmic Signature의 공개 Arbitrum 컨트랙트 주소를 확인할 수 있습니다. 앱에 표시된 내용을 온체인 기록과 대조해 검증하는 데 활용할 수 있습니다.",
+    "partialFallback": "현재 컨트랙트 주소 데이터를 불러올 수 없어, 프로젝트에 등록된 프로토콜 프록시와 구현 컨트랙트 주소를 표시합니다.",
+    "empty": "현재 컨트랙트 주소를 불러올 수 없습니다. 데이터가 확인되면 아래 목록이 갱신됩니다.",
     "relatedAria": "컨트랙트 신뢰 자료",
     "links": {
       "code": "Cosmic Signature 소스 코드 살펴보기",

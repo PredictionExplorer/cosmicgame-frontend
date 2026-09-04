@@ -41,7 +41,7 @@
     "confirmed": "落筆已確認，週期繼續推進。",
     "validation": {
       "notNftOwner": "目前錢包並未持有這枚 NFT。",
-      "tokenDecimalsWarning": "此代幣未實現 decimals()；將按 18 位小數處理。",
+      "tokenDecimalsWarning": "此代幣未提供 decimals()；將按 18 位小數處理。",
       "invalidContractAddress": "請輸入有效的合約地址。",
       "notErc721": "所選合約不符合 ERC-721 標準。",
       "notErc20": "所選合約不符合 ERC-20 標準。",
@@ -61,8 +61,8 @@
       "tooLongBidMessage": "落筆留言過長。",
       "wrongBidType": "所選落筆類型不正確。",
       "fundTransferFailed": "資金轉移失敗。",
-      "ethCostChanged": "ETH 落筆價格已變為 {required} ETH，比提交時高 {increase} ETH。請重試。",
-      "cstCostChanged": "交易處理期間，CST 落筆價格已變化。目前需 {required} CST，超過設定的 {maximum} CST 落筆價格上限。請重新整理後重試。"
+      "ethCostChanged": "ETH 落筆價格已升至 {required} ETH，比提交時高 {increase} ETH。請重試。",
+      "cstCostChanged": "交易處理期間，CST 落筆價格已變動。目前需 {required} CST，超過你設定的 {maximum} CST 上限。請重新整理後再試。"
     }
   },
   "anchor": {
@@ -105,7 +105,7 @@
     },
     "cst": {
       "tokenUnavailable": "CST 代幣地址暫不可用。",
-      "walletRequired": "請先連接錢包，再發送 CST。",
+      "walletRequired": "請先連接錢包，再傳送 CST。",
       "sourceWalletRequired": "請連接轉出錢包，再從該錢包傳送 CST。",
       "balanceLoading": "CST 餘額仍在載入，請稍後再試。",
       "insufficientBalance": "CST 餘額不足。",
@@ -115,7 +115,7 @@
     },
     "nft": {
       "contractUnavailable": "Cosmic Signature NFT 合約地址暫不可用。",
-      "walletRequired": "請先連接錢包，再發送 NFT。",
+      "walletRequired": "請先連接錢包，再傳送 NFT。",
       "sourceWalletRequired": "請連接轉出錢包，再從該錢包傳送 NFT。",
       "recipientMustDiffer": "接收地址不能與目前連接的錢包地址相同。",
       "selectOne": "請至少選擇一枚可轉移的 NFT。",
@@ -143,7 +143,7 @@
       "failed": "未能撥付推廣 CST。請檢查錢包與網路連線後重試。",
       "loading": "載入中…",
       "pay": "撥付推廣 CST",
-      "paying": "發放中…",
+      "paying": "撥付中…",
       "viewTransaction": "檢視交易"
     }
   },

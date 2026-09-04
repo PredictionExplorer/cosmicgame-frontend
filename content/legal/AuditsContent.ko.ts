@@ -5,7 +5,7 @@ export const auditsCopyKo: TrustPageCopy = {
   eyebrow: '보안 감사와 검증',
   title: 'Cosmic Signature 보안 감사',
   intro:
-    'Cosmic Signature는 컨트랙트 검토 맥락을 크롤링 가능한 형태로 공개하여, 참여자, 연구자, 검색 엔진, AI 시스템이 프로토콜이 어떻게 검증되었고 공개 구현을 어디에서 살펴볼 수 있는지 알 수 있게 합니다.',
+    'Cosmic Signature의 보안 감사 보고서와 검증 자료를 소개합니다. 검토 범위, 발견 사항과 대응 현황, 공개 소스 코드를 확인할 수 있습니다.',
   sections: [
     {
       heading: 'Hacken의 독립 보안 감사',

@@ -55,13 +55,13 @@ describe('MarketingCTA', () => {
 
   it('renders the contact link', () => {
     renderWithTooltip(<MarketingCTA />);
-    const link = screen.getByRole('link', { name: /contact marketing team/i });
+    const link = screen.getByRole('link', { name: /contact the outreach team/i });
     expect(link).toHaveAttribute('href', 'mailto:marketing@cosmicsignature.com');
   });
 
   it('has an info tooltip trigger', () => {
     renderWithTooltip(<MarketingCTA />);
-    expect(screen.getByLabelText('Info about contacting the marketing team')).toBeInTheDocument();
+    expect(screen.getByLabelText('About contacting the outreach team')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

@@ -53,7 +53,7 @@ export const termsCopyJa = {
         {
           id: 'protocol',
           subtitle: 'プロトコルの仕組み',
-          text: 'Cosmic Signatureは分散型のプロシージャル・オンチェーンアート・プロトコルで、参加者はパフォーマンス・サイクルの間にETHまたはCSTトークンで一筆を入れます。一筆はサイクル確定時刻を延ばし、プロトコルの対象を記録し、スマートコントラクトの式に従って動的な参加CSTを刻印することがあります。サイクル確定時刻が切れると、最後の一筆を入れた参加者がシグネチャー配分を受け取れます。追加の配分は、公開されている配分トラックの構成に従って配られます。',
+          text: 'Cosmic Signatureは分散型のプロシージャル・オンチェーンアート・プロトコルで、参加者はパフォーマンス・サイクルの間にETHまたはCSTトークンで一筆を入れます。一筆はサイクル確定時刻を延ばし、プロトコルの対象を記録し、スマートコントラクトの式に従って動的な参加CSTを刻印することがあります。サイクル確定時刻を過ぎると、最後の一筆を入れた参加者がシグネチャー配分を受け取れます。追加の配分は、公開されている配分トラックの構成に従って配られます。',
         },
         {
           id: 'dynamic-cst',
@@ -88,28 +88,28 @@ export const termsCopyJa = {
       content: [
         {
           id: 'distribution',
-          subtitle: '配分の分配',
+          subtitle: '配分の実行',
           text: `配分はスマートコントラクトのルールに従って自動的に配られます。標準的なサイクルでは、以下の配分トラック全体で${protocolFacts.typicalNftsPerCycle}点のCosmic Signature NFTと${protocolFacts.typicalCstImprintsPerCycle.toLocaleString()} CSTが刻印されます。`,
         },
         {
           id: 'signature',
           subtitle: 'シグネチャー配分',
-          text: `最後の一筆を入れた参加者は、${protocolFacts.mainEthPercentage}%のETH、${cst}の功労CST、Cosmic Signature NFT 1点、そしてサイクルで添付されたトークン（あれば）を受け取れます。`,
+          text: `最後の一筆を入れた参加者は、${protocolFacts.mainEthPercentage}%のETH、${cst} CSTの功労CST、Cosmic Signature NFT 1点、そしてサイクルで添付されたトークン（あれば）を受け取れます。`,
         },
         {
           id: 'chrono',
           subtitle: '時の戦士',
-          text: `持久チャンピオンの位置を最も長く連続して保った参加者は、${protocolFacts.chronoWarriorEthPercentage}%のETH、${cst}の功労CST、Cosmic Signature NFT 1点を受け取ります。`,
+          text: `持久チャンピオンの称号を最も長く連続して保持した参加者は、${protocolFacts.chronoWarriorEthPercentage}%のETH、${cst} CSTの功労CST、Cosmic Signature NFT 1点を受け取ります。`,
         },
         {
           id: 'endurance',
           subtitle: '持久チャンピオン',
-          text: `最新の一筆の位置を最も長く途切れずに保った参加者は、${cst}の功労CSTとCosmic Signature NFT 1点を受け取ります。`,
+          text: `最新の一筆を入れた参加者として最も長く先頭を保持した参加者は、${cst} CSTの功労CSTとCosmic Signature NFT 1点を受け取ります。`,
         },
         {
           id: 'final-cst',
           subtitle: '最後のCST一筆',
-          text: `サイクルで最後のCST一筆を入れた参加者は、${cst}の功労CSTとCosmic Signature NFT 1点を受け取ります。`,
+          text: `サイクルで最後のCST一筆を入れた参加者は、${cst} CSTの功労CSTとCosmic Signature NFT 1点を受け取ります。`,
         },
         {
           id: 'eth-selection',
@@ -119,12 +119,12 @@ export const termsCopyJa = {
         {
           id: 'nft-selection',
           subtitle: 'NFT星選',
-          text: `選ばれた${protocolFacts.nftStellarSelectionRecipients}人の参加者が、それぞれ${cst}の功労CSTとCosmic Signature NFT 1点を受け取ります。`,
+          text: `選ばれた${protocolFacts.nftStellarSelectionRecipients}人の参加者が、それぞれ${cst} CSTの功労CSTとCosmic Signature NFT 1点を受け取ります。`,
         },
         {
           id: 'anchored-selection',
           subtitle: '係留NFT星選',
-          text: `選ばれた${protocolFacts.anchoredRwlkNftSelectionRecipients}人のRandomWalk NFT係留者が、それぞれ${cst}の功労CSTとCosmic Signature NFT 1点を受け取ります。`,
+          text: `選ばれた${protocolFacts.anchoredRwlkNftSelectionRecipients}人のRandomWalk NFT係留者が、それぞれ${cst} CSTの功労CSTとCosmic Signature NFT 1点を受け取ります。`,
         },
         {
           id: 'anchor-distribution',
@@ -154,7 +154,7 @@ export const termsCopyJa = {
         {
           id: 'no-guarantee',
           subtitle: '結果の保証はありません',
-          text: 'Cosmic Signatureへの参加は、いかなる結果も保証しません。すべての一筆は最終的なものとみなされ、一筆の費用の全額が戻らないことがあります。手放す余裕のない資金で一筆を入れないでください。',
+          text: 'Cosmic Signatureへの参加は、いかなる結果も保証しません。すべての一筆は最終的なものとみなされ、一筆の費用の全額が戻らないことがあります。失っても生活に支障のない範囲で参加してください。',
         },
       ],
     },
@@ -271,7 +271,7 @@ export const termsCopyJa = {
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
   warning: {
     title: '重要な注意',
-    text: 'Cosmic Signatureへの参加には金銭的なリスクが伴います。暗号資産とNFTの市場は非常に変動が大きく、一筆の価値が戻らないことがあります。手放す余裕のない資金で一筆を入れないでください。Cosmic Signatureは投資商品ではなく、トークンの価格や将来の動きについて何も表明せず、投資として参加を勧誘することもありません。参加する前に、必ず自身で調べ、自身の経済状況を慎重に検討してください。',
+    text: 'Cosmic Signatureへの参加には金銭的なリスクが伴います。暗号資産とNFTの市場は非常に変動が大きく、一筆の価値が戻らないことがあります。失っても生活に支障のない範囲で参加してください。Cosmic Signatureは投資商品ではなく、トークンの価格や将来の動きについて何も表明せず、投資として参加を勧誘することもありません。参加する前に、必ず自身で調べ、自身の経済状況を慎重に検討してください。',
   },
   // lexicon-allow-end
   acknowledgment: {

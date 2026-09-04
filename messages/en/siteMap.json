@@ -8,7 +8,7 @@
   "sections": {
     "personal": {
       "title": "Personal App Tools",
-      "description": "Wallet-specific pages are useful to connected participants but are noindexed and absent from XML sitemaps.",
+      "description": "Connect your wallet to view your NFTs, allocations, and anchors.",
       "navLabel": "Personal app tools"
     },
     "system": {
@@ -18,7 +18,7 @@
     },
     "data": {
       "title": "Protocol Data Pages",
-      "description": "Every public data route from the XML sitemap, in one crawlable list.",
+      "description": "Explore public protocol records and activity.",
       "navLabel": "Protocol data pages"
     },
     "ecosystem": {
@@ -30,23 +30,23 @@
   "links": {
     "myNfts": {
       "label": "My NFTs",
-      "description": "Wallet-specific NFT view; noindexed."
+      "description": "View and manage the NFTs in your wallet."
     },
     "myAllocations": {
       "label": "My Unretrieved Allocations",
-      "description": "Wallet-specific allocation retrieval view; noindexed."
+      "description": "View and retrieve your allocations."
     },
     "myAnchors": {
       "label": "My Anchors",
-      "description": "Wallet-specific anchoring view; noindexed."
+      "description": "Manage your anchored NFTs and their distributions."
     },
     "about": {
       "label": "About Cosmic Signature",
-      "description": "Entity home and brand disambiguation."
+      "description": "An introduction to the protocol and its official resources."
     },
     "learn": {
       "label": "Cosmic Signature Learn Hub",
-      "description": "Crawlable explainers for AI and search systems."
+      "description": "Guides to the protocol, artwork, and participation."
     },
     "whatIsCosmicSignature": {
       "label": "What Is Cosmic Signature?",

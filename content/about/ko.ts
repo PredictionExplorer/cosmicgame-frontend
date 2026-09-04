@@ -13,7 +13,7 @@ export const aboutContentKo = {
       'Cosmic Signature는 퍼포먼스 사이클의 제스처에서 결정론적 삼체 NFT 아트를 생성하는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다.',
   },
   breadcrumbLabel: '소개',
-  eyebrow: '공식 소개',
+  eyebrow: '프로토콜 소개',
   heading: 'Cosmic Signature 소개',
   body: {
     paragraphs: [
@@ -23,7 +23,7 @@ export const aboutContentKo = {
     ],
     // lexicon-allow-start: explicit investment-product denial for crawler and compliance clarity.
     denial:
-      'Cosmic Signature는 투자 상품으로 제공되지 않습니다. 프로토콜은 참여, 제스처, 배분, 앵커링, 공공재 전달을 설명할 뿐, 토큰 가격의 움직임이나 금융적 결과를 약속하지 않습니다.',
+      'Cosmic Signature는 투자 상품으로 제공되지 않습니다. 프로토콜은 참여, 제스처, 배분, 앵커링, 공공재 전달을 설명할 뿐, 토큰 가격의 움직임이나 금전적 결과를 약속하지 않습니다.',
     // lexicon-allow-end
   },
   officialResources: {
@@ -35,7 +35,7 @@ export const aboutContentKo = {
         label: '검증된 Arbitrum 컨트랙트',
         href: ABOUT_RESOURCE_HREFS.contracts,
       },
-      { id: 'code', label: '소스 코드 자료', href: ABOUT_RESOURCE_HREFS.code },
+      { id: 'code', label: '소스 코드', href: ABOUT_RESOURCE_HREFS.code },
       { id: 'x', label: 'X / Twitter', href: ABOUT_RESOURCE_HREFS.x },
       { id: 'discord', label: 'Discord', href: ABOUT_RESOURCE_HREFS.discord },
       { id: 'github', label: 'GitHub', href: ABOUT_RESOURCE_HREFS.github },

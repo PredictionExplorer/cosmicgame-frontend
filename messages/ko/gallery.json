@@ -1,7 +1,7 @@
 {
   "error": {
     "title": "각인 아카이브를 불러올 수 없습니다",
-    "message": "Cosmic Signature 컬렉션을 읽지 못했습니다. 다시 시도해 아카이브를 불러와 주세요."
+    "message": "컬렉션을 불러오지 못했습니다. 다시 시도해 주세요."
   },
   "jsonLd": {
     "name": "Cosmic Signature 갤러리"
@@ -19,7 +19,7 @@
   "featured": {
     "viewAria": "Cosmic Signature {id} 보기",
     "alt": "Cosmic Signature 작품 {id}",
-    "emptyHint": "인덱싱된 NFT가 있으면 실제 컬렉션 작품이 여기에 표시됩니다.",
+    "emptyHint": "NFT 데이터를 불러오면 컬렉션의 작품이 여기에 표시됩니다.",
     "badgeImprint": "대표 각인",
     "badgeArchive": "아카이브",
     "awaitingMetadata": "메타데이터 대기 중"

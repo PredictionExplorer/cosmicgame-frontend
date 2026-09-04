@@ -8,7 +8,7 @@
   },
   "settings": {
     "title": "管理方法",
-    "subtitle": "以只讀方式檢視控制面板中的合約地址與參數。",
+    "subtitle": "檢視控制面板中的合約地址與參數；此處僅供查閱。",
     "breadcrumbs": {
       "home": "首頁",
       "admin": "管理",
@@ -44,7 +44,7 @@
       "timeIncrease": "時間增量",
       "allocationTimeout": "取回簽名分配的超時時間",
       "priceIncrease": "價格增幅",
-      "nanosecondsExtra": "額外納秒數",
+      "nanosecondsExtra": "額外奈秒數",
       "initialAllocationSeconds": "距簽名分配的初始秒數",
       "initialGestureCostFraction": "初始落筆價格比例",
       "activationTime": "啟用時間",

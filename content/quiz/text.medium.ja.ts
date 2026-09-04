@@ -32,7 +32,7 @@ export const mediumQuestionsTextJa = {
       c: 'サイクルが確定するまで同じまま。',
       d: `活動を促すために${protocolFacts.ethGestureCostStepUpPercent}%下がる。`,
     },
-    explanation: `最初の一筆の後、ETH一筆はそれぞれ次のETH一筆の費用を${protocolFacts.ethGestureCostStepUpPercent}%と1 weiだけ上げるので、費用は常に増えます。誰でも動く前にコントラクトから現在の費用を読み取れます。驚きはなく、上っていく階段があるだけです。`,
+    explanation: `最初の一筆の後、ETH一筆はそれぞれ次のETH一筆の費用を${protocolFacts.ethGestureCostStepUpPercent}%と1 weiだけ上げるので、費用は常に増えます。誰でも動く前にコントラクトから現在の費用を読み取れます。費用の上がり方はルールで決まっており、事前に確認できます。`,
     funFact:
       '追加の1 weiには意味があります。費用が小さすぎて、その一定割合がゼロに丸められる場合でも、厳密な増加を保証します。',
     referenceLabel: 'ホワイトペーパー §4.1——ETH一筆',
@@ -47,11 +47,11 @@ export const mediumQuestionsTextJa = {
       d: '公共財へ送られる。',
     },
     explanation:
-      'ダスト閾値を超える過払いは、同じトランザクションの中で返されます。その閾値より下では、返金は戻す額よりガス代のほうが高くつくので、差額は準備金に残ります。ペナルティではなく、意図的な配慮の区切りです。',
+      'ダスト閾値を超える過払いは、同じトランザクションの中で返されます。その閾値より下では、返金は戻す額よりガス代のほうが高くつくので、差額は準備金に残ります。少額の返金でガス代が返金額を上回らないよう、閾値を設けています。',
     referenceLabel: 'ホワイトペーパー §4.1——ETH一筆',
   },
   'cst-window-restart': {
-    prompt: 'LyraがCST一筆を入れました。それはCST調律期間に何をしますか？',
+    prompt: 'LyraがCST一筆を入れました。CST調律期間はどう変わりますか？',
     options: {
       a: `彼女が支払った費用の${protocolFacts.cstCalibrationCeilingMultiplier}倍——ただし${cst(protocolFacts.cstCalibrationCeilingMinCst)} CSTを下回らない——から期間をやり直し、再びゼロへ向かって線形に下がる。`,
       b: '何もしない。期間はそのまま下がり続ける。',
@@ -65,24 +65,24 @@ export const mediumQuestionsTextJa = {
     prompt:
       'プロトコルが長い間静かで、CST調律期間は完全に経過しました。いま何が成り立っていますか？',
     options: {
-      a: 'CST一筆の費用はほぼゼロ。わずかなCST残高でも持っていれば、誰でもサイクルを延ばせる。',
+      a: 'CST一筆の費用はゼロ。実行には現在のサイクルのルールが適用され、ガス代も別途必要。',
       b: 'サイクルは自動的に確定する。',
       c: 'ETH一筆が届くまでCST一筆は無効になる。',
       d: 'CSTの費用は上限まで上がっている。',
     },
     explanation:
-      '下降はゼロに達しうるもので、それは意図的です。少しのCSTを持つ誰かがいれば、サイクルは常に延ばせることを保証します。サイクルが自ら確定することはありません。確定は常に、誰かが送るトランザクションです。',
+      'CST調律期間が完全に過ぎると、CST一筆の費用はゼロになります。それでも現在のサイクルの実行条件を満たす必要があり、ガス代は別途かかります。費用がゼロでも、一筆の実行や時間延長が必ず成立するとは限りません。サイクルの確定には、別のトランザクションが必要です。',
     referenceLabel: 'ホワイトペーパー §4.3——CST一筆',
   },
   'window-feedback-loop': {
-    prompt: 'ETH一筆の連なりがサイクルを駆け抜けました。それはCST調律期間の長さに何をしますか？',
+    prompt: 'ETH一筆が続けて入りました。CST調律期間の長さはどう変わりますか？',
     options: {
       a: `ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くするので、CSTの費用はより速く下がり、CST一筆はより早く魅力的になる。`,
       b: `ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くし、CSTの下降を遅くする。`,
       c: '何もしない。二つの通貨は独立している。',
       d: '期間は元の長さにリセットされる。',
     },
-    explanation: `期間の長さは生きたパラメーターで、プロトコルのより静かなフィードバックループの一つです。ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くし、CST一筆はそれぞれ約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くします。ETHの活動が盛んならCSTの下降は速まり、CSTの活動が盛んならまた遅くなります。すべてのサイクルをバランスの取れた混合へそっと押しやるのです。`,
+    explanation: `期間の長さは参加状況に応じて変わり、ETHとCSTの利用を調整します。ETH一筆はそれぞれ約${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%短くし、CST一筆はそれぞれ約${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%長くします。ETHの活動が盛んならCSTの下降は速まり、CSTの活動が盛んならまた遅くなります。こうしてETHとCSTの利用状況が互いの費用に反映されます。`,
     referenceLabel: 'ホワイトペーパー §4.3——CST一筆',
   },
   'participation-cst-timing': {
@@ -96,7 +96,7 @@ export const mediumQuestionsTextJa = {
     },
     explanation: `参加CSTは前の一筆からの時間の平方根とともに増えます。1秒後に届く一筆はほとんど何も刻印しません（約${oneSecondExample.cst} CST）が、一日の沈黙を終わらせる一筆は数百を刻印します（約${oneDayExample.cst} CST）。一筆あたり一律${cst(100)} CSTは元のV1のルールでした。それは機械の速さの連続を無償のCSTに変えてしまい、まさにそれがV2が置き換えた理由です。`,
     funFact:
-      '意味のあるCSTを刻印する唯一の方法は忍耐です。毎秒一筆を連投するボットが刻印するのは、およそゼロです。',
+      '参加CSTは、前の一筆から時間が空くほど多くなります。ごく短い間隔で一筆を繰り返しても、各回の参加CSTはほぼゼロです。功労CSTと広報準備金には別の刻印ルールがあります。',
     referenceLabel: 'ホワイトペーパー §7.1——刻印のルール',
   },
   'cst-max-cost-protection': {
@@ -116,18 +116,18 @@ export const mediumQuestionsTextJa = {
     prompt:
       'Ariは静かな午後に一筆を入れ、十時間続けて誰にも追い落とされませんでした。サイクルで最も長い静かな間隔です。彼が受け取る位置にいる称号はどれですか？',
     options: {
-      a: '持久チャンピオン。最新の一筆の主として最も長く途切れずに留まった。',
+      a: '持久チャンピオン。最新の一筆を入れた参加者として最も長く連続して先頭を保持した。',
       b: '時の戦士。称号を最も長い時間保った。',
       c: 'どちらでもない。称号は入れた一筆の数で決まる。',
       d: '自動的に最後の一筆の役割。',
     },
     explanation:
-      '持久チャンピオンは、最新の一筆の主として最も長く途切れずに留まった参加者です。一つの一筆が持ちこたえた、最も長い静かな間隔です。時の戦士のトラックは一段上にあり、別のものを測ります：持久チャンピオンの称号そのものがどれだけ長く保たれたかです。',
+      '持久チャンピオンは、最新の一筆を入れた参加者として最も長く連続して先頭を保持した参加者です。一つの一筆が持ちこたえた、最も長い静かな間隔です。時の戦士のトラックは一段上にあり、別のものを測ります：持久チャンピオンの称号そのものがどれだけ長く保たれたかです。',
     referenceLabel: 'ホワイトペーパー §5.2——持久チャンピオンと時の戦士',
   },
   'chrono-definition': {
     prompt:
-      '前問のAriの十時間の記録は、Beaがそれを破るまで、さらに二日間揺るがずに立っていました。時の戦士が測っているのは誰ですか？',
+      'Ariは十時間の先頭保持記録を作り、Beaが更新するまで二日間、持久チャンピオンの称号を保持しました。時の戦士のトラックは何を測りますか？',
     options: {
       a: '持久チャンピオンの称号を最も長く途切れずに保った人。Ariが記録を保った二日間は彼のものとして数えられる。',
       b: '他の参加者の一筆の後、最も速く反応した人。',
@@ -157,7 +157,7 @@ export const mediumQuestionsTextJa = {
       c: `${cst(protocolFacts.outreachReserveCst)} CST。1回選ばれる。`,
       d: `NFT 1点のみ。${protocolFacts.typicalNftsPerCycle}回選ばれる。`,
     },
-    explanation: `NFT星選は${protocolFacts.nftStellarSelectionRecipients}件の対象を選び、それぞれが${cst(protocolFacts.specialAllocationCst)} CSTとNFT 1点を携えます。功労CSTは常にそのNFTとともに旅をします。確定時のすべてのNFTの分配は、この二つを対にします。`,
+    explanation: `NFT星選は${protocolFacts.nftStellarSelectionRecipients}件の対象を選び、それぞれが${cst(protocolFacts.specialAllocationCst)} CSTとNFT 1点を携えます。功労CSTはそのNFTとあわせて配分されます。確定時のすべてのNFTの分配は、この二つを対にします。`,
     referenceLabel: 'ホワイトペーパー §5.1——確定時の分配',
   },
   'draws-with-replacement': {
@@ -180,7 +180,7 @@ export const mediumQuestionsTextJa = {
       c: '何もない。係留できるのはCosmic Signature NFTだけ。',
       d: '係留を解除したときの一度きりのCSTの支払い。',
     },
-    explanation: `Random Walk NFTは別に、別の目的で係留されます。係留NFT星選で選定を受け、サイクルごとに${protocolFacts.anchoredRwlkNftSelectionRecipients}回、それぞれがCSTとCosmic Signature NFTを携えます。ETHの係留配分は係留中のCosmic Signature NFTだけのものです。Random Walkの係留はETHを携えません。`,
+    explanation: `Random Walk NFTの係留には、別の役割があります。係留NFT星選で選定を受け、サイクルごとに${protocolFacts.anchoredRwlkNftSelectionRecipients}回、それぞれがCSTとCosmic Signature NFTを携えます。ETHの係留配分は係留中のCosmic Signature NFTだけのものです。Random Walkの係留にETH配分はありません。`,
     referenceLabel: 'ホワイトペーパー §8——係留',
   },
   'exclusivity-window': {
@@ -274,7 +274,7 @@ export const mediumQuestionsTextJa = {
       c: 'サイクルごとに倍になる。',
       d: '参加者が増えるほど縮む。',
     },
-    explanation: `増分は確定したサイクルごとに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなります。累積が静かにその仕事をします。サイクルは長くなり、NFTの刻印のペースは遅くなり、プロトコルのテンポは年を重ねるにつれて設計どおりに伸びていきます。`,
+    explanation: `増分は確定したサイクルごとに${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}%ずつ大きくなります。この増加がサイクルごとに積み重なります。サイクルは長くなり、NFTの刻印のペースは遅くなり、プロトコルのテンポは年を重ねるにつれて設計どおりに伸びていきます。`,
     referenceLabel: 'ホワイトペーパー §3.2——カウントダウン',
   },
   'typical-cst-fixed': {

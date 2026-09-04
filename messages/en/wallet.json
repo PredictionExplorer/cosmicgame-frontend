@@ -23,13 +23,13 @@
   "account": {
     "heading": "Account",
     "myDashboard": "My Dashboard",
-    "myRewards": "My Rewards",
+    "myRewards": "My Allocations",
     "myNfts": "My NFTs",
     "transferCst": "Transfer CST",
     "addCstToMetaMask": "Add CST to MetaMask",
     "addingCstToMetaMask": "Adding CST to MetaMask...",
     "myAnchors": "My Anchors",
-    "winningHistory": "Winning History"
+    "winningHistory": "Allocation History"
   },
   "accessibility": {
     "copyAddress": "Copy wallet address",

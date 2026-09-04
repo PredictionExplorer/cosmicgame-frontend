@@ -152,7 +152,7 @@ export const termsCopyKo = {
         {
           id: 'no-guarantee',
           subtitle: '결과 보장 없음',
-          text: 'Cosmic Signature 참여는 어떠한 결과도 보장하지 않습니다. 모든 제스처는 최종적인 것으로 간주되며, 사용자는 제스처 비용 전액을 되돌려 받지 못할 수 있습니다. 잃어도 감당할 수 있는 자금이 아니라면 절대 제스처를 남기지 말아 주세요.',
+          text: 'Cosmic Signature 참여는 어떠한 결과도 보장하지 않습니다. 모든 제스처는 최종적인 것으로 간주되며, 사용자는 제스처 비용 전액을 되돌려 받지 못할 수 있습니다. 자금을 잃더라도 생활에 지장이 없는 범위에서만 참여해 주세요.',
         },
       ],
     },
@@ -269,7 +269,7 @@ export const termsCopyKo = {
   // lexicon-allow-start: Howey-test denial copy must explicitly negate an investment framing.
   warning: {
     title: '중요 경고',
-    text: 'Cosmic Signature 참여에는 재정적 위험이 따릅니다. 암호화폐와 NFT 시장은 변동성이 매우 크며, 사용자는 제스처의 가치를 되돌려 받지 못할 수 있습니다. 잃어도 감당할 수 있는 자금이 아니라면 절대 제스처를 남기지 말아 주세요. Cosmic Signature는 투자 상품이 아니며, 토큰 가격이나 향후 동향에 관해 어떠한 진술도 하지 않으며, 투자로서의 참여를 권유하지 않습니다. 참여하기 전에 항상 스스로 조사하고 재정 상황을 신중하게 고려해 주세요.',
+    text: 'Cosmic Signature 참여에는 금전적 위험이 따릅니다. 암호화폐와 NFT 시장은 변동성이 매우 크며, 사용자는 제스처의 가치를 되돌려 받지 못할 수 있습니다. 자금을 잃더라도 생활에 지장이 없는 범위에서만 참여해 주세요. Cosmic Signature는 투자 상품이 아니며, 토큰 가격이나 향후 동향에 관해 어떠한 진술도 하지 않으며, 투자로서의 참여를 권유하지 않습니다. 참여하기 전에 항상 스스로 조사하고 재정 상황을 신중하게 고려해 주세요.',
   },
   // lexicon-allow-end
   acknowledgment: {

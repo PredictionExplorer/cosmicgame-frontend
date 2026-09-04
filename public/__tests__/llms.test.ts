@@ -33,7 +33,7 @@ describe('LLM-facing protocol docs', () => {
   });
 
   it.each(docs)('%s avoids RandomWalk per-wallet discount wording', (_fileName, content) => {
-    expect(content).toContain('each RandomWalkNFT can be used once');
+    expect(content).toContain('each Random Walk NFT can be used once');
     expect(content).not.toMatch(/once per wallet/i);
   });
 

@@ -1,6 +1,6 @@
 {
-  "generic": "Something went off the star map. Please try again.",
-  "networkOffline": "No network. Reconnect to continue.",
+  "generic": "Something went wrong. Please try again.",
+  "networkOffline": "You’re offline. Reconnect to continue.",
   "walletNotConnected": "Connect a Web3 wallet to make a gesture.",
   "insufficientEth": "Not enough ETH in your wallet for this gesture.",
   "cycleClosed": "This cycle has closed. The next Performance Cycle opens soon.",
@@ -14,7 +14,7 @@
     "retry": "Try Again"
   },
   "route": {
-    "message": "Something went wrong while rendering this page. Try again, or come back in a moment.",
+    "message": "This page could not be loaded. Try again, or come back in a moment.",
     "titles": {
       "app": "This page failed to load",
       "allocation": "Allocation details failed to load",
@@ -27,8 +27,8 @@
     }
   },
   "global": {
-    "title": "The app hit an unexpected error",
-    "message": "Something went wrong outside the page content. Reloading usually clears it.",
+    "title": "The app could not load",
+    "message": "An unexpected error interrupted the app. Reload the page to try again.",
     "retry": "Reload"
   },
   "environment": {

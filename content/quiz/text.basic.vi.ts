@@ -31,7 +31,7 @@ export const basicQuestionsTextVi = {
       d: 'Một lời nhắn đăng trong các kênh cộng đồng.',
     },
     explanation:
-      'Nét bút là đầu vào duy nhất của giao thức. Mỗi nét bút mang ETH hoặc CST, đẩy thời điểm hoàn tất chu kỳ xa hơn, ghi nhận một lượt trong Tinh tuyển của chu kỳ và có thể khắc CST tham gia. Bạn không bao giờ vẽ gì bằng tay — tác phẩm được tính từ một seed khi hoàn tất.',
+      'Nét bút là thao tác thúc đẩy chu kỳ trình diễn. Mỗi nét bút mang ETH hoặc CST, đẩy thời điểm hoàn tất chu kỳ xa hơn, ghi nhận một lượt trong Tinh tuyển của chu kỳ và có thể khắc CST tham gia. Bạn không bao giờ vẽ gì bằng tay — tác phẩm được tính từ một seed khi hoàn tất.',
     referenceLabel: 'Sách trắng \u00a74 \u2014 Nét bút',
   },
   'two-currencies': {
@@ -67,7 +67,7 @@ export const basicQuestionsTextVi = {
       d: 'Người tham gia đặt nét bút mở chu kỳ.',
     },
     explanation:
-      'Khi thời điểm hoàn tất chu kỳ hết hạn, người đặt nét bút cuối cùng đủ điều kiện hoàn tất, và ban đầu là độc quyền. Khối lượng không bao giờ quan trọng ở đây: một nét bút đúng lúc đứng cuối vượt lên trên hàng trăm nét bút trước đó.',
+      'Khi đếm ngược hoàn tất về 0, người đặt nét bút cuối cùng đủ điều kiện hoàn tất, và ban đầu là độc quyền. Khối lượng không bao giờ quan trọng ở đây: một nét bút đúng lúc đứng cuối vượt lên trên hàng trăm nét bút trước đó.',
     referenceLabel: 'Sách trắng \u00a73.3 \u2014 Hoàn tất',
   },
   'sleepy-beneficiary': {
@@ -79,7 +79,7 @@ export const basicQuestionsTextVi = {
       c: 'Chu kỳ hoàn tất, nhưng người đặt nét bút cuối cùng vẫn nhận mọi thứ.',
       d: 'Không gì xảy ra cho đến khi Hội đồng Vũ trụ biểu quyết can thiệp.',
     },
-    explanation: `Người đặt nét bút cuối cùng giữ quyền độc quyền trong ${protocolFacts.finalGestureExclusivityHours} giờ. Sau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất, và hợp đồng coi người làm việc đó là người nhận của chu kỳ, cùng mọi thứ vai trò này mang theo. Quy tắc cố ý không nhân nhượng \u2014 nó giữ giao thức sống nếu một người tham gia biến mất, và nó khiến sự bất cẩn phải trả một cái giá.`,
+    explanation: `Người đặt nét bút cuối cùng giữ quyền độc quyền trong ${protocolFacts.finalGestureExclusivityHours} giờ. Sau đó, cửa sổ hoàn tất mở bắt đầu: bất kỳ ai cũng có thể hoàn tất, và hợp đồng coi người làm việc đó là người nhận của chu kỳ, cùng mọi thứ vai trò này mang theo. Quy tắc này giúp giao thức tiếp tục khi người nhận không thực hiện thao tác. Người nhận cần hoàn tất trong thời hạn ưu tiên để giữ quyền nhận phân bổ.`,
     funFact:
       'Không gì trong giao thức chờ mãi một người tham gia vắng mặt. Mọi thời hạn cuối cùng đều mở ra cho người gọi đầu tiên.',
     referenceLabel: 'Sách trắng \u00a73.3 \u2014 Hoàn tất',
@@ -96,7 +96,7 @@ export const basicQuestionsTextVi = {
     referenceLabel: 'Sách trắng \u00a75.1 \u2014 Phân phối khi hoàn tất',
   },
   'compounding-reserve': {
-    prompt: 'Vì sao mỗi chu kỳ trình diễn mở ra với dự trữ lớn hơn chu kỳ trước?',
+    prompt: 'Điều gì xảy ra với phần dự trữ còn lại sau các phân bổ của chu kỳ?',
     options: {
       a: `Khoảng ${protocolFacts.compoundingReservePercentage}% dự trữ của mỗi chu kỳ không bao giờ được phân phối \u2014 nó chuyển tiếp vào chu kỳ tiếp theo.`,
       b: 'Đội ngũ bổ sung dự trữ giữa các chu kỳ.',
@@ -104,7 +104,7 @@ export const basicQuestionsTextVi = {
       d: 'Hội đồng Vũ trụ biểu quyết đưa ETH mới vào dự trữ.',
     },
     explanation:
-      'Năm luồng ETH được phân phối cộng lại bằng một nửa dự trữ; phần còn lại tự động tích lũy. Không ai bổ sung gì, và không giao thức nào có thể khắc ETH \u2014 sự tăng trưởng hoàn toàn mang tính cơ học. Giao thức tích lũy thay vì rút ra.',
+      'Năm luồng ETH chiếm một nửa dự trữ; phần còn lại tự động chuyển sang chu kỳ tiếp theo. Cơ chế này không bảo đảm dự trữ tăng sau mỗi chu kỳ: số dư còn phụ thuộc vào ETH mới được đóng góp.',
     referenceLabel: 'Sách trắng \u00a75.1 \u2014 Phân phối khi hoàn tất',
   },
   'art-engine': {
@@ -137,13 +137,13 @@ export const basicQuestionsTextVi = {
   'cst-supply-origin': {
     prompt: 'CST đến từ đâu?',
     options: {
-      a: 'Nguồn cung bắt đầu từ không, và chỉ hợp đồng giao thức mới có thể khắc nó \u2014 mọi CST đều truy về việc tham gia một chu kỳ.',
+      a: 'Nguồn cung bắt đầu từ 0. Chỉ hợp đồng giao thức có thể khắc CST qua các cơ chế đã quy định trong chu kỳ.',
       b: 'Một phần lớn được tạo cho đội ngũ khi ra mắt.',
       c: 'Nó được phân phát cho các ví sớm trước khi ra mắt.',
       d: 'Bất kỳ ai cũng có thể khắc CST bằng cách gọi hợp đồng token.',
     },
     explanation:
-      'Hợp đồng token CST chỉ nhận lệnh khắc và đốt từ hợp đồng giao thức, và nguồn cung bắt đầu từ không. Không có giới hạn, không khắc trước, không phần dành cho đội ngũ \u2014 sự tham gia kiên nhẫn là nguồn duy nhất của CST mới.',
+      'Nguồn cung CST bắt đầu từ 0 và chỉ hợp đồng giao thức được phép khắc hoặc đốt token. CST được khắc qua ba cơ chế: CST tham gia khi đặt nét bút, CST ghi nhận đi cùng NFT và Dự trữ truyền thông do đội ngũ điều phối.',
     referenceLabel: 'Sách trắng \u00a77 \u2014 Token CST',
   },
   'cst-on-spend': {
@@ -155,7 +155,7 @@ export const basicQuestionsTextVi = {
       d: 'Nó được trả lại cho Rio khi chu kỳ hoàn tất.',
     },
     explanation:
-      'Toàn bộ chi phí của mỗi nét bút CST bị đốt. Điều đó gắn nguồn cung của token với việc sử dụng thực tế: chu kỳ yên ắng khắc ít, và hoạt động CST sôi động đốt nguồn cung xuống. Không gì chảy vào bất kỳ kho nào \u2014 chẳng có kho nào cả.',
+      'Toàn bộ CST dùng để trả chi phí nét bút bị đốt, tức bị loại bỏ vĩnh viễn khỏi nguồn cung. Số CST này không được chuyển vào dự trữ hay phân bổ lại.',
     referenceLabel: 'Sách trắng \u00a77.2 \u2014 Đốt và động lực nguồn cung',
   },
   'public-goods-beneficiary': {
@@ -191,7 +191,7 @@ export const basicQuestionsTextVi = {
       d: 'Có, nhưng chỉ trong cùng chu kỳ.',
     },
     explanation:
-      'Quy tắc một-lần-duy-nhất thay lịch khóa thông thường bằng một lựa chọn không thể đảo ngược, cho tập hợp đang neo giữ một cái giá thực sự khi rời đi. Giữ một NFT neo giữ là quyết định sống động mỗi chu kỳ; gỡ neo là quyết định vĩnh viễn.',
+      'NFT không có thời hạn neo giữ bắt buộc, nhưng chỉ được neo giữ một lần. Mira có thể gỡ neo bất cứ lúc nào; sau đó NFT này không thể neo giữ lại.',
     referenceLabel: 'Sách trắng \u00a78 \u2014 Neo giữ',
   },
   'random-walk-perk': {
@@ -233,13 +233,13 @@ export const basicQuestionsTextVi = {
   'who-runs-cycles': {
     prompt: 'Ai quyết định ETH của mỗi chu kỳ được phân phối thế nào?',
     options: {
-      a: 'Không ai \u2014 tỷ lệ phân bổ là các hằng số trong hợp đồng đã xác minh, thực thi cơ học khi hoàn tất.',
+      a: 'Các hợp đồng đã xác minh thực thi quy tắc phân bổ khi chu kỳ hoàn tất.',
       b: 'Đội ngũ xem xét từng chu kỳ và ký duyệt phân phối.',
       c: 'Một dịch vụ oracle tính toán cách chia.',
       d: 'Máy chủ backend của ứng dụng phát lệnh chuyển.',
     },
     explanation:
-      'Phân phối cơ học là một trong ba đặc tính neo của giao thức: không tài khoản tùy quyết nào đứng giữa người tham gia và quy tắc phân phối, và không ví nào của đội ngũ nhận ETH từ nét bút. Ứng dụng và máy chủ chỉ hiển thị những gì hợp đồng đã làm.',
+      'Phân phối theo quy tắc là một trong ba nguyên tắc của giao thức: không tài khoản tùy quyết nào đứng giữa người tham gia và quy tắc phân phối, và không ví nào của đội ngũ nhận ETH từ nét bút. Ứng dụng và máy chủ chỉ hiển thị những gì hợp đồng đã làm.',
     referenceLabel: 'Sách trắng \u00a71 \u2014 Giới thiệu',
   },
   'nft-count-typical': {

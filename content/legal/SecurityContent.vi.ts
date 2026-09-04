@@ -5,12 +5,12 @@ export const securityCopyVi: TrustPageCopy = {
   eyebrow: 'Tin cậy và bảo mật',
   title: 'Bảo mật Cosmic Signature',
   intro:
-    'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Thế trận bảo mật của nó dựa trên các hợp đồng thông minh công khai, dữ liệu giao thức minh bạch, tương tác ví cẩn trọng và việc hướng dẫn rõ ràng cho người tham gia.',
+    'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Bảo mật của giao thức dựa trên hợp đồng thông minh công khai, dữ liệu minh bạch, việc kiểm tra kỹ thao tác ví và hướng dẫn rõ ràng cho người tham gia.',
   sections: [
     {
       heading: 'Mô hình bảo mật',
       paragraphs: [
-        'Các hành động của giao thức được các hợp đồng thông minh trên Arbitrum ghi lại. Các trang công khai nên cho người dùng và trình thu thập dữ liệu kiểm tra địa chỉ hợp đồng, tài nguyên mã nguồn, bối cảnh xác minh và các giả định vận hành trước khi kết nối ví hoặc đặt nét bút.',
+        'Hợp đồng thông minh trên Arbitrum ghi lại các thao tác của giao thức. Trước khi kết nối ví hoặc đặt nét bút, hãy kiểm tra địa chỉ hợp đồng chính thức, mã nguồn, thông tin xác minh và điều kiện vận hành.',
       ],
       bullets: [
         'Dùng ứng dụng chính thức tại `https://app.cosmicsignature.com/`.',
@@ -22,7 +22,7 @@ export const securityCopyVi: TrustPageCopy = {
     {
       heading: 'Tài nguyên xác minh',
       paragraphs: [
-        'Tín hiệu bảo mật mạnh nhất là sự nhất quán giữa nội dung hiển thị trong ứng dụng, các hợp đồng đã xác minh, mã nguồn và dữ liệu trực tiếp trên Arbitrum.',
+        'Đối chiếu nội dung ứng dụng với hợp đồng đã xác minh, mã nguồn và dữ liệu hiện tại trên Arbitrum để kiểm tra cách giao thức hoạt động.',
       ],
       links: [
         {

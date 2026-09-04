@@ -27,7 +27,7 @@
     "expandAllAria": "Mở rộng tất cả câu hỏi",
     "collapseAllAria": "Thu gọn tất cả câu hỏi",
     "copyLink": "Sao chép liên kết",
-    "copied": "Đã sao chép!",
+    "copied": "Đã sao chép",
     "copyLinkAria": "Sao chép liên kết đến câu hỏi này"
   },
   "popular": {
@@ -52,11 +52,11 @@
     },
     "chronoWarrior": {
       "term": "Chiến binh Thời gian",
-      "content": "Danh hiệu còn hiếm hơn — người tham gia giữ vị trí Quán quân Bền bỉ trong khoảng thời gian liên tục dài nhất."
+      "content": "Danh hiệu dành cho người giữ vị trí Quán quân Bền bỉ lâu nhất trong một khoảng liên tục."
     },
     "calibrationWindow": {
       "term": "Cửa sổ hiệu chỉnh",
-      "content": "Một cửa sổ khám phá giá, trong đó chi phí nét bút bắt đầu ở mức cao rồi giảm dần theo thời gian từ trần hiệu chỉnh xuống sàn hiệu chỉnh. Càng chờ lâu, chi phí càng thấp."
+      "content": "Khoảng thời gian chi phí nét bút giảm dần từ trần hiệu chỉnh xuống sàn hiệu chỉnh. Trong cùng cửa sổ, chờ lâu hơn sẽ có chi phí thấp hơn."
     },
     "cosmicCouncil": {
       "term": "Hội đồng Vũ trụ",
@@ -64,7 +64,7 @@
     },
     "cst": {
       "term": "CST",
-      "content": "Token CST — các token ERC-20 được khắc cùng mỗi nét bút. Dùng trong Hội đồng Vũ trụ và làm phương thức thanh toán thay thế cho nét bút."
+      "content": "CST là token ERC-20 có thể được khắc khi đặt nét bút. CST dùng để tham gia Hội đồng Vũ trụ hoặc thanh toán chi phí nét bút."
     },
     "erc20": {
       "term": "ERC-20",
@@ -84,7 +84,7 @@
     },
     "randomWalkNft": {
       "term": "Random Walk NFT",
-      "content": "Một bộ sưu tập NFT chị em. Đính kèm một NFT này vào nét bút ETH giúp giảm 50% chi phí nét bút ETH một lần."
+      "content": "Bộ sưu tập NFT cùng hệ sinh thái. Đính kèm một NFT chưa sử dụng vào nét bút ETH để giảm 50% chi phí nét bút. Mỗi NFT chỉ áp dụng mức giảm này một lần."
     },
     "renounceOwnership": {
       "term": "từ bỏ quyền sở hữu",

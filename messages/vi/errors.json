@@ -1,5 +1,5 @@
 {
-  "generic": "Có gì đó đã lệch khỏi bản đồ sao. Vui lòng thử lại.",
+  "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
   "networkOffline": "Không có mạng. Kết nối lại để tiếp tục.",
   "walletNotConnected": "Kết nối ví Web3 để đặt nét bút.",
   "insufficientEth": "Ví không đủ ETH cho nét bút này.",
@@ -10,11 +10,11 @@
   },
   "boundary": {
     "title": "Đã xảy ra lỗi",
-    "description": "Một lỗi không mong đợi đã xảy ra.",
+    "description": "Đã xảy ra lỗi ngoài dự kiến.",
     "retry": "Thử lại"
   },
   "route": {
-    "message": "Đã xảy ra lỗi khi hiển thị trang này. Hãy thử lại, hoặc quay lại sau ít phút.",
+    "message": "Không thể hiển thị trang này. Hãy thử lại hoặc quay lại sau ít phút.",
     "titles": {
       "app": "Không tải được trang này",
       "allocation": "Không tải được chi tiết phân bổ",
@@ -27,18 +27,18 @@
     }
   },
   "global": {
-    "title": "Ứng dụng gặp lỗi không mong đợi",
-    "message": "Đã xảy ra lỗi bên ngoài nội dung trang. Tải lại thường sẽ khắc phục được.",
+    "title": "Ứng dụng gặp lỗi ngoài dự kiến",
+    "message": "Ứng dụng không thể hiển thị trang. Hãy tải lại để thử khắc phục.",
     "retry": "Tải lại"
   },
   "environment": {
     "title": "Không thể chạy vì các biến môi trường chưa được thiết lập.",
-    "description": "Chúng tôi không thể giả định giá trị mặc định cho mạng hay URL API — cách đó dễ sinh lỗi.",
+    "description": "Cần thiết lập mạng và URL API chính xác để ứng dụng hoạt động.",
     "missing": "Thiếu hoặc không hợp lệ:",
     "resolution": "Hãy thiết lập chúng trong shell hoặc trong tệp .env, rồi khởi động lại máy chủ phát triển."
   },
   "apiFailure": "Dịch vụ không phản hồi. Hãy thử lại sau ít phút.",
-  "unexpected": "Lỗi không mong đợi. Vui lòng thử lại.",
+  "unexpected": "Đã xảy ra lỗi ngoài dự kiến. Vui lòng thử lại.",
   "notFound": {
     "title": "404 — Không tìm thấy trang",
     "description": "Trang bạn tìm không tồn tại hoặc có thể đã được chuyển đi. Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum — hãy khám phá các liên kết bên dưới để tìm điều bạn cần.",

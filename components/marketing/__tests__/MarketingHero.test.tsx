@@ -40,13 +40,13 @@ jest.mock('framer-motion', () => {
 describe('MarketingHero', () => {
   it('renders the headline', () => {
     render(<MarketingHero />);
-    expect(screen.getByText(/Earn Rewards by/)).toBeInTheDocument();
+    expect(screen.getByText(/Receive CST for/)).toBeInTheDocument();
     expect(screen.getByText(/Spreading the Word/)).toBeInTheDocument();
   });
 
   it('renders the subtitle', () => {
     render(<MarketingHero />);
-    expect(screen.getByText(/Promote Cosmic Signature/)).toBeInTheDocument();
+    expect(screen.getByText(/Share Cosmic Signature/)).toBeInTheDocument();
   });
 
   it('renders the Learn How link pointing to #how-it-works', () => {

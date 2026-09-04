@@ -7,17 +7,17 @@
     "title": "Trình xem mã",
     "subtitle": "Xem mã tạo sinh chuyển seed thành hình ảnh",
     "description": "Đoạn mã dưới đây chuyển seed do hợp đồng thông minh tạo ra thành hình ảnh. Bạn cũng có thể tìm thấy nó trên IPFS:",
-    "github": "Tổ chức GitHub công khai có tại <link>github.com/PredictionExplorer</link>."
+    "github": "Xem mã nguồn của dự án tại <link>github.com/PredictionExplorer</link>."
   },
   "seo": {
     "eyebrow": "Mã nguồn · nghệ thuật tất định",
     "heading": "Mã nguồn Cosmic Signature",
-    "description": "Cosmic Signature công khai các tài nguyên mã nguồn của quy trình tạo tác phẩm tất định, biến seed trên chuỗi thành nghệ thuật NFT ba vật thể. Trình xem phía máy khách bên dưới có tính tương tác, còn bản tóm tắt kết xuất phía máy chủ này cung cấp cho trình thu thập dữ liệu những thông tin chính trước khi JavaScript chạy.",
+    "description": "Cosmic Signature công khai mã nguồn tạo tác phẩm: từ seed trên chuỗi, mô phỏng bài toán ba vật thể cho đến hình ảnh NFT. Quy trình tất định cho phép tái tạo tác phẩm từ cùng một seed. Bạn có thể xem mã nguồn bên dưới.",
     "excerpt": "seed -> dòng ngẫu nhiên SHA3-256 -> mô phỏng ba vật thể -> bộ kết xuất quang phổ -> hình ảnh Cosmic Signature NFT",
     "relatedAria": "Các trang liên quan đến mã nguồn",
     "links": {
       "ipfs": "Mở bản mã nguồn đã công bố trên IPFS",
-      "github": "Mở tổ chức GitHub",
+      "github": "Xem dự án trên GitHub",
       "contracts": "Xem các hợp đồng đã xác minh",
       "security": "Đọc ghi chú bảo mật",
       "gallery": "Khám phá nghệ thuật NFT đã tạo"

@@ -5,12 +5,12 @@ export const securityCopyKo: TrustPageCopy = {
   eyebrow: '신뢰와 보안',
   title: 'Cosmic Signature 보안',
   intro:
-    'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 보안 태세는 공개된 스마트 컨트랙트, 투명한 프로토콜 데이터, 신중한 지갑 상호작용, 참여자를 위한 명확한 안내에 기반합니다.',
+    'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 공개된 스마트 컨트랙트와 투명한 프로토콜 데이터, 신중한 지갑 사용, 명확한 참여 안내를 바탕으로 보안을 관리합니다.',
   sections: [
     {
       heading: '보안 모델',
       paragraphs: [
-        '프로토콜 작업은 Arbitrum 스마트 컨트랙트에 기록됩니다. 공개 페이지는 사용자와 크롤러가 지갑을 연결하거나 제스처를 남기기 전에 컨트랙트 주소, 소스 코드 자료, 검증 맥락, 운영상의 전제를 살펴볼 수 있도록 해야 합니다.',
+        '프로토콜 작업은 Arbitrum 스마트 컨트랙트에 기록됩니다. 지갑을 연결하거나 제스처를 남기기 전에 공개 페이지에서 컨트랙트 주소, 소스 코드, 검증 범위, 운영 조건을 확인할 수 있습니다.',
       ],
       bullets: [
         '공식 앱(`https://app.cosmicsignature.com/`)을 이용해 주세요.',
