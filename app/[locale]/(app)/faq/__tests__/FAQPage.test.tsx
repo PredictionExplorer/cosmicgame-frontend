@@ -149,6 +149,8 @@ describe('FAQPage', () => {
     );
   }, 15_000);
 
+  // Axe over the full FAQ page is one of the heaviest a11y scans in the suite;
+  // under pre-push load the default 5s timeout flakes (matches page.test.tsx).
   it('has no accessibility violations', async () => {
     const { container } = render(<FAQPage content={faqContentEn} />);
     await checkA11y(container, {
@@ -157,5 +159,5 @@ describe('FAQPage', () => {
         region: { enabled: false },
       },
     });
-  });
+  }, 30_000);
 });
