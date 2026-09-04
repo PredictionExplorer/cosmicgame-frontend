@@ -160,6 +160,15 @@
     "fdir": {
       "picomatch": "^4.0.4"
     },
+    "three-stdlib": {
+      "fflate": "^0.6.11"
+    },
+    "@shuding/opentype.js": {
+      "fflate": "^0.7.5"
+    },
+    "@types/three": {
+      "fflate": "^0.8.3"
+    },
     "jest-util": {
       "picomatch": "^2.3.2"
     },

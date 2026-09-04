@@ -23,6 +23,12 @@ export const LIVE_GAME_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['donationsERC20ByRound'],
   ['bidEthPrice'],
   ['ctPrice'],
+  // Account-menu balances: every gesture moves ETH (and CST — burned on CST
+  // gestures, minted to the outbid participant on V3), and finalization moves
+  // both plus the NFT/win counts that ride on userInfo. The keys are matched
+  // as prefixes, so these cover every connected address.
+  ['userBalance'],
+  ['userInfo'],
 ];
 
 /** Queries showing ETH donation data (list pages, per-round tabs, totals). */
