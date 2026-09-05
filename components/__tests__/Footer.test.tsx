@@ -8,13 +8,6 @@ import { LOCALE_LABELS, routing } from '@/i18n/routing';
 
 import { render, screen, checkA11y, within } from '@/test-utils';
 
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Record<string, unknown>) => {
-    return <img {...props} />;
-  },
-}));
-
 jest.mock('next/link', () => ({
   __esModule: true,
   default: ({
@@ -37,10 +30,10 @@ describe('Footer', () => {
     render(<Footer />);
   });
 
-  it('renders the logo', () => {
-    const logo = screen.getByAltText('Cosmic Signature');
+  it('renders a decorative logo within the labeled home link', () => {
+    const logo = screen.getByRole('link', { name: 'nav.brand.homeLabel' }).querySelector('svg');
     expect(logo).toBeInTheDocument();
-    expect(logo).toHaveAttribute('src', '/images/logo2.svg');
+    expect(logo).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('renders copyright and CC0 colophon', () => {

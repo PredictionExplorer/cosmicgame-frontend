@@ -17,9 +17,9 @@ export function FAQCallout({ faqCallout }: { faqCallout: HowItWorksContent['faqC
   return (
     <motion.section
       aria-labelledby="faq-callout-heading"
-      className="py-16"
+      className="py-8 sm:py-10"
       variants={fadeUp}
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, margin: '-60px' }}
     >
@@ -30,10 +30,7 @@ export function FAQCallout({ faqCallout }: { faqCallout: HowItWorksContent['faqC
           <HelpCircle className="h-6 w-6 text-primary" />
         </div>
 
-        <h2
-          id="faq-callout-heading"
-          className="mt-4 font-display text-2xl font-bold tracking-tight sm:text-3xl"
-        >
+        <h2 id="faq-callout-heading" className="mt-4 type-display-sm">
           {faqCallout.heading}
         </h2>
 

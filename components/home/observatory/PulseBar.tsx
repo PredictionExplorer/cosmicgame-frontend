@@ -35,9 +35,12 @@ export function PulseBar({
   return (
     <div
       data-testid="home-deck-header"
-      className={cn('flex flex-wrap items-center justify-between gap-x-6 gap-y-2', className)}
+      className={cn(
+        'flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6 sm:gap-y-2',
+        className,
+      )}
     >
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 w-full sm:flex-1">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <h1
             id="home-deck-title"

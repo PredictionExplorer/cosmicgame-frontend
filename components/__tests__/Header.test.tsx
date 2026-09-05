@@ -15,13 +15,7 @@ jest.mock('viem');
 
 let mockAccount: string | null = null;
 const mockAddCst = jest.fn();
-
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Record<string, unknown>) => {
-    return <img {...props} />;
-  },
-}));
+const mockPathname = jest.spyOn(jest.requireMock('next/navigation'), 'usePathname');
 
 jest.mock('../../hooks/web3', () => ({
   useActiveWeb3React: () => ({
@@ -84,15 +78,16 @@ const setViewportWidth = (value: number) => {
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = null;
+  mockPathname.mockReturnValue('/');
   setViewportWidth(1440);
 });
 
 describe('Header (desktop)', () => {
   it('renders the logo linked to home', () => {
     render(<Header />);
-    const logo = screen.getByAltText('Cosmic Signature');
+    const logo = screen.getByRole('link', { name: 'nav.brand.homeLabel' }).querySelector('svg');
     expect(logo).toBeInTheDocument();
-    expect(logo).toHaveAttribute('src', '/images/logo2.svg');
+    expect(logo).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('link', { name: 'nav.brand.homeLabel' })).toHaveAttribute('href', '/');
   });
 
@@ -219,6 +214,20 @@ describe('Header (desktop)', () => {
 });
 
 describe('Header (mobile)', () => {
+  it('identifies the current section on a nested page', async () => {
+    mockPathname.mockReturnValue('/statistics/participation');
+    const user = userEvent.setup();
+    render(<Header />);
+    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
+    const drawer = await screen.findByRole('dialog');
+    expect(
+      within(drawer).getByRole('link', { name: 'nav.links.statistics.label' }),
+    ).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(drawer).getByRole('link', { name: 'nav.links.gallery.label' }),
+    ).not.toHaveAttribute('aria-current');
+  });
+
   it('exposes drawer state and returns keyboard focus to its trigger', async () => {
     const user = userEvent.setup();
     render(<Header />);

@@ -30,12 +30,12 @@ interface SummaryMetricProps {
 
 function SummaryMetric({ label, value, tooltip, description }: SummaryMetricProps) {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+    <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
       <dt className="flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
         <span>{label}</span>
         <InfoTooltip content={tooltip} label={label} />
       </dt>
-      <dd className="mt-2 text-2xl font-semibold text-foreground">{value}</dd>
+      <dd className="mt-2 font-display text-2xl font-medium text-foreground">{value}</dd>
       <dd className="sr-only">{description}</dd>
     </div>
   );
@@ -52,12 +52,9 @@ export async function StatisticsSeoSummary() {
   const mainStats = data?.MainStats;
 
   return (
-    <section
-      aria-labelledby="statistics-heading"
-      className="mb-12 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
-    >
-      <p className="type-eyebrow text-muted-foreground">{t('hub.seo.eyebrow')}</p>
-      <h1 id="statistics-heading" className="mt-4 type-display-md text-foreground">
+    <section aria-labelledby="statistics-heading" className="mb-12 border-b border-border pb-10">
+      <p className="type-eyebrow text-primary/80">{t('hub.seo.eyebrow')}</p>
+      <h1 id="statistics-heading" className="mt-4 type-display-lg text-foreground">
         {t('hub.seo.heading')}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">

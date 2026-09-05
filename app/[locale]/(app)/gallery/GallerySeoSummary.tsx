@@ -14,39 +14,36 @@ export async function GallerySeoSummary() {
   const count = data?.MainStats?.NumCSTokenMints;
 
   return (
-    <section
-      aria-labelledby="gallery-seo-heading"
-      className="mb-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
-    >
-      <p className="type-eyebrow text-muted-foreground">{t('gallerySummary.eyebrow')}</p>
-      <h1 id="gallery-seo-heading" className="mt-4 type-display-md text-foreground">
+    <section aria-labelledby="gallery-seo-heading" className="mb-12 border-b border-border pb-10">
+      <p className="type-eyebrow text-primary/80">{t('gallerySummary.eyebrow')}</p>
+      <h1 id="gallery-seo-heading" className="mt-4 type-display-lg text-foreground">
         {t('gallerySummary.heading')}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
         {t('gallerySummary.description')}
       </p>
       <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
           <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
             {t('gallerySummary.cards.imprinted')}
           </dt>
-          <dd className="mt-2 text-2xl font-semibold">
+          <dd className="mt-2 font-display text-2xl font-medium">
             {typeof count === 'number' && Number.isFinite(count)
               ? numberFormatter.format(count)
               : t('gallerySummary.unavailable')}
           </dd>
         </div>
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
           <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
             {t('gallerySummary.cards.process')}
           </dt>
-          <dd className="mt-2 text-lg font-semibold">{t('gallerySummary.cards.processValue')}</dd>
+          <dd className="mt-2 text-lg font-medium">{t('gallerySummary.cards.processValue')}</dd>
         </div>
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
           <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
             {t('gallerySummary.cards.license')}
           </dt>
-          <dd className="mt-2 text-lg font-semibold">{t('gallerySummary.cards.licenseValue')}</dd>
+          <dd className="mt-2 text-lg font-medium">{t('gallerySummary.cards.licenseValue')}</dd>
         </div>
       </dl>
       <nav aria-label={t('gallerySummary.relatedAria')} className="mt-6">

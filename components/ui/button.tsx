@@ -5,19 +5,18 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-all duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default:
-          'capitalize border-0 bg-gradient-to-r from-[#06AEEC] via-[#35C9FF] to-[#9C37FD] text-white shadow-[0_14px_40px_-22px_rgb(var(--aurora-cyan-rgb)/0.9)] hover:-translate-y-0.5 hover:brightness-110',
+          'capitalize border border-transparent bg-primary text-primary-foreground hover:bg-primary/90',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'capitalize border border-primary/50 bg-transparent px-6 text-secondary hover:bg-primary/10',
+          'capitalize border border-white/20 bg-transparent px-6 text-foreground hover:border-white/35 hover:bg-white/[0.04]',
         secondary:
-          'relative capitalize px-6 text-primary border border-primary/50 bg-primary/[0.04] hover:-translate-y-0.5 hover:bg-primary/10',
-        ghost:
-          'hover:bg-white/[0.07] hover:text-foreground hover:shadow-[0_10px_36px_-26px_rgb(var(--aurora-cyan-rgb)/0.8)]',
+          'relative capitalize px-6 text-secondary border border-secondary/20 bg-secondary/[0.07] hover:bg-secondary/[0.12]',
+        ghost: 'hover:bg-white/[0.06] hover:text-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         text: 'text-white border border-white/[0.06] bg-white/[0.02] rounded-none',
       },

@@ -92,7 +92,11 @@ export default async function LearnArticlePage({ params }: PageProps) {
   };
 
   return (
-    <main id="main" tabIndex={-1} className="relative mx-auto max-w-4xl px-6 py-24 lg:py-32">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="relative mx-auto max-w-4xl px-4 pb-16 pt-12 sm:px-6 lg:pb-20 lg:pt-20"
+    >
       <JsonLd
         data={[
           breadcrumbJsonLd(
@@ -117,13 +121,9 @@ export default async function LearnArticlePage({ params }: PageProps) {
       </nav>
 
       <article>
-        <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">
-          {articleUi.eyebrow}
-        </p>
-        <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-          {article.h1}
-        </h1>
-        <p className="mt-6 text-lg leading-8 text-white/78">{article.summary}</p>
+        <p className="type-eyebrow text-primary/80">{articleUi.eyebrow}</p>
+        <h1 className="mt-4 type-display-lg text-balance text-foreground">{article.h1}</h1>
+        <p className="mt-6 type-body-lg text-muted-foreground">{article.summary}</p>
         <p className="mt-4 text-sm text-white/50">
           {articleUi.lastUpdatedLabel}
           {getLocaleConfig(locale).wordSpacing ? ' ' : null}
@@ -137,13 +137,16 @@ export default async function LearnArticlePage({ params }: PageProps) {
             <section key={section.heading} aria-labelledby={sectionId(article.slug, sectionIndex)}>
               <h2
                 id={sectionId(article.slug, sectionIndex)}
-                className="text-2xl font-semibold tracking-tight text-white"
+                className="type-display-sm text-foreground"
               >
                 {section.heading}
               </h2>
               <div className="mt-4 space-y-4">
                 {section.body.map((paragraph) => (
-                  <p key={paragraph} className="text-base leading-7 text-white/72">
+                  <p
+                    key={paragraph}
+                    className="text-base leading-8 text-muted-foreground [overflow-wrap:anywhere]"
+                  >
                     {paragraph}
                   </p>
                 ))}
@@ -153,8 +156,10 @@ export default async function LearnArticlePage({ params }: PageProps) {
         </div>
       </article>
 
-      <aside className="mt-14 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-        <h2 className="text-lg font-semibold text-white">{articleUi.relatedResourcesHeading}</h2>
+      <aside className="mt-14 rounded-2xl border border-border bg-card p-6">
+        <h2 className="font-display text-xl font-medium tracking-tight text-foreground">
+          {articleUi.relatedResourcesHeading}
+        </h2>
         <ul className="mt-4 space-y-3">
           {article.related.map((link) => (
             <li key={link.href}>

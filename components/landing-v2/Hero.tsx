@@ -8,6 +8,7 @@ import type { LandingContent, LandingLink } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { BrandMark } from '@/components/layout/BrandMark';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
 import { useCanRenderHeroCanvas } from '@/components/three/hero-canvas-gate';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
@@ -41,27 +42,9 @@ export function Hero({
       <div className={styles.backdrop} aria-hidden="true">
         <HeroBackdrop />
       </div>
-      <header className={styles.header}>
+      <header role="banner" className={styles.header}>
         <Link href="/" className={styles.brand}>
-          <svg viewBox="0 0 40 40" fill="none" aria-hidden="true" className={styles.brandIcon}>
-            <circle cx="20" cy="20" r="3" fill="currentColor" />
-            <ellipse
-              cx="20"
-              cy="20"
-              rx="18"
-              ry="7"
-              stroke="currentColor"
-              transform="rotate(-35 20 20)"
-            />
-            <ellipse
-              cx="20"
-              cy="20"
-              rx="18"
-              ry="7"
-              stroke="currentColor"
-              transform="rotate(65 20 20)"
-            />
-          </svg>
+          <BrandMark className={styles.brandIcon} />
           <span>
             Cosmic <span className={styles.brandSecond}>Signature</span>
           </span>

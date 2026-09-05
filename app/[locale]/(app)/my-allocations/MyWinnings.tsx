@@ -141,7 +141,6 @@ export default function MyWinnings() {
           align="left"
           eyebrow={<SectionEyebrow tone="solar">{t('allocations.eyebrow')}</SectionEyebrow>}
           title={t('allocations.title')}
-          gradientTitle="signature"
         />
         <EmptyState
           icon={<Wallet className="h-8 w-8 text-muted-foreground/50" />}
@@ -175,7 +174,6 @@ export default function MyWinnings() {
           </SectionEyebrow>
         }
         title={t('allocations.title')}
-        gradientTitle="signature"
         subtitle={t('allocations.subtitle')}
       />
 

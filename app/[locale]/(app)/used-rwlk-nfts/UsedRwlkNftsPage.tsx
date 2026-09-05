@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -93,7 +94,7 @@ const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
   );
 };
 
-const UsedRwlkNftsPage = () => {
+const UsedRwlkNftsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
   const perPage = 5;
@@ -102,18 +103,26 @@ const UsedRwlkNftsPage = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        align="left"
-        eyebrow={
+      {seoSummary}
+      {seoSummary ? (
+        <div className="mb-8">
           <SectionEyebrow tone="nebula">
             {t('usedRwlkNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
           </SectionEyebrow>
-        }
-        title={t('usedRwlkNfts.title')}
-        titleLevel={2}
-        gradientTitle="signature"
-        subtitle={t('usedRwlkNfts.subtitle')}
-      />
+        </div>
+      ) : (
+        <PageHeader
+          align="left"
+          eyebrow={
+            <SectionEyebrow tone="nebula">
+              {t('usedRwlkNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
+            </SectionEyebrow>
+          }
+          title={t('usedRwlkNfts.title')}
+          titleLevel={2}
+          subtitle={t('usedRwlkNfts.subtitle')}
+        />
+      )}
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('usedRwlkNfts.description')}
       </p>

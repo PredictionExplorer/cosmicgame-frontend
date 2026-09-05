@@ -58,7 +58,7 @@ export function PopularQuestions({
 
   return (
     <section aria-labelledby="popular-heading" className={cn('py-8', className)}>
-      <div className="mb-6 flex items-center justify-center gap-2">
+      <div className="mb-6 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-primary" />
         <h2
           id="popular-heading"
@@ -71,7 +71,7 @@ export function PopularQuestions({
 
       <motion.div
         variants={container}
-        initial="hidden"
+        initial={false}
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
         className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
@@ -85,7 +85,7 @@ export function PopularQuestions({
               onClick={() => onQuestionClick(item.id, category.id)}
               className="gradient-border-card group relative flex flex-col items-start gap-3 rounded-xl bg-white/[0.02] p-5 text-left transition-all duration-200 hover:bg-white/[0.05]"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary/15 to-accent/15 transition-colors group-hover:from-primary/25 group-hover:to-accent/25">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary/15 bg-primary/[0.06] transition-colors group-hover:bg-primary/10">
                 <Icon className="h-4 w-4 text-primary" />
               </div>
               <p className="text-sm font-medium leading-snug text-foreground">{item.question}</p>

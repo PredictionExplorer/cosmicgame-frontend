@@ -29,12 +29,9 @@ export function GameCycle({ gameCycle }: { gameCycle: HowItWorksContent['gameCyc
   ];
 
   return (
-    <section aria-labelledby="protocol-cycle-heading" className="py-16">
-      <div className="mb-10 text-center">
-        <h2
-          id="protocol-cycle-heading"
-          className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
-        >
+    <section aria-labelledby="protocol-cycle-heading" className="py-8 sm:py-10">
+      <div className="mb-10 max-w-3xl">
+        <h2 id="protocol-cycle-heading" className="type-display-sm">
           {gameCycle.heading}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">{gameCycle.subhead}</p>
@@ -42,7 +39,7 @@ export function GameCycle({ gameCycle }: { gameCycle: HowItWorksContent['gameCyc
 
       <motion.div
         variants={containerVariants}
-        initial="hidden"
+        initial={false}
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
         className="relative mx-auto max-w-2xl"

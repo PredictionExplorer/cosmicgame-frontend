@@ -157,14 +157,14 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
         id={`faq-category-${category.id}`}
         aria-labelledby={`faq-cat-${category.id}`}
         variants={fadeUp}
-        initial="hidden"
+        initial={false}
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
         className="scroll-mt-40"
       >
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-accent/15">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/[0.06]">
               <Icon className="h-5 w-5 text-primary" />
             </div>
             <div>

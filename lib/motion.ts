@@ -124,7 +124,9 @@ export const hoverLift: Transition = {
 };
 
 const REDUCED: Variants = {
-  initial: { opacity: 0 },
+  // Viewport reveals must remain readable before an intersection event.
+  // No transform: page templates contain controls fixed to the viewport.
+  initial: { opacity: 1 },
   animate: { opacity: 1, transition: { duration: 0 } },
   exit: { opacity: 0, transition: { duration: 0 } },
 };
@@ -136,7 +138,7 @@ const REDUCED_STAGGER: Variants = {
 };
 
 /**
- * Returns the given variants, or a no-op opacity-only fallback when the user
+ * Returns the given variants, or an immediately visible fallback when the user
  * prefers reduced motion. Prefer this over raw variants in interactive
  * components so motion is always accessible.
  */

@@ -48,12 +48,9 @@ export function HowItWorks() {
   ] as const;
 
   return (
-    <section id="how-it-works" aria-labelledby="how-it-works-heading" className="py-16">
+    <section id="how-it-works" aria-labelledby="how-it-works-heading" className="py-8 sm:py-10">
       <div className="mb-12 flex items-center justify-center gap-2">
-        <h2
-          id="how-it-works-heading"
-          className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
-        >
+        <h2 id="how-it-works-heading" className="type-display-sm">
           {t('howItWorks.title')}
         </h2>
         <Tooltip>
@@ -76,7 +73,7 @@ export function HowItWorks() {
 
       <motion.div
         variants={containerVariants}
-        initial="hidden"
+        initial={false}
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
         className="grid gap-8 sm:grid-cols-3"
@@ -85,9 +82,9 @@ export function HowItWorks() {
           <motion.div
             key={step.number}
             variants={itemVariants}
-            className="gradient-border-card group relative rounded-xl bg-white/[0.02] p-8 text-center"
+            className="group relative rounded-2xl border border-border bg-card p-6 sm:p-8"
           >
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-accent/20">
+            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-primary/15 bg-primary/[0.06]">
               <step.Icon className="h-6 w-6 text-primary" />
             </div>
 
@@ -99,7 +96,7 @@ export function HowItWorks() {
 
             <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
 
-            <div className="mt-3 flex justify-center">
+            <div className="mt-3 flex">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button

@@ -14,8 +14,9 @@ interface PageProps {
   params: Promise<{ locale: string; tier: string }>;
 }
 
-export const dynamicParams = false;
-
+// Let unknown tiers reach the guard below and the landing not-found boundary.
+// With dynamicParams=false, Next can select the app group's catch-all before
+// this route renders, which gives a missing quiz the wallet-enabled app shell.
 export function generateStaticParams() {
   return QUIZ_TIER_IDS.map((tier) => ({ tier }));
 }
@@ -65,7 +66,11 @@ export default async function QuizTierPage({ params }: PageProps) {
   };
 
   return (
-    <main id="main" tabIndex={-1} className="relative mx-auto max-w-3xl px-6 py-24 lg:py-32">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="relative mx-auto max-w-3xl px-4 pb-16 pt-12 sm:px-6 lg:pb-20 lg:pt-20"
+    >
       <JsonLd
         data={[
           breadcrumbJsonLd(
@@ -93,15 +98,13 @@ export default async function QuizTierPage({ params }: PageProps) {
       </nav>
 
       <header>
-        <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">
+        <p className="type-eyebrow text-primary/80">
           {hub.eyebrow}
           {' · '}
           {hub.questionCountTemplate.replace('{count}', String(tier.questions.length))}
         </p>
-        <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-          {tier.title}
-        </h1>
-        <p className="mt-6 text-lg leading-8 text-white/78">{tier.description}</p>
+        <h1 className="mt-4 type-display-lg text-balance text-foreground">{tier.title}</h1>
+        <p className="mt-6 type-body-lg text-muted-foreground">{tier.description}</p>
       </header>
 
       <div className="mt-10">

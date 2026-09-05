@@ -85,14 +85,10 @@ export function AppBarWrapper({
   return (
     <header
       className={cn(
-        // Base chrome: fixed glass bar with a soft aurora shadow.
-        // The height is declared rather than derived from content, so the
-        // sticky offsets that depend on it cannot drift out of sync.
-        'fixed top-0 left-0 right-0 z-50 flex h-[var(--header-height)] items-center border-b border-white/[0.06] bg-background/80 shadow-[0_16px_70px_-60px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-2xl',
-        // Gradient hairlines: a faint stellar sheen on top, an aurora seam below.
-        'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/[0.14] before:to-transparent',
-        'after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-px after:h-px after:bg-gradient-to-r after:from-transparent after:via-[rgb(var(--aurora-cyan-rgb)/0.4)] after:to-transparent',
-        'print:static print:z-auto print:w-full print:before:hidden print:after:hidden',
+        // A single fine rule and the same ink surface as the landing navigation.
+        // Keep the declared height in sync with sticky offsets throughout the app.
+        'fixed top-0 left-0 right-0 z-50 flex h-[var(--header-height)] items-center border-b border-white/10 bg-background/95 backdrop-blur-xl',
+        'print:static print:z-auto print:w-full',
         className,
       )}
       {...props}
@@ -168,7 +164,7 @@ export function MainWrapper({ className, id, ...props }: React.HTMLAttributes<HT
       id={id ?? 'main'}
       tabIndex={-1}
       className={cn(
-        'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-x-clip leading-normal min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
+        'mx-auto w-full max-w-[83rem] px-4 pt-[calc(var(--header-height)+3.5rem)] pb-12 leading-normal relative z-[1] sm:px-6 sm:pb-16 max-sm:pt-[calc(var(--header-height)+2rem)]',
         className,
       )}
       {...props}
@@ -269,7 +265,7 @@ export function SearchButton({
   return (
     <button
       className={cn(
-        'inline-flex h-11 shrink-0 items-center justify-center rounded-md text-sm font-medium px-4 py-2 bg-gradient-to-r from-[#06AEEC] to-[#9C37FD] text-white hover:opacity-90 max-xs:w-full',
+        'inline-flex h-11 shrink-0 items-center justify-center rounded-md text-sm font-medium px-4 py-2 bg-primary text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring max-xs:w-full',
         className,
       )}
       {...props}
@@ -280,10 +276,7 @@ export function SearchButton({
 export function VideoCard({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn(
-        'relative bg-[linear-gradient(#080B2A,#080B2A)_padding-box,linear-gradient(90deg,rgba(21,191,253,0)_8.19%,rgba(21,191,253,0.7)_70.61%,rgba(156,55,253,0.7)_100%)_border-box] rounded-2xl border-[6px] border-transparent px-4 py-5',
-        className,
-      )}
+      className={cn('relative rounded-xl border border-white/10 bg-card px-4 py-5', className)}
       {...props}
     />
   );
@@ -303,7 +296,7 @@ export function GradientText({
   return (
     <AnyComponent
       className={cn(
-        'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent',
+        'bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent',
         className,
       )}
       {...props}

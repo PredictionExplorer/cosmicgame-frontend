@@ -75,12 +75,12 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
                 className={cn(
                   'flex min-h-11 items-center justify-between gap-2 rounded-xl border px-3.5 py-2 text-left text-sm transition-colors',
                   selected
-                    ? 'border-sky-400/40 bg-sky-400/10 text-white'
+                    ? 'border-secondary/40 bg-secondary/10 text-white'
                     : 'border-white/[0.08] bg-white/[0.03] text-white/75 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white',
                 )}
               >
                 <span>{LOCALE_LABELS[option]}</span>
-                {selected && <Check className="h-4 w-4 shrink-0 text-sky-300" aria-hidden />}
+                {selected && <Check className="h-4 w-4 shrink-0 text-secondary" aria-hidden />}
               </button>
             );
           })}
@@ -99,14 +99,14 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
           size={compact ? 'icon' : 'sm'}
           aria-label={label}
           className={cn(
-            'rounded-full border border-white/[0.12] bg-white/[0.05] text-white/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-white/[0.22] hover:bg-white/[0.09] hover:text-white data-[state=open]:border-sky-400/40 data-[state=open]:bg-sky-400/10 data-[state=open]:text-white',
+            'rounded-full border border-white/[0.12] bg-white/[0.05] text-white/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-white/[0.22] hover:bg-white/[0.09] hover:text-white data-[state=open]:border-secondary/40 data-[state=open]:bg-secondary/10 data-[state=open]:text-white',
             compact
               ? 'h-11 w-11 shrink-0 sm:h-10 sm:w-10'
               : 'h-11 gap-2 pl-3 pr-2.5 text-xs font-medium sm:h-9',
             className,
           )}
         >
-          <Globe className="shrink-0 text-sky-300/90" aria-hidden />
+          <Globe className="shrink-0 text-secondary/90" aria-hidden />
           {!compact && (
             <>
               <span lang={locale} className="max-w-[9rem] truncate">
@@ -129,7 +129,7 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
               key={option}
               value={option}
               lang={option}
-              className="min-h-10 cursor-pointer rounded-lg py-2 pr-3 text-sm text-white/80 data-[state=checked]:bg-sky-400/10 data-[state=checked]:text-white sm:min-h-9"
+              className="min-h-10 cursor-pointer rounded-lg py-2 pr-3 text-sm text-white/80 data-[state=checked]:bg-secondary/10 data-[state=checked]:text-white sm:min-h-9"
             >
               {LOCALE_LABELS[option]}
             </DropdownMenuRadioItem>

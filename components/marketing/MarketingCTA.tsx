@@ -14,12 +14,12 @@ export function MarketingCTA() {
 
   return (
     <motion.section
-      initial={{ opacity: 0, scale: 0.97 }}
+      initial={false}
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       aria-labelledby="cta-heading"
-      className="gradient-border-card rounded-2xl bg-white/[0.02] px-8 py-16 text-center sm:px-16"
+      className="gradient-border-card rounded-2xl bg-white/[0.02] px-6 py-10 text-center sm:px-10 sm:py-12"
     >
       <h2 id="cta-heading" className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
         {t('cta.title')}

@@ -26,12 +26,9 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
   ];
 
   return (
-    <section aria-labelledby="steps-heading" className="py-16">
-      <div className="mb-10 text-center">
-        <h2
-          id="steps-heading"
-          className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
-        >
+    <section aria-labelledby="steps-heading" className="py-8 sm:py-10">
+      <div className="mb-10 max-w-3xl">
+        <h2 id="steps-heading" className="type-display-sm">
           {stepByStep.heading}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">{stepByStep.subhead}</p>
@@ -39,7 +36,7 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
 
       <motion.div
         variants={containerVariants}
-        initial="hidden"
+        initial={false}
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
         className="space-y-8"
@@ -51,7 +48,7 @@ export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['step
             className="gradient-border-card rounded-xl bg-white/[0.02] p-6 sm:p-8"
           >
             <div className="flex items-start gap-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-accent/20 sm:h-14 sm:w-14">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/[0.06] sm:h-14 sm:w-14">
                 <step.Icon className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
               </div>
 

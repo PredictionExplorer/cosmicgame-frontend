@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import AttachedNFTTable, { type NFTRecord } from '@/components/attachments/AttachedNFTTable';
@@ -9,27 +10,37 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
-const NFTDonationsPage = () => {
+const NFTDonationsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
   const { data: nftDonations = null } = useDonationsNFTList();
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        align="left"
-        eyebrow={
+      {seoSummary}
+      {seoSummary ? (
+        <div className="mb-8">
           <SectionEyebrow tone="impact">
             {t('attachedNfts.eyebrow', {
               count: (nftDonations?.length ?? 0).toLocaleString(locale),
             })}
           </SectionEyebrow>
-        }
-        title={t('attachedNfts.title')}
-        titleLevel={2}
-        gradientTitle="signature"
-        subtitle={t('attachedNfts.subtitle')}
-      />
+        </div>
+      ) : (
+        <PageHeader
+          align="left"
+          eyebrow={
+            <SectionEyebrow tone="impact">
+              {t('attachedNfts.eyebrow', {
+                count: (nftDonations?.length ?? 0).toLocaleString(locale),
+              })}
+            </SectionEyebrow>
+          }
+          title={t('attachedNfts.title')}
+          titleLevel={2}
+          subtitle={t('attachedNfts.subtitle')}
+        />
+      )}
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('attachedNfts.description')}
       </p>

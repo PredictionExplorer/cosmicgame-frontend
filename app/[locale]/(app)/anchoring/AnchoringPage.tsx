@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { Coins, Users, Layers, TrendingUp, ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -27,7 +28,7 @@ import { Surface } from '@/components/ui/surface';
 import { formatEthValue } from '@/utils/format';
 import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 
-const AnchoringPage = () => {
+const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('anchoring');
   const locale = useLocale();
   const {
@@ -103,6 +104,7 @@ const AnchoringPage = () => {
   if (hasError) {
     return (
       <PageShell variant="data">
+        {seoSummary}
         <ErrorState title={t('overview.errorTitle')} message={t('overview.errorMessage')} />
       </PageShell>
     );
@@ -110,18 +112,20 @@ const AnchoringPage = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        align="left"
-        eyebrow={
-          <SectionEyebrow tone="aurora" pulse>
-            {t('overview.eyebrow')}
-          </SectionEyebrow>
-        }
-        title={t('overview.title')}
-        titleLevel={2}
-        gradientTitle="signature"
-        subtitle={t('overview.subtitle')}
-      />
+      {seoSummary}
+      {!seoSummary && (
+        <PageHeader
+          align="left"
+          eyebrow={
+            <SectionEyebrow tone="aurora" pulse>
+              {t('overview.eyebrow')}
+            </SectionEyebrow>
+          }
+          title={t('overview.title')}
+          titleLevel={2}
+          subtitle={t('overview.subtitle')}
+        />
+      )}
 
       <Surface
         variant="impact"

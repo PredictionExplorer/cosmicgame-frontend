@@ -140,7 +140,6 @@ const MyAnchors = () => {
           </SectionEyebrow>
         }
         title={t('anchors.title')}
-        gradientTitle="signature"
         subtitle={t('anchors.subtitle')}
       />
 

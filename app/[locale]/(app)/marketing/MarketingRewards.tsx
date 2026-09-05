@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -15,7 +16,7 @@ import { TopMarketersLeaderboard } from '@/components/marketing/TopMarketersLead
 import { RewardsHistorySection } from '@/components/marketing/RewardsHistorySection';
 import { MarketingCTA } from '@/components/marketing/MarketingCTA';
 
-const MarketingRewards = () => {
+const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('marketing');
   const { data: marketingRewards = [], isLoading: rewardsLoading } = useMarketingRewards();
   const { data: dashboard, isLoading: dashboardLoading } = useDashboardInfo();
@@ -35,7 +36,8 @@ const MarketingRewards = () => {
   if (loading) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <div className="flex justify-center py-32" role="status" aria-label={t('loadingAria')}>
+        {seoSummary}
+        <div className="flex justify-center py-16" role="status" aria-label={t('loadingAria')}>
           <Spinner />
         </div>
       </PageShell>
@@ -44,7 +46,8 @@ const MarketingRewards = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <MarketingHero />
+      {seoSummary}
+      <MarketingHero compact={Boolean(seoSummary)} />
       <MarketingStats
         totalRewardsEth={totalRewardsEth}
         activeMarketers={activeMarketers}

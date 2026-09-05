@@ -41,10 +41,7 @@ export default async function Page({ params }: PageProps) {
         'tables',
       ]}
     >
-      <>
-        <CurrentCycleSeoSummary />
-        <CurrentRoundPage />
-      </>
+      <CurrentRoundPage seoSummary={<CurrentCycleSeoSummary />} />
     </PageMessages>
   );
 }

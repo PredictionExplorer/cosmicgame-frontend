@@ -28,10 +28,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['marketing', 'tables']}>
-      <>
-        <PublicDataRouteSeoSummary route="marketing" />
-        <MarketingRewards />
-      </>
+      <MarketingRewards seoSummary={<PublicDataRouteSeoSummary route="marketing" />} />
     </PageMessages>
   );
 }

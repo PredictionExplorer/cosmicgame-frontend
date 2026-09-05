@@ -9,17 +9,16 @@ export default async function LandingNotFound() {
   const { notFound } = getLandingContent(locale);
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-deep-space px-6">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="relative flex items-center justify-center px-4 py-12 sm:px-6 lg:py-16"
+    >
       <div className="max-w-md text-center">
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-white/60">
           {notFound.code}
         </p>
-        <h1
-          className="mt-4 text-4xl font-semibold text-gradient-signature"
-          style={{ fontFamily: 'var(--font-family-display)' }}
-        >
-          {notFound.heading}
-        </h1>
+        <h1 className="mt-4 type-display-md text-foreground">{notFound.heading}</h1>
         <p className="mt-4 text-white/70">{notFound.description}</p>
         <Link
           href={notFound.cta.href}

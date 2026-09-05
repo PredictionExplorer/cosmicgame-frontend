@@ -16,7 +16,11 @@ const EmbedEnduranceChart: FC<{ roundNum: number }> = ({ roundNum }) => {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen w-full items-center justify-center bg-background">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="flex min-h-screen w-full items-center justify-center bg-background"
+      >
         <Spinner size="lg" />
       </main>
     );
@@ -26,7 +30,7 @@ const EmbedEnduranceChart: FC<{ roundNum: number }> = ({ roundNum }) => {
   const isLive = roundNum >= curRoundNum;
 
   return (
-    <main className="min-h-screen w-full bg-background p-4 sm:p-6">
+    <main id="main" tabIndex={-1} className="min-h-screen w-full bg-background p-4 sm:p-6">
       <EnduranceTimelineChart round={roundNum} isLive={isLive} />
     </main>
   );

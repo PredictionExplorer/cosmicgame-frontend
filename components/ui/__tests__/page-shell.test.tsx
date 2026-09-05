@@ -19,8 +19,8 @@ describe('PageShell', () => {
   });
 
   it.each([
-    ['data', 'max-w-7xl'],
-    ['marketing', 'max-w-7xl'],
+    ['data', 'max-w-[83rem]'],
+    ['marketing', 'max-w-[83rem]'],
     ['form', 'max-w-3xl'],
     ['detail', 'max-w-6xl'],
   ])('applies variant=%s max-width', (variant, expected) => {

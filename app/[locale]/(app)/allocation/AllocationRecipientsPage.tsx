@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { Trophy, Gavel, Layers, Users } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -15,7 +16,7 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { AllocationTable } from '@/components/tables/AllocationTable';
 import { useRoundList } from '@/hooks/useApiQuery';
 
-const AllocationRecipientsPage = () => {
+const AllocationRecipientsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('allocation');
   const locale = useLocale();
   const { data: rawPrizeClaims = [], isLoading: loading } = useRoundList();
@@ -92,18 +93,9 @@ const AllocationRecipientsPage = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        align="left"
-        eyebrow={
-          <SectionEyebrow tone="aurora" pulse>
-            {t('recipients.header.eyebrow')}
-          </SectionEyebrow>
-        }
-        title={t('recipients.header.title')}
-        titleLevel={2}
-        gradientTitle="signature"
-        subtitle={t('recipients.header.subtitle')}
-        meta={
+      {seoSummary}
+      {seoSummary ? (
+        <div className="mb-8">
           <span className="inline-flex items-center gap-1.5 type-body-sm text-muted-foreground">
             <span>{t('recipients.header.scope')}</span>
             <InfoTooltip
@@ -111,8 +103,29 @@ const AllocationRecipientsPage = () => {
               label={t('recipients.header.scope')}
             />
           </span>
-        }
-      />
+        </div>
+      ) : (
+        <PageHeader
+          align="left"
+          eyebrow={
+            <SectionEyebrow tone="aurora" pulse>
+              {t('recipients.header.eyebrow')}
+            </SectionEyebrow>
+          }
+          title={t('recipients.header.title')}
+          titleLevel={2}
+          subtitle={t('recipients.header.subtitle')}
+          meta={
+            <span className="inline-flex items-center gap-1.5 type-body-sm text-muted-foreground">
+              <span>{t('recipients.header.scope')}</span>
+              <InfoTooltip
+                content={t('recipients.header.scopeTooltip')}
+                label={t('recipients.header.scope')}
+              />
+            </span>
+          }
+        />
+      )}
 
       <Surface
         variant="solar"

@@ -35,24 +35,21 @@ export async function ContractsSeoSummary() {
   );
 
   return (
-    <section
-      aria-labelledby="contracts-seo-heading"
-      className="mb-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
-    >
-      <p className="type-eyebrow text-muted-foreground">{t('seo.eyebrow')}</p>
-      <h1 id="contracts-seo-heading" className="mt-4 type-display-md text-foreground">
+    <section aria-labelledby="contracts-seo-heading" className="mb-12 border-b border-border pb-10">
+      <p className="type-eyebrow text-primary/80">{t('seo.eyebrow')}</p>
+      <h1 id="contracts-seo-heading" className="mt-4 type-display-lg text-foreground">
         {t('seo.heading')}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">{t('seo.description')}</p>
       {!data?.ContractAddrs ? (
-        <p className="mt-4 rounded-xl border border-white/[0.06] bg-black/20 p-4 text-sm text-muted-foreground">
+        <p className="mt-4 rounded-xl border border-border bg-card p-4 sm:p-5 text-sm text-muted-foreground">
           {t('seo.partialFallback')}
         </p>
       ) : null}
       {entries.length > 0 ? (
         <dl className="mt-6 grid gap-3 md:grid-cols-2">
           {entries.map(({ key, label, address, explorerUrl }) => (
-            <div key={key} className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+            <div key={key} className="rounded-xl border border-border bg-card p-4 sm:p-5">
               <dt className="text-sm font-semibold text-foreground">{label}</dt>
               <dd className="mt-2 break-all font-mono text-xs text-muted-foreground">
                 <a href={explorerUrl} className="text-primary underline-offset-4 hover:underline">
@@ -63,7 +60,7 @@ export async function ContractsSeoSummary() {
           ))}
         </dl>
       ) : (
-        <p className="mt-6 rounded-xl border border-white/[0.06] bg-black/20 p-4 text-sm text-muted-foreground">
+        <p className="mt-6 rounded-xl border border-border bg-card p-4 sm:p-5 text-sm text-muted-foreground">
           {t('seo.empty')}
         </p>
       )}

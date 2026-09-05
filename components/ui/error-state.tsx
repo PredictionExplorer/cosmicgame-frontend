@@ -53,7 +53,9 @@ export function ErrorState({
   const palette = TONE[tone];
   const Heading = headingLevel === 3 ? 'h3' : 'h4';
   const body = (
-    <div className={cn('flex flex-col items-center justify-center py-16 text-center', className)}>
+    <div
+      className={cn('flex flex-col items-center justify-center px-4 py-16 text-center', className)}
+    >
       <div className={cn('mb-4 rounded-full p-4', palette.bg)}>
         {icon ?? <AlertTriangle className={cn('h-8 w-8', palette.fg)} />}
       </div>

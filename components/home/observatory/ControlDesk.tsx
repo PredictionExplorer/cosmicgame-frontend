@@ -62,20 +62,20 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
               >
                 <div
                   data-testid="control-desk-clock"
-                  className="min-w-0 rounded-2xl border border-primary/15 bg-[#0b1429]/95"
+                  className="min-w-0 rounded-2xl border border-primary/15 bg-card"
                 >
                   {clock}
                 </div>
                 <div
                   data-testid="control-desk-latest"
-                  className="min-w-0 rounded-2xl border border-emerald-300/15 bg-[#101b2b]/95"
+                  className="min-w-0 rounded-2xl border border-emerald-300/15 bg-card"
                 >
                   {latestParticipant}
                 </div>
               </div>
               <div
                 data-testid="control-desk-chrono"
-                className="min-w-0 rounded-2xl border border-violet-300/15 bg-[#15152c]/95"
+                className="min-w-0 rounded-2xl border border-violet-300/15 bg-card"
               >
                 {chronoEndurance}
               </div>
@@ -90,7 +90,7 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
                 {gestureConsole && (
                   <div
                     data-testid="control-desk-gesture"
-                    className="min-w-0 rounded-2xl border border-primary/20 bg-[#10172c]/95"
+                    className="min-w-0 rounded-2xl border border-primary/20 bg-card"
                   >
                     {gestureConsole}
                   </div>
@@ -108,7 +108,7 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
           </div>
         )}
         {orientation}
-        <div className="rounded-2xl border border-white/10 bg-[#0b1226]/70">
+        <div className="rounded-2xl border border-white/10 bg-card">
           <details
             id="allocation-breakdown"
             data-testid="allocations-disclosure"

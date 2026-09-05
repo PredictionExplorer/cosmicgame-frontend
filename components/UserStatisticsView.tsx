@@ -239,7 +239,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   if (address === 'Invalid Address') {
     return (
       <MainWrapper>
-        <h1 className="text-xl font-medium">{t('statistics.page.invalidAddress')}</h1>
+        <PageHeader title={t('statistics.page.invalidAddress')} />
       </MainWrapper>
     );
   }
@@ -255,7 +255,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         }
       >
         {address && !isOwnProfile && (
-          <div className="mt-3 flex justify-center">
+          <div className="mt-5 flex">
             <AddressChip address={address} truncateLength={8} />
           </div>
         )}

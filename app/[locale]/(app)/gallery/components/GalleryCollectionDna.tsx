@@ -160,7 +160,7 @@ export function GalleryCollectionDna({
       data-testid="collection-dna"
     >
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 rounded-lg bg-gradient-to-br from-[#06AEEC] to-[#9C37FD] p-2 opacity-80">
+        <span className="mt-0.5 rounded-lg border border-primary/15 bg-primary/[0.06] p-2 text-primary">
           <Dna className="h-4 w-4 text-white" aria-hidden />
         </span>
         <div>

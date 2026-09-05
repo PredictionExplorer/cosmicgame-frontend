@@ -42,7 +42,11 @@ export default async function AboutPage({ params }: PageProps) {
   };
 
   return (
-    <main id="main" tabIndex={-1} className="relative mx-auto max-w-4xl px-6 py-24 lg:py-32">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="relative mx-auto max-w-4xl px-4 pb-16 pt-12 sm:px-6 lg:pb-20 lg:pt-20"
+    >
       <JsonLd
         data={[
           breadcrumbJsonLd(
@@ -55,21 +59,19 @@ export default async function AboutPage({ params }: PageProps) {
           aboutJsonLd,
         ]}
       />
-      <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">
-        {content.eyebrow}
-      </p>
-      <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-        {content.heading}
-      </h1>
-      <div className="mt-8 space-y-6 text-base leading-7 text-white/76">
+      <p className="type-eyebrow text-primary/80">{content.eyebrow}</p>
+      <h1 className="mt-4 type-display-lg text-balance text-foreground">{content.heading}</h1>
+      <div className="mt-8 space-y-6 text-base leading-8 text-muted-foreground">
         {content.body.paragraphs.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
         <p>{content.body.denial}</p>
       </div>
 
-      <section className="mt-12 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-        <h2 className="text-xl font-semibold text-white">{content.officialResources.heading}</h2>
+      <section className="mt-12 rounded-2xl border border-border bg-card p-6">
+        <h2 className="font-display text-xl font-medium tracking-tight text-foreground">
+          {content.officialResources.heading}
+        </h2>
         <ul className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
           {content.officialResources.links.map((link) => (
             <li key={link.id}>

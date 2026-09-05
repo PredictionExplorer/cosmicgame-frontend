@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -67,7 +68,7 @@ const NamedNFTsTable = ({ list }: { list: CSTTokenInfo[] }) => {
   );
 };
 
-const NamedNFTsPage = () => {
+const NamedNFTsPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('statistics');
   const locale = useLocale();
   const [curPage, setCurPage] = useState(1);
@@ -76,18 +77,26 @@ const NamedNFTsPage = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        align="left"
-        eyebrow={
+      {seoSummary}
+      {seoSummary ? (
+        <div className="mb-8">
           <SectionEyebrow tone="aurora">
             {t('namedNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
           </SectionEyebrow>
-        }
-        title={t('namedNfts.title')}
-        titleLevel={2}
-        gradientTitle="signature"
-        subtitle={t('namedNfts.subtitle')}
-      />
+        </div>
+      ) : (
+        <PageHeader
+          align="left"
+          eyebrow={
+            <SectionEyebrow tone="aurora">
+              {t('namedNfts.eyebrow', { count: list.length.toLocaleString(locale) })}
+            </SectionEyebrow>
+          }
+          title={t('namedNfts.title')}
+          titleLevel={2}
+          subtitle={t('namedNfts.subtitle')}
+        />
+      )}
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('namedNfts.description')}
       </p>

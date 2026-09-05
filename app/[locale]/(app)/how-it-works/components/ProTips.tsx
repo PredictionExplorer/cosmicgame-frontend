@@ -28,12 +28,9 @@ export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) 
   ];
 
   return (
-    <section aria-labelledby="tips-heading" className="py-16">
-      <div className="mb-10 text-center">
-        <h2
-          id="tips-heading"
-          className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
-        >
+    <section aria-labelledby="tips-heading" className="py-8 sm:py-10">
+      <div className="mb-10 max-w-3xl">
+        <h2 id="tips-heading" className="type-display-sm">
           {proTips.heading}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">{proTips.subhead}</p>
@@ -41,7 +38,7 @@ export function ProTips({ proTips }: { proTips: HowItWorksContent['proTips'] }) 
 
       <motion.div
         variants={containerVariants}
-        initial="hidden"
+        initial={false}
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
         className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"

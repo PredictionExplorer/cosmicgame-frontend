@@ -247,9 +247,7 @@ function RecipientCard({
         <div
           className={cn(
             'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
-            featured
-              ? 'bg-gradient-to-br from-primary/25 to-accent/25 text-primary'
-              : 'bg-white/[0.06] text-muted-foreground',
+            featured ? 'bg-primary/10 text-primary' : 'bg-white/[0.06] text-muted-foreground',
           )}
         >
           {icon}
@@ -292,9 +290,7 @@ function RecipientCard({
               <span
                 className={cn(
                   'text-sm font-medium tabular-nums',
-                  featured
-                    ? 'bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
-                    : 'text-white/80',
+                  featured ? 'text-primary' : 'text-white/80',
                 )}
               >
                 {r.value}
@@ -463,7 +459,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     return (
       <PageShell variant="data" backdrop="signature">
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h2 className="text-2xl font-bold mb-2">{t('details.invalid.title')}</h2>
+          <h1 className="type-display-md mb-4">{t('details.invalid.title')}</h1>
           <p className="text-muted-foreground mb-6">{t('details.invalid.help')}</p>
           <Link
             href="/allocation"
@@ -500,7 +496,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     return (
       <PageShell variant="data" backdrop="signature">
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h2 className="text-2xl font-bold mb-2">{t('details.notFound.title')}</h2>
+          <h1 className="type-display-md mb-4">{t('details.notFound.title')}</h1>
           <p className="text-muted-foreground mb-6">
             {t('details.notFound.help', { cycle: roundNum })}
           </p>
@@ -636,20 +632,17 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
         className="mb-12"
         aria-label={t('details.hero.aria')}
       >
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.04] via-white/[0.02] to-transparent p-6 md:p-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.04] via-transparent to-accent/[0.04] pointer-events-none" />
-
+        <div className="relative border-b border-border pb-10">
           <div className="relative flex flex-col gap-6">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
               <div className="space-y-4 min-w-0 flex-1">
-                <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-white">
+                <h1 className="type-display-lg text-foreground">
                   {t('formats.cycleHash', { cycle: roundNum })}
                 </h1>
 
                 <div className="flex items-baseline gap-2 flex-wrap">
                   <p
-                    className="text-3xl md:text-5xl font-bold tabular-nums bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent"
-                    style={{ textShadow: '0 0 40px rgba(21, 191, 253, 0.2)' }}
+                    className="font-display text-3xl font-medium tracking-tight tabular-nums text-primary md:text-5xl"
                     data-testid="hero-allocation-amount"
                   >
                     {formatFixed(allocationInfo.AmountEth, 4)} ETH

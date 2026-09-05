@@ -29,16 +29,16 @@ export function CallToAction({
   return (
     <motion.section
       aria-labelledby="cta-heading"
-      className="py-16"
+      className="pt-8 sm:pt-10"
       variants={fadeUp}
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, margin: '-60px' }}
     >
       <div className="gradient-border-card relative overflow-hidden rounded-2xl bg-white/[0.02] px-6 py-12 text-center sm:px-12">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent" />
 
-        <h2 id="cta-heading" className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+        <h2 id="cta-heading" className="type-display-sm">
           {callToAction.heading}
         </h2>
 

@@ -65,9 +65,11 @@ function TrustLink({ link, locale }: { link: TrustPageLink; locale: string }) {
 export function TrustPageContent({ copy, locale }: { copy: TrustPageCopy; locale: string }) {
   return (
     <>
-      <p className="type-eyebrow text-muted-foreground">{copy.eyebrow}</p>
-      <h1 className="mt-4 type-display-md text-foreground">{copy.title}</h1>
-      <p className="mt-6 type-body-lg text-muted-foreground">{copy.intro}</p>
+      <header className="border-b border-border pb-10">
+        <p className="type-eyebrow text-primary/80">{copy.eyebrow}</p>
+        <h1 className="mt-4 type-display-lg text-foreground">{copy.title}</h1>
+        <p className="mt-6 type-body-lg text-muted-foreground">{copy.intro}</p>
+      </header>
 
       {copy.sections.map((section) => {
         const linksOnly =
@@ -77,9 +79,9 @@ export function TrustPageContent({ copy, locale }: { copy: TrustPageCopy; locale
             key={section.heading}
             className={linksOnly ? 'mt-12 space-y-4' : 'mt-12 space-y-5'}
           >
-            <h2 className="text-2xl font-semibold">{section.heading}</h2>
+            <h2 className="font-display text-2xl font-medium tracking-tight">{section.heading}</h2>
             {section.paragraphs?.map((paragraph) => (
-              <p key={paragraph} className="text-muted-foreground">
+              <p key={paragraph} className="leading-8 text-muted-foreground">
                 {paragraph}
               </p>
             ))}
@@ -94,7 +96,7 @@ export function TrustPageContent({ copy, locale }: { copy: TrustPageCopy; locale
               </p>
             )}
             {section.bullets && (
-              <ul className="list-disc space-y-2 pl-5 text-muted-foreground [overflow-wrap:anywhere]">
+              <ul className="list-disc space-y-3 pl-5 leading-8 text-muted-foreground [overflow-wrap:anywhere]">
                 {section.bullets.map((bullet) => (
                   <li key={bullet}>{bullet}</li>
                 ))}

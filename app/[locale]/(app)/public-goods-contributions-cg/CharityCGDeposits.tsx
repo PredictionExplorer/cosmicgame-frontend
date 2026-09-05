@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -11,14 +12,17 @@ import {
 } from '@/components/tables/CharityDepositTable';
 import { useCharityCGDeposits, useDashboardInfo } from '@/hooks/useApiQuery';
 
-const CharityCGDeposits = () => {
+const CharityCGDeposits = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const { data: charityCGDeposits = [], isLoading: loading } = useCharityCGDeposits();
   const { data: dashboardData } = useDashboardInfo(undefined, { poll: false });
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader title={t('protocol.title')} titleLevel={2} subtitle={t('protocol.subtitle')} />
+      {seoSummary}
+      {!seoSummary && (
+        <PageHeader title={t('protocol.title')} titleLevel={2} subtitle={t('protocol.subtitle')} />
+      )}
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('protocol.description')}
       </p>

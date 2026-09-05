@@ -41,6 +41,7 @@
    * — follows without per-element overrides.
    */
   --font-family-display: var(--display-font-stack);
+  --font-display: var(--display-font-stack);
 
   /*
    * Tailwind v4 only generates `xs:` / `max-xs:` variants for a breakpoint it
@@ -185,26 +186,27 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 :root {
-  --background: 235 68% 10%;
-  --foreground: 0 0% 100%;
-  --card: 235 60% 16%;
-  --card-foreground: 0 0% 100%;
-  --popover: 235 60% 16%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 196 98% 54%;
-  --primary-foreground: 235 68% 10%;
-  --secondary: 205 100% 71%;
-  --secondary-foreground: 0 0% 100%;
-  --accent: 271 98% 60%;
-  --accent-foreground: 0 0% 100%;
-  --muted: 235 40% 20%;
-  --muted-foreground: 0 0% 100% / 0.68;
+  /* Shared with the landing composition: ink, lavender, and quiet surfaces. */
+  --background: 233 33% 5%;
+  --foreground: 250 38% 97%;
+  --card: 240 20% 8%;
+  --card-foreground: 250 38% 97%;
+  --popover: 240 18% 11%;
+  --popover-foreground: 250 38% 97%;
+  --primary: 254 100% 92%;
+  --primary-foreground: 261 38% 10%;
+  --secondary: 254 100% 86%;
+  --secondary-foreground: 261 38% 10%;
+  --accent: 254 28% 20%;
+  --accent-foreground: 254 100% 92%;
+  --muted: 240 15% 13%;
+  --muted-foreground: 247 14% 75%;
   --destructive: 0 62% 50%;
   --destructive-foreground: 0 0% 100%;
-  --border: 235 30% 20%;
-  --input: 235 30% 20%;
-  --ring: 196 98% 54%;
-  --radius: 0.5rem;
+  --border: 246 14% 19%;
+  --input: 246 14% 27%;
+  --ring: 254 100% 86%;
+  --radius: 0.625rem;
   --chart-1: 196 98% 54%;
   --chart-2: 271 98% 60%;
   --chart-3: 205 100% 71%;
@@ -218,7 +220,9 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   html {
+    color-scheme: dark;
     scroll-behavior: smooth;
+    scroll-padding-top: var(--sticky-offset);
   }
 
   body {
@@ -324,12 +328,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
   initial-value: 0;
 }
 
-@property --border {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0;
-}
-
 .cm-scroller::-webkit-scrollbar {
   width: 12px;
   height: 12px;
@@ -337,16 +335,16 @@ body:has([data-maintenance-banner]) .home-control-shell {
 
 .cm-scroller::-webkit-scrollbar-track {
   border-radius: 200px;
-  background: #161b3c;
+  background: hsl(var(--card));
 }
 
 .cm-scroller::-webkit-scrollbar-thumb {
-  background: #15bffd;
+  background: hsl(var(--muted-foreground) / 0.45);
   border-radius: 200px;
 }
 
 .cm-scroller::-webkit-scrollbar-thumb:hover {
-  background: #088dbe;
+  background: hsl(var(--secondary));
 }
 
 .cm-scroller::-webkit-scrollbar-corner {
@@ -363,6 +361,16 @@ body:has([data-maintenance-banner]) .home-control-shell {
   -ms-overflow-style: none;
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* The same content edge as the landing page, including its phone gutters. */
+@utility site-container {
+  width: min(100% - 3rem, 80rem);
+  margin-inline: auto;
+
+  @media (width < 40rem) {
+    width: calc(100% - 2rem);
   }
 }
 
@@ -562,7 +570,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(21, 191, 253, 0.4), rgba(156, 55, 253, 0.4));
+  background: linear-gradient(135deg, hsl(var(--secondary) / 0.3), hsl(var(--border)));
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -572,7 +580,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 .gradient-border-card-accent::before {
-  background: linear-gradient(135deg, rgba(21, 191, 253, 0.6), rgba(156, 55, 253, 0.6));
+  background: linear-gradient(135deg, hsl(var(--secondary) / 0.5), hsl(var(--secondary) / 0.15));
 }
 
 /*

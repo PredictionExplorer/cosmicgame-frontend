@@ -70,7 +70,7 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
     notFound();
   }
   setRequestLocale(locale);
-  const { meta } = getLandingContent(locale);
+  const { meta, footer } = getLandingContent(locale);
   const seo = await getTranslations({ locale, namespace: 'seo' });
   const inLanguage = jsonLdInLanguage(locale);
   const landingUrl = localeHref(LANDING_ORIGIN, '/', locale);
@@ -107,7 +107,7 @@ export default async function LandingRootLayout({ children, params }: LayoutProp
       }
     >
       <NextIntlClientProvider messages={chromeMessages}>
-        <LandingShell>{children}</LandingShell>
+        <LandingShell footer={footer}>{children}</LandingShell>
       </NextIntlClientProvider>
     </RootDocument>
   );

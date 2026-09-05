@@ -21,12 +21,12 @@ export function RewardsHistorySection({ rewards }: RewardsHistorySectionProps) {
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 20 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5 }}
       aria-labelledby="history-heading"
-      className="py-16"
+      className="py-8 sm:py-10"
     >
       <div className="mb-8 flex items-center justify-center gap-2">
         <History className="h-5 w-5 text-primary" />
@@ -64,7 +64,7 @@ export function RewardsHistorySection({ rewards }: RewardsHistorySectionProps) {
       )}
 
       {rewards.length === 0 ? (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-8 py-16 text-center">
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-6 py-10 text-center sm:px-8">
           <History className="mx-auto mb-4 h-10 w-10 text-muted-foreground/40" />
           <p className="text-lg font-medium text-muted-foreground">{t('history.emptyTitle')}</p>
           <p className="mt-1 text-sm text-muted-foreground/60">{t('history.emptyDescription')}</p>

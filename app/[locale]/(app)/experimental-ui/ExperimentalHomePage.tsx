@@ -690,7 +690,7 @@ const ExperimentalHomePage = ({
                   id="gesture-submit"
                   size="lg"
                   onClick={() => void handleGesture('console')}
-                  className="liquid-glass-cta h-12 w-full border-0 bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] text-base font-semibold text-white hover:opacity-90"
+                  className="liquid-glass-cta h-12 w-full border-0 bg-primary text-base font-semibold text-primary-foreground hover:bg-primary/90"
                   disabled={
                     isGesturing ||
                     (gestureType === 'RandomWalk' && rwlkId === -1) ||
@@ -716,7 +716,7 @@ const ExperimentalHomePage = ({
                   <Button
                     size="lg"
                     onClick={() => void handleFinalize('console')}
-                    className="liquid-glass-cta h-12 w-full border-0 bg-gradient-to-r from-emerald-500 to-emerald-600 text-base font-semibold text-white hover:opacity-90"
+                    className="liquid-glass-cta h-12 w-full border-0 bg-gradient-to-r from-emerald-500 to-emerald-600 text-base font-semibold text-primary-foreground hover:bg-primary/90"
                     disabled={isClaiming || (data?.LastBidderAddr !== account && claimWait > now)}
                   >
                     {isClaiming ? (
@@ -955,9 +955,8 @@ const ExperimentalHomePage = ({
               className="xl:h-[clamp(22rem,48vh,30rem)] xl:min-h-0 xl:flex-auto 2xl:h-[clamp(24rem,46vh,32rem)] print:max-h-none"
             />
 
-            {/* ===== DETAIL RAIL (prices, standing, links, receipts) =====
-                Lives under the chat so the deck's right column is the one
-                place for everything that supports the cycle. */}
+            {/* Live cycle status stays with the chat. Attached assets have
+                their own full-width section so they cannot stretch this row. */}
             <div data-testid="home-rail-column" className="space-y-6">
               <GestureStatus
                 data={data}
@@ -971,28 +970,27 @@ const ExperimentalHomePage = ({
                 attachedNFTCount={donatedNFTs.length}
                 attachedERC20Count={donatedERC20Tokens.length}
               />
-
-              {/* ===== ATTACHED ASSET RECEIPT ===== */}
-              {hasAttachedAssets && (
-                <m.div
-                  data-testid="home-rail-attached-assets"
-                  variants={sectionFade}
-                  initial="hidden"
-                  animate="visible"
-                  transition={{ delay: 0.48 }}
-                  className="print-motion-visible"
-                >
-                  <MemoAttachedNFTAllocationShowcase
-                    nfts={donatedNFTs}
-                    erc20Tokens={donatedERC20Tokens}
-                    cycleNumber={round >= 0 ? round : undefined}
-                    variant="rail"
-                  />
-                </m.div>
-              )}
             </div>
           </div>
         </div>
+
+        {/* ===== ATTACHED ASSET RECEIPT ===== */}
+        {hasAttachedAssets && (
+          <m.div
+            data-testid="home-attached-assets"
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.48 }}
+            className="mt-6 print-motion-visible"
+          >
+            <MemoAttachedNFTAllocationShowcase
+              nfts={donatedNFTs}
+              erc20Tokens={donatedERC20Tokens}
+              cycleNumber={round >= 0 ? round : undefined}
+            />
+          </m.div>
+        )}
 
         {/* ===== YOUR POSITION (connected wallets) ===== */}
         {account && (

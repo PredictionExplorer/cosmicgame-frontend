@@ -164,7 +164,7 @@ export function GestureComposer({
                 size="lg"
                 onClick={onGesture}
                 disabled={sendDisabled}
-                className="liquid-glass-cta mt-2.5 h-11 w-full border-0 bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] text-sm font-semibold text-white hover:opacity-90"
+                className="liquid-glass-cta mt-2.5 h-11 w-full border-0 bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
               >
                 {isGesturing ? (
                   <span className="flex items-center gap-2">

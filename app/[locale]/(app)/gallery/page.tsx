@@ -96,9 +96,8 @@ export default async function Page({ params }: PageProps) {
               : []),
           ]}
         />
-        <GallerySeoSummary />
         <Suspense>
-          <GalleryPage />
+          <GalleryPage seoSummary={<GallerySeoSummary />} />
         </Suspense>
       </>
     </PageMessages>

@@ -148,13 +148,16 @@ const SiteMapPage = () => {
         title={t('page.title')}
         subtitle={t('page.subtitle')}
         breadcrumbs={[{ label: t('page.home'), href: '/' }, { label: t('page.title') }]}
-        className="mb-10 max-w-3xl md:mx-auto md:text-center"
+        align="left"
+        className="mb-10"
       />
 
-      <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2 md:items-start">
+      {/* Independent columns keep short link groups from reserving the height
+          of a much longer neighboring group. Each group stays intact. */}
+      <div className="columns-1 gap-6 md:columns-2">
         <section
           aria-labelledby="sitemap-personal-heading"
-          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm"
+          className="mb-6 break-inside-avoid rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm"
         >
           <h2
             id="sitemap-personal-heading"
@@ -170,7 +173,7 @@ const SiteMapPage = () => {
 
         <section
           aria-labelledby="sitemap-system-heading"
-          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm"
+          className="mb-6 break-inside-avoid rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm"
         >
           <h2
             id="sitemap-system-heading"
@@ -186,7 +189,7 @@ const SiteMapPage = () => {
 
         <section
           aria-labelledby="sitemap-data-heading"
-          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm"
+          className="mb-6 break-inside-avoid rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm"
         >
           <h2
             id="sitemap-data-heading"
@@ -202,7 +205,7 @@ const SiteMapPage = () => {
 
         <section
           aria-labelledby="sitemap-ecosystem-heading"
-          className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm"
+          className="mb-6 break-inside-avoid rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 backdrop-blur-sm"
         >
           <h2
             id="sitemap-ecosystem-heading"

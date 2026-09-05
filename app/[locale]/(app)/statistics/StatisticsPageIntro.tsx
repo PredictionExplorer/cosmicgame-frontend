@@ -15,9 +15,9 @@ export function StatisticsPageIntro({
   description: string;
 }) {
   return (
-    <header className="mb-10">
+    <header className="mb-10 border-b border-border pb-10">
       <SectionEyebrow tone="aurora">{eyebrow}</SectionEyebrow>
-      <h1 className="mt-4 type-display-md text-foreground">{title}</h1>
+      <h1 className="mt-4 type-display-lg text-foreground">{title}</h1>
       <p className="mt-3 max-w-3xl type-body-lg text-muted-foreground">{description}</p>
     </header>
   );

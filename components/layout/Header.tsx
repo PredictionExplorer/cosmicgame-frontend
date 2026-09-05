@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo, type FC, type ReactNode } from 'react';
-import Image from 'next/image';
 import {
   ArrowUpRight,
   Coins,
@@ -24,6 +23,7 @@ import { AddCstToMetaMaskButton } from '@/components/common/AddCstToMetaMaskButt
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import ListNavItem from '@/components/common/ListNavItem';
 import { EcosystemDock } from '@/components/layout/EcosystemDock';
+import { BrandMark } from '@/components/layout/BrandMark';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { AppBarWrapper, DrawerList } from '@/components/styled';
 import { useApiData } from '@/contexts/ApiDataContext';
@@ -75,12 +75,22 @@ const DrawerNavRow: FC<{ item: NavDescriptor; onNavigate: () => void }> = ({
   item,
   onNavigate,
 }) => {
-  const rowClassName =
-    'flex items-center gap-3 px-5 py-2.5 text-sm text-white/75 no-underline transition-colors duration-[var(--duration-fast)] hover:bg-white/[0.04] hover:text-white';
+  const pathname = usePathname();
+  const active =
+    !!item.route &&
+    !isExternalRoute(item.route) &&
+    (pathname === item.route || pathname.startsWith(`${item.route}/`));
+  const rowClassName = cn(
+    'flex min-h-11 items-center gap-3 border-l-2 px-5 py-2.5 text-sm no-underline transition-colors duration-[var(--duration-fast)] hover:bg-white/[0.04] hover:text-white',
+    active ? 'border-primary bg-primary/[0.06] text-primary' : 'border-transparent text-white/75',
+  );
 
   const content = (
     <>
-      <DrawerIconTile icon={item.icon} />
+      <DrawerIconTile
+        icon={item.icon}
+        className={active ? 'border-primary/20 bg-primary/10 text-primary' : undefined}
+      />
       <span className="flex items-center gap-1.5">{item.title}</span>
       {item.external ? (
         <ArrowUpRight className="ml-auto h-3.5 w-3.5 shrink-0 text-white/30" aria-hidden />
@@ -97,7 +107,12 @@ const DrawerNavRow: FC<{ item: NavDescriptor; onNavigate: () => void }> = ({
   }
 
   return (
-    <Link href={item.route ?? '#'} className={rowClassName} onClick={onNavigate}>
+    <Link
+      href={item.route ?? '#'}
+      className={rowClassName}
+      onClick={onNavigate}
+      aria-current={active ? 'page' : undefined}
+    >
       {content}
     </Link>
   );
@@ -110,10 +125,10 @@ const DrawerFeaturedCard: FC<{ item: NavDescriptor }> = ({ item }) => {
     <a
       href={item.route}
       rel="noopener"
-      className="group mx-4 mt-2 flex items-center gap-3 rounded-xl border border-white/[0.08] bg-[linear-gradient(120deg,rgb(var(--aurora-cyan-rgb)/0.07),rgb(var(--nebula-violet-rgb)/0.14))] px-3 py-3 no-underline transition-colors duration-[var(--duration-fast)] hover:border-[rgb(var(--aurora-cyan-rgb)/0.35)]"
+      className="group mx-4 mt-2 flex items-center gap-3 rounded-xl border border-primary/15 bg-primary/[0.05] px-3 py-3 no-underline transition-colors duration-[var(--duration-fast)] hover:border-primary/30 hover:bg-primary/[0.08]"
     >
       <span
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-signature-gradient text-white"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary"
         aria-hidden
       >
         {Icon ? <Icon className="h-4 w-4" /> : null}
@@ -223,7 +238,7 @@ const Header: FC = () => {
             variant="ghost"
             size="icon"
             aria-label={t('menuLabel')}
-            className="h-11 w-11 shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03] xl:hidden"
+            className="h-11 w-11 shrink-0 rounded-lg border border-white/[0.08] bg-white/[0.02] xl:hidden"
           >
             <span className="relative inline-flex">
               <Menu className="h-5 w-5" aria-hidden />
@@ -237,21 +252,14 @@ const Header: FC = () => {
         <Link
           href="/"
           aria-label={t('brand.homeLabel')}
-          className="group flex min-h-11 min-w-11 shrink-0 items-center gap-3 rounded-full no-underline"
+          className="group flex min-h-11 min-w-11 shrink-0 items-center gap-2.5 rounded-lg no-underline"
         >
-          <Image
-            src="/images/logo2.svg"
-            width={48}
-            height={48}
-            alt="Cosmic Signature"
-            loading="eager"
-            className="h-9 w-9 object-contain xl:h-10 xl:w-10"
-          />
-          <span className="hidden flex-col justify-center leading-none sm:flex xl:hidden 2xl:flex">
-            <span className="font-display text-sm font-semibold tracking-[0.02em] text-white">
+          <BrandMark className="h-9 w-9 text-primary xl:h-10 xl:w-10" />
+          <span className="hidden flex-col justify-center leading-none sm:flex">
+            <span className="font-display text-base font-semibold tracking-tight text-white">
               Cosmic Signature
             </span>
-            <span className="mt-1 hidden font-mono text-[9px] uppercase tracking-[0.3em] text-white/55 2xl:block">
+            <span className="mt-1 hidden font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground 2xl:block">
               {t('brand.tagline')}
             </span>
           </span>
@@ -259,7 +267,7 @@ const Header: FC = () => {
 
         <div
           className={cn(
-            'hidden shrink-0 items-center gap-0.5 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md xl:flex',
+            'hidden shrink-0 items-center gap-0.5 xl:flex',
             experimentalUi && 'liquid-glass-control liquid-glass-static',
           )}
         >
@@ -304,14 +312,7 @@ const Header: FC = () => {
         <DrawerList className="overscroll-contain pb-[env(safe-area-inset-bottom)]">
           {/* Brand */}
           <div className="flex items-center gap-2.5 border-b border-white/[0.06] pl-5 pr-16 pb-3.5 pt-2">
-            <Image
-              src="/images/logo2.svg"
-              width={32}
-              height={32}
-              alt=""
-              aria-hidden
-              className="h-8 w-auto object-contain"
-            />
+            <BrandMark className="h-8 w-8 shrink-0 text-primary" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-sm font-semibold tracking-[0.02em] text-white">
                 Cosmic Signature
@@ -514,7 +515,7 @@ const Header: FC = () => {
 
   return (
     <AppBarWrapper>
-      <div className="mx-auto w-full max-w-7xl px-4">
+      <div className="site-container">
         {systemMode > 0 && (
           <div
             data-maintenance-banner

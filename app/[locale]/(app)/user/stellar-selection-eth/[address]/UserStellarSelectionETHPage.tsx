@@ -27,6 +27,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
@@ -197,28 +198,24 @@ const UserStellarSelectionETHPage = ({ address: rawAddress }: { address: string 
   if (invalidAddress) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <p className="text-lg font-semibold">{tStatistics('stellarSelectionEth.invalidAddress')}</p>
+        <PageHeader title={tStatistics('stellarSelectionEth.invalidAddress')} />
       </PageShell>
     );
   }
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <div className="mb-8">
-        <span className="mr-4 text-lg font-semibold text-primary">
-          {tStatistics('stellarSelectionEth.user')}
-        </span>
-        <span className="font-mono text-lg font-semibold">{validatedAddress}</span>
-      </div>
+      <PageHeader title={tStatistics('stellarSelectionEth.heading')}>
+        <p className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-muted-foreground">
+          <span>{tStatistics('stellarSelectionEth.user')}</span>
+          <span className="min-w-0 break-all font-mono">{validatedAddress}</span>
+        </p>
+      </PageHeader>
 
       <div className="mt-8">
-        <div className="mb-4 flex items-center justify-between">
-          <h4 className="text-lg font-semibold leading-none">
-            {tStatistics('stellarSelectionEth.heading')}
-          </h4>
-
+        <div className="mb-4 flex flex-wrap items-center justify-end gap-4">
           {status?.ETHRaffleToClaim > 0 && account === validatedAddress && (
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <span className="mr-4">
                 {tStatistics('stellarSelectionEth.retrievable', {
                   amount: formatFixed(status.ETHRaffleToClaim, 6),

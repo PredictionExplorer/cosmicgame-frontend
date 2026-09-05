@@ -32,10 +32,9 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['home', 'marketing', 'publicGoods', 'tables']}>
-      <>
-        <PublicDataRouteSeoSummary route="public-goods-contributions-cg" />
-        <CharityCGDeposits />
-      </>
+      <CharityCGDeposits
+        seoSummary={<PublicDataRouteSeoSummary route="public-goods-contributions-cg" />}
+      />
     </PageMessages>
   );
 }

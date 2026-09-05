@@ -31,37 +31,37 @@ export async function CurrentCycleSeoSummary() {
   return (
     <section
       aria-labelledby="current-cycle-seo-heading"
-      className="mb-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
+      className="mb-12 border-b border-border pb-10"
     >
-      <p className="type-eyebrow text-muted-foreground">{t('currentCycleSummary.eyebrow')}</p>
-      <h1 id="current-cycle-seo-heading" className="mt-4 type-display-md text-foreground">
+      <p className="type-eyebrow text-primary/80">{t('currentCycleSummary.eyebrow')}</p>
+      <h1 id="current-cycle-seo-heading" className="mt-4 type-display-lg text-foreground">
         {t('currentCycleSummary.heading')}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
         {t('currentCycleSummary.description')}
       </p>
       <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
           <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
             {t('currentCycleSummary.cards.cycle')}
           </dt>
-          <dd className="mt-2 text-2xl font-semibold">
+          <dd className="mt-2 font-display text-2xl font-medium">
             {formatNumber(data?.CurRoundNum, locale, unavailable)}
           </dd>
         </div>
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
           <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
             {t('currentCycleSummary.cards.gestures')}
           </dt>
-          <dd className="mt-2 text-2xl font-semibold">
+          <dd className="mt-2 font-display text-2xl font-medium">
             {formatNumber(data?.CurNumBids, locale, unavailable)}
           </dd>
         </div>
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
           <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
             {t('currentCycleSummary.cards.reserve')}
           </dt>
-          <dd className="mt-2 text-2xl font-semibold">
+          <dd className="mt-2 font-display text-2xl font-medium">
             {formatEth(data?.PrizeAmountEth ?? data?.CurPrizeAmountEth, locale, unavailable)}
           </dd>
         </div>

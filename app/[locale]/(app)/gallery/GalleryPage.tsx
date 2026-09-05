@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
@@ -66,7 +67,7 @@ function isNumeric(value: string) {
 /** Viewport at which the trait facets live in a sidebar instead of a sheet. */
 const RAIL_MEDIA_QUERY = '(min-width: 1024px)';
 
-const GalleryPage = () => {
+const GalleryPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('gallery');
   const tTraits = useTranslations('traits');
   const { data: nfts, isLoading, isError, refetch } = useCSTList();
@@ -338,7 +339,16 @@ const GalleryPage = () => {
     }
   }, []);
 
-  const pageHeader = (
+  const pageHeader = seoSummary ? (
+    <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <SectionEyebrow tone="aurora" pulse>
+        {stats.total > 0
+          ? t('page.eyebrowImprinted', { count: stats.total })
+          : t('page.eyebrowLive')}
+      </SectionEyebrow>
+      <NftMarketplaceButton variant="secondary" />
+    </div>
+  ) : (
     <PageHeader
       align="left"
       eyebrow={
@@ -350,7 +360,6 @@ const GalleryPage = () => {
       }
       title={t('page.title')}
       titleLevel={2}
-      gradientTitle="signature"
       subtitle={t('page.subtitle')}
       actions={<NftMarketplaceButton variant="secondary" />}
     />
@@ -361,6 +370,7 @@ const GalleryPage = () => {
   if (isError) {
     return (
       <PageShell variant="data" backdrop="signature">
+        {seoSummary}
         {pageHeader}
         <ErrorState
           title={t('error.title')}
@@ -389,6 +399,7 @@ const GalleryPage = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
+      {seoSummary}
       {pageHeader}
 
       <Surface

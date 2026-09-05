@@ -1,10 +1,10 @@
-import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 
 import type { LandingContent } from '@/content/landing';
 
 import { Link } from '@/i18n/navigation';
 import { LanguageDirectory } from '@/components/layout/LanguageDirectory';
+import { BrandMark } from '@/components/layout/BrandMark';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
 
 export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) {
@@ -12,19 +12,19 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
   const t = useTranslations('common');
 
   return (
-    <footer className="relative overflow-hidden border-t border-white/10 bg-[#0A0418] pt-14 pb-8 sm:pt-20 sm:pb-12">
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-deep-space opacity-70" />
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
+    <footer
+      role="contentinfo"
+      className="relative overflow-hidden border-t border-white/10 bg-background pt-12 pb-8 sm:pt-14 sm:pb-10"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/[0.04] via-transparent to-transparent"
+      />
+      <div className="site-container relative">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)] lg:gap-16">
           <div className="min-w-0">
             <Link href="/" className="inline-flex min-h-11 max-w-full items-center gap-3">
-              <Image
-                src="/images/logo.svg"
-                alt={footer.logoAlt}
-                width={36}
-                height={36}
-                className="shrink-0"
-              />
+              <BrandMark className="h-9 w-9 shrink-0 text-primary" />
               <span
                 className="text-xl font-semibold text-white [overflow-wrap:anywhere]"
                 style={{ fontFamily: 'var(--font-family-display)' }}
@@ -41,9 +41,9 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
           >
             {footer.columns.map((col) => (
               <div key={col.heading} className="min-w-0">
-                <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/65 [overflow-wrap:anywhere]">
+                <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/65 [overflow-wrap:anywhere]">
                   {col.heading}
-                </h3>
+                </h2>
                 <ul className="mt-3 space-y-0.5">
                   {col.links.map((link) => {
                     const href = localizeCrossHostHref(link.href, locale);
@@ -66,7 +66,7 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
           </nav>
         </div>
 
-        <div className="mt-12 border-t sm:mt-16 border-white/10 pt-6">
+        <div className="mt-8 border-t sm:mt-10 border-white/10 pt-6">
           <LanguageDirectory />
         </div>
 

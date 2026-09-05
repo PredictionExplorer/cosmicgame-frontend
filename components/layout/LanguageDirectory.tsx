@@ -99,7 +99,7 @@ export function LanguageDirectory({ className }: LanguageDirectoryProps) {
                 className={cn(
                   'inline-flex min-h-11 min-w-11 items-center text-sm no-underline transition-colors',
                   current
-                    ? 'font-medium text-white underline decoration-sky-400/60 decoration-1 underline-offset-4'
+                    ? 'font-medium text-white underline decoration-primary/60 decoration-1 underline-offset-4'
                     : 'text-white/60 hover:text-white',
                 )}
               >

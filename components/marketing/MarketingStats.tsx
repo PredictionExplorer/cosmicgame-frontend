@@ -58,7 +58,7 @@ function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCard
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5 }}
@@ -110,7 +110,7 @@ export function MarketingStats({
   const t = useTranslations('marketing');
 
   return (
-    <section aria-labelledby="stats-heading" className="py-16">
+    <section aria-labelledby="stats-heading" className="pb-8 sm:pb-10">
       <h2 id="stats-heading" className="sr-only">
         {t('stats.heading')}
       </h2>

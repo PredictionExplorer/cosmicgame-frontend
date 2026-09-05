@@ -51,11 +51,7 @@ export function ResponsiveTableContainer({
         // `overflow-y-auto` is declared rather than left implicit: a lone
         // `overflow-x-auto` already forces the other axis to `auto` per spec,
         // so stating it keeps the behaviour visible to the next reader.
-        'relative overflow-x-auto overflow-y-auto rounded-xl border border-white/[0.06] bg-white/[0.02]',
-        'bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.014)_48%,rgb(var(--nebula-violet-rgb)/0.05))]',
-        'shadow-[0_20px_90px_-70px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm',
-        'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-px',
-        'before:bg-gradient-to-r before:from-transparent before:via-[rgb(var(--aurora-cyan-rgb)/0.55)] before:to-transparent',
+        'relative min-w-0 overflow-x-auto overflow-y-auto rounded-xl border border-white/[0.10] bg-white/[0.02]',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         // Cards need room to breathe; the border/radius would clip them otherwise.
         'max-sm:border-0 max-sm:bg-none max-sm:shadow-none max-sm:backdrop-blur-none max-sm:before:hidden',
@@ -92,8 +88,7 @@ export function ResponsiveTableHead({
         // forces the other axis to `auto` — so this stuck to a container that
         // has no height constraint and therefore never scrolls vertically. It
         // pinned nothing and only created a stacking context.
-        'backdrop-blur-md',
-        'bg-[linear-gradient(90deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.10))]',
+        'bg-white/[0.03]',
         'print:static print:bg-transparent print:backdrop-blur-none print:[background-image:none]',
         className,
       )}

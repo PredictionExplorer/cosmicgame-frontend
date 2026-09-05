@@ -120,6 +120,22 @@ describe('GalleryPage', () => {
     );
   });
 
+  it.each([
+    { state: 'loaded', isLoading: false, isError: false },
+    { state: 'loading', isLoading: true, isError: false },
+    { state: 'failed', isLoading: false, isError: true },
+  ])('keeps the primary heading and marketplace action inside main when $state', (query) => {
+    mockUseCSTList.mockReturnValue({ ...query, data: [], refetch: jest.fn() });
+    render(<GalleryPage seoSummary={<h1>Collection overview</h1>} />);
+
+    const main = screen.getByRole('main');
+    expect(main).toContainElement(screen.getByRole('heading', { level: 1 }));
+    expect(screen.queryByText('gallery.page.title')).not.toBeInTheDocument();
+    expect(main).toContainElement(
+      screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' }),
+    );
+  });
+
   it('shows skeleton loading state', () => {
     mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true, error: null });
     const { container } = render(<GalleryPage />);

@@ -105,6 +105,33 @@ describe('<QuizRunner />', () => {
     expect(screen.queryByText('First stub prompt?')).not.toBeInTheDocument();
   });
 
+  it('lets a focused skip link handle Enter without starting the quiz', () => {
+    render(
+      <>
+        <a href="#main">Skip to content</a>
+        <main id="main" tabIndex={-1}>
+          <QuizRunner tier={tier} ui={ui} hubHref="/quiz" />
+        </main>
+      </>,
+    );
+    const link = screen.getByRole('link', { name: 'Skip to content' });
+    link.focus();
+
+    expect(fireEvent.keyDown(link, { key: 'Enter' })).toBe(true);
+    expect(screen.getByTestId('quiz-begin')).toBeInTheDocument();
+    expect(screen.queryByText('First stub prompt?')).not.toBeInTheDocument();
+  });
+
+  it('does not advance an answered question when Enter activates its reference link', () => {
+    begin();
+    fireEvent.click(screen.getByText('First correct option'));
+    const link = screen.getByRole('link', { name: /White paper — Gestures/ });
+    link.focus();
+
+    expect(fireEvent.keyDown(link, { key: 'Enter' })).toBe(true);
+    expect(screen.getByTestId('quiz-progress')).toHaveTextContent('Question 1 of 2');
+  });
+
   it('walks a full attempt: feedback, explanation, reference, summary, and study list', () => {
     begin();
 

@@ -26,12 +26,13 @@ export function GameOverview({ overview }: { overview: HowItWorksContent['overvi
   ];
 
   return (
-    <section id="protocol-overview" aria-labelledby="protocol-overview-heading" className="py-16">
-      <div className="mb-10 text-center">
-        <h2
-          id="protocol-overview-heading"
-          className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
-        >
+    <section
+      id="protocol-overview"
+      aria-labelledby="protocol-overview-heading"
+      className="py-8 sm:py-10"
+    >
+      <div className="mb-10 max-w-3xl">
+        <h2 id="protocol-overview-heading" className="type-display-sm">
           {overview.heading}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">{overview.subhead}</p>
@@ -39,7 +40,7 @@ export function GameOverview({ overview }: { overview: HowItWorksContent['overvi
 
       <motion.div
         variants={containerVariants}
-        initial="hidden"
+        initial={false}
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
         className="grid gap-8 sm:grid-cols-3"
@@ -48,9 +49,9 @@ export function GameOverview({ overview }: { overview: HowItWorksContent['overvi
           <motion.div
             key={card.number}
             variants={itemVariants}
-            className="gradient-border-card group relative rounded-xl bg-white/[0.02] p-8 text-center"
+            className="group relative rounded-2xl border border-border bg-card p-6 sm:p-8"
           >
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-accent/20">
+            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full border border-primary/15 bg-primary/[0.06]">
               <card.Icon className="h-6 w-6 text-primary" />
             </div>
 
@@ -62,7 +63,7 @@ export function GameOverview({ overview }: { overview: HowItWorksContent['overvi
 
             <p className="mt-2 text-sm text-muted-foreground">{card.description}</p>
 
-            <div className="mt-3 flex justify-center">
+            <div className="mt-3 flex">
               <InfoTooltip content={card.tooltip} />
             </div>
           </motion.div>

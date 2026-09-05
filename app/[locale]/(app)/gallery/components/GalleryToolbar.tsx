@@ -73,7 +73,7 @@ export function GalleryToolbar({
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200',
                 TOUCH_TARGET_HEIGHT_CLASS,
                 facetsOpen || activeTraitFilterCount > 0
-                  ? 'border-primary/30 bg-gradient-to-r from-[#06AEEC]/20 to-[#9C37FD]/20 text-primary shadow-[0_0_12px_rgba(21,191,253,0.1)]'
+                  ? 'border-primary/25 bg-primary/10 text-primary'
                   : 'border-white/[0.06] bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:text-foreground',
               )}
               data-testid="facets-toggle"

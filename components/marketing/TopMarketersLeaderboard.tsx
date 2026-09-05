@@ -53,7 +53,7 @@ export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProp
   const topMarketers = useMemo(() => aggregateMarketers(rewards).slice(0, 5), [rewards]);
 
   return (
-    <section aria-labelledby="leaderboard-heading" className="py-16">
+    <section aria-labelledby="leaderboard-heading" className="py-8 sm:py-10">
       <div className="mb-10 flex items-center justify-center gap-2">
         <Trophy className="h-5 w-5 text-primary" />
         <h2
@@ -86,7 +86,7 @@ export function TopMarketersLeaderboard({ rewards }: TopMarketersLeaderboardProp
         </p>
       ) : (
         <motion.div
-          initial="hidden"
+          initial={false}
           whileInView="visible"
           viewport={{ once: true, margin: '-40px' }}
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}

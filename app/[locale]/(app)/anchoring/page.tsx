@@ -28,10 +28,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['anchoring', 'marketing', 'tables']}>
-      <>
-        <PublicDataRouteSeoSummary route="anchoring" />
-        <AnchoringPage />
-      </>
+      <AnchoringPage seoSummary={<PublicDataRouteSeoSummary route="anchoring" />} />
     </PageMessages>
   );
 }

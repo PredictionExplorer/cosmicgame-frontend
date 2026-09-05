@@ -451,7 +451,7 @@ test.describe('home gesture chat', () => {
         }
       }
       for (const key of ['reward', 'cost', 'net']) {
-        await expectTextWithoutOverlap(page.getByTestId(`panel-cst-${key}`));
+        await expectTextWithoutOverlap(page.getByTestId(`panel-cst-metric-${key}`));
       }
     });
   }
@@ -477,7 +477,7 @@ test.describe('home gesture chat', () => {
       await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
       await expectTextWithoutOverlap(page.getByTestId('panel-cst-reward'));
       for (const key of ['reward', 'cost', 'net']) {
-        await expectTextWithoutOverlap(page.getByTestId(`panel-cst-${key}`));
+        await expectTextWithoutOverlap(page.getByTestId(`panel-cst-metric-${key}`));
       }
     });
   }

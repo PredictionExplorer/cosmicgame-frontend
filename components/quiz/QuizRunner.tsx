@@ -133,7 +133,17 @@ export function QuizRunner({ tier, ui, hubHref }: QuizRunnerProps) {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+      // Navigation and form controls keep their native keyboard behavior,
+      // including the site's skip link and the quiz's own reference links.
+      if (
+        event.target instanceof Element &&
+        event.target.closest(
+          'a, button, input, select, textarea, [role="button"], [contenteditable]:not([contenteditable="false"])',
+        )
+      ) {
+        return;
+      }
       if (phase === 'intro' && event.key === 'Enter') {
         event.preventDefault();
         begin();

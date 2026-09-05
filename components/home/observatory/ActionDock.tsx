@@ -109,7 +109,7 @@ export function ActionDock({
         <section
           aria-label={t('observatory.dock.aria')}
           data-testid="action-dock-mobile"
-          className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.12] bg-[rgb(10_14_42/0.92)] px-3.5 py-2.5 shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)] backdrop-blur-xl"
+          className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.12] bg-card/95 px-3.5 py-2.5 shadow-[var(--elevation-3)] backdrop-blur-xl"
         >
           <span className="flex min-w-0 flex-col">
             {clock}
@@ -117,9 +117,7 @@ export function ActionDock({
                 label, and at 320px an ellipsis would hide the reserve amount. */}
             <span className="mt-0.5 break-words text-[11px] leading-tight tabular-nums text-muted-foreground">
               {t('observatory.dock.reserve')}{' '}
-              <span className="font-semibold text-gradient-signature">
-                {reserveEth.toFixed(4)} ETH
-              </span>
+              <span className="font-semibold text-secondary">{reserveEth.toFixed(4)} ETH</span>
             </span>
           </span>
           {/* min-w-0 + whitespace-normal: RandomWalk labels carry a token id
@@ -130,7 +128,7 @@ export function ActionDock({
             data-testid="dock-open-sheet"
             onClick={onOpenSheet}
             aria-label={t('observatory.dock.openPanelAria')}
-            className="min-h-11 min-w-0 rounded-full border-0 bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] px-4 text-sm font-semibold leading-tight text-white hover:opacity-90 whitespace-normal"
+            className="min-h-11 min-w-0 rounded-full border-0 bg-primary px-4 text-sm font-semibold leading-tight text-primary-foreground hover:bg-primary/90 whitespace-normal"
           >
             {submitLabel}
           </Button>
@@ -144,14 +142,14 @@ export function ActionDock({
         <div className="fixed inset-x-0 bottom-4 z-30 hidden px-4 lg:block motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300">
           <div
             data-testid="action-dock-desktop"
-            className="mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-full border border-white/[0.12] bg-[rgb(10_14_42/0.9)] px-5 py-2 shadow-[0_24px_80px_-40px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-xl"
+            className="mx-auto flex max-w-3xl items-center justify-between gap-4 rounded-full border border-white/[0.12] bg-card/95 px-5 py-2 shadow-[var(--elevation-3)] backdrop-blur-xl"
           >
             {clock}
             <span className="flex min-w-0 items-center gap-2">
               <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {t('observatory.dock.reserve')}
               </span>
-              <span className="text-sm font-bold tabular-nums text-gradient-signature">
+              <span className="text-sm font-bold tabular-nums text-secondary">
                 {reserveEth.toFixed(4)} ETH
               </span>
             </span>
@@ -159,7 +157,7 @@ export function ActionDock({
               size="sm"
               data-testid="dock-jump-to-panel"
               onClick={onJumpToPanel}
-              className="h-9 shrink-0 rounded-full border-0 bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] px-4 text-xs font-semibold text-white hover:opacity-90"
+              className="h-9 shrink-0 rounded-full border-0 bg-primary px-4 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               {submitLabel}
               <ArrowUpRight className="ml-1 h-3.5 w-3.5" aria-hidden />

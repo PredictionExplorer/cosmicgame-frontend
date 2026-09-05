@@ -208,7 +208,7 @@ export function Providers({
   // Routes under /embed render a single artifact (e.g. a chart) with no app chrome
   // or background, so they can be opened standalone in their own browser window.
   const pathname = usePathname();
-  const bareEmbed = !!pathname && pathname.startsWith('/embed');
+  const bareEmbed = pathname === '/embed' || pathname.startsWith('/embed/');
   const chrome = showAppChrome && !bareEmbed;
 
   useEffect(() => {
@@ -271,6 +271,7 @@ export function Providers({
     // for coarse pointers, small viewports, and reduced-motion preferences
     // (the CSS `motion-reduce:hidden` only hides the canvas; this keeps the
     // engine from ever booting).
+    if (bareEmbed) return undefined;
     if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
       const skipParticles =
         window.matchMedia('(pointer: coarse)').matches ||
@@ -299,7 +300,7 @@ export function Providers({
       cancelled = true;
       cancelIdleTask();
     };
-  }, []);
+  }, [bareEmbed]);
 
   if (!envValidation.valid) {
     return <EnvErrorScreen missing={envValidation.missing} />;
@@ -319,10 +320,16 @@ export function Providers({
                     <ApiDataProvider>
                       <NotificationProvider>
                         <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-                          <SkipLink />
-                          {chrome && <Header />}
-                          <ErrorBoundary>{children}</ErrorBoundary>
-                          {chrome && <Footer />}
+                          <div
+                            className={chrome ? 'site-shell flex min-h-screen flex-col' : undefined}
+                          >
+                            {!bareEmbed && <SkipLink />}
+                            {chrome && <Header />}
+                            <div className={chrome ? 'min-w-0 flex-1' : undefined}>
+                              <ErrorBoundary>{children}</ErrorBoundary>
+                            </div>
+                            {chrome && <Footer />}
+                          </div>
                         </TooltipProvider>
                       </NotificationProvider>
                     </ApiDataProvider>

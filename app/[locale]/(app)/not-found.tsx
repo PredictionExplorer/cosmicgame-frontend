@@ -19,9 +19,9 @@ export default async function NotFound() {
 
   return (
     <PageShell variant="form" backdrop="signature">
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <h1 className="text-2xl font-bold text-primary text-center">{t('notFound.title')}</h1>
-        <p className="text-sm text-muted-foreground text-center max-w-md">
+      <div className="flex flex-col items-center gap-6 py-8">
+        <h1 className="type-display-md text-foreground text-center">{t('notFound.title')}</h1>
+        <p className="type-body-lg text-muted-foreground text-center max-w-md">
           {t('notFound.description')}
         </p>
         <Button variant="outline" asChild>

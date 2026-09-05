@@ -45,10 +45,7 @@ export function CalibrationStatus({
 
   if (!available || !sample) {
     return (
-      <section
-        aria-label={title}
-        className="rounded-2xl border border-primary/15 bg-[#0b182a]/95 p-3"
-      >
+      <section aria-label={title} className="rounded-2xl border border-primary/15 bg-card p-3">
         <h2 className="text-xs font-semibold text-primary">{title}</h2>
         <p role="status" className="mt-2 text-xs text-muted-foreground">
           {tCommon('status.loadingDots')}

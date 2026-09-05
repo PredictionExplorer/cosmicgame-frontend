@@ -50,8 +50,7 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <CodeSeoSummary />
-        <CodeViewer />
+        <CodeViewer seoSummary={<CodeSeoSummary />} />
       </>
     </PageMessages>
   );

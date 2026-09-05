@@ -32,7 +32,11 @@ export default async function QuizHubPage({ params }: PageProps) {
   const inLanguage = jsonLdInLanguage(locale);
 
   return (
-    <main id="main" tabIndex={-1} className="relative mx-auto max-w-6xl px-6 py-24 lg:py-32">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="relative mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 lg:pb-20 lg:pt-20"
+    >
       <JsonLd
         data={[
           breadcrumbJsonLd(
@@ -51,24 +55,24 @@ export default async function QuizHubPage({ params }: PageProps) {
         ]}
       />
 
-      <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">{hub.eyebrow}</p>
-      <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-        {hub.h1}
-      </h1>
-      <p className="mt-6 max-w-3xl text-lg leading-8 text-white/78">{hub.intro}</p>
+      <p className="type-eyebrow text-primary/80">{hub.eyebrow}</p>
+      <h1 className="mt-4 type-display-lg text-balance text-foreground">{hub.h1}</h1>
+      <p className="mt-6 max-w-3xl type-body-lg text-muted-foreground">{hub.intro}</p>
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">
         {tiers.map((tier) => (
           <Link
             key={tier.id}
             href={`${QUIZ_PATH}/${tier.id}`}
-            className="group flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20 hover:bg-white/[0.05]"
+            className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/25 hover:bg-primary/[0.04] sm:p-8"
           >
-            <h2 className="text-xl font-semibold tracking-tight text-white">{tier.title}</h2>
+            <h2 className="font-display text-xl font-medium tracking-tight text-foreground">
+              {tier.title}
+            </h2>
             <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-white/45">
               {hub.questionCountTemplate.replace('{count}', String(tier.questions.length))}
             </p>
-            <p className="mt-3 flex-1 text-sm leading-6 text-white/68">{tier.tagline}</p>
+            <p className="mt-3 flex-1 text-sm leading-7 text-muted-foreground">{tier.tagline}</p>
             <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
               {hub.startLabel}
               <ArrowRight

@@ -6,12 +6,9 @@ export async function CodeSeoSummary() {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'code' });
   return (
-    <section
-      aria-labelledby="code-seo-heading"
-      className="mb-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
-    >
-      <p className="type-eyebrow text-muted-foreground">{t('seo.eyebrow')}</p>
-      <h1 id="code-seo-heading" className="mt-4 type-display-md text-foreground">
+    <section aria-labelledby="code-seo-heading" className="mb-12 border-b border-border pb-10">
+      <p className="type-eyebrow text-primary/80">{t('seo.eyebrow')}</p>
+      <h1 id="code-seo-heading" className="mt-4 type-display-lg text-foreground">
         {t('seo.heading')}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">{t('seo.description')}</p>

@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { parseEther } from 'viem';
@@ -21,7 +22,7 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { isUserRejection, reportError } from '@/utils/errors';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 
-const EthDonations = () => {
+const EthDonations = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('ethContribution');
   const tToast = useTranslations('toasts');
   const [donateAmount, setDonateAmount] = useState('');
@@ -147,7 +148,10 @@ const EthDonations = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
+      {seoSummary}
+      {!seoSummary && (
+        <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
+      )}
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('page.description')}
       </p>

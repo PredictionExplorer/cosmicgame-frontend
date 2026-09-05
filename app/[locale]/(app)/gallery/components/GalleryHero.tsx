@@ -51,35 +51,30 @@ const statCards: {
   labelKey: string;
   icon: typeof Gem;
   tooltipKey: string;
-  gradient: string;
 }[] = [
   {
     key: 'total',
     labelKey: 'hero.totalImprinted.label',
     icon: Gem,
     tooltipKey: 'hero.totalImprinted.tooltip',
-    gradient: 'from-[#06AEEC] to-[#35C9FF]',
   },
   {
     key: 'staked',
     labelKey: 'hero.currentlyAnchored.label',
     icon: Lock,
     tooltipKey: 'hero.currentlyAnchored.tooltip',
-    gradient: 'from-[#9C37FD] to-[#C77DFF]',
   },
   {
     key: 'named',
     labelKey: 'hero.namedNfts.label',
     icon: Tag,
     tooltipKey: 'hero.namedNfts.tooltip',
-    gradient: 'from-[#06AEEC] to-[#9C37FD]',
   },
   {
     key: 'rounds',
     labelKey: 'hero.cycles.label',
     icon: Trophy,
     tooltipKey: 'hero.cycles.tooltip',
-    gradient: 'from-[#35C9FF] to-[#9C37FD]',
   },
 ];
 
@@ -100,7 +95,6 @@ export function GalleryHero({ stats, loading }: GalleryHeroProps) {
             label={t(card.labelKey)}
             icon={card.icon}
             tooltip={t(card.tooltipKey)}
-            gradient={card.gradient}
             loading={loading}
           />
         </motion.div>
@@ -114,11 +108,10 @@ interface StatCardProps {
   label: string;
   icon: typeof Gem;
   tooltip: string;
-  gradient: string;
   loading?: boolean;
 }
 
-function StatCard({ value, label, icon: Icon, tooltip, gradient, loading }: StatCardProps) {
+function StatCard({ value, label, icon: Icon, tooltip, loading }: StatCardProps) {
   const locale = useLocale();
   const animatedValue = useAnimatedCounter(loading ? 0 : value);
 
@@ -143,8 +136,8 @@ function StatCard({ value, label, icon: Icon, tooltip, gradient, loading }: Stat
                 </p>
               )}
             </div>
-            <div className={cn('rounded-lg bg-gradient-to-br p-2', gradient, 'opacity-80')}>
-              <Icon className="h-4 w-4 text-white" />
+            <div className="rounded-lg border border-primary/15 bg-primary/[0.06] p-2">
+              <Icon className="h-4 w-4 text-primary" />
             </div>
           </div>
         </div>

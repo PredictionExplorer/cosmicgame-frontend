@@ -10,6 +10,7 @@ import { Link } from '@/i18n/navigation';
 import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
 import { useStellarSelectionNFTAllocationsByUser } from '@/hooks/useApiQuery';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import {
   TablePrimary,
@@ -149,25 +150,21 @@ function UserStellarSelectionNFTPage({ address: rawAddress }: { address: string 
   if (invalidAddress) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <p className="text-lg font-semibold">{t('stellarSelectionNft.invalidAddress')}</p>
+        <PageHeader title={t('stellarSelectionNft.invalidAddress')} />
       </PageShell>
     );
   }
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <div className="mb-8">
-        <span className="mr-4 text-lg font-semibold text-primary">
-          {t('stellarSelectionNft.user')}
-        </span>
-        <span className="font-mono text-lg font-semibold">{validatedAddress}</span>
-      </div>
+      <PageHeader title={t('stellarSelectionNft.heading')}>
+        <p className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-muted-foreground">
+          <span>{t('stellarSelectionNft.user')}</span>
+          <span className="min-w-0 break-all font-mono">{validatedAddress}</span>
+        </p>
+      </PageHeader>
 
       <div className="mt-8">
-        <h4 className="mb-4 text-lg font-semibold leading-none">
-          {t('stellarSelectionNft.heading')}
-        </h4>
-
         {stellarSelectionNfts.loading ? (
           <p className="text-lg font-semibold">{t('stellarSelectionNft.loading')}</p>
         ) : (

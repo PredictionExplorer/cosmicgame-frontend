@@ -32,23 +32,44 @@ import { useEffect, type ReactNode } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
 import { MotionConfig } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+
+import type { LandingContent } from '@/content/landing/types';
 
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
-import { LanguageDirectory } from '@/components/layout/LanguageDirectory';
+import { LandingFooter } from '@/components/landing-v2/LandingFooter';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { BrandMark } from '@/components/layout/BrandMark';
 import { SkipLink } from '@/components/ui/skip-link';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { usePathname } from '@/i18n/navigation';
-import { publicPathname } from '@/lib/hostRouting';
+import { Link, usePathname } from '@/i18n/navigation';
+import { APP_ORIGIN, localeHref, publicPathname } from '@/lib/hostRouting';
+import { cn } from '@/lib/utils';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
-export function LandingShell({ children }: { children: ReactNode }) {
+export function LandingShell({
+  children,
+  footer,
+}: {
+  children: ReactNode;
+  footer: LandingContent['footer'];
+}) {
   const pathname = usePathname();
-  // The landing home brings its own header pill and footer directory
-  // (Hero, LandingFooter); every other marketing page gets the utility pill
-  // top-right and the crawlable language directory as its footer.
-  const showUtilityChrome = publicPathname(pathname) !== '/';
+  const locale = useLocale();
+  const t = useTranslations('nav');
+  const footerT = useTranslations('footer');
+  const landingT = useTranslations('landing');
+  // The home composition includes its own Hero header and LandingFooter.
+  // Subpages share the same complete navigation and footer through this shell.
+  const publicPath = publicPathname(pathname);
+  const showSiteChrome = publicPath !== '/';
+  const navigation = [
+    { href: '/about', label: footerT('links.about') },
+    { href: '/learn', label: footerT('links.learn') },
+    { href: '/white-paper', label: footerT('links.whitePaper') },
+  ];
 
   useEffect(() => {
     installGlobalErrorHandlers();
@@ -60,19 +81,60 @@ export function LandingShell({ children }: { children: ReactNode }) {
         <CookiesProvider>
           <TooltipProvider delayDuration={200} skipDelayDuration={300}>
             <SkipLink />
-            {showUtilityChrome ? (
-              <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-6">
-                <LanguageSwitcher />
+            <div className="site-shell flex min-h-screen flex-col">
+              {showSiteChrome ? (
+                <header className="relative z-30 bg-background/90">
+                  <div className="site-container flex min-h-21 flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-white/10 py-4 lg:flex-nowrap lg:py-0">
+                    <Link
+                      href="/"
+                      aria-label={t('brand.homeLabel')}
+                      className="inline-flex min-h-11 shrink-0 items-center gap-2.5 font-display text-base font-semibold tracking-tight text-foreground no-underline sm:text-lg"
+                    >
+                      <BrandMark className="h-8 w-8 shrink-0 text-primary" />
+                      <span>
+                        Cosmic <span className="text-primary">Signature</span>
+                      </span>
+                    </Link>
+                    <nav
+                      aria-label={t('primaryLabel')}
+                      className="order-3 flex w-full flex-wrap items-center gap-x-5 gap-y-1 lg:order-none lg:w-auto lg:justify-center"
+                    >
+                      {navigation.map((item) => {
+                        const active =
+                          publicPath === item.href || publicPath.startsWith(`${item.href}/`);
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            aria-current={active ? 'page' : undefined}
+                            className={cn(
+                              'inline-flex min-h-11 items-center border-b text-xs no-underline transition-colors hover:text-foreground sm:text-sm',
+                              active
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-muted-foreground',
+                            )}
+                          >
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                      <a
+                        href={localeHref(APP_ORIGIN, '/', locale)}
+                        className="inline-flex min-h-11 items-center gap-1.5 text-xs text-primary no-underline transition-colors hover:text-foreground sm:text-sm"
+                      >
+                        {landingT('timer.openLiveCycle')}
+                        <ArrowUpRight className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      </a>
+                    </nav>
+                    <LanguageSwitcher variant="compact" className="shrink-0" />
+                  </div>
+                </header>
+              ) : null}
+              <div className="min-w-0 flex-1">
+                <ErrorBoundary>{children}</ErrorBoundary>
               </div>
-            ) : null}
-            <ErrorBoundary>{children}</ErrorBoundary>
-            {showUtilityChrome ? (
-              <footer className="relative mx-auto w-full max-w-6xl px-6 pb-12">
-                <div className="border-t border-white/10 pt-6">
-                  <LanguageDirectory />
-                </div>
-              </footer>
-            ) : null}
+              {showSiteChrome ? <LandingFooter footer={footer} /> : null}
+            </div>
             <Toaster
               position="top-right"
               theme="dark"

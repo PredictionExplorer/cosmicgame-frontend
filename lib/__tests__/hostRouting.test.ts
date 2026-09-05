@@ -419,13 +419,20 @@ describe('hostRouting', () => {
   });
 
   describe('isLandingOnlyPath', () => {
-    it('keeps learn, about, and white-paper pages canonical on the landing host', () => {
-      expect(LANDING_ONLY_PATH_PREFIXES).toEqual(['/about', '/learn', '/white-paper']);
+    it('keeps informational and quiz pages canonical on the landing host', () => {
+      expect(LANDING_ONLY_PATH_PREFIXES).toEqual(['/about', '/learn', '/quiz', '/white-paper']);
       expect(isLandingOnlyPath('/about')).toBe(true);
       expect(isLandingOnlyPath('/learn')).toBe(true);
       expect(isLandingOnlyPath('/learn/what-is-cosmic-signature')).toBe(true);
       expect(isLandingOnlyPath('/white-paper')).toBe(true);
     });
+
+    it.each(['/quiz', '/quiz/basic', '/quiz/advanced', '/quiz/missing-tier'])(
+      'keeps %s in the landing route family',
+      (pathname) => {
+        expect(isLandingOnlyPath(pathname)).toBe(true);
+      },
+    );
 
     it('does not classify app routes as landing-only', () => {
       expect(isLandingOnlyPath('/statistics')).toBe(false);

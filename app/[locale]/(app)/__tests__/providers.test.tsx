@@ -10,6 +10,7 @@ import { NOTIFICATION_AUTO_HIDE_MS } from '../../../../config/constants';
 
 const mockInitParticlesEngine = jest.fn<Promise<void>, [(engine: unknown) => Promise<void>]>();
 const mockLoadSlim = jest.fn().mockResolvedValue(undefined);
+const mockPathname = jest.spyOn(jest.requireMock('next/navigation'), 'usePathname');
 
 jest.mock('next/dynamic', () =>
   jest.fn(() => {
@@ -144,6 +145,7 @@ describe('CookiesProvider (react-cookie v8 + React 19)', () => {
 describe('Providers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPathname.mockReturnValue('/');
     // Default: engine never initializes, preventing act() warnings
     // in tests that only care about the provider structure.
     mockInitParticlesEngine.mockImplementation(() => new Promise(() => {}));
@@ -179,6 +181,37 @@ describe('Providers', () => {
     expect(screen.getByTestId('header')).toBeInTheDocument();
     expect(screen.getByTestId('footer')).toBeInTheDocument();
   });
+
+  it.each(['/experimental-ui', '/gallery', '/statistics/participation', '/embed-example'])(
+    'keeps full site navigation on %s',
+    (pathname) => {
+      mockPathname.mockReturnValue(pathname);
+      render(
+        <Providers>
+          <main id="main">Content</main>
+        </Providers>,
+      );
+      expect(screen.getByTestId('header')).toBeInTheDocument();
+      expect(screen.getByTestId('footer')).toBeInTheDocument();
+      expect(document.querySelector('a[href="#main"]')).toBeInTheDocument();
+    },
+  );
+
+  it.each(['/embed', '/embed/statistics'])(
+    'omits navigation and background work in %s',
+    (pathname) => {
+      mockPathname.mockReturnValue(pathname);
+      render(
+        <Providers>
+          <main>Embedded content</main>
+        </Providers>,
+      );
+      expect(screen.queryByTestId('header')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
+      expect(document.querySelector('a[href="#main"]')).not.toBeInTheDocument();
+      expect(mockInitParticlesEngine).not.toHaveBeenCalled();
+    },
+  );
 
   it('places Header before children and Footer after in DOM order', () => {
     render(

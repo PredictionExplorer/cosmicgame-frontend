@@ -170,12 +170,14 @@ export function AttachedNFTAllocationShowcase({
 
           <div
             className={cn(
-              'grid gap-4',
+              'grid items-start gap-4',
               totalPreviewCount === 1
                 ? 'grid-cols-1'
                 : variant === 'rail'
                   ? 'grid-cols-1'
-                  : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]',
+                  : totalPreviewCount === 3 || totalPreviewCount > 4
+                    ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3'
+                    : 'grid-cols-1 md:grid-cols-2',
             )}
           >
             {previewNfts.map((nft, index) => (
@@ -192,7 +194,6 @@ export function AttachedNFTAllocationShowcase({
               <AttachedERC20AllocationCard
                 key={String(token.EvtLogId ?? `${token.TokenAddr}-${token.RoundNum}-${index}`)}
                 token={token}
-                featured={previewNfts.length === 0 && index === 0}
                 variant={variant}
               />
             ))}
@@ -257,25 +258,14 @@ function SummaryChip({ label, value }: { label: string; value: string }) {
   );
 }
 
-function AssetCardShell({
-  tone,
-  featured,
-  variant,
-  children,
-}: {
-  tone: AssetTone;
-  featured: boolean;
-  variant: AttachedNFTAllocationShowcaseProps['variant'];
-  children: ReactNode;
-}) {
+function AssetCardShell({ tone, children }: { tone: AssetTone; children: ReactNode }) {
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4 transition-all duration-300',
+        '@container group relative min-w-0 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4 transition-all duration-300',
         'hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-white/[0.05]',
         'before:pointer-events-none before:absolute before:inset-x-5 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent',
         assetTones[tone].card,
-        featured && variant === 'default' && 'md:col-span-2 xl:col-span-1',
       )}
     >
       {children}
@@ -359,8 +349,13 @@ function AttachedNFTAllocationCard({
   );
 
   return (
-    <AssetCardShell tone="nft" featured={featured} variant={variant}>
-      <div className="flex h-full flex-col gap-4">
+    <AssetCardShell tone="nft">
+      <div
+        className={cn(
+          'grid min-w-0 items-start gap-4',
+          variant === 'default' && '@xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
+        )}
+      >
         <div>
           {primaryLink.href ? (
             <a
@@ -470,11 +465,9 @@ function AttachedNFTAllocationCard({
 
 function AttachedERC20AllocationCard({
   token,
-  featured,
   variant,
 }: {
   token: DonatedERC20Token;
-  featured: boolean;
   variant: AttachedNFTAllocationShowcaseProps['variant'];
 }) {
   const t = useTranslations('currentCycle');
@@ -490,11 +483,11 @@ function AttachedERC20AllocationCard({
   const logoSource = metadata?.logoSource ?? t('showcase.erc20Card.logoSourceFallback');
 
   return (
-    <AssetCardShell tone="erc20" featured={featured} variant={variant}>
+    <AssetCardShell tone="erc20">
       <div
         className={cn(
-          'grid h-full gap-4',
-          featured && variant === 'default' ? 'lg:grid-cols-[220px_minmax(0,1fr)]' : '',
+          'grid min-w-0 items-start gap-4',
+          variant === 'default' && '@xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
         )}
       >
         <TokenLogo

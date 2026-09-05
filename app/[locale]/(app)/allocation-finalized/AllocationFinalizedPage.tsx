@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Fireworks, { FireworksHandlers } from '@fireworks-js/react';
@@ -25,7 +26,7 @@ import { formatFixed } from '@/utils/format';
 /** Poll interval while waiting for the next round to become active (chain activation time). */
 const ACTIVATION_POLL_MS = 4000;
 
-const AllocationFinalizedPage = () => {
+const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('allocation');
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -93,6 +94,7 @@ const AllocationFinalizedPage = () => {
 
   return (
     <MainWrapper className="max-sm:pb-16">
+      {seoSummary}
       <div className="mx-auto max-w-3xl">
         {isClaimSuccess && !finishFireworks && (
           <Fireworks

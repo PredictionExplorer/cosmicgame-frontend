@@ -32,10 +32,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['allocation', 'tables']}>
-      <>
-        <PublicDataRouteSeoSummary route="allocation" />
-        <AllocationRecipientsPage />
-      </>
+      <AllocationRecipientsPage seoSummary={<PublicDataRouteSeoSummary route="allocation" />} />
     </PageMessages>
   );
 }

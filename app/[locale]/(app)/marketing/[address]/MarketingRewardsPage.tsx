@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { getAddress, isAddress } from 'viem';
 
 import { Link } from '@/i18n/navigation';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import MarketingRewardsTable, {
   type MarketingReward,
@@ -25,20 +26,17 @@ const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps
   return (
     <PageShell variant="marketing" backdrop="signature">
       {invalidAddress ? (
-        <p className="text-lg font-semibold">{t('address.invalid')}</p>
+        <PageHeader title={t('address.invalid')} />
       ) : (
         <>
-          <div className="mb-8">
-            <span className="text-lg font-semibold text-primary mr-2">{t('address.heading')}</span>
-            <span className="text-lg font-semibold font-mono break-all">
-              <Link
-                href={`/user/${address}`}
-                className="text-inherit text-[length:inherit] font-mono"
-              >
-                {address}
-              </Link>
-            </span>
-          </div>
+          <PageHeader title={t('address.heading')}>
+            <Link
+              href={`/user/${address}`}
+              className="mt-5 inline-block break-all font-mono text-sm text-muted-foreground transition-colors hover:text-primary"
+            >
+              {address}
+            </Link>
+          </PageHeader>
           {loading ? (
             <p className="text-lg font-semibold" role="status">
               {t('address.loading')}

@@ -792,25 +792,28 @@ const HomePage = ({
               />
             </div>
 
-            <div data-testid="home-depth-rail" className="min-w-0 space-y-3">
+            <div data-testid="home-depth-rail" className="min-w-0">
               <MemoDeckArtCard bannerToken={bannerToken} />
-              {hasAttachedAssets && (
-                <div data-testid="home-rail-attached-assets">
-                  <MemoAttachedNFTAllocationShowcase
-                    nfts={donatedNFTs}
-                    erc20Tokens={donatedERC20Tokens}
-                    cycleNumber={round >= 0 ? round : undefined}
-                    variant="rail"
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>
 
+        {/* Receipts use the full content width. A tall attachment list in the
+            artwork rail would leave an equally tall blank below the chat. */}
+        {hasAttachedAssets && (
+          <div data-testid="home-attached-assets" className="mt-6">
+            <MemoAttachedNFTAllocationShowcase
+              nfts={donatedNFTs}
+              erc20Tokens={donatedERC20Tokens}
+              cycleNumber={round >= 0 ? round : undefined}
+              className="my-0"
+            />
+          </div>
+        )}
+
         <details
           data-testid="home-story-section"
-          className="group/story mt-6 rounded-2xl border border-white/10 bg-[#0b1226]/70"
+          className="group/story mt-6 rounded-2xl border border-white/10 bg-card"
         >
           <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
             {t('orientation.storyTitle')}
@@ -878,7 +881,7 @@ const HomePage = ({
       <Sheet open={gestureSheetOpen} onOpenChange={setGestureSheetOpen}>
         <SheetContent
           side="bottom"
-          className="max-h-[85dvh] overflow-y-auto rounded-t-2xl border-white/[0.10] bg-[rgb(10_14_42/0.97)] p-4 pb-6 lg:hidden"
+          className="max-h-[85dvh] overflow-y-auto rounded-t-2xl border-white/[0.10] bg-card/95 p-4 pb-6 lg:hidden"
         >
           <SheetTitle className="sr-only">{t('observatory.panel.sheetTitle')}</SheetTitle>
           <GesturePanel

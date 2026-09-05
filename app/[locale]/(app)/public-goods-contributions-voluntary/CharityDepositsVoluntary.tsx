@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -10,13 +11,20 @@ import {
 } from '@/components/tables/CharityDepositTable';
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 
-const CharityDepositsVoluntary = () => {
+const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const { data: voluntaryDeposits = [], isLoading: loading } = useCharityVoluntary();
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader title={t('voluntary.title')} titleLevel={2} subtitle={t('voluntary.subtitle')} />
+      {seoSummary}
+      {!seoSummary && (
+        <PageHeader
+          title={t('voluntary.title')}
+          titleLevel={2}
+          subtitle={t('voluntary.subtitle')}
+        />
+      )}
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('voluntary.description')}
       </p>

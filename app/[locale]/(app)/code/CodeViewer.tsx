@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { createTheme } from '@uiw/codemirror-themes';
 import { useTranslations } from 'next-intl';
@@ -21,12 +22,15 @@ const myTheme = createTheme({
   styles: [],
 });
 
-const CodeViewer = () => {
+const CodeViewer = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('code');
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader title={t('viewer.title')} titleLevel={2} subtitle={t('viewer.subtitle')} />
+      {seoSummary}
+      {!seoSummary && (
+        <PageHeader title={t('viewer.title')} titleLevel={2} subtitle={t('viewer.subtitle')} />
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div>

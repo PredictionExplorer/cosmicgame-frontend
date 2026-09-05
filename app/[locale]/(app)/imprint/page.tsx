@@ -53,8 +53,7 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <PublicDataRouteSeoSummary route="imprint" />
-        <Imprint />
+        <Imprint seoSummary={<PublicDataRouteSeoSummary route="imprint" />} />
       </>
     </PageMessages>
   );

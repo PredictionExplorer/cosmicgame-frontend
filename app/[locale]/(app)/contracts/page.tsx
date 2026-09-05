@@ -54,8 +54,7 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <ContractsSeoSummary />
-        <Contracts />
+        <Contracts seoSummary={<ContractsSeoSummary />} />
       </>
     </PageMessages>
   );

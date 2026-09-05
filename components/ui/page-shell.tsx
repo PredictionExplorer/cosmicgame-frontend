@@ -12,26 +12,24 @@ import { AmbientBackdrop, type AmbientBackdropProps } from '@/components/ui/ambi
  * and provides the `#main` skip-link target.
  */
 
-// `overflow-x-clip` contains the decorative backdrops without creating a
-// scroll container, so content that overflows vertically is still reachable
-// and horizontal bleed is cut rather than silently hidden in both axes.
-const shellVariants = cva(
-  'relative z-[1] mx-auto w-full overflow-x-clip print:overflow-visible leading-normal min-h-[calc(100vh-100px)]',
-  {
-    variants: {
-      variant: {
-        data: 'max-w-7xl px-4 pt-40 pb-24 max-sm:pt-36 max-sm:pb-20 sm:px-6 lg:px-8',
-        marketing: 'max-w-7xl px-4 pt-40 pb-32 max-sm:pt-36 max-sm:pb-24 sm:px-6 lg:px-8',
-        form: 'max-w-3xl px-4 pt-40 pb-24 max-sm:pt-36 max-sm:pb-20 sm:px-6',
-        detail: 'max-w-6xl px-4 pt-40 pb-28 max-sm:pt-36 max-sm:pb-20 sm:px-6 lg:px-8',
-        bare: 'max-w-none px-0 pt-0 pb-0 min-h-0 overflow-visible',
-      },
-    },
-    defaultVariants: {
-      variant: 'data',
+// Backdrops own their clipping. Content remains visible, including focus rings
+// and sticky controls; long data is contained by the responsive table primitive.
+const shellVariants = cva('relative z-[1] mx-auto w-full leading-normal', {
+  variants: {
+    variant: {
+      data: 'max-w-[83rem] px-4 pt-[calc(var(--header-height)+3.5rem)] pb-16 max-sm:pt-[calc(var(--header-height)+2rem)] max-sm:pb-12 sm:px-6',
+      marketing:
+        'max-w-[83rem] px-4 pt-[calc(var(--header-height)+3.5rem)] pb-20 max-sm:pt-[calc(var(--header-height)+2rem)] max-sm:pb-16 sm:px-6',
+      form: 'max-w-3xl px-4 pt-[calc(var(--header-height)+3.5rem)] pb-16 max-sm:pt-[calc(var(--header-height)+2rem)] max-sm:pb-12 sm:px-6',
+      detail:
+        'max-w-6xl px-4 pt-[calc(var(--header-height)+3.5rem)] pb-16 max-sm:pt-[calc(var(--header-height)+2rem)] max-sm:pb-12 sm:px-6',
+      bare: 'max-w-none px-0 pt-0 pb-0 min-h-0 overflow-visible',
     },
   },
-);
+  defaultVariants: {
+    variant: 'data',
+  },
+});
 
 type BackdropProp = AmbientBackdropProps['variant'] | null;
 

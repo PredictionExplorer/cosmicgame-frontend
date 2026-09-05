@@ -28,7 +28,6 @@ const AdminPage = () => {
           </SectionEyebrow>
         }
         title={t('page.title')}
-        gradientTitle="signature"
         subtitle={t('page.subtitle')}
       />
       <div>

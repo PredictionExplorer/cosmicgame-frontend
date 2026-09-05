@@ -1,13 +1,16 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+import { mockMobileAuditApi } from './mobile-audit-fixtures';
+import { waitForStableLayout } from './mobile-audit-helpers';
+
 const CST_UNISWAP_SWAP_URL =
   'https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0';
 const AXIOM_ZERO_URL = 'https://www.axiomzero.market/cosmic-signature';
 const CHAOS_ZERO_URL = 'https://chaoszero.com';
 
 async function isMobile(page: Page): Promise<boolean> {
-  return page.evaluate(() => window.innerWidth < 1024);
+  return page.evaluate(() => window.innerWidth < 1280);
 }
 
 /** Returns the container holding the ecosystem links for the active layout. */
@@ -23,7 +26,9 @@ async function openEcosystemSurface(page: Page) {
 
 test.describe('Header', () => {
   test.beforeEach(async ({ page }) => {
+    await mockMobileAuditApi(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await waitForStableLayout(page);
   });
 
   test('shows the ecosystem destinations with correct targets', async ({ page }) => {
@@ -75,9 +80,9 @@ test.describe('Header', () => {
     test.skip(await isMobile(page), 'Wordmark pairs with the desktop layout');
 
     await page.setViewportSize({ width: 1440, height: 900 });
-    const home = page.getByRole('link', { name: 'Cosmic Signature home' });
+    const home = page.getByRole('banner').getByRole('link', { name: 'Cosmic Signature home' });
     await expect(home).toBeVisible();
-    await expect(home).toContainText('Cosmic Signature');
+    await expect(home.getByText('Cosmic Signature', { exact: true })).toBeVisible();
   });
 
   test('mobile drawer groups navigation into labelled sections', async ({ page }) => {

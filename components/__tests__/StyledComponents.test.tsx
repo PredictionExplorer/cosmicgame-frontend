@@ -27,9 +27,9 @@ describe('MainWrapper', () => {
     expect(screen.getByText('Main content')).toBeInTheDocument();
   });
 
-  it('applies min-h class by default', () => {
+  it('lets the shared site shell own short-page height', () => {
     const { container } = render(<MainWrapper>content</MainWrapper>);
-    expect(container.firstChild).toHaveClass('min-h-[calc(100vh-100px)]');
+    expect(container.firstChild).not.toHaveClass('min-h-[calc(100svh-20rem)]');
   });
 
   it('merges additional className', () => {
@@ -296,7 +296,7 @@ describe('SearchButton', () => {
 
   it('has gradient background classes', () => {
     render(<SearchButton>Go</SearchButton>);
-    expect(screen.getByText('Go')).toHaveClass('bg-gradient-to-r');
+    expect(screen.getByText('Go')).toHaveClass('bg-primary', 'text-primary-foreground');
   });
 });
 

@@ -1485,7 +1485,7 @@ describe('HomePage', () => {
     expect(cycleDetailsLink).toHaveAttribute('href', '/current-cycle');
   });
 
-  it('fills the rail with attached assets when the current cycle has them', () => {
+  it('places attached assets below the deck without stretching the chat column', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),
       isLoading: false,
@@ -1507,11 +1507,16 @@ describe('HomePage', () => {
     expect(gestureStatusProps).toEqual(
       expect.objectContaining({ attachedNFTCount: 2, attachedERC20Count: 1 }),
     );
-    expect(rail).toContainElement(showcase);
+    expect(rail).not.toContainElement(showcase);
+    const deck = screen.getByTestId('home-deck-layout');
+    const assets = screen.getByTestId('home-attached-assets');
+    expect(deck).not.toContainElement(assets);
+    expect(assets).toContainElement(showcase);
+    expect(deck.compareDocumentPosition(assets) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(showcase).toHaveAttribute('data-count', '2');
     expect(showcase).toHaveAttribute('data-erc20-count', '1');
     expect(showcase).toHaveAttribute('data-cycle', '7');
-    expect(showcase).toHaveAttribute('data-variant', 'rail');
+    expect(showcase).toHaveAttribute('data-variant', 'default');
   });
 
   it('does not render empty rail placeholders when optional rail content is absent', () => {
@@ -1528,7 +1533,7 @@ describe('HomePage', () => {
 
     expect(linksRow).toContainElement(screen.getByTestId('cycle-details-link-card'));
     expect(screen.queryByTestId('home-rail-public-goods')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('home-rail-attached-assets')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('home-attached-assets')).not.toBeInTheDocument();
     expect(screen.queryByTestId('public-goods-impact-card')).not.toBeInTheDocument();
     expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
   });

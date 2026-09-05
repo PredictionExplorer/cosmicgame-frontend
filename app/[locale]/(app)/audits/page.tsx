@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getAuditsCopy } from '@/content/legal';
 import { TrustPageContent } from '@/content/legal/TrustPageContent';
 
+import { PageShell } from '@/components/ui/page-shell';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
@@ -32,7 +33,7 @@ export default async function AuditsPage({ params }: PageProps) {
   const copy = getAuditsCopy(locale);
 
   return (
-    <main id="main" tabIndex={-1} className="mx-auto max-w-4xl px-6 py-16 lg:py-24">
+    <PageShell variant="form">
       <JsonLd
         data={[
           webPageJsonLd({
@@ -57,6 +58,6 @@ export default async function AuditsPage({ params }: PageProps) {
         ]}
       />
       <TrustPageContent copy={copy} locale={locale} />
-    </main>
+    </PageShell>
   );
 }

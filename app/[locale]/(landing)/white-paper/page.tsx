@@ -45,10 +45,10 @@ function sectionTitle(section: WhitePaperSection): string {
 function BlockView({ block }: { block: WhitePaperBlock }) {
   switch (block.kind) {
     case 'paragraph':
-      return <p className="text-base leading-7 text-white/76">{block.text}</p>;
+      return <p className="text-base leading-8 text-muted-foreground">{block.text}</p>;
     case 'list':
       return (
-        <ul className="list-disc space-y-3 pl-5 text-base leading-7 text-white/76 marker:text-white/40">
+        <ul className="list-disc space-y-3 pl-5 text-base leading-8 text-muted-foreground marker:text-white/40">
           {block.items.map((item) => (
             <li key={item}>{item}</li>
           ))}
@@ -136,7 +136,7 @@ function SubsectionView({ subsection }: { subsection: WhitePaperSubsection }) {
     >
       <h3
         id={`${subsection.id}-heading`}
-        className="text-xl font-semibold tracking-tight text-white"
+        className="font-display text-xl font-medium tracking-tight text-foreground"
       >
         {subsection.number} {subsection.heading}
       </h3>
@@ -182,7 +182,11 @@ export default async function WhitePaperPage({ params }: PageProps) {
   };
 
   return (
-    <main id="main" tabIndex={-1} className="relative mx-auto max-w-4xl px-6 py-24 lg:py-32">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="relative mx-auto max-w-4xl px-4 pb-16 pt-12 sm:px-6 lg:pb-20 lg:pt-20"
+    >
       <JsonLd
         data={[
           breadcrumbJsonLd(
@@ -205,12 +209,8 @@ export default async function WhitePaperPage({ params }: PageProps) {
       </nav>
 
       <header>
-        <p className="font-mono text-xs uppercase tracking-[0.28em] text-white/50">
-          {content.hero.eyebrow}
-        </p>
-        <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-          {content.hero.title}
-        </h1>
+        <p className="type-eyebrow text-primary/80">{content.hero.eyebrow}</p>
+        <h1 className="mt-4 type-display-lg text-balance text-foreground">{content.hero.title}</h1>
         <p className="mt-3 text-xl text-white/70">{content.hero.subtitle}</p>
         <p className="mt-6 text-sm text-white/60">
           {content.hero.authorName}
@@ -239,12 +239,15 @@ export default async function WhitePaperPage({ params }: PageProps) {
 
       <section
         aria-labelledby="abstract-heading"
-        className="mt-12 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
+        className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8"
       >
-        <h2 id="abstract-heading" className="text-xl font-semibold text-white">
+        <h2
+          id="abstract-heading"
+          className="font-display text-xl font-medium tracking-tight text-foreground"
+        >
           {content.abstract.heading}
         </h2>
-        <div className="mt-4 space-y-4 text-base leading-7 text-white/72">
+        <div className="mt-4 space-y-4 text-base leading-8 text-muted-foreground">
           {content.abstract.paragraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
@@ -253,9 +256,12 @@ export default async function WhitePaperPage({ params }: PageProps) {
 
       <nav
         aria-labelledby="toc-heading"
-        className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
+        className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8"
       >
-        <h2 id="toc-heading" className="text-xl font-semibold text-white">
+        <h2
+          id="toc-heading"
+          className="font-display text-xl font-medium tracking-tight text-foreground"
+        >
           {content.tocHeading}
         </h2>
         <ol className="mt-4 grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
@@ -288,10 +294,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
             aria-labelledby={`${section.id}-heading`}
             className="scroll-mt-28"
           >
-            <h2
-              id={`${section.id}-heading`}
-              className="text-2xl font-semibold tracking-tight text-white sm:text-3xl"
-            >
+            <h2 id={`${section.id}-heading`} className="type-display-sm text-foreground">
               {sectionTitle(section)}
             </h2>
             {section.blocks.length > 0 ? (
@@ -314,13 +317,10 @@ export default async function WhitePaperPage({ params }: PageProps) {
           aria-labelledby="references-heading"
           className="scroll-mt-28"
         >
-          <h2
-            id="references-heading"
-            className="text-2xl font-semibold tracking-tight text-white sm:text-3xl"
-          >
+          <h2 id="references-heading" className="type-display-sm text-foreground">
             {content.references.heading}
           </h2>
-          <ol className="mt-5 list-decimal space-y-3 pl-5 text-base leading-7 text-white/76 marker:text-white/40">
+          <ol className="mt-5 list-decimal space-y-3 pl-5 text-base leading-8 text-muted-foreground marker:text-white/40">
             {content.references.items.map((reference) => (
               <li key={reference.href}>
                 {reference.label}

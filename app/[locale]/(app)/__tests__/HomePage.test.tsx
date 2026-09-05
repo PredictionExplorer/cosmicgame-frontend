@@ -1006,7 +1006,7 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('deck-personal-strip')).not.toBeInTheDocument();
   });
 
-  it('keeps artwork and attachments beside the activity feed below the decision stage', () => {
+  it('keeps artwork beside the feed and puts attachments in their own full-width section', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),
       isLoading: false,
@@ -1031,11 +1031,16 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('public-goods-impact-card')).not.toBeInTheDocument();
 
     const showcase = screen.getByTestId('attached-nft-showcase');
-    expect(rail).toContainElement(showcase);
+    expect(rail).not.toContainElement(showcase);
+    const assets = screen.getByTestId('home-attached-assets');
+    expect(assets).toContainElement(showcase);
+    expect(screen.getByTestId('home-feed-layout').compareDocumentPosition(assets)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
     expect(showcase).toHaveAttribute('data-count', '2');
     expect(showcase).toHaveAttribute('data-erc20-count', '1');
     expect(showcase).toHaveAttribute('data-cycle', '7');
-    expect(showcase).toHaveAttribute('data-variant', 'rail');
+    expect(showcase).toHaveAttribute('data-variant', 'default');
 
     // The rotating artwork links to its detail page.
     expect(screen.getByTestId('deck-art-link')).toHaveAttribute(
@@ -1044,7 +1049,7 @@ describe('HomePage', () => {
     );
   });
 
-  it('omits optional rail cards when the cycle has nothing to show', () => {
+  it('omits the attachment section when the cycle has nothing to show', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 1, CharityPercentage: 0 }),
       isLoading: false,

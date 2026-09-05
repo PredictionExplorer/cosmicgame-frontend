@@ -351,10 +351,10 @@ export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRo
   return (
     <section
       aria-labelledby={`${route}-seo-heading`}
-      className="mb-10 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8"
+      className="mb-12 border-b border-border pb-10"
     >
-      <p className="type-eyebrow text-muted-foreground">{t(`${prefix}.eyebrow`)}</p>
-      <h1 id={`${route}-seo-heading`} className="mt-4 type-display-md text-foreground">
+      <p className="type-eyebrow text-primary/80">{t(`${prefix}.eyebrow`)}</p>
+      <h1 id={`${route}-seo-heading`} className="mt-4 type-display-lg text-foreground">
         {heading}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">
@@ -374,14 +374,14 @@ export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRo
             const label = t(`${cardPrefix}.label`);
             const tooltip = card.hasTooltip ? t(`${cardPrefix}.tooltip`) : undefined;
             return (
-              <div key={card.key} className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+              <div key={card.key} className="rounded-xl border border-border bg-card p-4 sm:p-5">
                 <dt className="flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
                   <span>{label}</span>
                   {tooltip ? (
                     <InfoTooltip content={tooltip} label={label} iconClassName="h-3 w-3" />
                   ) : null}
                 </dt>
-                <dd className="mt-2 text-2xl font-semibold text-foreground">
+                <dd className="mt-2 font-display text-2xl font-medium text-foreground">
                   {card.value ?? t(`${cardPrefix}.value`)}
                 </dd>
               </div>

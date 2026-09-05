@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import type { AppLocale } from '@/i18n/routing';
 import { LanguageDirectory } from '@/components/layout/LanguageDirectory';
+import { BrandMark } from '@/components/layout/BrandMark';
 import { FooterWrapper } from '@/components/styled';
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
@@ -140,6 +140,8 @@ function getFooterLinks(t: FooterTranslator, locale: AppLocale): FooterGroup[] {
 
 const Footer = () => {
   const t = useTranslations('footer');
+  const commonT = useTranslations('common');
+  const navT = useTranslations('nav');
   const locale = useLocale() as AppLocale;
   const footerLinks = getFooterLinks(t, locale);
   const build = getClientBuildInfo();
@@ -147,31 +149,26 @@ const Footer = () => {
     build && (!isVercelProductionDeploy() || process.env.NEXT_PUBLIC_SHOW_BUILD_COMMIT === '1');
 
   return (
-    <FooterWrapper>
-      <div className="relative overflow-hidden border-t border-white/10">
+    <FooterWrapper className="relative mt-auto border-t border-white/10">
+      <div className="relative overflow-hidden">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-deep-space opacity-70"
+          className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/[0.04] via-transparent to-transparent"
         />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[oklch(84.7%_0.149_213)]/40 to-transparent"
-        />
-        <div className="relative mx-auto w-full max-w-7xl px-4">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 py-12 sm:grid-cols-3 sm:py-14 xl:grid-cols-6">
-            <div className="col-span-2 min-w-0 sm:col-span-3 xl:col-span-1">
-              <Image
-                src="/images/logo2.svg"
-                width={180}
-                height={36}
-                alt="Cosmic Signature"
-                loading="eager"
-                className="h-8 w-auto max-w-[140px] object-contain"
-              />
-              <p
-                className="mt-4 max-w-[260px] text-sm leading-relaxed text-white/60"
-                style={{ fontFamily: 'var(--font-inter, inherit)' }}
+        <div className="site-container relative">
+          <div className="grid gap-10 py-12 sm:py-14 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,3.4fr)] xl:gap-12">
+            <div className="min-w-0">
+              <Link
+                href="/"
+                aria-label={navT('brand.homeLabel')}
+                className="inline-flex min-h-11 max-w-full items-center gap-3 no-underline"
               >
+                <BrandMark className="h-9 w-9 shrink-0 text-primary" />
+                <span className="font-display text-xl font-semibold tracking-tight text-foreground [overflow-wrap:anywhere]">
+                  Cosmic <span className="text-primary">Signature</span>
+                </span>
+              </Link>
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
                 {t('tagline')}
               </p>
               <div className="mt-5 flex items-center gap-2">
@@ -180,7 +177,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('social.twitterLabel')}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-muted-foreground transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
                 >
                   <XIcon />
                 </a>
@@ -189,43 +186,48 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('social.discordLabel')}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-muted-foreground transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
                 >
                   <DiscordIcon />
                 </a>
               </div>
             </div>
 
-            {footerLinks.map(({ title, links }) => (
-              <div key={title} className="min-w-0">
-                <h4 className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/65 [overflow-wrap:anywhere]">
-                  {title}
-                </h4>
-                <ul className="space-y-0.5">
-                  {links.map((link) => (
-                    <li key={link.label}>
-                      {link.external ? (
-                        <a
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 no-underline transition hover:text-white [overflow-wrap:anywhere]"
-                        >
-                          {link.label}
-                        </a>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 no-underline transition hover:text-white [overflow-wrap:anywhere]"
-                        >
-                          {link.label}
-                        </Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <nav
+              aria-label={commonT('accessibility.footer')}
+              className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-5"
+            >
+              {footerLinks.map(({ title, links }) => (
+                <div key={title} className="min-w-0">
+                  <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-white/65 [overflow-wrap:anywhere]">
+                    {title}
+                  </h2>
+                  <ul className="space-y-0.5">
+                    {links.map((link) => (
+                      <li key={link.label}>
+                        {link.external ? (
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 no-underline transition hover:text-white [overflow-wrap:anywhere]"
+                          >
+                            {link.label}
+                          </a>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 no-underline transition hover:text-white [overflow-wrap:anywhere]"
+                          >
+                            {link.label}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </nav>
           </div>
 
           <div className="border-t border-white/10 py-5">

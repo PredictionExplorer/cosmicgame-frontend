@@ -91,7 +91,7 @@ const PanelFeaturedRow: FC<{ item: NavDescriptor }> = ({ item }) => {
   const card = (
     <>
       <span
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-signature-gradient text-white shadow-[0_10px_28px_-14px_rgb(var(--aurora-cyan-rgb)/0.8)]"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
         aria-hidden
       >
         {Icon ? <Icon className="h-4 w-4" /> : null}

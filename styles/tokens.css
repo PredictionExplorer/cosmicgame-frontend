@@ -38,11 +38,7 @@
     oklch(77.1% 0.163 161) 0%,
     oklch(84.7% 0.149 213) 100%
   );
-  --gradient-signature: linear-gradient(
-    135deg,
-    oklch(84.7% 0.149 213) 0%,
-    oklch(50.4% 0.247 296) 100%
-  );
+  --gradient-signature: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
 
   /*
    * Motion tokens — surfaced as Tailwind utilities:
@@ -98,8 +94,8 @@
   /* Focus ring — two-layer ring: background offset then aurora glow */
   --focus-ring-offset: 2px;
   --focus-ring-width: 2px;
-  --focus-ring-color: rgb(var(--aurora-cyan-rgb) / 0.75);
-  --focus-ring-glow: rgb(var(--aurora-cyan-rgb) / 0.35);
+  --focus-ring-color: hsl(var(--ring) / 0.8);
+  --focus-ring-glow: hsl(var(--ring) / 0.2);
 }
 
 @layer utilities {

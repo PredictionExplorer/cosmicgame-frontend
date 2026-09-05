@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -67,7 +68,7 @@ function getLiveCstPreviewRefreshMs(): number {
   return CST_REWARD_PREVIEW_REFRESH_MS;
 }
 
-const Contracts = () => {
+const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('contracts');
   const { data, isLoading: loading } = useDashboardInfo();
   const { charity, cosmicGame } = useContractAddresses();
@@ -250,19 +251,25 @@ const Contracts = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader
-        eyebrow={
-          <SectionEyebrow tone="aurora" pulse>
-            {t('page.eyebrow')}
-          </SectionEyebrow>
-        }
-        title={t('page.title')}
-        titleLevel={2}
-        gradientTitle="aurora"
-        subtitle={t('page.subtitle')}
-      >
-        <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
-      </PageHeader>
+      {seoSummary}
+      {seoSummary ? (
+        <div className="mb-8">
+          <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
+        </div>
+      ) : (
+        <PageHeader
+          eyebrow={
+            <SectionEyebrow tone="aurora" pulse>
+              {t('page.eyebrow')}
+            </SectionEyebrow>
+          }
+          title={t('page.title')}
+          titleLevel={2}
+          subtitle={t('page.subtitle')}
+        >
+          <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
+        </PageHeader>
+      )}
 
       <div className="space-y-10">
         <motion.section

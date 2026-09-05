@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -7,7 +8,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { useSystemModelist, useSystemEvents } from '@/hooks/useApiQuery';
 import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
 
-function ChangedParameters() {
+function ChangedParameters({ seoSummary }: { seoSummary?: ReactNode }) {
   const t = useTranslations('coordination');
   const { data: modeList, isLoading: isLoadingModeList } = useSystemModelist();
   const startId = modeList != null ? ((modeList as { EvtLogId: number }[])[0]?.EvtLogId ?? 0) : -1;
@@ -16,7 +17,10 @@ function ChangedParameters() {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
+      {seoSummary}
+      {!seoSummary && (
+        <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
+      )}
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('page.description')}
       </p>

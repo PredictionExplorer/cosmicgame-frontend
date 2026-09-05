@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatEther, parseEther } from 'viem';
@@ -21,7 +22,7 @@ import { asWriteFn } from '@/utils/contractWrite';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 
-const Imprint = () => {
+const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('imprint');
   const toastT = useTranslations('toasts');
   const locale = useLocale();
@@ -104,7 +105,10 @@ const Imprint = () => {
 
   return (
     <PageShell variant="form">
-      <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
+      {seoSummary}
+      {!seoSummary && (
+        <PageHeader title={t('page.title')} titleLevel={2} subtitle={t('page.subtitle')} />
+      )}
 
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         {t('page.description')}

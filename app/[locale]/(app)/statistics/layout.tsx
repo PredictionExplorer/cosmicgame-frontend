@@ -8,10 +8,8 @@ import { StatisticsSubNav } from './StatisticsSubNav';
 /**
  * Shared shell for the statistics hub and its section pages.
  *
- * `overflow-visible overflow-x-clip` replaces PageShell's default
- * `overflow-hidden`: horizontal clipping still contains the decorative
- * backdrop glows, but without creating a scroll container, so the sticky
- * sub-navigation actually sticks.
+ * Clip horizontal overflow without creating a vertical scroll container,
+ * so the section navigation can remain sticky within the document.
  */
 export default function StatisticsLayout({ children }: { children: ReactNode }) {
   return (

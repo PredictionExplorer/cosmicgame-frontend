@@ -33,12 +33,11 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['allocation']}>
-      <>
-        <PublicDataRouteSeoSummary route="allocation-finalized" />
-        <Suspense>
-          <AllocationFinalizedPage />
-        </Suspense>
-      </>
+      <Suspense>
+        <AllocationFinalizedPage
+          seoSummary={<PublicDataRouteSeoSummary route="allocation-finalized" />}
+        />
+      </Suspense>
     </PageMessages>
   );
 }

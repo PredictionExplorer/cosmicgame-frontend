@@ -70,11 +70,11 @@ describe('useMotionVariants', () => {
     expect(result.current).toBe(fadeRise);
   });
 
-  it('returns an opacity-only fallback under prefers-reduced-motion', () => {
+  it('keeps content visible before viewport reveals under prefers-reduced-motion', () => {
     mockMatchMedia(true);
     const { result } = renderHook(() => useMotionVariants(fadeRise));
     expect(result.current).not.toBe(fadeRise);
-    expect(result.current.initial).toEqual({ opacity: 0 });
+    expect(result.current.initial).toEqual({ opacity: 1 });
     expect(result.current.animate).toEqual(
       expect.objectContaining({ opacity: 1, transition: { duration: 0 } }),
     );

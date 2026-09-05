@@ -849,7 +849,7 @@ export function GesturePanel({
                       id={variant === 'card' ? 'gesture-submit' : 'gesture-submit-sheet'}
                       size="lg"
                       onClick={onSubmit}
-                      className="h-auto min-h-12 w-full whitespace-normal border-0 bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] px-3 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                      className="h-auto min-h-12 w-full whitespace-normal border-0 bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
                       disabled={submitDisabled}
                     >
                       {isGesturing ? (

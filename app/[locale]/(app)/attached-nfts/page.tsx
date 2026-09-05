@@ -31,10 +31,7 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   return (
     <PageMessages namespaces={['detail', 'statistics', 'tables']}>
-      <>
-        <PublicDataRouteSeoSummary route="attached-nfts" />
-        <NFTDonationsPage />
-      </>
+      <NFTDonationsPage seoSummary={<PublicDataRouteSeoSummary route="attached-nfts" />} />
     </PageMessages>
   );
 }

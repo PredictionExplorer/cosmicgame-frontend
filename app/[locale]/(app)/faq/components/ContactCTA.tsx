@@ -28,10 +28,10 @@ export function ContactCTA() {
     <motion.section
       aria-labelledby="contact-heading"
       variants={fadeUp}
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, margin: '-60px' }}
-      className="pt-8 pb-4"
+      className="pt-8"
     >
       <div className="gradient-border-card relative overflow-hidden rounded-2xl bg-white/[0.02] p-8 sm:p-10">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent" />

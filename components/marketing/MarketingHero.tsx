@@ -6,41 +6,31 @@ import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 
-export function MarketingHero() {
+export function MarketingHero({ compact = false }: { compact?: boolean }) {
   const t = useTranslations('marketing');
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 30 }}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
-      className="relative overflow-hidden rounded-2xl px-6 py-20 text-center sm:px-12 sm:py-28"
+      className={compact ? 'mb-8' : 'relative mb-10 border-b border-border pb-12 sm:pb-16'}
     >
-      <div
-        aria-hidden
-        className="animate-gradient-shift pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-primary/20 via-accent/10 to-primary/20 bg-[length:200%_200%]"
-      />
+      {!compact && (
+        <>
+          <h2 className="max-w-4xl type-display-lg text-foreground">
+            {t.rich('hero.title', {
+              highlight: (chunks) => <span className="text-primary">{chunks}</span>,
+            })}
+          </h2>
 
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 rounded-2xl border border-white/[0.06]"
-      />
+          <p className="mt-6 max-w-2xl type-body-lg text-muted-foreground">
+            {t('hero.description')}
+          </p>
+        </>
+      )}
 
-      <h2 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-        {t.rich('hero.title', {
-          highlight: (chunks) => (
-            <span className="bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent">
-              {chunks}
-            </span>
-          ),
-        })}
-      </h2>
-
-      <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-        {t('hero.description')}
-      </p>
-
-      <div className="mt-10">
+      <div className={compact ? undefined : 'mt-10'}>
         <Button asChild size="lg" className="group">
           <a href="#how-it-works">
             {t('hero.learnHow')}

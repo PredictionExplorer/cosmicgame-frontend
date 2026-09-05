@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useState, useMemo } from 'react';
 import { zeroAddress } from 'viem';
 import {
@@ -60,7 +61,7 @@ const sectionFade = {
   }),
 };
 
-const CurrentRoundPage = () => {
+const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('currentCycle');
   const locale = useLocale();
   const { data: dashboardData, isLoading, isError } = useDashboardInfo();
@@ -116,7 +117,8 @@ const CurrentRoundPage = () => {
   if (isLoading) {
     return (
       <PageShell variant="data" backdrop="signature">
-        <div className="flex items-center justify-center py-32">
+        {seoSummary}
+        <div className="flex items-center justify-center py-16">
           <Spinner size="lg" />
         </div>
       </PageShell>
@@ -126,6 +128,7 @@ const CurrentRoundPage = () => {
   if (isError || !data) {
     return (
       <PageShell variant="data" backdrop="signature">
+        {seoSummary}
         <ErrorState
           title={t('error.title')}
           message={t('error.message')}
@@ -166,6 +169,7 @@ const CurrentRoundPage = () => {
 
   return (
     <PageShell variant="data" backdrop="signature">
+      {seoSummary}
       {/* Back navigation */}
       <Link
         href="/"
@@ -180,15 +184,7 @@ const CurrentRoundPage = () => {
 
       {/* ===== HERO SECTION ===== */}
       {/* No gradient-border-card (mask pseudo): Chrome/Skia PDF often drops nested content in that compositing path. */}
-      <div className="relative mb-8 flex flex-col gap-6 overflow-hidden rounded-2xl border border-white/[0.1] bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.11),rgb(var(--nebula-violet-rgb)/0.08)_46%,transparent)] p-6 shadow-[0_24px_100px_-72px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm print:overflow-visible sm:p-8">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full opacity-40 blur-3xl"
-          style={{
-            background:
-              'radial-gradient(circle, rgb(var(--aurora-cyan-rgb) / 0.22), rgb(var(--nebula-violet-rgb) / 0.18) 48%, transparent 70%)',
-          }}
-        />
+      <div className="relative mb-10 flex flex-col gap-8 overflow-hidden rounded-2xl border border-border bg-card p-5 print:overflow-visible sm:p-8">
         {/* Header row: LIVE badge + round info */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -197,9 +193,7 @@ const CurrentRoundPage = () => {
               <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-live-dot" />
             </div>
             <div>
-              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                {t('hero.title', { n: data.CurRoundNum })}
-              </h2>
+              <h2 className="type-display-sm">{t('hero.title', { n: data.CurRoundNum })}</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {t('hero.subtitle', { date: roundStarted, count: data.CurNumBids })}
               </p>
@@ -262,7 +256,7 @@ const CurrentRoundPage = () => {
         )}
 
         {!isPreActivation && hasStarted && isGesturesExhausted && (
-          <div className="text-center rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
+          <div className="text-center rounded-xl bg-primary/[0.06] p-5">
             <Zap className="mx-auto h-7 w-7 text-primary mb-2" />
             <p className="font-display text-lg font-bold text-primary">
               {t('hero.countdown.readyTitle')}
@@ -283,11 +277,7 @@ const CurrentRoundPage = () => {
 
         {/* CTA Button */}
         <div className="flex justify-center">
-          <Button
-            asChild
-            size="lg"
-            className="bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold"
-          >
+          <Button asChild size="lg" className="font-semibold">
             <Link href="/">
               {primaryCtaLabel} <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

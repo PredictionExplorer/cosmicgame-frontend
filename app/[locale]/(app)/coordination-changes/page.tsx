@@ -32,10 +32,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageMessages namespaces={['coordination', 'statistics', 'tables']}>
-      <>
-        <PublicDataRouteSeoSummary route="coordination-changes" />
-        <ChangedParameters />
-      </>
+      <ChangedParameters seoSummary={<PublicDataRouteSeoSummary route="coordination-changes" />} />
     </PageMessages>
   );
 }
