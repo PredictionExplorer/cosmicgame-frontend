@@ -24,11 +24,11 @@ export const landingTextUk = {
 
   hero: {
     eyebrow: 'Процедурний протокол ончейн-мистецтва · Arbitrum',
-    headline: 'Cosmic Signature: процедурне ончейн-мистецтво на Arbitrum',
-    headlineLead: 'Cosmic Signature: процедурне ончейн-мистецтво на',
-    headlineAccent: 'Arbitrum',
+    headline: 'Мистецтво, яке творить кожен жест.',
+    headlineLead: 'Мистецтво, яке творить',
+    headlineAccent: 'кожен жест.',
     subhead:
-      'Кожен жест у перформанс-циклі залишає слід у фінальній Сигнатурі. Після завершення циклу протокол розподіляє резерв за понад десятьма напрямами, зокрема на підтримку інфраструктури Ethereum.',
+      'Долучайтеся до живого мистецького протоколу на Arbitrum. Кожен жест формує наступну Сигнатуру, а кожен цикл розподіляє резерви між учасниками та публічною інфраструктурою Ethereum.',
     biologyDisclaimer:
       'Cosmic Signature не має стосунку до бази даних онкологічних мутацій COSMIC чи мутаційних сигнатур COSMIC у біології. Це протокол ончейн-мистецтва та застосунок.',
     primaryCtaLabel: 'Відкрити застосунок',
@@ -46,7 +46,7 @@ export const landingTextUk = {
       'Arbitrum One',
     ],
     art: {
-      eyebrow: 'Наживо з колекції',
+      eyebrow: 'З колекції',
       caption: 'Закарбовано ончейн · CC0',
       cstNote: `До кожної закарбованої Сигнатури додається ${protocolFacts.specialAllocationCst.toLocaleString('uk-UA')} CST.`,
       formingLabel: 'Сигнал формується',
@@ -93,7 +93,7 @@ export const landingTextUk = {
       description: 'Твори з’являться тут після оновлення метаданих NFT.',
     },
     showcase: {
-      liveLabel: 'Сигнатура наживо',
+      collectionLabel: 'З колекції',
       signalLabel: 'Сигнал',
       awaitingMetadataLabel: 'Очікування метаданих',
       viewAriaLabel: 'Переглянути Cosmic Signature {tokenLabel}',

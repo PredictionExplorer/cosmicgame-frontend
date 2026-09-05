@@ -820,6 +820,9 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   #tsparticles {
     display: none !important;
   }

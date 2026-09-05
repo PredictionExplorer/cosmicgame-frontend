@@ -24,11 +24,11 @@ export const landingTextEn = {
 
   hero: {
     eyebrow: 'Procedural on-chain art protocol · Arbitrum',
-    headline: 'Cosmic Signature: Procedural On-Chain Art on Arbitrum',
-    headlineLead: 'Cosmic Signature: Procedural On-Chain Art on',
-    headlineAccent: 'Arbitrum',
+    headline: 'Art, shaped by every gesture.',
+    headlineLead: 'Art, shaped by',
+    headlineAccent: 'every gesture.',
     subhead:
-      'Every gesture helps shape the cycle’s final Signature. Take part during a Performance Cycle; when it finalizes, the protocol distributes its reserves across more than ten allocation tracks, including support for the infrastructure Ethereum depends on.',
+      'Take part in a living art protocol on Arbitrum. Every gesture helps shape the next Signature; every cycle distributes its reserves among participants and Ethereum’s public infrastructure.',
     biologyDisclaimer:
       'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
     primaryCtaLabel: 'Open the App',
@@ -46,7 +46,7 @@ export const landingTextEn = {
       'Arbitrum One',
     ],
     art: {
-      eyebrow: 'Live from the collection',
+      eyebrow: 'From the collection',
       caption: 'Imprinted on-chain · CC0',
       cstNote: `Every imprinted Signature is paired with ${protocolFacts.specialAllocationCst.toLocaleString('en-US')} CST.`,
       formingLabel: 'Signal forming',
@@ -92,7 +92,7 @@ export const landingTextEn = {
       description: 'Artwork appears here as soon as the collection data is available.',
     },
     showcase: {
-      liveLabel: 'Live Signature',
+      collectionLabel: 'From the collection',
       signalLabel: 'Signal',
       awaitingMetadataLabel: 'Awaiting metadata',
       viewAriaLabel: 'View Cosmic Signature {tokenLabel}',

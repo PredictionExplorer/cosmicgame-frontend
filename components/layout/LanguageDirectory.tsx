@@ -75,7 +75,7 @@ export function LanguageDirectory({ className }: LanguageDirectoryProps) {
       aria-label={label}
       data-testid="language-directory"
       className={cn(
-        'flex flex-col gap-3 text-xs sm:flex-row sm:items-baseline sm:gap-6',
+        'flex min-w-0 flex-col gap-2 text-xs lg:flex-row lg:items-baseline lg:gap-6',
         className,
       )}
     >
@@ -83,7 +83,7 @@ export function LanguageDirectory({ className }: LanguageDirectoryProps) {
         <Globe className="h-3.5 w-3.5" aria-hidden />
         {label}
       </p>
-      <ul className="flex flex-wrap gap-x-5 gap-y-1">
+      <ul className="flex min-w-0 flex-wrap gap-x-5 gap-y-1">
         {routing.locales.map((option) => {
           const current = option === locale;
           return (
@@ -97,7 +97,7 @@ export function LanguageDirectory({ className }: LanguageDirectoryProps) {
                 onClick={(event) => onClick(event, option)}
                 onAuxClick={(event) => onAuxClick(event, option)}
                 className={cn(
-                  'inline-flex min-h-8 items-center text-sm no-underline transition-colors sm:min-h-6',
+                  'inline-flex min-h-11 min-w-11 items-center text-sm no-underline transition-colors',
                   current
                     ? 'font-medium text-white underline decoration-sky-400/60 decoration-1 underline-offset-4'
                     : 'text-white/60 hover:text-white',

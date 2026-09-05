@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { getLandingContent } from '../content/landing';
+
 import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES } from './locale-fixtures';
 
 const APP_HOST = 'app.cosmicsignature.com';
@@ -17,7 +19,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/',
     host: LANDING_HOST,
-    h1: 'Cosmic Signature:',
+    h1: getLandingContent('en').hero.headlineLead,
     jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
   },
   { path: '/about', host: LANDING_HOST, h1: 'About Cosmic Signature', jsonLd: ['AboutPage'] },
@@ -31,7 +33,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/zh',
     host: LANDING_HOST,
-    h1: 'Cosmic Signature：程序化链上艺术',
+    h1: getLandingContent('zh').hero.headlineLead,
     jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
   },
   {
@@ -55,7 +57,7 @@ const publicPages: PublicPage[] = [
   {
     path: '/uk',
     host: LANDING_HOST,
-    h1: 'Cosmic Signature: процедурне ончейн-мистецтво',
+    h1: getLandingContent('uk').hero.headlineLead,
     jsonLd: ['Organization', 'WebSite', 'CreativeWork'],
   },
   {

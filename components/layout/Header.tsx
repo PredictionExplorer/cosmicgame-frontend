@@ -35,7 +35,7 @@ import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { HEADER_POLL_INTERVAL_MS } from '@/config/constants';
 import { formatFixed } from '@/utils/format';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 
 interface Balance {
@@ -138,7 +138,7 @@ const Header: FC = () => {
   const locale = useLocale() as AppLocale;
   const pathname = usePathname();
   const experimentalUi = pathname === '/experimental-ui';
-  const [mobileView, setMobileView] = useState<boolean>(false);
+  const [mobileView, setMobileView] = useState<boolean>(true);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
   const { apiData: status } = useApiData();
@@ -185,7 +185,9 @@ const Header: FC = () => {
 
   useEffect(() => {
     const handleWindowResize = () => {
-      setMobileView(window.innerWidth < 1024);
+      const isMobile = window.innerWidth < 1280;
+      setMobileView(isMobile);
+      if (!isMobile) setDrawerOpen(false);
     };
 
     handleWindowResize();
@@ -201,7 +203,6 @@ const Header: FC = () => {
   const standaloneNavs = navs.filter((nav) => !nav.children);
   const groupedNavs = navs.filter((nav) => nav.children);
 
-  const handleDrawerOpen = () => setDrawerOpen(true);
   const closeDrawer = () => setDrawerOpen(false);
 
   const hasUnclaimedRewards = !!(
@@ -212,120 +213,75 @@ const Header: FC = () => {
         (status?.claimableActionIds?.length ?? 0) > 0))
   );
 
-  const brand = (
-    <Link
-      href="/"
-      aria-label={t('brand.homeLabel')}
-      className="group flex shrink-0 items-center gap-3 rounded-full no-underline"
-    >
-      <span className="relative flex h-10 w-10 items-center justify-center">
-        <span
-          aria-hidden
-          className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgb(var(--aurora-cyan-rgb)/0.35),transparent_70%)] opacity-0 blur-md transition-opacity duration-[var(--duration-base)] group-hover:opacity-100"
-        />
-        <Image
-          src="/images/logo2.svg"
-          width={48}
-          height={48}
-          alt="Cosmic Signature"
-          loading="eager"
-          className="relative h-10 w-auto max-h-10 object-contain"
-        />
-      </span>
-      <span className="hidden flex-col justify-center leading-none xl:flex">
-        <span className="font-display text-[15px] font-semibold tracking-[0.02em] text-white">
-          Cosmic Signature
-        </span>
-        <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
-          {t('brand.tagline')}
-        </span>
-      </span>
-    </Link>
-  );
-
-  const renderDesktop = () => (
-    <nav aria-label={t('primaryLabel')} className="flex items-center gap-4 xl:gap-6">
-      {brand}
-
-      <div
-        className={cn(
-          'flex items-center gap-0.5 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md',
-          experimentalUi && 'liquid-glass-control liquid-glass-static',
-        )}
-      >
-        {navs.map((nav, i) => (
-          <ListNavItem key={i} nav={nav} />
-        ))}
-      </div>
-
-      <div className="ml-auto flex items-center gap-3">
-        <EcosystemDock
-          className={experimentalUi ? 'liquid-glass-control liquid-glass-static' : undefined}
-        />
-        <LanguageSwitcher className={experimentalUi ? 'liquid-glass-control' : undefined} />
-        <ConnectWalletButton
-          isMobileView={false}
-          loading={loading}
-          balance={balance}
-          stakedTokenCount={{
-            cst: anchoredCSTokens?.length,
-            rwalk: anchoredRWLKTokens?.length,
-          }}
-          hasUnclaimedRewards={hasUnclaimedRewards}
-          liquid={experimentalUi}
-        />
-      </div>
-    </nav>
-  );
-
-  const renderMobile = () => {
-    return (
-      <nav className="flex items-center gap-2.5">
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t('menuLabel')}
-          aria-haspopup="true"
-          onClick={handleDrawerOpen}
-          className="h-11 w-11 shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03] sm:h-10 sm:w-10"
-        >
-          {hasUnclaimedRewards ? (
+  // CSS owns navigation visibility so the first server-rendered frame fits
+  // every viewport. The viewport state only selects the wallet presentation.
+  const navigation = (
+    <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+      <nav aria-label={t('primaryLabel')} className="flex min-w-0 items-center gap-2 sm:gap-3">
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t('menuLabel')}
+            className="h-11 w-11 shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03] xl:hidden"
+          >
             <span className="relative inline-flex">
-              <Menu className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              <Menu className="h-5 w-5" aria-hidden />
+              {hasUnclaimedRewards ? (
+                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              ) : null}
             </span>
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
-        </Button>
+          </Button>
+        </SheetTrigger>
 
         <Link
           href="/"
           aria-label={t('brand.homeLabel')}
-          className="flex items-center gap-2.5 no-underline"
+          className="group flex min-h-11 min-w-11 shrink-0 items-center gap-3 rounded-full no-underline"
         >
           <Image
             src="/images/logo2.svg"
             width={48}
             height={48}
-            alt=""
-            aria-hidden
+            alt="Cosmic Signature"
             loading="eager"
-            className="h-9 w-auto max-h-9 object-contain"
+            className="h-9 w-9 object-contain xl:h-10 xl:w-10"
           />
-          <span className="hidden font-display text-sm font-semibold tracking-[0.02em] text-white min-[480px]:inline">
-            Cosmic Signature
+          <span className="hidden flex-col justify-center leading-none sm:flex xl:hidden 2xl:flex">
+            <span className="font-display text-sm font-semibold tracking-[0.02em] text-white">
+              Cosmic Signature
+            </span>
+            <span className="mt-1 hidden font-mono text-[9px] uppercase tracking-[0.3em] text-white/55 2xl:block">
+              {t('brand.tagline')}
+            </span>
           </span>
         </Link>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div
+          className={cn(
+            'hidden shrink-0 items-center gap-0.5 rounded-full border border-white/[0.07] bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] backdrop-blur-md xl:flex',
+            experimentalUi && 'liquid-glass-control liquid-glass-static',
+          )}
+        >
+          {navs.map((nav, i) => (
+            <ListNavItem key={i} nav={nav} />
+          ))}
+        </div>
+
+        <div className="ml-auto flex min-w-0 items-center gap-2 xl:gap-3">
+          <EcosystemDock
+            className={cn(
+              'hidden xl:flex',
+              experimentalUi && 'liquid-glass-control liquid-glass-static',
+            )}
+          />
           <LanguageSwitcher
-            variant="compact"
+            variant={mobileView ? 'compact' : 'pill'}
             className={experimentalUi ? 'liquid-glass-control' : undefined}
           />
-          <div className="max-w-[12rem] overflow-hidden">
+          <div className="min-w-0 max-w-48">
             <ConnectWalletButton
-              isMobileView
+              isMobileView={mobileView}
               balance={balance}
               loading={loading}
               stakedTokenCount={{
@@ -334,240 +290,227 @@ const Header: FC = () => {
               }}
               hasUnclaimedRewards={hasUnclaimedRewards}
               liquid={experimentalUi}
+              className="max-w-full whitespace-normal text-center leading-tight"
             />
           </div>
         </div>
+      </nav>
+      <SheetContent
+        side="left"
+        aria-describedby={undefined}
+        className="w-[min(360px,100vw)] max-w-full border-r border-white/[0.08] p-0 sm:max-w-[360px]"
+      >
+        <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
+        <DrawerList className="overscroll-contain pb-[env(safe-area-inset-bottom)]">
+          {/* Brand */}
+          <div className="flex items-center gap-2.5 border-b border-white/[0.06] pl-5 pr-16 pb-3.5 pt-2">
+            <Image
+              src="/images/logo2.svg"
+              width={32}
+              height={32}
+              alt=""
+              aria-hidden
+              className="h-8 w-auto object-contain"
+            />
+            <span className="flex flex-col leading-none">
+              <span className="font-display text-sm font-semibold tracking-[0.02em] text-white">
+                Cosmic Signature
+              </span>
+              <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.3em] text-white/40">
+                {t('brand.tagline')}
+              </span>
+            </span>
+          </div>
 
-        <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <SheetContent
-            side="left"
-            className="w-[320px] border-r border-white/[0.08] p-0 sm:max-w-[320px]"
-          >
-            <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
-            <DrawerList>
-              {/* Brand */}
-              <div className="flex items-center gap-2.5 border-b border-white/[0.06] px-5 pb-3.5 pt-2">
-                <Image
-                  src="/images/logo2.svg"
-                  width={32}
-                  height={32}
-                  alt=""
-                  aria-hidden
-                  className="h-8 w-auto object-contain"
-                />
-                <span className="flex flex-col leading-none">
-                  <span className="font-display text-sm font-semibold tracking-[0.02em] text-white">
-                    Cosmic Signature
-                  </span>
-                  <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.3em] text-white/40">
-                    {t('brand.tagline')}
+          <div className="px-5 py-4">
+            <ConnectWalletButton
+              isMobileView
+              balance={balance}
+              loading={loading}
+              stakedTokenCount={{
+                cst: anchoredCSTokens?.length,
+                rwalk: anchoredRWLKTokens?.length,
+              }}
+              liquid={experimentalUi}
+            />
+          </div>
+
+          <Separator className="bg-white/[0.06]" />
+
+          {/* Protocol: standalone destinations (Gallery, plus contextual items) */}
+          <DrawerHeading>{t('sections.protocol')}</DrawerHeading>
+          {standaloneNavs.map((nav, i) => (
+            <DrawerNavRow key={i} item={nav} onNavigate={closeDrawer} />
+          ))}
+
+          {/* Grouped destinations (Explore, Help) */}
+          {groupedNavs.map((group, i) => (
+            <div key={i}>
+              <Separator className="my-2 bg-white/[0.06]" />
+              <DrawerHeading>{group.title}</DrawerHeading>
+              {group.children
+                ?.filter((child) => !child.featured)
+                .map((child, j) => (
+                  <DrawerNavRow key={j} item={child} onNavigate={closeDrawer} />
+                ))}
+              {group.children
+                ?.filter((child) => child.featured)
+                .map((child, j) => (
+                  <DrawerFeaturedCard key={`featured-${j}`} item={child} />
+                ))}
+            </div>
+          ))}
+
+          <Separator className="my-2 bg-white/[0.06]" />
+
+          {/* Ecosystem: Uniswap, Axiom Zero, Chaos Zero */}
+          <DrawerHeading>{t('sections.ecosystem')}</DrawerHeading>
+          {ecosystemDestinations.map((destination) => {
+            const Icon = destination.icon;
+            return (
+              <a
+                key={destination.id}
+                href={destination.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={destination.ariaLabel}
+                className="flex items-center gap-3 px-5 py-2.5 no-underline transition-colors duration-[var(--duration-fast)] hover:bg-white/[0.04]"
+              >
+                <DrawerIconTile icon={Icon} />
+                <span className="flex min-w-0 flex-col">
+                  <span className="text-sm leading-tight text-white/85">{destination.name}</span>
+                  <span className="mt-0.5 text-xs leading-tight text-white/45">
+                    {destination.product}
                   </span>
                 </span>
-              </div>
+                <ArrowUpRight className="ml-auto h-3.5 w-3.5 shrink-0 text-white/30" aria-hidden />
+              </a>
+            );
+          })}
 
-              <div className="px-5 py-4">
-                <ConnectWalletButton
-                  isMobileView
-                  balance={balance}
-                  loading={loading}
-                  stakedTokenCount={{
-                    cst: anchoredCSTokens?.length,
-                    rwalk: anchoredRWLKTokens?.length,
-                  }}
-                  liquid={experimentalUi}
-                />
-              </div>
+          {account && (
+            <>
+              <Separator className="my-2 bg-white/[0.06]" />
 
-              <div className="px-5 pb-4">
-                <LanguageSwitcher variant="list" />
-              </div>
-
-              <Separator className="bg-white/[0.06]" />
-
-              {/* Protocol: standalone destinations (Gallery, plus contextual items) */}
-              <DrawerHeading>{t('sections.protocol')}</DrawerHeading>
-              {standaloneNavs.map((nav, i) => (
-                <DrawerNavRow key={i} item={nav} onNavigate={closeDrawer} />
-              ))}
-
-              {/* Grouped destinations (Explore, Help) */}
-              {groupedNavs.map((group, i) => (
-                <div key={i}>
-                  <Separator className="my-2 bg-white/[0.06]" />
-                  <DrawerHeading>{group.title}</DrawerHeading>
-                  {group.children
-                    ?.filter((child) => !child.featured)
-                    .map((child, j) => (
-                      <DrawerNavRow key={j} item={child} onNavigate={closeDrawer} />
-                    ))}
-                  {group.children
-                    ?.filter((child) => child.featured)
-                    .map((child, j) => (
-                      <DrawerFeaturedCard key={`featured-${j}`} item={child} />
-                    ))}
-                </div>
-              ))}
+              {/* My Account */}
+              <DrawerHeading>{t('sections.myAccount')}</DrawerHeading>
+              <DrawerNavRow
+                item={{
+                  title: t('links.myDashboard'),
+                  route: '/my-statistics',
+                  icon: LayoutDashboard,
+                }}
+                onNavigate={closeDrawer}
+              />
+              <DrawerNavRow
+                item={{
+                  title: hasUnclaimedRewards ? (
+                    <span className="flex items-center gap-2">
+                      {t('links.myAllocations')}
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                    </span>
+                  ) : (
+                    t('links.myAllocations')
+                  ),
+                  route: '/my-allocations',
+                  icon: Gift,
+                }}
+                onNavigate={closeDrawer}
+              />
+              <DrawerNavRow
+                item={{ title: t('links.myNfts'), route: '/my-tokens', icon: Coins }}
+                onNavigate={closeDrawer}
+              />
+              <DrawerNavRow
+                item={{ title: t('links.myAnchors'), route: '/my-anchors', icon: Layers }}
+                onNavigate={closeDrawer}
+              />
+              <DrawerNavRow
+                item={{
+                  title: t('links.recipientHistory'),
+                  route: '/recipient-history',
+                  icon: History,
+                }}
+                onNavigate={closeDrawer}
+              />
 
               <Separator className="my-2 bg-white/[0.06]" />
 
-              {/* Ecosystem: Uniswap, Axiom Zero, Chaos Zero */}
-              <DrawerHeading>{t('sections.ecosystem')}</DrawerHeading>
-              {ecosystemDestinations.map((destination) => {
-                const Icon = destination.icon;
-                return (
-                  <a
-                    key={destination.id}
-                    href={destination.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={destination.ariaLabel}
-                    className="flex items-center gap-3 px-5 py-2.5 no-underline transition-colors duration-[var(--duration-fast)] hover:bg-white/[0.04]"
-                  >
-                    <DrawerIconTile icon={Icon} />
-                    <span className="flex min-w-0 flex-col">
-                      <span className="text-sm leading-tight text-white/85">
-                        {destination.name}
-                      </span>
-                      <span className="mt-0.5 text-xs leading-tight text-white/45">
-                        {destination.product}
-                      </span>
-                    </span>
-                    <ArrowUpRight
-                      className="ml-auto h-3.5 w-3.5 shrink-0 text-white/30"
-                      aria-hidden
-                    />
-                  </a>
-                );
-              })}
-
-              {account && (
-                <>
-                  <Separator className="my-2 bg-white/[0.06]" />
-
-                  {/* My Account */}
-                  <DrawerHeading>{t('sections.myAccount')}</DrawerHeading>
-                  <DrawerNavRow
-                    item={{
-                      title: t('links.myDashboard'),
-                      route: '/my-statistics',
-                      icon: LayoutDashboard,
-                    }}
-                    onNavigate={closeDrawer}
-                  />
-                  <DrawerNavRow
-                    item={{
-                      title: hasUnclaimedRewards ? (
-                        <span className="flex items-center gap-2">
-                          {t('links.myAllocations')}
-                          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                        </span>
-                      ) : (
-                        t('links.myAllocations')
-                      ),
-                      route: '/my-allocations',
-                      icon: Gift,
-                    }}
-                    onNavigate={closeDrawer}
-                  />
-                  <DrawerNavRow
-                    item={{ title: t('links.myNfts'), route: '/my-tokens', icon: Coins }}
-                    onNavigate={closeDrawer}
-                  />
-                  <DrawerNavRow
-                    item={{ title: t('links.myAnchors'), route: '/my-anchors', icon: Layers }}
-                    onNavigate={closeDrawer}
-                  />
-                  <DrawerNavRow
-                    item={{
-                      title: t('links.recipientHistory'),
-                      route: '/recipient-history',
-                      icon: History,
-                    }}
-                    onNavigate={closeDrawer}
-                  />
-
-                  <Separator className="my-2 bg-white/[0.06]" />
-
-                  {/* Balances */}
-                  <div className="space-y-1.5 px-5 py-2">
-                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
-                      {walletT('labels.balancesHeading')}
-                    </p>
-                    {loading ? (
-                      <p className="text-xs text-primary">{walletT('labels.loading')}</p>
-                    ) : (
-                      <>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">{walletT('balances.eth')}</span>
-                          <span className="font-medium">{formatFixed(balance.ETH, 4)}</span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">{walletT('balances.cst')}</span>
-                          <span className="font-medium">{formatFixed(balance.CosmicToken, 2)}</span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">
-                            {walletT('balances.cosmicNfts')}
-                          </span>
-                          <span className="font-medium">
-                            {walletT('labels.nftCount', {
-                              count: balance.CosmicSignature,
-                            })}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">
-                            {walletT('balances.rwlkNfts')}
-                          </span>
-                          <span className="font-medium">
-                            {walletT('labels.nftCount', { count: balance.RWLK })}
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  <AddCstToMetaMaskButton variant="drawer" />
-
-                  <div className="space-y-1.5 px-5 py-2">
-                    <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
-                      {walletT('labels.anchoredHeading')}
-                    </p>
+              {/* Balances */}
+              <div className="space-y-1.5 px-5 py-2">
+                <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
+                  {walletT('labels.balancesHeading')}
+                </p>
+                {loading ? (
+                  <p className="text-xs text-primary">{walletT('labels.loading')}</p>
+                ) : (
+                  <>
                     <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">
-                        {walletT('balances.anchoredCst')}
-                      </span>
-                      <span className="font-medium text-primary">
-                        {anchoredCSTokens == null
-                          ? null
-                          : walletT('labels.nftCount', {
-                              count: anchoredCSTokens.length,
-                            })}
-                      </span>
+                      <span className="text-muted-foreground">{walletT('balances.eth')}</span>
+                      <span className="font-medium">{formatFixed(balance.ETH, 4)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">{walletT('balances.cst')}</span>
+                      <span className="font-medium">{formatFixed(balance.CosmicToken, 2)}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">
-                        {walletT('balances.anchoredRwlk')}
+                        {walletT('balances.cosmicNfts')}
                       </span>
-                      <span className="font-medium text-primary">
-                        {anchoredRWLKTokens == null
-                          ? null
-                          : walletT('labels.nftCount', {
-                              count: anchoredRWLKTokens.length,
-                            })}
+                      <span className="font-medium">
+                        {walletT('labels.nftCount', {
+                          count: balance.CosmicSignature,
+                        })}
                       </span>
                     </div>
-                  </div>
-                </>
-              )}
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">{walletT('balances.rwlkNfts')}</span>
+                      <span className="font-medium">
+                        {walletT('labels.nftCount', { count: balance.RWLK })}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
 
-              <div className="pb-6" />
-            </DrawerList>
-          </SheetContent>
-        </Sheet>
-      </nav>
-    );
-  };
+              <AddCstToMetaMaskButton variant="drawer" />
+
+              <div className="space-y-1.5 px-5 py-2">
+                <p className="font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-white/40">
+                  {walletT('labels.anchoredHeading')}
+                </p>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{walletT('balances.anchoredCst')}</span>
+                  <span className="font-medium text-primary">
+                    {anchoredCSTokens == null
+                      ? null
+                      : walletT('labels.nftCount', {
+                          count: anchoredCSTokens.length,
+                        })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{walletT('balances.anchoredRwlk')}</span>
+                  <span className="font-medium text-primary">
+                    {anchoredRWLKTokens == null
+                      ? null
+                      : walletT('labels.nftCount', {
+                          count: anchoredRWLKTokens.length,
+                        })}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
+
+          <Separator className="my-4 bg-white/[0.06]" />
+          <div className="px-5 pb-6">
+            <LanguageSwitcher variant="list" />
+          </div>
+        </DrawerList>
+      </SheetContent>
+    </Sheet>
+  );
 
   return (
     <AppBarWrapper>
@@ -590,7 +533,7 @@ const Header: FC = () => {
           </div>
         )}
 
-        {mobileView ? renderMobile() : renderDesktop()}
+        {navigation}
       </div>
     </AppBarWrapper>
   );

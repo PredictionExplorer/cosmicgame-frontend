@@ -26,11 +26,11 @@ export const landingTextVi = {
 
   hero: {
     eyebrow: 'Giao thức nghệ thuật tạo sinh trên chuỗi · Arbitrum',
-    headline: 'Cosmic Signature: Nghệ thuật tạo sinh trên chuỗi Arbitrum',
-    headlineLead: 'Cosmic Signature: Nghệ thuật tạo sinh trên chuỗi',
-    headlineAccent: 'Arbitrum',
+    headline: 'Nghệ thuật từ từng nét bút.',
+    headlineLead: 'Nghệ thuật từ',
+    headlineAccent: 'từng nét bút.',
     subhead:
-      'Mỗi nét bút trong chu kỳ trình diễn đều để lại dấu ấn trên Signature cuối cùng. Khi chu kỳ hoàn tất, giao thức phân phối dự trữ qua hơn mười luồng phân bổ, trong đó có phần hỗ trợ hạ tầng Ethereum.',
+      'Tham gia giao thức nghệ thuật sống động trên Arbitrum. Mỗi nét bút góp phần tạo nên Signature tiếp theo; mỗi chu kỳ phân phối dự trữ cho người tham gia và hạ tầng công cộng của Ethereum.',
     biologyDisclaimer:
       'Cosmic Signature không liên quan đến cơ sở dữ liệu đột biến ung thư COSMIC hay các chữ ký đột biến COSMIC trong sinh học. Đây là một giao thức và ứng dụng nghệ thuật trên chuỗi.',
     primaryCtaLabel: 'Mở ứng dụng',
@@ -48,7 +48,7 @@ export const landingTextVi = {
       'Arbitrum One',
     ],
     art: {
-      eyebrow: 'Trực tiếp từ bộ sưu tập',
+      eyebrow: 'Từ bộ sưu tập',
       caption: 'Khắc trên chuỗi · CC0',
       cstNote: `Mỗi Signature được khắc đều đi cùng ${cstAmount} CST.`,
       formingLabel: 'Tín hiệu đang hình thành',
@@ -94,7 +94,7 @@ export const landingTextVi = {
       description: 'Tác phẩm sẽ xuất hiện tại đây sau khi siêu dữ liệu NFT được cập nhật.',
     },
     showcase: {
-      liveLabel: 'Signature trực tiếp',
+      collectionLabel: 'Từ bộ sưu tập',
       signalLabel: 'Tín hiệu',
       awaitingMetadataLabel: 'Đang chờ siêu dữ liệu',
       viewAriaLabel: 'Xem Cosmic Signature {tokenLabel}',

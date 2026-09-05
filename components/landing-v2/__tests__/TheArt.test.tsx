@@ -1,8 +1,9 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { landingContentEn } from '@/content/landing';
 
 import { TheArt } from '@/components/landing-v2/TheArt';
+import { FEATURED_LANDING_ART } from '@/components/landing-v2/featured-art';
 
 jest.mock('framer-motion', () => {
   const React = require('react');
@@ -54,9 +55,22 @@ describe('<TheArt />', () => {
     jest.restoreAllMocks();
   });
 
-  it('renders a real generated NFT with its token number and app detail link', async () => {
-    mockTokenFetch([{ TokenId: 42, Seed: 'abc123' }]);
+  it('shows bundled verified artwork while the collection request is pending', () => {
+    (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
+    render(<TheArt art={landingContentEn.art} />);
 
+    expect(screen.getByRole('link', { name: 'View Cosmic Signature #000024' })).toHaveAttribute(
+      'href',
+      'https://app.cosmicsignature.com/detail/24',
+    );
+    expect(screen.getByAltText('Cosmic Signature artwork #000024')).toHaveAttribute(
+      'src',
+      FEATURED_LANDING_ART[1].imageSrc,
+    );
+  });
+
+  it('renders a real generated NFT with matching thumbnail, token number, and app detail link', async () => {
+    mockTokenFetch([{ TokenId: 42, Seed: 'abc123' }]);
     render(<TheArt art={landingContentEn.art} />);
 
     expect(await screen.findByText('#000042')).toBeInTheDocument();
@@ -66,37 +80,62 @@ describe('<TheArt />', () => {
     );
     expect(screen.getByAltText('Cosmic Signature artwork #000042')).toHaveAttribute(
       'src',
-      expect.stringContaining('/cosmicsignature/0xabc123.png'),
+      expect.stringContaining('/cosmicsignature/0xabc123/thumb_card.webp'),
     );
   });
 
-  it('shows a neutral non-NFT visual when no real token metadata is available', async () => {
-    mockTokenFetch([]);
+  it.each(['empty', 'offline'] as const)(
+    'retains bundled art when the collection is %s',
+    async (state) => {
+      if (state === 'empty') mockTokenFetch([]);
+      else (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Offline'));
+      render(<TheArt art={landingContentEn.art} />);
 
-    render(<TheArt art={landingContentEn.art} />);
+      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+      expect(screen.getByText('#000024')).toBeInTheDocument();
+      expect(screen.getByAltText('Cosmic Signature artwork #000024')).toHaveAttribute(
+        'src',
+        FEATURED_LANDING_ART[1].imageSrc,
+      );
+      expect(screen.queryByText('Awaiting metadata')).not.toBeInTheDocument();
+    },
+  );
 
-    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
-    expect(screen.getByText('Awaiting metadata')).toBeInTheDocument();
-    expect(screen.getByText(/Artwork appears here/)).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /View Cosmic Signature/ })).not.toBeInTheDocument();
-  });
-
-  it('rotates through real NFTs on a calm interval', async () => {
+  it('keeps the second real artwork stable instead of rotating its image and link', async () => {
     jest.useFakeTimers();
-    jest.spyOn(Math, 'random').mockReturnValue(0);
     mockTokenFetch([
       { TokenId: 1, Seed: 'aaa' },
       { TokenId: 2, Seed: 'bbb' },
     ]);
-
     render(<TheArt art={landingContentEn.art} />);
-
-    expect(await screen.findByText('#000001')).toBeInTheDocument();
-
-    act(() => {
-      jest.advanceTimersByTime(18_000);
-    });
-
     expect(await screen.findByText('#000002')).toBeInTheDocument();
+
+    act(() => jest.advanceTimersByTime(120_000));
+    expect(screen.getByText('#000002')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View Cosmic Signature #000002' })).toHaveAttribute(
+      'href',
+      'https://app.cosmicsignature.com/detail/2',
+    );
+    expect(screen.getByAltText('Cosmic Signature artwork #000002')).toHaveAttribute(
+      'src',
+      expect.stringContaining('/0xbbb/thumb_card.webp'),
+    );
+  });
+
+  it('tries the full-resolution artwork when its thumbnail fails', async () => {
+    mockTokenFetch([{ TokenId: 42, Seed: 'abc123' }]);
+    render(<TheArt art={landingContentEn.art} />);
+    const image = await screen.findByAltText('Cosmic Signature artwork #000042');
+    fireEvent.error(image);
+    expect(image).toHaveAttribute('src', expect.stringContaining('/cosmicsignature/0xabc123.png'));
+
+    fireEvent.error(image);
+    expect(screen.getByRole('img', { name: 'Cosmic Signature artwork #000042' })).toHaveTextContent(
+      landingContentEn.art.loading.label,
+    );
+    expect(screen.getByRole('link', { name: 'View Cosmic Signature #000042' })).toHaveAttribute(
+      'href',
+      'https://app.cosmicsignature.com/detail/42',
+    );
   });
 });

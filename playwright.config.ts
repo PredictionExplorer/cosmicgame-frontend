@@ -85,9 +85,14 @@ export default defineConfig({
       // Scoped to those deliberately. The interaction suites are built around
       // hover tooltips and Tab-to-link focus, neither of which behaves the
       // same under WebKit, so running them here reports on the engine rather
-      // than on the app.
+      // than on the app. The landing suite explicitly uses Safari's Option+Tab
+      // convention and also checks its countdown at tablet and desktop widths.
       name: 'Mobile Safari',
-      testMatch: ['**/mobile-overflow.mobile.spec.ts', '**/mobile-tap-targets.mobile.spec.ts'],
+      testMatch: [
+        '**/mobile-overflow.mobile.spec.ts',
+        '**/mobile-tap-targets.mobile.spec.ts',
+        '**/landing-responsive.spec.ts',
+      ],
       use: { ...devices['iPhone 13'] },
     },
     ...(harnessEnabled

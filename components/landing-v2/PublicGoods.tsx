@@ -15,7 +15,7 @@ export function PublicGoods({ publicGoods }: { publicGoods: LandingContent['publ
   const locale = useLocale();
 
   return (
-    <section className="relative overflow-hidden border-t border-white/10 bg-[#031810] py-28 sm:py-40">
+    <section className="relative overflow-hidden border-t border-white/10 bg-[#031810] py-16 sm:py-24 lg:py-28">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-80"
@@ -34,7 +34,7 @@ export function PublicGoods({ publicGoods }: { publicGoods: LandingContent['publ
         }}
       />
 
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-12">
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-12">
         <div className="grid gap-16 lg:grid-cols-[1fr_1fr] lg:items-center">
           <SectionHeading
             eyebrow={publicGoods.eyebrow}

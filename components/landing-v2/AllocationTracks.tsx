@@ -30,8 +30,11 @@ const TONE_TEXT: Record<Tone, string> = {
 
 export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] }) {
   return (
-    <section id="tracks" className="relative border-t border-white/10 bg-[#0A0418] py-28 sm:py-40">
-      <div className="mx-auto max-w-7xl px-6 lg:px-12">
+    <section
+      id="tracks"
+      className="relative border-t border-white/10 bg-[#080910] py-16 sm:py-24 lg:py-28"
+    >
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-12">
         <SectionHeading
           eyebrow={tracks.eyebrow}
           heading={tracks.heading}

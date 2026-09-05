@@ -158,8 +158,8 @@ const Footer = () => {
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[oklch(84.7%_0.149_213)]/40 to-transparent"
         />
         <div className="relative mx-auto w-full max-w-7xl px-4">
-          <div className="grid grid-cols-2 gap-8 py-14 sm:grid-cols-3 lg:grid-cols-6">
-            <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 py-12 sm:grid-cols-3 sm:py-14 xl:grid-cols-6">
+            <div className="col-span-2 min-w-0 sm:col-span-3 xl:col-span-1">
               <Image
                 src="/images/logo2.svg"
                 width={180}
@@ -180,7 +180,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('social.twitterLabel')}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 sm:h-9 sm:w-9 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
                 >
                   <XIcon />
                 </a>
@@ -189,7 +189,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={t('social.discordLabel')}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 sm:h-9 sm:w-9 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
                 >
                   <DiscordIcon />
                 </a>
@@ -197,11 +197,11 @@ const Footer = () => {
             </div>
 
             {footerLinks.map(({ title, links }) => (
-              <div key={title}>
-                <h4 className="mb-4 font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
+              <div key={title} className="min-w-0">
+                <h4 className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/65 [overflow-wrap:anywhere]">
                   {title}
                 </h4>
-                <ul className="space-y-2.5">
+                <ul className="space-y-0.5">
                   {links.map((link) => (
                     <li key={link.label}>
                       {link.external ? (
@@ -209,14 +209,14 @@ const Footer = () => {
                           href={link.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-white/70 no-underline transition hover:text-white"
+                          className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 no-underline transition hover:text-white [overflow-wrap:anywhere]"
                         >
                           {link.label}
                         </a>
                       ) : (
                         <Link
                           href={link.href}
-                          className="text-sm text-white/70 no-underline transition hover:text-white"
+                          className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 no-underline transition hover:text-white [overflow-wrap:anywhere]"
                         >
                           {link.label}
                         </Link>
@@ -232,13 +232,13 @@ const Footer = () => {
             <LanguageDirectory />
           </div>
 
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-xs sm:flex-row">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-xs lg:flex-row">
             <div className="flex flex-col items-center gap-1 sm:items-start">
               <p className="text-white/50">{t('copyright', { year: new Date().getFullYear() })}</p>
               {showBuild ? (
                 <p
                   data-testid="build-commit"
-                  className="font-mono text-[10px] text-white/40"
+                  className="font-mono text-[10px] text-white/40 [overflow-wrap:anywhere]"
                   title={`${build.fullSha}${build.ref ? ` (${build.ref})` : ''}`}
                 >
                   {build.shortSha}
@@ -252,13 +252,13 @@ const Footer = () => {
               </span>
               <Link
                 href="/terms"
-                className="inline-flex min-h-6 items-center text-white/60 no-underline transition hover:text-white"
+                className="inline-flex min-h-11 items-center text-white/60 no-underline transition hover:text-white"
               >
                 {t('links.terms')}
               </Link>
               <Link
                 href="/privacy"
-                className="inline-flex min-h-6 items-center text-white/60 no-underline transition hover:text-white"
+                className="inline-flex min-h-11 items-center text-white/60 no-underline transition hover:text-white"
               >
                 {t('links.privacy')}
               </Link>

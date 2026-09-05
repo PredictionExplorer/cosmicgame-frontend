@@ -64,5 +64,9 @@
     "countdownAria": "{label}：{duration}",
     "durationPart": "{value}{unit}",
     "durationSeparator": "，"
+  },
+  "artwork": {
+    "previous": "上一件作品",
+    "next": "下一件作品"
   }
 }

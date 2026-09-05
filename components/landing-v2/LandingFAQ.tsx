@@ -22,9 +22,12 @@ export function LandingFAQ({ faq }: { faq: LandingContent['faq'] }) {
   }));
 
   return (
-    <section id="faq" className="relative border-t border-white/10 bg-[#0D0521] py-28 sm:py-40">
+    <section
+      id="faq"
+      className="relative border-t border-white/10 bg-[#0b0b13] py-16 sm:py-24 lg:py-28"
+    >
       <JsonLd data={faqPageJsonLd(faqItems, jsonLdInLanguage(locale))} />
-      <div className="mx-auto max-w-4xl px-6 lg:px-12">
+      <div className="mx-auto max-w-4xl px-5 sm:px-6 lg:px-12">
         <SectionHeading
           eyebrow={faq.eyebrow}
           heading={faq.heading}

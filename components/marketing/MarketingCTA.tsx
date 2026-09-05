@@ -25,10 +25,14 @@ export function MarketingCTA() {
         {t('cta.title')}
       </h2>
       <p className="mx-auto mt-4 max-w-lg text-muted-foreground">{t('cta.description')}</p>
-      <div className="mt-8 inline-flex items-center gap-2">
+      <div className="mt-8 inline-flex max-w-full items-center justify-center gap-3">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button asChild size="lg">
+            <Button
+              asChild
+              size="lg"
+              className="h-auto min-w-0 max-w-full whitespace-normal px-5 py-3 text-center sm:px-8"
+            >
               <a href="mailto:marketing@cosmicsignature.com">
                 {t('cta.contact')}
                 <ExternalLink className="ml-1.5 h-4 w-4" />
@@ -44,7 +48,7 @@ export function MarketingCTA() {
               aria-label={t('cta.infoAria')}
               data-touch-target="extended"
               className={cn(
-                'text-muted-foreground/60 hover:text-muted-foreground transition-colors',
+                'shrink-0 text-muted-foreground/60 hover:text-muted-foreground transition-colors',
                 TOUCH_TARGET_EXTENDED_CLASS,
               )}
             >

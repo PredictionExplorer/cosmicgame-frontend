@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+import { getLandingContent } from '../content/landing';
+
 import { LOCALE_CHROME, LOCALE_SEO, TRANSLATED_LOCALES, routing } from './locale-fixtures';
 
 /**
@@ -89,9 +91,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
   test('renders the hero headline with lexicon-safe copy', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const h1 = page.getByRole('heading', { level: 1 });
-    await expect(h1).toContainText(/Cosmic Signature/i);
-    await expect(h1).toContainText(/Procedural On-Chain Art/i);
-    await expect(h1).toContainText(/Arbitrum/i);
+    const hero = getLandingContent('en').hero;
+    await expect(h1).toContainText(hero.headlineLead);
+    await expect(h1).toContainText(hero.headlineAccent);
   });
 
   test('primary CTA links to the app subdomain', async ({ page }) => {
@@ -156,7 +158,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
 
     const sectionTitles = [
       'A Performance Cycle',
-      'The Three Body Problem',
+      getLandingContent('en').art.heading,
       'More than ten ways the protocol distributes',
       'Anchor Cosmic Signature',
       '7% of every cycle',
@@ -186,7 +188,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await page.goto('/zh', { waitUntil: 'domcontentloaded' });
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('程序化链上艺术');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      getLandingContent('zh').hero.headlineLead,
+    );
     await expect(page.getByRole('link', { name: '打开应用' }).first()).toHaveAttribute(
       'href',
       APP_ZH_ORIGIN_PATTERN,
@@ -219,7 +223,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     ]) {
       await page.setViewportSize(viewport);
       await page.goto('/zh', { waitUntil: 'domcontentloaded' });
-      await expect(page.getByRole('heading', { level: 1 })).toContainText('程序化链上艺术');
+      await expect(page.getByRole('heading', { level: 1 })).toContainText(
+        getLandingContent('zh').hero.headlineLead,
+      );
       await expect
         .poll(() =>
           page.evaluate(

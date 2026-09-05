@@ -26,11 +26,11 @@ export const landingTextJa = {
 
   hero: {
     eyebrow: 'プロシージャル・オンチェーンアート・プロトコル · Arbitrum',
-    headline: 'Cosmic Signature：プロシージャル・オンチェーンアート · Arbitrum',
-    headlineLead: 'Cosmic Signature：プロシージャル・オンチェーンアート ·',
-    headlineAccent: 'Arbitrum',
+    headline: '一筆ごとに、 アートが生まれます。',
+    headlineLead: '一筆ごとに、',
+    headlineAccent: 'アートが生まれます。',
     subhead:
-      '一筆を重ねるたびに、シグネチャーが形づくられます。サイクルが確定すると、準備金は10を超える配分トラックへ。参加者に加え、Ethereumを支えるインフラにも届けられます。',
+      'Arbitrumに息づくアートプロトコルに参加できます。一筆ごとに次のシグネチャーが形づくられ、サイクルごとに準備金を参加者とEthereumの公共インフラへ配分します。',
     biologyDisclaimer:
       'Cosmic Signatureは、生物学におけるCOSMICがん変異データベースやCOSMIC変異シグネチャーとは関係がありません。オンチェーンアートのプロトコルとアプリです。',
     primaryCtaLabel: 'アプリを開く',
@@ -48,7 +48,7 @@ export const landingTextJa = {
       'Arbitrum One',
     ],
     art: {
-      eyebrow: 'コレクションの作品',
+      eyebrow: 'コレクションより',
       caption: 'オンチェーンに刻印 · CC0',
       cstNote: `刻印されたシグネチャーにはそれぞれ${cst} CSTが添えられています。`,
       formingLabel: '作品を読み込み中',
@@ -95,7 +95,7 @@ export const landingTextJa = {
         'インデックス済みのトークンメタデータが利用できるようになると、実際に生成されたNFTがここに表示されます。',
     },
     showcase: {
-      liveLabel: 'ライブのシグネチャー',
+      collectionLabel: 'コレクションより',
       signalLabel: 'シグナル',
       awaitingMetadataLabel: 'メタデータ待ち',
       viewAriaLabel: 'Cosmic Signature {tokenLabel}を見る',

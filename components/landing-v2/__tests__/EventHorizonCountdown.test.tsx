@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 
 import { CST_GECKOTERMINAL_POOL_URL } from '@/config/geckoterminal';
 
@@ -175,6 +175,7 @@ describe('<EventHorizonCountdown />', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
   it('renders the live Event Horizon timer with cycle context from the backend', async () => {
@@ -221,6 +222,40 @@ describe('<EventHorizonCountdown />', () => {
       ).toBeInTheDocument();
     });
     expect(screen.getByText('landing.timer.phases.unavailable.body')).toBeInTheDocument();
+    expect(screen.queryByText('landing.timer.status.synchronized')).not.toBeInTheDocument();
+    expect(screen.queryByText(/landing\.timer\.gestureCount/)).not.toBeInTheDocument();
+  });
+
+  it('keeps the visible clock and accessible duration in sync without announcing every tick', async () => {
+    jest.useFakeTimers({ doNotFake: ['Date'] });
+    mockFetchFinalization.mockResolvedValue(1_700_007_265);
+
+    render(<EventHorizonCountdown />);
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('countdown-value').map((value) => value.textContent)).toEqual([
+        '00',
+        '02',
+        '01',
+        '05',
+      ]);
+    });
+    expect(screen.getByRole('timer')).toHaveAttribute('aria-live', 'off');
+    expect(screen.getByTestId('countdown-units')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByRole('timer')).toHaveAccessibleName(/value=5/);
+
+    jest.mocked(Date.now).mockReturnValue(nowMs + 1_000);
+    act(() => {
+      jest.advanceTimersByTime(1_000);
+    });
+
+    expect(screen.getAllByTestId('countdown-value').map((value) => value.textContent)).toEqual([
+      '00',
+      '02',
+      '01',
+      '04',
+    ]);
+    expect(screen.getByRole('timer')).toHaveAccessibleName(/value=4/);
   });
 
   it('renders waiting state without a ticking countdown', async () => {

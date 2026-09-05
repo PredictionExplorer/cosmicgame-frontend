@@ -15,7 +15,7 @@ export function Anchoring({ anchoring }: { anchoring: LandingContent['anchoring'
   const locale = useLocale();
 
   return (
-    <section className="relative border-t border-white/10 bg-[#0D0521] py-28 sm:py-40">
+    <section className="relative border-t border-white/10 bg-[#0b0b13] py-16 sm:py-24 lg:py-28">
       <div className="mx-auto grid max-w-7xl gap-16 px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:px-12">
         <motion.div
           initial={{ opacity: 0, scale: 0.92 }}

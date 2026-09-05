@@ -24,11 +24,11 @@ export const landingTextZh = {
 
   hero: {
     eyebrow: '程序化链上艺术协议 · Arbitrum',
-    headline: 'Cosmic Signature：程序化链上艺术 · Arbitrum',
-    headlineLead: 'Cosmic Signature：程序化链上艺术 ·',
-    headlineAccent: 'Arbitrum',
+    headline: '每一次落笔， 都在塑造艺术。',
+    headlineLead: '每一次落笔，',
+    headlineAccent: '都在塑造艺术。',
     subhead:
-      '每一笔，都在塑造签名。在演绎周期中落笔，你的每一笔都会融入这一周期最终的签名。周期收官后，储备会沿十余条轨道发放，其中一部分将流向以太坊基础设施。',
+      '参与 Arbitrum 上不断生长的艺术协议。每次落笔都在塑造下一份签名；每个周期都会将储备分配给参与者和以太坊的公共基础设施。',
     biologyDisclaimer:
       'Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。本项目是链上艺术协议及应用。',
     primaryCtaLabel: '打开应用',
@@ -46,7 +46,7 @@ export const landingTextZh = {
       'Arbitrum One',
     ],
     art: {
-      eyebrow: '来自作品集的实时展示',
+      eyebrow: '来自作品集',
       caption: '铭刻于链上 · CC0',
       cstNote: `每枚铭刻的签名作品都配有 ${protocolFacts.specialAllocationCst.toLocaleString('zh-CN')} CST。`,
       formingLabel: '信号生成中',
@@ -94,7 +94,7 @@ export const landingTextZh = {
       description: '索引到代币元数据后，真实生成的 NFT 会随即在此呈现。',
     },
     showcase: {
-      liveLabel: '实时签名',
+      collectionLabel: '来自作品集',
       signalLabel: '信号',
       awaitingMetadataLabel: '等待元数据',
       viewAriaLabel: '查看 Cosmic Signature {tokenLabel}',

@@ -52,9 +52,8 @@ describe('<Hero />', () => {
   it('renders the lexicon-safe headline', () => {
     render(<Hero hero={landingContentEn.hero} />);
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent(/Cosmic Signature/i);
-    expect(heading).toHaveTextContent(/Procedural On-Chain Art/i);
-    expect(heading).toHaveTextContent(/Arbitrum/i);
+    expect(heading).toHaveTextContent(landingContentEn.hero.headlineLead);
+    expect(heading).toHaveTextContent(landingContentEn.hero.headlineAccent);
   });
 
   it('renders the primary CTA linking to the app subdomain', () => {

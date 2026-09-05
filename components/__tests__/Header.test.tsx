@@ -7,7 +7,7 @@ import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CHAOS_ZERO_PREDICTIONS_URL } from '@/config/predictions';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
-import { render, screen, checkA11y, within } from '@/test-utils';
+import { render, screen, checkA11y, within, act, waitFor } from '@/test-utils';
 
 jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
@@ -84,7 +84,7 @@ const setViewportWidth = (value: number) => {
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = null;
-  setViewportWidth(1200);
+  setViewportWidth(1440);
 });
 
 describe('Header (desktop)', () => {
@@ -219,6 +219,46 @@ describe('Header (desktop)', () => {
 });
 
 describe('Header (mobile)', () => {
+  it('exposes drawer state and returns keyboard focus to its trigger', async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+    const trigger = screen.getByRole('button', { name: 'nav.menuLabel' });
+
+    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await user.click(trigger);
+    const dialog = await screen.findByRole('dialog');
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(trigger).toHaveAttribute('aria-controls', dialog.id);
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('closes the drawer when resizing to desktop and keeps it closed on return', async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+    await user.click(screen.getByRole('button', { name: 'nav.menuLabel' }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+
+    act(() => {
+      setViewportWidth(1440);
+      window.dispatchEvent(new Event('resize'));
+    });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    act(() => {
+      setViewportWidth(820);
+      window.dispatchEvent(new Event('resize'));
+    });
+    expect(screen.getByRole('button', { name: 'nav.menuLabel' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+  });
+
   beforeEach(() => {
     setViewportWidth(375);
   });

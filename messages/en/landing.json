@@ -64,5 +64,9 @@
     "countdownAria": "{label}: {duration}",
     "durationPart": "{value} {unit}",
     "durationSeparator": ", "
+  },
+  "artwork": {
+    "previous": "Previous artwork",
+    "next": "Next artwork"
   }
 }

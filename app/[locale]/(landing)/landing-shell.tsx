@@ -31,6 +31,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
+import { MotionConfig } from 'framer-motion';
 
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
@@ -55,35 +56,37 @@ export function LandingShell({ children }: { children: ReactNode }) {
 
   return (
     <ErrorBoundary>
-      <CookiesProvider>
-        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-          <SkipLink />
-          {showUtilityChrome ? (
-            <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-6">
-              <LanguageSwitcher />
-            </div>
-          ) : null}
-          <ErrorBoundary>{children}</ErrorBoundary>
-          {showUtilityChrome ? (
-            <footer className="relative mx-auto w-full max-w-6xl px-6 pb-12">
-              <div className="border-t border-white/10 pt-6">
-                <LanguageDirectory />
+      <MotionConfig reducedMotion="user">
+        <CookiesProvider>
+          <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+            <SkipLink />
+            {showUtilityChrome ? (
+              <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-6">
+                <LanguageSwitcher />
               </div>
-            </footer>
-          ) : null}
-          <Toaster
-            position="top-right"
-            theme="dark"
-            richColors
-            closeButton
-            toastOptions={{
-              duration: NOTIFICATION_AUTO_HIDE_MS,
-              className:
-                'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
-            }}
-          />
-        </TooltipProvider>
-      </CookiesProvider>
+            ) : null}
+            <ErrorBoundary>{children}</ErrorBoundary>
+            {showUtilityChrome ? (
+              <footer className="relative mx-auto w-full max-w-6xl px-6 pb-12">
+                <div className="border-t border-white/10 pt-6">
+                  <LanguageDirectory />
+                </div>
+              </footer>
+            ) : null}
+            <Toaster
+              position="top-right"
+              theme="dark"
+              richColors
+              closeButton
+              toastOptions={{
+                duration: NOTIFICATION_AUTO_HIDE_MS,
+                className:
+                  'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
+              }}
+            />
+          </TooltipProvider>
+        </CookiesProvider>
+      </MotionConfig>
     </ErrorBoundary>
   );
 }

@@ -62,7 +62,7 @@ export interface LandingArtLoadingContent {
 }
 
 export interface LandingArtShowcaseContent {
-  readonly liveLabel: string;
+  readonly collectionLabel: string;
   readonly signalLabel: string;
   readonly awaitingMetadataLabel: string;
   /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */

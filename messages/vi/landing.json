@@ -64,5 +64,9 @@
     "countdownAria": "{label}: {duration}",
     "durationPart": "{value} {unit}",
     "durationSeparator": ", "
+  },
+  "artwork": {
+    "previous": "Tác phẩm trước",
+    "next": "Tác phẩm tiếp theo"
   }
 }

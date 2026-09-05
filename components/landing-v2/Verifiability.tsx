@@ -15,15 +15,15 @@ export function Verifiability({
   verifiability: LandingContent['verifiability'];
 }) {
   return (
-    <section className="relative border-t border-white/10 bg-[#0A0418] py-28 sm:py-40">
-      <div className="mx-auto max-w-7xl px-6 lg:px-12">
+    <section className="relative border-t border-white/10 bg-[#080910] py-16 sm:py-24 lg:py-28">
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-12">
         <SectionHeading
           eyebrow={verifiability.eyebrow}
           heading={verifiability.heading}
           description={verifiability.body}
         />
 
-        <div className="mt-20 grid gap-6 md:grid-cols-3">
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {verifiability.pillars.map((pillar, idx) => {
             const Icon = ICONS[idx] ?? FileCheck;
             return (
@@ -33,7 +33,7 @@ export function Verifiability({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.6, delay: idx * 0.08 }}
-                className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-8 transition hover:border-white/20"
+                className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition hover:border-white/20"
               >
                 <div
                   aria-hidden

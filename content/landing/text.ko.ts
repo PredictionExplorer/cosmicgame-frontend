@@ -24,11 +24,11 @@ export const landingTextKo = {
 
   hero: {
     eyebrow: '절차적 온체인 아트 프로토콜 · Arbitrum',
-    headline: 'Cosmic Signature: Arbitrum 위의 절차적 온체인 아트',
-    headlineLead: 'Cosmic Signature: Arbitrum 위의',
-    headlineAccent: '절차적 온체인 아트',
+    headline: '모든 제스처가 아트를 만듭니다.',
+    headlineLead: '모든 제스처가',
+    headlineAccent: '아트를 만듭니다.',
     subhead:
-      '모든 제스처가 시그니처를 빚어냅니다. 퍼포먼스 사이클 동안 제스처를 남기면, 그 하나하나가 사이클의 최종 시그니처에 스며듭니다. 사이클이 마감되면 프로토콜은 준비금을 열 개가 넘는 배분 경로로 배분하며, 그 가운데에는 이더리움 자체가 의존하는 인프라도 있습니다.',
+      'Arbitrum에서 함께 만드는 살아 있는 아트 프로토콜입니다. 모든 제스처가 다음 시그니처를 빚고, 매 사이클마다 준비금을 참여자와 이더리움의 공공 인프라에 배분합니다.',
     biologyDisclaimer:
       'Cosmic Signature는 COSMIC 암 돌연변이 데이터베이스나 생물학의 COSMIC 돌연변이 시그니처와 관련이 없습니다. 온체인 아트 프로토콜이자 앱입니다.',
     primaryCtaLabel: '앱 열기',
@@ -93,7 +93,7 @@ export const landingTextKo = {
         '인덱싱된 토큰 메타데이터가 준비되는 즉시 실제로 생성된 NFT가 이곳에 나타납니다.',
     },
     showcase: {
-      liveLabel: '실시간 시그니처',
+      collectionLabel: '컬렉션의 작품',
       signalLabel: '신호',
       awaitingMetadataLabel: '메타데이터 대기 중',
       viewAriaLabel: 'Cosmic Signature {tokenLabel} 보기',

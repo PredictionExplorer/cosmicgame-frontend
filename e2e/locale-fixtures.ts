@@ -6,6 +6,7 @@
  * `scripts/__tests__/locale-e2e-fixtures.test.ts` asserts that each
  * translated locale also has its chrome fixture here.
  */
+import { getLandingContent } from '../content/landing';
 import { LOCALE_LABELS, routing, TRANSLATED_LOCALES } from '../i18n/routing';
 import { SCRIPT_PATTERNS } from '../test-utils/locale-expectations';
 
@@ -491,7 +492,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     inLanguage: 'zh-Hans',
     ogLocale: 'zh_CN',
     landingPages: [
-      { path: '/zh', h1: 'Cosmic Signature：程序化链上艺术' },
+      { path: '/zh', h1: getLandingContent('zh').hero.headlineLead },
       { path: '/zh/about', h1: '关于 Cosmic Signature' },
       { path: '/zh/learn', h1: '了解 Cosmic Signature' },
       { path: '/zh/learn/what-is-cosmic-signature', h1: '什么是 Cosmic Signature？' },
@@ -508,7 +509,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     inLanguage: 'zh-Hant-TW',
     ogLocale: 'zh_TW',
     landingPages: [
-      { path: '/zh-TW', h1: 'Cosmic Signature：程序化鏈上藝術' },
+      { path: '/zh-TW', h1: getLandingContent('zh-TW').hero.headlineLead },
       { path: '/zh-TW/about', h1: '關於 Cosmic Signature' },
       { path: '/zh-TW/learn', h1: '了解 Cosmic Signature' },
       { path: '/zh-TW/learn/what-is-cosmic-signature', h1: '什麼是 Cosmic Signature？' },
@@ -525,7 +526,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     inLanguage: 'zh-Hant-HK',
     ogLocale: 'zh_HK',
     landingPages: [
-      { path: '/zh-HK', h1: 'Cosmic Signature：程序化鏈上藝術' },
+      { path: '/zh-HK', h1: getLandingContent('zh-HK').hero.headlineLead },
       { path: '/zh-HK/about', h1: '關於 Cosmic Signature' },
       { path: '/zh-HK/learn', h1: '了解 Cosmic Signature' },
       { path: '/zh-HK/learn/what-is-cosmic-signature', h1: '什麼是 Cosmic Signature？' },
@@ -542,7 +543,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     inLanguage: 'uk',
     ogLocale: 'uk_UA',
     landingPages: [
-      { path: '/uk', h1: 'Cosmic Signature: процедурне ончейн-мистецтво на Arbitrum' },
+      { path: '/uk', h1: getLandingContent('uk').hero.headlineLead },
       { path: '/uk/about', h1: 'Про Cosmic Signature' },
       { path: '/uk/learn', h1: 'Дізнайтеся, як працює Cosmic Signature' },
       { path: '/uk/learn/what-is-cosmic-signature', h1: 'Що таке Cosmic Signature?' },
@@ -559,7 +560,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     inLanguage: 'ko',
     ogLocale: 'ko_KR',
     landingPages: [
-      { path: '/ko', h1: 'Cosmic Signature: Arbitrum 위의 절차적 온체인 아트' },
+      { path: '/ko', h1: getLandingContent('ko').hero.headlineLead },
       { path: '/ko/about', h1: 'Cosmic Signature 소개' },
       { path: '/ko/learn', h1: 'Cosmic Signature 알아보기' },
       { path: '/ko/learn/what-is-cosmic-signature', h1: 'Cosmic Signature란 무엇인가요?' },
@@ -576,7 +577,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     inLanguage: 'ja',
     ogLocale: 'ja_JP',
     landingPages: [
-      { path: '/ja', h1: 'Cosmic Signature：プロシージャル・オンチェーンアート · Arbitrum' },
+      { path: '/ja', h1: getLandingContent('ja').hero.headlineLead },
       { path: '/ja/about', h1: 'Cosmic Signatureについて' },
       { path: '/ja/learn', h1: 'Cosmic Signatureを知る' },
       { path: '/ja/learn/what-is-cosmic-signature', h1: 'Cosmic Signatureとは？' },
@@ -593,7 +594,7 @@ export const LOCALE_SEO: Record<TranslatedLocale, LocaleSeoFixture> = {
     inLanguage: 'vi',
     ogLocale: 'vi_VN',
     landingPages: [
-      { path: '/vi', h1: 'Cosmic Signature: Nghệ thuật tạo sinh trên chuỗi Arbitrum' },
+      { path: '/vi', h1: getLandingContent('vi').hero.headlineLead },
       { path: '/vi/about', h1: 'Về Cosmic Signature' },
       { path: '/vi/learn', h1: 'Tìm hiểu Cosmic Signature' },
       { path: '/vi/learn/what-is-cosmic-signature', h1: 'Cosmic Signature là gì?' },
@@ -625,8 +626,8 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     siteMap: { heading: '网站地图', title: '网站地图 · Cosmic Signature', section: '个人工具' },
     notFound: { headingPattern: /404：找不到页面/, homeLink: '返回首页' },
     skipLink: '跳至主要内容',
-    landingH1: 'Cosmic Signature：程序化链上艺术',
-    landingText: '程序化链上艺术',
+    landingH1: getLandingContent('zh').hero.headlineLead,
+    landingText: getLandingContent('zh').hero.headlineLead,
   },
   'zh-TW': {
     script: SCRIPT_PATTERNS['zh-TW'],
@@ -644,8 +645,8 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     siteMap: { heading: '網站導覽', title: '網站導覽 · Cosmic Signature', section: '個人工具' },
     notFound: { headingPattern: /404：找不到頁面/, homeLink: '返回首頁' },
     skipLink: '跳至主要內容',
-    landingH1: 'Cosmic Signature：程序化鏈上藝術',
-    landingText: '程序化鏈上藝術',
+    landingH1: getLandingContent('zh-TW').hero.headlineLead,
+    landingText: getLandingContent('zh-TW').hero.headlineLead,
   },
   'zh-HK': {
     script: SCRIPT_PATTERNS['zh-HK'],
@@ -663,8 +664,8 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     siteMap: { heading: '網站地圖', title: '網站地圖 · Cosmic Signature', section: '個人工具' },
     notFound: { headingPattern: /404：找不到頁面/, homeLink: '返回主頁' },
     skipLink: '跳至主要內容',
-    landingH1: 'Cosmic Signature：程序化鏈上藝術',
-    landingText: '程序化鏈上藝術',
+    landingH1: getLandingContent('zh-HK').hero.headlineLead,
+    landingText: getLandingContent('zh-HK').hero.headlineLead,
   },
   uk: {
     script: SCRIPT_PATTERNS.uk,
@@ -686,8 +687,8 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     },
     notFound: { headingPattern: /404 — Сторінку не знайдено/, homeLink: 'На головну' },
     skipLink: 'Перейти до основного вмісту',
-    landingH1: 'Cosmic Signature: процедурне ончейн-мистецтво на Arbitrum',
-    landingText: 'процедурне ончейн-мистецтво',
+    landingH1: getLandingContent('uk').hero.headlineLead,
+    landingText: getLandingContent('uk').hero.headlineLead,
   },
   ko: {
     script: SCRIPT_PATTERNS.ko,
@@ -705,8 +706,8 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     siteMap: { heading: '사이트맵', title: '사이트맵 | Cosmic Signature', section: '개인 도구' },
     notFound: { headingPattern: /404 — 페이지를 찾을 수 없습니다/, homeLink: '홈으로' },
     skipLink: '본문으로 건너뛰기',
-    landingH1: 'Cosmic Signature: Arbitrum 위의 절차적 온체인 아트',
-    landingText: '절차적 온체인 아트',
+    landingH1: getLandingContent('ko').hero.headlineLead,
+    landingText: getLandingContent('ko').hero.headlineLead,
   },
   ja: {
     script: SCRIPT_PATTERNS.ja,
@@ -728,8 +729,8 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     },
     notFound: { headingPattern: /404：ページが見つかりません/, homeLink: 'ホームへ戻る' },
     skipLink: 'メインコンテンツへスキップ',
-    landingH1: 'Cosmic Signature：プロシージャル・オンチェーンアート · Arbitrum',
-    landingText: 'プロシージャル・オンチェーンアート',
+    landingH1: getLandingContent('ja').hero.headlineLead,
+    landingText: getLandingContent('ja').hero.headlineLead,
   },
   vi: {
     script: SCRIPT_PATTERNS.vi,
@@ -751,7 +752,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     },
     notFound: { headingPattern: /404 — Không tìm thấy trang/, homeLink: 'Về trang chủ' },
     skipLink: 'Chuyển đến nội dung chính',
-    landingH1: 'Cosmic Signature: Nghệ thuật tạo sinh trên chuỗi Arbitrum',
-    landingText: 'tạo sinh trên chuỗi',
+    landingH1: getLandingContent('vi').hero.headlineLead,
+    landingText: getLandingContent('vi').hero.headlineLead,
   },
 };

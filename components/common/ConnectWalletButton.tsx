@@ -47,6 +47,7 @@ interface AnchoredTokenCount {
 
 interface ConnectWalletButtonProps {
   isMobileView: boolean;
+  className?: string;
   loading: boolean;
   balance: Balance;
   stakedTokenCount: AnchoredTokenCount;
@@ -57,6 +58,7 @@ interface ConnectWalletButtonProps {
 
 const ConnectWalletButton = ({
   isMobileView,
+  className,
   loading,
   balance,
   stakedTokenCount,
@@ -77,7 +79,7 @@ const ConnectWalletButton = ({
 
   if (account) {
     if (isMobileView) {
-      return <MobileWallet label={shortenHex(account)} />;
+      return <MobileWallet label={shortenHex(account)} className={className} />;
     }
 
     return (
@@ -86,6 +88,7 @@ const ConnectWalletButton = ({
           className={cn(
             'ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
             liquid && 'liquid-glass-control',
+            className,
           )}
         >
           <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
@@ -264,7 +267,7 @@ const ConnectWalletButton = ({
         onClick={requestConnectModal}
         onPointerEnter={warmConnectModal}
         onFocus={warmConnectModal}
-        className={cn('min-h-11 sm:min-h-0', liquid && 'liquid-glass-cta')}
+        className={cn('min-h-11 sm:min-h-0', liquid && 'liquid-glass-cta', className)}
         data-testid="connect-wallet-button"
       >
         {t('connect.button')}
