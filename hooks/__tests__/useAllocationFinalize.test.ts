@@ -2,12 +2,23 @@ import { AxiosError } from 'axios';
 import { createElement, StrictMode, type ReactNode } from 'react';
 
 import type { DashboardInfo } from '@/services/api/types';
+import { activeChain } from '@/config/chains';
 
 import { act, renderHook, waitFor } from '@/test-utils';
 
 const mockNotify = jest.fn();
 const mockNotifyErrorFromEthers = jest.fn();
 const mockPush = jest.fn();
+const mockEnsureCorrectChain = jest.fn().mockResolvedValue(true);
+const mockGameAddress = '0x1111111111111111111111111111111111111111';
+const mockUseContractAddresses = jest.fn(() => ({ cosmicGame: mockGameAddress }));
+
+jest.mock('../useRequireChain', () => ({
+  useRequireChain: () => ({ ensureCorrectChain: mockEnsureCorrectChain }),
+}));
+jest.mock('../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => mockUseContractAddresses(),
+}));
 
 jest.mock('../../hooks/useNotify', () => ({
   useNotify: () => ({ notify: mockNotify, notifyErrorFromEthers: mockNotifyErrorFromEthers }),
@@ -17,9 +28,23 @@ jest.mock('next/navigation', () => ({
 }));
 
 const mockWaitForReceipt = jest.fn().mockResolvedValue({ status: 'success' });
-const mockUsePublicClient = jest.fn(() => ({ waitForTransactionReceipt: mockWaitForReceipt }));
+const mockReadContract = jest.fn(({ functionName }: { functionName: string }) => {
+  if (functionName === 'roundNum') return mockReadRoundNum();
+  if (functionName === 'lastCstBidderAddress') return Promise.resolve(undefined);
+  throw new Error(`Unexpected read: ${functionName}`);
+});
+const mockUsePublicClient = jest.fn((_options?: { chainId: number }) => ({
+  waitForTransactionReceipt: mockWaitForReceipt,
+  readContract: mockReadContract,
+  estimateContractGas: mockEstimateGas,
+}));
 jest.mock('wagmi', () => ({
-  usePublicClient: () => mockUsePublicClient(),
+  usePublicClient: (options: { chainId: number }) => mockUsePublicClient(options),
+  useConfig: () => ({}),
+}));
+jest.mock('@wagmi/core', () => ({
+  getAccount: () => ({ address: '0x2222222222222222222222222222222222222222' }),
+  writeContract: (_config: unknown, request: unknown) => mockFinalizeCycle(request),
 }));
 
 const mockEstimateGas = jest.fn().mockResolvedValue(BigInt(500000));
@@ -86,7 +111,13 @@ beforeEach(() => {
   mockReadRoundNum.mockReset();
   mockReadRoundNum.mockResolvedValueOnce(BigInt(5)).mockResolvedValueOnce(BigInt(6));
   mockGetContractErrorDescriptor.mockReturnValue(null);
-  mockUsePublicClient.mockReturnValue({ waitForTransactionReceipt: mockWaitForReceipt });
+  mockEnsureCorrectChain.mockResolvedValue(true);
+  mockUseContractAddresses.mockReturnValue({ cosmicGame: mockGameAddress });
+  mockUsePublicClient.mockReturnValue({
+    waitForTransactionReceipt: mockWaitForReceipt,
+    readContract: mockReadContract,
+    estimateContractGas: mockEstimateGas,
+  });
   mockWaitForReceipt.mockResolvedValue({ status: 'success' });
   mockUseAllocationTime.mockReturnValue({ data: 1000 } as ReturnType<typeof useAllocationTime>);
   mockUseCurrentTime.mockReturnValue({
@@ -152,8 +183,16 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(success).toBe(true);
+    expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(1);
+    expect(mockUsePublicClient).toHaveBeenCalledWith({ chainId: activeChain.id });
     expect(mockEstimateGas).toHaveBeenCalled();
-    expect(mockFinalizeCycle).toHaveBeenCalled();
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        address: mockGameAddress,
+        chainId: activeChain.id,
+        functionName: 'claimMainPrize',
+      }),
+    );
     expect(mockWaitForReceipt).toHaveBeenCalledWith({ hash: '0xhash' });
     expect(mockReadRoundNum).toHaveBeenCalledTimes(2);
     expect(mockApi.create).toHaveBeenCalledWith(5, 5);
@@ -171,7 +210,9 @@ describe('useAllocationFinalize', () => {
       await result.current.onFinalize();
     });
 
-    expect(mockFinalizeCycle).toHaveBeenCalledWith({ gas: BigInt(300_000) + BigInt(1_000_000) });
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({ gas: BigInt(300_000) + BigInt(1_000_000) }),
+    );
   });
 
   it('falls back to GAS_FLOOR when estimateGas returns undefined', async () => {
@@ -183,7 +224,9 @@ describe('useAllocationFinalize', () => {
       await result.current.onFinalize();
     });
 
-    expect(mockFinalizeCycle).toHaveBeenCalledWith({ gas: BigInt(2_000_000) });
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({ gas: BigInt(2_000_000) }),
+    );
   });
 
   it('falls back to GAS_FLOOR when estimateGas throws (still claims)', async () => {
@@ -197,7 +240,9 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(mockReportError).toHaveBeenCalledWith(estimateErr, 'finalize-cycle-gas-estimate');
-    expect(mockFinalizeCycle).toHaveBeenCalledWith({ gas: BigInt(2_000_000) });
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({ gas: BigInt(2_000_000) }),
+    );
   });
 
   it('includes NumRaffleNFTWinnersStakingRWalk in count when RWLK tokens are anchored', async () => {
@@ -342,8 +387,8 @@ describe('useAllocationFinalize', () => {
     );
   });
 
-  it('onFinalize with no contract: notifies error, returns false, never calls write', async () => {
-    mockUseCosmicGameContract.mockReturnValueOnce(null);
+  it('onFinalize with no contract address: notifies error, returns false, never calls write', async () => {
+    mockUseContractAddresses.mockReturnValueOnce({ cosmicGame: '' });
 
     const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
 
@@ -456,6 +501,67 @@ describe('useAllocationFinalize', () => {
   // ─────────────────────────────────────────────
   //  concurrency
   // ─────────────────────────────────────────────
+
+  it('stops before transaction reads or writes when the network guard rejects', async () => {
+    mockEnsureCorrectChain.mockResolvedValueOnce(false);
+    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onFinalize();
+    });
+
+    expect(success).toBe(false);
+    expect(result.current.isClaiming).toBe(false);
+    expect(mockReadContract).not.toHaveBeenCalled();
+    expect(mockEstimateGas).not.toHaveBeenCalled();
+    expect(mockFinalizeCycle).not.toHaveBeenCalled();
+    expect(mockApi.create).not.toHaveBeenCalled();
+    expect(mockPush).not.toHaveBeenCalled();
+
+    await act(async () => {
+      success = await result.current.onFinalize();
+    });
+    expect(success).toBe(true);
+  });
+
+  it('holds the submission lock during a network switch, then writes without a render-time signer', async () => {
+    let finishSwitch!: (allowed: boolean) => void;
+    mockEnsureCorrectChain.mockReturnValueOnce(
+      new Promise<boolean>((resolve) => {
+        finishSwitch = resolve;
+      }),
+    );
+    // A wallet can switch successfully before React supplies a new contract
+    // with a signer. The action uses the current wagmi connector instead.
+    mockUseCosmicGameContract.mockReturnValueOnce(null);
+    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
+    let firstAttempt!: Promise<boolean>;
+    act(() => {
+      firstAttempt = result.current.onFinalize();
+    });
+
+    expect(result.current.isClaiming).toBe(true);
+    expect(mockReadContract).not.toHaveBeenCalled();
+    expect(mockFinalizeCycle).not.toHaveBeenCalled();
+    await act(async () => {
+      expect(await result.current.onFinalize()).toBe(false);
+    });
+    expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      finishSwitch(true);
+      expect(await firstAttempt).toBe(true);
+    });
+    expect(mockFinalizeCycle).toHaveBeenCalledTimes(1);
+    expect(mockFinalizeCycle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chainId: activeChain.id,
+        address: mockGameAddress,
+      }),
+    );
+    expect(result.current.isClaiming).toBe(false);
+  });
 
   it('prevents concurrent claim attempts (returns false on second call while first in flight)', async () => {
     mockReadRoundNum.mockReset();

@@ -480,7 +480,7 @@
   },
   "deck": {
     "title": "Cosmic Signature観測所",
-    "intro": "一筆ごとに時間が延び、シグネチャーが形づくられるパフォーマンス・サイクルです。参加の記録に応じて、確定時の配分の対象になります。",
+    "intro": "ETHまたはCSTで一筆を入れると最新の参加者になります。時計がゼロになると、最新の参加者がサイクルを確定してシグネチャー配分を受け取れます。",
     "newHere": "初めてですか？仕組みを見る",
     "experimentalUi": "実験的なUI",
     "returnToCurrent": "現在のUIに戻る",
@@ -651,5 +651,34 @@
     "searchPlaceholder": "NFT IDを入力",
     "searchIconAlt": "検索アイコン",
     "empty": "見つかりませんでした"
+  },
+  "orientation": {
+    "title": "サイクルの仕組み",
+    "steps": {
+      "enter": {
+        "title": "一筆を入れる",
+        "body": "ETHまたはCSTを支払うと、参加CSTがすぐにウォレットに届きます。"
+      },
+      "extend": {
+        "title": "最新の参加者であり続ける",
+        "body": "新しい一筆で最新の参加者が入れ替わり、時計が延長されることがあります。"
+      },
+      "finalize": {
+        "title": "時計がゼロになったら確定",
+        "body": "最新の参加者はサイクルを確定してシグネチャー配分を受け取れます。確定のトランザクションが承認されるまで一筆を入れられます。"
+      }
+    },
+    "costsNote": "別の参加者が最新になっても、一筆に使ったETHまたはCSTは返金されません。トランザクションのガス代は常にETHで支払います。",
+    "standingsTitle": "ほかの参加の形",
+    "standingsDescription": "このサイクルの持久チャンピオンと時の戦士の記録を見られます。",
+    "allocationsTitle": "サイクルの準備金の行き先",
+    "allocationsDescription": "星選と公共財を含むすべての配分を確認できます。",
+    "storyTitle": "サイクルから生まれるアート",
+    "methods": {
+      "eth": "現在の一筆の費用をETHで支払います。",
+      "cst": "ウォレット内のCSTを使います。現在のコストは時間とともに変わります。",
+      "randomWalk": "対象のRandomWalk NFTでETH一筆の費用を減らせます。NFTはウォレットに残ります。"
+    },
+    "connectHelp": "Arbitrumのウォレットを接続して、一筆の内容を確認できます。"
   }
 }

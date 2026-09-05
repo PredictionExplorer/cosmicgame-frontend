@@ -51,6 +51,56 @@ const baseChampions: ChampionsState = {
 };
 
 describe('ChronoEnduranceIntel', () => {
+  it('keeps every role and the distinct active challenge visible in the dashboard', () => {
+    render(<ChronoEnduranceIntel champions={baseChampions} chronoEth={0.8} compact />);
+    expect(
+      within(screen.getByTestId('control-desk-endurance')).getByRole('link', { name: ENDURANCE }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('chrono-role-summary')).getByRole('link', { name: CHRONO }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('final-cst-role-summary')).getByRole('link', { name: FINAL_CST }),
+    ).toBeInTheDocument();
+    const challenge = screen.getByTestId('chrono-active-challenge');
+    expect(within(challenge).getByRole('link', { name: ENDURANCE })).toBeInTheDocument();
+    expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
+    expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
+    expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('10m 1s');
+  });
+
+  it('exposes the live segment, record threshold, and conditional close time in the dashboard', () => {
+    render(
+      <ChronoEnduranceIntel
+        champions={{
+          ...baseChampions,
+          chrono: {
+            ...baseChampions.chrono,
+            isLive: true,
+            currentSegmentDuration: 1900,
+            willStopGrowingIn: 300,
+          },
+          chronoChallenge: { ...baseChampions.chronoChallenge, isLive: true },
+        }}
+        chronoEth={0.8}
+        compact
+      />,
+    );
+    expect(screen.getByTestId('chrono-current-segment')).toHaveTextContent('31m 40s');
+    expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
+    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent(
+      'tables.specialAllocation.mayCloseValue(duration=5m',
+    );
+    expect(screen.queryByTestId('chrono-active-challenge')).not.toBeInTheDocument();
+  });
+
+  it('keeps all dashboard roles and challenge metrics accessible', async () => {
+    const { container } = render(
+      <ChronoEnduranceIntel champions={baseChampions} chronoEth={0.8} compact />,
+    );
+    await checkA11y(container);
+  });
+
   it('shows Endurance, Chrono, and Final CST roles with distinct recipients and amounts', () => {
     render(<ChronoEnduranceIntel champions={baseChampions} chronoEth={0.8} />);
 

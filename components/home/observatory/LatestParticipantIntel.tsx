@@ -3,7 +3,7 @@
 import { ArrowRight, Radio, User } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatSeconds } from '@/utils';
+import { formatSeconds, shortenHex } from '@/utils';
 
 import { LatestParticipantDetails } from '@/components/special-allocation/LatestParticipantDetails';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -23,6 +23,8 @@ export interface LatestParticipantIntelProps {
   attachedErc20Count?: number;
   showLastGesture?: boolean;
   gestureDetailsPending?: boolean;
+  /** Always-visible dashboard: removes the allocation repeated in the cycle clock. */
+  compact?: boolean;
   className?: string;
 }
 
@@ -47,6 +49,7 @@ export function LatestParticipantIntel({
   attachedErc20Count = 0,
   showLastGesture,
   gestureDetailsPending = false,
+  compact = false,
   className,
 }: LatestParticipantIntelProps) {
   const t = useTranslations('home');
@@ -79,10 +82,12 @@ export function LatestParticipantIntel({
                 id="latest-participant-intel-title"
                 className="font-display text-sm font-bold tracking-tight"
               >
-                {tTables('specialAllocation.latestParticipant')}
+                {tTables(
+                  compact ? 'specialAllocation.lastGesture' : 'specialAllocation.latestParticipant',
+                )}
               </h2>
               <InfoTooltip content={tTables('specialAllocation.latestTooltip')} />
-              {latest.address && (
+              {latest.address && !compact && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-emerald-300">
                   <Radio className="h-2.5 w-2.5" aria-hidden />
                   {tTables('specialAllocation.liveGrowing')}
@@ -94,15 +99,47 @@ export function LatestParticipantIntel({
                 </span>
               )}
             </div>
-            <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
-              {t('observatory.intel.latestSubtitle')}
-            </p>
+            {!compact && (
+              <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
+                {t('observatory.intel.latestSubtitle')}
+              </p>
+            )}
+            {compact && latest.address && (
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <Link
+                  href={`/user/${latest.address}`}
+                  aria-label={latest.address}
+                  title={latest.address}
+                  className={cn(
+                    'font-mono text-xs text-foreground hover:text-primary',
+                    TOUCH_TARGET_TEXT_LINK_CLASS,
+                  )}
+                >
+                  {shortenHex(latest.address, 6)}
+                </Link>
+                {latestGesture && (
+                  <Link
+                    href={`/gesture/${latestGesture.EvtLogId}`}
+                    aria-label={t('observatory.intel.viewGesture')}
+                    title={t('observatory.intel.viewGesture')}
+                    className="inline-flex min-h-6 min-w-6 items-center justify-center rounded text-primary hover:text-foreground"
+                  >
+                    <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
         {latest.address && (
           <span className="shrink-0 text-right">
-            <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span
+              className={cn(
+                'block text-muted-foreground',
+                compact ? 'text-xs' : 'text-[10px] uppercase tracking-wider',
+              )}
+            >
               {tTables('specialAllocation.currentHold')}
             </span>
             <span className="block font-mono text-sm font-semibold tabular-nums text-emerald-300">
@@ -114,29 +151,33 @@ export function LatestParticipantIntel({
 
       {latest.address ? (
         <>
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-            <Link
-              href={`/user/${latest.address}`}
-              className={cn(
-                'min-w-0 break-all font-mono text-xs text-foreground transition-colors hover:text-primary',
-                TOUCH_TARGET_TEXT_LINK_CLASS,
-              )}
-            >
-              {latest.address}
-            </Link>
-            {latestGesture && (
+          {!compact && (
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
               <Link
-                href={`/gesture/${latestGesture.EvtLogId}`}
+                href={`/user/${latest.address}`}
+                aria-label={latest.address}
+                title={latest.address}
                 className={cn(
-                  'inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold text-primary transition-colors hover:text-foreground',
+                  'min-w-0 break-all font-mono text-xs text-foreground transition-colors hover:text-primary',
                   TOUCH_TARGET_TEXT_LINK_CLASS,
                 )}
               >
-                {t('observatory.intel.viewGesture')}
-                <ArrowRight className="h-3 w-3" aria-hidden />
+                {compact ? shortenHex(latest.address, 6) : latest.address}
               </Link>
-            )}
-          </div>
+              {latestGesture && (
+                <Link
+                  href={`/gesture/${latestGesture.EvtLogId}`}
+                  className={cn(
+                    'inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-foreground',
+                    TOUCH_TARGET_TEXT_LINK_CLASS,
+                  )}
+                >
+                  {t('observatory.intel.viewGesture')}
+                  <ArrowRight className="h-3 w-3" aria-hidden />
+                </Link>
+              )}
+            </div>
+          )}
 
           <div className="mt-2">
             <LatestParticipantDetails
@@ -148,20 +189,25 @@ export function LatestParticipantIntel({
               showLastGesture={showLastGesture}
               gestureDetailsPending={gestureDetailsPending}
               compact
-              allocationPackage={{
-                label: t('observatory.intel.inLineFor'),
-                primary: [
-                  t('allocation.amounts.eth', { amount: signatureEth.toFixed(4) }),
-                  t('allocation.amounts.fixedCst'),
-                  t('allocation.amounts.nft'),
-                ].join(' · '),
-                secondary:
-                  attachmentParts.length > 0
-                    ? t('observatory.intel.plusCycleAttachments', {
-                        assets: attachmentParts.join(' · '),
-                      })
-                    : undefined,
-              }}
+              dashboard={compact}
+              allocationPackage={
+                compact
+                  ? undefined
+                  : {
+                      label: t('observatory.intel.inLineFor'),
+                      primary: [
+                        t('allocation.amounts.eth', { amount: signatureEth.toFixed(4) }),
+                        t('allocation.amounts.fixedCst'),
+                        t('allocation.amounts.nft'),
+                      ].join(' · '),
+                      secondary:
+                        attachmentParts.length > 0
+                          ? t('observatory.intel.plusCycleAttachments', {
+                              assets: attachmentParts.join(' · '),
+                            })
+                          : undefined,
+                    }
+              }
             />
           </div>
         </>

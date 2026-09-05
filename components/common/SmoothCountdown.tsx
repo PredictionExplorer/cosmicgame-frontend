@@ -20,6 +20,8 @@ export interface CountdownParts {
 
 interface SmoothCountdownProps {
   date: number;
+  /** Serialized clock sample shared by SSR and the first hydration render. */
+  initialNowMs?: number;
   intervalMs?: number;
   renderer?: (props: LocalizedCountdownRenderProps) => ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -62,12 +64,15 @@ export function toCountdownRenderProps(parts: CountdownParts): CountdownRenderPr
 
 export function SmoothCountdown({
   date,
+  initialNowMs = 0,
   intervalMs = 100,
   renderer,
   size = 'md',
 }: SmoothCountdownProps) {
   const t = useTranslations('formats');
-  const nowMs = useNow(intervalMs);
+  // The shared ticker reports 0 during SSR/hydration. An epoch deadline
+  // must use the page's clock sample until the live browser ticker takes over.
+  const nowMs = useNow(intervalMs) || initialNowMs;
   const props = toCountdownRenderProps(getCountdownParts(date, nowMs));
   const unitLabels: CounterUnitLabels = {
     days: t('countdown.days'),

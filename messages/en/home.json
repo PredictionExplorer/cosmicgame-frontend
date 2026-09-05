@@ -480,7 +480,7 @@
   },
   "deck": {
     "title": "The Cosmic Signature Observatory",
-    "intro": "One live Performance Cycle. Every Gesture extends the clock, shapes the final Signature, and stands in line for allocations.",
+    "intro": "Make a Gesture with ETH or CST to become the latest participant. After the clock reaches zero, the latest participant can finalize and receive the Signature Allocation.",
     "newHere": "New here? How it works",
     "experimentalUi": "Experimental UI",
     "returnToCurrent": "Return to current UI",
@@ -651,5 +651,34 @@
     "searchPlaceholder": "Enter NFT ID",
     "searchIconAlt": "search icon",
     "empty": "Nothing Found!"
+  },
+  "orientation": {
+    "title": "How this cycle works",
+    "steps": {
+      "enter": {
+        "title": "Make a Gesture",
+        "body": "Pay ETH or CST. Your wallet receives Participation CST immediately."
+      },
+      "extend": {
+        "title": "Hold the latest position",
+        "body": "Each new Gesture replaces the latest participant and can extend the clock."
+      },
+      "finalize": {
+        "title": "Finalize after zero",
+        "body": "The latest participant can finalize to receive the Signature Allocation. Gestures remain open until confirmation."
+      }
+    },
+    "costsNote": "ETH or CST spent on a Gesture is not refunded when another participant takes your place. Transaction gas is always paid in ETH.",
+    "standingsTitle": "More ways to participate",
+    "standingsDescription": "Explore the Endurance and Chrono records for this cycle.",
+    "allocationsTitle": "Where the cycle reserve goes",
+    "allocationsDescription": "See every allocation, including Stellar Selection and public goods.",
+    "storyTitle": "The art behind the cycle",
+    "methods": {
+      "eth": "Pay the current Gesture Cost in ETH.",
+      "cst": "Use CST already in your wallet. The live cost changes over time.",
+      "randomWalk": "Use an eligible RandomWalk NFT for a reduced ETH Gesture Cost. The NFT stays in your wallet."
+    },
+    "connectHelp": "Connect a wallet on Arbitrum to review and confirm your Gesture."
   }
 }

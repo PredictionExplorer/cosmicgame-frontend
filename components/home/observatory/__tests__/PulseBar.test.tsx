@@ -38,10 +38,11 @@ describe('PulseBar', () => {
     );
   });
 
-  it('offers the isolated experimental UI without replacing the home route', () => {
+  it('keeps the masthead focused on one newcomer route', () => {
     render(<PulseBar {...baseProps} />);
 
-    expect(screen.getByTestId('experimental-ui-entry')).toHaveAttribute('href', '/experimental-ui');
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.queryByTestId('experimental-ui-entry')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('home.deck.title');
   });
 

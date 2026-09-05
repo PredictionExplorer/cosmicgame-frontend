@@ -88,7 +88,12 @@ export function ActionDock({
     <span className="flex min-w-0 items-center gap-2">
       <Clock3 className={cn('h-4 w-4 shrink-0', view.iconClass)} aria-hidden />
       {showCountdown ? (
-        <SmoothCountdown date={targetMs} renderer={renderCompactCountdown} intervalMs={1000} />
+        <SmoothCountdown
+          date={targetMs}
+          initialNowMs={now}
+          renderer={renderCompactCountdown}
+          intervalMs={1000}
+        />
       ) : (
         <span className="truncate text-sm font-semibold">
           {t(`chrono.phase.${view.messageKey}.label`)}

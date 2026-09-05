@@ -480,7 +480,7 @@
   },
   "deck": {
     "title": "Đài quan sát Cosmic Signature",
-    "intro": "Chu kỳ trình diễn đang diễn ra. Mỗi nét bút kéo dài đếm ngược, định hình Signature cuối cùng và góp phần xác định các phân bổ.",
+    "intro": "Đặt nét bút bằng ETH hoặc CST để trở thành người tham gia gần nhất. Khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
     "newHere": "Mới đến đây? Cách hoạt động",
     "experimentalUi": "Giao diện thử nghiệm",
     "returnToCurrent": "Quay về giao diện hiện tại",
@@ -651,5 +651,34 @@
     "searchPlaceholder": "Nhập mã NFT",
     "searchIconAlt": "biểu tượng tìm kiếm",
     "empty": "Không tìm thấy NFT phù hợp"
+  },
+  "orientation": {
+    "title": "Cách chu kỳ hoạt động",
+    "steps": {
+      "enter": {
+        "title": "Đặt nét bút",
+        "body": "Thanh toán bằng ETH hoặc CST. Ví nhận CST tham gia ngay lập tức."
+      },
+      "extend": {
+        "title": "Giữ vị trí gần nhất",
+        "body": "Mỗi nét bút mới thay thế người tham gia gần nhất và có thể kéo dài đếm ngược."
+      },
+      "finalize": {
+        "title": "Hoàn tất khi về 0",
+        "body": "Người tham gia gần nhất có thể hoàn tất để nhận phân bổ Signature. Vẫn có thể đặt nét bút cho đến khi giao dịch hoàn tất được xác nhận."
+      }
+    },
+    "costsNote": "ETH hoặc CST đã dùng cho nét bút không được hoàn trả khi người khác thay thế vị trí của bạn. Phí gas giao dịch luôn được thanh toán bằng ETH.",
+    "standingsTitle": "Thêm cách tham gia",
+    "standingsDescription": "Khám phá kỷ lục Bền bỉ và Thời gian trong chu kỳ này.",
+    "allocationsTitle": "Dự trữ chu kỳ được phân bổ ra sao",
+    "allocationsDescription": "Xem mọi phân bổ, bao gồm Tinh tuyển và Hàng hóa công.",
+    "storyTitle": "Nghệ thuật phía sau chu kỳ",
+    "methods": {
+      "eth": "Thanh toán chi phí nét bút hiện tại bằng ETH.",
+      "cst": "Dùng CST sẵn có trong ví. Chi phí trực tiếp thay đổi theo thời gian.",
+      "randomWalk": "Dùng RandomWalk NFT đủ điều kiện để giảm chi phí nét bút ETH. NFT vẫn ở trong ví."
+    },
+    "connectHelp": "Kết nối ví trên Arbitrum để xem lại và xác nhận nét bút."
   }
 }

@@ -42,10 +42,16 @@ describe('AllocationLedger', () => {
     }
   });
 
-  it('is the canonical home allocation anchor and links to the full cycle breakdown', () => {
+  it('names its region and links to the full cycle breakdown without duplicating the disclosure anchor', () => {
     render(<AllocationLedger data={makeData()} />);
 
-    expect(screen.getByTestId('allocation-ledger')).toHaveAttribute('id', 'allocation-breakdown');
+    expect(screen.getByRole('region', { name: 'home.observatory.ribbon.title' })).toBe(
+      screen.getByTestId('allocation-ledger'),
+    );
+    expect(screen.getByTestId('allocation-ledger')).not.toHaveAttribute(
+      'id',
+      'allocation-breakdown',
+    );
     expect(
       screen.getByRole('link', { name: /home\.observatory\.ribbon\.fullBreakdown/ }),
     ).toHaveAttribute('href', '/current-cycle#allocation-breakdown');

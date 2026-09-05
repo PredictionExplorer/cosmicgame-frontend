@@ -480,7 +480,7 @@
   },
   "deck": {
     "title": "Cosmic Signature 觀測台",
-    "intro": "一個即時進行的演繹週期：每一次落筆都會延長時鐘、塑造最終簽名，並排入各條分配軌道的候選之列。",
+    "intro": "用 ETH 或 CST 落筆，成為最新落筆者。倒數歸零後，最新落筆者可收官並獲得簽名分配。",
     "newHere": "初來乍到？了解運作方式",
     "experimentalUi": "實驗介面",
     "returnToCurrent": "返回目前介面",
@@ -651,5 +651,34 @@
     "searchPlaceholder": "輸入 NFT ID",
     "searchIconAlt": "搜尋圖示",
     "empty": "找不到符合的 NFT"
+  },
+  "orientation": {
+    "title": "週期如何運作",
+    "steps": {
+      "enter": {
+        "title": "寫下一筆",
+        "body": "支付 ETH 或 CST，錢包會立即收到參與 CST。"
+      },
+      "extend": {
+        "title": "保持最新落筆的位置",
+        "body": "每次新落筆都會替換最新落筆者，並可能延長倒數。"
+      },
+      "finalize": {
+        "title": "歸零後收官",
+        "body": "最新落筆者可收官並獲得簽名分配。收官交易確認前，仍可繼續落筆。"
+      }
+    },
+    "costsNote": "其他參與者取代你的位置時，落筆所花費的 ETH 或 CST 不會退還。交易 Gas 費一律使用 ETH 支付。",
+    "standingsTitle": "更多參與方式",
+    "standingsDescription": "了解本週期的堅守與時之勇士紀錄。",
+    "allocationsTitle": "週期儲備如何分配",
+    "allocationsDescription": "檢視全部分配，包括星選與公共財。",
+    "storyTitle": "週期背後的藝術",
+    "methods": {
+      "eth": "用 ETH 支付目前落筆價格。",
+      "cst": "使用錢包中已有的 CST。即時價格會隨時間變化。",
+      "randomWalk": "使用符合條件的 RandomWalk NFT，降低 ETH 落筆價格。NFT 仍保留在錢包中。"
+    },
+    "connectHelp": "連接 Arbitrum 錢包，檢視並確認你的落筆。"
   }
 }

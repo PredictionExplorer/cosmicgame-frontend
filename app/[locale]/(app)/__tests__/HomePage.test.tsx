@@ -303,8 +303,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   resetUxScenarioForTest();
   window.history.pushState({}, '', '/');
-  // The story section marks returning visitors in localStorage; without a
-  // reset, the first test in the file would leak "visited" into the rest.
+  // Keep notification preferences isolated between tests.
   window.localStorage.clear();
   mockAccount = '0xUser';
   mockUseEndgameChainSync.mockReturnValue({
@@ -391,10 +390,26 @@ const makeDashboardData = (overrides = {}) => ({
   ...overrides,
 });
 
-function mockScrollIntoView() {
+function mockScrollIntoView(reducedMotion = false) {
   const scrollIntoView = jest.fn();
   const prototype = window.HTMLElement.prototype as Partial<Pick<HTMLElement, 'scrollIntoView'>>;
   const original = prototype.scrollIntoView;
+  const originalMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: jest.fn((query: string) => ({
+      matches: reducedMotion && query === '(prefers-reduced-motion: reduce)',
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  });
 
   Object.defineProperty(prototype, 'scrollIntoView', {
     configurable: true,
@@ -405,6 +420,11 @@ function mockScrollIntoView() {
   return {
     scrollIntoView,
     restore: () => {
+      if (originalMatchMedia) {
+        Object.defineProperty(window, 'matchMedia', originalMatchMedia);
+      } else {
+        Reflect.deleteProperty(window, 'matchMedia');
+      }
       if (original) {
         Object.defineProperty(prototype, 'scrollIntoView', {
           configurable: true,
@@ -423,6 +443,15 @@ function getPanelSubmitButton() {
   const button = document.getElementById('gesture-submit');
   expect(button).toBeInstanceOf(HTMLButtonElement);
   return button as HTMLButtonElement;
+}
+
+async function openDisclosure(user: ReturnType<typeof userEvent.setup>, testId: string) {
+  const disclosure = screen.getByTestId(testId);
+  const summary = disclosure.querySelector('summary');
+  expect(summary).not.toBeNull();
+  await user.click(summary!);
+  expect(disclosure).toHaveAttribute('open');
+  return disclosure;
 }
 
 /* ── Tests ──────────────────────────────────────────────────────── */
@@ -504,7 +533,7 @@ describe('HomePage', () => {
     expect(header.compareDocumentPosition(grid)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
-  it('renders the whole game state in one desk: clock, participant intel, panel, and ledger', () => {
+  it('keeps all live decision information visible while allocation detail is collapsed', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),
       isLoading: false,
@@ -516,18 +545,28 @@ describe('HomePage', () => {
     const clock = screen.getByTestId('cycle-clock');
     const latest = screen.getByTestId('latest-participant-intel');
     const chrono = screen.getByTestId('chrono-endurance-intel');
+    const calibration = screen.getByTestId('control-desk-calibration');
     const panel = screen.getByTestId('gesture-panel');
     const ledger = screen.getByTestId('allocation-ledger');
 
     expect(desk).toContainElement(clock);
     expect(desk).toContainElement(latest);
     expect(desk).toContainElement(chrono);
+    expect(desk).toContainElement(calibration);
     expect(desk).toContainElement(panel);
     expect(desk).toContainElement(ledger);
-    expect(clock).toHaveAttribute('data-phase', 'live');
-    expect(screen.getByTestId('latest-participant-allocation-package')).toHaveTextContent(
-      'home.allocation.amounts.eth(amount=1.5000)',
+    expect(clock).toBeVisible();
+    expect(panel).toBeVisible();
+    expect(latest).toBeVisible();
+    expect(chrono).toBeVisible();
+    expect(calibration).toBeVisible();
+    expect(within(calibration).getByRole('region')).toHaveAccessibleName(
+      'home.calibration.cstTitle',
     );
+    expect(screen.queryByTestId('standings-disclosure')).not.toBeInTheDocument();
+    expect(ledger).not.toBeVisible();
+    expect(clock).toHaveAttribute('data-phase', 'live');
+    expect(screen.getByTestId('clock-reserve')).toHaveTextContent('1.5000 ETH');
     expect(screen.getByTestId('control-desk-chrono')).toHaveTextContent(
       'home.allocation.amounts.eth(amount=0.8000)',
     );
@@ -549,13 +588,16 @@ describe('HomePage', () => {
     expect(within(reserve).getByText('home.observatory.clock.reserveExtras')).toBeInTheDocument();
   });
 
-  it('keeps every allocation track visible in the integrated ledger with live amounts', () => {
+  it('reveals the integrated allocation ledger with live amounts on demand', async () => {
+    const user = userEvent.setup();
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
 
     render(<HomePage />);
+
+    await openDisclosure(user, 'allocations-disclosure');
 
     expect(
       within(screen.getByTestId('ledger-track-signature')).getByText(
@@ -587,7 +629,50 @@ describe('HomePage', () => {
     expect(screen.getByTestId('panel-method-cst-cost')).toHaveTextContent('1 CST');
   });
 
-  it('restores complete latest-participant transaction and receipt intelligence', () => {
+  it.each(['ETH', 'CST', 'RandomWalk'])(
+    'keeps one live CST Calibration Window visible with %s selected',
+    (method) => {
+      mockGestureForm.gestureType = method;
+      mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+
+      render(<HomePage />);
+
+      const calibration = screen.getByTestId('control-desk-calibration');
+      expect(calibration).toBeVisible();
+      expect(within(calibration).getByRole('progressbar')).toBeVisible();
+      expect(screen.getAllByRole('region', { name: 'home.calibration.cstTitle' })).toHaveLength(1);
+      expect(screen.getByTestId('gesture-panel')).not.toContainElement(calibration);
+    },
+  );
+
+  it('starts with only the optional message editor closed while decision information and participant identities stay visible', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<HomePage />);
+
+    expect(screen.getByTestId('panel-message-disclosure')).not.toHaveAttribute('open');
+    expect(screen.getByTestId('gesture-message-input')).not.toBeVisible();
+    for (const testId of [
+      'cycle-clock',
+      'latest-participant-intel',
+      'control-desk-endurance',
+      'chrono-role-summary',
+      'control-desk-calibration',
+    ]) {
+      expect(screen.getByTestId(testId)).toBeVisible();
+    }
+    for (const [testId, address] of [
+      ['latest-participant-intel', mockChampions.latestGesture.address],
+      ['control-desk-endurance', mockChampions.endurance.address],
+      ['chrono-role-summary', mockChampions.chrono.address],
+    ] as const) {
+      const profile = within(screen.getByTestId(testId)).getByRole('link', { name: address });
+      expect(profile).toBeVisible();
+      expect(profile).toHaveAttribute('href', `/user/${address}`);
+      expect(profile).toHaveAttribute('title', address);
+    }
+  });
+
+  it('shows complete latest-participant transaction and receipt details without disclosure', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -619,7 +704,7 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const intel = screen.getByTestId('latest-participant-intel');
-    for (const link of within(intel).getAllByText('0xBidder')) {
+    for (const link of within(intel).getAllByRole('link', { name: '0xBidder' })) {
       expect(link).toHaveAttribute('href', '/user/0xBidder');
     }
     expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('0.0500000 ETH');
@@ -635,9 +720,7 @@ describe('HomePage', () => {
     expect(
       screen.getByRole('progressbar', { name: 'tables.specialAllocation.progressAria' }),
     ).toHaveAttribute('aria-valuenow', '16');
-    expect(screen.getByTestId('latest-participant-allocation-package')).toHaveTextContent(
-      'home.observatory.intel.plusCycleAttachments',
-    );
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-erc20-count', '1');
   });
 
   it('restores the active Endurance challenge and complete Chrono next-change state', () => {
@@ -659,7 +742,7 @@ describe('HomePage', () => {
     );
   });
 
-  it('keeps Last Gesture visible when the special-recipient snapshot is stale', () => {
+  it('keeps Last Gesture current when the special-recipient snapshot is stale', () => {
     const freshAddress = '0xFresh';
     const freshGesture = {
       EvtLogId: 91,
@@ -705,7 +788,7 @@ describe('HomePage', () => {
       '0.0700000 ETH',
     );
     expect(
-      within(screen.getByTestId('latest-participant-gesture-details')).getByRole('link', {
+      within(screen.getByTestId('latest-participant-intel')).getByRole('link', {
         name: freshAddress,
       }),
     ).toHaveAttribute('href', `/user/${freshAddress}`);
@@ -822,7 +905,7 @@ describe('HomePage', () => {
     expect(screen.getByTestId('gesture-panel')).toBeInTheDocument();
   });
 
-  it('keeps mobile prices in the desk while the inline console is desktop-only', () => {
+  it('keeps prices and the inline action together at every viewport size', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -830,11 +913,15 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(screen.getByTestId('gesture-price-strip')).toBeInTheDocument();
-    expect(screen.getByTestId('gesture-price-eth')).toHaveTextContent('0.01000 ETH');
-    expect(screen.getByTestId('gesture-price-randomWalk')).toHaveTextContent('0.00500 ETH');
-    expect(screen.getByTestId('gesture-price-cst')).toHaveTextContent('1 CST');
-    expect(screen.getByTestId('control-desk-gesture')).toHaveClass('hidden', 'lg:block');
+    const panel = screen.getByTestId('gesture-panel');
+    expect(panel).toBeVisible();
+    expect(within(panel).getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
+    expect(within(panel).getByTestId('panel-method-randomWalk-cost')).toHaveTextContent(
+      '0.00500 ETH',
+    );
+    expect(within(panel).getByTestId('panel-method-cst-cost')).toHaveTextContent('1 CST');
+    expect(screen.queryByTestId('gesture-price-strip')).not.toBeInTheDocument();
+    expect(screen.getByTestId('control-desk-gesture')).not.toHaveClass('hidden');
   });
 
   it('threads first-paint role and latest-gesture seeds into their live hooks', () => {
@@ -888,12 +975,13 @@ describe('HomePage', () => {
     const feed = screen.getByTestId('home-feed-layout');
     const ledger = screen.getByTestId('allocation-ledger');
     const story = screen.getByTestId('home-story-section');
-    const phaseGuide = screen.getByRole('heading', { name: 'home.phaseGuide.title' });
+    const phaseGuide = within(story).getByText('home.phaseGuide.title');
 
     expect(desk).toContainElement(strip);
     expect(desk).toContainElement(ledger);
     expect(desk.compareDocumentPosition(feed)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(story.compareDocumentPosition(phaseGuide)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(story).toContainElement(phaseGuide);
+    expect(phaseGuide).not.toBeVisible();
     expect(screen.queryByText('home.allocation.title')).not.toBeInTheDocument();
   });
 
@@ -918,7 +1006,7 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('deck-personal-strip')).not.toBeInTheDocument();
   });
 
-  it('keeps artwork and attachments in the depth rail while consolidating cycle links above it', () => {
+  it('keeps artwork and attachments beside the activity feed below the decision stage', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),
       isLoading: false,
@@ -933,7 +1021,10 @@ describe('HomePage', () => {
 
     const rail = screen.getByTestId('home-depth-rail');
     const actions = screen.getByTestId('home-feed-actions');
-    expect(rail).toContainElement(screen.getByTestId('deck-art-card'));
+    const art = screen.getByTestId('deck-art-card');
+    expect(screen.getByTestId('control-desk')).not.toContainElement(art);
+    expect(art).toBeVisible();
+    expect(rail).toContainElement(art);
     expect(actions).toContainElement(screen.getByTestId('cycle-details-link-card'));
     expect(screen.getByTestId('cycle-details-link-card')).toHaveAttribute('href', '/current-cycle');
     expect(screen.getByTestId('previous-cycle-link-card')).toHaveAttribute('href', '/allocation/6');
@@ -966,7 +1057,8 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
   });
 
-  it('renders the story hero below the fold with a level-2 heading', () => {
+  it('reveals the story with a level-2 heading while preserving the single page H1', async () => {
+    const user = userEvent.setup();
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42, PrizeAmountEth: 2.75 }),
       isLoading: false,
@@ -974,7 +1066,7 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    const story = screen.getByTestId('home-story-section');
+    const story = await openDisclosure(user, 'home-story-section');
     expect(
       within(story).getByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
     ).toBeInTheDocument();
@@ -983,39 +1075,45 @@ describe('HomePage', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('collapses the story section for returning visitors and expands on demand', async () => {
+  it('starts the story collapsed without depending on a saved visit and toggles on demand', async () => {
     const user = userEvent.setup();
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
 
-    // First visit: full story, and the visit is recorded.
-    const first = render(<HomePage />);
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
-    ).toBeInTheDocument();
-    expect(window.localStorage.getItem('cosmic-observatory-visited')).toBe('1');
-    first.unmount();
-
-    // Return visit: collapsed to the disclosure row until expanded.
     render(<HomePage />);
-    expect(
-      screen.queryByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
-    ).not.toBeInTheDocument();
-    const expand = screen.getByTestId('story-expand');
-    expect(expand).toHaveTextContent('home.deck.story.collapsedTitle');
+    const story = screen.getByTestId('home-story-section');
+    const headline = within(story).getByText('home.hero.phase.live.headline');
+    expect(story).not.toHaveAttribute('open');
+    expect(headline).not.toBeVisible();
+    expect(window.localStorage.getItem('cosmic-observatory-visited')).toBeNull();
 
-    await user.click(expand);
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'home.hero.phase.live.headline' }),
-    ).toBeInTheDocument();
+    await openDisclosure(user, 'home-story-section');
+    expect(headline).toBeVisible();
+    expect(within(story).getByRole('link', { name: 'home.deck.experimentalUi' })).toHaveAttribute(
+      'href',
+      '/experimental-ui',
+    );
+    expect(screen.getByTestId('home-deck-header')).not.toContainElement(
+      screen.getByTestId('experimental-ui-entry'),
+    );
+
+    await user.click(within(story).getByText('home.orientation.storyTitle'));
+    expect(story).not.toHaveAttribute('open');
+    expect(headline).not.toBeVisible();
   });
 
-  it('renders LatestNFTs after the shell', () => {
+  it('offers gallery discovery from one featured artwork instead of repeating the gallery', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<HomePage />);
-    expect(screen.getByTestId('latest-nfts')).toBeInTheDocument();
+    expect(screen.queryByTestId('latest-nfts')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('deck-art-card')).toHaveLength(1);
+    expect(
+      within(screen.getByTestId('deck-art-card')).getByRole('link', {
+        name: 'home.deck.art.galleryCta',
+      }),
+    ).toHaveAttribute('href', '/gallery');
   });
 
   /* ── Gesture flow (the one panel) ───────────────────────────── */
@@ -1213,16 +1311,13 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('gesture-panel')).not.toBeInTheDocument();
     expect(screen.queryByTestId('action-dock-mobile')).not.toBeInTheDocument();
     expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon');
-    expect(screen.getByTestId('control-desk-latest')).toHaveClass('lg:col-span-7', 'xl:col-span-9');
-    expect(screen.getByTestId('control-desk-chrono')).toHaveClass('lg:col-span-12');
+    expect(screen.getByTestId('latest-participant-intel')).toBeVisible();
+    expect(screen.getByTestId('chrono-endurance-intel')).toBeVisible();
+    expect(screen.getByTestId('home-depth-rail')).toContainElement(
+      screen.getByTestId('deck-art-card'),
+    );
     expect(screen.getByTestId('clock-calendar-link')).toBeInTheDocument();
-    const links = screen.getAllByRole('link', {
-      name: /home\.hero\.viewCycleDetails|home\.chrono\.cta\.viewCycle/,
-    });
-    expect(links.length).toBeGreaterThanOrEqual(1);
-    for (const link of links) {
-      expect(link).toHaveAttribute('href', '/current-cycle');
-    }
+    expect(screen.getByTestId('cycle-details-link-card')).toHaveAttribute('href', '/current-cycle');
   });
 
   it('shows the panel skeleton instead of a blocking overlay while loading', () => {
@@ -1284,7 +1379,9 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
-    expect(screen.getByText('home.form.preview')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('connect-to-gesture')).getByText('home.orientation.connectHelp'),
+    ).toBeVisible();
     // Live prices stay visible for observers deciding whether to join.
     expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
     expect((await screen.findAllByTestId('connect-wallet-button')).length).toBeGreaterThanOrEqual(
@@ -1387,28 +1484,47 @@ describe('HomePage', () => {
     expect(events.some((event) => event.dataset.kind === 'enduranceRecord')).toBe(true);
   });
 
-  it('routes the chat join CTA to the gesture panel and focuses the message field', async () => {
-    const user = userEvent.setup();
-    const { scrollIntoView, restore } = mockScrollIntoView();
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
-      isLoading: false,
-    });
-    mockUseGestureListByCycle.mockReturnValue({ data: [] });
+  it.each([false, true])(
+    'opens the optional message editor before focusing it from the chat CTA (reduced motion: %s)',
+    async (reducedMotion) => {
+      const user = userEvent.setup();
+      const { scrollIntoView, restore } = mockScrollIntoView(reducedMotion);
+      mockUseDashboardInfo.mockReturnValue({
+        data: makeDashboardData(),
+        isLoading: false,
+      });
+      mockUseGestureListByCycle.mockReturnValue({ data: [] });
 
-    try {
-      render(<HomePage />);
+      try {
+        render(<HomePage />);
 
-      const chat = screen.getByTestId('gesture-message-chat');
-      await user.click(within(chat).getByRole('button', { name: 'home.chat.empty.cta' }));
+        const disclosure = screen.getByTestId('panel-message-disclosure');
+        const input = screen.getByTestId('gesture-message-input');
+        const openStatesOnFocus: boolean[] = [];
+        input.addEventListener('focus', () => {
+          openStatesOnFocus.push(disclosure.hasAttribute('open'));
+        });
+        expect(disclosure).not.toHaveAttribute('open');
+        expect(input).not.toBeVisible();
 
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
-      expect(screen.getByTestId('gesture-message-input')).toHaveFocus();
-      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
-    } finally {
-      restore();
-    }
-  });
+        const chat = screen.getByTestId('gesture-message-chat');
+        await user.click(within(chat).getByRole('button', { name: 'home.chat.empty.cta' }));
+
+        expect(scrollIntoView).toHaveBeenCalledWith({
+          behavior: reducedMotion ? 'instant' : 'smooth',
+          block: 'start',
+        });
+        expect(disclosure).toHaveAttribute('open');
+        expect(input).toBeVisible();
+        expect(input).toHaveFocus();
+        expect(openStatesOnFocus).toEqual([true]);
+        expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1);
+        expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
+      } finally {
+        restore();
+      }
+    },
+  );
 
   it('shows an optimistic pending message until the indexer echoes it', async () => {
     const user = userEvent.setup();
@@ -1453,12 +1569,31 @@ describe('HomePage', () => {
     try {
       render(<HomePage />);
 
-      const story = screen.getByTestId('home-story-section');
+      const story = await openDisclosure(user, 'home-story-section');
       await user.click(within(story).getByRole('button', { name: /home\.hero\.phase\.live\.cta/ }));
 
       expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+      expect(document.getElementById('make-gesture')).toHaveFocus();
       expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
       expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
+    } finally {
+      restore();
+    }
+  });
+
+  it('respects reduced motion when the story action moves focus to the form', async () => {
+    const user = userEvent.setup();
+    const { scrollIntoView, restore } = mockScrollIntoView(true);
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+
+    try {
+      render(<HomePage />);
+      const story = await openDisclosure(user, 'home-story-section');
+      await user.click(within(story).getByRole('button', { name: /home\.hero\.phase\.live\.cta/ }));
+
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'instant', block: 'start' });
+      expect(document.getElementById('make-gesture')).toHaveFocus();
+      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
     } finally {
       restore();
     }
@@ -1484,6 +1619,7 @@ describe('HomePage', () => {
 
   it('opens the bottom sheet hosting the same gesture panel from the dock', async () => {
     const user = userEvent.setup();
+    mockGestureForm.message = 'A shared draft';
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1491,12 +1627,24 @@ describe('HomePage', () => {
 
     render(<HomePage />);
     expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1);
+    const inlineEditor = screen.getByTestId('gesture-message-input');
+    expect(inlineEditor).toHaveValue('A shared draft');
+    expect(inlineEditor).not.toBeVisible();
 
     await user.click(screen.getByTestId('dock-open-sheet'));
 
     const panels = screen.getAllByTestId('gesture-panel');
     expect(panels).toHaveLength(2);
-    expect(panels[panels.length - 1]).toHaveAttribute('data-variant', 'sheet');
+    const sheet = panels[panels.length - 1]!;
+    expect(sheet).toHaveAttribute('data-variant', 'sheet');
+    expect(within(sheet).queryByTestId('panel-message-disclosure')).not.toBeInTheDocument();
+    expect(within(sheet).getByTestId('gesture-message-input')).toBeVisible();
+    expect(within(sheet).getByTestId('gesture-message-input')).toHaveValue('A shared draft');
+
+    await user.keyboard('{Escape}');
+    expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1);
+    expect(screen.getByTestId('panel-message-disclosure')).not.toHaveAttribute('open');
+    expect(inlineEditor).toHaveValue('A shared draft');
   });
 
   it('submits from the sheet panel and closes it', async () => {
@@ -1616,6 +1764,23 @@ describe('HomePage', () => {
       isLoading: false,
     });
     const { container } = render(<HomePage />);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
+  });
+
+  it('keeps optional content accessible after all disclosures are expanded', async () => {
+    const user = userEvent.setup();
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    const { container } = render(<HomePage />);
+
+    for (const testId of ['allocations-disclosure', 'home-story-section']) {
+      await openDisclosure(user, testId);
+    }
+
+    expect(screen.getByTestId('latest-participant-intel')).toBeVisible();
+    expect(screen.getByTestId('allocation-ledger')).toBeVisible();
+    expect(screen.getByTestId('experimental-ui-entry')).toBeVisible();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(container.querySelectorAll('#allocation-breakdown')).toHaveLength(1);
     await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

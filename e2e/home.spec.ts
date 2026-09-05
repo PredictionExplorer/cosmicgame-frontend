@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 const CST_UNISWAP_SWAP_URL =
   'https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0';
@@ -14,6 +14,13 @@ const CST_UNISWAP_SWAP_URL =
 /** Scrolls locator into view before interaction/assertion (needed on mobile). */
 async function ensureVisible(locator: { scrollIntoViewIfNeeded(): Promise<void> }) {
   await locator.scrollIntoViewIfNeeded();
+}
+
+async function openDisclosure(page: Page, testId: string) {
+  const disclosure = page.getByTestId(testId);
+  await disclosure.locator('summary').click();
+  await expect(disclosure).toHaveAttribute('open', '');
+  return disclosure;
 }
 
 /**
@@ -62,6 +69,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('shows cycle info', async ({ page }) => {
+    await openDisclosure(page, 'home-story-section');
     const cycleInfo = page.getByRole('region', { name: 'Current cycle observatory' });
     await ensureVisible(cycleInfo);
     await expect(cycleInfo).toBeVisible();
@@ -69,24 +77,8 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('links to trade CST on Uniswap', async ({ page }) => {
-    const isMobile = await page.evaluate(() => window.innerWidth < 1024);
-    if (isMobile) {
-      const dock = page.getByTestId('dock-open-sheet');
-      test.skip(
-        !(await dock.isVisible({ timeout: 5000 }).catch(() => false)),
-        'no active cycle, so the mobile gesture sheet is unavailable',
-      );
-      await dock.click();
-      const cstMethod = page
-        .locator('[data-testid="gesture-panel"][data-variant="sheet"]:visible')
-        .getByTestId('panel-method-cst');
-      test.skip(
-        !(await cstMethod.isVisible({ timeout: 3000 }).catch(() => false)),
-        'CST method unlocks after the first Gesture',
-      );
-      await cstMethod.click();
-    }
-    const tradeLink = page.getByRole('link', { name: 'Trade CST on Uniswap' }).first();
+    const story = await openDisclosure(page, 'home-story-section');
+    const tradeLink = story.getByRole('link', { name: 'Trade CST on Uniswap' });
     await ensureVisible(tradeLink);
     await expect(tradeLink).toBeVisible();
     await expect(tradeLink).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
@@ -98,6 +90,8 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     ).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('control-desk')).toBeVisible();
     const ledger = page.getByTestId('allocation-ledger');
+    await expect(ledger).toBeHidden();
+    await openDisclosure(page, 'allocations-disclosure');
     await ensureVisible(ledger);
     await expect(ledger).toBeVisible();
     await expect(ledger.getByText('Allocation Tracks')).toBeVisible();
@@ -134,13 +128,6 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
       'the gesture panel is legitimately hidden while no cycle is active',
     );
 
-    const isMobile = await page.evaluate(() => window.innerWidth < 1024);
-    if (isMobile) {
-      await expect(page.locator('[data-testid="gesture-panel"]:visible')).toHaveCount(0);
-      await expect(page.getByTestId('gesture-price-strip')).toBeVisible();
-      return;
-    }
-
     const panel = page.locator('[data-testid="gesture-panel"]:visible').first();
     await ensureVisible(panel);
     await expect(panel).toBeVisible();
@@ -148,7 +135,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(panel.getByTestId('panel-method-eth-cost')).toBeVisible();
     // Disconnected visitors get the connect prompt inside the panel.
     await expect(panel.getByTestId('connect-to-gesture')).toBeVisible();
-    await expect(panel.getByText(/Connect to submit your gesture/i)).toBeVisible();
+    await expect(panel.getByText(/Connect a wallet on Arbitrum/i)).toBeVisible();
 
     // The panel sits in the stage, above the message feed.
     const chat = page.locator('[data-testid="gesture-message-chat"]:visible').first();
@@ -168,23 +155,21 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
       'gesture prices are legitimately hidden while no cycle is active',
     );
 
-    const isMobile = await page.evaluate(() => window.innerWidth < 1024);
-    const ethCost = isMobile
-      ? page.getByTestId('gesture-price-eth')
-      : page.locator('[data-testid="panel-method-eth-cost"]:visible').first();
+    const ethCost = page.locator('[data-testid="panel-method-eth-cost"]:visible').first();
     await ensureVisible(ethCost);
     await expect(ethCost).toBeVisible({ timeout: 15000 });
     await expect(ethCost).toContainText(/ETH/);
   });
 
   test('shows main allocation reward', async ({ page }) => {
-    const signatureAllocation = page.locator('text=/Signature Allocation/i').first();
+    const signatureAllocation = page.getByTestId('clock-reserve').getByText('Signature Allocation');
     await ensureVisible(signatureAllocation);
     await expect(signatureAllocation).toBeVisible();
   });
 
   test('keeps Public Goods compact in the ledger rather than a feature card', async ({ page }) => {
     await expect(page.getByTestId('public-goods-impact-card')).toHaveCount(0);
+    await openDisclosure(page, 'allocations-disclosure');
     const track = page.getByTestId('ledger-track-public-goods');
     await ensureVisible(track);
     await expect(track).toBeVisible();
@@ -196,10 +181,10 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     const latest = page.getByTestId('latest-participant-intel').first();
     await ensureVisible(latest);
     await expect(latest).toBeVisible();
-    await expect(latest.getByText('Latest Participant')).toBeVisible();
+    await expect(latest.getByRole('heading', { name: 'Last Gesture' })).toBeVisible();
     await expect(latest.getByText('Amount paid')).toBeVisible();
     await expect(latest.getByText('CST received')).toBeVisible();
-    await expect(latest.getByText('Currently in line for at finalization')).toBeVisible();
+    await expect(page.getByTestId('clock-reserve')).toContainText('Signature Allocation');
     await expect(
       latest.getByRole('progressbar', { name: /Progress toward Endurance/ }),
     ).toBeVisible();
@@ -210,7 +195,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     const intel = page.getByTestId('chrono-endurance-intel').first();
     await ensureVisible(intel);
     await expect(intel).toBeVisible({ timeout: 15000 });
-    await expect(intel.getByText('Endurance & Chrono')).toBeVisible();
+    await expect(intel).toHaveAccessibleName('Endurance & Chrono');
     const championLabel = intel.getByText('Endurance Champion').first();
     await expect(championLabel).toBeVisible();
     const chronoLabel = intel.getByText(/Chrono-Warrior|Chrono Warrior/i).first();
@@ -241,10 +226,16 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     }
   });
 
-  test('NFT grid shows items', async ({ page }) => {
-    const latestNfts = page.locator('text=/Latest NFTs/i').first();
-    await ensureVisible(latestNfts);
-    await expect(latestNfts).toBeVisible();
+  test('features one artwork panel with a path to the gallery', async ({ page }) => {
+    const artwork = page.getByTestId('deck-art-card');
+    await expect(artwork).toHaveCount(1);
+    await ensureVisible(artwork);
+    await expect(artwork).toBeVisible();
+    await expect(artwork.getByRole('link', { name: 'Gallery' })).toHaveAttribute(
+      'href',
+      '/gallery',
+    );
+    await expect(page.getByText('Latest NFTs', { exact: true })).toHaveCount(0);
   });
 
   test('role intelligence labels exist', async ({ page }) => {
@@ -297,6 +288,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('Distribution of funds section renders', async ({ page }) => {
+    await openDisclosure(page, 'allocations-disclosure');
     const section = page.getByTestId('allocation-ledger');
     await ensureVisible(section);
     await expect(section).toBeVisible();

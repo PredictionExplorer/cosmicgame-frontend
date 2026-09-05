@@ -1,3 +1,5 @@
+import type { CTPriceInfo } from '@/services/api/types';
+
 import {
   deriveLiveCstGestureData,
   formatCstProgressPercent,
@@ -20,6 +22,7 @@ describe('cstGesture utilities', () => {
       SecondsElapsed: 1200,
       isFree: false,
       source: 'api',
+      timingAvailable: true,
     });
   });
 
@@ -110,6 +113,108 @@ describe('cstGesture utilities', () => {
 
     expect(result.isFree).toBe(true);
   });
+
+  it('keeps a duration-only contract snapshot unpriced until a price arrives', () => {
+    const durations = { AuctionDuration: 5400, SecondsElapsed: 6000, updatedAtMs: 10_000 };
+    const pending = mapCTPriceInfo(undefined, durations);
+
+    expect(pending).toMatchObject({
+      ...durations,
+      source: 'empty',
+      isFree: false,
+      timingAvailable: true,
+    });
+    expect(deriveLiveCstGestureData(pending, { nowMs: 15_000 })).toMatchObject({
+      source: 'empty',
+      isFree: false,
+    });
+    expect(mapCTPriceInfo(undefined, durations, 0n)).toMatchObject({
+      CSTPriceWei: 0n,
+      source: 'contract',
+      isFree: true,
+    });
+  });
+
+  it.each([0n, 20n * 10n ** 18n])(
+    'keeps quote-only timing unavailable for a confirmed price of %s',
+    (price) => {
+      expect(mapCTPriceInfo(null, null, price)).toMatchObject({
+        source: 'contract',
+        CSTPriceWei: price,
+        timingAvailable: false,
+      });
+    },
+  );
+
+  it('distinguishes a missing sample from a confirmed zero-duration window', () => {
+    expect(mapCTPriceInfo(null).timingAvailable).toBe(false);
+    expect(
+      mapCTPriceInfo({ AuctionDuration: '0', SecondsElapsed: '0', CSTPrice: '0' }),
+    ).toMatchObject({
+      timingAvailable: true,
+      AuctionDuration: 0,
+      SecondsElapsed: 0,
+    });
+    expect(mapCTPriceInfo(null, { AuctionDuration: 0, SecondsElapsed: 0 })).toMatchObject({
+      timingAvailable: true,
+      source: 'empty',
+      isFree: false,
+    });
+  });
+
+  it.each([
+    { AuctionDuration: '3600', SecondsElapsed: undefined },
+    { AuctionDuration: undefined, SecondsElapsed: '60' },
+    { AuctionDuration: '', SecondsElapsed: '60' },
+    { AuctionDuration: '3600ms', SecondsElapsed: '60' },
+    { AuctionDuration: '3600', SecondsElapsed: '-1' },
+    { AuctionDuration: '3600', SecondsElapsed: '1.5' },
+  ])('does not promote malformed or missing API timing to a real window: %j', (timing) => {
+    const result = mapCTPriceInfo({ ...timing, CSTPrice: '20000000000000000000' } as CTPriceInfo);
+    expect(result).toMatchObject({ source: 'api', CSTPrice: 20, timingAvailable: false });
+    expect(result.AuctionDuration).toBe(0);
+    expect(result.SecondsElapsed).toBe(0);
+  });
+
+  it.each([
+    { AuctionDuration: Number.NaN, SecondsElapsed: 60 },
+    { AuctionDuration: 3600, SecondsElapsed: Number.POSITIVE_INFINITY },
+    { AuctionDuration: 3600, SecondsElapsed: -1 },
+    { AuctionDuration: 3600, SecondsElapsed: 1.5 },
+  ])('rejects malformed contract timing without discarding a valid price: %j', (timing) => {
+    expect(mapCTPriceInfo(null, timing, 20n * 10n ** 18n)).toMatchObject({
+      source: 'contract',
+      CSTPrice: 20,
+      timingAvailable: false,
+    });
+  });
+
+  it('uses the coherent API pair when a contract timing read is invalid', () => {
+    const result = mapCTPriceInfo(
+      { AuctionDuration: '3600', SecondsElapsed: '900', CSTPrice: '20000000000000000000' },
+      { AuctionDuration: Number.NaN, SecondsElapsed: 10, updatedAtMs: 10_000 },
+    );
+    expect(result).toMatchObject({
+      timingAvailable: true,
+      AuctionDuration: 3600,
+      SecondsElapsed: 900,
+      source: 'api',
+    });
+    expect(result.updatedAtMs).toBeUndefined();
+  });
+
+  it.each(['', ' ', '-1', 'invalid'])(
+    'does not advertise a malformed price as free: %j',
+    (price) => {
+      const result = mapCTPriceInfo({
+        AuctionDuration: '43200',
+        CSTPrice: price,
+        SecondsElapsed: '1200',
+      });
+
+      expect(result).toMatchObject({ source: 'empty', isFree: false });
+    },
+  );
 
   it('does not leak NaN when API fields are malformed', () => {
     const result = mapCTPriceInfo({

@@ -1,6 +1,7 @@
 'use client';
 
 import type { CountdownRenderProps } from 'react-countdown';
+import { zeroAddress } from 'viem';
 import { ArrowRight, BellRing, CalendarPlus, Clock3 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -45,6 +46,8 @@ export interface CycleClockProps {
   ethUsdPrice?: number;
   /** Removes the standalone card treatment inside the unified control desk. */
   embedded?: boolean;
+  /** Dense decision view; keeps the timer and allocation in the first screen. */
+  compact?: boolean;
   className?: string;
 }
 
@@ -69,10 +72,12 @@ export function CycleClock({
   onNotifyThresholdChange,
   ethUsdPrice = 0,
   embedded = false,
+  compact = false,
   className,
 }: CycleClockProps) {
   const t = useTranslations('home');
   const locale = useLocale();
+  const tTables = useTranslations('tables');
 
   const cycleState = getCycleState({
     data,
@@ -108,7 +113,7 @@ export function CycleClock({
   const renderClockCounter = (props: CountdownRenderProps) => (
     <Counter
       {...props}
-      size={embedded ? 'md' : 'xl'}
+      size={compact ? 'dashboard' : 'xl'}
       tone={cycleState.isOpeningSoon ? 'impact' : 'default'}
     />
   );
@@ -151,7 +156,7 @@ export function CycleClock({
         <div
           className={cn(
             'relative flex h-full flex-col text-center',
-            embedded ? 'px-3 py-3' : 'px-4 py-5 sm:px-6 sm:py-6',
+            compact ? 'p-3' : embedded ? 'px-5 py-6 sm:px-8 sm:py-8' : 'px-4 py-5 sm:px-6 sm:py-6',
           )}
         >
           <div
@@ -169,8 +174,12 @@ export function CycleClock({
             className={cn(
               // `@container`: the fluid `xl` Counter sizes its digits in cqw
               // against this box, so the clock always fits its column.
-              '@container border border-white/[0.10] bg-black/20 text-center backdrop-blur-md',
-              embedded ? 'rounded-xl p-2.5' : 'rounded-[1.75rem] p-4 sm:p-5',
+              '@container mx-auto w-full max-w-lg text-center',
+              compact
+                ? 'px-0 py-1'
+                : embedded
+                  ? 'px-1 py-3 sm:px-4'
+                  : 'rounded-[1.75rem] p-4 sm:p-5',
               phase === 'final-minute' && 'motion-safe:animate-urgency-pulse',
             )}
             role="timer"
@@ -178,7 +187,12 @@ export function CycleClock({
             aria-label={t('chrono.timerAria', { label, status })}
           >
             {showCountdown ? (
-              <SmoothCountdown date={targetMs} renderer={renderClockCounter} />
+              <SmoothCountdown
+                date={targetMs}
+                initialNowMs={now}
+                renderer={renderClockCounter}
+                intervalMs={phase === 'final-minute' ? 100 : 1000}
+              />
             ) : (
               <div
                 className={cn(
@@ -188,7 +202,9 @@ export function CycleClock({
               >
                 <p
                   className={cn(
-                    'font-display text-3xl font-bold tracking-tight sm:text-5xl',
+                    compact
+                      ? 'font-display text-xl font-bold tracking-tight'
+                      : 'font-display text-3xl font-bold tracking-tight sm:text-5xl',
                     view.clockTextClass,
                   )}
                 >
@@ -201,7 +217,13 @@ export function CycleClock({
           <p
             className={cn(
               'mx-auto max-w-xl text-muted-foreground',
-              embedded ? 'mt-2 text-xs leading-relaxed' : 'mt-3 text-sm',
+              compact
+                ? 'sr-only'
+                : embedded
+                  ? compact
+                    ? 'mt-1 text-xs leading-snug'
+                    : 'mt-2 text-xs leading-relaxed'
+                  : 'mt-3 text-sm',
             )}
           >
             {status}
@@ -211,8 +233,12 @@ export function CycleClock({
           <div
             data-testid="clock-reserve"
             className={cn(
-              'mx-auto w-full max-w-md border border-primary/20 bg-primary/[0.05]',
-              embedded ? 'mt-2.5 rounded-lg px-3 py-2' : 'mt-4 rounded-2xl px-4 py-3',
+              'mx-auto w-full max-w-md',
+              compact
+                ? 'mt-2 border-t border-white/10 pt-2'
+                : embedded
+                  ? 'mt-5 px-3 py-2'
+                  : 'mt-4 rounded-2xl px-4 py-3',
             )}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -222,7 +248,11 @@ export function CycleClock({
             <p
               className={cn(
                 'mt-0.5 font-display font-bold tabular-nums text-gradient-signature',
-                embedded ? 'text-xl' : 'text-3xl',
+                compact
+                  ? 'inline-block text-[clamp(1.6rem,2.2vw,2rem)] break-words leading-tight'
+                  : embedded
+                    ? 'text-4xl sm:text-5xl'
+                    : 'text-3xl',
               )}
             >
               {reserveEth.toFixed(4)} ETH
@@ -230,7 +260,10 @@ export function CycleClock({
             {reserveUsd > 0 && (
               <p
                 data-testid="clock-reserve-usd"
-                className="mt-0.5 text-xs font-medium tabular-nums text-muted-foreground"
+                className={cn(
+                  'mt-0.5 text-xs font-medium tabular-nums text-muted-foreground',
+                  compact && 'ml-2 inline-block',
+                )}
               >
                 {t('observatory.clock.reserveUsd', {
                   amount: reserveUsd.toLocaleString(locale, { maximumFractionDigits: 0 }),
@@ -240,12 +273,28 @@ export function CycleClock({
             <p
               className={cn(
                 'text-muted-foreground',
-                embedded ? 'mt-0.5 text-[10px]' : 'mt-1 text-xs',
+                compact ? 'mt-1 text-xs leading-snug' : 'mt-2 text-xs leading-relaxed',
               )}
             >
               {t('observatory.clock.reserveExtras')}
             </p>
           </div>
+
+          {!compact && data?.LastBidderAddr && data.LastBidderAddr !== zeroAddress && (
+            <div
+              data-testid="clock-latest-participant"
+              className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-white/10 pt-4 text-xs text-muted-foreground"
+            >
+              <span>{tTables('specialAllocation.latestParticipant')}</span>
+              <Link
+                href={`/user/${data.LastBidderAddr}`}
+                className="inline-flex min-h-8 items-center font-mono text-primary hover:text-foreground"
+                aria-label={data.LastBidderAddr}
+              >
+                {data.LastBidderAddr.slice(0, 6)}…{data.LastBidderAddr.slice(-4)}
+              </Link>
+            </div>
+          )}
 
           {/* Finalize is the clock's own action: it exists because the clock hit zero. */}
           {!loading && cycleState.isReadyToFinalize && canClaim && account && (
@@ -254,7 +303,7 @@ export function CycleClock({
                 size="lg"
                 data-testid="clock-finalize"
                 onClick={onFinalize}
-                className="h-12 w-full border-0 bg-gradient-to-r from-emerald-500 to-emerald-600 text-base font-semibold text-white hover:opacity-90"
+                className="min-h-11 h-auto w-full whitespace-normal py-2 border-0 bg-gradient-to-r from-emerald-500 to-emerald-600 text-base font-semibold text-white hover:opacity-90"
                 disabled={isClaiming || finalizeWaiting}
               >
                 {isClaiming ? (
@@ -264,12 +313,13 @@ export function CycleClock({
                 ) : (
                   <>
                     {t('form.finalize')}
-                    <span className="flex items-center">
+                    <span className="flex flex-wrap items-center justify-center">
                       {finalizeWaiting && (
                         <>
                           &nbsp;{t('form.finalizeAvailableIn')}&nbsp;
                           <SmoothCountdown
                             date={claimWait}
+                            initialNowMs={now}
                             renderer={renderInlineCountdown}
                             intervalMs={1000}
                           />

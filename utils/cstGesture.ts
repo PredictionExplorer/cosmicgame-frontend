@@ -13,6 +13,9 @@ export interface CstGestureData extends CstAuctionDurations {
   CSTPriceWei: bigint;
   isFree: boolean;
   source: 'api' | 'contract' | 'empty';
+  /** Independent of quote availability. Optional for legacy snapshots;
+   * mapCTPriceInfo always supplies it, including valid zero-duration windows. */
+  timingAvailable?: boolean;
   apiAuctionDuration?: number;
   apiSecondsElapsed?: number;
 }
@@ -37,18 +40,22 @@ const EMPTY_CST_GESTURE_DATA: CstGestureData = {
   SecondsElapsed: 0,
   isFree: false,
   source: 'empty',
+  timingAvailable: false,
 };
 
-function parseDuration(value: unknown): number {
-  const parsed = Number.parseInt(String(value ?? '0'), 10);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+function parseDuration(value: unknown): number | null {
+  if (typeof value !== 'number' && typeof value !== 'string') return null;
+  if (typeof value === 'string' && !/^\d+$/.test(value.trim())) return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : null;
 }
 
-function parseWei(value: unknown): bigint {
+function parseWei(value: unknown): bigint | null {
+  if (typeof value !== 'string' || !/^\d+$/.test(value.trim())) return null;
   try {
-    return BigInt(String(value ?? '0'));
+    return BigInt(value);
   } catch {
-    return 0n;
+    return null;
   }
 }
 
@@ -57,10 +64,12 @@ export function isCstGestureFree({
   CSTPrice,
   CSTPriceWei,
   SecondsElapsed,
+  source,
 }: Pick<
   CstGestureData,
-  'AuctionDuration' | 'CSTPrice' | 'CSTPriceWei' | 'SecondsElapsed'
+  'AuctionDuration' | 'CSTPrice' | 'CSTPriceWei' | 'SecondsElapsed' | 'source'
 >): boolean {
+  if (source === 'empty') return false;
   return CSTPriceWei === 0n || CSTPrice <= 0 || SecondsElapsed > AuctionDuration;
 }
 
@@ -73,20 +82,42 @@ export function mapCTPriceInfo(
 
   const apiAuctionDuration = parseDuration(raw?.AuctionDuration);
   const apiSecondsElapsed = parseDuration(raw?.SecondsElapsed);
+  const contractAuctionDuration = parseDuration(contractDurations?.AuctionDuration);
+  const contractSecondsElapsed = parseDuration(contractDurations?.SecondsElapsed);
+  const hasContractTiming = contractAuctionDuration !== null && contractSecondsElapsed !== null;
+  const hasApiTiming = apiAuctionDuration !== null && apiSecondsElapsed !== null;
   const cstPriceWei = contractCstPriceWei ?? parseWei(raw?.CSTPrice);
-  const auctionDuration = contractDurations?.AuctionDuration ?? apiAuctionDuration;
-  const secondsElapsed = contractDurations?.SecondsElapsed ?? apiSecondsElapsed;
-  const cstPrice = Number(formatEther(cstPriceWei));
+  // Keep duration and elapsed time from one coherent sample. An absent or
+  // malformed pair must not turn into a real zero-duration calibration.
+  const auctionDuration = hasContractTiming
+    ? contractAuctionDuration
+    : hasApiTiming
+      ? apiAuctionDuration
+      : 0;
+  const secondsElapsed = hasContractTiming
+    ? contractSecondsElapsed
+    : hasApiTiming
+      ? apiSecondsElapsed
+      : 0;
+  const cstPrice = cstPriceWei != null ? Number(formatEther(cstPriceWei)) : 0;
+  const hasQuote = cstPriceWei != null && cstPriceWei >= 0n && Number.isFinite(cstPrice);
   const data: CstGestureData = {
     AuctionDuration: auctionDuration,
-    CSTPrice: Number.isFinite(cstPrice) ? cstPrice : 0,
-    CSTPriceWei: cstPriceWei,
+    CSTPrice: hasQuote ? cstPrice : 0,
+    CSTPriceWei: hasQuote ? cstPriceWei : 0n,
     SecondsElapsed: secondsElapsed,
+    timingAvailable: hasContractTiming || hasApiTiming,
     isFree: false,
-    source: contractDurations || contractCstPriceWei != null ? 'contract' : 'api',
-    apiAuctionDuration,
-    apiSecondsElapsed,
-    updatedAtMs: contractDurations?.updatedAtMs,
+    // Timing and price reads resolve independently. A duration sample alone
+    // must not promote a missing (or malformed) quote into a free gesture.
+    source: !hasQuote
+      ? 'empty'
+      : hasContractTiming || contractCstPriceWei != null
+        ? 'contract'
+        : 'api',
+    apiAuctionDuration: apiAuctionDuration ?? undefined,
+    apiSecondsElapsed: apiSecondsElapsed ?? undefined,
+    updatedAtMs: hasContractTiming ? contractDurations?.updatedAtMs : undefined,
   };
   return { ...data, isFree: isCstGestureFree(data) };
 }

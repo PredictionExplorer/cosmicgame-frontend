@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 interface DeckArtCardProps {
   /** Seed is `0x`-prefixed, matching the HomePage banner-token shape. */
   bannerToken: { seed: string; id: number } | null;
+  featured?: boolean;
 }
 
 /**
@@ -22,7 +23,7 @@ interface DeckArtCardProps {
  * Shows the same server-picked, client-rotated token as the story section —
  * one shared "featured artwork" concept across the page.
  */
-export function DeckArtCard({ bannerToken }: DeckArtCardProps) {
+export function DeckArtCard({ bannerToken, featured = false }: DeckArtCardProps) {
   const t = useTranslations('home');
 
   return (
@@ -31,13 +32,27 @@ export function DeckArtCard({ bannerToken }: DeckArtCardProps) {
       variant="glass-bordered"
       radius="xl"
       padding="none"
-      className="min-w-0 overflow-hidden"
+      className={cn(
+        'min-w-0 overflow-hidden',
+        featured && 'h-full rounded-none border-0 bg-transparent shadow-none',
+      )}
     >
-      <section aria-label={t('deck.art.sectionAria')} data-testid="deck-art-card">
-        <div className="flex items-center justify-between gap-2 border-b border-white/[0.07] p-4">
+      <section
+        aria-label={t('deck.art.sectionAria')}
+        data-testid="deck-art-card"
+        className={cn(featured && 'flex h-full flex-col justify-center')}
+      >
+        <div
+          className={cn(
+            'flex gap-2 p-4',
+            featured
+              ? 'items-center justify-between px-5 pt-6'
+              : 'items-center justify-between border-b border-white/[0.07]',
+          )}
+        >
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" aria-hidden />
-            <h2 className="font-display text-lg font-bold tracking-tight">
+            <h2 className="font-display text-base font-semibold tracking-tight">
               {t('deck.art.eyebrow')}
             </h2>
           </div>
@@ -57,7 +72,7 @@ export function DeckArtCard({ bannerToken }: DeckArtCardProps) {
           <Link
             key={bannerToken.id}
             href={`/detail/${bannerToken.id}`}
-            className="group block animate-in fade-in duration-700"
+            className="group block motion-safe:animate-in motion-safe:fade-in motion-safe:duration-700"
             aria-label={t('deck.art.viewAria', { id: formatId(bannerToken.id) })}
             data-testid="deck-art-link"
           >
@@ -69,7 +84,7 @@ export function DeckArtCard({ bannerToken }: DeckArtCardProps) {
                 alt={t('deck.art.alt', { id: formatId(bannerToken.id) })}
                 priority
                 sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 50vw, 380px"
-                className="relative transition-transform duration-700 group-hover:scale-[1.03]"
+                className="relative transition-transform duration-700 motion-reduce:transition-none motion-safe:group-hover:scale-[1.03]"
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 via-black/25 to-transparent px-3.5 pb-3 pt-10">
                 <span className="inline-flex items-center rounded-full border border-white/[0.14] bg-white/[0.09] px-2.5 py-0.5 font-mono text-[11px] font-medium text-white/90 backdrop-blur-sm">
@@ -91,7 +106,12 @@ export function DeckArtCard({ bannerToken }: DeckArtCardProps) {
           </div>
         )}
 
-        <p className="border-t border-white/[0.07] p-3.5 text-xs leading-relaxed text-muted-foreground">
+        <p
+          className={cn(
+            'text-xs leading-relaxed text-muted-foreground',
+            featured ? 'px-5 pb-6 pt-3' : 'border-t border-white/[0.07] p-3.5',
+          )}
+        >
           {t('deck.art.pairingNote')}
         </p>
       </section>

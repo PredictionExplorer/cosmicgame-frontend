@@ -23,7 +23,7 @@ export interface LocalizedCountdownRenderProps extends CountdownRenderProps {
 }
 
 interface CounterProps extends LocalizedCountdownRenderProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'dashboard';
   tone?: 'default' | 'impact';
 }
 
@@ -35,6 +35,12 @@ const DEFAULT_UNIT_LABELS: CounterUnitLabels = {
 };
 
 const sizeClasses = {
+  dashboard: {
+    digit: 'text-[clamp(0.9rem,8cqw,2rem)]',
+    label: 'text-[10px]',
+    pad: 'px-[1.4cqw] py-1',
+    gap: 'gap-[1cqw]',
+  },
   sm: { digit: 'text-xl', label: 'text-[10px]', pad: 'px-2.5 py-1', gap: 'gap-1.5' },
   md: { digit: 'text-3xl', label: 'text-xs', pad: 'px-3.5 py-2', gap: 'gap-2' },
   lg: { digit: 'text-5xl md:text-6xl', label: 'text-sm', pad: 'px-5 py-3', gap: 'gap-3' },
@@ -119,10 +125,13 @@ const Counter = ({
   const isImpact = tone === 'impact' && !isUrgent && !isCritical;
   const s = sizeClasses[size];
   const timeUnits = getTimeUnits(days, hours, minutes, seconds, unitLabels);
-  const isMonument = size === 'xl';
-  const digitClass = isMonument
-    ? getFluidDigitClass(timeUnits.length, String(Math.max(0, days)).length)
-    : s.digit;
+  const isMonument = size === 'xl' || size === 'dashboard';
+  const digitClass =
+    size === 'dashboard'
+      ? s.digit
+      : isMonument
+        ? getFluidDigitClass(timeUnits.length, String(Math.max(0, days)).length)
+        : s.digit;
 
   return (
     <div className={cn('flex items-center justify-center', s.gap)}>
@@ -144,7 +153,7 @@ const Counter = ({
             >
               <AnimatePresence mode="popLayout">
                 <motion.span
-                  key={value}
+                  key={isMonument ? id : value}
                   initial={isMonument ? false : { y: -8, opacity: 0, filter: 'blur(4px)' }}
                   animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
                   exit={

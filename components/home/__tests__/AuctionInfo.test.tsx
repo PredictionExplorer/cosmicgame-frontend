@@ -9,6 +9,34 @@ import { render, screen, checkA11y } from '@/test-utils';
 import { AuctionInfo } from '../AuctionInfo';
 
 describe('AuctionInfo', () => {
+  it('keeps all compact timing values and progress visible without duplicating duration', () => {
+    render(<AuctionInfo compact secondsElapsed={1350} auctionDuration={5400} />);
+
+    expect(screen.getAllByRole('term')).toHaveLength(3);
+    expect(screen.getAllByRole('definition')).toHaveLength(3);
+    expect(screen.getAllByText('5400s')).toHaveLength(1);
+    expect(screen.getByText('1350s')).toBeVisible();
+    expect(screen.getByText('4050s')).toBeVisible();
+    expect(screen.getByText('home.calibration.percentComplete(percent=25%)')).toBeVisible();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25');
+    expect(screen.queryByText('home.calibration.defaultSubtitle')).toBeNull();
+    expect(
+      screen.getByRole('button', {
+        name: 'More information about home.calibration.defaultTitle',
+      }),
+    ).toBeVisible();
+  });
+
+  it('preserves the ended state and all timing values in compact mode', () => {
+    render(<AuctionInfo compact secondsElapsed={6000} auctionDuration={5400} />);
+
+    expect(screen.getByText('home.calibration.defaultEndedMessage')).toBeVisible();
+    expect(screen.getByText('5400s')).toBeVisible();
+    expect(screen.getByText('6000s')).toBeVisible();
+    expect(screen.getByText('0s')).toBeVisible();
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
+
   it('renders a prominent dynamic duration and active progress details', () => {
     render(<AuctionInfo secondsElapsed={1350} auctionDuration={5400} />);
 
@@ -103,9 +131,14 @@ describe('AuctionInfo', () => {
     expect(screen.getByText('home.calibration.percentComplete(percent=50%)')).toBeInTheDocument();
   });
 
-  it('has no accessibility violations', async () => {
+  it.each([false, true])('has no accessibility violations with compact=%s', async (compact) => {
     const { container } = render(
-      <AuctionInfo secondsElapsed={1350} auctionDuration={5400} title="CST Calibration Window" />,
+      <AuctionInfo
+        compact={compact}
+        secondsElapsed={1350}
+        auctionDuration={5400}
+        title="CST Calibration Window"
+      />,
     );
     await checkA11y(container);
   });

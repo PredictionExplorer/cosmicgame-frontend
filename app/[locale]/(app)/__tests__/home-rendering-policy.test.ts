@@ -56,9 +56,12 @@ describe('home page client component rendering policy', () => {
     expect(source).not.toContain('useSearchParams');
   });
 
-  it('uses the exact fixed-header height instead of generic inner-page top padding', () => {
+  it('keeps the redesigned masthead clear of the fixed header', () => {
     expect(source).toContain('home-control-shell');
-    expect(source).toContain('pt-[var(--header-height)]');
+    // The exact gap may change during visual refinement. Preserve the
+    // header-aware clearance; viewport geometry is exercised in browser tests.
+    expect(source).toMatch(/pt-\[calc\(var\(--header-height\)\+[\d.]+rem\)\]/);
+    expect(source).toMatch(/max-sm:pt-\[calc\(var\(--header-height\)\+[\d.]+rem\)\]/);
   });
 
   it('restores safe clearance when the maintenance banner is present', () => {

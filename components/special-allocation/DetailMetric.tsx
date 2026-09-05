@@ -7,6 +7,8 @@ export interface DetailMetricProps {
   tone?: 'muted' | 'primary' | 'emerald' | 'gold';
   /** Removes outer margin and tightens padding for the home control desk. */
   compact?: boolean;
+  /** Plain definition pair for the always-visible desktop dashboard. */
+  unframed?: boolean;
   className?: string;
 }
 
@@ -23,27 +25,30 @@ export function DetailMetric({
   testId,
   tone = 'muted',
   compact = false,
+  unframed = false,
   className,
 }: DetailMetricProps) {
   return (
-    <div
+    <dl
       data-testid={testId}
       className={cn(
-        'rounded-lg border',
-        compact ? 'px-2.5 py-1.5' : 'mt-2 px-3 py-2',
-        tone === 'primary'
-          ? 'border-primary/20 bg-primary/[0.055] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
-          : tone === 'emerald'
-            ? 'border-emerald-400/20 bg-emerald-400/[0.055]'
-            : tone === 'gold'
-              ? 'border-[rgb(var(--solar-gold-rgb)/0.24)] bg-[rgb(var(--solar-gold-rgb)/0.055)]'
-              : 'border-white/[0.06] bg-black/10',
+        'min-w-0',
+        !unframed && 'rounded-lg border',
+        !unframed && (compact ? 'px-2.5 py-1.5' : 'mt-2 px-3 py-2'),
+        !unframed &&
+          (tone === 'primary'
+            ? 'border-primary/20 bg-primary/[0.055] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
+            : tone === 'emerald'
+              ? 'border-emerald-400/20 bg-emerald-400/[0.055]'
+              : tone === 'gold'
+                ? 'border-[rgb(var(--solar-gold-rgb)/0.24)] bg-[rgb(var(--solar-gold-rgb)/0.055)]'
+                : 'border-white/[0.06] bg-black/10'),
         className,
       )}
     >
-      <p
+      <dt
         className={cn(
-          'text-[10px] uppercase tracking-wider',
+          unframed ? 'text-xs leading-4' : 'text-[10px] uppercase tracking-wider',
           tone === 'primary'
             ? 'text-primary/90'
             : tone === 'emerald'
@@ -54,8 +59,10 @@ export function DetailMetric({
         )}
       >
         {label}
-      </p>
-      <p className="mt-0.5 break-words text-xs font-medium text-foreground">{value}</p>
-    </div>
+      </dt>
+      <dd className="mt-0.5 break-words text-xs font-medium leading-4 tabular-nums text-foreground">
+        {value}
+      </dd>
+    </dl>
   );
 }

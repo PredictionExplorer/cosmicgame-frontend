@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { expectAllLabelTooltips } from './tooltip-helpers';
 
@@ -13,9 +13,9 @@ const HOME_TOOLTIPS = [
     label: 'Allocation Tracks',
     expected: /Live view of every allocation track/,
   },
-  // Latest-participant intelligence is a primary home decision surface.
+  // Decision information is present without opening any disclosure.
   {
-    label: 'Latest Participant',
+    label: 'Last Gesture',
     expected: /latest gesture maker is building an endurance window/i,
   },
 ];
@@ -29,6 +29,9 @@ test.describe('/ tooltips', () => {
   test('opens representative home-page tooltips across stat and section surfaces', async ({
     page,
   }) => {
+    const disclosure = page.getByTestId('allocations-disclosure');
+    await disclosure.locator('summary').click();
+    await expect(disclosure).toHaveAttribute('open', '');
     await expectAllLabelTooltips(page, HOME_TOOLTIPS);
   });
 });

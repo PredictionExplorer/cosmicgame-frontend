@@ -75,6 +75,69 @@ const baseProps = {
 };
 
 describe('LatestParticipantIntel', () => {
+  it('keeps the complete current transaction and endurance challenge visible in the dashboard', () => {
+    render(<LatestParticipantIntel {...baseProps} compact />);
+
+    const intel = screen.getByTestId('latest-participant-intel');
+    expect(
+      within(intel).getByRole('heading', { name: 'tables.specialAllocation.lastGesture' }),
+    ).toBeInTheDocument();
+    expect(within(intel).getByRole('link', { name: ADDRESS })).toHaveAttribute(
+      'href',
+      `/user/${ADDRESS}`,
+    );
+    expect(
+      within(intel).getByRole('link', { name: 'home.observatory.intel.viewGesture' }),
+    ).toHaveAttribute('href', '/gesture/77');
+    expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('0.0500000 ETH');
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('123.45 CST');
+    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent(
+      'tables.specialAllocation.yesToken',
+    );
+    expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#12');
+    expect(screen.getByTestId('latest-participant-attached-assets')).toHaveTextContent(
+      'NFT + ERC20',
+    );
+    expect(intel).toHaveTextContent('tables.specialAllocation.gestureTime');
+    expect(screen.getByTestId('latest-participant-remaining')).toHaveTextContent(
+      'tables.specialAllocation.needsToBecomeChampion',
+    );
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '24');
+    expect(screen.queryByTestId('latest-participant-allocation-package')).not.toBeInTheDocument();
+  });
+
+  it('retains the indexed participant when the dashboard identity is ahead of the indexer', () => {
+    const indexedAddress = '0x9999999999999999999999999999999999999999';
+    render(
+      <LatestParticipantIntel
+        {...baseProps}
+        compact
+        latestGesture={{ ...latestGesture, BidderAddr: indexedAddress }}
+      />,
+    );
+    expect(
+      within(screen.getByTestId('latest-participant-gesture-details')).getByRole('link', {
+        name: indexedAddress,
+      }),
+    ).toHaveAttribute('href', `/user/${indexedAddress}`);
+  });
+
+  it('keeps the dashboard transaction panel visible while details synchronize', () => {
+    render(
+      <LatestParticipantIntel {...baseProps} compact latestGesture={null} gestureDetailsPending />,
+    );
+    expect(screen.getByTestId('latest-participant-gesture-syncing')).toHaveTextContent(
+      'tables.specialAllocation.gestureDetailsSyncing',
+    );
+    expect(screen.queryByTestId('latest-participant-message')).not.toBeInTheDocument();
+  });
+
+  it('has accessible definition pairs and controls in the dashboard', async () => {
+    const { container } = render(<LatestParticipantIntel {...baseProps} compact />);
+    expect(screen.getByTestId('latest-participant-paid-amount').tagName).toBe('DL');
+    await checkA11y(container);
+  });
+
   it('shows full participant identity with profile and gesture links', () => {
     render(<LatestParticipantIntel {...baseProps} />);
 

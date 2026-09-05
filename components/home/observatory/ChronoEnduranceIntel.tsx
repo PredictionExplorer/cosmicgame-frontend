@@ -16,6 +16,8 @@ export interface ChronoEnduranceIntelProps {
   champions: ChampionsState;
   chronoEth: number;
   account?: string | null;
+  /** Role cards and a single decision strip for the always-visible dashboard. */
+  compact?: boolean;
   className?: string;
 }
 
@@ -34,6 +36,7 @@ function RoleSummary({
   isLive,
   account,
   emptyText,
+  compact = false,
 }: {
   testId: string;
   icon: React.ReactNode;
@@ -45,6 +48,7 @@ function RoleSummary({
   isLive?: boolean;
   account?: string | null;
   emptyText: string;
+  compact?: boolean;
 }) {
   const t = useTranslations('tables');
   const locale = useLocale();
@@ -53,11 +57,19 @@ function RoleSummary({
   return (
     <div
       data-testid={testId}
-      className="min-w-0 rounded-lg border border-white/[0.06] bg-black/10 p-2.5"
+      className={cn(
+        'min-w-0 rounded-lg border border-white/[0.06] bg-black/10',
+        compact ? 'p-2' : 'p-2.5',
+      )}
     >
       <div className="flex min-w-0 items-start gap-1.5">
         <span className="mt-0.5 shrink-0 text-muted-foreground">{icon}</span>
-        <span className="min-w-0 break-words text-[10px] font-semibold uppercase leading-tight tracking-wider text-muted-foreground">
+        <span
+          className={cn(
+            'min-w-0 break-words font-semibold leading-4 text-muted-foreground',
+            compact ? 'text-xs' : 'text-[10px] uppercase tracking-wider',
+          )}
+        >
           {label}
         </span>
         <InfoTooltip content={tooltip} className="ml-auto shrink-0" />
@@ -66,13 +78,13 @@ function RoleSummary({
 
       {address ? (
         <>
-          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          <div className={cn('flex flex-wrap items-center gap-1.5', compact ? 'mt-1' : 'mt-1.5')}>
             <Link
               href={`/user/${address}`}
               title={address}
               aria-label={address}
               className={cn(
-                'min-w-0 break-all font-mono text-[11px] text-foreground transition-colors hover:text-primary',
+                'min-w-0 break-all font-mono text-xs leading-4 text-foreground transition-colors hover:text-primary',
                 TOUCH_TARGET_TEXT_LINK_CLASS,
               )}
             >
@@ -85,10 +97,16 @@ function RoleSummary({
             )}
           </div>
           {duration !== undefined && (
-            <div className="mt-1.5 flex flex-wrap items-center justify-between gap-1.5">
+            <div
+              className={cn(
+                'flex flex-wrap items-center justify-between gap-1.5',
+                compact ? 'mt-1' : 'mt-1.5',
+              )}
+            >
               <span
                 className={cn(
-                  'font-mono text-sm font-semibold tabular-nums',
+                  'font-mono font-semibold tabular-nums',
+                  compact ? 'text-xs leading-4' : 'text-sm',
                   isLive ? 'text-emerald-300' : 'text-foreground',
                 )}
               >
@@ -97,7 +115,10 @@ function RoleSummary({
               {isLive !== undefined && (
                 <span
                   className={cn(
-                    'inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider',
+                    'inline-flex items-center gap-1',
+                    compact
+                      ? 'text-xs leading-4'
+                      : 'rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider',
                     isLive
                       ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
                       : 'border-white/10 bg-white/[0.04] text-muted-foreground',
@@ -134,6 +155,7 @@ export function ChronoEnduranceIntel({
   champions,
   chronoEth,
   account = null,
+  compact = false,
   className,
 }: ChronoEnduranceIntelProps) {
   const t = useTranslations('home');
@@ -143,9 +165,14 @@ export function ChronoEnduranceIntel({
     <section
       aria-labelledby="chrono-endurance-intel-title"
       data-testid="chrono-endurance-intel"
-      className={cn('min-w-0 p-2.5', className)}
+      className={cn('@container/standings min-w-0 p-2.5', className)}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+      <div
+        className={cn(
+          'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1',
+          compact && 'sr-only',
+        )}
+      >
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <h2
             id="chrono-endurance-intel-title"
@@ -162,7 +189,14 @@ export function ChronoEnduranceIntel({
         </span>
       </div>
 
-      <div className="mt-2 grid items-start gap-2 sm:grid-cols-3 xl:grid-cols-[0.9fr_0.9fr_0.8fr_1.7fr]">
+      <div
+        className={cn(
+          'grid items-start gap-2',
+          compact
+            ? '@min-[450px]/standings:grid-cols-3'
+            : 'mt-2 @min-[450px]/standings:grid-cols-3 @min-[1000px]/standings:grid-cols-[0.9fr_0.9fr_0.8fr_1.7fr]',
+        )}
+      >
         <RoleSummary
           testId="control-desk-endurance"
           icon={<Crown className="h-3.5 w-3.5" aria-hidden />}
@@ -174,6 +208,7 @@ export function ChronoEnduranceIntel({
           isLive={champions.endurance.isLive}
           account={account}
           emptyText={tTables('specialAllocation.noEnduranceRecord')}
+          compact={compact}
         />
         <RoleSummary
           testId="chrono-role-summary"
@@ -186,6 +221,7 @@ export function ChronoEnduranceIntel({
           isLive={champions.chrono.isLive}
           account={account}
           emptyText={tTables('specialAllocation.noChronoRecord')}
+          compact={compact}
         />
         <RoleSummary
           testId="final-cst-role-summary"
@@ -196,13 +232,20 @@ export function ChronoEnduranceIntel({
           value={t('observatory.standings.cstPlusNft')}
           account={account}
           emptyText={tTables('specialAllocation.awaitingCstGesture')}
+          compact={compact}
         />
         {champions.chrono.address && (
-          <div className="sm:col-span-3 xl:col-span-1">
+          <div
+            className={cn(
+              '@min-[450px]/standings:col-span-3',
+              !compact && '@min-[1000px]/standings:col-span-1',
+            )}
+          >
             <ChronoWarriorDetails
               chrono={champions.chrono}
               challenge={champions.chronoChallenge}
               compact
+              dashboard={compact}
             />
           </div>
         )}

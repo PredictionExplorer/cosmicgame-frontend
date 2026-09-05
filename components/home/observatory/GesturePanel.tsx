@@ -2,7 +2,7 @@
 
 import type { RefObject } from 'react';
 import { zeroAddress } from 'viem';
-import { ArrowRight, Settings2 } from 'lucide-react';
+import { ArrowRight, ChevronDown, Settings2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
@@ -100,6 +100,8 @@ export interface GesturePanelProps {
   variant?: 'card' | 'sheet';
   /** Removes the standalone card treatment inside the unified control desk/sheet. */
   embedded?: boolean;
+  /** The surrounding dashboard already renders the live Calibration Window. */
+  calibrationExternal?: boolean;
   messageInputRef?: RefObject<HTMLTextAreaElement | null>;
   className?: string;
 }
@@ -137,6 +139,7 @@ export function GesturePanel({
   onSelectGestureType,
   variant = 'card',
   embedded = false,
+  calibrationExternal = false,
   messageInputRef,
   className,
 }: GesturePanelProps) {
@@ -177,24 +180,31 @@ export function GesturePanel({
   } = form;
 
   const preview = !account;
+  const selectedMethod = METHOD_OPTIONS.find((option) => option.value === gestureType);
   const isFirstGesture = data?.LastBidderAddr === zeroAddress;
   const showAllMethods = !isFirstGesture;
   const visibleMethods = showAllMethods
     ? METHOD_OPTIONS
     : METHOD_OPTIONS.filter((option) => option.value === 'ETH');
 
-  const ethPrice = ethGestureInfo?.ETHPrice ?? 0;
+  const ethPrice = ethGestureInfo?.ETHPrice;
+  const hasEthQuote = ethPrice != null && Number.isFinite(ethPrice) && ethPrice >= 0;
+  const hasCstQuote = cstGestureData.source !== 'empty';
+  const quotePending = tCommon('status.loadingDots');
   const methodCost: Record<(typeof METHOD_OPTIONS)[number]['value'], string> = {
-    ETH: `${ethPrice.toFixed(5)} ETH`,
-    RandomWalk: `${(ethPrice / 2).toFixed(5)} ETH`,
-    CST: cstGestureData.isFree
-      ? t('status.metrics.free')
-      : `${formatCstAmount(cstGestureData.CSTPrice)} CST`,
+    ETH: hasEthQuote ? `${ethPrice.toFixed(5)} ETH` : quotePending,
+    RandomWalk: hasEthQuote ? `${(ethPrice / 2).toFixed(5)} ETH` : quotePending,
+    CST: !hasCstQuote
+      ? quotePending
+      : cstGestureData.isFree
+        ? t('status.metrics.free')
+        : `${formatCstAmount(cstGestureData.CSTPrice)} CST`,
   };
 
   const currentCstGestureCost = cstGestureData.isFree ? 0 : cstGestureData.CSTPrice;
   const hasCstReward = gestureCstRewardAmount != null && Number.isFinite(gestureCstRewardAmount);
-  const hasCstCost = Number.isFinite(currentCstGestureCost) && currentCstGestureCost >= 0;
+  const hasCstCost =
+    hasCstQuote && Number.isFinite(currentCstGestureCost) && currentCstGestureCost >= 0;
   const netCstAmount =
     hasCstReward && hasCstCost ? gestureCstRewardAmount - currentCstGestureCost : null;
   const netCstLabel =
@@ -211,22 +221,65 @@ export function GesturePanel({
     gestureType === 'CST'
       ? t('form.reward.economicsDescription')
       : t('form.reward.previewDescription');
-  const minAcceptedCstLabel = acceptAnyCstReward
-    ? t('form.reward.minAcceptedAny')
-    : t('form.reward.cstAmount', { amount: formatCstAmount(gestureCstRewardAmountMin) });
+  const minAcceptedCstLabel =
+    !hasCstReward || isCstRewardLoading
+      ? t('form.reward.cstAmount', { amount: '--' })
+      : acceptAnyCstReward
+        ? t('form.reward.minAcceptedAny')
+        : t('form.reward.cstAmount', { amount: formatCstAmount(gestureCstRewardAmountMin) });
   const minAcceptedCstTooltip = acceptAnyCstReward
     ? t('form.reward.minAcceptedTooltipAny')
     : t('form.reward.minAcceptedTooltip');
 
   const needsRwlkToken = gestureType === 'RandomWalk' && rwlkId === -1;
-  const submitDisabled = isGesturing || needsRwlkToken || gestureType === '' || !canGesture;
+  const hasSelectedQuote = gestureType === 'CST' ? hasCstQuote : hasEthQuote;
+  const submitDisabled =
+    isGesturing || needsRwlkToken || gestureType === '' || !canGesture || !hasSelectedQuote;
+
+  const messageLabel = (
+    <>
+      {t('form.advanced.messageLabel')}{' '}
+      <span className="normal-case tracking-normal text-muted-foreground">
+        {t('form.advanced.messageOptionalHint', { maxLength: String(MESSAGE_MAX_LENGTH) })}
+      </span>
+    </>
+  );
+  const messageCounter = (
+    <span
+      data-testid="gesture-message-char-count"
+      className={cn(
+        'ml-auto shrink-0 text-xs tabular-nums',
+        message.length >= MESSAGE_COUNTER_WARN_AT ? 'text-amber-300' : 'text-muted-foreground/60',
+      )}
+    >
+      {message.length}/{MESSAGE_MAX_LENGTH}
+    </span>
+  );
+  const messageInput = (
+    <textarea
+      id={`gesture-message-${variant}`}
+      ref={messageInputRef}
+      data-testid="gesture-message-input"
+      aria-label={compactDesk ? t('form.advanced.messageLabel') : undefined}
+      placeholder={t('form.advanced.messagePlaceholder')}
+      value={message}
+      maxLength={MESSAGE_MAX_LENGTH}
+      rows={compactDesk ? 1 : 2}
+      disabled={preview}
+      className={cn(
+        'flex w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 text-sm ring-offset-background transition-colors placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-60',
+        compactDesk ? 'min-h-11 py-2' : 'min-h-[56px] py-2.5',
+      )}
+      onChange={(e) => setMessage(e.target.value)}
+    />
+  );
 
   if (!loading && !isRoundActive) return null;
 
   return (
     <Surface
       asChild
-      variant={embedded ? 'plain' : 'gradient-border-accent'}
+      variant="plain"
       radius={embedded ? 'none' : 'xl'}
       padding="none"
       className={cn(embedded && 'border-0 bg-transparent shadow-none', 'min-w-0', className)}
@@ -236,25 +289,34 @@ export function GesturePanel({
         data-testid="gesture-panel"
         data-variant={variant}
         id={variant === 'card' ? 'make-gesture' : undefined}
-        className="scroll-mt-24"
+        className="scroll-mt-24 focus:outline-none"
+        tabIndex={-1}
       >
         <div
           className={cn(
             'flex flex-col',
-            compactDesk ? 'gap-2 p-3' : embedded ? 'gap-3 p-3.5' : 'gap-4',
+            compactDesk ? 'gap-2 p-3' : embedded ? 'gap-3 p-3.5' : 'gap-3',
             !embedded && (variant === 'card' ? 'p-4 sm:p-5' : 'p-1'),
           )}
         >
           <div>
-            <h2
-              id={`gesture-panel-title-${variant}`}
-              className={cn(
-                'font-display font-bold tracking-tight',
-                embedded ? 'text-base' : 'text-lg',
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <h2
+                id={`gesture-panel-title-${variant}`}
+                className={cn(
+                  'font-display font-bold tracking-tight',
+                  embedded ? 'text-base' : 'text-lg',
+                )}
+              >
+                {t('form.title')}
+              </h2>
+              {compactDesk && selectedMethod && (
+                <InfoTooltip content={t(`orientation.methods.${selectedMethod.messageKey}`)} />
               )}
-            >
-              {t('form.title')}
-            </h2>
+              {compactDesk && !loading && gestureType === 'CST' && (
+                <UniswapTradeButton variant="compact" className="ml-auto" />
+              )}
+            </div>
             <p className={cn('mt-0.5 text-xs text-muted-foreground', compactDesk && 'sr-only')}>
               {t('form.subtitle')}
             </p>
@@ -279,7 +341,12 @@ export function GesturePanel({
             <>
               {/* Method picker: every way to gesture, each with its live cost. */}
               <div>
-                <Label className="mb-2 block text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <Label
+                  className={cn(
+                    'mb-2 block text-xs font-medium uppercase tracking-wider text-muted-foreground',
+                    compactDesk && 'sr-only',
+                  )}
+                >
                   {t('form.methodLabel')}
                 </Label>
                 <div
@@ -299,14 +366,14 @@ export function GesturePanel({
                       onClick={() => onSelectGestureType(option.value)}
                       aria-pressed={gestureType === option.value}
                       className={cn(
-                        'rounded-lg border px-2 text-center transition-all',
-                        compactDesk ? 'py-1.5' : embedded ? 'py-2' : 'py-2.5',
+                        'min-w-0 rounded-lg border px-2 text-center transition-all',
+                        compactDesk ? 'py-1.5' : embedded ? 'py-2' : 'min-h-20 py-3',
                         gestureType === option.value
                           ? 'border-primary/50 bg-primary/10 text-white'
                           : 'border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:bg-white/[0.04] hover:text-white',
                       )}
                     >
-                      <span className="block text-sm font-medium">
+                      <span className="block text-sm font-medium [overflow-wrap:anywhere]">
                         {t(`form.method.${option.messageKey}.label`)}
                       </span>
                       {/* Wraps rather than truncating: at 320px the tab is
@@ -314,27 +381,51 @@ export function GesturePanel({
                           the one thing this control exists to show. */}
                       <span
                         data-testid={`panel-method-${option.messageKey}-cost`}
-                        className="mt-0.5 block break-words font-mono text-[11px] leading-tight tabular-nums opacity-70"
+                        className="mt-0.5 block font-mono text-xs leading-tight tabular-nums text-muted-foreground [overflow-wrap:anywhere]"
                       >
                         {methodCost[option.value]}
                       </span>
                       {!compactDesk && (
-                        <span className="mt-0.5 block text-[10px] opacity-60">
+                        <span className="mt-1 block text-[11px] text-muted-foreground">
                           {t(`form.method.${option.messageKey}.desc`)}
                         </span>
                       )}
                     </button>
                   ))}
                 </div>
+                {!compactDesk && selectedMethod && (
+                  <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                    {t(`orientation.methods.${selectedMethod.messageKey}`)}
+                  </p>
+                )}
               </div>
 
               {/* Method context: calibration windows, token picker, CST trade. */}
-              {gestureType === 'ETH' && isFirstGesture && (
+              {!calibrationExternal && isFirstGesture && hasEthQuote && (
                 <AuctionInfo
+                  compact
                   secondsElapsed={ethGestureInfo?.SecondsElapsed ?? 0}
                   auctionDuration={ethGestureInfo?.AuctionDuration ?? 0}
                   title={t('calibration.firstGestureTitle')}
                   subtitle={t('calibration.firstGestureSubtitle')}
+                />
+              )}
+
+              {!calibrationExternal && !isFirstGesture && hasCstQuote && (
+                <AuctionInfo
+                  compact
+                  secondsElapsed={cstGestureData.SecondsElapsed}
+                  auctionDuration={cstGestureData.AuctionDuration}
+                  title={t('calibration.cstTitle')}
+                  subtitle={t('calibration.cstSubtitle', {
+                    decreasePercent: String(
+                      protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
+                    ),
+                    increasePercent: String(
+                      protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
+                    ),
+                  })}
+                  endedMessage={t('calibration.cstEndedMessage')}
                 />
               )}
 
@@ -359,26 +450,12 @@ export function GesturePanel({
                 </div>
               )}
 
-              {gestureType === 'CST' && (
-                <div className="space-y-3">
-                  <AuctionInfo
-                    secondsElapsed={cstGestureData.SecondsElapsed}
-                    auctionDuration={cstGestureData.AuctionDuration}
-                    title={t('calibration.cstTitle')}
-                    subtitle={t('calibration.cstSubtitle', {
-                      decreasePercent: String(
-                        protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture,
-                      ),
-                      increasePercent: String(
-                        protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture,
-                      ),
-                    })}
-                    endedMessage={t('calibration.cstEndedMessage')}
-                  />
-                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/15 bg-primary/[0.045] p-3">
-                    <p className="max-w-md text-xs text-muted-foreground">{t('form.cstTrade')}</p>
-                    <UniswapTradeButton variant="compact" />
-                  </div>
+              {gestureType === 'CST' && !compactDesk && (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/15 bg-primary/[0.045] p-3">
+                  <p className="min-w-0 flex-1 text-xs text-muted-foreground">
+                    {t('form.cstTrade')}
+                  </p>
+                  <UniswapTradeButton variant="compact" />
                 </div>
               )}
 
@@ -391,81 +468,91 @@ export function GesturePanel({
                     compactDesk ? 'p-2' : 'p-3',
                   )}
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+                    <div className="flex min-w-0 items-center gap-1.5">
+                      <p className="text-xs font-medium text-muted-foreground">
                         {rewardPreviewTitle}
                       </p>
-                      {!embedded && (
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {rewardPreviewDescription}
-                        </p>
-                      )}
+                      <InfoTooltip content={rewardPreviewDescription} className="shrink-0" />
                     </div>
-                    <div className="text-right font-mono tabular-nums">
-                      {gestureType === 'CST' ? (
-                        <div className="grid min-w-[13rem] grid-cols-3 gap-1.5 text-left">
-                          <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-2 py-1.5">
-                            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                              {t('form.reward.rewardLabel')}
-                            </p>
-                            <p className="mt-0.5 text-xs font-semibold text-emerald-300">
-                              {isCstRewardLoading
-                                ? tCommon('status.loadingDots')
-                                : t('form.reward.cstAmount', {
-                                    amount: formatCstAmount(gestureCstRewardAmount),
-                                  })}
-                            </p>
-                          </div>
-                          <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-2 py-1.5">
-                            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                              {t('form.reward.costLabel')}
-                            </p>
-                            <p className="mt-0.5 text-xs font-semibold text-foreground">
-                              {t('form.reward.cstAmount', {
-                                amount: formatCstAmount(currentCstGestureCost),
-                              })}
-                            </p>
-                          </div>
-                          <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-2 py-1.5">
-                            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                              {t('form.reward.netLabel')}
-                            </p>
-                            <p
-                              className={cn(
-                                'mt-0.5 text-xs font-semibold',
-                                netCstAmount != null && netCstAmount > 0
-                                  ? 'text-emerald-300'
-                                  : netCstAmount != null && netCstAmount < 0
-                                    ? 'text-amber-200'
-                                    : 'text-muted-foreground',
-                              )}
-                            >
-                              {isCstRewardLoading ? tCommon('status.loadingDots') : netCstLabel}
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-sm font-semibold text-emerald-300">
-                          {isCstRewardLoading
+                    {gestureType !== 'CST' && (
+                      <p className="min-w-0 font-mono text-sm font-semibold tabular-nums text-emerald-300 [overflow-wrap:anywhere]">
+                        {isCstRewardLoading
+                          ? tCommon('status.loadingDots')
+                          : t('form.reward.cstAmount', {
+                              amount: formatCstAmount(gestureCstRewardAmount),
+                            })}
+                      </p>
+                    )}
+                  </div>
+                  {gestureType === 'CST' && (
+                    <dl
+                      data-testid="panel-cst-economics"
+                      className="mt-2 grid grid-cols-[repeat(3,minmax(0,1fr))] gap-1.5"
+                    >
+                      {[
+                        {
+                          key: 'reward',
+                          label: t('form.reward.rewardLabel'),
+                          value: isCstRewardLoading
                             ? tCommon('status.loadingDots')
                             : t('form.reward.cstAmount', {
                                 amount: formatCstAmount(gestureCstRewardAmount),
-                              })}
-                        </p>
-                      )}
-                      <p className="mt-1 flex items-center justify-end gap-1 text-[11px] text-muted-foreground">
-                        <span>{t('form.reward.minAccepted', { value: minAcceptedCstLabel })}</span>
-                        <InfoTooltip
-                          content={minAcceptedCstTooltip}
-                          ariaLabel={t('form.reward.minAcceptedAria')}
-                          maxWidth={320}
-                          side="top"
-                          className="text-muted-foreground/60"
-                        />
-                      </p>
-                    </div>
-                  </div>
+                              }),
+                          color: 'text-emerald-300',
+                        },
+                        {
+                          key: 'cost',
+                          label: t('form.reward.costLabel'),
+                          value: t('form.reward.cstAmount', {
+                            amount: hasCstCost ? formatCstAmount(currentCstGestureCost) : '--',
+                          }),
+                          color: 'text-foreground',
+                        },
+                        {
+                          key: 'net',
+                          label: t('form.reward.netLabel'),
+                          value: isCstRewardLoading ? tCommon('status.loadingDots') : netCstLabel,
+                          color:
+                            netCstAmount != null && netCstAmount > 0
+                              ? 'text-emerald-300'
+                              : netCstAmount != null && netCstAmount < 0
+                                ? 'text-amber-200'
+                                : 'text-muted-foreground',
+                        },
+                      ].map(({ key, label, value, color }) => (
+                        <div
+                          key={key}
+                          data-testid={`panel-cst-metric-${key}`}
+                          className="min-w-0 rounded-lg border border-white/[0.06] bg-white/[0.025] px-2 py-1.5"
+                        >
+                          <dt className="text-xs leading-tight text-muted-foreground [overflow-wrap:anywhere]">
+                            {label}
+                          </dt>
+                          <dd
+                            className={cn(
+                              'mt-1 font-mono text-xs font-semibold leading-snug tabular-nums [overflow-wrap:anywhere]',
+                              color,
+                            )}
+                          >
+                            {value}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                  <p className="mt-1.5 flex min-w-0 items-start gap-1.5 text-xs text-muted-foreground">
+                    <span className="min-w-0 [overflow-wrap:anywhere]">
+                      {t('form.reward.minAccepted', { value: minAcceptedCstLabel })}
+                    </span>
+                    <InfoTooltip
+                      content={minAcceptedCstTooltip}
+                      ariaLabel={t('form.reward.minAcceptedAria')}
+                      maxWidth={320}
+                      side="top"
+                      className="mt-0.5 shrink-0 text-muted-foreground/60"
+                    />
+                  </p>
                   {gestureType === 'CST' &&
                     cstGestureData.source === 'contract' &&
                     cstGestureData.apiAuctionDuration != null &&
@@ -480,62 +567,61 @@ export function GesturePanel({
                 </div>
               )}
 
+              <p
+                data-testid="participation-cost-note"
+                className="text-xs leading-relaxed text-muted-foreground"
+              >
+                {t('orientation.costsNote')}
+              </p>
+
               {!preview && (
-                <>
-                  {/* The on-chain message is first-class: it feeds the live feed. */}
-                  <div>
-                    <div className="mb-1.5 flex items-center gap-2">
-                      <Label
-                        htmlFor={`gesture-message-${variant}`}
-                        className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                      >
-                        {t('form.advanced.messageLabel')}{' '}
-                        <span className="normal-case tracking-normal opacity-50">
-                          {t('form.advanced.messageOptionalHint', {
-                            maxLength: String(MESSAGE_MAX_LENGTH),
-                          })}
-                        </span>
-                      </Label>
-                      <InfoTooltip
-                        content={t('form.advanced.messageTooltip')}
-                        ariaLabel={t('form.advanced.messageTooltipAria')}
-                        maxWidth={260}
-                      />
+                <div className={compactDesk ? 'grid grid-cols-2 items-start gap-x-3' : 'contents'}>
+                  {/* The optional editor keeps decision data and the action in view. */}
+                  {compactDesk ? (
+                    <details
+                      data-testid="panel-message-disclosure"
+                      className="group/message min-w-0 border-b border-white/[0.06] open:col-span-2"
+                    >
+                      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-xs text-muted-foreground focus-visible:outline-2 focus-visible:outline-primary sm:min-h-8 [&::-webkit-details-marker]:hidden">
+                        <span className="min-w-0 [overflow-wrap:anywhere]">{messageLabel}</span>
+                        {messageCounter}
+                        <ChevronDown
+                          className="h-3.5 w-3.5 shrink-0 transition-transform group-open/message:rotate-180"
+                          aria-hidden
+                        />
+                      </summary>
+                      <div className="space-y-2 pt-1.5">
+                        <p className="text-xs leading-relaxed text-muted-foreground">
+                          {t('form.advanced.messageTooltip')}
+                        </p>
+                        {messageInput}
+                      </div>
+                    </details>
+                  ) : (
+                    <div>
+                      <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <Label
+                          htmlFor={`gesture-message-${variant}`}
+                          className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                        >
+                          {messageLabel}
+                        </Label>
+                        <InfoTooltip
+                          content={t('form.advanced.messageTooltip')}
+                          ariaLabel={t('form.advanced.messageTooltipAria')}
+                          maxWidth={260}
+                        />
+                        {messageCounter}
+                      </div>
+                      {messageInput}
                     </div>
-                    <textarea
-                      id={`gesture-message-${variant}`}
-                      ref={messageInputRef}
-                      data-testid="gesture-message-input"
-                      placeholder={t('form.advanced.messagePlaceholder')}
-                      value={message}
-                      maxLength={MESSAGE_MAX_LENGTH}
-                      rows={compactDesk ? 1 : 2}
-                      disabled={preview}
-                      className={cn(
-                        'flex w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 text-sm ring-offset-background transition-colors placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-60',
-                        compactDesk ? 'min-h-11 py-2' : 'min-h-[56px] py-2.5',
-                      )}
-                      onChange={(e) => setMessage(e.target.value)}
-                    />
-                    <div className="mt-1 flex justify-end">
-                      <span
-                        data-testid="gesture-message-char-count"
-                        className={cn(
-                          'text-[11px] tabular-nums',
-                          message.length >= MESSAGE_COUNTER_WARN_AT
-                            ? 'text-amber-300'
-                            : 'text-muted-foreground/60',
-                        )}
-                      >
-                        {message.length}/{MESSAGE_MAX_LENGTH}
-                      </span>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Advanced: attachments and transaction protections. */}
                   <Accordion
                     type="single"
                     collapsible
+                    className={cn('min-w-0', compactDesk && advancedExpanded && 'col-span-2')}
                     value={advancedExpanded ? 'advanced' : ''}
                     onValueChange={(val) => !preview && setAdvancedExpanded(val === 'advanced')}
                   >
@@ -731,11 +817,13 @@ export function GesturePanel({
                                 </div>
                                 <span className="min-w-0 font-mono text-sm tabular-nums text-muted-foreground">
                                   {t('form.advanced.collision.approxCost', {
-                                    amount: (
-                                      ethPrice *
-                                      (1 + gestureCostPlus / 100) *
-                                      (gestureType === 'RandomWalk' ? 0.5 : 1)
-                                    ).toFixed(6),
+                                    amount: hasEthQuote
+                                      ? (
+                                          ethPrice *
+                                          (1 + gestureCostPlus / 100) *
+                                          (gestureType === 'RandomWalk' ? 0.5 : 1)
+                                        ).toFixed(6)
+                                      : '--',
                                   })}
                                 </span>
                               </div>
@@ -750,7 +838,7 @@ export function GesturePanel({
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
-                </>
+                </div>
               )}
 
               {/* Submit — the only gesture button on the page. */}
@@ -761,7 +849,7 @@ export function GesturePanel({
                       id={variant === 'card' ? 'gesture-submit' : 'gesture-submit-sheet'}
                       size="lg"
                       onClick={onSubmit}
-                      className="h-12 w-full border-0 bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] text-base font-semibold text-white hover:opacity-90"
+                      className="h-auto min-h-12 w-full whitespace-normal border-0 bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] px-3 py-2.5 text-sm font-semibold text-white hover:opacity-90"
                       disabled={submitDisabled}
                     >
                       {isGesturing ? (
@@ -770,7 +858,8 @@ export function GesturePanel({
                         </span>
                       ) : (
                         <>
-                          {submitLabel} <ArrowRight className="ml-2 h-5 w-5" />
+                          <span className="min-w-0 [overflow-wrap:anywhere]">{submitLabel}</span>
+                          <ArrowRight className="h-5 w-5 shrink-0" />
                         </>
                       )}
                     </Button>
@@ -788,14 +877,19 @@ export function GesturePanel({
               ) : (
                 <div
                   data-testid="connect-to-gesture"
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/[0.06] p-3"
+                  className={cn(
+                    'flex flex-col items-stretch border-t border-white/10 [&_button]:w-full',
+                    compactDesk ? 'gap-2 pt-2' : 'gap-4 pt-5',
+                  )}
                 >
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-base font-semibold tracking-tight">
-                      {t('form.connect.title')}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {t('form.preview')}
+                  <div className={cn('min-w-0 flex-1', compactDesk && 'sr-only')}>
+                    {!compactDesk && (
+                      <h3 className="font-display text-base font-semibold tracking-tight">
+                        {t('form.connect.title')}
+                      </h3>
+                    )}
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      {t('orientation.connectHelp')}
                     </p>
                   </div>
                   <ConnectWalletButton

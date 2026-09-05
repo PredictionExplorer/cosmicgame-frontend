@@ -143,7 +143,7 @@ export function AllocationLedger({ data, className }: AllocationLedgerProps) {
 
   return (
     <section
-      id="allocation-breakdown"
+      id="allocation-ledger"
       aria-labelledby="allocation-ledger-title"
       data-testid="allocation-ledger"
       className={cn('min-w-0 border-t border-white/[0.08]', className)}

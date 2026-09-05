@@ -8,10 +8,10 @@ type HomeTranslator = ReturnType<typeof useTranslations>;
 export interface GestureSubmitLabelInput {
   t: HomeTranslator;
   gestureType: string;
-  ethPrice: number;
+  ethPrice: number | null | undefined;
   gestureCostPlus: number;
   rwlkId: number;
-  cstGestureData: Pick<CstGestureData, 'isFree' | 'CSTPrice'>;
+  cstGestureData: Pick<CstGestureData, 'isFree' | 'CSTPrice' | 'source'>;
 }
 
 /**
@@ -26,7 +26,14 @@ export function getGestureSubmitLabel({
   rwlkId,
   cstGestureData,
 }: GestureSubmitLabelInput): string {
-  const adj = ethPrice * (1 + gestureCostPlus / 100);
+  const hasEthQuote = ethPrice != null && Number.isFinite(ethPrice) && ethPrice >= 0;
+  if (
+    ((gestureType === 'ETH' || gestureType === 'RandomWalk') && !hasEthQuote) ||
+    (gestureType === 'CST' && cstGestureData.source === 'empty')
+  ) {
+    return t('form.submit.generic', { method: gestureType });
+  }
+  const adj = (ethPrice ?? 0) * (1 + gestureCostPlus / 100);
   const fmt = (v: number, threshold: number) => (v > threshold ? v.toFixed(2) : v.toFixed(5));
   if (gestureType === 'ETH') return t('form.submit.eth', { cost: fmt(adj, 0.1) });
   if (gestureType === 'RandomWalk' && rwlkId !== -1)

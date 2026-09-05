@@ -1,7 +1,6 @@
 'use client';
 
 import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -26,8 +25,9 @@ import { AllocationLedger } from '@/components/home/observatory/AllocationLedger
 import { ChronoEnduranceIntel } from '@/components/home/observatory/ChronoEnduranceIntel';
 import { ControlDesk } from '@/components/home/observatory/ControlDesk';
 import { CycleClock } from '@/components/home/observatory/CycleClock';
+import { CalibrationStatus } from '@/components/home/observatory/CalibrationStatus';
 import { GesturePanel } from '@/components/home/observatory/GesturePanel';
-import { GesturePriceStrip } from '@/components/home/observatory/GesturePriceStrip';
+import { ParticipationGuide } from '@/components/home/observatory/ParticipationGuide';
 import { LatestParticipantIntel } from '@/components/home/observatory/LatestParticipantIntel';
 import { PulseBar } from '@/components/home/observatory/PulseBar';
 import { getGestureSubmitLabel } from '@/components/home/observatory/gestureSubmitLabel';
@@ -70,14 +70,6 @@ import {
 import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from '@/services/api';
 import { deriveLiveCstGestureData } from '@/utils/cstGesture';
 
-const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
-  ssr: false,
-  // Reserves roughly the section's final height (heading + divider + one
-  // card row) in the section's own background color, so the client-only
-  // mount grows the page smoothly instead of slamming the footer downward.
-  loading: () => <div className="min-h-[36rem] bg-[#101441] py-20" aria-hidden />,
-});
-
 // This page re-renders every second (useNow keeps countdown-derived CTA
 // state honest). These sections never consume the tick, so memo boundaries
 // stop the per-second reconciliation of the heaviest subtrees — the chat
@@ -88,14 +80,6 @@ const MemoHomeObservatoryHero = memo(HomeObservatoryHero);
 const MemoGestureMessageChat = memo(GestureMessageChat);
 const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
 const MemoDeckArtCard = memo(DeckArtCard);
-
-/**
- * Marks the browser as a returning visitor. The story section (demoted hero)
- * auto-collapses for returning visitors after hydration; it sits below the
- * fold, so the collapse is never a visible layout shift, and the SSR HTML
- * always carries the full crawlable content.
- */
-const STORY_VISITED_STORAGE_KEY = 'cosmic-observatory-visited';
 
 /** Chosen "notify me before finalization" threshold, in minutes. */
 const NOTIFY_THRESHOLD_STORAGE_KEY = 'cosmic-notify-threshold-min';
@@ -532,7 +516,7 @@ const HomePage = ({
   const submitLabel = getGestureSubmitLabel({
     t,
     gestureType,
-    ethPrice: ethGestureInfo?.ETHPrice ?? 0,
+    ethPrice: ethGestureInfo?.ETHPrice,
     gestureCostPlus,
     rwlkId,
     cstGestureData: liveCstGestureData,
@@ -543,7 +527,13 @@ const HomePage = ({
   const scrollToGesturePanel = useCallback(() => {
     const el = document.getElementById('make-gesture');
     if (el && typeof el.scrollIntoView === 'function') {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'instant'
+          : 'smooth',
+        block: 'start',
+      });
+      el.focus({ preventScroll: true });
     }
   }, []);
 
@@ -560,18 +550,6 @@ const HomePage = ({
     },
     [setBidType, setRwlkId],
   );
-
-  // Returning visitors get the story section collapsed to a disclosure row.
-  // SSR and first hydration render it expanded (state starts false), so
-  // there is no hydration mismatch; the effect flips it below the fold.
-  const [storyCollapsed, setStoryCollapsed] = useState(false);
-  useEffect(() => {
-    if (window.localStorage.getItem(STORY_VISITED_STORAGE_KEY) === '1') {
-      setStoryCollapsed(true);
-    } else {
-      window.localStorage.setItem(STORY_VISITED_STORAGE_KEY, '1');
-    }
-  }, []);
 
   // The desktop action dock appears only after the stage scrolls out of
   // view. jsdom has no IntersectionObserver, so the guard also keeps unit
@@ -609,7 +587,10 @@ const HomePage = ({
   const handleJoinChatCta = useCallback(() => {
     trackChatJoinCtaClicked();
     scrollToGesturePanel();
-    panelMessageInputRef.current?.focus({ preventScroll: true });
+    const input = panelMessageInputRef.current;
+    const disclosure = input?.closest('details');
+    if (disclosure) disclosure.open = true;
+    input?.focus({ preventScroll: true });
   }, [scrollToGesturePanel]);
 
   // Mobile bottom sheet: hosts the same gesture panel, opened from the dock,
@@ -643,7 +624,7 @@ const HomePage = ({
   // not exist, so say the read failed and offer a retry instead.
   if (dashboardFailed && !dashboardData) {
     return (
-      <PageShell variant="data" backdrop="signature">
+      <PageShell variant="data" backdrop="subtle">
         <ErrorState
           title={t('error.title')}
           message={t('error.message')}
@@ -658,11 +639,11 @@ const HomePage = ({
     <LazyMotion features={domAnimation}>
       <PageShell
         variant="data"
-        backdrop="signature"
-        className="home-control-shell pb-24 pt-[var(--header-height)] max-sm:pt-[calc(var(--header-height)+0.75rem)] lg:pb-8 xl:max-w-[92rem] 2xl:max-w-[108rem] 2xl:px-10"
+        backdrop="subtle"
+        className="home-control-shell pb-24 pt-[calc(var(--header-height)+1rem)] max-sm:pt-[calc(var(--header-height)+0.75rem)] lg:px-5 lg:pb-12 xl:max-w-[100rem]"
       >
         {uxScenario && (
-          <div className="mb-5 rounded-xl border border-amber-300/25 bg-amber-300/[0.08] px-4 py-3 text-sm text-amber-100">
+          <div className="mb-2 rounded-lg border border-amber-300/25 bg-amber-300/[0.08] px-3 py-1 text-xs text-amber-100">
             <span className="font-semibold text-amber-50">UX scenario: {uxScenario.name}</span>
             <span className="ml-2 text-amber-100/80">
               Cycle data and gesture placement are simulated for local UI testing.
@@ -670,9 +651,7 @@ const HomePage = ({
           </div>
         )}
 
-        {/* ===== PARTICIPANT CONTROL DESK =====
-            One continuous surface: no independent grid cards waiting on a
-            taller sibling, and no critical role detail relegated below it. */}
+        {/* All live decision inputs stay visible together on desktop. */}
         <ControlDesk
           ref={stageContainerRef}
           header={
@@ -699,16 +678,18 @@ const HomePage = ({
               notifyThresholdMin={notifyThresholdMin}
               onNotifyThresholdChange={handleNotifyThresholdChange}
               ethUsdPrice={ethUsdPrice}
+              compact
               embedded
             />
           }
-          mobilePrices={
-            <GesturePriceStrip
+          calibration={
+            <CalibrationStatus
               data={data}
               ethGestureInfo={ethGestureInfo}
               cstGestureData={liveCstGestureData}
             />
           }
+          orientation={<ParticipationGuide />}
           latestParticipant={
             <LatestParticipantIntel
               champions={champions}
@@ -720,12 +701,14 @@ const HomePage = ({
               attachedErc20Count={donatedERC20Tokens.length}
               showLastGesture={showLastGesture}
               gestureDetailsPending={latestResolution.isSyncing}
+              compact
             />
           }
           chronoEndurance={
             <ChronoEnduranceIntel
               champions={champions}
               chronoEth={trackAmounts.chronoEth}
+              compact
               account={account}
             />
           }
@@ -747,6 +730,7 @@ const HomePage = ({
                 variant="card"
                 messageInputRef={panelMessageInputRef}
                 embedded
+                calibrationExternal
               />
             ) : undefined
           }
@@ -765,9 +749,7 @@ const HomePage = ({
           allocationLedger={<AllocationLedger data={data} />}
         />
 
-        {/* ===== LIVE FEED + ARTWORK =====
-            Observer depth follows immediately after the desk. Navigation is
-            folded into this section header instead of occupying full cards. */}
+        {/* Activity and attached assets follow the current cycle controls. */}
         <div className="mt-5">
           <div
             data-testid="home-feed-actions"
@@ -826,31 +808,18 @@ const HomePage = ({
           </div>
         </div>
 
-        {/* ===== STORY: what Cosmic Signature is (crawlable, below the fold).
-            SSR always ships the full section; returning visitors get it
-            collapsed to this disclosure after hydration. ===== */}
-        <div data-testid="home-story-section" className="mt-8">
-          {storyCollapsed ? (
-            <button
-              type="button"
-              data-testid="story-expand"
-              onClick={() => setStoryCollapsed(false)}
-              className="flex w-full items-center justify-between gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 text-left transition-colors hover:border-primary/30 hover:bg-white/[0.05]"
-            >
-              <span className="min-w-0">
-                <span className="block text-sm font-semibold text-foreground">
-                  {t('deck.story.collapsedTitle')}
-                </span>
-                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                  {t('deck.story.collapsedSubtitle')}
-                </span>
-              </span>
-              <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-primary">
-                {t('deck.story.expand')}
-                <ChevronDown className="h-4 w-4" aria-hidden />
-              </span>
-            </button>
-          ) : (
+        <details
+          data-testid="home-story-section"
+          className="group/story mt-6 rounded-2xl border border-white/10 bg-[#0b1226]/70"
+        >
+          <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
+            {t('orientation.storyTitle')}
+            <ChevronDown
+              className="h-5 w-5 text-muted-foreground transition-transform motion-reduce:transition-none group-open/story:rotate-180"
+              aria-hidden
+            />
+          </summary>
+          <div className="border-t border-white/10 p-3 sm:p-5">
             <MemoHomeObservatoryHero
               data={data}
               bannerToken={bannerToken}
@@ -859,18 +828,25 @@ const HomePage = ({
               onPrimaryCtaClick={handlePrimaryCtaClick}
               headingLevel="h2"
             />
-          )}
-        </div>
-
-        {/* ===== CYCLE EXPLAINER (education, crawlable) ===== */}
-        <CyclePhaseGuide
-          data={data}
-          loading={loading}
-          allocationTime={allocationTime}
-          activationTime={activationTime}
-          now={now}
-          finalizationConfirmed={finalizationConfirmed}
-        />
+            <CyclePhaseGuide
+              data={data}
+              loading={loading}
+              allocationTime={allocationTime}
+              activationTime={activationTime}
+              now={now}
+              finalizationConfirmed={finalizationConfirmed}
+            />
+            <Link
+              href="/experimental-ui"
+              prefetch={false}
+              data-testid="experimental-ui-entry"
+              className="inline-flex min-h-11 items-center gap-2 px-2 text-sm text-muted-foreground hover:text-primary"
+            >
+              {t('deck.experimentalUi')}
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
+        </details>
       </PageShell>
 
       {/* Endgame theater: full-viewport vignette during the final window. */}
@@ -926,8 +902,6 @@ const HomePage = ({
           />
         </SheetContent>
       </Sheet>
-
-      <LatestNFTs />
     </LazyMotion>
   );
 };

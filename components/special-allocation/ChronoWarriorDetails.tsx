@@ -15,6 +15,8 @@ export interface ChronoWarriorDetailsProps {
   challenge: ChampionsState['chronoChallenge'];
   /** Tight control-desk layout; the full cycle cards use the roomier default. */
   compact?: boolean;
+  /** A horizontal decision strip below the dashboard's role summaries. */
+  dashboard?: boolean;
 }
 
 /**
@@ -29,6 +31,7 @@ export function ChronoWarriorDetails({
   chrono,
   challenge,
   compact = false,
+  dashboard = false,
 }: ChronoWarriorDetailsProps) {
   const t = useTranslations('tables');
   const locale = useLocale();
@@ -54,17 +57,113 @@ export function ChronoWarriorDetails({
 
   const showChallenge = challenge.hasDetails && !challenge.isLive;
 
+  if (dashboard) {
+    if (!showChallenge && !chrono.isLive) return null;
+
+    return (
+      <div
+        data-testid="chrono-warrior-details"
+        className="@container/chrono min-w-0 rounded-lg border border-primary/15 bg-primary/[0.04] px-2.5 py-2"
+      >
+        {showChallenge ? (
+          <div
+            data-testid="chrono-active-challenge"
+            className="grid min-w-0 grid-cols-2 gap-x-3 gap-y-2 @min-[570px]/chrono:grid-cols-[1.4fr_1fr_1fr_1fr]"
+          >
+            <div className="min-w-0">
+              <p className="text-xs font-medium leading-4 text-emerald-300">
+                {t('specialAllocation.activeEnduranceChallenge')}
+              </p>
+              {challenge.address && (
+                <Link
+                  href={`/user/${challenge.address}`}
+                  title={challenge.address}
+                  aria-label={challenge.address}
+                  className="mt-0.5 inline-block break-all font-mono text-xs leading-4 text-foreground hover:text-primary"
+                >
+                  {shortenHex(challenge.address, 6)}
+                </Link>
+              )}
+            </div>
+            {challenge.duration !== undefined && (
+              <DetailMetric
+                testId="chrono-challenge-segment"
+                label={t('specialAllocation.challengeSegment')}
+                value={formatSeconds(challenge.duration, locale)}
+                tone="emerald"
+                unframed
+              />
+            )}
+            <DetailMetric
+              testId="chrono-challenge-record-to-beat"
+              label={t('specialAllocation.recordToBeat')}
+              value={formatSeconds(challenge.recordToBeat, locale)}
+              tone="gold"
+              unframed
+            />
+            <DetailMetric
+              testId="chrono-challenge-next-change"
+              label={
+                challenge.isRecordHolder
+                  ? t('specialAllocation.canExtendIn')
+                  : t('specialAllocation.canOvertakeIn')
+              }
+              value={
+                challenge.startsGrowingIn !== undefined
+                  ? formatSeconds(challenge.startsGrowingIn, locale)
+                  : challenge.isRecordHolder
+                    ? t('specialAllocation.waitingToExtend')
+                    : t('specialAllocation.waitingToOvertake')
+              }
+              tone="emerald"
+              unframed
+            />
+          </div>
+        ) : (
+          <div className="grid min-w-0 grid-cols-2 gap-x-3 gap-y-2 @min-[570px]/chrono:grid-cols-[1fr_1fr_2fr]">
+            {chrono.currentSegmentDuration !== undefined && (
+              <DetailMetric
+                testId="chrono-current-segment"
+                label={t('specialAllocation.recordGrowingSegment')}
+                value={formatSeconds(chrono.currentSegmentDuration, locale)}
+                tone="primary"
+                unframed
+              />
+            )}
+            <DetailMetric
+              testId="chrono-challenge-record-to-beat"
+              label={t('specialAllocation.recordToBeat')}
+              value={formatSeconds(challenge.recordToBeat, locale)}
+              tone="gold"
+              unframed
+            />
+            <DetailMetric
+              testId="chrono-next-change"
+              label={nextMetric.label}
+              value={nextMetric.value}
+              tone="emerald"
+              unframed
+              className="col-span-2 @min-[570px]/chrono:col-span-1"
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       data-testid="chrono-warrior-details"
       className={cn(
-        'rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]',
+        '@container/chrono rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]',
         compact ? 'p-2' : 'mt-3 p-3',
       )}
     >
       <div
         className={cn(
-          compact && showChallenge && 'grid items-start gap-1.5 sm:grid-cols-[0.45fr_1.55fr]',
+          compact &&
+            showChallenge &&
+            'grid items-start gap-1.5 @min-[560px]/chrono:grid-cols-[0.45fr_1.55fr]',
         )}
       >
         <div>
@@ -74,7 +173,12 @@ export function ChronoWarriorDetails({
               {t('specialAllocation.chronoReign')}
             </p>
           </div>
-          <div className={cn('grid gap-1.5', compact && chrono.isLive && 'sm:grid-cols-2')}>
+          <div
+            className={cn(
+              'grid gap-1.5',
+              compact && chrono.isLive && '@min-[350px]/chrono:grid-cols-2',
+            )}
+          >
             {chrono.isLive && chrono.currentSegmentDuration !== undefined && (
               <DetailMetric
                 testId="chrono-current-segment"

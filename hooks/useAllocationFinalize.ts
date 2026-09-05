@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { usePublicClient } from 'wagmi';
+import { useConfig, usePublicClient } from 'wagmi';
+import { getAccount, writeContract } from '@wagmi/core';
 import { zeroAddress } from 'viem';
 
+import { cosmicGameAbi } from '@/contracts/abis';
+
+import { activeChain } from '@/config/chains';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useRouter } from '@/i18n/navigation';
 import api from '@/services/api';
 import { isAxiosError } from '@/services/api/client';
@@ -10,9 +15,9 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
 import { isUserRejection, reportError } from '@/utils/errors';
 import { getContractErrorDescriptor, isEmptyContractReadError } from '@/utils/contractErrors';
-import { asWriteFn } from '@/utils/contractWrite';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { useNotify } from '@/hooks/useNotify';
+import { useRequireChain } from '@/hooks/useRequireChain';
 import { useAllocationTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
 import { getStableClientTargetTime } from '@/utils/time';
 import type { ServerTimingSample } from '@/utils/time';
@@ -34,9 +39,12 @@ export function useAllocationFinalize({
 }: UseAllocationFinalizeOptions) {
   const t = useTranslations('toasts');
   const router = useRouter();
-  const publicClient = usePublicClient();
+  const config = useConfig();
+  const publicClient = usePublicClient({ chainId: activeChain.id });
+  const { cosmicGame } = useContractAddresses();
   const cosmicGameContract = useCosmicGameContract();
   const { notify, notifyErrorFromEthers } = useNotify();
+  const { ensureCorrectChain } = useRequireChain();
   const uxScenario = useUxScenarioSnapshot();
 
   const { data: prizeTimeRaw } = useAllocationTime(
@@ -115,7 +123,7 @@ export function useAllocationFinalize({
    */
   const onFinalize = async (): Promise<boolean> => {
     if (inFlightRef.current) return false;
-    if (!cosmicGameContract) {
+    if (!cosmicGame) {
       notify('error', t('wallet.connectCorrectNetwork'));
       return false;
     }
@@ -127,25 +135,47 @@ export function useAllocationFinalize({
     inFlightRef.current = true;
     setIsClaiming(true);
     try {
-      const roundBefore = (await cosmicGameContract.read.roundNum?.()) as bigint;
+      // Hold the submission lock while the wallet asks to switch networks.
+      // Resolve the signer at write time: a successful switch can precede
+      // React's next render and the old contract can still be read-only.
+      if (!(await ensureCorrectChain())) return false;
+      const contract = { address: cosmicGame as `0x${string}`, abi: cosmicGameAbi };
+      const roundBefore = (await publicClient.readContract({
+        ...contract,
+        functionName: 'roundNum',
+      })) as bigint;
       const finalCstGestureParticipant =
-        ((await cosmicGameContract.read.lastCstBidderAddress?.()) as string | undefined) ??
-        zeroAddress;
+        ((await publicClient.readContract({
+          ...contract,
+          functionName: 'lastCstBidderAddress',
+        })) as string | undefined) ?? zeroAddress;
       const hasFinalCstGesture = finalCstGestureParticipant !== zeroAddress;
 
       let gasLimit = GAS_FLOOR;
       try {
-        const estimate = await cosmicGameContract.estimateGas.claimMainPrize?.({});
+        const estimate = await publicClient.estimateContractGas({
+          ...contract,
+          functionName: 'claimMainPrize',
+          account: getAccount(config).address,
+        });
         if (estimate) gasLimit = estimate + GAS_EXTRA;
       } catch (estimateErr) {
         reportError(estimateErr, 'finalize-cycle-gas-estimate');
       }
 
-      const hash = await asWriteFn(cosmicGameContract.write.claimMainPrize)({ gas: gasLimit });
+      const hash = await writeContract(config, {
+        ...contract,
+        functionName: 'claimMainPrize',
+        chainId: activeChain.id,
+        gas: gasLimit,
+      });
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       assertSuccessfulTransactionReceipt(receipt);
 
-      const roundAfter = (await cosmicGameContract.read.roundNum?.()) as bigint;
+      const roundAfter = (await publicClient.readContract({
+        ...contract,
+        functionName: 'roundNum',
+      })) as bigint;
       if (roundAfter <= roundBefore) {
         notify('warning', t('finalize.roundDidNotAdvance'));
         return true;
