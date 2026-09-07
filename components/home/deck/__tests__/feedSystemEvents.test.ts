@@ -246,15 +246,99 @@ describe('deriveFeedSystemEvents', () => {
     ).toEqual([expect.objectContaining({ kind: 'cycleStart' })]);
   });
 
-  it('announces each newcomer once, Final CST changes only on CST role changes, and sparse activity milestones', () => {
+  it('announces each newcomer once and sparse activity milestones', () => {
     const gestures = Array.from({ length: 20 }, (_, i) =>
       gesture(1000 + i, i < 2 ? '0xAbC' : '0xabc', { GestureType: i === 1 || i === 3 ? 2 : 0 }),
     );
     const events = derive(gestures, 1020);
     expect(events.filter((e) => e.kind === 'newParticipant')).toHaveLength(1);
-    expect(events.filter((e) => e.kind === 'finalCstLeader')).toHaveLength(1);
+    expect(events.filter((e) => e.kind === 'finalCstLeader')).toEqual([
+      expect.objectContaining({ timestamp: 1003, address: '0xabc' }),
+    ]);
     expect(events.filter((e) => e.kind === 'gestureMilestone').map((e) => e.count)).toEqual([
       10, 20,
+    ]);
+  });
+
+  it('keeps only the latest Final CST position across different participants', () => {
+    const events = derive(
+      [
+        gesture(1300, 'D'),
+        gesture(1100, 'B', { GestureType: 2 }),
+        gesture(1000, 'A', { GestureType: 2 }),
+        gesture(1200, 'C', { GestureType: 2 }),
+      ],
+      1400,
+    );
+    expect(events.filter((e) => e.kind === 'finalCstLeader')).toEqual([
+      {
+        id: 'final-cst-7-1200',
+        timestamp: 1200,
+        kind: 'finalCstLeader',
+        address: 'C',
+      },
+    ]);
+    expect(events.filter((e) => e.kind === 'newParticipant')).toHaveLength(4);
+  });
+
+  it('refreshes the Final CST timestamp and identity when the same participant repeats', () => {
+    const first = gesture(1000, '0xAbC', { EvtLogId: 10, GestureType: 2 });
+    const events = derive(
+      [first, gesture(1100, 'B'), gesture(1200, '0xabc', { EvtLogId: 30, GestureType: 2 })],
+      1300,
+    );
+    expect(events.filter((e) => e.kind === 'finalCstLeader')).toEqual([
+      {
+        id: 'final-cst-7-30',
+        timestamp: 1200,
+        kind: 'finalCstLeader',
+        address: '0xabc',
+      },
+    ]);
+    expect(events.some((e) => e.id === 'final-cst-7-10')).toBe(false);
+  });
+
+  it.each([
+    [{ EvtLogId: 11 }, { EvtLogId: 10 }],
+    [
+      { EvtLogId: 11, BidPosition: 2 },
+      { EvtLogId: 10, BidPosition: 1 },
+    ],
+    [{ EvtLogId: 11, BidPosition: 2 }, { EvtLogId: 10 }],
+  ])('uses indexed order for same-second Final CST positions (%j, %j)', (latest, first) => {
+    const events = derive(
+      [
+        gesture(1000, 'B', { ...latest, GestureType: 2 }),
+        gesture(1000, 'A', { ...first, GestureType: 2 }),
+      ],
+      1000,
+    );
+    expect(events.filter((e) => e.kind === 'finalCstLeader')).toEqual([
+      {
+        id: 'final-cst-7-11',
+        timestamp: 1000,
+        kind: 'finalCstLeader',
+        address: 'B',
+      },
+    ]);
+  });
+
+  it('omits the Final CST position when the cycle has no CST Gestures', () => {
+    const events = derive([gesture(1000, 'A'), gesture(1100, 'B', { GestureType: 1 })], 1200);
+    expect(events.some((e) => e.kind === 'finalCstLeader')).toBe(false);
+  });
+
+  it('does not replace the Final CST position with a future or other-cycle Gesture', () => {
+    const gestures = [
+      gesture(1000, 'A', { GestureType: 2 }),
+      gesture(1100, 'B', { GestureType: 2, RoundNum: 6 }),
+      gesture(1200, 'C', { GestureType: 2 }),
+    ];
+    expect(derive(gestures, 1150).filter((e) => e.kind === 'finalCstLeader')).toEqual([
+      expect.objectContaining({ id: 'final-cst-7-1000', timestamp: 1000, address: 'A' }),
+    ]);
+    expect(derive(gestures, 1200).filter((e) => e.kind === 'finalCstLeader')).toEqual([
+      expect.objectContaining({ id: 'final-cst-7-1200', timestamp: 1200, address: 'C' }),
     ]);
   });
 

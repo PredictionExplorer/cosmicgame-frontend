@@ -129,7 +129,7 @@ export function deriveFeedSystemEvents({
   const lineage: RecordStint[] = [];
   let enduranceRecord = 0;
   const participants = new Set<string>();
-  let finalCstAddress: string | undefined;
+  let finalCstPosition: GestureFeedSystemEvent | undefined;
   let calibrationStart = observed[0]?.TimeStamp ?? 0;
   let calibrationHasReachedFloor = false;
   let calibrationStateKnown = true;
@@ -188,15 +188,14 @@ export function deriveFeedSystemEvents({
     const gestureType = resolveGestureTypeCode(gesture);
     if (gestureType === undefined) calibrationStart = 0;
     if (gestureType === 2) {
-      if (finalCstAddress !== addressKey) {
-        add({
-          id: `final-cst-${key}`,
-          timestamp: gesture.TimeStamp,
-          kind: 'finalCstLeader',
-          address,
-        });
-        finalCstAddress = addressKey;
-      }
+      // Keep only the latest position, with the actual most recent CST
+      // Gesture's identity and time even when the same participant repeats.
+      finalCstPosition = {
+        id: `final-cst-${key}`,
+        timestamp: gesture.TimeStamp,
+        kind: 'finalCstLeader',
+        address,
+      };
       calibrationStart = gesture.TimeStamp;
       calibrationKey = key;
       calibrationHasReachedFloor = false;
@@ -269,6 +268,8 @@ export function deriveFeedSystemEvents({
       }
     }
   }
+
+  if (finalCstPosition) add(finalCstPosition);
 
   // The stored initial Chrono value is the signed sentinel -1, so the first
   // participant establishes a zero-length reign at the first Gesture.

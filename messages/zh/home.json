@@ -468,6 +468,23 @@
       "description": "留言和周期重要事件会显示在这里，最新的排在最前。",
       "cta": "落笔"
     },
+    "eventTitles": {
+      "cycleOpen": "周期开启",
+      "cycleStart": "周期开始",
+      "enduranceGrowing": "坚守纪录延长",
+      "enduranceRecord": "坚守时段结束",
+      "chronoLead": "时之勇士纪录延长",
+      "chronoReignEnded": "时之勇士在位结束",
+      "finalCstLeader": "最新 CST 落笔",
+      "newParticipant": "新参与者",
+      "gestureMilestone": "活动里程碑",
+      "cstCalibrationReady": "CST 校准完成",
+      "finalWindow": "临近收官",
+      "clockExtended": "倒计时延长",
+      "clockReopened": "归零后落笔",
+      "finalizationAvailable": "可收官",
+      "cycleFinalized": "周期已收官"
+    },
     "system": {
       "cycleStart": "第 {number} 个周期开始了。第一笔启动了收官倒计时。",
       "cycleOpen": "第 {number} 个周期开放了。第一笔 ETH 落笔可启动倒计时。",
@@ -475,7 +492,7 @@
       "enduranceRecord": "{address} 结束了长达 {duration} 的破纪录领先时段。坚守纪录将保留，直到更长的领先时段将其刷新。",
       "chronoLead": "{address} 连续担任坚守冠军达 {duration}，开始延长时之勇士纪录。",
       "chronoReignEnded": "{address} 结束了长达 {duration} 的坚守冠军在位时段。时之勇士由最长的单次连续在位时长决定。",
-      "finalCstLeader": "{address} 成为当前 CST 收官之笔的落笔者。在下一笔 CST 落笔之前，这一位置将由该参与者保持。",
+      "finalCstLeader": "{address} 保持 CST 收官之笔的位置。",
       "newParticipant": "{address} 完成了本周期的首次落笔。",
       "gestureMilestone": "本周期落笔次数达到 {count} 次。",
       "cstCalibrationReady": "CST 校准窗口已达价格下限。下一笔 CST 落笔将重启窗口；交易仍需支付 Gas 费。",

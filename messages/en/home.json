@@ -468,6 +468,23 @@
       "description": "Messages and cycle milestones will appear here, newest first.",
       "cta": "Make a Gesture"
     },
+    "eventTitles": {
+      "cycleOpen": "Cycle open",
+      "cycleStart": "Cycle started",
+      "enduranceGrowing": "Endurance record growing",
+      "enduranceRecord": "Endurance hold complete",
+      "chronoLead": "Chrono-Warrior record growing",
+      "chronoReignEnded": "Chrono reign complete",
+      "finalCstLeader": "Latest CST Gesture",
+      "newParticipant": "New participant",
+      "gestureMilestone": "Activity milestone",
+      "cstCalibrationReady": "CST calibration complete",
+      "finalWindow": "Closing window",
+      "clockExtended": "Clock extended",
+      "clockReopened": "Gesture after zero",
+      "finalizationAvailable": "Ready to finalize",
+      "cycleFinalized": "Cycle finalized"
+    },
     "system": {
       "cycleStart": "Cycle #{number} began. The first Gesture started the finalization clock.",
       "cycleOpen": "Cycle #{number} opened. The first ETH Gesture can start the clock.",
@@ -475,7 +492,7 @@
       "enduranceRecord": "{address} ended a record-setting hold of {duration}. The Endurance record stands until a longer hold replaces it.",
       "chronoLead": "{address} started growing the Chrono-Warrior record with a continuous Endurance reign of {duration}.",
       "chronoReignEnded": "{address} ended an Endurance reign of {duration}. Chrono-Warrior is determined by the longest continuous reign.",
-      "finalCstLeader": "{address} took the Final CST Gesture position. It stays with this participant until another CST Gesture.",
+      "finalCstLeader": "{address} holds the Final CST Gesture position.",
       "newParticipant": "{address} made their first Gesture of this cycle.",
       "gestureMilestone": "Cycle activity reached {count} Gestures.",
       "cstCalibrationReady": "The CST Calibration Window reached its floor. The next CST Gesture restarts it; transaction gas still applies.",

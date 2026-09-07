@@ -16,6 +16,7 @@ import {
   Swords,
   TimerReset,
   Users,
+  type LucideIcon,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -42,6 +43,29 @@ import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
 import { TOUCH_TARGET_ICON_CLASS, TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import type { GestureInfo } from '@/services/api';
+
+import styles from './GestureMessageChat.module.css';
+
+type EventTone = 'endurance' | 'chrono' | 'clock' | 'cycle' | 'calibration' | 'community' | 'cst';
+
+// Text labels and icon silhouettes carry the same distinctions as the color.
+const EVENT_PRESENTATION = {
+  cycleStart: { icon: Sparkles, tone: 'cycle' },
+  cycleOpen: { icon: Flag, tone: 'cycle' },
+  enduranceGrowing: { icon: Crown, tone: 'endurance' },
+  enduranceRecord: { icon: Crown, tone: 'endurance' },
+  chronoLead: { icon: Swords, tone: 'chrono' },
+  chronoReignEnded: { icon: Swords, tone: 'chrono' },
+  finalCstLeader: { icon: Flag, tone: 'cst' },
+  newParticipant: { icon: Users, tone: 'community' },
+  gestureMilestone: { icon: Radio, tone: 'community' },
+  cstCalibrationReady: { icon: Hourglass, tone: 'calibration' },
+  finalWindow: { icon: Clock3, tone: 'clock' },
+  clockExtended: { icon: TimerReset, tone: 'clock' },
+  clockReopened: { icon: TimerReset, tone: 'clock' },
+  finalizationAvailable: { icon: CircleCheck, tone: 'cycle' },
+  cycleFinalized: { icon: CircleCheck, tone: 'cycle' },
+} satisfies Record<GestureFeedSystemEvent['kind'], { icon: LucideIcon; tone: EventTone }>;
 
 /** A just-submitted message shown instantly while the indexer catches up. */
 export interface PendingChatMessage {
@@ -107,14 +131,14 @@ function GestureMessageTimestamp({
   return (
     <time
       dateTime={isValid ? date.toISOString() : undefined}
-      className="mt-2 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground"
+      className={styles.timestamp}
       aria-live="off"
     >
       <span>{absolute}</span>
       {relativeLabel ? (
         <>
           <span aria-hidden="true">·</span>
-          <span>{relativeLabel}</span>
+          <span className={styles.relativeAge}>{relativeLabel}</span>
         </>
       ) : null}
     </time>
@@ -234,30 +258,7 @@ function SystemEventRow({
   nowMs: number;
 }) {
   const t = useTranslations('home');
-  const icons = {
-    cycleStart: Sparkles,
-    cycleOpen: Flag,
-    enduranceGrowing: Crown,
-    enduranceRecord: Crown,
-    chronoLead: Swords,
-    chronoReignEnded: Swords,
-    finalCstLeader: Flag,
-    newParticipant: Users,
-    gestureMilestone: Radio,
-    cstCalibrationReady: Hourglass,
-    finalWindow: Clock3,
-    clockExtended: TimerReset,
-    clockReopened: TimerReset,
-    finalizationAvailable: CircleCheck,
-    cycleFinalized: CircleCheck,
-  };
-  const Icon = icons[event.kind];
-  const iconClass =
-    event.kind === 'enduranceRecord' || event.kind === 'enduranceGrowing'
-      ? 'text-[rgb(var(--solar-gold-rgb))]'
-      : event.kind === 'chronoLead' || event.kind === 'chronoReignEnded'
-        ? 'text-[rgb(var(--nebula-violet-rgb))]'
-        : 'text-primary';
+  const { icon: Icon, tone } = EVENT_PRESENTATION[event.kind];
   const text = t(`chat.system.${event.kind}`, {
     ...(event.cycleNumber != null ? { number: String(event.cycleNumber) } : {}),
     ...(event.address ? { address: shortenHex(event.address, 4) } : {}),
@@ -271,11 +272,15 @@ function SystemEventRow({
     <div
       data-testid="chat-system-event"
       data-kind={event.kind}
-      className="flex items-start gap-2 rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] px-3 py-2"
+      data-tone={tone}
+      className={styles.eventCard}
     >
-      <Icon className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', iconClass)} aria-hidden />
-      <div className="min-w-0">
-        <p className="text-xs leading-relaxed text-muted-foreground">{text}</p>
+      <span className={styles.eventIcon} aria-hidden="true">
+        <Icon className="h-4 w-4" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <h3 className={styles.eventTitle}>{t(`chat.eventTitles.${event.kind}`)}</h3>
+        <p className={styles.eventDescription}>{text}</p>
         <GestureMessageTimestamp timestamp={event.timestamp} locale={locale} nowMs={nowMs} />
       </div>
     </div>
@@ -296,7 +301,7 @@ function PendingMessageRow({
   return (
     <article
       data-testid="chat-pending-message"
-      className="rounded-xl border border-primary/20 border-dashed bg-primary/[0.04] p-3 sm:rounded-2xl sm:p-4 xl:p-3.5"
+      className={cn(styles.messageCard, styles.pendingCard)}
       aria-label={t('chat.pending.aria')}
     >
       <div className="flex items-center justify-between gap-3">
@@ -458,12 +463,8 @@ export function GestureMessageChat({
                   return (
                     <li key={listItemKey}>
                       <article
-                        className={cn(
-                          'rounded-xl border p-3 transition-colors sm:rounded-2xl sm:p-4 xl:p-3.5 2xl:p-4',
-                          isNewest
-                            ? 'border-primary/25 bg-primary/[0.075] shadow-[0_18px_70px_-54px_rgb(var(--aurora-cyan-rgb)/0.9)]'
-                            : 'border-white/[0.06] bg-white/[0.03]',
-                        )}
+                        className={styles.messageCard}
+                        data-newest={isNewest}
                         aria-label={t('chat.messageAria', { address: gesture.BidderAddr })}
                       >
                         {/*
@@ -475,18 +476,24 @@ export function GestureMessageChat({
                         */}
                         <div
                           data-testid="gesture-message-meta"
-                          className="flex items-start justify-between gap-3 max-sm:flex-col max-sm:items-start max-sm:gap-2"
+                          className={cn(
+                            styles.messageMeta,
+                            'flex items-start justify-between gap-3 max-sm:flex-col max-sm:items-start max-sm:gap-2',
+                          )}
                         >
                           <div
                             data-testid="gesture-message-participant"
                             className="flex min-w-0 items-center gap-1"
                           >
+                            <span className={styles.messageIcon} aria-hidden="true">
+                              <MessageCircle className="h-4 w-4" />
+                            </span>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Link
                                   href={`/user/${gesture.BidderAddr}`}
                                   className={cn(
-                                    'min-w-0 font-mono text-sm font-semibold text-white underline-offset-4 hover:text-primary hover:underline',
+                                    'min-w-0 truncate font-mono text-sm font-semibold text-white underline-offset-4 hover:text-primary hover:underline',
                                     TOUCH_TARGET_TEXT_LINK_CLASS,
                                   )}
                                   title={gesture.BidderAddr}
@@ -500,7 +507,10 @@ export function GestureMessageChat({
                           </div>
                           <div
                             data-testid="gesture-message-badges"
-                            className="flex shrink-0 flex-wrap items-center justify-end gap-1.5 max-sm:justify-start"
+                            className={cn(
+                              styles.messageBadges,
+                              'flex shrink-0 flex-wrap items-center justify-end gap-1.5 max-sm:justify-start',
+                            )}
                           >
                             <span
                               data-testid="gesture-method-badge"
@@ -524,15 +534,14 @@ export function GestureMessageChat({
                           </div>
                         </div>
 
+                        <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/95">
+                          <LinkifiedText text={message} />
+                        </p>
                         <GestureMessageTimestamp
                           timestamp={gesture.TimeStamp}
                           locale={locale}
                           nowMs={nowMs}
                         />
-
-                        <p className="mt-2.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/95">
-                          <LinkifiedText text={message} />
-                        </p>
                       </article>
                     </li>
                   );

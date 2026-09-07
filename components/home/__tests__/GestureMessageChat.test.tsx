@@ -297,11 +297,9 @@ describe('GestureMessageChat', () => {
     );
     expect(screen.getByTestId('gesture-message-badges')).toHaveClass('max-sm:justify-start');
 
-    expect(screen.getByLabelText(`home.chat.messageAria(address=${participant})`)).toHaveClass(
-      'p-3',
-      'sm:p-4',
-      'xl:p-3.5',
-      '2xl:p-4',
+    expect(screen.getByLabelText(`home.chat.messageAria(address=${participant})`)).toHaveAttribute(
+      'data-newest',
+      'true',
     );
     expect(screen.getByRole('button', { name: 'common.actions.copyAddress' })).toHaveClass(
       'max-sm:min-h-11',
@@ -524,6 +522,13 @@ describe('GestureMessageChat', () => {
 
     const event = screen.getByTestId('chat-system-event');
     expect(event).toHaveAttribute('data-kind', kind);
+    // The event is identifiable from a real heading even without its color.
+    expect(
+      within(event).getByRole('heading', {
+        level: 3,
+        name: `home.chat.eventTitles.${kind}`,
+      }),
+    ).toBeInTheDocument();
     expect(event).toHaveTextContent(`home.chat.system.${kind}(`);
     expect(event.querySelector('time')).toHaveAttribute('dateTime', '2023-11-14T22:13:20.000Z');
     expect(event.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:13:20 UTC');
@@ -604,7 +609,19 @@ describe('GestureMessageChat', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(
-      <GestureMessageChat gestures={[makeGesture({ Message: 'Accessible gesture message' })]} />,
+      <GestureMessageChat
+        gestures={[makeGesture({ Message: 'Accessible gesture message' })]}
+        systemEvents={[
+          { id: 'start', kind: 'cycleStart', timestamp: 1_700_000_000, cycleNumber: 7 },
+          {
+            id: 'record',
+            kind: 'enduranceGrowing',
+            timestamp: 1_700_000_100,
+            address: '0x1111111111111111111111111111111111111111',
+            durationSeconds: 100,
+          },
+        ]}
+      />,
     );
 
     await checkA11y(container);

@@ -1,0 +1,174 @@
+/* Semantic colors stay consistent across the visitor's chosen site palette. */
+.eventCard {
+  --event-accent: 172 190 214;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid rgb(var(--event-accent) / 0.15);
+  border-inline-start: 2px solid rgb(var(--event-accent) / 0.65);
+  border-radius: 0.875rem;
+  background:
+    linear-gradient(110deg, rgb(var(--event-accent) / 0.075), transparent 75%),
+    hsl(var(--card) / 0.55);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.025);
+}
+
+.eventCard[data-tone='endurance'] {
+  --event-accent: 245 198 117;
+}
+
+.eventCard[data-tone='chrono'] {
+  --event-accent: 198 172 255;
+}
+
+.eventCard[data-tone='clock'] {
+  --event-accent: 139 196 250;
+}
+
+.eventCard[data-tone='cycle'] {
+  --event-accent: 137 218 187;
+}
+
+.eventCard[data-tone='calibration'] {
+  --event-accent: 125 214 213;
+}
+
+/* Background activity has a lighter visual weight than record milestones. */
+.eventCard[data-tone='community'],
+.eventCard[data-tone='cst'] {
+  border-inline-start-color: rgb(var(--event-accent) / 0.3);
+  background: hsl(var(--card) / 0.4);
+}
+
+.eventCard[data-tone='cst'] {
+  gap: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  border-inline-start-width: 1px;
+}
+
+.eventCard[data-tone='cst'] .eventIcon {
+  flex-basis: 1.5rem;
+  height: 1.5rem;
+}
+
+.eventCard[data-tone='cst'] .eventTitle,
+.eventCard[data-tone='cst'] .eventDescription {
+  font-size: 0.75rem;
+}
+
+.eventIcon {
+  display: flex;
+  flex: 0 0 1.875rem;
+  align-items: center;
+  justify-content: center;
+  height: 1.875rem;
+  border: 1px solid rgb(var(--event-accent) / 0.2);
+  border-radius: 0.625rem;
+  color: rgb(var(--event-accent));
+  background: rgb(var(--event-accent) / 0.09);
+}
+
+.eventTitle {
+  margin: 0;
+  color: rgb(var(--event-accent));
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.eventDescription {
+  margin-top: 0.3rem;
+  color: hsl(var(--foreground) / 0.84);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.timestamp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.125rem 0.4rem;
+  margin-top: 0.625rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.relativeAge {
+  color: hsl(var(--foreground) / 0.85);
+  font-weight: 500;
+}
+
+.messageCard {
+  container-type: inline-size;
+  padding: 1rem;
+  border: 1px solid hsl(var(--foreground) / 0.14);
+  border-radius: 1rem;
+  background: hsl(var(--foreground) / 0.045);
+  box-shadow:
+    inset 0 1px 0 hsl(var(--foreground) / 0.04),
+    0 4px 16px rgb(0 0 0 / 0.06);
+}
+
+.messageCard[data-newest='true'] {
+  border-color: hsl(var(--foreground) / 0.23);
+  background: hsl(var(--foreground) / 0.065);
+}
+
+.messageIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  margin-inline-end: 0.25rem;
+  border: 1px solid hsl(var(--foreground) / 0.12);
+  border-radius: 50%;
+  color: hsl(var(--foreground) / 0.8);
+  background: hsl(var(--foreground) / 0.06);
+}
+
+.pendingCard {
+  border-style: dashed;
+  border-color: hsl(var(--primary) / 0.35);
+}
+
+/* The experimental chat rail can be narrow even on a wide screen. */
+@container (max-width: 380px) {
+  .messageMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .messageBadges {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 639px) {
+  .eventCard {
+    gap: 0.625rem;
+    padding: 0.75rem;
+  }
+
+  .messageCard {
+    padding: 0.875rem;
+  }
+}
+
+@media print {
+  .eventCard,
+  .messageCard {
+    break-inside: avoid;
+    border-color: #aaa;
+    background: none;
+    box-shadow: none;
+  }
+}

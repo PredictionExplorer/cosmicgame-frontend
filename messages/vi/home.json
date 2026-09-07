@@ -468,6 +468,23 @@
       "description": "Lời nhắn và các cột mốc của chu kỳ sẽ xuất hiện ở đây, mới nhất trước.",
       "cta": "Đặt nét bút"
     },
+    "eventTitles": {
+      "cycleOpen": "Chu kỳ đã mở",
+      "cycleStart": "Chu kỳ bắt đầu",
+      "enduranceGrowing": "Kỷ lục Bền bỉ đang kéo dài",
+      "enduranceRecord": "Kết thúc giữ vị trí dẫn đầu",
+      "chronoLead": "Kỷ lục Chiến binh Thời gian đang kéo dài",
+      "chronoReignEnded": "Kết thúc giữ danh hiệu Chiến binh Thời gian",
+      "finalCstLeader": "Nét bút CST mới nhất",
+      "newParticipant": "Người tham gia mới",
+      "gestureMilestone": "Cột mốc hoạt động",
+      "cstCalibrationReady": "Hiệu chỉnh CST hoàn tất",
+      "finalWindow": "Giai đoạn sắp kết thúc",
+      "clockExtended": "Đếm ngược được kéo dài",
+      "clockReopened": "Nét bút sau khi đồng hồ về không",
+      "finalizationAvailable": "Có thể hoàn tất",
+      "cycleFinalized": "Chu kỳ đã hoàn tất"
+    },
     "system": {
       "cycleStart": "Chu kỳ #{number} bắt đầu. Nét bút đầu tiên đã khởi động đếm ngược hoàn tất.",
       "cycleOpen": "Chu kỳ #{number} đã mở. Nét bút ETH đầu tiên có thể khởi động đồng hồ.",
@@ -475,7 +492,7 @@
       "enduranceRecord": "{address} kết thúc thời gian giữ vị trí dẫn đầu lập kỷ lục kéo dài {duration}. Kỷ lục Bền bỉ được giữ nguyên cho đến khi một thời gian giữ vị trí dài hơn thay thế.",
       "chronoLead": "{address} bắt đầu kéo dài kỷ lục Chiến binh Thời gian sau khi liên tục giữ danh hiệu Quán quân Bền bỉ trong {duration}.",
       "chronoReignEnded": "{address} kết thúc thời gian giữ danh hiệu Quán quân Bền bỉ kéo dài {duration}. Chiến binh Thời gian được xác định theo thời gian liên tục giữ danh hiệu dài nhất.",
-      "finalCstLeader": "{address} đã nắm vị trí nét bút CST cuối cùng. Vị trí này thuộc về người tham gia đó cho đến nét bút CST tiếp theo.",
+      "finalCstLeader": "{address} đang giữ vị trí nét bút CST cuối cùng.",
       "newParticipant": "{address} đã đặt nét bút đầu tiên của mình trong chu kỳ này.",
       "gestureMilestone": "Hoạt động trong chu kỳ đã đạt {count} nét bút.",
       "cstCalibrationReady": "Cửa sổ hiệu chỉnh CST đã chạm giá sàn. Nét bút CST tiếp theo sẽ khởi động lại cửa sổ; giao dịch vẫn cần phí gas.",

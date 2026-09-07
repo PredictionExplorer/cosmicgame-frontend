@@ -468,6 +468,23 @@
       "description": "メッセージとサイクルの節目が、新しいものから順にここに表示されます。",
       "cta": "一筆を入れる"
     },
+    "eventTitles": {
+      "cycleOpen": "サイクル開放",
+      "cycleStart": "サイクル開始",
+      "enduranceGrowing": "持久記録の延長",
+      "enduranceRecord": "先頭保持の終了",
+      "chronoLead": "時の戦士の記録延長",
+      "chronoReignEnded": "時の戦士の保持期間終了",
+      "finalCstLeader": "最新のCST一筆",
+      "newParticipant": "新しい参加者",
+      "gestureMilestone": "活動の節目",
+      "cstCalibrationReady": "CST調律完了",
+      "finalWindow": "確定間近",
+      "clockExtended": "カウントダウン延長",
+      "clockReopened": "カウントダウン終了後の一筆",
+      "finalizationAvailable": "確定可能",
+      "cycleFinalized": "サイクル確定"
+    },
     "system": {
       "cycleStart": "サイクル{number}が始まりました。最初の一筆が確定カウントダウンを開始しました。",
       "cycleOpen": "サイクル{number}が開きました。最初のETH一筆でカウントダウンを開始できます。",
@@ -475,7 +492,7 @@
       "enduranceRecord": "{address}の記録を更新した先頭保持期間が{duration}で終わりました。持久記録は、より長い保持期間に更新されるまで残ります。",
       "chronoLead": "{address}が{duration}にわたり持久チャンピオンを連続で保持し、時の戦士の記録を延ばし始めました。",
       "chronoReignEnded": "{address}の持久チャンピオン保持期間が{duration}で終わりました。時の戦士は最も長い連続保持期間によって決まります。",
-      "finalCstLeader": "{address}が最終CST一筆の位置を占めました。次のCST一筆まで、この参加者がその位置を保持します。",
+      "finalCstLeader": "{address}が最終CST一筆の位置を保持しています。",
       "newParticipant": "{address}がこのサイクルで初めて一筆を入れました。",
       "gestureMilestone": "サイクルの一筆の件数が{count}件に達しました。",
       "cstCalibrationReady": "CST調律期間の価格が下限に達しました。次のCST一筆で再開します。トランザクションのガス代は引き続き必要です。",

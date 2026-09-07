@@ -468,6 +468,23 @@
       "description": "메시지와 사이클의 주요 이벤트가 최신순으로 여기에 표시됩니다.",
       "cta": "제스처 남기기"
     },
+    "eventTitles": {
+      "cycleOpen": "사이클 참여 시작",
+      "cycleStart": "사이클 시작",
+      "enduranceGrowing": "선두 유지 기록 연장",
+      "enduranceRecord": "선두 유지 종료",
+      "chronoLead": "시간의 전사 기록 연장",
+      "chronoReignEnded": "시간의 전사 유지 종료",
+      "finalCstLeader": "최신 CST 제스처",
+      "newParticipant": "새 참여자",
+      "gestureMilestone": "활동 이정표",
+      "cstCalibrationReady": "CST 보정 완료",
+      "finalWindow": "마감 임박",
+      "clockExtended": "카운트다운 연장",
+      "clockReopened": "카운트다운 종료 후 제스처",
+      "finalizationAvailable": "마감 가능",
+      "cycleFinalized": "사이클 마감 완료"
+    },
     "system": {
       "cycleStart": "사이클 {number} 시작: 첫 제스처가 마감 카운트다운을 시작했습니다.",
       "cycleOpen": "사이클 {number} 참여가 열렸습니다. 첫 ETH 제스처로 카운트다운을 시작할 수 있습니다.",
@@ -475,7 +492,7 @@
       "enduranceRecord": "{address} 참여자의 기록 경신 선두 유지 구간이 {duration} 만에 끝났습니다. 더 긴 유지 구간이 나오기 전까지 선두 유지 기록은 그대로 남습니다.",
       "chronoLead": "{address} 참여자가 {duration} 동안 수호 챔피언을 연속으로 유지하며 시간의 전사 기록을 늘리기 시작했습니다.",
       "chronoReignEnded": "{address} 참여자의 수호 챔피언 유지 구간이 {duration} 만에 끝났습니다. 시간의 전사는 가장 긴 연속 유지 구간으로 결정됩니다.",
-      "finalCstLeader": "{address} 참여자가 최종 CST 제스처 위치를 차지했습니다. 다음 CST 제스처가 나올 때까지 이 참여자가 해당 위치를 유지합니다.",
+      "finalCstLeader": "{address} 참여자가 최종 CST 제스처 위치를 유지합니다.",
       "newParticipant": "{address} 참여자가 이번 사이클의 첫 제스처를 남겼습니다.",
       "gestureMilestone": "사이클의 제스처 수가 {count}회에 도달했습니다.",
       "cstCalibrationReady": "CST 보정 구간이 가격 하한에 도달했습니다. 다음 CST 제스처가 구간을 다시 시작하며, 트랜잭션 가스 비용은 계속 적용됩니다.",
