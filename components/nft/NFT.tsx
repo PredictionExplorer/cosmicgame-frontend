@@ -18,7 +18,7 @@ const NFT = ({ nft }: { nft: NFTProps }) => {
   const fullImage = getAssetsUrl(`cosmicsignature/0x${seed}.png`);
 
   return (
-    <div className="group relative rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_20px_rgba(21,191,253,0.08)]">
+    <div className="group relative rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.08)]">
       {!nft ? (
         <NFTSkeleton />
       ) : (

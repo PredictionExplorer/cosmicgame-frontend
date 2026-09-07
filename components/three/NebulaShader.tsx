@@ -1,17 +1,20 @@
 'use client';
 
-import { useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import { nebulaFragment } from '@/shaders/nebula.frag';
 import { nebulaVertex } from '@/shaders/nebula.vert';
 
+import type { ScenePalette } from './scene-palette';
+
 interface NebulaShaderProps {
   intensity?: number;
+  palette: ScenePalette;
 }
 
-export function NebulaShader({ intensity = 1 }: NebulaShaderProps) {
+export function NebulaShader({ intensity = 1, palette }: NebulaShaderProps) {
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const { size, pointer } = useThree();
 
@@ -24,7 +27,23 @@ export function NebulaShader({ intensity = 1 }: NebulaShaderProps) {
     uResolution: { value: new THREE.Vector2(size.width, size.height) },
     uMouse: { value: new THREE.Vector2(0, 0) },
     uIntensity: { value: intensity },
+    uBackground: { value: palette.background.clone().convertLinearToSRGB() },
+    uSurface: { value: palette.surface.clone().convertLinearToSRGB() },
+    uPrimary: { value: palette.primary.clone().convertLinearToSRGB() },
+    uSecondary: { value: palette.secondary.clone().convertLinearToSRGB() },
+    uHighlight: { value: palette.foreground.clone().convertLinearToSRGB() },
   });
+
+  useLayoutEffect(() => {
+    // Preserve the shader clock and its existing sRGB noise interpolation.
+    // Standard Three materials use linear colors; this custom fragment shader
+    // writes sRGB directly and therefore needs the display-space values.
+    uniforms.current.uBackground.value.copy(palette.background).convertLinearToSRGB();
+    uniforms.current.uSurface.value.copy(palette.surface).convertLinearToSRGB();
+    uniforms.current.uPrimary.value.copy(palette.primary).convertLinearToSRGB();
+    uniforms.current.uSecondary.value.copy(palette.secondary).convertLinearToSRGB();
+    uniforms.current.uHighlight.value.copy(palette.foreground).convertLinearToSRGB();
+  }, [palette]);
 
   useFrame((_, delta) => {
     if (!materialRef.current) return;

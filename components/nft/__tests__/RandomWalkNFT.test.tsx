@@ -48,9 +48,9 @@ describe('RandomWalkNFT', () => {
     expect(container.firstChild).toHaveClass('border-white');
   });
 
-  it('applies default border style when not selected', () => {
+  it('uses the palette border when not selected', () => {
     const { container } = render(<RandomWalkNFT tokenId={1} selected={false} />);
-    expect(container.firstChild).toHaveClass('border-[#181F64]');
+    expect(container.firstChild).toHaveClass('border-border');
   });
 
   it('has no accessibility violations', async () => {

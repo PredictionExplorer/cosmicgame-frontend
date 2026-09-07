@@ -85,7 +85,7 @@ const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
   // Reserves roughly the section's final height (heading + divider + one
   // card row) in the section's own background color, so the client-only
   // mount grows the page smoothly instead of slamming the footer downward.
-  loading: () => <div className="min-h-[36rem] bg-[#101441] py-20" aria-hidden />,
+  loading: () => <div className="min-h-[36rem] bg-card py-20" aria-hidden />,
 });
 
 // This page re-renders every second (useNow keeps countdown-derived CTA
@@ -1189,7 +1189,7 @@ const ExperimentalHomePage = ({
       <Sheet open={composerSheetOpen} onOpenChange={setComposerSheetOpen}>
         <SheetContent
           side="bottom"
-          className="rounded-t-2xl border-white/[0.10] bg-[rgb(10_14_42/0.97)] p-4 pb-6 sm:hidden"
+          className="rounded-t-2xl border-white/[0.10] bg-popover/95 p-4 pb-6 sm:hidden"
         >
           <SheetTitle className="sr-only">{t('deck.composer.title')}</SheetTitle>
           <GestureComposer

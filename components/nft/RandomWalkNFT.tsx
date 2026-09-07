@@ -38,7 +38,7 @@ const RandomWalkNFT = ({
     <div
       className={cn(
         'border rounded-lg overflow-hidden relative',
-        selected ? 'border-white' : 'border-[#181F64]',
+        selected ? 'border-white' : 'border-border',
       )}
     >
       {selectable ? (

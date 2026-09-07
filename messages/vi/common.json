@@ -6,6 +6,33 @@
   "languageSwitcher": {
     "label": "Ngôn ngữ"
   },
+  "themeSwitcher": {
+    "label": "Bảng màu",
+    "description": "Sắc thái mới. Vẫn là Cosmic Signature.",
+    "sitewide": "Bảng màu bạn chọn áp dụng trên toàn bộ trang web.",
+    "themes": {
+      "midnight": {
+        "name": "Nửa đêm",
+        "description": "Đen mực và tím oải hương dịu nhẹ"
+      },
+      "classic-blue": {
+        "name": "Xanh nguyên bản",
+        "description": "Sắc xanh vũ trụ thuở đầu"
+      },
+      "aurora": {
+        "name": "Cực quang",
+        "description": "Xanh mòng két đậm và thủy tinh biển"
+      },
+      "nebula": {
+        "name": "Tinh vân",
+        "description": "Tím mận và tử đinh hương rạng ngời"
+      },
+      "ember": {
+        "name": "Than hồng",
+        "description": "Xám than ấm và vàng champagne"
+      }
+    }
+  },
   "accessibility": {
     "skipToMain": "Chuyển đến nội dung chính",
     "breadcrumb": "Đường dẫn điều hướng",

@@ -88,19 +88,19 @@ export const CTBalanceDistributionChart: FC<CTBalanceDistributionChartProps> = (
         <YAxis
           type="category"
           dataKey="category"
-          tick={{ fill: 'white', fontSize: 13 }}
+          tick={{ fill: 'hsl(var(--foreground))', fontSize: 13 }}
           width={130}
           axisLine={false}
           tickLine={false}
         />
-        <Bar dataKey="value" fill="#15bffd" isAnimationActive={false} barSize={20}>
+        <Bar dataKey="value" fill="hsl(var(--chart-1))" isAnimationActive={false} barSize={20}>
           {chartData.map((entry) => (
             <Cell key={entry.category} />
           ))}
           <LabelList
             dataKey="value"
             position="right"
-            fill="white"
+            fill="hsl(var(--foreground))"
             fontSize={12}
             formatter={formatLabel}
           />

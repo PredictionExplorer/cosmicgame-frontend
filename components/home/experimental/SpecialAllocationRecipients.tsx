@@ -134,7 +134,7 @@ function RoleCard({
       className={cn(
         'rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.04] print:border print:border-border print:animate-none',
         accent === 'primary' &&
-          'border-primary/35 bg-primary/[0.04] shadow-[0_0_24px_-12px_rgba(21,191,253,0.45)]',
+          'border-primary/35 bg-primary/[0.04] shadow-[0_0_24px_-12px_hsl(var(--primary)/0.45)]',
         accent === 'emerald' &&
           'border-emerald-400/30 bg-emerald-400/[0.035] shadow-[0_0_24px_-12px_rgba(52,211,153,0.4)]',
       )}
@@ -445,10 +445,10 @@ function ChronoWarriorDetails({
   return (
     <div
       data-testid="chrono-warrior-details"
-      className="mt-2 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent p-2.5 shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]"
+      className="mt-2 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent p-2.5 shadow-[0_0_30px_-20px_hsl(var(--primary)/0.8)]"
     >
       <div className="mb-1.5 flex items-center gap-2">
-        <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(21,191,253,0.9)]" />
+        <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_12px_hsl(var(--primary)/0.9)]" />
         <p className="text-[11px] font-medium uppercase tracking-wider text-primary/90">
           {t('specialAllocation.chronoReign')}
         </p>

@@ -18,7 +18,7 @@ const LatestNFTs = () => {
   const { scrollRef, pages, activePageIndex, next, prev } = useSnapCarousel();
 
   return (
-    <div className="bg-[#101441]">
+    <div className="bg-card">
       <div className="container mx-auto px-2.5 py-20 md:pb-[150px]">
         <div className="flex items-center justify-center flex-wrap gap-3">
           <h2 className="text-2xl font-semibold text-foreground">{t('latestNfts.title')}</h2>

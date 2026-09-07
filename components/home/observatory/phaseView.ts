@@ -52,7 +52,7 @@ export function viewForPhase(phase: CyclePhase): PhaseView {
         glowClass: 'shadow-[0_0_125px_rgb(var(--impact-green-rgb)/0.34)]',
         pulseClass: 'animate-cosmic-drift',
         clockTextClass:
-          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent',
+          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-secondary to-primary bg-clip-text text-transparent',
         iconClass: 'text-[rgb(var(--impact-green-rgb))]',
       };
     case 'waiting-first-gesture':
@@ -65,7 +65,7 @@ export function viewForPhase(phase: CyclePhase): PhaseView {
         glowClass: 'shadow-[0_0_105px_rgb(var(--impact-green-rgb)/0.26)]',
         pulseClass: 'animate-cosmic-drift',
         clockTextClass:
-          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent',
+          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-secondary to-primary bg-clip-text text-transparent',
         iconClass: 'text-[rgb(var(--impact-green-rgb))]',
       };
     case 'approach':

@@ -471,7 +471,7 @@ const GalleryPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
           )}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,rgb(13_5_33/0.18)_58%,rgb(13_5_33/0.64)_100%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,hsl(var(--background)/0.18)_58%,hsl(var(--background)/0.64)_100%)]"
           />
           <HueStrip
             hues={featuredEntry?.hues}

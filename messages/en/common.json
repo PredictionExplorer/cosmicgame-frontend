@@ -6,6 +6,33 @@
   "languageSwitcher": {
     "label": "Language"
   },
+  "themeSwitcher": {
+    "label": "Color scheme",
+    "description": "A different atmosphere. The same Cosmic Signature.",
+    "sitewide": "Your choice follows you across the site.",
+    "themes": {
+      "midnight": {
+        "name": "Midnight",
+        "description": "Ink & soft lavender"
+      },
+      "classic-blue": {
+        "name": "Classic Blue",
+        "description": "The original cosmic blue"
+      },
+      "aurora": {
+        "name": "Aurora",
+        "description": "Deep teal & sea glass"
+      },
+      "nebula": {
+        "name": "Nebula",
+        "description": "Plum & luminous lilac"
+      },
+      "ember": {
+        "name": "Ember",
+        "description": "Warm charcoal & champagne"
+      }
+    }
+  },
   "accessibility": {
     "skipToMain": "Skip to main content",
     "breadcrumb": "Breadcrumb",

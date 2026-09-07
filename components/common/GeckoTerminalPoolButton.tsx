@@ -27,7 +27,7 @@ export function GeckoTerminalPoolButton({
       size="sm"
       variant="secondary"
       className={cn(
-        'h-8 rounded-md border-[#7556F6]/35 bg-[#7556F6]/[0.06] px-2.5 text-xs text-[#CBBDFF] hover:border-[#7556F6]/55 hover:bg-[#7556F6]/[0.12]',
+        'h-8 rounded-md border-secondary/35 bg-secondary/[0.06] px-2.5 text-xs text-secondary hover:border-secondary/55 hover:bg-secondary/[0.12]',
         className,
       )}
     >

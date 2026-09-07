@@ -92,6 +92,7 @@ export default defineConfig({
         '**/mobile-overflow.mobile.spec.ts',
         '**/mobile-tap-targets.mobile.spec.ts',
         '**/landing-responsive.spec.ts',
+        '**/themes.spec.ts',
       ],
       use: { ...devices['iPhone 13'] },
     },

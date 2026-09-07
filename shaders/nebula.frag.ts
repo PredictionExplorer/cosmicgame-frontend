@@ -2,8 +2,8 @@
  * Nebula fragment shader.
  *
  * Renders a procedural deep-space nebula using 4-octave fractal Brownian
- * motion over 3D simplex noise. Three cosmic color anchors (Cosmic Indigo,
- * Nebula Violet, Aurora Cyan) interpolate through the noise field. A radial
+ * motion over 3D simplex noise. The active site palette
+ * interpolates through the noise field. A radial
  * vignette keeps text contrast within WCAG AA on top of the hero headline.
  *
  * OKLab-space color mixing would be ideal, but for the fragment path we do
@@ -14,6 +14,7 @@
  *   uResolution  viewport size in pixels
  *   uMouse       mouse position in [-1, 1] clip coords; subtle parallax
  *   uIntensity   0..1 master multiplier; 0 = near-black, 1 = full bloom
+ *   uBackground, uSurface, uPrimary, uSecondary, uHighlight: sRGB palette anchors
  */
 export const nebulaFragment = /* glsl */ `
   precision highp float;
@@ -25,11 +26,11 @@ export const nebulaFragment = /* glsl */ `
   uniform vec2 uMouse;
   uniform float uIntensity;
 
-  const vec3 COSMIC_INDIGO = vec3(0.102, 0.043, 0.243);
-  const vec3 NEBULA_VIOLET = vec3(0.424, 0.235, 0.882);
-  const vec3 AURORA_CYAN   = vec3(0.000, 0.898, 1.000);
-  const vec3 CHRONO_ROSE   = vec3(1.000, 0.239, 0.541);
-  const vec3 DEEP_SPACE    = vec3(0.051, 0.020, 0.129);
+  uniform vec3 uBackground;
+  uniform vec3 uSurface;
+  uniform vec3 uPrimary;
+  uniform vec3 uSecondary;
+  uniform vec3 uHighlight;
 
   vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
   vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
@@ -119,11 +120,11 @@ export const nebulaFragment = /* glsl */ `
     float detail = 0.5 + 0.5 * noise2;
     float sparkle = 0.5 + 0.5 * noise3;
 
-    vec3 col = DEEP_SPACE;
-    col = mix(col, COSMIC_INDIGO, smoothstep(0.15, 0.65, shape));
-    col = mix(col, NEBULA_VIOLET, smoothstep(0.35, 0.85, shape * detail));
-    col = mix(col, AURORA_CYAN, smoothstep(0.55, 0.95, detail * sparkle) * 0.65);
-    col = mix(col, CHRONO_ROSE, smoothstep(0.75, 0.98, sparkle) * 0.35);
+    vec3 col = uBackground;
+    col = mix(col, uSurface, smoothstep(0.15, 0.65, shape));
+    col = mix(col, uSecondary, smoothstep(0.35, 0.85, shape * detail));
+    col = mix(col, uPrimary, smoothstep(0.55, 0.95, detail * sparkle) * 0.65);
+    col = mix(col, uHighlight, smoothstep(0.75, 0.98, sparkle) * 0.35);
 
     float r = length(centered);
     float vignette = smoothstep(1.6, 0.4, r);

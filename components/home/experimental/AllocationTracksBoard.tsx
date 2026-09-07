@@ -271,7 +271,7 @@ export function AllocationTracksBoard({
                       className={cn(
                         'shrink-0 text-xs font-bold tabular-nums',
                         row.emphasis === 'signature'
-                          ? 'bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
+                          ? 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'
                           : 'text-foreground/90',
                       )}
                     >

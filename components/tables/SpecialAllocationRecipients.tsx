@@ -113,7 +113,7 @@ function RoleCard({
       className={cn(
         'rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.04] print:border print:border-border print:animate-none',
         accent === 'primary' &&
-          'border-primary/35 bg-primary/[0.04] shadow-[0_0_24px_-12px_rgba(21,191,253,0.45)]',
+          'border-primary/35 bg-primary/[0.04] shadow-[0_0_24px_-12px_hsl(var(--primary)/0.45)]',
         accent === 'emerald' &&
           'border-emerald-400/30 bg-emerald-400/[0.035] shadow-[0_0_24px_-12px_rgba(52,211,153,0.4)]',
       )}

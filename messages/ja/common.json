@@ -6,6 +6,33 @@
   "languageSwitcher": {
     "label": "言語"
   },
+  "themeSwitcher": {
+    "label": "カラーテーマ",
+    "description": "雰囲気を変えても、いつものCosmic Signatureです。",
+    "sitewide": "選んだ配色をサイト全体に適用します。",
+    "themes": {
+      "midnight": {
+        "name": "ミッドナイト",
+        "description": "インクブラックと柔らかなラベンダー"
+      },
+      "classic-blue": {
+        "name": "クラシックブルー",
+        "description": "初代のコズミックブルー"
+      },
+      "aurora": {
+        "name": "オーロラ",
+        "description": "深い青緑とシーグラス"
+      },
+      "nebula": {
+        "name": "ネビュラ",
+        "description": "プラムと光を帯びたライラック"
+      },
+      "ember": {
+        "name": "エンバー",
+        "description": "温かなチャコールとシャンパン"
+      }
+    }
+  },
   "accessibility": {
     "skipToMain": "メインコンテンツへスキップ",
     "breadcrumb": "パンくずリスト",

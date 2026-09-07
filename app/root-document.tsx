@@ -3,6 +3,8 @@ import Script from 'next/script';
 import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
+import { ThemeSync } from '@/components/theme/ThemeSync';
+import { DEFAULT_SITE_THEME, THEME_INIT_SCRIPT } from '@/lib/theme/config';
 import { networkConfig } from '@/config/networks';
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing, type AppLocale } from '@/i18n/routing';
@@ -60,9 +62,12 @@ export function RootDocument({
       lang={locale}
       dir={getLocaleConfig(locale).textDirection}
       data-scroll-behavior="smooth"
+      data-theme={DEFAULT_SITE_THEME}
+      suppressHydrationWarning
       className={FONT_VARIABLE_CLASS_NAMES}
     >
       <head>
+        <script id="site-theme" dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         {/* No `crossOrigin`: artwork loads as plain <img> requests (no CORS),
             and a crossorigin preconnect would warm the wrong connection. */}
         {MEDIA_PRECONNECT_ORIGINS.map((origin) => (
@@ -87,6 +92,7 @@ export function RootDocument({
         )}
       </head>
       <body>
+        <ThemeSync />
         {children}
         <Suspense fallback={null}>
           <Analytics />

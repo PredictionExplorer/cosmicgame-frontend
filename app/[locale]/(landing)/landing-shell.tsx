@@ -40,6 +40,7 @@ import type { LandingContent } from '@/content/landing/types';
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import { LandingFooter } from '@/components/landing-v2/LandingFooter';
+import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { BrandMark } from '@/components/layout/BrandMark';
 import { SkipLink } from '@/components/ui/skip-link';
@@ -126,6 +127,7 @@ export function LandingShell({
                         <ArrowUpRight className="h-3.5 w-3.5 shrink-0" aria-hidden />
                       </a>
                     </nav>
+                    <ThemeSwitcher />
                     <LanguageSwitcher variant="compact" className="shrink-0" />
                   </div>
                 </header>

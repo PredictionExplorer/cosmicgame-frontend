@@ -103,7 +103,7 @@ export function PublicGoodsImpactCard({
       )}
       style={{
         background:
-          'linear-gradient(155deg, rgba(0, 214, 143, 0.08) 0%, rgba(0, 229, 255, 0.06) 45%, rgba(13, 5, 33, 0.9) 100%)',
+          'linear-gradient(155deg, rgb(var(--impact-green-rgb) / 0.08) 0%, hsl(var(--primary) / 0.06) 45%, hsl(var(--card) / 0.9) 100%)',
       }}
     >
       <div

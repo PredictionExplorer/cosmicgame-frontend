@@ -44,7 +44,7 @@ export function viewForPhase(phase: CyclePhase): PhaseView {
           'border-emerald-300/35 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.13))]',
         glowClass: 'shadow-[0_0_125px_rgb(var(--impact-green-rgb)/0.34)]',
         clockTextClass:
-          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent',
+          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-secondary to-primary bg-clip-text text-transparent',
         iconClass: 'text-[rgb(var(--impact-green-rgb))]',
       };
     case 'waiting-first-gesture':
@@ -55,7 +55,7 @@ export function viewForPhase(phase: CyclePhase): PhaseView {
           'border-emerald-300/30 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.13),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.12))]',
         glowClass: 'shadow-[0_0_105px_rgb(var(--impact-green-rgb)/0.26)]',
         clockTextClass:
-          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent',
+          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-secondary to-primary bg-clip-text text-transparent',
         iconClass: 'text-[rgb(var(--impact-green-rgb))]',
       };
     case 'approach':

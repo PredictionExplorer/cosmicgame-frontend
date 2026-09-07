@@ -26,16 +26,16 @@ interface FundDistributionProps {
 }
 
 const SEGMENT_COLORS = {
-  allocation: 'bg-[#35C9FF]',
-  chrono: 'bg-[#AC56FF]',
+  allocation: 'bg-chart-1',
+  chrono: 'bg-chart-2',
   stellarSelection: 'bg-[#F59E0B]',
   anchoring: 'bg-[#10B981]',
   charity: 'bg-[#F472B6]',
 } as const;
 
 const DOT_COLORS = {
-  allocation: 'bg-[#35C9FF]',
-  chrono: 'bg-[#AC56FF]',
+  allocation: 'bg-chart-1',
+  chrono: 'bg-chart-2',
   stellarSelection: 'bg-[#F59E0B]',
   anchoring: 'bg-[#10B981]',
   charity: 'bg-[#F472B6]',

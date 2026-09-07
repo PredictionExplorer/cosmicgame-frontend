@@ -6,6 +6,33 @@
   "languageSwitcher": {
     "label": "Мова"
   },
+  "themeSwitcher": {
+    "label": "Кольорова схема",
+    "description": "Інша атмосфера. Той самий Cosmic Signature.",
+    "sitewide": "Вибрана схема діє на всіх сторінках сайту.",
+    "themes": {
+      "midnight": {
+        "name": "Опівніч",
+        "description": "Чорнильний і ніжний лавандовий"
+      },
+      "classic-blue": {
+        "name": "Класичний синій",
+        "description": "Початковий космічний синій"
+      },
+      "aurora": {
+        "name": "Полярне сяйво",
+        "description": "Глибокий бірюзовий і морське скло"
+      },
+      "nebula": {
+        "name": "Туманність",
+        "description": "Сливовий і сяйливий бузковий"
+      },
+      "ember": {
+        "name": "Жар",
+        "description": "Теплий вугільний і шампань"
+      }
+    }
+  },
   "accessibility": {
     "skipToMain": "Перейти до основного вмісту",
     "breadcrumb": "Навігаційний шлях",

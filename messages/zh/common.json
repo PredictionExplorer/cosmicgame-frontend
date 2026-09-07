@@ -6,6 +6,33 @@
   "languageSwitcher": {
     "label": "语言"
   },
+  "themeSwitcher": {
+    "label": "配色",
+    "description": "换一种色彩，Cosmic Signature 依然如初。",
+    "sitewide": "所选配色会应用于全站。",
+    "themes": {
+      "midnight": {
+        "name": "午夜",
+        "description": "墨黑与柔和薰衣草紫"
+      },
+      "classic-blue": {
+        "name": "经典蓝",
+        "description": "最初的宇宙蓝"
+      },
+      "aurora": {
+        "name": "极光",
+        "description": "深青与海玻璃绿"
+      },
+      "nebula": {
+        "name": "星云",
+        "description": "深梅紫与微光丁香紫"
+      },
+      "ember": {
+        "name": "余烬",
+        "description": "暖炭灰与香槟金"
+      }
+    }
+  },
   "accessibility": {
     "skipToMain": "跳至主要内容",
     "breadcrumb": "面包屑导航",

@@ -152,9 +152,9 @@ describe('CstGestureCostView', () => {
 
     const circles = container.querySelectorAll('circle');
     expect(circles).toHaveLength(3);
-    expect(circles[0]).toHaveAttribute('fill', '#9C37FD');
+    expect(circles[0]).toHaveAttribute('fill', 'hsl(var(--chart-2))');
     expect(circles[1]).toHaveAttribute('fill', 'none'); // free gesture, clamped to the floor
-    expect(circles[2]).toHaveAttribute('fill', '#9C37FD');
+    expect(circles[2]).toHaveAttribute('fill', 'hsl(var(--chart-2))');
   });
 
   it('shows the priciest / total / count summary', () => {

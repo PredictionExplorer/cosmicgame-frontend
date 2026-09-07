@@ -6,6 +6,33 @@
   "languageSwitcher": {
     "label": "언어"
   },
+  "themeSwitcher": {
+    "label": "색상 테마",
+    "description": "분위기는 새롭게, Cosmic Signature는 그대로입니다.",
+    "sitewide": "선택한 색상이 사이트 전체에 적용됩니다.",
+    "themes": {
+      "midnight": {
+        "name": "깊은 밤",
+        "description": "잉크 블랙과 은은한 라벤더"
+      },
+      "classic-blue": {
+        "name": "클래식 블루",
+        "description": "처음의 우주빛 블루"
+      },
+      "aurora": {
+        "name": "오로라",
+        "description": "깊은 청록과 바다 유리빛"
+      },
+      "nebula": {
+        "name": "성운",
+        "description": "자두빛 보라와 빛나는 라일락"
+      },
+      "ember": {
+        "name": "잔불",
+        "description": "따뜻한 차콜과 샴페인빛"
+      }
+    }
+  },
   "accessibility": {
     "skipToMain": "본문으로 건너뛰기",
     "breadcrumb": "탐색 경로",

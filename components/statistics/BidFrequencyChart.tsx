@@ -15,7 +15,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 
 const CHART_HEIGHT = 320;
-const BAR_COLOR = 'rgb(var(--aurora-cyan-rgb))';
+const BAR_COLOR = 'hsl(var(--chart-1))';
 const DAY_SECS = 86400;
 const HOUR_SECS = 3600;
 const DEFAULT_LOOKBACK_SECS = 365 * DAY_SECS;
@@ -55,16 +55,16 @@ function FrequencyTooltip({ active, payload }: FrequencyTooltipProps) {
   if (!point) return null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-background/95 px-3 py-2 text-sm shadow-lg">
-      <p className="mb-2 font-medium text-white">{point.label}</p>
+    <div className="rounded-lg border border-border bg-background/95 px-3 py-2 text-sm shadow-lg">
+      <p className="mb-2 font-medium text-foreground">{point.label}</p>
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex justify-between gap-4">
           <dt>{t('charts.frequency.gestures')}</dt>
-          <dd className="text-white">{formatGroupedNumber(point.numBids, locale)}</dd>
+          <dd className="text-foreground">{formatGroupedNumber(point.numBids, locale)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.frequency.uniqueParticipants')}</dt>
-          <dd className="text-white">{formatGroupedNumber(point.uniqueBidders, locale)}</dd>
+          <dd className="text-foreground">{formatGroupedNumber(point.uniqueBidders, locale)}</dd>
         </div>
       </dl>
     </div>
@@ -150,16 +150,16 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
         <>
           <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
             <BarChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
               <XAxis
                 dataKey="bucketTs"
                 tickFormatter={(ts) => formatUnixTsLabel(Number(ts), interval === 'hour', locale)}
-                tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                 interval="preserveStartEnd"
                 minTickGap={interval === 'hour' ? 48 : 24}
               />
               <YAxis
-                tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                 allowDecimals={false}
                 width={40}
               />

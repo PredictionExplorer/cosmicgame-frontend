@@ -155,7 +155,7 @@ export function ChronoWarriorDetails({
     <div
       data-testid="chrono-warrior-details"
       className={cn(
-        '@container/chrono rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]',
+        '@container/chrono rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent shadow-[0_0_30px_-20px_hsl(var(--primary)/0.8)]',
         compact ? 'p-2' : 'mt-3 p-3',
       )}
     >
@@ -168,7 +168,7 @@ export function ChronoWarriorDetails({
       >
         <div>
           <div className="mb-1.5 flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(21,191,253,0.9)]" />
+            <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_12px_hsl(var(--primary)/0.9)]" />
             <p className="text-[10px] font-medium uppercase tracking-wider text-primary/90">
               {t('specialAllocation.chronoReign')}
             </p>

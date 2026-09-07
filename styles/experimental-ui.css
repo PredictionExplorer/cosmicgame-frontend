@@ -19,7 +19,7 @@
   .liquid-glass-control {
     --lg-edge-hi: rgb(255 255 255 / 0.9);
     --lg-edge-lo: rgb(255 255 255 / 0.36);
-    --lg-body: rgb(2 4 20 / 0.28);
+    --lg-body: hsl(var(--background) / 0.28);
     position: relative;
     isolation: isolate;
     background-color: var(--lg-body);
@@ -41,7 +41,7 @@
   .liquid-glass-control:where(:hover, :focus-visible) {
     --lg-edge-hi: rgb(255 255 255 / 1);
     --lg-edge-lo: rgb(255 255 255 / 0.5);
-    --lg-body: rgb(2 4 20 / 0.18);
+    --lg-body: hsl(var(--background) / 0.18);
     transform: scale(1.03);
     box-shadow:
       inset 1px 1px 0 0 var(--lg-edge-hi),
@@ -52,7 +52,7 @@
   }
   .liquid-glass-control:active {
     transform: scale(0.97);
-    --lg-body: rgb(2 4 20 / 0.4);
+    --lg-body: hsl(var(--background) / 0.4);
   }
   .liquid-glass-control[aria-pressed='true'],
   .liquid-glass-control[data-state='active'] {

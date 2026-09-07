@@ -24,6 +24,7 @@ import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import ListNavItem from '@/components/common/ListNavItem';
 import { EcosystemDock } from '@/components/layout/EcosystemDock';
 import { BrandMark } from '@/components/layout/BrandMark';
+import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { AppBarWrapper, DrawerList } from '@/components/styled';
 import { useApiData } from '@/contexts/ApiDataContext';
@@ -283,6 +284,7 @@ const Header: FC = () => {
               experimentalUi && 'liquid-glass-control liquid-glass-static',
             )}
           />
+          <ThemeSwitcher />
           <LanguageSwitcher
             variant={mobileView ? 'compact' : 'pill'}
             className={experimentalUi ? 'liquid-glass-control' : undefined}

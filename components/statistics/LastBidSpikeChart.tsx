@@ -25,7 +25,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 
 const CHART_HEIGHT = 320;
-const BAR_COLOR = 'rgb(var(--aurora-cyan-rgb))';
+const BAR_COLOR = 'hsl(var(--chart-1))';
 const SPIKE_COLOR = 'rgba(239, 68, 68, 0.18)';
 const SPIKE_INTERVAL_SECS = 3600;
 const VIEW_PADDING_SECS = 12 * 3600;
@@ -67,8 +67,8 @@ function SpikeTooltip({ active, payload }: SpikeTooltipProps) {
   if (!point) return null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-background/95 px-3 py-2 text-sm shadow-lg">
-      <p className="mb-1 font-medium text-white">{point.label}</p>
+    <div className="rounded-lg border border-border bg-background/95 px-3 py-2 text-sm shadow-lg">
+      <p className="mb-1 font-medium text-foreground">{point.label}</p>
       <p className="text-muted-foreground">
         {t('charts.spikes.gestures', { count: point.numBids })}
       </p>
@@ -231,7 +231,7 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
       ) : spikes.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">{t('charts.spikes.empty')}</p>
       ) : showEmptyRecent ? (
-        <div className="rounded-lg border border-dashed border-white/10 py-12 text-center">
+        <div className="rounded-lg border border-dashed border-border py-12 text-center">
           <p className="text-sm text-muted-foreground">{t('charts.spikes.noneRecent')}</p>
           <p className="mt-2 text-xs text-muted-foreground/80">
             {t('charts.spikes.selectEarlier')}
@@ -248,18 +248,18 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
           </p>
           <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
             <BarChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
               <XAxis
                 dataKey="bucketTs"
                 type="number"
                 domain={['dataMin', 'dataMax']}
                 tickFormatter={(ts) => formatUnixTsLabel(Number(ts), true, locale)}
-                tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 10 }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                 interval="preserveStartEnd"
                 minTickGap={40}
               />
               <YAxis
-                tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                 allowDecimals={false}
                 width={40}
               />

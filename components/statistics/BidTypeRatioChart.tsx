@@ -27,9 +27,9 @@ import { formatFixed } from '@/utils/format';
 const CHART_HEIGHT = 340;
 
 // bid_type mapping: 0=ETH, 1=RandomWalk (ETH-paid), 2=CST
-const ETH_COLOR = '#627eea';
-const RWALK_COLOR = '#9C37FD';
-const CST_COLOR = '#15bffd';
+const ETH_COLOR = 'hsl(var(--chart-3))';
+const RWALK_COLOR = 'hsl(var(--chart-2))';
+const CST_COLOR = 'hsl(var(--chart-1))';
 
 const DAY_SECS = 86400;
 
@@ -105,8 +105,8 @@ function RatioTooltip({ active, payload }: RatioTooltipProps) {
   ];
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
-      <p className="mb-2 font-medium text-white">{point.label}</p>
+    <div className="rounded-lg border border-border bg-popover/95 text-popover-foreground px-3 py-2 text-sm shadow-lg">
+      <p className="mb-2 font-medium text-foreground">{point.label}</p>
       <dl className="space-y-1 text-muted-foreground">
         {rows.map((row) => (
           <div key={row.name} className="flex items-center justify-between gap-4">
@@ -117,14 +117,14 @@ function RatioTooltip({ active, payload }: RatioTooltipProps) {
               />
               {row.name}
             </dt>
-            <dd className="text-white">
+            <dd className="text-foreground">
               {formatFixed(row.pct, 2)}% <span className="text-muted-foreground">({row.bids})</span>
             </dd>
           </div>
         ))}
-        <div className="mt-1 flex justify-between gap-4 border-t border-white/10 pt-1">
+        <div className="mt-1 flex justify-between gap-4 border-t border-border pt-1">
           <dt>{t('charts.typeRatio.totalGestures')}</dt>
-          <dd className="text-white">{point.totalBids}</dd>
+          <dd className="text-foreground">{point.totalBids}</dd>
         </div>
       </dl>
     </div>
@@ -150,11 +150,11 @@ const RatioAreaChart = memo(function RatioAreaChart({
   return (
     <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
       <AreaChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
         <XAxis
           dataKey="bucketTs"
           tickFormatter={(ts) => formatUnixTsLabel(Number(ts), withTime, locale)}
-          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
           interval="preserveStartEnd"
           minTickGap={withTime ? 48 : 24}
         />
@@ -162,7 +162,7 @@ const RatioAreaChart = memo(function RatioAreaChart({
           domain={[0, 100]}
           ticks={[0, 25, 50, 75, 100]}
           tickFormatter={(v) => `${v}%`}
-          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
           width={44}
         />
         <Tooltip

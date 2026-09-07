@@ -15,7 +15,7 @@ export function Verifiability({
   verifiability: LandingContent['verifiability'];
 }) {
   return (
-    <section className="relative border-t border-white/10 bg-[#080910] py-16 sm:py-24 lg:py-28">
+    <section className="relative border-t border-border bg-background py-16 sm:py-24 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-12">
         <SectionHeading
           eyebrow={verifiability.eyebrow}
@@ -33,28 +33,23 @@ export function Verifiability({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.6, delay: idx * 0.08 }}
-                className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition hover:border-white/20"
+                className="relative overflow-hidden rounded-2xl border border-border bg-foreground/[0.02] p-6 transition hover:border-primary/20"
               >
                 <div
                   aria-hidden
                   className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-20 blur-3xl"
                   style={{
-                    background:
-                      idx === 0
-                        ? 'radial-gradient(circle, rgb(var(--solar-gold-rgb) / 0.6), transparent)'
-                        : idx === 1
-                          ? 'radial-gradient(circle, rgb(var(--aurora-cyan-rgb) / 0.6), transparent)'
-                          : 'radial-gradient(circle, rgb(var(--nebula-violet-rgb) / 0.6), transparent)',
+                    background: 'radial-gradient(circle, hsl(var(--primary) / 0.6), transparent)',
                   }}
                 />
-                <Icon className="h-8 w-8 text-white/80" aria-hidden />
+                <Icon className="h-8 w-8 text-foreground/80" aria-hidden />
                 <h3
-                  className="mt-6 text-xl font-semibold text-white sm:text-2xl"
+                  className="mt-6 text-xl font-semibold text-foreground sm:text-2xl"
                   style={{ fontFamily: 'var(--font-family-display)' }}
                 >
                   {pillar.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-white/70 sm:text-base">
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
                   {pillar.body}
                 </p>
               </motion.div>

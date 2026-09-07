@@ -9,6 +9,7 @@ import type { LandingContent, LandingLink } from '@/content/landing';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { BrandMark } from '@/components/layout/BrandMark';
+import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
 import { useCanRenderHeroCanvas } from '@/components/three/hero-canvas-gate';
 import { localizeCrossHostHref } from '@/lib/hostRouting';
@@ -45,7 +46,7 @@ export function Hero({
       <header role="banner" className={styles.header}>
         <Link href="/" className={styles.brand}>
           <BrandMark className={styles.brandIcon} />
-          <span>
+          <span className={styles.brandName}>
             Cosmic <span className={styles.brandSecond}>Signature</span>
           </span>
         </Link>
@@ -56,8 +57,9 @@ export function Hero({
             </Link>
           ))}
         </nav>
-        <div className={styles.language}>
-          <LanguageSwitcher />
+        <div className={styles.preferences}>
+          <ThemeSwitcher />
+          <LanguageSwitcher variant="compact" />
         </div>
       </header>
 

@@ -16,6 +16,7 @@ import { NebulaShader } from './NebulaShader';
 import { ReducedMotionFallback } from './ReducedMotionFallback';
 import { ThreeBodyOrbit } from './ThreeBodyOrbit';
 import { useCanRenderHeroCanvas } from './hero-canvas-gate';
+import { useScenePalette } from './scene-palette';
 
 export function HeroCanvas() {
   // Defense-in-depth: consumers gate the dynamic import with the same hook
@@ -23,6 +24,7 @@ export function HeroCanvas() {
   // in-component check additionally handles live viewport/preference changes
   // after the chunk has loaded.
   const canRender = useCanRenderHeroCanvas();
+  const palette = useScenePalette();
 
   if (!canRender) {
     return <ReducedMotionFallback />;
@@ -41,12 +43,12 @@ export function HeroCanvas() {
         camera={{ position: [0, 0.35, 4.6], fov: 55, near: 0.1, far: 40 }}
         frameloop="always"
       >
-        <color attach="background" args={['#0D0521']} />
-        <fog attach="fog" args={['#0D0521', 5, 16]} />
+        <color attach="background" args={[palette.background]} />
+        <fog attach="fog" args={[palette.background, 5, 16]} />
 
         <Suspense fallback={null}>
-          <NebulaShader intensity={0.9} />
-          <ThreeBodyOrbit />
+          <NebulaShader intensity={0.9} palette={palette} />
+          <ThreeBodyOrbit palette={palette} />
         </Suspense>
 
         <EffectComposer multisampling={0} enableNormalPass={false}>

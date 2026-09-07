@@ -233,7 +233,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                         allocation.impact
                           ? 'font-medium text-[rgb(var(--impact-green-rgb))]'
                           : allocation.featured
-                            ? 'font-medium bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
+                            ? 'font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'
                             : 'text-muted-foreground',
                       )}
                     >

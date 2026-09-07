@@ -1,0 +1,115 @@
+/*
+ * Site palettes. Every surface, including landing sections and portalled UI,
+ * inherits from the document. data-palette scopes the same tokens to menu
+ * previews, so swatches cannot drift from the real theme.
+ *
+ * Keep status colors semantic. Artwork and data categories retain their own
+ * colors; the surrounding interface is the visitor's choice.
+ */
+:root,
+[data-palette='midnight'] {
+  --background: 233 33% 5%;
+  --surface-deep: 240 29% 3%;
+  --foreground: 250 38% 97%;
+  --card: 240 20% 8%;
+  --popover: 240 18% 11%;
+  --primary: 254 100% 92%;
+  --primary-hover: 254 100% 96%;
+  --primary-foreground: 261 38% 10%;
+  --secondary: 254 100% 86%;
+  --accent: 254 28% 20%;
+  --muted: 240 15% 13%;
+  --muted-foreground: 247 14% 75%;
+  --border: 246 14% 19%;
+  --input: 246 14% 27%;
+}
+
+/* Original blue canvas and cyan, recovered from the pre-redesign palette. */
+:root[data-theme='classic-blue'],
+[data-palette='classic-blue'] {
+  --background: 235 68% 10%;
+  --surface-deep: 235 68% 7%;
+  --foreground: 220 40% 97%;
+  --card: 235 60% 16%;
+  --popover: 235 50% 19%;
+  --primary: 196 98% 54%;
+  --primary-hover: 196 98% 66%;
+  --primary-foreground: 235 68% 8%;
+  --secondary: 205 100% 71%;
+  --accent: 224 48% 26%;
+  --muted: 235 40% 20%;
+  --muted-foreground: 226 25% 77%;
+  --border: 235 30% 27%;
+  --input: 230 30% 36%;
+}
+
+:root[data-theme='aurora'],
+[data-palette='aurora'] {
+  --background: 185 43% 7%;
+  --surface-deep: 185 45% 4%;
+  --foreground: 165 30% 96%;
+  --card: 182 32% 11%;
+  --popover: 182 28% 14%;
+  --primary: 161 65% 76%;
+  --primary-hover: 161 65% 85%;
+  --primary-foreground: 182 45% 8%;
+  --secondary: 177 54% 64%;
+  --accent: 174 30% 20%;
+  --muted: 182 22% 17%;
+  --muted-foreground: 172 16% 74%;
+  --border: 180 22% 24%;
+  --input: 178 22% 33%;
+}
+
+:root[data-theme='nebula'],
+[data-palette='nebula'] {
+  --background: 278 34% 8%;
+  --surface-deep: 278 36% 5%;
+  --foreground: 285 35% 97%;
+  --card: 276 27% 12%;
+  --popover: 276 24% 15%;
+  --primary: 280 80% 85%;
+  --primary-hover: 280 80% 92%;
+  --primary-foreground: 278 38% 10%;
+  --secondary: 320 65% 76%;
+  --accent: 285 30% 23%;
+  --muted: 276 20% 18%;
+  --muted-foreground: 282 18% 76%;
+  --border: 280 20% 26%;
+  --input: 280 20% 35%;
+}
+
+:root[data-theme='ember'],
+[data-palette='ember'] {
+  --background: 24 29% 7%;
+  --surface-deep: 24 30% 4%;
+  --foreground: 36 35% 96%;
+  --card: 25 25% 11%;
+  --popover: 25 22% 14%;
+  --primary: 35 88% 77%;
+  --primary-hover: 35 88% 86%;
+  --primary-foreground: 24 38% 9%;
+  --secondary: 18 77% 73%;
+  --accent: 28 30% 21%;
+  --muted: 25 18% 17%;
+  --muted-foreground: 30 18% 75%;
+  --border: 28 18% 25%;
+  --input: 28 20% 34%;
+}
+
+:root,
+[data-palette] {
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
+  --secondary-foreground: var(--primary-foreground);
+  --accent-foreground: var(--primary);
+  --ring: var(--secondary);
+  --chart-1: var(--primary);
+  --chart-2: 276 80% 74%;
+  --chart-3: 198 80% 65%;
+  --chart-4: 45 93% 52%;
+  --chart-5: 0 62% 50%;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 151 65% 76%;
+}

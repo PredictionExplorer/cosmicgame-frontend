@@ -135,6 +135,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 - **Error handling:** Errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
 - **SEO:** Per-page metadata via `createMetadata()` (`utils/seo.ts`), JSON-LD via `utils/jsonLd.tsx`, host-aware sitemap/robots, dynamic OG images.
 - **State:** Wallet state via wagmi, server state via React Query, shared app state via React contexts.
+- **Color schemes:** Shared palette tokens, accessible previews, and a cross-subdomain preference; see [Theme system](docs/theme-system.md).
 
 ## Networks
 

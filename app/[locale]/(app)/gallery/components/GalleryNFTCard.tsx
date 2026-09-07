@@ -138,8 +138,8 @@ function StatusIcons({ nft, hasName }: { nft: GalleryNFTData; hasName: boolean }
       {nft.Staked && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="inline-flex items-center rounded-md border border-[#9C37FD]/30 bg-[#9C37FD]/20 px-1.5 py-0.5 backdrop-blur-sm">
-              <Lock className="h-3 w-3 text-[#C77DFF]" aria-hidden />
+            <span className="inline-flex items-center rounded-md border border-secondary/30 bg-secondary/20 px-1.5 py-0.5 backdrop-blur-sm">
+              <Lock className="h-3 w-3 text-secondary" aria-hidden />
               <span className="sr-only">{t('card.tooltips.anchored')}</span>
             </span>
           </TooltipTrigger>
@@ -151,8 +151,8 @@ function StatusIcons({ nft, hasName }: { nft: GalleryNFTData; hasName: boolean }
       {hasName && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="inline-flex items-center rounded-md border border-[#06AEEC]/30 bg-[#06AEEC]/20 px-1.5 py-0.5 backdrop-blur-sm">
-              <Tag className="h-3 w-3 text-[#35C9FF]" aria-hidden />
+            <span className="inline-flex items-center rounded-md border border-primary/30 bg-primary/20 px-1.5 py-0.5 backdrop-blur-sm">
+              <Tag className="h-3 w-3 text-primary" aria-hidden />
               <span className="sr-only">{t('card.tooltips.customName')}</span>
             </span>
           </TooltipTrigger>
@@ -224,7 +224,7 @@ function GridCard({ nft, seed, fullImage, hasName, index, traits, onQuickView }:
       className={cn(
         'group relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] transition-all duration-300',
         hue === null
-          ? 'hover:border-primary/30 hover:shadow-[0_0_24px_rgba(21,191,253,0.08)]'
+          ? 'hover:border-primary/30 hover:shadow-[0_0_24px_hsl(var(--primary)/0.08)]'
           : 'hover:border-[hsl(var(--nft-hue)_80%_60%_/_0.4)] hover:shadow-[0_0_28px_hsl(var(--nft-hue)_80%_60%_/_0.18)]',
       )}
       data-testid="gallery-card"

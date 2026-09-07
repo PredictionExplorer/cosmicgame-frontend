@@ -432,7 +432,7 @@ const NFTTrait = ({ tokenId, initialMetadata }: NFTTraitProps) => {
           {/* Image column */}
           <div>
             <div
-              className="gradient-border-card rounded-xl overflow-hidden cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_40px_rgba(21,191,253,0.15)]"
+              className="gradient-border-card rounded-xl overflow-hidden cursor-pointer transition-shadow duration-300 hover:shadow-[0_0_40px_hsl(var(--primary)/0.15)]"
               onClick={() => setImageOpen(true)}
               data-testid="nft-image-container"
             >

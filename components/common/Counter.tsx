@@ -168,14 +168,14 @@ const Counter = ({
                       : isUrgent
                         ? 'text-amber-300'
                         : isImpact
-                          ? 'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent'
-                          : 'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent',
+                          ? 'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-secondary to-primary bg-clip-text text-transparent'
+                          : 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent',
                   )}
                   style={
                     isImpact
                       ? { textShadow: '0 0 30px rgb(var(--impact-green-rgb) / 0.35)' }
                       : !isCritical && !isUrgent
-                        ? { textShadow: '0 0 30px rgba(21, 191, 253, 0.3)' }
+                        ? { textShadow: '0 0 30px hsl(var(--primary) / 0.3)' }
                         : isCritical
                           ? { textShadow: '0 0 20px rgba(239, 68, 68, 0.4)' }
                           : { textShadow: '0 0 20px rgba(245, 158, 11, 0.3)' }

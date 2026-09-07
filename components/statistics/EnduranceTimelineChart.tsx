@@ -34,8 +34,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const LEAD_COLOR = '#15bffd'; // cyan — ordinary lead stint
-const ENDURANCE_COLOR = '#9C37FD'; // violet — endurance champion (longest single hold)
+const LEAD_COLOR = 'hsl(var(--chart-1))'; // ordinary lead stint
+const ENDURANCE_COLOR = 'hsl(var(--chart-2))'; // endurance champion (longest single hold)
 const CHRONO_COLOR = '#fb7185'; // rose — chrono warrior (longest reign)
 const RECORD_COLOR = '#fbbf24'; // amber — a stint that set a new endurance record
 
@@ -47,7 +47,7 @@ const pct = (v: number): string => `${Math.max(0, Math.min(100, v * 100))}%`;
 function gridlineGradient(columns: number): string {
   return (
     `repeating-linear-gradient(to right,` +
-    ` rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 1px,` +
+    ` hsl(var(--border) / 0.45) 0, hsl(var(--border) / 0.45) 1px,` +
     ` transparent 1px, transparent calc(100% / ${columns}))`
   );
 }
@@ -74,7 +74,7 @@ function RoleBadge({
   return (
     <span
       className="rounded px-1 py-px text-[9px] font-semibold leading-none"
-      style={{ backgroundColor: `${color}26`, color }}
+      style={{ backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`, color }}
       title={label}
       aria-label={label}
     >
@@ -108,8 +108,8 @@ function TimelineTooltip({ active, payload }: TimelineTooltipProps) {
   ];
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
-      <p className="mb-2 font-medium text-white">
+    <div className="rounded-lg border border-border bg-popover/95 text-popover-foreground px-3 py-2 text-sm shadow-lg">
+      <p className="mb-2 font-medium text-foreground">
         {t('charts.endurance.intoCycle', {
           duration: formatHoursTick(point.hoursIntoRound, locale),
         })}
@@ -124,12 +124,12 @@ function TimelineTooltip({ active, payload }: TimelineTooltipProps) {
               />
               {row.name}
             </dt>
-            <dd className="text-white">{formatSeconds(row.value, locale)}</dd>
+            <dd className="text-foreground">{formatSeconds(row.value, locale)}</dd>
           </div>
         ))}
-        <div className="mt-1 flex justify-between gap-4 border-t border-white/10 pt-1">
+        <div className="mt-1 flex justify-between gap-4 border-t border-border pt-1">
           <dt>{t('charts.endurance.leadHeldBy')}</dt>
-          <dd className="font-mono text-white">{shortenHex(point.leader, 4)}</dd>
+          <dd className="font-mono text-foreground">{shortenHex(point.leader, 4)}</dd>
         </div>
       </dl>
     </div>
@@ -137,7 +137,7 @@ function TimelineTooltip({ active, payload }: TimelineTooltipProps) {
 }
 
 /**
- * Line view: the live lead window (cyan sawtooth) plus the two monotonic record
+ * Line view: the live lead window (sawtooth) plus the two monotonic record
  * lines (endurance + chrono). Memoized on `points` so it doesn't repaint on the
  * page's periodic re-renders.
  */
@@ -152,26 +152,26 @@ const EnduranceLineView = memo(function EnduranceLineView({
   return (
     <ResponsiveContainer width="100%" height={LINE_CHART_HEIGHT}>
       <ComposedChart data={points} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
         <XAxis
           dataKey="hoursIntoRound"
           type="number"
           domain={[0, 'dataMax']}
           tickFormatter={(h) => formatHoursTick(Number(h), locale)}
-          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
           interval="preserveStartEnd"
           minTickGap={32}
           label={{
             value: t('charts.endurance.timeIntoCycle'),
             position: 'insideBottom',
             offset: -4,
-            fill: 'rgba(255,255,255,0.45)',
+            fill: 'hsl(var(--muted-foreground) / 0.8)',
             fontSize: 11,
           }}
         />
         <YAxis
           tickFormatter={(v) => formatDurationTick(Number(v), locale)}
-          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
           width={48}
         />
         <Tooltip
@@ -271,7 +271,10 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
           {gantt.lanes.map((lane) => (
             <div key={lane.address} className="flex items-center gap-3">
               <div className="flex w-24 shrink-0 items-center gap-1.5 overflow-hidden sm:w-36">
-                <span className="font-mono text-xs text-white sm:truncate" title={lane.address}>
+                <span
+                  className="font-mono text-xs text-foreground sm:truncate"
+                  title={lane.address}
+                >
                   {shortenHex(lane.address, 4)}
                 </span>
                 {lane.isEnduranceChampion ? (
@@ -478,7 +481,7 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
           aria-label={t('charts.endurance.openWindowAria')}
           title={t('charts.endurance.openWindowTitle')}
           className={cn(
-            'ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-white',
+            'ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-foreground',
             TOUCH_TARGET_ICON_CLASS,
           )}
         >

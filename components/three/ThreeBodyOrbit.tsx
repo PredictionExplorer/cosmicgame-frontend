@@ -4,11 +4,12 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+import type { ScenePalette } from './scene-palette';
+
 interface Body {
   mass: number;
   position: THREE.Vector3;
   velocity: THREE.Vector3;
-  color: THREE.Color;
 }
 
 const G = 1.0;
@@ -21,19 +22,16 @@ function createBodies(): Body[] {
       mass: 1.0,
       position: new THREE.Vector3(-1.1, 0.0, 0.0),
       velocity: new THREE.Vector3(0.0, -0.45, 0.08),
-      color: new THREE.Color('#6C3CE1'),
     },
     {
       mass: 1.0,
       position: new THREE.Vector3(1.1, 0.0, 0.0),
       velocity: new THREE.Vector3(0.0, 0.45, -0.08),
-      color: new THREE.Color('#00E5FF'),
     },
     {
       mass: 0.6,
       position: new THREE.Vector3(0.0, 0.9, 0.2),
       velocity: new THREE.Vector3(-0.22, 0.0, 0.12),
-      color: new THREE.Color('#FF3D8A'),
     },
   ];
 }
@@ -64,13 +62,17 @@ function advance(bodies: Body[]) {
   bodies.forEach((b) => b.position.sub(com));
 }
 
-export function ThreeBodyOrbit() {
+export function ThreeBodyOrbit({ palette }: { palette: ScenePalette }) {
   // Bodies are created once and mutated in place by `advance` per-frame —
   // useMemo gives the same "create once" semantics as useRef without a
   // `.current` access during render that would trip the refs-in-render
   // lint rule. The simulation step in useFrame still mutates the array
   // entries directly, so the closure over `bodies` stays current.
   const bodies = useMemo(() => createBodies(), []);
+  const bodyColors = useMemo(
+    () => [palette.secondary, palette.primary, palette.foreground],
+    [palette],
+  );
   const bodyMeshRefs = useRef<(THREE.Mesh | null)[]>([null, null, null]);
   const groupRef = useRef<THREE.Group | null>(null);
 
@@ -113,6 +115,7 @@ export function ThreeBodyOrbit() {
     }
 
     bodies.forEach((body, i) => {
+      const color = bodyColors[i]!;
       const mesh = bodyMeshRefs.current[i];
       if (mesh) mesh.position.copy(body.position);
 
@@ -130,7 +133,7 @@ export function ThreeBodyOrbit() {
         const p = history[k]!;
         posAttr.setXYZ(k, p.x, p.y, p.z);
         const fade = k / history.length;
-        colAttr.setXYZ(k, body.color.r * fade, body.color.g * fade, body.color.b * fade);
+        colAttr.setXYZ(k, color.r * fade, color.g * fade, color.b * fade);
       }
       posAttr.needsUpdate = true;
       colAttr.needsUpdate = true;
@@ -141,7 +144,7 @@ export function ThreeBodyOrbit() {
   return (
     <group ref={groupRef}>
       <ambientLight intensity={0.6} />
-      <pointLight position={[5, 5, 5]} intensity={1.1} color="#F0EDFF" />
+      <pointLight position={[5, 5, 5]} intensity={1.1} color={palette.foreground} />
 
       {bodies.map((body, i) => (
         <mesh
@@ -152,8 +155,8 @@ export function ThreeBodyOrbit() {
         >
           <sphereGeometry args={[body.mass * 0.14, 32, 32]} />
           <meshStandardMaterial
-            color={body.color}
-            emissive={body.color}
+            color={bodyColors[i]}
+            emissive={bodyColors[i]}
             emissiveIntensity={1.4}
             roughness={0.2}
             metalness={0.1}

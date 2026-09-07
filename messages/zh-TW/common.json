@@ -6,6 +6,33 @@
   "languageSwitcher": {
     "label": "語言"
   },
+  "themeSwitcher": {
+    "label": "配色",
+    "description": "換個色彩，感受熟悉的 Cosmic Signature。",
+    "sitewide": "全站都會套用你選擇的配色。",
+    "themes": {
+      "midnight": {
+        "name": "午夜",
+        "description": "墨黑與柔和薰衣草紫"
+      },
+      "classic-blue": {
+        "name": "經典藍",
+        "description": "最初的宇宙藍"
+      },
+      "aurora": {
+        "name": "極光",
+        "description": "深青綠與海玻璃綠"
+      },
+      "nebula": {
+        "name": "星雲",
+        "description": "深梅紫與透亮丁香紫"
+      },
+      "ember": {
+        "name": "餘燼",
+        "description": "暖炭灰與香檳金"
+      }
+    }
+  },
   "accessibility": {
     "skipToMain": "跳至主要內容",
     "breadcrumb": "麵包屑導覽",

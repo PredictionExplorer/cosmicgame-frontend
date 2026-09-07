@@ -26,10 +26,10 @@ import { CyclePickerSection } from '@/components/statistics/CyclePickerSection';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 
-const LINE_COLOR = 'rgba(255,255,255,0.85)';
-const ETH_COLOR = '#15bffd'; // cyan — ETH gesture (shortens the window)
+const LINE_COLOR = 'hsl(var(--foreground) / 0.85)';
+const ETH_COLOR = 'hsl(var(--chart-1))'; // ETH gesture (shortens the window)
 const RWALK_COLOR = '#fbbf24'; // amber — ETH + RandomWalk gesture (shortens)
-const CST_COLOR = '#9C37FD'; // violet — CST gesture (lengthens)
+const CST_COLOR = 'hsl(var(--chart-2))'; // CST gesture (lengthens)
 
 const CHART_HEIGHT = 360;
 
@@ -70,8 +70,8 @@ function WindowTooltip({ active, payload }: WindowTooltipProps) {
           : null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
-      <p className="mb-2 font-medium text-white">
+    <div className="rounded-lg border border-border bg-popover/95 text-popover-foreground px-3 py-2 text-sm shadow-lg">
+      <p className="mb-2 font-medium text-foreground">
         {t('charts.cstWindow.intoCycle', {
           duration: formatHoursTick(point.hoursIntoRound, locale),
         })}
@@ -79,7 +79,7 @@ function WindowTooltip({ active, payload }: WindowTooltipProps) {
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex items-center justify-between gap-4">
           <dt>{t('charts.cstWindow.windowAfter')}</dt>
-          <dd className="text-white">{formatSeconds(point.windowSeconds, locale)}</dd>
+          <dd className="text-foreground">{formatSeconds(point.windowSeconds, locale)}</dd>
         </div>
         {typeLabel ? (
           <div className="flex items-center justify-between gap-4">
@@ -91,7 +91,7 @@ function WindowTooltip({ active, payload }: WindowTooltipProps) {
               {typeLabel}
             </dt>
             {point.bidder ? (
-              <dd className="font-mono text-white">{shortenHex(point.bidder, 4)}</dd>
+              <dd className="font-mono text-foreground">{shortenHex(point.bidder, 4)}</dd>
             ) : null}
           </div>
         ) : null}
@@ -142,20 +142,20 @@ const CalibrationChartView = memo(function CalibrationChartView({
   return (
     <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
       <ComposedChart data={points} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
         <XAxis
           dataKey="hoursIntoRound"
           type="number"
           domain={[0, 'dataMax']}
           tickFormatter={(h) => formatHoursTick(Number(h), locale)}
-          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
           interval="preserveStartEnd"
           minTickGap={32}
           label={{
             value: t('charts.cstWindow.timeIntoCycle'),
             position: 'insideBottom',
             offset: -4,
-            fill: 'rgba(255,255,255,0.45)',
+            fill: 'hsl(var(--muted-foreground) / 0.8)',
             fontSize: 11,
           }}
         />
@@ -165,7 +165,7 @@ const CalibrationChartView = memo(function CalibrationChartView({
             (dataMax: number) => Math.ceil(dataMax * 1.05),
           ]}
           tickFormatter={(v) => formatDurationTick(Number(v), locale)}
-          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
           width={48}
         />
         <Tooltip
@@ -244,7 +244,7 @@ export const CstCalibrationWindowView: FC<CstCalibrationWindowViewProps> = ({
             duration: formatSeconds(timeline.maxSeconds, locale),
           })}
         </span>
-        <span className="text-white">
+        <span className="text-foreground">
           {t(isLive ? 'charts.cstWindow.summaryCurrent' : 'charts.cstWindow.summaryFinal', {
             duration: formatSeconds(timeline.currentSeconds, locale),
           })}

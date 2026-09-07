@@ -9,30 +9,30 @@ import { SectionHeading } from './SectionHeading';
 type Tone = 'primary' | 'aurora' | 'rose' | 'impact' | 'nebula' | 'solar' | 'default';
 
 const TONE_STYLES: Record<Tone, string> = {
-  primary: 'border-[oklch(84.7%_0.149_213)]/30 bg-[oklch(21.3%_0.135_286)]/40 glow-aurora',
-  aurora: 'border-[oklch(84.7%_0.149_213)]/25 bg-[oklch(21.3%_0.135_286)]/30',
-  rose: 'border-[oklch(67.2%_0.228_4)]/25 bg-[oklch(67.2%_0.228_4)]/5',
-  impact: 'border-[oklch(77.1%_0.163_161)]/25 bg-[oklch(77.1%_0.163_161)]/5 glow-impact',
-  nebula: 'border-[oklch(50.4%_0.247_296)]/25 bg-[oklch(50.4%_0.247_296)]/5 glow-nebula',
-  solar: 'border-[oklch(82.4%_0.162_81)]/25 bg-[oklch(82.4%_0.162_81)]/5 glow-solar',
-  default: 'border-white/10 bg-white/[0.02]',
+  primary: 'border-primary/30 bg-primary/[0.06] shadow-[0_20px_70px_-30px_hsl(var(--primary)/0.2)]',
+  aurora: 'border-primary/25 bg-primary/[0.04]',
+  rose: 'border-secondary/25 bg-secondary/[0.04]',
+  impact: 'border-primary/20 bg-primary/[0.03]',
+  nebula: 'border-secondary/20 bg-secondary/[0.03]',
+  solar: 'border-primary/25 bg-primary/[0.04]',
+  default: 'border-border bg-foreground/[0.02]',
 };
 
 const TONE_TEXT: Record<Tone, string> = {
   primary: 'text-gradient-signature',
-  aurora: 'text-[oklch(84.7%_0.149_213)]',
-  rose: 'text-[oklch(67.2%_0.228_4)]',
-  impact: 'text-[oklch(77.1%_0.163_161)]',
-  nebula: 'text-[oklch(67.2%_0.228_4)]',
-  solar: 'text-[oklch(82.4%_0.162_81)]',
-  default: 'text-white',
+  aurora: 'text-primary',
+  rose: 'text-secondary',
+  impact: 'text-primary',
+  nebula: 'text-secondary',
+  solar: 'text-primary',
+  default: 'text-foreground',
 };
 
 export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] }) {
   return (
     <section
       id="tracks"
-      className="relative border-t border-white/10 bg-[#080910] py-16 sm:py-24 lg:py-28"
+      className="relative border-t border-border bg-background py-16 sm:py-24 lg:py-28"
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-12">
         <SectionHeading
@@ -61,21 +61,23 @@ export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] 
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.5, delay: Math.min(idx * 0.04, 0.3) }}
-                className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-6 transition hover:border-white/25 ${TONE_STYLES[tone]} ${span}`}
+                className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-6 transition hover:border-primary/30 ${TONE_STYLES[tone]} ${span}`}
               >
                 <div
                   className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-30 blur-3xl transition-opacity group-hover:opacity-60"
                   style={{
                     background:
                       tone === 'default'
-                        ? 'radial-gradient(circle, rgb(255 255 255 / 0.15), transparent)'
+                        ? 'radial-gradient(circle, hsl(var(--primary) / 0.15), transparent)'
                         : undefined,
                   }}
                   aria-hidden
                 />
 
                 <div className="relative">
-                  <p className={`font-mono text-[10px] uppercase tracking-[0.24em] text-white/50`}>
+                  <p
+                    className={`font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground`}
+                  >
                     {tracks.cardLabel}
                   </p>
                   <p
@@ -88,12 +90,12 @@ export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] 
 
                 <div className="relative mt-6">
                   <h3
-                    className="text-xl font-semibold text-white sm:text-2xl"
+                    className="text-xl font-semibold text-foreground sm:text-2xl"
                     style={{ fontFamily: 'var(--font-family-display)' }}
                   >
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/70">{item.body}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
                 </div>
               </motion.div>
             );

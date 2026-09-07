@@ -14,7 +14,7 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
   return (
     <footer
       role="contentinfo"
-      className="relative overflow-hidden border-t border-white/10 bg-background pt-12 pb-8 sm:pt-14 sm:pb-10"
+      className="relative overflow-hidden border-t border-border bg-background pt-12 pb-8 sm:pt-14 sm:pb-10"
     >
       <div
         aria-hidden
@@ -26,13 +26,15 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
             <Link href="/" className="inline-flex min-h-11 max-w-full items-center gap-3">
               <BrandMark className="h-9 w-9 shrink-0 text-primary" />
               <span
-                className="text-xl font-semibold text-white [overflow-wrap:anywhere]"
+                className="text-xl font-semibold text-foreground [overflow-wrap:anywhere]"
                 style={{ fontFamily: 'var(--font-family-display)' }}
               >
                 {footer.brandName}
               </span>
             </Link>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">{footer.tagline}</p>
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
+              {footer.tagline}
+            </p>
           </div>
 
           <nav
@@ -41,7 +43,7 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
           >
             {footer.columns.map((col) => (
               <div key={col.heading} className="min-w-0">
-                <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/65 [overflow-wrap:anywhere]">
+                <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground [overflow-wrap:anywhere]">
                   {col.heading}
                 </h2>
                 <ul className="mt-3 space-y-0.5">
@@ -51,7 +53,7 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
                       <li key={link.label}>
                         <Link
                           href={href}
-                          className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-white/70 transition hover:text-white [overflow-wrap:anywhere]"
+                          className="inline-flex min-h-11 max-w-full items-center py-1.5 text-sm leading-relaxed text-muted-foreground transition hover:text-foreground [overflow-wrap:anywhere]"
                           rel={link.href.startsWith('http') ? 'noopener' : undefined}
                           target={link.href.startsWith('http') ? '_blank' : undefined}
                         >
@@ -66,11 +68,11 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
           </nav>
         </div>
 
-        <div className="mt-8 border-t sm:mt-10 border-white/10 pt-6">
+        <div className="mt-8 border-t sm:mt-10 border-border pt-6">
           <LanguageDirectory />
         </div>
 
-        <div className="mt-6 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-8 text-xs text-white/50 sm:flex-row sm:items-center">
+        <div className="mt-6 flex flex-col items-start justify-between gap-3 border-t border-border pt-8 text-xs text-muted-foreground sm:flex-row sm:items-center">
           <p>{footer.copyright.replace('{year}', String(new Date().getFullYear()))}</p>
           <p className="font-mono uppercase tracking-[0.2em] [overflow-wrap:anywhere]">
             {footer.colophon}

@@ -33,7 +33,7 @@ import { CyclePickerSection } from '@/components/statistics/CyclePickerSection';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 
-const PRICE_COLOR = '#9C37FD'; // violet — CST actually paid
+const PRICE_COLOR = 'hsl(var(--chart-2))'; // CST actually paid
 const CLOCK_COLOR = '#fb7185'; // rose — allocation clock remaining (subdued dashed line)
 
 const CHART_HEIGHT = 360;
@@ -96,8 +96,8 @@ function CostTooltip({ active, payload }: CostTooltipProps) {
   if (!point) return null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
-      <p className="mb-2 font-medium text-white">
+    <div className="rounded-lg border border-border bg-popover/95 text-popover-foreground px-3 py-2 text-sm shadow-lg">
+      <p className="mb-2 font-medium text-foreground">
         {t('charts.cstCost.intoCycle', {
           duration: formatHoursTick(point.hoursIntoRound, locale),
         })}
@@ -114,7 +114,7 @@ function CostTooltip({ active, payload }: CostTooltipProps) {
             />
             {t('charts.cstCost.cstPaid')}
           </dt>
-          <dd className="text-white">{formatCSTValue(point.cstPaid)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.cstPaid)}</dd>
         </div>
         <div className="flex items-center justify-between gap-4">
           <dt className="flex items-center gap-2">
@@ -124,15 +124,15 @@ function CostTooltip({ active, payload }: CostTooltipProps) {
             />
             {t('charts.cstCost.clockBefore')}
           </dt>
-          <dd className="text-white">
+          <dd className="text-foreground">
             {point.clockRemainingSeconds !== null
               ? formatSeconds(point.clockRemainingSeconds, locale)
               : '—'}
           </dd>
         </div>
-        <div className="mt-1 flex justify-between gap-4 border-t border-white/10 pt-1">
+        <div className="mt-1 flex justify-between gap-4 border-t border-border pt-1">
           <dt>{t('charts.cstCost.gestureBy')}</dt>
-          <dd className="font-mono text-white">{shortenHex(point.bidder, 4)}</dd>
+          <dd className="font-mono text-foreground">{shortenHex(point.bidder, 4)}</dd>
         </div>
       </dl>
       {point.txHash ? (
@@ -189,20 +189,20 @@ const CostChartView = memo(function CostChartView({ series }: { series: CstGestu
   return (
     <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
       <ComposedChart data={series.points} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
         <XAxis
           dataKey="hoursIntoRound"
           type="number"
           domain={[0, 'dataMax']}
           tickFormatter={(h) => formatHoursTick(Number(h), locale)}
-          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
           interval="preserveStartEnd"
           minTickGap={32}
           label={{
             value: t('charts.cstCost.timeIntoCycle'),
             position: 'insideBottom',
             offset: -4,
-            fill: 'rgba(255,255,255,0.45)',
+            fill: 'hsl(var(--muted-foreground) / 0.8)',
             fontSize: 11,
           }}
         />
@@ -212,7 +212,7 @@ const CostChartView = memo(function CostChartView({ series }: { series: CstGestu
           domain={[ticks[0]!, ticks[ticks.length - 1]!]}
           ticks={ticks}
           tickFormatter={(v) => formatCstTick(Number(v))}
-          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
           width={48}
         />
         <YAxis
@@ -291,7 +291,7 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures }) =>
   return (
     <div className="space-y-3" data-testid="cst-gesture-cost-chart">
       <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
-        <span className="text-white">
+        <span className="text-foreground">
           {t('charts.cstCost.summaryMax', {
             amount: formatCSTValue(series.maxPaid),
             when: formatHoursTick((series.maxTs - series.roundStart) / 3600, locale),

@@ -70,8 +70,7 @@ const gestureMetricTone: Record<
     card: 'border-primary/25 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.055)_55%,rgb(var(--chrono-rose-rgb)/0.055))]',
     icon: 'bg-primary/15 text-primary',
     glow: 'after:bg-[rgb(var(--aurora-cyan-rgb)/0.45)]',
-    value:
-      'bg-gradient-to-r from-[#35C9FF] via-[#7DD3FC] to-[#AC56FF] bg-clip-text text-transparent',
+    value: 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent',
   },
   eth: {
     card: 'border-[rgb(var(--solar-gold-rgb)/0.24)] bg-[linear-gradient(135deg,rgb(var(--solar-gold-rgb)/0.10),rgb(255_255_255/0.025)_60%,transparent)]',

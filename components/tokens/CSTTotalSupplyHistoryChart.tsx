@@ -30,7 +30,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 
 const CHART_HEIGHT = 320;
-const LINE_COLOR = '#15bffd';
+const LINE_COLOR = 'hsl(var(--chart-1))';
 
 type ChartPoint = {
   dateKey: string;
@@ -70,28 +70,28 @@ function SupplyTooltip({ active, payload }: SupplyTooltipProps) {
   if (!point) return null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
-      <p className="mb-2 font-medium text-white">{point.label}</p>
+    <div className="rounded-lg border border-border bg-popover/95 text-popover-foreground px-3 py-2 text-sm shadow-lg">
+      <p className="mb-2 font-medium text-foreground">{point.label}</p>
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.totalSupply')}</dt>
-          <dd className="text-white">{formatCSTValue(point.totalSupplyEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.totalSupplyEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.imprint')}</dt>
-          <dd className="text-white">{formatCSTValue(point.mintAmountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.mintAmountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.consume')}</dt>
-          <dd className="text-white">{formatCSTValue(point.burnAmountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.burnAmountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.net')}</dt>
-          <dd className="text-white">{formatCSTValue(point.amountEth)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.amountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>{t('charts.supply.numGestures')}</dt>
-          <dd className="text-white">
+          <dd className="text-foreground">
             {new Intl.NumberFormat(toIntlLocale(locale)).format(point.numBids)}
           </dd>
         </div>
@@ -195,15 +195,15 @@ export const CSTTotalSupplyHistoryChart: FC<CSTTotalSupplyHistoryChartProps> = (
       ) : (
         <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.6)" />
             <XAxis
               dataKey="label"
-              tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
               interval="preserveStartEnd"
               minTickGap={24}
             />
             <YAxis
-              tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
               tickFormatter={(v) => (typeof v === 'number' ? v.toFixed(0) : String(v))}
               width={56}
             />
@@ -214,7 +214,12 @@ export const CSTTotalSupplyHistoryChart: FC<CSTTotalSupplyHistoryChartProps> = (
               stroke={LINE_COLOR}
               strokeWidth={2}
               dot={{ r: 4, fill: LINE_COLOR, strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: LINE_COLOR, stroke: '#fff', strokeWidth: 1 }}
+              activeDot={{
+                r: 6,
+                fill: LINE_COLOR,
+                stroke: 'hsl(var(--foreground))',
+                strokeWidth: 1,
+              }}
               isAnimationActive={false}
             />
           </LineChart>
