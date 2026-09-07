@@ -255,7 +255,7 @@ const Header: FC = () => {
           aria-label={t('brand.homeLabel')}
           className="group flex min-h-11 min-w-11 shrink-0 items-center gap-2.5 rounded-lg no-underline"
         >
-          <BrandMark className="h-9 w-9 text-primary xl:h-10 xl:w-10" />
+          <BrandMark className="h-9 w-9 xl:h-10 xl:w-10" />
           <span className="hidden flex-col justify-center leading-none sm:flex">
             <span className="font-display text-base font-semibold tracking-tight text-white">
               Cosmic Signature
@@ -314,7 +314,7 @@ const Header: FC = () => {
         <DrawerList className="overscroll-contain pb-[env(safe-area-inset-bottom)]">
           {/* Brand */}
           <div className="flex items-center gap-2.5 border-b border-white/[0.06] pl-5 pr-16 pb-3.5 pt-2">
-            <BrandMark className="h-8 w-8 shrink-0 text-primary" />
+            <BrandMark className="h-8 w-8 shrink-0" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-sm font-semibold tracking-[0.02em] text-white">
                 Cosmic Signature

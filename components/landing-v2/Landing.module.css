@@ -52,7 +52,6 @@
 .brandIcon {
   width: 2.25rem;
   height: 2.25rem;
-  color: hsl(var(--secondary));
 }
 .brandSecond {
   color: hsl(var(--secondary));

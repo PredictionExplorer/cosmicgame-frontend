@@ -163,7 +163,7 @@ const Footer = () => {
                 aria-label={navT('brand.homeLabel')}
                 className="inline-flex min-h-11 max-w-full items-center gap-3 no-underline"
               >
-                <BrandMark className="h-9 w-9 shrink-0 text-primary" />
+                <BrandMark className="h-9 w-9 shrink-0" />
                 <span className="font-display text-xl font-semibold tracking-tight text-foreground [overflow-wrap:anywhere]">
                   Cosmic <span className="text-primary">Signature</span>
                 </span>

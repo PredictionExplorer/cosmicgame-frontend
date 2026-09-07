@@ -1,10 +1,18 @@
-/** Decorative orbit mark; the adjacent wordmark names the home link. */
+import Image from 'next/image';
+
+import { cn } from '@/lib/utils';
+
+/** Original brand artwork; the adjacent wordmark or home link supplies its accessible name. */
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true" className={className}>
-      <circle cx="20" cy="20" r="3" fill="currentColor" />
-      <ellipse cx="20" cy="20" rx="18" ry="7" stroke="currentColor" transform="rotate(-35 20 20)" />
-      <ellipse cx="20" cy="20" rx="18" ry="7" stroke="currentColor" transform="rotate(65 20 20)" />
-    </svg>
+    <Image
+      src="/images/logo2.svg"
+      width={48}
+      height={48}
+      alt=""
+      aria-hidden="true"
+      loading="eager"
+      className={cn('shrink-0 object-contain', className)}
+    />
   );
 }

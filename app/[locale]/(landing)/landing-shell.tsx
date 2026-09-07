@@ -91,7 +91,7 @@ export function LandingShell({
                       aria-label={t('brand.homeLabel')}
                       className="inline-flex min-h-11 shrink-0 items-center gap-2.5 font-display text-base font-semibold tracking-tight text-foreground no-underline sm:text-lg"
                     >
-                      <BrandMark className="h-8 w-8 shrink-0 text-primary" />
+                      <BrandMark className="h-8 w-8 shrink-0" />
                       <span>
                         Cosmic <span className="text-primary">Signature</span>
                       </span>

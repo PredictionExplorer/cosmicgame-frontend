@@ -24,7 +24,7 @@ export function LandingFooter({ footer }: { footer: LandingContent['footer'] }) 
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)] lg:gap-16">
           <div className="min-w-0">
             <Link href="/" className="inline-flex min-h-11 max-w-full items-center gap-3">
-              <BrandMark className="h-9 w-9 shrink-0 text-primary" />
+              <BrandMark className="h-9 w-9 shrink-0" />
               <span
                 className="text-xl font-semibold text-foreground [overflow-wrap:anywhere]"
                 style={{ fontFamily: 'var(--font-family-display)' }}
