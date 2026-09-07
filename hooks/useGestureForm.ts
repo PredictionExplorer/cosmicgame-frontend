@@ -312,7 +312,7 @@ export function useGestureForm() {
     };
   }, [contractAddrs.cosmicGame, cosmicGameContract, publicClient, uxScenario]);
 
-  // One-shot V3 detection: mainPrizeNumCosmicSignatureNfts() only exists on V3, where the
+  // One-shot V3 detection: cstBidPriceDeclineMultiplier() only exists on V3, where the
   // entire per-gesture Participation CST is minted to the outbid previous participant.
   // The selector does not exist on V2, in which case the state stays false and the UI
   // keeps V2 semantics (whole reward to the gesturer).
@@ -324,7 +324,7 @@ export function useGestureForm() {
     let cancelled = false;
     (async () => {
       try {
-        const value = (await cosmicGameContract.read.mainPrizeNumCosmicSignatureNfts?.()) as
+        const value = (await cosmicGameContract.read.cstBidPriceDeclineMultiplier?.()) as
           | bigint
           | undefined;
         if (!cancelled && value !== undefined) {
@@ -334,7 +334,7 @@ export function useGestureForm() {
         // Expected on V2 deployments (selector absent; behind the proxy this surfaces as a
         // reasonless revert rather than "unrecognized selector"). Anything else is worth reporting.
         if (!cancelled && !isMissingFunctionReadError(err)) {
-          reportError(err, 'mainPrizeNumCosmicSignatureNfts');
+          reportError(err, 'cstBidPriceDeclineMultiplier');
         }
         if (!cancelled) setCstRewardToOutbidBidder(false);
       }

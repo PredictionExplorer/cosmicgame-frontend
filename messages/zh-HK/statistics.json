@@ -715,7 +715,15 @@
       "allocationRetrievalTimeout": "分配取回超時時長已變更。",
       "ethCalibrationDurationDivisor": "ETH 校準窗口時長已變更。",
       "ethCalibrationEndingCostDivisor": "ETH 校準窗口結束時落筆價格的除數已變更。",
-      "chronoWarriorEthPercentage": "用於時之勇士 ETH 分配的資金比例已變更。"
+      "chronoWarriorEthPercentage": "用於時之勇士 ETH 分配的資金比例已變更。",
+      "cstCalibrationDurationChangeDivisor": "每筆落筆對 CST 校準窗口時長的調整幅度除數已變更（V2 週期）。",
+      "lateGestureWindowDivisor": "臨近收官落筆窗口時長的除數已變更。",
+      "lateGesturePremiumBaseMultiplier": "臨近收官落筆價格溢價的基礎乘數已變更。",
+      "lateGesturePremiumExponent": "臨近收官落筆價格溢價的指數已變更。",
+      "cstGestureCostDeclineRate": "CST 落筆價格下降速率（每秒 CST）已變更。",
+      "signatureAllocationNftCount": "週期收官時為簽名配額獲配者銘刻的 Cosmic Signature NFT 數量已變更。",
+      "cstGestureCostDeclineChangeDivisor": "每筆落筆對 CST 落筆價格下降速率的調整幅度除數已變更。",
+      "ethGestureRefundGasLimit": "吸收小額 ETH 落筆退款的最大燃氣量已變更。"
     }
   },
   "attachedNftCard": {

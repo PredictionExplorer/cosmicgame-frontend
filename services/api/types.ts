@@ -829,6 +829,7 @@ export interface AdminEventRow {
   TimeStamp: number;
   TxHash: string;
   IntegerValue: number;
+  FloatValue: number;
   AddressValue: string;
   StringValue: string;
   [key: string]: unknown;

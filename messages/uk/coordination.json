@@ -44,6 +44,14 @@
     "allocationRetrievalTimeout": "Змінено час очікування до отримання розподілів",
     "ethCalibrationDurationDivisor": "Змінено дільник тривалості вікна калібрування ETH",
     "ethCalibrationEndingCostDivisor": "Змінено дільник кінцевої вартості жесту у вікні калібрування ETH",
-    "chronoWarriorEthPercentage": "Змінено відсоток розподілу ETH для Воїна часу"
+    "chronoWarriorEthPercentage": "Змінено відсоток розподілу ETH для Воїна часу",
+    "cstCalibrationDurationChangeDivisor": "Змінено дільник зміни тривалості вікна калібрування CST",
+    "lateGestureWindowDivisor": "Змінено дільник вікна пізніх жестів",
+    "lateGesturePremiumBaseMultiplier": "Змінено базовий множник надбавки за пізні жести",
+    "lateGesturePremiumExponent": "Змінено показник степеня надбавки за пізні жести",
+    "cstGestureCostDeclineRate": "Змінено швидкість зниження вартості жесту CST",
+    "signatureAllocationNftCount": "Змінено кількість NFT розподілу Сигнатури",
+    "cstGestureCostDeclineChangeDivisor": "Змінено дільник зміни швидкості зниження вартості жесту CST",
+    "ethGestureRefundGasLimit": "Змінено максимальний газ для поглинання відшкодувань ETH-жестів"
   }
 }

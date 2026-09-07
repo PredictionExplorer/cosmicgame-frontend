@@ -715,7 +715,15 @@
       "allocationRetrievalTimeout": "分配取回超时时长已变更。",
       "ethCalibrationDurationDivisor": "ETH 校准窗口时长已变更。",
       "ethCalibrationEndingCostDivisor": "ETH 校准窗口结束时落笔价格的除数已变更。",
-      "chronoWarriorEthPercentage": "用于时之勇士 ETH 分配的资金比例已变更。"
+      "chronoWarriorEthPercentage": "用于时之勇士 ETH 分配的资金比例已变更。",
+      "cstCalibrationDurationChangeDivisor": "每笔落笔对 CST 校准窗口时长的调整幅度除数已变更（V2 周期）。",
+      "lateGestureWindowDivisor": "临近收官落笔窗口时长的除数已变更。",
+      "lateGesturePremiumBaseMultiplier": "临近收官落笔价格溢价的基础乘数已变更。",
+      "lateGesturePremiumExponent": "临近收官落笔价格溢价的指数已变更。",
+      "cstGestureCostDeclineRate": "CST 落笔价格下降速率（每秒 CST）已变更。",
+      "signatureAllocationNftCount": "周期收官时为签名配额获配者铭刻的 Cosmic Signature NFT 数量已变更。",
+      "cstGestureCostDeclineChangeDivisor": "每笔落笔对 CST 落笔价格下降速率的调整幅度除数已变更。",
+      "ethGestureRefundGasLimit": "吸收小额 ETH 落笔退款的最大燃气量已变更。"
     }
   },
   "attachedNftCard": {

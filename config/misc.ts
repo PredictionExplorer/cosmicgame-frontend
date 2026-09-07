@@ -249,4 +249,56 @@ export const ADMIN_EVENTS = [
     description:
       'The allocation percentage for funds designated for chrono warrior ETH allocations has been changed.',
   },
+  {
+    name: 'CstDutchAuctionDurationChangeDivisorChanged',
+    messageKey: 'cstCalibrationDurationChangeDivisor',
+    type: 'number',
+    description:
+      'The divisor controlling how much each gesture changes the CST Calibration Window length has been changed (V2 cycles).',
+  },
+  {
+    name: 'RoundLateBidDurationDivisorChanged',
+    messageKey: 'lateGestureWindowDivisor',
+    type: 'number',
+    description: 'The divisor that sets the Late-Gesture Window length has been changed.',
+  },
+  {
+    name: 'RoundLateBidPricePremiumAmountBaseMultiplierChanged',
+    messageKey: 'lateGesturePremiumBaseMultiplier',
+    type: 'number',
+    description: 'The base multiplier for the Late-Gesture Window cost premium has been changed.',
+  },
+  {
+    name: 'RoundLateBidPricePremiumAmountExponentChanged',
+    messageKey: 'lateGesturePremiumExponent',
+    type: 'number',
+    description: 'The exponent for the Late-Gesture Window cost premium has been changed.',
+  },
+  {
+    name: 'CstBidPriceDeclineMultiplierChanged',
+    messageKey: 'cstGestureCostDeclineRate',
+    type: 'float',
+    description: 'The CST Gesture Cost decline rate (CST per second) has been changed.',
+  },
+  {
+    name: 'MainPrizeNumCosmicSignatureNftsChanged',
+    messageKey: 'signatureAllocationNftCount',
+    type: 'number',
+    description:
+      'The number of Cosmic Signature NFTs imprinted for the Signature Allocation recipient has been changed.',
+  },
+  {
+    name: 'CstBidPriceDeclineMultiplierChangeDivisorChanged',
+    messageKey: 'cstGestureCostDeclineChangeDivisor',
+    type: 'number',
+    description:
+      'The divisor controlling how much each gesture shifts the CST Gesture Cost decline rate has been changed.',
+  },
+  {
+    name: 'EthBidRefundAmountInGasToSwallowMaxLimitChanged',
+    messageKey: 'ethGestureRefundGasLimit',
+    type: 'number',
+    description:
+      'The maximum gas amount for swallowing small ETH gesture refunds has been changed.',
+  },
 ];

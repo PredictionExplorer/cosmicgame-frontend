@@ -715,7 +715,15 @@
       "allocationRetrievalTimeout": "The timeout duration to retrieve allocations has been changed.",
       "ethCalibrationDurationDivisor": "The ETH Calibration Window duration has been changed.",
       "ethCalibrationEndingCostDivisor": "The divisor for ETH Calibration Window ending gesture cost has been changed.",
-      "chronoWarriorEthPercentage": "The Chrono-Warrior ETH allocation percentage has changed."
+      "chronoWarriorEthPercentage": "The Chrono-Warrior ETH allocation percentage has changed.",
+      "cstCalibrationDurationChangeDivisor": "The divisor controlling how much each gesture changes the CST Calibration Window length has been changed (V2 cycles).",
+      "lateGestureWindowDivisor": "The divisor that sets the Late-Gesture Window length has been changed.",
+      "lateGesturePremiumBaseMultiplier": "The base multiplier for the Late-Gesture Window cost premium has been changed.",
+      "lateGesturePremiumExponent": "The exponent for the Late-Gesture Window cost premium has been changed.",
+      "cstGestureCostDeclineRate": "The CST Gesture Cost decline rate (CST per second) has been changed.",
+      "signatureAllocationNftCount": "The number of Cosmic Signature NFTs imprinted for the Signature Allocation recipient has been changed.",
+      "cstGestureCostDeclineChangeDivisor": "The divisor controlling how much each gesture shifts the CST Gesture Cost decline rate has been changed.",
+      "ethGestureRefundGasLimit": "The maximum gas amount for swallowing small ETH gesture refunds has been changed."
     }
   },
   "attachedNftCard": {

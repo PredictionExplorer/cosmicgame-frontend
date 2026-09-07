@@ -3391,7 +3391,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "cstDutchAuctionDuration",
+        "name": "cstBidPriceDeclineMultiplier",
         "type": "uint256"
       },
       {
@@ -3471,12 +3471,7 @@
   },
   {
     "inputs": [],
-    "name": "BidPlacedWithinCurrentSecond",
-    "type": "error"
-  },
-  {
-    "inputs": [],
-    "name": "ZeroValue",
+    "name": "NotImplemented",
     "type": "error"
   },
   {
@@ -3490,6 +3485,32 @@
       }
     ],
     "name": "BidCstRewardAmountMultiplierChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "CstBidPriceDeclineMultiplierChangeDivisorChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "CstBidPriceDeclineMultiplierChanged",
     "type": "event"
   },
   {
@@ -3575,23 +3596,25 @@
     "type": "fallback"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "roundNum",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "bidNum",
-        "type": "uint256"
-      }
-    ],
-    "name": "bidRaffleCumulativeWeights",
+    "inputs": [],
+    "name": "cstBidPriceDeclineMultiplier",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "cumulativeWeight",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cstBidPriceDeclineMultiplierChangeDivisor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -3614,6 +3637,32 @@
       }
     ],
     "name": "setBidCstRewardAmountMultiplier",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newValue_",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCstBidPriceDeclineMultiplier",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newValue_",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCstBidPriceDeclineMultiplierChangeDivisor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -3694,6 +3743,61 @@
     "name": "setRoundLateBidPricePremiumAmountExponent",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundNum_",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "bidIndex_",
+        "type": "uint256"
+      }
+    ],
+    "name": "getBidInfoAt",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "bidderAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "raffleCumulativeWeight",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct ICosmicSignatureGameStorage.BidInfo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundNum",
+        "type": "uint256"
+      }
+    ],
+    "name": "bidsInfo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "numItems",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]
