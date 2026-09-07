@@ -764,13 +764,24 @@ describe('HomePage', () => {
 
   it('interleaves derived system events into the chat feed alongside messages', () => {
     mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData({ CurRoundNum: 7, TsRoundStart: 1_699_999_000 }),
+      data: makeDashboardData({
+        CurRoundNum: 7,
+        CurNumBids: 2,
+        TsRoundStart: 1_700_000_000,
+        LastBidderAddr: '0x2222222222222222222222222222222222222222',
+      }),
+      isLoading: false,
+    });
+    mockUseCurrentTime.mockReturnValue({
+      data: 1_700_000_900,
+      dataUpdatedAt: Date.now(),
       isLoading: false,
     });
     mockUseGestureListByCycle.mockReturnValue({
       data: [
         {
           EvtLogId: 1,
+          BidPosition: 1,
           TimeStamp: 1_700_000_000,
           BidderAddr: '0x1111111111111111111111111111111111111111',
           RoundNum: 7,
@@ -780,6 +791,7 @@ describe('HomePage', () => {
         {
           // 600s stint by 0x1111 completes here: a record event lands at this ts.
           EvtLogId: 2,
+          BidPosition: 2,
           TimeStamp: 1_700_000_600,
           BidderAddr: '0x2222222222222222222222222222222222222222',
           RoundNum: 7,
@@ -793,11 +805,25 @@ describe('HomePage', () => {
 
     const chat = screen.getByTestId('gesture-message-chat');
     const events = within(chat).getAllByTestId('chat-system-event');
-    expect(events.length).toBe(2);
-    expect(events.some((event) => event.dataset.kind === 'cycleStart')).toBe(true);
-    expect(events.some((event) => event.dataset.kind === 'enduranceRecord')).toBe(true);
-    // Count copy still reflects messages only.
+    expect(events.map((event) => event.dataset.kind).sort()).toEqual([
+      'chronoLead',
+      'cycleStart',
+      'enduranceGrowing',
+      'enduranceRecord',
+      'newParticipant',
+      'newParticipant',
+    ]);
+    expect(events.every((event) => event.querySelector('time[datetime]'))).toBe(true);
+    const listItems = within(chat).getAllByRole('listitem');
+    expect(listItems[0]).toHaveTextContent('second signal');
+    expect(listItems[1]).toHaveTextContent('home.chat.system.enduranceRecord');
+    expect(listItems[1]?.querySelector('time')).toHaveAttribute(
+      'dateTime',
+      '2023-11-14T22:23:20.000Z',
+    );
+    expect(listItems[1]?.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:23:20 UTC');
     expect(within(chat).getByText(/home\.chat\.messageCount\(count=2\)/)).toBeInTheDocument();
+    expect(within(chat).getByText(/home\.chat\.eventCount\(count=6\)/)).toBeInTheDocument();
   });
 
   it('keeps the mini-bar hidden until the deck is confirmed above the viewport', () => {
@@ -1422,9 +1448,9 @@ describe('HomePage', () => {
     }
   });
 
-  it('keeps the gesture chat in the page when the current cycle has no messages', () => {
+  it('keeps the event timeline and join CTA visible when the current cycle has no messages', () => {
     mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData({ CurRoundNum: 7 }),
+      data: makeDashboardData({ CurRoundNum: 7, TsRoundStart: 1_700_000_000 }),
       isLoading: false,
     });
     mockUseGestureListByCycle.mockReturnValue({ data: [] });
@@ -1432,7 +1458,14 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const chat = screen.getByTestId('gesture-message-chat');
-    expect(within(chat).getByText('home.chat.empty.title')).toBeInTheDocument();
+    expect(within(chat).queryByText('home.chat.empty.title')).not.toBeInTheDocument();
+    const event = within(chat).getByTestId('chat-system-event');
+    expect(event).toHaveAttribute('data-kind', 'cycleStart');
+    expect(event.querySelector('time')).toHaveAttribute('dateTime', '2023-11-14T22:13:20.000Z');
+    expect(event.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:13:20 UTC');
+    expect(within(chat).getByRole('button', { name: 'home.chat.empty.cta' })).toBeVisible();
+    expect(within(chat).getByText(/home\.chat\.messageCount\(count=0\)/)).toBeInTheDocument();
+    expect(within(chat).getByText(/home\.chat\.eventCount\(count=1\)/)).toBeInTheDocument();
   });
 
   /* ── Console layout and rail ────────────────────────────────── */
