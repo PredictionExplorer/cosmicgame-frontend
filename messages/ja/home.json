@@ -464,19 +464,32 @@
       "cstFallback": "CST"
     },
     "empty": {
-      "title": "一筆のメッセージはまだありません",
-      "description": "現在のサイクルの一筆に添えられたメッセージが、新しいものから順にここに表示されます。",
+      "title": "メッセージやイベントはまだありません",
+      "description": "メッセージとサイクルの節目が、新しいものから順にここに表示されます。",
       "cta": "一筆を入れる"
     },
     "system": {
-      "cycleStart": "サイクル{number}が始まりました——最初の一筆が時計を動かしました",
-      "enduranceRecord": "{address}が持久記録を打ち立てました——{duration}",
-      "chronoLead": "{address}が時の戦士の先頭に立ちました——{duration}"
+      "cycleStart": "サイクル{number}が始まりました。最初の一筆が確定カウントダウンを開始しました。",
+      "cycleOpen": "サイクル{number}が開きました。最初のETH一筆でカウントダウンを開始できます。",
+      "enduranceGrowing": "{address}が{duration}にわたり連続で先頭を保持し、持久記録を延ばし始めました。",
+      "enduranceRecord": "{address}の記録を更新した先頭保持期間が{duration}で終わりました。持久記録は、より長い保持期間に更新されるまで残ります。",
+      "chronoLead": "{address}が{duration}にわたり持久チャンピオンを連続で保持し、時の戦士の記録を延ばし始めました。",
+      "chronoReignEnded": "{address}の持久チャンピオン保持期間が{duration}で終わりました。時の戦士は最も長い連続保持期間によって決まります。",
+      "finalCstLeader": "{address}が最終CST一筆の位置を占めました。次のCST一筆まで、この参加者がその位置を保持します。",
+      "newParticipant": "{address}がこのサイクルで初めて一筆を入れました。",
+      "gestureMilestone": "サイクルの一筆の件数が{count}件に達しました。",
+      "cstCalibrationReady": "CST調律期間の価格が下限に達しました。次のCST一筆で再開します。トランザクションのガス代は引き続き必要です。",
+      "finalWindow": "確定カウントダウンの残り時間が{duration}になりました。次の一筆で期限を延ばせます。",
+      "clockExtended": "{address}が確定間近の期間にカウントダウンを{duration}延ばしました。",
+      "clockReopened": "{address}がカウントダウン終了後に一筆を入れ、過ぎた期限に{duration}を加えました。",
+      "finalizationAvailable": "確定カウントダウンが終了しました。{address}が確定を実行できます。確認されるまでは一筆を入れられます。",
+      "cycleFinalized": "サイクル{number}が確定しました。配分の受領者が決まりました。"
     },
     "pending": {
       "aria": "自分のメッセージ、オンチェーンで確認中",
       "label": "確認中"
-    }
+    },
+    "eventCount": "{count, plural, =0 {まだイベントはありません} other {#件のイベント}}"
   },
   "deck": {
     "title": "Cosmic Signature観測所",

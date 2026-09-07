@@ -71,7 +71,7 @@ import {
   useDonationsNFTByRound,
   useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
-import { getCycleState } from '@/lib/cycleState';
+import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
   simulateUxScenarioGesture,
@@ -374,7 +374,10 @@ const ExperimentalHomePage = ({
 
   const recordPendingMessage = useCallback((address: string, message: string) => {
     const id = `pending-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setPendingMessages((prev) => [...prev, { id, address, message }]);
+    setPendingMessages((prev) => [
+      ...prev,
+      { id, address, message, timestamp: Math.floor(Date.now() / 1000) },
+    ]);
     pendingExpiryTimersRef.current.push(
       setTimeout(() => {
         setPendingMessages((prev) => prev.filter((entry) => entry.id !== id));
@@ -578,16 +581,22 @@ const ExperimentalHomePage = ({
     }
   }, []);
 
-  // Derived cycle moments for the chat feed. Memoized so the feed's memo
-  // boundary holds between polls (the page re-renders every second).
+  // The source-aligned clock discovers milestones even between Gestures.
+  // A 30-second bucket keeps this larger timeline out of the one-second
+  // countdown render path; event timestamps still retain their exact second.
+  const feedNowSeconds = Math.floor((now + offset) / 30_000) * 30;
+  const feedActivationTs = getDashboardActivationTime(data) ?? 0;
   const feedSystemEvents = useMemo(
     () =>
       deriveFeedSystemEvents({
         gestures: curGestureList,
         cycleNumber: round >= 0 ? round : undefined,
         roundStartTs: data?.TsRoundStart ?? 0,
+        activationTs: feedActivationTs,
+        nowSeconds: feedNowSeconds,
+        expectedGestureCount: data?.CurNumBids,
       }),
-    [curGestureList, round, data?.TsRoundStart],
+    [curGestureList, round, data?.TsRoundStart, data?.CurNumBids, feedActivationTs, feedNowSeconds],
   );
 
   // Chat empty-state CTA: bring the composer into view and focus it. Falls

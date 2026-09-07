@@ -2,90 +2,378 @@ import type { GestureInfo } from '@/services/api';
 
 import { deriveFeedSystemEvents } from '../feedSystemEvents';
 
-function gesture(overrides: Partial<GestureInfo>): GestureInfo {
+function gesture(
+  timestamp: number,
+  address: string,
+  extra: Partial<GestureInfo> = {},
+): GestureInfo {
   return {
-    EvtLogId: 1,
-    TimeStamp: 0,
-    BidderAddr: '0x0',
+    EvtLogId: timestamp,
+    TimeStamp: timestamp,
+    BidderAddr: address,
     RoundNum: 7,
-    ...overrides,
+    GestureType: 0,
+    ...extra,
   } as GestureInfo;
 }
 
+function derive(gestures: GestureInfo[], nowSeconds?: number) {
+  return deriveFeedSystemEvents({ gestures, cycleNumber: 7, nowSeconds });
+}
+
 describe('deriveFeedSystemEvents', () => {
-  it('returns nothing for an idle cycle', () => {
-    expect(deriveFeedSystemEvents({ gestures: [], cycleNumber: 7, roundStartTs: 0 })).toEqual([]);
-  });
-
-  it('emits the cycle-start marker once the round has begun', () => {
-    const events = deriveFeedSystemEvents({ gestures: [], cycleNumber: 7, roundStartTs: 1_000 });
-    expect(events).toEqual([
-      expect.objectContaining({ kind: 'cycleStart', timestamp: 1_000, cycleNumber: 7 }),
+  it('shows activation only once reached, and distinguishes it from the first Gesture', () => {
+    expect(deriveFeedSystemEvents({ gestures: [], activationTs: 1000, nowSeconds: 999 })).toEqual(
+      [],
+    );
+    expect(
+      deriveFeedSystemEvents({
+        gestures: [],
+        cycleNumber: 7,
+        activationTs: 1000,
+        nowSeconds: 1001,
+      }),
+    ).toEqual([expect.objectContaining({ kind: 'cycleOpen', timestamp: 1000, cycleNumber: 7 })]);
+    expect(deriveFeedSystemEvents({ gestures: [], cycleNumber: 7, roundStartTs: 1000 })).toEqual([
+      expect.objectContaining({ kind: 'cycleStart', timestamp: 1000, cycleNumber: 7 }),
     ]);
   });
 
-  it('emits endurance-record and chrono-lead events for completed stints and reigns', () => {
+  it('includes live Endurance and Chrono growing milestones without another Gesture', () => {
+    const events = derive([gesture(1000, 'A')], 1500);
+    expect(events).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'enduranceGrowing',
+          address: 'A',
+          timestamp: 1000,
+          durationSeconds: 0,
+        }),
+        expect.objectContaining({
+          kind: 'chronoLead',
+          address: 'A',
+          timestamp: 1000,
+          durationSeconds: 0,
+        }),
+      ]),
+    );
+    expect(events.some((e) => e.kind === 'enduranceRecord' || e.kind === 'chronoReignEnded')).toBe(
+      false,
+    );
+  });
+
+  it('records the threshold that was known then, never the future length of a completed reign', () => {
     const gestures = [
-      gesture({ EvtLogId: 1, TimeStamp: 1_000, BidderAddr: '0xAAA' }),
-      // 0xAAA holds 500s — first record, stamped when the stint completes.
-      gesture({ EvtLogId: 2, TimeStamp: 1_500, BidderAddr: '0xBBB' }),
-      // 0xBBB holds 300s — shorter than the record, no event.
-      gesture({ EvtLogId: 3, TimeStamp: 1_800, BidderAddr: '0xCCC' }),
-      // 0xCCC holds 900s — new record.
-      gesture({ EvtLogId: 4, TimeStamp: 2_700, BidderAddr: '0xDDD' }),
-      // 0xDDD's stint is still growing (no next gesture): never emitted.
+      gesture(1000, 'A'),
+      gesture(1500, 'B'),
+      gesture(1800, 'C'),
+      gesture(2700, 'D'),
     ];
+    const events = derive(gestures);
+    expect(events).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'enduranceGrowing',
+          address: 'C',
+          timestamp: 2301,
+          durationSeconds: 501,
+        }),
+        expect.objectContaining({
+          kind: 'enduranceRecord',
+          address: 'A',
+          timestamp: 1500,
+          durationSeconds: 500,
+        }),
+        expect.objectContaining({
+          kind: 'enduranceRecord',
+          address: 'C',
+          timestamp: 2700,
+          durationSeconds: 900,
+        }),
+        expect.objectContaining({
+          kind: 'chronoReignEnded',
+          address: 'A',
+          timestamp: 2301,
+          durationSeconds: 1300,
+        }),
+      ]),
+    );
+    expect(events.find((e) => e.kind === 'chronoLead')).toMatchObject({
+      address: 'A',
+      timestamp: 1000,
+      durationSeconds: 0,
+    });
+    expect(events.some((e) => e.kind === 'chronoLead' && e.address === 'C')).toBe(false);
+  });
 
-    const events = deriveFeedSystemEvents({ gestures, cycleNumber: 7, roundStartTs: 900 });
+  it('keeps Endurance ties standing until the following second', () => {
+    const gestures = [gesture(1000, 'A'), gesture(1100, 'B'), gesture(1200, 'C')];
+    expect(
+      derive(gestures, 1300).some((e) => e.kind === 'enduranceGrowing' && e.address === 'C'),
+    ).toBe(false);
+    expect(derive(gestures, 1301)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'enduranceGrowing',
+          address: 'C',
+          timestamp: 1301,
+          durationSeconds: 101,
+        }),
+        expect.objectContaining({
+          kind: 'chronoReignEnded',
+          address: 'A',
+          timestamp: 1301,
+          durationSeconds: 300,
+        }),
+      ]),
+    );
+  });
 
-    expect(events).toEqual([
-      expect.objectContaining({ kind: 'cycleStart', timestamp: 900 }),
-      expect.objectContaining({
-        kind: 'enduranceRecord',
-        address: '0xAAA',
-        durationSeconds: 500,
-        timestamp: 1_500,
+  it('preserves separate same-wallet holds and waits to surpass its earlier Chrono reign', () => {
+    const gestures = [gesture(1000, 'A'), gesture(1100, 'A'), gesture(1300, 'B')];
+    const events = derive(gestures, 1350);
+    expect(
+      events.filter((e) => e.kind === 'enduranceRecord').map((e) => e.durationSeconds),
+    ).toEqual([100, 200]);
+    expect(events.filter((e) => e.kind === 'chronoLead')).toHaveLength(1);
+    expect(derive(gestures, 1400).filter((e) => e.kind === 'chronoLead')).toHaveLength(1);
+    expect(derive(gestures, 1401)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'chronoLead',
+          address: 'A',
+          timestamp: 1401,
+          durationSeconds: 201,
+        }),
+      ]),
+    );
+  });
+
+  it('does not give Chrono to a completed reign that only tied the previous record', () => {
+    const events = derive(
+      [gesture(1000, 'A'), gesture(1100, 'B'), gesture(1201, 'C'), gesture(1299, 'D')],
+      1401,
+    );
+    expect(events.some((e) => e.kind === 'chronoLead' && e.address === 'B')).toBe(false);
+    expect(events.find((e) => e.kind === 'chronoReignEnded' && e.address === 'B')).toMatchObject({
+      durationSeconds: 200,
+    });
+  });
+
+  it('retains the initial zero-length record and orders same-second Gestures by their event order', () => {
+    const gestures = [gesture(1000, 'B', { EvtLogId: 2 }), gesture(1000, 'A', { EvtLogId: 1 })];
+    expect(
+      derive(gestures, 1000)
+        .filter((e) => e.kind === 'enduranceGrowing')
+        .map((e) => e.address),
+    ).toEqual(['A']);
+    expect(derive(gestures, 1001)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'enduranceGrowing', address: 'B', timestamp: 1001 }),
+        expect.objectContaining({
+          kind: 'chronoLead',
+          address: 'B',
+          timestamp: 1001,
+          durationSeconds: 1,
+        }),
+      ]),
+    );
+  });
+
+  it('orders same-second entries with mixed position metadata by comparable event IDs', () => {
+    const events = derive(
+      [
+        gesture(1000, 'B', { EvtLogId: 100001, BidPosition: 2 }),
+        gesture(1000, 'A', { EvtLogId: 100000 }),
+      ],
+      1000,
+    );
+    expect(events.find((e) => e.kind === 'enduranceGrowing')).toMatchObject({ address: 'A' });
+  });
+
+  it('keeps calibration event identities unique for same-second zero-length resets', () => {
+    const events = derive(
+      [
+        gesture(1000, 'A', { EvtLogId: 1, GestureType: 2, CstDutchAuctionDurationInt: 0 }),
+        gesture(1000, 'B', { EvtLogId: 2, GestureType: 2, CstDutchAuctionDurationInt: 0 }),
+      ],
+      1001,
+    );
+    const floorEvents = events.filter((e) => e.kind === 'cstCalibrationReady');
+    expect(floorEvents).toHaveLength(2);
+    expect(new Set(floorEvents.map((e) => e.id)).size).toBe(2);
+  });
+
+  it('keeps completed event identities and descriptions stable as time advances', () => {
+    const gestures = [gesture(1000, 'A'), gesture(1100, 'B'), gesture(1201, 'C')];
+    const before = derive(gestures, 1350);
+    const after = derive(gestures, 1450);
+    for (const event of before) expect(after.find((e) => e.id === event.id)).toEqual(event);
+    expect(new Set(after.map((e) => e.id)).size).toBe(after.length);
+  });
+
+  it('ignores invalid, duplicate and other-cycle Gestures, without changing the input', () => {
+    const first = gesture(1000, 'A');
+    const input = [
+      gesture(1100, 'B'),
+      first,
+      first,
+      gesture(NaN, 'C'),
+      gesture(900, 'D', { RoundNum: 6 }),
+    ];
+    expect(derive(input, 1200)).toEqual(derive([first, gesture(1100, 'B')], 1200));
+    expect(input[0]!.BidderAddr).toBe('B');
+  });
+
+  it('does not invent records or newcomers from incomplete history', () => {
+    const gestures = [gesture(1100, 'B', { BidPosition: 2 })];
+    expect(
+      deriveFeedSystemEvents({
+        gestures,
+        cycleNumber: 7,
+        expectedGestureCount: 2,
+        roundStartTs: 1000,
+        nowSeconds: 1200,
       }),
-      expect.objectContaining({
-        kind: 'enduranceRecord',
-        address: '0xCCC',
-        durationSeconds: 900,
-        timestamp: 2_700,
+    ).toEqual([expect.objectContaining({ kind: 'cycleStart' })]);
+    expect(derive(gestures, 1200)).toEqual([]);
+    expect(
+      deriveFeedSystemEvents({
+        gestures: [gesture(1100, 'B')],
+        roundStartTs: 1000,
+        nowSeconds: 1200,
       }),
-      // 0xAAA's completed reign: from taking the record (1000) until 0xCCC
-      // took it (1800 + 500s grace of the old record = 2300) — 1300s.
-      expect.objectContaining({
-        kind: 'chronoLead',
-        address: '0xAAA',
-        durationSeconds: 1_300,
-        timestamp: 1_000,
-      }),
+    ).toEqual([expect.objectContaining({ kind: 'cycleStart' })]);
+  });
+
+  it('announces each newcomer once, Final CST changes only on CST role changes, and sparse activity milestones', () => {
+    const gestures = Array.from({ length: 20 }, (_, i) =>
+      gesture(1000 + i, i < 2 ? '0xAbC' : '0xabc', { GestureType: i === 1 || i === 3 ? 2 : 0 }),
+    );
+    const events = derive(gestures, 1020);
+    expect(events.filter((e) => e.kind === 'newParticipant')).toHaveLength(1);
+    expect(events.filter((e) => e.kind === 'finalCstLeader')).toHaveLength(1);
+    expect(events.filter((e) => e.kind === 'gestureMilestone').map((e) => e.count)).toEqual([
+      10, 20,
     ]);
   });
 
-  it('never emits a chrono event for the live reign of the current champion', () => {
-    const gestures = [
-      gesture({ EvtLogId: 1, TimeStamp: 1_000, BidderAddr: '0xAAA' }),
-      gesture({ EvtLogId: 2, TimeStamp: 1_500, BidderAddr: '0xBBB' }),
-    ];
-
-    const events = deriveFeedSystemEvents({ gestures, roundStartTs: 0 });
-
-    // One endurance record exists (0xAAA), but its reign is still live —
-    // there is no next champion, so no chrono event can be stamped yet.
-    expect(events.filter((event) => event.kind === 'chronoLead')).toEqual([]);
+  it('tracks calibration starts across ETH adjustments and resets after CST', () => {
+    const events = derive(
+      [
+        gesture(1000, 'A', { CstDutchAuctionDurationInt: 500 }),
+        gesture(1200, 'B', { CstDutchAuctionDurationInt: 100 }),
+        gesture(1300, 'C', { CstDutchAuctionDurationInt: 90 }),
+        gesture(1400, 'D', { GestureType: 2, CstDutchAuctionDurationInt: 100 }),
+      ],
+      1600,
+    );
+    expect(events.filter((e) => e.kind === 'cstCalibrationReady').map((e) => e.timestamp)).toEqual([
+      1200, 1500,
+    ]);
   });
 
-  it('sorts an unsorted gesture list before deriving stints', () => {
-    const gestures = [
-      gesture({ EvtLogId: 2, TimeStamp: 1_500, BidderAddr: '0xBBB' }),
-      gesture({ EvtLogId: 1, TimeStamp: 1_000, BidderAddr: '0xAAA' }),
-    ];
-
-    const events = deriveFeedSystemEvents({ gestures, roundStartTs: 0 });
-
-    expect(events).toEqual([
-      expect.objectContaining({ kind: 'enduranceRecord', address: '0xAAA', durationSeconds: 500 }),
+  it('does not invent a calibration crossing after missing history and recovers at a known reset', () => {
+    const events = derive(
+      [
+        gesture(1000, 'A', { CstDutchAuctionDurationInt: 500 }),
+        gesture(1200, 'B', { CstDutchAuctionDurationInt: -1 }),
+        gesture(1600, 'C', { CstDutchAuctionDurationInt: 400 }),
+        gesture(1800, 'D', { GestureType: 2, CstDutchAuctionDurationInt: 100 }),
+      ],
+      2000,
+    );
+    expect(events.filter((e) => e.kind === 'cstCalibrationReady').map((e) => e.timestamp)).toEqual([
+      1900,
     ]);
+  });
+
+  it('recovers an exact future calibration threshold after an unknown duration', () => {
+    const events = derive(
+      [
+        gesture(1000, 'A', { CstDutchAuctionDurationInt: -1 }),
+        gesture(1100, 'B', { CstDutchAuctionDurationInt: 500 }),
+      ],
+      1600,
+    );
+    expect(events.find((e) => e.kind === 'cstCalibrationReady')).toMatchObject({ timestamp: 1500 });
+  });
+
+  it('does not assume an unknown Gesture method left the calibration start unchanged', () => {
+    const events = derive(
+      [
+        gesture(1000, 'A', { CstDutchAuctionDurationInt: 500 }),
+        gesture(1100, 'B', { GestureType: undefined, CstDutchAuctionDurationInt: 600 }),
+        gesture(1200, 'C', { CstDutchAuctionDurationInt: 500 }),
+      ],
+      2000,
+    );
+    expect(events.some((e) => e.kind === 'cstCalibrationReady')).toBe(false);
+  });
+
+  it('never derives a floor from unavailable legacy calibration durations', () => {
+    expect(
+      derive([gesture(1000, 'A', { CstDutchAuctionDurationInt: -1 })], 9000).some(
+        (e) => e.kind === 'cstCalibrationReady',
+      ),
+    ).toBe(false);
+  });
+
+  it('timestamps final windows and zero crossings against the deadline in effect at that time', () => {
+    const events = derive(
+      [gesture(1000, 'A', { PrizeTime: 5000 }), gesture(4500, 'B', { PrizeTime: 5500 })],
+      6000,
+    );
+    expect(
+      events.filter((e) => e.kind === 'finalWindow').map((e) => [e.timestamp, e.durationSeconds]),
+    ).toEqual([
+      [1400, 3600],
+      [4400, 600],
+      [4900, 600],
+    ]);
+    expect(events.find((e) => e.kind === 'clockExtended')).toMatchObject({
+      timestamp: 4500,
+      durationSeconds: 500,
+    });
+    expect(events.filter((e) => e.kind === 'finalizationAvailable')).toEqual([
+      expect.objectContaining({ timestamp: 5500, address: 'B' }),
+    ]);
+  });
+
+  it('keeps a late extension honest when it leaves the deadline in the past', () => {
+    const events = derive(
+      [gesture(1000, 'A', { PrizeTime: 2000 }), gesture(5000, 'B', { PrizeTime: 3000 })],
+      5100,
+    );
+    expect(events.find((e) => e.kind === 'clockReopened')).toMatchObject({
+      timestamp: 5000,
+      durationSeconds: 1000,
+    });
+    expect(
+      events.filter((e) => e.kind === 'finalizationAvailable').map((e) => e.timestamp),
+    ).toEqual([2000]);
+  });
+
+  it('continues record timers after zero but freezes them at actual finalization', () => {
+    const gestures = [gesture(1000, 'A', { PrizeTime: 1100 })];
+    const events = deriveFeedSystemEvents({
+      gestures,
+      nowSeconds: 5000,
+      finalizedAtTs: 1500,
+      cycleNumber: 7,
+    });
+    expect(events.find((e) => e.kind === 'enduranceRecord')).toMatchObject({
+      timestamp: 1500,
+      durationSeconds: 500,
+    });
+    expect(events.find((e) => e.kind === 'chronoReignEnded')).toMatchObject({
+      timestamp: 1500,
+      durationSeconds: 500,
+    });
+    expect(events.find((e) => e.kind === 'cycleFinalized')).toMatchObject({
+      timestamp: 1500,
+      cycleNumber: 7,
+    });
+    expect(events.every((e) => e.timestamp <= 1500)).toBe(true);
   });
 });

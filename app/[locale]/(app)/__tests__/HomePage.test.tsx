@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { shortenHex } from '@/utils';
+
 import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
 
 import { render, screen, within, act, checkA11y } from '@/test-utils';
@@ -1455,13 +1457,24 @@ describe('HomePage', () => {
 
   it('interleaves derived system events into the chat feed alongside messages', () => {
     mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData({ CurRoundNum: 7, TsRoundStart: 1_699_999_000 }),
+      data: makeDashboardData({
+        CurRoundNum: 7,
+        CurNumBids: 2,
+        TsRoundStart: 1_700_000_000,
+        LastBidderAddr: '0x2222222222222222222222222222222222222222',
+      }),
+      isLoading: false,
+    });
+    mockUseCurrentTime.mockReturnValue({
+      data: 1_700_000_900,
+      dataUpdatedAt: Date.now(),
       isLoading: false,
     });
     mockUseGestureListByCycle.mockReturnValue({
       data: [
         {
           EvtLogId: 1,
+          BidPosition: 1,
           TimeStamp: 1_700_000_000,
           BidderAddr: '0x1111111111111111111111111111111111111111',
           RoundNum: 7,
@@ -1471,6 +1484,7 @@ describe('HomePage', () => {
         {
           // 600s stint by 0x1111 completes here: a record event lands at this ts.
           EvtLogId: 2,
+          BidPosition: 2,
           TimeStamp: 1_700_000_600,
           BidderAddr: '0x2222222222222222222222222222222222222222',
           RoundNum: 7,
@@ -1484,9 +1498,105 @@ describe('HomePage', () => {
 
     const chat = screen.getByTestId('gesture-message-chat');
     const events = within(chat).getAllByTestId('chat-system-event');
-    expect(events.length).toBe(2);
-    expect(events.some((event) => event.dataset.kind === 'cycleStart')).toBe(true);
-    expect(events.some((event) => event.dataset.kind === 'enduranceRecord')).toBe(true);
+    expect(events.map((event) => event.dataset.kind).sort()).toEqual([
+      'chronoLead',
+      'cycleStart',
+      'enduranceGrowing',
+      'enduranceRecord',
+      'newParticipant',
+      'newParticipant',
+    ]);
+    expect(events.every((event) => event.querySelector('time[datetime]'))).toBe(true);
+    const listItems = within(chat).getAllByRole('listitem');
+    expect(listItems[0]).toHaveTextContent('second signal');
+    expect(listItems[1]).toHaveTextContent('home.chat.system.enduranceRecord');
+    expect(within(chat).getByText(/home\.chat\.eventCount\(count=6\)/)).toBeInTheDocument();
+  });
+
+  it('discovers live Endurance and Chrono growth on clock ticks without a new Gesture', () => {
+    jest.useFakeTimers();
+    const realNow = Date.now();
+    const clockStartMs = Math.floor(realNow / 30_000) * 30_000;
+    const cycleStart = clockStartMs / 1000 - 180;
+    const firstAddress = '0x1111111111111111111111111111111111111111';
+    const secondAddress = '0x2222222222222222222222222222222222222222';
+    try {
+      jest.setSystemTime(clockStartMs);
+      mockUseCurrentTime.mockReturnValue({
+        data: clockStartMs / 1000,
+        dataUpdatedAt: clockStartMs,
+        isLoading: false,
+      });
+      mockUseDashboardInfo.mockReturnValue({
+        data: makeDashboardData({
+          CurRoundNum: 7,
+          CurNumBids: 2,
+          TsRoundStart: cycleStart,
+          LastBidderAddr: secondAddress,
+        }),
+        isLoading: false,
+      });
+      mockUseGestureListByCycle.mockReturnValue({
+        data: [
+          {
+            EvtLogId: 1,
+            BidPosition: 1,
+            TimeStamp: cycleStart,
+            BidderAddr: firstAddress,
+            RoundNum: 7,
+            GestureType: 0,
+            Message: 'first signal',
+          },
+          {
+            EvtLogId: 2,
+            BidPosition: 2,
+            TimeStamp: cycleStart + 100,
+            BidderAddr: secondAddress,
+            RoundNum: 7,
+            GestureType: 0,
+            Message: 'second signal',
+          },
+        ],
+      });
+      render(<HomePage />);
+      act(() => jest.advanceTimersByTime(1_000));
+      const chat = screen.getByTestId('gesture-message-chat');
+      const eventsOfKind = (kind: string) =>
+        within(chat)
+          .getAllByTestId('chat-system-event')
+          .filter((event) => event.dataset.kind === kind);
+      expect(eventsOfKind('enduranceGrowing')).toHaveLength(1);
+      expect(eventsOfKind('chronoLead')).toHaveLength(1);
+
+      act(() => jest.advanceTimersByTime(30_000));
+
+      expect(eventsOfKind('enduranceGrowing')).toHaveLength(2);
+      const newEndurance = eventsOfKind('enduranceGrowing')[0]!;
+      expect(newEndurance).toHaveTextContent(`address=${shortenHex(secondAddress, 4)}`);
+      expect(newEndurance.querySelector('time')).toHaveAttribute(
+        'dateTime',
+        new Date((cycleStart + 201) * 1000).toISOString(),
+      );
+      expect(eventsOfKind('chronoLead')).toHaveLength(1);
+
+      act(() => jest.advanceTimersByTime(210_000));
+
+      expect(eventsOfKind('chronoLead')).toHaveLength(2);
+      const newChrono = eventsOfKind('chronoLead')[0]!;
+      expect(newChrono).toHaveTextContent(`address=${shortenHex(secondAddress, 4)}`);
+      expect(newChrono.querySelector('time')).toHaveAttribute(
+        'dateTime',
+        new Date((cycleStart + 401) * 1000).toISOString(),
+      );
+      expect(eventsOfKind('enduranceGrowing')).toHaveLength(2);
+      expect(within(chat).getByText(/home\.chat\.messageCount\(count=2\)/)).toBeInTheDocument();
+    } finally {
+      act(() => {
+        jest.setSystemTime(realNow);
+        jest.advanceTimersByTime(1_000);
+      });
+      jest.useRealTimers();
+    }
   });
 
   it.each([false, true])(

@@ -464,19 +464,32 @@
       "cstFallback": "CST"
     },
     "empty": {
-      "title": "Chưa có lời nhắn nét bút",
-      "description": "Lời nhắn đính kèm nét bút của chu kỳ hiện tại sẽ xuất hiện ở đây, mới nhất trước.",
+      "title": "Chưa có lời nhắn hay sự kiện",
+      "description": "Lời nhắn và các cột mốc của chu kỳ sẽ xuất hiện ở đây, mới nhất trước.",
       "cta": "Đặt nét bút"
     },
     "system": {
-      "cycleStart": "Chu kỳ #{number} bắt đầu — nét bút đầu tiên đã khởi động đồng hồ",
-      "enduranceRecord": "{address} lập kỷ lục Bền bỉ — {duration}",
-      "chronoLead": "{address} vươn lên dẫn đầu Chiến binh Thời gian — {duration}"
+      "cycleStart": "Chu kỳ #{number} bắt đầu. Nét bút đầu tiên đã khởi động đếm ngược hoàn tất.",
+      "cycleOpen": "Chu kỳ #{number} đã mở. Nét bút ETH đầu tiên có thể khởi động đồng hồ.",
+      "enduranceGrowing": "{address} bắt đầu kéo dài kỷ lục Bền bỉ sau khi giữ vị trí dẫn đầu liên tục trong {duration}.",
+      "enduranceRecord": "{address} kết thúc thời gian giữ vị trí dẫn đầu lập kỷ lục kéo dài {duration}. Kỷ lục Bền bỉ được giữ nguyên cho đến khi một thời gian giữ vị trí dài hơn thay thế.",
+      "chronoLead": "{address} bắt đầu kéo dài kỷ lục Chiến binh Thời gian sau khi liên tục giữ danh hiệu Quán quân Bền bỉ trong {duration}.",
+      "chronoReignEnded": "{address} kết thúc thời gian giữ danh hiệu Quán quân Bền bỉ kéo dài {duration}. Chiến binh Thời gian được xác định theo thời gian liên tục giữ danh hiệu dài nhất.",
+      "finalCstLeader": "{address} đã nắm vị trí nét bút CST cuối cùng. Vị trí này thuộc về người tham gia đó cho đến nét bút CST tiếp theo.",
+      "newParticipant": "{address} đã đặt nét bút đầu tiên của mình trong chu kỳ này.",
+      "gestureMilestone": "Hoạt động trong chu kỳ đã đạt {count} nét bút.",
+      "cstCalibrationReady": "Cửa sổ hiệu chỉnh CST đã chạm giá sàn. Nét bút CST tiếp theo sẽ khởi động lại cửa sổ; giao dịch vẫn cần phí gas.",
+      "finalWindow": "Đếm ngược hoàn tất còn {duration}. Nét bút tiếp theo có thể dời thời hạn.",
+      "clockExtended": "{address} đã kéo dài đếm ngược hoàn tất thêm {duration} trong giai đoạn sắp kết thúc.",
+      "clockReopened": "{address} đã đặt nét bút sau khi đồng hồ về không, cộng thêm {duration} vào thời hạn đã qua.",
+      "finalizationAvailable": "Đếm ngược hoàn tất đã về không. {address} có thể hoàn tất; nét bút vẫn được tiếp nhận cho đến khi xác nhận.",
+      "cycleFinalized": "Chu kỳ #{number} đã hoàn tất. Người nhận phân bổ đã được xác định."
     },
     "pending": {
       "aria": "Lời nhắn của bạn, đang xác nhận trên chuỗi",
       "label": "Đang xác nhận"
-    }
+    },
+    "eventCount": "{count, plural, =0 {Chưa có sự kiện} other {# sự kiện}}"
   },
   "deck": {
     "title": "Đài quan sát Cosmic Signature",

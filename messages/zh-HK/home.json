@@ -464,19 +464,32 @@
       "cstFallback": "CST"
     },
     "empty": {
-      "title": "暫無落筆留言",
-      "description": "目前週期隨落筆附上的留言會顯示在這裏，最新的排在最前。",
+      "title": "暫無留言或事件",
+      "description": "留言和週期重要事件會顯示在這裏，最新的排在最前。",
       "cta": "落筆"
     },
     "system": {
-      "cycleStart": "第 {number} 個週期開始——第一筆啟動了時鐘",
-      "enduranceRecord": "{address} 刷新堅守紀錄——{duration}",
-      "chronoLead": "{address} 領跑時之勇士——{duration}"
+      "cycleStart": "第 {number} 個週期開始了。第一筆啟動了收官倒數。",
+      "cycleOpen": "第 {number} 個週期開放了。第一筆 ETH 落筆可啟動倒數。",
+      "enduranceGrowing": "{address} 連續保持領先 {duration} 後，開始延長堅守紀錄。",
+      "enduranceRecord": "{address} 結束了長達 {duration} 的破紀錄領先時段。堅守紀錄會保留，直至更長的領先時段將其刷新。",
+      "chronoLead": "{address} 連續擔任堅守冠軍達 {duration}，開始延長時之勇士紀錄。",
+      "chronoReignEnded": "{address} 結束了長達 {duration} 的堅守冠軍在位時段。時之勇士由最長的單次連續在位時長決定。",
+      "finalCstLeader": "{address} 成為目前 CST 收官之筆的落筆者。在下一筆 CST 落筆之前，這個位置會由該參與者保持。",
+      "newParticipant": "{address} 完成了本週期的首次落筆。",
+      "gestureMilestone": "本週期落筆次數達到 {count} 次。",
+      "cstCalibrationReady": "CST 校準窗口已達價格下限。下一筆 CST 落筆會重啟窗口；交易仍需支付 Gas 費。",
+      "finalWindow": "收官倒數尚餘 {duration}。再次落筆可延遲截止時間。",
+      "clockExtended": "{address} 在臨近收官時將倒數延長了 {duration}。",
+      "clockReopened": "{address} 在倒數歸零後落筆，將已到期的截止時間向後延長了 {duration}。",
+      "finalizationAvailable": "收官倒數已歸零。{address} 可執行收官；交易確認前仍可落筆。",
+      "cycleFinalized": "第 {number} 個週期已收官。分配獲配者現已確定。"
     },
     "pending": {
       "aria": "你的留言，鏈上確認中",
       "label": "確認中"
-    }
+    },
+    "eventCount": "{count, plural, =0 {暫無事件} other {# 項事件}}"
   },
   "deck": {
     "title": "Cosmic Signature 觀測台",

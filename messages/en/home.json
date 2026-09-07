@@ -464,19 +464,32 @@
       "cstFallback": "CST"
     },
     "empty": {
-      "title": "No gesture messages yet",
-      "description": "Messages attached to current-cycle gestures will appear here, newest first.",
+      "title": "No messages or events yet",
+      "description": "Messages and cycle milestones will appear here, newest first.",
       "cta": "Make a Gesture"
     },
     "system": {
-      "cycleStart": "Cycle #{number} began — the first Gesture started the clock",
-      "enduranceRecord": "{address} set the Endurance record — {duration}",
-      "chronoLead": "{address} took the Chrono-Warrior lead — {duration}"
+      "cycleStart": "Cycle #{number} began. The first Gesture started the finalization clock.",
+      "cycleOpen": "Cycle #{number} opened. The first ETH Gesture can start the clock.",
+      "enduranceGrowing": "{address} started growing the Endurance record after a continuous hold of {duration}.",
+      "enduranceRecord": "{address} ended a record-setting hold of {duration}. The Endurance record stands until a longer hold replaces it.",
+      "chronoLead": "{address} started growing the Chrono-Warrior record with a continuous Endurance reign of {duration}.",
+      "chronoReignEnded": "{address} ended an Endurance reign of {duration}. Chrono-Warrior is determined by the longest continuous reign.",
+      "finalCstLeader": "{address} took the Final CST Gesture position. It stays with this participant until another CST Gesture.",
+      "newParticipant": "{address} made their first Gesture of this cycle.",
+      "gestureMilestone": "Cycle activity reached {count} Gestures.",
+      "cstCalibrationReady": "The CST Calibration Window reached its floor. The next CST Gesture restarts it; transaction gas still applies.",
+      "finalWindow": "The finalization clock reached {duration} remaining. Another Gesture can move the deadline.",
+      "clockExtended": "{address} extended the finalization clock by {duration} during the closing window.",
+      "clockReopened": "{address} made a Gesture after the clock reached zero and added {duration} to the expired deadline.",
+      "finalizationAvailable": "The finalization clock reached zero. {address} can finalize; Gestures remain open until confirmation.",
+      "cycleFinalized": "Cycle #{number} finalized. The allocation recipients are now settled."
     },
     "pending": {
       "aria": "Your message, confirming on-chain",
       "label": "Confirming"
-    }
+    },
+    "eventCount": "{count, plural, =0 {No events yet} one {# event} other {# events}}"
   },
   "deck": {
     "title": "The Cosmic Signature Observatory",

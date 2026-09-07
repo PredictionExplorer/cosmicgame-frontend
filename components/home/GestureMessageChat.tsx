@@ -1,7 +1,22 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Check, Copy, Crown, Info, MessageCircle, Radio, Sparkles, Swords } from 'lucide-react';
+import {
+  Check,
+  CircleCheck,
+  Clock3,
+  Copy,
+  Crown,
+  Flag,
+  Hourglass,
+  Info,
+  MessageCircle,
+  Radio,
+  Sparkles,
+  Swords,
+  TimerReset,
+  Users,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -13,7 +28,7 @@ import {
 } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
-import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
+import { getLocaleConfig } from '@/i18n/localeConfig';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { LinkifiedText } from '@/components/ui/linkified-text';
@@ -33,6 +48,8 @@ export interface PendingChatMessage {
   id: string;
   address: string;
   message: string;
+  /** Submission time in Unix seconds, before its confirmed block time is known. */
+  timestamp: number;
 }
 
 interface GestureMessageChatProps {
@@ -43,9 +60,7 @@ interface GestureMessageChatProps {
   /** When provided, the empty state offers a "Make a Gesture" call to action. */
   onJoinCta?: () => void;
   /**
-   * Derived cycle moments (cycle start, Endurance records, Chrono leads)
-   * interleaved into the feed by timestamp. Only rendered once real messages
-   * exist, so the cold-start empty state keeps its call to action.
+   * Derived cycle moments interleaved with participant messages by timestamp.
    */
   systemEvents?: GestureFeedSystemEvent[];
   /** Optimistic messages rendered on top of the feed until indexed. */
@@ -57,17 +72,6 @@ interface GestureChatMessage {
   message: string;
 }
 
-function formatGestureMessageTimestamp(timestamp: number, display: string) {
-  const [date = display, time = ''] = display.split(', ');
-
-  return {
-    date,
-    time,
-    absolute: time ? `${date}, ${time}` : date,
-    iso: Number.isFinite(timestamp) ? new Date(timestamp * 1000).toISOString() : undefined,
-  };
-}
-
 function GestureMessageTimestamp({
   timestamp,
   locale,
@@ -77,20 +81,43 @@ function GestureMessageTimestamp({
   locale: string;
   nowMs: number;
 }) {
-  const display = useHydrationSafeDateTime(timestamp, true, locale);
-  const formatted = formatGestureMessageTimestamp(timestamp, display);
+  // An explicit UTC zone makes the exact time unambiguous and identical during
+  // server rendering and hydration, including dates spanning different years.
+  const formatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(getLocaleConfig(locale).intlLocale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hourCycle: 'h23',
+        timeZone: 'UTC',
+        timeZoneName: 'short',
+      }),
+    [locale],
+  );
+  const date = new Date(timestamp * 1000);
+  const isValid = Number.isFinite(date.getTime());
+  const absolute = isValid ? formatter.format(date) : '—';
   const relativeLabel =
-    nowMs > 0 ? getRelativeTime(timestamp, Math.floor(nowMs / 1000), locale) : formatted.absolute;
+    isValid && nowMs > 0 ? getRelativeTime(timestamp, Math.floor(nowMs / 1000), locale) : null;
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <time dateTime={formatted.iso} className="mt-2 block w-fit text-xs text-muted-foreground">
-          {relativeLabel}
-        </time>
-      </TooltipTrigger>
-      <TooltipContent>{formatted.absolute}</TooltipContent>
-    </Tooltip>
+    <time
+      dateTime={isValid ? date.toISOString() : undefined}
+      className="mt-2 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground"
+      aria-live="off"
+    >
+      <span>{absolute}</span>
+      {relativeLabel ? (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>{relativeLabel}</span>
+        </>
+      ) : null}
+    </time>
   );
 }
 
@@ -197,42 +224,73 @@ function mergeFeedItems(
   });
 }
 
-function SystemEventRow({ event, locale }: { event: GestureFeedSystemEvent; locale: string }) {
+function SystemEventRow({
+  event,
+  locale,
+  nowMs,
+}: {
+  event: GestureFeedSystemEvent;
+  locale: string;
+  nowMs: number;
+}) {
   const t = useTranslations('home');
-  const Icon =
-    event.kind === 'enduranceRecord' ? Crown : event.kind === 'chronoLead' ? Swords : Sparkles;
+  const icons = {
+    cycleStart: Sparkles,
+    cycleOpen: Flag,
+    enduranceGrowing: Crown,
+    enduranceRecord: Crown,
+    chronoLead: Swords,
+    chronoReignEnded: Swords,
+    finalCstLeader: Flag,
+    newParticipant: Users,
+    gestureMilestone: Radio,
+    cstCalibrationReady: Hourglass,
+    finalWindow: Clock3,
+    clockExtended: TimerReset,
+    clockReopened: TimerReset,
+    finalizationAvailable: CircleCheck,
+    cycleFinalized: CircleCheck,
+  };
+  const Icon = icons[event.kind];
   const iconClass =
-    event.kind === 'enduranceRecord'
+    event.kind === 'enduranceRecord' || event.kind === 'enduranceGrowing'
       ? 'text-[rgb(var(--solar-gold-rgb))]'
-      : event.kind === 'chronoLead'
+      : event.kind === 'chronoLead' || event.kind === 'chronoReignEnded'
         ? 'text-[rgb(var(--nebula-violet-rgb))]'
         : 'text-primary';
-  const text =
-    event.kind === 'cycleStart'
-      ? t('chat.system.cycleStart', { number: String(event.cycleNumber ?? '') })
-      : t(
-          event.kind === 'enduranceRecord'
-            ? 'chat.system.enduranceRecord'
-            : 'chat.system.chronoLead',
-          {
-            address: shortenHex(event.address ?? '', 4),
-            duration: formatSeconds(event.durationSeconds ?? 0, locale),
-          },
-        );
+  const text = t(`chat.system.${event.kind}`, {
+    ...(event.cycleNumber != null ? { number: String(event.cycleNumber) } : {}),
+    ...(event.address ? { address: shortenHex(event.address, 4) } : {}),
+    ...(event.durationSeconds != null
+      ? { duration: formatSeconds(event.durationSeconds, locale) }
+      : {}),
+    ...(event.count != null ? { count: String(event.count) } : {}),
+  });
 
   return (
     <div
       data-testid="chat-system-event"
       data-kind={event.kind}
-      className="flex items-center gap-2 rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] px-3 py-2"
+      className="flex items-start gap-2 rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] px-3 py-2"
     >
-      <Icon className={cn('h-3.5 w-3.5 shrink-0', iconClass)} aria-hidden />
-      <p className="min-w-0 text-xs leading-relaxed text-muted-foreground">{text}</p>
+      <Icon className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', iconClass)} aria-hidden />
+      <div className="min-w-0">
+        <p className="text-xs leading-relaxed text-muted-foreground">{text}</p>
+        <GestureMessageTimestamp timestamp={event.timestamp} locale={locale} nowMs={nowMs} />
+      </div>
     </div>
   );
 }
 
-function PendingMessageRow({ pending }: { pending: PendingChatMessage }) {
+function PendingMessageRow({
+  pending,
+  locale,
+  nowMs,
+}: {
+  pending: PendingChatMessage;
+  locale: string;
+  nowMs: number;
+}) {
   const t = useTranslations('home');
 
   return (
@@ -250,6 +308,7 @@ function PendingMessageRow({ pending }: { pending: PendingChatMessage }) {
           {t('chat.pending.label')}
         </span>
       </div>
+      <GestureMessageTimestamp timestamp={pending.timestamp} locale={locale} nowMs={nowMs} />
       <p className="mt-2.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/80">
         {pending.message}
       </p>
@@ -279,11 +338,11 @@ export function GestureMessageChat({
     [gestures, bannedGestureIds],
   );
   const feedItems = useMemo(
-    () => mergeFeedItems(messages, messages.length > 0 ? (systemEvents ?? []) : []),
+    () => mergeFeedItems(messages, systemEvents ?? []),
     [messages, systemEvents],
   );
   const pending = pendingMessages ?? [];
-  const hasFeedContent = messages.length > 0 || pending.length > 0;
+  const hasFeedContent = feedItems.length > 0 || pending.length > 0;
   const isPulsing = useLivePulse(pulseKey);
   // 30s tick keeps minute-level relative timestamps fresh; 0 during SSR.
   const nowMs = useNow(30_000);
@@ -346,6 +405,8 @@ export function GestureMessageChat({
                     : t('chat.currentCycle')}
                   {' \u00b7 '}
                   {t('chat.messageCount', { count: messages.length })}
+                  {' \u00b7 '}
+                  {t('chat.eventCount', { count: systemEvents?.length ?? 0 })}
                 </p>
               </div>
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/12 text-primary max-sm:hidden">
@@ -363,18 +424,25 @@ export function GestureMessageChat({
             // deliberately capped desktop panel scroll here instead.
             className="relative z-[1] min-h-0 flex-1 overflow-y-visible p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60 sm:p-4 lg:max-h-[calc(100vh-13rem)] lg:overflow-y-auto xl:max-h-none xl:overflow-y-auto xl:p-4 xl:[scrollbar-gutter:stable] print:max-h-none print:overflow-visible print:[scrollbar-gutter:auto]"
           >
+            {hasFeedContent && messages.length === 0 && pending.length === 0 && onJoinCta ? (
+              <div className="mb-3">
+                <Button variant="secondary" size="sm" onClick={onJoinCta}>
+                  {t('chat.empty.cta')}
+                </Button>
+              </div>
+            ) : null}
             {hasFeedContent ? (
               <ol className="space-y-2.5 sm:space-y-3 xl:space-y-2.5" aria-live="polite">
                 {pending.map((entry) => (
                   <li key={entry.id}>
-                    <PendingMessageRow pending={entry} />
+                    <PendingMessageRow pending={entry} locale={locale} nowMs={nowMs} />
                   </li>
                 ))}
                 {feedItems.map((item, index) => {
                   if (item.type === 'system') {
                     return (
                       <li key={item.event.id}>
-                        <SystemEventRow event={item.event} locale={locale} />
+                        <SystemEventRow event={item.event} locale={locale} nowMs={nowMs} />
                       </li>
                     );
                   }

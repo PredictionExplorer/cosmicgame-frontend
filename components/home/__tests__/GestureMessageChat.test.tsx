@@ -1,7 +1,9 @@
 import userEvent from '@testing-library/user-event';
 
-import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { getRelativeTime, shortenHex } from '@/utils';
 
+import { routing } from '@/i18n/routing';
+import type { GestureFeedSystemEvent } from '@/components/home/deck/feedSystemEvents';
 import type { GestureInfo } from '@/services/api';
 
 import { render, screen, within, act, checkA11y, fireEvent } from '@/test-utils';
@@ -53,7 +55,9 @@ describe('GestureMessageChat', () => {
     expect(screen.getByText('First signal')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Open gesture 2' })).not.toBeInTheDocument();
     expect(
-      screen.getByText('home.chat.cycleNumber(number=7) · home.chat.messageCount(count=1)'),
+      screen.getByText(
+        'home.chat.cycleNumber(number=7) · home.chat.messageCount(count=1) · home.chat.eventCount(count=0)',
+      ),
     ).toBeInTheDocument();
   });
 
@@ -70,7 +74,9 @@ describe('GestureMessageChat', () => {
     );
 
     expect(
-      screen.getByText('home.chat.cycleNumber(number=9) · home.chat.messageCount(count=2)'),
+      screen.getByText(
+        'home.chat.cycleNumber(number=9) · home.chat.messageCount(count=2) · home.chat.eventCount(count=0)',
+      ),
     ).toBeInTheDocument();
   });
 
@@ -100,11 +106,9 @@ describe('GestureMessageChat', () => {
     expect(await screen.findAllByText('home.chat.joinTooltip')).not.toHaveLength(0);
   });
 
-  it('renders the address, relative time, and message body', async () => {
-    const user = userEvent.setup();
+  it('renders the address, visible exact UTC time, relative age, and message body', () => {
     const participant = '0x2222222222222222222222222222222222222222';
     const timestamp = Math.floor(Date.now() / 1000) - 300;
-    const absolute = convertTimestampToDateTime(timestamp, true);
 
     render(
       <GestureMessageChat
@@ -130,10 +134,9 @@ describe('GestureMessageChat', () => {
     expect(positionBadge).toHaveAttribute('href', '/gesture/9');
     expect(positionBadge).toHaveTextContent('#3');
 
-    const time = screen.getByText(/^[45] minutes ago$/);
+    const time = screen.getByText(/^[45] minutes ago$/).closest('time');
     expect(time).toHaveAttribute('dateTime', new Date(timestamp * 1000).toISOString());
-    await user.hover(time);
-    expect(await screen.findAllByText(absolute)).not.toHaveLength(0);
+    expect(time).toHaveTextContent(/\d{4}, \d{2}:\d{2}:\d{2} UTC/);
 
     expect(screen.getByText('A carefully timed gesture.')).toBeInTheDocument();
   });
@@ -240,7 +243,9 @@ describe('GestureMessageChat', () => {
       'xl:min-h-0',
     );
     expect(
-      screen.getByText('home.chat.currentCycle · home.chat.messageCount(count=0)'),
+      screen.getByText(
+        'home.chat.currentCycle · home.chat.messageCount(count=0) · home.chat.eventCount(count=0)',
+      ),
     ).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'home.chat.empty.cta' })).not.toBeInTheDocument();
   });
@@ -389,6 +394,7 @@ describe('GestureMessageChat', () => {
     expect(screen.getByText('home.chat.system.cycleStart(number=7)')).toBeInTheDocument();
     // The header count stays messages-only.
     expect(screen.getByText(/home\.chat\.messageCount\(count=2\)/)).toBeInTheDocument();
+    expect(screen.getByText(/home\.chat\.eventCount\(count=2\)/)).toBeInTheDocument();
   });
 
   it('shows pending optimistic messages on top of the feed while confirming', () => {
@@ -400,6 +406,7 @@ describe('GestureMessageChat', () => {
             id: 'pending-1',
             address: '0x2222222222222222222222222222222222222222',
             message: 'my fresh message',
+            timestamp: 1_700_000_200,
           },
         ]}
       />,
@@ -408,6 +415,11 @@ describe('GestureMessageChat', () => {
     const pendingRow = screen.getByTestId('chat-pending-message');
     expect(pendingRow).toHaveTextContent('my fresh message');
     expect(pendingRow).toHaveTextContent('home.chat.pending.label');
+    expect(pendingRow.querySelector('time')).toHaveAttribute(
+      'dateTime',
+      '2023-11-14T22:16:40.000Z',
+    );
+    expect(pendingRow.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:16:40 UTC');
     // Pending rows render before the indexed feed.
     const listItems = screen.getAllByRole('listitem');
     expect(listItems[0]).toContainElement(pendingRow);
@@ -424,6 +436,7 @@ describe('GestureMessageChat', () => {
             id: 'pending-1',
             address: '0x2222222222222222222222222222222222222222',
             message: 'first ever message',
+            timestamp: 1_700_000_200,
           },
         ]}
       />,
@@ -454,19 +467,139 @@ describe('GestureMessageChat', () => {
     expect(event).toHaveTextContent(/home\.chat\.system\.chronoLead/);
   });
 
-  it('keeps the empty state (and its CTA) when only system events exist', () => {
+  it('shows events and their timestamps alongside a join CTA when no participant messages exist', async () => {
+    const user = userEvent.setup();
+    const onJoinCta = jest.fn();
     render(
       <GestureMessageChat
         gestures={[makeGesture({ Message: '' })]}
         systemEvents={[
           { id: 'cycle-start-7', timestamp: 1_700_000_000, kind: 'cycleStart', cycleNumber: 7 },
         ]}
-        onJoinCta={jest.fn()}
+        onJoinCta={onJoinCta}
       />,
     );
 
-    expect(screen.getByText('home.chat.empty.title')).toBeInTheDocument();
-    expect(screen.queryByTestId('chat-system-event')).not.toBeInTheDocument();
+    expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
+    const event = screen.getByTestId('chat-system-event');
+    expect(event).toHaveTextContent('home.chat.system.cycleStart(number=7)');
+    expect(event.querySelector('time')).toHaveAttribute('dateTime', '2023-11-14T22:13:20.000Z');
+    expect(event.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:13:20 UTC');
+    expect(event.querySelector('time')).toHaveTextContent(/ago/);
+    expect(screen.getByText(/home\.chat\.messageCount\(count=0\)/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'home.chat.empty.cta' }));
+    expect(onJoinCta).toHaveBeenCalledTimes(1);
+  });
+
+  it.each<GestureFeedSystemEvent['kind']>([
+    'cycleOpen',
+    'enduranceGrowing',
+    'chronoReignEnded',
+    'finalCstLeader',
+    'newParticipant',
+    'gestureMilestone',
+    'cstCalibrationReady',
+    'finalWindow',
+    'clockExtended',
+    'clockReopened',
+    'finalizationAvailable',
+    'cycleFinalized',
+  ])('renders %s with its own localized copy and exact event time', (kind) => {
+    render(
+      <GestureMessageChat
+        gestures={[]}
+        systemEvents={[
+          {
+            id: kind,
+            kind,
+            timestamp: 1_700_000_000,
+            address: '0x3333333333333333333333333333333333333333',
+            durationSeconds: 1_300,
+            cycleNumber: 7,
+            count: 10,
+          },
+        ]}
+      />,
+    );
+
+    const event = screen.getByTestId('chat-system-event');
+    expect(event).toHaveAttribute('data-kind', kind);
+    expect(event).toHaveTextContent(`home.chat.system.${kind}(`);
+    expect(event.querySelector('time')).toHaveAttribute('dateTime', '2023-11-14T22:13:20.000Z');
+    expect(event.querySelector('time')).toHaveTextContent('Nov 14, 2023, 22:13:20 UTC');
+    expect(screen.getByText(/home\.chat\.eventCount\(count=1\)/)).toBeInTheDocument();
+  });
+
+  it('refreshes relative ages for messages and events while preserving their exact times', () => {
+    jest.useFakeTimers();
+    const realNow = Date.now();
+    const nowSeconds = Math.floor(realNow / 1000);
+    const messageTimestamp = nowSeconds - 8 * 3_600;
+    const eventTimestamp = nowSeconds - 3 * 86_400;
+    try {
+      render(
+        <GestureMessageChat
+          gestures={[makeGesture({ TimeStamp: messageTimestamp })]}
+          systemEvents={[
+            { id: 'start', timestamp: eventTimestamp, kind: 'cycleStart', cycleNumber: 7 },
+          ]}
+        />,
+      );
+      act(() => jest.advanceTimersByTime(30_000));
+
+      const messageTime = screen.getByText('8 hours ago').closest('time');
+      const eventTime = screen.getByText('3 days ago').closest('time');
+      expect(messageTime).toHaveAttribute(
+        'dateTime',
+        new Date(messageTimestamp * 1000).toISOString(),
+      );
+      expect(eventTime).toHaveAttribute('dateTime', new Date(eventTimestamp * 1000).toISOString());
+
+      act(() => {
+        jest.setSystemTime(realNow + 86_400_000);
+        jest.advanceTimersByTime(30_000);
+      });
+
+      expect(messageTime).toHaveTextContent('1 day ago');
+      expect(eventTime).toHaveTextContent('4 days ago');
+      expect(messageTime).toHaveAttribute(
+        'dateTime',
+        new Date(messageTimestamp * 1000).toISOString(),
+      );
+      expect(eventTime).toHaveAttribute('dateTime', new Date(eventTimestamp * 1000).toISOString());
+      // Clock ticks must not repeatedly announce every age in the live feed.
+      expect(messageTime).toHaveAttribute('aria-live', 'off');
+      expect(eventTime).toHaveAttribute('aria-live', 'off');
+    } finally {
+      act(() => {
+        jest.setSystemTime(realNow);
+        jest.advanceTimersByTime(30_000);
+      });
+      jest.useRealTimers();
+    }
+  });
+
+  it.each(routing.locales)('localizes exact dates and relative ages in %s', (locale) => {
+    const nextIntl = jest.requireMock('next-intl') as { useLocale: () => string };
+    const localeSpy = jest.spyOn(nextIntl, 'useLocale').mockReturnValue(locale);
+    const timestamp = Math.floor(Date.now() / 1000) - 3 * 86_400;
+    try {
+      render(
+        <GestureMessageChat
+          gestures={[]}
+          systemEvents={[{ id: 'start', timestamp, kind: 'cycleStart', cycleNumber: 7 }]}
+        />,
+      );
+      const time = screen.getByTestId('chat-system-event').querySelector('time');
+      expect(time).toHaveTextContent(getRelativeTime(timestamp, timestamp + 3 * 86_400, locale));
+      expect(time).toHaveAttribute('dateTime', new Date(timestamp * 1000).toISOString());
+      expect(time?.firstElementChild?.textContent).toContain('UTC');
+      expect(time?.firstElementChild?.textContent).toContain(
+        String(new Date(timestamp * 1000).getUTCFullYear()),
+      );
+    } finally {
+      localeSpy.mockRestore();
+    }
   });
 
   it('has no accessibility violations', async () => {
