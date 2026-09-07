@@ -68,9 +68,25 @@ for (const host of ['app', 'landing'] as const) {
         hydrationErrors.push(message.text());
     });
     await page.goto('/');
+    const logoColors = new Set<string>();
     for (const theme of SITE_THEMES) {
       await chooseTheme(page, theme);
       await assertPaletteContrast(page);
+      const logos = page.locator('[data-brand-mark]');
+      await expect(logos.first()).toBeVisible();
+      const paints = await logos.evaluateAll((elements) =>
+        elements.map((element) => {
+          const style = getComputedStyle(element);
+          return { color: style.backgroundColor, artwork: style.maskImage };
+        }),
+      );
+      expect(paints.length).toBeGreaterThanOrEqual(2);
+      for (const paint of paints) {
+        expect(paint.artwork).toContain('/images/logo2.svg');
+        expect(paint.color).not.toBe('rgba(0, 0, 0, 0)');
+        expect(paint.color).toBe(paints[0]!.color);
+      }
+      logoColors.add(paints[0]!.color);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
@@ -82,8 +98,13 @@ for (const host of ['app', 'landing'] as const) {
       await page.reload();
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     }
+    expect(logoColors.size).toBe(SITE_THEMES.length);
     await page.goto(host === 'landing' ? '/about' : '/faq');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'ember');
+    await expect(page.locator('[data-brand-mark]').first()).toHaveCSS(
+      'background-color',
+      [...logoColors].at(-1)!,
+    );
     await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible();
     expect(hydrationErrors).toEqual([]);
   });

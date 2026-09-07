@@ -17,6 +17,8 @@ accent; Aurora, Nebula, and Ember add coordinated dark palettes.
 - `components/theme/ThemeSwitcher.tsx` uses the shared Radix radio menu for arrow
   keys, typeahead, selected-state announcements, Escape, and focus return. Names
   and descriptions live in every locale's `common.json`.
+- `components/layout/BrandMark.tsx` applies the primary color through an alpha mask
+  of the original logo asset, preserving its geometry across every palette.
 - The wallet theme consumes CSS variables directly. `components/three/scene-palette.ts`
   converts the same HSL values for WebGL; material changes preserve animation state.
 

@@ -1,18 +1,14 @@
-import Image from 'next/image';
-
 import { cn } from '@/lib/utils';
 
-/** Original brand artwork; the adjacent wordmark or home link supplies its accessible name. */
+import styles from './BrandMark.module.css';
+
+/** Original logo silhouette, colored by the shared palette; its home link supplies the name. */
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <Image
-      src="/images/logo2.svg"
-      width={48}
-      height={48}
-      alt=""
+    <span
+      data-brand-mark
       aria-hidden="true"
-      loading="eager"
-      className={cn('shrink-0 object-contain', className)}
+      className={cn('inline-block h-12 w-12 shrink-0', styles.mark, className)}
     />
   );
 }

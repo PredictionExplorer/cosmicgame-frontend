@@ -33,7 +33,7 @@ describe('Footer', () => {
   it('renders a decorative logo within the labeled home link', () => {
     const logo = screen
       .getByRole('link', { name: 'nav.brand.homeLabel' })
-      .querySelector('img[src="/images/logo2.svg"]');
+      .querySelector('[data-brand-mark]');
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute('aria-hidden', 'true');
   });
