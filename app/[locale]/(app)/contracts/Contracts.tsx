@@ -98,6 +98,7 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const [v3Config, setV3Config] = useState<{
     mainPrizeNumNfts: number;
     lateBidDurationSeconds: number;
+    cstBidPriceDeclinePerSecond: number;
   } | null>(null);
 
   const charityWalletContract = useContractNoSigner(charity, CHARITY_WALLET_ABI);
@@ -173,16 +174,18 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     // errors — expected, so they are swallowed rather than reported.
     void (async () => {
       try {
-        const [numNfts, lateBidDuration] = await Promise.all([
+        const [declineMultiplier, numNfts, lateBidDuration] = await Promise.all([
+          cosmicGameContract.read.cstBidPriceDeclineMultiplier?.() as Promise<bigint | undefined>,
           cosmicGameContract.read.mainPrizeNumCosmicSignatureNfts?.() as Promise<
             bigint | undefined
           >,
           cosmicGameContract.read.getRoundLateBidDuration?.() as Promise<bigint | undefined>,
         ]);
-        if (numNfts === undefined) return;
+        if (declineMultiplier === undefined || numNfts === undefined) return;
         setV3Config({
           mainPrizeNumNfts: Number(numNfts),
           lateBidDurationSeconds: Number(lateBidDuration ?? 0n),
+          cstBidPriceDeclinePerSecond: Number(formatEther(declineMultiplier)),
         });
       } catch (e) {
         // On V2 the selectors are absent; behind the proxy this surfaces as a reasonless revert.

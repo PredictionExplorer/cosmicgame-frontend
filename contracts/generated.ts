@@ -2916,7 +2916,7 @@ export const cosmicGameAbi = [
         indexed: false,
       },
       {
-        name: 'cstDutchAuctionDuration',
+        name: 'cstBidPriceDeclineMultiplier',
         internalType: 'uint256',
         type: 'uint256',
         indexed: false,
@@ -2991,8 +2991,7 @@ export const cosmicGameAbi = [
     ],
     name: 'BidCstRewardAmountMinLimitNotReached',
   },
-  { type: 'error', inputs: [], name: 'BidPlacedWithinCurrentSecond' },
-  { type: 'error', inputs: [], name: 'ZeroValue' },
+  { type: 'error', inputs: [], name: 'NotImplemented' },
   {
     type: 'event',
     anonymous: false,
@@ -3005,6 +3004,32 @@ export const cosmicGameAbi = [
       },
     ],
     name: 'BidCstRewardAmountMultiplierChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'newValue',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'CstBidPriceDeclineMultiplierChangeDivisorChanged',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'newValue',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'CstBidPriceDeclineMultiplierChanged',
   },
   {
     type: 'event',
@@ -3087,12 +3112,16 @@ export const cosmicGameAbi = [
   { type: 'fallback', stateMutability: 'payable' },
   {
     type: 'function',
-    inputs: [
-      { name: 'roundNum', internalType: 'uint256', type: 'uint256' },
-      { name: 'bidNum', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'bidRaffleCumulativeWeights',
-    outputs: [{ name: 'cumulativeWeight', internalType: 'uint256', type: 'uint256' }],
+    inputs: [],
+    name: 'cstBidPriceDeclineMultiplier',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'cstBidPriceDeclineMultiplierChangeDivisor',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
   },
   {
@@ -3106,6 +3135,20 @@ export const cosmicGameAbi = [
     type: 'function',
     inputs: [{ name: 'newValue_', internalType: 'uint256', type: 'uint256' }],
     name: 'setBidCstRewardAmountMultiplier',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newValue_', internalType: 'uint256', type: 'uint256' }],
+    name: 'setCstBidPriceDeclineMultiplier',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newValue_', internalType: 'uint256', type: 'uint256' }],
+    name: 'setCstBidPriceDeclineMultiplierChangeDivisor',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -3150,6 +3193,37 @@ export const cosmicGameAbi = [
     name: 'setRoundLateBidPricePremiumAmountExponent',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'roundNum_', internalType: 'uint256', type: 'uint256' },
+      { name: 'bidIndex_', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'getBidInfoAt',
+    outputs: [
+      {
+        name: '',
+        internalType: 'struct ICosmicSignatureGameStorage.BidInfo',
+        type: 'tuple',
+        components: [
+          { name: 'bidderAddress', internalType: 'address', type: 'address' },
+          {
+            name: 'raffleCumulativeWeight',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'roundNum', internalType: 'uint256', type: 'uint256' }],
+    name: 'bidsInfo',
+    outputs: [{ name: 'numItems', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
 ] as const;
 

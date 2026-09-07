@@ -135,6 +135,11 @@
         "label": "訊息長度上限",
         "tooltip": "落筆訊息允許輸入的最大字元數。"
       },
+      "v3CstDecline": {
+        "label": "CST 價格下降速率",
+        "value": "{amount} CST/分鐘",
+        "tooltip": "CST 落筆價格在 CST 校準窗口中的下降速度。每次參與 CST 銘刻全額記入被超越的參與者。"
+      },
       "v3SignatureNfts": {
         "label": "簽名配額 NFT 數量",
         "tooltip": "週期收官時為簽名配額獲配者銘刻的 Cosmic Signature NFT 數量（連續編號）。"

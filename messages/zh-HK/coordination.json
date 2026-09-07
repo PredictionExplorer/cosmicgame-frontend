@@ -44,6 +44,14 @@
     "allocationRetrievalTimeout": "分配取回超時時間已變更",
     "ethCalibrationDurationDivisor": "ETH 校準窗口時長除數已變更",
     "ethCalibrationEndingCostDivisor": "ETH 校準窗口收尾落筆價格除數已變更",
-    "chronoWarriorEthPercentage": "時之勇士 ETH 分配比例已變更"
+    "chronoWarriorEthPercentage": "時之勇士 ETH 分配比例已變更",
+    "cstCalibrationDurationChangeDivisor": "CST 校準窗口時長調整除數已變更",
+    "lateGestureWindowDivisor": "臨近收官落筆窗口除數已變更",
+    "lateGesturePremiumBaseMultiplier": "臨近收官落筆溢價基礎乘數已變更",
+    "lateGesturePremiumExponent": "臨近收官落筆溢價指數已變更",
+    "cstGestureCostDeclineRate": "CST 價格下降速率已變更",
+    "signatureAllocationNftCount": "簽名配額 NFT 數量已變更",
+    "cstGestureCostDeclineChangeDivisor": "CST 價格下降速率調整除數已變更",
+    "ethGestureRefundGasLimit": "ETH 落筆退款燃氣上限已變更"
   }
 }

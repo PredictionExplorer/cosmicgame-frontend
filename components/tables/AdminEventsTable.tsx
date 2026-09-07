@@ -85,6 +85,8 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
           `${row.IntegerValue}%`
         ) : event?.type === 'number' ? (
           row.IntegerValue
+        ) : event?.type === 'float' ? (
+          row.FloatValue
         ) : event?.type === 'time' ? (
           formatSeconds(row.IntegerValue, locale)
         ) : event?.type === 'address' ? (
