@@ -369,7 +369,7 @@ export function GestureMessageChat({
         <div className="pointer-events-none absolute -left-12 bottom-0 h-36 w-36 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
 
         <div className="relative z-[1] flex h-full min-h-0 flex-col">
-          <div className="border-b border-white/[0.07] p-4 sm:p-5 xl:p-4">
+          <div className="shrink-0 border-b border-white/[0.07] p-4 sm:p-5 xl:p-4">
             <div className="flex items-start justify-between gap-2.5">
               <div className="min-w-0">
                 <div className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -425,9 +425,10 @@ export function GestureMessageChat({
             role="region"
             aria-labelledby="gesture-message-chat-title"
             tabIndex={0}
-            // Phones stay in the document flow. Tablet-sized feeds and the
-            // deliberately capped desktop panel scroll here instead.
-            className="relative z-[1] min-h-0 flex-1 overflow-y-visible p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60 sm:p-4 lg:max-h-[calc(100vh-13rem)] lg:overflow-y-auto xl:max-h-none xl:overflow-y-auto xl:p-4 xl:[scrollbar-gutter:stable] print:max-h-none print:overflow-visible print:[scrollbar-gutter:auto]"
+            // Keep history within a viewport-sized reading area on phones.
+            // svh stays stable as browser chrome opens/closes; desktop fills
+            // the sized panel. Native scrolling preserves touch and keyboard access.
+            className="relative z-[1] max-h-[min(28rem,55svh)] min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60 sm:p-4 lg:max-h-[calc(100vh-13rem)] xl:max-h-none xl:p-4 xl:[scrollbar-gutter:stable] print:max-h-none print:overflow-visible print:[scrollbar-gutter:auto]"
           >
             {hasFeedContent && messages.length === 0 && pending.length === 0 && onJoinCta ? (
               <div className="mb-3">

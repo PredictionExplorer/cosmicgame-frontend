@@ -89,6 +89,7 @@ export default defineConfig({
       // convention and also checks its countdown at tablet and desktop widths.
       name: 'Mobile Safari',
       testMatch: [
+        '**/home-chat-layout.mobile.spec.ts',
         '**/mobile-overflow.mobile.spec.ts',
         '**/mobile-tap-targets.mobile.spec.ts',
         '**/landing-responsive.spec.ts',

@@ -261,7 +261,7 @@ describe('GestureMessageChat', () => {
     expect(onJoinCta).toHaveBeenCalledTimes(1);
   });
 
-  it('uses compact responsive layout and an accessible desktop scroller', () => {
+  it('uses compact responsive layout and an accessible scroller at every size', () => {
     const participant = '0x4444444444444444444444444444444444444444';
 
     render(
@@ -281,11 +281,11 @@ describe('GestureMessageChat', () => {
     expect(scroll).toHaveAttribute('tabIndex', '0');
     expect(scroll).toHaveClass(
       'min-h-0',
-      'overflow-y-visible',
+      'max-h-[min(28rem,55svh)]',
+      'overflow-y-auto',
+      'overscroll-y-contain',
       'lg:max-h-[calc(100vh-13rem)]',
-      'lg:overflow-y-auto',
       'xl:max-h-none',
-      'xl:overflow-y-auto',
       'xl:p-4',
       'print:max-h-none',
       'print:overflow-visible',

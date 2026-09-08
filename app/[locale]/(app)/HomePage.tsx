@@ -789,7 +789,7 @@ const HomePage = ({
             className="mt-2 grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,23rem)]"
           >
             <div data-testid="home-feed-column" className="min-w-0">
-              {/* Height only at lg+: phones keep the feed in document flow. */}
+              {/* Desktop sizes the panel; chat caps its reading area on phones. */}
               <MemoGestureMessageChat
                 gestures={curGestureList}
                 cycleNumber={round >= 0 ? round : undefined}

@@ -44,7 +44,7 @@ The current-cycle controls come first. The next row pairs a capped, internally s
 
 Asset cards use their available container width: wide cards place media beside details, while narrow cards stack them. Two or four previews use two columns, and larger groups use three columns on wide screens. All previewed assets and links remain accessible.
 
-On phones, the grid stacks and the feed expands naturally with the page instead of creating a nested vertical scroller. Compact padding, stacked participant metadata, safe text wrapping, and 44px touch targets keep the panel usable down to 320px. Tablet-sized feeds may scroll internally when they exceed the available viewport height.
+On phones and tablets below the desktop breakpoint, the grid stacks and the message area scrolls within a maximum height of `min(28rem, 55svh)`. Short feeds shrink to their content; long histories cannot stretch the page. The small viewport unit keeps the reading area stable as mobile browser controls appear or disappear, and there is no minimum height forcing it beyond a short landscape viewport. The heading remains outside the scroller. Native scrolling, a named keyboard-focusable region, a visible focus ring, and contained vertical overscroll keep history accessible without moving the page when the feed reaches an edge. Compact padding, stacked participant metadata, safe text wrapping, and 44px touch targets keep the panel usable down to 320px. Print styles remove the height cap and expose the full history.
 
 ## Test Coverage
 
@@ -65,7 +65,11 @@ URL segmentation coverage lives in `utils/__tests__/linkify.test.ts`, and the co
 
 Home-page integration coverage lives in `app/[locale]/(app)/__tests__/HomePage.test.tsx` and verifies the panel receives the current-cycle gesture feed, the primary gesture flow remains in the main column, the full-width attachment section follows the feed only when data exists, and the chat empty-state CTA expands the gesture form's Advanced options.
 
-E2E coverage lives in `e2e/home-gesture-chat.spec.ts` and mocks current-cycle API responses to verify the panel renders the expected messages, caps and scrolls a long desktop feed, expands a long phone feed without nested scrolling, keeps the next full-width section close to the chat even with many attached assets, and does not overlap the primary column. The mobile overflow and tap-target audits exercise the home feed at 320px, 375px, and 414px in Chromium and WebKit.
+E2E coverage lives in `e2e/home-gesture-chat.spec.ts` and mocks current-cycle API responses to verify the panel renders the expected messages, caps and scrolls long feeds across screen sizes, keeps the next full-width section close to the chat even with many attached assets, and does not overlap the primary column. The mobile overflow and tap-target audits exercise the home feed at 320px, 375px, and 414px in Chromium and WebKit.
+
+`e2e/home-chat-layout.mobile.spec.ts` checks small phones, tablets, and landscape in Chromium and WebKit, including reaching older messages, keeping the heading in place, stable page height when history grows from 12 to 120 messages, and exposing the complete feed in print. Shared API fixtures live in `e2e/home-gesture-chat-fixtures.ts`.
+
+The separate [pagination proposal](./chat-pagination-proposal.md) reviews the backend and describes how to reduce history transfer without changing the other homepage features that use the same data.
 
 ## Validation Commands
 
