@@ -142,6 +142,10 @@ export async function mockHomeGestureChatApi(
   roleSnapshot = specialRecipients,
   cstPriceWei = '20000000000000000000',
 ) {
+  await page.unroute('**/api/v2/cosmicgame/**');
+  await page.route('**/api/v2/cosmicgame/**', (route) =>
+    route.fulfill({ status: 404, json: { error: 'Not found' } }),
+  );
   await page.route('**/api/cosmicgame/**', async (route) => {
     const url = new URL(route.request().url());
     const path = url.pathname;
@@ -163,7 +167,10 @@ export async function mockHomeGestureChatApi(
 
     // lexicon-allow-start: backend route paths are sealed API contracts.
     if (path.includes(`/bid/list/by_round/${CYCLE_NUMBER}/1/`)) {
-      await route.fulfill({ json: { BidsByRound: gestureFeed } });
+      const feed = path.endsWith('/0/1')
+        ? [...gestureFeed].sort((a, b) => b.Tx.TimeStamp - a.Tx.TimeStamp).slice(0, 1)
+        : gestureFeed;
+      await route.fulfill({ json: { BidsByRound: feed } });
       return;
     }
 
@@ -217,4 +224,121 @@ export async function mockHomeGestureChatApi(
 
     await route.fulfill({ json: {} });
   });
+}
+
+/** Compact v2 responses plus controls for repeatable history/recovery scenarios. */
+export async function mockPagedHomeGestureChatApi(
+  page: Page,
+  options: { initialFailures?: number; olderFailures?: number } = {},
+) {
+  const legacyFeed = makeLongGestureFeed(120);
+  await mockHomeGestureChatApi(page, legacyFeed);
+  await page.unroute('**/api/v2/cosmicgame/**');
+  const requests: URL[] = [];
+  let initialFailures = options.initialFailures ?? 0;
+  let olderFailures = options.olderFailures ?? 0;
+  let revision = '1';
+  let syncCursor = 'sync-1';
+  let sendNewMessage = false;
+  let resetOnSync = false;
+  // lexicon-allow-start: these names are the sealed v2 chat wire format.
+  const rows = legacyFeed.map((entry, index) => ({
+    eventLogId: entry.Tx.EvtLogId,
+    round: CYCLE_NUMBER,
+    position: legacyFeed.length - index,
+    bidderAddress: entry.BidderAddr,
+    occurredAt: new Date(entry.Tx.TimeStamp * 1_000).toISOString(),
+    message: entry.Message,
+    bidType: 'eth' as const,
+    transactionHash: entry.Tx.TxHash,
+    ethPriceWei: '100000000000000000',
+  }));
+  const liveMessage = {
+    ...rows[0]!,
+    eventLogId: 9999,
+    position: 121,
+    occurredAt: new Date(MOCK_NOW_SECONDS * 1_000).toISOString(),
+    message: 'New live message',
+  };
+  await page.route('**/api/v2/cosmicgame/**', async (route) => {
+    const url = new URL(route.request().url());
+    requests.push(url);
+    // The server-rendered bootstrap may precede the mocked dashboard. Keep
+    // that earlier cycle valid without consuming the target cycle's failures.
+    if (!url.pathname.includes(`/rounds/${CYCLE_NUMBER}/`)) {
+      await route.fulfill({
+        json: {
+          data: [],
+          meta: url.pathname.endsWith('/messages')
+            ? { limit: 50, syncCursor: 'bootstrap', hasMore: false, revision: '1' }
+            : { revision: '1' },
+        },
+      });
+      return;
+    }
+    if (url.pathname.endsWith('/chat-context')) {
+      await route.fulfill({
+        json: {
+          data: rows.toReversed().map((row) => ({
+            eventLogId: row.eventLogId,
+            round: row.round,
+            position: row.position,
+            bidderAddress: row.bidderAddress,
+            occurredAt: row.occurredAt,
+            bidType: row.bidType,
+            prizeAt: new Date((MOCK_NOW_SECONDS + 3_600) * 1_000).toISOString(),
+            cstDutchAuctionDurationSeconds: 3_600,
+          })),
+          meta: { revision },
+        },
+      });
+      return;
+    }
+    if (!url.pathname.endsWith('/messages')) {
+      await route.fulfill({ status: 404, json: { error: 'Not found' } });
+      return;
+    }
+    const cursor = url.searchParams.get('cursor');
+    const after = url.searchParams.get('after');
+    if (after) {
+      if (resetOnSync) {
+        resetOnSync = false;
+        revision = '2';
+        syncCursor = 'sync-corrected';
+        rows[0]!.message = 'Corrected history message';
+        await route.fulfill({
+          status: 409,
+          json: { type: 'https://cosmicsignature.com/problems/feed-reset-required' },
+        });
+        return;
+      }
+      const data = sendNewMessage ? [liveMessage] : [];
+      if (sendNewMessage) syncCursor = 'sync-2';
+      sendNewMessage = false;
+      await route.fulfill({
+        json: { data, meta: { limit: 50, syncCursor, hasMore: false, revision } },
+      });
+      return;
+    }
+    if ((cursor && olderFailures-- > 0) || (!cursor && initialFailures-- > 0)) {
+      await route.fulfill({ status: 503, json: { error: 'Temporarily unavailable' } });
+      return;
+    }
+    const offset = cursor ? Number(cursor.split('-')[1]) : 0;
+    const data = rows.slice(offset, offset + 50);
+    const nextCursor = offset + 50 < rows.length ? `older-${offset + 50}` : undefined;
+    await route.fulfill({
+      json: { data, meta: { limit: 50, nextCursor, syncCursor, hasMore: false, revision } },
+    });
+  });
+  // lexicon-allow-end
+  return {
+    requests,
+    addLiveMessage: () => {
+      sendNewMessage = true;
+    },
+    correctHistory: () => {
+      resetOnSync = true;
+    },
+  };
 }

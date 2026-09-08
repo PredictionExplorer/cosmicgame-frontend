@@ -6,11 +6,9 @@ import { GestureStatus } from '../GestureStatus';
 
 const mockCountdownProps: Array<Record<string, unknown>> = [];
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
-const mockUseUserInfo = jest.fn().mockReturnValue({ data: undefined });
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
-  useUserInfo: (...args: unknown[]) => mockUseUserInfo(...args),
 }));
 
 jest.mock('../../../hooks/web3', () => ({
@@ -206,16 +204,15 @@ describe('GestureStatus', () => {
   });
 
   it('shows cycle standing copy without restricted chance wording', () => {
-    mockUseUserInfo.mockReturnValueOnce({
-      data: { Gestures: [{ RoundNum: 5 }] },
-    });
-
     render(
       <GestureStatus
         {...baseProps}
         data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
         allocationTime={Date.now() + 60000}
-        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        curGestureList={[
+          { RoundNum: 5, BidderAddr: '0xUser' } as never,
+          { RoundNum: 5, BidderAddr: '0xOther' } as never,
+        ]}
         ethGestureInfo={{ ETHPrice: 0.01 }}
       />,
     );
@@ -224,17 +221,36 @@ describe('GestureStatus', () => {
     expect(screen.queryByText('Your Chances')).not.toBeInTheDocument();
   });
 
-  it('includes attached NFTs in the latest gesture maker Signature Allocation copy', () => {
-    mockUseUserInfo.mockReturnValueOnce({
-      data: { Gestures: [{ RoundNum: 5 }] },
-    });
+  it('calculates standing from the complete metadata list without message bodies', () => {
+    const metadata = Array.from({ length: 60 }, (_, index) => ({
+      RoundNum: 5,
+      BidderAddr: index < 6 ? '0xUSER' : '0xOther',
+    }));
 
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={activeData as never}
+        allocationTime={Date.now() + 60000}
+        curGestureList={metadata as never}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+      />,
+    );
+
+    expect(screen.getByText('27.1%')).toBeInTheDocument();
+    expect(screen.getByText('19.0%')).toBeInTheDocument();
+  });
+
+  it('includes attached NFTs in the latest gesture maker Signature Allocation copy', () => {
     render(
       <GestureStatus
         {...baseProps}
         data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
         allocationTime={Date.now() + 60000}
-        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        curGestureList={[
+          { RoundNum: 5, BidderAddr: '0xUser' } as never,
+          { RoundNum: 5, BidderAddr: '0xOther' } as never,
+        ]}
         ethGestureInfo={{ ETHPrice: 0.01 }}
         attachedNFTCount={3}
       />,
@@ -246,16 +262,15 @@ describe('GestureStatus', () => {
   });
 
   it('includes attached ERC20 tokens in the latest gesture maker Signature Allocation copy', () => {
-    mockUseUserInfo.mockReturnValueOnce({
-      data: { Gestures: [{ RoundNum: 5 }] },
-    });
-
     render(
       <GestureStatus
         {...baseProps}
         data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
         allocationTime={Date.now() + 60000}
-        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        curGestureList={[
+          { RoundNum: 5, BidderAddr: '0xUser' } as never,
+          { RoundNum: 5, BidderAddr: '0xOther' } as never,
+        ]}
         ethGestureInfo={{ ETHPrice: 0.01 }}
         attachedERC20Count={2}
       />,
@@ -267,16 +282,15 @@ describe('GestureStatus', () => {
   });
 
   it('combines attached NFTs and ERC20 tokens in the latest gesture maker copy', () => {
-    mockUseUserInfo.mockReturnValueOnce({
-      data: { Gestures: [{ RoundNum: 5 }] },
-    });
-
     render(
       <GestureStatus
         {...baseProps}
         data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
         allocationTime={Date.now() + 60000}
-        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        curGestureList={[
+          { RoundNum: 5, BidderAddr: '0xUser' } as never,
+          { RoundNum: 5, BidderAddr: '0xOther' } as never,
+        ]}
         ethGestureInfo={{ ETHPrice: 0.01 }}
         attachedNFTCount={3}
         attachedERC20Count={1}
@@ -291,16 +305,15 @@ describe('GestureStatus', () => {
   });
 
   it('omits attached NFT copy when no attached NFTs are available', () => {
-    mockUseUserInfo.mockReturnValueOnce({
-      data: { Gestures: [{ RoundNum: 5 }] },
-    });
-
     render(
       <GestureStatus
         {...baseProps}
         data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
         allocationTime={Date.now() + 60000}
-        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        curGestureList={[
+          { RoundNum: 5, BidderAddr: '0xUser' } as never,
+          { RoundNum: 5, BidderAddr: '0xOther' } as never,
+        ]}
         ethGestureInfo={{ ETHPrice: 0.01 }}
       />,
     );

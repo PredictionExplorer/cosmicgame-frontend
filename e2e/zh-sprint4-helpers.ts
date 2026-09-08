@@ -177,6 +177,10 @@ const rewardsByToken = {
  * so no assertion depends on the current protocol cycle.
  */
 export async function mockSprint4Api(page: Page): Promise<void> {
+  // Keep capability probes inside this synthetic legacy backend as well.
+  await page.route('**/api/v2/cosmicgame/**', (route) =>
+    route.fulfill({ status: 404, json: { error: 'V2 API unavailable in legacy fixture' } }),
+  );
   await page.route('**/api/cosmicgame/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
 

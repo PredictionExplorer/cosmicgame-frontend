@@ -33,6 +33,7 @@ import { PulseBar } from '@/components/home/observatory/PulseBar';
 import { getGestureSubmitLabel } from '@/components/home/observatory/gestureSubmitLabel';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import { useGestureForm } from '@/hooks/useGestureForm';
+import { useHomeGestureFeed } from '@/hooks/useHomeGestureFeed';
 import { useChampions } from '@/hooks/useChampions';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
@@ -51,7 +52,6 @@ import {
 } from '@/lib/gameAnalytics';
 import {
   useDashboardInfo,
-  useGestureListByCycle,
   useCurrentTime,
   useCSTInfo,
   useDonationsNFTByRound,
@@ -150,7 +150,7 @@ const HomePage = ({
         : undefined,
     [initialLatestGesture, round],
   );
-  const { data: bidListData } = useGestureListByCycle(round, 'desc', initialGestureList);
+  const feed = useHomeGestureFeed(round, initialGestureList);
   const { data: nftDonationsData } = useDonationsNFTByRound(round);
   const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
 
@@ -158,7 +158,17 @@ const HomePage = ({
   const loading = dashboardLoading;
   // Stable fallbacks: a bare `?? []` would mint a new array identity every
   // second (this page ticks via useNow) and defeat the memo boundaries.
-  const curGestureList = useMemo(() => bidListData ?? [], [bidListData]);
+  const curGestureList = feed.gestures;
+  const chatGestures = feed.chatGestures;
+  const chatPagination = useMemo(
+    () => ({
+      hasMore: feed.hasMore,
+      isLoading: feed.isLoadingOlder,
+      error: Boolean(feed.olderError),
+      onLoadMore: feed.loadOlder,
+    }),
+    [feed.hasMore, feed.isLoadingOlder, feed.olderError, feed.loadOlder],
+  );
   const donatedNFTs = useMemo(() => nftDonationsData ?? [], [nftDonationsData]);
   const donatedERC20Tokens = useMemo(() => erc20DonationsData ?? [], [erc20DonationsData]);
 
@@ -187,9 +197,9 @@ const HomePage = ({
     () =>
       resolveLatestGesture({
         dashboardLastAddress: data?.LastBidderAddr,
-        gestures: curGestureList,
+        gestures: feed.latestGesture ? [feed.latestGesture] : [],
       }),
-    [curGestureList, data?.LastBidderAddr],
+    [feed.latestGesture, data?.LastBidderAddr],
   );
   const latestGesture = latestResolution.gesture;
 
@@ -398,7 +408,7 @@ const HomePage = ({
       if (prev.length === 0) return prev;
       const next = prev.filter(
         (entry) =>
-          !curGestureList.some(
+          !chatGestures.some(
             (gesture) =>
               gesture.BidderAddr?.toLowerCase() === entry.address.toLowerCase() &&
               typeof gesture.Message === 'string' &&
@@ -407,7 +417,7 @@ const HomePage = ({
       );
       return next.length === prev.length ? prev : next;
     });
-  }, [curGestureList]);
+  }, [chatGestures]);
 
   const handleGesture = useCallback(
     async (source: GestureSurface = 'panel') => {
@@ -791,7 +801,13 @@ const HomePage = ({
             <div data-testid="home-feed-column" className="min-w-0">
               {/* Desktop sizes the panel; chat caps its reading area on phones. */}
               <MemoGestureMessageChat
-                gestures={curGestureList}
+                gestures={chatGestures}
+                pagination={chatPagination}
+                serverModerated={feed.mode === 'paged'}
+                isLoading={feed.isLoading}
+                error={Boolean(feed.error)}
+                onRetry={feed.retry}
+                resetKey={feed.resetKey}
                 cycleNumber={round >= 0 ? round : undefined}
                 pulseKey={gesturePulseKey}
                 onJoinCta={!loading && isRoundActive ? handleJoinChatCta : undefined}

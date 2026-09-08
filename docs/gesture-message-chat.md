@@ -11,7 +11,8 @@ The Gesture Message Chat surfaces the optional messages participants attach when
 - It shows only gestures whose `Message` field contains non-whitespace text.
 - Messages are ordered newest first by gesture `TimeStamp`, with `EvtLogId` as a deterministic tiebreaker.
 - Each entry displays the participant address (with a copy-to-clipboard button), a gesture method badge (cost + ETH/CST, plus `+ RWLK` for RandomWalk gestures), a relative timestamp ("5 minutes ago") with the absolute date/time in a tooltip and `<time dateTime>`, and the message body.
-- The header subtitle shows the visible message count for the cycle ("Cycle #7 · 3 messages").
+- The header subtitle shows loaded messages and displayed system events ("Cycle #7 · 3 messages"). It does not imply a cycle-wide total when older history is not loaded.
+- The initial history window contains at most 50 messages and 50 derived system events. "Load older" reveals the next group, with loading/retry states and preserved reading position.
 - `http(s)` and `www.` URLs inside message bodies are clickable via `LinkifiedText` (`components/ui/linkified-text.tsx`). Because messages are permissionless on-chain content, clicking a link opens a leave-site confirmation dialog that shows the full destination URL before `window.open(..., 'noopener,noreferrer')`. Links are rendered as buttons (no `href`), so the confirm step cannot be bypassed with middle/modified clicks. URL detection lives in `utils/linkify.ts` and only accepts http(s) destinations with dotted hostnames.
 - The same linkified rendering is used for the message on the gesture detail page (`app/(app)/gesture/[id]/GesturePage.tsx`). Truncated table cells (e.g. `GestureHistoryTable`) stay plain text.
 - Participant addresses link to `/user/{address}` and gesture ids link to `/gesture/{EvtLogId}`.
@@ -20,23 +21,13 @@ The Gesture Message Chat surfaces the optional messages participants attach when
 
 ## Data Source
 
-`app/HomePage.tsx` already fetches current-cycle gestures through:
+Both home layouts use `useHomeGestureFeed`. It detects the new v2 `/rounds/{round}/messages` endpoint and requests 50 messages, with older pages on demand and bounded `after` requests for live updates. A separate `/rounds/{round}/chat-context` snapshot supplies complete metadata without message bodies for counts and milestone reconstruction, and the existing cycle-list endpoint supplies one complete latest gesture for detail panels.
 
-```ts
-useGestureListByCycle(round, 'desc');
-```
-
-That hook maps to the backend route:
-
-```text
-bid/list/by_round/{round}/1/0/1000000
-```
-
-The chat component receives the resulting `GestureInfo[]` and does not perform another gesture-list request. This keeps the panel consistent with the rest of the home page and avoids a global all-history fetch.
+Servers returning 404/501 for the new routes use the existing `bid/list/by_round/{round}/1/0/1000000` response. The frontend reveals that downloaded response in groups of 50 locally and rechecks server capability after five minutes. Other failures surface with retry controls. See the [pagination and rollout guide](./chat-pagination-proposal.md) for revision resets, exact API behavior, and the remaining metadata cost.
 
 ## Moderation
 
-The panel uses `useBannedGestures()` and hides messages whose `EvtLogId` is present in the backend ban list (`bid_id`). This matches the moderation behavior of `GestureHistoryTable`, where banned gesture messages are not rendered.
+On paginated servers, SQL filters moderated messages before applying the page limit, using the database's actual gesture row identity. The panel does not apply the legacy event-ID heuristic again to these server-moderated responses. Legacy responses retain the existing `useBannedGestures()` filtering behavior shared with `GestureHistoryTable`.
 
 ## Layout Notes
 
@@ -69,7 +60,7 @@ E2E coverage lives in `e2e/home-gesture-chat.spec.ts` and mocks current-cycle AP
 
 `e2e/home-chat-layout.mobile.spec.ts` checks small phones, tablets, and landscape in Chromium and WebKit, including reaching older messages, keeping the heading in place, stable page height when history grows from 12 to 120 messages, and exposing the complete feed in print. Shared API fixtures live in `e2e/home-gesture-chat-fixtures.ts`.
 
-The separate [pagination proposal](./chat-pagination-proposal.md) reviews the backend and describes how to reduce history transfer without changing the other homepage features that use the same data.
+`e2e/home-chat-pagination.spec.ts` checks the new API, explicit older-page requests, failures/retries, live synchronization, and corrected history. The separate [pagination and rollout guide](./chat-pagination-proposal.md) documents both server modes and the backend migrations.
 
 ## Validation Commands
 

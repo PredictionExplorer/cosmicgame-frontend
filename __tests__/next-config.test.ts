@@ -82,6 +82,10 @@ describe('next.config', () => {
           source: '/api/cosmicgame/:path*',
           destination: 'http://127.0.0.1:8099/api/cosmicgame/:path*',
         },
+        {
+          source: '/api/v2/cosmicgame/:path*',
+          destination: 'http://127.0.0.1:8099/api/v2/cosmicgame/:path*',
+        },
       ]);
     });
   });

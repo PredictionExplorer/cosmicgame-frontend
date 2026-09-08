@@ -90,6 +90,7 @@ export default defineConfig({
       name: 'Mobile Safari',
       testMatch: [
         '**/home-chat-layout.mobile.spec.ts',
+        '**/home-chat-pagination.spec.ts',
         '**/mobile-overflow.mobile.spec.ts',
         '**/mobile-tap-targets.mobile.spec.ts',
         '**/landing-responsive.spec.ts',

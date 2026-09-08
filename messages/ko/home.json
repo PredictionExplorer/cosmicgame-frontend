@@ -463,6 +463,15 @@
       "cst": "{amount} CST",
       "cstFallback": "CST"
     },
+    "history": {
+      "shown": "표시된 기록 기준입니다.",
+      "loadOlder": "이전 기록 불러오기",
+      "loadingOlder": "이전 기록 불러오는 중…",
+      "loading": "채팅 불러오는 중…",
+      "error": "채팅을 불러오지 못했습니다.",
+      "olderError": "이전 메시지를 불러오지 못했습니다.",
+      "retry": "다시 시도"
+    },
     "empty": {
       "title": "아직 메시지나 이벤트가 없습니다",
       "description": "메시지와 사이클의 주요 이벤트가 최신순으로 여기에 표시됩니다.",

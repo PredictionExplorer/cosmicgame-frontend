@@ -19,6 +19,7 @@ export const LIVE_GAME_QUERY_KEYS: readonly (readonly unknown[])[] = [
   ['currentTime'],
   ['gestureList'],
   ['bidListByRound'],
+  ['homeGestureFeed'],
   ['donationsNFTByRound'],
   ['donationsERC20ByRound'],
   ['bidEthPrice'],

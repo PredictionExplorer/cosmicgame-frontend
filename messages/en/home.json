@@ -463,6 +463,15 @@
       "cst": "{amount} CST",
       "cstFallback": "CST"
     },
+    "history": {
+      "shown": "Counts reflect the history shown.",
+      "loadOlder": "Load older",
+      "loadingOlder": "Loading older history…",
+      "loading": "Loading chat…",
+      "error": "Could not load chat.",
+      "olderError": "Could not load older messages.",
+      "retry": "Retry"
+    },
     "empty": {
       "title": "No messages or events yet",
       "description": "Messages and cycle milestones will appear here, newest first.",

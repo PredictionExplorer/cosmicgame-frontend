@@ -12,7 +12,6 @@ import { useHydrationSafeDateTime } from '@/components/common/HydrationSafeDateT
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
-import { useUserInfo } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { getSelectionStanding } from '@/lib/selectionStanding';
 import { cn } from '@/lib/utils';
@@ -189,22 +188,24 @@ export const GestureStatus = ({
   const locale = useLocale();
   const activationDateTime = useHydrationSafeDateTime(activationTime, true, locale);
   const { account } = useActiveWeb3React();
-  const { data: userInfoRaw } = useUserInfo(account);
 
   const now = useNow(1000);
 
   const selectionFrequency = useMemo(() => {
     if (!account || !data || !curGestureList.length) return null;
-    const Gestures = (userInfoRaw?.Gestures as GestureInfo[] | undefined) || [];
-    if (!Gestures.length) return null;
-    const curCycleGestures = Gestures.filter((bid) => bid.RoundNum === data.CurRoundNum);
+    const curCycleGestures = curGestureList.filter(
+      (gesture) =>
+        gesture.RoundNum === data.CurRoundNum &&
+        gesture.BidderAddr?.toLowerCase() === account.toLowerCase(),
+    );
+    if (!curCycleGestures.length) return null;
     return getSelectionStanding({
       totalGestures: curGestureList.length,
       myGestures: curCycleGestures.length,
       ethRecipients: data.NumRaffleEthWinnersBidding ?? 1,
       nftRecipients: data.NumRaffleNFTWinnersBidding ?? 1,
     });
-  }, [account, data, userInfoRaw, curGestureList]);
+  }, [account, data, curGestureList]);
 
   const attachedAssetVariant = getAttachedAssetVariant(attachedNFTCount, attachedERC20Count);
   const attachedAssetValues = getAttachedAssetValues(

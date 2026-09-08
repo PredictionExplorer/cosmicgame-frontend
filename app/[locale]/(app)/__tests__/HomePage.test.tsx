@@ -13,7 +13,7 @@ jest.mock('@rainbow-me/rainbowkit');
 /* ── useApiQuery hooks ──────────────────────────────────────────── */
 
 const mockUseDashboardInfo = jest.fn().mockReturnValue({ data: undefined, isLoading: false });
-const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: undefined });
+const mockUseHomeGestureFeed = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseBannedGestures = jest.fn().mockReturnValue({ data: [] });
@@ -25,12 +25,42 @@ const mockUseCSTInfo = jest.fn().mockReturnValue({ data: undefined });
 
 jest.mock('../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
-  useGestureListByCycle: (...args: unknown[]) => mockUseGestureListByCycle(...args),
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
   useBannedGestures: (...args: unknown[]) => mockUseBannedGestures(...args),
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
   useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
+}));
+
+const mockEmptyGestures: unknown[] = [];
+const mockLoadOlder = jest.fn().mockResolvedValue(undefined);
+const mockRetryFeed = jest.fn();
+
+jest.mock('@/hooks/useHomeGestureFeed', () => ({
+  useHomeGestureFeed: (...args: unknown[]) => {
+    const result = mockUseHomeGestureFeed(...args);
+    const gestures = result.data ?? mockEmptyGestures;
+    return {
+      gestures,
+      chatGestures: gestures,
+      latestGesture:
+        [...gestures].sort(
+          (left, right) =>
+            Number(right.TimeStamp ?? 0) - Number(left.TimeStamp ?? 0) ||
+            Number(right.EvtLogId ?? 0) - Number(left.EvtLogId ?? 0),
+        )[0] ?? null,
+      mode: 'legacy',
+      isLoading: false,
+      error: null,
+      hasMore: false,
+      isLoadingOlder: false,
+      olderError: null,
+      loadOlder: mockLoadOlder,
+      retry: mockRetryFeed,
+      resetKey: String(args[0]),
+      ...result,
+    };
+  },
 }));
 
 /* ── useGestureForm ─────────────────────────────────────────────────── */
@@ -353,7 +383,7 @@ beforeEach(() => {
   mockAllocationFinalize.fetchActivationTime.mockResolvedValue(0);
   mockAllocationFinalize.onFinalize.mockResolvedValue(true);
   mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false });
-  mockUseGestureListByCycle.mockReturnValue({ data: undefined });
+  mockUseHomeGestureFeed.mockReturnValue({ data: undefined });
   mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
   mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
   mockUseBannedGestures.mockReturnValue({ data: [] });
@@ -494,7 +524,7 @@ describe('HomePage', () => {
       }),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({
+    mockUseHomeGestureFeed.mockReturnValue({
       data: [
         {
           EvtLogId: 42,
@@ -679,7 +709,7 @@ describe('HomePage', () => {
       data: makeDashboardData(),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({
+    mockUseHomeGestureFeed.mockReturnValue({
       data: [
         {
           EvtLogId: 77,
@@ -761,7 +791,7 @@ describe('HomePage', () => {
       data: makeDashboardData({ LastBidderAddr: freshAddress }),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({ data: [freshGesture] });
+    mockUseHomeGestureFeed.mockReturnValue({ data: [freshGesture] });
     mockUseChampions.mockImplementationOnce((_seed, evidence) => ({
       ...mockChampions,
       latestGesture: {
@@ -803,18 +833,31 @@ describe('HomePage', () => {
       data: makeDashboardData({ LastBidderAddr: freshAddress }),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({
-      data: [
+    const previousGesture = {
+      EvtLogId: 90,
+      TimeStamp: 1_700_000_100,
+      BidderAddr: '0xPrevious',
+      RoundNum: 5,
+      GestureType: 0,
+      GestureCostEth: 0.05,
+      Message: 'stale signal',
+    };
+    mockUseHomeGestureFeed.mockReturnValue({
+      mode: 'paged',
+      // Metadata may index a new participant before their full detail read.
+      gestures: [
         {
-          EvtLogId: 90,
-          TimeStamp: 1_700_000_100,
-          BidderAddr: '0xPrevious',
+          EvtLogId: 91,
+          TimeStamp: 1_700_000_200,
+          BidderAddr: freshAddress,
           RoundNum: 5,
           GestureType: 0,
-          GestureCostEth: 0.05,
-          Message: 'stale signal',
+          GestureCostEth: -1,
         },
+        previousGesture,
       ],
+      latestGesture: previousGesture,
+      chatGestures: [previousGesture],
     });
     mockUseChampions.mockImplementationOnce((_seed, evidence) => ({
       ...mockChampions,
@@ -845,7 +888,7 @@ describe('HomePage', () => {
       }),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({ data: [] });
+    mockUseHomeGestureFeed.mockReturnValue({ data: [] });
     mockAllocationFinalize.activationTime = Math.floor(Date.now() / 1000) + 3600;
 
     render(<HomePage />);
@@ -858,7 +901,7 @@ describe('HomePage', () => {
       data: makeDashboardData(),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({
+    mockUseHomeGestureFeed.mockReturnValue({
       data: [
         {
           EvtLogId: 90,
@@ -944,13 +987,13 @@ describe('HomePage', () => {
       data: makeDashboardData({ LastBidderAddr: '0xSeeded' }),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({ data: [seededGesture] });
+    mockUseHomeGestureFeed.mockReturnValue({ data: [seededGesture] });
 
     render(
       <HomePage initialLatestGesture={seededGesture} initialSpecialRecipients={seededRecipients} />,
     );
 
-    expect(mockUseGestureListByCycle).toHaveBeenCalledWith(5, 'desc', [seededGesture]);
+    expect(mockUseHomeGestureFeed).toHaveBeenCalledWith(5, [seededGesture]);
     expect(mockUseChampions).toHaveBeenCalledWith(seededRecipients, {
       address: '0xSeeded',
       timestamp: 1_700_000_100,
@@ -964,7 +1007,7 @@ describe('HomePage', () => {
       data: makeDashboardData(),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({
+    mockUseHomeGestureFeed.mockReturnValue({
       data: [
         { EvtLogId: 1, TimeStamp: 1700000000, BidderAddr: '0xUser', RoundNum: 5, Message: '' },
       ],
@@ -992,7 +1035,7 @@ describe('HomePage', () => {
       data: makeDashboardData(),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({
+    mockUseHomeGestureFeed.mockReturnValue({
       data: [
         { EvtLogId: 1, TimeStamp: 1700000000, BidderAddr: '0xUser', RoundNum: 5, Message: '' },
       ],
@@ -1416,12 +1459,77 @@ describe('HomePage', () => {
 
   /* ── Feed and chat ──────────────────────────────────────────── */
 
+  it('keeps cycle metadata and latest details complete while chat loads only 50 messages', async () => {
+    const user = userEvent.setup();
+    const cycleStart = 1_700_000_000;
+    const participant = '0x1111111111111111111111111111111111111111';
+    const latestParticipant = '0x2222222222222222222222222222222222222222';
+    const metadata = Array.from({ length: 60 }, (_, index) => ({
+      EvtLogId: index + 1,
+      BidPosition: index + 1,
+      TimeStamp: cycleStart + index * 60,
+      BidderAddr: index < 10 ? participant : latestParticipant,
+      RoundNum: 7,
+      GestureType: 0,
+      GestureCostEth: 0.1,
+      ...(index === 59 ? { Message: '' } : {}),
+    })).reverse();
+    const chatGestures = metadata.slice(1, 51).map((gesture) => ({
+      ...gesture,
+      Message: `Loaded signal ${gesture.BidPosition}`,
+    }));
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        CurRoundNum: 7,
+        CurNumBids: 60,
+        TsRoundStart: cycleStart,
+        LastBidderAddr: latestParticipant,
+      }),
+      isLoading: false,
+    });
+    mockUseCurrentTime.mockReturnValue({
+      data: cycleStart + 3600,
+      dataUpdatedAt: Date.now(),
+      isLoading: false,
+    });
+    // Paged rows have already passed server moderation; legacy ban IDs
+    // cannot be compared with their event-log IDs.
+    mockUseBannedGestures.mockReturnValue({ data: [{ bid_id: 59 }] });
+    mockUseHomeGestureFeed.mockReturnValue({
+      mode: 'paged',
+      gestures: metadata,
+      latestGesture: metadata[0],
+      chatGestures,
+      hasMore: true,
+    });
+
+    render(<HomePage />);
+
+    expect(screen.getByTestId('deck-personal-strip')).toHaveAttribute('data-gesture-count', '60');
+    expect(mockDeckPersonalStrip).toHaveBeenCalledWith(
+      expect.objectContaining({ gestures: metadata }),
+    );
+    expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#60');
+    const chat = screen.getByTestId('gesture-message-chat');
+    expect(within(chat).getAllByText(/^Loaded signal /)).toHaveLength(50);
+    expect(within(chat).getByText('Loaded signal 59')).toBeInTheDocument();
+    expect(within(chat).queryByText('Loaded signal 60')).not.toBeInTheDocument();
+    // Reconstructed records require the entire cycle, including its first ten rows.
+    expect(
+      within(chat)
+        .getAllByTestId('chat-system-event')
+        .some((event) => event.dataset.kind === 'enduranceRecord'),
+    ).toBe(true);
+    await user.click(within(chat).getByRole('button', { name: 'home.chat.history.loadOlder' }));
+    expect(mockLoadOlder).toHaveBeenCalledTimes(1);
+  });
+
   it('renders current-cycle gesture messages in the feed', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({
+    mockUseHomeGestureFeed.mockReturnValue({
       data: [
         {
           EvtLogId: 1,
@@ -1448,7 +1556,7 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(mockUseGestureListByCycle).toHaveBeenCalledWith(7, 'desc', undefined);
+    expect(mockUseHomeGestureFeed).toHaveBeenCalledWith(7, undefined);
     const chat = screen.getByTestId('gesture-message-chat');
     expect(screen.getByTestId('home-feed-column')).toContainElement(chat);
     expect(within(chat).getByText('Newest current-cycle signal')).toBeInTheDocument();
@@ -1470,7 +1578,7 @@ describe('HomePage', () => {
       dataUpdatedAt: Date.now(),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({
+    mockUseHomeGestureFeed.mockReturnValue({
       data: [
         {
           EvtLogId: 1,
@@ -1536,7 +1644,7 @@ describe('HomePage', () => {
         }),
         isLoading: false,
       });
-      mockUseGestureListByCycle.mockReturnValue({
+      mockUseHomeGestureFeed.mockReturnValue({
         data: [
           {
             EvtLogId: 1,
@@ -1608,7 +1716,7 @@ describe('HomePage', () => {
         data: makeDashboardData(),
         isLoading: false,
       });
-      mockUseGestureListByCycle.mockReturnValue({ data: [] });
+      mockUseHomeGestureFeed.mockReturnValue({ data: [] });
 
       try {
         render(<HomePage />);
@@ -1648,7 +1756,7 @@ describe('HomePage', () => {
       data: makeDashboardData(),
       isLoading: false,
     });
-    mockUseGestureListByCycle.mockReturnValue({ data: [] });
+    mockUseHomeGestureFeed.mockReturnValue({ data: [] });
 
     const { rerender } = render(<HomePage />);
     await user.click(getPanelSubmitButton());
@@ -1656,18 +1764,27 @@ describe('HomePage', () => {
     const pendingRow = screen.getByTestId('chat-pending-message');
     expect(pendingRow).toHaveTextContent('fresh signal');
 
-    // The indexer echoes the gesture — the pending row clears.
-    mockUseGestureListByCycle.mockReturnValue({
-      data: [
-        {
-          EvtLogId: 9,
-          TimeStamp: Math.floor(Date.now() / 1000),
-          BidderAddr: '0xUser',
-          RoundNum: 5,
-          GestureType: 0,
-          Message: 'fresh signal',
-        },
-      ],
+    // Metadata arrives independently and cannot reconcile a message body.
+    const metadata = {
+      EvtLogId: 9,
+      TimeStamp: Math.floor(Date.now() / 1000),
+      BidderAddr: '0xUser',
+      RoundNum: 5,
+      GestureType: 0,
+    };
+    mockUseHomeGestureFeed.mockReturnValue({
+      mode: 'paged',
+      gestures: [metadata],
+      chatGestures: [],
+    });
+    rerender(<HomePage />);
+    expect(screen.getByTestId('chat-pending-message')).toHaveTextContent('fresh signal');
+
+    // The message page echoes the gesture — the pending row clears.
+    mockUseHomeGestureFeed.mockReturnValue({
+      mode: 'paged',
+      gestures: [metadata],
+      chatGestures: [{ ...metadata, Message: 'fresh signal' }],
     });
     rerender(<HomePage />);
     expect(screen.queryByTestId('chat-pending-message')).not.toBeInTheDocument();

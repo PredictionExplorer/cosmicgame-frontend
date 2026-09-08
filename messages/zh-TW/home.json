@@ -463,6 +463,15 @@
       "cst": "{amount} CST",
       "cstFallback": "CST"
     },
+    "history": {
+      "shown": "數量僅包含目前顯示的紀錄。",
+      "loadOlder": "載入更早紀錄",
+      "loadingOlder": "正在載入更早紀錄…",
+      "loading": "正在載入聊天內容…",
+      "error": "無法載入聊天內容。",
+      "olderError": "無法載入更早的訊息。",
+      "retry": "重試"
+    },
     "empty": {
       "title": "暫無留言或事件",
       "description": "留言和週期重要事件會顯示在這裡，最新的排在最前。",

@@ -1,50 +1,47 @@
-# Chat history pagination proposal
+# Chat history pagination and rollout
 
-Status: design only; no backend or data-fetching changes implemented. The mobile layout fix bounds the visible chat, but it does not reduce the downloaded history or rendered message count.
+Implemented in the frontend and `augur-explorer`, based on the updated `main` branch of each repository. Backend baseline: `07219b84`; frontend baseline: `3fc41898`. No deployment is part of this change.
 
-## Repository review
+## Behavior
 
-Reviewed `../augur-explorer` after a successful `git pull --ff-only` on 2026-09-07. The selected branch, `feat/nft-trait-ingestion-metadata`, was already synchronized with its remote at `649f1b107370d40a0c26b1a3e24916c43e100553`. The pull also fetched newer `origin/cgv3` and `origin/cgv3.1` references; their relevant chat store and v2 list handler are identical. The backend working tree was left clean.
+The chat starts with the latest 50 messages. **Load older** adds the next 50, with separate loading and retry states. Messages remain newest first, duplicate event identities are merged, and the row being read stays in place when history changes. Derived system events also appear in groups of 50. Header counts describe loaded messages and displayed events, rather than pretending to be cycle-wide totals.
 
-## Current behavior
+The frontend supports both server versions:
 
-- `services/api/client.ts` defaults list requests to 1,000,000 rows. `useGestureListByCycle` in `hooks/useApiQuery.ts` refreshes the current cycle list on a 10-second active polling interval. Chat receives that shared list and filters messages locally.
-- The legacy `/api/cosmicgame/bid/with_message/by_round/{round}` route already accepts `sort`, `offset`, and `limit`. Its handler in `internal/api/cosmicgame/api_cosmicgame.go` defaults to 1,000 rows, does not cap positive limits, and serializes both full `Bids` and a redundant `messages` projection. OpenAPI marks it deprecated.
-- `/api/v2/cosmicgame/rounds/{round}/bids` already has versioned, scope-checked cursors, a default of 50 rows, a maximum of 200, and `LIMIT n+1`. Its order is oldest first and it includes gestures without messages. Reuse its pagination conventions, rather than exposing this endpoint unchanged as chat.
-- `internal/store/cosmicgame/bidding.go` uses a shared query with reward and attached-asset joins that the chat does not need. Migration `00009_cg_bid_cursor_index.sql` supplies the existing general-history index.
+- New servers: use the v2 message pages below. Older messages are requested only when the reader asks for them. Active polling every 10 seconds requests new messages through a synchronization cursor; it does not refetch every older page.
+- Existing servers: a 404 or 501 from the new routes activates the existing full-cycle endpoint. The frontend displays that response in groups of 50 locally. Network usage remains the old server's full-history behavior until deployment. Capability is checked again after five minutes, or when the selected backend changes, so an open page can discover the new server.
+- Real failures, rate limits, and malformed payloads remain errors with retry controls. They never silently trigger a large legacy download.
 
-## Proposed contract
+## Backend contract
 
-Add `GET /api/v2/cosmicgame/rounds/{round}/messages?limit=50&cursor=…` through the OpenAPI generation workflow.
+`GET /api/v2/cosmicgame/rounds/{round}/messages?limit=50`
 
-The first request returns the newest 50 visible, nonblank messages. A versioned opaque `nextCursor` requests older messages. Reuse the existing `{ data, meta }` envelope and default/max limits. Add a `syncCursor` for live updates, including on empty pages, plus the indexed source block and a feed revision. Scope every cursor to its resource, cycle, direction, and revision.
+The default is 50; the backend maximum is 200. The response contains one slim `data` array and `meta: { limit, nextCursor?, syncCursor, hasMore, revision }`. Message rows carry the event identity, cycle, gesture position, participant, timestamp, message, method, exact ETH/CST values, and transaction identity. The SQL query does not load attached assets or reward data. Nonblank and moderation filters run before the limit; whitespace follows JavaScript's trim behavior, and moderation uses the database row identity rather than the distinct event-log ID.
 
-Each message needs only its stable event identity, cycle, gesture position, participant address, timestamp, text, gesture method, exact ETH/CST amounts, and transaction identity. Keep amounts as exact integer strings as in v2; avoid repeating the same messages under multiple response keys. Make the distinction between a loaded count and a cycle-wide count explicit. Supply authoritative totals separately if the UI retains cycle-wide labels.
+For older history, pass `cursor=nextCursor`. Rows are ordered by `(occurredAt, eventLogId)` descending, with a strict tuple boundary and `LIMIT n+1`. Keep the original synchronization cursor when appending older pages; the older response's fresh synchronization watermark must not replace it.
 
-Preserve the current `(timestamp, eventLogId)` newest-first order. For older pages, use a strict tuple boundary `(time_stamp, evtlog_id) < (cursor_time, cursor_id)`, descending order, and fetch at most `limit + 1` records. The unique tiebreaker prevents losing messages with identical timestamps. Insertions at the top do not shift older-page boundaries.
+For live updates, pass `after=syncCursor`. Rows arrive ascending, and `hasMore` indicates further catch-up pages. Advance only through returned rows. The frontend drains at most 20 update pages in one polling pass and retains its completed cursor for the next pass if more remain. This prevents gaps when more than 50 messages arrive between polls without creating an unbounded request loop. Cursors are versioned and scoped to cycle, direction, boundary, and history revision; the frontend keeps caches scoped to the issuing backend as well.
 
-## Query and live synchronization
+Actual message edits/deletions and moderation changes advance a durable revision in the same database transaction. This covers reorganizations and legacy moderation writes. Stale cursors receive `409` with a problem type ending in `/feed-reset-required`. The frontend discards invalidated messages immediately and reloads from the newest page; if that reload fails, removed messages do not remain visible as valid history. Ordinary appended records do not invalidate older pages.
 
-1. Filter blank and moderated messages in SQL **before** applying the limit. Agree on a precise whitespace definition: SQL `TRIM` and JavaScript `.trim()` currently differ for tabs, newlines, and some Unicode spaces. Use the same definition for filtering and any partial index.
-2. Use a narrow message query, with only the participant/transaction joins needed for its response. Add a matching partial index on `(round_num, time_stamp DESC, evtlog_id DESC)` for nonblank messages. Keep moderation as an indexed anti-join; a partial index cannot encode changing rows in another table. Check query plans using sparse-message cycles and deep histories. PostgreSQL still computes skipped offset rows, which makes cursor paging a better fit for growing history ([pagination documentation](https://www.postgresql.org/docs/current/queries-limit.html), [partial indexes](https://www.postgresql.org/docs/current/indexes-partial.html)).
-3. Define `after=syncCursor` as a separate bounded catch-up mode, mutually exclusive with an older-page `cursor`. Read new events oldest first within a fixed indexed high-water mark, then merge them into the newest-first UI by identity. If a burst exceeds one page, drain each continuation before advancing the durable sync cursor. Use an ingestion watermark or equivalent server-maintained position rather than a client wall-clock timestamp.
-4. Start with the existing polling while the page is visible, requesting only updates. Older pages load on demand, with an accessible loading/retry control. Preserve the current reading position when new entries arrive. Do not configure the history query to refetch every previously loaded page each interval. SSE can follow if measured polling traffic warrants it.
-5. Include a revision/reset mechanism for bans, unbans, replay, or chain reorganizations. Append-only polling cannot remove an already cached message or reveal an unbanned older one. Increment the revision atomically with changes that invalidate history; an outdated cursor returns an explicit reset response. All pages in a snapshot must share a revision. The indexer already removes and replays reorganized blocks in `internal/indexer/chainsplit.go`.
+The [backend API guide](../../augur-explorer/docs/chat-api.md) and its OpenAPI v2 schema define the exact fields, validation, migrations, and response examples.
 
-## Frontend migration dependencies
+## Preserving the rest of the homepage
 
-The full current-cycle list also powers `DeckPersonalStrip` counts and `feedSystemEvents.ts` milestones. The event builder explicitly suppresses some events when history is incomplete. Replacing that shared list with 50 messages would silently alter other homepage features; adding a second paginated request while retaining it would preserve the expensive background download.
+The same full cycle list previously powered counts, latest-gesture panels, optimistic messages, and reconstructed system events. Replacing that array with 50 messages would have changed those features incorrectly.
 
-Move these consumers to authoritative cycle/participant summaries and an indexed, paginated system-event history. Persist derived event identities/timestamps, or compute them once per indexed update, rather than reconstructing every milestone from all gestures in each browser. Merge message and event pages with deterministic ordering. Audit both home layouts, their server-rendered initial data, and all consumers of the cycle-list hook before removing its full-history request.
+The new `/api/v2/cosmicgame/rounds/{round}/chat-context` response therefore supplies complete, compact gesture metadata **without message bodies**, costs, rewards, or attached assets. It retains empty-message and moderated gestures because they still affect protocol counts and milestones. Counts and timeline reconstruction consume this metadata; latest panels use one complete latest gesture from the existing endpoint with `limit=1`. Pending chat rows reconcile against loaded message pages. The status panels no longer download a separate full wallet history to calculate the same counts.
 
-Confirm moderation identity during this migration: the frontend currently compares ban `bid_id` with `EvtLogId`, while v2's `internal/store/cosmicgame/banned_bids.go` validates `bid_id` against `cg_bid.id`. These are distinct columns. The server-side filter should use the database relationship, with a fixture where row ID and event ID differ.
+This metadata response intentionally remains **O(cycle size)** and is refreshed with the live feed. The change eliminates unconditional full message-body downloads on new servers, not every full-history metadata read. A future authoritative summary and paginated system-event API can remove that remaining cost. No milestone reconstruction was moved or approximated in this change.
 
-After migration, load only the initial page and explicitly requested older pages. Consider list virtualization or a page-cache bound only if long reading sessions produce a measurable rendering or memory problem; pagination should first eliminate the unconditional full-history load.
+## Deployment order
 
-## Delivery and verification
+1. Apply backend migrations `00030_cg_chat_revision.sql` and `00031_cg_chat_message_index.sql` using the project's migration process. The latter builds its partial index concurrently. Existing servers work with these additive migrations.
+2. Deploy the backend with the two v2 routes.
+3. Deploy the frontend either before or after the backend; fallback supports either order. Verify that a paginated homepage uses the message/context routes and that its only legacy cycle-list request has `limit=1`.
 
-Ship the message contract/query/index and summaries additively, then migrate the frontend, including optimistic messages and cycle rollover. Confirm that opening either homepage no longer issues the million-row request before retiring legacy consumption according to the existing deprecation policy.
+Backend deployment and production migrations are separate operator actions. Tests use disposable PostgreSQL instances.
 
-Cover empty cycles; whitespace-only text; same-timestamp page boundaries; new entries between page loads; invalid and cross-cycle cursors; bans/unbans; more than one page of live catch-up; reorganizations; rollover; and pending-to-indexed deduplication. Check that totals and derived events remain correct. Measure response bytes, query latency, query plans, and browser render/memory cost against realistic long cycles.
+## Validation
 
-The immediate mobile containment follows native [scroll-region accessibility guidance](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/overflow#accessibility) and uses the [small viewport height](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length#small_viewport_units) to keep its reading area stable as browser controls change.
+Coverage includes old-server fallback, automatic capability re-probing, 50-message older pages, retries, same-timestamp boundaries, a burst exceeding 50 new messages, moderation identity, whitespace-only messages, revision rollback/reset, cycle rollover/cancellation, stale server-rendered detail, metadata-only counts, full milestone reconstruction, and scroll-position preservation. Mobile Chrome and Safari exercise the paging UI and print behavior. Printing exposes already loaded messages and known system events; it never downloads more history automatically.

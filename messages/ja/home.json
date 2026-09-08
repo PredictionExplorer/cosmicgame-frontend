@@ -463,6 +463,15 @@
       "cst": "{amount} CST",
       "cstFallback": "CST"
     },
+    "history": {
+      "shown": "表示中の履歴の件数です。",
+      "loadOlder": "過去の履歴を読み込む",
+      "loadingOlder": "過去の履歴を読み込み中…",
+      "loading": "チャットを読み込み中…",
+      "error": "チャットを読み込めませんでした。",
+      "olderError": "過去のメッセージを読み込めませんでした。",
+      "retry": "再試行"
+    },
     "empty": {
       "title": "メッセージやイベントはまだありません",
       "description": "メッセージとサイクルの節目が、新しいものから順にここに表示されます。",

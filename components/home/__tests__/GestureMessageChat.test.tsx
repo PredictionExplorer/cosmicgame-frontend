@@ -626,4 +626,118 @@ describe('GestureMessageChat', () => {
 
     await checkA11y(container);
   });
+
+  it('shows loading and retry states without presenting failed requests as an empty chat', async () => {
+    const user = userEvent.setup();
+    const onRetry = jest.fn();
+    const { rerender } = render(
+      <GestureMessageChat gestures={[]} isLoading onJoinCta={jest.fn()} />,
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent('home.chat.history.loading');
+    expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
+    expect(screen.queryByText(/home\.chat\.messageCount/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/home\.chat\.eventCount/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'home.chat.empty.cta' })).not.toBeInTheDocument();
+
+    rerender(<GestureMessageChat gestures={[]} error onRetry={onRetry} />);
+    expect(screen.getByRole('alert')).toHaveTextContent('home.chat.history.error');
+    expect(screen.queryByText('home.chat.empty.title')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.retry' }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+
+    rerender(<GestureMessageChat gestures={[]} />);
+    expect(screen.getByText('home.chat.empty.title')).toBeInTheDocument();
+  });
+
+  it('keeps loaded messages readable while older history loads or needs a retry', async () => {
+    const user = userEvent.setup();
+    const onLoadMore = jest.fn().mockResolvedValue(undefined);
+    const props = {
+      gestures: [makeGesture({ Message: 'Already loaded' })],
+      pagination: { hasMore: true, isLoading: false, error: false, onLoadMore },
+    };
+    const { rerender } = render(<GestureMessageChat {...props} />);
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <GestureMessageChat {...props} pagination={{ ...props.pagination, isLoading: true }} />,
+    );
+    expect(screen.getByRole('button', { name: /home.chat.history.loadingOlder/ })).toBeDisabled();
+    expect(screen.getByText('Already loaded')).toBeInTheDocument();
+
+    rerender(<GestureMessageChat {...props} pagination={{ ...props.pagination, error: true }} />);
+    expect(screen.getByRole('alert')).toHaveTextContent('home.chat.history.olderError');
+    expect(screen.getByText('Already loaded')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.retry' }));
+    expect(onLoadMore).toHaveBeenCalledTimes(2);
+  });
+
+  it('pages an event-only history and resets its window for corrected history or a new cycle', async () => {
+    const user = userEvent.setup();
+    const systemEvents: GestureFeedSystemEvent[] = Array.from({ length: 120 }, (_, index) => ({
+      id: `event-${index}`,
+      kind: 'newParticipant',
+      timestamp: 1_700_000_000 + index,
+      address: `0x${String(index).padStart(40, '0')}`,
+    }));
+    const { rerender } = render(
+      <GestureMessageChat gestures={[]} systemEvents={systemEvents} resetKey="7:original" />,
+    );
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
+    expect(screen.getAllByRole('listitem')[0]).toHaveAttribute('data-chat-row', 'event:event-119');
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(100);
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(120);
+    expect(
+      screen.queryByRole('button', { name: 'home.chat.history.loadOlder' }),
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <GestureMessageChat gestures={[]} systemEvents={systemEvents} resetKey="7:corrected" />,
+    );
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
+    await user.click(screen.getByRole('button', { name: 'home.chat.history.loadOlder' }));
+    rerender(
+      <GestureMessageChat gestures={[]} systemEvents={systemEvents} resetKey="8:original" />,
+    );
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
+  });
+
+  it('prints all known events and loaded messages without fetching older messages', () => {
+    const onLoadMore = jest.fn().mockResolvedValue(undefined);
+    const systemEvents: GestureFeedSystemEvent[] = Array.from({ length: 75 }, (_, index) => ({
+      id: `event-${index}`,
+      kind: 'cycleStart',
+      timestamp: 1_700_000_000 + index,
+      cycleNumber: index,
+    }));
+    render(
+      <GestureMessageChat
+        gestures={[makeGesture({ Message: 'Loaded for print' })]}
+        systemEvents={systemEvents}
+        pagination={{ hasMore: true, isLoading: false, error: false, onLoadMore }}
+      />,
+    );
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
+    act(() => window.dispatchEvent(new Event('beforeprint')));
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(75);
+    expect(screen.getByText('Loaded for print')).toBeInTheDocument();
+    expect(onLoadMore).not.toHaveBeenCalled();
+    act(() => window.dispatchEvent(new Event('afterprint')));
+    expect(screen.getAllByTestId('chat-system-event')).toHaveLength(50);
+  });
+
+  it('does not apply legacy event-ID moderation to server-moderated message pages', () => {
+    mockUseBannedGestures.mockReturnValue({ data: [{ bid_id: 2 }] });
+    render(
+      <GestureMessageChat
+        gestures={[makeGesture({ EvtLogId: 2, Message: 'Approved by server' })]}
+        serverModerated
+      />,
+    );
+    expect(screen.getByText('Approved by server')).toBeInTheDocument();
+  });
 });

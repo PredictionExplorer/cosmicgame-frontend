@@ -463,6 +463,15 @@
       "cst": "{amount} CST",
       "cstFallback": "CST"
     },
+    "history": {
+      "shown": "数量仅包含当前显示的记录。",
+      "loadOlder": "加载更早记录",
+      "loadingOlder": "正在加载更早记录…",
+      "loading": "正在加载聊天内容…",
+      "error": "未能加载聊天内容。",
+      "olderError": "未能加载更早的消息。",
+      "retry": "重试"
+    },
     "empty": {
       "title": "暂无留言或事件",
       "description": "留言和周期重要事件会显示在这里，最新的排在最前。",

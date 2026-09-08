@@ -463,6 +463,15 @@
       "cst": "{amount} CST",
       "cstFallback": "CST"
     },
+    "history": {
+      "shown": "Số lượng chỉ tính các mục đang hiển thị.",
+      "loadOlder": "Tải lịch sử cũ hơn",
+      "loadingOlder": "Đang tải lịch sử cũ hơn…",
+      "loading": "Đang tải trò chuyện…",
+      "error": "Không tải được trò chuyện.",
+      "olderError": "Không tải được tin nhắn cũ hơn.",
+      "retry": "Thử lại"
+    },
     "empty": {
       "title": "Chưa có lời nhắn hay sự kiện",
       "description": "Lời nhắn và các cột mốc của chu kỳ sẽ xuất hiện ở đây, mới nhất trước.",

@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import {
   Check,
   CircleCheck,
@@ -89,7 +90,22 @@ interface GestureMessageChatProps {
   systemEvents?: GestureFeedSystemEvent[];
   /** Optimistic messages rendered on top of the feed until indexed. */
   pendingMessages?: PendingChatMessage[];
+  pagination?: {
+    hasMore: boolean;
+    isLoading: boolean;
+    error: boolean;
+    onLoadMore: () => Promise<void>;
+  };
+  isLoading?: boolean;
+  error?: boolean;
+  onRetry?: () => void;
+  /** A new cycle or corrected history starts at the newest entries again. */
+  resetKey?: string;
+  /** Paged responses are already moderated against the backend's own row IDs. */
+  serverModerated?: boolean;
 }
+
+const SYSTEM_EVENTS_PER_PAGE = 50;
 
 interface GestureChatMessage {
   gesture: GestureInfo;
@@ -330,24 +346,106 @@ export function GestureMessageChat({
   onJoinCta,
   systemEvents,
   pendingMessages,
+  pagination,
+  isLoading = false,
+  error = false,
+  onRetry,
+  resetKey,
+  serverModerated = false,
 }: GestureMessageChatProps) {
   const t = useTranslations('home');
   const locale = useLocale();
   const { data: bannedGestures } = useBannedGestures();
   const bannedGestureIds = useMemo(
-    () => new Set((bannedGestures ?? []).map((gesture) => gesture.bid_id)),
-    [bannedGestures],
+    () => new Set(serverModerated ? [] : (bannedGestures ?? []).map((gesture) => gesture.bid_id)),
+    [bannedGestures, serverModerated],
   );
   const messages = useMemo(
     () => getGestureChatMessages(gestures, bannedGestureIds),
     [gestures, bannedGestureIds],
   );
+  const [eventWindow, setEventWindow] = useState({ key: resetKey, limit: SYSTEM_EVENTS_PER_PAGE });
+  const eventLimit = eventWindow.key === resetKey ? eventWindow.limit : SYSTEM_EVENTS_PER_PAGE;
+  const [isPrinting, setIsPrinting] = useState(false);
+  const visibleEvents = useMemo(() => {
+    const newestFirst = [...(systemEvents ?? [])].sort((a, b) => b.timestamp - a.timestamp);
+    return isPrinting ? newestFirst : newestFirst.slice(0, eventLimit);
+  }, [systemEvents, eventLimit, isPrinting]);
   const feedItems = useMemo(
-    () => mergeFeedItems(messages, systemEvents ?? []),
-    [messages, systemEvents],
+    () => mergeFeedItems(messages, visibleEvents),
+    [messages, visibleEvents],
   );
   const pending = pendingMessages ?? [];
   const hasFeedContent = feedItems.length > 0 || pending.length > 0;
+  const hasMoreEvents = (systemEvents?.length ?? 0) > eventLimit;
+  const hasOlderContent = hasMoreEvents || pagination?.hasMore;
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const previousResetKey = useRef(resetKey);
+  const readingAnchor = useRef<{ key: string | null; offset: number } | null>(null);
+  const rememberReadingPosition = useCallback(() => {
+    const scroll = scrollRef.current;
+    if (!scroll) return;
+    if (scroll.scrollTop <= 2) {
+      readingAnchor.current = { key: null, offset: 0 };
+      return;
+    }
+    const top = scroll.getBoundingClientRect().top;
+    const row = Array.from(scroll.querySelectorAll<HTMLElement>('[data-chat-row]')).find(
+      (element) => element.getBoundingClientRect().bottom > top,
+    );
+    if (row) {
+      readingAnchor.current = {
+        key: row.dataset.chatRow ?? null,
+        offset: row.getBoundingClientRect().top - top,
+      };
+    }
+  }, []);
+
+  // Keep the row being read at the same position when fresh messages arrive or
+  // older history is appended. This also covers browsers without scroll anchoring.
+  useLayoutEffect(() => {
+    const scroll = scrollRef.current;
+    if (!scroll || isPrinting) return;
+    const anchor = readingAnchor.current;
+    if (previousResetKey.current !== resetKey || anchor?.key === null) {
+      scroll.scrollTop = 0;
+    } else if (anchor?.key) {
+      const row = Array.from(scroll.querySelectorAll<HTMLElement>('[data-chat-row]')).find(
+        (element) => element.dataset.chatRow === anchor.key,
+      );
+      if (row) {
+        scroll.scrollTop +=
+          row.getBoundingClientRect().top - scroll.getBoundingClientRect().top - anchor.offset;
+      }
+    }
+    previousResetKey.current = resetKey;
+    rememberReadingPosition();
+  }, [feedItems, pendingMessages, isPrinting, resetKey, rememberReadingPosition]);
+
+  // Printing renders known history only; it never starts a network request.
+  useEffect(() => {
+    const printMedia = window.matchMedia?.('print');
+    const beforePrint = () => flushSync(() => setIsPrinting(true));
+    const afterPrint = () => setIsPrinting(false);
+    const mediaChanged = (event: MediaQueryListEvent) => setIsPrinting(event.matches);
+    printMedia?.addEventListener('change', mediaChanged);
+    window.addEventListener('beforeprint', beforePrint);
+    window.addEventListener('afterprint', afterPrint);
+    return () => {
+      printMedia?.removeEventListener('change', mediaChanged);
+      window.removeEventListener('beforeprint', beforePrint);
+      window.removeEventListener('afterprint', afterPrint);
+    };
+  }, []);
+
+  const loadOlder = () => {
+    if (pagination?.isLoading) return;
+    rememberReadingPosition();
+    if (hasMoreEvents && !pagination?.error) {
+      setEventWindow({ key: resetKey, limit: eventLimit + SYSTEM_EVENTS_PER_PAGE });
+    }
+    if (pagination?.hasMore || pagination?.error) void pagination.onLoadMore();
+  };
   const isPulsing = useLivePulse(pulseKey);
   // 30s tick keeps minute-level relative timestamps fresh; 0 during SSR.
   const nowMs = useNow(30_000);
@@ -408,11 +506,24 @@ export function GestureMessageChat({
                   {cycleNumber != null
                     ? t('chat.cycleNumber', { number: String(cycleNumber) })
                     : t('chat.currentCycle')}
-                  {' \u00b7 '}
-                  {t('chat.messageCount', { count: messages.length })}
-                  {' \u00b7 '}
-                  {t('chat.eventCount', { count: systemEvents?.length ?? 0 })}
+                  {messages.length > 0 || (!isLoading && !error) ? (
+                    <>
+                      {' \u00b7 '}
+                      {t('chat.messageCount', { count: messages.length })}
+                    </>
+                  ) : null}
+                  {visibleEvents.length > 0 || (!isLoading && !error) ? (
+                    <>
+                      {' \u00b7 '}
+                      {t('chat.eventCount', { count: visibleEvents.length })}
+                    </>
+                  ) : null}
                 </p>
+                {(pagination || hasMoreEvents) && !isLoading && !error ? (
+                  <p className="mt-1 text-xs text-muted-foreground print:hidden">
+                    {t('chat.history.shown')}
+                  </p>
+                ) : null}
               </div>
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/12 text-primary max-sm:hidden">
                 <MessageCircle className="h-5 w-5" />
@@ -421,16 +532,43 @@ export function GestureMessageChat({
           </div>
 
           <div
+            ref={scrollRef}
             data-testid="gesture-message-chat-scroll"
             role="region"
             aria-labelledby="gesture-message-chat-title"
             tabIndex={0}
+            onScroll={isPrinting ? undefined : rememberReadingPosition}
             // Keep history within a viewport-sized reading area on phones.
             // svh stays stable as browser chrome opens/closes; desktop fills
             // the sized panel. Native scrolling preserves touch and keyboard access.
             className="relative z-[1] max-h-[min(28rem,55svh)] min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/60 sm:p-4 lg:max-h-[calc(100vh-13rem)] xl:max-h-none xl:p-4 xl:[scrollbar-gutter:stable] print:max-h-none print:overflow-visible print:[scrollbar-gutter:auto]"
           >
-            {hasFeedContent && messages.length === 0 && pending.length === 0 && onJoinCta ? (
+            {isLoading ? (
+              <div
+                role="status"
+                className="flex items-center gap-2 p-3 text-sm text-muted-foreground print:hidden"
+              >
+                <Spinner className="h-4 w-4" aria-hidden="true" />
+                {t('chat.history.loading')}
+              </div>
+            ) : error ? (
+              <div className="space-y-3 p-3 print:hidden">
+                <p role="alert" className="text-sm text-muted-foreground">
+                  {t('chat.history.error')}
+                </p>
+                {onRetry ? (
+                  <Button variant="secondary" size="sm" onClick={onRetry}>
+                    {t('chat.history.retry')}
+                  </Button>
+                ) : null}
+              </div>
+            ) : null}
+            {!isLoading &&
+            !error &&
+            hasFeedContent &&
+            messages.length === 0 &&
+            pending.length === 0 &&
+            onJoinCta ? (
               <div className="mb-3">
                 <Button variant="secondary" size="sm" onClick={onJoinCta}>
                   {t('chat.empty.cta')}
@@ -440,14 +578,14 @@ export function GestureMessageChat({
             {hasFeedContent ? (
               <ol className="space-y-2.5 sm:space-y-3 xl:space-y-2.5" aria-live="polite">
                 {pending.map((entry) => (
-                  <li key={entry.id}>
+                  <li key={entry.id} data-chat-row={`pending:${entry.id}`}>
                     <PendingMessageRow pending={entry} locale={locale} nowMs={nowMs} />
                   </li>
                 ))}
                 {feedItems.map((item, index) => {
                   if (item.type === 'system') {
                     return (
-                      <li key={item.event.id}>
+                      <li key={item.event.id} data-chat-row={`event:${item.event.id}`}>
                         <SystemEventRow event={item.event} locale={locale} nowMs={nowMs} />
                       </li>
                     );
@@ -462,7 +600,7 @@ export function GestureMessageChat({
                   const badge = getGestureMethodBadge(gesture, locale);
 
                   return (
-                    <li key={listItemKey}>
+                    <li key={listItemKey} data-chat-row={`message:${listItemKey}`}>
                       <article
                         className={styles.messageCard}
                         data-newest={isNewest}
@@ -548,7 +686,7 @@ export function GestureMessageChat({
                   );
                 })}
               </ol>
-            ) : (
+            ) : !isLoading && !error ? (
               <EmptyState
                 icon={<MessageCircle className="h-8 w-8 text-muted-foreground/50" />}
                 title={t('chat.empty.title')}
@@ -562,7 +700,36 @@ export function GestureMessageChat({
                 }
                 className="min-h-[14rem] py-8 sm:min-h-[16rem] xl:h-full xl:min-h-0 xl:py-6"
               />
-            )}
+            ) : null}
+            {!isLoading &&
+            !error &&
+            (hasOlderContent || pagination?.error || pagination?.isLoading) ? (
+              <div className="mt-4 space-y-2 border-t border-white/[0.07] pt-3 print:hidden">
+                {pagination?.error ? (
+                  <p role="alert" className="text-sm text-muted-foreground">
+                    {t('chat.history.olderError')}
+                  </p>
+                ) : null}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-h-11 w-full whitespace-normal"
+                  disabled={pagination?.isLoading}
+                  onClick={loadOlder}
+                >
+                  {pagination?.isLoading ? (
+                    <span role="status" className="flex items-center justify-center gap-2">
+                      <Spinner className="h-4 w-4" aria-hidden="true" />
+                      {t('chat.history.loadingOlder')}
+                    </span>
+                  ) : pagination?.error ? (
+                    t('chat.history.retry')
+                  ) : (
+                    t('chat.history.loadOlder')
+                  )}
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </aside>

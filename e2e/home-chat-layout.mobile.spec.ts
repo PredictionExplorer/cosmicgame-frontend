@@ -13,7 +13,7 @@ async function openChat(page: Page, messageCount = 12) {
   await mockHomeGestureChatApi(page, makeLongGestureFeed(messageCount));
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const chat = page.getByTestId('gesture-message-chat');
-  await expect(chat.getByText(`Cycle #7 · ${messageCount} messages`)).toBeVisible();
+  await expect(chat.getByText(`Cycle #7 · ${Math.min(messageCount, 50)} messages`)).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   return chat;
 }
@@ -79,6 +79,12 @@ test('more history does not push the rest of the mobile page down', async ({ pag
   );
   const scroll = chat.getByTestId('gesture-message-chat-scroll');
   await chat.scrollIntoViewIfNeeded();
+  await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(50);
+  await chat.getByRole('button', { name: 'Load older', exact: true }).click();
+  await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(100);
+  await chat.getByRole('button', { name: 'Load older', exact: true }).click();
+  await expect(chat.getByTestId('gesture-message-meta')).toHaveCount(120);
+  expect((await chat.boundingBox())!.height).toBeCloseTo(originalChatHeight, 0);
   await scroll.evaluate((element) => {
     element.scrollTop = element.scrollHeight;
   });

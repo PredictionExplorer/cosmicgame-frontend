@@ -142,6 +142,10 @@ const nextConfig: NextConfig = {
         source: '/api/cosmicgame/:path*',
         destination: `${base}/api/cosmicgame/:path*`,
       },
+      {
+        source: '/api/v2/cosmicgame/:path*',
+        destination: `${base}/api/v2/cosmicgame/:path*`,
+      },
     ];
   },
   images: {
