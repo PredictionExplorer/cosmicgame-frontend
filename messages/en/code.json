@@ -12,7 +12,7 @@
   "seo": {
     "eyebrow": "Source code · deterministic art",
     "heading": "Cosmic Signature Source Code",
-    "description": "Explore the source code that turns on-chain seeds into reproducible three-body NFT artwork. Use the viewer below to inspect the rendering code or open the published source files.",
+    "description": "Explore the frontend, Go backend, smart contracts, and image generation source code for Cosmic Signature. Use the viewer below to inspect how on-chain seeds become reproducible NFT artwork.",
     "excerpt": "seed -> SHA3-256 random stream -> three-body simulation -> spectral renderer -> Cosmic Signature NFT image",
     "relatedAria": "Source code related pages",
     "links": {
@@ -21,6 +21,27 @@
       "contracts": "Review verified contracts",
       "security": "Read security notes",
       "gallery": "Explore generated NFT art"
+    }
+  },
+  "repositories": {
+    "heading": "Project repositories",
+    "items": {
+      "frontend": {
+        "title": "Frontend",
+        "description": "The Next.js website and application interface."
+      },
+      "backend": {
+        "title": "Go backend (Augur Explorer)",
+        "description": "Indexes on-chain events and serves protocol data through an API."
+      },
+      "contracts": {
+        "title": "Smart contracts",
+        "description": "Solidity contracts defining the Cosmic Signature protocol on Arbitrum."
+      },
+      "images": {
+        "title": "Image generation",
+        "description": "The Rust three-body simulation and renderer for Cosmic Signature images and videos."
+      }
     }
   }
 }

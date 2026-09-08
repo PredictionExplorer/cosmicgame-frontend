@@ -12,7 +12,7 @@
   "seo": {
     "eyebrow": "ソースコード · 決定論的アート",
     "heading": "Cosmic Signatureソースコード",
-    "description": "オンチェーンのシードから三体NFTアートを生成する、決定論的な作品制作パイプラインのソースコードを公開しています。以下のビューアーで処理の内容を確認できます。",
+    "description": "Cosmic Signatureのフロントエンド、Goバックエンド、スマートコントラクト、画像生成のソースコードを公開しています。以下のビューアーで、オンチェーンのシードから再現可能なNFTアートを生成する仕組みを確認できます。",
     "excerpt": "シード -> SHA3-256乱数ストリーム -> 三体シミュレーション -> スペクトルレンダラー -> Cosmic Signature NFT画像",
     "relatedAria": "ソースコードの関連ページ",
     "links": {
@@ -21,6 +21,27 @@
       "contracts": "検証済みコントラクトを確認する",
       "security": "セキュリティに関する注記を読む",
       "gallery": "生成されたNFTアートを探索する"
+    }
+  },
+  "repositories": {
+    "heading": "プロジェクトのリポジトリ",
+    "items": {
+      "frontend": {
+        "title": "フロントエンド",
+        "description": "Next.jsで構築したウェブサイトとアプリケーションのインターフェースです。"
+      },
+      "backend": {
+        "title": "Goバックエンド（Augur Explorer）",
+        "description": "オンチェーンイベントをインデックス化し、APIを通じてプロトコルのデータを提供します。"
+      },
+      "contracts": {
+        "title": "スマートコントラクト",
+        "description": "Arbitrum上のCosmic Signatureプロトコルを定義するSolidityコントラクトです。"
+      },
+      "images": {
+        "title": "画像生成",
+        "description": "Cosmic Signatureの画像と動画を生成する、Rust製の三体シミュレーションとレンダラーです。"
+      }
     }
   }
 }

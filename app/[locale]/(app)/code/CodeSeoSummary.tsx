@@ -1,4 +1,7 @@
 import { getLocale, getTranslations } from 'next-intl/server';
+import { ArrowUpRight } from 'lucide-react';
+
+import { CODE_REPOSITORIES } from '@/content/code/structure';
 
 import { Link } from '@/i18n/navigation';
 
@@ -12,6 +15,30 @@ export async function CodeSeoSummary() {
         {t('seo.heading')}
       </h1>
       <p className="mt-4 max-w-3xl type-body-lg text-muted-foreground">{t('seo.description')}</p>
+      <section id="repositories" aria-labelledby="repositories-heading" className="mt-8">
+        <h2 id="repositories-heading" className="type-display-sm text-foreground">
+          {t('repositories.heading')}
+        </h2>
+        <ul className="mt-4 grid gap-4 md:grid-cols-2">
+          {CODE_REPOSITORIES.map(({ id, name, href }) => (
+            <li key={id} className="min-w-0 rounded-xl border border-border bg-card/50 p-5">
+              <h3 className="text-lg font-semibold">
+                <a
+                  href={href}
+                  className="inline-flex items-start gap-2 rounded-sm text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+                >
+                  {t(`repositories.items.${id}.title`)}
+                  <ArrowUpRight aria-hidden="true" className="mt-1 size-4 shrink-0" />
+                </a>
+              </h3>
+              <p className="mt-2 break-all font-mono text-sm text-muted-foreground">{name}</p>
+              <p className="mt-3 type-body-sm text-muted-foreground">
+                {t(`repositories.items.${id}.description`)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
       <pre className="mt-6 overflow-x-auto rounded-xl border border-white/[0.06] bg-black/30 p-4 text-sm text-muted-foreground">
         <code>{t('seo.excerpt')}</code>
       </pre>

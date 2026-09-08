@@ -12,7 +12,7 @@
   "seo": {
     "eyebrow": "源代码 · 确定性艺术",
     "heading": "Cosmic Signature 源代码",
-    "description": "查看 Cosmic Signature 确定性艺术管线的源代码，了解链上种子如何通过三体模拟生成 NFT 图像。",
+    "description": "查看 Cosmic Signature 的前端、Go 后端、智能合约与图像生成源代码。通过下方查看器，了解链上种子如何生成可复现的 NFT 艺术作品。",
     "excerpt": "种子 -> SHA3-256 随机流 -> 三体模拟 -> 光谱渲染器 -> Cosmic Signature NFT 图像",
     "relatedAria": "源代码相关页面",
     "links": {
@@ -21,6 +21,27 @@
       "contracts": "查看已验证合约",
       "security": "阅读安全说明",
       "gallery": "浏览生成的 NFT 艺术"
+    }
+  },
+  "repositories": {
+    "heading": "项目代码仓库",
+    "items": {
+      "frontend": {
+        "title": "前端",
+        "description": "基于 Next.js 的网站与应用界面。"
+      },
+      "backend": {
+        "title": "Go 后端（Augur Explorer）",
+        "description": "索引链上事件，并通过 API 提供协议数据。"
+      },
+      "contracts": {
+        "title": "智能合约",
+        "description": "以 Solidity 编写，定义 Arbitrum 上的 Cosmic Signature 协议。"
+      },
+      "images": {
+        "title": "图像生成",
+        "description": "以 Rust 编写的三体模拟与渲染器，用于生成 Cosmic Signature 图像和视频。"
+      }
     }
   }
 }

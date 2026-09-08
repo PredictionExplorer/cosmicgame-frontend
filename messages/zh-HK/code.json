@@ -12,7 +12,7 @@
   "seo": {
     "eyebrow": "源代碼 · 確定性藝術",
     "heading": "Cosmic Signature 源代碼",
-    "description": "查看 Cosmic Signature 確定性藝術管線的源代碼，了解鏈上種子如何透過三體模擬生成 NFT 圖像。",
+    "description": "查看 Cosmic Signature 的前端、Go 後端、智能合約與圖像生成源代碼。透過下方查看器，了解鏈上種子如何生成可重現的 NFT 藝術作品。",
     "excerpt": "種子 -> SHA3-256 隨機流 -> 三體模擬 -> 光譜渲染器 -> Cosmic Signature NFT 圖像",
     "relatedAria": "源代碼相關頁面",
     "links": {
@@ -21,6 +21,27 @@
       "contracts": "查看已驗證合約",
       "security": "閱讀安全說明",
       "gallery": "瀏覽生成的 NFT 藝術"
+    }
+  },
+  "repositories": {
+    "heading": "項目代碼庫",
+    "items": {
+      "frontend": {
+        "title": "前端",
+        "description": "以 Next.js 建構的網站與應用程式介面。"
+      },
+      "backend": {
+        "title": "Go 後端（Augur Explorer）",
+        "description": "為鏈上事件建立索引，並透過 API 提供協議數據。"
+      },
+      "contracts": {
+        "title": "智能合約",
+        "description": "以 Solidity 編寫，定義 Arbitrum 上的 Cosmic Signature 協議。"
+      },
+      "images": {
+        "title": "圖像生成",
+        "description": "以 Rust 編寫的三體模擬與渲染器，用於生成 Cosmic Signature 圖像和影片。"
+      }
     }
   }
 }

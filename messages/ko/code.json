@@ -12,7 +12,7 @@
   "seo": {
     "eyebrow": "소스 코드 · 결정론적 아트",
     "heading": "Cosmic Signature 소스 코드",
-    "description": "온체인 시드에서 삼체 NFT 아트를 생성하는 결정론적 제작 파이프라인의 소스 코드를 공개합니다. 아래 뷰어에서 처리 과정을 살펴볼 수 있습니다.",
+    "description": "Cosmic Signature의 프론트엔드, Go 백엔드, 스마트 컨트랙트, 이미지 생성 소스 코드를 살펴볼 수 있습니다. 아래 뷰어에서 온체인 시드가 재현 가능한 NFT 아트로 변환되는 과정을 확인할 수 있습니다.",
     "excerpt": "시드 -> SHA3-256 무작위 스트림 -> 삼체 시뮬레이션 -> 스펙트럼 렌더러 -> Cosmic Signature NFT 이미지",
     "relatedAria": "소스 코드 관련 페이지",
     "links": {
@@ -21,6 +21,27 @@
       "contracts": "검증된 컨트랙트 보기",
       "security": "보안 안내 읽기",
       "gallery": "생성된 NFT 아트 둘러보기"
+    }
+  },
+  "repositories": {
+    "heading": "프로젝트 저장소",
+    "items": {
+      "frontend": {
+        "title": "프론트엔드",
+        "description": "Next.js로 만든 웹사이트와 애플리케이션 인터페이스입니다."
+      },
+      "backend": {
+        "title": "Go 백엔드(Augur Explorer)",
+        "description": "온체인 이벤트를 인덱싱하고 API로 프로토콜 데이터를 제공합니다."
+      },
+      "contracts": {
+        "title": "스마트 컨트랙트",
+        "description": "Arbitrum에서 Cosmic Signature 프로토콜을 정의하는 Solidity 컨트랙트입니다."
+      },
+      "images": {
+        "title": "이미지 생성",
+        "description": "Cosmic Signature 이미지와 영상을 생성하는 Rust 기반 삼체 시뮬레이션과 렌더러입니다."
+      }
     }
   }
 }

@@ -12,7 +12,7 @@
   "seo": {
     "eyebrow": "Mã nguồn · nghệ thuật tất định",
     "heading": "Mã nguồn Cosmic Signature",
-    "description": "Cosmic Signature công khai mã nguồn tạo tác phẩm: từ seed trên chuỗi, mô phỏng bài toán ba vật thể cho đến hình ảnh NFT. Quy trình tất định cho phép tái tạo tác phẩm từ cùng một seed. Bạn có thể xem mã nguồn bên dưới.",
+    "description": "Khám phá mã nguồn giao diện, backend Go, hợp đồng thông minh và công cụ tạo hình ảnh của Cosmic Signature. Trình xem bên dưới cho thấy cách seed trên chuỗi trở thành tác phẩm NFT có thể tái tạo.",
     "excerpt": "seed -> dòng ngẫu nhiên SHA3-256 -> mô phỏng ba vật thể -> bộ kết xuất quang phổ -> hình ảnh Cosmic Signature NFT",
     "relatedAria": "Các trang liên quan đến mã nguồn",
     "links": {
@@ -21,6 +21,27 @@
       "contracts": "Xem các hợp đồng đã xác minh",
       "security": "Đọc ghi chú bảo mật",
       "gallery": "Khám phá nghệ thuật NFT đã tạo"
+    }
+  },
+  "repositories": {
+    "heading": "Kho mã nguồn dự án",
+    "items": {
+      "frontend": {
+        "title": "Giao diện",
+        "description": "Trang web và giao diện ứng dụng được xây dựng bằng Next.js."
+      },
+      "backend": {
+        "title": "Backend Go (Augur Explorer)",
+        "description": "Lập chỉ mục sự kiện trên chuỗi và cung cấp dữ liệu giao thức qua API."
+      },
+      "contracts": {
+        "title": "Hợp đồng thông minh",
+        "description": "Các hợp đồng Solidity định nghĩa giao thức Cosmic Signature trên Arbitrum."
+      },
+      "images": {
+        "title": "Tạo hình ảnh",
+        "description": "Mô phỏng ba vật thể và bộ kết xuất viết bằng Rust để tạo hình ảnh và video Cosmic Signature."
+      }
     }
   }
 }
