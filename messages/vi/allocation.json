@@ -13,7 +13,7 @@
       "scope": "Chỉ gồm các bản ghi chu kỳ đã hoàn tất",
       "scopeTooltip": "Số liệu chỉ bao gồm các chu kỳ trình diễn đã hoàn tất. Chu kỳ đang chờ và các lần nhận về không liên quan không được tính vào tổng."
     },
-    "intro": "Khi một chu kỳ trình diễn hoàn tất, người tham gia đặt nét bút cuối cùng nhận về phân bổ Signature — {percentage}% Dự trữ chu kỳ, 1.000 CST và một Cosmic Signature NFT độc nhất. Các phân bổ khác chảy qua Chiến binh Thời gian, Tinh tuyển, phân phối neo giữ, Hàng hóa công và Dự trữ tích lũy.",
+    "intro": "Khi một chu kỳ trình diễn hoàn tất, người tham gia đặt nét bút cuối cùng nhận về phân bổ Signature — {percentage}% Dự trữ chu kỳ, 1.000 CST và {cscNftCount} Cosmic Signature NFT độc nhất. Các phân bổ khác chảy qua Chiến binh Thời gian, Tinh tuyển, phân phối neo giữ, Hàng hóa công và Dự trữ tích lũy.",
     "reserveSplit": {
       "label": "Cơ cấu Dự trữ chu kỳ",
       "tooltip": "Tỷ lệ phần trăm cho thấy dự trữ ETH của một chu kỳ đã hoàn tất được phân bổ qua các luồng của giao thức như thế nào.",
@@ -103,6 +103,7 @@
       "amountTooltip": "Tổng ETH được người tham gia đặt nét bút cuối cùng nhận về khi đếm ngược về không.",
       "recipient": "Người nhận",
       "nft": "NFT",
+      "nfts": "NFT",
       "nftTooltip": "Xem Cosmic Signature NFT này trong phòng trưng bày.",
       "finalized": "Hoàn tất {dateTime}",
       "viewTransaction": "Xem giao dịch",
@@ -121,7 +122,7 @@
       "cards": {
         "signature": {
           "title": "Phân bổ Signature",
-          "tooltip": "Khi đếm ngược về 0, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ Signature: ETH, 1.000 CST và một Cosmic Signature NFT."
+          "tooltip": "Khi đếm ngược về 0, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ Signature: ETH, 1.000 CST và {cscNftCount} Cosmic Signature NFT."
         },
         "chrono": {
           "title": "Chiến binh Thời gian",

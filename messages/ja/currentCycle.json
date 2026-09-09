@@ -94,6 +94,7 @@
   "rules": {
     "howItWorks": "仕組み",
     "participation": "一筆を入れると、<em>動的な参加CST</em>を刻印できます。その量は、前の一筆からの経過時間に基づく平方根の式で決まります。",
+    "participationV3": "一筆を入れると、<em>動的な参加CST</em>を刻印できます。その量は、前の一筆からの経過時間に応じて一定の速さで積み上がります。",
     "calibration": "ETH一筆はCST調律期間を約{decreasePercent}%短くし、CST一筆は約{increasePercent}%長くします。",
     "stellarSelection": "一筆ごとに星選の対象が1件記録されます。{ethEntries}件の対象がサイクル準備金の{rafflePercent}%を受け取ります。さらに{nftEntries}人の星選受領者と{anchorHolders}人のRandom Walk NFT係留者がCosmic Signature NFTを受け取ります。",
     "publicGoods": "Protocol Guildはサイクルごとにサイクル準備金の{percent}%（少なくとも{amount} ETH）を受け取ります。"

@@ -134,6 +134,19 @@
       "message": {
         "label": "메시지 최대 길이",
         "tooltip": "제스처 메시지에 허용되는 최대 글자 수입니다."
+      },
+      "v3CstDecline": {
+        "label": "CST 가격 하락 속도",
+        "value": "{amount} CST/분",
+        "tooltip": "CST 보정 구간 동안 CST 제스처 비용이 낮아지는 속도입니다. 각인되는 참여 CST는 추월당한 참여자에게 전액 지급됩니다."
+      },
+      "v3SignatureNfts": {
+        "label": "시그니처 배분 NFT 수",
+        "tooltip": "사이클이 마감될 때 시그니처 배분 수령자에게 각인되는 Cosmic Signature NFT(연속 ID)의 수입니다."
+      },
+      "v3LateWindow": {
+        "label": "막판 제스처 구간",
+        "tooltip": "사이클 마감 시점 직전 구간으로, 제스처 비용에 기하급수적으로 커지는 할증(최대 약 5배)이 붙습니다."
       }
     }
   },

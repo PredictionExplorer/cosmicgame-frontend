@@ -44,6 +44,14 @@
     "allocationRetrievalTimeout": "배분 회수 제한 시간 변경",
     "ethCalibrationDurationDivisor": "ETH 보정 구간 길이 제수 변경",
     "ethCalibrationEndingCostDivisor": "ETH 보정 구간 종료 제스처 비용 제수 변경",
-    "chronoWarriorEthPercentage": "시간의 전사 ETH 배분 비율 변경"
+    "chronoWarriorEthPercentage": "시간의 전사 ETH 배분 비율 변경",
+    "cstCalibrationDurationChangeDivisor": "CST 보정 구간 길이 변경 제수 변경",
+    "cstGestureCostDeclineChangeDivisor": "CST 제스처 비용 하락 속도 변경 제수 변경",
+    "cstGestureCostDeclineRate": "CST 제스처 비용 하락 속도 변경",
+    "ethGestureRefundGasLimit": "ETH 제스처 환불 가스 허용량 변경",
+    "lateGesturePremiumBaseMultiplier": "막판 제스처 할증 기본 배수 변경",
+    "lateGesturePremiumExponent": "막판 제스처 할증 지수 변경",
+    "lateGestureWindowDivisor": "막판 제스처 구간 제수 변경",
+    "signatureAllocationNftCount": "시그니처 배분 NFT 수 변경"
   }
 }

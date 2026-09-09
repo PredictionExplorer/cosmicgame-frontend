@@ -47,7 +47,8 @@
       "notErc20": "첨부한 토큰 컨트랙트가 ERC-20 토큰 컨트랙트가 아닙니다.",
       "insufficientAttachedToken": "이 제스처에 첨부할 토큰 잔액이 부족합니다.",
       "insufficientEth": "ETH 잔액이 부족합니다. 지갑에 ETH가 충분하지 않습니다.",
-      "insufficientCst": "CST 잔액이 부족합니다. 지갑에 CST(ERC-20)가 충분하지 않습니다."
+      "insufficientCst": "CST 잔액이 부족합니다. 지갑에 CST(ERC-20)가 충분하지 않습니다.",
+      "cycleNotStarted": "다음 사이클이 아직 시작되지 않았습니다. {duration} 후에 제스처를 남길 수 있습니다."
     },
     "transaction": {
       "failed": "제스처를 제출할 수 없습니다. 지갑과 네트워크 연결을 확인하고 현재 비용을 새로 고친 뒤 다시 시도해 주세요.",
@@ -62,7 +63,8 @@
       "wrongBidType": "제스처 유형이 잘못 선택되었습니다.",
       "fundTransferFailed": "자금 전송에 실패했습니다.",
       "ethCostChanged": "트랜잭션이 전송되는 동안 제스처 비용이 {increase} ETH 올랐습니다. 새로 필요한 비용은 {required} ETH입니다. 다시 시도해 주세요.",
-      "cstCostChanged": "트랜잭션이 전송되는 동안 CST 제스처 비용이 바뀌었습니다. 다른 제스처가 먼저 처리된 것으로 보입니다. 컨트랙트가 요구한 {required} CST가 설정한 최대치 {maximum} CST를 넘었습니다. 새로 고친 뒤 다시 시도해 주세요."
+      "cstCostChanged": "트랜잭션이 전송되는 동안 CST 제스처 비용이 바뀌었습니다. 다른 제스처가 먼저 처리된 것으로 보입니다. 컨트랙트가 요구한 {required} CST가 설정한 최대치 {maximum} CST를 넘었습니다. 새로 고친 뒤 다시 시도해 주세요.",
+      "bidHasBeenPlacedInCurrentRound": "현재 사이클에 이미 제스처가 있습니다."
     }
   },
   "anchor": {

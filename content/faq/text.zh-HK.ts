@@ -9,10 +9,7 @@ import {
 import type { FAQText } from './structure';
 
 /** protocolFacts stores the example gaps as English strings; render them in zh. */
-const ELAPSED_ZH_HK: Record<
-  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
-  string
-> = {
+const ELAPSED_ZH_HK: Record<string, string> = {
   '0 seconds': '0 秒',
   '1 second': '1 秒',
   '60 seconds': '60 秒',

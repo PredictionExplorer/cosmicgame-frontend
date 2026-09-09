@@ -94,6 +94,7 @@
   "rules": {
     "howItWorks": "작동 원리",
     "participation": "제스처를 남기면 <em>동적 참여 CST</em>를 각인할 수 있습니다. 각인량은 이전 제스처 이후 흐른 시간을 바탕으로 제곱근 공식에 따라 정해집니다.",
+    "participationV3": "제스처를 남기면 <em>동적 참여 CST</em>를 각인할 수 있습니다. 각인량은 이전 제스처 이후 흐른 시간에 따라 일정한 속도로 쌓입니다.",
     "calibration": "ETH 제스처는 CST 보정 구간을 약 {decreasePercent}% 단축하고, CST 제스처는 약 {increasePercent}% 연장합니다.",
     "stellarSelection": "제스처 한 건마다 별빛 선정 자격이 하나씩 기록됩니다. 선정된 {ethEntries}건의 자격에는 사이클 준비금의 {rafflePercent}%가 배분됩니다. 추가로 선정된 수령자 {nftEntries}명과 Random Walk NFT 앵커링 보유자 {anchorHolders}명은 Cosmic Signature NFT를 받습니다.",
     "publicGoods": "Protocol Guild는 사이클마다 사이클 준비금의 {percent}%(최소 {amount} ETH)를 받습니다."

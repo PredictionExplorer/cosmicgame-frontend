@@ -47,6 +47,8 @@
     "cycleValue": "Chu kỳ {round}",
     "gestureCost": "Chi phí nét bút",
     "participationCst": "CST tham gia",
+    "cstToOutbid": "Cho người tham gia bị vượt",
+    "cstToThis": "Cho người tham gia này",
     "attachedRandomWalk": "RandomWalk NFT đính kèm vào nét bút ETH:",
     "paidWithCst": "Thanh toán bằng CST (ERC-20):",
     "randomWalkId": "Mã RandomWalkNFT:",

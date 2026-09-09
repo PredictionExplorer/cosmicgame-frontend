@@ -232,10 +232,10 @@
     "metrics": {
       "signatureAllocation": "Phân bổ Signature",
       "signatureTooltip": {
-        "base": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT.",
-        "withNft": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, một Cosmic Signature NFT và {nftCount, plural, other {toàn bộ # NFT đính kèm}}.",
-        "withErc20": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, một Cosmic Signature NFT và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}}.",
-        "withBoth": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, một Cosmic Signature NFT, cùng {nftCount, plural, other {toàn bộ # NFT đính kèm}} và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}}."
+        "base": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST và {cscNftCount} Cosmic Signature NFT.",
+        "withNft": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, {cscNftCount} Cosmic Signature NFT và {nftCount, plural, other {toàn bộ # NFT đính kèm}}.",
+        "withErc20": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, {cscNftCount} Cosmic Signature NFT và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}}.",
+        "withBoth": "Phần ETH của phân bổ Signature; người nhận cũng nhận 1.000 CST, {cscNftCount} Cosmic Signature NFT, cùng {nftCount, plural, other {toàn bộ # NFT đính kèm}} và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}}."
       },
       "ethGesture": "Nét bút ETH",
       "ethGestureTooltip": "Chi phí hiện tại để đặt nét bút bằng ETH",
@@ -252,10 +252,10 @@
       "title": "Vị thế của bạn trong chu kỳ",
       "tooltip": "Hiển thị vị thế nét bút cuối cùng hiện tại và tần suất Tinh tuyển của bạn dựa trên các nét bút trong chu kỳ này.",
       "leader": {
-        "base": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT).",
-        "withNft": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} bên dưới).",
-        "withErc20": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới).",
-        "withBoth": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, 1 Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới)."
+        "base": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, {cscNftCount} Cosmic Signature NFT).",
+        "withNft": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, {cscNftCount} Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} bên dưới).",
+        "withErc20": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, {cscNftCount} Cosmic Signature NFT, cộng thêm {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới).",
+        "withBoth": "Bạn đã đặt nét bút gần nhất. Nếu không ai đặt thêm, bạn nhận phân bổ Signature ({amount} ETH, 1.000 CST, {cscNftCount} Cosmic Signature NFT, cộng thêm {nftCount, plural, other {toàn bộ # NFT đính kèm}} và {erc20Count, plural, other {toàn bộ # khoản nạp token ERC20 đính kèm}} bên dưới)."
       },
       "notLeader": "Nét bút gần nhất thuộc về người khác. Bạn có thể đặt thêm nét bút để dẫn đầu; các nét bút trước vẫn được tính vào Tinh tuyển.",
       "ethStellar": "ETH Tinh tuyển",
@@ -310,6 +310,8 @@
       "previewTitle": "Xem trước CST tham gia",
       "economicsDescription": "CST ròng là CST tham gia nhận được trừ đi chi phí nét bút CST hiện tại.",
       "previewDescription": "Lượng CST tham gia ước tính nếu nét bút được ghi nhận, thay đổi theo thời gian kể từ nét bút trước. Với mọi cách thanh toán, bạn có thể đặt giới hạn chi phí tối đa và lượng CST tham gia tối thiểu.",
+      "previewDescriptionV3": "Lượng CST động ước tính mà nét bút này tạo ra. Toàn bộ số lượng được chuyển cho người tham gia bạn vừa vượt — và bạn nhận trọn CST của nét bút kế tiếp khi có người vượt bạn. Giới hạn chi phí tối đa và mức bảo vệ CST tối thiểu áp dụng cho số lượng này.",
+      "goesToOutbid": "Được trả trọn cho người tham gia bạn vừa vượt; khi bị vượt, bạn nhận CST của nét bút kế tiếp.",
       "rewardLabel": "Nhận",
       "costLabel": "Chi phí",
       "netLabel": "CST ròng",
@@ -335,6 +337,7 @@
       "minCstProtection": {
         "title": "Bảo đảm CST tham gia tối thiểu",
         "body": "CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua. Thiết lập này bảo vệ bạn nếu một nét bút khác đến trước và hạ thấp số lượng trước khi giao dịch của bạn được xác nhận.",
+        "bodyV3": "CST tham gia tích lũy tuyến tính theo thời gian đã trôi qua. Thiết lập này bảo vệ bạn nếu một nét bút khác đến trước và hạ thấp số lượng trước khi giao dịch của bạn được xác nhận.",
         "acceptAnyAria": "Chấp nhận mọi mức CST tham gia",
         "acceptAnyTitle": "Chấp nhận mọi mức CST tham gia, kể cả 0",
         "acceptAnyBody": "Đặt lượng CST tham gia tối thiểu là 0. Chọn tùy chọn này nếu bạn muốn nét bút được ghi nhận ngay cả khi lượng CST nhận được thay đổi trước lúc xác nhận.",
@@ -402,12 +405,13 @@
       "fixedCstEach": "1.000 CST mỗi người",
       "nft": "1 Cosmic Signature NFT",
       "nftEach": "1 Cosmic Signature NFT mỗi người",
+      "signatureNft": "{count, plural, one {1 Cosmic Signature NFT} other {# Cosmic Signature NFT}}",
       "attachedTokens": "Token đính kèm (nếu có)"
     },
     "cards": {
       "signature": {
         "name": "Phân bổ Signature",
-        "tooltip": "Người tham gia đặt nét bút cuối cùng khi đếm ngược về không có thể nhận về phân bổ này: ETH, 1.000 CST, một Cosmic Signature NFT và các token đính kèm."
+        "tooltip": "Người tham gia đặt nét bút cuối cùng khi đếm ngược về không có thể nhận về phân bổ này: ETH, 1.000 CST, {cscNftCount} Cosmic Signature NFT và các token đính kèm."
       },
       "publicGoods": {
         "name": "Hàng hóa công",

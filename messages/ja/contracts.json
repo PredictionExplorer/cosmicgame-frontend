@@ -134,6 +134,19 @@
       "message": {
         "label": "メッセージの最大長",
         "tooltip": "一筆のメッセージに許される最大文字数"
+      },
+      "v3CstDecline": {
+        "label": "CST価格の下降レート",
+        "value": "{amount} CST/分",
+        "tooltip": "CST調律期間中にCST一筆費用が下がる速さです。刻印される参加CSTは、上回られた参加者に全額付与されます。"
+      },
+      "v3SignatureNfts": {
+        "label": "シグネチャー配分NFT数",
+        "tooltip": "サイクル確定時にシグネチャー配分の受領者へ刻印されるCosmic Signature NFT（連番ID）の数です。"
+      },
+      "v3LateWindow": {
+        "label": "終盤一筆期間",
+        "tooltip": "サイクル確定時刻の直前に設けられる期間で、一筆費用に指数的に増える割増（最大約5倍）が適用されます。"
       }
     }
   },
