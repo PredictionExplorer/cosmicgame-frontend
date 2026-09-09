@@ -715,7 +715,15 @@
       "allocationRetrievalTimeout": "Đã thay đổi thời gian chờ nhận về phân bổ.",
       "ethCalibrationDurationDivisor": "Đã thay đổi số chia dùng để tính thời lượng cửa sổ hiệu chỉnh ETH.",
       "ethCalibrationEndingCostDivisor": "Đã thay đổi số chia dùng để tính chi phí nét bút cuối cửa sổ hiệu chỉnh ETH.",
-      "chronoWarriorEthPercentage": "Đã thay đổi tỷ lệ phân bổ ETH cho Chiến binh Thời gian."
+      "chronoWarriorEthPercentage": "Đã thay đổi tỷ lệ phân bổ ETH cho Chiến binh Thời gian.",
+      "cstCalibrationDurationChangeDivisor": "Đã thay đổi số chia kiểm soát mức mỗi nét bút làm thay đổi độ dài cửa sổ hiệu chỉnh CST (chu kỳ V2).",
+      "lateGestureWindowDivisor": "Đã thay đổi số chia quy định độ dài cửa sổ nét bút muộn.",
+      "lateGesturePremiumBaseMultiplier": "Đã thay đổi hệ số cơ sở của phụ trội chi phí trong cửa sổ nét bút muộn.",
+      "lateGesturePremiumExponent": "Đã thay đổi số mũ của phụ trội chi phí trong cửa sổ nét bút muộn.",
+      "cstGestureCostDeclineRate": "Đã thay đổi tốc độ giảm chi phí nét bút CST (CST mỗi giây).",
+      "signatureAllocationNftCount": "Đã thay đổi số Cosmic Signature NFT được khắc cho người nhận phân bổ Signature.",
+      "cstGestureCostDeclineChangeDivisor": "Đã thay đổi số chia kiểm soát mức mỗi nét bút dịch chuyển tốc độ giảm chi phí nét bút CST.",
+      "ethGestureRefundGasLimit": "Đã thay đổi lượng gas tối đa để bỏ qua các khoản hoàn trả ETH nhỏ của nét bút."
     }
   },
   "attachedNftCard": {

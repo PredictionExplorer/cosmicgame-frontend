@@ -94,6 +94,7 @@
   "rules": {
     "howItWorks": "Cách hoạt động",
     "participation": "Khi đặt nét bút, bạn có thể khắc <em>CST tham gia động</em>. Số lượng tính theo công thức căn bậc hai dựa trên khoảng thời gian kể từ nét bút trước.",
+    "participationV3": "Khi đặt nét bút, bạn có thể khắc <em>CST tham gia động</em>. Số lượng tích lũy với tốc độ đều đặn dựa trên khoảng thời gian kể từ nét bút trước.",
     "calibration": "Nét bút ETH rút ngắn cửa sổ hiệu chỉnh CST khoảng {decreasePercent}%; nét bút CST kéo dài cửa sổ này khoảng {increasePercent}%.",
     "stellarSelection": "Mỗi nét bút ghi nhận một lượt Tinh tuyển. {ethEntries} lượt nhận {rafflePercent}% Dự trữ chu kỳ. {nftEntries} người nhận Tinh tuyển khác và {anchorHolders} người neo giữ Random Walk NFT nhận một Cosmic Signature NFT.",
     "publicGoods": "Protocol Guild nhận {percent}% Dự trữ chu kỳ (ít nhất {amount} ETH) mỗi chu kỳ."

@@ -47,6 +47,8 @@
     "cycleValue": "サイクル{round}",
     "gestureCost": "一筆の費用",
     "participationCst": "参加CST",
+    "cstToOutbid": "上回られた参加者へ",
+    "cstToThis": "この参加者へ",
     "attachedRandomWalk": "ETH一筆に添付されたRandomWalk NFT：",
     "paidWithCst": "CST（ERC-20）で支払い：",
     "randomWalkId": "RandomWalk NFT ID：",

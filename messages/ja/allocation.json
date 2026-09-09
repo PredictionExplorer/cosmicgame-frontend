@@ -13,7 +13,7 @@
       "scope": "確定したサイクルの記録のみ",
       "scopeTooltip": "このページはサイクルAPIから確定済みのパフォーマンス・サイクルを要約しています。未確定のサイクルや、関係のない配分受け取りの記録はこれらの合計に含まれません。"
     },
-    "intro": "パフォーマンス・サイクルが確定すると、最後の一筆を入れた参加者がシグネチャー配分——サイクル準備金の{percentage}%、1,000 CST、そして唯一のCosmic Signature NFT——を受け取ります。さらに、時の戦士、星選、係留配分、公共財、累積準備金を通じて追加の配分が流れます。",
+    "intro": "パフォーマンス・サイクルが確定すると、最後の一筆を入れた参加者がシグネチャー配分——サイクル準備金の{percentage}%、1,000 CST、そして{cscNftCount}点のCosmic Signature NFT——を受け取ります。さらに、時の戦士、星選、係留配分、公共財、累積準備金を通じて追加の配分が流れます。",
     "reserveSplit": {
       "label": "サイクル準備金の内訳",
       "tooltip": "確定したサイクルのETH準備金がプロトコルの各トラックにどう配分されるかを割合で示します。",
@@ -103,6 +103,7 @@
       "amountTooltip": "このサイクルのシグネチャー配分として受け取られたETHの総額です。",
       "recipient": "受領者",
       "nft": "NFT",
+      "nfts": "NFT",
       "nftTooltip": "このCosmic Signature NFTをギャラリーで見る。",
       "finalized": "{dateTime}に確定",
       "viewTransaction": "トランザクションを見る",
@@ -121,7 +122,7 @@
       "cards": {
         "signature": {
           "title": "シグネチャー配分",
-          "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、Cosmic Signature NFTが含まれます。"
+          "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、{cscNftCount}点のCosmic Signature NFTが含まれます。"
         },
         "chrono": {
           "title": "時の戦士",

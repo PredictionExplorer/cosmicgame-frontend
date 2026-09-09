@@ -715,7 +715,15 @@
       "allocationRetrievalTimeout": "配分を受け取るためのタイムアウト時間が変更されました。",
       "ethCalibrationDurationDivisor": "ETH調律期間の長さが変更されました。",
       "ethCalibrationEndingCostDivisor": "ETH調律期間終了時の一筆の費用の除数が変更されました。",
-      "chronoWarriorEthPercentage": "時の戦士のETH配分に指定された資金の配分割合が変更されました。"
+      "chronoWarriorEthPercentage": "時の戦士のETH配分に指定された資金の配分割合が変更されました。",
+      "cstCalibrationDurationChangeDivisor": "各一筆がCST調律期間の長さをどれだけ変えるかを制御する除数が変更されました（V2サイクル）。",
+      "lateGestureWindowDivisor": "終盤一筆期間の長さを定める除数が変更されました。",
+      "lateGesturePremiumBaseMultiplier": "終盤一筆期間の費用割増の基本倍率が変更されました。",
+      "lateGesturePremiumExponent": "終盤一筆期間の費用割増の指数が変更されました。",
+      "cstGestureCostDeclineRate": "CST一筆費用の下降レート（毎秒のCST）が変更されました。",
+      "signatureAllocationNftCount": "シグネチャー配分の受領者へ刻印されるCosmic Signature NFTの数が変更されました。",
+      "cstGestureCostDeclineChangeDivisor": "各一筆がCST一筆費用の下降レートをどれだけ動かすかを制御する除数が変更されました。",
+      "ethGestureRefundGasLimit": "少額のETH返金を切り捨てる際のガス上限が変更されました。"
     }
   },
   "attachedNftCard": {

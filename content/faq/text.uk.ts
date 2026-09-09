@@ -9,10 +9,7 @@ import {
 import type { FAQText } from './structure';
 
 /** protocolFacts stores the example gaps as English strings; render them in Ukrainian. */
-const ELAPSED_UK: Record<
-  (typeof protocolFacts.dynamicCstRewardExamples)[number]['elapsed'],
-  string
-> = {
+const ELAPSED_UK: Record<string, string> = {
   '0 seconds': '0 секунд',
   '1 second': '1 секунда',
   '60 seconds': '60 секунд',

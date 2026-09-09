@@ -47,6 +47,8 @@
     "cycleValue": "사이클 {round}",
     "gestureCost": "제스처 비용",
     "participationCst": "참여 CST",
+    "cstToOutbid": "추월당한 참여자에게",
+    "cstToThis": "이 참여자에게",
     "attachedRandomWalk": "ETH 제스처에 RandomWalk NFT 첨부 여부:",
     "paidWithCst": "CST(ERC-20) 지불 여부:",
     "randomWalkId": "RandomWalk NFT ID:",

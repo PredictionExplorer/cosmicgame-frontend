@@ -47,7 +47,8 @@
       "notErc20": "添付されたトークンコントラクトはERC20トークンコントラクトではありません。",
       "insufficientAttachedToken": "この一筆に添付するトークンの残高が不足しています。",
       "insufficientEth": "ETHの残高が不足しています。ウォレットに十分なETHがありません。",
-      "insufficientCst": "CSTの残高が不足しています。ウォレットに十分なCST（ERC-20）がありません。"
+      "insufficientCst": "CSTの残高が不足しています。ウォレットに十分なCST（ERC-20）がありません。",
+      "cycleNotStarted": "次のサイクルはまだ始まっていません。あと{duration}で一筆を入れられます。"
     },
     "transaction": {
       "failed": "一筆を送信できませんでした。ウォレットとネットワーク接続を確認し、現在の費用を更新してから、もう一度お試しください。",
@@ -62,7 +63,8 @@
       "wrongBidType": "一筆の種類の選択が正しくありません。",
       "fundTransferFailed": "資金の送付に失敗しました。",
       "ethCostChanged": "トランザクションの送信中に一筆の費用が{increase} ETH上がりました。新たに必要な費用は{required} ETHです。もう一度お試しください。",
-      "cstCostChanged": "トランザクションの送信中にCST一筆の費用が変わりました。別の一筆が先に届いたためと考えられます。コントラクトは{required} CSTを求めましたが、上限の{maximum} CSTを超えています。更新してからもう一度お試しください。"
+      "cstCostChanged": "トランザクションの送信中にCST一筆の費用が変わりました。別の一筆が先に届いたためと考えられます。コントラクトは{required} CSTを求めましたが、上限の{maximum} CSTを超えています。更新してからもう一度お試しください。",
+      "bidHasBeenPlacedInCurrentRound": "現在のサイクルには既に一筆が入っています。"
     }
   },
   "anchor": {

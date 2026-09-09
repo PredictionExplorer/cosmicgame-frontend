@@ -47,7 +47,8 @@
       "notErc20": "Hợp đồng token đính kèm không phải là hợp đồng token ERC20.",
       "insufficientAttachedToken": "Số dư token không đủ để đính kèm vào nét bút này.",
       "insufficientEth": "Ví không đủ ETH cho giao dịch này.",
-      "insufficientCst": "Ví không đủ CST (ERC-20) cho giao dịch này."
+      "insufficientCst": "Ví không đủ CST (ERC-20) cho giao dịch này.",
+      "cycleNotStarted": "Chu kỳ tiếp theo chưa bắt đầu. Nét bút mở sau {duration}."
     },
     "transaction": {
       "failed": "Không thể gửi nét bút. Hãy kiểm tra ví và kết nối mạng, làm mới chi phí hiện tại, rồi thử lại.",
@@ -62,7 +63,8 @@
       "wrongBidType": "Đã chọn sai loại nét bút.",
       "fundTransferFailed": "Chuyển tiền thất bại.",
       "ethCostChanged": "Chi phí nét bút đã tăng {increase} ETH trong khi giao dịch của bạn đang được gửi. Chi phí mới cần thiết là {required} ETH. Vui lòng thử lại.",
-      "cstCostChanged": "Chi phí nét bút CST đã thay đổi trong khi giao dịch của bạn đang được gửi, có thể do một nét bút khác đã đến trước. Hợp đồng yêu cầu {required} CST, cao hơn mức tối đa {maximum} CST của bạn. Hãy làm mới và thử lại."
+      "cstCostChanged": "Chi phí nét bút CST đã thay đổi trong khi giao dịch của bạn đang được gửi, có thể do một nét bút khác đã đến trước. Hợp đồng yêu cầu {required} CST, cao hơn mức tối đa {maximum} CST của bạn. Hãy làm mới và thử lại.",
+      "bidHasBeenPlacedInCurrentRound": "Chu kỳ hiện tại đã có nét bút."
     }
   },
   "anchor": {

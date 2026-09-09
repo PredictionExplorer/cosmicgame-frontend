@@ -232,10 +232,10 @@
     "metrics": {
       "signatureAllocation": "シグネチャー配分",
       "signatureTooltip": {
-        "base": "シグネチャー配分のETH部分。受領者は1,000 CSTとCosmic Signature NFTも受け取ります。",
-        "withNft": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT、そして{nftCount, plural, other {添付された#点のNFTすべて}}も受け取ります。",
-        "withErc20": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT、そして{erc20Count, plural, other {添付された#件のERC20トークン添付分すべて}}も受け取ります。",
-        "withBoth": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT、そして{nftCount, plural, other {添付された#点のNFT}}と{erc20Count, plural, other {添付された#件のERC20トークン添付分}}のすべても受け取ります。"
+        "base": "シグネチャー配分のETH部分。受領者は1,000 CSTとCosmic Signature NFT {cscNftCount}点も受け取ります。",
+        "withNft": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT {cscNftCount}点、そして{nftCount, plural, other {添付された#点のNFTすべて}}も受け取ります。",
+        "withErc20": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT {cscNftCount}点、そして{erc20Count, plural, other {添付された#件のERC20トークン添付分すべて}}も受け取ります。",
+        "withBoth": "シグネチャー配分のETH部分。受領者は1,000 CST、Cosmic Signature NFT {cscNftCount}点、そして{nftCount, plural, other {添付された#点のNFT}}と{erc20Count, plural, other {添付された#件のERC20トークン添付分}}のすべても受け取ります。"
       },
       "ethGesture": "ETH一筆",
       "ethGestureTooltip": "ETHで一筆を入れる現在の費用",
@@ -252,10 +252,10 @@
       "title": "このサイクルでの位置",
       "tooltip": "このサイクルで最新の一筆を入れた参加者と、一筆の数に応じた星選の選定頻度を確認できます。",
       "leader": {
-        "base": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点）を受け取ります。",
-        "withNft": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{nftCount, plural, other {添付された#点のNFTすべて}}）を受け取ります。",
-        "withErc20": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{erc20Count, plural, other {添付された#件のERC20トークン添付分すべて}}）を受け取ります。",
-        "withBoth": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT 1点、さらに下に示す{nftCount, plural, other {添付された#点のNFT}}と{erc20Count, plural, other {添付された#件のERC20トークン添付分}}のすべて）を受け取ります。"
+        "base": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT {cscNftCount}点）を受け取ります。",
+        "withNft": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT {cscNftCount}点、さらに下に示す{nftCount, plural, other {添付された#点のNFTすべて}}）を受け取ります。",
+        "withErc20": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT {cscNftCount}点、さらに下に示す{erc20Count, plural, other {添付された#件のERC20トークン添付分すべて}}）を受け取ります。",
+        "withBoth": "最新の一筆を入れたのはこのウォレットです。他に誰も一筆を入れなければ、シグネチャー配分（{amount} ETH、1,000 CST、Cosmic Signature NFT {cscNftCount}点、さらに下に示す{nftCount, plural, other {添付された#点のNFT}}と{erc20Count, plural, other {添付された#件のERC20トークン添付分}}のすべて）を受け取ります。"
       },
       "notLeader": "現在、最新の一筆を入れたのは別の参加者です。もう一度一筆を入れられます。追加しなくても、星選の対象には引き続き含まれます。",
       "ethStellar": "ETH星選",
@@ -310,6 +310,8 @@
       "previewTitle": "参加CSTのプレビュー",
       "economicsDescription": "純CSTは、参加CSTから現在のCST一筆の費用を引いたものです。",
       "previewDescription": "この一筆で刻印される参加CSTの見込みです。数量は前の一筆からの経過時間で変わります。どの方法でも、費用の上限と参加CSTの最小数量を設定できます。",
+      "previewDescriptionV3": "この一筆で生成される動的CSTの見込みです。全額が上回られた参加者に渡り、次に上回られた際は、その一筆のCST全額を受け取ります。費用の上限と最小CSTの保護はこの数量に適用されます。",
+      "goesToOutbid": "上回られた参加者に全額支払われます。上回られた際は、次の一筆のCSTを受け取ります。",
       "rewardLabel": "参加CST",
       "costLabel": "費用",
       "netLabel": "純CST",
@@ -335,6 +337,7 @@
       "minCstProtection": {
         "title": "最低参加CST保護",
         "body": "参加CSTの数量は、経過時間を使った平方根の式で決まります。この設定では、別の一筆が先に確認されて数量が減った場合に備え、受け入れる最小数量を指定できます。",
+        "bodyV3": "参加CSTは経過時間に比例して積み上がります。この設定では、別の一筆が先に確認されて数量が減った場合に備え、受け入れる最小数量を指定できます。",
         "acceptAnyAria": "どの参加CSTでも受け入れる",
         "acceptAnyTitle": "0を含むどの参加CSTでも受け入れる",
         "acceptAnyBody": "受け入れる最小数量を0に設定します。確認前に参加CSTの数量が変わっても、一筆を成立させたい場合に選択してください。",
@@ -402,12 +405,13 @@
       "fixedCstEach": "各1,000 CST",
       "nft": "Cosmic Signature NFT 1点",
       "nftEach": "各Cosmic Signature NFT 1点",
+      "signatureNft": "{count, plural, one {Cosmic Signature NFT 1点} other {Cosmic Signature NFT #点}}",
       "attachedTokens": "添付されたトークン（あれば）"
     },
     "cards": {
       "signature": {
         "name": "シグネチャー配分",
-        "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、Cosmic Signature NFT、添付されたトークンが含まれます。"
+        "tooltip": "確定時刻を過ぎると、最後に一筆を入れた参加者がサイクルを確定できます。シグネチャー配分にはETH、1,000 CST、{cscNftCount}点のCosmic Signature NFT、添付されたトークンが含まれます。"
       },
       "publicGoods": {
         "name": "公共財",

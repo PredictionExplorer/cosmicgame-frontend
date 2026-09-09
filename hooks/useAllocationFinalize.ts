@@ -188,7 +188,7 @@ export function useAllocationFinalize({
       // V1/V2 award exactly 1 (the getter does not exist there, so the read fails and we keep 1).
       let signatureAllocationNftCount = 1;
       try {
-        const value = (await cosmicGameContract.read.mainPrizeNumCosmicSignatureNfts?.()) as
+        const value = (await cosmicGameContract?.read.mainPrizeNumCosmicSignatureNfts?.()) as
           | bigint
           | undefined;
         if (value !== undefined && value > 0n) signatureAllocationNftCount = Number(value);

@@ -134,6 +134,19 @@
       "message": {
         "label": "Độ dài lời nhắn tối đa",
         "tooltip": "Số ký tự tối đa được phép trong lời nhắn của nét bút"
+      },
+      "v3CstDecline": {
+        "label": "Tốc độ giảm giá CST",
+        "value": "{amount} CST/phút",
+        "tooltip": "Tốc độ giảm của chi phí nét bút CST trong cửa sổ hiệu chỉnh CST. Mỗi lượt khắc CST tham gia được ghi trọn cho người tham gia bị vượt."
+      },
+      "v3SignatureNfts": {
+        "label": "NFT phân bổ Signature",
+        "tooltip": "Số Cosmic Signature NFT (ID liên tiếp) được khắc cho người nhận phân bổ Signature khi chu kỳ hoàn tất."
+      },
+      "v3LateWindow": {
+        "label": "Cửa sổ nét bút muộn",
+        "tooltip": "Khoảng thời gian ngay trước thời điểm hoàn tất chu kỳ, trong đó chi phí nét bút chịu phần phụ trội tăng theo cấp số nhân (tối đa khoảng 5 lần)."
       }
     }
   },

@@ -232,10 +232,10 @@
     "metrics": {
       "signatureAllocation": "시그니처 배분",
       "signatureTooltip": {
-        "base": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST와 Cosmic Signature NFT 1개도 함께 받습니다.",
-        "withNft": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST, Cosmic Signature NFT 1개, 그리고 {nftCount, plural, other {첨부된 NFT #개}}도 함께 받습니다.",
-        "withErc20": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST, Cosmic Signature NFT 1개, 그리고 {erc20Count, plural, other {첨부된 ERC20 토큰 적립 #건}}도 함께 받습니다.",
-        "withBoth": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST, Cosmic Signature NFT 1개, 그리고 {nftCount, plural, other {첨부된 NFT #개}} 및 {erc20Count, plural, other {첨부된 ERC20 토큰 적립 #건}}도 함께 받습니다."
+        "base": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST와 Cosmic Signature NFT {cscNftCount}개도 함께 받습니다.",
+        "withNft": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST, Cosmic Signature NFT {cscNftCount}개, 그리고 {nftCount, plural, other {첨부된 NFT #개}}도 함께 받습니다.",
+        "withErc20": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST, Cosmic Signature NFT {cscNftCount}개, 그리고 {erc20Count, plural, other {첨부된 ERC20 토큰 적립 #건}}도 함께 받습니다.",
+        "withBoth": "시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST, Cosmic Signature NFT {cscNftCount}개, 그리고 {nftCount, plural, other {첨부된 NFT #개}} 및 {erc20Count, plural, other {첨부된 ERC20 토큰 적립 #건}}도 함께 받습니다."
       },
       "ethGesture": "ETH 제스처",
       "ethGestureTooltip": "지금 ETH로 제스처를 남기는 데 드는 비용",
@@ -252,10 +252,10 @@
       "title": "내 사이클 현황",
       "tooltip": "이번 사이클에서 남긴 제스처를 기준으로, 지금 최종 제스처 자리에 있는지와 별빛 선정 자격 수를 보여 줍니다.",
       "leader": {
-        "base": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개)을 받습니다.",
-        "withNft": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}})을 받습니다.",
-        "withErc20": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다.",
-        "withBoth": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT 1개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}} 및 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다."
+        "base": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT {cscNftCount}개)을 받습니다.",
+        "withNft": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT {cscNftCount}개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}})을 받습니다.",
+        "withErc20": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT {cscNftCount}개, 그리고 아래에 표시된 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다.",
+        "withBoth": "최근 제스처를 남겼습니다. 다른 참여자가 제스처를 남기지 않으면 시그니처 배분({amount} ETH, 1,000 CST, Cosmic Signature NFT {cscNftCount}개, 그리고 아래에 표시된 {nftCount, plural, other {첨부 NFT #개}} 및 {erc20Count, plural, other {첨부 ERC20 토큰 적립 #건}})을 받습니다."
       },
       "notLeader": "최근 참여자가 아닙니다. 다시 제스처를 남겨 선두에 서거나, 별빛 선정 자격을 그대로 유지할 수 있습니다.",
       "ethStellar": "ETH 별빛 선정",
@@ -310,6 +310,8 @@
       "previewTitle": "참여 CST 미리 보기",
       "economicsDescription": "순 CST는 각인되는 참여 CST에서 현재 CST 제스처 비용을 뺀 값입니다.",
       "previewDescription": "이 제스처로 각인될 참여 CST의 예상 수량입니다. 수량은 이전 제스처 이후 흐른 시간에 따라 달라집니다. 모든 제스처 방식에서 최대 비용과 최소 참여 CST를 설정할 수 있습니다.",
+      "previewDescriptionV3": "이 제스처로 생성될 동적 CST의 예상 수량입니다. 전액이 내가 추월한 참여자에게 지급되며, 누군가 나를 추월하면 다음 제스처의 CST 전액을 내가 받습니다. 최대 비용과 최소 CST 보호는 이 수량에 적용됩니다.",
+      "goesToOutbid": "추월당한 참여자에게 전액 지급됩니다. 내가 추월당하면 다음 제스처의 CST를 받습니다.",
       "rewardLabel": "참여 CST",
       "costLabel": "비용",
       "netLabel": "순 CST",
@@ -335,6 +337,7 @@
       "minCstProtection": {
         "title": "최소 참여 CST 보호",
         "body": "참여 CST 수량은 경과 시간에 제곱근 공식을 적용해 정합니다. 다른 제스처가 먼저 반영되어 수량이 줄어드는 경우에 대비해, 허용할 최소 수량을 설정할 수 있습니다.",
+        "bodyV3": "참여 CST는 경과 시간에 비례해 쌓입니다. 다른 제스처가 먼저 반영되어 수량이 줄어드는 경우에 대비해, 허용할 최소 수량을 설정할 수 있습니다.",
         "acceptAnyAria": "모든 참여 CST 허용",
         "acceptAnyTitle": "0을 포함한 모든 참여 CST 허용",
         "acceptAnyBody": "허용할 참여 CST의 최소 수량을 0으로 설정합니다. 확인 전에 참여 CST 수량이 바뀌어도 제스처를 실행하려면 이 옵션을 선택해 주세요.",
@@ -402,12 +405,13 @@
       "fixedCstEach": "각 1,000 CST",
       "nft": "Cosmic Signature NFT 1개",
       "nftEach": "각 Cosmic Signature NFT 1개",
+      "signatureNft": "{count, plural, one {Cosmic Signature NFT 1개} other {Cosmic Signature NFT #개}}",
       "attachedTokens": "첨부 토큰 (있는 경우)"
     },
     "cards": {
       "signature": {
         "name": "시그니처 배분",
-        "tooltip": "마감 시각이 지나면 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있습니다. 시그니처 배분에는 ETH, 1,000 CST, Cosmic Signature NFT 1개와 첨부 토큰이 포함됩니다."
+        "tooltip": "마감 시각이 지나면 최종 제스처를 남긴 참여자가 사이클을 마감할 수 있습니다. 시그니처 배분에는 ETH, 1,000 CST, Cosmic Signature NFT {cscNftCount}개와 첨부 토큰이 포함됩니다."
       },
       "publicGoods": {
         "name": "공공재",

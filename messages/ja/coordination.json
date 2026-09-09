@@ -44,6 +44,14 @@
     "allocationRetrievalTimeout": "配分受け取りのタイムアウトの変更",
     "ethCalibrationDurationDivisor": "ETH調律期間の長さの除数の変更",
     "ethCalibrationEndingCostDivisor": "ETH調律期間終了時の一筆の費用の除数の変更",
-    "chronoWarriorEthPercentage": "時の戦士ETH配分の割合の変更"
+    "chronoWarriorEthPercentage": "時の戦士ETH配分の割合の変更",
+    "cstCalibrationDurationChangeDivisor": "CST調律期間の長さ変更除数の変更",
+    "cstGestureCostDeclineChangeDivisor": "CST一筆費用の下降レート変更除数の変更",
+    "cstGestureCostDeclineRate": "CST一筆費用の下降レートの変更",
+    "ethGestureRefundGasLimit": "ETH一筆の返金ガス許容量の変更",
+    "lateGesturePremiumBaseMultiplier": "終盤一筆割増の基本倍率の変更",
+    "lateGesturePremiumExponent": "終盤一筆割増の指数の変更",
+    "lateGestureWindowDivisor": "終盤一筆期間の除数の変更",
+    "signatureAllocationNftCount": "シグネチャー配分NFT数の変更"
   }
 }

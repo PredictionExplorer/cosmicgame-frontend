@@ -44,6 +44,14 @@
     "allocationRetrievalTimeout": "Đã thay đổi thời gian chờ nhận về phân bổ",
     "ethCalibrationDurationDivisor": "Đã thay đổi số chia dùng để tính thời lượng cửa sổ hiệu chỉnh ETH",
     "ethCalibrationEndingCostDivisor": "Đã thay đổi số chia dùng để tính chi phí nét bút cuối cửa sổ hiệu chỉnh ETH",
-    "chronoWarriorEthPercentage": "Đã thay đổi tỷ lệ phân bổ ETH cho Chiến binh Thời gian"
+    "chronoWarriorEthPercentage": "Đã thay đổi tỷ lệ phân bổ ETH cho Chiến binh Thời gian",
+    "cstCalibrationDurationChangeDivisor": "Đã thay đổi số chia điều chỉnh độ dài cửa sổ hiệu chỉnh CST",
+    "cstGestureCostDeclineChangeDivisor": "Đã thay đổi số chia điều chỉnh tốc độ giảm chi phí nét bút CST",
+    "cstGestureCostDeclineRate": "Đã thay đổi tốc độ giảm chi phí nét bút CST",
+    "ethGestureRefundGasLimit": "Đã thay đổi hạn mức gas cho hoàn trả nét bút ETH",
+    "lateGesturePremiumBaseMultiplier": "Đã thay đổi hệ số cơ sở của phụ trội nét bút muộn",
+    "lateGesturePremiumExponent": "Đã thay đổi số mũ của phụ trội nét bút muộn",
+    "lateGestureWindowDivisor": "Đã thay đổi số chia của cửa sổ nét bút muộn",
+    "signatureAllocationNftCount": "Đã thay đổi số NFT của phân bổ Signature"
   }
 }
