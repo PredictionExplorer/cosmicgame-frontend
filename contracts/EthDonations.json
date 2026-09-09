@@ -1897,19 +1897,6 @@
     "name": "getDurationUntilMainPrize",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getDurationUntilMainPrizeRaw",
-    "outputs": [
-      {
         "internalType": "int256",
         "name": "",
         "type": "int256"
@@ -3253,5 +3240,201 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "BidHasBeenPlacedInCurrentRound",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IERC721",
+        "name": "nftAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nftId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "callerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "CallerIsNotNftOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FirstRound",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "bidPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "receivedAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "InsufficientReceivedBidAmount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidOperationInCurrentState",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "lastBidderAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "beneficiaryAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "durationUntilOperationIsPermitted",
+        "type": "uint256"
+      }
+    ],
+    "name": "MainPrizeClaimDenied",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "mainPrizeTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockTimeStamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "MainPrizeEarlyClaim",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoBidsPlacedInCurrentRound",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundActivationTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockTimeStamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoundIsActive",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundActivationTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockTimeStamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "RoundIsInactive",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "messageLength",
+        "type": "uint256"
+      }
+    ],
+    "name": "TooLongBidMessage",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "randomWalkNftId",
+        "type": "uint256"
+      }
+    ],
+    "name": "UsedRandomWalkNft",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "WrongBidType",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "ArbGasInfoGetGasBacklogCallFailed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "ArbGasInfoGetL1PricingUnitsSinceUpdateCallFailed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "ArbSysArbBlockHashCallFailed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "ArbSysArbBlockNumberCallFailed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "charityAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "EthTransferToCharityFailed",
+    "type": "event"
   }
 ]

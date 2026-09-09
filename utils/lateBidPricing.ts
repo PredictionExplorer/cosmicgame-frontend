@@ -33,9 +33,11 @@ export type LateGesturePhase = 'normal' | 'curve' | 'lastMinute';
 
 /**
  * Classifies the moment of a gesture relative to the V3 late-gesture window.
- * `durationUntilMainPrize` is the contract's clamped-to-zero countdown, so an
- * overdue round (deadline in the past, premium at maximum) lands in
- * 'lastMinute' as required.
+ * `durationUntilMainPrize` comes from `getDurationUntilMainPrize()`: V3.1
+ * returns a signed value that goes negative once the deadline passes, while
+ * older versions clamp at zero — either way an overdue round (premium at
+ * maximum) lands in 'lastMinute' as required, since bigint comparisons
+ * handle negatives naturally.
  */
 export function resolveLateGesturePhase(
   durationUntilMainPrize: bigint,
