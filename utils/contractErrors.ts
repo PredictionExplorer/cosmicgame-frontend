@@ -146,8 +146,18 @@ function getPriceChangeDescriptor(
   }
   if (!inner || !('data' in inner)) return null;
 
-  const data = (inner as Error & { data?: { args?: readonly unknown[] } }).data;
-  const requiredWei = data?.args?.[1];
+  const data = (
+    inner as Error & {
+      data?: { args?: readonly unknown[]; abiItem?: { inputs?: { name?: string }[] } };
+    }
+  ).data;
+  // V3.1 dropped the leading `errStr` string from custom errors, shifting
+  // `bidPrice` from args[1] to args[0]; resolve it by input name and fall
+  // back to the first bigint arg for ABIs without input names.
+  const inputs = data?.abiItem?.inputs ?? [];
+  const byName = inputs.findIndex((i) => i?.name === 'bidPrice');
+  const requiredWei =
+    byName >= 0 ? data?.args?.[byName] : data?.args?.find((a) => typeof a === 'bigint');
   if (typeof requiredWei !== 'bigint') return null;
 
   const displayedPrice =

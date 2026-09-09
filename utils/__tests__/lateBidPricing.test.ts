@@ -27,9 +27,12 @@ describe('resolveLateGesturePhase', () => {
   it('is lastMinute inside the final minute and once the deadline passed', () => {
     expect(resolveLateGesturePhase(LATE_GESTURE_LAST_MINUTE_SECONDS, WINDOW)).toBe('lastMinute');
     expect(resolveLateGesturePhase(1n, WINDOW)).toBe('lastMinute');
-    // getDurationUntilMainPrize() clamps overdue rounds to zero, where the
-    // premium sits at its maximum — the full cap must apply there.
+    // Pre-V3.1 getDurationUntilMainPrize() clamps overdue rounds to zero,
+    // where the premium sits at its maximum — the full cap must apply there.
     expect(resolveLateGesturePhase(0n, WINDOW)).toBe('lastMinute');
+    // V3.1 returns a signed duration: overdue rounds go negative and must
+    // land in lastMinute as well.
+    expect(resolveLateGesturePhase(-4000n, WINDOW)).toBe('lastMinute');
   });
 
   it('keeps the curve headroom above the default tolerance', () => {
