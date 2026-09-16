@@ -16,6 +16,7 @@ jest.mock('@sentry/nextjs', () => ({
 }));
 
 const mockedSentry = Sentry as jest.Mocked<typeof Sentry>;
+const { BaseError } = jest.requireActual<typeof import('viem')>('viem');
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -190,6 +191,50 @@ describe('isEmptyContractReadError', () => {
 
   it('returns false for unrelated errors', () => {
     expect(isEmptyContractReadError(new Error('contract reverted'))).toBe(false);
+  });
+
+  it('does not re-enter viem walk for a non-empty read failure', () => {
+    const err = new BaseError('Contract read failed', { cause: new Error('HTTP request failed') });
+    const originalWalk = err.walk.bind(err);
+    let walking = false;
+    const walk = jest.spyOn(err, 'walk').mockImplementation((predicate) => {
+      // Bound the regression: viem calls the predicate on itself first.
+      if (walking) throw new Error('Recursive viem walk');
+      walking = true;
+      try {
+        return originalWalk(predicate);
+      } finally {
+        walking = false;
+      }
+    });
+
+    expect(isEmptyContractReadError(err)).toBe(false);
+    expect(walk.mock.calls.length).toBeLessThanOrEqual(1);
+  });
+
+  it('detects an empty read nested inside real viem errors', () => {
+    const inner = new BaseError('returned no data ("0x")');
+    const err = new BaseError('Contract read failed', {
+      cause: new BaseError('Execution failed', { cause: inner }),
+    });
+
+    expect(err.message).not.toContain('returned no data');
+    expect(isEmptyContractReadError(err)).toBe(true);
+  });
+
+  it('returns false for a self-referencing error cause', () => {
+    const err = new Error('Contract read failed', { cause: undefined });
+    err.cause = err;
+
+    expect(isEmptyContractReadError(err)).toBe(false);
+  });
+
+  it('returns false for a cyclic error cause chain', () => {
+    const inner = new Error('HTTP request failed', { cause: undefined });
+    const err = new Error('Contract read failed', { cause: inner });
+    inner.cause = err;
+
+    expect(isEmptyContractReadError(err)).toBe(false);
   });
 });
 
