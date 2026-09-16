@@ -99,7 +99,7 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
           size={compact ? 'icon' : 'sm'}
           aria-label={label}
           className={cn(
-            'rounded-full border border-white/[0.12] bg-white/[0.05] text-white/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-white/[0.22] hover:bg-white/[0.09] hover:text-white data-[state=open]:border-secondary/40 data-[state=open]:bg-secondary/10 data-[state=open]:text-white',
+            'cs-glass-control rounded-full border border-white/[0.12] bg-white/[0.05] text-white/85 shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-white/[0.22] hover:bg-white/[0.09] hover:text-white data-[state=open]:border-secondary/40 data-[state=open]:bg-secondary/10 data-[state=open]:text-white',
             compact
               ? 'h-11 w-11 shrink-0 sm:h-10 sm:w-10'
               : 'h-11 gap-2 pl-3 pr-2.5 text-xs font-medium sm:h-9',

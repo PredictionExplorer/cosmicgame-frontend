@@ -79,14 +79,19 @@ const ConnectWalletButton = ({
 
   if (account) {
     if (isMobileView) {
-      return <MobileWallet label={shortenHex(account)} className={className} />;
+      return (
+        <MobileWallet
+          label={shortenHex(account)}
+          className={cn('cs-glass-control cs-glass-static', className)}
+        />
+      );
     }
 
     return (
       <DropdownMenu>
         <DropdownMenuTrigger
           className={cn(
-            'ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
+            'cs-glass-control ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
             liquid && 'liquid-glass-control',
             className,
           )}

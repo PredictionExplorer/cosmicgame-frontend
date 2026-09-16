@@ -202,7 +202,7 @@ const CostChartView = memo(function CostChartView({ series }: { series: CstGestu
             value: t('charts.cstCost.timeIntoCycle'),
             position: 'insideBottom',
             offset: -4,
-            fill: 'hsl(var(--muted-foreground) / 0.8)',
+            fill: 'color-mix(in srgb, hsl(var(--muted-foreground)) 80%, transparent)',
             fontSize: 11,
           }}
         />

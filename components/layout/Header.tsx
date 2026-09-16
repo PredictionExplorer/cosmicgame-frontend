@@ -268,7 +268,7 @@ const Header: FC = () => {
 
         <div
           className={cn(
-            'hidden shrink-0 items-center gap-0.5 xl:flex',
+            'cs-glass-control cs-glass-static hidden shrink-0 items-center gap-0.5 xl:flex',
             experimentalUi && 'liquid-glass-control liquid-glass-static',
           )}
         >

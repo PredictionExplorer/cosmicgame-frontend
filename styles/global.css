@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './tokens.css';
 @import './themes.css';
+@import './liquid-glass-theme.css';
 @import './typography.css';
 @import './focus-ring.css';
 
@@ -316,7 +317,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 .cm-scroller::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.45);
+  background: color-mix(in srgb, hsl(var(--muted-foreground)) 45%, transparent);
   border-radius: 200px;
 }
 

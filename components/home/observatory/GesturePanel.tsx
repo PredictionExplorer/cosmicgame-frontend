@@ -366,7 +366,7 @@ export function GesturePanel({
                       onClick={() => onSelectGestureType(option.value)}
                       aria-pressed={gestureType === option.value}
                       className={cn(
-                        'min-w-0 rounded-lg border px-2 text-center transition-all',
+                        'cs-glass-control min-w-0 rounded-lg border px-2 text-center transition-all',
                         compactDesk ? 'py-1.5' : embedded ? 'py-2' : 'min-h-20 py-3',
                         gestureType === option.value
                           ? 'border-primary/50 bg-primary/10 text-white'

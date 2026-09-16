@@ -30,6 +30,10 @@
       "ember": {
         "name": "余烬",
         "description": "暖炭灰与香槟金"
+      },
+      "liquid-glass": {
+        "name": "原版玻璃",
+        "description": "原版配色与玻璃质感控件"
       }
     }
   },

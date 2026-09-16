@@ -37,6 +37,8 @@ export interface PageShellProps
   extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof shellVariants> {
   /** Ambient backdrop variant. Pass `null` to skip. Defaults per `variant`. */
   backdrop?: BackdropProp;
+  /** Historical atmosphere for Original Glass without changing other palettes. */
+  originalGlassBackdrop?: AmbientBackdropProps['originalGlassVariant'];
   /** Override the default `#main` skip-link target id. */
   id?: string;
 }
@@ -50,12 +52,28 @@ const DEFAULT_BACKDROP: Record<NonNullable<PageShellProps['variant']>, BackdropP
 };
 
 export const PageShell = React.forwardRef<HTMLElement, PageShellProps>(
-  ({ className, variant = 'data', backdrop, id = 'main', children, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'data',
+      backdrop,
+      originalGlassBackdrop,
+      id = 'main',
+      children,
+      ...props
+    },
+    ref,
+  ) => {
     const resolvedBackdrop =
       backdrop === undefined ? DEFAULT_BACKDROP[variant ?? 'data'] : backdrop;
     return (
       <>
-        {resolvedBackdrop ? <AmbientBackdrop variant={resolvedBackdrop} /> : null}
+        {resolvedBackdrop ? (
+          <AmbientBackdrop
+            variant={resolvedBackdrop}
+            originalGlassVariant={originalGlassBackdrop}
+          />
+        ) : null}
         <main
           ref={ref}
           id={id}

@@ -84,6 +84,7 @@ export function AppBarWrapper({
 }: React.HTMLAttributes<HTMLElement>) {
   return (
     <header
+      data-original-glass-header
       className={cn(
         // A single fine rule and the same ink surface as the landing navigation.
         // Keep the declared height in sync with sticky offsets throughout the app.

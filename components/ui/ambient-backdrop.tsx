@@ -2,6 +2,7 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
+import { OriginalAmbientBackdrop } from '@/components/ui/original-ambient-backdrop';
 
 /**
  * AmbientBackdrop — decorative, fixed-position backdrop layer for a page.
@@ -28,10 +29,13 @@ const backdropVariants = cva(
 );
 
 export type AmbientBackdropProps = React.HTMLAttributes<HTMLDivElement> &
-  VariantProps<typeof backdropVariants>;
+  VariantProps<typeof backdropVariants> & {
+    originalGlassVariant?: NonNullable<VariantProps<typeof backdropVariants>['variant']>;
+  };
 
 export function AmbientBackdrop({
   variant = 'subtle',
+  originalGlassVariant,
   className,
   children,
   ...props
@@ -43,9 +47,12 @@ export function AmbientBackdrop({
       className={cn(backdropVariants({ variant }), className)}
       {...props}
     >
-      {variant === 'subtle' && <SubtleLayer />}
-      {variant === 'signature' && <SignatureLayer />}
-      {variant === 'hero' && <HeroLayer />}
+      <div data-current-ambient className="absolute inset-0">
+        {variant === 'subtle' && <SubtleLayer />}
+        {variant === 'signature' && <SignatureLayer />}
+        {variant === 'hero' && <HeroLayer />}
+      </div>
+      <OriginalAmbientBackdrop variant={originalGlassVariant ?? variant ?? 'subtle'} />
       {children}
     </div>
   );
