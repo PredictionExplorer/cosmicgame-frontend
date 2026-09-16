@@ -67,6 +67,7 @@ export const Surface = React.forwardRef<HTMLDivElement, SurfaceProps>(
     return (
       <Comp
         ref={ref}
+        data-original-surface={variant ?? 'glass'}
         className={cn(surfaceVariants({ variant, radius, padding, interactive }), className)}
         {...props}
       />

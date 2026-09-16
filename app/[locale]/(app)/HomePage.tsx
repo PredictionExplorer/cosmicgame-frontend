@@ -659,6 +659,7 @@ const HomePage = ({
       <PageShell
         variant="data"
         backdrop="subtle"
+        originalGlassBackdrop="signature"
         className="home-control-shell pb-24 pt-[calc(var(--header-height)+1rem)] max-sm:pt-[calc(var(--header-height)+0.75rem)] lg:px-5 lg:pb-12 xl:max-w-[100rem]"
       >
         {uxScenario && (

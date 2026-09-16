@@ -274,6 +274,65 @@ test('Original Glass changes control material without moving controls and restor
   await expect(cta).toHaveCSS('background-image', 'none');
 });
 
+test('Original Glass restores the indigo atmosphere and translucent panels without moving the dashboard', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await chooseTheme(page, 'classic-blue');
+  const clock = page.getByTestId('control-desk-clock');
+  const originalAtmosphere = page.locator('[data-original-ambient="signature"]');
+  const before = await clock.boundingBox();
+  const originalFill = await clock.evaluate((element) => getComputedStyle(element).background);
+  await expect(originalAtmosphere).toBeHidden();
+  await chooseTheme(page, 'liquid-glass');
+  await expect(originalAtmosphere).toBeVisible();
+  expect(await clock.boundingBox()).toEqual(before);
+  await expect(clock).toHaveCSS('background-image', /linear-gradient/);
+  expect(await clock.evaluate((element) => getComputedStyle(element).background)).not.toBe(
+    originalFill,
+  );
+  // A motion preference stops the stars, not the static color atmosphere.
+  await expect(page.locator('#tsparticles canvas')).toHaveCount(0);
+  await page.screenshot({ path: test.info().outputPath('original-glass-still-atmosphere.png') });
+  await chooseTheme(page, 'classic-blue');
+  await expect(originalAtmosphere).toBeHidden();
+  await expect(clock).toHaveCSS('background', originalFill);
+  await page.goto('/gallery');
+  await chooseTheme(page, 'liquid-glass');
+  await expect(page.locator('[data-original-surface="glass-bordered"].sticky')).toHaveCSS(
+    'position',
+    'sticky',
+  );
+});
+
+test('Original Glass shows the existing drifting stars with motion enabled', async ({
+  page,
+  context,
+  baseURL,
+  isMobile,
+}, testInfo) => {
+  test.skip(isMobile, 'Moving particles retain the existing desktop-only behavior.');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await context.addCookies([{ name: THEME_COOKIE_NAME, value: 'liquid-glass', url: baseURL! }]);
+  await page.goto('/');
+  await expect(page.locator('[data-original-ambient="signature"]')).toBeVisible();
+  const canvas = page.locator('#tsparticles canvas');
+  await expect(canvas).toBeVisible();
+  const firstFrame = await canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL());
+  // Contract reads settle after the first frames; keep checking responsiveness
+  // through that point so a static screenshot cannot hide a stalled dashboard.
+  await expect
+    .poll(() => page.evaluate(() => performance.now()), { timeout: 20_000, intervals: [1_000] })
+    .toBeGreaterThan(10_000);
+  await expect
+    .poll(() => canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL()))
+    .not.toBe(firstFrame);
+  await page.screenshot({ path: testInfo.outputPath('original-glass-moving-stars.png') });
+  await chooseTheme(page, 'classic-blue');
+  await chooseTheme(page, 'liquid-glass');
+});
+
 test('saved palette is applied before hydration scripts download', async ({
   page,
   context,

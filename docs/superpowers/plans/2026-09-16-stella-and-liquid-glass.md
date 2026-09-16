@@ -63,3 +63,48 @@ headless WebGL unavailable). Playwright summarizes the expected failures as pass
 33 expected outcomes, three skips, zero unexpected failures. The saved-color
 regression was first confirmed failing against the adapted draft and passes with
 the restored source colors. Screenshots use fixture cycle data.
+
+## Owner correction: restore the rendered atmosphere
+
+The owner identified the missing softer indigo appearance and drifting stars. A
+source comparison found that the saved palette alone did not reproduce the old
+rendering: the signature background, translucent Surface/Card materials and header
+effects had been removed upstream. Earlier screenshots also forced reduced motion,
+which suppressed the app particle engine and hid the whole ambient backdrop.
+
+Restore those archived layers only for Original Glass. Keep the current dashboard
+geometry and other palettes. Use the historical signature background on the current
+home page, map its raw panels to the saved surface materials, and reuse the unchanged
+desktop particle engine. Reduced motion retains static colors while stopping
+animation. Verify both static and normal-motion views, including actual changing
+particle canvas frames and theme switching without layout movement.
+
+## Atmosphere restoration verification receipt
+
+The saved signature atmosphere, translucent panels and header now render on the
+current dashboard. Existing palettes retain their backgrounds and layout. A browser
+regression verifies panel geometry and preserves the gallery toolbar's sticky
+position. Normal-motion verification keeps the home responsive beyond ten seconds,
+checks changing particle frames, and switches themes; a headed desktop recording
+also confirms sustained movement. Updated desktop/mobile screenshots and a
+10-second clip use fixture cycle data.
+
+That longer check exposed an existing contract-error recursion: the empty-read
+classifier recursively called viem's self-first `walk` predicate. A separate fix
+traverses Error causes once with cycle protection. Its bounded regression failed
+before the fix; actual viem errors and cyclic causes pass afterward. Independent
+review found no remaining blockers in the fix or theme changes.
+
+Supported Node 24.19.0 / npm 10.9.8. Full coverage: 504 suites, 8,220 tests passed;
+statements 84.11%, branches 77.33%, functions 80.14%, lines 85.64%. Locale/terminology/
+lexicon, full lint, TypeScript, dependency audit and production build passed. Audit:
+zero advisories/exceptions. App/landing bundles: 633.7/292.0 KB gzip, within 640/320 KB.
+Jest emitted a worker-teardown warning but exited zero with every suite passing.
+
+Browser checks: 28 ordinary theme passes and six permission passes; three explicitly
+expected original-CTA contrast failures; five intentional skips (three landing
+WebGL checks and two mobile particle checks). Playwright reports 37 expected
+outcomes, five skips, zero unexpected failures. The previously documented headless
+WebKit black rectangle remains visible across existing themes and this preset;
+real Safari visual review remains needed before rollout. No Cosmic deployment or
+merge was performed.
