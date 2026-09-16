@@ -1,3 +1,48 @@
+:root[data-theme='liquid-glass'] {
+  --brand-cosmic-indigo: oklch(21.3% 0.135 286);
+  --brand-cosmic-indigo-deep: oklch(14.4% 0.1 289);
+  --brand-nebula-violet: oklch(50.4% 0.247 296);
+  --brand-stellar-white: oklch(96.5% 0.012 293);
+  --brand-aurora-cyan: oklch(84.7% 0.149 213);
+  --brand-muted-cosmos: oklch(26.5% 0.124 287);
+  --gradient-deep-space: linear-gradient(
+    180deg,
+    oklch(21.3% 0.135 286) 0%,
+    oklch(14.4% 0.1 289) 100%
+  );
+  --gradient-nebula-glow: linear-gradient(
+    135deg,
+    oklch(50.4% 0.247 296) 0%,
+    oklch(67.2% 0.228 4) 100%
+  );
+  --gradient-allocation-shimmer: linear-gradient(
+    135deg,
+    oklch(82.4% 0.162 81) 0%,
+    oklch(67.2% 0.228 4) 100%
+  );
+  --gradient-ethereum-aura: linear-gradient(
+    135deg,
+    oklch(77.1% 0.163 161) 0%,
+    oklch(84.7% 0.149 213) 100%
+  );
+  --gradient-signature: linear-gradient(
+    135deg,
+    oklch(84.7% 0.149 213) 0%,
+    oklch(50.4% 0.247 296) 100%
+  );
+  --cosmic-indigo-rgb: 26 11 62;
+  --cosmic-indigo-deep-rgb: 13 5 33;
+  --nebula-violet-rgb: 108 60 225;
+  --stellar-white-rgb: 240 237 255;
+  --aurora-cyan-rgb: 0 229 255;
+  --solar-gold-rgb: 255 184 0;
+  --chrono-rose-rgb: 255 61 138;
+  --impact-green-rgb: 0 214 143;
+  --muted-cosmos-rgb: 45 27 105;
+  --focus-ring-color: rgb(var(--aurora-cyan-rgb) / 0.75);
+  --focus-ring-glow: rgb(var(--aurora-cyan-rgb) / 0.35);
+}
+
 /*
  * Optional control material recovered from b675472/styles/liquid-glass.css.
  * Keep the current layout, cards and artwork. Unlayered, root-scoped rules let
@@ -9,7 +54,6 @@
   --lg-body: rgb(2 4 20 / 0.28);
   background-color: var(--lg-body);
   background-image: none;
-  color: hsl(var(--foreground));
   -webkit-backdrop-filter: saturate(1.45) contrast(1.06);
   backdrop-filter: saturate(1.45) contrast(1.06);
   box-shadow:
@@ -37,7 +81,7 @@
     inset -1px -1px 0 0 var(--lg-edge-lo),
     0 1px 2px 0 rgb(0 0 0 / 0.5),
     0 12px 28px -12px rgb(0 0 0 / 0.65),
-    0 0 22px -8px hsl(var(--primary) / 0.4);
+    0 0 22px -8px rgb(var(--aurora-cyan-rgb) / 0.4);
 }
 
 :root[data-theme='liquid-glass']
@@ -53,8 +97,8 @@
     [data-state='active'],
     [data-state='open']
   ) {
-  --lg-edge-hi: hsl(var(--primary));
-  --lg-edge-lo: hsl(var(--primary) / 0.45);
+  --lg-edge-hi: rgb(var(--aurora-cyan-rgb));
+  --lg-edge-lo: rgb(var(--aurora-cyan-rgb) / 0.45);
 }
 
 /* Grouped navigation holds several controls; its geometry stays still. */
@@ -66,29 +110,52 @@
   transform: none;
 }
 
-/* Dark text and a lighter violet stop keep every part of the CTA readable. */
+/* Original button fill and gloss from e58da429. Preserve its white labels. */
 :root[data-theme='liquid-glass'] .cs-glass-cta {
-  color: hsl(var(--primary-foreground));
-  background-color: hsl(var(--primary));
-  background-image:
-    linear-gradient(
-      180deg,
-      rgb(255 255 255 / 0.34) 0%,
-      rgb(255 255 255 / 0.1) 44%,
-      rgb(0 0 0 / 0) 50%,
-      rgb(0 0 0 / 0.1) 100%
-    ),
-    linear-gradient(
-      125deg,
-      hsl(var(--glass-gradient-start)),
-      hsl(var(--glass-gradient-middle)) 52%,
-      hsl(var(--glass-gradient-end))
-    );
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background-color: #06aeec;
+  background-image: linear-gradient(to right in oklab, #06aeec, #35c9ff, #9c37fd);
   box-shadow:
     inset 0 1.5px 0 rgb(255 255 255 / 0.55),
     inset 1px 0 0 rgb(255 255 255 / 0.25),
     inset 0 -1.5px 0 rgb(0 0 0 / 0.22),
-    0 14px 40px -22px hsl(var(--primary) / 0.9);
+    0 14px 40px -22px rgb(var(--aurora-cyan-rgb) / 0.9);
+  transition: all var(--duration-fast) var(--ease-out-soft);
+}
+
+:root[data-theme='liquid-glass'] .cs-glass-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.34) 0%,
+    rgb(255 255 255 / 0.1) 44%,
+    rgb(0 0 0 / 0) 50%,
+    rgb(0 0 0 / 0.1) 100%
+  );
+}
+
+:root[data-theme='liquid-glass']
+  .cs-glass-cta:where(:hover):where(:not(:disabled):not([aria-disabled='true'])) {
+  transform: translateY(-0.125rem);
+  filter: brightness(1.1);
+}
+
+:root[data-theme='liquid-glass'] .cs-glass-outline {
+  border-color: hsl(var(--primary) / 0.5);
+  color: hsl(var(--secondary));
+}
+
+:root[data-theme='liquid-glass'] .cs-glass-secondary {
+  border-color: hsl(var(--primary) / 0.5);
+  color: hsl(var(--primary));
 }
 
 :root[data-theme='liquid-glass'] :is(.cs-glass-control, .cs-glass-cta):focus-visible {
@@ -100,21 +167,25 @@
   :root[data-theme='liquid-glass'] .cs-glass-control {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    background-color: hsl(var(--surface-deep));
+    background-color: rgb(var(--cosmic-indigo-deep-rgb) / 0.94);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root[data-theme='liquid-glass'] .cs-glass-control {
+  :root[data-theme='liquid-glass'] :is(.cs-glass-control, .cs-glass-cta) {
     transition: none;
     transform: none;
   }
-  :root[data-theme='liquid-glass'] .cs-glass-control:where(:hover, :focus-visible, :active) {
+  :root[data-theme='liquid-glass']
+    :is(.cs-glass-control, .cs-glass-cta):where(:hover, :focus-visible, :active) {
     transform: none;
   }
 }
 
 @media print {
+  :root[data-theme='liquid-glass'] .cs-glass-cta::after {
+    display: none !important;
+  }
   :root[data-theme='liquid-glass'] :is(.cs-glass-control, .cs-glass-cta) {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;

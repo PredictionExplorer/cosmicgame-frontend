@@ -47,5 +47,5 @@ owner must explicitly allow that exact preview origin in Holloway and the fronte
 must add an equally narrow microphone-policy rule if voice is being tested. Remove
 temporary origins after review; do not introduce wildcard origin or microphone access.
 
-Liquid Glass is independent of this integration and remains an optional Color scheme
+Original Glass is independent of this integration and remains an optional Color scheme
 selection. The default scheme and existing layout are unchanged.

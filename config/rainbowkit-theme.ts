@@ -32,7 +32,7 @@ export const cosmicRainbowTheme = {
     modalBackground: 'hsl(var(--popover))',
     modalBorder: 'hsl(var(--border))',
     modalText: 'hsl(var(--popover-foreground))',
-    modalTextDim: 'hsl(var(--muted-foreground) / 0.7)',
+    modalTextDim: 'color-mix(in srgb, hsl(var(--muted-foreground)) 70%, transparent)',
     modalTextSecondary: 'hsl(var(--muted-foreground))',
     profileAction: 'hsl(var(--muted))',
     profileActionHover: 'hsl(var(--accent))',

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { expect, test, type Page } from '@playwright/test';
 
 import { SITE_THEMES, THEME_COOKIE_NAME, THEME_STORAGE_KEY } from '../lib/theme/config';
@@ -21,32 +23,34 @@ async function chooseTheme(page: Page, theme: (typeof SITE_THEMES)[number]) {
 async function assertPaletteContrast(page: Page) {
   const contrasts = await page.evaluate(() => {
     const css = getComputedStyle(document.documentElement);
-    const luminance = (token: string, shade = 1) => {
-      const [h, s, l] = css.getPropertyValue(token).trim().split(/\s+/).map(parseFloat);
+    const channels = (token: string) => {
+      const [triplet, opacity = '1'] = css.getPropertyValue(token).trim().split('/');
+      const [h, s, l] = triplet!.trim().split(/\s+/).map(parseFloat);
       const sat = s! / 100;
       const light = l! / 100;
       const a = sat * Math.min(light, 1 - light);
       const channel = (n: number) => {
         const k = (n + h! / 30) % 12;
-        const value = (light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))) * shade;
-        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+        return light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
       };
-      return channel(0) * 0.2126 + channel(8) * 0.7152 + channel(4) * 0.0722;
+      return { rgb: [channel(0), channel(8), channel(4)], alpha: parseFloat(opacity) };
+    };
+    const luminance = (rgb: number[]) => {
+      const linear = rgb.map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+      return linear[0]! * 0.2126 + linear[1]! * 0.7152 + linear[2]! * 0.0722;
     };
     const contrast = (a: number, b: number) => {
       const values = [a, b].sort((x, y) => y - x);
       return (values[0]! + 0.05) / (values[1]! + 0.05);
     };
-    const ratio = (a: string, b: string) => contrast(luminance(a), luminance(b));
-    const glassStops =
-      document.documentElement.dataset.theme === 'liquid-glass'
-        ? ['--glass-gradient-start', '--glass-gradient-middle', '--glass-gradient-end'].map(
-            (token) => ({
-              pair: `glass CTA ${token}, including the darkest gloss`,
-              value: contrast(luminance(token, 0.9), luminance('--primary-foreground')),
-            }),
-          )
-        : [];
+    const ratio = (a: string, b: string) => {
+      const ink = channels(a);
+      const surface = channels(b).rgb;
+      const composed = ink.rgb.map(
+        (value, index) => value * ink.alpha + surface[index]! * (1 - ink.alpha),
+      );
+      return contrast(luminance(composed), luminance(surface));
+    };
     return ['--background', '--card', '--popover']
       .flatMap((surface) =>
         ['--foreground', '--muted-foreground', '--primary', '--secondary'].map((ink) => ({
@@ -54,10 +58,10 @@ async function assertPaletteContrast(page: Page) {
           value: ratio(ink, surface),
         })),
       )
-      .concat(
-        { pair: 'primary button', value: ratio('--primary', '--primary-foreground') },
-        ...glassStops,
-      );
+      .concat({
+        pair: 'solid primary palette pair',
+        value: ratio('--primary', '--primary-foreground'),
+      });
   });
   for (const { pair, value } of contrasts) expect(value, pair).toBeGreaterThanOrEqual(4.5);
 }
@@ -67,8 +71,101 @@ test.beforeEach(async ({ page }) => {
   await mockMobileAuditApi(page);
 });
 
+test('Original Glass restores the saved palette and gradient button colors', async ({
+  page,
+  context,
+  baseURL,
+}) => {
+  await context.addCookies([{ name: THEME_COOKIE_NAME, value: 'liquid-glass', url: baseURL! }]);
+  await page.goto('/faq');
+  const colors = await page.evaluate(() => {
+    const sample = document.createElement('span');
+    document.body.append(sample);
+    const color = (value: string) => {
+      sample.style.color = value;
+      return getComputedStyle(sample).color;
+    };
+    // Reference values from e58da429, before the upstream palette redesign.
+    const references = [
+      ['--foreground', '0 0% 100%'],
+      ['--secondary', '205 100% 71%'],
+      ['--accent', '271 98% 60%'],
+      ['--popover', '235 60% 16%'],
+      ['--border', '235 30% 20%'],
+      ['--ring', '196 98% 54%'],
+    ].map(([token, value]) => ({
+      token,
+      actual: color(`hsl(var(${token}))`),
+      original: color(`hsl(${value})`),
+    }));
+    for (const [token, value] of [
+      ['--aurora-cyan-rgb', '0 229 255'],
+      ['--nebula-violet-rgb', '108 60 225'],
+      ['--cosmic-indigo-rgb', '26 11 62'],
+    ]) {
+      references.push({
+        token,
+        actual: color(`rgb(var(${token}))`),
+        original: color(`rgb(${value})`),
+      });
+    }
+    sample.remove();
+    return references;
+  });
+  for (const { token, actual, original } of colors) expect(actual, token).toBe(original);
+  // Validate the actual newer consumers after substituting the original alpha-bearing token.
+  for (const file of [
+    'config/rainbowkit-theme.ts',
+    'styles/global.css',
+    'components/statistics/EnduranceTimelineChart.tsx',
+    'components/statistics/CstCalibrationWindowChart.tsx',
+    'components/statistics/CstGestureCostChart.tsx',
+  ]) {
+    const expressions = readFileSync(file, 'utf8').match(
+      /(?:hsl|color-mix)\([^'"`;\n}]*var\(--muted-foreground\)[^'"`;\n}]*/g,
+    );
+    expect(expressions?.length, file).toBeGreaterThan(0);
+    for (const expression of expressions!) {
+      expect(
+        await page.evaluate((value) => {
+          const ink = getComputedStyle(document.documentElement).getPropertyValue(
+            '--muted-foreground',
+          );
+          return CSS.supports('color', value.replace('var(--muted-foreground)', ink));
+        }, expression),
+        `${file}: ${expression}`,
+      ).toBe(true);
+    }
+  }
+  const cta = page.getByTestId('connect-wallet-button').first();
+  await expect(cta).toHaveCSS('color', 'rgb(255, 255, 255)');
+  const gradient = await cta.evaluate((element) => getComputedStyle(element).backgroundImage);
+  for (const color of ['rgb(6, 174, 236)', 'rgb(53, 201, 255)', 'rgb(156, 55, 253)']) {
+    expect(gradient).toContain(color);
+  }
+});
+
+test('Original Glass source colors retain the known CTA contrast shortfall', async ({ page }) => {
+  await page.goto('/faq');
+  await chooseTheme(page, 'liquid-glass');
+  const cta = page.getByTestId('connect-wallet-button').first();
+  await expect(cta).toHaveCSS('color', 'rgb(255, 255, 255)');
+  const gradient = await cta.evaluate((element) => getComputedStyle(element).backgroundImage);
+  expect(gradient).toContain('rgb(53, 201, 255)');
+  const rgb = [53, 201, 255].map((value) => {
+    const channel = value / 255;
+    return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+  });
+  const middleContrast = 1.05 / (rgb[0]! * 0.2126 + rgb[1]! * 0.7152 + rgb[2]! * 0.0722 + 0.05);
+  test.fail(
+    true,
+    'Requested faithful restoration: original white-on-cyan CTA is below AA. See docs/theme-system.md.',
+  );
+  expect(middleContrast).toBeGreaterThanOrEqual(4.5);
+});
+
 for (const host of ['app', 'landing'] as const) {
-  test(`${host}: every palette is readable, responsive and remembered`, async ({
+  test(`${host}: every palette has readable core text and is responsive and remembered`, async ({
     page,
     context,
     isMobile,
@@ -150,7 +247,7 @@ test('palette menu works with the keyboard and follows a language change', async
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'classic-blue');
 });
 
-test('Liquid Glass changes control material without moving controls and restores the prior palette', async ({
+test('Original Glass changes control material without moving controls and restores the prior palette', async ({
   page,
 }) => {
   await page.goto('/faq');

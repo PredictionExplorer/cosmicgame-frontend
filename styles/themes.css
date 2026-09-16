@@ -97,28 +97,6 @@
   --input: 28 20% 34%;
 }
 
-/* The original blue canvas, with a readable violet highlight for glass controls. */
-:root[data-theme='liquid-glass'],
-[data-palette='liquid-glass'] {
-  --background: 235 68% 10%;
-  --surface-deep: 235 68% 7%;
-  --foreground: 220 40% 97%;
-  --card: 235 60% 16%;
-  --popover: 235 50% 19%;
-  --primary: 196 98% 54%;
-  --primary-hover: 196 98% 66%;
-  --primary-foreground: 235 68% 8%;
-  --secondary: 271 98% 80%;
-  --accent: 271 48% 26%;
-  --muted: 235 40% 20%;
-  --muted-foreground: 226 25% 77%;
-  --border: 235 30% 27%;
-  --input: 230 30% 36%;
-  --glass-gradient-start: 196 95% 47%;
-  --glass-gradient-middle: 196 100% 60%;
-  --glass-gradient-end: 271 98% 76%;
-}
-
 :root,
 [data-palette] {
   --card-foreground: var(--foreground);
@@ -134,4 +112,35 @@
   --destructive: 0 62% 50%;
   --destructive-foreground: 0 0% 100%;
   --success: 151 65% 76%;
+}
+
+/* Original palette from e58da429; material and brand colors are restored together. */
+:root[data-theme='liquid-glass'],
+[data-palette='liquid-glass'] {
+  --surface-deep: 257.142857 73.684211% 7.45098%;
+  --primary-hover: 196 98% 66%;
+  --background: 235 68% 10%;
+  --foreground: 0 0% 100%;
+  --card: 235 60% 16%;
+  --card-foreground: 0 0% 100%;
+  --popover: 235 60% 16%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 196 98% 54%;
+  --primary-foreground: 235 68% 10%;
+  --secondary: 205 100% 71%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 271 98% 60%;
+  --accent-foreground: 0 0% 100%;
+  --muted: 235 40% 20%;
+  --muted-foreground: 0 0% 100% / 0.68;
+  --destructive: 0 62% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 235 30% 20%;
+  --input: 235 30% 20%;
+  --ring: 196 98% 54%;
+  --chart-1: 196 98% 54%;
+  --chart-2: 271 98% 60%;
+  --chart-3: 205 100% 71%;
+  --chart-4: 45 93% 52%;
+  --chart-5: 0 62% 50%;
 }

@@ -31,7 +31,7 @@ export function ThemeSwitcher({ className }: { className?: string }) {
           aria-label={t('themeSwitcher.label')}
           title={t('themeSwitcher.label')}
           className={cn(
-            'h-11 w-11 shrink-0 rounded-full border border-foreground/12 bg-foreground/5 text-secondary shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-primary/40 hover:bg-primary/10 hover:text-primary data-[state=open]:border-primary/40 data-[state=open]:bg-primary/10 sm:h-10 sm:w-10',
+            'cs-glass-control h-11 w-11 shrink-0 rounded-full border border-foreground/12 bg-foreground/5 text-secondary shadow-[inset_0_1px_0_rgb(255_255_255/0.05)] hover:border-primary/40 hover:bg-primary/10 hover:text-primary data-[state=open]:border-primary/40 data-[state=open]:bg-primary/10 sm:h-10 sm:w-10',
             className,
           )}
         >

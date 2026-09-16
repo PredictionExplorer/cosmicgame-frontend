@@ -27,8 +27,39 @@ Stack: existing Next.js App Router, TypeScript, Tailwind v4, next-intl, Radix an
 - [x] Run focused theme/integration browser checks, inspect screenshots, then independent code review.
 - [x] Prepare reviewable commits on a fresh branch for Andrew's fork and draft PR delivery against current main. Leave PR55 and its old layout branch unchanged. Vercel preview authorization and production merging remain with the upstream team.
 
-## Verification receipt
+## Initial draft verification receipt
 
 Supported Node 24.19.0 / npm 10.9.8. Full Jest coverage: 504 suites, 8,216 tests passed; statements 84.09%, branches 77.29%, functions 80.07%, lines 85.62%. Locale/terminology/lexicon checks, full lint, TypeScript, and dependency audit passed. Targeted supported dependency patches leave zero advisories and no exceptions. Production build and app/landing bundle budgets passed using local fixture configuration.
 
 Browser checks: 21 theme checks passed across desktop Chromium, mobile Chromium, and mobile WebKit; three ambient-canvas cases skipped (mobile by design, desktop headless WebGL unavailable). Six permission-inheritance checks passed in desktop/mobile Chromium. The permission regression first failed with the external-only policy and passed after including the required parent self permission. Real Holloway iframe QA confirmed both canonical hosts, first welcome, no automatic audio, persistent dismissal, shared theme preference, one loader/frame across navigation, and allowed iframe microphone policy with camera blocked. No device capture, paid provider session, wallet transaction, or Cosmic production deployment was performed by this frontend verification.
+
+## Owner correction: preserve the saved look
+
+Restore the full e58da429 palette, fixed brand colors/gradients and original control
+material together under the display name Original Glass. Keep the current layout,
+Midnight default, other palettes and Stella integration. Preserve white CTA labels
+and exact original gradient stops rather than the initial readability substitutions.
+The original CTA contrast shortfall is documented in theme-system.md and explicitly
+reported by a known-limitation browser assertion; do not describe this preset as fully AA.
+The original 68%-white muted text is now contrast-checked after alpha compositing.
+
+## Saved-look restoration verification receipt
+
+Restored the saved palette, brand gradients and control material under the Original
+Glass label in all eight locales. Compatibility fixes compose the saved muted-text
+alpha correctly in the wallet, scrollbar and three charts. Independent review found
+no outstanding issues.
+
+Full Jest coverage passed: 504 suites, 8,216 tests. After the five alpha-consumer
+changes, their 44 focused chart tests also passed. Locale/terminology/lexicon,
+lint, TypeScript, production build and bundle budgets passed. App/landing bundles
+remain 632.5/292.0 KB gzip against 640/320 KB budgets.
+
+Browser verification: 24 theme checks passed across desktop Chromium, mobile
+Chromium and mobile WebKit; six permission-inheritance checks passed in Chromium.
+Three explicitly expected failures record the retained original CTA source-color
+contrast shortfall. Three ambient-canvas cases skipped (mobile by design; desktop
+headless WebGL unavailable). Playwright summarizes the expected failures as passed:
+33 expected outcomes, three skips, zero unexpected failures. The saved-color
+regression was first confirmed failing against the adapted draft and passes with
+the restored source colors. Screenshots use fixture cycle data.

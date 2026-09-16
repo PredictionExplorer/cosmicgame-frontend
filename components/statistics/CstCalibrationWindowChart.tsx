@@ -155,7 +155,7 @@ const CalibrationChartView = memo(function CalibrationChartView({
             value: t('charts.cstWindow.timeIntoCycle'),
             position: 'insideBottom',
             offset: -4,
-            fill: 'hsl(var(--muted-foreground) / 0.8)',
+            fill: 'color-mix(in srgb, hsl(var(--muted-foreground)) 80%, transparent)',
             fontSize: 11,
           }}
         />

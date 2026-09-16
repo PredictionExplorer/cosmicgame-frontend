@@ -13,12 +13,12 @@ const buttonVariants = cva(
           'cs-glass-cta capitalize border border-transparent bg-primary text-primary-foreground hover:bg-primary/90',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'cs-glass-control capitalize border border-white/20 bg-transparent px-6 text-foreground hover:border-white/35 hover:bg-white/[0.04]',
+          'cs-glass-control cs-glass-outline capitalize border border-white/20 bg-transparent px-6 text-foreground hover:border-white/35 hover:bg-white/[0.04]',
         secondary:
-          'cs-glass-control relative capitalize px-6 text-secondary border border-secondary/20 bg-secondary/[0.07] hover:bg-secondary/[0.12]',
-        ghost: 'cs-glass-control hover:bg-white/[0.06] hover:text-foreground',
+          'cs-glass-control cs-glass-secondary relative capitalize px-6 text-secondary border border-secondary/20 bg-secondary/[0.07] hover:bg-secondary/[0.12]',
+        ghost: 'hover:bg-white/[0.06] hover:text-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        text: 'cs-glass-control text-white border border-white/[0.06] bg-white/[0.02] rounded-none',
+        text: 'text-white border border-white/[0.06] bg-white/[0.02] rounded-none',
       },
       // Every size reaches the 44px touch target below `sm` and keeps its
       // original desktop density above it, so pointer UIs stay compact
