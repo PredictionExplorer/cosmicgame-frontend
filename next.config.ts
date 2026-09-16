@@ -201,6 +201,17 @@ const nextConfig: NextConfig = {
           { key: 'Cross-Origin-Opener-Policy', value: 'unsafe-none' },
         ],
       },
+      {
+        source: '/(.*)',
+        has: [{ type: 'host', value: '(?:app\\.)?cosmicsignature\\.com' }],
+        headers: [
+          {
+            key: 'Permissions-Policy',
+            // The parent must enable itself before delegating to a child frame.
+            value: 'camera=(), microphone=(self "https://holloway-bay.vercel.app"), geolocation=()',
+          },
+        ],
+      },
     ];
   },
 };

@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { THEME_COOKIE_NAME, THEME_STORAGE_KEY } from '@/lib/theme/config';
+import { restoreSiteTheme } from '@/lib/theme/client';
 
 import { ThemeSwitcher } from '../ThemeSwitcher';
 
@@ -47,5 +48,32 @@ describe('color scheme menu', () => {
     expect(document.cookie).toContain(`${THEME_COOKIE_NAME}=classic-blue`);
     await waitFor(() => expect(trigger).toHaveFocus());
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('offers Liquid Glass as an optional choice and restores it without changing the default', async () => {
+    const user = userEvent.setup();
+    const { unmount } = render(<ThemeSwitcher />);
+    expect(document.documentElement).toHaveAttribute('data-theme', 'midnight');
+    await user.click(screen.getByRole('button', { name: 'common.themeSwitcher.label' }));
+    await user.click(
+      await screen.findByRole('menuitemradio', {
+        name: /themeSwitcher.themes.liquid-glass.name/,
+      }),
+    );
+
+    expect(document.documentElement).toHaveAttribute('data-theme', 'liquid-glass');
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('liquid-glass');
+    expect(document.cookie).toContain(`${THEME_COOKIE_NAME}=liquid-glass`);
+    unmount();
+    document.documentElement.dataset.theme = 'midnight';
+    restoreSiteTheme();
+    render(<ThemeSwitcher />);
+    await user.click(screen.getByRole('button', { name: 'common.themeSwitcher.label' }));
+    expect(
+      await screen.findByRole('menuitemradio', {
+        name: /themeSwitcher.themes.liquid-glass.name/,
+      }),
+    ).toHaveAttribute('aria-checked', 'true');
+    expect(document.documentElement).toHaveAttribute('data-theme', 'liquid-glass');
   });
 });

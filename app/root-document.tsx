@@ -94,6 +94,12 @@ export function RootDocument({
       <body>
         <ThemeSync />
         {children}
+        <Script
+          id="cosmic-website-assistant"
+          src="https://holloway-bay.vercel.app/website-assistant.js"
+          data-holloway-assistant="ee939b0c-7dac-455c-a68e-9afc07ef91eb"
+          strategy="afterInteractive"
+        />
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>

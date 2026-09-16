@@ -1,0 +1,124 @@
+/*
+ * Optional control material recovered from b675472/styles/liquid-glass.css.
+ * Keep the current layout, cards and artwork. Unlayered, root-scoped rules let
+ * this material override control utilities only while Liquid Glass is selected.
+ */
+:root[data-theme='liquid-glass'] .cs-glass-control {
+  --lg-edge-hi: rgb(255 255 255 / 0.9);
+  --lg-edge-lo: rgb(255 255 255 / 0.36);
+  --lg-body: rgb(2 4 20 / 0.28);
+  background-color: var(--lg-body);
+  background-image: none;
+  color: hsl(var(--foreground));
+  -webkit-backdrop-filter: saturate(1.45) contrast(1.06);
+  backdrop-filter: saturate(1.45) contrast(1.06);
+  box-shadow:
+    inset 1px 1px 0 0 var(--lg-edge-hi),
+    inset -1px -1px 0 0 var(--lg-edge-lo),
+    0 1px 2px 0 rgb(0 0 0 / 0.5),
+    0 8px 20px -10px rgb(0 0 0 / 0.6);
+  transition:
+    transform var(--duration-fast) var(--ease-out-soft),
+    box-shadow var(--duration-fast) var(--ease-out-soft),
+    background-color var(--duration-fast) var(--ease-out-soft),
+    color var(--duration-fast) var(--ease-out-soft);
+}
+
+:root[data-theme='liquid-glass']
+  .cs-glass-control:where(:hover, :focus-visible):where(
+    :not(:disabled):not([aria-disabled='true'])
+  ) {
+  --lg-edge-hi: rgb(255 255 255 / 1);
+  --lg-edge-lo: rgb(255 255 255 / 0.5);
+  --lg-body: rgb(2 4 20 / 0.18);
+  transform: scale(1.03);
+  box-shadow:
+    inset 1px 1px 0 0 var(--lg-edge-hi),
+    inset -1px -1px 0 0 var(--lg-edge-lo),
+    0 1px 2px 0 rgb(0 0 0 / 0.5),
+    0 12px 28px -12px rgb(0 0 0 / 0.65),
+    0 0 22px -8px hsl(var(--primary) / 0.4);
+}
+
+:root[data-theme='liquid-glass']
+  .cs-glass-control:where(:active):where(:not(:disabled):not([aria-disabled='true'])) {
+  transform: scale(0.97);
+  --lg-body: rgb(2 4 20 / 0.4);
+}
+
+:root[data-theme='liquid-glass']
+  .cs-glass-control:where(
+    [aria-pressed='true'],
+    [aria-checked='true'],
+    [data-state='active'],
+    [data-state='open']
+  ) {
+  --lg-edge-hi: hsl(var(--primary));
+  --lg-edge-lo: hsl(var(--primary) / 0.45);
+}
+
+/* Grouped navigation holds several controls; its geometry stays still. */
+:root[data-theme='liquid-glass'] .cs-glass-static {
+  border-radius: 9999px;
+}
+
+:root[data-theme='liquid-glass'] .cs-glass-static:where(:hover, :focus-visible, :active) {
+  transform: none;
+}
+
+/* Dark text and a lighter violet stop keep every part of the CTA readable. */
+:root[data-theme='liquid-glass'] .cs-glass-cta {
+  color: hsl(var(--primary-foreground));
+  background-color: hsl(var(--primary));
+  background-image:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.34) 0%,
+      rgb(255 255 255 / 0.1) 44%,
+      rgb(0 0 0 / 0) 50%,
+      rgb(0 0 0 / 0.1) 100%
+    ),
+    linear-gradient(
+      125deg,
+      hsl(var(--glass-gradient-start)),
+      hsl(var(--glass-gradient-middle)) 52%,
+      hsl(var(--glass-gradient-end))
+    );
+  box-shadow:
+    inset 0 1.5px 0 rgb(255 255 255 / 0.55),
+    inset 1px 0 0 rgb(255 255 255 / 0.25),
+    inset 0 -1.5px 0 rgb(0 0 0 / 0.22),
+    0 14px 40px -22px hsl(var(--primary) / 0.9);
+}
+
+:root[data-theme='liquid-glass'] :is(.cs-glass-control, .cs-glass-cta):focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-theme='liquid-glass'] .cs-glass-control {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: hsl(var(--surface-deep));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme='liquid-glass'] .cs-glass-control {
+    transition: none;
+    transform: none;
+  }
+  :root[data-theme='liquid-glass'] .cs-glass-control:where(:hover, :focus-visible, :active) {
+    transform: none;
+  }
+}
+
+@media print {
+  :root[data-theme='liquid-glass'] :is(.cs-glass-control, .cs-glass-cta) {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+}

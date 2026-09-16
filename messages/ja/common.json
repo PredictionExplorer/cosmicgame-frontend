@@ -30,6 +30,10 @@
       "ember": {
         "name": "エンバー",
         "description": "温かなチャコールとシャンパン"
+      },
+      "liquid-glass": {
+        "name": "リキッドグラス",
+        "description": "コズミックブルーと澄んだガラス"
       }
     }
   },

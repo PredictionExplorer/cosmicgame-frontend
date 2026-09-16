@@ -73,7 +73,7 @@ export function LanguageSwitcher({ className, variant = 'pill' }: LanguageSwitch
                 aria-checked={selected}
                 onClick={() => switchTo(option)}
                 className={cn(
-                  'flex min-h-11 items-center justify-between gap-2 rounded-xl border px-3.5 py-2 text-left text-sm transition-colors',
+                  'cs-glass-control flex min-h-11 items-center justify-between gap-2 rounded-xl border px-3.5 py-2 text-left text-sm transition-colors',
                   selected
                     ? 'border-secondary/40 bg-secondary/10 text-white'
                     : 'border-white/[0.08] bg-white/[0.03] text-white/75 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white',

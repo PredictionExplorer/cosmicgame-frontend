@@ -30,6 +30,10 @@
       "ember": {
         "name": "Than hồng",
         "description": "Xám than ấm và vàng champagne"
+      },
+      "liquid-glass": {
+        "name": "Thủy tinh lỏng",
+        "description": "Xanh vũ trụ và thủy tinh trong trẻo"
       }
     }
   },

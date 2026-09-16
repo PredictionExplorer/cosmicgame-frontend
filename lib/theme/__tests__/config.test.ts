@@ -80,6 +80,14 @@ describe('theme bootstrap before hydration', () => {
     expect(localStorage.getItem).not.toHaveBeenCalled();
   });
 
+  it('restores Liquid Glass before hydration from either persistence mechanism', () => {
+    expect(runBootstrap(`${THEME_COOKIE_NAME}=liquid-glass`, 'midnight').theme).toBe(
+      'liquid-glass',
+    );
+    expect(runBootstrap('', 'liquid-glass').theme).toBe('liquid-glass');
+    expect(DEFAULT_SITE_THEME).toBe('midnight');
+  });
+
   it('uses local storage when the shared cookie is absent or invalid', () => {
     for (const cookie of ['', `${THEME_COOKIE_NAME}=unrecognized`]) {
       const { theme, localStorage } = runBootstrap(cookie, 'classic-blue');

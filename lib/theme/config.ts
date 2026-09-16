@@ -1,5 +1,12 @@
 /** Stable preference IDs; palettes live in styles/themes.css and names in common.json. */
-export const SITE_THEMES = ['midnight', 'classic-blue', 'aurora', 'nebula', 'ember'] as const;
+export const SITE_THEMES = [
+  'midnight',
+  'classic-blue',
+  'aurora',
+  'nebula',
+  'ember',
+  'liquid-glass',
+] as const;
 export type SiteTheme = (typeof SITE_THEMES)[number];
 export const DEFAULT_SITE_THEME: SiteTheme = 'midnight';
 export const THEME_STORAGE_KEY = 'cosmic-signature-theme';

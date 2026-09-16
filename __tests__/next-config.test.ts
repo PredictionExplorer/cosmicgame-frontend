@@ -1,4 +1,7 @@
+import type { IncomingMessage } from 'node:http';
+
 import type { NextConfig } from 'next';
+import { matchHas } from 'next/dist/shared/lib/router/utils/prepare-destination';
 import { withSentryConfig } from '@sentry/nextjs';
 
 import config from '@/next.config';
@@ -142,6 +145,37 @@ describe('next.config', () => {
     ])('includes %s header', (key, value) => {
       const headerValues = headers[0]?.headers;
       expect(headerValues).toContainEqual({ key, value });
+    });
+
+    it.each(['cosmicsignature.com', 'app.cosmicsignature.com'])(
+      'delegates only microphone access to the assistant on %s',
+      (host) => {
+        const values = new Map<string, string>();
+        for (const rule of headers) {
+          if (matchHas({ headers: { host } } as IncomingMessage, {}, rule.has, rule.missing)) {
+            for (const header of rule.headers) values.set(header.key, header.value);
+          }
+        }
+        expect(values.get('Permissions-Policy')).toBe(
+          'camera=(), microphone=(self "https://holloway-bay.vercel.app"), geolocation=()',
+        );
+      },
+    );
+
+    it.each([
+      'localhost:3000',
+      'preview.vercel.app',
+      'www.cosmicsignature.com',
+      'cosmicsignature.com.example.org',
+      'cosmicsignatureXcom',
+    ])('keeps microphone access disabled on unapproved host %s', (host) => {
+      const values = new Map<string, string>();
+      for (const rule of headers) {
+        if (matchHas({ headers: { host } } as IncomingMessage, {}, rule.has, rule.missing)) {
+          for (const header of rule.headers) values.set(header.key, header.value);
+        }
+      }
+      expect(values.get('Permissions-Policy')).toBe('camera=(), microphone=(), geolocation=()');
     });
   });
 

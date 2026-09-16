@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './tokens.css';
 @import './themes.css';
+@import './liquid-glass-theme.css';
 @import './typography.css';
 @import './focus-ring.css';
 

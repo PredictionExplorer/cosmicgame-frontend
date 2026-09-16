@@ -2,6 +2,14 @@
 
 Midnight is the default. Classic Blue restores the original blue canvas and cyan
 accent; Aurora, Nebula, and Ember add coordinated dark palettes.
+Liquid Glass is an optional sixth choice: the original blue canvas with violet
+highlights, sharp reflective control edges, and cyan-to-violet primary buttons.
+It preserves the current page layout; Midnight remains the default.
+
+Review screenshots use deterministic browser-test data:
+[default Midnight](images/liquid-glass-default-comparison.png),
+[Liquid Glass desktop](images/liquid-glass-desktop.png), and
+[Liquid Glass mobile](images/liquid-glass-mobile.png).
 
 ## Ownership
 
@@ -9,6 +17,12 @@ accent; Aurora, Nebula, and Ember add coordinated dark palettes.
   `background`, `card`, `popover`, `primary`, `secondary`, `muted`, and `border`
   rather than fixed interface colors. `data-palette` reuses the actual palette
   for each selector preview. Status colors and artwork keep their own meaning.
+- `styles/liquid-glass-theme.css` applies the control material recovered from
+  `b675472/styles/liquid-glass.css` only below `data-theme="liquid-glass"`.
+  Stable `cs-glass-control`, `cs-glass-static`, and `cs-glass-cta` hooks cover
+  existing buttons, header navigation, the ecosystem dock, language choices,
+  and wallet controls. Cards, artwork, destructive buttons, and page geometry
+  keep their existing treatment. The experimental route remains independent.
 - `lib/theme/config.ts` owns stable preference IDs, validation, cookie scope, and
   the synchronous bootstrap. `app/root-document.tsx` installs it for both hosts.
 - `lib/theme/client.ts` updates the document and publishes changes through
@@ -42,6 +56,10 @@ Add a stable ID in `SITE_THEMES`, its complete palette in `styles/themes.css`, a
 names/descriptions to every locale's `common.json`. Keep data-series colors distinct
 and body text, muted text, accents, and primary-button text at least WCAG AA 4.5:1.
 Avoid a light palette without first auditing existing white foreground utilities.
+Liquid Glass keeps the backdrop sharp: saturation and contrast, without blur.
+Its CTA uses dark text and a lighter violet stop to maintain AA contrast,
+including the darkest gloss. Reduced motion prevents control scaling; reduced
+transparency uses an opaque surface; print removes the material effects.
 
 Run `npm run i18n:check`, `npm run lint`, `npm run type-check`, the theme unit tests,
 and `npx playwright test e2e/themes.spec.ts`. The browser suite covers both hosts,
