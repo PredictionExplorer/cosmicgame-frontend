@@ -55,10 +55,15 @@ export function useClaimAllocations(onSuccess?: () => void) {
   // unmounted component (this is a frequent source of stale-warning noise and
   // subtle bugs when the user navigates away mid-transaction).
   const mountedRef = useRef(true);
+  // Pending burst-refresh timers (see refreshAfterClaim); cleared on unmount
+  // and whenever a new claim lands so bursts never overlap.
+  const refreshTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   useEffect(() => {
     mountedRef.current = true;
+    const timers = refreshTimersRef.current;
     return () => {
       mountedRef.current = false;
+      timers.forEach(clearTimeout);
     };
   }, []);
 
@@ -88,10 +93,35 @@ export function useClaimAllocations(onSuccess?: () => void) {
     });
   }, [setNotification, t]);
 
+  /**
+   * Refreshes page data after a claim transaction has been confirmed.
+   *
+   * By the time this runs the receipt has landed, so on-chain state (e.g. the
+   * PrizesWallet ETH balance dropping to zero) is already final. The API,
+   * however, lags behind while the backend indexer processes the new block:
+   * a single immediate refetch usually returns pre-claim data and the page
+   * then sits stale until the next slow polling cycle (10-30s). Refetching in
+   * a short burst makes the page converge as soon as the backend has indexed
+   * the claim — typically the first or second retry — at the cost of a few
+   * extra lightweight API calls. React Query only re-renders when the data
+   * actually changes, so intermediate stale responses are invisible.
+   */
   const refreshAfterClaim = useCallback(() => {
     if (!mountedRef.current) return;
-    fetchStatusData();
-    onSuccess?.();
+    refreshTimersRef.current.forEach(clearTimeout);
+    refreshTimersRef.current = [];
+    const refresh = () => {
+      fetchStatusData();
+      onSuccess?.();
+    };
+    refresh();
+    for (const delayMs of [1_500, 3_000, 5_000, 8_000, 12_000]) {
+      refreshTimersRef.current.push(
+        setTimeout(() => {
+          if (mountedRef.current) refresh();
+        }, delayMs),
+      );
+    }
   }, [fetchStatusData, onSuccess]);
 
   /**
