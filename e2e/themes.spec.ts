@@ -21,30 +21,51 @@ async function chooseTheme(page: Page, theme: (typeof SITE_THEMES)[number]) {
 async function assertPaletteContrast(page: Page) {
   const contrasts = await page.evaluate(() => {
     const css = getComputedStyle(document.documentElement);
-    const luminance = (token: string) => {
+    type Rgb = readonly [number, number, number];
+    const color = (token: string): Rgb => {
       const [h, s, l] = css.getPropertyValue(token).trim().split(/\s+/).map(parseFloat);
       const sat = s! / 100;
       const light = l! / 100;
       const a = sat * Math.min(light, 1 - light);
       const channel = (n: number) => {
         const k = (n + h! / 30) % 12;
-        const value = light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
-        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+        return light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
       };
-      return channel(0) * 0.2126 + channel(8) * 0.7152 + channel(4) * 0.0722;
+      return [channel(0), channel(8), channel(4)];
     };
-    const ratio = (a: string, b: string) => {
-      const values = [luminance(a), luminance(b)].sort((x, y) => y - x);
-      return (values[0]! + 0.05) / (values[1]! + 0.05);
+    const luminance = ([red, green, blue]: Rgb) => {
+      const linear = (value: number) =>
+        value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+      return linear(red) * 0.2126 + linear(green) * 0.7152 + linear(blue) * 0.0722;
     };
-    return ['--background', '--card', '--popover']
-      .flatMap((surface) =>
+    const ratio = (a: Rgb, b: Rgb) => {
+      const first = luminance(a);
+      const second = luminance(b);
+      return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
+    };
+    const pairs = ['--background', '--card', '--popover', '--muted', '--accent'].flatMap(
+      (surface) =>
         ['--foreground', '--muted-foreground', '--primary', '--secondary'].map((ink) => ({
           pair: `${ink} on ${surface}`,
-          value: ratio(ink, surface),
+          value: ratio(color(ink), color(surface)),
         })),
-      )
-      .concat({ pair: 'primary button', value: ratio('--primary', '--primary-foreground') });
+    );
+    const primary = color('--primary');
+    const secondary = color('--secondary');
+    // The signature gradient explicitly interpolates in sRGB. Its middle can
+    // be darker than either endpoint, so check its full path for text and CTAs.
+    for (let percent = 0; percent <= 100; percent++) {
+      const mix = (index: 0 | 1 | 2) =>
+        primary[index] + (secondary[index] - primary[index]) * (percent / 100);
+      const sample: Rgb = [mix(0), mix(1), mix(2)];
+      for (const surface of ['--background', '--card', '--popover', '--primary-foreground']) {
+        pairs.push({
+          pair: `signature gradient at ${percent}% against ${surface}`,
+          value: ratio(sample, color(surface)),
+        });
+      }
+    }
+    return pairs;
   });
   for (const { pair, value } of contrasts) expect(value, pair).toBeGreaterThanOrEqual(4.5);
 }
@@ -72,6 +93,18 @@ for (const host of ['app', 'landing'] as const) {
     for (const theme of SITE_THEMES) {
       await chooseTheme(page, theme);
       await assertPaletteContrast(page);
+      if (host === 'app') {
+        const backdrop = page.locator('[data-ambient-backdrop]');
+        await expect(backdrop).toBeVisible();
+        // Reduced motion should stop movement, not remove the static palette.
+        expect(
+          await backdrop.evaluate((element) =>
+            [element, ...element.querySelectorAll('*')].some((layer) =>
+              getComputedStyle(layer).backgroundImage.includes('radial-gradient('),
+            ),
+          ),
+        ).toBe(true);
+      }
       const logos = page.locator('[data-brand-mark]');
       await expect(logos.first()).toBeVisible();
       const paints = await logos.evaluateAll((elements) =>
@@ -139,7 +172,25 @@ test('saved palette is applied before hydration scripts download', async ({
   await page.route('**/_next/static/**/*.js', (route) => route.abort());
   await page.goto('/faq', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'aurora');
-  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(10, 24, 26)');
+  const swatches = await page.evaluate(() => {
+    const swatch = document.createElement('div');
+    swatch.hidden = true;
+    swatch.style.backgroundColor = 'hsl(var(--background))';
+    document.body.append(swatch);
+    try {
+      // Scoped palette values supply an independent expectation even when the
+      // document's saved-theme selector or pre-paint application is broken.
+      swatch.dataset.palette = 'midnight';
+      const midnight = getComputedStyle(swatch).backgroundColor;
+      swatch.dataset.palette = 'aurora';
+      const aurora = getComputedStyle(swatch).backgroundColor;
+      return { midnight, aurora };
+    } finally {
+      swatch.remove();
+    }
+  });
+  expect(swatches.aurora).not.toBe(swatches.midnight);
+  await expect(page.locator('body')).toHaveCSS('background-color', swatches.aurora);
 });
 
 test('shared cookie carries the choice across real sibling origins and back', async ({

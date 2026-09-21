@@ -64,9 +64,9 @@ export function ThemeSwitcher({ className }: { className?: string }) {
                 aria-hidden
                 className="relative flex h-11 w-14 shrink-0 items-end overflow-hidden rounded-lg border border-foreground/15 bg-background p-1.5 shadow-sm"
               >
-                <span className="absolute inset-x-0 top-0 h-5 bg-primary/15" />
-                <span className="h-3 w-5 rounded-sm bg-primary" />
-                <span className="ml-1 h-3 w-3 rounded-sm bg-secondary/70" />
+                <span className="absolute inset-0 bg-[image:var(--gradient-atmosphere)] opacity-[var(--atmosphere-strength)]" />
+                <span className="relative h-3 w-8 rounded-sm bg-signature-gradient" />
+                <span className="relative ml-1 h-3 w-1 rounded-sm bg-secondary" />
               </span>
               <span className="min-w-0">
                 <span className="block text-sm font-medium text-foreground">

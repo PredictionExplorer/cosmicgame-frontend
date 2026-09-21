@@ -16,6 +16,7 @@ import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MessageTextarea } from '@/components/ui/message-textarea';
 import { Surface } from '@/components/ui/surface';
 
 interface EthContributionFormProps {
@@ -258,15 +259,15 @@ export function EthContributionForm({
       <div>
         <Label
           htmlFor="eth-contribution-message"
-          className="mb-1.5 block text-xs text-muted-foreground"
+          className="mb-2 block text-sm font-semibold text-foreground"
         >
-          {t('form.messageLabel')} <span className="opacity-50">{t('form.optional')}</span>
+          {t('form.messageLabel')}{' '}
+          <span className="text-xs font-normal text-muted-foreground">{t('form.optional')}</span>
         </Label>
-        <textarea
+        <MessageTextarea
           id="eth-contribution-message"
           value={message}
           rows={3}
-          className="flex w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm transition-colors ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={t('form.messagePlaceholder')}
           onChange={(event) => setMessage(event.target.value)}
         />

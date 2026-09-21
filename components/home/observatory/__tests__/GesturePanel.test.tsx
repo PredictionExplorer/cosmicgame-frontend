@@ -376,7 +376,7 @@ describe('GesturePanel', () => {
 
   /* ── Message ────────────────────────────────────────────────── */
 
-  it('keeps a compact message draft mounted and focusable after opening its optional editor', async () => {
+  it('keeps a compact message draft visible, labeled and ready to edit without a disclosure', async () => {
     const user = userEvent.setup();
     const messageInputRef = createRef<HTMLTextAreaElement>();
     const form = makeForm({ message: 'draft', gestureType: 'CST' });
@@ -390,24 +390,24 @@ describe('GesturePanel', () => {
       />,
     );
 
-    const disclosure = screen.getByTestId('panel-message-disclosure');
-    const input = screen.getByTestId('gesture-message-input');
-    expect(input).not.toBeVisible();
+    const input = screen.getByRole('textbox', { name: /home\.form\.advanced\.messageLabel/ });
+    expect(input).toBeVisible();
+    expect(input.closest('details')).toBeNull();
     expect(input).toHaveValue('draft');
+    expect(input).toHaveAccessibleDescription('5/280');
     expect(messageInputRef.current).toBe(input);
     expect(screen.getByTestId('gesture-message-char-count')).toHaveTextContent('5/280');
     expect(document.getElementById('gesture-submit')).toBeVisible();
 
-    await user.click(disclosure.querySelector('summary')!);
-    expect(input).toBeVisible();
     await user.type(input, '!');
     expect(form.setMessage).toHaveBeenCalledWith('draft!');
   });
 
   it('keeps the optional message editor visible in the mobile sheet', () => {
     render(<GesturePanel {...baseProps} form={makeForm()} embedded variant="sheet" />);
-    expect(screen.queryByTestId('panel-message-disclosure')).toBeNull();
-    expect(screen.getByTestId('gesture-message-input')).toBeVisible();
+    expect(
+      screen.getByRole('textbox', { name: /home\.form\.advanced\.messageLabel/ }),
+    ).toBeVisible();
   });
 
   it('treats the on-chain message as first-class with a live character count', async () => {
@@ -438,6 +438,31 @@ describe('GesturePanel', () => {
     expect(screen.queryByText('home.form.advanced.attachIntro')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /home\.form\.advanced\.title/ }));
     expect(form.setAdvancedExpanded).toHaveBeenCalledWith(true);
+  });
+
+  it('keeps one focused draft and protections before submission in the wide layout', () => {
+    const form = makeForm({ message: 'A persistent draft' });
+    const { rerender } = render(<GesturePanel {...baseProps} form={form} layout="wide" embedded />);
+    const input = screen.getByTestId('gesture-message-input');
+    input.focus();
+
+    rerender(
+      <GesturePanel
+        {...baseProps}
+        form={{ ...form, advancedExpanded: true }}
+        layout="wide"
+        embedded
+      />,
+    );
+
+    expect(screen.getAllByTestId('gesture-message-input')).toEqual([input]);
+    expect(input).toHaveValue('A persistent draft');
+    expect(input).toHaveFocus();
+    const advanced = screen.getByTestId('gesture-panel-advanced');
+    const submit = screen.getByRole('button', { name: baseProps.submitLabel });
+    expect(input.compareDocumentPosition(advanced)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(advanced.compareDocumentPosition(submit)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeVisible();
   });
 
   it('exposes attachment fields, CST protection, and collision prevention when expanded', async () => {
@@ -510,22 +535,30 @@ describe('GesturePanel', () => {
 
   /* ── Wallet / lifecycle states ──────────────────────────────── */
 
-  it('previews methods and prices with a connect prompt when disconnected', () => {
-    render(<GesturePanel {...baseProps} form={makeForm()} account={null} />);
+  it.each(['card', 'sheet'] as const)(
+    'allows drafting in the %s before connecting while keeping transaction controls guarded',
+    async (variant) => {
+      const user = userEvent.setup();
+      const form = makeForm();
+      render(<GesturePanel {...baseProps} form={form} account={null} variant={variant} />);
 
-    expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
-    expect(screen.getByText('home.orientation.connectHelp')).toBeInTheDocument();
-    expect(screen.getByTestId('connect-wallet-button')).toBeInTheDocument();
-    // Prices stay visible — that is the point of the preview.
-    expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
-    // Writing and advanced transaction controls appear only after connect,
-    // keeping the observer preview compact.
-    expect(screen.queryByTestId('gesture-message-input')).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /home\.form\.advanced\.title/ }),
-    ).not.toBeInTheDocument();
-    expect(document.getElementById('gesture-submit')).not.toBeInTheDocument();
-  });
+      expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
+      expect(screen.getByText('home.orientation.connectHelp')).toBeInTheDocument();
+      expect(screen.getByTestId('connect-wallet-button')).toBeInTheDocument();
+      // Prices stay visible — that is the point of the preview.
+      expect(screen.getByTestId('panel-method-eth-cost')).toHaveTextContent('0.01000 ETH');
+      const input = screen.getByRole('textbox', { name: /home\.form\.advanced\.messageLabel/ });
+      expect(input).toBeVisible();
+      expect(input).toBeEnabled();
+      expect(input.closest('details')).toBeNull();
+      await user.type(input, 'A');
+      expect(form.setMessage).toHaveBeenCalledWith('A');
+      expect(
+        screen.queryByRole('button', { name: /home\.form\.advanced\.title/ }),
+      ).not.toBeInTheDocument();
+      expect(document.getElementById('gesture-submit')).not.toBeInTheDocument();
+    },
+  );
 
   it('renders a labeled skeleton while the dashboard loads', () => {
     render(<GesturePanel {...baseProps} form={makeForm()} loading isRoundActive={false} />);
@@ -564,8 +597,13 @@ describe('GesturePanel', () => {
     expect(screen.getByRole('button', { name: /home\.form\.method\.eth\.label/ })).toHaveFocus();
   });
 
-  it('has no accessibility violations', async () => {
-    const { container } = render(<GesturePanel {...baseProps} form={makeForm()} />);
-    await checkA11y(container);
-  });
+  it.each(['stacked', 'wide'] as const)(
+    'has no accessibility violations in the %s layout',
+    async (layout) => {
+      const { container } = render(
+        <GesturePanel {...baseProps} form={makeForm()} layout={layout} />,
+      );
+      await checkA11y(container);
+    },
+  );
 });

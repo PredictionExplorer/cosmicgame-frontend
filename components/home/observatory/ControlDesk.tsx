@@ -20,9 +20,10 @@ export interface ControlDeskProps {
   className?: string;
 }
 
-/** The complete decision dashboard. Required timing and standings never live
- * behind disclosures. Layout grows naturally at zoomed/narrow sizes instead of
- * clipping information to a fixed viewport height.
+/** Cycle context comes first; the full-width action workspace follows it.
+ * Keeping the variable-height form out of a side rail prevents an expanded
+ * editor or attachment picker from leaving a blank column beside the overview.
+ * Content stays in reading order and grows naturally at narrow/zoomed sizes.
  */
 export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
   (
@@ -47,54 +48,45 @@ export const ControlDesk = forwardRef<HTMLDivElement, ControlDeskProps>(
           <div data-testid="control-desk-header" className="pb-3">
             {header}
           </div>
-          <div
-            data-testid="control-desk-grid"
-            className={cn(
-              'grid min-w-0 items-start gap-3',
-              (gestureConsole || calibration) &&
-                'lg:grid-cols-[minmax(0,1fr)_21rem] xl:grid-cols-[minmax(0,1fr)_23rem] 2xl:grid-cols-[minmax(0,1fr)_25rem]',
-            )}
-          >
-            <div className="min-w-0 space-y-3">
-              <div
-                data-testid="control-desk-overview"
-                className="grid min-w-0 items-stretch gap-3 sm:grid-cols-[minmax(0,0.85fr)_minmax(0,1.35fr)]"
-              >
+          <div data-testid="control-desk-grid" className="@container/desk grid min-w-0 gap-3">
+            <div
+              data-testid="control-desk-overview"
+              className="grid min-w-0 items-start gap-3 @min-[48rem]/desk:grid-cols-[minmax(0,0.85fr)_minmax(0,1.35fr)]"
+            >
+              <div className="grid min-w-0 gap-3">
                 <div
                   data-testid="control-desk-clock"
                   className="min-w-0 rounded-2xl border border-primary/15 bg-card"
                 >
                   {clock}
                 </div>
+                {calibration && (
+                  <div data-testid="control-desk-calibration" className="min-w-0">
+                    {calibration}
+                  </div>
+                )}
+              </div>
+              <div className="grid min-w-0 gap-3">
                 <div
                   data-testid="control-desk-latest"
                   className="min-w-0 rounded-2xl border border-emerald-300/15 bg-card"
                 >
                   {latestParticipant}
                 </div>
-              </div>
-              <div
-                data-testid="control-desk-chrono"
-                className="min-w-0 rounded-2xl border border-violet-300/15 bg-card"
-              >
-                {chronoEndurance}
+                <div
+                  data-testid="control-desk-chrono"
+                  className="min-w-0 rounded-2xl border border-violet-300/15 bg-card"
+                >
+                  {chronoEndurance}
+                </div>
               </div>
             </div>
-            {(gestureConsole || calibration) && (
-              <div className="min-w-0 space-y-3">
-                {calibration && (
-                  <div data-testid="control-desk-calibration" className="min-w-0">
-                    {calibration}
-                  </div>
-                )}
-                {gestureConsole && (
-                  <div
-                    data-testid="control-desk-gesture"
-                    className="min-w-0 rounded-2xl border border-primary/20 bg-card"
-                  >
-                    {gestureConsole}
-                  </div>
-                )}
+            {gestureConsole && (
+              <div
+                data-testid="control-desk-gesture"
+                className="min-w-0 rounded-2xl border border-primary/20 bg-card"
+              >
+                {gestureConsole}
               </div>
             )}
           </div>

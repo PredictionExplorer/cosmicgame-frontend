@@ -128,7 +128,7 @@ export function ActionDock({
             data-testid="dock-open-sheet"
             onClick={onOpenSheet}
             aria-label={t('observatory.dock.openPanelAria')}
-            className="min-h-11 min-w-0 rounded-full border-0 bg-primary px-4 text-sm font-semibold leading-tight text-primary-foreground hover:bg-primary/90 whitespace-normal"
+            className="min-h-11 min-w-0 rounded-full border-0 px-4 text-sm font-semibold leading-tight text-primary-foreground whitespace-normal"
           >
             {submitLabel}
           </Button>
@@ -157,7 +157,7 @@ export function ActionDock({
               size="sm"
               data-testid="dock-jump-to-panel"
               onClick={onJumpToPanel}
-              className="h-9 shrink-0 rounded-full border-0 bg-primary px-4 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+              className="h-9 shrink-0 rounded-full border-0 px-4 text-xs font-semibold text-primary-foreground"
             >
               {submitLabel}
               <ArrowUpRight className="ml-1 h-3.5 w-3.5" aria-hidden />

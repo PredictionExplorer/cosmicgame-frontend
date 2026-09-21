@@ -14,13 +14,13 @@ import { cn } from '@/lib/utils';
  */
 
 const backdropVariants = cva(
-  'pointer-events-none fixed inset-0 -z-10 overflow-hidden motion-reduce:hidden print:hidden',
+  'pointer-events-none fixed inset-0 -z-10 overflow-hidden print:hidden',
   {
     variants: {
       variant: {
-        subtle: '',
-        signature: '',
-        hero: '',
+        subtle: 'opacity-[calc(var(--atmosphere-strength)*0.65)]',
+        signature: 'opacity-[var(--atmosphere-strength)]',
+        hero: 'opacity-[var(--atmosphere-strength)]',
       },
     },
     defaultVariants: { variant: 'subtle' },
@@ -43,40 +43,11 @@ export function AmbientBackdrop({
       className={cn(backdropVariants({ variant }), className)}
       {...props}
     >
-      {variant === 'subtle' && <SubtleLayer />}
-      {variant === 'signature' && <SignatureLayer />}
-      {variant === 'hero' && <HeroLayer />}
+      {/* Static atmosphere stays visible for visitors who reduce motion. */}
+      <div className="absolute inset-0 bg-[image:var(--gradient-atmosphere)]" />
       {children}
     </div>
   );
-}
-
-function SubtleLayer() {
-  return (
-    <div
-      className="absolute inset-0"
-      style={{
-        background:
-          'radial-gradient(ellipse 65% 40% at 75% 0%, hsl(var(--secondary) / 0.035), transparent 70%)',
-      }}
-    />
-  );
-}
-
-function SignatureLayer() {
-  return (
-    <div
-      className="absolute inset-0"
-      style={{
-        background:
-          'radial-gradient(ellipse 70% 45% at 80% 0%, hsl(var(--secondary) / 0.065), transparent 70%)',
-      }}
-    />
-  );
-}
-
-function HeroLayer() {
-  return <SignatureLayer />;
 }
 
 export { backdropVariants };

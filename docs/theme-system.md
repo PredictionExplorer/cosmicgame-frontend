@@ -1,14 +1,22 @@
 # Theme system
 
-Midnight is the default. Classic Blue restores the original blue canvas and cyan
-accent; Aurora, Nebula, and Ember add coordinated dark palettes.
+Midnight is the default and keeps its ink-and-lavender palette. Classic Blue brings
+back the original cyan-to-violet gradients over navy. Aurora pairs sea glass with
+ice blue, Nebula pairs lilac with rose over violet ink, and Ember pairs champagne
+with peach over warm charcoal. Saturation is concentrated in accents and soft
+background light, leaving reading surfaces calm.
 
 ## Ownership
 
 - `styles/themes.css` owns palette values and semantic aliases. Components use
   `background`, `card`, `popover`, `primary`, `secondary`, `muted`, and `border`
   rather than fixed interface colors. `data-palette` reuses the actual palette
-  for each selector preview. Status colors and artwork keep their own meaning.
+  for each selector preview. Signature gradients interpolate in sRGB; their entire
+  color range must meet the contrast requirement for both dark button labels and
+  gradient text on dark surfaces. Atmospheric glows have separate saturated color
+  tokens and a per-palette strength, so Midnight stays restrained. Static backdrop
+  light remains visible with reduced motion. Status colors and artwork keep their
+  own meaning.
 - `lib/theme/config.ts` owns stable preference IDs, validation, cookie scope, and
   the synchronous bootstrap. `app/root-document.tsx` installs it for both hosts.
 - `lib/theme/client.ts` updates the document and publishes changes through

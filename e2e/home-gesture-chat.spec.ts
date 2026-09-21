@@ -1,5 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
+import { TRANSLATED_LOCALES } from '../i18n/routing';
+import home from '../messages/en/home.json';
+
 import {
   gestures,
   makeLongGestureFeed,
@@ -23,10 +26,6 @@ async function expectDecisionDashboardInViewport(page: Page) {
     ['Chrono Warrior', page.getByTestId('chrono-role-summary')],
     ['active challenge', page.getByTestId('chrono-active-challenge')],
     ['Calibration Window', page.getByTestId('control-desk-calibration')],
-    ['ETH price', page.getByTestId('panel-method-eth-cost')],
-    ['RandomWalk price', page.getByTestId('panel-method-randomWalk-cost')],
-    ['CST price', page.getByTestId('panel-method-cst-cost')],
-    ['connect action', page.getByTestId('connect-to-gesture')],
   ] as const;
 
   // Visibility alone does not mean that a participant can see the content
@@ -45,6 +44,77 @@ async function expectDecisionDashboardInViewport(page: Page) {
     await page.evaluate(() => document.documentElement.scrollWidth),
     'the page must not overflow horizontally',
   ).toBeLessThanOrEqual(viewport.width);
+}
+
+/** The expanded editor can extend the form, but every control must remain reachable. */
+async function expectCommentFormReachable(page: Page) {
+  const panel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
+  const message = panel.getByTestId('gesture-message-input');
+  const connect = panel.getByTestId('connect-to-gesture');
+  await expect(message).toBeVisible();
+  await expect(message).toBeEditable();
+  await expect(message).toHaveAccessibleName(/\S/);
+  expect(await message.evaluate((element) => element.closest('details') !== null)).toBe(false);
+  const messageBox = await message.boundingBox();
+  const connectBox = await connect.boundingBox();
+  expect(messageBox).not.toBeNull();
+  expect(connectBox).not.toBeNull();
+  expect(messageBox!.height).toBeGreaterThanOrEqual(96);
+  expect(messageBox!.y + messageBox!.height).toBeLessThanOrEqual(connectBox!.y);
+  await expectTextWithoutOverlap(panel.getByTestId('gesture-panel-message'));
+  // Center each control so fractional scroll alignment at the viewport edge
+  // cannot turn a reachable field into a false clipping failure.
+  await message.evaluate((element) =>
+    element.scrollIntoView({ block: 'center', behavior: 'instant' }),
+  );
+  await expect(message).toBeInViewport({ ratio: 1 });
+  const connectButton = connect.getByRole('button');
+  await connectButton.evaluate((element) =>
+    element.scrollIntoView({ block: 'center', behavior: 'instant' }),
+  );
+  await expect(connectButton).toBeInViewport({ ratio: 1 });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+}
+
+/** A taller editor must use the full row instead of reserving an empty sidebar band. */
+async function expectEfficientDesktopLayout(page: Page) {
+  const overview = page.getByTestId('control-desk-overview');
+  const form = page.getByTestId('control-desk-gesture');
+  const methods = page.getByTestId('panel-method-tabs');
+  const editor = form.getByTestId('gesture-panel-message');
+  const [overviewBox, formBox, methodsBox, editorBox] = await Promise.all([
+    overview.boundingBox(),
+    form.boundingBox(),
+    methods.boundingBox(),
+    editor.boundingBox(),
+  ]);
+  expect(overviewBox).not.toBeNull();
+  expect(formBox).not.toBeNull();
+  expect(methodsBox).not.toBeNull();
+  expect(editorBox).not.toBeNull();
+
+  expect(Math.abs(formBox!.x - overviewBox!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(formBox!.width - overviewBox!.width)).toBeLessThanOrEqual(1);
+  const gap = await page
+    .getByTestId('control-desk-grid')
+    .evaluate((element) => Number.parseFloat(getComputedStyle(element).rowGap));
+  const formGap = formBox!.y - (overviewBox!.y + overviewBox!.height);
+  expect(formGap).toBeGreaterThanOrEqual(0);
+  expect(formGap).toBeLessThanOrEqual(gap + 2);
+
+  // The writing area and method controls occupy the same horizontal band.
+  // Bounds catch the old narrow, vertically stacked form even if its outer
+  // wrapper has been stretched to look full-width.
+  expect(methodsBox!.x + methodsBox!.width).toBeLessThanOrEqual(editorBox!.x);
+  expect(editorBox!.y).toBeLessThan(methodsBox!.y + methodsBox!.height);
+  expect(editorBox!.y + editorBox!.height).toBeGreaterThan(methodsBox!.y);
+  expect(editorBox!.width).toBeGreaterThanOrEqual(formBox!.width * 0.4);
+  expect(editorBox!.x + editorBox!.width).toBeLessThanOrEqual(formBox!.x + formBox!.width);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+    'the page must not overflow horizontally',
+  ).toBeLessThanOrEqual(page.viewportSize()!.width);
 }
 
 /** Check rendered glyph bounds, which catch overlapping labels even when their cards fit. */
@@ -211,22 +281,35 @@ test.describe('home gesture chat', () => {
   });
 
   for (const viewport of DESKTOP_VIEWPORTS) {
-    test(`keeps every decision surface above the fold at ${viewport.width}×${viewport.height} with ETH and CST selected`, async ({
+    test(`keeps standings above the fold and uses the full form width at ${viewport.width}×${viewport.height} with ETH and CST selected`, async ({
       page,
     }, testInfo) => {
       test.skip(testInfo.project.name !== 'Desktop Chrome', 'desktop density guard');
       await page.setViewportSize(viewport);
       await page.goto('/', { waitUntil: 'domcontentloaded' });
       await expect(page.getByTestId('panel-method-cst-cost')).toContainText('20 CST');
+      await page.evaluate(() => document.fonts.ready);
 
       await expectDecisionDashboardInViewport(page);
+      await expectEfficientDesktopLayout(page);
       await expect(page.getByTestId('standings-disclosure')).toHaveCount(0);
       await expect(page.getByTestId('allocation-ledger')).toBeHidden();
       await expect(page.getByTestId('control-desk-calibration').getByRole('region')).toHaveCount(1);
+      await expectCommentFormReachable(page);
+      if (viewport.width === 1280 || viewport.width === 1440) {
+        const screenshotPath = testInfo.outputPath(`home-dashboard-${viewport.width}.png`);
+        await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled' });
+        await testInfo.attach(`home-dashboard-${viewport.width}`, {
+          path: screenshotPath,
+          contentType: 'image/png',
+        });
+      }
 
       await page.getByTestId('panel-method-cst').click();
       await expect(page.getByTestId('panel-method-cst')).toHaveAttribute('aria-pressed', 'true');
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
       await expectDecisionDashboardInViewport(page);
+      await expectEfficientDesktopLayout(page);
       await expect(page.getByTestId('panel-cst-economics')).toBeVisible();
       await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
       await expectTextWithoutOverlap(page.getByTestId('panel-cst-reward'));
@@ -247,6 +330,7 @@ test.describe('home gesture chat', () => {
       for (const key of ['reward', 'cost', 'net']) {
         await expectTextWithoutOverlap(page.getByTestId(`panel-cst-metric-${key}`));
       }
+      await expectCommentFormReachable(page);
     });
   }
 
@@ -266,13 +350,42 @@ test.describe('home gesture chat', () => {
       await page.goto('/', { waitUntil: 'domcontentloaded' });
       await expect(page.getByTestId('panel-method-cst-cost')).toContainText('987');
       await page.getByTestId('panel-method-cst').click();
+      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 
       await expectDecisionDashboardInViewport(page);
+      await expectEfficientDesktopLayout(page);
       await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
       await expectTextWithoutOverlap(page.getByTestId('panel-cst-reward'));
       for (const key of ['reward', 'cost', 'net']) {
         await expectTextWithoutOverlap(page.getByTestId(`panel-cst-metric-${key}`));
       }
+      await expectCommentFormReachable(page);
+    });
+  }
+
+  for (const locale of TRANSLATED_LOCALES) {
+    test(`${locale} keeps the expanded composer usable across the desktop row`, async ({
+      page,
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== 'Desktop Chrome', 'translated desktop layout guard');
+      await page.setViewportSize(DESKTOP_VIEWPORTS[0]);
+      await page.goto(`/${locale}`, { waitUntil: 'domcontentloaded' });
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await expect(page.getByTestId('panel-method-cst-cost')).toContainText('20');
+      await page.evaluate(() => document.fonts.ready);
+
+      await expectEfficientDesktopLayout(page);
+      await expectCommentFormReachable(page);
+      await page.getByTestId('panel-method-cst').click();
+      await expect(page.getByTestId('panel-method-cst')).toHaveAttribute('aria-pressed', 'true');
+      await expectEfficientDesktopLayout(page);
+      await expectTextWithoutOverlap(page.getByTestId('panel-method-tabs'));
+      await expectTextWithoutOverlap(page.getByTestId('control-desk-calibration'));
+      for (const key of ['reward', 'cost', 'net']) {
+        await expectTextWithoutOverlap(page.getByTestId(`panel-cst-metric-${key}`));
+      }
+      await expectCommentFormReachable(page);
     });
   }
 
@@ -280,11 +393,19 @@ test.describe('home gesture chat', () => {
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name === 'Desktop Chrome', 'mobile action-path guard');
+    await page.setViewportSize({ width: 320, height: 800 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const inlinePanel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
     await expect(inlinePanel).toBeVisible();
     await expect(inlinePanel.getByTestId('panel-method-eth-cost')).toBeVisible();
+    const inlineMessage = inlinePanel.getByRole('textbox', {
+      name: new RegExp(`^${home.form.advanced.messageLabel}`),
+    });
+    await expect(inlineMessage).toBeVisible();
+    await expect(inlineMessage).toBeEditable();
+    const draft = 'A comment started before connecting.';
+    await inlineMessage.fill(draft);
     await expect(page.getByTestId('gesture-price-strip')).toHaveCount(0);
     const dockAction = page.getByTestId('dock-open-sheet');
     await expect(dockAction).toBeVisible();
@@ -293,12 +414,26 @@ test.describe('home gesture chat', () => {
     const sheetPanel = page.locator('[data-testid="gesture-panel"][data-variant="sheet"]:visible');
     await expect(sheetPanel).toHaveCount(1);
     await expect(sheetPanel.getByTestId('panel-method-eth-cost')).toBeVisible();
-    // This mocked production project has no connected wallet; the same sheet
-    // exposes the message input after connect (covered by HomePage unit flow).
+    const sheetMessage = sheetPanel.getByRole('textbox', {
+      name: new RegExp(`^${home.form.advanced.messageLabel}`),
+    });
+    await expect(sheetMessage).toBeVisible();
+    await expect(sheetMessage).toBeEditable();
+    await expect(sheetMessage).toHaveValue(draft);
+    const revisedDraft = `${draft} Finished in the quick-action sheet.`;
+    await sheetMessage.fill(revisedDraft);
     await expect(sheetPanel.getByTestId('connect-to-gesture')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(sheetPanel).toHaveCount(0);
     await expect(inlinePanel).toBeVisible();
+    await expect(inlineMessage).toHaveValue(revisedDraft);
+    await page.evaluate(() => document.fonts.ready);
+    const screenshotPath = testInfo.outputPath('home-dashboard-mobile-320.png');
+    await page.screenshot({ path: screenshotPath, fullPage: true, animations: 'disabled' });
+    await testInfo.attach('home-dashboard-mobile-320', {
+      path: screenshotPath,
+      contentType: 'image/png',
+    });
   });
 
   test('opens optional allocations from the keyboard while decision information stays visible', async ({
@@ -425,8 +560,9 @@ test.describe('home gesture chat', () => {
       return;
     }
 
-    // Desktop control desk: the panel flanks the clock's right in the same band.
-    expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(panelBox!.x + 2);
+    // The full-width composer follows the standings; the feed follows the desk.
+    expect(clockBox!.y + clockBox!.height).toBeLessThanOrEqual(panelBox!.y + 2);
+    await expectEfficientDesktopLayout(page);
     expect(panelBox!.y + panelBox!.height).toBeLessThanOrEqual(artworkBox!.y + 2);
     expect(box!.x + box!.width).toBeLessThanOrEqual(artworkBox!.x + 2);
     // Without attachments, the feed uses the available page width.

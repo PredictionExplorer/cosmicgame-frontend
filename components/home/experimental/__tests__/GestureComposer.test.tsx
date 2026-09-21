@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 
+import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
@@ -47,7 +48,7 @@ describe('GestureComposer', () => {
     render(<GestureComposer {...makeProps()} />);
 
     expect(screen.getByText('home.deck.composer.title')).toBeInTheDocument();
-    expect(screen.getByTestId('composer-message-input')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'home.form.advanced.messageLabel' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: /home\.form\.submit\.eth\(cost=0\.01020\)/ }),
     ).toBeEnabled();
@@ -60,6 +61,7 @@ describe('GestureComposer', () => {
     render(<GestureComposer {...makeProps({ message: 'gm cosmos', setMessage })} />);
 
     expect(screen.getByTestId('composer-message-input')).toHaveValue('gm cosmos');
+    expect(screen.getByTestId('composer-message-input')).toHaveAccessibleDescription('9/280');
     expect(screen.getByTestId('composer-char-count')).toHaveTextContent('9/280');
 
     await user.type(screen.getByTestId('composer-message-input'), '!');
@@ -141,16 +143,42 @@ describe('GestureComposer', () => {
     expect(screen.queryByTestId('composer-cst-free')).not.toBeInTheDocument();
   });
 
-  it('shows a connect prompt when the wallet is disconnected', () => {
+  it('shows the labeled editor and counter alongside the disconnected wallet prompt', () => {
     render(<GestureComposer {...makeProps({ account: null })} />);
 
     const connect = screen.getByTestId('composer-connect');
     expect(within(connect).getByText('home.deck.composer.connectBody')).toBeInTheDocument();
-    expect(screen.queryByTestId('composer-message-input')).not.toBeInTheDocument();
+    const editor = screen.getByRole('textbox', { name: 'home.form.advanced.messageLabel' });
+    expect(editor).toBeVisible();
+    expect(editor).toBeEnabled();
+    expect(editor).toHaveAccessibleDescription('0/280');
+    expect(screen.queryByTestId('composer-gesture-submit')).not.toBeInTheDocument();
   });
 
-  it('has no accessibility violations', async () => {
-    const { container } = render(<GestureComposer {...makeProps()} />);
+  it('keeps a disconnected draft in the same editor when the wallet connects', async () => {
+    const user = userEvent.setup();
+    function ComposerWithDraft({ account }: { account: string | null }) {
+      const [message, setMessage] = useState('');
+      return <GestureComposer {...makeProps({ account, message, setMessage })} />;
+    }
+    const { rerender } = render(<ComposerWithDraft account={null} />);
+    const editor = screen.getByRole('textbox', { name: 'home.form.advanced.messageLabel' });
+
+    await user.type(editor, 'gm cosmos');
+    expect(editor).toHaveValue('gm cosmos');
+    expect(editor).toHaveAccessibleDescription('9/280');
+
+    rerender(<ComposerWithDraft account="0xUser" />);
+
+    expect(screen.getByRole('textbox', { name: 'home.form.advanced.messageLabel' })).toBe(editor);
+    expect(editor).toHaveValue('gm cosmos');
+    expect(editor).toHaveFocus();
+    expect(screen.getByTestId('composer-gesture-submit')).toBeEnabled();
+    expect(screen.queryByTestId('composer-connect')).not.toBeInTheDocument();
+  });
+
+  it.each([null, '0xUser'])('has no accessibility violations with account %s', async (account) => {
+    const { container } = render(<GestureComposer {...makeProps({ account })} />);
     await checkA11y(container);
   });
 });

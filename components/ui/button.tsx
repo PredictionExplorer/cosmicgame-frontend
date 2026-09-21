@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'capitalize border border-transparent bg-primary text-primary-foreground hover:bg-primary/90',
+          'capitalize border border-transparent bg-signature-gradient text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.16)] hover:brightness-110',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
           'capitalize border border-white/20 bg-transparent px-6 text-foreground hover:border-white/35 hover:bg-white/[0.04]',

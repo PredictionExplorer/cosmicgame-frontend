@@ -11,6 +11,16 @@
   background: hsl(var(--background));
 }
 
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--gradient-atmosphere);
+  opacity: var(--atmosphere-strength);
+}
+
 .backdrop {
   position: absolute;
   inset: 0;
@@ -150,14 +160,15 @@
   font-weight: 600;
   transition:
     background 180ms,
-    border-color 180ms;
+    border-color 180ms,
+    filter 180ms;
 }
 .primaryAction {
-  background: hsl(var(--primary));
+  background: var(--gradient-signature);
   color: hsl(var(--primary-foreground));
 }
 .primaryAction:hover {
-  background: hsl(var(--primary-hover));
+  filter: brightness(1.1);
 }
 .secondaryAction {
   border-color: hsl(var(--border));

@@ -1499,7 +1499,8 @@ describe('HomePage', () => {
     expect(mockGestureForm.setBidType).toHaveBeenCalledWith('CST');
   });
 
-  it('shows a connect prompt in the composer when the wallet is disconnected', () => {
+  it('allows drafting beside the connect prompt while the wallet is disconnected', async () => {
+    const user = userEvent.setup();
     mockAccount = null;
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
@@ -1510,7 +1511,18 @@ describe('HomePage', () => {
 
     const composer = screen.getByTestId('gesture-composer');
     expect(within(composer).getByTestId('composer-connect')).toBeInTheDocument();
-    expect(within(composer).queryByTestId('composer-message-input')).not.toBeInTheDocument();
+    const editor = within(composer).getByRole('textbox', {
+      name: 'home.form.advanced.messageLabel',
+    });
+    expect(editor).toBeVisible();
+    expect(editor).toBeEnabled();
+    expect(editor).toHaveAccessibleDescription('0/280');
+    expect(within(composer).queryByTestId('composer-gesture-submit')).not.toBeInTheDocument();
+
+    await user.type(editor, 'g');
+
+    expect(mockGestureForm.setMessage).toHaveBeenCalledWith('g');
+    expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
   });
 
   it('focuses the composer from the chat empty-state CTA', async () => {
@@ -1536,10 +1548,10 @@ describe('HomePage', () => {
     }
   });
 
-  it('falls back to the console message options when the composer has no input', async () => {
+  it('focuses the disconnected composer from the chat empty-state CTA', async () => {
     const user = userEvent.setup();
     const { scrollIntoView, restore } = mockScrollIntoView();
-    mockAccount = null; // composer renders its connect prompt without a textarea
+    mockAccount = null;
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1552,8 +1564,9 @@ describe('HomePage', () => {
       const chat = screen.getByTestId('gesture-message-chat');
       await user.click(within(chat).getByRole('button', { name: 'home.chat.empty.cta' }));
 
-      expect(mockGestureForm.setAdvancedExpanded).toHaveBeenCalledWith(true);
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+      expect(screen.getByTestId('composer-message-input')).toHaveFocus();
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'center' });
+      expect(mockGestureForm.setAdvancedExpanded).not.toHaveBeenCalled();
     } finally {
       restore();
     }

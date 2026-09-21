@@ -1,5 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 
+import { protocolFacts } from '../content/protocol-facts';
+import { SITE_THEMES } from '../lib/theme/config';
+import common from '../messages/en/common.json';
+import home from '../messages/en/home.json';
+
 import { mockZhQualityApi } from './zh-quality-mocks';
 
 const MOCK_CST_ADDRESS = '0x6666666666666666666666666666666666666666';
@@ -106,20 +111,187 @@ test.describe('Wallet connection state (disconnected)', () => {
 
   test('MetaMask connects through injected provider without loading MetaMask SDK', async ({
     page,
-  }) => {
+    isMobile,
+  }, testInfo) => {
     const pageErrors: string[] = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await mockZhQualityApi(page);
     await installMockMetaMask(page);
 
-    const dialog = await openWalletModal(page);
+    await page.goto('/', { waitUntil: 'networkidle' });
+    const inlinePanel = page.locator('[data-testid="gesture-panel"][data-variant="card"]');
+    const inlineMessage = inlinePanel.getByRole('textbox', {
+      name: new RegExp(`^${home.form.advanced.messageLabel}`),
+    });
+    const draft = 'A note for the cosmos.';
+
+    // The editor must be discoverable and usable before any wallet interaction.
+    await expect(inlineMessage).toBeVisible();
+    await expect(inlineMessage).toBeEditable();
+    expect(await inlineMessage.evaluate((element) => element.closest('details') !== null)).toBe(
+      false,
+    );
+    expect((await inlineMessage.boundingBox())!.height).toBeGreaterThanOrEqual(96);
+    await inlineMessage.fill(draft);
+    await expect(inlineMessage).toHaveValue(draft);
+    await inlinePanel
+      .getByTestId('connect-to-gesture')
+      .getByRole('button', { name: /connect/i })
+      .click();
+
+    const dialog = page.getByRole('dialog', { name: /connect a wallet/i }).first();
+    await expect(dialog).toBeVisible();
     await dialog.getByRole('button', { name: /^MetaMask$/i }).click();
 
     await expect(page.getByText(/0x1234\.{4}5678/).first()).toBeVisible({ timeout: 10_000 });
+    await expect(inlineMessage).toHaveValue(draft);
     await expect
       .poll(() => page.evaluate(() => window.__mockEthereumRequests ?? []))
       .toContain('eth_requestAccounts');
     expect(pageErrors.join('\n')).not.toContain('@metamask/sdk');
     expect(pageErrors.join('\n')).not.toContain('Cannot find module');
+
+    for (const theme of SITE_THEMES) {
+      await page.getByRole('button', { name: common.themeSwitcher.label, exact: true }).click();
+      await page
+        .getByRole('menuitemradio', {
+          name: new RegExp(`^${common.themeSwitcher.themes[theme].name}`),
+        })
+        .click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+
+      if (isMobile) await page.getByTestId('dock-open-sheet').click();
+      const panel = page.locator(
+        `[data-testid="gesture-panel"][data-variant="${isMobile ? 'sheet' : 'card'}"]`,
+      );
+      const message = panel.getByRole('textbox', {
+        name: new RegExp(`^${home.form.advanced.messageLabel}`),
+      });
+      await expect(panel.locator(isMobile ? '#gesture-submit-sheet' : '#gesture-submit')).toHaveCSS(
+        'background-image',
+        /linear-gradient/,
+      );
+
+      // A connected participant can immediately find and use the editor;
+      // opening Advanced or a separate message disclosure is never required.
+      await expect(message).toBeVisible();
+      await expect(message).toBeEditable();
+      await expect(message).toHaveValue(draft);
+      expect(await message.evaluate((element) => element.closest('details') !== null)).toBe(false);
+      await expect(message).toHaveAttribute('placeholder', home.form.advanced.messagePlaceholder);
+      expect((await message.boundingBox())!.height).toBeGreaterThanOrEqual(96);
+      await message.fill('');
+      await message.blur();
+      await message.locator('..').screenshot({
+        path: testInfo.outputPath(`message-${theme}-empty.png`),
+        animations: 'disabled',
+      });
+
+      await message.fill(draft);
+      await expect(message).toBeFocused();
+      await expect(message).toHaveValue(draft);
+      const counter = panel.getByTestId('gesture-message-char-count');
+      const count = `${draft.length}/${protocolFacts.gestureMessageMaxLength}`;
+      await expect(counter).toHaveText(count);
+      await expect(message).toHaveAccessibleDescription(count);
+      await message.locator('..').screenshot({
+        path: testInfo.outputPath(`message-${theme}-focused.png`),
+        animations: 'disabled',
+      });
+
+      if (isMobile) {
+        await page.keyboard.press('Escape');
+        await expect(inlineMessage).toHaveValue(draft);
+      }
+    }
+
+    if (isMobile) await page.getByTestId('dock-open-sheet').click();
+    const panel = page.locator(
+      `[data-testid="gesture-panel"][data-variant="${isMobile ? 'sheet' : 'card'}"]`,
+    );
+    const message = panel.getByRole('textbox', {
+      name: new RegExp(`^${home.form.advanced.messageLabel}`),
+    });
+    const advanced = panel.getByTestId('gesture-panel-advanced');
+    const advancedTrigger = advanced.getByRole('button', {
+      name: home.form.advanced.title,
+      exact: true,
+    });
+
+    // The selected method's controls remain usable alongside the visible draft.
+    await panel.getByTestId('panel-method-randomWalk').click();
+    await expect(panel.getByTestId('panel-method-randomWalk')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    const tokenPicker = panel.getByTestId('panel-rwlk-picker');
+    await expect(tokenPicker.getByRole('heading', { name: home.form.rwlk.title })).toBeVisible();
+    const tokenSearch = tokenPicker.getByPlaceholder(home.rwlkGrid.searchPlaceholder);
+    await tokenSearch.fill('42');
+    await expect(tokenSearch).toHaveValue('42');
+    await expect(message).toHaveValue(draft);
+    await expect(
+      panel.locator(isMobile ? '#gesture-submit-sheet' : '#gesture-submit'),
+    ).toBeDisabled();
+
+    const layoutBox = (await panel.getByTestId('gesture-panel-layout').boundingBox())!;
+    const contextBox = (await panel.getByTestId('gesture-panel-context').boundingBox())!;
+    const messageBox = (await panel.getByTestId('gesture-panel-message').boundingBox())!;
+    const actionBox = (await panel.getByTestId('gesture-panel-action').boundingBox())!;
+    const collapsedBox = (await advanced.boundingBox())!;
+    expect(collapsedBox.x).toBeCloseTo(contextBox.x, 0);
+    expect(collapsedBox.width).toBeCloseTo(contextBox.width, 0);
+    expect(actionBox.x).toBeCloseTo(messageBox.x, 0);
+    expect(actionBox.width).toBeCloseTo(messageBox.width, 0);
+    if (!isMobile) {
+      expect(contextBox.x + contextBox.width).toBeLessThan(messageBox.x);
+      expect(contextBox.y).toBeCloseTo(messageBox.y, 0);
+    }
+
+    await advancedTrigger.click();
+    await expect(advancedTrigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(advanced.getByRole('region')).toBeVisible();
+    const expandedBox = (await advanced.boundingBox())!;
+    expect(expandedBox.x).toBeCloseTo(layoutBox.x, 0);
+    expect(expandedBox.width).toBeCloseTo(layoutBox.width, 0);
+    await expect(message).toHaveValue(draft);
+    await expect(tokenSearch).toHaveValue('42');
+
+    const acceptAnyReward = advanced.getByRole('checkbox', {
+      name: home.form.advanced.minCstProtection.acceptAnyAria,
+    });
+    await acceptAnyReward.check();
+    await expect(acceptAnyReward).toBeChecked();
+    const revisedDraft = `${draft} A little more to say.`;
+    await message.fill(revisedDraft);
+    await expect(message).toBeFocused();
+
+    if (!isMobile) {
+      // Reflow must preserve the same live editor and its keyboard focus.
+      const viewport = page.viewportSize()!;
+      await page.setViewportSize({ width: 720, height: viewport.height });
+      await expect(message).toBeFocused();
+      await expect(message).toHaveValue(revisedDraft);
+      await page.setViewportSize(viewport);
+      await expect(message).toBeFocused();
+    }
+
+    await advancedTrigger.click();
+    await expect(advancedTrigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(advanced.getByRole('region')).toBeHidden();
+    await expect(message).toHaveValue(revisedDraft);
+    await expect(tokenSearch).toHaveValue('42');
+    await advancedTrigger.click();
+    await expect(acceptAnyReward).toBeChecked();
+    await expect(message).toHaveValue(revisedDraft);
+    if (isMobile) {
+      await page.keyboard.press('Escape');
+      await expect(inlineMessage).toHaveValue(revisedDraft);
+    }
+    expect(await page.evaluate(() => window.__mockEthereumRequests ?? [])).not.toContain(
+      'eth_sendTransaction',
+    );
   });
 
   test('connected users can add CST to MetaMask with the expected metadata', async ({
@@ -206,7 +378,12 @@ test.describe('Wallet connection state (disconnected)', () => {
 
     const prompt = panel.getByTestId('connect-to-gesture');
     await expect(prompt).toBeVisible();
-    await expect(prompt.getByText('Connect to submit your gesture')).toBeVisible();
+    // The compact desktop panel keeps its explanation for assistive technology;
+    // the mobile sheet also renders the full visible heading.
+    await expect(prompt).toContainText(home.orientation.connectHelp);
+    if (isMobile) {
+      await expect(prompt.getByRole('heading', { name: home.form.connect.title })).toBeVisible();
+    }
     await expect(prompt.getByRole('button', { name: /connect/i })).toBeVisible();
   });
 

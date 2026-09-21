@@ -677,12 +677,11 @@ describe('HomePage', () => {
     },
   );
 
-  it('starts with only the optional message editor closed while decision information and participant identities stay visible', () => {
+  it('shows the message editor alongside decision information and participant identities', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<HomePage />);
 
-    expect(screen.getByTestId('panel-message-disclosure')).not.toHaveAttribute('open');
-    expect(screen.getByTestId('gesture-message-input')).not.toBeVisible();
+    expect(screen.getByTestId('gesture-message-input')).toBeVisible();
     for (const testId of [
       'cycle-clock',
       'latest-participant-intel',
@@ -1439,8 +1438,9 @@ describe('HomePage', () => {
     );
   });
 
-  it('switches from the preview to live controls after the wallet connects', () => {
+  it('preserves the visible draft when the wallet connects', () => {
     mockAccount = null;
+    mockGestureForm.message = 'A draft before connecting';
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -1449,12 +1449,20 @@ describe('HomePage', () => {
     const { rerender } = render(<HomePage />);
     expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
     expect(document.getElementById('gesture-submit')).not.toBeInTheDocument();
+    const input = screen.getByTestId('gesture-message-input');
+    expect(input).toBeVisible();
+    expect(input).toBeEnabled();
+    expect(input).toHaveValue('A draft before connecting');
 
     mockAccount = '0xUser';
     rerender(<HomePage />);
 
     expect(screen.queryByTestId('connect-to-gesture')).not.toBeInTheDocument();
+    expect(screen.getByTestId('gesture-message-input')).toBe(input);
+    expect(input).toHaveValue('A draft before connecting');
+    expect(mockGestureForm.setMessage).not.toHaveBeenCalled();
     expect(getPanelSubmitButton()).toBeEnabled();
+    expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
   });
 
   /* ── Feed and chat ──────────────────────────────────────────── */
@@ -1708,7 +1716,7 @@ describe('HomePage', () => {
   });
 
   it.each([false, true])(
-    'opens the optional message editor before focusing it from the chat CTA (reduced motion: %s)',
+    'focuses the visible message editor from the chat CTA (reduced motion: %s)',
     async (reducedMotion) => {
       const user = userEvent.setup();
       const { scrollIntoView, restore } = mockScrollIntoView(reducedMotion);
@@ -1721,14 +1729,8 @@ describe('HomePage', () => {
       try {
         render(<HomePage />);
 
-        const disclosure = screen.getByTestId('panel-message-disclosure');
         const input = screen.getByTestId('gesture-message-input');
-        const openStatesOnFocus: boolean[] = [];
-        input.addEventListener('focus', () => {
-          openStatesOnFocus.push(disclosure.hasAttribute('open'));
-        });
-        expect(disclosure).not.toHaveAttribute('open');
-        expect(input).not.toBeVisible();
+        expect(input).toBeVisible();
 
         const chat = screen.getByTestId('gesture-message-chat');
         await user.click(within(chat).getByRole('button', { name: 'home.chat.empty.cta' }));
@@ -1737,10 +1739,8 @@ describe('HomePage', () => {
           behavior: reducedMotion ? 'instant' : 'smooth',
           block: 'start',
         });
-        expect(disclosure).toHaveAttribute('open');
         expect(input).toBeVisible();
         expect(input).toHaveFocus();
-        expect(openStatesOnFocus).toEqual([true]);
         expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1);
         expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
       } finally {
@@ -1861,7 +1861,7 @@ describe('HomePage', () => {
     expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1);
     const inlineEditor = screen.getByTestId('gesture-message-input');
     expect(inlineEditor).toHaveValue('A shared draft');
-    expect(inlineEditor).not.toBeVisible();
+    expect(inlineEditor).toBeVisible();
 
     await user.click(screen.getByTestId('dock-open-sheet'));
 
@@ -1869,13 +1869,12 @@ describe('HomePage', () => {
     expect(panels).toHaveLength(2);
     const sheet = panels[panels.length - 1]!;
     expect(sheet).toHaveAttribute('data-variant', 'sheet');
-    expect(within(sheet).queryByTestId('panel-message-disclosure')).not.toBeInTheDocument();
     expect(within(sheet).getByTestId('gesture-message-input')).toBeVisible();
     expect(within(sheet).getByTestId('gesture-message-input')).toHaveValue('A shared draft');
 
     await user.keyboard('{Escape}');
     expect(screen.getAllByTestId('gesture-panel')).toHaveLength(1);
-    expect(screen.getByTestId('panel-message-disclosure')).not.toHaveAttribute('open');
+    expect(inlineEditor).toBeVisible();
     expect(inlineEditor).toHaveValue('A shared draft');
   });
 

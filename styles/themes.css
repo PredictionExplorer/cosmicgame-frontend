@@ -22,83 +22,113 @@
   --muted-foreground: 247 14% 75%;
   --border: 246 14% 19%;
   --input: 246 14% 27%;
+  --glow-primary: 245 70% 65%;
+  --glow-secondary: 270 65% 60%;
+  --atmosphere-strength: 0.3;
 }
 
-/* Original blue canvas and cyan, recovered from the pre-redesign palette. */
+/* Cyan and violet bring back the original blue atmosphere, with lighter
+ * gradient endpoints so dark button labels remain readable throughout. */
 :root[data-theme='classic-blue'],
 [data-palette='classic-blue'] {
-  --background: 235 68% 10%;
-  --surface-deep: 235 68% 7%;
-  --foreground: 220 40% 97%;
-  --card: 235 60% 16%;
-  --popover: 235 50% 19%;
-  --primary: 196 98% 54%;
-  --primary-hover: 196 98% 66%;
-  --primary-foreground: 235 68% 8%;
-  --secondary: 205 100% 71%;
-  --accent: 224 48% 26%;
-  --muted: 235 40% 20%;
-  --muted-foreground: 226 25% 77%;
-  --border: 235 30% 27%;
-  --input: 230 30% 36%;
+  --background: 233 58% 9%;
+  --surface-deep: 238 55% 5%;
+  --foreground: 225 40% 97%;
+  --card: 233 42% 14%;
+  --popover: 235 35% 17%;
+  --primary: 194 96% 64%;
+  --primary-hover: 194 96% 74%;
+  --primary-foreground: 235 60% 9%;
+  --secondary: 258 94% 80%;
+  --accent: 239 35% 23%;
+  --muted: 234 30% 19%;
+  --muted-foreground: 226 24% 77%;
+  --border: 233 28% 28%;
+  --input: 229 30% 42%;
+  --glow-primary: 199 100% 50%;
+  --glow-secondary: 262 90% 61%;
+  --atmosphere-strength: 1;
 }
 
+/* Sea-glass accents on cool, gently desaturated teal. */
 :root[data-theme='aurora'],
 [data-palette='aurora'] {
-  --background: 185 43% 7%;
-  --surface-deep: 185 45% 4%;
-  --foreground: 165 30% 96%;
-  --card: 182 32% 11%;
-  --popover: 182 28% 14%;
-  --primary: 161 65% 76%;
-  --primary-hover: 161 65% 85%;
-  --primary-foreground: 182 45% 8%;
-  --secondary: 177 54% 64%;
-  --accent: 174 30% 20%;
-  --muted: 182 22% 17%;
-  --muted-foreground: 172 16% 74%;
-  --border: 180 22% 24%;
-  --input: 178 22% 33%;
+  --background: 192 32% 7%;
+  --surface-deep: 196 35% 4%;
+  --foreground: 165 25% 96%;
+  --card: 190 26% 11%;
+  --popover: 190 23% 14%;
+  --primary: 164 64% 73%;
+  --primary-hover: 164 64% 83%;
+  --primary-foreground: 190 44% 8%;
+  --secondary: 194 86% 76%;
+  --accent: 186 25% 20%;
+  --muted: 190 20% 17%;
+  --muted-foreground: 180 15% 75%;
+  --border: 187 20% 25%;
+  --input: 182 24% 39%;
+  --glow-primary: 161 72% 44%;
+  --glow-secondary: 205 80% 55%;
+  --atmosphere-strength: 0.8;
 }
 
+/* Violet ink, luminous lilac, and a restrained rose reflection. */
 :root[data-theme='nebula'],
 [data-palette='nebula'] {
-  --background: 278 34% 8%;
-  --surface-deep: 278 36% 5%;
-  --foreground: 285 35% 97%;
-  --card: 276 27% 12%;
-  --popover: 276 24% 15%;
-  --primary: 280 80% 85%;
-  --primary-hover: 280 80% 92%;
-  --primary-foreground: 278 38% 10%;
-  --secondary: 320 65% 76%;
-  --accent: 285 30% 23%;
-  --muted: 276 20% 18%;
-  --muted-foreground: 282 18% 76%;
-  --border: 280 20% 26%;
-  --input: 280 20% 35%;
+  --background: 266 28% 8%;
+  --surface-deep: 266 32% 5%;
+  --foreground: 280 30% 97%;
+  --card: 266 23% 12%;
+  --popover: 266 21% 15%;
+  --primary: 267 88% 83%;
+  --primary-hover: 267 88% 91%;
+  --primary-foreground: 267 38% 10%;
+  --secondary: 326 74% 81%;
+  --accent: 275 25% 23%;
+  --muted: 266 18% 18%;
+  --muted-foreground: 274 17% 77%;
+  --border: 269 20% 27%;
+  --input: 271 24% 41%;
+  --glow-primary: 260 78% 59%;
+  --glow-secondary: 325 68% 53%;
+  --atmosphere-strength: 0.85;
 }
 
+/* Warm charcoal stays neutral enough for champagne and peach to shine. */
 :root[data-theme='ember'],
 [data-palette='ember'] {
-  --background: 24 29% 7%;
-  --surface-deep: 24 30% 4%;
-  --foreground: 36 35% 96%;
-  --card: 25 25% 11%;
-  --popover: 25 22% 14%;
-  --primary: 35 88% 77%;
-  --primary-hover: 35 88% 86%;
-  --primary-foreground: 24 38% 9%;
-  --secondary: 18 77% 73%;
-  --accent: 28 30% 21%;
-  --muted: 25 18% 17%;
-  --muted-foreground: 30 18% 75%;
-  --border: 28 18% 25%;
-  --input: 28 20% 34%;
+  --background: 24 16% 7%;
+  --surface-deep: 20 18% 4%;
+  --foreground: 36 30% 96%;
+  --card: 25 15% 11%;
+  --popover: 25 14% 14%;
+  --primary: 38 86% 77%;
+  --primary-hover: 38 86% 86%;
+  --primary-foreground: 24 30% 9%;
+  --secondary: 16 85% 77%;
+  --accent: 28 20% 21%;
+  --muted: 25 12% 17%;
+  --muted-foreground: 30 16% 76%;
+  --border: 28 15% 26%;
+  --input: 30 20% 40%;
+  --glow-primary: 34 85% 51%;
+  --glow-secondary: 9 72% 53%;
+  --atmosphere-strength: 0.7;
 }
 
 :root,
 [data-palette] {
+  /* Declare derived paints in each preview scope as well as the root. CSS
+   * variables otherwise resolve against the active document palette. */
+  --gradient-signature: linear-gradient(
+    115deg in srgb,
+    hsl(var(--primary)) 0%,
+    hsl(var(--secondary)) 100%
+  );
+  --gradient-atmosphere:
+    radial-gradient(ellipse 75% 65% at 6% 0%, hsl(var(--glow-primary) / 0.17), transparent 72%),
+    radial-gradient(ellipse 65% 60% at 96% 12%, hsl(var(--glow-secondary) / 0.22), transparent 72%),
+    radial-gradient(ellipse 80% 50% at 55% 100%, hsl(var(--glow-primary) / 0.055), transparent 75%);
   --card-foreground: var(--foreground);
   --popover-foreground: var(--foreground);
   --secondary-foreground: var(--primary-foreground);

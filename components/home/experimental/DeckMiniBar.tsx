@@ -119,7 +119,7 @@ export function DeckMiniBar({
             onClick={onGesture}
             disabled={isGesturing}
             data-testid="mini-bar-gesture"
-            className="liquid-glass-cta h-9 shrink-0 rounded-full border-0 bg-primary px-4 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+            className="liquid-glass-cta h-9 shrink-0 rounded-full border-0 px-4 text-xs font-semibold text-primary-foreground"
           >
             {isGesturing ? t('form.processing') : submitLabel}
             <ArrowRight className="ml-1 h-3.5 w-3.5" aria-hidden />

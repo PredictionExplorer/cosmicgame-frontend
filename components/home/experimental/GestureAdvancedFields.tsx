@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import { Settings2, Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -9,6 +10,7 @@ import { formatCstAmount } from '@/utils/cstGesture';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MessageTextarea } from '@/components/ui/message-textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -86,14 +88,15 @@ export function GestureAdvancedFields({
   layout = 'stack',
 }: GestureAdvancedFieldsProps) {
   const t = useTranslations('home');
+  const messageInputId = useId();
 
   const messageField = (
     <>
       <div>
         <div className="mb-2 flex items-center gap-2">
-          <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <Label htmlFor={messageInputId} className="text-sm font-semibold text-foreground">
             {t('form.advanced.messageLabel')}{' '}
-            <span className="normal-case tracking-normal opacity-50">
+            <span className="text-xs font-normal text-muted-foreground">
               {t('form.advanced.messageOptionalHint', {
                 maxLength: String(MESSAGE_MAX_LENGTH),
               })}
@@ -114,23 +117,25 @@ export function GestureAdvancedFields({
             </TooltipContent>
           </Tooltip>
         </div>
-        <textarea
+        <MessageTextarea
+          id={messageInputId}
+          aria-describedby={`${messageInputId}-count`}
           placeholder={t('form.advanced.messagePlaceholder')}
           value={message}
           maxLength={MESSAGE_MAX_LENGTH}
           rows={3}
           disabled={previewMode}
-          className="w-full flex min-h-[72px] rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
           onChange={(e) => setMessage(e.target.value)}
         />
         <div className="mt-1.5 flex justify-end">
           <span
+            id={`${messageInputId}-count`}
             data-testid="gesture-message-char-count"
             className={cn(
               'text-xs tabular-nums',
               message.length >= MESSAGE_COUNTER_WARN_AT
                 ? 'text-amber-300'
-                : 'text-muted-foreground/60',
+                : 'text-muted-foreground',
             )}
           >
             {message.length}/{MESSAGE_MAX_LENGTH}

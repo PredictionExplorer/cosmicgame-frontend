@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import {
   Pagination,
   PaginationContent,
@@ -15,6 +16,8 @@ import RandomWalkNFT from './RandomWalkNFT';
 
 interface PaginationRWLKGridProps {
   loading: boolean;
+  /** Dense, container-aware artwork choices inside the wide gesture workspace. */
+  compact?: boolean;
   data: number[];
   selectedToken?: number;
   setSelectedToken?: (tokenId: number) => void;
@@ -34,6 +37,7 @@ function getPaginationRange(current: number, total: number): (number | 'ellipsis
 
 const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
   loading,
+  compact = false,
   data,
   selectedToken = -1,
   setSelectedToken = null,
@@ -66,7 +70,7 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
-    <div className="mt-8">
+    <div className={cn('@container/rwlk', compact ? 'mt-3' : 'mt-8')}>
       {/* Search Input */}
       <div className="relative mb-4">
         <Input
@@ -94,7 +98,14 @@ const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
       {/* Grid + Pagination */}
       {!loading && filteredData.length > 0 && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div
+            className={cn(
+              'grid grid-cols-2',
+              compact
+                ? 'gap-3 @min-[30rem]/rwlk:grid-cols-3 @min-[48rem]/rwlk:grid-cols-4 @min-[64rem]/rwlk:grid-cols-6'
+                : 'gap-8 md:grid-cols-3',
+            )}
+          >
             {paginatedItems.map((tokenId) => (
               <div
                 key={tokenId}

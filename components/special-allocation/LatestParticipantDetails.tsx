@@ -190,7 +190,7 @@ function LatestGestureDetails({
               : t('specialAllocation.gestureDetailsUnavailable')}
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-2 @min-[340px]/gesture:grid-cols-3">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2 @min-[340px]/gesture:grid-cols-3 @min-[680px]/gesture:grid-cols-6">
             <DetailMetric
               testId="latest-participant-paid-amount"
               label={t('specialAllocation.amountPaid')}

@@ -1,6 +1,6 @@
 'use client';
 
-import type { RefObject } from 'react';
+import { useId, type RefObject } from 'react';
 import { ArrowRight, PenLine } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -8,6 +8,8 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { MessageTextarea } from '@/components/ui/message-textarea';
 import { Spinner } from '@/components/ui/spinner';
 import { Surface } from '@/components/ui/surface';
 import { cn } from '@/lib/utils';
@@ -58,6 +60,7 @@ export function GestureComposer({
   className,
 }: GestureComposerProps) {
   const t = useTranslations('home');
+  const messageInputId = useId();
 
   const needsRwlkToken = gestureType === 'RandomWalk' && rwlkId === -1;
   const sendDisabled = isGesturing || !canGesture || needsRwlkToken || gestureType === '';
@@ -96,75 +99,84 @@ export function GestureComposer({
             )}
           </div>
 
+          <div className="mt-3">
+            <Label
+              htmlFor={messageInputId}
+              className="mb-2 block text-sm font-semibold text-foreground"
+            >
+              {t('form.advanced.messageLabel')}
+            </Label>
+            <MessageTextarea
+              id={messageInputId}
+              ref={textareaRef}
+              data-testid="composer-message-input"
+              placeholder={t('deck.composer.placeholder')}
+              value={message}
+              maxLength={MESSAGE_MAX_LENGTH}
+              rows={3}
+              aria-describedby={`${messageInputId}-count`}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <div className="mt-1 flex items-center justify-between gap-2">
+              {account && (
+                <div
+                  role="group"
+                  aria-label={t('form.methodLabel')}
+                  className="flex items-center gap-1"
+                >
+                  {['ETH', ...(showCstOption ? ['CST'] : [])].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => onSelectGestureType(option)}
+                      aria-pressed={methodValue === option}
+                      className={cn(
+                        'liquid-glass-control rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
+                        methodValue === option
+                          ? 'border-primary/50 bg-primary/12 text-white'
+                          : 'border-white/[0.08] bg-white/[0.02] text-muted-foreground hover:text-white',
+                      )}
+                    >
+                      {option === 'ETH' ? t('form.method.eth.label') : t('form.method.cst.label')}
+                    </button>
+                  ))}
+                  {gestureType === 'RandomWalk' && (
+                    <button
+                      type="button"
+                      onClick={onOpenFullConsole}
+                      className="rounded-full border border-[rgb(var(--nebula-violet-rgb)/0.4)] bg-[rgb(var(--nebula-violet-rgb)/0.12)] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--nebula-violet-rgb))]"
+                    >
+                      {rwlkId !== -1
+                        ? t('deck.composer.rwlkChip', { id: String(rwlkId) })
+                        : t('deck.composer.rwlkChoose')}
+                    </button>
+                  )}
+                </div>
+              )}
+              <span
+                id={`${messageInputId}-count`}
+                data-testid="composer-char-count"
+                className={cn(
+                  'ml-auto text-[11px] tabular-nums',
+                  message.length >= MESSAGE_COUNTER_WARN_AT
+                    ? 'text-amber-300'
+                    : 'text-muted-foreground',
+                )}
+              >
+                {message.length}/{MESSAGE_MAX_LENGTH}
+              </span>
+            </div>
+          </div>
+
           {account ? (
             <>
-              <div className="mt-3">
-                <textarea
-                  ref={textareaRef}
-                  data-testid="composer-message-input"
-                  placeholder={t('deck.composer.placeholder')}
-                  value={message}
-                  maxLength={MESSAGE_MAX_LENGTH}
-                  rows={2}
-                  aria-label={t('form.advanced.messageLabel')}
-                  className="flex min-h-[56px] w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background transition-colors placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  onChange={(e) => setMessage(e.target.value)}
-                />
-                <div className="mt-1 flex items-center justify-between gap-2">
-                  <div
-                    role="group"
-                    aria-label={t('form.methodLabel')}
-                    className="flex items-center gap-1"
-                  >
-                    {['ETH', ...(showCstOption ? ['CST'] : [])].map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => onSelectGestureType(option)}
-                        aria-pressed={methodValue === option}
-                        className={cn(
-                          'liquid-glass-control rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
-                          methodValue === option
-                            ? 'border-primary/50 bg-primary/12 text-white'
-                            : 'border-white/[0.08] bg-white/[0.02] text-muted-foreground hover:text-white',
-                        )}
-                      >
-                        {option === 'ETH' ? t('form.method.eth.label') : t('form.method.cst.label')}
-                      </button>
-                    ))}
-                    {gestureType === 'RandomWalk' && (
-                      <button
-                        type="button"
-                        onClick={onOpenFullConsole}
-                        className="rounded-full border border-[rgb(var(--nebula-violet-rgb)/0.4)] bg-[rgb(var(--nebula-violet-rgb)/0.12)] px-2.5 py-1 text-[11px] font-semibold text-[rgb(var(--nebula-violet-rgb))]"
-                      >
-                        {rwlkId !== -1
-                          ? t('deck.composer.rwlkChip', { id: String(rwlkId) })
-                          : t('deck.composer.rwlkChoose')}
-                      </button>
-                    )}
-                  </div>
-                  <span
-                    data-testid="composer-char-count"
-                    className={cn(
-                      'text-[11px] tabular-nums',
-                      message.length >= MESSAGE_COUNTER_WARN_AT
-                        ? 'text-amber-300'
-                        : 'text-muted-foreground/60',
-                    )}
-                  >
-                    {message.length}/{MESSAGE_MAX_LENGTH}
-                  </span>
-                </div>
-              </div>
-
               <Button
                 id="composer-gesture-submit"
                 data-testid="composer-gesture-submit"
                 size="lg"
                 onClick={onGesture}
                 disabled={sendDisabled}
-                className="liquid-glass-cta mt-2.5 h-11 w-full border-0 bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                className="liquid-glass-cta mt-2.5 h-11 w-full border-0 text-sm font-semibold text-primary-foreground"
               >
                 {isGesturing ? (
                   <span className="flex items-center gap-2">

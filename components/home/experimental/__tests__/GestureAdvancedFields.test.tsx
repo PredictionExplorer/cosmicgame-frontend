@@ -62,7 +62,7 @@ describe('GestureAdvancedFields', () => {
 
   it('forwards edits to the shared form state', () => {
     render(<GestureAdvancedFields {...baseProps} layout="panel" />);
-    fireEvent.change(screen.getByPlaceholderText('home.form.advanced.messagePlaceholder'), {
+    fireEvent.change(screen.getByRole('textbox', { name: /home\.form\.advanced\.messageLabel/ }), {
       target: { value: 'hello' },
     });
     expect(baseProps.setMessage).toHaveBeenCalledWith('hello');

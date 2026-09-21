@@ -606,10 +606,7 @@ const HomePage = ({
   const handleJoinChatCta = useCallback(() => {
     trackChatJoinCtaClicked();
     scrollToGesturePanel();
-    const input = panelMessageInputRef.current;
-    const disclosure = input?.closest('details');
-    if (disclosure) disclosure.open = true;
-    input?.focus({ preventScroll: true });
+    panelMessageInputRef.current?.focus({ preventScroll: true });
   }, [scrollToGesturePanel]);
 
   // Mobile bottom sheet: hosts the same gesture panel, opened from the dock,
@@ -670,7 +667,7 @@ const HomePage = ({
           </div>
         )}
 
-        {/* All live decision inputs stay visible together on desktop. */}
+        {/* Read the cycle context, then use the full-width action workspace. */}
         <ControlDesk
           ref={stageContainerRef}
           header={
@@ -747,6 +744,7 @@ const HomePage = ({
                 onSubmit={() => void handleGesture('panel')}
                 onSelectGestureType={handleSelectGestureType}
                 variant="card"
+                layout="wide"
                 messageInputRef={panelMessageInputRef}
                 embedded
                 calibrationExternal

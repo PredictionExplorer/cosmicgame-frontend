@@ -611,7 +611,7 @@ const ExperimentalHomePage = ({
 
   // Chat empty-state CTA: bring the composer into view and focus it. Falls
   // back to the full console's message field when the composer isn't
-  // rendered (disconnected wallet or inactive cycle).
+  // rendered (for example, while the cycle is inactive).
   const composerInputRef = useRef<HTMLTextAreaElement | null>(null);
   const handleJoinChatCta = useCallback(() => {
     trackChatJoinCtaClicked();
@@ -709,7 +709,7 @@ const ExperimentalHomePage = ({
                   id="gesture-submit"
                   size="lg"
                   onClick={() => void handleGesture('console')}
-                  className="liquid-glass-cta h-12 w-full border-0 bg-primary text-base font-semibold text-primary-foreground hover:bg-primary/90"
+                  className="liquid-glass-cta h-12 w-full border-0 text-base font-semibold text-primary-foreground"
                   disabled={
                     isGesturing ||
                     (gestureType === 'RandomWalk' && rwlkId === -1) ||
@@ -735,7 +735,7 @@ const ExperimentalHomePage = ({
                   <Button
                     size="lg"
                     onClick={() => void handleFinalize('console')}
-                    className="liquid-glass-cta h-12 w-full border-0 bg-gradient-to-r from-emerald-500 to-emerald-600 text-base font-semibold text-primary-foreground hover:bg-primary/90"
+                    className="liquid-glass-cta h-12 w-full border-0 bg-gradient-to-r from-emerald-500 to-emerald-600 text-base font-semibold text-primary-foreground"
                     disabled={isClaiming || (data?.LastBidderAddr !== account && claimWait > now)}
                   >
                     {isClaiming ? (

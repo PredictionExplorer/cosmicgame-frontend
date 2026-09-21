@@ -24,9 +24,9 @@ describe('AmbientBackdrop', () => {
     expect(container.querySelector('[data-ambient-backdrop="hero"]')).toBeInTheDocument();
   });
 
-  it('hides under prefers-reduced-motion via motion-reduce:hidden', () => {
+  it('keeps its static atmosphere when motion is reduced', () => {
     const { container } = render(<AmbientBackdrop />);
-    expect(container.firstElementChild).toHaveClass('motion-reduce:hidden');
+    expect(container.firstElementChild).not.toHaveClass('motion-reduce:hidden');
   });
 
   it('has no accessibility violations', async () => {

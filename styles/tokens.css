@@ -38,7 +38,6 @@
     oklch(77.1% 0.163 161) 0%,
     hsl(var(--primary)) 100%
   );
-  --gradient-signature: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
 
   /*
    * Motion tokens — surfaced as Tailwind utilities:
@@ -113,7 +112,8 @@
     background: var(--gradient-ethereum-aura);
   }
   .bg-signature-gradient {
-    background: var(--gradient-signature);
+    background-color: hsl(var(--primary));
+    background-image: var(--gradient-signature);
   }
 
   .text-gradient-signature {
