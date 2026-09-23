@@ -106,33 +106,33 @@ describe('formatSeconds', () => {
 
 describe('formatEthValue', () => {
   it('formats a number as ETH with decimals', () => {
-    const result = formatEthValue(1.23456789);
+    const result = formatEthValue(1.23456789, 'en');
     expect(result).toContain('1.2346');
     expect(result).toContain('ETH');
   });
 
   it('returns 0 ETH for zero input', () => {
-    expect(formatEthValue(0)).toBe('0\u00a0ETH');
+    expect(formatEthValue(0, 'en')).toBe('0\u00a0ETH');
   });
 
   it('keeps 4 decimals for large values too, so a figure reads the same everywhere', () => {
-    const result = formatEthValue(100.123);
+    const result = formatEthValue(100.123, 'en');
     expect(result).toBe('100.1230\u00a0ETH');
   });
 });
 
 describe('formatCSTValue', () => {
   it('formats whole values without decimals', () => {
-    expect(formatCSTValue(5)).toBe('5\u00a0CST');
-    expect(formatCSTValue(15)).toBe('15\u00a0CST');
+    expect(formatCSTValue(5, 'en')).toBe('5\u00a0CST');
+    expect(formatCSTValue(15, 'en')).toBe('15\u00a0CST');
   });
 
   it('formats fractional values with up to 2 decimals', () => {
-    expect(formatCSTValue(15.456)).toBe('15.46\u00a0CST');
+    expect(formatCSTValue(15.456, 'en')).toBe('15.46\u00a0CST');
   });
 
   it('formats zero', () => {
-    expect(formatCSTValue(0)).toBe('0\u00a0CST');
+    expect(formatCSTValue(0, 'en')).toBe('0\u00a0CST');
   });
 });
 

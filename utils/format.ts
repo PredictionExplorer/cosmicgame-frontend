@@ -87,8 +87,11 @@ export const toIntlLocale = (locale: string = 'en'): string => getLocaleConfig(l
  * ETH", vi "8,0735 ETH"), dust as "<0.0001 ETH". A missing or non-finite
  * value renders "0 ETH", as it always has; negatives keep their sign.
  * Delegates to `formatAmount` (`context: 'card'`).
+ *
+ * `locale` is required on this and the other legacy amount helpers, so a
+ * call site cannot silently print English grouping on a translated page.
  */
-export const formatEthValue = (value: number | null | undefined, locale: string = 'en'): string =>
+export const formatEthValue = (value: number | null | undefined, locale: string): string =>
   formatAmount(Number.isFinite(value) ? value : 0, { unit: 'ETH', locale });
 
 /**
@@ -96,7 +99,7 @@ export const formatEthValue = (value: number | null | undefined, locale: string 
  * constant reads "1,000 CST" and a balance "60,872.26 CST"; dust renders
  * "<0.01 CST". A missing value renders "0 CST". Delegates to `formatAmount`.
  */
-export const formatCSTValue = (value: number | null | undefined, locale: string = 'en'): string =>
+export const formatCSTValue = (value: number | null | undefined, locale: string): string =>
   formatAmount(Number.isFinite(value) ? value : 0, { unit: 'CST', locale });
 
 /**
@@ -107,7 +110,7 @@ export const formatCSTValue = (value: number | null | undefined, locale: string 
  */
 export const formatTableAmount = (
   value: number | null | undefined,
-  locale: string = 'en',
+  locale: string,
   unit: AmountUnit = 'ETH',
 ): string => formatAmount(value, { unit, locale, context: 'table', withUnit: false });
 

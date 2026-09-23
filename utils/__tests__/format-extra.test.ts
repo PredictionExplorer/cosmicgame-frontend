@@ -80,19 +80,19 @@ describe('formatUtcDateTimeStamp', () => {
 
 describe('formatTableAmount', () => {
   it('renders zero as a bare 0', () => {
-    expect(formatTableAmount(0)).toBe('0');
+    expect(formatTableAmount(0, 'en')).toBe('0');
   });
 
   it('renders dust below display precision as a bounded value', () => {
-    expect(formatTableAmount(0.00000001)).toBe('<0.0001');
-    expect(formatTableAmount(-0.00000001)).toBe('>-0.0001');
+    expect(formatTableAmount(0.00000001, 'en')).toBe('<0.0001');
+    expect(formatTableAmount(-0.00000001, 'en')).toBe('>-0.0001');
   });
 
   it('pads ETH to 4 fixed decimals so a column lines up', () => {
-    expect(formatTableAmount(0.1)).toBe('0.1000');
-    expect(formatTableAmount(1.5)).toBe('1.5000');
-    expect(formatTableAmount(0.135830123)).toBe('0.1358');
-    expect(formatTableAmount(3.100415642)).toBe('3.1004');
+    expect(formatTableAmount(0.1, 'en')).toBe('0.1000');
+    expect(formatTableAmount(1.5, 'en')).toBe('1.5000');
+    expect(formatTableAmount(0.135830123, 'en')).toBe('0.1358');
+    expect(formatTableAmount(3.100415642, 'en')).toBe('3.1004');
   });
 
   it('uses 2 fixed decimals for CST columns', () => {
@@ -100,7 +100,7 @@ describe('formatTableAmount', () => {
   });
 
   it('adds thousands separators for large values', () => {
-    expect(formatTableAmount(12096.254179)).toBe('12,096.2542');
+    expect(formatTableAmount(12096.254179, 'en')).toBe('12,096.2542');
     expect(formatTableAmount(12096.254179, 'zh')).toBe('12,096.2542');
   });
 
@@ -114,9 +114,9 @@ describe('formatTableAmount', () => {
   });
 
   it('renders non-finite input as an em dash', () => {
-    expect(formatTableAmount(undefined)).toBe('—');
-    expect(formatTableAmount(null)).toBe('—');
-    expect(formatTableAmount(Number.NaN)).toBe('—');
+    expect(formatTableAmount(undefined, 'en')).toBe('—');
+    expect(formatTableAmount(null, 'en')).toBe('—');
+    expect(formatTableAmount(Number.NaN, 'en')).toBe('—');
   });
 });
 
@@ -183,37 +183,37 @@ describe('calculateTimeDiff', () => {
 
 describe('formatEthValue', () => {
   it('returns "0 ETH" for zero', () => {
-    expect(formatEthValue(0)).toBe('0\u00a0ETH');
+    expect(formatEthValue(0, 'en')).toBe('0\u00a0ETH');
   });
 
   it('returns 4 decimals for values less than 10', () => {
-    expect(formatEthValue(1.23456)).toBe('1.2346\u00a0ETH');
+    expect(formatEthValue(1.23456, 'en')).toBe('1.2346\u00a0ETH');
   });
 
   it('keeps 4 decimals for values 10 or greater, so one figure never reads two ways', () => {
-    expect(formatEthValue(10)).toBe('10.0000\u00a0ETH');
-    expect(formatEthValue(32.29391)).toBe('32.2939\u00a0ETH');
-    expect(formatEthValue(99.99999)).toBe('100.0000\u00a0ETH');
+    expect(formatEthValue(10, 'en')).toBe('10.0000\u00a0ETH');
+    expect(formatEthValue(32.29391, 'en')).toBe('32.2939\u00a0ETH');
+    expect(formatEthValue(99.99999, 'en')).toBe('100.0000\u00a0ETH');
   });
 
   it('returns "0 ETH" for NaN-ish falsy value', () => {
-    expect(formatEthValue(NaN)).toBe('0\u00a0ETH');
+    expect(formatEthValue(NaN, 'en')).toBe('0\u00a0ETH');
   });
 });
 
 describe('formatCSTValue', () => {
   it('returns "0 CST" for zero', () => {
-    expect(formatCSTValue(0)).toBe('0\u00a0CST');
+    expect(formatCSTValue(0, 'en')).toBe('0\u00a0CST');
   });
 
   it('returns up to 2 decimals at any size', () => {
-    expect(formatCSTValue(5.6789)).toBe('5.68\u00a0CST');
-    expect(formatCSTValue(42.12345)).toBe('42.12\u00a0CST');
+    expect(formatCSTValue(5.6789, 'en')).toBe('5.68\u00a0CST');
+    expect(formatCSTValue(42.12345, 'en')).toBe('42.12\u00a0CST');
   });
 
   it('groups thousands and keeps whole amounts whole', () => {
-    expect(formatCSTValue(60872.26)).toBe('60,872.26\u00a0CST');
-    expect(formatCSTValue(1000)).toBe('1,000\u00a0CST');
+    expect(formatCSTValue(60872.26, 'en')).toBe('60,872.26\u00a0CST');
+    expect(formatCSTValue(1000, 'en')).toBe('1,000\u00a0CST');
   });
 });
 

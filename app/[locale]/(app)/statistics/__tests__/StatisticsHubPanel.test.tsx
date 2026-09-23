@@ -78,6 +78,26 @@ describe('StatisticsHubPanel', () => {
     expect(screen.getByText('Public Goods & Contributions')).toBeInTheDocument();
   });
 
+  it('groups every count, like the amounts beside it', () => {
+    const base = createDashboardInfo();
+    mockDashboard({
+      data: createDashboardInfo({
+        NumRwalkTokensUsed: 3_101,
+        MainStats: {
+          ...base.MainStats,
+          NumBidsCST: 1_254,
+          NumMktRewards: 2_048,
+          TotalNamedTokens: 4_096,
+        },
+      }),
+    });
+    render(<StatisticsHubPanel />);
+    for (const count of ['1,254', '2,048', '4,096', '3,101']) {
+      expect(screen.getByText(count)).toBeInTheDocument();
+    }
+    expect(screen.queryByText('1254')).not.toBeInTheDocument();
+  });
+
   it('does not render the heavy detail sections on the hub', () => {
     render(<StatisticsHubPanel />);
     expect(screen.queryByText('Unique Participants')).not.toBeInTheDocument();

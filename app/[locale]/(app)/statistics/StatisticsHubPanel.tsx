@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { ArrowRight, Coins, Hash, Heart, Layers, Lock, Trophy, Wallet } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatCSTValue, formatEthValue, formatGroupedNumber } from '@/utils';
+import { formatCSTValue, formatCount, formatEthValue } from '@/utils';
 
 import { Link } from '@/i18n/navigation';
 import { useCTStatistics, useDashboardInfo } from '@/hooks/useApiQuery';
@@ -117,23 +117,23 @@ const StatisticsHubPanel = () => {
 
   const exploreHeadlines: Record<string, { headline: ReactNode; headlineLabel: string }> = {
     participation: {
-      headline: formatGroupedNumber(data.MainStats.NumUniqueBidders, locale),
+      headline: formatCount(data.MainStats.NumUniqueBidders, locale),
       headlineLabel: t('hub.headlines.uniqueParticipants'),
     },
     tokens: {
-      headline: formatGroupedNumber(data.MainStats.NumCSTokenMints, locale),
+      headline: formatCount(data.MainStats.NumCSTokenMints, locale),
       headlineLabel: t('hub.headlines.nftsImprinted'),
     },
     anchoring: {
-      headline: formatGroupedNumber(totalAnchored, locale),
+      headline: formatCount(totalAnchored, locale),
       headlineLabel: t('hub.headlines.nftsAnchored'),
     },
     activity: {
-      headline: formatGroupedNumber(Number(data.CurNumBids ?? 0), locale),
+      headline: formatCount(Number(data.CurNumBids ?? 0), locale),
       headlineLabel: t('hub.headlines.gesturesThisCycle'),
     },
     performance: {
-      headline: formatGroupedNumber(totalAllocationsDistributed, locale),
+      headline: formatCount(totalAllocationsDistributed, locale),
       headlineLabel: t('hub.headlines.allocationsDistributed'),
     },
   };
@@ -144,19 +144,19 @@ const StatisticsHubPanel = () => {
       <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
         <StatCard
           label={t('metrics.totalCycles.label')}
-          value={data.CurRoundNum}
+          value={formatCount(data.CurRoundNum, locale)}
           icon={<Hash className="h-4 w-4" />}
           tooltip={t('metrics.totalCycles.tooltip')}
         />
         <StatCard
           label={t('metrics.allocationsDistributed.label')}
-          value={totalAllocationsDistributed}
+          value={formatCount(totalAllocationsDistributed, locale)}
           icon={<Trophy className="h-4 w-4" />}
           tooltip={t('metrics.allocationsDistributed.tooltip')}
         />
         <StatCard
           label={t('metrics.cosmicSignatureNftsImprinted.shortLabel')}
-          value={data.MainStats.NumCSTokenMints}
+          value={formatCount(data.MainStats.NumCSTokenMints, locale)}
           icon={<Layers className="h-4 w-4" />}
           tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
         />
@@ -254,12 +254,13 @@ const StatisticsHubPanel = () => {
           {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
             <p className="mt-2 text-sm text-primary">
               {t('hub.pendingStellarRetrievals', {
-                count: formatGroupedNumber(
+                count: formatCount(
                   data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0,
                   locale,
                 ),
                 amount: formatEthValue(
                   data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn,
+                  locale,
                 ),
               })}
             </p>
@@ -281,7 +282,7 @@ const StatisticsHubPanel = () => {
             title={t('metrics.cosmicSignatureNftsImprinted.shortLabel')}
             value={
               <Link href="/gallery" className="text-inherit">
-                {data.MainStats.NumCSTokenMints}
+                {formatCount(data.MainStats.NumCSTokenMints, locale)}
               </Link>
             }
             tooltip={t('metrics.cosmicSignatureNftsImprinted.tooltip')}
@@ -298,7 +299,7 @@ const StatisticsHubPanel = () => {
           />
           <StatisticsItem
             title={t('metrics.cstGestures.label')}
-            value={data.MainStats.NumBidsCST}
+            value={formatCount(data.MainStats.NumBidsCST, locale)}
             tooltip={t('metrics.cstGestures.tooltip')}
           />
           <StatisticsItem
@@ -310,7 +311,7 @@ const StatisticsHubPanel = () => {
             title={t('metrics.outreachTransactions.label')}
             value={
               <Link className="text-inherit" href="/marketing">
-                {data.MainStats.NumMktRewards}
+                {formatCount(data.MainStats.NumMktRewards, locale)}
               </Link>
             }
             tooltip={t('metrics.outreachTransactions.tooltip')}
@@ -319,7 +320,7 @@ const StatisticsHubPanel = () => {
             title={t('metrics.randomWalkNftsUsed.label')}
             value={
               <Link className="text-inherit" href="/used-rwlk-nfts">
-                {data.NumRwalkTokensUsed as ReactNode}
+                {formatCount(Number(data.NumRwalkTokensUsed), locale)}
               </Link>
             }
             tooltip={t('metrics.randomWalkNftsUsed.tooltip')}
@@ -328,7 +329,7 @@ const StatisticsHubPanel = () => {
             title={t('metrics.namedTokens.label')}
             value={
               <Link className="text-inherit" href="/named-nfts">
-                {data.MainStats.TotalNamedTokens}
+                {formatCount(data.MainStats.TotalNamedTokens, locale)}
               </Link>
             }
             tooltip={t('metrics.namedTokens.tooltip')}
@@ -350,7 +351,7 @@ const StatisticsHubPanel = () => {
             title={t('metrics.attachedNfts.label')}
             value={
               <Link className="text-inherit" href="/attached-nfts">
-                {data.NumDonatedNFTs as ReactNode}
+                {formatCount(Number(data.NumDonatedNFTs), locale)}
               </Link>
             }
             tooltip={t('metrics.attachedNfts.tooltip')}
@@ -375,7 +376,7 @@ const StatisticsHubPanel = () => {
                 title={t('metrics.protocolContributions.label')}
                 value={
                   <Link className="text-inherit" href="/public-goods-contributions-cg">
-                    {data.MainStats.NumCosmicGameDonations}
+                    {formatCount(data.MainStats.NumCosmicGameDonations, locale)}
                   </Link>
                 }
                 tooltip={t('metrics.protocolContributions.tooltip')}
@@ -397,7 +398,7 @@ const StatisticsHubPanel = () => {
               value={
                 <Link className="text-inherit" href="/public-goods-contributions-voluntary">
                   {t('hub.voluntaryContributionSummary', {
-                    count: formatGroupedNumber(Number(data.NumVoluntaryDonations) || 0, locale),
+                    count: formatCount(Number(data.NumVoluntaryDonations) || 0, locale),
                     amount: formatEthValue(Number(data.SumVoluntaryDonationsEth) || 0, locale),
                   })}
                 </Link>
@@ -410,7 +411,7 @@ const StatisticsHubPanel = () => {
               title={t('metrics.publicGoodsRetrievals.label')}
               value={
                 <Link className="text-inherit" href="/public-goods-retrievals">
-                  {data.MainStats.NumWithdrawals}
+                  {formatCount(data.MainStats.NumWithdrawals, locale)}
                 </Link>
               }
               tooltip={t('metrics.publicGoodsRetrievals.tooltip')}
@@ -436,11 +437,8 @@ const StatisticsHubPanel = () => {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
               {t('hub.anchoringGlanceDescription', {
-                cosmicCount: formatGroupedNumber(cstAnchorStats.TotalTokensStaked ?? 0, locale),
-                randomWalkCount: formatGroupedNumber(
-                  rwlkAnchorStats.TotalTokensStaked ?? 0,
-                  locale,
-                ),
+                cosmicCount: formatCount(cstAnchorStats.TotalTokensStaked ?? 0, locale),
+                randomWalkCount: formatCount(rwlkAnchorStats.TotalTokensStaked ?? 0, locale),
               })}
             </p>
             <Link

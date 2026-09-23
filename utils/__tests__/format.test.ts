@@ -501,24 +501,24 @@ describe('addresses', () => {
 
 describe('legacy helpers delegate to the formatting layer', () => {
   it('formatEthValue: grouped card ETH in every locale, "0 ETH" when missing', () => {
-    expect(formatEthValue(32.29391)).toBe(nb('32.2939~ETH'));
-    expect(formatEthValue(263113.6)).toBe(nb('263,113.6000~ETH'));
+    expect(formatEthValue(32.29391, 'en')).toBe(nb('32.2939~ETH'));
+    expect(formatEthValue(263113.6, 'en')).toBe(nb('263,113.6000~ETH'));
     expect(formatEthValue(8.07351, 'vi')).toBe(nb('8,0735~ETH'));
-    expect(formatEthValue(undefined)).toBe(nb('0~ETH'));
-    expect(formatEthValue(Number.NaN)).toBe(nb('0~ETH'));
+    expect(formatEthValue(undefined, 'en')).toBe(nb('0~ETH'));
+    expect(formatEthValue(Number.NaN, 'en')).toBe(nb('0~ETH'));
   });
 
   it('formatCSTValue: grouped card CST with 2 decimals, none when whole', () => {
-    expect(formatCSTValue(60872.26)).toBe(nb('60,872.26~CST'));
-    expect(formatCSTValue(1000)).toBe(nb('1,000~CST'));
+    expect(formatCSTValue(60872.26, 'en')).toBe(nb('60,872.26~CST'));
+    expect(formatCSTValue(1000, 'en')).toBe(nb('1,000~CST'));
     expect(formatCSTValue(1000, 'uk')).toBe(nb('1~000~CST'));
-    expect(formatCSTValue(null)).toBe(nb('0~CST'));
+    expect(formatCSTValue(null, 'en')).toBe(nb('0~CST'));
   });
 
   it('formatTableAmount: unit-free fixed digits for ledger columns', () => {
-    expect(formatTableAmount(2.65478)).toBe('2.6548');
-    expect(formatTableAmount(0)).toBe('0');
+    expect(formatTableAmount(2.65478, 'en')).toBe('2.6548');
+    expect(formatTableAmount(0, 'en')).toBe('0');
     expect(formatTableAmount(12.5, 'en', 'CST')).toBe('12.50');
-    expect(formatTableAmount(null)).toBe(UNAVAILABLE_VALUE);
+    expect(formatTableAmount(null, 'en')).toBe(UNAVAILABLE_VALUE);
   });
 });
