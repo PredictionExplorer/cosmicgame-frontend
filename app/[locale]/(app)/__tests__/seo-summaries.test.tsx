@@ -120,6 +120,14 @@ const dashboard = {
   },
 };
 
+/** Wallet addresses for list rows; the summaries count only real addresses. */
+const WALLET_A = `0x${'a1'.repeat(20)}`;
+const WALLET_B = `0x${'b2'.repeat(20)}`;
+const WALLET_C = `0x${'c3'.repeat(20)}`;
+const WALLET_E = `0x${'e4'.repeat(20)}`;
+/** The recipient production records on Anchor Distribution (type 15) rows: not a wallet. */
+const ANCHOR_DISTRIBUTION_RECIPIENT = '(All CS NFT Stakers)'; // lexicon-allow-backend-type
+
 describe('server-visible SEO summaries', () => {
   beforeEach(() => {
     mockGetLocale.mockResolvedValue('en');
@@ -128,23 +136,23 @@ describe('server-visible SEO summaries', () => {
     mockGetDashboardInfo.mockResolvedValue(
       dashboard as unknown as Awaited<ReturnType<typeof get_dashboard_info>>,
     );
-    mockMarketingRewards.mockResolvedValue([{ MarketerAddr: '0xabc' }] as Awaited<
+    mockMarketingRewards.mockResolvedValue([{ MarketerAddr: WALLET_A }] as Awaited<
       ReturnType<typeof get_marketing_rewards>
     >);
     mockCstActions.mockResolvedValue([{}] as Awaited<ReturnType<typeof get_staking_cst_actions>>);
     mockRwalkActions.mockResolvedValue([{}] as Awaited<
       ReturnType<typeof get_staking_rwalk_actions>
     >);
-    mockDirectContributions.mockResolvedValue([{ AmountEth: 1, DonorAddr: '0xabc' }] as Awaited<
+    mockDirectContributions.mockResolvedValue([{ AmountEth: 1, DonorAddr: WALLET_A }] as Awaited<
       ReturnType<typeof get_donations_both>
     >);
     mockCstRewards.mockResolvedValue([]);
     mockRwalkImprints.mockResolvedValue([]);
     mockCoordinationEvents.mockResolvedValue([]);
-    mockAttachedNfts.mockResolvedValue([{ TokenAddr: '0xabc', DonorAddr: '0xdef' }] as Awaited<
+    mockAttachedNfts.mockResolvedValue([{ TokenAddr: WALLET_A, DonorAddr: WALLET_B }] as Awaited<
       ReturnType<typeof get_donations_nft_list>
     >);
-    mockNamedNfts.mockResolvedValue([{ TokenId: 1, CurOwnerAddr: '0xabc' }] as Awaited<
+    mockNamedNfts.mockResolvedValue([{ TokenId: 1, CurOwnerAddr: WALLET_A }] as Awaited<
       ReturnType<typeof get_named_nfts>
     >);
     mockUsedRwlkNfts.mockResolvedValue([{}] as Awaited<ReturnType<typeof get_used_rwlk_nfts>>);
@@ -255,12 +263,12 @@ describe('server-visible SEO summaries', () => {
 
   it('renders allocation totals from finalized rounds instead of claim history', async () => {
     mockGetRoundList.mockResolvedValue([
-      { AmountEth: 1.25, WinnerAddr: '0xaaa' },
-      { AmountEth: 2.5, WinnerAddr: '0xbbb' },
-      { AmountEth: 3, WinnerAddr: '0xaaa' },
+      { AmountEth: 1.25, WinnerAddr: WALLET_A },
+      { AmountEth: 2.5, WinnerAddr: WALLET_B },
+      { AmountEth: 3, WinnerAddr: WALLET_A },
     ] as Awaited<ReturnType<typeof get_round_list>>);
     mockGetClaimHistory.mockResolvedValue([
-      { AmountEth: 24_009.1377, WinnerAddr: '0xclaim' },
+      { AmountEth: 24_009.1377, WinnerAddr: WALLET_C },
     ] as unknown as Awaited<ReturnType<typeof get_claim_history>>);
 
     render(await PublicDataRouteSeoSummary({ route: 'allocation' }));
@@ -292,14 +300,14 @@ describe('server-visible SEO summaries', () => {
       // The /allocation-finalized card once read "48,028 ETH": every 1,000 CST row was
       // summed as 1,000 ETH, and a timeout retrieval (type 18) repeats a type-10 deposit.
       mockGetClaimHistory.mockResolvedValue([
-        { RecordType: 0, AmountEth: 11.0616, WinnerAddr: '0xaaa' },
-        { RecordType: 7, AmountEth: 3.5397, WinnerAddr: '0xbbb' },
-        { RecordType: 10, AmountEth: 0.4596, WinnerAddr: '0xccc' },
-        { RecordType: 15, AmountEth: 2.6548, WinnerAddr: '0xddd' },
-        { RecordType: 1, AmountEth: 1000, WinnerAddr: '0xaaa' },
-        { RecordType: 11, AmountEth: 1000, WinnerAddr: '0xccc' },
-        { RecordType: 2, AmountEth: 0, WinnerAddr: '0xaaa' },
-        { RecordType: 18, AmountEth: 0.4596, WinnerAddr: '0xeee' },
+        { RecordType: 0, AmountEth: 11.0616, WinnerAddr: WALLET_A },
+        { RecordType: 7, AmountEth: 3.5397, WinnerAddr: WALLET_B },
+        { RecordType: 10, AmountEth: 0.4596, WinnerAddr: WALLET_C },
+        { RecordType: 15, AmountEth: 2.6548, WinnerAddr: ANCHOR_DISTRIBUTION_RECIPIENT },
+        { RecordType: 1, AmountEth: 1000, WinnerAddr: `0x${'A1'.repeat(20)}` },
+        { RecordType: 11, AmountEth: 1000, WinnerAddr: WALLET_C },
+        { RecordType: 2, AmountEth: 0, WinnerAddr: WALLET_A },
+        { RecordType: 18, AmountEth: 0.4596, WinnerAddr: WALLET_E },
       ] as Rows<typeof get_claim_history>);
 
       render(await PublicDataRouteSeoSummary({ route: 'allocation-finalized' }));
@@ -308,7 +316,8 @@ describe('server-visible SEO summaries', () => {
       expect(screen.getByText(copy.eth.label)).toBeInTheDocument();
       expect(cardFigure('eth')).toHaveTextContent('17.7157 ETH');
       expect(cardFigure('records')).toHaveTextContent('8');
-      expect(cardFigure('recipients')).toHaveTextContent('5');
+      // A, B, C and E: the placeholder is not a wallet, and case does not split a wallet.
+      expect(cardFigure('recipients')).toHaveTextContent(/^4$/);
       expect(screen.queryByText(/2,0\d\d/)).not.toBeInTheDocument();
     });
 
@@ -321,7 +330,8 @@ describe('server-visible SEO summaries', () => {
 
       render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
 
-      expect(cardFigure('cost')).toHaveTextContent('0.1021 ETH');
+      // The same quote format as the home tabs and submit button (five significant digits).
+      expect(cardFigure('cost')).toHaveTextContent(/^0\.10211 ETH$/);
       expect(screen.queryByText(/185/)).not.toBeInTheDocument();
       expect(cardFigure('discount')).toHaveTextContent(
         `${protocolFacts.randomWalkDiscountPercentage}%`,
@@ -344,9 +354,10 @@ describe('server-visible SEO summaries', () => {
 
     it('builds the direct-contribution cards from the table source', async () => {
       const rows = [
-        { AmountEth: 20, DonorAddr: '0x4D39' },
-        { AmountEth: 10, DonorAddr: '0xfc79' },
-        { AmountEth: 0.5, DonorAddr: '0x4D39' },
+        { AmountEth: 20, DonorAddr: '0x4D3949CD8980E942eb9Dd24d4eCc27584a8D71fA' },
+        { AmountEth: 10, DonorAddr: WALLET_B },
+        // The same wallet in lower case: still one contributor.
+        { AmountEth: 0.5, DonorAddr: '0x4d3949cd8980e942eb9dd24d4ecc27584a8d71fa' },
       ] as Rows<typeof get_donations_both>;
       mockDirectContributions.mockResolvedValue(rows);
 

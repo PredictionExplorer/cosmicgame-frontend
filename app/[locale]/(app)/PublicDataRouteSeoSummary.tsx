@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from 'next-intl/server';
+import { isAddress } from 'viem';
 
 import { protocolFacts } from '@/content/protocol-facts';
 
@@ -24,7 +25,9 @@ import { get_claim_history, get_dashboard_info, get_round_list } from '@/service
 import { get_coordination_events } from '@/services/api/system';
 import { get_named_nfts, get_used_rwlk_nfts } from '@/services/api/tokens';
 import { sumAllocatedEth } from '@/utils/allocationRecords';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatUtcDateTimeStamp, toIntlLocale } from '@/utils/format';
+import { formatEthQuote } from '@/utils/gestureQuote';
 
 export type SeoSummaryRoute =
   | 'allocation'
@@ -156,16 +159,6 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   },
 };
 
-/** A finite number from a numeric wire value; `null` for anything else (missing, NaN, `null`). */
-function toFiniteNumber(value: unknown): number | null {
-  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
-  if (typeof value === 'string' && value.trim() !== '') {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
-
 /** Locale-aware figure formatters; each returns `null` when the value is not a finite number. */
 function createFormatters(locale: string) {
   const intlLocale = toIntlLocale(locale);
@@ -179,6 +172,8 @@ function createFormatters(locale: string) {
   return {
     number: (value: unknown) => format(value, (n) => count.format(n)),
     eth: (value: unknown) => format(value, (n) => `${amount.format(n)} ETH`),
+    /** An ETH Gesture Cost, in the same quote format as the home tabs and submit button. */
+    ethQuote: (value: unknown) => format(value, (n) => `${formatEthQuote(n, locale)} ETH`),
     cst: (value: unknown) => format(value, (n) => `${amount.format(n)} CST`),
     percent: (value: unknown) => format(value, (n) => percent.format(n / 100)),
   };
@@ -197,8 +192,19 @@ function sumAmountEth(rows: readonly { AmountEth?: unknown }[]): number {
   return rows.reduce((total, row) => total + (toFiniteNumber(row.AmountEth) ?? 0), 0);
 }
 
-function countDistinct(values: readonly unknown[]): number {
-  return new Set(values.filter((value) => typeof value === 'string' && value !== '')).size;
+/**
+ * Distinct wallet or contract addresses, case-insensitively. Anything that is not an address
+ * is skipped: the allocation history records Anchor Distribution ETH against the placeholder
+ * "(All CS NFT Stakers)", which is not a wallet and must not count as a recipient.
+ */
+function countDistinctAddresses(values: readonly unknown[]): number {
+  const addresses = new Set<string>();
+  for (const value of values) {
+    if (typeof value === 'string' && isAddress(value, { strict: false })) {
+      addresses.add(value.toLowerCase());
+    }
+  }
+  return addresses.size;
 }
 
 async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<SummaryCard[]> {
@@ -215,7 +221,8 @@ async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<
         },
         {
           key: 'recipients',
-          figure: rounds && format.number(countDistinct(rounds.map((row) => row.WinnerAddr))),
+          figure:
+            rounds && format.number(countDistinctAddresses(rounds.map((row) => row.WinnerAddr))),
           hasTooltip: true,
         },
         {
@@ -262,7 +269,9 @@ async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<
         { key: 'allocatedCst', figure: format.cst(dashboard?.MainStats?.TotalMktRewardsEth) },
         {
           key: 'contributors',
-          figure: rewards && format.number(countDistinct(rewards.map((row) => row.MarketerAddr))),
+          figure:
+            rewards &&
+            format.number(countDistinctAddresses(rewards.map((row) => row.MarketerAddr))),
         },
       ];
     }
@@ -270,7 +279,7 @@ async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<
       const dashboard = await settle(get_dashboard_info());
       return [
         { key: 'cycle', figure: format.number(dashboard?.CurRoundNum) },
-        { key: 'cost', figure: format.eth(dashboard?.CurBidPriceEth) },
+        { key: 'cost', figure: format.ethQuote(dashboard?.CurBidPriceEth) },
         { key: 'discount', figure: format.percent(protocolFacts.randomWalkDiscountPercentage) },
       ];
     }
@@ -285,7 +294,7 @@ async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<
           key: 'contributors',
           figure:
             contributions &&
-            format.number(countDistinct(contributions.map((row) => row.DonorAddr))),
+            format.number(countDistinctAddresses(contributions.map((row) => row.DonorAddr))),
         },
       ];
     }
@@ -296,12 +305,14 @@ async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<
         {
           key: 'contracts',
           figure:
-            attachedNfts && format.number(countDistinct(attachedNfts.map((row) => row.TokenAddr))),
+            attachedNfts &&
+            format.number(countDistinctAddresses(attachedNfts.map((row) => row.TokenAddr))),
         },
         {
           key: 'contributors',
           figure:
-            attachedNfts && format.number(countDistinct(attachedNfts.map((row) => row.DonorAddr))),
+            attachedNfts &&
+            format.number(countDistinctAddresses(attachedNfts.map((row) => row.DonorAddr))),
         },
       ];
     }
@@ -314,7 +325,8 @@ async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<
         { key: 'eth', figure: history && format.eth(sumAllocatedEth(history)), hasTooltip: true },
         {
           key: 'recipients',
-          figure: history && format.number(countDistinct(history.map((row) => row.WinnerAddr))),
+          figure:
+            history && format.number(countDistinctAddresses(history.map((row) => row.WinnerAddr))),
         },
       ];
     }
@@ -326,7 +338,9 @@ async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<
           key: 'owners',
           figure:
             named &&
-            format.number(countDistinct(named.map((row) => row.CurOwnerAddr ?? row.OwnerAddr))),
+            format.number(
+              countDistinctAddresses(named.map((row) => row.CurOwnerAddr ?? row.OwnerAddr)),
+            ),
         },
         { key: 'collection' },
       ];
@@ -363,7 +377,8 @@ async function getSummaryCards(route: SeoSummaryRoute, locale: string): Promise<
         { key: 'totalEth', figure: deposits && format.eth(sumAmountEth(deposits)) },
         {
           key: 'contributors',
-          figure: deposits && format.number(countDistinct(deposits.map((row) => row.DonorAddr))),
+          figure:
+            deposits && format.number(countDistinctAddresses(deposits.map((row) => row.DonorAddr))),
         },
       ];
     }
