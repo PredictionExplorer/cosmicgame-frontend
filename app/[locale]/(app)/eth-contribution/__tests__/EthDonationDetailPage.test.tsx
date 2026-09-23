@@ -56,7 +56,10 @@ describe('EthDonationDetailPage', () => {
     render(<EthDonationDetailPage id={7} />);
 
     expect(screen.queryByText('Contribution not found.')).not.toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong');
+    // The shared error state, as a section heading under the page title.
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Something went wrong' }),
+    ).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }));
     expect(refetch).toHaveBeenCalled();
   });

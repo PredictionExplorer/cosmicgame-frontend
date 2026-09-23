@@ -15,9 +15,10 @@ interface ErrorStateProps {
   message?: ReactNode;
   /**
    * Heading level for the title. Defaults to 4; pass 3 when the state sits
-   * directly under a page `h2` so the document keeps a valid heading order.
+   * directly under a page `h2`, or 2 when it replaces a page's content under
+   * its `h1`, so the document keeps a valid heading order.
    */
-  headingLevel?: 3 | 4;
+  headingLevel?: 2 | 3 | 4;
   /** Lucide icon override. Defaults to AlertTriangle. */
   icon?: ReactNode;
   tone?: Tone;
@@ -51,7 +52,7 @@ export function ErrorState({
 }: ErrorStateProps) {
   const t = useTranslations('errors');
   const palette = TONE[tone];
-  const Heading = headingLevel === 3 ? 'h3' : 'h4';
+  const Heading = `h${headingLevel}` as const;
   const body = (
     <div
       className={cn('flex flex-col items-center justify-center px-4 py-16 text-center', className)}

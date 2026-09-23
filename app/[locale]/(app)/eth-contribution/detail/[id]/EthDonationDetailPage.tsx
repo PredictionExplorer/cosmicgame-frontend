@@ -16,7 +16,7 @@ import {
   detailPanelClass,
 } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Button } from '@/components/ui/button';
+import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
@@ -31,7 +31,6 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   const locale = useLocale();
   const t = useTranslations('ethContribution');
   const tCommon = useTranslations('common');
-  const tErrors = useTranslations('errors');
   const {
     data: rawDonationInfo,
     isLoading: loading,
@@ -124,20 +123,15 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
             className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
             align="left"
           />
-          <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            {isError ? (
-              <>
-                <p className="font-medium text-foreground" role="alert">
-                  {tErrors('state.title')}
-                </p>
-                <Button variant="outline" size="sm" className="mt-6" onClick={() => void refetch()}>
-                  {tErrors('state.retry')}
-                </Button>
-              </>
-            ) : (
+          {isError ? (
+            <div className={detailPanelClass}>
+              <ErrorState headingLevel={2} onRetry={() => void refetch()} />
+            </div>
+          ) : (
+            <div className={cn(detailPanelClass, 'p-10 text-center')}>
               <p className="font-medium text-foreground">{t('detail.notFound')}</p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </PageShell>
     );
