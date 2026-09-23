@@ -3,15 +3,15 @@ import { act, renderHook } from '@testing-library/react';
 import { createFakeTxFlow } from '@/test-utils/txFlow';
 
 const USER = '0xUser' as const;
-const STAKING_CST = '0xStakingCst';
-const STAKING_RWALK = '0xStakingRwalk';
+const ANCHORING_CST_WALLET = '0xStakingCst';
+const ANCHORING_RWALK_WALLET = '0xStakingRwalk';
 
 const mockTx = createFakeTxFlow(USER);
 const mockTranslate = (key: string) => `toasts.${key}`;
 const mockNotify = jest.fn();
 const mockNotifyErrorFromEthers = jest.fn();
 const mockInvalidateQueries = jest.fn();
-const mockFetchStakedTokens = jest.fn();
+const mockFetchAnchoredTokens = jest.fn();
 
 jest.mock('next-intl', () => ({
   useLocale: () => 'en',
@@ -25,10 +25,13 @@ jest.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
 }));
 jest.mock('../../contexts/AnchoredTokenContext', () => ({
-  useAnchoredToken: () => ({ fetchData: mockFetchStakedTokens }),
+  useAnchoredToken: () => ({ fetchData: mockFetchAnchoredTokens }),
 }));
 jest.mock('../../contexts/ContractAddressesContext', () => ({
-  useContractAddresses: () => ({ stakingCst: STAKING_CST, stakingRwalk: STAKING_RWALK }),
+  useContractAddresses: () => ({
+    stakingCst: ANCHORING_CST_WALLET,
+    stakingRwalk: ANCHORING_RWALK_WALLET,
+  }),
 }));
 jest.mock('../web3', () => ({
   useActiveWeb3React: () => ({ account: USER, chainId: 421614, active: true }),
@@ -103,8 +106,8 @@ describe('useAnchorActions', () => {
         await result.current.anchor(7, false);
       });
 
-      expect(mockCsNft.read.isApprovedForAll).toHaveBeenCalledWith([USER, STAKING_CST]);
-      expect(mockCsNft.write.setApprovalForAll).toHaveBeenCalledWith([STAKING_CST, true]);
+      expect(mockCsNft.read.isApprovedForAll).toHaveBeenCalledWith([USER, ANCHORING_CST_WALLET]);
+      expect(mockCsNft.write.setApprovalForAll).toHaveBeenCalledWith([ANCHORING_CST_WALLET, true]);
       expect(mockTx.sentApprovals()).toEqual(['toasts.anchor.approval']);
       expect(mockCstAnchoring!.write.stake).toHaveBeenCalledWith([7]);
       expect(mockTx.lastSuccessMessage()).toBe('toasts.anchor.anchored');
@@ -135,7 +138,10 @@ describe('useAnchorActions', () => {
       await act(async () => {
         await result.current.anchor(9, true);
       });
-      expect(mockRwalkNft.read.isApprovedForAll).toHaveBeenCalledWith([USER, STAKING_RWALK]);
+      expect(mockRwalkNft.read.isApprovedForAll).toHaveBeenCalledWith([
+        USER,
+        ANCHORING_RWALK_WALLET,
+      ]);
       expect(mockRwlkAnchoring!.write.stake).toHaveBeenCalledWith([9]);
       expect(mockCstAnchoring!.write.stake).not.toHaveBeenCalled();
     });
@@ -198,7 +204,7 @@ describe('useAnchorActions', () => {
       });
       expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
       expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['stakingCSTActionsByUser'] });
-      expect(mockFetchStakedTokens).toHaveBeenCalledTimes(1);
+      expect(mockFetchAnchoredTokens).toHaveBeenCalledTimes(1);
     });
 
     it('cancels the pending refresh when the caller unmounts first', async () => {
