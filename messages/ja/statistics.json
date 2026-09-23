@@ -181,10 +181,6 @@
       "label": "ユニークETH拠出者",
       "tooltip": "プロトコルへETHを拠出したユニークなウォレットアドレス。"
     },
-    "uniqueAnchorHolders": {
-      "label": "ユニーク係留者",
-      "tooltip": "Cosmic Signature NFTまたはRandomWalk NFTを係留したことのあるユニークなウォレットの合計。"
-    },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT保有者",
       "tooltip": "Cosmic Signature NFTを少なくとも1点現在保有しているユニークなウォレットアドレス。"

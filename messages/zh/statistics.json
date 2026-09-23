@@ -181,10 +181,6 @@
       "label": "独立 ETH 贡献者",
       "tooltip": "曾向协议贡献 ETH 的独立钱包地址。"
     },
-    "uniqueAnchorHolders": {
-      "label": "独立锚定者",
-      "tooltip": "曾锚定 Cosmic Signature NFT 或 Random Walk NFT 的独立钱包合计数。"
-    },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT 持有者",
       "tooltip": "当前至少持有一枚 Cosmic Signature NFT 的独立钱包地址。"

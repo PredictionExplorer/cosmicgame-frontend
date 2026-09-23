@@ -181,10 +181,6 @@
       "label": "고유 ETH 기여자",
       "tooltip": "프로토콜에 ETH를 기여한 고유 지갑 주소입니다."
     },
-    "uniqueAnchorHolders": {
-      "label": "고유 앵커링 보유자",
-      "tooltip": "Cosmic Signature NFT 또는 RandomWalk NFT를 앵커링한 고유 지갑을 합산한 값입니다."
-    },
     "cosmicSignatureNftHolders": {
       "label": "Cosmic Signature NFT 보유자",
       "tooltip": "현재 Cosmic Signature NFT를 한 개 이상 보유한 고유 지갑 주소입니다."

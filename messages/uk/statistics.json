@@ -181,10 +181,6 @@
       "label": "Унікальні автори внесків ETH",
       "tooltip": "Унікальні адреси гаманців, що зробили внесок ETH до протоколу."
     },
-    "uniqueAnchorHolders": {
-      "label": "Унікальні власники закріплень",
-      "tooltip": "Сукупна кількість унікальних гаманців, що закріпили Cosmic Signature NFT або RandomWalk NFT."
-    },
     "cosmicSignatureNftHolders": {
       "label": "Власники Cosmic Signature NFT",
       "tooltip": "Унікальні адреси гаманців, які зараз володіють щонайменше одним Cosmic Signature NFT."

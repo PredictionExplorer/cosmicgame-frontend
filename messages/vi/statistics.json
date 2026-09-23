@@ -181,10 +181,6 @@
       "label": "Người đóng góp ETH riêng biệt",
       "tooltip": "Các địa chỉ ví riêng biệt đã đóng góp ETH cho giao thức."
     },
-    "uniqueAnchorHolders": {
-      "label": "Người neo giữ riêng biệt",
-      "tooltip": "Tổng số ví riêng biệt đã neo giữ Cosmic Signature NFT hoặc RandomWalk NFT."
-    },
     "cosmicSignatureNftHolders": {
       "label": "Người nắm giữ Cosmic Signature NFT",
       "tooltip": "Các địa chỉ ví riêng biệt hiện đang nắm giữ ít nhất một Cosmic Signature NFT."
