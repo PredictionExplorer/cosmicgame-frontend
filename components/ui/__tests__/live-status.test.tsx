@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render as renderWithWrapper } from '@testing-library/react';
 import type { ReactNode } from 'react';
@@ -6,11 +9,18 @@ import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 
 import { act, checkA11y, render, renderHook, screen } from '@/test-utils';
 
-import { LiveStatus, LiveStatusView } from '../live-status';
+import { LiveStatus, LiveStatusView as ReExportedView } from '../live-status';
+import { LiveStatusView } from '../live-status-view';
 
 jest.unmock('@tanstack/react-query');
 
 describe('LiveStatusView', () => {
+  it('stays free of React Query and the wallet stack so the landing can render it', () => {
+    const source = readFileSync(path.join(__dirname, '..', 'live-status-view.tsx'), 'utf8');
+    expect(source).not.toMatch(/@tanstack\/react-query|wagmi|rainbowkit|@\/hooks\//);
+    expect(ReExportedView).toBe(LiveStatusView);
+  });
+
   it('pulses only while live, with the state as text', () => {
     render(<LiveStatusView state="live" variant="dot" />);
     const status = screen.getByRole('status');
