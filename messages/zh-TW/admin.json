@@ -25,7 +25,7 @@
       "set": "設定"
     },
     "values": {
-      "divisorPercent": "{percent}%（除數 {divisor}）"
+      "divisorPercent": "{percent}（除數 {divisor}）"
     },
     "fields": {
       "ethStellarRecipients": "每個週期的 ETH 星選獲配者人數",

@@ -25,7 +25,7 @@
       "set": "Set"
     },
     "values": {
-      "divisorPercent": "{percent}% (divisor {divisor})"
+      "divisorPercent": "{percent} (divisor {divisor})"
     },
     "fields": {
       "ethStellarRecipients": "Number of ETH Stellar Selection recipients per cycle",

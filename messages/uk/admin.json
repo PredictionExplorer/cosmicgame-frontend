@@ -25,7 +25,7 @@
       "set": "Встановити"
     },
     "values": {
-      "divisorPercent": "{percent}% (дільник {divisor})"
+      "divisorPercent": "{percent} (дільник {divisor})"
     },
     "fields": {
       "ethStellarRecipients": "Кількість отримувачів зоряного відбору ETH за цикл",

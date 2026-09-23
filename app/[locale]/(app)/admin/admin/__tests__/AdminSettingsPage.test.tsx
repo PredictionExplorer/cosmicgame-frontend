@@ -1,3 +1,5 @@
+import { formatSeconds } from '@/utils/format';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import AdminSettingsPage from '../AdminSettingsPage';
@@ -101,13 +103,24 @@ describe('AdminSettingsPage', () => {
       expect(valueOf('Number of NFT holder recipients per cycle')).toBe('10');
     });
 
+    it('formats percentages and counts through Intl', () => {
+      render(<AdminSettingsPage />);
+      expect(valueOf('Signature Allocation percentage')).toBe('25%');
+      expect(valueOf('Public Goods percentage')).toBe('7%');
+    });
+
     it('shows divisors as the percentage they apply and durations as durations', () => {
       render(<AdminSettingsPage />);
       expect(valueOf('Time increase')).toBe('1% (divisor 100)');
       expect(valueOf('Price increase')).toBe('1% (divisor 100)');
-      expect(valueOf('Time added per gesture')).toBe('1h 1m 12s');
-      expect(valueOf('Timeout to retrieve Signature Allocation')).toBe('2d');
-      expect(valueOf('Initial seconds until Signature Allocation')).toBe('1d 0h 28m 55s');
+      // The page converts units (microseconds, the misnamed divisor) and hands the seconds
+      // to the shared duration formatter, which owns spacing and unit labels.
+      expect(valueOf('Time added per gesture')).toBe(formatSeconds(3672.36, 'en'));
+      expect(valueOf('Time added per gesture')).toMatch(/^1h\s1m\s12s$/);
+      expect(valueOf('Timeout to retrieve Signature Allocation')).toBe(formatSeconds(172800, 'en'));
+      expect(valueOf('Initial seconds until Signature Allocation')).toBe(
+        formatSeconds(88135, 'en'),
+      );
     });
   });
 

@@ -25,7 +25,7 @@
       "set": "Đặt"
     },
     "values": {
-      "divisorPercent": "{percent}% (số chia {divisor})"
+      "divisorPercent": "{percent} (số chia {divisor})"
     },
     "fields": {
       "ethStellarRecipients": "Số người nhận ETH Tinh tuyển mỗi chu kỳ",

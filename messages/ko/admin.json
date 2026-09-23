@@ -25,7 +25,7 @@
       "set": "설정"
     },
     "values": {
-      "divisorPercent": "{percent}% (제수 {divisor})"
+      "divisorPercent": "{percent} (제수 {divisor})"
     },
     "fields": {
       "ethStellarRecipients": "사이클별 ETH 별빛 선정 수령자 수",

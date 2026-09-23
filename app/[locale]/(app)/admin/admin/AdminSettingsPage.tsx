@@ -25,8 +25,10 @@ import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api/types';
-import { formatUtcDateTimeStamp } from '@/utils/format';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatGroupedNumber, formatUtcDateTimeStamp } from '@/utils/format';
 import {
+  formatPercentPoints,
   initialDurationSeconds,
   percentFromDivisor,
   secondsFromMicroseconds,
@@ -82,16 +84,26 @@ const AdminSettingsPage = () => {
   ) as ContractEntryCopy;
 
   const parameterFields = (dashboard: DashboardInfo): ParameterField[] => {
-    const count = (value: unknown) => (typeof value === 'number' ? String(value) : null);
-    const percent = (value: unknown) => (typeof value === 'number' ? `${value}%` : null);
+    const count = (value: unknown) => {
+      const numeric = toFiniteNumber(value);
+      return numeric === null ? null : formatGroupedNumber(numeric, locale);
+    };
+    const percent = (value: unknown) => {
+      const numeric = toFiniteNumber(value);
+      return numeric === null ? null : formatPercentPoints(numeric, locale);
+    };
     const divisor = (value: unknown) => {
       const share = percentFromDivisor(value);
-      return share === null
+      const raw = toFiniteNumber(value);
+      return share === null || raw === null
         ? null
-        : t('settings.values.divisorPercent', { percent: share, divisor: String(value) });
+        : t('settings.values.divisorPercent', {
+            percent: formatPercentPoints(share, locale),
+            divisor: formatGroupedNumber(raw, locale),
+          });
     };
     const duration = (seconds: number | null) =>
-      seconds === null ? null : formatSeconds(seconds, locale).trim();
+      seconds === null ? null : formatSeconds(seconds, locale);
     const activation = dashboard.CurRoundStats?.ActivationTime;
     const timeIncrementMicroseconds = dashboard.MainPrizeTimeIncrementInMicroSeconds;
 
