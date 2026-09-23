@@ -89,36 +89,38 @@ export function WalletAccountPanel({ className }: { className?: string }) {
         <NetworkLine account={account} />
         {account.isWrongChain && <SwitchNetworkButton size="sm" className="w-full" />}
       </div>
-      <div className="flex flex-col gap-1 border-t border-border pt-3">
-        {account.explorerUrl && (
-          <a
-            href={account.explorerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex min-h-11 items-center gap-2.5 rounded-md px-2 text-sm text-foreground transition-colors hover:bg-muted sm:min-h-9"
+      <div className="border-t border-border pt-3">
+        <div className="-mx-2 flex flex-col gap-1">
+          {account.explorerUrl && (
+            <a
+              href={account.explorerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-11 items-center gap-2.5 rounded-md px-2 text-sm text-foreground transition-colors hover:bg-muted sm:min-h-9"
+            >
+              <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden />
+              {t('account.viewOnExplorer', { explorer: account.explorerName })}
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={() => void account.switchWallet()}
+            disabled={account.isDisconnecting}
+            className="flex min-h-11 items-center gap-2.5 rounded-md px-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-60 sm:min-h-9"
           >
-            <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden />
-            {t('account.viewOnExplorer', { explorer: account.explorerName })}
-          </a>
-        )}
-        <button
-          type="button"
-          onClick={() => void account.switchWallet()}
-          disabled={account.isDisconnecting}
-          className="flex min-h-11 items-center gap-2.5 rounded-md px-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-60 sm:min-h-9"
-        >
-          <Repeat className="h-4 w-4 text-muted-foreground" aria-hidden />
-          {t('account.switchWallet')}
-        </button>
-        <button
-          type="button"
-          onClick={() => void account.disconnect()}
-          disabled={account.isDisconnecting}
-          className="flex min-h-11 items-center gap-2.5 rounded-md px-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-60 sm:min-h-9"
-        >
-          <LogOut className="h-4 w-4 text-muted-foreground" aria-hidden />
-          {t('account.disconnect')}
-        </button>
+            <Repeat className="h-4 w-4 text-muted-foreground" aria-hidden />
+            {t('account.switchWallet')}
+          </button>
+          <button
+            type="button"
+            onClick={() => void account.disconnect()}
+            disabled={account.isDisconnecting}
+            className="flex min-h-11 items-center gap-2.5 rounded-md px-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:opacity-60 sm:min-h-9"
+          >
+            <LogOut className="h-4 w-4 text-muted-foreground" aria-hidden />
+            {t('account.disconnect')}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -136,12 +138,12 @@ export function WalletAccountMenuItems() {
 
   return (
     <>
-      <div className="px-3 py-2">
+      <div className="px-2 py-1.5">
         <NetworkLine account={account} />
       </div>
       {account.isWrongChain && (
         <DropdownMenuItem
-          className="cursor-pointer gap-2.5 px-3 font-semibold"
+          className="cursor-pointer gap-2.5 px-2 font-semibold"
           onSelect={() => void account.switchToRequiredChain()}
         >
           <Repeat className={cn('h-3.5 w-3.5', ATTENTION_TEXT)} aria-hidden />
@@ -149,7 +151,7 @@ export function WalletAccountMenuItems() {
         </DropdownMenuItem>
       )}
       {account.explorerUrl && (
-        <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-3">
+        <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2">
           <a href={account.explorerUrl} target="_blank" rel="noopener noreferrer">
             <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
             {t('account.viewOnExplorer', { explorer: account.explorerName })}
@@ -157,14 +159,14 @@ export function WalletAccountMenuItems() {
         </DropdownMenuItem>
       )}
       <DropdownMenuItem
-        className="cursor-pointer gap-2.5 px-3"
+        className="cursor-pointer gap-2.5 px-2"
         onSelect={() => void account.switchWallet()}
       >
         <Repeat className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
         {t('account.switchWallet')}
       </DropdownMenuItem>
       <DropdownMenuItem
-        className="cursor-pointer gap-2.5 px-3"
+        className="cursor-pointer gap-2.5 px-2"
         onSelect={() => void account.disconnect()}
       >
         <LogOut className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
