@@ -18,11 +18,9 @@ describe('CTBalanceDistributionTable', () => {
       },
     ];
     render(<CTBalanceDistributionTable list={mockData} />);
-    // AddressLink shows full address on desktop or shortened (0x555ece....310e60) on mobile
-    const addressEl =
-      screen.queryByText(mockData[0]!.OwnerAddr) || screen.queryByText(/0x555ece.*310e60/);
-    expect(addressEl).toBeInTheDocument();
-    // Balance renders with up to 6 decimals, trailing zeros trimmed
+    // AddressLink shows the one short form (0x + 4 … 4) at every width.
+    expect(screen.getByText('0x555e…0e60')).toBeInTheDocument();
+    // CST balances use the CST table precision: 2 fixed decimals.
     expect(screen.getByText('3.10')).toBeInTheDocument();
   });
 

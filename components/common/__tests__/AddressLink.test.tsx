@@ -15,54 +15,37 @@ describe('AddressLink', () => {
   const address = '0x1234567890abcdef1234567890abcdef12345678';
   const url = '/user/0x1234567890abcdef1234567890abcdef12345678';
 
-  it('renders full address on desktop', () => {
+  it('renders one link with the standard short form at every width', () => {
     render(<AddressLink address={address} url={url} />);
-    const desktopLink = screen.getByText(address);
-    expect(desktopLink).toBeInTheDocument();
-    expect(desktopLink).toHaveAttribute('href', url);
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveTextContent('0x1234…5678');
+    expect(links[0]).toHaveAttribute('href', url);
   });
 
-  it('renders shortened address on mobile', () => {
+  it('never wraps mid-hex and keeps the monospaced address face', () => {
     render(<AddressLink address={address} url={url} />);
-    const mobileLink = screen.getByText('0x1234…5678');
-    expect(mobileLink).toBeInTheDocument();
-    expect(mobileLink).toHaveAttribute('href', url);
+    expect(screen.getByRole('link')).toHaveClass('whitespace-nowrap', 'font-mono');
   });
 
-  it('renders "Outreach Reserve Wallet" for marketing address', () => {
+  it('names protocol contracts instead of printing hex', () => {
     render(<AddressLink address={TEST_MARKETING_WALLET} url="/user/marketing" />);
-    const links = screen.getAllByText('Outreach Reserve Wallet');
-    expect(links.length).toBeGreaterThanOrEqual(1);
+    const link = screen.getByRole('link');
+    expect(link).toHaveTextContent('formats.address.known.outreach');
+    expect(link).not.toHaveClass('font-mono');
   });
 
-  it('sets target="_blank" on all links', () => {
-    render(<AddressLink address={address} url={url} />);
-    const links = screen.getAllByRole('link');
-    for (const link of links) {
-      expect(link).toHaveAttribute('target', '_blank');
-    }
+  it('names the zero address instead of linking forty zeros', () => {
+    render(<AddressLink address="0x0000000000000000000000000000000000000000" url="/user/0x0" />);
+    expect(screen.getByText('formats.address.zero')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).toBeNull();
   });
 
-  it('sets rel="noopener noreferrer" on all target="_blank" links', () => {
+  it('opens its target in a new tab with rel="noopener noreferrer"', () => {
     render(<AddressLink address={address} url={url} />);
-    const links = screen.getAllByRole('link');
-    expect(links.length).toBe(2);
-    for (const link of links) {
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-    }
-  });
-
-  it('applies font-mono class to links', () => {
-    render(<AddressLink address={address} url={url} />);
-    const links = screen.getAllByRole('link');
-    for (const link of links) {
-      expect(link).toHaveClass('font-mono');
-    }
-  });
-
-  it('shows tooltip content with full address', () => {
-    render(<AddressLink address={address} url={url} />);
-    expect(screen.getByText(address)).toBeInTheDocument();
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('has no accessibility violations', async () => {
