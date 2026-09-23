@@ -355,7 +355,7 @@ body:has([data-maintenance-banner]) .home-control-shell {
  * (`z-[10003]`, an inline `zIndex: 10000`) are the ones that caused trouble.
  */
 @theme inline {
-  --z-backdrop: -10; /* ambient gradients, particles */
+  --z-backdrop: -10; /* the ambient backdrop */
   --z-base: 1; /* page shell and ordinary card content */
   --z-raised: 10; /* pinned rails and toolbars */
   --z-sticky-nav: 30; /* sticky sub-navigation bars */
@@ -657,6 +657,37 @@ body:has([data-maintenance-banner]) .home-control-shell {
 }
 
 /*
+ * The hero starfield (AmbientBackdrop variant="hero"): the --starfield
+ * points in the palette's foreground colour, masked to the gutters outside
+ * the 80rem content column (fading out 2rem before its edge), so no point
+ * ever sits behind a card or a line of text. Screens without a gutter wider
+ * than the content edge show no stars at all.
+ */
+@utility starfield {
+  --starfield-gutters: linear-gradient(
+    90deg,
+    #000 0,
+    #000 calc(50% - 42rem),
+    transparent calc(50% - 40rem),
+    transparent calc(50% + 40rem),
+    #000 calc(50% + 42rem)
+  );
+  background-color: hsl(var(--foreground));
+  -webkit-mask-image: var(--starfield), var(--starfield-gutters);
+  mask-image: var(--starfield), var(--starfield-gutters);
+  -webkit-mask-size:
+    720px 720px,
+    100% 100%;
+  mask-size:
+    720px 720px,
+    100% 100%;
+  -webkit-mask-repeat: repeat, no-repeat;
+  mask-repeat: repeat, no-repeat;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/*
  * Mobile card layout for `.cs-table` (see components/ui/responsive-table.tsx).
  *
  * Each cell becomes a label/value grid row. The label comes from the cell's own
@@ -883,11 +914,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
     background-color: hsl(var(--background)) !important;
   }
 
-  /* Canvas particles do not reproduce; rely on solid page background */
-  #tsparticles {
-    display: none !important;
-  }
-
   [data-sonner-toaster] {
     display: none !important;
   }
@@ -1110,9 +1136,6 @@ body:has([data-maintenance-banner]) .home-control-shell {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-  #tsparticles {
-    display: none !important;
   }
   .animate-pulse-glow,
   .animate-gradient-shift,
