@@ -181,7 +181,7 @@
 
   /*
    * Text tiers: foreground (body, headings, figures), muted-foreground
-   * (secondary copy; 7.8:1 or more) and subtle-foreground (labels, captions,
+   * (secondary copy; 7.7:1 or more) and subtle-foreground (labels, captions,
    * counts, hints; 5.1:1 or more even on muted). Pick a tier instead of
    * dimming text with an opacity modifier. `--muted-foreground-subtle` is the
    * audit's name for the same tier.
