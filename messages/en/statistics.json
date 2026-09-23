@@ -296,11 +296,12 @@
       "randomWalkTooltip": "Total number of Random Walk NFTs currently anchored and eligible for Anchored-NFT Stellar Selection.",
       "poolLabel": "Anchor Distribution Pool",
       "poolTooltip": "ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.",
+      "poolCaption": "Accumulates during this cycle and is deposited when it finalizes. Earlier deposits not yet retrieved appear as Unretrieved Anchor Distributions.",
       "perNftLabel": "Distribution per Cosmic Signature NFT",
       "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
-      "perNftTooltipUnavailable": "The Anchor Distribution per NFT is unavailable while the anchored NFT count is being updated. The on-chain pool already contains ETH.",
+      "perNftNoneAnchored": "No anchored Cosmic Signature NFTs indexed yet",
       "activeHoldersLabel": "Active Anchor-holders",
-      "activeHoldersTooltip": "Combined active wallets currently anchoring at least one Cosmic Signature NFT or Random Walk NFT."
+      "activeHoldersTooltip": "Distinct wallets that currently anchor at least one Cosmic Signature NFT or Random Walk NFT. A wallet anchoring both kinds counts once."
     },
     "description": "Anchored NFTs are a core part of Cosmic Signature: Cosmic Signature NFTs share ETH Anchor Distributions, while Random Walk NFTs participate in Anchored-NFT Stellar Selection.",
     "historyLink": "View anchor history",
@@ -314,7 +315,8 @@
       "randomWalk": "RWLK Anchoring Overview"
     },
     "stats": {
-      "activeHolders": "Number of Active Anchor-holders",
+      "activeHoldersCosmicSignature": "Active Cosmic Signature NFT Anchor-holders",
+      "activeHoldersRandomWalk": "Active Random Walk NFT Anchor-holders",
       "distributionDeposits": "Number of Anchor-Distribution Deposits",
       "totalDistributions": "Total Anchor Distributions",
       "tokensImprinted": "Total Tokens Imprinted",

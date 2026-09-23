@@ -35,7 +35,8 @@
     "stats": {
       "pool": {
         "label": "Anchor Distribution Pool",
-        "tooltip": "Total ETH currently allocated to the Anchor Distribution pool, distributed proportionally to Cosmic Signature NFT anchor-holders each cycle."
+        "tooltip": "Total ETH currently allocated to the Anchor Distribution pool, distributed proportionally to Cosmic Signature NFT anchor-holders each cycle.",
+        "caption": "Accumulates during this cycle and is deposited to anchored Cosmic Signature NFTs when the cycle finalizes."
       },
       "cosmicSignatureAnchored": {
         "label": "Cosmic Signature NFTs Anchored",
@@ -48,11 +49,11 @@
       "distributionPerNft": {
         "label": "Distribution per NFT",
         "tooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
-        "tooltipUnavailable": "The Anchor Distribution per NFT is unavailable while the anchored NFT count is being updated. The on-chain pool already contains ETH."
+        "noneAnchored": "No anchored Cosmic Signature NFTs indexed yet"
       },
-      "uniqueHolders": {
-        "label": "Unique Anchor-holders",
-        "tooltip": "Number of distinct wallet addresses that have anchored Cosmic Signature NFTs."
+      "activeHolders": {
+        "label": "Active Anchor-holders",
+        "tooltip": "Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT. A wallet anchoring both kinds counts once."
       }
     },
     "cta": {

@@ -65,7 +65,7 @@
       "distributionPerNft": {
         "label": "Cosmic Signature NFTあたりの配分",
         "tooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分。係留プール全体（オンチェーン）を、インデックス済みの係留Cosmic Signature NFT数で割って計算します。",
-        "indexUnavailableSuffix": "現在、プール残高と係留中のNFT数が同期していないため、NFTあたりの値を計算できません。"
+        "noneAnchored": "係留中のCosmic Signature NFTはまだインデックスされていません"
       }
     }
   },

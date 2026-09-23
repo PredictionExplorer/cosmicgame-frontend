@@ -35,7 +35,8 @@
     "stats": {
       "pool": {
         "label": "Quỹ phân phối neo giữ",
-        "tooltip": "Tổng ETH hiện được phân bổ vào quỹ phân phối neo giữ, phân phối theo tỷ lệ cho những người neo giữ Cosmic Signature NFT mỗi chu kỳ."
+        "tooltip": "Tổng ETH hiện được phân bổ vào quỹ phân phối neo giữ, phân phối theo tỷ lệ cho những người neo giữ Cosmic Signature NFT mỗi chu kỳ.",
+        "caption": "Tích lũy trong chu kỳ này và được nạp cho các Cosmic Signature NFT đang neo giữ khi chu kỳ hoàn tất."
       },
       "cosmicSignatureAnchored": {
         "label": "Cosmic Signature NFT đang neo giữ",
@@ -48,11 +49,11 @@
       "distributionPerNft": {
         "label": "Phân phối mỗi NFT",
         "tooltip": "ETH phân phối neo giữ cho mỗi Cosmic Signature NFT: số dư quỹ trên chuỗi chia cho tổng số NFT đang neo giữ đã được ghi nhận.",
-        "tooltipUnavailable": "Quỹ trên chuỗi có ETH nhưng dữ liệu chưa ghi nhận Cosmic Signature NFT nào đang neo giữ. Chưa thể tính mức phân phối cho mỗi NFT cho đến khi số liệu được cập nhật."
+        "noneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ"
       },
-      "uniqueHolders": {
-        "label": "Người neo giữ riêng biệt",
-        "tooltip": "Số địa chỉ ví riêng biệt đã neo giữ Cosmic Signature NFT."
+      "activeHolders": {
+        "label": "Người neo giữ đang hoạt động",
+        "tooltip": "Số ví khác nhau hiện neo giữ ít nhất một Cosmic Signature NFT hoặc RandomWalk NFT. Ví neo giữ cả hai loại chỉ được tính một lần."
       }
     },
     "cta": {

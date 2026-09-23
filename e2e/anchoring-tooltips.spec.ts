@@ -20,8 +20,9 @@ const ANCHORING_TOOLTIPS = [
     expected: /Current ETH Anchor Distribution per anchored Cosmic Signature NFT/,
   },
   {
-    label: 'Unique Anchor-holders',
-    expected: /distinct wallet addresses that have anchored/,
+    label: 'Active Anchor-holders',
+    expected:
+      /Distinct wallets that currently anchor at least one Cosmic Signature or RandomWalk NFT/,
   },
 ];
 

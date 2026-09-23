@@ -296,11 +296,12 @@
       "randomWalkTooltip": "Tổng số RandomWalk NFT hiện đang neo giữ và thuộc diện Tinh tuyển NFT neo giữ.",
       "poolLabel": "Quỹ phân phối neo giữ",
       "poolTooltip": "ETH hiện được phân bổ vào quỹ phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
+      "poolCaption": "Tích lũy trong chu kỳ này và được nạp khi chu kỳ hoàn tất. Các đợt nạp trước chưa được nhận về hiển thị ở mục “Phân phối neo giữ chưa nhận về”.",
       "perNftLabel": "Phân phối mỗi Cosmic Signature NFT",
       "perNftTooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục.",
-      "perNftTooltipUnavailable": "Quỹ trên chuỗi có ETH nhưng dữ liệu chưa ghi nhận Cosmic Signature NFT nào đang neo giữ. Chưa thể tính mức phân phối cho mỗi NFT cho đến khi số liệu được cập nhật.",
+      "perNftNoneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ",
       "activeHoldersLabel": "Người neo giữ đang hoạt động",
-      "activeHoldersTooltip": "Tổng số ví đang hoạt động hiện neo giữ ít nhất một Cosmic Signature NFT hoặc RandomWalk NFT."
+      "activeHoldersTooltip": "Số ví khác nhau hiện neo giữ ít nhất một Cosmic Signature NFT hoặc RandomWalk NFT. Ví neo giữ cả hai loại chỉ được tính một lần."
     },
     "description": "NFT đang neo giữ là phần cốt lõi của Cosmic Signature: Cosmic Signature NFT chia sẻ phân phối neo giữ ETH, còn RandomWalk NFT tham gia Tinh tuyển NFT neo giữ.",
     "historyLink": "Xem lịch sử neo giữ",
@@ -314,7 +315,8 @@
       "randomWalk": "Tổng quan neo giữ RWLK"
     },
     "stats": {
-      "activeHolders": "Số người neo giữ đang hoạt động",
+      "activeHoldersCosmicSignature": "Số người neo giữ Cosmic Signature NFT đang hoạt động",
+      "activeHoldersRandomWalk": "Số người neo giữ RandomWalk NFT đang hoạt động",
       "distributionDeposits": "Số đợt nạp phân phối neo giữ",
       "totalDistributions": "Tổng phân phối neo giữ",
       "tokensImprinted": "Tổng token đã khắc",

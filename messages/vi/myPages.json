@@ -65,7 +65,7 @@
       "distributionPerNft": {
         "label": "Phân phối mỗi Cosmic Signature NFT",
         "tooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ, tính bằng tổng quỹ neo giữ (trên chuỗi) chia cho số Cosmic Signature NFT neo giữ đã lập chỉ mục.",
-        "indexUnavailableSuffix": "Quỹ trên chuỗi có ETH nhưng dữ liệu chưa ghi nhận Cosmic Signature NFT nào đang neo giữ. Chưa thể tính mức phân phối cho mỗi NFT cho đến khi số liệu được cập nhật."
+        "noneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ"
       }
     }
   },

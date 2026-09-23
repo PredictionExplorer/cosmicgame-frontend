@@ -35,7 +35,8 @@
     "stats": {
       "pool": {
         "label": "錨定派發池",
-        "tooltip": "目前分配至錨定派發池的 ETH 總額；每個週期按比例派發給 Cosmic Signature NFT 錨定者。"
+        "tooltip": "目前分配至錨定派發池的 ETH 總額；每個週期按比例派發給 Cosmic Signature NFT 錨定者。",
+        "caption": "在本週期內累積，於週期收官時存入已錨定的 Cosmic Signature NFT。"
       },
       "cosmicSignatureAnchored": {
         "label": "已錨定 Cosmic Signature NFT",
@@ -48,11 +49,11 @@
       "distributionPerNft": {
         "label": "每枚 NFT 派發額",
         "tooltip": "目前每枚已錨定 Cosmic Signature NFT 對應的 ETH 錨定派發額：鏈上派發池總額除以已索引的錨定 NFT 總數。",
-        "tooltipUnavailable": "鏈上錨定池已有餘額，但錨定數量數據尚未同步，因此暫無法計算每枚 NFT 的派發額。請稍後再試。"
+        "noneAnchored": "尚未索引到已錨定的 Cosmic Signature NFT"
       },
-      "uniqueHolders": {
-        "label": "獨立錨定者",
-        "tooltip": "曾錨定 Cosmic Signature NFT 的獨立錢包地址數量。"
+      "activeHolders": {
+        "label": "活躍錨定者",
+        "tooltip": "目前至少錨定一枚 Cosmic Signature NFT 或 Random Walk NFT 的不同錢包數；同時錨定兩類 NFT 的錢包只計一次。"
       }
     },
     "cta": {

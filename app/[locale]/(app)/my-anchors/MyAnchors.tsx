@@ -26,10 +26,12 @@ import { StatCardSkeleton } from '@/components/ui/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { distributionPerAnchoredNft, formatPerNftEth } from '@/utils/anchoringStats';
 
 const MyAnchors = () => {
   const t = useTranslations('myPages');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const { account } = useActiveWeb3React();
   const { anchor, release, handleError, rwalkContract } = useAnchorActions();
@@ -48,7 +50,7 @@ const MyAnchors = () => {
 
   const distributionPerCST = useMemo(
     () =>
-      formatDistributionPerAnchoredNftEth(
+      distributionPerAnchoredNft(
         dashboardData?.StakingAmountEth,
         dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
       ),
@@ -95,19 +97,29 @@ const MyAnchors = () => {
       },
       {
         label: t('anchors.stats.distributionPerNft.label'),
-        value: distributionPerCST.value,
-        tooltip: [
-          t('anchors.stats.distributionPerNft.tooltip'),
-          distributionPerCST.indexedCountUnavailable
-            ? t('anchors.stats.distributionPerNft.indexUnavailableSuffix')
-            : '',
-        ]
-          .filter(Boolean)
-          .join(' '),
+        value:
+          distributionPerCST.status === 'available' ? (
+            formatPerNftEth(distributionPerCST.perNftEth)
+          ) : (
+            <UnknownValue label={tCommon('status.unavailable')} />
+          ),
+        tooltip: t('anchors.stats.distributionPerNft.tooltip'),
+        caption:
+          distributionPerCST.status === 'noneAnchored'
+            ? t('anchors.stats.distributionPerNft.noneAnchored')
+            : undefined,
         icon: <TrendingUp className="h-4 w-4" />,
       },
     ],
-    [anchoredCSTokens, anchoredRWLKTokens, unclaimedRewardEth, distributionPerCST, locale, t],
+    [
+      anchoredCSTokens,
+      anchoredRWLKTokens,
+      unclaimedRewardEth,
+      distributionPerCST,
+      locale,
+      t,
+      tCommon,
+    ],
   );
 
   useEffect(() => {

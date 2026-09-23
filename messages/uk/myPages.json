@@ -65,7 +65,7 @@
       "distributionPerNft": {
         "label": "Надходження на один Cosmic Signature NFT",
         "tooltip": "Поточне надходження за закріплення в ETH на один закріплений Cosmic Signature NFT: загальний пул закріплення (ончейн), поділений на проіндексовану кількість закріплених Cosmic Signature NFT.",
-        "indexUnavailableSuffix": "В ончейн-пулі є ETH, але дані ще не відображають жодного закріпленого Cosmic Signature NFT. Значення на один NFT можна буде обчислити після оновлення даних."
+        "noneAnchored": "Закріплених Cosmic Signature NFT ще не проіндексовано"
       }
     }
   },

@@ -35,7 +35,8 @@
     "stats": {
       "pool": {
         "label": "앵커링 지급 풀",
-        "tooltip": "현재 앵커링 지급 풀에 쌓여 있는 ETH 총액입니다. 사이클마다 Cosmic Signature NFT 앵커링 보유자에게 비례 지급됩니다."
+        "tooltip": "현재 앵커링 지급 풀에 쌓여 있는 ETH 총액입니다. 사이클마다 Cosmic Signature NFT 앵커링 보유자에게 비례 지급됩니다.",
+        "caption": "이번 사이클 동안 쌓이며, 사이클이 마감되면 앵커링된 Cosmic Signature NFT에 적립됩니다."
       },
       "cosmicSignatureAnchored": {
         "label": "앵커링된 Cosmic Signature NFT",
@@ -48,11 +49,11 @@
       "distributionPerNft": {
         "label": "NFT당 지급액",
         "tooltip": "앵커링된 Cosmic Signature NFT 한 개당 현재 ETH 앵커링 지급액입니다. 온체인 풀을 인덱싱된 앵커링 NFT 총 개수로 나눈 값입니다.",
-        "tooltipUnavailable": "NFT 한 개당 ETH 앵커링 지급액은 풀 잔액을 앵커링된 전체 NFT 수로 나누어 계산합니다. 현재 잔액과 NFT 수 데이터가 동기화되지 않아 계산할 수 없습니다."
+        "noneAnchored": "인덱싱된 앵커링 Cosmic Signature NFT가 아직 없습니다"
       },
-      "uniqueHolders": {
-        "label": "고유 앵커링 보유자",
-        "tooltip": "Cosmic Signature NFT를 앵커링한 서로 다른 지갑 주소의 개수를 나타냅니다."
+      "activeHolders": {
+        "label": "활성 앵커링 보유자",
+        "tooltip": "현재 Cosmic Signature NFT 또는 RandomWalk NFT를 한 개 이상 앵커링 중인 서로 다른 지갑 수입니다. 두 종류를 모두 앵커링한 지갑은 한 번만 셉니다."
       }
     },
     "cta": {

@@ -35,7 +35,8 @@
     "stats": {
       "pool": {
         "label": "係留配分プール",
-        "tooltip": "現在係留配分プールに配分されているETHの総額。サイクルごとにCosmic Signature NFTの係留者へ比例配分されます。"
+        "tooltip": "現在係留配分プールに配分されているETHの総額。サイクルごとにCosmic Signature NFTの係留者へ比例配分されます。",
+        "caption": "このサイクルの間に積み上がり、サイクルが確定すると係留中のCosmic Signature NFTへ積み立てられます。"
       },
       "cosmicSignatureAnchored": {
         "label": "係留中のCosmic Signature NFT",
@@ -48,11 +49,11 @@
       "distributionPerNft": {
         "label": "NFTあたりの配分",
         "tooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。",
-        "tooltipUnavailable": "NFT 1点あたりのETH係留配分は、プール残高を係留中のNFT総数で割って求めます。現在、残高とNFT数のデータが同期していないため計算できません。"
+        "noneAnchored": "係留中のCosmic Signature NFTはまだインデックスされていません"
       },
-      "uniqueHolders": {
-        "label": "ユニーク係留者",
-        "tooltip": "Cosmic Signature NFTを係留したことのある異なるウォレットアドレスの数。"
+      "activeHolders": {
+        "label": "活動中の係留者",
+        "tooltip": "Cosmic Signature NFTまたはRandomWalk NFTを少なくとも1点現在係留している異なるウォレットの数です。両方を係留しているウォレットは1つとして数えます。"
       }
     },
     "cta": {

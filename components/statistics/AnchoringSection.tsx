@@ -114,7 +114,7 @@ export function AnchoringSection({
           tooltip={t('anchoringTooltips.cstGroup')}
         >
           <StatisticsItem
-            title={t('anchoringPage.stats.activeHolders')}
+            title={t('anchoringPage.stats.activeHoldersCosmicSignature')}
             value={cstStats.NumActiveStakers}
             tooltip={t('anchoringTooltips.cstActiveAnchorHolders')}
           />
@@ -175,7 +175,7 @@ export function AnchoringSection({
           tooltip={t('anchoringTooltips.rwlkGroup')}
         >
           <StatisticsItem
-            title={t('anchoringPage.stats.activeHolders')}
+            title={t('anchoringPage.stats.activeHoldersRandomWalk')}
             value={rwlkStats.NumActiveStakers}
             tooltip={t('anchoringTooltips.rwlkActiveAnchorHolders')}
           />
