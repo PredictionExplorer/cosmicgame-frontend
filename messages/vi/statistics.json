@@ -581,7 +581,7 @@
       "summaryMax": "Cao nhất: {amount} ({when} trong chu kỳ)",
       "summaryTotal": "Tổng đã tiêu thụ: {amount}",
       "summaryCount": "{count} nét bút CST",
-      "description": "Mỗi chấm tím là lượng CST thực trả cho một nét bút (thang log — chấm rỗng là không tốn chi phí). Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Đường hồng đứt nét là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang. Nhấn vào một chấm để mở giao dịch của nó.",
+      "description": "Mỗi chấm là lượng CST thực trả cho một nét bút (thang log — chấm rỗng là không tốn chi phí). Sau mỗi nét bút CST, chi phí đặt lại ở gần gấp đôi lượng đã trả rồi giảm về không qua cửa sổ hiệu chỉnh. Đường hồng đứt nét là thời gian còn lại của đồng hồ phân bổ ngay trước mỗi nét bút: khi đồng hồ cạn, đặt nét bút liên tục khiến chi phí không có thời gian giảm, nên giá phải trả leo thang. Nhấn vào một chấm để mở giao dịch của nó.",
       "empty": "Không có nét bút CST trong chu kỳ này.",
       "selectCycle": "Chọn một chu kỳ để xem.",
       "loadErrorTitle": "Không tải được chi phí nét bút CST",

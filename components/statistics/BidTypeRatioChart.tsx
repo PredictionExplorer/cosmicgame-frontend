@@ -23,13 +23,14 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 import { formatFixed } from '@/utils/format';
+import { GESTURE_METHOD_COLOR } from '@/lib/theme/dataColors';
 
 const CHART_HEIGHT = 340;
 
 // bid_type mapping: 0=ETH, 1=RandomWalk (ETH-paid), 2=CST
-const ETH_COLOR = 'hsl(var(--chart-3))';
-const RWALK_COLOR = 'hsl(var(--chart-2))';
-const CST_COLOR = 'hsl(var(--chart-1))';
+const ETH_COLOR = GESTURE_METHOD_COLOR.eth;
+const RWALK_COLOR = GESTURE_METHOD_COLOR.ethRandomWalk;
+const CST_COLOR = GESTURE_METHOD_COLOR.cst;
 
 const DAY_SECS = 86400;
 

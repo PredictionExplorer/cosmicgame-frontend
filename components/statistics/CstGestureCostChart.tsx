@@ -32,8 +32,9 @@ import { useGestureListByCycle } from '@/hooks/useApiQuery';
 import { CyclePickerSection } from '@/components/statistics/CyclePickerSection';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
+import { GESTURE_METHOD_COLOR } from '@/lib/theme/dataColors';
 
-const PRICE_COLOR = 'hsl(var(--chart-2))'; // CST actually paid
+const PRICE_COLOR = GESTURE_METHOD_COLOR.cst; // CST actually paid
 const CLOCK_COLOR = '#fb7185'; // rose — allocation clock remaining (subdued dashed line)
 
 const CHART_HEIGHT = 360;
