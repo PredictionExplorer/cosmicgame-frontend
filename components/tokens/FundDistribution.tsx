@@ -1,12 +1,22 @@
 'use client';
 
-import { type ReactNode } from 'react';
-import { Trophy, Shuffle, Heart, Layers, Swords, RotateCcw } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
+import { Heart, Layers, RotateCcw, Shuffle, Swords, Trophy } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { useLocale, useTranslations } from 'next-intl';
 
+import {
+  ALLOCATION_TRACK_COLORS,
+  ALLOCATION_TRACK_COPY_KEYS,
+  withNextCycleShare,
+  type AllocationTrackId,
+} from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { UnknownValue } from '@/components/ui/unknown-value';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatGroupedNumber } from '@/utils/format';
+import { formatPercentPoints } from '@/utils/protocolParams';
 
 type DistData = {
   PrizePercentage?: number;
@@ -17,154 +27,104 @@ type DistData = {
   CosmicGameBalanceEth?: number;
 };
 
-interface FundCategory {
-  label: string;
-  value: number;
-  eth: number;
-  icon: ReactNode;
-  tooltip: string;
-  color: string;
-  gradient: string;
+const TRACK_ICONS: Record<AllocationTrackId, ReactNode> = {
+  signature: <Trophy className="h-4 w-4" aria-hidden />,
+  chrono: <Swords className="h-4 w-4" aria-hidden />,
+  stellar: <Shuffle className="h-4 w-4" aria-hidden />,
+  anchor: <Layers className="h-4 w-4" aria-hidden />,
+  publicGoods: <Heart className="h-4 w-4" aria-hidden />,
+  nextCycle: <RotateCcw className="h-4 w-4" aria-hidden />,
+};
+
+/** A track's share of the reserve, clamped into [0, 100]; `null` when it could not be read. */
+function toShare(value: unknown): number | null {
+  const numeric = toFiniteNumber(value);
+  return numeric === null ? null : Math.min(100, Math.max(0, numeric));
 }
 
-const clamp = (n: number | undefined, min = 0, max = 100) => {
-  const num = Number(n);
-  return Number.isFinite(num) ? Math.min(max, Math.max(min, num)) : 0;
-};
-
-const fmtEth = (eth: number) => (Number.isFinite(eth) ? eth.toFixed(4) : '0.0000');
-
-const barVariants = {
-  hidden: { opacity: 0, x: -12 },
-  visible: (i: number) => ({
-    opacity: 1,
-    x: 0,
-    transition: { delay: i * 0.07, duration: 0.35, ease: 'easeOut' as const },
-  }),
-};
-
-const fillVariants = {
-  hidden: { width: 0 },
-  visible: (pct: number) => ({
-    width: `${pct}%`,
-    transition: { duration: 0.7, ease: 'easeOut' as const, delay: 0.15 },
-  }),
-};
-
+/**
+ * The live Cycle Reserve split on /current-cycle. Every bar is drawn against the whole
+ * reserve (100%) in the track order and colors of /allocation, /allocation/[id] and
+ * /contracts, so a 25% track fills a quarter of its bar here too. A share that could not be
+ * read shows as unavailable with an empty bar, never as 0%.
+ */
 export function FundDistribution({ data }: { data?: DistData }) {
   const t = useTranslations('contracts');
-  const allocation = clamp(data?.PrizePercentage);
-  const stellarSelection = clamp(data?.RafflePercentage);
-  const charity = clamp(data?.CharityPercentage);
-  const anchoring = clamp(data?.StakingPercentage);
-  const chrono = clamp(data?.ChronoWarriorPercentage);
-  const balance = Number(data?.CosmicGameBalanceEth) || 0;
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const reduceMotion = useReducedMotion();
+  const unknown = <UnknownValue label={tCommon('status.unavailable')} />;
 
-  const remainder = clamp(100 - (allocation + stellarSelection + charity + anchoring + chrono));
-
-  const categories: FundCategory[] = [
-    {
-      label: t('funds.segments.signature.label'),
-      value: allocation,
-      eth: (allocation * balance) / 100,
-      icon: <Trophy className="h-4 w-4" />,
-      tooltip: t('funds.segments.signature.tooltip'),
-      color: 'text-chart-1',
-      gradient: 'from-chart-1 to-chart-1/70',
-    },
-    {
-      label: t('funds.segments.stellar.label'),
-      value: stellarSelection,
-      eth: (stellarSelection * balance) / 100,
-      icon: <Shuffle className="h-4 w-4" />,
-      tooltip: t('funds.segments.stellar.tooltip'),
-      color: 'text-chart-2',
-      gradient: 'from-chart-2 to-chart-2/70',
-    },
-    {
-      label: t('funds.segments.publicGoods.label'),
-      value: charity,
-      eth: (charity * balance) / 100,
-      icon: <Heart className="h-4 w-4" />,
-      tooltip: t('funds.segments.publicGoods.tooltip'),
-      color: 'text-chart-3',
-      gradient: 'from-chart-3 to-chart-3/70',
-    },
-    {
-      label: t('funds.segments.anchor.label'),
-      value: anchoring,
-      eth: (anchoring * balance) / 100,
-      icon: <Layers className="h-4 w-4" />,
-      tooltip: t('funds.segments.anchor.tooltip'),
-      color: 'text-chart-4',
-      gradient: 'from-chart-4 to-chart-4/70',
-    },
-    {
-      label: t('funds.segments.chrono.label'),
-      value: chrono,
-      eth: (chrono * balance) / 100,
-      icon: <Swords className="h-4 w-4" />,
-      tooltip: t('funds.segments.chrono.tooltip'),
-      color: 'text-chart-5',
-      gradient: 'from-chart-5 to-chart-5/70',
-    },
-    {
-      label: t('funds.segments.next.label'),
-      value: remainder,
-      eth: (remainder * balance) / 100,
-      icon: <RotateCcw className="h-4 w-4" />,
-      tooltip: t('funds.segments.next.tooltip'),
-      color: 'text-muted-foreground',
-      gradient: 'from-white/30 to-white/15',
-    },
-  ].sort((a, b) => b.value - a.value);
-
-  const maxValue = Math.max(...categories.map((c) => c.value), 1);
+  const balanceEth = toFiniteNumber(data?.CosmicGameBalanceEth);
+  const shares = withNextCycleShare([
+    { id: 'signature', percent: toShare(data?.PrizePercentage) },
+    { id: 'chrono', percent: toShare(data?.ChronoWarriorPercentage) },
+    { id: 'stellar', percent: toShare(data?.RafflePercentage) },
+    { id: 'anchor', percent: toShare(data?.StakingPercentage) },
+    { id: 'publicGoods', percent: toShare(data?.CharityPercentage) },
+  ]);
 
   return (
-    <div
+    <ul
       data-testid="fund-distribution"
-      className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 space-y-3"
+      className="space-y-1 rounded-xl border border-border bg-card/40 p-3 sm:p-5"
     >
-      {categories.map((cat, i) => {
-        const barPct = (cat.value / maxValue) * 100;
+      {shares.map(({ id, percent }, index) => {
+        const copyKey = ALLOCATION_TRACK_COPY_KEYS[id];
+        const label = t(`funds.segments.${copyKey}.label`);
+        const eth = percent !== null && balanceEth !== null ? (percent * balanceEth) / 100 : null;
 
         return (
-          <motion.div
-            key={cat.label}
-            custom={i}
-            variants={barVariants}
-            initial="hidden"
-            animate="visible"
-            className="group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-white/[0.03]"
+          <motion.li
+            key={id}
+            data-track={id}
+            initial={reduceMotion ? false : { opacity: 0, x: -12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.07, duration: 0.35, ease: 'easeOut' }}
+            className="flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-foreground/[0.03] sm:px-3"
           >
-            <div className={cn('shrink-0', cat.color)}>{cat.icon}</div>
+            <span className="shrink-0 text-muted-foreground">{TRACK_ICONS[id]}</span>
 
             <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-medium text-white">{cat.label}</span>
-                  <InfoTooltip content={cat.tooltip} />
+              <div className="mb-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                <div className="flex min-w-0 items-center gap-1.5">
+                  <span
+                    aria-hidden
+                    className={cn('h-2.5 w-2.5 shrink-0 rounded-full', ALLOCATION_TRACK_COLORS[id])}
+                  />
+                  <span className="text-sm font-medium text-foreground">{label}</span>
+                  <InfoTooltip content={t(`funds.segments.${copyKey}.tooltip`)} label={label} />
                 </div>
-                <span className="text-sm tabular-nums font-medium text-white/90">
-                  {cat.value}%{' '}
-                  <span className="text-xs text-muted-foreground">({fmtEth(cat.eth)} ETH)</span>
+                <span className="text-sm font-medium tabular-nums text-foreground">
+                  {percent === null ? unknown : formatPercentPoints(percent, locale)}{' '}
+                  <span className="text-xs text-muted-foreground">
+                    (
+                    {eth === null
+                      ? unknown
+                      : `${formatGroupedNumber(eth, locale, {
+                          minimumFractionDigits: 4,
+                          maximumFractionDigits: 4,
+                        })} ETH`}
+                    )
+                  </span>
                 </span>
               </div>
 
-              <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
-                <motion.div
-                  custom={barPct}
-                  variants={fillVariants}
-                  initial="hidden"
-                  animate="visible"
-                  className={cn('h-full rounded-full bg-gradient-to-r', cat.gradient)}
-                />
+              <div className="h-2 overflow-hidden rounded-full bg-foreground/[0.06]">
+                {percent !== null && percent > 0 ? (
+                  <motion.div
+                    data-testid={`fund-track-fill-${id}`}
+                    initial={reduceMotion ? false : { width: 0 }}
+                    animate={{ width: `${percent}%` }}
+                    transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
+                    className={cn('h-full rounded-full', ALLOCATION_TRACK_COLORS[id])}
+                  />
+                ) : null}
               </div>
             </div>
-          </motion.div>
+          </motion.li>
         );
       })}
-    </div>
+    </ul>
   );
 }

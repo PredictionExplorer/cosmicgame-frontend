@@ -1,12 +1,24 @@
 import { protocolFacts } from '@/content/protocol-facts';
+import contractsMessages from '@/messages/en/contracts.json';
 
 import {
   ALLOCATION_TRACK_COLORS,
+  ALLOCATION_TRACK_COPY_KEYS,
   ALLOCATION_TRACK_IDS,
   withNextCycleShare,
 } from '../allocationTracks';
 
 describe('allocation tracks', () => {
+  it('names a label and tooltip in the catalog for every track', () => {
+    const segments: Record<string, { label?: string; tooltip?: string }> =
+      contractsMessages.funds.segments;
+    for (const id of ALLOCATION_TRACK_IDS) {
+      const copy = segments[ALLOCATION_TRACK_COPY_KEYS[id]];
+      expect(copy?.label).toBeTruthy();
+      expect(copy?.tooltip).toBeTruthy();
+    }
+  });
+
   it('gives every track its own palette-token color', () => {
     const colors = ALLOCATION_TRACK_IDS.map((id) => ALLOCATION_TRACK_COLORS[id]);
     expect(new Set(colors).size).toBe(ALLOCATION_TRACK_IDS.length);

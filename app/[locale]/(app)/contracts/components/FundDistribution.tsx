@@ -1,15 +1,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import {
   ALLOCATION_TRACK_COLORS,
+  ALLOCATION_TRACK_COPY_KEYS,
   withNextCycleShare,
-  type AllocationTrackId,
   type AllocationTrackShare,
 } from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatPercentPoints } from '@/utils/protocolParams';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,20 +25,6 @@ interface FundDistributionProps {
   stakingPercentage?: number;
   charityPercentage?: number;
   loading?: boolean;
-}
-
-/** Catalog key under `contracts.funds.segments` for each track. */
-const SEGMENT_COPY_KEY: Record<AllocationTrackId, string> = {
-  signature: 'signature',
-  chrono: 'chrono',
-  stellar: 'stellar',
-  anchor: 'anchor',
-  publicGoods: 'publicGoods',
-  nextCycle: 'next',
-};
-
-function toPercent(value: number | undefined): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
 /**
@@ -54,6 +42,7 @@ export function FundDistribution({
 }: FundDistributionProps) {
   const t = useTranslations('contracts');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
 
   if (loading) {
     return (
@@ -74,17 +63,18 @@ export function FundDistribution({
   }
 
   const shares: AllocationTrackShare[] = withNextCycleShare([
-    { id: 'signature', percent: toPercent(prizePercentage) },
-    { id: 'chrono', percent: toPercent(chronoWarriorPercentage) },
-    { id: 'stellar', percent: toPercent(stellarSelectionPercentage) },
-    { id: 'anchor', percent: toPercent(stakingPercentage) },
-    { id: 'publicGoods', percent: toPercent(charityPercentage) },
+    { id: 'signature', percent: toFiniteNumber(prizePercentage) },
+    { id: 'chrono', percent: toFiniteNumber(chronoWarriorPercentage) },
+    { id: 'stellar', percent: toFiniteNumber(stellarSelectionPercentage) },
+    { id: 'anchor', percent: toFiniteNumber(stakingPercentage) },
+    { id: 'publicGoods', percent: toFiniteNumber(charityPercentage) },
   ]);
   const segments = shares.map((share) => ({
     ...share,
-    label: t(`funds.segments.${SEGMENT_COPY_KEY[share.id]}.label`),
-    tooltip: t(`funds.segments.${SEGMENT_COPY_KEY[share.id]}.tooltip`),
+    label: t(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.label`),
+    tooltip: t(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.tooltip`),
     color: ALLOCATION_TRACK_COLORS[share.id],
+    formatted: share.percent === null ? null : formatPercentPoints(share.percent, locale),
   }));
 
   return (
@@ -120,7 +110,7 @@ export function FundDistribution({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="max-w-[220px] text-xs leading-relaxed">
-                    {segment.label}: {segment.percent}%
+                    {segment.label}: {segment.formatted}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -134,11 +124,7 @@ export function FundDistribution({
               <span className={cn('inline-block h-2.5 w-2.5 rounded-full', segment.color)} />
               <span className="text-muted-foreground">{segment.label}</span>
               <span className="font-semibold">
-                {segment.percent === null ? (
-                  <UnknownValue label={tCommon('status.unavailable')} />
-                ) : (
-                  `${segment.percent}%`
-                )}
+                {segment.formatted ?? <UnknownValue label={tCommon('status.unavailable')} />}
               </span>
               <InfoTooltip content={segment.tooltip} />
             </div>

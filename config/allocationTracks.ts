@@ -1,7 +1,7 @@
 /**
  * The Cycle Reserve's allocation tracks, in the order every chart of the split lists them.
  * One color per track, taken from the palette tokens, so a reader who learns the colors on
- * /allocation reads the same categories on /allocation/[id] and /contracts.
+ * /allocation reads the same categories on /allocation/[id], /contracts and /current-cycle.
  */
 export const ALLOCATION_TRACK_IDS = [
   'signature',
@@ -26,6 +26,16 @@ export const ALLOCATION_TRACK_COLORS: Readonly<Record<AllocationTrackId, string>
   anchor: 'bg-[rgb(var(--impact-green-rgb))]',
   publicGoods: 'bg-[rgb(var(--chrono-rose-rgb))]',
   nextCycle: 'bg-muted-foreground/40',
+};
+
+/** Each track's key under `contracts.funds.segments` (label and tooltip) in the catalogs. */
+export const ALLOCATION_TRACK_COPY_KEYS: Readonly<Record<AllocationTrackId, string>> = {
+  signature: 'signature',
+  chrono: 'chrono',
+  stellar: 'stellar',
+  anchor: 'anchor',
+  publicGoods: 'publicGoods',
+  nextCycle: 'next',
 };
 
 /** A track's share of a whole, in percent. `null` when the share could not be read. */
