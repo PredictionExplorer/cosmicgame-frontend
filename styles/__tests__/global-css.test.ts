@@ -166,12 +166,21 @@ describe('global typography guarantees', () => {
     expect(body).toContain('text-transform: none');
   });
 
-  it('sets figures with tabular, lining numerals and a slashed zero', () => {
+  it('sets figures in Inter with tabular, lining numerals and a slashed zero', () => {
     for (const tier of ['xl', 'lg', 'md', 'sm']) {
       const body = typographyCss.slice(typographyCss.indexOf(`@utility type-figure-${tier} {`));
-      expect(body.slice(0, body.indexOf('}'))).toContain(
-        'font-variant-numeric: tabular-nums lining-nums slashed-zero',
-      );
+      const rule = body.slice(0, body.indexOf('}'));
+      expect(rule).toContain('font-variant-numeric: tabular-nums lining-nums slashed-zero');
+      // Named, not inherited: a figure inside a font-display or font-mono
+      // parent would otherwise turn Clash (round zero) or JetBrains Mono.
+      expect(rule).toContain('font-family: var(--body-font-stack)');
+    }
+  });
+
+  it('keeps the Inter heading tiers in Inter inside a display or mono parent', () => {
+    for (const tier of ['heading-3', 'title']) {
+      const body = typographyCss.slice(typographyCss.indexOf(`@utility type-${tier} {`));
+      expect(body.slice(0, body.indexOf('}'))).toContain('font-family: var(--body-font-stack)');
     }
   });
 
