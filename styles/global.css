@@ -443,6 +443,23 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
+   * An unstyled link inside running text is an inline link: it must not rely
+   * on hue alone (WCAG 1.4.1), so it carries the quiet underline of the
+   * `link` utility. Styled links (buttons, nav, cards) are untouched.
+   */
+  :where(p, li, dd, figcaption, blockquote, td) a:not([class]) {
+    color: hsl(var(--primary));
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+    text-underline-offset: 0.2em;
+  }
+
+  :where(p, li, dd, figcaption, blockquote, td) a:not([class]):hover {
+    text-decoration-color: currentColor;
+  }
+
+  /*
    * CJK headings (docs/i18n/README.md §5), shared by every Chinese locale
    * (`:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike), by Korean, and by
    * Japanese. The Latin display face has no CJK, Hangul, or kana glyphs, so
