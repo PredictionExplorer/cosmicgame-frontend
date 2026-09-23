@@ -8,6 +8,7 @@
     "subtitle": "Own a Random Walk NFT and receive a 50% reduction in ETH Gesture Cost",
     "description": "Each Random Walk NFT can reduce the ETH Gesture Cost of one gesture by 50%. Choose an unused NFT when making an ETH gesture to apply the reduction. This one-time use is separate from anchoring Random Walk NFTs for Anchored-NFT Stellar Selection eligibility.",
     "currentCost": "Current imprint cost",
+    "costBreakdown": "Contract cost {base} ETH, plus a {percent}% buffer so the imprint still succeeds if the cost rises before it confirms.",
     "submit": "Imprint Now",
     "myNfts": "My Random Walk NFTs"
   },

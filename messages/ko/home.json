@@ -353,7 +353,7 @@
         "title": "충돌 방지",
         "raiseBy": "인상 폭",
         "approxCost": "≈ {amount} ETH",
-        "note": "두 제스처가 같은 블록에 들어갈 때의 충돌을 피하기 위해 제스처 비용을 {percent}% 올립니다. 비용이 영구적으로 오르는 것은 아닙니다."
+        "note": "같은 블록에서 다른 제스처가 먼저 처리되어도 제스처가 성공하도록 보내는 금액에 여유분 {percent}%를 더합니다. 컨트랙트는 현재 제스처 비용만 받고 나머지는 같은 트랜잭션에서 돌려줍니다. 다만 차액이 가스비보다 작으면 돌려주지 않습니다."
       }
     },
     "submit": {
@@ -362,7 +362,8 @@
       "randomWalk": "ETH + RandomWalk로 제스처 남기기",
       "cst": "CST로 제스처 남기기 ({cost} CST)",
       "cstFree": "CST로 제스처 남기기 (비용 없음)",
-      "generic": "{method} 제스처 남기기"
+      "generic": "{method} 제스처 남기기",
+      "sendsNote": "충돌 방지 여유분 {percent}%를 포함해 약 {amount} ETH를 보냅니다."
     },
     "processing": "처리 중…",
     "finalGestureMade": "현재 가장 최근 제스처를 남긴 지갑입니다. 카운트다운이 0이 되면 아래의 ‘사이클 마감’에서 진행할 수 있습니다.",

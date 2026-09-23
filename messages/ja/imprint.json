@@ -8,6 +8,7 @@
     "subtitle": "Random Walk NFTを保有すると、ETH一筆の費用が50%引き下げられます",
     "description": "RandomWalk NFTは、保有者にCosmic Signatureプロトコルでの戦略的な優位をもたらすユニークなデジタルコレクティブルです。RandomWalk NFTをETH一筆に添付すると、ETH一筆の費用が50%引き下げられます。サイクル終盤では大きな差になります。各RandomWalk NFTはこの割引に一度だけ使えるので、最大の効果が出る瞬間を選んでください。この一筆への添付は、係留NFT星選の対象となるためのRandomWalk NFTの係留とは別のものです。",
     "currentCost": "現在の刻印費用",
+    "costBreakdown": "コントラクト上の費用{base} ETHに、確定前に費用が上がっても刻印が成功するよう{percent}%を上乗せしています。",
     "submit": "今すぐ刻印",
     "myNfts": "自分のRandom Walk NFT"
   },

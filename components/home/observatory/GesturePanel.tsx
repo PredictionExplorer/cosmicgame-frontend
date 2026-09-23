@@ -32,6 +32,13 @@ import { Surface } from '@/components/ui/surface';
 import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { formatCstAmount, type CstGestureData } from '@/utils/cstGesture';
+import {
+  MAX_COLLISION_BUFFER_PERCENT,
+  clampCollisionBufferPercent,
+  ethGestureBaseCost,
+  ethGestureSendAmount,
+  formatEthQuote,
+} from '@/utils/gestureQuote';
 import type { EthGestureInfo } from '@/hooks/useGestureForm';
 import type { DashboardInfo } from '@/services/api/types';
 
@@ -197,8 +204,10 @@ export function GesturePanel({
   const hasCstQuote = cstGestureData.source !== 'empty';
   const quotePending = tCommon('status.loadingDots');
   const methodCost: Record<(typeof METHOD_OPTIONS)[number]['value'], string> = {
-    ETH: hasEthQuote ? `${ethPrice.toFixed(5)} ETH` : quotePending,
-    RandomWalk: hasEthQuote ? `${(ethPrice / 2).toFixed(5)} ETH` : quotePending,
+    ETH: hasEthQuote ? `${formatEthQuote(ethGestureBaseCost(ethPrice, 'ETH'))} ETH` : quotePending,
+    RandomWalk: hasEthQuote
+      ? `${formatEthQuote(ethGestureBaseCost(ethPrice, 'RandomWalk'))} ETH`
+      : quotePending,
     CST: !hasCstQuote
       ? quotePending
       : cstGestureData.isFree
@@ -803,12 +812,13 @@ export function GesturePanel({
                                     placeholder="0"
                                     value={gestureCostPlus}
                                     min={0}
-                                    max={50}
+                                    max={MAX_COLLISION_BUFFER_PERCENT}
+                                    step={1}
+                                    data-testid="collision-buffer-input"
                                     className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
                                     disabled={preview}
                                     onChange={(e) => {
-                                      const value = Number(e.target.value);
-                                      if (value <= 50) setBidPricePlus(value);
+                                      setBidPricePlus(clampCollisionBufferPercent(e.target.value));
                                     }}
                                   />
                                   <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
@@ -816,16 +826,21 @@ export function GesturePanel({
                                   </span>
                                 </div>
                               </div>
-                              <span className="min-w-0 font-mono text-sm tabular-nums text-muted-foreground">
-                                {t('form.advanced.collision.approxCost', {
-                                  amount: hasEthQuote
-                                    ? (
-                                        ethPrice *
-                                        (1 + gestureCostPlus / 100) *
-                                        (gestureType === 'RandomWalk' ? 0.5 : 1)
-                                      ).toFixed(6)
-                                    : '--',
-                                })}
+                              <span
+                                className="min-w-0 font-mono text-sm tabular-nums text-muted-foreground"
+                                data-testid="collision-send-amount"
+                              >
+                                {hasEthQuote
+                                  ? t('form.advanced.collision.approxCost', {
+                                      amount: formatEthQuote(
+                                        ethGestureSendAmount(
+                                          ethPrice,
+                                          gestureType,
+                                          gestureCostPlus,
+                                        ),
+                                      ),
+                                    })
+                                  : quotePending}
                               </span>
                             </div>
                             <p className="text-xs leading-relaxed text-muted-foreground">
@@ -875,6 +890,19 @@ export function GesturePanel({
                         </p>
                       )
                     )}
+                    {canGesture && gestureType !== 'CST' && hasEthQuote && gestureCostPlus > 0 ? (
+                      <p
+                        className="text-xs leading-relaxed text-muted-foreground"
+                        data-testid="gesture-send-amount"
+                      >
+                        {t('form.submit.sendsNote', {
+                          amount: formatEthQuote(
+                            ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
+                          ),
+                          percent: gestureCostPlus,
+                        })}
+                      </p>
+                    ) : null}
                     {!compactDesk && (
                       <p className="text-xs leading-relaxed text-muted-foreground">
                         {t('observatory.panel.microcopy')}

@@ -37,6 +37,7 @@ import { useNotify } from '@/hooks/useNotify';
 import { useRequireChain } from '@/hooks/useRequireChain';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@/utils/cstGesture';
+import { clampCollisionBufferPercent } from '@/utils/gestureQuote';
 import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 
 export type { CstGestureData } from '@/utils/cstGesture';
@@ -439,7 +440,9 @@ export function useGestureForm() {
 
   const getNextEthGestureCostWithModifiers = async () => {
     const base = (await cosmicGameContract!.read.getNextEthBidPrice?.()) as bigint;
-    let price = (base * parseEther((100 + gestureCostPlus).toString())) / parseEther('100');
+    // A negative or non-numeric buffer would underpay (and revert) or make parseEther throw.
+    const buffer = clampCollisionBufferPercent(gestureCostPlus);
+    let price = (base * parseEther((100 + buffer).toString())) / parseEther('100');
     if (gestureType === 'RandomWalk') {
       price = (price * parseEther('50')) / parseEther('100');
     }

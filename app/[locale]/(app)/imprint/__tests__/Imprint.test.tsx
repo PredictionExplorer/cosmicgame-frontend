@@ -105,8 +105,39 @@ describe('Mint', () => {
 
   it('displays mint price with ETH label', async () => {
     await renderImprint();
-    expect(screen.getByText('ETH')).toBeInTheDocument();
+    expect(await screen.findByText('ETH')).toBeInTheDocument();
     expect(screen.getByText('Current imprint cost')).toBeInTheDocument();
+  });
+
+  it('displays exactly the value it sends, with the contract cost broken out', async () => {
+    // Regression: the page once showed cost × 1.01 + 0.008 ETH while sending cost × 1.01.
+    mockGetImprintCost.mockResolvedValue(BigInt('91300000000000000'));
+    const user = userEvent.setup();
+    mockImprint.mockResolvedValueOnce('0xTxHash');
+    render(<Imprint />);
+
+    expect(await screen.findByTestId('imprint-send-value')).toHaveTextContent('0.092213 ETH');
+    expect(screen.getByTestId('imprint-cost-breakdown')).toHaveTextContent(
+      'Contract cost 0.0913 ETH, plus a 1% buffer',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
+    await waitFor(() =>
+      expect(mockImprint).toHaveBeenCalledWith({ value: BigInt('92213000000000000') }),
+    );
+    mockGetImprintCost.mockResolvedValue(BigInt(1000000000000000));
+  });
+
+  it('shows the cost as unavailable, not 0 ETH, when the read fails', async () => {
+    mockGetImprintCost.mockRejectedValueOnce(new Error('RPC down'));
+    render(<Imprint />);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('imprint-send-value')).toHaveTextContent(
+        'common.status.unavailable',
+      ),
+    );
+    expect(screen.getByTestId('imprint-send-value')).not.toHaveTextContent(/\d/);
   });
 
   it('calls getMintPrice on mount', async () => {

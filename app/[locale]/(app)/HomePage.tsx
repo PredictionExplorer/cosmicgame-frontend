@@ -300,7 +300,6 @@ const HomePage = ({
     cstGestureData,
     isGesturing,
     rwlkId,
-    gestureCostPlus,
     onGesture,
     onGestureWithCST,
     setBidType,
@@ -530,7 +529,6 @@ const HomePage = ({
     t,
     gestureType,
     ethPrice: ethGestureInfo?.ETHPrice,
-    gestureCostPlus,
     rwlkId,
     cstGestureData: liveCstGestureData,
   });
