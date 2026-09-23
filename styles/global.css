@@ -572,18 +572,24 @@ body:has([data-maintenance-banner]) .home-control-shell {
  * different, usually failing, contrast in every palette (muted-foreground at
  * 60% was 4.1:1, at 40% 2.4:1). These exact classes now render in the subtle
  * text tier, which is 5.1:1 or more on every surface. New code writes
- * `text-subtle`; lib/__tests__/design-tokens.test.ts stops the count of these
- * classes from growing. Unlayered with zero specificity: it outranks the
- * utilities layer, and any authored rule still outranks it.
+ * `text-subtle`; styles/__tests__/token-usage.test.ts stops the count of
+ * these classes from growing.
+ *
+ * The correction sits in the utilities layer, after Tailwind's own
+ * utilities, with the same single-class specificity. It replaces the base
+ * utility by source order, while every state variant on the same element
+ * (hover:, group-hover:, focus-visible:, aria-*:, data-[…]:) adds a
+ * pseudo-class or an attribute to its class and still wins, so
+ * `text-muted-foreground/50 hover:text-primary` turns primary on hover.
  */
-:where(
+@layer utilities {
   .text-muted-foreground\/40,
   .text-muted-foreground\/50,
   .text-muted-foreground\/60,
   .text-white\/40,
-  .text-white\/45
-) {
-  color: hsl(var(--subtle-foreground));
+  .text-white\/45 {
+    color: hsl(var(--subtle-foreground));
+  }
 }
 
 @property --radius {
