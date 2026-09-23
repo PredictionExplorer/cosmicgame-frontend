@@ -18,9 +18,11 @@
 
 @layer base {
   /*
-   * The ring colour is set at rest, so an element with `transition-colors`
-   * (which animates outline-color) does not fade its ring in from the text
-   * colour; only the outline style changes on focus.
+   * The ring's colour, width and offset are set at rest, so an element with
+   * `transition-colors` (which animates outline-color) does not fade its ring
+   * in from the text colour and the offset never slides; on focus only the
+   * outline style changes. The width still computes to 0 while the style is
+   * none, which is why `transition-all` gets its own rule below.
    */
   :where(
     a,
@@ -43,6 +45,8 @@
     [tabindex]
   ) {
     outline-color: var(--focus-ring-color);
+    outline-width: var(--focus-ring-width);
+    outline-offset: var(--focus-ring-offset);
   }
 
   :where(
@@ -96,6 +100,21 @@
   ):focus-visible {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
     outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}
+
+/*
+ * `transition-all` animates every property, the outline's width among them,
+ * and that width computes to 0 until the outline style turns solid, so the
+ * ring grew in from nothing over the element's transition (the accordion
+ * triggers showed a 0px outline right after Tab). On keyboard focus the
+ * outline switches at once; every other property keeps the element's own
+ * duration and easing. Two classes' worth of specificity beats `duration-*`.
+ */
+@layer utilities {
+  .transition-all:focus-visible {
+    transition-property: all, outline-width, outline-offset;
+    transition-duration: var(--tw-duration, var(--default-transition-duration)), 0s, 0s;
   }
 }
 

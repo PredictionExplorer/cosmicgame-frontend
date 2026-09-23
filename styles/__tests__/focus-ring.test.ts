@@ -34,6 +34,28 @@ describe('focus ring', () => {
     expect(base).not.toMatch(/box-shadow/);
   });
 
+  it('sets the ring colour, width and offset at rest, so only the style changes on focus', () => {
+    const base = css.slice(css.indexOf('@layer base {'), layerBaseEnd());
+    const rest = base.slice(base.indexOf('[tabindex]\n  ) {'));
+    const body = rest.slice(rest.indexOf('{') + 1, rest.indexOf('}'));
+    expect(body).toContain('outline-color: var(--focus-ring-color)');
+    expect(body).toContain('outline-width: var(--focus-ring-width)');
+    expect(body).toContain('outline-offset: var(--focus-ring-offset)');
+  });
+
+  it('switches the outline at once under transition-all instead of growing it from 0px', () => {
+    // An outline's width computes to 0 while its style is none, so an
+    // at-rest width alone cannot stop `transition-all` from animating it.
+    const start = css.indexOf('.transition-all:focus-visible {');
+    expect(start).toBeGreaterThan(layerBaseEnd());
+    expect(css.lastIndexOf('@layer utilities {', start)).toBeGreaterThan(layerBaseEnd());
+    const body = css.slice(start, css.indexOf('}', start));
+    expect(body).toContain('transition-property: all, outline-width, outline-offset;');
+    expect(body).toContain(
+      'transition-duration: var(--tw-duration, var(--default-transition-duration)), 0s, 0s;',
+    );
+  });
+
   it('keeps a system-coloured outline in forced-colors mode, outside any layer', () => {
     const forced = css.indexOf('@media (forced-colors: active)');
     expect(forced).toBeGreaterThan(layerBaseEnd());
