@@ -649,8 +649,11 @@ export interface Participant {
 export interface Recipient {
   WinnerAid: string;
   WinnerAddr: string;
-  AllocationsCount: number;
+  /** Mapped from the wire's `PrizesCount` in `get_unique_winners`; undefined when absent. */
+  AllocationsCount?: number;
+  /** Largest Signature Allocation (main ETH) received; 0 for wallets that never received one. */
   MaxWinAmountEth: number;
+  /** Sum of every ETH allocation received. */
   PrizesSum: number;
   [key: string]: unknown;
 }
@@ -787,7 +790,8 @@ export interface NotifyRedBoxResult {
   ETHRaffleToClaim: number;
   ETHRaffleToClaimWei: number;
   NumDonatedNFTToClaim: number;
-  UnretrievedAnchorDistribution: number;
+  /** Mapped from the wire's `UnclaimedStakingReward` in `notify_red_box`. */
+  UnretrievedAnchorDistribution?: number;
   [key: string]: unknown;
 }
 

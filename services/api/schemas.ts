@@ -399,11 +399,12 @@ export const ParticipantSchema = z
   })
   .loose();
 
+/** Raw `statistics/unique/winners` row; `get_unique_winners` maps `PrizesCount` to `AllocationsCount`. */
 export const RecipientSchema = z
   .object({
     WinnerAid: IdSchema,
     WinnerAddr: AddressSchema,
-    AllocationsCount: z.number().optional(),
+    PrizesCount: z.number(),
     MaxWinAmountEth: z.number(),
     PrizesSum: z.number(),
   })

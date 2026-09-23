@@ -38,6 +38,12 @@ describe('UniqueRecipientsTable', () => {
     expect(screen.getByText('15.75')).toBeInTheDocument();
   });
 
+  it('shows a missing allocation count as unavailable, never as a blank cell', () => {
+    render(<UniqueRecipientsTable list={[createRecipient({ AllocationsCount: undefined })]} />);
+    expect(screen.getByText('tables.status.unavailable')).toBeInTheDocument();
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
   it('formats ETH values without a trailing-zero wall', () => {
     render(
       <UniqueRecipientsTable list={[createRecipient({ MaxWinAmountEth: 0.1, PrizesSum: 0.2 })]} />,
