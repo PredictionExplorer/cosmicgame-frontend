@@ -80,6 +80,15 @@ describe('MarketingStats', () => {
     expect(screen.getByText('Total Allocations')).toBeInTheDocument();
   });
 
+  it('shows unread figures as unavailable, never as 0 CST', () => {
+    renderWithTooltip(
+      <MarketingStats totalAllocatedCst={null} activeMarketers={3} rewardTransactions={null} />,
+    );
+    expect(screen.getAllByText('common.status.unavailable')).toHaveLength(2);
+    expect(screen.queryByText('CST')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Total Allocations.*0/)).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = renderWithTooltip(<MarketingStats {...defaultProps} />);
     await checkA11y(container);

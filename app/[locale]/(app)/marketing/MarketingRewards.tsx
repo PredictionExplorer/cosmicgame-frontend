@@ -9,6 +9,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useMarketingRewards } from '@/hooks/useApiQuery';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import type { MarketingReward } from '@/services/api/types';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { MarketingHero } from '@/components/marketing/MarketingHero';
 import { MarketingStats } from '@/components/marketing/MarketingStats';
 import { HowItWorks } from '@/components/marketing/HowItWorks';
@@ -18,21 +19,23 @@ import { MarketingCTA } from '@/components/marketing/MarketingCTA';
 
 const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
   const t = useTranslations('marketing');
-  const { data: marketingRewards = [], isLoading: rewardsLoading } = useMarketingRewards();
+  const { data: marketingRewards, isLoading: rewardsLoading } = useMarketingRewards();
   const { data: dashboard, isLoading: dashboardLoading } = useDashboardInfo();
 
   const loading = rewardsLoading || dashboardLoading;
 
   const rewards = useMemo(() => (marketingRewards ?? []) as MarketingReward[], [marketingRewards]);
 
-  const activeMarketers = useMemo(() => {
-    const unique = new Set(rewards.map((r) => r.MarketerAddr));
-    return unique.size;
-  }, [rewards]);
+  // `null` until the list is read, so a failed read shows as unknown rather than 0.
+  const activeMarketers = useMemo(
+    () => (marketingRewards ? new Set(rewards.map((r) => r.MarketerAddr)).size : null),
+    [marketingRewards, rewards],
+  );
 
-  // `TotalMktRewardsEth` is a CST amount despite its wire name.
-  const totalAllocatedCst = dashboard?.MainStats?.TotalMktRewardsEth ?? 0;
-  const rewardTransactions = dashboard?.MainStats?.NumMktRewards ?? 0;
+  // `TotalMktRewardsEth` is a CST amount despite its wire name. A figure the dashboard read
+  // did not return stays `null` (unknown), never a confident 0.
+  const totalAllocatedCst = toFiniteNumber(dashboard?.MainStats?.TotalMktRewardsEth);
+  const rewardTransactions = toFiniteNumber(dashboard?.MainStats?.NumMktRewards);
 
   if (loading) {
     return (
