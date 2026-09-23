@@ -196,8 +196,8 @@ describe('Root layout viewport', () => {
     expect(viewport.initialScale).toBe(1);
   });
 
-  it('exports viewport with themeColor', () => {
-    expect(viewport.themeColor).toBe('#15BFFD');
+  it("paints the browser chrome in the default palette's page colour", () => {
+    expect(viewport.themeColor).toBe('#090a11');
   });
 });
 
