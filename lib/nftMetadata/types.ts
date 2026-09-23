@@ -10,7 +10,7 @@
  * document is parsed loosely: unknown keys pass through, and a malformed
  * attribute row is dropped rather than failing the whole document.
  */
-import { z } from 'zod';
+import * as z from 'zod';
 
 /** One OpenSea-style attribute row (`trait_type` / `value` / optional display hints). */
 export const NftAttributeSchema = z

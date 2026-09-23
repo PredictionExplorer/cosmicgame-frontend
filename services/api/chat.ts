@@ -1,5 +1,5 @@
 import { formatUnits } from 'viem';
-import { z } from 'zod';
+import * as z from 'zod';
 
 import { apiBaseUrls, getApiBase, markServerDown } from '@/lib/serverRotation';
 

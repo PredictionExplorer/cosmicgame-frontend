@@ -75,6 +75,18 @@ const config = [
           ],
         },
       ],
+      // `{ z }` and the default export are Zod's materialized namespace, which
+      // drags its ~50 locale tables (~40 KB gzip) into the shared client
+      // chunk of every app page; `import * as z from 'zod'` lets Turbopack
+      // tree-shake them.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "ImportDeclaration[source.value='zod'] > :matches(ImportSpecifier[imported.name='z'], ImportDefaultSpecifier)",
+          message: "Use `import * as z from 'zod'` so unused Zod locales stay out of the bundle.",
+        },
+      ],
     },
   },
   {
