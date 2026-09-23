@@ -14,6 +14,13 @@ import { loadScaledArtwork, pngDataUri } from './fetchImage';
 export const OG_DATA_REVALIDATE_SECONDS = 3600;
 
 /**
+ * How long a card waits for the API or the media origin. A card renders
+ * during the build and on regeneration; a slow origin must degrade it to the
+ * text layout, never stall either.
+ */
+export const OG_FETCH_TIMEOUT_MS = 8_000;
+
+/**
  * Width every render is scaled to: the plate of the plate card
  * (lib/og/CosmicOgCard.tsx), the largest size a card draws art at.
  */
@@ -41,6 +48,7 @@ async function readApi(path: string): Promise<Record<string, unknown> | null> {
     const response = await fetch(getAPIUrl(path), {
       headers: { Accept: 'application/json' },
       next: { revalidate: OG_DATA_REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(OG_FETCH_TIMEOUT_MS),
     });
     if (!response.ok) return null;
     const data: unknown = await response.json();

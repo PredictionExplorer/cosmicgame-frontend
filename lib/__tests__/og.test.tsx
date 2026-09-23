@@ -31,6 +31,7 @@ jest.mock('next/og', () => ({
 
 jest.mock('@/lib/og/art', () => ({
   OG_DATA_REVALIDATE_SECONDS: 3600,
+  OG_FETCH_TIMEOUT_MS: 8000,
   loadCycleArtwork: jest.fn(async () => null),
   loadGesture: jest.fn(async () => null),
   loadLatestArtworks: jest.fn(async () => []),

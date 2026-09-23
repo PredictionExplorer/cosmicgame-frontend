@@ -13,6 +13,7 @@ import { parseCanonicalNonNegativeSafeInteger } from '@/utils/routeParams';
 
 import {
   OG_DATA_REVALIDATE_SECONDS,
+  OG_FETCH_TIMEOUT_MS,
   loadCycleArtwork,
   loadGesture,
   loadLatestArtworks,
@@ -149,6 +150,7 @@ export async function tokenCardAlt(locale: string, rawId: string): Promise<strin
   try {
     const metadata = await fetchNftMetadata(tokenId, {
       next: { revalidate: OG_DATA_REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(OG_FETCH_TIMEOUT_MS),
     });
     const entry = metadata ? normalizeTraitEntry(metadata, tokenId) : null;
     if (entry?.structure && entry.palette && copy.altWithTraits) {

@@ -28,6 +28,7 @@ import { fetchNftMetadata } from '@/lib/nftMetadata';
 
 jest.mock('@/lib/og/art', () => ({
   OG_DATA_REVALIDATE_SECONDS: 3600,
+  OG_FETCH_TIMEOUT_MS: 8000,
   loadCycleArtwork: jest.fn(),
   loadGesture: jest.fn(),
   loadLatestArtworks: jest.fn(),
