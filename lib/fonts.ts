@@ -27,6 +27,16 @@ import type { LocaleRecord } from '@/i18n/locale';
  * name its @font-face rules declare. styles/global.css names those families
  * in CSS variables (`--font-noto-sc: 'Noto Sans SC'`) that every stack reads,
  * so a variable is always defined even on pages that never load the face.
+ *
+ * The three faces below declare no `fallback`. next/font appends that list to
+ * the family variable (`--font-inter: 'Inter', 'Inter Fallback', …`), and the
+ * stacks in styles/global.css put the variable ahead of `--cjk-font-stack`. A
+ * generic family there (`sans-serif`, `system-ui`, `monospace`) resolves per
+ * script from the page's `lang`, so it caught every CJK glyph first and the
+ * locale's Noto cut never rendered body text (/ja showed Hiragino Kaku Gothic
+ * ProN, /ko Apple SD Gothic Neo). The metric-matched `… Fallback` face that
+ * next/font generates still covers Latin text while a face loads, and each
+ * stack ends in its own generic family after the CJK faces.
  */
 
 export const clashDisplay = localFont({
@@ -40,7 +50,6 @@ export const clashDisplay = localFont({
   variable: '--font-clash-display',
   display: 'swap',
   preload: true,
-  fallback: ['system-ui', 'Arial', 'sans-serif'],
 });
 
 /**
@@ -58,7 +67,6 @@ export const inter = Inter({
   variable: '--font-inter',
   display: 'swap',
   preload: true,
-  fallback: ['system-ui', 'Arial', 'sans-serif'],
 });
 
 /**
@@ -74,7 +82,6 @@ export const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
   display: 'swap',
   preload: false,
-  fallback: ['ui-monospace', 'Menlo', 'Consolas', 'monospace'],
 });
 
 /** Every face loaded on every page, in `<html>` class order. */

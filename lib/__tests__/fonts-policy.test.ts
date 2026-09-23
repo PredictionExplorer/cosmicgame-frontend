@@ -75,6 +75,30 @@ describe('font configuration policy', () => {
     expect(block).toContain('preload: false');
   });
 
+  it("lets CJK glyphs reach the locale's CJK stack before any generic family", () => {
+    // next/font appends a `fallback` list to the family variable, and a generic
+    // family resolves per script from `lang`: `sans-serif` ahead of
+    // `--cjk-font-stack` drew /ja body text in Hiragino Kaku Gothic ProN
+    // instead of Noto Sans JP.
+    for (const face of ['clashDisplay', 'inter', 'jetbrainsMono']) {
+      const start = source.indexOf(`export const ${face} = `);
+      expect(start).toBeGreaterThan(-1);
+      expect(source.slice(start, source.indexOf('});', start))).not.toContain('fallback');
+    }
+    const stacks = [...cssWithoutComments.matchAll(/(--[\w-]+-font-stack):([^;]+);/g)];
+    const withCjk = stacks.filter(([, , value]) => value!.includes('var(--cjk-font-stack)'));
+    expect(withCjk.length).toBeGreaterThanOrEqual(6);
+    for (const [, name, value] of withCjk) {
+      const beforeCjk = value!.slice(0, value!.indexOf('var(--cjk-font-stack)'));
+      expect({ name, beforeCjk }).toEqual({
+        name,
+        beforeCjk: expect.not.stringMatching(
+          /(?<![\w-])(?:sans-serif|serif|monospace|system-ui)\b/,
+        ),
+      });
+    }
+  });
+
   it('does not reference a full-range local Inter file', () => {
     expect(source).not.toContain('InterVariable');
     expect(source).not.toMatch(/fonts\/Inter\//);
