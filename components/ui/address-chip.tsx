@@ -48,8 +48,10 @@ export interface AddressChipProps {
   /** The address the page is about; a match reads "This address" and is not linked. */
   currentAddress?: string | null;
   /**
-   * A label to show instead of hex. By default protocol contracts are
-   * labelled by name ("Public Goods Vault"); pass `false` to always show hex.
+   * A label to show instead of hex. By default the address the page is
+   * about, the zero address and protocol contracts ("Public Goods Vault")
+   * read as words; pass `false` to always show hex (linking still follows
+   * `href`, `currentAddress` and the zero-address rule).
    */
   label?: string | false;
   className?: string;
@@ -92,10 +94,12 @@ export function AddressChip({
 
   let wordLabel: string | null = null;
   if (typeof label === 'string') wordLabel = label;
-  else if (isSelf) wordLabel = t('address.self');
-  else if (label !== false && isZeroAddress(address)) {
-    wordLabel = t(zeroRole ? ZERO_ADDRESS_LABELS[zeroRole] : 'address.zero');
-  } else if (knownKey) wordLabel = t(`address.known.${knownKey}`);
+  else if (label !== false) {
+    if (isSelf) wordLabel = t('address.self');
+    else if (isZeroAddress(address)) {
+      wordLabel = t(zeroRole ? ZERO_ADDRESS_LABELS[zeroRole] : 'address.zero');
+    } else if (knownKey) wordLabel = t(`address.known.${knownKey}`);
+  }
 
   const title = wordLabel ? `${wordLabel} · ${full}` : full;
   const linkTarget =

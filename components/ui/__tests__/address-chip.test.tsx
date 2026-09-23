@@ -79,6 +79,14 @@ describe('AddressChip', () => {
     publishDashboardContractAddresses({ ...emptyContractAddresses(), charity: ADDRESS });
     const { rerender } = render(<AddressChip address={ADDRESS} label={false} />);
     expect(screen.getByRole('link').textContent).toMatch(SHORT);
+    // `false` wins over the own-address and zero-address words too.
+    rerender(<AddressChip address={ADDRESS} label={false} currentAddress={ADDRESS} />);
+    expect(screen.queryByText('formats.address.self')).toBeNull();
+    expect(screen.getByTitle(/^0x/).textContent).toMatch(SHORT);
+    expect(screen.queryByRole('link')).toBeNull();
+    rerender(<AddressChip address={ZERO} label={false} zeroRole="from" />);
+    expect(screen.queryByText('formats.address.imprinted')).toBeNull();
+    expect(screen.getByTitle(ZERO).textContent).toMatch(/^0x0000…\u20600000$/);
     rerender(<AddressChip address={ADDRESS} label="Treasury" href={false} showCopy={false} />);
     expect(screen.getByText('Treasury')).toBeInTheDocument();
     expect(screen.queryByRole('link')).toBeNull();
