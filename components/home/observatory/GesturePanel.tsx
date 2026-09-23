@@ -204,9 +204,11 @@ export function GesturePanel({
   const hasCstQuote = cstGestureData.source !== 'empty';
   const quotePending = tCommon('status.loadingDots');
   const methodCost: Record<(typeof METHOD_OPTIONS)[number]['value'], string> = {
-    ETH: hasEthQuote ? `${formatEthQuote(ethGestureBaseCost(ethPrice, 'ETH'))} ETH` : quotePending,
+    ETH: hasEthQuote
+      ? `${formatEthQuote(ethGestureBaseCost(ethPrice, 'ETH'), locale)} ETH`
+      : quotePending,
     RandomWalk: hasEthQuote
-      ? `${formatEthQuote(ethGestureBaseCost(ethPrice, 'RandomWalk'))} ETH`
+      ? `${formatEthQuote(ethGestureBaseCost(ethPrice, 'RandomWalk'), locale)} ETH`
       : quotePending,
     CST: !hasCstQuote
       ? quotePending
@@ -838,6 +840,7 @@ export function GesturePanel({
                                           gestureType,
                                           gestureCostPlus,
                                         ),
+                                        locale,
                                       ),
                                     })
                                   : quotePending}
@@ -898,6 +901,7 @@ export function GesturePanel({
                         {t('form.submit.sendsNote', {
                           amount: formatEthQuote(
                             ethGestureSendAmount(ethPrice, gestureType, gestureCostPlus),
+                            locale,
                           ),
                           percent: gestureCostPlus,
                         })}

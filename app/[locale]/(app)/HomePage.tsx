@@ -5,7 +5,7 @@ import { zeroAddress } from 'viem';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { LazyMotion, domAnimation } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { reportError } from '@/utils/errors';
@@ -120,6 +120,7 @@ const HomePage = ({
 }: HomePageProps) => {
   const t = useTranslations('home');
   const tToast = useTranslations('toasts');
+  const locale = useLocale();
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
   const { notify } = useNotify();
@@ -527,6 +528,7 @@ const HomePage = ({
   // displayed cost can never drift between them.
   const submitLabel = getGestureSubmitLabel({
     t,
+    locale,
     gestureType,
     ethPrice: ethGestureInfo?.ETHPrice,
     rwlkId,

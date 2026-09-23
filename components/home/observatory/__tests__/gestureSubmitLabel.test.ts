@@ -6,6 +6,7 @@ const t = jest.fn((key: string, values?: Record<string, unknown>) =>
 
 const baseInput: GestureSubmitLabelInput = {
   t,
+  locale: 'en',
   gestureType: 'ETH',
   ethPrice: 0.01,
   rwlkId: -1,
@@ -34,6 +35,12 @@ describe('getGestureSubmitLabel', () => {
     expect(getGestureSubmitLabel({ ...baseInput, ethPrice: 0.10210695701197195 })).toBe(
       JSON.stringify({ key: 'form.submit.eth', cost: '0.10211' }),
     );
+  });
+
+  it("quotes in the locale's decimal separator", () => {
+    expect(
+      getGestureSubmitLabel({ ...baseInput, locale: 'uk', ethPrice: 0.10210695701197195 }),
+    ).toBe(JSON.stringify({ key: 'form.submit.eth', cost: '0,10211' }));
   });
 
   it('applies the RandomWalk reduction used by the form', () => {

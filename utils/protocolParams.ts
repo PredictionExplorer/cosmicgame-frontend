@@ -4,33 +4,26 @@
  * of inventing a figure (a missing divisor is not 100%, a missing duration is not 0 seconds).
  */
 
-const MICROSECONDS_PER_SECOND = 1_000_000;
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { formatGroupedNumber } from '@/utils/format';
 
-function toFinite(value: unknown): number | null {
-  if (typeof value === 'bigint') return Number(value);
-  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
-  if (typeof value === 'string' && value.trim() !== '') {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
+const MICROSECONDS_PER_SECOND = 1_000_000;
 
 /** The percentage an on-chain divisor applies (divisor 100 → 1%); `null` for 0, negative or unreadable. */
 export function percentFromDivisor(divisor: unknown): number | null {
-  const value = toFinite(divisor);
+  const value = toFiniteNumber(divisor);
   return value !== null && value > 0 ? 100 / value : null;
 }
 
 /** Seconds from an on-chain microsecond value; `null` when missing, unreadable or negative. */
 export function secondsFromMicroseconds(microseconds: unknown): number | null {
-  const value = toFinite(microseconds);
+  const value = toFiniteNumber(microseconds);
   return value !== null && value >= 0 ? value / MICROSECONDS_PER_SECOND : null;
 }
 
 /** A non-negative number of seconds; `null` when missing, unreadable or negative. */
 export function secondsOrNull(seconds: unknown): number | null {
-  const value = toFinite(seconds);
+  const value = toFiniteNumber(seconds);
   return value !== null && value >= 0 ? value : null;
 }
 
@@ -43,8 +36,20 @@ export function initialDurationSeconds(
   timeIncrementMicroseconds: unknown,
   initialDurationDivisor: unknown,
 ): number | null {
-  const increment = toFinite(timeIncrementMicroseconds);
-  const divisor = toFinite(initialDurationDivisor);
+  const increment = toFiniteNumber(timeIncrementMicroseconds);
+  const divisor = toFiniteNumber(initialDurationDivisor);
   if (increment === null || divisor === null || increment < 0 || divisor <= 0) return null;
   return Math.floor(increment / divisor);
+}
+
+/**
+ * A percentage parameter given in points, as the API and contract report them (25 → "25%",
+ * 0.5 → "0.5%"), through `Intl` percent formatting in the page locale: locale digits, the sign
+ * attached as every style guide requires, at most two decimals.
+ */
+export function formatPercentPoints(points: number, locale: string): string {
+  return formatGroupedNumber(points / 100, locale, {
+    style: 'percent',
+    maximumFractionDigits: 2,
+  });
 }

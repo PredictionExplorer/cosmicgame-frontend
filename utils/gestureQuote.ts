@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { toIntlLocale } from '@/utils/format';
+
 /**
  * Quotes for the ETH a participant is about to send. Every surface that shows an ETH Gesture
  * Cost (method tabs, the submit button, the mobile dock, the collision line) formats it here,
@@ -15,13 +17,23 @@ export const MAX_COLLISION_BUFFER_PERCENT = 50;
 /** Buffer added to the RandomWalk imprint value so a cost rise before confirmation still succeeds. */
 export const IMPRINT_COST_BUFFER_PERCENT = 1;
 
-const quoteFormat = new Intl.NumberFormat('en-US', {
-  maximumSignificantDigits: QUOTE_SIGNIFICANT_DIGITS,
-  useGrouping: false,
-});
+const quoteFormats = new Map<string, Intl.NumberFormat>();
 
-/** Formats an ETH amount for a cost quote: five significant digits, no grouping. */
-export function formatEthQuote(eth: number): string {
+/**
+ * Formats an ETH amount for a cost quote: five significant digits, no grouping, in the
+ * locale's decimal separator ("0.10211", uk and vi "0,10211"), so a quote reads like every
+ * other figure on the page.
+ */
+export function formatEthQuote(eth: number, locale: string = 'en'): string {
+  const intlLocale = toIntlLocale(locale);
+  let quoteFormat = quoteFormats.get(intlLocale);
+  if (!quoteFormat) {
+    quoteFormat = new Intl.NumberFormat(intlLocale, {
+      maximumSignificantDigits: QUOTE_SIGNIFICANT_DIGITS,
+      useGrouping: false,
+    });
+    quoteFormats.set(intlLocale, quoteFormat);
+  }
   return quoteFormat.format(eth);
 }
 

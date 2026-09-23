@@ -8,6 +8,8 @@ type HomeTranslator = ReturnType<typeof useTranslations>;
 
 export interface GestureSubmitLabelInput {
   t: HomeTranslator;
+  /** The page locale, for the quote's decimal separator. */
+  locale: string;
   gestureType: string;
   ethPrice: number | null | undefined;
   rwlkId: number;
@@ -15,13 +17,15 @@ export interface GestureSubmitLabelInput {
 }
 
 /**
- * The one label used by every gesture submit button (full console, monument,
- * chat composer), so the shown cost can never drift between surfaces. It quotes
- * the Gesture Cost itself, formatted like the method tabs; the collision buffer
- * the form adds on top is disclosed next to the button, not folded in here.
+ * The one label used by every gesture submit button (the home gesture panel and
+ * action dock, and the experimental console, monument and chat composer), so the
+ * shown cost can never drift between surfaces. It quotes the Gesture Cost itself,
+ * formatted like the method tabs; the collision buffer the form adds on top is
+ * disclosed next to the button, not folded in here.
  */
 export function getGestureSubmitLabel({
   t,
+  locale,
   gestureType,
   ethPrice,
   rwlkId,
@@ -36,12 +40,14 @@ export function getGestureSubmitLabel({
   }
   const price = ethPrice ?? 0;
   if (gestureType === 'ETH') {
-    return t('form.submit.eth', { cost: formatEthQuote(ethGestureBaseCost(price, 'ETH')) });
+    return t('form.submit.eth', {
+      cost: formatEthQuote(ethGestureBaseCost(price, 'ETH'), locale),
+    });
   }
   if (gestureType === 'RandomWalk' && rwlkId !== -1)
     return t('form.submit.randomWalkWithToken', {
       tokenId: String(rwlkId),
-      cost: formatEthQuote(ethGestureBaseCost(price, 'RandomWalk')),
+      cost: formatEthQuote(ethGestureBaseCost(price, 'RandomWalk'), locale),
     });
   if (gestureType === 'CST') {
     if (cstGestureData.isFree) return t('form.submit.cstFree');

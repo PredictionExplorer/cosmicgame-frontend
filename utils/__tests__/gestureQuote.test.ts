@@ -26,6 +26,13 @@ describe('formatEthQuote', () => {
   it('never groups digits', () => {
     expect(formatEthQuote(12345.6)).toBe('12346');
   });
+
+  it("uses the locale's decimal separator, like every other figure on the page", () => {
+    expect(formatEthQuote(0.10210695701197195, 'uk')).toBe('0,10211');
+    expect(formatEthQuote(0.10210695701197195, 'vi')).toBe('0,10211');
+    expect(formatEthQuote(0.10210695701197195, 'zh-TW')).toBe('0.10211');
+    expect(formatEthQuote(12345.6, 'uk')).toBe('12346');
+  });
 });
 
 describe('gesture cost quotes', () => {

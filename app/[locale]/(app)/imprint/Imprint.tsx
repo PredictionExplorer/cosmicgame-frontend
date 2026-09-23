@@ -124,8 +124,10 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mx-auto mb-4">
             <Sparkles className="h-8 w-8 text-primary" />
           </div>
-          {/* The figure is exactly the value sent with the imprint; the contract's own cost and
-              the buffer are broken out underneath. */}
+          {/* The value an imprint sends at the cost read on load (the cost plus the buffer),
+              quoted to five significant digits like every ETH cost; the contract's own cost and
+              the buffer are broken out underneath. The imprint re-reads the cost when it is
+              sent, so the wallet shows the exact wei, which differs only if the cost moved. */}
           <p className="text-3xl font-bold font-display" data-testid="imprint-send-value">
             {contractCostWei === null ? (
               <UnknownValue
@@ -133,7 +135,7 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
               />
             ) : (
               <>
-                {formatEthQuote(Number(formatEther(imprintSendValueWei(contractCostWei))))}{' '}
+                {formatEthQuote(Number(formatEther(imprintSendValueWei(contractCostWei))), locale)}{' '}
                 <span className="text-primary">ETH</span>
               </>
             )}
@@ -145,7 +147,7 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
               data-testid="imprint-cost-breakdown"
             >
               {t('page.costBreakdown', {
-                base: formatEthQuote(Number(formatEther(contractCostWei))),
+                base: formatEthQuote(Number(formatEther(contractCostWei)), locale),
                 percent: IMPRINT_COST_BUFFER_PERCENT,
               })}
             </p>
