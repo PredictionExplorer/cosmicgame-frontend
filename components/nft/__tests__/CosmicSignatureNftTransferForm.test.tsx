@@ -30,6 +30,11 @@ jest.mock('@wagmi/core', () => ({
   writeContract: (...args: unknown[]) => mockWriteContract(...args),
 }));
 
+const mockEnsureCorrectChain = jest.fn().mockResolvedValue(true);
+jest.mock('@/hooks/useRequireChain', () => ({
+  useRequireChain: () => ({ ensureCorrectChain: mockEnsureCorrectChain }),
+}));
+
 jest.mock('wagmi', () => ({
   useConfig: () => ({ id: 'test-config' }),
   usePublicClient: () => ({

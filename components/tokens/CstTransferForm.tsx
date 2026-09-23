@@ -15,6 +15,7 @@ import { getExplorerUrl, shortenHex } from '@/utils';
 import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { useRequireChain } from '@/hooks/useRequireChain';
 import { getEthErrorMessage, isUserRejection, reportError } from '@/utils/errors';
 import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,8 @@ export function CstTransferForm({
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
 
   const config = useConfig();
+
+  const { ensureCorrectChain } = useRequireChain();
   const publicClient = usePublicClient({ chainId: activeChain.id });
   const queryClient = useQueryClient();
   const contractAddrs = useContractAddresses();
@@ -193,6 +196,9 @@ export function CstTransferForm({
     const validTransfer = validateTransfer();
     if (!validTransfer) return;
 
+    // A wallet on another chain is asked to switch first (wagmi's writeContract
+    // would throw a chain mismatch instead).
+    if (!(await ensureCorrectChain())) return;
     setSubmitting(true);
     setTxHash(null);
     try {

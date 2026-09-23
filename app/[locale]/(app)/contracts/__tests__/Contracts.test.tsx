@@ -75,6 +75,11 @@ jest.mock('@wagmi/core', () => ({
   writeContract: jest.fn(),
 }));
 
+const mockEnsureCorrectChain = jest.fn().mockResolvedValue(true);
+jest.mock('@/hooks/useRequireChain', () => ({
+  useRequireChain: () => ({ ensureCorrectChain: mockEnsureCorrectChain }),
+}));
+
 jest.mock('wagmi', () => ({
   useAccount: () => ({ address: undefined, isConnected: false }),
   useChainId: () => 421614,
