@@ -200,12 +200,47 @@
 }
 
 /*
+ * Chinese punctuation in a Chinese face. Inter, first in the text stack,
+ * carries the ellipsis and the em dash, so 搜尋問題…… rendered as six tight
+ * Latin dots and —— as a short Latin dash inside Chinese copy. These aliases
+ * cover only those code points (plus the curly quotes Simplified Chinese
+ * uses) and point at the platform's regional CJK face, so the marks take the
+ * full-width Chinese forms; where no such face is installed the alias does
+ * not load and Inter draws them as before.
+ */
+@font-face {
+  font-family: 'CS CJK Punctuation SC';
+  src:
+    local('PingFang SC Regular'), local('PingFangSC-Regular'), local('Noto Sans CJK SC Regular'),
+    local('NotoSansCJKsc-Regular'), local('Source Han Sans SC Regular'), local('Microsoft YaHei');
+  unicode-range: U+2014, U+2026, U+201C-201D;
+}
+
+@font-face {
+  font-family: 'CS CJK Punctuation TC';
+  src:
+    local('PingFang TC Regular'), local('PingFangTC-Regular'), local('Noto Sans CJK TC Regular'),
+    local('NotoSansCJKtc-Regular'), local('Source Han Sans TC Regular'), local('Microsoft JhengHei');
+  unicode-range: U+2014, U+2026;
+}
+
+@font-face {
+  font-family: 'CS CJK Punctuation HK';
+  src:
+    local('PingFang HK Regular'), local('PingFangHK-Regular'), local('Noto Sans CJK HK Regular'),
+    local('NotoSansCJKhk-Regular'), local('Source Han Sans HC Regular'), local('Microsoft JhengHei');
+  unicode-range: U+2014, U+2026;
+}
+
+/*
  * Simplified Chinese: the mainland cut of Noto Sans CJK, then the platform
  * faces. Unlayered next to :root for the same reason as the Ukrainian
  * override below.
  */
 html:lang(zh) {
   --cjk-font-stack: var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei';
+  --body-font-stack:
+    'CS CJK Punctuation SC', var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
 }
 
 /*
@@ -215,10 +250,14 @@ html:lang(zh) {
  */
 html:lang(zh-TW) {
   --cjk-font-stack: var(--font-noto-tc), 'PingFang TC', 'Microsoft JhengHei';
+  --body-font-stack:
+    'CS CJK Punctuation TC', var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
 }
 
 html:lang(zh-HK) {
   --cjk-font-stack: var(--font-noto-hk), 'PingFang HK', 'Microsoft JhengHei';
+  --body-font-stack:
+    'CS CJK Punctuation HK', var(--font-inter), Inter, var(--cjk-font-stack), sans-serif;
 }
 
 /*
