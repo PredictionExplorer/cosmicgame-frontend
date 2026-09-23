@@ -108,9 +108,19 @@ describe('isUserRejection', () => {
 });
 
 describe('getEthErrorMessage', () => {
-  it('extracts message from provider error data', () => {
+  it('extracts message from provider error data when asked to preserve it', () => {
     const err = { data: { message: 'execution reverted' } };
-    expect(getEthErrorMessage(err)).toBe('execution reverted');
+    expect(getEthErrorMessage(err, undefined, { preserveProviderMessage: true })).toBe(
+      'execution reverted',
+    );
+  });
+
+  it('never shows provider text by default, in any locale', () => {
+    const err = { data: { message: 'execution reverted: arbitrary developer text' } };
+    expect(getEthErrorMessage(err)).toBe('An error occurred');
+    expect(getEthErrorMessage(err, 'Transaction failed.', { locale: 'en' })).toBe(
+      'Transaction failed.',
+    );
   });
 
   it('returns fallback when data has no message', () => {
@@ -131,11 +141,14 @@ describe('getEthErrorMessage', () => {
     expect(getEthErrorMessage(err, '交易未能完成。', { locale: 'zh' })).toBe('交易未能完成。');
   });
 
-  it('preserves detailed provider diagnostics for English UI', () => {
+  it('preserves detailed provider diagnostics when explicitly requested', () => {
     const err = { data: { message: 'execution reverted: useful detail' } };
-    expect(getEthErrorMessage(err, 'Transaction failed.', { locale: 'en' })).toBe(
-      'execution reverted: useful detail',
-    );
+    expect(
+      getEthErrorMessage(err, 'Transaction failed.', {
+        locale: 'en',
+        preserveProviderMessage: true,
+      }),
+    ).toBe('execution reverted: useful detail');
   });
 
   it('returns fallback for null', () => {

@@ -54,7 +54,9 @@ describe('WinningHistory', () => {
       error: { message: 'Network error' },
     });
     render(<WinningHistory />);
-    expect(screen.getByText('Network error')).toBeInTheDocument();
+    // The localized explanation, never the raw transport message.
+    expect(screen.getByText('Please try again in a moment.')).toBeInTheDocument();
+    expect(screen.queryByText('Network error')).not.toBeInTheDocument();
   });
 
   it('shows empty state when no winnings', () => {
