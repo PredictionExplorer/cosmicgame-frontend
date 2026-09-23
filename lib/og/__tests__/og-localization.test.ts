@@ -188,6 +188,20 @@ describe('share-card typography', () => {
     }
   });
 
+  // Regression: `new URL(\`…/${name}\`, import.meta.url)` made Turbopack resolve
+  // every face of a directory to one guessed file (an .eot for Clash Display),
+  // and satori rejected it. Each file must be a literal the bundler can trace.
+  it('addresses every font file with a literal URL, one file per face', () => {
+    const source = readFileSync(join(ROOT, 'lib', 'og', 'fonts.ts'), 'utf8');
+    expect(source).not.toMatch(/new URL\(\s*`/);
+    for (const locale of routing.locales) {
+      const files = ogFontFiles(locale).map((font) => basename(fileURLToPath(font.file)));
+      expect(new Set(files).size).toBe(files.length);
+      for (const file of files) expect(file).toMatch(/\.ttf$/);
+    }
+    expect(ogFontFiles('zh')).toHaveLength(7);
+  });
+
   it('loads the wordmark face and the mono face in every locale', () => {
     for (const locale of routing.locales) {
       for (const font of OG_SHARED_FONTS) expect(ogFontFiles(locale)).toContain(font);
@@ -215,7 +229,7 @@ describe('share-card font files', () => {
     expect(data.byteLength).toBeLessThan(250_000);
     expect(data.subarray(0, 4)).toEqual(Buffer.from([0x00, 0x01, 0x00, 0x00]));
     if (font.source === 'subset') {
-      expect(readFileSync(fileURLToPath(font.license!), 'utf8')).toContain(
+      expect(readFileSync(join(ROOT, font.license!), 'utf8')).toContain(
         'SIL OPEN FONT LICENSE Version 1.1',
       );
     } else {

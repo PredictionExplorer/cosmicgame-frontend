@@ -55,9 +55,7 @@ describe('Open Graph font assets', () => {
     for (const locale of routing.locales) {
       for (const font of ogFontFiles(locale)) {
         expect(notices).toContain(basename(fileURLToPath(font.file)));
-        if (font.license) {
-          expect(notices).toContain(`assets/fonts/${basename(fileURLToPath(font.license))}`);
-        }
+        if (font.license) expect(notices).toContain(font.license);
       }
     }
   });

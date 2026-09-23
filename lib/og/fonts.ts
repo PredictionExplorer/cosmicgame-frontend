@@ -22,8 +22,11 @@ export interface OgFontFile {
   readonly family: string;
   readonly weight: 400 | 500 | 700;
   readonly file: URL;
-  /** License text shipped next to the file (Clash Display's lives in THIRD_PARTY_NOTICES.md). */
-  readonly license: URL | null;
+  /**
+   * Repository path of the license text shipped with the file (Clash
+   * Display's terms are in THIRD_PARTY_NOTICES.md).
+   */
+  readonly license: string | null;
   /** `subset`: cut by `npm run og:fonts`; `verbatim`: the vendor's file, unmodified. */
   readonly source: 'subset' | 'verbatim';
 }
@@ -54,22 +57,19 @@ export interface OgTypography {
   readonly subheadBreak: OgLineBreak;
 }
 
-const asset = (fileName: string): URL => new URL(`../../assets/fonts/${fileName}`, import.meta.url);
-const clash = (fileName: string): URL =>
-  new URL(`../../public/fonts/ClashDisplay/fonts/${fileName}`, import.meta.url);
+/*
+ * Every file is addressed by a literal `new URL('…', import.meta.url)`: the
+ * bundler emits exactly that file next to the server code. A URL built from a
+ * template (`${name}`) makes Turbopack resolve a whole directory to a single
+ * guessed file, so the cards would read the wrong face (or an .eot).
+ */
 
 const subset = (
   family: string,
   weight: OgFontFile['weight'],
-  fileName: string,
+  file: URL,
   license: string,
-): OgFontFile => ({
-  family,
-  weight,
-  file: asset(fileName),
-  license: asset(license),
-  source: 'subset',
-});
+): OgFontFile => ({ family, weight, file, license: `assets/fonts/${license}`, source: 'subset' });
 
 const NOTO_CJK_LICENSE = 'OFL-NotoSansCJK.txt';
 
@@ -77,7 +77,7 @@ const NOTO_CJK_LICENSE = 'OFL-NotoSansCJK.txt';
 export const CLASH_DISPLAY_500: OgFontFile = {
   family: 'Clash Display',
   weight: 500,
-  file: clash('ClashDisplay-Medium.ttf'),
+  file: new URL('../../public/fonts/ClashDisplay/fonts/ClashDisplay-Medium.ttf', import.meta.url),
   license: null,
   source: 'verbatim',
 };
@@ -86,20 +86,30 @@ export const CLASH_DISPLAY_500: OgFontFile = {
 export const CLASH_DISPLAY_700: OgFontFile = {
   family: 'Clash Display',
   weight: 700,
-  file: clash('ClashDisplay-Bold.ttf'),
+  file: new URL('../../public/fonts/ClashDisplay/fonts/ClashDisplay-Bold.ttf', import.meta.url),
   license: null,
   source: 'verbatim',
 };
 
 /** Body face in every locale: Latin, Cyrillic and Vietnamese (lib/fonts.ts `inter`). */
-export const INTER_400 = subset('Inter', 400, 'Inter-400.subset.ttf', 'OFL-Inter.txt');
-export const INTER_500 = subset('Inter', 500, 'Inter-500.subset.ttf', 'OFL-Inter.txt');
+export const INTER_400 = subset(
+  'Inter',
+  400,
+  new URL('../../assets/fonts/Inter-400.subset.ttf', import.meta.url),
+  'OFL-Inter.txt',
+);
+export const INTER_500 = subset(
+  'Inter',
+  500,
+  new URL('../../assets/fonts/Inter-500.subset.ttf', import.meta.url),
+  'OFL-Inter.txt',
+);
 
 /** Token numbers and addresses. */
 export const JETBRAINS_MONO_500 = subset(
   'JetBrains Mono',
   500,
-  'JetBrainsMono-500.subset.ttf',
+  new URL('../../assets/fonts/JetBrainsMono-500.subset.ttf', import.meta.url),
   'OFL-JetBrainsMono.txt',
 );
 
@@ -107,19 +117,73 @@ export const JETBRAINS_MONO_500 = subset(
  * Ukrainian and Vietnamese titles: Clash Display has no Cyrillic and few
  * Vietnamese letters, so the whole display stack is Onest, as on the site.
  */
-export const ONEST_500 = subset('Onest', 500, 'Onest-500.subset.ttf', 'OFL-Onest.txt');
+export const ONEST_500 = subset(
+  'Onest',
+  500,
+  new URL('../../assets/fonts/Onest-500.subset.ttf', import.meta.url),
+  'OFL-Onest.txt',
+);
 
-const noto = (family: string, cut: string) =>
-  [
-    subset(family, 700, `NotoSans${cut}-700.subset.ttf`, NOTO_CJK_LICENSE),
-    subset(family, 400, `NotoSans${cut}-400.subset.ttf`, NOTO_CJK_LICENSE),
-  ] as const;
-
-const [NOTO_SC_700, NOTO_SC_400] = noto('Noto Sans SC', 'SC');
-const [NOTO_TC_700, NOTO_TC_400] = noto('Noto Sans TC', 'TC');
-const [NOTO_HK_700, NOTO_HK_400] = noto('Noto Sans HK', 'HK');
-const [NOTO_KR_700, NOTO_KR_400] = noto('Noto Sans KR', 'KR');
-const [NOTO_JP_700, NOTO_JP_400] = noto('Noto Sans JP', 'JP');
+const NOTO_SC_700 = subset(
+  'Noto Sans SC',
+  700,
+  new URL('../../assets/fonts/NotoSansSC-700.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_SC_400 = subset(
+  'Noto Sans SC',
+  400,
+  new URL('../../assets/fonts/NotoSansSC-400.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_TC_700 = subset(
+  'Noto Sans TC',
+  700,
+  new URL('../../assets/fonts/NotoSansTC-700.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_TC_400 = subset(
+  'Noto Sans TC',
+  400,
+  new URL('../../assets/fonts/NotoSansTC-400.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_HK_700 = subset(
+  'Noto Sans HK',
+  700,
+  new URL('../../assets/fonts/NotoSansHK-700.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_HK_400 = subset(
+  'Noto Sans HK',
+  400,
+  new URL('../../assets/fonts/NotoSansHK-400.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_KR_700 = subset(
+  'Noto Sans KR',
+  700,
+  new URL('../../assets/fonts/NotoSansKR-700.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_KR_400 = subset(
+  'Noto Sans KR',
+  400,
+  new URL('../../assets/fonts/NotoSansKR-400.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_JP_700 = subset(
+  'Noto Sans JP',
+  700,
+  new URL('../../assets/fonts/NotoSansJP-700.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
+const NOTO_JP_400 = subset(
+  'Noto Sans JP',
+  400,
+  new URL('../../assets/fonts/NotoSansJP-400.subset.ttf', import.meta.url),
+  NOTO_CJK_LICENSE,
+);
 
 const BODY_LATIN = [INTER_400, INTER_500] as const;
 

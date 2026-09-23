@@ -256,9 +256,9 @@ export async function participantCard(locale: string, rawAddress: string): Promi
   });
 }
 
-export function participantCardAlt(locale: string, rawAddress: string): string {
+export function participantCardAlt(locale: string, rawAddress: string | undefined): string {
   const copy = getOgCopy(locale, 'participant');
-  const trimmed = rawAddress.trim();
+  const trimmed = rawAddress?.trim() ?? '';
   return isAddress(trimmed, { strict: false }) && copy.altWithValue
     ? fillOgTemplate(copy.altWithValue, { address: getAddress(trimmed) })
     : copy.alt;
