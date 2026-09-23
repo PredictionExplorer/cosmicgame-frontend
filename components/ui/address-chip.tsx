@@ -127,8 +127,11 @@ export function AddressChip({
     );
   }
 
-  const textClass =
-    'inline-flex min-w-0 items-center text-muted-foreground no-underline transition-colors print:!text-foreground';
+  // A chip is a muted pill; plain text takes the colour of the cell or sentence it sits in.
+  const textClass = cn(
+    'inline-flex min-w-0 items-center no-underline transition-colors print:!text-foreground',
+    variant === 'chip' ? 'text-muted-foreground' : '[color:inherit]',
+  );
 
   return (
     <span

@@ -68,6 +68,8 @@ describe('AddressChip', () => {
     publishDashboardContractAddresses({ ...emptyContractAddresses(), charity: ADDRESS });
     render(<AddressChip address={ADDRESS} variant="plain" />);
     const link = screen.getByRole('link');
+    expect(link).toHaveClass('[color:inherit]');
+    expect(link).not.toHaveClass('text-muted-foreground');
     expect(link).toHaveTextContent('formats.address.known.publicGoods');
     expect(link.getAttribute('title')).toMatch(/^formats\.address\.known\.publicGoods · 0x/);
   });
