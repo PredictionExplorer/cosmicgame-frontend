@@ -181,8 +181,9 @@ export type AmountUnit = 'ETH' | 'CST' | 'USD';
  *   USD 2), zero as a bare "0", dust as a bound ("<0.0001"). Pair with
  *   `withUnit: false` when the column header names the unit.
  * - `card` (default): stat cards, summaries, chart tooltips. ETH keeps a
- *   fixed 4 digits; CST shows 0–2, so a protocol constant reads "1,000 CST";
- *   USD rounds to whole dollars from 100 up.
+ *   fixed 4 digits; CST shows 2, or none for a whole amount, so a protocol
+ *   constant reads "1,000 CST" beside "103,782.40 CST"; USD rounds to whole
+ *   dollars from 100 up.
  * - `hero`: one large readout or a figure in running prose; trailing zeros
  *   are trimmed ("1.5 ETH").
  * - `exact`: an amount the participant is about to pay or receive, which
@@ -198,12 +199,20 @@ interface AmountPolicy {
   readonly dust: number | null;
   /** From `from` up, the amount shows exactly `fractionDigits` digits instead. */
   readonly large?: { readonly from: number; readonly fractionDigits: number };
+  /** A whole amount (after rounding) drops its fraction: "1,000", not "1,000.00". */
+  readonly wholeWithoutFraction?: boolean;
 }
 
 const fixedDigits = (digits: number, dust: number | null): AmountPolicy => ({
   minimumFractionDigits: digits,
   maximumFractionDigits: digits,
   dust,
+});
+
+/** Fixed digits, or none when the amount is whole: every figure in a column reads alike. */
+const fixedOrWhole = (digits: number, dust: number | null): AmountPolicy => ({
+  ...fixedDigits(digits, dust),
+  wholeWithoutFraction: true,
 });
 
 const upToDigits = (digits: number, dust: number | null): AmountPolicy => ({
@@ -227,8 +236,8 @@ const AMOUNT_POLICY: Record<AmountUnit, Record<AmountContext, AmountPolicy>> = {
   },
   CST: {
     table: fixedDigits(2, 0.01),
-    card: upToDigits(2, 0.01),
-    hero: upToDigits(2, 0.01),
+    card: fixedOrWhole(2, 0.01),
+    hero: fixedOrWhole(2, 0.01),
     exact: upToDigits(6, null),
   },
   USD: {
@@ -353,8 +362,11 @@ export function formatAmountParts(value: AmountInput, options: AmountOptions): A
     });
     lossy = decimal.replace(/^-?0\.0*/, '').replace(/0+$/, '').length > TINY_SIGNIFICANT_DIGITS;
   } else {
-    const digits =
-      policy.large && magnitude >= policy.large.from ? policy.large.fractionDigits : null;
+    const scale = 10 ** policy.maximumFractionDigits;
+    const roundsToWhole = Math.round(magnitude * scale) % scale === 0;
+    let digits: number | null = null;
+    if (policy.large && magnitude >= policy.large.from) digits = policy.large.fractionDigits;
+    else if (policy.wholeWithoutFraction && roundsToWhole) digits = 0;
     const maximumFractionDigits = digits ?? policy.maximumFractionDigits;
     number = formatWithConventions(numeric, locale, {
       minimumFractionDigits: digits ?? policy.minimumFractionDigits,

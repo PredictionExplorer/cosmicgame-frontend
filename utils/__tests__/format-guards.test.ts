@@ -132,8 +132,8 @@ describe('formatEthValue / formatCSTValue treat negatives as real values', () =>
   });
 
   it('renders a negative CST amount instead of "0 CST"', () => {
-    expect(formatCSTValue(-0.5)).toBe(nb('-0.5~CST'));
-    expect(formatCSTValue(-42.5)).toBe(nb('-42.5~CST'));
+    expect(formatCSTValue(-0.5)).toBe(nb('-0.50~CST'));
+    expect(formatCSTValue(-42.5)).toBe(nb('-42.50~CST'));
   });
 
   it('still collapses zero and non-finite values to the zero label', () => {

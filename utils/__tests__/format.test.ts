@@ -65,7 +65,7 @@ describe('formatAmount', () => {
     expect(formatAmount(1000, { unit: 'CST', locale: 'vi' })).toBe(nb('1.000~CST'));
   });
 
-  it('shows CST with 0–2 decimals so protocol constants stay whole', () => {
+  it('shows CST with 2 decimals, or none when whole, so protocol constants stay whole', () => {
     expectEveryLocale((locale) => formatAmount(60872.256, { unit: 'CST', locale }), {
       en: '60,872.26~CST',
       zh: '60,872.26~CST',
@@ -77,7 +77,9 @@ describe('formatAmount', () => {
       vi: '60.872,26~CST',
     });
     expect(formatAmount(1000, { unit: 'CST' })).toBe(nb('1,000~CST'));
-    expect(formatAmount(205.9, { unit: 'CST' })).toBe(nb('205.9~CST'));
+    expect(formatAmount(205.9, { unit: 'CST' })).toBe(nb('205.90~CST'));
+    expect(formatAmount(999.999, { unit: 'CST' })).toBe(nb('1,000~CST'));
+    expect(formatAmountParts(999.999, { unit: 'CST' }).exact).toBe(nb('999.999~CST'));
   });
 
   it.each<[AmountContext, number, string]>([
@@ -494,7 +496,7 @@ describe('legacy helpers delegate to the formatting layer', () => {
     expect(formatEthValue(Number.NaN)).toBe(nb('0~ETH'));
   });
 
-  it('formatCSTValue: grouped card CST with 0–2 decimals', () => {
+  it('formatCSTValue: grouped card CST with 2 decimals, none when whole', () => {
     expect(formatCSTValue(60872.26)).toBe(nb('60,872.26~CST'));
     expect(formatCSTValue(1000)).toBe(nb('1,000~CST'));
     expect(formatCSTValue(1000, 'uk')).toBe(nb('1~000~CST'));
