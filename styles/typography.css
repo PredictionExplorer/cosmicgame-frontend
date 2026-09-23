@@ -213,9 +213,16 @@
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  /*
+   * In a narrow column (a two-up stat grid on a phone) a long uppercase word
+   * can be wider than its label: hyphenate it at a syllable rather than
+   * letting overflow-wrap chop it mid-syllable (SELECTIO / N).
+   */
+  hyphens: auto;
+  overflow-wrap: break-word;
 
   @media (width < 40rem) {
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
   }
 
   &:where(:lang(zh), :lang(ja), :lang(ko)) {
