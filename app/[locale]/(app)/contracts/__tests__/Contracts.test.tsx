@@ -367,7 +367,9 @@ describe('Contracts', () => {
 
     render(<Contracts />);
 
-    await waitFor(() => expect(screen.getByText('0%')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getAllByText('common.status.unavailable').length).toBeGreaterThan(0),
+    );
     expect(screen.queryByText('Infinity%')).not.toBeInTheDocument();
     expect(screen.queryByText(/Infinity/)).not.toBeInTheDocument();
     expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
@@ -392,7 +394,9 @@ describe('Contracts', () => {
 
     render(<Contracts />);
 
-    await waitFor(() => expect(screen.getByText('0%')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getAllByText('common.status.unavailable').length).toBeGreaterThan(0),
+    );
     expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
   });
 
@@ -428,6 +432,52 @@ describe('Contracts', () => {
       expect(screen.getByText('125.1235 CST')).toBeInTheDocument();
     });
     expect(readParticipationCstPreview.mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('pauses the live CST preview while the tab is hidden and resumes when shown', async () => {
+    const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
+    liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
+    liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = 10;
+    let hidden = false;
+    const hiddenSpy = jest.spyOn(document, 'hidden', 'get').mockImplementation(() => hidden);
+    const readParticipationCstPreview = jest.fn(async () => BigInt('100000000000000000000'));
+
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseContractNoSigner.mockReturnValue({
+      read: {
+        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
+        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(100n),
+        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
+        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
+        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
+        getBidCstRewardAmount: readParticipationCstPreview,
+        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
+        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
+        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
+        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
+      },
+    });
+
+    try {
+      render(<Contracts />);
+      await waitFor(() => expect(readParticipationCstPreview.mock.calls.length).toBeGreaterThan(1));
+
+      hidden = true;
+      await new Promise((resolve) => setTimeout(resolve, 40));
+      const readsWhileHidden = readParticipationCstPreview.mock.calls.length;
+      await new Promise((resolve) => setTimeout(resolve, 60));
+      expect(readParticipationCstPreview.mock.calls.length).toBe(readsWhileHidden);
+
+      hidden = false;
+      document.dispatchEvent(new Event('visibilitychange'));
+      await waitFor(() =>
+        expect(readParticipationCstPreview.mock.calls.length).toBeGreaterThan(readsWhileHidden),
+      );
+    } finally {
+      hiddenSpy.mockRestore();
+      delete liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__;
+      delete liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__;
+    }
   });
 
   it('renders stellar selection configuration cards', () => {

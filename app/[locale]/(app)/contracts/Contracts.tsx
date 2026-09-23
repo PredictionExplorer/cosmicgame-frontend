@@ -34,7 +34,11 @@ const sectionFade = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
-const CST_REWARD_PREVIEW_REFRESH_MS = 1_000;
+/**
+ * The preview grows with the seconds since the last gesture, so it stays live, but at a pace
+ * that does not hammer the RPC from every open tab; hidden tabs stop polling entirely.
+ */
+const CST_REWARD_PREVIEW_REFRESH_MS = 2_000;
 
 interface LiveCstPreviewTestGlobals {
   expect?: unknown;
@@ -59,6 +63,12 @@ function percentFromDivisor(divisor: unknown): number | null {
   return 100 / value;
 }
 
+/** A positive finite number from a contract read; `null` (unknown) for anything else. */
+function positiveOrNull(value: unknown): number | null {
+  const numeric = typeof value === 'bigint' ? Number(value) : Number(value ?? Number.NaN);
+  return Number.isFinite(numeric) && numeric > 0 ? numeric : null;
+}
+
 function getLiveCstPreviewRefreshMs(): number {
   const testInterval = (globalThis as LiveCstPreviewTestGlobals)
     .__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__;
@@ -75,11 +85,12 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [charityAddress, setCharityAddress] = useState('');
-  const [priceIncrease, setPriceIncrease] = useState(0);
-  const [timeIncrease, setTimeIncrease] = useState(0);
-  const [timeIncrement, setTimeIncrement] = useState(0);
-  const [initialIncrement, setInitialIncrement] = useState(0);
-  const [msgMaxLen, setMsgMaxLen] = useState(0);
+  // `null` until each read succeeds, so a failed read renders as unknown rather than 0.
+  const [priceIncrease, setPriceIncrease] = useState<number | null>(null);
+  const [timeIncrease, setTimeIncrease] = useState<number | null>(null);
+  const [timeIncrement, setTimeIncrement] = useState<number | null>(null);
+  const [initialIncrement, setInitialIncrement] = useState<number | null>(null);
+  const [msgMaxLen, setMsgMaxLen] = useState<number | null>(null);
   const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState<number | null>(null);
   const [cstDutchAuctionDurations, setCstDutchAuctionDurations] = useState({
     AuctionDuration: 0,
@@ -108,7 +119,7 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
 
     safeCall(async () => {
       const v = await cosmicGameContract.read.bidMessageLengthMaxLimit?.();
-      setMsgMaxLen(Number(v ?? 0));
+      setMsgMaxLen(positiveOrNull(v));
     }, 'bidMessageLengthMaxLimit');
 
     safeCall(async () => {
@@ -124,8 +135,10 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     }, 'mainPrizeTimeIncrementIncreaseDivisor');
 
     safeCall(async () => {
-      const v = await cosmicGameContract.read.mainPrizeTimeIncrementInMicroSeconds?.();
-      setTimeIncrement(Number(v ?? 0) / 1_000_000);
+      const v = positiveOrNull(
+        await cosmicGameContract.read.mainPrizeTimeIncrementInMicroSeconds?.(),
+      );
+      setTimeIncrement(v === null ? null : v / 1_000_000);
     }, 'mainPrizeTimeIncrementInMicroSeconds');
 
     // Read the resolved initial duration (seconds) directly from the contract instead of the
@@ -133,7 +146,7 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     // `initialDurationUntilMainPrizeDivisor` and is not seconds.
     safeCall(async () => {
       const v = await cosmicGameContract.read.getInitialDurationUntilMainPrize?.();
-      setInitialIncrement(Number(v ?? 0));
+      setInitialIncrement(positiveOrNull(v));
     }, 'getInitialDurationUntilMainPrize');
 
     safeCall(async () => {
@@ -200,18 +213,37 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       }
     };
 
-    const scheduleNextRefresh = () => {
-      if (cancelled) return;
+    // One refresh-then-wait chain at a time; it stops while the tab is hidden and
+    // restarts with a fresh read when the tab becomes visible again.
+    let polling = false;
+    const tick = async () => {
+      await refreshCstRewardPreview();
+      if (cancelled || document.hidden) {
+        polling = false;
+        return;
+      }
       timeoutId = window.setTimeout(() => {
-        void refreshCstRewardPreview().finally(scheduleNextRefresh);
+        timeoutId = null;
+        void tick();
       }, getLiveCstPreviewRefreshMs());
     };
+    const startPolling = () => {
+      if (polling || cancelled) return;
+      polling = true;
+      void tick();
+    };
 
-    if (shouldScheduleLiveCstPreviewTimer()) {
-      void refreshCstRewardPreview().finally(scheduleNextRefresh);
+    const liveTimers = shouldScheduleLiveCstPreviewTimer();
+    if (liveTimers) {
+      startPolling();
     } else {
       void refreshCstRewardPreview();
     }
+
+    const handleVisibilityChange = () => {
+      if (liveTimers && !document.hidden) startPolling();
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     const handleGesturePlaced = () => {
       void refreshCstRewardPreview();
@@ -221,6 +253,7 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     return () => {
       cancelled = true;
       if (timeoutId !== null) window.clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('cosmic:gesture-placed', handleGesturePlaced);
     };
   }, [cosmicGameContract]);
@@ -301,7 +334,7 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             timeIncrement={timeIncrement}
             cstRewardPerBid={cstRewardAmountForBidding}
             maxMessageLength={msgMaxLen}
-            claimTimeout={data?.TimeoutClaimPrize ?? 0}
+            claimTimeout={positiveOrNull(data?.TimeoutClaimPrize)}
             initialIncrement={initialIncrement}
             loading={loading}
           />

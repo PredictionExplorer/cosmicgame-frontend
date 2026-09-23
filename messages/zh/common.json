@@ -47,7 +47,8 @@
     "loadingEllipsis": "加载中…",
     "loadingDots": "加载中…",
     "noData": "暂无数据",
-    "nothingHere": "暂无内容"
+    "nothingHere": "暂无内容",
+    "unavailable": "暂不可用"
   },
   "actions": {
     "copyAddress": "复制地址",

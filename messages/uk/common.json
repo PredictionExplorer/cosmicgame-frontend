@@ -47,7 +47,8 @@
     "loadingEllipsis": "Завантаження…",
     "loadingDots": "Завантаження…",
     "noData": "Немає даних.",
-    "nothingHere": "Тут поки нічого немає"
+    "nothingHere": "Тут поки нічого немає",
+    "unavailable": "Недоступно"
   },
   "actions": {
     "copyAddress": "Копіювати адресу",
