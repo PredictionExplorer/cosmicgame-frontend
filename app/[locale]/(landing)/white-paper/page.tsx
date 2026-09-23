@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { Download } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
@@ -14,19 +14,23 @@ import {
 import { Link } from '@/i18n/navigation';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale } = await params;
   setRequestLocale(locale);
   const { metadata } = getWhitePaperContent(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
-  return createMetadata(
+  return createPageMetadata(
+    parent,
     t('whitePaper.title'),
     t('whitePaper.description'),
     undefined,

@@ -1,5 +1,6 @@
 import zhMeta from '@/messages/zh/meta.json';
 import { expectedLanguageAlternates } from '@/test-utils/i18n';
+import { resolvingMetadata } from '@/test-utils/metadata';
 
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
@@ -36,7 +37,10 @@ describe('Sprint 6 route metadata', () => {
   it.each(localizedRoutes)(
     '%s emits zh canonical, hreflang, and OG locale',
     async (path, build) => {
-      const metadata = await build({ params: Promise.resolve({ locale: 'zh' }) });
+      const metadata = await build(
+        { params: Promise.resolve({ locale: 'zh' }) },
+        resolvingMetadata(),
+      );
       expect(metadata.alternates).toEqual({
         canonical: `${APP_ORIGIN}/zh${path}`,
         languages: expectedLanguageAlternates(APP_ORIGIN, path),

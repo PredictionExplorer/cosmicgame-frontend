@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { documentTitleOf } from '@/test-utils/metadata';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import Page, { generateMetadata } from '../page';
@@ -49,7 +51,9 @@ describe('app/faq/page.tsx', () => {
   describe('metadata', () => {
     it('has the correct title', async () => {
       const metadata = await generateMetadata(pageProps);
-      expect(metadata.title).toBe('Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol');
+      expect(documentTitleOf(metadata)).toBe(
+        'Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol',
+      );
     });
 
     it('has the correct description', async () => {

@@ -37,6 +37,7 @@
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "white-paper:pdf": "tsx scripts/generate-white-paper-pdf.ts",
     "og:fonts": "tsx scripts/build-og-fonts.ts",
+    "seo:share-check": "tsx scripts/share-metadata-check.ts",
     "prepare": "husky"
   },
   "dependencies": {

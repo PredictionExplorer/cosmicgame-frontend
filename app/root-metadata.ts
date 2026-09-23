@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { SITE_NAME, X_HANDLE } from '@/utils/seo';
 
 // Browsers cache favicons separately from normal HTTP cache entries and per
 // origin. Increment this value whenever either favicon asset is replaced.
@@ -78,36 +79,20 @@ export function createRootMetadata(
     },
     openGraph: {
       type: 'website',
-      siteName: copy.defaultTitle,
+      siteName: SITE_NAME,
       title: copy.defaultOgTitle,
       description: copy.defaultDescription,
       locale: 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@CosmicSignature',
+      site: X_HANDLE,
       title: copy.defaultOgTitle,
       description: copy.defaultDescription,
     },
-    keywords: [
-      'Cosmic Signature',
-      'NFT',
-      'procedural art protocol',
-      'Arbitrum',
-      'Ethereum',
-      'generative art',
-      'three-body problem',
-      'anchoring',
-      'CC0',
-      'formally verified',
-      'on-chain art',
-      'public goods',
-      'Protocol Guild',
-      'ERC-721',
-      'RandomWalkNFT',
-      'Cosmic Signature CST Token',
-      'CST',
-    ],
+    // No site-wide `keywords`: one English list served on every locale's
+    // pages helped no search engine, and the landing home sets its own
+    // localized list (content/landing).
   };
 }
 

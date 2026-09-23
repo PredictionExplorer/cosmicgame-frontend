@@ -1,3 +1,5 @@
+import { documentTitleOf, resolvingMetadata } from '@/test-utils/metadata';
+
 import { getCstInfoSeed, getDashboardInfoSeed } from '@/services/api/server';
 
 import { render, screen } from '@/test-utils';
@@ -87,9 +89,9 @@ describe('experimental UI server page', () => {
 
 describe('experimental UI metadata', () => {
   it('is self-canonical and excluded from search indexes', async () => {
-    const metadata = await generateMetadata(englishProps);
+    const metadata = await generateMetadata(englishProps, resolvingMetadata());
 
-    expect(metadata.title).toBe('Experimental UI | Cosmic Signature');
+    expect(documentTitleOf(metadata)).toBe('Experimental UI | Cosmic Signature');
     expect(metadata.robots).toEqual(
       expect.objectContaining({
         index: false,
@@ -100,11 +102,12 @@ describe('experimental UI metadata', () => {
   });
 
   it('localizes the Chinese title and canonical path', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'zh' }),
-    });
+    const metadata = await generateMetadata(
+      { params: Promise.resolve({ locale: 'zh' }) },
+      resolvingMetadata(),
+    );
 
-    expect(metadata.title).toBe('实验界面 · Cosmic Signature');
+    expect(documentTitleOf(metadata)).toBe('实验界面 · Cosmic Signature');
     expect(String(metadata.alternates?.canonical)).toMatch(/\/zh\/experimental-ui$/);
   });
 });

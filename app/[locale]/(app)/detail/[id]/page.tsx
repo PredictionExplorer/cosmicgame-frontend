@@ -101,9 +101,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     notFound();
   }
 
-  return createMetadata(title, description, tokenImageUrl(tokenInfo?.Seed), '/detail/' + id, {
-    locale,
-  });
+  // The share image is the co-located artwork card (./opengraph-image.tsx):
+  // a 1200×630 PNG of the piece on its black plate, never the multi-MB source.
+  return createMetadata(title, description, undefined, '/detail/' + id, { locale });
 }
 
 export default async function Page({ params }: PageProps) {

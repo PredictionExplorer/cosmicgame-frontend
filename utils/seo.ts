@@ -1,10 +1,23 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { languageAlternates } from '@/lib/hreflang';
 
 export type CanonicalHost = 'app' | 'landing';
+
+/** The brand as every share card, `og:site_name`, and tab title spells it, in every locale. */
+export const SITE_NAME = 'Cosmic Signature';
+
+/** The protocol's X account, emitted as `twitter:site` on every page. */
+export const X_HANDLE = '@CosmicSignature';
+
+/**
+ * Joins a page title to the brand in the document `<title>`. One separator
+ * site-wide: the page name leads so a crowded tab strip still tells tabs
+ * apart, and the brand closes every title exactly once.
+ */
+export const TITLE_BRAND_SEPARATOR = ' · ';
 
 const CANONICAL_ORIGINS: Record<CanonicalHost, string> = {
   app: APP_ORIGIN,
@@ -13,7 +26,7 @@ const CANONICAL_ORIGINS: Record<CanonicalHost, string> = {
 const OPEN_GRAPH_IMAGE_WIDTH = 1200;
 const OPEN_GRAPH_IMAGE_HEIGHT = 630;
 
-interface MetadataOptions {
+export interface MetadataOptions {
   canonicalHost?: CanonicalHost;
   /**
    * Public indexable pages should be explicit about snippets/previews. Private,
@@ -25,40 +38,52 @@ interface MetadataOptions {
    * Locale of the page being rendered (from `params.locale`). When set
    * together with `path`, the canonical points at the locale's own URL and
    * hreflang alternates (every locale, its aliases, `x-default`) are emitted.
-   *
-   * PROGRESSIVE ACTIVATION (docs/i18n/progress-zh.md, Sprint 0 note): pages that
-   * have not been translated yet must NOT pass this — their `/zh` variant is
-   * an English duplicate, so it should keep canonicalizing to the English URL
-   * and stay out of hreflang. Pass the locale as each page's translation
-   * ships (Sprints 2-7).
    */
   locale?: string;
+  /** `og:type`. Long-form editorial pages are `article`; everything else is a `website` page. */
+  ogType?: 'website' | 'article';
 }
 
 function normalizeCanonicalPath(path: string): string {
-  const [pathname = '/', query = ''] = path.split('?');
-  const prefixedPath = pathname === '' ? '/' : pathname.startsWith('/') ? pathname : `/${pathname}`;
-  const normalizedPath =
-    prefixedPath.length > 1 && prefixedPath.endsWith('/')
-      ? prefixedPath.replace(/\/+$/, '')
-      : prefixedPath;
-
-  if (!query) return normalizedPath;
-
   // Keep metadata canonicals clean. View-state query parameters are handled by
   // the app, but crawlers should consolidate signals on the base URL.
-  return normalizedPath;
+  const [pathname = '/'] = path.split('?');
+  const prefixedPath = pathname === '' ? '/' : pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return prefixedPath.length > 1 && prefixedPath.endsWith('/')
+    ? prefixedPath.replace(/\/+$/, '')
+    : prefixedPath;
 }
 
 /**
- * Builds App Router Metadata with OpenGraph + Twitter tags and an
- * optional canonical URL.
+ * The document title for a page title: `FAQ · Cosmic Signature`. A title that
+ * already names the brand (the home pages, "What Is Cosmic Signature?") is
+ * used as is, so no tab ever repeats it.
+ */
+export function documentTitle(title: string): string {
+  return title.includes(SITE_NAME) ? title : `${title}${TITLE_BRAND_SEPARATOR}${SITE_NAME}`;
+}
+
+/**
+ * Builds a page's App Router Metadata: title, description, canonical and
+ * hreflang alternates, robots, and complete Open Graph / Twitter blocks.
  *
- * When `imageUrl` is omitted, no `og:image` / `twitter:image` is set;
- * Next.js then resolves the nearest `opengraph-image.tsx` PNG. Pass
- * `imageUrl` only when a page has its own asset (e.g. `/detail/[id]`
- * surfaces the actual NFT PNG). Pass `path` (e.g. "/faq") to add a
- * self-referencing canonical URL.
+ * Next.js merges metadata SHALLOWLY: a page that returns `openGraph` replaces
+ * its layout's whole `openGraph` object. So every field the layouts set once
+ * (`og:site_name`, `og:type`, `twitter:site`, the card type) is emitted here
+ * again for every page; nothing is left to inheritance except the image.
+ *
+ * Images:
+ *   - `imageUrl` set: that asset is the page's share image (1200×630).
+ *   - Omitted, and an `opengraph-image.tsx` sits next to the page: the file
+ *     convention fills `og:image` / `twitter:image` after this object merges.
+ *   - Omitted, and no co-located card: use `createPageMetadata` instead, which
+ *     carries the nearest ancestor's card over; a bare `openGraph` object here
+ *     would otherwise drop it (`app/[locale]/(app)/__tests__/share-metadata.test.ts`
+ *     enforces the choice per route).
+ *
+ * `title` is the page title without the brand; the document `<title>` gets
+ * the brand suffix (`documentTitle`), while `og:title` stays bare because
+ * `og:site_name` already names the site in every preview.
  */
 export function createMetadata(
   title: string,
@@ -67,9 +92,26 @@ export function createMetadata(
   path?: string,
   options: MetadataOptions = {},
 ): Metadata {
-  const openGraph: NonNullable<Metadata['openGraph']> = { title, description };
+  const origin = CANONICAL_ORIGINS[options.canonicalHost ?? 'app'];
+  const canonicalPath = path === undefined ? undefined : normalizeCanonicalPath(path);
+  const canonical =
+    canonicalPath === undefined
+      ? undefined
+      : options.locale === undefined
+        ? `${origin}${canonicalPath}`
+        : localeHref(origin, canonicalPath, options.locale);
+
+  const openGraph: NonNullable<Metadata['openGraph']> = {
+    type: options.ogType ?? 'website',
+    siteName: SITE_NAME,
+    title,
+    description,
+    ...(canonical !== undefined ? { url: canonical } : {}),
+    ...(options.locale !== undefined ? { locale: getLocaleConfig(options.locale).ogLocale } : {}),
+  };
   const twitter: NonNullable<Metadata['twitter']> = {
     card: 'summary_large_image',
+    site: X_HANDLE,
     title,
     description,
   };
@@ -86,13 +128,9 @@ export function createMetadata(
     twitter.images = [imageUrl];
   }
 
-  if (options.locale !== undefined) {
-    openGraph.locale = getLocaleConfig(options.locale).ogLocale;
-  }
-
   const index = options.index ?? true;
   const metadata: Metadata = {
-    title,
+    title: { absolute: documentTitle(title) },
     description,
     openGraph,
     twitter,
@@ -118,19 +156,38 @@ export function createMetadata(
         },
   };
 
-  if (path !== undefined) {
-    const origin = CANONICAL_ORIGINS[options.canonicalHost ?? 'app'];
-    const normalizedPath = normalizeCanonicalPath(path);
-
-    if (options.locale !== undefined) {
-      metadata.alternates = {
-        canonical: localeHref(origin, normalizedPath, options.locale),
-        languages: languageAlternates(origin, normalizedPath),
-      };
-    } else {
-      metadata.alternates = { canonical: `${origin}${normalizedPath}` };
-    }
+  if (canonicalPath !== undefined) {
+    metadata.alternates =
+      options.locale !== undefined
+        ? { canonical, languages: languageAlternates(origin, canonicalPath) }
+        : { canonical };
   }
 
   return metadata;
+}
+
+/**
+ * `createMetadata` for a page WITHOUT its own `opengraph-image.tsx`: the page
+ * keeps the share card of the nearest ancestor segment (the route group's
+ * brand card, the Learn card, ...), which the shallow `openGraph` merge would
+ * otherwise discard. Pass the `parent` argument Next.js hands to
+ * `generateMetadata`:
+ *
+ *   export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata) {
+ *     return createPageMetadata(parent, t('faq.title'), t('faq.description'), undefined, '/faq', { locale });
+ *   }
+ *
+ * `twitter:image` follows `og:image` (Next.js fills it from Open Graph when
+ * the Twitter block names none). An explicit `imageUrl` wins over the parent.
+ */
+export async function createPageMetadata(
+  parent: ResolvingMetadata,
+  ...args: Parameters<typeof createMetadata>
+): Promise<Metadata> {
+  const metadata = createMetadata(...args);
+  if (args[2] !== undefined) return metadata;
+
+  const images = (await parent).openGraph?.images;
+  if (!images || images.length === 0) return metadata;
+  return { ...metadata, openGraph: { ...metadata.openGraph, images } };
 }

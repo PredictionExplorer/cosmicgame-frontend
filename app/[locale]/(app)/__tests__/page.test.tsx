@@ -1,4 +1,5 @@
 import { expectedLanguageAlternates } from '@/test-utils/i18n';
+import { documentTitleOf } from '@/test-utils/metadata';
 
 import {
   getCstInfoSeed,
@@ -217,7 +218,7 @@ describe('generateMetadata', () => {
 
     const metadata = await generateMetadata(pageProps);
 
-    expect(metadata.title).toBe('Cosmic Signature');
+    expect(documentTitleOf(metadata)).toBe('Cosmic Signature');
     expect(metadata.description).toContain('0.6250 ETH Cycle Reserve');
     expect(metadata.openGraph).toEqual(expect.objectContaining({ locale: 'en_US' }));
   });

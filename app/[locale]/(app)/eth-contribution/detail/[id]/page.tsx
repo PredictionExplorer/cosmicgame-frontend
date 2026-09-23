@@ -1,19 +1,19 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import EthDonationDetailPage from './EthDonationDetailPage';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string; id: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string; id: string }> },
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale, id } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
-  return createMetadata(
+  return createPageMetadata(
+    parent,
     t('ethContributionDetail.title'),
     t('ethContributionDetail.description'),
     undefined,

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
@@ -8,7 +8,7 @@ import { QuizRunner } from '@/components/quiz/QuizRunner';
 import { Link } from '@/i18n/navigation';
 import { LANDING_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage } from '@/utils/jsonLd';
-import { createMetadata } from '@/utils/seo';
+import { createPageMetadata } from '@/utils/seo';
 
 interface PageProps {
   params: Promise<{ locale: string; tier: string }>;
@@ -21,13 +21,17 @@ export function generateStaticParams() {
   return QUIZ_TIER_IDS.map((tier) => ({ tier }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { locale, tier } = await params;
   setRequestLocale(locale);
   if (!isQuizTierId(tier)) return {};
   const t = await getTranslations({ locale, namespace: 'meta' });
 
-  return createMetadata(
+  return createPageMetadata(
+    parent,
     t(`quiz.tiers.${tier}.title`),
     t(`quiz.tiers.${tier}.description`),
     undefined,

@@ -1,3 +1,5 @@
+import { resolvingMetadata } from '@/test-utils/metadata';
+
 import { appSitemapRoutes, dynamicNoindexRoutePrefixes, noindexAppRoutes } from '@/lib/seoRoutes';
 import { createMetadata } from '@/utils/seo';
 
@@ -94,22 +96,31 @@ describe('SEO route policy', () => {
 
   it('marks wallet-personal routes as noindex', async () => {
     expectNoIndex(
-      await generateRecipientHistoryMetadata({
-        params: Promise.resolve({ locale: 'en' }),
-      }),
+      await generateRecipientHistoryMetadata(
+        {
+          params: Promise.resolve({ locale: 'en' }),
+        },
+        resolvingMetadata(),
+      ),
     );
     expectNoIndex(
-      await generateTransferCstMetadata({
-        params: Promise.resolve({ locale: 'en' }),
-      }),
+      await generateTransferCstMetadata(
+        {
+          params: Promise.resolve({ locale: 'en' }),
+        },
+        resolvingMetadata(),
+      ),
     );
   });
 
   it('marks the URL-only CST outreach transfer route as noindex and out of sitemap', async () => {
     expectNoIndex(
-      await generateCstOutreachTransferMetadata({
-        params: Promise.resolve({ locale: 'en' }),
-      }),
+      await generateCstOutreachTransferMetadata(
+        {
+          params: Promise.resolve({ locale: 'en' }),
+        },
+        resolvingMetadata(),
+      ),
     );
     expect(noindexAppRoutes).toEqual(
       expect.arrayContaining([

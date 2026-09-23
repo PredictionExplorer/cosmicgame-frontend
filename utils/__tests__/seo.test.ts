@@ -1,28 +1,84 @@
 import { expectedLanguageAlternates } from '@/test-utils/i18n';
+import { PARENT_SHARE_IMAGE, documentTitleOf, resolvingMetadata } from '@/test-utils/metadata';
 
-import { createMetadata } from '@/utils/seo';
+import {
+  SITE_NAME,
+  TITLE_BRAND_SEPARATOR,
+  X_HANDLE,
+  createMetadata,
+  createPageMetadata,
+  documentTitle,
+} from '@/utils/seo';
 
-describe('createMetadata', () => {
-  it('returns title and description at the top level', () => {
-    const result = createMetadata('My Title', 'My Description');
-
-    expect(result.title).toBe('My Title');
-    expect(result.description).toBe('My Description');
+describe('documentTitle', () => {
+  it('closes a page title with the brand', () => {
+    expect(documentTitle('FAQ')).toBe('FAQ · Cosmic Signature');
+    expect(TITLE_BRAND_SEPARATOR).toBe(' · ');
   });
 
-  // When no `imageUrl` is provided we intentionally omit `images` from
-  // both OG and Twitter blocks so Next.js can resolve the file-system
-  // `opengraph-image.tsx` PNG. Setting an SVG fallback here is what
-  // broke Discord / Slack / X / Facebook / LinkedIn previews previously.
+  it('never repeats the brand when the page title already names it', () => {
+    expect(documentTitle('Cosmic Signature')).toBe('Cosmic Signature');
+    expect(documentTitle('What Is Cosmic Signature?')).toBe('What Is Cosmic Signature?');
+    expect(documentTitle('Twisted Mind · Cosmic Signature #25')).toBe(
+      'Twisted Mind · Cosmic Signature #25',
+    );
+  });
+});
+
+describe('createMetadata', () => {
+  it('leads the document title with the page and keeps og:title brand-free', () => {
+    const result = createMetadata('My Title', 'My Description');
+
+    expect(result.title).toEqual({ absolute: 'My Title · Cosmic Signature' });
+    expect(documentTitleOf(result)).toBe('My Title · Cosmic Signature');
+    expect(result.description).toBe('My Description');
+    expect(result.openGraph).toEqual(expect.objectContaining({ title: 'My Title' }));
+    expect(result.twitter).toEqual(expect.objectContaining({ title: 'My Title' }));
+  });
+
+  // Next.js merges `openGraph` / `twitter` shallowly, so every page must
+  // re-emit what the layouts set; otherwise Discord, Telegram and Slack drop
+  // the provider line and X the account attribution on every inner page.
+  it('always emits og:site_name, og:type and twitter:site', () => {
+    const result = createMetadata('Title', 'Desc');
+
+    expect(result.openGraph).toEqual(
+      expect.objectContaining({ siteName: SITE_NAME, type: 'website' }),
+    );
+    expect(result.twitter).toEqual(
+      expect.objectContaining({ site: X_HANDLE, card: 'summary_large_image' }),
+    );
+    expect(SITE_NAME).toBe('Cosmic Signature');
+    expect(X_HANDLE).toBe('@CosmicSignature');
+  });
+
+  it('marks editorial pages as articles', () => {
+    const result = createMetadata('Article', 'Desc', undefined, '/learn/x', { ogType: 'article' });
+    expect(result.openGraph).toEqual(expect.objectContaining({ type: 'article' }));
+  });
+
+  it('sets og:url to the canonical URL', () => {
+    expect(createMetadata('T', 'D', undefined, '/faq').openGraph).toEqual(
+      expect.objectContaining({ url: 'https://app.cosmicsignature.com/faq' }),
+    );
+    expect(
+      createMetadata('T', 'D', undefined, '/learn', { canonicalHost: 'landing', locale: 'ja' })
+        .openGraph,
+    ).toEqual(expect.objectContaining({ url: 'https://cosmicsignature.com/ja/learn' }));
+    expect(createMetadata('T', 'D').openGraph).not.toHaveProperty('url');
+  });
+
+  // Without `imageUrl` the co-located `opengraph-image.tsx` PNG fills
+  // og:image after this object merges; an SVG fallback here is what broke
+  // Discord / Slack / X / Facebook / LinkedIn previews before.
   it('omits images when no imageUrl is provided so file-system OG can resolve', () => {
     const result = createMetadata('Title', 'Desc');
 
-    expect(result.openGraph).toBeDefined();
     expect((result.openGraph as { images?: unknown }).images).toBeUndefined();
     expect((result.twitter as { images?: unknown }).images).toBeUndefined();
   });
 
-  it('uses custom image URL when provided', () => {
+  it('uses a custom image URL when provided', () => {
     const customUrl = 'https://example.com/custom.png';
     const result = createMetadata('Title', 'Desc', customUrl);
 
@@ -31,82 +87,38 @@ describe('createMetadata', () => {
         images: [{ url: customUrl, width: 1200, height: 630, alt: 'Title' }],
       }),
     );
-    expect(result.twitter).toEqual(expect.objectContaining({ images: [customUrl] }));
-  });
-
-  it('includes openGraph title and description', () => {
-    const result = createMetadata('Page Title', 'Page Desc');
-
-    expect(result.openGraph).toEqual(
-      expect.objectContaining({ title: 'Page Title', description: 'Page Desc' }),
-    );
-  });
-
-  it('includes twitter meta with summary_large_image card', () => {
-    const result = createMetadata('Title', 'Desc', 'https://img.com/pic.png');
-
     expect(result.twitter).toEqual({
       card: 'summary_large_image',
+      site: '@CosmicSignature',
       title: 'Title',
       description: 'Desc',
-      images: ['https://img.com/pic.png'],
+      images: [customUrl],
     });
-  });
-
-  it('twitter card defaults to summary_large_image even without an image', () => {
-    const result = createMetadata('Title', 'Desc');
-
-    expect(result.twitter).toEqual(
-      expect.objectContaining({ card: 'summary_large_image', title: 'Title' }),
-    );
   });
 
   it('does not include alternates when path is omitted', () => {
-    const result = createMetadata('Title', 'Desc');
-
-    expect(result.alternates).toBeUndefined();
+    expect(createMetadata('Title', 'Desc').alternates).toBeUndefined();
+    expect(createMetadata('T', 'D', undefined, undefined).alternates).toBeUndefined();
   });
 
-  it('includes canonical URL when path is provided', () => {
-    const result = createMetadata('Title', 'Desc', undefined, '/faq');
-
-    expect(result.alternates).toEqual({
+  it('includes canonical URLs for static, root and dynamic paths', () => {
+    expect(createMetadata('Title', 'Desc', undefined, '/faq').alternates).toEqual({
       canonical: 'https://app.cosmicsignature.com/faq',
     });
-  });
-
-  it('generates canonical for root path', () => {
-    const result = createMetadata('Title', 'Desc', undefined, '/');
-
-    expect(result.alternates).toEqual({
+    expect(createMetadata('Title', 'Desc', undefined, '/').alternates).toEqual({
       canonical: 'https://app.cosmicsignature.com/',
     });
-  });
-
-  it('generates canonical for dynamic paths', () => {
-    const result = createMetadata('Title', 'Desc', 'https://img.com/pic.png', '/detail/42');
-
-    expect(result.alternates).toEqual({
+    expect(createMetadata('Title', 'Desc', undefined, '/detail/42').alternates).toEqual({
       canonical: 'https://app.cosmicsignature.com/detail/42',
     });
   });
 
-  it('preserves both image and canonical when both are provided', () => {
-    const result = createMetadata('T', 'D', 'https://img.com/x.png', '/foo');
-
-    expect((result.openGraph as { images: unknown[] }).images).toEqual([
-      { url: 'https://img.com/x.png', width: 1200, height: 630, alt: 'T' },
-    ]);
-    expect((result.twitter as { images: string[] }).images).toEqual(['https://img.com/x.png']);
-    expect(result.alternates).toEqual({
-      canonical: 'https://app.cosmicsignature.com/foo',
-    });
-  });
-
-  it('normalizes non-root trailing slashes in canonical paths', () => {
-    const result = createMetadata('T', 'D', undefined, '/anchoring/');
-    expect(result.alternates).toEqual({
+  it('normalizes trailing slashes and strips query strings from canonical paths', () => {
+    expect(createMetadata('T', 'D', undefined, '/anchoring/').alternates).toEqual({
       canonical: 'https://app.cosmicsignature.com/anchoring',
+    });
+    expect(createMetadata('T', 'D', undefined, '/gallery?page=1&sort=newest').alternates).toEqual({
+      canonical: 'https://app.cosmicsignature.com/gallery',
     });
   });
 
@@ -140,71 +152,25 @@ describe('createMetadata', () => {
       canonical: 'https://app.cosmicsignature.com/uk/gallery',
       languages: expectedLanguageAlternates('https://app.cosmicsignature.com', '/gallery'),
     });
-    expect(result.alternates?.languages).toHaveProperty(
-      'uk',
-      'https://app.cosmicsignature.com/uk/gallery',
-    );
     expect(result.openGraph).toEqual(expect.objectContaining({ locale: 'uk_UA' }));
   });
 
-  it('strips query strings from canonical paths', () => {
-    const result = createMetadata('T', 'D', undefined, '/gallery?page=1&sort=newest');
-
-    expect(result.alternates).toEqual({
-      canonical: 'https://app.cosmicsignature.com/gallery',
-    });
-  });
-
-  it('echoes title and description into both openGraph and twitter blocks', () => {
-    const result = createMetadata('Page Title', 'Page Description');
-
-    expect(result.openGraph).toEqual(
-      expect.objectContaining({ title: 'Page Title', description: 'Page Description' }),
-    );
-    expect(result.twitter).toEqual(
-      expect.objectContaining({ title: 'Page Title', description: 'Page Description' }),
-    );
-  });
-
-  it('does not leak the openGraph object into the twitter object (no shared reference)', () => {
+  it('does not share one object between the openGraph and twitter blocks', () => {
     const result = createMetadata('T', 'D');
     expect(result.openGraph).not.toBe(result.twitter);
   });
 
-  // The intent of the imageless contract: route-level
-  // `opengraph-image.tsx` PNGs must not be overridden by a parent layout
-  // metadata that defaults `images`. This test pins that contract so a
-  // future "let's add a logo fallback" PR cannot reintroduce the bug.
-  it('omits images even when an empty-string imageUrl is somehow passed', () => {
-    const result = createMetadata('T', 'D', '');
-
-    // Empty string is `!== undefined`, so the contract is "use it" — but
-    // an empty src is meaningless to crawlers. We document the existing
-    // behavior here so any change is intentional.
-    expect((result.openGraph as { images: unknown[] }).images).toEqual([
-      { url: '', width: 1200, height: 630, alt: 'T' },
-    ]);
-  });
-
-  it('handles unicode characters in title and description', () => {
+  it('keeps unicode in titles and descriptions', () => {
     const result = createMetadata(
-      'Cosmic Signature \u2014 Cycle #42',
-      'Every gesture shapes the cycle\u2019s final Signature.',
+      'Cycle #42 — Allocations',
+      'Every gesture shapes the cycle’s final Signature.',
     );
-    expect(result.title).toContain('\u2014');
-    expect(result.description).toContain('\u2019');
-    expect((result.openGraph as { title: string }).title).toContain('\u2014');
-  });
-
-  it('omits canonical when path is explicitly undefined', () => {
-    const result = createMetadata('T', 'D', undefined, undefined);
-    expect(result.alternates).toBeUndefined();
+    expect(documentTitleOf(result)).toBe('Cycle #42 — Allocations · Cosmic Signature');
+    expect(result.description).toContain('’');
   });
 
   it('adds indexable robots directives by default', () => {
-    const result = createMetadata('T', 'D', undefined, '/faq');
-
-    expect(result.robots).toEqual({
+    expect(createMetadata('T', 'D', undefined, '/faq').robots).toEqual({
       index: true,
       follow: true,
       googleBot: {
@@ -218,15 +184,54 @@ describe('createMetadata', () => {
   });
 
   it('can mark thin or private pages as noindex,follow', () => {
-    const result = createMetadata('T', 'D', undefined, '/my-tokens', { index: false });
-
-    expect(result.robots).toEqual({
+    expect(createMetadata('T', 'D', undefined, '/my-tokens', { index: false }).robots).toEqual({
       index: false,
       follow: true,
-      googleBot: {
-        index: false,
-        follow: true,
-      },
+      googleBot: { index: false, follow: true },
     });
+  });
+});
+
+describe('createPageMetadata', () => {
+  it('carries the nearest ancestor share card over the shallow openGraph merge', async () => {
+    const result = await createPageMetadata(
+      resolvingMetadata(),
+      'Security',
+      'How the protocol is secured.',
+      undefined,
+      '/security',
+      { locale: 'en' },
+    );
+
+    expect(result.openGraph).toEqual(
+      expect.objectContaining({
+        title: 'Security',
+        siteName: 'Cosmic Signature',
+        type: 'website',
+        url: 'https://app.cosmicsignature.com/security',
+        images: [PARENT_SHARE_IMAGE],
+      }),
+    );
+    // twitter:image is filled from og:image by Next.js; the block itself names none.
+    expect((result.twitter as { images?: unknown }).images).toBeUndefined();
+    expect(result.twitter).toEqual(expect.objectContaining({ site: '@CosmicSignature' }));
+    expect(documentTitleOf(result)).toBe('Security · Cosmic Signature');
+  });
+
+  it('prefers an explicit image over the parent card', async () => {
+    const result = await createPageMetadata(
+      resolvingMetadata(),
+      'T',
+      'D',
+      'https://example.com/own.png',
+    );
+    expect((result.openGraph as { images: Array<{ url: string }> }).images[0]?.url).toBe(
+      'https://example.com/own.png',
+    );
+  });
+
+  it('leaves images unset when no ancestor resolved a card', async () => {
+    const result = await createPageMetadata(resolvingMetadata({}), 'T', 'D', undefined, '/x');
+    expect((result.openGraph as { images?: unknown }).images).toBeUndefined();
   });
 });

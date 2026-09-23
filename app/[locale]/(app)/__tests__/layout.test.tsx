@@ -59,7 +59,6 @@ describe('Root layout metadata (shared by both route groups)', () => {
   it('shares copy defaults while keeping host-specific origins', () => {
     expect(landingMetadata.title).toEqual(metadata.title);
     expect(landingMetadata.description).toBe(metadata.description);
-    expect(landingMetadata.keywords).toEqual(metadata.keywords);
     expect(landingViewport).toBe(viewport);
     expect(metadata.metadataBase).toEqual(new URL('https://app.cosmicsignature.com'));
     expect(landingMetadata.metadataBase).toEqual(new URL('https://cosmicsignature.com'));
@@ -143,12 +142,13 @@ describe('Root layout metadata (shared by both route groups)', () => {
     expect((metadata.description as string).length).toBeLessThanOrEqual(320);
   });
 
-  it('exposes a robust keywords array', () => {
-    expect(Array.isArray(metadata.keywords)).toBe(true);
-    const keywords = metadata.keywords as readonly string[];
-    expect(keywords).toEqual(
-      expect.arrayContaining(['Cosmic Signature', 'Arbitrum', 'Protocol Guild', 'CC0']),
-    );
+  // One English keyword list served on every locale helped no search engine
+  // and carried a blanket "formally verified" claim; the landing home sets
+  // its own localized list.
+  it('sets no site-wide keywords', async () => {
+    expect(metadata.keywords).toBeUndefined();
+    expect(landingMetadata.keywords).toBeUndefined();
+    expect((await generateMetadata(paramsFor('ja'))).keywords).toBeUndefined();
   });
 
   it('declares the same cache-busted SVG and ICO favicons for both hosts', () => {
