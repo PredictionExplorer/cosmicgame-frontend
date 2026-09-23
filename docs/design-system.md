@@ -40,8 +40,11 @@ complete colour; the table says which.
 Pick a tier instead of dimming text with an opacity modifier (`text-white/40`,
 `text-muted-foreground/60`). Opacity produced a different, usually failing, contrast in
 every palette. The retired classes `text-muted-foreground/40`, `/50`, `/60` and
-`text-white/40`, `/45` render in the subtle tier through an unlayered shim in
-`styles/global.css` until their call sites move to `text-subtle`.
+`text-white/40`, `/45` render in the subtle tier until their call sites move to
+`text-subtle`. The shim sits in the utilities layer of `styles/global.css`, after
+Tailwind's utilities and with the same specificity, so it replaces the base class while
+state variants on the same element (`hover:text-primary`, `group-hover:`, `data-[…]:`)
+still win.
 `--muted-foreground-subtle` is an alias of `--subtle-foreground`, and so is the utility
 `text-subtle-foreground`.
 
@@ -99,7 +102,11 @@ are tuned away from those palettes' accents.
 | `--track-compounding`                               | data-8 (neutral)                         |
 | `--method-eth`, `--method-eth-rwlk`, `--method-cst` | data-1, data-2, data-3                   |
 
-`--chart-1` to `--chart-5` are kept as aliases of `--data-1` to `--data-5`.
+`--chart-1` to `--chart-5` are kept as aliases of `--data-1` to `--data-5`; new charts
+name a data, track or method token instead. Where a class cannot reach (recharts `stroke`
+and `fill`, inline styles), import the colour from `lib/theme/dataColors.ts`:
+`GESTURE_METHOD_COLOR.eth` / `.ethRandomWalk` / `.cst`, or
+`gestureMethodColor(gesture.GestureType)`.
 
 ### Art
 
@@ -195,6 +202,12 @@ cuts, Onest) loads only on that locale's pages, through `CompanionFontFaces`
 (`components/theme/companion-fonts/`). To add a face, add a descriptor, a module and a
 loader entry. `lib/__tests__/fonts-policy.test.ts` checks that the three agree.
 
+None of the next/font calls declares a `fallback`. next/font appends that list to the
+family variable, and a generic family (`sans-serif`, `system-ui`, `monospace`) resolves
+per script from `lang`: ahead of `--cjk-font-stack` it caught every CJK glyph, and the
+locale's Noto cut never set body text. Each stack ends in its own generic family, after
+the CJK faces.
+
 ### Script rules
 
 - **CJK**: display at 600 with no tracking. Headings use line-height 1.25 and balanced
@@ -268,6 +281,18 @@ themselves.
 - `focus-ring-within`: ring a container while something inside it has keyboard focus.
 - `focus-ring-none`: the component draws its own indicator.
 
+The ring's colour, width and offset are set at rest, so on focus only the outline style
+changes; under `transition-all` the outline switches at once instead of growing from 0px.
+Two cases the automatic rules cannot see:
+
+- A link that absolutely positioned siblings paint over (a vignette, a hue strip, a
+  badge): put `focus-ring-within` on the container and `focus-ring-none` on the link, as
+  the gallery's featured plate does.
+- Segments of a rounded bar: round the end segments with `first:rounded-l-full` and
+  `last:rounded-r-full` instead of clipping the bar with `overflow-hidden`, and give
+  dimmed segments `focus-visible:opacity-100`, since opacity fades an element's outline
+  too.
+
 A bare `outline-none` no longer removes the keyboard indicator. Do not add
 `focus-visible:outline-none focus-visible:ring-*`; the shared outline already covers the
 element.
@@ -284,8 +309,9 @@ atmosphere gradient at its `--atmosphere-strength`, scaled by the variant.
 | `none`                | 0                        | Lights down: detail pages, the fullscreen viewer                       |
 
 The starfield (`--starfield`, the `starfield` utility) is about 40 static points in the
-palette's foreground colour. It is masked to the gutters outside the content column, so it
-never sits behind text. There is no canvas and no motion.
+palette's foreground colour. It is masked to the gutters outside the content column
+(`--starfield-column`, 100rem by default: the app home's control desk), so it never sits
+behind text. There is no canvas and no motion.
 
 ## Retired patterns
 
@@ -310,11 +336,13 @@ counts may only fall. When a change removes some, lower the baseline in the same
   control, status and data token against WCAG 2.2 AA on background, card, popover and muted,
   in all five palettes.
 - `styles/__tests__/token-usage.test.ts` is the ratchet on retired patterns.
-- `styles/__tests__/focus-ring.test.ts` checks the outline recipe and the forced-colors
-  fallback.
+- `styles/__tests__/focus-ring.test.ts` checks the outline recipe, the at-rest ring, the
+  `transition-all` rule and the forced-colors fallback.
 - `styles/__tests__/global-css.test.ts` checks the site-wide guarantees: the dimmed-text
-  shim, the display guard, the 12px floor, the CJK eyebrow reset, figure numerals, display
-  tokens and the content edge.
+  shim (compiled through Tailwind, to prove its layer, order and specificity), the display
+  guard, the 12px floor, the CJK eyebrow reset, figure faces and numerals, display tokens
+  and the content edge.
+- `lib/theme/__tests__/dataColors.test.ts` ties the chart colours to the method tokens.
 - `lib/__tests__/fonts-policy.test.ts`, `lib/__tests__/fonts.test.ts` and
   `lib/__tests__/display-font-coverage.test.ts` cover font delivery and script coverage.
 - `lib/theme/__tests__/config.test.ts` pins `THEME_CHROME` to the palettes.
