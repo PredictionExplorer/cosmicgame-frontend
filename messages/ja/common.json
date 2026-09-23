@@ -49,6 +49,44 @@
     "noData": "データがありません。",
     "nothingHere": "まだ何もありません"
   },
+  "liveStatus": {
+    "connecting": "接続中…",
+    "live": "ライブ",
+    "updated": "{age}に更新",
+    "reconnecting": "再接続中…",
+    "delayed": "更新が遅れています・最終更新{age}",
+    "offline": "オフライン",
+    "offlineDetail": "ネットワークに接続されていません。最終更新は{age}です。",
+    "clockCaveat": "その後、確定時刻が延長されている可能性があります。",
+    "age": {
+      "justNow": "たった今",
+      "seconds": "{count}秒前",
+      "minutes": "{count}分前",
+      "hours": "{count}時間前",
+      "days": "{count}日前"
+    },
+    "delayedShort": "更新が遅れています"
+  },
+  "attention": {
+    "menuLabel": "通知とサウンド",
+    "title": "通知とサウンド",
+    "intro": "ここにある項目は、オンにするまですべてオフです。選択はこのブラウザーに保存されます。",
+    "sound": {
+      "label": "自分の一筆の後に新しい一筆が入ったら音で知らせる",
+      "description": "他の参加者の一筆が自分の最新の一筆の後に入ると、短い音が鳴ります。ウォレットの接続と、このタブを開いておくことが必要です。"
+    },
+    "alert": {
+      "label": "確定前に通知",
+      "description": "サイクル確定時刻の前にブラウザーで通知します。このタブを開いたままにしてください。",
+      "minutes": "{minutes}分",
+      "blocked": "このサイトの通知はブロックされています。使うには、ブラウザーの設定で通知を許可してください。",
+      "unsupported": "このブラウザーは通知に対応していません。"
+    },
+    "tabTitle": {
+      "label": "タブのタイトルにカウントダウンを表示",
+      "description": "サイクルの最後の1時間、ブラウザーのタブに残り時間を表示します。"
+    }
+  },
   "actions": {
     "copyAddress": "アドレスをコピー",
     "addressCopied": "アドレスをコピーしました",

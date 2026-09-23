@@ -3,19 +3,24 @@
 import { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAccount, useConfig, useConnectorClient, useSwitchChain, useWalletClient } from 'wagmi';
-import { getConnectorClient } from '@wagmi/core';
-import { getChainId } from 'viem/actions';
-import type { Client } from 'viem';
 
 import { activeChain } from '@/config/chains';
 import { useNotify } from '@/hooks/useNotify';
+import {
+  REQUIRED_CHAIN_NAME,
+  ensureWalletOnRequiredChain,
+  getChainDisplayName,
+  type ChainGuardStatus,
+} from '@/lib/chainGuard';
 import { isUserRejection } from '@/utils/errors';
+
+export type { ChainGuardStatus } from '@/lib/chainGuard';
 
 export interface UseRequireChainOptions {
   /**
    * Message shown when the wallet could not be moved to the app chain.
-   * Defaults to the generic wrong-chain copy; flows with their own wording
-   * (the gesture form) pass a localized override.
+   * Defaults to the generic wrong-network copy naming the required chain;
+   * flows with their own wording (the gesture form) pass a localized override.
    */
   switchFailedMessage?: string;
 }
@@ -23,18 +28,28 @@ export interface UseRequireChainOptions {
 export interface RequireChainResult {
   /** Chain the app's contracts are deployed on. */
   requiredChainId: number;
+  /** Display name of the required chain ("Arbitrum One"). */
+  requiredChainName: string;
   /** Chain the connected wallet reports, or `null` when no wallet is connected. */
   connectedChainId: number | null;
+  /** Display name of the wallet's chain, or `null` when unknown or disconnected. */
+  connectedChainName: string | null;
   /** True only when a wallet IS connected and reports a different chain. */
   isWrongChain: boolean;
   isConnected: boolean;
+  /** True while a switch request is waiting in the wallet. */
+  isSwitching: boolean;
   /** Explicit, user-initiated switch. Resolves true once the wallet is on the app chain. */
   switchToRequiredChain: () => Promise<boolean>;
   /**
-   * Gate for contract writes. Re-reads the chain from the wallet client (not
-   * from wagmi's cached state) and, on a mismatch, asks the wallet to switch —
-   * which the user still has to approve. Resolves false, having already shown
-   * a notification, when the write must not proceed.
+   * Silent gate for contract writes: re-reads the chain from the wallet (not
+   * wagmi's cached state) and asks the wallet to switch on a mismatch. Shows
+   * nothing; the caller explains each status. `useTxFlow` uses this.
+   */
+  ensureChain: () => Promise<ChainGuardStatus>;
+  /**
+   * `ensureChain` plus the matching notification. Resolves false, having
+   * already shown a message, when the write must not proceed.
    */
   ensureCorrectChain: () => Promise<boolean>;
 }
@@ -45,41 +60,52 @@ export interface RequireChainResult {
  * `useActiveWeb3React().chainId` reads wagmi's connection state, which
  * resolves to a configured chain even when the wallet itself is elsewhere, so
  * callers cannot tell "on the app chain" from "wagmi assumed the app chain".
- * Every contract write should therefore go through `ensureCorrectChain()`
- * rather than trusting that value, and chain-sensitive UI should read
- * `isWrongChain`.
+ * Every contract write goes through `ensureChain()` / `ensureCorrectChain()`
+ * (useTxFlow and useContract's writes do it for you), and chain-sensitive UI
+ * reads `isWrongChain` — see `WrongNetworkChip` and `ChainGuard` in
+ * components/wallet.
  *
- * Nothing here switches networks on its own: `ensureCorrectChain` only runs
- * from an action the user already initiated, and the wallet still prompts.
+ * Nothing here switches networks on its own: the guards only run from an
+ * action the person already started, and the wallet still prompts.
  */
 export function useRequireChain(options: UseRequireChainOptions = {}): RequireChainResult {
   const t = useTranslations('toasts');
   const { notify } = useNotify();
   const config = useConfig();
   const { isConnected, chainId: walletChainId } = useAccount();
-  const { switchChainAsync } = useSwitchChain();
+  const { switchChainAsync, isPending: isSwitching = false } = useSwitchChain();
   const { data: connectorClient } = useConnectorClient({ chainId: activeChain.id });
   const { data: walletClient } = useWalletClient({ chainId: activeChain.id });
 
   const requiredChainId: number = activeChain.id;
-  const connectedChainId = walletChainId ?? null;
-  const isWrongChain =
-    Boolean(isConnected) && connectedChainId !== null && connectedChainId !== requiredChainId;
-  const switchFailedMessage = options.switchFailedMessage ?? t('network.wrongChain');
+  const connectedChainId = isConnected ? (walletChainId ?? null) : null;
+  const isWrongChain = connectedChainId !== null && connectedChainId !== requiredChainId;
+  const switchFailedMessage =
+    options.switchFailedMessage ?? t('network.wrongChain', { network: REQUIRED_CHAIN_NAME });
 
-  const requestSwitch = useCallback(async (): Promise<boolean> => {
-    try {
-      await switchChainAsync({ chainId: activeChain.id });
-      return true;
-    } catch (err) {
-      if (isUserRejection(err)) {
-        notify('info', t('walletTransactionCancelled'));
-      } else {
-        notify('error', switchFailedMessage);
-      }
-      return false;
-    }
-  }, [notify, switchChainAsync, switchFailedMessage, t]);
+  const switchTo = useCallback(
+    (chainId: number) => switchChainAsync({ chainId }),
+    [switchChainAsync],
+  );
+
+  const notifyStatus = useCallback(
+    (status: ChainGuardStatus) => {
+      if (status === 'rejected') notify('info', t('walletTransactionCancelled'));
+      else if (status === 'failed') notify('error', switchFailedMessage);
+      else if (status === 'no-wallet') notify('error', t('wallet.notReady'));
+    },
+    [notify, switchFailedMessage, t],
+  );
+
+  const ensureChain = useCallback(
+    () =>
+      ensureWalletOnRequiredChain(config, {
+        signer: connectorClient ?? walletClient,
+        fallbackChainId: walletChainId ?? null,
+        switchTo,
+      }),
+    [config, connectorClient, switchTo, walletChainId, walletClient],
+  );
 
   const switchToRequiredChain = useCallback(async (): Promise<boolean> => {
     if (!isConnected) {
@@ -87,53 +113,32 @@ export function useRequireChain(options: UseRequireChainOptions = {}): RequireCh
       return false;
     }
     if (!isWrongChain) return true;
-    return requestSwitch();
-  }, [isConnected, isWrongChain, notify, requestSwitch, t]);
-
-  const ensureCorrectChain = useCallback(async (): Promise<boolean> => {
-    let signer = connectorClient ?? walletClient;
-    if (!signer) {
-      // Deliberately unpinned: wagmi rejects a pinned `chainId` when the
-      // connector is not already on it (`ConnectorChainMismatchError`), and a
-      // client on the wallet's *current* chain is exactly what we need to
-      // detect the mismatch below.
-      try {
-        signer = ((await getConnectorClient(config)) as unknown as typeof signer) ?? undefined;
-      } catch {
-        signer = undefined;
-      }
-    }
-    if (!signer) {
-      notify('error', t('wallet.notReady'));
+    try {
+      await switchTo(requiredChainId);
+      return true;
+    } catch (err) {
+      notifyStatus(isUserRejection(err) ? 'rejected' : 'failed');
       return false;
     }
+  }, [isConnected, isWrongChain, notify, notifyStatus, requiredChainId, switchTo, t]);
 
-    let actualChainId: number;
-    try {
-      actualChainId = await getChainId(signer as Client);
-    } catch {
-      actualChainId = walletChainId ?? requiredChainId;
-    }
-
-    if (actualChainId === requiredChainId) return true;
-    return requestSwitch();
-  }, [
-    config,
-    connectorClient,
-    notify,
-    requestSwitch,
-    requiredChainId,
-    t,
-    walletChainId,
-    walletClient,
-  ]);
+  const ensureCorrectChain = useCallback(async (): Promise<boolean> => {
+    const status = await ensureChain();
+    if (status === 'ok') return true;
+    notifyStatus(status);
+    return false;
+  }, [ensureChain, notifyStatus]);
 
   return {
     requiredChainId,
+    requiredChainName: REQUIRED_CHAIN_NAME,
     connectedChainId,
+    connectedChainName: getChainDisplayName(connectedChainId),
     isWrongChain,
     isConnected: Boolean(isConnected),
+    isSwitching,
     switchToRequiredChain,
+    ensureChain,
     ensureCorrectChain,
   };
 }

@@ -6,12 +6,20 @@
 import type { ReactNode } from 'react';
 
 module.exports = {
-  useAccount: () => ({ address: undefined, isConnected: false, chainId: undefined }),
+  useAccount: () => ({
+    address: undefined,
+    isConnected: false,
+    chainId: undefined,
+    status: 'disconnected',
+    connector: undefined,
+  }),
+  useBalance: () => ({ data: undefined }),
   useChainId: () => 421614,
   useConfig: () => ({}),
   useConnectorClient: () => ({ data: undefined }),
+  useDisconnect: () => ({ disconnectAsync: async () => undefined, isPending: false }),
   usePublicClient: () => undefined,
   useWalletClient: () => ({ data: undefined }),
-  useSwitchChain: () => ({ switchChainAsync: async () => undefined }),
+  useSwitchChain: () => ({ switchChainAsync: async () => undefined, isPending: false }),
   WagmiProvider: ({ children }: { children: ReactNode }) => children,
 };

@@ -33,12 +33,12 @@
   },
   "network": {
     "unavailable": "網路暫不可用，請重新連接錢包。",
-    "switchForGesture": "請先將錢包切換至應用程式所用網路，再落筆。",
-    "wrongChain": "錢包尚未連接完成，或目前網路與應用程式不一致。請切換至應用程式所用網路後重試。"
+    "switchForGesture": "落筆前，請將錢包切換至 {network}。",
+    "wrongChain": "錢包尚未連接完成，或目前位於其他網路。請切換至 {network} 後重試。"
   },
   "gesture": {
     "simulated": "模擬落筆已完成，計時延長 {seconds} 秒。",
-    "confirmed": "落筆已確認，週期繼續推進。",
+    "confirmed": "落筆已記錄，週期收官時間已延長。",
     "validation": {
       "notNftOwner": "目前錢包並未持有這枚 NFT。",
       "tokenDecimalsWarning": "此代幣未提供 decimals()；將按 18 位小數處理。",
@@ -46,8 +46,8 @@
       "notErc721": "所選合約不符合 ERC-721 標準。",
       "notErc20": "所選合約不符合 ERC-20 標準。",
       "insufficientAttachedToken": "錢包中的代幣餘額不足，無法附加至本次落筆。",
-      "insufficientEth": "錢包中的 ETH 餘額不足。",
-      "insufficientCst": "錢包中的 CST（ERC-20）餘額不足。"
+      "insufficientEth": "本次落筆需要 {required} ETH 及網路手續費，錢包在 {network} 上僅有 {available} ETH。",
+      "insufficientCst": "本次落筆最多需要 {required} CST，錢包中有 {available} CST。"
     },
     "transaction": {
       "failed": "未能提交落筆。請檢查錢包與網路連線，重新整理目前落筆價格後重試。",
@@ -63,14 +63,20 @@
       "fundTransferFailed": "資金轉移失敗。",
       "ethCostChanged": "ETH 落筆價格已升至 {required} ETH，比提交時高 {increase} ETH。請重試。",
       "cstCostChanged": "交易處理期間，CST 落筆價格已變動。目前需 {required} CST，超過你設定的 {maximum} CST 上限。請重新整理後再試。"
+    },
+    "confirmedWithCst": "落筆已記錄，週期收官時間已延長，{cst} 參與 CST 已存入錢包。",
+    "approval": {
+      "token": "錢包將請求授權，允許協議隨本次落筆轉移恰好 {amount} 枚此代幣。附帶的代幣將歸屬週期獲配者，不會退回。",
+      "nft": "錢包將請求授權，允許協議隨本次落筆轉移 NFT #{tokenId}。附帶的 NFT 將歸屬週期獲配者，不會退回。"
     }
   },
   "anchor": {
-    "walletNotReady": "錢包尚未連接完成，或目前網路與應用程式不一致。請切換至應用程式所用網路後重試。",
+    "walletNotReady": "錢包尚未連接完成，或目前位於其他網路。請切換至 {network} 後重試。",
     "anchored": "{count} 枚 NFT 已錨定至協議。",
     "released": "已完成 {count} 項解錨操作。",
     "releasedWithDistributions": "已完成 {count} 項解錨操作，累積的 ETH 錨定配發已取回至錢包。",
-    "failed": "錨定交易未能完成。請檢查錢包與網路連線後重試。"
+    "failed": "錨定交易未能完成。請檢查錢包與網路連線後重試。",
+    "approval": "錢包將請求授權，允許錨定合約在錨定期間保管你的 NFT。每個合集只需授權一次。"
   },
   "allocation": {
     "retrieved": "分配已取回至錢包。"
@@ -87,7 +93,7 @@
   },
   "claim": {
     "walletNotConnected": "請連接錢包，並確認已切換至正確的網路。",
-    "failed": "未能取回分配。請檢查錢包與網路連線後重試。",
+    "failed": "取回未完成。請檢查錢包與網路後重試。",
     "stellarEthSuccess": "星選 ETH 已取回至錢包。",
     "nftSuccess": "已附加 NFT 已取回至錢包。",
     "nftsSuccess": "已將 {count} 枚已附加 NFT 取回至錢包。",
@@ -175,7 +181,7 @@
   "imprint": {
     "contractUnavailable": "Random Walk NFT 合約暫不可用。請連接錢包並切換至正確網路後重試。",
     "confirmed": "Random Walk NFT 銘刻已確認。",
-    "failed": "未能銘刻 Random Walk NFT。請檢查錢包與網路連線後重試。",
+    "failed": "銘刻未完成。請檢查錢包與網路後重試。",
     "imprinting": "銘刻中…"
   },
   "admin": {
@@ -184,5 +190,53 @@
       "unbanned": "落筆已解除封鎖。",
       "failed": "未能更新落筆審核狀態，請重試。"
     }
+  },
+  "regionLabel": "通知",
+  "close": "關閉通知",
+  "tx": {
+    "stage": {
+      "switchNetwork": "請在錢包中切換至 {network}",
+      "switchNetworkHint": "Cosmic Signature 運行於 {network}。請在錢包中核准切換以繼續。",
+      "approve": "請在錢包中核准第 {step} 步（共 {total} 步）",
+      "approvalPending": "正在確認第 {step} 步授權（共 {total} 步）",
+      "confirm": "請在錢包中確認",
+      "confirmStep": "請在錢包中確認第 {step} 步（共 {total} 步）",
+      "confirmHint": "請在錢包中核對詳情。確認之前不會傳送任何內容。",
+      "pending": "正在等待 {network} 確認"
+    },
+    "button": {
+      "preparing": "準備中…",
+      "switchNetwork": "請在錢包中切換網路…",
+      "approve": "在錢包中核准 {step}/{total}…",
+      "approvalPending": "授權 {step}/{total} 確認中…",
+      "confirm": "在錢包中確認…",
+      "confirmStep": "在錢包中確認 {step}/{total}…",
+      "pending": "確認中…"
+    },
+    "steps": {
+      "signature": "簽署",
+      "pending": "確認中",
+      "confirmed": "已確認"
+    },
+    "status": {
+      "confirmed": "已在鏈上確認。",
+      "cancelled": "已在錢包中取消，未傳送任何內容。"
+    },
+    "error": {
+      "insufficientFunds": "錢包在 {network} 上的 ETH 不足以支付本次交易及網路手續費。",
+      "wrongNetwork": "錢包目前位於其他網路。請切換至 {network} 後重試。",
+      "walletNotConnected": "請先連接錢包，然後重試。",
+      "walletBusy": "錢包中已有一個未完成的請求。請先在錢包中完成或關閉它，然後重試。",
+      "wouldRevert": "合約會拒絕這筆交易，因此沒有傳送。請重新整理頁面後重試。",
+      "reverted": "交易在鏈上執行失敗，只消耗了網路手續費。請重新整理頁面後重試。",
+      "timeout": "仍在等待確認。重試之前，請先在 {explorer} 上查看這筆交易。",
+      "network": "無法連上網路。請檢查網路連線後重試。"
+    },
+    "viewOnExplorer": "在 {explorer} 上查看",
+    "viewOnExplorerShort": "查看交易",
+    "copyDetails": "複製詳情",
+    "detailsCopied": "錯誤詳情已複製。",
+    "connectWallet": "連接錢包",
+    "busy": "請先完成進行中的交易。"
   }
 }

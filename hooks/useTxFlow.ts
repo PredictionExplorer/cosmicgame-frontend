@@ -1,0 +1,406 @@
+'use client';
+
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { useAccount, useConfig, usePublicClient, useSwitchChain } from 'wagmi';
+import { writeContract, type Config, type WriteContractParameters } from '@wagmi/core';
+import type {
+  Abi,
+  Address,
+  ContractFunctionArgs,
+  ContractFunctionName,
+  Hash,
+  TransactionReceipt,
+} from 'viem';
+
+import { activeChain } from '@/config/chains';
+import { TxExplorerLink } from '@/components/ui/tx-status';
+import { useOptionalWalletUi } from '@/contexts/WalletUiContext';
+import { useTxErrorMessage } from '@/hooks/useTxErrorMessage';
+import {
+  ChainGuardError,
+  EXPLORER_NAME,
+  REQUIRED_CHAIN_NAME,
+  ensureWalletOnRequiredChain,
+} from '@/lib/chainGuard';
+import { TxRevertedError, classifyTxError, type TxErrorInfo } from '@/lib/txErrors';
+import { IDLE_TX_STAGE, isTxBusy, type TxStage } from '@/lib/txStage';
+import { getContractErrorDescriptor } from '@/utils/contractErrors';
+import { reportError } from '@/utils/errors';
+
+export { isTxBusy, txStageHash, type TxStage, type TxStatusName } from '@/lib/txStage';
+export { useTxStageLabel } from '@/hooks/useTxStageLabel';
+
+/* ────────────────────────────────────────────────────────────────── */
+/*  Run options                                                      */
+/* ────────────────────────────────────────────────────────────────── */
+
+type WritableFunctionName<abi extends Abi | readonly unknown[]> = ContractFunctionName<
+  abi,
+  'nonpayable' | 'payable'
+>;
+
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+
+/**
+ * wagmi `writeContract` parameters minus the chain: the flow always writes on
+ * the protocol's chain, after the chain guard has run.
+ */
+export type TxWriteRequest<
+  abi extends Abi | readonly unknown[] = Abi,
+  functionName extends WritableFunctionName<abi> = WritableFunctionName<abi>,
+  args extends ContractFunctionArgs<abi, 'nonpayable' | 'payable', functionName> =
+    ContractFunctionArgs<abi, 'nonpayable' | 'payable', functionName>,
+> = DistributiveOmit<
+  WriteContractParameters<abi, functionName, args, Config>,
+  'chainId' | 'connector'
+>;
+
+export interface TxContext {
+  /** The connected account the flow started with. */
+  account: Address;
+  /**
+   * Sends a contract write on the protocol's chain. The signer is resolved
+   * when this runs — after any network switch — never captured at render.
+   */
+  writeContract: <
+    const abi extends Abi | readonly unknown[],
+    functionName extends WritableFunctionName<abi>,
+    args extends ContractFunctionArgs<abi, 'nonpayable' | 'payable', functionName>,
+  >(
+    request: TxWriteRequest<abi, functionName, args>,
+  ) => Promise<Hash>;
+}
+
+export interface TxApprovalStep {
+  /**
+   * One sentence shown while the wallet asks, explaining why this extra
+   * prompt appears ("Lets the protocol move exactly 25 USDC for this
+   * gesture."). Localized by the caller.
+   */
+  description: string;
+  /** Resolves true when the approval is still needed. Omit to always ask. */
+  isNeeded?: (ctx: TxContext) => Promise<boolean>;
+  write: (ctx: TxContext) => Promise<Hash>;
+}
+
+export interface TxRunOptions {
+  /**
+   * Pre-flight checks and reads (balances, ownership, fresh prices). Runs
+   * after the chain guard, before any wallet prompt. Return `false` to stop
+   * quietly — show your own inline or toast message first.
+   */
+  prepare?: (ctx: TxContext) => Promise<boolean | void>;
+  /** Approvals sent, and mined, before the main transaction. */
+  approvals?: TxApprovalStep[];
+  /** The main transaction. */
+  write: (ctx: TxContext) => Promise<Hash>;
+  /**
+   * Success toast copy, or a builder that reads the receipt (event amounts…).
+   * `null` (or a builder returning null) closes the lifecycle toast instead —
+   * for flows that navigate to their own confirmation page.
+   */
+  successMessage:
+    | string
+    | ((receipt: TransactionReceipt) => string | null | Promise<string | null>)
+    | null;
+  /**
+   * Action-specific fallback for failures the classifier cannot name, as a
+   * cause-plus-next-step sentence ("Retrieve didn't go through. Check your
+   * wallet and try again.").
+   */
+  failureMessage?: string;
+  /**
+   * Flow-specific copy for a failure (a price that moved, a balance
+   * shortfall with amounts). Return null to fall back to the defaults.
+   */
+  describeError?: (err: unknown, info: TxErrorInfo) => string | null;
+  /** Runs after the receipt confirms and before the success toast. */
+  onConfirmed?: (receipt: TransactionReceipt, ctx: TxContext) => void | Promise<void>;
+  /** Sentry context for unexpected failures. */
+  errorContext?: string;
+}
+
+export type TxResult =
+  | { status: 'confirmed'; hash: Hash; receipt: TransactionReceipt }
+  | { status: 'failed'; error: TxErrorInfo; hash?: Hash }
+  | { status: 'cancelled' }
+  /** `prepare` returned false, or no wallet was connected. */
+  | { status: 'aborted' }
+  /** Another run of this flow is still in progress. */
+  | { status: 'busy' };
+
+export interface UseTxFlowResult {
+  stage: TxStage;
+  isBusy: boolean;
+  run: (options: TxRunOptions) => Promise<TxResult>;
+  /** Back to `idle` (e.g. when the form the flow belongs to is reset). */
+  reset: () => void;
+}
+
+/** How long a confirmed-transaction toast stays up (ms). */
+const SUCCESS_TOAST_MS = 8_000;
+/** Receipt wait before the flow reports "still waiting" (ms). Arbitrum confirms in seconds. */
+const RECEIPT_TIMEOUT_MS = 180_000;
+
+let toastSequence = 0;
+
+/* ────────────────────────────────────────────────────────────────── */
+/*  Hook                                                             */
+/* ────────────────────────────────────────────────────────────────── */
+
+/**
+ * One transaction lifecycle for every write in the app:
+ *
+ *   preparing → (switching-network) → approving i/n → awaiting-signature
+ *     → pending(hash) → confirmed | failed | cancelled
+ *
+ * - Runs the chain guard first and resolves the signer at write time, so a
+ *   wallet parked on another network is asked to switch instead of failing
+ *   with a generic error.
+ * - Drives ONE sonner toast by id through the stages ("Confirm in your
+ *   wallet" → "Waiting for confirmation on Arbitrum One · View on Arbiscan"
+ *   → success with the same link). Errors stay until dismissed and carry a
+ *   "Copy details" action; the body is always a localized sentence, never
+ *   raw provider text. A wallet rejection is a neutral "cancelled", not an
+ *   error.
+ * - Exposes `stage` so the trigger can read "Approve 1 of 2 in wallet…" /
+ *   "Confirm in wallet…" / "Pending…" (see `useTxStageLabel`) and a `TxStatus`
+ *   strip can sit under it.
+ *
+ * Pre-flight validation that belongs to the form (not enough CST, not the
+ * NFT owner) stays in `prepare` and uses the caller's own messages.
+ */
+export function useTxFlow(): UseTxFlowResult {
+  const t = useTranslations('toasts');
+  const config = useConfig();
+  const publicClient = usePublicClient({ chainId: activeChain.id });
+  const { address, chainId: walletChainId } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const walletUi = useOptionalWalletUi();
+
+  const [stage, setStage] = useState<TxStage>(IDLE_TX_STAGE);
+  const inFlightRef = useRef(false);
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  const update = useCallback((next: TxStage) => {
+    if (mountedRef.current) setStage(next);
+  }, []);
+
+  const reset = useCallback(() => update(IDLE_TX_STAGE), [update]);
+
+  const explorerLink = useCallback(
+    (hash: Hash) =>
+      createElement(TxExplorerLink, {
+        hash,
+        label: t('tx.viewOnExplorer', { explorer: EXPLORER_NAME }),
+      }),
+    [t],
+  );
+
+  const describeFailure = useTxErrorMessage();
+
+  const copyDetailsAction = useCallback(
+    (details: string, toastId: string) => ({
+      label: t('tx.copyDetails'),
+      onClick: (event: { preventDefault: () => void }) => {
+        // Keep the error on screen: sonner closes a toast after its action
+        // unless the click's default is prevented.
+        event.preventDefault();
+        void navigator.clipboard
+          ?.writeText(details)
+          .then(() => toast.success(t('tx.detailsCopied'), { id: `${toastId}:copied` }))
+          .catch(() => undefined);
+      },
+    }),
+    [t],
+  );
+
+  const run = useCallback(
+    async (options: TxRunOptions): Promise<TxResult> => {
+      if (inFlightRef.current) {
+        toast.info(t('tx.busy'));
+        return { status: 'busy' };
+      }
+      const toastId = `tx-${++toastSequence}`;
+
+      if (!address) {
+        update({ status: 'idle' });
+        toast.error(t('tx.error.walletNotConnected'), {
+          id: toastId,
+          ...(walletUi
+            ? {
+                action: {
+                  label: t('tx.connectWallet'),
+                  onClick: () => walletUi.requestConnectModal(),
+                },
+              }
+            : {}),
+        });
+        return { status: 'aborted' };
+      }
+
+      inFlightRef.current = true;
+      let currentHash: Hash | undefined;
+      const ctx: TxContext = {
+        account: address,
+        writeContract: (request) =>
+          writeContract(config, {
+            ...request,
+            chainId: activeChain.id,
+          } as unknown as WriteContractParameters),
+      };
+
+      const waitForReceipt = async (hash: Hash): Promise<TransactionReceipt> => {
+        if (!publicClient) throw new Error('Public client is unavailable.');
+        let replacedBy: 'cancelled' | null = null;
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash,
+          timeout: RECEIPT_TIMEOUT_MS,
+          onReplaced: (replacement) => {
+            // A speed-up in the wallet replaces the hash; follow it so the
+            // explorer link stays right. A wallet "cancel" is a cancellation.
+            if (replacement.reason === 'cancelled') replacedBy = 'cancelled';
+            currentHash = replacement.transaction.hash;
+          },
+        });
+        if (replacedBy === 'cancelled') {
+          throw new ChainGuardError('rejected');
+        }
+        if (receipt.status !== 'success') throw new TxRevertedError(receipt.transactionHash);
+        return receipt;
+      };
+
+      try {
+        update({ status: 'preparing' });
+
+        const chainStatus = await ensureWalletOnRequiredChain(config, {
+          fallbackChainId: walletChainId ?? null,
+          switchTo: async (chainId) => {
+            update({ status: 'switching-network' });
+            toast.loading(t('tx.stage.switchNetwork', { network: REQUIRED_CHAIN_NAME }), {
+              id: toastId,
+              description: t('tx.stage.switchNetworkHint', { network: REQUIRED_CHAIN_NAME }),
+            });
+            await switchChainAsync({ chainId });
+          },
+        });
+        if (chainStatus !== 'ok') throw new ChainGuardError(chainStatus);
+
+        update({ status: 'preparing' });
+        if (options.prepare && (await options.prepare(ctx)) === false) {
+          toast.dismiss(toastId);
+          update({ status: 'idle' });
+          return { status: 'aborted' };
+        }
+
+        const approvals: TxApprovalStep[] = [];
+        for (const approval of options.approvals ?? []) {
+          if (!approval.isNeeded || (await approval.isNeeded(ctx))) approvals.push(approval);
+        }
+        const total = approvals.length + 1;
+
+        for (const [index, approval] of approvals.entries()) {
+          const step = index + 1;
+          update({ status: 'approving', step, total, phase: 'signature' });
+          toast.loading(t('tx.stage.approve', { step, total }), {
+            id: toastId,
+            description: approval.description,
+          });
+          const approvalHash = await approval.write(ctx);
+          currentHash = approvalHash;
+          update({ status: 'approving', step, total, phase: 'pending', hash: approvalHash });
+          toast.loading(t('tx.stage.approvalPending', { step, total }), {
+            id: toastId,
+            description: explorerLink(approvalHash),
+          });
+          await waitForReceipt(approvalHash);
+        }
+
+        update({ status: 'awaiting-signature', step: total, total });
+        toast.loading(
+          total > 1 ? t('tx.stage.confirmStep', { step: total, total }) : t('tx.stage.confirm'),
+          { id: toastId, description: t('tx.stage.confirmHint') },
+        );
+        const hash = await options.write(ctx);
+        currentHash = hash;
+        update({ status: 'pending', hash });
+        toast.loading(t('tx.stage.pending', { network: REQUIRED_CHAIN_NAME }), {
+          id: toastId,
+          description: explorerLink(hash),
+        });
+
+        const receipt = await waitForReceipt(hash);
+        const finalHash = receipt.transactionHash ?? currentHash ?? hash;
+        update({ status: 'confirmed', hash: finalHash });
+        await options.onConfirmed?.(receipt, ctx);
+
+        const success =
+          typeof options.successMessage === 'function'
+            ? await options.successMessage(receipt)
+            : options.successMessage;
+        if (success) {
+          toast.success(success, {
+            id: toastId,
+            description: explorerLink(finalHash),
+            duration: SUCCESS_TOAST_MS,
+          });
+        } else {
+          toast.dismiss(toastId);
+        }
+        return { status: 'confirmed', hash: finalHash, receipt };
+      } catch (err) {
+        const info = classifyTxError(err);
+        if (info.kind === 'rejected') {
+          update({ status: 'cancelled' });
+          toast.info(t('walletTransactionCancelled'), { id: toastId });
+          return { status: 'cancelled' };
+        }
+
+        reportError(err, options.errorContext ?? 'tx-flow');
+        const descriptor = getContractErrorDescriptor(err);
+        const message =
+          options.describeError?.(err, info) ??
+          (descriptor ? t(descriptor.key, descriptor.values) : null) ??
+          describeFailure(info, options.failureMessage);
+        update({
+          status: 'failed',
+          error: info,
+          message,
+          ...(currentHash ? { hash: currentHash } : {}),
+        });
+        toast.error(message, {
+          id: toastId,
+          duration: Number.POSITIVE_INFINITY,
+          ...(currentHash ? { description: explorerLink(currentHash) } : {}),
+          action: copyDetailsAction(info.details, toastId),
+        });
+        return { status: 'failed', error: info, ...(currentHash ? { hash: currentHash } : {}) };
+      } finally {
+        inFlightRef.current = false;
+      }
+    },
+    [
+      address,
+      config,
+      copyDetailsAction,
+      explorerLink,
+      describeFailure,
+      publicClient,
+      switchChainAsync,
+      t,
+      update,
+      walletChainId,
+      walletUi,
+    ],
+  );
+
+  return useMemo(() => ({ stage, isBusy: isTxBusy(stage), run, reset }), [reset, run, stage]);
+}

@@ -117,7 +117,27 @@ describe('useRequireChain — wallet on the wrong chain', () => {
     });
 
     expect(allowed).toBe(false);
-    expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.network.wrongChain');
+    // The copy names the network to switch to.
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'toasts.network.wrongChain(network=Arbitrum Sepolia)',
+    );
+  });
+
+  it('names both networks and exposes the silent guard', async () => {
+    const { result } = renderHook(() => useRequireChain());
+
+    expect(result.current.requiredChainName).toBe('Arbitrum Sepolia');
+    expect(result.current.connectedChainName).toBe('Arbitrum One');
+    expect(result.current.isSwitching).toBe(false);
+
+    mockSwitchChainAsync.mockRejectedValueOnce({ code: 4001, message: 'User rejected' });
+    let status: string | undefined;
+    await act(async () => {
+      status = await result.current.ensureChain();
+    });
+    expect(status).toBe('rejected');
+    expect(mockNotify).not.toHaveBeenCalled();
   });
 
   it('uses the caller-supplied failure copy when provided', async () => {

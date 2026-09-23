@@ -4,9 +4,21 @@
  */
 import type { ReactNode } from 'react';
 
+const emptyQueryCache = {
+  subscribe: () => () => undefined,
+  findAll: () => [],
+};
+
 module.exports = {
   useQuery: () => ({ data: undefined, isLoading: false, error: null }),
-  useQueryClient: () => ({ invalidateQueries: jest.fn() }),
+  useQueryClient: () => ({
+    invalidateQueries: jest.fn(),
+    getQueryCache: () => emptyQueryCache,
+  }),
+  onlineManager: {
+    isOnline: () => true,
+    subscribe: () => () => undefined,
+  },
   QueryClient: class QueryClient {},
   QueryCache: class QueryCache {},
   QueryClientProvider: ({ children }: { children: ReactNode }) => children,

@@ -1,6 +1,8 @@
 {
   "connect": {
-    "button": "连接钱包"
+    "button": "连接钱包",
+    "opening": "正在打开钱包列表…",
+    "disclaimer": "连接钱包即表示你同意<terms>服务条款</terms>，并已知悉<risk>风险披露</risk>。落笔在 {network} 上进行，需要该网络上的 ETH 支付落笔价格与网络手续费。"
   },
   "groups": {
     "popular": "热门",
@@ -29,10 +31,52 @@
     "addCstToMetaMask": "将 CST 添加至 MetaMask",
     "addingCstToMetaMask": "正在添加 CST…",
     "myAnchors": "我的锚定",
-    "winningHistory": "获配记录"
+    "winningHistory": "获配记录",
+    "viewOnExplorer": "在 {explorer} 上查看",
+    "switchWallet": "更换钱包",
+    "disconnect": "断开连接"
   },
   "accessibility": {
     "copyAddress": "复制钱包地址",
     "addressCopied": "已复制钱包地址"
+  },
+  "network": {
+    "wrong": "网络不符",
+    "switchTo": "切换至 {network}",
+    "switching": "切换中…",
+    "walletOn": "钱包当前处于 {current}，Cosmic Signature 运行在 {network} 上。",
+    "walletOnOther": "钱包当前处于其他网络，Cosmic Signature 运行在 {network} 上。",
+    "connectedTo": "已连接 {network}"
+  },
+  "required": {
+    "hint": "连接只会向本页面提供钱包地址。在钱包中确认交易之前，不会发送任何内容。",
+    "allocations": {
+      "title": "连接钱包，查看你的分配",
+      "publicLink": "浏览全部获配者"
+    },
+    "anchors": {
+      "title": "连接钱包，管理你的锚定",
+      "publicLink": "了解锚定"
+    },
+    "nfts": {
+      "title": "连接钱包，查看你的 NFT",
+      "publicLink": "浏览画廊"
+    },
+    "statistics": {
+      "title": "连接钱包，查看你的统计",
+      "description": "连接后，这里会显示你在每个演绎周期中的落笔、分配与锚定。",
+      "publicLink": "查看参与统计"
+    },
+    "history": {
+      "title": "连接钱包，查看你的分配历史",
+      "publicLink": "浏览全部获配者"
+    },
+    "transferCst": {
+      "title": "连接钱包，发送 CST"
+    }
+  },
+  "funding": {
+    "short": "钱包在 {network} 上有 {available} ETH。本次落笔约需 {required} ETH 及网络手续费。",
+    "howTo": "如何在 {network} 上获取 ETH"
   }
 }

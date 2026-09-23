@@ -215,11 +215,56 @@ describe('integration', () => {
 });
 
 describe('useNotification', () => {
-  it('throws when used outside of NotificationProvider', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => renderHook(() => useNotification())).toThrow(
-      'useNotification must be used within a NotificationProvider',
+  it('falls back to a local dispatcher outside NotificationProvider', () => {
+    const { result } = renderHook(() => useNotification());
+
+    act(() => {
+      result.current.setNotification({ text: 'Standalone', type: 'warning', visible: true });
+    });
+
+    expect(mockToastWarning).toHaveBeenCalledWith('Standalone');
+  });
+});
+
+describe('technical details', () => {
+  it('keeps an error with details open and offers a Copy details action', () => {
+    const writeText = jest.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    const { result } = renderHook(() => useNotification(), { wrapper });
+
+    act(() => {
+      result.current.setNotification({
+        text: 'Friendly sentence',
+        type: 'error',
+        visible: true,
+        details: 'InsufficientFundsError: insufficient funds',
+      });
+    });
+
+    expect(mockToastError).toHaveBeenCalledWith(
+      'Friendly sentence',
+      expect.objectContaining({
+        duration: Number.POSITIVE_INFINITY,
+        action: expect.objectContaining({ label: 'toasts.tx.copyDetails' }),
+      }),
     );
-    consoleSpy.mockRestore();
+    const [, options] = mockToastError.mock.calls[0] as [
+      string,
+      { action: { onClick: (event: { preventDefault: () => void }) => void } },
+    ];
+    const preventDefault = jest.fn();
+    options.action.onClick({ preventDefault });
+    expect(preventDefault).toHaveBeenCalled();
+    expect(writeText).toHaveBeenCalledWith('InsufficientFundsError: insufficient funds');
+  });
+
+  it('replaces the toast with the same id instead of stacking another', () => {
+    const { result } = renderHook(() => useNotification(), { wrapper });
+
+    act(() => {
+      result.current.setNotification({ text: 'Once', type: 'info', visible: true, id: 'n1' });
+    });
+
+    expect(mockToastInfo).toHaveBeenCalledWith('Once', { id: 'n1' });
   });
 });

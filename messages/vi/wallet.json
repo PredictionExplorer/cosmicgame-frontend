@@ -1,6 +1,8 @@
 {
   "connect": {
-    "button": "Kết nối ví"
+    "button": "Kết nối ví",
+    "opening": "Đang mở danh sách ví…",
+    "disclaimer": "Khi kết nối ví, bạn đồng ý với <terms>Điều khoản sử dụng</terms> và xác nhận đã đọc <risk>Công bố rủi ro</risk>. Nét bút diễn ra trên {network} và cần ETH trên mạng đó cho chi phí nét bút và phí mạng."
   },
   "groups": {
     "popular": "Phổ biến",
@@ -29,10 +31,52 @@
     "addCstToMetaMask": "Thêm CST vào MetaMask",
     "addingCstToMetaMask": "Đang thêm CST vào MetaMask…",
     "myAnchors": "Neo giữ của tôi",
-    "winningHistory": "Lịch sử nhận phân bổ"
+    "winningHistory": "Lịch sử nhận phân bổ",
+    "viewOnExplorer": "Xem trên {explorer}",
+    "switchWallet": "Đổi ví",
+    "disconnect": "Ngắt kết nối"
   },
   "accessibility": {
     "copyAddress": "Sao chép địa chỉ ví",
     "addressCopied": "Đã sao chép địa chỉ ví"
+  },
+  "network": {
+    "wrong": "Sai mạng",
+    "switchTo": "Chuyển sang {network}",
+    "switching": "Đang chuyển…",
+    "walletOn": "Ví đang ở {current}. Cosmic Signature chạy trên {network}.",
+    "walletOnOther": "Ví đang ở mạng khác. Cosmic Signature chạy trên {network}.",
+    "connectedTo": "Đã kết nối với {network}"
+  },
+  "required": {
+    "hint": "Kết nối chỉ chia sẻ địa chỉ ví với trang này. Không có gì được gửi cho đến khi bạn xác nhận giao dịch trong ví.",
+    "allocations": {
+      "title": "Kết nối ví để xem phân bổ của bạn",
+      "publicLink": "Xem tất cả người nhận phân bổ"
+    },
+    "anchors": {
+      "title": "Kết nối ví để quản lý neo giữ",
+      "publicLink": "Tìm hiểu neo giữ"
+    },
+    "nfts": {
+      "title": "Kết nối ví để xem NFT của bạn",
+      "publicLink": "Xem bộ sưu tập"
+    },
+    "statistics": {
+      "title": "Kết nối ví để xem thống kê của bạn",
+      "description": "Sau khi kết nối, nét bút, phân bổ và neo giữ của bạn trong mọi chu kỳ trình diễn sẽ hiện ở đây.",
+      "publicLink": "Xem thống kê tham gia"
+    },
+    "history": {
+      "title": "Kết nối ví để xem lịch sử phân bổ",
+      "publicLink": "Xem tất cả người nhận phân bổ"
+    },
+    "transferCst": {
+      "title": "Kết nối ví để gửi CST"
+    }
+  },
+  "funding": {
+    "short": "Ví có {available} ETH trên {network}. Nét bút này cần khoảng {required} ETH cộng phí mạng.",
+    "howTo": "Cách có ETH trên {network}"
   }
 }

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-import { WalletUiProvider, useWalletUi } from '../WalletUiContext';
+import { WalletUiProvider, useOptionalWalletUi, useWalletUi } from '../WalletUiContext';
 
 /**
  * The whole point of WalletUiProvider is that the RainbowKit surface (and
@@ -15,16 +15,28 @@ jest.mock('@/config/wagmi', () => ({
 }));
 
 jest.mock('@/components/wallet/WalletUi', () => ({
-  WalletUi: ({ connectRequestId }: { connectRequestId: number }) => {
+  WalletUi: ({
+    connectRequestId,
+    onModalOpened,
+  }: {
+    connectRequestId: number;
+    onModalOpened?: () => void;
+  }) => {
     walletUiMounted(connectRequestId);
-    return <div data-testid="wallet-ui" data-request-id={connectRequestId} />;
+    return (
+      <div data-testid="wallet-ui" data-request-id={connectRequestId}>
+        <button type="button" onClick={onModalOpened}>
+          modal opened
+        </button>
+      </div>
+    );
   },
 }));
 
 function ConnectProbe() {
-  const { requestConnectModal } = useWalletUi();
+  const { requestConnectModal, connectPending } = useWalletUi();
   return (
-    <button type="button" onClick={requestConnectModal}>
+    <button type="button" onClick={requestConnectModal} aria-busy={connectPending}>
       connect
     </button>
   );
@@ -74,6 +86,30 @@ describe('WalletUiProvider', () => {
     await waitFor(() =>
       expect(screen.getByTestId('wallet-ui')).toHaveAttribute('data-request-id', '2'),
     );
+  });
+
+  it('reports the connect request as pending until the modal is on screen', async () => {
+    render(
+      <WalletUiProvider>
+        <ConnectProbe />
+      </WalletUiProvider>,
+    );
+    const trigger = screen.getByRole('button', { name: 'connect' });
+    expect(trigger).toHaveAttribute('aria-busy', 'false');
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-busy', 'true');
+
+    fireEvent.click(await screen.findByRole('button', { name: 'modal opened' }));
+    expect(trigger).toHaveAttribute('aria-busy', 'false');
+  });
+
+  it('gives shared hooks a null context outside the provider instead of throwing', () => {
+    function OptionalProbe() {
+      return <span>{useOptionalWalletUi() === null ? 'none' : 'some'}</span>;
+    }
+    render(<OptionalProbe />);
+    expect(screen.getByText('none')).toBeInTheDocument();
   });
 
   it('throws a clear error when used outside the provider', () => {

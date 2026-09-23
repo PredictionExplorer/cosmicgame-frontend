@@ -33,12 +33,12 @@
   },
   "network": {
     "unavailable": "Mạng không khả dụng — vui lòng kết nối lại ví.",
-    "switchForGesture": "Hãy chuyển ví sang mạng của ứng dụng trước khi đặt nét bút.",
-    "wrongChain": "Ví vẫn đang kết nối hoặc MetaMask đang ở sai chuỗi. Hãy chuyển sang mạng của ứng dụng và thử lại."
+    "switchForGesture": "Hãy chuyển ví sang {network} trước khi đặt nét bút.",
+    "wrongChain": "Ví vẫn đang kết nối hoặc đang ở mạng khác. Hãy chuyển sang {network} và thử lại."
   },
   "gesture": {
     "simulated": "Đã đặt nét bút mô phỏng. Bộ đếm được kéo dài thêm {seconds, plural, other {# giây}}.",
-    "confirmed": "Nét bút đã được xác nhận. Chu kỳ tiếp tục.",
+    "confirmed": "Nét bút đã được ghi nhận. Thời điểm hoàn tất chu kỳ đã được kéo dài.",
     "validation": {
       "notNftOwner": "Ví đang kết nối không sở hữu token này.",
       "tokenDecimalsWarning": "Token không triển khai decimals(); giả định 18 chữ số thập phân.",
@@ -46,8 +46,8 @@
       "notErc721": "Hợp đồng NFT đính kèm không phải là hợp đồng token ERC721.",
       "notErc20": "Hợp đồng token đính kèm không phải là hợp đồng token ERC20.",
       "insufficientAttachedToken": "Số dư token không đủ để đính kèm vào nét bút này.",
-      "insufficientEth": "Ví không đủ ETH cho giao dịch này.",
-      "insufficientCst": "Ví không đủ CST (ERC-20) cho giao dịch này."
+      "insufficientEth": "Nét bút này cần {required} ETH cộng phí mạng. Ví có {available} ETH trên {network}.",
+      "insufficientCst": "Nét bút này cần tối đa {required} CST. Ví có {available} CST."
     },
     "transaction": {
       "failed": "Không thể gửi nét bút. Hãy kiểm tra ví và kết nối mạng, làm mới chi phí hiện tại, rồi thử lại.",
@@ -63,14 +63,20 @@
       "fundTransferFailed": "Chuyển tiền thất bại.",
       "ethCostChanged": "Chi phí nét bút đã tăng {increase} ETH trong khi giao dịch của bạn đang được gửi. Chi phí mới cần thiết là {required} ETH. Vui lòng thử lại.",
       "cstCostChanged": "Chi phí nét bút CST đã thay đổi trong khi giao dịch của bạn đang được gửi, có thể do một nét bút khác đã đến trước. Hợp đồng yêu cầu {required} CST, cao hơn mức tối đa {maximum} CST của bạn. Hãy làm mới và thử lại."
+    },
+    "confirmedWithCst": "Nét bút đã được ghi nhận. Thời điểm hoàn tất chu kỳ đã được kéo dài, và {cst} CST tham gia đã về ví.",
+    "approval": {
+      "token": "Ví sẽ xin quyền chuyển đúng {amount} token này cùng nét bút. Token đính kèm sẽ thuộc về một người nhận của chu kỳ và không được hoàn lại.",
+      "nft": "Ví sẽ xin quyền chuyển NFT #{tokenId} cùng nét bút. NFT đính kèm sẽ thuộc về một người nhận của chu kỳ và không được hoàn lại."
     }
   },
   "anchor": {
-    "walletNotReady": "Ví vẫn đang kết nối hoặc MetaMask đang ở sai chuỗi. Hãy chuyển sang mạng của ứng dụng và thử lại.",
+    "walletNotReady": "Ví vẫn đang kết nối hoặc đang ở mạng khác. Hãy chuyển sang {network} và thử lại.",
     "anchored": "{count, plural, other {# NFT đã được neo giữ với giao thức.}}",
     "released": "{count, plural, other {Đã gỡ neo cho # NFT đã chọn.}}",
     "releasedWithDistributions": "{count, plural, other {Đã gỡ neo cho # NFT và nhận về ETH tích lũy từ phân phối neo giữ.}}",
-    "failed": "Không thể hoàn thành giao dịch neo giữ. Hãy kiểm tra ví và kết nối mạng, rồi thử lại."
+    "failed": "Không thể hoàn thành giao dịch neo giữ. Hãy kiểm tra ví và kết nối mạng, rồi thử lại.",
+    "approval": "Ví sẽ xin quyền để hợp đồng neo giữ giữ NFT của bạn trong thời gian neo giữ. Mỗi bộ sưu tập chỉ hỏi một lần."
   },
   "allocation": {
     "retrieved": "Đã nhận về phân bổ vào ví của bạn."
@@ -87,7 +93,7 @@
   },
   "claim": {
     "walletNotConnected": "Vui lòng kết nối ví và đảm bảo bạn đang ở đúng mạng.",
-    "failed": "Đã xảy ra lỗi",
+    "failed": "Chưa nhận về được. Hãy kiểm tra ví và mạng, rồi thử lại.",
     "stellarEthSuccess": "Đã nhận về ETH Tinh tuyển vào ví của bạn.",
     "nftSuccess": "Đã nhận về NFT đính kèm vào ví của bạn.",
     "nftsSuccess": "{count, plural, other {Đã nhận về # NFT đính kèm vào ví của bạn.}}",
@@ -175,7 +181,7 @@
   "imprint": {
     "contractUnavailable": "Hợp đồng Random Walk NFT không khả dụng. Hãy kết nối ví trên đúng mạng và thử lại.",
     "confirmed": "Đã xác nhận khắc Random Walk NFT.",
-    "failed": "Khắc thất bại",
+    "failed": "Chưa khắc được. Hãy kiểm tra ví và mạng, rồi thử lại.",
     "imprinting": "Đang khắc…"
   },
   "admin": {
@@ -184,5 +190,53 @@
       "unbanned": "Đã bỏ chặn nét bút.",
       "failed": "Đã xảy ra lỗi"
     }
+  },
+  "regionLabel": "Thông báo",
+  "close": "Đóng thông báo",
+  "tx": {
+    "stage": {
+      "switchNetwork": "Hãy chuyển sang {network} trong ví",
+      "switchNetworkHint": "Cosmic Signature chạy trên {network}. Hãy chấp thuận việc chuyển mạng trong ví để tiếp tục.",
+      "approve": "Hãy chấp thuận bước {step}/{total} trong ví",
+      "approvalPending": "Đang xác nhận bước chấp thuận {step}/{total}",
+      "confirm": "Hãy xác nhận trong ví",
+      "confirmStep": "Hãy xác nhận bước {step}/{total} trong ví",
+      "confirmHint": "Hãy kiểm tra chi tiết trong ví. Không có gì được gửi cho đến khi bạn xác nhận.",
+      "pending": "Đang chờ xác nhận trên {network}"
+    },
+    "button": {
+      "preparing": "Đang chuẩn bị…",
+      "switchNetwork": "Chuyển mạng trong ví…",
+      "approve": "Chấp thuận {step}/{total} trong ví…",
+      "approvalPending": "Đang chờ chấp thuận {step}/{total}…",
+      "confirm": "Xác nhận trong ví…",
+      "confirmStep": "Xác nhận {step}/{total} trong ví…",
+      "pending": "Đang chờ…"
+    },
+    "steps": {
+      "signature": "Chữ ký",
+      "pending": "Đang chờ",
+      "confirmed": "Đã xác nhận"
+    },
+    "status": {
+      "confirmed": "Đã xác nhận trên chuỗi.",
+      "cancelled": "Đã hủy trong ví. Không có gì được gửi."
+    },
+    "error": {
+      "insufficientFunds": "Ví không đủ ETH trên {network} để trả cho giao dịch này và phí mạng.",
+      "wrongNetwork": "Ví đang ở mạng khác. Hãy chuyển sang {network} và thử lại.",
+      "walletNotConnected": "Hãy kết nối ví rồi thử lại.",
+      "walletBusy": "Ví đang có một yêu cầu chưa xong. Hãy hoàn tất hoặc đóng nó trong ví, rồi thử lại.",
+      "wouldRevert": "Hợp đồng sẽ từ chối giao dịch này nên chưa có gì được gửi. Hãy tải lại trang và thử lại.",
+      "reverted": "Giao dịch đã thất bại trên chuỗi. Chỉ phí mạng bị trừ. Hãy tải lại trang và thử lại.",
+      "timeout": "Vẫn đang chờ xác nhận. Hãy kiểm tra giao dịch trên {explorer} trước khi thử lại.",
+      "network": "Không kết nối được mạng. Hãy kiểm tra kết nối rồi thử lại."
+    },
+    "viewOnExplorer": "Xem trên {explorer}",
+    "viewOnExplorerShort": "Xem giao dịch",
+    "copyDetails": "Sao chép chi tiết",
+    "detailsCopied": "Đã sao chép chi tiết lỗi.",
+    "connectWallet": "Kết nối ví",
+    "busy": "Hãy hoàn tất giao dịch đang diễn ra trước."
   }
 }

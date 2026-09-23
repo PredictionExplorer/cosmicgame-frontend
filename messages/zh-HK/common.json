@@ -49,6 +49,44 @@
     "noData": "暫無數據",
     "nothingHere": "暫無內容"
   },
+  "liveStatus": {
+    "connecting": "連接中…",
+    "live": "即時",
+    "updated": "{age}更新",
+    "reconnecting": "重新連接中…",
+    "delayed": "更新延遲 · 最後更新：{age}",
+    "offline": "離線",
+    "offlineDetail": "網絡連接已中斷。最後更新：{age}。",
+    "clockCaveat": "此後倒數可能已被延長。",
+    "age": {
+      "justNow": "剛剛",
+      "seconds": "{count} 秒前",
+      "minutes": "{count} 分鐘前",
+      "hours": "{count} 小時前",
+      "days": "{count} 天前"
+    },
+    "delayedShort": "更新延遲"
+  },
+  "attention": {
+    "menuLabel": "提示與聲音",
+    "title": "提示與聲音",
+    "intro": "以下選項預設全部關閉，開啟後只會儲存在此瀏覽器中。",
+    "sound": {
+      "label": "有人在你之後落筆時播放提示音",
+      "description": "其他參與者在你最近一次落筆之後落筆時，播放一聲短提示音。需要連接錢包並保持此分頁開啟。"
+    },
+    "alert": {
+      "label": "收官前提示",
+      "description": "在週期收官時間之前發送瀏覽器通知。請保持此分頁開啟。",
+      "minutes": "{minutes} 分鐘",
+      "blocked": "此網站的通知已被封鎖。如需使用提示，請在瀏覽器設定中允許通知。",
+      "unsupported": "此瀏覽器不支援通知。"
+    },
+    "tabTitle": {
+      "label": "在分頁標題中顯示倒數",
+      "description": "在週期的最後一小時，於瀏覽器分頁中顯示剩餘時間。"
+    }
+  },
   "actions": {
     "copyAddress": "複製地址",
     "addressCopied": "已複製地址",

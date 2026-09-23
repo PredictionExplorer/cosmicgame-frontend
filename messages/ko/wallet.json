@@ -1,6 +1,8 @@
 {
   "connect": {
-    "button": "지갑 연결"
+    "button": "지갑 연결",
+    "opening": "지갑 목록을 여는 중…",
+    "disclaimer": "지갑을 연결하면 <terms>이용약관</terms>에 동의하고 <risk>위험 고지</risk> 내용을 확인한 것으로 간주됩니다. 제스처는 {network} 네트워크에서 이루어지며, 제스처 비용과 네트워크 수수료를 위해 해당 네트워크의 ETH가 필요합니다."
   },
   "groups": {
     "popular": "인기",
@@ -29,10 +31,52 @@
     "addCstToMetaMask": "MetaMask에 CST 추가",
     "addingCstToMetaMask": "MetaMask에 CST 추가 중…",
     "myAnchors": "내 앵커링",
-    "winningHistory": "내 배분 내역"
+    "winningHistory": "내 배분 내역",
+    "viewOnExplorer": "{explorer} 사이트에서 보기",
+    "switchWallet": "지갑 변경",
+    "disconnect": "연결 해제"
   },
   "accessibility": {
     "copyAddress": "지갑 주소 복사",
     "addressCopied": "지갑 주소 복사됨"
+  },
+  "network": {
+    "wrong": "다른 네트워크",
+    "switchTo": "{network} 네트워크로 전환",
+    "switching": "전환 중…",
+    "walletOn": "지갑이 {current} 네트워크에 있습니다. Cosmic Signature는 {network} 네트워크에서 운영됩니다.",
+    "walletOnOther": "지갑이 다른 네트워크에 있습니다. Cosmic Signature는 {network} 네트워크에서 운영됩니다.",
+    "connectedTo": "{network} 네트워크에 연결됨"
+  },
+  "required": {
+    "hint": "연결하면 이 페이지에 지갑 주소만 공유됩니다. 지갑에서 트랜잭션을 확인하기 전에는 아무것도 전송되지 않습니다.",
+    "allocations": {
+      "title": "지갑을 연결하면 내 배분을 볼 수 있습니다",
+      "publicLink": "전체 배분 수령자 보기"
+    },
+    "anchors": {
+      "title": "지갑을 연결하면 내 앵커링을 관리할 수 있습니다",
+      "publicLink": "앵커링 살펴보기"
+    },
+    "nfts": {
+      "title": "지갑을 연결하면 내 NFT를 볼 수 있습니다",
+      "publicLink": "갤러리 둘러보기"
+    },
+    "statistics": {
+      "title": "지갑을 연결하면 내 통계를 볼 수 있습니다",
+      "description": "연결하면 모든 퍼포먼스 사이클에서 남긴 제스처, 배분, 앵커링이 여기에 표시됩니다.",
+      "publicLink": "참여 통계 보기"
+    },
+    "history": {
+      "title": "지갑을 연결하면 배분 내역을 볼 수 있습니다",
+      "publicLink": "전체 배분 수령자 보기"
+    },
+    "transferCst": {
+      "title": "지갑을 연결하면 CST를 전송할 수 있습니다"
+    }
+  },
+  "funding": {
+    "short": "지갑의 {network} 잔액은 {available} ETH입니다. 이 제스처에는 약 {required} ETH와 네트워크 수수료가 필요합니다.",
+    "howTo": "{network} 네트워크에서 ETH를 준비하는 방법"
   }
 }

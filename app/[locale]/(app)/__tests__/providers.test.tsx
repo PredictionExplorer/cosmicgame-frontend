@@ -255,9 +255,9 @@ describe('Providers', () => {
       </Providers>,
     );
     // The Toaster mock spreads className onto data-classname; the value
-    // changed when we themed the toast to brand tokens (border, glass bg,
-    // elevation shadow). Assert the recipe is applied, not the exact string.
-    expect(screen.getByTestId('toaster').getAttribute('data-classname')).toMatch(/bg-card/);
+    // changed when we themed the toast to brand tokens (border, popover
+    // surface, elevation shadow). Assert the recipe, not the exact string.
+    expect(screen.getByTestId('toaster').getAttribute('data-classname')).toMatch(/bg-popover/);
   });
 
   it('wraps content in two ErrorBoundary layers', () => {
