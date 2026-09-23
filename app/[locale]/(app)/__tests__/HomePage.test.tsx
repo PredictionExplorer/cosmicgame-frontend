@@ -400,7 +400,7 @@ const makeDashboardData = (overrides = {}) => ({
   CurRoundNum: 5,
   CurNumBids: 10,
   LastBidderAddr: '0xBidder',
-  GestureCostEth: 0.01,
+  CurBidPriceEth: 0.01,
   PrizeAmountEth: 1.5,
   RaffleAmountEth: 0.4,
   StakingAmountEth: 0.6,

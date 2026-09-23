@@ -493,7 +493,7 @@ const makeDashboardData = (overrides = {}) => ({
   CurRoundNum: 5,
   CurNumBids: 10,
   LastBidderAddr: '0xBidder',
-  GestureCostEth: 0.01,
+  CurBidPriceEth: 0.01,
   PrizeAmountEth: 1.5,
   CosmicGameBalanceEth: 10,
   CharityPercentage: 7,
@@ -870,7 +870,7 @@ describe('HomePage', () => {
         // The generic observer stub has no geometry. Treat that as "not yet
         // passed" so the bar cannot cover the artwork at scroll zero.
         visible: false,
-        submitLabel: 'home.form.submit.eth(cost=0.01020)',
+        submitLabel: 'home.form.submit.eth(cost=0.01)',
         canGesture: true,
       }),
     );
@@ -1456,7 +1456,7 @@ describe('HomePage', () => {
 
     expect(within(composer).getByTestId('composer-message-input')).toBeInTheDocument();
     const send = within(composer).getByRole('button', {
-      name: /home\.form\.submit\.eth\(cost=0\.01020\)/,
+      name: /home\.form\.submit\.eth\(cost=0\.01\)/,
     });
     expect(send).toBeEnabled();
     expect(within(composer).getByText('home.deck.composer.note')).toBeInTheDocument();
@@ -1884,7 +1884,7 @@ describe('HomePage', () => {
     mockAccount = '0xUser';
     rerender(<HomePage />);
     const fab = screen.getByTestId('mobile-composer-fab');
-    expect(fab).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
+    expect(fab).toHaveTextContent('home.form.submit.eth(cost=0.01)');
 
     await user.click(fab);
     // The sheet hosts a second composer sharing the same form state.
@@ -2059,7 +2059,12 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    expect(getConsoleSubmitButton()).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
+    // The button quotes the Gesture Cost, as on the home page; the 2% collision buffer the
+    // form adds is disclosed under it rather than folded into the quote.
+    expect(getConsoleSubmitButton()).toHaveTextContent('home.form.submit.eth(cost=0.01)');
+    expect(screen.getByTestId('gesture-send-amount')).toHaveTextContent(
+      'home.form.submit.sendsNote(amount=0.0102,percent=2)',
+    );
     await user.click(getConsoleSubmitButton());
 
     expect(mockRequestNotificationPermission).toHaveBeenCalledTimes(1);
