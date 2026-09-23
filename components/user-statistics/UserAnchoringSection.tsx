@@ -127,14 +127,14 @@ export function UserAnchoringSection({
                 />
                 <StatCard
                   label={t('statistics.anchoring.stats.totalDistributions.label')}
-                  value={formatEthValue(totalRewardEth)}
+                  value={formatEthValue(totalRewardEth, locale)}
                   icon={<Coins className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.totalDistributions.tooltip')}
                   featured
                 />
                 <StatCard
                   label={t('statistics.anchoring.stats.unretrievedDistributions.label')}
-                  value={formatEthValue(unclaimedRewardEth)}
+                  value={formatEthValue(unclaimedRewardEth, locale)}
                   icon={<Gift className="h-3.5 w-3.5" />}
                   tooltip={t('statistics.anchoring.stats.unretrievedDistributions.tooltip')}
                   featured={unclaimedRewardEth > 0}

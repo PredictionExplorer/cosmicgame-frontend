@@ -253,7 +253,7 @@ export function RoundInfoSection({
                   {t('footer.contractBalance')}
                 </p>
                 <p className="text-sm font-bold text-white">
-                  {formatEthValue(Number(data?.CosmicGameBalanceEth) || 0)}
+                  {formatEthValue(Number(data?.CosmicGameBalanceEth) || 0, locale)}
                 </p>
               </div>
             </div>

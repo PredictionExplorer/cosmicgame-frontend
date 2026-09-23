@@ -80,7 +80,7 @@ const AnchoringPanel = () => {
     },
     {
       label: t('anchoringPage.snapshot.poolLabel'),
-      value: formatEthValue(dashboardData?.StakingAmountEth ?? 0),
+      value: formatEthValue(dashboardData?.StakingAmountEth ?? 0, locale),
       tooltip: t('anchoringPage.snapshot.poolTooltip'),
       icon: <Coins className="h-4 w-4" />,
       gradient: true,

@@ -308,14 +308,14 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         />
         <StatCard
           label={t('stats.cycleReserve.label')}
-          value={formatEthValue(data.PrizeAmountEth ?? 0)}
+          value={formatEthValue(data.PrizeAmountEth ?? 0, locale)}
           icon={<Trophy className="h-4 w-4" />}
           tooltip={t('stats.cycleReserve.tooltip')}
           gradient
         />
         <StatCard
           label={t('stats.stellarSelectionPool.label')}
-          value={formatEthValue(data.RaffleAmountEth ?? 0)}
+          value={formatEthValue(data.RaffleAmountEth ?? 0, locale)}
           icon={<Shuffle className="h-4 w-4" />}
           tooltip={t('stats.stellarSelectionPool.tooltip', {
             count: data.NumRaffleEthWinnersBidding ?? 0,
@@ -323,13 +323,13 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         />
         <StatCard
           label={t('stats.publicGoods.label')}
-          value={formatEthValue(charityAmount)}
+          value={formatEthValue(charityAmount, locale)}
           icon={<Heart className="h-4 w-4" />}
           tooltip={t('stats.publicGoods.tooltip', { percent: data.CharityPercentage ?? 0 })}
         />
         <StatCard
           label={t('stats.contributedEth.label')}
-          value={formatEthValue(data.CurRoundStats?.TotalDonatedAmountEth ?? 0)}
+          value={formatEthValue(data.CurRoundStats?.TotalDonatedAmountEth ?? 0, locale)}
           icon={<Coins className="h-4 w-4" />}
           tooltip={t('stats.contributedEth.tooltip')}
         />

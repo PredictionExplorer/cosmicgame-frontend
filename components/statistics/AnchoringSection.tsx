@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { formatEthValue } from '@/utils';
 
@@ -89,6 +89,7 @@ export function AnchoringSection({
   uniqueRWLKAnchorHolders,
 }: AnchoringSectionProps) {
   const t = useTranslations('statistics');
+  const locale = useLocale();
 
   return (
     <Tabs defaultValue="cst" className="mt-8">
@@ -125,7 +126,7 @@ export function AnchoringSection({
           />
           <StatisticsItem
             title={t('anchoringPage.stats.totalDistributions')}
-            value={formatEthValue(cstStats.TotalRewardEth ?? 0)}
+            value={formatEthValue(cstStats.TotalRewardEth ?? 0, locale)}
             tooltip={t('anchoringTooltips.cstTotalAnchorDistributions')}
           />
           <StatisticsItem
@@ -135,7 +136,7 @@ export function AnchoringSection({
           />
           <StatisticsItem
             title={t('anchoringPage.stats.unretrievedDistributions')}
-            value={formatEthValue(cstStats.UnclaimedRewardEth ?? 0)}
+            value={formatEthValue(cstStats.UnclaimedRewardEth ?? 0, locale)}
             tooltip={t('anchoringTooltips.cstUnretrievedAnchorDistributions')}
           />
         </StatisticsGroup>

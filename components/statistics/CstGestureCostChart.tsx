@@ -114,7 +114,7 @@ function CostTooltip({ active, payload }: CostTooltipProps) {
             />
             {t('charts.cstCost.cstPaid')}
           </dt>
-          <dd className="text-foreground">{formatCSTValue(point.cstPaid)}</dd>
+          <dd className="text-foreground">{formatCSTValue(point.cstPaid, locale)}</dd>
         </div>
         <div className="flex items-center justify-between gap-4">
           <dt className="flex items-center gap-2">
@@ -293,12 +293,12 @@ export const CstGestureCostView: FC<CstGestureCostViewProps> = ({ gestures }) =>
       <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
         <span className="text-foreground">
           {t('charts.cstCost.summaryMax', {
-            amount: formatCSTValue(series.maxPaid),
+            amount: formatCSTValue(series.maxPaid, locale),
             when: formatHoursTick((series.maxTs - series.roundStart) / 3600, locale),
           })}
         </span>
         <span>
-          {t('charts.cstCost.summaryTotal', { amount: formatCSTValue(series.totalPaid) })}
+          {t('charts.cstCost.summaryTotal', { amount: formatCSTValue(series.totalPaid, locale) })}
         </span>
         <span>{t('charts.cstCost.summaryCount', { count: series.points.length })}</span>
       </div>

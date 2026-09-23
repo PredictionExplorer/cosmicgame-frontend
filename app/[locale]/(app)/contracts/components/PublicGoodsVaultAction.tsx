@@ -110,7 +110,7 @@ export function PublicGoodsVaultAction({
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
               <span className="text-muted-foreground">{t('vault.balance')}</span>
               <span className="font-mono font-semibold text-foreground">
-                {formatEthValue(displayBalance)}
+                {formatEthValue(displayBalance, locale)}
               </span>
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">

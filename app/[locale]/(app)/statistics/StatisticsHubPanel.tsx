@@ -162,7 +162,7 @@ const StatisticsHubPanel = () => {
         />
         <StatCard
           label={t('metrics.contractBalance.label')}
-          value={formatEthValue(data.CosmicGameBalanceEth ?? 0)}
+          value={formatEthValue(data.CosmicGameBalanceEth ?? 0, locale)}
           icon={<Wallet className="h-4 w-4" />}
           tooltip={t('metrics.contractBalance.tooltip')}
           gradient
@@ -233,22 +233,22 @@ const StatisticsHubPanel = () => {
           />
           <StatisticsItem
             title={t('metrics.totalSignatureAllocationsDistributed.label')}
-            value={formatEthValue(Number(data.TotalPrizesPaidAmountEth) || 0)}
+            value={formatEthValue(Number(data.TotalPrizesPaidAmountEth) || 0, locale)}
             tooltip={t('metrics.totalSignatureAllocationsDistributed.tooltip')}
           />
           <StatisticsItem
             title={t('metrics.stellarSelectionEthDeposited.label')}
-            value={formatEthValue(data.MainStats.TotalRaffleEthDeposits)}
+            value={formatEthValue(data.MainStats.TotalRaffleEthDeposits, locale)}
             tooltip={t('metrics.stellarSelectionEthDeposited.tooltip')}
           />
           <StatisticsItem
             title={t('metrics.stellarSelectionEthRetrieved.label')}
-            value={formatEthValue(data.MainStats.TotalRaffleEthWithdrawn)}
+            value={formatEthValue(data.MainStats.TotalRaffleEthWithdrawn, locale)}
             tooltip={t('metrics.stellarSelectionEthRetrieved.tooltip')}
           />
           <StatisticsItem
             title={t('metrics.ethInGesturesCurrentCycle.label')}
-            value={formatEthValue(data.CurRoundStats?.TotalEthInBidsEth ?? 0)}
+            value={formatEthValue(data.CurRoundStats?.TotalEthInBidsEth ?? 0, locale)}
             tooltip={t('metrics.ethInGesturesCurrentCycle.tooltip')}
           />
           {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
@@ -274,7 +274,7 @@ const StatisticsHubPanel = () => {
         >
           <StatisticsItem
             title={t('metrics.totalSupplyErc20.label')}
-            value={formatCSTValue(ctStatisticsData?.TotalSupplyEth ?? 0)}
+            value={formatCSTValue(ctStatisticsData?.TotalSupplyEth ?? 0, locale)}
             tooltip={t('metrics.totalSupplyErc20.tooltip')}
           />
           <StatisticsItem
@@ -288,12 +288,12 @@ const StatisticsHubPanel = () => {
           />
           <StatisticsItem
             title={t('metrics.totalCstConsumed.label')}
-            value={formatCSTValue(data.MainStats.TotalCSTConsumedEth)}
+            value={formatCSTValue(data.MainStats.TotalCSTConsumedEth, locale)}
             tooltip={t('metrics.totalCstConsumed.tooltip')}
           />
           <StatisticsItem
             title={t('metrics.cstConsumedCurrentCycle.label')}
-            value={formatCSTValue(data.CurRoundStats?.TotalCstInBidsEth ?? 0)}
+            value={formatCSTValue(data.CurRoundStats?.TotalCstInBidsEth ?? 0, locale)}
             tooltip={t('metrics.cstConsumedCurrentCycle.tooltip')}
           />
           <StatisticsItem
@@ -303,7 +303,7 @@ const StatisticsHubPanel = () => {
           />
           <StatisticsItem
             title={t('metrics.outreachReserve.label')}
-            value={formatCSTValue(data.MainStats.TotalMktRewardsEth)}
+            value={formatCSTValue(data.MainStats.TotalMktRewardsEth, locale)}
             tooltip={t('metrics.outreachReserve.tooltip')}
           />
           <StatisticsItem
@@ -343,7 +343,7 @@ const StatisticsHubPanel = () => {
         >
           <StatisticsItem
             title={t('metrics.publicGoodsBalance.label')}
-            value={formatEthValue(Number(data.CharityBalanceEth) || 0)}
+            value={formatEthValue(Number(data.CharityBalanceEth) || 0, locale)}
             tooltip={t('metrics.publicGoodsBalance.tooltip')}
           />
           <StatisticsItem
@@ -364,7 +364,7 @@ const StatisticsHubPanel = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {formatEthValue(data.MainStats.TotalEthDonatedAmountEth ?? 0)}
+                {formatEthValue(data.MainStats.TotalEthDonatedAmountEth ?? 0, locale)}
               </Link>
             }
             tooltip={t('metrics.totalContributedEth.tooltip')}
@@ -384,7 +384,7 @@ const StatisticsHubPanel = () => {
                 title={t('metrics.protocolContributionsSum.label')}
                 value={
                   <Link className="text-inherit" href="/public-goods-contributions-cg">
-                    {formatEthValue(data.MainStats.SumCosmicGameDonationsEth ?? 0)}
+                    {formatEthValue(data.MainStats.SumCosmicGameDonationsEth ?? 0, locale)}
                   </Link>
                 }
                 tooltip={t('metrics.protocolContributionsSum.tooltip')}
@@ -398,7 +398,7 @@ const StatisticsHubPanel = () => {
                 <Link className="text-inherit" href="/public-goods-contributions-voluntary">
                   {t('hub.voluntaryContributionSummary', {
                     count: formatGroupedNumber(Number(data.NumVoluntaryDonations) || 0, locale),
-                    amount: formatEthValue(Number(data.SumVoluntaryDonationsEth) || 0),
+                    amount: formatEthValue(Number(data.SumVoluntaryDonationsEth) || 0, locale),
                   })}
                 </Link>
               }
@@ -418,7 +418,7 @@ const StatisticsHubPanel = () => {
           )}
           <StatisticsItem
             title={t('metrics.totalPublicGoodsRetrieved.label')}
-            value={formatEthValue(data.MainStats.SumWithdrawals ?? 0)}
+            value={formatEthValue(data.MainStats.SumWithdrawals ?? 0, locale)}
             tooltip={t('metrics.totalPublicGoodsRetrieved.tooltip')}
           />
         </StatisticsGroup>
