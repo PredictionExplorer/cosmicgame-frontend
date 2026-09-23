@@ -159,6 +159,28 @@ describe('donations API', () => {
       );
     });
 
+    it('treats the zero-filled record for an unknown id as missing', async () => {
+      // Regression: /eth-contribution/detail/7 rendered "Contribution #7" with 0 ETH, an
+      // empty contributor link and a timestamp-0 date from this payload.
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          ETHDonation: {
+            Tx: { EvtLogId: 0, BlockNum: 0, TxId: 0, TxHash: '', TimeStamp: 0, DateTime: '' },
+            DonorAid: 0,
+            DonorAddr: '',
+            Amount: '',
+            AmountEth: 0,
+            RoundNum: 0,
+            CGRecordId: 0,
+            DataJson: '',
+          },
+          RecordId: 7,
+        },
+      });
+
+      expect(await get_donations_with_info_by_id(7)).toBeNull();
+    });
+
     it('returns null on 400', async () => {
       mockedAxios.get.mockRejectedValue(make400());
       expect(await get_donations_with_info_by_id(10)).toBeNull();

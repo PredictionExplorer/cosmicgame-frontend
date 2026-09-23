@@ -16,7 +16,9 @@ import {
   detailPanelClass,
 } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { Button } from '@/components/ui/button';
 import { PageShell } from '@/components/ui/page-shell';
+import { UnknownValue } from '@/components/ui/unknown-value';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 import { formatFixed } from '@/utils/format';
@@ -28,7 +30,14 @@ interface EthDonationDetailPageProps {
 const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   const locale = useLocale();
   const t = useTranslations('ethContribution');
-  const { data: rawDonationInfo, isLoading: loading } = useDonationsWithInfoById(id);
+  const tCommon = useTranslations('common');
+  const tErrors = useTranslations('errors');
+  const {
+    data: rawDonationInfo,
+    isLoading: loading,
+    isError,
+    refetch,
+  } = useDonationsWithInfoById(id);
   const donationInfo =
     (rawDonationInfo as {
       TxHash: string;
@@ -100,7 +109,8 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
     );
   }
 
-  if (!donationInfo) {
+  // A failed read is not a missing record: offer a retry instead of "not found".
+  if (isError || !donationInfo) {
     return (
       <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
         <div className="mx-auto max-w-3xl">
@@ -115,7 +125,18 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
             align="left"
           />
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="font-medium text-foreground">{t('detail.notFound')}</p>
+            {isError ? (
+              <>
+                <p className="font-medium text-foreground" role="alert">
+                  {tErrors('state.title')}
+                </p>
+                <Button variant="outline" size="sm" className="mt-6" onClick={() => void refetch()}>
+                  {tErrors('state.retry')}
+                </Button>
+              </>
+            ) : (
+              <p className="font-medium text-foreground">{t('detail.notFound')}</p>
+            )}
           </div>
         </div>
       </PageShell>
@@ -157,12 +178,16 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
               </span>
             </DetailRow>
             <DetailRow label={t('detail.contributorAddressLabel')}>
-              <Link
-                href={`/user/${donationInfo.DonorAddr}`}
-                className={cn(detailLinkClass, 'font-mono text-[13px] break-all')}
-              >
-                {donationInfo.DonorAddr}
-              </Link>
+              {donationInfo.DonorAddr ? (
+                <Link
+                  href={`/user/${donationInfo.DonorAddr}`}
+                  className={cn(detailLinkClass, 'font-mono text-[13px] break-all')}
+                >
+                  {donationInfo.DonorAddr}
+                </Link>
+              ) : (
+                <UnknownValue label={tCommon('status.unavailable')} />
+              )}
             </DetailRow>
             <DetailRow label={t('detail.cycleNumberLabel')}>
               <Link href={`/allocation/${donationInfo.RoundNum}`} className={detailLinkClass}>

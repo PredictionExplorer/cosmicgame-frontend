@@ -132,7 +132,11 @@ export function get_donations_cg_with_info_by_round(
   }, []);
 }
 
-/** Fetches a single ETH donation with extended info by its record ID. */
+/**
+ * Fetches a single ETH donation with extended info by its record ID. The server answers an
+ * unknown ID with a zero-filled record (EvtLogId 0, empty TxHash) instead of a 404; that is
+ * mapped to `null` so no page renders a fabricated 0 ETH contribution from nobody.
+ */
 export function get_donations_with_info_by_id(
   id: number,
   opts?: ApiRequestOptions,
@@ -140,7 +144,7 @@ export function get_donations_with_info_by_id(
   return apiCall(async () => {
     const { data } = await apiGet(getAPIUrl(`donations/eth/with_info/info/${id}`), opts);
     const donation = flattenTx(data.ETHDonation) as ETHDonation | null;
-    if (donation == null) return donation;
+    if (donation == null || Number(donation.EvtLogId) === 0 || !donation.TxHash) return null;
     return safeValidate(ETHDonationSchema, donation, 'donationWithInfo') as ETHDonation;
   }, null);
 }
