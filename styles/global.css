@@ -721,18 +721,22 @@ body:has([data-maintenance-banner]) .home-control-shell {
 /*
  * The hero starfield (AmbientBackdrop variant="hero"): the --starfield
  * points in the palette's foreground colour, masked to the gutters outside
- * the 80rem content column (fading out 2rem before its edge), so no point
- * ever sits behind a card or a line of text. Screens without a gutter wider
- * than the content edge show no stars at all.
+ * the content column (fading in over 2rem beyond its edge), so no point ever
+ * sits behind a card or a line of text. Screens without a gutter wider than
+ * the content edge show no stars at all. The column is --starfield-column:
+ * 100rem by default, the width of the app home's control desk
+ * (`xl:max-w-[100rem]`), the widest hero content; a hero page with a
+ * narrower column may set a smaller value on the backdrop.
  */
 @utility starfield {
+  --starfield-edge: calc(var(--starfield-column, 100rem) / 2);
   --starfield-gutters: linear-gradient(
     90deg,
     #000 0,
-    #000 calc(50% - 42rem),
-    transparent calc(50% - 40rem),
-    transparent calc(50% + 40rem),
-    #000 calc(50% + 42rem)
+    #000 calc(50% - var(--starfield-edge) - 2rem),
+    transparent calc(50% - var(--starfield-edge)),
+    transparent calc(50% + var(--starfield-edge)),
+    #000 calc(50% + var(--starfield-edge) + 2rem)
   );
   background-color: hsl(var(--foreground));
   -webkit-mask-image: var(--starfield), var(--starfield-gutters);

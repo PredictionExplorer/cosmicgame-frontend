@@ -148,6 +148,16 @@ describe('global typography guarantees', () => {
     for (const size of fontSizes(label)) expect(size).toBeGreaterThanOrEqual(12);
   });
 
+  it('keeps the starfield out from behind the widest hero content, the home desk', () => {
+    // The home is the one `hero` backdrop page; its desk grows to
+    // `xl:max-w-[…rem]`, wider than the 83rem data shell.
+    const home = readFileSync(resolve(STYLES, '..', 'app/[locale]/(app)/HomePage.tsx'), 'utf8');
+    const desk = Number(/xl:max-w-\[([\d.]+)rem\]/.exec(home)?.[1]);
+    const column = Number(/var\(--starfield-column, ([\d.]+)rem\)/.exec(globalCss)?.[1]);
+    expect(desk).toBeGreaterThan(0);
+    expect(column).toBeGreaterThanOrEqual(desk);
+  });
+
   it('shares one content edge on the --gutter token', () => {
     expect(ruleBody(globalCss, '@utility site-container')).toContain(
       'width: min(100% - 2 * var(--gutter), 80rem)',
