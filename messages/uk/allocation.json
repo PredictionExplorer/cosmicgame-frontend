@@ -78,7 +78,7 @@
       "nftToken": "NFT-токен"
     },
     "share": {
-      "summary": "Цикл {cycle} — Cosmic Signature\nРозподіл Сигнатури: {amount} ETH\nОтримувач: {recipient}\nЖестів: {gestures}\n{url}",
+      "summary": "Цикл {cycle} — Cosmic Signature\nРозподіл Сигнатури: {amount} ETH\nОтримувач: {recipient}\nЖестів: {gestures}\n{url}",
       "success": "Підсумок циклу скопійовано в буфер обміну"
     },
     "invalid": {
@@ -144,19 +144,19 @@
       "segments": {
         "signature": {
           "label": "Розподіл Сигнатури",
-          "tooltip": "{amount} ETH забрав учасник, який зробив завершальний жест."
+          "tooltip": "{amount} ETH забрав учасник, який зробив завершальний жест."
         },
         "publicGoods": {
           "label": "Суспільні блага",
-          "tooltip": "{amount} ETH перераховано бенефіціару суспільних благ (Protocol Guild)."
+          "tooltip": "{amount} ETH перераховано бенефіціару суспільних благ (Protocol Guild)."
         },
         "anchor": {
           "label": "Надходження за закріплення",
-          "tooltip": "{amount} ETH надійшло пропорційно до кількості закріплених Cosmic Signature NFT у кожному гаманці."
+          "tooltip": "{amount} ETH надійшло пропорційно до кількості закріплених Cosmic Signature NFT у кожному гаманці."
         },
         "stellar": {
           "label": "Зоряний відбір",
-          "tooltip": "{amount} ETH спрямовано в пул зоряного відбору."
+          "tooltip": "{amount} ETH спрямовано в пул зоряного відбору."
         }
       }
     },

@@ -237,7 +237,7 @@ describe('GalleryCollectionDna', () => {
       />,
     );
     const fate = screen.getByTestId('dna-fate');
-    fireEvent.click(within(fate).getByRole('button', { name: /^Ejection: 1 NFTs/ }));
+    fireEvent.click(within(fate).getByRole('button', { name: /^Ejection: 1\sNFTs/ }));
     expect(onSelect).toHaveBeenCalledWith('fate', 'Ejection');
     const spectral = screen.getByTestId('dna-spectralClass');
     // Hottest to coolest: B before F.
@@ -256,11 +256,11 @@ describe('GalleryCollectionDna', () => {
         onSelect={noop}
       />,
     );
-    expect(screen.getByRole('button', { name: /^Ejection: 1 NFTs/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /^Ejection: 1\sNFTs/ })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    expect(screen.getByRole('button', { name: /^Eternal Dance: 1 NFTs/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /^Eternal Dance: 1\sNFTs/ })).toHaveAttribute(
       'aria-pressed',
       'false',
     );

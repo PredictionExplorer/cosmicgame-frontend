@@ -360,7 +360,7 @@
       "transferable": "Transferable"
     },
     "progress": {
-      "transferred": "Transferred {completed} of {total} NFTs",
+      "transferred": "Transferred {completed} of {total} NFTs",
       "stopped": "Transfer stopped at NFT #{id}",
       "current": "Current NFT: #{id}"
     },

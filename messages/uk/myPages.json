@@ -339,7 +339,7 @@
     "recipientAddress": "Адреса отримувача",
     "empty": "У цьому гаманці немає Cosmic Signature NFT.",
     "pickerTitle": "Виберіть NFT для передачі",
-    "pickerSummary": "Вибрано {selected} з {total} NFT, доступних для передачі.",
+    "pickerSummary": "Вибрано {selected} з {total} NFT, доступних для передачі.",
     "selectAll": "Вибрати всі доступні",
     "selectPage": "Вибрати сторінку",
     "clear": "Зняти вибір",
@@ -360,7 +360,7 @@
       "transferable": "Можна передати"
     },
     "progress": {
-      "transferred": "Передано {completed} з {total} NFT",
+      "transferred": "Передано {completed} з {total} NFT",
       "stopped": "Передачу зупинено на NFT #{id}",
       "current": "Поточний NFT: #{id}"
     },

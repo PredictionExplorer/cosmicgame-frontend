@@ -78,7 +78,7 @@
       "nftToken": "NFT 編號"
     },
     "share": {
-      "summary": "Cosmic Signature · 第 {cycle} 個週期\n簽名分配：{amount} ETH\n獲配者：{recipient}\n落筆次數：{gestures}\n{url}",
+      "summary": "Cosmic Signature · 第 {cycle} 個週期\n簽名分配：{amount} ETH\n獲配者：{recipient}\n落筆次數：{gestures}\n{url}",
       "success": "週期摘要已複製到剪貼板"
     },
     "invalid": {
@@ -144,19 +144,19 @@
       "segments": {
         "signature": {
           "label": "簽名分配",
-          "tooltip": "寫下收官之筆的參與者取回了 {amount} ETH。"
+          "tooltip": "寫下收官之筆的參與者取回了 {amount} ETH。"
         },
         "publicGoods": {
           "label": "公共物品",
-          "tooltip": "{amount} ETH 已轉撥給公共物品受益方 Protocol Guild。"
+          "tooltip": "{amount} ETH 已轉撥給公共物品受益方 Protocol Guild。"
         },
         "anchor": {
           "label": "錨定派發",
-          "tooltip": "已按各錢包錨定的 Cosmic Signature NFT 數量派發 {amount} ETH。"
+          "tooltip": "已按各錢包錨定的 Cosmic Signature NFT 數量派發 {amount} ETH。"
         },
         "stellar": {
           "label": "星選",
-          "tooltip": "{amount} ETH 已分配至星選池。"
+          "tooltip": "{amount} ETH 已分配至星選池。"
         }
       }
     },
@@ -267,7 +267,7 @@
       "ethAllocation": "ETH 分配",
       "nftId": "Cosmic Signature NFT ID",
       "attachedTokensLabel": "已附加 NFT（ERC-721）",
-      "attachedTokens": "{count} 枚已附加 NFT（ERC-721）"
+      "attachedTokens": "{count, number} 枚已附加 NFT（ERC-721）"
     },
     "next": {
       "title": "接下來",

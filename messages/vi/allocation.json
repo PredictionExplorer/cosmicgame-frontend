@@ -78,7 +78,7 @@
       "nftToken": "Token NFT"
     },
     "share": {
-      "summary": "Chu kỳ #{cycle} — Cosmic Signature\nPhân bổ Signature: {amount} ETH\nNgười nhận: {recipient}\nNét bút: {gestures}\n{url}",
+      "summary": "Chu kỳ #{cycle} — Cosmic Signature\nPhân bổ Signature: {amount} ETH\nNgười nhận: {recipient}\nNét bút: {gestures}\n{url}",
       "success": "Đã sao chép tóm tắt chu kỳ vào bảng nhớ tạm"
     },
     "invalid": {
@@ -144,19 +144,19 @@
       "segments": {
         "signature": {
           "label": "Phân bổ Signature",
-          "tooltip": "{amount} ETH được người tham gia đặt nét bút cuối cùng nhận về."
+          "tooltip": "{amount} ETH được người tham gia đặt nét bút cuối cùng nhận về."
         },
         "publicGoods": {
           "label": "Hàng hóa công",
-          "tooltip": "{amount} ETH chuyển đến đơn vị thụ hưởng Hàng hóa công (Protocol Guild)."
+          "tooltip": "{amount} ETH chuyển đến đơn vị thụ hưởng Hàng hóa công (Protocol Guild)."
         },
         "anchor": {
           "label": "Phân phối neo giữ",
-          "tooltip": "{amount} ETH phân phối theo tỷ lệ số Cosmic Signature NFT đang neo giữ của mỗi ví."
+          "tooltip": "{amount} ETH phân phối theo tỷ lệ số Cosmic Signature NFT đang neo giữ của mỗi ví."
         },
         "stellar": {
           "label": "Tinh tuyển",
-          "tooltip": "{amount} ETH phân bổ vào quỹ Tinh tuyển."
+          "tooltip": "{amount} ETH phân bổ vào quỹ Tinh tuyển."
         }
       }
     },
@@ -267,7 +267,7 @@
       "ethAllocation": "Phân bổ ETH",
       "nftId": "Mã Cosmic Signature NFT",
       "attachedTokensLabel": "NFT đính kèm (ERC-721)",
-      "attachedTokens": "{count, plural, other {# NFT đính kèm}} (ERC-721)"
+      "attachedTokens": "{count, plural, other {# NFT đính kèm}} (ERC-721)"
     },
     "next": {
       "title": "Bước tiếp theo",

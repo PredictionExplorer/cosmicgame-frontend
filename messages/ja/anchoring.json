@@ -227,7 +227,7 @@
       "releaseAll": "すべて解除して受け取る",
       "dialog": {
         "title": "トークンを解除して配分を受け取る",
-        "description": "<strong>係留中のCosmic Signature NFTをすべて解除</strong>し、累積した配分<amountStrong>{amount} ETH</amountStrong>をウォレットへ送ります。",
+        "description": "<strong>係留中のCosmic Signature NFTをすべて解除</strong>し、累積した配分<amountStrong>{amount} ETH</amountStrong>をウォレットへ送ります。",
         "warning": "<strong>取り消せない操作です：</strong>一度解除したCosmic Signature NFTは、再び係留できません。係留を完全にやめたい場合にだけ進めてください。",
         "confirm": "解除して受け取る"
       }

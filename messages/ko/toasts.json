@@ -61,7 +61,7 @@
       "tooLongBidMessage": "제스처 메시지가 너무 깁니다.",
       "wrongBidType": "제스처 유형이 잘못 선택되었습니다.",
       "fundTransferFailed": "자금 전송에 실패했습니다.",
-      "ethCostChanged": "트랜잭션이 전송되는 동안 제스처 비용이 {increase} ETH 올랐습니다. 새로 필요한 비용은 {required} ETH입니다. 다시 시도해 주세요.",
+      "ethCostChanged": "트랜잭션이 전송되는 동안 제스처 비용이 {increase} ETH 올랐습니다. 새로 필요한 비용은 {required} ETH입니다. 다시 시도해 주세요.",
       "cstCostChanged": "트랜잭션이 전송되는 동안 CST 제스처 비용이 바뀌었습니다. 다른 제스처가 먼저 처리된 것으로 보입니다. 컨트랙트가 요구한 {required} CST가 설정한 최대치 {maximum} CST를 넘었습니다. 새로 고친 뒤 다시 시도해 주세요."
     }
   },
@@ -154,10 +154,10 @@
     "invalidUrl": "http:// 또는 https://로 시작하는 올바른 URL을 입력해 주세요.",
     "invalidUrlInline": "http:// 또는 https:// URL을 사용해 주세요.",
     "contractUnavailable": "지갑을 연결하고 올바른 네트워크인지 확인해 주세요.",
-    "formSubmitted": "{amount} ETH 기여가 확인되었습니다.",
-    "formSubmittedWithInfo": "정보를 포함한 {amount} ETH 기여가 확인되었습니다.",
-    "submitted": "{amount} ETH 기여가 완료되었습니다.",
-    "submittedWithInfo": "정보를 포함한 {amount} ETH 기여가 완료되었습니다.",
+    "formSubmitted": "{amount} ETH 기여가 확인되었습니다.",
+    "formSubmittedWithInfo": "정보를 포함한 {amount} ETH 기여가 확인되었습니다.",
+    "submitted": "{amount} ETH 기여가 완료되었습니다.",
+    "submittedWithInfo": "정보를 포함한 {amount} ETH 기여가 완료되었습니다.",
     "formFailed": "ETH 기여에 실패했습니다. 입력 내용을 확인한 뒤 다시 시도해 주세요.",
     "failed": "기여에 실패했습니다. 잠시 후 다시 시도해 주세요.",
     "failedWithInfo": "정보를 포함한 기여에 실패했습니다. 입력 내용을 확인해 주세요.",

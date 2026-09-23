@@ -223,11 +223,11 @@
         "distributionAmountEth": "Сума надходження (ETH)",
         "unretrievedAmountEth": "Не забрано (ETH)"
       },
-      "summary": "Ваші надходження, які можна забрати: {amount} ETH",
+      "summary": "Ваші надходження, які можна забрати: {amount} ETH",
       "releaseAll": "Відкріпити та забрати все",
       "dialog": {
         "title": "Відкріпити токени та забрати надходження",
-        "description": "Ця дія <strong>відкріпить усі ваші закріплені Cosmic Signature NFT</strong> і перекаже <amountStrong>{amount} ETH</amountStrong> накопичених надходжень у ваш гаманець.",
+        "description": "Ця дія <strong>відкріпить усі ваші закріплені Cosmic Signature NFT</strong> і перекаже <amountStrong>{amount} ETH</amountStrong> накопичених надходжень у ваш гаманець.",
         "warning": "<strong>Незворотна дія:</strong> після відкріплення ці Cosmic Signature NFT більше не можна буде закріпити. Продовжуйте лише тоді, коли вирішили остаточно припинити закріплення цих NFT.",
         "confirm": "Відкріпити й забрати"
       }

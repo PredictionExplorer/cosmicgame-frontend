@@ -223,11 +223,11 @@
         "distributionAmountEth": "Số tiền phân phối (ETH)",
         "unretrievedAmountEth": "Số tiền chưa nhận về (ETH)"
       },
-      "summary": "Phân phối bạn có thể nhận về là {amount} ETH",
+      "summary": "Phân phối bạn có thể nhận về là {amount} ETH",
       "releaseAll": "Gỡ neo và nhận về tất cả",
       "dialog": {
         "title": "Gỡ neo token và nhận về phân phối",
-        "description": "Thao tác này sẽ <strong>gỡ neo toàn bộ Cosmic Signature NFT bạn đang neo giữ</strong> và chuyển <amountStrong>{amount} ETH</amountStrong> phân phối tích lũy về ví của bạn.",
+        "description": "Thao tác này sẽ <strong>gỡ neo toàn bộ Cosmic Signature NFT bạn đang neo giữ</strong> và chuyển <amountStrong>{amount} ETH</amountStrong> phân phối tích lũy về ví của bạn.",
         "warning": "<strong>Không thể hoàn tác:</strong> sau khi gỡ neo, những Cosmic Signature NFT này không thể neo giữ lại. Chỉ tiếp tục nếu bạn đã quyết định ngừng neo giữ các NFT này.",
         "confirm": "Gỡ neo và nhận về"
       }

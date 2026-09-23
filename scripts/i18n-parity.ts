@@ -110,6 +110,7 @@ for (const namespaceFile of enNamespaces) {
     ...report.invalidValues.map((key) => `not a string: ${key}`),
     ...report.syntaxErrors,
     ...report.pluralGaps,
+    ...report.unitSpacing,
   ];
   if (problems.length) {
     console.log(`  ${DEFAULT_LOCALE}/${namespace}: ${problems.length} source problem(s)`);

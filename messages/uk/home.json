@@ -252,10 +252,10 @@
       "title": "Ваша позиція в циклі",
       "tooltip": "Показує вашу поточну позицію щодо завершального жесту та частоту зоряного відбору на основі ваших жестів у цьому циклі.",
       "leader": {
-        "base": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури ({amount} ETH, 1 000 CST, 1 Cosmic Signature NFT).",
-        "withNft": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT і {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} (див. нижче).",
-        "withErc20": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT і {erc20Count, plural, one {# долучений депозит ERC-20} few {# долучені депозити ERC-20} many {# долучених депозитів ERC-20} other {# долученого депозиту ERC-20}} (див. нижче).",
-        "withBoth": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT, {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} і {erc20Count, plural, one {# долучений депозит ERC-20} few {# долучені депозити ERC-20} many {# долучених депозитів ERC-20} other {# долученого депозиту ERC-20}} (див. нижче)."
+        "base": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури ({amount} ETH, 1 000 CST, 1 Cosmic Signature NFT).",
+        "withNft": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT і {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} (див. нижче).",
+        "withErc20": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT і {erc20Count, plural, one {# долучений депозит ERC-20} few {# долучені депозити ERC-20} many {# долучених депозитів ERC-20} other {# долученого депозиту ERC-20}} (див. нижче).",
+        "withBoth": "Останній жест зробили ви. Якщо більше ніхто не зробить жесту, ви отримаєте розподіл Сигнатури: {amount} ETH, 1 000 CST, 1 Cosmic Signature NFT, {nftCount, plural, one {# долучений NFT} few {# долучені NFT} many {# долучених NFT} other {# долученого NFT}} і {erc20Count, plural, one {# долучений депозит ERC-20} few {# долучені депозити ERC-20} many {# долучених депозитів ERC-20} other {# долученого депозиту ERC-20}} (див. нижче)."
       },
       "notLeader": "Останній жест не ваш — зробіть жест ще раз, щоб знову вийти вперед, або залишайтеся серед кандидатів зоряного відбору.",
       "ethStellar": "Зоряний відбір ETH",
@@ -313,7 +313,7 @@
       "rewardLabel": "CST участі",
       "costLabel": "Вартість",
       "netLabel": "Зміна балансу CST",
-      "cstAmount": "{amount} CST",
+      "cstAmount": "{amount} CST",
       "minAccepted": "Прийнятний мінімум: {value}",
       "minAcceptedAny": "будь-яка кількість, зокрема 0 CST",
       "minAcceptedAria": "Мінімальна прийнятна кількість CST участі",
@@ -339,7 +339,7 @@
         "acceptAnyTitle": "Приймати будь-яку кількість CST участі, зокрема 0",
         "acceptAnyBody": "Установлює мінімальну кількість CST участі на 0. Оберіть цей варіант, якщо хочете підтвердити жест навіть тоді, коли кількість CST зміниться до виконання транзакції.",
         "toleranceLabel": "Дозволити зниження кількості CST на",
-        "minAmount": "мін. {amount} CST",
+        "minAmount": "мін. {amount} CST",
         "revertNote": "Якщо на момент виконання транзакції контракт має закарбувати менше CST за встановлений мінімум, він відхилить транзакцію."
       },
       "attachNft": "Долучити NFT",
@@ -352,15 +352,15 @@
       "collision": {
         "title": "Захист від зміни вартості",
         "raiseBy": "Підвищити на",
-        "approxCost": "≈ {amount} ETH",
+        "approxCost": "≈ {amount} ETH",
         "note": "Дозволяє зростання вартості жесту до {percent}%, якщо інший жест у тому самому блоці випередить ваш. Це налаштування не збільшує базову вартість у протоколі."
       }
     },
     "submit": {
-      "eth": "Зробити ETH-жест ({cost} ETH)",
-      "randomWalkWithToken": "Зробити ETH-жест + RandomWalk {tokenId} ({cost} ETH)",
+      "eth": "Зробити ETH-жест ({cost} ETH)",
+      "randomWalkWithToken": "Зробити ETH-жест + RandomWalk {tokenId} ({cost} ETH)",
       "randomWalk": "Зробити ETH-жест + RandomWalk",
-      "cst": "Зробити CST-жест ({cost} CST)",
+      "cst": "Зробити CST-жест ({cost} CST)",
       "cstFree": "Зробити CST-жест (без оплати)",
       "generic": "Зробити жест: {method}"
     },
@@ -396,8 +396,8 @@
     "titleTooltip": "Розподіли, що виконуються під час завершення циклу за понад десятьма напрямами.",
     "recipientCount": "{count, plural, one {# отримувач} few {# отримувачі} many {# отримувачів} other {# отримувача}}",
     "amounts": {
-      "eth": "{amount} ETH",
-      "ethEach": "по {amount} ETH",
+      "eth": "{amount} ETH",
+      "ethEach": "по {amount} ETH",
       "fixedCst": "1 000 CST",
       "fixedCstEach": "по 1 000 CST",
       "nft": "1 Cosmic Signature NFT",
@@ -456,11 +456,11 @@
     "messageAria": "Повідомлення жесту від {address}",
     "openPositionAria": "Відкрити жест на позиції {position}",
     "badge": {
-      "eth": "{amount} ETH",
+      "eth": "{amount} ETH",
       "ethFallback": "ETH",
-      "ethRwlk": "{amount} ETH + RWLK",
+      "ethRwlk": "{amount} ETH + RWLK",
       "rwlkFallback": "ETH + RWLK",
-      "cst": "{amount} CST",
+      "cst": "{amount} CST",
       "cstFallback": "CST"
     },
     "history": {
@@ -575,7 +575,7 @@
       "gestures": "{count, plural, =0 {У цьому циклі жестів ще немає} one {# жест у цьому циклі} few {# жести в цьому циклі} many {# жестів у цьому циклі} other {# жесту в цьому циклі}}",
       "retrieve": "Забрати розподіли",
       "nothingWaiting": "Немає що забирати",
-      "cstPreview": "Орієнтовно за жест зараз: ~{amount} CST"
+      "cstPreview": "Орієнтовно за жест зараз: ~{amount} CST"
     },
     "miniBar": {
       "aria": "Швидка консоль циклу",
@@ -600,7 +600,7 @@
     "clock": {
       "reserveLabel": "Розподіл Сигнатури",
       "reserveExtras": "+ 1 000 CST · 1 Cosmic Signature NFT · долучені активи",
-      "reserveUsd": "≈ {amount} USD",
+      "reserveUsd": "≈ {amount} USD",
       "notifyAria": "Сповістити мене, перш ніж цикл можна буде завершити",
       "notifyLabel": "Сповістити до завершення за:",
       "notifyMinutes": "{minutes} хв",

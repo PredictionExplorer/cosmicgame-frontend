@@ -650,7 +650,7 @@
     "invalidAddress": "地址无效",
     "user": "参与者",
     "heading": "此参与者获配的星选 ETH",
-    "retrievable": "可取回分配共 {amount} ETH",
+    "retrievable": "可取回分配共 {amount} ETH",
     "retrieveAll": "全部取回",
     "empty": "暂无星选 ETH。"
   },

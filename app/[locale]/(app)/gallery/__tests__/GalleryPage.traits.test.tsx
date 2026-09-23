@@ -207,7 +207,7 @@ describe('GalleryPage with the collection trait index', () => {
   it('applies a DNA segment as a replacing trait filter', () => {
     render(<GalleryPage />);
     const dna = screen.getByTestId('dna-fate');
-    fireEvent.click(within(dna).getByRole('button', { name: /^Ejection: 1 NFTs/ }));
+    fireEvent.click(within(dna).getByRole('button', { name: /^Ejection: 1\sNFTs/ }));
     expect(mockPush).toHaveBeenCalledWith('/gallery?fate=Ejection');
   });
 

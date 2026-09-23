@@ -78,7 +78,7 @@
       "nftToken": "NFTトークン"
     },
     "share": {
-      "summary": "サイクル{cycle}——Cosmic Signature\nシグネチャー配分：{amount} ETH\n受領者：{recipient}\n筆数：{gestures}\n{url}",
+      "summary": "サイクル{cycle}——Cosmic Signature\nシグネチャー配分：{amount} ETH\n受領者：{recipient}\n筆数：{gestures}\n{url}",
       "success": "サイクルの要約をクリップボードにコピーしました"
     },
     "invalid": {
@@ -144,19 +144,19 @@
       "segments": {
         "signature": {
           "label": "シグネチャー配分",
-          "tooltip": "最後の一筆を入れた参加者が受け取った{amount} ETH。"
+          "tooltip": "最後の一筆を入れた参加者が受け取った{amount} ETH。"
         },
         "publicGoods": {
           "label": "公共財",
-          "tooltip": "公共財の受け手（Protocol Guild）へ送られた{amount} ETH。"
+          "tooltip": "公共財の受け手（Protocol Guild）へ送られた{amount} ETH。"
         },
         "anchor": {
           "label": "係留配分",
-          "tooltip": "各ウォレットが係留しているCosmic Signature NFTの数に比例して配られた{amount} ETH。"
+          "tooltip": "各ウォレットが係留しているCosmic Signature NFTの数に比例して配られた{amount} ETH。"
         },
         "stellar": {
           "label": "星選",
-          "tooltip": "星選プールに配分された{amount} ETH。"
+          "tooltip": "星選プールに配分された{amount} ETH。"
         }
       }
     },

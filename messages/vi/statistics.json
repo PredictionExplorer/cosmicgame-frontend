@@ -650,7 +650,7 @@
     "invalidAddress": "Địa chỉ không hợp lệ",
     "user": "Người dùng",
     "heading": "ETH Tinh tuyển được phân bổ cho người tham gia này",
-    "retrievable": "Phân bổ bạn có thể nhận về là {amount} ETH",
+    "retrievable": "Phân bổ bạn có thể nhận về là {amount} ETH",
     "retrieveAll": "Nhận về tất cả",
     "empty": "Chưa có ETH Tinh tuyển."
   },

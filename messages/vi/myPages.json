@@ -339,7 +339,7 @@
     "recipientAddress": "Địa chỉ người nhận",
     "empty": "Bạn không có Cosmic Signature NFT nào trong ví này.",
     "pickerTitle": "Chọn NFT để chuyển giao",
-    "pickerSummary": "Đã chọn {selected} trong {total} NFT có thể chuyển giao.",
+    "pickerSummary": "Đã chọn {selected} trong {total} NFT có thể chuyển giao.",
     "selectAll": "Chọn tất cả NFT có thể chuyển giao",
     "selectPage": "Chọn trang hiện tại",
     "clear": "Bỏ chọn",
@@ -360,7 +360,7 @@
       "transferable": "Có thể chuyển giao"
     },
     "progress": {
-      "transferred": "Đã chuyển giao {completed} trong {total} NFT",
+      "transferred": "Đã chuyển giao {completed} trong {total} NFT",
       "stopped": "Chuyển giao dừng ở NFT #{id}",
       "current": "NFT hiện tại: #{id}"
     },

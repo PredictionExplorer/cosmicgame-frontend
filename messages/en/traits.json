@@ -178,7 +178,7 @@
     "clearFacet": "Clear {trait}",
     "activeAria": "Active trait filters",
     "removeFilter": "Remove filter {trait}: {value}",
-    "optionAria": "{value}: {count} NFTs",
+    "optionAria": "{value}: {count} NFTs",
     "chaosRange": "Chaos range",
     "chaosMin": "Minimum chaos",
     "chaosMax": "Maximum chaos",
@@ -191,7 +191,7 @@
     "partial": "Trait index still filling in ({indexed} of {total})",
     "unavailable": "Trait filters are unavailable right now.",
     "retry": "Retry",
-    "matches": "{count} NFTs match"
+    "matches": "{count} NFTs match"
   },
   "quickView": {
     "title": "Cosmic Signature {id}",
@@ -250,7 +250,7 @@
   "dna": {
     "title": "Collection DNA",
     "subtitle": "The collection’s distribution across its defining traits. Select a segment to filter the gallery.",
-    "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
+    "segmentAria": "{value}: {count} NFTs. Filter by this trait.",
     "legendCount": "{count}",
     "loading": "Reading the collection's traits…"
   }

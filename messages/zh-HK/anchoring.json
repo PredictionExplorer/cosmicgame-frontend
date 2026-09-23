@@ -223,11 +223,11 @@
         "distributionAmountEth": "錨定派發額（ETH）",
         "unretrievedAmountEth": "未取回金額（ETH）"
       },
-      "summary": "可取回錨定派發：{amount} ETH",
+      "summary": "可取回錨定派發：{amount} ETH",
       "releaseAll": "全部解錨並取回",
       "dialog": {
         "title": "解錨代幣並取回錨定派發",
-        "description": "此操作會<strong>解錨全部 Cosmic Signature NFT</strong>，並將累積的 <amountStrong>{amount} ETH</amountStrong> 錨定派發取回至錢包。",
+        "description": "此操作會<strong>解錨全部 Cosmic Signature NFT</strong>，並將累積的 <amountStrong>{amount} ETH</amountStrong> 錨定派發取回至錢包。",
         "warning": "<strong>解錨後不可撤銷：</strong>這些 Cosmic Signature NFT 將無法再次錨定。",
         "confirm": "解錨並取回"
       }

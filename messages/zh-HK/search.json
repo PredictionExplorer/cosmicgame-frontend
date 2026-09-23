@@ -4,6 +4,6 @@
     "ariaLabel": "搜尋 NFT",
     "clear": "清除搜尋",
     "submit": "搜尋",
-    "results": "{count} 項結果"
+    "results": "{count, number} 項結果"
   }
 }
