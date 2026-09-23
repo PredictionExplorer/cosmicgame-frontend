@@ -366,7 +366,7 @@
     "maxGestureEth": "Nét bút tính bằng ETH lớn nhất được ghi nhận cho ví này.",
     "recipientAddress": "Địa chỉ ví đã nhận một hoặc nhiều phân bổ giao thức được lập chỉ mục.",
     "allocationsReceived": "Số phân bổ được lập chỉ mục mà ví này đã nhận.",
-    "maxAllocationEth": "Phân bổ Signature lớn nhất người nhận này nhận được nhờ đặt nét bút cuối cùng; bằng 0 nếu chưa từng nhận. ETH Chiến binh Thời gian, Tinh tuyển và phân phối neo giữ chỉ được tính vào tổng.",
+    "maxAllocationEth": "Phân bổ Signature lớn nhất người nhận này nhận được nhờ đặt nét bút cuối cùng; bằng 0 nếu chưa từng nhận. ETH Chiến binh Thời gian và Tinh tuyển chỉ được tính vào tổng.",
     "allocationsSumEth": "Tổng phân bổ ETH được lập chỉ mục cho người nhận này.",
     "contributorAddress": "Địa chỉ ví đã đóng góp ETH cho giao thức.",
     "numberOfContributions": "Số giao dịch đóng góp ETH được lập chỉ mục từ ví này.",
