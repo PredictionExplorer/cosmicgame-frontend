@@ -343,6 +343,39 @@ per-locale date/duration templates (compact duration units come from the
 English output must remain byte-identical — every formatting change is guarded by
 existing unit tests plus new zh cases.
 
+### 4.1 The formatting layer
+
+Every displayed number, amount, date, duration and address goes through
+`utils/format.ts` (implementation in `utils/format/`), tested in all locales by
+`utils/__tests__/format.test.ts`:
+
+| Value           | Function                                   | Component                                    |
+| --------------- | ------------------------------------------ | -------------------------------------------- |
+| ETH / CST / USD | `formatAmount(value, { unit, context })`   | `<Amount>` (`components/ui/amount.tsx`)      |
+| count           | `formatCount`                              | ICU `{n, number}` or plural `#`              |
+| percentage      | `formatPercent` (percentage points)        | —                                            |
+| date-time       | `formatDateTime`, `formatDateTimeTitle`    | `<DateTime>` (`components/ui/date-time.tsx`) |
+| duration        | `formatDuration` (`compact` or `clock`)    | `<Duration>` (`components/ui/duration.tsx`)  |
+| address / hash  | `formatAddress` (0x1Ec1…E990, checksummed) | `<AddressChip>`                              |
+
+- **Precision policy** (`AmountContext`): `table` pads to fixed digits so columns line
+  up (ETH 4, CST 2), renders zero as `0` and dust as `<0.0001`; `card` (default) keeps
+  ETH at 4 digits and CST at 0–2 (a protocol constant reads 1,000 CST); `hero` trims
+  trailing zeros; `exact` (an amount about to be paid) keeps up to 6 digits and never
+  bounds.
+- **Numbers** come from `Intl` for the locale's `intlLocale`, with one documented
+  deviation: `uk` prints token amounts and percentages with the dot (§4 of its style
+  guide), grouped with U+00A0. `vi` keeps Intl's comma decimal and dot grouping.
+- **No-break joins:** a number and its unit, and the tokens of one duration, are joined
+  by U+00A0 so they never wrap apart. Catalogs follow the same rule (`{amount} ETH`
+  with U+00A0), enforced by `i18n:strict` (§7).
+- **Dates:** the compact form adds the year when it is not the current one; `<DateTime>`
+  renders `<time dateTime title>` with UTC through hydration and the reader's zone after
+  it, the full date, zone (as a UTC offset) and age on hover. State the zone once per
+  table with `<TimeZoneNote>`.
+- Token amounts in messages are passed as strings from `formatAmount`; counts are passed
+  as numbers and formatted by the message (`{count, number}` or `#`).
+
 ## 5. Fonts
 
 Clash Display (display headings) and Inter (body) contain **no CJK glyphs**. Without
@@ -471,7 +504,11 @@ Noto cut per glyph is their intended rendering.
    compares each namespace against `messages/en/**` and checks key parity, ICU syntax
    (the same `@formatjs` parser next-intl uses), placeholder parity (same `{arguments}`,
    no invented `<tags>`), plural completeness against the locale's CLDR categories
-   (`one/few/many/other` for uk, `other` for zh, ko, ja, and vi), and verbatim-copy catalogs. It
+   (`one/few/many/other` for uk, `other` for zh, ko, ja, and vi), number-format parity
+   (an argument the English formats as a number, `#` or `{n, number}`, is never printed
+   bare and ungrouped), no-break unit joins in every catalog including the English
+   (`{amount}`, `{cost}`, `{count}`… or `#` before ETH, CST, USD or NFT takes U+00A0), and
+   verbatim-copy catalogs. It
    then reports every long-form content area (`scripts/i18n-content-areas.ts`) as the
    share of prose still identical to the English, and `--strict` fails an area that is
    untranslated — a scaffolded module cannot ship as a translation. `npm run
