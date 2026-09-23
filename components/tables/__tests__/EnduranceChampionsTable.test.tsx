@@ -97,7 +97,7 @@ describe('EnduranceChampionsTable', () => {
     const sortButtons = screen.getAllByText('tables.endurance.chronoWarrior');
     const headerButton = sortButtons.find((el) => el.tagName === 'BUTTON') ?? sortButtons[0]!;
     fireEvent.click(headerButton);
-    const timeCells = screen.getAllByText(formatSeconds(500));
+    const timeCells = screen.getAllByText('8m 20s');
     expect(timeCells.length).toBeGreaterThanOrEqual(1);
   });
 

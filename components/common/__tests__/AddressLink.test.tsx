@@ -24,7 +24,7 @@ describe('AddressLink', () => {
 
   it('renders shortened address on mobile', () => {
     render(<AddressLink address={address} url={url} />);
-    const mobileLink = screen.getByText('0x123456....345678');
+    const mobileLink = screen.getByText('0x1234…5678');
     expect(mobileLink).toBeInTheDocument();
     expect(mobileLink).toHaveAttribute('href', url);
   });

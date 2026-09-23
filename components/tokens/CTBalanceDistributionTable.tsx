@@ -35,7 +35,7 @@ const CTBalanceDistributionRow: FC<{ row?: BalanceRow; locale: string }> = memo(
         </TablePrimaryCell>
 
         <TablePrimaryCell label={t('statisticsColumns.cstBalance')} align="right">
-          {formatTableAmount(row.BalanceFloat, locale)}
+          {formatTableAmount(row.BalanceFloat, locale, 'CST')}
         </TablePrimaryCell>
       </TablePrimaryRow>
     );

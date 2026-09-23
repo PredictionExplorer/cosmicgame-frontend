@@ -62,7 +62,7 @@ describe('PublicGoodsImpactCard', () => {
     expect(card).toHaveAttribute('data-variant', 'compact');
     expect(card).toHaveClass('p-4');
     expect(card).toHaveTextContent('8.6415 ETH');
-    expect(card).toHaveTextContent('11.23 ETH');
+    expect(card).toHaveTextContent('11.2345 ETH');
     expect(card).toHaveTextContent('0.5000 ETH');
     expect(card).toHaveTextContent('2.5000 ETH');
     expect(screen.queryByRole('link', { name: /home\.publicGoods\.cta/ })).not.toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('PublicGoodsImpactCard', () => {
   it('renders supporting public-goods totals', () => {
     render(<PublicGoodsImpactCard data={dashboardData} />);
     expect(screen.getByText('home.publicGoods.stats.lifetime')).toBeInTheDocument();
-    expect(screen.getByText('11.23 ETH')).toBeInTheDocument();
+    expect(screen.getByText('11.2345 ETH')).toBeInTheDocument();
     expect(screen.getByText('home.publicGoods.stats.vault')).toBeInTheDocument();
     expect(screen.getByText('0.5000 ETH')).toBeInTheDocument();
     expect(screen.getByText('home.publicGoods.stats.retrieved')).toBeInTheDocument();

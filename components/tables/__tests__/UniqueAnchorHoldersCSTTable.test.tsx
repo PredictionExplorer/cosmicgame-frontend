@@ -71,14 +71,14 @@ describe('UniqueAnchorHoldersCSTTable', () => {
     expect(screen.getByText('7')).toBeInTheDocument();
   });
 
-  it('formats ETH values to 6 decimal places', () => {
+  it('formats ETH values to 4 fixed decimal places so the column lines up', () => {
     render(
       <UniqueAnchorHoldersCSTTable
         list={[createAnchorHolder({ TotalRewardEth: 1.5, UnclaimedRewardEth: 0.3 })]}
       />,
     );
-    expect(screen.getByText('1.5')).toBeInTheDocument();
-    expect(screen.getByText('0.3')).toBeInTheDocument();
+    expect(screen.getByText('1.5000')).toBeInTheDocument();
+    expect(screen.getByText('0.3000')).toBeInTheDocument();
   });
 
   it('renders shortened address with link', () => {

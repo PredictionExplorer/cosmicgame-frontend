@@ -48,7 +48,7 @@ describe('StatisticsHubPanel', () => {
     expect(screen.getByText('Total Cycles')).toBeInTheDocument();
     expect(screen.getByText('Allocations Distributed', { selector: 'p' })).toBeInTheDocument();
     expect(screen.getByText('Contract Balance')).toBeInTheDocument();
-    expect(screen.getByText('36.16 ETH')).toBeInTheDocument();
+    expect(screen.getByText('36.1595 ETH')).toBeInTheDocument();
   });
 
   it('renders an explore card linking to every section page', () => {

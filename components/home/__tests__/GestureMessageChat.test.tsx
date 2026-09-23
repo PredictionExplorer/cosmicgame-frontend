@@ -153,9 +153,9 @@ describe('GestureMessageChat', () => {
     );
 
     const badges = screen.getAllByTestId('gesture-method-badge').map((badge) => badge.textContent);
-    expect(badges).toContain('home.chat.badge.eth(amount=0.1)');
-    expect(badges).toContain('home.chat.badge.cst(amount=20)');
-    expect(badges).toContain('home.chat.badge.ethRwlk(amount=0.05)');
+    expect(badges).toContain('home.chat.badge.eth(amount=0.1000)');
+    expect(badges).toContain('home.chat.badge.cst(amount=20.00)');
+    expect(badges).toContain('home.chat.badge.ethRwlk(amount=0.0500)');
   });
 
   it('copies the participant address from a message', async () => {

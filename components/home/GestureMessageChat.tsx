@@ -177,7 +177,7 @@ function getGestureMethodBadge(
     const cost =
       typeof gesture.CstCost === 'number' && gesture.CstCost >= 0 ? gesture.CstCost : null;
     return cost != null
-      ? { messageKey: 'cst', amount: formatTableAmount(cost, locale) }
+      ? { messageKey: 'cst', amount: formatTableAmount(cost, locale, 'CST') }
       : { messageKey: 'cstFallback' };
   }
   const cost =

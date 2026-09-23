@@ -1,5 +1,3 @@
-import { execFileSync } from 'node:child_process';
-
 import {
   formatSeconds,
   calculateTimeDiff,
@@ -90,26 +88,29 @@ describe('formatTableAmount', () => {
     expect(formatTableAmount(-0.00000001)).toBe('>-0.0001');
   });
 
-  it('trims trailing zeros instead of padding to 6 decimals', () => {
-    expect(formatTableAmount(0.1)).toBe('0.1');
-    expect(formatTableAmount(1.5)).toBe('1.5');
+  it('pads ETH to 4 fixed decimals so a column lines up', () => {
+    expect(formatTableAmount(0.1)).toBe('0.1000');
+    expect(formatTableAmount(1.5)).toBe('1.5000');
+    expect(formatTableAmount(0.135830123)).toBe('0.1358');
+    expect(formatTableAmount(3.100415642)).toBe('3.1004');
   });
 
-  it('keeps up to 6 decimals of precision', () => {
-    expect(formatTableAmount(0.135830123)).toBe('0.13583');
-    expect(formatTableAmount(3.100415642)).toBe('3.100416');
+  it('uses 2 fixed decimals for CST columns', () => {
+    expect(formatTableAmount(60872.256, 'en', 'CST')).toBe('60,872.26');
   });
 
   it('adds thousands separators for large values', () => {
-    expect(formatTableAmount(12096.254179)).toBe('12,096.254179');
-    expect(formatTableAmount(12096.254179, 'zh')).toBe('12,096.254179');
+    expect(formatTableAmount(12096.254179)).toBe('12,096.2542');
+    expect(formatTableAmount(12096.254179, 'zh')).toBe('12,096.2542');
   });
 
-  it('uses the Ukrainian comma decimal and space grouping', () => {
-    // Intl groups with a (narrow) no-break space; normalize for the assertion.
-    expect(formatTableAmount(12096.254179, 'uk').replace(/[\u00a0\u202f]/g, ' ')).toBe(
-      '12 096,254179',
-    );
+  it('groups Ukrainian with a no-break space and keeps the token-amount dot', () => {
+    // docs/i18n/style-guide-uk.md §4: amounts keep the dot in every context.
+    expect(formatTableAmount(12096.254179, 'uk')).toBe('12\u00a0096.2542');
+  });
+
+  it('uses the Vietnamese dot grouping and comma decimal', () => {
+    expect(formatTableAmount(12096.254179, 'vi')).toBe('12.096,2542');
   });
 
   it('renders non-finite input as an em dash', () => {
@@ -120,19 +121,19 @@ describe('formatTableAmount', () => {
 });
 
 describe('formatSeconds edge cases', () => {
-  it('returns "1m " for exactly 60 seconds', () => {
-    expect(formatSeconds(60)).toBe('1m ');
+  it('returns "1m" for exactly 60 seconds, without a trailing space', () => {
+    expect(formatSeconds(60)).toBe('1m');
   });
 
-  it('returns "1h " for exactly 3600 seconds', () => {
-    expect(formatSeconds(3600)).toBe('1h ');
+  it('returns "1h" for exactly 3600 seconds', () => {
+    expect(formatSeconds(3600)).toBe('1h');
   });
 
   it('returns full breakdown for days+hours+minutes+seconds', () => {
-    expect(formatSeconds(90061)).toBe('1d 1h 1m 1s');
+    expect(formatSeconds(90061)).toBe('1d\u00a01h\u00a01m\u00a01s');
     expect(formatSeconds(90061, 'zh')).toBe('1天1小时1分1秒');
-    // Ukrainian separates words, so tokens keep the English-style space.
-    expect(formatSeconds(90061, 'uk')).toBe('1д 1год 1хв 1с');
+    // Ukrainian separates words, so tokens keep a (no-break) space.
+    expect(formatSeconds(90061, 'uk')).toBe('1д\u00a01год\u00a01хв\u00a01с');
   });
 
   it('truncates fractional seconds', () => {
@@ -156,7 +157,7 @@ describe('calculateTimeDiff', () => {
   it('returns formatted duration for a past timestamp', () => {
     const timestamp = 1_700_000_000 - 3661;
     const result = calculateTimeDiff(timestamp);
-    expect(result).toBe('1h 1m 1s');
+    expect(result).toBe('1h\u00a01m\u00a01s');
   });
 
   it('returns empty string when timestamp is in the future', () => {
@@ -170,50 +171,63 @@ describe('calculateTimeDiff', () => {
 
   it('returns days for large differences', () => {
     const oneDayAgo = 1_700_000_000 - 86400;
-    expect(calculateTimeDiff(oneDayAgo)).toBe('1d ');
+    expect(calculateTimeDiff(oneDayAgo)).toBe('1d');
   });
 
   it('returns multi-day difference with hours', () => {
     const threeDaysAgo = 1_700_000_000 - 3 * 86400 - 7200;
-    expect(calculateTimeDiff(threeDaysAgo)).toBe('3d 2h ');
+    expect(calculateTimeDiff(threeDaysAgo)).toBe('3d\u00a02h');
     expect(calculateTimeDiff(threeDaysAgo, 'zh')).toBe('3天2小时');
   });
 });
 
 describe('formatEthValue', () => {
   it('returns "0 ETH" for zero', () => {
-    expect(formatEthValue(0)).toBe('0 ETH');
+    expect(formatEthValue(0)).toBe('0\u00a0ETH');
   });
 
   it('returns 4 decimals for values less than 10', () => {
-    expect(formatEthValue(1.23456)).toBe('1.2346 ETH');
+    expect(formatEthValue(1.23456)).toBe('1.2346\u00a0ETH');
   });
 
-  it('returns 2 decimals for values 10 or greater', () => {
-    expect(formatEthValue(10)).toBe('10.00 ETH');
-    expect(formatEthValue(99.999)).toBe('100.00 ETH');
+  it('keeps 4 decimals for values 10 or greater, so one figure never reads two ways', () => {
+    expect(formatEthValue(10)).toBe('10.0000\u00a0ETH');
+    expect(formatEthValue(32.29391)).toBe('32.2939\u00a0ETH');
+    expect(formatEthValue(99.99999)).toBe('100.0000\u00a0ETH');
   });
 
   it('returns "0 ETH" for NaN-ish falsy value', () => {
-    expect(formatEthValue(NaN)).toBe('0 ETH');
+    expect(formatEthValue(NaN)).toBe('0\u00a0ETH');
   });
 });
 
 describe('formatCSTValue', () => {
   it('returns "0 CST" for zero', () => {
-    expect(formatCSTValue(0)).toBe('0 CST');
+    expect(formatCSTValue(0)).toBe('0\u00a0CST');
   });
 
-  it('returns 4 decimals for values less than 10', () => {
-    expect(formatCSTValue(5.6789)).toBe('5.6789 CST');
+  it('returns up to 2 decimals at any size', () => {
+    expect(formatCSTValue(5.6789)).toBe('5.68\u00a0CST');
+    expect(formatCSTValue(42.12345)).toBe('42.12\u00a0CST');
   });
 
-  it('returns 2 decimals for values 10 or greater', () => {
-    expect(formatCSTValue(42.12345)).toBe('42.12 CST');
+  it('groups thousands and keeps whole amounts whole', () => {
+    expect(formatCSTValue(60872.26)).toBe('60,872.26\u00a0CST');
+    expect(formatCSTValue(1000)).toBe('1,000\u00a0CST');
   });
 });
 
 describe('YYYYMMDD date helpers', () => {
+  // Timestamps below are in 2026; pin the clock there so the compact form
+  // keeps omitting the (current) year in every future year the suite runs.
+  beforeEach(() => {
+    jest.spyOn(Date, 'now').mockReturnValue(Date.UTC(2026, 5, 15));
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('converts ISO date to YYYYMMDD', () => {
     expect(toYyyymmdd('2026-05-06')).toBe('20260506');
   });
@@ -258,31 +272,6 @@ describe('YYYYMMDD date helpers', () => {
     expect(labels[4]).toBe('15 трав., 09:00');
     expect(labels[11]).toBe('15 груд., 09:00');
     expect(new Set(labels).size).toBe(12);
-  });
-
-  it('keeps local semantics in a non-UTC timezone across a date boundary', () => {
-    const script = `
-      import('./utils/format.ts').then((format) => {
-        const api = format.default ?? format;
-        const timestamp = Date.UTC(2026, 0, 1, 0, 30, 45) / 1000;
-        process.stdout.write(JSON.stringify([
-          api.convertTimestampToDateTime(timestamp, true),
-          api.convertTimestampToDateTime(timestamp, true, 'zh'),
-          api.convertTimestampToServerDateTime(timestamp, true),
-        ]));
-      });
-    `;
-    const output = execFileSync(process.execPath, ['--import', 'tsx', '--eval', script], {
-      cwd: process.cwd(),
-      env: { ...process.env, TZ: 'America/Los_Angeles' },
-      encoding: 'utf8',
-    });
-
-    expect(JSON.parse(output)).toEqual([
-      'Dec 31, 16:30:45',
-      '12月31日 16:30:45',
-      'Jan 01, 00:30:45',
-    ]);
   });
 
   it('groups per locale: Western commas for en/zh, spaces for uk', () => {

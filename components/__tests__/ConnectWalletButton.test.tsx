@@ -61,7 +61,7 @@ describe('ConnectWalletButton', () => {
       />,
     );
 
-    expect(screen.getByText(/0x1234\.{4}5678/)).toBeInTheDocument();
+    expect(screen.getByText(/0x1234…5678/)).toBeInTheDocument();
   });
 
   it('renders the shortened wallet address in mobile view when connected', () => {
@@ -80,7 +80,7 @@ describe('ConnectWalletButton', () => {
       />,
     );
 
-    expect(screen.getByText(/0x1234\.{4}5678/)).toBeInTheDocument();
+    expect(screen.getByText(/0x1234…5678/)).toBeInTheDocument();
   });
 
   it('renders dropdown trigger with address when connected (desktop)', () => {
@@ -99,7 +99,7 @@ describe('ConnectWalletButton', () => {
       />,
     );
 
-    const trigger = screen.getByText(/0x1234\.{4}5678/);
+    const trigger = screen.getByText(/0x1234…5678/);
     expect(trigger).toBeInTheDocument();
   });
 
@@ -120,7 +120,7 @@ describe('ConnectWalletButton', () => {
       />,
     );
 
-    await user.click(screen.getByText(/0x1234\.{4}5678/));
+    await user.click(screen.getByText(/0x1234…5678/));
 
     expect(screen.getByText('wallet.labels.balancesHeading')).toBeInTheDocument();
     expect(screen.getByText('2.5000')).toBeInTheDocument();
@@ -143,7 +143,7 @@ describe('ConnectWalletButton', () => {
       />,
     );
 
-    await user.click(screen.getByText(/0x1234\.{4}5678/));
+    await user.click(screen.getByText(/0x1234…5678/));
 
     expect(screen.getByText('wallet.labels.loading')).toBeInTheDocument();
   });
@@ -165,7 +165,7 @@ describe('ConnectWalletButton', () => {
       />,
     );
 
-    await user.click(screen.getByText(/0x1234\.{4}5678/));
+    await user.click(screen.getByText(/0x1234…5678/));
 
     expect(screen.getByText('wallet.balances.anchoredCst')).toBeInTheDocument();
     expect(screen.queryByText('CST NFTs')).not.toBeInTheDocument();
@@ -189,7 +189,7 @@ describe('ConnectWalletButton', () => {
       />,
     );
 
-    await user.click(screen.getByText(/0x1234\.{4}5678/));
+    await user.click(screen.getByText(/0x1234…5678/));
 
     expect(screen.getByText('wallet.account.myDashboard')).toBeInTheDocument();
     expect(screen.getByText('wallet.account.myNfts')).toBeInTheDocument();

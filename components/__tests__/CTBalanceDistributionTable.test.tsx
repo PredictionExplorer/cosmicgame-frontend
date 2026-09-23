@@ -23,7 +23,7 @@ describe('CTBalanceDistributionTable', () => {
       screen.queryByText(mockData[0]!.OwnerAddr) || screen.queryByText(/0x555ece.*310e60/);
     expect(addressEl).toBeInTheDocument();
     // Balance renders with up to 6 decimals, trailing zeros trimmed
-    expect(screen.getByText('3.100416')).toBeInTheDocument();
+    expect(screen.getByText('3.10')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
