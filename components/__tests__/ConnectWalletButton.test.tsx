@@ -80,7 +80,10 @@ describe('ConnectWalletButton', () => {
       />,
     );
 
-    expect(screen.getByText(/0x1234…\u20605678/)).toBeInTheDocument();
+    const pill = screen.getByText(/0x1234…\u20605678/);
+    expect(pill).toBeInTheDocument();
+    // The unbreakable short address must fit the ~80px the 320px header leaves.
+    expect(pill).toHaveClass('max-[359px]:px-2.5', 'max-[359px]:text-xs');
   });
 
   it('renders dropdown trigger with address when connected (desktop)', () => {

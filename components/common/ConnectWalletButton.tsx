@@ -79,7 +79,14 @@ const ConnectWalletButton = ({
 
   if (account) {
     if (isMobileView) {
-      return <MobileWallet label={shortenHex(account)} className={className} />;
+      // The short address is one unbreakable word; below 360px the header
+      // leaves this pill about 80px, so it tightens instead of spilling out.
+      return (
+        <MobileWallet
+          label={shortenHex(account)}
+          className={cn('max-[359px]:px-2.5 max-[359px]:text-xs', className)}
+        />
+      );
     }
 
     return (
