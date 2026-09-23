@@ -55,7 +55,11 @@ describe('AnchoringRecipientTable', () => {
     const datetime = screen.getByText(convertTimestampToDateTime(recipient.TimeStamp));
     expect(datetime.closest('a')).toHaveAttribute('target', '_blank');
     expect(datetime.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(recipient.TimeStamp, false, 'en');
+    expect(
+      document.querySelector(
+        `time[datetime="${new Date(recipient.TimeStamp * 1000).toISOString()}"]`,
+      ),
+    ).toBeInTheDocument();
   });
 
   it('renders shortened anchorHolder address with link', () => {

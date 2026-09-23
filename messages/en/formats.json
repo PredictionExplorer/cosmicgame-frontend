@@ -18,5 +18,27 @@
     "minutes": "m",
     "seconds": "s",
     "leftPattern": "{duration} left"
+  },
+  "address": {
+    "zero": "Zero address",
+    "imprinted": "Imprinted",
+    "consumed": "Consumed",
+    "self": "This address",
+    "known": {
+      "protocol": "Cosmic Signature Protocol",
+      "implementation": "Implementation Contract",
+      "cst": "Cosmic Signature CST Token",
+      "nft": "Cosmic Signature NFT",
+      "randomWalk": "RandomWalk",
+      "council": "Cosmic Council",
+      "publicGoods": "Public Goods Vault",
+      "outreach": "Outreach Reserve",
+      "allocations": "Allocations Wallet",
+      "cosmicAnchor": "Cosmic Signature NFT Anchoring Wallet",
+      "rwalkAnchor": "RWLK Anchoring Wallet"
+    }
+  },
+  "dateTime": {
+    "timeZone": "Time zone: {zone}"
   }
 }

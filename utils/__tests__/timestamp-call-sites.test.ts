@@ -11,16 +11,25 @@ function sourceFiles(directory: string): string[] {
   });
 }
 
+/**
+ * Formatters whose output depends on the process time zone. Called during
+ * render they print the server's zone in the HTML and the reader's after
+ * hydration, so UI reaches them only through `<DateTime>`, which renders UTC
+ * until hydration and the local zone afterwards.
+ */
+const ZONE_DEPENDENT_FORMATTER =
+  /\b(?:convertTimestampToDateTime|convertTimestampToServerDateTime|formatDateTime|formatDateTimeTitle)\b/;
+
 describe('timestamp rendering call sites', () => {
-  it('routes production UI through the hydration-safe formatter', () => {
+  it('routes production UI through the hydration-safe <DateTime>', () => {
     const root = process.cwd();
     const files = ['app', 'components', 'hooks'].flatMap((directory) =>
       sourceFiles(join(root, directory)),
     );
-    const allowed = join(root, 'components/common/HydrationSafeDateTime.tsx');
+    const allowed = join(root, 'components/ui/date-time.tsx');
     const offenders = files
       .filter((path) => path !== allowed)
-      .filter((path) => readFileSync(path, 'utf8').includes('convertTimestampToDateTime'))
+      .filter((path) => ZONE_DEPENDENT_FORMATTER.test(readFileSync(path, 'utf8')))
       .map((path) => relative(root, path));
 
     expect(offenders).toEqual([]);

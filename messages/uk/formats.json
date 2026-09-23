@@ -18,5 +18,27 @@
     "minutes": "хв",
     "seconds": "с",
     "leftPattern": "залишилося {duration}"
+  },
+  "address": {
+    "zero": "Нульова адреса",
+    "imprinted": "Закарбовано",
+    "consumed": "Витрачено",
+    "self": "Ця адреса",
+    "known": {
+      "protocol": "Протокол Cosmic Signature",
+      "implementation": "Контракт реалізації",
+      "cst": "Токен Cosmic Signature CST",
+      "nft": "Cosmic Signature NFT",
+      "randomWalk": "RandomWalk",
+      "council": "Космічна Рада",
+      "publicGoods": "Сховище суспільних благ",
+      "outreach": "Резерв просування",
+      "allocations": "Гаманець розподілів",
+      "cosmicAnchor": "Гаманець закріплення Cosmic Signature NFT",
+      "rwalkAnchor": "Гаманець закріплення RWLK"
+    }
+  },
+  "dateTime": {
+    "timeZone": "Часовий пояс: {zone}"
   }
 }

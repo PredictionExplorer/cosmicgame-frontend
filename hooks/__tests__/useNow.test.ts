@@ -59,6 +59,18 @@ describe('useNow', () => {
     setIntervalSpy.mockRestore();
   });
 
+  it('restarts from the current time when a ticker is reused after going idle', () => {
+    const first = renderHook(() => useNow(7000));
+    first.unmount();
+
+    // Minutes pass with no subscriber, so no tick refreshes the stored time.
+    jest.setSystemTime(Date.now() + 5 * 60_000);
+    const expected = Date.now();
+
+    const { result } = renderHook(() => useNow(7000));
+    expect(result.current).toBeGreaterThanOrEqual(expected);
+  });
+
   it('clears the interval when the last subscriber unmounts', () => {
     const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
     clearIntervalSpy.mockClear();

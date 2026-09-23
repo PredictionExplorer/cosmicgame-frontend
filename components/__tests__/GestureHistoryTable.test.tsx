@@ -63,7 +63,7 @@ describe('GestureHistoryTable', () => {
     expect(
       screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp, true)),
     ).toBeInTheDocument();
-    expect(mockConvertTimestampToDateTime).toHaveBeenCalledWith(1701346718, true, 'en');
+    expect(document.querySelector('time[datetime="2023-11-30T12:18:38.000Z"]')).toBeInTheDocument();
     expect(mockFormatSeconds).toHaveBeenCalledWith(expect.any(Number), 'en');
     expect(screen.getByText(shortenHex(mockData[0]!.BidderAddr, 6))).toBeInTheDocument();
     // Component displays "X ETH" suffix, not "Ξ"
