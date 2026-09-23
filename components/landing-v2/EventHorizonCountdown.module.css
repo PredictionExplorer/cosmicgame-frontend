@@ -69,8 +69,8 @@
   margin-block: 0.75rem 0;
   font-family: var(--font-family-display);
   font-size: clamp(1.375rem, 3.5cqw, 2rem);
-  font-weight: 500;
-  letter-spacing: -0.025em;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.025em * var(--display-tracking-scale));
   line-height: 1.15;
   text-wrap: balance;
 }
@@ -118,7 +118,7 @@
 .value {
   display: block;
   color: var(--clock-accent);
-  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-family: var(--mono-font-stack);
   font-size: min(var(--digit-scale), 3.5rem);
   font-variant-numeric: tabular-nums;
   font-weight: 400;
@@ -232,4 +232,11 @@
   .links a {
     transition: none;
   }
+}
+
+/* No case and no Latin tracking for Chinese, Japanese and Korean labels. */
+.eyebrow:is(:lang(zh), :lang(ja), :lang(ko)),
+.unitLabel:is(:lang(zh), :lang(ja), :lang(ko)) {
+  letter-spacing: 0;
+  text-transform: none;
 }
