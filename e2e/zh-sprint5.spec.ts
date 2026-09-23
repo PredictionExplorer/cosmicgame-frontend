@@ -231,7 +231,7 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       [
         '/zh/statistics',
         'Cosmic Signature 协议统计',
-        'Cosmic Signature 统计 · 演绎周期、落笔、NFT 与 CST',
+        '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature',
       ],
       ['/zh/statistics/activity', '落笔活动统计', '落笔活动统计 · Cosmic Signature'],
       ['/zh/statistics/anchoring', '锚定统计', '锚定统计 · Cosmic Signature'],
@@ -239,11 +239,7 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
       ['/zh/statistics/performance', '参与者表现统计', '参与者表现统计 · Cosmic Signature'],
       ['/zh/statistics/tokens', '代币分布统计', '代币分布统计 · Cosmic Signature'],
       ['/zh/recipient-history', '我的分配历史', '我的分配历史 · Cosmic Signature'],
-      [
-        '/zh/named-nfts',
-        '已命名 Cosmic Signature NFT',
-        '已命名 Cosmic Signature NFT · Cosmic Signature',
-      ],
+      ['/zh/named-nfts', '已命名 Cosmic Signature NFT', '已命名 NFT · Cosmic Signature'],
       ['/zh/attached-nfts', '已附加 NFT 贡献', '已附加 NFT 贡献 · Cosmic Signature'],
       [
         '/zh/used-rwlk-nfts',
@@ -277,7 +273,11 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
   test('localizes statistics tooltips, dates, chart axes, and system-event copy', async ({
     page,
   }) => {
-    await openZhRoute(page, '/zh/statistics', 'Cosmic Signature 统计 · 演绎周期、落笔、NFT 与 CST');
+    await openZhRoute(
+      page,
+      '/zh/statistics',
+      '统计：演绎周期、落笔、NFT 与 CST · Cosmic Signature',
+    );
     const label = page.getByText('周期总数', { exact: true }).first();
     const tooltipTrigger = label
       .locator('xpath=ancestor::*[.//button][1]')
@@ -288,7 +288,7 @@ test.describe('zh Sprint 5 — statistics, tables, and formatting', () => {
     await expectTooltipFullyVisible(page, /协议上线以来/);
     await dismissOpenTooltips(page);
 
-    await openZhRoute(page, '/zh/named-nfts', '已命名 Cosmic Signature NFT · Cosmic Signature');
+    await openZhRoute(page, '/zh/named-nfts', '已命名 NFT · Cosmic Signature');
     await expect(page.getByText(/1月1日 \d{2}:34/, { exact: true })).toBeVisible();
 
     await openZhRoute(page, '/zh/statistics/tokens', '代币分布统计 · Cosmic Signature');

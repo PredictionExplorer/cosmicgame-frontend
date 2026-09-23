@@ -20,7 +20,7 @@ describe('localized site-map route', () => {
       resolvingMetadata(),
     );
 
-    expect(documentTitleOf(metadata)).toBe(zhMeta.siteMap.title);
+    expect(documentTitleOf(metadata)).toBe(`${zhMeta.siteMap.title} · Cosmic Signature`);
     expect(metadata.description).toBe(zhMeta.siteMap.description);
     expect(metadata.alternates).toEqual({
       canonical: `${APP_ORIGIN}/zh/site-map`,

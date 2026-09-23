@@ -3,6 +3,10 @@ import { dirname, join, relative } from 'node:path';
 
 import enMeta from '@/messages/en/meta.json';
 import zhMeta from '@/messages/zh/meta.json';
+import { getLandingContent } from '@/content/landing';
+
+import { routing } from '@/i18n/routing';
+import { SITE_NAME, documentTitle } from '@/utils/seo';
 
 const APP_LOCALE_ROOT = join(process.cwd(), 'app', '[locale]');
 const INHERITED_OR_NON_DOCUMENT_ROUTES = new Set([
@@ -116,6 +120,36 @@ describe('site-wide localized page metadata', () => {
     const zhPairs = metadataPairs(zhMeta);
     expect(zhPairs.map(({ key }) => key).sort()).toEqual(enPairs.map(({ key }) => key).sort());
     expect(enPairs.length).toBeGreaterThanOrEqual(60);
+  });
+
+  // F313: open tabs read "FAQ: …", "Twisted Mind · …" instead of a column of
+  // "Cosmic Signature …". Catalog titles name the page; createMetadata closes
+  // the document title with the brand, exactly once.
+  it.each(routing.locales)('%s titles lead with the page and name the brand once', (locale) => {
+    const catalog = JSON.parse(
+      readFileSync(join(process.cwd(), 'messages', locale, 'meta.json'), 'utf8'),
+    ) as Record<string, unknown>;
+    const titles = metadataPairs(catalog)
+      .map(({ key, title }) => ({ key, title }))
+      .filter(({ key }) => key !== 'shared');
+    expect(titles.length).toBeGreaterThanOrEqual(60);
+    for (const { key, title } of titles) {
+      expect([key, title]).not.toEqual([
+        key,
+        expect.stringMatching(/(?:\||·)\s*Cosmic Signature$/),
+      ]);
+      expect([key, documentTitle(title).split(SITE_NAME).length - 1]).toEqual([key, 1]);
+    }
+  });
+
+  // F161: a blanket "formally verified" keyword is the claim the hero keeps
+  // off its marquee; verification is sourced on /security and /audits.
+  it.each(routing.locales)('%s landing keywords make no verification claim', (locale) => {
+    const { keywords } = getLandingContent(locale).meta;
+    expect(keywords.length).toBeGreaterThan(5);
+    for (const keyword of keywords) {
+      expect(keyword).not.toMatch(/formal|形式|формальн|정형|hình thức|verif|验证|驗證/i);
+    }
   });
 
   it('gives every Chinese metadata pair localized copy instead of an English fallback', () => {

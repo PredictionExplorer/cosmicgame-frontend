@@ -91,7 +91,7 @@ describe('experimental UI metadata', () => {
   it('is self-canonical and excluded from search indexes', async () => {
     const metadata = await generateMetadata(englishProps, resolvingMetadata());
 
-    expect(documentTitleOf(metadata)).toBe('Experimental UI | Cosmic Signature');
+    expect(documentTitleOf(metadata)).toBe('Experimental UI · Cosmic Signature');
     expect(metadata.robots).toEqual(
       expect.objectContaining({
         index: false,

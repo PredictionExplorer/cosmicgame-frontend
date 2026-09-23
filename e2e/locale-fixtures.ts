@@ -682,7 +682,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     },
     siteMap: {
       heading: 'Мапа сайту',
-      title: 'Мапа сайту | Cosmic Signature',
+      title: 'Мапа сайту · Cosmic Signature',
       section: 'Персональні інструменти застосунку',
     },
     notFound: { headingPattern: /404 — Сторінку не знайдено/, homeLink: 'На головну' },
@@ -703,7 +703,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
       help: '도움말',
       aboutPattern: /Cosmic Signature 소개/,
     },
-    siteMap: { heading: '사이트맵', title: '사이트맵 | Cosmic Signature', section: '개인 도구' },
+    siteMap: { heading: '사이트맵', title: '사이트맵 · Cosmic Signature', section: '개인 도구' },
     notFound: { headingPattern: /404 — 페이지를 찾을 수 없습니다/, homeLink: '홈으로' },
     skipLink: '본문으로 건너뛰기',
     landingH1: getLandingContent('ko').hero.headlineLead,
@@ -724,7 +724,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     },
     siteMap: {
       heading: 'サイトマップ',
-      title: 'サイトマップ | Cosmic Signature',
+      title: 'サイトマップ · Cosmic Signature',
       section: '個人ツール',
     },
     notFound: { headingPattern: /404：ページが見つかりません/, homeLink: 'ホームへ戻る' },
@@ -747,7 +747,7 @@ export const LOCALE_CHROME: Record<TranslatedLocale, LocaleChromeFixture> = {
     },
     siteMap: {
       heading: 'Sơ đồ trang',
-      title: 'Sơ đồ trang | Cosmic Signature',
+      title: 'Sơ đồ trang · Cosmic Signature',
       section: 'Công cụ ứng dụng cá nhân',
     },
     notFound: { headingPattern: /404 — Không tìm thấy trang/, homeLink: 'Về trang chủ' },

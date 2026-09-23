@@ -18,7 +18,6 @@ export const landingTextUk = {
       'суспільні блага',
       'Protocol Guild',
       'CC0',
-      'формально верифікований',
     ],
   },
 

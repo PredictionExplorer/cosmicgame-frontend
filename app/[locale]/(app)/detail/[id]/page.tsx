@@ -93,13 +93,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const t = await getTranslations({ locale, namespace: 'meta' });
-  const title = t('tokenDetail.titleFor', { id });
-  const description = t('tokenDetail.descriptionFor', { id });
-
   const tokenInfo = await loadTokenInfo(tokenId);
   if (tokenInfo === null) {
     notFound();
   }
+
+  // A named piece is shared by its name: `Twisted Mind · Cosmic Signature #25`.
+  const name = typeof tokenInfo?.TokenName === 'string' ? tokenInfo.TokenName.trim() : '';
+  const title = name
+    ? t('tokenDetail.titleWithName', { name, id })
+    : t('tokenDetail.titleFor', { id });
+  const description = t('tokenDetail.descriptionFor', { id });
 
   // The share image is the co-located artwork card (./opengraph-image.tsx):
   // a 1200×630 PNG of the piece on its black plate, never the multi-MB source.

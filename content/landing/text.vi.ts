@@ -20,7 +20,6 @@ export const landingTextVi = {
       'hàng hóa công',
       'Protocol Guild',
       'CC0',
-      'kiểm chứng hình thức',
     ],
   },
 

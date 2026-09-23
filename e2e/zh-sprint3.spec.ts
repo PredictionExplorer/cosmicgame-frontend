@@ -82,7 +82,7 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await page.goto('/zh/gallery', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page).toHaveTitle('Cosmic Signature 画廊 · 确定性三体 NFT 艺术');
+    await expect(page).toHaveTitle('画廊：确定性三体 NFT 艺术 · Cosmic Signature');
     // The visible gallery heading is an h2; the page's h1 belongs to the
     // crawler-facing SeoSummary (still English until Sprint 7).
     await expect(page.getByRole('heading', { name: 'NFT 画廊' })).toBeVisible();
@@ -160,7 +160,7 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
   test('/zh/how-it-works renders the Chinese protocol guide', async ({ page }) => {
     await page.goto('/zh/how-it-works');
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page).toHaveTitle('Cosmic Signature 运作原理 · 演绎周期、落笔与 NFT');
+    await expect(page).toHaveTitle('运作原理：演绎周期、落笔与 NFT · Cosmic Signature');
     await expect(page.getByRole('heading', { level: 1, name: /运作原理/ })).toBeVisible();
     await expect(page.getByText('演绎周期的完整历程', { exact: true })).toBeVisible();
   });
