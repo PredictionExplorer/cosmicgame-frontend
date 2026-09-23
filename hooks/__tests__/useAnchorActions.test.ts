@@ -1,647 +1,223 @@
-import { act, renderHook } from '@/test-utils';
+import { act, renderHook } from '@testing-library/react';
 
-// ---------------------------------------------------------------------------
-// Mocks — keep every external collaborator stubbed so tests are hermetic.
-// ---------------------------------------------------------------------------
+import { createFakeTxFlow } from '@/test-utils/txFlow';
 
-const mockAccount = '0xUser';
-const mockSetNotification = jest.fn();
-const mockFetchAnchoredTokens = jest.fn();
+const USER = '0xUser' as const;
+const STAKING_CST = '0xStakingCst';
+const STAKING_RWALK = '0xStakingRwalk';
+
+const mockTx = createFakeTxFlow(USER);
+const mockTranslate = (key: string) => `toasts.${key}`;
+const mockNotify = jest.fn();
+const mockNotifyErrorFromEthers = jest.fn();
 const mockInvalidateQueries = jest.fn();
+const mockFetchStakedTokens = jest.fn();
 
-jest.mock('../web3', () => ({
-  useActiveWeb3React: () => ({ account: mockAccount }),
+jest.mock('next-intl', () => ({
+  useLocale: () => 'en',
+  useTranslations: () => mockTranslate,
 }));
-
-jest.mock('../../contexts/NotificationContext', () => ({
-  useNotification: () => ({ setNotification: mockSetNotification }),
+jest.mock('../useTxFlow', () => ({ useTxFlow: () => mockTx.flow }));
+jest.mock('../useNotify', () => ({
+  useNotify: () => ({ notify: mockNotify, notifyErrorFromEthers: mockNotifyErrorFromEthers }),
 }));
-
-jest.mock('../../contexts/AnchoredTokenContext', () => ({
-  useAnchoredToken: () => ({ fetchData: mockFetchAnchoredTokens }),
-}));
-
 jest.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
 }));
-
-const mockWaitForTransactionReceipt = jest
-  .fn<Promise<unknown>, unknown[]>()
-  .mockResolvedValue({ status: 'success' });
-const mockUsePublicClient = jest.fn(() => ({
-  waitForTransactionReceipt: mockWaitForTransactionReceipt,
+jest.mock('../../contexts/AnchoredTokenContext', () => ({
+  useAnchoredToken: () => ({ fetchData: mockFetchStakedTokens }),
 }));
-jest.mock('@wagmi/core', () => ({
-  getConnectorClient: jest.fn().mockResolvedValue(undefined),
+jest.mock('../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({ stakingCst: STAKING_CST, stakingRwalk: STAKING_RWALK }),
 }));
-
-const mockSwitchChainAsync = jest.fn().mockResolvedValue(undefined);
-
-jest.mock('wagmi', () => ({
-  usePublicClient: () => mockUsePublicClient(),
-  useWalletClient: () => ({ data: {} }),
-  useConnectorClient: () => ({ data: undefined }),
-  useConfig: () => ({}),
-  useAccount: () => ({ address: mockAccount, isConnected: true, chainId: 421614 }),
-  useSwitchChain: () => ({ switchChainAsync: mockSwitchChainAsync }),
+jest.mock('../web3', () => ({
+  useActiveWeb3React: () => ({ account: USER, chainId: 421614, active: true }),
 }));
 
-// The chain guard reads the wallet client's real chain before every write;
-// default it to the app chain so existing cases exercise the happy path.
-const mockGetChainId = jest.fn<Promise<number>, [unknown]>();
-jest.mock('viem/actions', () => ({
-  getChainId: (...args: unknown[]) => mockGetChainId(args[0]),
-}));
+function nftContract() {
+  return {
+    read: { isApprovedForAll: jest.fn().mockResolvedValue(false) },
+    write: { setApprovalForAll: jest.fn().mockResolvedValue('0xapprove') },
+  };
+}
+function anchoringContract() {
+  return {
+    write: {
+      stake: jest.fn().mockResolvedValue('0xstake'),
+      stakeMany: jest.fn().mockResolvedValue('0xstakemany'),
+      unstake: jest.fn().mockResolvedValue('0xunstake'),
+      unstakeMany: jest.fn().mockResolvedValue('0xunstakemany'),
+    },
+  };
+}
 
-// Contract write methods on the NFT, CST anchoring wallet, and RWLK anchoring wallet.
-const mockSetApprovalForAll = jest.fn().mockResolvedValue('0xapproveHash' as const);
-const mockIsApprovedForAll = jest.fn().mockResolvedValue(false);
-
-// CST path mocks
-const mockCstAnchor = jest.fn().mockResolvedValue('0xstakeHash' as const);
-const mockCstAnchorMany = jest.fn().mockResolvedValue('0xstakeManyHash' as const);
-const mockCstRelease = jest.fn().mockResolvedValue('0xunstakeHash' as const);
-const mockCstReleaseMany = jest.fn().mockResolvedValue('0xunstakeManyHash' as const);
-
-// RWLK path mocks (separate instances so tests can assert non-crossover).
-const mockRwlkAnchor = jest.fn().mockResolvedValue('0xstakeHash' as const);
-const mockRwlkAnchorMany = jest.fn().mockResolvedValue('0xstakeManyHash' as const);
-const mockRwlkRelease = jest.fn().mockResolvedValue('0xunstakeHash' as const);
-const mockRwlkReleaseMany = jest.fn().mockResolvedValue('0xunstakeManyHash' as const);
-
-const mockCosmicSignatureContract = {
-  read: { isApprovedForAll: mockIsApprovedForAll },
-  write: { setApprovalForAll: mockSetApprovalForAll },
-};
-
-const mockRwalkContract = {
-  read: { isApprovedForAll: mockIsApprovedForAll },
-  write: { setApprovalForAll: mockSetApprovalForAll },
-};
-
-const mockCstAnchoringContract = {
-  write: {
-    stake: mockCstAnchor,
-    stakeMany: mockCstAnchorMany,
-    unstake: mockCstRelease,
-    unstakeMany: mockCstReleaseMany,
-  },
-};
-
-const mockRwlkAnchoringContract = {
-  write: {
-    stake: mockRwlkAnchor,
-    stakeMany: mockRwlkAnchorMany,
-    unstake: mockRwlkRelease,
-    unstakeMany: mockRwlkReleaseMany,
-  },
-};
-
-const mockUseCosmicSignatureContract = jest.fn(() => mockCosmicSignatureContract);
-const mockUseRWLKNFTContract = jest.fn(() => mockRwalkContract);
-const mockUseAnchoringWalletCSTContract = jest.fn(() => mockCstAnchoringContract);
-const mockUseAnchoringWalletRWLKContract = jest.fn(() => mockRwlkAnchoringContract);
+let mockCsNft = nftContract();
+let mockRwalkNft = nftContract();
+let mockCstAnchoring: ReturnType<typeof anchoringContract> | null = anchoringContract();
+let mockRwlkAnchoring: ReturnType<typeof anchoringContract> | null = anchoringContract();
 
 jest.mock('../useCosmicSignatureContract', () => ({
   __esModule: true,
-  default: () => mockUseCosmicSignatureContract(),
+  default: () => mockCsNft,
 }));
-
-jest.mock('../useRWLKNFTContract', () => ({
-  __esModule: true,
-  default: () => mockUseRWLKNFTContract(),
-}));
-
+jest.mock('../useRWLKNFTContract', () => ({ __esModule: true, default: () => mockRwalkNft }));
 jest.mock('../useAnchoringWalletCSTContract', () => ({
   __esModule: true,
-  default: () => mockUseAnchoringWalletCSTContract(),
+  default: () => mockCstAnchoring,
 }));
-
 jest.mock('../useAnchoringWalletRWLKContract', () => ({
   __esModule: true,
-  default: () => mockUseAnchoringWalletRWLKContract(),
-}));
-
-jest.mock('../../contexts/ContractAddressesContext', () => ({
-  useContractAddresses: () => ({
-    randomWalkNft: '0x0',
-    cosmicGame: '0x0',
-    cosmicSignature: '0x0',
-    cosmicToken: '0x0',
-    cosmicDao: '0x0',
-    charity: '0x0',
-    prizesWallet: '0x0',
-    stakingCst: '0xCstWallet',
-    stakingRwalk: '0xRwlkWallet',
-    marketing: '0x0',
-    implementation: '0x0',
-  }),
-}));
-
-const mockIsUserRejection = jest.fn((_err: unknown) => false);
-const mockReportError = jest.fn((_err: unknown, _context?: string) => {});
-const mockGetEthErrorMessage = jest.fn(
-  (_err: unknown, fallback?: string) => fallback ?? 'An error occurred',
-);
-
-jest.mock('../../utils/errors', () => ({
-  isUserRejection: (...args: unknown[]) => mockIsUserRejection(...(args as [unknown])),
-  reportError: (...args: unknown[]) => mockReportError(...(args as [unknown, string])),
-  getEthErrorMessage: (...args: unknown[]) =>
-    mockGetEthErrorMessage(...(args as [unknown, string | undefined])),
-}));
-
-const mockGetErrorMessage = jest.fn((msg: string) => msg);
-jest.mock('../../utils/alert', () => ({
-  __esModule: true,
-  default: (...args: unknown[]) => mockGetErrorMessage(...(args as [string])),
+  default: () => mockRwlkAnchoring,
 }));
 
 import { useAnchorActions } from '../useAnchorActions';
 
-// ---------------------------------------------------------------------------
-// Test scaffolding
-// ---------------------------------------------------------------------------
-
 beforeEach(() => {
-  jest.clearAllMocks();
   jest.useFakeTimers();
-  mockGetChainId.mockResolvedValue(421614);
-  mockSwitchChainAsync.mockResolvedValue(undefined);
-  mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
-  mockIsApprovedForAll.mockResolvedValue(false);
-  mockSetApprovalForAll.mockResolvedValue('0xapproveHash');
-  mockCstAnchor.mockResolvedValue('0xstakeHash');
-  mockCstAnchorMany.mockResolvedValue('0xstakeManyHash');
-  mockCstRelease.mockResolvedValue('0xunstakeHash');
-  mockCstReleaseMany.mockResolvedValue('0xunstakeManyHash');
-  mockRwlkAnchor.mockResolvedValue('0xstakeHash');
-  mockRwlkAnchorMany.mockResolvedValue('0xstakeManyHash');
-  mockRwlkRelease.mockResolvedValue('0xunstakeHash');
-  mockRwlkReleaseMany.mockResolvedValue('0xunstakeManyHash');
-  mockIsUserRejection.mockReturnValue(false);
-  mockGetEthErrorMessage.mockImplementation((_err, fallback) => fallback ?? 'An error occurred');
-  mockGetErrorMessage.mockImplementation((msg: string) => msg);
-  mockUseCosmicSignatureContract.mockReturnValue(mockCosmicSignatureContract);
-  mockUseRWLKNFTContract.mockReturnValue(mockRwalkContract);
-  mockUseAnchoringWalletCSTContract.mockReturnValue(mockCstAnchoringContract);
-  mockUseAnchoringWalletRWLKContract.mockReturnValue(mockRwlkAnchoringContract);
+  jest.clearAllMocks();
+  mockTx.reset();
+  mockCsNft = nftContract();
+  mockRwalkNft = nftContract();
+  mockCstAnchoring = anchoringContract();
+  mockRwlkAnchoring = anchoringContract();
 });
 
 afterEach(() => {
   jest.useRealTimers();
 });
 
-// Helper that advances the internal setTimeout(..., 2000) inside the hook so
-// the deferred notification + invalidation fires.
-async function flushDeferredAnchoringEffects() {
-  await act(async () => {
-    jest.advanceTimersByTime(2100);
-    // Let the microtask queue flush so setState side-effects land.
-    await Promise.resolve();
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
 describe('useAnchorActions', () => {
-  describe('return shape', () => {
-    it('exposes anchor, release, handleError, rwalkContract', () => {
-      const { result } = renderHook(() => useAnchorActions());
-      expect(typeof result.current.anchor).toBe('function');
-      expect(typeof result.current.release).toBe('function');
-      expect(typeof result.current.handleError).toBe('function');
-      expect(result.current.rwalkContract).toBe(mockRwalkContract);
-    });
+  it('exposes the actions, the RWLK contract and the shared stage', () => {
+    const { result } = renderHook(() => useAnchorActions());
+    expect(typeof result.current.anchor).toBe('function');
+    expect(typeof result.current.release).toBe('function');
+    expect(typeof result.current.handleError).toBe('function');
+    expect(result.current.rwalkContract).toBe(mockRwalkNft);
+    expect(result.current.txStage).toEqual({ status: 'idle' });
   });
 
-  describe('anchor (CST single token)', () => {
-    it('approves if not approved, then calls anchor, then invalidates queries', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(false);
+  describe('anchor', () => {
+    it('asks for the anchoring approval as step 1 when the collection has none', async () => {
       const { result } = renderHook(() => useAnchorActions());
-
       await act(async () => {
-        await result.current.anchor(42, false);
+        await result.current.anchor(7, false);
       });
 
-      expect(mockIsApprovedForAll).toHaveBeenCalledWith(['0xUser', '0xCstWallet']);
-      expect(mockSetApprovalForAll).toHaveBeenCalledWith(['0xCstWallet', true]);
-      expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xapproveHash' });
-      expect(mockCstAnchor).toHaveBeenCalledWith([42]);
-      expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xstakeHash' });
-
-      await flushDeferredAnchoringEffects();
-      expect(mockInvalidateQueries).toHaveBeenCalled();
-      expect(mockFetchAnchoredTokens).toHaveBeenCalled();
+      expect(mockCsNft.read.isApprovedForAll).toHaveBeenCalledWith([USER, STAKING_CST]);
+      expect(mockCsNft.write.setApprovalForAll).toHaveBeenCalledWith([STAKING_CST, true]);
+      expect(mockTx.sentApprovals()).toEqual(['toasts.anchor.approval']);
+      expect(mockCstAnchoring!.write.stake).toHaveBeenCalledWith([7]);
+      expect(mockTx.lastSuccessMessage()).toBe('toasts.anchor.anchored');
     });
 
-    it('skips approval when already approved', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
+    it('skips the approval when the anchoring contract is already approved', async () => {
+      mockCsNft.read.isApprovedForAll.mockResolvedValue(true);
       const { result } = renderHook(() => useAnchorActions());
-
       await act(async () => {
-        await result.current.anchor(42, false);
+        await result.current.anchor(7, false);
       });
 
-      expect(mockSetApprovalForAll).not.toHaveBeenCalled();
-      expect(mockCstAnchor).toHaveBeenCalledWith([42]);
+      expect(mockCsNft.write.setApprovalForAll).not.toHaveBeenCalled();
+      expect(mockTx.sentApprovals()).toEqual([]);
+      expect(mockCstAnchoring!.write.stake).toHaveBeenCalledWith([7]);
     });
 
-    it('routes to the CST contracts when isRwalk=false', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
+    it('anchors a batch with stakeMany', async () => {
       const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-
-      // The CST anchoring wallet contract receives the anchor call.
-      expect(mockCstAnchoringContract.write.stake).toHaveBeenCalledWith([42]);
-    });
-
-    it('shows success notification after the 2s deferred indexer delay', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-      expect(mockSetNotification).not.toHaveBeenCalled();
-
-      await flushDeferredAnchoringEffects();
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'success',
-          text: 'toasts.anchor.anchored(count=1)',
-        }),
-      );
-    });
-
-    it('notifies and aborts when NFT contract is null', async () => {
-      mockUseCosmicSignatureContract.mockReturnValue(null as never);
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-      expect(mockCstAnchor).not.toHaveBeenCalled();
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'error',
-          text: 'toasts.wallet.connectCorrectNetwork',
-        }),
-      );
-    });
-
-    it('notifies and aborts when anchoring wallet contract is null', async () => {
-      mockUseAnchoringWalletCSTContract.mockReturnValue(null as never);
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-      expect(mockCstAnchor).not.toHaveBeenCalled();
-      expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
-    });
-
-    it('shows the cancelled notification on user rejection (approval phase)', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(false);
-      mockSetApprovalForAll.mockRejectedValueOnce(new Error('user rejected'));
-      mockIsUserRejection.mockReturnValueOnce(true);
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ text: 'toasts.walletTransactionCancelled', type: 'info' }),
-      );
-      expect(mockCstAnchor).not.toHaveBeenCalled();
-    });
-
-    it('reports non-rejection approval errors', async () => {
-      const err = new Error('gas estimation failed');
-      mockIsApprovedForAll.mockResolvedValueOnce(false);
-      mockSetApprovalForAll.mockRejectedValueOnce(err);
-      mockIsUserRejection.mockReturnValueOnce(false);
-      mockGetEthErrorMessage.mockReturnValueOnce('gas estimation failed');
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-      expect(mockReportError).toHaveBeenCalledWith(err, 'anchor action error');
-      expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
-    });
-  });
-
-  describe('anchor (CST batch)', () => {
-    it('calls stakeMany when given an array of ids', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
-      const { result } = renderHook(() => useAnchorActions());
-
       await act(async () => {
         await result.current.anchor([1, 2, 3], false);
       });
-
-      expect(mockCstAnchorMany).toHaveBeenCalledWith([[1, 2, 3]]);
-      expect(mockCstAnchor).not.toHaveBeenCalled();
+      expect(mockCstAnchoring!.write.stakeMany).toHaveBeenCalledWith([[1, 2, 3]]);
     });
 
-    it('uses plural success message for batch', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
+    it('routes RandomWalk NFTs to the RandomWalk contracts', async () => {
       const { result } = renderHook(() => useAnchorActions());
-
       await act(async () => {
-        await result.current.anchor([1, 2, 3], false);
+        await result.current.anchor(9, true);
       });
-      await flushDeferredAnchoringEffects();
+      expect(mockRwalkNft.read.isApprovedForAll).toHaveBeenCalledWith([USER, STAKING_RWALK]);
+      expect(mockRwlkAnchoring!.write.stake).toHaveBeenCalledWith([9]);
+      expect(mockCstAnchoring!.write.stake).not.toHaveBeenCalled();
+    });
 
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          text: 'toasts.anchor.anchored(count=3)',
-        }),
-      );
+    it('names the network when the anchoring contract is not available', async () => {
+      mockCstAnchoring = null;
+      const { result } = renderHook(() => useAnchorActions());
+      await act(async () => {
+        await result.current.anchor(7, false);
+      });
+      expect(mockTx.runs).toHaveLength(0);
+      expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.anchor.walletNotReady');
+    });
+
+    it('fails with the anchoring fallback when the write returns no hash', async () => {
+      mockCstAnchoring!.write.stake.mockResolvedValueOnce(undefined);
+      mockCsNft.read.isApprovedForAll.mockResolvedValue(true);
+      const { result } = renderHook(() => useAnchorActions());
+      await act(async () => {
+        await result.current.anchor(7, false);
+      });
+      expect(mockTx.lastFailureMessage()).toBe('toasts.anchor.failed');
     });
   });
 
-  describe('anchor (RWLK)', () => {
-    it('routes to RWLK contracts and uses RWLK wallet address when isRwalk=true', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
+  describe('release', () => {
+    it('releases one anchor or many', async () => {
       const { result } = renderHook(() => useAnchorActions());
-
       await act(async () => {
-        await result.current.anchor(42, true);
+        await result.current.release(3, false);
+        await result.current.release([4, 5], true);
       });
+      expect(mockCstAnchoring!.write.unstake).toHaveBeenCalledWith([3]);
+      expect(mockRwlkAnchoring!.write.unstakeMany).toHaveBeenCalledWith([[4, 5]]);
+      expect(mockTx.lastSuccessMessage()).toBe('toasts.anchor.released');
+    });
 
-      // CST path must NOT be touched.
-      expect(mockCstAnchoringContract.write.stake).not.toHaveBeenCalled();
-      // RWLK path used the RWLK wallet address for approval and the RWLK
-      // anchoring wallet for the anchor call.
-      expect(mockIsApprovedForAll).toHaveBeenCalledWith(['0xUser', '0xRwlkWallet']);
-      expect(mockRwlkAnchoringContract.write.stake).toHaveBeenCalledWith([42]);
+    it('names the network when the anchoring contract is not available', async () => {
+      mockRwlkAnchoring = null;
+      const { result } = renderHook(() => useAnchorActions());
+      await act(async () => {
+        await result.current.release(3, true);
+      });
+      expect(mockTx.runs).toHaveLength(0);
+      expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.anchor.walletNotReady');
     });
   });
 
-  describe('release (CST single action)', () => {
-    it('calls release with the action id', async () => {
+  describe('refresh after the indexer settles', () => {
+    it('invalidates the anchoring queries two seconds after confirmation', async () => {
+      mockCsNft.read.isApprovedForAll.mockResolvedValue(true);
       const { result } = renderHook(() => useAnchorActions());
       await act(async () => {
-        await result.current.release(7, false);
+        await result.current.anchor(7, false);
       });
-      expect(mockCstRelease).toHaveBeenCalledWith([7]);
-      expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xunstakeHash' });
+      expect(mockInvalidateQueries).not.toHaveBeenCalled();
+
+      act(() => {
+        jest.advanceTimersByTime(2000);
+      });
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['stakingCSTActionsByUser'] });
+      expect(mockFetchStakedTokens).toHaveBeenCalledTimes(1);
     });
 
-    it('notifies and aborts when anchoring wallet contract is null', async () => {
-      mockUseAnchoringWalletCSTContract.mockReturnValue(null as never);
-      const { result } = renderHook(() => useAnchorActions());
-      await act(async () => {
-        await result.current.release(7, false);
-      });
-      expect(mockCstRelease).not.toHaveBeenCalled();
-      expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
-    });
-
-    it('emits success notification after the deferred delay', async () => {
-      const { result } = renderHook(() => useAnchorActions());
-      await act(async () => {
-        await result.current.release(7, false);
-      });
-      expect(mockSetNotification).not.toHaveBeenCalled();
-      await flushDeferredAnchoringEffects();
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success' }),
-      );
-    });
-
-    it('handles user rejection cleanly without reporting an error', async () => {
-      mockCstRelease.mockRejectedValueOnce({ code: 4001, message: 'user rejected' });
-      mockIsUserRejection.mockReturnValueOnce(true);
-      const { result } = renderHook(() => useAnchorActions());
-      await act(async () => {
-        await result.current.release(7, false);
-      });
-      expect(mockReportError).not.toHaveBeenCalled();
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'info', text: 'toasts.walletTransactionCancelled' }),
-      );
-    });
-  });
-
-  describe('release (batch)', () => {
-    it('calls unstakeMany for batch action ids', async () => {
-      const { result } = renderHook(() => useAnchorActions());
-      await act(async () => {
-        await result.current.release([10, 11], false);
-      });
-      expect(mockCstReleaseMany).toHaveBeenCalledWith([[10, 11]]);
-      expect(mockCstRelease).not.toHaveBeenCalled();
-    });
-
-    it('uses plural success message for batch release', async () => {
-      const { result } = renderHook(() => useAnchorActions());
-      await act(async () => {
-        await result.current.release([10, 11], false);
-      });
-      await flushDeferredAnchoringEffects();
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          text: 'toasts.anchor.released(count=2)',
-        }),
-      );
-    });
-  });
-
-  describe('chain guard', () => {
-    it('blocks the anchor write when the wallet will not move to the app chain', async () => {
-      mockGetChainId.mockResolvedValueOnce(1);
-      mockSwitchChainAsync.mockRejectedValueOnce(new Error('switch refused'));
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-
-      expect(mockCstAnchor).not.toHaveBeenCalled();
-      expect(mockSetApprovalForAll).not.toHaveBeenCalled();
-    });
-
-    it('blocks the release write on the same mismatch', async () => {
-      mockGetChainId.mockResolvedValueOnce(1);
-      mockSwitchChainAsync.mockRejectedValueOnce(new Error('switch refused'));
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.release(7, false);
-      });
-
-      expect(mockCstRelease).not.toHaveBeenCalled();
-    });
-
-    it('proceeds once the wallet accepts the switch', async () => {
-      mockGetChainId.mockResolvedValueOnce(1);
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-
-      expect(mockSwitchChainAsync).toHaveBeenCalledWith({ chainId: 421614 });
-      expect(mockCstAnchor).toHaveBeenCalledWith([42]);
-    });
-  });
-
-  describe('deferred refresh cleanup', () => {
-    it('cancels the pending anchor refresh when the caller unmounts first', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
+    it('cancels the pending refresh when the caller unmounts first', async () => {
       const { result, unmount } = renderHook(() => useAnchorActions());
-
       await act(async () => {
-        await result.current.anchor(42, false);
+        await result.current.release(3, false);
       });
-      expect(mockInvalidateQueries).not.toHaveBeenCalled();
-
       unmount();
-      await flushDeferredAnchoringEffects();
-
-      expect(mockInvalidateQueries).not.toHaveBeenCalled();
-      expect(mockFetchAnchoredTokens).not.toHaveBeenCalled();
-      expect(mockSetNotification).not.toHaveBeenCalled();
-    });
-
-    it('cancels the pending release refresh when the caller unmounts first', async () => {
-      const { result, unmount } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.release(7, false);
-      });
-
-      unmount();
-      await flushDeferredAnchoringEffects();
-
-      expect(mockInvalidateQueries).not.toHaveBeenCalled();
-      expect(mockSetNotification).not.toHaveBeenCalled();
-    });
-
-    it('still fires the refresh when the caller stays mounted', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-      await flushDeferredAnchoringEffects();
-
-      expect(mockInvalidateQueries).toHaveBeenCalled();
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success' }),
-      );
-    });
-  });
-
-  describe('invalidateAnchoringQueries', () => {
-    it('invalidates each expected query key after a successful anchor', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
-      const { result } = renderHook(() => useAnchorActions());
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-      await flushDeferredAnchoringEffects();
-
-      const expectedKeys = [
-        'dashboardInfo',
-        'stakingCSTActionsByUser',
-        'cstTokensByUser',
-        'stakingRewardsByUser',
-        'stakingRWLKActionsByUser',
-        'stakingRWLKMintsByUser',
-      ];
-      for (const key of expectedKeys) {
-        expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: [key] });
-      }
-    });
-  });
-
-  describe('handleError (exposed for callers)', () => {
-    it('shows info notification on user rejection', () => {
-      const { result } = renderHook(() => useAnchorActions());
-      mockIsUserRejection.mockReturnValueOnce(true);
-      result.current.handleError(new Error('rejected'));
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'info', text: 'toasts.walletTransactionCancelled' }),
-      );
-      expect(mockReportError).not.toHaveBeenCalled();
-    });
-
-    it('reports and notifies on a real error', () => {
-      const err = new Error('revert: bad state');
-      mockIsUserRejection.mockReturnValueOnce(false);
-      mockGetEthErrorMessage.mockReturnValueOnce('revert: bad state');
-      const { result } = renderHook(() => useAnchorActions());
-      result.current.handleError(err);
-      expect(mockReportError).toHaveBeenCalledWith(err, 'anchor action error');
-      expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
-    });
-
-    it('shows the localized generic fallback when no provider message exists', () => {
-      mockIsUserRejection.mockReturnValueOnce(false);
-      mockGetEthErrorMessage.mockReturnValueOnce('toasts.anchor.failed');
-      const { result } = renderHook(() => useAnchorActions());
-      result.current.handleError(new Error('unknown'));
-      expect(mockReportError).toHaveBeenCalled();
-      expect(mockGetEthErrorMessage).toHaveBeenCalledWith(
-        expect.any(Error),
-        'toasts.anchor.failed',
-        { locale: 'en' },
-      );
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'error', text: 'toasts.anchor.failed' }),
-      );
-    });
-  });
-
-  describe('transaction receipt waiting', () => {
-    it('reports a reverted receipt and shows the localized anchor fallback', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
-      mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
-      const { result } = renderHook(() => useAnchorActions());
-
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-
-      expect(mockReportError).toHaveBeenCalledWith(expect.any(Error), 'anchor action error');
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.anchor.failed',
-        type: 'error',
-        visible: true,
-      });
-    });
-
-    it('shows the localized failure if the tx hash is undefined', async () => {
-      mockIsApprovedForAll.mockResolvedValueOnce(true);
-      mockCstAnchor.mockResolvedValueOnce(undefined as never);
-      const { result } = renderHook(() => useAnchorActions());
-      await act(async () => {
-        await result.current.anchor(42, false);
-      });
-      await flushDeferredAnchoringEffects();
-      const successCalls = mockSetNotification.mock.calls.filter(
-        ([arg]) => arg?.type === 'success',
-      );
-      expect(successCalls).toHaveLength(0);
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.anchor.failed',
-        type: 'error',
-        visible: true,
+      act(() => {
+        jest.advanceTimersByTime(5000);
       });
       expect(mockInvalidateQueries).not.toHaveBeenCalled();
     });
+  });
+
+  it('reports read failures with the anchoring fallback', () => {
+    const { result } = renderHook(() => useAnchorActions());
+    const err = new Error('rpc down');
+    result.current.handleError(err);
+    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(err, 'toasts.anchor.failed');
   });
 });

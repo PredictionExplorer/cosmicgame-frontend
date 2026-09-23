@@ -1,42 +1,39 @@
-import { act, renderHook, waitFor } from '@/test-utils';
+import { createFakeTxFlow } from '@/test-utils/txFlow';
+
+import { act, renderHook } from '@/test-utils';
 
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
 
-const mockSetNotification = jest.fn();
+const mockNotify = jest.fn();
 const mockFetchStatusData = jest.fn();
-const mockTranslate = jest.fn((key: string) => `toasts.${key}`);
+const mockTx = createFakeTxFlow();
+// A stable translator (like next-intl's) so callback identities can be checked.
+const mockTranslate = (key: string) => `toasts.${key}`;
 
 jest.mock('next-intl', () => ({
   useLocale: () => 'en',
   useTranslations: () => mockTranslate,
 }));
 
-jest.mock('../../contexts/NotificationContext', () => ({
-  useNotification: () => ({ setNotification: mockSetNotification }),
+jest.mock('../useTxFlow', () => ({ useTxFlow: () => mockTx.flow }));
+
+jest.mock('../useNotify', () => ({
+  useNotify: () => ({ notify: mockNotify, notifyErrorFromEthers: jest.fn() }),
 }));
 
 jest.mock('../../contexts/ApiDataContext', () => ({
   useApiData: () => ({ fetchData: mockFetchStatusData }),
 }));
 
-const mockWaitForTransactionReceipt = jest.fn().mockResolvedValue({ status: 'success' });
-const mockUsePublicClient = jest.fn(() => ({
-  waitForTransactionReceipt: mockWaitForTransactionReceipt,
-}));
+const mockWriteWithdrawEverything = jest.fn();
+const mockWriteClaimDonatedNft = jest.fn();
+const mockWriteClaimManyDonatedNfts = jest.fn();
+const mockWriteClaimDonatedToken = jest.fn();
+const mockWriteClaimManyDonatedTokens = jest.fn();
 
-jest.mock('wagmi', () => ({
-  usePublicClient: () => mockUsePublicClient(),
-}));
-
-const mockWriteWithdrawEverything = jest.fn().mockResolvedValue('0xtx1' as const);
-const mockWriteClaimDonatedNft = jest.fn().mockResolvedValue('0xtx2' as const);
-const mockWriteClaimManyDonatedNfts = jest.fn().mockResolvedValue('0xtx3' as const);
-const mockWriteClaimDonatedToken = jest.fn().mockResolvedValue('0xtx4' as const);
-const mockWriteClaimManyDonatedTokens = jest.fn().mockResolvedValue('0xtx5' as const);
-
-const mockUseStellarSelectionWalletContract = jest.fn(() => ({
+const walletContract = {
   write: {
     withdrawEverything: mockWriteWithdrawEverything,
     claimDonatedNft: mockWriteClaimDonatedNft,
@@ -44,642 +41,242 @@ const mockUseStellarSelectionWalletContract = jest.fn(() => ({
     claimDonatedToken: mockWriteClaimDonatedToken,
     claimManyDonatedTokens: mockWriteClaimManyDonatedTokens,
   },
-}));
+};
+const mockUseStellarSelectionWalletContract = jest.fn(() => walletContract as unknown);
 
 jest.mock('../useStellarSelectionWalletContract', () => ({
   __esModule: true,
   default: () => mockUseStellarSelectionWalletContract(),
 }));
 
-const mockIsUserRejection = jest.fn((_err: unknown) => false);
-const mockReportError = jest.fn((_err: unknown, _context?: string) => {});
-const mockGetEthErrorMessage = jest.fn(
-  (_err: unknown, fallback?: string) => fallback ?? 'ETH error',
-);
-
-jest.mock('../../utils/errors', () => ({
-  isUserRejection: (...args: unknown[]) => mockIsUserRejection(...(args as [unknown])),
-  reportError: (...args: unknown[]) => mockReportError(...(args as [unknown, string])),
-  getEthErrorMessage: (...args: unknown[]) =>
-    mockGetEthErrorMessage(...(args as [unknown, string | undefined])),
-}));
-
-const mockGetErrorMessage = jest.fn((msg: string) => msg);
-jest.mock('../../utils/alert', () => ({
-  __esModule: true,
-  default: (...args: unknown[]) => mockGetErrorMessage(...(args as [string])),
-}));
-
 import { useClaimAllocations } from '../useClaimAllocations';
-
-// ---------------------------------------------------------------------------
-// Shared helpers
-// ---------------------------------------------------------------------------
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockUsePublicClient.mockReturnValue({
-    waitForTransactionReceipt: mockWaitForTransactionReceipt,
-  });
-  mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
-  mockWriteWithdrawEverything.mockResolvedValue('0xtx1' as const);
-  mockWriteClaimDonatedNft.mockResolvedValue('0xtx2' as const);
-  mockWriteClaimManyDonatedNfts.mockResolvedValue('0xtx3' as const);
-  mockWriteClaimDonatedToken.mockResolvedValue('0xtx4' as const);
-  mockWriteClaimManyDonatedTokens.mockResolvedValue('0xtx5' as const);
-  mockIsUserRejection.mockReturnValue(false);
-  mockGetEthErrorMessage.mockImplementation((_err, fallback) => fallback ?? 'ETH error');
-  mockGetErrorMessage.mockImplementation((msg: string) => msg);
-  mockUseStellarSelectionWalletContract.mockReturnValue({
-    write: {
-      withdrawEverything: mockWriteWithdrawEverything,
-      claimDonatedNft: mockWriteClaimDonatedNft,
-      claimManyDonatedNfts: mockWriteClaimManyDonatedNfts,
-      claimDonatedToken: mockWriteClaimDonatedToken,
-      claimManyDonatedTokens: mockWriteClaimManyDonatedTokens,
-    },
-  });
+  mockTx.reset();
+  mockUseStellarSelectionWalletContract.mockReturnValue(walletContract);
+  mockWriteWithdrawEverything.mockResolvedValue('0xtx1');
+  mockWriteClaimDonatedNft.mockResolvedValue('0xtx2');
+  mockWriteClaimManyDonatedNfts.mockResolvedValue('0xtx3');
+  mockWriteClaimDonatedToken.mockResolvedValue('0xtx4');
+  mockWriteClaimManyDonatedTokens.mockResolvedValue('0xtx5');
 });
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
 describe('useClaimAllocations', () => {
-  describe('initial state', () => {
-    it('starts with all isClaiming flags false', () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      expect(result.current.isClaiming).toEqual({
-        raffleETH: false,
-        donatedNFT: false,
-        donatedERC20: false,
-      });
+  it('starts idle, with every flag false and the shared stage exposed', () => {
+    const { result } = renderHook(() => useClaimAllocations());
+    expect(result.current.isClaiming).toEqual({
+      raffleETH: false,
+      donatedNFT: false,
+      donatedERC20: false,
     });
-
-    it('starts with no NFTs being claimed', () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      expect(result.current.claimingDonatedNFTs).toEqual([]);
-    });
-
-    it('exposes all six claim methods', () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      expect(typeof result.current.retrieveAllStellarSelectionETH).toBe('function');
-      expect(typeof result.current.claimDonatedNFT).toBe('function');
-      expect(typeof result.current.claimAllDonatedNFTs).toBe('function');
-      expect(typeof result.current.claimDonatedERC20).toBe('function');
-      expect(typeof result.current.claimAllDonatedERC20).toBe('function');
-    });
+    expect(result.current.claimingDonatedNFTs).toEqual([]);
+    expect(result.current.txStage).toEqual({ status: 'idle' });
   });
 
   describe('retrieveAllStellarSelectionETH', () => {
-    it('calls withdrawEverything with the round list', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
+    it('writes withdrawEverything through the transaction flow', async () => {
+      const onSuccess = jest.fn();
+      const { result } = renderHook(() => useClaimAllocations(onSuccess));
       await act(async () => {
         await result.current.retrieveAllStellarSelectionETH([5, 6, 7]);
       });
+
       expect(mockWriteWithdrawEverything).toHaveBeenCalledWith([[5, 6, 7], [], []]);
-    });
-
-    it('awaits the transaction receipt before finishing', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-      expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx1' });
-    });
-
-    it('refreshes status data on success', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
+      expect(mockTx.runs).toHaveLength(1);
+      expect(mockTx.runs[0]!.failureMessage).toBe('toasts.claim.failed');
+      expect(mockTx.lastSuccessMessage()).toBe('toasts.claim.stellarEthSuccess');
       expect(mockFetchStatusData).toHaveBeenCalledTimes(1);
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.claim.stellarEthSuccess',
-        type: 'success',
-        visible: true,
-      });
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+      expect(result.current.isClaiming.raffleETH).toBe(false);
     });
 
-    it('calls onSuccess callback after success', async () => {
+    it('holds the flag while the transaction runs', async () => {
+      let release!: (hash: string) => void;
+      mockWriteWithdrawEverything.mockImplementationOnce(
+        () => new Promise<string>((resolve) => (release = resolve)),
+      );
+      const { result } = renderHook(() => useClaimAllocations());
+
+      let pending!: Promise<void>;
+      await act(async () => {
+        pending = result.current.retrieveAllStellarSelectionETH([1]);
+        await Promise.resolve();
+      });
+      expect(result.current.isClaiming.raffleETH).toBe(true);
+
+      await act(async () => {
+        release('0xtx1');
+        await pending;
+      });
+      expect(result.current.isClaiming.raffleETH).toBe(false);
+    });
+
+    it('tells the person when the contract is not available yet', async () => {
+      mockUseStellarSelectionWalletContract.mockReturnValue(null);
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.retrieveAllStellarSelectionETH([1]);
+      });
+
+      expect(mockTx.runs).toHaveLength(0);
+      expect(mockNotify).toHaveBeenCalledWith('error', 'toasts.claim.walletNotConnected');
+    });
+
+    it('treats a missing transaction hash as a failure, never a success', async () => {
+      mockWriteWithdrawEverything.mockResolvedValueOnce(undefined);
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.retrieveAllStellarSelectionETH([1]);
+      });
+
+      expect(mockTx.lastSuccessMessage()).toBeUndefined();
+      expect(mockTx.lastFailureMessage()).toBe('toasts.claim.failed');
+      expect(mockFetchStatusData).not.toHaveBeenCalled();
+    });
+
+    it('does not refresh when the wallet prompt is dismissed', async () => {
+      mockWriteWithdrawEverything.mockRejectedValueOnce({ code: 4001, message: 'User rejected' });
       const onSuccess = jest.fn();
       const { result } = renderHook(() => useClaimAllocations(onSuccess));
       await act(async () => {
         await result.current.retrieveAllStellarSelectionETH([1]);
       });
-      expect(onSuccess).toHaveBeenCalledTimes(1);
-    });
 
-    it('notifies and aborts when wallet contract is null', async () => {
-      mockUseStellarSelectionWalletContract.mockReturnValue(null as never);
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-      expect(mockWriteWithdrawEverything).not.toHaveBeenCalled();
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'error',
-          text: 'toasts.claim.walletNotConnected',
-        }),
-      );
-    });
-
-    it('sets isClaiming.raffleETH true during the call and false after', async () => {
-      let capturedDuring = false;
-      mockWriteWithdrawEverything.mockImplementation(async () => {
-        capturedDuring = true;
-        return '0xtx1';
-      });
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-      expect(capturedDuring).toBe(true);
+      expect(mockFetchStatusData).not.toHaveBeenCalled();
+      expect(onSuccess).not.toHaveBeenCalled();
       expect(result.current.isClaiming.raffleETH).toBe(false);
-    });
-
-    it('shows cancelled notification when user rejects the tx', async () => {
-      const rejection = { code: 4001, message: 'user rejected' };
-      mockWriteWithdrawEverything.mockRejectedValueOnce(rejection);
-      mockIsUserRejection.mockReturnValueOnce(true);
-
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-      expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'info',
-          text: 'toasts.walletTransactionCancelled',
-        }),
-      );
-      // Should NOT refresh data if the user cancelled.
-      expect(mockFetchStatusData).not.toHaveBeenCalled();
-    });
-
-    it('reports non-user-rejection errors and shows error notification', async () => {
-      const err = new Error('revert: insufficient balance');
-      mockWriteWithdrawEverything.mockRejectedValueOnce(err);
-      mockIsUserRejection.mockReturnValueOnce(false);
-      mockGetEthErrorMessage.mockReturnValueOnce('revert: insufficient balance');
-
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-      expect(mockReportError).toHaveBeenCalledWith(err, 'retrieve all Stellar Selection ETH');
-      expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
-      expect(result.current.isClaiming.raffleETH).toBe(false);
-    });
-
-    it('reports a reverted receipt with the localized claim fallback', async () => {
-      mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
-      const { result } = renderHook(() => useClaimAllocations());
-
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-
-      expect(mockReportError).toHaveBeenCalledWith(
-        expect.any(Error),
-        'retrieve all Stellar Selection ETH',
-      );
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.claim.failed',
-        type: 'error',
-        visible: true,
-      });
-      expect(mockFetchStatusData).not.toHaveBeenCalled();
-    });
-
-    it('handles empty round list gracefully', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([]);
-      });
-      expect(mockWriteWithdrawEverything).toHaveBeenCalledWith([[], [], []]);
-    });
-
-    it('treats a missing transaction hash as a localized claim failure', async () => {
-      mockWriteWithdrawEverything.mockResolvedValueOnce(undefined as never);
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-      expect(mockWaitForTransactionReceipt).not.toHaveBeenCalled();
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.claim.failed',
-        type: 'error',
-        visible: true,
-      });
-      expect(mockFetchStatusData).not.toHaveBeenCalled();
     });
   });
 
-  describe('claimDonatedNFT', () => {
-    it('calls claimDonatedNft with the token id', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimDonatedNFT(42);
-      });
-      expect(mockWriteClaimDonatedNft).toHaveBeenCalledWith([42]);
-    });
-
-    it('awaits the receipt and refreshes on success', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimDonatedNFT(42);
-      });
-      expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx2' });
-      expect(mockFetchStatusData).toHaveBeenCalled();
-      expect(mockTranslate).toHaveBeenCalledWith('claim.nftSuccess');
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.claim.nftSuccess',
-        type: 'success',
-        visible: true,
-      });
-    });
-
-    it('tracks the token id in claimingDonatedNFTs during the call', async () => {
-      // Use a deferred promise so we can observe the in-flight state via the
-      // hook's own `result.current` between `setState` flush and tx resolve.
-      let release!: (v: `0x${string}`) => void;
+  describe('attached NFTs', () => {
+    it('retrieves one NFT and tracks its id while pending', async () => {
+      let release!: (hash: string) => void;
       mockWriteClaimDonatedNft.mockImplementationOnce(
-        () => new Promise<`0x${string}`>((r) => (release = r)),
+        () => new Promise<string>((resolve) => (release = resolve)),
       );
       const { result } = renderHook(() => useClaimAllocations());
 
-      let pending!: Promise<unknown>;
+      let pending!: Promise<void>;
       await act(async () => {
         pending = result.current.claimDonatedNFT(42);
         await Promise.resolve();
       });
-
-      // The setState happened inside claimDonatedNFT before the write call,
-      // so by now React has flushed it and the id should be visible.
       expect(result.current.claimingDonatedNFTs).toEqual([42]);
 
       await act(async () => {
         release('0xtx2');
         await pending;
       });
+      expect(mockWriteClaimDonatedNft).toHaveBeenCalledWith([42]);
+      expect(mockTx.lastSuccessMessage()).toBe('toasts.claim.nftSuccess');
       expect(result.current.claimingDonatedNFTs).toEqual([]);
     });
 
-    it('supports concurrent claims of different NFTs', async () => {
-      let release1!: (v: `0x${string}`) => void;
-      let release2!: (v: `0x${string}`) => void;
-      mockWriteClaimDonatedNft.mockImplementationOnce(
-        () => new Promise<`0x${string}`>((r) => (release1 = r)),
-      );
-      mockWriteClaimDonatedNft.mockImplementationOnce(
-        () => new Promise<`0x${string}`>((r) => (release2 = r)),
-      );
-
-      const { result } = renderHook(() => useClaimAllocations());
-
-      let p1!: Promise<unknown>;
-      let p2!: Promise<unknown>;
-      await act(async () => {
-        p1 = result.current.claimDonatedNFT(1);
-        p2 = result.current.claimDonatedNFT(2);
-        // Allow state updates to flush.
-        await Promise.resolve();
-      });
-
-      expect(result.current.claimingDonatedNFTs).toEqual(expect.arrayContaining([1, 2]));
-
-      await act(async () => {
-        release1('0xtx2');
-        release2('0xtx2');
-        await p1;
-        await p2;
-      });
-
-      expect(result.current.claimingDonatedNFTs).toEqual([]);
-    });
-
-    it('removes only the specific token id after completion', async () => {
-      let release!: (v: `0x${string}`) => void;
-      mockWriteClaimDonatedNft.mockImplementationOnce(
-        () => new Promise<`0x${string}`>((r) => (release = r)),
-      );
-      mockWriteClaimDonatedNft.mockResolvedValueOnce('0xtx2');
-
-      const { result } = renderHook(() => useClaimAllocations());
-      let p1!: Promise<unknown>;
-      await act(async () => {
-        p1 = result.current.claimDonatedNFT(1);
-        await result.current.claimDonatedNFT(2);
-      });
-
-      // Token 2 completed; token 1 is still pending.
-      expect(result.current.claimingDonatedNFTs).toEqual([1]);
-
-      await act(async () => {
-        release('0xtx2');
-        await p1;
-      });
-      expect(result.current.claimingDonatedNFTs).toEqual([]);
-    });
-
-    it('notifies and aborts when wallet contract is null', async () => {
-      mockUseStellarSelectionWalletContract.mockReturnValue(null as never);
+    it('clears the pending id even when the write fails', async () => {
+      mockWriteClaimDonatedNft.mockRejectedValueOnce(new Error('execution reverted'));
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedNFT(42);
-      });
-      expect(mockWriteClaimDonatedNft).not.toHaveBeenCalled();
-      expect(result.current.claimingDonatedNFTs).toEqual([]);
-    });
-
-    it('clears claiming state even on error', async () => {
-      const err = new Error('revert');
-      mockWriteClaimDonatedNft.mockRejectedValueOnce(err);
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimDonatedNFT(42);
+        await result.current.claimDonatedNFT(7);
       });
       expect(result.current.claimingDonatedNFTs).toEqual([]);
-      expect(mockReportError).toHaveBeenCalledWith(err, 'retrieve attached NFT');
+      expect(mockTx.lastFailureMessage()).toBe('toasts.claim.failed');
     });
-  });
 
-  describe('claimAllDonatedNFTs', () => {
-    it('calls claimManyDonatedNfts with the index list', async () => {
+    it('retrieves many NFTs with a counted success message', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
         await result.current.claimAllDonatedNFTs([1, 2, 3]);
       });
       expect(mockWriteClaimManyDonatedNfts).toHaveBeenCalledWith([[1, 2, 3]]);
-    });
-
-    it('toggles isClaiming.donatedNFT around the call', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimAllDonatedNFTs([1]);
-      });
-      expect(result.current.isClaiming.donatedNFT).toBe(false);
-    });
-
-    it('notifies and aborts when wallet contract is null', async () => {
-      mockUseStellarSelectionWalletContract.mockReturnValue(null as never);
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimAllDonatedNFTs([1]);
-      });
-      expect(mockWriteClaimManyDonatedNfts).not.toHaveBeenCalled();
-    });
-
-    it('awaits receipt and refreshes on success', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimAllDonatedNFTs([1]);
-      });
-      expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx3' });
-      expect(mockFetchStatusData).toHaveBeenCalled();
-    });
-
-    it('clears isClaiming.donatedNFT even on error', async () => {
-      mockWriteClaimManyDonatedNfts.mockRejectedValueOnce(new Error('revert'));
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimAllDonatedNFTs([1]);
-      });
+      expect(mockTx.lastSuccessMessage()).toBe('toasts.claim.nftsSuccess');
       expect(result.current.isClaiming.donatedNFT).toBe(false);
     });
   });
 
-  describe('claimDonatedERC20', () => {
+  describe('attached ERC-20 tokens', () => {
     it('forwards raw base-unit amounts as bigint without scaling', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1999999999999999994000');
+        await result.current.claimDonatedERC20(5, '0xToken', '1500000000000000000');
       });
-      expect(mockWriteClaimDonatedToken).toHaveBeenCalledWith([
-        5,
-        '0xToken',
-        BigInt('1999999999999999994000'),
-      ]);
+      expect(mockWriteClaimDonatedToken).toHaveBeenCalledWith([5, '0xToken', 1500000000000000000n]);
+      expect(mockTx.lastSuccessMessage()).toBe('toasts.claim.tokenSuccess');
     });
 
-    it('accepts zero as a raw amount for contract-side balance fallback', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '0');
-      });
-      expect(mockWriteClaimDonatedToken).toHaveBeenCalledWith([5, '0xToken', 0n]);
-    });
-
-    it('rejects display-denominated decimals before writing', async () => {
+    it('fails inside the flow, before any write, for display-denominated amounts', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
         await result.current.claimDonatedERC20(5, '0xToken', '1.5');
       });
       expect(mockWriteClaimDonatedToken).not.toHaveBeenCalled();
-      expect(mockReportError).toHaveBeenCalledWith(
-        expect.any(Error),
-        'retrieve attached ERC20 token',
-      );
-    });
-
-    it('notifies and aborts when wallet contract is null', async () => {
-      mockUseStellarSelectionWalletContract.mockReturnValue(null as never);
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1.5');
-      });
-      expect(mockWriteClaimDonatedToken).not.toHaveBeenCalled();
-    });
-
-    it('awaits receipt and refreshes', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1500000000000000000');
-      });
-      expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx4' });
-      expect(mockFetchStatusData).toHaveBeenCalled();
-    });
-
-    it('tracks isClaiming.donatedERC20 state', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1500000000000000000');
-      });
+      expect(mockTx.lastFailureMessage()).toBe('toasts.claim.failed');
       expect(result.current.isClaiming.donatedERC20).toBe(false);
     });
 
-    it('clears isClaiming.donatedERC20 on error', async () => {
-      mockWriteClaimDonatedToken.mockRejectedValueOnce(new Error('revert'));
+    it('retrieves a batch with raw amounts', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1500000000000000000');
-      });
-      expect(result.current.isClaiming.donatedERC20).toBe(false);
-    });
-  });
-
-  describe('claimAllDonatedERC20', () => {
-    it('forwards raw token amounts to claimManyDonatedTokens as bigint', async () => {
-      const tokens = [
-        { roundNum: 1, tokenAddress: '0xA', amount: '2000000000000000000' },
-        { roundNum: 2, tokenAddress: '0xB', amount: 3n },
-      ];
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimAllDonatedERC20(tokens);
+        await result.current.claimAllDonatedERC20([
+          { roundNum: 1, tokenAddress: '0xA', amount: '10' },
+          { roundNum: 2, tokenAddress: '0xB', amount: 20n },
+        ]);
       });
       expect(mockWriteClaimManyDonatedTokens).toHaveBeenCalledWith([
         [
-          { roundNum: 1, tokenAddress: '0xA', amount: BigInt('2000000000000000000') },
-          { roundNum: 2, tokenAddress: '0xB', amount: 3n },
+          { roundNum: 1, tokenAddress: '0xA', amount: 10n },
+          { roundNum: 2, tokenAddress: '0xB', amount: 20n },
         ],
       ]);
+      expect(mockTx.lastSuccessMessage()).toBe('toasts.claim.tokensSuccess');
     });
 
-    it('does not write batch claims when any amount is display-denominated', async () => {
+    it('does not write a batch when any amount is display-denominated', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
         await result.current.claimAllDonatedERC20([
-          { roundNum: 1, tokenAddress: '0xA', amount: '1.25' },
+          { roundNum: 1, tokenAddress: '0xA', amount: '10' },
+          { roundNum: 2, tokenAddress: '0xB', amount: '0.5' },
         ]);
       });
       expect(mockWriteClaimManyDonatedTokens).not.toHaveBeenCalled();
-      expect(mockReportError).toHaveBeenCalledWith(
-        expect.any(Error),
-        'retrieve all attached ERC20 tokens',
-      );
-    });
-
-    it('notifies and aborts when wallet contract is null', async () => {
-      mockUseStellarSelectionWalletContract.mockReturnValue(null as never);
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimAllDonatedERC20([]);
-      });
-      expect(mockWriteClaimManyDonatedTokens).not.toHaveBeenCalled();
-    });
-
-    it('awaits receipt and refreshes', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimAllDonatedERC20([
-          { roundNum: 1, tokenAddress: '0xA', amount: 2 },
-        ]);
-      });
-      expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx5' });
-      expect(mockFetchStatusData).toHaveBeenCalled();
-    });
-
-    it('clears isClaiming.donatedERC20 even on error', async () => {
-      mockWriteClaimManyDonatedTokens.mockRejectedValueOnce(new Error('revert'));
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.claimAllDonatedERC20([
-          { roundNum: 1, tokenAddress: '0xA', amount: 2 },
-        ]);
-      });
-      expect(result.current.isClaiming.donatedERC20).toBe(false);
+      expect(mockTx.lastFailureMessage()).toBe('toasts.claim.failed');
     });
   });
 
-  describe('unmount safety', () => {
-    it('does not call fetchData if the component unmounts before tx resolves', async () => {
-      let release!: (v: `0x${string}`) => void;
-      mockWriteWithdrawEverything.mockImplementationOnce(
-        () => new Promise<`0x${string}`>((r) => (release = r)),
-      );
+  it('does not refresh after the component unmounts mid-transaction', async () => {
+    let release!: (hash: string) => void;
+    mockWriteWithdrawEverything.mockImplementationOnce(
+      () => new Promise<string>((resolve) => (release = resolve)),
+    );
+    const onSuccess = jest.fn();
+    const { result, unmount } = renderHook(() => useClaimAllocations(onSuccess));
 
-      const onSuccess = jest.fn();
-      const { result, unmount } = renderHook(() => useClaimAllocations(onSuccess));
-
-      let pending!: Promise<unknown>;
-      await act(async () => {
-        pending = result.current.retrieveAllStellarSelectionETH([1]);
-        // Let the microtask that invokes the write start.
-        await Promise.resolve();
-      });
-
-      unmount();
-
-      await act(async () => {
-        release('0xtx1');
-        await pending;
-      });
-
-      // Refresh path is gated on mount, so neither side effect fires.
-      expect(mockFetchStatusData).not.toHaveBeenCalled();
-      expect(onSuccess).not.toHaveBeenCalled();
+    let pending!: Promise<void>;
+    await act(async () => {
+      pending = result.current.retrieveAllStellarSelectionETH([1]);
+      await Promise.resolve();
     });
+    unmount();
+    await act(async () => {
+      release('0xtx1');
+      await pending;
+    });
+
+    expect(mockFetchStatusData).not.toHaveBeenCalled();
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  describe('publicClient edge cases', () => {
-    it('shows a localized failure when publicClient is unavailable', async () => {
-      mockUsePublicClient.mockReturnValue(undefined as never);
-      const { result } = renderHook(() => useClaimAllocations());
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-      expect(mockFetchStatusData).not.toHaveBeenCalled();
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.claim.failed',
-        type: 'error',
-        visible: true,
-      });
-    });
-  });
-
-  describe('onSuccess callback behavior', () => {
-    it('does not call onSuccess if the claim errors', async () => {
-      mockWriteWithdrawEverything.mockRejectedValueOnce(new Error('revert'));
-      const onSuccess = jest.fn();
-      const { result } = renderHook(() => useClaimAllocations(onSuccess));
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-      });
-      expect(onSuccess).not.toHaveBeenCalled();
-    });
-
-    it('works without an onSuccess callback', async () => {
-      const { result } = renderHook(() => useClaimAllocations());
-      await expect(
-        act(async () => {
-          await result.current.retrieveAllStellarSelectionETH([1]);
-        }),
-      ).resolves.toBeUndefined();
-    });
-
-    it('onSuccess fires once per successful claim, regardless of method', async () => {
-      const onSuccess = jest.fn();
-      const { result } = renderHook(() => useClaimAllocations(onSuccess));
-
-      await act(async () => {
-        await result.current.retrieveAllStellarSelectionETH([1]);
-        await result.current.claimDonatedNFT(2);
-        await result.current.claimAllDonatedNFTs([3]);
-        await result.current.claimDonatedERC20(4, '0xT', '1');
-      });
-
-      expect(onSuccess).toHaveBeenCalledTimes(4);
-    });
-  });
-
-  describe('identity stability', () => {
-    it('method identities are stable across re-renders with the same deps', () => {
-      const { result, rerender } = renderHook(() => useClaimAllocations());
-      const first = result.current;
-      rerender();
-      const second = result.current;
-      expect(second.retrieveAllStellarSelectionETH).toBe(first.retrieveAllStellarSelectionETH);
-      expect(second.claimDonatedNFT).toBe(first.claimDonatedNFT);
-      expect(second.claimAllDonatedNFTs).toBe(first.claimAllDonatedNFTs);
-      expect(second.claimDonatedERC20).toBe(first.claimDonatedERC20);
-      expect(second.claimAllDonatedERC20).toBe(first.claimAllDonatedERC20);
-    });
+  it('keeps method identities stable across re-renders', () => {
+    const { result, rerender } = renderHook(() => useClaimAllocations());
+    const first = result.current;
+    rerender();
+    expect(result.current.retrieveAllStellarSelectionETH).toBe(
+      first.retrieveAllStellarSelectionETH,
+    );
+    expect(result.current.claimDonatedNFT).toBe(first.claimDonatedNFT);
+    expect(result.current.claimAllDonatedNFTs).toBe(first.claimAllDonatedNFTs);
+    expect(result.current.claimDonatedERC20).toBe(first.claimDonatedERC20);
+    expect(result.current.claimAllDonatedERC20).toBe(first.claimAllDonatedERC20);
   });
 });
-
-// waitFor is imported above to ensure the helper is exported from test-utils,
-// keeping future tests ergonomic.
-void waitFor;

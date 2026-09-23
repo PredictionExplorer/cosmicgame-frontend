@@ -75,6 +75,8 @@ jest.mock('../../../../../config/networks', () => ({
   networkConfig: {
     chainId: 421614,
     rpcUrl: 'http://test-rpc.example',
+    explorerUrl: 'https://sepolia.arbiscan.io',
+    chainName: 'Arbitrum Sepolia',
   },
 }));
 

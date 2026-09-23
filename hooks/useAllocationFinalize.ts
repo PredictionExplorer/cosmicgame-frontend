@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { useConfig, usePublicClient } from 'wagmi';
-import { getAccount, writeContract } from '@wagmi/core';
+import { usePublicClient } from 'wagmi';
 import { zeroAddress } from 'viem';
 
 import { cosmicGameAbi } from '@/contracts/abis';
@@ -13,11 +12,10 @@ import api from '@/services/api';
 import { isAxiosError } from '@/services/api/client';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
-import { isUserRejection, reportError } from '@/utils/errors';
-import { getContractErrorDescriptor, isEmptyContractReadError } from '@/utils/contractErrors';
-import { assertSuccessfulTransactionReceipt } from '@/utils/transactions';
+import { reportError } from '@/utils/errors';
+import { isEmptyContractReadError } from '@/utils/contractErrors';
 import { useNotify } from '@/hooks/useNotify';
-import { useRequireChain } from '@/hooks/useRequireChain';
+import { useTxFlow } from '@/hooks/useTxFlow';
 import { useAllocationTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
 import { getStableClientTargetTime } from '@/utils/time';
 import type { ServerTimingSample } from '@/utils/time';
@@ -39,12 +37,11 @@ export function useAllocationFinalize({
 }: UseAllocationFinalizeOptions) {
   const t = useTranslations('toasts');
   const router = useRouter();
-  const config = useConfig();
   const publicClient = usePublicClient({ chainId: activeChain.id });
   const { cosmicGame } = useContractAddresses();
   const cosmicGameContract = useCosmicGameContract();
-  const { notify, notifyErrorFromEthers } = useNotify();
-  const { ensureCorrectChain } = useRequireChain();
+  const { notify } = useNotify();
+  const tx = useTxFlow();
   const uxScenario = useUxScenarioSnapshot();
 
   const { data: prizeTimeRaw } = useAllocationTime(
@@ -116,10 +113,13 @@ export function useAllocationFinalize({
   }, []);
 
   /**
-   * Claim the Signature Allocation for the current cycle.
-   * Returns `true` on a successfully mined transaction so the caller can
-   * trigger a post-tx refresh. Returns `false` on wallet-not-connected,
-   * user rejection, tx failure, or concurrent double-submit attempt.
+   * Finalizes the current cycle (the contract's `claimMainPrize`), then
+   * records the cycle for the indexer and opens the finalized-cycle page.
+   * Runs through `useTxFlow`: chain guard, one lifecycle toast with an
+   * explorer link, and localized failures (known contract errors included).
+   * Returns `true` once the transaction is confirmed so the caller can
+   * refresh; `false` on a missing contract, a dismissed wallet prompt, a
+   * failure, or a concurrent submit.
    */
   const onFinalize = async (): Promise<boolean> => {
     if (inFlightRef.current) return false;
@@ -134,90 +134,74 @@ export function useAllocationFinalize({
 
     inFlightRef.current = true;
     setIsClaiming(true);
+    const contract = { address: cosmicGame as `0x${string}`, abi: cosmicGameAbi };
+    let roundBefore = 0n;
+    let hasFinalCstGesture = false;
+    let gasLimit = GAS_FLOOR;
+    let roundAdvanced = false;
+
     try {
-      // Hold the submission lock while the wallet asks to switch networks.
-      // Resolve the signer at write time: a successful switch can precede
-      // React's next render and the old contract can still be read-only.
-      if (!(await ensureCorrectChain())) return false;
-      const contract = { address: cosmicGame as `0x${string}`, abi: cosmicGameAbi };
-      const roundBefore = (await publicClient.readContract({
-        ...contract,
-        functionName: 'roundNum',
-      })) as bigint;
-      const finalCstGestureParticipant =
-        ((await publicClient.readContract({
-          ...contract,
-          functionName: 'lastCstBidderAddress',
-        })) as string | undefined) ?? zeroAddress;
-      const hasFinalCstGesture = finalCstGestureParticipant !== zeroAddress;
+      const result = await tx.run({
+        prepare: async (ctx) => {
+          roundBefore = (await publicClient.readContract({
+            ...contract,
+            functionName: 'roundNum',
+          })) as bigint;
+          const finalCstGestureParticipant =
+            ((await publicClient.readContract({
+              ...contract,
+              functionName: 'lastCstBidderAddress',
+            })) as string | undefined) ?? zeroAddress;
+          hasFinalCstGesture = finalCstGestureParticipant !== zeroAddress;
+          try {
+            const estimate = await publicClient.estimateContractGas({
+              ...contract,
+              functionName: 'claimMainPrize',
+              account: ctx.account,
+            });
+            if (estimate) gasLimit = estimate + GAS_EXTRA;
+          } catch (estimateErr) {
+            reportError(estimateErr, 'finalize-cycle-gas-estimate');
+          }
+        },
+        write: (ctx) =>
+          ctx.writeContract({ ...contract, functionName: 'claimMainPrize', gas: gasLimit }),
+        onConfirmed: async () => {
+          const roundAfter = (await publicClient.readContract({
+            ...contract,
+            functionName: 'roundNum',
+          })) as bigint;
+          if (roundAfter <= roundBefore) {
+            notify('warning', t('finalize.roundDidNotAdvance'));
+            return;
+          }
+          roundAdvanced = true;
 
-      let gasLimit = GAS_FLOOR;
-      try {
-        const estimate = await publicClient.estimateContractGas({
-          ...contract,
-          functionName: 'claimMainPrize',
-          account: getAccount(config).address,
-        });
-        if (estimate) gasLimit = estimate + GAS_EXTRA;
-      } catch (estimateErr) {
-        reportError(estimateErr, 'finalize-cycle-gas-estimate');
-      }
+          let count = (data?.NumRaffleNFTWinnersBidding ?? 0) + 3 + (hasFinalCstGesture ? 1 : 0);
+          if ((data?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0) > 0) {
+            count += data?.NumRaffleNFTWinnersStakingRWalk ?? 0;
+          }
+          try {
+            await api.create(Number(roundBefore), count);
+          } catch (apiErr) {
+            const missingIndexer = isAxiosError(apiErr) && apiErr.response?.status === 404;
+            if (!missingIndexer) {
+              reportError(apiErr, 'post-claim-api');
+              notify('warning', t('finalize.metadataUpdating'));
+            }
+          }
 
-      const hash = await writeContract(config, {
-        ...contract,
-        functionName: 'claimMainPrize',
-        chainId: activeChain.id,
-        gas: gasLimit,
+          /** Completed cycle is the on-chain round before advance — matches `api.get_round_info`. */
+          const params = new URLSearchParams();
+          params.set('cycle', String(Number(roundBefore)));
+          params.set('message', 'success');
+          router.push(`/allocation-finalized?${params.toString()}`);
+        },
+        successMessage: () => (roundAdvanced ? t('cycleFinalized') : null),
+        failureMessage: t('finalize.failed'),
+        errorContext: 'finalize-cycle',
       });
-      const receipt = await publicClient.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-
-      const roundAfter = (await publicClient.readContract({
-        ...contract,
-        functionName: 'roundNum',
-      })) as bigint;
-      if (roundAfter <= roundBefore) {
-        notify('warning', t('finalize.roundDidNotAdvance'));
-        return true;
-      }
-
-      /** Completed cycle is the on-chain round before advance — matches `api.get_round_info`. */
-      const claimedRound = Number(roundBefore);
-
-      let count = (data?.NumRaffleNFTWinnersBidding ?? 0) + 3 + (hasFinalCstGesture ? 1 : 0);
-      if ((data?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0) > 0) {
-        count += data?.NumRaffleNFTWinnersStakingRWalk ?? 0;
-      }
-
-      try {
-        await api.create(Number(roundBefore), count);
-      } catch (apiErr) {
-        const missingIndexer = isAxiosError(apiErr) && apiErr.response?.status === 404;
-        if (!missingIndexer) {
-          reportError(apiErr, 'post-claim-api');
-          notify('warning', t('finalize.metadataUpdating'));
-        }
-      }
-
-      const params = new URLSearchParams();
-      params.set('cycle', String(claimedRound));
-      params.set('message', 'success');
-      router.push(`/allocation-finalized?${params.toString()}`);
-
-      return true;
-    } catch (err: unknown) {
-      if (isUserRejection(err)) {
-        notify('info', t('walletTransactionCancelled'));
-        return false;
-      }
-      reportError(err, 'finalize-cycle');
-      const descriptor = getContractErrorDescriptor(err);
-      if (descriptor) {
-        notify('error', t(descriptor.key, descriptor.values));
-      } else {
-        notifyErrorFromEthers(err, t('finalize.failed'));
-      }
-      return false;
+      return result.status === 'confirmed';
     } finally {
       inFlightRef.current = false;
       if (mountedRef.current) setIsClaiming(false);
