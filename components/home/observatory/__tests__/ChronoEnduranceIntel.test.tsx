@@ -109,7 +109,7 @@ describe('ChronoEnduranceIntel', () => {
       'href',
       `/user/${ENDURANCE}`,
     );
-    expect(endurance).toHaveTextContent('0x1111…1111');
+    expect(endurance).toHaveTextContent('0x1111…\u20601111');
     expect(endurance).toHaveTextContent('1h');
     expect(endurance).toHaveTextContent('home.observatory.standings.cstPlusNft');
 
@@ -134,7 +134,7 @@ describe('ChronoEnduranceIntel', () => {
 
     const challenge = screen.getByTestId('chrono-active-challenge');
     expect(challenge).toHaveTextContent('tables.specialAllocation.activeEnduranceChallenge');
-    expect(challenge).toHaveTextContent('0x1111…1111');
+    expect(challenge).toHaveTextContent('0x1111…\u20601111');
     expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
     expect(screen.getByTestId('chrono-challenge-record-to-beat')).toHaveTextContent('30m');
     expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent(

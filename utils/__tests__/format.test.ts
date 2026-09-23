@@ -451,10 +451,22 @@ describe('addresses', () => {
   });
 
   it('shortens to 0x + 4 … 4 with a single ellipsis character', () => {
-    expect(formatAddress(lower)).toBe(`${checksummed.slice(0, 6)}…${checksummed.slice(-4)}`);
-    expect(formatAddress(lower)).toMatch(/^0x[0-9a-fA-F]{4}…[0-9a-fA-F]{4}$/);
+    expect(formatAddress(lower)).toBe(`${checksummed.slice(0, 6)}…\u2060${checksummed.slice(-4)}`);
+    expect(formatAddress(lower)).toMatch(/^0x[0-9a-fA-F]{4}…\u2060[0-9a-fA-F]{4}$/);
     expect(formatAddress(lower, { variant: 'full' })).toBe(checksummed);
-    expect(formatAddress(`0x${'ab'.repeat(32)}`)).toBe('0xabab…abab');
+    expect(formatAddress(`0x${'ab'.repeat(32)}`)).toBe('0xabab…\u2060abab');
+  });
+
+  it('joins the halves with a word joiner after the ellipsis so the short form never wraps', () => {
+    // UAX #14 allows a line break after U+2026; U+2060 WORD JOINER removes that
+    // opportunity, so "0x1Ec1…" never sits above "E990" in a narrow button.
+    const short = formatAddress(lower);
+    expect([...short]).toHaveLength(2 + 4 + 2 + 4);
+    expect(short.indexOf('\u2060')).toBe(short.indexOf('…') + 1);
+    expect(short.split('\u2060')).toHaveLength(2);
+    expect(short).not.toMatch(/\s/);
+    // The full form carries no invisible characters: it is what users copy.
+    expect(formatAddress(lower, { variant: 'full' })).not.toContain('\u2060');
   });
 
   it('returns short and non-hex values whole, and empty input as an empty string', () => {

@@ -16,12 +16,12 @@ import {
 describe('shortenHex', () => {
   it('shortens a standard Ethereum address to the checksummed 0x + 4 … 4 form', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 4)).toBe('0x1234…5678');
+    expect(shortenHex(addr, 4)).toBe('0x1234…\u20605678');
   });
 
   it('ignores the legacy length so every address reads the same', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    expect(shortenHex(addr, 6)).toBe('0x1234…5678');
+    expect(shortenHex(addr, 6)).toBe('0x1234…\u20605678');
   });
 
   it('returns empty string for falsy input', () => {

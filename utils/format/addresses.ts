@@ -9,7 +9,8 @@ import type { AppContractAddresses } from '@/config/networks';
  * One address display for the whole app: EIP-55 checksummed, shortened as
  * `0x` + 4 … 4 with a single U+2026 ("0x1Ec1…E990") everywhere an address
  * shares space with other data, and shown in full only in a detail-page
- * header. Render through `<AddressChip>` (components/ui/address-chip.tsx),
+ * header. The short form is one unbreakable word (see `ADDRESS_JOIN`), so it
+ * never wraps even where the caller sets no `white-space: nowrap`. Render through `<AddressChip>` (components/ui/address-chip.tsx),
  * which adds the copy button, the `/user` link, `title` with the full
  * address, and labels for protocol contracts.
  *
@@ -21,6 +22,16 @@ const SHORT_SIDE_LENGTH = 4;
 
 /** U+2026, never "...." (the ellipsis is data typography, the same in every locale). */
 const ADDRESS_ELLIPSIS = '…';
+
+/**
+ * U+2060 WORD JOINER. Line breaking (UAX #14) forbids a break before an
+ * ellipsis but allows one after it, so "0x1Ec1…E990" alone can wrap as
+ * "0x1Ec1…" over "E990" in a narrow box. The joiner after the ellipsis makes
+ * the short form one unbreakable word. It is invisible, has no width, and is
+ * ignored by screen readers; copy buttons copy the full address, never this
+ * display string.
+ */
+const ADDRESS_JOIN = `${ADDRESS_ELLIPSIS}\u2060`;
 
 /** Values shortened around the ellipsis: addresses, hashes, anything 0x-prefixed. */
 const HEX_PREFIXED = /^0x/i;
@@ -71,7 +82,7 @@ export function formatAddress(
   const display = checksumAddress(value.trim());
   if (variant === 'full' || !HEX_PREFIXED.test(display)) return display;
   if (display.length <= 2 + SHORT_SIDE_LENGTH * 2 + 1) return display;
-  return `${display.slice(0, 2 + SHORT_SIDE_LENGTH)}${ADDRESS_ELLIPSIS}${display.slice(
+  return `${display.slice(0, 2 + SHORT_SIDE_LENGTH)}${ADDRESS_JOIN}${display.slice(
     -SHORT_SIDE_LENGTH,
   )}`;
 }

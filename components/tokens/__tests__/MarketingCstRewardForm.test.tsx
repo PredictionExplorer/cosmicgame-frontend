@@ -129,10 +129,10 @@ describe('MarketingCstRewardForm', () => {
   it('renders outreach reserve balance, owner, treasurer, and history link', async () => {
     await renderReadyForm();
 
-    expect(screen.getByText('0x8888…8888')).toBeInTheDocument();
+    expect(screen.getByText('0x8888…\u20608888')).toBeInTheDocument();
     expect(screen.getByText('3000.00 CST')).toBeInTheDocument();
-    expect(screen.getByText('0x1111…1111')).toBeInTheDocument();
-    expect(screen.getByText('0x2222…2222')).toBeInTheDocument();
+    expect(screen.getByText('0x1111…\u20601111')).toBeInTheDocument();
+    expect(screen.getByText('0x2222…\u20602222')).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'toasts.transfer.marketingCst.pay' }),
     ).toHaveTextContent('toasts.transfer.marketingCst.pay');

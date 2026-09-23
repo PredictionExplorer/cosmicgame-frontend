@@ -19,7 +19,7 @@ describe('AddressLink', () => {
     render(<AddressLink address={address} url={url} />);
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(1);
-    expect(links[0]).toHaveTextContent('0x1234…5678');
+    expect(links[0]).toHaveTextContent('0x1234…\u20605678');
     expect(links[0]).toHaveAttribute('href', url);
   });
 

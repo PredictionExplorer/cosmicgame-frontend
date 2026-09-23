@@ -19,7 +19,7 @@ describe('CTBalanceDistributionTable', () => {
     ];
     render(<CTBalanceDistributionTable list={mockData} />);
     // AddressLink shows the one short form (0x + 4 … 4) at every width.
-    expect(screen.getByText('0x555e…0e60')).toBeInTheDocument();
+    expect(screen.getByText('0x555e…\u20600e60')).toBeInTheDocument();
     // CST balances use the CST table precision: 2 fixed decimals.
     expect(screen.getByText('3.10')).toBeInTheDocument();
   });

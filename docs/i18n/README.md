@@ -369,6 +369,10 @@ Every displayed number, amount, date, duration and address goes through
 - **No-break joins:** a number and its unit, and the tokens of one duration, are joined
   by U+00A0 so they never wrap apart. Catalogs follow the same rule (`{amount} ETH`
   with U+00A0), enforced by `i18n:strict` (§7).
+- **Addresses** shorten to `0x` + 4 … 4 around one U+2026, followed by U+2060 WORD
+  JOINER: line breaking allows a break after an ellipsis, and the joiner removes it, so
+  the short form never wraps even without `whitespace-nowrap`. Tests that pin a short
+  address write it as `'0x1234…\u20605678'`; copy buttons copy the full address.
 - **Dates:** the compact form adds the year when it is not the current one; `<DateTime>`
   renders `<time dateTime title>` with UTC through hydration and the reader's zone after
   it, the full date, zone (as a UTC offset) and age on hover. State the zone once per

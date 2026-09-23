@@ -6,7 +6,8 @@ import { AddressChip } from '../address-chip';
 
 const ADDRESS = '0x1ec14a8e8b5c1f7f0a7a1c3b5e6d7e8f9ad7e990';
 const ZERO = '0x0000000000000000000000000000000000000000';
-const SHORT = /^0x[0-9a-fA-F]{4}…[0-9a-fA-F]{4}$/;
+// The short form joins its halves with U+2060 so it never wraps (see formatAddress).
+const SHORT = /^0x[0-9a-fA-F]{4}…\u2060[0-9a-fA-F]{4}$/;
 
 describe('AddressChip', () => {
   afterEach(() => {

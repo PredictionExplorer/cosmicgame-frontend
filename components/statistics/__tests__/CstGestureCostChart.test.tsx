@@ -173,7 +173,7 @@ describe('CstGestureCostView', () => {
     // First CST gesture landed 3600s after the ETH gesture whose deadline was T0+7200.
     expect(screen.getByText('Clock remaining before')).toBeInTheDocument();
     expect(screen.getByText('1h')).toBeInTheDocument();
-    expect(screen.getByText(/0xb1b2…5678/)).toBeInTheDocument();
+    expect(screen.getByText(/0xb1b2…\u20605678/)).toBeInTheDocument();
     expect(screen.getByText('Click the dot to open the transaction.')).toBeInTheDocument();
   });
 
