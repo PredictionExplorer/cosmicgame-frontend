@@ -1,3 +1,22 @@
+/**
+ * Page metadata for both hosts.
+ *
+ * Next.js merges metadata SHALLOWLY: a page that returns `openGraph` replaces
+ * its layout's whole `openGraph` object. So every field the layouts set once
+ * (`og:site_name`, `og:type`, `twitter:site`, the card type) is emitted again
+ * by `createMetadata` for every page; nothing is left to inheritance except
+ * the share image, which comes from one of three places:
+ *
+ *   - an explicit `imageUrl`;
+ *   - an `opengraph-image.tsx` next to the page (the file convention fills
+ *     `og:image` after the page's object merges): use `createMetadata`;
+ *   - the nearest ancestor's card, for every other page: use
+ *     `createPageMetadata(parent, …)`, which carries it over the merge.
+ *
+ * `app/[locale]/(app)/__tests__/sitewide-metadata.test.ts` enforces the
+ * choice per route and `npm run seo:share-check` checks the built HTML.
+ */
+
 import type { Metadata, ResolvingMetadata } from 'next';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
@@ -64,26 +83,12 @@ export function documentTitle(title: string): string {
 }
 
 /**
- * Builds a page's App Router Metadata: title, description, canonical and
- * hreflang alternates, robots, and complete Open Graph / Twitter blocks.
- *
- * Next.js merges metadata SHALLOWLY: a page that returns `openGraph` replaces
- * its layout's whole `openGraph` object. So every field the layouts set once
- * (`og:site_name`, `og:type`, `twitter:site`, the card type) is emitted here
- * again for every page; nothing is left to inheritance except the image.
- *
- * Images:
- *   - `imageUrl` set: that asset is the page's share image (1200×630).
- *   - Omitted, and an `opengraph-image.tsx` sits next to the page: the file
- *     convention fills `og:image` / `twitter:image` after this object merges.
- *   - Omitted, and no co-located card: use `createPageMetadata` instead, which
- *     carries the nearest ancestor's card over; a bare `openGraph` object here
- *     would otherwise drop it (`app/[locale]/(app)/__tests__/share-metadata.test.ts`
- *     enforces the choice per route).
- *
- * `title` is the page title without the brand; the document `<title>` gets
- * the brand suffix (`documentTitle`), while `og:title` stays bare because
- * `og:site_name` already names the site in every preview.
+ * A page's metadata: title, description, canonical and hreflang alternates,
+ * robots, and complete Open Graph and Twitter blocks. `title` is the page
+ * title without the brand: the document `<title>` gets the brand suffix
+ * (`documentTitle`), while `og:title` stays bare because `og:site_name`
+ * names the site in every preview. For a page with no card of its own, use
+ * `createPageMetadata`.
  */
 export function createMetadata(
   title: string,
@@ -167,18 +172,11 @@ export function createMetadata(
 }
 
 /**
- * `createMetadata` for a page WITHOUT its own `opengraph-image.tsx`: the page
- * keeps the share card of the nearest ancestor segment (the route group's
- * brand card, the Learn card, ...), which the shallow `openGraph` merge would
- * otherwise discard. Pass the `parent` argument Next.js hands to
- * `generateMetadata`:
- *
- *   export async function generateMetadata({ params }: PageProps, parent: ResolvingMetadata) {
- *     return createPageMetadata(parent, t('faq.title'), t('faq.description'), undefined, '/faq', { locale });
- *   }
- *
- * `twitter:image` follows `og:image` (Next.js fills it from Open Graph when
- * the Twitter block names none). An explicit `imageUrl` wins over the parent.
+ * `createMetadata` for a page without its own `opengraph-image.tsx`: keeps
+ * the nearest ancestor's share card, which the shallow `openGraph` merge
+ * would otherwise drop. Pass the `parent` that Next.js hands to
+ * `generateMetadata` as its second argument. `twitter:image` follows
+ * `og:image`; an explicit `imageUrl` wins over the parent.
  */
 export async function createPageMetadata(
   parent: ResolvingMetadata,
