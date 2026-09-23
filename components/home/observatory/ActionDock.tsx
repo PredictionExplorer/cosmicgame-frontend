@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Button } from '@/components/ui/button';
+import { Duration } from '@/components/ui/duration';
 import { getCycleState } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
@@ -30,16 +31,17 @@ export interface ActionDockProps {
   className?: string;
 }
 
-function pad(value: number): string {
-  return String(value).padStart(2, '0');
-}
-
+/**
+ * "6d 22:23:44" with the locale's day unit, joined by a no-break space so the
+ * dock timer never stacks the days above the clock.
+ */
 function renderCompactCountdown({ days, hours, minutes, seconds }: CountdownRenderProps) {
   return (
-    <span className="font-mono text-sm font-semibold tabular-nums">
-      {days > 0 ? `${days}d ` : ''}
-      {pad(hours)}:{pad(minutes)}:{pad(seconds)}
-    </span>
+    <Duration
+      seconds={days * 86_400 + hours * 3_600 + minutes * 60 + seconds}
+      variant="clock"
+      className="font-mono text-sm font-semibold"
+    />
   );
 }
 

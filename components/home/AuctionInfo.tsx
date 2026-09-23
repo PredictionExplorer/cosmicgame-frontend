@@ -113,7 +113,13 @@ export function AuctionInfo({
         </div>
       )}
 
-      <dl className={cn('grid gap-3', compact ? 'mt-2 grid-cols-3' : 'mt-4 sm:grid-cols-3')}>
+      <dl
+        className={cn(
+          'grid gap-3',
+          // Phones get full-width rows: three columns split uk labels and values.
+          compact ? 'mt-2 grid-cols-1 min-[26rem]:grid-cols-3' : 'mt-4 sm:grid-cols-3',
+        )}
+      >
         {[
           { label: compact ? 'dynamicDuration' : 'durationLabel', value: progress.auctionDuration },
           { label: 'elapsedLabel', value: progress.secondsElapsed },
@@ -127,7 +133,7 @@ export function AuctionInfo({
             )}
           >
             <dt className="text-xs text-muted-foreground">{t(`calibration.${label}`)}</dt>
-            <dd className="mt-1 font-mono text-sm tabular-nums [overflow-wrap:anywhere]">
+            <dd className="mt-1 whitespace-nowrap font-mono text-sm tabular-nums">
               {formatSeconds(value, locale)}
             </dd>
           </div>
