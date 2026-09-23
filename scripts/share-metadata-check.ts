@@ -12,7 +12,11 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { prerenderedDocuments, shareMetadataProblems } from './share-metadata-check-core';
+import {
+  isRedirectDocument,
+  prerenderedDocuments,
+  shareMetadataProblems,
+} from './share-metadata-check-core';
 
 const APP_DIR = join(process.cwd(), '.next', 'server', 'app');
 
@@ -23,7 +27,13 @@ function main(): void {
     return;
   }
 
-  const documents = prerenderedDocuments(APP_DIR);
+  const readMeta = (document: string) => {
+    const meta = join(APP_DIR, document.replace(/\.html$/, '.meta'));
+    return existsSync(meta) ? readFileSync(meta, 'utf8') : undefined;
+  };
+  const documents = prerenderedDocuments(APP_DIR).filter(
+    (document) => !isRedirectDocument(readMeta(document)),
+  );
   const failures = documents.flatMap((document) => {
     const problems = shareMetadataProblems(readFileSync(join(APP_DIR, document), 'utf8'));
     return problems.length > 0 ? [{ document, problems }] : [];

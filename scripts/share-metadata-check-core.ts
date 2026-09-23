@@ -70,6 +70,21 @@ export function shareMetadataProblems(html: string): string[] {
   return problems;
 }
 
+/**
+ * Whether a prerendered document is a redirect (its `.meta` sidecar records a
+ * 3xx status, as for the `/source-code` alias): it is never shown, so it has
+ * no preview to check.
+ */
+export function isRedirectDocument(metaJson: string | undefined): boolean {
+  if (!metaJson) return false;
+  try {
+    const { status } = JSON.parse(metaJson) as { status?: unknown };
+    return typeof status === 'number' && status >= 300 && status < 400;
+  } catch {
+    return false;
+  }
+}
+
 /** Every prerendered HTML document under `appDir`, relative paths first-level sorted. */
 export function prerenderedDocuments(appDir: string): string[] {
   const walk = (directory: string): string[] =>

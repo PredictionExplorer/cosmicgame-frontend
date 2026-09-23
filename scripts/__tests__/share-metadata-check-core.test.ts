@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import {
   REQUIRED_SHARE_TAGS,
   isIndexable,
+  isRedirectDocument,
   metaTags,
   prerenderedDocuments,
   shareMetadataProblems,
@@ -79,6 +80,16 @@ describe('share metadata check', () => {
       'og:image is not absolute: /images/logo.svg',
       'og:image is an SVG: /images/logo.svg',
     ]);
+  });
+
+  it('recognizes prerendered redirects by their .meta status', () => {
+    expect(
+      isRedirectDocument(JSON.stringify({ status: 308, headers: { location: '/code' } })),
+    ).toBe(true);
+    expect(isRedirectDocument(JSON.stringify({ status: 200 }))).toBe(false);
+    expect(isRedirectDocument(JSON.stringify({ headers: {} }))).toBe(false);
+    expect(isRedirectDocument('not json')).toBe(false);
+    expect(isRedirectDocument(undefined)).toBe(false);
   });
 
   it('skips noindex pages', () => {
