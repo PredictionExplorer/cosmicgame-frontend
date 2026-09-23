@@ -36,7 +36,7 @@
       "pool": {
         "label": "錨定配發池",
         "tooltip": "目前分配至錨定配發池的 ETH 總額；每個週期按比例配發給 Cosmic Signature NFT 錨定者。",
-        "caption": "在本週期內累積，於週期收官時存入已錨定的 Cosmic Signature NFT。"
+        "caption": "本週期收官時存入已錨定的 Cosmic Signature NFT。"
       },
       "cosmicSignatureAnchored": {
         "label": "已錨定 Cosmic Signature NFT",

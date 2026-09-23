@@ -296,7 +296,7 @@
       "randomWalkTooltip": "当前已锚定且具备锚定 NFT 星选资格的 Random Walk NFT 总数。",
       "poolLabel": "锚定派发池",
       "poolTooltip": "当前分配至 Cosmic Signature NFT 锚定者派发池的 ETH。",
-      "poolCaption": "在本周期内累积，于周期收官时存入。此前已存入但尚未取回的部分列为“未取回锚定派发”。",
+      "poolCaption": "本周期收官时存入；此前已存入但尚未取回的部分计入“未取回”。",
       "perNftLabel": "每枚 Cosmic Signature NFT 派发额",
       "perNftTooltip": "当前每枚已锚定 Cosmic Signature NFT 对应的 ETH 锚定派发：链上派发池除以已索引的已锚定 NFT 总数。",
       "perNftNoneAnchored": "尚未索引到已锚定的 Cosmic Signature NFT",

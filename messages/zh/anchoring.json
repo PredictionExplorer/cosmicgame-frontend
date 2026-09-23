@@ -36,7 +36,7 @@
       "pool": {
         "label": "锚定派发池",
         "tooltip": "当前分配至锚定派发池的 ETH 总额；每个周期按比例派发给 Cosmic Signature NFT 锚定者。",
-        "caption": "在本周期内累积，于周期收官时存入已锚定的 Cosmic Signature NFT。"
+        "caption": "本周期收官时存入已锚定的 Cosmic Signature NFT。"
       },
       "cosmicSignatureAnchored": {
         "label": "已锚定 Cosmic Signature NFT",

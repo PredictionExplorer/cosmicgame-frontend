@@ -36,7 +36,7 @@
       "pool": {
         "label": "앵커링 지급 풀",
         "tooltip": "현재 앵커링 지급 풀에 쌓여 있는 ETH 총액입니다. 사이클마다 Cosmic Signature NFT 앵커링 보유자에게 비례 지급됩니다.",
-        "caption": "이번 사이클 동안 쌓이며, 사이클이 마감되면 앵커링된 Cosmic Signature NFT에 적립됩니다."
+        "caption": "이번 사이클이 마감되면 앵커링된 Cosmic Signature NFT에 적립됩니다."
       },
       "cosmicSignatureAnchored": {
         "label": "앵커링된 Cosmic Signature NFT",

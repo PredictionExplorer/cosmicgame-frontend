@@ -101,7 +101,9 @@ describe('AnchoringPanel', () => {
 
   it('explains how the pool relates to unretrieved distributions', () => {
     render(<AnchoringPanel />);
-    expect(screen.getByText(/Earlier deposits not yet retrieved appear as/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/earlier deposits not yet retrieved show as Unretrieved/),
+    ).toBeInTheDocument();
   });
 
   it('renders CST/RWLK anchoring tabs', () => {

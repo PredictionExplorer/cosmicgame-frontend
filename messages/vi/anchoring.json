@@ -36,7 +36,7 @@
       "pool": {
         "label": "Quỹ phân phối neo giữ",
         "tooltip": "Tổng ETH hiện được phân bổ vào quỹ phân phối neo giữ, phân phối theo tỷ lệ cho những người neo giữ Cosmic Signature NFT mỗi chu kỳ.",
-        "caption": "Tích lũy trong chu kỳ này và được nạp cho các Cosmic Signature NFT đang neo giữ khi chu kỳ hoàn tất."
+        "caption": "Được nạp cho các Cosmic Signature NFT đang neo giữ khi chu kỳ này hoàn tất."
       },
       "cosmicSignatureAnchored": {
         "label": "Cosmic Signature NFT đang neo giữ",

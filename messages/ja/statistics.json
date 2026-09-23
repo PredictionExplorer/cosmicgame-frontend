@@ -296,7 +296,7 @@
       "randomWalkTooltip": "現在係留され、係留NFT星選の対象となっているRandomWalk NFTの総数。",
       "poolLabel": "係留配分プール",
       "poolTooltip": "Cosmic Signature NFTの係留者のために係留配分プールに現在配分されているETH。",
-      "poolCaption": "このサイクルの間に積み上がり、確定時に積み立てられます。以前に積み立てられ、まだ受け取られていない分は「未受け取りの係留配分」に表示されます。",
+      "poolCaption": "このサイクルの確定時に積み立てられます。以前の積立分でまだ受け取られていないものは「未受け取り」に表示されます。",
       "perNftLabel": "Cosmic Signature NFTあたりの配分",
       "perNftTooltip": "係留中のCosmic Signature NFT 1点あたりの現在のETH係留配分：オンチェーンのプールを、インデックス済みの係留NFT総数で割った値。",
       "perNftNoneAnchored": "係留中のCosmic Signature NFTはまだインデックスされていません",

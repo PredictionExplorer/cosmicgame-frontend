@@ -296,7 +296,7 @@
       "randomWalkTooltip": "Total number of Random Walk NFTs currently anchored and eligible for Anchored-NFT Stellar Selection.",
       "poolLabel": "Anchor Distribution Pool",
       "poolTooltip": "ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.",
-      "poolCaption": "Accumulates during this cycle and is deposited when it finalizes. Earlier deposits not yet retrieved appear as Unretrieved Anchor Distributions.",
+      "poolCaption": "Deposited when this cycle finalizes; earlier deposits not yet retrieved show as Unretrieved.",
       "perNftLabel": "Distribution per Cosmic Signature NFT",
       "perNftTooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.",
       "perNftNoneAnchored": "No anchored Cosmic Signature NFTs indexed yet",

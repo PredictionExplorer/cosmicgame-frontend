@@ -141,7 +141,7 @@ const Imprint = ({ seoSummary }: { seoSummary?: ReactNode }) => {
           <p className="text-sm text-muted-foreground mt-2">{t('page.currentCost')}</p>
           {contractCostWei !== null ? (
             <p
-              className="mt-1 font-mono text-xs text-muted-foreground"
+              className="mt-2 text-xs leading-relaxed text-muted-foreground tabular-nums"
               data-testid="imprint-cost-breakdown"
             >
               {t('page.costBreakdown', {

@@ -296,7 +296,7 @@
       "randomWalkTooltip": "Tổng số RandomWalk NFT hiện đang neo giữ và thuộc diện Tinh tuyển NFT neo giữ.",
       "poolLabel": "Quỹ phân phối neo giữ",
       "poolTooltip": "ETH hiện được phân bổ vào quỹ phân phối neo giữ cho những người neo giữ Cosmic Signature NFT.",
-      "poolCaption": "Tích lũy trong chu kỳ này và được nạp khi chu kỳ hoàn tất. Các đợt nạp trước chưa được nhận về hiển thị ở mục “Phân phối neo giữ chưa nhận về”.",
+      "poolCaption": "Được nạp khi chu kỳ này hoàn tất; các đợt nạp trước chưa nhận về hiển thị ở mục “Chưa nhận về”.",
       "perNftLabel": "Phân phối mỗi Cosmic Signature NFT",
       "perNftTooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ: quỹ trên chuỗi chia cho tổng số NFT neo giữ đã lập chỉ mục.",
       "perNftNoneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ",

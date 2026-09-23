@@ -36,7 +36,7 @@
       "pool": {
         "label": "Anchor Distribution Pool",
         "tooltip": "Total ETH currently allocated to the Anchor Distribution pool, distributed proportionally to Cosmic Signature NFT anchor-holders each cycle.",
-        "caption": "Accumulates during this cycle and is deposited to anchored Cosmic Signature NFTs when the cycle finalizes."
+        "caption": "Deposited to anchored Cosmic Signature NFTs when this cycle finalizes."
       },
       "cosmicSignatureAnchored": {
         "label": "Cosmic Signature NFTs Anchored",

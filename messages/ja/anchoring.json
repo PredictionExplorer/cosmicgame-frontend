@@ -36,7 +36,7 @@
       "pool": {
         "label": "係留配分プール",
         "tooltip": "現在係留配分プールに配分されているETHの総額。サイクルごとにCosmic Signature NFTの係留者へ比例配分されます。",
-        "caption": "このサイクルの間に積み上がり、サイクルが確定すると係留中のCosmic Signature NFTへ積み立てられます。"
+        "caption": "このサイクルが確定すると、係留中のCosmic Signature NFTへ積み立てられます。"
       },
       "cosmicSignatureAnchored": {
         "label": "係留中のCosmic Signature NFT",
