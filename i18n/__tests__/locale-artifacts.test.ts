@@ -9,7 +9,7 @@ import { LEXICON_PROFILES } from '@/scripts/lexicon-scan-core';
 import { TERMINOLOGY_PACKS } from '@/scripts/terminology-consistency-core';
 import { SCRIPT_PATTERNS } from '@/test-utils/locale-expectations';
 
-import { OG_TYPOGRAPHY } from '@/lib/og/fonts';
+import { ogFontFiles } from '@/lib/og/fonts';
 
 import { LOCALE_LABELS, routing, TRANSLATED_LOCALES } from '../routing';
 
@@ -53,10 +53,12 @@ describe('Open Graph font assets', () => {
   it('names every embedded font and its license in THIRD_PARTY_NOTICES.md', () => {
     const notices = readFileSync(join(ROOT, 'THIRD_PARTY_NOTICES.md'), 'utf8');
     for (const locale of routing.locales) {
-      const { font } = OG_TYPOGRAPHY[locale];
-      if (!font) continue;
-      expect(notices).toContain(`assets/fonts/${basename(fileURLToPath(font.file))}`);
-      expect(notices).toContain(`assets/fonts/${basename(fileURLToPath(font.license))}`);
+      for (const font of ogFontFiles(locale)) {
+        expect(notices).toContain(basename(fileURLToPath(font.file)));
+        if (font.license) {
+          expect(notices).toContain(`assets/fonts/${basename(fileURLToPath(font.license))}`);
+        }
+      }
     }
   });
 });

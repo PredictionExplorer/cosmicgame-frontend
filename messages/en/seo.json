@@ -354,70 +354,84 @@
     }
   },
   "og": {
+    "shared": {
+      "cycle": "Cycle {cycle}",
+      "plateCaption": "{name} · {cycle}"
+    },
     "default": {
       "alt": "Cosmic Signature — Every Gesture Shapes the Signature.",
-      "eyebrow": "Cosmic Signature",
       "title": "Every Gesture Shapes the Signature.",
       "subhead": "A procedural on-chain art protocol on Arbitrum.",
-      "chips": ["CC0", "Verified On-Chain", "7% Protocol Guild"]
+      "fact": "CC0 · Open source · 7% to Protocol Guild"
     },
     "gallery": {
       "alt": "Cosmic Signature — Gallery",
       "eyebrow": "Gallery",
-      "title": "Three-body trajectories, rendered on-chain.",
-      "subhead": "Every Signature is a deterministic three-body simulation, spectrally rendered. Same seed, identical pixels.",
-      "chips": ["CC0", "Deterministic", "Reproducible Art"]
+      "title": "Three-body trajectories, seeded on-chain.",
+      "subhead": "Every Signature is a deterministic three-body simulation, rendered spectrally from its on-chain seed. Same seed, identical pixels.",
+      "fact": "CC0 · Deterministic · Reproducible"
     },
     "currentCycle": {
       "alt": "Cosmic Signature — The Performance Cycle, live.",
       "eyebrow": "Current Cycle",
       "title": "The Performance Cycle, live.",
       "subhead": "Gesture history, leaderboards, attached contributions, and allocation distribution — in real time.",
-      "chips": ["Live", "Arbitrum One", "On-Chain"]
+      "fact": "Live on Arbitrum One"
     },
     "anchoring": {
       "alt": "Cosmic Signature — Anchoring",
       "eyebrow": "Anchoring",
-      "title": "Anchor a Signature. Receive a share each cycle.",
-      "subhead": "Anchored Cosmic Signature NFTs receive a proportional share of the per-cycle Anchor Distribution. Release any time.",
-      "chips": ["No Lockup", "Per-Cycle ETH", "Stellar Selection"]
+      "title": "Anchor a Signature to every cycle.",
+      "subhead": "Anchored Cosmic Signature NFTs take part in each cycle’s Anchor Distribution, pro rata. Release any time.",
+      "fact": "CC0 · Release any time · Anchor Distribution"
     },
     "faq": {
       "alt": "Cosmic Signature — FAQ",
       "eyebrow": "FAQ",
       "title": "Questions worth answering plainly.",
       "subhead": "Performance Cycles, gestures, allocations, anchoring, Protocol Coordination.",
-      "chips": ["CC0", "Verified On-Chain", "7% Protocol Guild"]
+      "fact": "CC0 · Open source · 7% to Protocol Guild"
     },
     "howItWorks": {
       "alt": "Cosmic Signature — How It Works",
       "eyebrow": "How It Works",
       "title": "From Calibration to Allocation, in four stages.",
       "subhead": "Open the cycle. Make a gesture. Finalize. The protocol distributes the reserve.",
-      "chips": ["Calibration", "Gestures", "Allocations"]
+      "fact": "Calibration · Gestures · Allocations"
     },
     "gesture": {
       "alt": "Cosmic Signature — Gesture",
+      "altWithValue": "Cosmic Signature — Gesture #{position} in Cycle {cycle}",
       "eyebrow": "Gesture",
-      "eyebrowWithValue": "Gesture Position #{value}",
       "title": "An imprint on the Signature.",
-      "subhead": "Each gesture extends the Cycle Finalization Time, imprints Participation CST, and shapes the cycle’s evolving Signature.",
-      "chips": ["CC0", "Verified On-Chain", "7% Protocol Guild"]
+      "titleWithValue": "Gesture #{position} · Cycle {cycle}",
+      "subhead": "Each gesture extends the cycle, shapes its Signature, and can imprint Participation CST.",
+      "methods": {
+        "eth": "ETH gesture",
+        "ethRandomWalk": "ETH + RandomWalk gesture",
+        "cst": "CST gesture"
+      }
     },
     "allocation": {
       "alt": "Cosmic Signature — Allocation Distribution",
+      "altWithValue": "Cosmic Signature — Cycle {cycle} allocations",
       "eyebrow": "Allocation",
-      "eyebrowWithValue": "Cycle #{value}",
       "title": "Allocation Distribution",
-      "subhead": "How the Cycle Reserve was distributed across more than ten allocation tracks.",
-      "chips": ["Signature", "Chrono-Warrior", "Anchor"]
+      "titleWithValue": "Cycle {cycle} allocations",
+      "subhead": "How the Cycle Reserve was distributed across more than ten allocation tracks."
     },
     "participant": {
       "alt": "Cosmic Signature — Participant",
+      "altWithValue": "Cosmic Signature — Participant {address}",
       "eyebrow": "Participant",
       "title": "Participant",
-      "subhead": "Gestures, allocations, anchors, and contributions across every Performance Cycle.",
-      "chips": ["Gestures", "Allocations", "Anchors"]
+      "subhead": "Gestures, allocations, anchors, and contributions across every Performance Cycle."
+    },
+    "token": {
+      "alt": "Cosmic Signature #{id}, a deterministic three-body artwork",
+      "altWithTraits": "Cosmic Signature #{id}: {structure} structure, {palette} palette",
+      "title": "Signature #{id}",
+      "subhead": "A deterministic three-body simulation, seeded on-chain and rendered by the open-source renderer."
     }
   }
 }

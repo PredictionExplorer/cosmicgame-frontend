@@ -97,6 +97,7 @@
     "react-snap-carousel": "^0.5.1",
     "react-transition-group": "^4.4.2",
     "recharts": "^3.8.0",
+    "sharp": "^0.35.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.1",

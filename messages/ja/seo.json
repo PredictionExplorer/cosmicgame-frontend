@@ -354,70 +354,84 @@
     }
   },
   "og": {
+    "shared": {
+      "cycle": "サイクル{cycle}",
+      "plateCaption": "{name}・{cycle}"
+    },
     "default": {
       "alt": "Cosmic Signature——すべての一筆がシグネチャーを形づくる。",
-      "eyebrow": "Cosmic Signature",
       "title": "すべての一筆がシグネチャーを形づくる。",
       "subhead": "Arbitrum上のプロシージャル・オンチェーンアート・プロトコル。",
-      "chips": ["CC0", "オンチェーンで検証済み", "Protocol Guild 7%"]
+      "fact": "CC0・オープンソース・Protocol Guildへ7%"
     },
     "gallery": {
       "alt": "Cosmic Signature——ギャラリー",
       "eyebrow": "ギャラリー",
-      "title": "三体の軌跡を、オンチェーンで描く。",
-      "subhead": "すべてのシグネチャーは決定論的な三体シミュレーションをスペクトルレンダリングしたもの。同じシードなら、同じピクセル。",
-      "chips": ["CC0", "決定論的", "再現可能なアート"]
+      "title": "オンチェーンのシードから生まれる三体の軌跡。",
+      "subhead": "すべてのシグネチャーは、オンチェーンのシードから始まる決定論的な三体シミュレーションをスペクトルレンダリングしたものです。同じシードなら、同じピクセル。",
+      "fact": "CC0・決定論的・再現可能"
     },
     "currentCycle": {
       "alt": "Cosmic Signature——パフォーマンス・サイクル、ライブ。",
       "eyebrow": "現在のサイクル",
       "title": "パフォーマンス・サイクル、ライブ。",
       "subhead": "一筆の履歴、順位表、添付された拠出、配分の分布——リアルタイムで。",
-      "chips": ["ライブ", "Arbitrum One", "オンチェーン"]
+      "fact": "Arbitrum Oneでライブ"
     },
     "anchoring": {
       "alt": "Cosmic Signature——係留",
       "eyebrow": "係留",
-      "title": "シグネチャーを係留し、サイクルごとに分け前を受け取る。",
-      "subhead": "係留中のCosmic Signature NFTは、サイクルごとの係留配分を比例して受け取ります。解除はいつでも。",
-      "chips": ["ロックなし", "サイクルごとのETH", "星選"]
+      "title": "シグネチャーを係留し、毎サイクルに参加する。",
+      "subhead": "係留中のCosmic Signature NFTは、サイクルごとの係留配分に比例して参加します。係留解除はいつでもできます。",
+      "fact": "CC0・いつでも係留解除・係留配分"
     },
     "faq": {
       "alt": "Cosmic Signature——よくある質問",
       "eyebrow": "よくある質問",
       "title": "率直に答えておきたい質問。",
       "subhead": "パフォーマンス・サイクル、一筆、配分、係留、プロトコルの調整。",
-      "chips": ["CC0", "オンチェーンで検証済み", "Protocol Guild 7%"]
+      "fact": "CC0・オープンソース・Protocol Guildへ7%"
     },
     "howItWorks": {
       "alt": "Cosmic Signature——仕組み",
       "eyebrow": "仕組み",
       "title": "調律から配分まで、四つの段階で。",
       "subhead": "サイクルを開く。一筆を入れる。確定する。プロトコルが準備金を配る。",
-      "chips": ["調律", "一筆", "配分"]
+      "fact": "調律・一筆・配分"
     },
     "gesture": {
       "alt": "Cosmic Signature——一筆",
+      "altWithValue": "Cosmic Signature——サイクル{cycle}の一筆#{position}",
       "eyebrow": "一筆",
-      "eyebrowWithValue": "一筆の順位 #{value}",
       "title": "シグネチャーへの刻印。",
-      "subhead": "一筆ごとにサイクル確定時刻が延び、参加CSTが刻印され、変化し続けるサイクルのシグネチャーが形づくられます。",
-      "chips": ["CC0", "オンチェーンで検証済み", "Protocol Guild 7%"]
+      "titleWithValue": "一筆#{position}・サイクル{cycle}",
+      "subhead": "一筆ごとにサイクルが延び、シグネチャーが形づくられ、参加CSTが刻印されることがあります。",
+      "methods": {
+        "eth": "ETH一筆",
+        "ethRandomWalk": "ETH + RandomWalk一筆",
+        "cst": "CST一筆"
+      }
     },
     "allocation": {
       "alt": "Cosmic Signature——配分の分布",
+      "altWithValue": "Cosmic Signature——サイクル{cycle}の配分",
       "eyebrow": "配分",
-      "eyebrowWithValue": "サイクル{value}",
       "title": "配分の分布",
-      "subhead": "サイクル準備金が10を超える配分トラックへどう配られたか。",
-      "chips": ["シグネチャー", "時の戦士", "係留"]
+      "titleWithValue": "サイクル{cycle}の配分",
+      "subhead": "サイクル準備金が10を超える配分トラックへどう配られたか。"
     },
     "participant": {
       "alt": "Cosmic Signature——参加者",
+      "altWithValue": "Cosmic Signature——参加者{address}",
       "eyebrow": "参加者",
       "title": "参加者",
-      "subhead": "すべてのパフォーマンス・サイクルにわたる一筆、配分、係留、拠出。",
-      "chips": ["一筆", "配分", "係留"]
+      "subhead": "すべてのパフォーマンス・サイクルにわたる一筆、配分、係留、拠出。"
+    },
+    "token": {
+      "alt": "Cosmic Signature #{id}、決定論的な三体のアートワーク",
+      "altWithTraits": "Cosmic Signature #{id}：構造は{structure}、パレットは{palette}",
+      "title": "シグネチャー#{id}",
+      "subhead": "オンチェーンのシードとオープンソースのレンダラーから生まれる、決定論的な三体シミュレーション。"
     }
   }
 }

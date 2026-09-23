@@ -1,13 +1,15 @@
 import { COSMIC_OG_SIZE } from '@/lib/og/CosmicOgCard';
-import { getOgCopy, getOgImageMetadata } from '@/lib/og/copy';
-import { createCosmicOgImage } from '@/lib/og/createCosmicOgImage';
+import { latestArtworkCard, ogImageMetadata } from '@/lib/og/cards';
+import { getOgCopy } from '@/lib/og/copy';
 
 /**
- * Brand card for every marketing-host page without its own (the white paper,
- * the quiz and its tiers). Pages inherit it through `createPageMetadata`.
+ * The marketing host's brand card, inherited by the pages without their own
+ * (the white paper, the quiz and its tiers) through `createPageMetadata`.
  */
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
+// The card shows the newest Signature; regenerate as new ones are imprinted.
+export const revalidate = 3600;
 
 interface ImageProps {
   params: Promise<{ locale: string }>;
@@ -15,10 +17,10 @@ interface ImageProps {
 
 export async function generateImageMetadata({ params }: ImageProps) {
   const { locale } = await params;
-  return getOgImageMetadata(locale, 'default');
+  return ogImageMetadata(getOgCopy(locale, 'default').alt);
 }
 
 export default async function Image({ params }: ImageProps) {
   const { locale } = await params;
-  return createCosmicOgImage(locale, getOgCopy(locale, 'default'));
+  return latestArtworkCard(locale, 'default', 'landing');
 }

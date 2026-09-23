@@ -1,16 +1,17 @@
 /**
- * Source registry and glyph sets for the Open Graph font subsets that
+ * Source registry and glyph sets for the share-card font subsets that
  * `npm run og:fonts` (scripts/build-og-fonts.ts) cuts and lib/og/fonts.ts
- * embeds. Kept apart from the CLI so the unit suite can assert that the two
- * registries agree without running a build.
+ * embeds. Kept apart from the CLI so the unit suite can check the registries
+ * and the coverage of every locale's copy without running a build.
  */
 
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { OG_TYPOGRAPHY, type OgFontSpec } from '../lib/og/fonts';
-import { TRANSLATED_LOCALES, type AppLocale, type TranslatedLocale } from '../i18n/routing';
+import { getLocaleConfig } from '../i18n/localeConfig';
+import { routing, type AppLocale } from '../i18n/routing';
+import { OG_TYPOGRAPHY, ogFontFiles, type OgFontFile } from '../lib/og/fonts';
 
 /** The variable TTFs of the google/fonts repository are pinned to one commit for reproducible builds. */
 export const GOOGLE_FONTS_COMMIT = 'f6b2b7e8545e086ad3f821af21895d732b6485cf';
@@ -20,142 +21,165 @@ export interface FontSource {
   readonly path: string;
 }
 
+export interface SubsetSource extends FontSource {
+  /** Variation-axis values the subset is instanced at (satori draws static faces only). */
+  readonly axes: Readonly<Record<string, number>>;
+  /** Fixed glyph set, for faces that only ever draw numbers and addresses. */
+  readonly glyphs?: string;
+}
+
+/** Token numbers (`#000047`) and checksummed, shortened addresses (`0xA169…63B6`). */
+const MONO_GLYPHS = '0123456789abcdefABCDEFx#….· ';
+
+const noto = (cut: string, weight: number): SubsetSource => ({
+  path: `ofl/notosans${cut.toLowerCase()}/NotoSans${cut}[wght].ttf`,
+  axes: { wght: weight },
+});
+
 /**
- * Where each locale's OG face comes from; `null` when the locale renders with
- * next/og's built-in Latin fonts. Typed against the translated locales so a
- * locale whose `OG_TYPOGRAPHY` entry embeds a font cannot register without
- * naming its source here (`sourceRegistryProblems` checks the converse too).
- * The output file name is the one `OG_TYPOGRAPHY` embeds; locales that embed
- * the same file must name the same source, and the build cuts that file from
- * the union of their copy (`ogFontBuilds`).
+ * Every checked-in subset, by file name in assets/fonts. Inter is instanced
+ * at the optical size of the text it sets (28–32px), as a browser with the
+ * full variable font would.
  */
-export const OG_FONT_SOURCES: Readonly<Record<TranslatedLocale, FontSource | null>> = {
-  zh: { path: 'ofl/notosanssc/NotoSansSC[wght].ttf' },
-  'zh-TW': { path: 'ofl/notosanstc/NotoSansTC[wght].ttf' },
-  'zh-HK': { path: 'ofl/notosanshk/NotoSansHK[wght].ttf' },
-  uk: { path: 'ofl/onest/Onest[wght].ttf' },
-  ko: { path: 'ofl/notosanskr/NotoSansKR[wght].ttf' },
-  ja: { path: 'ofl/notosansjp/NotoSansJP[wght].ttf' },
-  // Onest carries the Vietnamese letters Clash Display lacks; shared with `uk`.
-  vi: { path: 'ofl/onest/Onest[wght].ttf' },
+export const OG_SUBSET_SOURCES: Readonly<Record<string, SubsetSource>> = {
+  'Inter-400.subset.ttf': { path: 'ofl/inter/Inter[opsz,wght].ttf', axes: { opsz: 28, wght: 400 } },
+  'Inter-500.subset.ttf': { path: 'ofl/inter/Inter[opsz,wght].ttf', axes: { opsz: 28, wght: 500 } },
+  'JetBrainsMono-500.subset.ttf': {
+    path: 'ofl/jetbrainsmono/JetBrainsMono[wght].ttf',
+    axes: { wght: 500 },
+    glyphs: MONO_GLYPHS,
+  },
+  'Onest-500.subset.ttf': { path: 'ofl/onest/Onest[wght].ttf', axes: { wght: 500 } },
+  'NotoSansSC-700.subset.ttf': noto('SC', 700),
+  'NotoSansSC-400.subset.ttf': noto('SC', 400),
+  'NotoSansTC-700.subset.ttf': noto('TC', 700),
+  'NotoSansTC-400.subset.ttf': noto('TC', 400),
+  'NotoSansHK-700.subset.ttf': noto('HK', 700),
+  'NotoSansHK-400.subset.ttf': noto('HK', 400),
+  'NotoSansKR-700.subset.ttf': noto('KR', 700),
+  'NotoSansKR-400.subset.ttf': noto('KR', 400),
+  'NotoSansJP-700.subset.ttf': noto('JP', 700),
+  'NotoSansJP-400.subset.ttf': noto('JP', 400),
 };
 
 /** Punctuation the card layout may render around CJK copy. */
-const CJK_PUNCTUATION = '，。、：；！？「」『』（）《》〈〉【】—…·／％－～　';
+const CJK_PUNCTUATION = '，。、：；！？「」『』（）《》〈〉【】—…·・／％－～　';
 /** Typographic punctuation any locale's copy may carry (quotes, dashes, ellipsis). */
 const TYPOGRAPHIC_PUNCTUATION = '“”‘’«»—–…·';
+/** Hosts printed in the card footer. */
+const DOMAINS = 'app.cosmicsignature.com';
 
 const PRINTABLE_ASCII = Array.from({ length: 0x7f - 0x20 }, (_, index) =>
   String.fromCharCode(0x20 + index),
 ).join('');
 
-function collectStrings(value: unknown, out: string[]): void {
+function collectStrings(value: unknown, out: string[], key = ''): void {
+  // Alt text is read by screen readers and crawlers, never drawn.
+  if (key.startsWith('alt')) return;
   if (typeof value === 'string') out.push(value);
   else if (Array.isArray(value)) value.forEach((item) => collectStrings(item, out));
   else if (value && typeof value === 'object') {
-    Object.values(value as Record<string, unknown>).forEach((item) => collectStrings(item, out));
+    for (const [childKey, child] of Object.entries(value as Record<string, unknown>)) {
+      collectStrings(child, out, childKey);
+    }
   }
 }
 
 /**
- * Every distinct character the locale's OG images can render: its `seo.json`
- * og copy, printable ASCII for dynamic values (counts, `#42`, addresses, the
- * footer domain), and the punctuation the card may emit.
+ * Every distinct character a locale's cards can draw: its `seo.json` og copy
+ * (without alt text), the uppercase eyebrows of cased scripts — cased with
+ * the same `toLocaleUpperCase` the card applies, so no capital is missing
+ * from the face that sets the word — printable ASCII for dynamic values, the
+ * footer host, and the punctuation the card may emit.
  */
-export function ogGlyphText(root: string, locale: AppLocale): string {
+export function ogRenderedText(root: string, locale: AppLocale): string {
   const seo = JSON.parse(readFileSync(join(root, 'messages', locale, 'seo.json'), 'utf8')) as {
     og: unknown;
   };
   const strings: string[] = [];
   collectStrings(seo.og, strings);
-  const punctuation = OG_TYPOGRAPHY[locale].cjk
+  const { cjk } = OG_TYPOGRAPHY[locale];
+  const intl = getLocaleConfig(locale).intlLocale;
+  const cased = cjk ? [] : strings.map((text) => text.toLocaleUpperCase(intl));
+  const punctuation = cjk
     ? `${CJK_PUNCTUATION}${TYPOGRAPHIC_PUNCTUATION}`
     : TYPOGRAPHIC_PUNCTUATION;
-  return Array.from(new Set([...strings.join(''), ...PRINTABLE_ASCII, ...punctuation])).join('');
-}
-
-/** Locales whose OG typography embeds a font, with the spec to write. */
-export function ogFontLocales(): ReadonlyArray<{ locale: TranslatedLocale; font: OgFontSpec }> {
-  return TRANSLATED_LOCALES.flatMap((locale) => {
-    const { font } = OG_TYPOGRAPHY[locale];
-    return font ? [{ locale, font }] : [];
-  });
-}
-
-/** One subset file to cut: its source, every locale it serves, and the copy it must cover. */
-export interface OgFontBuild {
-  readonly font: OgFontSpec;
-  readonly source: FontSource;
-  /** In routing order; the first locale names the build in CLI output. */
-  readonly locales: readonly TranslatedLocale[];
-}
-
-/**
- * The subset files to write, one per distinct output file. A face shared by
- * several locales (Onest for Ukrainian and Vietnamese) is cut once from the
- * union of their copy, so each locale's OG images render with the same
- * buffer `getOgFontConfig` caches under the family name.
- */
-export function ogFontBuilds(): readonly OgFontBuild[] {
-  const byFile = new Map<string, { font: OgFontSpec; locales: TranslatedLocale[] }>();
-  for (const { locale, font } of ogFontLocales()) {
-    const key = fileURLToPath(font.file);
-    const build = byFile.get(key);
-    if (build) build.locales.push(locale);
-    else byFile.set(key, { font, locales: [locale] });
-  }
-  return Array.from(byFile.values(), ({ font, locales }) => ({
-    font,
-    source: OG_FONT_SOURCES[locales[0]!]!,
-    locales,
-  }));
-}
-
-/** Every distinct character the locales sharing one subset file may render. */
-export function ogGlyphTextForBuild(root: string, build: OgFontBuild): string {
   return Array.from(
-    new Set(build.locales.flatMap((locale) => Array.from(ogGlyphText(root, locale)))),
+    new Set([
+      ...strings.join(''),
+      ...cased.join(''),
+      ...PRINTABLE_ASCII,
+      ...DOMAINS,
+      ...punctuation,
+    ]),
   ).join('');
 }
 
-/** Both registries must agree on which locales embed a font, and on shared files. */
+const fileName = (font: OgFontFile): string => basename(fileURLToPath(font.file));
+
+/** Locales whose cards embed the subset file. */
+export function subsetConsumers(file: string): AppLocale[] {
+  return routing.locales.filter((locale) =>
+    ogFontFiles(locale).some((font) => font.source === 'subset' && fileName(font) === file),
+  );
+}
+
+/**
+ * The characters to cut `file` with, before restricting them to what its
+ * source font covers: a fixed set for the mono face, otherwise the union of
+ * the text of every locale that embeds it.
+ */
+export function subsetGlyphText(root: string, file: string): string {
+  const source = OG_SUBSET_SOURCES[file];
+  if (!source) throw new Error(`${file} has no entry in OG_SUBSET_SOURCES`);
+  if (source.glyphs) return source.glyphs;
+  return Array.from(
+    new Set(subsetConsumers(file).flatMap((locale) => Array.from(ogRenderedText(root, locale)))),
+  ).join('');
+}
+
+/** Every subset file the typography registry embeds, by file name. */
+export function embeddedSubsetFiles(): string[] {
+  return Array.from(
+    new Set(
+      routing.locales.flatMap((locale) =>
+        ogFontFiles(locale)
+          .filter((font) => font.source === 'subset')
+          .map(fileName),
+      ),
+    ),
+  ).sort();
+}
+
+/** Both registries must agree on which subsets exist, and one file is one face. */
 export function sourceRegistryProblems(): string[] {
   const problems: string[] = [];
-  for (const locale of TRANSLATED_LOCALES) {
-    const embeds = OG_TYPOGRAPHY[locale].font !== null;
-    const sourced = OG_FONT_SOURCES[locale] !== null;
-    if (embeds && !sourced) {
+  const embedded = embeddedSubsetFiles();
+  for (const file of embedded) {
+    if (!OG_SUBSET_SOURCES[file]) {
       problems.push(
-        `${locale} embeds an OG font (lib/og/fonts.ts) but has no source in OG_FONT_SOURCES (scripts/build-og-fonts-core.ts)`,
-      );
-    }
-    if (sourced && !embeds) {
-      problems.push(
-        `${locale} has a font source in OG_FONT_SOURCES but renders with next/og defaults (lib/og/fonts.ts)`,
+        `${file} is embedded (lib/og/fonts.ts) but has no source in OG_SUBSET_SOURCES (scripts/build-og-fonts-core.ts)`,
       );
     }
   }
-  // Locales that embed one file must cut it from one source and name one
-  // family; otherwise the last build wins and the other locale's OG images
-  // silently render with the wrong glyph set.
-  const byFile = new Map<string, Array<{ locale: TranslatedLocale; font: OgFontSpec }>>();
-  for (const entry of ogFontLocales()) {
-    const key = fileURLToPath(entry.font.file);
-    byFile.set(key, [...(byFile.get(key) ?? []), entry]);
+  for (const file of Object.keys(OG_SUBSET_SOURCES)) {
+    if (!embedded.includes(file)) {
+      problems.push(`${file} has a source in OG_SUBSET_SOURCES but no locale embeds it`);
+    }
   }
-  for (const entries of byFile.values()) {
-    const [first, ...rest] = entries;
-    if (!first) continue;
-    for (const other of rest) {
-      if (OG_FONT_SOURCES[other.locale]?.path !== OG_FONT_SOURCES[first.locale]?.path) {
-        problems.push(
-          `${first.locale} and ${other.locale} embed the same OG subset file but name different sources in OG_FONT_SOURCES`,
-        );
-      }
-      if (other.font.name !== first.font.name) {
-        problems.push(
-          `${first.locale} and ${other.locale} embed the same OG subset file under different family names (lib/og/fonts.ts)`,
-        );
+  // One file must be one family at one weight in every locale's typography,
+  // and its weight must be the one it is instanced at.
+  const faces = new Map<string, string>();
+  for (const locale of routing.locales) {
+    for (const font of ogFontFiles(locale)) {
+      const file = fileName(font);
+      const face = `${font.family}@${font.weight}`;
+      const seen = faces.get(file);
+      if (seen && seen !== face) problems.push(`${file} is embedded as both ${seen} and ${face}`);
+      faces.set(file, face);
+      const axes = OG_SUBSET_SOURCES[file]?.axes;
+      if (font.source === 'subset' && axes && axes.wght !== font.weight) {
+        problems.push(`${file} is embedded at weight ${font.weight} but cut at wght=${axes.wght}`);
       }
     }
   }
