@@ -44,7 +44,6 @@ const BANNED_PACKAGES: ReadonlyArray<RegExp> = [
   /^@coinbase\/wallet-sdk(\/|$)/,
   /^@metamask\/(sdk|providers)(\/|$)/,
   /^@tanstack\/react-query(\/|$)/,
-  /^@tsparticles\//,
 ];
 
 const RESOLVE_EXTENSIONS = [

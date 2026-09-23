@@ -258,7 +258,6 @@ describe('Providers', () => {
       </Providers>,
     );
     expect(container.querySelector('canvas')).toBeNull();
-    expect(container.querySelector('#tsparticles')).toBeNull();
   });
 
   it('has no accessibility violations', async () => {
