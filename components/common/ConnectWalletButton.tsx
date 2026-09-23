@@ -99,6 +99,7 @@ const ConnectWalletButton = ({
           </PopoverTrigger>
           <PopoverContent
             align="end"
+            collisionPadding={16}
             aria-label={t('account.heading')}
             className="w-[min(20rem,calc(100vw-2rem))] border-border"
           >

@@ -123,6 +123,7 @@ export function AttentionMenu({ className }: AttentionMenuProps) {
       </PopoverTrigger>
       <PopoverContent
         align="end"
+        collisionPadding={16}
         aria-labelledby={`${baseId}-title`}
         className="w-[min(22rem,calc(100vw-2rem))] border-border p-4"
         data-testid="attention-menu"
