@@ -52,7 +52,7 @@
     },
     "transaction": {
       "failed": "未能提交落笔。请检查钱包与网络连接，刷新当前落笔价格后重试。",
-      "cstReverted": "CST 落笔未完成，落笔价格或铭刻量已发生变化。请刷新预览后重试；如可接受 0 CST 铭刻量，也可选择“接受任意 CST 铭刻量”。"
+      "cstReverted": "CST 落笔未完成，落笔价格已超出您设定的上限。请刷新预览后重试。"
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "当前落笔价格高于转入金额。",

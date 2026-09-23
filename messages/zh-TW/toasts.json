@@ -52,7 +52,7 @@
     },
     "transaction": {
       "failed": "未能提交落筆。請檢查錢包與網路連線，重新整理目前落筆價格後重試。",
-      "cstReverted": "CST 落筆未完成，落筆價格或銘刻量已發生變化。請重新整理預覽後重試；如可接受 0 CST 銘刻量，也可選擇「接受任意 CST 銘刻量」。"
+      "cstReverted": "CST 落筆未完成，落筆價格已超出你設定的上限。請重新整理預覽後重試。"
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "目前落筆價格高於轉入金額。",

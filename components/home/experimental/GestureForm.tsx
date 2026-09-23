@@ -15,7 +15,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import type { DashboardInfo } from '@/services/api/types';
@@ -56,7 +55,6 @@ interface GestureFormProps {
   cstGestureData: CSTGestureData;
   ethGestureInfo: EthGestureInfo | null;
   gestureCstRewardAmount?: number | null;
-  gestureCstRewardAmountMin?: number | null;
   isCstRewardLoading?: boolean;
   /**
    * V3: the entire quoted Participation CST is minted to the OUTBID previous
@@ -64,10 +62,6 @@ interface GestureFormProps {
    * them). `false` on V2 contracts — whole reward to the gesturer.
    */
   cstRewardToOutbidBidder?: boolean;
-  cstRewardTolerancePercent?: number;
-  setCstRewardTolerancePercent?: (value: number) => void;
-  acceptAnyCstReward?: boolean;
-  setAcceptAnyCstReward?: (value: boolean) => void;
   previewMode?: boolean;
   /**
    * Where the Advanced options open. `inline` (default) expands the accordion
@@ -117,13 +111,8 @@ export function GestureForm({
   cstGestureData,
   ethGestureInfo,
   gestureCstRewardAmount = null,
-  gestureCstRewardAmountMin = null,
   isCstRewardLoading = false,
   cstRewardToOutbidBidder = false,
-  cstRewardTolerancePercent = 1,
-  setCstRewardTolerancePercent,
-  acceptAnyCstReward = false,
-  setAcceptAnyCstReward,
   previewMode = false,
   advancedPlacement = 'inline',
 }: GestureFormProps) {
@@ -153,16 +142,14 @@ export function GestureForm({
     gestureType === 'CST' ? t('form.reward.economicsTitle') : t('form.reward.previewTitle');
   const rewardPreviewDescription =
     gestureType === 'CST'
-      ? t('form.reward.economicsDescription')
+      ? t(
+          cstRewardToOutbidBidder
+            ? 'form.reward.economicsDescriptionV3'
+            : 'form.reward.economicsDescription',
+        )
       : cstRewardToOutbidBidder
         ? t('form.reward.previewDescriptionV3')
         : t('form.reward.previewDescription');
-  const minAcceptedCstLabel = acceptAnyCstReward
-    ? t('form.reward.minAcceptedAny')
-    : t('form.reward.cstAmount', { amount: formatCstAmount(gestureCstRewardAmountMin) });
-  const minAcceptedCstTooltip = acceptAnyCstReward
-    ? t('form.reward.minAcceptedTooltipAny')
-    : t('form.reward.minAcceptedTooltip');
 
   return (
     <div
@@ -275,7 +262,12 @@ export function GestureForm({
             </div>
             <div className="text-right font-mono tabular-nums">
               {gestureType === 'CST' ? (
-                <div className="grid min-w-[13rem] grid-cols-2 gap-2 text-left sm:min-w-[19rem] sm:grid-cols-3">
+                <div
+                  className={cn(
+                    'grid min-w-[13rem] grid-cols-2 gap-2 text-left',
+                    !cstRewardToOutbidBidder && 'sm:min-w-[19rem] sm:grid-cols-3',
+                  )}
+                >
                   <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2">
                     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                       {t('form.reward.rewardLabel')}
@@ -298,23 +290,27 @@ export function GestureForm({
                       })}
                     </p>
                   </div>
-                  <div className="col-span-2 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2 sm:col-span-1">
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                      {t('form.reward.netLabel')}
-                    </p>
-                    <p
-                      className={cn(
-                        'mt-1 text-sm font-semibold',
-                        netCstAmount != null && netCstAmount > 0
-                          ? 'text-emerald-300'
-                          : netCstAmount != null && netCstAmount < 0
-                            ? 'text-amber-200'
-                            : 'text-muted-foreground',
-                      )}
-                    >
-                      {isCstRewardLoading ? tCommon('status.loadingDots') : netCstLabel}
-                    </p>
-                  </div>
+                  {/* Net CST is a V1/V2 concept: on V3 the imprint goes to the outbid
+                      participant, so reward-minus-cost would mix two wallets. */}
+                  {!cstRewardToOutbidBidder && (
+                    <div className="col-span-2 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2 sm:col-span-1">
+                      <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                        {t('form.reward.netLabel')}
+                      </p>
+                      <p
+                        className={cn(
+                          'mt-1 text-sm font-semibold',
+                          netCstAmount != null && netCstAmount > 0
+                            ? 'text-emerald-300'
+                            : netCstAmount != null && netCstAmount < 0
+                              ? 'text-amber-200'
+                              : 'text-muted-foreground',
+                        )}
+                      >
+                        {isCstRewardLoading ? tCommon('status.loadingDots') : netCstLabel}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-base font-semibold text-emerald-300">
@@ -330,26 +326,19 @@ export function GestureForm({
                   {t('form.reward.goesToOutbid')}
                 </p>
               )}
-              <p className="mt-1 flex items-center justify-end gap-1 text-xs text-muted-foreground">
-                <span>{t('form.reward.minAccepted', { value: minAcceptedCstLabel })}</span>
-                <InfoTooltip
-                  content={minAcceptedCstTooltip}
-                  ariaLabel={t('form.reward.minAcceptedAria')}
-                  maxWidth={320}
-                  side="top"
-                  className="text-muted-foreground/60"
-                />
-              </p>
-              {gestureType === 'CST' && !isCstRewardLoading && netCstAmount != null && (
-                <p
-                  className={cn(
-                    'mt-1 text-xs',
-                    netCstAmount > 0 ? 'text-emerald-300' : 'text-muted-foreground',
-                  )}
-                >
-                  {netCstAmount > 0 ? t('form.reward.netPositive') : t('form.reward.netNegative')}
-                </p>
-              )}
+              {gestureType === 'CST' &&
+                !cstRewardToOutbidBidder &&
+                !isCstRewardLoading &&
+                netCstAmount != null && (
+                  <p
+                    className={cn(
+                      'mt-1 text-xs',
+                      netCstAmount > 0 ? 'text-emerald-300' : 'text-muted-foreground',
+                    )}
+                  >
+                    {netCstAmount > 0 ? t('form.reward.netPositive') : t('form.reward.netNegative')}
+                  </p>
+                )}
             </div>
           </div>
           {gestureType === 'CST' &&
@@ -411,13 +400,7 @@ export function GestureForm({
                 gestureCostPlus={gestureCostPlus}
                 setBidPricePlus={setBidPricePlus}
                 ethGestureInfo={ethGestureInfo}
-                gestureCstRewardAmountMin={gestureCstRewardAmountMin}
-                cstRewardTolerancePercent={cstRewardTolerancePercent}
-                setCstRewardTolerancePercent={setCstRewardTolerancePercent}
-                acceptAnyCstReward={acceptAnyCstReward}
-                setAcceptAnyCstReward={setAcceptAnyCstReward}
                 previewMode={previewMode}
-                showAll={showAll}
                 layout="stack"
               />
             </AccordionContent>

@@ -309,18 +309,14 @@
       "economicsTitle": "CST 제스처 계산",
       "previewTitle": "참여 CST 미리 보기",
       "economicsDescription": "순 CST는 각인되는 참여 CST에서 현재 CST 제스처 비용을 뺀 값입니다.",
-      "previewDescription": "이 제스처로 각인될 참여 CST의 예상 수량입니다. 수량은 이전 제스처 이후 흐른 시간에 따라 달라집니다. 모든 제스처 방식에서 최대 비용과 최소 참여 CST를 설정할 수 있습니다.",
-      "previewDescriptionV3": "이 제스처로 생성될 동적 CST의 예상 수량입니다. 전액이 내가 추월한 참여자에게 지급되며, 누군가 나를 추월하면 다음 제스처의 CST 전액을 내가 받습니다. 최대 비용과 최소 CST 보호는 이 수량에 적용됩니다.",
+      "economicsDescriptionV3": "CST 비용은 내 잔액에서 차감됩니다. 이 제스처로 생성되는 동적 CST는 내가 추월한 참여자에게 전액 각인되며, 나의 CST는 내가 최신 참여자로 있는 동안 쌓여 다음 제스처가 처리될 때 각인됩니다.",
+      "previewDescription": "이 제스처로 각인될 참여 CST의 예상 수량입니다. 수량은 이전 제스처 이후 흐른 시간에 따라 달라집니다.",
+      "previewDescriptionV3": "이 제스처로 생성될 동적 CST의 예상 수량입니다. 전액이 내가 추월한 참여자에게 지급되며, 누군가 나를 추월하면 다음 제스처의 CST 전액을 내가 받습니다.",
       "goesToOutbid": "추월당한 참여자에게 전액 지급됩니다. 내가 추월당하면 다음 제스처의 CST를 받습니다.",
       "rewardLabel": "참여 CST",
       "costLabel": "비용",
       "netLabel": "순 CST",
       "cstAmount": "{amount} CST",
-      "minAccepted": "최소 허용 수량: {value}",
-      "minAcceptedAny": "0 CST를 포함한 모든 수량",
-      "minAcceptedAria": "최소 허용 CST의 의미",
-      "minAcceptedTooltip": "이 트랜잭션에서 허용할 참여 CST의 최소 수량입니다. 현재 미리 보기 수량에서 최소 참여 CST 보호의 허용 폭을 빼서 계산합니다. 확인 시점에 각인되는 수량이 이 값보다 적으면 제스처 트랜잭션이 취소됩니다.",
-      "minAcceptedTooltipAny": "‘모든 참여 CST 허용’을 선택하면 최소 수량이 0으로 설정됩니다. 참여 CST가 0이어도 제스처 트랜잭션을 실행할 수 있습니다.",
       "netPositive": "이 제스처가 반영되면 각인되는 CST가 비용보다 많습니다.",
       "netNegative": "대부분의 CST 제스처는 받는 CST보다 더 많은 CST를 씁니다.",
       "durationMismatch": "API 보고값({apiDuration})과 달라 온체인 지속 시간({contractDuration})을 사용합니다."
@@ -334,17 +330,6 @@
       "messageTooltip": "제스처 채팅에 표시될 메시지를 남길 수 있습니다. 메시지는 제스처와 함께 온체인에 기록되어 블록체인에 영구히 남습니다.",
       "messagePlaceholder": "제스처와 함께 남길 메시지…",
       "attachIntro": "제스처에 토큰이나 NFT를 첨부하고, 비용 상승에 대비해 허용할 추가 금액을 설정할 수 있습니다.",
-      "minCstProtection": {
-        "title": "최소 참여 CST 보호",
-        "body": "참여 CST 수량은 경과 시간에 제곱근 공식을 적용해 정합니다. 다른 제스처가 먼저 반영되어 수량이 줄어드는 경우에 대비해, 허용할 최소 수량을 설정할 수 있습니다.",
-        "bodyV3": "참여 CST는 경과 시간에 비례해 쌓입니다. 다른 제스처가 먼저 반영되어 수량이 줄어드는 경우에 대비해, 허용할 최소 수량을 설정할 수 있습니다.",
-        "acceptAnyAria": "모든 참여 CST 허용",
-        "acceptAnyTitle": "0을 포함한 모든 참여 CST 허용",
-        "acceptAnyBody": "허용할 참여 CST의 최소 수량을 0으로 설정합니다. 확인 전에 참여 CST 수량이 바뀌어도 제스처를 실행하려면 이 옵션을 선택해 주세요.",
-        "toleranceLabel": "참여 CST 감소 허용 폭",
-        "minAmount": "최소 {amount} CST",
-        "revertNote": "확인 시점에 각인되는 CST가 이 최소 수량보다 적으면 제스처 트랜잭션이 취소됩니다."
-      },
       "attachNft": "NFT 첨부",
       "attachToken": "토큰 첨부",
       "tokenContractLabel": "컨트랙트 주소",
@@ -579,7 +564,7 @@
       "gestures": "{count, plural, =0 {이번 사이클에 아직 제스처 없음} other {이번 사이클 제스처 #개}}",
       "retrieve": "대기 중인 배분 회수",
       "nothingWaiting": "회수할 배분 없음",
-      "cstPreview": "지금 제스처를 남기면 약 {amount} CST 각인"
+      "cstPreview": "다음 제스처는 약 {amount} CST를 각인합니다"
     },
     "miniBar": {
       "aria": "사이클 간편 콘솔",

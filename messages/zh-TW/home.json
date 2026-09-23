@@ -309,18 +309,14 @@
       "economicsTitle": "CST 落筆收支",
       "previewTitle": "CST 銘刻預覽",
       "economicsDescription": "淨 CST 即參與 CST 銘刻量減去目前 CST 落筆價格。",
-      "previewDescription": "這一筆預計銘刻的動態參與 CST。數量取決於距上一筆經過的時間；每種落筆方式都有雙重保護：價格上限與 CST 銘刻下限。",
-      "previewDescriptionV3": "這一筆預計產生的動態參與 CST。全部歸被你超越的參與者所有——當有人超越你時，你將獲得下一筆的全部 CST。價格上限與 CST 銘刻下限保護適用於該數量。",
+      "economicsDescriptionV3": "CST 費用將從你的餘額中扣除。這一筆產生的動態 CST 會全額銘刻給被你超越的參與者；你自己的 CST 會在你保持最新參與者期間持續累積，並在下一筆落筆時銘刻。",
+      "previewDescription": "這一筆預計銘刻的動態參與 CST。數量取決於距上一筆經過的時間。",
+      "previewDescriptionV3": "這一筆預計產生的動態參與 CST。全部歸被你超越的參與者所有——當有人超越你時，你將獲得下一筆的全部 CST。",
       "goesToOutbid": "全額支付給被你超越的參與者；當你被超越時，你將獲得下一筆的 CST。",
       "rewardLabel": "銘刻量",
       "costLabel": "價格",
       "netLabel": "淨 CST",
       "cstAmount": "{amount} CST",
-      "minAccepted": "最低接受：{value}",
-      "minAcceptedAny": "任意數額（含 0 CST）",
-      "minAcceptedAria": "了解最低接受 CST 的含義",
-      "minAcceptedTooltip": "交易可接受的參與 CST 銘刻下限：由目前預覽值減去你在「CST 銘刻下限保護」中設定的下調幅度得出。若確認時合約的實際銘刻量低於該下限，這一筆會被還原，而不會接受更低的數額。",
-      "minAcceptedTooltipAny": "勾選「接受任意 CST 銘刻量」後，最低接受值即為 0：無論動態 CST 是多少，甚至為零，這一筆都能照常落下。",
       "netPositive": "這一筆若落下，銘刻的 CST 將多於支出的 CST。",
       "netNegative": "多數 CST 落筆的支出會多於銘刻量。",
       "durationMismatch": "API 回傳的時長為 {apiDuration}，此處以鏈上時長（{contractDuration}）為準。"
@@ -334,17 +330,6 @@
       "messageTooltip": "留言會出現在落筆留言板中，與這一筆一同記錄在鏈上，並永久儲存。",
       "messagePlaceholder": "為這一筆留下一句話…",
       "attachIntro": "可為這一筆附加代幣或 NFT，也可調整落筆價格的防碰撞設定。",
-      "minCstProtection": {
-        "title": "CST 銘刻下限保護",
-        "body": "參與 CST 取決於距上一筆經過的時間，按其平方根計算。若他人搶先落筆，銘刻數額可能在交易確認前下降，此設定可為你守住下限。",
-        "bodyV3": "參與 CST 隨距上一筆經過的時間線性累積。若他人搶先落筆，銘刻數額可能在交易確認前下降，此設定可為你守住下限。",
-        "acceptAnyAria": "接受任意 CST 銘刻量",
-        "acceptAnyTitle": "接受任意 CST 銘刻量（含 0）",
-        "acceptAnyBody": "將最低接受值設為 0：即便動態 CST 在確認前有所變動，這一筆也會照常落下。",
-        "toleranceLabel": "允許銘刻量下調",
-        "minAmount": "下限 {amount} CST",
-        "revertNote": "交易確認時，若合約實際銘刻的 CST 低於該下限，這一筆會被還原，不會接受更低的動態數額。"
-      },
       "attachNft": "附加 NFT",
       "attachToken": "附加代幣",
       "tokenContractLabel": "合約地址",
@@ -579,7 +564,7 @@
       "gestures": "{count, plural, =0 {本週期尚未落筆} other {本週期已落筆 # 次}}",
       "retrieve": "取回等待中的分配",
       "nothingWaiting": "暫無等待取回的分配",
-      "cstPreview": "此刻落筆約可銘刻 {amount} CST"
+      "cstPreview": "下一筆約可銘刻 {amount} CST"
     },
     "miniBar": {
       "aria": "週期快捷台",

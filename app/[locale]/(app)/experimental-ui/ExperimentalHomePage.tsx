@@ -667,7 +667,7 @@ const ExperimentalHomePage = ({
   const advancedConsoleWide =
     advancedExpanded && isAdvancedSideViewport && !loading && isRoundActive && !!account;
   const advancedSidePanel = advancedConsoleWide ? (
-    <GestureAdvancedPanel {...gestureForm} showAll={data?.LastBidderAddr !== zeroAddress} />
+    <GestureAdvancedPanel {...gestureForm} />
   ) : undefined;
 
   const gestureConsole =

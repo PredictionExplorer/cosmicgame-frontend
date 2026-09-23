@@ -309,18 +309,14 @@
       "economicsTitle": "CST 落笔收支",
       "previewTitle": "CST 铭刻预览",
       "economicsDescription": "净 CST 即参与 CST 铭刻量减去当前 CST 落笔价格。",
-      "previewDescription": "这一笔预计铭刻的动态参与 CST。数量取决于距上一笔经过的时间；每种落笔方式都有双重保护：价格上限与 CST 铭刻下限。",
-      "previewDescriptionV3": "这一笔预计产生的动态参与 CST。全部归被您超越的参与者所有——当有人超越您时，您将获得下一笔的全部 CST。价格上限与 CST 铭刻下限保护适用于该数量。",
+      "economicsDescriptionV3": "CST 费用将从您的余额中扣除。这一笔产生的动态 CST 将全额铭刻给被您超越的参与者；您自己的 CST 会在您保持最新参与者期间持续累积，并在下一笔落笔时铭刻。",
+      "previewDescription": "这一笔预计铭刻的动态参与 CST。数量取决于距上一笔经过的时间。",
+      "previewDescriptionV3": "这一笔预计产生的动态参与 CST。全部归被您超越的参与者所有——当有人超越您时，您将获得下一笔的全部 CST。",
       "goesToOutbid": "全额支付给被您超越的参与者；当您被超越时，您将获得下一笔的 CST。",
       "rewardLabel": "铭刻量",
       "costLabel": "价格",
       "netLabel": "净 CST",
       "cstAmount": "{amount} CST",
-      "minAccepted": "最低接受：{value}",
-      "minAcceptedAny": "任意数额（含 0 CST）",
-      "minAcceptedAria": "了解最低接受 CST 的含义",
-      "minAcceptedTooltip": "交易可接受的参与 CST 铭刻下限：由当前预览值减去你在“CST 铭刻下限保护”中设定的下浮幅度得出。若确认时合约的实际铭刻量低于该下限，这一笔会回退，而不会接受更低的数额。",
-      "minAcceptedTooltipAny": "勾选“接受任意 CST 铭刻量”后，最低接受值即为 0：无论动态 CST 是多少，甚至为零，这一笔都能照常落下。",
       "netPositive": "这一笔若落下，铭刻的 CST 将多于支出的 CST。",
       "netNegative": "多数 CST 落笔的支出会多于铭刻量。",
       "durationMismatch": "API 返回的时长为 {apiDuration}，此处以链上时长（{contractDuration}）为准。"
@@ -334,17 +330,6 @@
       "messageTooltip": "留言会出现在落笔留言板中，与这一笔一同记录在链上，并永久保存。",
       "messagePlaceholder": "为这一笔留下一句话…",
       "attachIntro": "可为这一笔附加代币或 NFT，也可调整落笔价格的防碰撞设置。",
-      "minCstProtection": {
-        "title": "CST 铭刻下限保护",
-        "body": "参与 CST 取决于距上一笔经过的时间，按其平方根计算。若他人抢先落笔，铭刻数额可能在交易确认前下降，此设置可为你守住下限。",
-        "bodyV3": "参与 CST 随距上一笔经过的时间线性累积。若他人抢先落笔，铭刻数额可能在交易确认前下降，此设置可为你守住下限。",
-        "acceptAnyAria": "接受任意 CST 铭刻量",
-        "acceptAnyTitle": "接受任意 CST 铭刻量（含 0）",
-        "acceptAnyBody": "将最低接受值设为 0：即便动态 CST 在确认前有所变动，这一笔也会照常落下。",
-        "toleranceLabel": "允许铭刻量下浮",
-        "minAmount": "下限 {amount} CST",
-        "revertNote": "交易确认时，若合约实际铭刻的 CST 低于该下限，这一笔会回退，不会接受更低的动态数额。"
-      },
       "attachNft": "附加 NFT",
       "attachToken": "附加代币",
       "tokenContractLabel": "合约地址",
@@ -579,7 +564,7 @@
       "gestures": "{count, plural, =0 {本周期尚未落笔} other {本周期已落笔 # 次}}",
       "retrieve": "取回等待中的分配",
       "nothingWaiting": "暂无等待取回的分配",
-      "cstPreview": "此刻落笔约可铭刻 {amount} CST"
+      "cstPreview": "下一笔约可铭刻 {amount} CST"
     },
     "miniBar": {
       "aria": "周期快捷台",

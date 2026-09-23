@@ -309,18 +309,14 @@
       "economicsTitle": "CST一筆の収支",
       "previewTitle": "参加CSTのプレビュー",
       "economicsDescription": "純CSTは、参加CSTから現在のCST一筆の費用を引いたものです。",
-      "previewDescription": "この一筆で刻印される参加CSTの見込みです。数量は前の一筆からの経過時間で変わります。どの方法でも、費用の上限と参加CSTの最小数量を設定できます。",
-      "previewDescriptionV3": "この一筆で生成される動的CSTの見込みです。全額が上回られた参加者に渡り、次に上回られた際は、その一筆のCST全額を受け取ります。費用の上限と最小CSTの保護はこの数量に適用されます。",
+      "economicsDescriptionV3": "CSTの費用は残高から消費されます。この一筆で生成される動的CSTは、上回られた参加者に全額刻印されます。自身のCSTは最新の参加者でいる間に蓄積され、次の一筆が入った時点で刻印されます。",
+      "previewDescription": "この一筆で刻印される参加CSTの見込みです。数量は前の一筆からの経過時間で変わります。",
+      "previewDescriptionV3": "この一筆で生成される動的CSTの見込みです。全額が上回られた参加者に渡り、次に上回られた際は、その一筆のCST全額を受け取ります。",
       "goesToOutbid": "上回られた参加者に全額支払われます。上回られた際は、次の一筆のCSTを受け取ります。",
       "rewardLabel": "参加CST",
       "costLabel": "費用",
       "netLabel": "純CST",
       "cstAmount": "{amount} CST",
-      "minAccepted": "最小数量：{value}",
-      "minAcceptedAny": "0 CSTを含め、数量を問わず受け入れる",
-      "minAcceptedAria": "受け入れるCSTの最小数量について",
-      "minAcceptedTooltip": "このトランザクションで受け入れる参加CSTの最小数量です。プレビューの数量から、最低参加CST保護で指定した許容幅を引いて求めます。確認時に刻印される数量がこの値を下回ると、一筆のトランザクションは取り消されます。",
-      "minAcceptedTooltipAny": "「どの参加CSTでも受け入れる」を選ぶと最小数量は0になります。参加CSTが0でも、一筆のトランザクションを実行できます。",
       "netPositive": "この一筆が確認されると、刻印される参加CSTが費用として使うCSTを上回ります。",
       "netNegative": "ほとんどのCST一筆は、受け取るCSTより多くのCSTを使います。",
       "durationMismatch": "APIの値（{apiDuration}）と異なるため、オンチェーンの期間（{contractDuration}）を表示しています。"
@@ -334,17 +330,6 @@
       "messageTooltip": "一筆チャットに表示されるメッセージを添えられます。メッセージは一筆とともにオンチェーンに記録され、ブロックチェーン上に永久に残ります。",
       "messagePlaceholder": "一筆に添えるメッセージ…",
       "attachIntro": "一筆にトークンやNFTを添付したり、費用の上乗せ幅を設定したりできます。",
-      "minCstProtection": {
-        "title": "最低参加CST保護",
-        "body": "参加CSTの数量は、経過時間を使った平方根の式で決まります。この設定では、別の一筆が先に確認されて数量が減った場合に備え、受け入れる最小数量を指定できます。",
-        "bodyV3": "参加CSTは経過時間に比例して積み上がります。この設定では、別の一筆が先に確認されて数量が減った場合に備え、受け入れる最小数量を指定できます。",
-        "acceptAnyAria": "どの参加CSTでも受け入れる",
-        "acceptAnyTitle": "0を含むどの参加CSTでも受け入れる",
-        "acceptAnyBody": "受け入れる最小数量を0に設定します。確認前に参加CSTの数量が変わっても、一筆を成立させたい場合に選択してください。",
-        "toleranceLabel": "許容する減少幅",
-        "minAmount": "最小{amount} CST",
-        "revertNote": "確認時に刻印されるCSTがこの最小数量を下回ると、一筆のトランザクションは取り消されます。"
-      },
       "attachNft": "NFTを添付",
       "attachToken": "トークンを添付",
       "tokenContractLabel": "コントラクトアドレス",
@@ -579,7 +564,7 @@
       "gestures": "{count, plural, =0 {このサイクルではまだ一筆を入れていません} other {このサイクルで#筆}}",
       "retrieve": "待機中の配分を受け取る",
       "nothingWaiting": "未受け取りの配分はありません",
-      "cstPreview": "いま一筆を入れると約{amount} CSTが刻印されます"
+      "cstPreview": "次の一筆で約{amount} CSTが刻印されます"
     },
     "miniBar": {
       "aria": "サイクルのクイックコンソール",

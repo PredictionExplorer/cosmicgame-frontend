@@ -20,8 +20,6 @@ jest.mock('@/components/nft/PaginationRWLKGrid', () => ({
   default: ({ data }: { data: number[] }) => <div data-testid="rwlk-grid">{data.length} NFTs</div>,
 }));
 
-import { isV3Mechanics } from '@/content/protocol-facts';
-
 import type { DashboardInfo } from '@/services/api/types';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
@@ -62,11 +60,7 @@ const defaultProps = {
   },
   ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
   gestureCstRewardAmount: 100,
-  gestureCstRewardAmountMin: 99,
   isCstRewardLoading: false,
-  cstRewardTolerancePercent: 1,
-  setCstRewardTolerancePercent: jest.fn(),
-  acceptAnyCstReward: false,
   setAcceptAnyCstReward: jest.fn(),
 };
 
@@ -169,29 +163,15 @@ describe('GestureForm', () => {
     expect(screen.getByText('home.calibration.firstGestureSubtitle')).toBeInTheDocument();
   });
 
-  it('CST selection shows reward preview and minimum accepted amount', () => {
+  it('CST selection shows reward preview and economics', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" />);
     expect(screen.getByText('home.form.reward.economicsTitle')).toBeInTheDocument();
     expect(screen.getByText('home.form.reward.cstAmount(amount=100)')).toBeInTheDocument();
     expect(screen.getByText('home.form.reward.cstAmount(amount=1.5)')).toBeInTheDocument();
     expect(screen.getByText('home.form.reward.cstAmount(amount=+98.5)')).toBeInTheDocument();
     expect(screen.getByText('home.form.reward.netPositive')).toBeInTheDocument();
-    expect(
-      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=99))'),
-    ).toBeInTheDocument();
     expect(screen.queryByText(/Protection 1:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Protection 2:/)).not.toBeInTheDocument();
-  });
-
-  it('explains the minimum accepted CST reward guard', async () => {
-    const user = userEvent.setup();
-    render(<GestureForm {...defaultProps} gestureType="CST" />);
-
-    await user.hover(screen.getByRole('button', { name: 'home.form.reward.minAcceptedAria' }));
-
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'home.form.reward.minAcceptedTooltip',
-    );
   });
 
   it('shows negative net CST when the CST gesture cost is greater than the reward', () => {
@@ -200,7 +180,6 @@ describe('GestureForm', () => {
         {...defaultProps}
         gestureType="CST"
         gestureCstRewardAmount={1}
-        gestureCstRewardAmountMin={0.99}
         cstGestureData={{
           ...defaultProps.cstGestureData,
           CSTPrice: 1.5,
@@ -220,7 +199,6 @@ describe('GestureForm', () => {
         {...defaultProps}
         gestureType="CST"
         gestureCstRewardAmount={5}
-        gestureCstRewardAmountMin={4.95}
         cstGestureData={{
           ...defaultProps.cstGestureData,
           CSTPrice: 1.25,
@@ -240,7 +218,6 @@ describe('GestureForm', () => {
         {...defaultProps}
         gestureType="CST"
         gestureCstRewardAmount={2}
-        gestureCstRewardAmountMin={1.98}
         cstGestureData={{
           ...defaultProps.cstGestureData,
           CSTPrice: 1.5,
@@ -257,26 +234,13 @@ describe('GestureForm', () => {
   it('shows a loading state while the live CST reward preview is refreshing', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" isCstRewardLoading />);
     expect(screen.getAllByText('Loading...')).toHaveLength(2);
-    expect(
-      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=99))'),
-    ).toBeInTheDocument();
     expect(screen.queryByText('home.form.reward.netPositive')).not.toBeInTheDocument();
   });
 
   it('shows a placeholder when the live CST reward preview is unavailable', () => {
-    render(
-      <GestureForm
-        {...defaultProps}
-        gestureType="CST"
-        gestureCstRewardAmount={null}
-        gestureCstRewardAmountMin={null}
-      />,
-    );
+    render(<GestureForm {...defaultProps} gestureType="CST" gestureCstRewardAmount={null} />);
 
     expect(screen.getAllByText('home.form.reward.cstAmount(amount=--)')).toHaveLength(2);
-    expect(
-      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=--))'),
-    ).toBeInTheDocument();
     expect(screen.queryByText('home.form.reward.netPositive')).not.toBeInTheDocument();
     expect(screen.queryByText('home.form.reward.netNegative')).not.toBeInTheDocument();
   });
@@ -285,26 +249,11 @@ describe('GestureForm', () => {
     const { rerender } = render(<GestureForm {...defaultProps} gestureType="CST" />);
 
     expect(screen.getByText('home.form.reward.cstAmount(amount=100)')).toBeInTheDocument();
-    expect(
-      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=99))'),
-    ).toBeInTheDocument();
 
-    rerender(
-      <GestureForm
-        {...defaultProps}
-        gestureType="CST"
-        gestureCstRewardAmount={125}
-        gestureCstRewardAmountMin={123.75}
-      />,
-    );
+    rerender(<GestureForm {...defaultProps} gestureType="CST" gestureCstRewardAmount={125} />);
 
     expect(screen.getByText('home.form.reward.cstAmount(amount=125)')).toBeInTheDocument();
     expect(screen.getByText('home.form.reward.cstAmount(amount=+123.5)')).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=123.75))',
-      ),
-    ).toBeInTheDocument();
     expect(screen.queryByText('home.form.reward.cstAmount(amount=100)')).not.toBeInTheDocument();
   });
 
@@ -320,20 +269,6 @@ describe('GestureForm', () => {
       />,
     );
     expect(screen.queryByText('home.form.reward.previewTitle')).not.toBeInTheDocument();
-  });
-
-  it('CST preview shows zero minimum when accepting any reward', () => {
-    render(
-      <GestureForm
-        {...defaultProps}
-        gestureType="CST"
-        acceptAnyCstReward
-        gestureCstRewardAmountMin={0}
-      />,
-    );
-    expect(
-      screen.getByText('home.form.reward.minAccepted(value=home.form.reward.minAcceptedAny)'),
-    ).toBeInTheDocument();
   });
 
   it('Message textarea accepts input', () => {
@@ -503,52 +438,6 @@ describe('GestureForm', () => {
   it('hides gesture cost collision prevention for CST gesture type', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="CST" />);
     expect(screen.queryByText('home.form.advanced.collision.title')).not.toBeInTheDocument();
-  });
-
-  it('shows minimum CST reward protection control for every unlocked gesture type', () => {
-    render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="ETH" />);
-    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        isV3Mechanics
-          ? 'home.form.advanced.minCstProtection.bodyV3'
-          : 'home.form.advanced.minCstProtection.body',
-      ),
-    ).toBeInTheDocument();
-  });
-
-  it('updates CST reward tolerance from advanced options', () => {
-    render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="CST" />);
-    const input = screen.getByPlaceholderText('1');
-    fireEvent.change(input, { target: { value: '5' } });
-    expect(defaultProps.setCstRewardTolerancePercent).toHaveBeenCalledWith(5);
-  });
-
-  it('allows users to accept any CST reward including zero', () => {
-    render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="CST" />);
-    const checkbox = screen.getByRole('checkbox', {
-      name: 'home.form.advanced.minCstProtection.acceptAnyAria',
-    });
-
-    fireEvent.click(checkbox);
-
-    expect(defaultProps.setAcceptAnyCstReward).toHaveBeenCalledWith(true);
-    expect(
-      screen.getByText('home.form.advanced.minCstProtection.acceptAnyBody'),
-    ).toBeInTheDocument();
-  });
-
-  it('disables CST tolerance input when accepting any CST reward', () => {
-    render(
-      <GestureForm
-        {...defaultProps}
-        advancedExpanded={true}
-        gestureType="CST"
-        acceptAnyCstReward
-      />,
-    );
-
-    expect(screen.getByPlaceholderText('1')).toBeDisabled();
   });
 
   it('shows CalibrationInfo with endedMessage for CST when window closed', () => {

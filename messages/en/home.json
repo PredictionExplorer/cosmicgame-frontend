@@ -309,18 +309,14 @@
       "economicsTitle": "CST Gesture Economics",
       "previewTitle": "CST Reward Preview",
       "economicsDescription": "Net CST is the Participation CST reward minus the current CST gesture cost.",
-      "previewDescription": "Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.",
-      "previewDescriptionV3": "Estimated dynamic CST this gesture generates. The entire amount goes to the participant you outbid — and you receive the full CST of the next gesture when someone outbids you. Maximum cost and minimum CST reward protections apply to that amount.",
+      "economicsDescriptionV3": "The CST cost is consumed from your balance. The dynamic CST this gesture generates is imprinted in full to the participant you outbid; your own CST accrues while you remain the latest participant and is imprinted when the next gesture lands.",
+      "previewDescription": "Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture.",
+      "previewDescriptionV3": "Estimated dynamic CST this gesture generates. The entire amount is imprinted to the participant you outbid — and you receive the full CST of the next gesture when someone outbids you.",
       "goesToOutbid": "Paid in full to the participant you outbid; you receive the next gesture's CST when outbid.",
       "rewardLabel": "Reward",
       "costLabel": "Cost",
       "netLabel": "Net CST",
       "cstAmount": "{amount} CST",
-      "minAccepted": "Min accepted: {value}",
-      "minAcceptedAny": "any reward, including 0 CST",
-      "minAcceptedAria": "What Min accepted CST means",
-      "minAcceptedTooltip": "The minimum Participation CST reward your transaction will accept. It is the current preview minus your Minimum CST Reward Protection tolerance. If the contract would imprint less by confirmation, the gesture reverts instead of accepting a lower reward.",
-      "minAcceptedTooltipAny": "Accept any CST reward sends a minimum accepted reward of 0, so the gesture can land with any dynamic CST reward, including none.",
       "netPositive": "The CST reward exceeds the CST cost if this lands.",
       "netNegative": "Most CST gestures spend more CST than they receive.",
       "durationMismatch": "Using on-chain duration ({contractDuration}) because the API reported {apiDuration}."
@@ -334,17 +330,6 @@
       "messageTooltip": "Leave a message to appear in Gesture Chat. Your message is recorded on-chain with your gesture and remains on the blockchain permanently.",
       "messagePlaceholder": "Leave a message with your gesture...",
       "attachIntro": "Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.",
-      "minCstProtection": {
-        "title": "Minimum CST Reward Protection",
-        "body": "Participation CST uses a square-root formula based on elapsed time. This setting protects you if another gesture lands first and lowers the amount before your transaction confirms.",
-        "bodyV3": "Participation CST accrues linearly with elapsed time. This setting protects you if another gesture lands first and lowers the amount before your transaction confirms.",
-        "acceptAnyAria": "Accept any CST reward",
-        "acceptAnyTitle": "Accept any CST reward, including 0",
-        "acceptAnyBody": "Sends a minimum accepted CST reward of 0. Use this when you prefer the gesture to land even if the dynamic CST amount changes before confirmation.",
-        "toleranceLabel": "Allow reward to move down by",
-        "minAmount": "min {amount} CST",
-        "revertNote": "If the contract would imprint less CST than this minimum by the time your transaction lands, the gesture should revert instead of accepting a lower dynamic CST amount."
-      },
       "attachNft": "Attach NFT",
       "attachToken": "Attach Token",
       "tokenContractLabel": "Contract Address",
@@ -579,7 +564,7 @@
       "gestures": "{count, plural, =0 {No gestures this cycle yet} one {# gesture this cycle} other {# gestures this cycle}}",
       "retrieve": "Retrieve waiting allocations",
       "nothingWaiting": "Nothing waiting to retrieve",
-      "cstPreview": "A gesture now imprints ~{amount} CST"
+      "cstPreview": "The next gesture imprints ~{amount} CST"
     },
     "miniBar": {
       "aria": "Cycle quick console",

@@ -22,10 +22,6 @@ const baseProps = {
   gestureCostPlus: 2,
   setBidPricePlus: jest.fn(),
   ethGestureInfo: { ETHPrice: 0.01, AuctionDuration: 0, SecondsElapsed: 0 },
-  gestureCstRewardAmountMin: 99,
-  setCstRewardTolerancePercent: jest.fn(),
-  setAcceptAnyCstReward: jest.fn(),
-  showAll: true,
 };
 
 describe('GestureAdvancedFields', () => {
@@ -37,7 +33,6 @@ describe('GestureAdvancedFields', () => {
     expect(root).toHaveClass('space-y-4');
     expect(screen.getAllByText('home.form.advanced.messageLabel')).toHaveLength(1);
     expect(screen.getByText('home.form.advanced.attachIntro')).toBeInTheDocument();
-    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeInTheDocument();
     expect(screen.getByText('home.form.advanced.attachNft')).toBeInTheDocument();
     expect(screen.getByText('home.form.advanced.collision.title')).toBeInTheDocument();
   });
@@ -48,15 +43,11 @@ describe('GestureAdvancedFields', () => {
     expect(root).toHaveAttribute('data-layout', 'panel');
     expect(root).not.toHaveClass('max-w-xl');
     expect(screen.getAllByText('home.form.advanced.messageLabel')).toHaveLength(1);
-    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeInTheDocument();
     expect(screen.getByText('home.form.advanced.collision.title')).toBeInTheDocument();
   });
 
-  it('hides the protection box before the first gesture and the collision box for CST', () => {
-    render(
-      <GestureAdvancedFields {...baseProps} layout="panel" showAll={false} gestureType="CST" />,
-    );
-    expect(screen.queryByText('home.form.advanced.minCstProtection.title')).not.toBeInTheDocument();
+  it('hides the collision box for CST', () => {
+    render(<GestureAdvancedFields {...baseProps} layout="panel" gestureType="CST" />);
     expect(screen.queryByText('home.form.advanced.collision.title')).not.toBeInTheDocument();
   });
 

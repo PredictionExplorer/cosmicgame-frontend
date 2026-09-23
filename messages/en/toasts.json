@@ -52,7 +52,7 @@
     },
     "transaction": {
       "failed": "Unable to submit the gesture. Check your wallet and network connection, refresh the current cost, and try again.",
-      "cstReverted": "The CST gesture reverted. Another gesture may have landed first, causing your max CST cost or minimum CST reward protection to fail. Refresh the preview and try again, or choose \"Accept any CST reward\" if you are comfortable receiving 0 CST."
+      "cstReverted": "The CST gesture reverted. Another gesture may have landed first, raising the CST cost above your maximum. Refresh the preview and try again."
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "The current Gesture Cost is greater than the amount you transferred.",

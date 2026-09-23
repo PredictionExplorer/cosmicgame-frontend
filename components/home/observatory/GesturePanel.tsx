@@ -5,7 +5,7 @@ import { zeroAddress } from 'viem';
 import { ArrowRight, PenLine, Settings2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { isV3Mechanics, protocolFacts } from '@/content/protocol-facts';
+import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
 
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
@@ -20,7 +20,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -67,12 +66,9 @@ export interface GesturePanelFormState {
   rwlknftIds: number[];
   ethGestureInfo: EthGestureInfo | null;
   gestureCstRewardAmount?: number | null;
-  gestureCstRewardAmountMin?: number | null;
   isCstRewardLoading?: boolean;
-  cstRewardTolerancePercent?: number;
-  setCstRewardTolerancePercent?: (value: number) => void;
-  acceptAnyCstReward?: boolean;
-  setAcceptAnyCstReward?: (value: boolean) => void;
+  /** True on V3 contracts: the whole per-gesture CST imprint goes to the outbid participant. */
+  cstRewardToOutbidBidder?: boolean;
 }
 
 /** Wiring for the panel: live data, shared form state, and submit control. */
@@ -176,12 +172,8 @@ export function GesturePanel({
     rwlknftIds,
     ethGestureInfo,
     gestureCstRewardAmount = null,
-    gestureCstRewardAmountMin = null,
     isCstRewardLoading = false,
-    cstRewardTolerancePercent = 1,
-    setCstRewardTolerancePercent,
-    acceptAnyCstReward = false,
-    setAcceptAnyCstReward,
+    cstRewardToOutbidBidder = false,
   } = form;
 
   const preview = !account;
@@ -224,17 +216,16 @@ export function GesturePanel({
     gestureType === 'CST' ? t('form.reward.economicsTitle') : t('form.reward.previewTitle');
   const rewardPreviewDescription =
     gestureType === 'CST'
-      ? t('form.reward.economicsDescription')
-      : t('form.reward.previewDescription');
-  const minAcceptedCstLabel =
-    !hasCstReward || isCstRewardLoading
-      ? t('form.reward.cstAmount', { amount: '--' })
-      : acceptAnyCstReward
-        ? t('form.reward.minAcceptedAny')
-        : t('form.reward.cstAmount', { amount: formatCstAmount(gestureCstRewardAmountMin) });
-  const minAcceptedCstTooltip = acceptAnyCstReward
-    ? t('form.reward.minAcceptedTooltipAny')
-    : t('form.reward.minAcceptedTooltip');
+      ? t(
+          cstRewardToOutbidBidder
+            ? 'form.reward.economicsDescriptionV3'
+            : 'form.reward.economicsDescription',
+        )
+      : t(
+          cstRewardToOutbidBidder
+            ? 'form.reward.previewDescriptionV3'
+            : 'form.reward.previewDescription',
+        );
 
   const needsRwlkToken = gestureType === 'RandomWalk' && rwlkId === -1;
   const hasSelectedQuote = gestureType === 'CST' ? hasCstQuote : hasEthQuote;
@@ -479,7 +470,12 @@ export function GesturePanel({
                     {gestureType === 'CST' && (
                       <dl
                         data-testid="panel-cst-economics"
-                        className="mt-2 grid grid-cols-[repeat(3,minmax(0,1fr))] gap-1.5"
+                        className={cn(
+                          'mt-2 grid gap-1.5',
+                          cstRewardToOutbidBidder
+                            ? 'grid-cols-[repeat(2,minmax(0,1fr))]'
+                            : 'grid-cols-[repeat(3,minmax(0,1fr))]',
+                        )}
                       >
                         {[
                           {
@@ -500,17 +496,26 @@ export function GesturePanel({
                             }),
                             color: 'text-foreground',
                           },
-                          {
-                            key: 'net',
-                            label: t('form.reward.netLabel'),
-                            value: isCstRewardLoading ? tCommon('status.loadingDots') : netCstLabel,
-                            color:
-                              netCstAmount != null && netCstAmount > 0
-                                ? 'text-emerald-300'
-                                : netCstAmount != null && netCstAmount < 0
-                                  ? 'text-amber-200'
-                                  : 'text-muted-foreground',
-                          },
+                          // Net CST only makes sense on V1/V2, where the reward is the
+                          // gesturer's own. On V3 the imprint goes to the outbid
+                          // participant, so "reward minus cost" mixes two wallets.
+                          ...(cstRewardToOutbidBidder
+                            ? []
+                            : [
+                                {
+                                  key: 'net',
+                                  label: t('form.reward.netLabel'),
+                                  value: isCstRewardLoading
+                                    ? tCommon('status.loadingDots')
+                                    : netCstLabel,
+                                  color:
+                                    netCstAmount != null && netCstAmount > 0
+                                      ? 'text-emerald-300'
+                                      : netCstAmount != null && netCstAmount < 0
+                                        ? 'text-amber-200'
+                                        : 'text-muted-foreground',
+                                },
+                              ]),
                         ].map(({ key, label, value, color }) => (
                           <div
                             key={key}
@@ -532,18 +537,14 @@ export function GesturePanel({
                         ))}
                       </dl>
                     )}
-                    <p className="mt-1.5 flex min-w-0 items-start gap-1.5 text-xs text-muted-foreground">
-                      <span className="min-w-0 [overflow-wrap:anywhere]">
-                        {t('form.reward.minAccepted', { value: minAcceptedCstLabel })}
-                      </span>
-                      <InfoTooltip
-                        content={minAcceptedCstTooltip}
-                        ariaLabel={t('form.reward.minAcceptedAria')}
-                        maxWidth={320}
-                        side="top"
-                        className="mt-0.5 shrink-0 text-muted-foreground/60"
-                      />
-                    </p>
+                    {cstRewardToOutbidBidder && !isCstRewardLoading && hasCstReward && (
+                      <p
+                        data-testid="panel-cst-goes-to-outbid"
+                        className="mt-1.5 min-w-0 text-xs text-muted-foreground [overflow-wrap:anywhere]"
+                      >
+                        {t('form.reward.goesToOutbid')}
+                      </p>
+                    )}
                     {gestureType === 'CST' &&
                       cstGestureData.source === 'contract' &&
                       cstGestureData.apiAuctionDuration != null &&
@@ -646,71 +647,6 @@ export function GesturePanel({
                         <p className="text-xs text-muted-foreground">
                           {t('form.advanced.attachIntro')}
                         </p>
-                        {showAllMethods && (
-                          <div className="space-y-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
-                            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                              {t('form.advanced.minCstProtection.title')}
-                            </p>
-                            <p className="text-xs leading-relaxed text-muted-foreground">
-                              {t(
-                                isV3Mechanics
-                                  ? 'form.advanced.minCstProtection.bodyV3'
-                                  : 'form.advanced.minCstProtection.body',
-                              )}
-                            </p>
-                            <label className="flex items-start gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] p-3 text-sm">
-                              <Checkbox
-                                checked={acceptAnyCstReward}
-                                disabled={preview || !setAcceptAnyCstReward}
-                                onChange={(e) => setAcceptAnyCstReward?.(e.currentTarget.checked)}
-                                aria-label={t('form.advanced.minCstProtection.acceptAnyAria')}
-                              />
-                              <span>
-                                <span className="block font-medium text-foreground">
-                                  {t('form.advanced.minCstProtection.acceptAnyTitle')}
-                                </span>
-                                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
-                                  {t('form.advanced.minCstProtection.acceptAnyBody')}
-                                </span>
-                              </span>
-                            </label>
-                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-                              <div className="flex shrink-0 items-center gap-2">
-                                <span className="whitespace-nowrap text-sm text-muted-foreground">
-                                  {t('form.advanced.minCstProtection.toleranceLabel')}
-                                </span>
-                                <div className="relative w-[4.75rem] shrink-0">
-                                  <CustomTextField
-                                    type="number"
-                                    placeholder="1"
-                                    value={cstRewardTolerancePercent}
-                                    min={0}
-                                    max={100}
-                                    step={0.1}
-                                    className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
-                                    disabled={
-                                      acceptAnyCstReward || preview || !setCstRewardTolerancePercent
-                                    }
-                                    onChange={(e) =>
-                                      setCstRewardTolerancePercent?.(Number(e.target.value))
-                                    }
-                                  />
-                                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                                    %
-                                  </span>
-                                </div>
-                              </div>
-                              <span className="min-w-0 font-mono text-sm tabular-nums text-muted-foreground">
-                                {t('form.advanced.minCstProtection.minAmount', {
-                                  amount: formatCstAmount(gestureCstRewardAmountMin),
-                                })}
-                              </span>
-                            </div>
-                            <p className="text-xs leading-relaxed text-muted-foreground">
-                              {t('form.advanced.minCstProtection.revertNote')}
-                            </p>
-                          </div>
-                        )}
                         <RadioGroup
                           value={contributionType}
                           onValueChange={(value) => {

@@ -258,11 +258,6 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(message).toHaveValue(draft);
     await expect(tokenSearch).toHaveValue('42');
 
-    const acceptAnyReward = advanced.getByRole('checkbox', {
-      name: home.form.advanced.minCstProtection.acceptAnyAria,
-    });
-    await acceptAnyReward.check();
-    await expect(acceptAnyReward).toBeChecked();
     const revisedDraft = `${draft} A little more to say.`;
     await message.fill(revisedDraft);
     await expect(message).toBeFocused();
@@ -283,7 +278,6 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(message).toHaveValue(revisedDraft);
     await expect(tokenSearch).toHaveValue('42');
     await advancedTrigger.click();
-    await expect(acceptAnyReward).toBeChecked();
     await expect(message).toHaveValue(revisedDraft);
     if (isMobile) {
       await page.keyboard.press('Escape');

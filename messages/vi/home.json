@@ -309,18 +309,14 @@
       "economicsTitle": "Cân đối CST của nét bút",
       "previewTitle": "Xem trước CST tham gia",
       "economicsDescription": "CST ròng là CST tham gia nhận được trừ đi chi phí nét bút CST hiện tại.",
-      "previewDescription": "Lượng CST tham gia ước tính nếu nét bút được ghi nhận, thay đổi theo thời gian kể từ nét bút trước. Với mọi cách thanh toán, bạn có thể đặt giới hạn chi phí tối đa và lượng CST tham gia tối thiểu.",
-      "previewDescriptionV3": "Lượng CST động ước tính mà nét bút này tạo ra. Toàn bộ số lượng được chuyển cho người tham gia bạn vừa vượt — và bạn nhận trọn CST của nét bút kế tiếp khi có người vượt bạn. Giới hạn chi phí tối đa và mức bảo vệ CST tối thiểu áp dụng cho số lượng này.",
+      "economicsDescriptionV3": "Chi phí CST được trừ từ số dư của bạn. Lượng CST động mà nét bút này tạo ra được ghi trọn cho người tham gia bạn vừa vượt; CST của riêng bạn tích lũy trong lúc bạn còn là người tham gia mới nhất và được ghi khi nét bút kế tiếp xuất hiện.",
+      "previewDescription": "Lượng CST tham gia ước tính nếu nét bút được ghi nhận, thay đổi theo thời gian kể từ nét bút trước.",
+      "previewDescriptionV3": "Lượng CST động ước tính mà nét bút này tạo ra. Toàn bộ số lượng được chuyển cho người tham gia bạn vừa vượt — và bạn nhận trọn CST của nét bút kế tiếp khi có người vượt bạn.",
       "goesToOutbid": "Được trả trọn cho người tham gia bạn vừa vượt; khi bị vượt, bạn nhận CST của nét bút kế tiếp.",
       "rewardLabel": "Nhận",
       "costLabel": "Chi phí",
       "netLabel": "CST ròng",
       "cstAmount": "{amount} CST",
-      "minAccepted": "Mức chấp nhận tối thiểu: {value}",
-      "minAcceptedAny": "mọi mức, kể cả 0 CST",
-      "minAcceptedAria": "Mức chấp nhận tối thiểu CST nghĩa là gì",
-      "minAcceptedTooltip": "Lượng CST tham gia tối thiểu bạn chấp nhận, được tính từ mức ước tính hiện tại sau khi trừ biên độ cho phép. Nếu lượng CST được khắc thấp hơn giới hạn này tại thời điểm xác nhận, hợp đồng sẽ hoàn nguyên giao dịch.",
-      "minAcceptedTooltipAny": "Chọn “Chấp nhận mọi mức CST tham gia” sẽ đặt giới hạn tối thiểu là 0. Nét bút có thể được ghi nhận với bất kỳ lượng CST tham gia nào, kể cả 0.",
       "netPositive": "CST tham gia nhận được vượt chi phí CST nếu nét bút này được ghi nhận.",
       "netNegative": "Hầu hết nét bút CST tiêu nhiều CST hơn lượng nhận được.",
       "durationMismatch": "Đang dùng thời lượng trên chuỗi ({contractDuration}) vì API báo {apiDuration}."
@@ -334,17 +330,6 @@
       "messageTooltip": "Để lại lời nhắn để hiển thị trong Trò chuyện nét bút. Lời nhắn được ghi trên chuỗi cùng nét bút và tồn tại vĩnh viễn trên blockchain.",
       "messagePlaceholder": "Để lại lời nhắn cùng nét bút của bạn…",
       "attachIntro": "Đính kèm token hoặc NFT, hoặc điều chỉnh giới hạn chi phí để xử lý trường hợp có nét bút khác được ghi nhận trước.",
-      "minCstProtection": {
-        "title": "Bảo đảm CST tham gia tối thiểu",
-        "body": "CST tham gia dùng công thức căn bậc hai dựa trên thời gian đã trôi qua. Thiết lập này bảo vệ bạn nếu một nét bút khác đến trước và hạ thấp số lượng trước khi giao dịch của bạn được xác nhận.",
-        "bodyV3": "CST tham gia tích lũy tuyến tính theo thời gian đã trôi qua. Thiết lập này bảo vệ bạn nếu một nét bút khác đến trước và hạ thấp số lượng trước khi giao dịch của bạn được xác nhận.",
-        "acceptAnyAria": "Chấp nhận mọi mức CST tham gia",
-        "acceptAnyTitle": "Chấp nhận mọi mức CST tham gia, kể cả 0",
-        "acceptAnyBody": "Đặt lượng CST tham gia tối thiểu là 0. Chọn tùy chọn này nếu bạn muốn nét bút được ghi nhận ngay cả khi lượng CST nhận được thay đổi trước lúc xác nhận.",
-        "toleranceLabel": "Cho phép mức nhận giảm tối đa",
-        "minAmount": "tối thiểu {amount} CST",
-        "revertNote": "Nếu lượng CST được khắc thấp hơn mức tối thiểu này khi giao dịch được xử lý, hợp đồng sẽ hoàn nguyên giao dịch."
-      },
       "attachNft": "Đính kèm NFT",
       "attachToken": "Đính kèm token",
       "tokenContractLabel": "Địa chỉ hợp đồng",
@@ -579,7 +564,7 @@
       "gestures": "{count, plural, =0 {Chưa có nét bút trong chu kỳ này} other {# nét bút trong chu kỳ này}}",
       "retrieve": "Nhận về các phân bổ đang chờ",
       "nothingWaiting": "Không có gì đang chờ nhận về",
-      "cstPreview": "CST ước tính khi đặt nét bút lúc này: ~{amount}"
+      "cstPreview": "Nét bút kế tiếp sẽ ghi khoảng ~{amount} CST"
     },
     "miniBar": {
       "aria": "Bảng điều khiển nhanh của chu kỳ",

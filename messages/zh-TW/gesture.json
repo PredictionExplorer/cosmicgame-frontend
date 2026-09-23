@@ -48,7 +48,6 @@
     "gestureCost": "落筆價格",
     "participationCst": "參與 CST",
     "cstToOutbid": "歸被超越的參與者",
-    "cstToThis": "歸本筆參與者",
     "attachedRandomWalk": "ETH 落筆是否附加 Random Walk NFT",
     "paidWithCst": "是否使用 CST（ERC-20）支付",
     "randomWalkId": "Random Walk NFT ID",

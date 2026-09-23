@@ -80,12 +80,7 @@ const mockGestureForm = {
   },
   ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
   gestureCstRewardAmount: 100,
-  gestureCstRewardAmountMin: 99,
   isCstRewardLoading: false,
-  cstRewardTolerancePercent: 1,
-  setCstRewardTolerancePercent: jest.fn(),
-  acceptAnyCstReward: false,
-  setAcceptAnyCstReward: jest.fn(),
   message: '',
   setMessage: jest.fn(),
   nftDonateAddress: '',
@@ -249,9 +244,7 @@ jest.mock('@/components/home/experimental/GestureForm', () => ({
 }));
 
 jest.mock('@/components/home/experimental/GestureAdvancedFields', () => ({
-  GestureAdvancedPanel: ({ showAll }: { showAll: boolean }) => (
-    <div data-testid="gesture-advanced-panel" data-show-all={String(showAll)} />
-  ),
+  GestureAdvancedPanel: () => <div data-testid="gesture-advanced-panel" />,
 }));
 
 const mockUseMediaQuery = jest.fn<boolean, [string]>(() => false);
@@ -449,10 +442,7 @@ beforeEach(() => {
     },
     ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
     gestureCstRewardAmount: 100,
-    gestureCstRewardAmountMin: 99,
     isCstRewardLoading: false,
-    cstRewardTolerancePercent: 1,
-    acceptAnyCstReward: false,
     message: '',
     nftDonateAddress: '',
     nftId: '',
@@ -1062,7 +1052,6 @@ describe('HomePage', () => {
     expect(screen.getByTestId('home-deck-chat')).toHaveClass('xl:hidden');
     const panel = screen.getByTestId('gesture-advanced-panel');
     expect(screen.getByTestId('monument-side-panel')).toContainElement(panel);
-    expect(panel).toHaveAttribute('data-show-all', 'true');
 
     Object.assign(mockGestureForm, { advancedExpanded: false });
     rerender(<HomePage />);

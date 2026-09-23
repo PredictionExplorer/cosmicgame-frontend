@@ -49,12 +49,8 @@ const makeForm = (overrides: Partial<GesturePanelFormState> = {}): GesturePanelF
   rwlknftIds: [],
   ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
   gestureCstRewardAmount: 100,
-  gestureCstRewardAmountMin: 99,
   isCstRewardLoading: false,
-  cstRewardTolerancePercent: 1,
-  setCstRewardTolerancePercent: jest.fn(),
-  acceptAnyCstReward: false,
-  setAcceptAnyCstReward: jest.fn(),
+  cstRewardToOutbidBidder: false,
   ...overrides,
 });
 
@@ -304,11 +300,6 @@ describe('GesturePanel', () => {
     expect(
       within(economics).getByText('home.form.reward.cstAmount(amount=+123456776.6234)'),
     ).toBeVisible();
-    expect(
-      within(reward).getByText(
-        'home.form.reward.minAccepted(value=home.form.reward.cstAmount(amount=99))',
-      ),
-    ).toBeVisible();
   });
 
   it('shows the token picker inline and blocks submit until a RandomWalk token is chosen', () => {
@@ -462,15 +453,14 @@ describe('GesturePanel', () => {
     const submit = screen.getByRole('button', { name: baseProps.submitLabel });
     expect(input.compareDocumentPosition(advanced)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     expect(advanced.compareDocumentPosition(submit)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeVisible();
+    expect(screen.getByText('home.form.advanced.collision.title')).toBeVisible();
   });
 
-  it('exposes attachment fields, CST protection, and collision prevention when expanded', async () => {
+  it('exposes attachment fields and collision prevention when expanded', async () => {
     const user = userEvent.setup();
     const form = makeForm({ advancedExpanded: true });
     render(<GesturePanel {...baseProps} form={form} />);
 
-    expect(screen.getByText('home.form.advanced.minCstProtection.title')).toBeInTheDocument();
     expect(screen.getByText('home.form.advanced.collision.title')).toBeInTheDocument();
     // 0.01 ETH × 1.02 collision buffer.
     expect(

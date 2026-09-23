@@ -52,7 +52,7 @@
     },
     "transaction": {
       "failed": "Không thể gửi nét bút. Hãy kiểm tra ví và kết nối mạng, làm mới chi phí hiện tại, rồi thử lại.",
-      "cstReverted": "Nét bút CST đã bị hoàn nguyên. Có thể một nét bút khác đã đến trước, khiến mức chi phí CST tối đa hoặc bảo đảm CST tham gia tối thiểu của bạn không được đáp ứng. Hãy làm mới bản xem trước và thử lại, hoặc chọn “Chấp nhận mọi mức CST tham gia” nếu bạn sẵn lòng nhận 0 CST."
+      "cstReverted": "Nét bút CST đã bị hoàn nguyên. Có thể một nét bút khác đã đến trước, khiến chi phí CST vượt mức tối đa của bạn. Hãy làm mới bản xem trước và thử lại."
     },
     "contractErrors": {
       "insufficientReceivedBidAmount": "Chi phí nét bút hiện tại lớn hơn số tiền bạn đã chuyển.",

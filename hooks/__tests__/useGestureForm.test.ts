@@ -479,7 +479,6 @@ describe('useGestureForm', () => {
     expect(mockGetGestureCstRewardAmount.mock.calls.length).toBeGreaterThanOrEqual(2);
     expect(mockGetNextCstGestureCost.mock.calls.length).toBeGreaterThanOrEqual(2);
     expect(result.current.gestureCstRewardAmount).toBe(125);
-    expect(result.current.gestureCstRewardAmountMin).toBe(123.75);
     expect(result.current.cstGestureData.SecondsElapsed).toBe(1201);
     expect(result.current.cstGestureData.CSTPrice).toBe(2);
   });
@@ -544,7 +543,6 @@ describe('useGestureForm', () => {
 
     expect(mockGetGestureCstRewardAmountAdvanced).toHaveBeenCalledWith([0n]);
     expect(result.current.gestureCstRewardAmount).toBe(80);
-    expect(result.current.gestureCstRewardAmountMin).toBe(79.2);
   });
 
   it('cleans up the CST preview timer and gesture event listener on unmount', async () => {
@@ -764,13 +762,12 @@ describe('useGestureForm', () => {
     expect(result.current.isGesturing).toBe(false);
   });
 
-  it('passes selected minimum CST reward to V2 CST gesture writes', async () => {
+  it('always submits a zero minimum CST reward (the guard is nullified)', async () => {
+    // Under V3 the guarded amount is minted to the previous participant, so a
+    // nonzero limit only produces spurious BidCstRewardAmountMinLimitNotReached
+    // reverts. The hook therefore behaves as if the parameter did not exist.
     const { result } = renderHook(() => useGestureForm());
     await flushAsyncWork();
-
-    act(() => {
-      result.current.setCstRewardTolerancePercent(5);
-    });
 
     await result.current.onGestureWithCST();
     await flushAsyncWork();
@@ -781,28 +778,6 @@ describe('useGestureForm', () => {
         functionName: 'bidWithCst',
         // priceMaxLimit carries the default 2% max-cost headroom over the 1 CST quote, so a
         // cost rising between quote and confirmation (V3 late-gesture premium) does not revert.
-        args: [BigInt('1020000000000000000'), '', BigInt('95000000000000000000')],
-      }),
-    );
-  });
-
-  it('submits zero minimum CST reward when accepting any reward', async () => {
-    const { result } = renderHook(() => useGestureForm());
-    await flushAsyncWork();
-
-    act(() => {
-      result.current.setAcceptAnyCstReward(true);
-    });
-
-    await result.current.onGestureWithCST();
-    await flushAsyncWork();
-
-    expect(result.current.gestureCstRewardAmountMinLimitWei).toBe(0n);
-    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        functionName: 'bidWithCst',
-        // Quote + default 2% max-cost headroom (see the previous test).
         args: [BigInt('1020000000000000000'), '', 0n],
       }),
     );

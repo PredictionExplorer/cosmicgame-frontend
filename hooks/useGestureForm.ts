@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useConfig, usePublicClient, useWalletClient, useConnectorClient } from 'wagmi';
 import { getConnectorClient, writeContract } from '@wagmi/core';
@@ -118,13 +118,11 @@ export function useGestureForm() {
   const [contractCstPriceWei, setContractCstPriceWei] = useState<bigint | null>(null);
   const [gestureCstRewardAmountWei, setGestureCstRewardAmountWei] = useState<bigint | null>(null);
   const [isCstRewardLoading, setIsCstRewardLoading] = useState(false);
-  const [cstRewardTolerancePercent, setCstRewardTolerancePercent] = useState(1);
-  const [acceptAnyCstReward, setAcceptAnyCstReward] = useState(false);
   /**
-   * V3 Participation CST split: percentage of the quoted reward minted to the OUTBID
-   * participant (default 90); the participant placing the gesture receives the rest.
-   * `null` on V2 contracts (no split) — the UI then shows the whole reward as the
-   * participant's own, matching V2 behavior.
+   * True on V3 contracts, where the entire per-gesture Participation CST is imprinted
+   * to the outbid (previous) participant; the participant placing the gesture receives
+   * nothing at gesture time and instead accrues CST while they remain the latest
+   * participant. False on V1/V2 (whole reward to the gesturer).
    */
   const [cstRewardToOutbidBidder, setCstRewardToOutbidBidder] = useState<boolean>(false);
 
@@ -147,21 +145,15 @@ export function useGestureForm() {
     return Number.isFinite(value) ? value : null;
   }, [gestureCstRewardAmountWei]);
 
-  const cstRewardToleranceBps = useMemo(() => {
-    const clamped = Math.min(100, Math.max(0, cstRewardTolerancePercent));
-    return Math.round(clamped * 100);
-  }, [cstRewardTolerancePercent]);
-
-  const gestureCstRewardAmountMinLimitWei = useMemo(() => {
-    if (acceptAnyCstReward) return 0n;
-    if (!gestureCstRewardAmountWei || gestureCstRewardAmountWei <= 0n) return 0n;
-    return (gestureCstRewardAmountWei * BigInt(10_000 - cstRewardToleranceBps)) / 10_000n;
-  }, [acceptAnyCstReward, gestureCstRewardAmountWei, cstRewardToleranceBps]);
-
-  const gestureCstRewardAmountMin = useMemo(() => {
-    const value = Number(formatEther(gestureCstRewardAmountMinLimitWei));
-    return Number.isFinite(value) ? value : 0;
-  }, [gestureCstRewardAmountMinLimitWei]);
+  /**
+   * `bidCstRewardAmountMinLimit_` is intentionally nullified: we always pass 0.
+   * Under V3 the guarded amount is minted to the previous participant, so a
+   * nonzero limit only exposes honest gestures to spurious
+   * `BidCstRewardAmountMinLimitNotReached` reverts when another gesture lands
+   * first. The parameter is slated for removal from the contract signatures;
+   * until then the frontend behaves as if it did not exist.
+   */
+  const gestureCstRewardAmountMinLimitWei = 0n;
 
   useEffect(() => {
     if (uxScenario) {
@@ -1001,11 +993,6 @@ export function useGestureForm() {
     };
   }, [nftRWLKContract, account, usedRWLKData]);
 
-  const updateCstRewardTolerancePercent = useCallback((value: number) => {
-    if (!Number.isFinite(value)) return;
-    setCstRewardTolerancePercent(Math.min(100, Math.max(0, value)));
-  }, []);
-
   return {
     gestureType,
     setBidType,
@@ -1014,14 +1001,8 @@ export function useGestureForm() {
     cstGestureData,
     ethGestureInfo,
     gestureCstRewardAmount,
-    gestureCstRewardAmountMin,
-    gestureCstRewardAmountMinLimitWei,
     isCstRewardLoading,
     cstRewardToOutbidBidder,
-    cstRewardTolerancePercent,
-    setCstRewardTolerancePercent: updateCstRewardTolerancePercent,
-    acceptAnyCstReward,
-    setAcceptAnyCstReward,
     message,
     setMessage,
     nftDonateAddress,

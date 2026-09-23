@@ -83,18 +83,15 @@ function formatParticipationCST(gestureInfo: GestureInfo): string {
 }
 
 /**
- * V3 Participation CST split: the outbid (previous) participant receives most of the
- * imprint (90% by default) and the participant placing the gesture receives the rest.
- * Returns undefined for V1/V2 gestures (no split recorded) so the rows can be hidden.
+ * V3 Participation CST attribution: the entire per-gesture imprint goes to the
+ * outbid (previous) participant. Returns the imprinted amount, or undefined for
+ * V1/V2 gestures and a cycle's opening gesture (nothing went to a previous
+ * participant), so the row can be hidden.
  */
-function getCstRewardSplit(
-  gestureInfo: GestureInfo,
-): { previous: number; current: number } | undefined {
+function getCstToPreviousParticipant(gestureInfo: GestureInfo): number | undefined {
   const previous = gestureInfo.PreviousBidderCstRewardAmountEth;
-  const current = gestureInfo.ThisBidderCstRewardAmountEth;
-  if (typeof previous !== 'number' || typeof current !== 'number') return undefined;
-  if (previous <= 0) return undefined; // V1/V2 gesture or opening gesture of a cycle: no split occurred.
-  return { previous, current };
+  if (typeof previous !== 'number' || previous <= 0) return undefined;
+  return previous;
 }
 
 const GesturePage = ({ gestureId }: { gestureId: number }) => {
@@ -207,21 +204,14 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
                   </span>
                 </DetailRow>
                 {(() => {
-                  const split = getCstRewardSplit(gestureInfo);
-                  if (!split) return null;
+                  const cstToPrevious = getCstToPreviousParticipant(gestureInfo);
+                  if (cstToPrevious == null) return null;
                   return (
-                    <>
-                      <DetailRow label={t('rows.cstToOutbid')}>
-                        <span className="font-mono tabular-nums">
-                          {formatAmount(split.previous, 'CST', { fractional: 7, standard: 2 })}
-                        </span>
-                      </DetailRow>
-                      <DetailRow label={t('rows.cstToThis')}>
-                        <span className="font-mono tabular-nums">
-                          {formatAmount(split.current, 'CST', { fractional: 7, standard: 2 })}
-                        </span>
-                      </DetailRow>
-                    </>
+                    <DetailRow label={t('rows.cstToOutbid')}>
+                      <span className="font-mono tabular-nums">
+                        {formatAmount(cstToPrevious, 'CST', { fractional: 7, standard: 2 })}
+                      </span>
+                    </DetailRow>
                   );
                 })()}
               </DefinitionList>
