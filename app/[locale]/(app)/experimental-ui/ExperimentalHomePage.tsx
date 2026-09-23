@@ -53,6 +53,8 @@ import { useHomeGestureFeed } from '@/hooks/useHomeGestureFeed';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
+import { ALERT_MINUTE_CHOICES, useAttentionPreferences } from '@/hooks/useAttentionPreferences';
+import { useGestureChime } from '@/hooks/useGestureChime';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
@@ -122,10 +124,6 @@ const sectionFade = {
  * always carries the full crawlable content.
  */
 const STORY_VISITED_STORAGE_KEY = 'cosmic-observatory-visited';
-
-/** Chosen "notify me before finalization" threshold, in minutes. */
-const NOTIFY_THRESHOLD_STORAGE_KEY = 'cosmic-notify-threshold-min';
-const DEFAULT_NOTIFY_THRESHOLD_MIN = 5;
 
 /** Pending optimistic chat rows expire if the indexer never echoes them. */
 const PENDING_MESSAGE_EXPIRY_MS = 90_000;
@@ -266,48 +264,37 @@ const ExperimentalHomePage = ({
   const gestureForm = useGestureForm();
   const allocationFinalize = useAllocationFinalize({ data, offset });
 
-  // "Notify me before finalization" threshold, persisted per browser. Starts
-  // at the default for hydration consistency; the effect restores the choice.
-  const [notifyThresholdMin, setNotifyThresholdMin] = useState(DEFAULT_NOTIFY_THRESHOLD_MIN);
-  useEffect(() => {
-    const stored = Number(window.localStorage.getItem(NOTIFY_THRESHOLD_STORAGE_KEY));
-    if (Number.isFinite(stored) && stored > 0) setNotifyThresholdMin(stored);
-  }, []);
-
-  const { playAudio, requestNotificationPermission } = useAllocationNotification({
+  // Attention settings (chime, alert before finalization, tab-title
+  // countdown) are opt-in per browser: nothing sounds or notifies until the
+  // viewer turns it on (useAttentionPreferences).
+  const { preferences: attention, setFinalizationAlert } = useAttentionPreferences();
+  useAllocationNotification({
     allocationTime: allocationFinalize.allocationTime,
+    cycleNumber: dashboardData?.CurRoundNum ?? null,
     notificationTitle: t('notifications.finalizationSoonTitle'),
-    notificationBody: t('notifications.finalizationSoonBody', {
-      minutes: String(notifyThresholdMin),
-    }),
-    thresholdMs: notifyThresholdMin * 60 * 1000,
+    notificationBody: (minutesLeft) =>
+      t('notifications.finalizationSoonBody', { minutes: String(minutesLeft) }),
   });
 
+  // The clock's alert chips switch the opt-in alert: picking a threshold turns
+  // it on (asking for notification permission at that click); picking the
+  // active one turns it off.
+  const notifyThresholdMin = attention.finalizationAlert ? attention.alertMinutes : undefined;
   const handleNotifyThresholdChange = useCallback(
     (minutes: number) => {
-      setNotifyThresholdMin(minutes);
-      window.localStorage.setItem(NOTIFY_THRESHOLD_STORAGE_KEY, String(minutes));
-      // Choosing a threshold is a clear opt-in signal — the right moment to
-      // ask the browser for notification permission.
-      requestNotificationPermission();
+      const choice = ALERT_MINUTE_CHOICES.find((value) => value === minutes) ?? null;
+      void setFinalizationAlert(notifyThresholdMin === minutes ? null : choice);
     },
-    [requestNotificationPermission],
+    [notifyThresholdMin, setFinalizationAlert],
   );
 
-  const prevGestureCountRef = useRef<number>(0);
-  useEffect(() => {
-    if (dashboardData && prevGestureCountRef.current > 0) {
-      if (
-        account !== dashboardData.LastBidderAddr &&
-        dashboardData.CurNumBids > prevGestureCountRef.current
-      ) {
-        playAudio();
-      }
-    }
-    if (dashboardData) {
-      prevGestureCountRef.current = dashboardData.CurNumBids;
-    }
-  }, [dashboardData, account, playAudio]);
+  // Chime only for a connected viewer who opted in, when their Gesture was
+  // just followed by someone else's.
+  useGestureChime({
+    account,
+    lastGestureAddress: dashboardData?.LastBidderAddr,
+    gestureCount: dashboardData?.CurNumBids,
+  });
 
   const {
     gestureType,
@@ -413,7 +400,6 @@ const ExperimentalHomePage = ({
 
   const handleGesture = useCallback(
     async (source: GestureSurface = 'console') => {
-      requestNotificationPermission();
       const trimmedMessage = gestureForm.message.trim();
       if (uxScenario) {
         const nextScenario = simulateUxScenarioGesture({
@@ -449,7 +435,6 @@ const ExperimentalHomePage = ({
       onGestureWithCST,
       optimisticallyRecordGesture,
       recordPendingMessage,
-      requestNotificationPermission,
       setMessage,
       tToast,
       uxScenario,

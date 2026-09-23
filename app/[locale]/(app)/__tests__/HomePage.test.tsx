@@ -4,7 +4,7 @@ import { shortenHex } from '@/utils';
 
 import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
 
-import { render, screen, within, act, checkA11y } from '@/test-utils';
+import { render, screen, within, act, checkA11y, waitFor } from '@/test-utils';
 
 import HomePage, { resolveHomeNow } from '../HomePage';
 
@@ -194,11 +194,11 @@ jest.mock('../../../../hooks/useEndgameChainSync', () => ({
 
 /* ── notifications / prices ────────────────────────────────────── */
 
-const mockRequestNotificationPermission = jest.fn();
 jest.mock('../../../../hooks/useAllocationNotification', () => ({
   useAllocationNotification: () => ({
-    playAudio: jest.fn(),
-    requestNotificationPermission: mockRequestNotificationPermission,
+    sendNotification: jest.fn(),
+    alertEnabled: false,
+    alertMinutes: 5,
   }),
 }));
 
@@ -251,6 +251,7 @@ jest.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({
     invalidateQueries: mockInvalidateQueries,
     setQueryData: mockSetQueryData,
+    getQueryCache: () => ({ subscribe: () => () => undefined, findAll: () => [] }),
     cancelQueries: mockCancelQueries,
   }),
 }));
@@ -1198,7 +1199,8 @@ describe('HomePage', () => {
     expect(getPanelSubmitButton()).toHaveTextContent('home.form.submit.eth(cost=0.01020)');
     await user.click(getPanelSubmitButton());
 
-    expect(mockRequestNotificationPermission).toHaveBeenCalledTimes(1);
+    // No notification-permission prompt in the middle of a gesture.
+    expect(window.Notification?.requestPermission ?? jest.fn()).not.toHaveBeenCalled();
     expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
     expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
     expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
@@ -1400,21 +1402,42 @@ describe('HomePage', () => {
       isLoading: false,
     });
 
+    Object.defineProperty(window, 'Notification', {
+      value: { permission: 'granted', requestPermission: jest.fn().mockResolvedValue('granted') },
+      writable: true,
+      configurable: true,
+    });
     render(<HomePage />);
 
     const control = screen.getByTestId('clock-notify-control');
+    // Off by default: no chip is pressed until the viewer picks one.
+    expect(within(control).queryByRole('button', { pressed: true })).toBeNull();
     await user.click(
       within(control).getByRole('button', {
         name: 'home.observatory.clock.notifyMinutes(minutes=60)',
       }),
     );
 
-    expect(window.localStorage.getItem('cosmic-notify-threshold-min')).toBe('60');
     expect(
+      JSON.parse(window.localStorage.getItem('cosmic-attention-preferences') ?? '{}'),
+    ).toMatchObject({ finalizationAlert: true, alertMinutes: 60 });
+    await waitFor(() =>
+      expect(
+        within(control).getByRole('button', {
+          name: 'home.observatory.clock.notifyMinutes(minutes=60)',
+        }),
+      ).toHaveAttribute('aria-pressed', 'true'),
+    );
+
+    // Picking the active threshold again turns the alert off.
+    await user.click(
       within(control).getByRole('button', {
         name: 'home.observatory.clock.notifyMinutes(minutes=60)',
       }),
-    ).toHaveAttribute('aria-pressed', 'true');
+    );
+    await waitFor(() =>
+      expect(within(control).queryByRole('button', { pressed: true })).toBeNull(),
+    );
   });
 
   /* ── Wallet states ──────────────────────────────────────────── */

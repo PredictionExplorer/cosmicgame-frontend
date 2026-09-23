@@ -1,8 +1,10 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { LiveStatus } from '@/components/ui/live-status';
 import type { CyclePhase } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/navigation';
@@ -15,6 +17,8 @@ export interface PulseBarProps {
   gestureCount: number;
   /** Preformatted relative age of the newest gesture ("12s ago"); null hides it. */
   lastGestureAge?: string | null;
+  /** Controls placed before the "New here?" link (the attention menu). */
+  aside?: ReactNode;
   className?: string;
 }
 
@@ -27,6 +31,7 @@ export function PulseBar({
   phase,
   gestureCount,
   lastGestureAge = null,
+  aside = null,
   className,
 }: PulseBarProps) {
   const t = useTranslations('home');
@@ -50,7 +55,8 @@ export function PulseBar({
           </h1>
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-300 animate-live-dot" />
+              {/* Pulses only while the dashboard poll succeeds (liveFreshness). */}
+              <LiveStatus variant="dot" />
               {cycleNumber == null
                 ? t('hero.cycleFallback')
                 : t('hero.cycleNumber', { number: String(cycleNumber) })}
@@ -85,6 +91,7 @@ export function PulseBar({
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        {aside}
         <Link
           href="/how-it-works"
           className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] min-h-11 px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/35 hover:text-primary"
