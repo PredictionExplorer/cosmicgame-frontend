@@ -66,6 +66,24 @@
   }
 
   /*
+   * A focusable element that is a direct child of a clipping container
+   * (overflow-hidden or overflow-clip) often fills it, like a full-card link,
+   * and the container would clip an outside ring away. Such elements draw
+   * the ring just inside their edge instead, which is visible whether or not
+   * they fill the box.
+   */
+  :where(.overflow-hidden, .overflow-clip)
+    > :where(
+      a,
+      button,
+      [role='button'],
+      [role='link'],
+      [tabindex]:not([tabindex='-1'])
+    ):focus-visible {
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+
+  /*
    * Menu, listbox and command items take focus programmatically (roving
    * tabindex -1) and fill their row, so the ring sits just inside them, on
    * top of the highlight fill.
