@@ -85,7 +85,11 @@ function DistributionBar({
       <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
         {typeLabel(traitKey)}
       </p>
-      <div className="flex h-2.5 w-full gap-px overflow-hidden rounded-full bg-white/[0.04]">
+      {/*
+       * The end segments round the bar themselves: an overflow-hidden bar
+       * would clip a focused segment's outline, which is drawn outside it.
+       */}
+      <div className="flex h-2.5 w-full gap-px rounded-full bg-white/[0.04]">
         {ordered.map((option, index) => {
           const color = segmentColor(traitKey, option.value, index);
           const label = valueLabel(traitKey, option.value);
@@ -100,8 +104,10 @@ function DistributionBar({
                   aria-label={t('dna.segmentAria', { value: label, count: option.count })}
                   style={{ flexGrow: option.count, backgroundColor: color }}
                   className={cn(
-                    'min-w-[3px] transition-opacity duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'min-w-[3px] transition-opacity duration-200 first:rounded-l-full last:rounded-r-full',
                     anySelected && !active ? 'opacity-35 hover:opacity-70' : 'hover:opacity-80',
+                    // Opacity would fade the segment's focus ring with it.
+                    'focus-visible:opacity-100',
                   )}
                 />
               </TooltipTrigger>

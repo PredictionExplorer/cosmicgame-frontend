@@ -61,7 +61,7 @@ const RETIRED: Record<string, RetiredPattern> = {
   'focus reset that replaces the shared outline': {
     use: 'the global :focus-visible outline (styles/focus-ring.css), focus-ring-inset or focus-ring-within',
     pattern: /focus-visible:outline-none/g,
-    baseline: 24,
+    baseline: 23,
   },
   'bold display face': {
     use: 'type-heading-3 / type-title (Inter 600) below 24px, a display tier above',
