@@ -392,48 +392,76 @@ body:has([data-maintenance-banner]) .home-control-shell {
   }
 
   /*
-   * CJK typography (docs/i18n/README.md §5), shared by every Chinese locale
-   * (`:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike), by Korean, and by
-   * Japanese. The Latin display face (Clash Display) has no CJK, Hangul, or
-   * kana glyphs, so these headings fall through to the locale's Noto Sans
-   * cut. CJK must never inherit Latin display tracking, and the lighter
-   * display weights read too thin in CJK strokes.
+   * Paragraph-level wrapping: avoid a lone word (or a lone 「す。」) on the
+   * last line of a paragraph. Browsers without `pretty` wrap as before.
    */
-  html:lang(zh) .type-display,
-  html:lang(zh) h1,
-  html:lang(zh) h2,
-  html:lang(zh) h3,
-  html:lang(ko) .type-display,
-  html:lang(ko) h1,
-  html:lang(ko) h2,
-  html:lang(ko) h3,
-  html:lang(ja) .type-display,
-  html:lang(ja) h1,
-  html:lang(ja) h2,
-  html:lang(ja) h3 {
-    letter-spacing: 0 !important;
-    font-weight: 700;
+  p,
+  li,
+  dd,
+  figcaption,
+  blockquote {
+    text-wrap: pretty;
   }
 
   /*
-   * Japanese has no spaces to break at, so a heading wraps wherever the line
-   * ends — often mid-word (東京 | 都). `auto-phrase` asks the browser to break
-   * between phrases instead (Chrome 119+, BudouX); engines without it keep the
-   * default per-character behavior.
+   * CJK headings (docs/i18n/README.md §5), shared by every Chinese locale
+   * (`:lang(zh)` matches `zh`, `zh-TW`, and `zh-HK` alike), by Korean, and by
+   * Japanese. The Latin display face has no CJK, Hangul, or kana glyphs, so
+   * these headings fall through to the locale's Noto Sans cut. CJK never
+   * inherits Latin display tracking, and class-less headings (prose, legal,
+   * FAQ) take the CJK display weight; headings with a type utility already
+   * read the same --display-weight token.
    */
-  html:lang(ja) .type-display,
-  html:lang(ja) h1,
-  html:lang(ja) h2,
-  html:lang(ja) h3 {
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(zh),
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(ko),
+  :is(h1, h2, h3, [class*='type-display-'], [class*='type-heading-'], .type-section):lang(ja) {
+    letter-spacing: 0 !important;
+  }
+
+  :is(h1, h2, h3):lang(zh),
+  :is(h1, h2, h3):lang(ko),
+  :is(h1, h2, h3):lang(ja) {
+    font-weight: var(--display-weight);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  /*
+   * Japanese has no spaces to break at, so short text wraps wherever the line
+   * ends — often mid-word (シグネチャー配 | 分, 確 | 定できる). `auto-phrase`
+   * asks the browser to break between phrases instead (Chrome 119+, BudouX);
+   * engines without it keep the default per-character behavior. Long running
+   * prose (FAQ answers, legal) keeps normal breaking plus `text-wrap: pretty`.
+   */
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    [class*='type-display-'],
+    [class*='type-heading-'],
+    .type-section,
+    .type-title,
+    .type-lede,
+    .type-body-lg,
+    .type-label,
+    .type-caption,
+    summary,
+    button,
+    dt,
+    dd,
+    figcaption,
+    [role='tab']
+  ):lang(ja) {
     word-break: auto-phrase;
   }
 
   /* Tailwind tracking utilities are tuned for Latin labels. On a Chinese,
      Korean, or Japanese document, translated nav/table/status copy must keep
      natural CJK spacing. */
-  html:lang(zh) [class*='tracking-'],
-  html:lang(ko) [class*='tracking-'],
-  html:lang(ja) [class*='tracking-'] {
+  [class*='tracking-']:lang(zh),
+  [class*='tracking-']:lang(ko),
+  [class*='tracking-']:lang(ja) {
     letter-spacing: 0 !important;
   }
 
@@ -459,6 +487,47 @@ body:has([data-maintenance-banner]) .home-control-shell {
     overflow-wrap: anywhere;
     font-feature-settings: 'zero' 1;
   }
+}
+
+/*
+ * Display-face guard. Clash Display is drawn for 500; at 600-700 with
+ * `tracking-tight` its narrow space closes up and small headings read as
+ * one word. Until every call site moves to type-heading-3 / type-title
+ * (Inter) or a display tier, `font-display` caps bold at 600, relaxes tight
+ * tracking and opens the word space. Two-class selectors outrank the single
+ * utilities they correct.
+ */
+@layer utilities {
+  .font-display {
+    word-spacing: var(--display-word-spacing);
+  }
+
+  .font-display:is(.font-bold, .font-extrabold, .font-black) {
+    font-weight: var(--display-weight-strong);
+  }
+
+  .font-display:is(.tracking-tight, .tracking-tighter) {
+    letter-spacing: calc(-0.01em * var(--display-tracking-scale));
+  }
+}
+
+/*
+ * Retired dimmed-text utilities. Opacity on a text colour produced a
+ * different, usually failing, contrast in every palette (muted-foreground at
+ * 60% was 4.1:1, at 40% 2.4:1). These exact classes now render in the subtle
+ * text tier, which is 5.1:1 or more on every surface. New code writes
+ * `text-subtle`; lib/__tests__/design-tokens.test.ts stops the count of these
+ * classes from growing. Unlayered with zero specificity: it outranks the
+ * utilities layer, and any authored rule still outranks it.
+ */
+:where(
+  .text-muted-foreground\/40,
+  .text-muted-foreground\/50,
+  .text-muted-foreground\/60,
+  .text-white\/40,
+  .text-white\/45
+) {
+  color: hsl(var(--subtle-foreground));
 }
 
 @property --radius {
