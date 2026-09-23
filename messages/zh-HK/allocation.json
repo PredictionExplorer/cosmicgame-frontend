@@ -140,11 +140,15 @@
     "distribution": {
       "aria": "分配流向",
       "title": "分配流向",
-      "tooltip": "顯示本週期儲備沿各條分配軌道的發放情況。",
+      "tooltip": "顯示本週期發放的 ETH 在各條分配軌道間的佔比。週期儲備的其餘部分滾入下一週期，不在此顯示。",
       "segments": {
         "signature": {
           "label": "簽名分配",
           "tooltip": "寫下收官之筆的參與者取回了 {amount} ETH。"
+        },
+        "chrono": {
+          "label": "時之勇士",
+          "tooltip": "{amount} ETH 分配給時之勇士，即本週期單次連續保持堅守冠軍位置時間最長的參與者。"
         },
         "publicGoods": {
           "label": "公共物品",
@@ -158,7 +162,8 @@
           "label": "星選",
           "tooltip": "{amount} ETH 已分配至星選池。"
         }
-      }
+      },
+      "total": "本週期共發放 {amount} ETH"
     },
     "statistics": {
       "aria": "週期統計",

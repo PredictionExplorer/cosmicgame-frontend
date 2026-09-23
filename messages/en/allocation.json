@@ -140,11 +140,15 @@
     "distribution": {
       "aria": "Allocation Distribution",
       "title": "Allocation Distribution",
-      "tooltip": "Visual breakdown of how the cycle's Cycle Reserve was distributed across allocation tracks.",
+      "tooltip": "How the ETH distributed this cycle splits across allocation tracks. The rest of the Cycle Reserve carries into the next cycle and is not shown here.",
       "segments": {
         "signature": {
           "label": "Signature Allocation",
           "tooltip": "{amount} ETH retrieved by the participant who made the Final Gesture."
+        },
+        "chrono": {
+          "label": "Chrono-Warrior",
+          "tooltip": "{amount} ETH allocated to the Chrono-Warrior, the participant who held the Endurance Champion position for the longest consecutive interval."
         },
         "publicGoods": {
           "label": "Public Goods",
@@ -158,7 +162,8 @@
           "label": "Stellar Selection",
           "tooltip": "{amount} ETH allocated to the Stellar Selection pool."
         }
-      }
+      },
+      "total": "{amount} ETH distributed this cycle"
     },
     "statistics": {
       "aria": "Cycle Statistics",

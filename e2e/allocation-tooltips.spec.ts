@@ -60,7 +60,7 @@ const ALLOCATION_DETAIL_TOOLTIPS = [
   },
   {
     label: 'Allocation Distribution',
-    expected: /Visual breakdown of how the cycle's Cycle Reserve/,
+    expected: /How the ETH distributed this cycle splits across allocation tracks/,
   },
 ];
 

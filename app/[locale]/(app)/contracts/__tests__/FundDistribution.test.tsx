@@ -8,14 +8,22 @@ jest.mock('framer-motion', () => ({
       children,
       title,
       className,
+      animate,
+      'data-testid': testId,
       ..._rest
     }: React.HTMLAttributes<HTMLDivElement> & {
       variants?: unknown;
       initial?: unknown;
-      animate?: unknown;
+      animate?: { width?: string };
       transition?: unknown;
+      'data-testid'?: string;
     }) => (
-      <div className={className} title={title} data-testid="motion-div">
+      <div
+        className={className}
+        title={title}
+        data-testid={testId ?? 'motion-div'}
+        data-width={animate?.width}
+      >
         {children}
       </div>
     ),
@@ -38,6 +46,7 @@ describe('FundDistribution', () => {
     expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
     expect(screen.getByText('Anchor Distribution')).toBeInTheDocument();
     expect(screen.getByText('Public Goods')).toBeInTheDocument();
+    expect(screen.getByText('Next cycle')).toBeInTheDocument();
   });
 
   it('renders percentage values for each segment', () => {
@@ -47,6 +56,16 @@ describe('FundDistribution', () => {
     expect(screen.getByText('4%')).toBeInTheDocument();
     expect(screen.getByText('6%')).toBeInTheDocument();
     expect(screen.getByText('7%')).toBeInTheDocument();
+    expect(screen.getByText('50%')).toBeInTheDocument();
+  });
+
+  it('draws each track against the whole Cycle Reserve, not against their sum', () => {
+    // Regression: the five distributed tracks sum to 50%, and the bar once stretched them
+    // to the full width, so the 25% Signature Allocation filled half of it.
+    render(<FundDistribution {...defaultProps} />);
+    expect(screen.getByTestId('fund-segment-signature')).toHaveAttribute('data-width', '25%');
+    expect(screen.getByTestId('fund-segment-publicGoods')).toHaveAttribute('data-width', '7%');
+    expect(screen.getByTestId('fund-segment-nextCycle')).toHaveAttribute('data-width', '50%');
   });
 
   it('renders the Allocation Tracks title', () => {
@@ -72,12 +91,21 @@ describe('FundDistribution', () => {
     expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
     const zeros = screen.getAllByText('0%');
     expect(zeros.length).toBe(5);
+    expect(screen.getByText('100%')).toBeInTheDocument();
   });
 
-  it('handles missing percentages with 0 default', () => {
+  it('renders missing percentages as unavailable, never as 0%', () => {
     render(<FundDistribution />);
-    const zeros = screen.getAllByText('0%');
-    expect(zeros.length).toBe(5);
+    expect(screen.queryByText('0%')).not.toBeInTheDocument();
+    expect(screen.getAllByText('common.status.unavailable')).toHaveLength(6);
+    expect(screen.queryByTestId(/^fund-segment-/)).not.toBeInTheDocument();
+  });
+
+  it('leaves the next-cycle share unknown when any track is unknown', () => {
+    render(<FundDistribution {...defaultProps} charityPercentage={undefined} />);
+    expect(screen.queryByText('50%')).not.toBeInTheDocument();
+    expect(screen.queryByText('57%')).not.toBeInTheDocument();
+    expect(screen.getAllByText('common.status.unavailable')).toHaveLength(2);
   });
 
   it('shows loading skeleton when loading is true', () => {
@@ -130,6 +158,10 @@ describe('FundDistribution tooltips', () => {
     {
       label: 'Public Goods',
       tooltip: /Forwarded to the Public Goods Beneficiary/,
+    },
+    {
+      label: 'Next cycle',
+      tooltip: /roll forward into the next cycle/,
     },
   ];
 

@@ -140,11 +140,15 @@
     "distribution": {
       "aria": "Cơ cấu phân bổ",
       "title": "Cơ cấu phân bổ",
-      "tooltip": "Biểu đồ thể hiện cách dự trữ chu kỳ được phân bổ theo từng luồng.",
+      "tooltip": "Cách ETH được phân bổ trong chu kỳ này chia theo từng luồng phân bổ. Phần còn lại của dự trữ chu kỳ chuyển sang chu kỳ tiếp theo và không hiển thị ở đây.",
       "segments": {
         "signature": {
           "label": "Phân bổ Signature",
           "tooltip": "{amount} ETH được người tham gia đặt nét bút cuối cùng nhận về."
+        },
+        "chrono": {
+          "label": "Chiến binh Thời gian",
+          "tooltip": "{amount} ETH phân bổ cho Chiến binh Thời gian, người giữ danh hiệu Quán quân Bền bỉ lâu nhất trong một khoảng liên tục."
         },
         "publicGoods": {
           "label": "Hàng hóa công",
@@ -158,7 +162,8 @@
           "label": "Tinh tuyển",
           "tooltip": "{amount} ETH phân bổ vào quỹ Tinh tuyển."
         }
-      }
+      },
+      "total": "Đã phân bổ {amount} ETH trong chu kỳ này"
     },
     "statistics": {
       "aria": "Thống kê chu kỳ",

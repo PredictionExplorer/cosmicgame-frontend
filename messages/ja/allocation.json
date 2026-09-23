@@ -140,11 +140,15 @@
     "distribution": {
       "aria": "配分の分布",
       "title": "配分の分布",
-      "tooltip": "このサイクルのサイクル準備金が配分トラックにどう配られたかを視覚的に示します。",
+      "tooltip": "このサイクルで配分されたETHが各配分トラックにどう分かれたかを示します。サイクル準備金の残りは次のサイクルへ持ち越され、ここには表示されません。",
       "segments": {
         "signature": {
           "label": "シグネチャー配分",
           "tooltip": "最後の一筆を入れた参加者が受け取った{amount} ETH。"
+        },
+        "chrono": {
+          "label": "時の戦士",
+          "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者である時の戦士に配分された{amount} ETH。"
         },
         "publicGoods": {
           "label": "公共財",
@@ -158,7 +162,8 @@
           "label": "星選",
           "tooltip": "星選プールに配分された{amount} ETH。"
         }
-      }
+      },
+      "total": "このサイクルの配分総額：{amount} ETH"
     },
     "statistics": {
       "aria": "サイクル統計",
