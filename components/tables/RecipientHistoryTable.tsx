@@ -20,10 +20,8 @@ import {
 } from '@/components/styled';
 import { cn } from '@/lib/utils';
 import type { WinningHistoryEntry } from '@/services/api/types';
+import { CST_RECORD_TYPES, ETH_RECORD_TYPES, NFT_RECORD_TYPES } from '@/utils/allocationRecords';
 export type { WinningHistoryEntry };
-
-/** Stellar Selection rows in `AllPrizes` / `cg_prize.ptype`. */
-export const STELLAR_SELECTION_RECORD_TYPES = new Set([10, 11, 12, 13, 14, 18]);
 
 /** Backend `cg_prize.ptype` / API `RecordType` — must match black-site prize history labels. */
 const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; textKey: string }> = {
@@ -80,10 +78,6 @@ const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; textKey: string }> = {
     textKey: 'recipientHistory.types.stellarEthRetrieval',
   },
 };
-
-const ETH_RECORD_TYPES = new Set([0, 7, 10, 15, 18]);
-const CST_RECORD_TYPES = new Set([1, 4, 6, 8, 11, 13]);
-const NFT_RECORD_TYPES = new Set([2, 3, 5, 9, 12, 14, 16]);
 
 function formatAllocationAmount(
   recordType: number,

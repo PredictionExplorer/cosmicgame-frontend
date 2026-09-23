@@ -56,9 +56,9 @@ import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
 import RecipientHistoryTable, {
-  STELLAR_SELECTION_RECORD_TYPES,
   type WinningHistoryEntry,
 } from '@/components/tables/RecipientHistoryTable';
+import { STELLAR_SELECTION_RECORD_TYPES } from '@/utils/allocationRecords';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 24 },
