@@ -1,15 +1,27 @@
 /*
- * Global focus-visible recipe.
+ * Keyboard focus: one treatment for every interactive element.
  *
- * Every interactive element (button, a, [role=button], [tabindex]) gets a
- * two-layer aurora ring on keyboard focus. Pointer focus is suppressed
- * thanks to :focus-visible so the ring only appears when useful.
+ * A solid outline in the palette's ring colour, offset from the element.
+ * Outlines (unlike the box-shadow ring this replaces) are not removed by
+ * `shadow-*` utilities and survive Windows High Contrast / forced colours.
+ * Pointer focus shows nothing, thanks to :focus-visible.
  *
- * Tokens live in tokens.css (--focus-ring-*). Components opt out with the
- * `focus-ring-none` utility if they provide their own treatment.
+ * Tokens: --focus-ring-width, --focus-ring-offset, --focus-ring-color
+ * (styles/tokens.css). Utilities for the awkward cases:
+ *   focus-ring-inset   draw the ring inside the element, for full-bleed links
+ *                      and rows inside an `overflow: hidden` card, which clips
+ *                      an outside ring
+ *   focus-ring-within  draw the ring on a container whenever something inside
+ *                      it has keyboard focus (a card whose link is clipped)
+ *   focus-ring-none    the component draws its own indicator
  */
 
 @layer base {
+  /*
+   * The ring colour is set at rest, so an element with `transition-colors`
+   * (which animates outline-color) does not fade its ring in from the text
+   * colour; only the outline style changes on focus.
+   */
   :where(
     a,
     button,
@@ -20,17 +32,110 @@
     [role='button'],
     [role='link'],
     [role='tab'],
-    [tabindex]:not([tabindex='-1'])
-  ):focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 var(--focus-ring-offset) hsl(var(--background)),
-      0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-ring-color),
-      0 0 24px var(--focus-ring-glow);
-    border-radius: inherit;
+    [role='checkbox'],
+    [role='radio'],
+    [role='switch'],
+    [role='slider'],
+    [role='menuitem'],
+    [role='menuitemradio'],
+    [role='menuitemcheckbox'],
+    [role='option'],
+    [tabindex]
+  ) {
+    outline-color: var(--focus-ring-color);
   }
 
-  .focus-ring-none:focus-visible {
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [role='button'],
+    [role='link'],
+    [role='tab'],
+    [role='checkbox'],
+    [role='radio'],
+    [role='switch'],
+    [role='slider'],
+    [tabindex]:not([tabindex='-1'])
+  ):focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /*
+   * Menu, listbox and command items take focus programmatically (roving
+   * tabindex -1) and fill their row, so the ring sits just inside them, on
+   * top of the highlight fill.
+   */
+  :where(
+    [role='menuitem'],
+    [role='menuitemradio'],
+    [role='menuitemcheckbox'],
+    [role='option']
+  ):focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}
+
+@utility focus-ring-inset {
+  &:focus-visible {
+    outline-offset: calc(var(--focus-ring-width) * -1 - 1px);
+  }
+}
+
+@utility focus-ring-within {
+  &:has(:focus-visible) {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+@utility focus-ring-none {
+  &:focus-visible {
+    outline: none;
     box-shadow: none;
+  }
+}
+
+/*
+ * Unlayered on purpose, so no utility can undo these.
+ *
+ * A bare `outline-none` (Tailwind's reset for mouse focus) must not erase the
+ * keyboard indicator: it only restores the outline style, keeping the
+ * element's own colour, width and offset if it sets them. Elements that draw
+ * their own ring through `focus-visible:outline-none focus-visible:ring-*`
+ * are left alone until they migrate to the outline.
+ */
+:where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [role='button'],
+    [role='link'],
+    [role='tab'],
+    [role='menuitem'],
+    [role='menuitemradio'],
+    [role='menuitemcheckbox'],
+    [role='option'],
+    [tabindex]:not([tabindex='-1'])
+  ):where(.outline-none):focus-visible:not(.focus-ring-none) {
+  outline-style: solid !important;
+}
+
+/*
+ * Forced colours drop box-shadows and author colours. Every focused element
+ * gets a system-coloured outline, including the ones that opted out above.
+ */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px;
   }
 }
