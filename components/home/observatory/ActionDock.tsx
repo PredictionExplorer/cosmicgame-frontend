@@ -113,7 +113,7 @@ export function ActionDock({
           data-testid="action-dock-mobile"
           className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.12] bg-card/95 px-3.5 py-2.5 shadow-[var(--elevation-3)] backdrop-blur-xl"
         >
-          <span className="flex min-w-0 flex-col">
+          <span className="flex shrink-0 flex-col">
             {clock}
             {/* Wraps instead of truncating: the CTA carries a long live-cost
                 label, and at 320px an ellipsis would hide the reserve amount. */}
@@ -130,7 +130,7 @@ export function ActionDock({
             data-testid="dock-open-sheet"
             onClick={onOpenSheet}
             aria-label={t('observatory.dock.openPanelAria')}
-            className="min-h-11 min-w-0 rounded-full border-0 px-4 text-sm font-semibold leading-tight text-primary-foreground whitespace-normal"
+            className="h-auto min-h-11 min-w-0 rounded-full border-0 px-4 py-1.5 text-sm font-semibold leading-tight text-primary-foreground whitespace-normal"
           >
             {submitLabel}
           </Button>
