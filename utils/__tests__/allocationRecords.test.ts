@@ -7,7 +7,6 @@ import {
   NFT_RECORD_TYPES,
   STELLAR_SELECTION_RECORD_TYPES,
   allocationAmountUnit,
-  sumAllocatedCst,
   sumAllocatedEth,
 } from '../allocationRecords';
 
@@ -58,10 +57,6 @@ describe('allocation totals', () => {
 
   it('sums ETH allocations only', () => {
     expect(sumAllocatedEth(history)).toBeCloseTo(28.1636, 4);
-  });
-
-  it('sums CST allocations only', () => {
-    expect(sumAllocatedCst(history)).toBe(48_000);
   });
 
   it('skips rows without a record type or a finite amount', () => {

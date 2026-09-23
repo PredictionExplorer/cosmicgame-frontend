@@ -14,7 +14,12 @@
  *  7 Chrono-Warrior ETH                17 Attached ERC-20 retrieval
  *  8 Chrono-Warrior CST                18 Stellar Selection ETH timeout retrieval
  *  9 Chrono-Warrior NFT
+ *
+ * Type 15 is not addressed to a wallet: its `WinnerAddr` is the placeholder
+ * "(All CS NFT Stakers)", so wallet counts must skip anything that is not an address.
  */
+
+import { toFiniteNumber } from '@/utils/finiteNumber';
 
 /** Rows whose `AmountEth` is an ETH amount (allocations and the type-18 timeout retrieval). */
 export const ETH_RECORD_TYPES: ReadonlySet<number> = new Set([0, 7, 10, 15, 18]);
@@ -62,24 +67,16 @@ export interface AllocationAmountRow {
   AmountEth?: number;
 }
 
-function sumWhere(rows: readonly AllocationAmountRow[], types: ReadonlySet<number>): number {
-  return rows.reduce((total, row) => {
-    if (typeof row.RecordType !== 'number' || !types.has(row.RecordType)) return total;
-    const amount = Number(row.AmountEth);
-    return Number.isFinite(amount) ? total + amount : total;
-  }, 0);
-}
-
 /**
  * Total ETH allocated across allocation history rows: Signature, Chrono-Warrior, Stellar
  * Selection and Anchor Distribution ETH. CST, NFT and ERC-20 rows are excluded, and so are
  * timeout-retrieval rows, which repeat ETH an allocation row already counts.
  */
 export function sumAllocatedEth(rows: readonly AllocationAmountRow[]): number {
-  return sumWhere(rows, ETH_ALLOCATION_RECORD_TYPES);
-}
-
-/** Total CST allocated across allocation history rows (CST record types only). */
-export function sumAllocatedCst(rows: readonly AllocationAmountRow[]): number {
-  return sumWhere(rows, CST_RECORD_TYPES);
+  return rows.reduce((total, row) => {
+    if (typeof row.RecordType !== 'number' || !ETH_ALLOCATION_RECORD_TYPES.has(row.RecordType)) {
+      return total;
+    }
+    return total + (toFiniteNumber(row.AmountEth) ?? 0);
+  }, 0);
 }
