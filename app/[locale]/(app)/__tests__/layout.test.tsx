@@ -151,17 +151,30 @@ describe('Root layout metadata (shared by both route groups)', () => {
     expect((await generateMetadata(paramsFor('ja'))).keywords).toBeUndefined();
   });
 
-  it('declares the same cache-busted SVG and ICO favicons for both hosts', () => {
+  it('declares the same cache-busted favicons and touch icon for both hosts', () => {
     const icons = metadata.icons as {
       icon: Array<{ url: string; type?: string; sizes?: string }>;
+      apple: Array<{ url: string; type?: string; sizes?: string }>;
     };
     const landingIcons = landingMetadata.icons as typeof icons;
 
     expect(landingIcons).toEqual(icons);
+    // The ICO names its sizes (not `any`) so SVG-capable browsers pick the SVG.
     expect(icons.icon).toEqual([
-      { url: '/favicon.svg?v=20260825', type: 'image/svg+xml' },
-      { url: '/favicon.ico?v=20260825', sizes: 'any' },
+      { url: '/favicon.ico?v=20260923', sizes: '16x16 32x32 48x48' },
+      { url: '/favicon.svg?v=20260923', type: 'image/svg+xml' },
     ]);
+    expect(icons.apple).toEqual([
+      { url: '/apple-touch-icon.png?v=20260923', sizes: '180x180', type: 'image/png' },
+    ]);
+  });
+
+  // F312: installing from the marketing host turned the landing into a
+  // chromeless "app"; only the dApp links a (localized) manifest.
+  it('links the localized web manifest on the app host only', async () => {
+    expect(metadata.manifest).toBe('/en/manifest.webmanifest');
+    expect((await generateMetadata(paramsFor('ja'))).manifest).toBe('/ja/manifest.webmanifest');
+    expect(landingMetadata.manifest).toBeUndefined();
   });
 
   it('declares the Google Search Console verification token', () => {

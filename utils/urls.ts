@@ -1,5 +1,6 @@
 import { networkConfig } from '@/config/networks';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { BRAND_ICON_PATHS } from '@/lib/og/brandIcons';
 import { getApiOrigin } from '@/lib/serverRotation';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
@@ -96,5 +97,5 @@ export const getOriginUrl = (url: string): string => {
 /** Same origin as root `metadataBase` — marketing/branding, not chain-specific. */
 const CANONICAL_SITE_ORIGIN = LANDING_ORIGIN;
 
-/** Site branding logo (`public/images/logo.svg`). Not on the NFT CDN. */
-export const logoImgUrl = `${CANONICAL_SITE_ORIGIN}/images/logo.svg`;
+/** Site logo: the orbit mark on the Midnight plate, a 512px PNG. Not on the NFT CDN. */
+export const logoImgUrl = `${CANONICAL_SITE_ORIGIN}${BRAND_ICON_PATHS.logo512}`;

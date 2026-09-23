@@ -2,13 +2,8 @@ import type { Metadata, Viewport } from 'next';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { BRAND_ICON_URLS } from '@/lib/og/brandIcons';
 import { SITE_NAME, X_HANDLE } from '@/utils/seo';
-
-// Browsers cache favicons separately from normal HTTP cache entries and per
-// origin. Increment this value whenever either favicon asset is replaced.
-export const FAVICON_VERSION = '20260825';
-export const FAVICON_SVG_URL = `/favicon.svg?v=${FAVICON_VERSION}`;
-export const FAVICON_ICO_URL = `/favicon.ico?v=${FAVICON_VERSION}`;
 
 export interface RootMetadataCopy {
   defaultTitle: string;
@@ -19,6 +14,8 @@ export interface RootMetadataCopy {
 export interface RootMetadataOptions {
   origin: string;
   canonical: string;
+  /** The web app manifest to link; only the app host installs, so the landing passes none. */
+  manifest?: string;
 }
 
 // Default OG/Twitter title is intentionally punchier than the document
@@ -48,18 +45,23 @@ export function openGraphLocale(locale: string): string {
  */
 export function createRootMetadata(
   copy: RootMetadataCopy,
-  { origin, canonical }: RootMetadataOptions,
+  { origin, canonical, manifest }: RootMetadataOptions,
 ): Metadata {
   return {
     metadataBase: new URL(origin),
     title: { default: copy.defaultTitle, template: '%s' },
     description: copy.defaultDescription,
+    // The ICO is declared with its sizes, not `any`, so browsers that read
+    // SVG favicons choose the SVG; iOS takes the apple-touch icon
+    // (lib/og/brandIcons.ts, `npm run brand:icons`).
     icons: {
       icon: [
-        { url: FAVICON_SVG_URL, type: 'image/svg+xml' },
-        { url: FAVICON_ICO_URL, sizes: 'any' },
+        { url: BRAND_ICON_URLS.faviconIco, sizes: '16x16 32x32 48x48' },
+        { url: BRAND_ICON_URLS.faviconSvg, type: 'image/svg+xml' },
       ],
+      apple: [{ url: BRAND_ICON_URLS.appleTouchIcon, sizes: '180x180', type: 'image/png' }],
     },
+    ...(manifest ? { manifest } : {}),
     verification: {
       google: 'ZUw5gzqw7CFIEZgCJ2pLy-MhDe7Fdotpc31fS75v3dE',
     },

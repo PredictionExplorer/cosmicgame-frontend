@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
 import {
   artProtocolJsonLd,
   breadcrumbJsonLd,
@@ -151,7 +154,10 @@ describe('JSON-LD generators', () => {
     it('includes name, URL, and logo', () => {
       expect(result.name).toBe('Cosmic Signature');
       expect(result.url).toBe('https://cosmicsignature.com/');
-      expect(result.logo).toBe('https://cosmicsignature.com/images/logo.svg');
+      expect(result.logo).toBe('https://cosmicsignature.com/images/brand/logo-512.png');
+      expect(existsSync(join(process.cwd(), 'public', 'images', 'brand', 'logo-512.png'))).toBe(
+        true,
+      );
       expect(result['@id']).toBe('https://cosmicsignature.com/#organization');
     });
 
@@ -211,6 +217,21 @@ describe('JSON-LD generators', () => {
 
     it('includes genre Generative Art', () => {
       expect(result.genre).toBe('Generative Art');
+    });
+
+    // F294: the art protocol was pictured by the 2023 "© Cosmic" wordmark.
+    it('pictures a real Signature bundled with the site', () => {
+      expect(result.image).toEqual(
+        expect.objectContaining({
+          '@type': 'ImageObject',
+          url: 'https://cosmicsignature.com/images/landing/signature-23.webp',
+          width: 960,
+          height: 621,
+        }),
+      );
+      expect(existsSync(join(process.cwd(), 'public', new URL(result.image.url).pathname))).toBe(
+        true,
+      );
     });
 
     it('has lexicon-safe description', () => {

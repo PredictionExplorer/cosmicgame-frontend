@@ -18,6 +18,7 @@ import {
 import { RootDocument } from '../../root-document';
 import { createRootMetadata, rootViewport, openGraphLocale } from '../../root-metadata';
 
+import { webManifestPath } from './manifest.webmanifest/build-manifest';
 import { Providers } from './providers';
 
 // NOTE: '@rainbow-me/rainbowkit/styles.css' is intentionally imported
@@ -48,6 +49,7 @@ export async function generateMetadata({ params }: Pick<LayoutProps, 'params'>):
     {
       origin: APP_ORIGIN,
       canonical: localeHref(APP_ORIGIN, '/', locale),
+      manifest: webManifestPath(locale),
     },
   );
   return {

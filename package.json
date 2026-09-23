@@ -38,6 +38,7 @@
     "white-paper:pdf": "tsx scripts/generate-white-paper-pdf.ts",
     "og:fonts": "tsx scripts/build-og-fonts.ts",
     "seo:share-check": "tsx scripts/share-metadata-check.ts",
+    "brand:icons": "tsx scripts/build-brand-icons.ts",
     "prepare": "husky"
   },
   "dependencies": {

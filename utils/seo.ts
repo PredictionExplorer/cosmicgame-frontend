@@ -28,6 +28,13 @@ export type CanonicalHost = 'app' | 'landing';
 /** The brand as every share card, `og:site_name`, and tab title spells it, in every locale. */
 export const SITE_NAME = 'Cosmic Signature';
 
+/**
+ * The brand in 12 characters or fewer, where a launcher or home screen would
+ * cut the full name off (the web manifest's `short_name`). The brand is
+ * written in Latin letters in every locale, so one form serves all of them.
+ */
+export const SITE_SHORT_NAME = 'Cosmic Sig';
+
 /** The protocol's X account, emitted as `twitter:site` on every page. */
 export const X_HANDLE = '@CosmicSignature';
 

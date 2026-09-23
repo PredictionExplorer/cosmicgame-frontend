@@ -360,7 +360,7 @@ test.describe('raw HTML SEO', () => {
   }
 
   test('both hosts emit and serve the same versioned favicon assets', async ({ request }) => {
-    const expectedHrefs = ['/favicon.svg?v=20260825', '/favicon.ico?v=20260825'];
+    const expectedHrefs = ['/favicon.ico?v=20260923', '/favicon.svg?v=20260923'];
     let baselineAssets: Buffer[] | undefined;
 
     for (const host of [APP_HOST, LANDING_HOST]) {
@@ -392,6 +392,35 @@ test.describe('raw HTML SEO', () => {
           expect(asset.equals(baselineAssets?.[index] ?? Buffer.alloc(0))).toBe(true);
         });
       }
+    }
+  });
+
+  test('only the app host links its localized web manifest, served as JSON', async ({
+    request,
+  }) => {
+    const manifestHref = (html: string) =>
+      html
+        .match(/<link\b[^>]*rel=["']manifest["'][^>]*>/i)?.[0]
+        .match(/href=["']([^"']+)["']/)?.[1];
+
+    const landing = await request.get('/', { headers: hostHeaders(LANDING_HOST) });
+    expect(manifestHref(await landing.text())).toBeUndefined();
+
+    for (const [path, href, lang] of [
+      ['/', '/en/manifest.webmanifest', 'en'],
+      ['/ja', '/ja/manifest.webmanifest', 'ja'],
+    ] as const) {
+      const page = await request.get(path, { headers: hostHeaders(APP_HOST) });
+      expect(manifestHref(await page.text())).toBe(href);
+      const manifest = await request.get(href, {
+        headers: hostHeaders(APP_HOST),
+        maxRedirects: 0,
+      });
+      expect(manifest.status()).toBe(200);
+      expect(manifest.headers()['content-type']).toContain('application/manifest+json');
+      expect(await manifest.json()).toEqual(
+        expect.objectContaining({ id: '/', lang, theme_color: '#090A11' }),
+      );
     }
   });
 
