@@ -17,6 +17,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 import { readCosmicGameWithFallback } from '@/utils/cosmicGameContractCompat';
+import { percentFromDivisor } from '@/utils/protocolParams';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
@@ -50,17 +51,6 @@ function shouldScheduleLiveCstPreviewTimer(): boolean {
   const testGlobals = globalThis as LiveCstPreviewTestGlobals;
   const isJest = typeof testGlobals.expect === 'function';
   return !isJest || testGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ === true;
-}
-
-/**
- * Turns a contract divisor into the percentage the UI shows. A zero or
- * unreadable divisor would produce `Infinity`/`NaN` and render as
- * "Infinity%", so those return null and the caller keeps the previous value.
- */
-function percentFromDivisor(divisor: unknown): number | null {
-  const value = Number(divisor ?? 1);
-  if (!Number.isFinite(value) || value === 0) return null;
-  return 100 / value;
 }
 
 /** A positive finite number from a contract read; `null` (unknown) for anything else. */

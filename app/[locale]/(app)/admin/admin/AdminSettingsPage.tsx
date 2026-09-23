@@ -1,7 +1,14 @@
 'use client';
 
 import { useId, type ReactNode } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+
+import { formatSeconds } from '@/utils';
+import {
+  buildContracts,
+  CONTRACT_ENTRY_IDS,
+  type ContractEntryCopy,
+} from '@/app/[locale]/(app)/contracts/contractAddressData';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +24,14 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
+import type { DashboardInfo } from '@/services/api/types';
+import { formatUtcDateTimeStamp } from '@/utils/format';
+import {
+  initialDurationSeconds,
+  percentFromDivisor,
+  secondsFromMicroseconds,
+  secondsOrNull,
+} from '@/utils/protocolParams';
 
 function AdminFieldRow({ label, children }: { label: string; children: ReactNode }) {
   const labelId = useId();
@@ -37,9 +52,86 @@ function AdminFieldRow({ label, children }: { label: string; children: ReactNode
   );
 }
 
+/** A parameter row: a read-only current value, or an empty input when the API has no value. */
+interface ParameterField {
+  key: string;
+  /** The formatted current value; `null` when the dashboard does not report it. */
+  value: string | null;
+  /** Rows without an API source keep an editable number input. */
+  editable?: boolean;
+}
+
+const actionButtonClass = 'shrink-0 w-full sm:ml-2 sm:w-auto';
+
 const AdminSettingsPage = () => {
   const t = useTranslations('admin');
+  const tContracts = useTranslations('contracts');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
   const { data, isLoading } = useDashboardInfo();
+  const unavailable = tCommon('status.unavailable');
+
+  const contractCopy = Object.fromEntries(
+    CONTRACT_ENTRY_IDS.map((id) => [
+      id,
+      {
+        name: tContracts(`entries.${id}.name`),
+        description: tContracts(`entries.${id}.description`),
+      },
+    ]),
+  ) as ContractEntryCopy;
+
+  const parameterFields = (dashboard: DashboardInfo): ParameterField[] => {
+    const count = (value: unknown) => (typeof value === 'number' ? String(value) : null);
+    const percent = (value: unknown) => (typeof value === 'number' ? `${value}%` : null);
+    const divisor = (value: unknown) => {
+      const share = percentFromDivisor(value);
+      return share === null
+        ? null
+        : t('settings.values.divisorPercent', { percent: share, divisor: String(value) });
+    };
+    const duration = (seconds: number | null) =>
+      seconds === null ? null : formatSeconds(seconds, locale).trim();
+    const activation = dashboard.CurRoundStats?.ActivationTime;
+    const timeIncrementMicroseconds = dashboard.MainPrizeTimeIncrementInMicroSeconds;
+
+    return [
+      { key: 'ethStellarRecipients', value: count(dashboard.NumRaffleEthWinnersBidding) },
+      { key: 'nftStellarRecipients', value: count(dashboard.NumRaffleNFTWinnersBidding) },
+      { key: 'nftHolderRecipients', value: count(dashboard.NumRaffleNFTWinnersStakingRWalk) },
+      { key: 'signatureAllocationPercentage', value: percent(dashboard.PrizePercentage) },
+      { key: 'publicGoodsPercentage', value: percent(dashboard.CharityPercentage) },
+      { key: 'stellarSelectionPercentage', value: percent(dashboard.RafflePercentage) },
+      { key: 'anchorDistributionPercentage', value: percent(dashboard.StakingPercentage) },
+      { key: 'timeIncrease', value: divisor(dashboard.TimeIncrease) },
+      { key: 'allocationTimeout', value: duration(secondsOrNull(dashboard.TimeoutClaimPrize)) },
+      { key: 'priceIncrease', value: divisor(dashboard.PriceIncrease) },
+      {
+        key: 'gestureTimeIncrement',
+        value: duration(secondsFromMicroseconds(timeIncrementMicroseconds)),
+      },
+      {
+        key: 'initialAllocationSeconds',
+        // `InitialSecondsUntilPrize` carries the divisor, not seconds (see DashboardInfo).
+        value: duration(
+          initialDurationSeconds(timeIncrementMicroseconds, dashboard.InitialSecondsUntilPrize),
+        ),
+      },
+      { key: 'initialGestureCostFraction', value: null, editable: true },
+      {
+        key: 'activationTime',
+        value:
+          typeof activation === 'number' && activation > 0
+            ? formatUtcDateTimeStamp(new Date(activation * 1000), locale)
+            : null,
+      },
+      { key: 'gestureRatio', value: null, editable: true },
+      {
+        key: 'calibrationWindowLength',
+        value: duration(secondsOrNull(dashboard.RoundStartCSTAuctionLength)),
+      },
+    ];
+  };
 
   return (
     <PageShell variant="data" className="max-sm:pb-16">
@@ -69,274 +161,41 @@ const AdminSettingsPage = () => {
             description={t('settings.contractDescription')}
           >
             <div>
-              <AdminFieldRow label={t('settings.fields.cosmicSignatureNft')}>
-                <Input
-                  placeholder={t('settings.placeholders.address')}
-                  className="flex-1 font-mono text-sm"
-                  value={String(data?.ContractAddrs?.CosmicSignatureAddr ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.setAddress')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.cstToken')}>
-                <Input
-                  placeholder={t('settings.placeholders.address')}
-                  className="flex-1 font-mono text-sm"
-                  value={String(data?.ContractAddrs?.CosmicTokenAddr ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.setAddress')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.publicGoodsVault')}>
-                <Input
-                  placeholder={t('settings.placeholders.address')}
-                  className="flex-1 font-mono text-sm"
-                  value={String(data?.ContractAddrs?.CharityWalletAddr ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.setAddress')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.randomWalkNft')}>
-                <Input
-                  placeholder={t('settings.placeholders.address')}
-                  className="flex-1 font-mono text-sm"
-                  value={String(data?.ContractAddrs?.RandomWalkAddr ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.setAddress')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.stellarSelectionWallet')}>
-                <Input
-                  placeholder={t('settings.placeholders.address')}
-                  className="flex-1 font-mono text-sm"
-                  value={String(data?.ContractAddrs?.RaffleWalletAddr ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.setAddress')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.anchoringWallet')}>
-                <Input
-                  placeholder={t('settings.placeholders.address')}
-                  className="flex-1 font-mono text-sm"
-                  value={String(data?.ContractAddrs?.StakingWalletAddr ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.setAddress')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.outreachWallet')}>
-                <Input
-                  placeholder={t('settings.placeholders.address')}
-                  className="flex-1 font-mono text-sm"
-                  value={String(data?.ContractAddrs?.MarketingWalletAddr ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.setAddress')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.businessLogic')}>
-                <Input
-                  placeholder={t('settings.placeholders.address')}
-                  className="flex-1 font-mono text-sm"
-                  value={String(data?.ContractAddrs?.BusinessLogicAddr ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.setAddress')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.ethStellarRecipients')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.NumRaffleEthWinners ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.nftStellarRecipients')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.NumRaffleNFTWinners ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.nftHolderRecipients')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.NumHolderNFTWinners ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.signatureAllocationPercentage')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.PrizePercentage ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.publicGoodsPercentage')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.CharityPercentage ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.stellarSelectionPercentage')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.RafflePercentage ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.anchorDistributionPercentage')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.StakingPercentage ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.timeIncrease')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.TimeIncrease ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.allocationTimeout')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.priceIncrease')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.PriceIncrease ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.nanosecondsExtra')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                  value={String(data?.NanosecondsExtra ?? '')}
-                  readOnly
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.initialAllocationSeconds')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.initialGestureCostFraction')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.activationTime')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.gestureRatio')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
-              <AdminFieldRow label={t('settings.fields.calibrationWindowLength')}>
-                <Input
-                  type="number"
-                  placeholder={t('settings.placeholders.number')}
-                  className="flex-1"
-                />
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
-                  {t('settings.actions.set')}
-                </Button>
-              </AdminFieldRow>
+              {/* The same address mapping and names as the public Contracts page. */}
+              {buildContracts(data.ContractAddrs, contractCopy).map((contract) => (
+                <AdminFieldRow key={contract.id} label={contract.name}>
+                  <Input
+                    placeholder={unavailable}
+                    className="flex-1 font-mono text-sm"
+                    value={contract.address}
+                    readOnly
+                  />
+                  <Button variant="secondary" className={actionButtonClass}>
+                    {t('settings.actions.setAddress')}
+                  </Button>
+                </AdminFieldRow>
+              ))}
+              {parameterFields(data).map((field) => (
+                <AdminFieldRow key={field.key} label={t(`settings.fields.${field.key}`)}>
+                  {field.editable ? (
+                    <Input
+                      type="number"
+                      placeholder={t('settings.placeholders.number')}
+                      className="flex-1"
+                    />
+                  ) : (
+                    <Input
+                      placeholder={unavailable}
+                      className="flex-1 tabular-nums"
+                      value={field.value ?? ''}
+                      readOnly
+                    />
+                  )}
+                  <Button variant="secondary" className={actionButtonClass}>
+                    {t('settings.actions.set')}
+                  </Button>
+                </AdminFieldRow>
+              ))}
               <AdminFieldRow label={t('settings.fields.switchMode')}>
                 <Select defaultValue="runtime">
                   <SelectTrigger className="w-full flex-1">
@@ -347,7 +206,7 @@ const AdminSettingsPage = () => {
                     <SelectItem value="maintenance">{t('settings.modes.maintenance')}</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                <Button variant="secondary" className={actionButtonClass}>
                   {t('settings.actions.set')}
                 </Button>
               </AdminFieldRow>

@@ -18,22 +18,16 @@
     "contractTitle": "Cosmic Signature 컨트랙트",
     "contractDescription": "대시보드 API에서 가져온 컨트랙트 주소와 온체인 매개변수 목록입니다.",
     "placeholders": {
-      "address": "주소를 입력해 주세요",
       "number": "숫자를 입력해 주세요"
     },
     "actions": {
       "setAddress": "주소 설정",
       "set": "설정"
     },
+    "values": {
+      "divisorPercent": "{percent}% (제수 {divisor})"
+    },
     "fields": {
-      "cosmicSignatureNft": "Cosmic Signature NFT(ERC-721) 컨트랙트 주소",
-      "cstToken": "Cosmic Signature CST 토큰(ERC-20) 컨트랙트 주소",
-      "publicGoodsVault": "공공재 금고 컨트랙트 주소",
-      "randomWalkNft": "RandomWalk NFT 컨트랙트 주소",
-      "stellarSelectionWallet": "별빛 선정 지갑 컨트랙트 주소",
-      "anchoringWallet": "앵커링 지갑 컨트랙트 주소",
-      "outreachWallet": "홍보 지갑 컨트랙트 주소",
-      "businessLogic": "비즈니스 로직 컨트랙트 주소",
       "ethStellarRecipients": "사이클별 ETH 별빛 선정 수령자 수",
       "nftStellarRecipients": "사이클별 NFT 별빛 선정 수령자 수",
       "nftHolderRecipients": "사이클별 NFT 보유자 수령자 수",
@@ -44,7 +38,7 @@
       "timeIncrease": "시간 증가",
       "allocationTimeout": "시그니처 배분 회수 제한 시간",
       "priceIncrease": "비용 증가",
-      "nanosecondsExtra": "추가 나노초",
+      "gestureTimeIncrement": "제스처당 추가되는 시간",
       "initialAllocationSeconds": "시그니처 배분까지의 초기 시간 (초)",
       "initialGestureCostFraction": "초기 제스처 비용 비율",
       "activationTime": "활성화 시각",

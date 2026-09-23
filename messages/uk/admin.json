@@ -18,22 +18,16 @@
     "contractTitle": "Контракт Cosmic Signature",
     "contractDescription": "Адреси контрактів та ончейн-параметри з API панелі керування.",
     "placeholders": {
-      "address": "Введіть адресу",
       "number": "Введіть число"
     },
     "actions": {
       "setAddress": "Встановити адресу",
       "set": "Встановити"
     },
+    "values": {
+      "divisorPercent": "{percent}% (дільник {divisor})"
+    },
     "fields": {
-      "cosmicSignatureNft": "Адреса контракту Cosmic Signature NFT (ERC-721)",
-      "cstToken": "Адреса контракту токена Cosmic Signature CST (ERC-20)",
-      "publicGoodsVault": "Адреса контракту сховища суспільних благ",
-      "randomWalkNft": "Адреса контракту Random Walk NFT",
-      "stellarSelectionWallet": "Адреса контракту гаманця зоряного відбору",
-      "anchoringWallet": "Адреса контракту гаманця закріплення",
-      "outreachWallet": "Адреса контракту гаманця просування",
-      "businessLogic": "Адреса контракту бізнес-логіки",
       "ethStellarRecipients": "Кількість отримувачів зоряного відбору ETH за цикл",
       "nftStellarRecipients": "Кількість отримувачів зоряного відбору NFT за цикл",
       "nftHolderRecipients": "Кількість отримувачів серед власників NFT за цикл",
@@ -44,7 +38,7 @@
       "timeIncrease": "Приріст часу",
       "allocationTimeout": "Час очікування до отримання розподілу Сигнатури",
       "priceIncrease": "Приріст вартості",
-      "nanosecondsExtra": "Додаткові наносекунди",
+      "gestureTimeIncrement": "Час, що додається за жест",
       "initialAllocationSeconds": "Початкова кількість секунд до розподілу Сигнатури",
       "initialGestureCostFraction": "Початкова частка вартості жесту",
       "activationTime": "Час активації",

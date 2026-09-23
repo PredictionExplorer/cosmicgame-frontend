@@ -18,22 +18,16 @@
     "contractTitle": "Cosmic Signature 合约",
     "contractDescription": "控制面板 API 提供的合约地址与链上参数。",
     "placeholders": {
-      "address": "在此输入地址",
       "number": "在此输入数值"
     },
     "actions": {
       "setAddress": "设置地址",
       "set": "设置"
     },
+    "values": {
+      "divisorPercent": "{percent}%（除数 {divisor}）"
+    },
     "fields": {
-      "cosmicSignatureNft": "Cosmic Signature NFT（ERC-721）合约地址",
-      "cstToken": "Cosmic Signature CST 代币（ERC-20）合约地址",
-      "publicGoodsVault": "公共物品金库合约地址",
-      "randomWalkNft": "Random Walk NFT 合约地址",
-      "stellarSelectionWallet": "星选钱包合约地址",
-      "anchoringWallet": "锚定钱包合约地址",
-      "outreachWallet": "推广钱包合约地址",
-      "businessLogic": "业务逻辑合约地址",
       "ethStellarRecipients": "每个周期的 ETH 星选获配者人数",
       "nftStellarRecipients": "每个周期的 NFT 星选获配者人数",
       "nftHolderRecipients": "每个周期的 NFT 持有者获配人数",
@@ -44,7 +38,7 @@
       "timeIncrease": "时间增量",
       "allocationTimeout": "取回签名分配的超时时间",
       "priceIncrease": "价格增幅",
-      "nanosecondsExtra": "额外纳秒数",
+      "gestureTimeIncrement": "每笔落笔增加的时间",
       "initialAllocationSeconds": "距签名分配的初始秒数",
       "initialGestureCostFraction": "初始落笔价格比例",
       "activationTime": "启用时间",

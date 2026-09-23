@@ -9,7 +9,7 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDonationsWithInfoById: (...args: unknown[]) => mockUseDonationsWithInfoById(...args),
 }));
 
-const donation = {
+const record = {
   EvtLogId: 18955,
   TxHash: '0x7545e61f9ae02f59dc2b1951edf97549b258eab28a40927f78178c11fec384c5',
   TimeStamp: 1782078578,
@@ -31,12 +31,12 @@ beforeEach(() => jest.clearAllMocks());
 
 describe('EthDonationDetailPage', () => {
   it('renders a found contribution with its contributor link', () => {
-    mockUseDonationsWithInfoById.mockReturnValue(query({ data: donation }));
+    mockUseDonationsWithInfoById.mockReturnValue(query({ data: record }));
     render(<EthDonationDetailPage id={3} />);
 
-    expect(screen.getByRole('link', { name: donation.DonorAddr })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: record.DonorAddr })).toHaveAttribute(
       'href',
-      `/user/${donation.DonorAddr}`,
+      `/user/${record.DonorAddr}`,
     );
     expect(screen.getByText('20.00 ETH')).toBeInTheDocument();
   });
@@ -62,7 +62,7 @@ describe('EthDonationDetailPage', () => {
   });
 
   it('never renders an empty contributor link', async () => {
-    mockUseDonationsWithInfoById.mockReturnValue(query({ data: { ...donation, DonorAddr: '' } }));
+    mockUseDonationsWithInfoById.mockReturnValue(query({ data: { ...record, DonorAddr: '' } }));
     const { container } = render(<EthDonationDetailPage id={3} />);
 
     expect(container.querySelector('a[href="/user/"]')).toBeNull();

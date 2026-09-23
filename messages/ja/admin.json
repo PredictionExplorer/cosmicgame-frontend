@@ -18,22 +18,16 @@
     "contractTitle": "Cosmic Signatureコントラクト",
     "contractDescription": "ダッシュボードAPIから取得したコントラクトアドレスとオンチェーンのパラメーター。",
     "placeholders": {
-      "address": "アドレスを入力",
       "number": "数値を入力"
     },
     "actions": {
       "setAddress": "アドレスを設定",
       "set": "設定"
     },
+    "values": {
+      "divisorPercent": "{percent}%（除数{divisor}）"
+    },
     "fields": {
-      "cosmicSignatureNft": "Cosmic Signature NFT（ERC-721）コントラクトアドレス",
-      "cstToken": "Cosmic Signature CSTトークン（ERC-20）コントラクトアドレス",
-      "publicGoodsVault": "公共財金庫コントラクトアドレス",
-      "randomWalkNft": "RandomWalk NFTコントラクトアドレス",
-      "stellarSelectionWallet": "星選ウォレットコントラクトアドレス",
-      "anchoringWallet": "係留ウォレットコントラクトアドレス",
-      "outreachWallet": "広報ウォレットコントラクトアドレス",
-      "businessLogic": "ビジネスロジックコントラクトアドレス",
       "ethStellarRecipients": "サイクルあたりのETH星選受領者数",
       "nftStellarRecipients": "サイクルあたりのNFT星選受領者数",
       "nftHolderRecipients": "サイクルあたりのNFT保有者受領者数",
@@ -44,7 +38,7 @@
       "timeIncrease": "時間増加",
       "allocationTimeout": "シグネチャー配分の受け取りタイムアウト",
       "priceIncrease": "価格上昇",
-      "nanosecondsExtra": "追加ナノ秒",
+      "gestureTimeIncrement": "一筆あたりに加わる時間",
       "initialAllocationSeconds": "シグネチャー配分までの初期秒数",
       "initialGestureCostFraction": "初期一筆の費用の比率",
       "activationTime": "有効化時刻",
