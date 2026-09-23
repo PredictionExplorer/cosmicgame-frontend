@@ -17,6 +17,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 import { readCosmicGameWithFallback } from '@/utils/cosmicGameContractCompat';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { percentFromDivisor } from '@/utils/protocolParams';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -55,8 +56,8 @@ function shouldScheduleLiveCstPreviewTimer(): boolean {
 
 /** A positive finite number from a contract read; `null` (unknown) for anything else. */
 function positiveOrNull(value: unknown): number | null {
-  const numeric = typeof value === 'bigint' ? Number(value) : Number(value ?? Number.NaN);
-  return Number.isFinite(numeric) && numeric > 0 ? numeric : null;
+  const numeric = toFiniteNumber(value);
+  return numeric !== null && numeric > 0 ? numeric : null;
 }
 
 function getLiveCstPreviewRefreshMs(): number {

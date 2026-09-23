@@ -3,9 +3,7 @@
  * metric has one definition on every page.
  */
 
-function finiteOrNull(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
-}
+import { toFiniteNumber } from '@/utils/finiteNumber';
 
 /**
  * The live Anchor Distribution pool (`StakingAmountEth`) divided by the indexed count of
@@ -26,8 +24,8 @@ export function distributionPerAnchoredNft(
   stakingPoolEth: unknown,
   totalAnchoredFromStats: unknown,
 ): DistributionPerAnchoredNft {
-  const pool = finiteOrNull(stakingPoolEth);
-  const count = finiteOrNull(totalAnchoredFromStats);
+  const pool = toFiniteNumber(stakingPoolEth);
+  const count = toFiniteNumber(totalAnchoredFromStats);
   if (pool === null || count === null || pool < 0) return { status: 'unavailable' };
   if (count <= 0) return { status: 'noneAnchored' };
   return { status: 'available', perNftEth: pool / count };
