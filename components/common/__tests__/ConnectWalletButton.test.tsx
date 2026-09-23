@@ -29,14 +29,26 @@ jest.mock('../../../hooks/useMetaMaskWatchAsset', () => ({
 
 const mockRequestConnectModal = jest.fn();
 const mockWarmConnectModal = jest.fn();
+let mockConnectPending = false;
 
-jest.mock('../../../contexts/WalletUiContext', () => ({
-  useWalletUi: () => ({
+jest.mock('../../../contexts/WalletUiContext', () => {
+  const walletUi = () => ({
     requestConnectModal: mockRequestConnectModal,
     warmConnectModal: mockWarmConnectModal,
-  }),
-  // test-utils wraps every render with the real provider component name.
-  WalletUiProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    connectPending: mockConnectPending,
+  });
+  return {
+    useWalletUi: walletUi,
+    useOptionalWalletUi: walletUi,
+    // test-utils wraps every render with the real provider component name.
+    WalletUiProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  };
+});
+
+const mockDisconnectAsync = jest.fn().mockResolvedValue(undefined);
+jest.mock('wagmi', () => ({
+  ...jest.requireActual('../../../__mocks__/wagmi'),
+  useDisconnect: () => ({ disconnectAsync: mockDisconnectAsync, isPending: false }),
 }));
 
 jest.mock('../../ui/dropdown-menu', () => ({
@@ -49,10 +61,10 @@ jest.mock('../../ui/dropdown-menu', () => ({
   ),
 }));
 
-function renderWalletButton(liquid = false) {
+function renderWalletButton(liquid = false, isMobileView = false) {
   render(
     <ConnectWalletButton
-      isMobileView={false}
+      isMobileView={isMobileView}
       loading={false}
       balance={{
         ETH: 1,
@@ -69,8 +81,43 @@ function renderWalletButton(liquid = false) {
 describe('ConnectWalletButton', () => {
   beforeEach(() => {
     mockAccount = ACCOUNT;
+    mockConnectPending = false;
     mockRequestConnectModal.mockClear();
     mockWarmConnectModal.mockClear();
+    mockDisconnectAsync.mockClear();
+  });
+
+  it('shows a busy spinner while the wallet list downloads', () => {
+    mockAccount = null;
+    mockConnectPending = true;
+    renderWalletButton();
+
+    const trigger = screen.getByTestId('connect-wallet-button');
+    expect(trigger).toHaveAttribute('aria-busy', 'true');
+    expect(trigger).toHaveTextContent('wallet.connect.opening');
+  });
+
+  it('offers explorer, switch wallet and disconnect in the desktop menu', async () => {
+    renderWalletButton();
+
+    expect(screen.getByRole('link', { name: /wallet\.account\.viewOnExplorer/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining(`/address/${ACCOUNT}`),
+    );
+    expect(screen.getByText('wallet.account.switchWallet')).toBeInTheDocument();
+    expect(screen.getByText('wallet.account.disconnect')).toBeInTheDocument();
+  });
+
+  it('makes the phone-width wallet pill open the account panel', async () => {
+    renderWalletButton(false, true);
+
+    const trigger = screen.getByTestId('wallet-account-trigger');
+    expect(trigger).toHaveAccessibleName(/0xabcd/);
+    fireEvent.click(trigger);
+
+    expect(await screen.findByTestId('wallet-account-panel')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'wallet.account.disconnect' }));
+    expect(mockDisconnectAsync).toHaveBeenCalledTimes(1);
   });
 
   it('renders the deferred connect trigger when disconnected', () => {

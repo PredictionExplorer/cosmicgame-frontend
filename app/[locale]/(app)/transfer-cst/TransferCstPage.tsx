@@ -1,17 +1,17 @@
 'use client';
 
-import { SendHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { CstTransferForm } from '@/components/tokens/CstTransferForm';
-import { EmptyState } from '@/components/ui/empty-state';
+import { WalletRequiredState } from '@/components/ui/wallet-required-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 export default function TransferCstPage() {
   const t = useTranslations('myPages');
+  const tWallet = useTranslations('wallet');
   const { account, active } = useActiveWeb3React();
 
   return (
@@ -30,9 +30,8 @@ export default function TransferCstPage() {
         />
 
         {!active || !account ? (
-          <EmptyState
-            icon={<SendHorizontal className="h-8 w-8 text-muted-foreground/50" />}
-            title={t('shared.walletNotConnected')}
+          <WalletRequiredState
+            title={tWallet('required.transferCst.title')}
             description={t('transferCst.page.walletDescription')}
           />
         ) : (

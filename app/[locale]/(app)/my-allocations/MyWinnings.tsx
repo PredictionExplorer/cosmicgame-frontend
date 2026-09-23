@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Wallet, Trophy, Gift, Coins } from 'lucide-react';
+import { Trophy, Gift, Coins } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { useRouter } from '@/i18n/navigation';
@@ -11,6 +11,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { EmptyState } from '@/components/ui/empty-state';
+import { WalletRequiredState } from '@/components/ui/wallet-required-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { Spinner } from '@/components/ui/spinner';
 import { CustomPagination } from '@/components/common/CustomPagination';
@@ -48,6 +49,7 @@ interface UnclaimedDonatedNFT {
 
 export default function MyWinnings() {
   const t = useTranslations('myPages');
+  const tWallet = useTranslations('wallet');
   const { account } = useActiveWeb3React();
   const { apiData: status } = useApiData();
   const router = useRouter();
@@ -142,10 +144,10 @@ export default function MyWinnings() {
           eyebrow={<SectionEyebrow tone="solar">{t('allocations.eyebrow')}</SectionEyebrow>}
           title={t('allocations.title')}
         />
-        <EmptyState
-          icon={<Wallet className="h-8 w-8 text-muted-foreground/50" />}
-          title={t('shared.walletNotConnected')}
+        <WalletRequiredState
+          title={tWallet('required.allocations.title')}
           description={t('allocations.walletDescription')}
+          publicLink={{ href: '/allocation', label: tWallet('required.allocations.publicLink') }}
         />
       </PageShell>
     );

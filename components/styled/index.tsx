@@ -137,13 +137,6 @@ export function Wallet({
   );
 }
 
-export function MobileWallet({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement> & { label?: string }) {
-  return <Wallet className={cn('mx-auto ml-0', className)} {...props} />;
-}
-
 export function ConnectButton({
   className,
   ...props

@@ -62,8 +62,12 @@ describe('MyTokens', () => {
     mockAccount = null;
     mockActive = false;
     render(<MyWallet />);
-    expect(screen.getByText('myPages.shared.walletNotConnected')).toBeInTheDocument();
+    expect(screen.getByText('wallet.required.nfts.title')).toBeInTheDocument();
     expect(screen.getByText('myPages.tokens.page.walletDescription')).toBeInTheDocument();
+    expect(screen.getByTestId('connect-wallet-button')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /wallet\.required\.nfts\.publicLink/ }),
+    ).toHaveAttribute('href', '/gallery');
     expect(mockUseCSTTokensByUser).toHaveBeenCalledWith(undefined);
   });
 

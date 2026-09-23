@@ -127,8 +127,12 @@ describe('MyWinnings', () => {
   it('prompts login when no account is connected', () => {
     mockAccount = null;
     render(<MyWinnings />);
-    expect(screen.getByText('myPages.shared.walletNotConnected')).toBeInTheDocument();
+    expect(screen.getByText('wallet.required.allocations.title')).toBeInTheDocument();
     expect(screen.getByText('myPages.allocations.walletDescription')).toBeInTheDocument();
+    expect(screen.getByTestId('connect-wallet-button')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /wallet\.required\.allocations\.publicLink/ }),
+    ).toHaveAttribute('href', '/allocation');
   });
 
   it('shows error state when queries fail', () => {
