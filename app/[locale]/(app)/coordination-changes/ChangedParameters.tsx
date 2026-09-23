@@ -7,12 +7,20 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { useSystemModelist, useSystemEvents } from '@/hooks/useApiQuery';
 import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
+import { COORDINATION_EVENTS_END_ID } from '@/services/api/system';
 
+/**
+ * Lists the same rows as `get_coordination_events` (the server summary's count): admin events
+ * from the latest system-mode change onward.
+ */
 function ChangedParameters({ seoSummary }: { seoSummary?: ReactNode }) {
   const t = useTranslations('coordination');
   const { data: modeList, isLoading: isLoadingModeList } = useSystemModelist();
   const startId = modeList != null ? ((modeList as { EvtLogId: number }[])[0]?.EvtLogId ?? 0) : -1;
-  const { data: events = [], isLoading: isLoadingEvents } = useSystemEvents(startId, 9999999999);
+  const { data: events = [], isLoading: isLoadingEvents } = useSystemEvents(
+    startId,
+    COORDINATION_EVENTS_END_ID,
+  );
   const loading = isLoadingModeList || isLoadingEvents;
 
   return (

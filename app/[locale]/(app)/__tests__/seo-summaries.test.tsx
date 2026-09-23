@@ -1,6 +1,7 @@
 import { getLocale } from 'next-intl/server';
 
 import { protocolFacts } from '@/content/protocol-facts';
+import seoMessages from '@/messages/en/seo.json';
 import statisticsMessages from '@/messages/en/statistics.json';
 import zhSeoMessages from '@/messages/zh/seo.json';
 
@@ -23,12 +24,12 @@ import {
 import { get_marketing_rewards } from '../../../../services/api/marketing';
 import {
   get_staking_cst_actions,
+  get_staking_cst_rewards,
   get_staking_rwalk_actions,
+  get_staking_rwalk_mints_global,
 } from '../../../../services/api/anchoring';
-import {
-  get_donations_cg_with_info_list,
-  get_donations_nft_list,
-} from '../../../../services/api/donations';
+import { get_donations_both, get_donations_nft_list } from '../../../../services/api/donations';
+import { get_coordination_events } from '../../../../services/api/system';
 import { get_named_nfts, get_used_rwlk_nfts } from '../../../../services/api/tokens';
 // lexicon-allow-end
 
@@ -39,8 +40,6 @@ jest.mock('../../../../services/api/rounds', () => ({
   get_claim_history: jest.fn(() => Promise.resolve([])),
 }));
 jest.mock('../../../../services/api/anchoring', () => ({
-  get_staked_cst_tokens: jest.fn(() => Promise.resolve([])),
-  get_staked_rwalk_tokens: jest.fn(() => Promise.resolve([])),
   get_staking_cst_actions: jest.fn(),
   get_staking_cst_rewards: jest.fn(() => Promise.resolve([])),
   get_staking_rwalk_actions: jest.fn(),
@@ -50,14 +49,14 @@ jest.mock('../../../../services/api/donations', () => ({
   get_charity_cg_deposits: jest.fn(() => Promise.resolve([])),
   get_charity_voluntary: jest.fn(() => Promise.resolve([])),
   get_charity_withdrawals: jest.fn(() => Promise.resolve([])),
-  get_donations_cg_with_info_list: jest.fn(),
+  get_donations_both: jest.fn(),
   get_donations_nft_list: jest.fn(),
 }));
 jest.mock('../../../../services/api/marketing', () => ({
   get_marketing_rewards: jest.fn(),
 }));
 jest.mock('../../../../services/api/system', () => ({
-  get_system_modelist: jest.fn(() => Promise.resolve([])),
+  get_coordination_events: jest.fn(() => Promise.resolve([])),
 }));
 jest.mock('../../../../services/api/tokens', () => ({
   get_named_nfts: jest.fn(),
@@ -78,8 +77,17 @@ const mockCstActions = get_staking_cst_actions as jest.MockedFunction<
 const mockRwalkActions = get_staking_rwalk_actions as jest.MockedFunction<
   typeof get_staking_rwalk_actions
 >;
-const mockDirectContributions = get_donations_cg_with_info_list as jest.MockedFunction<
-  typeof get_donations_cg_with_info_list
+const mockCstRewards = get_staking_cst_rewards as jest.MockedFunction<
+  typeof get_staking_cst_rewards
+>;
+const mockRwalkImprints = get_staking_rwalk_mints_global as jest.MockedFunction<
+  typeof get_staking_rwalk_mints_global
+>;
+const mockDirectContributions = get_donations_both as jest.MockedFunction<
+  typeof get_donations_both
+>;
+const mockCoordinationEvents = get_coordination_events as jest.MockedFunction<
+  typeof get_coordination_events
 >;
 const mockAttachedNfts = get_donations_nft_list as jest.MockedFunction<
   typeof get_donations_nft_list
@@ -128,8 +136,11 @@ describe('server-visible SEO summaries', () => {
       ReturnType<typeof get_staking_rwalk_actions>
     >);
     mockDirectContributions.mockResolvedValue([{ AmountEth: 1, DonorAddr: '0xabc' }] as Awaited<
-      ReturnType<typeof get_donations_cg_with_info_list>
+      ReturnType<typeof get_donations_both>
     >);
+    mockCstRewards.mockResolvedValue([]);
+    mockRwalkImprints.mockResolvedValue([]);
+    mockCoordinationEvents.mockResolvedValue([]);
     mockAttachedNfts.mockResolvedValue([{ TokenAddr: '0xabc', DonorAddr: '0xdef' }] as Awaited<
       ReturnType<typeof get_donations_nft_list>
     >);
@@ -265,6 +276,134 @@ describe('server-visible SEO summaries', () => {
         name: 'More information about Total Signature Allocation ETH',
       }),
     ).toBeInTheDocument();
+  });
+
+  describe('figures reconcile with their data source', () => {
+    type Rows<F extends (...args: never[]) => unknown> = Awaited<ReturnType<F>>;
+
+    /** The rendered figure of the summary card with the given catalog key. */
+    const cardFigure = (key: string) => {
+      const card = document.querySelector(`[data-summary-card="${key}"] dd`);
+      if (!card) throw new Error(`no summary card ${key}`);
+      return card;
+    };
+
+    it('sums only ETH allocation record types into ETH Allocated', async () => {
+      // The /allocation-finalized card once read "48,028 ETH": every 1,000 CST row was
+      // summed as 1,000 ETH, and a timeout retrieval (type 18) repeats a type-10 deposit.
+      mockGetClaimHistory.mockResolvedValue([
+        { RecordType: 0, AmountEth: 11.0616, WinnerAddr: '0xaaa' },
+        { RecordType: 7, AmountEth: 3.5397, WinnerAddr: '0xbbb' },
+        { RecordType: 10, AmountEth: 0.4596, WinnerAddr: '0xccc' },
+        { RecordType: 15, AmountEth: 2.6548, WinnerAddr: '0xddd' },
+        { RecordType: 1, AmountEth: 1000, WinnerAddr: '0xaaa' },
+        { RecordType: 11, AmountEth: 1000, WinnerAddr: '0xccc' },
+        { RecordType: 2, AmountEth: 0, WinnerAddr: '0xaaa' },
+        { RecordType: 18, AmountEth: 0.4596, WinnerAddr: '0xeee' },
+      ] as Rows<typeof get_claim_history>);
+
+      render(await PublicDataRouteSeoSummary({ route: 'allocation-finalized' }));
+
+      const copy = seoMessages.publicData.routes['allocation-finalized'].cards;
+      expect(screen.getByText(copy.eth.label)).toBeInTheDocument();
+      expect(cardFigure('eth')).toHaveTextContent('17.7157 ETH');
+      expect(cardFigure('records')).toHaveTextContent('8');
+      expect(cardFigure('recipients')).toHaveTextContent('5');
+      expect(screen.queryByText(/2,0\d\d/)).not.toBeInTheDocument();
+    });
+
+    it('shows the ETH Gesture Cost from CurBidPriceEth, never the CST reward', async () => {
+      mockGetDashboardInfo.mockResolvedValue({
+        ...dashboard,
+        CurBidPriceEth: 0.10210695701197195,
+        ParticipationCstReward: 185.6693,
+      } as unknown as Awaited<ReturnType<typeof get_dashboard_info>>);
+
+      render(await PublicDataRouteSeoSummary({ route: 'imprint' }));
+
+      expect(cardFigure('cost')).toHaveTextContent('0.1021 ETH');
+      expect(screen.queryByText(/185/)).not.toBeInTheDocument();
+      expect(cardFigure('discount')).toHaveTextContent(
+        `${protocolFacts.randomWalkDiscountPercentage}%`,
+      );
+    });
+
+    it('shows Outreach CST Allocated in CST, not as an ETH reserve', async () => {
+      mockGetDashboardInfo.mockResolvedValue({
+        ...dashboard,
+        MainStats: { ...dashboard.MainStats, TotalMktRewardsEth: 5999 },
+      } as unknown as Awaited<ReturnType<typeof get_dashboard_info>>);
+
+      render(await PublicDataRouteSeoSummary({ route: 'marketing' }));
+
+      const copy = seoMessages.publicData.routes.marketing.cards;
+      expect(screen.getByText(copy.allocatedCst.label)).toBeInTheDocument();
+      expect(cardFigure('allocatedCst')).toHaveTextContent('5,999 CST');
+      expect(screen.queryByText(/5,999 ETH/)).not.toBeInTheDocument();
+    });
+
+    it('builds the direct-contribution cards from the table source', async () => {
+      const rows = [
+        { AmountEth: 20, DonorAddr: '0x4D39' },
+        { AmountEth: 10, DonorAddr: '0xfc79' },
+        { AmountEth: 0.5, DonorAddr: '0x4D39' },
+      ] as Rows<typeof get_donations_both>;
+      mockDirectContributions.mockResolvedValue(rows);
+
+      render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
+
+      expect(mockDirectContributions).toHaveBeenCalled();
+      expect(cardFigure('records')).toHaveTextContent(String(rows.length));
+      expect(cardFigure('totalEth')).toHaveTextContent('30.5 ETH');
+      expect(cardFigure('contributors')).toHaveTextContent('2');
+    });
+
+    it('counts the coordination events the table lists, not the mode list', async () => {
+      mockCoordinationEvents.mockResolvedValue([{}, {}] as Rows<typeof get_coordination_events>);
+
+      render(await PublicDataRouteSeoSummary({ route: 'coordination-changes' }));
+
+      expect(cardFigure('records')).toHaveTextContent('2');
+    });
+
+    it('splits anchoring records into ETH deposits and Stellar Selection imprints', async () => {
+      mockCstRewards.mockResolvedValue([{}] as Rows<typeof get_staking_cst_rewards>);
+      mockRwalkImprints.mockResolvedValue(
+        Array.from({ length: 20 }, () => ({})) as Rows<typeof get_staking_rwalk_mints_global>,
+      );
+
+      render(await PublicDataRouteSeoSummary({ route: 'anchoring' }));
+
+      expect(cardFigure('actions')).toHaveTextContent('2');
+      expect(cardFigure('ethDeposits')).toHaveTextContent('1');
+      expect(cardFigure('stellarImprints')).toHaveTextContent('20');
+      expect(document.querySelector('[data-summary-card="tokens"]')).toBeNull();
+    });
+
+    it('renders a failed read as unavailable, never as a confident zero', async () => {
+      mockDirectContributions.mockRejectedValue(new Error('Network response was not OK'));
+
+      render(await PublicDataRouteSeoSummary({ route: 'eth-contribution' }));
+
+      for (const key of ['records', 'totalEth', 'contributors']) {
+        const figure = cardFigure(key);
+        expect(figure).toHaveTextContent(seoMessages.publicData.common.unavailable);
+        expect(figure).toHaveTextContent('—');
+        expect(figure).not.toHaveTextContent(/\d/);
+      }
+    });
+
+    it('marks only the cards whose read failed as unavailable', async () => {
+      mockGetDashboardInfo.mockRejectedValue(new Error('Network response was not OK'));
+
+      render(await PublicDataRouteSeoSummary({ route: 'marketing' }));
+
+      expect(cardFigure('allocatedCst')).toHaveTextContent(
+        seoMessages.publicData.common.unavailable,
+      );
+      expect(cardFigure('records')).toHaveTextContent('1');
+      expect(cardFigure('contributors')).toHaveTextContent('1');
+    });
   });
 
   it('renders every shared data-route surface in Chinese without English fallback copy', async () => {

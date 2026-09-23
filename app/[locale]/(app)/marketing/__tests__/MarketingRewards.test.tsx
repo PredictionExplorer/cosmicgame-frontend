@@ -56,7 +56,7 @@ function MockStats(props: Record<string, unknown>) {
   return (
     <div
       data-testid="stats"
-      data-total={props.totalRewardsEth}
+      data-total={props.totalAllocatedCst}
       data-marketers={props.activeMarketers}
       data-transactions={props.rewardTransactions}
     >

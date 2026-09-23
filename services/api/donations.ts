@@ -175,7 +175,10 @@ export function get_donations_both_by_round(
   }, []);
 }
 
-/** Fetches all combined (direct + voluntary) Cosmic Game donations. */
+/**
+ * Fetches every direct ETH contribution to the protocol — simple contributions and those that
+ * carry a note — unpaged. The /eth-contribution table and its summary cards both read this.
+ */
 export function get_donations_both(opts?: ApiRequestOptions): Promise<ETHDonation[]> {
   return apiCall(async () => {
     const { data } = await apiGet(getAPIUrl('donations/eth/both/all'), opts);

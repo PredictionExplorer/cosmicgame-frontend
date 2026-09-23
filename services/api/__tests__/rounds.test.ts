@@ -89,7 +89,6 @@ const mockDashboard = (overrides: Record<string, unknown> = {}) => ({
   PrizeClaimTs: 1_700_000_000,
   TsRoundStart: 1_699_000_000,
   LastBidderAddr: '0xabc',
-  GestureCostEth: 0.001,
   StakingAmountEth: 0.5,
   NumRaffleNFTWinnersBidding: 3,
   NumRaffleNFTWinnersStakingRWalk: 2,
@@ -379,7 +378,7 @@ describe('rounds API', () => {
   describe('get_claim_history', () => {
     it('returns flattened claim history on success', async () => {
       mockedAxios.get.mockResolvedValue({
-        data: { GlobalPrizeHistory: [mockTx(1), mockTx(2)] },
+        data: { GlobalPrizeHistory: [mockClaim(1), mockClaim(2)] },
       });
 
       const result = await get_claim_history();
@@ -387,9 +386,18 @@ describe('rounds API', () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(result[1]).toHaveProperty('TxHash', '0x2');
+      expect(result[0]).toHaveProperty('RecordType', 0);
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/prizes\/history\/global/),
       );
+    });
+
+    it('rejects rows without a RecordType, since totals depend on it', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { GlobalPrizeHistory: [mockTx(1)] },
+      });
+
+      await expect(get_claim_history()).rejects.toThrow(/schemaMismatch:WinningHistory\[global\]/);
     });
 
     it('returns empty array when GlobalPrizeHistory is missing', async () => {

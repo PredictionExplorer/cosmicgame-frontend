@@ -302,9 +302,9 @@ const StatisticsHubPanel = () => {
             tooltip={t('metrics.cstGestures.tooltip')}
           />
           <StatisticsItem
-            title={t('metrics.outreachReserve.label')}
+            title={t('metrics.outreachCstAllocated.label')}
             value={formatCSTValue(data.MainStats.TotalMktRewardsEth)}
-            tooltip={t('metrics.outreachReserve.tooltip')}
+            tooltip={t('metrics.outreachCstAllocated.tooltip')}
           />
           <StatisticsItem
             title={t('metrics.outreachTransactions.label')}

@@ -45,11 +45,13 @@
           "actions": {
             "label": "Anchor / Release Actions"
           },
-          "tokens": {
-            "label": "Currently Anchored Tokens"
+          "ethDeposits": {
+            "label": "ETH Anchor Distribution Deposits",
+            "tooltip": "ETH deposits into the Anchor Distribution for anchored Cosmic Signature NFTs. Each deposit is shared among the NFTs anchored when it is made."
           },
-          "distributions": {
-            "label": "Anchor Distribution Records"
+          "stellarImprints": {
+            "label": "Anchored-NFT Stellar Selection Imprints",
+            "tooltip": "Cosmic Signature NFTs imprinted for anchored RandomWalk NFTs through Anchored-NFT Stellar Selection."
           }
         }
       },
@@ -67,8 +69,8 @@
           "records": {
             "label": "Outreach Allocation Records"
           },
-          "reserve": {
-            "label": "Outreach Reserve"
+          "allocatedCst": {
+            "label": "Outreach CST Allocated"
           },
           "contributors": {
             "label": "Unique Outreach Contributors"
@@ -153,10 +155,12 @@
         },
         "cards": {
           "records": {
-            "label": "Retrieved Allocation Records"
+            "label": "Allocation Records",
+            "tooltip": "Every allocation record across finalized cycles, including ETH, CST and NFT allocations."
           },
           "eth": {
-            "label": "ETH Retrieved"
+            "label": "ETH Allocated",
+            "tooltip": "The sum of Signature Allocation, Chrono-Warrior, Stellar Selection and Anchor Distribution ETH across finalized cycles. CST and NFT allocations are not included."
           },
           "recipients": {
             "label": "Recipient Wallets"

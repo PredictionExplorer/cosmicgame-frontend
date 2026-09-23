@@ -153,9 +153,9 @@
       "label": "Nét bút bằng CST",
       "tooltip": "Số nét bút đặt bằng CST thay vì ETH trong các chu kỳ được lập chỉ mục."
     },
-    "outreachReserve": {
-      "label": "Dự trữ truyền thông",
-      "tooltip": "CST được khắc cho những người đóng góp truyền thông và hệ sinh thái, tách biệt với CST tham gia theo từng nét bút và CST ghi nhận đi kèm NFT."
+    "outreachCstAllocated": {
+      "label": "Tổng CST phân bổ truyền thông",
+      "tooltip": "CST đã chuyển từ Dự trữ truyền thông đến những người đóng góp truyền thông và hệ sinh thái cho đến nay, tách biệt với CST tham gia theo từng nét bút và CST ghi nhận đi kèm NFT."
     },
     "outreachTransactions": {
       "label": "Giao dịch truyền thông",

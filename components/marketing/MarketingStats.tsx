@@ -97,13 +97,14 @@ function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCard
 }
 
 export interface MarketingStatsProps {
-  totalRewardsEth: number;
+  /** CST sent from the Outreach Reserve so far (`MainStats.TotalMktRewardsEth`, a CST amount). */
+  totalAllocatedCst: number;
   activeMarketers: number;
   rewardTransactions: number;
 }
 
 export function MarketingStats({
-  totalRewardsEth,
+  totalAllocatedCst,
   activeMarketers,
   rewardTransactions,
 }: MarketingStatsProps) {
@@ -117,7 +118,7 @@ export function MarketingStats({
       <div className="grid gap-6 sm:grid-cols-3">
         <StatCard
           label={t('stats.totalAllocations.label')}
-          value={totalRewardsEth}
+          value={totalAllocatedCst}
           suffix="CST"
           decimals={2}
           tooltip={t('stats.totalAllocations.tooltip')}

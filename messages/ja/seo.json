@@ -45,11 +45,13 @@
           "actions": {
             "label": "係留 / 解除の操作"
           },
-          "tokens": {
-            "label": "現在係留中のトークン"
+          "ethDeposits": {
+            "label": "ETH係留配分の積立回数",
+            "tooltip": "係留中のCosmic Signature NFTのために係留配分へETHが積み立てられた回数です。各積立分は、積立時点で係留されているNFTで分け合います。"
           },
-          "distributions": {
-            "label": "係留配分の記録"
+          "stellarImprints": {
+            "label": "係留NFT星選による刻印数",
+            "tooltip": "係留NFT星選を通じて、係留中のRandomWalk NFTのために刻印されたCosmic Signature NFTの数です。"
           }
         }
       },
@@ -67,8 +69,8 @@
           "records": {
             "label": "広報配分の記録"
           },
-          "reserve": {
-            "label": "広報準備金"
+          "allocatedCst": {
+            "label": "広報配分CSTの総量"
           },
           "contributors": {
             "label": "ユニーク広報貢献者"
@@ -153,10 +155,12 @@
         },
         "cards": {
           "records": {
-            "label": "受け取り済み配分の記録"
+            "label": "配分の記録",
+            "tooltip": "確定したサイクルにわたるすべての配分の記録で、ETH、CST、NFTの配分を含みます。"
           },
           "eth": {
-            "label": "受け取ったETH"
+            "label": "配分されたETH",
+            "tooltip": "確定したサイクルにわたるシグネチャー配分、時の戦士、星選、係留配分のETHの合計です。CSTとNFTの配分は含みません。"
           },
           "recipients": {
             "label": "受領者ウォレット"

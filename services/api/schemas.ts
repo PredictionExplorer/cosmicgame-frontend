@@ -122,7 +122,7 @@ export const DashboardInfoSchema = z
     PrizeClaimTs: z.number(),
     TsRoundStart: z.number(),
     LastBidderAddr: AddressSchema,
-    GestureCostEth: z.number(),
+    ParticipationCstReward: z.number().optional(),
     StakingAmountEth: z.number(),
     MainStats: MainStatsSchema,
     ContractAddrs: ContractAddressesSchema.optional(),

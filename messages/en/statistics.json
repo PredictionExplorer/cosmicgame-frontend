@@ -153,9 +153,9 @@
       "label": "Gestures with CST",
       "tooltip": "Number of gestures made with CST instead of ETH across indexed cycles."
     },
-    "outreachReserve": {
-      "label": "Outreach Reserve",
-      "tooltip": "CST imprinted for outreach and ecosystem contributors, separate from per-gesture Participation CST and NFT-paired Recognition CST."
+    "outreachCstAllocated": {
+      "label": "Outreach CST Allocated",
+      "tooltip": "CST sent from the Outreach Reserve to outreach and ecosystem contributors so far, separate from per-gesture Participation CST and NFT-paired Recognition CST."
     },
     "outreachTransactions": {
       "label": "Outreach Transactions",

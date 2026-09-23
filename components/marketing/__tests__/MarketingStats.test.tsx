@@ -43,7 +43,7 @@ jest.mock('framer-motion', () => {
 });
 
 const defaultProps = {
-  totalRewardsEth: 1234.56,
+  totalAllocatedCst: 1234.56,
   activeMarketers: 42,
   rewardTransactions: 150,
 };
@@ -75,7 +75,7 @@ describe('MarketingStats', () => {
 
   it('renders zero values without crashing', () => {
     renderWithTooltip(
-      <MarketingStats totalRewardsEth={0} activeMarketers={0} rewardTransactions={0} />,
+      <MarketingStats totalAllocatedCst={0} activeMarketers={0} rewardTransactions={0} />,
     );
     expect(screen.getByText('Total Allocations')).toBeInTheDocument();
   });

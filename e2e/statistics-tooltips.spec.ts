@@ -36,8 +36,8 @@ const HUB_TOOLTIPS = [
     expected: /ETH currently held by the Cosmic Signature protocol contract/,
   },
   {
-    label: 'Outreach Reserve',
-    expected: /CST imprinted for outreach and ecosystem contributors/,
+    label: 'Outreach CST Allocated',
+    expected: /CST sent from the Outreach Reserve to outreach and ecosystem contributors/,
   },
   {
     label: 'Allocation Economy',

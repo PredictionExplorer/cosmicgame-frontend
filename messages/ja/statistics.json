@@ -153,9 +153,9 @@
       "label": "CSTでの一筆",
       "tooltip": "インデックス済みのサイクルにわたって、ETHではなくCSTで入れられた一筆の数。"
     },
-    "outreachReserve": {
-      "label": "広報準備金",
-      "tooltip": "広報とエコシステムの貢献者のために刻印されたCST。一筆ごとの参加CSTやNFTに伴う功労CSTとは別のものです。"
+    "outreachCstAllocated": {
+      "label": "広報配分CSTの総量",
+      "tooltip": "これまでに広報準備金から広報とエコシステムの貢献者へ送られたCSTです。一筆ごとの参加CSTやNFTに伴う功労CSTとは別のものです。"
     },
     "outreachTransactions": {
       "label": "広報トランザクション",

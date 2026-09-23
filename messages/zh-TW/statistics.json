@@ -153,9 +153,9 @@
       "label": "CST 落筆",
       "tooltip": "所有已索引週期中，使用 CST 而非 ETH 完成的落筆次數。"
     },
-    "outreachReserve": {
-      "label": "推廣儲備",
-      "tooltip": "推廣與生態貢獻者所獲 CST 單獨計算；每筆落筆產生的參與 CST 與 NFT 配套的表彰 CST 均不計入。"
+    "outreachCstAllocated": {
+      "label": "推廣分配 CST 總量",
+      "tooltip": "迄今由推廣儲備發放給推廣與生態貢獻者的 CST，與每筆落筆產生的參與 CST 及 NFT 配套的表彰 CST 分開計算。"
     },
     "outreachTransactions": {
       "label": "推廣交易",

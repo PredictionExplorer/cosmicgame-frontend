@@ -30,7 +30,8 @@ const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     return unique.size;
   }, [rewards]);
 
-  const totalRewardsEth = dashboard?.MainStats?.TotalMktRewardsEth ?? 0;
+  // `TotalMktRewardsEth` is a CST amount despite its wire name.
+  const totalAllocatedCst = dashboard?.MainStats?.TotalMktRewardsEth ?? 0;
   const rewardTransactions = dashboard?.MainStats?.NumMktRewards ?? 0;
 
   if (loading) {
@@ -49,7 +50,7 @@ const MarketingRewards = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       {seoSummary}
       <MarketingHero compact={Boolean(seoSummary)} />
       <MarketingStats
-        totalRewardsEth={totalRewardsEth}
+        totalAllocatedCst={totalAllocatedCst}
         activeMarketers={activeMarketers}
         rewardTransactions={rewardTransactions}
       />

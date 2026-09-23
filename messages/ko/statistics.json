@@ -153,9 +153,9 @@
       "label": "CST 제스처",
       "tooltip": "인덱싱된 사이클에 걸쳐 ETH 대신 CST로 남긴 제스처 수를 나타냅니다."
     },
-    "outreachReserve": {
-      "label": "홍보 준비금",
-      "tooltip": "홍보 및 생태계 기여자를 위해 각인된 CST로, 제스처마다 각인되는 참여 CST나 NFT와 함께 각인되는 공로 CST와는 별개입니다."
+    "outreachCstAllocated": {
+      "label": "홍보 배분 CST 총량",
+      "tooltip": "지금까지 홍보 준비금에서 홍보 및 생태계 기여자에게 보낸 CST로, 제스처마다 각인되는 참여 CST나 NFT와 함께 각인되는 공로 CST와는 별개입니다."
     },
     "outreachTransactions": {
       "label": "홍보 트랜잭션",

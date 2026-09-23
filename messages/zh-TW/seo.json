@@ -45,11 +45,13 @@
           "actions": {
             "label": "錨定／解錨操作"
           },
-          "tokens": {
-            "label": "目前已錨定代幣"
+          "ethDeposits": {
+            "label": "ETH 錨定配發存入次數",
+            "tooltip": "為已錨定 Cosmic Signature NFT 存入錨定配發的 ETH 次數。每次存入由存入時已錨定的 NFT 共享。"
           },
-          "distributions": {
-            "label": "錨定配發紀錄"
+          "stellarImprints": {
+            "label": "錨定 NFT 星選銘刻數",
+            "tooltip": "透過錨定 NFT 星選為已錨定 Random Walk NFT 銘刻的 Cosmic Signature NFT 數量。"
           }
         }
       },
@@ -67,8 +69,8 @@
           "records": {
             "label": "推廣分配紀錄"
           },
-          "reserve": {
-            "label": "推廣儲備"
+          "allocatedCst": {
+            "label": "推廣分配 CST 總量"
           },
           "contributors": {
             "label": "獨立推廣貢獻者"
@@ -153,10 +155,12 @@
         },
         "cards": {
           "records": {
-            "label": "已取回分配紀錄"
+            "label": "分配紀錄",
+            "tooltip": "已收官週期中的全部分配紀錄，包括 ETH、CST 與 NFT 分配。"
           },
           "eth": {
-            "label": "已取回 ETH"
+            "label": "已分配 ETH",
+            "tooltip": "已收官週期中簽名分配、時之勇士、星選與錨定配發 ETH 的合計，不含 CST 與 NFT 分配。"
           },
           "recipients": {
             "label": "獲配者錢包"
