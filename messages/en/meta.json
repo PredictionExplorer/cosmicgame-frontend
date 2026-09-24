@@ -236,11 +236,11 @@
     "description": "Endurance Champion and Chrono-Warrior timeline for a Cosmic Signature Performance Cycle."
   },
   "about": {
-    "title": "About Cosmic Signature: On-Chain Art on Arbitrum",
+    "title": "About Cosmic Signature: on-chain art on Arbitrum",
     "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum that turns Performance Cycle gestures into deterministic three-body NFT art."
   },
   "learn": {
-    "title": "Learn Cosmic Signature: On-Chain Art, Performance Cycles, and Arbitrum",
+    "title": "Learn Cosmic Signature: on-chain art, Performance Cycles and Arbitrum",
     "description": "Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications."
   },
   "whitePaper": {
@@ -248,19 +248,19 @@
     "description": "The reference description of Cosmic Signature: Performance Cycles, gestures, allocation tracks, deterministic three-body NFT art, CST, anchoring, the Cosmic Council, protocol upgrades, and the path to full decentralization."
   },
   "quiz": {
-    "title": "Quiz: Test Your Protocol Knowledge",
+    "title": "Quiz: test your protocol knowledge",
     "description": "One hundred questions across three tiers, drawn from the Cosmic Signature white paper: Performance Cycles, gestures, allocations, the art pipeline, and the edge cases only careful readers catch.",
     "tiers": {
       "basic": {
-        "title": "Basic Quiz",
+        "title": "Basic quiz",
         "description": "Twenty-five questions on Cosmic Signature fundamentals: gestures, Performance Cycles, allocation tracks, and the deterministic three-body art."
       },
       "medium": {
-        "title": "Medium Quiz",
+        "title": "Medium quiz",
         "description": "Twenty-five questions on the live mechanics of Cosmic Signature: Calibration Windows, the CST feedback loop, persistence tracks, and Cosmic Council rules."
       },
       "hard": {
-        "title": "Hard Quiz",
+        "title": "Hard quiz",
         "description": "Fifty questions on Cosmic Signature edge cases and design forensics: post-expiry semantics, defensive design, upgrade history, and the art pipeline."
       }
     }
@@ -275,19 +275,19 @@
   },
   "learnArticles": {
     "what-is-cosmic-signature": {
-      "title": "What Is Cosmic Signature?",
+      "title": "What is Cosmic Signature?",
       "description": "Cosmic Signature is a procedural on-chain art protocol on Arbitrum where Performance Cycle gestures shape deterministic three-body NFT artwork."
     },
     "how-the-performance-cycle-works": {
-      "title": "How the Cosmic Signature Performance Cycle Works",
+      "title": "How the Performance Cycle works",
       "description": "Learn how Cosmic Signature Performance Cycles use Calibration Windows, gestures, finalization, and allocation tracks on Arbitrum."
     },
     "how-gestures-work": {
-      "title": "How Gestures Work in Cosmic Signature",
+      "title": "How gestures work",
       "description": "Understand ETH gestures, CST gestures, Gesture Cost, Participation CST, and how gestures shape each Cosmic Signature Performance Cycle."
     },
     "three-body-nft-art": {
-      "title": "How Cosmic Signature Generates Three-Body NFT Art",
+      "title": "How the three-body NFT art is generated",
       "description": "A technical explanation of deterministic Cosmic Signature NFT artwork generated from on-chain seeds and three-body physics."
     },
     "cosmic-signature-on-arbitrum": {
@@ -295,7 +295,7 @@
       "description": "Why Cosmic Signature runs on Arbitrum and how the protocol uses Ethereum Layer 2 infrastructure for on-chain art."
     },
     "contracts-security-verification": {
-      "title": "Cosmic Signature Contracts, Security, and Verification",
+      "title": "Contracts, security and verification",
       "description": "Find the Cosmic Signature smart contract, source code, verification, and security context for the Arbitrum protocol."
     },
     "cst-token-and-cosmic-council": {
@@ -311,7 +311,7 @@
       "description": "How Cosmic Signature routes a public-goods allocation to Protocol Guild, the funding mechanism for Ethereum core contributors."
     },
     "collecting-and-trading-cosmic-signature": {
-      "title": "Collecting and Trading Cosmic Signature NFTs and CST",
+      "title": "Collecting and trading the NFTs and CST",
       "description": "Where Cosmic Signature assets trade: the zero-fee Axiom Zero NFT marketplace, Uniswap CST swaps on Arbitrum, and the Chaos Zero prediction market for cycles."
     },
     "not-a-\u006cottery-not-an-\u0069nvestment": {

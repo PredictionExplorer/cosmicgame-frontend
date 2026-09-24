@@ -110,7 +110,7 @@ html:is(:lang(zh), :lang(ja)) .headline {
 .bleedPlate {
   box-shadow:
     var(--art-edge),
-    0 0 3rem 1.25rem hsl(var(--art-ground) / 0.55);
+    0 0 2.5rem 0.5rem hsl(var(--art-ground) / 0.45);
 }
 
 .heroArt {
