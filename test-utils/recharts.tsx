@@ -19,12 +19,18 @@ export function lastChartData<T = unknown>(): T[] {
   return state.data as T[];
 }
 
+/** Whether a chart child is SVG `<defs>` (gradients), which must render inside an `<svg>`. */
+const isDefs = (child: React.ReactNode) => React.isValidElement(child) && child.type === 'defs';
+
 function chart(testId: string) {
   return function Chart({ data, children }: Props) {
     state.data = (data as unknown[]) ?? [];
+    const items = React.Children.toArray(children);
+    const defs = items.filter(isDefs);
     return (
       <div data-testid={testId} data-point-count={state.data.length}>
-        {children}
+        {defs.length > 0 ? <svg aria-hidden>{defs}</svg> : null}
+        {items.filter((child) => !isDefs(child))}
       </div>
     );
   };
@@ -46,12 +52,18 @@ function axis(testId: string) {
 
 const Nothing = () => null;
 
-/** A series draws its own dot renderer for every datum, so custom dots are testable. */
+/**
+ * A series draws its own dot renderer for every datum, so custom dots are
+ * testable, and carries its fill as `data-fill`.
+ */
 function series(kind: string) {
-  return function Series({ dataKey, dot }: Props) {
+  return function Series({ dataKey, dot, fill }: Props) {
     const draw = typeof dot === 'function' ? (dot as (props: object) => React.ReactNode) : null;
     return (
-      <svg data-testid={`${kind}-${String(dataKey)}`}>
+      <svg
+        data-testid={`${kind}-${String(dataKey)}`}
+        data-fill={typeof fill === 'string' ? fill : undefined}
+      >
         {draw
           ? state.data.map((payload, index) => draw({ cx: index, cy: index, index, payload }))
           : null}

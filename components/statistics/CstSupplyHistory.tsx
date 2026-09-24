@@ -169,6 +169,10 @@ const SupplyArea = memo(function SupplyArea({
   const xAxis = view === 'gesture' ? gestureAxis : timeAxis;
   const supplies = points.map((p) => p.supply);
   const yAxis = useLinearAxis(Math.min(...supplies), Math.max(...supplies));
+  // An area's height reads as an amount, which is only true from zero: on a
+  // range that starts higher the supply is a line with no fill, so a swing
+  // of a few percent never looks like a doubling.
+  const fromZero = yAxis.domain[0] <= 0;
 
   return (
     <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
@@ -201,8 +205,8 @@ const SupplyArea = memo(function SupplyArea({
           dataKey="supply"
           stroke={COLOR}
           strokeWidth={1.75}
-          fill={`url(#${gradientId})`}
-          baseValue={yAxis.domain[0]}
+          fill={fromZero ? `url(#${gradientId})` : 'none'}
+          baseValue={0}
           dot={false}
           activeDot={{ r: 4, fill: COLOR, stroke: 'hsl(var(--background))', strokeWidth: 2 }}
           isAnimationActive={false}
@@ -213,7 +217,8 @@ const SupplyArea = memo(function SupplyArea({
 });
 
 /**
- * CST total supply over time: one area line, by day or after every gesture,
+ * CST total supply over time: one line (filled only when its axis starts at
+ * zero), by day or after every gesture,
  * over the last 30 or 90 days, the last year or all time. The summary states
  * the supply at the end of the range and what was imprinted and burned in
  * it; the table view lists the same points.
