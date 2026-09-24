@@ -186,7 +186,8 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/gesture/${gestureId}`,
     host: 'app',
     cluster: 'core',
-    expectedText: '落笔详情',
+    // A header figure label: it renders only once the gesture has loaded.
+    expectedText: '落笔价格',
   },
   {
     id: 'how-it-works',

@@ -45,8 +45,8 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
 
     await page.goto(`/zh/gesture/${gestureId}`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText('落笔详情', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('交易与周期', { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /^落笔 #\d+$/ })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: '记录', exact: true })).toBeVisible();
   });
 
   test('keeps the anchoring journey localized without a wallet write', async ({ page }) => {

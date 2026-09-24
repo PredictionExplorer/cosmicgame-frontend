@@ -145,9 +145,11 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
 
     await page.goto('/zh/gesture/9101', { waitUntil: 'networkidle' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
-    await expect(page.getByText('落笔详情', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('交易与周期', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('落笔价格与参与 CST', { exact: true }).first()).toBeVisible();
+    // The mock carries no cycle position, so the H1 is the plain noun.
+    await expect(page.getByRole('heading', { level: 1, name: '落笔', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: '记录', exact: true })).toBeVisible();
+    await expect(page.locator('[data-figure="cost"]')).toContainText('落笔价格');
+    await expect(page.locator('[data-figure="participationCst"]')).toContainText('参与 CST');
   });
 
   test('/zh/how-it-works renders the Chinese protocol guide', async ({ page }) => {
