@@ -502,6 +502,7 @@
       "loadErrorMessage": "上位参加者の活動タイムラインを取得できませんでした。",
       "empty": "上位参加者の活動期間は見つかりませんでした。",
       "periods": "活動期間",
+      "noPeriods": "活動期間なし",
       "longest": "最長の期間",
       "lastActive": "最終活動",
       "summary": "{range}で最も活発な参加者{count, number}人。一筆が最も多いのは<who>{leader}</who>（{gestures}筆）。",

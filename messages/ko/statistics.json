@@ -502,6 +502,7 @@
       "loadErrorMessage": "상위 참여자 활동 타임라인을 불러오지 못했습니다.",
       "empty": "상위 참여자의 활동 구간을 찾지 못했습니다.",
       "periods": "활동 구간",
+      "noPeriods": "활동 구간 없음",
       "longest": "최장 구간",
       "lastActive": "마지막 활동",
       "summary": "{range} 가장 활발한 참여자 {count, number}명. 제스처 최다: <who>{leader}</who> ({gestures}회).",

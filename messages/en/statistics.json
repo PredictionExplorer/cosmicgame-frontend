@@ -502,6 +502,7 @@
       "loadErrorMessage": "Could not fetch top participant activity timeline.",
       "empty": "No active gesture periods found for top participants.",
       "periods": "Active periods",
+      "noPeriods": "No active period",
       "longest": "Longest period",
       "lastActive": "Last active",
       "summary": "{count, plural, one {The most active participant} other {The # most active participants}}, {range}. Most gestures: <who>{leader}</who> ({gestures}).",

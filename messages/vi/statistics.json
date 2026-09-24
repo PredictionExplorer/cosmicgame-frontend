@@ -502,6 +502,7 @@
       "loadErrorMessage": "Không lấy được dòng thời gian hoạt động của những người tham gia hàng đầu.",
       "empty": "Không tìm thấy khoảng hoạt động nét bút nào của những người tham gia hàng đầu.",
       "periods": "Khoảng hoạt động",
+      "noPeriods": "Không có khoảng hoạt động",
       "longest": "Khoảng dài nhất",
       "lastActive": "Hoạt động gần nhất",
       "summary": "{count, number} người tham gia tích cực nhất, {range}. Nhiều nét bút nhất: <who>{leader}</who> ({gestures}).",

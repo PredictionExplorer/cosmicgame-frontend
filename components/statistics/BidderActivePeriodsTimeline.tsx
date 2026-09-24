@@ -275,6 +275,12 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
                 </span>
               </div>
               <div className="relative min-h-10">
+                {lane.periods.length === 0 ? (
+                  // Gestures more than six hours apart form no period: say so, not an empty lane.
+                  <span className="absolute inset-y-0 start-0 flex items-center type-caption text-subtle">
+                    {t('charts.activePeriods.noPeriods')}
+                  </span>
+                ) : null}
                 {axis.ticks.map((tick) => (
                   <span
                     key={tick}

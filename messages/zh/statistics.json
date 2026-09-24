@@ -502,6 +502,7 @@
       "loadErrorMessage": "未能获取活跃参与者时间线。",
       "empty": "活跃参与者中暂无符合条件的落笔时段。",
       "periods": "活跃时段",
+      "noPeriods": "无活跃时段",
       "longest": "最长时段",
       "lastActive": "最近活跃",
       "summary": "{range} 最活跃的 {count, number} 位参与者。落笔最多：<who>{leader}</who>（{gestures} 次）。",
