@@ -1,8 +1,7 @@
-import { ArrowUpRight, ShieldCheck } from 'lucide-react';
-
 import type { LegalDocumentLabels } from '@/content/legal/labels';
 
 import { LegalDocument } from '@/components/legal/LegalDocument';
+import { ContractEvidence } from '@/components/legal/ContractEvidence';
 import { CopyValue } from '@/components/legal/CopyValue';
 import {
   LegalLedger,
@@ -13,15 +12,12 @@ import {
 } from '@/components/legal/LegalProse';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { AddressChip } from '@/components/ui/address-chip';
-import { Badge } from '@/components/ui/badge';
 import { networkConfig } from '@/config/networks';
 
 import {
   OFFICIAL_COMMUNITY,
   OFFICIAL_CONTRACTS,
   OFFICIAL_WEBSITES,
-  isSourcifyVerified,
-  sourcifyContractUrl,
   type OfficialCommunityId,
   type OfficialContractId,
   type OfficialWebsiteId,
@@ -64,9 +60,6 @@ export interface SecurityCopy {
 }
 
 const COMMUNITY_NAMES: Record<OfficialCommunityId, string> = { x: 'X', discord: 'Discord' };
-
-const SOURCE_LINK_CLASS =
-  'link-quiet inline-flex min-h-6 items-center gap-1 text-muted-foreground transition-colors duration-fast hover:text-foreground';
 
 /**
  * /security, the Trust Center hub: the official websites, community accounts
@@ -128,7 +121,6 @@ export function SecurityContent({
           heading={official.contractsHeading}
           rows={OFFICIAL_CONTRACTS.map(({ id, address }) => {
             const name = contractNames[id];
-            const verified = isSourcifyVerified(address);
             return {
               key: id,
               term: name,
@@ -142,33 +134,15 @@ export function SecurityContent({
                     href={false}
                     className="text-foreground"
                   />
-                  <span className="flex flex-wrap items-center gap-x-4 gap-y-1 type-label">
-                    <SiteLink
-                      href={`${networkConfig.explorerUrl}/address/${address}`}
-                      kind="external"
-                      className={SOURCE_LINK_CLASS}
-                      externalIcon={false}
-                    >
-                      {official.explorerLink}
-                      <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
-                    </SiteLink>
-                    {verified ? (
-                      <>
-                        <SiteLink
-                          href={sourcifyContractUrl(address)}
-                          kind="external"
-                          className={SOURCE_LINK_CLASS}
-                          externalIcon={false}
-                        >
-                          {official.sourcifyLink}
-                          <ArrowUpRight aria-hidden className="size-3.5 text-subtle" />
-                        </SiteLink>
-                        <Badge tone="positive" size="sm" icon={<ShieldCheck />}>
-                          {official.sourcifyMatch}
-                        </Badge>
-                      </>
-                    ) : null}
-                  </span>
+                  <ContractEvidence
+                    address={address}
+                    explorerUrl={networkConfig.explorerUrl}
+                    labels={{
+                      explorer: official.explorerLink,
+                      sourcify: official.sourcifyLink,
+                      exactMatch: official.sourcifyMatch,
+                    }}
+                  />
                 </span>
               ),
             };

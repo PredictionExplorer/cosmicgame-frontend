@@ -8,8 +8,8 @@ import { readDashboard } from '../publicDataReads';
 /**
  * The /contracts page header, rendered on the server: H1, lede, the network
  * the addresses live on, and the trust resources. The address list itself is
- * the page body's: the route hands the body this request's dashboard read
- * (`initialContractAddrs`), so every address is in the server HTML, with the
+ * rendered by the route from this request's dashboard read
+ * (`ContractAddressList`), so every address is in the server HTML, with the
  * verified fallback addresses when the read fails. The header does not list
  * the addresses a second time.
  */

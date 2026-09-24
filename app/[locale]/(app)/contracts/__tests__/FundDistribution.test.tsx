@@ -1,34 +1,6 @@
-import { fireEvent, render, screen, checkA11y } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen } from '@/test-utils';
 
 import { FundDistribution } from '../components/FundDistribution';
-
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({
-      children,
-      title,
-      className,
-      animate,
-      'data-testid': testId,
-      ..._rest
-    }: React.HTMLAttributes<HTMLDivElement> & {
-      variants?: unknown;
-      initial?: unknown;
-      animate?: { width?: string };
-      transition?: unknown;
-      'data-testid'?: string;
-    }) => (
-      <div
-        className={className}
-        title={title}
-        data-testid={testId ?? 'motion-div'}
-        data-width={animate?.width}
-      >
-        {children}
-      </div>
-    ),
-  },
-}));
 
 const defaultProps = {
   prizePercentage: 25,
@@ -38,47 +10,47 @@ const defaultProps = {
   charityPercentage: 7,
 };
 
+const figure = (track: string) => document.querySelector(`[data-track="${track}"] dd`);
+
 describe('FundDistribution', () => {
-  it('renders all percentage segments with labels', () => {
+  it('titles the section in sentence case', () => {
     render(<FundDistribution {...defaultProps} />);
-    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
-    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
-    expect(screen.getByText('Anchor Distribution')).toBeInTheDocument();
-    expect(screen.getByText('Public Goods')).toBeInTheDocument();
-    expect(screen.getByText('Next cycle')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Allocation tracks' }),
+    ).toBeInTheDocument();
   });
 
-  it('renders percentage values for each segment', () => {
+  it('lists every track with its share, and the remainder that carries forward', () => {
     render(<FundDistribution {...defaultProps} />);
-    expect(screen.getByText('25%')).toBeInTheDocument();
-    expect(screen.getByText('8%')).toBeInTheDocument();
-    expect(screen.getByText('4%')).toBeInTheDocument();
-    expect(screen.getByText('6%')).toBeInTheDocument();
-    expect(screen.getByText('7%')).toBeInTheDocument();
-    expect(screen.getByText('50%')).toBeInTheDocument();
+    expect(figure('signature')).toHaveTextContent('25%');
+    expect(figure('chrono')).toHaveTextContent('8%');
+    expect(figure('stellar')).toHaveTextContent('4%');
+    expect(figure('anchor')).toHaveTextContent('6%');
+    expect(figure('publicGoods')).toHaveTextContent('7%');
+    expect(figure('nextCycle')).toHaveTextContent('50%');
+    for (const label of [
+      'Signature Allocation',
+      'Chrono-Warrior',
+      'Stellar Selection',
+      'Anchor Distribution',
+      'Public Goods',
+      'Next cycle',
+    ]) {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    }
   });
 
   it('draws each track against the whole Cycle Reserve, not against their sum', () => {
     // Regression: the five distributed tracks sum to 50%, and the bar once stretched them
     // to the full width, so the 25% Signature Allocation filled half of it.
     render(<FundDistribution {...defaultProps} />);
-    expect(screen.getByTestId('fund-segment-signature')).toHaveAttribute('data-width', '25%');
-    expect(screen.getByTestId('fund-segment-publicGoods')).toHaveAttribute('data-width', '7%');
-    expect(screen.getByTestId('fund-segment-nextCycle')).toHaveAttribute('data-width', '50%');
-  });
-
-  it('renders the Allocation Tracks title', () => {
-    render(<FundDistribution {...defaultProps} />);
-    expect(screen.getByText('Allocation Tracks')).toBeInTheDocument();
-  });
-
-  it('renders the distribution bar', () => {
-    render(<FundDistribution {...defaultProps} />);
+    expect(screen.getByTestId('fund-segment-signature')).toHaveStyle({ width: '25%' });
+    expect(screen.getByTestId('fund-segment-publicGoods')).toHaveStyle({ width: '7%' });
+    expect(screen.getByTestId('fund-segment-nextCycle')).toHaveStyle({ width: '50%' });
     expect(screen.getByRole('img', { name: /allocation tracks bar chart/i })).toBeInTheDocument();
   });
 
-  it('handles zero percentages gracefully', () => {
+  it('shows zero shares as 0% and draws no segment for them', () => {
     render(
       <FundDistribution
         prizePercentage={0}
@@ -88,10 +60,9 @@ describe('FundDistribution', () => {
         charityPercentage={0}
       />,
     );
-    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
-    const zeros = screen.getAllByText('0%');
-    expect(zeros.length).toBe(5);
-    expect(screen.getByText('100%')).toBeInTheDocument();
+    expect(screen.getAllByText('0%')).toHaveLength(5);
+    expect(figure('nextCycle')).toHaveTextContent('100%');
+    expect(screen.queryByTestId('fund-segment-signature')).not.toBeInTheDocument();
   });
 
   it('renders missing percentages as unavailable, never as 0%', () => {
@@ -108,10 +79,10 @@ describe('FundDistribution', () => {
     expect(screen.getAllByText('common.status.unavailable')).toHaveLength(2);
   });
 
-  it('shows loading skeleton when loading is true', () => {
+  it('shows skeletons, not figures, while the dashboard loads', () => {
     const { container } = render(<FundDistribution loading />);
-    const skeletons = container.querySelectorAll('.animate-pulse');
-    expect(skeletons.length).toBeGreaterThan(0);
+    expect(container.querySelector('[aria-busy="true"]')).not.toBeNull();
+    expect(container.textContent).not.toMatch(/%/);
   });
 
   it('has no accessibility violations', async () => {
@@ -120,72 +91,36 @@ describe('FundDistribution', () => {
   });
 });
 
-describe('FundDistribution tooltips', () => {
-  function openTooltipNextTo(label: string): HTMLElement {
-    const labelNode = screen.getByText(label);
-    const row = labelNode.parentElement;
-    if (!row) {
-      throw new Error(`Could not find tooltip row for label "${label}"`);
-    }
-    const trigger = row.querySelector<HTMLElement>('button[aria-label^="More information"]');
-    if (!trigger) {
-      throw new Error(`Could not find tooltip trigger next to label "${label}"`);
-    }
-    const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
-    Object.defineProperty(event, 'pointerType', { value: 'touch' });
-    fireEvent(trigger, event);
-    fireEvent.click(trigger);
-    return trigger;
-  }
-
-  const SEGMENT_TOOLTIPS: Array<{ label: string; tooltip: string | RegExp }> = [
-    {
-      label: 'Signature Allocation',
-      tooltip: /participant who made the Final Gesture/,
-    },
-    {
-      label: 'Chrono-Warrior',
-      tooltip: /ETH allocation to the Chrono-Warrior/,
-    },
+describe('FundDistribution definitions', () => {
+  const SEGMENT_DEFINITIONS: Array<{ label: string; definition: RegExp }> = [
+    { label: 'Signature Allocation', definition: /participant who made the Final Gesture/ },
+    { label: 'Chrono-Warrior', definition: /ETH allocation to the Chrono-Warrior/ },
     {
       label: 'Stellar Selection',
-      tooltip: /Portion distributed to randomly selected participants/,
+      definition: /Portion distributed to randomly selected participants/,
     },
     {
       label: 'Anchor Distribution',
-      tooltip: /ETH Anchor Distributions to Cosmic Signature NFT anchor-holders/,
+      definition: /ETH Anchor Distributions to Cosmic Signature NFT anchor-holders/,
     },
-    {
-      label: 'Public Goods',
-      tooltip: /Forwarded to the Public Goods Beneficiary/,
-    },
-    {
-      label: 'Next cycle',
-      tooltip: /roll forward into the next cycle/,
-    },
+    { label: 'Public Goods', definition: /Forwarded to the Public Goods Beneficiary/ },
+    { label: 'Next cycle', definition: /roll forward into the next cycle/ },
   ];
 
-  it.each(SEGMENT_TOOLTIPS)(
-    'wires the "$label" segment to its expected tooltip copy',
-    async ({ label, tooltip }) => {
+  it.each(SEGMENT_DEFINITIONS)(
+    'the "$label" label explains itself when pressed',
+    async ({ label, definition }) => {
       render(<FundDistribution {...defaultProps} />);
-      openTooltipNextTo(label);
-      const popper = await screen.findByRole('tooltip');
-      expect(popper.textContent ?? '').toMatch(tooltip);
+      fireEvent.click(screen.getByRole('button', { name: `More information about ${label}` }));
+      const card = await screen.findByRole('tooltip');
+      expect(card.textContent ?? '').toMatch(definition);
     },
   );
 
-  it('exposes one tooltip trigger per segment plus one for the section title', () => {
+  it('offers one explanation per track and no other', () => {
     render(<FundDistribution {...defaultProps} />);
-    const triggers = screen.getAllByRole('button', { name: /information/i });
-    expect(triggers).toHaveLength(SEGMENT_TOOLTIPS.length + 1);
-  });
-
-  it('opens the tooltip popper outside the FundDistribution render subtree (portaled)', async () => {
-    const { container } = render(<FundDistribution {...defaultProps} />);
-    openTooltipNextTo('Signature Allocation');
-    const popper = await screen.findByRole('tooltip');
-    expect(container.contains(popper)).toBe(false);
-    expect(document.body.contains(popper)).toBe(true);
+    expect(screen.getAllByRole('button', { name: /^More information about/ })).toHaveLength(
+      SEGMENT_DEFINITIONS.length,
+    );
   });
 });

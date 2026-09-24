@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { formatEther } from 'viem';
 
@@ -22,19 +21,13 @@ import { toFiniteNumber } from '@/utils/finiteNumber';
 import { percentFromDivisor } from '@/utils/protocolParams';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { SectionDivider } from '@/components/ui/section-divider';
 
-import { NetworkBadge } from './components/NetworkBadge';
+import { CalibrationWindows } from './components/CalibrationWindows';
+import { ContractAddressList } from './components/ContractAddressList';
 import { FundDistribution } from './components/FundDistribution';
-import { GameConfiguration } from './components/GameConfiguration';
-import { ContractAddressGrid } from './components/ContractAddressGrid';
-import { AuctionParameters } from './components/AuctionParameters';
-import { buildContracts, CONTRACT_ENTRY_IDS, type ContractEntryCopy } from './contractAddressData';
-
-const sectionFade = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
-};
+import { ProtocolConfiguration } from './components/ProtocolConfiguration';
+import { PublicGoodsVaultAction } from './components/PublicGoodsVaultAction';
+import type { CalibrationWindowReading } from './components/calibrationWindow';
 
 /**
  * The preview grows with the seconds since the last gesture, so it stays live, but at a pace
@@ -60,6 +53,15 @@ function positiveOrNull(value: unknown): number | null {
   return numeric !== null && numeric > 0 ? numeric : null;
 }
 
+/** A `[duration, elapsed]` pair from a Calibration Window read, stamped with when it was read. */
+function windowReading(value: unknown): CalibrationWindowReading | null {
+  if (!Array.isArray(value) || value.length < 2) return null;
+  const duration = toFiniteNumber(value[0]);
+  const elapsed = toFiniteNumber(value[1]);
+  if (duration === null || elapsed === null) return null;
+  return { durationSeconds: duration, elapsedSeconds: elapsed, readAtMs: Date.now() };
+}
+
 function getLiveCstPreviewRefreshMs(): number {
   const testInterval = (globalThis as LiveCstPreviewTestGlobals)
     .__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__;
@@ -69,120 +71,129 @@ function getLiveCstPreviewRefreshMs(): number {
   return CST_REWARD_PREVIEW_REFRESH_MS;
 }
 
+/** A contract read: `undefined` while it is in flight, `null` when it failed. */
+type Read<T> = T | null | undefined;
+
 interface ContractsProps {
   /** The server-rendered page header, the page's only header. */
   seoSummary?: ReactNode;
   /**
-   * The contract addresses from the page's server read. The client dashboard
-   * query only hydrates after mount, so these put every address into the
-   * server HTML (search engines and AI systems read the list there); the live
-   * query replaces them once it resolves.
+   * The server-rendered address list (`ContractAddressList`), so every address is in
+   * the server HTML. Without it (tests, a render outside the route) the body renders
+   * the list itself from the addresses it has.
    */
+  addresses?: ReactNode;
+  /** The contract addresses from the page's server read, for the fallback list. */
   initialContractAddrs?: ContractAddresses | null;
 }
 
-const Contracts = ({ seoSummary, initialContractAddrs = null }: ContractsProps) => {
+/**
+ * /contracts, below its header: the address list, the allocation tracks, the live
+ * protocol configuration, the two Calibration Windows and Public Goods. Figures read
+ * from the contracts show a skeleton while they load and a dash when a read fails.
+ */
+const Contracts = ({ seoSummary, addresses, initialContractAddrs = null }: ContractsProps) => {
   const t = useTranslations('contracts');
   const { data, isLoading: loading } = useDashboardInfo();
-  const { charity, cosmicGame } = useContractAddresses();
+  const { charity: appVaultAddress, cosmicGame } = useContractAddresses();
+  // The vault from the app-wide addresses, else from this page's own reads, so the
+  // Public Goods section is in the server HTML rather than appearing after hydration.
+  const vaultAddress =
+    [
+      appVaultAddress,
+      data?.ContractAddrs?.CharityWalletAddr,
+      initialContractAddrs?.CharityWalletAddr,
+    ].find(Boolean) ?? '';
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [charityAddress, setCharityAddress] = useState('');
-  // `null` until each read succeeds, so a failed read renders as unknown rather than 0.
-  const [priceIncrease, setPriceIncrease] = useState<number | null>(null);
-  const [timeIncrease, setTimeIncrease] = useState<number | null>(null);
-  const [timeIncrement, setTimeIncrement] = useState<number | null>(null);
-  const [initialIncrement, setInitialIncrement] = useState<number | null>(null);
-  const [msgMaxLen, setMsgMaxLen] = useState<number | null>(null);
-  const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState<number | null>(null);
-  const [cstDutchAuctionDurations, setCstDutchAuctionDurations] = useState({
-    AuctionDuration: 0,
-    ElapsedDuration: 0,
-  });
-  const [ethDutchAuctionDurations, setEthDutchAuctionDurations] = useState({
-    AuctionDuration: 0,
-    ElapsedDuration: 0,
-  });
-  const [cstDutchAuctionBeginningBidPriceMinLimit, setCstDutchAuctionBeginningBidPriceMinLimit] =
-    useState(0);
+  const [charityAddress, setCharityAddress] = useState<Read<string>>(undefined);
+  const [priceIncrease, setPriceIncrease] = useState<Read<number>>(undefined);
+  const [timeIncrease, setTimeIncrease] = useState<Read<number>>(undefined);
+  const [timeIncrement, setTimeIncrement] = useState<Read<number>>(undefined);
+  const [initialIncrement, setInitialIncrement] = useState<Read<number>>(undefined);
+  const [msgMaxLen, setMsgMaxLen] = useState<Read<number>>(undefined);
+  const [cstRewardAmountForBidding, setCstRewardAmountForBidding] =
+    useState<Read<number>>(undefined);
+  const [cstWindow, setCstWindow] = useState<Read<CalibrationWindowReading>>(undefined);
+  const [ethWindow, setEthWindow] = useState<Read<CalibrationWindowReading>>(undefined);
+  const [cstStartingCost, setCstStartingCost] = useState<Read<number>>(undefined);
 
-  const charityWalletContract = useContractNoSigner(charity, CHARITY_WALLET_ABI);
+  const charityWalletContract = useContractNoSigner(vaultAddress, CHARITY_WALLET_ABI);
   const cosmicGameContract = useContractNoSigner(cosmicGame, COSMICGAME_ABI);
 
   useEffect(() => {
     if (!cosmicGameContract) return;
 
-    const safeCall = async (fn: () => Promise<void>, name: string) => {
+    /** Runs one read; a failure is reported and stored as `null` (unknown). */
+    const read = async <T,>(
+      name: string,
+      fn: () => Promise<T | null>,
+      set: (value: T | null) => void,
+    ) => {
       try {
-        await fn();
+        set(await fn());
       } catch (e) {
         reportError(e, `contracts read ${name}`);
+        set(null);
       }
     };
 
-    safeCall(async () => {
-      const v = await cosmicGameContract.read.bidMessageLengthMaxLimit?.();
-      setMsgMaxLen(positiveOrNull(v));
-    }, 'bidMessageLengthMaxLimit');
-
-    safeCall(async () => {
-      const v = await cosmicGameContract.read.ethBidPriceIncreaseDivisor?.();
-      const percent = percentFromDivisor(v);
-      if (percent !== null) setPriceIncrease(percent);
-    }, 'ethBidPriceIncreaseDivisor');
-
-    safeCall(async () => {
-      const v = await cosmicGameContract.read.mainPrizeTimeIncrementIncreaseDivisor?.();
-      const percent = percentFromDivisor(v);
-      if (percent !== null) setTimeIncrease(percent);
-    }, 'mainPrizeTimeIncrementIncreaseDivisor');
-
-    safeCall(async () => {
-      const v = positiveOrNull(
-        await cosmicGameContract.read.mainPrizeTimeIncrementInMicroSeconds?.(),
-      );
-      setTimeIncrement(v === null ? null : v / 1_000_000);
-    }, 'mainPrizeTimeIncrementInMicroSeconds');
-
-    // Read the resolved initial duration (seconds) directly from the contract instead of the
-    // legacy `InitialSecondsUntilPrize` API field, which actually carries the raw
-    // `initialDurationUntilMainPrizeDivisor` and is not seconds.
-    safeCall(async () => {
-      const v = await cosmicGameContract.read.getInitialDurationUntilMainPrize?.();
-      setInitialIncrement(positiveOrNull(v));
-    }, 'getInitialDurationUntilMainPrize');
-
-    safeCall(async () => {
-      const v = (await cosmicGameContract.read.getCstDutchAuctionDurations?.()) as
-        | bigint[]
-        | undefined;
-      setCstDutchAuctionDurations({
-        AuctionDuration: Number(v?.[0] ?? 0n),
-        ElapsedDuration: Number(v?.[1] ?? 0n),
-      });
-    }, 'getCstDutchAuctionDurations');
-
-    safeCall(async () => {
-      const v = (await cosmicGameContract.read.getEthDutchAuctionDurations?.()) as
-        | bigint[]
-        | undefined;
-      setEthDutchAuctionDurations({
-        AuctionDuration: Number(v?.[0] ?? 0n),
-        ElapsedDuration: Number(v?.[1] ?? 0n),
-      });
-    }, 'getEthDutchAuctionDurations');
-
-    safeCall(async () => {
-      const v = await cosmicGameContract.read.cstDutchAuctionBeginningBidPriceMinLimit?.();
-      setCstDutchAuctionBeginningBidPriceMinLimit(Number(formatEther((v ?? 0n) as bigint)));
-    }, 'cstDutchAuctionBeginningBidPriceMinLimit');
+    void read(
+      'bidMessageLengthMaxLimit',
+      async () => positiveOrNull(await cosmicGameContract.read.bidMessageLengthMaxLimit?.()),
+      setMsgMaxLen,
+    );
+    void read(
+      'ethBidPriceIncreaseDivisor',
+      async () => percentFromDivisor(await cosmicGameContract.read.ethBidPriceIncreaseDivisor?.()),
+      setPriceIncrease,
+    );
+    void read(
+      'mainPrizeTimeIncrementIncreaseDivisor',
+      async () =>
+        percentFromDivisor(await cosmicGameContract.read.mainPrizeTimeIncrementIncreaseDivisor?.()),
+      setTimeIncrease,
+    );
+    void read(
+      'mainPrizeTimeIncrementInMicroSeconds',
+      async () => {
+        const v = positiveOrNull(
+          await cosmicGameContract.read.mainPrizeTimeIncrementInMicroSeconds?.(),
+        );
+        return v === null ? null : v / 1_000_000;
+      },
+      setTimeIncrement,
+    );
+    // The resolved initial duration (seconds), read from the contract rather than the
+    // legacy `InitialSecondsUntilPrize` API field, which carries a divisor, not seconds.
+    void read(
+      'getInitialDurationUntilMainPrize',
+      async () =>
+        positiveOrNull(await cosmicGameContract.read.getInitialDurationUntilMainPrize?.()),
+      setInitialIncrement,
+    );
+    void read(
+      'getCstDutchAuctionDurations',
+      async () => windowReading(await cosmicGameContract.read.getCstDutchAuctionDurations?.()),
+      setCstWindow,
+    );
+    void read(
+      'getEthDutchAuctionDurations',
+      async () => windowReading(await cosmicGameContract.read.getEthDutchAuctionDurations?.()),
+      setEthWindow,
+    );
+    // The current CST window's own starting cost, not its lower bound.
+    void read(
+      'cstDutchAuctionBeginningBidPrice',
+      async () => {
+        const v = await cosmicGameContract.read.cstDutchAuctionBeginningBidPrice?.();
+        return typeof v === 'bigint' ? Number(formatEther(v)) : null;
+      },
+      setCstStartingCost,
+    );
   }, [cosmicGameContract]);
 
   useEffect(() => {
-    if (!cosmicGameContract) {
-      setCstRewardAmountForBidding(null);
-      return;
-    }
+    if (!cosmicGameContract) return;
 
     let cancelled = false;
     let inFlight = false;
@@ -265,109 +276,80 @@ const Contracts = ({ seoSummary, initialContractAddrs = null }: ContractsProps) 
     if (!charityWalletContract) return;
     const fetchData = async () => {
       try {
-        const addr = (await charityWalletContract.read.charityAddress?.()) as string;
-        setCharityAddress(addr);
+        const addr = (await charityWalletContract.read.charityAddress?.()) as string | undefined;
+        setCharityAddress(addr || null);
       } catch (e) {
         reportError(e, 'fetch public goods beneficiary address');
+        setCharityAddress(null);
       }
     };
-    fetchData();
+    void fetchData();
   }, [charityWalletContract]);
 
-  const contractCopy = Object.fromEntries(
-    CONTRACT_ENTRY_IDS.map((id) => [
-      id,
-      {
-        name: t(`entries.${id}.name`),
-        description: t(`entries.${id}.description`),
-      },
-    ]),
-  ) as ContractEntryCopy;
-  const contracts = buildContracts(data?.ContractAddrs ?? initialContractAddrs, contractCopy);
+  // Dashboard figures: `undefined` while the dashboard loads, `null` when a field is missing.
+  const dashboardNumber = (value: unknown): Read<number> =>
+    loading && !data ? undefined : toFiniteNumber(value);
 
   return (
     <PageShell variant="data" backdrop="signature">
       {/* The server-rendered header (ContractsSeoSummary) is the page's only header. */}
       {seoSummary ?? (
-        <PageHeader section="trust" title={t('page.title')} subtitle={t('page.subtitle')}>
-          <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
-        </PageHeader>
+        <PageHeader
+          section="trust"
+          title={t('page.title')}
+          subtitle={t('page.subtitle')}
+          meta={
+            <>
+              <span className="text-muted-foreground">{networkConfig.chainName}</span>
+              <span>{t('network.chain', { chainId: networkConfig.chainId })}</span>
+            </>
+          }
+        />
       )}
 
-      <div className="space-y-10">
-        <motion.section
-          variants={sectionFade}
-          initial="hidden"
-          animate="visible"
-          aria-label={t('page.allocationAria')}
-        >
-          <FundDistribution
-            prizePercentage={data?.PrizePercentage}
-            chronoWarriorPercentage={data?.ChronoWarriorPercentage}
-            stellarSelectionPercentage={data?.RafflePercentage}
-            stakingPercentage={data?.StakingPercentage}
-            charityPercentage={data?.CharityPercentage}
-            loading={loading}
-          />
-        </motion.section>
-
-        <motion.section
-          variants={sectionFade}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.15 }}
-          aria-label={t('page.configurationAria')}
-        >
-          <GameConfiguration
-            priceIncrease={priceIncrease}
-            timeIncrease={timeIncrease}
-            timeIncrement={timeIncrement}
-            cstRewardPerBid={cstRewardAmountForBidding}
-            maxMessageLength={msgMaxLen}
-            claimTimeout={positiveOrNull(data?.TimeoutClaimPrize)}
-            initialIncrement={initialIncrement}
-            loading={loading}
-          />
-        </motion.section>
-
-        <motion.section
-          variants={sectionFade}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.3 }}
-          aria-label={t('page.addressesAria')}
-        >
-          <SectionDivider title={t('page.addressesTitle')} className="mb-4" />
-          <ContractAddressGrid
-            contracts={contracts}
+      <div className="space-y-16 sm:space-y-20">
+        {addresses ?? (
+          <ContractAddressList
+            apiAddresses={data?.ContractAddrs ?? initialContractAddrs}
             explorerUrl={networkConfig.explorerUrl}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
           />
-        </motion.section>
+        )}
 
-        <motion.section
-          variants={sectionFade}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.45 }}
-          aria-label={t('page.parametersAria')}
-        >
-          <AuctionParameters
-            cstDurations={cstDutchAuctionDurations}
-            ethDurations={ethDutchAuctionDurations}
-            cstBeginningBidPrice={cstDutchAuctionBeginningBidPriceMinLimit}
-            publicGoodsVaultAddress={charity}
-            charityAddress={charityAddress}
-            charityVaultBalanceEth={Number(data?.CharityBalanceEth ?? 0)}
-            charityPercentage={data?.CharityPercentage}
-            explorerUrl={networkConfig.explorerUrl}
-            raffleEthWinners={data?.NumRaffleEthWinnersBidding}
-            raffleNftWinnersBidding={data?.NumRaffleNFTWinnersBidding}
-            raffleNftWinnersStaking={data?.NumRaffleNFTWinnersStakingRWalk}
-            loading={loading}
-          />
-        </motion.section>
+        <FundDistribution
+          prizePercentage={data?.PrizePercentage}
+          chronoWarriorPercentage={data?.ChronoWarriorPercentage}
+          stellarSelectionPercentage={data?.RafflePercentage}
+          stakingPercentage={data?.StakingPercentage}
+          charityPercentage={data?.CharityPercentage}
+          loading={loading}
+        />
+
+        <ProtocolConfiguration
+          priceIncrease={priceIncrease}
+          timeIncrease={timeIncrease ?? null}
+          timeIncrement={timeIncrement}
+          cstRewardPerBid={cstRewardAmountForBidding}
+          maxMessageLength={msgMaxLen}
+          claimTimeout={loading && !data ? undefined : positiveOrNull(data?.TimeoutClaimPrize)}
+          initialIncrement={initialIncrement}
+          ethStellarRecipients={dashboardNumber(data?.NumRaffleEthWinnersBidding)}
+          nftStellarRecipients={dashboardNumber(data?.NumRaffleNFTWinnersBidding)}
+          anchoredStellarRecipients={dashboardNumber(data?.NumRaffleNFTWinnersStakingRWalk)}
+        />
+
+        <CalibrationWindows
+          cst={cstWindow}
+          eth={ethWindow}
+          cstStartingCost={cstStartingCost}
+          cycleHasGestures={(data?.CurNumBids ?? 0) > 0}
+        />
+
+        <PublicGoodsVaultAction
+          vaultAddress={vaultAddress}
+          beneficiaryAddress={charityAddress}
+          vaultBalanceEth={dashboardNumber(data?.CharityBalanceEth)}
+          sharePercent={dashboardNumber(data?.CharityPercentage)}
+        />
       </div>
     </PageShell>
   );

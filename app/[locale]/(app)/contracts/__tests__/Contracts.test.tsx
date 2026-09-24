@@ -7,8 +7,9 @@ import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { WalletUiProvider } from '@/contexts/WalletUiContext';
+import { checksumAddress } from '@/utils/format';
 
-import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
+import { checkA11y, render, screen, waitFor } from '@/test-utils';
 
 import Contracts from '../Contracts';
 
@@ -17,72 +18,9 @@ interface LiveCstPreviewTestGlobals {
   __COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__?: number;
 }
 
-/* ── framer-motion mock ───────────────────────────────────────── */
-
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({
-      children,
-      className,
-      ..._rest
-    }: React.HTMLAttributes<HTMLDivElement> & {
-      variants?: unknown;
-      initial?: unknown;
-      animate?: unknown;
-      transition?: unknown;
-    }) => (
-      <div className={className} data-testid="motion-div">
-        {children}
-      </div>
-    ),
-    section: ({
-      children,
-      className,
-      ...rest
-    }: React.HTMLAttributes<HTMLElement> & {
-      variants?: unknown;
-      initial?: unknown;
-      animate?: unknown;
-      transition?: unknown;
-    }) => (
-      <section className={className} data-testid="motion-section" aria-label={rest['aria-label']}>
-        {children}
-      </section>
-    ),
-  },
-}));
-
-/* ── viem mock ─────────────────────────────────────────────────── */
-
 jest.mock('viem', () => ({
+  ...jest.requireActual('viem'),
   formatEther: (v: bigint) => (Number(v) / 1e18).toString(),
-}));
-
-/* ── utils mock ────────────────────────────────────────────────── */
-
-jest.mock('../../../../../utils', () => ({
-  formatEthValue: (value: number) => (value ? `${value.toFixed(4)} ETH` : '0 ETH'),
-  formatSeconds: (s: number) => (s > 0 ? `${s}s` : '0s'),
-  shortenHex: (hex: string, length = 4) =>
-    hex ? `${hex.substring(0, length + 2)}....${hex.substring(hex.length - length)}` : '',
-}));
-
-/* ── next/link mock ────────────────────────────────────────────── */
-
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, ...props }: { children: React.ReactNode; href: string }) => (
-    <a {...props}>{children}</a>
-  ),
-}));
-
-jest.mock('@wagmi/core', () => ({
-  writeContract: jest.fn(),
-}));
-
-const mockEnsureCorrectChain = jest.fn().mockResolvedValue(true);
-jest.mock('@/hooks/useRequireChain', () => ({
-  useRequireChain: () => ({ ensureCorrectChain: mockEnsureCorrectChain }),
 }));
 
 jest.mock('wagmi', () => ({
@@ -92,356 +30,255 @@ jest.mock('wagmi', () => ({
   usePublicClient: () => undefined,
 }));
 
-jest.mock('sonner', () => ({
-  toast: {
-    error: jest.fn(),
-    info: jest.fn(),
-    success: jest.fn(),
-  },
+jest.mock('@/hooks/useTxFlow', () => ({
+  useTxFlow: () => ({ stage: { status: 'idle' }, isBusy: false, run: jest.fn(), reset: jest.fn() }),
+  useTxStageLabel: () => () => null,
 }));
 
-/* ── useApiQuery mock ──────────────────────────────────────────── */
-
-const mockUseDashboardInfo = jest.fn().mockReturnValue({
-  data: undefined,
-  isLoading: false,
-});
-
-jest.mock('../../../../../hooks/useApiQuery', () => ({
+const mockUseDashboardInfo = jest.fn().mockReturnValue({ data: undefined, isLoading: false });
+jest.mock('@/hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
 
-/* ── useContractNoSigner mock ──────────────────────────────────── */
-
 const mockUseContractNoSigner = jest.fn().mockReturnValue(null);
-
-jest.mock('../../../../../hooks/useContractNoSigner', () => ({
+jest.mock('@/hooks/useContractNoSigner', () => ({
   __esModule: true,
   default: (...args: unknown[]) => mockUseContractNoSigner(...args),
 }));
 
-/* ── config/networks mock ──────────────────────────────────────── */
-
-jest.mock('../../../../../config/networks', () => ({
+jest.mock('@/config/networks', () => ({
+  ...jest.requireActual('@/config/networks'),
   networkConfig: {
     chainName: 'Arbitrum Sepolia',
     chainId: 421614,
     explorerUrl: 'https://sepolia.arbiscan.io',
   },
-  getPublicClientRpcUrl: () => 'http://127.0.0.1:8545',
-  emptyContractAddresses: () => ({
-    randomWalkNft: '',
-    cosmicGame: '',
-    cosmicSignature: '',
-    cosmicToken: '',
-    cosmicDao: '',
-    charity: '',
-    prizesWallet: '',
-    stakingCst: '',
-    stakingRwalk: '',
-    marketing: '',
-    implementation: '',
-  }),
-  publishDashboardContractAddresses: jest.fn(),
-  getCachedDashboardContractAddresses: () => ({
-    randomWalkNft: '0x0',
-    cosmicGame: '0xGame',
-    cosmicSignature: '0x0',
-    cosmicToken: '0x0',
-    cosmicDao: '0x0',
-    charity: '0xCharity',
-    prizesWallet: '0x0',
-    stakingCst: '0x0',
-    stakingRwalk: '0x0',
-    marketing: '0x0',
-    implementation: '0x0',
-  }),
 }));
 
-/* ── contracts/abis mock ──────────────────────────────────────── */
-
-jest.mock('../../../../../contracts/abis', () => ({
+jest.mock('@/contracts/abis', () => ({
   charityWalletAbi: [],
   cosmicGameAbi: [],
+  marketingWalletAbi: [],
 }));
 
-/* ── utils/errors mock ─────────────────────────────────────────── */
-
-jest.mock('../../../../../utils/errors', () => ({
+jest.mock('@/utils/errors', () => ({
+  ...jest.requireActual('@/utils/errors'),
   reportError: jest.fn(),
 }));
 
-/* ── clipboard mock ────────────────────────────────────────────── */
-
-const mockWriteText = jest.fn().mockResolvedValue(undefined);
-Object.assign(navigator, {
-  clipboard: { writeText: mockWriteText },
-});
-
-/* ── helpers ───────────────────────────────────────────────────── */
+/** A distinct, well-formed address per contract. */
+const addr = (digit: string) => `0x${digit.repeat(40)}`;
 
 const makeDashboardData = (overrides = {}) => ({
   PrizePercentage: 25,
-  ChronoWarriorPercentage: 10,
-  RafflePercentage: 25,
-  StakingPercentage: 30,
-  CharityPercentage: 10,
+  ChronoWarriorPercentage: 8,
+  RafflePercentage: 4,
+  StakingPercentage: 6,
+  CharityPercentage: 7,
   CharityBalanceEth: 0.5,
-  NumRaffleEthRecipientsBidding: 5,
-  NumRaffleNFTRecipientsBidding: 3,
-  NumRaffleNFTRecipientsStakingRWalk: 2,
-  TimeoutClaimPrize: 86400,
+  CurNumBids: 12,
+  NumRaffleEthWinnersBidding: 3,
+  NumRaffleNFTWinnersBidding: 10,
+  NumRaffleNFTWinnersStakingRWalk: 10,
+  TimeoutClaimPrize: 172800,
   ContractAddrs: {
-    CosmicGameAddr: '0xGameAddr',
-    CosmicTokenAddr: '0xTokenAddr',
-    CosmicSignatureAddr: '0xSigAddr',
-    RandomWalkAddr: '0xRWAddr',
-    CosmicDaoAddr: '0xDaoAddr',
-    CharityWalletAddr: '0xCharityAddr',
-    MarketingWalletAddr: '0xMktAddr',
-    PrizesWalletAddr: '0xPrizesAddr',
-    StakingWalletCSTAddr: '0xStakeCSTAddr',
-    StakingWalletRWalkAddr: '0xStakeRWLKAddr',
-    ImplementationAddr: '0x7739148013777c485AD9f3d971e1005Eca686661',
+    CosmicGameAddr: addr('1'),
+    CosmicTokenAddr: addr('2'),
+    CosmicSignatureAddr: addr('3'),
+    RandomWalkAddr: addr('4'),
+    CosmicDaoAddr: addr('5'),
+    CharityWalletAddr: addr('6'),
+    MarketingWalletAddr: addr('7'),
+    PrizesWalletAddr: addr('8'),
+    StakingWalletCSTAddr: addr('9'),
+    StakingWalletRWalkAddr: addr('a'),
+    ImplementationAddr: addr('b'),
   },
   ...overrides,
 });
 
+const contractReads = (overrides: Record<string, jest.Mock> = {}) => ({
+  read: {
+    bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
+    ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(100n),
+    mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
+    mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(3_600_000_000n),
+    getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(86_400n),
+    getBidCstRewardAmount: jest.fn().mockResolvedValue(100_000_000_000_000_000_000n),
+    getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43_200n, 10_800n]),
+    getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7_200n, 3_650_000n]),
+    cstDutchAuctionBeginningBidPrice: jest.fn().mockResolvedValue(400_000_000_000_000_000_000n),
+    charityAddress: jest.fn().mockResolvedValue(protocolFacts.publicGoodsBeneficiary.address),
+    ...overrides,
+  },
+});
+
 beforeEach(() => {
   jest.clearAllMocks();
-  mockWriteText.mockClear();
   mockUseContractNoSigner.mockReturnValue(null);
+  mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false });
   const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
   liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = false;
   liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = undefined;
 });
 
-/* ── Tests ─────────────────────────────────────────────────────── */
-
 describe('Contracts', () => {
-  it('renders page header with correct title', () => {
+  it('orders the page: addresses, allocation tracks, configuration, windows, Public Goods', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<Contracts />);
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Contract addresses',
+      'Allocation tracks',
+      'Protocol configuration',
+      'Calibration Windows',
+      'Public Goods',
+    ]);
+  });
+
+  it('lists each address once, grouped, with its explorer and Sourcify evidence', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<Contracts />);
+    expect(screen.getByRole('heading', { level: 3, name: 'Core contracts' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Wallets' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Anchoring' })).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-contract]')).toHaveLength(11);
+    const token = document.querySelector('[data-contract="cst"]');
+    expect(
+      token?.querySelector(`a[href="https://sepolia.arbiscan.io/address/${addr('2')}"]`),
+    ).not.toBeNull();
+    // An address the API reports that was never checked on Sourcify gets no badge.
+    expect(token?.textContent).not.toContain('Exact match');
+    // The verified implementation, from protocolFacts, is an exact match.
+    const implementation = document.querySelector('[data-contract="implementation"]');
+    expect(implementation?.textContent).toContain('Exact match');
+  });
+
+  it('drops API address fields it has no name for', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        ContractAddrs: { ...makeDashboardData().ContractAddrs, MarketplaceAddr: addr('c') },
+      }),
+      isLoading: false,
+    });
+    render(<Contracts />);
+    expect(document.body.textContent).not.toContain('MarketplaceAddr');
+    expect(document.querySelectorAll('[data-contract]')).toHaveLength(11);
+  });
+
+  it('keeps the market links on the CST and NFT rows', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     expect(
-      screen.getByRole('heading', { name: 'Contract Addresses', level: 1 }),
-    ).toBeInTheDocument();
+      document.querySelector(`[data-contract="cst"] a[href="${CST_UNISWAP_SWAP_URL}"]`),
+    ).not.toBeNull();
+    expect(
+      document.querySelector(`[data-contract="nft"] a[href="${COSMIC_SIGNATURE_MARKETPLACE_URL}"]`),
+    ).not.toBeNull();
   });
 
-  it('renders network badge with chain name and ID', () => {
+  it('shows the verified implementation address over a stale dashboard value', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Arbitrum Sepolia')).toBeInTheDocument();
-    expect(screen.getByText('Chain 421614')).toBeInTheDocument();
-  });
-
-  it('renders allocation tracks section with percentages', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    expect(screen.getByText('Allocation Tracks')).toBeInTheDocument();
-    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
-    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
-    expect(screen.getByText('Anchor Distribution')).toBeInTheDocument();
-    expect(screen.getByText('Public Goods')).toBeInTheDocument();
-  });
-
-  it('renders game configuration section', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    expect(screen.getByText('Protocol Configuration')).toBeInTheDocument();
-    expect(screen.getByText('ETH Gesture-Cost Step-Up')).toBeInTheDocument();
-    expect(screen.getByText('Time Increment')).toBeInTheDocument();
-    expect(screen.getByText('Current Participation CST Preview')).toBeInTheDocument();
-  });
-
-  it('renders all contract address groups', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    expect(screen.getByText('Core Contracts')).toBeInTheDocument();
-    expect(screen.getByText('Wallet Contracts')).toBeInTheDocument();
-    expect(screen.getByText('Anchoring Contracts')).toBeInTheDocument();
-  });
-
-  it('renders contract address cards', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    expect(screen.getByText('Implementation Contract')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature CST Token')).toBeInTheDocument();
-    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
-  });
-
-  it('links the CST token card to the Uniswap swap page', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-
-    expect(screen.getByRole('link', { name: 'nav.ecosystem.uniswap.ariaLabel' })).toHaveAttribute(
-      'href',
-      CST_UNISWAP_SWAP_URL,
+    const row = document.querySelector('[data-contract="implementation"]');
+    expect(row?.textContent).toContain(
+      checksumAddress(protocolFacts.contractAddresses.implementation),
     );
+    expect(row?.textContent).not.toContain(checksumAddress(addr('b')));
   });
 
-  it('links the Cosmic Signature NFT card to the marketplace', () => {
+  it('draws the allocation tracks against the whole reserve, with the remainder', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
+    expect(screen.getByTestId('fund-segment-signature')).toHaveStyle({ width: '25%' });
+    expect(screen.getByTestId('fund-segment-nextCycle')).toHaveStyle({ width: '50%' });
+    expect(document.querySelector('[data-track="publicGoods"] dd')).toHaveTextContent('7%');
+  });
 
-    expect(screen.getByRole('link', { name: 'nav.ecosystem.axiomZero.ariaLabel' })).toHaveAttribute(
-      'href',
-      COSMIC_SIGNATURE_MARKETPLACE_URL,
+  it('reads the live configuration from the contracts', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseContractNoSigner.mockReturnValue(
+      contractReads({ ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(50n) }),
     );
-  });
-
-  it('renders the verified implementation address over a stale dashboard value', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-
-    expect(screen.getByText(protocolFacts.contractAddresses.implementation)).toBeInTheDocument();
-    expect(
-      screen.queryByText('0x7739148013777c485AD9f3d971e1005Eca686661'),
-    ).not.toBeInTheDocument();
+    const value = (id: string) => document.querySelector(`[data-parameter="${id}"] dd`);
+    await waitFor(() => expect(value('ethStep')).toHaveTextContent('2%'));
+    expect(value('message')).toHaveTextContent('280');
+    expect(value('timeIncrement')).toHaveTextContent('1h');
+    expect(value('ethStellar')).toHaveTextContent('3');
+    expect(value('anchoredStellar')).toHaveTextContent('10');
   });
 
-  it('renders calibration parameters section', () => {
+  it('shows a skeleton while a read is in flight and a dash when it fails', async () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    expect(
-      screen.getByText('Calibration Window & Stellar Selection Parameters'),
-    ).toBeInTheDocument();
-    expect(screen.getByText('CST Calibration Window')).toBeInTheDocument();
-    expect(screen.getByText('ETH Calibration Window')).toBeInTheDocument();
-  });
-
-  it('renders dynamic CST calibration duration from contract reads', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    mockUseContractNoSigner.mockReturnValue({
-      read: {
-        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
-        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(100n),
-        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
-        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
-        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
-        getBidCstRewardAmount: jest.fn().mockResolvedValue(100000000000000000000n),
-        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
-        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
-        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
-        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
-      },
-    });
-
-    render(<Contracts />);
-
-    await waitFor(() => {
-      expect(screen.getByText('43200s')).toBeInTheDocument();
-      expect(screen.getByText('1200s')).toBeInTheDocument();
-    });
-  });
-
-  it('renders the divisor-derived percentages from contract reads', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    mockUseContractNoSigner.mockReturnValue({
-      read: {
-        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
-        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(50n),
-        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
-        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
-        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
-        getBidCstRewardAmount: jest.fn().mockResolvedValue(100000000000000000000n),
-        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
-        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
-        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
-        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
-      },
-    });
-
-    render(<Contracts />);
-
-    await waitFor(() => expect(screen.getByText('2%')).toBeInTheDocument());
-  });
-
-  it('never shows Infinity% when the contract returns a zero divisor', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    mockUseContractNoSigner.mockReturnValue({
-      read: {
-        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
+    mockUseContractNoSigner.mockReturnValue(
+      contractReads({
         ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(0n),
-        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(0n),
-        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
-        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
-        getBidCstRewardAmount: jest.fn().mockResolvedValue(100000000000000000000n),
-        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
-        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
-        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
-        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
-      },
-    });
-
-    render(<Contracts />);
-
-    await waitFor(() =>
-      expect(screen.getAllByText('common.status.unavailable').length).toBeGreaterThan(0),
+        bidMessageLengthMaxLimit: jest.fn().mockRejectedValue(new Error('rpc down')),
+      }),
     );
-    expect(screen.queryByText('Infinity%')).not.toBeInTheDocument();
-    expect(screen.queryByText(/Infinity/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
+    render(<Contracts />);
+    await waitFor(() =>
+      expect(document.querySelector('[data-parameter="message"] dd')).toHaveTextContent(
+        'common.status.unavailable',
+      ),
+    );
+    expect(document.querySelector('[data-parameter="ethStep"] dd')).toHaveTextContent(
+      'common.status.unavailable',
+    );
+    expect(document.body.textContent).not.toMatch(/Infinity|NaN/);
   });
 
-  it('leaves the percentages alone when the divisor read is unusable', async () => {
+  it('shows a running CST window with its progress and a closed ETH window', async () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    mockUseContractNoSigner.mockReturnValue({
-      read: {
-        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
-        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue('not-a-number'),
-        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue('not-a-number'),
-        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
-        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
-        getBidCstRewardAmount: jest.fn().mockResolvedValue(100000000000000000000n),
-        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
-        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
-        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
-        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
-      },
-    });
-
+    mockUseContractNoSigner.mockReturnValue(contractReads());
     render(<Contracts />);
-
-    await waitFor(() =>
-      expect(screen.getAllByText('common.status.unavailable').length).toBeGreaterThan(0),
+    const cst = () => document.querySelector('[data-window="cst"]');
+    const eth = () => document.querySelector('[data-window="eth"]');
+    await waitFor(() => expect(cst()).toHaveAttribute('data-state', 'running'));
+    expect(screen.getByRole('progressbar', { name: 'CST Calibration Window' })).toHaveAttribute(
+      'aria-valuenow',
+      '25',
     );
-    expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
+    expect(cst()?.textContent).toContain('25% complete');
+    expect(cst()?.textContent).toContain('Remaining');
+    expect(cst()?.textContent).toMatch(/400/);
+    // The cycle has gestures, so the ETH window no longer prices anything.
+    expect(eth()).toHaveAttribute('data-state', 'closed');
+    expect(eth()?.textContent).toContain('Closed');
+    expect(eth()?.textContent).not.toContain('Remaining');
+  });
+
+  it('reads a window that has run its full length as complete, not overdue', async () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurNumBids: 0 }),
+      isLoading: false,
+    });
+    mockUseContractNoSigner.mockReturnValue(contractReads());
+    render(<Contracts />);
+    const eth = () => document.querySelector('[data-window="eth"]');
+    await waitFor(() => expect(eth()).toHaveAttribute('data-state', 'complete'));
+    expect(eth()?.textContent).toContain('Complete');
+    expect(eth()?.textContent).not.toContain('Elapsed');
   });
 
   it('refreshes the participation CST preview live', async () => {
     const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
     liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
     liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = 20;
-    const rewardValues = [BigInt('100000000000000000000'), BigInt('125123456789123000000')];
-    let rewardReadCount = 0;
-    const readParticipationCstPreview = jest.fn(async () => {
-      return rewardValues[Math.min(rewardReadCount++, rewardValues.length - 1)]!;
-    });
-
+    const rewardValues = [100_000_000_000_000_000_000n, 125_123_456_789_123_000_000n];
+    let reads = 0;
+    const readPreview = jest.fn(async () => rewardValues[Math.min(reads++, 1)]!);
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    mockUseContractNoSigner.mockReturnValue({
-      read: {
-        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
-        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(100n),
-        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
-        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
-        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
-        getBidCstRewardAmount: readParticipationCstPreview,
-        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
-        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
-        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
-        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
-      },
-    });
+    mockUseContractNoSigner.mockReturnValue(contractReads({ getBidCstRewardAmount: readPreview }));
 
     render(<Contracts />);
-
-    await waitFor(() => {
-      expect(screen.getByText('125.1235 CST')).toBeInTheDocument();
-    });
-    expect(readParticipationCstPreview.mock.calls.length).toBeGreaterThanOrEqual(2);
+    await waitFor(() =>
+      expect(document.querySelector('[data-parameter="cstPreview"] dd')).toHaveTextContent(
+        /125\.12/,
+      ),
+    );
+    expect(readPreview.mock.calls.length).toBeGreaterThanOrEqual(2);
   });
 
   it('pauses the live CST preview while the tab is hidden and resumes when shown', async () => {
@@ -450,93 +287,26 @@ describe('Contracts', () => {
     liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = 10;
     let hidden = false;
     const hiddenSpy = jest.spyOn(document, 'hidden', 'get').mockImplementation(() => hidden);
-    const readParticipationCstPreview = jest.fn(async () => BigInt('100000000000000000000'));
-
+    const readPreview = jest.fn(async () => 100_000_000_000_000_000_000n);
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    mockUseContractNoSigner.mockReturnValue({
-      read: {
-        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
-        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(100n),
-        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
-        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
-        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
-        getBidCstRewardAmount: readParticipationCstPreview,
-        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
-        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
-        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
-        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
-      },
-    });
+    mockUseContractNoSigner.mockReturnValue(contractReads({ getBidCstRewardAmount: readPreview }));
 
     try {
       render(<Contracts />);
-      await waitFor(() => expect(readParticipationCstPreview.mock.calls.length).toBeGreaterThan(1));
-
+      await waitFor(() => expect(readPreview.mock.calls.length).toBeGreaterThan(1));
       hidden = true;
       await new Promise((resolve) => setTimeout(resolve, 40));
-      const readsWhileHidden = readParticipationCstPreview.mock.calls.length;
+      const readsWhileHidden = readPreview.mock.calls.length;
       await new Promise((resolve) => setTimeout(resolve, 60));
-      expect(readParticipationCstPreview.mock.calls.length).toBe(readsWhileHidden);
-
+      expect(readPreview.mock.calls.length).toBe(readsWhileHidden);
       hidden = false;
       document.dispatchEvent(new Event('visibilitychange'));
-      await waitFor(() =>
-        expect(readParticipationCstPreview.mock.calls.length).toBeGreaterThan(readsWhileHidden),
-      );
+      await waitFor(() => expect(readPreview.mock.calls.length).toBeGreaterThan(readsWhileHidden));
     } finally {
       hiddenSpy.mockRestore();
       delete liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__;
       delete liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__;
     }
-  });
-
-  it('renders stellar selection configuration cards', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    expect(screen.getByText('ETH Stellar Selection Recipients')).toBeInTheDocument();
-    expect(screen.getByText('NFT Stellar Selection (Participants)')).toBeInTheDocument();
-    expect(screen.getByText('NFT Stellar Selection (Anchored RWLK)')).toBeInTheDocument();
-  });
-
-  it('renders search input for contract addresses', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    expect(screen.getByLabelText('Search contracts')).toBeInTheDocument();
-  });
-
-  it('filters contracts when searching', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    const searchInput = screen.getByLabelText('Search contracts');
-    fireEvent.change(searchInput, { target: { value: 'charity' } }); // lexicon-allow-line
-    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
-    expect(screen.queryByText('Cosmic Signature CST Token')).not.toBeInTheDocument();
-  });
-
-  it('shows empty state when search has no results', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    const searchInput = screen.getByLabelText('Search contracts');
-    fireEvent.change(searchInput, { target: { value: 'zzzznotfound' } });
-    expect(screen.getByText(/No contracts match/)).toBeInTheDocument();
-  });
-
-  it('renders explorer links for contracts', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    const explorerLinks = screen.getAllByLabelText(/View .+ on block explorer/);
-    expect(explorerLinks.length).toBeGreaterThan(0);
-    expect(explorerLinks[0]).toHaveAttribute('target', '_blank');
-  });
-
-  it('copies contract address when copy button is clicked', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
-    render(<Contracts />);
-    const copyButtons = screen.getAllByLabelText(/Copy .+ address/);
-    fireEvent.click(copyButtons[0]!);
-    await waitFor(() => {
-      expect(mockWriteText).toHaveBeenCalled();
-    });
   });
 
   describe('server HTML', () => {
@@ -555,10 +325,9 @@ describe('Contracts', () => {
       for (const [key, address] of Object.entries(serverAddrs)) {
         // The verified implementation address always wins over the dashboard's.
         if (key === 'ImplementationAddr') continue;
-        expect(html).toContain(address);
+        expect(html).toContain(checksumAddress(address));
       }
-      expect(html).toContain(protocolFacts.contractAddresses.implementation);
-      expect(html).not.toContain(serverAddrs.ImplementationAddr);
+      expect(html).toContain(checksumAddress(protocolFacts.contractAddresses.implementation));
     });
 
     it('falls back to the verified addresses when the server read failed', () => {
@@ -569,28 +338,15 @@ describe('Contracts', () => {
     });
   });
 
-  it('lets the live dashboard replace the server addresses once it resolves', () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData({
-        ContractAddrs: { ...makeDashboardData().ContractAddrs, CosmicTokenAddr: '0xLiveToken' },
-      }),
-      isLoading: false,
-    });
-    render(<Contracts initialContractAddrs={makeDashboardData().ContractAddrs} />);
-    expect(screen.getByText('0xLiveToken')).toBeInTheDocument();
-    expect(screen.queryByText('0xTokenAddr')).not.toBeInTheDocument();
-  });
-
-  it('renders loading state with skeletons', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
-    const { container } = render(<Contracts />);
-    const skeletons = container.querySelectorAll('.animate-pulse');
-    expect(skeletons.length).toBeGreaterThan(0);
+  it('renders the addresses the route rendered on the server when it passes them', () => {
+    render(<Contracts addresses={<section data-testid="server-addresses" />} />);
+    expect(screen.getByTestId('server-addresses')).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-contract]')).toHaveLength(0);
   });
 
   it('has no accessibility violations', async () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     const { container } = render(<Contracts />);
-    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
+    await checkA11y(container);
   });
 });

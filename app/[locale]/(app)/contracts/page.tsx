@@ -5,12 +5,14 @@ import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { networkConfig } from '@/config/networks';
 
 import { readDashboard } from '../publicDataReads';
 import { DashboardQuerySeed } from '../QuerySeed';
 
 import Contracts from './Contracts';
 import { ContractsSeoSummary } from './ContractsSeoSummary';
+import { ContractAddressList } from './components/ContractAddressList';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -70,6 +72,12 @@ export default async function Page({ params }: PageProps) {
         <DashboardQuerySeed>
           <Contracts
             seoSummary={<ContractsSeoSummary />}
+            addresses={
+              <ContractAddressList
+                apiAddresses={dashboard.data?.ContractAddrs ?? null}
+                explorerUrl={networkConfig.explorerUrl}
+              />
+            }
             initialContractAddrs={dashboard.data?.ContractAddrs ?? null}
           />
         </DashboardQuerySeed>

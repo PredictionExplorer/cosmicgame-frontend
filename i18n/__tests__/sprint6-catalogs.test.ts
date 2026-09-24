@@ -30,15 +30,15 @@ describe('Sprint 6 focused catalogs', () => {
   it('contains Chinese UI, tooltip, form, and ARIA copy', () => {
     expect(zhFaq.search.ariaLabel).toBe('搜索常见问题');
     expect(zhFaq.category.copyLinkAria).toContain('复制');
-    expect(zhContracts.search.placeholder).toContain('搜索合约');
-    expect(zhContracts.addressCard.explorerAria).toContain('区块浏览器');
+    expect(zhContracts.addresses.title).toBe('合约地址');
+    expect(zhContracts.addresses.exactMatch).toBe('完全匹配');
     expect(zhCode.viewer.title).toBe('代码查看器');
     expect(zhImprint.page.submit).toBe('铭刻');
   });
 
   it('does not alter English UI source strings', () => {
     expect(enFaq.search.placeholder).toBe('Search questions...');
-    expect(enContracts.page.title).toBe('Contract Addresses');
+    expect(enContracts.page.title).toBe('Contract addresses');
     expect(enCode.viewer.title).toBe('Code Viewer');
     expect(enImprint.page.submit).toBe('Imprint Now');
   });

@@ -5,12 +5,7 @@
   },
   "page": {
     "title": "コントラクトアドレス",
-    "subtitle": "Cosmic Signatureプロトコルのオンチェーンアドレス、構成、ソースへのリンク、検証の背景。",
-    "allocationAria": "配分トラック",
-    "configurationAria": "プロトコル構成",
-    "addressesAria": "コントラクトアドレス",
-    "addressesTitle": "コントラクトアドレス",
-    "parametersAria": "調律期間と星選のパラメーター"
+    "subtitle": "Cosmic Signatureプロトコルのオンチェーンアドレス、構成、ソースへのリンク、検証の背景。"
   },
   "network": {
     "chain": "チェーン{chainId}"
@@ -63,18 +58,15 @@
   },
   "categories": {
     "core": "コアコントラクト",
-    "wallet": "ウォレットコントラクト",
-    "anchoring": "係留コントラクト"
+    "wallet": "ウォレット",
+    "anchoring": "係留"
   },
-  "search": {
-    "placeholder": "名前またはアドレスでコントラクトを検索…",
-    "ariaLabel": "コントラクトを検索",
-    "clearAria": "検索をクリア",
-    "empty": "「{searchTerm}」に一致するコントラクトはありません"
-  },
-  "addressCard": {
-    "copyAria": "{name}のアドレスをコピー",
-    "explorerAria": "{name}をブロックエクスプローラーで見る"
+  "addresses": {
+    "title": "コントラクトアドレス",
+    "description": "Arbitrum One上のCosmic Signatureのすべてのコントラクトです。アドレスをコピーするか、Arbiscanでアドレスを、Sourcifyでソースコードを確認できます。",
+    "explorer": "Arbiscan",
+    "sourcify": "Sourcify",
+    "exactMatch": "完全一致"
   },
   "funds": {
     "title": "配分トラック",
@@ -109,6 +101,7 @@
   },
   "configuration": {
     "title": "プロトコル構成",
+    "description": "プロトコルのコントラクトが読み取っている現在のパラメーターです。",
     "cards": {
       "ethStep": {
         "label": "ETH一筆の費用の上げ幅",
@@ -137,21 +130,28 @@
     }
   },
   "parameters": {
-    "title": "調律期間と星選のパラメーター",
+    "windowsTitle": "調律期間",
+    "windowsDescription": "各期間は時間とともに一筆の費用を下げます。CSTの期間はCSTの一筆のたびに始まり直し、ETHの期間は各サイクルの始まりに開いて最初の一筆で閉じます。",
     "cstTitle": "CST調律期間",
     "ethTitle": "ETH調律期間",
     "duration": "長さ",
     "elapsed": "経過時間",
-    "ceiling": "調律上限",
+    "remaining": "残り",
+    "progress": "{percent}完了",
+    "state": {
+      "running": "進行中",
+      "complete": "完了",
+      "closed": "終了",
+      "notStarted": "未開始"
+    },
+    "ceiling": "開始時の費用",
     "cstDurationTooltip": "CST調律期間のライブの保存された長さ。CST一筆は約{increase}%長くし、ETH一筆は約{decrease}%短くします。",
     "cstElapsedTooltip": "現在のCST調律期間ですでに経過した時間",
     "cstCeilingTooltip": "現在表示されているCST調律期間の開始時の一筆の費用。費用は保存された長さの間に線形に下がります。",
     "ethDurationTooltip": "一筆の費用が時間とともに下がるETH調律期間の全体の長さ",
     "ethElapsedTooltip": "現在のETH調律期間ですでに経過した時間",
-    "publicGoodsAddress": "公共財アドレス",
+    "publicGoodsAddress": "公共財の受け手",
     "publicGoodsAddressTooltip": "公共財金庫コントラクトから公共財配分を現在受け取っているオンチェーンアドレス",
-    "copyPublicGoodsAria": "公共財アドレスをコピー",
-    "viewPublicGoodsAria": "公共財アドレスをブロックエクスプローラーで見る",
     "selection": {
       "ethLabel": "ETH星選の受領者",
       "ethTooltip": "サイクルごとにETH配分を受け取るために無作為に選ばれる参加者の数",
@@ -159,15 +159,20 @@
       "nftTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれる参加者の数",
       "anchorLabel": "NFT星選（係留RWLK）",
       "anchorTooltip": "サイクルごとにCosmic Signature NFTを受け取るために無作為に選ばれるRandomWalk NFT係留者の数"
-    }
+    },
+    "cstComplete": "期間が最後まで経過したため、次のCSTの一筆で始まり直すまで、CSTの一筆の費用は最低値のままです。",
+    "ethClosed": "このサイクルの最初の一筆でこの期間は閉じました。以後、ETHの一筆の費用は一筆ごとに上がります。",
+    "ethComplete": "期間が最後まで経過したため、このサイクルの最初の一筆まで、ETHの一筆の費用は最低値のままです。"
   },
   "vault": {
-    "title": "公共財金庫の操作",
+    "title": "公共財",
+    "description": "各サイクルの公共財の割合は金庫に入り、金庫から公共財の受け手へ送られます。",
     "tooltip": "公共財金庫のsend()関数を呼び出し、金庫のETH残高を設定済みのProtocol Guildの受け手へ送ります。",
+    "vaultAddress": "金庫",
+    "share": "サイクルごとの割合",
     "balance": "現在の金庫残高",
-    "description": "金庫にある公共財の資金をProtocol Guildへ送ります。",
-    "descriptionWithBeneficiary": "金庫にある公共財の資金をProtocol Guild（{address}）へ送ります。",
-    "aria": "公共財金庫の残高をProtocol Guildへ送る"
+    "empty": "金庫は空のため、送れる資金はまだありません。",
+    "note": "誰でも金庫の残高を受け手へ送ることができ、かかるのはガス代だけです。"
   },
   "seo": {
     "heading": "Cosmic Signatureコントラクト",

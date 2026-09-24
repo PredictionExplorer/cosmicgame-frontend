@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
 import {
@@ -11,11 +10,10 @@ import {
 } from '@/config/allocationTracks';
 import { cn } from '@/lib/utils';
 import { toFiniteNumber } from '@/utils/finiteNumber';
-import { formatPercentPoints } from '@/utils/protocolParams';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { formatPercent } from '@/utils/format';
+import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { UnknownValue } from '@/components/ui/unknown-value';
 
 interface FundDistributionProps {
@@ -30,7 +28,8 @@ interface FundDistributionProps {
 /**
  * The Cycle Reserve split. Each segment is drawn against the whole reserve (100%), and the
  * remainder that carries into the next cycle is its own segment, so a 25% track fills a
- * quarter of the bar rather than half of it.
+ * quarter of the bar rather than half of it. The legend below the bar carries every figure
+ * as text, each track's name explaining itself; the bar only draws the proportions.
  */
 export function FundDistribution({
   prizePercentage,
@@ -44,24 +43,6 @@ export function FundDistribution({
   const tCommon = useTranslations('common');
   const locale = useLocale();
 
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-48" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-10 w-full rounded-full" />
-          <div className="mt-4 flex flex-wrap gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-4 w-24" />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   const shares: AllocationTrackShare[] = withNextCycleShare([
     { id: 'signature', percent: toFiniteNumber(prizePercentage) },
     { id: 'chrono', percent: toFiniteNumber(chronoWarriorPercentage) },
@@ -74,63 +55,68 @@ export function FundDistribution({
     label: t(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.label`),
     tooltip: t(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[share.id]}.tooltip`),
     color: ALLOCATION_TRACK_COLORS[share.id],
-    formatted: share.percent === null ? null : formatPercentPoints(share.percent, locale),
+    formatted: share.percent === null ? null : formatPercent(share.percent, locale),
   }));
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-lg font-semibold">{t('funds.title')}</CardTitle>
-          <InfoTooltip content={t('funds.description')} />
+    <section aria-labelledby="allocation-tracks-heading">
+      <SectionHeader
+        headingId="allocation-tracks-heading"
+        title={t('funds.title')}
+        description={t('funds.description')}
+      />
+      {loading ? (
+        <div className="mt-6" aria-busy="true">
+          <Skeleton className="h-3 w-full rounded-pill" />
+          <div className="mt-5 grid gap-x-10 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+            {segments.map((segment) => (
+              <Skeleton key={segment.id} className="h-6 w-full" />
+            ))}
+          </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div
-          className="flex h-10 w-full overflow-hidden rounded-full bg-white/[0.06]"
-          role="img"
-          aria-label={t('funds.chartAria')}
-        >
-          {segments.map((segment, i) => {
-            if (segment.percent === null || segment.percent <= 0) return null;
-            return (
-              <Tooltip key={segment.id}>
-                <TooltipTrigger asChild>
-                  <motion.div
-                    className={cn(
-                      segment.color,
-                      'relative h-full',
-                      i > 0 && 'border-l border-black/20',
-                    )}
-                    data-testid={`fund-segment-${segment.id}`}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.min(100, segment.percent)}%` }}
-                    transition={{ duration: 0.8, delay: i * 0.1, ease: 'easeOut' as const }}
+      ) : (
+        <div className="mt-6">
+          <div
+            className="flex h-3 w-full gap-0.5"
+            role="img"
+            aria-label={t('funds.chartAria')}
+            data-testid="fund-bar"
+          >
+            {segments.map((segment) =>
+              segment.percent === null || segment.percent <= 0 ? null : (
+                <span
+                  key={segment.id}
+                  data-testid={`fund-segment-${segment.id}`}
+                  className={cn('h-full first:rounded-s-pill last:rounded-e-pill', segment.color)}
+                  style={{ width: `${Math.min(100, segment.percent)}%` }}
+                />
+              ),
+            )}
+          </div>
+          <dl className="mt-5 grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3">
+            {segments.map((segment) => (
+              <div
+                key={segment.id}
+                data-track={segment.id}
+                className="flex min-h-11 items-center gap-3 border-b border-rule-faint py-2"
+              >
+                <dt className="flex min-w-0 flex-1 items-center gap-2.5 type-body-sm text-muted-foreground">
+                  <span
+                    aria-hidden
+                    className={cn('size-2.5 shrink-0 rounded-full', segment.color)}
                   />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-[220px] text-xs leading-relaxed">
-                    {segment.label}: {segment.formatted}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
+                  <ExplainedTerm definition={segment.tooltip} announce="moreInformation">
+                    {segment.label}
+                  </ExplainedTerm>
+                </dt>
+                <dd className="shrink-0 type-figure-sm text-foreground">
+                  {segment.formatted ?? <UnknownValue label={tCommon('status.unavailable')} />}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
-
-        <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-          {segments.map((segment) => (
-            <div key={segment.id} className="flex items-center gap-2 text-sm">
-              <span className={cn('inline-block h-2.5 w-2.5 rounded-full', segment.color)} />
-              <span className="text-muted-foreground">{segment.label}</span>
-              <span className="font-semibold">
-                {segment.formatted ?? <UnknownValue label={tCommon('status.unavailable')} />}
-              </span>
-              <InfoTooltip content={segment.tooltip} />
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+      )}
+    </section>
   );
 }
