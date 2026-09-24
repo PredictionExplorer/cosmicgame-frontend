@@ -400,10 +400,10 @@
     "remainingLabel": "剩余",
     "costNow": "当前费用",
     "floor": "0 CST",
-    "reachesFloorIn": "{duration} 后降至 0 CST",
-    "windowEndsIn": "{duration} 后窗口结束",
+    "reachesFloorIn": "{duration}后降至 0 CST",
+    "windowEndsIn": "{duration}后窗口结束",
     "windowDetails": "窗口时长：{duration}。已过去：{elapsed}。",
-    "floorIn": "{duration} 后"
+    "floorIn": "{duration}后"
   },
   "allocation": {
     "title": "分配一览",
