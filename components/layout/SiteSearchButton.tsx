@@ -3,11 +3,16 @@
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 import { requestSiteSearch } from './siteSearchEvents';
 
-/** Opens the header's command palette from anywhere on the app host. */
+/**
+ * Opens the header's command palette from anywhere on the app host. An
+ * outline button from the shared primitive, so it matches the secondary
+ * action it usually sits beside.
+ */
 export function SiteSearchButton({ className }: { className?: string }) {
   const t = useTranslations('nav');
   return (
@@ -15,11 +20,12 @@ export function SiteSearchButton({ className }: { className?: string }) {
       type="button"
       onClick={requestSiteSearch}
       className={cn(
-        'inline-flex h-11 items-center gap-2 rounded-control border border-input bg-surface-sunken px-4 text-sm text-muted-foreground transition-colors duration-150 hover:border-foreground/40 hover:text-foreground sm:h-10',
+        buttonVariants({ variant: 'outline', size: 'lg' }),
+        'px-5 normal-case',
         className,
       )}
     >
-      <Search aria-hidden className="size-4" />
+      <Search aria-hidden />
       {t('search.triggerLabel')}
     </button>
   );

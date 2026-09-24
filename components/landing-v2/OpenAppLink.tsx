@@ -1,16 +1,18 @@
-'use client';
-
 import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getSiteRoute, resolveRouteHref } from '@/config/siteNav';
+import { buttonVariants } from '@/components/ui/button';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { cn } from '@/lib/utils';
 
 /**
  * "Open the app": the landing's one way into the Observatory, with one label
  * everywhere (`nav.cta.openApp`). It crosses hosts in the same tab, so it
- * carries a forward arrow, not the new-tab arrow.
+ * carries a forward arrow, not the new-tab arrow. Drawn by the shared button
+ * primitive's gradient variant, so it follows the primitive; `normal-case`
+ * keeps the sentence-case label as written. Renders on the server (the
+ * landing footer) and inside client components (the landing header).
  */
 export function OpenAppLink({
   size = 'md',
@@ -27,13 +29,14 @@ export function OpenAppLink({
       href={app.href}
       kind={app.kind}
       className={cn(
-        'inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-control bg-signature-gradient text-sm font-semibold text-primary-foreground no-underline shadow-[inset_0_1px_0_hsl(var(--foreground)/0.16)] transition-[filter] duration-150 hover:brightness-110',
-        size === 'md' ? 'h-10 px-3 sm:px-4' : 'h-11 px-5',
+        buttonVariants({ variant: 'default', size: size === 'md' ? 'default' : 'lg' }),
+        'shrink-0 normal-case no-underline',
+        size === 'md' ? 'max-sm:px-3' : 'px-5',
         className,
       )}
     >
       {t('cta.openApp')}
-      <ArrowRight aria-hidden className="size-4" />
+      <ArrowRight aria-hidden />
     </SiteLink>
   );
 }

@@ -8,6 +8,8 @@ import {
   type SiteHost,
 } from '@/config/siteNav';
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 import { BrandMark } from './BrandMark';
 import { NavRowContent } from './NavRow';
@@ -40,19 +42,27 @@ export function NotFoundView({ host }: { host: SiteHost }) {
       </h1>
       <p className="type-lede mt-4 text-muted-foreground">{t('notFound.description')}</p>
 
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <div className="mt-8 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
+        {/* The shared button primitive draws all three actions; normal-case
+            keeps the sentence-case labels as written. */}
         <SiteLink
           href={observatory.href}
           kind={observatory.kind}
-          className="inline-flex h-11 items-center gap-2 rounded-control bg-signature-gradient px-5 text-sm font-semibold text-primary-foreground no-underline shadow-[inset_0_1px_0_hsl(var(--foreground)/0.16)] transition-[filter] duration-150 hover:brightness-110"
+          className={cn(
+            buttonVariants({ variant: 'default', size: 'lg' }),
+            'px-5 normal-case no-underline',
+          )}
         >
           {t('notFound.primaryCta')}
-          <ArrowRight aria-hidden className="size-4" />
+          <ArrowRight aria-hidden />
         </SiteLink>
         <SiteLink
           href={gallery.href}
           kind={gallery.kind}
-          className="inline-flex h-11 items-center rounded-control border border-input px-5 text-sm font-semibold text-foreground no-underline transition-colors duration-150 hover:border-foreground/40 hover:bg-muted"
+          className={cn(
+            buttonVariants({ variant: 'outline', size: 'lg' }),
+            'px-5 normal-case no-underline',
+          )}
         >
           {t('notFound.secondaryCta')}
         </SiteLink>
