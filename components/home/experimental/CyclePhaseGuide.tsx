@@ -77,6 +77,7 @@ export function CyclePhaseGuide({
     >
       <SectionHeader
         as="h2"
+        size="panel"
         headingId="cycle-phase-guide-title"
         eyebrow={t('phaseGuide.eyebrow')}
         title={t('phaseGuide.title')}

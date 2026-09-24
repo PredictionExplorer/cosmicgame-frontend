@@ -99,7 +99,7 @@ export function MethodSelector({
               data-method={option.value}
               className={cn(
                 'focus-ring-inset grid min-h-12 min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 rounded-[calc(var(--radius-control)-2px)] px-3 py-2 text-start',
-                '@min-[21rem]:min-h-16 @min-[21rem]:grid-cols-1 @min-[21rem]:content-center @min-[21rem]:items-start',
+                '@min-[21rem]:min-h-16 @min-[21rem]:grid-cols-1 @min-[21rem]:content-start @min-[21rem]:items-start',
                 'transition-[background-color,color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
                 selected
                   ? 'bg-surface-raised text-foreground shadow-[inset_0_-2px_0_hsl(var(--primary))]'

@@ -140,9 +140,7 @@ describe('StageArtwork', () => {
       if (current) fireEvent.error(current);
     }
     expect(image).toBeTruthy();
-    expect(screen.getByTestId('pending-plate')).toHaveAccessibleName(
-      'home.deck.art.alt(id=#000030)',
-    );
+    expect(screen.getByTestId('pending-plate')).toHaveAccessibleName('Cosmic Signature #000030');
     expect(onArtStatus).toHaveBeenLastCalledWith(30, 'unavailable');
   });
 

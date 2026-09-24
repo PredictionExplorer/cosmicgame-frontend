@@ -11,7 +11,7 @@ import {
   getLatestGestureSeed,
   getServerRenderTimeMs,
 } from '@/services/api/server';
-import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from '@/services/api';
+import type { CSTTokenInfo, DashboardInfo, GestureInfo } from '@/services/api';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
 
@@ -73,7 +73,7 @@ export default async function Page({ params }: PageProps) {
     initialDashboardData
       ? getLatestGestureSeed(initialDashboardData.CurRoundNum)
       : Promise.resolve<GestureInfo | null>(null),
-    getCurrentSpecialRecipientsSeed() as Promise<SpecialRecipients | null>,
+    getCurrentSpecialRecipientsSeed(),
   ]);
   const [meta, experiment] = await Promise.all([
     getTranslations({ locale, namespace: 'meta' }),

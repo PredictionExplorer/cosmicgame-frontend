@@ -8,7 +8,7 @@ import { formatId } from '@/utils/format/ids';
 import { Link } from '@/i18n/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { signatureMedia, signatureSources } from '@/components/nft/signatureArt';
+import { signatureMedia, signatureSources, useSignatureAlt } from '@/components/nft/signatureArt';
 import { Button } from '@/components/ui/button';
 import {
   ART_PLATE_CLASS,
@@ -84,6 +84,7 @@ export function StageArtwork({
 }: StageArtworkProps) {
   const t = useTranslations('home');
   const tDetail = useTranslations('detail');
+  const signatureAlt = useSignatureAlt();
   const reducedMotion = usePrefersReducedMotion();
   const isReelViewport = useMediaQuery(REEL_MEDIA_QUERY);
   const [failedClipSeed, setFailedClipSeed] = useState<string | null>(null);
@@ -118,7 +119,8 @@ export function StageArtwork({
     : name
       ? t('deck.art.titleNamed', { name })
       : t('deck.art.title', { id: tokenLabel ?? '' });
-  const alt = token ? t('deck.art.alt', { id: tokenLabel ?? '' }) : '';
+  // The shared Signature alt: the name and number (traits when the token carries them).
+  const alt = token && tokenLabel ? signatureAlt({ id: tokenLabel, name }) : '';
   const canPause = reelActive || rotates;
 
   return (
