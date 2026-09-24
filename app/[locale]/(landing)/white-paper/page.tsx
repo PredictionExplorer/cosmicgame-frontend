@@ -41,6 +41,7 @@ import { SIGNATURE_PLATES } from '@/components/reading/signaturePlates';
 import { fillTemplate } from '@/components/reading/template';
 import { AllocationSplit } from '@/components/white-paper/AllocationSplit';
 import { CycleTimeline } from '@/components/white-paper/CycleTimeline';
+import { referenceTargets, withReferences } from '@/components/white-paper/crossReferences';
 import { APP_ORIGIN, LANDING_ORIGIN, localeHref, localizeCrossHostHref } from '@/lib/hostRouting';
 import { formatOgCycle } from '@/lib/og/copy';
 import { cn } from '@/lib/utils';
@@ -133,14 +134,22 @@ interface BlockContext {
   /** The section or subsection the block belongs to. */
   sectionId: string;
   reading: WhitePaperContent['reading'];
+  /** Running text with its cross-references ("Section 5.2") linked. */
+  renderText: (text: string) => ReactNode;
 }
 
 function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockContext }) {
   switch (block.kind) {
     case 'paragraph':
-      return <p className={PROSE_CLASS}>{block.text}</p>;
+      return <p className={PROSE_CLASS}>{context.renderText(block.text)}</p>;
     case 'list':
-      return <RunInList items={block.items} ordered={ORDERED_LISTS.has(context.sectionId)} />;
+      return (
+        <RunInList
+          items={block.items}
+          ordered={ORDERED_LISTS.has(context.sectionId)}
+          renderText={context.renderText}
+        />
+      );
     case 'formula':
       return (
         <FormulaFigure
@@ -153,7 +162,7 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
         />
       );
     case 'note':
-      return <Callout label={context.reading.noteLabel}>{block.text}</Callout>;
+      return <Callout label={context.reading.noteLabel}>{context.renderText(block.text)}</Callout>;
     case 'table':
       return (
         <div className={BREAKOUT_CLASS}>
@@ -187,7 +196,7 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
                             : undefined
                       }
                     >
-                      {cell}
+                      {context.renderText(cell)}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -196,7 +205,7 @@ function BlockView({ block, context }: { block: WhitePaperBlock; context: BlockC
           </Table>
           {block.table.footnote ? (
             <p className="mt-3 max-w-[var(--measure-prose)] type-caption text-subtle">
-              {block.table.footnote}
+              {context.renderText(block.table.footnote)}
             </p>
           ) : null}
         </div>
@@ -232,10 +241,12 @@ function Blocks({
 function SubsectionView({
   subsection,
   reading,
+  renderText,
   figure,
 }: {
   subsection: WhitePaperSubsection;
   reading: WhitePaperContent['reading'];
+  renderText: BlockContext['renderText'];
   figure?: ReactNode;
 }) {
   const headingId = `${subsection.id}-heading`;
@@ -259,7 +270,7 @@ function SubsectionView({
       <div className="mt-4">
         <Blocks
           blocks={subsection.blocks}
-          context={{ headingId, sectionId: subsection.id, reading }}
+          context={{ headingId, sectionId: subsection.id, reading, renderText }}
           figure={figure}
         />
       </div>
@@ -278,6 +289,8 @@ export default async function WhitePaperPage({ params }: PageProps) {
   const detail = await getTranslations({ locale, namespace: 'detail' });
   const traits = await getTranslations({ locale, namespace: 'traits' });
   const minutes = readingMinutes(paperText(content), locale);
+  const targets = referenceTargets(content);
+  const renderText = (text: string) => withReferences(text, locale, targets);
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -520,7 +533,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
                   <div className="mt-5">
                     <Blocks
                       blocks={section.blocks}
-                      context={{ headingId, sectionId: section.id, reading }}
+                      context={{ headingId, sectionId: section.id, reading, renderText }}
                       figure={sectionFigures[section.id]}
                     />
                   </div>
@@ -532,6 +545,7 @@ export default async function WhitePaperPage({ params }: PageProps) {
                         key={subsection.id}
                         subsection={subsection}
                         reading={reading}
+                        renderText={renderText}
                         figure={sectionFigures[subsection.id]}
                       />
                     ))}

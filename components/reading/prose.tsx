@@ -122,6 +122,8 @@ export interface RunInListProps {
   items: readonly string[];
   /** A sequence (the art pipeline): number each term. */
   ordered?: boolean;
+  /** Renders an item's text, e.g. with its cross-references linked. */
+  renderText?: (text: string) => ReactNode;
   className?: string;
 }
 
@@ -131,7 +133,7 @@ export interface RunInListProps {
  * divided by hairlines, so a reader can scan the terms. Items without a term
  * span the row.
  */
-export function RunInList({ items, ordered = false, className }: RunInListProps) {
+export function RunInList({ items, ordered = false, renderText, className }: RunInListProps) {
   const split = items.map(splitRunIn);
   return (
     <dl
@@ -156,7 +158,7 @@ export function RunInList({ items, ordered = false, className }: RunInListProps)
             </dt>
           ) : null}
           <dd className={cn('type-body-md text-muted-foreground', !item.term && 'sm:col-span-2')}>
-            {item.text}
+            {renderText ? renderText(item.text) : item.text}
           </dd>
         </div>
       ))}
