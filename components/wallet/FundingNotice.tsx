@@ -48,7 +48,7 @@ export function FundingNotice({ requiredWei, purpose = 'gesture', className }: F
       role="note"
       data-testid="funding-notice"
       className={cn(
-        'flex items-start gap-2.5 rounded-lg border border-border bg-card/60 px-3 py-2.5 text-sm text-muted-foreground',
+        'flex items-start gap-2.5 rounded-control border border-rule bg-surface px-3 py-2.5 type-body-sm text-muted-foreground',
         className,
       )}
     >
