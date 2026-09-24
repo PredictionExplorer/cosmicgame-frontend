@@ -27,7 +27,9 @@ export interface GestureMethodControlProps {
   costs: Record<GestureMethodValue, MethodCost | null>;
   /**
    * Whether the connected wallet holds an unused Random Walk NFT. Without
-   * one the half-price option reads as subordinate, never as the best deal.
+   * one the half-price option reads as subordinate, never as the best deal:
+   * its price is muted and it is described by what it needs, with no
+   * outline that would read as a broken or drop-zone state.
    */
   randomWalkEligible: boolean;
   onSelect: (value: string) => void;
@@ -110,7 +112,6 @@ export function GestureMethodControl({
                       columns && '@min-[30rem]/gesture:shadow-[inset_0_-2px_0_hsl(var(--primary))]',
                     )
                   : 'text-muted-foreground hover:bg-surface hover:text-foreground',
-                subordinate && !isSelected && 'border-dashed border-rule',
               )}
             >
               <span className="type-label min-w-0">
