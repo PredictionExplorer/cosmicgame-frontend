@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event';
 
 import { ApiReadError } from '@/services/api/readError';
 
-import { act, checkA11y, render, screen, waitFor, within } from '@/test-utils';
+import { act, checkA11y, render, screen, within } from '@/test-utils';
 
 import AllocationFinalizedPage from '../AllocationFinalizedPage';
 
@@ -312,22 +312,26 @@ describe('AllocationFinalizedPage', () => {
     await checkA11y(container);
   });
 
-  it('redirects home when message=success and the next cycle has opened', async () => {
+  it('says quietly that the next cycle is open, and never leaves the page', async () => {
     mockSearchParams = new URLSearchParams('cycle=3&message=success');
-    roundInfo(null);
+    mockAccount = RECIPIENT;
+    roundInfo({ ...ALLOCATION, RoundNum: 3 });
     mockRoundActivationTime.mockResolvedValue(100n);
     mockGetBlock.mockResolvedValue({ timestamp: 200n });
 
     render(<AllocationFinalizedPage />);
 
-    await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/');
-    });
+    const notice = await screen.findByTestId('next-cycle-notice');
+    expect(notice).toHaveAttribute('role', 'status');
+    expect(notice).toHaveTextContent('allocation.finalized.nextCycle');
+    // The recipient keeps reading the Signature they just received.
+    expect(screen.getByTestId('finalized-signature')).toBeInTheDocument();
+    expect(mockReplace).not.toHaveBeenCalled();
   });
 
-  it('does not redirect while the next cycle has not opened', async () => {
+  it('says nothing about the next cycle while it has not opened', async () => {
     mockSearchParams = new URLSearchParams('cycle=3&message=success');
-    roundInfo(null);
+    roundInfoFails(400);
     mockRoundActivationTime.mockResolvedValue(1_000_000n);
     mockGetBlock.mockResolvedValue({ timestamp: 100n });
 
@@ -339,11 +343,13 @@ describe('AllocationFinalizedPage', () => {
       });
     });
 
+    expect(screen.queryByTestId('next-cycle-notice')).not.toBeInTheDocument();
     expect(mockReplace).not.toHaveBeenCalled();
   });
 
-  it('does not redirect when the page was not opened by a finalization', async () => {
+  it('never watches the next cycle when the page was not opened by a finalization', async () => {
     mockSearchParams = new URLSearchParams('cycle=3');
+    roundInfo({ ...ALLOCATION, RoundNum: 3 });
     mockRoundActivationTime.mockResolvedValue(1n);
     mockGetBlock.mockResolvedValue({ timestamp: 9_999_999n });
 
@@ -355,6 +361,7 @@ describe('AllocationFinalizedPage', () => {
       });
     });
 
-    expect(mockReplace).not.toHaveBeenCalled();
+    expect(mockRoundActivationTime).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('next-cycle-notice')).not.toBeInTheDocument();
   });
 });

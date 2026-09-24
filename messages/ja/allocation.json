@@ -188,6 +188,7 @@
       "finalized": "確定日時",
       "viewTransaction": "トランザクションを見る"
     },
+    "nextCycle": "次のサイクルが始まりました。<link>観測所へ移動</link>",
     "next": {
       "title": "次のステップ",
       "body": "星選から追加の配分がある可能性もあります。配分を確認するには<allocations>自分の配分</allocations>ページへ。係留配分は<anchors>自分の係留</anchors>ページで確認できます。"

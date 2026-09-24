@@ -188,6 +188,7 @@
       "finalized": "Finalized",
       "viewTransaction": "View transaction"
     },
+    "nextCycle": "The next cycle is open. <link>Go to the Observatory</link>",
     "next": {
       "title": "Next steps",
       "body": "There could also be additional allocations from Stellar Selection. To view your allocations, go to the <allocations>My Allocations</allocations> page. For Anchor Distributions, visit the <anchors>My Anchors</anchors> page."

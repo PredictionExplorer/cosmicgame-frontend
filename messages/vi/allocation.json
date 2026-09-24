@@ -188,6 +188,7 @@
       "finalized": "Hoàn tất",
       "viewTransaction": "Xem giao dịch"
     },
+    "nextCycle": "Chu kỳ tiếp theo đã bắt đầu. <link>Đến Đài quan sát</link>",
     "next": {
       "title": "Bước tiếp theo",
       "body": "Cũng có thể có thêm phân bổ từ Tinh tuyển. Để xem phân bổ của bạn, hãy vào trang <allocations>Phân bổ của tôi</allocations>. Với phân phối neo giữ, hãy xem trang <anchors>Neo giữ của tôi</anchors>."

@@ -1,13 +1,13 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { usePublicClient } from 'wagmi';
 import { useTranslations } from 'next-intl';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { AddressChip } from '@/components/ui/address-chip';
 import { Amount } from '@/components/ui/amount';
@@ -67,9 +67,6 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
   const t = useTranslations('allocation');
   const tCommon = useTranslations('common');
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const publicClient = usePublicClient();
-  const cosmicGameContract = useCosmicGameContract();
   const { account } = useActiveWeb3React();
 
   const cycle = cycleParam(searchParams.get('cycle'));
@@ -82,41 +79,8 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
   const missing =
     (isError && isRecordNotFound(error)) || (!isLoading && !isError && !allocationInfo);
 
-  /**
-   * After `claimMainPrize`, the chain is on the next cycle; `roundActivationTime()` is when
-   * that cycle opens. Until then the participant stays on this page; once it opens they are
-   * sent home, where the dashboard shows the live cycle.
-   */
-  useEffect(() => {
-    if (!isClaimSuccess || cycle === null || !publicClient || !cosmicGameContract) return;
-
-    let cancelled = false;
-
-    const maybeRedirectWhenRoundActive = async () => {
-      try {
-        const activationTime = await cosmicGameContract.read.roundActivationTime?.();
-        const block = await publicClient.getBlock({ blockTag: 'latest' });
-        if (cancelled || activationTime === undefined || block === null) return;
-
-        const activationSec = Number(activationTime);
-        const blockSec = Number(block.timestamp);
-        if (!Number.isFinite(activationSec) || activationSec <= 0) return;
-
-        if (blockSec >= activationSec) {
-          router.replace('/');
-        }
-      } catch {
-        /* transient RPC or contract read failure — next poll retries */
-      }
-    };
-
-    void maybeRedirectWhenRoundActive();
-    const id = window.setInterval(() => void maybeRedirectWhenRoundActive(), ACTIVATION_POLL_MS);
-    return () => {
-      cancelled = true;
-      window.clearInterval(id);
-    };
-  }, [isClaimSuccess, cycle, publicClient, cosmicGameContract, router]);
+  const nextCycleOpen = useNextCycleOpen(isClaimSuccess && cycle !== null);
+  const nextCycleNotice = nextCycleOpen ? <NextCycleNotice /> : null;
 
   // A participant who just finalized arrives before the indexer: keep asking until it has
   // the cycle, so the record (and its Signature) appears without a reload.
@@ -192,7 +156,9 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
               { href: `/allocation/${cycle}`, label: t('finalized.links.viewCycle', { cycle }) },
               { href: '/my-allocations', label: t('finalized.links.myAllocations') },
             ]}
-          />
+          >
+            {nextCycleNotice}
+          </PageHeader>
           <FinalizedSignatureSkeleton label={t('finalized.loading.status')} />
         </PageShell>
       );
@@ -234,6 +200,7 @@ const AllocationFinalizedPage = ({ seoSummary }: { seoSummary?: ReactNode }) => 
       />
       <FinalizedSignature allocation={allocationInfo} reveal={congratulate}>
         {congratulate ? <NextSteps /> : null}
+        {nextCycleNotice}
       </FinalizedSignature>
     </PageShell>
   );
@@ -374,6 +341,67 @@ function FinalizedSignature({
         {children}
       </div>
     </section>
+  );
+}
+
+/**
+ * After `claimMainPrize` the chain is on the next cycle, which opens at `roundActivationTime()`.
+ * True once it has. The page then says so quietly and never takes the reader elsewhere: the
+ * recipient may still be looking at the Signature they just received.
+ */
+function useNextCycleOpen(enabled: boolean): boolean {
+  const publicClient = usePublicClient();
+  const cosmicGameContract = useCosmicGameContract();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!enabled || open || !publicClient || !cosmicGameContract) return;
+    let cancelled = false;
+
+    const check = async () => {
+      try {
+        const activationTime = await cosmicGameContract.read.roundActivationTime?.();
+        const block = await publicClient.getBlock({ blockTag: 'latest' });
+        if (cancelled || activationTime === undefined || block === null) return;
+        const activationSec = Number(activationTime);
+        if (!Number.isFinite(activationSec) || activationSec <= 0) return;
+        if (Number(block.timestamp) >= activationSec) setOpen(true);
+      } catch {
+        /* transient RPC or contract read failure: the next poll retries */
+      }
+    };
+
+    void check();
+    const id = window.setInterval(() => void check(), ACTIVATION_POLL_MS);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [enabled, open, publicClient, cosmicGameContract]);
+
+  return open;
+}
+
+/** The next cycle has opened: a quiet line with the way to it, announced politely. */
+function NextCycleNotice() {
+  const t = useTranslations('allocation');
+  return (
+    <p
+      role="status"
+      data-testid="next-cycle-notice"
+      className="mt-6 flex items-start gap-2 border-t border-rule-faint pt-4 type-body-sm text-muted-foreground"
+    >
+      <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-positive" />
+      <span>
+        {t.rich('finalized.nextCycle', {
+          link: (chunks) => (
+            <Link href="/" className="link">
+              {chunks}
+            </Link>
+          ),
+        })}
+      </span>
+    </p>
   );
 }
 

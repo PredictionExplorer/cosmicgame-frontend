@@ -188,6 +188,7 @@
       "finalized": "收官时间",
       "viewTransaction": "查看交易"
     },
+    "nextCycle": "下一个周期已开始。<link>前往观测台</link>",
     "next": {
       "title": "接下来",
       "body": "其他星选分配可在<allocations>我的分配</allocations>中查看；锚定派发可在<anchors>我的锚定</anchors>中查看。"
