@@ -37,11 +37,23 @@ interface FlowNodeProps {
   loading?: boolean;
 }
 
+/**
+ * A lane from `sm`: figures and steps in one row of columns, with three
+ * shared rows (label, value, caption) that each figure joins as a subgrid.
+ * Every value then sits on the same line however many lines a label takes
+ * in a long locale, and the steps align to the values. It stacks on phones.
+ */
+const LANE_CLASS = cn(
+  'mt-4 flex flex-col gap-3',
+  'sm:grid sm:grid-flow-col sm:grid-rows-[repeat(3,auto)] sm:gap-x-3 sm:gap-y-1.5 lg:gap-x-4',
+  'sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]',
+);
+
 /** One figure of a lane: its label, the live value and an optional caption. */
 function FlowNode({ label, definition, value, caption, loading = false }: FlowNodeProps) {
   return (
-    <li className="min-w-0 flex-1 sm:basis-0">
-      <p className="type-label text-subtle hyphens-auto sm:min-h-9">
+    <li className="min-w-0 sm:row-span-3 sm:grid sm:grid-rows-subgrid">
+      <p className="type-label text-subtle hyphens-auto sm:self-end">
         {definition ? (
           <ExplainedTerm definition={definition} announce="moreInformation">
             {label}
@@ -50,39 +62,35 @@ function FlowNode({ label, definition, value, caption, loading = false }: FlowNo
           label
         )}
       </p>
-      <div className="mt-1.5 type-figure-md text-foreground">
+      <div className="mt-1.5 type-figure-md text-foreground sm:mt-0">
         {loading ? <Skeleton className="h-6 w-24" /> : value}
       </div>
-      {caption && !loading ? <p className="mt-1 type-caption text-subtle">{caption}</p> : null}
+      {caption && !loading ? (
+        <p className="mt-1 type-caption text-subtle sm:row-start-3 sm:mt-0">{caption}</p>
+      ) : null}
     </li>
   );
 }
 
 /**
- * The step between two figures: an arrow with an optional operator ("÷",
- * "="). It points down on phones, where the lane stacks, and right from
- * `sm`. The operator is read out through `spoken`; the glyphs are decoration.
+ * The step between two figures, centred on the value row from `sm`: the
+ * operator ("÷", "=") where the lane is arithmetic, an arrow where it is a
+ * sequence. On phones, where the lane stacks, a down arrow leads, followed
+ * by the operator. The step is read out through `spoken`; the glyphs are
+ * decoration.
  */
 function FlowStep({ symbol, spoken }: { symbol?: string; spoken: string }) {
   return (
-    <li
-      className={cn(
-        'flex shrink-0 items-center gap-2 ps-1 text-subtle',
-        'sm:w-8 sm:flex-col sm:gap-0.5 sm:ps-0 lg:w-10',
-        symbol ? 'sm:mt-7' : 'sm:mt-12',
-      )}
-    >
+    <li className="flex shrink-0 items-center gap-2 ps-1 text-subtle sm:row-start-2 sm:w-8 sm:justify-center sm:self-center sm:ps-0 lg:w-10">
       <span className="sr-only">{spoken}</span>
+      <ArrowDown aria-hidden className="size-4 sm:hidden" />
       {symbol ? (
-        <span
-          aria-hidden
-          className="type-label font-medium text-muted-foreground max-sm:order-last"
-        >
+        <span aria-hidden className="type-label font-medium text-muted-foreground sm:type-title">
           {symbol}
         </span>
-      ) : null}
-      <ArrowDown aria-hidden className="size-4 sm:hidden" />
-      <ArrowRight aria-hidden className="size-4 max-sm:hidden" />
+      ) : (
+        <ArrowRight aria-hidden className="size-4 max-sm:hidden" />
+      )}
     </li>
   );
 }
@@ -123,7 +131,7 @@ export function AnchoringFlow({
           <span aria-hidden className="size-1.5 rounded-full bg-track-anchoring" />
           {t('flow.cosmicSignature.title')}
         </h3>
-        <ol className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-3 lg:gap-4">
+        <ol className={LANE_CLASS}>
           <FlowNode
             label={t('flow.cosmicSignature.pool.label')}
             definition={t('flow.cosmicSignature.pool.definition')}
@@ -168,7 +176,7 @@ export function AnchoringFlow({
           <span aria-hidden className="size-1.5 rounded-full bg-track-stellar-nft" />
           {t('flow.randomWalk.title')}
         </h3>
-        <ol className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-3 lg:gap-4">
+        <ol className={LANE_CLASS}>
           <FlowNode
             label={t('flow.randomWalk.anchored.label')}
             definition={t('flow.randomWalk.anchored.definition')}

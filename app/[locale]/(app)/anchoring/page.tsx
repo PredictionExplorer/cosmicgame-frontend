@@ -6,6 +6,8 @@ import { createMetadata } from '@/utils/seo';
 import { Link } from '@/i18n/navigation';
 import { buttonVariants } from '@/components/ui/button';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { AnchoringQuestions } from '@/components/anchoring/AnchoringQuestions';
+import { AnchoringSteps } from '@/components/anchoring/AnchoringSteps';
 
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 
@@ -33,6 +35,8 @@ export default async function Page({ params }: PageProps) {
   return (
     <PageMessages namespaces={['anchoring', 'tables']}>
       <AnchoringPage
+        steps={<AnchoringSteps />}
+        questions={<AnchoringQuestions className="mt-[var(--block-gap)] sm:mt-20" />}
         seoSummary={
           <PublicDataRouteSeoSummary
             route="anchoring"

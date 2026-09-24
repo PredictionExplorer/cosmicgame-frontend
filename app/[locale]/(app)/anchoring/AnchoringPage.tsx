@@ -18,18 +18,26 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
 import { AnchoringFlow } from '@/components/anchoring/AnchoringFlow';
-import { AnchoringQuestions } from '@/components/anchoring/AnchoringQuestions';
-import { AnchoringSteps } from '@/components/anchoring/AnchoringSteps';
 import { GlobalAnchorDistributionsTable } from '@/components/anchoring/GlobalAnchorDistributionsTable';
 import { RwalkAnchorDistributionImprintsTable } from '@/components/anchoring/RwalkAnchorDistributionImprintsTable';
+
+interface AnchoringPageProps {
+  /** The server-rendered header; the plain PageHeader stands in without one. */
+  seoSummary?: ReactNode;
+  /** "How anchoring works" steps, rendered on the server (static copy, no client JS). */
+  steps: ReactNode;
+  /** The question list under the flow, rendered on the server with its own spacing. */
+  questions: ReactNode;
+}
 
 /**
  * The anchoring hub. A newcomer learns what anchoring is, what an anchored
  * NFT receives (the live figures of both lanes) and how to start; the two
  * public ledgers follow: every ETH Anchor Distribution deposit and every
- * Anchored-NFT Stellar Selection imprint.
+ * Anchored-NFT Stellar Selection imprint. The static explanations arrive as
+ * server-rendered slots; this client part only reads the live figures.
  */
-const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+const AnchoringPage = ({ seoSummary, steps, questions }: AnchoringPageProps) => {
   const t = useTranslations('anchoring');
   const distributions = useCSTAnchorDistributions();
   const imprints = useGlobalRWLKAnchorImprints();
@@ -65,10 +73,10 @@ const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             title={t('overview.howItWorks.title')}
             description={t('overview.howItWorks.description')}
           />
-          <AnchoringSteps />
+          {steps}
         </div>
         <AnchoringFlow
-          className="lg:col-span-7 lg:mt-1"
+          className="lg:col-span-7 lg:mt-1 lg:self-start"
           poolEth={toFiniteNumber(dashboard.data?.StakingAmountEth)}
           anchoredCosmicSignature={toFiniteNumber(stats?.StakeStatisticsCST?.TotalTokensStaked)}
           perNft={distributionPerAnchoredNft(
@@ -81,7 +89,7 @@ const AnchoringPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         />
       </section>
 
-      <AnchoringQuestions className="mt-[var(--block-gap)] sm:mt-20" />
+      {questions}
 
       <GlobalAnchorDistributionsTable
         className="mt-[var(--block-gap)] sm:mt-20"
