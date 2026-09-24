@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 import { getAllFaqItems, getFaqContent } from '@/content/faq';
+import { getHowItWorksContent } from '@/content/how-it-works';
 import { getLandingContent } from '@/content/landing';
 import { getLearnContent } from '@/content/learn';
 import { protocolFacts } from '@/content/protocol-facts';
@@ -60,6 +61,11 @@ const sources: CopySource[] = [
         .join('\n'),
     },
     { name: `landing-${locale}`, locale, text: JSON.stringify(getLandingContent(locale)) },
+    {
+      name: `how-it-works-${locale}`,
+      locale,
+      text: JSON.stringify(getHowItWorksContent(locale)),
+    },
     { name: `learn-${locale}`, locale, text: JSON.stringify(getLearnContent(locale).articles) },
     { name: `quiz-${locale}`, locale, text: JSON.stringify(getQuizContent(locale)) },
     { name: `messages-${locale}`, locale, text: readMessageCatalogs(locale) },

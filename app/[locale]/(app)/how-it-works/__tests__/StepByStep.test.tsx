@@ -12,7 +12,7 @@ describe('StepByStep', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Getting started' })).toBeInTheDocument();
   });
 
-  it('numbers the three steps in sentence case', () => {
+  it('numbers the three steps as an ordered list, the step names read before each title', () => {
     render(<StepByStep stepByStep={stepByStep} />);
     expect(screen.getByText('Step 1')).toBeInTheDocument();
     expect(screen.getByText('Step 2')).toBeInTheDocument();
@@ -20,6 +20,8 @@ describe('StepByStep', () => {
     for (const step of stepByStep.steps) {
       expect(screen.getByRole('heading', { level: 3, name: step.title })).toBeInTheDocument();
     }
+    // D073: step titles are headings, not popover triggers.
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('lets each locale place the step number, with no space beside Japanese', () => {
@@ -38,6 +40,15 @@ describe('StepByStep', () => {
     }
     expect(screen.getByText(/Press the gesture button/)).toBeInTheDocument();
     expect(screen.queryByText(/Gesture Now/)).not.toBeInTheDocument();
+  });
+
+  it('links the FAQ answer on getting ETH to Arbitrum (D087)', () => {
+    render(<StepByStep stepByStep={stepByStep} />);
+    expect(screen.getByTestId('funding-help')).toHaveTextContent(stepByStep.funding.text);
+    expect(screen.getByRole('link', { name: stepByStep.funding.link.label })).toHaveAttribute(
+      'href',
+      '/faq#how-to-get-eth-on-arbitrum',
+    );
   });
 
   it('has no accessibility violations', async () => {

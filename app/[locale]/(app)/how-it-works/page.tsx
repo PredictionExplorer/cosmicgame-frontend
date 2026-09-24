@@ -3,6 +3,11 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getHowItWorksContent } from '@/content/how-it-works';
 
+import {
+  ALLOCATION_TRACK_COPY_KEYS,
+  ALLOCATION_TRACK_IDS,
+  type AllocationTrackId,
+} from '@/config/allocationTracks';
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
@@ -35,7 +40,17 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
   const content = getHowItWorksContent(locale);
   const inLanguage = jsonLdInLanguage(locale);
-  const tDetail = await getTranslations({ locale, namespace: 'detail' });
+  const [tDetail, tContracts] = await Promise.all([
+    getTranslations({ locale, namespace: 'detail' }),
+    getTranslations({ locale, namespace: 'contracts' }),
+  ]);
+  // The tracks carry the names /current-cycle and /contracts give them.
+  const trackLabels = Object.fromEntries(
+    ALLOCATION_TRACK_IDS.map((id) => [
+      id,
+      tContracts(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[id]}.label`),
+    ]),
+  ) as Record<AllocationTrackId, string>;
 
   return (
     <>
@@ -56,7 +71,12 @@ export default async function Page({ params }: PageProps) {
           ),
         ]}
       />
-      <HowToPlayPage content={content} unavailableLabel={tDetail('image.artworkUnavailable')} />
+      <HowToPlayPage
+        content={content}
+        trackLabels={trackLabels}
+        locale={locale}
+        unavailableLabel={tDetail('image.artworkUnavailable')}
+      />
     </>
   );
 }

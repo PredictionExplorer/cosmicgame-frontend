@@ -32,6 +32,13 @@ function buildHowItWorksContent(text: HowItWorksText): HowItWorksContent {
       secondaryCta: { label: text.hero.secondaryCtaLabel, href: structure.hero.secondaryCtaHref },
     },
     rewardBreakdown: text.rewardBreakdown,
+    costs: {
+      heading: text.costs.heading,
+      subhead: text.costs.subhead,
+      items: text.costs.items,
+      note: text.costs.note,
+      riskLink: { label: text.costs.riskLinkLabel, href: structure.costs.riskHref },
+    },
     gameCycle: text.gameCycle,
     payoff: {
       heading: text.payoff.heading,
@@ -43,7 +50,16 @@ function buildHowItWorksContent(text: HowItWorksText): HowItWorksContent {
       },
       sample: structure.payoffSample,
     },
-    stepByStep: text.stepByStep,
+    stepByStep: {
+      heading: text.stepByStep.heading,
+      subhead: text.stepByStep.subhead,
+      stepLabel: text.stepByStep.stepLabel,
+      steps: text.stepByStep.steps,
+      funding: {
+        text: text.stepByStep.fundingText,
+        link: { label: text.stepByStep.fundingLinkLabel, href: structure.stepByStep.fundingHref },
+      },
+    },
     proTips: text.proTips,
     callToAction: {
       heading: text.callToAction.heading,

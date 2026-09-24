@@ -1,24 +1,33 @@
 import type { HowItWorksContent } from '@/content/how-it-works';
 
+import type { AllocationTrackId } from '@/config/allocationTracks';
 import { PageShell } from '@/components/ui/page-shell';
 
 import { CallToAction } from './components/CallToAction';
 import { CycleTimeline } from './components/CycleTimeline';
+import { GestureCosts } from './components/GestureCosts';
 import { HeroSection } from './components/HeroSection';
 import { ProTips } from './components/ProTips';
 import { RewardBreakdown } from './components/RewardBreakdown';
 import { StepByStep } from './components/StepByStep';
 
 /**
- * How it works: the mechanism drawn once (the cycle timeline and its payoff),
- * then what a gesture leads to, how to start, tips, and one closing call to
- * action. Server-rendered; only the term explanations hydrate.
+ * How it works: the mechanism drawn once (the cycle timeline, its key and
+ * its payoff), then what a gesture leads to and what it costs, how to start,
+ * what is good to know, and one closing call to action. Server-rendered and
+ * static: every rule is in the visible copy, so nothing on the page hydrates
+ * to explain itself.
  */
 export default function HowToPlayPage({
   content,
+  trackLabels,
+  locale,
   unavailableLabel,
 }: {
   content: HowItWorksContent;
+  /** Each allocation track's name, for the drawing's key. */
+  trackLabels: Readonly<Record<AllocationTrackId, string>>;
+  locale: string;
   /** "Artwork unavailable", for the payoff plate when the image cannot load. */
   unavailableLabel: string;
 }) {
@@ -29,9 +38,14 @@ export default function HowToPlayPage({
         <CycleTimeline
           gameCycle={content.gameCycle}
           payoff={content.payoff}
+          trackLabels={trackLabels}
+          locale={locale}
           unavailableLabel={unavailableLabel}
         />
-        <RewardBreakdown rewardBreakdown={content.rewardBreakdown} />
+        <div className="flex flex-col gap-14 sm:gap-16">
+          <RewardBreakdown rewardBreakdown={content.rewardBreakdown} />
+          <GestureCosts costs={content.costs} />
+        </div>
         <StepByStep stepByStep={content.stepByStep} />
         <ProTips proTips={content.proTips} />
         <CallToAction callToAction={content.callToAction} />

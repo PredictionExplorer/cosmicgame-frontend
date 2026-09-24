@@ -2,7 +2,9 @@ import { protocolFacts } from '@/content/protocol-facts';
 
 import type { HowItWorksText } from './structure';
 
-/** 中文運作原理文案，以 structure.ts 中的骨架為鍵。 */
+const cst = protocolFacts.specialAllocationCst.toLocaleString('zh-HK');
+
+/** 繁體中文（香港）運作原理文案，以 structure.ts 中的骨架為鍵。 */
 export const howItWorksTextZhHk = {
   metadata: {
     title: 'Cosmic Signature 運作原理 · 演繹週期、落筆與 NFT',
@@ -27,67 +29,79 @@ export const howItWorksTextZhHk = {
   },
   rewardBreakdown: {
     heading: '每一筆會銘刻什麼',
-    subhead: '每個週期，參與都會在多條分配軌道留下銘刻。',
+    subhead: '每一筆都會參與本週期的多條分配軌道。',
     items: [
       {
         title: '動態參與 CST',
-        description: '每一筆都可能銘刻 CST，數量取決於距上一筆經過的時間。',
-        tooltip: `參與 CST 採用平方根公式：${protocolFacts.dynamicCstRewardFormula}。連續快速落筆可能銘刻 0 CST；沉寂越久，銘刻量越大。`,
+        description:
+          '每一筆都可能銘刻 CST，數量按距上一筆經過時間的平方根計算：緊接上一筆的落筆可能銘刻 0 CST，沉寂越久，銘刻越多。',
       },
       {
         title: '星選資格',
-        description: '每一筆都會計入一次星選資格，參與週期收官時的分配。',
-        tooltip: `週期收官後，協議會從星選資格中程序化隨機選出獲配者：3 位參與者均分週期儲備中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH。`,
+        description: `每一筆都會計入一次星選資格。週期收官時，協議從中隨機選出 3 個資格，均分週期儲備中 ${protocolFacts.stellarSelectionEthPercentage}% 的 ETH。`,
       },
       {
         title: 'Cosmic Signature NFT 星選',
-        description: `每個週期，都有 10 位參與者經星選獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚獨一無二的 Cosmic Signature NFT。`,
-        tooltip: `每個週期，10 位星選獲配者與 10 位 Random Walk NFT 錨定者，每位都會獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
+        description: `另有 10 個資格被選出，每個獲配 ${cst} CST 與 1 枚 Cosmic Signature NFT。同一地址可能多次入選；資格再多，也不保證入選。`,
       },
       {
         title: '簽名分配',
-        description: `寫下收官之筆的參與者，可取回週期儲備中 ${protocolFacts.mainEthPercentage}% 的 ETH、${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
-        tooltip: '週期儲備隨每一筆增長。寫下收官之筆的參與者透過協議合約取回簽名分配。',
+        description: `寫下收官之筆的參與者可收官本週期，並取回週期儲備中 ${protocolFacts.mainEthPercentage}% 的 ETH、${cst} CST 與 1 枚 Cosmic Signature NFT。`,
       },
     ],
+  },
+  costs: {
+    heading: '落筆的花費',
+    subhead: '以 ETH 或 CST 支付落筆之前，請先了解以下幾點。',
+    items: [
+      {
+        title: '花費不會退還',
+        body: '落筆支付的 ETH 會計入週期儲備，支付的 CST 會被銷毀。之後有人再落筆，這些花費也不會退還。',
+      },
+      {
+        title: 'ETH 價格逐筆上調',
+        body: `每一筆 ETH 落筆都會讓下一筆 ETH 落筆價格上調 ${protocolFacts.ethGestureCostStepUpPercent}%。只有每個週期開啟時的 ETH 校準窗口會讓價格回落。`,
+      },
+      {
+        title: 'Gas 費另計',
+        body: '每一筆落筆都是一筆 Arbitrum 交易，因此還需以 ETH 支付 Gas 費。確認前，錢包會顯示具體金額。',
+      },
+    ],
+    note: '請只動用你能夠承受失去的資金落筆。',
+    riskLinkLabel: '閱讀風險披露',
   },
   gameCycle: {
     heading: '演繹週期的完整歷程',
     subhead: '從開啟到收官，每個週期都沿同一順序展開。',
+    legend: {
+      gestures: '落筆',
+      exclusiveWindow: `${protocolFacts.finalGestureExclusivityHours} 小時窗口：僅寫下收官之筆的參與者可收官`,
+      allocations: '分配軌道',
+    },
     phases: [
       {
         label: '週期開啟',
-        description: `新的演繹週期由此開始。首個 ETH 校準窗口隨之開啟；CST 校準窗口從 ${protocolFacts.initialCstCalibrationWindowHours} 小時的基準出發，之後隨參與不斷變化。`,
-        tooltip:
-          '在校準窗口內，落筆價格會逐步回落，參與者可自行選擇落筆時機。週期儲備的起點，是上一週期滾入的滾動儲備。',
+        description: `新的演繹週期開啟。ETH 與 CST 落筆價格各自在校準窗口中回落；CST 校準窗口從 ${protocolFacts.initialCstCalibrationWindowHours} 小時的基準出發，之後隨參與變化。週期儲備的起點，是上一週期滾入的部分。`,
       },
       {
         label: '參與者落筆',
-        description: `每一筆都會按目前時間增量延長收官倒數。參與 CST 動態變化；ETH 落筆會使 CST 校準窗口縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%，CST 落筆則使其延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。`,
-        tooltip:
-          '參與 CST 按平方根公式計算，取決於距上一筆經過的時間。確切數量以應用程式中的即時預覽為準。',
+        description: `每一筆都會按目前時間增量延長收官倒數。ETH 落筆會使 CST 校準窗口縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%，CST 落筆則使其延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。`,
       },
       {
         label: '收官倒數歸零',
-        description: '倒數歸零後，寫下收官之筆的參與者隨即取得收官資格。',
-        tooltip: `收官真正執行前，仍可繼續落筆——遲來的一筆會再次延長倒數，併成為新的收官之筆。寫下收官之筆的參與者擁有 ${protocolFacts.finalGestureExclusivityHours} 小時的專屬收官窗口；窗口結束後，任何人都可收官並獲得簽名分配。`,
+        description: `倒數歸零後，寫下收官之筆的參與者有 ${protocolFacts.finalGestureExclusivityHours} 小時的專屬時間收官；此後任何人都可收官，收官者獲得簽名分配。收官執行之前仍可落筆，新的一筆會延長倒數，並成為新的收官之筆。`,
       },
       {
         label: '週期收官',
-        description: `寫下收官之筆的參與者取回簽名分配：週期儲備的 ${protocolFacts.mainEthPercentage}%、${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
-        tooltip: '簽名分配經由協議合約取回；CST 與 Cosmic Signature NFT 會自動完成銘刻。',
+        description: `收官後，各項分配隨即發放。收官者獲得簽名分配：週期儲備的 ${protocolFacts.mainEthPercentage}%、${cst} CST 與 1 枚 Cosmic Signature NFT。`,
       },
       {
         label: '星選',
-        description: `3 位 ETH 星選獲配者均分週期儲備的 ${protocolFacts.stellarSelectionEthPercentage}%；參與者 NFT 星選與錨定 NFT 星選各選出 10 位獲配者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
-        tooltip:
-          '星選資格隨每一筆計入；落筆越多，入選頻次越高。Random Walk NFT 錨定者另有單獨的星選。',
+        description: `3 位 ETH 星選獲配者均分週期儲備的 ${protocolFacts.stellarSelectionEthPercentage}%。參與者 NFT 星選選出 10 位獲配者，錨定 NFT 星選再從已錨定的 Random Walk NFT 中選出 10 位，每位獲配 ${cst} CST 與 1 枚 Cosmic Signature NFT。`,
       },
       {
         label: '下一週期',
-        description: '約一半週期儲備會作為滾動儲備滾入下一週期，新週期則以全新的校準窗口開啟。',
-        tooltip:
-          '滾動儲備意味着協議滾動累積，而非抽取。目前窗口時長與落筆價格，以即時合約數據為準。',
+        description: `其餘 ${protocolFacts.compoundingReservePercentage}% 的週期儲備作為滾動儲備滾入下一週期，新週期以全新的校準窗口開啟。`,
       },
     ],
   },
@@ -104,61 +118,47 @@ export const howItWorksTextZhHk = {
     steps: [
       {
         title: '連接錢包',
-        tooltip: 'Arbitrum 是以太坊上的 Layer 2 區塊鏈，Gas 費更低，交易更快。',
         highlights: [
           '點擊頁面頂部的「連接錢包」按鈕。',
-          '使用支援 Arbitrum 的錢包，例如 MetaMask。',
-          '按提示將網絡切換至 Arbitrum，並確認相關授權。',
+          '使用支援 Arbitrum 的錢包，例如 MetaMask。Arbitrum 是以太坊的 Layer 2，Gas 費更低，交易更快。',
+          '按提示將網絡切換至 Arbitrum，並確認連接。',
           '連接完成後，錢包地址會顯示在頁面頂部。',
         ],
       },
       {
         title: '查看落筆價格',
-        tooltip: 'Arbitrum 上的 Gas 費通常只有幾美分，遠低於以太坊主網。',
         highlights: [
           '落筆前，先確認目前的 ETH 或 CST 落筆價格。',
           '查看參與 CST 的即時預覽；數量會隨距上一筆的時間長短而變化。',
-          '留意簽名分配金額，了解這一週期潛在的 ETH 分配。',
-          '確保錢包中除落筆價格外，還留有少量 ETH 用作 Gas 費。',
+          '確保錢包中除落筆價格外，還留有少量 ETH 用作 Gas 費；確認前，錢包會顯示具體金額。',
         ],
       },
       {
         title: '落下第一筆',
-        tooltip: `每枚 Random Walk NFT 僅可使用一次，用於 ${protocolFacts.randomWalkDiscountPercentage}% 的 ETH 落筆價格減免——不妨留到合適的時機。`,
         highlights: [
-          `選擇 ETH 落筆，並可附加一枚 Random Walk NFT 獲得 ${protocolFacts.randomWalkDiscountPercentage}% 的 ETH 落筆價格減免；也可使用 CST（ERC-20）落筆。`,
+          `選擇 ETH 或 CST 落筆。ETH 落筆可附加一枚 Random Walk NFT，獲得 ${protocolFacts.randomWalkDiscountPercentage}% 的 ETH 落筆價格減免，每枚 NFT 僅可使用一次。`,
           '點擊標明方式與價格的落筆按鈕（例如「以 ETH 落筆」），然後在錢包中確認交易。',
         ],
       },
     ],
+    fundingText: '還沒有 Arbitrum 上的 ETH？',
+    fundingLinkLabel: '如何在 Arbitrum 上取得 ETH',
   },
   proTips: {
-    heading: '進階技巧與策略',
-    subhead: '實用建議，幫助你在各條分配軌道上更充分地參與。',
+    heading: '值得了解',
+    subhead: '幾處容易忽略的細節。',
     tips: [
       {
-        title: '同時關注兩個校準窗口',
-        body: 'ETH 落筆會略微縮短 CST 校準窗口，CST 落筆則會略微將其延長。目前價格走勢可在應用程式面板中即時查看。',
+        title: '兩個校準窗口',
+        body: `ETH 落筆價格只在每個週期開啟時的校準窗口中回落一次。CST 落筆價格則在每一筆 CST 落筆後開啟新的窗口：從剛支付價格的兩倍（至少 ${protocolFacts.cstCalibrationCeilingMinCst} CST）逐步降至零。`,
       },
       {
-        title: '附加 Random Walk NFT',
-        body: '每枚 Random Walk NFT 僅可用於一次價格減免。留到落筆價格較高時使用，效果更佳。',
-      },
-      {
-        title: '每一筆都計入星選',
-        body: `3 位 ETH 星選獲配者均分週期儲備的 ${protocolFacts.stellarSelectionEthPercentage}%；10 位參與者 NFT 獲配者與 10 位 Random Walk NFT 錨定者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
+        title: '每枚 Random Walk NFT 僅可使用一次',
+        body: `一枚 Random Walk NFT 可讓一筆 ETH 落筆的價格減免 ${protocolFacts.randomWalkDiscountPercentage}%，用過後不能再次減免。使用與錨定互不影響。`,
       },
       {
         title: '使用專用錢包',
-        body: '專用錢包將協議操作與主要資產隔離，安全性更高。審計與驗證狀態可在審計頁面查看。',
-      },
-      {
-        title: '留意收官倒數',
-        body: '臨近歸零時落筆，你距離收官之筆最近；但在週期收官前，其他參與者仍可在你之後落筆。',
-      },
-      {
-        title: '使用 CST 落筆',
-        body: `CST 落筆同樣會計入一次星選資格、延長收官倒數，還可能銘刻動態的參與 CST，並使 CST 校準窗口延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。`,
+        body: '專用錢包可將協議操作與主要資產隔離。審計頁面列出了已完成的審查與驗證。',
       },
     ],
   },
@@ -168,6 +168,6 @@ export const howItWorksTextZhHk = {
     primaryCtaLabel: '落筆',
     faqCtaLabel: '瀏覽常見問題',
     discordCtaLabel: 'Discord',
-    twitterCtaLabel: 'Twitter / X',
+    twitterCtaLabel: 'X（Twitter）',
   },
 } satisfies HowItWorksText;

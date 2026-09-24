@@ -1,46 +1,79 @@
+import { ArrowRight } from 'lucide-react';
+
 import type { HowItWorksContent } from '@/content/how-it-works';
 
-import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { Link } from '@/i18n/navigation';
 import { SectionHeader } from '@/components/ui/section-header';
 
 /**
- * Getting started: three numbered steps side by side on wide screens, each a
- * short checklist at a reading measure.
+ * Getting started: three steps as a vertical stepper (a numbered node on a
+ * rail beside each short checklist), with the section's header and the way
+ * to get ETH on Arbitrum in the left column from `lg`. Every instruction is
+ * in the open; nothing hides behind the step titles.
  */
 export function StepByStep({ stepByStep }: { stepByStep: HowItWorksContent['stepByStep'] }) {
   return (
-    <section aria-labelledby="steps-heading">
+    <section
+      aria-labelledby="steps-heading"
+      className="lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-12"
+    >
       <SectionHeader
         headingId="steps-heading"
         title={stepByStep.heading}
         description={stepByStep.subhead}
+        className="lg:col-span-4"
       />
-      <ol className="mt-8 grid gap-x-10 gap-y-10 lg:grid-cols-3">
+      <ol className="lg:col-span-8 lg:row-span-2 lg:pt-1">
         {stepByStep.steps.map((step, index) => (
-          <li key={step.title} className="border-t border-rule pt-5">
-            <p className="type-eyebrow text-subtle">
-              {stepByStep.stepLabel.replace('{n}', String(index + 1))}
-            </p>
-            <h3 className="mt-2 type-heading-3 text-foreground">
-              <ExplainedTerm definition={step.tooltip}>{step.title}</ExplainedTerm>
-            </h3>
-            <ul className="mt-4 flex max-w-[var(--measure-lede)] flex-col gap-2.5">
-              {step.highlights.map((highlight) => (
-                <li
-                  key={highlight}
-                  className="flex items-baseline gap-2.5 type-body-sm text-muted-foreground"
-                >
-                  <span
-                    aria-hidden
-                    className="size-1 shrink-0 translate-y-[-0.2em] rounded-pill bg-subtle"
-                  />
-                  <span className="min-w-0">{highlight}</span>
-                </li>
-              ))}
-            </ul>
+          <li
+            key={step.title}
+            className="group/step relative grid grid-cols-[2rem_minmax(0,1fr)] gap-x-5 pb-10 last:pb-0"
+          >
+            {/* The rail joining this step's node to the next one. */}
+            <span
+              aria-hidden
+              className="absolute bottom-0 left-4 top-10 w-px -translate-x-1/2 bg-rule group-last/step:hidden"
+            />
+            <span
+              aria-hidden
+              className="flex size-8 items-center justify-center rounded-pill border border-rule bg-surface-raised type-label tabular-nums text-foreground"
+            >
+              {index + 1}
+            </span>
+            <div className="min-w-0 pt-1">
+              <p className="sr-only">{stepByStep.stepLabel.replace('{n}', String(index + 1))}</p>
+              <h3 className="type-heading-3 text-foreground">{step.title}</h3>
+              <ul className="mt-3 flex max-w-[var(--measure-lede)] flex-col gap-2.5">
+                {step.highlights.map((highlight) => (
+                  <li
+                    key={highlight}
+                    className="flex items-baseline gap-2.5 type-body-sm text-muted-foreground"
+                  >
+                    <span
+                      aria-hidden
+                      className="size-1 shrink-0 translate-y-[-0.2em] rounded-pill bg-subtle"
+                    />
+                    <span className="min-w-0">{highlight}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </li>
         ))}
       </ol>
+      <p
+        data-testid="funding-help"
+        className="mt-8 border-t border-rule pt-4 type-body-sm text-muted-foreground lg:col-span-4 lg:row-start-2 lg:mt-0 lg:self-start"
+      >
+        {stepByStep.funding.text}{' '}
+        <Link
+          href={stepByStep.funding.link.href}
+          className="link inline-flex items-center gap-1.5 whitespace-nowrap"
+        >
+          {stepByStep.funding.link.label}
+          <ArrowRight aria-hidden className="size-3.5" />
+        </Link>
+      </p>
     </section>
   );
 }

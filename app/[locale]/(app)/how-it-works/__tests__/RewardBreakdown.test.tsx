@@ -15,14 +15,14 @@ describe('RewardBreakdown', () => {
     expect(screen.getByText(rewardBreakdown.subhead)).toBeInTheDocument();
   });
 
-  it('lists the four outcomes, each title explaining itself', () => {
+  it('lists the four outcomes with plain titles and the whole rule in the open (D073)', () => {
     render(<RewardBreakdown rewardBreakdown={rewardBreakdown} />);
     expect(screen.getAllByRole('listitem')).toHaveLength(4);
     for (const item of rewardBreakdown.items) {
       expect(screen.getByRole('heading', { level: 3, name: item.title })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: item.title })).toBeInTheDocument();
       expect(screen.getByText(item.description)).toBeInTheDocument();
     }
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('uses the palette tokens, not fixed hues or white alpha', () => {
