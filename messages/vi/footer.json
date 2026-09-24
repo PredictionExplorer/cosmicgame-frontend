@@ -1,43 +1,5 @@
 {
   "tagline": "Giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Mỗi nét bút đều định hình Signature cuối cùng của chu kỳ.",
-  "sections": {
-    "protocol": "Giao thức",
-    "explore": "Khám phá",
-    "ecosystem": "Hệ sinh thái",
-    "resources": "Tài nguyên",
-    "community": "Cộng đồng"
-  },
-  "links": {
-    "gallery": "Phòng trưng bày",
-    "currentCycle": "Chu kỳ hiện tại",
-    "statistics": "Thống kê",
-    "contracts": "Hợp đồng",
-    "sourceCode": "Mã nguồn",
-    "allocationRecipients": "Người nhận phân bổ",
-    "anchorDistributions": "Phân phối neo giữ",
-    "outreachReserve": "Dự trữ truyền thông",
-    "howItWorks": "Cách hoạt động",
-    "faq": "Câu hỏi thường gặp",
-    "axiomZero": "Sàn Axiom Zero",
-    "chaosZero": "Dự đoán Chaos Zero",
-    "uniswap": "Giao dịch CST trên Uniswap",
-    "geckoTerminal": "Xem pool CST trên GeckoTerminal",
-    "about": "Giới thiệu",
-    "learn": "Học",
-    "whitePaper": "Sách trắng",
-    "audits": "Kiểm toán bảo mật",
-    "siteMap": "Sơ đồ trang",
-    "protocolGuild": "Protocol Guild",
-    "twitter": "Twitter / X",
-    "discord": "Discord",
-    "discover": "Khám phá",
-    "terms": "Điều khoản",
-    "privacy": "Quyền riêng tư"
-  },
-  "social": {
-    "twitterLabel": "Twitter",
-    "discordLabel": "Discord"
-  },
   "copyright": "© {year} Cosmic Signature · Tài liệu thuộc dự án · CC0 1.0",
   "colophon": "CC0 · Đã xác minh · Có thể tái tạo"
 }

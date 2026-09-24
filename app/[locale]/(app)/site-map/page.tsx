@@ -1,6 +1,8 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { getLearnContent } from '@/content/learn';
+
 import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 import { JsonLd, breadcrumbJsonLd, jsonLdInLanguage, webPageJsonLd } from '@/utils/jsonLd';
 import { createPageMetadata } from '@/utils/seo';
@@ -38,6 +40,8 @@ export default async function Page({ params }: PageProps) {
   ]);
   const description = meta('siteMap.description');
   const inLanguage = jsonLdInLanguage(locale);
+  // Only slugs and titles cross to the client, not the articles' bodies.
+  const articles = getLearnContent(locale).articles.map(({ slug, h1 }) => ({ slug, title: h1 }));
 
   return (
     <PageMessages namespaces={['siteMap']}>
@@ -59,7 +63,7 @@ export default async function Page({ params }: PageProps) {
             ),
           ]}
         />
-        <SiteMapPage />
+        <SiteMapPage articles={articles} />
       </>
     </PageMessages>
   );

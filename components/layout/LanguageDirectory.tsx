@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils';
 
 interface LanguageDirectoryProps {
   className?: string;
+  /** Omit the visible "Language" label when a surrounding heading already says it. */
+  hideLabel?: boolean;
 }
 
 /** A left click without modifiers: the browser would navigate in this tab. */
@@ -38,7 +40,7 @@ function isPlainLeftClick(event: MouseEvent): boolean {
  * remembered language and an English page would otherwise reopen in the old
  * one (see `rememberLocale`).
  */
-export function LanguageDirectory({ className }: LanguageDirectoryProps) {
+export function LanguageDirectory({ className, hideLabel = false }: LanguageDirectoryProps) {
   const t = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
@@ -79,10 +81,12 @@ export function LanguageDirectory({ className }: LanguageDirectoryProps) {
         className,
       )}
     >
-      <p className="flex shrink-0 items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">
-        <Globe className="h-3.5 w-3.5" aria-hidden />
-        {label}
-      </p>
+      {hideLabel ? null : (
+        <p className="type-eyebrow flex shrink-0 items-center gap-2 text-subtle">
+          <Globe className="h-3.5 w-3.5" aria-hidden />
+          {label}
+        </p>
+      )}
       <ul className="flex min-w-0 flex-wrap gap-x-5 gap-y-1">
         {routing.locales.map((option) => {
           const current = option === locale;
@@ -97,10 +101,10 @@ export function LanguageDirectory({ className }: LanguageDirectoryProps) {
                 onClick={(event) => onClick(event, option)}
                 onAuxClick={(event) => onAuxClick(event, option)}
                 className={cn(
-                  'inline-flex min-h-11 min-w-11 items-center text-sm no-underline transition-colors',
+                  'inline-flex min-h-10 min-w-10 items-center text-sm no-underline transition-colors duration-150',
                   current
-                    ? 'font-medium text-white underline decoration-primary/60 decoration-1 underline-offset-4'
-                    : 'text-white/60 hover:text-white',
+                    ? 'font-medium text-foreground underline decoration-primary/60 decoration-1 underline-offset-4'
+                    : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 {LOCALE_LABELS[option]}
