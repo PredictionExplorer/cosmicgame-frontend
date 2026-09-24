@@ -9,9 +9,13 @@ import { cn } from '@/lib/utils';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { buttonVariants } from '@/components/ui/button';
 
+import { ANCHORED_PLATE_COUNT } from './Anchoring';
 import { CollectionPlates } from './CollectionPlates';
 import { LandingSection, SectionHeading } from './SectionHeading';
 import styles from './Landing.module.css';
+
+/** The Anchoring strip above: the close shows new work, not those plates again. */
+const ANCHORED_STRIP = { pick: 'anchored', count: ANCHORED_PLATE_COUNT } as const;
 
 interface ClosingBandProps {
   closing: LandingContent['closing'];
@@ -59,7 +63,8 @@ export function ClosingBand({ closing, showcase }: ClosingBandProps) {
         count={6}
         artworkAlt={showcase.artworkAlt}
         viewAriaLabel={showcase.viewAriaLabel}
-        sizes="(min-width: 64rem) 25rem, 50vw"
+        excluding={ANCHORED_STRIP}
+        sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 30vw, 50vw"
         className={styles.recentPlates}
       />
     </LandingSection>

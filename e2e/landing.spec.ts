@@ -393,17 +393,67 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     page,
   }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const externalLinks = page.locator('footer a[href^="https://"]');
-    const count = await externalLinks.count();
-    expect(count).toBeGreaterThan(0);
-
-    for (let i = 0; i < count; i++) {
-      const link = externalLinks.nth(i);
-      const target = await link.getAttribute('target');
-      const rel = await link.getAttribute('rel');
-      expect(target).toBe('_blank');
-      expect(rel ?? '').toContain('noopener');
+    const links = await page.locator('footer a[href^="http"]').evaluateAll((anchors) =>
+      anchors.map((anchor) => ({
+        href: anchor.getAttribute('href') ?? '',
+        target: anchor.getAttribute('target'),
+        rel: anchor.getAttribute('rel') ?? '',
+      })),
+    );
+    // The footer carries the app's directory too: those links cross to our own
+    // app host in the same tab (it is still Cosmic Signature). Every link that
+    // leaves Cosmic Signature opens a new tab without an opener.
+    const ownHost = (href: string) =>
+      /(^|\.)cosmicsignature\.(com|local)$/.test(new URL(href).hostname);
+    const thirdParty = links.filter((link) => !ownHost(link.href));
+    const appLinks = links.filter((link) => ownHost(link.href));
+    expect(thirdParty.map((link) => new URL(link.href).hostname)).toEqual(
+      expect.arrayContaining(['protocol-guild.readthedocs.io', 'x.com', 'discord.gg']),
+    );
+    for (const link of thirdParty) {
+      expect(link.target, link.href).toBe('_blank');
+      expect(link.rel, link.href).toContain('noopener');
     }
+    expect(appLinks.length).toBeGreaterThan(0);
+    for (const link of appLinks) expect(link.target, link.href).toBeNull();
+  });
+
+  test('reaches the closing band with every plate loaded, none repeated from Anchoring', async ({
+    page,
+  }) => {
+    // Nine Signatures, the three newest anchored; every published image is
+    // served from the bundled preview so the check never leaves the machine.
+    const tokens = Array.from({ length: 9 }, (_, index) => ({
+      TokenId: 60 - index,
+      Seed: (60 - index).toString(16).padStart(2, '0').repeat(32),
+      RoundNum: 3,
+      Staked: index < 3,
+      Tx: { TimeStamp: 1_790_000_000 },
+    }));
+    await page.route('**/api/cosmicgame/cst/list/all/**', (route) =>
+      route.fulfill({ json: { CosmicSignatureTokenList: tokens } }),
+    );
+    await page.route('**/images/new/cosmicsignature/**', (route) =>
+      route.fulfill({ path: 'public/images/landing/signature-24.webp', contentType: 'image/webp' }),
+    );
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.locator('#landing-closing-heading').scrollIntoViewIfNeeded();
+
+    const band = page.getByTestId('collection-recent');
+    const frames = band.getByTestId('art-frame');
+    await expect(frames).toHaveCount(6);
+    for (const frame of await frames.all()) {
+      await expect(frame).toHaveAttribute('data-status', 'loaded', { timeout: 3_000 });
+    }
+    const hrefs = async (testId: string) =>
+      page
+        .getByTestId(testId)
+        .locator('a[href*="/detail/"]')
+        .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+    const anchored = await hrefs('collection-anchored');
+    const newest = await hrefs('collection-recent');
+    expect(anchored).toHaveLength(3);
+    expect(newest.filter((href) => anchored.includes(href))).toEqual([]);
   });
 
   test('footer language directory links every edition of the home at its public URL', async ({

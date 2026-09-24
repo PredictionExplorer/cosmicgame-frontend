@@ -31,6 +31,7 @@ export const quizTextZhHk = {
       startOverLabel: '重新開始',
       ranksHeading: '理解程度',
       rankFromTemplate: '{percent} 起',
+      rankBelowTemplate: '低於 {percent}',
     },
     progressTemplate: '第 {current} 題，共 {total} 題',
     correctFeedback: [

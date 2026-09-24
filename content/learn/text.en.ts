@@ -42,7 +42,6 @@ export const learnTextEn = {
       description:
         'Learn how Cosmic Signature works: Performance Cycles, gestures, CST, three-body NFT art, Arbitrum contracts, anchoring, public goods, and risk clarifications.',
     },
-    eyebrow: 'Guides',
     h1: 'Learn Cosmic Signature',
     intro:
       'Explore how Cosmic Signature works, from your first gesture to the three-body physics behind each artwork. These guides explain Performance Cycles, protocol rules, and the records you can inspect on Arbitrum.',
@@ -73,7 +72,7 @@ export const learnTextEn = {
     },
     quizCta: {
       heading: 'Think you know the protocol?',
-      body: 'One hundred questions in three tiers, drawn from the white paper. Every answer explains the rule behind it and points to the section that settles it.',
+      body: 'One hundred questions in three tiers, based on the white paper. Every answer explains the rule behind it and points to the section that settles it.',
       linkLabel: 'Take the quiz',
     },
   },
@@ -100,6 +99,8 @@ export const learnTextEn = {
   articles: {
     'what-is-cosmic-signature': {
       cardTitle: 'What the protocol is',
+      cardDescription:
+        'Procedural art on Arbitrum, shaped by the gestures of each Performance Cycle.',
       title: 'What Is Cosmic Signature? | Cosmic Signature',
       description:
         'Cosmic Signature is a procedural on-chain art protocol on Arbitrum where Performance Cycle gestures shape deterministic three-body NFT artwork.',
@@ -140,6 +141,7 @@ export const learnTextEn = {
     },
     'how-the-performance-cycle-works': {
       cardTitle: 'The Performance Cycle',
+      cardDescription: 'How a cycle opens, runs on its clock, finalizes and allocates its reserve.',
       title: 'How the Cosmic Signature Performance Cycle Works | Cosmic Signature',
       description:
         'Learn how Cosmic Signature Performance Cycles use Calibration Windows, gestures, finalization, and allocation tracks on Arbitrum.',
@@ -184,6 +186,8 @@ export const learnTextEn = {
     },
     'how-gestures-work': {
       cardTitle: 'How gestures work',
+      cardDescription:
+        'What an ETH or CST gesture costs, what it records and how it extends the clock.',
       title: 'How Gestures Work in Cosmic Signature | Cosmic Signature',
       description:
         'Understand ETH gestures, CST gestures, Gesture Cost, Participation CST, and how gestures shape each Cosmic Signature Performance Cycle.',
@@ -228,6 +232,8 @@ export const learnTextEn = {
     },
     'three-body-nft-art': {
       cardTitle: 'Three-body art',
+      cardDescription:
+        'How an on-chain seed and three-body physics give the same artwork every time.',
       title: 'How Cosmic Signature Generates Three-Body NFT Art | Cosmic Signature',
       description:
         'A technical explanation of deterministic Cosmic Signature NFT artwork generated from on-chain seeds and three-body physics.',
@@ -272,6 +278,7 @@ export const learnTextEn = {
     },
     'cosmic-signature-on-arbitrum': {
       cardTitle: 'Built on Arbitrum',
+      cardDescription: 'Why the protocol runs on Arbitrum, an Ethereum Layer 2 network.',
       title: 'Cosmic Signature on Arbitrum | Cosmic Signature',
       description:
         'Why Cosmic Signature runs on Arbitrum and how the protocol uses Ethereum Layer 2 infrastructure for on-chain art.',
@@ -305,6 +312,8 @@ export const learnTextEn = {
     },
     'contracts-security-verification': {
       cardTitle: 'Contracts and verification',
+      cardDescription:
+        'Where to find the contracts and source code, and how to verify them yourself.',
       title: 'Cosmic Signature Contracts, Security, and Verification | Cosmic Signature',
       description:
         'Find the Cosmic Signature smart contract, source code, verification, and security context for the Arbitrum protocol.',
@@ -338,6 +347,7 @@ export const learnTextEn = {
     },
     'cst-token-and-cosmic-council': {
       cardTitle: 'CST and the Cosmic Council',
+      cardDescription: 'What CST is, how it is imprinted and how holders coordinate the protocol.',
       title: 'CST and the Cosmic Council | Cosmic Signature',
       description:
         'Learn how CST tokens relate to gestures, protocol coordination, and the Cosmic Council.',
@@ -372,6 +382,8 @@ export const learnTextEn = {
     },
     'anchoring-nfts': {
       cardTitle: 'Anchoring NFTs',
+      cardDescription:
+        'How anchored NFTs share each cycle’s Anchor Distribution, and how release works.',
       title: 'Anchoring Cosmic Signature NFTs | Cosmic Signature',
       description:
         'How anchoring works for Cosmic Signature NFTs, ETH Anchor Distributions, and Random Walk NFT eligibility.',
@@ -406,6 +418,7 @@ export const learnTextEn = {
     },
     'protocol-guild-public-goods': {
       cardTitle: 'Public goods and Protocol Guild',
+      cardDescription: 'How part of every Cycle Reserve reaches Ethereum’s core contributors.',
       title: 'Cosmic Signature and Ethereum Public Goods | Cosmic Signature',
       description:
         'How Cosmic Signature routes a public-goods allocation to Protocol Guild, the funding mechanism for Ethereum core contributors.',
@@ -439,6 +452,7 @@ export const learnTextEn = {
     },
     'collecting-and-trading-cosmic-signature': {
       cardTitle: 'Collecting and trading',
+      cardDescription: 'Where the NFTs and CST trade, and what to check before you do.',
       title: 'Collecting and Trading Cosmic Signature NFTs and CST | Cosmic Signature',
       description:
         'Where Cosmic Signature assets trade: the zero-fee Axiom Zero NFT marketplace, Uniswap CST swaps on Arbitrum, and the Chaos Zero prediction market for cycles.',
@@ -486,6 +500,7 @@ export const learnTextEn = {
     // lexicon-allow-start: explicit denial language for crawler and compliance clarity.
     'not-a-lottery-not-an-investment': {
       cardTitle: 'What it is not',
+      cardDescription: 'What the protocol is not, and why the difference matters.',
       title: 'Is Cosmic Signature a Lottery, Casino, or Investment? | Cosmic Signature',
       description:
         'Cosmic Signature is a procedural on-chain art protocol, not a lottery, casino, gambling product, or investment product.',

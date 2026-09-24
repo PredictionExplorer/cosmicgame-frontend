@@ -5,18 +5,24 @@ import type { ReactNode } from 'react';
 
 import { motionTokens, useIsInitialDocumentLoad, useMotionVariants } from '@/lib/motion';
 
+/**
+ * Opacity only, as in the app template — deliberately no `y`. Any transform
+ * on this element (framer-motion settles on a sub-pixel residual rather than
+ * clearing it) makes it the containing block for every `position: fixed`
+ * descendant, so the reading pages' fixed Contents button would anchor to
+ * the document instead of the viewport after a client-side navigation.
+ */
 const pageEnter = {
-  initial: { opacity: 0, y: motionTokens.offset.slide },
+  initial: { opacity: 0 },
   animate: {
     opacity: 1,
-    y: 0,
     transition: { duration: motionTokens.duration.page, ease: motionTokens.ease.outExpo },
   },
 };
 
 /**
- * Root template — runs on every route change. Wraps the route's children in
- * a fade-up motion so navigation feels animated rather than abrupt. Honors
+ * Root template — runs on every route change. Fades the route's children in
+ * so navigation feels animated rather than abrupt. Honors
  * prefers-reduced-motion via lib/motion's useMotionVariants helper.
  *
  * Sits between layout (persistent) and page (per-route) per Next.js App

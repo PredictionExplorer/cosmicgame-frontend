@@ -104,9 +104,9 @@ export interface HeaderLedeProps {
   /** Button label once it is expanded. */
   lessLabel: string;
   /**
-   * Clamp long ledes on phones (the data template). Reading pages (legal,
-   * trust, long-form) pass false: their lede is the page's first statement
-   * and always shows in full.
+   * Clamp long ledes on phones (the data template). `false`: the lede is the
+   * page's thesis (legal, trust and long-read headers), shown in full on
+   * phones too, with no button to mount or remove after hydration.
    */
   clamp?: boolean;
   className?: string;

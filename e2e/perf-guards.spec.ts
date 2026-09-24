@@ -13,8 +13,8 @@ import { LOCALE_PREFIXES } from './locale-fixtures';
  *    (measured CLS was 1.0: the footer travelled a full viewport).
  * 3. Fonts must stay subsetted (a full-range 352KB body font used to be
  *    preloaded on every page).
- * 4. Phones must never mount the WebGL hero (its three.js chunk is ~320KB
- *    of gzip that small viewports render nothing with).
+ * 4. No viewport mounts a WebGL hero: its three.js chunk was ~320KB of
+ *    gzip and a GPU loop, replaced by the static atmosphere and the art.
  */
 
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
@@ -167,22 +167,25 @@ test.describe('font payload stays subsetted', () => {
   });
 });
 
-test.describe('WebGL hero stays desktop-only', () => {
-  test('phones never mount the three.js canvas on the landing', async ({ page, isMobile }) => {
-    test.skip(!isMobile, 'mobile-only guard');
+test.describe('the landing hero ships no WebGL', () => {
+  // The three.js hero (~320 KB gzip and a GPU loop that never paused) was
+  // replaced by the static atmosphere and the art itself on every viewport.
+  // This used to guard phones only, with a desktop positive control; the
+  // guard now holds on desktop too, and the control is the hero's own art.
+  test('no viewport mounts a canvas or requests a three.js chunk on the landing', async ({
+    page,
+  }) => {
+    const scripts: string[] = [];
+    page.on('request', (request) => {
+      if (request.resourceType() === 'script') scripts.push(request.url());
+    });
     await page.setExtraHTTPHeaders(LANDING_HEADERS);
     await page.goto('/');
+    // Positive control: the hero rendered, with its Signature on the plate.
+    await expect(page.locator('main h1').first()).toBeVisible();
+    await expect(page.getByTestId('hero-art-link').locator('img').first()).toBeVisible();
     await page.waitForTimeout(1_500);
     expect(await page.locator('canvas').count()).toBe(0);
-  });
-
-  test('desktop mounts the three.js canvas on the landing (positive control)', async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(Boolean(isMobile), 'desktop-only control');
-    await page.setExtraHTTPHeaders(LANDING_HEADERS);
-    await page.goto('/');
-    await expect(page.locator('canvas').first()).toBeAttached({ timeout: 20_000 });
+    expect(scripts.filter((url) => /three|webgl|postprocessing/i.test(url))).toEqual([]);
   });
 });

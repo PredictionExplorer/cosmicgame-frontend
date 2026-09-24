@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 
 import { landingContentEn } from '@/content/landing';
 
@@ -121,13 +121,23 @@ describe('<HeroArtShowcase />', () => {
     expect(currentImage()).toHaveAttribute('fetchpriority', 'high');
   });
 
-  it('captions the plate with a wall label: the name, then the token number and cycle', () => {
+  it('captions the plate with a wall label: the title, then the cycle and the month', () => {
     render(<HeroArtShowcase art={art} />);
     const caption = screen.getByTestId('hero-art-showcase').querySelector('figcaption')!;
-    // An unnamed token takes the unnamed form, "Signature #000023".
+    // An unnamed token takes the unnamed form, "Signature #000023", with the
+    // number in the identifier face; the meta line does not repeat it.
     expect(caption).toHaveTextContent('landing.artwork.untitled(tokenLabel=#000023)');
-    expect(caption).toHaveTextContent('#000023');
+    expect(caption.textContent?.match(/#000023/g)).toHaveLength(1);
+    expect(within(caption).getByText('#000023')).toHaveClass('font-mono');
     expect(caption).toHaveTextContent('landing.timer.cycle.numbered(number=0)');
+    expect(within(caption).getByText('Jun 2026')).toHaveAttribute(
+      'dateTime',
+      '2026-06-15T07:00:02.000Z',
+    );
+    // The title opens the plate's page for the pointer; the plate is the tab stop.
+    const title = caption.querySelector('a[href$="/detail/23"]')!;
+    expect(title).toHaveAttribute('tabindex', '-1');
+    expect(title).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('link', { name: /Browse the full gallery/ })).toHaveAttribute(
       'href',
       'https://app.cosmicsignature.com/gallery',
@@ -246,7 +256,9 @@ describe('<HeroArtShowcase />', () => {
       .querySelector('[aria-live="polite"]') as HTMLElement;
     previous();
     const caption = screen.getByTestId('hero-art-showcase').querySelector('figcaption')!;
-    expect(caption.querySelector('p')).toHaveTextContent(/^Orbit Song$/);
+    expect(caption.querySelector('a')).toHaveTextContent(/^Orbit Song$/);
+    // A name takes the title, so the number moves to the meta line.
+    expect(within(caption).getByText('#000042')).toHaveClass('type-mono');
     expect(region).toHaveTextContent('Orbit Song #000042');
   });
 

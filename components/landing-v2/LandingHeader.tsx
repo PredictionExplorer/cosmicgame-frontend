@@ -27,6 +27,12 @@ import { useCollapseWhenCrowded } from './useCollapseWhenCrowded';
 export type LandingSectionLabels = Readonly<Record<LandingSectionAnchor, string>>;
 
 /**
+ * Pages without a header link of their own that belong to one that has: the
+ * quiz is part of the learning path, so Learn is current on /quiz and its tiers.
+ */
+const HEADER_PARENT: Readonly<Partial<Record<string, string>>> = { quiz: 'learnHub' };
+
+/**
  * Which home section is in view, for `aria-current="location"` on its link.
  * A band across the upper third of the viewport decides, so the link changes
  * when a section's heading reaches the reading line.
@@ -112,18 +118,29 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
         current: inView === id ? ('location' as const) : undefined,
       }))
     : [];
+  const locatedId = location.route?.id;
+  const headerId = locatedId ? (HEADER_PARENT[locatedId] ?? locatedId) : undefined;
   const pageLinks = LANDING_HEADER_LINKS.map(({ id, short }) => {
     const route = getSiteRoute(id);
-    const current = location.route?.id === id;
+    const current = headerId === id;
     return {
       key: id,
       href: route.path,
       label: short ? copy.routeShortLabel(id) : copy.routeLabel(id),
-      current: current ? (location.exact ? ('page' as const) : ('true' as const)) : undefined,
+      current:
+        current && locatedId === id && location.exact
+          ? ('page' as const)
+          : current
+            ? ('true' as const)
+            : undefined,
     };
   });
 
-  const openApp = <OpenAppLink />;
+  // On the home page "Open the app" is the bar's primary once the hero's own
+  // button has scrolled away. On a reading page the page's own primary leads,
+  // so the header's is an outline, and on phones it waits in the menu, which
+  // leaves the wordmark its place.
+  const openApp = <OpenAppLink variant={onHome ? 'default' : 'outline'} />;
 
   return (
     <header className="glass sticky top-0 z-40 border-b border-rule">
@@ -133,10 +150,10 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
           aria-label={t('brand.homeLabel')}
           className="inline-flex min-h-11 shrink-0 items-center no-underline"
         >
-          {/* On phones the name yields its place to "Open the app" once it appears. */}
+          {/* On the home page's phones the name yields its place to "Open the app" once it appears. */}
           <Wordmark
             size="md"
-            nameClassName={cn('max-[359px]:hidden', pastHero && 'max-sm:hidden')}
+            nameClassName={cn('max-[359px]:hidden', onHome && pastHero && 'max-sm:hidden')}
           />
         </Link>
 
@@ -175,7 +192,12 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
             <LanguageSwitcher variant="responsive" />
           </div>
           {pastHero ? (
-            <div className="animate-in fade-in-0 slide-in-from-top-1 duration-200 motion-reduce:animate-none">
+            <div
+              className={cn(
+                'animate-in fade-in-0 slide-in-from-top-1 duration-200 motion-reduce:animate-none',
+                !onHome && 'max-sm:hidden',
+              )}
+            >
               {openApp}
             </div>
           ) : null}

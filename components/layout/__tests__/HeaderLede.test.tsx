@@ -48,6 +48,22 @@ function mockLayout(lines: number, { scripting = true }: { scripting?: boolean }
 const latin = (lines: number) => 'word '.repeat((lines * LEDE_UNITS_PER_LINE) / 5).trim();
 
 describe('HeaderLede', () => {
+  it('shows a thesis lede in full, with no toggle to mount or remove after hydration', () => {
+    const html = renderToString(
+      <HeaderLede clamp={false} moreLabel="Read more" lessLabel="Show less">
+        The thesis of a long read.
+      </HeaderLede>,
+    );
+    expect(html).not.toContain('Read more');
+    render(
+      <HeaderLede clamp={false} moreLabel="Read more" lessLabel="Show less">
+        The thesis of a long read.
+      </HeaderLede>,
+    );
+    expect(screen.getByText('The thesis of a long read.')).not.toHaveClass(CLAMP_CLASS);
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
   it('ships a short lede whole from the server, so hydration removes nothing', () => {
     const html = renderToString(
       <HeaderLede moreLabel="Read more" lessLabel="Show less">

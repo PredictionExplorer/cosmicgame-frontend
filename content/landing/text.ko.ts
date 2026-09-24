@@ -111,6 +111,7 @@ export const landingTextKo = {
       '사이클이 마감되면 프로토콜은 ETH와 CST 준비금을 끈기, 타이밍, 헌신, 참여를 인정하는 배분 경로로 배분합니다. ETH 준비금의 약 절반은 다음 사이클로 이월됩니다.',
     ethLabel: '각 사이클 준비금의 ETH',
     fixedLabel: '사이클마다 배분되는 CST와 NFT',
+    fixedEach: `수령자마다 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT 1개를 받습니다.`,
     items: {
       'signature-allocation': {
         title: '시그니처 배분',
@@ -138,24 +139,24 @@ export const landingTextKo = {
         body: '무작위로 선정된 참여자 3명이 나누어 받습니다. 선정 빈도는 남긴 제스처 수에 따라 늘어납니다.',
       },
       'participant-nft-stellar-selection': {
-        amount: 'NFT 10개',
+        amount: '수령자 10명',
         title: '참여자 대상 NFT 별빛 선정',
-        body: `무작위로 선정된 참여자 10명이 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT 1개를 받습니다.`,
+        body: '사이클 참여자 가운데 무작위로 선정됩니다.',
       },
       'anchored-nft-stellar-selection': {
-        amount: 'NFT 10개',
+        amount: '수령자 10명',
         title: '앵커링 NFT 별빛 선정',
-        body: `무작위로 선정된 Random Walk NFT 앵커링 보유자 10명이 각각 ${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST와 Cosmic Signature NFT 1개를 받습니다.`,
+        body: 'Random Walk NFT 앵커링 보유자 가운데 무작위로 선정됩니다.',
       },
       'endurance-champion': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST`,
+        amount: '수령자 1명',
         title: '수호 챔피언 배분',
-        body: '가장 오랫동안 끊기지 않고 선두를 지킨 참여자에게 공로 CST 1,000개와 Cosmic Signature NFT 1개가 배분됩니다.',
+        body: '가장 오랫동안 끊기지 않고 선두를 지킨 참여자입니다.',
       },
       'final-cst-gesture': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('ko-KR')} CST`,
+        amount: '수령자 1명',
         title: '최종 CST 제스처 배분',
-        body: '사이클에서 마지막으로 CST 제스처를 남긴 참여자에게 공로 CST 1,000개와 Cosmic Signature NFT 1개가 배분됩니다.',
+        body: '사이클에서 마지막으로 CST 제스처를 남긴 참여자입니다.',
       },
     },
   },
@@ -217,11 +218,11 @@ export const landingTextKo = {
   verifiability: {
     eyebrow: '검증 가능성',
     heading: '열려 있고, 검증되었고, 재현 가능합니다.',
-    body: '누구나 시드로 시그니처를 다시 생성해 검증할 수 있습니다. 컨트랙트 검증, 정적 분석 노트, 보안 감사 현황은 보고서가 나오는 대로 앱을 통해 공개됩니다. Cosmic Signature 저장소들의 프로젝트 소유 자료는 CC0 1.0으로 공개되며, 제3자 의존성, 글꼴, 에셋은 각자의 라이선스를 유지합니다.',
+    body: '누구나 시드로 시그니처를 다시 생성하고, 앱에 공개된 컨트랙트, 소스 코드, 보안 감사 현황과 대조해 확인할 수 있습니다.',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: '프로젝트 소유의 컨트랙트, 셰이더, 렌더링 파이프라인. 어떤 권리도 유보하지 않습니다. 제3자 자료는 제외됩니다.',
+        body: 'Cosmic Signature 저장소들의 프로젝트 소유 자료(컨트랙트, 셰이더, 렌더링 파이프라인)는 CC0 1.0으로 공개되며 어떤 권리도 유보하지 않습니다. 제3자 의존성, 글꼴, 에셋은 각자의 라이선스를 유지합니다.',
       },
       {
         title: '검증 현황',

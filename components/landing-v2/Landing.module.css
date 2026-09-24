@@ -5,9 +5,25 @@
  * server HTML is the finished page, and only the art moves.
  */
 .page {
+  /*
+   * The landing's own rhythm: sections sit about 96px apart at 1440px (the
+   * shared 120px, applied above and below every section, read as the same
+   * slide repeated with a blank screen between).
+   */
+  --section-gap: clamp(3.5rem, 2.5rem + 4vw, 6rem);
   position: relative;
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+}
+
+/*
+ * Japanese has no spaces to break at: the landing's short paragraphs and
+ * list items (the hero subhead at every breakpoint, step and stage bodies,
+ * legend rows) break between phrases, as headings and ledes already do
+ * site-wide. FAQ answers are running prose and keep normal breaking.
+ */
+.page :is(p, li):lang(ja):not(:global(.type-prose)) {
+  word-break: auto-phrase;
 }
 
 /* ── Hero ─────────────────────────────────────────────────────────────── */
@@ -25,7 +41,8 @@
   z-index: -1;
   pointer-events: none;
   background-image: var(--gradient-atmosphere);
-  opacity: var(--atmosphere-strength);
+  /* The hero always carries a visible atmosphere, even in Midnight's quiet 0.3. */
+  opacity: max(var(--atmosphere-strength), 0.65);
 }
 
 .starfield {
@@ -66,6 +83,34 @@
 .headlineAccent {
   display: block;
   color: hsl(var(--secondary));
+}
+
+/*
+ * Chinese and Japanese set every glyph a full em wide, so the 72px display
+ * size overruns the five-column copy column (都在塑造艺术。 is 7em, the column
+ * about 6.9em) and balance strands 艺术。 on a third line. CJK headlines take
+ * 86% of the size beside the plate, and a line-final 。 gives up its empty
+ * half so it never forces a break.
+ */
+@media (width >= 64rem) {
+  html:is(:lang(zh), :lang(ja)) .headline {
+    font-size: calc(clamp(3rem, 0.75rem + 4.2vw, 4.5rem) * 0.86);
+  }
+}
+
+html:is(:lang(zh), :lang(ja)) .headline {
+  text-spacing-trim: trim-both;
+}
+
+/*
+ * The hero plate only: its edges dissolve into the art's own black, so the
+ * Signature floats on the atmosphere instead of sitting in a box. Grids keep
+ * their hard print edges.
+ */
+.bleedPlate {
+  box-shadow:
+    var(--art-edge),
+    0 0 2.5rem 0.5rem hsl(var(--art-ground) / 0.45);
 }
 
 .heroArt {
@@ -294,27 +339,91 @@
 
 /* ── The Cycle ────────────────────────────────────────────────────────── */
 
-.steps {
+/*
+ * The heading, the steps, then the actions (the reading order). From 64rem
+ * the heading and the actions hold the left five columns and the steps run
+ * down the right seven, so the section opens on content, not on an empty
+ * right half.
+ */
+.cycleLayout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 2.5rem;
-  margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+  grid-template-areas:
+    'intro'
+    'steps'
+    'actions';
+}
+
+.cycleIntro {
+  grid-area: intro;
+}
+
+.steps {
+  grid-area: steps;
+  min-width: 0;
+  margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+  border-bottom: 1px solid var(--rule-faint);
 }
 
 .step {
-  min-width: 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid hsl(var(--rule));
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  column-gap: clamp(1rem, 2vw, 2rem);
+  padding-block: clamp(1.25rem, 1rem + 1vw, 2rem);
+  border-top: 1px solid var(--rule-faint);
+}
+
+.step:first-child {
+  border-top-color: hsl(var(--rule));
 }
 
 .stepNumber {
-  display: block;
+  line-height: 1.1;
 }
 
-@media (width >= 48rem) {
+.cycleActions {
+  grid-area: actions;
+}
+
+@media (width >= 64rem) {
+  .cycleLayout {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'intro steps'
+      'actions steps';
+    column-gap: clamp(3rem, 6vw, 6rem);
+  }
+
   .steps {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: clamp(1.5rem, 3vw, 3rem);
+    margin-top: 0;
+  }
+
+  .cycleActions {
+    align-self: start;
+  }
+}
+
+/*
+ * A heading beside its lede (SectionHeading layout="split"): from 64rem the
+ * eyebrow and H2 take seven columns and the lede the other five, set on the
+ * heading's last line.
+ */
+.splitHeading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 1.25rem;
+}
+
+@media (width >= 64rem) {
+  .splitHeading {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(3rem, 6vw, 6rem);
+    align-items: end;
+  }
+
+  .splitLede {
+    padding-bottom: 0.25rem;
   }
 }
 
@@ -356,6 +465,29 @@
 .segmentLabel {
   color: hsl(var(--background));
   white-space: nowrap;
+}
+
+/* Inside reading text (the white paper's figure): the same bar, a quieter height. */
+.barInline {
+  height: 2.25rem;
+}
+
+.barInline .segment {
+  padding: 0.375rem;
+}
+
+/* The bar's key: swatch and name per track, wrapping in rows. */
+.key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.keyItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* A share too narrow for its figure shows the colour alone; the legend reads it. */

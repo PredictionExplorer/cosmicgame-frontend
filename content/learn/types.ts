@@ -22,6 +22,8 @@ export interface LearnArticle {
   readonly h1: string;
   /** A short title for the hub's cards, without the brand name. */
   readonly cardTitle: string;
+  /** One line under the card title: what the reader finds, without the brand name. */
+  readonly cardDescription: string;
   readonly updated: string;
   readonly summary: string;
   readonly schemaType: 'Article' | 'TechArticle';
@@ -43,7 +45,6 @@ export interface LearnHubContent {
     readonly title: string;
     readonly description: string;
   };
-  readonly eyebrow: string;
   readonly h1: string;
   readonly intro: string;
   readonly breadcrumbs: {

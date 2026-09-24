@@ -7,7 +7,7 @@
     },
     "phases": {
       "loading": {
-        "title": "サイクル時刻を同期しています"
+        "title": "サイクル確定時刻を読み込んでいます"
       },
       "openingSoon": {
         "title": "{cycle}はまもなく始まります"
@@ -22,12 +22,18 @@
       "finalHour": {
         "title": "{cycle}は最後の1時間に入りました"
       },
-      "nearHorizon": {
-        "title": "{cycle}の確定時刻が近づいています"
+      "finalMinutes": {
+        "title": "{cycle}は最後の数分に入りました"
       },
       "ready": {
         "title": "{cycle}を確定できます",
-        "body": "確定時刻を過ぎました。サイクルを確定すると、最終的なシグネチャーが生まれます。"
+        "state": "確定できます",
+        "body": "新しい一筆でまだサイクルを延長できます。最後の一筆を記した参加者は、今すぐサイクルを確定できます。"
+      },
+      "confirming": {
+        "title": "{cycle}のカウントダウンがゼロになりました",
+        "state": "確認中",
+        "body": "直前の一筆で確定時刻が延びていないか、チェーン上で確認しています。"
       },
       "unavailable": {
         "title": "現在のサイクル時刻を取得できません",
@@ -41,10 +47,10 @@
     "cycleClock": "サイクルの時計",
     "gestureCount": "{count, plural, other {#筆}}",
     "units": {
-      "days": "日",
-      "hours": "時間",
-      "minutes": "分",
-      "seconds": "秒"
+      "days": "{count, plural, other {日}}",
+      "hours": "{count, plural, other {時間}}",
+      "minutes": "{count, plural, other {分}}",
+      "seconds": "{count, plural, other {秒}}"
     },
     "duration": {
       "days": "{count, plural, other {#日}}",

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import { ArrowRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { getLearnContent } from '@/content/learn';
 import { QUIZ_PATH, getQuizContent } from '@/content/quiz';
+import { WHITE_PAPER_PATH } from '@/content/white-paper';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { DifficultyMeter } from '@/components/quiz/DifficultyMeter';
@@ -34,6 +37,8 @@ export default async function QuizHubPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const { hub, ui, tiers } = getQuizContent(locale);
+  const learn = getLearnContent(locale);
+  const firstGuide = learn.articles[0];
   const t = await getTranslations({ locale, namespace: 'meta' });
   const inLanguage = jsonLdInLanguage(locale);
   const rankNames = Object.fromEntries(
@@ -47,6 +52,7 @@ export default async function QuizHubPage({ params }: PageProps) {
           breadcrumbJsonLd(
             [
               { name: hub.breadcrumbs.homeLabel, path: '/' },
+              { name: learn.hub.breadcrumbs.learnLabel, path: '/learn' },
               { name: hub.breadcrumbs.quizLabel, path: QUIZ_PATH },
             ],
             localeHref(LANDING_ORIGIN, '/', locale),
@@ -60,7 +66,13 @@ export default async function QuizHubPage({ params }: PageProps) {
         ]}
       />
 
-      <PageHeader variant="reading" eyebrow={hub.eyebrow} title={hub.h1} subtitle={hub.intro} />
+      <PageHeader
+        variant="reading"
+        breadcrumbs={[{ label: learn.hub.breadcrumbs.learnLabel, href: '/learn' }]}
+        eyebrow={hub.eyebrow}
+        title={hub.h1}
+        subtitle={hub.intro}
+      />
 
       <ol className="grid gap-4 md:grid-cols-3 md:gap-5">
         {tiers.map((tier, index) => {
@@ -72,7 +84,7 @@ export default async function QuizHubPage({ params }: PageProps) {
                 className="group flex h-full flex-col rounded-surface border border-rule bg-surface p-6 transition-colors duration-fast hover:border-input hover:bg-surface-raised sm:p-7"
               >
                 <span className="flex items-center justify-between gap-4">
-                  <span aria-hidden className="type-mono text-subtle">
+                  <span aria-hidden className="type-label tabular-nums text-subtle">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <DifficultyMeter
@@ -114,6 +126,41 @@ export default async function QuizHubPage({ params }: PageProps) {
           );
         })}
       </ol>
+
+      {/* Not ready for the questions yet: the way back into the reading path. */}
+      <section
+        aria-labelledby="quiz-start-here"
+        className="mt-16 border-t border-rule pt-10 lg:mt-20"
+      >
+        <h2 id="quiz-start-here" className="type-heading-2 text-foreground">
+          {learn.hub.groups.start.title}
+        </h2>
+        <p className="mt-3 max-w-[var(--measure-lede)] type-body-md text-muted-foreground">
+          {learn.hub.groups.start.description}
+        </p>
+        <ul className="mt-6 flex flex-wrap gap-x-8 gap-y-2">
+          {firstGuide ? (
+            <li>
+              <Link
+                href={`/learn/${firstGuide.slug}`}
+                className="link-quiet inline-flex min-h-11 items-center gap-1.5 type-body-md text-foreground"
+              >
+                {firstGuide.cardTitle}
+                <ArrowRight aria-hidden className="size-4 text-subtle" />
+              </Link>
+            </li>
+          ) : null}
+          <li>
+            <Link
+              href={WHITE_PAPER_PATH}
+              className="link-quiet inline-flex min-h-11 items-center gap-1.5 type-body-md text-foreground"
+            >
+              {learn.hub.whitePaper.readLabel}
+              <ArrowRight aria-hidden className="size-4 text-subtle" />
+            </Link>
+          </li>
+        </ul>
+      </section>
     </ReadingMain>
   );
 }

@@ -232,8 +232,8 @@ export const KO_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     variants: ['지식 테스트', '지식 시험'],
   },
   {
-    concept: 'Learn Hub',
-    canonical: '학습 센터',
+    concept: 'Learn (was Learn Hub)',
+    canonical: '학습',
     variants: ['학습 허브', '러닝 허브', '배움터'],
   },
   {

@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
 import type { LandingContent } from '@/content/landing';
@@ -58,12 +58,14 @@ export function Hero({ hero }: { hero: LandingContent['hero'] }) {
               {hero.primaryCta.label}
               <ArrowRight aria-hidden />
             </SiteLink>
+            {/* A link that reads as one: it scrolls to the cycle below. */}
             <SiteLink
               href={hero.secondaryCta.href}
               kind="internal"
-              className={cn(buttonVariants({ variant: 'quiet', size: 'xl' }), 'px-2')}
+              className="link-quiet type-body-md inline-flex min-h-11 items-center gap-1.5 font-medium text-foreground"
             >
               {hero.secondaryCta.label}
+              <ArrowDown aria-hidden className="size-4 text-subtle" />
             </SiteLink>
           </div>
           <div className={styles.heroArt}>

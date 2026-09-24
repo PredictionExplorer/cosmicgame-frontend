@@ -7,7 +7,7 @@
     },
     "phases": {
       "loading": {
-        "title": "사이클 시각 동기화 중"
+        "title": "사이클 마감 시각을 불러오는 중입니다"
       },
       "openingSoon": {
         "title": "{cycle} 시작이 다가옵니다"
@@ -22,12 +22,18 @@
       "finalHour": {
         "title": "{cycle}, 마지막 한 시간에 들어섭니다"
       },
-      "nearHorizon": {
-        "title": "{cycle}, 마감 시각이 다가옵니다"
+      "finalMinutes": {
+        "title": "{cycle}, 마지막 몇 분입니다"
       },
       "ready": {
         "title": "{cycle}, 마감할 준비가 되었습니다",
-        "body": "마감 시각이 지났습니다. 사이클을 마감하면 최종 시그니처가 완성됩니다."
+        "state": "마감 준비 완료",
+        "body": "새 제스처로 사이클을 계속 연장할 수 있습니다. 최종 제스처를 한 참여자는 지금 사이클을 마감할 수 있습니다."
+      },
+      "confirming": {
+        "title": "{cycle}, 카운트다운이 0에 도달했습니다",
+        "state": "확인 중",
+        "body": "직전 제스처로 마감 시각이 연장되었는지 체인에서 확인하고 있습니다."
       },
       "unavailable": {
         "title": "실시간 사이클 시계에 연결할 수 없습니다",
@@ -41,10 +47,10 @@
     "cycleClock": "사이클 시계",
     "gestureCount": "{count, plural, other {제스처 #개}}",
     "units": {
-      "days": "일",
-      "hours": "시간",
-      "minutes": "분",
-      "seconds": "초"
+      "days": "{count, plural, other {일}}",
+      "hours": "{count, plural, other {시간}}",
+      "minutes": "{count, plural, other {분}}",
+      "seconds": "{count, plural, other {초}}"
     },
     "duration": {
       "days": "{count, plural, other {#일}}",

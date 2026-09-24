@@ -269,9 +269,9 @@ export const whitePaperTextKo = {
                     '수호 챔피언 자리를 가장 오래 지킨 참여자(5.2절).',
                   ],
                   [
-                    '공공재 배분',
-                    `${protocolFacts.publicGoodsPercentage}%`,
-                    'Protocol Guild. 공공재 금고를 거칩니다.',
+                    'ETH 별빛 선정',
+                    `${protocolFacts.stellarSelectionEthPercentage}%`,
+                    `사이클의 제스처 풀에서 선정된 자격 ${protocolFacts.ethStellarSelectionRecipients}건이 금액을 균등하게 나눕니다.`,
                   ],
                   [
                     '앵커링 지급',
@@ -279,9 +279,9 @@ export const whitePaperTextKo = {
                     '앵커링된 Cosmic Signature NFT. NFT 수에 비례해 나눕니다.',
                   ],
                   [
-                    'ETH 별빛 선정',
-                    `${protocolFacts.stellarSelectionEthPercentage}%`,
-                    `사이클의 제스처 풀에서 선정된 자격 ${protocolFacts.ethStellarSelectionRecipients}건이 금액을 균등하게 나눕니다.`,
+                    '공공재 배분',
+                    `${protocolFacts.publicGoodsPercentage}%`,
+                    'Protocol Guild. 공공재 금고를 거칩니다.',
                   ],
                   [
                     '누적 준비금',
@@ -912,7 +912,7 @@ export const whitePaperTextKo = {
   figures: {
     cycle: {
       title: '퍼포먼스 사이클의 흐름: 시작부터 다음 사이클까지',
-      caption: '시간은 출시 당시 매개변수 기준입니다. 정확한 규칙은 3절에 있습니다.',
+      caption: '시간은 출시 당시 매개변수 기준입니다. 정확한 규칙은 3.1~3.3절에 있습니다.',
       steps: [
         {
           label: '시작',

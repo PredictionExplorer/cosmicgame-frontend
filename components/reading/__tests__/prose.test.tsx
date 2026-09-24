@@ -97,6 +97,8 @@ describe('reading parts', () => {
       </ReadingHeading>,
     );
     expect(screen.getByRole('heading', { level: 2 })).toHaveAccessibleName('3.2 The Countdown');
+    // Reader mode, copy and search snippets get the number and title apart.
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('3.2 The Countdown');
     expect(
       screen.getByRole('link', { name: 'Link to this section: 3.2 The Countdown' }),
     ).toHaveAttribute('href', '#countdown');
@@ -114,7 +116,12 @@ describe('reading parts', () => {
       />,
     );
     const figure = screen.getByRole('figure');
-    expect(within(figure).getByText('CST = ⌊√(Δt × m ÷ i)⌋')).toBeVisible();
+    // The paper's notation is typeset as MathML (a real radical over the
+    // radicand), named by its plain form.
+    const math = figure.querySelector('math')!;
+    expect(math.namespaceURI).toBe('http://www.w3.org/1998/Math/MathML');
+    expect(math.getAttribute('aria-label')).toBe('CST = ⌊√(Δt × m ÷ i)⌋');
+    expect(math.querySelector('msqrt')?.textContent).toBe('Δt×m÷i');
     expect(within(figure).getByText('seconds since the previous gesture')).toBeInTheDocument();
     const details = figure.querySelector('details');
     expect(details).not.toHaveAttribute('open');

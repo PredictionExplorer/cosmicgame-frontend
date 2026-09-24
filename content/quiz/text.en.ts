@@ -31,6 +31,7 @@ export const quizTextEn = {
       startOverLabel: 'Start over',
       ranksHeading: 'Ranks',
       rankFromTemplate: 'From {percent}',
+      rankBelowTemplate: 'Below {percent}',
     },
     progressTemplate: 'Question {current} of {total}',
     correctFeedback: [

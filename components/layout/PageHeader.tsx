@@ -74,8 +74,9 @@ export interface PageHeaderProps {
   variant?: PageHeaderVariant;
   /**
    * Clamp a long lede on phones. Defaults to true on `data` pages and false on
-   * `reading` pages, whose lede is often the page's core statement (the risk
-   * disclosure, a policy's scope).
+   * `reading` pages, whose lede is the page's thesis (the risk disclosure, a
+   * policy's scope, a long read) and must not hide words or shift the page
+   * when the client removes an unneeded "Read more".
    */
   clampLede?: boolean;
   /**
@@ -247,7 +248,8 @@ export function PageHeader({
       {eyebrowContent ? (
         <div
           className={cn(
-            'mb-3 type-eyebrow text-secondary sm:mb-4',
+            // The eyebrow pairs with the subtle tier everywhere (docs/design-system.md).
+            'mb-3 type-eyebrow text-subtle sm:mb-4',
             centered && 'flex justify-center',
           )}
         >

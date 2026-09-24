@@ -14,8 +14,11 @@ import styles from './Landing.module.css';
 
 /**
  * How a cycle works, in three numbered steps, then the way to take the first
- * one: a gesture in the app, or the full walkthrough. The Calibration Window
- * mechanics live in the FAQ and on How it works, not here.
+ * one: a gesture in the app, or the full walkthrough. From 64rem the heading
+ * and the actions hold the left five columns while the steps run down the
+ * right seven; on phones the steps come between the heading and the actions.
+ * The Calibration Window mechanics live in the FAQ and on How it works, not
+ * here.
  */
 export function TheCycle({ cycle }: { cycle: LandingContent['cycle'] }) {
   const locale = useLocale();
@@ -24,39 +27,45 @@ export function TheCycle({ cycle }: { cycle: LandingContent['cycle'] }) {
 
   return (
     <LandingSection id="cycle" labelledBy="landing-cycle-heading">
-      <SectionHeading
-        eyebrow={cycle.eyebrow}
-        heading={cycle.heading}
-        headingId="landing-cycle-heading"
-      />
-      <ol className={styles.steps}>
-        {cycle.steps.map((step) => (
-          <li key={step.number} className={styles.step}>
-            <span className={cn('type-figure-display text-subtle', styles.stepNumber)}>
-              {step.number}
-            </span>
-            <h3 className="type-heading-1 mt-6">{step.title}</h3>
-            <p className="type-body-md mt-3 max-w-[40ch] text-muted-foreground">{step.body}</p>
-          </li>
-        ))}
-      </ol>
-      <div className={styles.sectionActions}>
-        <SiteLink
-          href={localizeCrossHostHref(gesture.href, locale)}
-          kind={classifyHref(gesture.href, 'landing')}
-          className={cn(buttonVariants({ variant: 'commit', size: 'lg' }), 'no-underline')}
-        >
-          {gesture.label}
-          <ArrowRight aria-hidden />
-        </SiteLink>
-        <SiteLink
-          href={localizeCrossHostHref(guide.href, locale)}
-          kind={classifyHref(guide.href, 'landing')}
-          className="link-quiet type-body-md inline-flex min-h-11 items-center gap-1.5 text-foreground"
-        >
-          {guide.label}
-          <ArrowRight aria-hidden className="size-4 text-subtle" />
-        </SiteLink>
+      <div className={styles.cycleLayout}>
+        <SectionHeading
+          eyebrow={cycle.eyebrow}
+          heading={cycle.heading}
+          headingId="landing-cycle-heading"
+          className={styles.cycleIntro}
+        />
+        <ol className={styles.steps}>
+          {cycle.steps.map((step) => (
+            <li key={step.number} className={styles.step}>
+              {/* Inter figures: Clash's round zeros read as the letter O. */}
+              <span className={cn('type-figure-lg text-subtle', styles.stepNumber)}>
+                {step.number}
+              </span>
+              <div className="min-w-0">
+                <h3 className="type-heading-2">{step.title}</h3>
+                <p className="type-body-md mt-2 max-w-[48ch] text-muted-foreground">{step.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <div className={cn(styles.sectionActions, styles.cycleActions)}>
+          <SiteLink
+            href={localizeCrossHostHref(gesture.href, locale)}
+            kind={classifyHref(gesture.href, 'landing')}
+            className={cn(buttonVariants({ variant: 'commit', size: 'lg' }), 'no-underline')}
+          >
+            {gesture.label}
+            <ArrowRight aria-hidden />
+          </SiteLink>
+          <SiteLink
+            href={localizeCrossHostHref(guide.href, locale)}
+            kind={classifyHref(guide.href, 'landing')}
+            className="link-quiet type-body-md inline-flex min-h-11 items-center gap-1.5 text-foreground"
+          >
+            {guide.label}
+            <ArrowRight aria-hidden className="size-4 text-subtle" />
+          </SiteLink>
+        </div>
       </div>
     </LandingSection>
   );

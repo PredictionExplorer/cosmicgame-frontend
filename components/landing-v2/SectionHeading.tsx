@@ -13,6 +13,13 @@ interface SectionHeadingProps {
   description?: ReactNode;
   /** `display` for a section that leads with its heading, `compact` beside another section. */
   size?: 'display' | 'compact';
+  /**
+   * `stack` (default): eyebrow, heading and lede in one column. `split`: from
+   * 64rem the lede moves beside the heading (seven columns and five, on the
+   * heading's last line), so a section that leads with its heading does not
+   * open on an empty right half.
+   */
+  layout?: 'stack' | 'split';
   className?: string;
 }
 
@@ -26,21 +33,26 @@ export function SectionHeading({
   headingId,
   description,
   size = 'display',
+  layout = 'stack',
   className,
 }: SectionHeadingProps) {
+  const split = layout === 'split' && Boolean(description);
   return (
-    <div className={cn('max-w-[48rem]', className)}>
-      <p className="type-eyebrow text-subtle">{eyebrow}</p>
-      <h2
-        id={headingId}
-        className={cn('mt-4', size === 'display' ? 'type-display-md' : 'type-display-sm')}
-      >
-        {typeof heading === 'string' ? <PhrasedText>{heading}</PhrasedText> : heading}
-      </h2>
+    <div className={cn(split ? styles.splitHeading : 'max-w-[48rem]', className)}>
+      <div>
+        <p className="type-eyebrow text-subtle">{eyebrow}</p>
+        <h2
+          id={headingId}
+          className={cn('mt-4', size === 'display' ? 'type-display-md' : 'type-display-sm')}
+        >
+          {typeof heading === 'string' ? <PhrasedText>{heading}</PhrasedText> : heading}
+        </h2>
+      </div>
       {description ? (
         <p
           className={cn(
-            'mt-5 text-muted-foreground',
+            'text-muted-foreground',
+            split ? styles.splitLede : 'mt-5',
             size === 'display' ? 'type-lede' : 'type-body-md max-w-[var(--measure-lede)]',
           )}
         >

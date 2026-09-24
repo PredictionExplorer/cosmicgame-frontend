@@ -113,6 +113,7 @@ export const landingTextVi = {
       'Khi một chu kỳ hoàn tất, giao thức phân phối dự trữ ETH và CST của mình qua các luồng phân bổ ghi nhận sự bền bỉ, thời điểm, sự tận tâm và sự tham gia. Khoảng một nửa dự trữ ETH được tích lũy sang chu kỳ tiếp theo.',
     ethLabel: 'ETH từ mỗi Dự trữ chu kỳ',
     fixedLabel: 'CST và NFT trong mỗi chu kỳ',
+    fixedEach: `Mỗi người nhận được ${cstAmount} CST và một Cosmic Signature NFT.`,
     items: {
       'signature-allocation': {
         title: 'Phân bổ Signature',
@@ -140,24 +141,24 @@ export const landingTextVi = {
         body: 'Chia cho ba người tham gia được chọn ngẫu nhiên. Tần suất được chọn tăng theo số nét bút đã đặt.',
       },
       'participant-nft-stellar-selection': {
-        amount: '10 NFT',
+        amount: '10 người nhận',
         title: 'NFT Tinh tuyển — Người tham gia',
-        body: `Mười người tham gia được chọn ngẫu nhiên, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT.`,
+        body: 'Được chọn ngẫu nhiên trong số người tham gia của chu kỳ.',
       },
       'anchored-nft-stellar-selection': {
-        amount: '10 NFT',
+        amount: '10 người nhận',
         title: 'Tinh tuyển NFT neo giữ',
-        body: `Mười người neo giữ Random Walk NFT được chọn ngẫu nhiên, mỗi người nhận ${cstAmount} CST và một Cosmic Signature NFT.`,
+        body: 'Được chọn ngẫu nhiên trong số người neo giữ Random Walk NFT.',
       },
       'endurance-champion': {
-        amount: `${cstAmount} CST`,
+        amount: '1 người nhận',
         title: 'Phân bổ Quán quân Bền bỉ',
-        body: '1.000 CST ghi nhận và một Cosmic Signature NFT dành cho người giữ vị trí người đặt nét bút gần nhất lâu nhất trong một khoảng liên tục.',
+        body: 'Người giữ vị trí người đặt nét bút gần nhất lâu nhất trong một khoảng liên tục.',
       },
       'final-cst-gesture': {
-        amount: `${cstAmount} CST`,
+        amount: '1 người nhận',
         title: 'Phân bổ nét bút CST cuối cùng',
-        body: '1.000 CST ghi nhận và một Cosmic Signature NFT dành cho người tham gia đặt nét bút CST cuối cùng của chu kỳ.',
+        body: 'Người tham gia đặt nét bút CST cuối cùng của chu kỳ.',
       },
     },
   },
@@ -219,11 +220,11 @@ export const landingTextVi = {
   verifiability: {
     eyebrow: 'Khả năng xác minh',
     heading: 'Mở, đã xác minh, có thể tái tạo.',
-    body: 'Bất kỳ ai cũng có thể kiểm tra Signature bằng cách tái tạo tác phẩm từ seed. Ứng dụng công bố thông tin xác minh hợp đồng, phân tích tĩnh và tình trạng kiểm toán khi có báo cáo. Tài liệu thuộc dự án trong các kho mã Cosmic Signature được công bố theo CC0 1.0; các phụ thuộc bên thứ ba, phông chữ và tài sản giữ giấy phép riêng của chúng.',
+    body: 'Bất kỳ ai cũng có thể tái tạo Signature từ seed và đối chiếu với hợp đồng, mã nguồn và tình trạng kiểm toán mà ứng dụng công bố.',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: 'Hợp đồng, shader và quy trình kết xuất thuộc dự án. Không bảo lưu quyền nào. Tài liệu bên thứ ba không thuộc phạm vi này.',
+        body: 'Tài liệu thuộc dự án trong các kho mã Cosmic Signature (hợp đồng, shader và quy trình kết xuất) được công bố theo CC0 1.0, không bảo lưu quyền nào; các phụ thuộc bên thứ ba, phông chữ và tài sản giữ giấy phép riêng của chúng.',
       },
       {
         title: 'Tình trạng xác minh',

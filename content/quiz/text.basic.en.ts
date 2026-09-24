@@ -20,7 +20,7 @@ export const basicQuestionsTextEn = {
       'Cosmic Signature is a procedural art protocol: timed Performance Cycles fill with gestures, and finalization imprints deterministic three-body artwork. No AI is involved anywhere in the pipeline — the art is physics computed from a seed, which is the opposite of a text-prompt image service.',
     funFact:
       'The name collides with COSMIC, a well-known cancer mutation database. The protocol has nothing to do with it — a disambiguation the docs state outright.',
-    referenceLabel: 'Learn: What Is Cosmic Signature?',
+    referenceLabel: 'Learn: What is Cosmic Signature?',
   },
   'what-is-a-gesture': {
     prompt: 'In protocol terms, what is a gesture?',
@@ -269,13 +269,13 @@ export const basicQuestionsTextEn = {
   'stellar-selection-what': {
     prompt: 'What are Stellar Selections?',
     options: {
-      a: 'Per-gesture entries recorded during the cycle, from which the contract draws recipients at finalization.',
+      a: 'Per-gesture entries recorded during the cycle, from which the contract selects recipients at finalization.',
       b: 'A leaderboard ranking participants by activity.',
       c: 'Rarity tiers assigned to the NFT artwork.',
       d: 'A scheme for naming constellations in the art.',
     },
     explanation:
-      'Each gesture records one entry in the cycle\u2019s Selection pool. At finalization the contract draws entries for the ETH and NFT Stellar Selections, so selection frequency is proportional to participation. It is a distribution mechanism, not a ranking.',
+      'Each gesture records one entry in the cycle\u2019s Selection pool. At finalization the contract selects entries for the ETH and NFT Stellar Selections, so selection frequency is proportional to participation. It is a distribution mechanism, not a ranking.',
     referenceLabel: 'White paper \u00a75.3 \u2014 Stellar Selections',
   },
   'ecosystem-optionality': {

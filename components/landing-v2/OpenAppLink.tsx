@@ -17,9 +17,12 @@ import { cn } from '@/lib/utils';
  */
 export function OpenAppLink({
   size = 'md',
+  variant = 'default',
   className,
 }: {
   size?: 'md' | 'lg';
+  /** `outline` where the page's own primary action should lead (the reading pages' header). */
+  variant?: 'default' | 'outline';
   className?: string;
 }) {
   const t = useTranslations('nav');
@@ -30,7 +33,7 @@ export function OpenAppLink({
       href={app.href}
       kind={app.kind}
       className={cn(
-        buttonVariants({ variant: 'default', size: size === 'md' ? 'default' : 'lg' }),
+        buttonVariants({ variant, size: size === 'md' ? 'default' : 'lg' }),
         'shrink-0 no-underline',
         size === 'md' ? 'max-sm:px-3' : 'px-5',
         className,

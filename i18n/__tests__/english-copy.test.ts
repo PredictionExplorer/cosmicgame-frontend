@@ -62,7 +62,6 @@ const CAPITALISED_GESTURE_ALLOWLIST = new Set([
   'meta:shared.defaultOgTitle',
   'meta:statistics.title',
   'meta:howItWorks.title',
-  'meta:learnArticles.how-gestures-work.title',
   'seo:og.default.alt',
   'seo:og.default.title',
   // The ETH Calibration Window that closes at the first gesture.

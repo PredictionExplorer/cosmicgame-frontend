@@ -311,7 +311,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | Галерея                                           |                                                |
 | How It Works                         | Як це працює                                      |                                                |
 | FAQ / Clarifications                 | Поширені запитання                                | nav and page heading alike; never ЧаПи         |
-| Learn Hub                            | Навчальний центр                                  |                                                |
+| Learn (was Learn Hub)                | Навчання                                          | prose: розділ «Навчання»                       |
 | About                                | Про проєкт                                        | 2019 orthography: проєкт                       |
 | Statistics                           | Статистика                                        |                                                |
 | My Statistics / My Tokens            | Моя статистика / Мої токени                       |                                                |

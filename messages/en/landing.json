@@ -7,7 +7,7 @@
     },
     "phases": {
       "loading": {
-        "title": "Synchronizing the cycle horizon"
+        "title": "Reading the Cycle Finalization Time"
       },
       "openingSoon": {
         "title": "{cycle} opens soon"
@@ -22,12 +22,18 @@
       "finalHour": {
         "title": "{cycle} is entering the final hour"
       },
-      "nearHorizon": {
-        "title": "{cycle} is near the horizon"
+      "finalMinutes": {
+        "title": "{cycle}: final minutes"
       },
       "ready": {
         "title": "{cycle} is ready to finalize",
-        "body": "The horizon has closed. The protocol is ready to transform the cycle into a final Signature."
+        "state": "Ready to finalize",
+        "body": "A new gesture can still extend the cycle. The participant who made the last gesture can finalize it now."
+      },
+      "confirming": {
+        "title": "{cycle} reached zero",
+        "state": "Confirming",
+        "body": "Checking the chain for a last-second gesture before the cycle can finalize."
       },
       "unavailable": {
         "title": "Live cycle clock unavailable",
@@ -41,10 +47,10 @@
     "cycleClock": "Cycle clock",
     "gestureCount": "{count, plural, one {# Gesture} other {# Gestures}}",
     "units": {
-      "days": "days",
-      "hours": "hours",
-      "minutes": "minutes",
-      "seconds": "seconds"
+      "days": "{count, plural, one {day} other {days}}",
+      "hours": "{count, plural, one {hour} other {hours}}",
+      "minutes": "{count, plural, one {minute} other {minutes}}",
+      "seconds": "{count, plural, one {second} other {seconds}}"
     },
     "duration": {
       "days": "{count, plural, one {# day} other {# days}}",

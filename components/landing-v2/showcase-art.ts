@@ -23,6 +23,8 @@ export interface ShowcaseArtwork {
   RoundNum?: number;
   TokenName?: string;
   Staked?: boolean;
+  /** Imprint time in Unix seconds, when known. */
+  ImprintedAt?: number;
   /** The bundled preview, for the two featured Signatures. */
   imageSrc?: string;
 }

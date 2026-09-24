@@ -7,7 +7,7 @@
     },
     "phases": {
       "loading": {
-        "title": "正在同步週期倒數"
+        "title": "正在讀取週期收官時間"
       },
       "openingSoon": {
         "title": "{cycle}即將開啟"
@@ -22,12 +22,18 @@
       "finalHour": {
         "title": "{cycle}進入最後一小時"
       },
-      "nearHorizon": {
-        "title": "{cycle}即將收官"
+      "finalMinutes": {
+        "title": "{cycle}進入最後幾分鐘"
       },
       "ready": {
         "title": "{cycle}已可收官",
-        "body": "收官倒數已經歸零，協議已可將本週期銘刻為最終簽名。"
+        "state": "已可收官",
+        "body": "新的落筆仍可延長本週期。最後一次落筆的參與者現在即可收官。"
+      },
+      "confirming": {
+        "title": "{cycle}倒數已歸零",
+        "state": "確認中",
+        "body": "正在鏈上驗證最後一刻是否有新落筆延長週期。"
       },
       "unavailable": {
         "title": "無法讀取即時週期時鐘",
@@ -41,10 +47,10 @@
     "cycleClock": "週期時鐘",
     "gestureCount": "{count, number} 次落筆",
     "units": {
-      "days": "天",
-      "hours": "小時",
-      "minutes": "分",
-      "seconds": "秒"
+      "days": "{count, plural, other {天}}",
+      "hours": "{count, plural, other {小時}}",
+      "minutes": "{count, plural, other {分}}",
+      "seconds": "{count, plural, other {秒}}"
     },
     "duration": {
       "days": "{count, plural, other {# 天}}",

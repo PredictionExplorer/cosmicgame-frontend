@@ -63,7 +63,7 @@ export const landingTextZhTw = {
     eyebrow: '藝術',
     heading: '三體軌跡，由鏈上種子\u200B生成。',
     description:
-      '每枚 Cosmic Signature NFT 都呈現 3 個天體在牛頓引力下的運動軌跡。三體運動天生混沌。沒有 AI，沒有訓練資料，只有確定性的物理。同一種子生成的畫面逐畫素一致。',
+      '每枚 Cosmic Signature NFT 都呈現 3 個天體在牛頓引力下的運動軌跡。三體運動天生混沌。沒有 AI，沒有訓練資料，只有確定性的物理。同一種子生成的畫面逐畫素一致。',
     showcase: {
       viewAriaLabel: '檢視 Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature 作品 {tokenLabel}',
@@ -72,11 +72,11 @@ export const landingTextZhTw = {
     stages: {
       seed: {
         title: '種子',
-        body: '從鏈上資料——區塊資訊與 ArbSys 預編譯——派生出 32 位元組雜湊，再送入 SHA3-256 RNG。',
+        body: '從鏈上資料——區塊資訊與 ArbSys 預編譯——派生出 32 位元組雜湊，再送入 SHA3-256 RNG。',
       },
       simulation: {
         title: '模擬',
-        body: '十萬組候選構型分別透過四階 Yoshida 辛積分器演算，每組推進 1,000,000 個物理步。',
+        body: '十萬組候選構型分別透過四階 Yoshida 辛積分器演算，每組推進 1,000,000 個物理步。',
       },
       selection: {
         title: '篩選',
@@ -92,17 +92,17 @@ export const landingTextZhTw = {
       },
       'spectral-render': {
         title: '光譜渲染',
-        body: '從 380 至 700 奈米劃分 64 個波長區間，以隨速度變化的線寬和景深渲染軌跡。',
+        body: '從 380 至 700 奈米劃分 64 個波長區間，以隨速度變化的線寬和景深渲染軌跡。',
       },
       signature: {
         title: '簽名',
-        body: 'AgX 色調對映、輝光、OpenSimplex 星雲層與色彩分級共同完成畫面。最終生成一張 16 位元 PNG 與一段 30 秒 H.265 影片。',
+        body: 'AgX 色調對映、輝光、OpenSimplex 星雲層與色彩分級共同完成畫面。最終生成一張 16 位元 PNG 與一段 30 秒 H.265 影片。',
       },
     },
     facts: {
       imprinted: { label: '已銘刻' },
       resolution: { label: '原生解析度' },
-      animation: { label: '動畫', value: '30 秒 · 60 fps' },
+      animation: { label: '動畫', value: '30 秒 · 60 fps' },
       license: { label: '授權條款' },
     },
   },
@@ -114,10 +114,11 @@ export const landingTextZhTw = {
       '週期收官後，協議會沿各條分配軌道發放 ETH 與 CST 儲備，以表彰堅守、時機、投入與參與。約一半 ETH 儲備會滾入下一週期。',
     ethLabel: '每個週期儲備中的 ETH',
     fixedLabel: '每個週期的 CST 與 NFT',
+    fixedEach: `每位獲配者獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。`,
     items: {
       'signature-allocation': {
         title: '簽名分配',
-        body: '寫下收官之筆的參與者獲配。其中包括 1,000 CST 與 1 枚 Cosmic Signature NFT。',
+        body: '寫下收官之筆的參與者獲配。其中包括 1,000 CST 與 1 枚 Cosmic Signature NFT。',
       },
       'compounding-reserve': {
         percent: '約 50%',
@@ -126,7 +127,7 @@ export const landingTextZhTw = {
       },
       'chrono-warrior': {
         title: '時之勇士分配',
-        body: `單次連續保持堅守冠軍身分時間最長的參與者獲配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。`,
+        body: `單次連續保持堅守冠軍身分時間最長的參與者獲配。其中包括 ${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。`,
       },
       'public-goods': {
         title: '公共財分配',
@@ -138,27 +139,27 @@ export const landingTextZhTw = {
       },
       'eth-stellar-selection': {
         title: 'ETH 星選',
-        body: '由程序化隨機選出的 3 位參與者均分；入選頻次隨落筆次數增加。',
+        body: '由程序化隨機選出的 3 位參與者均分；入選頻次隨落筆次數增加。',
       },
       'participant-nft-stellar-selection': {
-        amount: '10 枚 NFT',
+        amount: '10 位獲配者',
         title: '參與者 NFT 星選',
-        body: `程序化隨機選出 10 位參與者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。`,
+        body: '從本週期的參與者中程序化隨機選出。',
       },
       'anchored-nft-stellar-selection': {
-        amount: '10 枚 NFT',
+        amount: '10 位獲配者',
         title: '錨定 NFT 星選',
-        body: `程序化隨機選出 10 位 Random Walk NFT 錨定者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT。`,
+        body: '從 Random Walk NFT 錨定者中程序化隨機選出。',
       },
       'endurance-champion': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST`,
+        amount: '1 位獲配者',
         title: '堅守冠軍分配',
-        body: '連續堅守時間最長的參與者獲配 1,000 表彰 CST 與 1 枚 Cosmic Signature NFT。',
+        body: '連續堅守時間最長的參與者。',
       },
       'final-cst-gesture': {
-        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST`,
+        amount: '1 位獲配者',
         title: 'CST 收官之筆分配',
-        body: '本週期最後一次使用 CST 落筆的參與者獲配 1,000 表彰 CST 與 1 枚 Cosmic Signature NFT。',
+        body: '本週期最後一次使用 CST 落筆的參與者。',
       },
     },
   },
@@ -171,7 +172,7 @@ export const landingTextZhTw = {
       '每個週期累積 ETH，解錨時取回',
       '無固定期限、無罰則；每枚 NFT 解錨後不可再錨定',
       '姊妹系列 Random Walk NFT 也可以錨定',
-      `已錨定的 Random Walk NFT 可獲得錨定 NFT 星選資格：${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT，不含 ETH`,
+      `已錨定的 Random Walk NFT 可獲得錨定 NFT 星選資格：${protocolFacts.specialAllocationCst.toLocaleString('zh-TW')} CST 與 1 枚 Cosmic Signature NFT，不含 ETH`,
     ],
     ctaLabel: '前往應用程式錨定',
   },
@@ -204,7 +205,7 @@ export const landingTextZhTw = {
     columns: [
       {
         title: '協調提案',
-        body: '獲委託權重不少於 100 CST 的地址均可提交提案。協調延遲為 2 天，協調期為 2 週。',
+        body: '獲委託權重不少於 100 CST 的地址均可提交提案。協調延遲為 2 天，協調期為 2 週。',
       },
       {
         title: '協調權重',
@@ -220,11 +221,11 @@ export const landingTextZhTw = {
   verifiability: {
     eyebrow: '可驗證性',
     heading: '開放、已驗證、可復現。',
-    body: '任何人都能從種子重新生成簽名作品，獨立完成驗證。合約驗證、靜態分析說明和審計狀態會隨報告一同發布在應用程式中。Cosmic Signature 各儲存庫中的專案自有材料採用 CC0 1.0；第三方依賴、字型與素材仍適用各自的授權條款。',
+    body: '任何人都能從種子重新生成簽名作品，並對照應用程式中公開的合約、原始碼與審計狀態自行驗證。',
     pillars: [
       {
         title: 'CC0 1.0',
-        body: '專案自有的合約、著色器與渲染管線採用 CC0 1.0，不保留任何權利；第三方材料不在此範圍內。',
+        body: 'Cosmic Signature 各儲存庫中的專案自有材料（合約、著色器與渲染管線）採用 CC0 1.0，不保留任何權利；第三方依賴、字型與素材仍適用各自的授權條款。',
       },
       {
         title: '驗證狀態',
@@ -251,7 +252,7 @@ export const landingTextZhTw = {
       {
         question: '這件藝術作品在技術上是什麼？',
         answer:
-          '每枚 Cosmic Signature NFT 都由確定性三體模擬渲染而成，模擬遵循牛頓引力。鏈上種子從 100,000 條候選軌道中選出一條；這些軌道均由四階 Yoshida 辛積分器模擬，再透過 64 個波長區間進行光譜渲染，並以 OKLab 混合色彩。整套管線以 CC0 完全開源，任何人都能從種子復現簽名作品。',
+          '每枚 Cosmic Signature NFT 都由確定性三體模擬渲染而成，模擬遵循牛頓引力。鏈上種子從 100,000 條候選軌道中選出一條；這些軌道均由四階 Yoshida 辛積分器模擬，再透過 64 個波長區間進行光譜渲染，並以 OKLab 混合色彩。整套管線以 CC0 完全開源，任何人都能從種子復現簽名作品。',
       },
       {
         question: 'ETH 分配來自哪裡？',

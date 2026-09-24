@@ -79,10 +79,13 @@ describe('imprintedCount', () => {
     ).toBe(48);
   });
 
-  it('is unknown until the collection answers, and zero for an empty one', () => {
+  it('is unknown until the collection answers', () => {
     expect(imprintedCount({ status: 'loading', tokens: [] })).toBeNull();
     expect(imprintedCount({ status: 'failed', tokens: [] })).toBeNull();
-    expect(imprintedCount({ status: 'ready', tokens: [] })).toBe(0);
+  });
+
+  it('is unknown, never 0, when the answer has no usable token beside the bundled Signatures', () => {
+    expect(imprintedCount({ status: 'ready', tokens: [] })).toBeNull();
   });
 });
 

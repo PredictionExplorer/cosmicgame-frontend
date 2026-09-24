@@ -25,6 +25,7 @@ export function TheArt({ art }: TheArtProps) {
         heading={art.heading}
         headingId="landing-art-heading"
         description={art.description}
+        layout="split"
       />
 
       <div className={styles.artLayout}>
@@ -38,7 +39,7 @@ export function TheArt({ art }: TheArtProps) {
         <ol className={styles.stages}>
           {art.stages.map((stage) => (
             <li key={stage.number} className={styles.stage}>
-              <span className="type-mono pt-0.5 text-subtle">
+              <span className="type-label pt-1 tabular-nums text-subtle">
                 <span className="sr-only">{art.stageLabel} </span>
                 {stage.number}
               </span>

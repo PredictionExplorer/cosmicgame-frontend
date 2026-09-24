@@ -286,7 +286,7 @@ Interface vocabulary — no coinage needed, but fixed for consistency:
 | Gallery                              | 画廊                       | art gallery, not 图库                                |
 | How It Works                         | 运作原理                   |                                                      |
 | FAQ / Clarifications                 | 常见问题 / 释疑            | nav uses 常见问题; the FAQ page heading may use 释疑 |
-| Learn Hub                            | 学习中心                   |                                                      |
+| Learn (was Learn Hub)                | 学习                       | prose: 学习指南                                      |
 | About                                | 关于                       |                                                      |
 | Statistics                           | 统计                       |                                                      |
 | My Statistics / My Tokens            | 我的统计 / 我的代币        |                                                      |

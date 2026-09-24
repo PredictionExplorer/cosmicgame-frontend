@@ -1,5 +1,7 @@
-import type { ReactNode } from 'react';
+import { createElement as h, type ReactNode } from 'react';
 import { ChevronRight, Hash, Info } from 'lucide-react';
+
+import { protocolFacts } from '@/content/protocol-facts';
 
 import { cn } from '@/lib/utils';
 
@@ -57,11 +59,16 @@ export function ReadingHeading({
         )}
       >
         {number ? (
-          <span
-            className={cn('tabular-nums text-subtle', Heading === 'h2' ? 'mr-3 sm:mr-4' : 'mr-2.5')}
-          >
-            {number}
-          </span>
+          <>
+            <span
+              className={cn(
+                'tabular-nums text-subtle',
+                Heading === 'h2' ? 'mr-2 sm:mr-3' : 'mr-1.5',
+              )}
+            >
+              {number}
+            </span>{' '}
+          </>
         ) : null}
         {children}
       </Heading>
@@ -202,8 +209,40 @@ export interface FormulaFigureProps {
 }
 
 /**
- * A formula in a sunken well: the plain notation with a legend of its
- * symbols, the contract's own expression one click away, and the caption.
+ * Notations the paper sets as MathML rather than as a line of text: a real
+ * radical over its radicand and floor brackets that grow with it, drawn by
+ * the browser's math typesetting (MathML Core) instead of fallback glyphs
+ * in the mono face. Built with createElement, since JSX has no MathML types.
+ */
+const NOTATION_MATH: Readonly<Record<string, () => ReactNode>> = {
+  [protocolFacts.participationCstNotation]: () =>
+    h(
+      'math',
+      { 'aria-label': protocolFacts.participationCstNotation, className: 'text-foreground' },
+      h(
+        'mrow',
+        null,
+        h('mi', { mathvariant: 'normal' }, 'CST'),
+        h('mo', null, '='),
+        h('mo', null, '⌊'),
+        h(
+          'msqrt',
+          null,
+          h('mi', { mathvariant: 'normal' }, 'Δt'),
+          h('mo', null, '×'),
+          h('mi', null, 'm'),
+          h('mo', null, '÷'),
+          h('mi', null, 'i'),
+        ),
+        h('mo', null, '⌋'),
+      ),
+    ),
+};
+
+/**
+ * A formula in a sunken well: the plain notation (set as MathML when the
+ * paper has a typeset form of it) with a legend of its symbols, the
+ * contract's own expression one click away, and the caption.
  */
 export function FormulaFigure({
   label,
@@ -223,9 +262,13 @@ export function FormulaFigure({
       )}
     >
       <p className="type-label text-subtle">{label}</p>
-      <p className="mt-3 break-words font-mono type-body-lg text-foreground">
-        {notation ?? formula}
-      </p>
+      {notation && NOTATION_MATH[notation] ? (
+        <div className="mt-3 type-body-lg">{NOTATION_MATH[notation]()}</div>
+      ) : (
+        <p className="mt-3 break-words font-mono type-body-lg text-foreground">
+          {notation ?? formula}
+        </p>
+      )}
       {legend && legend.length > 0 ? (
         <dl className="mt-4 grid gap-1.5">
           {legend.map((entry) => (
@@ -261,7 +304,8 @@ export interface NumberedFigureProps {
   /** "Figure 1". */
   label: string;
   title: string;
-  caption?: string;
+  /** The caption, e.g. with its cross-references linked. */
+  caption?: ReactNode;
   children: ReactNode;
   className?: string;
   /** Id of the title, which names the figure. */

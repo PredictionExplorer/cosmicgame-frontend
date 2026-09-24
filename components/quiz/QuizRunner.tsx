@@ -608,7 +608,7 @@ function QuizSummary({
   return (
     <section aria-labelledby="quiz-summary-heading" data-testid="quiz-summary">
       <div className="rounded-surface border border-rule bg-surface p-5 sm:p-8">
-        <p className="type-eyebrow text-secondary">{ui.summary.eyebrow}</p>
+        <p className="type-eyebrow text-subtle">{ui.summary.eyebrow}</p>
         <h2
           ref={headingRef}
           id="quiz-summary-heading"
@@ -707,28 +707,25 @@ function MissedQuestion({
   return (
     <li className="py-5 sm:py-6">
       <p className="type-title text-foreground">{entry.question.prompt}</p>
-      <dl className="mt-3 grid gap-2">
+      {/* Each group holds only a term and its value; the mark sits inside the term. */}
+      <dl className="mt-3 grid gap-3">
         {chosenId ? (
-          <div className="flex items-start gap-2.5">
-            <X aria-hidden className="mt-0.5 size-4 shrink-0 text-critical" />
-            <dt className="sr-only">{ui.yourAnswerLabel}</dt>
-            <dd className="type-body-sm text-muted-foreground">
-              <span aria-hidden className="type-label text-subtle">
-                {ui.yourAnswerLabel}
-                {' · '}
-              </span>
+          <div>
+            <dt className="flex items-center gap-1.5 type-label text-subtle">
+              <X aria-hidden className="size-4 shrink-0 text-critical" />
+              {ui.yourAnswerLabel}
+            </dt>
+            <dd className="mt-0.5 pl-[1.375rem] type-body-sm text-muted-foreground">
               <span className="tabular-nums">{letterOf(chosenId)}.</span> {textOf(chosenId)}
             </dd>
           </div>
         ) : null}
-        <div className="flex items-start gap-2.5">
-          <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-positive" />
-          <dt className="sr-only">{ui.correctAnswerLabel}</dt>
-          <dd className="type-body-sm text-foreground">
-            <span aria-hidden className="type-label text-subtle">
-              {ui.correctAnswerLabel}
-              {' · '}
-            </span>
+        <div>
+          <dt className="flex items-center gap-1.5 type-label text-subtle">
+            <Check aria-hidden className="size-4 shrink-0 text-positive" />
+            {ui.correctAnswerLabel}
+          </dt>
+          <dd className="mt-0.5 pl-[1.375rem] type-body-sm text-foreground">
             <span className="tabular-nums">{letterOf(correctId)}.</span> {textOf(correctId)}
           </dd>
         </div>

@@ -121,8 +121,8 @@ export const UK_TERMINOLOGY_RULES: readonly TerminologyRule[] = [
     variants: ['галері'],
   },
   {
-    concept: 'Learn Hub',
-    canonical: 'навчальний центр',
+    concept: 'Learn (was Learn Hub)',
+    canonical: 'навчання',
     variants: ['освітній хаб', 'навчальний хаб', 'хаб знань'],
   },
   {

@@ -7,7 +7,7 @@
     },
     "phases": {
       "loading": {
-        "title": "Синхронізація часу циклу"
+        "title": "Зчитуємо час завершення циклу"
       },
       "openingSoon": {
         "title": "{cycle} скоро відкриється"
@@ -22,12 +22,18 @@
       "finalHour": {
         "title": "{cycle}: залишається остання година"
       },
-      "nearHorizon": {
-        "title": "{cycle} наближається до завершення"
+      "finalMinutes": {
+        "title": "{cycle}: останні хвилини"
       },
       "ready": {
         "title": "{cycle} готовий до завершення",
-        "body": "Відлік дійшов до нуля. Протокол готовий завершити цикл і закарбувати фінальну Сигнатуру."
+        "state": "Готовий до завершення",
+        "body": "Новий жест ще може подовжити цикл. Учасник, який зробив останній жест, уже може його завершити."
+      },
+      "confirming": {
+        "title": "{cycle}: відлік дійшов до нуля",
+        "state": "Підтвердження",
+        "body": "Перевіряємо, чи новий жест в останню мить не подовжив цикл."
       },
       "unavailable": {
         "title": "Годинник циклу недоступний",
@@ -41,10 +47,10 @@
     "cycleClock": "Годинник циклу",
     "gestureCount": "{count, plural, one {# жест} few {# жести} many {# жестів} other {# жесту}}",
     "units": {
-      "days": "дн",
-      "hours": "год",
-      "minutes": "хв",
-      "seconds": "с"
+      "days": "{count, plural, one {день} few {дні} many {днів} other {дня}}",
+      "hours": "{count, plural, one {година} few {години} many {годин} other {години}}",
+      "minutes": "{count, plural, one {хвилина} few {хвилини} many {хвилин} other {хвилини}}",
+      "seconds": "{count, plural, one {секунда} few {секунди} many {секунд} other {секунди}}"
     },
     "duration": {
       "days": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}",

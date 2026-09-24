@@ -7,7 +7,7 @@
     },
     "phases": {
       "loading": {
-        "title": "正在同步周期倒计时"
+        "title": "正在读取周期收官时间"
       },
       "openingSoon": {
         "title": "{cycle}即将开启"
@@ -22,12 +22,18 @@
       "finalHour": {
         "title": "{cycle}进入最后一小时"
       },
-      "nearHorizon": {
-        "title": "{cycle}即将收官"
+      "finalMinutes": {
+        "title": "{cycle}进入最后几分钟"
       },
       "ready": {
         "title": "{cycle}已可收官",
-        "body": "收官倒计时已经归零，协议已可将本周期铭刻为最终签名。"
+        "state": "已可收官",
+        "body": "新的落笔仍可延长本周期。最后一次落笔的参与者现在即可收官。"
+      },
+      "confirming": {
+        "title": "{cycle}倒计时已归零",
+        "state": "确认中",
+        "body": "正在链上核验最后一刻是否有新落笔延长周期。"
       },
       "unavailable": {
         "title": "无法读取实时周期时钟",
@@ -41,10 +47,10 @@
     "cycleClock": "周期时钟",
     "gestureCount": "{count, number} 次落笔",
     "units": {
-      "days": "天",
-      "hours": "小时",
-      "minutes": "分",
-      "seconds": "秒"
+      "days": "{count, plural, other {天}}",
+      "hours": "{count, plural, other {小时}}",
+      "minutes": "{count, plural, other {分}}",
+      "seconds": "{count, plural, other {秒}}"
     },
     "duration": {
       "days": "{count, plural, other {# 天}}",

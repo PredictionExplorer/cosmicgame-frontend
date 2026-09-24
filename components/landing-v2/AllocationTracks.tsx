@@ -21,6 +21,7 @@ export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] 
         heading={tracks.heading}
         headingId="landing-tracks-heading"
         description={tracks.description}
+        layout="split"
       />
 
       <div className={styles.split}>
@@ -46,7 +47,15 @@ export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] 
         <h3 className="type-label text-subtle" id="landing-tracks-fixed">
           {tracks.fixedLabel}
         </h3>
-        <ul className={styles.fixedList} aria-labelledby="landing-tracks-fixed">
+        {/* What each recipient receives, once; the figures below count recipients. */}
+        <p className="type-body-md mt-2 text-muted-foreground" id="landing-tracks-fixed-each">
+          {tracks.fixedEach}
+        </p>
+        <ul
+          className={styles.fixedList}
+          aria-labelledby="landing-tracks-fixed"
+          aria-describedby="landing-tracks-fixed-each"
+        >
           {tracks.fixed.map((track) => (
             <li key={track.id} className={styles.fixedItem}>
               <span className="type-figure-md">{track.amount}</span>

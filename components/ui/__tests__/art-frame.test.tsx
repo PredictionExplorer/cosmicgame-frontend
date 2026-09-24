@@ -131,6 +131,33 @@ describe('ArtFrame', () => {
     expect(screen.queryByTestId('orbit-mark')).not.toBeInTheDocument();
   });
 
+  it('keeps the loading mark until the loaded image is decoded and can paint', async () => {
+    let finishDecode = () => {};
+    const decode = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finishDecode = resolve;
+        }),
+    );
+    Object.defineProperty(HTMLImageElement.prototype, 'decode', {
+      configurable: true,
+      value: decode,
+    });
+    try {
+      render(
+        <ArtFrame sources={[RENDITIONS]} alt="Art" sizes="100vw" unavailableLabel="Unavailable" />,
+      );
+      const frame = screen.getByTestId('art-frame');
+      fireEvent.load(screen.getByAltText('Art'));
+      expect(decode).toHaveBeenCalled();
+      expect(frame).toHaveAttribute('data-status', 'loading');
+      finishDecode();
+      await waitFor(() => expect(frame).toHaveAttribute('data-status', 'loaded'));
+    } finally {
+      delete (HTMLImageElement.prototype as Partial<HTMLImageElement>).decode;
+    }
+  });
+
   it('falls back through its sources and ends in the designed unavailable state', () => {
     const onStatusChange = jest.fn();
     render(

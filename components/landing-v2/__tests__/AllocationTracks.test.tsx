@@ -64,8 +64,14 @@ describe('<AllocationTracks />', () => {
     render(<AllocationTracks tracks={tracks} />);
     const fixed = screen.getByRole('list', { name: tracks.fixedLabel });
     expect(within(fixed).getAllByRole('listitem')).toHaveLength(4);
-    expect(within(fixed).getAllByText('1,000 CST')).toHaveLength(2);
-    expect(within(fixed).getAllByText('10 NFTs')).toHaveLength(2);
+    // One frame for all four: the figure counts recipients, and what each
+    // receives is said once for the group instead of mixing NFTs and CST.
+    expect(within(fixed).getAllByText('10 recipients')).toHaveLength(2);
+    expect(within(fixed).getAllByText('1 recipient')).toHaveLength(2);
+    expect(fixed).toHaveAccessibleDescription(
+      'Each recipient receives 1,000 CST and one Cosmic Signature NFT.',
+    );
+    expect(fixed.textContent).not.toMatch(/Recognition CST|NFTs/);
   });
 
   it('gives no track a promotional treatment', () => {

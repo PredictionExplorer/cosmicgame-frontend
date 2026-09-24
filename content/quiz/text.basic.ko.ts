@@ -20,7 +20,7 @@ export const basicQuestionsTextKo = {
       'Cosmic Signature는 절차적 아트 프로토콜입니다. 시간이 정해진 퍼포먼스 사이클이 제스처로 채워지고, 마감이 결정론적 삼체 작품을 각인합니다. 파이프라인 어디에도 AI는 없습니다. 작품은 시드에서 계산된 물리 그 자체이며, 텍스트 프롬프트 이미지 서비스와는 정반대입니다.',
     funFact:
       '이 이름은 잘 알려진 암 돌연변이 데이터베이스 COSMIC과 겹칩니다. 프로토콜은 이 데이터베이스와 아무 관련이 없고, 문서도 이 점을 분명히 밝혀 둡니다.',
-    referenceLabel: '학습 센터: Cosmic Signature란 무엇인가요?',
+    referenceLabel: '학습: Cosmic Signature란 무엇인가요?',
   },
   'what-is-a-gesture': {
     prompt: '프로토콜에서 말하는 제스처란 무엇인가요?',
@@ -313,6 +313,6 @@ export const basicQuestionsTextKo = {
     },
     explanation:
       '프로토콜은 Arbitrum One 위에서 실행되고, 중요한 기록, 곧 모든 제스처와 시드와 배분은 온체인에 있습니다. 그래서 작품은 재현 가능하고, 배분은 어떤 서버도 신뢰할 필요 없이 누구나 확인할 수 있습니다.',
-    referenceLabel: '학습 센터: Arbitrum 위의 Cosmic Signature',
+    referenceLabel: '학습: Arbitrum 위의 Cosmic Signature',
   },
 } as const satisfies QuizTierQuestionsText<'basic'>;

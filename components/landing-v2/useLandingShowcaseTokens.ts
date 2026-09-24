@@ -15,7 +15,12 @@ export interface LandingShowcaseToken {
   RoundNum?: number;
   /** Anchored to the protocol right now. */
   Staked?: boolean;
+  /** When the token was imprinted (Unix seconds), for the wall label's date. */
+  ImprintedAt?: number;
 }
+
+/** A token as the collection list returns it: the imprint time sits on its transaction. */
+type ListedToken = Omit<LandingShowcaseToken, 'ImprintedAt'> & { Tx?: { TimeStamp?: unknown } };
 
 export type ShowcaseStatus = 'loading' | 'ready' | 'failed';
 
@@ -31,8 +36,15 @@ function landingApiUrl(path: string): string {
   return base ? `${base}/${cleanPath}` : `/${cleanPath}`;
 }
 
-function isShowcaseToken(token: LandingShowcaseToken): boolean {
+function isShowcaseToken(token: ListedToken): boolean {
   return Number.isFinite(token.TokenId) && token.Seed !== undefined && String(token.Seed) !== '';
+}
+
+function toShowcaseToken({ Tx, ...token }: ListedToken): LandingShowcaseToken {
+  const imprintedAt = Tx?.TimeStamp;
+  return typeof imprintedAt === 'number' && imprintedAt > 0
+    ? { ...token, ImprintedAt: imprintedAt }
+    : token;
 }
 
 async function fetchShowcase(): Promise<LandingShowcase> {
@@ -40,10 +52,10 @@ async function fetchShowcase(): Promise<LandingShowcase> {
     const response = await fetch(landingApiUrl(`cst/list/all/0/${SHOWCASE_LIMIT}`));
     if (!response.ok) return { tokens: [], status: 'failed' };
     const body = (await response.json()) as {
-      CosmicSignatureTokenList?: LandingShowcaseToken[];
+      CosmicSignatureTokenList?: ListedToken[];
     };
     return {
-      tokens: (body.CosmicSignatureTokenList ?? []).filter(isShowcaseToken),
+      tokens: (body.CosmicSignatureTokenList ?? []).filter(isShowcaseToken).map(toShowcaseToken),
       status: 'ready',
     };
   } catch {
@@ -89,10 +101,12 @@ export function useLandingShowcaseTokens(): LandingShowcase {
 
 /**
  * How many Signatures exist: token ids run from 0 without gaps, so the
- * newest id plus one. `null` until the collection answers.
+ * newest id plus one. `null` until the collection answers, and `null` when
+ * it answers without a usable token: the page already shows imprinted
+ * Signatures (the bundled featured pieces), so an empty answer is a broken
+ * read, never "0 imprinted".
  */
 export function imprintedCount(showcase: LandingShowcase): number | null {
-  if (showcase.status !== 'ready') return null;
-  if (showcase.tokens.length === 0) return 0;
+  if (showcase.status !== 'ready' || showcase.tokens.length === 0) return null;
   return Math.max(...showcase.tokens.map((token) => token.TokenId)) + 1;
 }

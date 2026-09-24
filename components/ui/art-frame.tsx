@@ -206,6 +206,24 @@ function replaySettledImage(image: HTMLImageElement | null): void {
 }
 
 /**
+ * Reports a load once the image is decoded, so `loaded` means paintable.
+ * Chromium defers an off-screen async image's decode until it nears the
+ * viewport, so a plate fetched ahead of the reader (the landing's collection
+ * strips) could still paint empty for a moment on a fast scroll, and always
+ * in a full-page capture. Decoding at load time keeps the loading mark up
+ * until the art can actually paint. Where decode() is missing, it reports at
+ * once.
+ */
+function reportDecoded(image: HTMLImageElement, onLoad: (() => void) | undefined): void {
+  if (!onLoad) return;
+  if (typeof image.decode !== 'function') {
+    onLoad();
+    return;
+  }
+  image.decode().then(onLoad, onLoad);
+}
+
+/**
  * One source of a chain. A responsive set is a plain `<img>` whose srcset
  * lists the published files at their real widths (the media server already
  * publishes every size, so the optimizer has nothing to add); a single file
@@ -241,7 +259,7 @@ export function ArtImage({
         fetchPriority={fetchPriority}
         decoding="async"
         onError={onError}
-        onLoad={onLoad}
+        onLoad={(event) => reportDecoded(event.currentTarget, onLoad)}
         // As next/image does: a broken image's alt text never flashes on the plate.
         className={cn('text-transparent', className)}
         style={style}
@@ -261,7 +279,7 @@ export function ArtImage({
       loading={loadingMode}
       fetchPriority={fetchPriority}
       onError={onError}
-      onLoad={onLoad}
+      onLoad={(event) => reportDecoded(event.currentTarget, onLoad)}
       className={className}
       style={style}
     />
@@ -411,6 +429,12 @@ export interface ArtFrameProps {
   /** Above the fold: load eagerly at high fetch priority. */
   priority?: boolean;
   /**
+   * Overrides the loading mode `priority` implies: `eager` for a plate the
+   * page has decided to fetch now (it is about to scroll into view) without
+   * raising its fetch priority.
+   */
+  loading?: 'lazy' | 'eager';
+  /**
    * Caption of the unavailable state ("Artwork unavailable"). Passed in, so
    * the primitive works on both hosts whatever catalogs a page loads.
    */
@@ -437,6 +461,7 @@ export function ArtFrame({
   alt,
   sizes,
   priority = false,
+  loading,
   unavailableLabel,
   unavailableDetail,
   density = 'full',
@@ -484,6 +509,7 @@ export function ArtFrame({
         alt={alt}
         sizes={sizes}
         priority={priority}
+        loading={loading}
         onError={chain.onError}
         onLoad={chain.onLoad}
         className="relative z-[1]"
