@@ -27,6 +27,9 @@ export const UNAVAILABLE_VALUE = '—';
  */
 export const NBSP = '\u00a0';
 
+/** U+2212, the minus sign: as wide as "+" and on its axis, unlike the hyphen-minus. */
+const TYPOGRAPHIC_MINUS = '\u2212';
+
 interface NumberConventions {
   /**
    * Decimal mark for every fraction a formatter prints (token amounts,
@@ -377,7 +380,9 @@ export function formatAmountParts(value: AmountInput, options: AmountOptions): A
   }
 
   return {
-    number,
+    // A signed delta sits beside "+" in a tabular column: the hyphen-minus
+    // is shorter and lower than the plus, so it takes the true minus sign.
+    number: signDisplay === 'auto' ? number : number.replace(/-/g, TYPOGRAPHIC_MINUS),
     unit: withUnit ? unit : null,
     exact: lossy ? `${formatExactDecimal(decimal, locale)}${NBSP}${unit}` : null,
     machineValue: decimal,

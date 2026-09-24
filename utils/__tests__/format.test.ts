@@ -522,3 +522,29 @@ describe('legacy helpers delegate to the formatting layer', () => {
     expect(formatTableAmount(null, 'en')).toBe(UNAVAILABLE_VALUE);
   });
 });
+
+describe('typographic details', () => {
+  it('signs a delta with the true minus sign, level with the plus', () => {
+    // Regression: signed CST amounts printed Intl's hyphen-minus ("-269.74"),
+    // short and low beside "+176.00" in the same tabular column.
+    expect(
+      formatAmount(-269.74, { unit: 'CST', context: 'table', signDisplay: 'exceptZero' }),
+    ).toBe('\u2212269.74\u00a0CST');
+    expect(formatAmount(176, { unit: 'CST', context: 'table', signDisplay: 'exceptZero' })).toBe(
+      '+176.00\u00a0CST',
+    );
+    // An unsigned amount keeps whatever Intl prints.
+    expect(formatAmount(-1, { unit: 'ETH', context: 'hero' })).toBe('-1\u00a0ETH');
+  });
+
+  it('pads the day only where dates stack in a column', () => {
+    const march9 = Date.UTC(2024, 2, 9, 10, 0, 0) / 1000;
+    const now = Date.UTC(2026, 8, 24);
+    // Compact (tables, cards): padded so a column lines up.
+    expect(formatDateTime(march9, { timeZone: 'utc', now })).toBe('Mar 09, 2024, 10:00');
+    // Full (record pages, hover titles): as written.
+    expect(formatDateTime(march9, { style: 'full', timeZone: 'utc', now })).toBe(
+      'Mar 9, 2024, 10:00:00',
+    );
+  });
+});

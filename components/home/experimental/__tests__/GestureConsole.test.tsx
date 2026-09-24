@@ -171,7 +171,7 @@ describe('GestureConsole', () => {
     const preview = screen.getByTestId('gesture-reward-preview');
     expect(visibleText(preview)).toContain('home.form.reward.rewardLabel');
     expect(visibleText(preview)).toContain('home.form.reward.costLabel');
-    expect(visibleText(preview)).toContain('-64.34 CST');
+    expect(visibleText(preview)).toContain('\u221264.34 CST');
     expect(screen.getByText('home.form.reward.netNegative')).toBeInTheDocument();
   });
 

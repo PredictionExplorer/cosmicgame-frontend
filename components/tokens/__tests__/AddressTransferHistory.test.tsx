@@ -103,7 +103,7 @@ describe('AddressTransferHistory — CST', () => {
     expect(rows[0]).toHaveTextContent('myPages.transferHistory.activity.imprinted');
     expect(rows[0]).toHaveTextContent('+176.00');
     expect(rows[1]).toHaveTextContent('myPages.transferHistory.activity.consumed');
-    expect(rows[1]).toHaveTextContent('-200.00');
+    expect(rows[1]).toHaveTextContent('\u2212200.00');
     expect(rows[3]).toHaveTextContent('myPages.transferHistory.activity.sent');
     expect(table()).not.toHaveTextContent(/0x0000/);
     expect(within(table()).queryByRole('link', { name: /0x0000/ })).not.toBeInTheDocument();

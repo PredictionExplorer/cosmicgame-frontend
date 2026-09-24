@@ -46,7 +46,7 @@ describe('DateTime', () => {
     );
     try {
       expect(serverHtml).toContain('Jan 01, 00:30:45');
-      expect(serverHtml).toContain('title="Jan 01, 2026, 00:30:45 UTC"');
+      expect(serverHtml).toContain('title="Jan 1, 2026, 00:30:45 UTC"');
       const time = container.querySelector('time');
       expect(time).toHaveAttribute('datetime', '2026-01-01T00:30:45.000Z');
       // Local time crosses into the previous year, so the year appears.

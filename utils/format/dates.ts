@@ -135,6 +135,8 @@ const koreanNumericDate = (year: number, monthIndex: number, day: number): strin
 interface DateTimeTemplateInput extends CalendarParts {
   readonly withYear: boolean;
   readonly withSeconds: boolean;
+  /** Pad a one-digit day ("Jan 05") so a column of compact dates lines up. */
+  readonly padDay: boolean;
 }
 
 const clock = ({ hours, minutes, seconds, withSeconds }: DateTimeTemplateInput): string =>
@@ -149,10 +151,11 @@ const hanDateTime = (input: DateTimeTemplateInput): string =>
   `${input.withYear ? `${input.year}年` : ''}${input.monthIndex + 1}月${input.day}日 ${clock(input)}`;
 
 const DATE_TIME_TEMPLATES: LocaleRecord<(input: DateTimeTemplateInput) => string> = {
-  // "Jan 05, 12:34" / "Jan 05, 2025, 12:34": the historical padded day keeps
-  // table columns aligned.
+  // Compact "Jan 05, 12:34" / "Jan 05, 2025, 12:34": the padded day keeps a
+  // column of dates aligned. Full "Jan 5, 2025, 12:34:56": a record page, a
+  // hover title or a sentence, where a padded day just reads wrong.
   en: (input) =>
-    `${MONTH_LABELS[input.monthIndex]} ${pad2(input.day)}${
+    `${MONTH_LABELS[input.monthIndex]} ${input.padDay ? pad2(input.day) : input.day}${
       input.withYear ? `, ${input.year}` : ''
     }, ${clock(input)}`,
   zh: hanDateTime,
@@ -245,6 +248,7 @@ export function formatDateTime(
     ...parts,
     withYear,
     withSeconds: style === 'full' || seconds,
+    padDay: style === 'compact',
   });
 }
 
