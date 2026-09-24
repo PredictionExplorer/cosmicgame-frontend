@@ -133,6 +133,9 @@
       }
     }
   },
+  "art": {
+    "failed": "Không tải được tác phẩm"
+  },
   "missingCycle": {
     "open": {
       "title": "Chu kỳ {cycle} vẫn đang diễn ra",
@@ -152,7 +155,12 @@
     "title": "Phân bổ đã hoàn tất",
     "index": {
       "title": "Các chu kỳ vừa hoàn tất",
-      "description": "Phân bổ Signature của từng chu kỳ, kèm Cosmic Signature được khắc trong chu kỳ đó."
+      "description": "Phân bổ Signature của từng chu kỳ, kèm Cosmic Signature được khắc trong chu kỳ đó.",
+      "error": "Không tải được các chu kỳ mới nhất",
+      "empty": {
+        "title": "Chưa có chu kỳ nào hoàn tất",
+        "description": "Phân bổ Signature của chu kỳ đầu tiên sẽ xuất hiện ở đây sau khi chu kỳ hoàn tất."
+      }
     },
     "loading": {
       "status": "Đang tải chu kỳ đã hoàn tất"
@@ -164,7 +172,8 @@
     "links": {
       "viewCycle": "Xem chu kỳ {cycle}",
       "myAllocations": "Phân bổ của tôi",
-      "allRecipients": "Người nhận phân bổ"
+      "allRecipients": "Người nhận phân bổ",
+      "allCycles": "Tất cả chu kỳ"
     },
     "result": {
       "title": "Phân bổ Signature của chu kỳ {cycle}",

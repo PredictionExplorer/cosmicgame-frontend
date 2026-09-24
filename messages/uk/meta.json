@@ -151,8 +151,8 @@
     "description": "Добровільні внески спільноти Cosmic Signature до сховища суспільних благ для підтримки налаштованого бенефіціара."
   },
   "allocationRetrieved": {
-    "title": "Забрані розподіли",
-    "description": "Відомості про розподіли, забрані з протоколу Cosmic Signature, зокрема отримані суми ETH, розподіли Cosmic Signature NFT та розподіли зоряного відбору."
+    "title": "Завершені розподіли",
+    "description": "Розподіл Сигнатури кожного завершеного циклу Cosmic Signature і підсумки записів розподілів ETH, CST та Cosmic Signature NFT."
   },
   "outreach": {
     "title": "Розподіли за просування",

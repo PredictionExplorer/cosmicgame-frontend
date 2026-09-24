@@ -111,8 +111,9 @@ const routeDefinitions: Record<SeoSummaryRoute, RouteDefinition> = {
   },
   'allocation-finalized': {
     section: 'records',
+    // Every cycle is one click away in the page's own index ("All cycles").
     links: [
-      { href: '/allocation', key: 'allocation' },
+      { href: '/my-allocations', key: 'myAllocations' },
       { href: '/statistics', key: 'statistics' },
       { href: '/contracts', key: 'contracts' },
     ],

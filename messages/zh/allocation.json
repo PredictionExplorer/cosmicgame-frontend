@@ -133,6 +133,9 @@
       }
     }
   },
+  "art": {
+    "failed": "无法加载作品"
+  },
   "missingCycle": {
     "open": {
       "title": "第 {cycle} 个周期仍在进行",
@@ -152,7 +155,12 @@
     "title": "周期已收官",
     "index": {
       "title": "最近收官的周期",
-      "description": "每个周期的签名分配，以该周期铭刻的 Cosmic Signature 呈现。"
+      "description": "每个周期的签名分配，以该周期铭刻的 Cosmic Signature 呈现。",
+      "error": "无法加载最新周期",
+      "empty": {
+        "title": "尚无已收官的周期",
+        "description": "首个周期收官后，其签名分配会显示在这里。"
+      }
     },
     "loading": {
       "status": "正在加载已收官的周期"
@@ -164,7 +172,8 @@
     "links": {
       "viewCycle": "查看第 {cycle} 个周期",
       "myAllocations": "我的分配",
-      "allRecipients": "分配名录"
+      "allRecipients": "分配名录",
+      "allCycles": "全部周期"
     },
     "result": {
       "title": "第 {cycle} 个周期的签名分配",

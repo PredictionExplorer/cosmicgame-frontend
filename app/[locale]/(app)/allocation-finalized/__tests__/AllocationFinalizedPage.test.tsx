@@ -18,8 +18,10 @@ jest.mock('../../../../../hooks/useApiQuery', () => ({
   useRoundInfo: (...args: unknown[]) => mockUseRoundInfo(...args),
   useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
   useRoundList: (...args: unknown[]) => mockUseRoundList(...args),
-  useCSTList: () => ({ data: [{ TokenId: 31, Seed: 'aa', TokenName: '' }], isLoading: false }),
+  useCSTList: () => mockUseCSTList(),
 }));
+
+const mockUseCSTList = jest.fn();
 
 let mockAccount: string | null = null;
 jest.mock('../../../../../hooks/web3', () => ({
@@ -91,6 +93,10 @@ beforeEach(() => {
   roundInfo(undefined);
   mockUseCSTInfo.mockReturnValue({ data: { TokenId: 99, Seed: 'abc', TokenName: '' } });
   mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
+  mockUseCSTList.mockReturnValue({
+    data: [{ TokenId: 31, Seed: 'aa', TokenName: '' }],
+    isLoading: false,
+  });
 });
 
 describe('AllocationFinalizedPage', () => {
@@ -229,6 +235,57 @@ describe('AllocationFinalizedPage', () => {
       '/allocation/1',
     );
     expect(mockUseRoundInfo).toHaveBeenCalledWith(-1);
+  });
+
+  it('links every cycle once from the index, never twice', () => {
+    mockSearchParams = new URLSearchParams('');
+    mockUseRoundList.mockReturnValue({
+      data: [{ RoundNum: 0, TokenId: 12, AmountEth: 6.17, TimeStamp: 1_600_000_000 }],
+      isLoading: false,
+    });
+    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    expect(
+      screen.getByRole('link', { name: 'allocation.finalized.links.allCycles' }),
+    ).toHaveAttribute('href', '/allocation');
+  });
+
+  it('says so when no cycle is finalized yet, instead of a heading over an empty grid', () => {
+    mockSearchParams = new URLSearchParams('');
+    mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
+    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    expect(screen.getByText('allocation.finalized.index.empty.title')).toBeInTheDocument();
+    expect(screen.queryAllByRole('figure')).toHaveLength(0);
+  });
+
+  it('shows a failed cycle list as an error with a retry', async () => {
+    mockSearchParams = new URLSearchParams('');
+    const refetch = jest.fn();
+    mockUseRoundList.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    expect(screen.getByText('allocation.finalized.index.error')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('never calls the index art unavailable while the collection index loads', () => {
+    mockSearchParams = new URLSearchParams('');
+    mockUseRoundList.mockReturnValue({
+      data: [{ RoundNum: 1, TokenId: 31, AmountEth: 11.06, TimeStamp: 1_700_000_000 }],
+      isLoading: false,
+    });
+    mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true });
+    render(<AllocationFinalizedPage seoSummary={<h1>Summary</h1>} />);
+    expect(screen.getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
+  });
+
+  it('holds the received Signature on a busy plate while its seed loads', () => {
+    roundInfo(ALLOCATION);
+    mockUseCSTInfo.mockReturnValue({ data: undefined, isLoading: true });
+    render(<AllocationFinalizedPage />);
+    const section = screen.getByTestId('finalized-signature');
+    expect(within(section).getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
+    expect(within(section).queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
   });
 
   it('treats a cycle parameter that is not a number as no cycle', () => {

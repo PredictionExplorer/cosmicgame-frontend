@@ -151,8 +151,8 @@
     "description": "Voluntary contributions from the Cosmic Signature community to the Public Goods Vault for its configured recipient."
   },
   "allocationRetrieved": {
-    "title": "Retrieved Allocations",
-    "description": "Details of retrieved allocations from the Cosmic Signature protocol, including ETH receipts, Cosmic Signature NFT allocations, and Stellar Selection allocations."
+    "title": "Finalized Allocations",
+    "description": "The Signature Allocation of every finalized Cosmic Signature cycle, with totals across its ETH, CST and Cosmic Signature NFT allocation records."
   },
   "outreach": {
     "title": "Outreach Allocations",

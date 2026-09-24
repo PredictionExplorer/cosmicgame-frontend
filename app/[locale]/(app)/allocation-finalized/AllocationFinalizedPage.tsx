@@ -14,6 +14,7 @@ import { Amount } from '@/components/ui/amount';
 import { PendingPlate, WallLabel } from '@/components/ui/art-frame';
 import { buttonVariants } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
+import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionHeader } from '@/components/ui/section-header';
@@ -29,6 +30,7 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { useCSTInfo, useRoundInfo, useRoundList } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { AllocationIcon } from '@/lib/conceptIcons';
 import { isRecordNotFound } from '@/services/api/readError';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { sameAddress } from '@/utils/format';
@@ -264,7 +266,7 @@ function FinalizedSignature({
   const t = useTranslations('allocation');
   const tDetail = useTranslations('detail');
   const hasToken = allocation.TokenId >= 0;
-  const { data: token } = useCSTInfo(hasToken ? allocation.TokenId : null);
+  const { data: token, isLoading: loadingToken } = useCSTInfo(hasToken ? allocation.TokenId : null);
   const nowMs = useNow(60_000);
   const id = formatId(allocation.TokenId);
   const name = typeof token?.TokenName === 'string' ? token.TokenName.trim() : '';
@@ -281,17 +283,22 @@ function FinalizedSignature({
       <figure className="flex min-w-0 flex-col gap-4 lg:col-span-7">
         {hasToken ? (
           <Link href={`/detail/${allocation.TokenId}`} tabIndex={-1} aria-hidden className="block">
-            <SignatureReveal
-              reveal={reveal}
-              sources={sources}
-              alt=""
-              sizes="(min-width: 1280px) 45rem, (min-width: 1024px) 56vw, 100vw"
-              priority
-              unavailableLabel={
-                rendering ? tDetail('image.rendering') : tDetail('image.artworkUnavailable')
-              }
-              unavailableDetail={id}
-            />
+            {/* The seed is on its way: a busy plate, never "Artwork unavailable". */}
+            {loadingToken ? (
+              <PendingPlate busy />
+            ) : (
+              <SignatureReveal
+                reveal={reveal}
+                sources={sources}
+                alt=""
+                sizes="(min-width: 1280px) 45rem, (min-width: 1024px) 56vw, 100vw"
+                priority
+                unavailableLabel={
+                  rendering ? tDetail('image.rendering') : tDetail('image.artworkUnavailable')
+                }
+                unavailableDetail={id}
+              />
+            )}
           </Link>
         ) : (
           <PendingPlate label={tDetail('image.artworkUnavailable')} />
@@ -428,12 +435,75 @@ function FinalizedSignatureSkeleton({ label }: { label: string }) {
 function FinalizedCycleIndex() {
   const t = useTranslations('allocation');
   const tDetail = useTranslations('detail');
-  const { data: cycles = [], isLoading } = useRoundList();
+  const { data: cycles, isLoading, isError, refetch } = useRoundList();
   const signatures = useSignatureIndex();
   const latest = useMemo(
-    () => [...cycles].sort((a, b) => b.RoundNum - a.RoundNum).slice(0, INDEX_CYCLES),
+    () => [...(cycles ?? [])].sort((a, b) => b.RoundNum - a.RoundNum).slice(0, INDEX_CYCLES),
     [cycles],
   );
+
+  let body: ReactNode;
+  if (!cycles && isError) {
+    body = (
+      <ErrorState
+        headingLevel={3}
+        title={t('finalized.index.error')}
+        onRetry={() => void refetch()}
+      />
+    );
+  } else if (!isLoading && latest.length === 0) {
+    body = (
+      <EmptyState
+        headingLevel={3}
+        icon={<AllocationIcon aria-hidden className="size-6" />}
+        title={t('finalized.index.empty.title')}
+        description={t('finalized.index.empty.description')}
+      />
+    );
+  } else {
+    body = (
+      <>
+        {signatures.state === 'failed' ? (
+          <ErrorState
+            variant="inline"
+            headingLevel={3}
+            tone="warning"
+            title={t('art.failed')}
+            onRetry={signatures.retry}
+            className="mb-6"
+          />
+        ) : null}
+        <ul className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" aria-busy={isLoading}>
+          {isLoading
+            ? Array.from({ length: INDEX_CYCLES }, (_, index) => (
+                <li key={index} className="flex flex-col gap-3">
+                  <PendingPlate busy density="compact" />
+                  <Skeleton className="h-4 w-2/5" />
+                  <Skeleton className="h-3 w-3/5" />
+                </li>
+              ))
+            : latest.map((round) => (
+                <li key={round.RoundNum}>
+                  <SignatureCard
+                    tokenId={round.TokenId}
+                    seed={signatures.get(round.TokenId)?.seed}
+                    artState={signatures.state}
+                    href={`/allocation/${round.RoundNum}`}
+                    title={t('formats.cycleHash', { cycle: round.RoundNum })}
+                    meta={[
+                      <Amount key="eth" value={round.AmountEth} unit="ETH" />,
+                      round.TimeStamp ? <DateTime key="date" timestamp={round.TimeStamp} /> : null,
+                    ]}
+                    sizes="(min-width: 1024px) 26rem, (min-width: 640px) 45vw, 100vw"
+                    unavailableLabel={tDetail('image.artworkUnavailable')}
+                    unavailableDetail={formatId(round.TokenId)}
+                  />
+                </li>
+              ))}
+        </ul>
+      </>
+    );
+  }
 
   return (
     <section aria-labelledby="finalized-index">
@@ -443,38 +513,12 @@ function FinalizedCycleIndex() {
         description={t('finalized.index.description')}
         actions={
           <Link href="/allocation" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-            {t('finalized.links.allRecipients')}
+            {t('finalized.links.allCycles')}
             <ArrowRight aria-hidden className="size-4" />
           </Link>
         }
       />
-      <ul className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" aria-busy={isLoading}>
-        {isLoading
-          ? Array.from({ length: INDEX_CYCLES }, (_, index) => (
-              <li key={index} className="flex flex-col gap-3">
-                <PendingPlate busy density="compact" />
-                <Skeleton className="h-4 w-2/5" />
-                <Skeleton className="h-3 w-3/5" />
-              </li>
-            ))
-          : latest.map((round) => (
-              <li key={round.RoundNum}>
-                <SignatureCard
-                  tokenId={round.TokenId}
-                  seed={signatures.get(round.TokenId)?.seed}
-                  href={`/allocation/${round.RoundNum}`}
-                  title={t('formats.cycleHash', { cycle: round.RoundNum })}
-                  meta={[
-                    <Amount key="eth" value={round.AmountEth} unit="ETH" />,
-                    round.TimeStamp ? <DateTime key="date" timestamp={round.TimeStamp} /> : null,
-                  ]}
-                  sizes="(min-width: 1024px) 26rem, (min-width: 640px) 45vw, 100vw"
-                  unavailableLabel={tDetail('image.artworkUnavailable')}
-                  unavailableDetail={formatId(round.TokenId)}
-                />
-              </li>
-            ))}
-      </ul>
+      {body}
     </section>
   );
 }

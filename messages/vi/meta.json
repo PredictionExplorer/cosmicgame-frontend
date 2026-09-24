@@ -151,8 +151,8 @@
     "description": "Đóng góp tự nguyện của cộng đồng Cosmic Signature vào Kho Hàng hóa công để hỗ trợ đơn vị thụ hưởng được cấu hình trong hợp đồng."
   },
   "allocationRetrieved": {
-    "title": "Phân bổ đã nhận về",
-    "description": "Chi tiết các phân bổ đã nhận về từ giao thức Cosmic Signature, gồm biên nhận ETH, phân bổ Cosmic Signature NFT và phân bổ Tinh tuyển."
+    "title": "Phân bổ đã hoàn tất",
+    "description": "Phân bổ Signature của mọi chu kỳ Cosmic Signature đã hoàn tất, cùng tổng các bản ghi phân bổ ETH, CST và Cosmic Signature NFT."
   },
   "outreach": {
     "title": "Phân bổ truyền thông",

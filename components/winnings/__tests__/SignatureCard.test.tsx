@@ -44,6 +44,38 @@ describe('SignatureCard', () => {
     expect(screen.getByTestId('pending-plate')).toBeInTheDocument();
   });
 
+  it('holds a busy plate with no "unavailable" caption while the seed is on its way', () => {
+    render(
+      <SignatureCard
+        tokenId={24}
+        seed={undefined}
+        artState="loading"
+        title="Chrono-Warrior"
+        sizes="20rem"
+        unavailableLabel="Artwork unavailable"
+        unavailableDetail="#000024"
+      />,
+    );
+    expect(screen.getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('Artwork unavailable')).not.toBeInTheDocument();
+    expect(screen.queryByText('#000024')).not.toBeInTheDocument();
+  });
+
+  it('draws the bare plate, not "unavailable", when the seeds could not be read', () => {
+    render(
+      <SignatureCard
+        tokenId={24}
+        seed={undefined}
+        artState="failed"
+        title="Chrono-Warrior"
+        sizes="20rem"
+        unavailableLabel="Artwork unavailable"
+      />,
+    );
+    expect(screen.getByTestId('pending-plate')).not.toHaveAttribute('aria-busy');
+    expect(screen.queryByText('Artwork unavailable')).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <SignatureCard

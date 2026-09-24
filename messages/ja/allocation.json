@@ -133,6 +133,9 @@
       }
     }
   },
+  "art": {
+    "failed": "作品を読み込めませんでした"
+  },
   "missingCycle": {
     "open": {
       "title": "サイクル{cycle}は進行中です",
@@ -152,7 +155,12 @@
     "title": "配分が確定しました",
     "index": {
       "title": "最近確定したサイクル",
-      "description": "各サイクルのシグネチャー配分を、そのサイクルで刻印されたCosmic Signatureとともに表示します。"
+      "description": "各サイクルのシグネチャー配分を、そのサイクルで刻印されたCosmic Signatureとともに表示します。",
+      "error": "最新のサイクルを読み込めませんでした",
+      "empty": {
+        "title": "確定したサイクルはまだありません",
+        "description": "最初のサイクルが確定すると、シグネチャー配分がここに表示されます。"
+      }
     },
     "loading": {
       "status": "確定したサイクルを読み込み中"
@@ -164,7 +172,8 @@
     "links": {
       "viewCycle": "サイクル{cycle}を見る",
       "myAllocations": "自分の配分",
-      "allRecipients": "配分の受領者"
+      "allRecipients": "配分の受領者",
+      "allCycles": "すべてのサイクル"
     },
     "result": {
       "title": "サイクル{cycle}のシグネチャー配分",

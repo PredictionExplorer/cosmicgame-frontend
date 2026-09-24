@@ -349,6 +349,26 @@ describe('AllocationInfoPage', () => {
     });
   });
 
+  describe('recipient art', () => {
+    it('holds busy plates, never "Artwork unavailable", while the collection index loads', () => {
+      mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+      renderCycle();
+      const card = screen.getByTestId('recipient-card-signature');
+      expect(within(card).getByTestId('pending-plate')).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
+    });
+
+    it('says once that the artwork could not be loaded, with a retry, when the index fails', async () => {
+      const refetch = jest.fn();
+      mockUseCSTList.mockReturnValue({ data: undefined, isLoading: false, isError: true, refetch });
+      renderCycle();
+      expect(screen.getAllByText('allocation.art.failed')).toHaveLength(1);
+      expect(screen.queryByText('detail.image.artworkUnavailable')).not.toBeInTheDocument();
+      await userEvent.click(screen.getByRole('button', { name: /try again/i }));
+      expect(refetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('recipients', () => {
     it('shows each role by the Signature it received, its token and its recipient', () => {
       renderCycle();

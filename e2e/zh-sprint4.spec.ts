@@ -84,7 +84,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await openZhRoute(
       page,
       `/zh/allocation-finalized?cycle=${SPRINT4_MOCK_CYCLE}`,
-      '已取回分配 · Cosmic Signature',
+      '已收官的分配 · Cosmic Signature',
     );
     await expect(
       page.getByRole('heading', {

@@ -5,12 +5,20 @@ import type { ReactNode } from 'react';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { signatureMedia, signatureSources } from '@/components/nft/signatureArt';
-import { ArtFrame, WallLabel } from '@/components/ui/art-frame';
+import { ArtFrame, PendingPlate, WallLabel } from '@/components/ui/art-frame';
+
+import type { SignatureArtState } from './useSignatureIndex';
 
 export interface SignatureCardProps {
   tokenId: number;
-  /** The token's seed; without one the plate shows the designed pending state. */
+  /** The token's seed; without one the plate shows the designed unavailable state. */
   seed: string | number | null | undefined;
+  /**
+   * Whether the seed is known yet. `loading`: a busy pending plate with no
+   * caption (the art is on its way, not unavailable). `failed`: the bare
+   * plate, while the page says once that the artwork could not be loaded.
+   */
+  artState?: SignatureArtState;
   /** Line 1 of the wall label: the token's name, or what the token stands for (a role). */
   title: ReactNode;
   /** Where the plate and the title lead. Default: the token's page. */
@@ -47,6 +55,7 @@ export interface SignatureCardProps {
 export function SignatureCard({
   tokenId,
   seed,
+  artState = 'ready',
   title,
   href = `/detail/${tokenId}`,
   linkTitle = true,
@@ -63,14 +72,18 @@ export function SignatureCard({
   return (
     <figure className={cn('flex min-w-0 flex-col gap-3', className)} data-token-id={tokenId}>
       <Link href={href} tabIndex={-1} aria-hidden className="block">
-        <ArtFrame
-          sources={signatureSources(signatureMedia(seed))}
-          alt=""
-          sizes={sizes}
-          priority={priority}
-          unavailableLabel={unavailableLabel}
-          unavailableDetail={unavailableDetail}
-        />
+        {artState === 'ready' ? (
+          <ArtFrame
+            sources={signatureSources(signatureMedia(seed))}
+            alt=""
+            sizes={sizes}
+            priority={priority}
+            unavailableLabel={unavailableLabel}
+            unavailableDetail={unavailableDetail}
+          />
+        ) : (
+          <PendingPlate busy={artState === 'loading'} />
+        )}
       </Link>
       <WallLabel
         as="figcaption"

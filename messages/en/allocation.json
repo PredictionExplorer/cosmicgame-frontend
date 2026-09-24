@@ -133,6 +133,9 @@
       }
     }
   },
+  "art": {
+    "failed": "The artwork couldn't be loaded"
+  },
   "missingCycle": {
     "open": {
       "title": "Cycle {cycle} is still open",
@@ -152,7 +155,12 @@
     "title": "Allocation finalized",
     "index": {
       "title": "Latest finalized cycles",
-      "description": "Each cycle's Signature Allocation, shown by the Signature it imprinted."
+      "description": "Each cycle's Signature Allocation, shown by the Signature it imprinted.",
+      "error": "The latest cycles couldn't be loaded",
+      "empty": {
+        "title": "No cycle is finalized yet",
+        "description": "The first cycle's Signature Allocation appears here once it is finalized."
+      }
     },
     "loading": {
       "status": "Loading the finalized cycle"
@@ -164,7 +172,8 @@
     "links": {
       "viewCycle": "View Cycle {cycle}",
       "myAllocations": "My Allocations",
-      "allRecipients": "Allocation Recipients"
+      "allRecipients": "Allocation Recipients",
+      "allCycles": "All cycles"
     },
     "result": {
       "title": "Cycle {cycle} Signature Allocation",

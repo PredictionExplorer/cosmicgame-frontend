@@ -142,11 +142,11 @@
         }
       },
       "allocation-finalized": {
-        "heading": "Phân bổ đã nhận về",
-        "description": "Xem các bản ghi nhận về phân bổ công khai của Cosmic Signature, gồm biên nhận ETH, phân bổ Cosmic Signature NFT và phân phối Tinh tuyển.",
+        "heading": "Phân bổ đã hoàn tất",
+        "description": "Những gì mỗi chu kỳ đã hoàn tất phân bổ, từ phân bổ Signature đến mọi bản ghi Tinh tuyển và phân phối neo giữ.",
         "source": "Các API nhận về phân bổ công khai của Cosmic Signature",
         "links": {
-          "allocation": "Xem người nhận phân bổ",
+          "myAllocations": "Nhận về phân bổ của bạn",
           "statistics": "Xem thống kê tổng hợp",
           "contracts": "Xem các hợp đồng đã xác minh"
         },

@@ -133,6 +133,9 @@
       }
     }
   },
+  "art": {
+    "failed": "작품을 불러오지 못했습니다"
+  },
   "missingCycle": {
     "open": {
       "title": "사이클 {cycle} 진행 중",
@@ -152,7 +155,12 @@
     "title": "배분 마감 완료",
     "index": {
       "title": "최근 마감된 사이클",
-      "description": "각 사이클의 시그니처 배분을 그 사이클에 각인된 Cosmic Signature와 함께 보여 줍니다."
+      "description": "각 사이클의 시그니처 배분을 그 사이클에 각인된 Cosmic Signature와 함께 보여 줍니다.",
+      "error": "최근 사이클을 불러오지 못했습니다",
+      "empty": {
+        "title": "아직 마감된 사이클이 없습니다",
+        "description": "첫 사이클이 마감되면 시그니처 배분이 여기에 표시됩니다."
+      }
     },
     "loading": {
       "status": "마감된 사이클을 불러오는 중"
@@ -164,7 +172,8 @@
     "links": {
       "viewCycle": "사이클 {cycle} 보기",
       "myAllocations": "내 배분",
-      "allRecipients": "배분 수령자"
+      "allRecipients": "배분 수령자",
+      "allCycles": "전체 사이클"
     },
     "result": {
       "title": "사이클 {cycle} 시그니처 배분",

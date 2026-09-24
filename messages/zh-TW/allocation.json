@@ -133,6 +133,9 @@
       }
     }
   },
+  "art": {
+    "failed": "無法載入作品"
+  },
   "missingCycle": {
     "open": {
       "title": "第 {cycle} 個週期仍在進行",
@@ -152,7 +155,12 @@
     "title": "週期已收官",
     "index": {
       "title": "最近收官的週期",
-      "description": "每個週期的簽名分配，以該週期銘刻的 Cosmic Signature 呈現。"
+      "description": "每個週期的簽名分配，以該週期銘刻的 Cosmic Signature 呈現。",
+      "error": "無法載入最新週期",
+      "empty": {
+        "title": "尚無已收官的週期",
+        "description": "首個週期收官後，其簽名分配會顯示在這裡。"
+      }
     },
     "loading": {
       "status": "正在載入已收官的週期"
@@ -164,7 +172,8 @@
     "links": {
       "viewCycle": "檢視第 {cycle} 個週期",
       "myAllocations": "我的分配",
-      "allRecipients": "分配名錄"
+      "allRecipients": "分配名錄",
+      "allCycles": "全部週期"
     },
     "result": {
       "title": "第 {cycle} 個週期的簽名分配",

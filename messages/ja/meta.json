@@ -151,8 +151,8 @@
     "description": "Cosmic Signatureコミュニティによる公共財金庫への拠出履歴です。拠出は、設定されている公共財の受け手を支えます。"
   },
   "allocationRetrieved": {
-    "title": "受け取り済みの配分",
-    "description": "Cosmic Signatureプロトコルから受け取った配分の詳細。ETHの受領、Cosmic Signature NFTの配分、星選の配分を含みます。"
+    "title": "確定した配分",
+    "description": "確定したCosmic Signatureの各サイクルのシグネチャー配分と、ETH、CST、Cosmic Signature NFTの配分記録の合計です。"
   },
   "outreach": {
     "title": "広報配分",

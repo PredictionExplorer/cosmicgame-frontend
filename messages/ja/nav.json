@@ -116,7 +116,7 @@
       "description": "プロトコルのパラメーターのすべての変更"
     },
     "retrievedAllocations": {
-      "label": "受け取り済みの配分",
+      "label": "確定した配分",
       "description": "確定したサイクルの配分記録"
     },
     "howItWorks": {

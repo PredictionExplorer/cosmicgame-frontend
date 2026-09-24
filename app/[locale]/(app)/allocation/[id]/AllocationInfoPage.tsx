@@ -46,7 +46,7 @@ import {
 } from '@/components/winnings/AllocationSplitBar';
 import { useMissingCycle } from '@/components/winnings/missingCycle';
 import { SignatureCard } from '@/components/winnings/SignatureCard';
-import { useSignatureIndex } from '@/components/winnings/useSignatureIndex';
+import { useSignatureIndex, type SignatureArtState } from '@/components/winnings/useSignatureIndex';
 import {
   useRoundInfo,
   useGestureListByCycle,
@@ -426,6 +426,8 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           ledger={cycleAllocationLedger}
           anchorHolders={loadingAnchoring ? undefined : anchorDistributions.length}
           signatureSeed={(tokenId) => signatures.get(tokenId)?.seed}
+          artState={signatures.state}
+          onRetryArt={signatures.retry}
           trackLabel={(id) => tContracts(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[id]}.label`)}
           trackDefinition={(id) =>
             tContracts(`funds.segments.${ALLOCATION_TRACK_COPY_KEYS[id]}.tooltip`)
@@ -559,6 +561,8 @@ function CycleRecord({
   ledger,
   anchorHolders,
   signatureSeed,
+  artState,
+  onRetryArt,
   trackLabel,
   trackDefinition,
   unavailable,
@@ -569,6 +573,9 @@ function CycleRecord({
   /** Wallets that received this cycle's Anchor Distribution; `undefined` while it loads. */
   anchorHolders: number | undefined;
   signatureSeed: (tokenId: number) => string | number | undefined;
+  /** Whether the seeds are known yet (the collection index loads apart from the cycle). */
+  artState: SignatureArtState;
+  onRetryArt: () => void;
   trackLabel: (id: AllocationTrackId) => string;
   trackDefinition: (id: AllocationTrackId) => string;
   unavailable: string;
@@ -635,6 +642,16 @@ function CycleRecord({
         title={t('details.recipientSection.title')}
         description={t('details.recipientSection.description')}
       >
+        {artState === 'failed' ? (
+          <ErrorState
+            variant="inline"
+            headingLevel={3}
+            tone="warning"
+            title={t('art.failed')}
+            onRetry={onRetryArt}
+            className="mb-6"
+          />
+        ) : null}
         <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4">
           {roles.map((role, index) => {
             const hasToken = role.tokenId >= 0;
@@ -645,6 +662,7 @@ function CycleRecord({
                   <SignatureCard
                     tokenId={role.tokenId}
                     seed={signatureSeed(role.tokenId)}
+                    artState={artState}
                     title={
                       <Term id={ROLE_TERMS[role.id]}>
                         {t(`details.recipientSection.cards.${role.id}.title`)}
