@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { formatEther } from 'viem';
+import { formatEther, zeroAddress } from 'viem';
 
 import {
   charityWalletAbi as CHARITY_WALLET_ABI,
@@ -212,6 +212,17 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       inFlight = true;
 
       try {
+        // The reward accrues since the previous gesture of the cycle. With no
+        // gestures yet, the getter measures elapsed time from timestamp 0 and
+        // returns an astronomical amount the contract never mints (a cycle's
+        // first gesture mints no Participation CST) — show '--' instead.
+        const lastBidder = (await cosmicGameContract.read.lastBidderAddress?.()) as
+          | string
+          | undefined;
+        if (lastBidder === zeroAddress) {
+          if (!cancelled) setCstRewardAmountForBidding(null);
+          return;
+        }
         const v = await readCosmicGameWithFallback<bigint>([
           () => cosmicGameContract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
           () =>

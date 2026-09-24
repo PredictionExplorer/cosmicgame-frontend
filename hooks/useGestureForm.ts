@@ -204,6 +204,25 @@ export function useGestureForm() {
       inFlight = true;
       if (showLoading && canReadReward) setIsCstRewardLoading(true);
 
+      // A cycle with no gestures has no previous gesture to accrue from: the
+      // on-chain reward getter would measure elapsed time from timestamp 0 and
+      // return an astronomical amount that is never minted (a cycle's first
+      // gesture earns no Participation CST). Null the preview instead.
+      let hasPreviousGesture = true;
+      if (canReadReward) {
+        try {
+          const lastGesturer = (await cosmicGameContract!.read.lastBidderAddress?.()) as
+            | string
+            | undefined;
+          if (lastGesturer && lastGesturer.startsWith('0x') && BigInt(lastGesturer) === 0n) {
+            hasPreviousGesture = false;
+          }
+        } catch {
+          // Unknown state: fall through and fetch the reward as before.
+        }
+      }
+      if (!hasPreviousGesture && !cancelled) setGestureCstRewardAmountWei(null);
+
       try {
         await Promise.all([
           canReadDurations
@@ -253,7 +272,7 @@ export function useGestureForm() {
                   }
                 })
             : Promise.resolve(),
-          canReadReward
+          canReadReward && hasPreviousGesture
             ? readCosmicGameWithFallback<bigint>([
                 () =>
                   cosmicGameContract!.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,

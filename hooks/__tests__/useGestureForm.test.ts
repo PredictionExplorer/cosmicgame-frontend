@@ -97,6 +97,7 @@ const mockGetGestureCstRewardAmountAdvanced = jest
 
 const mockContractObj = {
   read: {
+    lastBidderAddress: jest.fn().mockResolvedValue('0x2100000000000000000000000000000000000021'),
     getNextEthBidPrice: mockGetNextEthGestureCost,
     getNextCstBidPrice: mockGetNextCstGestureCost,
     getBidCstRewardAmount: mockGetGestureCstRewardAmount,
@@ -328,6 +329,11 @@ afterEach(() => {
 });
 
 const flushAsyncWork = async () => {
+  // Enough microtask rounds to drain the live-preview refresh chain, which
+  // awaits lastBidderAddress() before the parallel preview reads.
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
   await Promise.resolve();
   await Promise.resolve();
   await Promise.resolve();

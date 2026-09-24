@@ -81,7 +81,7 @@ export function GameConfiguration({
     },
     {
       label: t('configuration.cards.cstPreview.label'),
-      value: `${formatCstAmount(cstRewardPerBid)} CST`,
+      value: cstRewardPerBid == null ? '--' : `${formatCstAmount(cstRewardPerBid)} CST`,
       icon: <Coins className="h-4 w-4" />,
       tooltip: t('configuration.cards.cstPreview.tooltip', {
         formula: cstRewardFacts.formula,

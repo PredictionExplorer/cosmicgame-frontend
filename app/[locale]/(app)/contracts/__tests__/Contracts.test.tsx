@@ -318,6 +318,9 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     mockUseContractNoSigner.mockReturnValue({
       read: {
+        lastBidderAddress: jest
+          .fn()
+          .mockResolvedValue('0x2100000000000000000000000000000000000021'),
         bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
         ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(100n),
         mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
@@ -343,6 +346,9 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     mockUseContractNoSigner.mockReturnValue({
       read: {
+        lastBidderAddress: jest
+          .fn()
+          .mockResolvedValue('0x2100000000000000000000000000000000000021'),
         bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
         ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(50n),
         mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
@@ -365,6 +371,9 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     mockUseContractNoSigner.mockReturnValue({
       read: {
+        lastBidderAddress: jest
+          .fn()
+          .mockResolvedValue('0x2100000000000000000000000000000000000021'),
         bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
         ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(0n),
         mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(0n),
@@ -390,6 +399,9 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     mockUseContractNoSigner.mockReturnValue({
       read: {
+        lastBidderAddress: jest
+          .fn()
+          .mockResolvedValue('0x2100000000000000000000000000000000000021'),
         bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
         ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue('not-a-number'),
         mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue('not-a-number'),
@@ -422,6 +434,9 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     mockUseContractNoSigner.mockReturnValue({
       read: {
+        lastBidderAddress: jest
+          .fn()
+          .mockResolvedValue('0x2100000000000000000000000000000000000021'),
         bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
         ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(100n),
         mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
