@@ -1,6 +1,6 @@
 {
   "gallery": {
-    "placeholder": "按代幣 ID 或名稱搜尋…",
+    "placeholder": "編號或名稱",
     "ariaLabel": "搜尋 NFT",
     "clear": "清除搜尋",
     "submit": "搜尋",

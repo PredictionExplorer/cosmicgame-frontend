@@ -303,7 +303,7 @@
   },
   "gallerySummary": {
     "heading": "Cosmic Signature 画廊",
-    "description": "浏览由确定性三体物理、链上种子、光谱渲染与演绎周期数据共同生成的 Cosmic Signature NFT。每件签名作品都可从协议记录复现，并对应一个特定周期。",
+    "description": "浏览由确定性三体物理、链上种子、光谱渲染与演绎周期数据共同生成的 Cosmic Signature NFT。",
     "cards": {
       "imprinted": "已铭刻 NFT",
       "anchored": "已锚定 NFT",

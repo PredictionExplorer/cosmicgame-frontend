@@ -62,7 +62,7 @@
   },
   "about": {
     "title": "关于作品集",
-    "description": "每枚 Cosmic Signature NFT 都是独一无二的生成艺术，由链上种子经三体问题物理模拟推演而成。通常每个周期会铭刻 24 枚新 NFT：4 枚角色 NFT，10 枚经参与者 NFT 星选发放，另有 10 枚经锚定 NFT 星选发放给 Random Walk NFT 锚定者。"
+    "description": "每枚 Cosmic Signature NFT 都是独一无二的生成艺术，由链上种子经三体问题物理模拟推演而成。所有签名作品都可从协议记录复现，并各自对应一个特定周期。通常每个周期会铭刻 24 枚新 NFT：4 枚角色 NFT，10 枚经参与者 NFT 星选发放，另有 10 枚经锚定 NFT 星选发放给 Random Walk NFT 锚定者。"
   },
   "toolbar": {
     "filters": "筛选",

@@ -62,7 +62,8 @@ export function signatureCardSources(
  * SignatureCard — one Signature on a wall: the art on its black plate at the
  * native ratio with nothing over it, and a quiet wall label under it. The
  * title is the token's name, or its number when it has none; the caption
- * carries the number (for a named token), structure and palette. The whole
+ * carries the number (for a named token), then structure and palette from
+ * `sm` (a phone's two-across label keeps to the name and number). The whole
  * card is one link to the detail page, named by the plate's alt text (composed
  * from the traits); the visible label repeats part of it, so it is hidden
  * from assistive technology rather than read twice.
@@ -87,6 +88,7 @@ export function SignatureCard({
   const trimmedName = name?.trim() || null;
   const alt = signatureAlt({ id, name: trimmedName, entry });
   const traitsLoading = entry === undefined;
+  const idFact = trimmedName ? { key: 'id', node: <span className="type-mono">{id}</span> } : null;
   const structure = entry?.structure ? valueLabel('structure', entry.structure) : null;
   const palette = entry?.palette ? valueLabel('palette', entry.palette) : null;
   // One locale-aware pair: a palette name may itself hold a middle dot (uk).
@@ -128,21 +130,27 @@ export function SignatureCard({
                 {trimmedName ?? id}
               </p>
               {traitsLoading ? (
-                <Skeleton className="mt-1.5 h-3 w-2/3" data-testid="trait-skeleton" />
+                <>
+                  <CaptionLine facts={[idFact]} />
+                  <Skeleton
+                    className="mt-1.5 h-3 w-2/3 max-sm:hidden"
+                    data-testid="trait-skeleton"
+                  />
+                </>
               ) : (
                 <CaptionLine
                   facts={[
-                    trimmedName ? (
-                      <span key="id" className="type-mono">
-                        {id}
-                      </span>
-                    ) : null,
-                    traitSummary,
+                    idFact,
+                    traitSummary ? { key: 'traits', node: traitSummary, fromSm: true } : null,
                   ]}
                 />
               )}
             </div>
-            {extraMeta && extraMeta.length > 0 ? <CaptionLine facts={extraMeta} /> : null}
+            {extraMeta && extraMeta.length > 0 ? (
+              <CaptionLine
+                facts={extraMeta.map((node, index) => ({ key: `extra-${index}`, node }))}
+              />
+            ) : null}
           </div>
           {/*
            * The status slot: the anchor, and (to a mouse, on hover or focus)
@@ -190,24 +198,47 @@ export function SignatureCard({
   );
 }
 
+/** One fact of a wall-label caption. */
+interface CaptionFact {
+  key: string;
+  node: ReactNode;
+  /** Shown from `sm` only, with its separator: a phone's label keeps to the name and number. */
+  fromSm?: boolean;
+}
+
 /**
  * A wall-label caption: short facts joined by middle dots. The space before
  * each dot does not break, so a wrapped caption ends its line with the dot
  * instead of starting the next one with it; two lines at most.
  */
-function CaptionLine({ facts }: { facts: readonly ReactNode[] }) {
+function CaptionLine({ facts }: { facts: readonly (CaptionFact | null)[] }) {
   const present = facts.filter(
-    (fact) => fact !== null && fact !== undefined && fact !== false && fact !== '',
+    (fact): fact is CaptionFact =>
+      fact !== null && fact.node !== null && fact.node !== undefined && fact.node !== '',
   );
   if (present.length === 0) return null;
   return (
-    <p className="mt-0.5 line-clamp-2 type-caption text-subtle">
-      {present.map((fact, index) => (
-        <Fragment key={index}>
-          {index > 0 ? '\u00a0· ' : null}
-          {fact}
-        </Fragment>
-      ))}
+    <p
+      className={cn(
+        'mt-0.5 line-clamp-2 type-caption text-subtle',
+        present.every((fact) => fact.fromSm) && 'max-sm:hidden',
+      )}
+    >
+      {present.map((fact, index) => {
+        const content = (
+          <>
+            {index > 0 ? '\u00a0· ' : null}
+            {fact.node}
+          </>
+        );
+        return fact.fromSm ? (
+          <span key={fact.key} className="max-sm:hidden">
+            {content}
+          </span>
+        ) : (
+          <Fragment key={fact.key}>{content}</Fragment>
+        );
+      })}
     </p>
   );
 }

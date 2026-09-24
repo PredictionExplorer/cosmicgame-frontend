@@ -17,11 +17,11 @@ import { createMetadata } from '@/utils/seo';
 import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { PageMessages } from '@/components/i18n/PageMessages';
 import { PageShell } from '@/components/ui/page-shell';
-import { SectionHeader } from '@/components/ui/section-header';
 
 import { readCollection } from '../publicDataReads';
 import { QuerySeed } from '../QuerySeed';
 
+import { GalleryAbout } from './GalleryAbout';
 import GalleryPage from './GalleryPage';
 import { GallerySeoSummary } from './GallerySeoSummary';
 import { GalleryView } from './GalleryView';
@@ -118,13 +118,7 @@ export default async function Page({ params }: PageProps) {
               <GalleryPage />
             </Suspense>
           </QuerySeed>
-          <section
-            aria-labelledby="gallery-about"
-            className="mt-16 border-t border-rule-faint pt-10 sm:mt-20"
-          >
-            <SectionHeader headingId="gallery-about" title={t('about.title')} />
-            <p className="type-prose text-muted-foreground">{t('about.description')}</p>
-          </section>
+          <GalleryAbout locale={locale} />
         </PageShell>
       </>
     </PageMessages>
