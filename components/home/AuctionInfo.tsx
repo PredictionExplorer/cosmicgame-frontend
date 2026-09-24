@@ -41,7 +41,10 @@ export function AuctionInfo({
     <section
       aria-label={resolvedTitle}
       className={cn(
-        'min-w-0 rounded-xl border border-primary/15 bg-primary/[0.045]',
+        // `@container`: the value grid sizes by this card, not the viewport —
+        // the card sits in the gesture panel and the side column, which stay
+        // narrow on wide screens.
+        '@container min-w-0 rounded-xl border border-primary/15 bg-primary/[0.045]',
         compact ? 'p-3' : 'p-4',
       )}
     >
@@ -115,9 +118,13 @@ export function AuctionInfo({
 
       <dl
         className={cn(
-          'grid gap-3',
-          // Phones get full-width rows: three columns split uk labels and values.
-          compact ? 'mt-2 grid-cols-1 min-[26rem]:grid-cols-3' : 'mt-4 sm:grid-cols-3',
+          'grid',
+          // Narrow cards get full-width rows: three columns would split uk
+          // labels and push the no-wrap values into each other. A compact
+          // row reads label left, value right, so the card stays short.
+          compact
+            ? 'mt-2 grid-cols-1 gap-1 @min-[26rem]:grid-cols-3 @min-[26rem]:gap-3'
+            : 'mt-4 gap-3 @lg:grid-cols-3',
         )}
       >
         {[
@@ -129,11 +136,18 @@ export function AuctionInfo({
             key={label}
             className={cn(
               'min-w-0',
-              !compact && 'rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2',
+              compact
+                ? 'flex items-baseline justify-between gap-3 @min-[26rem]:block'
+                : 'rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2',
             )}
           >
-            <dt className="text-xs text-muted-foreground">{t(`calibration.${label}`)}</dt>
-            <dd className="mt-1 whitespace-nowrap font-mono text-sm tabular-nums">
+            <dt className="min-w-0 text-xs text-muted-foreground">{t(`calibration.${label}`)}</dt>
+            <dd
+              className={cn(
+                'whitespace-nowrap font-mono text-sm tabular-nums',
+                compact ? '@min-[26rem]:mt-1' : 'mt-1',
+              )}
+            >
               {formatSeconds(value, locale)}
             </dd>
           </div>
