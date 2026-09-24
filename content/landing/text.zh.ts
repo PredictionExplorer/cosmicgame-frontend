@@ -175,8 +175,8 @@ export const landingTextZh = {
 
   publicGoods: {
     eyebrow: '公共物品',
-    heading: `${protocolFacts.publicGoodsPercentage}% 的周期储备，流向以太坊核心贡献者。`,
-    body: `每个演绎周期都会将 ETH 储备的 ${protocolFacts.publicGoodsPercentage}% 转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的集体机制。协议使用得越多，流向以太坊底层基础设施的资源也越多。`,
+    heading: '每个周期的储备，都有一部分流向以太坊核心贡献者。',
+    body: `每个演绎周期都会将 ETH 储备中的固定份额转拨给 Protocol Guild——为 170 多位以太坊核心贡献者提供资助的集体机制。协议使用得越多，流向以太坊底层基础设施的资源也越多。`,
     disclaimerHeading: '免责声明',
     // lexicon-allow-start: 明确否认慈善捐赠及相关税务定性。
     disclaimer:

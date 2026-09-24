@@ -1,7 +1,9 @@
 import { render, screen, within } from '@testing-library/react';
 
-import { landingContentEn } from '@/content/landing';
+import { getLandingContent, landingContentEn } from '@/content/landing';
+import { protocolFacts } from '@/content/protocol-facts';
 
+import { routing } from '@/i18n/routing';
 import { AllocationTracks } from '@/components/landing-v2/AllocationTracks';
 import { Anchoring } from '@/components/landing-v2/Anchoring';
 import { ClosingBand } from '@/components/landing-v2/ClosingBand';
@@ -79,6 +81,21 @@ describe('landing sections', () => {
         expect(screen.getByText(row.label).nextSibling).toHaveTextContent(row.value);
       }
       expect(screen.getByText(content.publicGoods.disclaimer)).toHaveClass('type-caption');
+    });
+
+    it('states the share once, in the figure, in every locale', () => {
+      // Regression: the heading, the body, the figure and its caption all said "7%".
+      const share = new RegExp(`${protocolFacts.publicGoodsPercentage}\\s?%`, 'g');
+      for (const locale of routing.locales) {
+        const { container, unmount } = render(
+          <PublicGoods publicGoods={getLandingContent(locale).publicGoods} />,
+        );
+        expect({ locale, count: container.textContent?.match(share)?.length }).toEqual({
+          locale,
+          count: 1,
+        });
+        unmount();
+      }
     });
 
     it('opens Protocol Guild in a new tab, announced', () => {

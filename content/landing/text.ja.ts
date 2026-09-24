@@ -177,8 +177,8 @@ export const landingTextJa = {
 
   publicGoods: {
     eyebrow: '公共財',
-    heading: 'すべてのサイクルの7%が、Ethereumのコア貢献者を支えます。',
-    body: 'すべてのパフォーマンス・サイクルは、ETH準備金の7%を、170人以上のEthereumコア貢献者の共同資金支援メカニズムであるProtocol Guildへ送ります。プロトコルの利用が増えるほど、Ethereumを支えるインフラへ届く資金も増えます。',
+    heading: 'すべてのサイクルが、Ethereumのコア貢献者を支えます。',
+    body: 'すべてのパフォーマンス・サイクルは、ETH準備金の一定割合を、170人以上のEthereumコア貢献者の共同資金支援メカニズムであるProtocol Guildへ送ります。プロトコルの利用が増えるほど、Ethereumを支えるインフラへ届く資金も増えます。',
     disclaimerHeading: '免責事項',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:

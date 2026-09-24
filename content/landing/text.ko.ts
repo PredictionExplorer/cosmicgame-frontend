@@ -175,8 +175,8 @@ export const landingTextKo = {
 
   publicGoods: {
     eyebrow: '공공재',
-    heading: '모든 사이클의 7%가 이더리움 핵심 기여자에게 흘러갑니다.',
-    body: '모든 퍼포먼스 사이클은 ETH 준비금의 7%를 Protocol Guild로 전달합니다. Protocol Guild는 170명이 넘는 이더리움 핵심 기여자를 위한 공동 자금 지원 메커니즘입니다. 프로토콜이 많이 쓰일수록 이더리움 자체가 의존하는 인프라로 더 많이 흘러갑니다.',
+    heading: '모든 사이클이 이더리움 핵심 기여자를 지원합니다.',
+    body: '모든 퍼포먼스 사이클은 ETH 준비금의 일정 비율을 Protocol Guild로 전달합니다. Protocol Guild는 170명이 넘는 이더리움 핵심 기여자를 위한 공동 자금 지원 메커니즘입니다. 프로토콜이 많이 쓰일수록 이더리움 자체가 의존하는 인프라로 더 많이 흘러갑니다.',
     disclaimerHeading: '면책 고지',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:

@@ -175,8 +175,8 @@ export const landingTextZhHk = {
 
   publicGoods: {
     eyebrow: '公共物品',
-    heading: `${protocolFacts.publicGoodsPercentage}% 的週期儲備，流向以太坊核心貢獻者。`,
-    body: `每個演繹週期都會將 ETH 儲備的 ${protocolFacts.publicGoodsPercentage}% 轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的集體機制。協議使用得越多，流向以太坊底層基礎設施的資源也越多。`,
+    heading: '每個週期的儲備，都有一部分流向以太坊核心貢獻者。',
+    body: `每個演繹週期都會將 ETH 儲備中的固定份額轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的集體機制。協議使用得越多，流向以太坊底層基礎設施的資源也越多。`,
     disclaimerHeading: '免責聲明',
     // lexicon-allow-start: 明確否認慈善捐贈及相關稅務定性。
     disclaimer:

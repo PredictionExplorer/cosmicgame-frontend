@@ -177,8 +177,8 @@ export const landingTextVi = {
 
   publicGoods: {
     eyebrow: 'Hàng hóa công',
-    heading: '7% của mỗi chu kỳ tài trợ những người đóng góp cốt lõi cho Ethereum.',
-    body: 'Mỗi chu kỳ trình diễn chuyển 7% dự trữ ETH của mình đến Protocol Guild — cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho Ethereum. Hoạt động trong giao thức góp phần duy trì nguồn hỗ trợ cho hạ tầng Ethereum.',
+    heading: 'Mỗi chu kỳ đều tài trợ những người đóng góp cốt lõi cho Ethereum.',
+    body: 'Mỗi chu kỳ trình diễn chuyển một tỷ lệ cố định trong dự trữ ETH của mình đến Protocol Guild — cơ chế tài trợ tập thể cho hơn 170 người đóng góp cốt lõi cho Ethereum. Hoạt động trong giao thức góp phần duy trì nguồn hỗ trợ cho hạ tầng Ethereum.',
     disclaimerHeading: 'Lưu ý',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:

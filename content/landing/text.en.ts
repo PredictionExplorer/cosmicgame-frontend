@@ -175,8 +175,8 @@ export const landingTextEn = {
 
   publicGoods: {
     eyebrow: 'Public Goods',
-    heading: '7% of every cycle funds Ethereum’s core contributors.',
-    body: 'Every Performance Cycle forwards 7% of its ETH reserve to Protocol Guild — the collective funding mechanism for 170+ Ethereum core contributors. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.',
+    heading: 'Every cycle funds Ethereum’s core contributors.',
+    body: 'Every Performance Cycle forwards a fixed share of its ETH reserve to Protocol Guild — the collective funding mechanism for 170+ Ethereum core contributors. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.',
     disclaimerHeading: 'Disclaimer',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:
@@ -184,7 +184,7 @@ export const landingTextEn = {
     // lexicon-allow-end
     card: {
       label: 'Cycle allocation',
-      description: 'of every Performance Cycle is forwarded to Protocol Guild.',
+      description: 'of every Performance Cycle’s ETH reserve is forwarded to Protocol Guild.',
       tableRows: {
         contributors: { label: 'Protocol Guild contributors' },
         enforcement: { label: 'Enforcement', value: 'on-chain' },

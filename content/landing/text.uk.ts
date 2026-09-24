@@ -176,8 +176,8 @@ export const landingTextUk = {
 
   publicGoods: {
     eyebrow: 'Суспільні блага',
-    heading: '7% кожного циклу — на підтримку розробників ядра Ethereum.',
-    body: 'Кожен перформанс-цикл перераховує 7% свого резерву ETH Protocol Guild — колективному механізму фінансування понад 170 розробників ядра Ethereum. Що активніше використовують протокол, то більше надходить інфраструктурі, на яку спирається сам Ethereum.',
+    heading: 'Кожен цикл підтримує розробників ядра Ethereum.',
+    body: 'Кожен перформанс-цикл перераховує фіксовану частку свого резерву ETH Protocol Guild — колективному механізму фінансування понад 170 розробників ядра Ethereum. Що активніше використовують протокол, то більше надходить інфраструктурі, на яку спирається сам Ethereum.',
     disclaimerHeading: 'Застереження',
     // lexicon-allow-start: explicit legal denial of charitable-tax-treatment framing.
     disclaimer:

@@ -180,7 +180,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
       'A Performance Cycle',
       'More than ten ways the protocol distributes',
       'Anchor Cosmic Signature',
-      '7% of every cycle',
+      'Every cycle funds Ethereum',
       'Protocol Coordination',
       'Open, verified, reproducible',
       'Questions worth answering plainly',
