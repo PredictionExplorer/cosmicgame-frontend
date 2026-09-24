@@ -155,11 +155,14 @@ describe('CycleStanding', () => {
     expect(screen.getByTestId('personal-gesture-count')).not.toHaveTextContent('share');
   });
 
-  it('keeps its shape before a wallet connects', () => {
+  it('says in one sentence what connecting adds, with no column of empty dashes', () => {
     render(<CycleStandingPreview />);
-    expect(screen.getByTestId('cycle-standing-preview')).toHaveTextContent(
-      'home.observatory.standing.connectBody',
-    );
+    const preview = screen.getByTestId('cycle-standing-preview');
+    expect(preview).toHaveTextContent('home.observatory.standing.connectBody');
+    expect(preview).not.toHaveTextContent('—');
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'home.observatory.standing.title' }),
+    ).toBeVisible();
   });
 
   it('has no accessibility violations', async () => {

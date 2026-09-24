@@ -771,5 +771,16 @@
       "randomWalk": "Використайте придатний RandomWalk NFT для зменшення вартості ETH-жесту. NFT залишається в гаманці."
     },
     "connectHelp": "Під’єднайте гаманець у мережі Arbitrum, щоб переглянути та підтвердити жест."
+  },
+  "latestSignature": {
+    "title": "Найновіші Сигнатури",
+    "gallery": "Галерея",
+    "unnamed": "Cosmic Signature {id}",
+    "named": "«{name}», Cosmic Signature {id}",
+    "imprintedIn": "Закарбовано в циклі {number}",
+    "position": "{index} з {count}",
+    "newer": "Новіша Сигнатура",
+    "older": "Старіша Сигнатура",
+    "none": "Ще не закарбовано жодної Сигнатури"
   }
 }

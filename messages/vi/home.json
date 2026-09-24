@@ -771,5 +771,16 @@
       "randomWalk": "Dùng RandomWalk NFT đủ điều kiện để giảm chi phí nét bút ETH. NFT vẫn ở trong ví."
     },
     "connectHelp": "Kết nối ví trên Arbitrum để xem lại và xác nhận nét bút."
+  },
+  "latestSignature": {
+    "title": "Signature mới nhất",
+    "gallery": "Phòng trưng bày",
+    "unnamed": "Cosmic Signature {id}",
+    "named": "“{name}”, Cosmic Signature {id}",
+    "imprintedIn": "Được khắc trong Chu kỳ #{number}",
+    "position": "{index} / {count}",
+    "newer": "Signature mới hơn",
+    "older": "Signature cũ hơn",
+    "none": "Chưa có Signature nào được khắc"
   }
 }

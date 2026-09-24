@@ -67,8 +67,9 @@ function Pending() {
 }
 
 /**
- * The standing's place before a wallet connects: what it will show, so the
- * form keeps its shape and the visitor knows what connecting adds.
+ * The standing's place before a wallet connects: one sentence on what it
+ * will show, under the latest Signature, so the visitor knows what
+ * connecting adds without a column of empty dashes.
  */
 export function CycleStandingPreview({ className }: { className?: string }) {
   const t = useTranslations('home.observatory.standing');
@@ -78,24 +79,17 @@ export function CycleStandingPreview({ className }: { className?: string }) {
       data-testid="cycle-standing-preview"
       className={cn('min-w-0', className)}
     >
-      <h3 id="cycle-standing-title" className="type-title text-foreground">
+      <h2 id="cycle-standing-title" className="type-title text-foreground">
         {t('title')}
-      </h3>
+      </h2>
       <p className="type-body-sm mt-2 text-muted-foreground">{t('connectBody')}</p>
-      <dl className="mt-3 divide-y divide-rule-faint" aria-hidden>
-        {(['position', 'thisCycle', 'waiting'] as const).map((key) => (
-          <div key={key} className="flex items-baseline justify-between gap-4 py-3">
-            <dt className="type-label text-subtle">{t(key)}</dt>
-            <dd className="type-body-sm text-subtle">—</dd>
-          </div>
-        ))}
-      </dl>
     </section>
   );
 }
 
 /**
- * The connected wallet's cycle standing, beside the gesture form: where it
+ * The connected wallet's cycle standing, beside the gesture form (under the
+ * latest Signature from 1024px, right after the form on phones): where it
  * stands (phase-aware, including its exclusive finalization window), how many
  * of this cycle's Gestures are its own, and whether anything waits to be
  * retrieved. Every figure is read, never assumed: while a read loads it shows
@@ -279,9 +273,9 @@ export function CycleStanding({
       data-testid="cycle-standing"
       className={cn('min-w-0', className)}
     >
-      <h3 id="cycle-standing-title" className="type-title text-foreground">
+      <h2 id="cycle-standing-title" className="type-title text-foreground">
         {t('title')}
-      </h3>
+      </h2>
       <dl className="mt-2 divide-y divide-rule-faint">
         <Row
           testId="personal-standing"

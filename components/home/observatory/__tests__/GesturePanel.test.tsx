@@ -498,24 +498,6 @@ describe('GesturePanel', () => {
     },
   );
 
-  it('sets the standing beside the form and can keep a placeholder off phones', () => {
-    const { rerender } = render(
-      <GesturePanel {...baseProps} form={makeForm()} standing={<p>Standing</p>} />,
-    );
-    expect(screen.getByTestId('gesture-panel-standing')).toHaveTextContent('Standing');
-    expect(screen.getByTestId('gesture-panel-standing')).not.toHaveClass('max-md:hidden');
-
-    rerender(
-      <GesturePanel
-        {...baseProps}
-        form={makeForm()}
-        standing={<p>Standing</p>}
-        standingOnPhones={false}
-      />,
-    );
-    expect(screen.getByTestId('gesture-panel-standing')).toHaveClass('max-md:hidden');
-  });
-
   /* ── Lifecycle and anchors ───────────────────────────────────── */
 
   it('renders a labeled skeleton while the dashboard loads', () => {

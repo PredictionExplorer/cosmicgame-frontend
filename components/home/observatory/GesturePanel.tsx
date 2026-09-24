@@ -116,13 +116,6 @@ export interface GesturePanelProps {
    * `sheet` renders the same panel inside the mobile bottom sheet.
    */
   variant?: 'card' | 'sheet';
-  /** The connected wallet's standing, beside the form (card only). */
-  standing?: ReactNode;
-  /**
-   * Show the standing on phones too. A placeholder standing (no wallet yet)
-   * only earns its space beside the form, from tablets up.
-   */
-  standingOnPhones?: boolean;
   /** What the connected wallet spent this cycle; omit while disconnected. */
   cycleSpend?: CycleSpend | null;
   /** Moves to the clock's Finalize action (the Last Gesture holder at zero). */
@@ -168,8 +161,8 @@ function SpecRow({
  * price), what the Gesture imprints, an optional message, the optional
  * settings, the not-refunded note beside what this wallet already spent, and
  * the one commit action with its price. The decision and the action lead; the
- * message recedes behind "Add a message" until it is wanted. Beside it, the
- * connected wallet's standing.
+ * message recedes behind "Add a message" until it is wanted. The wallet's
+ * standing sits beside it on the desk (ControlDesk), not inside the form.
  */
 export function GesturePanel({
   data,
@@ -186,8 +179,6 @@ export function GesturePanel({
   onSubmit,
   onSelectGestureType,
   variant = 'card',
-  standing,
-  standingOnPhones = true,
   cycleSpend = null,
   onGoToFinalize,
   messageFocusRequest = 0,
@@ -654,33 +645,15 @@ export function GesturePanel({
       className={cn('@container/gesture min-w-0 scroll-mt-24 focus:outline-none', className)}
       tabIndex={-1}
     >
-      <div
-        className={cn(
-          'grid min-w-0 gap-x-10 gap-y-8',
-          standing && '@min-[52rem]/gesture:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]',
-        )}
-      >
-        <div className="min-w-0 space-y-3.5">
-          <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-            <h2 id={`gesture-panel-title-${variant}`} className="type-heading-3 text-foreground">
-              {t('form.title')}
-            </h2>
-            {!loading && gestureType === 'CST' && <UniswapTradeButton variant="compact" />}
-          </header>
-          {decision}
-          {action}
-        </div>
-        {standing && (
-          <div
-            data-testid="gesture-panel-standing"
-            className={cn(
-              'min-w-0 border-t border-rule-faint pt-6 @min-[52rem]/gesture:border-s @min-[52rem]/gesture:border-t-0 @min-[52rem]/gesture:ps-10 @min-[52rem]/gesture:pt-0',
-              !standingOnPhones && 'max-md:hidden',
-            )}
-          >
-            {standing}
-          </div>
-        )}
+      <div className="min-w-0 space-y-3.5">
+        <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <h2 id={`gesture-panel-title-${variant}`} className="type-heading-3 text-foreground">
+            {t('form.title')}
+          </h2>
+          {!loading && gestureType === 'CST' && <UniswapTradeButton variant="compact" />}
+        </header>
+        {decision}
+        {action}
       </div>
     </section>
   );

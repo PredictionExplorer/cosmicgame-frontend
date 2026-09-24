@@ -771,5 +771,16 @@
       "randomWalk": "사용 가능한 RandomWalk NFT로 ETH 제스처 비용을 줄입니다. NFT는 지갑에 그대로 남습니다."
     },
     "connectHelp": "Arbitrum 지갑을 연결하면 제스처를 검토하고 확인할 수 있습니다."
+  },
+  "latestSignature": {
+    "title": "최신 시그니처",
+    "gallery": "갤러리",
+    "unnamed": "Cosmic Signature {id}",
+    "named": "Cosmic Signature {id} “{name}”",
+    "imprintedIn": "각인: 사이클 {number}",
+    "position": "{index} / {count}",
+    "newer": "더 최근 시그니처",
+    "older": "이전 시그니처",
+    "none": "아직 각인된 시그니처가 없습니다"
   }
 }

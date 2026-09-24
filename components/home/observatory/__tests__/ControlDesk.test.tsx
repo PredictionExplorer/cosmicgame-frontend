@@ -10,6 +10,8 @@ const regions = {
   calibration: <section aria-label="Calibration">Calibration</section>,
   standings: <section aria-label="Standings">Standings</section>,
   gestureConsole: <section aria-label="Gesture form">Form</section>,
+  standing: <section aria-label="Your standing">Standing</section>,
+  art: <section aria-label="Latest Signature">Art</section>,
   allocationLedger: <p>Ledger</p>,
 };
 
@@ -27,11 +29,46 @@ describe('ControlDesk', () => {
       'control-desk-calibration',
       'control-desk-standings',
       'control-desk-gesture',
+      'control-desk-standing',
+      'control-desk-art',
     ]);
-    // Row 1: the Cycle column (5 of 12) beside the standings (7 of 12); row 2: the form.
-    expect(screen.getByTestId('control-desk-cycle')).toHaveClass('lg:col-span-5');
+    // Row 1: the Cycle column (5 of 12) beside the standings (7 of 12).
+    expect(screen.getByTestId('control-desk-cycle')).toHaveClass('lg:col-span-5', 'lg:row-start-1');
     expect(screen.getByTestId('control-desk-standings')).toHaveClass('lg:col-span-7');
-    expect(screen.getByTestId('control-desk-gesture')).toHaveClass('lg:col-span-12');
+    // Row 2: the form (8 of 12), and beside it the art over the wallet's standing.
+    expect(screen.getByTestId('control-desk-gesture')).toHaveClass(
+      'lg:col-span-8',
+      'lg:row-span-2',
+    );
+    expect(screen.getByTestId('control-desk-art')).toHaveClass('lg:col-start-9', 'lg:row-start-2');
+    expect(screen.getByTestId('control-desk-standing')).toHaveClass(
+      'lg:col-start-9',
+      'lg:row-start-3',
+    );
+  });
+
+  it('hangs the art on the wall and frames the standing only while the desk is one column', () => {
+    render(<ControlDesk {...regions} />);
+    const art = screen.getByTestId('control-desk-art');
+    expect(art.className).not.toMatch(/(?:^|\s)(?:border|bg-surface)/);
+    const standing = screen.getByTestId('control-desk-standing');
+    expect(standing).toHaveClass('border', 'lg:border-0', 'lg:bg-transparent');
+  });
+
+  it('keeps a placeholder standing off phones', () => {
+    const { rerender } = render(<ControlDesk {...regions} />);
+    expect(screen.getByTestId('control-desk-standing')).not.toHaveClass('max-md:hidden');
+    rerender(<ControlDesk {...regions} standingOnPhones={false} />);
+    expect(screen.getByTestId('control-desk-standing')).toHaveClass('max-md:hidden');
+  });
+
+  it("gives the art the form's place between cycles", () => {
+    render(<ControlDesk {...regions} gestureConsole={undefined} />);
+    expect(screen.getByTestId('control-desk-art')).toHaveClass('lg:col-span-7', 'lg:row-start-2');
+    expect(screen.getByTestId('control-desk-standing')).toHaveClass(
+      'lg:col-span-5',
+      'lg:row-start-2',
+    );
   });
 
   it('keeps tablets in one column and moves the form under the clock on phones', () => {
@@ -42,8 +79,10 @@ describe('ControlDesk', () => {
     );
     expect(screen.getByTestId('control-desk-clock')).toHaveClass('max-md:order-1');
     expect(screen.getByTestId('control-desk-gesture')).toHaveClass('max-md:order-2');
-    expect(screen.getByTestId('control-desk-standings')).toHaveClass('max-md:order-3');
-    expect(screen.getByTestId('control-desk-calibration')).toHaveClass('max-md:order-4');
+    expect(screen.getByTestId('control-desk-standing')).toHaveClass('max-md:order-3');
+    expect(screen.getByTestId('control-desk-standings')).toHaveClass('max-md:order-4');
+    expect(screen.getByTestId('control-desk-calibration')).toHaveClass('max-md:order-5');
+    expect(screen.getByTestId('control-desk-art')).toHaveClass('max-md:order-6');
   });
 
   it('frames each region once: no bordered box inside a bordered box', () => {

@@ -4,18 +4,18 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { formatId, getAssetsUrl } from '@/utils';
 
 import {
-  getCstInfoSeed,
   getCurrentSpecialRecipientsSeed,
   getDashboardInfoSeed,
   getHomeTimingSeed,
   getLatestGestureSeed,
+  getLatestSignaturesSeed,
   getServerRenderTimeMs,
 } from '@/services/api/server';
 import { createMetadata } from '@/utils/seo';
 import { formatAmount } from '@/utils/format';
 import { toFiniteNumber } from '@/utils/finiteNumber';
 import { JsonLd, jsonLdInLanguage, liveCycleJsonLd, visualArtworkJsonLd } from '@/utils/jsonLd';
-import type { CSTTokenInfo, DashboardInfo, GestureInfo, SpecialRecipients } from '@/services/api';
+import type { GestureInfo, SpecialRecipients } from '@/services/api';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
 import HomePage from './HomePage';
@@ -38,29 +38,6 @@ export const revalidate = 15;
 
 interface PageProps {
   params: Promise<{ locale: string }>;
-}
-
-export interface InitialBannerToken {
-  id: number;
-  info: CSTTokenInfo;
-}
-
-/**
- * Server-picks the hero artwork so its (priority) image URL is present in
- * the prerendered HTML. Before this, the artwork resolved through two
- * client-side queries after hydration, so the largest image on the page was
- * discovered seconds late. A fresh random token is chosen at each ISR
- * regeneration; the client rotation continues from it.
- */
-async function pickInitialBannerToken(
-  dashboard: DashboardInfo | null,
-): Promise<InitialBannerToken | null> {
-  const imprintedCount = dashboard?.MainStats?.NumCSTokenMints ?? 0;
-  if (!Number.isFinite(imprintedCount) || imprintedCount <= 0) return null;
-  const id = Math.floor(Math.random() * imprintedCount);
-  const info = await getCstInfoSeed(id);
-  if (!info?.Seed) return null;
-  return { id, info };
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -93,16 +70,18 @@ export default async function Page({ params }: PageProps) {
     getDashboardInfoSeed(),
     getHomeTimingSeed(),
   ]);
-  const [initialBannerToken, initialLatestGesture, initialSpecialRecipients] = await Promise.all([
-    pickInitialBannerToken(initialDashboardData),
-    initialDashboardData
-      ? getLatestGestureSeed(initialDashboardData.CurRoundNum)
-      : Promise.resolve<GestureInfo | null>(null),
-    getCurrentSpecialRecipientsSeed() as Promise<SpecialRecipients | null>,
-  ]);
+  const [initialLatestSignatures, initialLatestGesture, initialSpecialRecipients] =
+    await Promise.all([
+      getLatestSignaturesSeed(),
+      initialDashboardData
+        ? getLatestGestureSeed(initialDashboardData.CurRoundNum)
+        : Promise.resolve<GestureInfo | null>(null),
+      getCurrentSpecialRecipientsSeed() as Promise<SpecialRecipients | null>,
+    ]);
   const liveCycleStartTs = initialDashboardData?.TsRoundStart ?? 0;
   const liveCycleNumber = initialDashboardData?.CurRoundNum ?? 0;
   const tArtwork = await getTranslations({ locale, namespace: 'detail' });
+  const newestSignature = initialLatestSignatures?.[0] ?? null;
 
   // Deliberately NO Suspense wrapper: HomePage must render fully on the
   // server (it holds the LCP text). A future hook that suspends or bails to
@@ -123,22 +102,22 @@ export default async function Page({ params }: PageProps) {
           })}
         />
       )}
-      {/* The featured artwork leads the page visually; give crawlers and AI
-          engines the same fact as a licensed VisualArtwork node. */}
-      {initialBannerToken?.info.Seed && (
+      {/* The newest Signature hangs on the desk; give crawlers and AI engines
+          the same fact as a licensed VisualArtwork node. */}
+      {newestSignature?.Seed && (
         <JsonLd
           data={visualArtworkJsonLd({
-            tokenId: initialBannerToken.id,
-            name: `Cosmic Signature ${formatId(initialBannerToken.id)}`,
+            tokenId: newestSignature.TokenId,
+            name: `Cosmic Signature ${formatId(newestSignature.TokenId)}`,
             description: tArtwork('jsonLd.productDescription'),
-            imageUrl: getAssetsUrl(`cosmicsignature/0x${initialBannerToken.info.Seed}.png`),
+            imageUrl: getAssetsUrl(`cosmicsignature/0x${String(newestSignature.Seed)}.png`),
             inLanguage: jsonLdInLanguage(locale),
           })}
         />
       )}
       <HomePage
         initialDashboardData={initialDashboardData}
-        initialBannerToken={initialBannerToken}
+        initialLatestSignatures={initialLatestSignatures}
         initialLatestGesture={initialLatestGesture}
         initialSpecialRecipients={initialSpecialRecipients}
         initialTimingSample={initialTimingSample}

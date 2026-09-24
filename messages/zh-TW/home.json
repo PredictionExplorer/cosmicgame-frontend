@@ -771,5 +771,16 @@
       "randomWalk": "使用符合條件的 RandomWalk NFT，降低 ETH 落筆價格。NFT 仍保留在錢包中。"
     },
     "connectHelp": "連接 Arbitrum 錢包，檢視並確認你的落筆。"
+  },
+  "latestSignature": {
+    "title": "最新簽名",
+    "gallery": "畫廊",
+    "unnamed": "Cosmic Signature {id}",
+    "named": "Cosmic Signature {id}《{name}》",
+    "imprintedIn": "銘刻於第 {number} 個週期",
+    "position": "{index} / {count}",
+    "newer": "較新的簽名",
+    "older": "較早的簽名",
+    "none": "尚未銘刻簽名"
   }
 }

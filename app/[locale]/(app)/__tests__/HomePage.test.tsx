@@ -21,7 +21,9 @@ const mockUseCurrentTime = jest.fn().mockReturnValue({
   data: Math.floor(Date.now() / 1000),
   isLoading: false,
 });
-const mockUseCSTInfo = jest.fn().mockReturnValue({ data: undefined });
+const mockUseLatestSignatures = jest
+  .fn()
+  .mockReturnValue({ signatures: [], isLoading: false, isError: false });
 
 jest.mock('../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -29,7 +31,10 @@ jest.mock('../../../../hooks/useApiQuery', () => ({
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
   useBannedGestures: (...args: unknown[]) => mockUseBannedGestures(...args),
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
-  useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
+}));
+
+jest.mock('@/hooks/useLatestSignatures', () => ({
+  useLatestSignatures: (...args: unknown[]) => mockUseLatestSignatures(...args),
 }));
 
 const mockEmptyGestures: unknown[] = [];
@@ -402,7 +407,7 @@ beforeEach(() => {
     data: Math.floor(Date.now() / 1000),
     isLoading: false,
   });
-  mockUseCSTInfo.mockReturnValue({ data: undefined });
+  mockUseLatestSignatures.mockReturnValue({ signatures: [], isLoading: false, isError: false });
 });
 
 /* ── helpers ────────────────────────────────────────────────────── */
@@ -1076,12 +1081,19 @@ describe('HomePage', () => {
     expect(screen.getByTestId('personal-retrieve-status')).not.toHaveTextContent('waitingNothing');
   });
 
-  it('keeps artwork beside the feed and puts attachments in their own full-width section', () => {
+  it('hangs the newest Signature beside the form and gives attachments their own section', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7 }),
       isLoading: false,
     });
-    mockUseCSTInfo.mockReturnValue({ data: { Seed: 'abc123' } });
+    mockUseLatestSignatures.mockReturnValue({
+      signatures: [
+        { TokenId: 47, Seed: 'abc123', RoundNum: 6, TimeStamp: 1_786_491_506 },
+        { TokenId: 46, Seed: 'def456', RoundNum: 6, TimeStamp: 1_786_491_506 },
+      ],
+      isLoading: false,
+      isError: false,
+    });
     mockUseDonationsNFTByRound.mockReturnValue({ data: [{ RecordId: 1 }, { RecordId: 2 }] });
     mockUseDonationsERC20ByRound.mockReturnValue({
       data: [{ EvtLogId: 1, TokenAddr: '0xToken', AmountDonatedEth: 5 }],
@@ -1089,19 +1101,22 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    const rail = screen.getByTestId('home-depth-rail');
+    // The art is part of the desk: row 2, beside the form, above the fold.
+    const art = screen.getByTestId('latest-signature');
+    expect(screen.getByTestId('control-desk-art')).toContainElement(art);
+    expect(within(art).getByTestId('latest-signature-link')).toHaveAttribute('href', '/detail/47');
+    expect(within(art).getByText('home.latestSignature.imprintedIn(number=6)')).toBeVisible();
+    expect(
+      within(art).getByRole('link', { name: /home\.latestSignature\.gallery/ }),
+    ).toHaveAttribute('href', '/gallery');
+
     const actions = screen.getByTestId('home-feed-actions');
-    const art = screen.getByTestId('deck-art-card');
-    expect(screen.getByTestId('control-desk')).not.toContainElement(art);
-    expect(art).toBeVisible();
-    expect(rail).toContainElement(art);
     expect(actions).toContainElement(screen.getByTestId('cycle-details-link-card'));
     expect(screen.getByTestId('cycle-details-link-card')).toHaveAttribute('href', '/current-cycle');
     expect(screen.getByTestId('previous-cycle-link-card')).toHaveAttribute('href', '/allocation/6');
     expect(screen.queryByTestId('public-goods-impact-card')).not.toBeInTheDocument();
 
     const showcase = screen.getByTestId('attached-nft-showcase');
-    expect(rail).not.toContainElement(showcase);
     const assets = screen.getByTestId('home-attached-assets');
     expect(assets).toContainElement(showcase);
     expect(screen.getByTestId('home-feed-layout').compareDocumentPosition(assets)).toBe(
@@ -1111,11 +1126,15 @@ describe('HomePage', () => {
     expect(showcase).toHaveAttribute('data-erc20-count', '1');
     expect(showcase).toHaveAttribute('data-cycle', '7');
     expect(showcase).toHaveAttribute('data-variant', 'default');
+  });
 
-    // The rotating artwork links to its detail page.
-    expect(screen.getByTestId('deck-art-link')).toHaveAttribute(
-      'href',
-      expect.stringMatching(/^\/detail\/\d+$/),
+  it('reads the newest imprints keyed by the dashboard imprint count and the server seed', () => {
+    const seed = [{ TokenId: 47, Seed: 'abc123', RoundNum: 1 }];
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<HomePage initialLatestSignatures={seed as never} />);
+    expect(mockUseLatestSignatures).toHaveBeenCalledWith(
+      makeDashboardData().MainStats.NumCSTokenMints,
+      seed,
     );
   });
 
@@ -1179,16 +1198,12 @@ describe('HomePage', () => {
     expect(headline).not.toBeVisible();
   });
 
-  it('offers gallery discovery from one featured artwork instead of repeating the gallery', () => {
+  it('shows one plate of the newest Signature instead of repeating the gallery', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<HomePage />);
     expect(screen.queryByTestId('latest-nfts')).not.toBeInTheDocument();
-    expect(screen.getAllByTestId('deck-art-card')).toHaveLength(1);
-    expect(
-      within(screen.getByTestId('deck-art-card')).getByRole('link', {
-        name: 'home.deck.art.galleryCta',
-      }),
-    ).toHaveAttribute('href', '/gallery');
+    expect(screen.queryByTestId('deck-art-card')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('latest-signature')).toHaveLength(1);
   });
 
   it('sets the control desk on the full-strength atmosphere and starfield', () => {
@@ -1399,8 +1414,9 @@ describe('HomePage', () => {
     expect(screen.getByTestId('cycle-clock')).toHaveAttribute('data-phase', 'opening-soon');
     expect(screen.getByTestId('latest-participant-intel')).toBeVisible();
     expect(screen.getByTestId('standings-ledger')).toBeVisible();
-    expect(screen.getByTestId('home-depth-rail')).toContainElement(
-      screen.getByTestId('deck-art-card'),
+    // Between cycles the art takes the form's place on the desk.
+    expect(screen.getByTestId('control-desk-art')).toContainElement(
+      screen.getByTestId('latest-signature'),
     );
     expect(screen.getByTestId('clock-calendar-link')).toBeInTheDocument();
     expect(screen.getByTestId('cycle-details-link-card')).toHaveAttribute('href', '/current-cycle');

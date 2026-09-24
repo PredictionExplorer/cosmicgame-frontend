@@ -2,11 +2,11 @@ import { expectedLanguageAlternates } from '@/test-utils/i18n';
 import { documentTitleOf } from '@/test-utils/metadata';
 
 import {
-  getCstInfoSeed,
   getCurrentSpecialRecipientsSeed,
   getDashboardInfoSeed,
   getHomeTimingSeed,
   getLatestGestureSeed,
+  getLatestSignaturesSeed,
   getServerRenderTimeMs,
 } from '@/services/api/server';
 
@@ -16,7 +16,7 @@ import Page, { generateMetadata } from '../page';
 
 jest.mock('@/services/api/server', () => ({
   getDashboardInfoSeed: jest.fn(),
-  getCstInfoSeed: jest.fn(),
+  getLatestSignaturesSeed: jest.fn(),
   getLatestGestureSeed: jest.fn(),
   getCurrentSpecialRecipientsSeed: jest.fn(),
   getHomeTimingSeed: jest.fn(),
@@ -27,14 +27,14 @@ jest.mock('../HomePage', () => ({
   __esModule: true,
   default: ({
     initialDashboardData,
-    initialBannerToken,
+    initialLatestSignatures,
     initialLatestGesture,
     initialSpecialRecipients,
     initialTimingSample,
     initialRenderAtMs,
   }: {
     initialDashboardData?: { CurRoundNum?: number } | null;
-    initialBannerToken?: { id: number; info: { Seed?: string } } | null;
+    initialLatestSignatures?: { TokenId: number; Seed?: string }[] | null;
     initialLatestGesture?: { EvtLogId?: number } | null;
     initialSpecialRecipients?: { ChronoWarriorAddress?: string } | null;
     initialTimingSample?: { targetServerTimeSec?: number } | null;
@@ -43,8 +43,7 @@ jest.mock('../HomePage', () => ({
     <div
       data-testid="home-page"
       data-cycle={initialDashboardData?.CurRoundNum ?? ''}
-      data-banner-id={initialBannerToken?.id ?? ''}
-      data-banner-seed={initialBannerToken?.info.Seed ?? ''}
+      data-signature-ids={(initialLatestSignatures ?? []).map((token) => token.TokenId).join(',')}
       data-latest-gesture-id={initialLatestGesture?.EvtLogId ?? ''}
       data-chrono-address={initialSpecialRecipients?.ChronoWarriorAddress ?? ''}
       data-finalization-time={initialTimingSample?.targetServerTimeSec ?? ''}
@@ -56,7 +55,9 @@ jest.mock('../HomePage', () => ({
 const mockGetDashboardInfoSeed = getDashboardInfoSeed as jest.MockedFunction<
   typeof getDashboardInfoSeed
 >;
-const mockGetCstInfoSeed = getCstInfoSeed as jest.MockedFunction<typeof getCstInfoSeed>;
+const mockGetLatestSignaturesSeed = getLatestSignaturesSeed as jest.MockedFunction<
+  typeof getLatestSignaturesSeed
+>;
 const mockGetLatestGestureSeed = getLatestGestureSeed as jest.MockedFunction<
   typeof getLatestGestureSeed
 >;
@@ -82,7 +83,10 @@ function dashboardSeed(overrides: Record<string, unknown> = {}) {
 beforeEach(() => {
   jest.clearAllMocks();
   mockGetDashboardInfoSeed.mockResolvedValue(dashboardSeed());
-  mockGetCstInfoSeed.mockResolvedValue({ Seed: 'abc123' } as never);
+  mockGetLatestSignaturesSeed.mockResolvedValue([
+    { TokenId: 3, Seed: 'abc123' },
+    { TokenId: 2, Seed: 'def456' },
+  ] as never);
   mockGetLatestGestureSeed.mockResolvedValue({ EvtLogId: 77 } as never);
   mockGetCurrentSpecialRecipientsSeed.mockResolvedValue({
     ChronoWarriorAddress: '0xChrono',
@@ -116,35 +120,11 @@ describe('app home page (server shell)', () => {
     expect(screen.getByTestId('home-page')).toHaveAttribute('data-finalization-time', '1700000600');
   });
 
-  it('server-picks a hero banner token within the imprinted range', async () => {
+  it('seeds the newest imprinted Signatures so the plate is in the first paint', async () => {
     render(await Page(pageProps));
 
-    const requestedId = mockGetCstInfoSeed.mock.calls[0]?.[0];
-    expect(requestedId).toBeGreaterThanOrEqual(0);
-    expect(requestedId).toBeLessThan(4);
-
-    const home = screen.getByTestId('home-page');
-    expect(home).toHaveAttribute('data-banner-id', String(requestedId));
-    expect(home).toHaveAttribute('data-banner-seed', 'abc123');
-  });
-
-  it('omits the banner seed when no tokens have been imprinted yet', async () => {
-    mockGetDashboardInfoSeed.mockResolvedValue(
-      dashboardSeed({ MainStats: { NumCSTokenMints: 0 } }),
-    );
-
-    render(await Page(pageProps));
-
-    expect(mockGetCstInfoSeed).not.toHaveBeenCalled();
-    expect(screen.getByTestId('home-page')).toHaveAttribute('data-banner-id', '');
-  });
-
-  it('omits the banner seed when the token read has no Seed', async () => {
-    mockGetCstInfoSeed.mockResolvedValue({ Seed: '' } as never);
-
-    render(await Page(pageProps));
-
-    expect(screen.getByTestId('home-page')).toHaveAttribute('data-banner-seed', '');
+    expect(mockGetLatestSignaturesSeed).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('home-page')).toHaveAttribute('data-signature-ids', '3,2');
   });
 
   it('renders with a null dashboard when the seed read is unavailable', async () => {
@@ -153,7 +133,6 @@ describe('app home page (server shell)', () => {
     render(await Page(pageProps));
 
     expect(screen.getByTestId('home-page')).toHaveAttribute('data-cycle', '');
-    expect(mockGetCstInfoSeed).not.toHaveBeenCalled();
     expect(mockGetLatestGestureSeed).not.toHaveBeenCalled();
   });
 
@@ -184,7 +163,7 @@ describe('app home page (server shell)', () => {
     expect(types).not.toContain('Event');
   });
 
-  it('embeds licensed VisualArtwork JSON-LD for the server-picked featured artwork', async () => {
+  it('embeds licensed VisualArtwork JSON-LD for the newest Signature', async () => {
     const { container } = render(await Page(pageProps));
 
     const artwork = [...container.querySelectorAll('script[type="application/ld+json"]')]
@@ -192,16 +171,14 @@ describe('app home page (server shell)', () => {
       .find((data) => data['@type'] === 'VisualArtwork');
 
     expect(artwork).toBeDefined();
-    expect(String(artwork?.url)).toMatch(/\/detail\/\d+$/);
+    expect(String(artwork?.url)).toMatch(/\/detail\/3$/);
     const image = artwork?.image as Record<string, string>;
     expect(image.contentUrl).toContain('0xabc123.png');
     expect(image.license).toContain('creativecommons.org/publicdomain/zero');
   });
 
   it('omits the VisualArtwork JSON-LD when no artwork resolves', async () => {
-    mockGetDashboardInfoSeed.mockResolvedValue(
-      dashboardSeed({ MainStats: { NumCSTokenMints: 0 } }),
-    );
+    mockGetLatestSignaturesSeed.mockResolvedValue(null);
 
     const { container } = render(await Page(pageProps));
 

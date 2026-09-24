@@ -771,5 +771,16 @@
       "randomWalk": "Use an eligible RandomWalk NFT for a reduced ETH Gesture Cost. The NFT stays in your wallet."
     },
     "connectHelp": "Connect a wallet on Arbitrum to review and confirm your Gesture."
+  },
+  "latestSignature": {
+    "title": "Latest Signatures",
+    "gallery": "Gallery",
+    "unnamed": "Cosmic Signature {id}",
+    "named": "“{name}”, Cosmic Signature {id}",
+    "imprintedIn": "Imprinted in Cycle #{number}",
+    "position": "{index} of {count}",
+    "newer": "Newer Signature",
+    "older": "Older Signature",
+    "none": "No Signature imprinted yet"
   }
 }

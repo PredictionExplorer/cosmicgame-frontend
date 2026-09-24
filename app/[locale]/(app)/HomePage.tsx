@@ -18,7 +18,6 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
 import { GestureMessageChat, type PendingChatMessage } from '@/components/home/GestureMessageChat';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
-import { DeckArtCard } from '@/components/home/deck/DeckArtCard';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
 import { AllocationLedger } from '@/components/home/observatory/AllocationLedger';
@@ -27,6 +26,7 @@ import { CycleClock } from '@/components/home/observatory/CycleClock';
 import { CalibrationStatus } from '@/components/home/observatory/CalibrationStatus';
 import { CycleStanding, CycleStandingPreview } from '@/components/home/observatory/CycleStanding';
 import { GesturePanel } from '@/components/home/observatory/GesturePanel';
+import { LatestSignature } from '@/components/home/observatory/LatestSignature';
 import { ParticipationGuide } from '@/components/home/observatory/ParticipationGuide';
 import { PulseBar } from '@/components/home/observatory/PulseBar';
 import { StandingsLedger } from '@/components/home/observatory/StandingsLedger';
@@ -48,7 +48,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { usePositionMoment } from '@/hooks/usePositionMoment';
-import { useRotatingIndex } from '@/hooks/useRotatingIndex';
+import { useLatestSignatures } from '@/hooks/useLatestSignatures';
 import { useTabTitleCountdown } from '@/hooks/useTabTitleCountdown';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 import {
@@ -61,7 +61,6 @@ import {
 import {
   useDashboardInfo,
   useCurrentTime,
-  useCSTInfo,
   useDonationsNFTByRound,
   useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
@@ -89,7 +88,7 @@ import { deriveLiveCstGestureData } from '@/utils/cstGesture';
 const MemoHomeObservatoryHero = memo(HomeObservatoryHero);
 const MemoGestureMessageChat = memo(GestureMessageChat);
 const MemoAttachedNFTAllocationShowcase = memo(AttachedNFTAllocationShowcase);
-const MemoDeckArtCard = memo(DeckArtCard);
+const MemoLatestSignature = memo(LatestSignature);
 
 /** The deadline's own read: the tab title trusts it while it keeps arriving. */
 const DEADLINE_FRESHNESS_KEYS = [['allocationTime']] as const;
@@ -139,8 +138,8 @@ export function overlayOwnGesture(
 
 interface HomePageProps {
   initialDashboardData?: DashboardInfo | null;
-  /** Server-picked story artwork so its URL ships in the SSR HTML. */
-  initialBannerToken?: { id: number; info: CSTTokenInfo } | null;
+  /** The newest imprinted Signatures, so the plate ships in the SSR HTML. */
+  initialLatestSignatures?: CSTTokenInfo[] | null;
   /** Server-seeded latest gesture so participant intelligence is complete on first paint. */
   initialLatestGesture?: GestureInfo | null;
   /** Server-seeded role snapshot; direct-chain fallback still takes over when required. */
@@ -153,7 +152,7 @@ interface HomePageProps {
 
 const HomePage = ({
   initialDashboardData = null,
-  initialBannerToken = null,
+  initialLatestSignatures = null,
   initialLatestGesture = null,
   initialSpecialRecipients = null,
   initialTimingSample = null,
@@ -290,33 +289,19 @@ const HomePage = ({
   }, [currentTimeAnchorMs, currentTimeData]);
 
   const [gesturePulseKey, setGesturePulseKey] = useState(0);
-  const imprintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
-  // The server picks the first artwork (initialBannerToken) so its URL is
-  // discoverable in the prerendered HTML; the client rotation starts from
-  // that index and the seeded query below keeps the first client render
-  // byte-identical with the SSR output.
-  const bannerTokenId = useRotatingIndex({
-    count: imprintedTokenCount,
-    intervalMs: 15_000,
-    enabled: imprintedTokenCount > 1,
-    randomStart: true,
-    initialIndex: initialBannerToken?.id ?? null,
-  });
-
-  const { data: bannerCSTInfo } = useCSTInfo(
-    bannerTokenId,
-    bannerTokenId != null && bannerTokenId === initialBannerToken?.id
-      ? initialBannerToken.info
-      : undefined,
+  const imprintedTokenCount = dashboardData?.MainStats?.NumCSTokenMints ?? null;
+  // The art is the newest imprints, newest first (F089): the server seeds the
+  // list so the plate is in the HTML, and a finalization that imprints new
+  // Signatures refetches it through the dashboard's imprint count.
+  const latestSignatures = useLatestSignatures(imprintedTokenCount, initialLatestSignatures);
+  const newestSignature = latestSignatures.signatures[0] ?? null;
+  const bannerToken = useMemo(
+    () =>
+      newestSignature?.Seed
+        ? { seed: `0x${String(newestSignature.Seed)}`, id: newestSignature.TokenId }
+        : null,
+    [newestSignature],
   );
-
-  const bannerToken = useMemo(() => {
-    if (bannerTokenId != null && bannerCSTInfo)
-      return { seed: `0x${bannerCSTInfo.Seed}`, id: bannerTokenId };
-    if (initialBannerToken?.info.Seed)
-      return { seed: `0x${initialBannerToken.info.Seed}`, id: initialBannerToken.id };
-    return null;
-  }, [bannerTokenId, bannerCSTInfo, initialBannerToken]);
 
   const gestureForm = useGestureForm();
   const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
@@ -925,14 +910,20 @@ const HomePage = ({
                 onSubmit={() => void handleGesture('panel')}
                 onSelectGestureType={handleSelectGestureType}
                 variant="card"
-                standing={standing}
-                standingOnPhones={!!account}
                 cycleSpend={cycleSpend}
                 onGoToFinalize={scrollToClock}
                 messageFocusRequest={messageFocusRequest}
                 messageInputRef={panelMessageInputRef}
               />
             ) : undefined
+          }
+          standing={standing}
+          standingOnPhones={!!account}
+          art={
+            <MemoLatestSignature
+              signatures={latestSignatures.signatures}
+              loading={latestSignatures.isLoading}
+            />
           }
           orientation={<ParticipationGuide />}
           allocationLedger={<AllocationLedger data={data} />}
@@ -964,10 +955,7 @@ const HomePage = ({
             )}
           </div>
 
-          <div
-            data-testid="home-feed-layout"
-            className="mt-3 grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,23rem)]"
-          >
+          <div data-testid="home-feed-layout" className="mt-3 grid items-start gap-4">
             <div data-testid="home-feed-column" className="min-w-0">
               {/* Desktop sizes the panel; chat caps its reading area on phones. */}
               <MemoGestureMessageChat
@@ -985,10 +973,6 @@ const HomePage = ({
                 pendingMessages={pendingMessages}
                 className="lg:h-[clamp(20rem,48vh,28rem)] print:h-auto"
               />
-            </div>
-
-            <div data-testid="home-depth-rail" className="min-w-0">
-              <MemoDeckArtCard bannerToken={bannerToken} />
             </div>
           </div>
         </div>
