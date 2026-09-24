@@ -36,7 +36,7 @@
       },
       "anchoring": {
         "heading": "Anchor Distributions",
-        "description": "Track public Cosmic Signature NFT anchoring, ETH Anchor Distribution records, RandomWalk NFT anchoring, and Anchored-NFT Stellar Selection imprints.",
+        "description": "Track public Cosmic Signature NFT anchoring, ETH Anchor Distribution records, Random Walk NFT anchoring, and Anchored-NFT Stellar Selection imprints.",
         "source": "Cosmic Signature public anchoring APIs",
         "links": {
           "statistics": "View anchoring statistics",
@@ -45,15 +45,15 @@
         },
         "cards": {
           "actions": {
-            "label": "Anchor / Release Actions"
+            "label": "Anchor / release actions"
           },
           "ethDeposits": {
-            "label": "ETH Anchor Distribution Deposits",
+            "label": "ETH Anchor Distribution deposits",
             "tooltip": "ETH deposits into the Anchor Distribution for anchored Cosmic Signature NFTs. Each deposit is shared among the NFTs anchored when it is made."
           },
           "stellarImprints": {
-            "label": "Anchored-NFT Stellar Selection Imprints",
-            "tooltip": "Cosmic Signature NFTs imprinted for anchored RandomWalk NFTs through Anchored-NFT Stellar Selection."
+            "label": "Anchored-NFT Stellar Selection imprints",
+            "tooltip": "Cosmic Signature NFTs imprinted for anchored Random Walk NFTs through Anchored-NFT Stellar Selection."
           }
         }
       },

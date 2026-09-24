@@ -36,7 +36,7 @@
       },
       "anchoring": {
         "heading": "앵커링 지급",
-        "description": "Cosmic Signature NFT 앵커링, ETH 앵커링 지급 기록, RandomWalk NFT 앵커링, 앵커링 NFT 별빛 선정 각인 기록을 추적할 수 있습니다.",
+        "description": "Cosmic Signature NFT 앵커링, ETH 앵커링 지급 기록, Random Walk NFT 앵커링, 앵커링 NFT 별빛 선정 각인 기록을 추적할 수 있습니다.",
         "source": "Cosmic Signature 공개 앵커링 API",
         "links": {
           "statistics": "앵커링 통계 보기",
@@ -53,7 +53,7 @@
           },
           "stellarImprints": {
             "label": "앵커링 NFT 별빛 선정 각인 수",
-            "tooltip": "앵커링 NFT 별빛 선정을 통해 앵커링된 RandomWalk NFT에 각인된 Cosmic Signature NFT 수입니다."
+            "tooltip": "앵커링 NFT 별빛 선정을 통해 앵커링된 Random Walk NFT에 각인된 Cosmic Signature NFT 수입니다."
           }
         }
       },

@@ -36,7 +36,7 @@
       },
       "anchoring": {
         "heading": "係留配分",
-        "description": "Cosmic Signature NFTの公開係留、ETH係留配分の記録、RandomWalk NFTの係留、係留NFT星選の刻印を追う。",
+        "description": "Cosmic Signature NFTの公開係留、ETH係留配分の記録、Random Walk NFTの係留、係留NFT星選の刻印を追う。",
         "source": "Cosmic Signature公開係留API",
         "links": {
           "statistics": "係留統計を見る",
@@ -53,7 +53,7 @@
           },
           "stellarImprints": {
             "label": "係留NFT星選による刻印数",
-            "tooltip": "係留NFT星選を通じて、係留中のRandomWalk NFTのために刻印されたCosmic Signature NFTの数です。"
+            "tooltip": "係留NFT星選を通じて、係留中のRandom Walk NFTのために刻印されたCosmic Signature NFTの数です。"
           }
         }
       },
