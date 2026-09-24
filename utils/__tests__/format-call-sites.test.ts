@@ -8,10 +8,12 @@ import { join, relative } from 'node:path';
  * `toFixed` (or its total twin `formatFixed`) does none of that: "60872.26
  * CST" beside "1,135", 4 digits in one card and 2 in the next.
  *
- * Files that still use them are listed with their current count. The count
- * may only go down: migrate a call site, then lower (or delete) its entry.
- * A new file starts at zero. Machine values that are not displayed (a
- * `parseEther` argument, a CSS width) may stay, with their count kept here.
+ * Files that still use them are listed with their exact current count. The
+ * count may only go down, and the entry must follow it: migrate a call site,
+ * then lower (or delete) its entry in the same change, so freed slack can
+ * never be spent again. A new file starts at zero. Machine values that are
+ * not displayed (a `parseEther` argument, a CSS width) may stay, with their
+ * count kept here.
  */
 
 function sourceFiles(directory: string): string[] {
@@ -63,7 +65,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/home/experimental/GestureStatus.tsx': 6,
   'components/home/experimental/gestureSubmitLabel.ts': 3,
   'components/home/HomeObservatoryHero.tsx': 1,
-  'components/home/observatory/ActionDock.tsx': 2,
   'components/home/observatory/AllocationLedger.tsx': 1,
   'components/home/observatory/ChronoEnduranceIntel.tsx': 1,
   'components/home/observatory/CycleClock.tsx': 1,
@@ -119,11 +120,18 @@ const LOCAL_AMOUNT_FORMATTER_BASELINE: readonly string[] = [
   'components/home/HomeObservatoryHero.tsx',
 ];
 
+const fixedDecimalCount = (file: string): number =>
+  (readFileSync(join(ROOT, file), 'utf8').match(FIXED_DECIMAL_CALL) ?? []).length;
+
+const declaresLocalAmountFormatter = (file: string): boolean =>
+  LOCAL_AMOUNT_FORMATTER.test(readFileSync(join(ROOT, file), 'utf8'));
+
 describe('formatting call sites', () => {
+  const files = FILES.map((path) => relative(ROOT, path));
+
   it('adds no raw toFixed/formatFixed display formatting', () => {
-    const grown = FILES.flatMap((path) => {
-      const file = relative(ROOT, path);
-      const count = (readFileSync(path, 'utf8').match(FIXED_DECIMAL_CALL) ?? []).length;
+    const grown = files.flatMap((file) => {
+      const count = fixedDecimalCount(file);
       const allowed = FIXED_DECIMAL_BASELINE[file] ?? 0;
       return count > allowed
         ? [`${file}: ${count} fixed-decimal call(s), baseline ${allowed} — use formatAmount`]
@@ -132,19 +140,39 @@ describe('formatting call sites', () => {
     expect(grown).toEqual([]);
   });
 
+  it('lowers a baseline in the same change that migrates its call sites', () => {
+    const slack = Object.entries(FIXED_DECIMAL_BASELINE).flatMap(([file, allowed]) => {
+      const count = files.includes(file) ? fixedDecimalCount(file) : 0;
+      return count < allowed
+        ? [
+            `${file}: baseline ${allowed}, now ${count} — ${
+              count ? `lower the entry to ${count}` : 'delete the entry'
+            }`,
+          ]
+        : [];
+    });
+    expect(slack).toEqual([]);
+  });
+
   it('declares no new private amount formatters', () => {
-    const declared = FILES.map((path) => relative(ROOT, path))
+    const declared = files
       .filter((file) => !LOCAL_AMOUNT_FORMATTER_BASELINE.includes(file))
-      .filter((file) => LOCAL_AMOUNT_FORMATTER.test(readFileSync(join(ROOT, file), 'utf8')));
+      .filter(declaresLocalAmountFormatter);
     expect(declared).toEqual([]);
   });
 
+  it('drops a private formatter from its baseline once the file has migrated', () => {
+    const migrated = LOCAL_AMOUNT_FORMATTER_BASELINE.filter(
+      (file) => files.includes(file) && !declaresLocalAmountFormatter(file),
+    );
+    expect(migrated).toEqual([]);
+  });
+
   it('keeps the baselines pointing at real files', () => {
-    const files = new Set(FILES.map((path) => relative(ROOT, path)));
     const stale = [
       ...Object.keys(FIXED_DECIMAL_BASELINE),
       ...LOCAL_AMOUNT_FORMATTER_BASELINE,
-    ].filter((file) => !files.has(file));
+    ].filter((file) => !files.includes(file));
     expect(stale).toEqual([]);
   });
 });
