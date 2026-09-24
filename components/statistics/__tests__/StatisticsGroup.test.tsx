@@ -1,121 +1,77 @@
-import { Layers } from 'lucide-react';
-import userEvent from '@testing-library/user-event';
-
 import { render, screen, checkA11y } from '@/test-utils';
 
+import { DefinitionsDisclosure } from '../DefinitionsDisclosure';
 import { StatisticsGroup } from '../StatisticsGroup';
+import { StatisticsItem } from '../StatisticsItem';
 
-describe('StatisticsGroup', () => {
-  it('renders the title', () => {
+describe('StatisticsGroup and StatisticsItem', () => {
+  it('renders a titled spec sheet of label/value rows', () => {
     render(
-      <StatisticsGroup title="Allocation Economy">
-        <p>Content</p>
+      <StatisticsGroup title="Token economy">
+        <StatisticsItem title="Total CST consumed" value="264,467.61 CST" />
+        <StatisticsItem title="Named tokens" value="3" caption="across 2 cycles" />
       </StatisticsGroup>,
     );
-    expect(screen.getByText('Allocation Economy')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Token economy' })).toBeInTheDocument();
+    const terms = screen.getAllByRole('term').map((el) => el.textContent);
+    expect(terms).toEqual(['Total CST consumed', 'Named tokens']);
+    const values = screen.getAllByRole('definition');
+    expect(values[0]).toHaveTextContent('264,467.61 CST');
+    expect(values[1]).toHaveTextContent('3across 2 cycles');
   });
 
-  it('renders children', () => {
+  it('takes the heading level from its place in the outline', () => {
     render(
-      <StatisticsGroup title="Group">
-        <p>Child content here</p>
+      <StatisticsGroup title="Overview" headingLevel={4}>
+        <StatisticsItem title="A" value="1" />
       </StatisticsGroup>,
     );
-    expect(screen.getByText('Child content here')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 4, name: 'Overview' })).toBeInTheDocument();
   });
 
-  it('renders an icon when provided', () => {
+  it('links a figure to the ledger behind it', () => {
     render(
-      <StatisticsGroup title="Group" icon={<Layers data-testid="icon" className="h-4 w-4" />}>
-        <p>Content</p>
+      <StatisticsGroup title="Public Goods">
+        <StatisticsItem title="Protocol contributions" value="4.826 ETH" href="/public-goods" />
       </StatisticsGroup>,
     );
-    expect(screen.getByTestId('icon')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '4.826 ETH' })).toHaveAttribute(
+      'href',
+      '/public-goods',
+    );
   });
 
-  it('does not render icon wrapper when no icon is provided', () => {
+  it('has no axe violations', async () => {
     const { container } = render(
-      <StatisticsGroup title="Group">
-        <p>Content</p>
-      </StatisticsGroup>,
-    );
-    const iconWrappers = container.querySelectorAll('svg');
-    expect(iconWrappers.length).toBe(0);
-  });
-
-  it('applies accentColor left border', () => {
-    const { container } = render(
-      <StatisticsGroup title="Allocations" accentColor="blue">
-        <p>Content</p>
-      </StatisticsGroup>,
-    );
-    expect(container.firstChild).toHaveClass('border-l-2');
-  });
-
-  it('uses accent icon background when accentColor is set', () => {
-    render(
-      <StatisticsGroup
-        title="Tokens"
-        icon={<Layers data-testid="icon" className="h-4 w-4" />}
-        accentColor="purple"
-      >
-        <p>Content</p>
-      </StatisticsGroup>,
-    );
-    expect(screen.getByTestId('icon')).toBeInTheDocument();
-    const wrapper = screen.getByTestId('icon').parentElement;
-    expect(wrapper).toHaveClass('bg-[rgb(var(--nebula-violet-rgb)/0.10)]');
-  });
-
-  it('applies custom className', () => {
-    const { container } = render(
-      <StatisticsGroup title="Group" className="custom-class">
-        <p>Content</p>
-      </StatisticsGroup>,
-    );
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
-
-  it('renders title as an h4 heading', () => {
-    render(
-      <StatisticsGroup title="Heading">
-        <p>Content</p>
-      </StatisticsGroup>,
-    );
-    const heading = screen.getByText('Heading');
-    expect(heading.tagName).toBe('H4');
-  });
-
-  it('opens a group tooltip when provided', async () => {
-    const user = userEvent.setup();
-    render(
-      <StatisticsGroup title="Tokens" tooltip="CST and NFT counters use different token standards.">
-        <p>Content</p>
-      </StatisticsGroup>,
-    );
-
-    await user.hover(screen.getByRole('button', { name: 'More information about Tokens' }));
-
-    expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      'CST and NFT counters use different token standards.',
-    );
-  });
-
-  it('has no accessibility violations', async () => {
-    const { container } = render(
-      <StatisticsGroup title="Test Group" icon={<Layers className="h-4 w-4" />}>
-        <p>Accessible content</p>
+      <StatisticsGroup title="Allocation economy" info="What these figures count.">
+        <StatisticsItem title="Signature Allocations" value="25.5 ETH" />
       </StatisticsGroup>,
     );
     await checkA11y(container);
   });
+});
 
-  it('has no accessibility violations without icon', async () => {
+describe('DefinitionsDisclosure', () => {
+  it('keeps every definition in one closed disclosure', () => {
     const { container } = render(
-      <StatisticsGroup title="Test Group">
-        <p>Accessible content</p>
-      </StatisticsGroup>,
+      <DefinitionsDisclosure
+        label="Definitions"
+        items={[
+          { term: 'Named tokens', definition: 'NFTs given a name by their owner.' },
+          { term: 'CST gestures', definition: 'Gestures paid in CST.' },
+        ]}
+      />,
     );
-    await checkA11y(container);
+    const details = container.querySelector('details');
+    expect(details).not.toBeNull();
+    expect(details).not.toHaveAttribute('open');
+    expect(screen.getByText('Definitions')).toBeInTheDocument();
+    // In the server HTML even while closed, for search and print.
+    expect(details).toHaveTextContent('NFTs given a name by their owner.');
+  });
+
+  it('renders nothing without items', () => {
+    const { container } = render(<DefinitionsDisclosure label="Definitions" items={[]} />);
+    expect(container).toBeEmptyDOMElement();
   });
 });

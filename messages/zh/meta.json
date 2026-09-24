@@ -107,8 +107,8 @@
     "description": "查看落笔频次、活动峰值、参与者活跃时段、落笔类型占比、周期时间线与周期启用记录。"
   },
   "statisticsPerformance": {
-    "title": "参与者表现统计",
-    "description": "查看参与者表现榜，以及 Cosmic Signature 各演绎周期中可取回资产的处理情况。"
+    "title": "参与者结果",
+    "description": "每位参与者在落笔上的支出与获配的分配，以及各周期可取回资产的取回情况。"
   },
   "recipientHistory": {
     "title": "我的分配历史",

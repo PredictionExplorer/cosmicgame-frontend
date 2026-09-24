@@ -76,9 +76,9 @@
       "description": "每个周期中落笔发生的时间"
     },
     "statisticsPerformance": {
-      "label": "参与者表现统计",
-      "short": "表现",
-      "description": "周期记录与参与者排名"
+      "label": "参与者结果",
+      "short": "结果",
+      "description": "支出与获配、各周期取回"
     },
     "allocationRecipients": {
       "label": "分配名录",

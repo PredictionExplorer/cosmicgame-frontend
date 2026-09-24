@@ -5,7 +5,8 @@ import { useTranslations } from 'next-intl';
 import { useActiveWeb3React } from '@/hooks/web3';
 import UserStatisticsView from '@/components/UserStatisticsView';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
+import { SITE_EDGE_SHELL_CLASS } from '@/components/statistics/shell';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 
 /**
@@ -20,7 +21,7 @@ const MyStatistics = () => {
 
   if (!account) {
     return (
-      <MainWrapper aria-label={t('statistics.page.ariaOwn')}>
+      <PageShell variant="data" className={SITE_EDGE_SHELL_CLASS}>
         <PageHeader
           section="account"
           sectionHub
@@ -35,7 +36,7 @@ const MyStatistics = () => {
             label: tWallet('required.statistics.publicLink'),
           }}
         />
-      </MainWrapper>
+      </PageShell>
     );
   }
 

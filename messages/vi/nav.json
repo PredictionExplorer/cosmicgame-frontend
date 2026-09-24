@@ -76,9 +76,9 @@
       "description": "Thời điểm các nét bút diễn ra qua từng chu kỳ"
     },
     "statisticsPerformance": {
-      "label": "Thống kê thành tích người tham gia",
-      "short": "Thành tích",
-      "description": "Kỷ lục chu kỳ và thứ hạng người tham gia"
+      "label": "Kết quả của người tham gia",
+      "short": "Kết quả",
+      "description": "Đã chi và đã nhận, nhận về theo chu kỳ"
     },
     "allocationRecipients": {
       "label": "Người nhận phân bổ",

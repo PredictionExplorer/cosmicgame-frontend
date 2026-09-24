@@ -1,122 +1,103 @@
 'use client';
 
-import { Coins, Layers, TrendingUp, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { AttachedAssetsIcon } from '@/lib/conceptIcons';
+import { toFiniteNumber } from '@/utils/finiteNumber';
+import { useFormat } from '@/hooks/useFormat';
 import {
   useCSTDistribution,
   useCTBalancesDistribution,
+  useCTStatistics,
   useDashboardInfo,
 } from '@/hooks/useApiQuery';
 import type { CTBalanceDistribution, TokenDistribution } from '@/services/api/types';
-import { StatCard } from '@/components/ui/stat-card';
 import { StatsSection } from '@/components/statistics/StatsSection';
 import { AttachedAssetsSection } from '@/components/statistics/AttachedAssetsSection';
+import { CstHoldersLedger } from '@/components/statistics/CstHoldersLedger';
+import { CstSupplyHistory } from '@/components/statistics/CstSupplyHistory';
 import AttachedNFTDistributionTable from '@/components/attachments/AttachedNFTDistributionTable';
 import { CSTokenDistributionTable } from '@/components/tokens/CSTokenDistributionTable';
-import { CTBalanceDistributionTable } from '@/components/tokens/CTBalanceDistributionTable';
-import { CTBalanceDistributionChart } from '@/components/tokens/CTBalanceDistributionChart';
-import { CSTTotalSupplyHistorySection } from '@/components/tokens/CSTTotalSupplyHistorySection';
 
-/** Token distribution tables, CST supply history, and attached assets. */
+/**
+ * Token distribution: who holds the Cosmic Signature NFTs, who holds CST and
+ * how concentrated it is, the CST supply over time, and the assets attached
+ * to gestures. The header carries the holder counts and the supply.
+ */
 const TokensPanel = () => {
   const t = useTranslations('statistics');
+  const format = useFormat();
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo(undefined, {
     poll: false,
   });
   const cstDistributionQuery = useCSTDistribution();
   const ctBalanceQuery = useCTBalancesDistribution();
+  const ctStatistics = useCTStatistics();
 
   const cstDistribution = (cstDistributionQuery.data ?? []) as TokenDistribution[];
   const ctBalanceDistribution = (ctBalanceQuery.data ?? []) as CTBalanceDistribution[];
+  const supply = toFiniteNumber(ctStatistics.data?.TotalSupplyEth);
   const curRoundNum = dashboardData?.CurRoundNum ?? -1;
 
   return (
-    <div data-testid="tokens-panel">
-      <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-        <StatCard
-          label={t('metrics.cosmicSignatureNftHolders.label')}
-          value={cstDistribution.length}
-          icon={<Users className="h-4 w-4" />}
-          tooltip={t('metrics.cosmicSignatureNftHolders.tooltip')}
-          loading={cstDistributionQuery.isLoading}
-          featured
+    <div data-testid="tokens-panel" className="space-y-12 sm:space-y-16">
+      <StatsSection
+        title={t('tokens.sections.nftDistribution')}
+        tooltip={t('sectionTooltips.cosmicSignatureTokenDistribution')}
+        isLoading={cstDistributionQuery.isLoading}
+        isError={cstDistributionQuery.isError}
+        onRetry={() => cstDistributionQuery.refetch()}
+        isEmpty={cstDistribution.length === 0}
+        emptyTitle={t('tokens.empty.nftTitle')}
+        emptyDescription={t('tokens.empty.nftDescription')}
+      >
+        <CSTokenDistributionTable list={cstDistribution} />
+      </StatsSection>
+
+      <StatsSection
+        title={t('tokens.sections.cstDistribution')}
+        tooltip={t('sectionTooltips.cstBalanceDistribution')}
+        description={
+          ctBalanceDistribution.length > 0
+            ? supply === null
+              ? t('tokens.holders.summaryNoSupply', { count: ctBalanceDistribution.length })
+              : t('tokens.holders.summary', {
+                  count: ctBalanceDistribution.length,
+                  supply: format.amount(supply, { unit: 'CST', context: 'hero' }),
+                })
+            : undefined
+        }
+        isLoading={ctBalanceQuery.isLoading}
+        isError={ctBalanceQuery.isError}
+        onRetry={() => ctBalanceQuery.refetch()}
+        isEmpty={ctBalanceDistribution.length === 0}
+        emptyTitle={t('tokens.empty.cstTitle')}
+        emptyDescription={t('tokens.empty.cstDescription')}
+      >
+        <CstHoldersLedger list={ctBalanceDistribution} supply={supply} />
+      </StatsSection>
+
+      <StatsSection
+        title={t('tokens.sections.totalSupply')}
+        tooltip={t('sectionTooltips.cstTotalSupply')}
+      >
+        <CstSupplyHistory label={t('tokens.sections.totalSupply')} />
+      </StatsSection>
+
+      <StatsSection
+        title={t('tokens.sections.attachedDistribution')}
+        tooltip={t('sectionTooltips.attachedTokenDistribution')}
+        defaultOpen={false}
+        lazy
+        isLoading={dashboardLoading}
+        isEmpty={(dashboardData?.MainStats.DonatedTokenDistribution ?? []).length === 0}
+        emptyTitle={t('tokens.empty.contractsTitle')}
+      >
+        <AttachedNFTDistributionTable
+          list={dashboardData?.MainStats.DonatedTokenDistribution ?? []}
         />
-        <StatCard
-          label={t('metrics.cstErc20Holders.label')}
-          value={ctBalanceDistribution.length}
-          icon={<Coins className="h-4 w-4" />}
-          tooltip={t('metrics.cstErc20Holders.tooltip')}
-          loading={ctBalanceQuery.isLoading}
-        />
-        <StatCard
-          label={t('metrics.attachedNfts.label')}
-          value={Number(dashboardData?.NumDonatedNFTs ?? 0)}
-          icon={<AttachedAssetsIcon className="h-4 w-4" />}
-          tooltip={t('metrics.attachedNfts.tooltip')}
-          loading={dashboardLoading}
-          featured
-        />
-      </div>
+      </StatsSection>
 
-      <div className="space-y-8">
-        <StatsSection
-          title={t('tokens.sections.nftDistribution')}
-          tooltip={t('sectionTooltips.cosmicSignatureTokenDistribution')}
-          icon={<Layers className="h-3.5 w-3.5" />}
-          isLoading={cstDistributionQuery.isLoading}
-          isError={cstDistributionQuery.isError}
-          onRetry={() => cstDistributionQuery.refetch()}
-          isEmpty={cstDistribution.length === 0}
-          emptyTitle={t('tokens.empty.nftTitle')}
-          emptyDescription={t('tokens.empty.nftDescription')}
-        >
-          <CSTokenDistributionTable list={cstDistribution} />
-        </StatsSection>
-
-        <StatsSection
-          title={t('tokens.sections.cstDistribution')}
-          tooltip={t('sectionTooltips.cstBalanceDistribution')}
-          icon={<Coins className="h-3.5 w-3.5" />}
-          isLoading={ctBalanceQuery.isLoading}
-          isError={ctBalanceQuery.isError}
-          onRetry={() => ctBalanceQuery.refetch()}
-          isEmpty={ctBalanceDistribution.length === 0}
-          emptyTitle={t('tokens.empty.cstTitle')}
-          emptyDescription={t('tokens.empty.cstDescription')}
-        >
-          <CTBalanceDistributionChart list={ctBalanceDistribution} />
-          <div className="mt-4">
-            <CTBalanceDistributionTable list={ctBalanceDistribution.slice(0, 20)} />
-          </div>
-        </StatsSection>
-
-        <StatsSection
-          title={t('tokens.sections.totalSupply')}
-          tooltip={t('sectionTooltips.cstTotalSupply')}
-          icon={<TrendingUp className="h-3.5 w-3.5" />}
-        >
-          <CSTTotalSupplyHistorySection />
-        </StatsSection>
-
-        <StatsSection
-          title={t('tokens.sections.attachedDistribution')}
-          tooltip={t('sectionTooltips.attachedTokenDistribution')}
-          icon={<AttachedAssetsIcon className="h-3.5 w-3.5" />}
-          defaultOpen={false}
-          lazy
-          isLoading={dashboardLoading}
-          isEmpty={(dashboardData?.MainStats.DonatedTokenDistribution ?? []).length === 0}
-          emptyTitle={t('tokens.empty.contractsTitle')}
-        >
-          <AttachedNFTDistributionTable
-            list={dashboardData?.MainStats.DonatedTokenDistribution ?? []}
-          />
-        </StatsSection>
-
-        <AttachedAssetsSection currentRoundNum={curRoundNum} />
-      </div>
+      <AttachedAssetsSection currentRoundNum={curRoundNum} />
     </div>
   );
 };

@@ -76,9 +76,9 @@
       "description": "每個週期中落筆發生的時間"
     },
     "statisticsPerformance": {
-      "label": "參與者表現統計",
-      "short": "表現",
-      "description": "週期紀錄與參與者排名"
+      "label": "參與者結果",
+      "short": "結果",
+      "description": "支出與獲配、各週期取回"
     },
     "allocationRecipients": {
       "label": "分配名錄",

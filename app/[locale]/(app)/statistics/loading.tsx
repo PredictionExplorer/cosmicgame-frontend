@@ -1,22 +1,20 @@
-import { Skeleton, SkeletonStatCard, SkeletonTableRow } from '@/components/ui/skeleton';
+import { Skeleton, SkeletonPageHeader, SkeletonTable } from '@/components/ui/skeleton';
 
-/** Route-transition fallback for statistics pages: mirrors the typical page shape. */
+/**
+ * Route-transition fallback for the statistics pages, in the finished page's
+ * shape: the header, the section tabs on its rule, and a section of rows.
+ */
 export default function StatisticsLoading() {
   return (
-    <div data-testid="statistics-page-loading">
-      <Skeleton className="h-4 w-48" />
-      <Skeleton className="mt-4 h-10 w-2/3 max-w-xl" />
-      <Skeleton className="mt-4 h-4 w-full max-w-3xl" />
-      <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <SkeletonStatCard key={i} />
-        ))}
-      </div>
-      <div className="mt-10 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+    <div data-testid="statistics-page-loading" aria-busy>
+      <SkeletonPageHeader breadcrumb={false} className="mb-8" />
+      <div aria-hidden className="mb-10 flex gap-6 border-b border-rule pb-3 sm:mb-12">
         {Array.from({ length: 6 }).map((_, i) => (
-          <SkeletonTableRow key={i} />
+          <Skeleton key={i} shine={false} className="h-3.5 w-16 shrink-0" />
         ))}
       </div>
+      <Skeleton className="mb-8 h-7 w-56" />
+      <SkeletonTable rows={6} columns={3} />
     </div>
   );
 }

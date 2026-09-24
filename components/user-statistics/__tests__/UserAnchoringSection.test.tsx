@@ -27,10 +27,6 @@ jest.mock('../../anchoring/RwalkAnchorDistributionImprintsTable', () => ({
   RwalkAnchorDistributionImprintsTable: () => <div data-testid="rwlk-mints" />,
 }));
 
-jest.mock('../../../utils', () => ({
-  formatEthValue: (v: number) => `${v.toFixed(4)} ETH`,
-}));
-
 const defaultProps: UserAnchoringSectionProps = {
   address: '0xUser',
   userInfo: {
@@ -68,19 +64,31 @@ describe('UserAnchoringSection', () => {
     expect(screen.getByText('myPages.statistics.anchoring.tabs.randomWalk')).toBeInTheDocument();
   });
 
-  it('renders CST stat cards with correct values', () => {
+  it('renders the Cosmic Signature figure strip with its counts', () => {
+    render(<UserAnchoringSection {...defaultProps} />);
+    const figure = (id: string) => document.querySelector(`[data-figure="${id}"]`);
+    expect(figure('anchors')).toHaveTextContent('myPages.statistics.anchoring.stats.anchorActions');
+    expect(figure('anchors')).toHaveTextContent('1');
+    expect(figure('releases')).toHaveTextContent('1');
+    expect(figure('distributions')).toHaveTextContent('0 ETH');
+    expect(figure('unretrieved')).toBeInTheDocument();
+  });
+
+  it('draws the NFT kinds as underline tabs with short labels', () => {
     render(<UserAnchoringSection {...defaultProps} />);
     expect(
-      screen.getByText('myPages.statistics.anchoring.stats.anchorActions.label'),
+      screen.getByRole('tablist', { name: 'myPages.statistics.anchoring.tabs.label' }),
     ).toBeInTheDocument();
+    expect(screen.getAllByRole('tab')).toHaveLength(2);
+  });
+
+  it('titles each ledger with an H3', () => {
+    render(<UserAnchoringSection {...defaultProps} />);
     expect(
-      screen.getByText('myPages.statistics.anchoring.stats.releaseActions.label'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('myPages.statistics.anchoring.stats.totalDistributions.label'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('myPages.statistics.anchoring.stats.unretrievedDistributions.label'),
+      screen.getByRole('heading', {
+        level: 3,
+        name: 'myPages.statistics.anchoring.sections.actions',
+      }),
     ).toBeInTheDocument();
   });
 

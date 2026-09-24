@@ -1,76 +1,57 @@
 'use client';
 
-import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useCallback, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { formatSeconds, formatEthValue, getExplorerUrl, shortenHex } from '@/utils';
-
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { AddressLink } from '@/components/common/AddressLink';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { Spinner } from '@/components/ui/spinner';
-import { ErrorState } from '@/components/ui/error-state';
+import { formatAddress, formatSeconds } from '@/utils/format';
+import { useFormat } from '@/hooks/useFormat';
 import { useNow } from '@/hooks/useNow';
+import { useClaimsByRound, useClaimDetailByRound } from '@/hooks/useApiQuery';
+import type {
+  AttachedToken,
+  ClaimTxn,
+  ClaimUnclaimedItem,
+  RoundClaimSummary,
+} from '@/services/api/types';
+import { Button } from '@/components/ui/button';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog';
-import { useClaimsByRound, useClaimDetailByRound } from '@/hooks/useApiQuery';
-import type {
-  ClaimUnclaimedItem,
-  RoundClaimSummary,
-  ClaimTxn,
-  AttachedToken,
-} from '@/services/api/types';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { SkeletonTable } from '@/components/ui/skeleton';
 
-const PER_PAGE = 10;
+type AssetType = ClaimUnclaimedItem['AssetType'];
 
-/** Delegates to the shared address shortener so truncation is consistent app-wide. */
-const shortAddr = (a: string) => shortenHex(a);
-
-/** Small labelled count badge; renders nothing when the count is zero. */
-const CountBadge = ({ n, label }: { n: number; label: string }) => {
-  if (n <= 0) return null;
-  return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-      {n} {label}
-    </span>
+/** What a claimable asset is, in words and figures: "0.25 ETH", "NFT 0x12…34 #5". */
+function useAssetText() {
+  const t = useTranslations('statistics');
+  const format = useFormat();
+  return useCallback(
+    (asset: { AssetType: AssetType; AmountEth: number; TokenAddr: string; TokenId: number }) => {
+      if (asset.AssetType === 'ETH') return format.amount(asset.AmountEth, { unit: 'ETH' });
+      if (asset.AssetType === 'ERC721') {
+        return `${t('performance.claims.assets.nft')} ${formatAddress(asset.TokenAddr)} #${asset.TokenId}`;
+      }
+      const amount = format.number(asset.AmountEth, { maximumFractionDigits: 4 });
+      return `${t('performance.claims.assets.erc20')} ${amount} · ${formatAddress(asset.TokenAddr)}`;
+    },
+    [format, t],
   );
-};
+}
 
-const ItemDetail = ({ item }: { item: ClaimUnclaimedItem }) => {
-  const locale = useLocale();
-  if (item.AssetType === 'ETH') {
-    return <span>{formatEthValue(item.AmountEth, locale)}</span>;
-  }
-  if (item.AssetType === 'ERC721') {
-    return (
-      <span className="text-muted-foreground">
-        <span className="font-mono break-all">{shortAddr(item.TokenAddr)}</span> #{item.TokenId}
-      </span>
-    );
-  }
-  return (
-    <span className="text-muted-foreground">
-      {item.AmountEth.toLocaleString(locale)} ·{' '}
-      <span className="font-mono break-all">{shortAddr(item.TokenAddr)}</span>
-    </span>
-  );
-};
+/** The share of a cycle's retrievable assets already retrieved, 0..1; null when none were allocated. */
+export function retrievedShare(cycle: Pick<RoundClaimSummary, 'TotalAwarded' | 'TotalUnclaimed'>) {
+  if (!(cycle.TotalAwarded > 0)) return null;
+  return Math.min(1, Math.max(0, (cycle.TotalAwarded - cycle.TotalUnclaimed) / cycle.TotalAwarded));
+}
 
-const UnclaimedDialog = ({
+const UnretrievedDialog = ({
   cycle,
   nowSec,
   onClose,
@@ -80,17 +61,29 @@ const UnclaimedDialog = ({
   onClose: () => void;
 }) => {
   const t = useTranslations('statistics');
-  const locale = useLocale();
-  const assetLabel: Record<ClaimUnclaimedItem['AssetType'], string> = {
-    ETH: t('performance.claims.assets.eth'),
-    ERC721: t('performance.claims.assets.nft'),
-    ERC20: t('performance.claims.assets.erc20'),
-  };
+  const format = useFormat();
+  const assetText = useAssetText();
+  const columns = useMemo<DataTableColumn<ClaimUnclaimedItem>[]>(
+    () => [
+      {
+        id: 'asset',
+        header: t('performance.claims.dialog.asset'),
+        value: (row) => assetText(row),
+      },
+      {
+        id: 'recipient',
+        kind: 'address',
+        header: t('performance.claims.dialog.recipient'),
+        value: (row) => row.RecipientAddr || null,
+      },
+    ],
+    [assetText, t],
+  );
 
   return (
     <Dialog open={!!cycle} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-xl">
-        {cycle && (
+        {cycle ? (
           <>
             <DialogHeader>
               <DialogTitle>
@@ -102,285 +95,143 @@ const UnclaimedDialog = ({
                   : t('performance.claims.dialog.closesIn', {
                       duration: formatSeconds(
                         Math.max(0, cycle.ClaimWindowTimeout - nowSec),
-                        locale,
+                        format.locale,
                       ),
                     })}
               </DialogDescription>
             </DialogHeader>
             <div className="max-h-[60vh] overflow-auto">
-              <TablePrimaryContainer>
-                <TablePrimary>
-                  <TablePrimaryHead>
-                    <tr>
-                      <TablePrimaryHeadCell align="left">
-                        {t('performance.claims.dialog.asset')}
-                      </TablePrimaryHeadCell>
-                      <TablePrimaryHeadCell align="left">
-                        {t('performance.claims.dialog.recipient')}
-                      </TablePrimaryHeadCell>
-                      <TablePrimaryHeadCell align="right">
-                        {t('performance.claims.dialog.detail')}
-                      </TablePrimaryHeadCell>
-                    </tr>
-                  </TablePrimaryHead>
-                  <TablePrimaryBody>
-                    {cycle.UnclaimedItems.map((item, idx) => (
-                      <TablePrimaryRow
-                        key={`${item.AssetType}-${item.TokenAddr ?? ''}-${item.TokenId ?? ''}-${item.RecipientAddr ?? idx}`}
-                      >
-                        <TablePrimaryCell label={t('performance.claims.dialog.asset')}>
-                          {assetLabel[item.AssetType]}
-                        </TablePrimaryCell>
-                        <TablePrimaryCell label={t('performance.claims.dialog.recipient')}>
-                          {item.RecipientAddr ? (
-                            <AddressLink
-                              address={item.RecipientAddr}
-                              url={`/user/${item.RecipientAddr}`}
-                            />
-                          ) : (
-                            '—'
-                          )}
-                        </TablePrimaryCell>
-                        <TablePrimaryCell
-                          label={t('performance.claims.dialog.detail')}
-                          align="right"
-                        >
-                          <ItemDetail item={item} />
-                        </TablePrimaryCell>
-                      </TablePrimaryRow>
-                    ))}
-                  </TablePrimaryBody>
-                </TablePrimary>
-              </TablePrimaryContainer>
+              <DataTable
+                data={cycle.UnclaimedItems}
+                columns={columns}
+                ariaLabel={t('performance.claims.dialog.unclaimedTitle', { cycle: cycle.RoundNum })}
+                getRowKey={(row, index) =>
+                  `${row.AssetType}-${row.TokenAddr}-${row.TokenId}-${row.RecipientAddr}-${index}`
+                }
+              />
             </div>
           </>
-        )}
+        ) : null}
       </DialogContent>
     </Dialog>
   );
 };
 
-const TxLink = ({ hash }: { hash: string }) =>
-  hash ? (
-    <a
-      href={getExplorerUrl('tx', hash)}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="font-mono break-all text-primary hover:underline"
-    >
-      {shortenHex(hash)}
-    </a>
-  ) : (
-    <span className="text-muted-foreground">—</span>
-  );
-
-const TxnAssetDetail = ({ txn }: { txn: ClaimTxn }) => {
+/** One cycle in detail: its retrieval transactions (with how long each took) and the tokens attached during it. */
+const CycleDetailDialog = ({ round, onClose }: { round: number | null; onClose: () => void }) => {
   const t = useTranslations('statistics');
-  const locale = useLocale();
-  if (txn.AssetType === 'ETH') return <span>{formatEthValue(txn.AmountEth, locale)}</span>;
-  if (txn.AssetType === 'ERC721')
-    return (
-      <span>
-        {t('performance.claims.assets.nft')}{' '}
-        <a
-          href={getExplorerUrl('address', txn.TokenAddr)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-mono break-all text-primary hover:underline"
-        >
-          {shortAddr(txn.TokenAddr)}
-        </a>{' '}
-        #{txn.TokenId}
-      </span>
-    );
-  return (
-    <span>
-      {txn.AmountEth.toLocaleString(locale)}{' '}
-      <a
-        href={getExplorerUrl('address', txn.TokenAddr)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-mono break-all text-primary hover:underline"
-      >
-        {shortAddr(txn.TokenAddr)}
-      </a>
-    </span>
-  );
-};
-
-/** Explore dialog: the claim transactions (with latency) + tokens attached this cycle. */
-const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: () => void }) => {
-  const t = useTranslations('statistics');
-  const locale = useLocale();
+  const assetText = useAssetText();
   const { data, isLoading } = useClaimDetailByRound(round);
   const claims: ClaimTxn[] = data?.ClaimTransactions ?? [];
   const attached: AttachedToken[] = data?.AttachedTokens ?? [];
 
+  const claimColumns = useMemo<DataTableColumn<ClaimTxn>[]>(
+    () => [
+      { id: 'asset', header: t('performance.claims.dialog.asset'), value: (row) => assetText(row) },
+      {
+        id: 'recipient',
+        kind: 'address',
+        header: t('performance.claims.dialog.recipient'),
+        value: (row) => row.RecipientAddr,
+        cell: (row) => (
+          <span className="min-w-0">
+            <span className="block font-mono">{formatAddress(row.RecipientAddr)}</span>
+            {row.BeneficiaryAddr &&
+            row.BeneficiaryAddr.toLowerCase() !== row.RecipientAddr.toLowerCase() ? (
+              <span className="block type-caption text-muted-foreground">
+                {t('performance.claims.dialog.sweptBy', {
+                  address: formatAddress(row.BeneficiaryAddr),
+                })}
+              </span>
+            ) : null}
+          </span>
+        ),
+      },
+      {
+        id: 'after',
+        kind: 'duration',
+        header: t('performance.claims.dialog.claimedAfter'),
+        value: (row) => Math.max(0, row.ClaimedAfterSecs),
+        sortable: true,
+      },
+      {
+        id: 'when',
+        kind: 'datetime',
+        header: t('performance.claims.dialog.when'),
+        value: (row) => row.ClaimTs,
+        txHash: (row) => row.TxHash,
+        sortable: true,
+      },
+    ],
+    [assetText, t],
+  );
+
+  const attachedColumns = useMemo<DataTableColumn<AttachedToken>[]>(
+    () => [
+      { id: 'asset', header: t('performance.claims.dialog.token'), value: (row) => assetText(row) },
+      {
+        id: 'by',
+        kind: 'address',
+        header: t('performance.claims.dialog.attachedBy'),
+        value: (row) => row.ContributorAddr,
+      },
+      {
+        id: 'when',
+        kind: 'datetime',
+        header: t('performance.claims.dialog.when'),
+        value: (row) => row.Ts,
+        txHash: (row) => row.TxHash,
+        sortable: true,
+      },
+    ],
+    [assetText, t],
+  );
+
   return (
     <Dialog open={round != null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[883px]">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>
-            {t('performance.claims.dialog.exploreTitle', { cycle: round ?? 0 })}
-          </DialogTitle>
+          <DialogTitle>{t('performance.claims.dialog.exploreTitle', { cycle: round ?? 0 })}</DialogTitle>
           <DialogDescription>{t('performance.claims.dialog.exploreDescription')}</DialogDescription>
         </DialogHeader>
-
         {isLoading ? (
-          <div className="flex justify-center py-10">
-            <Spinner />
-          </div>
+          <SkeletonTable rows={4} columns={4} />
         ) : (
-          <div className="max-h-[65vh] space-y-6 overflow-auto">
-            <div>
-              <h4 className="mb-2 text-sm font-semibold text-white">
+          <div className="max-h-[65vh] space-y-8 overflow-auto">
+            <section>
+              <h3 className="mb-3 type-title text-foreground">
                 {t('performance.claims.dialog.claimTransactions')}
-              </h4>
+              </h3>
               {claims.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <p className="type-body-sm text-muted-foreground">
                   {t('performance.claims.dialog.noClaims')}
                 </p>
               ) : (
-                <TablePrimaryContainer>
-                  <TablePrimary>
-                    <TablePrimaryHead>
-                      <tr>
-                        <TablePrimaryHeadCell align="left">
-                          {t('performance.claims.dialog.asset')}
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="left">
-                          {t('performance.claims.dialog.recipient')}
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="right">
-                          {t('performance.claims.dialog.claimedAfter')}
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="left">
-                          {t('performance.claims.dialog.when')}
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="right">
-                          {t('performance.claims.dialog.transaction')}
-                        </TablePrimaryHeadCell>
-                      </tr>
-                    </TablePrimaryHead>
-                    <TablePrimaryBody>
-                      {claims.map((txn, idx) => (
-                        <TablePrimaryRow key={txn.TxHash ? `${txn.TxHash}-${idx}` : idx}>
-                          <TablePrimaryCell label={t('performance.claims.dialog.asset')}>
-                            <TxnAssetDetail txn={txn} />
-                          </TablePrimaryCell>
-                          <TablePrimaryCell label={t('performance.claims.dialog.recipient')}>
-                            <AddressLink
-                              address={txn.RecipientAddr}
-                              url={`/user/${txn.RecipientAddr}`}
-                            />
-                            {txn.BeneficiaryAddr &&
-                              txn.BeneficiaryAddr.toLowerCase() !==
-                                txn.RecipientAddr.toLowerCase() && (
-                                <span className="block break-words text-xs text-red-400">
-                                  {t('performance.claims.dialog.sweptBy', {
-                                    address: shortAddr(txn.BeneficiaryAddr),
-                                  })}
-                                </span>
-                              )}
-                          </TablePrimaryCell>
-                          <TablePrimaryCell
-                            label={t('performance.claims.dialog.claimedAfter')}
-                            align="right"
-                          >
-                            {formatSeconds(Math.max(0, txn.ClaimedAfterSecs), locale)}
-                          </TablePrimaryCell>
-                          <TablePrimaryCell label={t('performance.claims.dialog.when')}>
-                            <HydrationSafeDateTime timestamp={txn.ClaimTs} locale={locale} />
-                          </TablePrimaryCell>
-                          <TablePrimaryCell
-                            label={t('performance.claims.dialog.transaction')}
-                            align="right"
-                          >
-                            <TxLink hash={txn.TxHash} />
-                          </TablePrimaryCell>
-                        </TablePrimaryRow>
-                      ))}
-                    </TablePrimaryBody>
-                  </TablePrimary>
-                </TablePrimaryContainer>
+                <DataTable
+                  data={claims}
+                  columns={claimColumns}
+                  ariaLabel={t('performance.claims.dialog.claimTransactions')}
+                  initialSort={{ id: 'when', direction: 'desc' }}
+                />
               )}
-            </div>
-
-            <div>
-              <h4 className="mb-2 text-sm font-semibold text-white">
+            </section>
+            <section>
+              <h3 className="mb-3 type-title text-foreground">
                 {t('performance.claims.dialog.attachedTokens')}
-              </h4>
+              </h3>
               {attached.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <p className="type-body-sm text-muted-foreground">
                   {t('performance.claims.dialog.noAttached')}
                 </p>
               ) : (
-                <TablePrimaryContainer>
-                  <TablePrimary>
-                    <TablePrimaryHead>
-                      <tr>
-                        <TablePrimaryHeadCell align="left">
-                          {t('performance.claims.dialog.asset')}
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="left">
-                          {t('performance.claims.dialog.token')}
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="right">
-                          {t('performance.claims.dialog.detail')}
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="left">
-                          {t('performance.claims.dialog.attachedBy')}
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell align="right">
-                          {t('performance.claims.dialog.transaction')}
-                        </TablePrimaryHeadCell>
-                      </tr>
-                    </TablePrimaryHead>
-                    <TablePrimaryBody>
-                      {attached.map((tok, idx) => (
-                        <TablePrimaryRow key={tok.TxHash ? `${tok.TxHash}-${idx}` : idx}>
-                          <TablePrimaryCell label={t('performance.claims.dialog.asset')}>
-                            {tok.AssetType === 'ERC721'
-                              ? t('performance.claims.assets.nft')
-                              : t('performance.claims.assets.erc20')}
-                          </TablePrimaryCell>
-                          <TablePrimaryCell label={t('performance.claims.dialog.token')}>
-                            <a
-                              href={getExplorerUrl('address', tok.TokenAddr)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-mono break-all text-primary hover:underline"
-                            >
-                              {shortAddr(tok.TokenAddr)}
-                            </a>
-                          </TablePrimaryCell>
-                          <TablePrimaryCell
-                            label={t('performance.claims.dialog.detail')}
-                            align="right"
-                          >
-                            {tok.AssetType === 'ERC721'
-                              ? `#${tok.TokenId}`
-                              : tok.AmountEth.toLocaleString(locale)}
-                          </TablePrimaryCell>
-                          <TablePrimaryCell label={t('performance.claims.dialog.attachedBy')}>
-                            <AddressLink
-                              address={tok.ContributorAddr}
-                              url={`/user/${tok.ContributorAddr}`}
-                            />
-                          </TablePrimaryCell>
-                          <TablePrimaryCell
-                            label={t('performance.claims.dialog.transaction')}
-                            align="right"
-                          >
-                            <TxLink hash={tok.TxHash} />
-                          </TablePrimaryCell>
-                        </TablePrimaryRow>
-                      ))}
-                    </TablePrimaryBody>
-                  </TablePrimary>
-                </TablePrimaryContainer>
+                <DataTable
+                  data={attached}
+                  columns={attachedColumns}
+                  ariaLabel={t('performance.claims.dialog.attachedTokens')}
+                  initialSort={{ id: 'when', direction: 'desc' }}
+                />
               )}
-            </div>
+            </section>
           </div>
         )}
       </DialogContent>
@@ -388,192 +239,116 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
   );
 };
 
-/** One asset type's claimed percentage; "—" when nothing of that type was awarded. */
-const PctRow = ({
-  label,
-  awarded,
-  unclaimed,
-}: {
-  label: string;
-  awarded: number;
-  unclaimed: number;
-}) => {
-  if (awarded <= 0) {
-    return (
-      <span className="text-muted-foreground">
-        {label} <span className="tabular-nums">—</span>
-      </span>
-    );
-  }
-  const pct = Math.round(((awarded - unclaimed) / awarded) * 100);
-  const tone = pct >= 100 ? 'text-emerald-400' : pct <= 0 ? 'text-red-400' : 'text-white';
-  return (
-    <span>
-      <span className="text-muted-foreground">{label}</span>{' '}
-      <span className={`tabular-nums font-medium ${tone}`}>{pct}%</span>
-    </span>
-  );
-};
-
-const ClaimedPctCell = ({ cycle }: { cycle: RoundClaimSummary }) => (
-  <span className="inline-flex flex-col items-end gap-0.5 text-xs leading-tight">
-    <PctRow label="ETH" awarded={cycle.EthAwarded} unclaimed={cycle.EthUnclaimed} />
-    <PctRow label="NFT" awarded={cycle.NftAwarded} unclaimed={cycle.NftUnclaimed} />
-    <PctRow label="ERC-20" awarded={cycle.Erc20Awarded} unclaimed={cycle.Erc20Unclaimed} />
-  </span>
-);
-
-const Row = ({
-  cycle,
-  onOpen,
-  onExplore,
-}: {
-  cycle?: RoundClaimSummary;
-  onOpen: (c: RoundClaimSummary) => void;
-  onExplore: (round: number) => void;
-}) => {
-  const t = useTranslations('statistics');
-  const locale = useLocale();
-  if (!cycle) return <TablePrimaryRow />;
-
-  const hasUnclaimed = cycle.TotalUnclaimed > 0;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('performance.claims.columns.cycle')} align="center">
-        {cycle.RoundNum}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('performance.claims.columns.awarded')}>
-        <span className="inline-flex flex-wrap items-center gap-1.5">
-          <CountBadge n={cycle.EthAwarded} label="ETH" />
-          <CountBadge n={cycle.NftAwarded} label="NFT" />
-          <CountBadge n={cycle.Erc20Awarded} label="ERC-20" />
-        </span>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('performance.claims.columns.unclaimed')} align="right">
-        {hasUnclaimed ? (
-          <button
-            type="button"
-            onClick={() => onOpen(cycle)}
-            className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:border-primary/60 hover:bg-primary/15"
-            title={t('performance.claims.viewUnclaimed')}
-          >
-            {t('performance.claims.unclaimedCount', {
-              count: cycle.TotalUnclaimed.toLocaleString(locale),
-            })}
-            {cycle.EthUnclaimedEth > 0 && (
-              <span className="text-muted-foreground">
-                · {formatEthValue(cycle.EthUnclaimedEth, locale)}
-              </span>
-            )}
-          </button>
-        ) : (
-          <span className="text-muted-foreground">{t('performance.claims.allClaimed')}</span>
-        )}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('performance.claims.columns.claimedPercent')} align="right">
-        <ClaimedPctCell cycle={cycle} />
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('performance.claims.columns.averageTime')} align="right">
-        {cycle.AvgClaimPeriodSecs > 0 ? (
-          formatSeconds(cycle.AvgClaimPeriodSecs, locale)
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        )}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('performance.claims.columns.details')} align="right">
-        <button
-          type="button"
-          onClick={() => onExplore(cycle.RoundNum)}
-          className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white transition-colors hover:border-white/30 hover:bg-white/[0.08]"
-        >
-          {t('performance.claims.explore')}
-        </button>
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
+/**
+ * What each finalized cycle left to retrieve (secondary ETH, attached NFTs
+ * and ERC-20 tokens), how much of it has been retrieved and how quickly, in
+ * neutral figures; a cycle with assets still waiting opens their list, and
+ * every cycle opens its retrieval transactions.
+ */
 export const ClaimsByRoundSection = () => {
   const t = useTranslations('statistics');
-  const [page, setPage] = useState(1);
+  const format = useFormat();
   const [selected, setSelected] = useState<RoundClaimSummary | null>(null);
   const [exploreRound, setExploreRound] = useState<number | null>(null);
-
   const { data, isLoading, isError, refetch } = useClaimsByRound();
-  const list = data ?? [];
-  // Ticks every 30s so the "claim window closes in …" countdown never goes
-  // stale during long sessions (a mount-time snapshot previously froze it).
+  const list = useMemo(() => data ?? [], [data]);
+  // Ticks every 30s so the "window closes in …" countdown never goes stale.
   const nowSec = Math.floor(useNow(30_000) / 1000);
 
+  const columns = useMemo<DataTableColumn<RoundClaimSummary>[]>(() => {
+    const awarded = (row: RoundClaimSummary) =>
+      [
+        row.EthAwarded > 0 ? `${format.count(row.EthAwarded)} ETH` : null,
+        row.NftAwarded > 0 ? `${format.count(row.NftAwarded)} NFT` : null,
+        row.Erc20Awarded > 0 ? `${format.count(row.Erc20Awarded)} ERC-20` : null,
+      ]
+        .filter(Boolean)
+        .join(' · ');
+    return [
+      {
+        id: 'cycle',
+        header: t('performance.claims.columns.cycle'),
+        value: (row) => row.RoundNum,
+        sortable: true,
+        nowrap: true,
+      },
+      {
+        id: 'awarded',
+        header: t('performance.claims.columns.awarded'),
+        value: (row) => awarded(row) || null,
+        whenBlank: 'empty',
+      },
+      {
+        id: 'retrieved',
+        kind: 'percent',
+        percentScale: 'ratio',
+        header: t('performance.claims.columns.claimedPercent'),
+        value: (row) => retrievedShare(row),
+        sortable: true,
+      },
+      {
+        id: 'unretrieved',
+        kind: 'count',
+        header: t('performance.claims.columns.unclaimed'),
+        value: (row) => row.TotalUnclaimed,
+        sortable: true,
+        cell: (row) =>
+          row.TotalUnclaimed > 0 ? (
+            <Button variant="outline" size="sm" onClick={() => setSelected(row)}>
+              {t('performance.claims.unclaimedCount', { count: row.TotalUnclaimed })}
+            </Button>
+          ) : (
+            <span className="text-muted-foreground">{t('performance.claims.allClaimed')}</span>
+          ),
+      },
+      {
+        id: 'average',
+        kind: 'duration',
+        header: t('performance.claims.columns.averageTime'),
+        value: (row) => (row.AvgClaimPeriodSecs > 0 ? row.AvgClaimPeriodSecs : null),
+        whenBlank: 'empty',
+        sortable: true,
+      },
+      {
+        id: 'details',
+        header: t('performance.claims.columns.details'),
+        align: 'right',
+        cell: (row) => (
+          <Button variant="ghost" size="sm" onClick={() => setExploreRound(row.RoundNum)}>
+            {t('performance.claims.explore')}
+          </Button>
+        ),
+      },
+    ];
+  }, [format, t]);
+
   return (
-    <div className="space-y-4">
-      <p className="text-sm leading-6 text-muted-foreground">
+    <div className="space-y-6">
+      <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
         {t('performance.claims.description')}
       </p>
-
       {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Spinner />
-        </div>
+        <SkeletonTable rows={5} columns={5} />
       ) : isError ? (
         <ErrorState
+          headingLevel={3}
           title={t('performance.claims.loadErrorTitle')}
           message={t('performance.claims.loadErrorMessage')}
           onRetry={() => refetch()}
-          className="py-10"
         />
       ) : list.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">{t('performance.claims.empty')}</p>
+        <EmptyState headingLevel={3} variant="inline" title={t('performance.claims.empty')} />
       ) : (
-        <>
-          <TablePrimaryContainer>
-            <TablePrimary>
-              <TablePrimaryHead>
-                <tr>
-                  <TablePrimaryHeadCell align="center">
-                    {t('performance.claims.columns.cycle')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="left">
-                    {t('performance.claims.columns.awarded')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">
-                    {t('performance.claims.columns.unclaimed')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">
-                    {t('performance.claims.columns.claimedPercent')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">
-                    {t('performance.claims.columns.averageTime')}
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="right">
-                    {t('performance.claims.columns.details')}
-                  </TablePrimaryHeadCell>
-                </tr>
-              </TablePrimaryHead>
-              <TablePrimaryBody>
-                {list.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((cycle) => (
-                  <Row
-                    key={cycle.RoundNum}
-                    cycle={cycle}
-                    onOpen={setSelected}
-                    onExplore={setExploreRound}
-                  />
-                ))}
-              </TablePrimaryBody>
-            </TablePrimary>
-          </TablePrimaryContainer>
-          <CustomPagination
-            page={page}
-            setPage={setPage}
-            totalLength={list.length}
-            perPage={PER_PAGE}
-          />
-        </>
+        <DataTable
+          data={list}
+          columns={columns}
+          ariaLabel={t('performance.claimsTitle')}
+          initialSort={{ id: 'cycle', direction: 'desc' }}
+          getRowKey={(row) => String(row.RoundNum)}
+        />
       )}
-
-      <UnclaimedDialog cycle={selected} nowSec={nowSec} onClose={() => setSelected(null)} />
-      <ClaimDetailDialog round={exploreRound} onClose={() => setExploreRound(null)} />
+      <UnretrievedDialog cycle={selected} nowSec={nowSec} onClose={() => setSelected(null)} />
+      <CycleDetailDialog round={exploreRound} onClose={() => setExploreRound(null)} />
     </div>
   );
 };

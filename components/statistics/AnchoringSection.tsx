@@ -1,9 +1,11 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { formatEthValue } from '@/utils';
-
+import { useFormat } from '@/hooks/useFormat';
+import { PageHeaderFigures, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import { Amount } from '@/components/ui/amount';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GlobalAnchorActionsTable } from '@/components/anchoring/GlobalAnchorActionsTable';
 import { GlobalAnchoredTokensTable } from '@/components/anchoring/GlobalAnchoredTokensTable';
@@ -13,8 +15,7 @@ import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHold
 import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
 import type { AnchorAction, AnchoredTokenInfo } from '@/services/api';
 
-import { StatisticsItem } from './StatisticsItem';
-import { StatisticsGroup } from './StatisticsGroup';
+import { DefinitionsDisclosure } from './DefinitionsDisclosure';
 import { StatsSection } from './StatsSection';
 
 /** Query-state bundle for one anchoring dataset. */
@@ -52,7 +53,7 @@ interface AnchoringTableSectionProps<T> {
   tooltip: string;
   state: AnchoringDataState<T>;
   emptyTitle: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function AnchoringTableSection<T>({
@@ -77,7 +78,12 @@ function AnchoringTableSection<T>({
   );
 }
 
-/** CST and RWLK anchoring tabs with stats, actions, anchored tokens, and unique anchor-holders. */
+/**
+ * The anchoring statistics, one underline tab per NFT kind: an overview
+ * figure strip (label over value, divided by hairlines, one row on a wide
+ * screen instead of a single stacked column), its Definitions disclosure,
+ * then the actions, anchored tokens and anchor-holders ledgers as sections.
+ */
 export function AnchoringSection({
   cstStats,
   rwlkStats,
@@ -89,57 +95,104 @@ export function AnchoringSection({
   uniqueRWLKAnchorHolders,
 }: AnchoringSectionProps) {
   const t = useTranslations('statistics');
-  const locale = useLocale();
+  const format = useFormat();
+  const count = (value: number | undefined) =>
+    typeof value === 'number' ? format.count(value) : null;
+
+  const cstFigures: PageHeaderFigure[] = [
+    {
+      id: 'activeHolders',
+      label: t('anchoringPage.stats.activeHoldersCosmicSignature'),
+      value: count(cstStats.NumActiveStakers),
+    },
+    {
+      id: 'tokensAnchored',
+      label: t('anchoringPage.stats.tokensAnchored'),
+      value: count(cstStats.TotalTokensStaked),
+    },
+    {
+      id: 'deposits',
+      label: t('anchoringPage.stats.distributionDeposits'),
+      value: count(cstStats.NumDeposits),
+    },
+    {
+      id: 'totalDistributions',
+      label: t('anchoringPage.stats.totalDistributions'),
+      value:
+        typeof cstStats.TotalRewardEth === 'number' ? (
+          <Amount value={cstStats.TotalRewardEth} unit="ETH" />
+        ) : null,
+    },
+    {
+      id: 'unretrieved',
+      label: t('anchoringPage.stats.unretrievedDistributions'),
+      value:
+        typeof cstStats.UnclaimedRewardEth === 'number' ? (
+          <Amount value={cstStats.UnclaimedRewardEth} unit="ETH" />
+        ) : null,
+    },
+  ];
+
+  const rwlkFigures: PageHeaderFigure[] = [
+    {
+      id: 'activeHolders',
+      label: t('anchoringPage.stats.activeHoldersRandomWalk'),
+      value: count(rwlkStats.NumActiveStakers),
+    },
+    {
+      id: 'tokensAnchored',
+      label: t('anchoringPage.stats.tokensAnchored'),
+      value: count(rwlkStats.TotalTokensStaked),
+    },
+    {
+      id: 'tokensImprinted',
+      label: t('anchoringPage.stats.tokensImprinted'),
+      value: count(rwlkStats.TotalTokensMinted),
+    },
+  ];
 
   return (
     <Tabs defaultValue="cst" className="mt-8">
-      <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 p-1 sm:inline-flex sm:w-auto sm:flex-nowrap">
-        <TabsTrigger
-          value="cst"
-          className="min-w-0 flex-1 whitespace-normal px-2 py-2 text-center text-sm font-semibold leading-tight sm:flex-none sm:whitespace-nowrap sm:px-3 sm:py-1.5 sm:text-lg"
-        >
-          {t('anchoringPage.tabs.cosmicSignature')}
-        </TabsTrigger>
-        <TabsTrigger
-          value="rwlk"
-          className="min-w-0 flex-1 whitespace-normal px-2 py-2 text-center text-sm font-semibold leading-tight sm:flex-none sm:whitespace-nowrap sm:px-3 sm:py-1.5 sm:text-lg"
-        >
-          {t('anchoringPage.tabs.randomWalk')}
-        </TabsTrigger>
+      <TabsList
+        variant="underline"
+        scroll
+        className="min-w-full"
+        aria-label={t('anchoringPage.tabs.label')}
+      >
+        <TabsTrigger value="cst">{t('anchoringPage.tabs.cosmicSignature')}</TabsTrigger>
+        <TabsTrigger value="rwlk">{t('anchoringPage.tabs.randomWalk')}</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="cst" className="space-y-6 pt-4">
-        <StatisticsGroup
-          title={t('anchoringPage.groups.cosmicSignature')}
-          accentColor="blue"
-          tooltip={t('anchoringTooltips.cstGroup')}
-        >
-          <StatisticsItem
-            title={t('anchoringPage.stats.activeHoldersCosmicSignature')}
-            value={cstStats.NumActiveStakers}
-            tooltip={t('anchoringTooltips.cstActiveAnchorHolders')}
+      <TabsContent value="cst" className="mt-8 space-y-12 sm:space-y-16">
+        <div>
+          <PageHeaderFigures figures={cstFigures} className="mt-0 sm:mt-0" />
+          <DefinitionsDisclosure
+            className="mt-6"
+            label={t('shared.definitions')}
+            items={[
+              {
+                term: t('anchoringPage.stats.activeHoldersCosmicSignature'),
+                definition: t('anchoringTooltips.cstActiveAnchorHolders'),
+              },
+              {
+                term: t('anchoringPage.stats.tokensAnchored'),
+                definition: t('anchoringTooltips.cstTotalTokensAnchored'),
+              },
+              {
+                term: t('anchoringPage.stats.distributionDeposits'),
+                definition: t('anchoringTooltips.cstAnchorDistributionDeposits'),
+              },
+              {
+                term: t('anchoringPage.stats.totalDistributions'),
+                definition: t('anchoringTooltips.cstTotalAnchorDistributions'),
+              },
+              {
+                term: t('anchoringPage.stats.unretrievedDistributions'),
+                definition: t('anchoringTooltips.cstUnretrievedAnchorDistributions'),
+              },
+            ]}
           />
-          <StatisticsItem
-            title={t('anchoringPage.stats.distributionDeposits')}
-            value={cstStats.NumDeposits ?? '—'}
-            tooltip={t('anchoringTooltips.cstAnchorDistributionDeposits')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.totalDistributions')}
-            value={formatEthValue(cstStats.TotalRewardEth ?? 0, locale)}
-            tooltip={t('anchoringTooltips.cstTotalAnchorDistributions')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.tokensAnchored')}
-            value={cstStats.TotalTokensStaked}
-            tooltip={t('anchoringTooltips.cstTotalTokensAnchored')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.unretrievedDistributions')}
-            value={formatEthValue(cstStats.UnclaimedRewardEth ?? 0, locale)}
-            tooltip={t('anchoringTooltips.cstUnretrievedAnchorDistributions')}
-          />
-        </StatisticsGroup>
+        </div>
 
         <AnchoringTableSection
           title={t('anchoringPage.tables.actions')}
@@ -169,28 +222,28 @@ export function AnchoringSection({
         </AnchoringTableSection>
       </TabsContent>
 
-      <TabsContent value="rwlk" className="space-y-6 pt-4">
-        <StatisticsGroup
-          title={t('anchoringPage.groups.randomWalk')}
-          accentColor="purple"
-          tooltip={t('anchoringTooltips.rwlkGroup')}
-        >
-          <StatisticsItem
-            title={t('anchoringPage.stats.activeHoldersRandomWalk')}
-            value={rwlkStats.NumActiveStakers}
-            tooltip={t('anchoringTooltips.rwlkActiveAnchorHolders')}
+      <TabsContent value="rwlk" className="mt-8 space-y-12 sm:space-y-16">
+        <div>
+          <PageHeaderFigures figures={rwlkFigures} className="mt-0 sm:mt-0" />
+          <DefinitionsDisclosure
+            className="mt-6"
+            label={t('shared.definitions')}
+            items={[
+              {
+                term: t('anchoringPage.stats.activeHoldersRandomWalk'),
+                definition: t('anchoringTooltips.rwlkActiveAnchorHolders'),
+              },
+              {
+                term: t('anchoringPage.stats.tokensAnchored'),
+                definition: t('anchoringTooltips.rwlkTotalTokensAnchored'),
+              },
+              {
+                term: t('anchoringPage.stats.tokensImprinted'),
+                definition: t('anchoringTooltips.rwlkTotalTokensImprinted'),
+              },
+            ]}
           />
-          <StatisticsItem
-            title={t('anchoringPage.stats.tokensImprinted')}
-            value={rwlkStats.TotalTokensMinted ?? '—'}
-            tooltip={t('anchoringTooltips.rwlkTotalTokensImprinted')}
-          />
-          <StatisticsItem
-            title={t('anchoringPage.stats.tokensAnchored')}
-            value={rwlkStats.TotalTokensStaked}
-            tooltip={t('anchoringTooltips.rwlkTotalTokensAnchored')}
-          />
-        </StatisticsGroup>
+        </div>
 
         <AnchoringTableSection
           title={t('anchoringPage.tables.actions')}

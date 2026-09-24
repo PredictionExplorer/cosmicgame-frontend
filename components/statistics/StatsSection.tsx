@@ -4,57 +4,33 @@ import type { ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
-import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
 import { ErrorState } from '@/components/ui/error-state';
 import { EmptyState } from '@/components/ui/empty-state';
-import { SkeletonTableRow } from '@/components/ui/skeleton';
+import { SkeletonTable } from '@/components/ui/skeleton';
 
-export interface StatsSectionProps {
-  title: string;
-  tooltip?: string;
-  icon?: ReactNode;
-  description?: string;
-  defaultOpen?: boolean;
-  /** Defer mounting content until first expanded (see CollapsibleSection). */
-  lazy?: boolean;
-  /** Query state driving the standard loading/error/empty presentation. */
+import { SectionShell, type SectionShellProps } from './SectionShell';
+
+export interface StatsSectionProps extends Omit<SectionShellProps, 'busy'> {
+  /** Query state behind the standard loading, error and empty treatments. */
   isLoading?: boolean;
   isError?: boolean;
   onRetry?: () => void;
-  /** Rendered content is replaced by an empty state when true (and not loading/error). */
+  /** Replaces the content with an empty state (unless loading or failed). */
   isEmpty?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyIcon?: ReactNode;
-  /** Custom loading placeholder; defaults to shimmering table rows. */
+  /** Custom loading placeholder; defaults to ledger skeleton rows. */
   skeleton?: ReactNode;
   errorTitle?: string;
-  className?: string;
-  children: ReactNode;
-}
-
-function DefaultSkeleton() {
-  return (
-    <div data-testid="stats-section-skeleton">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <SkeletonTableRow key={i} />
-      ))}
-    </div>
-  );
 }
 
 /**
- * Standard statistics section: a collapsible card whose body renders the
- * shared loading / error / empty treatments so every table and chart on the
- * statistics pages degrades the same way.
+ * StatsSection — a statistics page section (`SectionShell`) whose body
+ * renders the shared loading, error and empty treatments, so every table and
+ * chart on the statistics pages degrades the same way.
  */
 export function StatsSection({
-  title,
-  tooltip,
-  icon,
-  description,
-  defaultOpen = true,
-  lazy = false,
   isLoading = false,
   isError = false,
   onRetry,
@@ -64,50 +40,46 @@ export function StatsSection({
   emptyIcon,
   skeleton,
   errorTitle,
-  className,
   children,
+  ...shell
 }: StatsSectionProps) {
   const t = useTranslations('statistics');
   const locale = useLocale();
+  const stateHeading = (shell.headingLevel ?? 2) + 1;
+
   let body: ReactNode = children;
   if (isLoading) {
-    body = skeleton ?? <DefaultSkeleton />;
+    body = skeleton ?? <SkeletonTable rows={5} columns={3} />;
   } else if (isError) {
     body = (
       <ErrorState
+        headingLevel={stateHeading as 3 | 4}
         title={
           errorTitle ??
           t('shared.sectionLoadErrorTitle', {
-            title: getLocaleConfig(locale).lowercaseMidSentence ? title.toLowerCase() : title,
+            title: getLocaleConfig(locale).lowercaseMidSentence
+              ? shell.title.toLowerCase()
+              : shell.title,
           })
         }
         message={t('shared.serviceError')}
         onRetry={onRetry}
-        className="py-10"
       />
     );
   } else if (isEmpty) {
     body = (
       <EmptyState
+        headingLevel={stateHeading as 3 | 4}
         title={emptyTitle ?? t('shared.noDataTitle')}
         description={emptyDescription}
         icon={emptyIcon}
-        className="py-10"
       />
     );
   }
 
   return (
-    <CollapsibleSection
-      title={title}
-      tooltip={tooltip}
-      icon={icon}
-      description={description}
-      defaultOpen={defaultOpen}
-      lazy={lazy}
-      className={className}
-    >
+    <SectionShell {...shell} busy={isLoading}>
       {body}
-    </CollapsibleSection>
+    </SectionShell>
   );
 }

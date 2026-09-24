@@ -61,7 +61,7 @@ export default async function Page({
   }
 
   return (
-    <PageMessages namespaces={['anchoring', 'detail', 'marketing', 'myPages', 'tables']}>
+    <PageMessages namespaces={['anchoring', 'detail', 'marketing', 'myPages', 'tables', 'traits']}>
       <UserPage address={address} />
     </PageMessages>
   );

@@ -99,12 +99,12 @@ describe('AttachedAssetsSection NFT scope', () => {
       'aria-selected',
       'true',
     );
-    expect(screen.getByRole('button', { name: 'All cycles' })).toHaveAttribute(
-      'aria-pressed',
+    expect(screen.getByRole('radio', { name: 'All cycles' })).toHaveAttribute(
+      'aria-checked',
       'true',
     );
-    expect(screen.getByRole('button', { name: 'Current cycle' })).toHaveAttribute(
-      'aria-pressed',
+    expect(screen.getByRole('radio', { name: 'Current cycle' })).toHaveAttribute(
+      'aria-checked',
       'false',
     );
   });
@@ -115,11 +115,11 @@ describe('AttachedAssetsSection NFT scope', () => {
 
     expect(nftCards()).toHaveLength(12);
 
-    await user.click(screen.getByRole('button', { name: 'Current cycle' }));
+    await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
 
     expect(nftCards()).toHaveLength(3);
-    expect(screen.getByRole('button', { name: 'Current cycle' })).toHaveAttribute(
-      'aria-pressed',
+    expect(screen.getByRole('radio', { name: 'Current cycle' })).toHaveAttribute(
+      'aria-checked',
       'true',
     );
   });
@@ -131,17 +131,17 @@ describe('AttachedAssetsSection NFT scope', () => {
     await goToPage(user, '2');
     expect(nftCards()).toHaveLength(3);
 
-    await user.click(screen.getByRole('button', { name: 'Current cycle' }));
-    await user.click(screen.getByRole('button', { name: 'All cycles' }));
+    await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
+    await user.click(screen.getByRole('radio', { name: 'All cycles' }));
 
     expect(nftCards()).toHaveLength(12);
   });
 
-  it('groups the scope buttons for assistive tech', () => {
+  it('groups the scope options as one radio group', () => {
     render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
 
-    const group = screen.getByRole('group', { name: 'Attached NFT scope' });
-    expect(within(group).getAllByRole('button')).toHaveLength(2);
+    const group = screen.getByRole('radiogroup', { name: 'Attached NFT scope' });
+    expect(within(group).getAllByRole('radio')).toHaveLength(2);
   });
 });
 
@@ -178,7 +178,7 @@ describe('AttachedAssetsSection NFT paging', () => {
     const user = userEvent.setup();
     render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
 
-    await user.click(screen.getByRole('button', { name: 'Current cycle' }));
+    await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
 
     expect(
       screen.queryByRole('navigation', { name: 'tables.pagination.label' }),
@@ -201,7 +201,7 @@ describe('AttachedAssetsSection NFT states', () => {
     mockUseDonationsNFTList.mockReturnValue(okQuery([nft(1, 1)]));
     render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
 
-    await user.click(screen.getByRole('button', { name: 'Current cycle' }));
+    await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
 
     expect(screen.getByText('No NFTs attached this cycle')).toBeInTheDocument();
     expect(
@@ -327,12 +327,12 @@ describe('AttachedAssetsSection ERC-20 tab', () => {
     const user = userEvent.setup();
     render(<AttachedAssetsSection currentRoundNum={CURRENT_CYCLE} />);
 
-    await user.click(screen.getByRole('button', { name: 'Current cycle' }));
+    await user.click(screen.getByRole('radio', { name: 'Current cycle' }));
     await openErc20Tab(user);
     await user.click(screen.getByRole('tab', { name: 'NFTs (ERC-721)' }));
 
-    expect(screen.getByRole('button', { name: 'Current cycle' })).toHaveAttribute(
-      'aria-pressed',
+    expect(screen.getByRole('radio', { name: 'Current cycle' })).toHaveAttribute(
+      'aria-checked',
       'true',
     );
     expect(nftCards()).toHaveLength(3);

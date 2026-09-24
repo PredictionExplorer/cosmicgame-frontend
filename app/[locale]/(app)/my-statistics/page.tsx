@@ -30,7 +30,7 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['anchoring', 'detail', 'marketing', 'myPages', 'tables']}>
+    <PageMessages namespaces={['anchoring', 'detail', 'marketing', 'myPages', 'tables', 'traits']}>
       <MyStatistics />
     </PageMessages>
   );

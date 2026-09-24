@@ -41,12 +41,12 @@ describe('DonatedAssetsSection', () => {
 
   it('shows skeleton loading for NFTs', () => {
     render(<DonatedAssetsSection {...defaultProps} loadingNFTs={true} />);
-    expect(screen.getAllByTestId('table-skeleton').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('status', { name: 'tables.skeleton.loadingRows' }).length).toBeGreaterThan(0);
   });
 
   it('shows skeleton loading for ERC20', () => {
     render(<DonatedAssetsSection {...defaultProps} loadingERC20={true} />);
-    expect(screen.getAllByTestId('table-skeleton').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('status', { name: 'tables.skeleton.loadingRows' }).length).toBeGreaterThan(0);
   });
 
   it('shows empty state when no attached NFTs', () => {

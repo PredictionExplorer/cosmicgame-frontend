@@ -1,53 +1,32 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 import UserStatisticsView from '../UserStatisticsView';
 
-const defaultHookReturn = { data: undefined, isLoading: false };
+const defaultHookReturn = { data: undefined, isLoading: false, isError: false, refetch: jest.fn() };
+const list = { data: [], isLoading: false };
 
-const mockUseDashboardInfo = jest.fn().mockReturnValue(defaultHookReturn);
-const mockUseClaimHistoryByUser = jest.fn().mockReturnValue(defaultHookReturn);
-const mockUseUserInfo = jest.fn().mockReturnValue(defaultHookReturn);
-const mockUseUserBalance = jest.fn().mockReturnValue(defaultHookReturn);
-const mockUseCSTAnchorActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseRWLKAnchorActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseMarketingRewardsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseCSTTokensByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseAnchorDistributionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseCSTAnchorDistributionsRetrievedByUser = jest
-  .fn()
-  .mockReturnValue({ data: [], isLoading: false });
-const mockUseCSTAnchorDistributionsByUserByDeposit = jest
-  .fn()
-  .mockReturnValue({ data: [], isLoading: false });
-const mockUseRWLKAnchorImprintsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseClaimedDonatedNFTByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseUnclaimedDonatedNFTByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseDonationsERC20ByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockClaimDonatedNFT = jest.fn();
-const mockClaimAllDonatedNFTs = jest.fn();
-const mockClaimDonatedERC20 = jest.fn();
-const mockClaimAllDonatedERC20 = jest.fn();
+const mockUseDashboardInfo = jest.fn();
+const mockUseClaimHistoryByUser = jest.fn();
+const mockUseUserInfo = jest.fn();
+const mockUseUserBalance = jest.fn();
+const mockUseCSTTokensByUser = jest.fn();
 
 jest.mock('../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useClaimHistoryByUser: (...args: unknown[]) => mockUseClaimHistoryByUser(...args),
   useUserInfo: (...args: unknown[]) => mockUseUserInfo(...args),
   useUserBalance: (...args: unknown[]) => mockUseUserBalance(...args),
-  useCSTAnchorActionsByUser: (...args: unknown[]) => mockUseCSTAnchorActionsByUser(...args),
-  useRWLKAnchorActionsByUser: (...args: unknown[]) => mockUseRWLKAnchorActionsByUser(...args),
-  useMarketingRewardsByUser: (...args: unknown[]) => mockUseMarketingRewardsByUser(...args),
   useCSTTokensByUser: (...args: unknown[]) => mockUseCSTTokensByUser(...args),
-  useAnchorDistributionsByUser: (...args: unknown[]) => mockUseAnchorDistributionsByUser(...args),
-  useCSTAnchorDistributionsRetrievedByUser: (...args: unknown[]) =>
-    mockUseCSTAnchorDistributionsRetrievedByUser(...args),
-  useCSTAnchorDistributionsByUserByDeposit: (...args: unknown[]) =>
-    mockUseCSTAnchorDistributionsByUserByDeposit(...args),
-  useRWLKAnchorImprintsByUser: (...args: unknown[]) => mockUseRWLKAnchorImprintsByUser(...args),
-  useClaimedDonatedNFTByUser: (...args: unknown[]) => mockUseClaimedDonatedNFTByUser(...args),
-  useUnclaimedDonatedNFTByUser: (...args: unknown[]) => mockUseUnclaimedDonatedNFTByUser(...args),
-  useDonationsERC20ByUser: (...args: unknown[]) => mockUseDonationsERC20ByUser(...args),
-  useGestureListByCycle: (...args: unknown[]) => mockUseGestureListByCycle(...args),
+  useCSTAnchorActionsByUser: () => list,
+  useRWLKAnchorActionsByUser: () => list,
+  useMarketingRewardsByUser: () => list,
+  useAnchorDistributionsByUser: () => list,
+  useCSTAnchorDistributionsRetrievedByUser: () => list,
+  useCSTAnchorDistributionsByUserByDeposit: () => list,
+  useRWLKAnchorImprintsByUser: () => list,
+  useClaimedDonatedNFTByUser: () => list,
+  useUnclaimedDonatedNFTByUser: () => list,
+  useDonationsERC20ByUser: () => list,
 }));
 
 jest.mock('../../hooks/web3', () => ({
@@ -57,84 +36,29 @@ jest.mock('../../hooks/useClaimAllocations', () => ({
   useClaimAllocations: () => ({
     isClaiming: { raffleETH: false, donatedNFT: false, donatedERC20: false },
     claimingDonatedNFTs: [],
-    retrieveAllStellarSelectionETH: jest.fn(),
-    claimDonatedNFT: mockClaimDonatedNFT,
-    claimAllDonatedNFTs: mockClaimAllDonatedNFTs,
-    claimDonatedERC20: mockClaimDonatedERC20,
-    claimAllDonatedERC20: mockClaimAllDonatedERC20,
+    claimDonatedNFT: jest.fn(),
+    claimAllDonatedNFTs: jest.fn(),
+    claimDonatedERC20: jest.fn(),
+    claimAllDonatedERC20: jest.fn(),
   }),
 }));
-
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
   useQueryClient: () => ({ invalidateQueries: jest.fn() }),
 }));
-
-jest.mock('../../hooks/useStellarSelectionWalletContract', () => ({
-  __esModule: true,
-  default: () => ({
-    write: {
-      claimDonatedNft: jest.fn(),
-      claimManyDonatedNfts: jest.fn(),
-      claimDonatedToken: jest.fn(),
-      claimManyDonatedTokens: jest.fn(),
-    },
-  }),
-}));
 jest.mock('../../contexts/AnchoredTokenContext', () => ({
   useAnchoredToken: () => ({ fetchData: jest.fn() }),
 }));
-jest.mock('../../contexts/ApiDataContext', () => ({
-  useApiData: () => ({ fetchData: jest.fn() }),
-}));
-jest.mock('../../contexts/NotificationContext', () => ({
-  useNotification: () => ({ setNotification: jest.fn() }),
-}));
 
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div data-testid={props['data-testid'] as string | undefined}>{children}</div>
-    ),
-    section: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <section data-testid={props['data-testid'] as string | undefined}>{children}</section>
-    ),
-  },
-}));
-
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Record<string, unknown>) => <img {...props} />,
-}));
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  ),
-}));
-
-jest.mock('../user-statistics/UserStatsSection', () => ({
-  UserStatsSection: ({ userInfo }: { userInfo: { NumBids: number } }) => (
-    <div data-testid="user-stats-section">gestures: {userInfo?.NumBids}</div>
-  ),
-}));
 jest.mock('../user-statistics/UserAnchoringSection', () => ({
-  UserAnchoringSection: () => (
-    <div data-testid="user-anchoring-section">
-      <div data-testid="anchor-actions-table" />
-      <div data-testid="anchor-distributions-table" />
-    </div>
-  ),
+  UserAnchoringSection: () => <div data-testid="user-anchoring-section" />,
 }));
 jest.mock('../user-statistics/DonatedAssetsSection', () => ({
-  DonatedAssetsSection: () => (
-    <div data-testid="attached-assets-section">
-      <div data-testid="attached-nft-table" />
-      <div data-testid="attached-erc20-table" />
-    </div>
-  ),
+  DonatedAssetsSection: () => <div data-testid="attached-assets-section" />,
 }));
-
+jest.mock('../user-statistics/ProfileArtworks', () => ({
+  ProfileArtworks: () => <div data-testid="profile-artworks" />,
+}));
 jest.mock('../tables/GestureHistoryTable', () => ({
   __esModule: true,
   default: () => <div data-testid="gesture-history-table" />,
@@ -147,27 +71,22 @@ jest.mock('../tables/MarketingRewardsTable', () => ({
   __esModule: true,
   default: () => <div data-testid="marketing-rewards-table" />,
 }));
-jest.mock('../tokens/CSTTable', () => ({
-  CSTTable: () => <div data-testid="cst-table" />,
-}));
 
-beforeEach(() => jest.clearAllMocks());
+const ADDRESS = '0xA169574D0d353E3010997A3E64846b7D1B2a63B6';
 
-const baseUserInfo = {
+const userInfo = {
   UserInfo: {
-    NumBids: 5,
+    NumBids: 3,
     NumPrizes: 2,
-    MaxBidAmount: 1.5,
-    MaxWinAmount: 3.0,
-    CosmicSignatureNumTransfers: 10,
-    TotalCSTokensWon: 7,
-    Address: '0xUser',
+    MaxBidAmount: 0.1456,
+    CosmicSignatureNumTransfers: 6,
+    TotalCSTokensWon: 3,
     SumRaffleEthWinnings: 0.5,
     SumRaffleEthWithdrawal: 0.2,
     UnclaimedNFTs: 1,
     NumRaffleEthWinnings: 3,
     RaffleNFTsCount: 2,
-    RewardNFTsCount: 4,
+    RewardNFTsCount: 3,
     StakingStatisticsRWalk: {
       TotalNumStakeActions: 1,
       TotalNumUnstakeActions: 0,
@@ -175,80 +94,143 @@ const baseUserInfo = {
       TotalTokensMinted: 1,
     },
   },
-  Gestures: [],
+  Gestures: [
+    { EvtLogId: 1, RoundNum: 1, TimeStamp: 100, GestureType: 0, GestureCostEth: 0.25 },
+    { EvtLogId: 2, RoundNum: 2, TimeStamp: 200, GestureType: 2, CstCost: 120 },
+    { EvtLogId: 3, RoundNum: 2, TimeStamp: 300, GestureType: 0, GestureCostEth: 0.5 },
+  ],
+  CurrentlyStakedTokens: [],
 };
 
+const claims = [
+  { RoundNum: 1, RecordType: 0, AmountEth: 11 },
+  { RoundNum: 1, RecordType: 1, AmountEth: 1000 },
+  { RoundNum: 1, RecordType: 5, AmountEth: 0 },
+];
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseDashboardInfo.mockReturnValue({
+    data: {
+      CurRoundNum: 2,
+      TsRoundStart: 1,
+      CurNumBids: 20,
+      NumRaffleEthWinnersBidding: 3,
+      NumRaffleNFTWinnersBidding: 10,
+    },
+  });
+  mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, data: userInfo });
+  mockUseClaimHistoryByUser.mockReturnValue({ ...defaultHookReturn, data: claims });
+  mockUseUserBalance.mockReturnValue({
+    ...defaultHookReturn,
+    data: { CosmicTokenBalance: '1000000000000000000', ETH_Balance: '2000000000000000000' },
+  });
+  mockUseCSTTokensByUser.mockReturnValue(list);
+});
+
 describe('UserStatisticsView', () => {
-  it('shows invalid address empty state', () => {
+  it('shows the invalid-address header', () => {
     render(<UserStatisticsView address="Invalid Address" isOwnProfile={false} />);
-    expect(screen.getByText('myPages.statistics.page.invalidAddress')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'myPages.statistics.page.invalidAddress' }),
+    ).toBeInTheDocument();
   });
 
-  it('shows skeleton loading state', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
-    render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
+  it('shows the profile skeleton while the profile loads', () => {
+    mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, isLoading: true });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
     expect(screen.getByTestId('statistics-loading-skeleton')).toBeInTheDocument();
   });
 
-  it('shows empty state when no user info', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
-    mockUseUserInfo.mockReturnValue({ data: null, isLoading: false });
-    render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
+  it('offers a retry when the profile read fails', () => {
+    const refetch = jest.fn();
+    mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, isError: true, refetch });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(screen.getByText('myPages.statistics.page.loadErrorTitle')).toBeInTheDocument();
+    screen.getByRole('button', { name: /try again|retry/i }).click();
+    expect(refetch).toHaveBeenCalled();
+  });
+
+  it('shows the empty state when the address has no activity', () => {
+    mockUseUserInfo.mockReturnValue({ ...defaultHookReturn, data: null });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
     expect(screen.getByText('myPages.statistics.page.emptyTitle')).toBeInTheDocument();
   });
 
-  it('renders user stats and tables with full data', () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: { CurRoundNum: 5, TsRoundStart: 1, StakingAmountEth: 1.0 },
-      isLoading: false,
-    });
-    mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
-    mockUseUserBalance.mockReturnValue({
-      data: { CosmicTokenBalance: '1000000000000000000', ETH_Balance: '2000000000000000000' },
-      isLoading: false,
-    });
-    render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
+  it('names another participant by address, never as "you"', () => {
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(h1).toHaveTextContent('myPages.statistics.page.participant');
+    expect(h1).toHaveTextContent('0xA169…⁠63B6');
+    expect(screen.getByText('myPages.statistics.page.userSubtitle')).toBeInTheDocument();
+    expect(screen.queryByTestId('quick-actions')).not.toBeInTheDocument();
+  });
 
-    expect(screen.getByTestId('user-stats-section')).toHaveTextContent('gestures: 5');
+  it('shows spending beside receipts, each figure once', () => {
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    const figure = (id: string) => document.querySelector(`[data-figure="${id}"]`) as HTMLElement;
+    expect(within(figure('gestures')).getByText('3')).toBeInTheDocument();
+    // 0.25 + 0.5 ETH across the ETH gestures; the CST gesture is its own caption.
+    expect(figure('spent')).toHaveTextContent('0.7500 ETH');
+    expect(figure('spent')).toHaveTextContent('amount=120 CST');
+    // Only the ETH allocation row counts as ETH received.
+    expect(figure('received')).toHaveTextContent('11.0000 ETH');
+    expect(figure('balance')).toHaveTextContent('2.0000 ETH');
+    expect(screen.getAllByText('myPages.statistics.figures.gestures.label')).toHaveLength(1);
+  });
+
+  it('lists the titles the allocation records carry', () => {
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    const titles = screen.getByRole('list', { name: 'myPages.statistics.titles.label' });
+    expect(within(titles).getAllByRole('listitem')).toHaveLength(2);
+  });
+
+  it('shows this cycle’s Stellar Selection share as a plain count, never compounded', () => {
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    // Two of the address's gestures are in cycle 2, out of the cycle's 20.
+    expect(screen.getByText('myPages.statistics.selection.share(mine=2,total=20)')).toBeInTheDocument();
+    expect(screen.getByText('10%')).toBeInTheDocument();
+    // 1 - (18/20)^10 would read 65.1%; nothing on the profile compounds the share.
+    expect(document.body).not.toHaveTextContent('65.1%');
+  });
+
+  it('hides the Stellar Selection share when the address has no gesture this cycle', () => {
+    mockUseUserInfo.mockReturnValue({
+      ...defaultHookReturn,
+      data: { ...userInfo, Gestures: userInfo.Gestures.filter((g) => g.RoundNum !== 2) },
+    });
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    expect(screen.queryByText(/statistics\.selection\.share/)).not.toBeInTheDocument();
+  });
+
+  it('renders the sections as H2s', () => {
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
+    for (const key of [
+      'overview.title',
+      'page.sections.artworks',
+      'page.sections.gestureHistory',
+      'page.sections.recipientHistory',
+      'page.sections.anchoring',
+      'page.sections.claimableAssets',
+    ]) {
+      expect(
+        screen.getByRole('heading', { level: 2, name: `myPages.statistics.${key}` }),
+      ).toBeInTheDocument();
+    }
     expect(screen.getByTestId('gesture-history-table')).toBeInTheDocument();
-    expect(screen.getByTestId('cst-table')).toBeInTheDocument();
-    expect(screen.getByTestId('winning-history-table')).toBeInTheDocument();
-    expect(screen.getByTestId('attached-assets-section')).toBeInTheDocument();
+    expect(screen.getByTestId('profile-artworks')).toBeInTheDocument();
   });
 
-  it('shows "My Statistics" heading for own profile', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
-    mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
-    render(<UserStatisticsView address="0xUser" isOwnProfile={true} />);
-    expect(screen.getByText('myPages.statistics.page.ownTitle')).toBeInTheDocument();
-  });
-
-  it('shows "User Profile" heading for other profile', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
-    mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
-    render(<UserStatisticsView address="0xOther" isOwnProfile={false} />);
-    expect(screen.getByText('myPages.statistics.page.userTitle')).toBeInTheDocument();
-  });
-
-  it('renders section dividers', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
-    mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
-    render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
-    expect(screen.getByText('myPages.statistics.page.sections.gestureHistory')).toBeInTheDocument();
+  it('shows your own statistics with next steps', () => {
+    render(<UserStatisticsView address={ADDRESS} isOwnProfile />);
     expect(
-      screen.getByText('myPages.statistics.page.sections.recipientHistory'),
+      screen.getByRole('heading', { level: 1, name: 'myPages.statistics.page.ownTitle' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('myPages.statistics.page.sections.anchoring')).toBeInTheDocument();
-    expect(screen.getByText('myPages.statistics.page.sections.tokenHoldings')).toBeInTheDocument();
-    expect(
-      screen.getByText('myPages.statistics.page.sections.claimableAssets'),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('quick-actions')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
-    mockUseUserInfo.mockReturnValue({ data: null, isLoading: false });
-    const { container } = render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
+    const { container } = render(<UserStatisticsView address={ADDRESS} isOwnProfile={false} />);
     await checkA11y(container);
   });
 });

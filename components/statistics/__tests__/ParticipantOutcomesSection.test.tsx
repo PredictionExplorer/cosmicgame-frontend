@@ -1,0 +1,88 @@
+import userEvent from '@testing-library/user-event';
+
+import { checkA11y, render, screen, within } from '@/test-utils';
+
+import { ParticipantOutcomesSection } from '../ParticipantOutcomesSection';
+
+const mockUseOutcomes = jest.fn();
+
+jest.mock('../../../hooks/useApiQuery', () => ({
+  useRoiLeaderboard: (...args: unknown[]) => mockUseOutcomes(...args),
+}));
+
+const entry = (addr: string, gestures: number, spent: number, received: number) => ({
+  BidderAid: gestures,
+  BidderAddr: addr,
+  NumBids: gestures,
+  RoundsParticipated: 2,
+  RoundsWon: received > 0 ? 1 : 0,
+  WinRate: received > 0 ? 0.5 : 0,
+  TotalEthSpent: '0',
+  TotalEthSpentEth: spent,
+  TotalCstSpent: '0',
+  TotalCstSpentEth: 120,
+  EthWon: '0',
+  EthWonEth: received,
+  PrizesCount: received > 0 ? 3 : 0,
+  CstPrizesCount: received > 0 ? 1 : 0,
+  NftPrizesCount: received > 0 ? 1 : 0,
+  NetPlEth: received - spent,
+  Roi: 0,
+});
+
+const list = [
+  entry('0x1111111111111111111111111111111111111111', 40, 2, 5),
+  entry('0x2222222222222222222222222222222222222222', 810, 4, 1),
+  entry('0x3333333333333333333333333333333333333333', 7, 1, 0),
+];
+
+const ok = <T,>(data: T) => ({ data, isLoading: false, isError: false, refetch: jest.fn() });
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseOutcomes.mockReturnValue(ok(list));
+});
+
+describe('ParticipantOutcomesSection', () => {
+  it('asks the backend in gesture order and sorts by gestures', () => {
+    render(<ParticipantOutcomesSection />);
+    expect(mockUseOutcomes).toHaveBeenCalledWith('bids', 5);
+    const rows = within(screen.getByRole('table')).getAllByRole('row');
+    expect(rows[1]).toHaveTextContent('810');
+    expect(rows[3]).toHaveTextContent('7');
+  });
+
+  it('totals spending beside what came back, and who received more', () => {
+    render(<ParticipantOutcomesSection />);
+    expect(screen.getByText(/^7(\.0+)? ETH$/)).toBeInTheDocument();
+    expect(screen.getByText(/^6(\.0+)? ETH$/)).toBeInTheDocument();
+    expect(screen.getByText('1 of 3')).toBeInTheDocument();
+  });
+
+  it('prints net figures signed and in the same ink, with no P&L sorts', () => {
+    render(<ParticipantOutcomesSection />);
+    const table = screen.getByRole('table');
+    expect(within(table).getByText(/^\+3(\.0+)?$/)).toBeInTheDocument();
+    expect(within(table).getAllByText(/^[-−]3(\.0+)?$/)).toHaveLength(1);
+    expect(table.querySelector('[class*="emerald"], [class*="red-"]')).toBeNull();
+    expect(screen.queryByText(/Biggest Spender|Net %/)).not.toBeInTheDocument();
+  });
+
+  it('refetches with the gesture floor a reader picks', async () => {
+    const user = userEvent.setup();
+    render(<ParticipantOutcomesSection />);
+    await user.click(screen.getByRole('radio', { name: '25+' }));
+    expect(mockUseOutcomes).toHaveBeenLastCalledWith('bids', 25);
+  });
+
+  it('says when no participant meets the floor', () => {
+    mockUseOutcomes.mockReturnValue(ok([]));
+    render(<ParticipantOutcomesSection />);
+    expect(screen.getByText('No participants match this filter yet.')).toBeInTheDocument();
+  });
+
+  it('has no axe violations', async () => {
+    const { container } = render(<ParticipantOutcomesSection />);
+    await checkA11y(container);
+  });
+});

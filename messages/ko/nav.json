@@ -76,9 +76,9 @@
       "description": "사이클별로 제스처가 일어나는 시간대"
     },
     "statisticsPerformance": {
-      "label": "참여자 성과 통계",
-      "short": "성과",
-      "description": "사이클 기록과 참여자 순위"
+      "label": "참여자 결과",
+      "short": "결과",
+      "description": "지출과 수령, 사이클별 회수"
     },
     "allocationRecipients": {
       "label": "배분 수령자",

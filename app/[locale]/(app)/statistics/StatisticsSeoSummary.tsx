@@ -8,6 +8,8 @@ import { dashboardSeed, type DashboardMetric } from '../dashboardMetrics';
 import { readDashboard } from '../publicDataReads';
 
 import { ActiveCycleGesturesCaption } from './ActiveCycleGesturesCaption';
+import { STATISTICS_HEADER_CLASS } from './StatisticsPageIntro';
+import { StatisticsSubNav } from './StatisticsSubNav';
 
 /**
  * The statistics hub header, rendered on the server: the hub's one headline
@@ -26,9 +28,11 @@ export async function StatisticsSeoSummary() {
   );
 
   return (
+    <>
     <PageHeader
       section="explore"
       sectionHub
+      className={STATISTICS_HEADER_CLASS}
       title={t('hub.seo.heading')}
       titleId="statistics-heading"
       subtitle={t('hub.seo.description')}
@@ -68,5 +72,7 @@ export async function StatisticsSeoSummary() {
       ]}
       relatedLabel={t('hub.seo.relatedPagesAria')}
     />
+    <StatisticsSubNav />
+    </>
   );
 }
