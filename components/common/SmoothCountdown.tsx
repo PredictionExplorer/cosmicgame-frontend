@@ -6,7 +6,17 @@ import { useTranslations } from 'next-intl';
 
 import { useNow } from '@/hooks/useNow';
 
-import Counter, { type CounterUnitLabels, type LocalizedCountdownRenderProps } from './Counter';
+/** The locale's unit words, for a renderer that labels its figures. */
+export interface CountdownUnitLabels {
+  days: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+}
+
+export interface LocalizedCountdownRenderProps extends CountdownRenderProps {
+  unitLabels: CountdownUnitLabels;
+}
 
 export interface CountdownParts {
   total: number;
@@ -23,8 +33,12 @@ interface SmoothCountdownProps {
   /** Serialized clock sample shared by SSR and the first hydration render. */
   initialNowMs?: number;
   intervalMs?: number;
-  renderer?: (props: LocalizedCountdownRenderProps) => ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  /**
+   * Draws the remaining time. Every clock sets its own figures (the home
+   * clock, the dock, the finalize window), so the countdown only supplies
+   * the parts and the locale's unit words.
+   */
+  renderer: (props: LocalizedCountdownRenderProps) => ReactNode;
 }
 
 const EMPTY_API = {} as CountdownRenderProps['api'];
@@ -67,21 +81,17 @@ export function SmoothCountdown({
   initialNowMs = 0,
   intervalMs = 100,
   renderer,
-  size = 'md',
 }: SmoothCountdownProps) {
   const t = useTranslations('formats');
   // The shared ticker reports 0 during SSR/hydration. An epoch deadline
   // must use the page's clock sample until the live browser ticker takes over.
   const nowMs = useNow(intervalMs) || initialNowMs;
   const props = toCountdownRenderProps(getCountdownParts(date, nowMs));
-  const unitLabels: CounterUnitLabels = {
+  const unitLabels: CountdownUnitLabels = {
     days: t('countdown.days'),
     hours: t('countdown.hours'),
     minutes: t('countdown.minutes'),
     seconds: t('countdown.seconds'),
   };
-  const localizedProps: LocalizedCountdownRenderProps = { ...props, unitLabels };
-
-  if (renderer) return <>{renderer(localizedProps)}</>;
-  return <Counter {...localizedProps} size={size} />;
+  return <>{renderer({ ...props, unitLabels })}</>;
 }

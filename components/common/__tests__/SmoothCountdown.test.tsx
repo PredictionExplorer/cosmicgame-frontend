@@ -58,17 +58,30 @@ describe('SmoothCountdown', () => {
     expect(screen.getByTestId('seconds')).toHaveTextContent('1');
   });
 
-  it('feeds tenths to the existing Counter renderer under one minute', () => {
-    render(<SmoothCountdown date={12_900} />);
+  it('hands the renderer the milliseconds, so it can show tenths under a minute', () => {
+    render(
+      <SmoothCountdown
+        date={12_900}
+        renderer={({ seconds, milliseconds }) => (
+          <span data-testid="tenths">{`${seconds}.${Math.floor(milliseconds / 100)}`}</span>
+        )}
+      />,
+    );
 
-    expect(screen.getByTestId('countdown-tenths')).toHaveTextContent('.9');
+    expect(screen.getByTestId('tenths')).toHaveTextContent('12.9');
   });
 
-  it('supplies localized unit labels to the shared Counter', () => {
-    render(<SmoothCountdown date={90_000} />);
+  it("hands the renderer the locale's unit words", () => {
+    render(
+      <SmoothCountdown
+        date={90_000}
+        renderer={({ unitLabels }) => <span>{`${unitLabels.minutes} ${unitLabels.seconds}`}</span>}
+      />,
+    );
 
-    expect(screen.getByText('formats.countdown.minutes')).toBeInTheDocument();
-    expect(screen.getByText('formats.countdown.seconds')).toBeInTheDocument();
+    expect(
+      screen.getByText('formats.countdown.minutes formats.countdown.seconds'),
+    ).toBeInTheDocument();
   });
 
   it('renders an epoch deadline against the serialized clock before hydration', () => {
