@@ -41,7 +41,7 @@ describe('concept icons', () => {
     );
   });
 
-  it('never maps a concept to auction, lottery, prize or game imagery', () => {
+  it('never maps a concept to a glyph ESLint restricts', () => {
     const restricted = new Set(restrictedIconNames());
     for (const name of ['Gavel', 'Trophy', 'Crown', 'Swords', 'Gamepad2', 'Dices', 'Gift']) {
       expect(restricted.has(name)).toBe(true);
