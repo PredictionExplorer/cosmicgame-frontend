@@ -405,6 +405,8 @@ jest.mock('@/utils', () => ({
   formatTableAmount: (value: number | null | undefined) =>
     value == null || !Number.isFinite(value) ? '\u2014' : String(value),
   getAssetsUrl: (path: string) => `https://assets.example.com/${path}`,
+  getThumbUrl: (seed: string) => `https://assets.example.com/thumb/${seed}.webp`,
+  getWebImageUrl: (seed: string) => `https://assets.example.com/web/${seed}.webp`,
   getEnduranceChampions: () => [],
   getGestureKindLabel: (gestureType: unknown) =>
     gestureType === 2
@@ -1012,11 +1014,12 @@ describe('HomePage', () => {
     expect(
       screen.getByRole('link', { name: /home\.hero\.console\.viewSignatureAria/ }),
     ).toHaveAttribute('href', expect.stringMatching(/^\/detail\/\d+$/));
+    // The story's art hangs on its plate with a wall label, nothing over it.
     const story = screen.getByTestId('home-story-section');
-    expect(within(story).getByTestId('nft-image')).toHaveAttribute(
-      'alt',
-      expect.stringMatching(/^home\.hero\.console\.artworkAlt\(id=#\d{6}\)$/),
-    );
+    expect(within(story).getByTestId('art-frame')).toBeInTheDocument();
+    expect(
+      within(story).getByRole('img', { name: /^home\.hero\.console\.artworkAlt\(id=#\d{6}\)$/ }),
+    ).toBeInTheDocument();
   });
 
   it('shows the rotating artwork as the full-width hero, linked to its detail page', () => {

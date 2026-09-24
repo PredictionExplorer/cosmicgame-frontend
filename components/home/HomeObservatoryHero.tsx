@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Fingerprint, Orbit, Radio, Sparkles } from 'lucide-react';
+import { ArrowRight, Fingerprint, Orbit, Radio } from 'lucide-react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { formatId, getAssetsUrl } from '@/utils';
+import { formatId } from '@/utils';
 
 import { formatCount, formatPercent } from '@/utils/format';
 import { PublicGoodsIcon } from '@/lib/conceptIcons';
@@ -15,7 +15,8 @@ import { Button } from '@/components/ui/button';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Surface } from '@/components/ui/surface';
-import NFTImage from '@/components/nft/NFTImage';
+import { ArtFrame, PendingPlate, WallLabel } from '@/components/ui/art-frame';
+import { signatureMedia, signatureSources } from '@/components/nft/signatureMedia';
 // riseIn (not fadeRise): this section's copy must stay visible in the server
 // HTML instead of fading in after hydration — it is the page's crawlable
 // story text (and held the LCP before the Deck redesign moved the H1 up).
@@ -130,26 +131,6 @@ function getHeroPhaseView(phase: CyclePhase) {
   }
 }
 
-function getHeroArtSrc(bannerToken: BannerToken): string {
-  return getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`);
-}
-
-function ObservatoryArtworkUnavailable() {
-  const t = useTranslations('home');
-
-  return (
-    <div className="relative flex aspect-video min-h-[220px] overflow-hidden rounded-surface border border-rule-faint bg-surface-sunken">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgb(var(--aurora-cyan-rgb)/0.18),transparent_34%),radial-gradient(circle_at_78%_15%,rgb(var(--nebula-violet-rgb)/0.20),transparent_38%)]" />
-      <div className="pointer-events-none absolute inset-x-10 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/20 bg-primary/10 blur-sm" />
-      <div className="relative z-[1] m-auto max-w-xs px-6 text-center">
-        <p className="type-eyebrow text-primary">{t('hero.artUnavailable.eyebrow')}</p>
-        <p className="type-body-sm mt-3 text-muted-foreground">{t('hero.artUnavailable.body')}</p>
-      </div>
-    </div>
-  );
-}
-
 function useAnimatedNumber(value: number, durationMs = 650): number {
   const [displayValue, setDisplayValue] = useState(value);
   const previousValueRef = useRef(value);
@@ -208,7 +189,6 @@ export function HomeObservatoryHero({
   const animatedSignatureAllocation = useAnimatedNumber(signatureAllocation ?? 0);
   const hasRealBannerToken = bannerToken != null && bannerToken.seed !== '' && bannerToken.id >= 0;
   const artHref = hasRealBannerToken ? `/detail/${bannerToken.id}` : null;
-  const artSrc = hasRealBannerToken ? getHeroArtSrc(bannerToken) : null;
   const primaryCtaHref = canOpenGesturePanel ? '#make-gesture' : '/current-cycle';
   const phaseView = getHeroPhaseView(phase);
   const cycleLabel =
@@ -235,11 +215,7 @@ export function HomeObservatoryHero({
         initial="initial"
         animate="animate"
       >
-        <Surface variant="gradient-border-accent" radius="xl" padding="none" className="isolate">
-          <div className="pointer-events-none absolute -left-20 top-6 h-56 w-56 rounded-full bg-primary/20 blur-3xl" />
-          <div className="pointer-events-none absolute -right-24 -top-16 h-72 w-72 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.24)] blur-3xl" />
-          <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
-
+        <Surface variant="outlined" radius="xl" padding="none" className="isolate">
           <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:p-8">
             <m.div variants={staggerVariants} className="flex min-w-0 flex-col justify-center">
               <m.div
@@ -317,7 +293,7 @@ export function HomeObservatoryHero({
 
             <m.div variants={itemVariants} className="min-w-0">
               <Surface
-                variant="glass-bordered"
+                variant="quiet"
                 radius="xl"
                 padding="none"
                 className="h-full p-4 sm:p-5"
@@ -326,10 +302,7 @@ export function HomeObservatoryHero({
               >
                 <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary/12 ring-1 ring-primary/20">
-                      <Radio className="h-5 w-5 text-primary" />
-                      <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-live" />
-                    </div>
+                    <Radio className="size-5 shrink-0 text-subtle" aria-hidden />
                     <div>
                       <p className="type-eyebrow text-muted-foreground">
                         {t('hero.console.eyebrow')}
@@ -349,38 +322,34 @@ export function HomeObservatoryHero({
                   </Link>
                 </div>
 
-                {artHref && artSrc && bannerToken ? (
-                  <Link
-                    key={bannerToken.id}
-                    href={artHref}
-                    className="group block animate-in fade-in duration-700"
-                    aria-label={t('hero.console.viewSignatureAria', {
-                      id: formatId(bannerToken.id),
-                    })}
-                  >
-                    <div className="relative overflow-hidden rounded-surface border border-rule-faint bg-surface-sunken">
-                      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgb(var(--aurora-cyan-rgb)/0.16),transparent_34%),radial-gradient(circle_at_78%_15%,rgb(var(--nebula-violet-rgb)/0.18),transparent_38%)]" />
-                      {/* No `priority`: since the Deck redesign this section renders
-                          below the first viewport, so preloading the artwork would
-                          compete with the Deck's LCP text for bandwidth. */}
-                      <NFTImage
-                        src={artSrc}
+                {artHref && bannerToken ? (
+                  <figure className="min-w-0">
+                    <Link
+                      key={bannerToken.id}
+                      href={artHref}
+                      className="block rounded-edge"
+                      aria-label={t('hero.console.viewSignatureAria', {
+                        id: formatId(bannerToken.id),
+                      })}
+                    >
+                      {/* Below the first viewport since the Deck redesign: no
+                          priority, so the art never competes with the LCP. */}
+                      <ArtFrame
+                        sources={signatureSources(signatureMedia(bannerToken.seed))}
                         alt={t('hero.console.artworkAlt', { id: formatId(bannerToken.id) })}
-                        terminalFallbackSrc={null}
                         sizes="(max-width: 1024px) 100vw, 520px"
-                        className="relative transition-transform duration-700 group-hover:scale-[1.025]"
+                        unavailableLabel={t('hero.artUnavailable.eyebrow')}
+                        unavailableDetail={formatId(bannerToken.id)}
                       />
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 via-black/25 to-transparent px-4 pb-4 pt-12">
-                        <span className="glass type-caption inline-flex items-center gap-2 rounded-pill border border-rule px-3 py-1 text-foreground">
-                          <Sparkles className="h-3.5 w-3.5 text-primary" />
-                          {t('hero.console.signatureBadge', { id: formatId(bannerToken.id) })}
-                        </span>
-                        <ArrowRight className="h-4 w-4 text-white/80 transition-transform duration-300 group-hover:translate-x-1" />
-                      </div>
-                    </div>
-                  </Link>
+                    </Link>
+                    <figcaption className="mt-2">
+                      <WallLabel
+                        title={t('hero.console.signatureBadge', { id: formatId(bannerToken.id) })}
+                      />
+                    </figcaption>
+                  </figure>
                 ) : (
-                  <ObservatoryArtworkUnavailable />
+                  <PendingPlate label={t('hero.artUnavailable.eyebrow')} />
                 )}
 
                 <div className="mt-4 grid grid-cols-2 gap-2 min-[400px]:grid-cols-3">
