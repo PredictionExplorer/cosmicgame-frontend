@@ -116,9 +116,10 @@ describe('CstCalibrationWindowView', () => {
 
     const circles = container.querySelectorAll('circle');
     expect(circles).toHaveLength(3);
-    expect(circles[0]).toHaveAttribute('fill', 'hsl(var(--chart-1))'); // ETH
-    expect(circles[1]).toHaveAttribute('fill', '#fbbf24'); // RandomWalk
-    expect(circles[2]).toHaveAttribute('fill', 'hsl(var(--chart-2))'); // CST
+    // The gesture-method tokens every chart shares.
+    expect(circles[0]).toHaveAttribute('fill', 'hsl(var(--method-eth))');
+    expect(circles[1]).toHaveAttribute('fill', 'hsl(var(--method-eth-rwlk))');
+    expect(circles[2]).toHaveAttribute('fill', 'hsl(var(--method-cst))');
   });
 
   it('shows the low/high/now summary for the live cycle', () => {

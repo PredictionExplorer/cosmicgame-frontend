@@ -1,15 +1,29 @@
 /*
- * Global focus-visible recipe.
+ * Keyboard focus: one treatment for every interactive element.
  *
- * Every interactive element (button, a, [role=button], [tabindex]) gets a
- * two-layer aurora ring on keyboard focus. Pointer focus is suppressed
- * thanks to :focus-visible so the ring only appears when useful.
+ * A solid outline in the palette's ring colour, offset from the element.
+ * Outlines (unlike the box-shadow ring this replaces) are not removed by
+ * `shadow-*` utilities and survive Windows High Contrast / forced colours.
+ * Pointer focus shows nothing, thanks to :focus-visible.
  *
- * Tokens live in tokens.css (--focus-ring-*). Components opt out with the
- * `focus-ring-none` utility if they provide their own treatment.
+ * Tokens: --focus-ring-width, --focus-ring-offset, --focus-ring-color
+ * (styles/tokens.css). Utilities for the awkward cases:
+ *   focus-ring-inset   draw the ring inside the element, for full-bleed links
+ *                      and rows inside an `overflow: hidden` card, which clips
+ *                      an outside ring
+ *   focus-ring-within  draw the ring on a container whenever something inside
+ *                      it has keyboard focus (a card whose link is clipped)
+ *   focus-ring-none    the component draws its own indicator
  */
 
 @layer base {
+  /*
+   * The ring's colour, width and offset are set at rest, so an element with
+   * `transition-colors` (which animates outline-color) does not fade its ring
+   * in from the text colour and the offset never slides; on focus only the
+   * outline style changes. The width still computes to 0 while the style is
+   * none, which is why `transition-all` gets its own rule below.
+   */
   :where(
     a,
     button,
@@ -20,17 +34,145 @@
     [role='button'],
     [role='link'],
     [role='tab'],
-    [tabindex]:not([tabindex='-1'])
-  ):focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 var(--focus-ring-offset) hsl(var(--background)),
-      0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-ring-color),
-      0 0 24px var(--focus-ring-glow);
-    border-radius: inherit;
+    [role='checkbox'],
+    [role='radio'],
+    [role='switch'],
+    [role='slider'],
+    [role='menuitem'],
+    [role='menuitemradio'],
+    [role='menuitemcheckbox'],
+    [role='option'],
+    [tabindex]
+  ) {
+    outline-color: var(--focus-ring-color);
+    outline-width: var(--focus-ring-width);
+    outline-offset: var(--focus-ring-offset);
   }
 
-  .focus-ring-none:focus-visible {
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [role='button'],
+    [role='link'],
+    [role='tab'],
+    [role='checkbox'],
+    [role='radio'],
+    [role='switch'],
+    [role='slider'],
+    [tabindex]:not([tabindex='-1'])
+  ):focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /*
+   * A focusable element that is a direct child of a clipping container
+   * (overflow-hidden or overflow-clip) often fills it, like a full-card link,
+   * and the container would clip an outside ring away. Such elements draw
+   * the ring just inside their edge instead, which is visible whether or not
+   * they fill the box.
+   */
+  :where(.overflow-hidden, .overflow-clip)
+    > :where(
+      a,
+      button,
+      [role='button'],
+      [role='link'],
+      [tabindex]:not([tabindex='-1'])
+    ):focus-visible {
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+
+  /*
+   * Menu, listbox and command items take focus programmatically (roving
+   * tabindex -1) and fill their row, so the ring sits just inside them, on
+   * top of the highlight fill.
+   */
+  :where(
+    [role='menuitem'],
+    [role='menuitemradio'],
+    [role='menuitemcheckbox'],
+    [role='option']
+  ):focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
+}
+
+/*
+ * `transition-all` animates every property, the outline's width among them,
+ * and that width computes to 0 until the outline style turns solid, so the
+ * ring grew in from nothing over the element's transition (the accordion
+ * triggers showed a 0px outline right after Tab). On keyboard focus the
+ * outline switches at once; every other property keeps the element's own
+ * duration and easing. Two classes' worth of specificity beats `duration-*`.
+ */
+@layer utilities {
+  .transition-all:focus-visible {
+    transition-property: all, outline-width, outline-offset;
+    transition-duration: var(--tw-duration, var(--default-transition-duration)), 0s, 0s;
+  }
+}
+
+@utility focus-ring-inset {
+  &:focus-visible {
+    outline-offset: calc(var(--focus-ring-width) * -1 - 1px);
+  }
+}
+
+@utility focus-ring-within {
+  &:has(:focus-visible) {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+@utility focus-ring-none {
+  &:focus-visible {
+    outline: none;
     box-shadow: none;
+  }
+}
+
+/*
+ * Unlayered on purpose, so no utility can undo these.
+ *
+ * A bare `outline-none` (Tailwind's reset for mouse focus) must not erase the
+ * keyboard indicator: it only restores the outline style, keeping the
+ * element's own colour, width and offset if it sets them. Elements that draw
+ * their own ring through `focus-visible:outline-none focus-visible:ring-*`
+ * are left alone until they migrate to the outline.
+ */
+:where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [role='button'],
+    [role='link'],
+    [role='tab'],
+    [role='menuitem'],
+    [role='menuitemradio'],
+    [role='menuitemcheckbox'],
+    [role='option'],
+    [tabindex]:not([tabindex='-1'])
+  ):where(.outline-none):focus-visible:not(.focus-ring-none) {
+  outline-style: solid !important;
+}
+
+/*
+ * Forced colours drop box-shadows and author colours. Every focused element
+ * gets a system-coloured outline, including the ones that opted out above.
+ */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px;
   }
 }

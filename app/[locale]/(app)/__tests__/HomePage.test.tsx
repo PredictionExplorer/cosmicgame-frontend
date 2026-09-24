@@ -1165,6 +1165,16 @@ describe('HomePage', () => {
     ).toHaveAttribute('href', '/gallery');
   });
 
+  it('sets the control desk on the full-strength atmosphere and starfield', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<HomePage />);
+    // The home is a hero page: full palette atmosphere plus the static
+    // starfield, where data pages dim both to 40% (`subtle`).
+    const backdrop = document.querySelector('[data-ambient-backdrop]');
+    expect(backdrop).toHaveAttribute('data-ambient-backdrop', 'hero');
+    expect(backdrop!.querySelector('[data-starfield]')).not.toBeNull();
+  });
+
   /* ── Gesture flow (the one panel) ───────────────────────────── */
 
   it('switches methods through the shared state, resetting any picked RandomWalk token', async () => {

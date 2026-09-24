@@ -35,7 +35,9 @@ function pad(value: number): string {
 
 function renderCompactCountdown({ days, hours, minutes, seconds }: CountdownRenderProps) {
   return (
-    <span className="font-mono text-sm font-semibold tabular-nums">
+    // One unbreakable run: squeezed by a long Korean button label, the
+    // countdown used to wrap its last digit (or its days) onto a new line.
+    <span className="whitespace-nowrap font-mono text-sm font-semibold tabular-nums">
       {days > 0 ? `${days}d ` : ''}
       {pad(hours)}:{pad(minutes)}:{pad(seconds)}
     </span>

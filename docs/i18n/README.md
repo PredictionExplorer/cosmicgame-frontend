@@ -349,17 +349,36 @@ Clash Display (display headings) and Inter (body) contain **no CJK glyphs**. Wit
 action, Chinese renders in unstyled system fallback.
 
 - Add **Noto Sans SC** via `next/font/google` (one variable-weight set,
-  `--font-noto-sc`, `display: 'optional'`). Google Fonts serves it as ~100 small
-  `unicode-range` slices, so browsers only download the glyph ranges a page actually uses —
-  English pages fetch nothing. `optional` prevents a late CJK metric swap on slow links;
-  the approved system CJK stack remains visible when Noto misses the short load window.
-  Noto is appended to the global font stacks unconditionally (after Inter / after Clash
-  Display).
+  `display: 'optional'`). Google Fonts serves it as ~100 small `unicode-range` slices, so
+  browsers only download the glyph ranges a page actually uses. `optional` prevents a late
+  CJK metric swap on slow links; the approved system CJK stack remains visible when Noto
+  misses the short load window.
+- **Each companion face loads on its own locale's pages only.** The root layout serves
+  every locale, and next/font attaches a face's `@font-face` stylesheet to every page of
+  the module graph that declares it — declared in `lib/fonts.ts`, the five CJK cuts made
+  every English page carry about 170 KB of render-blocking CSS. Each face therefore lives in
+  its own module under `components/theme/companion-fonts/`, and `CompanionFontFaces`
+  (rendered by `RootDocument`) loads the page locale's module through `next/dynamic`, which
+  links that face's stylesheet and no other. `lib/fonts.ts` keeps only descriptors (`id`,
+  `family`, `variable`), and `styles/global.css` names each family in its variable
+  (`--font-noto-sc: 'Noto Sans SC'`) so every stack stays valid on pages that never load
+  the face. `lib/__tests__/fonts-policy.test.ts` checks the descriptor, the module, the
+  loader entry and the variable agree.
 - Chinese headings render in the locale's Noto Sans cut via fallback (Clash Display has
-  no CJK). An `html:lang(zh)` rule — matching `zh`, `zh-TW`, and `zh-HK` alike — bumps
-  display-heading weight to 700 and tightens letter-spacing to `0` (CJK must never be
-  letter-spaced like the Latin display face).
-- System fallback chain after Noto: `"PingFang SC", "Microsoft YaHei", sans-serif`.
+  no CJK). The `html:lang(zh), html:lang(ja), html:lang(ko)` rule sets the display tokens
+  (`--display-weight: 600`, `--display-tracking-scale: 0`) that every display and heading
+  utility reads, and the `:lang()` heading rules set tracking to `0` (CJK must never be
+  letter-spaced like the Latin display face). 600 rather than 700: every CJK face in the
+  stacks carries it, and it stays below the Latin display voice.
+- The default `--cjk-font-stack` (English, Ukrainian and Vietnamese pages) is
+  platform-only: PingFang SC, Hiragino Sans, Apple SD Gothic Neo, Microsoft YaHei and
+  Malgun Gothic. Each CJK locale swaps in its own Noto cut first. Elements whose own
+  `lang` differs from the page's (the language menu's endonyms) re-declare the text stack
+  with their language's cut (`:where([lang]:not(html)):lang(ja)` …), so 日本語 takes
+  Japanese forms on an English page.
+- Chinese ellipses and dashes: Inter leads the text stack and carries `…` and `—`, so the
+  zh, zh-TW and zh-HK text stacks start with a `local()` alias limited to those code points
+  (plus `“”` for zh) that resolves to the platform's regional CJK face.
 - **Three cuts, one property.** Noto Sans SC, TC, and HK share a design but differ in
   glyph forms (mainland, Taiwan MOE, and Hong Kong 常用字字形表 standards); a Hong Kong
   reader shown TC forms sees text that is legible but subtly wrong. Every font-family that
@@ -372,24 +391,27 @@ action, Chinese renders in unstyled system fallback.
 - **Hangul (Korean).** Noto Sans KR is the Korean cut of the same family, loaded with the
   same policy (`--font-noto-kr`); `html:lang(ko)` swaps it into `--cjk-font-stack`, so
   Korean falls through per glyph like Chinese (Latin tokens stay in Clash / Inter). The
-  CJK heading rule (weight 700, tracking 0) covers `:lang(ko)` too, and `html:lang(ko)`
+  CJK display tokens (weight 600, tracking 0) cover `:lang(ko)` too, and `html:lang(ko)`
   sets `word-break: keep-all` — the browser's CJK default breaks a Korean word between
-  syllables, which is the most visible typographic defect in Korean web copy;
-  `.font-mono` opts back into `break-all` so addresses still wrap.
+  syllables, which is the most visible typographic defect in Korean web copy. Monospace
+  text keeps `keep-all` as well (a `break-all` opt-out used to split the live countdown and
+  durations mid-number); addresses and hashes still wrap through
+  `overflow-wrap: anywhere`.
 - **Kanji and kana (Japanese).** Noto Sans JP is the Japanese cut (`--font-noto-jp`): its
   kanji follow the JIS glyph standard, which differs from every Chinese cut (直, 骨, 令 are
   drawn differently), and it carries the kana the Chinese cuts only nominally cover.
   `html:lang(ja)` swaps it into `--cjk-font-stack` with the Japanese system faces as
   fallbacks and sets `line-break: strict` (kinsoku: no line starts with a small kana or ー);
   it deliberately does **not** set `keep-all`, which is right for Korean and wrong for a
-  language with no word spaces. Display headings additionally opt into
-  `word-break: auto-phrase` so browsers that support it break between phrases rather than
-  mid-word. The CJK heading, tracking, and mono rules cover `:lang(ja)` alongside `zh` and
-  `ko`. The white-paper PDF binds Hiragino's separately named weights explicitly
+  language with no word spaces. Headings, ledes, labels, captions, buttons, tabs,
+  summaries and definition lists additionally opt into `word-break: auto-phrase` so
+  browsers that support it break between phrases rather than mid-word; paragraphs keep
+  normal breaking with `text-wrap: pretty`, which avoids a lone 「す。」 line. The CJK
+  heading, tracking, and mono rules cover `:lang(ja)` alongside `zh` and `ko`. The white-paper PDF binds Hiragino's separately named weights explicitly
   (`BoldFont={Hiragino Mincho ProN W6}`), because fontspec cannot infer them.
 - **The companion face is a registry.** `LOCALE_COMPANION_FONTS` in `lib/fonts.ts` records
-  one face (or `null`) per locale, `RootDocument` derives its font-variable classes from
-  it, and `OG_TYPOGRAPHY` (`lib/og/fonts.ts`) + `OG_FONT_SOURCES`
+  one face (or `null`) per locale, `RootDocument` loads the page locale's face from it
+  through `CompanionFontFaces`, and `OG_TYPOGRAPHY` (`lib/og/fonts.ts`) + `OG_FONT_SOURCES`
   (`scripts/build-og-fonts-core.ts`) do the same for the OG subsets — all four cuts and
   Onest are built by one `npm run og:fonts` run, and a unit test fails when the two OG
   registries disagree or a notice is missing from `THIRD_PARTY_NOTICES.md`.
@@ -401,10 +423,14 @@ action, Chinese renders in unstyled system fallback.
 `cyrillic-ext` `unicode-range` slices, so body text needs nothing extra and those slices
 are fetched on demand only (never preloaded — English pages must not pay for them).
 Clash Display, however, has no Cyrillic glyphs, so `/uk` headings switch to **Onest**
-(`next/font/google`, `--font-onest`, `preload: false`, `display: 'optional'` — the same
-policy as Noto Sans SC). The display stack is indirected through the
-`--display-font-stack` custom property in `styles/global.css`: `html:lang(uk)` replaces
-the whole stack rather than appending Onest after Clash, so Latin letters inside a
+(`next/font/google`, `--font-onest`, `preload: false`, loaded on `/uk` and `/vi` only).
+Onest is small, so it uses `display: 'swap'` rather than `optional`: with `optional` the
+hero headline painted in the fallback and never swapped while later headings picked Onest
+up, so one page showed two display faces. Onest and Inter are narrower than Clash, so the
+same rule halves the display tracking (`--display-tracking-scale: 0.45`). The display
+stack is indirected through the `--display-font-stack` custom property in
+`styles/global.css`: `html:lang(uk)` replaces the whole stack rather than appending Onest
+after Clash, so Latin letters inside a
 Ukrainian heading (ETH, CST, brand names) do not render in a different face with a
 different x-height. OG images for `/uk` load `assets/fonts/Onest-700.subset.ttf`, cut by
 `npm run og:fonts` like the CJK subsets, through `lib/og/fonts.ts`.

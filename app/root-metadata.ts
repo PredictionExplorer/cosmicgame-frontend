@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 
 import { getLocaleConfig } from '@/i18n/localeConfig';
 import { LANDING_ORIGIN } from '@/lib/hostRouting';
+import { DEFAULT_SITE_THEME, THEME_CHROME } from '@/lib/theme/config';
 
 // Browsers cache favicons separately from normal HTTP cache entries and per
 // origin. Increment this value whenever either favicon asset is replaced.
@@ -116,8 +117,13 @@ export const rootMetadata: Metadata = createRootMetadata(englishRootMetadataCopy
   canonical: LANDING_ORIGIN,
 });
 
+/**
+ * `themeColor` is the default palette's page colour. The theme bootstrap
+ * (lib/theme/config.ts) rewrites it before first paint for the visitor's
+ * palette, so mobile browser chrome always blends into the page.
+ */
 export const rootViewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#15BFFD',
+  themeColor: THEME_CHROME[DEFAULT_SITE_THEME],
 };

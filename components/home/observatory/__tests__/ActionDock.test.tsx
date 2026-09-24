@@ -44,6 +44,14 @@ describe('ActionDock', () => {
     expect(baseProps.onOpenSheet).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps the dock countdown on one line', () => {
+    render(<ActionDock {...baseProps} />);
+    const dock = screen.getByTestId('action-dock-mobile');
+    const countdown = within(dock).getByText(/\d{2}:\d{2}:\d{2}/);
+    // Korean labels squeeze the countdown column; the digits must not wrap.
+    expect(countdown).toHaveClass('whitespace-nowrap');
+  });
+
   it('shows the desktop dock only after the stage scrolls away', async () => {
     const user = userEvent.setup();
     const { rerender } = render(<ActionDock {...baseProps} />);

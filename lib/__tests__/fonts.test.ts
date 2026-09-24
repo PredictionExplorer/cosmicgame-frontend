@@ -3,6 +3,7 @@ import {
   clashDisplay,
   FONT_VARIABLE_CLASS_NAMES,
   inter,
+  jetbrainsMono,
   LOCALE_COMPANION_FONTS,
 } from '@/lib/fonts';
 
@@ -13,13 +14,23 @@ describe('locale companion fonts', () => {
     expect(LOCALE_COMPANION_FONTS[routing.defaultLocale]).toBeNull();
   });
 
-  it('puts every face the document may need on <html>', () => {
-    const classes = FONT_VARIABLE_CLASS_NAMES.split(' ');
-    expect(classes).toContain(clashDisplay.variable);
-    expect(classes).toContain(inter.variable);
-    for (const font of Object.values(LOCALE_COMPANION_FONTS)) {
-      if (font) expect(classes).toContain(font.variable);
-    }
-    expect(new Set(classes).size).toBe(classes.length);
+  it('gives each companion face one family, variable and module', () => {
+    const faces = Object.values(LOCALE_COMPANION_FONTS).filter((face) => face !== null);
+    const byId = new Map(faces.map((face) => [face.id, face]));
+    // A face shared by two locales (Onest) is the same descriptor object.
+    for (const face of faces) expect(byId.get(face.id)).toBe(face);
+    const variables = [...byId.values()].map((face) => face.variable);
+    expect(new Set(variables).size).toBe(variables.length);
+    for (const face of byId.values()) expect(face.variable).toMatch(/^--font-[a-z-]+$/);
+  });
+
+  it('puts only the faces every page loads on <html>', () => {
+    // Companion faces need no class: styles/global.css names their families,
+    // and their @font-face rules load on their own locale's pages only.
+    expect(FONT_VARIABLE_CLASS_NAMES.split(' ')).toEqual([
+      clashDisplay.variable,
+      inter.variable,
+      jetbrainsMono.variable,
+    ]);
   });
 });

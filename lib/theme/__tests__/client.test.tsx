@@ -10,6 +10,7 @@ import {
 import {
   DEFAULT_SITE_THEME,
   THEME_CHANGE_EVENT,
+  THEME_CHROME,
   THEME_COOKIE_NAME,
   THEME_STORAGE_KEY,
 } from '../config';
@@ -63,15 +64,19 @@ describe('browser theme preferences', () => {
   });
 
   it('keeps mobile browser chrome aligned with the applied palette', () => {
-    document.documentElement.style.setProperty('--background', '218 35% 8%');
     const meta = document.createElement('meta');
     meta.name = 'theme-color';
     meta.content = '#000000';
     document.head.appendChild(meta);
 
     setSiteTheme('classic-blue');
+    expect(meta.content).toBe(THEME_CHROME['classic-blue']);
 
-    expect(meta.content).toBe('hsl(218 35% 8%)');
+    // A soft navigation re-renders the viewport meta with the static default;
+    // restoring the saved palette paints it again.
+    meta.content = THEME_CHROME[DEFAULT_SITE_THEME];
+    restoreSiteTheme();
+    expect(meta.content).toBe(THEME_CHROME['classic-blue']);
   });
 
   it('ignores unsupported selections without changing the page or persistence', () => {

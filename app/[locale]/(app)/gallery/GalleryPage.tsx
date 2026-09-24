@@ -443,11 +443,15 @@ const GalleryPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             </div>
           ) : null}
         </div>
-        <div className="relative min-h-[220px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.10] bg-black/30">
+        {/*
+         * The vignette, hue strip and badge are painted over the link, so the
+         * plate draws the focus ring for it (focus-ring-within).
+         */}
+        <div className="focus-ring-within relative min-h-[220px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.10] bg-black/30">
           {featuredNft && featuredImage ? (
             <Link
               href={`/detail/${featuredNft.TokenId}`}
-              className="group block h-full min-h-[220px]"
+              className="focus-ring-none group block h-full min-h-[220px]"
               aria-label={t('featured.viewAria', { id: formatId(featuredNft.TokenId) })}
             >
               <NFTImage

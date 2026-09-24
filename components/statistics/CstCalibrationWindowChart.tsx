@@ -25,19 +25,15 @@ import { useNow } from '@/hooks/useNow';
 import { CyclePickerSection } from '@/components/statistics/CyclePickerSection';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
+import { GESTURE_METHOD_COLOR, gestureMethodColor } from '@/lib/theme/dataColors';
 
 const LINE_COLOR = 'hsl(var(--foreground) / 0.85)';
-const ETH_COLOR = 'hsl(var(--chart-1))'; // ETH gesture (shortens the window)
-const RWALK_COLOR = '#fbbf24'; // amber — ETH + RandomWalk gesture (shortens)
-const CST_COLOR = 'hsl(var(--chart-2))'; // CST gesture (lengthens)
+// ETH gestures (with or without a RandomWalk NFT) shorten the window; CST gestures lengthen it.
+const ETH_COLOR = GESTURE_METHOD_COLOR.eth;
+const RWALK_COLOR = GESTURE_METHOD_COLOR.ethRandomWalk;
+const CST_COLOR = GESTURE_METHOD_COLOR.cst;
 
 const CHART_HEIGHT = 360;
-
-function gestureColor(gestureType: number): string {
-  if (gestureType === 2) return CST_COLOR;
-  if (gestureType === 1) return RWALK_COLOR;
-  return ETH_COLOR;
-}
 
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
@@ -86,7 +82,7 @@ function WindowTooltip({ active, payload }: WindowTooltipProps) {
             <dt className="flex items-center gap-2">
               <span
                 className="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: gestureColor(point.gestureType) }}
+                style={{ backgroundColor: gestureMethodColor(point.gestureType) }}
               />
               {typeLabel}
             </dt>
@@ -120,7 +116,7 @@ function gestureDot(props: DotProps) {
       cx={cx}
       cy={cy}
       r={isCst ? 2.5 : 1.5}
-      fill={gestureColor(payload.gestureType)}
+      fill={gestureMethodColor(payload.gestureType)}
       fillOpacity={isCst ? 0.95 : 0.7}
       stroke="none"
     />

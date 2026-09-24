@@ -3,6 +3,8 @@
   with the full brand palette plus lexicon-safe gradient names
   (Allocation Shimmer replaces the old Prize Shimmer label per lexicon).
   Semantic accents retain their OKLCH values; interface colors follow the site palette.
+
+  docs/design-system.md documents every token and utility declared here.
 */
 
 @theme inline {
@@ -40,19 +42,45 @@
   );
 
   /*
-   * Motion tokens — surfaced as Tailwind utilities:
-   *   duration-instant / duration-fast / duration-base / duration-slow / duration-page
-   *   ease-out-expo / ease-out-soft / ease-in-out-soft / ease-spring
+   * Motion tokens, surfaced as Tailwind utilities:
+   *   duration-instant (press) / duration-fast (hover, colour) /
+   *   duration-base (disclosures, tabs, sheets) / duration-slow (lights down,
+   *   plate reveal) / duration-page (the ceiling) / duration-settle (a changed
+   *   live value washing back to foreground)
+   *   ease-out-expo (entrances) / ease-gallery (lights down) / ease-out-soft /
+   *   ease-in-out-soft
+   * No springs and no overshoot: --ease-spring is kept as an alias of
+   * --ease-out-expo so existing call sites stop bouncing.
    */
   --duration-instant: 80ms;
   --duration-fast: 150ms;
-  --duration-base: 300ms;
-  --duration-slow: 500ms;
-  --duration-page: 700ms;
+  --duration-base: 240ms;
+  --duration-slow: 400ms;
+  --duration-page: 560ms;
+  --duration-settle: 900ms;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-gallery: cubic-bezier(0.2, 0, 0, 1);
   --ease-out-soft: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-in-out-soft: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-spring: var(--ease-out-expo);
+}
+
+/*
+ * Radius scale: four values. Tailwind's rounded-sm / rounded-md resolve to
+ * `control` and rounded-lg / -xl / -2xl / -3xl to `surface` (styles/global.css),
+ * so existing call sites already land on the scale.
+ *   rounded-edge     2px   art plates, tags and badges (the museum-print edge)
+ *   rounded-control  8px   buttons, fields, menus, tabs, menu items
+ *   rounded-surface  12px  the one quiet group, dialogs, sheets, link cards
+ *   rounded-pill           the live status pill and the segmented control track
+ * `static` emits every variable even when no utility uses it, because CSS
+ * modules and arbitrary values read them directly.
+ */
+@theme static {
+  --radius-edge: 2px;
+  --radius-control: 0.5rem;
+  --radius-surface: 0.75rem;
+  --radius-pill: 9999px;
 }
 
 :root {
@@ -67,6 +95,25 @@
   --impact-green-rgb: 0 214 143;
   --muted-cosmos-rgb: from hsl(var(--muted)) r g b;
 
+  /*
+   * Art. Every Signature is rendered at 3456 x 2234 and hangs on a pure
+   * black plate with object-fit: contain; nothing overlays, crops or tints
+   * it. The plate sits 1.06 to 1.14:1 against every palette's background,
+   * so it reads as a deliberate object rather than a letterbox. --art-edge
+   * is the plate's only hover and focus signal.
+   */
+  --art-ratio: 3456 / 2234;
+  --art-ground: 0 0% 0%;
+  --art-edge: inset 0 0 0 1px hsl(var(--foreground) / 0.06);
+  --art-edge-active: inset 0 0 0 1px hsl(var(--foreground) / 0.14);
+
+  /*
+   * Starfield: about 40 static points at three opacities on a 720px tile,
+   * used as a mask so the points take the palette's foreground colour (the
+   * `starfield` utility). The atmosphere's only texture: no lines, no motion.
+   */
+  --starfield: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='720'%3E%3Ccircle cx='441.7' cy='676.1' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='119.6' cy='364.2' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='78.6' cy='286.6' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='396.7' cy='517.6' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='551.5' cy='577.1' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='459.8' cy='468.6' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='374.8' cy='458.0' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='492.4' cy='157.2' r='0.9' fill-opacity='0.9'/%3E%3Ccircle cx='251.0' cy='615.9' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='205.7' cy='427.3' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='391.2' cy='395.6' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='380.3' cy='221.7' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='331.5' cy='153.4' r='0.9' fill-opacity='0.9'/%3E%3Ccircle cx='300.4' cy='702.5' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='120.6' cy='641.5' r='0.9' fill-opacity='0.9'/%3E%3Ccircle cx='630.6' cy='672.2' r='0.9' fill-opacity='0.9'/%3E%3Ccircle cx='11.7' cy='468.3' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='551.0' cy='117.6' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='71.1' cy='151.3' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='280.4' cy='375.6' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='393.0' cy='5.7' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='180.9' cy='521.4' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='133.6' cy='126.8' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='158.2' cy='39.3' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='299.9' cy='527.5' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='691.8' cy='150.0' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='539.0' cy='680.2' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='472.4' cy='539.9' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='688.3' cy='599.2' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='317.1' cy='439.0' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='363.1' cy='623.5' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='48.2' cy='629.2' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='360.5' cy='77.7' r='0.9' fill-opacity='0.9'/%3E%3Ccircle cx='646.3' cy='410.7' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='266.9' cy='146.4' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='198.6' cy='172.5' r='0.9' fill-opacity='0.9'/%3E%3Ccircle cx='194.8' cy='237.2' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='192.0' cy='339.7' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='690.6' cy='343.6' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='448.1' cy='205.1' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='68.8' cy='527.4' r='0.6' fill-opacity='0.55'/%3E%3Ccircle cx='645.4' cy='531.9' r='0.6' fill-opacity='0.55'/%3E%3C/svg%3E");
+
   /* Semantic spacing — complements Tailwind's numeric scale */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
@@ -77,25 +124,59 @@
   --space-3xl: 4rem;
   --space-4xl: 6rem;
 
-  /* Radius scale — semantic, distinct from Tailwind's sm/md/lg/xl */
-  --radius-pill: 9999px;
-  --radius-field: 0.375rem;
-  --radius-button: 0.5rem;
-  --radius-card: 0.75rem;
-  --radius-surface: 1rem;
-  --radius-hero: 1.5rem;
+  /*
+   * Layout rhythm. --gutter is the one content edge shared by the header,
+   * pages and footer on both hosts (the site-container utility). Sections on
+   * landing and long-form pages are --section-gap apart, blocks on data pages
+   * --block-gap, stacked items --stack-gap. --row-h is a ledger row.
+   */
+  --gutter: clamp(1rem, 4vw, 5rem);
+  --section-gap: clamp(4rem, 3rem + 5vw, 8rem);
+  --block-gap: 3rem;
+  --stack-gap: 1.5rem;
+  --row-h: 3rem;
+  --row-h-dense: 2.75rem;
+  --measure-prose: 66ch;
+  --measure-lede: 60ch;
 
-  /* Elevation — four-step shadow scale tuned for a dark cosmic surface */
+  /* Retired radius names, aliased onto the scale above. */
+  --radius-field: var(--radius-control);
+  --radius-button: var(--radius-control);
+  --radius-card: var(--radius-surface);
+  --radius-hero: var(--radius-surface);
+
+  /*
+   * Elevation. Depth is only for things that actually float (popovers,
+   * dialogs, sheets, the dock); page content gets no shadow and no glow.
+   * --elevation-float carries a rim light on its top edge so it reads on a
+   * near-black ground. The four-step scale is kept for existing call sites.
+   */
+  --elevation-float:
+    inset 0 1px 0 hsl(var(--foreground) / 0.06), 0 0 0 1px hsl(var(--rule)),
+    0 12px 24px -8px rgb(0 0 0 / 0.45), 0 4px 8px -2px rgb(0 0 0 / 0.25);
   --elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.25);
   --elevation-2: 0 4px 8px -2px rgb(0 0 0 / 0.35), 0 1px 3px 0 rgb(0 0 0 / 0.2);
   --elevation-3: 0 12px 24px -8px rgb(0 0 0 / 0.45), 0 4px 8px -2px rgb(0 0 0 / 0.25);
   --elevation-4: 0 24px 48px -16px rgb(0 0 0 / 0.55), 0 8px 16px -4px rgb(0 0 0 / 0.35);
 
-  /* Focus ring — two-layer ring: background offset then aurora glow */
+  /*
+   * Glass: only the sticky header, the mobile dock, sheets and menus. The
+   * `glass` utility (global.css) falls back to an opaque fill under
+   * prefers-reduced-transparency.
+   */
+  --glass-fill: hsl(var(--background) / 0.78);
+  --glass-blur: 16px;
+
+  /*
+   * Focus ring: a solid outline in the palette's --ring colour (8.4 to
+   * 12.2:1 on every background), offset from the element. Outlines survive
+   * forced-colors mode and `shadow-*` utilities; see styles/focus-ring.css.
+   */
   --focus-ring-offset: 2px;
   --focus-ring-width: 2px;
-  --focus-ring-color: hsl(var(--ring) / 0.8);
-  --focus-ring-glow: hsl(var(--ring) / 0.2);
+  --focus-ring-color: hsl(var(--ring));
+  /* Retired with the box-shadow ring; kept so old references stay valid. */
+  --focus-ring-glow: transparent;
 }
 
 @layer utilities {

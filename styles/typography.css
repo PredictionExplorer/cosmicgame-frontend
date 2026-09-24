@@ -1,63 +1,88 @@
 /*
- * Typography scale — applied via Tailwind @utility so every class composes
- * with variants (sm:, md:, hover:, etc.) just like built-in text utilities.
+ * Typography — applied via Tailwind @utility so every class composes with
+ * variants (sm:, md:, hover:, …) like the built-in text utilities.
  *
- * Usage: <h1 class="type-display-lg">…</h1>
+ *   <h1 class="type-display-sm">…</h1>
  *
- * The display + heading tiers use the ClashDisplay variable font
- * (loaded via next/font in lib/fonts.ts → --font-family-display).
+ * Four roles, three families plus one mono (docs/design-system.md):
+ *   Display  Clash Display 500, at 24px and above only, never bold. Onest
+ *            replaces it for uk and vi; CJK glyphs come from the locale's
+ *            Noto Sans cut. Weight, tracking and word spacing are per-script
+ *            tokens set in styles/global.css (--display-weight,
+ *            --display-tracking-scale, --display-word-spacing).
+ *   Text     Inter 400/500/600: body, labels, buttons and every heading of
+ *            24px or less (type-heading-3, type-title).
+ *   Figures  Inter with tabular, lining numerals and a slashed zero.
+ *   Ids      JetBrains Mono, only for addresses, hashes, seeds and token
+ *            numbers (type-hash, type-mono).
  *
- * Every tier sets `overflow-wrap: break-word`. Display sizes start at 36px, so
- * a single long word — a token name, an untranslated identifier — is wider
- * than a 320px screen and would otherwise escape its container.
+ * The scale has nine text steps: 12 (floor) / 13 / 14 / 16 / 18 / 20 / 24 /
+ * 32 / 44 px, plus the display clamps. Nothing a reader needs renders below
+ * 12px. The type utilities never set a colour: pair labels, captions and
+ * eyebrows with `text-subtle` (or another text tier) at the call site.
+ *
+ * Every tier sets `overflow-wrap: break-word`: display sizes start at 28px, so
+ * one long word (a token name, an untranslated identifier) is wider than a
+ * 320px screen and would otherwise escape its container.
  */
 
+/* ── Display: Clash Display, 28px and up ─────────────────────────────── */
+
+/* Landing hero only. */
 @utility type-display-xl {
   font-family: var(--font-family-display);
   font-size: clamp(3.5rem, 4vw + 2rem, 5.75rem); /* 56 → 92px */
   line-height: 1;
-  font-weight: 500;
-  letter-spacing: -0.03em;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.03em * var(--display-tracking-scale));
   text-wrap: balance;
   overflow-wrap: break-word;
 }
 
+/* Landing section H2s. */
 @utility type-display-lg {
   font-family: var(--font-family-display);
   font-size: clamp(2.75rem, 3vw + 1.75rem, 4.5rem); /* 44 → 72px */
   line-height: 1.05;
-  font-weight: 500;
-  letter-spacing: -0.025em;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.025em * var(--display-tracking-scale));
   text-wrap: balance;
   overflow-wrap: break-word;
 }
 
+/* Long-form H1, detail title. */
 @utility type-display-md {
   font-family: var(--font-family-display);
   font-size: clamp(2.25rem, 2vw + 1.5rem, 3.5rem); /* 36 → 56px */
   line-height: 1.1;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.02em * var(--display-tracking-scale));
   text-wrap: balance;
   overflow-wrap: break-word;
 }
 
+/* Every app and utility-page H1. */
 @utility type-display-sm {
   font-family: var(--font-family-display);
   font-size: clamp(1.75rem, 1.5vw + 1.25rem, 2.5rem); /* 28 → 40px */
   line-height: 1.15;
-  font-weight: 500;
-  letter-spacing: -0.015em;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.015em * var(--display-tracking-scale));
+  word-spacing: var(--display-word-spacing);
   text-wrap: balance;
   overflow-wrap: break-word;
 }
+
+/* ── Headings ─────────────────────────────────────────────────────────── */
 
 @utility type-heading-1 {
   font-family: var(--font-family-display);
   font-size: clamp(1.5rem, 1vw + 1.125rem, 2rem); /* 24 → 32px */
   line-height: 1.2;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.01em * var(--display-tracking-scale));
+  word-spacing: var(--display-word-spacing);
+  text-wrap: balance;
   overflow-wrap: break-word;
 }
 
@@ -65,24 +90,93 @@
   font-family: var(--font-family-display);
   font-size: 1.5rem; /* 24px */
   line-height: 1.25;
-  font-weight: 500;
-  letter-spacing: -0.005em;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.005em * var(--display-tracking-scale));
+  word-spacing: var(--display-word-spacing);
   overflow-wrap: break-word;
 }
 
+/*
+ * Data-page section titles and long-form H2s: the smallest Clash tier. A
+ * section heading that sits in a panel or card uses type-heading-3 instead.
+ */
+@utility type-section {
+  font-family: var(--font-family-display);
+  font-size: clamp(1.5rem, 1rem + 1vw, 1.75rem); /* 24 → 28px */
+  line-height: 1.2;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.01em * var(--display-tracking-scale));
+  word-spacing: var(--display-word-spacing);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+/*
+ * Inter from here down: Clash never renders below 24px. The two Inter
+ * heading tiers and the figures name the text stack themselves, so they stay
+ * Inter inside a `font-display` or `font-mono` parent; the reading and label
+ * tiers inherit their family.
+ */
 @utility type-heading-3 {
-  font-size: 1.25rem; /* 20px */
+  font-family: var(--body-font-stack);
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.25rem); /* 18 → 20px */
   line-height: 1.3;
   font-weight: 600;
   letter-spacing: -0.005em;
   overflow-wrap: break-word;
 }
 
+/* Panel, card and dialog titles. */
+@utility type-title {
+  font-family: var(--body-font-stack);
+  font-size: 1rem; /* 16px */
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  overflow-wrap: break-word;
+}
+
+/* ── Reading text ─────────────────────────────────────────────────────── */
+
 @utility type-body-lg {
   font-size: 1.125rem; /* 18px */
   line-height: 1.6;
   font-weight: 400;
   overflow-wrap: break-word;
+}
+
+/* The one-sentence page lede under an H1. */
+@utility type-lede {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.55;
+  font-weight: 400;
+  max-inline-size: var(--measure-lede);
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+/*
+ * Long-form prose (legal, learn, white paper, FAQ answers): a 66-character
+ * measure. Cyrillic and Vietnamese stacked diacritics need a little more
+ * leading; CJK sets at 16px on a looser 1.85 line with a 40em measure.
+ */
+@utility type-prose {
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.65;
+  font-weight: 400;
+  max-inline-size: var(--measure-prose);
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+
+  &:where(:lang(uk), :lang(vi)) {
+    line-height: 1.7;
+  }
+
+  &:where(:lang(zh), :lang(ja), :lang(ko)) {
+    font-size: 1rem;
+    line-height: 1.85;
+    max-inline-size: 40em;
+  }
 }
 
 @utility type-body-md {
@@ -99,39 +193,164 @@
   overflow-wrap: break-word;
 }
 
+/* ── Labels ───────────────────────────────────────────────────────────── */
+
+/*
+ * Field, figure and ledger-header labels: sentence case, no tracking, so
+ * labels translate naturally and never break mid-word. Pair with text-subtle.
+ */
+@utility type-label {
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.125rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  overflow-wrap: break-word;
+}
+
+/*
+ * Section and page kicker: at most once per landing section or page header.
+ * Chinese, Japanese and Korean have no case and need no tracking, so under
+ * :lang() the eyebrow is a plain 13px label. The rule lives on the utility,
+ * so a language island (a menu endonym) follows its own script.
+ */
+@utility type-eyebrow {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  /*
+   * In a narrow column (a two-up stat grid on a phone) a long uppercase word
+   * can be wider than its label: hyphenate it at a syllable rather than
+   * letting overflow-wrap chop it mid-syllable (SELECTIO / N).
+   */
+  hyphens: auto;
+  overflow-wrap: break-word;
+
+  @media (width < 40rem) {
+    letter-spacing: 0.06em;
+  }
+
+  &:where(:lang(zh), :lang(ja), :lang(ko)) {
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+}
+
+/* Captions, footnotes, helper text and units: the 12px floor. */
+@utility type-caption {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.45;
+  font-weight: 400;
+  overflow-wrap: break-word;
+}
+
+/* ── Figures ──────────────────────────────────────────────────────────── */
+
+/*
+ * Every number that ticks or aligns is Inter with tabular, lining numerals
+ * and a slashed zero, so a column of amounts lines up and 0 never reads as O.
+ * Set units in type-caption text-subtle, joined to the number by U+00A0.
+ */
+@utility type-figure-xl {
+  font-family: var(--body-font-stack);
+  font-size: clamp(3rem, 2.5rem + 2vw, 4.5rem); /* 48 → 72px */
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: calc(-0.03em * var(--display-tracking-scale));
+  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+}
+
+@utility type-figure-lg {
+  font-family: var(--body-font-stack);
+  font-size: 2rem; /* 32px */
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+}
+
+@utility type-figure-md {
+  font-family: var(--body-font-stack);
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.3;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+}
+
+/* Ledger cells and inline readouts. */
+@utility type-figure-sm {
+  font-family: var(--body-font-stack);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+}
+
+/*
+ * A static display figure in Clash (a hero total that never ticks). Clash's
+ * zero is round, so keep this for figures read as a whole; anything that
+ * updates or aligns in a column uses type-figure-*.
+ */
+@utility type-figure-display {
+  font-family: var(--font-family-display);
+  font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem); /* 40 → 56px */
+  line-height: 1;
+  font-weight: var(--display-weight);
+  letter-spacing: calc(-0.02em * var(--display-tracking-scale));
+  font-variant-numeric: lining-nums;
+}
+
+/* ── Identifiers: JetBrains Mono ──────────────────────────────────────── */
+
+/* Addresses, hashes, seeds: no break opportunities of their own, so they may
+ * wrap anywhere rather than widen their container. */
+@utility type-hash {
+  font-family: var(--mono-font-stack);
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.45;
+  font-weight: 400;
+  font-feature-settings: 'zero' 1;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Token numbers (#000025) and short ids: never broken. */
+@utility type-mono {
+  font-family: var(--mono-font-stack);
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.45;
+  font-weight: 400;
+  font-feature-settings: 'zero' 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Legacy mono tiers, kept for existing call sites; new code uses type-hash
+ * or type-mono. */
 @utility type-mono-md {
-  font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Menlo', 'Consolas', monospace;
+  font-family: var(--mono-font-stack);
   font-size: 0.875rem;
   line-height: 1.5;
   font-weight: 500;
-  font-feature-settings: 'tnum' 1;
+  font-feature-settings:
+    'tnum' 1,
+    'zero' 1;
   /* Hashes and addresses have no break opportunities of their own. */
   overflow-wrap: anywhere;
 }
 
 @utility type-mono-sm {
-  font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Menlo', 'Consolas', monospace;
+  font-family: var(--mono-font-stack);
   font-size: 0.75rem;
   line-height: 1.4;
   font-weight: 500;
-  font-feature-settings: 'tnum' 1;
+  font-feature-settings:
+    'tnum' 1,
+    'zero' 1;
   /* Hashes and addresses have no break opportunities of their own. */
   overflow-wrap: anywhere;
-}
-
-@utility type-eyebrow {
-  font-size: 0.6875rem; /* 11px */
-  line-height: 1.2;
-  font-weight: 500;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-
-  /*
-   * 0.28em of tracking adds roughly half again to the width of an uppercase
-   * label. In a two-column stat grid on a 320px screen that is enough for
-   * "Stellar Selection Pool" to overrun its card, so ease off on phones.
-   */
-  @media (width < 40rem) {
-    letter-spacing: 0.12em;
-  }
 }

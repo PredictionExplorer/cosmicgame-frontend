@@ -160,6 +160,16 @@ describe('GalleryPage', () => {
     expect(screen.getByText('#000001')).toBeInTheDocument();
   });
 
+  it('rings the featured plate while its link has keyboard focus', () => {
+    mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
+    render(<GalleryPage />);
+    const link = screen.getByRole('link', { name: 'gallery.featured.viewAria(id=#000003)' });
+    // The vignette, hue strip and badge paint over the link, so an outline on
+    // the link itself never showed; the plate draws it instead.
+    expect(link).toHaveClass('focus-ring-none');
+    expect(link.parentElement).toHaveClass('focus-ring-within');
+  });
+
   it('shows empty state when no data', () => {
     mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<GalleryPage />);

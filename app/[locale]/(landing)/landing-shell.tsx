@@ -22,7 +22,6 @@
  *   - @tanstack/react-query (no API data fetching on landing)
  *   - AnchoredTokenProvider / SystemModeProvider / ApiDataProvider /
  *     NotificationProvider — all protocol-state contexts
- *   - tsparticles — the landing uses its own three.js / CSS background
  *
  * Any static import added here should be reviewed against that contract;
  * see app/__tests__/landing-shell.test.ts for the enforcement check.

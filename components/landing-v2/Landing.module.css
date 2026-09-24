@@ -123,9 +123,9 @@
   margin-top: 1.5rem;
   font-family: var(--font-family-display);
   font-size: clamp(3.25rem, 5.5vw, 5.75rem);
-  font-weight: 500;
+  font-weight: var(--display-weight);
   line-height: 1.035;
-  letter-spacing: -0.035em;
+  letter-spacing: calc(-0.035em * var(--display-tracking-scale));
   text-wrap: balance;
 }
 .headlineAccent {
@@ -298,7 +298,7 @@
   gap: 0.5rem 1rem;
   padding: 1rem 0.5rem 0.5rem;
   color: hsl(var(--muted-foreground));
-  font-family: ui-monospace, monospace;
+  font-family: var(--mono-font-stack);
   font-size: 0.625rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -345,7 +345,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-family: ui-monospace, monospace;
+  font-family: var(--mono-font-stack);
   color: hsl(var(--secondary));
   font-size: 0.625rem;
   font-weight: 500;
@@ -364,9 +364,9 @@
   margin-top: 1.25rem;
   font-family: var(--font-family-display);
   font-size: clamp(2rem, 3.5vw, 3.5rem);
-  font-weight: 500;
+  font-weight: var(--display-weight);
   line-height: 1.12;
-  letter-spacing: -0.035em;
+  letter-spacing: calc(-0.035em * var(--display-tracking-scale));
   text-wrap: balance;
 }
 .sectionDescription {
@@ -394,7 +394,7 @@
   color: hsl(var(--secondary));
 }
 .stageTop span {
-  font-family: ui-monospace, monospace;
+  font-family: var(--mono-font-stack);
   font-size: 0.75rem;
 }
 .stageTop svg {
@@ -404,7 +404,7 @@
   margin-top: 1.5rem;
   font-family: var(--font-family-display);
   font-size: 1.5rem;
-  font-weight: 500;
+  font-weight: var(--display-weight);
 }
 .cycleStage p {
   margin-top: 0.875rem;
@@ -577,4 +577,17 @@
 .artImage a:focus-visible {
   outline: 2px solid hsl(var(--secondary));
   outline-offset: -4px;
+}
+
+/*
+ * Chinese, Japanese and Korean have no letter case, and Latin tracking only
+ * pulls their characters apart (styles/typography.css, type-eyebrow).
+ */
+.eyebrow:is(:lang(zh), :lang(ja), :lang(ko)),
+.credentials li:is(:lang(zh), :lang(ja), :lang(ko)),
+.artEyebrow:is(:lang(zh), :lang(ja), :lang(ko)),
+.artCaption:is(:lang(zh), :lang(ja), :lang(ko)),
+.sectionEyebrow:is(:lang(zh), :lang(ja), :lang(ko)) {
+  letter-spacing: 0;
+  text-transform: none;
 }

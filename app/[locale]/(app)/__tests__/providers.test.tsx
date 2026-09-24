@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { CookiesProvider } from 'react-cookie';
 
 import { checkA11y } from '@/test-utils';
@@ -8,52 +8,7 @@ import { checkA11y } from '@/test-utils';
 import { Providers } from '../providers';
 import { NOTIFICATION_AUTO_HIDE_MS } from '../../../../config/constants';
 
-const mockInitParticlesEngine = jest.fn<Promise<void>, [(engine: unknown) => Promise<void>]>();
-const mockLoadSlim = jest.fn().mockResolvedValue(undefined);
 const mockPathname = jest.spyOn(jest.requireMock('next/navigation'), 'usePathname');
-
-jest.mock('next/dynamic', () =>
-  jest.fn(() => {
-    const MockParticles = (props: Record<string, unknown>) => {
-      const options = props.options as
-        | {
-            fullScreen?: { enable?: boolean };
-            interactivity?: {
-              detectsOn?: string;
-              events?: {
-                onHover?: { enable?: boolean };
-                onClick?: { enable?: boolean };
-              };
-            };
-          }
-        | undefined;
-
-      return (
-        <div
-          data-testid="particles"
-          data-fullscreen-enabled={String(options?.fullScreen?.enable)}
-          data-detects-on={options?.interactivity?.detectsOn}
-          data-hover-enabled={String(options?.interactivity?.events?.onHover?.enable)}
-          data-click-enabled={String(options?.interactivity?.events?.onClick?.enable)}
-          {...props}
-        />
-      );
-    };
-    MockParticles.displayName = 'MockParticles';
-    return MockParticles;
-  }),
-);
-
-jest.mock('@tsparticles/react', () => ({
-  __esModule: true,
-  default: () => null,
-  initParticlesEngine: (...args: unknown[]) =>
-    mockInitParticlesEngine(args[0] as (engine: unknown) => Promise<void>),
-}));
-
-jest.mock('@tsparticles/slim', () => ({
-  loadSlim: (...args: unknown[]) => mockLoadSlim(...args),
-}));
 
 jest.mock('wagmi');
 jest.mock('@rainbow-me/rainbowkit');
@@ -146,9 +101,6 @@ describe('Providers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockPathname.mockReturnValue('/');
-    // Default: engine never initializes, preventing act() warnings
-    // in tests that only care about the provider structure.
-    mockInitParticlesEngine.mockImplementation(() => new Promise(() => {}));
   });
 
   it('renders children', () => {
@@ -209,7 +161,6 @@ describe('Providers', () => {
       expect(screen.queryByTestId('header')).not.toBeInTheDocument();
       expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
       expect(document.querySelector('a[href="#main"]')).not.toBeInTheDocument();
-      expect(mockInitParticlesEngine).not.toHaveBeenCalled();
     },
   );
 
@@ -297,100 +248,16 @@ describe('Providers', () => {
     expect(notification).toContainElement(screen.getByTestId('child'));
   });
 
-  it('does not render particles before engine is ready', () => {
-    render(
+  it('draws no animated backdrop of its own', () => {
+    // The white particle plexus drew lines through text and cards and ignored
+    // the palette. The atmosphere is the static, palette-aware AmbientBackdrop
+    // that PageShell renders; nothing here runs a canvas or a frame loop.
+    const { container } = render(
       <Providers>
         <div>Content</div>
       </Providers>,
     );
-    expect(screen.queryByTestId('particles')).not.toBeInTheDocument();
-  });
-
-  it('renders particles after engine initializes', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      expect(screen.getByTestId('particles')).toBeInTheDocument();
-    });
-  });
-
-  it('wraps particles in an inert aria-hidden backdrop', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      const backdrop = screen.getByTestId('particles').parentElement;
-      expect(backdrop).toHaveAttribute('aria-hidden', 'true');
-      expect(backdrop).toHaveClass(
-        'pointer-events-none',
-        'fixed',
-        'inset-0',
-        '-z-10',
-        'touch-none',
-      );
-    });
-  });
-
-  it('configures particles as non-fullscreen and non-interactive', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      const particles = screen.getByTestId('particles');
-      expect(particles).toHaveAttribute('data-fullscreen-enabled', 'false');
-      expect(particles).toHaveAttribute('data-detects-on', 'window');
-      expect(particles).toHaveAttribute('data-hover-enabled', 'false');
-      expect(particles).toHaveAttribute('data-click-enabled', 'false');
-    });
-  });
-
-  it('calls initParticlesEngine on mount', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      expect(mockInitParticlesEngine).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it('calls loadSlim during engine initialization', async () => {
-    mockInitParticlesEngine.mockImplementation(async (cb) => {
-      await cb({});
-    });
-
-    render(
-      <Providers>
-        <div>Content</div>
-      </Providers>,
-    );
-    await waitFor(() => {
-      expect(mockLoadSlim).toHaveBeenCalledTimes(1);
-    });
+    expect(container.querySelector('canvas')).toBeNull();
   });
 
   it('has no accessibility violations', async () => {

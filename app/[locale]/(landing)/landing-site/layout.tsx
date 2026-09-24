@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from 'next';
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -37,12 +37,6 @@ export async function generateMetadata({ params }: Pick<LayoutProps, 'params'>):
     },
   };
 }
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  themeColor: '#0B1028',
-};
 
 /**
  * Landing-site nested layout.

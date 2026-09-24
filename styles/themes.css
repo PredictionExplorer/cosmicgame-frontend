@@ -3,9 +3,41 @@
  * inherits from the document. data-palette scopes the same tokens to menu
  * previews, so swatches cannot drift from the real theme.
  *
- * Keep status colors semantic. Artwork and data categories retain their own
- * colors; the surrounding interface is the visitor's choice.
+ * Structure (docs/design-system.md documents every token):
+ *   1. Defaults a palette may override (status hues).
+ *   2. One block per palette: its raw HSL channels.
+ *   3. Derived tokens shared by every palette (text tiers, surface ladder,
+ *      rules, status fills, data series, gradients). They are redeclared on
+ *      each [data-palette] scope so a preview swatch resolves against its own
+ *      palette rather than the document's.
+ *
+ * Values are HSL channel triplets (`233 33% 5%`), consumed as
+ * `hsl(var(--token))` or `hsl(var(--token) / 0.5)`. The few tokens that hold
+ * a complete colour say so where they are declared.
+ *
+ * styles/__tests__/palette-contrast.test.ts pins the contrast of every text,
+ * control, status and data token against background, card, popover and muted
+ * in all five palettes; change a value here and that suite says whether it
+ * still meets WCAG 2.2 AA.
  */
+
+/*
+ * Status hues. Colour belongs to the art and to live state: these appear
+ * only on values that change or need action, always with a word or an icon.
+ * Four palettes share the defaults; a palette overrides one only where the
+ * default falls within 30 degrees of its own --primary and would read as the
+ * accent (Aurora's teal, Ember's champagne).
+ *
+ * Keep this block ABOVE the palette blocks: `[data-palette='aurora']` and
+ * `[data-palette]` have equal specificity, so the later rule wins.
+ */
+:root,
+[data-palette] {
+  --positive: 152 55% 70%;
+  --attention: 40 90% 68%;
+  --critical: 0 80% 72%;
+}
+
 :root,
 [data-palette='midnight'] {
   --background: 233 33% 5%;
@@ -20,8 +52,9 @@
   --accent: 254 28% 20%;
   --muted: 240 15% 13%;
   --muted-foreground: 247 14% 75%;
+  --subtle-foreground: 247 12% 62%;
   --border: 246 14% 19%;
-  --input: 246 14% 27%;
+  --input: 246 14% 46%;
   --glow-primary: 245 70% 65%;
   --glow-secondary: 270 65% 60%;
   --atmosphere-strength: 0.3;
@@ -43,14 +76,17 @@
   --accent: 239 35% 23%;
   --muted: 234 30% 19%;
   --muted-foreground: 226 24% 77%;
+  --subtle-foreground: 226 20% 64%;
   --border: 233 28% 28%;
-  --input: 229 30% 42%;
+  --input: 229 30% 50%;
   --glow-primary: 199 100% 50%;
   --glow-secondary: 262 90% 61%;
   --atmosphere-strength: 1;
 }
 
-/* Sea-glass accents on cool, gently desaturated teal. */
+/* Sea-glass accents on cool, gently desaturated teal. The default status
+ * green sits 12 degrees from this primary, so Aurora's positive leans to
+ * leaf green and never reads as the accent. */
 :root[data-theme='aurora'],
 [data-palette='aurora'] {
   --background: 192 32% 7%;
@@ -65,11 +101,13 @@
   --accent: 186 25% 20%;
   --muted: 190 20% 17%;
   --muted-foreground: 180 15% 75%;
+  --subtle-foreground: 180 12% 60%;
   --border: 187 20% 25%;
-  --input: 182 24% 39%;
+  --input: 182 24% 40%;
   --glow-primary: 161 72% 44%;
   --glow-secondary: 205 80% 55%;
   --atmosphere-strength: 0.8;
+  --positive: 118 45% 72%;
 }
 
 /* Violet ink, luminous lilac, and a restrained rose reflection. */
@@ -87,14 +125,18 @@
   --accent: 275 25% 23%;
   --muted: 266 18% 18%;
   --muted-foreground: 274 17% 77%;
+  --subtle-foreground: 274 14% 64%;
   --border: 269 20% 27%;
-  --input: 271 24% 41%;
+  --input: 271 24% 50%;
   --glow-primary: 260 78% 59%;
   --glow-secondary: 325 68% 53%;
   --atmosphere-strength: 0.85;
 }
 
-/* Warm charcoal stays neutral enough for champagne and peach to shine. */
+/* Warm charcoal stays neutral enough for champagne and peach to shine. The
+ * default amber sits 2 degrees from the champagne primary, so Ember's
+ * attention is a brighter, more saturated yellow, and it always travels with
+ * an icon and a word. */
 :root[data-theme='ember'],
 [data-palette='ember'] {
   --background: 24 16% 7%;
@@ -109,11 +151,13 @@
   --accent: 28 20% 21%;
   --muted: 25 12% 17%;
   --muted-foreground: 30 16% 76%;
+  --subtle-foreground: 30 12% 62%;
   --border: 28 15% 26%;
-  --input: 30 20% 40%;
+  --input: 30 20% 43%;
   --glow-primary: 34 85% 51%;
   --glow-secondary: 9 72% 53%;
   --atmosphere-strength: 0.7;
+  --attention: 52 96% 62%;
 }
 
 :root,
@@ -134,12 +178,85 @@
   --secondary-foreground: var(--primary-foreground);
   --accent-foreground: var(--primary);
   --ring: var(--secondary);
-  --chart-1: var(--primary);
-  --chart-2: 276 80% 74%;
-  --chart-3: 198 80% 65%;
-  --chart-4: 45 93% 52%;
-  --chart-5: 0 62% 50%;
-  --destructive: 0 62% 50%;
+
+  /*
+   * Text tiers: foreground (body, headings, figures), muted-foreground
+   * (secondary copy; 7.7:1 or more) and subtle-foreground (labels, captions,
+   * counts, hints; 5.1:1 or more even on muted). Pick a tier instead of
+   * dimming text with an opacity modifier. `--muted-foreground-subtle` is the
+   * audit's name for the same tier.
+   */
+  --muted-foreground-subtle: var(--subtle-foreground);
+
+  /*
+   * Surface ladder. Every palette already carries an opaque tinted ladder,
+   * so these name roles rather than add colours:
+   *   sunken   field fills, seed and formula wells
+   *   surface  the one quiet group per view (a card, a panel)
+   *   raised   floating layers: popovers, menus, dialogs, sheets, the dock
+   * Use them instead of white alpha fills, which turn warm and teal palettes
+   * grey.
+   */
+  --surface-sunken: var(--surface-deep);
+  --surface: var(--card);
+  --surface-raised: var(--popover);
+
+  /*
+   * Rules separate; borders identify. --rule is a structural edge and a
+   * ledger header rule; --rule-faint (a complete colour) divides rows. A
+   * control boundary uses --input, which meets 3:1 on every surface.
+   */
+  --rule: var(--border);
+  --rule-faint: color-mix(in oklab, hsl(var(--border)) 55%, hsl(var(--card)));
+
+  /*
+   * Live state. --live marks a value that is changing right now. The
+   * -surface companions are complete colours for badge and well fills.
+   * --success and --warning are the names the existing utilities use.
+   */
+  --live: var(--positive);
+  --success: var(--positive);
+  --warning: var(--attention);
+  --positive-surface: hsl(var(--positive) / 0.12);
+  --attention-surface: hsl(var(--attention) / 0.12);
+  --critical-surface: hsl(var(--critical) / 0.12);
+  --live-surface: hsl(var(--live) / 0.12);
+  /* A fill that carries a white label (5.8:1). Error text uses --critical:
+   * styles/global.css routes `text-destructive` there. */
+  --destructive: 0 65% 46%;
   --destructive-foreground: 0 0% 100%;
-  --success: 151 65% 76%;
+
+  /*
+   * Data series: fixed hues in every palette, so a track or a gesture method
+   * keeps its colour on every page and in every palette; each is 5.3:1 or
+   * more on muted. Red is never a series.
+   */
+  --data-1: 262 80% 76%;
+  --data-2: 198 80% 65%;
+  --data-3: 45 93% 62%;
+  --data-4: 330 70% 72%;
+  --data-5: 160 50% 60%;
+  --data-6: 20 80% 68%;
+  --data-7: 90 50% 62%;
+  --data-8: 220 15% 70%;
+  /* Allocation tracks and gesture methods, named once. The two Stellar
+   * Selection tracks share a hue; the NFT track is drawn hatched. */
+  --track-signature: var(--data-1);
+  --track-endurance: var(--data-3);
+  --track-chrono: var(--data-4);
+  --track-stellar-eth: var(--data-2);
+  --track-stellar-nft: var(--data-2);
+  --track-anchoring: var(--data-5);
+  --track-public-goods: var(--data-6);
+  --track-outreach: var(--data-7);
+  --track-compounding: var(--data-8);
+  --method-eth: var(--data-1);
+  --method-eth-rwlk: var(--data-2);
+  --method-cst: var(--data-3);
+  /* Legacy chart names, kept as aliases while charts move to --data-N. */
+  --chart-1: var(--data-1);
+  --chart-2: var(--data-2);
+  --chart-3: var(--data-3);
+  --chart-4: var(--data-4);
+  --chart-5: var(--data-5);
 }

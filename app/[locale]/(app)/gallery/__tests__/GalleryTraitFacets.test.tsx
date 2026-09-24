@@ -266,6 +266,23 @@ describe('GalleryCollectionDna', () => {
     );
   });
 
+  it('draws a focused segment ring where the bar cannot clip or fade it', () => {
+    render(
+      <GalleryCollectionDna
+        collectionTraits={collectionTraits}
+        selected={{ fate: ['Ejection'] }}
+        onSelect={noop}
+      />,
+    );
+    const dimmed = screen.getByRole('button', { name: /^Eternal Dance: 1 NFTs/ });
+    // An overflow-hidden bar clipped the ring, which sits outside the segment.
+    expect(dimmed.parentElement).not.toHaveClass('overflow-hidden');
+    // Opacity applies to an element's outline too: focus restores full strength.
+    expect(dimmed).toHaveClass('opacity-35', 'focus-visible:opacity-100');
+    // The shared outline, not a box-shadow ring of its own.
+    expect(dimmed.className).not.toMatch(/focus-visible:(?:outline-none|ring)/);
+  });
+
   it('shows a loading state and hides itself when unavailable', () => {
     const { rerender } = render(
       <GalleryCollectionDna collectionTraits={undefined} selected={{}} onSelect={noop} />,

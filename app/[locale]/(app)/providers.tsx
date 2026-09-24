@@ -1,8 +1,7 @@
 'use client';
 
-import { memo, useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
-import type { ISourceOptions } from '@tsparticles/engine';
 import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -40,11 +39,6 @@ import { getApiBase, getApiOrigin, getRpcUrl } from '@/lib/serverRotation';
 // can fail after deploys or HMR and surfaces as a misleading contract read error.
 void offchainLookupSignature;
 
-const Particles = dynamic(
-  () => import('@tsparticles/react').then((mod) => ({ default: mod.default })),
-  { ssr: false },
-);
-
 // Local test-harness dev panel (scripts/harness). The literal env checks are
 // inlined at build time, so production builds (any non-local network, or no
 // NEXT_PUBLIC_HARNESS) drop both the flag and the dynamically imported chunk.
@@ -53,17 +47,6 @@ const harnessUiEnabled =
 const HarnessPanel = harnessUiEnabled
   ? dynamic(() => import('@/components/dev/HarnessPanel'), { ssr: false })
   : null;
-
-const ParticleBackdrop = memo(function ParticleBackdrop() {
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-10 touch-none [contain:strict] motion-reduce:hidden print:hidden"
-    >
-      <Particles id="tsparticles" options={particleOptions} className="h-full w-full" />
-    </div>
-  );
-});
 
 function makeQueryClient() {
   return new QueryClient({
@@ -92,67 +75,6 @@ function LiveGameDataRefresh() {
   useLiveGameDataRefresh();
   return null;
 }
-
-function scheduleIdleTask(task: () => void): () => void {
-  if (typeof window === 'undefined') return () => {};
-  if (typeof window.requestIdleCallback === 'function') {
-    const idleId = window.requestIdleCallback(task, { timeout: 2_500 });
-    return () => window.cancelIdleCallback(idleId);
-  }
-  const timeoutId = window.setTimeout(task, 1);
-  return () => window.clearTimeout(timeoutId);
-}
-
-const particleOptions: ISourceOptions = {
-  fullScreen: { enable: false },
-  background: { color: { value: 'transparent' } },
-  fpsLimit: 60,
-  interactivity: {
-    detectsOn: 'window',
-    events: {
-      onHover: { enable: false },
-      onClick: { enable: false },
-      resize: { enable: true },
-    },
-    modes: {
-      grab: { distance: 120, links: { opacity: 0.22 } },
-    },
-  },
-  particles: {
-    color: {
-      value: '#ffffff',
-      animation: {
-        enable: true,
-        speed: 20,
-        sync: true,
-        h: { enable: true, offset: 0, speed: 0.5, sync: false },
-        s: { enable: false, offset: 0, speed: 1, sync: true },
-        l: { enable: false, offset: 0, speed: 1, sync: true },
-      },
-    },
-    links: { color: '#ffffff', distance: 150, enable: true, opacity: 0.1, width: 1 },
-    collisions: { enable: false },
-    move: {
-      direction: 'none',
-      enable: true,
-      outModes: { default: 'out' },
-      random: true,
-      speed: 0.35,
-      straight: false,
-    },
-    number: { density: { enable: true, width: 1000, height: 1000 }, value: 20 },
-    opacity: {
-      value: { min: 0.1, max: 0.4 },
-      animation: { enable: true, speed: 0.5, startValue: 'min', sync: false },
-    },
-    shape: { type: 'circle' },
-    size: {
-      value: { min: 1, max: 3 },
-      animation: { enable: true, speed: 2, startValue: 'min', sync: false },
-    },
-  },
-  detectRetina: true,
-};
 
 const envValidation = getEnvValidation();
 
@@ -203,7 +125,6 @@ export function Providers({
   showAppChrome?: boolean;
 }) {
   const [queryClient] = useState(() => makeQueryClient());
-  const [engineReady, setEngineReady] = useState(false);
 
   // Routes under /embed render a single artifact (e.g. a chart) with no app chrome
   // or background, so they can be opened standalone in their own browser window.
@@ -263,45 +184,6 @@ export function Providers({
     getApiBase();
   }, []);
 
-  useEffect(() => {
-    // The ambient particle backdrop is desktop polish. Phones pay for it
-    // twice — the engine chunks over the network and a persistent rAF loop
-    // on the main thread (worse INP on mid-range devices) — while the
-    // backdrop is barely visible behind content on small screens. Skip it
-    // for coarse pointers, small viewports, and reduced-motion preferences
-    // (the CSS `motion-reduce:hidden` only hides the canvas; this keeps the
-    // engine from ever booting).
-    if (bareEmbed) return undefined;
-    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-      const skipParticles =
-        window.matchMedia('(pointer: coarse)').matches ||
-        window.matchMedia('(max-width: 767px)').matches ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (skipParticles) return undefined;
-    }
-
-    let cancelled = false;
-    const cancelIdleTask = scheduleIdleTask(() => {
-      void (async () => {
-        try {
-          const { initParticlesEngine } = await import('@tsparticles/react');
-          const { loadSlim } = await import('@tsparticles/slim');
-          await initParticlesEngine(async (engine) => {
-            await loadSlim(engine);
-          });
-          if (cancelled) return;
-          setEngineReady(true);
-        } catch (err) {
-          reportError(err, 'particlesInit');
-        }
-      })();
-    });
-    return () => {
-      cancelled = true;
-      cancelIdleTask();
-    };
-  }, [bareEmbed]);
-
   if (!envValidation.valid) {
     return <EnvErrorScreen missing={envValidation.missing} />;
   }
@@ -312,7 +194,6 @@ export function Providers({
         <ContractAddressesProvider>
           <LiveGameDataRefresh />
           <WalletUiProvider>
-            {engineReady && !bareEmbed && <ParticleBackdrop />}
             <ErrorBoundary>
               <CookiesProvider>
                 <AnchoredTokenProvider>
