@@ -188,6 +188,27 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
     },
   ];
 
+  const shareOf = (row: AllocationRow) =>
+    row.track ? (tracks.get(row.track)?.percent ?? null) : undefined;
+  const shareText = (share: number | null | undefined) =>
+    share === undefined ? null : share === null ? unknown : formatPercent(share, locale);
+  const nameOf = (row: AllocationRow) => (
+    <span className="inline-flex items-baseline gap-2.5">
+      <span
+        aria-hidden
+        className={cn(
+          'size-2.5 shrink-0 translate-y-px rounded-edge',
+          row.track ? ALLOCATION_TRACK_COLORS[row.track] : 'border border-rule',
+        )}
+      />
+      {row.definition ? (
+        <ExplainedTerm definition={row.definition}>{row.name}</ExplainedTerm>
+      ) : (
+        row.name
+      )}
+    </span>
+  );
+
   const columns = {
     allocation: t('allocations.columns.allocation'),
     share: t('allocations.columns.share'),
@@ -203,7 +224,29 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
         description={t('sections.allocations.description')}
       />
       <FundDistribution data={data} describe={false} className="mb-6" />
-      <Table labelledBy={headingId}>
+      {/* Phones: one short record per allocation (name and share, what each
+          recipient receives, how many), instead of four labelled lines each. */}
+      <ul
+        className="divide-y divide-rule-faint border-y border-rule sm:hidden"
+        aria-labelledby={headingId}
+      >
+        {rows.map((row) => {
+          const share = shareOf(row);
+          return (
+            <li key={row.key} data-allocation={row.key} className="py-4">
+              <div className="flex items-baseline justify-between gap-4 type-body-sm text-foreground">
+                {nameOf(row)}
+                {share === undefined ? null : (
+                  <span className="shrink-0 type-figure-sm">{shareText(share)}</span>
+                )}
+              </div>
+              <p className="mt-1.5 pl-5 type-body-sm text-muted-foreground">{row.receives}</p>
+              <p className="mt-0.5 pl-5 type-caption text-subtle">{row.recipients}</p>
+            </li>
+          );
+        })}
+      </ul>
+      <Table labelledBy={headingId} containerClassName="max-sm:hidden">
         <TableHeader>
           <TableRow>
             <TableHead>{columns.allocation}</TableHead>
@@ -214,24 +257,11 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
         </TableHeader>
         <TableBody>
           {rows.map((row) => {
-            const share = row.track ? (tracks.get(row.track)?.percent ?? null) : undefined;
+            const share = shareOf(row);
             return (
               <TableRow key={row.key} data-allocation={row.key}>
                 <TableCell label={columns.allocation} className="text-foreground">
-                  <span className="inline-flex items-baseline gap-2.5">
-                    <span
-                      aria-hidden
-                      className={cn(
-                        'size-2.5 shrink-0 translate-y-px rounded-edge',
-                        row.track ? ALLOCATION_TRACK_COLORS[row.track] : 'border border-rule',
-                      )}
-                    />
-                    {row.definition ? (
-                      <ExplainedTerm definition={row.definition}>{row.name}</ExplainedTerm>
-                    ) : (
-                      row.name
-                    )}
-                  </span>
+                  {nameOf(row)}
                 </TableCell>
                 <TableCell
                   label={columns.share}
@@ -240,11 +270,7 @@ export function CycleAllocations({ data, headingId }: { data: DashboardInfo; hea
                   data-empty={share === undefined ? 'true' : undefined}
                   className="text-foreground"
                 >
-                  {share === undefined
-                    ? null
-                    : share === null
-                      ? unknown
-                      : formatPercent(share, locale)}
+                  {shareText(share)}
                 </TableCell>
                 <TableCell label={columns.receives}>{row.receives}</TableCell>
                 <TableCell label={columns.recipients} align="end" numeric>

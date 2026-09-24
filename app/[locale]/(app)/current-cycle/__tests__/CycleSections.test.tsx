@@ -34,7 +34,7 @@ const data = {
 } as unknown as DashboardInfo;
 
 const row = (key: string) => {
-  const element = document.querySelector(`[data-allocation="${key}"]`);
+  const element = document.querySelector(`tr[data-allocation="${key}"]`);
   if (!element) throw new Error(`no allocation row ${key}`);
   return element as HTMLElement;
 };
@@ -71,6 +71,23 @@ describe('CycleAllocations', () => {
     );
     expect(within(row('ethStellar')).getByText('common.status.unavailable')).toBeInTheDocument();
     expect(row('ethStellar')).not.toHaveTextContent('0%');
+  });
+
+  it('gives phones one short record per allocation instead of four labelled lines', () => {
+    render(<CycleAllocations data={data} headingId="allocations" />);
+    const record = (key: string) =>
+      document.querySelector(`li[data-allocation="${key}"]`) as HTMLElement;
+
+    expect(document.querySelectorAll('li[data-allocation]')).toHaveLength(10);
+    expect(record('signature')).toHaveTextContent('25%');
+    expect(record('signature')).toHaveTextContent('8.0735');
+    expect(record('ethStellar')).toHaveTextContent('recipientCount(count=3)');
+    // No column labels repeated inside the records.
+    expect(record('signature')).not.toHaveTextContent('currentCycle.allocations.columns');
+    // A CST-and-NFT allocation has no share of the reserve to show.
+    expect(record('endurance')).not.toHaveTextContent('%');
+    // The table and the list swap at `sm`, so only one is ever shown.
+    expect(document.querySelector('ul[data-allocation], ul.sm\\:hidden')).not.toBeNull();
   });
 
   it('has no accessibility violations', async () => {
