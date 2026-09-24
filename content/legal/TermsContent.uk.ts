@@ -6,8 +6,6 @@ export const termsCopyUk = {
   title: 'Умови використання',
   subtitle:
     'Уважно ознайомтеся з цими умовами, перш ніж використовувати Cosmic Signature. Використовуючи нашу платформу, ви погоджуєтеся дотримуватися цих умов.',
-  homeLabel: 'Головна',
-  lastUpdated: 'Оновлено: 20 липня 2026 р.',
   sections: [
     {
       id: 'acceptance',

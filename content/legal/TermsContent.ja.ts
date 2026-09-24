@@ -8,8 +8,6 @@ export const termsCopyJa = {
   title: '利用規約',
   subtitle:
     'Cosmic Signatureをご利用になる前に、本規約をよくお読みください。当プラットフォームを利用することで、本規約に拘束されることに同意したものとみなされます。',
-  homeLabel: 'ホーム',
-  lastUpdated: '最終更新：2026年7月20日',
   sections: [
     {
       id: 'acceptance',

@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Chinese copy for /security, rendered by TrustPageContent. */
 export const securityCopyZhTw: TrustPageCopy = {
-  eyebrow: '信任與安全',
-  title: 'Cosmic Signature 安全',
+  title: '安全',
   intro:
     'Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。其安全體系依靠公開的智慧合約、透明的協議資料、審慎的錢包互動，以及清晰的參與者教育。',
   sections: [

@@ -2,7 +2,6 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Ukrainian copy for /security, rendered by TrustPageContent. */
 export const securityCopyUk: TrustPageCopy = {
-  eyebrow: 'Довіра та безпека',
   title: 'Безпека',
   intro:
     'Cosmic Signature — це процедурний протокол ончейн-мистецтва на Arbitrum. Його безпека спирається на публічні смарт-контракти, прозорі дані протоколу, обережну взаємодію з гаманцем і чітке інформування учасників.',

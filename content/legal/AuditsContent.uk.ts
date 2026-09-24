@@ -2,7 +2,6 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Ukrainian copy for /audits, rendered by TrustPageContent. */
 export const auditsCopyUk: TrustPageCopy = {
-  eyebrow: 'Аудити та верифікація',
   title: 'Аудити',
   intro:
     'На цій сторінці зібрано результати перевірок контрактів Cosmic Signature та посилання на звіти. Ознайомтеся з обсягом аудиту, зауваженнями й публічною реалізацією протоколу.',

@@ -1,13 +1,17 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Database, Eye, Lock, Shield, UserCheck, type LucideIcon } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Badge } from '@/components/ui/badge';
+import { ReviewedStamp } from '@/components/layout/ReviewedStamp';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { PageShell } from '@/components/ui/page-shell';
 import { cn } from '@/lib/utils';
+
+import { LegalSectionHeading } from './LegalSectionHeading';
+import { TRUST_DOCUMENT_DATES } from './trustCenter';
 
 export type PrivacySectionId = 'collection' | 'use' | 'security' | 'sharing' | 'rights';
 
@@ -26,8 +30,6 @@ export interface PrivacySection {
 export interface PrivacyCopy {
   readonly title: string;
   readonly subtitle: string;
-  readonly homeLabel: string;
-  readonly lastUpdated: string;
   readonly introductionTitle: string;
   readonly introduction: readonly string[];
   readonly sections: readonly PrivacySection[];
@@ -49,33 +51,31 @@ const SECTION_ICONS: Record<PrivacySectionId, LucideIcon> = {
   rights: UserCheck,
 };
 
-export function PrivacyContent({ copy }: { copy: PrivacyCopy }) {
+/**
+ * The privacy policy in the Trust Center template: the reading header with
+ * the document date and the Trust Center tabs, then the sections.
+ */
+export function PrivacyContent({ copy, tabs }: { copy: PrivacyCopy; tabs?: ReactNode }) {
+  const documentDate = TRUST_DOCUMENT_DATES.privacy;
   return (
     <PageShell variant="form" className="max-sm:pb-16">
       <PageHeader
+        variant="reading"
+        section="trust"
         title={copy.title}
         subtitle={copy.subtitle}
-        breadcrumbs={[{ label: copy.homeLabel, href: '/' }, { label: copy.title }]}
-        align="left"
-        className="mb-8"
+        meta={
+          documentDate ? (
+            <ReviewedStamp date={documentDate.date} kind={documentDate.kind} />
+          ) : undefined
+        }
+        tabs={tabs}
       />
-
-      <div className="mb-10 flex">
-        <Badge
-          variant="outline"
-          className="border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground"
-        >
-          {copy.lastUpdated}
-        </Badge>
-      </div>
 
       <div className="mx-auto max-w-4xl space-y-8">
         <Card className={legalCard}>
           <CardHeader>
-            <h2 className="flex items-center gap-3 font-display text-xl font-semibold tracking-tight">
-              <Shield className="h-6 w-6 shrink-0 text-primary" aria-hidden />
-              <span>{copy.introductionTitle}</span>
-            </h2>
+            <LegalSectionHeading icon={Shield}>{copy.introductionTitle}</LegalSectionHeading>
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground">
             {copy.introduction.map((paragraph) => (
@@ -96,10 +96,7 @@ export function PrivacyContent({ copy }: { copy: PrivacyCopy }) {
             >
               <Card className={legalCard}>
                 <CardHeader>
-                  <h2 className="flex items-center gap-3 font-display text-xl font-semibold tracking-tight">
-                    <Icon className="h-6 w-6 shrink-0 text-primary" aria-hidden />
-                    <span>{section.title}</span>
-                  </h2>
+                  <LegalSectionHeading icon={Icon}>{section.title}</LegalSectionHeading>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {section.content.map((item) => (
@@ -116,9 +113,7 @@ export function PrivacyContent({ copy }: { copy: PrivacyCopy }) {
 
         <Card className={legalCard}>
           <CardHeader>
-            <h2 className="font-display text-xl font-semibold tracking-tight">
-              {copy.additionalTitle}
-            </h2>
+            <LegalSectionHeading>{copy.additionalTitle}</LegalSectionHeading>
           </CardHeader>
           <CardContent className="space-y-6 text-muted-foreground">
             {copy.additional.map((item) => (

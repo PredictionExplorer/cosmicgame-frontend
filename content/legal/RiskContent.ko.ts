@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Korean copy for /risk-disclosures, rendered by TrustPageContent. */
 export const riskCopyKo: TrustPageCopy = {
-  eyebrow: '위험과 참여자 안내',
-  title: 'Cosmic Signature 위험 고지',
+  title: '위험 고지',
   // lexicon-allow-start: explicit legal denial copy must name the denied categories.
   intro:
     'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 이는 복권도, 카지노도, 도박 상품도, 투자 상품도 아니며, 재정적 결과를 약속하지도 않습니다.',

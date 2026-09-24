@@ -482,7 +482,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/risk-disclosures',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 风险披露',
+    expectedText: '风险披露',
   },
   {
     id: 'security',
@@ -491,7 +491,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/security',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 安全',
+    expectedText: '安全',
   },
   {
     id: 'audits',
@@ -500,7 +500,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: '/audits',
     host: 'app',
     cluster: 'trust',
-    expectedText: 'Cosmic Signature 审计',
+    expectedText: '审计',
   },
   {
     id: 'imprint',

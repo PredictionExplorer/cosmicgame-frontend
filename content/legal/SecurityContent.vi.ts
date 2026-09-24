@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Vietnamese copy for /security, rendered by TrustPageContent. */
 export const securityCopyVi: TrustPageCopy = {
-  eyebrow: 'Tin cậy và bảo mật',
-  title: 'Bảo mật Cosmic Signature',
+  title: 'Bảo mật',
   intro:
     'Cosmic Signature là giao thức nghệ thuật tạo sinh trên chuỗi Arbitrum. Bảo mật của giao thức dựa trên hợp đồng thông minh công khai, dữ liệu minh bạch, việc kiểm tra kỹ thao tác ví và hướng dẫn rõ ràng cho người tham gia.',
   sections: [

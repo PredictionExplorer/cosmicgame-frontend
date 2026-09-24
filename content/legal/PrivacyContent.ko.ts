@@ -4,8 +4,6 @@ export const privacyCopyKo = {
   title: '개인정보 처리방침',
   subtitle:
     'Cosmic Signature(이하 “회사”)는 사용자의 개인정보를 중요하게 생각합니다. 본 방침은 사용자가 회사의 탈중앙화 애플리케이션을 이용할 때 회사가 사용자의 정보를 어떻게 수집하고 이용하며 보호하는지 설명합니다.',
-  homeLabel: '홈',
-  lastUpdated: '최종 업데이트: 2026년 7월 20일',
   introductionTitle: '개요',
   introduction: [
     'Cosmic Signature는 이더리움 레이어 2 네트워크인 Arbitrum 위에 구축된 탈중앙화 온체인 아트 프로토콜입니다. 탈중앙화 애플리케이션(dApp)인 만큼, 데이터와 개인정보를 다루는 방식이 기존 웹 애플리케이션과 다릅니다.',

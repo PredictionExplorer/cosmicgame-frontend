@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Japanese copy for /risk-disclosures, rendered by TrustPageContent. */
 export const riskCopyJa: TrustPageCopy = {
-  eyebrow: 'リスクと参加にあたっての注意事項',
-  title: 'Cosmic Signatureリスク開示',
+  title: 'リスク開示',
   // lexicon-allow-start: explicit legal denial copy must name the denied categories.
   intro:
     'Cosmic SignatureはArbitrum上のプロシージャル・オンチェーンアート・プロトコルです。宝くじ、カジノ、ギャンブル商品、投資商品ではなく、金銭的な結果を約束するものでもありません。',

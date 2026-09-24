@@ -6,8 +6,6 @@ export const termsCopyEn = {
   title: 'Terms of Service',
   subtitle:
     'Please read these terms carefully before using Cosmic Signature. By using our platform, you agree to be bound by these terms.',
-  homeLabel: 'Home',
-  lastUpdated: 'Last updated: July 20, 2026',
   sections: [
     {
       id: 'acceptance',

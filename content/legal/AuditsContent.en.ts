@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** English copy for /audits, rendered by TrustPageContent. */
 export const auditsCopyEn: TrustPageCopy = {
-  eyebrow: 'Audits and verification',
-  title: 'Cosmic Signature Audits',
+  title: 'Audits',
   intro:
     'Review the published audit findings, verification status, and source-code resources for the Cosmic Signature contracts.',
   sections: [

@@ -55,6 +55,7 @@
     },
     "snapshot": "データのスナップショット：{date}",
     "lastReviewed": "最終確認：{date}",
+    "lastUpdated": "最終更新：{date}",
     "relatedPages": "関連ページ"
   },
   "status": {

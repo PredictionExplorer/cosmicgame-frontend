@@ -55,6 +55,7 @@
     },
     "snapshot": "Знімок даних · {date}",
     "lastReviewed": "Останній перегляд: {date}",
+    "lastUpdated": "Оновлено: {date}",
     "relatedPages": "Пов’язані сторінки"
   },
   "status": {

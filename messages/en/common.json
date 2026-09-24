@@ -55,6 +55,7 @@
     },
     "snapshot": "Snapshot · {date}",
     "lastReviewed": "Last reviewed {date}",
+    "lastUpdated": "Last updated {date}",
     "relatedPages": "Related pages"
   },
   "status": {

@@ -6,8 +6,6 @@ export const termsCopyKo = {
   title: '이용약관',
   subtitle:
     'Cosmic Signature를 이용하기 전에 본 약관을 주의 깊게 읽어 주세요. 플랫폼을 이용하면 본 약관에 구속되는 데 동의한 것으로 봅니다.',
-  homeLabel: '홈',
-  lastUpdated: '최종 업데이트: 2026년 7월 20일',
   sections: [
     {
       id: 'acceptance',

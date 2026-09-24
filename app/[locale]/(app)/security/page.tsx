@@ -2,6 +2,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getSecurityCopy } from '@/content/legal';
+import { TrustCenterTabs } from '@/content/legal/TrustCenterTabs';
 import { TrustPageContent } from '@/content/legal/TrustPageContent';
 
 import { PageShell } from '@/components/ui/page-shell';
@@ -45,7 +46,7 @@ export default async function SecurityPage({ params }: PageProps) {
       <JsonLd
         data={[
           webPageJsonLd({
-            name: copy.title,
+            name: t('security.title'),
             description: t('security.description'),
             url: pageUrl,
             inLanguage,
@@ -65,7 +66,12 @@ export default async function SecurityPage({ params }: PageProps) {
           ),
         ]}
       />
-      <TrustPageContent copy={copy} locale={locale} />
+      <TrustPageContent
+        copy={copy}
+        locale={locale}
+        page="security"
+        tabs={<TrustCenterTabs current="security" locale={locale} />}
+      />
     </PageShell>
   );
 }

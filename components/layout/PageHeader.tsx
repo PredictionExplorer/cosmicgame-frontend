@@ -82,8 +82,13 @@ export interface PageHeaderProps {
   relatedLabel?: string;
   /** Right-aligned action cluster (buttons, links). Stacks below the title on phones. */
   actions?: ReactNode;
-  /** Extra header content, rendered last (an address chip, a network badge). */
+  /** Extra header content, rendered after the related pages (an address chip, a network badge). */
   children?: ReactNode;
+  /**
+   * Sub-navigation between sibling pages (`PageHeaderTabs`), set on the
+   * header's bottom rule, e.g. the Trust Center pages.
+   */
+  tabs?: ReactNode;
   /** `id` of the H1, for an `aria-labelledby` elsewhere on the page. */
   titleId?: string;
   className?: string;
@@ -164,6 +169,7 @@ export function PageHeader({
   relatedLabel,
   actions,
   children,
+  tabs,
   titleId,
   className,
   align = 'left',
@@ -199,7 +205,8 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        'relative mb-8 border-b border-rule pb-7 print:relative print:z-[2] print:text-foreground sm:mb-10 sm:pb-10',
+        'relative mb-8 border-b border-rule print:relative print:z-[2] print:text-foreground sm:mb-10',
+        tabs ? 'pb-0' : 'pb-7 sm:pb-10',
         centered && 'text-center',
         className,
       )}
@@ -301,7 +308,54 @@ export function PageHeader({
       ) : null}
 
       {children}
+
+      {tabs ? <div className="mt-6 sm:mt-8">{tabs}</div> : null}
     </header>
+  );
+}
+
+export interface PageHeaderTab {
+  href: string;
+  label: string;
+  /** The page being viewed. */
+  current?: boolean;
+}
+
+/**
+ * Underline tabs between sibling pages, for `PageHeader`'s `tabs` slot: they
+ * sit on the header's bottom rule, the current page marked with a 2px primary
+ * rule and `aria-current="page"`. On phones the row scrolls, fading at the
+ * edge. Links, not ARIA tabs: each one is its own page.
+ */
+export function PageHeaderTabs({
+  label,
+  items,
+}: {
+  /** Accessible name of the nav. */
+  label: string;
+  items: readonly PageHeaderTab[];
+}) {
+  return (
+    <nav aria-label={label} className="-mb-px">
+      <ul className="flex gap-6 overflow-x-auto scrollbar-none max-sm:pe-8 max-sm:[mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)]">
+        {items.map((item) => (
+          <li key={item.href} className="shrink-0">
+            <Link
+              href={item.href}
+              aria-current={item.current ? 'page' : undefined}
+              className={cn(
+                'focus-ring-inset inline-flex min-h-11 items-center whitespace-nowrap border-b-2 type-label transition-colors duration-fast',
+                item.current
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:border-rule hover:text-foreground',
+              )}
+            >
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 

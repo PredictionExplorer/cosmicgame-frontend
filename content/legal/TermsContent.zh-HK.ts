@@ -5,8 +5,6 @@ import type { TermsCopy } from './TermsContent';
 export const termsCopyZhHk = {
   title: '服務條款',
   subtitle: '使用 Cosmic Signature 前，請仔細閱讀本條款。使用本平台即表示你同意受本條款約束。',
-  homeLabel: '主頁',
-  lastUpdated: '最後更新：2026年7月20日',
   sections: [
     {
       id: 'acceptance',

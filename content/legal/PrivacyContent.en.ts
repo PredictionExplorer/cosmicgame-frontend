@@ -4,8 +4,6 @@ export const privacyCopyEn = {
   title: 'Privacy Policy',
   subtitle:
     'Your privacy is important to us. This policy explains how Cosmic Signature collects, uses, and protects your information when you interact with our decentralized application.',
-  homeLabel: 'Home',
-  lastUpdated: 'Last updated: July 20, 2026',
   introductionTitle: 'Introduction',
   introduction: [
     'Cosmic Signature is a procedural on-chain art protocol built on Arbitrum, an Ethereum Layer 2 network. As a decentralized application (dApp), we operate differently from traditional web applications when it comes to data and privacy.',

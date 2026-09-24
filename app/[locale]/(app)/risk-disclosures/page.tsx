@@ -2,6 +2,7 @@ import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { getRiskCopy } from '@/content/legal';
+import { TrustCenterTabs } from '@/content/legal/TrustCenterTabs';
 import { TrustPageContent } from '@/content/legal/TrustPageContent';
 
 import { PageShell } from '@/components/ui/page-shell';
@@ -51,7 +52,12 @@ export default async function RiskDisclosuresPage({ params }: PageProps) {
           localeHref(APP_ORIGIN, '/', locale),
         )}
       />
-      <TrustPageContent copy={getRiskCopy(locale)} locale={locale} />
+      <TrustPageContent
+        copy={getRiskCopy(locale)}
+        locale={locale}
+        page="risk"
+        tabs={<TrustCenterTabs current="risk" locale={locale} />}
+      />
     </PageShell>
   );
 }

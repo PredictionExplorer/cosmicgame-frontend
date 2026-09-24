@@ -55,6 +55,7 @@
     },
     "snapshot": "數據快照：{date}",
     "lastReviewed": "最後審閱：{date}",
+    "lastUpdated": "最後更新：{date}",
     "relatedPages": "相關頁面"
   },
   "status": {

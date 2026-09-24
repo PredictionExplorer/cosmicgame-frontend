@@ -55,6 +55,7 @@
     },
     "snapshot": "데이터 스냅숏: {date}",
     "lastReviewed": "최종 검토: {date}",
+    "lastUpdated": "최종 업데이트: {date}",
     "relatedPages": "관련 페이지"
   },
   "status": {

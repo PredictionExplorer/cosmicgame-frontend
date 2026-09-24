@@ -4,8 +4,6 @@ export const privacyCopyZh = {
   title: '隐私政策',
   subtitle:
     '我们重视你的隐私。本政策说明你与 Cosmic Signature 去中心化应用交互时，我们如何收集、使用及保护相关信息。',
-  homeLabel: '首页',
-  lastUpdated: '最后更新：2026年7月20日',
   introductionTitle: '引言',
   introduction: [
     'Cosmic Signature 是构建在 Arbitrum（以太坊二层网络）上的程序化链上艺术协议。作为去中心化应用（dApp），我们在数据与隐私方面的运作方式不同于传统 Web 应用。',

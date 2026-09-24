@@ -2,8 +2,7 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Korean copy for /security, rendered by TrustPageContent. */
 export const securityCopyKo: TrustPageCopy = {
-  eyebrow: '신뢰와 보안',
-  title: 'Cosmic Signature 보안',
+  title: '보안',
   intro:
     'Cosmic Signature는 Arbitrum 위의 절차적 온체인 아트 프로토콜입니다. 공개된 스마트 컨트랙트와 투명한 프로토콜 데이터, 신중한 지갑 사용, 명확한 참여 안내를 바탕으로 보안을 관리합니다.',
   sections: [

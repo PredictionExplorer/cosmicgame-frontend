@@ -14,12 +14,28 @@ describe('SnapshotStamp', () => {
 });
 
 describe('ReviewedStamp', () => {
-  it('renders the review date as a machine-readable calendar date', () => {
+  it('renders the review date as a machine-readable, spelled-out calendar date', () => {
     render(<ReviewedStamp date="2026-07-20" />);
     const time = screen.getByText(/common\.pageHeader\.lastReviewed/);
     expect(time.tagName).toBe('TIME');
     expect(time).toHaveAttribute('datetime', '2026-07-20');
-    expect(time).toHaveTextContent('date=Jul 20, 2026');
+    expect(time).toHaveTextContent('date=July 20, 2026');
+  });
+
+  it('says "Last updated" for a document whose text changed that day', () => {
+    render(<ReviewedStamp date="2026-07-20" kind="updated" />);
+    expect(screen.getByText(/common\.pageHeader\.lastUpdated/)).toHaveAttribute(
+      'datetime',
+      '2026-07-20',
+    );
+  });
+
+  it('never shifts the date across time zones', () => {
+    // Midnight UTC is the evening before in the Americas; the date must not move.
+    render(<ReviewedStamp date="2026-01-01" />);
+    expect(screen.getByText(/common\.pageHeader\.lastReviewed/)).toHaveTextContent(
+      'date=January 1, 2026',
+    );
   });
 
   it('renders nothing for a date that is not an ISO calendar date', () => {

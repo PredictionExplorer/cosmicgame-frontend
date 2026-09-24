@@ -12,8 +12,6 @@ export const termsCopyVi = {
   title: 'Điều khoản dịch vụ',
   subtitle:
     'Vui lòng đọc kỹ các điều khoản này trước khi sử dụng Cosmic Signature. Khi sử dụng nền tảng, bạn đồng ý chịu ràng buộc bởi các điều khoản này.',
-  homeLabel: 'Trang chủ',
-  lastUpdated: 'Cập nhật lần cuối: 20 tháng 7 năm 2026',
   sections: [
     {
       id: 'acceptance',

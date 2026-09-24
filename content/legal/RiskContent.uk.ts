@@ -2,7 +2,6 @@ import type { TrustPageCopy } from './TrustPageContent';
 
 /** Ukrainian copy for /risk-disclosures, rendered by TrustPageContent. */
 export const riskCopyUk: TrustPageCopy = {
-  eyebrow: 'Ризики та ясність для учасників',
   title: 'Розкриття ризиків',
   // lexicon-allow-start: explicit legal denial copy must name the denied categories.
   intro:
