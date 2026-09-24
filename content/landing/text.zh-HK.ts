@@ -6,8 +6,7 @@ import type { LandingText } from './structure';
 export const landingTextZhHk = {
   meta: {
     title: 'Cosmic Signature · Arbitrum 上的程序化鏈上藝術協議',
-    description:
-      'Cosmic Signature 是運行於 Arbitrum 的程序化鏈上藝術協議。每一筆都在塑造這一週期最終的簽名；週期收官後，協議會將儲備重新分配給共同塑造結果的參與者，並將其中一部分轉撥給以太坊賴以運轉的基礎設施。',
+    description: `Cosmic Signature 是運行於 Arbitrum 的程序化鏈上藝術協議。參與者在每個演繹週期中落筆；週期收官後，新的簽名作品隨之銘刻，週期儲備按十餘條軌道分配，其中 ${protocolFacts.publicGoodsPercentage}% 轉撥給以太坊核心貢獻者。`,
     keywords: [
       'Cosmic Signature',
       '程序化藝術協議',
@@ -22,34 +21,14 @@ export const landingTextZhHk = {
   },
 
   hero: {
-    eyebrow: '程序化鏈上藝術協議 · Arbitrum',
+    eyebrow: '程序化鏈上藝術協議 · Arbitrum',
     headline: '每一次落筆， 都在塑造藝術。',
     headlineLead: '每一次落筆，',
     headlineAccent: '都在塑造藝術。',
-    subhead:
-      '參與 Arbitrum 上不斷成長的藝術協議。每次落筆都在塑造下一份簽名；每個週期都會將儲備分配給參與者及以太坊的公共基礎設施。',
-    biologyDisclaimer:
-      'Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵沒有關聯。本項目是鏈上藝術協議及應用程式。',
+    subhead: `使用 ETH 或 CST 落筆，延長週期的收官倒數。倒數歸零後，完成收官即可銘刻新的簽名作品並分配週期儲備，其中 ${protocolFacts.publicGoodsPercentage}% 轉撥給以太坊核心貢獻者。`,
     primaryCtaLabel: '打開應用程式',
-    secondaryCtaLabel: '探索週期',
-    statisticsCtaLabel: '查看統計',
-    galleryCtaLabel: '瀏覽畫廊',
-    scrollAriaLabel: '滾動到週期介紹',
-    marqueeChips: [
-      '已驗證合約',
-      'CC0',
-      '開源',
-      '確定性藝術',
-      '7% 轉撥至 Protocol Guild',
-      '宇宙議會',
-      'Arbitrum One',
-    ],
+    secondaryCtaLabel: '了解週期如何運作',
     art: {
-      eyebrow: '來自作品集',
-      caption: '銘刻於鏈上 · CC0',
-      cstNote: `每枚銘刻的簽名作品都配有 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST。`,
-      formingLabel: '信號生成中',
-      formingBody: '作品載入完成後，便會在這裏顯示。',
       viewAriaLabel: '在應用程式中查看 Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature {tokenLabel} —— 確定性三體生成藝術作品',
       galleryCta: '瀏覽完整畫廊',
@@ -59,28 +38,22 @@ export const landingTextZhHk = {
   cycle: {
     eyebrow: '週期',
     heading: '從開啟到收官，讀懂完整的演繹週期。',
-    // lexicon-allow-start: 明確否認莊家角色。
-    description:
-      '每個週期都從校準窗口開始，在一次次落筆中延展，直至收官倒數歸零。沒有莊家，沒有中介，只有協議本身。',
-    // lexicon-allow-end
-    stages: {
-      opening: {
-        title: '週期開啟',
-        body: `新的演繹週期由此開始。首個 ETH 校準窗口隨之開啟；CST 校準窗口的初始時長記錄在鏈上，目前為 ${protocolFacts.initialCstCalibrationWindowHours} 小時。`,
-      },
-      gestures: {
+    steps: {
+      gesture: {
         title: '落筆',
-        body: `參與者使用 ETH 或 CST 落筆。每一筆都會延長收官倒數，計入一次星選資格，還可能銘刻參與 CST；具體數量取決於距上一筆經過的時間，並按其平方根計算。ETH 落筆會使 CST 校準窗口縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%；CST 落筆則使其延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%。`,
+        body: 'ETH 或 CST 均可參與。每一筆都記錄在鏈上，並計入本週期的星選資格。',
       },
-      finalization: {
-        title: '收官',
-        body: '收官倒數歸零後，寫下收官之筆的參與者可率先收官。專屬窗口結束後，任何人都可在公開收官窗口收官。',
+      extend: {
+        title: '延長倒數',
+        body: '每一筆都會延長收官倒數；只要有人持續參與，週期就會延續。',
       },
-      allocations: {
-        title: '分配',
-        body: '協議將週期儲備發放至十餘條分配軌道。約一半 ETH 儲備會滾入下一週期的滾動儲備。',
+      finalize: {
+        title: '收官與分配',
+        body: '倒數歸零後即可收官：新的簽名作品隨之銘刻，週期儲備沿下方各條軌道分配。',
       },
     },
+    gestureCtaLabel: '落筆',
+    guideCtaLabel: '逐步了解運作原理',
   },
 
   art: {
@@ -88,14 +61,7 @@ export const landingTextZhHk = {
     heading: '三體軌跡，由鏈上種子生成。',
     description:
       '每枚 Cosmic Signature NFT 都呈現 3 個天體在牛頓引力下的運動軌跡。三體運動天生混沌。沒有 AI，沒有訓練數據，只有確定性的物理。同一種子生成的畫面逐像素一致。',
-    loading: {
-      label: '即時檔案同步中',
-      description: '索引到代幣元數據後，真實生成的 NFT 會隨即在此呈現。',
-    },
     showcase: {
-      collectionLabel: '來自作品集',
-      signalLabel: '信號',
-      awaitingMetadataLabel: '等待元數據',
       viewAriaLabel: '查看 Cosmic Signature {tokenLabel}',
       artworkAlt: 'Cosmic Signature 作品 {tokenLabel}',
     },
@@ -131,10 +97,9 @@ export const landingTextZhHk = {
       },
     },
     facts: {
-      'wavelength-bins': { label: '波長區間' },
-      // Chinese data displays keep Western grouping (glossary-zh.md §3).
-      'physics-steps': { label: '每組候選的物理步數', value: '1,000,000' },
-      'candidate-orbits': { label: '候選軌道', value: '100,000' },
+      imprinted: { label: '已銘刻' },
+      resolution: { label: '原生解像度' },
+      animation: { label: '動畫', value: '30 秒 · 60 fps' },
       license: { label: '授權條款' },
     },
   },
@@ -144,7 +109,8 @@ export const landingTextZhHk = {
     heading: '十餘條軌道，讓週期儲備循軌而行。',
     description:
       '週期收官後，協議會沿各條分配軌道發放 ETH 與 CST 儲備，以表彰堅守、時機、投入與參與。約一半 ETH 儲備會滾入下一週期。',
-    cardLabel: '分配',
+    ethLabel: '每個週期儲備中的 ETH',
+    fixedLabel: '每個週期的 CST 與 NFT',
     items: {
       'signature-allocation': {
         title: '簽名分配',
@@ -172,22 +138,22 @@ export const landingTextZhHk = {
         body: '由程序化隨機選出的 3 位參與者均分；入選頻次隨落筆次數增加。',
       },
       'participant-nft-stellar-selection': {
-        percent: '10 枚 NFT',
+        amount: '10 枚 NFT',
         title: '參與者 NFT 星選',
         body: `程序化隨機選出 10 位參與者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
       },
       'anchored-nft-stellar-selection': {
-        percent: '10 枚 NFT',
+        amount: '10 枚 NFT',
         title: '錨定 NFT 星選',
         body: `程序化隨機選出 10 位 Random Walk NFT 錨定者，每位獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT。`,
       },
       'endurance-champion': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST`,
         title: '堅守冠軍分配',
         body: '連續堅守時間最長的參與者獲配 1,000 表彰 CST 與 1 枚 Cosmic Signature NFT。',
       },
       'final-cst-gesture': {
-        percent: `${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST`,
+        amount: `${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST`,
         title: 'CST 收官之筆分配',
         body: '本週期最後一次使用 CST 落筆的參與者獲配 1,000 表彰 CST 與 1 枚 Cosmic Signature NFT。',
       },
@@ -197,20 +163,20 @@ export const landingTextZhHk = {
   anchoring: {
     eyebrow: '錨定',
     heading: '將 Cosmic Signature NFT 錨定至協議。',
-    body: `每個週期，${protocolFacts.anchorDistributionPercentage}% 的 ETH 週期儲備會用於錨定派發。已錨定的 Cosmic Signature NFT 會按比例累積相應份額，解錨時即可取回。每枚 NFT 僅可錨定一次，但可隨時解錨；一旦解錨，便永久失去再次錨定的資格。已錨定的 Random Walk NFT 可獲得錨定 NFT 星選資格；入選錨定者將獲配 ${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT（不含 ETH）。`,
+    body: `將 Cosmic Signature NFT 錨定至協議後，它每個週期都會按比例累積 ${protocolFacts.anchorDistributionPercentage}% 錨定派發中的份額，解錨時即可取回。可隨時解錨，但每枚 NFT 只可錨定一次。`,
     bullets: [
-      '每個週期累積 ETH 錨定派發，解錨時取回',
-      '可隨時解錨；每枚 NFT 僅可錨定一次',
-      '錨定 Random Walk NFT 可獲得星選資格',
-      '無固定期限、無罰則；每枚 NFT 解錨後不可再錨定',
+      '每個週期累積 ETH，解錨時取回',
+      '沒有固定期限、沒有罰則；每枚 NFT 解錨後不可再錨定',
+      '姊妹系列 Random Walk NFT 也可以錨定',
+      `已錨定的 Random Walk NFT 可獲得錨定 NFT 星選資格：${protocolFacts.specialAllocationCst.toLocaleString('zh-HK')} CST 與 1 枚 Cosmic Signature NFT，不含 ETH`,
     ],
     ctaLabel: '前往應用程式錨定',
   },
 
   publicGoods: {
     eyebrow: '公共物品',
-    heading: `${protocolFacts.publicGoodsPercentage}% 的週期儲備，流向以太坊核心貢獻者。`,
-    body: `每個演繹週期都會將 ETH 儲備的 ${protocolFacts.publicGoodsPercentage}% 轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的集體機制。協議使用得越多，流向以太坊底層基礎設施的資源也越多。`,
+    heading: '每個週期的儲備，都有一部分流向以太坊核心貢獻者。',
+    body: `每個演繹週期都會將 ETH 儲備中的固定份額轉撥給 Protocol Guild——為 170 多位以太坊核心貢獻者提供資助的集體機制。協議使用得越多，流向以太坊底層基礎設施的資源也越多。`,
     disclaimerHeading: '免責聲明',
     // lexicon-allow-start: 明確否認慈善捐贈及相關稅務定性。
     disclaimer:
@@ -231,7 +197,7 @@ export const landingTextZhHk = {
   council: {
     eyebrow: '宇宙議會',
     heading: '協議協調，盡在鏈上。',
-    body: '宇宙議會讓 CST 持有者在鏈上協調協議事務。持有者可將權重委託給自己或其他地址、提交協調提案，並對提案表示支持或反對。支持與棄權權重之和達到 CST 供應量的 3%，即達到協調法定權重要求。提交提案需至少 100 CST 的委託權重。',
+    body: 'CST 持有者在鏈上協調協議事務：委託權重、提交協調提案，並表示支持或反對。',
     columns: [
       {
         title: '協調提案',
@@ -251,7 +217,7 @@ export const landingTextZhHk = {
   verifiability: {
     eyebrow: '可驗證性',
     heading: '開放、已驗證、可復現。',
-    body: '任何人都能從種子重新生成簽名作品，獨立完成驗證。合約驗證、靜態分析說明和審計狀態會隨報告一同發佈在應用程式中。本儲存庫中的項目自有材料採用 CC0 1.0；第三方依賴、字體與素材仍適用各自的授權條款。',
+    body: '任何人都能從種子重新生成簽名作品，獨立完成驗證。合約驗證、靜態分析說明和審計狀態會隨報告一同發佈在應用程式中。Cosmic Signature 各儲存庫中的項目自有材料採用 CC0 1.0；第三方依賴、字體與素材仍適用各自的授權條款。',
     pillars: [
       {
         title: 'CC0 1.0',
@@ -266,12 +232,36 @@ export const landingTextZhHk = {
         body: '持續集成會校驗生成畫面的 SHA-256 哈希。同一種子，得到完全相同的輸出。',
       },
     ],
+    evidenceLabel: '親自查證',
   },
 
   faq: {
     eyebrow: '釋疑',
     heading: '值得直面的問題。',
+    moreLabel: '更多解答請見常見問題',
     items: [
+      {
+        question: '參與者實際要做什麼？',
+        answer:
+          '你可以落筆。每一筆都是使用 ETH 或 CST 發起的鏈上交易，會延長收官倒數、計入一次星選資格，還可能銘刻參與 CST，並共同塑造這一週期的簽名。你還可以將 Cosmic Signature NFT 錨定至協議，使其按比例參與錨定派發；持有至少 100 CST 時，也可以透過宇宙議會提交協調提案。',
+      },
+      {
+        question: '這件藝術作品在技術上是什麼？',
+        answer:
+          '每枚 Cosmic Signature NFT 都由確定性三體模擬渲染而成，模擬遵循牛頓引力。鏈上種子從 100,000 條候選軌道中選出一條；這些軌道均由四階 Yoshida 辛積分器模擬，再透過 64 個波長區間進行光譜渲染，並以 OKLab 混合色彩。整套管線以 CC0 完全開源，任何人都能從種子復現簽名作品。',
+      },
+      {
+        question: 'ETH 分配來自哪裏？',
+        answer:
+          '來自週期儲備；參與者落筆時，儲備隨之增加。週期收官後，約一半滾入下一週期的滾動儲備，其餘則按照鏈上參數，經由各條分配軌道發放，包括簽名分配、時之勇士、錨定派發、星選與公共物品。',
+      },
+      // lexicon-allow-start: 明確否認慈善捐贈及相關稅務定性。
+      {
+        question: '公共物品具體指什麼？',
+        answer:
+          '每個週期會將 ETH 儲備的 7% 轉撥至公共物品地址，目前為 Protocol Guild。Protocol Guild 是為 170 多位以太坊核心貢獻者提供資助的集體機制。這是向公共物品地址轉撥 ETH，並非美國稅法意義上的慈善捐贈；Cosmic Signature 不對其稅務處理作任何陳述。',
+      },
+      // lexicon-allow-end
       // lexicon-allow-start: 明確否認彩票、賭場、賭博、莊家、荷官及賭注類別。
       {
         question: '這是彩票、賭場或賭博產品嗎？',
@@ -279,11 +269,13 @@ export const landingTextZhHk = {
           '不是。Cosmic Signature 是程序化鏈上藝術協議。參與者在演繹週期中落筆；週期收官後，協議將儲備分配至十餘條軌道。這裏沒有莊家，沒有荷官，也沒有賭注。分配所表彰的是堅守、時機與參與。唯一帶有隨機性的分配軌道——星選——是協議層面的程序化分配。',
       },
       // lexicon-allow-end
+      // lexicon-allow-start: 明確否認投資、利潤、股息及投資合同定性。
       {
-        question: '參與者實際要做什麼？',
+        question: '這屬於投資嗎？',
         answer:
-          '你可以落筆。每一筆都是使用 ETH 或 CST 發起的鏈上交易，會延長收官倒數、計入一次星選資格，還可能銘刻參與 CST，並共同塑造這一週期的簽名。你還可以將 Cosmic Signature NFT 錨定至協議，使其按比例參與錨定派發；持有至少 100 CST 時，也可以透過宇宙議會提交協調提案。',
+          '不是。CST 代幣用於表達協議內的參與和協調權重，不代表股權、利潤分成、股息或投資合同。團隊錢包不會從參與者的落筆中接收 ETH。Cosmic Signature 不對代幣價格或未來表現作任何陳述，也不以投資名義招攬參與。',
       },
+      // lexicon-allow-end
       {
         question: '為什麼參與 CST 的數量會變化？',
         answer:
@@ -294,40 +286,23 @@ export const landingTextZhHk = {
         answer: `CST 校準窗口保存在鏈上，每次落筆後都會變化。CST 落筆使窗口延長約 ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%，CST 落筆價格因而下降得更慢；ETH 落筆使窗口縮短約 ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%，價格下降得更快。`,
       },
       {
-        question: 'ETH 分配來自哪裏？',
-        answer:
-          '來自週期儲備；參與者落筆時，儲備隨之增加。週期收官後，約一半滾入下一週期的滾動儲備，其餘則按照鏈上參數，經由各條分配軌道發放，包括簽名分配、時之勇士、錨定派發、星選與公共物品。',
-      },
-      // lexicon-allow-start: 明確否認投資、利潤、股息及投資合同定性。
-      {
-        question: '這屬於投資嗎？',
-        answer:
-          '不是。CST 代幣用於表達協議內的參與和協調權重，不代表股權、利潤分成、股息或投資合同。團隊錢包不會從參與者的落筆中接收 ETH。Cosmic Signature 不對代幣價格或未來表現作任何陳述，也不以投資名義招攬參與。',
-      },
-      // lexicon-allow-end
-      // lexicon-allow-start: 明確否認慈善捐贈及相關稅務定性。
-      {
-        question: '公共物品具體指什麼？',
-        answer:
-          '每個週期會將 ETH 儲備的 7% 轉撥至公共物品地址，目前為 Protocol Guild。Protocol Guild 是為 170 多位以太坊核心貢獻者提供資助的集體機制。這是向公共物品地址轉撥 ETH，並非美國稅法意義上的慈善捐贈；Cosmic Signature 不對其稅務處理作任何陳述。',
-      },
-      // lexicon-allow-end
-      {
-        question: '這件藝術作品在技術上是什麼？',
-        answer:
-          '每枚 Cosmic Signature NFT 都由確定性三體模擬渲染而成，模擬遵循牛頓引力。鏈上種子從 100,000 條候選軌道中選出一條；這些軌道均由四階 Yoshida 辛積分器模擬，再透過 64 個波長區間進行光譜渲染，並以 OKLab 混合色彩。整套管線以 CC0 完全開源，任何人都能從種子復現簽名作品。',
-      },
-      {
         question: '我可以自由複用或改編嗎？',
         answer:
           '可以。項目自有的合約、着色器、渲染器、推廣頁面與文檔均採用 CC0 1.0，不保留任何權利。第三方依賴、字體與素材仍適用各自的授權條款；詳見 THIRD_PARTY_NOTICES.md。',
       },
     ],
   },
+  closing: {
+    eyebrow: '作品集',
+    heading: '每個週期，都為作品集添上新作。',
+    body: '關注即時週期、落筆參與，或瀏覽至今銘刻的每一幅簽名作品。',
+  },
 
   footer: {
     tagline: 'Arbitrum 上的程序化鏈上藝術協議。',
     copyright: '© {year} Cosmic Signature。項目自有材料採用 CC0 1.0。',
     colophon: 'CC0 1.0 · 公開可驗證 · 可復現藝術',
+    disambiguation:
+      'Cosmic Signature 與 COSMIC 癌症突變數據庫及生物學中的 COSMIC 突變特徵沒有關聯。本項目是鏈上藝術協議及應用程式。',
   },
 } satisfies LandingText;

@@ -7,28 +7,23 @@
     },
     "phases": {
       "loading": {
-        "title": "Đang đồng bộ thời gian chu kỳ",
-        "body": "Đang lấy thời gian từ giao thức để hiển thị đếm ngược."
+        "title": "Đang đồng bộ thời gian chu kỳ"
       },
       "openingSoon": {
-        "title": "{cycle} sắp mở",
-        "body": "Chu kỳ tiếp theo sắp mở. Bạn có thể đặt nét bút khi đếm ngược về 0."
+        "title": "{cycle} sắp mở"
       },
       "waitingFirstGesture": {
         "title": "{cycle} đang chờ nét bút đầu tiên",
         "body": "Nét bút đầu tiên bắt đầu đếm ngược đến khi hoàn tất chu kỳ và định hình Signature tiếp theo."
       },
       "approach": {
-        "title": "{cycle} hoàn tất sau",
-        "body": "Chu kỳ đang diễn ra. Mỗi nét bút định hình Signature và có thể kéo dài thời gian đến khi hoàn tất."
+        "title": "{cycle} hoàn tất sau"
       },
       "finalHour": {
-        "title": "{cycle} đang bước vào giờ cuối",
-        "body": "Mỗi nét bút mới có thể kéo dài chu kỳ và để lại thêm dấu vết trên Signature đang hình thành."
+        "title": "{cycle} đang bước vào giờ cuối"
       },
       "nearHorizon": {
-        "title": "{cycle} sắp đến thời điểm hoàn tất",
-        "body": "Thời điểm hoàn tất chu kỳ đã cận kề. Những khoảnh khắc tiếp theo sẽ quyết định hình dạng cuối cùng."
+        "title": "{cycle} sắp đến thời điểm hoàn tất"
       },
       "ready": {
         "title": "{cycle} đã sẵn sàng hoàn tất",
@@ -39,33 +34,37 @@
         "body": "Trang giới thiệu không kết nối được với đồng hồ giao thức. Hãy mở ứng dụng để xem trạng thái chu kỳ mới nhất."
       },
       "live": {
-        "title": "{cycle} hoàn tất sau",
-        "body": "Thời gian đến khi hoàn tất chu kỳ được đồng bộ với ứng dụng. Mỗi nét bút định hình Signature và có thể kéo dài chu kỳ."
+        "title": "{cycle} hoàn tất sau"
       }
     },
-    "staticClock": {
-      "waitingFirstGesture": "Đang chờ nét bút đầu tiên",
-      "ready": "00:00",
-      "unavailable": "Đồng hồ không khả dụng",
-      "syncing": "Đang đồng bộ"
-    },
     "liveClock": "Đồng hồ chu kỳ trực tiếp",
+    "cycleClock": "Đồng hồ chu kỳ",
     "gestureCount": "{count, plural, other {# nét bút}}",
-    "sameClock": "Cùng đồng hồ với ứng dụng",
-    "status": {
-      "ready": "Sẵn sàng hoàn tất",
-      "openingSoon": "Đếm ngược đến lúc mở chu kỳ",
-      "waitingFirstGesture": "Đã mở và đang chờ nét bút đầu tiên",
-      "synchronized": "Đếm ngược đồng bộ với thời gian giao thức"
+    "units": {
+      "days": "ngày",
+      "hours": "giờ",
+      "minutes": "phút",
+      "seconds": "giây"
     },
-    "viewCstPool": "Pool CST trên GeckoTerminal",
-    "eventHorizon": "Chân trời sự kiện",
+    "duration": {
+      "days": "{count, plural, other {# ngày}}",
+      "hours": "{count, plural, other {# giờ}}",
+      "minutes": "{count, plural, other {# phút}}",
+      "seconds": "{count, plural, other {# giây}}"
+    },
+    "currentCycle": "Mở chu kỳ hiện tại",
+    "noscript": "Đồng hồ trực tiếp cần JavaScript. Ứng dụng luôn hiển thị chu kỳ hiện tại.",
     "countdownAria": "{label}: {duration}",
-    "durationPart": "{value} {unit}",
     "durationSeparator": ", "
   },
   "artwork": {
     "previous": "Tác phẩm trước",
-    "next": "Tác phẩm tiếp theo"
+    "next": "Tác phẩm tiếp theo",
+    "pauseRotation": "Tạm dừng chuyển tác phẩm",
+    "resumeRotation": "Tiếp tục chuyển tác phẩm",
+    "playAnimation": "Phát hoạt ảnh",
+    "pauseAnimation": "Tạm dừng hoạt ảnh",
+    "unavailable": "Tác phẩm không khả dụng",
+    "untitled": "Signature {tokenLabel}"
   }
 }

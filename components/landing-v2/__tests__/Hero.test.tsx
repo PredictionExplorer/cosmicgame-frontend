@@ -4,106 +4,109 @@ import { landingContentEn } from '@/content/landing';
 
 import { Hero } from '@/components/landing-v2/Hero';
 
-// HeroCanvas uses dynamic() + ssr:false, which renders a loading state on
-// the server and first client render. We don't need to assert the WebGL;
-// we just need the section chrome to render. Mounting the stub is the
-// observable proxy for "the three.js chunk import was triggered".
-jest.mock('next/dynamic', () => () => {
-  const Stub = () => <div data-testid="hero-canvas-stub" />;
-  Stub.displayName = 'HeroCanvasStub';
-  return Stub;
-});
-
-jest.mock('@/components/three/ReducedMotionFallback', () => ({
-  ReducedMotionFallback: () => <div data-testid="reduced-motion-fallback" />,
-}));
-
 jest.mock('../EventHorizonCountdown', () => ({
   EventHorizonCountdown: () => (
     <section aria-label="Live Performance Cycle countdown" data-testid="event-horizon-countdown" />
   ),
 }));
 
-function installMatchMedia({
-  highQuality,
-  reducedMotion = false,
-}: {
-  highQuality: boolean;
-  reducedMotion?: boolean;
-}) {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    configurable: true,
-    value: jest.fn((query: string) => ({
-      matches: query.includes('prefers-reduced-motion') ? reducedMotion : highQuality,
-      media: query,
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      onchange: null,
-      dispatchEvent: jest.fn(),
-    })),
-  });
-}
+jest.mock('../useLandingShowcaseTokens', () => ({
+  ...jest.requireActual('../useLandingShowcaseTokens'),
+  useLandingShowcaseTokens: () => ({ tokens: [], status: 'loading' }),
+}));
+
+const hero = landingContentEn.hero;
 
 describe('<Hero />', () => {
-  beforeEach(() => {
-    installMatchMedia({ highQuality: true });
-  });
   it('renders the lexicon-safe headline', () => {
-    render(<Hero hero={landingContentEn.hero} />);
+    render(<Hero hero={hero} />);
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent(landingContentEn.hero.headlineLead);
-    expect(heading).toHaveTextContent(landingContentEn.hero.headlineAccent);
+    expect(heading).toHaveTextContent(hero.headlineLead);
+    expect(heading).toHaveTextContent(hero.headlineAccent);
   });
 
-  it('renders the primary CTA linking to the app subdomain in the same tab', () => {
-    render(<Hero hero={landingContentEn.hero} />);
+  it('states the loop in the subhead, with the public-goods share from protocol facts', () => {
+    render(<Hero hero={hero} />);
+    expect(screen.getByText(hero.subhead)).toBeInTheDocument();
+    expect(hero.subhead).toMatch(/gesture with ETH or CST/);
+    expect(hero.subhead).toMatch(/7% of it to Ethereum’s core contributors/);
+  });
+
+  it('offers one commit action into the app, in the same tab', () => {
+    render(<Hero hero={hero} />);
     const primaryCta = screen.getByRole('link', { name: /open the app/i });
     expect(primaryCta).toHaveAttribute('href', 'https://app.cosmicsignature.com');
     expect(primaryCta).not.toHaveAttribute('target');
+    expect(primaryCta.className).toMatch(/bg-signature-gradient/);
+  });
+
+  it('offers a quiet second action to the cycle explainer', () => {
+    render(<Hero hero={hero} />);
+    const secondaryCta = screen.getByRole('link', { name: 'How a cycle works' });
+    expect(secondaryCta).toHaveAttribute('href', '#cycle');
+    expect(secondaryCta.className).not.toMatch(/bg-signature-gradient/);
+  });
+
+  it('reads headline, lede and actions before the exhibit and its controls', () => {
+    // Regression: the plate sat between the H1 and the lede in the source, so
+    // focus met five exhibit controls before the primary action. The grid
+    // still draws the plate under the headline on phones (Landing.module.css).
+    const { container } = render(<Hero hero={hero} />);
+    const inOrder = [
+      screen.getByRole('heading', { level: 1 }),
+      screen.getByText(hero.subhead),
+      screen.getByRole('link', { name: /open the app/i }),
+      screen.getByRole('link', { name: hero.secondaryCta.label }),
+      screen.getByTestId('hero-art-showcase'),
+    ];
+    for (let index = 1; index < inOrder.length; index += 1) {
+      expect(
+        inOrder[index - 1]!.compareDocumentPosition(inOrder[index]!) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
+    expect(container.querySelector('img')).toHaveAttribute('fetchpriority', 'high');
+  });
+
+  it('sets its type from the tokens alone', () => {
+    render(<Hero hero={hero} />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveClass('type-display-xl');
+    expect(screen.getByText(hero.subhead)).toHaveClass('type-body-md', 'sm:type-lede');
   });
 
   it('leaves the site header to the landing shell, outside <main>', () => {
-    render(<Hero hero={landingContentEn.hero} />);
+    render(<Hero hero={hero} />);
     expect(screen.queryByRole('banner')).not.toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
-  it('renders the secondary CTA anchoring to the cycle section', () => {
-    render(<Hero hero={landingContentEn.hero} />);
-    const secondaryCta = screen.getByRole('link', { name: /explore the cycle/i });
-    expect(secondaryCta).toHaveAttribute('href', '#cycle');
-  });
-
-  it('renders the live Event Horizon countdown inside the hero', () => {
-    render(<Hero hero={landingContentEn.hero} />);
+  it('renders the live cycle clock inside the hero', () => {
+    render(<Hero hero={hero} />);
     expect(screen.getByTestId('event-horizon-countdown')).toBeInTheDocument();
-    expect(screen.getByLabelText('Live Performance Cycle countdown')).toBeInTheDocument();
   });
 
-  it('renders the scroll-to-cycle chevron with an accessible label', () => {
-    render(<Hero hero={landingContentEn.hero} />);
-    const chevron = screen.getByRole('link', { name: /scroll to the cycle section/i });
-    expect(chevron).toHaveAttribute('href', '#cycle');
+  it('keeps trust claims and tertiary links off the hero', () => {
+    // Verification and audit status belong on /security and /audits with
+    // their sources (the Verifiability section links them); the hero asks
+    // for one decision.
+    render(<Hero hero={hero} />);
+    for (const claim of ['Verified Contracts', 'Audited Contracts', 'Formally Verified']) {
+      expect(screen.queryByText(claim)).not.toBeInTheDocument();
+    }
+    expect(screen.queryByRole('link', { name: /protocol statistics/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /scroll to/i })).not.toBeInTheDocument();
   });
 
-  it('renders the marquee credibility chips', () => {
-    render(<Hero hero={landingContentEn.hero} />);
-    expect(screen.getByText('CC0')).toBeInTheDocument();
-    expect(screen.getByText('Verified Contracts')).toBeInTheDocument();
-    expect(screen.getByText('7% to Protocol Guild')).toBeInTheDocument();
-  });
-
-  it('avoids unsupported audit claims in the marquee chips', () => {
-    // Audit/formal-verification status is published on /audits; the hero
-    // must not assert it as a blanket fact.
-    render(<Hero hero={landingContentEn.hero} />);
-    expect(screen.queryByText('Formally Verified')).not.toBeInTheDocument();
-    expect(screen.queryByText('Audited Contracts')).not.toBeInTheDocument();
+  it('draws its atmosphere without a canvas or WebGL', () => {
+    // The 16%-opacity three.js scene cost ~314 KB gzip on desktop and threw
+    // without WebGL; the hero is static CSS now, in every browser.
+    const { container } = render(<Hero hero={hero} />);
+    expect(container.querySelector('canvas')).toBeNull();
+    expect(container.querySelector('.starfield')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('contains no banned lexicon terms in the rendered DOM', () => {
-    const { container } = render(<Hero hero={landingContentEn.hero} />);
+    const { container } = render(<Hero hero={hero} />);
     const text = container.textContent ?? '';
     expect(text).not.toMatch(/\bbid(?:ding|der|s)?\b/i);
     expect(text).not.toMatch(/\bprize(?:s|d)?\b/i);
@@ -111,43 +114,22 @@ describe('<Hero />', () => {
     expect(text).not.toMatch(/\bwinner(?:s)?\b/i);
   });
 
-  it('mounts the hero canvas on large viewports without reduced motion', () => {
-    render(<Hero hero={landingContentEn.hero} />);
-    expect(screen.getByTestId('hero-canvas-stub')).toBeInTheDocument();
-  });
-
-  it('never triggers the three.js dynamic import on small viewports', () => {
-    // The gate must run OUTSIDE the dynamically imported component: mounting
-    // it is what downloads the ~320KB three.js chunk, which phones render
-    // nothing with. The static gradient fallback renders instead.
-    installMatchMedia({ highQuality: false });
-    render(<Hero hero={landingContentEn.hero} />);
-    expect(screen.queryByTestId('hero-canvas-stub')).not.toBeInTheDocument();
-    expect(screen.getByTestId('reduced-motion-fallback')).toBeInTheDocument();
-  });
-
-  it('never triggers the three.js dynamic import under reduced motion', () => {
-    installMatchMedia({ highQuality: true, reducedMotion: true });
-    render(<Hero hero={landingContentEn.hero} />);
-    expect(screen.queryByTestId('hero-canvas-stub')).not.toBeInTheDocument();
-    expect(screen.getByTestId('reduced-motion-fallback')).toBeInTheDocument();
-  });
-
   it('keeps the LCP candidates visible at first paint (no opacity-0 wrappers)', () => {
-    // The headline and subhead are the page's LCP candidates. If any
-    // ancestor renders with opacity: 0 (e.g. a framer-motion fade-in), the
-    // server HTML hides them until the whole bundle hydrates, and mobile
-    // LCP degrades by seconds. Entrances here must be transform-only.
-    const { container } = render(<Hero hero={landingContentEn.hero} />);
-    const heading = screen.getByRole('heading', { level: 1 });
-    const subhead = screen.getByText(landingContentEn.hero.subhead);
-    const primaryCta = screen.getByRole('link', { name: /open the app/i });
-
-    for (const element of [heading, subhead, primaryCta]) {
+    // The headline, subhead and first artwork are the page's LCP candidates.
+    // If any ancestor rendered at opacity 0 (a scroll reveal), the server
+    // HTML would hide them until hydration.
+    const { container } = render(<Hero hero={hero} />);
+    const candidates = [
+      screen.getByRole('heading', { level: 1 }),
+      screen.getByText(hero.subhead),
+      screen.getByRole('link', { name: /open the app/i }),
+      container.querySelector('img')!,
+    ];
+    for (const element of candidates) {
       let node: HTMLElement | null = element;
       while (node && node !== container) {
-        const opacity = node.style.opacity;
-        expect(opacity === '' || Number(opacity) > 0).toBe(true);
+        expect(node.style.opacity === '' || Number(node.style.opacity) > 0).toBe(true);
+        expect(node.className.toString()).not.toMatch(/(?:^|\s)opacity-0(?:\s|$)/);
         node = node.parentElement;
       }
     }

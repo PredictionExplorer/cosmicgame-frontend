@@ -71,6 +71,8 @@ test.describe('LCP text paints from server HTML without JavaScript', () => {
     await page.setExtraHTTPHeaders(LANDING_HEADERS);
     await page.goto('/');
     const heading = page.locator('main h1').first();
+    // The lede follows the headline in the source (the grid draws the art
+    // between them on phones).
     const subhead = page.locator('main h1 + p').first();
     await expect(heading).toBeVisible();
     expect(await isHiddenByOpacity(heading)).toBe(false);

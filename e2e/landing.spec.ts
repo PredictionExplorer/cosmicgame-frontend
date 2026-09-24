@@ -19,6 +19,8 @@ const APP_ORIGIN_PATTERN =
   /^https:\/\/app\.cosmicsignature\.com$|^http:\/\/app\.cosmicsignature\.local:3000$/;
 const APP_ZH_ORIGIN_PATTERN =
   /^https:\/\/app\.cosmicsignature\.com\/zh$|^http:\/\/app\.cosmicsignature\.local:3000\/zh$/;
+const CURRENT_CYCLE_PATTERN =
+  /^https:\/\/app\.cosmicsignature\.com(\/zh)?\/current-cycle$|^http:\/\/app\.cosmicsignature\.local:3000(\/zh)?\/current-cycle$/;
 const MOCK_NOW_SECONDS = 1_700_000_000;
 const MOCK_CYCLE_FINALIZATION_SECONDS = MOCK_NOW_SECONDS + 7_265;
 const CURRENT_TIME_ROUTE = '**/api/cosmicgame/time/current';
@@ -110,10 +112,24 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(timer.getByText('Live cycle clock')).toBeVisible();
     await expect(timer.getByRole('heading', { name: /Cycle #42 finalizes in/i })).toBeVisible();
     await expect(timer.getByText('128 Gestures')).toBeVisible();
-    await expect(timer.getByText('Same clock as the app')).toBeVisible();
+    // One freshness stamp replaces the three "same clock as the app" lines.
+    await expect(timer.getByText(/^Updated /)).toBeVisible();
+    await expect(timer.getByTestId('countdown-value')).toHaveCount(4);
 
-    const liveCycleLink = timer.getByRole('link', { name: /open live cycle/i });
-    await expect(liveCycleLink).toHaveAttribute('href', APP_ORIGIN_PATTERN);
+    const liveCycleLink = timer.getByRole('link', { name: /open the current cycle/i });
+    await expect(liveCycleLink).toHaveAttribute('href', CURRENT_CYCLE_PATTERN);
+  });
+
+  test('keeps counting from the last reading when a poll fails', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const timer = page.getByLabel('Live Performance Cycle countdown');
+    await expect(timer.getByTestId('countdown-value')).toHaveCount(4, { timeout: 10_000 });
+
+    await page.route('**/api/cosmicgame/**', (route) => route.abort());
+    await expect(timer.getByRole('status')).toHaveText('Reconnecting…', { timeout: 20_000 });
+    await expect(timer.getByRole('heading', { name: /Cycle #42 finalizes in/i })).toBeVisible();
+    await expect(timer.getByTestId('countdown-value')).toHaveCount(4);
+    await expect(timer.getByText(/unavailable/i)).toHaveCount(0);
   });
 
   test('renders opening-soon state in the hero timer', async ({ page }) => {
@@ -132,8 +148,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
 
     const timer = page.getByLabel('Live Performance Cycle countdown');
     await expect(timer.getByRole('heading', { name: /Cycle #42 opens soon/i })).toBeVisible();
-    await expect(timer.getByText(/countdown reaches zero/i)).toBeVisible();
-    await expect(timer.getByText('Countdown to cycle opening')).toBeVisible();
+    await expect(timer.getByTestId('countdown-value')).toHaveCount(4);
   });
 
   test('renders waiting-for-first-Gesture state in the hero timer', async ({ page }) => {
@@ -150,21 +165,26 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(
       timer.getByRole('heading', { name: /Cycle #42 is waiting for its first Gesture/i }),
     ).toBeVisible();
-    await expect(timer.getByText('Open and waiting for the first Gesture')).toBeVisible();
+    await expect(timer.getByText(/The first Gesture ignites/)).toBeVisible();
+    await expect(timer.getByRole('link', { name: /open the app/i })).toHaveAttribute(
+      'href',
+      APP_ORIGIN_PATTERN,
+    );
   });
 
-  test('all ten landing sections are present in the DOM', async ({ page }) => {
+  test('every landing section is present, art first', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const sectionTitles = [
-      'A Performance Cycle',
       getLandingContent('en').art.heading,
+      'A Performance Cycle',
       'More than ten ways the protocol distributes',
       'Anchor Cosmic Signature',
-      '7% of every cycle',
+      'Every cycle funds Ethereum',
       'Protocol Coordination',
       'Open, verified, reproducible',
       'Questions worth answering plainly',
+      'Every cycle adds to the collection',
     ];
 
     for (const title of sectionTitles) {
@@ -200,10 +220,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(timer.getByText('实时周期时钟')).toBeVisible({ timeout: 10_000 });
     await expect(timer.getByRole('heading', { name: /第 42 个周期距收官还有/ })).toBeVisible();
     await expect(timer.getByText('128 次落笔')).toBeVisible();
-    await expect(timer.getByText('与应用内时钟同步')).toBeVisible();
-    await expect(timer.getByRole('link', { name: '查看实时周期' })).toHaveAttribute(
+    await expect(timer.getByRole('link', { name: '查看当前周期' })).toHaveAttribute(
       'href',
-      APP_ZH_ORIGIN_PATTERN,
+      CURRENT_CYCLE_PATTERN,
     );
 
     await expect(page.getByText('参与者实际要做什么？')).toBeVisible();
@@ -331,7 +350,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     }
   });
 
-  test('honors prefers-reduced-motion by skipping the WebGL canvas', async ({ browser }) => {
+  test('draws no canvas, and holds the art still under reduced motion', async ({ browser }) => {
     const context = await browser.newContext({
       reducedMotion: 'reduce',
       extraHTTPHeaders: LANDING_HEADERS,
@@ -339,13 +358,35 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     const page = await context.newPage();
     try {
       await page.goto('/', { waitUntil: 'domcontentloaded' });
-      // The hero fallback renders a plain gradient div instead of a canvas.
+      // The hero atmosphere is static CSS; there is no WebGL at all.
       await expect(page.locator('canvas')).toHaveCount(0);
-      // Hero content is still present.
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      // No rotation and no animation start by themselves.
+      await expect(page.getByTestId('hero-art-showcase')).toHaveAttribute('data-rotating', 'false');
+      await expect(page.getByRole('button', { name: /pause the artwork rotation/i })).toHaveCount(
+        0,
+      );
+      await expect(page.locator('#art video')).toHaveCount(0);
     } finally {
       await context.close();
     }
+  });
+
+  test('requests the animation only once The Art nears the screen', async ({ page }) => {
+    // Regression: the 3 MB mp4 downloaded on every desktop load, before the
+    // visitor scrolled anywhere near The Art.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const videoRequests: string[] = [];
+    await page.route('**/*.mp4', (route) => {
+      videoRequests.push(route.request().url());
+      return route.abort();
+    });
+    await page.goto('/', { waitUntil: 'load' });
+    await page.waitForLoadState('networkidle');
+    expect(videoRequests).toEqual([]);
+
+    await page.locator('#art figure').scrollIntoViewIfNeeded();
+    await expect.poll(() => videoRequests.length).toBeGreaterThan(0);
   });
 
   test('cross-domain links to Protocol Guild and social open in a new tab with rel="noopener"', async ({
@@ -386,7 +427,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
 
   test('hero secondary CTA scrolls to #cycle', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const secondary = page.getByRole('link', { name: /explore the cycle/i });
+    const secondary = page.getByRole('link', { name: /how a cycle works/i });
     await expect(secondary).toHaveAttribute('href', '#cycle');
 
     await secondary.click();
@@ -395,10 +436,90 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(cycleSection).toBeInViewport({ ratio: 0.01 });
   });
 
-  test('marquee chips render credibility signals', async ({ page }) => {
+  test('keeps trust claims off the hero and links them to their evidence', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    for (const chip of ['CC0', 'Verified Contracts', '7% to Protocol Guild']) {
-      await expect(page.getByText(chip).first()).toBeVisible();
+    const hero = page.locator('[aria-labelledby="landing-headline"]');
+    for (const claim of ['Verified Contracts', 'Audited Contracts', 'Formally Verified']) {
+      await expect(hero.getByText(claim)).toHaveCount(0);
+    }
+    const evidence = page.getByRole('list', { name: 'Check it yourself' });
+    for (const [name, path] of [
+      ['Contracts', '/contracts'],
+      ['Source Code', '/code'],
+      ['Audits', '/audits'],
+      ['Security', '/security'],
+    ] as const) {
+      await expect(evidence.getByRole('link', { name })).toHaveAttribute(
+        'href',
+        new RegExp(`${path}$`),
+      );
+    }
+  });
+
+  test('shows the art in the first screen of a phone, above the primary action', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const plate = page.getByTestId('hero-art-link');
+    const primary = page
+      .locator('main')
+      .getByRole('link', { name: /open the app/i })
+      .first();
+    await expect(plate).toBeInViewport({ ratio: 1 });
+    await expect(primary).toBeInViewport();
+    // Drawn above the action, but read (and focused) after it.
+    const plateBox = await plate.boundingBox();
+    const primaryBox = await primary.boundingBox();
+    expect(plateBox!.y).toBeLessThan(primaryBox!.y);
+  });
+
+  test('reaches the primary action by keyboard before the exhibit controls', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const hero = page.locator('[aria-labelledby="landing-headline"]');
+    const primary = hero.getByRole('link', { name: /open the app/i });
+    const firstControl = hero.getByRole('button').first();
+    const order = await primary.evaluate(
+      (node, other) => node.compareDocumentPosition(other as Node),
+      await firstControl.elementHandle(),
+    );
+    expect(order & 4 /* Node.DOCUMENT_POSITION_FOLLOWING */).toBeTruthy();
+  });
+
+  test('opens the FAQ with what a participant does, not with a denial', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const questions = page.locator('#faq summary');
+    await expect(questions.first()).toHaveText('What do I actually do as a participant?');
+    await expect(questions.nth(1)).toHaveText('What is the art, technically?');
+  });
+
+  test('renders every section visibly without JavaScript', async ({ browser }) => {
+    // Regression (F056): scroll reveals rendered sections at opacity 0 until
+    // hydration; without JavaScript they stayed blank.
+    const context = await browser.newContext({
+      javaScriptEnabled: false,
+      extraHTTPHeaders: LANDING_HEADERS,
+    });
+    const page = await context.newPage();
+    try {
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      for (const selector of ['#art ol', '#tracks ul', '#faq details', '#cycle ol']) {
+        const element = page.locator(selector).first();
+        await element.scrollIntoViewIfNeeded();
+        await expect(element).toBeVisible();
+        expect(await element.evaluate((node) => getComputedStyle(node).opacity)).toBe('1');
+      }
+      // The clock's noscript line stands in for the figures.
+      await expect(page.locator('main noscript p')).toContainText(
+        'The live clock needs JavaScript.',
+      );
+      // Controls that need JavaScript are not offered; the links still work.
+      for (const name of [/next artwork/i, /previous artwork/i, /play the animation/i]) {
+        await expect(page.getByRole('button', { name })).toBeHidden();
+      }
+      await expect(page.getByTestId('hero-art-link')).toBeVisible();
+    } finally {
+      await context.close();
     }
   });
 });

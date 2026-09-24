@@ -41,8 +41,8 @@ Every token and utility these palettes feed is listed in
   hero pages, kept to the gutters. It is pure CSS; there is no particle canvas.
 - `components/layout/BrandMark.tsx` applies the primary colour through an alpha mask
   of the original logo asset, preserving its geometry across every palette.
-- The wallet theme consumes CSS variables directly. `components/three/scene-palette.ts`
-  converts the same HSL values for WebGL; material changes preserve animation state.
+- The wallet theme consumes CSS variables directly. Nothing draws with WebGL: the
+  landing hero's atmosphere and starfield are the same static CSS as the app's.
 
 ## Persistence and rendering
 

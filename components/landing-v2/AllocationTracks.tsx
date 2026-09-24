@@ -1,107 +1,61 @@
-'use client';
-
-import { motion } from 'framer-motion';
-
 import type { LandingContent } from '@/content/landing';
 
-import { SectionHeading } from './SectionHeading';
+import { cn } from '@/lib/utils';
 
-type Tone = 'primary' | 'aurora' | 'rose' | 'impact' | 'nebula' | 'solar' | 'default';
+import { AllocationBar, trackFill } from './AllocationBar';
+import { LandingSection, SectionHeading } from './SectionHeading';
+import styles from './Landing.module.css';
 
-const TONE_STYLES: Record<Tone, string> = {
-  primary: 'border-primary/30 bg-primary/[0.06] shadow-[0_20px_70px_-30px_hsl(var(--primary)/0.2)]',
-  aurora: 'border-primary/25 bg-primary/[0.04]',
-  rose: 'border-secondary/25 bg-secondary/[0.04]',
-  impact: 'border-primary/20 bg-primary/[0.03]',
-  nebula: 'border-secondary/20 bg-secondary/[0.03]',
-  solar: 'border-primary/25 bg-primary/[0.04]',
-  default: 'border-border bg-foreground/[0.02]',
-};
-
-const TONE_TEXT: Record<Tone, string> = {
-  primary: 'text-gradient-signature',
-  aurora: 'text-primary',
-  rose: 'text-secondary',
-  impact: 'text-primary',
-  nebula: 'text-secondary',
-  solar: 'text-primary',
-  default: 'text-foreground',
-};
-
+/**
+ * Allocation Tracks: where a cycle's ETH goes, as one bar drawn to scale
+ * against 100% (the same order and colours as every chart of the split in
+ * the app), a legend with each track's share and purpose, and the fixed CST
+ * and NFT allocations beside it. Server-rendered and visible without
+ * JavaScript; the bar is decorative and the legend carries every figure.
+ */
 export function AllocationTracks({ tracks }: { tracks: LandingContent['tracks'] }) {
   return (
-    <section
-      id="tracks"
-      className="relative border-t border-border bg-background py-16 sm:py-24 lg:py-28"
-    >
-      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-12">
-        <SectionHeading
-          eyebrow={tracks.eyebrow}
-          heading={tracks.heading}
-          description={tracks.description}
-        />
+    <LandingSection id="tracks" labelledBy="landing-tracks-heading">
+      <SectionHeading
+        eyebrow={tracks.eyebrow}
+        heading={tracks.heading}
+        headingId="landing-tracks-heading"
+        description={tracks.description}
+      />
 
-        <div className="mt-16 grid auto-rows-[minmax(220px,auto)] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-          {tracks.items.map((item, idx) => {
-            const tone = (item.tone ?? 'default') as Tone;
-
-            let span = 'sm:col-span-1 lg:col-span-2';
-            if (idx === 0) span = 'sm:col-span-2 lg:col-span-4';
-            if (idx === 1) span = 'sm:col-span-2 lg:col-span-2';
-            if (idx === 2) span = 'sm:col-span-1 lg:col-span-3';
-            if (idx === 3) span = 'sm:col-span-1 lg:col-span-3';
-            if (idx === 4) span = 'sm:col-span-1 lg:col-span-2';
-            if (idx === 5) span = 'sm:col-span-1 lg:col-span-2';
-            if (idx === 6) span = 'sm:col-span-2 lg:col-span-2';
-
-            return (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5, delay: Math.min(idx * 0.04, 0.3) }}
-                className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-6 transition hover:border-primary/30 ${TONE_STYLES[tone]} ${span}`}
-              >
-                <div
-                  className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-30 blur-3xl transition-opacity group-hover:opacity-60"
-                  style={{
-                    background:
-                      tone === 'default'
-                        ? 'radial-gradient(circle, hsl(var(--primary) / 0.15), transparent)'
-                        : undefined,
-                  }}
-                  aria-hidden
-                />
-
-                <div className="relative">
-                  <p
-                    className={`font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground`}
-                  >
-                    {tracks.cardLabel}
-                  </p>
-                  <p
-                    className={`mt-3 text-4xl font-semibold tracking-tight sm:text-5xl ${TONE_TEXT[tone]}`}
-                    style={{ fontFamily: 'var(--font-family-display)' }}
-                  >
-                    {item.percent}
-                  </p>
-                </div>
-
-                <div className="relative mt-6">
-                  <h3
-                    className="text-xl font-semibold text-foreground sm:text-2xl"
-                    style={{ fontFamily: 'var(--font-family-display)' }}
-                  >
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+      <div className={styles.split}>
+        <h3 className="type-label text-subtle" id="landing-tracks-eth">
+          {tracks.ethLabel}
+        </h3>
+        <AllocationBar tracks={tracks.eth} className="mt-4" />
+        <ul className={styles.legend} aria-labelledby="landing-tracks-eth">
+          {tracks.eth.map((track) => (
+            <li key={track.id} className={styles.legendItem}>
+              <span aria-hidden="true" className={cn(styles.swatch, trackFill(track.id))} />
+              <h4 className="type-title">{track.title}</h4>
+              <span className="type-figure-md text-right">{track.percent}</span>
+              <p className={cn('type-body-sm text-muted-foreground', styles.legendBody)}>
+                {track.body}
+              </p>
+            </li>
+          ))}
+        </ul>
       </div>
-    </section>
+
+      <div className={styles.fixed}>
+        <h3 className="type-label text-subtle" id="landing-tracks-fixed">
+          {tracks.fixedLabel}
+        </h3>
+        <ul className={styles.fixedList} aria-labelledby="landing-tracks-fixed">
+          {tracks.fixed.map((track) => (
+            <li key={track.id} className={styles.fixedItem}>
+              <span className="type-figure-md">{track.amount}</span>
+              <h4 className="type-title mt-3">{track.title}</h4>
+              <p className="type-body-sm mt-1.5 text-muted-foreground">{track.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </LandingSection>
   );
 }

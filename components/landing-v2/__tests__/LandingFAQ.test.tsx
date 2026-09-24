@@ -1,50 +1,78 @@
 import { render, screen } from '@testing-library/react';
 
-import { landingContentEn } from '@/content/landing';
+import { getLandingContent, landingContentEn } from '@/content/landing';
 
+import { routing } from '@/i18n/routing';
 import { LandingFAQ } from '@/components/landing-v2/LandingFAQ';
+
+const faq = landingContentEn.faq;
 
 describe('<LandingFAQ />', () => {
   it('renders the section heading with an id="faq" anchor', () => {
-    const { container } = render(<LandingFAQ faq={landingContentEn.faq} />);
-    expect(container.querySelector('#faq')).not.toBeNull();
+    const { container } = render(<LandingFAQ faq={faq} />);
+    expect(container.querySelector('#faq')).toHaveAttribute(
+      'aria-labelledby',
+      'landing-faq-heading',
+    );
   });
 
-  it('renders every question in the FAQ list', () => {
-    render(<LandingFAQ faq={landingContentEn.faq} />);
-    for (const item of landingContentEn.faq.items) {
-      expect(screen.getByText(item.question)).toBeInTheDocument();
+  it('puts every answer in the server HTML as a native disclosure, all closed', () => {
+    const { container } = render(<LandingFAQ faq={faq} />);
+    const disclosures = container.querySelectorAll('details');
+    expect(disclosures).toHaveLength(faq.items.length);
+    for (const [index, disclosure] of Array.from(disclosures).entries()) {
+      expect(disclosure.open).toBe(false);
+      expect(disclosure.getAttribute('name')).toBe('landing-faq');
+      expect(disclosure.querySelector('summary')).toHaveTextContent(faq.items[index]!.question);
+      expect(disclosure).toHaveTextContent(faq.items[index]!.answer);
     }
   });
 
-  it('renders a FAQPage JSON-LD script for SEO', () => {
-    const { container } = render(<LandingFAQ faq={landingContentEn.faq} />);
+  it('opens with what a participant does and what the art is, not with a denial', () => {
+    // lexicon-allow-start: the denial questions are matched to assert their place.
+    const denial = /lottery|casino|gambling|investment/i;
+    // lexicon-allow-end
+    for (const locale of routing.locales) {
+      const items = getLandingContent(locale).faq.items;
+      expect(items[0]!.question).not.toMatch(denial);
+      expect(items[1]!.question).not.toMatch(denial);
+    }
+    expect(faq.items[0]!.question).toBe('What do I actually do as a participant?');
+    expect(faq.items[1]!.question).toBe('What is the art, technically?');
+  });
+
+  it('keeps the same questions in the same order in every locale', () => {
+    const count = faq.items.length;
+    for (const locale of routing.locales) {
+      expect(getLandingContent(locale).faq.items).toHaveLength(count);
+    }
+  });
+
+  it('renders a FAQPage JSON-LD script in the same order', () => {
+    const { container } = render(<LandingFAQ faq={faq} />);
     const script = container.querySelector('script[type="application/ld+json"]');
-    expect(script).not.toBeNull();
     const data = JSON.parse(script?.textContent ?? '{}') as {
       '@type'?: string;
-      mainEntity?: unknown[];
+      mainEntity?: { name?: string }[];
     };
     expect(data['@type']).toBe('FAQPage');
-    expect(Array.isArray(data.mainEntity)).toBe(true);
-    expect(data.mainEntity?.length).toBe(landingContentEn.faq.items.length);
+    expect(data.mainEntity?.map((entity) => entity.name)).toEqual(
+      faq.items.map((item) => item.question),
+    );
   });
 
-  it('starts with all answers collapsed (Radix Accordion type=single)', () => {
-    render(<LandingFAQ faq={landingContentEn.faq} />);
-    const triggers = screen.getAllByRole('button');
-    for (const trigger of triggers) {
-      expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    }
+  it('links to the full FAQ in the app, in the same tab', () => {
+    render(<LandingFAQ faq={faq} />);
+    const link = screen.getByRole('link', { name: faq.moreLabel });
+    expect(link).toHaveAttribute('href', 'https://app.cosmicsignature.com/faq');
+    expect(link).not.toHaveAttribute('target');
   });
 
   it('question text uses cosmic vocabulary (not banned terms, except denial copy)', () => {
-    // Questions themselves may include banned words only in FAQ denial copy
-    // ("Is this a lottery..."). Non-denial questions must be lexicon-safe.
     // lexicon-allow-start: denial-marker array must contain the banned words by design
     const denialMarkers = ['lottery', 'casino', 'gambling', 'investment'];
     // lexicon-allow-end
-    for (const item of landingContentEn.faq.items) {
+    for (const item of faq.items) {
       const isDenial = denialMarkers.some((m) => item.question.toLowerCase().includes(m));
       if (isDenial) continue;
       expect(item.question).not.toMatch(/\bbid(?:ding|s|der)?\b/i);

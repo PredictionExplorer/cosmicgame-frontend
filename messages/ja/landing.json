@@ -7,28 +7,23 @@
     },
     "phases": {
       "loading": {
-        "title": "サイクル時刻を同期しています",
-        "body": "カウントダウンを表示する前に、プロトコルのライブ時計を読み取っています。"
+        "title": "サイクル時刻を同期しています"
       },
       "openingSoon": {
-        "title": "{cycle}はまもなく始まります",
-        "body": "次のサイクルが開始の準備をしています。このカウントダウンがゼロになると、一筆を入れられるようになります。"
+        "title": "{cycle}はまもなく始まります"
       },
       "waitingFirstGesture": {
         "title": "{cycle}は最初の一筆を待っています",
         "body": "最初の一筆で確定までのカウントダウンが始まり、次のシグネチャーが形づくられていきます。"
       },
       "approach": {
-        "title": "{cycle}の確定まで",
-        "body": "サイクルは進行中です。一筆ごとにシグネチャーが形づくられ、確定までの時計が延びることがあります。"
+        "title": "{cycle}の確定まで"
       },
       "finalHour": {
-        "title": "{cycle}は最後の1時間に入りました",
-        "body": "新たな一筆を入れると確定までの時間が延び、シグネチャーに新しい痕跡が加わります。"
+        "title": "{cycle}は最後の1時間に入りました"
       },
       "nearHorizon": {
-        "title": "{cycle}の確定時刻が近づいています",
-        "body": "サイクル確定時刻まであとわずかです。最後まで、一筆を重ねるたびに作品が変化します。"
+        "title": "{cycle}の確定時刻が近づいています"
       },
       "ready": {
         "title": "{cycle}を確定できます",
@@ -39,33 +34,37 @@
         "body": "サイクル時刻を取得できませんでした。最新の状態はアプリで確認してください。"
       },
       "live": {
-        "title": "{cycle}の確定まで",
-        "body": "アプリと同じサイクル確定時刻を表示しています。一筆ごとにシグネチャーが形づくられ、確定までの時間が延びることがあります。"
+        "title": "{cycle}の確定まで"
       }
     },
-    "staticClock": {
-      "waitingFirstGesture": "最初の一筆を待っています",
-      "ready": "00:00",
-      "unavailable": "時刻を取得できません",
-      "syncing": "同期中"
-    },
     "liveClock": "ライブのサイクル時計",
+    "cycleClock": "サイクルの時計",
     "gestureCount": "{count, plural, other {#筆}}",
-    "sameClock": "アプリと同じ時計",
-    "status": {
-      "ready": "確定できる状態",
-      "openingSoon": "サイクル開始までのカウントダウン",
-      "waitingFirstGesture": "開始済み、最初の一筆を待っています",
-      "synchronized": "プロトコル時刻に同期したカウントダウン"
+    "units": {
+      "days": "日",
+      "hours": "時間",
+      "minutes": "分",
+      "seconds": "秒"
     },
-    "viewCstPool": "GeckoTerminalのCSTプール",
-    "eventHorizon": "事象の地平線",
+    "duration": {
+      "days": "{count, plural, other {#日}}",
+      "hours": "{count, plural, other {#時間}}",
+      "minutes": "{count, plural, other {#分}}",
+      "seconds": "{count, plural, other {#秒}}"
+    },
+    "currentCycle": "現在のサイクルを開く",
+    "noscript": "ライブの時計にはJavaScriptが必要です。アプリでは現在のサイクルをいつでも確認できます。",
     "countdownAria": "{label}：{duration}",
-    "durationPart": "{value}{unit}",
     "durationSeparator": " "
   },
   "artwork": {
     "previous": "前の作品",
-    "next": "次の作品"
+    "next": "次の作品",
+    "pauseRotation": "作品の切り替えを一時停止",
+    "resumeRotation": "作品の切り替えを再開",
+    "playAnimation": "アニメーションを再生",
+    "pauseAnimation": "アニメーションを一時停止",
+    "unavailable": "アートワークを利用できません",
+    "untitled": "シグネチャー{tokenLabel}"
   }
 }

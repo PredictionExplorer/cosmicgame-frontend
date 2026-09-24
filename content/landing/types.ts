@@ -1,3 +1,5 @@
+import type { AllocationTrackId } from '@/config/allocationTracks';
+
 export interface LandingLink {
   readonly label: string;
   readonly href: string;
@@ -9,12 +11,8 @@ export interface LandingMetaContent {
   readonly keywords: readonly string[];
 }
 
+/** Copy around the hero's artwork; the token itself comes from the collection. */
 export interface LandingHeroArtContent {
-  readonly eyebrow: string;
-  readonly caption: string;
-  readonly cstNote: string;
-  readonly formingLabel: string;
-  readonly formingBody: string;
   /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */
   readonly viewAriaLabel: string;
   /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */
@@ -27,14 +25,10 @@ export interface LandingHeroContent {
   readonly headline: string;
   readonly headlineLead: string;
   readonly headlineAccent: string;
+  /** The loop in one breath: what a visitor does and what happens at zero. */
   readonly subhead: string;
-  readonly biologyDisclaimer: string;
   readonly primaryCta: LandingLink;
   readonly secondaryCta: LandingLink;
-  readonly statisticsCta: LandingLink;
-  readonly galleryCta: LandingLink;
-  readonly scrollAriaLabel: string;
-  readonly marqueeChips: readonly string[];
   readonly art: LandingHeroArtContent;
 }
 
@@ -44,27 +38,25 @@ export interface LandingStage {
   readonly body: string;
 }
 
+/** "How a cycle works": three numbered steps, then a way to take the first one. */
 export interface LandingCycleContent {
   readonly eyebrow: string;
   readonly heading: string;
-  readonly description: string;
-  readonly stages: readonly LandingStage[];
+  readonly steps: readonly LandingStage[];
+  readonly gestureCta: LandingLink;
+  readonly guideCta: LandingLink;
 }
+
+export type LandingArtFactId = 'imprinted' | 'resolution' | 'animation' | 'license';
 
 export interface LandingArtFact {
+  readonly id: LandingArtFactId;
   readonly label: string;
-  readonly value: string;
-}
-
-export interface LandingArtLoadingContent {
-  readonly label: string;
-  readonly description: string;
+  /** `null` for a figure read live from the collection (the imprinted count). */
+  readonly value: string | null;
 }
 
 export interface LandingArtShowcaseContent {
-  readonly collectionLabel: string;
-  readonly signalLabel: string;
-  readonly awaitingMetadataLabel: string;
   /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */
   readonly viewAriaLabel: string;
   /** Serializable template. Replace `{tokenLabel}` with the formatted token identifier. */
@@ -75,35 +67,40 @@ export interface LandingArtContent {
   readonly eyebrow: string;
   readonly heading: string;
   readonly description: string;
-  readonly loading: LandingArtLoadingContent;
   readonly showcase: LandingArtShowcaseContent;
   readonly stageLabel: string;
   readonly stages: readonly LandingStage[];
   readonly facts: readonly LandingArtFact[];
 }
 
-export type LandingTrackTone =
-  | 'primary'
-  | 'aurora'
-  | 'rose'
-  | 'impact'
-  | 'nebula'
-  | 'solar'
-  | 'default';
-
-export interface LandingTrackItem {
+/** One share of a cycle's ETH reserve, drawn to scale against 100%. */
+export interface LandingEthTrack {
+  readonly id: AllocationTrackId;
+  /** Percent of the ETH Cycle Reserve (the compounding share is the remainder). */
+  readonly share: number;
+  /** The share as the reader sees it ("25%", "~50%"). */
   readonly percent: string;
   readonly title: string;
   readonly body: string;
-  readonly tone: LandingTrackTone;
+}
+
+/** A fixed CST and NFT allocation made every cycle. */
+export interface LandingFixedTrack {
+  readonly id: string;
+  /** "1,000 CST", "10 NFTs": each locale formats its own amount. */
+  readonly amount: string;
+  readonly title: string;
+  readonly body: string;
 }
 
 export interface LandingTracksContent {
   readonly eyebrow: string;
   readonly heading: string;
   readonly description: string;
-  readonly cardLabel: string;
-  readonly items: readonly LandingTrackItem[];
+  readonly ethLabel: string;
+  readonly fixedLabel: string;
+  readonly eth: readonly LandingEthTrack[];
+  readonly fixed: readonly LandingFixedTrack[];
 }
 
 export interface LandingAnchoringContent {
@@ -158,6 +155,8 @@ export interface LandingVerifiabilityContent {
   readonly heading: string;
   readonly body: string;
   readonly pillars: readonly LandingVerifiabilityPillar[];
+  /** Heads the links to the evidence (contracts, source code, security, audits). */
+  readonly evidenceLabel: string;
 }
 
 export interface LandingFaqItem {
@@ -168,7 +167,19 @@ export interface LandingFaqItem {
 export interface LandingFaqContent {
   readonly eyebrow: string;
   readonly heading: string;
+  /** Names the link to the app's full FAQ. */
+  readonly moreLabel: string;
   readonly items: readonly LandingFaqItem[];
+}
+
+/** The closing band: recent Signatures and a next step in the app. */
+export interface LandingClosingContent {
+  readonly eyebrow: string;
+  readonly heading: string;
+  readonly body: string;
+  /** The band's commit action: the app's gesture panel (the same link as The Cycle's). */
+  readonly gestureCta: LandingLink;
+  readonly galleryCta: LandingLink;
 }
 
 /** The landing footer's own copy; its links come from config/siteNav.ts. */
@@ -177,6 +188,8 @@ export interface LandingFooterContent {
   /** Serializable template. Replace `{year}` with the current four-digit year. */
   readonly copyright: string;
   readonly colophon: string;
+  /** Says what Cosmic Signature is not (the COSMIC cancer database), in the legal row. */
+  readonly disambiguation: string;
 }
 
 export interface LandingContent {
@@ -190,5 +203,6 @@ export interface LandingContent {
   readonly council: LandingCouncilContent;
   readonly verifiability: LandingVerifiabilityContent;
   readonly faq: LandingFaqContent;
+  readonly closing: LandingClosingContent;
   readonly footer: LandingFooterContent;
 }

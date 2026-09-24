@@ -16,10 +16,13 @@ export const DEFAULT_BUDGET_KB = 640;
 
 /**
  * Landing-home client payload budget. The landing must stay lean: it ships
- * no wallet stack and its three.js hero is a desktop-only dynamic chunk that
- * this manifest-based measurement intentionally excludes.
+ * no wallet stack and no WebGL (its hero atmosphere is static CSS).
+ *
+ * Measured at ~253 KB gzip once the three.js hero was removed (it was
+ * ~289 KB with it). The budget keeps ~17 KB of headroom, so bringing a
+ * WebGL scene or a chart library back to the marketing host fails CI.
  */
-export const DEFAULT_LANDING_BUDGET_KB = 320;
+export const DEFAULT_LANDING_BUDGET_KB = 270;
 
 export type BuildManifest = {
   pages?: Record<string, string[]>;
