@@ -17,14 +17,15 @@ export interface HeaderLedeProps {
  * The page header's lede. On phones it is clamped to three lines, so the
  * header stays inside the first screen, with a "Read more" button when the
  * text is longer; from `sm` it always shows in full. The whole text is in the
- * server HTML either way, and the button only appears once the clamp is
- * measured to hide something.
+ * server HTML either way. Most ledes run past three lines on a phone, so the
+ * server renders the button and the client removes it once it measures a
+ * lede that fits: the common case never shifts the page.
  */
 export function HeaderLede({ children, moreLabel, lessLabel, className }: HeaderLedeProps) {
   const id = useId();
   const ref = useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = useState(false);
-  const [clamped, setClamped] = useState(false);
+  const [clamped, setClamped] = useState(true);
 
   useEffect(() => {
     const element = ref.current;

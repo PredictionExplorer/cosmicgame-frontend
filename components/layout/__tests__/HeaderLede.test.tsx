@@ -1,3 +1,5 @@
+import { renderToString } from 'react-dom/server';
+
 import { HeaderLede } from '@/components/layout/HeaderLede';
 
 import { fireEvent, render, screen } from '@/test-utils';
@@ -16,7 +18,7 @@ function mockOverflow(scrollHeight: number, clientHeight: number) {
 }
 
 describe('HeaderLede', () => {
-  it('shows the whole text and no toggle when nothing is clamped', () => {
+  it('drops the toggle once it measures a lede that fits', () => {
     const restore = mockOverflow(48, 48);
     render(
       <HeaderLede moreLabel="Read more" lessLabel="Show less">
@@ -26,6 +28,16 @@ describe('HeaderLede', () => {
     expect(screen.getByText('A short lede.')).toHaveClass('max-sm:line-clamp-3');
     expect(screen.queryByRole('button')).toBeNull();
     restore();
+  });
+
+  it('renders the toggle on the server, where nothing is measured yet', () => {
+    const html = renderToString(
+      <HeaderLede moreLabel="Read more" lessLabel="Show less">
+        A lede.
+      </HeaderLede>,
+    );
+    expect(html).toContain('Read more');
+    expect(html).toContain('aria-expanded="false"');
   });
 
   it('offers "Read more" when the phone clamp hides text, and expands in place', () => {
