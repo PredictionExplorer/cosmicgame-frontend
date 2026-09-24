@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type RefObject } from 'react';
 
+import { headerRootMargin } from '@/lib/headerOffset';
 import { cn } from '@/lib/utils';
 
 import { GalleryFiltersButton } from './GalleryFiltersButton';
@@ -45,7 +46,7 @@ export function GalleryFloatingFilters({
         setVisible(!toolbarInView && resultsInView);
       },
       // The fixed header covers the top of the viewport.
-      { rootMargin: '-72px 0px 0px 0px' },
+      { rootMargin: headerRootMargin() },
     );
     observer.observe(toolbar);
     observer.observe(results);

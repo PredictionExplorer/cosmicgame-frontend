@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
 import { reportError } from '@/utils/errors';
+import { headerRootMargin } from '@/lib/headerOffset';
 import { useNotify } from '@/hooks/useNotify';
 import { ErrorState } from '@/components/ui/error-state';
 import { AttentionMenu } from '@/components/ui/attention-menu';
@@ -633,7 +634,7 @@ const HomePage = ({
     const form = document.getElementById('make-gesture');
     const desk = document.getElementById('deck');
     // The sticky header covers the top; a sliver behind it is not "in view".
-    const options: IntersectionObserverInit = { rootMargin: '-72px 0px 0px 0px' };
+    const options: IntersectionObserverInit = { rootMargin: headerRootMargin() };
     const formObserver = new IntersectionObserver(
       ([entry]) => setFormInView(entry ? entry.isIntersecting : false),
       options,
