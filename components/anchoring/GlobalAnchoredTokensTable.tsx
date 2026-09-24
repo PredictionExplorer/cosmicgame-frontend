@@ -22,6 +22,18 @@ function anchoredTokenId(row: AnchoredTokenInfo, isRandomWalk: boolean): number 
 }
 
 /**
+ * Newest anchored first: by the anchor's time, then (for NFTs anchored in one
+ * transaction, which share it) by the anchor action, so the ledger reads in
+ * the actions ledger's order above it. Ascending; the table flips it.
+ */
+function byAnchorTime(a: AnchoredTokenInfo, b: AnchoredTokenInfo): number {
+  return (
+    (a.StakeTimeStamp ?? 0) - (b.StakeTimeStamp ?? 0) ||
+    (a.StakeActionId ?? 0) - (b.StakeActionId ?? 0)
+  );
+}
+
+/**
  * Every NFT anchored right now in one collection, shown by its artwork: when
  * it was anchored, the anchor action and its anchor-holder. Newest anchored
  * first, like the actions ledger above it; the date and the NFT sort from
@@ -78,6 +90,7 @@ export const GlobalAnchoredTokensTable = ({
         header: t('tables.globalAnchoredTokens.headers.anchorDatetime.desktop'),
         label: t('tables.globalAnchoredTokens.headers.anchorDatetime.mobile'),
         value: (row) => row.StakeTimeStamp,
+        compare: byAnchorTime,
         sortable: true,
         // On a phone the token's caption carries the date and the action.
         priority: 'secondary',

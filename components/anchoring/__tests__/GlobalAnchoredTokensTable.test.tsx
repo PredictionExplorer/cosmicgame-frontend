@@ -52,6 +52,19 @@ describe('GlobalAnchoredTokensTable', () => {
     }
   });
 
+  it('orders NFTs anchored at the same moment by their action, newest first', () => {
+    // One transaction anchors several NFTs: the API lists them oldest action first.
+    const rows = [26, 27, 28].map((action) => ({
+      ...cstRow,
+      StakeEvtLogId: action,
+      StakeActionId: action,
+      TokenInfo: { TokenId: action },
+    }));
+    render(<GlobalAnchoredTokensTable list={rows} IsRWLK={false} />);
+    const numbers = screen.getAllByRole('link', { name: /^#0000/ }).map((link) => link.textContent);
+    expect(numbers).toEqual(['#000028', '#000027', '#000026']);
+  });
+
   it('shows a Random Walk NFT by its render and links it to its own site', () => {
     render(<GlobalAnchoredTokensTable list={[rwlkRow]} IsRWLK />);
     expect(screen.getByTestId('art-frame')).toBeInTheDocument();
