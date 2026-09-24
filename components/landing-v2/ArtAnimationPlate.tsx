@@ -159,12 +159,13 @@ export function ArtAnimationPlate({
                 {tokenLabel}
               </span>,
               timerT('cycle.numbered', { number: artwork.RoundNum ?? 0 }),
-              <span key="seed" className="inline-flex items-baseline gap-1.5">
-                {seedLabel}
-                <span className="type-hash">{shortSeed(artwork.Seed)}</span>
-              </span>,
             ]}
           />
+          {/* The seed on a line of its own: on a phone it never breaks the facts line. */}
+          <p className="type-caption mt-0.5 flex items-baseline gap-1.5 text-subtle">
+            {seedLabel}
+            <span className="type-hash">{shortSeed(artwork.Seed)}</span>
+          </p>
         </div>
         {failed ? null : (
           <Button

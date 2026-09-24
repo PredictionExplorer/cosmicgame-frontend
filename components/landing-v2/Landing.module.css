@@ -156,10 +156,17 @@
   margin-inline-end: -0.5rem;
 }
 
-/* Controls that only work with JavaScript are not offered without it. */
+/*
+ * Controls that only work with JavaScript are not offered without it; the
+ * gallery link then ends the row, flush with the plate.
+ */
 @media (scripting: none) {
   .scriptedControl {
     display: none;
+  }
+
+  .wallControls {
+    margin-inline-end: 0;
   }
 }
 
@@ -492,9 +499,11 @@
   border-top: 1px solid var(--rule-faint);
 }
 
+/* Kept to a reading measure, also when the plates are not drawn and the words take the row. */
 .checkList {
   display: grid;
   gap: 0.75rem;
+  max-inline-size: var(--measure-prose);
   margin-top: 2rem;
 }
 
@@ -546,10 +555,22 @@
   gap: clamp(3.5rem, 3rem + 3vw, 6rem);
 }
 
+/*
+ * Side by side, the two sections share their rows (heading, list, evidence),
+ * so both lists start level however long either heading runs.
+ */
 @media (width >= 64rem) {
   .pair {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: clamp(3rem, 6vw, 6rem);
+    row-gap: 0;
+  }
+
+  .pair > * {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    align-content: start;
   }
 }
 
