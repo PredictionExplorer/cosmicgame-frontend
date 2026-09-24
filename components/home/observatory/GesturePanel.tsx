@@ -276,6 +276,12 @@ export function GesturePanel({
       ? ethSendWei(priceWei, gestureType, gestureCostPlus)
       : null;
 
+  // The running total earns its line once the wallet has spent something
+  // this cycle; before that the not-refunded note stands alone.
+  const showSpend =
+    cycleSpend != null &&
+    !(cycleSpend.status === 'ready' && cycleSpend.eth <= 0 && cycleSpend.cst <= 0);
+
   const pendingValue = <ValuePending ch={9} />;
   const cstAmount = (value: number | null) =>
     value == null ? pendingValue : <Amount value={value} unit="CST" context="card" />;
@@ -522,10 +528,14 @@ export function GesturePanel({
           : 'border-t border-rule-faint pt-5',
       )}
     >
-      <p data-testid="participation-cost-note" className="type-body-sm text-muted-foreground">
+      {/* The sheet's action row stays pinned, so its note sets small. */}
+      <p
+        data-testid="participation-cost-note"
+        className={cn(isSheet ? 'type-caption' : 'type-body-sm', 'text-muted-foreground')}
+      >
         {t('orientation.costsNote')}
       </p>
-      {cycleSpend && (
+      {showSpend && cycleSpend && (
         <p data-testid="personal-spent" className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <span className="type-label text-subtle">{t('observatory.standing.spent')}</span>{' '}
           <span className="type-figure-sm text-foreground">
@@ -535,7 +545,7 @@ export function GesturePanel({
               <UnknownValue label={t('observatory.standing.checkFailed')} />
             ) : (
               <>
-                {cycleSpend.eth > 0 || cycleSpend.cst <= 0 ? (
+                {cycleSpend.eth > 0 ? (
                   <Amount value={cycleSpend.eth} unit="ETH" context="card" />
                 ) : null}
                 {/* Two currencies side by side, never summed into one figure. */}
@@ -570,7 +580,7 @@ export function GesturePanel({
                     <span>{submit.action}</span>{' '}
                     {submit.cost && (
                       <span className="tabular-nums">
-                        <span aria-hidden className="opacity-70">
+                        <span aria-hidden className="font-normal">
                           ·{' '}
                         </span>
                         {submit.cost}

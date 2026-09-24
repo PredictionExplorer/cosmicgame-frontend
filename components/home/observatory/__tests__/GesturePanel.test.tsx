@@ -411,6 +411,18 @@ describe('GesturePanel', () => {
     expect(spent.querySelectorAll('data')).toHaveLength(2);
   });
 
+  it('leaves the note alone until the wallet has spent something this cycle', () => {
+    render(
+      <GesturePanel
+        {...baseProps}
+        form={makeForm()}
+        cycleSpend={{ status: 'ready', eth: 0, cst: 0 }}
+      />,
+    );
+    expect(screen.getByTestId('participation-cost-note')).toBeInTheDocument();
+    expect(screen.queryByTestId('personal-spent')).not.toBeInTheDocument();
+  });
+
   it('reads the spend as pending or unknown, never as a confident zero', () => {
     const { rerender } = render(
       <GesturePanel {...baseProps} form={makeForm()} cycleSpend={{ status: 'loading' }} />,
