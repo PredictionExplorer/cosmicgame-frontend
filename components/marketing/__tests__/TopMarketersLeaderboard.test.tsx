@@ -82,12 +82,21 @@ describe('TopMarketersLeaderboard', () => {
     expect(container.innerHTML).not.toMatch(/yellow-|amber-|gray-300|lucide-trophy/);
   });
 
-  it('ranks at most five contributors by default', () => {
-    const rewards = Array.from({ length: 8 }, (_, index) =>
-      makeReward(address(index + 1), (8 - index) * 10, index),
+  it('ranks every contributor, ten to a page (regression)', () => {
+    // Seven contributors were shown as five, with nothing saying two were missing.
+    const seven = Array.from({ length: 7 }, (_, index) =>
+      makeReward(address(index + 1), (7 - index) * 10, index),
     );
-    const { container } = render(<TopMarketersLeaderboard rewards={rewards} />);
-    expect(bodyRows(container)).toHaveLength(5);
+    const { container, unmount } = render(<TopMarketersLeaderboard rewards={seven} />);
+    expect(bodyRows(container)).toHaveLength(7);
+    unmount();
+
+    const twelve = Array.from({ length: 12 }, (_, index) =>
+      makeReward(address(index + 1), (12 - index) * 10, index),
+    );
+    const paged = render(<TopMarketersLeaderboard rewards={twelve} />);
+    expect(bodyRows(paged.container)).toHaveLength(10);
+    expect(paged.container).toHaveTextContent('tables.pagination.range(from=1,to=10,total=12)');
   });
 
   it('hands its loading and error states to the table', () => {

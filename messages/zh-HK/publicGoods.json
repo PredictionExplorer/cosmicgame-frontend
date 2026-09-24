@@ -1,11 +1,18 @@
 {
   "loadError": "無法載入公共物品記錄。",
-  "voluntaryLedger": "自願資助記錄",
   "vault": {
     "description": "每個週期收官時，週期儲備中的公共物品份額轉入金庫，並在此等待為 {beneficiary} 取回。",
     "due": "本週期應轉入",
     "dueCaption": "目前週期儲備的 {percent}",
     "inVault": "金庫現存",
     "retrieved": "累計已取回"
+  },
+  "ledger": {
+    "contributions": "資助記錄",
+    "retrievals": "取回記錄"
+  },
+  "contribute": {
+    "title": "向金庫資助",
+    "description": "將 ETH 直接發送到公共物品金庫。它會與協議份額一起在金庫中等待為 {beneficiary} 取回。"
   }
 }

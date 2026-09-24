@@ -1,6 +1,7 @@
 import type { MarketingReward } from '@/services/api/types';
 
 import {
+  allocatedOnOneDay,
   isSmallAllocation,
   rankOutreachContributors,
   summarizeOutreachAllocations,
@@ -93,5 +94,17 @@ describe('summarizeOutreachAllocations', () => {
     ]);
     expect(summary.first).toBe(1_700_000_000);
     expect(summary.latest).toBe(1_700_000_000);
+  });
+});
+
+describe('allocatedOnOneDay', () => {
+  it('is true for allocations minutes apart on one UTC day, so the header dates them once', () => {
+    // 2026-08-22 20:13 and 20:16 UTC.
+    expect(allocatedOnOneDay({ first: 1_787_429_580, latest: 1_787_429_760 })).toBe(true);
+  });
+
+  it('is false across midnight, and without allocations', () => {
+    expect(allocatedOnOneDay({ first: 1_787_443_199, latest: 1_787_443_200 })).toBe(false);
+    expect(allocatedOnOneDay({ first: null, latest: null })).toBe(false);
   });
 });

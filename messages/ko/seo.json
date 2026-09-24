@@ -60,7 +60,7 @@
       "marketing": {
         "heading": "홍보 배분",
         "description": "프로토콜을 널리 알리는 데 힘을 보탠 생태계 기여자를 위한 Cosmic Signature 홍보 배분 내역과 CST 배분 현황을 확인할 수 있습니다.",
-        "source": "Cosmic Signature 공개 홍보 배분 API",
+        "source": "Cosmic Signature 홍보 API",
         "links": {
           "faq": "자주 묻는 질문 읽기",
           "statistics": "프로토콜 통계 보기",
@@ -102,7 +102,7 @@
       "eth-contribution": {
         "heading": "직접 ETH 기여",
         "description": "사이클 준비금에 직접 기여된 ETH와 함께 남긴 메모, 해당 사이클, 기여자 기록을 확인할 수 있습니다.",
-        "source": "Cosmic Signature 공개 기여 API",
+        "source": "Cosmic Signature 기여 API",
         "links": {
           "reserve": "사이클 준비금 배분 방식",
           "protocol": "공공재 몫이 전달되는 곳",
@@ -208,8 +208,8 @@
       },
       "coordination-changes": {
         "heading": "조율 변경 내역",
-        "description": "프로토콜 모드 변경, 매개변수 업데이트, 이후 사이클에 영향을 주는 관리 기록 등 Cosmic Signature의 공개 조율 변경 내역을 확인할 수 있습니다.",
-        "source": "Cosmic Signature 공개 시스템 이벤트 API",
+        "description": "현재 모드가 시작된 이후 컨트랙트 소유자가 프로토콜 매개변수에 적용한 모든 변경 사항입니다.",
+        "source": "Cosmic Signature 시스템 이벤트 API",
         "links": {
           "security": "보안 개요 읽기",
           "audits": "보안 감사와 검증 확인",
@@ -231,7 +231,7 @@
       "public-goods-contributions-cg": {
         "heading": "프로토콜 공공재 기여",
         "description": "프로토콜 사이클에서 공공재 금고와 지정된 수령처(현재 Protocol Guild)로 자동 전달되는 Cosmic Signature 공공재 기여를 추적할 수 있습니다.",
-        "source": "Cosmic Signature 공개 공공재 API",
+        "source": "Cosmic Signature 공공재 API",
         "links": {
           "learn": "공공재 알아보기",
           "retrievals": "공공재 회수 내역 보기",
@@ -256,7 +256,7 @@
       "public-goods-contributions-voluntary": {
         "heading": "자발적 공공재 기여",
         "description": "Cosmic Signature 커뮤니티의 자발적 공공재 기여를 해당 사이클과 기여자 기록별로 살펴볼 수 있습니다.",
-        "source": "Cosmic Signature 공개 공공재 API",
+        "source": "Cosmic Signature 공공재 API",
         "links": {
           "direct": "직접 ETH 기여 보기",
           "protocol": "프로토콜 공공재 기여",
@@ -277,7 +277,7 @@
       "public-goods-retrievals": {
         "heading": "공공재 회수",
         "description": "사이클 준비금이 지정된 공공재 수령처(현재 Protocol Guild)로 전달되는 Cosmic Signature 공공재 금고의 회수 내역을 확인할 수 있습니다.",
-        "source": "Cosmic Signature 공개 공공재 API",
+        "source": "Cosmic Signature 공공재 API",
         "links": {
           "protocol": "프로토콜 공공재 기여",
           "voluntary": "자발적 공공재 기여",

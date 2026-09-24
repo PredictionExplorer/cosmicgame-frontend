@@ -13,6 +13,8 @@ export type { MarketingReward };
 
 interface MarketingRewardsTableProps extends LedgerStateProps {
   list: MarketingReward[];
+  /** Phone layout (`DataTable` `layout`); `compact` keeps the two columns side by side. */
+  layout?: 'auto' | 'cards' | 'compact';
 }
 
 /**
@@ -21,7 +23,7 @@ interface MarketingRewardsTableProps extends LedgerStateProps {
  * a test transfer of a few base units) is muted; a page that shows such rows
  * says why in the table's `description`.
  */
-const MarketingRewardsTable = ({ list, ...state }: MarketingRewardsTableProps) => {
+const MarketingRewardsTable = ({ list, layout, ...state }: MarketingRewardsTableProps) => {
   const t = useTranslations('tables');
 
   const columns = useMemo<DataTableColumn<MarketingReward>[]>(
@@ -64,6 +66,7 @@ const MarketingRewardsTable = ({ list, ...state }: MarketingRewardsTableProps) =
       ariaLabel={t('names.outreachAllocations')}
       getRowKey={(row) => row.EvtLogId}
       emptyTitle={t('empty.outreachAllocations')}
+      layout={layout}
       {...state}
     />
   );

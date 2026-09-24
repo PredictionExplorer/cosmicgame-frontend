@@ -1,11 +1,18 @@
 {
   "loadError": "Không tải được hồ sơ Hàng hóa công.",
-  "voluntaryLedger": "Các khoản đóng góp tự nguyện",
   "vault": {
     "description": "Khi một chu kỳ hoàn tất, phần Hàng hóa công trong Dự trữ chu kỳ được chuyển vào kho và chờ ở đó cho đến khi được nhận về cho {beneficiary}.",
     "due": "Phần của chu kỳ này",
     "dueCaption": "{percent} Dự trữ chu kỳ tính đến lúc này",
     "inVault": "Hiện có trong kho",
     "retrieved": "Đã nhận về tổng cộng"
+  },
+  "ledger": {
+    "contributions": "Bản ghi đóng góp",
+    "retrievals": "Bản ghi nhận về"
+  },
+  "contribute": {
+    "title": "Đóng góp vào kho",
+    "description": "Gửi ETH thẳng đến Kho Hàng hóa công. Số ETH này nằm trong kho cùng phần của giao thức cho đến khi được nhận về cho {beneficiary}."
   }
 }

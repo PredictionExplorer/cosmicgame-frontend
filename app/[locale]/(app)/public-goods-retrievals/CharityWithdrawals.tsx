@@ -16,7 +16,6 @@ import { useCharityWithdrawals } from '@/hooks/useApiQuery';
  */
 const CharityWithdrawals = ({ header }: { header: ReactNode }) => {
   const t = useTranslations('publicGoods');
-  const tTables = useTranslations('tables');
   const { data, isLoading, isError, refetch } = useCharityWithdrawals();
 
   return (
@@ -26,7 +25,7 @@ const CharityWithdrawals = ({ header }: { header: ReactNode }) => {
         loading={isLoading}
         error={isError ? t('loadError') : undefined}
         onRetry={() => void refetch()}
-        title={tTables('names.publicGoodsRetrievals')}
+        title={t('ledger.retrievals')}
       />
     </LedgerPage>
   );

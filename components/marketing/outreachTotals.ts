@@ -83,3 +83,14 @@ export function summarizeOutreachAllocations(rewards: readonly MarketingReward[]
   }
   return { totalCst, allocations: rewards.length, smallAllocations, first, latest };
 }
+
+const SECONDS_PER_DAY = 86_400;
+
+/**
+ * Whether every allocation arrived on one calendar day (UTC): the header then
+ * dates them once instead of a first and a latest a few minutes apart.
+ */
+export function allocatedOnOneDay({ first, latest }: Pick<OutreachSummary, 'first' | 'latest'>) {
+  if (first === null || latest === null) return false;
+  return Math.floor(first / SECONDS_PER_DAY) === Math.floor(latest / SECONDS_PER_DAY);
+}

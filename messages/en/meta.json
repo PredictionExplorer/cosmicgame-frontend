@@ -135,7 +135,7 @@
     "description": "All ETH allocations this participant received through Stellar Selection. Track random-selection allocations across completed cycles."
   },
   "publicGoodsCgContributions": {
-    "title": "Protocol Public-Goods Contributions",
+    "title": "Protocol Public Goods Contributions",
     "description": "Public Goods Allocations from each finalized Cosmic Signature cycle. Follow funds from the Cycle Reserve to the Public Goods Vault."
   },
   "publicGoodsRetrievals": {
@@ -143,7 +143,7 @@
     "description": "Funds forwarded from the Cosmic Signature Public Goods Vault to its configured Public Goods recipient."
   },
   "publicGoodsVoluntary": {
-    "title": "Voluntary Public-Goods Contributions",
+    "title": "Voluntary Public Goods Contributions",
     "description": "Voluntary contributions from the Cosmic Signature community to the Public Goods Vault for its configured recipient."
   },
   "allocationRetrieved": {

@@ -47,11 +47,13 @@ describe('CharityDepositsVoluntary', () => {
     );
   });
 
-  it('titles the table for its own ledger, not the protocol one', () => {
-    // Regression: it shared the protocol page's "Public Goods contributions".
+  it('names the ledger, not the page again', () => {
+    // Regression: its H2 repeated the H1 ("Voluntary contributions").
     mockUseCharityVoluntary.mockReturnValue({ data: [], isLoading: false });
     render(<CharityDepositsVoluntary header={HEADER} />);
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Voluntary contributions');
+    expect(within(screen.getByTestId('deposit-table')).getByRole('heading')).toHaveTextContent(
+      'Contribution records',
+    );
   });
 
   it('shows loading state', () => {
@@ -75,18 +77,23 @@ describe('CharityDepositsVoluntary', () => {
     expect(screen.getByTestId('deposit-table')).toHaveTextContent('rows: 0');
   });
 
-  it('names the vault that voluntary contributions go to, with its address to copy', () => {
-    // Regression: the empty state showed the vault as a bare hex chip.
-    mockUseCharityVoluntary.mockReturnValue({ data: [], isLoading: false });
+  it('says how to contribute, with the vault address to copy, also once the ledger has rows (regression)', () => {
+    // The instructions and the address lived only in the empty state, so the
+    // first contribution took away the page's only guidance.
+    mockUseCharityVoluntary.mockReturnValue({ data: [{ id: 1 }], isLoading: false });
     render(<CharityDepositsVoluntary header={HEADER} />);
-    const table = screen.getByTestId('deposit-table');
-    expect(within(table).getByText('formats.address.known.publicGoods')).toBeInTheDocument();
+    const section = screen.getByRole('region', { name: 'Contribute to the vault' });
+    expect(within(section).getByText('formats.address.known.publicGoods')).toBeInTheDocument();
     expect(
-      within(table).getByTitle('0x6666666666666666666666666666666666666666'),
+      within(section).getByTitle('0x6666666666666666666666666666666666666666'),
     ).toBeInTheDocument();
     expect(
-      within(table).getByRole('button', { name: 'common.actions.copyAddress' }),
+      within(section).getByRole('button', { name: 'common.actions.copyAddress' }),
     ).toBeInTheDocument();
+    expect(within(section).getByRole('link', { name: /Arbiscan/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining('0x6666666666666666666666666666666666666666'),
+    );
   });
 
   it('has no accessibility violations', async () => {

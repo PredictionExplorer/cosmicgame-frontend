@@ -60,7 +60,7 @@
       "marketing": {
         "heading": "推廣分配",
         "description": "查看 Cosmic Signature 推廣分配歷史，以及向幫助更多人了解協議的生態貢獻者發放的 CST。",
-        "source": "Cosmic Signature 公開推廣分配 API",
+        "source": "Cosmic Signature 推廣 API",
         "links": {
           "faq": "閱讀常見問題",
           "statistics": "查看協議統計",
@@ -102,7 +102,7 @@
       "eth-contribution": {
         "heading": "直接 ETH 貢獻",
         "description": "瀏覽直接轉入 Cosmic Signature 週期儲備的 ETH，以及隨這些記錄公開的留言、週期與貢獻者資訊。",
-        "source": "Cosmic Signature 公開貢獻 API",
+        "source": "Cosmic Signature 貢獻 API",
         "links": {
           "reserve": "週期儲備如何分配",
           "protocol": "公共物品份額的去向",
@@ -208,8 +208,8 @@
       },
       "coordination-changes": {
         "heading": "協調變更",
-        "description": "查看 Cosmic Signature 的公開協調變更，包括影響後續週期的協議模式、參數更新與管理記錄。",
-        "source": "Cosmic Signature 公開系統事件 API",
+        "description": "自目前模式開始以來，合約所有者對協議參數作出的每一項變更。",
+        "source": "Cosmic Signature 系統事件 API",
         "links": {
           "security": "閱讀安全概覽",
           "audits": "查閱審計與驗證",
@@ -231,7 +231,7 @@
       "public-goods-contributions-cg": {
         "heading": "協議公共物品資助",
         "description": "追蹤 Cosmic Signature 各週期自動轉入公共物品金庫、併發往其目前受益方 Protocol Guild 的資金。",
-        "source": "Cosmic Signature 公開公共物品 API",
+        "source": "Cosmic Signature 公共物品 API",
         "links": {
           "learn": "了解公共物品機制",
           "retrievals": "查看公共物品取回",
@@ -256,7 +256,7 @@
       "public-goods-contributions-voluntary": {
         "heading": "自願公共物品資助",
         "description": "瀏覽 Cosmic Signature 社區自願提供的公共物品資金，包括所屬週期與貢獻者記錄。",
-        "source": "Cosmic Signature 公開公共物品 API",
+        "source": "Cosmic Signature 公共物品 API",
         "links": {
           "direct": "查看直接 ETH 貢獻",
           "protocol": "查看協議公共物品資助",
@@ -277,7 +277,7 @@
       "public-goods-retrievals": {
         "heading": "公共物品取回",
         "description": "查看 Cosmic Signature 公共物品金庫的取回記錄；週期儲備會由此轉向目前配置的公共物品受益方 Protocol Guild。",
-        "source": "Cosmic Signature 公開公共物品 API",
+        "source": "Cosmic Signature 公共物品 API",
         "links": {
           "protocol": "查看協議公共物品資助",
           "voluntary": "查看自願公共物品資助",
