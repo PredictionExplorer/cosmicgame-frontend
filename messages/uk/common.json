@@ -42,6 +42,21 @@
     "home": "Головна",
     "gallery": "Галерея"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "Участь",
+      "collection": "Колекція",
+      "records": "Записи",
+      "insights": "Аналітика",
+      "trust": "Центр довіри",
+      "help": "Довідка",
+      "account": "Мій обліковий запис",
+      "admin": "Адміністрування"
+    },
+    "snapshot": "Знімок даних · {date}",
+    "lastReviewed": "Останній перегляд: {date}",
+    "relatedPages": "Пов’язані сторінки"
+  },
   "status": {
     "loading": "Завантаження",
     "loadingEllipsis": "Завантаження…",

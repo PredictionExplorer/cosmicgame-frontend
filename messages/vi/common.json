@@ -42,6 +42,21 @@
     "home": "Trang chủ",
     "gallery": "Phòng trưng bày"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "Tham gia",
+      "collection": "Bộ sưu tập",
+      "records": "Bản ghi",
+      "insights": "Phân tích",
+      "trust": "Trung tâm tin cậy",
+      "help": "Trợ giúp",
+      "account": "Tài khoản của tôi",
+      "admin": "Quản trị"
+    },
+    "snapshot": "Ảnh chụp dữ liệu · {date}",
+    "lastReviewed": "Xem xét lần cuối: {date}",
+    "relatedPages": "Trang liên quan"
+  },
   "status": {
     "loading": "Đang tải",
     "loadingEllipsis": "Đang tải…",

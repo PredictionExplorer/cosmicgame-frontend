@@ -42,6 +42,21 @@
     "home": "Home",
     "gallery": "Gallery"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "Participate",
+      "collection": "Collection",
+      "records": "Records",
+      "insights": "Insights",
+      "trust": "Trust Center",
+      "help": "Help",
+      "account": "My account",
+      "admin": "Admin"
+    },
+    "snapshot": "Snapshot · {date}",
+    "lastReviewed": "Last reviewed {date}",
+    "relatedPages": "Related pages"
+  },
   "status": {
     "loading": "Loading",
     "loadingEllipsis": "Loading…",

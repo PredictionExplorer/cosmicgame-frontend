@@ -42,6 +42,21 @@
     "home": "홈",
     "gallery": "갤러리"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "참여",
+      "collection": "컬렉션",
+      "records": "기록",
+      "insights": "분석",
+      "trust": "신뢰 센터",
+      "help": "도움말",
+      "account": "내 계정",
+      "admin": "관리자"
+    },
+    "snapshot": "데이터 스냅숏: {date}",
+    "lastReviewed": "최종 검토: {date}",
+    "relatedPages": "관련 페이지"
+  },
   "status": {
     "loading": "불러오는 중",
     "loadingEllipsis": "불러오는 중…",

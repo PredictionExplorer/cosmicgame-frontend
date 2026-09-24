@@ -42,6 +42,21 @@
     "home": "ホーム",
     "gallery": "ギャラリー"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "参加",
+      "collection": "コレクション",
+      "records": "記録",
+      "insights": "データ分析",
+      "trust": "トラストセンター",
+      "help": "ヘルプ",
+      "account": "アカウント",
+      "admin": "管理者"
+    },
+    "snapshot": "データのスナップショット：{date}",
+    "lastReviewed": "最終確認：{date}",
+    "relatedPages": "関連ページ"
+  },
   "status": {
     "loading": "読み込み中",
     "loadingEllipsis": "読み込み中…",

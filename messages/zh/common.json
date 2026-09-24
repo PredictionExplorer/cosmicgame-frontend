@@ -42,6 +42,21 @@
     "home": "首页",
     "gallery": "画廊"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "参与",
+      "collection": "作品集",
+      "records": "记录",
+      "insights": "数据分析",
+      "trust": "信任中心",
+      "help": "帮助",
+      "account": "我的账户",
+      "admin": "管理"
+    },
+    "snapshot": "数据快照：{date}",
+    "lastReviewed": "最后审阅：{date}",
+    "relatedPages": "相关页面"
+  },
   "status": {
     "loading": "加载中",
     "loadingEllipsis": "加载中…",

@@ -42,6 +42,21 @@
     "home": "首頁",
     "gallery": "畫廊"
   },
+  "pageHeader": {
+    "sections": {
+      "participate": "參與",
+      "collection": "作品集",
+      "records": "紀錄",
+      "insights": "資料分析",
+      "trust": "信任中心",
+      "help": "說明",
+      "account": "我的帳戶",
+      "admin": "管理"
+    },
+    "snapshot": "資料快照：{date}",
+    "lastReviewed": "最後審閱：{date}",
+    "relatedPages": "相關頁面"
+  },
   "status": {
     "loading": "載入中",
     "loadingEllipsis": "載入中…",
