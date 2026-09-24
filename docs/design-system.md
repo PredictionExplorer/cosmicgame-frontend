@@ -327,6 +327,25 @@ maintenance banner, page tops) derives from that one value. The other tokens are
 `--row-h` (48px ledger rows), `--row-h-dense` (44px), `--measure-prose` (66ch) and
 `--measure-lede` (60ch).
 
+**Regions, not cards.** A page's regions sit on the page ground, each opening on one
+`--rule` hairline over its heading (`DESK_REGION` in
+`components/home/observatory/ControlDesk.tsx` on the app home). A region that continues
+the one above it in the same column opens on `--rule-faint`. Only the one control group a
+view exists for keeps a surface (the gesture form: `bg-surface`, no border). Disclosures
+read as a list of hairline rows (`DeskDisclosure`), never as boxed accordions. Every region
+heading on one page uses one style (`type-heading-3`).
+
+**Ticking figures.** A line that carries a live figure has a fixed shape: the label wraps,
+the figure sits in its own column and never does, and a countdown reads as a clock
+(`<Duration variant="clock">`, "8d 06:56:51") whose width holds while it ticks. Lines
+stacked together share that one format, so a growing hold under a countdown reads as a
+clock too ("1d 01:12:05" over "8d 00:24:38") and the digits align. A `flex-wrap` row of
+ticking values re-wraps as the digits change and moves everything below it.
+
+**Targets.** Every text link is at least 24px tall at every width
+(`TOUCH_TARGET_TEXT_LINK_CLASS`, `lib/touch-target.ts`): WCAG 2.5.8 covers a mouse as much
+as a finger. The 44px helpers stay phone-only.
+
 **Motion.** `duration-instant` (80ms), `duration-fast` (150ms), `duration-base` (240ms),
 `duration-slow` (400ms), `duration-page` (560ms) and `duration-settle` (900ms, a changed
 live value washing back to foreground). The easings are `ease-out-expo` and

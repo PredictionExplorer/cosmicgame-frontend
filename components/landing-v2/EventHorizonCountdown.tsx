@@ -208,11 +208,12 @@ export function EventHorizonCountdown() {
   const stateWord =
     copyKey === 'ready' || copyKey === 'confirming' ? timerT(`phases.${copyKey}.state`) : null;
 
-  // The same plural captions as the app's clock: "01 hour", "02 hours".
+  // The same fixed column labels as the app's clock: a caption never changes
+  // word or width as the digits tick; the timer's name spells the value out.
   const groups: CountdownGroup[] = snapshot.shards.map((shard) => ({
     id: shard.unit,
     value: shard.value,
-    label: timerT(`units.${shard.unit}`, { count: shard.value }),
+    label: timerT(`units.${shard.unit}`),
   }));
   const timerLabel = showCountdown
     ? timerT('countdownAria', {

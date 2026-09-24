@@ -47,10 +47,10 @@
     "cycleClock": "サイクルの時計",
     "gestureCount": "{count, plural, other {#筆}}",
     "units": {
-      "days": "{count, plural, other {日}}",
-      "hours": "{count, plural, other {時間}}",
-      "minutes": "{count, plural, other {分}}",
-      "seconds": "{count, plural, other {秒}}"
+      "days": "日",
+      "hours": "時間",
+      "minutes": "分",
+      "seconds": "秒"
     },
     "duration": {
       "days": "{count, plural, other {#日}}",

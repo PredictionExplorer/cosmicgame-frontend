@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { SiteLink } from '@/components/layout/SiteLink';
@@ -8,7 +8,7 @@ import { CstTokenIcon, GestureIcon, PublicGoodsIcon } from '@/lib/conceptIcons';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 
-import { DESK_FRAME } from './ControlDesk';
+import { DeskDisclosure } from './ControlDesk';
 
 const STORIES = [
   { key: 'gestures', icon: GestureIcon },
@@ -34,15 +34,16 @@ export function HomeStory({ className }: HomeStoryProps) {
   const t = useTranslations('home');
   const tNav = useTranslations('nav');
   return (
-    <details data-testid="home-story-section" className={cn('group/story', DESK_FRAME, className)}>
-      <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 type-title text-foreground sm:px-6 [&::-webkit-details-marker]:hidden">
-        {t('orientation.storyTitle')}
-        <ChevronDown
-          className="size-5 shrink-0 text-subtle transition-transform duration-[var(--duration-base)] group-open/story:rotate-180 motion-reduce:transition-none"
-          aria-hidden
-        />
-      </summary>
-      <div className="border-t border-rule-faint px-5 py-5 sm:px-6">
+    <DeskDisclosure
+      testId="home-story-section"
+      className={className}
+      summary={
+        <span className="type-heading-3 min-w-0 text-foreground">
+          {t('orientation.storyTitle')}
+        </span>
+      }
+    >
+      <div className="py-5">
         {/* The summary is a control, not a heading: the notes' section heading
             is stated here for heading navigation. */}
         <h2 className="sr-only">{t('orientation.storyTitle')}</h2>
@@ -78,6 +79,6 @@ export function HomeStory({ className }: HomeStoryProps) {
           </SiteLink>
         </div>
       </div>
-    </details>
+    </DeskDisclosure>
   );
 }

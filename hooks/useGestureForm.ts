@@ -123,6 +123,10 @@ export function useGestureForm() {
   const [contractCstPriceWei, setContractCstPriceWei] = useState<bigint | null>(null);
   const [gestureCstRewardAmountWei, setGestureCstRewardAmountWei] = useState<bigint | null>(null);
   const [isCstRewardLoading, setIsCstRewardLoading] = useState(false);
+  // The last read of the Participation CST preview failed. The preview keeps
+  // polling, so this clears on the next successful read; the form shows
+  // "Unavailable" instead of a skeleton that would pulse forever.
+  const [cstRewardReadFailed, setCstRewardReadFailed] = useState(false);
   const [cstRewardTolerancePercent, setCstRewardTolerancePercent] = useState(1);
   const [acceptAnyCstReward, setAcceptAnyCstReward] = useState(false);
 
@@ -169,6 +173,7 @@ export function useGestureForm() {
       setContractCstPriceWei(null);
       setGestureCstRewardAmountWei(100n * 10n ** 18n);
       setIsCstRewardLoading(false);
+      setCstRewardReadFailed(false);
       return;
     }
 
@@ -271,11 +276,14 @@ export function useGestureForm() {
                   >,
               ])
                 .then((value) => {
-                  if (!cancelled) setGestureCstRewardAmountWei(value ?? null);
+                  if (cancelled) return;
+                  setGestureCstRewardAmountWei(value ?? null);
+                  setCstRewardReadFailed(value == null);
                 })
                 .catch((e) => {
                   if (!cancelled) {
                     if (!isTransientNetworkError(e)) setGestureCstRewardAmountWei(null);
+                    setCstRewardReadFailed(true);
                     reportPreviewError(e, 'getBidCstRewardAmount');
                   }
                 })
@@ -876,6 +884,7 @@ export function useGestureForm() {
     gestureCstRewardAmountMin,
     gestureCstRewardAmountMinLimitWei,
     isCstRewardLoading,
+    cstRewardReadFailed,
     cstRewardTolerancePercent,
     setCstRewardTolerancePercent: updateCstRewardTolerancePercent,
     acceptAnyCstReward,

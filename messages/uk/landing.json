@@ -47,10 +47,10 @@
     "cycleClock": "Годинник циклу",
     "gestureCount": "{count, plural, one {# жест} few {# жести} many {# жестів} other {# жесту}}",
     "units": {
-      "days": "{count, plural, one {день} few {дні} many {днів} other {дня}}",
-      "hours": "{count, plural, one {година} few {години} many {годин} other {години}}",
-      "minutes": "{count, plural, one {хвилина} few {хвилини} many {хвилин} other {хвилини}}",
-      "seconds": "{count, plural, one {секунда} few {секунди} many {секунд} other {секунди}}"
+      "days": "дні",
+      "hours": "години",
+      "minutes": "хвилини",
+      "seconds": "секунди"
     },
     "duration": {
       "days": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}",

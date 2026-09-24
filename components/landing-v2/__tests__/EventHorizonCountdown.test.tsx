@@ -4,7 +4,6 @@ import { resolve } from 'node:path';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { parse, TYPE } from '@formatjs/icu-messageformat-parser';
 
-import { getLocaleConfig } from '@/i18n/localeConfig';
 import { routing } from '@/i18n/routing';
 
 import {
@@ -195,14 +194,17 @@ describe('<EventHorizonCountdown />', () => {
     expect(screen.queryByText(/landing\.timer\.gestureCount/)).not.toBeInTheDocument();
   });
 
-  it('captions each figure for its own value, as the app clock does', async () => {
+  it('captions each figure with its fixed unit label, as the app clock does', async () => {
     render(<EventHorizonCountdown />);
 
     await waitFor(() => expect(clockValues()).toEqual(['00', '02', '01', '05']));
     const units = screen.getByTestId('countdown-units');
-    expect(units).toHaveTextContent('landing.timer.units.hours(count=2)');
-    expect(units).toHaveTextContent('landing.timer.units.minutes(count=1)');
-    expect(units).toHaveTextContent('landing.timer.units.seconds(count=5)');
+    // A column label, never pluralized for the value: it does not change
+    // word or width as the digits tick (the timer's name spells them out).
+    expect(units).toHaveTextContent('landing.timer.units.hours');
+    expect(units).toHaveTextContent('landing.timer.units.minutes');
+    expect(units).toHaveTextContent('landing.timer.units.seconds');
+    expect(units.textContent).not.toMatch(/count=/);
   });
 
   it('keeps the readout at the clock size at zero: the state in words, then what can still happen', async () => {
@@ -233,43 +235,23 @@ describe('landing clock unit captions', () => {
   const landingUnits = (locale: string) =>
     (read(locale, 'landing').timer as { units: Record<string, string> }).units;
 
-  /** Formats a one-plural caption message for `count` (the pound sign becomes the count). */
-  const caption = (message: string, locale: string, count: number): string => {
-    const [element] = parse(message);
-    if (element?.type !== TYPE.plural) throw new Error(`not a plural: ${message}`);
-    const option =
-      element.options[`=${count}`] ??
-      element.options[new Intl.PluralRules(locale).select(count)] ??
-      element.options.other;
-    return (option?.value ?? [])
-      .map((part) => (part.type === TYPE.literal ? part.value : String(count)))
-      .join('');
-  };
-
   it.each(routing.locales)(
     '%s shares the app clock captions, so the hosts cannot drift',
     (locale) => {
       const home = (
-        read(locale, 'home').observatory as { clock: { units: Record<string, string> } }
-      ).clock.units;
+        read(locale, 'home').observatory as { clock: { unitLabels: Record<string, string> } }
+      ).clock.unitLabels;
       expect(landingUnits(locale)).toEqual(home);
     },
   );
 
-  it.each(routing.locales)('%s captions a value of 1 in the singular form', (locale) => {
-    const intlLocale = getLocaleConfig(locale).intlLocale;
-    const rules = new Intl.PluralRules(intlLocale);
+  it.each(routing.locales)('%s captions each unit with one fixed word', (locale) => {
     for (const unit of units) {
-      const one = caption(landingUnits(locale)[unit]!, intlLocale, 1);
-      const two = caption(landingUnits(locale)[unit]!, intlLocale, 2);
-      expect(one.length).toBeGreaterThan(0);
-      // Where the language has a singular, 1 takes it (en "hour", uk "година").
-      if (rules.select(1) !== rules.select(2)) expect(one).not.toEqual(two);
+      const [element, ...rest] = parse(landingUnits(locale)[unit]!);
+      // Plain text: a plural caption would flip word and width as a group
+      // passes 1 ("01 hour" beside "02 hours").
+      expect(rest).toEqual([]);
+      expect(element?.type).toBe(TYPE.literal);
     }
-  });
-
-  it('reads "01 hour" in English, not "01 hours"', () => {
-    expect(caption(landingUnits('en').hours!, 'en', 1)).toBe('hour');
-    expect(caption(landingUnits('en').hours!, 'en', 6)).toBe('hours');
   });
 });

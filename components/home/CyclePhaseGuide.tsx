@@ -5,8 +5,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/navigation';
-import { Badge } from '@/components/ui/badge';
-import { ScrollRail } from '@/components/ui/scroll-rail';
+import { SectionHeader } from '@/components/ui/section-header';
 import type { CyclePhase } from '@/lib/cycleState';
 import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
@@ -44,32 +43,46 @@ export function stepForPhase(phase: CyclePhase): CycleStepId {
 
 export interface CyclePhaseGuideProps {
   phase: CyclePhase;
-  /** Links about this cycle, before the learning links in the footer. */
+  /** Links about this cycle, listed before the walkthrough and the FAQ. */
   cycleLinks?: ReactNode;
+  /** The heading's id, for the region's name. */
+  headingId?: string;
   className?: string;
 }
 
 type StepState = 'passed' | 'now' | 'next';
 
-const LINK_CLASS = cn(
+/**
+ * A text link in the guide's link list: a 24px line box at every width, so
+ * it meets WCAG 2.5.8 for a mouse as well as a finger.
+ */
+export const PHASE_GUIDE_LINK_CLASS = cn(
   'link-quiet inline-flex items-center gap-1 type-label text-primary',
   TOUCH_TARGET_TEXT_LINK_CLASS,
 );
 
 /**
  * How this cycle works, told as where it is now: the six steps of a
- * Performance Cycle with the current one marked. From 1024px it is a
- * vertical stepper with every step's explanation; below, a compact rail that
- * scrolls sideways (the current step kept in view) with the current step's
- * explanation under it. Links about this cycle, the walkthrough and the FAQ
- * close it.
+ * Performance Cycle as a vertical stepper with the current one marked. It
+ * draws with the page's progress-rule colours only: the path travelled and
+ * its checked steps in the accent, the current step filled, the steps ahead
+ * on the rule; nothing sits on a fill of its own. From
+ * 1024px every step explains itself; on narrower screens only the current
+ * one does (the others keep their explanation for screen readers), so the
+ * guide stays short without clipping a step or scrolling sideways. Links
+ * about this cycle, the walkthrough and the FAQ close it, as a list.
  */
-export function CyclePhaseGuide({ phase, cycleLinks, className }: CyclePhaseGuideProps) {
+export function CyclePhaseGuide({
+  phase,
+  cycleLinks,
+  headingId: headingIdProp,
+  className,
+}: CyclePhaseGuideProps) {
   const t = useTranslations('home');
-  const headingId = useId();
+  const generatedId = useId();
+  const headingId = headingIdProp ?? generatedId;
   const activeId = stepForPhase(phase);
   const activeIndex = CYCLE_STEPS.findIndex((step) => step.id === activeId);
-  const active = CYCLE_STEPS[activeIndex]!;
 
   return (
     <section
@@ -78,113 +91,106 @@ export function CyclePhaseGuide({ phase, cycleLinks, className }: CyclePhaseGuid
       data-step={activeId}
       className={cn('min-w-0', className)}
     >
-      <h2 id={headingId} className="type-title text-foreground">
-        {t('orientation.title')}
-      </h2>
+      <SectionHeader
+        size="panel"
+        headingId={headingId}
+        title={t('orientation.title')}
+        className="mb-4"
+      />
 
-      {/* The rail stays inside the frame's padding, so a step it cuts off
-          fades out before the edge instead of ending at the border. */}
-      <ScrollRail
-        activeSelector='[aria-current="step"]'
-        label={t('phaseGuide.timelineAria')}
-        className="mt-4"
-        trackClassName="max-lg:snap-x max-lg:snap-mandatory lg:flex-col lg:overflow-visible"
-      >
-        <ol
-          aria-label={t('phaseGuide.timelineAria')}
-          className="flex min-w-max gap-0 lg:min-w-0 lg:flex-col"
-        >
-          {CYCLE_STEPS.map((step, index) => {
-            const state: StepState =
-              index < activeIndex ? 'passed' : index === activeIndex ? 'now' : 'next';
-            const last = index === CYCLE_STEPS.length - 1;
-            return (
-              <li
-                key={step.id}
-                data-state-step={state}
-                aria-current={state === 'now' ? 'step' : undefined}
-                className={cn(
-                  'relative flex min-w-[8.5rem] snap-start flex-col gap-2 pe-3 lg:min-w-0 lg:flex-row lg:gap-3 lg:pb-5 lg:pe-0',
-                  last && 'lg:pb-0',
-                )}
-              >
-                {/* The rail: a hairline from this marker to the next. */}
-                {!last && (
-                  <span
-                    aria-hidden
-                    className={cn(
-                      'absolute max-lg:start-6 max-lg:end-0 max-lg:top-2.5 max-lg:h-px lg:bottom-0 lg:start-2.5 lg:top-6 lg:w-px',
-                      // The stretch already travelled reads a step stronger.
-                      state === 'passed' ? 'bg-subtle' : 'bg-rule',
-                    )}
-                  />
-                )}
+      <ol aria-label={t('phaseGuide.timelineAria')} className="flex min-w-0 flex-col">
+        {CYCLE_STEPS.map((step, index) => {
+          const state: StepState =
+            index < activeIndex ? 'passed' : index === activeIndex ? 'now' : 'next';
+          const last = index === CYCLE_STEPS.length - 1;
+          return (
+            <li
+              key={step.id}
+              data-state-step={state}
+              aria-current={state === 'now' ? 'step' : undefined}
+              className={cn('relative flex min-w-0 gap-3', last ? 'pb-0' : 'pb-3 lg:pb-5')}
+            >
+              {/* The rail: a hairline from this marker to the next, clear of
+                  both markers. The stretch travelled reads in the accent, as
+                  the fill of every progress rule on the page does. */}
+              {!last && (
                 <span
                   aria-hidden
                   className={cn(
-                    'relative flex size-5 shrink-0 items-center justify-center rounded-full border type-caption tabular-nums',
-                    state === 'now'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : state === 'passed'
-                        ? 'border-subtle bg-background text-subtle'
-                        : 'border-rule bg-background text-subtle',
+                    'absolute bottom-0 start-2.5 top-6 w-px',
+                    state === 'passed' ? 'bg-primary' : 'bg-rule',
+                  )}
+                />
+              )}
+              <span
+                aria-hidden
+                className={cn(
+                  'relative flex size-5 shrink-0 items-center justify-center rounded-full border type-caption tabular-nums',
+                  state === 'now'
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : state === 'passed'
+                      ? 'border-primary text-primary'
+                      : 'border-rule text-subtle',
+                )}
+              >
+                {state === 'passed' ? <Check className="size-3" /> : index + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span
+                    className={cn(
+                      'type-label',
+                      state === 'now' ? 'text-foreground' : 'text-muted-foreground',
+                    )}
+                  >
+                    {t(`phaseGuide.steps.${step.messageKey}.label`)}
+                  </span>
+                  {/* The state is a caption, never a chip: the marker carries the emphasis. */}
+                  <span
+                    className={cn(
+                      'type-caption',
+                      state === 'now' ? 'text-primary' : 'text-subtle',
+                      state === 'next' && 'sr-only',
+                    )}
+                  >
+                    {t(`phaseGuide.stepState.${state}`)}
+                  </span>
+                </p>
+                {/* Every step explains itself from 1024px; below, the current
+                    one does and the rest keep it for screen readers. */}
+                <p
+                  data-testid={state === 'now' ? 'cycle-phase-guide-current' : undefined}
+                  className={cn(
+                    'type-body-sm mt-1 text-muted-foreground',
+                    state !== 'now' && 'max-lg:sr-only',
                   )}
                 >
-                  {state === 'passed' ? <Check className="size-3" /> : index + 1}
-                </span>
-                <div className="min-w-0 lg:flex-1">
-                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span
-                      className={cn(
-                        'type-label',
-                        state === 'now' ? 'text-foreground' : 'text-muted-foreground',
-                      )}
-                    >
-                      {t(`phaseGuide.steps.${step.messageKey}.label`)}
-                    </span>
-                    {state === 'now' ? (
-                      <Badge tone="accent" size="sm">
-                        {t('phaseGuide.stepState.now')}
-                      </Badge>
-                    ) : (
-                      <span
-                        className={cn('type-caption text-subtle', state === 'next' && 'sr-only')}
-                      >
-                        {t(`phaseGuide.stepState.${state}`)}
-                      </span>
-                    )}
-                  </p>
-                  {/* Every step explains itself from 1024px; the rail keeps
-                      it for screen readers and shows the current one below. */}
-                  <p className="type-body-sm mt-1 text-muted-foreground max-lg:sr-only">
-                    {t(`phaseGuide.steps.${step.messageKey}.detail`)}
-                  </p>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      </ScrollRail>
+                  {t(`phaseGuide.steps.${step.messageKey}.detail`)}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
 
-      <p
-        aria-hidden
-        data-testid="cycle-phase-guide-current"
-        className="type-body-sm mt-3 text-muted-foreground lg:hidden"
+      <ul
+        role="list"
+        className="mt-4 grid gap-x-6 gap-y-2 border-t border-rule-faint pt-3 sm:grid-cols-2"
       >
-        {t(`phaseGuide.steps.${active.messageKey}.detail`)}
-      </p>
-
-      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-1 border-t border-rule-faint pt-3">
         {cycleLinks}
-        <Link href="/how-it-works" className={LINK_CLASS}>
-          {t('phaseGuide.explainer.walkthroughLink')}
-          <ArrowRight className="size-3.5" aria-hidden />
-        </Link>
-        <Link href="/faq" className={LINK_CLASS}>
-          {t('phaseGuide.explainer.faqLink')}
-          <ArrowRight className="size-3.5" aria-hidden />
-        </Link>
-      </div>
+        <li>
+          <Link href="/how-it-works" className={PHASE_GUIDE_LINK_CLASS}>
+            {t('phaseGuide.explainer.walkthroughLink')}
+            <ArrowRight className="size-3.5" aria-hidden />
+          </Link>
+        </li>
+        <li>
+          <Link href="/faq" className={PHASE_GUIDE_LINK_CLASS}>
+            {t('phaseGuide.explainer.faqLink')}
+            <ArrowRight className="size-3.5" aria-hidden />
+          </Link>
+        </li>
+      </ul>
     </section>
   );
 }

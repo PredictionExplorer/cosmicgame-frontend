@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { zeroAddress } from 'viem';
-import { ArrowRight, ChevronDown, PenLine, Settings2, Wallet } from 'lucide-react';
+import { ArrowRight, ChevronDown, PenLine, Settings2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { protocolFacts } from '@/content/protocol-facts';
@@ -23,6 +23,7 @@ import type { EthGestureInfo, RwlkListStatus } from '@/hooks/useGestureForm';
 import { useTxStageLabel, type TxStage } from '@/hooks/useTxFlow';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api/types';
+import { toFiniteNumber } from '@/utils/finiteNumber';
 import { formatAmountParts, formatDuration } from '@/utils/format';
 import type { CstGestureData } from '@/utils/cstGesture';
 import { ethGestureBaseCost, ethGestureSendAmount, formatEthQuote } from '@/utils/gestureQuote';
@@ -80,6 +81,8 @@ export interface GesturePanelFormState {
   gestureCstRewardAmount?: number | null;
   gestureCstRewardAmountMin?: number | null;
   isCstRewardLoading?: boolean;
+  /** The last read of the Participation CST preview failed; it retries on its own poll. */
+  cstRewardReadFailed?: boolean;
   cstRewardTolerancePercent?: number;
   setCstRewardTolerancePercent?: (value: number) => void;
   acceptAnyCstReward?: boolean;
@@ -188,6 +191,7 @@ export function GesturePanel({
   className,
 }: GesturePanelProps) {
   const t = useTranslations('home');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const stageLabel = useTxStageLabel();
   const isSheet = variant === 'sheet';
@@ -211,6 +215,7 @@ export function GesturePanel({
     gestureCstRewardAmount = null,
     gestureCstRewardAmountMin = null,
     isCstRewardLoading = false,
+    cstRewardReadFailed = false,
     acceptAnyCstReward = false,
   } = form;
 
@@ -244,6 +249,14 @@ export function GesturePanel({
 
   const ethPrice = ethGestureInfo?.ETHPrice;
   const hasEthQuote = ethPrice != null && Number.isFinite(ethPrice) && ethPrice >= 0;
+  // Until the live quote arrives, the server-read dashboard already names the
+  // ETH Gesture Cost: the methods show it as approximate instead of waiting.
+  const seededEthPrice = hasEthQuote ? null : toFiniteNumber(data?.CurBidPriceEth);
+  const methodEthPrice = hasEthQuote
+    ? ethPrice
+    : seededEthPrice != null && seededEthPrice >= 0
+      ? seededEthPrice
+      : null;
   const hasCstQuote = cstGestureData.source !== 'empty';
   const cstParts = hasCstQuote
     ? formatAmountParts(cstGestureData.isFree ? 0 : cstGestureData.CSTPrice, {
@@ -252,12 +265,22 @@ export function GesturePanel({
       })
     : null;
   const costs: Record<GestureMethodValue, MethodCost | null> = {
-    ETH: hasEthQuote
-      ? { value: formatEthQuote(ethGestureBaseCost(ethPrice, 'ETH'), locale), unit: 'ETH' }
-      : null,
-    RandomWalk: hasEthQuote
-      ? { value: formatEthQuote(ethGestureBaseCost(ethPrice, 'RandomWalk'), locale), unit: 'ETH' }
-      : null,
+    ETH:
+      methodEthPrice != null
+        ? {
+            value: formatEthQuote(ethGestureBaseCost(methodEthPrice, 'ETH'), locale),
+            unit: 'ETH',
+            approximate: !hasEthQuote,
+          }
+        : null,
+    RandomWalk:
+      methodEthPrice != null
+        ? {
+            value: formatEthQuote(ethGestureBaseCost(methodEthPrice, 'RandomWalk'), locale),
+            unit: 'ETH',
+            approximate: !hasEthQuote,
+          }
+        : null,
     CST: cstParts ? { value: cstParts.number, unit: 'CST' } : null,
   };
 
@@ -285,8 +308,15 @@ export function GesturePanel({
     !(cycleSpend.status === 'ready' && cycleSpend.eth <= 0 && cycleSpend.cst <= 0);
 
   const pendingValue = <ValuePending ch={9} />;
+  // A preview that could not be read says so (it retries on its own poll),
+  // rather than pulsing as if it were still on its way.
+  const missingValue = cstRewardReadFailed ? (
+    <UnknownValue label={tCommon('status.unavailable')} />
+  ) : (
+    pendingValue
+  );
   const cstAmount = (value: number | null) =>
-    value == null ? pendingValue : <Amount value={value} unit="CST" context="card" />;
+    value == null ? missingValue : <Amount value={value} unit="CST" context="card" />;
 
   if (!loading && !isRoundActive) return null;
 
@@ -371,7 +401,7 @@ export function GesturePanel({
                 label={t('form.reward.netLabel')}
                 value={
                   netCst == null || isCstRewardLoading ? (
-                    pendingValue
+                    missingValue
                   ) : (
                     <Amount value={netCst} unit="CST" context="card" signDisplay="exceptZero" />
                   )
@@ -643,18 +673,19 @@ export function GesturePanel({
             variant="commit"
             size="xl"
             warmOnVisible
-            // The icon flows with the label's first line, so a label that
-            // wraps on a phone never leaves it stranded beside two lines.
-            showIcon={false}
+            // One line at every width: the short label on phones, where the
+            // line under the button carries the purpose.
             label={
-              <span>
-                <Wallet aria-hidden className="me-2 inline size-4 align-[-0.125em]" />
-                {t('form.connect.cta')}
-              </span>
+              <>
+                <span className="sm:hidden">{t('form.connect.ctaShort')}</span>
+                <span className="max-sm:hidden">{t('form.connect.cta')}</span>
+              </>
             }
-            className={COMMIT_WRAP}
+            className="w-full whitespace-nowrap"
           />
-          <p className="type-caption text-center text-subtle">{t('orientation.connectHelp')}</p>
+          <p className="type-caption mx-auto max-w-[40em] text-balance text-center text-subtle">
+            {t('orientation.connectHelp')}
+          </p>
         </div>
       )}
     </div>

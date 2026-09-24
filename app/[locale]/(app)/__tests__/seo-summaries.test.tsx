@@ -5,7 +5,6 @@ import seoMessages from '@/messages/en/seo.json';
 import statisticsMessages from '@/messages/en/statistics.json';
 import zhSeoMessages from '@/messages/zh/seo.json';
 
-import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 
 import { render, screen, within } from '@/test-utils';
@@ -232,30 +231,6 @@ describe('server-rendered page headers', () => {
     mockUsedRwlkNfts.mockResolvedValue([{ BidderAddr: WALLET_A }] as Rows<
       typeof get_used_rwlk_nfts
     >);
-  });
-
-  it('renders the app home H1 and crawlable app links in the live hero', () => {
-    render(
-      <HomeObservatoryHero
-        data={dashboard as unknown as Parameters<typeof HomeObservatoryHero>[0]['data']}
-        bannerToken={{ seed: '0xabc123', id: 17 }}
-        canOpenGesturePanel
-        phase="live"
-      />,
-    );
-
-    expect(screen.getByRole('region', { name: 'home.hero.phase.live.headline' })).toHaveAttribute(
-      'aria-labelledby',
-      'home-observatory-title',
-    );
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'home.hero.phase.live.headline' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /home\.hero\.phase\.live\.cta/ })).toHaveAttribute(
-      'href',
-      '#make-gesture',
-    );
-    expect(screen.getByText('17')).toBeInTheDocument();
   });
 
   describe('statistics hub', () => {

@@ -16,7 +16,7 @@ import { AttentionMenu } from '@/components/ui/attention-menu';
 import { PageShell } from '@/components/ui/page-shell';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
+import { CyclePhaseGuide, PHASE_GUIDE_LINK_CLASS } from '@/components/home/CyclePhaseGuide';
 import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { deriveFeedSystemEvents } from '@/components/home/deck/feedSystemEvents';
 import { ActionDock } from '@/components/home/observatory/ActionDock';
@@ -24,7 +24,7 @@ import { AllocationLedger } from '@/components/home/observatory/AllocationLedger
 import {
   AllocationsDisclosure,
   ControlDesk,
-  DESK_FRAME,
+  DESK_REGION,
 } from '@/components/home/observatory/ControlDesk';
 import { HomeStory } from '@/components/home/observatory/HomeStory';
 import { CycleClock } from '@/components/home/observatory/CycleClock';
@@ -75,7 +75,6 @@ import { deriveAllocationTrackAmounts } from '@/lib/allocationTracks';
 import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
 import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
-import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { getStableClientTargetTime, type ServerTimingSample } from '@/utils/time';
 import { sameAddress } from '@/utils/format';
@@ -102,6 +101,9 @@ const DEADLINE_FRESHNESS_KEYS = [['allocationTime']] as const;
 
 /** How long the sheet shows its confirmed state before it closes by itself. */
 const SHEET_SUCCESS_CLOSE_MS = 1_600;
+
+/** Where the page lists the NFTs and tokens attached to this cycle's Gestures. */
+const ATTACHED_ASSETS_ID = 'home-attached-assets';
 
 export function resolveHomeNow(
   tickingNow: number,
@@ -619,39 +621,61 @@ const HomePage = ({
     [setBidType, setRwlkId],
   );
 
-  // The dock steps aside while the in-page form is on screen, so it never
-  // covers or duplicates it; from 1024px, where the form sits beside the
-  // standings, it also waits until the desk itself has scrolled away. Below
-  // that the desk is one long column, so the dock returns as soon as the
-  // form has scrolled out of view. Until the observers report, it stays
-  // aside, so the server HTML never paints a dock over the desk. jsdom has
+  // The dock is the way to act while the form's own action is off screen,
+  // and it never duplicates that action. Below 1024px it therefore stays
+  // until the form's action row (the commit or connect button) is on screen:
+  // a phone that opens on the clock has an action in its first viewport even
+  // though the form's heading already shows at the bottom edge. It also
+  // steps aside while someone works in the form on screen (focus inside
+  // it), so it never lies over the field being filled. From 1024px, where
+  // the dock would lie over the form's own method selector, it steps aside
+  // while any of the form is on screen. Until the observers report it stays
+  // aside, so the server HTML never paints a dock over the desk; jsdom has
   // no IntersectionObserver.
   const [formInView, setFormInView] = useState(true);
-  const [deskInView, setDeskInView] = useState(true);
+  const [actionInView, setActionInView] = useState(true);
+  const [formFocused, setFormFocused] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 64rem)');
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return undefined;
     const form = document.getElementById('make-gesture');
-    const desk = document.getElementById('deck');
+    // While the form loads it has no action row yet: the form stands in.
+    const action = form?.querySelector('[data-testid="gesture-panel-action"]') ?? form;
     // The sticky header covers the top; a sliver behind it is not "in view".
     const options: IntersectionObserverInit = { rootMargin: headerRootMargin() };
     const formObserver = new IntersectionObserver(
       ([entry]) => setFormInView(entry ? entry.isIntersecting : false),
       options,
     );
-    const deskObserver = new IntersectionObserver(
-      ([entry]) => setDeskInView(entry ? entry.isIntersecting : false),
+    const actionObserver = new IntersectionObserver(
+      ([entry]) => setActionInView(entry ? entry.isIntersecting : false),
       options,
     );
     if (form) formObserver.observe(form);
     else setFormInView(false);
-    if (desk) deskObserver.observe(desk);
+    if (action) actionObserver.observe(action);
+    else setActionInView(false);
     return () => {
       formObserver.disconnect();
-      deskObserver.disconnect();
+      actionObserver.disconnect();
     };
-  }, [showPanel]);
-  const dockAside = formInView || (isDesktop && deskInView);
+  }, [showPanel, loading]);
+  useEffect(() => {
+    const form = document.getElementById('make-gesture');
+    if (!form) return undefined;
+    const handleFocusIn = () => setFormFocused(true);
+    const handleFocusOut = (event: FocusEvent) => {
+      if (!form.contains(event.relatedTarget as Node | null)) setFormFocused(false);
+    };
+    form.addEventListener('focusin', handleFocusIn);
+    form.addEventListener('focusout', handleFocusOut);
+    return () => {
+      form.removeEventListener('focusin', handleFocusIn);
+      form.removeEventListener('focusout', handleFocusOut);
+    };
+  }, [showPanel, loading]);
+  const dockAside =
+    gestureSheetOpen || (isDesktop ? formInView : actionInView || (formFocused && formInView));
 
   // The source-aligned clock discovers milestones even between Gestures.
   // A 30-second bucket keeps this larger timeline out of the one-second
@@ -694,10 +718,12 @@ const HomePage = ({
     return t('ticker.age.days', { count: String(Math.floor(elapsedHours / 24)) });
   }, [latestGesture?.TimeStamp, now, t]);
 
-  const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
+  const attachedAssetCount = donatedNFTs.length + donatedERC20Tokens.length;
+  const hasAttachedAssets = attachedAssetCount > 0;
   const cycleNumber = data?.CurRoundNum;
-  const previousCycle = (cycleNumber ?? 0) - 1;
-  const hasPreviousCycle = previousCycle > 0;
+  // Cycles count from 0, so while Cycle 1 runs, Cycle 0 is the one before it.
+  const previousCycle = cycleNumber != null ? cycleNumber - 1 : -1;
+  const hasPreviousCycle = previousCycle >= 0;
 
   const holdSeconds =
     champions.latestGesture.isTimeKnown === false ? null : champions.latestGesture.holdDuration;
@@ -772,7 +798,6 @@ const HomePage = ({
               gestureCount={data?.CurNumBids ?? null}
               lastGestureAge={lastGestureAge}
               youHoldLatest={position.isLatest}
-              aside={<AttentionMenu />}
             />
           }
           clock={
@@ -789,6 +814,10 @@ const HomePage = ({
               claimWait={claimWait}
               onFinalize={() => void handleFinalize('clock')}
               ethUsdPrice={ethUsdPrice}
+              attachedAssetCount={attachedAssetCount}
+              attachedAssetsHref={`#${ATTACHED_ASSETS_ID}`}
+              // The alerts are about the clock reaching zero: they sit beside it.
+              headingAction={<AttentionMenu className="-my-2.5" />}
             />
           }
           calibration={
@@ -845,10 +874,11 @@ const HomePage = ({
 
         {/* Row 3: the conversation beside where the cycle is now (F169, F296).
             Messages lead the chat; the guide explains the loop as the six
-            steps with the current one marked, and carries the cycle links. */}
+            steps with the current one marked, and carries the cycle links.
+            Both open on a hairline, like the desk above. */}
         <div
           data-testid="home-feed-layout"
-          className="mt-6 grid min-w-0 gap-4 md:gap-5 lg:grid-cols-12 lg:items-stretch"
+          className="mt-10 grid min-w-0 gap-y-7 lg:grid-cols-12 lg:items-stretch lg:gap-x-6"
         >
           <div data-testid="home-feed-column" className="min-w-0 lg:col-span-7">
             <MemoGestureMessageChat
@@ -870,39 +900,43 @@ const HomePage = ({
           </div>
           <CyclePhaseGuide
             phase={cycleState.phase}
-            className={cn(DESK_FRAME, 'p-5 sm:p-6 lg:col-span-5')}
+            className={cn(DESK_REGION, 'lg:col-span-5')}
             cycleLinks={
-              <span data-testid="home-feed-actions" className="contents">
-                <Link
-                  href="/current-cycle"
-                  data-testid="cycle-details-link-card"
-                  className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link-quiet inline-flex items-center gap-1 type-label text-primary`}
-                >
-                  {t('cycleDetails.title')}
-                  <ArrowRight className="size-3.5" aria-hidden />
-                </Link>
-                {hasPreviousCycle && (
+              <>
+                <li data-testid="home-feed-actions">
                   <Link
-                    href={`/allocation/${previousCycle}`}
-                    data-testid="previous-cycle-link-card"
-                    className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link-quiet inline-flex items-center gap-1 type-label text-primary`}
+                    href="/current-cycle"
+                    data-testid="cycle-details-link-card"
+                    className={PHASE_GUIDE_LINK_CLASS}
                   >
-                    {t('hero.console.previousAllocations', { number: String(previousCycle) })}
+                    {t('cycleDetails.title')}
                     <ArrowRight className="size-3.5" aria-hidden />
                   </Link>
+                </li>
+                {hasPreviousCycle && (
+                  <li>
+                    <Link
+                      href={`/allocation/${previousCycle}`}
+                      data-testid="previous-cycle-link-card"
+                      className={PHASE_GUIDE_LINK_CLASS}
+                    >
+                      {t('hero.console.previousAllocations', { number: String(previousCycle) })}
+                      <ArrowRight className="size-3.5" aria-hidden />
+                    </Link>
+                  </li>
                 )}
-              </span>
+              </>
             }
           />
         </div>
 
-        <AllocationsDisclosure className="mt-6">
-          <AllocationLedger data={data} />
-        </AllocationsDisclosure>
-
         {/* Receipts use the full content width. */}
         {hasAttachedAssets && (
-          <div data-testid="home-attached-assets" className="mt-6">
+          <div
+            id={ATTACHED_ASSETS_ID}
+            data-testid="home-attached-assets"
+            className="mt-10 scroll-mt-24"
+          >
             <MemoAttachedNFTAllocationShowcase
               nfts={donatedNFTs}
               erc20Tokens={donatedERC20Tokens}
@@ -912,7 +946,11 @@ const HomePage = ({
           </div>
         )}
 
-        <HomeStory className="mt-6" />
+        {/* The page's two disclosures read as one list of hairline rows. */}
+        <AllocationsDisclosure className="mt-10">
+          <AllocationLedger data={data} />
+        </AllocationsDisclosure>
+        <HomeStory />
       </PageShell>
 
       {/* The one persistent quick-action surface: routes to the gesture

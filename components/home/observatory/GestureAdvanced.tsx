@@ -287,7 +287,7 @@ export function GestureAdvanced({
             hint={t('minCstProtection.minAmount', {
               amount:
                 gestureCstRewardAmountMin == null
-                  ? tCommon('status.loadingDots')
+                  ? tCommon('status.loadingEllipsis')
                   : formatAmount(gestureCstRewardAmountMin, {
                       unit: 'CST',
                       locale,

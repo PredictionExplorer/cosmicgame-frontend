@@ -27,7 +27,11 @@ import PaginationRWLKGrid from '../PaginationRWLKGrid';
 describe('PaginationRWLKGrid', () => {
   it('says the wallet’s NFTs are loading, with nothing to search yet', () => {
     render(<PaginationRWLKGrid loading={true} data={[]} />);
-    expect(screen.getByRole('status')).toHaveTextContent('home.rwlkGrid.loading');
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('home.rwlkGrid.loading');
+    // The grid's own shape waits in skeleton cards, not a spinner and a caption.
+    expect(within(status).getByText('home.rwlkGrid.loading')).toHaveClass('sr-only');
+    expect(status.querySelectorAll('.animate-pulse')).toHaveLength(6);
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
     expect(screen.queryByText('home.rwlkGrid.empty')).not.toBeInTheDocument();
   });

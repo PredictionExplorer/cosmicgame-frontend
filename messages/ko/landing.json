@@ -47,10 +47,10 @@
     "cycleClock": "사이클 시계",
     "gestureCount": "{count, plural, other {제스처 #개}}",
     "units": {
-      "days": "{count, plural, other {일}}",
-      "hours": "{count, plural, other {시간}}",
-      "minutes": "{count, plural, other {분}}",
-      "seconds": "{count, plural, other {초}}"
+      "days": "일",
+      "hours": "시간",
+      "minutes": "분",
+      "seconds": "초"
     },
     "duration": {
       "days": "{count, plural, other {#일}}",

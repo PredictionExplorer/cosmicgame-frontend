@@ -49,8 +49,11 @@ async function expectDecisionDashboardInViewport(page: Page) {
 /** Opens the optional message editor, which recedes behind one control until wanted. */
 async function openMessageEditor(panel: Locator) {
   const toggle = panel.getByTestId('gesture-message-toggle');
-  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
-  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  // A click that lands before hydration only focuses the toggle; try again.
+  await expect(async () => {
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true', { timeout: 2000 });
+  }).toPass();
 }
 
 /** The expanded editor can extend the form, but every control must remain reachable. */
@@ -86,42 +89,65 @@ async function expectCommentFormReachable(page: Page) {
 }
 
 /**
- * Row 1 is the cycle column beside the standings. Row 2 is the form (8 of 12
- * columns) with, beside it on the wall, the newest Signature over the
- * wallet's standing. The three methods sit side by side.
+ * Row 1 is the cycle column (the clock over the Calibration Window) beside
+ * the standings. Row 2 is the form (8 of 12 columns) with, beside it on the
+ * wall, the newest Signature over the wallet's standing. The three methods
+ * sit side by side.
  */
 async function expectEfficientDesktopLayout(page: Page) {
   const grid = page.getByTestId('control-desk-grid');
-  const cycle = page.getByTestId('control-desk-cycle');
+  const clock = page.getByTestId('control-desk-clock');
+  const calibration = page.getByTestId('control-desk-calibration');
   const standings = page.getByTestId('control-desk-standings');
   const form = page.getByTestId('control-desk-gesture');
   const methods = page.getByTestId('panel-method-tabs');
   const art = page.getByTestId('control-desk-art');
   const standing = page.getByTestId('control-desk-standing');
-  const [gridBox, cycleBox, standingsBox, formBox, methodsBox, artBox, standingBox] =
-    await Promise.all([
-      grid.boundingBox(),
-      cycle.boundingBox(),
-      standings.boundingBox(),
-      form.boundingBox(),
-      methods.boundingBox(),
-      art.boundingBox(),
-      standing.boundingBox(),
-    ]);
-  for (const box of [gridBox, cycleBox, standingsBox, formBox, methodsBox, artBox, standingBox]) {
+  const [
+    gridBox,
+    clockBox,
+    calibrationBox,
+    standingsBox,
+    formBox,
+    methodsBox,
+    artBox,
+    standingBox,
+  ] = await Promise.all([
+    grid.boundingBox(),
+    clock.boundingBox(),
+    calibration.boundingBox(),
+    standings.boundingBox(),
+    form.boundingBox(),
+    methods.boundingBox(),
+    art.boundingBox(),
+    standing.boundingBox(),
+  ]);
+  for (const box of [
+    gridBox,
+    clockBox,
+    calibrationBox,
+    standingsBox,
+    formBox,
+    methodsBox,
+    artBox,
+    standingBox,
+  ]) {
     expect(box).not.toBeNull();
   }
 
-  // The clock column and the standings share the first row.
-  expect(Math.abs(cycleBox!.y - standingsBox!.y)).toBeLessThanOrEqual(1);
-  expect(cycleBox!.x + cycleBox!.width).toBeLessThanOrEqual(standingsBox!.x);
+  // The cycle column and the standings share the first row, and the
+  // Calibration Window continues the cycle column under the clock.
+  expect(Math.abs(clockBox!.y - standingsBox!.y)).toBeLessThanOrEqual(1);
+  expect(clockBox!.x + clockBox!.width).toBeLessThanOrEqual(standingsBox!.x);
+  expect(Math.abs(calibrationBox!.x - clockBox!.x)).toBeLessThanOrEqual(1);
+  expect(calibrationBox!.y).toBeGreaterThanOrEqual(clockBox!.y + clockBox!.height - 1);
 
   // The form starts row 2 at the desk's edge and takes most of it.
   expect(Math.abs(formBox!.x - gridBox!.x)).toBeLessThanOrEqual(1);
   expect(formBox!.width).toBeGreaterThan(gridBox!.width * 0.6);
   const gap = await grid.evaluate((element) => Number.parseFloat(getComputedStyle(element).rowGap));
   const rowBottom = Math.max(
-    cycleBox!.y + cycleBox!.height,
+    calibrationBox!.y + calibrationBox!.height,
     standingsBox!.y + standingsBox!.height,
   );
   const formGap = formBox!.y - rowBottom;
@@ -249,15 +275,25 @@ test.describe('home gesture chat', () => {
     ).toBeVisible();
     await expect(page.getByTestId('clock-reserve')).toContainText('2.5000 ETH');
 
-    // The Endurance hold against the Chrono record, in neutral words; the
-    // holder is named once, on the Endurance row.
-    const challenge = page.getByTestId('chrono-active-challenge');
+    // The Endurance Champion's current reign against the Chrono record, in
+    // neutral words, under the Chrono-Warrior row it can change: the holder
+    // is named once, on the Endurance row, and the record once, as the
+    // Chrono-Warrior's time held.
+    const chrono = page.getByTestId('chrono-role-summary');
+    await expect(chrono).toContainText(/30m/);
+    const challenge = chrono.getByTestId('chrono-active-challenge');
     await expect(challenge).toBeVisible();
-    await expect(challenge).toContainText(home.observatory.ledger.challenge.title);
-    await expect(challenge).toContainText(/Held\s*20m/);
-    await expect(challenge).toContainText(/Chrono record\s*30m/);
-    // The hold keeps growing while the page is open, so the time left ticks down.
-    await expect(challenge).toContainText(/Passes it in\s*(10m( 1s)?|9m \d+s)/);
+    // The reign keeps growing while the page is open, so the time left ticks
+    // down; both read as clocks whose width holds while they tick.
+    await expect(challenge.getByTestId('chrono-challenge-segment')).toContainText(
+      new RegExp(`${home.observatory.ledger.challenge.reign}\\s*00:(20|21):\\d\\d`),
+    );
+    await expect(challenge.getByTestId('chrono-challenge-next-change')).toContainText(
+      new RegExp(`${home.observatory.ledger.challenge.passesIn}\\s*00:(10:0[01]|09:\\d\\d)`),
+    );
+    await expect(
+      challenge.getByRole('progressbar', { name: home.observatory.ledger.challenge.progressAria }),
+    ).toBeVisible();
     await expect(challenge.getByRole('link')).toHaveCount(0);
     await expect(
       page
@@ -443,8 +479,9 @@ test.describe('home gesture chat', () => {
     const draft = 'A comment started before connecting.';
     await inlineMessage.fill(draft);
 
-    // The dock never covers the form: it steps aside while the form is on
-    // screen and returns once it has scrolled away.
+    // The dock never lies over a field being filled: it steps aside while
+    // someone works in the form (or its own action is on screen) and returns
+    // once the form has scrolled away.
     // Aside, the dock slides away and leaves the accessibility tree and the
     // tab order (aria-hidden and inert); Playwright counts a faded element
     // as visible, so the attributes are the contract.

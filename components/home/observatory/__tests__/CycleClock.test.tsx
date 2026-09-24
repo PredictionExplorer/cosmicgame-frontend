@@ -1,8 +1,11 @@
 import userEvent from '@testing-library/user-event';
+import { renderToString } from 'react-dom/server';
+
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { render, screen, within, checkA11y } from '@/test-utils';
 
-import { CycleClock } from '../CycleClock';
+import { CycleClock, PREHYDRATION_TICK } from '../CycleClock';
 
 const HOLDER = '0x1111111111111111111111111111111111111111';
 const OTHER = '0x2222222222222222222222222222222222222222';
@@ -47,19 +50,24 @@ describe('CycleClock', () => {
 
     const clock = screen.getByTestId('cycle-clock');
     expect(clock).toHaveAttribute('data-phase', 'live');
-    expect(within(clock).getByText('home.chrono.phase.live.eyebrow')).toBeInTheDocument();
+    // The phase is the region's visible heading, in the desk's one heading
+    // style; the region keeps its stable name.
+    expect(
+      within(clock).getByRole('heading', { level: 2, name: 'home.chrono.phase.live.eyebrow' }),
+    ).toHaveClass('type-heading-3');
+    expect(screen.getByRole('region', { name: 'home.chrono.sectionAria' })).toBe(clock);
     expect(screen.getByTestId('clock-status')).toHaveTextContent('home.chrono.phase.live.status');
     expect(within(clock).getByRole('timer')).toBeInTheDocument();
 
-    // Days, hours, minutes and seconds: two digits each, a caption unit each.
+    // Days, hours, minutes and seconds: two digits each, a fixed caption each
+    // that never changes word or width as the digits tick.
     const figures = screen.getByTestId('clock-figures');
     expect(within(figures).getByText('02')).toBeInTheDocument();
+    expect(within(figures).getByText('home.observatory.clock.unitLabels.days')).toBeInTheDocument();
     expect(
-      within(figures).getByText(/home\.observatory\.clock\.units\.days\(count=2\)/),
+      within(figures).getByText('home.observatory.clock.unitLabels.seconds'),
     ).toBeInTheDocument();
-    expect(
-      within(figures).getByText(/home\.observatory\.clock\.units\.seconds\(count=\d+\)/),
-    ).toBeInTheDocument();
+    expect(figures.textContent).not.toMatch(/count=/);
     // No tiles, ring or glow behind the figures.
     expect(figures.innerHTML).not.toMatch(/rounded-full|blur|animate-/);
     // Regression: tailwind-merge dropped leading-none when the size class
@@ -71,8 +79,77 @@ describe('CycleClock', () => {
   it('drops the day group, not the figure size, once less than a day remains', () => {
     render(<CycleClock {...baseProps} allocationTime={Date.now() + 5 * 60_000} />);
     const figures = screen.getByTestId('clock-figures');
-    expect(within(figures).queryByText(/units\.days/)).not.toBeInTheDocument();
-    expect(within(figures).getByText(/units\.hours\(count=0\)/)).toBeInTheDocument();
+    expect(within(figures).queryByText(/unitLabels\.days/)).not.toBeInTheDocument();
+    expect(
+      within(figures).getByText('home.observatory.clock.unitLabels.hours'),
+    ).toBeInTheDocument();
+  });
+
+  it('ships a tick script after the figures in the server HTML, so the clock never sits frozen', () => {
+    const allocationTime = Date.now() + 5 * 60_000;
+    const html = renderToString(
+      <TooltipProvider>
+        <CycleClock {...baseProps} allocationTime={allocationTime} />
+      </TooltipProvider>,
+    );
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    const figures = container.querySelector('[data-testid="clock-figures"]')!;
+    expect(figures).toHaveAttribute('data-deadline', String(allocationTime));
+    expect(figures).not.toHaveAttribute('data-hydrated');
+    expect(figures.querySelectorAll('[data-unit]')).toHaveLength(3);
+    const script = figures.nextElementSibling;
+    expect(script?.tagName).toBe('SCRIPT');
+    expect(script?.innerHTML).toBe(PREHYDRATION_TICK);
+  });
+
+  it('never creates the script in a client render, where React ticks from the first frame', () => {
+    render(<CycleClock {...baseProps} allocationTime={Date.now() + 5 * 60_000} />);
+    const figures = screen.getByTestId('clock-figures');
+    expect(figures).toHaveAttribute('data-hydrated', 'true');
+    expect(screen.getByTestId('cycle-clock').querySelector('script')).toBeNull();
+  });
+
+  it('ticks the server-rendered figures from the deadline until hydration, then stops', () => {
+    jest.useFakeTimers();
+    const container = document.createElement('div');
+    try {
+      jest.setSystemTime(1_000_000);
+      // 1d 1h 1m 1s before the deadline.
+      container.innerHTML =
+        `<div id="figures" data-deadline="${1_000_000 + 90_061_000}">` +
+        '<span data-unit="days">09</span><span data-unit="hours">09</span>' +
+        '<span data-unit="minutes">09</span><span data-unit="seconds">09</span></div>' +
+        '<script id="tick"></script>';
+      document.body.append(container);
+      const script = container.querySelector('#tick');
+      Object.defineProperty(document, 'currentScript', { configurable: true, get: () => script });
+      new Function(PREHYDRATION_TICK)();
+
+      const figures = container.querySelector('#figures')!;
+      const digits = () => [...figures.querySelectorAll('[data-unit]')].map((n) => n.textContent);
+      // The first paint already reads the time left now, not when the page was built.
+      expect(digits()).toEqual(['01', '01', '01', '01']);
+      jest.advanceTimersByTime(2_000);
+      expect(digits()).toEqual(['01', '01', '00', '59']);
+
+      // Once React has the figures, the script leaves them alone.
+      figures.setAttribute('data-hydrated', 'true');
+      jest.advanceTimersByTime(3_000);
+      expect(digits()).toEqual(['01', '01', '00', '59']);
+    } finally {
+      Reflect.deleteProperty(document, 'currentScript');
+      container.remove();
+      jest.useRealTimers();
+    }
+  });
+
+  it('puts the alerts control beside the heading it is about', () => {
+    render(<CycleClock {...baseProps} headingAction={<button type="button">Alerts</button>} />);
+    const heading = screen.getByRole('heading', { level: 2 });
+    expect(heading.parentElement?.parentElement).toContainElement(
+      screen.getByRole('button', { name: 'Alerts' }),
+    );
   });
 
   it('leads with the Signature Allocation as an explained term and a tabular figure', () => {
@@ -86,10 +163,44 @@ describe('CycleClock', () => {
     const nbsp = String.fromCharCode(160);
     expect(screen.getByTestId('clock-reserve-amount').textContent).toBe(`2.7500${nbsp}ETH`);
     expect(screen.getByTestId('clock-reserve-amount')).toHaveClass('type-figure-lg');
-    expect(within(reserve).getByText('home.observatory.clock.reserveExtras')).toBeInTheDocument();
+    // The fixed extras as list items whose dots hang in a clipped gutter.
+    const extras = within(reserve).getByTestId('clock-reserve-extras');
+    expect(
+      within(extras)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['home.observatory.clock.reserveExtraCst', 'home.observatory.clock.reserveExtraNft']);
+    expect(extras.textContent).not.toContain('·');
     expect(screen.getByTestId('clock-reserve-usd')).toHaveTextContent(
       'home.observatory.clock.reserveUsd(amount=5,500)',
     );
+  });
+
+  it('names attached assets only when the cycle has some, and links to them', () => {
+    const { rerender } = render(<CycleClock {...baseProps} attachedAssetCount={0} />);
+    expect(screen.queryByTestId('clock-reserve-attached')).not.toBeInTheDocument();
+    expect(screen.getByTestId('clock-reserve')).not.toHaveTextContent(/reserveAttached/);
+
+    rerender(
+      <CycleClock
+        {...baseProps}
+        attachedAssetCount={3}
+        attachedAssetsHref="#home-attached-assets"
+      />,
+    );
+    const attached = screen.getByTestId('clock-reserve-attached');
+    expect(within(attached).getByRole('link')).toHaveAttribute('href', '#home-attached-assets');
+    expect(attached).toHaveTextContent('home.observatory.clock.reserveAttached(count=3)');
+  });
+
+  it('reads from the start edge, so a late USD figure never moves the allocation', () => {
+    render(<CycleClock {...baseProps} ethUsdPrice={2000} />);
+    const reserve = screen.getByTestId('clock-reserve');
+    expect(reserve.className).not.toMatch(/text-center/);
+    expect(screen.getByTestId('clock-reserve-amount').parentElement?.className).not.toMatch(
+      /justify-center/,
+    );
+    expect(screen.getByTestId('clock-figures')).toHaveClass('justify-start');
   });
 
   it('hides the USD line until the market price resolves', () => {

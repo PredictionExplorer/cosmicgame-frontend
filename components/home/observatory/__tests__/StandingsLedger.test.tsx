@@ -135,7 +135,7 @@ describe('StandingsLedger', () => {
     const latest = screen.getByTestId('latest-participant-intel');
     expect(visibleText(latest)).not.toMatch(/\b0s\b/);
     // The hold and its progress both read as pending (a skeleton and a spoken "Loading").
-    expect(within(latest).getAllByText('Loading...')).toHaveLength(2);
+    expect(within(latest).getAllByText('common.status.loadingEllipsis')).toHaveLength(2);
     expect(within(latest).queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
@@ -146,9 +146,24 @@ describe('StandingsLedger', () => {
     });
     expect(progress).toHaveAttribute('aria-valuenow', '24');
     expect(progress).toHaveClass('h-0.5');
-    expect(screen.getByTestId('latest-endurance-progress')).toHaveTextContent(
-      /home\.observatory\.ledger\.passesIn\(duration=45m 1s\)/,
-    );
+    // The time left reads as a clock in its own column, beside a label that
+    // never changes, so the row keeps its height while it ticks.
+    const countdown = screen.getByTestId('latest-endurance-countdown');
+    expect(countdown).toHaveTextContent('home.observatory.ledger.passesRecordIn');
+    expect(within(countdown).getByText('00:45:01')).toHaveClass('whitespace-nowrap');
+  });
+
+  it('gives every line that ticks a fixed shape, never a wrapping flex row', () => {
+    render(<StandingsLedger {...baseProps} />);
+    for (const line of [
+      screen.getByTestId('latest-endurance-countdown'),
+      screen.getByTestId('chrono-challenge-segment'),
+      screen.getByTestId('chrono-challenge-next-change'),
+    ]) {
+      expect(line.className).toMatch(/grid-cols-\[minmax\(0,3fr\)_minmax\(0,2fr\)\]/);
+      expect(line.className).not.toMatch(/flex-wrap/);
+      expect(line.querySelector('time')).toHaveClass('whitespace-nowrap', 'tabular-nums');
+    }
   });
 
   it('shows what the Last Gesture paid, received and when, with its record one tap away', () => {
@@ -200,17 +215,30 @@ describe('StandingsLedger', () => {
     expect(screen.getByTestId('latest-participant-intel')).toHaveAttribute('data-settling');
   });
 
-  it('reads the Endurance hold against the Chrono record in neutral words, once', () => {
+  it('reads the Endurance reign against the Chrono record under the row it can change', () => {
     render(<StandingsLedger {...baseProps} />);
-    const challenge = screen.getByTestId('chrono-active-challenge');
-    expect(challenge).toHaveTextContent('home.observatory.ledger.challenge.title');
-    expect(challenge).toHaveTextContent('home.observatory.ledger.challenge.passesIn');
-    // No contest wording ("record to beat", "overtake") and no repeated holder.
+    const chrono = screen.getByTestId('chrono-role-summary');
+    const challenge = within(chrono).getByTestId('chrono-active-challenge');
+    // Both lines read as clocks, so the stacked figures share one format.
+    expect(within(challenge).getByTestId('chrono-challenge-segment')).toHaveTextContent(
+      /home\.observatory\.ledger\.challenge\.reign\s*00:50:00/,
+    );
+    expect(within(challenge).getByTestId('chrono-challenge-next-change')).toHaveTextContent(
+      /home\.observatory\.ledger\.challenge\.passesIn\s*01:10:01/,
+    );
+    // The reign against the record on the row's own 2px rule: 3000s of 7201s.
+    expect(
+      within(challenge).getByRole('progressbar', {
+        name: 'home.observatory.ledger.challenge.progressAria',
+      }),
+    ).toHaveAttribute('aria-valuenow', '41');
+    // No contest wording ("record to beat", "overtake"), no repeated holder or record.
     expect(challenge.textContent).not.toMatch(/recordToBeat|canOvertakeIn|overtake/i);
     expect(within(challenge).queryByRole('link')).not.toBeInTheDocument();
+    expect(visibleText(challenge)).not.toContain('2h');
   });
 
-  it('states empty roles in words', () => {
+  it('states an empty role once, under its name, and dashes its holder and time', () => {
     const champions = makeChampions({
       endurance: { address: null, duration: 0, lockedDuration: 0, isLive: false },
       chrono: { address: null, duration: 0, lockedDuration: 0, isLive: false },
@@ -218,18 +246,25 @@ describe('StandingsLedger', () => {
       lastCst: { address: null },
     });
     render(<StandingsLedger {...baseProps} champions={champions} />);
-    expect(screen.getByTestId('control-desk-endurance')).toHaveTextContent(
-      'tables.specialAllocation.noEnduranceRecord',
+    expect(screen.getByTestId('control-desk-endurance-empty')).toHaveTextContent(
+      'home.observatory.ledger.empty.endurance',
     );
-    expect(screen.getByTestId('final-cst-role-summary')).toHaveTextContent(
-      'tables.specialAllocation.awaitingCstGesture',
+    expect(screen.getByTestId('chrono-role-summary-empty')).toHaveTextContent(
+      'home.observatory.ledger.empty.chrono',
     );
-    // An empty role never leaves its time held blank: a dash, with the reason for readers.
+    expect(screen.getByTestId('final-cst-role-summary-empty')).toHaveTextContent(
+      'home.observatory.ledger.empty.finalCst',
+    );
+    // A held role has no empty line.
+    expect(screen.queryByTestId('latest-participant-intel-empty')).not.toBeInTheDocument();
+    // The holder and time held columns read as a dash, and as "None" for readers.
     for (const testId of ['control-desk-endurance', 'chrono-role-summary']) {
-      const timeHeld = within(screen.getByTestId(testId)).getByText(
-        'home.observatory.ledger.columns.time',
-      ).nextElementSibling;
-      expect(timeHeld).toHaveTextContent('—');
+      const row = screen.getByTestId(testId);
+      for (const column of ['columns.holder', 'columns.time']) {
+        const value = within(row).getByText(`home.observatory.ledger.${column}`).nextElementSibling;
+        expect(value).toHaveTextContent('—');
+        expect(value).toHaveTextContent('tables.status.none');
+      }
     }
   });
 

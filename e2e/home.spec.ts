@@ -115,7 +115,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(
       clock
         .getByText(
-          /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|Cycle is live|less than one hour|Final minutes|Final minute|Finalization is ready/i,
+          /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|can extend the finalization clock|less than one hour|Final minutes|Final minute|Finalization is ready/i,
         )
         .first(),
     ).toBeVisible();
@@ -255,14 +255,26 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
 
   test('Chrono-Warrior standing uses its own address when leaders differ', async ({ page }) => {
     await skipUnlessCycleHasGestures(page);
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    // A complete (V2) snapshot: the page trusts it as it stands. A V1 payload
+    // without the segment fields is completed from the live chain, whose
+    // holders would replace the mocked ones. The records are longer than any
+    // live hold, so the live Last Gesture (measured from the real dashboard)
+    // never takes the Endurance title from the mocked holder.
+    const day = 86_400;
     const data = {
       ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
-      ChronoWarriorDuration: 7200,
+      ChronoWarriorDuration: 400 * day,
+      ChronoWarriorIsLive: false,
       EnduranceChampionAddress: '0x1111111111111111111111111111111111111111',
-      EnduranceChampionDuration: 3600,
+      EnduranceChampionDuration: 365 * day,
+      EnduranceChampionStartTimeStamp: nowSeconds - 400 * day,
+      PrevEnduranceChampionDuration: 0,
       LastBidderAddress: '0x3333333333333333333333333333333333333333',
-      LastBidderLastBidTime: Math.floor(Date.now() / 1000) - 60,
+      LastBidderLastBidTime: nowSeconds - 60,
       LastCstBidderAddress: '0x4444444444444444444444444444444444444444',
+      SourceBlockNumber: 100,
+      SourceBlockTimeStamp: nowSeconds,
     };
 
     await page.route(/\/api\/cosmicgame\/bid\/current_special_winners(?:\?.*)?$/, async (route) => {

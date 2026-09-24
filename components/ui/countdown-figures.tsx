@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 export interface CountdownGroup {
   id: string;
   value: number;
-  /** The unit caption for this value, already pluralized by the caller's catalog. */
+  /** The unit caption: a fixed column label from the caller's catalog. */
   label: string;
 }
 
@@ -68,10 +68,10 @@ const TONE = {
 
 /**
  * CountdownFigures — the Cycle clock as type, one presentation for every
- * clock of the Cycle Finalization Time: tabular Inter figures with a slashed
- * zero, hairline colons in the subtle tier, and each unit's caption centred
- * beneath its group, pluralized for its value by the caller's catalog. No
- * tiles, rings or glows. Decorative (`aria-hidden`): put it inside a
+ * clock of the Cycle Finalization Time: tabular lining Inter figures,
+ * hairline colons in the subtle tier, and each unit's caption centred
+ * beneath its group as a fixed column label. No tiles, rings or glows.
+ * Decorative (`aria-hidden`): put it inside a
  * `role="timer"` whose accessible name spells the duration out.
  */
 export function CountdownFigures({

@@ -47,10 +47,10 @@
     "cycleClock": "週期時鐘",
     "gestureCount": "{count, number} 次落筆",
     "units": {
-      "days": "{count, plural, other {天}}",
-      "hours": "{count, plural, other {小時}}",
-      "minutes": "{count, plural, other {分}}",
-      "seconds": "{count, plural, other {秒}}"
+      "days": "天",
+      "hours": "小時",
+      "minutes": "分",
+      "seconds": "秒"
     },
     "duration": {
       "days": "{count, plural, other {# 天}}",

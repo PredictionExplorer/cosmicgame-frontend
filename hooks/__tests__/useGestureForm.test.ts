@@ -556,6 +556,24 @@ describe('useGestureForm', () => {
     expect(result.current.gestureCstRewardAmountMin).toBe(79.2);
   });
 
+  it('reports a failed CST preview read, and clears it when a later read succeeds', async () => {
+    mockGetGestureCstRewardAmount.mockRejectedValue(new Error('execution reverted'));
+    mockGetGestureCstRewardAmountAdvanced.mockRejectedValue(new Error('execution reverted'));
+
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.cstRewardReadFailed).toBe(true));
+    // Regression: the preview pulsed as "loading" forever after a failed read.
+    expect(result.current.gestureCstRewardAmount).toBeNull();
+    expect(result.current.isCstRewardLoading).toBe(false);
+
+    mockGetGestureCstRewardAmount.mockResolvedValue(BigInt('90000000000000000000'));
+    act(() => {
+      window.dispatchEvent(new CustomEvent('cosmic:gesture-placed'));
+    });
+    await waitFor(() => expect(result.current.gestureCstRewardAmount).toBe(90));
+    expect(result.current.cstRewardReadFailed).toBe(false);
+  });
+
   it('cleans up the CST preview timer and gesture event listener on unmount', async () => {
     (globalThis as LiveCstPreviewTestGlobals).__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
     const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');

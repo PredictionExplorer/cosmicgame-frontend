@@ -79,7 +79,7 @@ export function CycleStandingPreview({ className }: { className?: string }) {
       data-testid="cycle-standing-preview"
       className={cn('min-w-0', className)}
     >
-      <h2 id="cycle-standing-title" className="type-title text-foreground">
+      <h2 id="cycle-standing-title" className="type-heading-3 text-foreground">
         {t('title')}
       </h2>
       <p className="type-body-sm mt-2 text-muted-foreground">{t('connectBody')}</p>
@@ -280,7 +280,7 @@ export function CycleStanding({
       data-testid="cycle-standing"
       className={cn('min-w-0', className)}
     >
-      <h2 id="cycle-standing-title" className="type-title text-foreground">
+      <h2 id="cycle-standing-title" className="type-heading-3 text-foreground">
         {t('title')}
       </h2>
       <dl className="mt-2 divide-y divide-rule-faint">

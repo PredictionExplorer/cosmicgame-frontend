@@ -123,14 +123,14 @@
       "waitingFirstGesture": {
         "eyebrow": "Cycle is open",
         "label": "Awaiting first gesture",
-        "status": "Cycle is open. The first gesture starts the finalization clock.",
+        "status": "The first gesture starts the finalization clock.",
         "tooltip": "No finalization countdown is running yet. The first gesture starts the cycle timer and begins shaping this Signature.",
         "display": "Awaiting first gesture"
       },
       "approach": {
         "eyebrow": "Cycle finalizes in",
         "label": "Under 12 hours",
-        "status": "Cycle is live. Each gesture can extend the finalization clock.",
+        "status": "Each gesture can extend the finalization clock.",
         "tooltip": "This is the Cycle Finalization Time. When it reaches zero, the participant holding the Last Gesture may finalize the cycle."
       },
       "finalHour": {
@@ -168,7 +168,7 @@
       "live": {
         "eyebrow": "Cycle finalizes in",
         "label": "Cycle is live",
-        "status": "Cycle is live. Each gesture can extend the finalization clock.",
+        "status": "Each gesture can extend the finalization clock.",
         "tooltip": "This is the Cycle Finalization Time. When it reaches zero, the participant holding the Last Gesture may finalize the cycle."
       }
     },
@@ -330,7 +330,7 @@
       "messageTooltipAria": "How gesture messages work",
       "messageTooltip": "Leave a message to appear in Gesture Chat. Your message is recorded on-chain with your gesture and remains on the blockchain permanently.",
       "messagePlaceholder": "Leave a message with your gesture…",
-      "attachIntro": "Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.",
+      "attachIntro": "Attach tokens or NFTs to your gesture, or adjust Gesture Cost collision prevention.",
       "minCstProtection": {
         "title": "Minimum CST reward protection",
         "body": "Participation CST uses a square-root formula based on elapsed time. This setting protects you if another gesture lands first and lowers the amount before your transaction confirms.",
@@ -379,7 +379,8 @@
     "connect": {
       "title": "Connect to submit your gesture",
       "body": "Review the live gesture methods and costs above, then connect MetaMask or another wallet to submit on Arbitrum.",
-      "cta": "Connect wallet to make a gesture"
+      "cta": "Connect wallet to make a gesture",
+      "ctaShort": "Connect wallet"
     },
     "message": {
       "add": "Add a message"
@@ -522,14 +523,13 @@
     "view": {
       "messages": "Messages",
       "all": "All activity"
-    },
-    "eventGroup": "{count, plural, one {# cycle event} other {# cycle events}}"
+    }
   },
   "deck": {
     "title": "The Cosmic Signature Observatory",
     "intro": "Make a gesture with ETH or CST to become the latest participant. After the clock reaches zero, the latest participant can finalize and receive the Signature Allocation.",
-    "introShort": "At zero, the latest participant can finalize and receive the Signature Allocation.",
     "newHere": "New here? How it works",
+    "howItWorks": "How it works",
     "experimentalUi": "Experimental UI",
     "returnToCurrent": "Return to current UI",
     "monument": {
@@ -567,7 +567,7 @@
       "gestures": "{count, plural, =0 {No gestures this cycle yet} one {# gesture this cycle} other {# gestures this cycle}}",
       "retrieve": "Retrieve waiting allocations",
       "nothingWaiting": "Nothing waiting to retrieve",
-      "cstPreview": "A gesture now imprints ~{amount} CST",
+      "cstPreview": "A Gesture now imprints ~{amount} CST",
       "entryShare": "{share} of this cycle’s Stellar Selection entries"
     },
     "introByPhase": {
@@ -599,16 +599,18 @@
     },
     "clock": {
       "reserveLabel": "Signature Allocation",
-      "reserveExtras": "+ 1,000 CST · 1 Cosmic Signature NFT · attached assets",
+      "reserveExtraCst": "+ 1,000 CST",
+      "reserveExtraNft": "1 Cosmic Signature NFT",
+      "reserveAttached": "{count, plural, one {# attached asset} other {# attached assets}}",
       "reserveUsd": "≈ {amount} USD",
       "calendarTitle": "Cosmic Signature Cycle #{number} opens",
       "calendarBody": "The next Performance Cycle opens for gestures. The first gesture starts the finalization clock.",
       "calendarCta": "Add the opening to your calendar",
-      "units": {
-        "days": "{count, plural, one {day} other {days}}",
-        "hours": "{count, plural, one {hour} other {hours}}",
-        "minutes": "{count, plural, one {minute} other {minutes}}",
-        "seconds": "{count, plural, one {second} other {seconds}}"
+      "unitLabels": {
+        "days": "days",
+        "hours": "hours",
+        "minutes": "minutes",
+        "seconds": "seconds"
       },
       "state": {
         "ready": "Ready to finalize",
@@ -651,16 +653,21 @@
         "time": "Time held",
         "allocation": "Allocation"
       },
-      "passesIn": "Passes the Endurance record in {duration}",
-      "extendsIn": "Extends the Endurance record in {duration}",
-      "chronoMayClose": "Stops growing in {duration} if the current hold continues",
+      "empty": {
+        "latest": "No gesture yet this cycle",
+        "endurance": "No Endurance record yet",
+        "chrono": "No Chrono-Warrior record yet",
+        "finalCst": "No CST gesture yet"
+      },
+      "passesRecordIn": "Passes the Endurance record in",
+      "extendsRecordIn": "Extends the Endurance record in",
+      "chronoStopsIn": "If the current hold continues, stops growing in",
       "finalCstNote": "Changes only with a CST gesture",
       "position": "Gesture position",
       "challenge": {
-        "title": "Current Endurance hold",
-        "held": "So far",
-        "record": "Chrono record",
-        "passesIn": "Passes it in"
+        "reign": "Endurance Champion’s current reign",
+        "passesIn": "Passes this record in",
+        "progressAria": "Endurance Champion’s current reign against the Chrono-Warrior record"
       },
       "paid": "Paid",
       "received": "Received"

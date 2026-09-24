@@ -123,14 +123,14 @@
       "waitingFirstGesture": {
         "eyebrow": "周期已开启",
         "label": "等待第一笔",
-        "status": "周期已开启。落下第一笔，收官倒计时随之启动。",
+        "status": "落下第一笔，收官倒计时随之启动。",
         "tooltip": "收官倒计时尚未启动。第一笔会启动周期时钟，这幅签名也由此开始成形。",
         "display": "等待第一笔"
       },
       "approach": {
         "eyebrow": "周期收官倒计时",
         "label": "不足 12 小时",
-        "status": "周期进行中。每一笔都可能延长收官倒计时。",
+        "status": "每一笔都可能延长收官倒计时。",
         "tooltip": "这是周期收官时间。归零后，最新落笔者即可收官。"
       },
       "finalHour": {
@@ -168,7 +168,7 @@
       "live": {
         "eyebrow": "周期收官倒计时",
         "label": "周期进行中",
-        "status": "周期进行中。每一笔都可能延长收官倒计时。",
+        "status": "每一笔都可能延长收官倒计时。",
         "tooltip": "这是周期收官时间。归零后，最新落笔者即可收官。"
       }
     },
@@ -379,7 +379,8 @@
     "connect": {
       "title": "连接钱包，提交这一笔",
       "body": "先在上方查看实时落笔方式与价格，再连接 MetaMask 或其他钱包，即可在 Arbitrum 上提交。",
-      "cta": "连接钱包以落笔"
+      "cta": "连接钱包以落笔",
+      "ctaShort": "连接钱包"
     },
     "message": {
       "add": "添加留言"
@@ -522,14 +523,13 @@
     "view": {
       "messages": "留言",
       "all": "全部动态"
-    },
-    "eventGroup": "{count, plural, other {# 条周期事件}}"
+    }
   },
   "deck": {
     "title": "Cosmic Signature 观测台",
     "intro": "用 ETH 或 CST 落笔，成为最新落笔者。倒计时归零后，最新落笔者可收官并获得签名分配。",
-    "introShort": "倒计时归零后，最新落笔者可收官并获得签名分配。",
     "newHere": "初来乍到？了解运作方式",
+    "howItWorks": "了解运作方式",
     "experimentalUi": "实验界面",
     "returnToCurrent": "返回当前界面",
     "monument": {
@@ -599,16 +599,18 @@
     },
     "clock": {
       "reserveLabel": "签名分配",
-      "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附加资产",
+      "reserveExtraCst": "+ 1,000 CST",
+      "reserveExtraNft": "1 枚 Cosmic Signature NFT",
+      "reserveAttached": "{count, plural, other {# 项附加资产}}",
       "reserveUsd": "≈ {amount} 美元",
       "calendarTitle": "Cosmic Signature 第 {number} 个周期开启",
       "calendarBody": "下一演绎周期即将开放落笔。第一笔会启动收官倒计时。",
       "calendarCta": "把开启时间加入日历",
-      "units": {
-        "days": "{count, plural, other {天}}",
-        "hours": "{count, plural, other {小时}}",
-        "minutes": "{count, plural, other {分}}",
-        "seconds": "{count, plural, other {秒}}"
+      "unitLabels": {
+        "days": "天",
+        "hours": "小时",
+        "minutes": "分",
+        "seconds": "秒"
       },
       "state": {
         "ready": "已可收官",
@@ -651,16 +653,21 @@
         "time": "保持时长",
         "allocation": "分配"
       },
-      "passesIn": "再保持 {duration} 将超过坚守纪录",
-      "extendsIn": "再保持 {duration} 将延长坚守纪录",
-      "chronoMayClose": "若当前坚守持续，{duration} 后停止增长",
+      "empty": {
+        "latest": "本周期尚无落笔",
+        "endurance": "暂无坚守纪录",
+        "chrono": "暂无时之勇士纪录",
+        "finalCst": "尚无 CST 落笔"
+      },
+      "passesRecordIn": "距超过坚守纪录还需",
+      "extendsRecordIn": "距延长坚守纪录还需",
+      "chronoStopsIn": "若当前坚守持续，距停止增长还需",
       "finalCstNote": "仅在 CST 落笔时变更",
       "position": "落笔位置",
       "challenge": {
-        "title": "当前坚守进程",
-        "held": "至今",
-        "record": "时之勇士纪录",
-        "passesIn": "距超过还需"
+        "reign": "坚守冠军当前在位时长",
+        "passesIn": "距超过此纪录还需",
+        "progressAria": "坚守冠军当前在位时长相对时之勇士纪录的进度"
       },
       "paid": "支付",
       "received": "收到"

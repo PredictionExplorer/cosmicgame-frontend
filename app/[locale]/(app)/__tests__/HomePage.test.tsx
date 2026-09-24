@@ -4,7 +4,7 @@ import { shortenHex } from '@/utils';
 
 import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
 
-import { render, screen, within, act, checkA11y, waitFor } from '@/test-utils';
+import { render, screen, within, act, checkA11y, fireEvent, waitFor } from '@/test-utils';
 
 import HomePage, { resolveHomeNow } from '../HomePage';
 
@@ -560,7 +560,6 @@ describe('HomePage', () => {
     expect(
       within(header).getByRole('heading', { level: 1, name: 'home.deck.title' }),
     ).toBeInTheDocument();
-    expect(within(header).getByText('home.deck.intro')).toBeInTheDocument();
     expect(within(header).getByText('home.hero.cycleNumber(number=7)')).toBeInTheDocument();
     expect(screen.getByTestId('pulse-phase-chip')).toHaveTextContent(
       'home.chrono.phase.live.label',
@@ -580,6 +579,30 @@ describe('HomePage', () => {
     const grid = screen.getByTestId('control-desk-grid');
     expect(desk).toContainElement(header);
     expect(header.compareDocumentPosition(grid)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it('sets every region heading of the desk and the feed in one style', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        CurRoundNum: 7,
+        CurNumBids: 42,
+        LastBidderAddr: '0x1111111111111111111111111111111111111111',
+      }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    // Position, not size, orders the regions: one tier for every desk H2, so
+    // no small heading sits above a larger neighbour (D040).
+    const regions = [screen.getByTestId('control-desk'), screen.getByTestId('home-feed-layout')];
+    const headings = regions.flatMap((region) =>
+      within(region).getAllByRole('heading', { level: 2 }),
+    );
+    expect(headings.length).toBeGreaterThanOrEqual(6);
+    for (const heading of headings) {
+      expect(heading).toHaveClass('type-heading-3');
+    }
   });
 
   it('keeps all live decision information visible while allocation detail is collapsed', () => {
@@ -636,7 +659,11 @@ describe('HomePage', () => {
     expect(reserve.querySelector('[data-term="signatureAllocation"]')).not.toBeNull();
     // 2.75 ETH × mocked 2,000 USD.
     expect(screen.getByTestId('clock-reserve-usd')).toHaveTextContent('amount=5,500');
-    expect(within(reserve).getByText('home.observatory.clock.reserveExtras')).toBeInTheDocument();
+    expect(within(reserve).getByTestId('clock-reserve-extras')).toHaveTextContent(
+      'home.observatory.clock.reserveExtraCst',
+    );
+    // No attachments in this cycle: the line promises none.
+    expect(within(reserve).queryByTestId('clock-reserve-attached')).not.toBeInTheDocument();
   });
 
   it('reveals the integrated allocation ledger with live amounts on demand', async () => {
@@ -769,6 +796,14 @@ describe('HomePage', () => {
       screen.getByRole('progressbar', { name: 'tables.specialAllocation.progressAria' }),
     ).toHaveAttribute('aria-valuenow', '16');
     expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-erc20-count', '1');
+    // The clock names the attached assets (one NFT, one token deposit) and links to them.
+    const attached = screen.getByTestId('clock-reserve-attached');
+    expect(attached).toHaveTextContent('home.observatory.clock.reserveAttached(count=2)');
+    expect(within(attached).getByRole('link')).toHaveAttribute('href', '#home-attached-assets');
+    expect(screen.getByTestId('home-attached-assets')).toHaveAttribute(
+      'id',
+      'home-attached-assets',
+    );
   });
 
   it('restores the active Endurance challenge and complete Chrono next-change state', () => {
@@ -779,15 +814,16 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    const challenge = screen.getByTestId('chrono-active-challenge');
-    expect(challenge).toHaveTextContent('home.observatory.ledger.challenge.title');
-    // Held 20m of a 30m record; it passes the record in 10m 1s.
-    expect(challenge).toHaveTextContent(/challenge\.held\s*20m/);
-    expect(challenge).toHaveTextContent(/challenge\.record\s*30m/);
-    expect(challenge).toHaveTextContent(/challenge\.passesIn\s*10m 1s/);
+    // Under the Chrono-Warrior row it can change: the Endurance Champion's
+    // reign so far (20m) against the 30m record, passed in 10m 1s.
+    const chrono = screen.getByTestId('chrono-role-summary');
+    const challenge = within(chrono).getByTestId('chrono-active-challenge');
+    expect(challenge).toHaveTextContent(/challenge\.reign\s*00:20:00/);
+    expect(challenge).toHaveTextContent(/challenge\.passesIn\s*00:10:01/);
+    expect(chrono).toHaveTextContent('30m');
     // The holder is named once, on the Endurance row, not again here.
     expect(within(challenge).queryByRole('link')).not.toBeInTheDocument();
-    expect(screen.getByTestId('chrono-role-summary')).toHaveTextContent('0.8000 ETH');
+    expect(chrono).toHaveTextContent('0.8000 ETH');
   });
 
   it('keeps Last Gesture current when the special-recipient snapshot is stale', () => {
@@ -1155,9 +1191,27 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(screen.queryByTestId('previous-cycle-link-card')).not.toBeInTheDocument();
     expect(screen.queryByTestId('public-goods-impact-card')).not.toBeInTheDocument();
     expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('clock-reserve-attached')).not.toBeInTheDocument();
+  });
+
+  it('links the cycle before the live one, Cycle 0 included, since cycles count from 0', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 1 }),
+      isLoading: false,
+    });
+    const { unmount } = render(<HomePage />);
+    // Regression: while Cycle 1 ran, "Cycle 0 allocations" never rendered.
+    expect(screen.getByTestId('previous-cycle-link-card')).toHaveAttribute('href', '/allocation/0');
+    unmount();
+
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 0 }),
+      isLoading: false,
+    });
+    render(<HomePage />);
+    expect(screen.queryByTestId('previous-cycle-link-card')).not.toBeInTheDocument();
   });
 
   it('tells the story behind the art in notes with level-3 headings under one page H1', async () => {
@@ -1559,6 +1613,7 @@ describe('HomePage', () => {
     expect(within(chat).getByText('Loaded signal 59')).toBeInTheDocument();
     expect(within(chat).queryByText('Loaded signal 60')).not.toBeInTheDocument();
     // Reconstructed records require the entire cycle, including its first ten rows.
+    await user.click(within(chat).getByRole('button', { name: 'home.chat.view.all' }));
     expect(
       within(chat)
         .getAllByTestId('chat-system-event')
@@ -1649,6 +1704,7 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const chat = screen.getByTestId('gesture-message-chat');
+    fireEvent.click(within(chat).getByRole('button', { name: 'home.chat.view.all' }));
     const events = within(chat).getAllByTestId('chat-system-event');
     expect(events.map((event) => event.dataset.kind).sort()).toEqual([
       'chronoLead',
@@ -1713,6 +1769,7 @@ describe('HomePage', () => {
       render(<HomePage />);
       act(() => jest.advanceTimersByTime(1_000));
       const chat = screen.getByTestId('gesture-message-chat');
+      fireEvent.click(within(chat).getByRole('button', { name: 'home.chat.view.all' }));
       const eventsOfKind = (kind: string) =>
         within(chat)
           .getAllByTestId('chat-system-event')
@@ -1862,6 +1919,63 @@ describe('HomePage', () => {
     expect(within(dock).getByTestId('dock-jump-to-panel')).toHaveTextContent(
       /home\.form\.submit\.action\.eth\s*0\.01 ETH/,
     );
+  });
+
+  it('keeps the dock on a phone until the form’s own action is on screen', () => {
+    type Observed = { target: Element; callback: IntersectionObserverCallback };
+    const observed: Observed[] = [];
+    class FakeIntersectionObserver {
+      constructor(private readonly callback: IntersectionObserverCallback) {}
+      observe(target: Element) {
+        observed.push({ target, callback: this.callback });
+      }
+      disconnect() {}
+      unobserve() {}
+      takeRecords() {
+        return [];
+      }
+    }
+    const original = Object.getOwnPropertyDescriptor(window, 'IntersectionObserver');
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: FakeIntersectionObserver,
+    });
+    try {
+      mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+      render(<HomePage />);
+
+      const report = (testId: string, isIntersecting: boolean) => {
+        const entry = observed.filter(({ target }) =>
+          testId === 'make-gesture'
+            ? target.id === 'make-gesture'
+            : target.getAttribute('data-testid') === testId,
+        );
+        expect(entry.length).toBeGreaterThan(0);
+        act(() => {
+          for (const { target, callback } of entry) {
+            callback(
+              [{ target, isIntersecting } as IntersectionObserverEntry],
+              {} as IntersectionObserver,
+            );
+          }
+        });
+      };
+      const dockWrapper = () => screen.getByTestId('action-dock').parentElement!;
+
+      // The form's heading shows at the bottom edge, its action row does not:
+      // the dock is the phone's action in the first viewport.
+      report('make-gesture', true);
+      report('gesture-panel-action', false);
+      expect(dockWrapper()).not.toHaveAttribute('aria-hidden');
+
+      // The commit row itself is on screen: the dock never duplicates it.
+      report('gesture-panel-action', true);
+      expect(dockWrapper()).toHaveAttribute('aria-hidden', 'true');
+    } finally {
+      if (original) Object.defineProperty(window, 'IntersectionObserver', original);
+      else Reflect.deleteProperty(window, 'IntersectionObserver');
+    }
   });
 
   it('opens the bottom sheet hosting the same gesture panel from the dock', async () => {

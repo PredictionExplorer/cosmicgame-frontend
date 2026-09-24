@@ -23,9 +23,10 @@ import { PHASE_TEXT_CLASS, viewForPhase } from './phaseView';
 
 export interface ActionDockProps {
   /**
-   * The in-page gesture form (or, from tablets up, the whole desk) is on
-   * screen. The dock then steps aside and leaves the tab order, so it never
-   * covers the form or duplicates it.
+   * The in-page form's own action is on screen, someone is working in the
+   * form, or (from 1024px) any of the form is on screen. The dock then steps
+   * aside and leaves the tab order, so it never duplicates the form's action
+   * or lies over a field being filled.
    */
   stepAside: boolean;
   data: DashboardInfo | null;
@@ -71,8 +72,8 @@ function renderDockClock({ total }: CountdownRenderProps) {
  * bottom sheet with the gesture panel, from tablets up it returns to the
  * panel, so the price shown and the price paid come from the same place. It
  * shows the live transaction stage while a Gesture is in flight, and at zero
- * it turns into Finalize for whoever may finalize. While the in-page form is
- * on screen the dock steps aside, so it never covers it.
+ * it turns into Finalize for whoever may finalize. It steps aside while the
+ * in-page form's own action is on screen, so the two never show together.
  */
 export function ActionDock({
   stepAside,
