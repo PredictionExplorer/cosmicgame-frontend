@@ -1,7 +1,12 @@
+import type { ReactElement } from 'react';
+import { renderToString } from 'react-dom/server';
+
 import { protocolFacts } from '@/content/protocol-facts';
 
 import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { WalletUiProvider } from '@/contexts/WalletUiContext';
 
 import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
 
@@ -532,6 +537,48 @@ describe('Contracts', () => {
     await waitFor(() => {
       expect(mockWriteText).toHaveBeenCalled();
     });
+  });
+
+  describe('server HTML', () => {
+    /** What the route's server render sends: the dashboard query has not hydrated yet. */
+    const serverHtml = (element: ReactElement) =>
+      renderToString(
+        <TooltipProvider>
+          <WalletUiProvider>{element}</WalletUiProvider>
+        </TooltipProvider>,
+      );
+    const serverAddrs = makeDashboardData().ContractAddrs;
+
+    it('lists every contract address from the route’s server read', () => {
+      mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+      const html = serverHtml(<Contracts initialContractAddrs={serverAddrs} />);
+      for (const [key, address] of Object.entries(serverAddrs)) {
+        // The verified implementation address always wins over the dashboard's.
+        if (key === 'ImplementationAddr') continue;
+        expect(html).toContain(address);
+      }
+      expect(html).toContain(protocolFacts.contractAddresses.implementation);
+      expect(html).not.toContain(serverAddrs.ImplementationAddr);
+    });
+
+    it('falls back to the verified addresses when the server read failed', () => {
+      mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+      const html = serverHtml(<Contracts initialContractAddrs={null} />);
+      expect(html).toContain(protocolFacts.contractAddresses.proxy);
+      expect(html).toContain(protocolFacts.contractAddresses.implementation);
+    });
+  });
+
+  it('lets the live dashboard replace the server addresses once it resolves', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        ContractAddrs: { ...makeDashboardData().ContractAddrs, CosmicTokenAddr: '0xLiveToken' },
+      }),
+      isLoading: false,
+    });
+    render(<Contracts initialContractAddrs={makeDashboardData().ContractAddrs} />);
+    expect(screen.getByText('0xLiveToken')).toBeInTheDocument();
+    expect(screen.queryByText('0xTokenAddr')).not.toBeInTheDocument();
   });
 
   it('renders loading state with skeletons', () => {

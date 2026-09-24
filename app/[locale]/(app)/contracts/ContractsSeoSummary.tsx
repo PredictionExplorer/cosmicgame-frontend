@@ -8,9 +8,10 @@ import { readDashboard } from '../publicDataReads';
 /**
  * The /contracts page header, rendered on the server: H1, lede, the network
  * the addresses live on, and the trust resources. The address list itself is
- * the page body's (server-rendered from the seeded dashboard, with verified
- * fallback addresses), so the header does not list the addresses a second
- * time.
+ * the page body's: the route hands the body this request's dashboard read
+ * (`initialContractAddrs`), so every address is in the server HTML, with the
+ * verified fallback addresses when the read fails. The header does not list
+ * the addresses a second time.
  */
 export async function ContractsSeoSummary() {
   const locale = await getLocale();

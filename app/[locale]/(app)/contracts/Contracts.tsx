@@ -12,6 +12,7 @@ import {
 } from '@/contracts/abis';
 
 import { networkConfig } from '@/config/networks';
+import type { ContractAddresses } from '@/services/api/types';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
@@ -68,7 +69,19 @@ function getLiveCstPreviewRefreshMs(): number {
   return CST_REWARD_PREVIEW_REFRESH_MS;
 }
 
-const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+interface ContractsProps {
+  /** The server-rendered page header, the page's only header. */
+  seoSummary?: ReactNode;
+  /**
+   * The contract addresses from the page's server read. The client dashboard
+   * query only hydrates after mount, so these put every address into the
+   * server HTML (search engines and AI systems read the list there); the live
+   * query replaces them once it resolves.
+   */
+  initialContractAddrs?: ContractAddresses | null;
+}
+
+const Contracts = ({ seoSummary, initialContractAddrs = null }: ContractsProps) => {
   const t = useTranslations('contracts');
   const { data, isLoading: loading } = useDashboardInfo();
   const { charity, cosmicGame } = useContractAddresses();
@@ -270,7 +283,7 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
       },
     ]),
   ) as ContractEntryCopy;
-  const contracts = buildContracts(data?.ContractAddrs, contractCopy);
+  const contracts = buildContracts(data?.ContractAddrs ?? initialContractAddrs, contractCopy);
 
   return (
     <PageShell variant="data" backdrop="signature">

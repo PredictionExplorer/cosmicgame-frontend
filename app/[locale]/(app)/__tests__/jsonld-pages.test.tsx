@@ -30,6 +30,10 @@ jest.mock('../contracts/ContractsSeoSummary', () => ({
 jest.mock('../QuerySeed', () => ({
   DashboardQuerySeed: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
+// /contracts hands the body its server read; the JSON-LD does not depend on it.
+jest.mock('../publicDataReads', () => ({
+  readDashboard: () => Promise.resolve({ data: null, at: 0 }),
+}));
 jest.mock('../code/CodeViewer', () => ({
   __esModule: true,
   default: () => <div data-testid="page-body" />,
