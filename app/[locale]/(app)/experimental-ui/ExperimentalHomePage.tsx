@@ -76,6 +76,7 @@ import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { getCycleState, getDashboardActivationTime } from '@/lib/cycleState';
 import { resolveLatestGesture, type LatestParticipantEvidence } from '@/lib/latestGesture';
 import { fetchEndgameChainSample, type EndgameChainSample } from '@/lib/rpcRace';
+import { TOUCH_TARGET_TEXT_LINK_CLASS } from '@/lib/touch-target';
 import {
   UX_SCENARIO_DEMO_ACCOUNT,
   simulateUxScenarioGesture,
@@ -753,7 +754,8 @@ const ExperimentalHomePage = ({
     canClaim,
     isClaiming,
     isLatestParticipant,
-    openToAllAtMs: claimWait,
+    // Until the finalize timeout is read, the holder's window is unknown.
+    openToAllAtMs: timeoutFinalize > 0 ? claimWait : null,
     nowMs: now,
   };
 
@@ -787,19 +789,23 @@ const ExperimentalHomePage = ({
               clampLede={false}
               actions={
                 // Phones: the newcomer's link reads straight after the lede,
-                // then the two controls share a row. Both controls take one
-                // height (44px on phones, 36px from sm) and one radius.
+                // then the two controls share a row. They are one control
+                // family: one height (44px on phones, 36px from sm), the
+                // control radius and the outline edge.
                 <div className="flex flex-col items-start gap-4 max-sm:-mt-2 sm:flex-row sm:items-center sm:gap-2">
                   <Link
                     href="/how-it-works"
                     data-testid="experimental-ui-new-here"
-                    className="link inline-flex items-center gap-1.5 type-body-sm max-sm:leading-6 sm:hidden"
+                    className={`${TOUCH_TARGET_TEXT_LINK_CLASS} link inline-flex items-center gap-1.5 type-body-sm sm:hidden`}
                   >
                     {t('deck.newHere')}
                     <ArrowRight aria-hidden className="size-3.5 shrink-0" />
                   </Link>
                   <div className="flex max-w-full items-center gap-2">
-                    <AttentionMenu className="shrink-0 rounded-control sm:h-9 sm:w-9" />
+                    {/* cn() cannot tell the rounded-control token is a radius,
+                        so only the arbitrary form displaces the bell's own
+                        rounded-full. */}
+                    <AttentionMenu className="shrink-0 rounded-[var(--radius-control)] border-input hover:border-foreground/60 sm:h-9 sm:w-9" />
                     {/* A long label (uk) wraps inside the button on a 320px phone
                         rather than widen the page. */}
                     <Button

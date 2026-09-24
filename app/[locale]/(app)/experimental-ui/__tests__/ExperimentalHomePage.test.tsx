@@ -328,6 +328,7 @@ beforeEach(() => {
     allocationTime: Date.now() + 13 * 3600_000,
     activationTime: 0,
     isClaiming: false,
+    timeoutFinalize: 600,
   });
   mockGestureForm.onGesture.mockResolvedValue(true);
 });
@@ -351,6 +352,21 @@ describe('ExperimentalHomePage', () => {
     newHere.forEach((link) => expect(link).toHaveAttribute('href', '/how-it-works'));
     expect(within(header).getByTestId('experimental-ui-new-here')).toHaveClass('sm:hidden');
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('draws the bell in the same control shape as "Return to current UI"', () => {
+    renderPage();
+
+    // The menu's own round shape and faint edge give way to the control
+    // radius and the outline button's edge. cn() does not read the
+    // rounded-control token as a radius, so a regression here keeps the
+    // circle (rounded-full wins in the generated CSS).
+    const bell = within(screen.getByTestId('home-deck-header')).getByTestId(
+      'attention-menu-trigger',
+    );
+    expect(bell).not.toHaveClass('rounded-full');
+    expect(bell).not.toHaveClass('border-rule');
+    expect(bell).toHaveClass('rounded-[var(--radius-control)]', 'border-input');
   });
 
   it('hangs the art beside the monument, with the standings under the art', () => {
@@ -556,6 +572,21 @@ describe('ExperimentalHomePage', () => {
     expect(screen.getByTestId('finalize-holder-window')).toHaveTextContent(
       /^home\.deck\.console\.holderWindow\(duration=9m 5\ds\)$/,
     );
+    expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
+  });
+
+  it('claims no exclusive window while the finalize timeout is unknown', () => {
+    // useAllocationFinalize reports 0 until the timeout read resolves, and
+    // again when it fails; the holder may still have their whole window.
+    mockAccount = LATEST;
+    Object.assign(mockAllocationFinalize, {
+      allocationTime: Date.now() - 1000,
+      timeoutFinalize: 0,
+    });
+    renderPage();
+
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+    expect(screen.queryByTestId('finalize-holder-window')).not.toBeInTheDocument();
     expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
   });
 

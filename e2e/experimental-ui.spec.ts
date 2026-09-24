@@ -117,9 +117,13 @@ test.describe('experimental UI', () => {
         const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
         const card = box('[data-testid="gesture-message-chat"]');
         const scroll = document.querySelector('[data-testid="gesture-message-chat-scroll"]')!;
-        const rows = Array.from(scroll.querySelectorAll('li, button')).map(
-          (node) => node.getBoundingClientRect().bottom,
-        );
+        // Only rows that paint: a closed event group keeps layout boxes for
+        // its rows, which sit below the card without drawing anything.
+        const painted = (node: Element) =>
+          node.checkVisibility() && !node.closest('details:not([open]) > :not(summary)');
+        const rows = Array.from(scroll.querySelectorAll('li, button'))
+          .filter(painted)
+          .map((node) => node.getBoundingClientRect().bottom);
         return {
           cardBottom: card.bottom,
           lastRowBottom: Math.max(0, ...rows),
@@ -130,6 +134,28 @@ test.describe('experimental UI', () => {
       expect(geometry.lastRowBottom).toBeLessThanOrEqual(geometry.cardBottom);
     });
   }
+
+  test('draws the bell and "Return" as one control family', async ({ page }) => {
+    await openExperiment(page);
+
+    // One radius, one edge and one height: a round bell beside a rounded
+    // rectangle reads as two kinds of control.
+    const header = page.getByTestId('home-deck-header');
+    const shape = (testId: string) =>
+      header.getByTestId(testId).evaluate((node) => {
+        const style = getComputedStyle(node);
+        return {
+          radius: style.borderTopLeftRadius,
+          borderWidth: style.borderTopWidth,
+          borderColor: style.borderTopColor,
+          height: Math.round(node.getBoundingClientRect().height),
+        };
+      });
+    const bell = await shape('attention-menu-trigger');
+    const back = await shape('experimental-ui-return');
+    expect(bell.radius).toBe('8px');
+    expect(bell).toEqual(back);
+  });
 
   test('uses the intended phone order, the shared dock and the still art', async ({
     page,
