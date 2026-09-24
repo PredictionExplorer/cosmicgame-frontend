@@ -11,7 +11,7 @@
   "boundary": {
     "title": "發生錯誤",
     "description": "發生了未預期的錯誤，請重試。",
-    "retry": "重試"
+    "home": "返回首頁"
   },
   "route": {
     "message": "頁面暫時無法顯示，請重試或稍後再來。",

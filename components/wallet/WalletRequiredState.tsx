@@ -1,12 +1,13 @@
 'use client';
 
-import { useId, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { ArrowRight, Loader2, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useConnection } from 'wagmi';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { EmptyState } from '@/components/ui/empty-state';
 
 import { ConnectWalletAction } from './ConnectWalletAction';
 
@@ -49,6 +50,10 @@ function withTrailingIcon(label: string, icon: ReactNode): ReactNode {
  * the wallet list, reassurance that connecting signs nothing, and a way to
  * the public view of the same data.
  *
+ * It is the page variant of `EmptyState`, so every empty, error and wallet
+ * state shares one well, icon tone and type scale, and its public link is the
+ * underlined `link` every empty state's next step uses.
+ *
  * While wagmi restores a returning visitor's session it shows a quiet
  * "Restoring your wallet connection…" line instead, so the Connect button
  * does not flash before the page switches to the connected view.
@@ -63,58 +68,54 @@ export function WalletRequiredState({
 }: WalletRequiredStateProps) {
   const t = useTranslations('wallet');
   const { status } = useConnection();
-  const Heading = headingLevel;
-  const titleId = useId();
   const restoring = status === 'reconnecting' || status === 'connecting';
 
   return (
     <section
-      aria-labelledby={titleId}
+      aria-label={title}
       data-testid="wallet-required-state"
-      className={cn(
-        'mx-auto flex max-w-xl flex-col items-center px-4 py-14 text-center sm:py-16',
-        className,
-      )}
+      className={cn('mx-auto max-w-xl', className)}
     >
-      <div className="mb-5 rounded-2xl border border-border bg-card/60 p-4">
-        <Wallet className="h-7 w-7 text-primary" aria-hidden />
-      </div>
-      <Heading id={titleId} className="type-heading-3 text-balance text-foreground">
-        {title}
-      </Heading>
-      {description && (
-        <p className="mt-2 max-w-md text-pretty text-sm leading-relaxed text-muted-foreground">
-          {description}
-        </p>
-      )}
-      {restoring ? (
-        <p
-          role="status"
-          className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-muted-foreground"
-        >
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-          {t('connect.restoring')}
-        </p>
-      ) : (
-        <div className="mt-6 flex max-w-full flex-col items-center gap-3 sm:flex-row sm:gap-5">
-          <ConnectWalletAction size="lg" warmOnVisible />
-          {publicLink && (
-            <Link
-              href={publicLink.href}
-              className="inline-block max-w-full py-3 text-sm font-semibold text-primary text-balance underline-offset-4 hover:underline sm:py-0"
-            >
-              {withTrailingIcon(
-                publicLink.label,
-                <ArrowRight className="ml-1.5 inline size-4 align-[-0.1875em]" aria-hidden />,
-              )}
-            </Link>
-          )}
-        </div>
-      )}
-      <p className="mt-4 max-w-sm text-pretty text-xs leading-relaxed text-muted-foreground">
-        {t('required.hint')}
-      </p>
-      {children}
+      <EmptyState
+        variant="page"
+        headingLevel={headingLevel === 'h3' ? 3 : 2}
+        icon={<Wallet />}
+        title={title}
+        description={description}
+        className="py-14 sm:py-16"
+        action={
+          <div className="flex flex-col items-center">
+            {restoring ? (
+              <p
+                role="status"
+                className="type-body-sm inline-flex min-h-11 items-center gap-2 text-muted-foreground"
+              >
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                {t('connect.restoring')}
+              </p>
+            ) : (
+              <div className="flex max-w-full flex-col items-center gap-3 sm:flex-row sm:gap-5">
+                <ConnectWalletAction size="lg" warmOnVisible />
+                {publicLink ? (
+                  <Link
+                    href={publicLink.href}
+                    className="link type-body-sm inline-block max-w-full py-3 font-medium text-balance sm:py-0"
+                  >
+                    {withTrailingIcon(
+                      publicLink.label,
+                      <ArrowRight className="ml-1.5 inline size-4 align-[-0.1875em]" aria-hidden />,
+                    )}
+                  </Link>
+                ) : null}
+              </div>
+            )}
+            <p className="type-caption mt-4 max-w-sm text-pretty text-subtle">
+              {t('required.hint')}
+            </p>
+            {children}
+          </div>
+        }
+      />
     </section>
   );
 }

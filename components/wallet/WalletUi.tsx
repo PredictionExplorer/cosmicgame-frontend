@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   RainbowKitProvider,
   useConnectModal,
@@ -75,21 +75,42 @@ const RAINBOW_KIT_LOCALES: LocaleRecord<RainbowKitLocale> = {
 };
 
 /**
+ * A link in the connect modal's disclaimer. RainbowKit's own `Link` sets the
+ * link apart from the sentence by colour alone (1.02–1.44:1 in the five
+ * palettes, WCAG 1.4.1), so the disclaimer draws its own: the site's
+ * underlined `link`, opening in a new tab so the modal stays where it was,
+ * and saying so to screen readers.
+ */
+export function DisclaimerLink({ href, children }: { href: string; children: ReactNode }) {
+  const t = useTranslations('nav');
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="link">
+      {children}
+      <span className="sr-only"> {t('link.newTab')}</span>
+    </a>
+  );
+}
+
+/**
  * The line under the wallet list: connecting means agreeing to the Terms and
  * acknowledging the Risk Disclosures, and gestures need ETH on the protocol's
- * chain. RainbowKit renders it with its own Text and Link so it matches the
- * modal's typography.
+ * chain. RainbowKit's `Text` keeps the modal's typography; the links are
+ * `DisclaimerLink`s.
  */
-const WalletDisclaimer: DisclaimerComponent = ({ Text, Link }) => {
+const WalletDisclaimer: DisclaimerComponent = ({ Text }) => {
   const t = useTranslations('wallet');
   const locale = useLocale();
   return (
     <Text>
       {t.rich('connect.disclaimer', {
         network: REQUIRED_CHAIN_NAME,
-        terms: (chunks) => <Link href={getPathname({ href: '/terms', locale })}>{chunks}</Link>,
+        terms: (chunks) => (
+          <DisclaimerLink href={getPathname({ href: '/terms', locale })}>{chunks}</DisclaimerLink>
+        ),
         risk: (chunks) => (
-          <Link href={getPathname({ href: '/risk-disclosures', locale })}>{chunks}</Link>
+          <DisclaimerLink href={getPathname({ href: '/risk-disclosures', locale })}>
+            {chunks}
+          </DisclaimerLink>
         ),
       })}
     </Text>

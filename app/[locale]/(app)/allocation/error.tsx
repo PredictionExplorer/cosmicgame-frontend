@@ -7,17 +7,17 @@ import { RouteError } from '@/components/layout/RouteError';
 /** Route-level error boundary for the allocation recipient pages. */
 export default function AllocationError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   const t = useTranslations('errors');
 
   return (
     <RouteError
       error={error}
-      reset={reset}
+      retry={retry}
       context="allocation-route"
       title={t('route.titles.allocation')}
       message={t('route.message')}

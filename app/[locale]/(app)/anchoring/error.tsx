@@ -7,17 +7,17 @@ import { RouteError } from '@/components/layout/RouteError';
 /** Route-level error boundary for the anchoring pages. */
 export default function AnchoringError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   const t = useTranslations('errors');
 
   return (
     <RouteError
       error={error}
-      reset={reset}
+      retry={retry}
       context="anchoring-route"
       title={t('route.titles.anchoring')}
       message={t('route.message')}

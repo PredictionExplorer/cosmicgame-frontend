@@ -17,7 +17,7 @@ import StatisticsError from '../statistics/error';
 
 jest.mock('../../../../utils/errors', () => ({ reportError: jest.fn() }));
 
-type Boundary = ComponentType<{ error: Error & { digest?: string }; reset: () => void }>;
+type Boundary = ComponentType<{ error: Error & { digest?: string }; retry: () => void }>;
 
 /**
  * Every wallet-heavy segment plus the group-level fallback. `titleKey` is the
@@ -48,29 +48,29 @@ beforeEach(() => {
 
 describe.each(BOUNDARIES)('%s route error boundary', (_name, Boundary, context, title) => {
   it('renders its fallback with the segment-specific title', () => {
-    render(<Boundary error={new Error('boom')} reset={() => {}} />);
+    render(<Boundary error={new Error('boom')} retry={() => {}} />);
     expect(screen.getByText(title)).toBeInTheDocument();
     expect(screen.getByText('errors.route.message')).toBeInTheDocument();
   });
 
   it('reports the error once with the segment context', () => {
     const error = Object.assign(new Error('boom'), { digest: 'digest-1' });
-    render(<Boundary error={error} reset={() => {}} />);
+    render(<Boundary error={error} retry={() => {}} />);
     expect(reportError).toHaveBeenCalledTimes(1);
     expect(reportError).toHaveBeenCalledWith(error, context);
   });
 
-  it('retries via reset', async () => {
+  it('retries via retry, which re-fetches the segment', async () => {
     const user = userEvent.setup();
-    const reset = jest.fn();
-    render(<Boundary error={new Error('boom')} reset={reset} />);
+    const retry = jest.fn();
+    render(<Boundary error={new Error('boom')} retry={retry} />);
 
     await user.click(screen.getByRole('button', { name: /try again/i }));
-    expect(reset).toHaveBeenCalledTimes(1);
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<Boundary error={new Error('boom')} reset={() => {}} />);
+    const { container } = render(<Boundary error={new Error('boom')} retry={() => {}} />);
     await checkA11y(container);
   });
 });
@@ -78,15 +78,15 @@ describe.each(BOUNDARIES)('%s route error boundary', (_name, Boundary, context, 
 describe('statistics route error boundary (shared component refactor)', () => {
   it('keeps its own copy and Sentry context', async () => {
     const user = userEvent.setup();
-    const reset = jest.fn();
+    const retry = jest.fn();
     const error = new Error('boom');
 
-    render(<StatisticsError error={error} reset={reset} />);
+    render(<StatisticsError error={error} retry={retry} />);
 
     expect(reportError).toHaveBeenCalledWith(error, 'statistics-route');
     expect(screen.getByText('Statistics failed to load')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /try again/i }));
-    expect(reset).toHaveBeenCalledTimes(1);
+    expect(retry).toHaveBeenCalledTimes(1);
   });
 });

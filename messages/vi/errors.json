@@ -11,7 +11,7 @@
   "boundary": {
     "title": "Đã xảy ra lỗi",
     "description": "Đã xảy ra lỗi ngoài dự kiến.",
-    "retry": "Thử lại"
+    "home": "Về trang chủ"
   },
   "route": {
     "message": "Không thể hiển thị trang này. Hãy thử lại hoặc quay lại sau ít phút.",

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 
-import { WalletUi } from '../WalletUi';
+import { DisclaimerLink, WalletUi } from '../WalletUi';
 
 // jest.setup stubs the lazy wallet UI for every other suite; this one tests it.
 jest.unmock('@/components/wallet/WalletUi');
@@ -97,5 +97,14 @@ describe('WalletUi', () => {
       />,
     );
     expect(screen.getByText(/wallet\.connect\.disclaimer/)).toBeInTheDocument();
+  });
+
+  it('underlines the Terms and Risk links and says they open a new tab (WCAG 1.4.1)', () => {
+    render(<DisclaimerLink href="/terms">Terms of Service</DisclaimerLink>);
+    const link = screen.getByRole('link', { name: /Terms of Service/ });
+    expect(link).toHaveClass('link');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(link).toHaveAccessibleName('Terms of Service nav.link.newTab');
   });
 });

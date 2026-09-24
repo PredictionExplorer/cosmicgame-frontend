@@ -7,17 +7,17 @@ import { RouteError } from '@/components/layout/RouteError';
 /** Route-level error boundary for the NFT gallery. */
 export default function GalleryError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   const t = useTranslations('errors');
 
   return (
     <RouteError
       error={error}
-      reset={reset}
+      retry={retry}
       context="gallery-route"
       title={t('route.titles.gallery')}
       message={t('route.message')}

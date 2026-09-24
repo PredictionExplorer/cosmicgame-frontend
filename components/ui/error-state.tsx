@@ -32,6 +32,8 @@ interface ErrorStateProps {
   /** If provided, renders a "Try again" button. */
   onRetry?: () => void;
   retryLabel?: string;
+  /** A second way on beside the retry, such as a link to a hub page. */
+  action?: ReactNode;
   /** Wrap the state in a Surface for inline/contained contexts. */
   surface?: boolean;
   className?: string;
@@ -63,6 +65,7 @@ export function ErrorState({
   variant = 'panel',
   onRetry,
   retryLabel,
+  action,
   surface = false,
   className,
 }: ErrorStateProps) {
@@ -94,16 +97,21 @@ export function ErrorState({
             {message}
           </div>
         ) : null}
-        {onRetry ? (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRetry}
-            className={isInline ? 'mt-3' : 'mt-6'}
+        {onRetry || action ? (
+          <div
+            className={cn(
+              'flex flex-wrap items-center gap-3',
+              isInline ? 'mt-3' : 'mt-6 justify-center',
+            )}
           >
-            <RefreshCw aria-hidden />
-            {retryLabel ?? t('state.retry')}
-          </Button>
+            {onRetry ? (
+              <Button variant="outline" size="sm" onClick={onRetry}>
+                <RefreshCw aria-hidden />
+                {retryLabel ?? t('state.retry')}
+              </Button>
+            ) : null}
+            {action}
+          </div>
         ) : null}
       </StateText>
     </div>
