@@ -757,6 +757,7 @@
     "none": "No Signature imprinted yet"
   },
   "announce": {
-    "newGesture": "New Gesture by {address}; it now holds the Last Gesture."
+    "newGesture": "New Gesture by {address}; it now holds the Last Gesture.",
+    "placeTaken": "Your place was taken: {address} now holds the Last Gesture."
   }
 }

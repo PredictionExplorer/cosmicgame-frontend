@@ -757,6 +757,7 @@
     "none": "尚未銘刻簽名"
   },
   "announce": {
-    "newGesture": "{address} 落下新的一筆，現為最新落筆者。"
+    "newGesture": "{address} 落下新的一筆，現為最新落筆者。",
+    "placeTaken": "你的位置已被取代：{address} 現為最新落筆者。"
   }
 }

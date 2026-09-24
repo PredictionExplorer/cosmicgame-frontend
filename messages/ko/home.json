@@ -757,6 +757,7 @@
     "none": "아직 각인된 시그니처가 없습니다"
   },
   "announce": {
-    "newGesture": "새 제스처: {address}. 이 참여자가 현재 최근 참여자입니다."
+    "newGesture": "새 제스처: {address}. 이 참여자가 현재 최근 참여자입니다.",
+    "placeTaken": "다른 참여자가 자리를 대신했습니다. 현재 최근 제스처: {address}."
   }
 }
