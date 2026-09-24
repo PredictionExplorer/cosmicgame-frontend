@@ -290,7 +290,7 @@ export const learnTextEn = {
           heading: 'Why the chain context is visible',
           body: [
             'Cosmic Signature identifies Arbitrum throughout the app because chain context is part of the protocol identity. Gestures, cycle records, contract addresses, CST, NFT ownership, and allocation retrievals all need a concrete network reference to be independently checked.',
-            'Use the contracts page to find deployment addresses and the statistics page to explore recorded activity. Together they connect the protocol’s rules to records you can verify.',
+            'Use the [contracts page](contracts) to find deployment addresses and the [statistics page](statistics) to explore recorded activity. Together they connect the protocol’s rules to records you can verify.',
           ],
         },
         {
@@ -322,7 +322,7 @@ export const learnTextEn = {
         {
           heading: 'Verification surfaces',
           body: [
-            'Verification is spread across several public surfaces. The contracts page lists deployment addresses and explorer links, the code page describes the deterministic rendering resources, the audits page states review status, and the security page explains how users should inspect official resources.',
+            'Verification is spread across several public surfaces. The [contracts page](contracts) lists deployment addresses and explorer links, the [code page](code) describes the deterministic rendering resources, the [audits page](audits) states review status, and the [security page](security) explains how users should inspect official resources.',
             'These pages should be read together. A contract address without context is hard to interpret; a security claim without links is hard to verify. Cosmic Signature therefore keeps addresses, source references, risk language, and audit status connected through internal links.',
           ],
         },

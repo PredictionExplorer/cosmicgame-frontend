@@ -12,6 +12,13 @@ import { learnTextZhTw } from './text.zh-TW';
 import type { LearnArticle, LearnContent, LearnSection } from './types';
 
 export * from './structure';
+export {
+  isLearnLinkTarget,
+  learnLinkKeys,
+  learnPlainText,
+  splitLearnLinks,
+  type LearnTextPart,
+} from './links';
 
 /** Composes the locale-independent skeleton with one locale's copy. */
 function buildLearnContent(text: LearnText): LearnContent {

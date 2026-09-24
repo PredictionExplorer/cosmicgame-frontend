@@ -10,6 +10,7 @@ import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { GUIDE_ICONS } from '@/components/learn/GuideCard';
+import { GuideText } from '@/components/learn/GuideText';
 import { guideMinutes, landingLink } from '@/components/learn/guides';
 import { QuizPrompt } from '@/components/learn/QuizPrompt';
 import { ReadingContents } from '@/components/reading/ContentsNav';
@@ -209,7 +210,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
                   <div className="mt-5 space-y-5">
                     {section.body.map((paragraph) => (
                       <p key={paragraph} className={cn(PROSE_CLASS, '[overflow-wrap:anywhere]')}>
-                        {paragraph}
+                        <GuideText text={paragraph} locale={locale} />
                       </p>
                     ))}
                   </div>
@@ -263,7 +264,7 @@ export default async function LearnArticlePage({ params }: PageProps) {
                   <div className="mt-2 space-y-2">
                     {section.body.map((paragraph) => (
                       <p key={paragraph} className="type-body-sm text-muted-foreground">
-                        {paragraph}
+                        <GuideText text={paragraph} locale={locale} />
                       </p>
                     ))}
                   </div>

@@ -299,7 +299,7 @@ export const learnTextVi = {
           heading: 'Vì sao bối cảnh chuỗi được hiển thị rõ',
           body: [
             'Cosmic Signature nêu rõ Arbitrum xuyên suốt ứng dụng vì bối cảnh chuỗi là một phần của bản sắc giao thức. Nét bút, bản ghi chu kỳ, địa chỉ hợp đồng, CST, quyền sở hữu NFT và các lần nhận về phân bổ đều cần một tham chiếu mạng cụ thể để có thể kiểm tra độc lập.',
-            'Trang hợp đồng cung cấp địa chỉ triển khai; trang thống kê tổng hợp hoạt động trên mạng. Hai nguồn này giúp bạn đối chiếu cơ chế được mô tả với dữ liệu thực tế.',
+            '[Trang hợp đồng](contracts) cung cấp địa chỉ triển khai; [trang thống kê](statistics) tổng hợp hoạt động trên mạng. Hai nguồn này giúp bạn đối chiếu cơ chế được mô tả với dữ liệu thực tế.',
           ],
         },
         {
@@ -331,7 +331,7 @@ export const learnTextVi = {
         {
           heading: 'Nguồn thông tin xác minh',
           body: [
-            'Việc xác minh trải trên nhiều bề mặt công khai. Trang hợp đồng liệt kê địa chỉ triển khai và liên kết trình khám phá, trang mã nguồn mô tả các tài nguyên kết xuất tất định, trang kiểm toán nêu tình trạng rà soát, và trang bảo mật giải thích cách người dùng nên kiểm tra các tài nguyên chính thức.',
+            'Việc xác minh trải trên nhiều bề mặt công khai. [Trang hợp đồng](contracts) liệt kê địa chỉ triển khai và liên kết trình khám phá, [trang mã nguồn](code) mô tả các tài nguyên kết xuất tất định, [trang kiểm toán](audits) nêu tình trạng rà soát, và [trang bảo mật](security) giải thích cách người dùng nên kiểm tra các tài nguyên chính thức.',
             'Những trang này nên được đọc cùng nhau. Một địa chỉ hợp đồng không có bối cảnh rất khó diễn giải; một tuyên bố bảo mật không có liên kết rất khó xác minh. Vì vậy Cosmic Signature giữ cho địa chỉ, tham chiếu mã nguồn, ngôn ngữ về rủi ro và tình trạng kiểm toán được kết nối qua các liên kết nội bộ.',
           ],
         },

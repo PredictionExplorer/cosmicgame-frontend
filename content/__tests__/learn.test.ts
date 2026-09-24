@@ -3,8 +3,12 @@ import {
   getLearnArticle as getLocalizedLearnArticle,
   getLearnContent,
   getLearnSlugs,
+  isLearnLinkTarget,
   learnContentEn,
   learnContentZh,
+  learnLinkKeys,
+  learnPlainText,
+  splitLearnLinks,
 } from '@/content/learn';
 
 import { routing } from '@/i18n/routing';
@@ -178,4 +182,63 @@ describe('learn article contract accuracy', () => {
     expect(hrefs).toContain('https://chaoszero.com');
     expect(hrefs.some((href) => href.startsWith('https://app.uniswap.org/'))).toBe(true);
   });
+});
+
+describe('inline links in guide prose', () => {
+  it('splits a paragraph into text and links, and reads it as plain text', () => {
+    const text = 'Open the [contracts page](contracts), then [nowhere](missing) and [code](code).';
+    expect(splitLearnLinks(text)).toEqual([
+      'Open the ',
+      { label: 'contracts page', target: 'contracts' },
+      ', then nowhere and ',
+      { label: 'code', target: 'code' },
+      '.',
+    ]);
+    expect(learnPlainText(text)).toBe('Open the contracts page, then nowhere and code.');
+    expect(splitLearnLinks('No links here.')).toEqual(['No links here.']);
+    expect(isLearnLinkTarget('toString')).toBe(false);
+  });
+
+  function paragraphsOf(locale: string) {
+    const { articles, articleUi } = getLearnContent(locale);
+    return [
+      ...articles.flatMap((article) =>
+        article.sections.flatMap((section, sectionIndex) =>
+          section.body.map((text, index) => ({
+            key: `${article.slug} ${sectionIndex}.${index}`,
+            text,
+          })),
+        ),
+      ),
+      ...articleUi.appendix.flatMap((section, sectionIndex) =>
+        section.body.map((text, index) => ({ key: `appendix ${sectionIndex}.${index}`, text })),
+      ),
+    ];
+  }
+
+  it('links the verification pages from the contracts guide', () => {
+    const guide = getLearnArticle('contracts-security-verification')!;
+    expect(guide.sections.flatMap((section) => section.body).flatMap(learnLinkKeys)).toEqual([
+      'contracts',
+      'code',
+      'audits',
+      'security',
+    ]);
+  });
+
+  it.each(routing.locales)(
+    '%s: links only to declared pages, the same ones as English',
+    (locale) => {
+      const english = new Map(
+        paragraphsOf('en').map(({ key, text }) => [key, learnLinkKeys(text)]),
+      );
+      for (const { key, text } of paragraphsOf(locale)) {
+        const keys = learnLinkKeys(text);
+        expect(keys.filter((target) => !isLearnLinkTarget(target))).toEqual([]);
+        expect([key, keys]).toEqual([key, english.get(key)]);
+        // No stray bracket or half-written token reaches the page.
+        expect(learnPlainText(text)).not.toMatch(/\]\(|\[[^\]]*\]\(/);
+      }
+    },
+  );
 });

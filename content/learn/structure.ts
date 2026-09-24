@@ -35,6 +35,22 @@ interface LearnArticleStructure {
   readonly related: readonly string[];
 }
 
+/**
+ * The pages a guide's prose may link to inline. A section paragraph writes
+ * `[label](key)` and the page links `label` to the target `key` names
+ * (content/learn/links.ts), so the eight text modules name a page without
+ * repeating its URL, and a locale cannot link anywhere else.
+ */
+export const LEARN_LINK_TARGETS = {
+  contracts: appLink('/contracts'),
+  code: appLink('/code'),
+  audits: appLink('/audits'),
+  security: appLink('/security'),
+  statistics: appLink('/statistics'),
+} as const;
+
+export type LearnLinkTarget = keyof typeof LEARN_LINK_TARGETS;
+
 export const LEARN_STRUCTURE = {
   hub: {
     quizCtaHref: '/quiz',

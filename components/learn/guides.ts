@@ -1,4 +1,4 @@
-import type { LearnArticle } from '@/content/learn';
+import { learnPlainText, type LearnArticle } from '@/content/learn';
 
 import { classifyHref, type SiteLinkKind } from '@/config/siteNav';
 import { LANDING_ORIGIN, localizeCrossHostHref } from '@/lib/hostRouting';
@@ -7,7 +7,13 @@ import { readingMinutes } from '@/components/reading/readingTime';
 /** The minutes a guide takes to read: its summary and sections. */
 export function guideMinutes(article: LearnArticle, locale: string): number {
   return readingMinutes(
-    [article.summary, ...article.sections.flatMap((section) => [section.heading, ...section.body])],
+    [
+      article.summary,
+      ...article.sections.flatMap((section) => [
+        section.heading,
+        ...section.body.map(learnPlainText),
+      ]),
+    ],
     locale,
   );
 }
