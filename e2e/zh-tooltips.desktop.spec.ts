@@ -22,10 +22,13 @@ interface TooltipRoute {
 const ROUTES: readonly TooltipRoute[] = [
   { path: '/zh', readyText: 'Cosmic Signature 观测台', minimum: 5 },
   {
+    // The header figures carry the info buttons; in the body only the coined
+    // Cycle Reserve and the standings roles explain themselves (the
+    // allocation names are plain, explained together in one disclosure).
     path: '/zh/current-cycle',
     readyText: '落笔总次数',
-    minimum: 4,
-    explainedTerms: ['周期储备', '签名分配', '公共物品', '坚守冠军'],
+    minimum: 2,
+    explainedTerms: ['周期储备', '坚守冠军'],
   },
   { path: `/zh/allocation/${cycle}`, readyText: `第 ${cycle} 个周期`, minimum: 5 },
   { path: '/zh/anchoring', readyText: '锚定运作原理', minimum: 3 },

@@ -70,11 +70,15 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
     await expect(page).toHaveTitle('当前演绎周期 · Cosmic Signature');
-    await expect(page.getByRole('heading', { name: /第 \d+ 个周期/ }).first()).toBeVisible();
+    // The H1 is the cycle itself, under the page's name as the eyebrow.
+    await expect(page.getByRole('heading', { level: 1, name: /^第 \d+ 个周期$/ })).toBeVisible();
+    await expect(page.getByText('当前演绎周期', { exact: true }).first()).toBeVisible();
 
+    // The header figures explain themselves; the cycle's own labels are plain words.
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
     await expectZhLabelTooltip(page, '落笔总次数', /本周期的落笔总次数/);
-    await expectZhLabelTooltip(page, 'ETH 贡献', /本周期来自社区的直接 ETH 贡献/);
+    await expectZhLabelTooltip(page, '签名分配', /签名分配中的 ETH 部分/);
+    await expect(page.getByRole('button', { name: 'ETH 贡献' })).toHaveCount(0);
   });
 
   test('/zh/gallery renders Chinese archive controls', async ({ page }) => {
