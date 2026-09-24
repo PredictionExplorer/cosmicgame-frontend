@@ -31,11 +31,11 @@ import { GestureConsole } from '@/components/home/experimental/GestureConsole';
 import { StageArtwork, type StageToken } from '@/components/home/experimental/StageArtwork';
 import { StandingsLedger } from '@/components/home/experimental/StandingsLedger';
 import { useArtMotionPreference } from '@/components/home/experimental/useArtMotionPreference';
+import { useChampionsAtClock } from '@/components/home/experimental/useChampionsAtClock';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import type { ArtStatus } from '@/components/ui/art-frame';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useHomeGestureFeed } from '@/hooks/useHomeGestureFeed';
-import { useChampions } from '@/hooks/useChampions';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useEndgameChainSync } from '@/hooks/useEndgameChainSync';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
@@ -44,6 +44,7 @@ import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import { useTabTitleCountdown } from '@/hooks/useTabTitleCountdown';
+import { useTxStageLabel } from '@/hooks/useTxStageLabel';
 import {
   trackChatJoinCtaClicked,
   trackFinalizeSubmitted,
@@ -287,11 +288,14 @@ const ExperimentalHomePage = ({
   // ── Cycle state ──────────────────────────────────────────────────────
   const gestureForm = useGestureForm();
   const hasCurrentGesture = !!data && data.LastBidderAddr !== zeroAddress;
-  const champions = useChampions(
-    initialSpecialRecipients,
-    latestResolution.evidence,
-    hasCurrentGesture,
-  );
+  // Measured against the page clock, so the server HTML and the hydration
+  // render show the hold as of the sampled instant, never a false "0s".
+  const champions = useChampionsAtClock({
+    initialData: initialSpecialRecipients,
+    latestParticipantEvidence: latestResolution.evidence,
+    enabled: hasCurrentGesture,
+    nowMs: now,
+  });
   const allocationFinalize = useAllocationFinalize({
     data,
     offset,
@@ -423,8 +427,9 @@ const ExperimentalHomePage = ({
     });
   }, [chatGestures]);
 
+  /** Resolves `true` once the Gesture is confirmed (or simulated). */
   const handleGesture = useCallback(
-    async (source: GestureSurface = 'console') => {
+    async (source: GestureSurface = 'console'): Promise<boolean> => {
       const trimmedMessage = gestureForm.message.trim();
       if (uxScenario) {
         const nextScenario = simulateUxScenarioGesture({
@@ -440,16 +445,16 @@ const ExperimentalHomePage = ({
             tToast('gesture.simulated', { seconds: nextScenario.extensionSeconds }),
           );
         }
-        return;
+        return Boolean(nextScenario);
       }
-      if (await (gestureType === 'CST' ? onGestureWithCST() : onGesture())) {
-        trackGestureSubmitted({ source, method: gestureType, hasMessage: trimmedMessage !== '' });
-        if (trimmedMessage && account) {
-          recordPendingMessage(account, trimmedMessage);
-        }
-        optimisticallyRecordGesture();
-        withPostTxRefresh();
+      if (!(await (gestureType === 'CST' ? onGestureWithCST() : onGesture()))) return false;
+      trackGestureSubmitted({ source, method: gestureType, hasMessage: trimmedMessage !== '' });
+      if (trimmedMessage && account) {
+        recordPendingMessage(account, trimmedMessage);
       }
+      optimisticallyRecordGesture();
+      withPostTxRefresh();
+      return true;
     },
     [
       account,
@@ -466,12 +471,13 @@ const ExperimentalHomePage = ({
       withPostTxRefresh,
     ],
   );
+  /** Resolves `true` once the finalization is confirmed. */
   const handleFinalize = useCallback(
-    async (source: GestureSurface = 'console') => {
-      if (await onFinalize()) {
-        trackFinalizeSubmitted(source);
-        withPostTxRefresh(1000, 3000);
-      }
+    async (source: GestureSurface = 'console'): Promise<boolean> => {
+      if (!(await onFinalize())) return false;
+      trackFinalizeSubmitted(source);
+      withPostTxRefresh(1000, 3000);
+      return true;
     },
     [onFinalize, withPostTxRefresh],
   );
@@ -502,7 +508,10 @@ const ExperimentalHomePage = ({
     now,
     finalizationConfirmed,
   });
-  const canGesture = allocationTime > now || data?.LastBidderAddr !== account;
+  // One address comparison for every role check: a checksum or case mismatch
+  // must never show the Gesture button, not Finalize, to the finalizer.
+  const isLatestParticipant = sameAddress(data?.LastBidderAddr, account);
+  const canGesture = allocationTime > now || !isLatestParticipant;
   // Finalization additionally waits for the on-chain zero-cross confirmation
   // so a last-second gesture can't leave anyone clicking into a revert.
   const canClaim =
@@ -531,6 +540,12 @@ const ExperimentalHomePage = ({
     rwlkId,
     cstGestureData: liveCstGestureData,
   });
+  // The dock names what its console will do: the transaction stage while a
+  // Gesture is in flight, Finalize for the wallet whose move that is.
+  const stageLabel = useTxStageLabel();
+  const dockLabel =
+    (gestureForm.isGesturing ? stageLabel(gestureForm.gestureTxStage) : null) ??
+    (!canGesture && canClaim ? t('form.finalize') : submitLabel);
 
   const trackAmounts = useMemo(() => deriveAllocationTrackAmounts(data), [data]);
 
@@ -624,11 +639,19 @@ const ExperimentalHomePage = ({
   }, []);
 
   // Phones: the dock opens the same console, with the same state, in a sheet.
+  // The sheet stays open through signing and pending, so its commit button
+  // and transaction status show the stage; it closes once the chain confirms.
   const [sheetOpen, setSheetOpen] = useState(false);
   const openSheet = useCallback(() => {
     trackGestureSheetOpened();
     setSheetOpen(true);
   }, []);
+  const handleSheetGesture = useCallback(async () => {
+    if (await handleGesture('sheet')) setSheetOpen(false);
+  }, [handleGesture]);
+  const handleSheetFinalize = useCallback(async () => {
+    if (await handleFinalize('sheet')) setSheetOpen(false);
+  }, [handleFinalize]);
 
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const cycleNumber = data?.CurRoundNum;
@@ -663,14 +686,17 @@ const ExperimentalHomePage = ({
     cycleTimerEnded,
     onSelectGestureType: handleSelectGestureType,
   };
+  const finalizeState = {
+    canClaim,
+    isClaiming,
+    isLatestParticipant,
+    openToAllAtMs: claimWait,
+    nowMs: now,
+  };
 
   return (
     <>
-      <PageShell
-        variant="data"
-        backdrop="hero"
-        className="max-w-none px-0 sm:px-0 max-lg:pb-28 max-sm:pb-28"
-      >
+      <PageShell variant="data" backdrop="hero" className="max-w-none px-0 sm:px-0">
         <Container>
           {uxScenario && (
             <p
@@ -749,11 +775,7 @@ const ExperimentalHomePage = ({
                         {...consoleProps}
                         onGesture={() => void handleGesture('console')}
                         finalize={{
-                          canClaim,
-                          isClaiming,
-                          isLatestParticipant: sameAddress(data?.LastBidderAddr, account),
-                          openToAllAtMs: claimWait,
-                          nowMs: now,
+                          ...finalizeState,
                           onFinalize: () => void handleFinalize('console'),
                         }}
                         messageInputRef={messageInputRef}
@@ -889,7 +911,7 @@ const ExperimentalHomePage = ({
         activationTime={activationTime}
         now={now}
         finalizationConfirmed={finalizationConfirmed}
-        submitLabel={submitLabel}
+        submitLabel={dockLabel}
         onOpenSheet={openSheet}
         onJumpToPanel={scrollToConsole}
         className={consoleInView ? 'hidden' : undefined}
@@ -904,10 +926,8 @@ const ExperimentalHomePage = ({
           <GestureConsole
             variant="sheet"
             {...consoleProps}
-            onGesture={() => {
-              setSheetOpen(false);
-              void handleGesture('sheet');
-            }}
+            onGesture={() => void handleSheetGesture()}
+            finalize={{ ...finalizeState, onFinalize: () => void handleSheetFinalize() }}
           />
         </SheetContent>
       </Sheet>

@@ -568,10 +568,12 @@
       "free": "비용 없음",
       "reward": "참여 CST 미리 보기",
       "minAccepted": "최소 허용 수량",
-      "messageHint": "메시지는 제스처와 함께 온체인에 기록됩니다"
+      "messageHint": "메시지는 제스처와 함께 온체인에 기록됩니다",
+      "finalizeOpensIn": "{duration} 후에는 누구나 사이클을 마감할 수 있습니다. 그전까지는 최종 제스처를 남긴 참여자만 마감할 수 있습니다."
     },
     "standings": {
-      "title": "실시간 현황"
+      "title": "실시간 현황",
+      "paidVia": "{method} 방식"
     },
     "links": {
       "previousCycleDescription": "지난 마감 사이클의 수령자와 배분"

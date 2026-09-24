@@ -123,6 +123,7 @@ describe('StandingsLedger', () => {
     expect(visibleText(latest)).toContain('tables.specialAllocation.currentHold');
     expect(visibleText(latest)).toContain('3h 16m 28s');
     expect(visibleText(latest)).toContain('8.0735 ETH');
+    expect(screen.getByTestId('standing-latest-rule')).toBeInTheDocument();
 
     const chrono = screen.getByTestId('standing-chrono');
     expect(chrono).toHaveAttribute('data-state', 'record');
@@ -141,13 +142,61 @@ describe('StandingsLedger', () => {
 
     const line = screen.getByTestId('standing-latest-gesture');
     expect(visibleText(line)).toContain('tables.specialAllocation.amountPaid');
-    // The exact amount paid, in the method's own unit, and the method by name.
+    // The exact amount paid in the method's own unit, which already names the method.
     expect(visibleText(line)).toContain('210.91 CST');
-    expect(visibleText(line)).toContain('home.form.method.cst.label');
+    expect(visibleText(line)).not.toContain('home.form.method.cst.label');
+    expect(visibleText(line)).toContain('3 hours ago');
     expect(within(line).getByRole('link')).toHaveAttribute('href', '/gesture/1135');
     expect(screen.getByTestId('standing-latest-progress')).toHaveTextContent(
       'tables.specialAllocation.needsToBecomeChampion(duration=49m 27s)',
     );
+  });
+
+  it('names the method of a RandomWalk Gesture, which its ETH unit does not', () => {
+    renderLedger({
+      latestGesture: {
+        ...latestGesture,
+        GestureType: 1,
+        CstCost: undefined,
+        GestureCostEth: 0.051053,
+      } as unknown as GestureInfo,
+    });
+
+    const line = visibleText(screen.getByTestId('standing-latest-gesture'));
+    expect(line).toContain('ETH');
+    expect(line).toContain('home.deck.standings.paidVia(method=home.form.method.randomWalk.label)');
+  });
+
+  it('never paints a live figure as 0s before the clock is known', () => {
+    // What useChampions derives against a clock of 0: every hold reads 0s.
+    const unclocked = makeChampions({
+      ...standingCycle,
+      latestGesture: {
+        ...standingCycle.latestGesture,
+        holdDuration: 0,
+        secondsUntilEnduranceChampion: 4 * 3600 + 5 * 60 + 56,
+        progressToEnduranceChampion: 0,
+      },
+    });
+    renderLedger({ champions: unclocked, nowMs: 0 });
+
+    const latest = screen.getByTestId('standing-latest');
+    // The holder is known without a clock; the hold is pending, not zero.
+    expect(visibleText(latest)).toContain('tables.specialAllocation.currentHold');
+    expect(within(latest).getByTestId('standing-pending-figure')).toHaveTextContent(
+      'tables.status.loading',
+    );
+    expect(visibleText(latest)).not.toMatch(/\b0s\b/);
+    // Nothing that is measured against the clock: no "needs", no rule, no age.
+    expect(screen.queryByTestId('standing-latest-progress')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('standing-latest-rule')).not.toBeInTheDocument();
+    expect(visibleText(screen.getByTestId('standing-latest-gesture'))).not.toContain('ago');
+    // Who holds Endurance and Chrono depends on the clock too: pending rows.
+    for (const key of ['endurance', 'chrono']) {
+      expect(screen.getByTestId(`standing-${key}`)).toHaveAttribute('data-state', 'pending');
+    }
+    expect(screen.getByTestId('standing-lastcst')).toHaveAttribute('data-state', 'held');
+    expect(screen.queryByTestId('standing-challenge')).not.toBeInTheDocument();
   });
 
   it('keeps the Endurance challenge to one caption line under the ledger', () => {

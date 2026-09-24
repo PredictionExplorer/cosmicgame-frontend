@@ -264,14 +264,17 @@ describe('GestureConsole', () => {
         canClaim: true,
         isClaiming: false,
         isLatestParticipant: false,
-        openToAllAtMs: 90_000,
+        openToAllAtMs: 120_000,
         nowMs: 30_000,
         onFinalize: jest.fn(),
       },
     });
 
     expect(screen.getByTestId('finalize-submit')).toBeDisabled();
-    expect(visibleText(screen.getByTestId('finalize-action'))).toContain('01:00');
+    // One sentence with the wait inside it, so every locale orders and spaces it.
+    expect(screen.getByTestId('finalize-wait')).toHaveTextContent(
+      'home.deck.console.finalizeOpensIn(duration=1m 30s)',
+    );
   });
 
   it('owns #make-gesture only on the page, not in the sheet', () => {

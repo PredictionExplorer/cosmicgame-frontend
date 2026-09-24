@@ -568,10 +568,12 @@
       "free": "費用なし",
       "reward": "参加CSTのプレビュー",
       "minAccepted": "最小数量",
-      "messageHint": "メッセージは一筆とともにオンチェーンに残ります"
+      "messageHint": "メッセージは一筆とともにオンチェーンに残ります",
+      "finalizeOpensIn": "{duration}後には、どのウォレットからでもサイクルを確定できます。それまでは、最後の一筆を入れた参加者だけが確定できます。"
     },
     "standings": {
-      "title": "ライブ順位"
+      "title": "ライブ順位",
+      "paidVia": "{method}を使用"
     },
     "links": {
       "previousCycleDescription": "前回確定したサイクルの受領者と配分"

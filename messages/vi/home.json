@@ -568,10 +568,12 @@
       "free": "Không tốn chi phí",
       "reward": "Xem trước CST tham gia",
       "minAccepted": "Mức chấp nhận tối thiểu",
-      "messageHint": "Lời nhắn được ghi trên chuỗi cùng nét bút"
+      "messageHint": "Lời nhắn được ghi trên chuỗi cùng nét bút",
+      "finalizeOpensIn": "Bạn có thể hoàn tất chu kỳ sau {duration}. Trước đó, chỉ người tham gia đã đặt nét bút cuối cùng mới có thể hoàn tất."
     },
     "standings": {
-      "title": "Thứ hạng trực tiếp"
+      "title": "Thứ hạng trực tiếp",
+      "paidVia": "qua {method}"
     },
     "links": {
       "previousCycleDescription": "Người nhận và phân bổ của chu kỳ vừa hoàn tất"

@@ -568,10 +568,12 @@
       "free": "Free",
       "reward": "Participation CST preview",
       "minAccepted": "Minimum accepted",
-      "messageHint": "Messages travel on-chain with your gesture"
+      "messageHint": "Messages travel on-chain with your gesture",
+      "finalizeOpensIn": "You can finalize the cycle in {duration}. Until then, only the participant who made the Final Gesture can."
     },
     "standings": {
-      "title": "Live standings"
+      "title": "Live standings",
+      "paidVia": "via {method}"
     },
     "links": {
       "previousCycleDescription": "Recipients and allocations of the last finalized cycle"

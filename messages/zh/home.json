@@ -568,10 +568,12 @@
       "free": "免费",
       "reward": "CST 铭刻预览",
       "minAccepted": "最低接受",
-      "messageHint": "留言与你的落笔一同上链"
+      "messageHint": "留言与你的落笔一同上链",
+      "finalizeOpensIn": "{duration}后你即可收官。在此之前，只有写下收官之笔的参与者可以收官。"
     },
     "standings": {
-      "title": "实时席位"
+      "title": "实时席位",
+      "paidVia": "使用 {method}"
     },
     "links": {
       "previousCycleDescription": "上一个收官周期的获配者与分配"

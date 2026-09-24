@@ -10,7 +10,6 @@ import { protocolFacts } from '@/content/protocol-facts';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
 import { Button } from '@/components/ui/button';
-import { Duration } from '@/components/ui/duration';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { Label } from '@/components/ui/label';
 import { MessageTextarea } from '@/components/ui/message-textarea';
@@ -24,7 +23,7 @@ import { useTxStageLabel } from '@/hooks/useTxStageLabel';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 import type { CstGestureData } from '@/utils/cstGesture';
-import { formatAmount, formatAmountParts, NBSP } from '@/utils/format';
+import { formatAmount, formatAmountParts, formatDuration, NBSP } from '@/utils/format';
 import { ethGestureBaseCost, ethGestureSendAmount, formatEthQuote } from '@/utils/gestureQuote';
 
 import { CalibrationWindow } from './CalibrationWindow';
@@ -531,15 +530,10 @@ export function GestureConsole({
                       {t('form.finalize')}
                     </Button>
                     {finalizeWaitMs > 0 ? (
-                      <p className="type-caption text-subtle">
-                        {t('form.finalizeAvailableIn')}{' '}
-                        <Duration
-                          seconds={finalizeWaitMs / 1000}
-                          variant="clock"
-                          className="type-figure-sm text-muted-foreground"
-                        />
-                        {' · '}
-                        {t('form.finalizeWaitNote')}
+                      <p className="type-caption text-subtle" data-testid="finalize-wait">
+                        {t('deck.console.finalizeOpensIn', {
+                          duration: formatDuration(Math.ceil(finalizeWaitMs / 1000), { locale }),
+                        })}
                       </p>
                     ) : null}
                   </div>

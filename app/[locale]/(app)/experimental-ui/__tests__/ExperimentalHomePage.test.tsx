@@ -2,8 +2,11 @@ import userEvent from '@testing-library/user-event';
 import { zeroAddress } from 'viem';
 
 import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
+import type { useChampionsAtClock } from '@/components/home/experimental/useChampionsAtClock';
 import type { ChampionsState } from '@/hooks/useChampions';
-import type { CSTTokenInfo } from '@/services/api';
+import type { SpecialAllocationSnapshot } from '@/hooks/useSpecialAllocationSnapshot';
+import type { TxStage } from '@/lib/txStage';
+import type { CSTTokenInfo, GestureInfo } from '@/services/api';
 
 import { render, screen, within, act, waitFor } from '@/test-utils';
 
@@ -49,9 +52,24 @@ jest.mock('@/hooks/useHomeGestureFeed', () => ({
   },
 }));
 
-const mockChampions = jest.fn<ChampionsState, []>();
-jest.mock('@/hooks/useChampions', () => ({
-  useChampions: () => mockChampions(),
+type ChampionsAtClockArgs = Parameters<typeof useChampionsAtClock>[0];
+const mockChampions = jest.fn<ChampionsState, [ChampionsAtClockArgs]>();
+jest.mock('@/components/home/experimental/useChampionsAtClock', () => ({
+  useChampionsAtClock: (args: ChampionsAtClockArgs) => mockChampions(args),
+}));
+
+const mockSpecialSnapshot = jest.fn<
+  { snapshot: SpecialAllocationSnapshot | null; isLoading: boolean },
+  []
+>(() => ({ snapshot: null, isLoading: false }));
+jest.mock('@/hooks/useSpecialAllocationSnapshot', () => ({
+  useSpecialAllocationSnapshot: () => mockSpecialSnapshot(),
+}));
+
+// The shared ticker: `0` is what it reads during server rendering and hydration.
+let mockTickingNow: number | null = null;
+jest.mock('@/hooks/useNow', () => ({
+  useNow: () => mockTickingNow ?? Date.now(),
 }));
 
 /* ── Gesture form and cycle hooks ───────────────────────────────── */
@@ -93,7 +111,7 @@ const mockGestureForm = {
   gestureCostPlus: 0,
   setBidPricePlus: jest.fn(),
   isGesturing: false,
-  gestureTxStage: { status: 'idle' as const },
+  gestureTxStage: { status: 'idle' } as TxStage,
   advancedExpanded: false,
   setAdvancedExpanded: jest.fn(),
   rwlknftIds: [],
@@ -278,7 +296,15 @@ beforeEach(() => {
   mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
   mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
   mockChampions.mockReturnValue(makeChampions());
-  Object.assign(mockGestureForm, { gestureType: 'ETH', message: '', rwlkId: -1 });
+  mockSpecialSnapshot.mockReturnValue({ snapshot: null, isLoading: false });
+  mockTickingNow = null;
+  Object.assign(mockGestureForm, {
+    gestureType: 'ETH',
+    message: '',
+    rwlkId: -1,
+    isGesturing: false,
+    gestureTxStage: { status: 'idle' },
+  });
   Object.assign(mockAllocationFinalize, {
     allocationTime: Date.now() + 13 * 3600_000,
     activationTime: 0,
@@ -447,6 +473,145 @@ describe('ExperimentalHomePage', () => {
 
     await userEvent.click(screen.getByTestId('finalize-submit'));
     await waitFor(() => expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1));
+  });
+
+  it('lets the finalizer finalize from the phone sheet, then closes it', async () => {
+    mockAccount = LATEST;
+    Object.assign(mockAllocationFinalize, { allocationTime: Date.now() - 1000 });
+    renderPage();
+
+    // At zero the dock names the move that is this wallet's to make.
+    expect(mockActionDock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ submitLabel: 'home.form.finalize' }),
+    );
+    await userEvent.click(screen.getByTestId('dock-open-sheet'));
+    const sheet = await screen.findByRole('dialog');
+    expect(within(sheet).queryByTestId('gesture-submit')).not.toBeInTheDocument();
+    await userEvent.click(within(sheet).getByTestId('finalize-submit'));
+    await waitFor(() => expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('knows the finalizer whatever the case of the address', () => {
+    const checksummed = '0xA169574D0d353E3010997A3E64846b7D1B2a63B6';
+    mockAccount = checksummed.toLowerCase();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboard({ LastBidderAddr: checksummed }),
+      isLoading: false,
+    });
+    Object.assign(mockAllocationFinalize, { allocationTime: Date.now() - 1000 });
+    renderPage();
+
+    expect(screen.queryByTestId('gesture-submit')).not.toBeInTheDocument();
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+    expect(mockActionDock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ submitLabel: 'home.form.finalize' }),
+    );
+  });
+
+  it('keeps the sheet open while the Gesture is signed and closes it once confirmed', async () => {
+    mockAccount = '0xUser';
+    let confirm: (confirmed: boolean) => void = () => undefined;
+    mockGestureForm.onGesture.mockImplementationOnce(
+      () =>
+        new Promise<boolean>((resolve) => {
+          confirm = resolve;
+        }),
+    );
+    renderPage();
+
+    await userEvent.click(screen.getByTestId('dock-open-sheet'));
+    const sheet = await screen.findByRole('dialog');
+    await userEvent.click(within(sheet).getByTestId('gesture-submit'));
+    await waitFor(() => expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1));
+    // Signing: the sheet, its busy button and its transaction status stay in view.
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    await act(async () => confirm(true));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('keeps the sheet open when the Gesture does not go through', async () => {
+    mockAccount = '0xUser';
+    mockGestureForm.onGesture.mockResolvedValueOnce(false);
+    renderPage();
+
+    await userEvent.click(screen.getByTestId('dock-open-sheet'));
+    const sheet = await screen.findByRole('dialog');
+    await userEvent.click(within(sheet).getByTestId('gesture-submit'));
+    await waitFor(() => expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('pending-count')).toHaveTextContent('0');
+  });
+
+  it('shows the transaction stage on the dock while a Gesture is in flight', () => {
+    mockAccount = '0xUser';
+    Object.assign(mockGestureForm, {
+      isGesturing: true,
+      gestureTxStage: { status: 'awaiting-signature', step: 1, total: 1 },
+    });
+    renderPage();
+
+    expect(mockActionDock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ submitLabel: 'toasts.tx.button.confirm' }),
+    );
+  });
+
+  it('measures the standings against the sampled clock before the client clock runs', () => {
+    const { useChampionsAtClock: actualChampionsAtClock } = jest.requireActual<{
+      useChampionsAtClock: typeof useChampionsAtClock;
+    }>('@/components/home/experimental/useChampionsAtClock');
+    mockChampions.mockImplementation(actualChampionsAtClock);
+    // Server rendering and hydration: the shared ticker reads 0.
+    mockTickingNow = 0;
+    const sampledAtMs = Math.floor(Date.now() / 1000) * 1000 - 5_000;
+    const heldSeconds = 2 * 3600 + 21 * 60 + 9;
+    const gestureAt = sampledAtMs / 1000 - heldSeconds;
+    mockUseHomeGestureFeed.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 7,
+          BidderAddr: LATEST,
+          GestureType: 0,
+          GestureCostEth: 0.0102,
+          TimeStamp: gestureAt,
+          RoundNum: 5,
+        } as unknown as GestureInfo,
+      ],
+    });
+    mockSpecialSnapshot.mockReturnValue({
+      snapshot: {
+        source: 'api-v1',
+        receivedAtMs: sampledAtMs,
+        hasChronoSegmentData: false,
+        hasFinalCstTime: false,
+        EnduranceChampionAddress: CHAMPION,
+        EnduranceChampionDuration: 7 * 3600 + 3 * 60 + 11,
+        ChronoWarriorAddress: CHAMPION,
+        ChronoWarriorDuration: 9 * 3600,
+        LastBidderAddress: LATEST,
+        LastBidderLastBidTime: gestureAt,
+      },
+      isLoading: false,
+    });
+    renderPage({
+      initialTimingSample: {
+        targetServerTimeSec: sampledAtMs / 1000 + 13 * 3600,
+        currentServerTimeSec: sampledAtMs / 1000,
+        sampledAtMs,
+      },
+    });
+
+    expect(mockChampions).toHaveBeenLastCalledWith(expect.objectContaining({ nowMs: sampledAtMs }));
+    const latest = screen.getByTestId('standing-latest');
+    // The hold as of the sampled instant, the same instant as "2 hours ago".
+    expect(latest).toHaveTextContent('2h 21m 9s');
+    expect(latest).toHaveTextContent('2 hours ago');
+    expect(within(latest).queryByTestId('standing-pending-figure')).not.toBeInTheDocument();
+    // (7h 3m 11s + 1s) − 2h 21m 9s.
+    expect(screen.getByTestId('standing-latest-progress')).toHaveTextContent(
+      'tables.specialAllocation.needsToBecomeChampion(duration=4h 42m 3s)',
+    );
   });
 
   it('shows the clock and calendar, not the console, while the next cycle waits', () => {

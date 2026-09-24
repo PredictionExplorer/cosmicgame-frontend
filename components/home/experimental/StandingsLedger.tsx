@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Duration } from '@/components/ui/duration';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
 import { SectionHeader } from '@/components/ui/section-header';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton, skeletonVariants } from '@/components/ui/skeleton';
 import { Term } from '@/components/ui/term';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import type { ChampionsState } from '@/hooks/useChampions';
@@ -28,12 +28,8 @@ import { getCstGestureCost, getEthGestureCost, resolveGestureType } from '@/util
 
 type RoleKey = 'latest' | 'endurance' | 'chrono' | 'lastcst';
 
-/** The method label of a recorded Gesture, as the console names the methods. */
-const METHOD_LABEL_KEYS: Record<number, string> = {
-  0: 'form.method.eth.label',
-  1: 'form.method.randomWalk.label',
-  2: 'form.method.cst.label',
-};
+/** The recorded Gesture types (`GestureInfo.GestureType`). */
+const GESTURE_TYPE = { eth: 0, randomWalk: 1, cst: 2 } as const;
 
 interface StandingRow {
   key: RoleKey;
@@ -51,6 +47,12 @@ interface StandingRow {
   caption?: ReactNode;
   /** Progress toward the record, 0–100. */
   progress?: number;
+  /**
+   * Who holds the role is itself measured against the clock (the latest
+   * participant may already have overtaken the Endurance record), so the
+   * holder line waits for a known clock.
+   */
+  clockBound?: boolean;
 }
 
 interface StandingsLedgerProps {
@@ -60,7 +62,13 @@ interface StandingsLedgerProps {
   account?: string | null;
   signatureEth: number | null;
   chronoEth: number | null;
-  /** Epoch ms, for the age of the latest Gesture. */
+  /**
+   * The clock the champions were derived at, in epoch ms: the page's seeded
+   * clock during server rendering and hydration, then the live one. `0`
+   * means no clock is known yet: every figure measured against it (holds,
+   * what the latest participant still needs, the progress rule, who holds
+   * the Endurance record) renders as pending, never as a confident "0s".
+   */
   nowMs: number;
   /** A slot under the rows: the connected wallet's position. */
   footer?: ReactNode;
@@ -74,7 +82,8 @@ interface StandingsLedgerProps {
  * side beside the gesture console. Each row gives the holder, the duration
  * the role is measured by (green only while it grows), what the role
  * receives, and what changes next. A role nobody holds yet says so plainly;
- * it never shows a record of 0s.
+ * it never shows a record of 0s, and a figure measured against a clock the
+ * page does not know yet is pending rather than zero.
  */
 export function StandingsLedger({
   champions,
@@ -90,6 +99,7 @@ export function StandingsLedger({
   const tTables = useTranslations('tables');
   const locale = useLocale();
   const duration = (seconds: number) => formatDuration(seconds, { locale });
+  const clockKnown = Number.isFinite(nowMs) && nowMs > 0;
 
   const { latestGesture: latest, endurance, chrono, chronoChallenge, lastCst } = champions;
   const cstPlusNft = t('deck.board.cstPlusNft');
@@ -104,32 +114,47 @@ export function StandingsLedger({
 
   const latestCaption = (() => {
     if (!latest.address) return undefined;
-    const progressLine = !endurance.address
-      ? tTables('specialAllocation.firstRecordForming')
-      : latest.isExtendingEnduranceRecord
-        ? tTables('specialAllocation.extendingRecord')
-        : latest.isCurrentEnduranceChampion
-          ? tTables('specialAllocation.needsToExtend', {
-              duration: duration(latest.secondsUntilEnduranceChampion),
-            })
-          : tTables('specialAllocation.needsToBecomeChampion', {
-              duration: duration(latest.secondsUntilEnduranceChampion),
-            });
+    // What the latest participant still needs is measured against the clock.
+    const progressLine = !clockKnown
+      ? null
+      : !endurance.address
+        ? tTables('specialAllocation.firstRecordForming')
+        : latest.isExtendingEnduranceRecord
+          ? tTables('specialAllocation.extendingRecord')
+          : latest.isCurrentEnduranceChampion
+            ? tTables('specialAllocation.needsToExtend', {
+                duration: duration(latest.secondsUntilEnduranceChampion),
+              })
+            : tTables('specialAllocation.needsToBecomeChampion', {
+                duration: duration(latest.secondsUntilEnduranceChampion),
+              });
     const gesture =
       latestGesture && sameAddress(latestGesture.BidderAddr, latest.address) ? latestGesture : null;
     const gestureType = gesture ? resolveGestureType(gesture) : undefined;
-    const paidInCst = gestureType === 2;
+    const paidInCst = gestureType === GESTURE_TYPE.cst;
     const paid = gesture
       ? paidInCst
         ? getCstGestureCost(gesture)
         : getEthGestureCost(gesture)
       : undefined;
-    const methodKey = gestureType !== undefined ? METHOD_LABEL_KEYS[gestureType] : undefined;
+    // The unit already names ETH and CST; only a RandomWalk Gesture adds its method.
+    const details = gesture
+      ? [
+          gestureType === GESTURE_TYPE.randomWalk
+            ? t('deck.standings.paidVia', { method: t('form.method.randomWalk.label') })
+            : null,
+          gesture.TimeStamp && clockKnown
+            ? formatRelativeTime(Number(gesture.TimeStamp), { locale, now: nowMs })
+            : null,
+        ].filter((detail): detail is string => Boolean(detail))
+      : [];
     return (
       <>
-        <span className="block" data-testid="standing-latest-progress">
-          {progressLine}
-        </span>
+        {progressLine ? (
+          <span className="block" data-testid="standing-latest-progress">
+            {progressLine}
+          </span>
+        ) : null}
         {gesture ? (
           <span
             className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-0.5"
@@ -145,15 +170,9 @@ export function StandingsLedger({
                 )}
               </span>
             </span>
-            <span className="inline-flex items-baseline gap-2 whitespace-nowrap">
-              {methodKey ? t(methodKey) : tTables('status.unknown')}
-              {gesture.TimeStamp ? (
-                <>
-                  <span aria-hidden>·</span>
-                  {formatRelativeTime(Number(gesture.TimeStamp), { locale, now: nowMs })}
-                </>
-              ) : null}
-            </span>
+            {details.length > 0 ? (
+              <span className="whitespace-nowrap">{details.join(' · ')}</span>
+            ) : null}
             <Link
               href={`/gesture/${gesture.EvtLogId}`}
               className="link-quiet inline-flex min-h-6 items-center gap-1 text-muted-foreground hover:text-foreground"
@@ -206,7 +225,9 @@ export function StandingsLedger({
       allocation: ethWithExtras(signatureEth),
       caption: latestCaption,
       progress:
-        latest.address && endurance.address ? latest.progressToEnduranceChampion : undefined,
+        clockKnown && latest.address && endurance.address
+          ? latest.progressToEnduranceChampion
+          : undefined,
     },
     {
       key: 'endurance',
@@ -223,6 +244,7 @@ export function StandingsLedger({
         : undefined,
       state: endurance.address ? (endurance.isLive ? 'growing' : 'record') : undefined,
       allocation: cstPlusNft,
+      clockBound: true,
     },
     {
       key: 'chrono',
@@ -240,6 +262,7 @@ export function StandingsLedger({
       state: chrono.address ? (chrono.isLive ? 'growing' : 'record') : undefined,
       allocation: ethWithExtras(chronoEth),
       caption: chronoCaption,
+      clockBound: true,
     },
     {
       key: 'lastcst',
@@ -253,9 +276,19 @@ export function StandingsLedger({
 
   const loading = champions.isLoading && !champions.hasData;
   const challenge =
-    chronoChallenge.hasDetails && !chronoChallenge.isLive && chronoChallenge.address
+    clockKnown && chronoChallenge.hasDetails && !chronoChallenge.isLive && chronoChallenge.address
       ? chronoChallenge
       : null;
+  // A live figure without a known clock: a placeholder, announced as loading.
+  const pendingFigure = (
+    <span data-testid="standing-pending-figure">
+      <span
+        aria-hidden
+        className={cn(skeletonVariants(), 'inline-block h-3.5 w-16 rounded-edge align-middle')}
+      />
+      <span className="sr-only">{tTables('status.loading')}</span>
+    </span>
+  );
 
   return (
     <section
@@ -278,33 +311,35 @@ export function StandingsLedger({
         {rows.map((row) => {
           const Icon = row.icon;
           const isYou = sameAddress(row.holder, account);
+          const holderPending = loading || (row.clockBound === true && !clockKnown);
+          const state = holderPending ? undefined : row.state;
           return (
             <li
               key={row.key}
               data-testid={`standing-${row.key}`}
-              data-state={row.holder ? (row.state ?? 'held') : 'empty'}
+              data-state={holderPending ? 'pending' : row.holder ? (row.state ?? 'held') : 'empty'}
               className="grid grid-cols-[1rem_minmax(0,1fr)] gap-x-3 py-4 sm:grid-cols-[1rem_minmax(0,1fr)_auto]"
             >
               <Icon className="mt-0.5 size-4 text-subtle" aria-hidden />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <p className="type-title text-foreground">{row.name}</p>
-                  {row.state === 'growing' ? (
+                  {state === 'growing' ? (
                     <Badge tone="live" size="sm" dot>
                       {tTables('specialAllocation.growingNow')}
                     </Badge>
-                  ) : row.state === 'record' ? (
+                  ) : state === 'record' ? (
                     <Badge tone="neutral" size="sm">
                       {tTables('specialAllocation.recordStanding')}
                     </Badge>
                   ) : null}
-                  {isYou ? (
+                  {isYou && !holderPending ? (
                     <Badge tone="accent" size="sm">
                       {tTables('status.youBadge')}
                     </Badge>
                   ) : null}
                 </div>
-                {loading ? (
+                {holderPending ? (
                   <Skeleton className="mt-2 h-4 w-48 max-w-full rounded-edge" />
                 ) : row.holder ? (
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -312,13 +347,17 @@ export function StandingsLedger({
                     {row.duration ? (
                       <span className="inline-flex items-baseline gap-1.5">
                         <span className="type-caption text-subtle">{row.duration.label}</span>
-                        <Duration
-                          seconds={row.duration.seconds}
-                          className={cn(
-                            'type-figure-sm',
-                            row.duration.live ? 'text-positive' : 'text-foreground',
-                          )}
-                        />
+                        {row.duration.live && !clockKnown ? (
+                          pendingFigure
+                        ) : (
+                          <Duration
+                            seconds={row.duration.seconds}
+                            className={cn(
+                              'type-figure-sm',
+                              row.duration.live ? 'text-positive' : 'text-foreground',
+                            )}
+                          />
+                        )}
                       </span>
                     ) : null}
                   </div>
@@ -328,6 +367,7 @@ export function StandingsLedger({
                 {row.progress != null ? (
                   <div
                     aria-hidden
+                    data-testid={`standing-${row.key}-rule`}
                     className="mt-2.5 h-0.5 max-w-sm overflow-hidden rounded-pill bg-rule"
                   >
                     <div
@@ -336,7 +376,7 @@ export function StandingsLedger({
                     />
                   </div>
                 ) : null}
-                {row.caption && !loading ? (
+                {row.caption && !holderPending ? (
                   <div className="mt-1.5 type-caption text-subtle">{row.caption}</div>
                 ) : null}
               </div>
