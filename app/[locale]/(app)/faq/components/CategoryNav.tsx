@@ -1,107 +1,95 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { LayoutGrid } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { type FAQCategory } from '@/content/faq';
-
 import { cn } from '@/lib/utils';
-import { TOUCH_TARGET_HEIGHT_CLASS } from '@/lib/touch-target';
+import { ScrollRail } from '@/components/ui/scroll-rail';
 
-import { FAQ_ICONS } from './faqIcons';
+/** A destination in the contents: a category, or the glossary at the end. */
+export interface CategoryNavEntry {
+  id: string;
+  label: string;
+  /** Questions in the category; omitted for the glossary. */
+  count?: number;
+  /** Shown beside the label in the desktop rail. */
+  icon: LucideIcon;
+}
 
 interface CategoryNavProps {
-  categories: readonly FAQCategory[];
-  activeCategory: string | null;
-  onCategoryClick: (categoryId: string | null) => void;
+  entries: readonly CategoryNavEntry[];
+  activeId: string | null;
+  onSelect: (id: string) => void;
   className?: string;
 }
 
-export function CategoryNav({
-  categories,
-  activeCategory,
-  onCategoryClick,
-  className,
-}: CategoryNavProps) {
+/** The fragment id of a contents entry. */
+export const categoryAnchor = (id: string) => `faq-category-${id}`;
+
+/**
+ * The FAQ's contents: in-page links to each category and the glossary, the
+ * one being read marked with `aria-current="location"`. One list in two
+ * shapes. Below `lg` it is a row of chips stuck under the site header, which
+ * starts at the left edge, scrolls sideways with an edge fade while more
+ * chips are hidden that way, and keeps the current chip in view. From `lg`
+ * it is the left column of a documentation layout: one entry per line with
+ * its count, stuck below the header. Render it as a direct child of the
+ * page's tall layout container so both shapes can stick.
+ */
+export function CategoryNav({ entries, activeId, onSelect, className }: CategoryNavProps) {
   const t = useTranslations('faq');
-  const navRef = useRef<HTMLDivElement>(null);
-  const [isSticky, setIsSticky] = useState(false);
-
-  useEffect(() => {
-    const el = navRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry) setIsSticky(!entry.isIntersecting);
-      },
-      { threshold: 1, rootMargin: '-1px 0px 0px 0px' },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const scrollToCategory = (categoryId: string | null) => {
-    onCategoryClick(categoryId);
-    if (categoryId) {
-      const el = document.getElementById(`faq-category-${categoryId}`);
-      if (el) {
-        const offset = 140;
-        const y = el.getBoundingClientRect().top + window.scrollY - offset;
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
 
   return (
-    <div ref={navRef} className={cn('sticky top-[var(--sticky-offset)] z-30', className)}>
-      <nav
-        aria-label={t('navigation.ariaLabel')}
-        className={cn(
-          'mx-auto -mx-4 overflow-x-auto px-4 py-3 transition-all duration-300 scrollbar-none',
-          isSticky && 'border-b border-white/[0.06] bg-background/90 backdrop-blur-xl',
-        )}
+    <nav
+      aria-label={t('navigation.ariaLabel')}
+      className={cn(
+        // Phones and tablets: a glass bar under the header, bleeding to the page gutters.
+        'glass sticky top-[var(--header-height)] z-sticky-nav -mx-4 border-b border-rule px-4 py-2 sm:-mx-6 sm:px-6',
+        // Desktop: the contents column.
+        'lg:top-[var(--sticky-offset)] lg:mx-0 lg:max-h-[calc(100dvh-var(--sticky-offset)-1.5rem)] lg:self-start lg:overflow-y-auto lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none',
+        className,
+      )}
+    >
+      <p className="mb-3 hidden type-eyebrow text-subtle lg:block">{t('navigation.heading')}</p>
+      <ScrollRail
+        activeSelector='[aria-current="location"]'
+        trackClassName="gap-2 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:border-l lg:border-rule"
       >
-        <div className="flex items-center gap-2 min-w-max mx-auto justify-center">
-          <button
-            onClick={() => scrollToCategory(null)}
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200',
-              TOUCH_TARGET_HEIGHT_CLASS,
-              activeCategory === null
-                ? 'bg-primary/15 text-primary shadow-sm shadow-primary/10'
-                : 'text-muted-foreground hover:bg-white/[0.04] hover:text-foreground',
-            )}
-          >
-            <LayoutGrid className="h-3.5 w-3.5" />
-            {t('navigation.all')}
-          </button>
-          {categories.map((cat) => {
-            const Icon = FAQ_ICONS[cat.icon];
-            return (
-              <button
-                key={cat.id}
-                onClick={() => scrollToCategory(cat.id)}
+        {entries.map((entry) => {
+          const current = entry.id === activeId;
+          const Icon = entry.icon;
+          return (
+            <a
+              key={entry.id}
+              href={`#${categoryAnchor(entry.id)}`}
+              aria-current={current ? 'location' : undefined}
+              onClick={(event) => {
+                event.preventDefault();
+                onSelect(entry.id);
+              }}
+              className={cn(
+                'group flex min-h-11 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-pill border px-3.5 type-body-sm transition-colors duration-fast',
+                'lg:-ml-px lg:min-h-10 lg:whitespace-normal lg:rounded-none lg:border-0 lg:border-l-2 lg:py-2 lg:pl-3.5 lg:pr-2',
+                current
+                  ? 'border-primary/50 bg-primary/12 text-foreground lg:border-primary lg:bg-transparent'
+                  : 'border-rule text-muted-foreground hover:border-input hover:text-foreground lg:border-transparent lg:hover:border-rule',
+              )}
+            >
+              <Icon
+                aria-hidden
                 className={cn(
-                  'inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap',
-                  TOUCH_TARGET_HEIGHT_CLASS,
-                  activeCategory === cat.id
-                    ? 'bg-primary/15 text-primary shadow-sm shadow-primary/10'
-                    : 'text-muted-foreground hover:bg-white/[0.04] hover:text-foreground',
+                  'hidden size-4 shrink-0 lg:block',
+                  current ? 'text-primary' : 'text-subtle',
                 )}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {cat.title}
-                <span className="ml-0.5 text-[10px] opacity-60">{cat.items.length}</span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
-    </div>
+              />
+              <span className="min-w-0 lg:flex-1">{entry.label}</span>
+              {entry.count !== undefined ? (
+                <span className="type-caption tabular-nums text-subtle">{entry.count}</span>
+              ) : null}
+            </a>
+          );
+        })}
+      </ScrollRail>
+    </nav>
   );
 }

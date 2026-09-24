@@ -1,10 +1,12 @@
 import userEvent from '@testing-library/user-event';
 
 import type { FAQCategory } from '@/content/faq';
+import { protocolFacts } from '@/content/protocol-facts';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
-import { FAQCategorySection, enrichWithTooltips } from '../components/FAQCategory';
+import { FAQCategorySection } from '../components/FAQCategory';
+import { enrichAnswer } from '../components/answerText';
 
 const mockCategory: FAQCategory = {
   id: 'test-cat',
@@ -15,7 +17,8 @@ const mockCategory: FAQCategory = {
     {
       id: 'q1',
       question: 'What is a Calibration Window?',
-      answer: 'A Calibration Window descends the Gesture Cost over time.',
+      answer:
+        'A Calibration Window descends the Gesture Cost over time. Every Calibration Window ends.',
     },
     {
       id: 'q2',
@@ -30,41 +33,6 @@ const mockCategory: FAQCategory = {
     },
   ],
 };
-
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                custom: _c,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-  };
-});
 
 Object.assign(navigator, {
   clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
@@ -97,125 +65,154 @@ function renderFAQCategory(
   );
 }
 
+/** The answer body of an item (Radix's collapsible content). */
+const body = (anchor: string) =>
+  document.getElementById(anchor)?.querySelector<HTMLElement>('[role="region"]') ?? null;
+
 describe('FAQCategorySection', () => {
-  it('renders category title and description', () => {
+  it('renders the category heading and description', () => {
     renderFAQCategory();
-    expect(screen.getByRole('heading', { name: 'Test Category' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Test Category' })).toBeInTheDocument();
     expect(screen.getByText('Test description')).toBeInTheDocument();
   });
 
-  it('renders all questions in the category', () => {
+  it('renders every question as a disclosure button', () => {
     renderFAQCategory();
-    expect(screen.getByText('What is a Calibration Window?')).toBeInTheDocument();
-    expect(screen.getByText('How does Anchoring work?')).toBeInTheDocument();
-    expect(screen.getByText('What is an Endurance Champion?')).toBeInTheDocument();
+    for (const item of mockCategory.items) {
+      expect(screen.getByRole('button', { name: item.question })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+    }
   });
 
-  it('keeps answer text mounted for crawlers even when accordions are collapsed', () => {
+  it('keeps closed answers in the HTML but hidden until found (F013)', () => {
     const { container } = renderFAQCategory({ expandedItems: [] });
 
-    expect(container).toHaveTextContent(/A Calibration Window.*Gesture Cost over time\./);
-    expect(container).toHaveTextContent('Anchoring pays a share of each cycle distribution.');
+    // Crawlers still read every answer (ignoring the terms' own hidden definitions).
+    const html = container.cloneNode(true) as HTMLElement;
+    html.querySelectorAll('span[hidden]').forEach((node) => node.remove());
+    expect(html).toHaveTextContent('Anchoring pays a share of each cycle distribution.');
+    // A closed answer is out of the page: hidden until find-in-page reaches it.
+    const closed = body('q2');
+    expect(closed).toHaveAttribute('data-state', 'closed');
+    expect(closed).toHaveAttribute('hidden', 'until-found');
   });
 
-  it('expands items that are in expandedItems', () => {
-    renderFAQCategory({ expandedItems: ['q1', 'q3'] });
-    const q1Content = document.getElementById('q1')?.closest('[data-state]');
-    const q3Content = document.getElementById('endurance-champion')?.closest('[data-state]');
-    expect(q1Content).toHaveAttribute('data-state', 'open');
-    expect(q3Content).toHaveAttribute('data-state', 'open');
+  it('shows an open answer and hides it again when it closes', () => {
+    const { rerender } = renderFAQCategory({ expandedItems: ['q1'] });
+    expect(body('q1')).toHaveAttribute('data-state', 'open');
+    expect(body('q1')).not.toHaveAttribute('hidden');
+
+    rerender(
+      <FAQCategorySection
+        category={mockCategory}
+        searchQuery=""
+        expandedItems={[]}
+        onItemToggle={jest.fn()}
+        onExpandAll={jest.fn()}
+      />,
+    );
+    expect(body('q1')).toHaveAttribute('hidden', 'until-found');
   });
 
-  it('calls onItemToggle when accordion item is toggled', async () => {
+  it('opens the item when find-in-page reveals its answer', () => {
+    const onItemToggle = jest.fn();
+    renderFAQCategory({ onItemToggle });
+    body('q2')!.dispatchEvent(new Event('beforematch'));
+    expect(onItemToggle).toHaveBeenCalledWith('test-cat', 'q2');
+  });
+
+  it('calls onItemToggle when a question is clicked', async () => {
     const user = userEvent.setup();
     const onItemToggle = jest.fn();
-    renderFAQCategory({ expandedItems: [], onItemToggle });
-    const trigger = screen.getByRole('button', { name: 'What is a Calibration Window?' });
-    await user.click(trigger);
+    renderFAQCategory({ onItemToggle });
+    await user.click(screen.getByRole('button', { name: 'What is a Calibration Window?' }));
     expect(onItemToggle).toHaveBeenCalledWith('test-cat', 'q1');
   });
 
-  it('calls onExpandAll when "Expand All" button is clicked', async () => {
+  it('offers "Expand all", then "Collapse all" once every item is open', async () => {
     const user = userEvent.setup();
     const onExpandAll = jest.fn();
-    renderFAQCategory({ expandedItems: [], onExpandAll });
-    const expandBtn = screen.getByRole('button', {
-      name: 'Expand all questions',
-    });
-    await user.click(expandBtn);
+    const { unmount } = renderFAQCategory({ onExpandAll });
+    await user.click(screen.getByRole('button', { name: 'Expand all questions' }));
     expect(onExpandAll).toHaveBeenCalledWith('test-cat');
-  });
+    unmount();
 
-  it('shows "Collapse All" when all items are expanded', () => {
-    renderFAQCategory({
-      expandedItems: ['q1', 'q2', 'q3'],
-    });
+    renderFAQCategory({ expandedItems: ['q1', 'q2', 'q3'] });
     expect(screen.getByRole('button', { name: 'Collapse all questions' })).toBeInTheDocument();
   });
 
-  it('filters items based on searchQuery', () => {
-    renderFAQCategory({ searchQuery: 'Calibration' });
-    expect(
-      screen.getByRole('button', { name: /What is a Calibration Window\?/ }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /How does Anchoring work\?/ }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /What is an Endurance Champion\?/ }),
-    ).not.toBeInTheDocument();
+  it('filters by the search and opens every matching answer, highlighted', () => {
+    renderFAQCategory({ searchQuery: 'share' });
+    expect(screen.queryByRole('button', { name: /Calibration Window/ })).not.toBeInTheDocument();
+    // The match is in the answer only, so the answer is open.
+    expect(body('q2')).toHaveAttribute('data-state', 'open');
+    expect(document.querySelector('mark')).toHaveTextContent('share');
   });
 
-  it('returns null when searchQuery matches nothing in this category', () => {
+  it('renders nothing when the search matches nothing in this category', () => {
     const { container } = renderFAQCategory({ searchQuery: 'xyznonexistent' });
     expect(container.firstChild).toBeNull();
   });
 
-  it('highlights search matches with mark elements', () => {
-    renderFAQCategory({ searchQuery: 'Calibration' });
-    const marks = document.querySelectorAll('mark');
-    expect(marks.length).toBeGreaterThan(0);
-    expect(marks[0]).toHaveTextContent(/Calibration/i);
-  });
-
-  it('renders "Copy link" button in expanded items', async () => {
+  it('explains a coined term in place from the glossary, once per answer', () => {
     renderFAQCategory({ expandedItems: ['q1'] });
-    const copyBtn = screen.getAllByRole('button', { name: 'Copy link to this question' })[0]!;
-    expect(copyBtn).toBeInTheDocument();
-    expect(copyBtn).toHaveTextContent('Copy link');
+    const terms = body('q1')!.querySelectorAll('[data-term="calibrationWindow"]');
+    expect(terms).toHaveLength(1);
+    expect(terms[0]).toHaveAttribute('role', 'button');
   });
 
-  it('renders tooltips for technical terms when not searching', () => {
-    renderFAQCategory({ searchQuery: '', expandedItems: ['q1'] });
-
-    expect(screen.getAllByRole('button', { name: /^More information/ }).length).toBeGreaterThan(0);
+  it('offers a copy link inside an open answer', () => {
+    renderFAQCategory({ expandedItems: ['q1'] });
+    expect(
+      screen.getAllByRole('button', { name: 'Copy link to this question' })[0],
+    ).toHaveTextContent('Copy link');
   });
 
-  it('matches normalized Chinese terms and enriches only their first occurrence', () => {
-    render(
-      <p>
-        {enrichWithTooltips('坚守冠军由坚守冠军规则确定。', [
-          { term: '坚守冠军', content: '连续保持最近落笔者身份时间最长的参与者。' },
-        ])}
-      </p>,
-    );
-
-    // The definition is in the DOM only as the trigger's hidden description.
-    const visible = document.body.cloneNode(true) as HTMLElement;
-    visible.querySelectorAll('[hidden]').forEach((node) => node.remove());
-    expect(visible).toHaveTextContent('坚守冠军由坚守冠军规则确定。');
-    expect(screen.getAllByRole('button', { name: /^More information/ })).toHaveLength(1);
-  });
-
-  it('sets correct id attribute for deep linking', () => {
+  it('keeps legacy ids for deep links', () => {
     renderFAQCategory();
     expect(document.getElementById('q1')).toBeInTheDocument();
-    expect(document.getElementById('q2')).toBeInTheDocument();
     expect(document.getElementById('endurance-champion')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
     const { container } = renderFAQCategory({ expandedItems: ['q1'] });
     await checkA11y(container);
+  });
+});
+
+describe('enrichAnswer', () => {
+  const visibleText = () => {
+    const copy = document.body.cloneNode(true) as HTMLElement;
+    copy.querySelectorAll('[hidden]').forEach((node) => node.remove());
+    return copy.textContent;
+  };
+
+  it('marks a CJK term as a substring, only at its first use', () => {
+    render(
+      <p>
+        {enrichAnswer('坚守冠军由坚守冠军规则确定。', [
+          { term: '坚守冠军', definition: '连续保持最近落笔者身份时间最长的参与者。' },
+        ])}
+      </p>,
+    );
+    expect(visibleText()).toBe('坚守冠军由坚守冠军规则确定。');
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+  });
+
+  it('matches a Latin term only as a whole word', () => {
+    render(<p>{enrichAnswer('CSTs are not CST.', [{ term: 'CST', definition: 'The token.' }])}</p>);
+    const [trigger] = screen.getAllByRole('button');
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(trigger).toHaveTextContent(/^CST$/);
+    expect(visibleText()).toBe('CSTs are not CST.');
+  });
+
+  it('sets a quoted contract formula as code', () => {
+    const formula = protocolFacts.dynamicCstRewardFormula;
+    render(<p>{enrichAnswer(`It uses ${formula} today.`, [], [formula])}</p>);
+    expect(document.querySelector('code')).toHaveTextContent(formula);
+    expect(visibleText()).toBe(`It uses ${formula} today.`);
   });
 });

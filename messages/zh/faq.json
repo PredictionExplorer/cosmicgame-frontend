@@ -1,24 +1,21 @@
 {
   "hero": {
-    "title": "Cosmic Signature <accent>常见问题</accent>",
+    "title": "Cosmic Signature 常见问题",
     "breadcrumb": "常见问题",
     "subtitle": "从初次参与到深入理解周期机制，这里汇集了关于 Cosmic Signature 的常见疑问。",
-    "answerCount": "{count}+ 条解答",
-    "answerCountTooltip": "全面解答 Cosmic Signature 各方面的常见问题。",
-    "categoryCount": "{count} 个分类",
-    "alwaysUpdated": "持续更新"
+    "answerCount": "{count, number} 条解答",
+    "categoryCount": "{count, number} 个分类"
   },
   "search": {
     "placeholder": "搜索问题……",
     "ariaLabel": "搜索常见问题",
-    "clear": "清除",
     "clearAria": "清除搜索内容",
     "noResults": "未找到相关问题，请尝试其他关键词。",
     "resultCount": "共 {totalCount} 个问题，当前显示 {resultCount} 个"
   },
   "navigation": {
     "ariaLabel": "常见问题分类",
-    "all": "全部"
+    "heading": "目录"
   },
   "category": {
     "expandAll": "全部展开",
@@ -30,13 +27,16 @@
     "copyLinkAria": "复制此问题的链接"
   },
   "popular": {
-    "heading": "热门问题",
-    "tooltip": "新参与者最常提出的问题。"
+    "heading": "热门问题"
   },
   "empty": {
     "heading": "未找到相关问题",
-    "descriptionPrefix": "请尝试其他关键词，或",
+    "description": "请尝试其他关键词，或清除搜索查看全部问题。",
     "clearAction": "清除搜索"
+  },
+  "glossary": {
+    "title": "术语表",
+    "description": "Cosmic Signature 的专用术语，每个术语只有一个定义。"
   },
   "contact": {
     "heading": "还有其他问题？",
@@ -45,26 +45,6 @@
     "discord": "Discord"
   },
   "tooltips": {
-    "enduranceChampion": {
-      "term": "坚守冠军",
-      "content": "一个演绎周期内，连续保持“最近一笔落笔者”身份时间最长的参与者。"
-    },
-    "chronoWarrior": {
-      "term": "时之勇士",
-      "content": "连续保持坚守冠军身份时间最长的参与者。"
-    },
-    "calibrationWindow": {
-      "term": "校准窗口",
-      "content": "用于发现落笔价格的时段。价格从校准上限开始，随时间向校准下限下降；等待越久，价格越低。"
-    },
-    "cosmicCouncil": {
-      "term": "宇宙议会",
-      "content": "链上协议协调机构。CST 持有者可提交协调提案并表达支持或反对，例如决定每个周期公共物品分配的受益方。"
-    },
-    "cst": {
-      "term": "CST",
-      "content": "每笔落笔都可能铭刻的 ERC-20 代币，可用于宇宙议会协调，也可替代 ETH 落笔。"
-    },
     "erc20": {
       "term": "ERC-20",
       "content": "以太坊广泛采用的同质化代币标准，同一合约中的代币可以互换。"

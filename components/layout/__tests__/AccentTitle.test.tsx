@@ -46,7 +46,8 @@ describe('split page titles (F152)', () => {
   it('mark exactly one accent in every locale', () => {
     for (const locale of routing.locales) {
       expect(getHowItWorksContent(locale).hero.heading.match(/<accent>/g)).toHaveLength(1);
-      expect(faqTitle(locale).match(/<accent>/g)).toHaveLength(1);
+      // The FAQ H1 is one plain string: its raw HTML reads "Cosmic Signature FAQ".
+      expect(faqTitle(locale)).not.toMatch(/<\/?accent>/);
     }
   });
 

@@ -1,42 +1,42 @@
 {
   "hero": {
-    "title": "Cosmic Signature <accent>FAQ</accent>",
+    "title": "Cosmic Signature FAQ",
     "breadcrumb": "FAQ",
     "subtitle": "Everything you need to know about Cosmic Signature — from getting started to the finer protocol mechanics.",
-    "answerCount": "{count}+ Answers",
-    "answerCountTooltip": "Comprehensive answers covering every aspect of Cosmic Signature.",
-    "categoryCount": "{count} Categories",
-    "alwaysUpdated": "Always Updated"
+    "answerCount": "{count, plural, one {# answer} other {# answers}}",
+    "categoryCount": "{count, plural, one {# category} other {# categories}}"
   },
   "search": {
-    "placeholder": "Search questions...",
+    "placeholder": "Search questions…",
     "ariaLabel": "Search frequently asked questions",
-    "clear": "Clear",
     "clearAria": "Clear search",
     "noResults": "No questions found. Try a different search term.",
     "resultCount": "Showing {resultCount} of {totalCount} questions"
   },
   "navigation": {
     "ariaLabel": "FAQ categories",
-    "all": "All"
+    "heading": "Contents"
   },
   "category": {
-    "expandAll": "Expand All",
-    "collapseAll": "Collapse All",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
     "expandAllAria": "Expand all questions",
     "collapseAllAria": "Collapse all questions",
     "copyLink": "Copy link",
-    "copied": "Copied!",
+    "copied": "Copied",
     "copyLinkAria": "Copy link to this question"
   },
   "popular": {
-    "heading": "Popular Questions",
-    "tooltip": "These are the most commonly asked questions by new participants."
+    "heading": "Popular questions"
   },
   "empty": {
     "heading": "No questions found",
-    "descriptionPrefix": "Try a different search term or",
-    "clearAction": "clear the search"
+    "description": "Try another word, or clear the search to see every question.",
+    "clearAction": "Clear the search"
+  },
+  "glossary": {
+    "title": "Glossary",
+    "description": "The coined terms used across Cosmic Signature, each defined once."
   },
   "contact": {
     "heading": "Still have a question?",
@@ -45,26 +45,6 @@
     "discord": "Discord"
   },
   "tooltips": {
-    "enduranceChampion": {
-      "term": "Endurance Champion",
-      "content": "A special title given to the participant who held the most-recent-gesture position for the longest uninterrupted interval within a Performance Cycle."
-    },
-    "chronoWarrior": {
-      "term": "Chrono-Warrior",
-      "content": "An even rarer title — the participant who held the Endurance Champion position for the longest consecutive interval."
-    },
-    "calibrationWindow": {
-      "term": "Calibration Window",
-      "content": "A price-discovery window where Gesture Cost starts high and descends over time from the Calibration Ceiling toward the Calibration Floor. The longer you wait, the lower the cost."
-    },
-    "cosmicCouncil": {
-      "term": "Cosmic Council",
-      "content": "The on-chain coordination body where CST holders submit Coordination Proposals and express Support or Opposition — for example, selecting the Public Goods Beneficiary that receives each cycle's public-goods allocation."
-    },
-    "cst": {
-      "term": "CST",
-      "content": "CST tokens — the ERC-20 tokens imprinted with every gesture. Used on the Cosmic Council and as alternative gesture currency."
-    },
     "erc20": {
       "term": "ERC-20",
       "content": "A widely used Ethereum token standard for fungible (interchangeable) tokens."

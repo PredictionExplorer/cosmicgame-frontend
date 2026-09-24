@@ -1,8 +1,10 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { MessageCircle, ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+
+import { cn } from '@/lib/utils';
+import { SiteLink } from '@/components/layout/SiteLink';
+import { buttonVariants } from '@/components/ui/button';
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
@@ -16,64 +18,52 @@ const DiscordIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
-};
+/** Community channels, the FAQ's last stop. */
+export const FAQ_CONTACT_LINKS = {
+  x: 'https://x.com/RandomWalkNFT',
+  discord: 'https://discord.gg/bGnPn96Qwt',
+} as const;
 
-export function ContactCTA() {
+/**
+ * The FAQ's closing note: where to ask what the answers do not cover. A
+ * quiet section on the page's hairline, with the two community channels as
+ * outline buttons that open in a new tab.
+ */
+export function ContactCTA({ className }: { className?: string }) {
   const t = useTranslations('faq');
 
   return (
-    <motion.section
+    <section
       aria-labelledby="contact-heading"
-      variants={fadeUp}
-      initial={false}
-      whileInView="visible"
-      viewport={{ once: true, margin: '-60px' }}
-      className="pt-8"
+      className={cn(
+        'flex flex-col gap-6 border-t border-rule pt-10 sm:flex-row sm:items-end sm:justify-between',
+        className,
+      )}
     >
-      <div className="gradient-border-card relative overflow-hidden rounded-2xl bg-white/[0.02] p-8 sm:p-10">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent" />
-
-        <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-            <MessageCircle className="h-7 w-7 text-primary" />
-          </div>
-
-          <div className="flex-1 text-center sm:text-left">
-            <h2 id="contact-heading" className="font-display text-xl font-bold tracking-tight">
-              {t('contact.heading')}
-            </h2>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
-              {t('contact.description')}
-            </p>
-
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
-              <a
-                href="https://x.com/RandomWalkNFT"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:border-primary/30 hover:bg-primary/[0.06]"
-              >
-                <XIcon className="h-4 w-4" />
-                {t('contact.x')}
-                <ArrowRight className="h-3 w-3 text-muted-foreground" />
-              </a>
-              <a
-                href="https://discord.gg/bGnPn96Qwt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-foreground transition-all hover:border-accent/30 hover:bg-accent/[0.06]"
-              >
-                <DiscordIcon className="h-4 w-4" />
-                {t('contact.discord')}
-                <ArrowRight className="h-3 w-3 text-muted-foreground" />
-              </a>
-            </div>
-          </div>
-        </div>
+      <div className="max-w-[var(--measure-lede)]">
+        <h2 id="contact-heading" className="type-heading-3 text-foreground">
+          {t('contact.heading')}
+        </h2>
+        <p className="mt-2 type-body-md text-muted-foreground">{t('contact.description')}</p>
       </div>
-    </motion.section>
+      <div className="flex shrink-0 flex-wrap gap-3">
+        <SiteLink
+          href={FAQ_CONTACT_LINKS.discord}
+          kind="external"
+          className={buttonVariants({ variant: 'outline' })}
+        >
+          <DiscordIcon className="size-4" />
+          {t('contact.discord')}
+        </SiteLink>
+        <SiteLink
+          href={FAQ_CONTACT_LINKS.x}
+          kind="external"
+          className={buttonVariants({ variant: 'outline' })}
+        >
+          <XIcon className="size-4" />
+          {t('contact.x')}
+        </SiteLink>
+      </div>
+    </section>
   );
 }
