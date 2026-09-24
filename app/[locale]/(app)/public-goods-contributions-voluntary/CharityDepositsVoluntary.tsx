@@ -31,7 +31,7 @@ const CharityDepositsVoluntary = ({ header }: { header: ReactNode }) => {
         loading={isLoading}
         error={isError ? t('loadError') : undefined}
         onRetry={() => void refetch()}
-        title={tTables('names.publicGoodsContributions')}
+        title={t('voluntaryLedger')}
         emptyDescription={tTables('publicGoods.voluntaryEmpty')}
         emptyAction={
           charity ? (

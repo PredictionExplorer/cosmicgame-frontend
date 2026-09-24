@@ -1,5 +1,6 @@
 {
   "loadError": "无法加载公共物品记录。",
+  "voluntaryLedger": "自愿资助记录",
   "vault": {
     "description": "每个周期收官时，周期储备中的公共物品份额转入金库，并在此等待为 {beneficiary} 取回。",
     "due": "本周期应转入",

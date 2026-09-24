@@ -18,13 +18,16 @@ jest.mock('../../../../../components/tables/CharityDepositTable', () => ({
   CharityDepositTable: ({
     list,
     loading,
+    title,
     emptyAction,
   }: {
     list: unknown[];
     loading?: boolean;
+    title?: React.ReactNode;
     emptyAction?: React.ReactNode;
   }) => (
     <div data-testid="deposit-table" data-loading={loading ? 'true' : undefined}>
+      <h2>{title}</h2>
       rows: {list.length}
       {list.length === 0 && !loading ? emptyAction : null}
     </div>
@@ -42,6 +45,13 @@ describe('CharityDepositsVoluntary', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Voluntary Public Goods contributions',
     );
+  });
+
+  it('titles the table for its own ledger, not the protocol one', () => {
+    // Regression: it shared the protocol page's "Public Goods contributions".
+    mockUseCharityVoluntary.mockReturnValue({ data: [], isLoading: false });
+    render(<CharityDepositsVoluntary header={HEADER} />);
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Voluntary contributions');
   });
 
   it('shows loading state', () => {

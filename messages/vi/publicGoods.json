@@ -1,5 +1,6 @@
 {
   "loadError": "Không tải được hồ sơ Hàng hóa công.",
+  "voluntaryLedger": "Các khoản đóng góp tự nguyện",
   "vault": {
     "description": "Khi một chu kỳ hoàn tất, phần Hàng hóa công trong Dự trữ chu kỳ được chuyển vào kho và chờ ở đó cho đến khi được nhận về cho {beneficiary}.",
     "due": "Phần của chu kỳ này",

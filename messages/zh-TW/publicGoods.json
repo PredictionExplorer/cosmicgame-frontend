@@ -1,5 +1,6 @@
 {
   "loadError": "無法載入公共財紀錄。",
+  "voluntaryLedger": "自願資助紀錄",
   "vault": {
     "description": "每個週期收官時，週期儲備中的公共財份額轉入金庫，並在此等待為 {beneficiary} 取回。",
     "due": "本週期應轉入",

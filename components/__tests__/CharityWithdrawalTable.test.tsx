@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 
+import { protocolFacts } from '@/content/protocol-facts';
 import { convertTimestampToDateTime } from '@/utils';
 
 import CharityWithdrawalTable from '@/components/tables/CharityWithdrawalTable';
@@ -33,6 +34,29 @@ describe('CharityWithdrawalTable', () => {
     // ETH reads at the ledger precision, with the exact value on hover.
     const amount = screen.getByText('0.1004');
     expect(amount).toHaveAttribute('title', expect.stringContaining('0.10041564272868614'));
+  });
+
+  test('names the documented beneficiary, as the page header does', () => {
+    // Regression: the header said "Protocol Guild" and the column said 0xdddd…cf79.
+    const { name, address } = protocolFacts.publicGoodsBeneficiary;
+    render(
+      <CharityWithdrawalTable
+        list={[
+          {
+            EvtLogId: '1',
+            BlockNum: 1,
+            TxId: 1,
+            TxHash: `0x${'1'.repeat(64)}`,
+            TimeStamp: 1701346718,
+            DateTime: '2023-11-30T12:18:38Z',
+            DestinationAddr: address.toLowerCase(),
+            AmountEth: 1,
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByText(name)).toBeInTheDocument();
+    expect(screen.getByTitle(`${name} · ${address}`)).toBeInTheDocument();
   });
 
   test('external links have rel="noopener noreferrer"', () => {
