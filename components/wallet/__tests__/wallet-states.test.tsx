@@ -252,7 +252,7 @@ describe('FundingNotice', () => {
     render(<FundingNotice requiredWei={2n * 10n ** 16n} />);
 
     expect(screen.getByTestId('funding-notice')).toHaveTextContent(
-      'wallet.funding.short(available=0.001,required=0.02,network=Arbitrum Sepolia)',
+      'wallet.funding.short(available=0.0010,required=0.0200,network=Arbitrum Sepolia)',
     );
     expect(
       screen.getByRole('link', { name: 'wallet.funding.howTo(network=Arbitrum Sepolia)' }),

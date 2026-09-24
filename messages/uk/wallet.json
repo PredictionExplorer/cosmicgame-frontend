@@ -82,7 +82,7 @@
     }
   },
   "funding": {
-    "short": "У гаманці є {available} ETH у мережі {network}. Для цього жесту потрібно близько {required} ETH і мережева комісія.",
+    "short": "У гаманці є {available} ETH у мережі {network}. Для цього жесту потрібно близько {required} ETH і мережева комісія.",
     "howTo": "Як отримати ETH у мережі {network}"
   }
 }

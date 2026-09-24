@@ -89,12 +89,12 @@ function StatCard({ label, value, suffix = '', tooltip, decimals = 0 }: StatCard
         </Tooltip>
       </div>
       {value === null ? (
-        <p className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <p className="mt-3 font-display text-3xl tracking-tight sm:text-4xl">
           <UnknownValue label={tCommon('status.unavailable')} />
         </p>
       ) : (
         <p
-          className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl"
+          className="mt-3 font-display text-3xl tracking-tight sm:text-4xl"
           aria-label={t('stats.valueAria', { label, value, suffix })}
         >
           {displayed.toLocaleString(locale)}

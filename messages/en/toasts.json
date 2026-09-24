@@ -45,8 +45,8 @@
       "notErc721": "The attached NFT must use an ERC-721 contract.",
       "notErc20": "The attached token must use an ERC-20 contract.",
       "insufficientAttachedToken": "Insufficient token balance to attach to this gesture.",
-      "insufficientEth": "This gesture needs {required} ETH plus a network fee. Your wallet has {available} ETH on {network}.",
-      "insufficientCst": "This gesture needs up to {required} CST. Your wallet has {available} CST."
+      "insufficientEth": "This gesture needs {required} ETH plus a network fee. Your wallet has {available} ETH on {network}.",
+      "insufficientCst": "This gesture needs up to {required} CST. Your wallet has {available} CST."
     },
     "transaction": {
       "failed": "Unable to submit the gesture. Check your wallet and network connection, refresh the current cost, and try again.",

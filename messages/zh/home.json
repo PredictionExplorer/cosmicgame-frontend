@@ -363,7 +363,7 @@
       "cst": "以 CST 落笔（{cost} CST）",
       "cstFree": "以 CST 落笔（免费）",
       "generic": "以 {method} 落笔",
-      "sendsNote": "约发送 {amount} ETH，含 {percent}% 防碰撞余量。"
+      "sendsNote": "约发送 {amount} ETH，含 {percent}% 防碰撞余量。"
     },
     "processing": "处理中…",
     "finalGestureMade": "本周期的最新一笔由你写下。倒计时走完后，点击下方的“收官”即可。",

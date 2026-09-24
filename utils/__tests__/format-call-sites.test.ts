@@ -32,13 +32,12 @@ const FIXED_DECIMAL_CALL = /\.toFixed\(|\bformatFixed\(/g;
 /** Remaining fixed-decimal calls per file; lower as call sites migrate. */
 const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'app/[locale]/(app)/allocation-finalized/AllocationFinalizedPage.tsx': 1,
-  'app/[locale]/(app)/allocation/[id]/AllocationInfoPage.tsx': 17,
+  'app/[locale]/(app)/allocation/[id]/AllocationInfoPage.tsx': 15,
   'app/[locale]/(app)/allocation/AllocationRecipientsPage.tsx': 1,
   'app/[locale]/(app)/cosmic-token-transfer/[address]/CosmicTokenTransfersPage.tsx': 1,
   'app/[locale]/(app)/distributions-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx': 2,
   'app/[locale]/(app)/eth-contribution/detail/[id]/EthDonationDetailPage.tsx': 1,
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx': 2,
-  'app/[locale]/(app)/imprint/Imprint.tsx': 2,
   'app/[locale]/(app)/my-allocations/MyWinnings.tsx': 1,
   'app/[locale]/(app)/my-anchors/MyAnchors.tsx': 1,
   'app/[locale]/(app)/page.tsx': 1,
@@ -61,16 +60,13 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/home/experimental/CycleMonument.tsx': 1,
   'components/home/experimental/DeckMiniBar.tsx': 1,
   'components/home/experimental/DeckPersonalStrip.tsx': 3,
-  'components/home/experimental/GestureAdvancedFields.tsx': 1,
   'components/home/experimental/GestureStatus.tsx': 6,
-  'components/home/experimental/gestureSubmitLabel.ts': 3,
   'components/home/HomeObservatoryHero.tsx': 1,
   'components/home/observatory/AllocationLedger.tsx': 1,
   'components/home/observatory/ChronoEnduranceIntel.tsx': 1,
   'components/home/observatory/CycleClock.tsx': 1,
-  'components/home/observatory/GesturePanel.tsx': 3,
   'components/home/observatory/GesturePriceStrip.tsx': 2,
-  'components/home/observatory/gestureSubmitLabel.ts': 3,
+  'components/home/observatory/gestureSubmitLabel.ts': 1,
   'components/home/observatory/LatestParticipantIntel.tsx': 1,
   'components/home/PublicGoodsImpactCard.tsx': 2,
   'components/home/RoundInfoSection.tsx': 1,
@@ -99,7 +95,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/tokens/CSTTotalSupplyHistoryChart.tsx': 1,
   'components/tokens/CstTransferForm.tsx': 2,
   'components/tokens/CTBalanceDistributionChart.tsx': 1,
-  'components/tokens/FundDistribution.tsx': 1,
   'components/tokens/MarketingCstRewardForm.tsx': 2,
   'components/ui/stat-card.tsx': 1,
   'components/user-statistics/HeroStats.tsx': 3,
@@ -113,7 +108,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
  */
 const LOCAL_AMOUNT_FORMATTER = /\b(?:function|const)\s+format(?:Eth|Cst|CST|EthValue|Amount)\b/;
 const LOCAL_AMOUNT_FORMATTER_BASELINE: readonly string[] = [
-  'app/[locale]/(app)/PublicDataRouteSeoSummary.tsx',
   'app/[locale]/(app)/current-cycle/CurrentCycleSeoSummary.tsx',
   'app/[locale]/(app)/gesture/[id]/GesturePage.tsx',
   'app/[locale]/(app)/statistics/StatisticsSeoSummary.tsx',

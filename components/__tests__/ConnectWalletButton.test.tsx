@@ -82,8 +82,9 @@ describe('ConnectWalletButton', () => {
 
     const pill = screen.getByText(/0x1234…\u20605678/);
     expect(pill).toBeInTheDocument();
-    // The unbreakable short address must fit the ~80px the 320px header leaves.
-    expect(pill).toHaveClass('max-[359px]:px-2.5', 'max-[359px]:text-xs');
+    // Below the sm breakpoint the address is announced but not drawn, so the
+    // icon-only trigger fits the 320px header.
+    expect(pill).toHaveClass('sr-only', 'sm:not-sr-only');
   });
 
   it('renders dropdown trigger with address when connected (desktop)', () => {

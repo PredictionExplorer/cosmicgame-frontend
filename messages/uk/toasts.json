@@ -45,8 +45,8 @@
       "notErc721": "Долучений NFT-контракт не є контрактом токена ERC-721.",
       "notErc20": "Долучений контракт токена не є контрактом токена ERC-20.",
       "insufficientAttachedToken": "На балансі недостатньо токенів, щоб долучити їх до цього жесту.",
-      "insufficientEth": "Для цього жесту потрібно {required} ETH і мережева комісія. У гаманці в мережі {network} є {available} ETH.",
-      "insufficientCst": "Для цього жесту потрібно до {required} CST. У гаманці є {available} CST."
+      "insufficientEth": "Для цього жесту потрібно {required} ETH і мережева комісія. У гаманці в мережі {network} є {available} ETH.",
+      "insufficientCst": "Для цього жесту потрібно до {required} CST. У гаманці є {available} CST."
     },
     "transaction": {
       "failed": "Не вдалося надіслати жест. Перевірте гаманець і з’єднання з мережею, оновіть поточну вартість і спробуйте ще раз.",

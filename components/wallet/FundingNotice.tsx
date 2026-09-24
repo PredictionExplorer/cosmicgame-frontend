@@ -3,25 +3,15 @@
 import { ArrowRight, Info } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useBalance, useConnection } from 'wagmi';
-import { formatEther } from 'viem';
 
 import { activeChain } from '@/config/chains';
 import { Link } from '@/i18n/navigation';
-import { getLocaleConfig } from '@/i18n/localeConfig';
 import { REQUIRED_CHAIN_NAME } from '@/lib/chainGuard';
 import { cn } from '@/lib/utils';
+import { formatAmount } from '@/utils/format/numbers';
 
 /** FAQ answer on moving ETH to the protocol's chain (a stable public anchor). */
 export const FUNDING_HELP_HREF = '/faq#how-to-get-eth-on-arbitrum';
-
-/** Fraction digits for the two ETH amounts in the notice. */
-const DISPLAY_DECIMALS = 4;
-
-function formatEth(wei: bigint, intlLocale: string): string {
-  const value = Number(formatEther(wei));
-  if (!Number.isFinite(value)) return '0';
-  return value.toLocaleString(intlLocale, { maximumFractionDigits: DISPLAY_DECIMALS });
-}
 
 export interface FundingNoticeProps {
   /** ETH the action needs before gas (the Gesture Cost), in wei; null while unknown. */
@@ -38,7 +28,7 @@ export interface FundingNoticeProps {
  */
 export function FundingNotice({ requiredWei, className }: FundingNoticeProps) {
   const t = useTranslations('wallet');
-  const { intlLocale } = getLocaleConfig(useLocale());
+  const locale = useLocale();
   const { address } = useConnection();
   const { data: balance } = useBalance({
     address,
@@ -62,8 +52,8 @@ export function FundingNotice({ requiredWei, className }: FundingNoticeProps) {
       <div className="min-w-0">
         <p className="text-foreground">
           {t('funding.short', {
-            available: formatEth(balance.value, intlLocale),
-            required: formatEth(requiredWei, intlLocale),
+            available: formatAmount(balance.value, { unit: 'ETH', locale, withUnit: false }),
+            required: formatAmount(requiredWei, { unit: 'ETH', locale, withUnit: false }),
             network: REQUIRED_CHAIN_NAME,
           })}
         </p>

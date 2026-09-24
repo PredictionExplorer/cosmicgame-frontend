@@ -148,7 +148,7 @@
         },
         "chrono": {
           "label": "시간의 전사",
-          "tooltip": "수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자인 시간의 전사에게 배분된 {amount} ETH"
+          "tooltip": "수호 챔피언 자리를 가장 오랫동안 연속으로 지킨 참여자인 시간의 전사에게 배분된 {amount} ETH"
         },
         "publicGoods": {
           "label": "공공재",
@@ -163,7 +163,7 @@
           "tooltip": "별빛 선정 풀에 배분된 {amount} ETH"
         }
       },
-      "total": "이 사이클 배분 총액 {amount} ETH"
+      "total": "이 사이클 배분 총액 {amount} ETH"
     },
     "statistics": {
       "aria": "사이클 통계",

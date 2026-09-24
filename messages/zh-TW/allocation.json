@@ -148,7 +148,7 @@
         },
         "chrono": {
           "label": "時之勇士",
-          "tooltip": "{amount} ETH 分配給時之勇士，即本週期單次連續保持堅守冠軍位置時間最長的參與者。"
+          "tooltip": "{amount} ETH 分配給時之勇士，即本週期單次連續保持堅守冠軍位置時間最長的參與者。"
         },
         "publicGoods": {
           "label": "公共財",
@@ -163,7 +163,7 @@
           "tooltip": "{amount} ETH 已分配至星選池。"
         }
       },
-      "total": "本週期共發放 {amount} ETH"
+      "total": "本週期共發放 {amount} ETH"
     },
     "statistics": {
       "aria": "週期統計",

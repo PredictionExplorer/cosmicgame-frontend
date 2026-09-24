@@ -112,7 +112,7 @@ describe('ConnectWalletButton', () => {
     renderWalletButton(false, true);
 
     const trigger = screen.getByTestId('wallet-account-trigger');
-    expect(trigger).toHaveAccessibleName(/0xabcd/);
+    expect(trigger).toHaveAccessibleName(/0xabcd/i);
     fireEvent.click(trigger);
 
     expect(await screen.findByTestId('wallet-account-panel')).toBeInTheDocument();

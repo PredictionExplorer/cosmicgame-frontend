@@ -99,7 +99,7 @@ export function LiveStatusView({
       className={cn(
         'inline-flex max-w-full items-center gap-2',
         variant === 'chip' &&
-          'rounded-full border border-border bg-card/60 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground',
+          'rounded-full border border-border bg-card/60 px-2.5 py-1 type-eyebrow font-semibold text-muted-foreground',
         variant === 'inline' && 'text-xs text-muted-foreground',
         className,
       )}

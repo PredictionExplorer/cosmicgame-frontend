@@ -82,7 +82,7 @@
     }
   },
   "funding": {
-    "short": "Your wallet has {available} ETH on {network}. This gesture needs about {required} ETH plus a network fee.",
+    "short": "Your wallet has {available} ETH on {network}. This gesture needs about {required} ETH plus a network fee.",
     "howTo": "How to add ETH on {network}"
   }
 }

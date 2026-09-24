@@ -45,8 +45,8 @@
       "notErc721": "所选合约不符合 ERC-721 标准。",
       "notErc20": "所选合约不符合 ERC-20 标准。",
       "insufficientAttachedToken": "钱包中的代币余额不足，无法附加至本次落笔。",
-      "insufficientEth": "本次落笔需要 {required} ETH 及网络手续费，钱包在 {network} 上仅有 {available} ETH。",
-      "insufficientCst": "本次落笔最多需要 {required} CST，钱包中有 {available} CST。"
+      "insufficientEth": "本次落笔需要 {required} ETH 及网络手续费，钱包在 {network} 上仅有 {available} ETH。",
+      "insufficientCst": "本次落笔最多需要 {required} CST，钱包中有 {available} CST。"
     },
     "transaction": {
       "failed": "未能提交落笔。请检查钱包与网络连接，刷新当前落笔价格后重试。",

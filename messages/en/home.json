@@ -363,7 +363,7 @@
       "cst": "Gesture with CST ({cost} CST)",
       "cstFree": "Gesture with CST (FREE GESTURE)",
       "generic": "Gesture with {method}",
-      "sendsNote": "Sends about {amount} ETH, including the {percent}% collision buffer."
+      "sendsNote": "Sends about {amount} ETH, including the {percent}% collision buffer."
     },
     "processing": "Processing...",
     "finalGestureMade": "You made the final gesture for this cycle. When the timer ends, use Finalize Cycle below.",

@@ -148,7 +148,7 @@
         },
         "chrono": {
           "label": "时之勇士",
-          "tooltip": "{amount} ETH 分配给时之勇士，即本周期单次连续保持坚守冠军位置时间最长的参与者。"
+          "tooltip": "{amount} ETH 分配给时之勇士，即本周期单次连续保持坚守冠军位置时间最长的参与者。"
         },
         "publicGoods": {
           "label": "公共物品",
@@ -163,7 +163,7 @@
           "tooltip": "{amount} ETH 已分配至星选池。"
         }
       },
-      "total": "本周期共发放 {amount} ETH"
+      "total": "本周期共发放 {amount} ETH"
     },
     "statistics": {
       "aria": "周期统计",

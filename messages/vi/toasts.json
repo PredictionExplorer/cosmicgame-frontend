@@ -45,8 +45,8 @@
       "notErc721": "Hợp đồng NFT đính kèm không phải là hợp đồng token ERC721.",
       "notErc20": "Hợp đồng token đính kèm không phải là hợp đồng token ERC20.",
       "insufficientAttachedToken": "Số dư token không đủ để đính kèm vào nét bút này.",
-      "insufficientEth": "Nét bút này cần {required} ETH cộng phí mạng. Ví có {available} ETH trên {network}.",
-      "insufficientCst": "Nét bút này cần tối đa {required} CST. Ví có {available} CST."
+      "insufficientEth": "Nét bút này cần {required} ETH cộng phí mạng. Ví có {available} ETH trên {network}.",
+      "insufficientCst": "Nét bút này cần tối đa {required} CST. Ví có {available} CST."
     },
     "transaction": {
       "failed": "Không thể gửi nét bút. Hãy kiểm tra ví và kết nối mạng, làm mới chi phí hiện tại, rồi thử lại.",

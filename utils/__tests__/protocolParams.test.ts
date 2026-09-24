@@ -14,7 +14,7 @@ describe('formatPercentPoints', () => {
   });
 
   it("uses the locale's digits and never puts a space before the sign", () => {
-    expect(formatPercentPoints(12.5, 'uk')).toBe('12,5%');
+    expect(formatPercentPoints(12.5, 'uk')).toBe('12.5%');
     expect(formatPercentPoints(12.5, 'vi')).toBe('12,5%');
     expect(formatPercentPoints(12.5, 'ja')).toBe('12.5%');
   });

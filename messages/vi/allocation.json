@@ -148,7 +148,7 @@
         },
         "chrono": {
           "label": "Chiến binh Thời gian",
-          "tooltip": "{amount} ETH phân bổ cho Chiến binh Thời gian, người giữ danh hiệu Quán quân Bền bỉ lâu nhất trong một khoảng liên tục."
+          "tooltip": "{amount} ETH phân bổ cho Chiến binh Thời gian, người giữ danh hiệu Quán quân Bền bỉ lâu nhất trong một khoảng liên tục."
         },
         "publicGoods": {
           "label": "Hàng hóa công",
@@ -163,7 +163,7 @@
           "tooltip": "{amount} ETH phân bổ vào quỹ Tinh tuyển."
         }
       },
-      "total": "Đã phân bổ {amount} ETH trong chu kỳ này"
+      "total": "Đã phân bổ {amount} ETH trong chu kỳ này"
     },
     "statistics": {
       "aria": "Thống kê chu kỳ",

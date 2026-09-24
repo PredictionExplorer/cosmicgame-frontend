@@ -148,7 +148,7 @@
         },
         "chrono": {
           "label": "時の戦士",
-          "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者である時の戦士に配分された{amount} ETH。"
+          "tooltip": "持久チャンピオンの称号を最も長く連続して保持した参加者である時の戦士に配分された{amount} ETH。"
         },
         "publicGoods": {
           "label": "公共財",
@@ -163,7 +163,7 @@
           "tooltip": "星選プールに配分された{amount} ETH。"
         }
       },
-      "total": "このサイクルの配分総額：{amount} ETH"
+      "total": "このサイクルの配分総額：{amount} ETH"
     },
     "statistics": {
       "aria": "サイクル統計",

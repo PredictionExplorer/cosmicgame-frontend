@@ -82,7 +82,7 @@
     }
   },
   "funding": {
-    "short": "Ví có {available} ETH trên {network}. Nét bút này cần khoảng {required} ETH cộng phí mạng.",
+    "short": "Ví có {available} ETH trên {network}. Nét bút này cần khoảng {required} ETH cộng phí mạng.",
     "howTo": "Cách có ETH trên {network}"
   }
 }

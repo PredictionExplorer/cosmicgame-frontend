@@ -45,8 +45,8 @@
       "notErc721": "所選合約不符合 ERC-721 標準。",
       "notErc20": "所選合約不符合 ERC-20 標準。",
       "insufficientAttachedToken": "錢包中的代幣餘額不足，無法附加至本次落筆。",
-      "insufficientEth": "本次落筆需要 {required} ETH 及網絡手續費，錢包在 {network} 上只有 {available} ETH。",
-      "insufficientCst": "本次落筆最多需要 {required} CST，錢包中有 {available} CST。"
+      "insufficientEth": "本次落筆需要 {required} ETH 及網絡手續費，錢包在 {network} 上只有 {available} ETH。",
+      "insufficientCst": "本次落筆最多需要 {required} CST，錢包中有 {available} CST。"
     },
     "transaction": {
       "failed": "未能提交落筆。請檢查錢包與網絡連接，重新整理目前落筆價格後重試。",

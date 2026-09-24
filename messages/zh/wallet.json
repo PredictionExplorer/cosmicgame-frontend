@@ -82,7 +82,7 @@
     }
   },
   "funding": {
-    "short": "钱包在 {network} 上有 {available} ETH。本次落笔约需 {required} ETH 及网络手续费。",
+    "short": "钱包在 {network} 上有 {available} ETH。本次落笔约需 {required} ETH 及网络手续费。",
     "howTo": "如何在 {network} 上获取 ETH"
   }
 }

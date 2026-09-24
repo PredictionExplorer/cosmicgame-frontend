@@ -148,7 +148,7 @@
         },
         "chrono": {
           "label": "Chrono-Warrior",
-          "tooltip": "{amount} ETH allocated to the Chrono-Warrior, the participant who held the Endurance Champion position for the longest consecutive interval."
+          "tooltip": "{amount} ETH allocated to the Chrono-Warrior, the participant who held the Endurance Champion position for the longest consecutive interval."
         },
         "publicGoods": {
           "label": "Public Goods",
@@ -163,7 +163,7 @@
           "tooltip": "{amount} ETH allocated to the Stellar Selection pool."
         }
       },
-      "total": "{amount} ETH distributed this cycle"
+      "total": "{amount} ETH distributed this cycle"
     },
     "statistics": {
       "aria": "Cycle Statistics",

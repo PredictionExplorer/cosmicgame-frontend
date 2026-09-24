@@ -363,7 +363,7 @@
       "cst": "Đặt nét bút bằng CST ({cost} CST)",
       "cstFree": "Đặt nét bút bằng CST (KHÔNG TỐN CHI PHÍ)",
       "generic": "Đặt nét bút bằng {method}",
-      "sendsNote": "Gửi khoảng {amount} ETH, gồm {percent}% dự phòng thay đổi chi phí."
+      "sendsNote": "Gửi khoảng {amount} ETH, gồm {percent}% dự phòng thay đổi chi phí."
     },
     "processing": "Đang xử lý…",
     "finalGestureMade": "Bạn đã đặt nét bút cuối cùng của chu kỳ này. Khi bộ đếm kết thúc, hãy dùng Hoàn tất chu kỳ bên dưới.",

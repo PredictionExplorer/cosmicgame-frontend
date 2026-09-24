@@ -274,7 +274,7 @@ describe('GalleryCollectionDna', () => {
         onSelect={noop}
       />,
     );
-    const dimmed = screen.getByRole('button', { name: /^Eternal Dance: 1 NFTs/ });
+    const dimmed = screen.getByRole('button', { name: /^Eternal Dance: 1\sNFTs/ });
     // An overflow-hidden bar clipped the ring, which sits outside the segment.
     expect(dimmed.parentElement).not.toHaveClass('overflow-hidden');
     // Opacity applies to an element's outline too: focus restores full strength.
