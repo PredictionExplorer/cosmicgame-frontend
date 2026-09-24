@@ -117,6 +117,29 @@ describe('GestureHistoryTable', () => {
     ).toHaveAttribute('href', '/gesture/1000');
   });
 
+  test("drops who and how long on a participant's own page", () => {
+    const { container } = render(
+      <GestureHistoryTable
+        gestureHistory={[
+          {
+            EvtLogId: 11,
+            TimeStamp: 1701346718,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 0,
+            EthPriceEth: 0.1,
+            RoundNum: 1,
+          },
+        ]}
+        showParticipant={false}
+        showHold={false}
+      />,
+    );
+    const headers = Array.from(container.querySelectorAll('th')).map((th) => th.textContent);
+    expect(headers).not.toContain('tables.columns.participant');
+    expect(headers).not.toContain('tables.columns.gestureDuration');
+    expect(headers).toContain('tables.columns.gestureCost');
+  });
+
   test('uses localized alt text for the Random Walk NFT image', () => {
     render(
       <GestureHistoryTable

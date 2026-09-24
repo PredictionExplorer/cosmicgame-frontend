@@ -39,6 +39,18 @@ interface GestureHistoryTableProps extends LedgerStateProps {
   gestureHistory: GestureHistory[];
   /** Show each gesture's cycle; a page about one cycle hides it. Default `true`. */
   showRound?: boolean;
+  /**
+   * Show who made each gesture. A participant's own page hides it: every row
+   * would repeat the address in the page's title. Default `true`.
+   */
+  showParticipant?: boolean;
+  /**
+   * Show how long each gesture stayed the latest one. That needs every
+   * gesture of the cycle in the list, so a participant's page, which lists
+   * only theirs, hides it rather than show the gap between their own
+   * gestures. Default `true`.
+   */
+  showHold?: boolean;
 }
 
 const CST_GESTURE = 2;
@@ -149,11 +161,14 @@ function GrowingDuration({ since }: { since: number }) {
  * A cycle's (or a participant's) gestures, newest first: when (leading to the
  * gesture's page), who, what it cost and how, how long it held the lead,
  * and what it carried. The info and message columns appear only when some
- * gesture has one.
+ * gesture has one. A participant's page passes `showParticipant={false}` and
+ * `showHold={false}`.
  */
 const GestureHistoryTable = ({
   gestureHistory,
   showRound = true,
+  showParticipant = true,
+  showHold = true,
   ...state
 }: GestureHistoryTableProps) => {
   const t = useTranslations('tables');
@@ -190,7 +205,7 @@ const GestureHistoryTable = ({
         seconds: true,
         sortable: true,
       },
-      {
+      showParticipant && {
         id: 'participant',
         kind: 'address',
         header: t('columns.participant'),
@@ -234,7 +249,7 @@ const GestureHistoryTable = ({
           />
         ),
       },
-      {
+      showHold && {
         id: 'hold',
         kind: 'duration',
         header: t('columns.gestureDuration'),
@@ -286,7 +301,7 @@ const GestureHistoryTable = ({
       },
     ];
     return all.filter((column): column is DataTableColumn<GestureHistory> => Boolean(column));
-  }, [t, showRound, holds, banned]);
+  }, [t, showRound, showParticipant, showHold, holds, banned]);
 
   return (
     <DataTable

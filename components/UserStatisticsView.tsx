@@ -295,7 +295,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           >
             <SectionDivider title={t('statistics.page.sections.gestureHistory')} />
             <div className="mt-6">
-              <GestureHistoryTable gestureHistory={gestureHistory} />
+              <GestureHistoryTable
+                gestureHistory={gestureHistory}
+                showParticipant={false}
+                showHold={false}
+              />
             </div>
           </motion.section>
 
