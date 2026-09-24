@@ -16,18 +16,31 @@ export const aboutContentEn = {
   eyebrow: 'About the protocol',
   heading: 'About Cosmic Signature',
   body: {
+    lede: 'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. During each Performance Cycle, participants make gestures with ETH or CST, and every gesture helps shape the final Signature: deterministic NFT artwork generated from on-chain data and rendered through a three-body physics simulation.',
     paragraphs: [
-      'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. During each Performance Cycle, participants make gestures with ETH or CST, and every gesture helps shape the final Signature: deterministic NFT artwork generated from on-chain data and rendered through a three-body physics simulation.',
       'The protocol is designed around public, verifiable mechanics. Arbitrum smart contracts record gestures, cycles, allocation tracks, CST, anchoring, and NFT imprints. The artwork is reproducible from its seed, and the project emphasizes open source code, CC0 art, and public-goods support.',
-      'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
     ],
+    disambiguation:
+      'Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app.',
     // lexicon-allow-start: explicit investment-product denial for crawler and compliance clarity.
     denial:
       'Cosmic Signature is not offered as an investment product. The protocol describes participation, gestures, allocations, anchoring, and public-goods forwarding; it does not promise token price behavior or financial outcomes.',
     // lexicon-allow-end
   },
+  facts: {
+    license: 'CC0 art and code',
+    network: 'Arbitrum One',
+    publicGoodsTemplate: '{percent} of every Cycle Reserve to Public Goods',
+  },
+  principlesHeading: 'Principles',
+  clarificationsHeading: 'Clarifications',
   officialResources: {
-    heading: 'Official Resources',
+    heading: 'Official resources',
+    groups: {
+      protocol: 'Protocol',
+      community: 'Community',
+      help: 'Help and legal',
+    },
     links: [
       { id: 'app', label: 'Cosmic Signature app', href: ABOUT_RESOURCE_HREFS.app },
       {

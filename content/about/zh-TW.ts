@@ -16,18 +16,31 @@ export const aboutContentZhTw = {
   eyebrow: '關於協議',
   heading: '關於 Cosmic Signature',
   body: {
+    lede: 'Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。在每個演繹週期中，參與者以 ETH 或 CST 落筆；每一筆都在塑造最終的簽名——一件從鏈上資料生成、經三體物理模擬渲染而成的確定性 NFT 藝術作品。',
     paragraphs: [
-      'Cosmic Signature 是 Arbitrum 上的程序化鏈上藝術協議。在每個演繹週期中，參與者以 ETH 或 CST 落筆；每一筆都在塑造最終的簽名——一件從鏈上資料生成、經三體物理模擬渲染而成的確定性 NFT 藝術作品。',
       '協議機制公開且可驗證。Arbitrum 智慧合約紀錄落筆、週期、分配軌道、CST、錨定和 NFT 銘刻。每件作品都能從種子復現。專案開放全部原始碼，以 CC0 發布藝術作品，並將公共財資助寫入協議機制。',
-      'Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突變特徵沒有關聯。本專案是鏈上藝術協議及應用程式。',
     ],
+    disambiguation:
+      'Cosmic Signature 與 COSMIC 癌症突變資料庫及生物學中的 COSMIC 突變特徵沒有關聯。本專案是鏈上藝術協議及應用程式。',
     // lexicon-allow-start: 明確否認投資產品及財務結果承諾。
     denial:
       'Cosmic Signature 並非投資產品。這裡介紹的是落筆、分配、錨定和公共財轉撥等協議機制；協議不對代幣價格走勢或任何財務結果作出承諾。',
     // lexicon-allow-end
   },
+  facts: {
+    license: 'CC0 作品與程式碼',
+    network: 'Arbitrum One',
+    publicGoodsTemplate: '每個週期儲備的 {percent} 用於公共財',
+  },
+  principlesHeading: '設計原則',
+  clarificationsHeading: '澄清說明',
   officialResources: {
     heading: '官方資源',
+    groups: {
+      protocol: '協議',
+      community: '社群',
+      help: '說明與法律',
+    },
     links: [
       { id: 'app', label: 'Cosmic Signature 應用程式', href: ABOUT_RESOURCE_HREFS.app },
       {

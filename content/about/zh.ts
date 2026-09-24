@@ -16,18 +16,31 @@ export const aboutContentZh = {
   eyebrow: '关于协议',
   heading: '关于 Cosmic Signature',
   body: {
+    lede: 'Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。在每个演绎周期中，参与者以 ETH 或 CST 落笔；每一笔都在塑造最终的签名——一件从链上数据生成、经三体物理模拟渲染而成的确定性 NFT 艺术作品。',
     paragraphs: [
-      'Cosmic Signature 是 Arbitrum 上的程序化链上艺术协议。在每个演绎周期中，参与者以 ETH 或 CST 落笔；每一笔都在塑造最终的签名——一件从链上数据生成、经三体物理模拟渲染而成的确定性 NFT 艺术作品。',
       '协议机制公开且可验证。Arbitrum 智能合约记录落笔、周期、分配轨道、CST、锚定和 NFT 铭刻。每件作品都能从种子复现。项目开放全部源代码，以 CC0 发布艺术作品，并将公共物品资助写入协议机制。',
-      'Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。本项目是链上艺术协议及应用。',
     ],
+    disambiguation:
+      'Cosmic Signature 与 COSMIC 癌症突变数据库及生物学中的 COSMIC 突变特征没有关联。本项目是链上艺术协议及应用。',
     // lexicon-allow-start: 明确否认投资产品及财务结果承诺。
     denial:
       'Cosmic Signature 并非投资产品。这里介绍的是落笔、分配、锚定和公共物品转拨等协议机制；协议不对代币价格走势或任何财务结果作出承诺。',
     // lexicon-allow-end
   },
+  facts: {
+    license: 'CC0 作品与代码',
+    network: 'Arbitrum One',
+    publicGoodsTemplate: '每个周期储备的 {percent} 用于公共物品',
+  },
+  principlesHeading: '设计原则',
+  clarificationsHeading: '澄清说明',
   officialResources: {
     heading: '官方资源',
+    groups: {
+      protocol: '协议',
+      community: '社区',
+      help: '帮助与法律',
+    },
     links: [
       { id: 'app', label: 'Cosmic Signature 应用', href: ABOUT_RESOURCE_HREFS.app },
       {
