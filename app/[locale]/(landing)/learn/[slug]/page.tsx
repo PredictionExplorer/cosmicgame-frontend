@@ -8,6 +8,7 @@ import { WHITE_PAPER_PATH, getWhitePaperContent } from '@/content/white-paper';
 
 import { getSiteRoute, resolveRouteHref, type SiteRouteId } from '@/config/siteNav';
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
+import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SiteLink } from '@/components/layout/SiteLink';
 import { GUIDE_ICONS } from '@/components/learn/GuideCard';
@@ -52,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const article = getLearnArticle(slug, locale);
-  if (!article) return {};
+  if (!article) return notFoundMetadata(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
   const metaKey = `learnArticles.${article.slug}`;
 

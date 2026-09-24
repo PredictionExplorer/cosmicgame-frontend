@@ -1,15 +1,12 @@
-// Server component on purpose: the 404 page must arrive as crawler-visible
-// HTML (branded copy + recovery links), not hydrate client-side.
-import type { Metadata } from 'next';
-
+// Server component on purpose: the recovery links render from the server,
+// without client state.
+//
+// No metadata here: a not-found file takes none, and reading the locale for
+// it would have to go through request headers, which turns a statically
+// generated route that 404s into a runtime error. The page that calls
+// `notFound()` names the tab instead (see notFoundMetadata).
 import { NotFoundView } from '@/components/layout/NotFoundView';
-import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
 import { PageShell } from '@/components/ui/page-shell';
-
-/** "Page not found · Cosmic Signature" in the tab instead of the site default. */
-export function generateMetadata(): Promise<Metadata> {
-  return notFoundMetadata();
-}
 
 export default function NotFound() {
   return (

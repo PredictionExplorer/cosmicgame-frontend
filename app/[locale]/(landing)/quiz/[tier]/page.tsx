@@ -10,6 +10,7 @@ import {
   type QuizRunnerUi,
 } from '@/content/quiz';
 
+import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { DifficultyMeter } from '@/components/quiz/DifficultyMeter';
 import { QuizRunner } from '@/components/quiz/QuizRunner';
@@ -42,7 +43,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, tier } = await params;
   setRequestLocale(locale);
-  if (!isQuizTierId(tier)) return {};
+  if (!isQuizTierId(tier)) return notFoundMetadata(locale);
   const t = await getTranslations({ locale, namespace: 'meta' });
 
   return createPageMetadata(

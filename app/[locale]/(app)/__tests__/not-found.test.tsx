@@ -7,10 +7,11 @@ import { APP_ORIGIN, localeHref } from '@/lib/hostRouting';
 
 import { render, screen, checkA11y, within } from '@/test-utils';
 
-import NotFound, { generateMetadata } from '../not-found';
-import LandingNotFound, {
-  generateMetadata as generateLandingMetadata,
-} from '../../(landing)/landing-site/not-found';
+import { generateMetadata } from '../[...notFound]/page';
+import NotFound from '../not-found';
+import * as landingNotFoundModule from '../../(landing)/landing-site/not-found';
+
+const LandingNotFound = landingNotFoundModule.default;
 
 jest.mock('../../../../components/ui/page-shell', () => ({
   PageShell: ({ children }: { children: React.ReactNode }) => <main>{children}</main>,
@@ -61,10 +62,16 @@ describe('app 404 page', () => {
     await checkA11y(container);
   });
 
-  it('names the tab after the error instead of the site default', async () => {
-    const metadata = await generateMetadata();
+  it('names the tab after the error from the catch-all page, which knows the locale', async () => {
+    const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) });
     expect(metadata.title).toEqual({ absolute: 'errors.notFound.title · Cosmic Signature' });
     expect(metadata.description).toBe('errors.notFound.description');
+    expect(metadata.robots).toEqual({ index: false, follow: true });
+  });
+
+  it('exports no metadata from the not-found file, which would read the locale from headers', async () => {
+    const appModule = await import('../not-found');
+    expect('generateMetadata' in appModule).toBe(false);
   });
 });
 
@@ -80,7 +87,7 @@ describe('landing 404 page', () => {
     expect(screen.queryByRole('button', { name: 'nav.search.triggerLabel' })).toBeNull();
   });
 
-  it('uses the same absolute tab title as the app, outside the landing title template', async () => {
-    expect(await generateLandingMetadata()).toEqual(await generateMetadata());
+  it('exports no metadata either: the Learn and Quiz pages name the tab for a missing slug', () => {
+    expect('generateMetadata' in landingNotFoundModule).toBe(false);
   });
 });

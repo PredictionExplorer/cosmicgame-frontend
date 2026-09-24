@@ -1,4 +1,21 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+
+import { notFoundMetadata } from '@/components/layout/notFoundMetadata';
+
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+/**
+ * "Page not found · Cosmic Signature" in the tab. Page metadata resolves
+ * independently of the `notFound()` below, and it is the head the browser
+ * keeps once the not-found boundary renders; `not-found.tsx` takes none.
+ */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  return notFoundMetadata(locale);
+}
 
 /**
  * Catch-all for unmatched URLs.
