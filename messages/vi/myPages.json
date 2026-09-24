@@ -4,10 +4,6 @@
     "unavailable": "Không khả dụng",
     "yes": "Có",
     "no": "Không",
-    "datetime": "Thời điểm",
-    "from": "Từ",
-    "to": "Đến",
-    "tokenId": "Mã token",
     "cycle": "Chu kỳ",
     "cycleNumber": "Chu kỳ {cycle}",
     "recipient": "Người nhận"
@@ -272,30 +268,22 @@
   "transferCst": {
     "page": {
       "title": "Chuyển CST",
-      "subtitle": "Gửi token CST của Cosmic Signature đến một địa chỉ khác.",
-      "sourceLabel": "Ví đang kết nối",
-      "description": "Chuyển CST từ ví đang kết nối. Giao dịch được ví của bạn ký và gửi trực tiếp đến hợp đồng token CST."
+      "subtitle": "Gửi CST từ ví đã kết nối của bạn đến một địa chỉ khác trên {network}."
     },
     "form": {
-      "title": "Chuyển CST",
-      "sourceWallet": "Ví nguồn",
-      "defaultDescription": "Gửi CST từ ví đang kết nối đến bất kỳ địa chỉ nào.",
-      "available": "CST khả dụng",
-      "balanceReadError": "Không đọc được số dư CST của ví này. Vui lòng thử lại.",
-      "decimalsReadWarning": "Không đọc được số chữ số thập phân của CST; giả định 18 chữ số thập phân.",
-      "recipientAddress": "Địa chỉ người nhận",
-      "amount": "Số lượng",
-      "sendAria": "Gửi CST",
-      "sending": "Đang gửi…",
       "send": "Gửi CST",
-      "viewHistory": "Xem lịch sử chuyển CST",
-      "confirmed": "Đã xác nhận chuyển CST.",
-      "viewTransaction": "Xem giao dịch"
+      "sendAmount": "Gửi {amount}"
+    },
+    "guide": {
+      "from": "Gửi từ",
+      "history": "Lịch sử chuyển CST của bạn",
+      "title": "Trước khi gửi",
+      "final": "Không thể hoàn tác giao dịch chuyển. CST gửi nhầm địa chỉ sẽ không thể khôi phục.",
+      "network": "Chỉ gửi đến địa chỉ có thể giữ token trên {network}.",
+      "paste": "Hãy sao chép địa chỉ từ ví nhận thay vì tự gõ."
     }
   },
   "nftTransfer": {
-    "sourceWallet": "Ví nguồn",
-    "recipientAddress": "Địa chỉ người nhận",
     "empty": "Bạn không có Cosmic Signature NFT nào trong ví này.",
     "pickerTitle": "Chọn NFT để chuyển giao",
     "pickerSummary": "Đã chọn {selected} trong {total} NFT có thể chuyển giao.",
@@ -303,7 +291,7 @@
     "selectPage": "Chọn trang hiện tại",
     "clear": "Bỏ chọn",
     "listAria": "Cosmic Signature NFT",
-    "selectAria": "Chọn NFT #{id}",
+    "selectAria": "Chọn NFT {id}",
     "cycle": "Chu kỳ {cycle}",
     "cycleUnavailable": "Không có dữ liệu chu kỳ",
     "statusLabels": {
@@ -312,49 +300,66 @@
     },
     "progress": {
       "transferred": "Đã chuyển giao {completed} trong {total} NFT",
-      "stopped": "Chuyển giao dừng ở NFT #{id}",
-      "current": "NFT hiện tại: #{id}"
-    },
-    "confirmation": {
-      "latest": "Đã xác nhận lần chuyển giao mới nhất.",
-      "multiple": "Đã xác nhận {count} lần chuyển giao.",
-      "viewLatest": "Xem giao dịch mới nhất"
+      "stopped": "Đã dừng sau {completed}/{total}, tại NFT {id}. Các NFT chưa gửi vẫn được chọn."
     },
     "sending": "Đang gửi…",
     "send": "Gửi NFT đã chọn",
     "viewHistory": "Xem lịch sử chuyển giao NFT",
-    "warning": {
-      "title": "Người nhận chưa có lịch sử giao dịch",
-      "description": "Địa chỉ này dường như chưa có giao dịch nào. Hãy kiểm tra kỹ người nhận trước khi gửi; việc chuyển giao NFT không thể hoàn tác.",
-      "cancel": "Hủy",
-      "continue": "Tiếp tục chuyển giao"
-    }
+    "review": {
+      "count": "{count, plural, other {# NFT}}"
+    },
+    "sendCount": "{count, plural, other {Gửi # NFT}}"
   },
   "transferHistory": {
-    "loading": "Đang tải…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Ví neo giữ Cosmic Signature NFT",
-      "randomWalkAnchoring": "Ví neo giữ RandomWalk",
-      "outreach": "Ví truyền thông",
-      "stellarSelection": "Ví Tinh tuyển",
-      "publicGoods": "Kho Hàng hóa công"
-    },
     "nft": {
-      "title": "Chuyển giao Cosmic Signature",
+      "title": "Lịch sử chuyển giao NFT",
       "empty": "Chưa có lần chuyển giao NFT nào.",
-      "invalidAddress": {
-        "title": "Địa chỉ không hợp lệ",
-        "description": "Nhập một địa chỉ ví hợp lệ để xem lịch sử chuyển giao NFT."
+      "lede": "Các Cosmic Signature NFT được khắc cho địa chỉ này, cùng mọi NFT nó đã nhận hoặc gửi.",
+      "emptyDescription": "NFT đến một địa chỉ khi được khắc cho nó hoặc được gửi từ ví khác.",
+      "figures": {
+        "imprinted": "Đã khắc",
+        "received": "Đã nhận",
+        "sent": "Đã gửi"
       }
     },
     "cst": {
-      "title": "Chuyển token CST của Cosmic Signature",
+      "title": "Lịch sử chuyển CST",
       "empty": "Chưa có lần chuyển CST nào.",
-      "invalidAddress": {
-        "title": "Địa chỉ không hợp lệ",
-        "description": "Nhập một địa chỉ ví hợp lệ để xem lịch sử chuyển CST."
-      },
-      "value": "Giá trị (CST)"
+      "lede": "CST được khắc cho địa chỉ này, CST địa chỉ này nhận và gửi, cùng CST bị tiêu thụ bởi các nét bút CST của nó.",
+      "emptyDescription": "CST đến một địa chỉ khi một nét bút khắc CST cho nó hoặc một ví khác gửi đến.",
+      "figures": {
+        "received": "Đã nhận",
+        "sent": "Đã gửi",
+        "net": "Thay đổi ròng",
+        "imprintedCaption": "Đã khắc: {amount}",
+        "consumedCaption": "Đã tiêu thụ: {amount}"
+      }
+    },
+    "switcherLabel": "Lịch sử chuyển của địa chỉ này",
+    "viewOnExplorer": "Xem trên {explorer}",
+    "error": "Không tải được lịch sử chuyển của địa chỉ này.",
+    "count": "{count, plural, other {# giao dịch}}",
+    "activity": {
+      "imprinted": "Đã khắc",
+      "received": "Đã nhận",
+      "sent": "Đã gửi",
+      "consumed": "Đã tiêu thụ"
+    },
+    "filter": {
+      "label": "Hiển thị",
+      "all": "Tất cả",
+      "in": "Chuyển vào",
+      "out": "Chuyển ra",
+      "empty": "Chưa có giao dịch nào theo chiều này."
+    },
+    "columns": {
+      "activity": "Hoạt động",
+      "counterparty": "Địa chỉ đối ứng"
+    },
+    "invalidAddress": {
+      "title": "Địa chỉ không hợp lệ",
+      "description": "Liên kết cần một địa chỉ đầy đủ: 0x và 40 chữ cái, chữ số theo sau.",
+      "action": "Xem danh sách người tham gia"
     }
   },
   "ethAllocations": {

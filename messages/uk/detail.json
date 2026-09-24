@@ -33,29 +33,22 @@
     "nameHistory": "Історія імен",
     "ownershipHistory": "Історія власників"
   },
-  "transferDialog": {
-    "title": "Підтвердити передачу",
-    "description": "Схоже, адреса отримувача ще не має історії транзакцій. Уважно перевірте її, перш ніж підтвердити передачу токена.",
-    "confirm": "Так, передати"
-  },
   "ownerActions": {
     "title": "Керування токеном",
-    "titleTooltip": "Як поточний власник, ви можете додати цей токен до MetaMask, передати його або дати йому ім’я.",
-    "metaMaskHeading": "Показати в MetaMask",
+    "tabs": {
+      "name": "Ім’я",
+      "transfer": "Передача"
+    },
     "metaMaskTooltip": "Запропонувати розширенню MetaMask для браузера показати цей NFT. Імпорт NFT — експериментальна функція, недоступна в MetaMask Mobile.",
     "addToMetaMask": "Додати NFT у MetaMask",
     "addingToMetaMask": "Додаємо NFT у MetaMask…",
-    "transferHeading": "Передача",
-    "transferTooltip": "Надіслати цей токен на іншу адресу Ethereum. Перевірте адресу перед підтвердженням — передачу неможливо скасувати.",
-    "recipientPlaceholder": "Адреса отримувача (0x…)",
-    "transferButton": "Передати",
-    "nameHeading": "Дати ім’я токену",
-    "renameHeading": "Змінити ім’я токена",
-    "nameTooltip": "Дайте токену власне ім’я (до 32 байтів). Іменовані токени з’являються на сторінці іменованих NFT.",
+    "nameLabel": "Ім’я",
+    "nameHint": "До {max} байтів; ім’я записується в блокчейн і видне всім.",
     "namePlaceholder": "Введіть ім’я токена",
     "setName": "Зберегти ім’я",
     "changeName": "Змінити ім’я",
     "clearName": "Очистити",
+    "transferButton": "Передати {id}",
     "namedTokensCount": "{count, plural, one {Ім’я надано # токену.} few {Ім’я надано # токенам.} many {Ім’я надано # токенам.} other {Ім’я надано # токена.}}",
     "viewAllNamedTokens": "Переглянути всі іменовані токени"
   },

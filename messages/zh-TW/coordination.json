@@ -2,7 +2,25 @@
   "page": {
     "title": "協調變更",
     "subtitle": "協議參數變更與管理事件紀錄",
-    "description": "在週期開啟窗口內，合約所有者可以調整 Cosmic Signature 的協議參數。此紀錄完整公開每次變更，包括落筆價格上調、時間增量和錨定配發設定。所有權一旦放棄，全部參數都將永久保持不變。"
+    "description": "在週期開啟窗口內，合約所有者可以調整 Cosmic Signature 的協議參數。此紀錄完整公開每次變更，包括落筆價格上調、時間增量和錨定配發設定。所有權一旦放棄，全部參數都將永久保持不變。",
+    "loadError": "未能載入協調變更。"
+  },
+  "systemEvent": {
+    "title": "第 {cycle} 個週期前的設定",
+    "titleInitial": "初始設定",
+    "lede": "第 {cycle} 個週期開啟前，合約所有者變更的協議參數，每項皆附新值與交易。",
+    "ledeInitial": "首個週期開啟前，合約所有者設定的協議參數，每項皆附數值與交易。",
+    "figures": {
+      "changes": "變更數",
+      "first": "首次變更",
+      "latest": "最近變更",
+      "changed": "變更時間"
+    },
+    "allChanges": "全部協調變更",
+    "loadError": "未能載入設定變更。",
+    "emptyDescription": "在此期間，協議沿用原有設定。",
+    "invalidTitle": "此設定期間不存在",
+    "invalidDescription": "連結中的週期或事件範圍無效。"
   },
   "events": {
     "undefined": "未定義",

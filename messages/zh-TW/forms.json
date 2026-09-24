@@ -12,5 +12,51 @@
       "friday": "五",
       "saturday": "六"
     }
+  },
+  "transfer": {
+    "recipient": {
+      "label": "接收地址",
+      "placeholder": "0x…",
+      "hint": "接收錢包的完整 0x 地址。",
+      "errors": {
+        "required": "請輸入接收地址。",
+        "invalid": "地址由 0x 加 40 位字母和數字組成。",
+        "checksum": "該地址可能有輸入錯誤：大小寫與校驗和不符。",
+        "zero": "零地址無法接收代幣。",
+        "self": "這正是傳送方錢包。"
+      },
+      "check": {
+        "checking": "正在 {network} 上核查該地址…",
+        "failed": "暫時無法在 {network} 上核查該地址。",
+        "checked": "已在 {network} 上核查。",
+        "active": "{count, plural, other {已在 {network} 上傳送過 # 筆交易。}}",
+        "fresh": "新地址：從未在 {network} 上傳送過交易。",
+        "contract": "該地址是合約，可能無法再轉出收到的代幣。",
+        "protocol": "這是 {name} 合約，不接收直接傳送給它的代幣。"
+      }
+    },
+    "amount": {
+      "label": "數量",
+      "available": "可用：{amount}",
+      "availableUnknown": "暫時無法讀取餘額",
+      "max": "最大",
+      "maxAria": "最大：填入全部餘額 {amount}",
+      "errors": {
+        "required": "請輸入數量。",
+        "format": "請輸入數字，例如 {example}。",
+        "precision": "最多保留 {decimals} 位小數。",
+        "zero": "請輸入大於 0 的數量。",
+        "exceedsBalance": "超過了可用的 {amount}。"
+      }
+    },
+    "review": {
+      "title": "核對",
+      "sending": "傳送",
+      "to": "接收方",
+      "final": "傳送後無法撤銷：傳送到錯誤地址的資產無法找回。",
+      "acknowledge": "我已核對該地址，確認傳送。",
+      "acknowledgeRequired": "請先確認已核對地址。",
+      "checking": "正在核查地址…"
+    }
   }
 }

@@ -1,40 +1,31 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowUpRight, SendHorizontal } from 'lucide-react';
-import { toast } from 'sonner';
-import { getAddress, isAddress, zeroAddress, type Hash } from 'viem';
+import { getAddress, isAddress, type Address } from 'viem';
 
 import { cosmicSignatureAbi } from '@/contracts/abis';
-import { getExplorerUrl } from '@/utils';
 
-import { formatCount } from '@/utils/format';
-import { formatId } from '@/utils/format/ids';
-import { useContractAddresses } from '@/contexts/ContractAddressesContext';
-import { useActiveWeb3React } from '@/hooks/web3';
-import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
-import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/navigation';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+import { useNotify } from '@/hooks/useNotify';
+import { useTxFlow, useTxStageLabel } from '@/hooks/useTxFlow';
+import { AnchoringIcon } from '@/lib/conceptIcons';
+import { cn } from '@/lib/utils';
+import { formatCount, formatId, sameAddress } from '@/utils/format';
 import type { CSTTokenInfo } from '@/services/api';
-import { reportError } from '@/utils/errors';
-import { AddressChip } from '@/components/ui/address-chip';
+import { RecipientField } from '@/components/tokens/transfer/RecipientField';
+import { TransferReview, transferGate } from '@/components/tokens/transfer/TransferReview';
+import { parseRecipient } from '@/components/tokens/transfer/recipient';
+import { useRecipientFacts } from '@/components/tokens/transfer/useRecipientFacts';
 import { ArtFrame } from '@/components/ui/art-frame';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { TablePagination } from '@/components/ui/pagination';
+import { TxStatus } from '@/components/ui/tx-status';
 import { ChainGuard } from '@/components/wallet/NetworkGuard';
 
 import { signatureCardSources } from './SignatureCard';
@@ -47,43 +38,26 @@ interface CosmicSignatureNftTransferFormProps {
   historyHref?: string;
 }
 
-interface ValidTransfer {
-  recipient: `0x${string}`;
-  tokenIds: number[];
-}
-
-interface TransferProgress {
-  total: number;
-  completed: number;
-  currentTokenId: number | null;
-  failedTokenId: number | null;
-}
-
 type DisabledReason = 'anchored' | 'ownerChanged';
 
-interface EthereumProvider {
-  request: (args: { method: string; params: unknown[] }) => Promise<unknown>;
+/** Where a batch stands: how many went, and the token it stopped at, if it stopped. */
+interface BatchProgress {
+  total: number;
+  completed: number;
+  stoppedAt: number | null;
 }
 
 /** Signatures shown per page of the picker: two full rows of four. */
 const PAGE_SIZE = 8;
 
-function normalizeAddress(value: string): `0x${string}` | null {
-  const trimmed = value.trim();
-  if (!isAddress(trimmed)) return null;
-  return getAddress(trimmed) as `0x${string}`;
+function toAddress(value: string | null | undefined): Address | null {
+  const trimmed = value?.trim() ?? '';
+  return isAddress(trimmed, { strict: false }) ? getAddress(trimmed) : null;
 }
 
-function isSameAddress(a: string | null | undefined, b: string | null | undefined): boolean {
-  return !!a && !!b && a.toLowerCase() === b.toLowerCase();
-}
-
-function getDisabledReason(
-  token: CSTTokenInfo,
-  sourceAddress: string | null,
-): DisabledReason | null {
+function disabledReason(token: CSTTokenInfo, source: Address | null): DisabledReason | null {
   if (token.Staked) return 'anchored';
-  if (sourceAddress && token.CurOwnerAddr && !isSameAddress(token.CurOwnerAddr, sourceAddress)) {
+  if (source && token.CurOwnerAddr && !sameAddress(token.CurOwnerAddr, source)) {
     return 'ownerChanged';
   }
   return null;
@@ -93,9 +67,12 @@ function getDisabledReason(
  * Sends Signatures from the connected wallet to another address. The picker
  * shows each piece on its plate with a checkbox in its label row (never over
  * the art); anchored pieces and pieces whose owner changed stay visible but
- * cannot be chosen. Each transfer is its own transaction through useTxFlow
- * (chain guard, wallet prompt, pending, confirmed), one after another; a
- * failure stops the run and keeps the transfers already confirmed.
+ * cannot be chosen. The recipient is checked on-chain as it is typed and the
+ * send is reviewed before one commit button asks the wallet once per NFT
+ * through `useTxFlow`. The send waits for the recipient check, and an address
+ * the check flags (new, a contract, or not checked) needs an acknowledgement.
+ * A batch that stops part-way (a rejected prompt, a failure) keeps the NFTs
+ * still to send selected and says where it stopped.
  */
 export function CosmicSignatureNftTransferForm({
   sourceAddress,
@@ -103,468 +80,390 @@ export function CosmicSignatureNftTransferForm({
   description,
   historyHref,
 }: CosmicSignatureNftTransferFormProps) {
-  const t = useTranslations('myPages');
+  const t = useTranslations('myPages.nftTransfer');
   const tToast = useTranslations('toasts');
+  const tReview = useTranslations('forms.transfer.review');
   const tDetail = useTranslations('detail');
   const locale = useLocale();
-  const recipientId = useId();
-  const [recipient, setRecipient] = useState('');
+  const queryClient = useQueryClient();
+  const { cosmicSignature } = useContractAddresses();
+  const { notify } = useNotify();
+  const { run, stage, isBusy } = useTxFlow();
+  const stageLabel = useTxStageLabel();
+
+  const source = toAddress(sourceAddress);
+  const [recipientText, setRecipientText] = useState('');
+  const [recipientTouched, setRecipientTouched] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectionMissing, setSelectionMissing] = useState(false);
   const [page, setPage] = useState(1);
-  const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
-  const [progress, setProgress] = useState<TransferProgress | null>(null);
-  const [txHashes, setTxHashes] = useState<Hash[]>([]);
-  const [warningOpen, setWarningOpen] = useState(false);
-  const [pendingTransfer, setPendingTransfer] = useState<ValidTransfer | null>(null);
+  const [acknowledged, setAcknowledged] = useState(false);
+  const [acknowledgementMissing, setAcknowledgementMissing] = useState(false);
+  const [progress, setProgress] = useState<BatchProgress | null>(null);
+  // The batch as a whole: between two NFTs the flow is briefly idle.
   const [running, setRunning] = useState(false);
 
-  const flow = useTxFlow();
-  const stageLabel = useTxStageLabel();
-  const queryClient = useQueryClient();
-  const contractAddrs = useContractAddresses();
-  const { account, active } = useActiveWeb3React();
-  const submitting = running || flow.isBusy;
+  const recipientRef = useRef<HTMLInputElement>(null);
+  const acknowledgementRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
 
-  const normalizedSource = useMemo(
-    () => (sourceAddress ? normalizeAddress(sourceAddress) : null),
-    [sourceAddress],
-  );
+  const recipient = parseRecipient(recipientText, { from: source });
+  const check = useRecipientFacts(recipient.address);
+  const gate = transferGate(check, acknowledged);
+  const busy = running || isBusy;
 
+  const transferableIds = tokens
+    .filter((token) => !disabledReason(token, source))
+    .map((token) => token.TokenId);
+  // A token that stopped being transferable (released elsewhere, sold) drops out.
+  const selected = selectedIds.filter((id) => transferableIds.includes(id));
   const pageCount = Math.max(1, Math.ceil(tokens.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
-  const pageItems = useMemo(
-    () => tokens.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-    [currentPage, tokens],
-  );
+  const pageItems = tokens.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  const transferableTokenIds = useMemo(
-    () =>
-      tokens
-        .filter((token) => getDisabledReason(token, normalizedSource) === null)
-        .map((token) => token.TokenId),
-    [normalizedSource, tokens],
-  );
-
-  const selectedTransferableIds = useMemo(
-    () => selectedTokenIds.filter((id) => transferableTokenIds.includes(id)),
-    [selectedTokenIds, transferableTokenIds],
-  );
-
-  // A token that stops being transferable (anchored, or sent elsewhere) leaves the selection.
-  useEffect(() => {
-    setSelectedTokenIds((current) => current.filter((id) => transferableTokenIds.includes(id)));
-  }, [transferableTokenIds]);
+  const choose = (ids: number[]) => {
+    setSelectedIds(ids);
+    if (ids.length > 0) setSelectionMissing(false);
+  };
 
   const toggle = (token: CSTTokenInfo) => {
-    if (submitting || getDisabledReason(token, normalizedSource) !== null) return;
-    setSelectedTokenIds((current) =>
+    if (busy || disabledReason(token, source)) return;
+    setSelectionMissing(false);
+    setSelectedIds((current) =>
       current.includes(token.TokenId)
         ? current.filter((id) => id !== token.TokenId)
         : [...current, token.TokenId],
     );
   };
 
-  const validateTransfer = (): ValidTransfer | null => {
-    if (!contractAddrs.cosmicSignature) {
-      toast.error(tToast('transfer.nft.contractUnavailable'));
-      return null;
-    }
-    if (!active || !account) {
-      toast.error(tToast('transfer.nft.walletRequired'));
-      return null;
-    }
-    if (!normalizedSource) {
-      toast.error(tToast('transfer.common.sourceUnavailable'));
-      return null;
-    }
-    if (!isSameAddress(account, normalizedSource)) {
-      toast.error(tToast('transfer.nft.sourceWalletRequired'));
-      return null;
-    }
-    const normalizedRecipient = normalizeAddress(recipient);
-    if (!normalizedRecipient || normalizedRecipient.toLowerCase() === zeroAddress) {
-      toast.error(tToast('transfer.common.invalidRecipient'));
-      return null;
-    }
-    if (isSameAddress(normalizedRecipient, normalizedSource)) {
-      toast.error(tToast('transfer.nft.recipientMustDiffer'));
-      return null;
-    }
-    if (selectedTransferableIds.length === 0) {
-      toast.error(tToast('transfer.nft.selectOne'));
-      return null;
-    }
-    return { recipient: normalizedRecipient, tokenIds: selectedTransferableIds };
+  const changeRecipient = (value: string) => {
+    setRecipientText(value);
+    setAcknowledged(false);
+    setAcknowledgementMissing(false);
   };
 
-  const shouldWarnForNewRecipient = async (address: `0x${string}`): Promise<boolean> => {
-    const ethereum = (window as Window & { ethereum?: EthereumProvider }).ethereum;
-    if (!ethereum) return false;
-    try {
-      const txCount = await ethereum.request({
-        method: 'eth_getTransactionCount',
-        params: [address, 'latest'],
-      });
-      return Number(txCount) === 0;
-    } catch (err) {
-      reportError(err, 'check NFT transfer destination');
-      return false;
+  const sendBatch = async (to: Address, ids: number[]) => {
+    if (!source || !cosmicSignature) {
+      notify('error', tToast('transfer.nft.contractUnavailable'));
+      return;
     }
-  };
-
-  const invalidateTransferQueries = async (transferredIds: number[], to: `0x${string}`) => {
-    if (!normalizedSource) return;
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['cstTokensByUser', normalizedSource] }),
-      queryClient.invalidateQueries({ queryKey: ['cstTokensByUser', to] }),
-      queryClient.invalidateQueries({ queryKey: ['cstTransfers', normalizedSource] }),
-      queryClient.invalidateQueries({ queryKey: ['cstTransfers', to] }),
-      ...transferredIds.map((tokenId) =>
-        queryClient.invalidateQueries({ queryKey: ['cstInfo', tokenId] }),
-      ),
-    ]);
-  };
-
-  const executeTransfer = async ({ recipient: to, tokenIds }: ValidTransfer) => {
-    const contract = contractAddrs.cosmicSignature;
-    if (!normalizedSource || !contract) return;
+    const sent: number[] = [];
     setRunning(true);
-    setTxHashes([]);
-    const total = tokenIds.length;
-    const transferred: number[] = [];
-    const hashes: Hash[] = [];
-
+    setProgress({ total: ids.length, completed: 0, stoppedAt: null });
     try {
-      for (const [index, tokenId] of tokenIds.entries()) {
-        setProgress({ total, completed: index, currentTokenId: tokenId, failedTokenId: null });
-        const last = index === total - 1;
-        const result = await flow.run({
+      for (const tokenId of ids) {
+        const last = sent.length === ids.length - 1;
+        const result = await run({
           write: (ctx) =>
             ctx.writeContract({
-              address: contract as `0x${string}`,
+              address: cosmicSignature as Address,
               abi: cosmicSignatureAbi,
               functionName: 'transferFrom',
-              args: [normalizedSource, to, BigInt(tokenId)],
-              account: normalizedSource,
+              args: [ctx.account, to, BigInt(tokenId)],
             }),
-          // One success toast for the whole run, on the last transfer.
-          successMessage: last ? tToast('transfer.nft.confirmed', { count: total }) : null,
-          failureMessage: tToast('transfer.nft.failedToken', { tokenId }),
-          errorContext: 'Cosmic Signature NFT transfer',
+          // One toast for the batch: each NFT's closes as the next one opens.
+          successMessage: last ? tToast('transfer.nft.confirmed', { count: ids.length }) : null,
+          failureMessage: tToast('transfer.nft.failedToken', { tokenId: formatId(tokenId) }),
+          errorContext: 'nft-transfer',
         });
         if (result.status !== 'confirmed') {
-          setProgress({
-            total,
-            completed: index,
-            currentTokenId: tokenId,
-            failedTokenId: result.status === 'failed' ? tokenId : null,
-          });
+          setProgress({ total: ids.length, completed: sent.length, stoppedAt: tokenId });
           break;
         }
-        transferred.push(tokenId);
-        hashes.push(result.hash);
-        setProgress({ total, completed: index + 1, currentTokenId: tokenId, failedTokenId: null });
+        sent.push(tokenId);
+        setProgress({ total: ids.length, completed: sent.length, stoppedAt: null });
       }
-      if (transferred.length === total) setRecipient('');
+
+      if (sent.length === 0) return;
+      setSelectedIds((current) => current.filter((id) => !sent.includes(id)));
+      if (sent.length === ids.length) {
+        setRecipientText('');
+        setRecipientTouched(false);
+        setAcknowledged(false);
+      }
+      await Promise.all(
+        [
+          ['cstTokensByUser'],
+          ['cstTransfers'],
+          ['ctOwnershipTransfers'],
+          ...sent.map((id) => ['cstInfo', id]),
+        ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
+      );
     } finally {
-      if (transferred.length > 0) {
-        setSelectedTokenIds((current) => current.filter((id) => !transferred.includes(id)));
-        setTxHashes(hashes);
-        await invalidateTransferQueries(transferred, to);
-      }
       setRunning(false);
     }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (submitting) return;
-    const valid = validateTransfer();
-    if (!valid) return;
-    if (await shouldWarnForNewRecipient(valid.recipient)) {
-      setPendingTransfer(valid);
-      setWarningOpen(true);
+    if (busy) return;
+    setRecipientTouched(true);
+    // In the order the form reads: the NFTs, then where they go.
+    if (selected.length === 0) {
+      setSelectionMissing(true);
+      pickerRef.current?.focus();
       return;
     }
-    await executeTransfer(valid);
+    if (recipient.error || !recipient.address) {
+      recipientRef.current?.focus();
+      return;
+    }
+    // Never race the recipient check: its answer decides whether the send
+    // needs an acknowledgement. The button says it is checking meanwhile.
+    if (gate === 'checking') return;
+    if (gate === 'acknowledge') {
+      setAcknowledgementMissing(true);
+      acknowledgementRef.current?.focus();
+      return;
+    }
+    await sendBatch(recipient.address, selected);
   };
 
-  const handleConfirmNewRecipient = async () => {
-    if (!pendingTransfer) return;
-    setWarningOpen(false);
-    const transfer = pendingTransfer;
-    setPendingTransfer(null);
-    await executeTransfer(transfer);
-  };
-
-  const submitDisabled =
-    !active ||
-    !account ||
-    !normalizedSource ||
-    !contractAddrs.cosmicSignature ||
-    selectedTransferableIds.length === 0;
-  // Between two transfers the flow is briefly idle: the run is still sending.
-  const busyLabel = submitting ? (stageLabel(flow.stage) ?? t('nftTransfer.sending')) : null;
+  const idsLabel = selected.map((id) => formatId(id)).join(', ');
+  const busyLabel = busy ? (stageLabel(stage) ?? t('sending')) : null;
+  const reviewShown = recipient.address !== null && selected.length > 0;
+  const checkingRecipient = !busy && recipient.address !== null && gate === 'checking';
 
   return (
-    <>
-      <div className="space-y-8">
-        {description ? (
-          <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
-            {description}
-          </p>
-        ) : null}
+    <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-8">
+      {description ? (
+        <p className="max-w-[var(--measure-lede)] type-body-sm text-muted-foreground">
+          {description}
+        </p>
+      ) : null}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="max-w-2xl space-y-2">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-              <Label htmlFor={recipientId}>{t('nftTransfer.recipientAddress')}</Label>
-              <p className="flex min-w-0 items-center gap-2 type-caption text-subtle">
-                <span>{t('nftTransfer.sourceWallet')}</span>
-                {normalizedSource ? (
-                  <AddressChip
-                    address={normalizedSource}
-                    variant="plain"
-                    href={false}
-                    showCopy={false}
-                  />
-                ) : (
-                  <span>{t('shared.unavailable')}</span>
-                )}
+      {tokens.length === 0 ? (
+        <p className="type-body-sm text-muted-foreground">{t('empty')}</p>
+      ) : (
+        <div
+          ref={pickerRef}
+          tabIndex={-1}
+          role="group"
+          aria-labelledby="nft-transfer-picker-title"
+          aria-describedby={selectionMissing ? 'nft-transfer-picker-error' : undefined}
+          data-testid="nft-transfer-picker"
+          className="flex flex-col gap-5 focus-ring-none"
+        >
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-rule-faint pb-4">
+            <div className="min-w-0">
+              <h3 id="nft-transfer-picker-title" className="type-title text-foreground">
+                {t('pickerTitle')}
+              </h3>
+              <p role="status" className="mt-1 type-caption tabular-nums text-subtle">
+                {t('pickerSummary', {
+                  selected: formatCount(selected.length, locale),
+                  total: formatCount(transferableIds.length, locale),
+                })}
               </p>
             </div>
-            <Input
-              id={recipientId}
-              value={recipient}
-              onChange={(event) => setRecipient(event.target.value)}
-              placeholder="0x…"
-              autoComplete="off"
-              spellCheck={false}
-              disabled={submitting}
-              className="font-mono"
-            />
-          </div>
-
-          {tokens.length === 0 ? (
-            <p className="type-body-sm text-muted-foreground">{t('nftTransfer.empty')}</p>
-          ) : (
-            <fieldset className="space-y-5" data-testid="nft-transfer-picker">
-              <legend className="sr-only">{t('nftTransfer.pickerTitle')}</legend>
-              <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-rule-faint pb-4">
-                <div className="min-w-0">
-                  <p aria-hidden className="type-title text-foreground">
-                    {t('nftTransfer.pickerTitle')}
-                  </p>
-                  <p role="status" className="mt-1 type-caption tabular-nums text-subtle">
-                    {t('nftTransfer.pickerSummary', {
-                      selected: formatCount(selectedTransferableIds.length, locale),
-                      total: formatCount(transferableTokenIds.length, locale),
-                    })}
-                  </p>
-                </div>
-                {/* Ghost buttons: -mx-3 lines their labels up with the rule's edges. */}
-                <div className="-mx-3 flex flex-wrap gap-x-1">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={submitting || transferableTokenIds.length === 0}
-                    onClick={() => setSelectedTokenIds(transferableTokenIds)}
-                  >
-                    {t('nftTransfer.selectAll')}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={submitting || pageItems.length === 0}
-                    onClick={() =>
-                      setSelectedTokenIds(
-                        pageItems
-                          .filter((token) => getDisabledReason(token, normalizedSource) === null)
-                          .map((token) => token.TokenId),
-                      )
-                    }
-                  >
-                    {t('nftTransfer.selectPage')}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={submitting || selectedTransferableIds.length === 0}
-                    onClick={() => setSelectedTokenIds([])}
-                  >
-                    {t('nftTransfer.clear')}
-                  </Button>
-                </div>
-              </div>
-
-              <ul
-                className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4"
-                aria-label={t('nftTransfer.listAria')}
+            {/* Ghost buttons: -mx-3 lines their labels up with the rule's edges. */}
+            <div className="-mx-3 flex flex-wrap gap-x-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={busy || transferableIds.length === 0}
+                onClick={() => choose(transferableIds)}
               >
-                {pageItems.map((token) => {
-                  const reason = getDisabledReason(token, normalizedSource);
-                  const selected = selectedTokenIds.includes(token.TokenId);
-                  const id = formatId(token.TokenId);
-                  return (
-                    <li
-                      key={`${token.EvtLogId}-${token.TokenId}`}
-                      data-testid={`nft-row-${token.TokenId}`}
-                      onClick={() => toggle(token)}
-                      className={cn(
-                        'min-w-0 rounded-control p-2 transition-colors duration-[var(--duration-fast)]',
-                        reason === null && !submitting
-                          ? 'cursor-pointer hover:bg-surface-raised'
-                          : 'cursor-not-allowed',
-                        selected && 'bg-primary/10 hover:bg-primary/15',
-                      )}
-                    >
-                      <ArtFrame
-                        sources={signatureCardSources(token.Seed)}
-                        alt=""
-                        sizes="(min-width: 1024px) 12rem, (min-width: 640px) 30vw, 45vw"
-                        density="compact"
-                        unavailableLabel={tDetail('image.artworkUnavailable')}
-                        className={cn(
-                          selected &&
-                            'after:shadow-[inset_0_0_0_2px_var(--color-primary)] hover:after:shadow-[inset_0_0_0_2px_var(--color-primary)]',
-                          reason !== null && 'opacity-50',
-                        )}
-                      />
-                      <div className="mt-2.5 flex items-start gap-2.5">
-                        <span className="mt-0.5 inline-flex">
-                          <Checkbox
-                            checked={selected}
-                            disabled={reason !== null || submitting}
-                            aria-label={t('nftTransfer.selectAria', { id: token.TokenId })}
-                            onChange={() => toggle(token)}
-                            onClick={(event) => event.stopPropagation()}
-                          />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate type-body-sm font-medium text-foreground">
-                            {token.TokenName ? (
-                              token.TokenName
-                            ) : (
-                              <span className="tabular-nums">{id}</span>
-                            )}
-                          </p>
-                          <p className="type-caption text-subtle">
-                            {token.TokenName ? <span className="type-mono">{id}</span> : null}
-                            {token.TokenName ? ' · ' : null}
-                            {token.RoundNum != null ? (
-                              <Link
-                                href={`/allocation/${token.RoundNum}`}
-                                className="link-quiet"
-                                onClick={(event) => event.stopPropagation()}
-                              >
-                                {t('nftTransfer.cycle', {
-                                  cycle: formatCount(token.RoundNum, locale),
-                                })}
-                              </Link>
-                            ) : (
-                              t('nftTransfer.cycleUnavailable')
-                            )}
-                          </p>
-                          {reason ? (
-                            <Badge tone="attention" size="sm" className="mt-1.5">
-                              {reason === 'anchored'
-                                ? t('nftTransfer.statusLabels.anchored')
-                                : t('nftTransfer.statusLabels.ownerChanged')}
-                            </Badge>
-                          ) : null}
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              <TablePagination
-                page={currentPage}
-                pageSize={PAGE_SIZE}
-                total={tokens.length}
-                onPageChange={setPage}
-                className="sm:pl-0"
-              />
-            </fieldset>
-          )}
-
-          {progress ? (
-            <p
-              role="status"
-              className={cn(
-                'type-body-sm',
-                progress.failedTokenId === null ? 'text-muted-foreground' : 'text-critical',
-              )}
-            >
-              {progress.failedTokenId === null
-                ? t('nftTransfer.progress.transferred', {
-                    completed: formatCount(progress.completed, locale),
-                    total: formatCount(progress.total, locale),
-                  })
-                : t('nftTransfer.progress.stopped', { id: progress.failedTokenId })}
-              {running && progress.currentTokenId !== null ? (
-                <span className="text-subtle">
-                  {' · '}
-                  {t('nftTransfer.progress.current', { id: progress.currentTokenId })}
-                </span>
-              ) : null}
-            </p>
-          ) : null}
-
-          {txHashes.length > 0 ? (
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1 type-body-sm">
-              <span className="text-positive">
-                {txHashes.length === 1
-                  ? t('nftTransfer.confirmation.latest')
-                  : t('nftTransfer.confirmation.multiple', { count: txHashes.length })}
-              </span>
-              <a
-                href={getExplorerUrl('tx', txHashes[txHashes.length - 1]!)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link inline-flex items-center gap-1"
-              >
-                {t('nftTransfer.confirmation.viewLatest')}
-                <ArrowUpRight className="size-3.5" aria-hidden />
-              </a>
-            </p>
-          ) : null}
-
-          <div className="flex flex-col gap-4 border-t border-rule-faint pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <ChainGuard>
-              <Button type="submit" disabled={submitDisabled} loading={submitting}>
-                <SendHorizontal aria-hidden />
-                {busyLabel ?? t('nftTransfer.send')}
+                {t('selectAll')}
               </Button>
-            </ChainGuard>
-            {historyHref ? (
-              <Link href={historyHref} className="link type-body-sm">
-                {t('nftTransfer.viewHistory')}
-              </Link>
-            ) : null}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={busy || pageItems.length === 0}
+                onClick={() =>
+                  choose(
+                    pageItems
+                      .filter((token) => !disabledReason(token, source))
+                      .map((token) => token.TokenId),
+                  )
+                }
+              >
+                {t('selectPage')}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={busy || selected.length === 0}
+                onClick={() => setSelectedIds([])}
+              >
+                {t('clear')}
+              </Button>
+            </div>
           </div>
-        </form>
-      </div>
 
-      <Dialog open={warningOpen} onOpenChange={setWarningOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('nftTransfer.warning.title')}</DialogTitle>
-            <DialogDescription>{t('nftTransfer.warning.description')}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setWarningOpen(false)}>
-              {t('nftTransfer.warning.cancel')}
-            </Button>
-            <Button onClick={() => void handleConfirmNewRecipient()}>
-              {t('nftTransfer.warning.continue')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+          <ul
+            className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4"
+            aria-label={t('listAria')}
+          >
+            {pageItems.map((token) => {
+              const reason = disabledReason(token, source);
+              const isSelected = selected.includes(token.TokenId);
+              const id = formatId(token.TokenId);
+              return (
+                <li
+                  key={`${token.EvtLogId}-${token.TokenId}`}
+                  data-testid={`nft-row-${token.TokenId}`}
+                  onClick={() => toggle(token)}
+                  className={cn(
+                    'min-w-0 rounded-control p-2 transition-colors duration-[var(--duration-fast)]',
+                    reason === null && !busy
+                      ? 'cursor-pointer hover:bg-surface-raised'
+                      : 'cursor-not-allowed',
+                    isSelected && 'bg-primary/10 hover:bg-primary/15',
+                  )}
+                >
+                  <ArtFrame
+                    sources={signatureCardSources(token.Seed)}
+                    alt=""
+                    sizes="(min-width: 1024px) 12rem, (min-width: 640px) 30vw, 45vw"
+                    density="compact"
+                    unavailableLabel={tDetail('image.artworkUnavailable')}
+                    className={cn(
+                      isSelected &&
+                        'after:shadow-[inset_0_0_0_2px_var(--color-primary)] hover:after:shadow-[inset_0_0_0_2px_var(--color-primary)]',
+                      reason !== null && 'opacity-50',
+                    )}
+                  />
+                  <div className="mt-2.5 flex items-start gap-2.5">
+                    <span className="mt-0.5 inline-flex">
+                      <Checkbox
+                        checked={isSelected}
+                        disabled={reason !== null || busy}
+                        aria-label={t('selectAria', { id })}
+                        onChange={() => toggle(token)}
+                        onClick={(event) => event.stopPropagation()}
+                      />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate type-body-sm font-medium text-foreground">
+                        {token.TokenName ? (
+                          token.TokenName
+                        ) : (
+                          <span className="tabular-nums">{id}</span>
+                        )}
+                      </p>
+                      <p className="type-caption text-subtle">
+                        {token.TokenName ? <span className="type-mono">{id}</span> : null}
+                        {token.TokenName ? ' · ' : null}
+                        {token.RoundNum != null ? (
+                          <Link
+                            href={`/allocation/${token.RoundNum}`}
+                            className="link-quiet"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            {t('cycle', { cycle: formatCount(token.RoundNum, locale) })}
+                          </Link>
+                        ) : (
+                          t('cycleUnavailable')
+                        )}
+                      </p>
+                      {reason === 'anchored' ? (
+                        <Badge size="sm" icon={<AnchoringIcon />} className="mt-1.5">
+                          {t('statusLabels.anchored')}
+                        </Badge>
+                      ) : reason === 'ownerChanged' ? (
+                        <Badge size="sm" tone="attention" className="mt-1.5">
+                          {t('statusLabels.ownerChanged')}
+                        </Badge>
+                      ) : null}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+
+          <TablePagination
+            page={currentPage}
+            pageSize={PAGE_SIZE}
+            total={tokens.length}
+            onPageChange={setPage}
+            className="sm:pl-0"
+          />
+
+          {selectionMissing ? (
+            <p id="nft-transfer-picker-error" className="type-caption text-critical">
+              {tToast('transfer.nft.selectOne')}
+            </p>
+          ) : null}
+        </div>
+      )}
+
+      <RecipientField
+        inputRef={recipientRef}
+        value={recipientText}
+        onChange={changeRecipient}
+        onBlur={() => setRecipientTouched(true)}
+        error={recipientTouched ? recipient.error : null}
+        check={check}
+        reviewShown={reviewShown}
+        disabled={busy}
+      />
+
+      {recipient.address && reviewShown ? (
+        <TransferReview
+          sending={
+            <span className="flex flex-col items-end gap-0.5">
+              <span>{t('review.count', { count: selected.length })}</span>
+              <span className="type-mono text-muted-foreground [overflow-wrap:anywhere]">
+                {idsLabel}
+              </span>
+            </span>
+          }
+          recipient={recipient.address}
+          check={check}
+          acknowledged={acknowledged}
+          onAcknowledgedChange={(next) => {
+            setAcknowledged(next);
+            if (next) setAcknowledgementMissing(false);
+          }}
+          acknowledgementMissing={acknowledgementMissing}
+          acknowledgementRef={acknowledgementRef}
+        />
+      ) : null}
+
+      <div className="flex flex-col gap-3 border-t border-rule-faint pt-6">
+        <ChainGuard requireConnection buttonClassName="w-full sm:w-auto">
+          <Button
+            type="submit"
+            variant="commit"
+            size="lg"
+            loading={busy || checkingRecipient}
+            className="w-full sm:w-auto sm:self-start"
+          >
+            {busyLabel ??
+              (checkingRecipient
+                ? tReview('checking')
+                : selected.length > 0
+                  ? t('sendCount', { count: selected.length })
+                  : t('send'))}
+          </Button>
+        </ChainGuard>
+        {progress && progress.total > 1 ? (
+          <p className="type-body-sm text-muted-foreground tabular-nums" role="status">
+            {progress.stoppedAt !== null
+              ? t('progress.stopped', {
+                  completed: progress.completed,
+                  total: progress.total,
+                  id: formatId(progress.stoppedAt),
+                })
+              : t('progress.transferred', { completed: progress.completed, total: progress.total })}
+          </p>
+        ) : null}
+        <TxStatus stage={stage} />
+        {historyHref ? (
+          <Link
+            href={historyHref}
+            className="link-quiet inline-flex min-h-6 items-center gap-1.5 self-start type-body-sm text-foreground"
+          >
+            {t('viewHistory')}
+            <ArrowRight aria-hidden className="size-3.5 text-subtle" />
+          </Link>
+        ) : null}
+      </div>
+    </form>
   );
 }

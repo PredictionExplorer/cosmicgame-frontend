@@ -3,10 +3,8 @@
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { PageHeader } from '@/components/layout/PageHeader';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
 import { AddressChip } from '@/components/ui/address-chip';
-import { RouteGroupNav } from '@/components/layout/RouteGroupNav';
-import { PageShell } from '@/components/ui/page-shell';
 import {
   CharityDepositTable,
   type PublicGoodsContributionEntry,
@@ -14,28 +12,26 @@ import {
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
-/** `seoSummary` is the server-rendered page header, the page's only header. */
-const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+/**
+ * Voluntary Public Goods contributions: ETH sent straight to the Public Goods
+ * Vault. `header` is the server-rendered page header, with the group's tabs
+ * on its rule.
+ */
+const CharityDepositsVoluntary = ({ header }: { header: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const tTables = useTranslations('tables');
   const tFormats = useTranslations('formats');
   const { charity } = useContractAddresses();
-  const { data: voluntaryDeposits = [], isLoading: loading } = useCharityVoluntary();
+  const { data, isLoading, isError, refetch } = useCharityVoluntary();
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      {seoSummary ?? (
-        <PageHeader
-          section="records"
-          title={t('voluntary.title')}
-          subtitle={t('voluntary.subtitle')}
-        />
-      )}
-      <RouteGroupNav group="publicGoods" current="publicGoodsVoluntary" />
+    <LedgerPage header={header}>
       <CharityDepositTable
-        list={voluntaryDeposits as PublicGoodsContributionEntry[]}
-        loading={loading}
-        title={tTables('names.publicGoodsContributions')}
+        list={(data ?? []) as PublicGoodsContributionEntry[]}
+        loading={isLoading}
+        error={isError ? t('loadError') : undefined}
+        onRetry={() => void refetch()}
+        title={t('voluntaryLedger')}
         emptyDescription={tTables('publicGoods.voluntaryEmpty')}
         emptyAction={
           charity ? (
@@ -50,7 +46,7 @@ const CharityDepositsVoluntary = ({ seoSummary }: { seoSummary?: ReactNode }) =>
           ) : null
         }
       />
-    </PageShell>
+    </LedgerPage>
   );
 };
 

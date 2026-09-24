@@ -1,8 +1,18 @@
-import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import type { ReactNode } from 'react';
+import { render as renderWithoutProviders } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
+import { getAddress } from 'viem';
 
-import { render, screen, fireEvent, checkA11y, waitFor, act, within } from '@/test-utils';
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { WalletUiProvider } from '@/contexts/WalletUiContext';
+
+import { render, screen, fireEvent, checkA11y, act, within } from '@/test-utils';
 
 import NFTTrait from '../NFTTrait';
+
+/** The connected wallet; mixed case, as wallets report it. */
+const OWNER = '0xAbCdEf0123456789aBcDeF0123456789AbCdEf01';
 
 /* ── framer-motion mock ───────────────────────────────────────── */
 jest.mock('framer-motion', () => {
@@ -60,24 +70,7 @@ jest.mock('../../../hooks/useApiQuery', () => ({
 }));
 
 jest.mock('../../../hooks/web3', () => ({
-  useActiveWeb3React: () => ({ account: '0xOwner' }),
-}));
-
-const mockWaitForTransactionReceipt = jest.fn();
-jest.mock('wagmi', () => ({
-  usePublicClient: () => ({ waitForTransactionReceipt: mockWaitForTransactionReceipt }),
-}));
-
-const mockEnsureCorrectChain = jest.fn<Promise<boolean>, []>();
-jest.mock('../../../hooks/useRequireChain', () => ({
-  useRequireChain: () => ({
-    requiredChainId: 421614,
-    connectedChainId: 421614,
-    isWrongChain: false,
-    isConnected: true,
-    switchToRequiredChain: jest.fn(),
-    ensureCorrectChain: mockEnsureCorrectChain,
-  }),
+  useActiveWeb3React: () => ({ account: OWNER }),
 }));
 
 const mockRouterPush = jest.fn();
@@ -85,20 +78,12 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockRouterPush }),
 }));
 
-const mockTransferFrom = jest.fn();
-const mockSetNftName = jest.fn();
 const mockTotalSupply = jest.fn().mockResolvedValue(BigInt(100));
 jest.mock('../../../hooks/useCosmicSignatureContract', () => ({
   __esModule: true,
   default: () => ({
     read: { totalSupply: mockTotalSupply },
-    write: { transferFrom: mockTransferFrom, setNftName: mockSetNftName },
   }),
-}));
-
-const mockSetNotification = jest.fn();
-jest.mock('../../../contexts/NotificationContext', () => ({
-  useNotification: () => ({ setNotification: mockSetNotification }),
 }));
 
 const mockReportError = jest.fn();
@@ -139,26 +124,16 @@ jest.mock('../NFTMetadata', () => ({
 }));
 jest.mock('../NFTOwnerActions', () => ({
   NFTOwnerActions: (props: {
-    onAddressChange: (value: string) => void;
-    onTransfer: () => void;
-    onSetName: () => void;
-    onClearName: () => void;
+    owner: string;
+    onTransferred: () => unknown;
+    onRenamed: () => unknown;
   }) => (
-    <div data-testid="owner-actions">
-      <button
-        type="button"
-        onClick={() => props.onAddressChange('0x1111111111111111111111111111111111111111')}
-      >
-        Set recipient
+    <div data-testid="owner-actions" data-owner={props.owner}>
+      <button type="button" onClick={() => void props.onTransferred()}>
+        Confirm test transfer
       </button>
-      <button type="button" onClick={props.onTransfer}>
-        Transfer test NFT
-      </button>
-      <button type="button" onClick={props.onSetName}>
-        Set test name
-      </button>
-      <button type="button" onClick={props.onClearName}>
-        Clear test name
+      <button type="button" onClick={() => void props.onRenamed()}>
+        Confirm test name
       </button>
     </div>
   ),
@@ -173,15 +148,7 @@ jest.mock('../../../components/tables/TransferHistoryTable', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockEnsureCorrectChain.mockResolvedValue(true);
   mockRouterPush.mockClear();
-  mockTransferFrom.mockResolvedValue('0xtransfer');
-  mockSetNftName.mockResolvedValue('0xname');
-  mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
-  Object.defineProperty(window, 'ethereum', {
-    configurable: true,
-    value: { request: jest.fn().mockResolvedValue('0x1') },
-  });
 });
 
 const baseNft = {
@@ -190,7 +157,7 @@ const baseNft = {
   TimeStamp: 1700000000,
   TxHash: '0xTx',
   WinnerAddr: '0xWinner',
-  CurOwnerAddr: '0xOwner',
+  CurOwnerAddr: OWNER.toLowerCase(),
   RoundNum: 3,
   RecordType: 3,
   TokenName: 'MyToken',
@@ -441,11 +408,67 @@ describe('NFTTrait', () => {
     expect(screen.queryByTestId('name-history-table')).not.toBeInTheDocument();
   });
 
-  it('renders owner actions when account matches owner', () => {
+  it('gives the owner their tools beside the plate, whatever the address case', () => {
     withDashboard();
-    withNft({ CurOwnerAddr: '0xOwner' });
+    withNft({ CurOwnerAddr: OWNER.toLowerCase() });
     render(<NFTTrait tokenId={5} />);
+    const actions = screen.getByTestId('owner-actions');
+    expect(within(screen.getByTestId('hero-section')).getByTestId('owner-actions')).toBe(actions);
+    // The checksummed wallet is the transfer's sender.
+    expect(actions).toHaveAttribute('data-owner', getAddress(OWNER));
+  });
+
+  it('keeps the owner’s tools out of the server HTML, so hydration matches (regression)', async () => {
+    // A wallet that reconnected before hydration put the tools in the first
+    // client render: React logged a mismatch and rebuilt the whole page.
+    withDashboard();
+    withNft({ CurOwnerAddr: OWNER });
+    // The same providers on both sides, so only the page itself can differ.
+    const Providers = ({ children }: { children: ReactNode }) => (
+      <TooltipProvider delayDuration={0}>
+        <WalletUiProvider>{children}</WalletUiProvider>
+      </TooltipProvider>
+    );
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(
+      <Providers>
+        <NFTTrait tokenId={5} />
+      </Providers>,
+    );
+    document.body.appendChild(container);
+    expect(container.querySelector('[data-testid="owner-actions"]')).toBeNull();
+
+    const errors = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    renderWithoutProviders(<NFTTrait tokenId={5} />, {
+      container,
+      hydrate: true,
+      wrapper: Providers,
+    });
+    await act(async () => undefined);
+    const hydrationErrors = errors.mock.calls.filter((call) =>
+      /hydrat/i.test(call.map(String).join(' ')),
+    );
+    errors.mockRestore();
+
+    expect(hydrationErrors).toEqual([]);
     expect(screen.getByTestId('owner-actions')).toBeInTheDocument();
+    container.remove();
+  });
+
+  it('refreshes the token and its ownership history after a confirmed transfer', () => {
+    const refetchCSTInfo = jest.fn();
+    const refetchTransfers = jest.fn();
+    withDashboard();
+    mockUseCSTInfo.mockReturnValue({ data: baseNft, isLoading: false, refetch: refetchCSTInfo });
+    mockUseCTOwnershipTransfers.mockReturnValue({
+      data: [],
+      isLoading: false,
+      refetch: refetchTransfers,
+    });
+    render(<NFTTrait tokenId={5} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm test transfer' }));
+    expect(refetchCSTInfo).toHaveBeenCalledTimes(1);
+    expect(refetchTransfers).toHaveBeenCalledTimes(1);
   });
 
   it('hides owner actions when account does not match', () => {
@@ -556,108 +579,6 @@ describe('NFTTrait', () => {
     });
   });
 
-  it('shows a localized success notification after a confirmed NFT transfer', async () => {
-    withDashboard();
-    withNft();
-    withNameHistory();
-    render(<NFTTrait tokenId={5} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
-
-    await waitFor(() =>
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.transfer.nft.detailTransferConfirmed',
-        type: 'success',
-        visible: true,
-      }),
-    );
-    expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtransfer' });
-  });
-
-  it('treats wallet rejection code 4001 as informational', async () => {
-    mockTransferFrom.mockRejectedValueOnce({ code: 4001 });
-    withDashboard();
-    withNft();
-    render(<NFTTrait tokenId={5} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
-
-    await waitFor(() =>
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.walletTransactionCancelled',
-        type: 'info',
-        visible: true,
-      }),
-    );
-    expect(mockReportError).not.toHaveBeenCalled();
-  });
-
-  it('reports transfer RPC failures with a localized fallback', async () => {
-    const error = new Error('RPC failed');
-    mockTransferFrom.mockRejectedValueOnce(error);
-    withDashboard();
-    withNft();
-    render(<NFTTrait tokenId={5} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
-
-    await waitFor(() =>
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.transfer.nft.failed',
-        type: 'error',
-        visible: true,
-      }),
-    );
-    expect(mockReportError).toHaveBeenCalledWith(error, 'transfer Cosmic Signature NFT');
-  });
-
-  it('does not report a reverted transfer receipt as success', async () => {
-    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
-    withDashboard();
-    withNft();
-    render(<NFTTrait tokenId={5} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
-
-    await waitFor(() =>
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.transfer.nft.failed',
-        type: 'error',
-        visible: true,
-      }),
-    );
-    expect(mockSetNotification).not.toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'success' }),
-    );
-  });
-
-  it('localizes token naming success and failure notifications', async () => {
-    withDashboard();
-    withNft();
-    render(<NFTTrait tokenId={5} />);
-
-    fireEvent.click(screen.getByRole('button', { name: 'Set test name' }));
-    await waitFor(() =>
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.transfer.nft.nameSet',
-        type: 'success',
-        visible: true,
-      }),
-    );
-
-    const error = new Error('clear failed');
-    mockSetNftName.mockRejectedValueOnce(error);
-    fireEvent.click(screen.getByRole('button', { name: 'Clear test name' }));
-    await waitFor(() =>
-      expect(mockSetNotification).toHaveBeenCalledWith({
-        text: 'toasts.transfer.nft.nameClearFailed',
-        type: 'error',
-        visible: true,
-      }),
-    );
-    expect(mockReportError).toHaveBeenCalledWith(error, 'clear Cosmic Signature NFT name');
-  });
-
   it('has no accessibility violations while loading', async () => {
     mockUseCSTInfo.mockReturnValue({ data: undefined, isLoading: true, refetch: jest.fn() });
     const { container } = render(<NFTTrait tokenId={5} />);
@@ -670,80 +591,6 @@ describe('NFTTrait', () => {
     withNameHistory();
     const { container } = render(<NFTTrait tokenId={5} />);
     await checkA11y(container);
-  });
-
-  describe('transaction failure feedback', () => {
-    it('tells the user when no injected wallet is available to check the recipient', async () => {
-      Object.defineProperty(window, 'ethereum', { configurable: true, value: undefined });
-      withDashboard();
-      withNft();
-      render(<NFTTrait tokenId={5} />);
-
-      fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
-      fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
-
-      await waitFor(() =>
-        expect(mockSetNotification).toHaveBeenCalledWith({
-          text: 'toasts.wallet.notReady',
-          type: 'error',
-          visible: true,
-        }),
-      );
-      expect(mockTransferFrom).not.toHaveBeenCalled();
-    });
-
-    it('reports and surfaces a failed recipient pre-check instead of doing nothing', async () => {
-      const checkError = new Error('eth_getTransactionCount failed');
-      Object.defineProperty(window, 'ethereum', {
-        configurable: true,
-        value: { request: jest.fn().mockRejectedValue(checkError) },
-      });
-      withDashboard();
-      withNft();
-      render(<NFTTrait tokenId={5} />);
-
-      fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
-      fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
-
-      await waitFor(() =>
-        expect(mockSetNotification).toHaveBeenCalledWith({
-          text: 'toasts.transfer.nft.recipientCheckFailed',
-          type: 'error',
-          visible: true,
-        }),
-      );
-      expect(mockReportError).toHaveBeenCalledWith(checkError, 'check transfer destination');
-    });
-  });
-
-  describe('chain guard', () => {
-    it('blocks the transfer write when the wallet is on the wrong chain', async () => {
-      mockEnsureCorrectChain.mockResolvedValue(false);
-      withDashboard();
-      withNft();
-      render(<NFTTrait tokenId={5} />);
-
-      fireEvent.click(screen.getByRole('button', { name: 'Set recipient' }));
-      fireEvent.click(screen.getByRole('button', { name: 'Transfer test NFT' }));
-
-      await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalled());
-      expect(mockTransferFrom).not.toHaveBeenCalled();
-    });
-
-    it('blocks the naming writes on the same mismatch', async () => {
-      mockEnsureCorrectChain.mockResolvedValue(false);
-      withDashboard();
-      withNft();
-      render(<NFTTrait tokenId={5} />);
-
-      fireEvent.click(screen.getByRole('button', { name: 'Set test name' }));
-      await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalled());
-      expect(mockSetNftName).not.toHaveBeenCalled();
-
-      fireEvent.click(screen.getByRole('button', { name: 'Clear test name' }));
-      await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(2));
-      expect(mockSetNftName).not.toHaveBeenCalled();
-    });
   });
 
   describe('deferred name refetch cleanup', () => {
@@ -772,7 +619,7 @@ describe('NFTTrait', () => {
 
       const { unmount } = render(<NFTTrait tokenId={5} />);
 
-      fireEvent.click(screen.getByRole('button', { name: 'Set test name' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Confirm test name' }));
       await act(async () => {
         await Promise.resolve();
         await Promise.resolve();
@@ -807,7 +654,7 @@ describe('NFTTrait', () => {
 
       render(<NFTTrait tokenId={5} />);
 
-      fireEvent.click(screen.getByRole('button', { name: 'Set test name' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Confirm test name' }));
       await act(async () => {
         await Promise.resolve();
         await Promise.resolve();

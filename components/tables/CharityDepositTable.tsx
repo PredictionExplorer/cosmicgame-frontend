@@ -69,7 +69,10 @@ export const CharityDepositTable = ({ list, ...state }: CharityDepositTableProps
     <DataTable
       data={list}
       columns={columns}
-      ariaLabel={t('names.publicGoodsContributions')}
+      // The page's own title names it (voluntary and protocol ledgers differ).
+      ariaLabel={
+        typeof state.title === 'string' ? state.title : t('names.publicGoodsContributions')
+      }
       getRowKey={(row) => row.EvtLogId}
       emptyTitle={t('empty.contributions')}
       {...state}

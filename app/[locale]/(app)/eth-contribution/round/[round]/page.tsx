@@ -34,7 +34,7 @@ export default async function Page({
   const { locale, round } = await params;
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['ethContribution', 'marketing', 'tables']}>
+    <PageMessages namespaces={['ethContribution', 'tables']}>
       <EthDonationByRoundPage round={Number(round)} />
     </PageMessages>
   );

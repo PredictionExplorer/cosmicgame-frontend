@@ -1,8 +1,26 @@
 {
   "page": {
-    "title": "Coordination Changes",
+    "title": "Coordination changes",
     "subtitle": "History of protocol parameter changes and admin events",
-    "description": "The contract owner can adjust protocol parameters during cycle activation windows. This log records those changes, including Gesture Cost increases, time extensions, and Anchor Distribution settings. Once the owner renounces ownership, these parameters can no longer be changed."
+    "description": "The contract owner can adjust protocol parameters during cycle activation windows. This log records those changes, including Gesture Cost increases, time extensions, and Anchor Distribution settings. Once the owner renounces ownership, these parameters can no longer be changed.",
+    "loadError": "The coordination changes could not be loaded."
+  },
+  "systemEvent": {
+    "title": "Configuration before cycle {cycle}",
+    "titleInitial": "Initial configuration",
+    "lede": "The protocol parameters the contract owner changed before cycle {cycle} opened, each with its new value and transaction.",
+    "ledeInitial": "The protocol parameters the contract owner set before the first cycle opened, each with its value and transaction.",
+    "figures": {
+      "changes": "Changes",
+      "first": "First change",
+      "latest": "Latest change",
+      "changed": "Changed"
+    },
+    "allChanges": "All coordination changes",
+    "loadError": "The configuration changes could not be loaded.",
+    "emptyDescription": "The protocol kept its existing settings through this window.",
+    "invalidTitle": "This configuration window does not exist",
+    "invalidDescription": "The cycle or event range in the link is not valid."
   },
   "events": {
     "undefined": "Unknown event",

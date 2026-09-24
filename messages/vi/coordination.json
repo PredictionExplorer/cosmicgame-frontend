@@ -2,7 +2,25 @@
   "page": {
     "title": "Thay đổi điều phối",
     "subtitle": "Lịch sử thay đổi tham số giao thức và các sự kiện quản trị",
-    "description": "Chủ sở hữu hợp đồng có thể điều chỉnh tham số của Cosmic Signature trong các cửa sổ kích hoạt chu kỳ. Nhật ký ghi lại từng thay đổi, từ mức tăng chi phí nét bút và thời gian cộng thêm đến thiết lập phân phối neo giữ. Khi chủ sở hữu từ bỏ quyền sở hữu, mọi tham số sẽ cố định vĩnh viễn."
+    "description": "Chủ sở hữu hợp đồng có thể điều chỉnh tham số của Cosmic Signature trong các cửa sổ kích hoạt chu kỳ. Nhật ký ghi lại từng thay đổi, từ mức tăng chi phí nét bút và thời gian cộng thêm đến thiết lập phân phối neo giữ. Khi chủ sở hữu từ bỏ quyền sở hữu, mọi tham số sẽ cố định vĩnh viễn.",
+    "loadError": "Không tải được các thay đổi điều phối."
+  },
+  "systemEvent": {
+    "title": "Cấu hình trước chu kỳ {cycle}",
+    "titleInitial": "Cấu hình ban đầu",
+    "lede": "Các tham số giao thức mà chủ sở hữu hợp đồng đã thay đổi trước khi chu kỳ {cycle} mở, kèm giá trị mới và giao dịch của từng thay đổi.",
+    "ledeInitial": "Các tham số giao thức mà chủ sở hữu hợp đồng đã đặt trước khi chu kỳ đầu tiên mở, kèm giá trị và giao dịch của từng tham số.",
+    "figures": {
+      "changes": "Số thay đổi",
+      "first": "Thay đổi đầu tiên",
+      "latest": "Thay đổi gần nhất",
+      "changed": "Thời điểm thay đổi"
+    },
+    "allChanges": "Tất cả thay đổi điều phối",
+    "loadError": "Không tải được các thay đổi cấu hình.",
+    "emptyDescription": "Trong khoảng này, giao thức giữ nguyên các thiết lập sẵn có.",
+    "invalidTitle": "Không có khoảng cấu hình này",
+    "invalidDescription": "Chu kỳ hoặc phạm vi sự kiện trong liên kết không hợp lệ."
   },
   "events": {
     "undefined": "Không xác định",

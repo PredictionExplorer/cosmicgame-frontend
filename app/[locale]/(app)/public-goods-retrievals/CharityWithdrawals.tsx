@@ -3,36 +3,32 @@
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { PageHeader } from '@/components/layout/PageHeader';
-import { RouteGroupNav } from '@/components/layout/RouteGroupNav';
-import { PageShell } from '@/components/ui/page-shell';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
 import CharityWithdrawalTable, {
   type CharityWithdrawal,
 } from '@/components/tables/CharityWithdrawalTable';
 import { useCharityWithdrawals } from '@/hooks/useApiQuery';
 
-/** `seoSummary` is the server-rendered page header, the page's only header. */
-const CharityWithdrawals = ({ seoSummary }: { seoSummary?: ReactNode }) => {
+/**
+ * Public Goods retrievals: ETH forwarded out of the Public Goods Vault to its
+ * beneficiary. `header` is the server-rendered page header, with the group's
+ * tabs on its rule.
+ */
+const CharityWithdrawals = ({ header }: { header: ReactNode }) => {
   const t = useTranslations('publicGoods');
   const tTables = useTranslations('tables');
-  const { data: charityWithdrawals = [], isLoading: loading } = useCharityWithdrawals();
+  const { data, isLoading, isError, refetch } = useCharityWithdrawals();
 
   return (
-    <PageShell variant="data" backdrop="signature">
-      {seoSummary ?? (
-        <PageHeader
-          section="records"
-          title={t('retrievals.title')}
-          subtitle={t('retrievals.subtitle')}
-        />
-      )}
-      <RouteGroupNav group="publicGoods" current="publicGoodsRetrievals" />
+    <LedgerPage header={header}>
       <CharityWithdrawalTable
-        list={charityWithdrawals as CharityWithdrawal[]}
-        loading={loading}
+        list={(data ?? []) as CharityWithdrawal[]}
+        loading={isLoading}
+        error={isError ? t('loadError') : undefined}
+        onRetry={() => void refetch()}
         title={tTables('names.publicGoodsRetrievals')}
       />
-    </PageShell>
+    </LedgerPage>
   );
 };
 

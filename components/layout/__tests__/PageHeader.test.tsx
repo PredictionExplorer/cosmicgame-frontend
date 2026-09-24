@@ -166,6 +166,22 @@ describe('PageHeader', () => {
       expect(within(figure as HTMLElement).getByText('this cycle')).toBeInTheDocument();
     });
 
+    it('keeps a long figure at figure-md where counts step up to figure-lg', () => {
+      render(
+        <PageHeader
+          title="Ledger"
+          figures={[
+            { id: 'count', label: 'Changes', value: '3' },
+            { id: 'date', label: 'Changed', value: 'Aug 06, 2026, 04:44', size: 'md' },
+          ]}
+        />,
+      );
+      const value = (id: string) => document.querySelector(`[data-figure="${id}"] dd`);
+      expect(value('count')).toHaveClass('type-figure-md', 'lg:type-figure-lg');
+      expect(value('date')).toHaveClass('type-figure-md');
+      expect(value('date')).not.toHaveClass('lg:type-figure-lg');
+    });
+
     it('renders an unknown figure as a dash announced as unavailable, never as zero', () => {
       render(
         <PageHeader title="Ledger" figures={[{ id: 'total', label: 'Total', value: null }]} />,

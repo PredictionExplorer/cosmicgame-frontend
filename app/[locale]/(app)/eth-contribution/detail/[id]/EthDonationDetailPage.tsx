@@ -1,260 +1,220 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import type { ReactNode } from 'react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
-import { getExplorerUrl, getMetadata } from '@/utils';
-
 import { Link } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import {
-  DefinitionList,
-  DetailRow,
-  SectionCard,
-  detailLinkClass,
-  detailPanelClass,
-} from '@/components/detail-page/DetailPageChrome';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { ErrorState } from '@/components/ui/error-state';
-import { PageShell } from '@/components/ui/page-shell';
-import { UnknownValue } from '@/components/ui/unknown-value';
+import { ContributionIcon } from '@/lib/conceptIcons';
+import { formatAddress, formatCount } from '@/utils/format';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
-import { cn } from '@/lib/utils';
-import { formatFixed } from '@/utils/format';
+import { parseContributionNote } from '@/components/contributions/contributionNote';
+import { LedgerPage } from '@/components/ledger/LedgerPage';
+import { PageHeader, type PageHeaderFigure } from '@/components/layout/PageHeader';
+import { AddressChip } from '@/components/ui/address-chip';
+import { Amount } from '@/components/ui/amount';
+import { TxProofLink } from '@/components/ui/data-table';
+import { DateTime } from '@/components/ui/date-time';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { SectionHeader } from '@/components/ui/section-header';
+import { Skeleton, SkeletonDetailRows } from '@/components/ui/skeleton';
 
 interface EthDonationDetailPageProps {
   id: number;
 }
 
+/** A label and its value on one hairline row; the value wraps under the label on phones. */
+function SpecRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="grid gap-1 py-3.5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:items-baseline sm:gap-6">
+      <dt className="type-label text-subtle">{label}</dt>
+      <dd className="min-w-0 type-body-sm text-foreground">{children}</dd>
+    </div>
+  );
+}
+
+function BackToAll() {
+  const t = useTranslations('ethContribution.detail');
+  return (
+    <Link href="/eth-contribution" className="link inline-flex items-center gap-1.5 type-body-sm">
+      {t('backToAll')}
+      <ArrowRight aria-hidden className="size-3.5" />
+    </Link>
+  );
+}
+
+/**
+ * One direct ETH contribution. The header leads with what a reader came for
+ * — how much, from whom, in which cycle and when, each said once on the
+ * page — and the body gives the contributor's note as a pull quote, then the
+ * on-chain record: its transaction and id. The note's link is shown, never
+ * fetched: opening a record page does not make the visitor's browser call a
+ * stranger's server.
+ */
 const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
+  const t = useTranslations('ethContribution.detail');
   const locale = useLocale();
-  const t = useTranslations('ethContribution');
-  const tCommon = useTranslations('common');
-  const {
-    data: rawDonationInfo,
-    isLoading: loading,
-    isError,
-    refetch,
-  } = useDonationsWithInfoById(id);
-  const donationInfo =
-    (rawDonationInfo as {
-      TxHash: string;
-      TimeStamp: number;
-      DonorAddr: string;
-      RoundNum: number;
-      AmountEth: number;
-      DataJson?: string;
-      [key: string]: unknown;
-    } | null) ?? null;
+  const valid = Number.isInteger(id) && id >= 0;
+  const { data, isLoading, isError, refetch } = useDonationsWithInfoById(valid ? id : null);
+  const trail = [{ label: t('breadcrumbContributions'), href: '/eth-contribution' }];
 
-  const [dataJson, setDataJson] = useState<{
-    title?: string;
-    message?: string;
-    url?: string;
-  } | null>(null);
-  const [metaData, setMetaData] = useState<{
-    description?: string;
-    Keywords?: string;
-    image?: string;
-  } | null>(null);
+  if (!valid) {
+    return (
+      <LedgerPage
+        width="narrow"
+        header={<PageHeader section="records" breadcrumbs={trail} title={t('invalidId')} />}
+      >
+        <EmptyState
+          variant="page"
+          headingLevel={2}
+          icon={<ContributionIcon aria-hidden />}
+          title={t('invalidIdTitle')}
+          description={t('invalidIdDescription')}
+          action={<BackToAll />}
+        />
+      </LedgerPage>
+    );
+  }
 
-  useEffect(() => {
-    if (!donationInfo) return;
-    if (!donationInfo.DataJson) return;
-
-    try {
-      const jsonData = JSON.parse(String(donationInfo.DataJson));
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDataJson(jsonData);
-      getMetadata(jsonData.url).then(setMetaData);
-    } catch {
-      // JSON parse error - ignore
-    }
-  }, [donationInfo]);
-
-  // A contribution sits under the contributions ledger; the subtitle names its id.
-  const contributionsTrail = [
-    { label: t('detail.breadcrumbContributions'), href: '/eth-contribution' },
+  const pending = isLoading ? <Skeleton className="h-7 w-24" /> : null;
+  const figures: PageHeaderFigure[] = [
+    {
+      id: 'amount',
+      label: t('figures.amount'),
+      value: data ? <Amount value={data.AmountEth} unit="ETH" /> : pending,
+    },
+    {
+      // The contributor as hex at the figure's own size, not a 12px chip.
+      id: 'from',
+      label: t('figures.from'),
+      value: data?.DonorAddr ? <AddressChip address={data.DonorAddr} variant="plain" /> : pending,
+      size: 'md',
+    },
+    {
+      id: 'cycle',
+      label: t('figures.cycle'),
+      value: data ? (
+        <Link
+          href={`/eth-contribution/round/${data.RoundNum}`}
+          title={t('cycleLink', { cycle: data.RoundNum })}
+          className="link-quiet"
+        >
+          {formatCount(data.RoundNum, locale)}
+        </Link>
+      ) : (
+        pending
+      ),
+    },
+    {
+      id: 'date',
+      label: t('figures.date'),
+      value: data ? <DateTime timestamp={data.TimeStamp} year="always" /> : pending,
+      size: 'md',
+    },
   ];
 
-  if (!Number.isInteger(id) || id < 0) {
+  const header = (
+    <PageHeader
+      section="records"
+      breadcrumbs={trail}
+      title={t('title', { id })}
+      subtitle={data ? t('lede', { cycle: data.RoundNum }) : undefined}
+      figures={isError || (!isLoading && !data) ? undefined : figures}
+    />
+  );
+
+  if (isError) {
     return (
-      <PageShell variant="data" backdrop="signature">
-        <div className={cn(detailPanelClass, 'mx-auto max-w-lg p-8 text-center')}>
-          <p className="font-display text-lg font-semibold text-foreground">
-            {t('detail.invalidId')}
-          </p>
-        </div>
-      </PageShell>
+      <LedgerPage width="narrow" header={header}>
+        <ErrorState headingLevel={2} message={t('loadError')} onRetry={() => void refetch()} />
+      </LedgerPage>
     );
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
-        <div className="mx-auto max-w-3xl">
-          <PageHeader
-            title={t('detail.title')}
-            subtitle={t('detail.loadingSubtitle')}
-            section="records"
-            breadcrumbs={contributionsTrail}
-          />
-          <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="text-sm font-medium text-muted-foreground">{t('detail.loading')}</p>
-          </div>
-        </div>
-      </PageShell>
+      <LedgerPage width="narrow" header={header}>
+        <SkeletonDetailRows rows={2} />
+      </LedgerPage>
     );
   }
 
-  // A failed read is not a missing record: offer a retry instead of "not found".
-  if (isError || !donationInfo) {
+  if (!data) {
     return (
-      <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
-        <div className="mx-auto max-w-3xl">
-          <PageHeader
-            title={t('detail.title')}
-            section="records"
-            breadcrumbs={contributionsTrail}
-          />
-          {isError ? (
-            <div className={detailPanelClass}>
-              <ErrorState headingLevel={2} onRetry={() => void refetch()} />
-            </div>
-          ) : (
-            <div className={cn(detailPanelClass, 'p-10 text-center')}>
-              <p className="font-medium text-foreground">{t('detail.notFound')}</p>
-            </div>
-          )}
-        </div>
-      </PageShell>
+      <LedgerPage width="narrow" header={header}>
+        <EmptyState
+          variant="page"
+          headingLevel={2}
+          icon={<ContributionIcon aria-hidden />}
+          title={t('notFoundTitle', { id })}
+          description={t('notFoundDescription')}
+          action={<BackToAll />}
+        />
+      </LedgerPage>
     );
   }
+
+  const note = parseContributionNote(data.DataJson);
+  const noteHost = note.kind === 'note' && note.url ? new URL(note.url).host : null;
 
   return (
-    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
-      <div className="mx-auto max-w-3xl">
-        <PageHeader
-          title={t('detail.title')}
-          subtitle={t('detail.subtitle', { id })}
-          section="records"
-          breadcrumbs={contributionsTrail}
-        />
-
-        <SectionCard
-          sectionId="eth-donation-core"
-          title={t('detail.contributionTitle')}
-          description={t('detail.contributionDescription')}
-        >
-          <DefinitionList>
-            <DetailRow label={t('detail.datetimeLabel')}>
-              <a
-                href={getExplorerUrl('tx', donationInfo.TxHash)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={detailLinkClass}
-              >
-                <HydrationSafeDateTime timestamp={donationInfo.TimeStamp} locale={locale} />
-              </a>
-              <span className="mt-1 block text-xs text-muted-foreground">
-                {t('detail.explorerHelp')}
-              </span>
-            </DetailRow>
-            <DetailRow label={t('detail.contributorAddressLabel')}>
-              {donationInfo.DonorAddr ? (
-                <Link
-                  href={`/user/${donationInfo.DonorAddr}`}
-                  className={cn(detailLinkClass, 'font-mono text-[13px] break-all')}
-                >
-                  {donationInfo.DonorAddr}
-                </Link>
-              ) : (
-                <UnknownValue label={tCommon('status.unavailable')} />
-              )}
-            </DetailRow>
-            <DetailRow label={t('detail.cycleNumberLabel')}>
-              <Link
-                href={`/eth-contribution/round/${donationInfo.RoundNum}`}
-                className={detailLinkClass}
-              >
-                {t('detail.cycleValue', { cycle: donationInfo.RoundNum })}
-              </Link>
-            </DetailRow>
-            <DetailRow label={t('detail.amountLabel')}>
-              <span className="font-mono tabular-nums">
-                {formatFixed(donationInfo.AmountEth, 2)} ETH
-              </span>
-            </DetailRow>
-          </DefinitionList>
-        </SectionCard>
-
-        {dataJson ? (
-          <SectionCard
-            sectionId="eth-donation-json"
-            title={t('detail.messageTitle')}
-            description={t('detail.messageDescription')}
-          >
-            <DefinitionList>
-              <DetailRow label={t('detail.titleLabel')}>{dataJson.title ?? '—'}</DetailRow>
-              <DetailRow label={t('detail.messageLabel')}>{dataJson.message ?? '—'}</DetailRow>
-              <DetailRow label={t('detail.urlLabel')}>
-                {dataJson.url ? (
+    <LedgerPage width="narrow" header={header}>
+      {note.kind !== 'none' ? (
+        <section aria-labelledby="contribution-note">
+          <SectionHeader headingId="contribution-note" title={t('noteTitle')} />
+          {note.kind === 'note' ? (
+            <figure className="border-s-2 border-primary ps-5">
+              {note.title ? (
+                <p className="type-heading-3 text-foreground [overflow-wrap:anywhere]">
+                  {note.title}
+                </p>
+              ) : null}
+              {note.message ? (
+                <blockquote className="mt-2 whitespace-pre-line type-body-lg text-foreground [overflow-wrap:anywhere]">
+                  {note.message}
+                </blockquote>
+              ) : null}
+              {note.url ? (
+                <figcaption className="mt-4">
                   <a
-                    href={dataJson.url}
+                    href={note.url}
                     target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(detailLinkClass, 'break-all')}
+                    rel="noopener noreferrer nofollow ugc"
+                    className="link inline-flex max-w-full items-center gap-1 type-body-sm [overflow-wrap:anywhere]"
                   >
-                    {dataJson.url}
+                    {noteHost}
+                    <ArrowUpRight aria-hidden className="size-3.5 shrink-0" />
+                    <span className="sr-only">{t('opensInNewTab')}</span>
                   </a>
-                ) : (
-                  '—'
-                )}
-              </DetailRow>
-            </DefinitionList>
-          </SectionCard>
-        ) : null}
-
-        {metaData?.description || metaData?.Keywords ? (
-          <SectionCard
-            sectionId="eth-donation-meta-text"
-            title={t('detail.linkPreviewTitle')}
-            description={t('detail.linkPreviewDescription')}
-          >
-            <DefinitionList>
-              {metaData?.description ? (
-                <DetailRow label={t('detail.metaDescriptionLabel')}>
-                  {metaData.description}
-                </DetailRow>
+                </figcaption>
               ) : null}
-              {metaData?.Keywords ? (
-                <DetailRow label={t('detail.metaKeywordsLabel')}>{metaData.Keywords}</DetailRow>
-              ) : null}
-            </DefinitionList>
-          </SectionCard>
-        ) : null}
+            </figure>
+          ) : (
+            <pre className="whitespace-pre-wrap rounded-control bg-surface-sunken p-4 type-hash text-foreground">
+              {note.text}
+            </pre>
+          )}
+          <p className="mt-3 type-caption text-subtle">
+            {note.kind === 'note' ? t('noteCaption') : t('noteRawCaption')}
+          </p>
+        </section>
+      ) : null}
 
-        {metaData?.image ? (
-          <SectionCard
-            sectionId="eth-donation-meta-image"
-            title={t('detail.metaImageTitle')}
-            description={t('detail.metaImageDescription')}
-          >
-            <div className="px-4 pb-5 pt-2 sm:px-5">
-              <Image
-                src={metaData.image}
-                width={1200}
-                height={675}
-                alt={t('detail.metaImageAlt')}
-                className="h-auto w-full rounded-lg border border-white/[0.06]"
-                unoptimized
-              />
-            </div>
-          </SectionCard>
-        ) : null}
-      </div>
-    </PageShell>
+      <section aria-labelledby="contribution-record">
+        <SectionHeader headingId="contribution-record" title={t('recordTitle')} />
+        <dl className="divide-y divide-rule-faint border-y border-rule-faint">
+          <SpecRow label={t('transactionLabel')}>
+            <TxProofLink hash={data.TxHash} className="type-hash">
+              {formatAddress(data.TxHash)}
+            </TxProofLink>
+          </SpecRow>
+          <SpecRow label={t('recordLabel')}>
+            <span className="type-mono">{t('recordValue', { id })}</span>
+          </SpecRow>
+        </dl>
+      </section>
+    </LedgerPage>
   );
 };
 

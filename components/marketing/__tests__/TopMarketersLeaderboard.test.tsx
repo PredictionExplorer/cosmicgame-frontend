@@ -1,142 +1,107 @@
-import { TooltipProvider } from '@/components/ui/tooltip';
 import type { MarketingReward } from '@/services/api/types';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, checkA11y, within } from '@/test-utils';
 
 import { TopMarketersLeaderboard } from '../TopMarketersLeaderboard';
 
-const renderWithTooltip = (ui: React.ReactElement) =>
-  render(<TooltipProvider>{ui}</TooltipProvider>);
-
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
-  return {
-    motion: new Proxy(
-      {},
-      {
-        get: (_target: unknown, prop: string) => {
-          if (!cache[prop]) {
-            const Comp = React.forwardRef(function MotionProxy(
-              props: Record<string, unknown>,
-              ref: React.Ref<HTMLElement>,
-            ) {
-              const {
-                initial: _i,
-                animate: _a,
-                whileInView: _w,
-                viewport: _v,
-                transition: _t,
-                variants: _va,
-                ...rest
-              } = props;
-              return React.createElement(prop, { ...rest, ref });
-            });
-            Comp.displayName = `motion.${prop}`;
-            cache[prop] = Comp;
-          }
-          return cache[prop];
-        },
-      },
-    ),
-    useInView: () => true,
-  };
-});
-
-jest.mock('../../../components/common/AddressLink', () => ({
-  AddressLink: ({ address, url }: { address: string; url: string }) => (
-    <a href={url} data-testid="address-link">
-      {address}
-    </a>
-  ),
-}));
+const address = (digit: number) => `0x${String(digit).repeat(40)}`;
 
 const makeReward = (addr: string, amount: number, id: number): MarketingReward => ({
   EvtLogId: id,
   TxHash: `0x${id}`,
-  TimeStamp: Date.now() / 1000,
+  TimeStamp: 1_700_000_000 + id,
   MarketerAddr: addr,
   AmountEth: amount,
 });
 
+const bodyRows = (container: HTMLElement) => Array.from(container.querySelectorAll('tbody tr'));
+
 describe('TopMarketersLeaderboard', () => {
-  it('renders the section heading', () => {
-    renderWithTooltip(<TopMarketersLeaderboard rewards={[]} />);
-    expect(screen.getByText('Top Outreach Contributors')).toBeInTheDocument();
+  it('is a titled ledger with a line on how it is ranked', () => {
+    render(<TopMarketersLeaderboard rewards={[makeReward(address(1), 10, 1)]} />);
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'marketing.leaderboard.title' }),
+    ).toBeVisible();
+    expect(screen.getByText('marketing.leaderboard.description')).toBeVisible();
   });
 
-  it('shows empty state when no rewards', () => {
-    renderWithTooltip(<TopMarketersLeaderboard rewards={[]} />);
-    expect(screen.getByText('No outreach contributors yet.')).toBeInTheDocument();
-  });
-
-  it('aggregates and ranks marketers by total earned', () => {
-    const rewards = [
-      makeReward('0xAAA', 10, 1),
-      makeReward('0xBBB', 50, 2),
-      makeReward('0xAAA', 30, 3),
-    ];
-    renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-
-    const links = screen.getAllByTestId('address-link');
-    expect(links[0]).toHaveTextContent('0xBBB');
-    expect(links[1]).toHaveTextContent('0xAAA');
-  });
-
-  it('shows rank numbers', () => {
-    const rewards = [makeReward('0xAAA', 100, 1), makeReward('0xBBB', 50, 2)];
-    renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-    expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
-  });
-
-  it('limits to top 5 marketers', () => {
-    const rewards = Array.from({ length: 8 }, (_, i) =>
-      makeReward(`0x${String(i).padStart(40, '0')}`, (8 - i) * 10, i),
+  it('ranks contributors by CST received, each linked to their outreach history', () => {
+    const { container } = render(
+      <TopMarketersLeaderboard
+        rewards={[
+          makeReward(address(1), 10, 1),
+          makeReward(address(2), 50, 2),
+          makeReward(address(1), 30, 3),
+        ]}
+      />,
     );
-    renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-    const links = screen.getAllByTestId('address-link');
-    expect(links).toHaveLength(5);
+    const rows = bodyRows(container);
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent('1');
+    expect(within(rows[0] as HTMLElement).getByRole('link')).toHaveAttribute(
+      'href',
+      `/marketing/${address(2)}`,
+    );
+    expect(within(rows[1] as HTMLElement).getByRole('link')).toHaveAttribute(
+      'href',
+      `/marketing/${address(1)}`,
+    );
   });
 
-  it('displays total earned with CST suffix', () => {
-    const rewards = [makeReward('0xAAA', 123.45, 1)];
-    renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-    expect(screen.getByText('123.45')).toBeInTheDocument();
-    expect(screen.getByText('CST')).toBeInTheDocument();
+  it('shows each share of all outreach CST, CST received and the allocation count', () => {
+    const { container } = render(
+      <TopMarketersLeaderboard
+        rewards={[
+          makeReward(address(1), 10, 1),
+          makeReward(address(2), 50, 2),
+          makeReward(address(1), 40, 3),
+        ]}
+      />,
+    );
+    const [first] = bodyRows(container);
+    expect(first).toHaveTextContent('50.0%');
+    expect(first).toHaveTextContent('50.00');
+    expect(first?.querySelector('.bg-track-outreach')).toHaveStyle({ width: '50%' });
+    const second = bodyRows(container)[1] as HTMLElement;
+    expect(second).toHaveTextContent('2');
   });
 
-  it('displays reward count', () => {
-    const rewards = [
-      makeReward('0xAAA', 10, 1),
-      makeReward('0xAAA', 20, 2),
-      makeReward('0xAAA', 30, 3),
-    ];
-    renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-    expect(screen.getByText('3 allocations')).toBeInTheDocument();
+  it('explains the share column from its header', () => {
+    render(<TopMarketersLeaderboard rewards={[makeReward(address(1), 10, 1)]} />);
+    expect(
+      screen.getAllByRole('button', { name: /marketing\.leaderboard\.columns\.share/ }).length,
+    ).toBeGreaterThan(0);
   });
 
-  it('uses singular "reward" for count of 1', () => {
-    const rewards = [makeReward('0xAAA', 10, 1)];
-    renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-    expect(screen.getByText('1 allocation')).toBeInTheDocument();
+  it('keeps one neutral row style for every rank', () => {
+    const { container } = render(
+      <TopMarketersLeaderboard
+        rewards={[1, 2, 3].map((digit) => makeReward(address(digit), digit * 10, digit))}
+      />,
+    );
+    expect(container.innerHTML).not.toMatch(/yellow-|amber-|gray-300|lucide-trophy/);
   });
 
-  it('links to marketer detail page', () => {
-    const rewards = [makeReward('0xAAA', 10, 1)];
-    renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
-    const link = screen.getByTestId('address-link');
-    expect(link).toHaveAttribute('href', '/marketing/0xAAA');
+  it('ranks at most five contributors by default', () => {
+    const rewards = Array.from({ length: 8 }, (_, index) =>
+      makeReward(address(index + 1), (8 - index) * 10, index),
+    );
+    const { container } = render(<TopMarketersLeaderboard rewards={rewards} />);
+    expect(bodyRows(container)).toHaveLength(5);
   });
 
-  it('has an info tooltip trigger', () => {
-    renderWithTooltip(<TopMarketersLeaderboard rewards={[]} />);
-    expect(screen.getByLabelText('About top outreach contributors')).toBeInTheDocument();
+  it('hands its loading and error states to the table', () => {
+    const onRetry = jest.fn();
+    render(<TopMarketersLeaderboard rewards={[]} error="Nope" onRetry={onRetry} />);
+    expect(screen.getByText('Nope')).toBeVisible();
+    screen.getByRole('button', { name: 'Try again' }).click();
+    expect(onRetry).toHaveBeenCalled();
   });
 
   it('has no accessibility violations', async () => {
-    const rewards = [makeReward('0xAAA', 10, 1)];
-    const { container } = renderWithTooltip(<TopMarketersLeaderboard rewards={rewards} />);
+    const { container } = render(
+      <TopMarketersLeaderboard rewards={[makeReward(address(1), 10, 1)]} />,
+    );
     await checkA11y(container);
   });
 });

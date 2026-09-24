@@ -1,42 +1,18 @@
 'use client';
 
-import {
-  useState,
-  useMemo,
-  useEffect,
-  useCallback,
-  useId,
-  useRef,
-  type ChangeEvent,
-  type ReactNode,
-} from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { usePublicClient } from 'wagmi';
-import { isAddress } from 'viem';
+import { useMemo, useEffect, useCallback, useId, useRef, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
+import { getAddress, isAddress } from 'viem';
 
-import { formatId } from '@/utils';
-
+import { formatId, sameAddress } from '@/utils/format';
 import { useCollectionTraits, useNftMetadata } from '@/hooks/useNftTraits';
 import { normalizeTraitEntry, type CosmicSignatureMetadata } from '@/lib/nftMetadata';
 import { useRouter } from '@/i18n/navigation';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
 import NameHistoryTable from '@/components/tables/NameHistoryTable';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { useRequireChain } from '@/hooks/useRequireChain';
-import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
-import { useNotification } from '@/contexts/NotificationContext';
+import { useHydrated } from '@/hooks/useHydrated';
 import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
-import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
-import { assertSuccessfulTransactionReceipt, assertTransactionHash } from '@/utils/transactions';
 import {
   useDashboardInfo,
   useCSTInfo,
@@ -165,15 +141,9 @@ function DetailSection({
  */
 const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => {
   const t = useTranslations('detail');
-  const tCommon = useTranslations('common');
-  const tToasts = useTranslations('toasts');
   const tTraits = useTranslations('traits');
   const signatureAlt = useSignatureAlt();
   const titleId = useId();
-  const locale = useLocale();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [address, setAddress] = useState('');
-  const [tokenName, setTokenName] = useState('');
 
   // The count only bounds the "next" link, so it need not poll on an art page.
   const { data: dashboard } = useDashboardInfo(undefined, { poll: false });
@@ -207,11 +177,11 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
   const renderPending = isRenderPending(nft?.TimeStamp, nowMs);
 
   const router = useRouter();
-  const nftContract = useCosmicSignatureContract();
   const { account } = useActiveWeb3React();
-  const publicClient = usePublicClient();
-  const { setNotification } = useNotification();
-  const { ensureCorrectChain } = useRequireChain();
+  // The server renders without a wallet: the owner's tools wait for
+  // hydration, so a wallet that reconnects first cannot change the first
+  // client render and make React discard the page's server HTML.
+  const hydrated = useHydrated();
   const { isMetaMaskConnected, isAddingNft, addCosmicSignatureNft } = useMetaMaskWatchAsset();
 
   const nameRefetchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -234,7 +204,15 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
     timers.add(timerId);
   }, []);
 
-  const isOwner = account != null && account === nft?.CurOwnerAddr;
+  // The connected wallet, when it owns this token: the owner's tools appear.
+  const owner =
+    hydrated &&
+    account &&
+    nft?.CurOwnerAddr &&
+    sameAddress(account, nft.CurOwnerAddr) &&
+    isAddress(account)
+      ? getAddress(account)
+      : null;
   const totalImprints = dashboard?.MainStats?.NumCSTokenMints ?? null;
   const { previous: previousId, next: nextId } = neighbourIds(tokenId, totalImprints);
 
@@ -249,172 +227,6 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [previousId, nextId, router]);
-
-  const handleClickTransfer = async () => {
-    if (!isAddress(address)) {
-      setNotification({
-        text: tToasts('transfer.common.invalidRecipient'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-    const { ethereum } = window as Window & {
-      ethereum?: { request: (args: { method: string; params: unknown[] }) => Promise<unknown> };
-    };
-    if (!ethereum) {
-      setNotification({
-        text: tToasts('wallet.notReady'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-    try {
-      const txCount = await ethereum.request({
-        method: 'eth_getTransactionCount',
-        params: [address, 'latest'],
-      });
-      if (Number(txCount) === 0) {
-        setOpenDialog(true);
-      } else {
-        await handleTransfer();
-      }
-    } catch (err) {
-      reportError(err, 'check transfer destination');
-      setNotification({
-        text: tToasts('transfer.nft.recipientCheckFailed'),
-        type: 'error',
-        visible: true,
-      });
-    }
-  };
-
-  const handleCloseDialog = () => setOpenDialog(false);
-
-  const handleTransfer = async () => {
-    handleCloseDialog();
-    if (!nftContract || !account) return;
-    if (!isAddress(address)) {
-      setNotification({
-        text: tToasts('transfer.common.invalidRecipient'),
-        type: 'error',
-        visible: true,
-      });
-      return;
-    }
-    if (!(await ensureCorrectChain())) return;
-    try {
-      const hash = await nftContract.write.transferFrom?.([account, address, tokenId]);
-      assertTransactionHash(hash);
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      await Promise.all([refetchCSTInfo(), refetchTransferHistory()]);
-      setAddress('');
-      setNotification({
-        text: tToasts('transfer.nft.detailTransferConfirmed'),
-        type: 'success',
-        visible: true,
-      });
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          text: tToasts('walletTransactionCancelled'),
-          type: 'info',
-          visible: true,
-        });
-      } else {
-        reportError(err, 'transfer Cosmic Signature NFT');
-        setNotification({
-          text: getEthErrorMessage(err, tToasts('transfer.nft.failed'), { locale }),
-          type: 'error',
-          visible: true,
-        });
-      }
-    }
-  };
-
-  const handleSetTokenName = async () => {
-    if (!nftContract) return;
-    if (!(await ensureCorrectChain())) return;
-    try {
-      const hash = await nftContract.write.setNftName?.([tokenId, tokenName]);
-      assertTransactionHash(hash);
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      scheduleNameRefetch(() => {
-        void Promise.all([refetchCSTInfo(), refetchNameHistory()]);
-      });
-      setTokenName('');
-      setNotification({
-        text: tToasts('transfer.nft.nameSet'),
-        type: 'success',
-        visible: true,
-      });
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          visible: true,
-          type: 'info',
-          text: tToasts('walletTransactionCancelled'),
-        });
-      } else {
-        reportError(err, 'set Cosmic Signature NFT name');
-        const msg = getEthErrorMessage(err, tToasts('transfer.nft.nameSetFailed'), { locale });
-        setNotification({ visible: true, type: 'error', text: msg });
-      }
-    }
-  };
-
-  const handleClearName = async () => {
-    if (!nftContract) return;
-    if (!(await ensureCorrectChain())) return;
-    try {
-      const hash = await nftContract.write.setNftName?.([tokenId, '']);
-      assertTransactionHash(hash);
-      const receipt = await publicClient?.waitForTransactionReceipt({ hash });
-      assertSuccessfulTransactionReceipt(receipt);
-      scheduleNameRefetch(() => {
-        void Promise.all([refetchCSTInfo(), refetchNameHistory()]);
-      });
-      setTokenName('');
-      setNotification({
-        text: tToasts('transfer.nft.nameCleared'),
-        type: 'success',
-        visible: true,
-      });
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          visible: true,
-          type: 'info',
-          text: tToasts('walletTransactionCancelled'),
-        });
-      } else {
-        reportError(err, 'clear Cosmic Signature NFT name');
-        const msg = getEthErrorMessage(err, tToasts('transfer.nft.nameClearFailed'), { locale });
-        setNotification({ visible: true, type: 'error', text: msg });
-      }
-    }
-  };
-
-  const handleChangeName = (e: ChangeEvent<HTMLInputElement>) => {
-    const inputName = e.target.value;
-    let len = 0;
-    let i;
-    for (i = 0; i < inputName.length; i++) {
-      if (inputName.charCodeAt(i) > 255) {
-        len += 3;
-      } else {
-        len++;
-      }
-      if (len > 32) {
-        i--;
-        break;
-      }
-    }
-    setTokenName(inputName.slice(0, i));
-  };
 
   if (!nft && loadingNFT) {
     return <NFTDetailSkeleton />;
@@ -443,31 +255,52 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
           sizes={PLATE_SIZES}
           navigation={<NFTNeighbourNav tokenId={tokenId} total={totalImprints} />}
           // Never taller than the screen leaves room for; full-bleed on phones.
-          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_var(--art-ratio)))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none"
+          // Beside a taller column (the owner's tools open) the plate stays in
+          // view while the tools scroll, instead of leaving a band of ground.
+          className="mx-auto w-full max-w-[max(20rem,calc((100svh_-_var(--header-height)_-_11rem)_*_var(--art-ratio)))] max-sm:-mx-[var(--gutter)] max-sm:w-auto max-sm:max-w-none lg:sticky lg:top-[var(--sticky-offset)]"
           plateClassName="max-sm:rounded-none"
           controlsClassName="max-sm:px-[var(--gutter)]"
         />
 
-        <NFTIdentity
-          tokenId={tokenId}
-          name={currentName}
-          titleId={titleId}
-          nft={nft}
-          entry={traitEntry}
-          rarity={rarity}
-          rarityTotal={collectionTraits?.rarity.total ?? 0}
-          className="lg:sticky lg:top-[var(--sticky-offset)]"
-          actions={
-            <>
-              <NFTShareMenu imageUrl={media?.sourceImage} videoUrl={media?.video} />
-              <NftMarketplaceButton
-                variant="card"
-                label={t('actions.buyOrSellNfts')}
-                className="h-11 border-input bg-transparent px-3 text-sm font-medium normal-case text-foreground hover:bg-surface sm:h-9"
-              />
-            </>
-          }
-        />
+        {/* The wall label, and for the owner their tools, beside the plate. */}
+        <div className="flex min-w-0 flex-col gap-8 lg:sticky lg:top-[var(--sticky-offset)]">
+          <NFTIdentity
+            tokenId={tokenId}
+            name={currentName}
+            titleId={titleId}
+            nft={nft}
+            entry={traitEntry}
+            rarity={rarity}
+            rarityTotal={collectionTraits?.rarity.total ?? 0}
+            actions={
+              <>
+                <NFTShareMenu imageUrl={media?.sourceImage} videoUrl={media?.video} />
+                <NftMarketplaceButton
+                  variant="card"
+                  label={t('actions.buyOrSellNfts')}
+                  className="h-11 border-input bg-transparent px-3 text-sm font-medium normal-case text-foreground hover:bg-surface sm:h-9"
+                />
+              </>
+            }
+          />
+          {owner ? (
+            <NFTOwnerActions
+              tokenId={tokenId}
+              owner={owner}
+              currentName={currentName ?? ''}
+              totalNamedTokens={dashboard?.MainStats?.TotalNamedTokens ?? null}
+              showMetaMaskAction={isMetaMaskConnected}
+              addingToMetaMask={isAddingNft}
+              onAddToMetaMask={() => void addCosmicSignatureNft(tokenId)}
+              onTransferred={() => Promise.all([refetchCSTInfo(), refetchTransferHistory()])}
+              onRenamed={() =>
+                scheduleNameRefetch(() => {
+                  void Promise.all([refetchCSTInfo(), refetchNameHistory()]);
+                })
+              }
+            />
+          ) : null}
+        </div>
       </section>
 
       {/* The traits and the seed they all derive from, verification data first. */}
@@ -483,28 +316,6 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
         />
       </section>
 
-      {isOwner && (
-        <section className="mt-16">
-          <NFTOwnerActions
-            address={address}
-            tokenName={tokenName}
-            nftTokenName={nft?.TokenName ?? ''}
-            nameHistoryCount={nameHistory.length}
-            currentName={nameHistory[0]?.TokenName ?? ''}
-            totalNamedTokens={dashboard?.MainStats.TotalNamedTokens ?? 0}
-            disabled={!address || address === account}
-            showMetaMaskAction={isMetaMaskConnected}
-            addingToMetaMask={isAddingNft}
-            onAddressChange={setAddress}
-            onTokenNameChange={handleChangeName}
-            onAddToMetaMask={() => void addCosmicSignatureNft(tokenId)}
-            onTransfer={handleClickTransfer}
-            onSetName={handleSetTokenName}
-            onClearName={handleClearName}
-          />
-        </section>
-      )}
-
       {nameHistory.length > 0 && (
         <DetailSection title={t('sections.nameHistory')}>
           <NameHistoryTable list={nameHistory} />
@@ -516,22 +327,6 @@ const NFTTrait = ({ tokenId, initialMetadata, initialToken }: NFTTraitProps) => 
           <TransferHistoryTable list={transferHistory} />
         </DetailSection>
       )}
-
-      {/* Transfer confirmation dialog */}
-      <Dialog open={openDialog} onOpenChange={(open) => !open && handleCloseDialog()}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('transferDialog.title')}</DialogTitle>
-            <DialogDescription>{t('transferDialog.description')}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={handleTransfer}>{t('transferDialog.confirm')}</Button>
-            <Button variant="outline" onClick={handleCloseDialog}>
-              {tCommon('actions.cancel')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

@@ -15,6 +15,8 @@ export interface LedgerStateProps {
   /** A visible heading that also names the table (H2 by default). */
   title?: ReactNode;
   headingLevel?: 2 | 3 | 4;
+  /** A line under the title: what the table lists. */
+  description?: ReactNode;
   /** Explains what the empty table will list, under its empty title. */
   emptyDescription?: string;
   /** A next step from the empty state (a link, an address to send to). */

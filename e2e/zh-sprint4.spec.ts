@@ -158,9 +158,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
       `/zh/cosmic-signature-transfer/${SPRINT4_MOCK_ADDRESS}`,
       'NFT 转移记录 · Cosmic Signature',
     );
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Cosmic Signature NFT 转移记录' }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'NFT 转移记录' })).toBeVisible();
     await expect(page.getByText('暂无 NFT 转移记录。', { exact: true })).toBeVisible();
   });
 
@@ -170,9 +168,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
       `/zh/cosmic-token-transfer/${SPRINT4_MOCK_ADDRESS}`,
       'CST 转账记录 · Cosmic Signature',
     );
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Cosmic Signature CST 转账记录' }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'CST 转账记录' })).toBeVisible();
     await expect(page.getByText('暂无 CST 转账记录。', { exact: true })).toBeVisible();
   });
 

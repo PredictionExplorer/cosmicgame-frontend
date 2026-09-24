@@ -4,10 +4,6 @@
     "unavailable": "Недоступно",
     "yes": "Так",
     "no": "Ні",
-    "datetime": "Дата й час",
-    "from": "Від кого",
-    "to": "Кому",
-    "tokenId": "ID токена",
     "cycle": "Цикл",
     "cycleNumber": "Цикл {cycle}",
     "recipient": "Отримувач"
@@ -272,30 +268,22 @@
   "transferCst": {
     "page": {
       "title": "Переказати CST",
-      "subtitle": "Надішліть свої токени CST Cosmic Signature на іншу адресу.",
-      "sourceLabel": "Під’єднаний гаманець",
-      "description": "Переказуйте CST зі свого під’єднаного гаманця. Транзакцію підписує ваш гаманець, і вона надсилається безпосередньо в контракт токена CST."
+      "subtitle": "Надішліть CST з під’єднаного гаманця на іншу адресу в {network}."
     },
     "form": {
-      "title": "Переказати CST",
-      "sourceWallet": "Гаманець-відправник",
-      "defaultDescription": "Надішліть CST зі свого під’єднаного гаманця на будь-яку адресу.",
-      "available": "Доступно CST",
-      "balanceReadError": "Не вдалося прочитати баланс CST цього гаманця. Спробуйте ще раз.",
-      "decimalsReadWarning": "Не вдалося прочитати кількість десяткових знаків CST; використовуємо 18 знаків після коми.",
-      "recipientAddress": "Адреса отримувача",
-      "amount": "Сума",
-      "sendAria": "Надіслати CST",
-      "sending": "Надсилання…",
       "send": "Надіслати CST",
-      "viewHistory": "Переглянути історію переказів CST",
-      "confirmed": "Переказ підтверджено.",
-      "viewTransaction": "Переглянути транзакцію"
+      "sendAmount": "Надіслати {amount}"
+    },
+    "guide": {
+      "from": "Надсилаєте з",
+      "history": "Ваші перекази CST",
+      "title": "Перед надсиланням",
+      "final": "Переказ остаточний. CST, надіслані на хибну адресу, не повернути.",
+      "network": "Надсилайте лише на адресу, яка може зберігати токени в {network}.",
+      "paste": "Скопіюйте адресу з гаманця отримувача, а не вводьте її вручну."
     }
   },
   "nftTransfer": {
-    "sourceWallet": "Гаманець-відправник",
-    "recipientAddress": "Адреса отримувача",
     "empty": "У цьому гаманці немає Cosmic Signature NFT.",
     "pickerTitle": "Виберіть NFT для передачі",
     "pickerSummary": "Вибрано {selected} з {total} NFT, доступних для передачі.",
@@ -303,7 +291,7 @@
     "selectPage": "Вибрати сторінку",
     "clear": "Зняти вибір",
     "listAria": "Cosmic Signature NFT",
-    "selectAria": "Вибрати NFT #{id}",
+    "selectAria": "Вибрати NFT {id}",
     "cycle": "Цикл {cycle}",
     "cycleUnavailable": "Дані циклу недоступні",
     "statusLabels": {
@@ -312,49 +300,66 @@
     },
     "progress": {
       "transferred": "Передано {completed} з {total} NFT",
-      "stopped": "Передачу зупинено на NFT #{id}",
-      "current": "Поточний NFT: #{id}"
-    },
-    "confirmation": {
-      "latest": "Останню передачу підтверджено.",
-      "multiple": "Підтверджено {count, plural, one {# передачу} few {# передачі} many {# передач} other {# передачі}}.",
-      "viewLatest": "Переглянути останню транзакцію"
+      "stopped": "Зупинено після {completed} з {total}, на NFT {id}. Ненадіслані NFT залишаються вибраними."
     },
     "sending": "Надсилання…",
     "send": "Надіслати вибрані NFT",
     "viewHistory": "Переглянути історію передач NFT",
-    "warning": {
-      "title": "Отримувач не має історії транзакцій",
-      "description": "Схоже, за цією адресою ще не було транзакцій. Перевірте отримувача ще раз перед надсиланням — передачу NFT не можна скасувати.",
-      "cancel": "Скасувати",
-      "continue": "Продовжити передачу"
-    }
+    "review": {
+      "count": "{count, plural, one {# NFT} few {# NFT} many {# NFT} other {# NFT}}"
+    },
+    "sendCount": "{count, plural, one {Надіслати # NFT} few {Надіслати # NFT} many {Надіслати # NFT} other {Надіслати # NFT}}"
   },
   "transferHistory": {
-    "loading": "Завантаження…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Гаманець закріплення Cosmic Signature NFT",
-      "randomWalkAnchoring": "Гаманець закріплення RandomWalk",
-      "outreach": "Гаманець просування",
-      "stellarSelection": "Гаманець зоряного відбору",
-      "publicGoods": "Сховище суспільних благ"
-    },
     "nft": {
-      "title": "Передачі Cosmic Signature NFT",
+      "title": "Передачі NFT",
       "empty": "Передач NFT ще немає.",
-      "invalidAddress": {
-        "title": "Недійсна адреса",
-        "description": "Введіть дійсну адресу гаманця, щоб переглянути історію передач NFT."
+      "lede": "Cosmic Signature NFT, закарбовані на цю адресу, і кожен, який вона отримала чи надіслала.",
+      "emptyDescription": "NFT з’являється на адресі, коли його на неї закарбовують або надсилають з іншого гаманця.",
+      "figures": {
+        "imprinted": "Закарбовано",
+        "received": "Отримано",
+        "sent": "Надіслано"
       }
     },
     "cst": {
-      "title": "Перекази токена CST Cosmic Signature",
+      "title": "Перекази CST",
       "empty": "Переказів CST ще немає.",
-      "invalidAddress": {
-        "title": "Недійсна адреса",
-        "description": "Введіть дійсну адресу гаманця, щоб переглянути історію переказів CST."
-      },
-      "value": "Сума (CST)"
+      "lede": "CST, закарбовані на цю адресу, отримані й надіслані нею, а також витрачені на її жести за CST.",
+      "emptyDescription": "CST з’являються на адресі, коли жест їх закарбовує або інший гаманець їх надсилає.",
+      "figures": {
+        "received": "Отримано",
+        "sent": "Надіслано",
+        "net": "Чиста зміна",
+        "imprintedCaption": "Закарбовано: {amount}",
+        "consumedCaption": "Витрачено: {amount}"
+      }
+    },
+    "switcherLabel": "Історія цієї адреси",
+    "viewOnExplorer": "Переглянути в {explorer}",
+    "error": "Не вдалося завантажити історію цієї адреси.",
+    "count": "{count, plural, one {# запис} few {# записи} many {# записів} other {# запису}}",
+    "activity": {
+      "imprinted": "Закарбовано",
+      "received": "Отримано",
+      "sent": "Надіслано",
+      "consumed": "Витрачено"
+    },
+    "filter": {
+      "label": "Показати",
+      "all": "Усі",
+      "in": "Вхідні",
+      "out": "Вихідні",
+      "empty": "У цьому напрямку ще нічого немає."
+    },
+    "columns": {
+      "activity": "Дія",
+      "counterparty": "Інша сторона"
+    },
+    "invalidAddress": {
+      "title": "Недійсна адреса",
+      "description": "У посиланні має бути повна адреса: 0x і 40 літер та цифр.",
+      "action": "Переглянути учасників"
     }
   },
   "ethAllocations": {

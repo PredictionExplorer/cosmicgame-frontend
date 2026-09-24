@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
+import { RouteGroupNav } from '@/components/layout/RouteGroupNav';
 
 import { PublicDataQuerySeed } from '../PublicDataQuerySeed';
 import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
@@ -36,10 +37,15 @@ export default async function Page({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <PageMessages namespaces={['home', 'marketing', 'publicGoods', 'tables']}>
+    <PageMessages namespaces={['publicGoods', 'tables']}>
       <PublicDataQuerySeed route="public-goods-contributions-cg">
         <CharityCGDeposits
-          seoSummary={<PublicDataRouteSeoSummary route="public-goods-contributions-cg" />}
+          header={
+            <PublicDataRouteSeoSummary
+              route="public-goods-contributions-cg"
+              tabs={<RouteGroupNav group="publicGoods" current="publicGoodsProtocol" />}
+            />
+          }
         />
       </PublicDataQuerySeed>
     </PageMessages>

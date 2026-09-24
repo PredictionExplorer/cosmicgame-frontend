@@ -1,339 +1,261 @@
-import { toast } from 'sonner';
+import type { ReactNode } from 'react';
+import type { Address } from 'viem';
 
 import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
+import { createFakeTxFlow } from '@/test-utils/txFlow';
 
-import { fireEvent, renderWithQuery, screen, waitFor } from '@/test-utils';
+import type { RecipientCheck } from '@/components/tokens/transfer/useRecipientFacts';
+
+import { checkA11y, fireEvent, render, screen, waitFor } from '@/test-utils';
 
 import { CstTransferForm } from '../CstTransferForm';
 
-const SOURCE = '0x1111111111111111111111111111111111111111';
-const OTHER_SOURCE = '0x2222222222222222222222222222222222222222';
-const RECIPIENT = '0x3333333333333333333333333333333333333333';
-const TX_HASH = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const SOURCE = '0x1111111111111111111111111111111111111111' as Address;
+const RECIPIENT = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
+const WEI = 1_000_000_000_000_000_000n;
 
-const mockWriteContract = jest.fn();
-const mockReadContract = jest.fn();
-const mockWaitForTransactionReceipt = jest.fn();
+const mockTx = createFakeTxFlow(SOURCE);
 const mockInvalidateQueries = jest.fn();
-const mockReportError = jest.fn();
+const mockNotify = jest.fn();
+let mockBalance: { data?: bigint; isError: boolean } = { data: 100n * WEI, isError: false };
+let mockCheck: RecipientCheck = { status: 'idle' };
 
-let mockAccount = SOURCE;
-let mockActive = true;
-let mockContractAddresses = TEST_APP_CONTRACT_ADDRESSES;
-
-jest.mock('@wagmi/core', () => ({
-  writeContract: (...args: unknown[]) => mockWriteContract(...args),
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
 }));
 
-const mockEnsureCorrectChain = jest.fn().mockResolvedValue(true);
-jest.mock('@/hooks/useRequireChain', () => ({
-  useRequireChain: () => ({ ensureCorrectChain: mockEnsureCorrectChain }),
+jest.mock('@/hooks/useTxFlow', () => ({
+  useTxFlow: () => mockTx.flow,
+  useTxStageLabel: () => () => null,
 }));
 
-jest.mock('wagmi', () => ({
-  useConfig: () => ({ id: 'test-config' }),
-  usePublicClient: () => ({
-    readContract: (...args: unknown[]) => mockReadContract(...args),
-    waitForTransactionReceipt: (...args: unknown[]) => mockWaitForTransactionReceipt(...args),
-  }),
+jest.mock('@/hooks/useNotify', () => ({
+  useNotify: () => ({ notify: mockNotify }),
 }));
 
-jest.mock('@tanstack/react-query', () => {
-  const actual = jest.requireActual('@tanstack/react-query');
-  return {
-    ...actual,
-    useQueryClient: () => ({
-      invalidateQueries: (...args: unknown[]) => mockInvalidateQueries(...args),
-    }),
+jest.mock('@/contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => TEST_APP_CONTRACT_ADDRESSES,
+}));
+
+jest.mock('@/components/tokens/transfer/useCstBalance', () => ({
+  ...jest.requireActual('@/components/tokens/transfer/useCstBalance'),
+  useCstBalance: () => mockBalance,
+}));
+
+jest.mock('@/components/tokens/transfer/useRecipientFacts', () => ({
+  ...jest.requireActual('@/components/tokens/transfer/useRecipientFacts'),
+  useRecipientFacts: (address: string | null) => (address ? mockCheck : { status: 'idle' }),
+}));
+
+jest.mock('@/components/wallet/NetworkGuard', () => ({
+  ChainGuard: ({ children }: { children: ReactNode }) => children,
+}));
+
+jest.mock('@/components/ui/tx-status', () => ({
+  TxStatus: () => null,
+}));
+
+const recipientField = () => screen.getByLabelText('forms.transfer.recipient.label');
+const amountField = () => screen.getByLabelText(/forms\.transfer\.amount\.label/);
+const sendButton = () => screen.getByRole('button', { name: /^myPages\.transferCst\.form\.send/ });
+
+function fill(recipient: string, amount: string) {
+  fireEvent.change(recipientField(), { target: { value: recipient } });
+  fireEvent.change(amountField(), { target: { value: amount } });
+}
+
+beforeEach(() => {
+  mockTx.reset();
+  mockInvalidateQueries.mockClear();
+  mockNotify.mockClear();
+  mockBalance = { data: 100n * WEI, isError: false };
+  mockCheck = {
+    status: 'ready',
+    facts: { transactionCount: 12, isContract: false },
+    known: null,
+    warning: null,
   };
 });
-
-jest.mock('../../../contexts/ContractAddressesContext', () => ({
-  useContractAddresses: () => mockContractAddresses,
-}));
-
-jest.mock('../../../hooks/web3', () => ({
-  useActiveWeb3React: () => ({
-    account: mockAccount,
-    active: mockActive,
-  }),
-}));
-
-jest.mock('../../../utils/errors', () => {
-  const actual = jest.requireActual('../../../utils/errors');
-  return {
-    ...actual,
-    reportError: (...args: unknown[]) => mockReportError(...args),
-  };
-});
-
-jest.mock('sonner', () => ({
-  toast: {
-    error: jest.fn(),
-    info: jest.fn(),
-    success: jest.fn(),
-    warning: jest.fn(),
-  },
-}));
-
-function setupReadContracts(balance = 100n * 10n ** 18n) {
-  mockReadContract.mockImplementation(({ functionName }: { functionName: string }) => {
-    if (functionName === 'decimals') return Promise.resolve(18);
-    if (functionName === 'balanceOf') return Promise.resolve(balance);
-    return Promise.resolve(null);
-  });
-}
-
-async function renderReadyForm(sourceAddress = SOURCE) {
-  renderWithQuery(
-    <CstTransferForm
-      sourceAddress={sourceAddress}
-      sourceLabel="Test source"
-      historyHref={`/cosmic-token-transfer/${sourceAddress}`}
-    />,
-  );
-  await screen.findByText('100.00 CST');
-}
-
-function fillTransferForm(amount = '12.5', recipient = RECIPIENT) {
-  fireEvent.change(screen.getByLabelText('myPages.transferCst.form.recipientAddress'), {
-    target: { value: recipient },
-  });
-  fireEvent.change(screen.getByLabelText('myPages.transferCst.form.amount'), {
-    target: { value: amount },
-  });
-}
-
-function submitTransferForm() {
-  const button = screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' });
-  const form = button.closest('form');
-  expect(form).not.toBeNull();
-  fireEvent.submit(form!);
-}
 
 describe('CstTransferForm', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockAccount = SOURCE;
-    mockActive = true;
-    mockContractAddresses = TEST_APP_CONTRACT_ADDRESSES;
-    setupReadContracts();
-    mockWriteContract.mockResolvedValue(TX_HASH);
-    mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
-    mockInvalidateQueries.mockResolvedValue(undefined);
-    mockEnsureCorrectChain.mockResolvedValue(true);
-  });
+  it('reviews the transfer, then sends it with the token contract', async () => {
+    render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '25');
 
-  it('renders source wallet, balance, and transfer history link', async () => {
-    await renderReadyForm();
+    // The review shows the whole address, so every character can be compared.
+    const review = screen.getByTestId('transfer-review');
+    expect(review.querySelector('dd.type-hash')?.textContent?.toLowerCase()).toBe(RECIPIENT);
+    expect(sendButton()).toHaveTextContent('myPages.transferCst.form.sendAmount(amount=25 CST)');
+    expect(screen.getByText(/forms\.transfer\.recipient\.check\.active/)).toBeInTheDocument();
 
-    expect(screen.getByText('Test source')).toBeInTheDocument();
-    expect(screen.getByText('0x1111…\u20601111')).toBeInTheDocument();
-    expect(screen.getByText('100.00 CST')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'myPages.transferCst.form.viewHistory' }),
-    ).toHaveAttribute('href', `/cosmic-token-transfer/${SOURCE}`);
-  });
+    fireEvent.click(sendButton());
 
-  it('rejects an invalid recipient before writing', async () => {
-    await renderReadyForm();
-    fillTransferForm('1', 'not-an-address');
-
-    submitTransferForm();
-
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidRecipient');
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('rejects a zero amount before writing', async () => {
-    await renderReadyForm();
-    fillTransferForm('0');
-
-    submitTransferForm();
-
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.amountPositive');
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('rejects a non-numeric amount before writing', async () => {
-    await renderReadyForm();
-    fillTransferForm('twelve');
-
-    submitTransferForm();
-
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.common.invalidAmount');
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('rejects an amount above the source balance', async () => {
-    await renderReadyForm();
-    fillTransferForm('100.01');
-
-    submitTransferForm();
-
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.cst.insufficientBalance');
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('does not submit while the CST token address is unavailable', async () => {
-    mockContractAddresses = { ...TEST_APP_CONTRACT_ADDRESSES, cosmicToken: '' };
-    renderWithQuery(<CstTransferForm sourceAddress={SOURCE} />);
-
-    expect(
-      screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' }),
-    ).toBeDisabled();
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('requires the connected account to match the source wallet', async () => {
-    mockAccount = OTHER_SOURCE;
-    await renderReadyForm(SOURCE);
-    fillTransferForm('1');
-
-    submitTransferForm();
-
-    expect(toast.error).toHaveBeenCalledWith('toasts.transfer.cst.sourceWalletRequired');
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('falls back to 18 decimals when the token decimals read fails', async () => {
-    mockReadContract.mockImplementation(({ functionName }: { functionName: string }) => {
-      if (functionName === 'decimals') return Promise.reject(new Error('decimals failed'));
-      if (functionName === 'balanceOf') return Promise.resolve(100n * 10n ** 18n);
-      return Promise.resolve(null);
-    });
-
-    await renderReadyForm();
-    fillTransferForm('1.5');
-    submitTransferForm();
-
-    await waitFor(() =>
-      expect(toast.warning).toHaveBeenCalledWith('toasts.transfer.cst.decimalsWarning'),
-    );
-    await waitFor(() => expect(mockWriteContract).toHaveBeenCalled());
-    expect(mockReportError).toHaveBeenCalledWith(
-      expect.any(Error),
-      'Cosmic Signature CST decimals read',
-    );
-  });
-
-  it('shows a balance error and disables submit when balanceOf fails', async () => {
-    mockReadContract.mockImplementation(({ functionName }: { functionName: string }) => {
-      if (functionName === 'decimals') return Promise.resolve(18);
-      if (functionName === 'balanceOf') return Promise.reject(new Error('balance failed'));
-      return Promise.resolve(null);
-    });
-
-    renderWithQuery(<CstTransferForm sourceAddress={SOURCE} />);
-
-    expect(
-      await screen.findByText('myPages.transferCst.form.balanceReadError'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' }),
-    ).toBeDisabled();
-  });
-
-  it('asks a wallet on another chain to switch first, and sends nothing when it does not', async () => {
-    mockEnsureCorrectChain.mockResolvedValueOnce(false);
-    await renderReadyForm();
-    fillTransferForm('12.5');
-
-    submitTransferForm();
-
-    await waitFor(() => expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(1));
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('stays busy while the wallet shows its switch prompt, so a second click sends nothing', async () => {
-    let answerSwitch!: (switched: boolean) => void;
-    mockEnsureCorrectChain.mockImplementationOnce(
-      () => new Promise<boolean>((resolve) => (answerSwitch = resolve)),
-    );
-    await renderReadyForm();
-    fillTransferForm('12.5');
-
-    submitTransferForm();
-    const button = screen.getByRole('button', { name: 'myPages.transferCst.form.sendAria' });
-    await waitFor(() => expect(button).toBeDisabled());
-    fireEvent.click(button);
-    expect(mockEnsureCorrectChain).toHaveBeenCalledTimes(1);
-
-    answerSwitch(false);
-    await waitFor(() => expect(button).not.toBeDisabled());
-    expect(mockWriteContract).not.toHaveBeenCalled();
-  });
-
-  it('calls standard ERC-20 transfer, waits for receipt, and invalidates related queries', async () => {
-    await renderReadyForm();
-    fillTransferForm('12.5');
-
-    submitTransferForm();
-
-    await waitFor(() => expect(mockWriteContract).toHaveBeenCalledTimes(1));
-    expect(mockWriteContract).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'test-config' }),
+    await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
+    expect(mockTx.writeContract).toHaveBeenCalledWith(
       expect.objectContaining({
         address: TEST_APP_CONTRACT_ADDRESSES.cosmicToken,
         functionName: 'transfer',
-        args: [RECIPIENT, 12500000000000000000n],
-        account: SOURCE,
-        chainId: 421614,
+        args: [expect.stringMatching(/^0x[0-9a-fA-F]{40}$/), 25n * WEI],
       }),
     );
-    expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: TX_HASH });
+    expect(mockTx.lastSuccessMessage()).toBe('toasts.transfer.cst.confirmed');
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['cstBalance'] });
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctTransfers'] });
+    await waitFor(() => expect(recipientField()).toHaveValue(''));
+    expect(amountField()).toHaveValue('');
+  });
 
-    await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith('toasts.transfer.cst.confirmed'),
-    );
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['userBalance', SOURCE] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['userBalance', RECIPIENT] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctTransfers', SOURCE] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctTransfers', RECIPIENT] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['ctBalancesDistribution'] });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
+  it('shows each error under its field and focuses the first one to fix', async () => {
+    render(<CstTransferForm source={SOURCE} />);
+
+    fireEvent.click(sendButton());
+    expect(await screen.findByText('forms.transfer.recipient.errors.required')).toBeInTheDocument();
+    expect(screen.getByText('forms.transfer.amount.errors.required')).toBeInTheDocument();
+    expect(recipientField()).toHaveFocus();
+    expect(recipientField()).toHaveAttribute('aria-invalid', 'true');
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it('refuses a malformed address, the source wallet and more CST than the balance', () => {
+    render(<CstTransferForm source={SOURCE} />);
+
+    fireEvent.change(recipientField(), { target: { value: '0x123' } });
+    fireEvent.blur(recipientField());
+    expect(screen.getByText('forms.transfer.recipient.errors.invalid')).toBeInTheDocument();
+
+    fireEvent.change(recipientField(), { target: { value: SOURCE } });
+    expect(screen.getByText('forms.transfer.recipient.errors.self')).toBeInTheDocument();
+
+    fireEvent.change(amountField(), { target: { value: '101' } });
+    fireEvent.blur(amountField());
     expect(
-      screen.getByRole('link', { name: 'myPages.transferCst.form.viewTransaction' }),
-    ).toHaveAttribute('href', expect.stringContaining(TX_HASH));
+      screen.getByText('forms.transfer.amount.errors.exceedsBalance(amount=100 CST)'),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('transfer-review')).not.toBeInTheDocument();
   });
 
-  it('shows an informational toast when the wallet rejects the transaction', async () => {
-    mockWriteContract.mockRejectedValue({ code: 4001 });
-    await renderReadyForm();
-    fillTransferForm('1');
+  it('fills in the exact balance with Max', () => {
+    mockBalance = { data: 12_345_678_900_000_000_000n, isError: false };
+    render(<CstTransferForm source={SOURCE} />);
 
-    submitTransferForm();
+    fireEvent.click(screen.getByRole('button', { name: /forms\.transfer\.amount\.maxAria/ }));
+    expect(amountField()).toHaveValue('12.3456789');
+  });
 
-    await waitFor(() =>
-      expect(toast.info).toHaveBeenCalledWith('toasts.walletTransactionCancelled'),
+  it('asks for an acknowledgement before sending to a new address', async () => {
+    mockCheck = {
+      status: 'ready',
+      facts: { transactionCount: 0, isContract: false },
+      known: null,
+      warning: 'fresh',
+    };
+    render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '1');
+
+    fireEvent.click(sendButton());
+    const acknowledgement = await screen.findByLabelText('forms.transfer.review.acknowledge');
+    expect(screen.getByText('forms.transfer.review.acknowledgeRequired')).toBeInTheDocument();
+    expect(acknowledgement).toHaveFocus();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+
+    fireEvent.click(acknowledgement);
+    fireEvent.click(sendButton());
+    await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
+  });
+
+  it('names a protocol contract recipient and warns against it', () => {
+    mockCheck = {
+      status: 'ready',
+      facts: { transactionCount: 0, isContract: true },
+      known: 'cst',
+      warning: 'protocol',
+    };
+    render(<CstTransferForm source={SOURCE} />);
+    fill(TEST_APP_CONTRACT_ADDRESSES.cosmicToken, '1');
+
+    // Said once, in the review beside its acknowledgement; the field only says it checked.
+    expect(
+      screen.getAllByText(
+        /forms\.transfer\.recipient\.check\.protocol\(name=formats\.address\.known\.cst\)/,
+      ),
+    ).toHaveLength(1);
+    expect(screen.getByTestId('transfer-review').textContent?.includes('check.protocol')).toBe(
+      true,
     );
-    expect(mockWaitForTransactionReceipt).not.toHaveBeenCalled();
+    expect(screen.getByText(/^forms\.transfer\.recipient\.check\.checked/)).toBeInTheDocument();
+    expect(screen.getByLabelText('forms.transfer.review.acknowledge')).toBeInTheDocument();
   });
 
-  it('reports and displays contract write failures', async () => {
-    const err = new Error('write failed');
-    mockWriteContract.mockRejectedValue(err);
-    await renderReadyForm();
-    fillTransferForm('1');
+  it('warns under the field while there is no review yet', () => {
+    mockCheck = {
+      status: 'ready',
+      facts: { transactionCount: 0, isContract: false },
+      known: null,
+      warning: 'fresh',
+    };
+    render(<CstTransferForm source={SOURCE} />);
+    fireEvent.change(recipientField(), { target: { value: RECIPIENT } });
 
-    submitTransferForm();
-
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('toasts.transfer.cst.failed'));
-    expect(mockReportError).toHaveBeenCalledWith(err, 'Cosmic Signature CST transfer');
+    expect(screen.queryByTestId('transfer-review')).not.toBeInTheDocument();
+    expect(screen.getByText(/^forms\.transfer\.recipient\.check\.fresh/)).toBeInTheDocument();
   });
 
-  it('reports a reverted receipt and shows the localized CST fallback', async () => {
-    mockWaitForTransactionReceipt.mockResolvedValueOnce({ status: 'reverted' });
-    await renderReadyForm();
-    fillTransferForm('1');
+  it('holds the send until the recipient check answers (regression)', async () => {
+    // A submit made while the field still said "Checking…" went straight to
+    // the wallet, and the new-address warning appeared only afterwards.
+    mockCheck = { status: 'checking' };
+    const { container, rerender } = render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '1');
 
-    submitTransferForm();
+    const button = screen.getByRole('button', { name: /forms\.transfer\.review\.checking/ });
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    fireEvent.click(button);
+    fireEvent.submit(container.querySelector('form')!);
+    await Promise.resolve();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('toasts.transfer.cst.failed'));
-    expect(mockReportError).toHaveBeenCalledWith(
-      expect.any(Error),
-      'Cosmic Signature CST transfer',
-    );
-    expect(toast.success).not.toHaveBeenCalled();
+    // The check answers: a new address, so the acknowledgement is required.
+    mockCheck = {
+      status: 'ready',
+      facts: { transactionCount: 0, isContract: false },
+      known: null,
+      warning: 'fresh',
+    };
+    rerender(<CstTransferForm source={SOURCE} />);
+    fireEvent.click(sendButton());
+    expect(
+      await screen.findByText('forms.transfer.review.acknowledgeRequired'),
+    ).toBeInTheDocument();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+  });
+
+  it('asks for an acknowledgement when the address could not be checked', async () => {
+    mockCheck = { status: 'failed' };
+    render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '1');
+
+    fireEvent.click(sendButton());
+    const acknowledgement = await screen.findByLabelText('forms.transfer.review.acknowledge');
+    expect(acknowledgement).toHaveFocus();
+    expect(mockTx.writeContract).not.toHaveBeenCalled();
+
+    fireEvent.click(acknowledgement);
+    fireEvent.click(sendButton());
+    await waitFor(() => expect(mockTx.writeContract).toHaveBeenCalledTimes(1));
+  });
+
+  it('says so when the balance cannot be read, and still validates the rest', () => {
+    mockBalance = { data: undefined, isError: true };
+    render(<CstTransferForm source={SOURCE} />);
+
+    expect(screen.getByText('forms.transfer.amount.availableUnknown')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /maxAria/ })).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CstTransferForm source={SOURCE} />);
+    fill(RECIPIENT, '5');
+    await checkA11y(container);
   });
 });

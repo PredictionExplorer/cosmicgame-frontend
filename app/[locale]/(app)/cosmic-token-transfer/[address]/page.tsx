@@ -34,7 +34,7 @@ export default async function Page({ params }: PageProps) {
   const { locale, address } = await params;
   setRequestLocale(locale);
   return (
-    <PageMessages namespaces={['marketing', 'myPages', 'tables']}>
+    <PageMessages namespaces={['myPages', 'tables']}>
       <CosmicTokenTransfersPage address={address} />
     </PageMessages>
   );

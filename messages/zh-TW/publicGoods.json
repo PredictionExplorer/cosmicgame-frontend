@@ -1,14 +1,11 @@
 {
-  "protocol": {
-    "title": "協議公共財資助",
-    "subtitle": "Cosmic Signature 協議自動轉入公共財金庫的資金"
-  },
-  "voluntary": {
-    "title": "自願公共財資助",
-    "subtitle": "社群成員自願轉入公共財金庫的資金"
-  },
-  "retrievals": {
-    "title": "公共財取回",
-    "subtitle": "從公共財金庫取回的資金"
+  "loadError": "無法載入公共財紀錄。",
+  "voluntaryLedger": "自願資助紀錄",
+  "vault": {
+    "description": "每個週期收官時，週期儲備中的公共財份額轉入金庫，並在此等待為 {beneficiary} 取回。",
+    "due": "本週期應轉入",
+    "dueCaption": "目前週期儲備的 {percent}",
+    "inVault": "金庫現存",
+    "retrieved": "累計已取回"
   }
 }

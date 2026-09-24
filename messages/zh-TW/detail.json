@@ -33,29 +33,22 @@
     "nameHistory": "命名紀錄",
     "ownershipHistory": "流轉紀錄"
   },
-  "transferDialog": {
-    "title": "確認轉移",
-    "description": "目標帳戶似乎沒有任何交易紀錄。確定要將代幣傳送至該地址嗎？請再次核對。",
-    "confirm": "仍要轉移"
-  },
   "ownerActions": {
     "title": "管理這枚代幣",
-    "titleTooltip": "身為目前持有者，你可以轉移或命名這枚代幣，也可以將它新增至 MetaMask。",
-    "metaMaskHeading": "在 MetaMask 中顯示",
+    "tabs": {
+      "name": "命名",
+      "transfer": "轉移"
+    },
     "metaMaskTooltip": "請求 MetaMask 瀏覽器擴充功能顯示這枚 NFT。NFT 匯入仍為實驗性功能，MetaMask 行動裝置暫不支援。",
     "addToMetaMask": "將 NFT 新增至 MetaMask",
     "addingToMetaMask": "正在新增 NFT…",
-    "transferHeading": "轉移",
-    "transferTooltip": "將代幣傳送至其他以太坊地址。轉移不可撤銷，確認前請仔細核對地址。",
-    "recipientPlaceholder": "接收地址（0x…）",
-    "transferButton": "轉移",
-    "nameHeading": "命名代幣",
-    "renameHeading": "重新命名",
-    "nameTooltip": "為代幣設定專屬名稱（最多 32 位元組）。已命名的代幣會顯示在「已命名 NFT」頁面。",
+    "nameLabel": "名稱",
+    "nameHint": "最多 {max} 位元組，記錄在鏈上，所有人皆可見。",
     "namePlaceholder": "輸入代幣名稱",
     "setName": "設定名稱",
     "changeName": "更改名稱",
     "clearName": "清除",
+    "transferButton": "轉移 {id}",
     "namedTokensCount": "目前共有 {count} 枚已命名代幣。",
     "viewAllNamedTokens": "檢視全部已命名代幣"
   },

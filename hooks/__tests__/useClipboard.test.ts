@@ -211,6 +211,33 @@ describe('useClipboard', () => {
     expect(writeText).toHaveBeenNthCalledWith(2, 'second');
   });
 
+  it('says whether the text reached the clipboard', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: jest.fn().mockResolvedValue(undefined) },
+      writable: true,
+      configurable: true,
+    });
+    const { result } = renderHook(() => useClipboard());
+    await expect(result.current.copy('ok')).resolves.toBe(true);
+
+    Object.defineProperty(navigator, 'clipboard', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    });
+    document.execCommand = jest.fn().mockReturnValue(true);
+    await expect(result.current.copy('legacy')).resolves.toBe(true);
+
+    // Refused both ways: no confirmation may claim otherwise.
+    document.execCommand = jest.fn().mockReturnValue(false);
+    await expect(result.current.copy('refused')).resolves.toBe(false);
+    document.execCommand = jest.fn(() => {
+      throw new Error('SecurityError');
+    });
+    await expect(result.current.copy('thrown')).resolves.toBe(false);
+    expect(document.querySelectorAll('textarea')).toHaveLength(0);
+  });
+
   it('returns a stable copy reference across renders', () => {
     const { result, rerender } = renderHook(() => useClipboard());
     const first = result.current.copy;

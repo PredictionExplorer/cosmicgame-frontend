@@ -46,7 +46,7 @@ const RETIRED: Record<string, RetiredPattern> = {
     // (WCAG exempts inactive controls).
     pattern:
       /(?<!disabled:)(?<![\w-])text-(?:muted-foreground|white)\/(?:[0-5]?\d|60|\[0?\.[0-6]\d*\])(?![\w.])/g,
-    baseline: 27,
+    baseline: 18,
   },
   'text below the 12px floor': {
     use: 'type-caption (12px) or type-label (13px)',
@@ -56,18 +56,18 @@ const RETIRED: Record<string, RetiredPattern> = {
   'white-alpha surface or border': {
     use: 'bg-surface-sunken / bg-surface / bg-surface-raised, border-rule / border-rule-faint',
     pattern: /(?<![\w-])(?:bg|border(?:-[trblxy])?)-white\/(?:\[[\d.]+\]|\d+)/g,
-    baseline: 43,
+    baseline: 25,
   },
   'focus reset that replaces the shared outline': {
     use: 'the global :focus-visible outline (styles/focus-ring.css), focus-ring-inset or focus-ring-within',
     pattern: /focus-visible:outline-none/g,
-    baseline: 1,
+    baseline: 0,
   },
   'bold display face': {
     use: 'type-heading-3 / type-title (Inter 600) below 24px, a display tier above',
     pattern:
       /font-display(?=[^'"`]*\bfont-(?:bold|extrabold|black)\b)|\bfont-(?:bold|extrabold|black)\b(?=[^'"`]*\bfont-display\b)/g,
-    baseline: 8,
+    baseline: 2,
   },
 };
 

@@ -297,7 +297,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/cosmic-signature-transfer/${address}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: 'Cosmic Signature NFT 转移记录',
+    expectedText: 'NFT 转移记录',
   },
   {
     id: 'cst-transfer-history',
@@ -306,7 +306,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/cosmic-token-transfer/${address}`,
     host: 'app',
     cluster: 'transactions',
-    expectedText: 'Cosmic Signature CST 转账记录',
+    expectedText: 'CST 转账记录',
   },
   {
     id: 'token-distributions',
@@ -445,7 +445,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/system-event/${cycle}/100/200`,
     host: 'app',
     cluster: 'statistics',
-    expectedText: `第 ${cycle} 个周期前的系统配置`,
+    expectedText: `第 ${cycle} 个周期前的配置`,
   },
 
   // Sprint 6 — FAQ, legal, trust, contracts, and source.
@@ -558,7 +558,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/eth-contribution/detail/${contributionId}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: 'ETH 贡献详情',
+    expectedText: `贡献 #${contributionId}`,
   },
   {
     id: 'eth-contribution-cycle',
@@ -567,7 +567,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/eth-contribution/round/${contributionId}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: `第 ${contributionId} 个周期的直接 ETH 贡献`,
+    expectedText: `第 ${contributionId} 个周期的贡献`,
   },
   {
     id: 'public-goods-cg',
@@ -612,8 +612,7 @@ export const ZH_ROUTE_INVENTORY: readonly ZhRouteInventoryEntry[] = [
     fixturePath: `/marketing/${address}`,
     host: 'app',
     cluster: 'long-tail',
-    expectedText: '此参与者的推广分配',
-    allowNoHeading: true,
+    expectedText: '获得的推广分配',
   },
   {
     id: 'coordination-changes',

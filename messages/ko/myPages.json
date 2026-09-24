@@ -4,10 +4,6 @@
     "unavailable": "확인 불가",
     "yes": "예",
     "no": "아니요",
-    "datetime": "일시",
-    "from": "보낸 주소",
-    "to": "받는 주소",
-    "tokenId": "토큰 ID",
     "cycle": "사이클",
     "cycleNumber": "사이클 {cycle}",
     "recipient": "수령자"
@@ -272,30 +268,22 @@
   "transferCst": {
     "page": {
       "title": "CST 전송",
-      "subtitle": "Cosmic Signature CST 토큰을 다른 주소로 보냅니다.",
-      "sourceLabel": "연결된 지갑",
-      "description": "연결된 지갑에서 CST를 전송합니다. 트랜잭션은 지갑에서 서명되어 CST 토큰 컨트랙트로 바로 전송됩니다."
+      "subtitle": "연결된 지갑의 CST를 {network}의 다른 주소로 보냅니다."
     },
     "form": {
-      "title": "CST 전송",
-      "sourceWallet": "보내는 지갑",
-      "defaultDescription": "연결된 지갑에서 원하는 주소로 CST를 보냅니다.",
-      "available": "보낼 수 있는 CST",
-      "balanceReadError": "이 지갑의 CST 잔액을 읽을 수 없습니다. 잠시 후 다시 시도해 주세요.",
-      "decimalsReadWarning": "CST 소수 자릿수를 읽을 수 없어 18자리로 간주합니다.",
-      "recipientAddress": "받는 주소",
-      "amount": "수량",
-      "sendAria": "CST 보내기",
-      "sending": "보내는 중…",
       "send": "CST 보내기",
-      "viewHistory": "CST 전송 내역 보기",
-      "confirmed": "전송이 확인되었습니다.",
-      "viewTransaction": "트랜잭션 보기"
+      "sendAmount": "{amount} 보내기"
+    },
+    "guide": {
+      "from": "보내는 지갑",
+      "history": "내 CST 전송 내역",
+      "title": "보내기 전에",
+      "final": "전송은 되돌릴 수 없습니다. 잘못된 주소로 보낸 CST는 되찾을 수 없습니다.",
+      "network": "{network}에서 토큰을 보관할 수 있는 주소로만 보내세요.",
+      "paste": "주소는 직접 입력하지 말고 받는 지갑에서 복사해 주세요."
     }
   },
   "nftTransfer": {
-    "sourceWallet": "보내는 지갑",
-    "recipientAddress": "받는 주소",
     "empty": "이 지갑에는 Cosmic Signature NFT가 없습니다.",
     "pickerTitle": "전송할 NFT 선택",
     "pickerSummary": "전송 가능한 NFT {total}개 중 {selected}개 선택됨",
@@ -303,7 +291,7 @@
     "selectPage": "현재 페이지 선택",
     "clear": "선택 해제",
     "listAria": "Cosmic Signature NFT 목록",
-    "selectAria": "NFT #{id} 선택",
+    "selectAria": "NFT {id} 선택",
     "cycle": "사이클 {cycle}",
     "cycleUnavailable": "사이클 데이터 없음",
     "statusLabels": {
@@ -312,49 +300,66 @@
     },
     "progress": {
       "transferred": "NFT {total}개 중 {completed}개 전송 완료",
-      "stopped": "NFT #{id}에서 전송이 중단되었습니다",
-      "current": "현재 NFT: #{id}"
-    },
-    "confirmation": {
-      "latest": "최근 전송이 확인되었습니다.",
-      "multiple": "전송 {count}건이 확인되었습니다.",
-      "viewLatest": "최근 트랜잭션 보기"
+      "stopped": "{total}개 중 {completed}개를 보낸 뒤 NFT {id}에서 멈췄습니다. 보내지 않은 NFT는 선택된 상태로 남아 있습니다."
     },
     "sending": "보내는 중…",
     "send": "선택한 NFT 보내기",
     "viewHistory": "NFT 전송 내역 보기",
-    "warning": {
-      "title": "받는 주소에 트랜잭션 기록이 없습니다",
-      "description": "이 주소에는 아직 트랜잭션이 없는 것으로 보입니다. NFT 전송은 되돌릴 수 없으니 보내기 전에 받는 주소를 다시 확인해 주세요.",
-      "cancel": "취소",
-      "continue": "전송 계속"
-    }
+    "review": {
+      "count": "{count, plural, other {NFT #개}}"
+    },
+    "sendCount": "{count, plural, other {NFT #개 보내기}}"
   },
   "transferHistory": {
-    "loading": "불러오는 중…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT 앵커링 지갑",
-      "randomWalkAnchoring": "RandomWalk 앵커링 지갑",
-      "outreach": "홍보 지갑",
-      "stellarSelection": "별빛 선정 지갑",
-      "publicGoods": "공공재 금고"
-    },
     "nft": {
-      "title": "Cosmic Signature NFT 전송 내역",
+      "title": "NFT 전송 내역",
       "empty": "아직 NFT 전송이 없습니다.",
-      "invalidAddress": {
-        "title": "잘못된 주소",
-        "description": "NFT 전송 내역을 보려면 올바른 지갑 주소를 입력해 주세요."
+      "lede": "이 주소에 각인된 Cosmic Signature NFT와 이 주소가 받거나 보낸 모든 NFT입니다.",
+      "emptyDescription": "NFT가 이 주소에 각인되거나 다른 지갑에서 전송되면 여기에 표시됩니다.",
+      "figures": {
+        "imprinted": "각인",
+        "received": "받음",
+        "sent": "보냄"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST 토큰 전송 내역",
+      "title": "CST 전송 내역",
       "empty": "아직 CST 전송이 없습니다.",
-      "invalidAddress": {
-        "title": "잘못된 주소",
-        "description": "CST 전송 내역을 보려면 올바른 지갑 주소를 입력해 주세요."
-      },
-      "value": "수량(CST)"
+      "lede": "이 주소에 각인된 CST, 이 주소가 받고 보낸 CST, 그리고 CST 제스처로 소모한 CST입니다.",
+      "emptyDescription": "제스처로 CST가 각인되거나 다른 지갑이 CST를 보내면 여기에 표시됩니다.",
+      "figures": {
+        "received": "받은 수량",
+        "sent": "보낸 수량",
+        "net": "순변동",
+        "imprintedCaption": "각인: {amount}",
+        "consumedCaption": "소모: {amount}"
+      }
+    },
+    "switcherLabel": "이 주소의 전송 내역",
+    "viewOnExplorer": "{explorer}에서 보기",
+    "error": "이 주소의 전송 내역을 불러오지 못했습니다.",
+    "count": "{count, plural, other {#건}}",
+    "activity": {
+      "imprinted": "각인",
+      "received": "받음",
+      "sent": "보냄",
+      "consumed": "소모"
+    },
+    "filter": {
+      "label": "표시",
+      "all": "전체",
+      "in": "받은 내역",
+      "out": "보낸 내역",
+      "empty": "이 방향의 내역이 아직 없습니다."
+    },
+    "columns": {
+      "activity": "내역",
+      "counterparty": "상대 주소"
+    },
+    "invalidAddress": {
+      "title": "잘못된 주소",
+      "description": "링크에 0x 뒤에 영문자와 숫자 40자가 이어지는 전체 주소가 필요합니다.",
+      "action": "참여자 둘러보기"
     }
   },
   "ethAllocations": {

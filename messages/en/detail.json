@@ -33,29 +33,22 @@
     "nameHistory": "Name History",
     "ownershipHistory": "Ownership History"
   },
-  "transferDialog": {
-    "title": "Confirm Transfer",
-    "description": "The destination account doesn't appear to have any transaction history. Are you sure you want to send the token to this address? Please double-check it.",
-    "confirm": "Yes, Transfer"
-  },
   "ownerActions": {
-    "title": "Manage Your Token",
-    "titleTooltip": "As the current owner, you can transfer this NFT, give it a name, or add it to MetaMask.",
-    "metaMaskHeading": "Display in MetaMask",
+    "title": "Manage your token",
+    "tabs": {
+      "name": "Name",
+      "transfer": "Transfer"
+    },
     "metaMaskTooltip": "Prompt the MetaMask browser extension to display this NFT. NFT import is experimental and is not available in MetaMask Mobile.",
     "addToMetaMask": "Add NFT to MetaMask",
-    "addingToMetaMask": "Adding NFT to MetaMask...",
-    "transferHeading": "Transfer",
-    "transferTooltip": "Send this token to another Ethereum address. Double-check the address before confirming — transfers are irreversible.",
-    "recipientPlaceholder": "Recipient address (0x...)",
-    "transferButton": "Transfer",
-    "nameHeading": "Name Token",
-    "renameHeading": "Rename Token",
-    "nameTooltip": "Give your token a custom name (max 32 bytes). Named tokens appear on the Named NFTs page.",
+    "addingToMetaMask": "Adding NFT to MetaMask…",
+    "nameLabel": "Name",
+    "nameHint": "Up to {max} bytes, recorded on-chain for everyone to see.",
     "namePlaceholder": "Enter token name",
-    "setName": "Set Name",
-    "changeName": "Change Name",
+    "setName": "Set name",
+    "changeName": "Change name",
     "clearName": "Clear",
+    "transferButton": "Transfer {id}",
     "namedTokensCount": "There are {count} tokens with a name.",
     "viewAllNamedTokens": "View all named tokens"
   },

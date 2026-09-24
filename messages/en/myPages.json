@@ -4,10 +4,6 @@
     "unavailable": "Unavailable",
     "yes": "Yes",
     "no": "No",
-    "datetime": "Date and time",
-    "from": "From",
-    "to": "To",
-    "tokenId": "Token ID",
     "cycle": "Cycle",
     "cycleNumber": "Cycle {cycle}",
     "recipient": "Recipient"
@@ -272,30 +268,22 @@
   "transferCst": {
     "page": {
       "title": "Transfer CST",
-      "subtitle": "Send your Cosmic Signature CST tokens to another address.",
-      "sourceLabel": "Connected wallet",
-      "description": "Transfer CST from your connected wallet. The transaction is signed by your wallet and sent directly to the CST token contract."
+      "subtitle": "Send CST from your connected wallet to another address on {network}."
     },
     "form": {
-      "title": "Transfer CST",
-      "sourceWallet": "Source wallet",
-      "defaultDescription": "Send CST from your connected wallet to any address.",
-      "available": "Available CST",
-      "balanceReadError": "Unable to read this wallet’s CST balance. Please try again.",
-      "decimalsReadWarning": "Unable to read CST decimals; assuming 18 decimal places.",
-      "recipientAddress": "Recipient address",
-      "amount": "Amount",
-      "sendAria": "Send CST",
-      "sending": "Sending...",
       "send": "Send CST",
-      "viewHistory": "View CST transfer history",
-      "confirmed": "Transfer confirmed.",
-      "viewTransaction": "View transaction"
+      "sendAmount": "Send {amount}"
+    },
+    "guide": {
+      "from": "Sending from",
+      "history": "Your CST transfers",
+      "title": "Before you send",
+      "final": "Transfers are final. CST sent to a wrong address can't be recovered.",
+      "network": "Send only to an address that can hold tokens on {network}.",
+      "paste": "Copy the address from the receiving wallet rather than typing it."
     }
   },
   "nftTransfer": {
-    "sourceWallet": "Source wallet",
-    "recipientAddress": "Recipient address",
     "empty": "You do not have any Cosmic Signature NFTs in this wallet.",
     "pickerTitle": "Choose NFTs to transfer",
     "pickerSummary": "{selected} selected of {total} transferable NFTs.",
@@ -303,7 +291,7 @@
     "selectPage": "Select current page",
     "clear": "Clear selection",
     "listAria": "Cosmic Signature NFTs",
-    "selectAria": "Select NFT #{id}",
+    "selectAria": "Select NFT {id}",
     "cycle": "Cycle {cycle}",
     "cycleUnavailable": "Cycle data not available",
     "statusLabels": {
@@ -312,49 +300,66 @@
     },
     "progress": {
       "transferred": "Transferred {completed} of {total} NFTs",
-      "stopped": "Transfer stopped at NFT #{id}",
-      "current": "Current NFT: #{id}"
-    },
-    "confirmation": {
-      "latest": "Latest transfer confirmed.",
-      "multiple": "{count} transfers confirmed.",
-      "viewLatest": "View latest transaction"
+      "stopped": "Stopped after {completed} of {total}, at NFT {id}. The NFTs not sent are still selected."
     },
     "sending": "Sending…",
     "send": "Send selected NFTs",
     "viewHistory": "View NFT transfer history",
-    "warning": {
-      "title": "Recipient has no transaction history",
-      "description": "This address appears to have no transactions yet. Double-check the recipient before sending; NFT transfers cannot be undone.",
-      "cancel": "Cancel",
-      "continue": "Continue transfer"
-    }
+    "review": {
+      "count": "{count, plural, one {# NFT} other {# NFTs}}"
+    },
+    "sendCount": "{count, plural, one {Send # NFT} other {Send # NFTs}}"
   },
   "transferHistory": {
-    "loading": "Loading...",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT Anchoring Wallet",
-      "randomWalkAnchoring": "Random Walk Anchoring Wallet",
-      "outreach": "Outreach Wallet",
-      "stellarSelection": "Stellar Selection Wallet",
-      "publicGoods": "Public Goods Vault"
-    },
     "nft": {
-      "title": "Cosmic Signature Transfers",
+      "title": "NFT transfers",
       "empty": "No NFT transfers yet.",
-      "invalidAddress": {
-        "title": "Invalid address",
-        "description": "Enter a valid wallet address to view NFT transfer history."
+      "lede": "Cosmic Signature NFTs imprinted to this address, and every one it received or sent.",
+      "emptyDescription": "An NFT reaches an address when it is imprinted to it or sent from another wallet.",
+      "figures": {
+        "imprinted": "Imprinted",
+        "received": "Received",
+        "sent": "Sent"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST Token Transfers",
+      "title": "CST transfers",
       "empty": "No CST transfers yet.",
-      "invalidAddress": {
-        "title": "Invalid address",
-        "description": "Enter a valid wallet address to view CST transfer history."
-      },
-      "value": "Value (CST)"
+      "lede": "CST imprinted to this address, received and sent by it, and consumed by its CST gestures.",
+      "emptyDescription": "CST reaches an address when a gesture imprints it or another wallet sends it.",
+      "figures": {
+        "received": "Received",
+        "sent": "Sent",
+        "net": "Net change",
+        "imprintedCaption": "Imprinted: {amount}",
+        "consumedCaption": "Consumed: {amount}"
+      }
+    },
+    "switcherLabel": "Transfers of this address",
+    "viewOnExplorer": "View on {explorer}",
+    "error": "The transfers of this address couldn't be loaded.",
+    "count": "{count, plural, one {# transfer} other {# transfers}}",
+    "activity": {
+      "imprinted": "Imprinted",
+      "received": "Received",
+      "sent": "Sent",
+      "consumed": "Consumed"
+    },
+    "filter": {
+      "label": "Show",
+      "all": "All",
+      "in": "Incoming",
+      "out": "Outgoing",
+      "empty": "Nothing in this direction yet."
+    },
+    "columns": {
+      "activity": "Activity",
+      "counterparty": "Counterparty"
+    },
+    "invalidAddress": {
+      "title": "Invalid address",
+      "description": "The link needs a full address: 0x followed by 40 letters and digits.",
+      "action": "Browse participants"
     }
   },
   "ethAllocations": {

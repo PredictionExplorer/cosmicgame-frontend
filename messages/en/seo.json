@@ -58,7 +58,7 @@
         }
       },
       "marketing": {
-        "heading": "Outreach Allocations",
+        "heading": "Outreach allocations",
         "description": "Review Cosmic Signature outreach allocation history and CST distributions for ecosystem contributors who help people discover the protocol.",
         "source": "Cosmic Signature public outreach allocation APIs",
         "links": {
@@ -68,13 +68,13 @@
         },
         "cards": {
           "records": {
-            "label": "Outreach Allocation Records"
+            "label": "Outreach allocation records"
           },
           "allocatedCst": {
-            "label": "Outreach CST Allocated"
+            "label": "Outreach CST allocated"
           },
           "contributors": {
-            "label": "Unique Outreach Contributors"
+            "label": "Unique outreach contributors"
           }
         }
       },
@@ -100,7 +100,7 @@
         }
       },
       "eth-contribution": {
-        "heading": "Direct ETH Contributions",
+        "heading": "Direct ETH contributions",
         "description": "Browse direct ETH contributions to the Cosmic Signature Cycle Reserve and the public notes, cycles, and contributor records attached to them.",
         "source": "Cosmic Signature public contribution APIs",
         "links": {
@@ -110,13 +110,13 @@
         },
         "cards": {
           "records": {
-            "label": "Direct Contribution Records"
+            "label": "Direct contribution records"
           },
           "totalEth": {
-            "label": "Total Direct ETH Contributions"
+            "label": "Total direct ETH contributions"
           },
           "contributors": {
-            "label": "Unique Contributors"
+            "label": "Unique contributors"
           }
         }
       },
@@ -207,7 +207,7 @@
         }
       },
       "coordination-changes": {
-        "heading": "Coordination Changes",
+        "heading": "Coordination changes",
         "description": "Review public Cosmic Signature coordination changes, including protocol mode changes, parameter updates, and administration records that affect future cycles.",
         "source": "Cosmic Signature public system event APIs",
         "links": {
@@ -217,84 +217,84 @@
         },
         "cards": {
           "records": {
-            "label": "Coordination Change Records"
+            "label": "Coordination change records"
           },
           "latest": {
-            "label": "Latest Change"
+            "label": "Latest change"
           },
           "parameters": {
-            "label": "Parameters Changed",
+            "label": "Parameters changed",
             "tooltip": "How many distinct protocol parameters these records change. Only the contract owner can change them."
           }
         }
       },
       "public-goods-contributions-cg": {
-        "heading": "Protocol Public-Goods Contributions",
+        "heading": "Protocol Public Goods contributions",
         "description": "Track automatic Cosmic Signature public-goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary — currently Protocol Guild.",
         "source": "Cosmic Signature public-goods API",
         "links": {
           "learn": "Learn about public goods",
-          "retrievals": "View public-goods retrievals",
+          "retrievals": "View Public Goods retrievals",
           "statistics": "View public-goods statistics"
         },
         "cards": {
           "records": {
-            "label": "Protocol Contribution Records"
+            "label": "Protocol contribution records"
           },
           "totalEth": {
-            "label": "Protocol Public-Goods ETH"
+            "label": "Protocol public-goods ETH"
           },
           "share": {
-            "label": "Share of Each Cycle Reserve",
+            "label": "Share of each Cycle Reserve",
             "tooltip": "The share of each finalized Cycle Reserve that the protocol forwards to the Public Goods Vault."
           },
           "latest": {
-            "label": "Latest Contribution"
+            "label": "Latest contribution"
           }
         }
       },
       "public-goods-contributions-voluntary": {
-        "heading": "Voluntary Public-Goods Contributions",
+        "heading": "Voluntary Public Goods contributions",
         "description": "Browse voluntary public-goods contributions from the Cosmic Signature community, including cycle context and contributor records.",
         "source": "Cosmic Signature public-goods API",
         "links": {
           "direct": "View direct ETH contributions",
-          "protocol": "Protocol public-goods contributions",
+          "protocol": "Protocol Public Goods contributions",
           "risk": "Read risk disclosures"
         },
         "cards": {
           "records": {
-            "label": "Voluntary Contribution Records"
+            "label": "Voluntary contribution records"
           },
           "totalEth": {
-            "label": "Voluntary Public-Goods ETH"
+            "label": "Voluntary public-goods ETH"
           },
           "contributors": {
-            "label": "Contributor Wallets"
+            "label": "Contributor wallets"
           }
         }
       },
       "public-goods-retrievals": {
-        "heading": "Public Goods Retrievals",
+        "heading": "Public Goods retrievals",
         "description": "Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured public-goods beneficiary — currently Protocol Guild.",
         "source": "Cosmic Signature public-goods API",
         "links": {
-          "protocol": "Protocol public-goods contributions",
-          "voluntary": "Voluntary public-goods contributions",
+          "protocol": "Protocol Public Goods contributions",
+          "voluntary": "Voluntary Public Goods contributions",
           "contracts": "Review public contract addresses"
         },
         "cards": {
           "records": {
-            "label": "Public-Goods Retrieval Records"
+            "label": "Public-goods retrieval records"
           },
           "totalEth": {
-            "label": "Retrieved Public-Goods ETH"
+            "label": "Retrieved public-goods ETH"
           },
           "latest": {
-            "label": "Latest Retrieval"
+            "label": "Latest retrieval"
           },
           "beneficiary": {
-            "label": "Latest Beneficiary",
+            "label": "Latest beneficiary",
             "tooltip": "The address that received the most recent retrieval from the Public Goods Vault. The configured beneficiary is currently Protocol Guild."
           }
         }

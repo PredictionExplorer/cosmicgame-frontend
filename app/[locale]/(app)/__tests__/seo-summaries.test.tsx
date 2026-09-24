@@ -427,8 +427,8 @@ describe('server-rendered page headers', () => {
 
   it.each([
     ['anchoring' as const, 'Anchor Distributions', 'records', null],
-    ['marketing' as const, 'Outreach Allocations', 'records', null],
-    ['eth-contribution' as const, 'Direct ETH Contributions', 'records', null],
+    ['marketing' as const, 'Outreach allocations', 'records', null],
+    ['eth-contribution' as const, 'Direct ETH contributions', 'records', null],
     ['attached-nfts' as const, 'Attached NFT Contributions', 'collection', '/gallery'],
     ['named-nfts' as const, 'Named Cosmic Signature NFTs', 'collection', '/gallery'],
     ['used-rwlk-nfts' as const, 'Used RandomWalk NFTs', 'collection', '/gallery'],
@@ -612,6 +612,9 @@ describe('server-rendered page headers', () => {
         'datetime',
         new Date(1_786_100_000 * 1000).toISOString(),
       );
+      // A date stays at figure-md beside the counts.
+      expect(figureValue('latest')).not.toHaveClass('lg:type-figure-lg');
+      expect(figureValue('records')).toHaveClass('lg:type-figure-lg');
       // No constant filler: the governance surface and the network are not figures.
       expect(document.querySelector('[data-figure="governance"]')).toBeNull();
       expect(document.querySelector('[data-figure="network"]')).toBeNull();

@@ -1,14 +1,11 @@
 {
-  "protocol": {
-    "title": "协议公共物品资助",
-    "subtitle": "Cosmic Signature 协议自动转入公共物品金库的资金"
-  },
-  "voluntary": {
-    "title": "自愿公共物品资助",
-    "subtitle": "社区成员自愿转入公共物品金库的资金"
-  },
-  "retrievals": {
-    "title": "公共物品取回",
-    "subtitle": "从公共物品金库取回的资金"
+  "loadError": "无法加载公共物品记录。",
+  "voluntaryLedger": "自愿资助记录",
+  "vault": {
+    "description": "每个周期收官时，周期储备中的公共物品份额转入金库，并在此等待为 {beneficiary} 取回。",
+    "due": "本周期应转入",
+    "dueCaption": "目前周期储备的 {percent}",
+    "inVault": "金库现存",
+    "retrieved": "累计已取回"
   }
 }

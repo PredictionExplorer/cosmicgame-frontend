@@ -4,10 +4,6 @@
     "unavailable": "暫不可用",
     "yes": "是",
     "no": "否",
-    "datetime": "日期時間",
-    "from": "轉出方",
-    "to": "接收方",
-    "tokenId": "代幣 ID",
     "cycle": "週期",
     "cycleNumber": "第 {cycle} 個週期",
     "recipient": "獲配者"
@@ -272,30 +268,22 @@
   "transferCst": {
     "page": {
       "title": "轉帳 CST",
-      "subtitle": "將 Cosmic Signature CST 代幣傳送至其他地址。",
-      "sourceLabel": "已連接錢包",
-      "description": "從已連接錢包轉帳 CST。交易由錢包簽名，並直接傳送至 CST 代幣合約。"
+      "subtitle": "將已連接錢包中的 CST 傳送至 {network} 上的其他地址。"
     },
     "form": {
-      "title": "轉帳 CST",
-      "sourceWallet": "來源錢包",
-      "defaultDescription": "從已連接錢包將 CST 傳送至任意地址。",
-      "available": "可用 CST",
-      "balanceReadError": "未能讀取此錢包的 CST 餘額，請重試。",
-      "decimalsReadWarning": "未能讀取 CST 小數位數，將按 18 位處理。",
-      "recipientAddress": "接收地址",
-      "amount": "數量",
-      "sendAria": "傳送 CST",
-      "sending": "傳送中…",
       "send": "傳送 CST",
-      "viewHistory": "檢視 CST 轉帳紀錄",
-      "confirmed": "轉帳已確認。",
-      "viewTransaction": "檢視交易"
+      "sendAmount": "傳送 {amount}"
+    },
+    "guide": {
+      "from": "傳送方",
+      "history": "你的 CST 轉帳紀錄",
+      "title": "傳送之前",
+      "final": "轉帳無法撤銷。傳送到錯誤地址的 CST 無法找回。",
+      "network": "只傳送到能在 {network} 上持有代幣的地址。",
+      "paste": "請從接收錢包複製地址，不要手動輸入。"
     }
   },
   "nftTransfer": {
-    "sourceWallet": "來源錢包",
-    "recipientAddress": "接收地址",
     "empty": "此錢包中沒有 Cosmic Signature NFT。",
     "pickerTitle": "選擇要轉移的 NFT",
     "pickerSummary": "可轉移 {total} 枚，已選擇 {selected} 枚。",
@@ -303,7 +291,7 @@
     "selectPage": "選擇目前頁",
     "clear": "清除選擇",
     "listAria": "Cosmic Signature NFT",
-    "selectAria": "選擇 NFT #{id}",
+    "selectAria": "選擇 NFT {id}",
     "cycle": "第 {cycle} 個週期",
     "cycleUnavailable": "暫無週期數據",
     "statusLabels": {
@@ -312,49 +300,66 @@
     },
     "progress": {
       "transferred": "已轉移 {completed} 枚，共 {total} 枚",
-      "stopped": "NFT #{id} 未能轉移，操作已停止。",
-      "current": "目前 NFT：#{id}"
-    },
-    "confirmation": {
-      "latest": "最新一筆轉移已確認。",
-      "multiple": "{count} 筆轉移已確認。",
-      "viewLatest": "檢視最新交易"
+      "stopped": "已傳送 {completed} 枚（共 {total} 枚），在 NFT {id} 處停止。未傳送的 NFT 仍保持選取。"
     },
     "sending": "傳送中…",
     "send": "傳送已選 NFT",
     "viewHistory": "檢視 NFT 轉移紀錄",
-    "warning": {
-      "title": "接收地址無交易紀錄",
-      "description": "暫未查到該地址的交易紀錄。傳送前請再次核對；NFT 轉移無法撤銷。",
-      "cancel": "取消",
-      "continue": "繼續轉移"
-    }
+    "review": {
+      "count": "{count, plural, other {# 枚 NFT}}"
+    },
+    "sendCount": "{count, plural, other {傳送 # 枚 NFT}}"
   },
   "transferHistory": {
-    "loading": "載入中…",
-    "walletLabels": {
-      "cosmicSignatureAnchoring": "Cosmic Signature NFT 錨定錢包",
-      "randomWalkAnchoring": "Random Walk NFT 錨定錢包",
-      "outreach": "推廣錢包",
-      "stellarSelection": "星選錢包",
-      "publicGoods": "公共財金庫"
-    },
     "nft": {
-      "title": "Cosmic Signature NFT 轉移紀錄",
+      "title": "NFT 轉移紀錄",
       "empty": "暫無 NFT 轉移紀錄。",
-      "invalidAddress": {
-        "title": "地址無效",
-        "description": "請輸入有效的錢包地址以檢視 NFT 轉移紀錄。"
+      "lede": "銘刻給此地址的 Cosmic Signature NFT，以及它收到或傳出的每一枚。",
+      "emptyDescription": "NFT 銘刻給該地址或由其他錢包傳來時，紀錄會顯示在這裡。",
+      "figures": {
+        "imprinted": "銘刻",
+        "received": "收到",
+        "sent": "傳出"
       }
     },
     "cst": {
-      "title": "Cosmic Signature CST 轉帳紀錄",
+      "title": "CST 轉帳紀錄",
       "empty": "暫無 CST 轉帳紀錄。",
-      "invalidAddress": {
-        "title": "地址無效",
-        "description": "請輸入有效的錢包地址以檢視 CST 轉帳紀錄。"
-      },
-      "value": "數量（CST）"
+      "lede": "銘刻給此地址的 CST、它收發的 CST，以及它的 CST 落筆所消耗的 CST。",
+      "emptyDescription": "落筆為地址銘刻 CST，或其他錢包傳來 CST 時，紀錄會顯示在這裡。",
+      "figures": {
+        "received": "收到",
+        "sent": "傳出",
+        "net": "淨變化",
+        "imprintedCaption": "其中銘刻：{amount}",
+        "consumedCaption": "其中消耗：{amount}"
+      }
+    },
+    "switcherLabel": "該地址的轉移紀錄",
+    "viewOnExplorer": "在 {explorer} 查看",
+    "error": "無法載入該地址的轉移紀錄。",
+    "count": "{count, plural, other {# 筆紀錄}}",
+    "activity": {
+      "imprinted": "銘刻",
+      "received": "收到",
+      "sent": "傳出",
+      "consumed": "消耗"
+    },
+    "filter": {
+      "label": "顯示",
+      "all": "全部",
+      "in": "轉入",
+      "out": "轉出",
+      "empty": "該方向暫無紀錄。"
+    },
+    "columns": {
+      "activity": "類型",
+      "counterparty": "對方地址"
+    },
+    "invalidAddress": {
+      "title": "地址無效",
+      "description": "連結中需要完整地址：0x 加 40 位字母和數字。",
+      "action": "瀏覽參與者"
     }
   },
   "ethAllocations": {

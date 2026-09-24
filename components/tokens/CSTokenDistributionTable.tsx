@@ -1,18 +1,10 @@
-import { useMemo, useState, type FC } from 'react';
+'use client';
+
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import {
-  TablePrimary,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
-import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 
 interface TokenDistribution {
   OwnerAddr: string;
@@ -20,77 +12,59 @@ interface TokenDistribution {
   NumTokens: number;
 }
 
-interface CSTokenDistributionRowProps {
-  row?: TokenDistribution;
-}
-
-const CSTokenDistributionRow: FC<CSTokenDistributionRowProps> = ({ row }) => {
-  const t = useTranslations('tables');
-
-  if (!row) return <TablePrimaryRow />;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('statisticsColumns.ownerAddress')}>
-        <AddressLink address={row.OwnerAddr} url={`/user/${row.OwnerAddr}`} />
-      </TablePrimaryCell>
-
-      <TablePrimaryCell label={t('statisticsColumns.numberOfTokensOwned')} align="right">
-        {row.NumTokens}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface CSTokenDistributionTableProps {
+interface CSTokenDistributionTableProps extends LedgerStateProps {
   list: TokenDistribution[];
+  /** Rows per page; the statistics section shows a short ledger. */
   perPage?: number;
+  /** Names the table; defaults to the statistics section it sits in. */
+  ariaLabel?: string;
 }
 
-export const CSTokenDistributionTable: FC<CSTokenDistributionTableProps> = ({
+/**
+ * Who holds the Cosmic Signature NFTs: each holder (linked to their
+ * profile) and how many they hold, most first, on the shared ledger with
+ * its phone layout, paging and empty state.
+ */
+export function CSTokenDistributionTable({
   list,
   perPage = 5,
-}) => {
+  ariaLabel,
+  ...state
+}: CSTokenDistributionTableProps) {
   const t = useTranslations('tables');
-  const [page, setPage] = useState(1);
+  const tStatistics = useTranslations('statistics');
 
-  const paginatedData = useMemo(
-    () => list.slice((page - 1) * perPage, page * perPage),
-    [list, page, perPage],
+  const columns = useMemo<DataTableColumn<TokenDistribution>[]>(
+    () => [
+      {
+        id: 'owner',
+        kind: 'address',
+        header: t('statisticsColumns.ownerAddress'),
+        help: t('statisticsTooltips.ownerAddress'),
+        value: (row) => row.OwnerAddr,
+      },
+      {
+        id: 'tokens',
+        kind: 'count',
+        header: t('statisticsColumns.numberOfTokensOwned'),
+        help: t('statisticsTooltips.numberOfTokensOwned'),
+        value: (row) => row.NumTokens,
+        sortable: true,
+      },
+    ],
+    [t],
   );
-
-  if (list.length === 0) return <p>{t('empty.tokens')}</p>;
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">
-                <TableHeaderHelp
-                  desktop={t('statisticsColumns.ownerAddress')}
-                  tooltip={t('statisticsTooltips.ownerAddress')}
-                />
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                <TableHeaderHelp
-                  desktop={t('statisticsColumns.numberOfTokensOwned')}
-                  tooltip={t('statisticsTooltips.numberOfTokensOwned')}
-                />
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-
-          <TablePrimaryBody>
-            {paginatedData.map((row) => (
-              <CSTokenDistributionRow row={row} key={row.OwnerAid} />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
-    </>
+    <DataTable
+      data={list}
+      columns={columns}
+      ariaLabel={ariaLabel ?? tStatistics('tokens.sections.nftDistribution')}
+      getRowKey={(row) => row.OwnerAid}
+      pageSize={perPage}
+      initialSort={{ id: 'tokens', direction: 'desc' }}
+      emptyTitle={t('empty.tokens')}
+      {...state}
+    />
   );
-};
+}

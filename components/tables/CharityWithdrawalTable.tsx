@@ -3,17 +3,27 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
+import { sameAddress } from '@/utils/format';
+import { AddressChip } from '@/components/ui/address-chip';
 import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import type { CharityWithdrawal } from '@/services/api/types';
 
 export type { CharityWithdrawal };
 
+const BENEFICIARY = protocolFacts.publicGoodsBeneficiary;
+
 interface CharityWithdrawalTableProps extends LedgerStateProps {
   list: CharityWithdrawal[];
 }
 
-/** ETH forwarded out of the Public Goods Vault, each date linked to its transaction. */
+/**
+ * ETH forwarded out of the Public Goods Vault, each date linked to its
+ * transaction. The vault's documented beneficiary reads by name, as it does
+ * in the page header; any other destination reads as hex.
+ */
 const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps) => {
   const t = useTranslations('tables');
 
@@ -33,6 +43,16 @@ const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps)
         kind: 'address',
         header: t('columns.destinationAddress'),
         value: (row) => row.DestinationAddr,
+        cell: (row) => (
+          <AddressChip
+            address={row.DestinationAddr}
+            variant="plain"
+            showCopy={false}
+            label={
+              sameAddress(row.DestinationAddr, BENEFICIARY.address) ? BENEFICIARY.name : undefined
+            }
+          />
+        ),
       },
       {
         id: 'amount',
