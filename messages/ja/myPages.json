@@ -2,7 +2,6 @@
   "shared": {
     "home": "ホーム",
     "user": "ユーザー",
-    "walletNotConnected": "ウォレットが接続されていません",
     "loading": "読み込み中…",
     "unavailable": "取得不可",
     "yes": "はい",
@@ -18,7 +17,6 @@
     "eyebrow": "個人 · 配分",
     "title": "自分の配分",
     "subtitle": "未受け取りの配分をすべて確認して受け取る",
-    "walletDescription": "配分を確認して受け取るにはウォレットを接続してください。",
     "loadErrorTitle": "読み込みに失敗しました",
     "loadErrorMessage": "未受け取りの配分データを読み込めませんでした",
     "sections": {
@@ -44,7 +42,6 @@
     "eyebrow": "個人 · 係留",
     "title": "自分の係留",
     "subtitle": "係留中のNFTを管理し、Cosmic Signature NFTの配分を確認する",
-    "walletDescription": "係留を管理するにはウォレットを接続してください。",
     "tabs": {
       "cosmicSignature": "Cosmic Signatureの係留",
       "randomWalk": "Random Walkの係留"
@@ -276,7 +273,6 @@
       "title": "自分のNFT",
       "subtitle": "接続中のウォレットにあるCosmic Signature NFT",
       "marketplace": "NFTを売買する",
-      "walletDescription": "NFTを確認して管理するにはウォレットを接続してください。",
       "loadErrorTitle": "トークンを読み込めませんでした",
       "loadErrorMessage": "Cosmic Signature NFTを読み込めませんでした。",
       "ownedTitle": "所有しているCosmic Signature NFT",
@@ -308,7 +304,6 @@
     "page": {
       "title": "CSTの送付",
       "subtitle": "Cosmic Signature CSTトークンを別のアドレスへ送ります。",
-      "walletDescription": "自分の残高からCSTを送付するにはウォレットを接続してください。",
       "sourceLabel": "接続中のウォレット",
       "description": "接続中のウォレットからCSTを送付します。トランザクションはウォレットで署名され、CSTトークンコントラクトへ直接送られます。"
     },

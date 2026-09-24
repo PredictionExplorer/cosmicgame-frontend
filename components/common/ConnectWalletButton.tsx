@@ -31,7 +31,12 @@ import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { NavLink } from '@/components/styled';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
-import { WalletAccountMenuItems, WalletAccountPanel } from '@/components/wallet/WalletAccountPanel';
+import { WrongNetworkBadge } from '@/components/wallet/NetworkGuard';
+import {
+  WalletAccountMenuItems,
+  WalletAccountPanel,
+  WalletNetworkMenuItems,
+} from '@/components/wallet/WalletAccountPanel';
 import { useActiveWeb3React } from '@/hooks/web3';
 
 interface Balance {
@@ -85,7 +90,7 @@ const ConnectWalletButton = ({
         <Popover>
           <PopoverTrigger
             className={cn(
-              'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card/40 px-3 text-sm outline-none transition-colors hover:bg-card/70',
+              'relative inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-border bg-card/40 px-3 text-sm outline-none transition-colors hover:bg-card/70',
               liquid && 'liquid-glass-control',
               className,
             )}
@@ -96,6 +101,8 @@ const ConnectWalletButton = ({
             {hasUnclaimedRewards && (
               <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-400" />
             )}
+            {/* Under 360px the header has no room for the wrong-network chip. */}
+            <WrongNetworkBadge className="min-[360px]:hidden" />
           </PopoverTrigger>
           <PopoverContent
             align="end"
@@ -112,12 +119,17 @@ const ConnectWalletButton = ({
     return (
       <DropdownMenu>
         <DropdownMenuTrigger
+          data-testid="wallet-menu-trigger"
           className={cn(
-            'ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
+            'relative ml-auto inline-flex h-auto cursor-pointer items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-4 py-2 text-sm outline-none transition-colors hover:bg-white/[0.06]',
             liquid && 'liquid-glass-control',
             className,
           )}
         >
+          {/* With the navigation in the bar there is no room for the
+              wrong-network chip: the pill carries the state, and the menu
+              opens on the switch. */}
+          <WrongNetworkBadge />
           <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
           {shortenHex(account)}
           {hasUnclaimedRewards && (
@@ -146,6 +158,11 @@ const ConnectWalletButton = ({
                 <Copy className="h-3.5 w-3.5" />
               )}
             </button>
+          </div>
+
+          {/* Network state (and the switch, when the wallet is elsewhere) */}
+          <div className="px-1 pb-1">
+            <WalletNetworkMenuItems />
           </div>
 
           <DropdownMenuSeparator />
@@ -282,7 +299,7 @@ const ConnectWalletButton = ({
 
           <DropdownMenuSeparator />
 
-          {/* Network, explorer, switch wallet and disconnect */}
+          {/* Explorer, switch wallet and disconnect */}
           <div className="px-1 py-1">
             <WalletAccountMenuItems />
           </div>

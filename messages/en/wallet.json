@@ -2,6 +2,7 @@
   "connect": {
     "button": "Connect Wallet",
     "opening": "Opening the wallet list…",
+    "restoring": "Restoring your wallet connection…",
     "disclaimer": "By connecting a wallet, you agree to the <terms>Terms of Service</terms> and acknowledge the <risk>Risk Disclosures</risk>. Gestures happen on {network} and need ETH there for the Gesture Cost and network fees."
   },
   "groups": {
@@ -52,14 +53,17 @@
     "hint": "Connecting shares your wallet address with this page. Nothing is sent until you confirm a transaction in your wallet.",
     "allocations": {
       "title": "Connect a wallet to see your allocations",
+      "description": "Your retrievable ETH, Anchor Distributions, and attached NFTs and tokens appear here once you connect.",
       "publicLink": "Browse all Allocation Recipients"
     },
     "anchors": {
       "title": "Connect a wallet to manage your anchors",
+      "description": "Your anchored NFTs, the NFTs you can anchor, and your Anchor Distributions appear here once you connect.",
       "publicLink": "Explore anchoring"
     },
     "nfts": {
       "title": "Connect a wallet to see your NFTs",
+      "description": "The Cosmic Signature NFTs in your wallet appear here once you connect, and you can send them to another address.",
       "publicLink": "Browse the gallery"
     },
     "statistics": {
@@ -69,10 +73,12 @@
     },
     "history": {
       "title": "Connect a wallet to see your allocation history",
+      "description": "Every allocation made to your wallet, in every Performance Cycle, appears here once you connect.",
       "publicLink": "Browse all Allocation Recipients"
     },
     "transferCst": {
-      "title": "Connect a wallet to send CST"
+      "title": "Connect a wallet to send CST",
+      "description": "Once you connect, your CST balance appears here with a form to send it and a link to your transfer history."
     }
   },
   "funding": {

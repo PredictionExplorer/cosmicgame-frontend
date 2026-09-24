@@ -6,20 +6,21 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useWalletAccount, type WalletAccountState } from '@/hooks/useWalletAccount';
+import { stateTone } from '@/lib/stateTone';
 import { cn } from '@/lib/utils';
 import { shortenHex } from '@/utils/format';
 
 import { SwitchNetworkButton } from './NetworkGuard';
-
-const POSITIVE_BG = 'bg-[hsl(var(--positive,var(--success)))]';
-const ATTENTION_TEXT = 'text-[hsl(var(--attention,40_90%_68%))]';
 
 function NetworkLine({ account }: { account: WalletAccountState }) {
   const t = useTranslations('wallet');
   if (account.isWrongChain) {
     return (
       <p className="flex items-start gap-2 text-xs text-muted-foreground">
-        <AlertTriangle className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', ATTENTION_TEXT)} aria-hidden />
+        <AlertTriangle
+          className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', stateTone.attentionText)}
+          aria-hidden
+        />
         <span>
           {account.connectedChainName
             ? t('network.walletOn', {
@@ -33,7 +34,10 @@ function NetworkLine({ account }: { account: WalletAccountState }) {
   }
   return (
     <p className="flex items-center gap-2 text-xs text-muted-foreground">
-      <span aria-hidden className={cn('h-1.5 w-1.5 shrink-0 rounded-full', POSITIVE_BG)} />
+      <span
+        aria-hidden
+        className={cn('h-1.5 w-1.5 shrink-0 rounded-full', stateTone.positiveDot)}
+      />
       {t('network.connectedTo', { network: account.requiredChainName })}
     </p>
   );
@@ -127,11 +131,12 @@ export function WalletAccountPanel({ className }: { className?: string }) {
 }
 
 /**
- * The same account actions as `DropdownMenuItem`s, for the desktop wallet
- * menu: network line (with switch), explorer link, Switch wallet, Disconnect.
- * Place inside a `DropdownMenuContent`.
+ * The network state as `DropdownMenuItem`s for the desktop wallet menu: the
+ * network line, plus "Switch to Arbitrum One" while the wallet is elsewhere.
+ * The menu shows it right under the address, so the fix is the first thing
+ * the wrong-network pill leads to. Place inside a `DropdownMenuContent`.
  */
-export function WalletAccountMenuItems() {
+export function WalletNetworkMenuItems() {
   const t = useTranslations('wallet');
   const account = useWalletAccount();
   if (!account.isConnected) return null;
@@ -146,10 +151,26 @@ export function WalletAccountMenuItems() {
           className="cursor-pointer gap-2.5 px-2 font-semibold"
           onSelect={() => void account.switchToRequiredChain()}
         >
-          <Repeat className={cn('h-3.5 w-3.5', ATTENTION_TEXT)} aria-hidden />
+          <Repeat className={cn('h-3.5 w-3.5', stateTone.attentionText)} aria-hidden />
           {t('network.switchTo', { network: account.requiredChainName })}
         </DropdownMenuItem>
       )}
+    </>
+  );
+}
+
+/**
+ * The account actions as `DropdownMenuItem`s, for the desktop wallet menu:
+ * explorer link, Switch wallet, Disconnect. Place inside a
+ * `DropdownMenuContent`.
+ */
+export function WalletAccountMenuItems() {
+  const t = useTranslations('wallet');
+  const account = useWalletAccount();
+  if (!account.isConnected) return null;
+
+  return (
+    <>
       {account.explorerUrl && (
         <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2">
           <a href={account.explorerUrl} target="_blank" rel="noopener noreferrer">

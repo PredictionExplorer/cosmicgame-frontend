@@ -6,7 +6,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import UserStatisticsView from '@/components/UserStatisticsView';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
-import { WalletRequiredState } from '@/components/ui/wallet-required-state';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 
 /**
  * The connected wallet's statistics. Without a wallet there is no "own"

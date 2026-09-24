@@ -3,16 +3,17 @@
 import { useId, type ReactNode } from 'react';
 import { ArrowRight, Loader2, Wallet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useAccount } from 'wagmi';
+import { useConnection } from 'wagmi';
 
 import { Link } from '@/i18n/navigation';
-import { ConnectWalletAction } from '@/components/wallet/ConnectWalletAction';
 import { cn } from '@/lib/utils';
+
+import { ConnectWalletAction } from './ConnectWalletAction';
 
 export interface WalletRequiredStateProps {
   /** What connecting unlocks, as a sentence title: "Connect a wallet to see your allocations". */
   title: string;
-  /** One sentence on what the page shows once connected. */
+  /** One sentence on what the page shows once connected (not a second call to connect). */
   description?: string;
   /** Public view of the same kind of data, for visitors who only want to look. */
   publicLink?: { href: string; label: string };
@@ -24,14 +25,33 @@ export interface WalletRequiredStateProps {
 }
 
 /**
+ * Keeps a trailing icon on the line of the label's last word: the text may
+ * wrap anywhere else, but never leaves the arrow alone on a line. Labels
+ * without spaces (Chinese, Japanese) stay whole.
+ */
+function withTrailingIcon(label: string, icon: ReactNode): ReactNode {
+  const cut = label.lastIndexOf(' ') + 1;
+  return (
+    <>
+      {label.slice(0, cut)}
+      <span className="whitespace-nowrap">
+        {label.slice(cut)}
+        {icon}
+      </span>
+    </>
+  );
+}
+
+/**
  * The disconnected state of a wallet-gated page (My Allocations, My NFTs, My
  * Anchors, My Statistics, Allocation History, Transfer CST): what connecting
- * unlocks, a Connect button that opens the wallet list, reassurance that
- * connecting signs nothing, and a way to the public view of the same data.
+ * unlocks, what the page shows once connected, a Connect button that opens
+ * the wallet list, reassurance that connecting signs nothing, and a way to
+ * the public view of the same data.
  *
  * While wagmi restores a returning visitor's session it shows a quiet
- * "Connecting…" line instead, so the Connect button does not flash before
- * the page switches to the connected view.
+ * "Restoring your wallet connection…" line instead, so the Connect button
+ * does not flash before the page switches to the connected view.
  */
 export function WalletRequiredState({
   title,
@@ -42,8 +62,7 @@ export function WalletRequiredState({
   className,
 }: WalletRequiredStateProps) {
   const t = useTranslations('wallet');
-  const tCommon = useTranslations('common');
-  const { status } = useAccount();
+  const { status } = useConnection();
   const Heading = headingLevel;
   const titleId = useId();
   const restoring = status === 'reconnecting' || status === 'connecting';
@@ -74,18 +93,20 @@ export function WalletRequiredState({
           className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-muted-foreground"
         >
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-          {tCommon('liveStatus.connecting')}
+          {t('connect.restoring')}
         </p>
       ) : (
-        <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+        <div className="mt-6 flex max-w-full flex-col items-center gap-3 sm:flex-row sm:gap-5">
           <ConnectWalletAction size="lg" warmOnVisible />
           {publicLink && (
             <Link
               href={publicLink.href}
-              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline sm:min-h-0"
+              className="inline-block max-w-full py-3 text-sm font-semibold text-primary text-balance underline-offset-4 hover:underline sm:py-0"
             >
-              {publicLink.label}
-              <ArrowRight className="h-4 w-4" aria-hidden />
+              {withTrailingIcon(
+                publicLink.label,
+                <ArrowRight className="ml-1.5 inline size-4 align-[-0.1875em]" aria-hidden />,
+              )}
             </Link>
           )}
         </div>

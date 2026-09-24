@@ -11,7 +11,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { EmptyState } from '@/components/ui/empty-state';
-import { WalletRequiredState } from '@/components/ui/wallet-required-state';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { ErrorState } from '@/components/ui/error-state';
 import { Spinner } from '@/components/ui/spinner';
 import { CustomPagination } from '@/components/common/CustomPagination';
@@ -146,7 +146,7 @@ export default function MyWinnings() {
         />
         <WalletRequiredState
           title={tWallet('required.allocations.title')}
-          description={t('allocations.walletDescription')}
+          description={tWallet('required.allocations.description')}
           publicLink={{ href: '/allocation', label: tWallet('required.allocations.publicLink') }}
         />
       </PageShell>

@@ -128,7 +128,7 @@ describe('MyWinnings', () => {
     mockAccount = null;
     render(<MyWinnings />);
     expect(screen.getByText('wallet.required.allocations.title')).toBeInTheDocument();
-    expect(screen.getByText('myPages.allocations.walletDescription')).toBeInTheDocument();
+    expect(screen.getByText('wallet.required.allocations.description')).toBeInTheDocument();
     expect(screen.getByTestId('connect-wallet-button')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /wallet\.required\.allocations\.publicLink/ }),

@@ -12,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { WalletRequiredState } from '@/components/ui/wallet-required-state';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { ErrorState } from '@/components/ui/error-state';
 import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
@@ -41,7 +41,7 @@ function MyWallet() {
       {!active || !account ? (
         <WalletRequiredState
           title={tWallet('required.nfts.title')}
-          description={t('tokens.page.walletDescription')}
+          description={tWallet('required.nfts.description')}
           publicLink={{ href: '/gallery', label: tWallet('required.nfts.publicLink') }}
         />
       ) : loading ? (

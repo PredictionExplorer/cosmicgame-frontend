@@ -2,6 +2,7 @@
   "connect": {
     "button": "连接钱包",
     "opening": "正在打开钱包列表…",
+    "restoring": "正在恢复钱包连接…",
     "disclaimer": "连接钱包即表示你同意<terms>服务条款</terms>，并已知悉<risk>风险披露</risk>。落笔在 {network} 上进行，需要该网络上的 ETH 支付落笔价格与网络手续费。"
   },
   "groups": {
@@ -52,14 +53,17 @@
     "hint": "连接只会向本页面提供钱包地址。在钱包中确认交易之前，不会发送任何内容。",
     "allocations": {
       "title": "连接钱包，查看你的分配",
+      "description": "连接后，这里会显示你可取回的 ETH、锚定派发，以及附加的 NFT 与代币。",
       "publicLink": "浏览全部获配者"
     },
     "anchors": {
       "title": "连接钱包，管理你的锚定",
+      "description": "连接后，这里会显示你已锚定的 NFT、可锚定的 NFT 以及你的锚定派发。",
       "publicLink": "了解锚定"
     },
     "nfts": {
       "title": "连接钱包，查看你的 NFT",
+      "description": "连接后，这里会显示你钱包中的 Cosmic Signature NFT，你也可以将它们发送到其他地址。",
       "publicLink": "浏览画廊"
     },
     "statistics": {
@@ -69,10 +73,12 @@
     },
     "history": {
       "title": "连接钱包，查看你的分配历史",
+      "description": "连接后，这里会显示你的钱包在每个演绎周期中获得的全部分配。",
       "publicLink": "浏览全部获配者"
     },
     "transferCst": {
-      "title": "连接钱包，发送 CST"
+      "title": "连接钱包，发送 CST",
+      "description": "连接后，这里会显示你的 CST 余额、发送表单，以及你的转账记录链接。"
     }
   },
   "funding": {

@@ -1,8 +1,12 @@
-import { WalletRequiredState } from '@/components/ui/wallet-required-state';
-
 import { checkA11y, fireEvent, render, screen } from '@/test-utils';
 
-import { ChainGuard, SwitchNetworkButton, WrongNetworkChip } from '../NetworkGuard';
+import { WalletRequiredState } from '../WalletRequiredState';
+import {
+  ChainGuard,
+  SwitchNetworkButton,
+  WrongNetworkBadge,
+  WrongNetworkChip,
+} from '../NetworkGuard';
 import { ConnectWalletAction } from '../ConnectWalletAction';
 import { FundingNotice } from '../FundingNotice';
 
@@ -30,14 +34,14 @@ const mockSwitchChainAsync = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('wagmi', () => ({
   ...jest.requireActual('../../../__mocks__/wagmi'),
-  useAccount: () => ({
+  useConnection: () => ({
     address: mockWalletChainId ? '0xUser' : undefined,
     isConnected: mockWalletChainId !== undefined,
     chainId: mockWalletChainId,
     status: mockAccountStatus,
   }),
   useBalance: () => ({ data: mockBalance }),
-  useSwitchChain: () => ({ switchChainAsync: mockSwitchChainAsync, isPending: false }),
+  useSwitchChain: () => ({ mutateAsync: mockSwitchChainAsync, isPending: false }),
 }));
 
 let mockAccount: string | null = null;
@@ -117,15 +121,29 @@ describe('WalletRequiredState', () => {
       'href',
       '/allocation',
     );
+    expect(screen.getByText('Your allocations appear here.')).toBeInTheDocument();
     expect(screen.getByText('wallet.required.hint')).toBeInTheDocument();
     await checkA11y(container);
   });
 
-  it('shows a quiet connecting line while a session is being restored', () => {
+  it('keeps the link arrow on the line of its last word', () => {
+    render(
+      <WalletRequiredState
+        title="Connect"
+        publicLink={{ href: '/allocation', label: 'Browse all Allocation Recipients' }}
+      />,
+    );
+    const link = screen.getByRole('link', { name: 'Browse all Allocation Recipients' });
+    const unbreakable = link.querySelector('.whitespace-nowrap');
+    expect(unbreakable).toHaveTextContent(/^Recipients$/);
+    expect(unbreakable?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('shows a quiet restoring line while a session is being restored', () => {
     mockAccountStatus = 'reconnecting';
     render(<WalletRequiredState title="Connect" />);
     expect(screen.queryByTestId('connect-wallet-button')).not.toBeInTheDocument();
-    expect(screen.getByRole('status')).toHaveTextContent('common.liveStatus.connecting');
+    expect(screen.getByRole('status')).toHaveTextContent('wallet.connect.restoring');
   });
 });
 
@@ -146,11 +164,33 @@ describe('network guard', () => {
     );
     expect(chip).toHaveAttribute(
       'title',
-      'wallet.network.walletOn(current=Ethereum,network=Arbitrum Sepolia)',
+      'wallet.network.walletOn(current=Ethereum,network=Arbitrum Sepolia) wallet.network.switchTo(network=Arbitrum Sepolia)',
     );
     fireEvent.click(chip);
     expect(mockSwitchChainAsync).toHaveBeenCalledWith({ chainId: 421614 });
     await checkA11y(container);
+  });
+
+  it('fits the header: icon-only 44px on phones, labelled from md, gone below 360px and from xl', () => {
+    // Layout is checked in a real browser by e2e/wrong-network-header.spec.ts
+    // (320-1280px); this pins the responsive contract it relies on.
+    mockWalletChainId = 1;
+    render(<WrongNetworkChip />);
+    const chip = screen.getByTestId('wrong-network-chip');
+    expect(chip).toHaveClass('hidden', 'min-[360px]:inline-flex', 'xl:hidden', 'size-11');
+    expect(screen.getByText('wallet.network.wrong')).toHaveClass('sr-only', 'md:not-sr-only');
+  });
+
+  it('marks the wallet pill instead where the chip has no room', () => {
+    mockWalletChainId = 1;
+    const { rerender } = render(<WrongNetworkBadge className="min-[360px]:hidden" />);
+    const badge = screen.getByTestId('wrong-network-badge');
+    expect(badge).toHaveClass('min-[360px]:hidden');
+    expect(badge).toHaveTextContent('wallet.network.wrong');
+
+    mockWalletChainId = 421614;
+    rerender(<WrongNetworkBadge className="min-[360px]:hidden" />);
+    expect(screen.queryByTestId('wrong-network-badge')).not.toBeInTheDocument();
   });
 
   it('swaps an action for the switch button and says why', () => {

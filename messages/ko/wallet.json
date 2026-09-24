@@ -2,6 +2,7 @@
   "connect": {
     "button": "지갑 연결",
     "opening": "지갑 목록을 여는 중…",
+    "restoring": "지갑 연결을 복원하는 중…",
     "disclaimer": "지갑을 연결하면 <terms>이용약관</terms>에 동의하고 <risk>위험 고지</risk> 내용을 확인한 것으로 간주됩니다. 제스처는 {network} 네트워크에서 이루어지며, 제스처 비용과 네트워크 수수료를 위해 해당 네트워크의 ETH가 필요합니다."
   },
   "groups": {
@@ -52,14 +53,17 @@
     "hint": "연결하면 이 페이지에 지갑 주소만 공유됩니다. 지갑에서 트랜잭션을 확인하기 전에는 아무것도 전송되지 않습니다.",
     "allocations": {
       "title": "지갑을 연결하면 내 배분을 볼 수 있습니다",
+      "description": "연결하면 회수할 수 있는 ETH, 앵커링 지급, 첨부된 NFT와 토큰이 여기에 표시됩니다.",
       "publicLink": "전체 배분 수령자 보기"
     },
     "anchors": {
       "title": "지갑을 연결하면 내 앵커링을 관리할 수 있습니다",
+      "description": "연결하면 앵커링한 NFT, 앵커링할 수 있는 NFT, 앵커링 지급이 여기에 표시됩니다.",
       "publicLink": "앵커링 살펴보기"
     },
     "nfts": {
       "title": "지갑을 연결하면 내 NFT를 볼 수 있습니다",
+      "description": "연결하면 지갑에 있는 Cosmic Signature NFT가 여기에 표시되며, 다른 주소로 보낼 수 있습니다.",
       "publicLink": "갤러리 둘러보기"
     },
     "statistics": {
@@ -69,10 +73,12 @@
     },
     "history": {
       "title": "지갑을 연결하면 배분 내역을 볼 수 있습니다",
+      "description": "연결하면 모든 퍼포먼스 사이클에서 지갑에 배분된 내역이 여기에 표시됩니다.",
       "publicLink": "전체 배분 수령자 보기"
     },
     "transferCst": {
-      "title": "지갑을 연결하면 CST를 전송할 수 있습니다"
+      "title": "지갑을 연결하면 CST를 전송할 수 있습니다",
+      "description": "연결하면 CST 잔액, 전송 양식, 전송 내역 링크가 여기에 표시됩니다."
     }
   },
   "funding": {

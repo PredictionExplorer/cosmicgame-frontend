@@ -5,20 +5,24 @@ import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { Button, type ButtonProps } from '@/components/ui/button';
-import { useRequireChain } from '@/hooks/useRequireChain';
+import { useWalletNetwork, type WalletNetworkState } from '@/hooks/useWalletNetwork';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { stateTone } from '@/lib/stateTone';
 import { cn } from '@/lib/utils';
 
 import { ConnectWalletAction } from './ConnectWalletAction';
 
-/*
- * Attention colour for the wrong-network state. `--attention` is the
- * palette-tuned state token; the fallback is its shared default. Always paired
- * with an icon and a word, never colour alone.
- */
-const ATTENTION_TEXT = 'text-[hsl(var(--attention,40_90%_68%))]';
-const ATTENTION_CHIP =
-  'border-[hsl(var(--attention,40_90%_68%)/0.45)] bg-[hsl(var(--attention,40_90%_68%)/0.12)] hover:bg-[hsl(var(--attention,40_90%_68%)/0.2)]';
+/** "Your wallet is on Ethereum. Cosmic Signature runs on Arbitrum One." */
+function useWrongNetworkSentence(): (network: WalletNetworkState) => string {
+  const t = useTranslations('wallet');
+  return (network) =>
+    network.connectedChainName
+      ? t('network.walletOn', {
+          current: network.connectedChainName,
+          network: network.requiredChainName,
+        })
+      : t('network.walletOnOther', { network: network.requiredChainName });
+}
 
 type SwitchNetworkButtonProps = Omit<ButtonProps, 'onClick' | 'children'>;
 
@@ -28,7 +32,7 @@ type SwitchNetworkButtonProps = Omit<ButtonProps, 'onClick' | 'children'>;
  */
 export function SwitchNetworkButton({ disabled, ...props }: SwitchNetworkButtonProps) {
   const t = useTranslations('wallet');
-  const { requiredChainName, switchToRequiredChain, isSwitching } = useRequireChain();
+  const { requiredChainName, switchToRequiredChain, isSwitching } = useWalletNetwork();
   return (
     <Button
       {...props}
@@ -44,57 +48,80 @@ export function SwitchNetworkButton({ disabled, ...props }: SwitchNetworkButtonP
 }
 
 /**
- * Compact wrong-network chip for the header, next to the wallet pill. Renders
- * nothing unless a connected wallet is on another chain; then it is a single
- * button — "Wrong network · Switch to Arbitrum One" — that asks the wallet to
- * switch.
+ * Wrong-network button for the header, next to the wallet pill. Renders
+ * nothing unless a connected wallet is on another chain; then one click asks
+ * the wallet to switch.
+ *
+ * It has to fit beside the pill at every width and in every locale, so the
+ * visible label follows the room the header has: an icon-only 44px target on
+ * phones (the header already holds four icon controls) and "Wrong network"
+ * from `md`, while the navigation sits in the drawer. Below 360px, and from
+ * `xl` where the navigation joins the bar, the chip steps aside and
+ * `WrongNetworkBadge` on the wallet pill carries the state. The accessible
+ * name is always the full "Wrong network. Switch to Arbitrum One", and
+ * `title` explains both networks on hover.
  */
 export function WrongNetworkChip({ className }: { className?: string }) {
   const t = useTranslations('wallet');
-  const {
-    isWrongChain,
-    requiredChainName,
-    connectedChainName,
-    switchToRequiredChain,
-    isSwitching,
-  } = useRequireChain();
-  if (!isWrongChain) return null;
+  const network = useWalletNetwork();
+  const sentence = useWrongNetworkSentence();
+  if (!network.isWrongChain) return null;
 
-  const description = connectedChainName
-    ? t('network.walletOn', { current: connectedChainName, network: requiredChainName })
-    : t('network.walletOnOther', { network: requiredChainName });
+  const action = network.isSwitching
+    ? t('network.switching')
+    : t('network.switchTo', { network: network.requiredChainName });
 
   return (
     <button
       type="button"
-      onClick={() => void switchToRequiredChain()}
-      aria-busy={isSwitching || undefined}
-      disabled={isSwitching}
-      title={description}
+      onClick={() => void network.switchToRequiredChain()}
+      aria-busy={network.isSwitching || undefined}
+      disabled={network.isSwitching}
+      title={`${sentence(network)} ${action}`}
       data-testid="wrong-network-chip"
       className={cn(
-        'inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors sm:min-h-9',
-        ATTENTION_CHIP,
-        ATTENTION_TEXT,
-        'disabled:cursor-progress',
+        'hidden size-11 shrink-0 items-center justify-center gap-1.5 rounded-full border text-xs font-semibold whitespace-nowrap transition-colors min-[360px]:inline-flex xl:hidden',
+        'sm:size-9 md:w-auto md:px-3',
+        stateTone.attentionChip,
+        stateTone.attentionText,
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-progress',
         className,
       )}
     >
-      {isSwitching ? (
-        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+      {network.isSwitching ? (
+        <Loader2 className="size-4 shrink-0 animate-spin md:size-3.5" aria-hidden />
       ) : (
-        <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+        <AlertTriangle className="size-4 shrink-0 md:size-3.5" aria-hidden />
       )}
-      <span>{t('network.wrong')}</span>
-      <span aria-hidden className="hidden sm:inline">
-        ·
-      </span>
-      <span className="sr-only sm:not-sr-only">
-        {isSwitching
-          ? t('network.switching')
-          : t('network.switchTo', { network: requiredChainName })}
-      </span>
+      <span className="sr-only md:not-sr-only">{t('network.wrong')}</span>
+      <span className="sr-only">{action}</span>
     </button>
+  );
+}
+
+/**
+ * The wrong-network state as a badge on the wallet pill, where the header has
+ * no room for `WrongNetworkChip`: phones under 360px and the desktop bar (xl
+ * and up), where the navigation fills the row. The pill opens the account
+ * panel or menu, which explains the state and offers the switch. Place it
+ * inside a `relative` trigger; pass visibility classes for the widths where
+ * the chip is shown instead.
+ */
+export function WrongNetworkBadge({ className }: { className?: string }) {
+  const t = useTranslations('wallet');
+  const { isWrongChain } = useWalletNetwork();
+  if (!isWrongChain) return null;
+  return (
+    <span
+      data-testid="wrong-network-badge"
+      className={cn(
+        'absolute right-0 -top-0.5 inline-flex size-4 items-center justify-center rounded-full border border-background bg-background',
+        className,
+      )}
+    >
+      <AlertTriangle className={cn('size-3.5', stateTone.attentionText)} aria-hidden />
+      <span className="sr-only">{t('network.wrong')}</span>
+    </span>
   );
 }
 
@@ -118,7 +145,7 @@ export interface ChainGuardProps {
  * another chain the action is replaced by "Switch to Arbitrum One" and one
  * sentence naming both networks, so a wrong-network write never becomes a
  * dead-end error. Every write still goes through the chain guard in useTxFlow
- * / useContract; this makes the state visible before the click.
+ * / useRequireChain; this makes the state visible before the click.
  */
 export function ChainGuard({
   children,
@@ -127,9 +154,9 @@ export function ChainGuard({
   className,
   buttonClassName,
 }: ChainGuardProps) {
-  const t = useTranslations('wallet');
   const { account } = useActiveWeb3React();
-  const { isWrongChain, requiredChainName, connectedChainName } = useRequireChain();
+  const network = useWalletNetwork();
+  const sentence = useWrongNetworkSentence();
 
   if (requireConnection && !account) {
     return (
@@ -138,16 +165,17 @@ export function ChainGuard({
       </div>
     );
   }
-  if (!isWrongChain) return <>{children}</>;
+  if (!network.isWrongChain) return <>{children}</>;
 
   return (
     <div className={cn('flex flex-col items-start gap-2', className)} data-testid="chain-guard">
       {explain && (
         <p className="flex items-start gap-2 text-sm text-muted-foreground">
-          <AlertTriangle className={cn('mt-0.5 h-4 w-4 shrink-0', ATTENTION_TEXT)} aria-hidden />
-          {connectedChainName
-            ? t('network.walletOn', { current: connectedChainName, network: requiredChainName })
-            : t('network.walletOnOther', { network: requiredChainName })}
+          <AlertTriangle
+            className={cn('mt-0.5 size-4 shrink-0', stateTone.attentionText)}
+            aria-hidden
+          />
+          {sentence(network)}
         </p>
       )}
       <SwitchNetworkButton className={buttonClassName} />

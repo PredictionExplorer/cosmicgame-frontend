@@ -43,6 +43,7 @@ describe('TransferCstPage', () => {
     render(<TransferCstPage />);
 
     expect(screen.getByText('wallet.required.transferCst.title')).toBeInTheDocument();
+    expect(screen.getByText('wallet.required.transferCst.description')).toBeInTheDocument();
     expect(screen.getByTestId('connect-wallet-button')).toBeInTheDocument();
     expect(screen.queryByTestId('cst-transfer-form')).not.toBeInTheDocument();
   });

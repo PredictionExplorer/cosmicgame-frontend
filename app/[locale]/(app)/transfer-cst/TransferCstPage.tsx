@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { CstTransferForm } from '@/components/tokens/CstTransferForm';
-import { WalletRequiredState } from '@/components/ui/wallet-required-state';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
 
@@ -32,7 +32,7 @@ export default function TransferCstPage() {
         {!active || !account ? (
           <WalletRequiredState
             title={tWallet('required.transferCst.title')}
-            description={t('transferCst.page.walletDescription')}
+            description={tWallet('required.transferCst.description')}
           />
         ) : (
           <CstTransferForm

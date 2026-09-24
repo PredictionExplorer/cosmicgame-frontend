@@ -10,7 +10,7 @@ import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 import { EmptyState } from '@/components/ui/empty-state';
-import { WalletRequiredState } from '@/components/ui/wallet-required-state';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { PageHeader } from '@/components/layout/PageHeader';
 
 function WinningHistory() {
@@ -29,12 +29,9 @@ function WinningHistory() {
           title={t('recipientHistory.pageTitle')}
           subtitle={t('recipientHistory.subtitle')}
         />
-        <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-          {t('recipientHistory.disconnectedDescription')}
-        </p>
         <WalletRequiredState
           title={tWallet('required.history.title')}
-          description={t('recipientHistory.walletDescription')}
+          description={tWallet('required.history.description')}
           publicLink={{ href: '/allocation', label: tWallet('required.history.publicLink') }}
         />
       </PageShell>

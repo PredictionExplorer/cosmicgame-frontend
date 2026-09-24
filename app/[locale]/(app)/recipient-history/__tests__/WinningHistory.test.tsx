@@ -30,13 +30,16 @@ describe('WinningHistory', () => {
     expect(screen.getByText('History of My Allocations')).toBeInTheDocument();
   });
 
-  it('shows login prompt when no account', () => {
+  it('asks to connect and says what the page shows, once', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: null });
     mockUseClaimHistoryByUser.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<WinningHistory />);
     expect(
-      screen.getByText('Please connect your wallet to see your allocation history.'),
+      screen.getByRole('heading', { name: 'wallet.required.history.title' }),
     ).toBeInTheDocument();
+    expect(screen.getByText('wallet.required.history.description')).toBeInTheDocument();
+    // The connected view's long intro is not repeated above the prompt.
+    expect(screen.queryByText(/Track your complete allocation history/)).not.toBeInTheDocument();
   });
 
   it('shows loading state', () => {

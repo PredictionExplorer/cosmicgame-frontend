@@ -24,7 +24,7 @@ import { AnchoringHeroStats } from '@/components/anchoring/AnchoringHeroStats';
 import type { AnchoringStatItem } from '@/components/anchoring/AnchoringHeroStats';
 import { StatCardSkeleton } from '@/components/ui/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { WalletRequiredState } from '@/components/ui/wallet-required-state';
+import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 
@@ -147,7 +147,7 @@ const MyAnchors = () => {
       {!account ? (
         <WalletRequiredState
           title={tWallet('required.anchors.title')}
-          description={t('anchors.walletDescription')}
+          description={tWallet('required.anchors.description')}
           publicLink={{ href: '/anchoring', label: tWallet('required.anchors.publicLink') }}
         />
       ) : loading ? (
