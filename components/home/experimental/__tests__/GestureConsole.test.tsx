@@ -110,7 +110,9 @@ describe('GestureConsole', () => {
     expect(radios).toHaveLength(3);
     expect(radios[0]).toHaveTextContent('0.10211 ETH');
     expect(radios[1]).toHaveTextContent('0.051055 ETH');
-    expect(radios[1]).toHaveTextContent('home.form.method.randomWalk.desc');
+    // A short qualifier, not the method's full sentence.
+    expect(radios[1]).toHaveTextContent('home.deck.console.randomWalkNote');
+    expect(radios[1]).not.toHaveTextContent('home.form.method.randomWalk.desc');
     expect(radios[2]).toHaveTextContent('250.52 CST');
   });
 
@@ -124,10 +126,10 @@ describe('GestureConsole', () => {
     ).toBeTruthy();
   });
 
-  it('reads a free CST Gesture on the CST segment itself', () => {
+  it('reads a CST Gesture at its floor as 0 CST, never "free"', () => {
     renderConsole({ cstGestureData: { ...cstGestureData, isFree: true } });
 
-    expect(methodRadios()[2]).toHaveTextContent('home.deck.console.free');
+    expect(methodRadios()[2]).toHaveTextContent('home.calibration.floor');
   });
 
   it('offers only ETH before the first Gesture of a cycle', () => {
@@ -256,6 +258,69 @@ describe('GestureConsole', () => {
 
     await userEvent.click(screen.getByTestId('finalize-submit'));
     expect(onFinalize).toHaveBeenCalledTimes(1);
+  });
+
+  it('tells the Final Gesture participant how long only they can finalize', () => {
+    renderConsole({
+      canGesture: false,
+      cycleTimerEnded: true,
+      finalize: {
+        canClaim: true,
+        isClaiming: false,
+        isLatestParticipant: true,
+        openToAllAtMs: 3_600_000,
+        nowMs: 1_800_000,
+        onFinalize: jest.fn(),
+      },
+    });
+
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+    const note = screen.getByTestId('finalize-holder-window');
+    expect(note).toHaveTextContent('home.deck.console.holderWindow(duration=30m)');
+    expect(note).toHaveClass('text-subtle');
+    expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
+  });
+
+  it('names no exclusive window while its length is unknown', () => {
+    renderConsole({
+      canGesture: false,
+      cycleTimerEnded: true,
+      finalize: {
+        canClaim: true,
+        isClaiming: false,
+        isLatestParticipant: true,
+        openToAllAtMs: null,
+        nowMs: 1_800_000,
+        onFinalize: jest.fn(),
+      },
+    });
+
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+    expect(screen.queryByTestId('finalize-holder-window')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
+  });
+
+  it('marks the last ten minutes of the exclusive window, then says it ended', () => {
+    const finalize: ConsoleFinalize = {
+      canClaim: true,
+      isClaiming: false,
+      isLatestParticipant: true,
+      openToAllAtMs: 3_600_000,
+      nowMs: 3_600_000 - 9 * 60_000,
+      onFinalize: jest.fn(),
+    };
+    const { unmount } = renderConsole({ canGesture: false, cycleTimerEnded: true, finalize });
+    expect(screen.getByTestId('finalize-holder-window')).toHaveClass('text-attention');
+    unmount();
+
+    renderConsole({
+      canGesture: false,
+      cycleTimerEnded: true,
+      finalize: { ...finalize, nowMs: 3_700_000 },
+    });
+    const note = screen.getByTestId('finalize-holder-window');
+    expect(note).toHaveTextContent(/^home\.deck\.console\.holderWindowEnded$/);
+    expect(note).toHaveClass('text-subtle');
   });
 
   it('holds finalization for others until the exclusive window ends', () => {

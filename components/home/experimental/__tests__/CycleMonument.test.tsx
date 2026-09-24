@@ -103,7 +103,33 @@ describe('CycleMonument', () => {
     expect(visibleText(reserve)).toContain('home.deck.monument.reserveLabel');
     expect(reserve.querySelector('data')).toHaveAttribute('value', '8.0735');
     expect(visibleText(reserve)).toContain('8.0735 ETH');
-    expect(visibleText(reserve)).toContain('home.deck.monument.reserveExtras');
+    // Nothing is attached this cycle, so the line names none.
+    expect(screen.getByTestId('monument-reserve-extras')).toHaveTextContent(
+      /^home\.deck\.monument\.extras\.base$/,
+    );
+  });
+
+  it('names the attached assets only when the cycle holds some', () => {
+    const { rerender } = renderMonument({ attachedNFTCount: 2 });
+    expect(screen.getByTestId('monument-reserve-extras')).toHaveTextContent(
+      'home.deck.monument.extras.withNft(nftCount=2)',
+    );
+
+    rerender(
+      <CycleMonument
+        data={makeDashboard()}
+        loading={false}
+        allocationTime={NOW + 13 * 3600_000}
+        activationTime={0}
+        now={NOW}
+        finalizationConfirmed
+        attachedNFTCount={1}
+        attachedERC20Count={3}
+      />,
+    );
+    expect(screen.getByTestId('monument-reserve-extras')).toHaveTextContent(
+      'home.deck.monument.extras.withBoth(nftCount=1,erc20Count=3)',
+    );
   });
 
   it('marks an unreadable Signature Allocation as unknown, never 0', () => {

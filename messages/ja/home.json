@@ -534,7 +534,12 @@
     "returnToCurrent": "現在のUIに戻る",
     "monument": {
       "reserveLabel": "シグネチャー配分",
-      "reserveExtras": "+ 1,000 CST · Cosmic Signature NFT 1点 · 添付されたアセット",
+      "extras": {
+        "base": "+ 1,000 CST · Cosmic Signature NFT 1点",
+        "withNft": "+ 1,000 CST · Cosmic Signature NFT 1点 · {nftCount, plural, other {添付NFT #点}}",
+        "withErc20": "+ 1,000 CST · Cosmic Signature NFT 1点 · {erc20Count, plural, other {添付トークン#件}}",
+        "withBoth": "+ 1,000 CST · Cosmic Signature NFT 1点 · {nftCount, plural, other {添付NFT #点}} · {erc20Count, plural, other {添付トークン#件}}"
+      },
       "calendarTitle": "Cosmic Signatureサイクル{number}が始まります",
       "calendarBody": "次のパフォーマンス・サイクルで一筆を入れられるようになります。最初の一筆が確定までの時計を動かします。",
       "calendarCta": "開始をカレンダーに追加"
@@ -578,18 +583,19 @@
     "console": {
       "title": "一筆を入れる",
       "methodLabel": "一筆の方法",
-      "free": "費用なし",
       "reward": "参加CSTのプレビュー",
       "minAccepted": "最小数量",
       "messageHint": "メッセージは一筆とともにオンチェーンに残ります",
-      "finalizeOpensIn": "{duration}後には、どのウォレットからでもサイクルを確定できます。それまでは、最後の一筆を入れた参加者だけが確定できます。"
-    },
-    "standings": {
-      "title": "ライブ順位",
-      "paidVia": "{method}を使用"
+      "finalizeOpensIn": "{duration}後には、どのウォレットからでもサイクルを確定できます。それまでは、最後の一筆を入れた参加者だけが確定できます。",
+      "holderWindow": "あと{duration}は単独で確定できます。その後は、どの参加者でも確定してシグネチャー配分を受け取れます。",
+      "holderWindowEnded": "単独で確定できる時間は終わりました。現在は、どの参加者でも確定してシグネチャー配分を受け取れます。",
+      "randomWalkNote": "未使用のRandom Walk NFTでETHの費用が半額"
     },
     "links": {
       "previousCycleDescription": "前回確定したサイクルの受領者と配分"
+    },
+    "phaseGuide": {
+      "later": "以降"
     }
   },
   "observatory": {

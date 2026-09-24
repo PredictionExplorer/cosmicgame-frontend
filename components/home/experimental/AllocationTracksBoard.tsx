@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 import { formatAmount, formatNumber } from '@/utils/format';
 
+import { QUIET_TERM_CLASS } from './quietTerm';
+
 interface AllocationTracksBoardProps {
   data: DashboardInfo | null;
   className?: string;
@@ -173,7 +175,9 @@ export function AllocationTracksBoard({ data, className }: AllocationTracksBoard
           />
           <div className="min-w-0">
             <p className="type-body-sm text-foreground">
-              <ExplainedTerm definition={track.definition}>{track.name}</ExplainedTerm>
+              <ExplainedTerm definition={track.definition} className={QUIET_TERM_CLASS}>
+                {track.name}
+              </ExplainedTerm>
             </p>
             <p className="mt-0.5 type-caption text-subtle">{track.detail}</p>
           </div>

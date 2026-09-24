@@ -15,6 +15,21 @@ function mockOverflow(overflow: number) {
 }
 
 describe('ScrollRail', () => {
+  it('marks the edge it can still scroll toward', async () => {
+    const restore = mockOverflow(500);
+    const { container } = render(
+      <ScrollRail label="Performance Cycle phases">
+        <ol>
+          <li>Opening</li>
+          <li aria-current="step">Open</li>
+        </ol>
+      </ScrollRail>,
+    );
+    await waitFor(() => expect(container.querySelector('[data-overflow-end]')).not.toBeNull());
+    expect(container.querySelector('[data-overflow-start]')).toBeNull();
+    restore();
+  });
+
   it('lets a keyboard scroll a track that overflows with nothing focusable inside', async () => {
     const restore = mockOverflow(200);
     render(
@@ -44,15 +59,18 @@ describe('ScrollRail', () => {
     restore();
   });
 
-  it('takes no focus when everything fits', async () => {
+  it('takes no focus and no name when everything fits', async () => {
     const restore = mockOverflow(0);
     const { container } = render(
       <ScrollRail label="Cycle timeline">
         <span>Fits</span>
       </ScrollRail>,
     );
+    // Let the first measurement run before asserting nothing changed.
     await new Promise((resolve) => requestAnimationFrame(resolve));
     expect(container.querySelector('[tabindex]')).toBeNull();
+    expect(container.querySelector('[role]')).toBeNull();
+    expect(container.querySelector('[aria-label]')).toBeNull();
     restore();
   });
 });

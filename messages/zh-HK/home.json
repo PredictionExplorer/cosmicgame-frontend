@@ -534,7 +534,12 @@
     "returnToCurrent": "返回目前介面",
     "monument": {
       "reserveLabel": "簽名分配",
-      "reserveExtras": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · 附加資產",
+      "extras": {
+        "base": "+ 1,000 CST · 1 枚 Cosmic Signature NFT",
+        "withNft": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · {nftCount, number} 枚附加 NFT",
+        "withErc20": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · {erc20Count, number} 筆附加代幣存入",
+        "withBoth": "+ 1,000 CST · 1 枚 Cosmic Signature NFT · {nftCount, number} 枚附加 NFT · {erc20Count, number} 筆附加代幣存入"
+      },
       "calendarTitle": "Cosmic Signature 第 {number} 個週期開啟",
       "calendarBody": "下一演繹週期即將開放落筆。第一筆會啟動收官倒數。",
       "calendarCta": "把開啟時間加入日曆"
@@ -578,18 +583,19 @@
     "console": {
       "title": "落筆",
       "methodLabel": "落筆方式",
-      "free": "免費",
       "reward": "CST 銘刻預覽",
       "minAccepted": "最低接受",
       "messageHint": "留言與你的落筆一同上鏈",
-      "finalizeOpensIn": "{duration}後你即可收官。在此之前，只有寫下收官之筆的參與者可以收官。"
-    },
-    "standings": {
-      "title": "即時席位",
-      "paidVia": "使用 {method}"
+      "finalizeOpensIn": "{duration}後你即可收官。在此之前，只有寫下收官之筆的參與者可以收官。",
+      "holderWindow": "接下來的{duration}內只有你可收官。之後，任何參與者都可收官並獲得簽名分配。",
+      "holderWindowEnded": "你的獨享時段已結束。現在任何參與者都可收官並獲得簽名分配。",
+      "randomWalkNote": "ETH 價格減半，需一枚未使用的 Random Walk NFT"
     },
     "links": {
       "previousCycleDescription": "上一個收官週期的獲配者與分配"
+    },
+    "phaseGuide": {
+      "later": "之後"
     }
   },
   "observatory": {

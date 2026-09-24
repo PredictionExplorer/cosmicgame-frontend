@@ -88,9 +88,73 @@ test.describe('experimental UI', () => {
     await expect(methods.first()).toContainText('ETH');
     await expect(page.getByTestId('calibration-window')).toBeVisible();
 
+    // The three prices share one line even when a label wraps (subgrid rows).
+    const priceTops = await methods.evaluateAll((radios) =>
+      radios.map((radio) => Math.round(radio.children[1]!.getBoundingClientRect().top)),
+    );
+    expect(Math.max(...priceTops) - Math.min(...priceTops)).toBeLessThanOrEqual(1);
+
     const console_ = page.getByTestId('gesture-console').first();
-    await console_.getByText('Advanced', { exact: true }).click();
+    await console_.getByText('Advanced options', { exact: true }).click();
     await expect(console_.getByTestId('gesture-advanced-fields')).toBeVisible();
+  });
+
+  for (const viewport of [
+    { name: 'phone', width: 390, height: 844 },
+    { name: 'tablet', width: 820, height: 1180 },
+  ]) {
+    test(`keeps the chat inside its own card on a ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await openExperiment(page);
+
+      // Below 1024px the chat grows with its rows (windowed behind "Show
+      // more"), so nothing it holds can paint over the tracks that follow.
+      const chat = page.getByTestId('gesture-message-chat');
+      const tracks = page.getByTestId('allocation-tracks-board');
+      await expect(chat).toBeVisible();
+      await expect(tracks).toBeVisible();
+      const geometry = await page.evaluate(() => {
+        const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+        const card = box('[data-testid="gesture-message-chat"]');
+        const scroll = document.querySelector('[data-testid="gesture-message-chat-scroll"]')!;
+        // Only rows that paint: a closed event group keeps layout boxes for
+        // its rows, which sit below the card without drawing anything.
+        const painted = (node: Element) =>
+          node.checkVisibility() && !node.closest('details:not([open]) > :not(summary)');
+        const rows = Array.from(scroll.querySelectorAll('li, button'))
+          .filter(painted)
+          .map((node) => node.getBoundingClientRect().bottom);
+        return {
+          cardBottom: card.bottom,
+          lastRowBottom: Math.max(0, ...rows),
+          tracksTop: box('[data-testid="allocation-tracks-board"]').top,
+        };
+      });
+      expect(geometry.cardBottom).toBeLessThanOrEqual(geometry.tracksTop);
+      expect(geometry.lastRowBottom).toBeLessThanOrEqual(geometry.cardBottom);
+    });
+  }
+
+  test('draws the bell and "Return" as one control family', async ({ page }) => {
+    await openExperiment(page);
+
+    // One radius, one edge and one height: a round bell beside a rounded
+    // rectangle reads as two kinds of control.
+    const header = page.getByTestId('home-deck-header');
+    const shape = (testId: string) =>
+      header.getByTestId(testId).evaluate((node) => {
+        const style = getComputedStyle(node);
+        return {
+          radius: style.borderTopLeftRadius,
+          borderWidth: style.borderTopWidth,
+          borderColor: style.borderTopColor,
+          height: Math.round(node.getBoundingClientRect().height),
+        };
+      });
+    const bell = await shape('attention-menu-trigger');
+    const back = await shape('experimental-ui-return');
+    expect(bell.radius).toBe('8px');
+    expect(bell).toEqual(back);
   });
 
   test('uses the intended phone order, the shared dock and the still art', async ({
@@ -121,16 +185,39 @@ test.describe('experimental UI', () => {
     expect(positions.board).toBeLessThan(positions.chat);
     expect(positions.scrollWidth).toBeLessThanOrEqual(positions.clientWidth + 1);
 
-    // The header's actions and its related link share one row on phones.
+    // Phones: the lede reads in full, the newcomer's link follows it as text,
+    // then the bell and "Return" share one row at one height.
     const header = page.getByTestId('home-deck-header');
     await expect(header.getByTestId('experimental-ui-new-here')).toBeVisible();
     await expect(header.getByRole('navigation')).toBeHidden();
+    await expect(header.getByRole('button', { name: /read more/i })).toHaveCount(0);
     const rows = await page.evaluate(() => {
-      const top = (testId: string) =>
-        document.querySelector(`[data-testid="${testId}"]`)?.getBoundingClientRect().top ?? 0;
-      return { back: top('experimental-ui-return'), newHere: top('experimental-ui-new-here') };
+      const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+      return {
+        newHere: box('[data-testid="experimental-ui-new-here"]'),
+        back: box('[data-testid="experimental-ui-return"]'),
+        bell: box('[data-testid="attention-menu-trigger"]'),
+      };
     });
-    expect(Math.abs(rows.back - rows.newHere)).toBeLessThan(12);
+    expect(rows.newHere.bottom).toBeLessThanOrEqual(rows.back.top);
+    expect(rows.newHere.right).toBeLessThanOrEqual(390);
+    expect(Math.abs(rows.back.top - rows.bell.top)).toBeLessThan(1);
+    expect(Math.round(rows.back.height)).toBe(Math.round(rows.bell.height));
+
+    // The cycle's six phases are one compact rail, not six stacked cards.
+    const phases = page.getByRole('list', { name: 'Performance Cycle phases' });
+    const phasesBox = await phases.boundingBox();
+    expect(phasesBox!.height).toBeLessThan(160);
+    // The rail keeps the current phase in view inside its own scroller.
+    await expect
+      .poll(() =>
+        phases.evaluate((list) => {
+          const track = list.parentElement!.getBoundingClientRect();
+          const current = list.querySelector('[aria-current="step"]')!.getBoundingClientRect();
+          return current.left >= track.left - 1 && current.right <= track.right + 1;
+        }),
+      )
+      .toBe(true);
 
     // The dock carries the clock and the priced action, and opens the same console.
     await expect(page.getByTestId('action-dock')).toBeVisible();

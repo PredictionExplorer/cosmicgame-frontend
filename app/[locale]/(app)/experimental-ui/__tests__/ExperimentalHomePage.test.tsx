@@ -2,8 +2,7 @@ import userEvent from '@testing-library/user-event';
 import { zeroAddress } from 'viem';
 
 import { resetUxScenarioForTest } from '@/lib/uxCycleScenarios';
-import type { useChampionsAtClock } from '@/components/home/experimental/useChampionsAtClock';
-import type { ChampionsState } from '@/hooks/useChampions';
+import type { ChampionsState, useChampions } from '@/hooks/useChampions';
 import type { SpecialAllocationSnapshot } from '@/hooks/useSpecialAllocationSnapshot';
 import type { TxStage } from '@/lib/txStage';
 import type { CSTTokenInfo, GestureInfo } from '@/services/api';
@@ -52,10 +51,18 @@ jest.mock('@/hooks/useHomeGestureFeed', () => ({
   },
 }));
 
-type ChampionsAtClockArgs = Parameters<typeof useChampionsAtClock>[0];
-const mockChampions = jest.fn<ChampionsState, [ChampionsAtClockArgs]>();
-jest.mock('@/components/home/experimental/useChampionsAtClock', () => ({
-  useChampionsAtClock: (args: ChampionsAtClockArgs) => mockChampions(args),
+type ChampionsArgs = Parameters<typeof useChampions>;
+const mockChampions = jest.fn<ChampionsState, ChampionsArgs>();
+jest.mock('@/hooks/useChampions', () => ({
+  ...jest.requireActual('@/hooks/useChampions'),
+  useChampions: (...args: ChampionsArgs) => mockChampions(...args),
+}));
+
+// The chain read behind the own-Gesture overlay and the verified alert.
+const mockFetchEndgameChainSample = jest.fn();
+jest.mock('@/lib/rpcRace', () => ({
+  ...jest.requireActual('@/lib/rpcRace'),
+  fetchEndgameChainSample: (...args: unknown[]) => mockFetchEndgameChainSample(...args),
 }));
 
 const mockSpecialSnapshot = jest.fn<
@@ -214,6 +221,7 @@ interface MockActionDockProps {
   stepAside: boolean;
   submit: { action: string; cost: string | null };
   canClaim: boolean;
+  data: { CurNumBids?: number; LastBidderAddr?: string } | null;
   onFinalize: () => void;
   onOpenSheet: () => void;
 }
@@ -305,6 +313,8 @@ beforeEach(() => {
   mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
   mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
   mockChampions.mockReturnValue(makeChampions());
+  mockFetchEndgameChainSample.mockReset();
+  mockFetchEndgameChainSample.mockReturnValue(new Promise(() => undefined));
   mockSpecialSnapshot.mockReturnValue({ snapshot: null, isLoading: false });
   mockTickingNow = null;
   Object.assign(mockGestureForm, {
@@ -318,6 +328,7 @@ beforeEach(() => {
     allocationTime: Date.now() + 13 * 3600_000,
     activationTime: 0,
     isClaiming: false,
+    timeoutFinalize: 600,
   });
   mockGestureForm.onGesture.mockResolvedValue(true);
 });
@@ -343,6 +354,21 @@ describe('ExperimentalHomePage', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
+  it('draws the bell in the same control shape as "Return to current UI"', () => {
+    renderPage();
+
+    // The menu's own round shape and faint edge give way to the control
+    // radius and the outline button's edge. cn() does not read the
+    // rounded-control token as a radius, so a regression here keeps the
+    // circle (rounded-full wins in the generated CSS).
+    const bell = within(screen.getByTestId('home-deck-header')).getByTestId(
+      'attention-menu-trigger',
+    );
+    expect(bell).not.toHaveClass('rounded-full');
+    expect(bell).not.toHaveClass('border-rule');
+    expect(bell).toHaveClass('rounded-[var(--radius-control)]', 'border-input');
+  });
+
   it('hangs the art beside the monument, with the standings under the art', () => {
     renderPage();
 
@@ -354,6 +380,7 @@ describe('ExperimentalHomePage', () => {
     expect(art.compareDocumentPosition(monument) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(monument.compareDocumentPosition(board) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(within(monument).getByRole('timer')).toBeInTheDocument();
+    // The one standings ledger of the app, the Observatory's own.
     expect(within(board).getByTestId('standings-ledger')).toBeInTheDocument();
     expect(screen.getByTestId('home-deck-header').compareDocumentPosition(deck)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
@@ -364,13 +391,40 @@ describe('ExperimentalHomePage', () => {
     renderPage();
 
     const board = screen.getByTestId('home-deck-board');
-    for (const key of ['latest', 'endurance', 'chrono', 'lastcst']) {
-      expect(within(board).getByTestId(`standing-${key}`)).toBeInTheDocument();
+    for (const testId of [
+      'latest-participant-intel',
+      'control-desk-endurance',
+      'chrono-role-summary',
+      'final-cst-role-summary',
+    ]) {
+      expect(within(board).getByTestId(testId)).toBeInTheDocument();
     }
     // The links row holds navigation only.
     expect(
-      within(screen.getByTestId('home-links-row')).queryByTestId('standing-lastcst'),
+      within(screen.getByTestId('home-links-row')).queryByTestId('final-cst-role-summary'),
     ).toBeNull();
+  });
+
+  it('feeds the standings the shared champions derivation, seeded with the page clock', () => {
+    const sampledAtMs = Math.floor(Date.now() / 1000) * 1000 - 5_000;
+    const special = { EnduranceChampionAddress: CHAMPION } as never;
+    renderPage({
+      initialSpecialRecipients: special,
+      initialTimingSample: {
+        targetServerTimeSec: sampledAtMs / 1000 + 13 * 3600,
+        currentServerTimeSec: sampledAtMs / 1000,
+        sampledAtMs,
+      },
+    });
+
+    // (initial snapshot, latest participant evidence, enabled, page clock)
+    expect(mockChampions).toHaveBeenCalledWith(
+      special,
+      expect.anything(),
+      true,
+      expect.any(Number),
+    );
+    expect(mockChampions.mock.calls[0]![1]).toEqual({ address: LATEST, timestamp: null });
   });
 
   it('has one gesture form: one console, one message field, one submit', () => {
@@ -437,7 +491,7 @@ describe('ExperimentalHomePage', () => {
       screen.getByRole('heading', { level: 2, name: 'home.deck.board.title' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { level: 2, name: 'home.deck.standings.title' }),
+      screen.getByRole('heading', { level: 2, name: 'home.observatory.standings.title' }),
     ).toBeInTheDocument();
   });
 
@@ -498,8 +552,42 @@ describe('ExperimentalHomePage', () => {
 
     await userEvent.click(document.getElementById('gesture-submit') as HTMLButtonElement);
     await waitFor(() => expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1));
-    expect(mockSetQueryData).toHaveBeenCalledWith(['dashboardInfo'], expect.any(Function));
     expect(screen.getByTestId('pending-count')).toHaveTextContent('1');
+    // The confirmed Gesture counts at once, on every surface, until the index
+    // includes it: the page never writes a guess into the indexed cache.
+    expect(mockActionDock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ CurNumBids: 11, LastBidderAddr: '0xUser' }),
+      }),
+    );
+    expect(mockSetQueryData).not.toHaveBeenCalledWith(['dashboardInfo'], expect.anything());
+  });
+
+  it('tells the Final Gesture participant how long only they can finalize', () => {
+    mockAccount = LATEST;
+    Object.assign(mockAllocationFinalize, { allocationTime: Date.now() - 1000 });
+    renderPage();
+
+    // timeoutFinalize is 600s, one second of it gone.
+    expect(screen.getByTestId('finalize-holder-window')).toHaveTextContent(
+      /^home\.deck\.console\.holderWindow\(duration=9m 5\ds\)$/,
+    );
+    expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
+  });
+
+  it('claims no exclusive window while the finalize timeout is unknown', () => {
+    // useAllocationFinalize reports 0 until the timeout read resolves, and
+    // again when it fails; the holder may still have their whole window.
+    mockAccount = LATEST;
+    Object.assign(mockAllocationFinalize, {
+      allocationTime: Date.now() - 1000,
+      timeoutFinalize: 0,
+    });
+    renderPage();
+
+    expect(screen.getByTestId('finalize-submit')).toBeEnabled();
+    expect(screen.queryByTestId('finalize-holder-window')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('finalize-wait')).not.toBeInTheDocument();
   });
 
   it('lets the eligible wallet finalize from the console', async () => {
@@ -607,10 +695,10 @@ describe('ExperimentalHomePage', () => {
   });
 
   it('measures the standings against the sampled clock before the client clock runs', () => {
-    const { useChampionsAtClock: actualChampionsAtClock } = jest.requireActual<{
-      useChampionsAtClock: typeof useChampionsAtClock;
-    }>('@/components/home/experimental/useChampionsAtClock');
-    mockChampions.mockImplementation(actualChampionsAtClock);
+    const { useChampions: actualChampions } = jest.requireActual<{
+      useChampions: typeof useChampions;
+    }>('@/hooks/useChampions');
+    mockChampions.mockImplementation(actualChampions);
     // Server rendering and hydration: the shared ticker reads 0.
     mockTickingNow = 0;
     const sampledAtMs = Math.floor(Date.now() / 1000) * 1000 - 5_000;
@@ -651,16 +739,14 @@ describe('ExperimentalHomePage', () => {
       },
     });
 
-    expect(mockChampions).toHaveBeenLastCalledWith(expect.objectContaining({ nowMs: sampledAtMs }));
-    const latest = screen.getByTestId('standing-latest');
-    // The hold as of the sampled instant, the same instant as "2 hours ago".
+    expect(mockChampions).toHaveBeenLastCalledWith(null, expect.anything(), true, sampledAtMs);
+    const latest = screen.getByTestId('latest-participant-intel');
+    // The hold as of the sampled instant, never a pending or a false "0s".
     expect(latest).toHaveTextContent('2h 21m 9s');
-    expect(latest).toHaveTextContent('2 hours ago');
-    expect(within(latest).queryByTestId('standing-pending-figure')).not.toBeInTheDocument();
-    // (7h 3m 11s + 1s) − 2h 21m 9s.
-    expect(screen.getByTestId('standing-latest-progress')).toHaveTextContent(
-      'tables.specialAllocation.needsToBecomeChampion(duration=4h 42m 3s)',
-    );
+    // (7h 3m 11s + 1s) − 2h 21m 9s, read as a clock beside its fixed label.
+    const countdown = within(latest).getByTestId('latest-endurance-countdown');
+    expect(countdown).toHaveTextContent('home.observatory.ledger.passesRecordIn');
+    expect(countdown).toHaveTextContent('04:42:03');
   });
 
   it('counts the wallet’s entries only once the feed holds the whole cycle', () => {
@@ -776,6 +862,6 @@ describe('ExperimentalHomePage', () => {
     expect(
       within(screen.getByTestId('gesture-method-selector')).getAllByRole('radio'),
     ).toHaveLength(1);
-    expect(screen.getByTestId('standing-latest')).toHaveAttribute('data-state', 'empty');
+    expect(screen.getByTestId('latest-participant-intel')).toHaveAttribute('data-empty', 'true');
   });
 });

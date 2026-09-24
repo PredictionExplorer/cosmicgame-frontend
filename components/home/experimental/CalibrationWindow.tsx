@@ -132,8 +132,11 @@ export function CalibrationWindow({
           </div>
         ))}
       </dl>
+      {/* A fact, not good news: gas still applies, so the floor reads neutral. */}
       {ended ? (
-        <p className="mt-2 type-caption text-positive">{t('calibration.cstEndedMessage')}</p>
+        <p className="mt-2 type-caption text-muted-foreground">
+          {t('calibration.cstEndedMessage')}
+        </p>
       ) : null}
     </div>
   );

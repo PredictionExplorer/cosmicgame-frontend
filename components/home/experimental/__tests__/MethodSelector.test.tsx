@@ -57,6 +57,62 @@ describe('MethodSelector', () => {
     expect(radios[2]).toHaveTextContent('CST250.52 CST');
   });
 
+  it('marks the chosen row along its start edge when stacked, its foot when side by side', () => {
+    renderSelector('RandomWalk');
+
+    const [eth, rwlk] = screen.getAllByRole('radio');
+    // Stacked rows (a narrow column): a start-edge rule and a ring, never a
+    // bottom rule that reads as a row divider.
+    expect(rwlk).toHaveClass('shadow-[inset_2px_0_0_hsl(var(--primary))]', 'ring-1');
+    // Side by side: the segmented control's foot rule, no ring.
+    expect(rwlk).toHaveClass(
+      '@min-[21rem]:shadow-[inset_0_-2px_0_hsl(var(--primary))]',
+      '@min-[21rem]:ring-0',
+    );
+    expect(eth).not.toHaveClass('ring-1');
+  });
+
+  it('lines the prices up across the segments whatever a label wraps to', () => {
+    renderSelector();
+
+    // Each segment shares the group's label and price rows.
+    screen.getAllByRole('radio').forEach((radio) => {
+      expect(radio).toHaveClass('@min-[21rem]:row-span-2', '@min-[21rem]:grid-rows-subgrid');
+    });
+  });
+
+  it('reads a note once under the track when the segments sit side by side', () => {
+    renderSelector('RandomWalk');
+
+    // No note row inside the segments, so the chosen one is not a tall,
+    // mostly empty box; its own note stays in its name for screen readers.
+    const rwlk = screen.getByRole('radio', { name: /ETH \+ RWLK/ });
+    // Stacked, the note runs the row's full width under label and price.
+    expect(screen.getByText('50% discount', { selector: 'button span' })).toHaveClass(
+      'col-span-2',
+      '@min-[21rem]:sr-only',
+    );
+    expect(rwlk).toHaveTextContent('50% discount');
+    const notes = screen.getByTestId('gesture-method-notes');
+    expect(notes).toHaveAttribute('aria-hidden', 'true');
+    expect(notes).toHaveClass('hidden', '@min-[21rem]:block');
+    expect(notes).toHaveTextContent(/^50% discount$/);
+    // The chosen method's note reads a step stronger.
+    expect(notes.firstElementChild).toHaveClass('text-muted-foreground');
+  });
+
+  it('shows no note line when no method has one', () => {
+    render(
+      <MethodSelector
+        options={OPTIONS.filter((option) => !option.note)}
+        value="ETH"
+        onChange={jest.fn()}
+        labelledBy="method-label"
+      />,
+    );
+    expect(screen.queryByTestId('gesture-method-notes')).not.toBeInTheDocument();
+  });
+
   it('marks only the selected method as checked, with one tab stop', () => {
     renderSelector('CST');
 

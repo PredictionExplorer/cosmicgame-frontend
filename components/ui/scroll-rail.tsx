@@ -93,6 +93,9 @@ export const ScrollRail = React.forwardRef<HTMLDivElement, ScrollRailProps>(
       track.addEventListener('scroll', onScroll, { passive: true });
       const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
       resize?.observe(track);
+      // The content can outgrow a track that keeps its size (a web font
+      // arriving, a label changing), which moves the overflow too.
+      for (const child of Array.from(track.children)) resize?.observe(child);
 
       // Follow the current item when it changes (a tab selected, a route
       // pushed): Radix and the router only flip attributes.

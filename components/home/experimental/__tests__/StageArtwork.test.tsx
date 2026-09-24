@@ -60,13 +60,24 @@ describe('StageArtwork', () => {
     expect(screen.getByTestId('home-art-hero')).toHaveAttribute('data-reel', 'still');
   });
 
-  it('captions the plate with a wall label: name, token number and cycle', () => {
-    renderStage({ token: { ...TOKEN, name: 'Twisted Mind' } });
+  it('captions the plate with a wall label: name, token number, cycle and imprint', () => {
+    renderStage({ token: { ...TOKEN, name: 'Twisted Mind', imprintedAt: 1_786_491_506 } });
 
-    const caption = screen.getByTestId('home-art-hero').querySelector('figcaption');
+    const caption = screen.getByTestId('home-art-hero').querySelector('figcaption')!;
     expect(caption).toHaveTextContent('home.deck.art.titleNamed(name=Twisted Mind)');
-    expect(caption).toHaveTextContent('#000030');
-    expect(caption).toHaveTextContent('home.hero.cycleNumber(number=1)');
+    // A name took the title line, so the number leads the meta line.
+    expect(caption.querySelector('.type-mono')).toHaveTextContent('#000030');
+    expect(caption).toHaveTextContent('home.latestSignature.imprintedIn(number=1)');
+    expect(caption.querySelector('time')).toHaveAttribute('dateTime', '2026-08-11T23:38:26.000Z');
+  });
+
+  it('never repeats the token number under an unnamed title', () => {
+    renderStage();
+
+    const caption = screen.getByTestId('home-art-hero').querySelector('figcaption')!;
+    expect(caption).toHaveTextContent('home.deck.art.title(id=#000030)');
+    expect(caption.querySelector('.type-mono')).toBeNull();
+    expect(caption).toHaveTextContent('home.latestSignature.imprintedIn(number=1)');
   });
 
   it('plays the generation reel on wide screens and hands rotation to it', () => {
@@ -76,6 +87,60 @@ describe('StageArtwork', () => {
     expect(screen.getByTestId('deck-art-reel-current')).toBeInTheDocument();
     expect(screen.getByTestId('deck-art-reel-current')).toHaveClass('object-contain');
     expect(onReelActiveChange).toHaveBeenLastCalledWith(true);
+  });
+
+  it('keeps the server-rendered still as the base layer and fades the clip in once it plays', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+    renderStage();
+
+    // The still is never swapped out: the page's first large paint stays put.
+    const still = screen.getByTestId('art-frame');
+    expect(still.querySelector('img')).toHaveAttribute('fetchpriority', 'high');
+    const clip = screen.getByTestId('deck-art-reel-current');
+    expect(clip).not.toHaveAttribute('poster');
+    expect(clip).toHaveClass('opacity-0');
+
+    act(() => {
+      fireEvent.playing(clip);
+    });
+    expect(clip).toHaveClass('opacity-100');
+    expect(screen.getByTestId('art-frame')).toBe(still);
+  });
+
+  it('paints the first token at once and fades in only the ones that follow', () => {
+    const { container, rerender } = renderStage();
+    const still = () => container.querySelector('[data-testid="art-frame"]')!.parentElement!;
+    expect(still()).not.toHaveClass('motion-safe:animate-in');
+
+    rerender(
+      <StageArtwork
+        token={NEXT}
+        nextToken={TOKEN}
+        rotates
+        paused={false}
+        onPausedChange={jest.fn()}
+        onReelEnded={jest.fn()}
+        onReelActiveChange={jest.fn()}
+      />,
+    );
+    expect(still()).toHaveClass('motion-safe:animate-in', 'motion-safe:fade-in');
+  });
+
+  it('does not skip a token whose still failed while its clip covers the plate', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+    const { onArtStatus } = renderStage();
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const image = screen.queryByTestId('art-frame')?.querySelector('img');
+      if (image) fireEvent.error(image);
+    }
+    expect(onArtStatus).not.toHaveBeenCalledWith(30, 'unavailable');
+
+    // The clip gives up too: now the token is reported, and may be skipped.
+    act(() => {
+      fireEvent.error(screen.getByTestId('deck-art-reel-current'));
+    });
+    expect(onArtStatus).toHaveBeenLastCalledWith(30, 'unavailable');
   });
 
   it('keeps the reel unmounted under reduced motion', () => {

@@ -43,6 +43,16 @@ export const TOUCH_TARGET_HEIGHT_CLASS = 'min-h-11 sm:min-h-0';
 export const TOUCH_TARGET_TEXT_LINK_CLASS = 'leading-6';
 
 /**
+ * Grows an inline text trigger (an explained term inside a label or a
+ * sentence) to a hit area at least 24px tall on coarse pointers (WCAG
+ * 2.5.8): a transparent pseudo-element reaches 6px above and below the
+ * word, as wide as the word itself, so its line keeps its height and a
+ * mouse user's layout is untouched.
+ */
+export const TOUCH_TARGET_INLINE_TEXT_CLASS =
+  "pointer-coarse:relative pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:-inset-y-1.5 pointer-coarse:after:content-['']";
+
+/**
  * Extends a control's hit area to 44x44 on coarse pointers with a transparent
  * pseudo-element, leaving layout untouched. Pair it with `data-touch-target="extended"` so the
  * audit measures the pseudo-element rather than the control's own box.
