@@ -181,7 +181,7 @@ export default function MyWinnings() {
 
       <div className="space-y-12">
         {/* ETH Allocations */}
-        <section>
+        <section id="eth" className="scroll-mt-28">
           <SectionDivider title={t('allocations.sections.eth')} className="mb-6" />
           {loading && stellarSelectionETHAllocations === null ? (
             <div className="flex justify-center py-8">
@@ -231,13 +231,13 @@ export default function MyWinnings() {
         </section>
 
         {/* Cosmic Signature NFT Anchoring */}
-        <section>
+        <section id="anchors" className="scroll-mt-28">
           <SectionDivider title={t('allocations.sections.anchors')} className="mb-6" />
           <UnretrievedCSTAnchorDistributionsTable user={account} />
         </section>
 
         {/* Attached NFTs */}
-        <section>
+        <section id="nfts" className="scroll-mt-28">
           <div className="flex items-center justify-between mb-6">
             <SectionDivider title={t('allocations.sections.nfts')} className="flex-1" />
             {status?.NumDonatedNFTToClaim > 0 && (
@@ -277,7 +277,7 @@ export default function MyWinnings() {
         </section>
 
         {/* Attached ERC-20 Tokens */}
-        <section>
+        <section id="erc20" className="scroll-mt-28">
           <div className="flex items-center justify-between mb-6">
             <SectionDivider title={t('allocations.sections.erc20')} className="flex-1" />
             {donatedERC20Data.filter((x) => !x.Claimed).length > 0 && (

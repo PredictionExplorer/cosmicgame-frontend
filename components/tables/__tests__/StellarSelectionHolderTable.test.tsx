@@ -30,12 +30,13 @@ beforeEach(() => jest.clearAllMocks());
 describe('StellarSelectionHolderTable', () => {
   it('renders empty state when list is empty', () => {
     render(<StellarSelectionHolderTable list={[]} />);
-    expect(screen.getByText('tables.empty.holders')).toBeInTheDocument();
+    expect(screen.getByText('tables.empty.stellarEntries')).toBeInTheDocument();
   });
 
-  it('renders loading state before processing', () => {
+  it('holds placeholder rows until the selection counts arrive', () => {
     render(<StellarSelectionHolderTable list={[createGesture()]} />);
-    expect(screen.getByText('tables.status.loading')).toBeInTheDocument();
+    expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('status')).toHaveTextContent('tables.skeleton.loadingRows');
   });
 
   it('renders table headers when data is processed', () => {
@@ -64,13 +65,21 @@ describe('StellarSelectionHolderTable', () => {
     expect(screen.getAllByText(/\d+\.\d+%/).length).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows "(You)" for current user', () => {
+  it('keeps your row at its true rank, marked You', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: '0x' + 'a'.repeat(40) });
-    const list = [createGesture({ BidderAddr: '0x' + 'a'.repeat(40) })];
-    render(
+    const list = [
+      createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
+      createGesture({ BidderAddr: '0x' + '1'.repeat(40) }),
+      createGesture({ BidderAddr: '0x' + 'A'.repeat(40) }),
+    ];
+    const { container } = render(
       <StellarSelectionHolderTable list={list} numRaffleEthWinner={1} numRaffleNFTWinner={1} />,
     );
-    expect(screen.getByText('tables.status.you')).toBeInTheDocument();
+    const rows = container.querySelectorAll('tbody tr');
+    expect(rows[0]).not.toHaveAttribute('data-current');
+    expect(rows[1]).toHaveAttribute('data-current', 'true');
+    expect(screen.getAllByText('tables.status.youBadge').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('tables.currentRow.position(rank=2,total=2)')).toBeInTheDocument();
   });
 
   it('shows entry count per holder', () => {

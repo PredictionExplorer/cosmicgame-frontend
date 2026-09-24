@@ -7,7 +7,6 @@ import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
 import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
 import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
-import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import { WalletRequiredState } from '@/components/wallet/WalletRequiredState';
@@ -48,11 +47,7 @@ function WinningHistory() {
         {t('recipientHistory.connectedDescription')}
       </p>
 
-      {loading ? (
-        <div className="flex justify-center py-8">
-          <Spinner />
-        </div>
-      ) : error ? (
+      {error ? (
         <ErrorState
           title={t('recipientHistory.loadError')}
           message={
@@ -61,16 +56,18 @@ function WinningHistory() {
               : t('recipientHistory.loadErrorDescription')
           }
         />
-      ) : !winningHistory || winningHistory.length === 0 ? (
+      ) : !loading && (!winningHistory || winningHistory.length === 0) ? (
         <EmptyState
           title={t('recipientHistory.emptyTitle')}
           description={t('recipientHistory.emptyDescription')}
         />
       ) : (
         <RecipientHistoryTable
-          winningHistory={winningHistory}
-          showClaimedStatus={true}
+          winningHistory={winningHistory ?? []}
+          loading={loading}
+          showClaimedStatus
           showWinnerAddr={false}
+          showSummary
         />
       )}
     </PageShell>

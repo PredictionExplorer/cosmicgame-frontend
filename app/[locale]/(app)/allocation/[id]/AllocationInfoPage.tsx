@@ -887,7 +887,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           <RecipientHistoryTable
             winningHistory={cycleAllocationLedger}
             showRoundColumn={false}
-            perPage={10}
+            groupBy="recipient"
           />
         ) : (
           <p className="text-sm text-muted-foreground">{t('details.ledger.empty')}</p>
@@ -930,7 +930,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
 
           <TabsContent value="gestures" className="mt-6">
             {gestureHistory.length > 0 ? (
-              <GestureHistoryTable gestureHistory={gestureHistory} />
+              <GestureHistoryTable gestureHistory={gestureHistory} showRound={false} />
             ) : (
               <EmptyState title={t('details.data.empty.gestures')} />
             )}

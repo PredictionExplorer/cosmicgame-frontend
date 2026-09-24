@@ -1,21 +1,13 @@
-import { useMemo, useState, type FC } from 'react';
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+'use client';
 
-import { formatSeconds } from '@/utils';
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
-import {
-  TablePrimaryContainer,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryHead,
-  TablePrimaryRow,
-  TablePrimary,
-  TablePrimaryHeadCell,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
-import { AddressLink } from '@/components/common/AddressLink';
+import { sameAddress } from '@/utils/format';
+import { AddressChip } from '@/components/ui/address-chip';
+import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 
 interface EnduranceChampion {
   participant: string;
@@ -23,162 +15,83 @@ interface EnduranceChampion {
   chronoWarrior?: number;
 }
 
-interface ChampionRowProps {
-  row: EnduranceChampion;
-  isLive?: boolean;
-}
-
-const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row, isLive = false }) => {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell label={t('columns.userAddress')} align="left">
-        <div className="flex flex-wrap items-center gap-2">
-          <AddressLink address={row.participant} url={`/user/${row.participant}`} />
-          {isLive && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
-              {t('status.live')}
-              <InfoTooltip content={t('endurance.liveHelp')} />
-            </span>
-          )}
-        </div>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('endurance.championTime')} align="center">
-        {formatSeconds(row.championTime, locale)}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('endurance.chronoWarrior')} align="center">
-        {formatSeconds(row.chronoWarrior || 0, locale)}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-interface ChampionsTableProps {
+interface ChampionsTableProps extends LedgerStateProps {
+  /** `null` while the list is still being computed. */
   championList: EnduranceChampion[] | null;
+  /** The latest gesture maker, whose endurance window is still growing. */
   lastBidderAddress?: string | null;
 }
 
-const SortIcon = ({
-  field,
-  sortField,
-  sortDirection,
-}: {
-  field: string;
-  sortField: string;
-  sortDirection: 'asc' | 'desc';
-}) => {
-  if (field !== sortField) return <ArrowUpDown className="ml-1 h-4 w-4 inline" />;
-  return sortDirection === 'asc' ? (
-    <ArrowUp className="ml-1 h-4 w-4 inline" />
-  ) : (
-    <ArrowDown className="ml-1 h-4 w-4 inline" />
+/** "Live": a value that is still changing, as a state dot and a word. */
+function LiveState() {
+  const t = useTranslations('tables');
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="inline-flex items-center gap-1.5 rounded-edge bg-live-surface px-1.5 type-caption font-medium text-live">
+        <span aria-hidden className="size-1.5 rounded-full bg-live" />
+        {t('status.live')}
+      </span>
+      <InfoTooltip content={t('endurance.liveHelp')} iconClassName="size-3.5" />
+    </span>
   );
-};
-
-function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
-  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
 }
 
-const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBidderAddress }) => {
+/**
+ * Endurance windows by participant, longest first: each participant's
+ * longest single hold as the latest gesture maker and their longest reign as
+ * Endurance Champion. Both columns sort; a hold still growing is marked live.
+ */
+const EnduranceChampionsTable = ({
+  championList,
+  lastBidderAddress,
+  ...state
+}: ChampionsTableProps) => {
   const t = useTranslations('tables');
-  const [sortField, setSortField] = useState<'championTime' | 'chronoWarrior'>('championTime');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [page, setPage] = useState<number>(1);
-  const perPage = 5;
 
-  const handleSort = (field: 'championTime' | 'chronoWarrior') => {
-    if (field === sortField) {
-      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortField(field);
-      setSortDirection('desc');
-    }
-  };
-
-  const paginatedList = useMemo(() => {
-    if (!championList) {
-      return [];
-    }
-
-    const sortedList = [...championList].sort((a, b) => {
-      return sortDirection === 'asc'
-        ? (a[sortField] ?? 0) - (b[sortField] ?? 0)
-        : (b[sortField] ?? 0) - (a[sortField] ?? 0);
-    });
-
-    const startIndex = (page - 1) * perPage;
-    return sortedList.slice(startIndex, startIndex + perPage);
-  }, [championList, sortField, sortDirection, page, perPage]);
-
-  if (!championList) {
-    return <p>{t('status.loading')}</p>;
-  }
-
-  if (championList.length === 0) {
-    return <p>{t('empty.enduranceChampions')}</p>;
-  }
+  const columns = useMemo<DataTableColumn<EnduranceChampion>[]>(
+    () => [
+      {
+        id: 'participant',
+        kind: 'address',
+        header: t('columns.userAddress'),
+        label: t('columns.participant'),
+        value: (row) => row.participant,
+        cell: (row) => (
+          <span className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1">
+            <AddressChip address={row.participant} variant="plain" showCopy={false} />
+            {sameAddress(row.participant, lastBidderAddress) ? <LiveState /> : null}
+          </span>
+        ),
+      },
+      {
+        id: 'championTime',
+        kind: 'duration',
+        header: t('endurance.championTime'),
+        value: (row) => row.championTime,
+        sortable: true,
+      },
+      {
+        id: 'chronoWarrior',
+        kind: 'duration',
+        header: t('endurance.chronoWarrior'),
+        value: (row) => row.chronoWarrior ?? 0,
+        sortable: true,
+      },
+    ],
+    [t, lastBidderAddress],
+  );
 
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <tr>
-              <TablePrimaryHeadCell align="left">{t('columns.userAddress')}</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">
-                <button
-                  className="inline-flex items-center font-inherit cursor-pointer bg-transparent border-0 text-inherit"
-                  onClick={() => handleSort('championTime')}
-                >
-                  {t('endurance.championTime')}
-                  <SortIcon
-                    field="championTime"
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                  />
-                </button>
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">
-                <button
-                  className="inline-flex items-center font-inherit cursor-pointer bg-transparent border-0 text-inherit"
-                  onClick={() => handleSort('chronoWarrior')}
-                >
-                  {t('endurance.chronoWarrior')}
-                  <SortIcon
-                    field="chronoWarrior"
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                  />
-                </button>
-              </TablePrimaryHeadCell>
-            </tr>
-          </TablePrimaryHead>
-          <TablePrimaryBody>
-            {paginatedList.map((row, index) => (
-              <EnduranceChampionsRow
-                key={`${row.participant}-${index}-${page}`}
-                row={row}
-                isLive={sameAddress(row.participant, lastBidderAddress)}
-              />
-            ))}
-          </TablePrimaryBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      {championList.length > perPage && (
-        <CustomPagination
-          page={page}
-          setPage={setPage}
-          totalLength={championList.length}
-          perPage={perPage}
-        />
-      )}
-    </>
+    <DataTable
+      data={championList ?? []}
+      columns={columns}
+      ariaLabel={t('names.enduranceChampions')}
+      getRowKey={(row, index) => `${row.participant}-${index}`}
+      initialSort={{ id: 'championTime', direction: 'desc' }}
+      emptyTitle={t('empty.enduranceChampions')}
+      {...state}
+      loading={state.loading || championList === null}
+    />
   );
 };
 
