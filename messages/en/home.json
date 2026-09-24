@@ -131,7 +131,7 @@
         "eyebrow": "Cycle finalizes in",
         "label": "Under 12 hours",
         "status": "Cycle is live. Each Gesture can extend the finalization clock.",
-        "tooltip": "This is the Cycle Finalization Time. When it reaches zero, the Final Gesture participant may finalize the cycle."
+        "tooltip": "This is the Cycle Finalization Time. When it reaches zero, the participant holding the Last Gesture may finalize the cycle."
       },
       "finalHour": {
         "eyebrow": "Final hour",
@@ -162,14 +162,14 @@
         "eyebrow": "Cycle ready to finalize",
         "label": "Ready",
         "status": "Finalization is ready. A new Gesture can still extend the cycle.",
-        "tooltip": "The Cycle Finalization Time reached zero. The Final Gesture participant may finalize; after the exclusivity window, anyone may finalize and receives the Signature Allocation. Gestures remain possible until finalization executes.",
+        "tooltip": "The Cycle Finalization Time reached zero. The participant holding the Last Gesture may finalize first; after the exclusivity window, anyone may finalize and receives the Signature Allocation. Gestures remain possible until finalization executes.",
         "display": "00:00"
       },
       "live": {
         "eyebrow": "Cycle finalizes in",
         "label": "Cycle is live",
         "status": "Cycle is live. Each Gesture can extend the finalization clock.",
-        "tooltip": "This is the Cycle Finalization Time. When it reaches zero, the Final Gesture participant may finalize the cycle."
+        "tooltip": "This is the Cycle Finalization Time. When it reaches zero, the participant holding the Last Gesture may finalize the cycle."
       }
     },
     "cta": {
@@ -223,7 +223,7 @@
   "status": {
     "opensAt": "Cycle {cycle} opens at {dateTime}",
     "finalizesIn": "Cycle finalizes in",
-    "finalizesInTooltip": "When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer.",
+    "finalizesInTooltip": "When this timer hits zero, the participant holding the Last Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer.",
     "readyToFinalize": "Cycle ready to finalize",
     "clockReachedZero": "The finalization clock reached zero.",
     "metrics": {
@@ -622,7 +622,7 @@
     },
     "standings": {
       "title": "Live standings",
-      "latestTooltip": "The most recent participant. After the clock reaches zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation.",
+      "latestTooltip": "The most recent participant. After the clock reaches zero, the participant still holding the Last Gesture may finalize the cycle and receive the Signature Allocation.",
       "cstPlusNft": "1,000 CST + NFT"
     },
     "intel": {

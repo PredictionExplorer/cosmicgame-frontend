@@ -72,6 +72,7 @@ describe('allocation totals', () => {
 });
 
 describe('countRecipients', () => {
+  const ANCHOR_HOLDERS_PLACEHOLDER = '(All CS NFT Stakers)'; // lexicon-allow-backend-type
   const walletA = '0x1Ec1CCEF3e1735bdA3F4BA698e8a524AA7c93274';
   const walletB = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
 
@@ -95,7 +96,7 @@ describe('countRecipients', () => {
     expect(
       countRecipients([
         { WinnerAddr: walletA },
-        { WinnerAddr: '(All CS NFT Stakers)' },
+        { WinnerAddr: ANCHOR_HOLDERS_PLACEHOLDER },
         { WinnerAddr: walletB },
       ]),
     ).toBe(2);

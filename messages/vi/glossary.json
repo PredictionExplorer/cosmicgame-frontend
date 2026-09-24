@@ -13,7 +13,7 @@
     "cycleFinalizationTime": {
       "term": "Thời điểm hoàn tất chu kỳ",
       "short": "Thời điểm chu kỳ có thể hoàn tất. Nét bút đầu tiên khởi động đồng hồ, và mỗi nét bút sau đó kéo dài nó.",
-      "long": "Khi đồng hồ về không, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về Phân bổ Signature. Bạn vẫn có thể đặt nét bút cho đến khi chu kỳ thật sự hoàn tất, và mỗi nét bút lại đẩy thời điểm lùi về sau."
+      "long": "Khi đồng hồ về không, người đang giữ Nét bút gần nhất có thể hoàn tất chu kỳ và nhận về Phân bổ Signature. Bạn vẫn có thể đặt nét bút cho đến khi chu kỳ thật sự hoàn tất, và mỗi nét bút lại đẩy thời điểm lùi về sau."
     },
     "calibrationWindow": {
       "term": "Cửa sổ hiệu chỉnh",
@@ -27,8 +27,8 @@
     },
     "signatureAllocation": {
       "term": "Phân bổ Signature",
-      "short": "Phân bổ dành cho nét bút cuối cùng của một chu kỳ: một phần Dự trữ chu kỳ bằng ETH, CST ghi nhận và một Cosmic Signature NFT.",
-      "long": "Người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận về phân bổ này, kèm quyền ưu tiên với các token và NFT đính kèm nét bút. Nếu người đó không hoàn tất trong khoảng thời gian dành riêng, người thực hiện hoàn tất sẽ nhận phân bổ."
+      "short": "Phân bổ dành cho người đang giữ Nét bút gần nhất khi chu kỳ khép lại: một phần Dự trữ chu kỳ bằng ETH, CST ghi nhận và một Cosmic Signature NFT.",
+      "long": "Người đang giữ Nét bút gần nhất có thể hoàn tất chu kỳ và nhận về phân bổ này, kèm quyền ưu tiên với các token và NFT đính kèm nét bút. Nếu người đó không hoàn tất trong khoảng thời gian dành riêng, người thực hiện hoàn tất sẽ nhận phân bổ."
     },
     "finalCstGesture": {
       "term": "Nét bút CST cuối cùng",

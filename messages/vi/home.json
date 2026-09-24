@@ -131,7 +131,7 @@
         "eyebrow": "Chu kỳ hoàn tất sau",
         "label": "Dưới 12 giờ",
         "status": "Chu kỳ đang diễn ra. Mỗi nét bút có thể kéo dài đếm ngược hoàn tất.",
-        "tooltip": "Đếm ngược đến khi chu kỳ có thể hoàn tất. Khi về 0, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ."
+        "tooltip": "Đếm ngược đến khi chu kỳ có thể hoàn tất. Khi về 0, người đang giữ Nét bút gần nhất có thể hoàn tất chu kỳ."
       },
       "finalHour": {
         "eyebrow": "Giờ cuối",
@@ -162,14 +162,14 @@
         "eyebrow": "Chu kỳ sẵn sàng hoàn tất",
         "label": "Sẵn sàng",
         "status": "Đã sẵn sàng hoàn tất. Một nét bút mới vẫn có thể kéo dài chu kỳ.",
-        "tooltip": "Thời điểm hoàn tất chu kỳ đã về không. Người đặt nét bút cuối cùng có thể hoàn tất; sau cửa sổ ưu tiên, bất kỳ ai cũng có thể hoàn tất và nhận phân bổ Signature. Vẫn có thể đặt nét bút cho đến khi việc hoàn tất được thực thi.",
+        "tooltip": "Thời điểm hoàn tất chu kỳ đã về không. Người đang giữ Nét bút gần nhất có thể hoàn tất trước; sau cửa sổ ưu tiên, bất kỳ ai cũng có thể hoàn tất và nhận phân bổ Signature. Vẫn có thể đặt nét bút cho đến khi việc hoàn tất được thực thi.",
         "display": "00:00"
       },
       "live": {
         "eyebrow": "Chu kỳ hoàn tất sau",
         "label": "Chu kỳ đang diễn ra",
         "status": "Chu kỳ đang diễn ra. Mỗi nét bút có thể kéo dài đếm ngược hoàn tất.",
-        "tooltip": "Đếm ngược đến khi chu kỳ có thể hoàn tất. Khi về 0, người đặt nét bút cuối cùng có thể hoàn tất chu kỳ."
+        "tooltip": "Đếm ngược đến khi chu kỳ có thể hoàn tất. Khi về 0, người đang giữ Nét bút gần nhất có thể hoàn tất chu kỳ."
       }
     },
     "cta": {
@@ -223,7 +223,7 @@
   "status": {
     "opensAt": "Chu kỳ {cycle} mở vào {dateTime}",
     "finalizesIn": "Chu kỳ hoàn tất sau",
-    "finalizesInTooltip": "Khi bộ đếm này về không, người tham gia đặt nét bút cuối cùng có thể hoàn tất chu kỳ và nhận phân bổ Signature. Mỗi nét bút mới kéo dài bộ đếm.",
+    "finalizesInTooltip": "Khi bộ đếm này về không, người đang giữ Nét bút gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature. Mỗi nét bút mới kéo dài bộ đếm.",
     "readyToFinalize": "Chu kỳ sẵn sàng hoàn tất",
     "clockReachedZero": "Đếm ngược hoàn tất đã về không.",
     "metrics": {

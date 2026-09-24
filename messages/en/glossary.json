@@ -13,7 +13,7 @@
     "cycleFinalizationTime": {
       "term": "Cycle Finalization Time",
       "short": "The moment a Cycle can close. The first Gesture starts the clock, and every later Gesture extends it.",
-      "long": "When the clock reaches zero, the participant who made the Final Gesture may finalize the Cycle and retrieve the Signature Allocation. Gestures stay possible until the Cycle is actually finalized, and each one moves the time forward again."
+      "long": "When the clock reaches zero, the participant holding the Last Gesture may finalize the Cycle and retrieve the Signature Allocation. Gestures stay possible until the Cycle is actually finalized, and each one moves the time forward again."
     },
     "calibrationWindow": {
       "term": "Calibration Window",
@@ -27,8 +27,8 @@
     },
     "signatureAllocation": {
       "term": "Signature Allocation",
-      "short": "The allocation for the Final Gesture of a Cycle: a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT.",
-      "long": "The participant who made the Final Gesture may finalize the Cycle and retrieve it, with priority over the tokens and NFTs attached to Gestures. If they do not finalize within their exclusive window, whoever finalizes the Cycle receives it."
+      "short": "The allocation for whoever holds the Last Gesture when a Cycle closes: a share of the Cycle Reserve in ETH, Recognition CST and a Cosmic Signature NFT.",
+      "long": "The participant holding the Last Gesture may finalize the Cycle and retrieve it, with priority over the tokens and NFTs attached to Gestures. If they do not finalize within their exclusive window, whoever finalizes the Cycle receives it."
     },
     "finalCstGesture": {
       "term": "Final CST Gesture",
