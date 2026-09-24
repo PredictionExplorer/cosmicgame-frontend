@@ -188,7 +188,7 @@
     },
     "steps": {
       "openingSoon": {
-        "label": "Opening Soon",
+        "label": "Opening soon",
         "detail": "The next cycle is scheduled and waiting to open."
       },
       "firstGesture": {
@@ -302,7 +302,7 @@
     },
     "cstTrade": "Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.",
     "reward": {
-      "economicsTitle": "CST Gesture Economics",
+      "economicsTitle": "CST Gesture economics",
       "previewTitle": "Participation CST",
       "economicsDescription": "Net CST is the Participation CST reward minus the current CST gesture cost.",
       "previewDescription": "Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.",
@@ -312,7 +312,7 @@
       "cstAmount": "{amount} CST",
       "minAccepted": "Min accepted: {value}",
       "minAcceptedAny": "any reward, including 0 CST",
-      "minAcceptedAria": "What Min accepted CST means",
+      "minAcceptedAria": "What minimum accepted CST means",
       "minAcceptedTooltip": "The minimum Participation CST reward your transaction will accept. It is the current preview minus your Minimum CST Reward Protection tolerance. If the contract would imprint less by confirmation, the gesture reverts instead of accepting a lower reward.",
       "minAcceptedTooltipAny": "Accept any CST reward sends a minimum accepted reward of 0, so the gesture can land with any dynamic CST reward, including none.",
       "netPositive": "The CST reward exceeds the CST cost if this lands.",
@@ -360,7 +360,7 @@
       "randomWalkWithToken": "Gesture with ETH + RandomWalk token {tokenId} ({cost} ETH)",
       "randomWalk": "Gesture with ETH + RandomWalk",
       "cst": "Gesture with CST ({cost} CST)",
-      "cstFree": "Gesture with CST (FREE GESTURE)",
+      "cstFree": "Gesture with CST (free)",
       "generic": "Gesture with {method}",
       "sendsNote": "Sends about {amount} ETH, including the {percent}% collision buffer.",
       "action": {
@@ -456,7 +456,7 @@
     }
   },
   "chat": {
-    "liveFeed": "Live Feed",
+    "liveFeed": "Live feed",
     "title": "Gesture Chat",
     "joinTooltipAria": "How to join Gesture Chat",
     "joinTooltip": "Want to join the chat? Make a gesture and leave an optional message. Messages attached to gestures appear here.",
@@ -557,7 +557,7 @@
     },
     "art": {
       "sectionAria": "Featured on-chain artwork",
-      "eyebrow": "On-Chain Artwork",
+      "eyebrow": "On-chain artwork",
       "galleryCta": "Gallery",
       "viewAria": "View Cosmic Signature {id}",
       "alt": "Cosmic Signature artwork {id} — deterministic three-body generative art",
@@ -597,7 +597,7 @@
     }
   },
   "mobileCta": {
-    "preview": "Preview Gesture Options"
+    "preview": "Preview Gesture options"
   },
   "observatory": {
     "pulse": {
@@ -710,11 +710,11 @@
     "body": "{percent}% of every Performance Cycle is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.",
     "cta": "View public-goods contributions",
     "stats": {
-      "lifetime": "Lifetime Contributed",
+      "lifetime": "Lifetime contributed",
       "lifetimeTooltip": "Automatic protocol forwards plus voluntary public-goods contributions.",
-      "vault": "In Vault Now",
+      "vault": "In vault now",
       "vaultTooltip": "ETH currently held in the Public Goods Vault before retrieval.",
-      "retrieved": "Already Retrieved",
+      "retrieved": "Already retrieved",
       "retrievedTooltip": "Total ETH retrieved from the Public Goods Vault for beneficiaries."
     }
   },
@@ -732,7 +732,7 @@
     "searchPlaceholder": "Enter NFT ID",
     "searchAria": "Find a RandomWalk NFT by ID",
     "tokenAria": "RandomWalk NFT {id}",
-    "empty": "Nothing Found!"
+    "empty": "No matching NFT found"
   },
   "orientation": {
     "title": "How this cycle works",
