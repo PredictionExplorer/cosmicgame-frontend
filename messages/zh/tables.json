@@ -46,6 +46,7 @@
       "empty": "暂无已附加 NFT。",
       "imageAlt": "NFT #{id}",
       "imageUnavailable": "暂无图像",
+      "unknownToken": "未知代币",
       "columns": {
         "datetime": "日期时间",
         "contributorAddress": "附加者地址",
@@ -54,7 +55,8 @@
         "tokenId": "代币 ID",
         "tokenImage": "代币图像",
         "tokenUri": "代币 URI"
-      }
+      },
+      "ariaLabel": "已附加 NFT"
     },
     "erc20": {
       "empty": "暂无已附加 ERC-20 代币。",
@@ -66,7 +68,8 @@
         "retrievedAmount": "已取回数量",
         "recipient": "获配者",
         "retrieved": "已取回"
-      }
+      },
+      "ariaLabel": "已附加 ERC-20 代币"
     }
   },
   "loading": "加载中…",

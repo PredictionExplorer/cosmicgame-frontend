@@ -591,17 +591,35 @@
     "title": "名前付きCosmic Signature NFT",
     "subtitle": "固有の名前が付けられたCosmic Signature NFTを見る",
     "emptyTitle": "名前付きNFTはありません",
-    "emptyDescription": "名前を付けられたCosmic Signature NFTはまだありません。"
+    "emptyDescription": "名前を付けられたCosmic Signature NFTはまだありません。",
+    "galleryLink": "ギャラリーで見る"
   },
   "attachedNfts": {
     "title": "添付されたNFT拠出",
-    "subtitle": "各サイクルでコミュニティメンバーが一筆に添付したNFT"
+    "subtitle": "各サイクルでコミュニティメンバーが一筆に添付したNFT",
+    "loadErrorTitle": "添付されたNFTを読み込めませんでした",
+    "loadErrorMessage": "添付されたNFTの記録を読み込めませんでした。もう一度お試しください。",
+    "emptyTitle": "添付されたNFTはまだありません",
+    "emptyDescription": "一筆に添付されたNFTがここに表示されます。各NFTはサイクルが確定すると、そのサイクルのシグネチャー配分の受領者に渡ります。",
+    "card": {
+      "cycle": "サイクル{cycle}",
+      "attachedBy": "添付者"
+    }
   },
   "usedRwlkNfts": {
     "title": "使用済みのRandom Walk NFT",
     "subtitle": "一度だけの50%の一筆の費用の割引のためにETH一筆に添付されたRandom Walk NFT",
-    "loading": "読み込み中…",
-    "empty": "NFTはまだありません。"
+    "columns": {
+      "artwork": "アートワーク",
+      "token": "RandomWalk NFT",
+      "participant": "参加者",
+      "cycle": "サイクル",
+      "date": "日時"
+    },
+    "artAlt": "RandomWalk NFT {id}",
+    "loadError": "使用済みのRandomWalk NFTを読み込めませんでした。もう一度お試しください。",
+    "emptyTitle": "使用済みのRandomWalk NFTはまだありません",
+    "emptyDescription": "ETH一筆が一度だけの一筆の費用の割引にRandomWalk NFTを使うと、ここに表示されます。"
   },
   "stellarSelectionEth": {
     "invalidAddress": "無効なアドレス",

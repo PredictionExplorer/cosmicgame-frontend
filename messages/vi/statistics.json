@@ -591,17 +591,35 @@
     "title": "Cosmic Signature NFT đã đặt tên",
     "subtitle": "Duyệt các Cosmic Signature NFT đã được đặt tên tùy chỉnh",
     "emptyTitle": "Không có NFT đã đặt tên",
-    "emptyDescription": "Chưa có Cosmic Signature NFT nào được đặt tên."
+    "emptyDescription": "Chưa có Cosmic Signature NFT nào được đặt tên.",
+    "galleryLink": "Xem trong phòng trưng bày"
   },
   "attachedNfts": {
     "title": "Đóng góp NFT đính kèm",
-    "subtitle": "Các NFT thành viên cộng đồng đã đính kèm vào nét bút qua các chu kỳ"
+    "subtitle": "Các NFT thành viên cộng đồng đã đính kèm vào nét bút qua các chu kỳ",
+    "loadErrorTitle": "Không tải được các NFT đính kèm",
+    "loadErrorMessage": "Không đọc được bản ghi NFT đính kèm. Hãy thử lại.",
+    "emptyTitle": "Chưa có NFT đính kèm nào",
+    "emptyDescription": "Các NFT đính kèm vào nét bút sẽ hiện ở đây. Mỗi NFT được chuyển cho người nhận phân bổ Signature của chu kỳ khi chu kỳ hoàn tất.",
+    "card": {
+      "cycle": "Chu kỳ {cycle}",
+      "attachedBy": "Đính kèm bởi"
+    }
   },
   "usedRwlkNfts": {
     "title": "Random Walk NFT đã sử dụng",
     "subtitle": "Các Random Walk NFT đã đính kèm vào nét bút ETH để giảm 50% chi phí nét bút một lần",
-    "loading": "Đang tải…",
-    "empty": "Chưa có NFT nào."
+    "columns": {
+      "artwork": "Tác phẩm",
+      "token": "RandomWalk NFT",
+      "participant": "Người tham gia",
+      "cycle": "Chu kỳ",
+      "date": "Thời gian"
+    },
+    "artAlt": "RandomWalk NFT {id}",
+    "loadError": "Không đọc được các RandomWalk NFT đã sử dụng. Hãy thử lại.",
+    "emptyTitle": "Chưa có RandomWalk NFT nào được sử dụng",
+    "emptyDescription": "RandomWalk NFT sẽ hiện ở đây khi một nét bút ETH dùng nó để giảm chi phí nét bút một lần."
   },
   "stellarSelectionEth": {
     "invalidAddress": "Địa chỉ không hợp lệ",

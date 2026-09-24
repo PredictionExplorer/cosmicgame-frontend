@@ -65,9 +65,11 @@ export function GalleryList({ items, collectionTraits, onQuickView }: GalleryLis
 
   const columns: DataTableColumn<ListRow>[] = [
     {
+      // On a phone the picture leads its record, full width and unlabelled.
       id: 'artwork',
       header: <span className="sr-only">{t('list.headers.artwork')}</span>,
-      label: t('list.headers.artwork'),
+      label: '',
+      stack: true,
       value: (row) => row.nft.TokenId,
       width: '7.5rem',
       cell: (row) => {
@@ -76,10 +78,10 @@ export function GalleryList({ items, collectionTraits, onQuickView }: GalleryLis
           <ArtFrame
             sources={signatureCardSources(row.nft.Seed)}
             alt={signatureAlt({ id, name: row.nft.TokenName, entry: row.entry })}
-            sizes="96px"
+            sizes="(max-width: 639px) 15rem, 96px"
             density="compact"
             unavailableLabel={tDetail('image.artworkUnavailable')}
-            className="w-24"
+            className="w-24 max-sm:w-full max-sm:max-w-60"
           />
         );
       },

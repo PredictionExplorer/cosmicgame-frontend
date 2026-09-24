@@ -274,7 +274,13 @@
       "ownedTitle": "持有的 Cosmic Signature NFT",
       "transferTitle": "轉移 NFT",
       "transferSubtitle": "可選：將選中的 Cosmic Signature NFT 發送至其他錢包。",
-      "transferDescription": "僅在準備好將 NFT 發送至其他地址後，再從此錢包中選擇要轉移的 NFT。"
+      "transferDescription": "僅在準備好將 NFT 發送至其他地址後，再從此錢包中選擇要轉移的 NFT。",
+      "figures": {
+        "owned": "此錢包中",
+        "anchored": "已錨定"
+      },
+      "emptyTitle": "此錢包中還沒有簽名",
+      "emptyDescription": "你在分配中獲得或在市場上購入的簽名會顯示在這裏。"
     },
     "table": {
       "empty": "暫無代幣。",

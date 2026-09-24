@@ -271,10 +271,16 @@
       "marketplace": "Buy or sell NFTs",
       "loadErrorTitle": "Failed to load tokens",
       "loadErrorMessage": "Failed to load Cosmic Signature NFTs.",
-      "ownedTitle": "Cosmic Signature NFTs I Own",
+      "ownedTitle": "Cosmic Signature NFTs I own",
       "transferTitle": "Transfer NFTs",
       "transferSubtitle": "Optional: send selected Cosmic Signature NFTs to another wallet.",
-      "transferDescription": "Select NFTs from this wallet only when you are ready to send them to another address."
+      "transferDescription": "Select NFTs from this wallet only when you are ready to send them to another address.",
+      "figures": {
+        "owned": "In this wallet",
+        "anchored": "Anchored"
+      },
+      "emptyTitle": "No Signatures in this wallet yet",
+      "emptyDescription": "Signatures you receive in an allocation or buy on the marketplace appear here."
     },
     "table": {
       "empty": "No tokens yet.",

@@ -46,6 +46,7 @@
       "empty": "添付されたNFTはまだありません。",
       "imageAlt": "NFT #{id}",
       "imageUnavailable": "画像を利用できません",
+      "unknownToken": "不明なトークン",
       "columns": {
         "datetime": "日時",
         "contributorAddress": "拠出者アドレス",
@@ -54,7 +55,8 @@
         "tokenId": "トークンID",
         "tokenImage": "トークン画像",
         "tokenUri": "トークンURI"
-      }
+      },
+      "ariaLabel": "添付されたNFT"
     },
     "erc20": {
       "empty": "添付されたERC20トークンはまだありません。",
@@ -66,7 +68,8 @@
         "retrievedAmount": "受け取り数量",
         "recipient": "受領者",
         "retrieved": "受け取り済み"
-      }
+      },
+      "ariaLabel": "添付されたERC-20トークン"
     }
   },
   "loading": "読み込み中…",

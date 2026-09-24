@@ -46,27 +46,30 @@
       "empty": "No attached NFTs yet.",
       "imageAlt": "NFT #{id}",
       "imageUnavailable": "Image not available",
+      "unknownToken": "Unknown token",
       "columns": {
-        "datetime": "Datetime",
-        "contributorAddress": "Contributor Address",
-        "round": "Cycle #",
-        "tokenAddress": "Token Address",
-        "tokenId": "Token ID",
-        "tokenImage": "Token Image",
+        "datetime": "Date",
+        "contributorAddress": "Contributor",
+        "round": "Cycle",
+        "tokenAddress": "Contract",
+        "tokenId": "Token",
+        "tokenImage": "Image",
         "tokenUri": "Token URI"
-      }
+      },
+      "ariaLabel": "Attached NFTs"
     },
     "erc20": {
       "empty": "No attached ERC-20 tokens yet.",
       "columns": {
-        "datetime": "Datetime",
-        "cycle": "Cycle #",
-        "tokenAddress": "Token Address",
-        "attachedAmount": "Attached Amount",
-        "retrievedAmount": "Retrieved Amount",
+        "datetime": "Date",
+        "cycle": "Cycle",
+        "tokenAddress": "Token",
+        "attachedAmount": "Attached amount",
+        "retrievedAmount": "Retrieved amount",
         "recipient": "Recipient",
         "retrieved": "Retrieved"
-      }
+      },
+      "ariaLabel": "Attached ERC-20 tokens"
     }
   },
   "loading": "Loading…",

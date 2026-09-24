@@ -274,7 +274,13 @@
       "ownedTitle": "所有しているCosmic Signature NFT",
       "transferTitle": "NFTを移転",
       "transferSubtitle": "任意：選択したCosmic Signature NFTを別のウォレットへ送ります。",
-      "transferDescription": "別のウォレットへ送るNFTを選択してください。"
+      "transferDescription": "別のウォレットへ送るNFTを選択してください。",
+      "figures": {
+        "owned": "このウォレット内",
+        "anchored": "係留中"
+      },
+      "emptyTitle": "このウォレットにはまだシグネチャーがありません",
+      "emptyDescription": "配分で受け取ったシグネチャーや、マーケットプレイスで購入したシグネチャーがここに表示されます。"
     },
     "table": {
       "empty": "トークンはまだありません。",

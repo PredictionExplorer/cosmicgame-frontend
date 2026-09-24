@@ -274,7 +274,13 @@
       "ownedTitle": "내가 보유한 Cosmic Signature NFT",
       "transferTitle": "NFT 전송",
       "transferSubtitle": "선택 사항: 원하는 Cosmic Signature NFT를 골라 다른 지갑으로 보냅니다.",
-      "transferDescription": "다른 지갑으로 전송할 NFT를 선택해 주세요."
+      "transferDescription": "다른 지갑으로 전송할 NFT를 선택해 주세요.",
+      "figures": {
+        "owned": "이 지갑의 NFT",
+        "anchored": "앵커링됨"
+      },
+      "emptyTitle": "이 지갑에는 아직 시그니처가 없습니다",
+      "emptyDescription": "배분으로 받거나 마켓플레이스에서 구매한 시그니처가 여기에 표시됩니다."
     },
     "table": {
       "empty": "아직 토큰이 없습니다.",

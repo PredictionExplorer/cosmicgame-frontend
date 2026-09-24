@@ -1,74 +1,88 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 import NamedNFTsPage from '../NamedNFTsPage';
 
 const mockUseNamedNFTs = jest.fn();
-
-jest.mock('../../../../../hooks/useApiQuery', () => ({
-  useNamedNFTs: (...args: unknown[]) => mockUseNamedNFTs(...args),
+const mockUseCSTList = jest.fn();
+jest.mock('@/hooks/useApiQuery', () => ({
+  useNamedNFTs: () => mockUseNamedNFTs(),
+  useCSTList: () => mockUseCSTList(),
 }));
 
-jest.mock('../../../../../components/common/CustomPagination', () => ({
-  CustomPagination: () => <div data-testid="pagination">Pagination</div>,
+const mockUseCollectionTraits = jest.fn();
+jest.mock('@/hooks/useNftTraits', () => ({
+  useCollectionTraits: () => mockUseCollectionTraits(),
 }));
 
-jest.mock('../../../../../utils', () => ({
-  convertTimestampToDateTime: (ts: number) => `date-${ts}`,
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => {
+    const { fill: _f, priority: _p, unoptimized: _u, fetchPriority: _fp, ...rest } = props;
+    return <img {...rest} />;
+  },
 }));
 
-beforeEach(() => jest.clearAllMocks());
+const named = [
+  { MintTimeStamp: 1000, TokenId: 1, TokenName: 'Alpha' },
+  { MintTimeStamp: 2000, TokenId: 2, TokenName: 'Beta' },
+];
+const collection = [
+  { TokenId: 1, Seed: 'a1', Staked: true },
+  { TokenId: 2, Seed: 'a2', Staked: false },
+];
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseNamedNFTs.mockReturnValue({ data: named, isLoading: false });
+  mockUseCSTList.mockReturnValue({ data: collection, isLoading: false });
+  mockUseCollectionTraits.mockReturnValue({ traits: null, isLoading: false, isError: true });
+});
 
 describe('NamedNFTsPage', () => {
-  it('renders the heading', () => {
-    mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
+  it('renders the fallback header without a server summary', () => {
     render(<NamedNFTsPage />);
-    expect(screen.getByText('Named Cosmic Signature NFTs')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Named Cosmic Signature NFTs' }),
+    ).toBeInTheDocument();
   });
 
-  it('shows loading state', () => {
-    mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: true });
+  it('hangs every named Signature as art, titled by its name', () => {
     render(<NamedNFTsPage />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    const wall = screen.getByRole('list', { name: 'Named Cosmic Signature NFTs' });
+    const cards = within(wall).getAllByTestId('signature-card');
+    expect(cards).toHaveLength(2);
+    expect(within(cards[0]!).getByText('Alpha')).toBeInTheDocument();
+    expect(within(cards[0]!).getByRole('link')).toHaveAttribute('href', '/detail/1');
+    // The anchored state comes from the collection list.
+    expect(within(cards[0]!).getByTestId('anchored-mark')).toBeInTheDocument();
+    expect(within(cards[1]!).queryByTestId('anchored-mark')).not.toBeInTheDocument();
   });
 
-  it('shows empty message when no NFTs', () => {
+  it('links to the gallery filtered to named Signatures', () => {
+    render(<NamedNFTsPage />);
+    expect(screen.getByRole('link', { name: 'See them in the gallery' })).toHaveAttribute(
+      'href',
+      '/gallery?show=named',
+    );
+  });
+
+  it('waits for a seed source rather than flashing unavailable plates', () => {
+    mockUseCSTList.mockReturnValue({ data: undefined, isLoading: true });
+    mockUseCollectionTraits.mockReturnValue({ traits: null, isLoading: true, isError: false });
+    render(<NamedNFTsPage />);
+    expect(screen.getByTestId('signature-grid-skeleton')).toBeInTheDocument();
+    expect(screen.queryByTestId('pending-plate')).not.toBeInTheDocument();
+  });
+
+  it('says so when no Signature has a name yet', () => {
     mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
     render(<NamedNFTsPage />);
-    expect(screen.getByText('No named NFTs')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'No named NFTs' })).toBeInTheDocument();
     expect(screen.getByText('No Cosmic Signature NFTs have been named yet.')).toBeInTheDocument();
   });
 
-  it('renders table rows for NFT data', () => {
-    mockUseNamedNFTs.mockReturnValue({
-      data: [
-        { MintTimeStamp: 1000, TokenId: 1, TokenName: 'Alpha' },
-        { MintTimeStamp: 2000, TokenId: 2, TokenName: 'Beta' },
-      ],
-      isLoading: false,
-    });
-    render(<NamedNFTsPage />);
-    expect(screen.getByText('Alpha')).toBeInTheDocument();
-    expect(screen.getByText('Beta')).toBeInTheDocument();
-  });
-
-  it('renders pagination when data exists', () => {
-    mockUseNamedNFTs.mockReturnValue({
-      data: [{ MintTimeStamp: 1000, TokenId: 1, TokenName: 'Alpha' }],
-      isLoading: false,
-    });
-    render(<NamedNFTsPage />);
-    expect(screen.getByTestId('pagination')).toBeInTheDocument();
-  });
-
-  it('does not render pagination when empty', () => {
-    mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
-    render(<NamedNFTsPage />);
-    expect(screen.queryByTestId('pagination')).not.toBeInTheDocument();
-  });
-
   it('has no accessibility violations', async () => {
-    mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
     const { container } = render(<NamedNFTsPage />);
-    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
+    await checkA11y(container);
   });
 });

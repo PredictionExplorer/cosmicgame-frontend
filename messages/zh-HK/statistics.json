@@ -591,17 +591,35 @@
     "title": "已命名 Cosmic Signature NFT",
     "subtitle": "瀏覽由持有者自定義名稱的 Cosmic Signature NFT",
     "emptyTitle": "暫無已命名 NFT",
-    "emptyDescription": "尚未有持有者為 Cosmic Signature NFT 命名。"
+    "emptyDescription": "尚未有持有者為 Cosmic Signature NFT 命名。",
+    "galleryLink": "在畫廊中查看"
   },
   "attachedNfts": {
     "title": "已附加 NFT 貢獻",
-    "subtitle": "瀏覽各週期中社區成員隨落筆附加的 NFT"
+    "subtitle": "瀏覽各週期中社區成員隨落筆附加的 NFT",
+    "loadErrorTitle": "無法載入已附加 NFT",
+    "loadErrorMessage": "無法讀取已附加 NFT 的記錄，請重試。",
+    "emptyTitle": "暫無已附加 NFT",
+    "emptyDescription": "隨落筆附加的 NFT 會顯示在這裏，並在週期收官時轉給該週期簽名分配的獲配者。",
+    "card": {
+      "cycle": "第 {cycle} 個週期",
+      "attachedBy": "附加者"
+    }
   },
   "usedRwlkNfts": {
     "title": "已使用的 Random Walk NFT",
     "subtitle": "隨 ETH 落筆附加、用於一次性降低 50% 落筆價格的 Random Walk NFT",
-    "loading": "載入中…",
-    "empty": "暫無 NFT。"
+    "columns": {
+      "artwork": "作品",
+      "token": "RandomWalk NFT",
+      "participant": "參與者",
+      "cycle": "週期",
+      "date": "時間"
+    },
+    "artAlt": "RandomWalk NFT {id}",
+    "loadError": "無法讀取已使用的 RandomWalk NFT，請重試。",
+    "emptyTitle": "暫無已使用的 RandomWalk NFT",
+    "emptyDescription": "ETH 落筆使用 RandomWalk NFT 獲得一次性落筆價格減免後，該 NFT 會顯示在這裏。"
   },
   "stellarSelectionEth": {
     "invalidAddress": "地址無效",
