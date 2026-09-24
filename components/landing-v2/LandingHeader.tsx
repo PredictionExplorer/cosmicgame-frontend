@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import {
-  LANDING_HEADER_ROUTE_IDS,
+  LANDING_HEADER_LINKS,
   LANDING_SECTION_ANCHORS,
   getSiteRoute,
   locateSitePath,
@@ -22,6 +22,7 @@ import { ThemeSwitcher } from '@/components/theme/ThemeSwitcher';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 import { OpenAppLink } from './OpenAppLink';
+import { useCollapseWhenCrowded } from './useCollapseWhenCrowded';
 
 export type LandingSectionLabels = Readonly<Record<LandingSectionAnchor, string>>;
 
@@ -97,6 +98,11 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
   const inView = useSectionInView(onHome && !!sections);
   const pastHero = usePastHero(onHome);
   const [menuOpen, setMenuOpen] = useState(false);
+  // When "Open the app" joins the bar, long names (Ukrainian, Vietnamese …)
+  // no longer fit beside it: the section anchors give way first.
+  const navRef = useRef<HTMLElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const anchorsCrowded = useCollapseWhenCrowded(navRef, listRef);
 
   const anchorLinks = sections
     ? LANDING_SECTION_ANCHORS.map((id) => ({
@@ -106,13 +112,13 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
         current: inView === id ? ('location' as const) : undefined,
       }))
     : [];
-  const pageLinks = LANDING_HEADER_ROUTE_IDS.map((id) => {
+  const pageLinks = LANDING_HEADER_LINKS.map(({ id, short }) => {
     const route = getSiteRoute(id);
     const current = location.route?.id === id;
     return {
       key: id,
       href: route.path,
-      label: copy.routeLabel(id),
+      label: short ? copy.routeShortLabel(id) : copy.routeLabel(id),
       current: current ? (location.exact ? ('page' as const) : ('true' as const)) : undefined,
     };
   });
@@ -134,14 +140,15 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
           />
         </Link>
 
-        <nav aria-label={t('primaryLabel')} className="hidden min-w-0 lg:block">
-          <ul className="flex items-center gap-1">
+        <nav ref={navRef} aria-label={t('primaryLabel')} className="hidden min-w-0 flex-1 lg:block">
+          <ul ref={listRef} className="flex items-center gap-1">
             {[...anchorLinks, ...pageLinks].map((link, index) => (
               <li
                 key={link.key}
                 className={cn(
-                  index < anchorLinks.length && 'hidden xl:block',
+                  index < anchorLinks.length && (anchorsCrowded ? 'hidden' : 'hidden xl:block'),
                   index === anchorLinks.length &&
+                    !anchorsCrowded &&
                     'xl:ml-3 xl:border-l xl:border-rule-faint xl:pl-3',
                 )}
               >
@@ -162,7 +169,7 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           <div className="hidden items-center gap-2 sm:flex">
             <ThemeSwitcher />
             <LanguageSwitcher variant="compact" />
