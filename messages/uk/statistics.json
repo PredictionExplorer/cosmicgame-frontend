@@ -19,7 +19,7 @@
     "anchoring": {
       "label": "Закріплення",
       "title": "Статистика закріплення",
-      "description": "Дії закріплення та відкріплення, зараз закріплені токени й унікальні власники закріплень для Cosmic Signature NFT і RandomWalk NFT."
+      "description": "Дії закріплення та відкріплення, зараз закріплені NFT й унікальні власники закріплень для Cosmic Signature NFT і Random Walk NFT."
     },
     "activity": {
       "label": "Активність",
@@ -252,11 +252,9 @@
     "cstActiveAnchorHolders": "Гаманці, що зараз мають щонайменше один закріплений Cosmic Signature NFT.",
     "cstAnchorDistributionDeposits": "Загальна кількість подій депозиту до пулу надходжень за закріплення Cosmic Signature NFT.",
     "cstTotalAnchorDistributions": "Загальна сума ETH, передана як надходження за закріплення власникам закріплень Cosmic Signature NFT.",
-    "cstTotalTokensAnchored": "Кількість Cosmic Signature NFT, зараз закріплених у протоколі.",
     "cstUnretrievedAnchorDistributions": "Надходження за закріплення, нараховані, але ще не забрані власниками закріплень Cosmic Signature NFT.",
     "rwlkActiveAnchorHolders": "Гаманці, що зараз мають щонайменше один закріплений RandomWalk NFT.",
     "rwlkTotalTokensImprinted": "Загальна кількість Cosmic Signature NFT і супровідних CST, закарбованих для власників закріплень RandomWalk NFT через зоряний відбір закріплених NFT.",
-    "rwlkTotalTokensAnchored": "Кількість RandomWalk NFT, зараз закріплених у протоколі.",
     "cstGroup": "Закріплення Cosmic Signature NFT розділяє надходження за закріплення в ETH між зараз закріпленими Cosmic Signature NFT.",
     "rwlkGroup": "Закріплення RandomWalk NFT дає право на розподіли зоряного відбору закріплених NFT."
   },
@@ -278,17 +276,10 @@
   },
   "anchoringPage": {
     "snapshot": {
-      "poolLabel": "Пул надходжень за закріплення",
-      "poolTooltip": "ETH, зараз спрямований до пулу надходжень за закріплення для власників закріплень Cosmic Signature NFT.",
-      "poolCaption": "Надходить, коли цей цикл завершується; попередні незабрані надходження показано як «Незабрані».",
-      "perNftLabel": "Надходження на один Cosmic Signature NFT",
-      "perNftTooltip": "Поточне надходження за закріплення в ETH на один закріплений Cosmic Signature NFT: ончейн-пул, поділений на проіндексовану загальну кількість закріплених NFT.",
-      "perNftNoneAnchored": "Закріплених Cosmic Signature NFT ще не проіндексовано",
       "activeHoldersLabel": "Активні власники закріплень",
       "activeHoldersTooltip": "Різні гаманці, які зараз мають щонайменше один закріплений Cosmic Signature NFT або Random Walk NFT. Гаманець, що закріплює обидва види, враховано один раз."
     },
     "nowTitle": "Закріплення зараз",
-    "description": "Закріплені NFT — ключова частина Cosmic Signature: Cosmic Signature NFT розділяють між собою надходження за закріплення в ETH, а Random Walk NFT беруть участь у зоряному відборі закріплених NFT.",
     "historyLink": "Переглянути історію закріплень",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -304,18 +295,17 @@
       "activeHoldersRandomWalk": "Активні власники закріплених RandomWalk NFT",
       "distributionDeposits": "Кількість депозитів надходжень за закріплення",
       "totalDistributions": "Усього надходжень за закріплення",
-      "tokensImprinted": "Усього закарбовано токенів",
-      "tokensAnchored": "Усього закріплено токенів",
+      "tokensImprinted": "Закарбовані Cosmic Signature NFT",
       "unretrievedDistributions": "Незабрані надходження за закріплення"
     },
     "tables": {
       "actions": "Дії закріплення та відкріплення",
-      "anchoredTokens": "Закріплені токени",
+      "anchoredTokens": "Закріплені NFT",
       "uniqueHolders": "Унікальні власники закріплень"
     },
     "empty": {
       "actions": "Дій закріплення ще немає",
-      "tokens": "Зараз немає закріплених токенів",
+      "tokens": "Зараз немає закріплених NFT",
       "holders": "Власників закріплень ще немає"
     }
   },

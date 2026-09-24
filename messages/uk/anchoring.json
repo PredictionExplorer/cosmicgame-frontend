@@ -183,6 +183,7 @@
     "confirm": "{count, plural, one {Відкріпити # NFT} few {Відкріпити # NFT} many {Відкріпити # NFT} other {Відкріпити # NFT}}"
   },
   "anchorActionDetail": {
+    "title": "Дія закріплення #{id}",
     "subtitle": "Дія закріплення — {token} NFT",
     "errorTitle": "Не вдалося завантажити цю дію закріплення",
     "error": "Записи закріплення тимчасово недоступні. Спробуйте ще раз за мить.",
@@ -266,23 +267,18 @@
       "headers": {
         "anchorDatetime": {
           "desktop": "Дата",
-          "mobile": "Дата",
-          "tooltip": "Час, коли дію закріплення чи відкріплення було проіндексовано."
+          "mobile": "Дата"
         },
         "actionType": {
-          "desktop": "Дія",
-          "mobile": "Тип",
-          "tooltip": "Закріплення чи відкріплення NFT у цьому рядку."
+          "desktop": "Дія"
         },
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "Токен, задіяний у дії закріплення чи відкріплення."
+          "mobile": "NFT"
         },
         "holderAddress": {
           "desktop": "Власник закріплення",
-          "mobile": "Власник",
-          "tooltip": "Адреса гаманця, який закріпив або відкріпив токени."
+          "mobile": "Власник"
         },
         "nftCount": {
           "desktop": "Закріплено всього",
@@ -296,23 +292,19 @@
       "headers": {
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "Ідентифікатор закріпленого токена."
+          "mobile": "NFT"
         },
         "anchorDatetime": {
           "desktop": "Закріплено",
-          "mobile": "Закріплено",
-          "tooltip": "Час, коли токен було закріплено."
+          "mobile": "Закріплено"
         },
         "actionId": {
           "desktop": "Дія закріплення",
-          "mobile": "Дія",
-          "tooltip": "Запис дії закріплення, пов’язаний із цим токеном."
+          "mobile": "Дія"
         },
         "holderAddress": {
           "desktop": "Власник закріплення",
-          "mobile": "Власник",
-          "tooltip": "Адреса гаманця, який закріпив або відкріпив токени."
+          "mobile": "Власник"
         }
       }
     },

@@ -32,13 +32,11 @@ const defaultProps: AnchoringSectionProps = {
     NumActiveStakers: 10,
     NumDeposits: 5,
     TotalRewardEth: 1.5,
-    TotalTokensStaked: 50,
     UnclaimedRewardEth: 0.3,
   },
   rwlkStats: {
     NumActiveStakers: 3,
     TotalTokensMinted: 20,
-    TotalTokensStaked: 8,
   },
   cstAnchorActions: dataState(),
   rwlkAnchorActions: dataState(),
@@ -76,9 +74,9 @@ describe('AnchoringSection', () => {
   it('shows the Cosmic Signature overview as one figure row, grouped', () => {
     render(<AnchoringSection {...defaultProps} />);
     const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    // The anchored counts of both collections lead the page above the tabs.
     expect(overviewValues(panel)).toEqual([
       '10',
-      '50',
       '5',
       expect.stringContaining('1.5'),
       expect.stringContaining('0.3'),
@@ -86,21 +84,37 @@ describe('AnchoringSection', () => {
   });
 
   it('shows an unread figure as unavailable, never as 0', () => {
-    render(
-      <AnchoringSection
-        {...defaultProps}
-        cstStats={{ NumActiveStakers: 10, TotalTokensStaked: 50 }}
-      />,
-    );
+    render(<AnchoringSection {...defaultProps} cstStats={{ NumActiveStakers: 10 }} />);
     const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
     // Deposits and both amounts were not read: the unknown dash, not a zero.
     expect(overviewValues(panel)).toEqual([
       '10',
-      '50',
       '—common.status.unavailable',
       '—common.status.unavailable',
       '—common.status.unavailable',
     ]);
+  });
+
+  it('holds skeletons while the dashboard loads, never confident zeros', () => {
+    render(
+      <AnchoringSection
+        {...defaultProps}
+        cstStats={undefined}
+        rwlkStats={undefined}
+        statsLoading
+      />,
+    );
+    const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    for (const value of overviewValues(panel)) expect(value).not.toMatch(/\d|—/);
+    expect(panel.querySelector('dl .animate-pulse')).not.toBeNull();
+  });
+
+  it('shows a dashboard that failed as unavailable figures, not zeros', () => {
+    render(<AnchoringSection {...defaultProps} cstStats={null} rwlkStats={null} />);
+    const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    expect(overviewValues(panel)).toEqual(
+      Array.from({ length: 4 }, () => '—common.status.unavailable'),
+    );
   });
 
   it('keeps the figure definitions in one disclosure instead of an icon per label', () => {
@@ -108,7 +122,7 @@ describe('AnchoringSection', () => {
     const panel = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
     const disclosure = within(panel).getByText('Definitions').closest('details')!;
     expect(disclosure).not.toHaveAttribute('open');
-    expect(within(disclosure).getAllByRole('term')).toHaveLength(5);
+    expect(within(disclosure).getAllByRole('term')).toHaveLength(4);
   });
 
   it('gives each ledger its own H2 section', () => {
@@ -118,7 +132,7 @@ describe('AnchoringSection', () => {
       within(panel)
         .getAllByRole('heading', { level: 2 })
         .map((heading) => heading.textContent),
-    ).toEqual(['Anchor / release actions', 'Anchored tokens', 'Unique anchor-holders']);
+    ).toEqual(['Anchor / release actions', 'Anchored NFTs', 'Unique anchor-holders']);
   });
 
   it('renders anchor-action table for CST', () => {
@@ -162,7 +176,7 @@ describe('AnchoringSection', () => {
     expect(screen.getByRole('tablist', { name: 'NFT collection' })).toBeInTheDocument();
     await user.click(screen.getByRole('tab', { name: 'Random Walk NFT' }));
     const panel = screen.getByRole('tabpanel', { name: 'Random Walk NFT' });
-    expect(overviewValues(panel)).toEqual(['3', '8', '20']);
+    expect(overviewValues(panel)).toEqual(['3', '20']);
   });
 
   it('explains imprinted-token anchoring counters', async () => {

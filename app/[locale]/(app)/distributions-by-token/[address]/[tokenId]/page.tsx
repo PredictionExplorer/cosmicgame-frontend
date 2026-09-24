@@ -1,6 +1,7 @@
 import type { Metadata, ResolvingMetadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { formatId } from '@/utils/format/ids';
 import { createPageMetadata } from '@/utils/seo';
 import { PageMessages } from '@/components/i18n/PageMessages';
 
@@ -16,9 +17,14 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { locale, address, tokenId } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
+  const tAnchoring = await getTranslations({ locale, namespace: 'anchoring' });
+  const id = Number(tokenId);
   return createPageMetadata(
     parent,
-    t('distributionsByToken.title'),
+    // Titled like its H1 ("Anchor Distributions for Cosmic Signature #000045").
+    Number.isSafeInteger(id) && id >= 0
+      ? tAnchoring('distributionsByToken.title', { id: formatId(id) })
+      : tAnchoring('overview.title'),
     t('distributionsByToken.description'),
     undefined,
     `/distributions-by-token/${address}/${tokenId}`,

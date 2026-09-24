@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { useCSTAnchorDistributionsByCycle } from '@/hooks/useApiQuery';
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { DataTable, TableLink, type DataTableColumn } from '@/components/ui/data-table';
 import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable';
 import type { CSTAnchorDistribution } from '@/services/api';
 
@@ -40,6 +40,7 @@ export const GlobalAnchorDistributionsTable = ({
   ...state
 }: GlobalAnchorDistributionsTableProps) => {
   const t = useTranslations('anchoring');
+  const tCommon = useTranslations('common');
 
   const columns = useMemo<DataTableColumn<CSTAnchorDistribution>[]>(
     () => [
@@ -48,7 +49,13 @@ export const GlobalAnchorDistributionsTable = ({
         kind: 'link',
         header: t('tables.globalDistributions.columns.cycle'),
         value: (row) => row.RoundNum,
-        href: (row) => `/allocation/${row.RoundNum}`,
+        // "Cycle #1", not a bare "1": a word-sized link, as every other ledger names a cycle.
+        cell: (row) => (
+          <TableLink href={`/allocation/${row.RoundNum}`}>
+            {tCommon('pageHeader.crumbs.cycle', { cycle: row.RoundNum })}
+          </TableLink>
+        ),
+        nowrap: true,
         sortable: true,
       },
       {
@@ -88,7 +95,7 @@ export const GlobalAnchorDistributionsTable = ({
         priority: 'secondary',
       },
     ],
-    [t],
+    [t, tCommon],
   );
 
   return (

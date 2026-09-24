@@ -57,7 +57,7 @@
         "caption": "Retrieved when you release. Releasing is permanent."
       },
       "distributionPerNft": {
-        "label": "Distribution per Cosmic Signature NFT",
+        "label": "Per anchored NFT",
         "tooltip": "Current ETH Anchor Distribution per anchored Cosmic Signature NFT, calculated as the total anchoring pool (on-chain) divided by the indexed number of anchored Cosmic Signature NFTs.",
         "noneAnchored": "No anchored Cosmic Signature NFTs indexed yet"
       }

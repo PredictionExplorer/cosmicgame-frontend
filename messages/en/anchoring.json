@@ -183,6 +183,7 @@
     "confirm": "{count, plural, one {Release # NFT} other {Release # NFTs}}"
   },
   "anchorActionDetail": {
+    "title": "Anchor action #{id}",
     "subtitle": "{token} NFT anchor action",
     "errorTitle": "This anchor action could not be loaded",
     "error": "The anchoring records are temporarily unavailable. Try again in a moment.",
@@ -266,23 +267,18 @@
       "headers": {
         "anchorDatetime": {
           "desktop": "Date",
-          "mobile": "Date",
-          "tooltip": "Timestamp when the anchor or release action was indexed."
+          "mobile": "Date"
         },
         "actionType": {
-          "desktop": "Action",
-          "mobile": "Type",
-          "tooltip": "Whether this row anchored or released NFTs."
+          "desktop": "Action"
         },
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "Token",
-          "tooltip": "Token involved in the anchor or release action."
+          "mobile": "Token"
         },
         "holderAddress": {
           "desktop": "Anchor-holder",
-          "mobile": "Holder",
-          "tooltip": "Wallet address that anchored or released tokens."
+          "mobile": "Holder"
         },
         "nftCount": {
           "desktop": "Anchored in total",
@@ -296,23 +292,19 @@
       "headers": {
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "Token",
-          "tooltip": "Anchored token identifier."
+          "mobile": "Token"
         },
         "anchorDatetime": {
           "desktop": "Anchored",
-          "mobile": "Anchored",
-          "tooltip": "Timestamp when the token was anchored."
+          "mobile": "Anchored"
         },
         "actionId": {
           "desktop": "Anchor action",
-          "mobile": "Action",
-          "tooltip": "Anchor action record linked to this token."
+          "mobile": "Action"
         },
         "holderAddress": {
           "desktop": "Anchor-holder",
-          "mobile": "Holder",
-          "tooltip": "Wallet address that anchored or released tokens."
+          "mobile": "Holder"
         }
       }
     },

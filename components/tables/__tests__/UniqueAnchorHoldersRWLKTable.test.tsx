@@ -40,14 +40,15 @@ describe('UniqueAnchorHoldersRWLKTable', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 
-  it('adds localized help to RandomWalk anchor-holder headers', async () => {
+  it('explains only the columns that do not explain themselves', async () => {
     const user = userEvent.setup();
     render(<UniqueAnchorHoldersRWLKTable list={[createAnchorHolder()]} />);
     const triggers = screen.getAllByRole('button', {
       name: /^tables\.tableHeaderHelp\.explainColumn/,
     });
-    expect(triggers.length).toBeGreaterThanOrEqual(5);
-    await user.hover(triggers[3]!);
+    // The address and the anchor and release counts need no definition.
+    expect(triggers).toHaveLength(2);
+    await user.hover(triggers[0]!);
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
       'tables.statisticsTooltips.totalAnchoredTokens',
     );

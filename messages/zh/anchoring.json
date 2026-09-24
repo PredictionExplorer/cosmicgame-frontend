@@ -183,6 +183,7 @@
     "confirm": "{count, plural, other {解锚 # 枚 NFT}}"
   },
   "anchorActionDetail": {
+    "title": "锚定操作 #{id}",
     "subtitle": "{token} NFT 锚定操作",
     "errorTitle": "无法加载该锚定操作",
     "error": "锚定记录暂时无法获取，请稍后重试。",
@@ -266,23 +267,18 @@
       "headers": {
         "anchorDatetime": {
           "desktop": "日期",
-          "mobile": "日期",
-          "tooltip": "锚定或解锚操作的索引时间。"
+          "mobile": "日期"
         },
         "actionType": {
-          "desktop": "操作类型",
-          "mobile": "类型",
-          "tooltip": "此行记录的是锚定还是解锚操作。"
+          "desktop": "操作类型"
         },
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "此锚定或解锚操作涉及的代币。"
+          "mobile": "NFT"
         },
         "holderAddress": {
           "desktop": "锚定者",
-          "mobile": "锚定者",
-          "tooltip": "执行锚定或解锚操作的钱包地址。"
+          "mobile": "锚定者"
         },
         "nftCount": {
           "desktop": "锚定总数",
@@ -296,23 +292,19 @@
       "headers": {
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "已锚定代币的标识符。"
+          "mobile": "NFT"
         },
         "anchorDatetime": {
           "desktop": "锚定时间",
-          "mobile": "锚定时间",
-          "tooltip": "代币锚定的时间。"
+          "mobile": "锚定时间"
         },
         "actionId": {
           "desktop": "锚定操作",
-          "mobile": "操作",
-          "tooltip": "与此代币关联的锚定操作记录。"
+          "mobile": "操作"
         },
         "holderAddress": {
           "desktop": "锚定者",
-          "mobile": "锚定者",
-          "tooltip": "执行锚定或解锚操作的钱包地址。"
+          "mobile": "锚定者"
         }
       }
     },

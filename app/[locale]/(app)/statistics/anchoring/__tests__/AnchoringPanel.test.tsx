@@ -67,25 +67,46 @@ beforeEach(() => {
 });
 
 describe('AnchoringPanel', () => {
-  it('shows anchoring now as one strip of figures no collection tab repeats', () => {
+  it('counts both collections in one strip, named as the hub names them', () => {
     render(<AnchoringPanel />);
     expect(screen.getByRole('heading', { level: 2, name: 'Anchoring now' })).toBeInTheDocument();
-    // The collection overviews below carry figures of their own.
     const strip = screen.getByRole('region', { name: 'Anchoring now' });
     const figures = [...strip.querySelectorAll('[data-figure]')].map((el) =>
       el.getAttribute('data-figure'),
     );
-    expect(figures).toEqual(['pool', 'perNft', 'activeHolders']);
-    // The per-collection anchored counts lead their own tab, not this strip.
-    expect(screen.queryByText('Cosmic Signature NFTs anchored')).not.toBeInTheDocument();
-    expect(screen.queryByText('Random Walk NFTs anchored')).not.toBeInTheDocument();
+    expect(figures).toEqual(['activeHolders', 'anchoredCosmicSignature', 'anchoredRandomWalk']);
+    expect(strip.querySelector('[data-figure="anchoredCosmicSignature"] dt')).toHaveTextContent(
+      'anchoring.flow.cosmicSignature.anchored.label',
+    );
+    expect(strip.querySelector('[data-figure="anchoredCosmicSignature"] dd')).toHaveTextContent(
+      /^11$/,
+    );
+    expect(strip.querySelector('[data-figure="anchoredRandomWalk"] dd')).toHaveTextContent(/^26$/);
   });
 
-  it('leads the strip with the pool and divides it by the anchored NFTs', () => {
+  it('leaves the pool and the share per NFT to the hub, one link away', () => {
     const { container } = render(<AnchoringPanel />);
-    expect(container.querySelector('[data-figure="pool"]')).toHaveTextContent('2.5000');
-    // 2.5 ETH over 11 anchored Cosmic Signature NFTs.
-    expect(container.querySelector('[data-figure="perNft"]')).toHaveTextContent('0.2273');
+    expect(container.querySelector('[data-figure="pool"]')).toBeNull();
+    expect(container.querySelector('[data-figure="perNft"]')).toBeNull();
+    // One lede on the page: the section adds none of its own before the figures.
+    const strip = screen.getByRole('region', { name: 'Anchoring now' });
+    expect(strip.querySelector('p')).toBeNull();
+  });
+
+  it('never shows a confident zero when the dashboard failed', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: jest.fn(),
+    });
+    render(<AnchoringPanel />);
+    const strip = screen.getByRole('region', { name: 'Anchoring now' });
+    expect(strip.querySelector('[data-figure="anchoredCosmicSignature"] dd')).toHaveTextContent(
+      /^—.*unavailable$/i,
+    );
+    const overview = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    expect(overview.querySelector('dl')).not.toHaveTextContent(/\d/);
   });
 
   it('counts a wallet anchoring both kinds once in Active Anchor-holders', () => {
@@ -113,13 +134,6 @@ describe('AnchoringPanel', () => {
     expect(screen.getAllByText('Active Cosmic Signature NFT anchor-holders')[0]).toBeVisible();
   });
 
-  it('explains how the pool relates to unretrieved distributions', () => {
-    render(<AnchoringPanel />);
-    expect(
-      screen.getByText(/earlier deposits not yet retrieved show as Unretrieved/),
-    ).toBeInTheDocument();
-  });
-
   it('renders CST/RWLK anchoring tabs', () => {
     render(<AnchoringPanel />);
     expect(screen.getByRole('tab', { name: 'Cosmic Signature NFT' })).toBeInTheDocument();
@@ -138,12 +152,15 @@ describe('AnchoringPanel', () => {
       isError: false,
       refetch: jest.fn(),
     });
-    const { container } = render(<AnchoringPanel />);
+    render(<AnchoringPanel />);
     const strip = screen.getByRole('region', { name: 'Anchoring now' });
-    for (const figure of strip.querySelectorAll('[data-figure]')) {
-      expect(figure.querySelector('.animate-pulse')).toBeInTheDocument();
+    for (const id of ['anchoredCosmicSignature', 'anchoredRandomWalk']) {
+      expect(strip.querySelector(`[data-figure="${id}"] .animate-pulse`)).toBeInTheDocument();
     }
-    expect(container).not.toHaveTextContent('2.5000');
+    // The collection overviews below wait too, instead of reading 0.
+    const overview = screen.getByRole('tabpanel', { name: 'Cosmic Signature NFT' });
+    expect(overview.querySelector('dl .animate-pulse')).toBeInTheDocument();
+    expect(overview.querySelector('dl')).not.toHaveTextContent(/\d/);
   });
 
   it('shows a section error with retry when anchor actions fail', async () => {

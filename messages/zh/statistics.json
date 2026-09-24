@@ -19,7 +19,7 @@
     "anchoring": {
       "label": "锚定",
       "title": "锚定统计",
-      "description": "查看 Cosmic Signature NFT 与 Random Walk NFT 的锚定和解锚操作、当前已锚定代币及独立锚定者。"
+      "description": "查看 Cosmic Signature NFT 与 Random Walk NFT 的锚定和解锚操作、当前已锚定的 NFT 及独立锚定者。"
     },
     "activity": {
       "label": "活动",
@@ -252,11 +252,9 @@
     "cstActiveAnchorHolders": "当前至少锚定一枚 Cosmic Signature NFT 的钱包。",
     "cstAnchorDistributionDeposits": "Cosmic Signature NFT 锚定派发池的累计存入事件数。",
     "cstTotalAnchorDistributions": "向 Cosmic Signature NFT 锚定者派发的 ETH 总额。",
-    "cstTotalTokensAnchored": "协议中当前已锚定的 Cosmic Signature NFT 数量。",
     "cstUnretrievedAnchorDistributions": "已分配但尚未由 Cosmic Signature NFT 锚定者取回的锚定派发。",
     "rwlkActiveAnchorHolders": "当前至少锚定一枚 Random Walk NFT 的钱包。",
     "rwlkTotalTokensImprinted": "通过锚定 NFT 星选，为 Random Walk NFT 锚定者铭刻的 Cosmic Signature NFT 与配套 CST 总量。",
-    "rwlkTotalTokensAnchored": "协议中当前已锚定的 Random Walk NFT 数量。",
     "cstGroup": "Cosmic Signature NFT 锚定会在当前已锚定的 Cosmic Signature NFT 之间分配 ETH 锚定派发。",
     "rwlkGroup": "锚定 Random Walk NFT 可获得锚定 NFT 星选资格。"
   },
@@ -278,17 +276,10 @@
   },
   "anchoringPage": {
     "snapshot": {
-      "poolLabel": "锚定派发池",
-      "poolTooltip": "当前分配至 Cosmic Signature NFT 锚定者派发池的 ETH。",
-      "poolCaption": "本周期收官时存入；此前已存入但尚未取回的部分计入“未取回”。",
-      "perNftLabel": "每枚 Cosmic Signature NFT 派发额",
-      "perNftTooltip": "当前每枚已锚定 Cosmic Signature NFT 对应的 ETH 锚定派发：链上派发池除以已索引的已锚定 NFT 总数。",
-      "perNftNoneAnchored": "尚未索引到已锚定的 Cosmic Signature NFT",
       "activeHoldersLabel": "活跃锚定者",
       "activeHoldersTooltip": "当前至少锚定一枚 Cosmic Signature NFT 或 Random Walk NFT 的不同钱包数；同时锚定两类 NFT 的钱包只计一次。"
     },
     "nowTitle": "当前锚定",
-    "description": "已锚定 NFT 是 Cosmic Signature 的核心组成部分：Cosmic Signature NFT 共享 ETH 锚定派发；Random Walk NFT 则参与锚定 NFT 星选。",
     "historyLink": "查看锚定历史",
     "tabs": {
       "cosmicSignature": "Cosmic Signature NFT",
@@ -304,18 +295,17 @@
       "activeHoldersRandomWalk": "活跃 Random Walk NFT 锚定者数量",
       "distributionDeposits": "锚定派发存入次数",
       "totalDistributions": "锚定派发总额",
-      "tokensImprinted": "已铭刻代币总数",
-      "tokensAnchored": "已锚定代币总数",
+      "tokensImprinted": "已铭刻的 Cosmic Signature NFT",
       "unretrievedDistributions": "未取回锚定派发"
     },
     "tables": {
       "actions": "锚定与解锚操作",
-      "anchoredTokens": "已锚定代币",
+      "anchoredTokens": "已锚定的 NFT",
       "uniqueHolders": "独立锚定者"
     },
     "empty": {
       "actions": "暂无锚定操作",
-      "tokens": "当前暂无已锚定代币",
+      "tokens": "当前暂无已锚定的 NFT",
       "holders": "暂无锚定者"
     }
   },

@@ -183,6 +183,7 @@
     "confirm": "{count, plural, other {Gỡ neo # NFT}}"
   },
   "anchorActionDetail": {
+    "title": "Thao tác neo giữ #{id}",
     "subtitle": "Thao tác neo giữ cho {token} NFT",
     "errorTitle": "Không tải được thao tác neo giữ này",
     "error": "Dữ liệu neo giữ tạm thời không khả dụng. Hãy thử lại sau giây lát.",
@@ -266,23 +267,18 @@
       "headers": {
         "anchorDatetime": {
           "desktop": "Thời điểm",
-          "mobile": "Thời điểm",
-          "tooltip": "Dấu thời gian khi thao tác neo giữ hoặc gỡ neo được lập chỉ mục."
+          "mobile": "Thời điểm"
         },
         "actionType": {
-          "desktop": "Thao tác",
-          "mobile": "Loại",
-          "tooltip": "Hàng này là thao tác neo giữ hay gỡ neo NFT."
+          "desktop": "Thao tác"
         },
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "Token liên quan đến thao tác neo giữ hoặc gỡ neo."
+          "mobile": "NFT"
         },
         "holderAddress": {
           "desktop": "Người neo giữ",
-          "mobile": "Người giữ",
-          "tooltip": "Địa chỉ ví đã neo giữ hoặc gỡ neo token."
+          "mobile": "Người giữ"
         },
         "nftCount": {
           "desktop": "Tổng đang neo giữ",
@@ -296,23 +292,19 @@
       "headers": {
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "Mã định danh của token đang neo giữ."
+          "mobile": "NFT"
         },
         "anchorDatetime": {
           "desktop": "Thời điểm neo giữ",
-          "mobile": "Thời điểm",
-          "tooltip": "Dấu thời gian khi token được neo giữ."
+          "mobile": "Thời điểm"
         },
         "actionId": {
           "desktop": "Thao tác neo giữ",
-          "mobile": "Thao tác",
-          "tooltip": "Bản ghi thao tác neo giữ liên kết với token này."
+          "mobile": "Thao tác"
         },
         "holderAddress": {
           "desktop": "Người neo giữ",
-          "mobile": "Người giữ",
-          "tooltip": "Địa chỉ ví đã neo giữ hoặc gỡ neo token."
+          "mobile": "Người giữ"
         }
       }
     },

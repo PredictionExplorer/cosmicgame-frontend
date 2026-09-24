@@ -31,7 +31,6 @@ export const UniqueAnchorHoldersRWLKTable = ({
         kind: 'address',
         header: t('columns.anchorHolderAddress'),
         label: t('columns.holder'),
-        help: t('statisticsTooltips.anchorHolderAddress'),
         value: (row) => row.StakerAddr,
       },
       {
@@ -39,7 +38,6 @@ export const UniqueAnchorHoldersRWLKTable = ({
         kind: 'count',
         header: t('uniqueAnchorHolders.numAnchorActions'),
         label: t('uniqueAnchorHolders.anchors'),
-        help: t('statisticsTooltips.numAnchorActions'),
         value: (row) => row.NumStakeActions,
         sortable: true,
       },
@@ -48,7 +46,6 @@ export const UniqueAnchorHoldersRWLKTable = ({
         kind: 'count',
         header: t('uniqueAnchorHolders.numReleaseActions'),
         label: t('uniqueAnchorHolders.releases'),
-        help: t('statisticsTooltips.numReleaseActions'),
         value: (row) => row.NumUnstakeActions,
         sortable: true,
       },

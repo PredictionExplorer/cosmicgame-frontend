@@ -43,10 +43,38 @@ describe('RwalkAnchorDistributionImprintsTable', () => {
   it('shows each imprint by its artwork, recipient, cycle and transaction', () => {
     render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} />);
     expect(screen.getByTestId('art-frame')).toBeInTheDocument();
+    // The plate leads to the token too, as a pointer shortcut: the number is the one named link.
     expect(screen.getByRole('link', { name: '#000038' })).toHaveAttribute('href', '/detail/38');
+    expect(document.querySelectorAll('a[href="/detail/38"]')).toHaveLength(2);
+    expect(document.querySelector('a[href="/detail/38"][aria-hidden="true"]')).toHaveAttribute(
+      'tabindex',
+      '-1',
+    );
     expect(document.querySelector(`a[href="/user/${RECIPIENT}"]`)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/allocation/1');
+    // A cycle reads as a word-sized link, never a bare "1".
+    expect(
+      screen.getAllByRole('link', { name: 'common.pageHeader.crumbs.cycle(cycle=1)' })[0],
+    ).toHaveAttribute('href', '/allocation/1');
     expect(document.querySelector('a[href*="0ximprint"]')).toHaveAttribute('target', '_blank');
+  });
+
+  it('reads as one media object on a phone: the caption carries the cycle and the proof', () => {
+    const { container } = render(<RwalkAnchorDistributionImprintsTable list={[imprint()]} />);
+    const tokenCell = container.querySelector(
+      'td[data-label="anchoring.tables.randomWalkImprints.columns.tokenId"]',
+    );
+    expect(tokenCell).toHaveAttribute('data-stack', 'true');
+    const caption = tokenCell?.querySelector('.sm\\:hidden');
+    expect(caption?.querySelector('a[href="/allocation/1"]')).not.toBeNull();
+    expect(caption?.querySelector('a[href*="0ximprint"]')).not.toBeNull();
+    // The columns the caption repeats drop out of the phone record.
+    for (const label of ['cycle', 'datetime']) {
+      expect(
+        container.querySelector(
+          `td[data-label="anchoring.tables.randomWalkImprints.columns.${label}"]`,
+        ),
+      ).toHaveAttribute('data-priority', 'secondary');
+    }
   });
 
   it('reads every thumbnail’s seed from one collection read, not a lookup per row', () => {

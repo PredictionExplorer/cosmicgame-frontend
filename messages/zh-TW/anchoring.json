@@ -183,6 +183,7 @@
     "confirm": "{count, plural, other {解錨 # 枚 NFT}}"
   },
   "anchorActionDetail": {
+    "title": "錨定操作 #{id}",
     "subtitle": "{token} NFT 錨定操作",
     "errorTitle": "無法載入該錨定操作",
     "error": "錨定紀錄暫時無法取得，請稍後再試。",
@@ -266,23 +267,18 @@
       "headers": {
         "anchorDatetime": {
           "desktop": "日期",
-          "mobile": "日期",
-          "tooltip": "錨定或解錨操作的索引時間。"
+          "mobile": "日期"
         },
         "actionType": {
-          "desktop": "操作類型",
-          "mobile": "類型",
-          "tooltip": "此行紀錄的是錨定還是解錨操作。"
+          "desktop": "操作類型"
         },
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "此錨定或解錨操作涉及的代幣。"
+          "mobile": "NFT"
         },
         "holderAddress": {
           "desktop": "錨定者",
-          "mobile": "錨定者",
-          "tooltip": "執行錨定或解錨操作的錢包地址。"
+          "mobile": "錨定者"
         },
         "nftCount": {
           "desktop": "錨定總數",
@@ -296,23 +292,19 @@
       "headers": {
         "tokenId": {
           "desktop": "NFT",
-          "mobile": "NFT",
-          "tooltip": "已錨定代幣的識別符號。"
+          "mobile": "NFT"
         },
         "anchorDatetime": {
           "desktop": "錨定時間",
-          "mobile": "錨定時間",
-          "tooltip": "代幣錨定的時間。"
+          "mobile": "錨定時間"
         },
         "actionId": {
           "desktop": "錨定操作",
-          "mobile": "操作",
-          "tooltip": "與此代幣關聯的錨定操作紀錄。"
+          "mobile": "操作"
         },
         "holderAddress": {
           "desktop": "錨定者",
-          "mobile": "錨定者",
-          "tooltip": "執行錨定或解錨操作的錢包地址。"
+          "mobile": "錨定者"
         }
       }
     },

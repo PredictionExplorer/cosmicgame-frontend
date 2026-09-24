@@ -121,10 +121,11 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await openZhRoute(
       page,
       `/zh/anchor-action/0/${SPRINT4_MOCK_ACTION_ID}`,
-      '锚定操作详情 · Cosmic Signature',
+      // Titled like its H1, so every action's tab says which one it is.
+      `锚定操作 #${SPRINT4_MOCK_ACTION_ID} · Cosmic Signature`,
     );
     await expect(
-      page.getByRole('heading', { level: 1, name: `操作 #${SPRINT4_MOCK_ACTION_ID}` }),
+      page.getByRole('heading', { level: 1, name: `锚定操作 #${SPRINT4_MOCK_ACTION_ID}` }),
     ).toBeVisible();
     await expect(page.getByText('Cosmic Signature NFT 锚定操作', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: '时间线' })).toBeVisible();
@@ -214,7 +215,7 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
     await openZhRoute(
       page,
       `/zh/distributions-by-token/${SPRINT4_MOCK_ADDRESS}/${SPRINT4_MOCK_TOKEN_ID}`,
-      '按代币查看锚定派发 · Cosmic Signature',
+      `Cosmic Signature #${String(SPRINT4_MOCK_TOKEN_ID).padStart(6, '0')} 的锚定派发 · Cosmic Signature`,
     );
     await expect(
       page.getByRole('heading', {
@@ -234,8 +235,17 @@ test.describe('zh Sprint 4 — transactions and holdings routes', () => {
 
   test('opens representative Chinese anchoring tooltips', async ({ page }) => {
     await openZhRoute(page, '/zh/anchoring', '锚定派发 · Cosmic Signature');
-    await expectZhLabelTooltip(page, '锚定派发池', /当前分配至锚定派发池的 ETH 总额/);
-    await expectZhLabelTooltip(page, '每枚 NFT 派发额', /当前每枚已锚定 Cosmic Signature NFT/);
+    // The hub's flow: the pool, divided by the anchored NFTs, is the share per anchored NFT.
+    await expectZhLabelTooltip(
+      page,
+      '锚定派发池',
+      /本周期为已锚定的 Cosmic Signature NFT 预留的 ETH/,
+    );
+    await expectZhLabelTooltip(
+      page,
+      '每枚已锚定 NFT',
+      /派发池除以索引器统计的已锚定 Cosmic Signature NFT 数量/,
+    );
   });
 
   test('shows an end-user-visible Chinese Sonner toast', async ({ page }) => {

@@ -47,7 +47,6 @@
     "description": "目前演繹週期的完整詳情：落筆歷史、排行榜、已附加貢獻與各軌道分配。"
   },
   "distributionsByToken": {
-    "title": "按代幣檢視錨定配發",
     "description": "檢視指定 Cosmic Signature NFT 的錨定配發明細，包括各週期 ETH 配發紀錄、取回狀態與累計錨定配發額。"
   },
   "allocationInfo": {
@@ -55,7 +54,6 @@
     "descriptionFor": "檢視第 {id} 個 Cosmic Signature 演繹週期的獲配者、簽名分配、星選結果及已附加 NFT 流向。"
   },
   "anchorAction": {
-    "title": "錨定操作詳情",
     "description": "檢視 Cosmic Signature 單次錨定操作的代幣類型、錨定數量與錨定配發的取回狀態。"
   },
   "allocationRetrieved": {
@@ -100,7 +98,7 @@
   },
   "statisticsAnchoring": {
     "title": "錨定統計",
-    "description": "檢視 Cosmic Signature NFT 與 Random Walk NFT 的錨定和解錨操作、目前已錨定代幣及獨立錨定者。"
+    "description": "檢視 Cosmic Signature NFT 與 Random Walk NFT 的錨定和解錨操作、目前已錨定的 NFT 及獨立錨定者。"
   },
   "statisticsActivity": {
     "title": "落筆活動統計",

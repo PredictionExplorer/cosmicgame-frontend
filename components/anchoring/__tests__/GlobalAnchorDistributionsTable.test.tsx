@@ -43,7 +43,9 @@ beforeEach(() => {
 describe('GlobalAnchorDistributionsTable', () => {
   it('lists each cycle deposit with its NFTs, amount and what is unretrieved', () => {
     render(<GlobalAnchorDistributionsTable list={[deposit()]} />);
-    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/allocation/1');
+    expect(
+      screen.getByRole('link', { name: 'common.pageHeader.crumbs.cycle(cycle=1)' }),
+    ).toHaveAttribute('href', '/allocation/1');
     expect(screen.getByText('17')).toBeInTheDocument();
     expect(screen.getAllByText('2.6548')).toHaveLength(2);
     expect(screen.getByText('anchoring.common.no')).toBeInTheDocument();

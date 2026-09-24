@@ -8,6 +8,7 @@ const action = (overrides = {}) => ({
   EvtLogId: 1,
   ActionId: 10,
   TimeStamp: 1_790_207_903,
+  TxHash: '0xactiontx',
   ActionType: 0,
   TokenId: 47,
   StakerAddr: HOLDER,
@@ -33,16 +34,26 @@ describe('GlobalAnchorActionsTable', () => {
     expect(screen.getAllByText('33')).toHaveLength(2);
   });
 
-  it('explains each column and leads each row to its record', () => {
+  it('says where each link goes: the action to its record, the date to its transaction', () => {
     render(<GlobalAnchorActionsTable list={[action()]} IsRWLK />);
-    expect(
-      screen.getByRole('button', {
-        name: /explainColumn\(column=anchoring\.tables\.globalAnchorActions\.headers\.holderAddress\.desktop\)/,
-      }),
-    ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'anchoring.anchorActionDetail.breadcrumbs.action(id=10)' }),
     ).toHaveAttribute('href', '/anchor-action/1/10');
+    const proof = document.querySelector('a[href*="0xactiontx"]');
+    expect(proof).toHaveAttribute('target', '_blank');
+    expect(proof?.closest('td')).toHaveAttribute(
+      'data-label',
+      'anchoring.tables.globalAnchorActions.headers.anchorDatetime.mobile',
+    );
+  });
+
+  it('defines only the column that does not explain itself: the running total', () => {
+    render(<GlobalAnchorActionsTable list={[action()]} IsRWLK={false} />);
+    const explanations = screen.getAllByRole('button', { name: /explainColumn/ });
+    expect(explanations).toHaveLength(1);
+    expect(explanations[0]).toHaveAccessibleName(
+      /explainColumn\(column=anchoring\.tables\.globalAnchorActions\.headers\.nftCount\.desktop\)/,
+    );
   });
 
   it('explains an empty list', () => {

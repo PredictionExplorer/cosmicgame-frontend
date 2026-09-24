@@ -57,7 +57,7 @@
         "caption": "Забирається під час відкріплення. Відкріплення незворотне."
       },
       "distributionPerNft": {
-        "label": "Надходження на один Cosmic Signature NFT",
+        "label": "На один закріплений NFT",
         "tooltip": "Поточне надходження за закріплення в ETH на один закріплений Cosmic Signature NFT: загальний пул закріплення (ончейн), поділений на проіндексовану кількість закріплених Cosmic Signature NFT.",
         "noneAnchored": "Закріплених Cosmic Signature NFT ще не проіндексовано"
       }

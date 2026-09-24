@@ -57,7 +57,7 @@
         "caption": "解锚时取回。解锚不可撤销。"
       },
       "distributionPerNft": {
-        "label": "每枚 Cosmic Signature NFT 派发额",
+        "label": "每枚已锚定 NFT",
         "tooltip": "当前每枚已锚定 Cosmic Signature NFT 的 ETH 锚定派发额，按链上锚定池总额除以已索引的锚定 NFT 数量计算。",
         "noneAnchored": "尚未索引到已锚定的 Cosmic Signature NFT"
       }

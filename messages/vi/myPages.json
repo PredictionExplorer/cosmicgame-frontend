@@ -57,7 +57,7 @@
         "caption": "Nhận về khi gỡ neo. Gỡ neo không thể hoàn tác."
       },
       "distributionPerNft": {
-        "label": "Phân phối mỗi Cosmic Signature NFT",
+        "label": "Mỗi NFT đang neo giữ",
         "tooltip": "Phân phối neo giữ ETH hiện tại trên mỗi Cosmic Signature NFT đang neo giữ, tính bằng tổng quỹ neo giữ (trên chuỗi) chia cho số Cosmic Signature NFT neo giữ đã lập chỉ mục.",
         "noneAnchored": "Chưa lập chỉ mục Cosmic Signature NFT nào đang neo giữ"
       }

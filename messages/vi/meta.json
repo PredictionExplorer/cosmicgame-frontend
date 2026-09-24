@@ -39,7 +39,7 @@
   },
   "statisticsAnchoring": {
     "title": "Thống kê neo giữ",
-    "description": "Thao tác neo giữ và gỡ neo, token đang neo giữ và người neo giữ riêng biệt của Cosmic Signature và RandomWalk NFT."
+    "description": "Thao tác neo giữ và gỡ neo, NFT đang neo giữ và người neo giữ riêng biệt của Cosmic Signature và Random Walk NFT."
   },
   "statisticsActivity": {
     "title": "Thống kê hoạt động nét bút",
@@ -103,7 +103,6 @@
     "description": "Lịch sử đầy đủ các lần điều chỉnh tham số giao thức Cosmic Signature. Theo dõi bước tăng chi phí nét bút, mức cộng thêm thời gian chu kỳ, thiết lập phân phối neo giữ và các cập nhật điều phối khác."
   },
   "distributionsByToken": {
-    "title": "Phân phối theo token",
     "description": "Chi tiết phân phối neo giữ của một Cosmic Signature NFT cụ thể — lịch sử phân phối ETH theo chu kỳ, trạng thái nhận về và phân phối neo giữ tích lũy."
   },
   "mint": {
@@ -123,7 +122,6 @@
     "descriptionFor": "Thông tin phân bổ chi tiết của chu kỳ Cosmic Signature #{id} — chi tiết người nhận, phân phối phân bổ Signature, kết quả Tinh tuyển và phân bổ NFT đính kèm."
   },
   "anchorAction": {
-    "title": "Chi tiết thao tác neo giữ",
     "description": "Chi tiết về một thao tác neo giữ cụ thể trong Cosmic Signature — loại token, số lượng đã neo giữ và trạng thái nhận về phân phối."
   },
   "pageTerms": {
