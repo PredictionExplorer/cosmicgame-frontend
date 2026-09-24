@@ -88,7 +88,14 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     ).toBeVisible();
     await expect(page.getByText('已铭刻 NFT', { exact: true })).toBeVisible();
     await expect(page.getByRole('searchbox', { name: '搜索 NFT' })).toBeVisible();
-    await expect(page.getByText('全部', { exact: true }).first()).toBeVisible();
+    // The status filter sits in the toolbar from lg and in the Filters sheet
+    // on smaller screens.
+    if ((page.viewportSize()?.width ?? 0) < 1024) {
+      await page.getByRole('button', { name: '筛选', exact: true }).click();
+    }
+    const all = page.getByRole('radio', { name: '全部', exact: true }).filter({ visible: true });
+    await expect(all).toHaveCount(1);
+    await expect(all).toHaveAttribute('aria-checked', 'true');
   });
 
   test('gallery card navigates to a Chinese detail page', async ({ page }) => {
