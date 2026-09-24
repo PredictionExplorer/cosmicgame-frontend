@@ -79,9 +79,11 @@ const buttonVariants = cva(
       // buttons with two-character labels are narrower than 44px. Those set
       // `max-sm:min-w-11` at the call site instead.
       size: {
-        default: 'h-11 min-h-11 px-4 py-2 sm:h-10 sm:min-h-0',
-        sm: 'h-11 min-h-11 px-3 sm:h-9 sm:min-h-0',
-        lg: 'h-11 min-h-11 px-8 sm:min-h-0',
+        // Below `sm` every size is a 44×44 target at least, so an icon-only
+        // button that keeps its text size (a toolbar's Wrap or Copy) is too.
+        default: 'h-11 min-h-11 min-w-11 px-4 py-2 sm:h-10 sm:min-h-0 sm:min-w-0',
+        sm: 'h-11 min-h-11 min-w-11 px-3 sm:h-9 sm:min-h-0 sm:min-w-0',
+        lg: 'h-11 min-h-11 min-w-11 px-8 sm:min-h-0 sm:min-w-0',
         /** 56px: the commit action in the dock and the gesture form, and landing CTAs. */
         xl: 'h-14 min-h-14 px-6 text-base',
         icon: 'h-11 w-11 min-h-11 min-w-11 sm:h-10 sm:w-10 sm:min-h-0 sm:min-w-0',

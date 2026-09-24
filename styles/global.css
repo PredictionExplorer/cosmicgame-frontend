@@ -689,6 +689,13 @@ body:has([data-maintenance-banner]) .home-control-shell {
   &:hover {
     text-decoration-color: currentColor;
   }
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
 }
 
 @utility link-quiet {
@@ -701,6 +708,54 @@ body:has([data-maintenance-banner]) .home-control-shell {
   &:hover,
   &:focus-visible {
     text-decoration-color: currentColor;
+  }
+
+  /* touch-link-target, below */
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
+}
+
+/*
+ * Touch targets on coarse pointers (WCAG 2.5.8; measured by
+ * e2e/mobile-tap-targets.mobile.spec.ts). Both grow the element's own box,
+ * which is what hit-testing and the audit see; neither draws a pad with a
+ * pseudo-element.
+ *
+ * touch-link-target: a text link laid out as a box (a flex item, an
+ * inline-flex row, a block) is at least 24×24px, its text centred in it. A
+ * link that flows inside a sentence stays `display: inline`, where min sizes
+ * do not apply, which is WCAG's inline exception. `link` and `link-quiet`
+ * already include it.
+ *
+ * touch-hit-area: a control that must not move the layout (a figure label, a
+ * standalone explained term) reaches 44px. Padding grows its border box and
+ * an equal negative margin hands the space back, on inline and block boxes
+ * alike, so nothing around it shifts. The focus ring moves in by the inline
+ * pad so it still hugs the text. The block pad assumes content about 1.1em
+ * tall, which Inter, Clash and the CJK faces all exceed, so the box is never
+ * under 44px. Never put it on a word inside a sentence: the pad would cover
+ * the lines above and below.
+ */
+@utility touch-link-target {
+  @media (pointer: coarse) {
+    min-block-size: 1.5rem;
+    min-inline-size: 1.5rem;
+    align-content: center;
+  }
+}
+
+@utility touch-hit-area {
+  @media (pointer: coarse) {
+    --touch-pad-block: max(0px, calc((2.75rem - 1.1em) / 2));
+    --touch-pad-inline: 0.625rem;
+    padding-block: var(--touch-pad-block);
+    padding-inline: var(--touch-pad-inline);
+    margin-block: calc(var(--touch-pad-block) * -1);
+    margin-inline: calc(var(--touch-pad-inline) * -1);
+    outline-offset: calc(var(--focus-ring-offset) - var(--touch-pad-inline));
   }
 }
 
@@ -878,6 +933,129 @@ body:has([data-maintenance-banner]) .home-control-shell {
   to {
     height: 0;
   }
+}
+
+/*
+ * Overlay motion: dialogs, sheets, menus, popovers, tooltips and the
+ * explanation card enter and leave through these (the class names of
+ * tailwindcss-animate, which the primitives were written against, defined
+ * here so no dependency is needed). `animate-in` plays `enter` from the
+ * values the modifiers set (`fade-in-0`, `zoom-in-95`, `slide-in-from-top-2`,
+ * `slide-in-from-right`); `animate-out` plays `exit` to theirs. Radix waits
+ * for the exit before unmounting. Both run only when motion is welcome, so a
+ * reduced-motion visitor sees overlays appear and go at once, and the
+ * `motion-reduce:animate-none` guards at call sites hold.
+ */
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale(var(--tw-enter-scale, 1));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale(var(--tw-exit-scale, 1));
+  }
+}
+
+@utility animate-in {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: enter var(--tw-duration, var(--duration-fast)) var(--tw-ease, var(--ease-out-expo));
+  }
+}
+
+@utility animate-out {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: exit var(--tw-duration, var(--duration-fast)) var(--tw-ease, var(--ease-out-soft))
+      forwards;
+  }
+}
+
+@utility fade-in-* {
+  --tw-enter-opacity: calc(--value(integer) / 100);
+}
+
+@utility fade-out-* {
+  --tw-exit-opacity: calc(--value(integer) / 100);
+}
+
+@utility zoom-in-* {
+  --tw-enter-scale: calc(--value(integer) / 100);
+  --tw-enter-scale: --value([number]);
+}
+
+@utility zoom-out-* {
+  --tw-exit-scale: calc(--value(integer) / 100);
+  --tw-exit-scale: --value([number]);
+}
+
+@utility slide-in-from-top-* {
+  --tw-enter-translate-y: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-in-from-bottom-* {
+  --tw-enter-translate-y: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-in-from-left-* {
+  --tw-enter-translate-x: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-in-from-right-* {
+  --tw-enter-translate-x: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-out-to-top-* {
+  --tw-exit-translate-y: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-out-to-bottom-* {
+  --tw-exit-translate-y: calc(var(--spacing) * --value(integer));
+}
+
+@utility slide-out-to-left-* {
+  --tw-exit-translate-x: calc(var(--spacing) * --value(integer) * -1);
+}
+
+@utility slide-out-to-right-* {
+  --tw-exit-translate-x: calc(var(--spacing) * --value(integer));
+}
+
+/* Whole-panel slides for sheets: in from, and out to, their own edge. */
+@utility slide-in-from-top {
+  --tw-enter-translate-y: -100%;
+}
+
+@utility slide-in-from-bottom {
+  --tw-enter-translate-y: 100%;
+}
+
+@utility slide-in-from-left {
+  --tw-enter-translate-x: -100%;
+}
+
+@utility slide-in-from-right {
+  --tw-enter-translate-x: 100%;
+}
+
+@utility slide-out-to-top {
+  --tw-exit-translate-y: -100%;
+}
+
+@utility slide-out-to-bottom {
+  --tw-exit-translate-y: 100%;
+}
+
+@utility slide-out-to-left {
+  --tw-exit-translate-x: -100%;
+}
+
+@utility slide-out-to-right {
+  --tw-exit-translate-x: 100%;
 }
 
 @utility animate-accordion-down {

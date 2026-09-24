@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import userEvent from '@testing-library/user-event';
 
-import { ExplainedTerm } from '@/components/ui/explain-popover';
+import { ExplainedTerm, sitsInSentence } from '@/components/ui/explain-popover';
 import { Term } from '@/components/ui/term';
 import { routing } from '@/i18n/routing';
 import { GLOSSARY_TERM_IDS } from '@/lib/glossary';
@@ -169,6 +169,89 @@ describe('ExplainedTerm', () => {
   it('adds no live region when there is nothing longer to announce', () => {
     render(<ExplainedTerm definition="Layer 2 network.">Arbitrum</ExplainedTerm>);
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('keeps a word inside a sentence on its line (no touch pad)', () => {
+    render(
+      <p>
+        Bridge to <ExplainedTerm definition="Layer 2 network.">Arbitrum</ExplainedTerm> first.
+      </p>,
+    );
+    const term = screen.getByRole('button', { name: 'Arbitrum' });
+    expect(term).toHaveAttribute('data-placement', 'sentence');
+    expect(term).not.toHaveClass('touch-hit-area');
+  });
+
+  it('gives a standalone label a real 44px touch target', () => {
+    render(
+      <dl>
+        <dt>
+          <ExplainedTerm definition="Gestures made across every Cycle." announce="moreInformation">
+            Gestures made
+          </ExplainedTerm>
+        </dt>
+        <dd>1,140</dd>
+      </dl>,
+    );
+    const term = screen.getByRole('button', { name: 'More information about Gestures made' });
+    expect(term).toHaveAttribute('data-placement', 'standalone');
+    expect(term).toHaveClass('touch-hit-area');
+  });
+
+  it('honours an explicit placement', () => {
+    render(
+      <p>
+        Held by{' '}
+        <ExplainedTerm definition="The newest participant." placement="standalone">
+          Last Gesture
+        </ExplainedTerm>
+      </p>,
+    );
+    expect(screen.getByRole('button', { name: 'Last Gesture' })).toHaveClass('touch-hit-area');
+  });
+});
+
+describe('sitsInSentence', () => {
+  function mount(html: string): HTMLElement {
+    document.body.innerHTML = html;
+    const trigger = document.querySelector<HTMLElement>('[data-trigger]');
+    if (!trigger) throw new Error('fixture has no trigger');
+    return trigger;
+  }
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('sees text beside the trigger', () => {
+    expect(sitsInSentence(mount('<p>The <span data-trigger>Cycle</span> ends.</p>'))).toBe(true);
+  });
+
+  it('sees text around an inline wrapper', () => {
+    expect(
+      sitsInSentence(
+        mount(
+          '<p>Before the <span style="display:inline"><span data-trigger>end</span></span>.</p>',
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  it('treats a label alone in its box as standalone, whitespace and companions included', () => {
+    expect(
+      sitsInSentence(
+        mount(
+          '<dt> <span data-trigger>Vault</span> <span hidden>Definition</span>' +
+            '<span data-explain-companion>Details</span> </dt>',
+        ),
+      ),
+    ).toBe(false);
+  });
+
+  it('stops at the first box that is not inline', () => {
+    expect(
+      sitsInSentence(mount('<p>Intro <div><span><span data-trigger>Label</span></span></div></p>')),
+    ).toBe(false);
   });
 });
 

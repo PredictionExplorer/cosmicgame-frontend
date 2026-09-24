@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
-import postcss, { type ChildNode, type Root, type Rule } from 'postcss';
+import postcss, { type AtRule, type ChildNode, type Root, type Rule } from 'postcss';
 import { compile } from 'tailwindcss';
 
 /**
@@ -203,5 +203,68 @@ describe('global typography guarantees', () => {
       expect(body).toContain('font-weight: var(--display-weight)');
       expect(body).toContain('var(--display-tracking-scale)');
     }
+  });
+});
+
+/** Every declaration Tailwind emits for `className`, media conditions included. */
+async function declarationsFor(className: string): Promise<string> {
+  const root = await compileGlobalCss([className]);
+  const selector = `.${className.replace(/[[\].:/]/g, (char) => `\\${char}`)}`;
+  const out: string[] = [];
+  root.walkRules((rule) => {
+    if (!rule.selector.split(',').some((part) => part.trim() === selector)) return;
+    rule.walkDecls((decl) => {
+      // Media conditions nested inside the rule or wrapping it, innermost last.
+      const conditions: string[] = [];
+      for (let node = decl.parent; node && node.type !== 'root'; node = node.parent) {
+        if (node.type === 'atrule' && (node as AtRule).name === 'media') {
+          conditions.unshift(`@media ${(node as AtRule).params}`);
+        }
+      }
+      out.push(`${conditions.join(' ')} ${decl.prop}: ${decl.value}`.trim());
+    });
+  });
+  return out.join('\n');
+}
+
+describe('touch targets on coarse pointers', () => {
+  it('grows a standalone control to 44px with padding a negative margin hands back', async () => {
+    const css = await declarationsFor('touch-hit-area');
+    expect(css).toContain('@media (pointer: coarse) padding-block: var(--touch-pad-block)');
+    expect(css).toContain(
+      '@media (pointer: coarse) margin-block: calc(var(--touch-pad-block) * -1)',
+    );
+    expect(css).toContain(
+      '@media (pointer: coarse) margin-inline: calc(var(--touch-pad-inline) * -1)',
+    );
+    expect(css).toContain('--touch-pad-block: max(0px, calc((2.75rem - 1.1em) / 2))');
+  });
+
+  it('gives box-laid text links a 24px floor that inline links never take', async () => {
+    for (const className of ['link', 'link-quiet', 'touch-link-target']) {
+      const css = await declarationsFor(className);
+      expect(css).toContain('@media (pointer: coarse) min-block-size: 1.5rem');
+      expect(css).toContain('@media (pointer: coarse) min-inline-size: 1.5rem');
+    }
+  });
+});
+
+describe('overlay motion', () => {
+  it('animates entrances and exits only when motion is welcome', async () => {
+    for (const className of ['animate-in', 'animate-out']) {
+      const css = await declarationsFor(className);
+      expect(css).toMatch(/^@media \(prefers-reduced-motion: no-preference\) animation: /m);
+      expect(css).not.toMatch(/^animation:/m);
+    }
+  });
+
+  it('turns the tailwindcss-animate modifiers into enter and exit values', async () => {
+    expect(await declarationsFor('fade-in-0')).toContain('--tw-enter-opacity: calc(0 / 100)');
+    expect(await declarationsFor('zoom-out-95')).toContain('--tw-exit-scale: calc(95 / 100)');
+    expect(await declarationsFor('zoom-in-[0.98]')).toContain('--tw-enter-scale: 0.98');
+    expect(await declarationsFor('slide-in-from-top-2')).toContain(
+      '--tw-enter-translate-y: calc(var(--spacing) * 2 * -1)',
+    );
+    expect(await declarationsFor('slide-out-to-left')).toContain('--tw-exit-translate-x: -100%');
   });
 });

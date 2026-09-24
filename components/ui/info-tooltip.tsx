@@ -35,12 +35,13 @@ interface InfoTooltipProps {
  *
  * The 16px icon sets the layout box, so the row keeps its height and a
  * caller's margins and colour apply to the icon as before. Over it sits the
- * button itself, 24px square (the WCAG 2.5.8 minimum, and the box automated
- * audits measure), extended to a 44px hit area on coarse pointers by a
- * transparent pseudo-element. Hover shows the explanation; a click, tap,
- * Enter or Space pins it. The full text is the button's description
- * (`aria-describedby`), so the name stays short and is never a truncated
- * sentence.
+ * button itself, absolutely positioned: 24px square on fine pointers (the
+ * WCAG 2.5.8 minimum) and a real 44px square on coarse pointers, so the box
+ * a finger hits is the box hit-testing and the tap-target audit measure. Its
+ * focus ring is drawn 10px inside that box, so it hugs the icon at every
+ * size. Hover shows the explanation; a click, tap, Enter or Space pins it.
+ * The full text is the button's description (`aria-describedby`), so the
+ * name stays short and is never a truncated sentence.
  */
 export function InfoTooltip({
   content,
@@ -68,12 +69,9 @@ export function InfoTooltip({
         <button
           type="button"
           aria-label={name}
-          // `data-touch-target` tells the mobile audit to measure the real
-          // hit area (the pseudo-element) rather than the button's box.
-          data-touch-target="extended"
           className={cn(
             'absolute left-1/2 top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 cursor-help rounded-full',
-            "pointer-coarse:after:absolute pointer-coarse:after:left-1/2 pointer-coarse:after:top-1/2 pointer-coarse:after:size-11 pointer-coarse:after:-translate-x-1/2 pointer-coarse:after:-translate-y-1/2 pointer-coarse:after:content-['']",
+            'pointer-coarse:size-11 pointer-coarse:[outline-offset:calc(var(--focus-ring-offset)-0.625rem)]',
           )}
         />
       </ExplainPopover>

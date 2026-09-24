@@ -11,8 +11,10 @@ import { ScrollRail } from '@/components/ui/scroll-rail';
  * Tabs in three shapes, one behaviour (Radix: arrow keys move between tabs,
  * Home and End jump, one tab stop for the list):
  *
- *   segmented  a sunken track with the selected option raised and underlined
- *              in --primary: switching views of one thing (the default)
+ *   segmented  a sunken track with the selected option raised on it, edged
+ *              by a hairline: switching views of one thing (the default). It
+ *              draws no --primary rule, so it never competes with an
+ *              underline tab row above it for "current".
  *   underline  a hairline with a 2px --primary indicator under the selected
  *              tab: page sub-navigation (statistics, detail, Trust Center)
  *   pills      separate chips, the selected one tinted: filters and short sets
@@ -47,7 +49,9 @@ const tabsListVariants = cva('min-w-0 items-center text-muted-foreground', {
 
 const tabsTriggerVariants = cva(
   [
-    'relative inline-flex min-h-11 min-w-0 select-none items-center justify-center gap-2 text-center text-sm font-medium',
+    // 44×44 below `sm` (a one-word segment such as "All" is narrower than
+    // its height); from `sm` the variants set their own compact heights.
+    'relative inline-flex min-h-11 min-w-11 select-none items-center justify-center gap-2 text-center text-sm font-medium sm:min-w-0',
     'transition-[color,background-color,border-color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
     'hover:text-foreground disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0',
   ],
@@ -56,8 +60,8 @@ const tabsTriggerVariants = cva(
       variant: {
         segmented: [
           'rounded-[calc(var(--radius-control)-2px)] px-3 py-1.5 sm:min-h-9',
-          'data-[state=active]:bg-surface-raised data-[state=active]:text-foreground data-[state=active]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]',
-          'aria-[current=page]:bg-surface-raised aria-[current=page]:text-foreground aria-[current=page]:shadow-[inset_0_-2px_0_0_hsl(var(--primary))]',
+          'data-[state=active]:bg-surface-raised data-[state=active]:text-foreground data-[state=active]:shadow-[inset_0_0_0_1px_hsl(var(--rule))]',
+          'aria-[current=page]:bg-surface-raised aria-[current=page]:text-foreground aria-[current=page]:shadow-[inset_0_0_0_1px_hsl(var(--rule))]',
         ],
         underline: [
           '-mb-px rounded-t-control px-3 pb-2.5 pt-2 sm:min-h-10',
@@ -102,7 +106,10 @@ const TabsList = React.forwardRef<React.ComponentRef<typeof TabsPrimitive.List>,
         ref={ref}
         className={cn(
           tabsListVariants({ variant: resolved }),
-          scroll && 'w-max flex-nowrap',
+          // At least the rail's width, so an underline row's hairline runs
+          // under the whole content column rather than stopping at its
+          // last tab.
+          scroll && 'w-max min-w-full flex-nowrap',
           className,
         )}
         {...props}
