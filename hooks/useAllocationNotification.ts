@@ -21,7 +21,12 @@ interface UseAllocationNotificationOptions {
 }
 
 const CHECK_INTERVAL_MS = 1_000;
-/** After a failed chain read, the next attempt waits this long. */
+/**
+ * After a chain read that does not send (it failed, the cycle already
+ * finalized, or the deadline moved out of the window), the next read waits
+ * at most this long, so the 1-second check never races both RPC nodes every
+ * second while the page's own deadline catches up.
+ */
 const VERIFY_RETRY_MS = 15_000;
 
 /**
@@ -102,14 +107,19 @@ export function useAllocationNotification({
         .then((verifiedMs) => {
           verifying = false;
           if (disposed || firedRef.current) return;
-          if (verifiedMs == null) {
-            // Unread: try again shortly rather than alert on a stale deadline.
-            retryAtMs = Date.now() + VERIFY_RETRY_MS;
+          if (verifiedMs != null && verifiedMs > 0 && verifiedMs <= thresholdMs) {
+            send(verifiedMs);
             return;
           }
-          // Outside the window, the deadline moved; past zero, nothing to warn about.
-          if (verifiedMs > thresholdMs || verifiedMs <= 0) return;
-          send(verifiedMs);
+          // Every other outcome waits before the next read: unread (never alert
+          // on a stale deadline), past zero (nothing left to warn about), or
+          // outside the window (the deadline moved; read again when the chain
+          // says the window opens, and no later than the retry wait).
+          const waitMs =
+            verifiedMs != null && verifiedMs > thresholdMs
+              ? Math.min(VERIFY_RETRY_MS, Math.max(CHECK_INTERVAL_MS, verifiedMs - thresholdMs))
+              : VERIFY_RETRY_MS;
+          retryAtMs = Date.now() + waitMs;
         });
     };
 
