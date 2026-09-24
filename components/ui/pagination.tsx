@@ -198,6 +198,11 @@ export interface TablePaginationProps {
    * are in. It is shown even when the table fits on one page.
    */
   caption?: React.ReactNode;
+  /**
+   * The navigation's accessible name ("Anchor Distributions pages"), so a
+   * page with several ledgers has distinguishable pagination landmarks.
+   */
+  label?: string;
   className?: string;
 }
 
@@ -212,6 +217,7 @@ export function TablePagination({
   total,
   onPageChange,
   caption,
+  label,
   className,
 }: TablePaginationProps) {
   const t = useTranslations('tables');
@@ -261,7 +267,7 @@ export function TablePagination({
 
       {paged ? (
         <div className="flex items-center gap-x-4">
-          <Pagination className="mx-0 w-auto">
+          <Pagination className="mx-0 w-auto" {...(label ? { 'aria-label': label } : {})}>
             <PaginationContent>
               <PaginationItem>
                 <PaginationLink
