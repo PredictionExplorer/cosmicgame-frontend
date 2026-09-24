@@ -18,11 +18,16 @@ export function FAQSearch({ value, onChange, resultCount, totalCount, className 
   const t = useTranslations('faq');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // "/" jumps to this page's own search; ⌘K / Ctrl+K stays with the site-wide
+  // command palette in the header, which it advertises on every page.
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-      e.preventDefault();
-      inputRef.current?.focus();
-    }
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
+    const target = e.target as HTMLElement | null;
+    const typing =
+      !!target && (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName));
+    if (typing) return;
+    e.preventDefault();
+    inputRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -58,7 +63,7 @@ export function FAQSearch({ value, onChange, resultCount, totalCount, className 
             </button>
           ) : (
             <kbd className="pointer-events-none hidden h-6 select-none items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.04] px-2 font-mono text-[10px] text-muted-foreground/50 sm:inline-flex">
-              <span className="text-xs">⌘</span>K
+              /
             </kbd>
           )}
         </div>

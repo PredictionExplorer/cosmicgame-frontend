@@ -141,6 +141,7 @@
     },
     "about": {
       "label": "Про Cosmic Signature",
+      "short": "Про проєкт",
       "description": "Історія створення протоколу"
     },
     "projectSite": {
@@ -245,8 +246,7 @@
     }
   },
   "link": {
-    "newTab": "(відкриється в новій вкладці)",
-    "onHost": "на {host}"
+    "newTab": "(відкриється в новій вкладці)"
   },
   "cta": {
     "openApp": "Відкрити застосунок"
@@ -256,6 +256,7 @@
     "triggerLabel": "Пошук сторінок і записів",
     "title": "Пошук на Cosmic Signature",
     "placeholder": "Шукайте сторінку або вставте адресу, токен, цикл чи ID жесту",
+    "placeholderShort": "Шукайте сторінку, адресу, ID",
     "listLabel": "Результати",
     "groups": {
       "jump": "Перейти"
@@ -282,8 +283,10 @@
     }
   },
   "drawer": {
-    "preferences": "Налаштування",
-    "palette": "Палітра"
+    "preferences": "Налаштування"
+  },
+  "footer": {
+    "linksAndLanguages": "Посилання та мови"
   },
   "ecosystem": {
     "uniswap": {

@@ -141,6 +141,7 @@
     },
     "about": {
       "label": "關於 Cosmic Signature",
+      "short": "關於",
       "description": "協議背後的故事"
     },
     "projectSite": {
@@ -245,8 +246,7 @@
     }
   },
   "link": {
-    "newTab": "（在新分頁中開啟）",
-    "onHost": "位於 {host}"
+    "newTab": "（在新分頁中開啟）"
   },
   "cta": {
     "openApp": "開啟應用程式"
@@ -256,6 +256,7 @@
     "triggerLabel": "搜尋頁面與紀錄",
     "title": "搜尋 Cosmic Signature",
     "placeholder": "搜尋頁面，或貼上地址、代幣、週期或落筆 ID",
+    "placeholderShort": "搜尋頁面、地址或 ID",
     "listLabel": "結果",
     "groups": {
       "jump": "前往"
@@ -282,8 +283,10 @@
     }
   },
   "drawer": {
-    "preferences": "偏好設定",
-    "palette": "配色"
+    "preferences": "偏好設定"
+  },
+  "footer": {
+    "linksAndLanguages": "連結與語言"
   },
   "ecosystem": {
     "uniswap": {

@@ -31,9 +31,10 @@ import {
   type SiteSectionId,
 } from '@/config/siteNav';
 import { SITE_ROUTE_ICONS } from '@/config/siteNavIcons';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useRouter } from '@/i18n/navigation';
 import { EXPLORER_NAME } from '@/lib/chainGuard';
-import { parseJumpQuery, searchEntries, type JumpTarget } from '@/lib/siteSearch';
+import { jumpKeywordsFor, parseJumpQuery, searchEntries, type JumpTarget } from '@/lib/siteSearch';
 import { cn } from '@/lib/utils';
 import { formatAddress } from '@/utils/format';
 import { formatId } from '@/utils/format/ids';
@@ -125,6 +126,7 @@ function usePaletteGroups(query: string): PaletteGroup[] {
   const t = useTranslations('nav');
   const locale = useLocale();
   const copy = useSiteNavCopy();
+  const jumpKeywords = useMemo(() => jumpKeywordsFor(locale), [locale]);
 
   const routeEntries = useMemo(
     () =>
@@ -145,7 +147,7 @@ function usePaletteGroups(query: string): PaletteGroup[] {
 
   return useMemo(() => {
     const groups: Omit<PaletteGroup, 'start'>[] = [];
-    const jumps = parseJumpQuery(query).map((jump): PaletteOption => {
+    const jumps = parseJumpQuery(query, jumpKeywords).map((jump): PaletteOption => {
       if (jump.kind === 'transaction') {
         return {
           key: `jump-tx-${jump.value}`,
@@ -205,7 +207,7 @@ function usePaletteGroups(query: string): PaletteGroup[] {
       start += group.options.length;
       return withStart;
     });
-  }, [copy, query, routeEntries, t]);
+  }, [copy, jumpKeywords, query, routeEntries, t]);
 }
 
 /**
@@ -218,6 +220,9 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
   const listId = useId();
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
+  // The full placeholder does not fit a phone's field; the short one names
+  // the same three kinds of query.
+  const roomy = useMediaQuery('(min-width: 640px)');
   const groups = usePaletteGroups(query);
   const options = useMemo(() => groups.flatMap((group) => group.options), [groups]);
   const activeIndex = Math.min(active, Math.max(options.length - 1, 0));
@@ -277,7 +282,7 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
             setActive(0);
           }}
           onKeyDown={onKeyDown}
-          placeholder={t('search.placeholder')}
+          placeholder={roomy ? t('search.placeholder') : t('search.placeholderShort')}
           className="focus-ring-none h-14 min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-subtle"
         />
         <span className="hidden sm:inline-flex">

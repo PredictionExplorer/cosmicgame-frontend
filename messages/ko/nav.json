@@ -141,6 +141,7 @@
     },
     "about": {
       "label": "Cosmic Signature 소개",
+      "short": "소개",
       "description": "프로토콜에 담긴 이야기"
     },
     "projectSite": {
@@ -245,8 +246,7 @@
     }
   },
   "link": {
-    "newTab": "(새 탭에서 열림)",
-    "onHost": "{host} 사이트"
+    "newTab": "(새 탭에서 열림)"
   },
   "cta": {
     "openApp": "앱 열기"
@@ -256,6 +256,7 @@
     "triggerLabel": "페이지와 기록 검색",
     "title": "Cosmic Signature 검색",
     "placeholder": "페이지 검색 또는 주소, 토큰, 사이클, 제스처 ID 붙여 넣기",
+    "placeholderShort": "페이지, 주소, ID 검색",
     "listLabel": "결과",
     "groups": {
       "jump": "바로 가기"
@@ -282,8 +283,10 @@
     }
   },
   "drawer": {
-    "preferences": "환경 설정",
-    "palette": "팔레트"
+    "preferences": "환경 설정"
+  },
+  "footer": {
+    "linksAndLanguages": "링크 및 언어"
   },
   "ecosystem": {
     "uniswap": {

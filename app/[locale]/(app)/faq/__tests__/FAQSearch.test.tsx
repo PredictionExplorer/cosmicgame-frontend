@@ -26,10 +26,10 @@ describe('FAQSearch', () => {
     expect(input).toHaveAttribute('aria-label', 'Search frequently asked questions');
   });
 
-  it('renders keyboard shortcut hint when empty', () => {
+  it('renders the "/" shortcut hint when empty', () => {
     render(<FAQSearch value="" onChange={jest.fn()} />);
-    expect(screen.getByText('⌘')).toBeInTheDocument();
-    expect(screen.getByText('K')).toBeInTheDocument();
+    expect(screen.getByText('/')).toBeInTheDocument();
+    expect(screen.queryByText('⌘')).not.toBeInTheDocument();
   });
 
   it('shows clear button when value is non-empty', () => {
@@ -81,26 +81,43 @@ describe('FAQSearch', () => {
     expect(screen.queryByText('Showing 5 of 20 questions')).not.toBeInTheDocument();
   });
 
-  it('focuses input on Cmd+K', () => {
+  it('focuses input on "/"', () => {
     render(<FAQSearch value="" onChange={jest.fn()} />);
     const input = screen.getByPlaceholderText('Search questions...');
     expect(document.activeElement).not.toBe(input);
 
-    const event = new KeyboardEvent('keydown', { key: 'k', metaKey: true });
+    const event = new KeyboardEvent('keydown', { key: '/', cancelable: true });
     document.dispatchEvent(event);
 
     expect(document.activeElement).toBe(input);
+    expect(event.defaultPrevented).toBe(true);
   });
 
-  it('focuses input on Ctrl+K', () => {
+  it('leaves Cmd+K and Ctrl+K to the site-wide command palette', () => {
     render(<FAQSearch value="" onChange={jest.fn()} />);
     const input = screen.getByPlaceholderText('Search questions...');
+
+    for (const modifier of [{ metaKey: true }, { ctrlKey: true }]) {
+      const event = new KeyboardEvent('keydown', { key: 'k', cancelable: true, ...modifier });
+      document.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    }
     expect(document.activeElement).not.toBe(input);
+  });
 
-    const event = new KeyboardEvent('keydown', { key: 'k', ctrlKey: true });
-    document.dispatchEvent(event);
-
-    expect(document.activeElement).toBe(input);
+  it('types "/" into another field instead of stealing focus', () => {
+    render(
+      <>
+        <input aria-label="other field" />
+        <FAQSearch value="" onChange={jest.fn()} />
+      </>,
+    );
+    const other = screen.getByLabelText('other field');
+    other.focus();
+    const event = new KeyboardEvent('keydown', { key: '/', cancelable: true, bubbles: true });
+    other.dispatchEvent(event);
+    expect(document.activeElement).toBe(other);
+    expect(event.defaultPrevented).toBe(false);
   });
 
   it('has no accessibility violations', async () => {

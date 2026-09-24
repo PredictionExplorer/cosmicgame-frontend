@@ -1,4 +1,13 @@
-import { foldForSearch, parseJumpQuery, searchEntries, type SearchEntry } from '../siteSearch';
+import { routing } from '@/i18n/routing';
+
+import {
+  JUMP_KEYWORDS,
+  foldForSearch,
+  jumpKeywordsFor,
+  parseJumpQuery,
+  searchEntries,
+  type SearchEntry,
+} from '../siteSearch';
 
 describe('parseJumpQuery', () => {
   const address = '0x1Ec14a0000000000000000000000000000d7E990';
@@ -34,6 +43,53 @@ describe('parseJumpQuery', () => {
     expect(parseJumpQuery('gallery')).toEqual([]);
     expect(parseJumpQuery('0x1234')).toEqual([]);
     expect(parseJumpQuery('12345678901')).toEqual([]);
+    expect(parseJumpQuery('gallery 3')).toEqual([]);
+    expect(parseJumpQuery('cycle 3 gesture')).toEqual([]);
+  });
+
+  it('reads "ID" after a keyword and a keyword after the number', () => {
+    expect(parseJumpQuery('Gesture ID 1135')).toEqual([
+      { kind: 'gesture', value: 1135, path: '/gesture/1135' },
+    ]);
+    expect(parseJumpQuery('3 cycle')).toEqual([{ kind: 'cycle', value: 3, path: '/allocation/3' }]);
+  });
+
+  it.each([
+    ['zh', '周期 3', 'cycle'],
+    ['zh', '落笔 ID 1135', 'gesture'],
+    ['zh-TW', '週期3', 'cycle'],
+    ['zh-HK', '簽名作品 7', 'token'],
+    ['uk', 'Цикл 3', 'cycle'],
+    ['uk', 'жест 1135', 'gesture'],
+    ['ko', '사이클 3', 'cycle'],
+    ['ko', '제스처 1135', 'gesture'],
+    ['ja', 'サイクル3', 'cycle'],
+    ['ja', '一筆ID1135', 'gesture'],
+    ['ja', 'シグネチャー 7', 'token'],
+    ['vi', 'Chu kỳ 3', 'cycle'],
+    ['vi', 'chu ky 3', 'cycle'],
+    ['vi', 'nét bút 1135', 'gesture'],
+    ['ja', 'cycle 3', 'cycle'],
+  ])('in %s reads "%s" as a %s', (locale, query, kind) => {
+    const jumps = parseJumpQuery(query, jumpKeywordsFor(locale));
+    expect(jumps).toHaveLength(1);
+    expect(jumps[0]!.kind).toBe(kind);
+  });
+
+  it('reads full-width digits as the number they are', () => {
+    expect(parseJumpQuery('サイクル３', jumpKeywordsFor('ja'))).toEqual([
+      { kind: 'cycle', value: 3, path: '/allocation/3' },
+    ]);
+  });
+
+  it('keeps English keywords working in every locale', () => {
+    for (const locale of routing.locales) {
+      const keywords = jumpKeywordsFor(locale);
+      for (const kind of ['token', 'cycle', 'gesture'] as const) {
+        expect(keywords[kind]).toEqual(expect.arrayContaining([...JUMP_KEYWORDS.en[kind]]));
+        expect(keywords[kind].length).toBeGreaterThan(0);
+      }
+    }
   });
 });
 

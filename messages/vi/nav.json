@@ -141,6 +141,7 @@
     },
     "about": {
       "label": "Về Cosmic Signature",
+      "short": "Giới thiệu",
       "description": "Câu chuyện phía sau giao thức"
     },
     "projectSite": {
@@ -245,8 +246,7 @@
     }
   },
   "link": {
-    "newTab": "(mở trong thẻ mới)",
-    "onHost": "trên {host}"
+    "newTab": "(mở trong thẻ mới)"
   },
   "cta": {
     "openApp": "Mở ứng dụng"
@@ -256,6 +256,7 @@
     "triggerLabel": "Tìm trang và bản ghi",
     "title": "Tìm kiếm trên Cosmic Signature",
     "placeholder": "Tìm trang, hoặc dán địa chỉ, token, chu kỳ hay ID nét bút",
+    "placeholderShort": "Tìm trang, địa chỉ, ID",
     "listLabel": "Kết quả",
     "groups": {
       "jump": "Đi tới"
@@ -282,8 +283,10 @@
     }
   },
   "drawer": {
-    "preferences": "Tùy chọn",
-    "palette": "Bảng màu"
+    "preferences": "Tùy chọn"
+  },
+  "footer": {
+    "linksAndLanguages": "Liên kết và ngôn ngữ"
   },
   "ecosystem": {
     "uniswap": {

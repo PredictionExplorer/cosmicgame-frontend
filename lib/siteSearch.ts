@@ -1,30 +1,77 @@
 /**
  * Lookup and matching for the command palette (components/layout/CommandPalette).
- * Pure and locale-agnostic: callers pass the localized labels in.
+ * Pure: callers pass the localized labels in, and the jump keywords come from
+ * a `LocaleRecord`.
  */
+import { pickByLocale, type LocaleRecord } from '@/i18n/locale';
+
+type NumberedKind = 'token' | 'cycle' | 'gesture';
 
 /** A direct jump the query spells out: an address, a transaction, or a numbered record. */
 export type JumpTarget =
   | { readonly kind: 'address'; readonly value: `0x${string}`; readonly path: string }
   | { readonly kind: 'transaction'; readonly value: `0x${string}` }
-  | { readonly kind: 'token' | 'cycle' | 'gesture'; readonly value: number; readonly path: string };
+  | { readonly kind: NumberedKind; readonly value: number; readonly path: string };
+
+/** The words that name a numbered record before (or after) its number. */
+export type JumpKeywords = Readonly<Record<NumberedKind, readonly string[]>>;
+
+/**
+ * Per-locale jump keywords, in each locale's glossary terms (the placeholder
+ * invites "cycle", "サイクル", "цикл" …). English always works as well, so a
+ * visitor can type "cycle 3" in any language.
+ */
+export const JUMP_KEYWORDS: LocaleRecord<JumpKeywords> = {
+  en: { token: ['token', 'nft', 'signature'], cycle: ['cycle'], gesture: ['gesture'] },
+  zh: { token: ['代币', '签名作品', '签名'], cycle: ['周期'], gesture: ['落笔'] },
+  'zh-TW': { token: ['代幣', '簽名作品', '簽名'], cycle: ['週期'], gesture: ['落筆'] },
+  'zh-HK': { token: ['代幣', '簽名作品', '簽名'], cycle: ['週期'], gesture: ['落筆'] },
+  uk: { token: ['токен', 'сигнатура'], cycle: ['цикл'], gesture: ['жест'] },
+  ko: { token: ['토큰', '시그니처'], cycle: ['사이클'], gesture: ['제스처'] },
+  ja: { token: ['トークン', 'シグネチャー'], cycle: ['サイクル'], gesture: ['一筆'] },
+  vi: { token: ['signature'], cycle: ['chu kỳ'], gesture: ['nét bút'] },
+};
+
+/** The locale's jump keywords plus the English ones. */
+export function jumpKeywordsFor(locale: string): JumpKeywords {
+  const local = pickByLocale(JUMP_KEYWORDS, locale);
+  const merge = (kind: NumberedKind) => [...new Set([...JUMP_KEYWORDS.en[kind], ...local[kind]])];
+  return { token: merge('token'), cycle: merge('cycle'), gesture: merge('gesture') };
+}
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const TRANSACTION = /^0x[0-9a-f]{64}$/i;
-/** `25`, `#25`, `token 25`, `nft #25`, `cycle 3`, `gesture 1135`. */
-const NUMBERED = /^(?:(token|nft|signature|cycle|gesture)\s*)?#?\s*(\d{1,9})$/i;
+/**
+ * A number with at most one word around it, after folding: `25`, `#25`,
+ * `token 25`, `cycle #3`, `gesture id 1135`, `サイクル3`, `3 周期`.
+ */
+const NUMBERED = /^(\D*?)\s*#?\s*(\d{1,9})\s*(\D*)$/u;
+/** "ID" after a keyword: "gesture ID 1135", "落笔 ID 1135", "一筆ID". */
+const TRAILING_ID = /\s*id$/u;
 
-function numbered(kind: 'token' | 'cycle' | 'gesture', value: number): JumpTarget {
+function numbered(kind: NumberedKind, value: number): JumpTarget {
   const base = kind === 'token' ? '/detail' : kind === 'cycle' ? '/allocation' : '/gesture';
   return { kind, value, path: `${base}/${value}` };
+}
+
+function keywordKind(word: string, keywords: JumpKeywords): NumberedKind | null {
+  const bare = word.replace(TRAILING_ID, '').trim();
+  for (const kind of ['cycle', 'gesture', 'token'] as const) {
+    if (keywords[kind].some((keyword) => foldForSearch(keyword) === bare)) return kind;
+  }
+  return null;
 }
 
 /**
  * Reads a query as direct jumps, most likely first. A keyword picks one
  * kind; a bare number offers all three, since token ids, cycle numbers and
- * gesture ids overlap.
+ * gesture ids overlap. Pass `jumpKeywordsFor(locale)` so the locale's own
+ * keywords work too; English is the default.
  */
-export function parseJumpQuery(raw: string): readonly JumpTarget[] {
+export function parseJumpQuery(
+  raw: string,
+  keywords: JumpKeywords = JUMP_KEYWORDS.en,
+): readonly JumpTarget[] {
   const query = raw.trim();
   if (!query) return [];
   if (ADDRESS.test(query)) {
@@ -32,14 +79,18 @@ export function parseJumpQuery(raw: string): readonly JumpTarget[] {
   }
   if (TRANSACTION.test(query)) return [{ kind: 'transaction', value: query as `0x${string}` }];
 
-  const match = NUMBERED.exec(query);
+  const match = NUMBERED.exec(foldForSearch(query));
   if (!match) return [];
   const value = Number(match[2]);
-  const keyword = match[1]?.toLowerCase();
-  if (keyword === 'cycle') return [numbered('cycle', value)];
-  if (keyword === 'gesture') return [numbered('gesture', value)];
-  if (keyword) return [numbered('token', value)];
-  return [numbered('token', value), numbered('cycle', value), numbered('gesture', value)];
+  const before = (match[1] ?? '').trim();
+  const after = (match[3] ?? '').trim();
+  if (before && after) return [];
+  const word = before || after;
+  if (!word) {
+    return [numbered('token', value), numbered('cycle', value), numbered('gesture', value)];
+  }
+  const kind = keywordKind(word, keywords);
+  return kind ? [numbered(kind, value)] : [];
 }
 
 /**

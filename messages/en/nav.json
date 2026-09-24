@@ -141,6 +141,7 @@
     },
     "about": {
       "label": "About Cosmic Signature",
+      "short": "About",
       "description": "The story behind the protocol"
     },
     "projectSite": {
@@ -245,8 +246,7 @@
     }
   },
   "link": {
-    "newTab": "(opens in a new tab)",
-    "onHost": "on {host}"
+    "newTab": "(opens in a new tab)"
   },
   "cta": {
     "openApp": "Open the app"
@@ -256,6 +256,7 @@
     "triggerLabel": "Search pages and records",
     "title": "Search Cosmic Signature",
     "placeholder": "Search pages, or paste an address, token, cycle or gesture ID",
+    "placeholderShort": "Search pages, addresses, IDs",
     "listLabel": "Results",
     "groups": {
       "jump": "Go to"
@@ -282,8 +283,10 @@
     }
   },
   "drawer": {
-    "preferences": "Preferences",
-    "palette": "Palette"
+    "preferences": "Preferences"
+  },
+  "footer": {
+    "linksAndLanguages": "Links and languages"
   },
   "ecosystem": {
     "uniswap": {

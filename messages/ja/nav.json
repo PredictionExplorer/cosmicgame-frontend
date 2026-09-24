@@ -141,6 +141,7 @@
     },
     "about": {
       "label": "Cosmic Signatureについて",
+      "short": "概要",
       "description": "プロトコルの背景にある物語"
     },
     "projectSite": {
@@ -245,8 +246,7 @@
     }
   },
   "link": {
-    "newTab": "（新しいタブで開きます）",
-    "onHost": "{host}のページ"
+    "newTab": "（新しいタブで開きます）"
   },
   "cta": {
     "openApp": "アプリを開く"
@@ -256,6 +256,7 @@
     "triggerLabel": "ページと記録を検索",
     "title": "Cosmic Signatureを検索",
     "placeholder": "ページを検索、またはアドレス、トークン、サイクル、一筆IDを貼り付け",
+    "placeholderShort": "ページ、アドレス、IDを検索",
     "listLabel": "結果",
     "groups": {
       "jump": "移動先"
@@ -282,8 +283,10 @@
     }
   },
   "drawer": {
-    "preferences": "設定",
-    "palette": "パレット"
+    "preferences": "設定"
+  },
+  "footer": {
+    "linksAndLanguages": "リンクと言語"
   },
   "ecosystem": {
     "uniswap": {
