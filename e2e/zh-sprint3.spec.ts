@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { dismissOpenTooltips, expectTooltipFullyVisible, openTooltip } from './tooltip-helpers';
 
@@ -10,38 +10,6 @@ import { dismissOpenTooltips, expectTooltipFullyVisible, openTooltip } from './t
  * Runs on localhost (neither configured host), which serves the dApp routes
  * without host redirects — same assumption as the other e2e suites.
  */
-
-/**
- * InfoTooltip triggers carry translated aria-labels on /zh
- * (tooltips.moreInformation* in messages/zh/tooltips.json), so the shared
- * English-prefix helper in tooltip-helpers.ts cannot locate them.
- */
-function zhTooltipTriggerForLabel(page: Page, label: string): Locator {
-  const zhTooltipButtonSelector = [
-    ':is(button, [role="button"])[aria-label^="更多信息"]',
-    ':is(button, [role="button"])[aria-label^="查看“"]',
-    'button[aria-label^="说明“"]',
-  ].join(', ');
-
-  return page
-    .getByText(label, { exact: true })
-    .first()
-    .locator('xpath=ancestor::*[.//button or .//*[@role="button"]][1]')
-    .locator(zhTooltipButtonSelector)
-    .first();
-}
-
-async function expectZhLabelTooltip(page: Page, label: string, expected: RegExp): Promise<void> {
-  await dismissOpenTooltips(page);
-  const trigger = zhTooltipTriggerForLabel(page, label);
-  await trigger.evaluate((element) => {
-    element.scrollIntoView({ block: 'center', inline: 'center' });
-  });
-  await expect(trigger, `trigger for "${label}" must be visible`).toBeVisible();
-  await openTooltip(trigger);
-  await expectTooltipFullyVisible(page, expected);
-  await dismissOpenTooltips(page);
-}
 
 test.describe('zh Sprint 3 — core dApp routes', () => {
   test('/zh home renders the Chinese gesture console', async ({ page }) => {
@@ -74,11 +42,25 @@ test.describe('zh Sprint 3 — core dApp routes', () => {
     await expect(page.getByRole('heading', { level: 1, name: /^第 \d+ 个周期$/ })).toBeVisible();
     await expect(page.getByText('当前演绎周期', { exact: true }).first()).toBeVisible();
 
-    // The header figures explain themselves; the cycle's own labels are plain words.
+    // One explanation pattern (D079): the header figures and the cycle's own
+    // labels are plain words; the coined Cycle Reserve explains itself in place.
     await expect(page.getByText('落笔总次数', { exact: true }).first()).toBeVisible();
-    await expectZhLabelTooltip(page, '落笔总次数', /本周期的落笔总次数/);
-    await expectZhLabelTooltip(page, '签名分配', /签名分配中的 ETH 部分/);
+    await expect(
+      page
+        .getByRole('main')
+        .locator('header')
+        .first()
+        .getByRole('button', { name: /^更多信息/ }),
+    ).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'ETH 贡献' })).toHaveCount(0);
+    await dismissOpenTooltips(page);
+    const reserve = page
+      .getByRole('main')
+      .getByRole('button', { name: '周期储备', exact: true })
+      .first();
+    await reserve.scrollIntoViewIfNeeded();
+    await openTooltip(reserve);
+    await expectTooltipFullyVisible(page, /为当前周期持有的 ETH/);
   });
 
   test('/zh/gallery renders Chinese archive controls', async ({ page }) => {

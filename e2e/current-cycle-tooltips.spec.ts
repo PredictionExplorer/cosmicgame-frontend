@@ -1,45 +1,43 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  expectAllLabelTooltips,
+  expectTooltipFullyVisible,
   expectTooltipPortaledOutOfMain,
   openTooltip,
-  tooltipTriggerForLabel,
 } from './tooltip-helpers';
 
 /**
- * The header figures explain themselves behind an info button, the page's
- * one explanation pattern for figures. The cycle's own labels (Contributed
- * ETH, Attached NFTs, the allocation names) are plain words: the allocations
- * are explained together in one disclosure (D079).
+ * One explanation pattern per screen (D079): the page explains its coined
+ * words in place, as dotted terms (Cycle Reserve, the standings roles), and
+ * its allocations together in one disclosure. The header figures and the
+ * cycle's own labels (Contributed ETH, Attached NFTs, the allocation names)
+ * are plain words.
  */
-const CURRENT_CYCLE_TOOLTIPS = [
-  {
-    label: 'Total gestures',
-    expected: /Total gestures made in this cycle/,
-  },
-  {
-    label: 'Signature Allocation',
-    expected: /ETH portion of the Signature Allocation/,
-  },
-];
-
 test.describe('/current-cycle tooltips', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/current-cycle', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
-  test('opens every documented tooltip on the current-cycle page', async ({ page }) => {
-    await expectAllLabelTooltips(page, CURRENT_CYCLE_TOOLTIPS);
+  test('sets the header figures as plain labels, with no info buttons', async ({ page }) => {
+    const header = page.getByRole('main').locator('header').first();
+    await expect(header.getByText('Total gestures', { exact: true })).toBeVisible();
+    await expect(header.getByText('Signature Allocation', { exact: true })).toBeVisible();
+    await expect(header.getByRole('button', { name: /^More information/ })).toHaveCount(0);
   });
 
-  test('keeps the Total gestures tooltip fully visible and portaled', async ({ page }) => {
-    const trigger = tooltipTriggerForLabel(page, 'Total gestures');
-    await trigger.scrollIntoViewIfNeeded();
-    await openTooltip(trigger);
+  test('explains the coined Cycle Reserve in place, fully visible and portaled', async ({
+    page,
+  }) => {
+    const term = page
+      .getByRole('main')
+      .getByRole('button', { name: 'Cycle Reserve', exact: true })
+      .first();
+    await term.scrollIntoViewIfNeeded();
+    await openTooltip(term);
 
-    await expectTooltipPortaledOutOfMain(page, /Total gestures made in this cycle/);
+    await expectTooltipFullyVisible(page, /The ETH held for the current Cycle/);
+    await expectTooltipPortaledOutOfMain(page, /The ETH held for the current Cycle/);
   });
 
   test('explains every allocation in one disclosure instead of ten hover cards', async ({

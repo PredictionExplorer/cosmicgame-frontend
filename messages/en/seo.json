@@ -325,10 +325,6 @@
       "signatureAllocation": "Signature Allocation",
       "opened": "Opened"
     },
-    "info": {
-      "gestures": "Total gestures made in this cycle. Each gesture is also a Stellar Selection entry.",
-      "signatureAllocation": "ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture. The recipient also receives 1,000 CST and a Cosmic Signature NFT."
-    },
     "relatedAria": "Current cycle related pages",
     "links": {
       "learn": "Learn how Performance Cycles work",

@@ -166,6 +166,8 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
     return (
       <PageShell variant="data" backdrop="signature">
         {seoSummary}
+        {/* The section bar draws the header's bottom rule; until it renders, this does. */}
+        <div aria-hidden className="mb-8 border-b border-rule sm:mb-10" />
         {dashboard.isError ? (
           <ErrorState
             headingLevel={2}
@@ -202,6 +204,8 @@ const CurrentRoundPage = ({ seoSummary }: { seoSummary?: ReactNode }) => {
             nowMs={nowMs}
             participants={participants}
             headingId="cycle-status-heading"
+            // One freshness stamp per page: the ledger's while there is one.
+            liveStatus={!hasStandings}
             className={hasStandings ? 'lg:col-span-5' : 'max-w-xl'}
           />
           {hasStandings ? (

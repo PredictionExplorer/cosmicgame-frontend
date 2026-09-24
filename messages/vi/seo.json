@@ -325,10 +325,6 @@
       "signatureAllocation": "Phân bổ Signature",
       "opened": "Ngày mở"
     },
-    "info": {
-      "gestures": "Tổng số nét bút trong chu kỳ này. Mỗi nét bút ghi nhận thêm một lượt Tinh tuyển.",
-      "signatureAllocation": "Phần ETH của phân bổ Signature được người tham gia đặt nét bút cuối cùng nhận về. Người nhận cũng nhận 1.000 CST và một Cosmic Signature NFT."
-    },
     "relatedAria": "Các trang liên quan đến chu kỳ hiện tại",
     "links": {
       "learn": "Tìm hiểu cách chu kỳ trình diễn vận hành",

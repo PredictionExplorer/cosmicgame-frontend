@@ -400,13 +400,15 @@ describe('server-rendered page headers', () => {
     expect(document.querySelector('[data-figure="opened"]')).toHaveTextContent(
       /formats\.dateTime\.timeZone\(zone=UTC/,
     );
-    // The gestures and Signature Allocation figures define themselves behind an info button.
+    // One explanation pattern per screen (D079): the figures are plain labels,
+    // the coined words below explain themselves in place.
     const cards = seoMessages.currentCycleSummary.cards;
     for (const label of [cards.gestures, cards.signatureAllocation]) {
-      expect(
-        screen.getByRole('button', { name: `More information about ${label}` }),
-      ).toBeInTheDocument();
+      expect(screen.getByText(label, { exact: true })).toBeInTheDocument();
     }
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    // The page's one freshness stamp is in the body, which follows the live cycle.
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('holds the server-read cycle figures before the first client read', async () => {

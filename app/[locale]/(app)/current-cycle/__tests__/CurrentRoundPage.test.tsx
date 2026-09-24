@@ -151,6 +151,28 @@ describe('CurrentRoundPage', () => {
     expect(mockRefetch).toHaveBeenCalledTimes(1);
   });
 
+  it('draws the header’s bottom rule while the body loads, before the section bar can', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true, isError: false });
+    render(<CurrentRoundPage seoSummary={<header data-testid="summary" />} />);
+    const standIn = screen.getByTestId('summary').nextElementSibling;
+    expect(standIn).toHaveClass('border-b', 'border-rule');
+    expect(standIn).toHaveAttribute('aria-hidden');
+  });
+
+  it('carries one freshness stamp, on the status column only while there are no standings', () => {
+    setupLoaded({ TsRoundStart: 0, LastBidderAddr: ZERO });
+    clock(0, NOW_SEC - 60);
+    const { container, unmount } = render(<CurrentRoundPage />);
+    expect(container.querySelectorAll('[data-live-state]')).toHaveLength(1);
+    expect(container.querySelector('[data-phase] [data-live-state]')).not.toBeNull();
+    unmount();
+
+    // With standings, the ledger carries it (mocked here), so the column does not.
+    setupLoaded();
+    const loaded = render(<CurrentRoundPage />);
+    expect(loaded.container.querySelector('[data-phase] [data-live-state]')).toBeNull();
+  });
+
   it('keeps the page when a background poll fails after a successful load', () => {
     setupLoaded({}, { isError: true, isRefetchError: true });
     mockFreshness.mockReturnValue({ state: 'delayed', ageMs: 60_000, lastSuccessAtMs: 1 });

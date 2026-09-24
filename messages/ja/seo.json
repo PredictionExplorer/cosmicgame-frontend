@@ -325,10 +325,6 @@
       "signatureAllocation": "シグネチャー配分",
       "opened": "開始日時"
     },
-    "info": {
-      "gestures": "このサイクルで入れられた一筆の総数。それぞれの一筆は星選の対象にもなります。",
-      "signatureAllocation": "最後の一筆を入れた参加者が受け取るシグネチャー配分のETH部分。受領者は1,000 CSTとCosmic Signature NFTも受け取ります。"
-    },
     "relatedAria": "現在のサイクルの関連ページ",
     "links": {
       "learn": "パフォーマンス・サイクルの仕組みを学ぶ",

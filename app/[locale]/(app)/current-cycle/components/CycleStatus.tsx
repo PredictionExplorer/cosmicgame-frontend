@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DateTime } from '@/components/ui/date-time';
 import { Duration } from '@/components/ui/duration';
-import { LiveStatusView } from '@/components/ui/live-status';
+import { LiveStatus, LiveStatusView } from '@/components/ui/live-status';
 import { Term } from '@/components/ui/term';
 import { UnknownValue } from '@/components/ui/unknown-value';
 import { useLiveFreshness } from '@/hooks/useLiveFreshness';
@@ -30,6 +30,11 @@ export interface CycleStatusProps {
   /** Unique participants this cycle, or null while the gesture list loads or failed. */
   participants: number | null;
   headingId: string;
+  /**
+   * Whether the column carries the page's one freshness stamp: while the
+   * cycle has no standings ledger beside it (the ledger carries it then).
+   */
+  liveStatus?: boolean;
   className?: string;
 }
 
@@ -53,6 +58,7 @@ export function CycleStatus({
   nowMs,
   participants,
   headingId,
+  liveStatus = false,
   className,
 }: CycleStatusProps) {
   const t = useTranslations('currentCycle');
@@ -70,6 +76,8 @@ export function CycleStatus({
       ? Math.max(0, Math.ceil((phase.countdownTargetMs - nowMs) / 1000))
       : null;
   const clockStale = freshness.state === 'delayed' || freshness.state === 'offline';
+  // A stale clock names the delay under itself; the stamp would say it twice.
+  const clockCaveat = clockStale && remainingSeconds !== null;
 
   const reserve = toFiniteNumber(data.CosmicGameBalanceEth);
   const startedAt = toFiniteNumber(data.TsRoundStart);
@@ -125,9 +133,12 @@ export function CycleStatus({
         <h2 id={headingId} className="type-section">
           {t('status.heading')}
         </h2>
-        <Badge data-testid="live-badge" tone={phase.tone} shape="pill" dot>
-          {phaseCopy('label')}
-        </Badge>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {liveStatus && !clockCaveat ? <LiveStatus variant="inline" /> : null}
+          <Badge data-testid="live-badge" tone={phase.tone} shape="pill" dot>
+            {phaseCopy('label')}
+          </Badge>
+        </div>
       </div>
 
       <div className="mt-8 sm:mt-10">
@@ -167,7 +178,7 @@ export function CycleStatus({
             </DateTime>
           </p>
         ) : null}
-        {clockStale && remainingSeconds !== null ? (
+        {clockCaveat ? (
           <LiveStatusView
             state={freshness.state}
             ageMs={freshness.ageMs}

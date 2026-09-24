@@ -325,10 +325,6 @@
       "signatureAllocation": "시그니처 배분",
       "opened": "시작 시각"
     },
-    "info": {
-      "gestures": "이 사이클에서 남겨진 모든 제스처의 합계입니다. 제스처 하나하나가 별빛 선정 자격으로도 기록됩니다.",
-      "signatureAllocation": "최종 제스처를 남긴 참여자가 회수하는 시그니처 배분의 ETH 부분입니다. 수령자는 1,000 CST와 Cosmic Signature NFT도 함께 받습니다."
-    },
     "relatedAria": "현재 사이클 관련 페이지",
     "links": {
       "learn": "퍼포먼스 사이클 작동 원리 알아보기",

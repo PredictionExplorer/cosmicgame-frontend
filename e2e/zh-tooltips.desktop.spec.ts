@@ -22,12 +22,12 @@ interface TooltipRoute {
 const ROUTES: readonly TooltipRoute[] = [
   { path: '/zh', readyText: 'Cosmic Signature 观测台', minimum: 5 },
   {
-    // The header figures carry the info buttons; in the body only the coined
-    // Cycle Reserve and the standings roles explain themselves (the
-    // allocation names are plain, explained together in one disclosure).
+    // One explanation pattern (D079): no info buttons; the coined Cycle
+    // Reserve and the standings roles explain themselves in place, and the
+    // allocation names are plain, explained together in one disclosure.
     path: '/zh/current-cycle',
     readyText: '落笔总次数',
-    minimum: 2,
+    minimum: 0,
     explainedTerms: ['周期储备', '坚守冠军'],
   },
   { path: `/zh/allocation/${cycle}`, readyText: `第 ${cycle} 个周期`, minimum: 5 },
@@ -49,7 +49,7 @@ test.describe('Sprint 8 translated tooltip interaction coverage', () => {
 
       await expect(page.getByText(route.readyText, { exact: false }).first()).toBeVisible();
       const triggers = page.getByRole('button', { name: TRANSLATED_TOOLTIP_NAME });
-      await expect(triggers.first()).toBeVisible();
+      if (route.minimum > 0) await expect(triggers.first()).toBeVisible();
       await page.waitForTimeout(300);
       const labels = await triggers.evaluateAll((elements) =>
         elements

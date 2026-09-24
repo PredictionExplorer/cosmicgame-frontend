@@ -1,9 +1,7 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 
-import { ZERO_ADDRESS } from '@/lib/cycleState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TimeZoneNote } from '@/components/ui/date-time';
-import { LiveStatus } from '@/components/ui/live-status';
 
 import { DashboardFigure } from '../DashboardFigure';
 import { dashboardSeed, type DashboardMetric } from '../dashboardMetrics';
@@ -17,9 +15,11 @@ import { CurrentCycleTitle } from './CurrentCycleTitle';
  * and the cycle's live figures (gestures, Signature Allocation, opening time
  * with its zone). The figures read the same polled dashboard query as the
  * page body and start from this request's server read, so the server HTML
- * holds them. The live status sits in the standings ledger when there is
- * one, so the page carries a single freshness stamp; before the first
- * gesture it stays here.
+ * holds them. They are plain labels: the page explains its coined words in
+ * place (dotted terms) and the allocations in one disclosure, so the first
+ * screen has one explanation pattern. The page's one freshness stamp is in
+ * the body, which follows the live cycle: on the standings ledger, or on
+ * the status column before the first gesture.
  */
 export async function CurrentCycleSeoSummary() {
   const locale = await getLocale();
@@ -29,7 +29,6 @@ export async function CurrentCycleSeoSummary() {
   const figure = (metric: DashboardMetric) => (
     <DashboardFigure metric={metric} seed={dashboardSeed(data, metric)} />
   );
-  const hasStandings = !!data && data.TsRoundStart !== 0 && data.LastBidderAddr !== ZERO_ADDRESS;
   const pageName = t('currentCycleSummary.heading');
 
   return (
@@ -44,13 +43,11 @@ export async function CurrentCycleSeoSummary() {
           id: 'gestures',
           label: t('currentCycleSummary.cards.gestures'),
           value: figure('gestures'),
-          info: t('currentCycleSummary.info.gestures'),
         },
         {
           id: 'signatureAllocation',
           label: t('currentCycleSummary.cards.signatureAllocation'),
           value: figure('reserve'),
-          info: t('currentCycleSummary.info.signatureAllocation'),
         },
         {
           id: 'opened',
@@ -61,14 +58,13 @@ export async function CurrentCycleSeoSummary() {
           caption: <TimeZoneNote />,
         },
       ]}
-      meta={hasStandings ? undefined : <LiveStatus variant="inline" />}
       related={[
         { href: '/how-it-works', label: t('currentCycleSummary.links.learn') },
         { href: '/statistics', label: t('currentCycleSummary.links.statistics') },
         { href: '/contracts', label: t('currentCycleSummary.links.contracts') },
       ]}
       relatedLabel={t('currentCycleSummary.relatedAria')}
-      // The section bar under the header draws its bottom rule.
+      // The section bar under the header (or its stand-in while the body loads) draws its bottom rule.
       className="mb-0 border-b-0 sm:mb-0"
     />
   );
