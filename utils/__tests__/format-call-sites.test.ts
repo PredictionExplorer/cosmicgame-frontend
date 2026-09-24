@@ -56,7 +56,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/home/experimental/DeckMiniBar.tsx': 1,
   'components/home/experimental/DeckPersonalStrip.tsx': 3,
   'components/home/experimental/GestureStatus.tsx': 6,
-  'components/home/PublicGoodsImpactCard.tsx': 2,
   'components/home/RoundInfoSection.tsx': 1,
   'components/marketing/MarketingStats.tsx': 1,
   'components/marketing/TopMarketersLeaderboard.tsx': 1,
