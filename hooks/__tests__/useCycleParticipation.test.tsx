@@ -18,6 +18,10 @@ jest.mock('@/services/api', () => ({
   default: { get_user_info: jest.fn() },
 }));
 jest.mock('../useApiQuery', () => ({ useNotifyRedBox: jest.fn() }));
+let mockClaimableActionIds: unknown[] | undefined = [{ DepositId: 1, StakeActionId: 2 }];
+jest.mock('@/contexts/ApiDataContext', () => ({
+  useApiData: () => ({ apiData: { claimableActionIds: mockClaimableActionIds } }),
+}));
 
 const mockUserInfo = api.get_user_info as jest.MockedFunction<typeof api.get_user_info>;
 const mockRedBox = useNotifyRedBox as jest.MockedFunction<typeof useNotifyRedBox>;
@@ -117,6 +121,23 @@ describe('useRetrieveStatus', () => {
     );
     const { result } = renderHook(() => useRetrieveStatus(ME));
     expect(result.current).toEqual({ state: 'waiting', eth: 0.35000000000000003, nfts: 1 });
+  });
+
+  it('counts Anchor Distributions only once one can be retrieved, as the header does', () => {
+    mockClaimableActionIds = [];
+    mockRedBox.mockReturnValue(
+      query({
+        data: { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 0, UnretrievedAnchorDistribution: 0.78 },
+      }),
+    );
+    expect(renderHook(() => useRetrieveStatus(ME)).result.current).toEqual({ state: 'none' });
+
+    mockClaimableActionIds = [{ DepositId: 1, StakeActionId: 2 }];
+    expect(renderHook(() => useRetrieveStatus(ME)).result.current).toEqual({
+      state: 'waiting',
+      eth: 0.78,
+      nfts: 0,
+    });
   });
 
   it('says nothing waits only after a successful read of zeros', () => {

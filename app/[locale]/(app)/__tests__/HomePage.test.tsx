@@ -1184,7 +1184,11 @@ describe('HomePage', () => {
     expect(within(story).queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
 
-    await user.click(within(story).getByText('home.orientation.storyTitle'));
+    // The notes sit under their own section heading for heading navigation.
+    expect(
+      within(story).getByRole('heading', { level: 2, name: 'home.orientation.storyTitle' }),
+    ).toBeInTheDocument();
+    await user.click(story.querySelector('summary')!);
     expect(story).not.toHaveAttribute('open');
   });
 

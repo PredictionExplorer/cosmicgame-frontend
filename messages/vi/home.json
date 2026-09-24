@@ -760,5 +760,8 @@
     "newer": "Signature mới hơn",
     "older": "Signature cũ hơn",
     "none": "Chưa có Signature nào được khắc"
+  },
+  "announce": {
+    "newGesture": "Nét bút mới của {address}; người này hiện là người tham gia gần nhất."
   }
 }

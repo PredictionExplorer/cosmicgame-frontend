@@ -760,5 +760,8 @@
     "newer": "Newer Signature",
     "older": "Older Signature",
     "none": "No Signature imprinted yet"
+  },
+  "announce": {
+    "newGesture": "New Gesture by {address}; it now holds the Last Gesture."
   }
 }

@@ -47,6 +47,7 @@ import { useAttentionPreferences } from '@/hooks/useAttentionPreferences';
 import { useBackgroundDeadlineRefresh, useReturnResync } from '@/hooks/useDeadlineWatch';
 import { useLiveFreshness } from '@/hooks/useLiveFreshness';
 import { useGestureChime } from '@/hooks/useGestureChime';
+import { useHomeAnnouncer } from '@/hooks/useHomeAnnouncer';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
@@ -622,6 +623,13 @@ const HomePage = ({
     cycle: data?.CurRoundNum,
     nowMs: now,
   });
+  const announcement = useHomeAnnouncer({
+    phase: cycleState.phase,
+    latestAddress: loading ? undefined : data?.LastBidderAddr,
+    gestureCount: data?.CurNumBids ?? null,
+    account,
+    moment: position.moment,
+  });
   const participation = useCycleParticipation(account, data?.CurRoundNum);
   const retrieve = useRetrieveStatus(account);
   const cycleSpend = !account
@@ -796,13 +804,10 @@ const HomePage = ({
           </div>
         )}
 
-        {/* One polite announcement when the wallet's place changes hands. */}
-        <p role="status" aria-live="polite" className="sr-only" data-testid="position-announcer">
-          {position.moment?.kind === 'taken'
-            ? t('observatory.standing.positionTaken')
-            : position.moment?.kind === 'landed'
-              ? t('observatory.standing.landed')
-              : ''}
+        {/* The page's one polite voice: the wallet's own moment, a new Last
+            Gesture and the clock's phase changes; never every chat update. */}
+        <p role="status" aria-live="polite" className="sr-only" data-testid="home-announcer">
+          {announcement.text ? <span key={announcement.id}>{announcement.text}</span> : null}
         </p>
 
         <ControlDesk

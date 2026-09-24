@@ -40,6 +40,9 @@ export function HomeStory({ className }: HomeStoryProps) {
         />
       </summary>
       <div className="border-t border-rule-faint px-5 py-5 sm:px-6">
+        {/* The summary is a control, not a heading: the notes' section heading
+            is stated here for heading navigation. */}
+        <h2 className="sr-only">{t('orientation.storyTitle')}</h2>
         <p className="type-body-md max-w-[var(--measure-lede)] text-muted-foreground">
           {t('hero.phase.live.body')}
         </p>

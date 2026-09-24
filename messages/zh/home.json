@@ -760,5 +760,8 @@
     "newer": "较新的签名",
     "older": "较早的签名",
     "none": "尚未铭刻签名"
+  },
+  "announce": {
+    "newGesture": "{address} 落下新的一笔，现为最新落笔者。"
   }
 }

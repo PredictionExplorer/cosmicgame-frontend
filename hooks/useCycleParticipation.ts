@@ -5,8 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 
 import api from '@/services/api';
 import type { GestureInfo, UserInfoWithLists } from '@/services/api';
+import { useApiData } from '@/contexts/ApiDataContext';
 import { useNotifyRedBox } from '@/hooks/useApiQuery';
-import { toFiniteNumber } from '@/utils/finiteNumber';
+import { summarizePendingRetrievals } from '@/lib/pendingRetrievals';
 import { getCstGestureCost, getEthGestureCost, resolveGestureType } from '@/utils/gesturePayment';
 
 /** One wallet's Gestures in one cycle and what they cost, never adding ETH and CST together. */
@@ -87,18 +88,19 @@ export type RetrieveStatus =
  */
 export function useRetrieveStatus(account: string | null | undefined): RetrieveStatus {
   const { data, isPending, isError, refetch } = useNotifyRedBox(account);
+  // The same read, with the retrievable anchor actions the header also uses.
+  const { apiData } = useApiData();
+  const claimableActionIds = apiData.claimableActionIds;
 
   return useMemo<RetrieveStatus>(() => {
     const retry = () => void refetch();
     if (data) {
-      const eth =
-        (toFiniteNumber(data.ETHRaffleToClaim) ?? 0) +
-        (toFiniteNumber(data.ETHChronoWarriorToClaim) ?? 0) +
-        (toFiniteNumber(data.UnretrievedAnchorDistribution) ?? 0);
-      const nfts = toFiniteNumber(data.NumDonatedNFTToClaim) ?? 0;
-      return eth > 0 || nfts > 0 ? { state: 'waiting', eth, nfts } : { state: 'none' };
+      const pending = summarizePendingRetrievals({ ...data, claimableActionIds });
+      return pending.hasAny
+        ? { state: 'waiting', eth: pending.eth + pending.anchorEth, nfts: pending.nfts }
+        : { state: 'none' };
     }
     if (isPending && !isError) return { state: 'loading' };
     return { state: 'unknown', retry };
-  }, [data, isError, isPending, refetch]);
+  }, [claimableActionIds, data, isError, isPending, refetch]);
 }

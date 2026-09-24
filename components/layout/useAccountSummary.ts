@@ -7,6 +7,7 @@ import { formatEther } from 'viem';
 import { HEADER_POLL_INTERVAL_MS } from '@/config/constants';
 import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
 import { useApiData } from '@/contexts/ApiDataContext';
+import { summarizePendingRetrievals } from '@/lib/pendingRetrievals';
 import { useUserBalance } from '@/hooks/useApiQuery';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
@@ -78,14 +79,10 @@ export function useAccountSummary(): AccountSummary {
   });
 
   return useMemo(() => {
-    const retrievableEth = (status?.ETHRaffleToClaim ?? 0) > 0 ? status!.ETHRaffleToClaim! : null;
-    const hasRetrievable = !!(
-      account &&
-      (retrievableEth !== null ||
-        (status?.NumDonatedNFTToClaim ?? 0) > 0 ||
-        ((status?.UnretrievedAnchorDistribution ?? 0) > 0 &&
-          (status?.claimableActionIds?.length ?? 0) > 0))
-    );
+    // The one retrieval rule the home's standing also reads (F157).
+    const pending = summarizePendingRetrievals(status);
+    const retrievableEth = pending.eth > 0 ? pending.eth : null;
+    const hasRetrievable = !!account && pending.hasAny;
     return {
       account: account ?? null,
       balance: {
