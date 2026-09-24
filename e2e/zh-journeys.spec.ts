@@ -138,13 +138,17 @@ test.describe('Sprint 8 deterministic Chinese journeys', () => {
     await expect(page.getByRole('button', { name: '转出 CST' })).toHaveCount(0);
   });
 
-  test('renders localized success and error toasts through safe mocked flows', async ({ page }) => {
+  test('renders a localized success toast through a safe mocked flow', async ({ page }) => {
     await page.goto(`/zh/allocation/${cycle}`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: '分享周期摘要' }).click();
     await expect(
       page.locator('[data-sonner-toast]').filter({ hasText: '周期摘要已复制到剪贴板' }),
     ).toBeVisible();
+  });
 
+  // This journey once checked the localized error toast of a forward without a wallet.
+  // The page no longer offers that dead button, so there is no error toast to check here.
+  test('offers a wallet connection instead of a dead Public Goods forward', async ({ page }) => {
     // The vault holds ETH in the mocks, but with no wallet the page offers to connect
     // instead of a forward button that could only fail with a toast.
     await page.goto('/zh/contracts', { waitUntil: 'domcontentloaded' });
