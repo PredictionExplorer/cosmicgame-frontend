@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { DataTable, type DataTableColumn } from '@/components/ui/data-table';
+import { DataTable, nextSort, type DataTableColumn } from '@/components/ui/data-table';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
@@ -162,6 +162,31 @@ describe('DataTable sorting', () => {
     expect(header).toHaveAttribute('aria-sort', 'none');
   });
 
+  it('turns an initial sort around on the first click, whichever way it runs', async () => {
+    // Regression: an initial sort opposite to the kind's first direction
+    // (amounts smallest first) made the first click "return" to the order
+    // the table was already in, so nothing happened.
+    const user = userEvent.setup();
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        initialSort={{ id: 'spent', direction: 'asc' }}
+      />,
+    );
+    const header = screen.getByRole('columnheader', { name: /Spent/ });
+    expect(header).toHaveAttribute('aria-sort', 'ascending');
+
+    await user.click(within(header).getByRole('button'));
+    expect(header).toHaveAttribute('aria-sort', 'descending');
+    expect(bodyRows()[0]).toHaveTextContent('1.5000');
+
+    await user.click(within(header).getByRole('button'));
+    expect(header).toHaveAttribute('aria-sort', 'ascending');
+  });
+
   it('starts from an initial sort', () => {
     render(
       <DataTable
@@ -173,6 +198,27 @@ describe('DataTable sorting', () => {
       />,
     );
     expect(bodyRows()[0]).toHaveTextContent('1.5000');
+  });
+});
+
+describe('nextSort', () => {
+  it('cycles a column through its first direction, the other, and back', () => {
+    const first = nextSort(null, 'amount', 'desc');
+    expect(first).toEqual({ id: 'amount', direction: 'desc' });
+    const second = nextSort(first, 'amount', 'desc');
+    expect(second).toEqual({ id: 'amount', direction: 'asc' });
+    expect(nextSort(second, 'amount', 'desc')).toBeNull();
+  });
+
+  it('returns to the table’s own order from another column', () => {
+    const own = { id: 'date', direction: 'desc' as const };
+    expect(nextSort({ id: 'amount', direction: 'asc' }, 'amount', 'desc', own)).toEqual(own);
+  });
+
+  it('always changes something on a column the table already sorts', () => {
+    const own = { id: 'amount', direction: 'asc' as const };
+    expect(nextSort(own, 'amount', 'desc', own)).toEqual({ id: 'amount', direction: 'desc' });
+    expect(nextSort({ id: 'amount', direction: 'desc' }, 'amount', 'desc', own)).toEqual(own);
   });
 });
 
@@ -253,6 +299,37 @@ describe('DataTable states', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText('No holders yet')).toBeInTheDocument();
     expect(screen.getByText('Holders appear after the first gesture.')).toBeInTheDocument();
+  });
+
+  it('puts the empty state’s title one level under the table’s heading', () => {
+    // Regression: the title was always an h4, so a titled table read
+    // H2 → H4 and skipped a level.
+    const { rerender } = render(
+      <DataTable
+        ariaLabel="Holders"
+        title="Contributions"
+        data={[]}
+        columns={columns}
+        emptyTitle="No contributions yet"
+      />,
+    );
+    expect(screen.getByRole('heading', { level: 2, name: 'Contributions' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'No contributions yet' }),
+    ).toBeInTheDocument();
+
+    rerender(
+      <DataTable
+        ariaLabel="Holders"
+        headingLevel={3}
+        data={[]}
+        columns={columns}
+        emptyTitle="No contributions yet"
+      />,
+    );
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'No contributions yet' }),
+    ).toBeInTheDocument();
   });
 
   it('shows the error state with a retry', async () => {
@@ -341,16 +418,137 @@ describe('DataTable rows', () => {
     expect(screen.getByRole('button', { name: 'Hide' })).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText('Details for 1')).toBeInTheDocument();
   });
+
+  it('points a disclosure at its details with a valid id, whatever the row key', async () => {
+    // Regression: the id was built from the row key, and a group keyed
+    // "(all cs nft stakers)" gave an id with spaces that aria-controls, a
+    // space-separated list of ids, could not resolve.
+    const user = userEvent.setup();
+    render(
+      <DataTable
+        ariaLabel="Holders"
+        data={rows}
+        columns={columns}
+        getRowKey={(r) => `(all holders ${r.id})`}
+        renderDetails={(r) => <p>Details for {r.id}</p>}
+        detailsLabel={(_r, expanded) => (expanded ? 'Hide' : 'Show')}
+      />,
+    );
+    await user.click(screen.getAllByRole('button', { name: 'Show' })[0]!);
+    const toggle = screen.getByRole('button', { name: 'Hide' });
+    const id = toggle.getAttribute('aria-controls') ?? '';
+    expect(id).not.toMatch(/\s/);
+    expect(document.getElementById(id)).toHaveTextContent('Details for 1');
+  });
 });
 
 describe('DataTable layout and naming', () => {
-  it('keeps three columns or fewer as a compact phone table and turns more into records', () => {
+  it('keeps three compact columns as a phone table and turns more into records', () => {
     const { rerender } = render(
       <DataTable ariaLabel="Holders" data={rows} columns={columns.slice(0, 3)} />,
     );
     expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'compact');
 
     rerender(<DataTable ariaLabel="Holders" data={rows} columns={columns} />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'cards');
+  });
+
+  it('turns a short table with a date or a duration into records on phones', () => {
+    // Regression: /public-goods-retrievals (date, address, amount) stayed a
+    // three-column table and pushed its amounts past a 320px screen.
+    const dated: DataTableColumn<Row>[] = [
+      { id: 'when', kind: 'datetime', header: 'Date', value: (r) => r.id * 1_700_000_000 },
+      columns[0]!,
+      columns[2]!,
+    ];
+    const { rerender } = render(<DataTable ariaLabel="Holders" data={rows} columns={dated} />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'cards');
+
+    const held: DataTableColumn<Row>[] = [
+      columns[0]!,
+      { id: 'held', kind: 'duration', header: 'Held', value: (r) => r.id * 3600 },
+    ];
+    rerender(<DataTable ariaLabel="Holders" data={rows} columns={held} />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'cards');
+  });
+
+  it('leaves out columns dropped on phones when choosing the phone layout', () => {
+    const withSecondary: DataTableColumn<Row>[] = [
+      ...columns.slice(0, 3),
+      { ...columns[3]!, priority: 'secondary' },
+    ];
+    render(<DataTable ariaLabel="Holders" data={rows} columns={withSecondary} />);
+    expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'compact');
+  });
+
+  describe('on a phone', () => {
+    let restore: () => void;
+
+    /** jsdom lays nothing out: a phone viewport, a ResizeObserver and the scroll geometry. */
+    function phoneWith(scrollWidth: number, clientWidth: number) {
+      const originalMatchMedia = window.matchMedia;
+      const originalObserver = window.ResizeObserver;
+      window.matchMedia = ((query: string) => ({
+        matches: query.includes('max-width'),
+        media: query,
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+      })) as typeof window.matchMedia;
+      class FakeResizeObserver {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      }
+      window.ResizeObserver = FakeResizeObserver as unknown as typeof ResizeObserver;
+      const spies = [
+        jest.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(scrollWidth),
+        jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(clientWidth),
+      ];
+      restore = () => {
+        window.matchMedia = originalMatchMedia;
+        window.ResizeObserver = originalObserver;
+        spies.forEach((spy) => spy.mockRestore());
+      };
+    }
+
+    afterEach(() => restore());
+
+    it('keeps three compact columns as a table while they fit', () => {
+      phoneWith(288, 288);
+      render(<DataTable ariaLabel="Holders" data={rows} columns={columns.slice(0, 3)} />);
+      expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'compact');
+    });
+
+    it('turns a compact table that is wider than the screen into records', () => {
+      // Regression: at 320px a panel's padding left an owner, a count and an
+      // amount 72px wider than their column, cutting the amounts off.
+      phoneWith(333, 261);
+      render(<DataTable ariaLabel="Holders" data={rows} columns={columns.slice(0, 3)} />);
+      expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'cards');
+    });
+
+    it('never overrides a layout the caller chose', () => {
+      phoneWith(333, 261);
+      render(
+        <DataTable
+          ariaLabel="Holders"
+          data={rows}
+          columns={columns.slice(0, 3)}
+          layout="compact"
+        />,
+      );
+      expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'compact');
+    });
+  });
+
+  it('keeps the phone layout a caller asks for', () => {
+    render(
+      <DataTable ariaLabel="Holders" data={rows} columns={columns.slice(0, 2)} layout="cards" />,
+    );
     expect(screen.getByRole('table')).toHaveAttribute('data-layout', 'cards');
   });
 

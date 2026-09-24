@@ -5,17 +5,21 @@
  */
 export {
   DataTable,
+  nextSort,
   type DataTableCellContext,
   type DataTableColumn,
   type DataTableProps,
 } from './data-table';
 export {
   COLUMN_KINDS,
+  COMPACT_MAX_COLUMNS,
   compareRows,
   compareSortValues,
   isBlankValue,
+  phoneLayoutFor,
   type ColumnKind,
   type ColumnKindSpec,
+  type PhoneColumn,
   type SortDirection,
   type SortValue,
 } from './column-kinds';

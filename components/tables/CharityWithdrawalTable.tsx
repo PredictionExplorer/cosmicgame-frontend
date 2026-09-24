@@ -52,6 +52,9 @@ const CharityWithdrawalTable = ({ list, ...state }: CharityWithdrawalTableProps)
       columns={columns}
       ariaLabel={t('names.publicGoodsRetrievals')}
       getRowKey={(row) => row.EvtLogId}
+      // A dated, year-stamped proof beside an address and an amount is wider
+      // than a 320px screen: each retrieval reads as a record on phones.
+      layout="cards"
       emptyTitle={t('empty.retrievals')}
       {...state}
     />

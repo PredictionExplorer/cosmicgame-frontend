@@ -3,6 +3,7 @@ import {
   compareRows,
   compareSortValues,
   isBlankValue,
+  phoneLayoutFor,
 } from '@/components/ui/data-table/column-kinds';
 
 describe('COLUMN_KINDS', () => {
@@ -70,5 +71,50 @@ describe('compareRows', () => {
       null,
       undefined,
     ]);
+  });
+});
+
+describe('phoneLayoutFor', () => {
+  it('keeps up to three compact columns as a real table', () => {
+    expect(phoneLayoutFor([{ kind: 'address' }, { kind: 'count' }, { kind: 'amount' }])).toBe(
+      'compact',
+    );
+    expect(phoneLayoutFor([{ kind: 'address' }, { kind: 'percent' }])).toBe('compact');
+  });
+
+  it.each(['datetime', 'duration', 'text'] as const)(
+    'turns a table holding a %s column into records',
+    (kind) => {
+      // Regression: three columns of any kind stayed a table, and a dated,
+      // year-stamped retrieval or two durations ran past a 320px screen.
+      expect(phoneLayoutFor([{ kind: 'address' }, { kind }])).toBe('cards');
+      expect(phoneLayoutFor([{ kind }, { kind: 'address' }, { kind: 'amount' }])).toBe('cards');
+    },
+  );
+
+  it('turns more than three columns into records', () => {
+    expect(
+      phoneLayoutFor([
+        { kind: 'address' },
+        { kind: 'count' },
+        { kind: 'percent' },
+        { kind: 'percent' },
+      ]),
+    ).toBe('cards');
+  });
+
+  it('counts only the columns a phone shows', () => {
+    expect(
+      phoneLayoutFor([
+        { kind: 'address' },
+        { kind: 'count' },
+        { kind: 'amount' },
+        { kind: 'datetime', priority: 'secondary' },
+      ]),
+    ).toBe('compact');
+  });
+
+  it('needs a record for text set under its label', () => {
+    expect(phoneLayoutFor([{ kind: 'address' }, { kind: 'link', stack: true }])).toBe('cards');
   });
 });

@@ -35,12 +35,14 @@ import {
   COLUMN_KINDS,
   compareRows,
   isBlankValue,
+  phoneLayoutFor,
   type ColumnKind,
   type SortDirection,
   type SortValue,
 } from './column-kinds';
 import { KindValue, blankShowsUnknown } from './kind-value';
-import { useTablePageSize } from './use-page-size';
+import { useCompactFit } from './use-compact-fit';
+import { DEFAULT_PAGE_SIZE, PHONE_PAGE_SIZE, usePhoneLayout } from './use-page-size';
 
 export type { SortDirection, SortValue };
 
@@ -129,15 +131,6 @@ export interface DataTableColumn<T> {
   width?: string;
   headerClassName?: string;
   cellClassName?: string;
-
-  /** @deprecated Use `value`. */
-  accessor?: (row: T) => SortValue;
-  /** @deprecated Use `cell`. */
-  render?: (row: T, index: number) => React.ReactNode;
-  /** @deprecated Use `help`. */
-  tooltip?: string;
-  /** @deprecated Use `priority: 'secondary'`. */
-  hideOnMobile?: boolean;
 }
 
 export interface DataTableProps<T> {
@@ -171,8 +164,6 @@ export interface DataTableProps<T> {
   getRowLabel?: (row: T, index: number) => string;
   /** The column that carries the row link and the "You" tag. Default: the first. */
   rowLinkColumn?: string;
-  /** @deprecated Pass `getRowHref`, which keyboard users can reach too. */
-  onRowClick?: (row: T, index: number) => void;
   /** Extra classes per row (a hidden, muted row). */
   rowClassName?: (row: T) => string | undefined;
 
@@ -220,8 +211,9 @@ export interface DataTableProps<T> {
   resetPageKey?: unknown;
 
   /**
-   * Phone layout. `auto` (default) keeps a real table for three columns or
-   * fewer and turns longer rows into records.
+   * Phone layout. `auto` (default) keeps a real table only for up to three
+   * compact columns (an address, a figure, a short link) and turns any other
+   * table into records; see `phoneLayoutFor`.
    */
   layout?: 'auto' | TableLayout;
   /** Row height: `comfortable` 48px (default) or `compact` 40px. */
@@ -230,8 +222,6 @@ export interface DataTableProps<T> {
   className?: string;
   /** Classes on the `<table>` (a `min-width` for a wide ledger). */
   tableClassName?: string;
-  /** @deprecated Density is set by `density`; there is no reader toggle any more. */
-  densityStorageKey?: string | null;
 }
 
 interface ResolvedColumn<T> {
@@ -250,7 +240,6 @@ interface ResolvedColumn<T> {
 function resolveColumn<T>(column: DataTableColumn<T>): ResolvedColumn<T> {
   const kind = column.kind ?? 'text';
   const spec = COLUMN_KINDS[kind];
-  const accessor = column.value ?? column.accessor;
   return {
     column,
     label: column.label ?? (typeof column.header === 'string' ? column.header : column.id),
@@ -258,10 +247,10 @@ function resolveColumn<T>(column: DataTableColumn<T>): ResolvedColumn<T> {
     align: column.align ? logicalAlign(column.align) : spec.align,
     numeric: spec.numeric,
     nowrap: column.nowrap ?? spec.nowrap,
-    priority: column.priority ?? (column.hideOnMobile ? 'secondary' : 'primary'),
-    help: column.help ?? column.tooltip,
-    valueOf: accessor ?? (() => undefined),
-    hasValue: Boolean(accessor),
+    priority: column.priority ?? 'primary',
+    help: column.help,
+    valueOf: column.value ?? (() => undefined),
+    hasValue: Boolean(column.value),
   };
 }
 
@@ -296,6 +285,31 @@ function prefersReducedMotion(): boolean {
   );
 }
 
+type SortState = { id: string; direction: SortDirection } | null;
+
+const flip = (direction: SortDirection): SortDirection => (direction === 'asc' ? 'desc' : 'asc');
+
+/**
+ * The order after a click on a column's header. A column cycles through its
+ * kind's first direction, the other direction, and back to the table's own
+ * order. Every click changes something: when the table's own order already
+ * sorts this column (in either direction), a click turns it around rather
+ * than "returning" to the order it is already in.
+ */
+export function nextSort(
+  current: SortState,
+  id: string,
+  firstDirection: SortDirection,
+  initialSort?: { id: string; direction: SortDirection },
+): SortState {
+  if (!current || current.id !== id) return { id, direction: firstDirection };
+  const isOwnOrder = initialSort?.id === current.id && initialSort.direction === current.direction;
+  if (isOwnOrder || current.direction === firstDirection) {
+    return { id, direction: flip(current.direction) };
+  }
+  return initialSort ?? null;
+}
+
 /**
  * DataTable: the one table. Pass `columns` with a `kind` each and `data`; the
  * table handles alignment, formatting, sorting (with `aria-sort`),
@@ -315,7 +329,6 @@ export function DataTable<T>({
   getRowHref,
   getRowLabel,
   rowLinkColumn,
-  onRowClick,
   rowClassName,
   isCurrentRow,
   currentRowSummary,
@@ -345,6 +358,8 @@ export function DataTable<T>({
   const router = useRouter();
   const headingId = React.useId();
   const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const isPhone = usePhoneLayout();
 
   const resolved = React.useMemo(() => columns.map(resolveColumn), [columns]);
   // Columns with a value somewhere in the data. The phone layout follows
@@ -354,19 +369,20 @@ export function DataTable<T>({
     [resolved, data],
   );
 
-  const layout: TableLayout =
+  const kindLayout: TableLayout =
     layoutProp === 'auto'
-      ? datasetColumns.length <= 3 && !datasetColumns.some((col) => col.column.stack)
-        ? 'compact'
-        : 'cards'
+      ? phoneLayoutFor(
+          datasetColumns.map((col) => ({
+            kind: col.kind,
+            priority: col.priority,
+            stack: col.column.stack,
+          })),
+        )
       : layoutProp;
-  const autoPageSize = useTablePageSize();
-  const pageSize = pageSizeProp ?? autoPageSize;
+  const pageSize = pageSizeProp ?? (isPhone ? PHONE_PAGE_SIZE : DEFAULT_PAGE_SIZE);
 
   // ── Sorting ───────────────────────────────────────────────────────────
-  const [sort, setSort] = React.useState<{ id: string; direction: SortDirection } | null>(
-    initialSort ?? null,
-  );
+  const [sort, setSort] = React.useState<SortState>(initialSort ?? null);
 
   const sorted = React.useMemo(() => {
     const active = sort ? resolved.find((col) => col.column.id === sort.id) : undefined;
@@ -394,13 +410,25 @@ export function DataTable<T>({
   const paginate = Number.isFinite(pageSize) && pageSize > 0;
   const pageCount = paginate ? pageCountFor(sorted.length, pageSize) : 1;
   const page = Math.min(Math.max(controlledPage ?? uncontrolledPage, 1), pageCount);
-  const pageRows = paginate ? sorted.slice((page - 1) * pageSize, page * pageSize) : sorted;
+  const pageRows = React.useMemo(
+    () => (paginate ? sorted.slice((page - 1) * pageSize, page * pageSize) : sorted),
+    [paginate, sorted, page, pageSize],
+  );
   const pageOffset = paginate ? (page - 1) * pageSize : 0;
   // A column that may be empty shows only on pages where some row has it,
   // so a page of gestures without messages carries no blank Message column.
   const visible = datasetColumns.filter(
     (col) => !col.column.hideWhenEmpty || hasAnyValue(col, pageRows),
   );
+
+  // An automatic compact table that turns out wider than a phone's column
+  // (a panel's padding, longer words in a locale) reads as records instead.
+  const compactFits = useCompactFit(
+    scrollRef,
+    isPhone && layoutProp === 'auto' && kindLayout === 'compact',
+    pageRows,
+  );
+  const layout: TableLayout = kindLayout === 'compact' && !compactFits ? 'cards' : kindLayout;
 
   const goToPage = (next: number) => {
     setPageState({ page: next, key: resetPageKey, sortKey });
@@ -420,15 +448,9 @@ export function DataTable<T>({
   };
 
   const toggleSort = (col: ResolvedColumn<T>) => {
-    const first = COLUMN_KINDS[col.kind].firstDirection;
-    setSort((current) => {
-      if (!current || current.id !== col.column.id) return { id: col.column.id, direction: first };
-      if (current.direction === first) {
-        return { id: col.column.id, direction: first === 'asc' ? 'desc' : 'asc' };
-      }
-      // A third click returns to the table's own order.
-      return initialSort ?? null;
-    });
+    setSort((current) =>
+      nextSort(current, col.column.id, COLUMN_KINDS[col.kind].firstDirection, initialSort),
+    );
   };
 
   // ── Expanded details ──────────────────────────────────────────────────
@@ -443,6 +465,9 @@ export function DataTable<T>({
   const hasDatetime = visible.some((col) => col.kind === 'datetime');
   const cellPadding = density === 'compact' ? 'py-2.5' : 'py-3';
   const Heading = `h${headingLevel}` as const;
+  // An empty or error state's title sits one level under the table's own
+  // heading, or takes the table's place in the outline when it has none.
+  const stateHeadingLevel = title ? (Math.min(headingLevel + 1, 4) as 3 | 4) : headingLevel;
   const columnCount = visible.length + (renderDetails ? 1 : 0);
 
   const toggleDetails = (key: React.Key) =>
@@ -480,7 +505,7 @@ export function DataTable<T>({
           title={errorTitle}
           message={error}
           onRetry={onRetry}
-          headingLevel={title ? (Math.min(headingLevel + 1, 4) as 3 | 4) : headingLevel}
+          headingLevel={stateHeadingLevel}
         />
       </div>
     );
@@ -496,6 +521,7 @@ export function DataTable<T>({
           title={emptyTitle ?? t('empty.nothingHere')}
           description={emptyDescription}
           action={emptyAction}
+          headingLevel={stateHeadingLevel}
         />
       </div>
     );
@@ -543,7 +569,7 @@ export function DataTable<T>({
         </p>
       ) : null}
 
-      <ResponsiveTableContainer label={ariaLabel}>
+      <ResponsiveTableContainer ref={scrollRef} label={ariaLabel}>
         <ResponsiveTable
           layout={layout}
           aria-label={title ? undefined : ariaLabel}
@@ -601,14 +627,13 @@ export function DataTable<T>({
                   const key = getRowKey ? getRowKey(row, index) : index;
                   const href = getRowHref?.(row, index) ?? null;
                   const isCurrent = isCurrentRow?.(row) ?? false;
-                  const activate = href
-                    ? () => router.push(href)
-                    : onRowClick
-                      ? () => onRowClick(row, index)
-                      : undefined;
+                  const activate = href ? () => router.push(href) : undefined;
                   const details = renderDetails?.(row) ?? null;
                   const isExpanded = details !== null && expanded.has(key);
-                  const detailsId = `${headingId}-details-${String(key)}`;
+                  // Built from the row's position, not its key: a key can hold
+                  // spaces or brackets ("(All CS NFT Stakers)"), which an
+                  // IDREF in aria-controls cannot carry.
+                  const detailsId = `${headingId}-details-${index}`;
 
                   return (
                     <React.Fragment key={key}>
@@ -732,7 +757,6 @@ function renderCell<T>(
 ): React.ReactNode {
   const { column } = col;
   if (column.cell) return column.cell(row, context);
-  if (column.render) return column.render(row, context.index);
   if (!col.hasValue) return null;
   // Nothing to show stays truly empty, so a phone record drops the line.
   if (isBlankValue(context.value) && !blankShowsUnknown(col.kind, column.whenBlank)) return null;
@@ -770,6 +794,19 @@ function HeaderCell<T>({
   const { column } = col;
   const active = sort?.id === column.id ? sort.direction : null;
   const Arrow = active === 'asc' ? ArrowUp : ArrowDown;
+  // On an end-aligned column the arrow leads, keeping the label at the edge.
+  const leads = col.align === 'end';
+  // The arrow sits in the label's own line of text, joined to the nearest
+  // word by U+2060 (no break there), so a label that wraps keeps its arrow
+  // beside it instead of stranding it at the far side of the cell. Both are
+  // hidden from assistive tech, which hears the order from `aria-sort`.
+  const arrow = active ? (
+    <span aria-hidden className="whitespace-nowrap">
+      {leads ? null : '\u2060'}
+      <Arrow className={cn('inline-block size-3.5 align-[-0.125em]', leads ? 'me-1' : 'ms-1')} />
+      {leads ? '\u2060' : null}
+    </span>
+  ) : null;
 
   // A sortable header reads like every other header until it is sorted: only
   // the active column shows its arrow, so no header holds a gap for an
@@ -783,15 +820,14 @@ function HeaderCell<T>({
       data-touch-target="extended"
       className={cn(
         TOUCH_TARGET_EXTENDED_CLASS,
-        'inline-flex min-w-0 items-center gap-1 rounded-sm [text-align:inherit]',
+        'inline-block min-w-0 max-w-full rounded-sm [text-align:inherit]',
         'transition-colors duration-[var(--duration-fast)] hover:text-foreground',
         active && 'text-foreground',
-        // On an end-aligned column the arrow leads, keeping the label at the edge.
-        col.align === 'end' && 'flex-row-reverse',
       )}
     >
+      {leads ? arrow : null}
       <span>{column.header}</span>
-      {active ? <Arrow aria-hidden className="size-3.5 shrink-0" /> : null}
+      {leads ? null : arrow}
     </button>
   ) : (
     <span className="min-w-0">{column.header}</span>

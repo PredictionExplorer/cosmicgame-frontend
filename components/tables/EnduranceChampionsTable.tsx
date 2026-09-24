@@ -88,6 +88,9 @@ const EnduranceChampionsTable = ({
       ariaLabel={t('names.enduranceChampions')}
       getRowKey={(row, index) => `${row.participant}-${index}`}
       initialSort={{ id: 'championTime', direction: 'desc' }}
+      // Two durations ("9d 1h 36m 4s") beside an address do not fit a phone
+      // row: each participant reads as a record.
+      layout="cards"
       emptyTitle={t('empty.enduranceChampions')}
       {...state}
       loading={state.loading || championList === null}

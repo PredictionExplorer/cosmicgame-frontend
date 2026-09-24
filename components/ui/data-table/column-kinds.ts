@@ -17,6 +17,10 @@ import type { LogicalAlign } from '@/components/ui/responsive-table';
  * | `percent`  | end    | `formatPercent`                       | largest    |
  * | `duration` | end    | `<Duration>`                          | longest    |
  * | `status`   | center | a status icon (the only centred kind) | A to Z     |
+ *
+ * On phones, `link`, `address`, `amount`, `count`, `percent` and `status`
+ * are compact kinds: up to three of them stay a real table. See
+ * {@link phoneLayoutFor}.
  */
 export type ColumnKind =
   | 'text'
@@ -42,19 +46,54 @@ export interface ColumnKindSpec {
   readonly nowrap: boolean;
   /** The direction a first click on the header sorts in. */
   readonly firstDirection: SortDirection;
+  /**
+   * Short enough to share a 320px screen with two other columns: an address,
+   * a figure, a short link or a status icon. A date with its year, a duration
+   * and free text are not, so a table holding one reads as records on phones.
+   */
+  readonly compact: boolean;
 }
 
 export const COLUMN_KINDS: Readonly<Record<ColumnKind, ColumnKindSpec>> = {
-  text: { align: 'start', numeric: false, nowrap: false, firstDirection: 'asc' },
-  link: { align: 'start', numeric: false, nowrap: false, firstDirection: 'asc' },
-  address: { align: 'start', numeric: false, nowrap: true, firstDirection: 'asc' },
-  datetime: { align: 'start', numeric: true, nowrap: true, firstDirection: 'desc' },
-  amount: { align: 'end', numeric: true, nowrap: true, firstDirection: 'desc' },
-  count: { align: 'end', numeric: true, nowrap: true, firstDirection: 'desc' },
-  percent: { align: 'end', numeric: true, nowrap: true, firstDirection: 'desc' },
-  duration: { align: 'end', numeric: true, nowrap: true, firstDirection: 'desc' },
-  status: { align: 'center', numeric: false, nowrap: true, firstDirection: 'asc' },
+  text: { align: 'start', numeric: false, nowrap: false, firstDirection: 'asc', compact: false },
+  link: { align: 'start', numeric: false, nowrap: false, firstDirection: 'asc', compact: true },
+  address: { align: 'start', numeric: false, nowrap: true, firstDirection: 'asc', compact: true },
+  datetime: { align: 'start', numeric: true, nowrap: true, firstDirection: 'desc', compact: false },
+  amount: { align: 'end', numeric: true, nowrap: true, firstDirection: 'desc', compact: true },
+  count: { align: 'end', numeric: true, nowrap: true, firstDirection: 'desc', compact: true },
+  percent: { align: 'end', numeric: true, nowrap: true, firstDirection: 'desc', compact: true },
+  duration: { align: 'end', numeric: true, nowrap: true, firstDirection: 'desc', compact: false },
+  status: { align: 'center', numeric: false, nowrap: true, firstDirection: 'asc', compact: true },
 };
+
+/** The most columns a phone keeps as a real table. */
+export const COMPACT_MAX_COLUMNS = 3;
+
+/** What the phone layout needs to know about a column. */
+export interface PhoneColumn {
+  readonly kind: ColumnKind;
+  /** `secondary` columns are dropped on phones, so they do not count. */
+  readonly priority?: 'primary' | 'secondary';
+  /** Long text set under its label: only a record can do that. */
+  readonly stack?: boolean;
+}
+
+/**
+ * The automatic phone layout. A table stays a real table (`compact`) only
+ * when every column a phone shows is a compact kind and there are at most
+ * three of them: an owner, a count and an amount fit 320px side by side. A
+ * date, a duration or free text needs the width of a record line, so any
+ * table holding one turns each row into a record (`cards`) instead of
+ * cutting values off at the screen's edge.
+ */
+export function phoneLayoutFor(columns: readonly PhoneColumn[]): 'compact' | 'cards' {
+  const shown = columns.filter((column) => column.priority !== 'secondary');
+  const fits =
+    shown.length > 0 &&
+    shown.length <= COMPACT_MAX_COLUMNS &&
+    shown.every((column) => COLUMN_KINDS[column.kind].compact && !column.stack);
+  return fits ? 'compact' : 'cards';
+}
 
 /** True for a value a reader would see as nothing at all (NaN included). */
 export function isBlankValue(value: SortValue): boolean {
