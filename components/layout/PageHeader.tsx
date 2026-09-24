@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import { classifyHref } from '@/config/siteNav';
 import { Link } from '@/i18n/navigation';
+import { TOUCH_TARGET_EXTENDED_CLASS } from '@/lib/touch-target';
 import { cn } from '@/lib/utils';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/ui/breadcrumbs';
 import { ExplainedTerm } from '@/components/ui/explain-popover';
@@ -461,6 +462,10 @@ export function PageHeaderFigures({
                 definition={figure.info}
                 title={figure.label}
                 announce="moreInformation"
+                // A one-line label cannot grow to 44px without pushing the
+                // figures apart; on a phone a transparent pad carries the target.
+                data-touch-target="extended"
+                className={TOUCH_TARGET_EXTENDED_CLASS}
               >
                 {figure.label}
               </ExplainedTerm>
@@ -472,7 +477,9 @@ export function PageHeaderFigures({
           {/* A date may wrap in a narrow column rather than overflow it. */}
           <dd
             className={cn(
-              'self-baseline type-figure-md text-foreground [&_time]:whitespace-normal',
+              // Positioned after the label, so a linked value stays above the
+              // label's touch pad where the two meet.
+              'self-baseline type-figure-md text-foreground [&_time]:whitespace-normal max-sm:relative',
               figure.size !== 'md' && 'lg:type-figure-lg',
               rows && 'max-sm:ms-auto max-sm:text-right',
             )}

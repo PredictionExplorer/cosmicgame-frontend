@@ -297,6 +297,21 @@ describe('PageHeader', () => {
       expect(trigger).toHaveAccessibleDescription('The sum.');
       expect(document.querySelector('[data-slot="info-tooltip"]')).toBeNull();
     });
+
+    it('gives an explained label a 44px touch pad on phones without growing the row', () => {
+      render(
+        <PageHeader
+          title="Ledger"
+          figures={[{ id: 'total', label: 'Total ETH', value: '1', info: 'The sum.' }]}
+        />,
+      );
+      const trigger = screen.getByRole('button', { name: 'More information about Total ETH' });
+      // The mobile tap-target audit measures the pad the attribute declares.
+      expect(trigger).toHaveAttribute('data-touch-target', 'extended');
+      expect(trigger).toHaveClass('relative', 'after:h-11', 'after:w-11', 'sm:after:hidden');
+      // The value is positioned after it, so a linked value stays above the pad.
+      expect(document.querySelector('[data-figure="total"] dd')).toHaveClass('max-sm:relative');
+    });
   });
 
   it('renders meta, actions and related pages', () => {

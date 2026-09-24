@@ -52,13 +52,19 @@ async function navigateTo(page: Page, href: string): Promise<void> {
     const trigger = page
       .getByRole('banner')
       .getByRole('button', { name: new RegExp(`^${destination.panel}$`) });
-    const menu = page.getByRole('menu', { name: destination.panel });
-    // A click that lands before hydration only focuses the trigger; try again.
+    // The panels are disclosures for site navigation: the button's aria-controls
+    // names a panel of ordinary links. A click that lands before hydration only
+    // focuses the trigger; try again.
     await expect(async () => {
-      if (!(await menu.isVisible())) await trigger.click();
-      await expect(menu).toBeVisible({ timeout: 2000 });
+      if ((await trigger.getAttribute('aria-expanded')) !== 'true') await trigger.click();
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true', { timeout: 2000 });
     }).toPass();
-    link = menu.locator(`a[href="${href}"]`).first();
+    const panel = page.locator(`[id="${await trigger.getAttribute('aria-controls')}"]`);
+    await expect(panel).toBeVisible();
+    link = panel
+      .getByRole('link')
+      .and(panel.locator(`a[href="${href}"]`))
+      .first();
   } else {
     link = page.getByRole('banner').locator(`a[href="${href}"]`).first();
   }
