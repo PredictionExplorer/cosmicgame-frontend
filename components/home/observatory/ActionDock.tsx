@@ -124,7 +124,8 @@ export function ActionDock({
   const hidden = stepAside;
 
   // The line under the clock: the wallet's own moment when there is one,
-  // otherwise what the cycle is for.
+  // otherwise what the cycle is for. Who may finalize and from when stays
+  // with the clock, so the dock keeps to one line in every locale.
   let status: ReactNode;
   if (moment?.kind === 'taken' && !isHolder) {
     status = (
@@ -151,7 +152,7 @@ export function ActionDock({
   const busy = isGesturing ? stageLabel(txStage) : null;
   const gestureLabel = busy ?? (
     <span className="flex min-w-0 flex-col items-center leading-tight">
-      <span className="text-sm font-semibold">{submit.action}</span>{' '}
+      <span className="text-[0.8125rem] font-semibold min-[360px]:text-sm">{submit.action}</span>{' '}
       {submit.cost && <span className="text-xs font-medium tabular-nums">{submit.cost}</span>}
     </span>
   );
@@ -174,7 +175,10 @@ export function ActionDock({
         data-phase={cycleState.phase}
         className="glass mx-auto flex min-h-16 max-w-2xl items-center justify-between gap-3 rounded-surface border border-rule px-3.5 py-2 shadow-float md:px-4"
       >
-        <div data-testid="action-dock-status" className="flex min-w-0 flex-col gap-0.5">
+        <div
+          data-testid="action-dock-status"
+          className="flex min-w-0 max-w-[55%] shrink-0 flex-col gap-0.5"
+        >
           {showCountdown ? (
             <span role="timer" aria-live="off" className="whitespace-nowrap">
               <SmoothCountdown
@@ -216,7 +220,7 @@ export function ActionDock({
               onClick={onOpenSheet}
               loading={isGesturing}
               aria-describedby={describedById}
-              className="h-auto min-h-12 min-w-0 shrink px-4 py-1.5 whitespace-normal md:hidden"
+              className="h-auto min-h-12 min-w-0 flex-1 px-3 py-1.5 whitespace-normal min-[360px]:px-4 md:hidden"
             >
               {gestureLabel}
             </Button>
@@ -226,7 +230,7 @@ export function ActionDock({
               onClick={onJumpToPanel}
               loading={isGesturing}
               aria-describedby={describedById}
-              className="hidden h-auto min-h-12 min-w-0 shrink px-5 py-1.5 whitespace-normal md:inline-flex"
+              className="hidden h-auto min-h-12 shrink-0 px-5 py-1.5 whitespace-normal md:inline-flex"
             >
               {gestureLabel}
             </Button>
