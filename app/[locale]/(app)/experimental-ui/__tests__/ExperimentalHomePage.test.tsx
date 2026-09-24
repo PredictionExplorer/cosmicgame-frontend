@@ -736,7 +736,8 @@ describe('HomePage', () => {
       within(observatory).getByRole('heading', { name: 'home.hero.cycleNumber(number=7)' }),
     ).toBeInTheDocument();
     expect(within(observatory).getByText('42')).toBeInTheDocument();
-    expect(within(observatory).getByText('2.7500 ETH')).toBeInTheDocument();
+    // The shared amount format binds the unit to the figure with a no-break space.
+    expect(observatory.textContent).toContain(`2.7500${String.fromCharCode(160)}ETH`);
     expect(within(observatory).getByText('7%')).toBeInTheDocument();
   });
 
@@ -2141,7 +2142,8 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    expect(getConsoleSubmitButton()).toHaveTextContent('home.form.submit.cst(cost=1.00)');
+    // The shared submit label formats CST through the format layer: whole amounts drop ".00".
+    expect(getConsoleSubmitButton()).toHaveTextContent('home.form.submit.cst(cost=1)');
     await user.click(getConsoleSubmitButton());
 
     expect(mockGestureForm.onGestureWithCST).toHaveBeenCalledTimes(1);
