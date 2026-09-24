@@ -4,7 +4,8 @@
     "description": "Giải đáp về Cosmic Signature: bản chất của giao thức, cách nét bút hoạt động và những giới hạn cần biết."
   },
   "languageSwitcher": {
-    "label": "Ngôn ngữ"
+    "label": "Ngôn ngữ",
+    "current": "Ngôn ngữ: {language}"
   },
   "themeSwitcher": {
     "label": "Bảng màu",

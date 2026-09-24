@@ -4,7 +4,8 @@
     "description": "プロトコルの概要から一筆の仕組み、よくある誤解まで、Cosmic Signatureに関する疑問にお答えします。"
   },
   "languageSwitcher": {
-    "label": "言語"
+    "label": "言語",
+    "current": "言語：{language}"
   },
   "themeSwitcher": {
     "label": "カラーテーマ",

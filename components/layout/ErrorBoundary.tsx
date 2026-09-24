@@ -1,24 +1,37 @@
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { Button } from '@/components/ui/button';
+import { Link } from '@/i18n/navigation';
+import { buttonVariants } from '@/components/ui/button';
+import { ErrorState } from '@/components/ui/error-state';
 import { reportError } from '@/utils/errors';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  /** What the reload action does; the document reload by default. */
+  onReload?: () => void;
   messages: {
     title: string;
     description: string;
-    retry: string;
+    /** The reload action's label. */
+    reload: string;
+    /** The link to the host's home page. */
+    home: string;
   };
 }
 
 interface State {
   hasError: boolean;
   error: Error | null;
+}
+
+/** Reloads the document: the render that threw would only throw again if re-rendered in place. */
+function reloadPage() {
+  window.location.reload();
 }
 
 export class ErrorBoundaryBase extends Component<Props, State> {
@@ -35,24 +48,33 @@ export class ErrorBoundaryBase extends Component<Props, State> {
     reportError(error, 'ErrorBoundary');
   }
 
-  handleReset = () => {
-    this.setState({ hasError: false, error: null });
-  };
-
   override render() {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
 
+      const { messages } = this.props;
       return (
-        <div className="flex min-h-[200px] flex-col items-center justify-center p-8">
-          <h5 className="mb-2 text-xl font-semibold text-foreground">
-            {this.props.messages.title}
-          </h5>
-          <p className="mb-4 text-sm text-muted-foreground">{this.props.messages.description}</p>
-          <Button variant="outline" onClick={this.handleReset}>
-            {this.props.messages.retry}
-          </Button>
-        </div>
+        <ErrorState
+          variant="page"
+          headingLevel={2}
+          title={messages.title}
+          message={messages.description}
+          onRetry={this.props.onReload ?? reloadPage}
+          retryLabel={messages.reload}
+          action={
+            <Link
+              href="/"
+              className={buttonVariants({
+                variant: 'ghost',
+                size: 'sm',
+                className: 'no-underline',
+              })}
+            >
+              {messages.home}
+              <ArrowRight aria-hidden />
+            </Link>
+          }
+        />
       );
     }
 
@@ -60,7 +82,15 @@ export class ErrorBoundaryBase extends Component<Props, State> {
   }
 }
 
-export default function ErrorBoundary({ children, fallback }: Omit<Props, 'messages'>) {
+/**
+ * The client-render safety net of both hosts (the landing's only one): the
+ * shared error state with a reload, which fetches the page afresh instead of
+ * re-rendering the tree that just threw, and a link to the host's home.
+ */
+export default function ErrorBoundary({
+  children,
+  fallback,
+}: Omit<Props, 'messages' | 'onReload'>) {
   const t = useTranslations('errors');
   return (
     <ErrorBoundaryBase
@@ -68,7 +98,8 @@ export default function ErrorBoundary({ children, fallback }: Omit<Props, 'messa
       messages={{
         title: t('boundary.title'),
         description: t('boundary.description'),
-        retry: t('boundary.retry'),
+        reload: t('global.retry'),
+        home: t('boundary.home'),
       }}
     >
       {children}

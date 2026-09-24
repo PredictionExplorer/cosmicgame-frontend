@@ -277,6 +277,7 @@
       "transaction": "在新标签页中打开区块浏览器"
     },
     "empty": "没有与“{query}”匹配的结果。请尝试页面名称、地址或数字。",
+    "resultCount": "{count, plural, other {# 个结果}}",
     "keys": {
       "move": "移动",
       "open": "打开",

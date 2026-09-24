@@ -277,6 +277,7 @@
       "transaction": "Mở trình khám phá khối trong thẻ mới"
     },
     "empty": "Không có kết quả cho “{query}”. Thử tên trang, địa chỉ hoặc một con số.",
+    "resultCount": "{count, plural, other {# kết quả}}",
     "keys": {
       "move": "Di chuyển",
       "open": "Mở",

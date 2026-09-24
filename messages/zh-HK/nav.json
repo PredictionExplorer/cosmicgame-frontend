@@ -277,6 +277,7 @@
       "transaction": "在新分頁中打開區塊瀏覽器"
     },
     "empty": "沒有與「{query}」相符的結果。請嘗試頁面名稱、地址或數字。",
+    "resultCount": "{count, plural, other {# 個結果}}",
     "keys": {
       "move": "移動",
       "open": "打開",

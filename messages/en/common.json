@@ -4,7 +4,8 @@
     "description": "Answers to common questions about Cosmic Signature, its protocol, and how gestures work."
   },
   "languageSwitcher": {
-    "label": "Language"
+    "label": "Language",
+    "current": "Language: {language}"
   },
   "themeSwitcher": {
     "label": "Color scheme",

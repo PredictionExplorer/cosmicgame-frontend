@@ -4,7 +4,8 @@
     "description": "프로토콜의 개념과 제스처의 작동 원리부터 흔히 생기는 오해까지, Cosmic Signature에 관한 질문에 답합니다."
   },
   "languageSwitcher": {
-    "label": "언어"
+    "label": "언어",
+    "current": "언어: {language}"
   },
   "themeSwitcher": {
     "label": "색상 테마",

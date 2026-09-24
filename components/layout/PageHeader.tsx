@@ -478,10 +478,13 @@ export function PageHeaderFigures({
             {figure.value === null ? (
               <>
                 <UnknownValue label={unavailable} />
-                {/* Seen, not heard: the dash above already announces it. */}
-                <span aria-hidden className="block type-caption text-subtle">
-                  {unavailable}
-                </span>
+                {/* Seen, not heard (the dash above already announces it), and drawn
+                    as generated content so the figure's text stays the dash alone. */}
+                <span
+                  aria-hidden
+                  data-caption={unavailable}
+                  className="block type-caption text-subtle after:content-[attr(data-caption)]"
+                />
               </>
             ) : (
               figure.value

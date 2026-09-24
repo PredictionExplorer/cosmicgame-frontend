@@ -277,6 +277,7 @@
       "transaction": "新しいタブでブロックエクスプローラーを開きます"
     },
     "empty": "「{query}」に一致する結果はありません。ページ名、アドレス、数字で検索してください。",
+    "resultCount": "{count, plural, other {#件の結果}}",
     "keys": {
       "move": "移動",
       "open": "開く",

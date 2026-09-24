@@ -4,7 +4,8 @@
     "description": "坦率解答關於 Cosmic Signature 的重要問題：協議是什麼、落筆如何運作，以及它不是什麼。"
   },
   "languageSwitcher": {
-    "label": "語言"
+    "label": "語言",
+    "current": "語言：{language}"
   },
   "themeSwitcher": {
     "label": "配色",

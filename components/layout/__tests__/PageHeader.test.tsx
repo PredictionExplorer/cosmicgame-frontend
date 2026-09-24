@@ -210,9 +210,12 @@ describe('PageHeader', () => {
         <PageHeader title="Ledger" figures={[{ id: 'total', label: 'Total', value: null }]} />,
       );
       const value = document.querySelector('[data-figure="total"] dd') as HTMLElement;
-      const visible = within(value).getAllByText('common.status.unavailable');
-      expect(visible).toHaveLength(2);
-      expect(visible.filter((node) => node.closest('[aria-hidden="true"]'))).toHaveLength(1);
+      // Heard once, from the dash's sr-only label; the visible word is generated content.
+      expect(value).toHaveTextContent(/^—common\.status\.unavailable$/);
+      const caption = value.querySelector('[data-caption]');
+      expect(caption).toHaveAttribute('data-caption', 'common.status.unavailable');
+      expect(caption).toHaveAttribute('aria-hidden', 'true');
+      expect(caption).toHaveClass('after:content-[attr(data-caption)]');
     });
 
     it('puts full-width figures after the pairs on phones, or lists every figure as rows', () => {

@@ -127,7 +127,7 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
 
   return (
     <header className="glass sticky top-0 z-40 border-b border-rule">
-      <div className="site-container flex h-16 items-center gap-3 lg:gap-8">
+      <div className="site-container flex h-[var(--header-height)] items-center gap-3 lg:gap-8">
         <Link
           href="/"
           aria-label={t('brand.homeLabel')}
@@ -172,7 +172,7 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
         <div className="ml-auto flex shrink-0 items-center gap-2">
           <div className="hidden items-center gap-2 sm:flex">
             <ThemeSwitcher />
-            <LanguageSwitcher variant="compact" />
+            <LanguageSwitcher variant="responsive" />
           </div>
           {pastHero ? (
             <div className="animate-in fade-in-0 slide-in-from-top-1 duration-200 motion-reduce:animate-none">
@@ -195,7 +195,7 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
               className="flex w-[min(20rem,100vw)] flex-col gap-0 border-l border-rule bg-background p-0"
             >
               <SheetTitle className="sr-only">{t('drawerTitle')}</SheetTitle>
-              <div className="flex h-16 items-center border-b border-rule-faint pl-4 pr-16">
+              <div className="flex h-[var(--header-height)] items-center border-b border-rule-faint pl-4 pr-16">
                 <Wordmark size="md" />
               </div>
               <nav
@@ -229,7 +229,7 @@ export function LandingHeader({ sections }: LandingHeaderProps) {
               <div className="border-t border-rule-faint px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3">
                 <p className="type-eyebrow text-subtle">{t('drawer.preferences')}</p>
                 <PalettePicker className="mt-1 -ml-2.5" />
-                <LanguageSwitcher variant="select" className="mt-2 w-full" />
+                <LanguageSwitcher variant="drawer" className="mt-2" />
               </div>
             </SheetContent>
           </Sheet>

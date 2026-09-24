@@ -4,7 +4,8 @@
     "description": "Відповіді на запитання про Cosmic Signature: що це за протокол, як працюють жести та чим він не є."
   },
   "languageSwitcher": {
-    "label": "Мова"
+    "label": "Мова",
+    "current": "Мова: {language}"
   },
   "themeSwitcher": {
     "label": "Кольорова схема",

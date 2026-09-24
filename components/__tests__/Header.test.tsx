@@ -76,6 +76,16 @@ beforeEach(() => {
 
 const primaryNav = () => screen.getByRole('navigation', { name: 'nav.primaryLabel' });
 
+/** Opens a header panel (a disclosure) and returns the panel it controls. */
+async function openPanel(user: ReturnType<typeof userEvent.setup>, name: string) {
+  const trigger = within(primaryNav()).getByRole('button', { name });
+  await user.click(trigger);
+  expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  const panel = document.getElementById(trigger.getAttribute('aria-controls') ?? '')!;
+  expect(panel).toBeVisible();
+  return { trigger, panel };
+}
+
 describe('Header', () => {
   it('links the wordmark lockup home', () => {
     render(<Header />);
@@ -137,10 +147,9 @@ describe('Header', () => {
       within(primaryNav()).getByRole('link', { name: 'nav.routes.observatory.label' }),
     ).not.toHaveAttribute('aria-current');
 
-    await user.click(explore);
-    const menu = await screen.findByRole('menu');
+    const { panel } = await openPanel(user, 'nav.menus.explore');
     expect(
-      within(menu).getByRole('menuitem', { name: /nav\.routes\.currentCycle\.label/ }),
+      within(panel).getByRole('link', { name: /nav\.routes\.currentCycle\.label/ }),
     ).toHaveAttribute('aria-current', 'page');
   });
 
@@ -190,24 +199,23 @@ describe('Header', () => {
     mockPathname.mockReturnValue('/public-goods-retrievals');
     const user = userEvent.setup();
     render(<Header />);
-    await user.click(within(primaryNav()).getByRole('button', { name: 'nav.menus.explore' }));
-    const menu = await screen.findByRole('menu');
+    const { panel: menu } = await openPanel(user, 'nav.menus.explore');
 
     expect(
-      within(menu).getByRole('menuitem', { name: /nav\.routes\.currentCycle\.label/ }),
+      within(menu).getByRole('link', { name: /nav\.routes\.currentCycle\.label/ }),
     ).toHaveAttribute('href', '/current-cycle');
-    expect(within(menu).getByText('nav.sections.records')).toBeInTheDocument();
-    const publicGoods = within(menu).getByRole('menuitem', {
+    expect(within(menu).getByRole('list', { name: 'nav.sections.records' })).toBeInTheDocument();
+    const publicGoods = within(menu).getByRole('link', {
       name: /nav\.groups\.publicGoods\.label/,
     });
     expect(publicGoods).toHaveAttribute('href', '/public-goods-contributions-cg');
     expect(publicGoods).toHaveAttribute('aria-current', 'true');
     expect(
-      within(menu).getByRole('menuitem', { name: 'nav.routes.statisticsTokens.short' }),
+      within(menu).getByRole('link', { name: 'nav.routes.statisticsTokens.short' }),
     ).toHaveAttribute('href', '/statistics/tokens');
 
     for (const link of OUTBOUND_LINKS.filter((candidate) => candidate.group === 'ecosystem')) {
-      const item = within(menu).getByRole('menuitem', {
+      const item = within(menu).getByRole('link', {
         name: new RegExp(`nav\\.outbound\\.${link.id}\\.label`),
       });
       expect(item).toHaveAttribute('href', link.href);
@@ -220,8 +228,7 @@ describe('Header', () => {
   it('opens the Learn panel with trust pages and same-tab links to the project site', async () => {
     const user = userEvent.setup();
     render(<Header />);
-    await user.click(within(primaryNav()).getByRole('button', { name: 'nav.menus.learn' }));
-    const menu = await screen.findByRole('menu');
+    const { panel: menu } = await openPanel(user, 'nav.menus.learn');
 
     for (const [name, href] of [
       ['security', '/security'],
@@ -229,10 +236,10 @@ describe('Header', () => {
       ['faq', '/faq'],
     ]) {
       expect(
-        within(menu).getByRole('menuitem', { name: new RegExp(`nav\\.routes\\.${name}\\.label`) }),
+        within(menu).getByRole('link', { name: new RegExp(`nav\\.routes\\.${name}\\.label`) }),
       ).toHaveAttribute('href', href);
     }
-    const whitePaper = within(menu).getByRole('menuitem', {
+    const whitePaper = within(menu).getByRole('link', {
       name: /nav\.routes\.whitePaper\.label/,
     });
     expect(whitePaper).toHaveAttribute('href', localeHref(LANDING_ORIGIN, '/white-paper', 'en'));
@@ -265,10 +272,47 @@ describe('Header', () => {
 
   it('has no accessibility violations with the Explore panel open', async () => {
     const user = userEvent.setup();
+    const { container } = render(<Header />);
+    await openPanel(user, 'nav.menus.explore');
+    await checkA11y(container);
+  });
+
+  it('uses the disclosure pattern for its panels: links, not menu items', async () => {
+    const user = userEvent.setup();
     render(<Header />);
-    await user.click(within(primaryNav()).getByRole('button', { name: 'nav.menus.explore' }));
-    // Scoped to the panel: Radix aria-hides background content while open.
-    await checkA11y(await screen.findByRole('menu'));
+    const { trigger, panel } = await openPanel(user, 'nav.menus.learn');
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(within(panel).queryAllByRole('menuitem')).toHaveLength(0);
+
+    // Tab walks into the panel's links in order.
+    await user.tab();
+    expect(panel).toContainElement(document.activeElement as HTMLElement);
+    expect(document.activeElement?.tagName).toBe('A');
+
+    // Escape closes it and returns to the button.
+    await user.keyboard('{Escape}');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(panel).not.toBeVisible();
+    expect(trigger).toHaveFocus();
+  });
+
+  it('keeps one panel open at a time and closes it on a press outside', async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+    const { trigger: explore } = await openPanel(user, 'nav.menus.explore');
+    const { trigger: learn } = await openPanel(user, 'nav.menus.learn');
+    expect(explore).toHaveAttribute('aria-expanded', 'false');
+    await user.click(document.body);
+    expect(learn).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('names the current language on its control', () => {
+    render(<Header />);
+    expect(
+      within(screen.getByRole('banner')).getByRole('button', {
+        name: 'common.languageSwitcher.current(language=English)',
+      }),
+    ).toBeInTheDocument();
   });
 });
 
@@ -312,9 +356,22 @@ describe('Header drawer', () => {
     expect(
       within(drawer).getByRole('radiogroup', { name: 'common.themeSwitcher.label' }),
     ).toBeInTheDocument();
+    // A menu of explicit choices, not a select that switches while it is arrowed through.
+    expect(within(drawer).queryByRole('combobox')).toBeNull();
     expect(
-      within(drawer).getByRole('combobox', { name: 'common.languageSwitcher.label' }),
+      within(drawer).getByRole('button', {
+        name: 'common.languageSwitcher.current(language=English)',
+      }),
     ).toBeInTheDocument();
+  });
+
+  it('opens from the right, from a button at the end of the header', async () => {
+    render(<Header />);
+    const banner = screen.getByRole('banner');
+    const buttons = within(banner).getAllByRole('button');
+    expect(buttons.at(-1)).toHaveAccessibleName('nav.menuLabel');
+    const { drawer } = await openDrawer();
+    expect(drawer).toHaveClass('border-l');
   });
 
   it('shows the account pages first once a wallet is connected', async () => {

@@ -277,6 +277,7 @@
       "transaction": "새 탭에서 블록 탐색기를 엽니다"
     },
     "empty": "검색 결과가 없습니다: {query}. 페이지 이름, 주소, 숫자로 검색해 주세요.",
+    "resultCount": "{count, plural, other {결과 #개}}",
     "keys": {
       "move": "이동",
       "open": "열기",
