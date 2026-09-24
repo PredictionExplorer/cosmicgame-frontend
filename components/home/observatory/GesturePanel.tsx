@@ -38,6 +38,13 @@ import {
 import type { GestureSubmitParts } from './gestureSubmitLabel';
 
 const MESSAGE_MAX_LENGTH = protocolFacts.gestureMessageMaxLength;
+
+/**
+ * The 56px commit button at full width, allowed to take a second line: a
+ * long label ("Під’єднати гаманець для жесту") wraps at 320px instead of
+ * running past the button's edge.
+ */
+const COMMIT_WRAP = 'h-auto w-full whitespace-normal py-2.5 text-balance @container/commit';
 const MESSAGE_COUNTER_WARN_AT = MESSAGE_MAX_LENGTH - 20;
 
 /**
@@ -148,7 +155,8 @@ function SpecRow({
   return (
     <div data-testid={testId} className="flex min-w-0 items-baseline justify-between gap-4 py-2.5">
       <dt className="type-label min-w-0 text-subtle">{label}</dt>
-      <dd className={cn('type-figure-sm min-w-0 text-end text-foreground', valueClassName)}>
+      {/* The label wraps; the figure keeps its width, so it never overflows the row. */}
+      <dd className={cn('type-figure-sm shrink-0 text-end text-foreground', valueClassName)}>
         {value}
       </dd>
     </div>
@@ -425,7 +433,8 @@ export function GesturePanel({
             <PenLine className="size-4 shrink-0 text-subtle" aria-hidden />
             <span>
               {t('form.message.add')}{' '}
-              <span className="type-caption font-normal text-subtle">
+              {/* The hint moves to its own line whole rather than breaking inside. */}
+              <span className="type-caption font-normal whitespace-nowrap text-subtle">
                 {t('form.advanced.messageOptionalHint', { maxLength: String(MESSAGE_MAX_LENGTH) })}
               </span>
             </span>
@@ -573,18 +582,23 @@ export function GesturePanel({
                 onClick={onSubmit}
                 loading={isGesturing}
                 disabled={submitUnavailable}
-                className="w-full"
+                className={COMMIT_WRAP}
               >
                 {busyLabel ?? (
-                  <span className="flex min-w-0 flex-wrap items-baseline justify-center gap-x-2">
+                  // One line with a dot where the button is wide enough; in a
+                  // phone column the verb and the price stack, so no line
+                  // ever starts on the separator.
+                  <span className="flex min-w-0 flex-col items-center leading-tight @[24rem]/commit:flex-row @[24rem]/commit:items-baseline @[24rem]/commit:gap-x-2">
                     <span>{submit.action}</span>{' '}
                     {submit.cost && (
-                      <span className="tabular-nums">
-                        <span aria-hidden className="font-normal">
-                          ·{' '}
+                      <>
+                        <span aria-hidden className="hidden font-normal @[24rem]/commit:inline">
+                          ·
                         </span>
-                        {submit.cost}
-                      </span>
+                        <span className="text-sm font-medium tabular-nums @[24rem]/commit:text-base @[24rem]/commit:font-semibold">
+                          {submit.cost}
+                        </span>
+                      </>
                     )}
                   </span>
                 )}
@@ -623,7 +637,7 @@ export function GesturePanel({
             size="xl"
             warmOnVisible
             label={t('form.connect.cta')}
-            className="w-full"
+            className={COMMIT_WRAP}
           />
           <p className="type-caption text-center text-subtle">{t('orientation.connectHelp')}</p>
         </div>

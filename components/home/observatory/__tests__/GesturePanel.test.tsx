@@ -385,7 +385,8 @@ describe('GesturePanel', () => {
     render(<GesturePanel {...baseProps} form={makeForm()} />);
 
     const submit = submitButton();
-    expect(submit).toHaveClass('bg-signature-gradient', 'w-full', 'h-14');
+    // At least 56px tall, and free to take a second line where a label is long.
+    expect(submit).toHaveClass('bg-signature-gradient', 'w-full', 'min-h-14', 'whitespace-normal');
     expect(submit).toHaveTextContent(/home\.form\.submit\.action\.eth.*0\.01.ETH/);
     await user.click(submit);
     expect(baseProps.onSubmit).toHaveBeenCalledTimes(1);
