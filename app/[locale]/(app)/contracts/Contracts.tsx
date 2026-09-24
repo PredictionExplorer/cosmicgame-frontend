@@ -216,10 +216,10 @@ const Contracts = ({ seoSummary }: { seoSummary?: ReactNode }) => {
         // gestures yet, the getter measures elapsed time from timestamp 0 and
         // returns an astronomical amount the contract never mints (a cycle's
         // first gesture mints no Participation CST) — show '--' instead.
-        const lastBidder = (await cosmicGameContract.read.lastBidderAddress?.()) as
+        const lastGesturer = (await cosmicGameContract.read.lastBidderAddress?.()) as
           | string
           | undefined;
-        if (lastBidder === zeroAddress) {
+        if (lastGesturer === zeroAddress) {
           if (!cancelled) setCstRewardAmountForBidding(null);
           return;
         }
