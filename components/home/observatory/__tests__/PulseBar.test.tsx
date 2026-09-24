@@ -99,7 +99,15 @@ describe('PulseBar', () => {
 
     rerender(<PulseBar {...baseProps} phase="final-minute" />);
     expect(screen.getByTestId('pulse-intro')).toHaveTextContent('home.deck.intro');
-    expect(screen.getByTestId('pulse-intro').className).toMatch(/max-sm:line-clamp-2/);
+  });
+
+  it('writes the standing intro to a phone’s length instead of clamping it mid-clause', () => {
+    render(<PulseBar {...baseProps} phase="live" />);
+    const intro = screen.getByTestId('pulse-intro');
+    expect(intro.className).not.toMatch(/line-clamp/);
+    expect(screen.getByTestId('pulse-intro-short')).toHaveTextContent('home.deck.introShort');
+    expect(screen.getByTestId('pulse-intro-short')).toHaveClass('sm:hidden');
+    expect(within(intro).getByText('home.deck.intro')).toHaveClass('max-sm:hidden');
   });
 
   it.each([

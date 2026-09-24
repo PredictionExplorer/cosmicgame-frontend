@@ -167,14 +167,21 @@ export function PulseBar({
       <p
         data-testid="pulse-intro"
         data-intro={intro}
-        className={cn(
-          'type-body-sm mt-2.5 max-w-[72ch] text-muted-foreground sm:col-span-2 xl:col-span-3 xl:mt-2 xl:max-w-none',
-          // The standing sentence may clamp on phones; a phase sentence is the
-          // explanation of a moment and always reads in full.
-          intro === 'default' && 'max-sm:line-clamp-2',
-        )}
+        className="type-body-sm mt-2.5 max-w-[72ch] text-muted-foreground sm:col-span-2 xl:col-span-3 xl:mt-2 xl:max-w-none"
       >
-        {intro === 'default' ? t('deck.intro') : t(`deck.introByPhase.${intro}`)}
+        {intro === 'default' ? (
+          <>
+            {/* Phones get a sentence written to their length (the form just
+                below says how to take part), never one cut off mid-clause. A
+                phase sentence explains a moment and always reads in full. */}
+            <span data-testid="pulse-intro-short" className="sm:hidden">
+              {t('deck.introShort')}
+            </span>
+            <span className="max-sm:hidden">{t('deck.intro')}</span>
+          </>
+        ) : (
+          t(`deck.introByPhase.${intro}`)
+        )}
       </p>
       {/* One set of routes: under the intro on phones, beside the H1 from sm. */}
       <div className="mt-2 flex items-center gap-3 sm:col-start-2 sm:row-start-1 sm:mt-0 xl:col-start-3">

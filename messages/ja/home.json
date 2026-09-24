@@ -528,6 +528,7 @@
   "deck": {
     "title": "Cosmic Signature観測所",
     "intro": "ETHまたはCSTで一筆を入れると最新の参加者になります。時計がゼロになると、最新の参加者がサイクルを確定してシグネチャー配分を受け取れます。",
+    "introShort": "時計がゼロになると、最新の参加者がサイクルを確定してシグネチャー配分を受け取れます。",
     "newHere": "初めてですか？仕組みを見る",
     "experimentalUi": "実験的なUI",
     "returnToCurrent": "現在のUIに戻る",
@@ -667,10 +668,9 @@
       "position": "一筆の番号",
       "challenge": {
         "title": "現在の持久保持",
-        "held": "保持",
+        "held": "これまで",
         "record": "時の戦士の記録",
-        "passesIn": "超えるまで",
-        "extendsIn": "延ばすまで"
+        "passesIn": "超えるまで"
       },
       "paid": "支払い",
       "received": "受け取り"

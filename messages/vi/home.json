@@ -528,6 +528,7 @@
   "deck": {
     "title": "Đài quan sát Cosmic Signature",
     "intro": "Đặt nét bút bằng ETH hoặc CST để trở thành người tham gia gần nhất. Khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
+    "introShort": "Khi đếm ngược về 0, người tham gia gần nhất có thể hoàn tất chu kỳ và nhận phân bổ Signature.",
     "newHere": "Mới đến đây? Cách hoạt động",
     "experimentalUi": "Giao diện thử nghiệm",
     "returnToCurrent": "Quay về giao diện hiện tại",
@@ -667,10 +668,9 @@
       "position": "Vị trí nét bút",
       "challenge": {
         "title": "Lần giữ Bền bỉ hiện tại",
-        "held": "Đã giữ",
+        "held": "Đến nay",
         "record": "Kỷ lục Chiến binh Thời gian",
-        "passesIn": "Vượt sau",
-        "extendsIn": "Nối dài sau"
+        "passesIn": "Vượt sau"
       },
       "paid": "Đã trả",
       "received": "Đã nhận"

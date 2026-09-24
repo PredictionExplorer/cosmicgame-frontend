@@ -652,9 +652,8 @@ export function StandingsLedger({
               },
               chronoChallenge.startsGrowingIn !== undefined && {
                 testId: 'chrono-challenge-next-change',
-                label: chronoChallenge.isRecordHolder
-                  ? t('ledger.challenge.extendsIn')
-                  : t('ledger.challenge.passesIn'),
+                // When the current hold passes the Chrono record, whoever holds it.
+                label: t('ledger.challenge.passesIn'),
                 seconds: chronoChallenge.startsGrowingIn,
               },
             ]

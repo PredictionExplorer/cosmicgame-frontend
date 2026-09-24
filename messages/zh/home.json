@@ -528,6 +528,7 @@
   "deck": {
     "title": "Cosmic Signature 观测台",
     "intro": "用 ETH 或 CST 落笔，成为最新落笔者。倒计时归零后，最新落笔者可收官并获得签名分配。",
+    "introShort": "倒计时归零后，最新落笔者可收官并获得签名分配。",
     "newHere": "初来乍到？了解运作方式",
     "experimentalUi": "实验界面",
     "returnToCurrent": "返回当前界面",
@@ -667,10 +668,9 @@
       "position": "落笔位置",
       "challenge": {
         "title": "当前坚守进程",
-        "held": "已坚守",
+        "held": "至今",
         "record": "时之勇士纪录",
-        "passesIn": "距超过还需",
-        "extendsIn": "距延长还需"
+        "passesIn": "距超过还需"
       },
       "paid": "支付",
       "received": "收到"
