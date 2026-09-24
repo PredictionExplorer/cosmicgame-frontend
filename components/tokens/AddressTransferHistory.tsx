@@ -25,6 +25,7 @@ import {
   ACTIVITY_DIRECTION,
   classifyTransfer,
   countByActivity,
+  movesInDirection,
   sumCstTransfers,
   transferWei,
   type TransferActivity,
@@ -43,11 +44,17 @@ interface TransferEntry {
   txHash: string;
   activity: TransferActivity;
   counterparty: string | null;
+  /** A transfer from the address to itself. */
+  self: boolean;
   /** CST in base units. */
   wei: bigint | null;
   /** The NFT moved. */
   tokenId: number | null;
 }
+
+/** +1 for what came into the address, -1 for what left it. */
+const signOf = (activity: TransferActivity): 1 | -1 =>
+  ACTIVITY_DIRECTION[activity] === 'in' ? 1 : -1;
 
 const ACTIVITY_ICONS: Record<TransferActivity, ComponentType<LucideProps>> = {
   imprinted: ImprintIcon,
@@ -146,7 +153,7 @@ export function AddressTransferHistory({
     if (!address) return [];
     return (query.data ?? []).map((row) => {
       const record = row as Record<string, unknown>;
-      const { activity, counterparty } = classifyTransfer(
+      const { activity, counterparty, self } = classifyTransfer(
         stringOrEmpty(record.FromAddr),
         stringOrEmpty(record.ToAddr),
         address,
@@ -157,6 +164,7 @@ export function AddressTransferHistory({
         txHash: stringOrEmpty(record.TxHash),
         activity,
         counterparty,
+        self,
         wei: asset === 'cst' ? transferWei(record.Value, record.ValueFloat) : null,
         tokenId: asset === 'nft' ? numberOrZero(record.TokenId) : null,
       };
@@ -164,10 +172,7 @@ export function AddressTransferHistory({
   }, [address, asset, query.data]);
 
   const shown = useMemo(
-    () =>
-      filter === 'all'
-        ? entries
-        : entries.filter((entry) => ACTIVITY_DIRECTION[entry.activity] === filter),
+    () => (filter === 'all' ? entries : entries.filter((entry) => movesInDirection(entry, filter))),
     [entries, filter],
   );
 
@@ -223,19 +228,20 @@ export function AddressTransferHistory({
           kind: 'amount',
           header: tTables('columns.amountCst'),
           unit: 'CST',
-          // Signed from this address's side, so a column of changes adds up.
+          // Signed from this address's side, so a column of changes adds up;
+          // a transfer to itself changes nothing, so it carries no sign.
           value: (entry) =>
             entry.wei === null
               ? null
-              : Number(entry.wei) * (ACTIVITY_DIRECTION[entry.activity] === 'in' ? 1 : -1),
+              : Number(entry.wei) * (entry.self ? 0 : signOf(entry.activity)),
           cell: (entry) =>
             entry.wei === null ? null : (
               <Amount
-                value={ACTIVITY_DIRECTION[entry.activity] === 'in' ? entry.wei : -entry.wei}
+                value={entry.self ? entry.wei : BigInt(signOf(entry.activity)) * entry.wei}
                 unit="CST"
                 context="table"
                 showUnit={false}
-                signDisplay="exceptZero"
+                signDisplay={entry.self ? 'never' : 'exceptZero'}
               />
             ),
           sortable: true,

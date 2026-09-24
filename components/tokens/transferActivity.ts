@@ -24,21 +24,41 @@ export interface ClassifiedTransfer {
   activity: TransferActivity;
   /** The other side of an ordinary transfer; `null` when the protocol created or consumed it. */
   counterparty: string | null;
+  /**
+   * From the address to itself: it both sent and received the amount, so
+   * the transfer counts on both sides and leaves the net unchanged.
+   */
+  self: boolean;
 }
 
 /**
  * Classifies one transfer from the point of view of `address`. A transfer
- * from the address to itself reads as sent, with itself as the counterparty.
+ * from the address to itself reads as sent, with itself as the counterparty,
+ * and is marked `self`.
  */
 export function classifyTransfer(
   from: string | null | undefined,
   to: string | null | undefined,
   address: string,
 ): ClassifiedTransfer {
-  if (isZeroAddress(from)) return { activity: 'imprinted', counterparty: null };
-  if (isZeroAddress(to)) return { activity: 'consumed', counterparty: null };
-  if (sameAddress(from, address)) return { activity: 'sent', counterparty: to ?? null };
-  return { activity: 'received', counterparty: from ?? null };
+  if (isZeroAddress(from)) return { activity: 'imprinted', counterparty: null, self: false };
+  if (isZeroAddress(to)) return { activity: 'consumed', counterparty: null, self: false };
+  if (sameAddress(from, address)) {
+    return { activity: 'sent', counterparty: to ?? null, self: sameAddress(to, address) };
+  }
+  return { activity: 'received', counterparty: from ?? null, self: false };
+}
+
+/** A classified row as the totals and the direction filter read it. */
+export interface ActivityRow {
+  activity: TransferActivity;
+  /** A transfer to itself: in and out at once (see `ClassifiedTransfer.self`). */
+  self?: boolean;
+}
+
+/** Whether a row moved value in the given direction; a self-transfer moves both ways. */
+export function movesInDirection(row: ActivityRow, direction: TransferDirection): boolean {
+  return row.self === true || ACTIVITY_DIRECTION[row.activity] === direction;
 }
 
 /**
@@ -63,12 +83,19 @@ export interface CstTransferTotals {
   net: bigint;
 }
 
-/** Sums a CST history by activity. Rows without a readable amount count as zero. */
+/**
+ * Sums a CST history by activity. Rows without a readable amount count as
+ * zero; a self-transfer counts as both received and sent.
+ */
 export function sumCstTransfers(
-  rows: readonly { activity: TransferActivity; wei: bigint | null }[],
+  rows: readonly (ActivityRow & { wei: bigint | null })[],
 ): CstTransferTotals {
   const totals = { received: 0n, imprinted: 0n, sent: 0n, consumed: 0n };
-  for (const row of rows) totals[row.activity] += row.wei ?? 0n;
+  for (const row of rows) {
+    const wei = row.wei ?? 0n;
+    totals[row.activity] += wei;
+    if (row.self) totals.received += wei;
+  }
   const incoming = totals.received + totals.imprinted;
   const outgoing = totals.sent + totals.consumed;
   // `received` and `sent` include what was imprinted and consumed: they are
@@ -82,16 +109,17 @@ export function sumCstTransfers(
   };
 }
 
-/** Counts of an address's NFT history by activity. */
-export function countByActivity(
-  rows: readonly { activity: TransferActivity }[],
-): Record<TransferActivity, number> {
+/** Counts of an address's NFT history by activity; a self-transfer counts as received and sent. */
+export function countByActivity(rows: readonly ActivityRow[]): Record<TransferActivity, number> {
   const counts: Record<TransferActivity, number> = {
     imprinted: 0,
     received: 0,
     sent: 0,
     consumed: 0,
   };
-  for (const row of rows) counts[row.activity] += 1;
+  for (const row of rows) {
+    counts[row.activity] += 1;
+    if (row.self) counts.received += 1;
+  }
   return counts;
 }
