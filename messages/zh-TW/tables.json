@@ -1,32 +1,32 @@
 {
   "empty": {
-    "gestures": "暫無落筆紀錄。",
-    "gestureHistory": "暫無落筆歷史。",
-    "participants": "暫無參與者。",
-    "recipients": "暫無獲配者。",
+    "gestures": "暫無落筆紀錄",
+    "gestureHistory": "暫無落筆歷史",
+    "participants": "暫無參與者",
+    "recipients": "暫無獲配者",
     "recipientCyclesTitle": "暫無獲配者",
     "recipientCyclesDescription": "尚無已收官的演繹週期。",
     "allocations": "暫無分配。",
     "outreachAllocations": "暫無推廣儲備分配",
     "anchorActions": "暫無錨定操作。",
-    "anchorHolders": "暫無錨定者。",
+    "anchorHolders": "暫無錨定者",
     "anchoredTokens": "暫無已錨定代幣。",
-    "contributions": "暫無貢獻紀錄。",
-    "contributors": "暫無貢獻者。",
+    "contributions": "暫無貢獻紀錄",
+    "contributors": "暫無貢獻者",
     "publicGoods": "暫無公共財活動。",
     "stellarSelection": "暫無星選分配。",
     "tokens": "暫無代幣。",
     "holders": "暫無持有者。",
     "stellarEntries": "暫無星選資格",
-    "spenders": "暫無 ETH 支出紀錄。",
-    "enduranceChampions": "暫無堅守冠軍。",
+    "spenders": "暫無 ETH 支出紀錄",
+    "enduranceChampions": "暫無堅守冠軍",
     "attachedNfts": "暫無已附加 NFT。",
     "attachedTokens": "暫無已附加代幣。",
     "systemEvents": "暫無系統事件。",
-    "modeChanges": "暫無模式變更。",
-    "events": "暫無事件。",
-    "history": "暫無紀錄。",
-    "retrievals": "暫無取回紀錄。",
+    "modeChanges": "暫無模式變更",
+    "events": "暫無事件",
+    "history": "暫無紀錄",
+    "retrievals": "暫無取回紀錄",
     "generic": "暫無資料。",
     "nothingHere": "暫無內容"
   },
@@ -81,8 +81,7 @@
     "unavailable": "暫不可用",
     "undefined": "未定義",
     "deployment": "部署",
-    "currentlyActive": "目前啟用",
-    "you": "（你）"
+    "currentlyActive": "目前啟用"
   },
   "columns": {
     "cycle": "週期",
@@ -230,16 +229,7 @@
       "anchorEth": "錨定配發（ETH）",
       "nftsAttached": "附加 NFT",
       "nftsViaStellar": "星選 NFT"
-    },
-    "cycleAria": "第 {cycle} 個週期分配摘要",
-    "explore": "檢視",
-    "exploreAria": "檢視第 {cycle} 個週期",
-    "exploreHelp": "檢視第 {cycle} 個週期的獲配者、存入和分配明細。",
-    "nfts": "NFT",
-    "stellar": "星選",
-    "anchor": "錨定",
-    "distributed": "已發放",
-    "loadingAria": "正在載入週期分配"
+    }
   },
   "anchoringRecipient": {
     "emptyTitle": "本週期沒有錨定的 NFT",
@@ -314,30 +304,6 @@
       "cst": "獲配 CST",
       "nfts": "獲配 NFT",
       "cycles": "週期數"
-    },
-    "notApplicable": "不適用",
-    "unretrievedHelp": "尚未取回，請前往「待取回分配」頁面操作。",
-    "unretrievedAria": "未取回分配說明",
-    "types": {
-      "mainEth": "主要 ETH 分配",
-      "mainCst": "主要簽名分配 CST",
-      "mainNft": "主要簽名分配 CS NFT",
-      "finalCstNft": "CST 收官之筆 CS NFT",
-      "finalCstRecognition": "CST 收官之筆（表彰 CST）",
-      "enduranceNft": "堅守冠軍 CS NFT",
-      "enduranceRecognition": "堅守冠軍表彰 CST",
-      "chronoEth": "時之勇士 ETH",
-      "chronoCst": "時之勇士 CST",
-      "chronoNft": "時之勇士 CS NFT",
-      "participantStellarEth": "參與者 ETH 星選",
-      "participantStellarCst": "參與者星選（表彰 CST）",
-      "participantStellarNft": "參與者星選（CS NFT）",
-      "anchorStellarCst": "Random Walk NFT 錨定者星選（表彰 CST）",
-      "anchorStellarNft": "Random Walk NFT 錨定者星選（CS NFT）",
-      "anchorDistributionEth": "Cosmic Signature NFT 錨定者的 ETH 錨定配發",
-      "attachedNftRetrieval": "附加 NFT（超時取回）",
-      "attachedErc20Retrieval": "附加 ERC-20（超時取回）",
-      "stellarEthRetrieval": "ETH 星選（超時取回）"
     }
   },
   "specialAllocation": {
@@ -455,24 +421,5 @@
     "systemEnded": "下一系統事件取代此事件的時間。",
     "attachedNftContractAddress": "隨落筆附加的代幣所屬 ERC-721 合約地址。",
     "attachedNftCount": "此合約中已隨落筆附加的 NFT 數量。"
-  },
-  "density": {
-    "groupLabel": "表格密度",
-    "comfortable": "舒適",
-    "compact": "緊湊",
-    "comfortableAria": "將表格密度設為舒適",
-    "compactAria": "將表格密度設為緊湊",
-    "comfortableHelp": "加高表格行並增大間距，便於瀏覽。",
-    "compactHelp": "減小表格行高，以便在螢幕上顯示更多分配紀錄。"
-  },
-  "stellarSelection": {
-    "ethDeposit": "ETH 存入",
-    "anchoredNft": "透過錨定 NFT 星選獲配的 Cosmic Signature NFT",
-    "signatureNftSelection": "Cosmic Signature NFT 星選",
-    "signatureNft": "Cosmic Signature NFT"
-  },
-  "transferHistory": {
-    "signatureAnchoringWallet": "Cosmic Signature NFT 錨定錢包",
-    "randomWalkAnchoringWallet": "Random Walk NFT 錨定錢包"
   }
 }

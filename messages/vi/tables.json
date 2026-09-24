@@ -1,32 +1,32 @@
 {
   "empty": {
-    "gestures": "Chưa có nét bút nào.",
-    "gestureHistory": "Chưa có lịch sử nét bút.",
-    "participants": "Chưa có người tham gia.",
-    "recipients": "Chưa có người nhận.",
+    "gestures": "Chưa có nét bút nào",
+    "gestureHistory": "Chưa có lịch sử nét bút",
+    "participants": "Chưa có người tham gia",
+    "recipients": "Chưa có người nhận",
     "recipientCyclesTitle": "Chưa có người nhận",
     "recipientCyclesDescription": "Chưa có chu kỳ trình diễn nào hoàn tất.",
     "allocations": "Chưa có phân bổ nào.",
     "outreachAllocations": "Chưa có phân bổ từ Dự trữ truyền thông",
     "anchorActions": "Chưa có thao tác neo giữ.",
-    "anchorHolders": "Chưa có người neo giữ.",
+    "anchorHolders": "Chưa có người neo giữ",
     "anchoredTokens": "Chưa có token đang neo giữ.",
-    "contributions": "Chưa có đóng góp nào.",
-    "contributors": "Chưa có người đóng góp.",
+    "contributions": "Chưa có đóng góp nào",
+    "contributors": "Chưa có người đóng góp",
     "publicGoods": "Chưa có hoạt động hàng hóa công.",
     "stellarSelection": "Chưa có phân bổ Tinh tuyển.",
     "tokens": "Chưa có token nào.",
     "holders": "Chưa có người nắm giữ.",
     "stellarEntries": "Chưa có lượt Tinh tuyển",
-    "spenders": "Chưa có dữ liệu chi tiêu.",
-    "enduranceChampions": "Chưa có Quán quân Bền bỉ.",
+    "spenders": "Chưa có dữ liệu chi tiêu",
+    "enduranceChampions": "Chưa có Quán quân Bền bỉ",
     "attachedNfts": "Chưa có NFT đính kèm.",
     "attachedTokens": "Chưa có token đính kèm.",
     "systemEvents": "Chưa có sự kiện hệ thống.",
-    "modeChanges": "Chưa có thay đổi chế độ.",
-    "events": "Chưa có sự kiện.",
-    "history": "Chưa có lịch sử.",
-    "retrievals": "Chưa có lần nhận về.",
+    "modeChanges": "Chưa có thay đổi chế độ",
+    "events": "Chưa có sự kiện",
+    "history": "Chưa có lịch sử",
+    "retrievals": "Chưa có lần nhận về",
     "generic": "Không có dữ liệu.",
     "nothingHere": "Chưa có gì ở đây"
   },
@@ -81,8 +81,7 @@
     "unavailable": "Không khả dụng",
     "undefined": "Chưa xác định",
     "deployment": "Triển khai",
-    "currentlyActive": "Đang hoạt động",
-    "you": "(Bạn)"
+    "currentlyActive": "Đang hoạt động"
   },
   "columns": {
     "cycle": "Chu kỳ",
@@ -230,16 +229,7 @@
       "anchorEth": "Phân phối neo giữ (ETH)",
       "nftsAttached": "NFT đính kèm",
       "nftsViaStellar": "NFT qua Tinh tuyển"
-    },
-    "cycleAria": "Tóm tắt phân bổ chu kỳ {cycle}",
-    "explore": "Khám phá",
-    "exploreAria": "Khám phá chu kỳ {cycle}",
-    "exploreHelp": "Xem người nhận, các khoản nạp và chi tiết phân bổ của chu kỳ #{cycle}.",
-    "nfts": "NFT",
-    "stellar": "Tinh tuyển",
-    "anchor": "Neo giữ",
-    "distributed": "Đã phân phối",
-    "loadingAria": "Đang tải các chu kỳ phân bổ"
+    }
   },
   "anchoringRecipient": {
     "emptyTitle": "Chu kỳ này không có NFT được neo giữ",
@@ -314,30 +304,6 @@
       "cst": "CST đã nhận",
       "nfts": "NFT đã nhận",
       "cycles": "Chu kỳ"
-    },
-    "notApplicable": "Không áp dụng",
-    "unretrievedHelp": "Chưa nhận về, hãy vào Phân bổ đang chờ để nhận về.",
-    "unretrievedAria": "Thông tin phân bổ chưa nhận về",
-    "types": {
-      "mainEth": "Phân bổ ETH chính",
-      "mainCst": "CST phân bổ Signature chính",
-      "mainNft": "CS NFT phân bổ Signature chính",
-      "finalCstNft": "CS NFT nét bút CST cuối cùng",
-      "finalCstRecognition": "CST ghi nhận nét bút CST cuối cùng",
-      "enduranceNft": "CS NFT Quán quân Bền bỉ",
-      "enduranceRecognition": "CST ghi nhận Quán quân Bền bỉ",
-      "chronoEth": "ETH Chiến binh Thời gian",
-      "chronoCst": "CST Chiến binh Thời gian",
-      "chronoNft": "CS NFT Chiến binh Thời gian",
-      "participantStellarEth": "ETH Tinh tuyển (dành cho người tham gia)",
-      "participantStellarCst": "CST ghi nhận từ Tinh tuyển (dành cho người tham gia)",
-      "participantStellarNft": "CS NFT Tinh tuyển (dành cho người tham gia)",
-      "anchorStellarCst": "CST ghi nhận từ Tinh tuyển NFT neo giữ (dành cho người neo giữ RandomWalk)",
-      "anchorStellarNft": "CS NFT Tinh tuyển (dành cho người neo giữ RandomWalk)",
-      "anchorDistributionEth": "ETH phân phối neo giữ (dành cho người neo giữ Cosmic Signature NFT)",
-      "attachedNftRetrieval": "NFT đính kèm (nhận về sau thời hạn)",
-      "attachedErc20Retrieval": "ERC-20 đính kèm (nhận về sau thời hạn)",
-      "stellarEthRetrieval": "ETH Tinh tuyển (nhận về sau thời hạn)"
     }
   },
   "specialAllocation": {
@@ -455,24 +421,5 @@
     "systemEnded": "Dấu thời gian khi sự kiện hệ thống tiếp theo thay thế sự kiện này.",
     "attachedNftContractAddress": "Địa chỉ hợp đồng ERC-721 của các token đính kèm vào nét bút.",
     "attachedNftCount": "Số NFT từ hợp đồng này đã được đính kèm vào nét bút."
-  },
-  "density": {
-    "groupLabel": "Mật độ hàng",
-    "comfortable": "thoáng",
-    "compact": "gọn",
-    "comfortableAria": "Mật độ hàng thoáng",
-    "compactAria": "Mật độ hàng gọn",
-    "comfortableHelp": "Dùng hàng cao hơn với nhiều khoảng cách để dễ đọc lướt.",
-    "compactHelp": "Dùng hàng thấp hơn để hiển thị nhiều bản ghi phân bổ hơn trên màn hình."
-  },
-  "stellarSelection": {
-    "ethDeposit": "Khoản nạp ETH",
-    "anchoredNft": "Cosmic Signature NFT từ Tinh tuyển NFT neo giữ",
-    "signatureNftSelection": "Tinh tuyển Cosmic Signature NFT",
-    "signatureNft": "Cosmic Signature NFT"
-  },
-  "transferHistory": {
-    "signatureAnchoringWallet": "Ví neo giữ Cosmic Signature NFT",
-    "randomWalkAnchoringWallet": "Ví neo giữ RandomWalk NFT"
   }
 }

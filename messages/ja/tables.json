@@ -1,32 +1,32 @@
 {
   "empty": {
-    "gestures": "一筆はまだありません。",
-    "gestureHistory": "一筆の履歴はまだありません。",
-    "participants": "参加者はまだいません。",
-    "recipients": "受領者はまだいません。",
+    "gestures": "一筆はまだありません",
+    "gestureHistory": "一筆の履歴はまだありません",
+    "participants": "参加者はまだいません",
+    "recipients": "受領者はまだいません",
     "recipientCyclesTitle": "受領者はまだいません",
     "recipientCyclesDescription": "確定したパフォーマンス・サイクルはまだありません。",
     "allocations": "配分はまだありません。",
     "outreachAllocations": "広報準備金の配分はまだありません",
     "anchorActions": "係留操作はまだありません。",
-    "anchorHolders": "係留者はまだいません。",
+    "anchorHolders": "係留者はまだいません",
     "anchoredTokens": "係留中のトークンはまだありません。",
-    "contributions": "拠出はまだありません。",
-    "contributors": "拠出者はまだいません。",
+    "contributions": "拠出はまだありません",
+    "contributors": "拠出者はまだいません",
     "publicGoods": "公共財の活動はまだありません。",
     "stellarSelection": "星選の配分はまだありません。",
     "tokens": "トークンはまだありません。",
     "holders": "保有者はまだいません。",
     "stellarEntries": "星選の対象はまだありません",
-    "spenders": "支出者はまだいません。",
-    "enduranceChampions": "持久チャンピオンはまだいません。",
+    "spenders": "支出者はまだいません",
+    "enduranceChampions": "持久チャンピオンはまだいません",
     "attachedNfts": "添付されたNFTはまだありません。",
     "attachedTokens": "添付されたトークンはまだありません。",
     "systemEvents": "システムイベントはまだありません。",
-    "modeChanges": "モードの変更はまだありません。",
-    "events": "イベントはまだありません。",
-    "history": "履歴はまだありません。",
-    "retrievals": "受け取りはまだありません。",
+    "modeChanges": "モードの変更はまだありません",
+    "events": "イベントはまだありません",
+    "history": "履歴はまだありません",
+    "retrievals": "受け取りはまだありません",
     "generic": "データがありません。",
     "nothingHere": "まだ何もありません"
   },
@@ -81,8 +81,7 @@
     "unavailable": "取得不可",
     "undefined": "未定義",
     "deployment": "デプロイ",
-    "currentlyActive": "現在有効",
-    "you": "（自分）"
+    "currentlyActive": "現在有効"
   },
   "columns": {
     "cycle": "サイクル",
@@ -230,16 +229,7 @@
       "anchorEth": "係留配分（ETH）",
       "nftsAttached": "添付されたNFT",
       "nftsViaStellar": "星選によるNFT"
-    },
-    "cycleAria": "サイクル{cycle}の配分の要約",
-    "explore": "探索",
-    "exploreAria": "サイクル{cycle}を探索",
-    "exploreHelp": "サイクル{cycle}の受領者、積立、配分の詳細を見ます。",
-    "nfts": "NFT",
-    "stellar": "星選",
-    "anchor": "係留",
-    "distributed": "配付済み",
-    "loadingAria": "配分サイクルを読み込み中"
+    }
   },
   "anchoringRecipient": {
     "emptyTitle": "このサイクルに係留されたNFTはありません",
@@ -314,30 +304,6 @@
       "cst": "受領したCST",
       "nfts": "受領したNFT",
       "cycles": "サイクル数"
-    },
-    "notApplicable": "該当なし",
-    "unretrievedHelp": "未受け取りです。自分の配分から受け取ってください。",
-    "unretrievedAria": "未受け取りの配分の情報",
-    "types": {
-      "mainEth": "主ETH配分",
-      "mainCst": "主シグネチャー配分CST",
-      "mainNft": "主シグネチャー配分CS NFT",
-      "finalCstNft": "最後のCST一筆CS NFT",
-      "finalCstRecognition": "最後のCST一筆 功労CST",
-      "enduranceNft": "持久チャンピオンCS NFT",
-      "enduranceRecognition": "持久チャンピオン 功労CST",
-      "chronoEth": "時の戦士ETH",
-      "chronoCst": "時の戦士CST",
-      "chronoNft": "時の戦士CS NFT",
-      "participantStellarEth": "ETH星選（参加者向け）",
-      "participantStellarCst": "星選からの功労CST（参加者向け）",
-      "participantStellarNft": "CS NFT星選（参加者向け）",
-      "anchorStellarCst": "係留NFT星選からの功労CST（RandomWalk係留者向け）",
-      "anchorStellarNft": "CS NFT星選（RandomWalk係留者向け）",
-      "anchorDistributionEth": "係留配分ETH（Cosmic Signature NFT係留者向け）",
-      "attachedNftRetrieval": "添付されたNFT（タイムアウト後の受け取り）",
-      "attachedErc20Retrieval": "添付されたERC-20（タイムアウト後の受け取り）",
-      "stellarEthRetrieval": "ETH星選（タイムアウト後の受け取り）"
     }
   },
   "specialAllocation": {
@@ -455,24 +421,5 @@
     "systemEnded": "次のシステムイベントがこれに置き換わった時刻。",
     "attachedNftContractAddress": "一筆に添付されたトークンのERC-721コントラクトアドレス。",
     "attachedNftCount": "このコントラクトのNFTのうち、一筆に添付されたものの数。"
-  },
-  "density": {
-    "groupLabel": "行の密度",
-    "comfortable": "ゆったり",
-    "compact": "コンパクト",
-    "comfortableAria": "ゆったりした行の密度",
-    "compactAria": "コンパクトな行の密度",
-    "comfortableHelp": "行を高くして余白を広げ、見やすくします。",
-    "compactHelp": "行を低くして、より多くの配分記録を画面に収めます。"
-  },
-  "stellarSelection": {
-    "ethDeposit": "ETH積立",
-    "anchoredNft": "係留NFT星選のCosmic Signature NFT",
-    "signatureNftSelection": "Cosmic Signature NFT星選",
-    "signatureNft": "Cosmic Signature NFT"
-  },
-  "transferHistory": {
-    "signatureAnchoringWallet": "Cosmic Signature NFT係留ウォレット",
-    "randomWalkAnchoringWallet": "RandomWalk NFT係留ウォレット"
   }
 }
