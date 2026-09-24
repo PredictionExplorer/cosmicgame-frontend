@@ -65,11 +65,11 @@ describe('BanGestureTable', () => {
     expect(screen.getAllByText('ETH').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders gesture type RWLK for GestureType 1', async () => {
+  it('renders gesture type ETH + RWLK for GestureType 1', async () => {
     await act(async () => {
       render(<BanGestureTable gestureHistory={[createGestureHistory({ GestureType: 1 })]} />);
     });
-    expect(screen.getAllByText('RWLK').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('ETH + RWLK').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders gesture type CST for GestureType 2', async () => {
@@ -231,6 +231,69 @@ describe('BanGestureTable', () => {
       }),
     );
     expect(reportError).toHaveBeenCalledWith(error, 'ban gesture');
+  });
+
+  it('reviews 25 messages a page instead of all of them at once', async () => {
+    const list = Array.from({ length: 60 }, (_, i) =>
+      createGestureHistory({ EvtLogId: i + 1, Message: `Message ${i + 1}` }),
+    );
+    let container: HTMLElement;
+    await act(async () => {
+      container = render(<BanGestureTable gestureHistory={list} />).container;
+    });
+    expect(container!.querySelectorAll('tbody tr')).toHaveLength(25);
+    expect(screen.getByText('tables.pagination.range(from=1,to=25,total=60)')).toBeInTheDocument();
+  });
+
+  it('filters to hidden messages and marks them', async () => {
+    const user = userEvent.setup();
+    mockGetBannedGestures.mockResolvedValue([{ bid_id: 2 }]);
+    const list = [
+      createGestureHistory({ EvtLogId: 1, Message: 'Kept' }),
+      createGestureHistory({ EvtLogId: 2, Message: 'Hidden one' }),
+    ];
+    render(<BanGestureTable gestureHistory={list} />);
+    await screen.findByRole('button', { name: 'tables.banGesture.unban' });
+
+    await user.click(screen.getByRole('button', { name: /tables\.banGesture\.filters\.hidden/ }));
+
+    expect(screen.queryByText('Kept')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Hidden one').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('tables.banGesture.hiddenTag')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /tables\.banGesture\.filters\.hidden/ }),
+    ).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('searches message text and says when nothing matches', async () => {
+    const user = userEvent.setup();
+    const list = [
+      createGestureHistory({ EvtLogId: 1, Message: 'Hello world' }),
+      createGestureHistory({ EvtLogId: 2, Message: 'Something else' }),
+    ];
+    render(<BanGestureTable gestureHistory={list} />);
+    const search = screen.getByRole('searchbox', { name: 'tables.banGesture.search' });
+
+    await user.type(search, 'hello');
+    expect(screen.queryByText('Something else')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Hello world').length).toBeGreaterThanOrEqual(1);
+
+    await user.clear(search);
+    await user.type(search, 'nothing like this');
+    expect(screen.getByText('tables.banGesture.noMatches')).toBeInTheDocument();
+    // The filters stay, so the moderator can clear them.
+    expect(screen.getByRole('searchbox', { name: 'tables.banGesture.search' })).toBeInTheDocument();
+  });
+
+  it('shows the moderation list without row tints', async () => {
+    let container: HTMLElement;
+    await act(async () => {
+      container = render(
+        <BanGestureTable gestureHistory={[createGestureHistory({ GestureType: 2 })]} />,
+      ).container;
+    });
+    const row = container!.querySelector('tbody tr');
+    expect(row?.className).not.toMatch(/bg-(teal|gray|black)/);
   });
 
   it('has no accessibility violations', async () => {

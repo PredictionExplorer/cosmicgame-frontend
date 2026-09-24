@@ -80,7 +80,6 @@ const FIXED_DECIMAL_BASELINE: Readonly<Record<string, number>> = {
   'components/statistics/RoiLeaderboardSection.tsx': 4,
   'components/tables/AllocationTable.tsx': 3,
   'components/tables/ETHSpentTable.tsx': 1,
-  'components/tables/GestureHistoryTable.tsx': 2,
   'components/tables/RecipientHistoryTable.tsx': 2,
   'components/tables/StellarSelectionHolderTable.tsx': 2,
   'components/tables/StellarSelectionRecipientTable.tsx': 1,

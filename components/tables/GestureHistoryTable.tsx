@@ -1,26 +1,21 @@
-import { useEffect, useState } from 'react';
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
-import { shortenHex, formatSeconds, getRWLKImageUrl, getExplorerUrl } from '@/utils';
+import { getRWLKImageUrl, getExplorerUrl } from '@/utils';
 import ERC20_ABI from '@/contracts/CosmicToken.json';
 
-import { Link, useRouter } from '@/i18n/navigation';
-import { HydrationSafeDateTime } from '@/components/common/HydrationSafeDateTime';
-import { TABLE_ROW_LINK_CLASS } from '@/components/ui/responsive-table';
+import { formatAddress, type AmountUnit } from '@/utils/format';
+import { Amount } from '@/components/ui/amount';
+import { DataTable, ExternalTableLink, type DataTableColumn } from '@/components/ui/data-table';
+import { Duration } from '@/components/ui/duration';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-  TablePrimaryContainer,
-  TablePrimaryBody,
-  TablePrimaryCell,
-  TablePrimaryHead,
-  TablePrimaryRow,
-  TablePrimaryHeadCell,
-  TablePrimary,
-} from '@/components/styled';
-import { CustomPagination } from '@/components/common/CustomPagination';
+import { GestureMethodTag, resolveGestureType } from '@/components/tables/GestureMethodTag';
+import type { LedgerStateProps } from '@/components/tables/ledger-props';
 import { useBannedGestures } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 
@@ -40,286 +35,270 @@ interface GestureHistory {
   Message?: string;
 }
 
-interface HistoryRowProps {
-  history: GestureHistory;
-  isBanned: boolean;
-  showRound: boolean;
-  gestureDuration: number;
-}
-
-interface HistoryTableProps {
+interface GestureHistoryTableProps extends LedgerStateProps {
   gestureHistory: GestureHistory[];
-  perPage: number;
-  curPage: number;
-  showRound: boolean;
-  nowSec: number;
-}
-
-interface GestureHistoryTableProps {
-  gestureHistory: GestureHistory[];
+  /** Show each gesture's cycle; a page about one cycle hides it. Default `true`. */
   showRound?: boolean;
 }
 
-const gestureTypeStyles: Record<number, string> = {
-  2: 'rgba(0,128,128, 0.1)',
-  1: 'rgba(128,128,128, 0.1)',
-  0: 'rgba(0,0,0, 0.1)',
-};
+const CST_GESTURE = 2;
+const RANDOM_WALK_GESTURE = 1;
 
-const gestureTypeLabels: Record<number, string> = {
-  2: 'CST',
-  1: 'RWLK',
-  0: 'ETH',
-};
-
-function resolveGestureType(history: GestureHistory): number | undefined {
-  if (typeof history.GestureType === 'number') return history.GestureType;
-  const backendGestureType = (history as GestureHistory & { BidType?: number }).BidType;
-  return typeof backendGestureType === 'number' ? backendGestureType : undefined;
+function hasGestureInfo(gesture: GestureHistory): boolean {
+  return (
+    (resolveGestureType(gesture) === RANDOM_WALK_GESTURE && Boolean(gesture.RWalkNFTId)) ||
+    Boolean(gesture.NFTDonationTokenAddr) ||
+    Boolean(gesture.DonatedERC20TokenAddr)
+  );
 }
 
-function formatGestureCostAmount(amount: number | undefined): string {
-  if (amount == null || amount < 0) return '—';
-  return amount < 1 ? amount.toFixed(7) : amount.toFixed(4);
-}
-
-const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRowProps) => {
-  const t = useTranslations('tables');
-  const locale = useLocale();
-  const router = useRouter();
+/** Reads an attached ERC-20's symbol and decimals from its contract. */
+function useErc20Meta(tokenAddr: string | undefined) {
   const publicClient = usePublicClient();
-  const [symbol, setSymbol] = useState('');
-  const [decimals, setDecimals] = useState(18);
-
-  const tokenAddr = history.DonatedERC20TokenAddr;
+  const [meta, setMeta] = useState<{ symbol: string; decimals: number } | null>(null);
 
   useEffect(() => {
     if (!tokenAddr || !publicClient) return;
-
     let cancelled = false;
     const read = { address: tokenAddr as `0x${string}`, abi: ERC20_ABI } as const;
-
     Promise.all([
       publicClient.readContract({ ...read, functionName: 'symbol' }),
       publicClient.readContract({ ...read, functionName: 'decimals' }),
     ])
-      .then(([sym, dec]) => {
+      .then(([symbol, decimals]) => {
         if (cancelled) return;
-        setSymbol(String(sym));
-        const parsed = Number(dec);
-        setDecimals(Number.isFinite(parsed) ? parsed : 18);
+        const parsed = Number(decimals);
+        setMeta({ symbol: String(symbol), decimals: Number.isFinite(parsed) ? parsed : 18 });
       })
       .catch(() => {
-        // A missing or non-standard ERC-20 leaves the amount unlabelled rather
-        // than breaking the row.
+        // A missing or non-standard ERC-20 leaves the amount unlabelled
+        // rather than breaking the row.
       });
-
     return () => {
       cancelled = true;
     };
   }, [tokenAddr, publicClient]);
 
-  const handleRowClick = () => {
-    router.push(`/gesture/${history.EvtLogId}`);
-  };
+  return meta;
+}
 
-  if (!history) return <TablePrimaryRow />;
-
-  const gestureType = resolveGestureType(history);
-  const backgroundStyle =
-    (gestureType !== undefined && gestureTypeStyles[gestureType]) || 'rgba(0,0,0,0.1)';
-  const gestureTypeLabel =
-    (gestureType !== undefined && gestureTypeLabels[gestureType]) || t('status.unknown');
-
-  const price =
-    gestureType === 2
-      ? `${formatGestureCostAmount(history.CstPriceEth)} CST`
-      : `${formatGestureCostAmount(history.EthPriceEth)} ETH`;
-
-  return (
-    <TablePrimaryRow style={{ background: backgroundStyle }} onActivate={handleRowClick}>
-      <TablePrimaryCell label={t('columns.datetime')}>
-        <Link
-          href={`/gesture/${history.EvtLogId}`}
-          className={TABLE_ROW_LINK_CLASS}
-          aria-label={t('gestureHistory.viewGesture', { id: history.EvtLogId })}
-        >
-          <HydrationSafeDateTime timestamp={history.TimeStamp} showSecond locale={locale} />
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.participant')}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="font-mono break-all">{shortenHex(history.BidderAddr, 6)}</span>
-          </TooltipTrigger>
-          <TooltipContent>{history.BidderAddr}</TooltipContent>
-        </Tooltip>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.gestureCost')} align="right">
-        {price}
-      </TablePrimaryCell>
-      {showRound && (
-        <TablePrimaryCell label={t('columns.cycle')} align="center">
-          {history.RoundNum}
-        </TablePrimaryCell>
-      )}
-      <TablePrimaryCell label={t('columns.gestureType')} align="center">
-        {gestureTypeLabel}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.gestureDuration')} align="center">
-        {formatSeconds(gestureDuration, locale)}
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.gestureInfo')}>
-        <span className="break-words">
-          {gestureType === 1 && history.RWalkNFTId && (
-            <>
-              {t('gestureHistory.randomWalkGesture', { id: history.RWalkNFTId })}
-              <Image
-                src={getRWLKImageUrl(history.RWalkNFTId.toString().padStart(6, '0'))}
-                width={32}
-                height={32}
-                className="align-middle inline"
-                alt={t('gestureHistory.randomWalkImageAlt')}
-                unoptimized
-              />
-            </>
-          )}
-          {(!!history.NFTDonationTokenAddr || !!history.DonatedERC20TokenAddr) && (
-            <>
-              {gestureType === 2 && t('gestureHistory.cstGesture')}
-              {gestureType === 0 && t('gestureHistory.ethGesture')}
-              {!!history.NFTDonationTokenAddr &&
-                t('gestureHistory.nftAttached', {
-                  address: shortenHex(history.NFTDonationTokenAddr, 6),
-                  id: String(history.NFTDonationTokenId),
-                })}
-              {!!history.DonatedERC20TokenAddr && (
-                <>
-                  {t('gestureHistory.erc20AttachedPrefix', {
-                    amount: formatUnits(BigInt(history.DonatedERC20TokenAmount || '0'), decimals),
-                  })}{' '}
-                  <a
-                    href={getExplorerUrl('token', history.DonatedERC20TokenAddr)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-inherit"
-                  >
-                    {symbol}
-                  </a>
-                  {t('gestureHistory.attachedSuffix')}
-                </>
-              )}
-            </>
-          )}{' '}
-        </span>
-      </TablePrimaryCell>
-      <TablePrimaryCell label={t('columns.message')}>
-        {!isBanned && history.Message ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {/*
-               * On a phone the message wraps in full: the desktop ellipsis hid
-               * it behind a hover tooltip that touch users can never open,
-               * because tapping the row navigates to the gesture instead.
-               */}
-              <span className="block break-words sm:max-w-[18rem] sm:truncate">
-                {history.Message}
-              </span>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-[min(20rem,90vw)] break-words">
-              {history.Message}
-            </TooltipContent>
-          </Tooltip>
-        ) : null}
-      </TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-};
-
-const HistoryTable = ({
-  gestureHistory,
-  perPage,
-  curPage,
-  showRound,
-  nowSec,
-}: HistoryTableProps) => {
+/** What else the gesture carried: a Random Walk NFT, an attached NFT or ERC-20. */
+function GestureInfo({ gesture }: { gesture: GestureHistory }) {
   const t = useTranslations('tables');
-  const { data: bannedBids } = useBannedGestures();
-  const bannedList = bannedBids?.map((x: { bid_id: number }) => x.bid_id) ?? [];
-
-  const displayedGestures = gestureHistory.slice((curPage - 1) * perPage, curPage * perPage);
+  const erc20 = useErc20Meta(gesture.DonatedERC20TokenAddr);
+  const gestureType = resolveGestureType(gesture);
 
   return (
-    <TablePrimaryContainer label={t('gestureHistory.tableLabel')}>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <tr>
-            <TablePrimaryHeadCell align="left">{t('columns.datetime')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">{t('columns.participant')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">{t('columns.gestureCost')}</TablePrimaryHeadCell>
-            {showRound && (
-              <TablePrimaryHeadCell align="center">{t('columns.cycle')}</TablePrimaryHeadCell>
-            )}
-            <TablePrimaryHeadCell align="center">{t('columns.gestureType')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="center">
-              {t('columns.gestureDuration')}
-            </TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">{t('columns.gestureInfo')}</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">{t('columns.message')}</TablePrimaryHeadCell>
-          </tr>
-        </TablePrimaryHead>
-        <TablePrimaryBody>
-          {displayedGestures.map((history, index) => {
-            const gestureDuration =
-              (curPage - 1) * perPage + index === 0
-                ? nowSec - history.TimeStamp
-                : (gestureHistory[(curPage - 1) * perPage + index - 1]?.TimeStamp ??
-                    history.TimeStamp) - history.TimeStamp;
-
-            return (
-              <HistoryRow
-                history={history}
-                key={history.EvtLogId}
-                isBanned={bannedList.includes(history.EvtLogId)}
-                showRound={showRound}
-                gestureDuration={gestureDuration}
-              />
-            );
-          })}
-        </TablePrimaryBody>
-      </TablePrimary>
-    </TablePrimaryContainer>
-  );
-};
-
-const GestureHistoryTable = ({ gestureHistory, showRound = true }: GestureHistoryTableProps) => {
-  const t = useTranslations('tables');
-  const perPage = 5;
-  const [curPage, setCurrentPage] = useState(1);
-  const nowSec = Math.floor(useNow(1000) / 1000);
-
-  return (
-    <div className="mt-4">
-      {gestureHistory.length > 0 ? (
+    <span className="break-words">
+      {gestureType === RANDOM_WALK_GESTURE && gesture.RWalkNFTId ? (
         <>
-          <HistoryTable
-            gestureHistory={gestureHistory}
-            perPage={perPage}
-            curPage={curPage}
-            showRound={showRound}
-            nowSec={nowSec}
-          />
-          <CustomPagination
-            page={curPage}
-            setPage={setCurrentPage}
-            totalLength={gestureHistory.length}
-            perPage={perPage}
+          {t('gestureHistory.randomWalkGesture', { id: gesture.RWalkNFTId })}{' '}
+          <Image
+            src={getRWLKImageUrl(gesture.RWalkNFTId.toString().padStart(6, '0'))}
+            width={32}
+            height={32}
+            className="inline rounded-edge align-middle"
+            alt={t('gestureHistory.randomWalkImageAlt')}
+            unoptimized
           />
         </>
-      ) : (
-        <p>{t('empty.gestures')}</p>
-      )}
-    </div>
+      ) : null}
+      {gesture.NFTDonationTokenAddr || gesture.DonatedERC20TokenAddr ? (
+        <>
+          {gestureType === CST_GESTURE && t('gestureHistory.cstGesture')}
+          {gestureType === 0 && t('gestureHistory.ethGesture')}
+          {gesture.NFTDonationTokenAddr
+            ? t('gestureHistory.nftAttached', {
+                address: formatAddress(gesture.NFTDonationTokenAddr),
+                id: String(gesture.NFTDonationTokenId),
+              })
+            : null}
+          {gesture.DonatedERC20TokenAddr ? (
+            <>
+              {t('gestureHistory.erc20AttachedPrefix', {
+                amount: formatUnits(
+                  BigInt(gesture.DonatedERC20TokenAmount || '0'),
+                  erc20?.decimals ?? 18,
+                ),
+              })}{' '}
+              <ExternalTableLink href={getExplorerUrl('token', gesture.DonatedERC20TokenAddr)}>
+                {erc20?.symbol ?? formatAddress(gesture.DonatedERC20TokenAddr)}
+              </ExternalTableLink>
+              {t('gestureHistory.attachedSuffix')}
+            </>
+          ) : null}
+        </>
+      ) : null}
+    </span>
+  );
+}
+
+/**
+ * The latest gesture's hold, which keeps growing until the next gesture. It
+ * ticks in its own cell, so the rest of the table does not re-render every
+ * second, and shows nothing until the browser clock is known rather than a
+ * confident "0s".
+ */
+function GrowingDuration({ since }: { since: number }) {
+  const nowMs = useNow(1000);
+  if (nowMs <= 0) return null;
+  return <Duration seconds={Math.floor(nowMs / 1000) - since} />;
+}
+
+/**
+ * A cycle's (or a participant's) gestures, newest first: when (leading to the
+ * gesture's page), who, what it cost and how, how long it held the lead,
+ * and what it carried. The info and message columns appear only when some
+ * gesture has one.
+ */
+const GestureHistoryTable = ({
+  gestureHistory,
+  showRound = true,
+  ...state
+}: GestureHistoryTableProps) => {
+  const t = useTranslations('tables');
+  const { data: bannedGestures } = useBannedGestures();
+
+  const banned = useMemo(
+    () => new Set((bannedGestures ?? []).map((entry: { bid_id: number }) => entry.bid_id)),
+    [bannedGestures],
+  );
+
+  // How long each gesture stayed the latest one: until the next gesture in
+  // the list (which is newest first). The newest is still holding.
+  const holds = useMemo(() => {
+    const byId = new Map<number, number | null>();
+    gestureHistory.forEach((gesture, index) => {
+      const next = gestureHistory[index - 1];
+      byId.set(gesture.EvtLogId, next ? next.TimeStamp - gesture.TimeStamp : null);
+    });
+    return byId;
+  }, [gestureHistory]);
+
+  const columns = useMemo<DataTableColumn<GestureHistory>[]>(() => {
+    const cost = (gesture: GestureHistory) =>
+      resolveGestureType(gesture) === CST_GESTURE ? gesture.CstPriceEth : gesture.EthPriceEth;
+    const costUnit = (gesture: GestureHistory): AmountUnit =>
+      resolveGestureType(gesture) === CST_GESTURE ? 'CST' : 'ETH';
+
+    const all: (DataTableColumn<GestureHistory> | false)[] = [
+      {
+        id: 'datetime',
+        kind: 'datetime',
+        header: t('columns.datetime'),
+        value: (gesture) => gesture.TimeStamp,
+        seconds: true,
+        sortable: true,
+      },
+      {
+        id: 'participant',
+        kind: 'address',
+        header: t('columns.participant'),
+        value: (gesture) => gesture.BidderAddr,
+      },
+      {
+        id: 'cost',
+        kind: 'amount',
+        header: t('columns.gestureCost'),
+        value: (gesture) => {
+          const amount = cost(gesture);
+          return amount != null && amount >= 0 ? amount : null;
+        },
+        cell: (gesture, { value }) =>
+          value == null ? null : (
+            <Amount
+              value={value as number}
+              unit={costUnit(gesture)}
+              context="table"
+              unitClassName="text-subtle"
+            />
+          ),
+        sortable: true,
+      },
+      showRound && {
+        id: 'cycle',
+        kind: 'link',
+        header: t('columns.cycle'),
+        value: (gesture) => gesture.RoundNum,
+        href: (gesture) => (gesture.RoundNum == null ? null : `/allocation/${gesture.RoundNum}`),
+      },
+      {
+        id: 'type',
+        kind: 'text',
+        header: t('columns.gestureType'),
+        value: (gesture) => resolveGestureType(gesture),
+        cell: (gesture) => (
+          <GestureMethodTag
+            gestureType={resolveGestureType(gesture)}
+            unknownLabel={t('status.unknown')}
+          />
+        ),
+      },
+      {
+        id: 'hold',
+        kind: 'duration',
+        header: t('columns.gestureDuration'),
+        value: (gesture) => holds.get(gesture.EvtLogId) ?? Number.POSITIVE_INFINITY,
+        cell: (gesture) => {
+          const hold = holds.get(gesture.EvtLogId);
+          return hold == null ? (
+            <GrowingDuration since={gesture.TimeStamp} />
+          ) : (
+            <Duration seconds={hold} />
+          );
+        },
+        sortable: true,
+      },
+      {
+        id: 'info',
+        kind: 'text',
+        header: t('columns.gestureInfo'),
+        value: (gesture) => (hasGestureInfo(gesture) ? gesture.EvtLogId : null),
+        cell: (gesture) => (hasGestureInfo(gesture) ? <GestureInfo gesture={gesture} /> : null),
+        hideWhenEmpty: true,
+        stack: true,
+      },
+      {
+        id: 'message',
+        kind: 'text',
+        header: t('columns.message'),
+        value: (gesture) =>
+          !banned.has(gesture.EvtLogId) && gesture.Message ? gesture.Message : null,
+        cell: (_gesture, { value }) =>
+          value ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {/*
+                 * On a phone the message wraps in full: a hover tooltip never
+                 * opens on touch, and tapping the row opens the gesture.
+                 */}
+                <span className="block break-words sm:max-w-[18rem] sm:truncate">
+                  {String(value)}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[min(20rem,90vw)] break-words">
+                {String(value)}
+              </TooltipContent>
+            </Tooltip>
+          ) : null,
+        hideWhenEmpty: true,
+        stack: true,
+      },
+    ];
+    return all.filter((column): column is DataTableColumn<GestureHistory> => Boolean(column));
+  }, [t, showRound, holds, banned]);
+
+  return (
+    <DataTable
+      data={gestureHistory}
+      columns={columns}
+      ariaLabel={t('gestureHistory.tableLabel')}
+      getRowKey={(gesture) => gesture.EvtLogId}
+      getRowHref={(gesture) => `/gesture/${gesture.EvtLogId}`}
+      getRowLabel={(gesture) => t('gestureHistory.viewGesture', { id: gesture.EvtLogId })}
+      emptyTitle={t('empty.gestures')}
+      {...state}
+    />
   );
 };
 
